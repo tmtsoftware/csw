@@ -33,6 +33,7 @@ import scala.runtime.BoxedUnit;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
+import static csw.common.components.command.ComponentStateForCommand.failureAfterValidationCmd;
 import static csw.common.components.command.ComponentStateForCommand.immediateCmd;
 import static csw.common.components.command.ComponentStateForCommand.immediateResCmd;
 import static csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand;
@@ -68,7 +69,8 @@ public class JSampleComponentHandlers extends JComponentHandlers<JTopLevelActorD
         log.debug("Initializing Sample component");
         try {
             Thread.sleep(100);
-        } catch (InterruptedException ignored) {}
+        } catch (InterruptedException ignored) {
+        }
         return CompletableFuture.supplyAsync(() -> {
             CurrentState initState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.initChoice()));
             Publish<CurrentState> publish = new Publish<>(initState);
@@ -114,14 +116,16 @@ public class JSampleComponentHandlers extends JComponentHandlers<JTopLevelActorD
         Publish<CurrentState> publish = new Publish<>(submitState);
         pubSubRef.tell(publish);
 
-        if (controlCommand.commandName().name().contains("failure")) {
-            return new Invalid(controlCommand.runId(), new CommandIssue.OtherIssue("Testing: Received failure, will return Invalid."));
-        } else if(controlCommand.commandName().equals(immediateCmd())) {
-          return new Completed(controlCommand.runId());
-        } else if(controlCommand.commandName().equals(immediateResCmd())) {
+        if (controlCommand.commandName().equals(immediateCmd())) {
+            return new Completed(controlCommand.runId());
+        } else if (controlCommand.commandName().equals(immediateResCmd())) {
             Parameter<Integer> param = JKeyTypes.IntKey().make("encoder").set(22);
             Result result = new Result(controlCommand.source().prefix()).add(param);
             return new CompletedWithResult(controlCommand.runId(), result);
+        } else if (controlCommand.commandName().equals(failureAfterValidationCmd())) {
+            return new Accepted(controlCommand.runId());
+        } else if (controlCommand.commandName().name().contains("failure")) {
+            return new Invalid(controlCommand.runId(), new CommandIssue.OtherIssue("Testing: Received failure, will return Invalid."));
         } else {
             return new Accepted(controlCommand.runId());
         }
@@ -129,9 +133,9 @@ public class JSampleComponentHandlers extends JComponentHandlers<JTopLevelActorD
 
     private void processCommand(ControlCommand controlCommand) {
         publishCurrentState(controlCommand);
-        if(controlCommand.commandName().equals(ComponentStateForCommand.matcherCmd()))
+        if (controlCommand.commandName().equals(ComponentStateForCommand.matcherCmd()))
             processCommandWithMatcher(controlCommand);
-        else if(controlCommand.commandName().equals(ComponentStateForCommand.withoutMatcherCmd()))
+        else if (controlCommand.commandName().equals(ComponentStateForCommand.withoutMatcherCmd()))
             processCommandWithoutMatcher(controlCommand);
         else processCommandWithoutMatcher(controlCommand);
 
@@ -139,20 +143,30 @@ public class JSampleComponentHandlers extends JComponentHandlers<JTopLevelActorD
 
     private void processCommandWithMatcher(ControlCommand controlCommand) {
         Source.range(1, 10)
-                .map(i -> {pubSubRef.tell(new Publish(new CurrentState(controlCommand.source().prefix()).add(JKeyTypes.IntKey().make("encoder").set(i * 10)))); return i;})
+                .map(i -> {
+                    pubSubRef.tell(new Publish(new CurrentState(controlCommand.source().prefix()).add(JKeyTypes.IntKey().make("encoder").set(i * 10))));
+                    return i;
+                })
                 .throttle(1, Duration.create(100, TimeUnit.MILLISECONDS), 1, ThrottleMode.shaping())
                 .runWith(Sink.ignore(), ActorMaterializer.create(akka.typed.javadsl.Adapter.toUntyped(actorContext.getSystem())));
     }
 
     private void processCommandWithoutMatcher(ControlCommand controlCommand) {
-        CommandResponseManagerMessage updateCommand = new AddOrUpdateCommand(controlCommand.runId(), new Completed(controlCommand.runId()));
-        commandResponseManagerRef.tell(updateCommand);
+
+        if (controlCommand.commandName().equals(failureAfterValidationCmd())) {
+            CommandResponseManagerMessage updateCommand = new AddOrUpdateCommand(controlCommand.runId(), new CommandResponse.Error(controlCommand.runId(), "Unknown Error occurred"));
+            commandResponseManagerRef.tell(updateCommand);
+        } else {
+            CommandResponseManagerMessage updateCommand = new AddOrUpdateCommand(controlCommand.runId(), new Completed(controlCommand.runId()));
+            commandResponseManagerRef.tell(updateCommand);
+        }
+
     }
 
     private void publishCurrentState(ControlCommand controlCommand) {
         CurrentState commandState;
 
-        if(controlCommand instanceof Setup)
+        if (controlCommand instanceof Setup)
             commandState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.setupConfigChoice())).add(controlCommand.paramSet().head());
         else
             commandState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.observeConfigChoice())).add(controlCommand.paramSet().head());
@@ -164,11 +178,11 @@ public class JSampleComponentHandlers extends JComponentHandlers<JTopLevelActorD
     @Override
     public CompletableFuture<BoxedUnit> jOnShutdown() {
         return CompletableFuture.supplyAsync(() -> {
-        CurrentState shutdownState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.shutdownChoice()));
-        Publish<CurrentState> publish = new Publish<>(shutdownState);
+            CurrentState shutdownState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.shutdownChoice()));
+            Publish<CurrentState> publish = new Publish<>(shutdownState);
 
-        pubSubRef.tell(publish);
-        return BoxedUnit.UNIT;
+            pubSubRef.tell(publish);
+            return BoxedUnit.UNIT;
         });
     }
 

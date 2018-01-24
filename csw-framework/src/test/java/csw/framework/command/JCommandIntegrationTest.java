@@ -212,4 +212,26 @@ public class JCommandIntegrationTest {
                 aggregatedCompletionResponse(timeout, hcdActorSystem.scheduler(),ec, mat);
         Assert.assertTrue(cmdCompletionResponseF.get() instanceof CommandResponse.Completed);
     }
+
+    // DEOPSCSW-208: Report failure on Configuration Completion command
+    @Test
+    public void testCommandFailure() throws ExecutionException, InterruptedException {
+        // using single submitAndSubscribe API
+        Key<Integer> intKey1 = JKeyTypes.IntKey().make("encoder");
+        Parameter<Integer> intParameter1 = intKey1.set(22, 23);
+        Setup failureResCommand1 = new Setup(prefix(), failureAfterValidationCmd(), Optional.empty()).add(intParameter1);
+        akka.typed.ActorSystem<?> typedSystem = ActorSystemAdapter.apply(hcdActorSystem);
+
+        CompletableFuture<CommandResponse> finalResponseCompletableFuture = hcdComponent.submitAndSubscribe(failureResCommand1, timeout, hcdActorSystem.scheduler(), typedSystem.executionContext());
+        CommandResponse actualValidationResponse = finalResponseCompletableFuture.get();
+        Assert.assertTrue(actualValidationResponse instanceof CommandResponse.Error);
+
+        // using separate submit and subscribe API
+        Setup failureResCommand2 = new Setup(prefix(), failureAfterValidationCmd(), Optional.empty()).add(intParameter1);
+        CompletableFuture<CommandResponse> validationResponse = hcdComponent.submit(failureResCommand2, timeout, hcdActorSystem.scheduler());
+        Assert.assertTrue(validationResponse.get() instanceof CommandResponse.Accepted);
+
+        CompletableFuture<CommandResponse> finalResponse = hcdComponent.subscribe(failureResCommand1.runId(), timeout, hcdActorSystem.scheduler());
+        Assert.assertTrue(finalResponse.get() instanceof CommandResponse.Error);
+    }
 }
