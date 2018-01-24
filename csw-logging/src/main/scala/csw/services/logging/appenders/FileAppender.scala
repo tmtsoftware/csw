@@ -171,7 +171,7 @@ class FileAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]) e
    */
   def append(baseMsg: Map[String, RichMsg], category: String): Unit =
     if (category != Category.Common.name || checkLevel(baseMsg)) {
-      val msg = if (fullHeaders) stdHeaders ++ baseMsg else baseMsg
+      val msg = (if (fullHeaders) stdHeaders ++ baseMsg else baseMsg) - LoggingKeys.PLAINSTACK
       // Maintain a file appender for each category in a logging system
       val fileAppenderKey = loggingSystemName + "-" + category
       val fileAppender = fileAppenders.get(fileAppenderKey) match {

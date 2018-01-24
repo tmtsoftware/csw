@@ -37,8 +37,9 @@ private[logging] object LoggingKeys {
 
   val KIND = "kind" // in Log message, but never set?
 
-  val METHOD = "method" // this and items below are used and populated
-  val TRACE  = "trace"  // iff an ex has been passed to actor.
-  val STACK  = "stack"  // these values are determined from ex throwable
-  val CAUSE  = "CAUSE"  // see above
+  val METHOD     = "method"     // this and items below are used and populated
+  val TRACE      = "trace"      // iff an ex has been passed to actor.
+  val STACK      = "stack"      // these values are determined from ex throwable
+  val PLAINSTACK = "plainstack" // these values are determined from ex throwable
+  val CAUSE      = "CAUSE"      // see above
 }

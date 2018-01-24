@@ -38,7 +38,8 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
       |  "${LoggingKeys.CLASS}": "csw.services.logging.appenders.FileAppenderTest",
       |  "${LoggingKeys.FILE}": "FileAppenderTest.scala",
       |  "${LoggingKeys.LINE}": 25,
-      |  "${LoggingKeys.MESSAGE}": "This is at ERROR level"
+      |  "${LoggingKeys.MESSAGE}": "This is at ERROR level",
+      |  "${LoggingKeys.PLAINSTACK}": "exceptions.AppenderNotFoundException at csw.services.logging.Main (Main.scala 19)"
       |}
     """.stripMargin
 
@@ -75,6 +76,7 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
     outCapture.toString.isEmpty shouldBe true
   }
 
+  // DEOPSCSW-325: Include exception stack trace in stdout log message for exceptions
   test("should able to pretty-print one log message to one line") {
 
     val config = ConfigFactory
@@ -93,7 +95,8 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
     val msg                   = expectedLogJson(LoggingKeys.MESSAGE)
     val fileName              = expectedLogJson(LoggingKeys.FILE)
     val lineNumber            = s"${expectedLogJson(LoggingKeys.LINE)}"
-    val expectedOneLineLogMsg = s"[$severity] $msg ($fileName $lineNumber)"
+    val plainStack            = s"${expectedLogJson(LoggingKeys.PLAINSTACK)}"
+    val expectedOneLineLogMsg = s"[$severity] $msg ($fileName $lineNumber) [Stacktrace] $plainStack"
 
     actualOneLineLogMsg shouldBe expectedOneLineLogMsg
 

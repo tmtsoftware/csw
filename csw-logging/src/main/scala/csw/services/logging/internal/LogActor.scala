@@ -1,5 +1,7 @@
 package csw.services.logging.internal
 
+import java.io.{PrintWriter, StringWriter}
+
 import akka.actor.{Actor, Props}
 import akka.dispatch.{BoundedMessageQueueSemantics, RequiresMessageQueue}
 import com.persist.Exceptions.SystemException
@@ -101,7 +103,20 @@ private[logging] class LogActor(done: Promise[Unit],
         JsonObject(LoggingKeys.CAUSE -> exceptionJson(ex.getCause))
       case _ => emptyJsonObject
     }
-    JsonObject(LoggingKeys.TRACE -> JsonObject(LoggingKeys.MESSAGE -> exToJson(ex), LoggingKeys.STACK -> stack)) ++ j1
+
+    JsonObject(
+      LoggingKeys.TRACE -> JsonObject(
+        LoggingKeys.MESSAGE -> exToJson(ex),
+        LoggingKeys.STACK   -> stack
+      ),
+      LoggingKeys.PLAINSTACK → extractPlainStacktrace(ex)
+    ) ++ j1
+  }
+
+  private def extractPlainStacktrace(ex: Throwable) = {
+    val sw = new StringWriter()
+    ex.printStackTrace(new PrintWriter(sw))
+    sw.toString
   }
 
   // Send JSON log object for each appender configured for the logging system
