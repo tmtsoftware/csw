@@ -27,7 +27,7 @@ import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 
 import scala.async.Async._
 import scala.concurrent.duration.DurationDouble
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future, TimeoutException}
 
 /**
  * Test Configuration :
@@ -166,8 +166,39 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       }
 
       val commandResponse = Await.result(eventualCommandResponse, timeout.duration)
-
       commandResponse shouldBe Completed(setupWithMatcher.runId)
+
+      // DEOPSCSW-317: Use state values of HCD to determine command completion
+      // simulate a scenario where timeout occurs while matching demand state vs current state
+      // 1. Demand matcher expect matching to be done in 500 millis
+      // 2. Assembly on receiving setupWithTimeoutMatcher command, sleeps for 1 second
+      // 3. This results in Timeout in Matcher
+      val demandMatcherToSimulateTimeout = DemandMatcher(DemandState(prefix, Set(param)), withUnits = false, 500.millis)
+      val setupWithTimeoutMatcher        = Setup(prefix, matcherTimeoutCmd, obsId)
+      val matcherForTimeout              = new Matcher(assemblyComponent.value, demandMatcherToSimulateTimeout)
+
+      val matcherResponseF1: Future[MatcherResponse] = matcherForTimeout.start
+
+      val timeoutExMsg = "The stream has not been completed in 500 milliseconds."
+      val eventualCommandResponse1: Future[CommandResponse] = async {
+        val initialResponse = await(assemblyComponent.oneway(setupWithTimeoutMatcher))
+        initialResponse match {
+          case _: Accepted ⇒
+            val matcherResponse = await(matcherResponseF1)
+            matcherResponse match {
+              case MatchCompleted                                       ⇒ Completed(setupWithMatcher.runId)
+              case MatchFailed(ex) if ex.isInstanceOf[TimeoutException] ⇒ Error(setupWithMatcher.runId, timeoutExMsg)
+              case MatchFailed(ex)                                      ⇒ Error(setupWithMatcher.runId, ex.getMessage)
+            }
+          case invalid: Invalid ⇒
+            matcher.stop()
+            invalid
+          case x ⇒ x
+        }
+      }
+      val commandResponseOnTimeout: CommandResponse = Await.result(eventualCommandResponse1, timeout.duration)
+      commandResponseOnTimeout shouldBe a[Error]
+      commandResponseOnTimeout.asInstanceOf[Error].message shouldBe timeoutExMsg
       enterBarrier("short-long-commands")
 
       // acquire lock on assembly

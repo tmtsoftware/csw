@@ -60,6 +60,7 @@ class ComponentHandlerForCommand(
     case `acceptedCmd`       ⇒ Accepted(controlCommand.runId)
     case `withoutMatcherCmd` ⇒ Accepted(controlCommand.runId)
     case `matcherCmd`        ⇒ Accepted(controlCommand.runId)
+    case `matcherTimeoutCmd` ⇒ Accepted(controlCommand.runId)
     case `cancelCmd`         ⇒ Accepted(controlCommand.runId)
     case `immediateCmd`      ⇒ Completed(controlCommand.runId)
     case `immediateResCmd` ⇒
@@ -113,10 +114,16 @@ class ComponentHandlerForCommand(
   }
 
   private def processCommandWithMatcher(controlCommand: ControlCommand): Unit = {
-    Source(1 to 10)
-      .map(i ⇒ pubSubRef ! Publish(CurrentState(controlCommand.source, Set(KeyType.IntKey.make("encoder").set(i * 10)))))
-      .throttle(1, 100.millis, 1, ThrottleMode.Shaping)
-      .runWith(Sink.ignore)
+
+    controlCommand.commandName match {
+      case `matcherTimeoutCmd` ⇒ Thread.sleep(1000)
+      case _ ⇒
+        Source(1 to 10)
+          .map(i ⇒ pubSubRef ! Publish(CurrentState(controlCommand.source, Set(KeyType.IntKey.make("encoder").set(i * 10)))))
+          .throttle(1, 100.millis, 1, ThrottleMode.Shaping)
+          .runWith(Sink.ignore)
+    }
+
   }
 
   override def onShutdown(): Future[Unit] = ???
