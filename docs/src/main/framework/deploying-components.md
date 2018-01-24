@@ -3,6 +3,7 @@
 A main application needs to be created which uses framework provided utility `csw.apps.containercmd.ContainerCmd` 
 to start a container or standalone component. The utility supports following parameters which can be provided as arguments to the
 application :
+
 * fully qualified path of the configuration file
 * **local** if the above path is a path to a file available on local disk. If this argument is not provided the file will be looked
 up in the `configuration service` using the same path.
@@ -10,19 +11,23 @@ up in the `configuration service` using the same path.
 application expects a configuration file describing a container component and will use it to start a container with all the
 components as described in the file.
 
-Starting a standalone component from a local configuration file
-:   @@@vars
+Scala
+:   @@snip [TromboneContainerCmdApp.scala](../../../../csw-vslice/src/main/scala/csw/trombone/TromboneContainerCmdApp.scala) { #container-app }
+
+Java
+:   @@snip [JTromboneContainerCmdApp](../../../../csw-vslice/src/main/java/csw/trombone/JTromboneContainerCmdApp.java) { #container-app }
+
+Starting a **standalone** component from a **local** configuration file
+
     ```
     SampleAssempbyCmdApp standalone local /tmp/config/assembly.conf
     ```
-    @@@  
     
-Starting a container component from a configuration file available in configuration service
-:   @@@vars
+Starting a **container** component from a configuration file available in **configuration service**
+
     ```
     SampleContainerCmdApp /sample/config/assembly.conf
     ```
-    @@@
 
 ### Container for deployment
 
