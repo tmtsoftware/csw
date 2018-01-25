@@ -17,6 +17,7 @@ The source code of this project can be found [here](https://github.com/tmtsoftwa
 * [Applications](apps.md)
 * [Services](services.md)
 * [Framework](framework.md)
+* [Command](command.md)
 
 @@@
 
