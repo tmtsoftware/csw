@@ -39,15 +39,10 @@ class CommandServiceBenchmark {
   implicit var scheduler: Scheduler     = _
   var setupCommand: commands.Setup      = _
   var componentRef: ComponentRef        = _
-  var log: Logger                       = _
-  var loggingSystem: LoggingSystem      = _
 
   @Setup(Level.Trial)
   def setup(): Unit = {
     actorSystem = ClusterAwareSettings.onPort(3552).system
-
-    loggingSystem = LoggingSystemFactory.start("CommandBench", "1.0", "localhost", actorSystem)
-    log = new LoggerFactory("Test").getLogger
 
     componentRef = spawnStandaloneComponent(actorSystem, ConfigFactory.load("standalone.conf"))
 
@@ -58,7 +53,6 @@ class CommandServiceBenchmark {
 
   @TearDown(Level.Trial)
   def teardown(): Unit = {
-    Await.result(loggingSystem.stop, 10.seconds)
     actorSystem.terminate()
     Await.ready(actorSystem.whenTerminated, 15.seconds)
   }
