@@ -4,4 +4,6 @@
 -Xss6M
 -XX:+CMSClassUnloadingEnabled
 -XX:+UseConcMarkSweepGC
---add-modules=java.xml.bind,java.activation
+
+# Uncomment below jvm option if you are using jdk9
+#--add-modules=java.xml.bind,java.activation
