@@ -125,6 +125,19 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       val shortCommandResponse = Await.result(assemblyComponent.submit(Setup(prefix, invalidCmd, obsId)), timeout.duration)
       shortCommandResponse shouldBe a[Invalid]
 
+      //#immediate-response
+      val eventualResponse: Future[CommandResponse] = async {
+        await(assemblyComponent.submit(Setup(prefix, immediateCmd, obsId))) match {
+          case response: Completed ⇒
+            //do something with completed result
+            response
+          case otherResponse ⇒
+            // do something with other response which is not expected
+            otherResponse
+        }
+      }
+      //#immediate-response
+
       // long running command which does not use matcher
       val setupWithoutMatcher = Setup(prefix, withoutMatcherCmd, obsId)
 

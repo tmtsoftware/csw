@@ -74,6 +74,14 @@ case class JComponentRef(value: ActorRef[ComponentMessage]) {
     componentRef.subscribe(commandRunId)(timeout, scheduler).toJava.toCompletableFuture
 
   /**
+   * Query for the result of a long running command which was sent as Submit to get a [[csw.messages.ccs.commands.CommandResponse]] as a Future.
+   * @param commandRunId the runId of the command for which response is required
+   * @return a CommandResponse as a CompletableFuture
+   */
+  def query(commandRunId: RunId, timeout: Timeout, scheduler: Scheduler): CompletableFuture[CommandResponse] =
+    componentRef.query(commandRunId)(timeout, scheduler).toJava.toCompletableFuture
+
+  /**
    * Submit a command and Subscribe for the result if it was successfully validated as `Accepted` to get a final [[csw.messages.ccs.commands.CommandResponse]] as a Future.
    * @param controlCommand the [[csw.messages.ccs.commands.ControlCommand]] payload.
    * @return a CommandResponse as a CompletableFuture

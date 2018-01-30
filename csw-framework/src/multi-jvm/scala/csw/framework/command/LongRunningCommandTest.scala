@@ -66,12 +66,23 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
       // 1. longSetup which takes 5 seconds to finish
       // 2. shortSetup which takes 1 second to finish
       // 3. mediumSetup which takes 3 seconds to finish
+
+      //#subscribe-for-result
       val eventualCommandResponse = assemblyComponent.submit(setup).flatMap {
         case _: Accepted ⇒ assemblyComponent.subscribe(setup.runId)
         case _           ⇒ Future(CommandResponse.Error(setup.runId, ""))
       }
+      //#subscribe-for-result
 
       Await.result(eventualCommandResponse, 20.seconds) shouldBe Completed(setup.runId)
+
+      //#query-response
+      assemblyComponent.submit(setup)
+
+      // do some work before querying for the result of above command as needed
+
+      val eventualResponse: Future[CommandResponse] = assemblyComponent.query(setup.runId)
+      //#query-response
 
       // verify that commands gets completed in following sequence
       // ShortSetup => MediumSetup => LongSetup

@@ -12,8 +12,11 @@ import csw.framework.internal.wiring.FrameworkWiring;
 import csw.framework.internal.wiring.Standalone;
 import csw.messages.SupervisorLockMessage;
 import csw.messages.ccs.CommandIssue;
-import csw.messages.ccs.commands.*;
+import csw.messages.ccs.commands.CommandResponse;
 import csw.messages.ccs.commands.CommandResponse.Completed;
+import csw.messages.ccs.commands.ControlCommand;
+import csw.messages.ccs.commands.JComponentRef;
+import csw.messages.ccs.commands.Setup;
 import csw.messages.ccs.commands.matchers.DemandMatcher;
 import csw.messages.ccs.commands.matchers.Matcher;
 import csw.messages.ccs.commands.matchers.MatcherResponse;
@@ -106,6 +109,20 @@ public class JCommandIntegrationTest {
         Parameter<Integer> intParameter2 = intKey2.set(22, 23);
         Setup imdInvalidCommand = new Setup(prefix(), invalidCmd(), Optional.empty()).add(intParameter2);
 
+        //#immediate-response
+        CompletableFuture<CommandResponse> eventualCommandResponse =
+                hcdComponent
+                        .submit(imdInvalidCommand, timeout, hcdActorSystem.scheduler())
+                        .thenApply(
+                                response -> {
+                                    if (response instanceof Completed) {
+                                        //do something with completed result
+                                    }
+                                    return response;
+                                }
+                        );
+        //#immediate-response
+
         CompletableFuture<CommandResponse> imdInvalidCmdResponseCompletableFuture = hcdComponent.submit(imdInvalidCommand, timeout, hcdActorSystem.scheduler());
         CommandResponse actualImdInvalidCmdResponse = imdInvalidCmdResponseCompletableFuture.get();
         Assert.assertTrue(actualImdInvalidCmdResponse instanceof CommandResponse.Invalid);
@@ -115,14 +132,25 @@ public class JCommandIntegrationTest {
         Parameter<Integer> parameter = encoder.set(22, 23);
         Setup controlCommand = new Setup(prefix(), withoutMatcherCmd(), Optional.empty()).add(parameter);
 
-        CompletableFuture<CommandResponse> commandResponseCompletableFuture = hcdComponent.submit(controlCommand, timeout, hcdActorSystem.scheduler());
+        //#query-response
+        hcdComponent.submit(controlCommand, timeout, hcdActorSystem.scheduler());
 
-        CompletableFuture<CommandResponse> testCommandResponse = commandResponseCompletableFuture.thenCompose(commandResponse -> {
-            if (commandResponse instanceof CommandResponse.Accepted)
-                return hcdComponent.subscribe(commandResponse.runId(), timeout, hcdActorSystem.scheduler());
-            else
-                return CompletableFuture.completedFuture(new CommandResponse.Error(commandResponse.runId(), "test error"));
-        });
+        // do some work before querying for the result of above command as needed
+
+        CompletableFuture<CommandResponse> queryResponse = hcdComponent.query(controlCommand.runId(), timeout, hcdActorSystem.scheduler());
+        //#query-response
+
+        //#subscribe-for-result
+        CompletableFuture<CommandResponse> testCommandResponse =
+                hcdComponent
+                        .submit(controlCommand, timeout, hcdActorSystem.scheduler())
+                        .thenCompose(commandResponse -> {
+                            if (commandResponse instanceof CommandResponse.Accepted)
+                                return hcdComponent.subscribe(commandResponse.runId(), timeout, hcdActorSystem.scheduler());
+                            else
+                                return CompletableFuture.completedFuture(new CommandResponse.Error(commandResponse.runId(), "test error"));
+                        });
+        //#subscribe-for-result
 
         Completed expectedCmdResponse = new Completed(controlCommand.runId());
         CommandResponse actualCmdResponse = testCommandResponse.get();
@@ -205,11 +233,11 @@ public class JCommandIntegrationTest {
         };
 
         CompletableFuture<CommandResponse> cmdValidationResponseF = new JCommandDistributor(componentsToCommands).
-                aggregatedValidationResponse(timeout, hcdActorSystem.scheduler(),ec, mat);
+                aggregatedValidationResponse(timeout, hcdActorSystem.scheduler(), ec, mat);
         Assert.assertTrue(cmdValidationResponseF.get() instanceof CommandResponse.Accepted);
 
         CompletableFuture<CommandResponse> cmdCompletionResponseF = new JCommandDistributor(componentsToCommands).
-                aggregatedCompletionResponse(timeout, hcdActorSystem.scheduler(),ec, mat);
+                aggregatedCompletionResponse(timeout, hcdActorSystem.scheduler(), ec, mat);
         Assert.assertTrue(cmdCompletionResponseF.get() instanceof CommandResponse.Completed);
     }
 
