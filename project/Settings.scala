@@ -1,12 +1,9 @@
-import java.io.File
-
-import sbt._
-import Keys._
-
 import com.typesafe.sbt.site.SitePlugin.autoImport._
+import sbt.Keys._
+import sbt._
 import sbtunidoc.BaseUnidocPlugin.autoImport.{unidoc, unidocProjectFilter}
-import sbtunidoc.ScalaUnidocPlugin.autoImport.ScalaUnidoc
 import sbtunidoc.JavaUnidocPlugin.autoImport.JavaUnidoc
+import sbtunidoc.ScalaUnidocPlugin.autoImport.ScalaUnidoc
 
 object Settings {
   def mergeSiteWith(p: Project): Setting[Task[Seq[(File, String)]]] =

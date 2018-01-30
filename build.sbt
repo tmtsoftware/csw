@@ -33,21 +33,18 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
   `examples`
 )
 
+lazy val githubReleases: Seq[ProjectReference] = Seq(
+  `csw-cluster-seed`,
+  `csw-location-agent`,
+  `csw-config-server`
+)
+
 //Root project
 lazy val `csw-prod` = project
   .in(file("."))
-  .enablePlugins(UnidocSite, PublishGithub, GitBranchPrompt, SbtGithubReleasePlugin)
+  .enablePlugins(UnidocSite, PublishGithub, GitBranchPrompt, GithubRelease)
   .aggregate(aggregatedProjects: _*)
-    .settings(
-      ghreleaseRepoOrg := "tmtsoftware",
-      ghreleaseRepoName := "csw-prod",
-      ghreleaseAssets := Seq(
-        (packageBin in Universal in `csw-cluster-seed`).value,
-        (packageBin in Universal in `csw-config-server`).value,
-        (packageBin in Universal in `csw-location-agent`).value
-      ),
-      aggregate in githubRelease := false
-    )
+  .settings(GithubRelease.githubReleases(githubReleases))
   .settings(Settings.mergeSiteWith(docs))
   .settings(Settings.docExclusions(unidocExclusions))
 
