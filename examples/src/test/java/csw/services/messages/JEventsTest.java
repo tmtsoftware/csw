@@ -1,6 +1,9 @@
 package csw.services.messages;
 
-import csw.messages.ccs.events.*;
+import csw.messages.ccs.events.EventInfo;
+import csw.messages.ccs.events.EventTime;
+import csw.messages.ccs.events.ObserveEvent;
+import csw.messages.ccs.events.SystemEvent;
 import csw.messages.javadsl.JUnits;
 import csw.messages.params.formats.JavaJsonSupport;
 import csw.messages.params.generics.JKeyTypes;
@@ -64,55 +67,6 @@ public class JEventsTest {
         //validations
         Assert.assertEquals(eventInfo1, eventInfo2);
         Assert.assertNotEquals(eventInfo3, eventInfo4);
-    }
-
-    @Test
-    public void showUsageOfStatusEvent() {
-        //#statusevent
-        //keys
-        Key<Integer> k1 = JKeyTypes.IntKey().make("encoder");
-        Key<Integer> k2 = JKeyTypes.IntKey().make("windspeed");
-        Key<String> k3 = JKeyTypes.StringKey().make("filter");
-        Key<Integer> k4 = JKeyTypes.IntKey().make("notUsed");
-
-        //prefixes
-        String ck1 = "wfos.prog.cloudcover";
-        String ck3 = "wfos.red.detector";
-
-        //parameters
-        Parameter<Integer> p1 = k1.set(22);
-        Parameter<Integer> p2 = k2.set(44);
-        Parameter<String> p3 = k3.set("A", "B", "C", "D");
-
-        //Create StatusEvent using madd
-        StatusEvent se1 = new StatusEvent(ck1).madd(p1, p2);
-        //Create StatusEvent using add
-        StatusEvent se2 = new StatusEvent(ck3).add(p1).add(p2);
-        //Create StatusEvent and use add
-        StatusEvent se3 = new StatusEvent(ck3).add(p1).add(p2).add(p3);
-
-        //access keys
-        Boolean k1Exists = se1.exists(k1); //true
-
-        //access Parameters
-        Optional<Parameter<Integer>> p4 = se1.jGet(k1);
-
-        //access values
-        List<Integer> v1 = se1.jGet(k1).get().jValues();
-        List<Integer> v2 = se2.parameter(k2).jValues();
-        //k4 is missing
-        Set<String> missingKeys = se3.jMissingKeys(k1, k2, k3, k4);
-
-        //remove keys
-        StatusEvent se4 = se3.remove(k3);
-        //#statusevent
-
-        Assert.assertTrue(k1Exists);
-        Assert.assertTrue(p4.get() == p1);
-        Assert.assertEquals(new HashSet<>(Arrays.asList(22)), new HashSet<>(v1));
-        Assert.assertEquals(new HashSet<>(Arrays.asList(44)), new HashSet<>(v2));
-        Assert.assertEquals(new HashSet<>(Arrays.asList(missingKeys)), new HashSet<>(Arrays.asList(missingKeys)));
-        Assert.assertEquals(se2, se4);
     }
 
     @Test
@@ -227,20 +181,18 @@ public class JEventsTest {
         Parameter<MatrixData<Double>> i1 = k1.set(m1);
 
         //events
-        StatusEvent statusEvent = new StatusEvent("wfos.blue.filter").add(i1);
         ObserveEvent observeEvent = new ObserveEvent("wfos.blue.filter").add(i1);
         SystemEvent systemEvent = new SystemEvent("wfos.blue.filter").add(i1);
 
         //json support - write
-        JsValue statusJson = JavaJsonSupport.writeEvent(statusEvent);
         JsValue observeJson = JavaJsonSupport.writeEvent(observeEvent);
         JsValue systemJson = JavaJsonSupport.writeEvent(systemEvent);
 
         //optionally prettify
-        String str = Json.prettyPrint(statusJson);
+        String str = Json.prettyPrint(systemJson);
 
         //construct DemandState from string
-        StatusEvent statusFromPrettyStr = JavaJsonSupport.readEvent(StatusEvent.class, Json.parse(str));
+        SystemEvent statusFromPrettyStr = JavaJsonSupport.readEvent(SystemEvent.class, Json.parse(str));
 
         //json support - read
         ObserveEvent observeEvent1 = JavaJsonSupport.readEvent(ObserveEvent.class, observeJson);
@@ -248,7 +200,7 @@ public class JEventsTest {
         //#json-serialization
 
         //validations
-        Assert.assertTrue(statusEvent.equals(statusFromPrettyStr));
+        Assert.assertTrue(systemEvent.equals(statusFromPrettyStr));
         Assert.assertTrue(observeEvent.equals(observeEvent1));
         Assert.assertTrue(systemEvent.equals(systemEvent1));
     }
@@ -276,7 +228,7 @@ public class JEventsTest {
         Parameter<Integer> miscParam1 = miscKey.set(100);
 
         //StatusEvent with duplicate key via madd
-        StatusEvent event = new StatusEvent(prefix).madd(
+        SystemEvent event = new SystemEvent(prefix).madd(
                 encParam1,
                 encParam2,
                 encParam3,
@@ -287,12 +239,12 @@ public class JEventsTest {
         List<String> uniqueKeys1 = event.jParamSet().stream().map(Parameter::keyName).collect(Collectors.toList());
 
         //try adding duplicate keys via add + madd
-        StatusEvent changedEvent = event.add(encParam3).madd(filterParam1, filterParam2, filterParam3);
+        SystemEvent changedEvent = event.add(encParam3).madd(filterParam1, filterParam2, filterParam3);
         //duplicate keys will not be added. Should contain one Encoder and one Filter key
         List<String> uniqueKeys2 = changedEvent.jParamSet().stream().map(Parameter::keyName).collect(Collectors.toList());
 
         //miscKey(unique) will be added; encoderKey(duplicate) will not be added
-        StatusEvent finalEvent = changedEvent.madd(miscParam1, encParam1);
+        SystemEvent finalEvent = changedEvent.madd(miscParam1, encParam1);
         //now contains encoderKey, filterKey, miscKey
         List<String> uniqueKeys3 = finalEvent.jParamSet().stream().map(Parameter::keyName).collect(Collectors.toList());
         //#unique-key
@@ -333,26 +285,22 @@ public class JEventsTest {
         Parameter<RaDec> param = raDecKey.set(raDec1, raDec2).withUnits(JUnits.arcmin);
 
         //events
-        StatusEvent statusEvent = StatusEvent.from(eventInfo1).add(param);
         ObserveEvent observeEvent = ObserveEvent.from(eventInfo2).add(param);
         SystemEvent systemEvent1 = SystemEvent.from(eventInfo3).add(param);
         SystemEvent systemEvent2 = SystemEvent.from(eventInfo4).add(param);
 
         //convert events to protobuf bytestring
-        byte[] byteArray1 = statusEvent.toPb();
         byte[] byteArray2 = observeEvent.toPb();
         byte[] byteArray3 = systemEvent1.toPb();
         byte[] byteArray4 = systemEvent2.toPb();
 
         //convert protobuf bytestring to events
-        StatusEvent pbStatusEvent = StatusEvent.fromPb(byteArray1);
         ObserveEvent pbObserveEvent = ObserveEvent.fromPb(byteArray2);
         SystemEvent pbSystemEvent1 = SystemEvent.fromPb(byteArray3);
         SystemEvent pbSystemEvent2 = SystemEvent.fromPb(byteArray4);
         //#protobuf
 
         //validations
-        Assert.assertEquals(pbStatusEvent, statusEvent);
         Assert.assertEquals(pbObserveEvent, observeEvent);
         Assert.assertEquals(pbSystemEvent1, systemEvent1);
         Assert.assertEquals(pbSystemEvent2, systemEvent2);

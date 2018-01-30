@@ -70,57 +70,6 @@ class EventsTest extends FunSpec with Matchers {
   }
 
   describe("Examples of Events") {
-    it("should show usages of StatusEvent") {
-
-      //#statusevent
-      //keys
-      val k1: Key[Int]    = KeyType.IntKey.make("encoder")
-      val k2: Key[Int]    = KeyType.IntKey.make("windspeed")
-      val k3: Key[String] = KeyType.StringKey.make("filter")
-      val k4: Key[Int]    = KeyType.IntKey.make("notUsed")
-
-      //prefixes
-      val ck1 = "wfos.prog.cloudcover"
-      val ck3 = "wfos.red.detector"
-
-      //parameters
-      val p1: Parameter[Int]    = k1.set(22)
-      val p2: Parameter[Int]    = k2.set(44)
-      val p3: Parameter[String] = k3.set("A", "B", "C", "D")
-
-      //Create StatusEvent using madd
-      val se1: StatusEvent = StatusEvent(ck1).madd(p1, p2)
-      //Create StatusEvent using apply
-      val se2: StatusEvent = StatusEvent(EventInfo(ck3), Set(p1, p2))
-      //Create StatusEvent and use add
-      val se3: StatusEvent = StatusEvent(EventInfo(ck3)).add(p1).add(p2).add(p3)
-
-      //access keys
-      val k1Exists: Boolean = se1.exists(k1) //true
-
-      //access Parameters
-      val p4: Option[Parameter[Int]] = se1.get(k1)
-
-      //access values
-      val v1: Array[Int] = se1(k1).values
-      val v2: Array[Int] = se2.parameter(k2).values
-      //k4 is missing
-      val missingKeys: Set[String] = se3.missingKeys(k1, k2, k3, k4)
-
-      //remove keys
-      val se4: StatusEvent = se3.remove(k3)
-
-      //#statusevent
-
-      //validations
-      assert(k1Exists === true)
-      assert(p4.get === p1)
-      assert(v1 === p1.values)
-      assert(v2 === p2.values)
-      assert(missingKeys === Set(k4.keyName))
-      assert(se2 === se4)
-    }
-
     it("should show usages of ObserveEvent") {
 
       //#observeevent
@@ -252,32 +201,28 @@ class EventsTest extends FunSpec with Matchers {
       val i1: Parameter[MatrixData[Double]] = k1.set(m1)
 
       //events
-      val statusEvent: StatusEvent   = StatusEvent("wfos.blue.filter").add(i1)
       val observeEvent: ObserveEvent = ObserveEvent("wfos.blue.filter").add(i1)
       val systemEvent: SystemEvent   = SystemEvent("wfos.blue.filter").add(i1)
 
       //json support - write
-      val statusJson: JsValue  = JsonSupport.writeEvent(statusEvent)
       val observeJson: JsValue = JsonSupport.writeEvent(observeEvent)
       val systemJson: JsValue  = JsonSupport.writeEvent(systemEvent)
 
       //optionally prettify
-      val str: String = Json.prettyPrint(statusJson)
+      val str: String = Json.prettyPrint(systemJson)
 
       //construct command from string
-      val statusEventFromPrettyStr: StatusEvent = JsonSupport.readEvent[StatusEvent](Json.parse(str))
+      val systemEventFromPrettyStr: SystemEvent = JsonSupport.readEvent[SystemEvent](Json.parse(str))
 
       //json support - read
-      val statusEvent1: StatusEvent   = JsonSupport.readEvent[StatusEvent](statusJson)
       val observeEvent1: ObserveEvent = JsonSupport.readEvent[ObserveEvent](observeJson)
       val systemEvent1: SystemEvent   = JsonSupport.readEvent[SystemEvent](systemJson)
       //#json-serialization
 
       //validations
-      assert(statusEvent === statusEvent1)
       assert(observeEvent === observeEvent1)
       assert(systemEvent === systemEvent1)
-      assert(statusEventFromPrettyStr === statusEvent)
+      assert(systemEventFromPrettyStr === systemEvent)
     }
   }
 
@@ -305,15 +250,15 @@ class EventsTest extends FunSpec with Matchers {
       val miscParam1 = miscKey.set(100)
 
       //StatusEvent with duplicate key via constructor
-      val statusEvent = StatusEvent(
+      val systemEvent = SystemEvent(
         prefix,
         Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3)
       )
       //four duplicate keys are removed; now contains one Encoder and one Filter key
-      val uniqueKeys1 = statusEvent.paramSet.toList.map(_.keyName)
+      val uniqueKeys1 = systemEvent.paramSet.toList.map(_.keyName)
 
       //try adding duplicate keys via add + madd
-      val changedStatusEvent = statusEvent
+      val changedStatusEvent = systemEvent
         .add(encParam3)
         .madd(
           filterParam1,
@@ -324,7 +269,7 @@ class EventsTest extends FunSpec with Matchers {
       val uniqueKeys2 = changedStatusEvent.paramSet.toList.map(_.keyName)
 
       //miscKey(unique) will be added; encoderKey(duplicate) will not be added
-      val finalStatusEvent = statusEvent.madd(Set(miscParam1, encParam1))
+      val finalStatusEvent = systemEvent.madd(Set(miscParam1, encParam1))
       //now contains encoderKey, filterKey, miscKey
       val uniqueKeys3 = finalStatusEvent.paramSet.toList.map(_.keyName)
       //#unique-key
@@ -341,7 +286,6 @@ class EventsTest extends FunSpec with Matchers {
 
       //#protobuf
       //Some variety in EventInfo
-      val info1 = EventInfo("wfos.blue.filter")
       val info2 = EventInfo("wfos.blue.filter", Instant.now().minusSeconds(60))
       val info3 = EventInfo("wfos.blue.filter", Instant.now(), ObsId("Obs002"))
       val info4 = EventInfo(
@@ -362,26 +306,22 @@ class EventsTest extends FunSpec with Matchers {
       val param = raDecKey.set(raDec1, raDec2).withUnits(arcmin)
 
       //events
-      val statusEvent: StatusEvent   = StatusEvent(info1).add(param)
       val observeEvent: ObserveEvent = ObserveEvent(info2).add(param)
       val systemEvent1: SystemEvent  = SystemEvent(info3).add(param)
       val systemEvent2: SystemEvent  = SystemEvent(info4).add(param)
 
       //convert events to protobuf bytestring
-      val byteArray1: Array[Byte] = statusEvent.toPb
       val byteArray2: Array[Byte] = observeEvent.toPb
       val byteArray3: Array[Byte] = systemEvent1.toPb
       val byteArray4: Array[Byte] = systemEvent2.toPb
 
       //convert protobuf bytestring to events
-      val pbStatusEvent: StatusEvent   = StatusEvent.fromPb(byteArray1)
       val pbObserveEvent: ObserveEvent = ObserveEvent.fromPb(byteArray2)
       val pbSystemEvent1: SystemEvent  = SystemEvent.fromPb(byteArray3)
       val pbSystemEvent2: SystemEvent  = SystemEvent.fromPb(byteArray4)
       //#protobuf
 
       //validations
-      assert(pbStatusEvent === statusEvent)
       assert(pbObserveEvent === observeEvent)
       assert(pbSystemEvent1 === systemEvent1)
       assert(pbSystemEvent2 === systemEvent2)

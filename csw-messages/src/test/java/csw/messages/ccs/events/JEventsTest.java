@@ -81,12 +81,6 @@ public class JEventsTest {
     }
 
     @Test
-    public void shouldAbleToCreateAndAccessStatusEvent() {
-        StatusEvent statusEvent = new StatusEvent(prefix).add(encoderParam).add(epochStringParam);
-        assertOnEventsAPI(statusEvent);
-    }
-
-    @Test
     public void shouldAbleToCreateAndAccessObserveEvent() {
         ObserveEvent observeEvent = new ObserveEvent(prefix).add(encoderParam).add(epochStringParam);
         assertOnEventsAPI(observeEvent);
@@ -99,16 +93,16 @@ public class JEventsTest {
     }
 
     @Test
-    public void shouldAbleToCreateAndAccessStatusEventWithCustomInfo() {
+    public void shouldAbleToCreateAndAccessSystemEventWithCustomInfo() {
         Instant currentTime = Instant.now();
         EventTime eventTime = new EventTime(currentTime);
         ObsId obsId = ObsId.apply("obsId");
         EventInfo eventInfo = EventInfo.apply(prefix, eventTime, obsId);
 
-        StatusEvent statusEvent = new StatusEvent(prefix, eventTime, obsId).add(encoderParam).add(epochStringParam);
-        Assert.assertEquals(eventInfo, statusEvent.info());
-        Assert.assertEquals(eventTime, statusEvent.eventTime());
-        Assert.assertEquals(Optional.of(obsId), statusEvent.obsIdOptional());
+        SystemEvent systemEvent = new SystemEvent(prefix, eventTime, obsId).add(encoderParam).add(epochStringParam);
+        Assert.assertEquals(eventInfo, systemEvent.info());
+        Assert.assertEquals(eventTime, systemEvent.eventTime());
+        Assert.assertEquals(Optional.of(obsId), systemEvent.obsIdOptional());
     }
 
 }

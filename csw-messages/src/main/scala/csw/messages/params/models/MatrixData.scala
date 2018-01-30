@@ -2,7 +2,6 @@ package csw.messages.params.models
 
 import java.util
 
-import scalapb.TypeMapper
 import csw.messages.params.pb.{ItemType, ItemTypeCompanion}
 import play.api.libs.json.{Format, Json}
 
@@ -10,6 +9,7 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.language.implicitConversions
 import scala.reflect.ClassTag
+import scalapb.TypeMapper
 
 /**
  * A top level key for a parameter set representing an matrix like collection.

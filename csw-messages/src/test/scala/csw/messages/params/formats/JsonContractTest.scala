@@ -82,19 +82,6 @@ class JsonContractTest extends FunSpec with Matchers {
 
   describe("Test Events") {
 
-    it("should adhere to specified standard StatusEvent json format") {
-      val k1 = KeyType.IntKey.make("encoder")
-      val k2 = KeyType.IntKey.make("windspeed")
-
-      val i1                = k1.set(22)
-      val i2                = k2.set(44)
-      val statusEvent       = StatusEvent(eventInfo).madd(i1, i2)
-      val statusEventToJson = Json.prettyPrint(JsonSupport.writeEvent(statusEvent))
-
-      val expectedStatusEventJson = Json.prettyPrint(Json.parse(Source.fromResource("json/status_event.json").mkString))
-      statusEventToJson shouldEqual expectedStatusEventJson
-    }
-
     it("should adhere to specified standard ObserveEvent json format") {
       val structKey = StructKey.make("myStruct")
 

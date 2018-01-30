@@ -5,7 +5,7 @@ import akka.typed.javadsl.Actor;
 import csw.messages.ccs.commands.Observe;
 import csw.messages.ccs.commands.Setup;
 import csw.messages.ccs.commands.Wait;
-import csw.messages.ccs.events.StatusEvent;
+import csw.messages.ccs.events.SystemEvent;
 import csw.messages.params.generics.JKeyTypes;
 import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;
@@ -22,7 +22,7 @@ public abstract class JavaCommandHandler {
     static final Parameter<Integer> encoderParam = encoderIntKey.set(55, 66);
     static final Parameter<String> epochStringParam = epochStringKey.set("Event1", "Event2");
 
-    private static StatusEvent statusEvent = new StatusEvent(prefix).add(encoderParam).add(epochStringParam);
+    private static SystemEvent systemEvent = new SystemEvent(prefix).add(encoderParam).add(epochStringParam);
 
     private JavaCommandHandler() {
     }
@@ -32,7 +32,7 @@ public abstract class JavaCommandHandler {
                 .onMessage(CommandMsg.class, msg -> msg.command().getClass().isAssignableFrom(Setup.class),(ctx, msg) -> {
                     Set<Parameter<?>> jParamSet = ((Setup) msg.command()).jParamSet();
                     msg.ackTo().tell(jParamSet);
-                    msg.replyTo().tell(statusEvent);
+                    msg.replyTo().tell(systemEvent);
                     msg.obsIdAck().tell(msg.command().jMaybeObsId());
                     return Actor.same();
                 })

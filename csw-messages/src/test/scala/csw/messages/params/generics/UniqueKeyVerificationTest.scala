@@ -173,23 +173,6 @@ class UniqueKeyVerificationTest extends FunSpec with Matchers {
   }
 
   describe("Test Events") {
-    it("StatusEvent command is able to remove duplicate keys") {
-
-      //parameters with duplicate key via constructor
-      val event =
-        StatusEvent(eventInfo, Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
-      event.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
-
-      //parameters with duplicate key via add + madd
-      val changedEvent = event.add(encParam3).madd(filterParam1, filterParam2, filterParam3)
-      changedEvent.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
-
-      //parameter with unique key and parameter with duplicate key
-      val finalEvent = event.madd(Set(miscParam1, encParam1))
-      finalEvent.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName,
-                                                                                      filterKey.keyName,
-                                                                                      miscKey.keyName)
-    }
 
     it("ObserveEvent command is able to remove duplicate keys") {
 

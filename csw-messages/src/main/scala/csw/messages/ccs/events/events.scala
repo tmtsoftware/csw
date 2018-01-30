@@ -61,7 +61,6 @@ object EventType {
   implicit def typeMapper[T <: EventType[_]]: TypeMapper[PbEvent, T] = new TypeMapper[PbEvent, T] {
     override def toCustom(base: PbEvent): T = {
       val factory: (EventInfo, Set[Parameter[_]]) ⇒ Any = base.eventType match {
-        case PbEventType.StatusEvent      ⇒ StatusEvent.apply
         case PbEventType.ObserveEvent     ⇒ ObserveEvent.apply
         case PbEventType.SystemEvent      ⇒ SystemEvent.apply
         case PbEventType.Unrecognized(dd) ⇒ throw new RuntimeException(s"unknown event type=$dd")
@@ -78,7 +77,6 @@ object EventType {
 
     override def toBase(custom: T): PbEvent = {
       val pbEventType = custom match {
-        case _: StatusEvent  ⇒ PbEventType.StatusEvent
         case _: ObserveEvent ⇒ PbEventType.ObserveEvent
         case _: SystemEvent  ⇒ PbEventType.SystemEvent
       }
@@ -96,7 +94,7 @@ object EventType {
 /**
  * Type of event used in the event service
  */
-sealed trait EventServiceEvent {
+sealed trait Event {
 
   /**
    * The event's prefix and subsystem
@@ -110,46 +108,6 @@ sealed trait EventServiceEvent {
 }
 
 /**
- * Defines a status event
- *
- * @param info event related information
- * @param paramSet an optional initial set of parameters (keys with values)
- */
-case class StatusEvent private (info: EventInfo, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])
-    extends EventType[StatusEvent]
-    with EventServiceEvent {
-
-  // Java API
-  def this(prefix: String) = this(EventInfo(prefix))
-  def this(prefix: String, time: EventTime, obsId: ObsId) = this(EventInfo(prefix, time, obsId))
-
-  override protected def create(data: Set[Parameter[_]]) = new StatusEvent(info, data)
-
-  /**
-   * Returns Protobuf representation of StatusEvent
-   */
-  def toPb: Array[Byte] = EventType.typeMapper[StatusEvent].toBase(this).toByteArray
-}
-
-object StatusEvent {
-  def apply(prefix: String, time: EventTime, obsId: ObsId): StatusEvent =
-    new StatusEvent(EventInfo(Prefix(prefix), time, Some(obsId)))
-
-  def apply(info: EventInfo, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]): StatusEvent =
-    new StatusEvent(info).madd(paramSet)
-
-  /**
-   * Constructs StatusEvent from EventInfo
-   */
-  def from(info: EventInfo): StatusEvent = new StatusEvent(info)
-
-  /**
-   * Constructs from byte array containing Protobuf representation of StatusEvent
-   */
-  def fromPb(array: Array[Byte]): StatusEvent = EventType.typeMapper[StatusEvent].toCustom(PbEvent.parseFrom(array))
-}
-
-/**
  * Defines a observe event
  *
  * @param info event related information
@@ -157,7 +115,7 @@ object StatusEvent {
  */
 case class ObserveEvent private (info: EventInfo, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])
     extends EventType[ObserveEvent]
-    with EventServiceEvent {
+    with Event {
 
   // Java API
   def this(prefix: String) = this(EventInfo(prefix))
@@ -197,7 +155,7 @@ object ObserveEvent {
  */
 case class SystemEvent private (info: EventInfo, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])
     extends EventType[SystemEvent]
-    with EventServiceEvent {
+    with Event {
 
   // Java API
   def this(prefix: String) = this(EventInfo(prefix))

@@ -91,7 +91,7 @@ public class JPbParameterTest {
 
 
         Events.PbEvent pbEvent = Events.PbEvent.newBuilder()
-                .setEventType(Events.PbEvent.PbEventType.StatusEvent)
+                .setEventType(Events.PbEvent.PbEventType.SystemEvent)
                 .addParamSet(pbParameter)
                 .build();
 

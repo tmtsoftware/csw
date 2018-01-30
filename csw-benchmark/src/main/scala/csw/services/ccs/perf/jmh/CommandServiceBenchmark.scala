@@ -10,8 +10,6 @@ import csw.messages.ccs.commands.{CommandName, CommandResponse, ComponentRef}
 import csw.messages.params.models.Prefix
 import csw.services.ccs.perf.BenchmarkHelpers.spawnStandaloneComponent
 import csw.services.location.commons.ClusterAwareSettings
-import csw.services.logging.internal.LoggingSystem
-import csw.services.logging.scaladsl.{Logger, LoggerFactory, LoggingSystemFactory}
 import org.openjdk.jmh.annotations._
 
 import scala.concurrent.Await

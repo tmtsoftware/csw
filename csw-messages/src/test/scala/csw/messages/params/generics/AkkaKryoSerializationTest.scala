@@ -18,7 +18,7 @@ import csw.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.messages.ccs.CommandIssue
 import csw.messages.ccs.commands.CommandResponse._
 import csw.messages.ccs.commands._
-import csw.messages.ccs.events.{EventInfo, ObserveEvent, StatusEvent, SystemEvent}
+import csw.messages.ccs.events.{EventInfo, ObserveEvent, SystemEvent}
 import csw.messages.framework.LocationServiceUsage.DoNotRegister
 import csw.messages.framework.{ComponentInfo, ContainerLifecycleState, SupervisorLifecycleState}
 import csw.messages.location.ComponentType.HCD
@@ -26,7 +26,7 @@ import csw.messages.location.Connection
 import csw.messages.models.PubSub.Subscribe
 import csw.messages.models.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.messages.models.{Component, Components, LifecycleStateChanged}
-import csw.messages.params.generics.KeyType.{ByteArrayKey, ChoiceKey, DoubleMatrixKey, IntKey, RaDecKey, StructKey}
+import csw.messages.params.generics.KeyType.{ByteArrayKey, ChoiceKey, DoubleMatrixKey, IntKey, StructKey}
 import csw.messages.params.models.Units.{arcmin, coulomb, encoder, joule, lightyear, meter, pascal, NoUnits}
 import csw.messages.params.models._
 import csw.messages.params.states.{CurrentState, DemandState}
@@ -101,22 +101,6 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
 
   describe("Test akka serialization of Events") {
     val eventInfo = EventInfo(prefixStr)
-
-    it("should serialize StatusEvent") {
-      val raDecKey = RaDecKey.make("raDecKey")
-
-      val raDec1 = RaDec(10.20, 40.20)
-      val raDec2 = RaDec(100.20, 400.20)
-      val param  = raDecKey.set(raDec1, raDec2).withUnits(arcmin)
-
-      val statusEvent: StatusEvent = StatusEvent(eventInfo).add(param)
-      val statusEventSerializer    = serialization.findSerializerFor(statusEvent)
-
-      statusEventSerializer.getClass shouldBe classOf[AkkaSerializer]
-
-      val statusEventBytes: Array[Byte] = statusEventSerializer.toBinary(statusEvent)
-      statusEventSerializer.fromBinary(statusEventBytes) shouldBe statusEvent
-    }
 
     it("should serialize ObserveEvent") {
       val jupiter   = Choice("Jupiter")

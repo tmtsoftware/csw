@@ -27,7 +27,6 @@ trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
   private val setupType        = classOf[Setup].getSimpleName
   private val observeType      = classOf[Observe].getSimpleName
   private val waitType         = classOf[Wait].getSimpleName
-  private val statusEventType  = classOf[StatusEvent].getSimpleName
   private val observeEventType = classOf[ObserveEvent].getSimpleName
   private val systemEventType  = classOf[SystemEvent].getSimpleName
   private val currentStateType = classOf[CurrentState].getSimpleName
@@ -164,7 +163,6 @@ trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
           case (JsString(typeName), eventInfo, paramSet) =>
             val info = eventInfo.as[EventInfo]
             typeName match {
-              case `statusEventType`  => StatusEvent(info, paramSetFormat.reads(paramSet).get).asInstanceOf[A]
               case `observeEventType` => ObserveEvent(info, paramSetFormat.reads(paramSet).get).asInstanceOf[A]
               case `systemEventType`  => SystemEvent(info, paramSetFormat.reads(paramSet).get).asInstanceOf[A]
               case _                  => unexpectedJsValueError(json)

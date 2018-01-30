@@ -3,7 +3,7 @@ package csw.messages.params.generics
 import java.time.Instant
 
 import csw.messages.ccs.commands.{CommandName, Observe, Setup, Wait}
-import csw.messages.ccs.events.{EventServiceEvent, SystemEvent}
+import csw.messages.ccs.events.{Event, SystemEvent}
 import csw.messages.params.models.{ObsId, Prefix}
 import csw.messages.params.states.{CurrentState, CurrentStates}
 import org.scalatest.FunSuite
@@ -84,7 +84,7 @@ class SerializationTest extends FunSuite {
 
     val bytes1 = write(event)
 
-    val out1 = read[EventServiceEvent](bytes1)
+    val out1 = read[Event](bytes1)
     assert(out1 == event)
   }
 

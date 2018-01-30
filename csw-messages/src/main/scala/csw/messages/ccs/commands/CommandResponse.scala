@@ -3,7 +3,6 @@ package csw.messages.ccs.commands
 import akka.NotUsed
 import akka.stream.Materializer
 import akka.stream.scaladsl.Source
-import akka.typed.ActorRef
 import csw.messages.TMTSerializable
 import csw.messages.ccs.CommandIssue
 import csw.messages.ccs.commands.CommandResultType.{Intermediate, Negative, Positive}

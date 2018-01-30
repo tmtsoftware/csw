@@ -5,7 +5,7 @@ import java.util.UUID
 
 import csw.messages.ccs.events._
 import csw.messages.params.generics.KeyType
-import csw.messages.params.generics.KeyType.{ChoiceKey, RaDecKey, StructKey}
+import csw.messages.params.generics.KeyType.{ChoiceKey, StructKey}
 import csw.messages.params.models.Units.{arcmin, joule}
 import csw.messages.params.models._
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
@@ -14,20 +14,6 @@ import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
 class ProtobufSerializationTest extends FunSpec with Matchers with BeforeAndAfterAll {
 
   describe("Test protobuf serialization of Events") {
-
-    it("should serialize StatusEvent") {
-      val eventInfo = EventInfo("wfos.blue.filter")
-      val raDecKey  = RaDecKey.make("raDecKey")
-
-      val raDec1 = RaDec(10.20, 40.20)
-      val raDec2 = RaDec(100.20, 400.20)
-      val param  = raDecKey.set(raDec1, raDec2).withUnits(arcmin)
-
-      val statusEvent: StatusEvent = StatusEvent(eventInfo).add(param)
-
-      //able to generate protobuf from event
-      StatusEvent.fromPb(statusEvent.toPb) shouldBe statusEvent
-    }
 
     it("should serialize ObserveEvent") {
       val eventInfo = EventInfo("wfos.blue.filter", Instant.now().minusSeconds(60))

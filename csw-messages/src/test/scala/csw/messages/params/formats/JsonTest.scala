@@ -1,7 +1,7 @@
 package csw.messages.params.formats
 
 import csw.messages.ccs.commands._
-import csw.messages.ccs.events.{ObserveEvent, StatusEvent, SystemEvent}
+import csw.messages.ccs.events.{ObserveEvent, SystemEvent}
 import csw.messages.params.formats.JsonSupport._
 import csw.messages.params.generics.KeyType.{
   ByteMatrixKey,
@@ -217,16 +217,6 @@ class JsonTest extends FunSpec {
       assert(c1in(k3).head == 1234L)
       assert(c1in == c1)
       assert(c1in.maybeObsId.isEmpty)
-    }
-
-    it("Should encode/decode an StatusEvent") {
-      val e1 = StatusEvent(ck).add(i1).add(i2).add(i3).add(i4).add(i5).add(i6).add(i7)
-      assert(e1.size == 7)
-      val e1out = JsonSupport.writeEvent(e1)
-      val e1in  = JsonSupport.readEvent[StatusEvent](e1out)
-      assert(e1in(k3).head == 1234L)
-      assert(e1in.info.eventTime == e1.info.eventTime)
-      assert(e1in == e1)
     }
 
     it("Should encode/decode an ObserveEvent") {

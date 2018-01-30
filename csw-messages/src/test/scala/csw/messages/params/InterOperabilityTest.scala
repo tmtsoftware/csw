@@ -9,7 +9,7 @@ import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import csw.messages.ccs.commands.{Command, CommandName, Setup}
-import csw.messages.ccs.events.StatusEvent
+import csw.messages.ccs.events.SystemEvent
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.{ObsId, Prefix}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
@@ -21,7 +21,7 @@ import scala.concurrent.{Await, Future}
 case class CommandMsg(
     command: Command,
     ackTo: ActorRef[java.util.Set[Parameter[_]]],
-    replyTo: ActorRef[StatusEvent],
+    replyTo: ActorRef[SystemEvent],
     obsIdAck: ActorRef[Optional[ObsId]]
 )
 
@@ -54,7 +54,7 @@ class InterOperabilityTest extends FunSuite with Matchers with BeforeAndAfterAll
   // 3. also, java actor creates StatusEvent and forward it to scala actor
   test("should able to send commands/events from scala code to java and vice a versa") {
     val ackProbe     = TestProbe[java.util.Set[Parameter[_]]]
-    val replyToProbe = TestProbe[StatusEvent]
+    val replyToProbe = TestProbe[SystemEvent]
     val obsIdProbe   = TestProbe[Optional[ObsId]]
 
     jCommandHandlerActor ! CommandMsg(scalaSetup, ackProbe.ref, replyToProbe.ref, obsIdProbe.ref)
@@ -62,7 +62,7 @@ class InterOperabilityTest extends FunSuite with Matchers with BeforeAndAfterAll
     val set = ackProbe.expectMsgType[java.util.Set[Parameter[_]]]
     set.asScala.toSet shouldBe Set(intParam, stringParam)
 
-    val eventFromJava = replyToProbe.expectMsgType[StatusEvent]
+    val eventFromJava = replyToProbe.expectMsgType[SystemEvent]
     eventFromJava.paramSet shouldBe Set(JavaCommandHandler.encoderParam, JavaCommandHandler.epochStringParam)
 
     obsIdProbe.expectMsgType[Optional[ObsId]]
