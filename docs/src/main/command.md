@@ -122,10 +122,16 @@ Java
 
 `CommandDistributor` is a utility for distributing commands to multiple components and get an aggregated response. 
 
-### aggregated validation
+### aggregated validation response
 
 A component can send one or more commands to one or more components using a `Map[ComponentRef, Set[ControlCommand]`, and get an aggregated response 
 of validation as `Accepted` if all the commands were successfully validated. An `Error` response is returned otherwise
+
+Scala
+:   @@snip [LongRunningCommandTest.scala](../../../csw-framework/src/multi-jvm/scala/csw/framework/command/LongRunningCommandTest.scala) { #aggregated-validation }
+
+Java
+:   @@snip [JCommandIntegrationTest.java](../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #aggregated-validation }
 
 ### aggregated completion response
 
@@ -133,5 +139,10 @@ A component can send one or more commands to one or more components using a `Map
 final completion result for all the commands post successful validation and get an aggregated response of completion as `Completed` if all the commands 
 were successfully completed. An `Error` response is returned otherwise.
 
+Scala
+:   @@snip [LongRunningCommandTest.scala](../../../csw-framework/src/multi-jvm/scala/csw/framework/command/LongRunningCommandTest.scala) { #aggregated-completion }
+
+Java
+:   @@snip [JCommandIntegrationTest.java](../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #aggregated-completion }
 
 
