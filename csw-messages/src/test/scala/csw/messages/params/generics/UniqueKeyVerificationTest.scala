@@ -2,7 +2,7 @@ package csw.messages.params.generics
 
 import csw.messages.ccs.commands._
 import csw.messages.ccs.events._
-import csw.messages.params.models.{ObsId, RunId, Struct}
+import csw.messages.params.models.{Id, ObsId, Prefix, Struct}
 import csw.messages.params.states.{CurrentState, DemandState}
 import org.scalatest.{FunSpec, Matchers}
 
@@ -13,9 +13,8 @@ class UniqueKeyVerificationTest extends FunSpec with Matchers {
   val filterKey: Key[Int]  = KeyType.IntKey.make("filter")
   val miscKey: Key[Int]    = KeyType.IntKey.make("misc.")
 
-  val runId     = RunId()
-  val prefix    = "wfos.blue.filter"
-  val eventInfo = EventInfo(prefix, EventTime(), None)
+  val runId  = Id()
+  val prefix = Prefix("wfos.blue.filter")
 
   private val encParam1 = encoderKey.set(1)
   private val encParam2 = encoderKey.set(2)
@@ -178,7 +177,7 @@ class UniqueKeyVerificationTest extends FunSpec with Matchers {
 
       //parameters with duplicate key via constructor
       val event =
-        ObserveEvent(eventInfo, Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
+        ObserveEvent(prefix, "filter wheel", Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
       event.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
 
       //parameters with duplicate key via add + madd
@@ -196,7 +195,7 @@ class UniqueKeyVerificationTest extends FunSpec with Matchers {
 
       //parameters with duplicate key via constructor
       val event =
-        SystemEvent(eventInfo, Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
+        SystemEvent(prefix, "filter wheel", Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
       event.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
 
       //parameters with duplicate key via add + madd

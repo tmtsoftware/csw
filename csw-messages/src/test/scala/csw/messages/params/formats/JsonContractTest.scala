@@ -20,12 +20,12 @@ import scala.io.Source
 //DEOPSCSW-184: Change configurations - attributes and values
 class JsonContractTest extends FunSpec with Matchers {
 
-  private val prefix: Prefix       = "wfos.blue.filter"
+  private val prefix: Prefix       = Prefix("wfos.blue.filter")
   private val obsId: ObsId         = ObsId("Obs001")
   private val instantStr: String   = "2017-08-09T06:40:00.898Z"
-  private val eventId: String      = "7a4cd6ab-6077-476d-a035-6f83be1de42c"
+  private val eventId: Id          = Id("7a4cd6ab-6077-476d-a035-6f83be1de42c")
   private val eventTime: EventTime = EventTime(Instant.parse(instantStr))
-  private val eventInfo: EventInfo = EventInfo(prefix, eventTime, Some(obsId), eventId)
+  private val eventName: String    = "filter wheel"
 
   describe("Test Sequence Commands") {
 
@@ -91,7 +91,7 @@ class JsonContractTest extends FunSpec with Matchers {
       val structItem = Struct().madd(ra.set("12:13:14.1"), dec.set("32:33:34.4"), epoch.set(1950.0))
 
       val structParam        = structKey.set(structItem)
-      val observeEvent       = ObserveEvent(eventInfo).add(structParam)
+      val observeEvent       = ObserveEvent(eventId, prefix, eventName, eventTime, Set(structParam))
       val observeEventToJson = Json.prettyPrint(JsonSupport.writeEvent(observeEvent))
 
       val expectedObserveEventJson =
@@ -106,7 +106,7 @@ class JsonContractTest extends FunSpec with Matchers {
       val arrayDataKey   = KeyType.ByteArrayKey.make("arrayDataKey")
       val arrayDataParam = arrayDataKey.set(ArrayData(a1), ArrayData(a2))
 
-      val systemEvent       = SystemEvent(eventInfo).add(arrayDataParam)
+      val systemEvent       = SystemEvent(eventId, prefix, eventName, eventTime, Set(arrayDataParam))
       val systemEventToJson = Json.prettyPrint(JsonSupport.writeEvent(systemEvent))
 
       val expectedSystemEventJson = Json.prettyPrint(Json.parse(Source.fromResource("json/system_event.json").mkString))

@@ -4,16 +4,12 @@ import csw.messages.params.generics.JKeyTypes;
 import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.generics.ParameterSetType;
-import csw.messages.params.models.ObsId;
 import csw.messages.params.models.Prefix;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static csw.messages.javadsl.JSubsystem.WFOS;
 
 // DEOPSCSW-183: Configure attributes and values
 // DEOPSCSW-185: Easy to Use Syntax/Api
@@ -27,15 +23,11 @@ public class JEventsTest {
     private final Parameter<String> epochStringParam = epochStringKey.set("A", "B");
     private final Parameter<Integer> epochIntParam = epochIntKey.set(44, 55);
 
-    private final String prefix = "wfos.red.detector";
+    private final Prefix prefix = new Prefix("wfos.red.detector");
 
-    private<T extends ParameterSetType & EventType> void assertOnEventsAPI(T event) {
+    private<T extends ParameterSetType & Event> void assertOnEventsAPI(T event) {
         // eventInfo, prefix, subsystem, source
-        Assert.assertEquals(EventInfo.create(prefix), event.info());
-        Assert.assertEquals(prefix, event.prefixStr());
-        Assert.assertEquals(new Prefix(prefix), event.prefix());
         Assert.assertEquals(prefix, event.source());
-        Assert.assertEquals(WFOS, event.subsystem());
 
         // contains and exists
         Assert.assertFalse(event.contains(notUsedKey));
@@ -82,27 +74,23 @@ public class JEventsTest {
 
     @Test
     public void shouldAbleToCreateAndAccessObserveEvent() {
-        ObserveEvent observeEvent = new ObserveEvent(prefix).add(encoderParam).add(epochStringParam);
+        ObserveEvent observeEvent = new ObserveEvent(prefix, "filter wheel").add(encoderParam).add(epochStringParam);
         assertOnEventsAPI(observeEvent);
     }
 
     @Test
     public void shouldAbleToCreateAndAccessSystemEvent() {
-        SystemEvent systemEvent = new SystemEvent(prefix).add(encoderParam).add(epochStringParam);
+        SystemEvent systemEvent = new SystemEvent(prefix, "filter wheel").add(encoderParam).add(epochStringParam);
         assertOnEventsAPI(systemEvent);
     }
 
     @Test
     public void shouldAbleToCreateAndAccessSystemEventWithCustomInfo() {
-        Instant currentTime = Instant.now();
-        EventTime eventTime = new EventTime(currentTime);
-        ObsId obsId = ObsId.apply("obsId");
-        EventInfo eventInfo = EventInfo.apply(prefix, eventTime, obsId);
-
-        SystemEvent systemEvent = new SystemEvent(prefix, eventTime, obsId).add(encoderParam).add(epochStringParam);
-        Assert.assertEquals(eventInfo, systemEvent.info());
-        Assert.assertEquals(eventTime, systemEvent.eventTime());
-        Assert.assertEquals(Optional.of(obsId), systemEvent.obsIdOptional());
+        SystemEvent systemEvent = new SystemEvent(prefix, "filter wheel").add(encoderParam).add(epochStringParam);
+        Assert.assertEquals(prefix, systemEvent.source());
+        Assert.assertEquals("filter wheel", systemEvent.name());
+        Assert.assertNotNull(systemEvent.eventId());
+        Assert.assertNotNull(systemEvent.eventTime());
     }
 
 }

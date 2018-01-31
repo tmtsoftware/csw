@@ -79,8 +79,10 @@ public class JEventsTest {
         Key<Integer> k4 = JKeyTypes.IntKey().make("notUsed");
 
         //prefixes
-        String ck1 = "wfos.prog.cloudcover";
-        String ck3 = "wfos.red.detector";
+        Prefix prefix1 = new Prefix("wfos.prog.cloudcover");
+        String name1 = "filter wheel";
+        Prefix prefix2 = new Prefix("wfos.red.detector");
+        String name2 = "iris";
 
         //parameters
         Parameter<Integer> p1 = k1.set(22);
@@ -88,11 +90,11 @@ public class JEventsTest {
         Parameter<String> p3 = k3.set("A", "B", "C", "D");
 
         //Create ObserveEvent using madd
-        ObserveEvent oc1 = new ObserveEvent(ck1).madd(p1, p2);
+        ObserveEvent oc1 = new ObserveEvent(prefix1, name1).madd(p1, p2);
         //Create ObserveEvent using add
-        ObserveEvent oc2 = new ObserveEvent(ck3).add(p1).add(p2);
+        ObserveEvent oc2 = new ObserveEvent(prefix2, name2).add(p1).add(p2);
         //Create ObserveEvent and use add
-        ObserveEvent oc3 = new ObserveEvent(ck3).add(p1).add(p2).add(p3);
+        ObserveEvent oc3 = new ObserveEvent(prefix2, name2).add(p1).add(p2).add(p3);
 
         //access keys
         Boolean k1Exists = oc1.exists(k1); //true
@@ -115,7 +117,7 @@ public class JEventsTest {
         Assert.assertEquals(new HashSet<>(Arrays.asList(22)), new HashSet<>(v1));
         Assert.assertEquals(new HashSet<>(Arrays.asList(44)), new HashSet<>(v2));
         Assert.assertEquals(new HashSet<>(Arrays.asList(missingKeys)), new HashSet<>(Arrays.asList(missingKeys)));
-        Assert.assertEquals(oc2, oc4);
+        Assert.assertNotEquals(oc2, oc4);
     }
 
     @Test
@@ -128,8 +130,10 @@ public class JEventsTest {
         Key<Integer> k4 = JKeyTypes.IntKey().make("notUsed");
 
         //prefixes
-        String ck1 = "wfos.prog.cloudcover";
-        String ck3 = "wfos.red.detector";
+        Prefix prefix1 = new Prefix("wfos.prog.cloudcover");
+        String name1 = "filter wheel";
+        Prefix prefix2 = new Prefix("wfos.red.detector");
+        String name2 = "iris";
 
         //parameters
         Parameter<Integer> p1 = k1.set(22);
@@ -137,11 +141,11 @@ public class JEventsTest {
         Parameter<String> p3 = k3.set("A", "B", "C", "D");
 
         //Create SystemEvent using madd
-        SystemEvent se1 = new SystemEvent(ck1).madd(p1, p2);
+        SystemEvent se1 = new SystemEvent(prefix1, name1).madd(p1, p2);
         //Create SystemEvent using add
-        SystemEvent se2 = new SystemEvent(ck3).add(p1).add(p2);
+        SystemEvent se2 = new SystemEvent(prefix2, name2).add(p1).add(p2);
         //Create SystemEvent and use add
-        SystemEvent se3 = new SystemEvent(ck3).add(p1).add(p2).add(p3);
+        SystemEvent se3 = new SystemEvent(prefix2, name2).add(p1).add(p2).add(p3);
 
         //access keys
         Boolean k1Exists = se1.exists(k1); //true
@@ -164,7 +168,7 @@ public class JEventsTest {
         Assert.assertEquals(new HashSet<>(Arrays.asList(22)), new HashSet<>(v1));
         Assert.assertEquals(new HashSet<>(Arrays.asList(44)), new HashSet<>(v2));
         Assert.assertEquals(new HashSet<>(Arrays.asList(missingKeys)), new HashSet<>(Arrays.asList(missingKeys)));
-        Assert.assertEquals(se2, oc4);
+        Assert.assertNotEquals(se2, oc4);
     }
 
     @Test
@@ -173,6 +177,10 @@ public class JEventsTest {
         //key
         Key<MatrixData<Double>> k1 = JKeyTypes.DoubleMatrixKey().make("myMatrix");
 
+        //prefixes
+        Prefix prefix1 = new Prefix("wfos.blue.filter");
+        String name1 = "filter wheel";
+
         //values
         Double[][] doubles = {{1.0, 2.0, 3.0}, {4.1, 5.1, 6.1}, {7.2, 8.2, 9.2}};
         MatrixData<Double> m1 = MatrixData.fromJavaArrays(Double.class, doubles);
@@ -180,9 +188,10 @@ public class JEventsTest {
         //parameter
         Parameter<MatrixData<Double>> i1 = k1.set(m1);
 
+
         //events
-        ObserveEvent observeEvent = new ObserveEvent("wfos.blue.filter").add(i1);
-        SystemEvent systemEvent = new SystemEvent("wfos.blue.filter").add(i1);
+        ObserveEvent observeEvent = new ObserveEvent(prefix1, name1).add(i1);
+        SystemEvent systemEvent = new SystemEvent(prefix1, name1).add(i1);
 
         //json support - write
         JsValue observeJson = JavaJsonSupport.writeEvent(observeEvent);
@@ -214,7 +223,8 @@ public class JEventsTest {
         Key<Integer> miscKey = JKeyTypes.IntKey().make("misc.");
 
         //prefix
-        String prefix = "wfos.blue.filter";
+        Prefix prefix1 = new Prefix("wfos.blue.filter");
+        String name1 = "filter wheel";
 
         //params
         Parameter<Integer> encParam1 = encoderKey.set(1);
@@ -228,7 +238,7 @@ public class JEventsTest {
         Parameter<Integer> miscParam1 = miscKey.set(100);
 
         //StatusEvent with duplicate key via madd
-        SystemEvent event = new SystemEvent(prefix).madd(
+        SystemEvent event = new SystemEvent(prefix1, name1).madd(
                 encParam1,
                 encParam2,
                 encParam3,
@@ -259,20 +269,11 @@ public class JEventsTest {
     public void showUsageOfProtobuf() {
         //#protobuf
 
-        //Some variety in EventInfo
-        EventInfo eventInfo1 = EventInfo.apply("wfos.blue.filter");
-        EventInfo eventInfo2 = EventInfo.apply(
-                "wfos.blue.filter",
-                EventTime.apply(Instant.now()));
-        EventInfo eventInfo3 = EventInfo.apply(
-                "wfos.blue.filter",
-                EventTime.apply(),
-                ObsId.apply("Obs001"));
-        EventInfo eventInfo4 = EventInfo.apply(
-                new Prefix("wfos.prog.cloudcover"),
-                EventTime.apply(),
-                ObsId.apply("Obs001").asOption(),
-                UUID.randomUUID().toString());
+        //prefixes
+        Prefix prefix1 = new Prefix("wfos.blue.filter");
+        String name1 = "filter wheel";
+        Prefix prefix2 = new Prefix("wfos.prog.cloudcover");
+        String name2 = "iris";
 
         //Key
         Key<RaDec> raDecKey = JKeyTypes.RaDecKey().make("raDecKey");
@@ -285,9 +286,9 @@ public class JEventsTest {
         Parameter<RaDec> param = raDecKey.set(raDec1, raDec2).withUnits(JUnits.arcmin);
 
         //events
-        ObserveEvent observeEvent = ObserveEvent.from(eventInfo2).add(param);
-        SystemEvent systemEvent1 = SystemEvent.from(eventInfo3).add(param);
-        SystemEvent systemEvent2 = SystemEvent.from(eventInfo4).add(param);
+        ObserveEvent observeEvent = new ObserveEvent(prefix1, name1).add(param);
+        SystemEvent systemEvent1 = new SystemEvent(prefix1, name1).add(param);
+        SystemEvent systemEvent2 = new SystemEvent(prefix2, name2).add(param);
 
         //convert events to protobuf bytestring
         byte[] byteArray2 = observeEvent.toPb();

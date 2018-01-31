@@ -10,7 +10,7 @@ import org.scalatest.{FunSpec, Matchers}
 class ResultTest extends FunSpec with Matchers {
 
   //#runid
-  val runId: RunId = RunId()
+  val runId: Id = Id()
   //#runid
 
   describe("Examples of Result") {

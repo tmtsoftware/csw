@@ -3,7 +3,7 @@ package csw.messages.params.formats
 import csw.messages.ccs.commands._
 import csw.messages.ccs.events._
 import csw.messages.params.generics.Parameter
-import csw.messages.params.models.{ObsId, Prefix, RunId}
+import csw.messages.params.models.{Id, ObsId, Prefix}
 import csw.messages.params.states.StateVariable.StateVariable
 import csw.messages.params.states.{CurrentState, DemandState}
 import play.api.libs.json._
@@ -17,7 +17,7 @@ trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
 
   // JSON formats
   lazy val paramSetFormat: Format[Set[Parameter[_]]] = implicitly[Format[Set[Parameter[_]]]]
-  lazy val runIdFormat: Format[RunId]                = implicitly[Format[RunId]]
+  lazy val runIdFormat: Format[Id]                   = implicitly[Format[Id]]
   lazy val obsIdFormat: Format[Option[ObsId]]        = implicitly[Format[Option[ObsId]]]
   lazy val prefixFormat: Format[Prefix]              = implicitly[Format[Prefix]]
   lazy val commandTypeFormat: Format[CommandName]    = implicitly[Format[CommandName]]
@@ -67,19 +67,19 @@ trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
           case (JsString(typeName), runId, source, commandName, obsId, paramSet) =>
             typeName match {
               case `setupType` =>
-                Setup(runId.as[RunId],
+                Setup(runId.as[Id],
                       source.as[Prefix],
                       commandName.as[CommandName],
                       obsId.as[Option[ObsId]],
                       paramSet.as[Set[Parameter[_]]]).asInstanceOf[A]
               case `observeType` =>
-                Observe(runId.as[RunId],
+                Observe(runId.as[Id],
                         source.as[Prefix],
                         commandName.as[CommandName],
                         obsId.as[Option[ObsId]],
                         paramSet.as[Set[Parameter[_]]]).asInstanceOf[A]
               case `waitType` =>
-                Wait(runId.as[RunId],
+                Wait(runId.as[Id],
                      source.as[Prefix],
                      commandName.as[CommandName],
                      obsId.as[Option[ObsId]],
@@ -139,12 +139,15 @@ trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
    * @tparam A the type of the event (implied)
    * @return a JsValue object representing the event
    */
-  def writeEvent[A <: EventType[_]](event: A): JsValue = {
+  def writeEvent[A <: Event](event: A): JsValue = {
     JsObject(
       Seq(
-        "type"     -> JsString(event.typeName),
-        "info"     -> eventInfoFormat.writes(event.info),
-        "paramSet" -> Json.toJson(event.paramSet)
+        "type"      → JsString(event.paramType.typeName),
+        "eventId"   → Id.format.writes(event.eventId),
+        "source"    → Prefix.format.writes(event.source),
+        "name"      → JsString(event.name),
+        "eventTime" → EventTime.format.writes(event.eventTime),
+        "paramSet"  → Json.toJson(event.paramSet)
       )
     )
   }
@@ -156,16 +159,29 @@ trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
    * @tparam A the type of the event (use Any and match on the type if you don't know)
    * @return an instance of the given event type, or an exception if the JSON is not valid for that type
    */
-  def readEvent[A <: EventType[_]](json: JsValue): A = {
+  def readEvent[A <: Event](json: JsValue): A = {
     json match {
       case JsObject(fields) =>
-        (fields("type"), fields("info"), fields("paramSet")) match {
-          case (JsString(typeName), eventInfo, paramSet) =>
-            val info = eventInfo.as[EventInfo]
+        (fields("type"), fields("eventId"), fields("source"), fields("name"), fields("eventTime"), fields("paramSet")) match {
+          case (JsString(typeName), eventId, source, JsString(name), eventTime, paramSet) =>
             typeName match {
-              case `observeEventType` => ObserveEvent(info, paramSetFormat.reads(paramSet).get).asInstanceOf[A]
-              case `systemEventType`  => SystemEvent(info, paramSetFormat.reads(paramSet).get).asInstanceOf[A]
-              case _                  => unexpectedJsValueError(json)
+              case `observeEventType` =>
+                ObserveEvent(
+                  eventId.as[Id],
+                  source.as[Prefix],
+                  name,
+                  eventTime.as[EventTime],
+                  paramSet.as[Set[Parameter[_]]]
+                ).asInstanceOf[A]
+              case `systemEventType` =>
+                SystemEvent(
+                  eventId.as[Id],
+                  source.as[Prefix],
+                  name,
+                  eventTime.as[EventTime],
+                  paramSet.as[Set[Parameter[_]]]
+                ).asInstanceOf[A]
+              case _ => unexpectedJsValueError(json)
             }
           case _ => unexpectedJsValueError(json)
         }

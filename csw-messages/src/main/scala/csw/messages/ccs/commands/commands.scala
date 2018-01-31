@@ -3,7 +3,7 @@ package csw.messages.ccs.commands
 import java.util.Optional
 
 import csw.messages.params.generics.{Parameter, ParameterSetType}
-import csw.messages.params.models.{ObsId, Prefix, RunId}
+import csw.messages.params.models.{Id, ObsId, Prefix}
 
 import scala.compat.java8.OptionConverters.{RichOptionForJava8, RichOptionalGeneric}
 
@@ -23,7 +23,7 @@ sealed trait Command { self: ParameterSetType[_] ⇒
   /**
    * unique ID for command parameter set
    */
-  val runId: RunId
+  val runId: Id
 
   /**
    * an optional initial set of parameters (keys with values)
@@ -60,7 +60,7 @@ sealed trait ControlCommand extends Command { self: ParameterSetType[_] ⇒
  * @param paramSet an optional initial set of parameters (keys with values)
  */
 case class Setup private (
-    runId: RunId,
+    runId: Id,
     source: Prefix,
     commandName: CommandName,
     maybeObsId: Option[ObsId],
@@ -70,7 +70,7 @@ case class Setup private (
     with ControlCommand {
 
   def this(source: Prefix, commandName: CommandName, maybeObsId: Optional[ObsId]) =
-    this(RunId(), source, commandName, maybeObsId.asScala, Set.empty)
+    this(Id(), source, commandName, maybeObsId.asScala, Set.empty)
 
   override protected def create(data: Set[Parameter[_]]): Setup = copy(paramSet = data)
 }
@@ -79,7 +79,7 @@ object Setup {
 
   // The default apply method is used only internally while reading the incoming json and de-serializing it to setup model
   private[messages] def apply(
-      runId: RunId,
+      runId: Id,
       source: Prefix,
       commandName: CommandName,
       maybeObsId: Option[ObsId],
@@ -88,7 +88,7 @@ object Setup {
 
   // The apply method is used to create Setup command by end-user. RunId is not accepted and will be created internally to guarantee unique value.
   def apply(source: Prefix, commandName: CommandName, maybeObsId: Option[ObsId]): Setup =
-    apply(RunId(), source, commandName, maybeObsId, Set.empty)
+    apply(Id(), source, commandName, maybeObsId, Set.empty)
 
   def apply(source: Prefix, commandName: CommandName, maybeObsId: Option[ObsId], paramSet: Set[Parameter[_]]): Setup =
     apply(source, commandName, maybeObsId).madd(paramSet)
@@ -101,7 +101,7 @@ object Setup {
  * @param paramSet an optional initial set of parameters (keys with values)
  */
 case class Observe private (
-    runId: RunId,
+    runId: Id,
     source: Prefix,
     commandName: CommandName,
     maybeObsId: Option[ObsId],
@@ -111,7 +111,7 @@ case class Observe private (
     with ControlCommand {
 
   def this(source: Prefix, commandName: CommandName, maybeObsId: Optional[ObsId]) =
-    this(RunId(), source, commandName, maybeObsId.asScala, Set.empty)
+    this(Id(), source, commandName, maybeObsId.asScala, Set.empty)
 
   override protected def create(data: Set[Parameter[_]]): Observe = copy(paramSet = data)
 }
@@ -119,7 +119,7 @@ case class Observe private (
 object Observe {
 
   private[messages] def apply(
-      runId: RunId,
+      runId: Id,
       source: Prefix,
       commandName: CommandName,
       maybeObsId: Option[ObsId],
@@ -127,7 +127,7 @@ object Observe {
   ) = new Observe(runId, source, commandName, maybeObsId, paramSet)
 
   def apply(source: Prefix, commandName: CommandName, maybeObsId: Option[ObsId]): Observe =
-    apply(RunId(), source, commandName, maybeObsId, Set.empty)
+    apply(Id(), source, commandName, maybeObsId, Set.empty)
 
   def apply(source: Prefix, commandName: CommandName, maybeObsId: Option[ObsId], paramSet: Set[Parameter[_]]): Observe =
     apply(source, commandName, maybeObsId).madd(paramSet)
@@ -140,7 +140,7 @@ object Observe {
  * @param paramSet an optional initial set of parameters (keys with values)
  */
 case class Wait private (
-    runId: RunId,
+    runId: Id,
     source: Prefix,
     commandName: CommandName,
     maybeObsId: Option[ObsId],
@@ -149,7 +149,7 @@ case class Wait private (
     with SequenceCommand {
 
   def this(source: Prefix, commandName: CommandName, maybeObsId: Optional[ObsId]) =
-    this(RunId(), source, commandName, maybeObsId.asScala, Set.empty)
+    this(Id(), source, commandName, maybeObsId.asScala, Set.empty)
 
   override protected def create(data: Set[Parameter[_]]): Wait = copy(paramSet = data)
 }
@@ -157,7 +157,7 @@ case class Wait private (
 object Wait {
 
   private[messages] def apply(
-      runId: RunId,
+      runId: Id,
       source: Prefix,
       commandName: CommandName,
       maybeObsId: Option[ObsId],
@@ -165,7 +165,7 @@ object Wait {
   ) = new Wait(runId, source, commandName, maybeObsId, paramSet)
 
   def apply(source: Prefix, commandName: CommandName, maybeObsId: Option[ObsId]): Wait =
-    apply(RunId(), source, commandName, maybeObsId, Set.empty)
+    apply(Id(), source, commandName, maybeObsId, Set.empty)
 
   def apply(source: Prefix, commandName: CommandName, maybeObsId: Option[ObsId], paramSet: Set[Parameter[_]]): Wait =
     apply(source, commandName, maybeObsId).madd(paramSet)

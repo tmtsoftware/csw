@@ -10,10 +10,10 @@ message PbEvent {
         ObserveEvent = 0;
         SystemEvent = 1;
     }
-    string prefix = 10;
-    google.protobuf.Timestamp eventTime = 11;
-    string obsId = 12;
-    string eventId = 13;
+    string eventId = 10;
+    string source = 11;
+    string name = 12;
+    google.protobuf.Timestamp eventTime = 13;
     repeated PbParameter paramSet = 14;
     PbEventType eventType = 15;
 }

@@ -12,7 +12,7 @@ import csw.messages.ccs.commands.CommandResponse.{Completed, NoLongerValid}
 import csw.messages.ccs.commands.{CommandResponse, ComponentRef, Setup}
 import csw.messages.models.PubSub
 import csw.messages.params.models.Units.encoder
-import csw.messages.params.models.{ObsId, RunId}
+import csw.messages.params.models.{Id, ObsId}
 import csw.trombone.assembly._
 import csw.trombone.assembly.actors.TromboneState.TromboneState
 import csw.trombone.hcd.TromboneHcdState
@@ -72,7 +72,7 @@ class PositionCommand(
 
   def stopCommand(): Unit = {
     tromboneHCD.foreach(
-      _.value ! Submit(TromboneHcdState.cancelSC(RunId(), s.maybeObsId.getOrElse(ObsId.empty)), ctx.spawnAnonymous(Actor.ignore))
+      _.value ! Submit(TromboneHcdState.cancelSC(Id(), s.maybeObsId.getOrElse(ObsId.empty)), ctx.spawnAnonymous(Actor.ignore))
     )
   }
 

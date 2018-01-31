@@ -51,7 +51,7 @@ object JavaJsonSupport {
    * @tparam A the type of the event (implied)
    * @return a JsValue object representing the event
    */
-  def writeEvent[A <: EventType[_]](event: A): JsValue = JsonSupport.writeEvent(event)
+  def writeEvent[A <: Event](event: A): JsValue = JsonSupport.writeEvent(event)
 
   /**
    * Reads an event back from JSON
@@ -60,7 +60,7 @@ object JavaJsonSupport {
    * @tparam A the type of the event (use Any and match on the type if you don't know)
    * @return an instance of the given event type, or an exception if the JSON is not valid for that type
    */
-  def readEvent[A <: EventType[_]](klass: Class[A], json: JsValue): A = JsonSupport.readEvent[A](json)
+  def readEvent[A <: Event](klass: Class[A], json: JsValue): A = JsonSupport.readEvent[A](json)
 
   /**
    * Writes a Result to JSON

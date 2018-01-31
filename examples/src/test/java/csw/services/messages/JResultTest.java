@@ -7,7 +7,7 @@ import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.models.MatrixData;
 import csw.messages.params.models.ObsId;
-import csw.messages.params.models.RunId;
+import csw.messages.params.models.Id;
 import org.junit.Assert;
 import org.junit.Test;
 import play.api.libs.json.JsValue;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class JResultTest {
 
     //#runid
-    RunId runId = RunId.apply();
+    Id runId = Id.apply();
     //#runid
 
     @Test

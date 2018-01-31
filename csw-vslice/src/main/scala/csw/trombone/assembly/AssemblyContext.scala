@@ -6,7 +6,7 @@ import csw.messages.framework.ComponentInfo
 import csw.messages.location.ComponentId
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.Units.{degree, kilometer, micrometer, millimeter}
-import csw.messages.params.models.{ObsId, Prefix, RunId}
+import csw.messages.params.models.{Id, ObsId, Prefix}
 
 /**
  * TMT Source Code: 10/4/16.
@@ -40,24 +40,24 @@ case class AssemblyContext(
   // Move submit command
   val moveCK = CommandName("move")
 
-  def moveSC(runId: RunId, position: Double): Setup =
+  def moveSC(runId: Id, position: Double): Setup =
     Setup(componentPrefix, moveCK, Some(obsId)).add(stagePositionKey -> position withUnits stagePositionUnits)
 
   // Position submit command
   val positionPrefix = s"$componentPrefix.position"
   val positionCK     = CommandName(positionPrefix)
 
-  def positionSC(runId: RunId, rangeDistance: Double): Setup =
+  def positionSC(runId: Id, rangeDistance: Double): Setup =
     Setup(componentPrefix, positionCK, Some(obsId)).add(naRangeDistanceKey -> rangeDistance withUnits naRangeDistanceUnits)
 
   // setElevation submit command
   val setElevationCK: CommandName = CommandName("setElevation")
-  def setElevationSC(runId: RunId, elevation: Double): Setup =
+  def setElevationSC(runId: Id, elevation: Double): Setup =
     Setup(componentPrefix, setElevationCK, Some(obsId)).add(naElevation(elevation))
 
   // setAngle submit command
   val setAngleCK = CommandName("setAngle")
-  def setAngleSC(runId: RunId, zenithAngle: Double): Setup =
+  def setAngleSC(runId: Id, zenithAngle: Double): Setup =
     Setup(componentPrefix, setAngleCK, Some(obsId)).add(za(zenithAngle))
 
   // Follow submit command
@@ -66,7 +66,7 @@ case class AssemblyContext(
 
   def setNssInUse(value: Boolean): Parameter[Boolean] = nssInUseKey -> value
 
-  def followSC(runId: RunId, nssInUse: Boolean): Setup =
+  def followSC(runId: Id, nssInUse: Boolean): Setup =
     Setup(componentPrefix, followCK, Some(obsId)).add(nssInUseKey -> nssInUse)
 
   // A list of all commands

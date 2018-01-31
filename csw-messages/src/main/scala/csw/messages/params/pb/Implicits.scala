@@ -16,9 +16,9 @@ object Implicits {
    */
   implicit val instantMapper: TypeMapper[Timestamp, Instant] =
     TypeMapper[Timestamp, Instant] { x =>
-      Instant.ofEpochSecond(x.seconds)
+      Instant.ofEpochSecond(x.seconds, x.nanos)
     } { x =>
-      Timestamp().withSeconds(x.getEpochSecond)
+      Timestamp().withSeconds(x.getEpochSecond).withNanos(x.getNano)
     }
 
   /**

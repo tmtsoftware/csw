@@ -7,7 +7,7 @@ import akka.stream.scaladsl.Source
 import akka.util.Timeout
 import csw.messages.ccs.commands.CommandResponse.Completed
 import csw.messages.ccs.commands.{CommandResponse, ComponentRef, ControlCommand}
-import csw.messages.params.models.RunId
+import csw.messages.params.models.Id
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -37,7 +37,7 @@ case class CommandDistributor(componentToCommands: Map[ComponentRef, Set[Control
       { case (component, commands) ⇒ component.submitAll(commands) }
     )
     CommandResponse.aggregateResponse(commandResponsesF).map {
-      case _: Completed  ⇒ CommandResponse.Accepted(RunId())
+      case _: Completed  ⇒ CommandResponse.Accepted(Id())
       case otherResponse ⇒ otherResponse
     }
   }

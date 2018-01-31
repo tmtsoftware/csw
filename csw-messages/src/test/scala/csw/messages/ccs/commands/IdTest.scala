@@ -1,14 +1,14 @@
 package csw.messages.ccs.commands
 
-import csw.messages.params.models.{ObsId, Prefix, RunId}
+import csw.messages.params.models.{Id, ObsId, Prefix}
 import org.scalatest.{FunSuite, Matchers}
 
 //DEOPSCSW-205 Return unique id on successful command verification
-class RunIdTest extends FunSuite with Matchers {
+class IdTest extends FunSuite with Matchers {
 
   test("should able to create setup commands having unique runId") {
 
-    var runIds: Set[RunId] = Set.empty
+    var runIds: Set[Id] = Set.empty
 
     // Create 10 setup commands. For each command created, fetch the runId and add it in a Set[RunId].
     // Since Set can contain only unique values, asserting 10 runIds in set determines the uniquely created runId for all 10 setup commands.
@@ -22,7 +22,7 @@ class RunIdTest extends FunSuite with Matchers {
 
   test("should able to create observe commands having unique runId") {
 
-    var runIds: Set[RunId] = Set.empty
+    var runIds: Set[Id] = Set.empty
 
     // Create 10 observe commands. For each command created, fetch the runId and add it in a Set[RunId].
     // Since Set can contain only unique values, asserting 10 runIds in set determines the uniquely created runId for all 10 observe commands.
@@ -36,7 +36,7 @@ class RunIdTest extends FunSuite with Matchers {
 
   test("should able to create wait commands having unique runId") {
 
-    var runIds: Set[RunId] = Set.empty
+    var runIds: Set[Id] = Set.empty
 
     // Create 10 wait commands. For each command created, fetch the runId and add it in a Set[RunId].
     // Since Set can contain only unique values, asserting 10 runIds in set determines the uniquely created runId for all 10 wait commands.

@@ -1,14 +1,12 @@
 {
   "type": "ObserveEvent",
-  "info": {
-    "source": {
-      "subsystem": "wfos",
-      "prefix": "wfos.blue.filter"
-    },
-    "eventTime": "2017-08-09T06:40:00.898Z",
-    "obsId": "Obs001",
-    "eventId": "7a4cd6ab-6077-476d-a035-6f83be1de42c"
+  "eventId": "7a4cd6ab-6077-476d-a035-6f83be1de42c",
+  "source": {
+    "subsystem": "wfos",
+    "prefix": "wfos.blue.filter"
   },
+  "name" : "filter wheel",
+  "eventTime": "2017-08-09T06:40:00.898Z",
   "paramSet": [
     {
       "keyName": "myStruct",

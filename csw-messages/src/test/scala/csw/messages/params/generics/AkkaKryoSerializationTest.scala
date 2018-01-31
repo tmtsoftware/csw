@@ -18,7 +18,7 @@ import csw.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.messages.ccs.CommandIssue
 import csw.messages.ccs.commands.CommandResponse._
 import csw.messages.ccs.commands._
-import csw.messages.ccs.events.{EventInfo, ObserveEvent, SystemEvent}
+import csw.messages.ccs.events.{EventTime, ObserveEvent, SystemEvent}
 import csw.messages.framework.LocationServiceUsage.DoNotRegister
 import csw.messages.framework.{ComponentInfo, ContainerLifecycleState, SupervisorLifecycleState}
 import csw.messages.location.ComponentType.HCD
@@ -41,7 +41,7 @@ import scala.concurrent.duration.DurationDouble
 class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfterAll {
   private final val system        = ActorSystem("example")
   private final val serialization = SerializationExtension(system)
-  private final val prefixStr     = "wfos.prog.cloudcover"
+  private final val prefix        = Prefix("wfos.prog.cloudcover")
 
   override protected def afterAll(): Unit = Await.result(system.terminate(), 2.seconds)
 
@@ -51,7 +51,7 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
       val intKey = IntKey.make("intKey")
       val param  = intKey.set(1, 2, 3).withUnits(coulomb)
 
-      val setup           = Setup(Prefix(prefixStr), CommandName("move"), Some(ObsId("Obs001"))).add(param)
+      val setup           = Setup(prefix, CommandName("move"), Some(ObsId("Obs001"))).add(param)
       val setupSerializer = serialization.findSerializerFor(setup)
 
       setupSerializer.getClass shouldBe classOf[AkkaSerializer]
@@ -70,7 +70,7 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
       val binaryImgData: ArrayData[Byte]    = ArrayData.fromArray(imgBytes)
       val param: Parameter[ArrayData[Byte]] = imageKey -> binaryImgData withUnits pascal
 
-      val observe           = Observe(Prefix(prefixStr), CommandName("move"), Some(ObsId("Obs001"))).add(param)
+      val observe           = Observe(prefix, CommandName("move"), Some(ObsId("Obs001"))).add(param)
       val observeSerializer = serialization.findSerializerFor(observe)
 
       observeSerializer.getClass shouldBe classOf[AkkaSerializer]
@@ -89,7 +89,7 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
       val doubleMatrixKey = DoubleMatrixKey.make(keyName)
       val param           = doubleMatrixKey.set(Array(matrixData1, matrixData2), lightyear)
 
-      val wait: Wait     = Wait(Prefix(prefixStr), CommandName("move"), Some(ObsId("Obs001"))).add(param)
+      val wait: Wait     = Wait(prefix, CommandName("move"), Some(ObsId("Obs001"))).add(param)
       val waitSerializer = serialization.findSerializerFor(wait)
 
       waitSerializer.getClass shouldBe classOf[AkkaSerializer]
@@ -100,7 +100,6 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
   }
 
   describe("Test akka serialization of Events") {
-    val eventInfo = EventInfo(prefixStr)
 
     it("should serialize ObserveEvent") {
       val jupiter   = Choice("Jupiter")
@@ -110,7 +109,7 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
 
       val param = choiceKey.set(jupiter, pluto).withUnits(arcmin)
 
-      val observeEvent: ObserveEvent = ObserveEvent(eventInfo).add(param)
+      val observeEvent: ObserveEvent = ObserveEvent(Id(), prefix, "filter wheel", EventTime(), Set.empty).add(param)
       val observeEventSerializer     = serialization.findSerializerFor(observeEvent)
 
       observeEventSerializer.getClass shouldBe classOf[AkkaSerializer]
@@ -129,7 +128,7 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
 
       val param = structKey.set(struct).withUnits(joule)
 
-      val systemEvent: SystemEvent = SystemEvent(eventInfo).add(param)
+      val systemEvent: SystemEvent = SystemEvent(Id(), prefix, "filter wheel", EventTime(), Set.empty).add(param)
       val systemEventSerializer    = serialization.findSerializerFor(systemEvent)
 
       systemEventSerializer.getClass shouldBe classOf[AkkaSerializer]
@@ -140,7 +139,6 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
   }
 
   describe("Test akka serialization of StateVariables") {
-    val prefix = Prefix(prefixStr)
 
     it("should serialize CurrentState") {
       val charKey        = KeyType.CharKey.make("charKey")
@@ -254,20 +252,20 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
     }
 
     it("should serialize CommandValidationResponse messages") {
-      serialization.findSerializerFor(Accepted(RunId())).getClass shouldBe classOf[AkkaSerializer]
+      serialization.findSerializerFor(Accepted(Id())).getClass shouldBe classOf[AkkaSerializer]
       serialization
-        .findSerializerFor(Invalid(RunId(), CommandIssue.OtherIssue("test issue")))
+        .findSerializerFor(Invalid(Id(), CommandIssue.OtherIssue("test issue")))
         .getClass shouldBe classOf[AkkaSerializer]
     }
 
     it("should serialize CommandExecutionResponse messages") {
       val testData = Table(
         "CommandExecutionResponse models",
-        CompletedWithResult(RunId(), Result(Prefix(prefixStr))),
-        NoLongerValid(RunId(), CommandIssue.OtherIssue("test issue")),
-        Completed(RunId()),
-        Error(RunId(), "test"),
-        Cancelled(RunId()),
+        CompletedWithResult(Id(), Result(prefix)),
+        NoLongerValid(Id(), CommandIssue.OtherIssue("test issue")),
+        Completed(Id()),
+        Error(Id(), "test"),
+        Cancelled(Id())
       )
 
       forAll(testData) { commandResponse ⇒

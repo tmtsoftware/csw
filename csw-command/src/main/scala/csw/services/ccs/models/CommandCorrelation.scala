@@ -1,6 +1,6 @@
 package csw.services.ccs.models
 
-import csw.messages.params.models.RunId
+import csw.messages.params.models.Id
 
 /**
  * This model maintains the relation of a command that can be split into two or more commands for execution. The state of the parent command then depends on the
@@ -8,7 +8,7 @@ import csw.messages.params.models.RunId
  * @param parentToChildren a map of parent command to all children command
  * @param childToParent a map of a child command to its parent command
  */
-case class CommandCorrelation(parentToChildren: Map[RunId, Set[RunId]], childToParent: Map[RunId, RunId]) {
+case class CommandCorrelation(parentToChildren: Map[Id, Set[Id]], childToParent: Map[Id, Id]) {
 
   /**
    * Add a new command relation
@@ -16,7 +16,7 @@ case class CommandCorrelation(parentToChildren: Map[RunId, Set[RunId]], childToP
    * @param childRunId child command identifier as RunID
    * @return a new CommandCorrelation model with te added coorelation
    */
-  def add(parentRunId: RunId, childRunId: RunId): CommandCorrelation = CommandCorrelation(
+  def add(parentRunId: Id, childRunId: Id): CommandCorrelation = CommandCorrelation(
     parentToChildren.updated(parentRunId, parentToChildren.getOrElse(parentRunId, Set()) + childRunId),
     childToParent.updated(childRunId, parentRunId)
   )
@@ -27,7 +27,7 @@ case class CommandCorrelation(parentToChildren: Map[RunId, Set[RunId]], childToP
    * @param childRunId child command identifier as RunID
    * @return a new CommandCorrelation model with the correlation removed
    */
-  def remove(parentRunId: RunId, childRunId: RunId): CommandCorrelation = CommandCorrelation(
+  def remove(parentRunId: Id, childRunId: Id): CommandCorrelation = CommandCorrelation(
     parentToChildren.updated(parentRunId, parentToChildren.getOrElse(parentRunId, Set(childRunId)) - childRunId),
     childToParent - childRunId
   )
@@ -37,9 +37,9 @@ case class CommandCorrelation(parentToChildren: Map[RunId, Set[RunId]], childToP
    * @param childRunId command identifier as RunID
    * @return an option of command identifier as RunID
    */
-  def getParent(childRunId: RunId): Option[RunId] = childToParent.get(childRunId)
+  def getParent(childRunId: Id): Option[Id] = childToParent.get(childRunId)
 
-  def hasChildren(parentRunId: RunId): Boolean = parentToChildren.get(parentRunId) match {
+  def hasChildren(parentRunId: Id): Boolean = parentToChildren.get(parentRunId) match {
     case Some(children) => children.nonEmpty
     case None           => false
   }

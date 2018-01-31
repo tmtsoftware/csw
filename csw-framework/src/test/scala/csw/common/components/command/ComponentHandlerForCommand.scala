@@ -18,7 +18,7 @@ import csw.messages.framework.ComponentInfo
 import csw.messages.location._
 import csw.messages.models.PubSub.{Publish, PublisherMessage}
 import csw.messages.params.generics.{KeyType, Parameter}
-import csw.messages.params.models.RunId
+import csw.messages.params.models.Id
 import csw.messages.params.states.CurrentState
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
@@ -85,11 +85,11 @@ class ComponentHandlerForCommand(
 
   private def processAcceptedSubmitCmd(controlCommand: ControlCommand): Unit =
     controlCommand.paramType.get(cancelCmdId).foreach { param ⇒
-      processCancelCommand(controlCommand.runId, RunId(param.head))
+      processCancelCommand(controlCommand.runId, Id(param.head))
     }
 
   private def processAcceptedOnewayCmd(controlCommand: ControlCommand): Unit =
-    controlCommand.paramType.get(cancelCmdId).foreach(param ⇒ processOriginalCommand(RunId(param.head)))
+    controlCommand.paramType.get(cancelCmdId).foreach(param ⇒ processOriginalCommand(Id(param.head)))
 
   private def processCommandWithoutMatcher(controlCommand: ControlCommand): Unit = {
     val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(20)
@@ -97,12 +97,12 @@ class ComponentHandlerForCommand(
     commandResponseManager ! AddOrUpdateCommand(controlCommand.runId, CompletedWithResult(controlCommand.runId, result))
   }
 
-  private def processCancelCommand(runId: RunId, cancelId: RunId): Unit = {
+  private def processCancelCommand(runId: Id, cancelId: Id): Unit = {
     processOriginalCommand(cancelId)
     commandResponseManager ! AddOrUpdateCommand(runId, Completed(runId))
   }
 
-  private def processOriginalCommand(cancelId: RunId): Unit = {
+  private def processOriginalCommand(cancelId: Id): Unit = {
     import akka.typed.scaladsl.AskPattern._
     implicit val timeout: Timeout     = 5.seconds
     implicit val scheduler: Scheduler = ctx.system.scheduler

@@ -6,7 +6,7 @@ import akka.stream.scaladsl.Source
 import csw.messages.TMTSerializable
 import csw.messages.ccs.CommandIssue
 import csw.messages.ccs.commands.CommandResultType.{Intermediate, Negative, Positive}
-import csw.messages.params.models.RunId
+import csw.messages.params.models.Id
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -16,19 +16,19 @@ import scala.util.{Failure, Success}
  * @param resultType the nature of command response as [[csw.messages.ccs.commands.CommandResultType]]
  */
 sealed abstract class CommandResponse(val resultType: CommandResultType) extends TMTSerializable {
-  def runId: RunId
+  def runId: Id
 }
 
 object CommandResponse {
-  case class Accepted(runId: RunId)                            extends CommandResponse(Intermediate)
-  case class Invalid(runId: RunId, issue: CommandIssue)        extends CommandResponse(Negative)
-  case class CompletedWithResult(runId: RunId, result: Result) extends CommandResponse(Positive)
-  case class Completed(runId: RunId)                           extends CommandResponse(Positive)
-  case class NoLongerValid(runId: RunId, issue: CommandIssue)  extends CommandResponse(Negative)
-  case class Error(runId: RunId, message: String)              extends CommandResponse(Negative)
-  case class Cancelled(runId: RunId)                           extends CommandResponse(Negative)
-  case class CommandNotAvailable(runId: RunId)                 extends CommandResponse(Negative)
-  case class NotAllowed(runId: RunId, issue: CommandIssue)     extends CommandResponse(Negative)
+  case class Accepted(runId: Id)                            extends CommandResponse(Intermediate)
+  case class Invalid(runId: Id, issue: CommandIssue)        extends CommandResponse(Negative)
+  case class CompletedWithResult(runId: Id, result: Result) extends CommandResponse(Positive)
+  case class Completed(runId: Id)                           extends CommandResponse(Positive)
+  case class NoLongerValid(runId: Id, issue: CommandIssue)  extends CommandResponse(Negative)
+  case class Error(runId: Id, message: String)              extends CommandResponse(Negative)
+  case class Cancelled(runId: Id)                           extends CommandResponse(Negative)
+  case class CommandNotAvailable(runId: Id)                 extends CommandResponse(Negative)
+  case class NotAllowed(runId: Id, issue: CommandIssue)     extends CommandResponse(Negative)
 
   /**
    * Transform a given CommandResponse to a response with the provided RunId
@@ -36,7 +36,7 @@ object CommandResponse {
    * @param commandResponse the CommandResponse to be transformed
    * @return
    */
-  def withRunId(id: RunId, commandResponse: CommandResponse): CommandResponse = commandResponse match {
+  def withRunId(id: Id, commandResponse: CommandResponse): CommandResponse = commandResponse match {
     case accepted: Accepted                       ⇒ accepted.copy(runId = id)
     case invalid: Invalid                         ⇒ invalid.copy(runId = id)
     case completedWithResult: CompletedWithResult ⇒ completedWithResult.copy(runId = id)
@@ -62,8 +62,8 @@ object CommandResponse {
           throw new RuntimeException(s"Command with runId [${x.runId}] failed with response [$x]")
       }
       .transform {
-        case Success(_)  ⇒ Success(CommandResponse.Completed(RunId()))
-        case Failure(ex) ⇒ Success(CommandResponse.Error(RunId(), s"${ex.getMessage}"))
+        case Success(_)  ⇒ Success(CommandResponse.Completed(Id()))
+        case Failure(ex) ⇒ Success(CommandResponse.Error(Id(), s"${ex.getMessage}"))
       }
   }
 }

@@ -23,7 +23,7 @@ import csw.messages.framework.{ComponentInfo, SupervisorLifecycleState}
 import csw.messages.models.PubSub.{Publish, Subscribe, Unsubscribe}
 import csw.messages.models.ToComponentLifecycleMessages._
 import csw.messages.models.{LifecycleStateChanged, PubSub}
-import csw.messages.params.models.RunId
+import csw.messages.params.models.Id
 import csw.messages.params.states.CurrentState
 import csw.messages.{models, _}
 import org.mockito.ArgumentMatchers.any
@@ -297,7 +297,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
 
     val childRef        = childComponentInbox.ref.upcast
     val subscriberProbe = TestProbe[CommandResponse]
-    val testCmdId       = RunId()
+    val testCmdId       = Id()
 
     supervisor.onMessage(Running(childRef))
 

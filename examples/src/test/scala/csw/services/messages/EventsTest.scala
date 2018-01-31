@@ -80,8 +80,10 @@ class EventsTest extends FunSpec with Matchers {
       val k4: Key[Int]    = KeyType.IntKey.make("notUsed")
 
       //prefixes
-      val ck1 = "wfos.prog.cloudcover"
-      val ck3 = "wfos.red.detector"
+      val ck1   = Prefix("wfos.prog.cloudcover")
+      val name1 = "filter wheel"
+      val ck3   = Prefix("wfos.red.detector")
+      val name3 = "iris"
 
       //parameters
       val p1: Parameter[Int]    = k1.set(22)
@@ -89,11 +91,11 @@ class EventsTest extends FunSpec with Matchers {
       val p3: Parameter[String] = k3.set("A", "B", "C", "D")
 
       //Create ObserveEvent using madd
-      val se1: ObserveEvent = ObserveEvent(ck1).madd(p1, p2)
+      val se1: ObserveEvent = ObserveEvent(ck1, name1).madd(p1, p2)
       //Create ObserveEvent using apply
-      val se2: ObserveEvent = ObserveEvent(EventInfo(ck3), Set(p1, p2))
+      val se2: ObserveEvent = ObserveEvent(ck3, name3, Set(p1, p2))
       //Create ObserveEvent and use add
-      val se3: ObserveEvent = ObserveEvent(EventInfo(ck3)).add(p1).add(p2).add(p3)
+      val se3: ObserveEvent = ObserveEvent(ck3, name3).add(p1).add(p2).add(p3)
 
       //access keys
       val k1Exists: Boolean = se1.exists(k1) //true
@@ -118,7 +120,7 @@ class EventsTest extends FunSpec with Matchers {
       assert(v1 === p1.values)
       assert(v2 === p2.values)
       assert(missingKeys === Set(k4.keyName))
-      assert(se2 === se4)
+      assert(se2 != se4)
     }
 
     it("should show usages of SystemEvent") {
@@ -131,8 +133,10 @@ class EventsTest extends FunSpec with Matchers {
       val k4: Key[Int]    = KeyType.IntKey.make("notUsed")
 
       //prefixes
-      val ck1 = "wfos.prog.cloudcover"
-      val ck3 = "wfos.red.detector"
+      val ck1   = Prefix("wfos.prog.cloudcover")
+      val name1 = "filter wheel"
+      val ck3   = Prefix("wfos.red.detector")
+      val name3 = "iris"
 
       //parameters
       val p1: Parameter[Int]    = k1.set(22)
@@ -140,11 +144,11 @@ class EventsTest extends FunSpec with Matchers {
       val p3: Parameter[String] = k3.set("A", "B", "C", "D")
 
       //Create SystemEvent using madd
-      val se1: SystemEvent = SystemEvent(ck1).madd(p1, p2)
+      val se1: SystemEvent = SystemEvent(ck1, name1).madd(p1, p2)
       //Create SystemEvent using apply
-      val se2: SystemEvent = SystemEvent(EventInfo(ck3), Set(p1, p2))
+      val se2: SystemEvent = SystemEvent(ck3, name3, Set(p1, p2))
       //Create SystemEvent and use add
-      val se3: SystemEvent = SystemEvent(EventInfo(ck3)).add(p1).add(p2).add(p3)
+      val se3: SystemEvent = SystemEvent(ck3, name3).add(p1).add(p2).add(p3)
 
       //access keys
       val k1Exists: Boolean = se1.exists(k1) //true
@@ -176,7 +180,7 @@ class EventsTest extends FunSpec with Matchers {
       assert(v1 === p1.values)
       assert(v2 === p2.values)
       assert(missingKeys === Set(k4.keyName))
-      assert(se2 === se4)
+      assert(se2 != se4)
       assert(paramSize === 4)
       assert(se6(k2).values === Array(5, 6, 7, 8))
     }
@@ -201,8 +205,8 @@ class EventsTest extends FunSpec with Matchers {
       val i1: Parameter[MatrixData[Double]] = k1.set(m1)
 
       //events
-      val observeEvent: ObserveEvent = ObserveEvent("wfos.blue.filter").add(i1)
-      val systemEvent: SystemEvent   = SystemEvent("wfos.blue.filter").add(i1)
+      val observeEvent: ObserveEvent = ObserveEvent("wfos.blue.filter", "filter wheel").add(i1)
+      val systemEvent: SystemEvent   = SystemEvent("wfos.blue.filter", "filter wheel").add(i1)
 
       //json support - write
       val observeJson: JsValue = JsonSupport.writeEvent(observeEvent)
@@ -252,6 +256,7 @@ class EventsTest extends FunSpec with Matchers {
       //StatusEvent with duplicate key via constructor
       val systemEvent = SystemEvent(
         prefix,
+        "filter wheel",
         Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3)
       )
       //four duplicate keys are removed; now contains one Encoder and one Filter key
@@ -283,18 +288,6 @@ class EventsTest extends FunSpec with Matchers {
 
   describe("Examples of protobuf") {
     it("should show usage of converting events to/from protobuf") {
-
-      //#protobuf
-      //Some variety in EventInfo
-      val info2 = EventInfo("wfos.blue.filter", Instant.now().minusSeconds(60))
-      val info3 = EventInfo("wfos.blue.filter", Instant.now(), ObsId("Obs002"))
-      val info4 = EventInfo(
-        Prefix("wfos.blue.filter"),
-        EventTime(Instant.now().minusSeconds(3600)),
-        Some(ObsId("Obs002")),
-        UUID.randomUUID().toString()
-      )
-
       //Key
       val raDecKey = RaDecKey.make("raDecKey")
 
@@ -306,9 +299,10 @@ class EventsTest extends FunSpec with Matchers {
       val param = raDecKey.set(raDec1, raDec2).withUnits(arcmin)
 
       //events
-      val observeEvent: ObserveEvent = ObserveEvent(info2).add(param)
-      val systemEvent1: SystemEvent  = SystemEvent(info3).add(param)
-      val systemEvent2: SystemEvent  = SystemEvent(info4).add(param)
+      val observeEvent: ObserveEvent = ObserveEvent("wfos.blue.filter", "filter wheel").add(param)
+      val systemEvent1: SystemEvent  = SystemEvent("wfos.blue.filter", "filter wheel").add(param)
+      val systemEvent2: SystemEvent =
+        SystemEvent(Id(), "wfos.blue.filter", "filter wheel", EventTime(Instant.now().minusSeconds(3600)), Set.empty).add(param)
 
       //convert events to protobuf bytestring
       val byteArray2: Array[Byte] = observeEvent.toPb

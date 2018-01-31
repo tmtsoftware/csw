@@ -6,7 +6,7 @@ import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState
 import csw.messages.location.TrackingEvent
 import csw.messages.models.PubSub.SubscriberMessage
 import csw.messages.models._
-import csw.messages.params.models.{Prefix, RunId}
+import csw.messages.params.models.{Id, Prefix}
 import csw.messages.params.states.CurrentState
 
 import scala.concurrent.duration.FiniteDuration
@@ -122,16 +122,16 @@ object FromSupervisorMessage {
 
 sealed trait CommandResponseManagerMessage
 object CommandResponseManagerMessage {
-  case class AddOrUpdateCommand(commandId: RunId, commandResponse: CommandResponse)  extends CommandResponseManagerMessage
-  case class AddSubCommand(commandId: RunId, subCommandId: RunId)                    extends CommandResponseManagerMessage
-  case class UpdateSubCommand(subCommandId: RunId, commandResponse: CommandResponse) extends CommandResponseManagerMessage
-  case class Query(commandId: RunId, replyTo: ActorRef[CommandResponse])
+  case class AddOrUpdateCommand(commandId: Id, commandResponse: CommandResponse)  extends CommandResponseManagerMessage
+  case class AddSubCommand(commandId: Id, subCommandId: Id)                       extends CommandResponseManagerMessage
+  case class UpdateSubCommand(subCommandId: Id, commandResponse: CommandResponse) extends CommandResponseManagerMessage
+  case class Query(commandId: Id, replyTo: ActorRef[CommandResponse])
       extends CommandResponseManagerMessage
       with SupervisorLockMessage
-  case class Subscribe(commandId: RunId, replyTo: ActorRef[CommandResponse])
+  case class Subscribe(commandId: Id, replyTo: ActorRef[CommandResponse])
       extends CommandResponseManagerMessage
       with SupervisorLockMessage
-  case class Unsubscribe(commandId: RunId, replyTo: ActorRef[CommandResponse])
+  case class Unsubscribe(commandId: Id, replyTo: ActorRef[CommandResponse])
       extends CommandResponseManagerMessage
       with SupervisorLockMessage
 }

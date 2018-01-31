@@ -11,7 +11,7 @@ import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Error}
 import csw.messages.ccs.commands.matchers.{Matcher, StateMatcher}
 import csw.messages.ccs.commands.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
-import csw.messages.params.models.RunId
+import csw.messages.params.models.Id
 import csw.messages.{CommandResponseManagerMessage, ComponentMessage}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -74,7 +74,7 @@ case class ComponentRef(value: ActorRef[ComponentMessage]) {
    * @param commandRunId the runId of the command for which response is required
    * @return a CommandResponse as a Future value.
    */
-  def subscribe(commandRunId: RunId)(implicit timeout: Timeout, scheduler: Scheduler): Future[CommandResponse] =
+  def subscribe(commandRunId: Id)(implicit timeout: Timeout, scheduler: Scheduler): Future[CommandResponse] =
     value ? (CommandResponseManagerMessage.Subscribe(commandRunId, _))
 
   /**

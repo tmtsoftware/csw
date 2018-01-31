@@ -10,7 +10,7 @@ import akka.typed.ActorRef
 import akka.util.Timeout
 import csw.messages.ComponentMessage
 import csw.messages.ccs.commands.matchers.StateMatcher
-import csw.messages.params.models.RunId
+import csw.messages.params.models.Id
 
 import scala.compat.java8.FutureConverters.FutureOps
 import scala.concurrent.ExecutionContext
@@ -70,7 +70,7 @@ case class JComponentRef(value: ActorRef[ComponentMessage]) {
    * @param commandRunId the runId of the command for which response is required
    * @return a CommandResponse as a CompletableFuture
    */
-  def subscribe(commandRunId: RunId, timeout: Timeout, scheduler: Scheduler): CompletableFuture[CommandResponse] =
+  def subscribe(commandRunId: Id, timeout: Timeout, scheduler: Scheduler): CompletableFuture[CommandResponse] =
     componentRef.subscribe(commandRunId)(timeout, scheduler).toJava.toCompletableFuture
 
   /**

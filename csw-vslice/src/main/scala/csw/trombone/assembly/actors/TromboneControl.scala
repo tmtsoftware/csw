@@ -3,7 +3,7 @@ package csw.trombone.assembly.actors
 import akka.typed.scaladsl.Actor
 import akka.typed.{ActorRef, Behavior}
 import csw.messages.CommandMessage.Submit
-import csw.messages.params.models.RunId
+import csw.messages.params.models.Id
 import csw.trombone.assembly.TromboneControlMsg.{GoToStagePosition, UpdateTromboneHcd}
 import csw.trombone.assembly.{Algorithms, AssemblyContext, TromboneControlMsg}
 import csw.trombone.hcd.TromboneHcdState
@@ -19,7 +19,7 @@ object TromboneControl {
             encoderPosition > ac.controlConfig.minEncoderLimit && encoderPosition < ac.controlConfig.maxEncoderLimit
           )
           tromboneHcd.foreach(
-            _ ! Submit(TromboneHcdState.positionSC(RunId(), ac.obsId, encoderPosition), ctx.spawnAnonymous(Actor.ignore))
+            _ ! Submit(TromboneHcdState.positionSC(Id(), ac.obsId, encoderPosition), ctx.spawnAnonymous(Actor.ignore))
           )
           Actor.same
         case UpdateTromboneHcd(runningIn) =>

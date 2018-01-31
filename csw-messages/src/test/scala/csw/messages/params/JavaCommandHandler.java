@@ -9,12 +9,13 @@ import csw.messages.ccs.events.SystemEvent;
 import csw.messages.params.generics.JKeyTypes;
 import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;
+import csw.messages.params.models.Prefix;
 
 import java.util.Set;
 
 public abstract class JavaCommandHandler {
 
-    private static final String prefix = "wfos.red.detector";
+    private static final Prefix prefix = new Prefix("wfos.red.detector");
 
     private static final Key<Integer> encoderIntKey = JKeyTypes.IntKey().make("encoder");
     private static final Key<String> epochStringKey = JKeyTypes.StringKey().make("epoch");
@@ -22,7 +23,7 @@ public abstract class JavaCommandHandler {
     static final Parameter<Integer> encoderParam = encoderIntKey.set(55, 66);
     static final Parameter<String> epochStringParam = epochStringKey.set("Event1", "Event2");
 
-    private static SystemEvent systemEvent = new SystemEvent(prefix).add(encoderParam).add(epochStringParam);
+    private static SystemEvent systemEvent = new SystemEvent(prefix, "").add(encoderParam).add(epochStringParam);
 
     private JavaCommandHandler() {
     }

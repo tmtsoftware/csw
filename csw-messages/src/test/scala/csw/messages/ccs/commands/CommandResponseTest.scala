@@ -6,7 +6,7 @@ import akka.stream.{ActorMaterializer, Materializer}
 import akka.stream.scaladsl.Source
 import csw.messages.ccs.commands
 import csw.messages.ccs.commands.CommandResponse.{Completed, Error}
-import csw.messages.params.models.RunId
+import csw.messages.params.models.Id
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
@@ -24,9 +24,9 @@ class CommandResponseTest extends FunSuite with Matchers with ScalaFutures with 
 
   test("aggregateResponse should return a aggregated response as AggregatedResponseError if one of the responses failed") {
 
-    val commandResponseSuccess1 = Future { Completed(RunId()) }
-    val commandResponseFailure  = Future { Error(RunId(), "test Error") }
-    val commandResponseSuccess2 = Future { Completed(RunId()) }
+    val commandResponseSuccess1 = Future { Completed(Id()) }
+    val commandResponseFailure  = Future { Error(Id(), "test Error") }
+    val commandResponseSuccess2 = Future { Completed(Id()) }
 
     val source: Source[CommandResponse, NotUsed] =
       Source(List(commandResponseSuccess1, commandResponseSuccess2, commandResponseFailure)).flatMapMerge(10, Source.fromFuture)
@@ -39,9 +39,9 @@ class CommandResponseTest extends FunSuite with Matchers with ScalaFutures with 
   test(
     "aggregateResponse should return a aggregated response as AggregatedResponseCompleted if all of the responses are successful"
   ) {
-    val commandResponseSuccess1 = Future { Completed(RunId()) }
-    val commandResponseSuccess2 = Future { Completed(RunId()) }
-    val commandResponseSuccess3 = Future { Completed(RunId()) }
+    val commandResponseSuccess1 = Future { Completed(Id()) }
+    val commandResponseSuccess2 = Future { Completed(Id()) }
+    val commandResponseSuccess3 = Future { Completed(Id()) }
 
     val source: Source[CommandResponse, NotUsed] =
       Source(List(commandResponseSuccess1, commandResponseSuccess2, commandResponseSuccess3))

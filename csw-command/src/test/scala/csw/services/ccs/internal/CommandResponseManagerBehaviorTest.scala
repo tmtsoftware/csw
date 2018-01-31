@@ -10,7 +10,7 @@ import csw.messages.CommandResponseManagerMessage
 import csw.messages.CommandResponseManagerMessage._
 import csw.messages.ccs.commands.CommandResponse
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Error}
-import csw.messages.params.models.RunId
+import csw.messages.params.models.Id
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -34,7 +34,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
   test("should be able to add command entry in Command Response Manager") {
     val commandStatusService = createCommandStatusService()
 
-    val runId = RunId()
+    val runId = Id()
     commandStatusService.onMessage(AddOrUpdateCommand(runId, Accepted(runId)))
 
     commandStatusService.commandStatus.get(runId) shouldBe Accepted(runId)
@@ -44,8 +44,8 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
 
   test("should be able to add correlation between parent and child via AddSubCommand") {
     val commandStatusService = createCommandStatusService()
-    val parentId             = RunId()
-    val childId              = RunId()
+    val parentId             = Id()
+    val childId              = Id()
 
     commandStatusService.onMessage(AddOrUpdateCommand(parentId, Accepted(parentId)))
     commandStatusService.onMessage(AddSubCommand(parentId, childId))
@@ -57,7 +57,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
   test("should be able to add subscriber and publish current state to newly added subscriber") {
     val commandStatusService = createCommandStatusService()
     val commandResponseProbe = TestProbe[CommandResponse]
-    val runId                = RunId()
+    val runId                = Id()
 
     commandStatusService.onMessage(AddOrUpdateCommand(runId, Completed(runId)))
     commandStatusService.commandStatus.cmdToCmdStatus(runId).subscribers shouldBe empty
@@ -70,7 +70,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
   test("should be able to remove subscriber") {
     val commandStatusService = createCommandStatusService()
     val commandResponseProbe = TestProbe[CommandResponse]
-    val runId                = RunId()
+    val runId                = Id()
 
     commandStatusService.onMessage(AddOrUpdateCommand(runId, Accepted(runId)))
 
@@ -84,7 +84,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
   test("should be able to get current status of command on Query message") {
     val commandStatusService = createCommandStatusService()
     val commandResponseProbe = TestProbe[CommandResponse]
-    val runId                = RunId()
+    val runId                = Id()
 
     commandStatusService.onMessage(AddOrUpdateCommand(runId, Accepted(runId)))
 
@@ -96,7 +96,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
     val commandStatusService  = createCommandStatusService()
     val commandResponseProbe1 = TestProbe[CommandResponse]
     val commandResponseProbe2 = TestProbe[CommandResponse]
-    val runId                 = RunId()
+    val runId                 = Id()
 
     commandStatusService.onMessage(AddOrUpdateCommand(runId, Accepted(runId)))
     commandStatusService.onMessage(Subscribe(runId, commandResponseProbe1.ref))
@@ -116,8 +116,8 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
   test("should be able to infer command status when status of sub command is updated") {
     val commandStatusService = createCommandStatusService()
     val commandResponseProbe = TestProbe[CommandResponse]
-    val commandId            = RunId()
-    val subCommandId         = RunId()
+    val commandId            = Id()
+    val subCommandId         = Id()
 
     commandStatusService.onMessage(AddOrUpdateCommand(commandId, Accepted(commandId)))
     commandStatusService.onMessage(Subscribe(commandId, commandResponseProbe.ref))
@@ -134,9 +134,9 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
   test("should be able to update command status with the status of subcommand if one of the subcommand fails") {
     val commandStatusService = createCommandStatusService()
     val commandResponseProbe = TestProbe[CommandResponse]
-    val commandId            = RunId()
-    val subCommandId1        = RunId()
-    val subCommandId2        = RunId()
+    val commandId            = Id()
+    val subCommandId1        = Id()
+    val subCommandId2        = Id()
 
     commandStatusService.onMessage(AddOrUpdateCommand(commandId, Accepted(commandId)))
     commandStatusService.onMessage(Subscribe(commandId, commandResponseProbe.ref))
@@ -156,9 +156,9 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
   test("should be able to update successful command status when all the subcommand completes with success") {
     val commandStatusService = createCommandStatusService()
     val commandResponseProbe = TestProbe[CommandResponse]
-    val commandId            = RunId()
-    val subCommandId1        = RunId()
-    val subCommandId2        = RunId()
+    val commandId            = Id()
+    val subCommandId1        = Id()
+    val subCommandId2        = Id()
 
     commandStatusService.onMessage(AddOrUpdateCommand(commandId, Accepted(commandId)))
     commandStatusService.onMessage(Subscribe(commandId, commandResponseProbe.ref))

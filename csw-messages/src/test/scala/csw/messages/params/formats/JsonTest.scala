@@ -220,7 +220,7 @@ class JsonTest extends FunSpec {
     }
 
     it("Should encode/decode an ObserveEvent") {
-      val e1 = ObserveEvent(ck).add(i1).add(i2).add(i3).add(i4).add(i5).add(i6).add(i7)
+      val e1 = ObserveEvent(ck, "").add(i1).add(i2).add(i3).add(i4).add(i5).add(i6).add(i7)
       assert(e1.size == 7)
       val e1out = JsonSupport.writeEvent(e1)
       val e1in  = JsonSupport.readEvent[ObserveEvent](e1out)
@@ -229,7 +229,7 @@ class JsonTest extends FunSpec {
     }
 
     it("Should encode/decode an SystemEvent") {
-      val e1 = SystemEvent(ck).add(i1).add(i2).add(i3).add(i4).add(i5).add(i6).add(i7)
+      val e1 = SystemEvent(ck, "").add(i1).add(i2).add(i3).add(i4).add(i5).add(i6).add(i7)
       assert(e1.size == 7)
       val e1out = JsonSupport.writeEvent(e1)
       val e1in  = JsonSupport.readEvent[SystemEvent](e1out)

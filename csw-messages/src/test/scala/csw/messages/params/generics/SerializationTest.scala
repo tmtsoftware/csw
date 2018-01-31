@@ -15,7 +15,7 @@ class SerializationTest extends FunSuite {
 
   val obsId      = ObsId("2023-Q22-4-33")
   val fqn1       = "tcs.base.pos.name"
-  val fqn1prefix = "tcs.base.pos"
+  val fqn1prefix = Prefix("tcs.base.pos")
   val fqn1name   = "name"
   val fqn2       = "tcs.base.pos.ra"
   val fqn3       = "tcs.base.pos.dec"
@@ -78,7 +78,7 @@ class SerializationTest extends FunSuite {
 
   test("System event kryo serialization") {
     import csw.messages.params.generics.ParamSetSerializer._
-    val event = SystemEvent(fqn1prefix)
+    val event = SystemEvent(fqn1prefix, "filter wheel")
       .add(ra.set("12:32:11"))
       .add(dec.set("30:22:22"))
 

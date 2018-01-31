@@ -14,7 +14,7 @@ import csw.messages.framework.ComponentInfo
 import csw.messages.location.{AkkaLocation, TrackingEvent}
 import csw.messages.models.PubSub
 import csw.messages.models.PubSub.Publish
-import csw.messages.params.models.RunId
+import csw.messages.params.models.Id
 import csw.messages.params.states.CurrentState
 import csw.messages.{CommandResponseManagerMessage, TopLevelActorMessage}
 import csw.services.location.scaladsl.LocationService
@@ -44,7 +44,7 @@ class McsAssemblyComponentHandlers(
   implicit val ec: ExecutionContext = ctx.executionContext
   var completedCommands: Int        = 0
   var hcdComponent: ComponentRef    = _
-  var commandId: RunId              = _
+  var commandId: Id                 = _
   var shortSetup: Setup             = _
   var mediumSetup: Setup            = _
   var longSetup: Setup              = _

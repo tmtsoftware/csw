@@ -6,7 +6,7 @@ import csw.messages.ccs.commands.{CommandName, Setup}
 import csw.messages.params.generics.KeyType.ChoiceKey
 import csw.messages.params.generics.{GChoiceKey, JKeyTypes, Key, KeyType}
 import csw.messages.params.models.Units.encoder
-import csw.messages.params.models.{Choice, ObsId, Prefix, RunId}
+import csw.messages.params.models.{Choice, Id, ObsId, Prefix}
 import csw.messages.params.states.CurrentState
 
 object TromboneHcdState {
@@ -83,17 +83,17 @@ object TromboneHcdState {
   val axisMoveCK: CommandName = CommandName("move")
   val sourcePrefix            = Prefix("sourcePrefix")
 
-  def positionSC(runId: RunId, obsId: ObsId, value: Int): Setup =
+  def positionSC(runId: Id, obsId: ObsId, value: Int): Setup =
     Setup(sourcePrefix, axisMoveCK, Some(obsId)).add(positionKey -> value withUnits encoder)
 
   val axisDatumCK: CommandName = CommandName("datum")
-  def datumSC(runId: RunId, obsId: ObsId) = {
+  def datumSC(runId: Id, obsId: ObsId) = {
     Setup(sourcePrefix, axisDatumCK, Some(obsId))
   }
 
-  val axisHomeCK: CommandName            = CommandName("home")
-  def homeSC(runId: RunId, obsId: ObsId) = Setup(sourcePrefix, axisHomeCK, Some(obsId))
+  val axisHomeCK: CommandName         = CommandName("home")
+  def homeSC(runId: Id, obsId: ObsId) = Setup(sourcePrefix, axisHomeCK, Some(obsId))
 
-  val axisCancelCK: CommandName            = CommandName("cancel")
-  def cancelSC(runId: RunId, obsId: ObsId) = Setup(sourcePrefix, axisCancelCK, Some(obsId))
+  val axisCancelCK: CommandName         = CommandName("cancel")
+  def cancelSC(runId: Id, obsId: ObsId) = Setup(sourcePrefix, axisCancelCK, Some(obsId))
 }

@@ -9,7 +9,7 @@ import csw.messages.ccs.commands._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.TrackingEvent
 import csw.messages.models.PubSub.PublisherMessage
-import csw.messages.params.models.RunId
+import csw.messages.params.models.Id
 import csw.messages.params.states.CurrentState
 import csw.messages.{CommandResponseManagerMessage, TopLevelActorMessage}
 import csw.services.location.scaladsl.LocationService
@@ -41,7 +41,7 @@ class ActionLessHandlers(
 
   override def onDomainMsg(msg: DomainMessage): Unit = ???
 
-  override def validateCommand(controlCommand: ControlCommand): CommandResponse = Completed(RunId())
+  override def validateCommand(controlCommand: ControlCommand): CommandResponse = Completed(Id())
 
   override def onSubmit(controlCommand: ControlCommand): Unit = ???
 

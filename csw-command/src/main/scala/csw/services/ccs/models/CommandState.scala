@@ -2,7 +2,7 @@ package csw.services.ccs.models
 
 import akka.typed.ActorRef
 import csw.messages.ccs.commands.CommandResponse
-import csw.messages.params.models.RunId
+import csw.messages.params.models.Id
 
 /**
  * Represents the state of a command execution
@@ -44,6 +44,6 @@ object CommandState {
    * @param initialState initial command response
    * @return a new command state
    */
-  def init(runId: RunId, initialState: CommandResponse): CommandState =
+  def init(runId: Id, initialState: CommandResponse): CommandState =
     CommandState(CommandStatus(runId, initialState), Set.empty)
 }

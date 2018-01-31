@@ -22,7 +22,7 @@ object EventTime {
     def reads(json: JsValue): JsResult[EventTime] = JsSuccess(json.as[Instant])
   }
 
-  def apply(): EventTime = new EventTime();
+  def apply(): EventTime = new EventTime()
 
   //used by Protobuf for conversion between Timestamp <==> EventTime
   implicit val typeMapper: TypeMapper[Timestamp, EventTime] =

@@ -1,8 +1,5 @@
 package csw.messages.params.pb
 
-import java.time.Instant
-import java.util.UUID
-
 import csw.messages.ccs.events._
 import csw.messages.params.generics.KeyType
 import csw.messages.params.generics.KeyType.{ChoiceKey, StructKey}
@@ -14,18 +11,19 @@ import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
 class ProtobufSerializationTest extends FunSpec with Matchers with BeforeAndAfterAll {
 
   describe("Test protobuf serialization of Events") {
+    val prefix: Prefix = Prefix("wfos.blue.filter")
+    val eventName      = "filter wheel"
 
     it("should serialize ObserveEvent") {
-      val eventInfo = EventInfo("wfos.blue.filter", Instant.now().minusSeconds(60))
 
-      val jupiter   = Choice("Jupiter")
-      val saturn    = Choice("Saturn")
-      val pluto     = Choice("Pluto")
+      val jupiter = Choice("Jupiter")
+      val saturn  = Choice("Saturn")
+      val pluto   = Choice("Pluto")
+
       val choiceKey = ChoiceKey.make("choiceKey", jupiter, saturn, pluto)
 
-      val param = choiceKey.set(jupiter, pluto).withUnits(arcmin)
-
-      val observeEvent: ObserveEvent = ObserveEvent(eventInfo).add(param)
+      val param                      = choiceKey.set(jupiter, pluto).withUnits(arcmin)
+      val observeEvent: ObserveEvent = ObserveEvent(prefix, eventName).add(param)
 
       //able to generate protobuf from event
       ObserveEvent.fromPb(observeEvent.toPb) shouldBe observeEvent
@@ -35,14 +33,6 @@ class ProtobufSerializationTest extends FunSpec with Matchers with BeforeAndAfte
     }
 
     it("should serialize SystemEvent") {
-      val eventInfo1 = EventInfo("wfos.blue.filter", Instant.now().minusSeconds(60), ObsId("Obs002"))
-      val eventInfo2 = EventInfo(
-        Prefix("wfos.blue.filter"),
-        EventTime(Instant.now().minusSeconds(3600)),
-        Some(ObsId("Obs002")),
-        UUID.randomUUID().toString()
-      )
-
       val structKey = StructKey.make("structKey")
 
       val ra     = KeyType.StringKey.make("ra")
@@ -52,12 +42,10 @@ class ProtobufSerializationTest extends FunSpec with Matchers with BeforeAndAfte
 
       val param = structKey.set(struct).withUnits(joule)
 
-      val systemEvent1: SystemEvent = SystemEvent(eventInfo1).add(param)
-      val systemEvent2: SystemEvent = SystemEvent(eventInfo2).add(param)
+      val systemEvent1: SystemEvent = SystemEvent(prefix, eventName).add(param)
 
       //able to generate protobuf from event
       SystemEvent.fromPb(systemEvent1.toPb) shouldBe systemEvent1
-      SystemEvent.fromPb(systemEvent2.toPb) shouldBe systemEvent2
     }
   }
 }
