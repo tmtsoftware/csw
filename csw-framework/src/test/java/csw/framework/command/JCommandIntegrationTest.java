@@ -159,17 +159,26 @@ public class JCommandIntegrationTest {
         // DEOPSCSW-229: Provide matchers infrastructure for comparison
         // long running command which uses matcher
         Parameter<Integer> param = JKeyTypes.IntKey().make("encoder").set(100);
-        DemandMatcher demandMatcher = new DemandMatcher(new DemandState(prefix().prefix()).add(param), false, timeout);
         Setup setup = new Setup(prefix(), matcherCmd(), Optional.empty()).add(parameter);
+
+        //#matcher
+
+        // create a DemandMatcher which specifies the desired state to be matched.
+        DemandMatcher demandMatcher = new DemandMatcher(new DemandState(prefix().prefix()).add(param), false, timeout);
+
+        // create matcher instance
         Matcher matcher = new Matcher(hcdComponent.value().narrow(), demandMatcher, ec, mat);
 
+        // start the matcher so that it is ready to receive state published by the source
         CompletableFuture<MatcherResponse> matcherResponseFuture = matcher.jStart();
 
+        // submit command and if the command is successfully validated, check for matching of demand state against current state
         CompletableFuture<CommandResponse> commandResponseToBeMatched = hcdComponent
                 .submit(setup, timeout, hcdActorSystem.scheduler())
                 .thenCompose(initialCommandResponse -> {
                     if (initialCommandResponse instanceof CommandResponse.Accepted) {
                         return matcherResponseFuture.thenApply(matcherResponse -> {
+                            // create appropriate response if demand state was matched from among the published state or otherwise
                             if (matcherResponse.getClass().isAssignableFrom(MatcherResponses.jMatchCompleted().getClass()))
                                 return new Completed(initialCommandResponse.runId());
                             else
@@ -181,8 +190,11 @@ public class JCommandIntegrationTest {
                     }
                 });
 
-        Completed expectedResponse = new Completed(setup.runId());
         CommandResponse actualResponse = commandResponseToBeMatched.get();
+
+        //#matcher
+
+        Completed expectedResponse = new Completed(setup.runId());
         Assert.assertEquals(expectedResponse, actualResponse);
     }
 

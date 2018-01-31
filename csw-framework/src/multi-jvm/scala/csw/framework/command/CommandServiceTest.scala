@@ -156,17 +156,26 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       // DEOPSCSW-317: Use state values of HCD to determine command completion
       // long running command which uses matcher
       val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(100)
-      val demandMatcher         = DemandMatcher(DemandState(prefix, Set(param)), withUnits = false, timeout)
       val setupWithMatcher      = Setup(prefix, matcherCmd, obsId)
-      val matcher               = new Matcher(assemblyComponent.value, demandMatcher)
 
+      //#matcher
+
+      // create a DemandMatcher which specifies the desired state to be matched.
+      val demandMatcher = DemandMatcher(DemandState(prefix, Set(param)), withUnits = false, timeout)
+
+      // create matcher instance
+      val matcher = new Matcher(assemblyComponent.value, demandMatcher)
+
+      // start the matcher so that it is ready to receive state published by the source
       val matcherResponseF: Future[MatcherResponse] = matcher.start
 
+      // submit command and if the command is successfully validated, check for matching of demand state against current state
       val eventualCommandResponse: Future[CommandResponse] = async {
         val initialResponse = await(assemblyComponent.oneway(setupWithMatcher))
         initialResponse match {
           case _: Accepted ⇒
             val matcherResponse = await(matcherResponseF)
+            // create appropriate response if demand state was matched from among the published state or otherwise
             matcherResponse match {
               case MatchCompleted  ⇒ Completed(setupWithMatcher.runId)
               case MatchFailed(ex) ⇒ Error(setupWithMatcher.runId, ex.getMessage)
@@ -179,6 +188,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       }
 
       val commandResponse = Await.result(eventualCommandResponse, timeout.duration)
+      //#matcher
       commandResponse shouldBe Completed(setupWithMatcher.runId)
 
       // DEOPSCSW-317: Use state values of HCD to determine command completion

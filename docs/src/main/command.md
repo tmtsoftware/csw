@@ -106,7 +106,17 @@ The API can be exercised as follows for different scenarios of command based com
 
 ## Matching state for command completion
 
-A `Matcher` is provided for matching a `DemandState` against a state generated
+A `Matcher` is provided for matching state against a desired state. The matcher is created with a source of state identified
+by its ActorRef and an instance of `StateMatcher` which defines the state and criteria for matching. Several instances of 
+`StateMatcher` are available for common use. These are `DemandMatcherAll` for matching the entire `DemandState` against the current state,
+`DemandMatcher` for matching state with or without units against the current state and `PresenceMatcher` which checks if a 
+matching state is found with a provided prefix. 
+  
+Scala
+:   @@snip [LongRunningCommandTest.scala](../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #matcher }
+
+Java
+:   @@snip [JCommandIntegrationTest.java](../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #matcher }
 
 ## Distributing commands
 
