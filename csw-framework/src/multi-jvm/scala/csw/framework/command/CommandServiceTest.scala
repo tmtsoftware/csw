@@ -191,6 +191,10 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       //#matcher
       commandResponse shouldBe Completed(setupWithMatcher.runId)
 
+      //#onewayAndMatch
+      val eventualResponse1: Future[CommandResponse] = assemblyComponent.onewayAndMatch(setupWithMatcher, demandMatcher)
+      //#onewayAndMatch
+
       // DEOPSCSW-317: Use state values of HCD to determine command completion
       // simulate a scenario where timeout occurs while matching demand state vs current state
       // 1. Demand matcher expect matching to be done in 500 millis

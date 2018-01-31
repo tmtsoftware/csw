@@ -17,10 +17,7 @@ import csw.messages.ccs.commands.CommandResponse.Completed;
 import csw.messages.ccs.commands.ControlCommand;
 import csw.messages.ccs.commands.JComponentRef;
 import csw.messages.ccs.commands.Setup;
-import csw.messages.ccs.commands.matchers.DemandMatcher;
-import csw.messages.ccs.commands.matchers.Matcher;
-import csw.messages.ccs.commands.matchers.MatcherResponse;
-import csw.messages.ccs.commands.matchers.MatcherResponses;
+import csw.messages.ccs.commands.matchers.*;
 import csw.messages.location.AkkaLocation;
 import csw.messages.location.ComponentId;
 import csw.messages.models.CoordinatedShutdownReasons;
@@ -156,6 +153,11 @@ public class JCommandIntegrationTest {
         CommandResponse actualCmdResponse = testCommandResponse.get();
         Assert.assertEquals(expectedCmdResponse, actualCmdResponse);
 
+        //#submitAndSubscribe
+        // ec is the ExecutionContext created with the help of actor system
+        CompletableFuture<CommandResponse> testResponse = hcdComponent.submitAndSubscribe(controlCommand, timeout, hcdActorSystem.scheduler(), ec);
+        //#submitAndSubscribe
+
         // DEOPSCSW-229: Provide matchers infrastructure for comparison
         // long running command which uses matcher
         Parameter<Integer> param = JKeyTypes.IntKey().make("encoder").set(100);
@@ -174,7 +176,7 @@ public class JCommandIntegrationTest {
 
         // submit command and if the command is successfully validated, check for matching of demand state against current state
         CompletableFuture<CommandResponse> commandResponseToBeMatched = hcdComponent
-                .submit(setup, timeout, hcdActorSystem.scheduler())
+                .oneway(setup, timeout, hcdActorSystem.scheduler())
                 .thenCompose(initialCommandResponse -> {
                     if (initialCommandResponse instanceof CommandResponse.Accepted) {
                         return matcherResponseFuture.thenApply(matcherResponse -> {
@@ -193,6 +195,22 @@ public class JCommandIntegrationTest {
         CommandResponse actualResponse = commandResponseToBeMatched.get();
 
         //#matcher
+
+        //#onewayAndMatch
+
+        // create a DemandMatcher which specifies the desired state to be matched.
+        StateMatcher stateMatcher = new DemandMatcher(new DemandState(prefix().prefix()).add(param), false, timeout);
+
+        // create matcher instance
+        Matcher matcher1 = new Matcher(hcdComponent.value().narrow(), demandMatcher, ec, mat);
+
+        // start the matcher so that it is ready to receive state published by the source
+        CompletableFuture<MatcherResponse> matcherResponse = matcher1.jStart();
+
+        CompletableFuture<CommandResponse> matchedCommandResponse =
+                hcdComponent.onewayAndMatch(setup, stateMatcher, timeout, hcdActorSystem.scheduler(), ec, mat);
+
+        //#onewayAndMatch
 
         Completed expectedResponse = new Completed(setup.runId());
         Assert.assertEquals(expectedResponse, actualResponse);

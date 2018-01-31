@@ -51,7 +51,7 @@ class DatumCommand(
 
       val setup = Setup(Prefix("sourcePrefix"), TromboneHcdState.axisDatumCK, s.maybeObsId)
 
-      tromboneHCD.get.submitAndMatch(setup, AssemblyMatchers.idleMatcher).map {
+      tromboneHCD.get.onewayAndMatch(setup, AssemblyMatchers.idleMatcher).map {
         case response: Completed ⇒
           publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), nssItem(false)))
           response

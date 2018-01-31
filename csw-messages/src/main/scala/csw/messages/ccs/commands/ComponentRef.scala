@@ -105,13 +105,13 @@ case class ComponentRef(value: ActorRef[ComponentMessage]) {
    * @param stateMatcher the StateMatcher implementation for matching received state against a demand state.
    * @return a CommandResponse as a Future value.
    */
-  def submitAndMatch(
+  def onewayAndMatch(
       controlCommand: ControlCommand,
       stateMatcher: StateMatcher
   )(implicit timeout: Timeout, scheduler: Scheduler, ec: ExecutionContext, mat: Materializer): Future[CommandResponse] = {
     val matcher          = new Matcher(value, stateMatcher)
     val matcherResponseF = matcher.start
-    submit(controlCommand).flatMap {
+    oneway(controlCommand).flatMap {
       case _: Accepted ⇒
         matcherResponseF.map {
           case MatchCompleted  ⇒ Completed(controlCommand.runId)

@@ -76,6 +76,12 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
 
       Await.result(eventualCommandResponse, 20.seconds) shouldBe Completed(setup.runId)
 
+      //#submitAndSubscribe
+      val response = assemblyComponent.submitAndSubscribe(setup)
+      //#submitAndSubscribe
+
+      Await.result(response, 20.seconds) shouldBe Completed(setup.runId)
+
       //#query-response
       assemblyComponent.submit(setup)
 

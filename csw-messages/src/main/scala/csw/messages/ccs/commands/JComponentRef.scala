@@ -101,7 +101,7 @@ case class JComponentRef(value: ActorRef[ComponentMessage]) {
    * @param stateMatcher the StateMatcher implementation for matching received state against a demand state.
    * @return a CommandResponse as a CompletableFuture
    */
-  def submitAndMatch(
+  def onewayAndMatch(
       controlCommand: ControlCommand,
       stateMatcher: StateMatcher,
       timeout: Timeout,
@@ -109,7 +109,7 @@ case class JComponentRef(value: ActorRef[ComponentMessage]) {
       ec: ExecutionContext,
       mat: Materializer
   ): CompletableFuture[CommandResponse] =
-    componentRef.submitAndMatch(controlCommand, stateMatcher)(timeout, scheduler, ec, mat).toJava.toCompletableFuture
+    componentRef.onewayAndMatch(controlCommand, stateMatcher)(timeout, scheduler, ec, mat).toJava.toCompletableFuture
 
   /**
    * Submit multiple commands and get final CommandResponse for all as a stream of CommandResponse. For long running commands, it will subscribe for the

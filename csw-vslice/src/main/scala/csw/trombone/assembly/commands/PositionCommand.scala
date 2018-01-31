@@ -61,7 +61,7 @@ class PositionCommand(
         .add(TromboneHcdState.positionKey -> encoderPosition withUnits encoder)
       publishState(TromboneState(cmdItem(cmdBusy), moveItem(moveIndexing), startState.sodiumLayer, startState.nss))
 
-      tromboneHCD.get.submitAndMatch(scOut, stateMatcher).map {
+      tromboneHCD.get.onewayAndMatch(scOut, stateMatcher).map {
         case response: Completed ⇒
           publishState(TromboneState(cmdItem(cmdReady), moveItem(moveIndexed), sodiumItem(false), nssItem(false)))
           response
