@@ -21,7 +21,7 @@ object UnidocSite extends AutoPlugin {
     filterNotSources(sources in (JavaUnidoc, unidoc), excludeJavadoc),
     addMappingsToSiteDir(mappings in (JavaUnidoc, packageDoc), siteSubdirName in JavaUnidoc),
     scalacOptions in (ScalaUnidoc, unidoc) ++= Seq("-skip-packages", excludeScaladoc),
-    autoAPIMappings := true,
+    autoAPIMappings := true
     //      apiURL := Some(url(s"http://tmtsoftware.github.io/csw-prod/api/${version.value}"))
   )
 

@@ -5,11 +5,12 @@ import ohnosequences.sbt.GithubRelease.keys.{ghreleaseAssets, ghreleaseRepoName,
 import ohnosequences.sbt.SbtGithubReleasePlugin
 import sbt.Keys.{aggregate, crossTarget, packageBin}
 import sbt.io.{IO, Path}
-import sbt.{AutoPlugin, Plugins, ProjectReference, Setting, Task, TaskKey}
+import sbt.taskKey
+import sbt.{AutoPlugin, Plugins, ProjectReference, Setting, Task}
 
 object GithubRelease extends AutoPlugin {
 
-  val coverageReportZipKey = TaskKey[File]("coverage-zip", "Creates a distributable zip file containing the coverage report.")
+  val coverageReportZipKey = taskKey[File]("Creates a distributable zip file containing the coverage report.")
 
   override def requires: Plugins = SbtGithubReleasePlugin
 
