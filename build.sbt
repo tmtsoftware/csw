@@ -1,4 +1,4 @@
-val enableCoverage         = sys.props.get("enableCoverage").contains("true")
+val enableCoverage = sys.props.get("enableCoverage").contains("true")
 val MaybeCoverage: Plugins = if (enableCoverage) Coverage else Plugins.empty
 
 lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
@@ -56,7 +56,7 @@ lazy val `csw-messages` = project
   .settings(
     Common.detectCycles := false,
     PB.targets in Compile := Seq(
-      PB.gens.java                        -> (sourceManaged in Compile).value,
+      PB.gens.java -> (sourceManaged in Compile).value,
       scalapb.gen(javaConversions = true) -> (sourceManaged in Compile).value
     )
   )
@@ -88,19 +88,19 @@ lazy val `csw-cluster-seed` = project
     `csw-messages`,
     `csw-location`,
     `csw-commons`,
-    `csw-framework`     % "test->test",
+    `csw-framework` % "test->test",
     `csw-config-server` % "test->test",
   )
   .enablePlugins(DeployApp, MaybeCoverage)
   .settings(
-    libraryDependencies ++= Dependencies.CswClusterSeed
+    libraryDependencies ++= Dependencies.ClusterSeed
   )
 
 lazy val `csw-location-agent` = project
   .dependsOn(`csw-location`)
   .enablePlugins(DeployApp, MaybeCoverage)
   .settings(
-    libraryDependencies ++= Dependencies.CswLocationAgent
+    libraryDependencies ++= Dependencies.LocationAgent
   )
 
 //Config service related projects
@@ -122,7 +122,7 @@ lazy val `csw-config-client` = project
     `csw-config-api`,
     `csw-commons`,
     `csw-config-server` % "test->test",
-    `csw-location`      % "compile->compile;multi-jvm->multi-jvm"
+    `csw-location` % "compile->compile;multi-jvm->multi-jvm"
   )
   .enablePlugins(AutoMultiJvm, MaybeCoverage)
   .settings(
@@ -133,11 +133,11 @@ lazy val `csw-config-client-cli` = project
   .dependsOn(
     `csw-config-client`,
     `csw-config-server` % "test->test",
-    `csw-location`      % "multi-jvm->multi-jvm"
+    `csw-location` % "multi-jvm->multi-jvm"
   )
   .enablePlugins(AutoMultiJvm, DeployApp, MaybeCoverage)
   .settings(
-    libraryDependencies ++= Dependencies.CswConfigClientCli
+    libraryDependencies ++= Dependencies.ConfigClientCli
   )
 
 lazy val `csw-vslice` = project
@@ -147,19 +147,13 @@ lazy val `csw-vslice` = project
   )
   .enablePlugins(DeployApp)
 
-lazy val `csw-framework` = project
+lazy val `csw-event` = project
   .dependsOn(
     `csw-messages`,
-    `csw-config-client`,
-    `csw-logging`,
-    `csw-command`,
-    `csw-location`      % "compile->compile;multi-jvm->multi-jvm",
-    `csw-config-server` % "multi-jvm->test"
+    `csw-logging`
   )
-  .enablePlugins(AutoMultiJvm, GenJavadocPlugin, CswBuildInfo, DeployApp)
-  .settings(
-    libraryDependencies ++= Dependencies.CswFramework
-  )
+  .enablePlugins(AutoMultiJvm, GenJavadocPlugin)
+  .settings(libraryDependencies ++= Dependencies.Event)
 
 lazy val `csw-command` = project
   .dependsOn(
@@ -167,12 +161,27 @@ lazy val `csw-command` = project
     `csw-logging`
   )
   .enablePlugins(AutoMultiJvm, GenJavadocPlugin)
-  .settings(libraryDependencies ++= Dependencies.CswCommand)
+  .settings(libraryDependencies ++= Dependencies.Command)
+
+lazy val `csw-framework` = project
+  .dependsOn(
+    `csw-messages`,
+    `csw-config-client`,
+    `csw-logging`,
+    `csw-command`,
+    `csw-location` % "compile->compile;multi-jvm->multi-jvm",
+    `csw-config-server` % "multi-jvm->test"
+  )
+  .enablePlugins(AutoMultiJvm, GenJavadocPlugin, CswBuildInfo, DeployApp)
+  .settings(
+    libraryDependencies ++= Dependencies.Framework
+  )
+
 
 lazy val `csw-commons` = project
   .enablePlugins(PublishBintray, GenJavadocPlugin)
   .settings(
-    libraryDependencies ++= Dependencies.CswCommons
+    libraryDependencies ++= Dependencies.Commons
   )
 
 lazy val `csw-benchmark` = project
@@ -203,5 +212,5 @@ lazy val examples = project
   .dependsOn(`csw-location`, `csw-config-client`, `csw-config-server` % "test->test", `csw-logging`, `csw-messages`)
   .enablePlugins(DeployApp)
   .settings(
-    libraryDependencies ++= Dependencies.CswProdExamples
+    libraryDependencies ++= Dependencies.Examples
   )

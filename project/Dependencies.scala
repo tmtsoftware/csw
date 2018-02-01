@@ -65,13 +65,13 @@ object Dependencies {
     Akka.`akka-multi-node-testkit` % Test
   )
 
-  val CswLocationAgent = Seq(
+  val LocationAgent = Seq(
     Akka.`akka-actor`,
     Libs.`scopt`,
     Libs.`scalatest` % Test
   )
 
-  val CswConfigClientCli = Seq(
+  val ConfigClientCli = Seq(
     Akka.`akka-actor`,
     Libs.`scopt`,
     Libs.`scalatest`               % Test,
@@ -111,7 +111,7 @@ object Dependencies {
     Akka.`akka-stream-testkit`     % Test
   )
 
-  val CswClusterSeed = Seq(
+  val ClusterSeed = Seq(
     AkkaHttp.`akka-http`,
     Libs.`play-json`,
     Libs.`akka-http-play-json`,
@@ -119,7 +119,7 @@ object Dependencies {
     Libs.`scalatest` % Test
   )
 
-  val CswFramework = Seq(
+  val Framework = Seq(
     Libs.`scala-async`,
     Libs.`play-json`,
     Enumeratum.`enumeratum-play`,
@@ -133,7 +133,7 @@ object Dependencies {
     Libs.`mockito-core`        % Test
   )
 
-  val CswCommand = Seq(
+  val Command = Seq(
     Libs.`scala-async`,
     Akka.`akka-typed`,
     Akka.`akka-typed-testkit`  % Test,
@@ -144,17 +144,28 @@ object Dependencies {
     Libs.`mockito-core`        % Test
   )
 
-  val CswCommons = Seq(
+  val Event = Seq(
+    Libs.`scala-async`,
+    Akka.`akka-stream`,
+    Akka.`akka-typed`,
+    Akka.`akka-typed-testkit`  % Test,
+    Akka.`akka-stream-testkit` % Test,
+    Libs.`scalatest`           % Test,
+    Libs.`junit`               % Test,
+    Libs.`junit-interface`     % Test
+  )
+
+  val Commons = Seq(
     Akka.`akka-stream`,
     AkkaHttp.`akka-http`,
     Libs.`play-json`
   )
 
-  val CswDeploy = Seq(
+  val Deploy = Seq(
     Libs.`scalatest` % Test
   )
 
-  val CswProdExamples = Seq(
+  val Examples = Seq(
     AkkaHttp.`akka-http`,
     Libs.`scalatest`       % Test,
     Libs.`junit`           % Test,
