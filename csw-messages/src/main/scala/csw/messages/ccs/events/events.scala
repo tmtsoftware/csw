@@ -1,55 +1,15 @@
 package csw.messages.ccs.events
 
 import csw.messages.params.generics.{Parameter, ParameterSetType}
-import csw.messages.params.models.{Id, ObsId, Prefix}
+import csw.messages.params.models.{Id, Prefix}
 import csw_protobuf.events.PbEvent
 import csw_protobuf.events.PbEvent.PbEventType
 import csw_protobuf.parameter.PbParameter
 
 import scalapb.TypeMapper
 
-/**
- * Base trait for events
- *
-// * @tparam T the subclass of EventType
- */
-//sealed trait EventType[T <: EventType[T]] extends ParameterSetType[T] with ParameterSetKeyData {
-//  self: T =>
-//
-//  /**
-//   * Contains related event information
-//   */
-//  def info: EventInfo
-//
-//  override def prefix: Prefix = info.source
-//
-//  /**
-//   * The event source is the prefix
-//   */
-//  def source: String = prefix.prefix
-//
-//  /**
-//   * The time the event was created
-//   */
-//  def eventTime: EventTime = info.eventTime
-//
-//  /**
-//   * The event id
-//   */
-//  def eventId: String = info.eventId
-//
-//  /**
-//   * The observation ID
-//   */
-//  def obsIdOption: Option[ObsId] = info.obsId
-//
-//  def obsIdOptional: Optional[ObsId] = info.obsId.asJava
-//}
-
-/**
- * Type of event used in the event service
- */
-sealed trait Event { self: ParameterSetType[_] ⇒
+sealed trait Event {
+  self: ParameterSetType[_] ⇒
 
   def paramType: ParameterSetType[_] = self
 
@@ -121,11 +81,7 @@ case class ObserveEvent private (eventId: Id, source: Prefix, name: String, even
     extends ParameterSetType[ObserveEvent]
     with Event {
 
-//   Java API
-  def this(source: Prefix, name: String) = this(Id(), source, name, EventTime(), Set.empty)
-
-//  def this(prefix: String, time: EventTime, obsId: ObsId) = this(EventInfo(prefix, time, obsId))
-
+  def this(source: Prefix, name: String) = this(Id(), source, name, EventTime(), Set.empty) //   Java API
   override protected def create(data: Set[Parameter[_]]): ObserveEvent = copy(paramSet = data)
 
   /**
@@ -150,11 +106,6 @@ object ObserveEvent {
     apply(source, eventName).madd(paramSet)
 
   /**
-   * Constructs ObserveEvent from EventInfo
-   */
-//  def from(info: EventInfo): ObserveEvent = new ObserveEvent(info)
-
-  /**
    * Constructs from byte array containing Protobuf representation of ObserveEvent
    */
   def fromPb(array: Array[Byte]): ObserveEvent = Event.typeMapper[ObserveEvent].toCustom(PbEvent.parseFrom(array))
@@ -173,11 +124,7 @@ case class SystemEvent private (eventId: Id, source: Prefix, name: String, event
     extends ParameterSetType[SystemEvent]
     with Event {
 
-  // Java API
-  def this(source: Prefix, name: String) = this(Id(), source, name, EventTime(), Set.empty)
-
-//  def this(prefix: String, time: EventTime, obsId: ObsId) = this(EventInfo(prefix, time, obsId))
-
+  def this(source: Prefix, name: String) = this(Id(), source, name, EventTime(), Set.empty) // Java API
   override protected def create(data: Set[Parameter[_]]): SystemEvent = copy(paramSet = data)
 
   /**
@@ -191,11 +138,6 @@ object SystemEvent {
 
   def apply(source: Prefix, eventName: String, paramSet: Set[Parameter[_]]): SystemEvent =
     apply(source, eventName).madd(paramSet)
-
-  /**
-   * Constructs SystemEvent from EventInfo
-   */
-//  def from(info: EventInfo): SystemEvent = new SystemEvent(info)
 
   /**
    * Constructs from byte array containing Protobuf representation of SystemEvent
