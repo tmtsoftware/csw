@@ -57,7 +57,10 @@ case class ComponentRef(value: ActorRef[ComponentMessage]) {
       controlCommands: Set[ControlCommand]
   )(implicit timeout: Timeout, scheduler: Scheduler, ec: ExecutionContext, mat: Materializer): Future[CommandResponse] = {
     val value = Source(controlCommands).mapAsyncUnordered(parallelism)(submit)
-    CommandResponse.aggregateResponse(value)
+    CommandResponse.aggregateResponse(value).map {
+      case _: Completed  ⇒ CommandResponse.Accepted(Id())
+      case otherResponse ⇒ otherResponse
+    }
   }
 
   /**

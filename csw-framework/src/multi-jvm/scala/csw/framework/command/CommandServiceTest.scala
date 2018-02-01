@@ -226,6 +226,21 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       val commandResponseOnTimeout: CommandResponse = Await.result(eventualCommandResponse1, timeout.duration)
       commandResponseOnTimeout shouldBe a[Error]
       commandResponseOnTimeout.asInstanceOf[Error].message shouldBe timeoutExMsg
+
+      //#oneway
+      val onewayCommandResponseF: Future[Unit] = async {
+        val initialResponse = await(assemblyComponent.oneway(setupWithTimeoutMatcher))
+        initialResponse match {
+          case _: Accepted ⇒
+          // do Something
+          case invalid: Invalid ⇒
+          // do Something
+          case x ⇒
+          // do Something
+        }
+      }
+      //#oneway
+
       enterBarrier("short-long-commands")
 
       // acquire lock on assembly

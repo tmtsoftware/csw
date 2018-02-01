@@ -77,24 +77,29 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
       Await.result(eventualCommandResponse, 20.seconds) shouldBe Completed(setup.runId)
 
       //#submitAndSubscribe
-      val response = assemblyComponent.submitAndSubscribe(setup)
+      val setupForSubscribe = Setup(prefix, longRunning, Some(obsId))
+      val response          = assemblyComponent.submitAndSubscribe(setupForSubscribe)
       //#submitAndSubscribe
 
-      Await.result(response, 20.seconds) shouldBe Completed(setup.runId)
-
-      //#query-response
-      assemblyComponent.submit(setup)
-
-      // do some work before querying for the result of above command as needed
-
-      val eventualResponse: Future[CommandResponse] = assemblyComponent.query(setup.runId)
-      //#query-response
+      Await.result(response, 20.seconds) shouldBe Completed(setupForSubscribe.runId)
 
       // verify that commands gets completed in following sequence
       // ShortSetup => MediumSetup => LongSetup
       probe.expectMsg(CurrentState(prefix, Set(choiceKey.set(shortCmdCompleted))))
       probe.expectMsg(CurrentState(prefix, Set(choiceKey.set(mediumCmdCompleted))))
       probe.expectMsg(CurrentState(prefix, Set(choiceKey.set(longCmdCompleted))))
+
+      //#query-response
+      val setupForQuery = Setup(prefix, longRunning, Some(obsId))
+      assemblyComponent.submit(setupForQuery)
+
+      //do some work before querying for the result of above command as needed
+
+      val eventualResponse: Future[CommandResponse] = assemblyComponent.query(setupForQuery.runId)
+      //#query-response
+      eventualResponse.map(_ shouldBe Accepted(setupForQuery.runId))
+      Thread.sleep(6000)
+
       enterBarrier("long-commands")
 
       val hcdLocF =
@@ -109,6 +114,15 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
       val setupHcd1      = Setup(prefix, shortRunning, Some(obsId))
       val setupHcd2      = Setup(prefix, mediumRunning, Some(obsId))
 
+      //#submitAllAndGetResponse
+
+      val responseOfMultipleCommands = hcdComponent.submitAllAndGetResponse(Set(setupHcd1, setupHcd2))
+
+      //#submitAllAndGetResponse
+      whenReady(responseOfMultipleCommands, PatienceConfiguration.Timeout(20.seconds)) { result ⇒
+        result shouldBe a[Accepted]
+      }
+
       //#aggregated-validation
       val aggregatedValidationResponse = CommandDistributor(
         Map(assemblyComponent → Set(setupAssembly1, setupAssembly2), hcdComponent → Set(setupHcd1, setupHcd2))
@@ -120,6 +134,15 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
       }
 
       enterBarrier("multiple-components-submit-multiple-commands")
+
+      //#submitAllAndGetFinalResponse
+
+      val finalResponseOfMultipleCommands = hcdComponent.submitAllAndGetFinalResponse(Set(setupHcd1, setupHcd2))
+
+      //#submitAllAndGetFinalResponse
+      whenReady(finalResponseOfMultipleCommands, PatienceConfiguration.Timeout(20.seconds)) { result ⇒
+        result shouldBe a[Completed]
+      }
 
       //#aggregated-completion
       val aggregatedResponse = CommandDistributor(

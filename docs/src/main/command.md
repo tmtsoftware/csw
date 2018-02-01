@@ -106,11 +106,29 @@ Java
 ### oneway
 Send a command as a Oneway and get a `CommandResponse` as a Future. The CommandResponse can be a response of validation (Accepted, Invalid) or a final Response.
 
+Scala
+:   @@snip [CommandServiceTest.scala](../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #oneway }
+
+Java
+:   @@snip [JCommandIntegrationTest.java](../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #oneway }
+
 ### subscribe
 Subscribe for the result of a long running command which was sent as Submit to get a `CommandResponse` as a Future.
 
+Scala
+:   @@snip [LongRunningCommandTest.scala](../../../csw-framework/src/multi-jvm/scala/csw/framework/command/LongRunningCommandTest.scala) { #subscribe-for-result }
+
+Java
+:   @@snip [JCommandIntegrationTest.java](../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #subscribe-for-result }
+
 ### query
 Query for the result of a long running command which was sent as Submit to get a `CommandResponse` as a Future.
+
+Scala
+:   @@snip [CommandServiceTest.scala](../../../csw-framework/src/multi-jvm/scala/csw/framework/command/LongRunningCommandTest.scala) { #query-response }
+
+Java
+:   @@snip [JCommandIntegrationTest.java](../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #query-response }
 
 ### submitAndSubscribe
 Submit a command and Subscribe for the result if it was successfully validated as `Accepted` to get a final `CommandResponse` as a Future.
@@ -126,7 +144,7 @@ Send a command and match the published state from the component using a `StateMa
 In case of a failure or unmatched state, `Error` CommandResponse is provided as a Future.
 
 Scala
-:   @@snip [CommandServiceTest.scala](../../../csw-framework/src/multi-jvm/scala/csw/framework/command/LongRunningCommandTest.scala) { #onewayAndMatch }
+:   @@snip [CommandServiceTest.scala](../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #onewayAndMatch }
 
 Java
 :   @@snip [JCommandIntegrationTest.java](../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #onewayAndMatch }
@@ -135,14 +153,22 @@ Java
 Submit multiple commands and get one CommandResponse as a Future of `CommandResponse` for all commands. If all the commands were successful, a CommandResponse 
 as `Completed` will be returned. If any one of the command fails, an `Error` will be returned.
 
-### submitAllAndSubscribe
-Submit multiple commands and get final CommandResponse for all as a stream of CommandResponse. For long running commands, it will subscribe for the result of 
-those which were successfully validated as `Accepted` and get the final CommandResponse.
+Scala
+:   @@snip [CommandServiceTest.scala](../../../csw-framework/src/multi-jvm/scala/csw/framework/command/LongRunningCommandTest.scala) { #submitAllAndGetResponse }
+
+Java
+:   @@snip [JCommandIntegrationTest.java](../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #submitAllAndGetResponse }
 
 ### submitAllAndGetFinalResponse
 Submit multiple commands and get final CommandResponse for all as one CommandResponse. If all the commands were successful, a CommandResponse as `Completed` will be 
 returned. If any one of the command fails, an `Error` will be returned. For long running commands, it will subscribe for the result of those which were successfully 
 validated as `Accepted` and get the final CommandResponse.
+
+Scala
+:   @@snip [CommandServiceTest.scala](../../../csw-framework/src/multi-jvm/scala/csw/framework/command/LongRunningCommandTest.scala) { #submitAllAndGetFinalResponse }
+
+Java
+:   @@snip [JCommandIntegrationTest.java](../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #submitAllAndGetFinalResponse }
 
 ## Matching state for command completion
 

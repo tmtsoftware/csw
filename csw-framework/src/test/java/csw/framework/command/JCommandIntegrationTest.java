@@ -153,11 +153,6 @@ public class JCommandIntegrationTest {
         CommandResponse actualCmdResponse = testCommandResponse.get();
         Assert.assertEquals(expectedCmdResponse, actualCmdResponse);
 
-        //#submitAndSubscribe
-        // ec is the ExecutionContext created with the help of actor system
-        CompletableFuture<CommandResponse> testResponse = hcdComponent.submitAndSubscribe(controlCommand, timeout, hcdActorSystem.scheduler(), ec);
-        //#submitAndSubscribe
-
         // DEOPSCSW-229: Provide matchers infrastructure for comparison
         // long running command which uses matcher
         Parameter<Integer> param = JKeyTypes.IntKey().make("encoder").set(100);
@@ -195,6 +190,19 @@ public class JCommandIntegrationTest {
         CommandResponse actualResponse = commandResponseToBeMatched.get();
 
         //#matcher
+
+        //#oneway
+        CompletableFuture onewayCommandResponseF = hcdComponent
+                .oneway(setup, timeout, hcdActorSystem.scheduler())
+                .thenAccept(initialCommandResponse -> {
+                    if (initialCommandResponse instanceof CommandResponse.Accepted) {
+                        //do something
+                    } else {
+                        //do something
+                    }
+                });
+
+        //#oneway
 
         //#onewayAndMatch
 
@@ -288,8 +296,11 @@ public class JCommandIntegrationTest {
         Setup failureResCommand1 = new Setup(prefix(), failureAfterValidationCmd(), Optional.empty()).add(intParameter1);
         akka.typed.ActorSystem<?> typedSystem = ActorSystemAdapter.apply(hcdActorSystem);
 
+        //#submitAndSubscribe
         CompletableFuture<CommandResponse> finalResponseCompletableFuture = hcdComponent.submitAndSubscribe(failureResCommand1, timeout, hcdActorSystem.scheduler(), typedSystem.executionContext());
         CommandResponse actualValidationResponse = finalResponseCompletableFuture.get();
+        //#submitAndSubscribe
+
         Assert.assertTrue(actualValidationResponse instanceof CommandResponse.Error);
 
         // using separate submit and subscribe API
@@ -299,5 +310,61 @@ public class JCommandIntegrationTest {
 
         CompletableFuture<CommandResponse> finalResponse = hcdComponent.subscribe(failureResCommand1.runId(), timeout, hcdActorSystem.scheduler());
         Assert.assertTrue(finalResponse.get() instanceof CommandResponse.Error);
+    }
+
+    @Test
+    public void testSubmitAllAndGetResponse() throws ExecutionException, InterruptedException {
+        Parameter<Integer> encoderParam = JKeyTypes.IntKey().make("encoder").set(22, 23);
+
+        //#submitAllAndGetResponse
+        Setup setupHcd1 = new Setup(prefix(), shortRunning(), Optional.empty()).add(encoderParam);
+        Setup setupHcd2 = new Setup(prefix(), mediumRunning(), Optional.empty()).add(encoderParam);
+
+        HashMap<JComponentRef, Set<ControlCommand>> componentsToCommands = new HashMap<JComponentRef, Set<ControlCommand>>() {
+            {
+                put(hcdComponent, new HashSet<ControlCommand>(Arrays.asList(setupHcd1, setupHcd2)));
+            }
+        };
+
+        CompletableFuture<CommandResponse> commandResponse = hcdComponent
+                .submitAllAndGetResponse(
+                        new HashSet<ControlCommand>(Arrays.asList(setupHcd1, setupHcd2)),
+                        timeout,
+                        hcdActorSystem.scheduler(),
+                        hcdActorSystem.dispatcher(),
+                        ActorMaterializer.create(hcdActorSystem)
+                );
+        //#submitAllAndGetResponse
+
+        Assert.assertTrue(commandResponse.get() instanceof CommandResponse.Accepted);
+    }
+
+    @Test
+    public void testSubmitAllAndGetFinalResponse() throws ExecutionException, InterruptedException {
+
+        Parameter<Integer> encoderParam = JKeyTypes.IntKey().make("encoder").set(22, 23);
+
+        //#submitAllAndGetFinalResponse
+        Setup setupHcd1 = new Setup(prefix(), shortRunning(), Optional.empty()).add(encoderParam);
+        Setup setupHcd2 = new Setup(prefix(), mediumRunning(), Optional.empty()).add(encoderParam);
+
+        HashMap<JComponentRef, Set<ControlCommand>> componentsToCommands = new HashMap<JComponentRef, Set<ControlCommand>>() {
+            {
+                put(hcdComponent, new HashSet<ControlCommand>(Arrays.asList(setupHcd1, setupHcd2)));
+            }
+        };
+
+        CompletableFuture<CommandResponse> finalCommandResponse = hcdComponent
+                .submitAllAndGetFinalResponse(
+                        new HashSet<ControlCommand>(Arrays.asList(setupHcd1, setupHcd2)),
+                        timeout,
+                        hcdActorSystem.scheduler(),
+                        hcdActorSystem.dispatcher(),
+                        ActorMaterializer.create(hcdActorSystem)
+                );
+        //#submitAllAndGetFinalResponse
+
+        Assert.assertTrue(finalCommandResponse.get() instanceof CommandResponse.Completed);
+
     }
 }

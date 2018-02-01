@@ -73,7 +73,10 @@ class McsAssemblyComponentHandlers(
       }
 
       completedCommands += 1
-      if (completedCommands == 3) commandResponseManager ! AddOrUpdateCommand(commandId, Completed(commandId))
+      if (completedCommands == 3) {
+        commandResponseManager ! AddOrUpdateCommand(commandId, Completed(commandId))
+        completedCommands = 0
+      }
     case _ ⇒
   }
 
