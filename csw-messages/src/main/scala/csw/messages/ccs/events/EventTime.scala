@@ -9,7 +9,7 @@ import play.api.libs.json._
 
 import scala.language.implicitConversions
 
-case class EventTime(time: Instant = Instant.now(Clock.systemUTC)) {
+case class EventTime(time: Instant = Instant.now()) {
   override def toString: String = time.toString
 }
 
