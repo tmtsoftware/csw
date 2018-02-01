@@ -288,6 +288,7 @@ class EventsTest extends FunSpec with Matchers {
 
   describe("Examples of protobuf") {
     it("should show usage of converting events to/from protobuf") {
+      //#protobuf
       //Key
       val raDecKey = RaDecKey.make("raDecKey")
 
