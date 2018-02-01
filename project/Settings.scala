@@ -8,11 +8,14 @@ import sbtunidoc.ScalaUnidocPlugin.autoImport.ScalaUnidoc
 object Settings {
   def mergeSiteWith(p: Project): Setting[Task[Seq[(File, String)]]] =
     (mappings in makeSite) := {
-      (mappings in makeSite).value.map {
-        case (file, output) => (file, "/" + version.value + output)
-      } ++ (mappings in makeSite in p).value.map {
-        case (file, output) => (file, "/" + version.value + output)
-      }
+      val globalMappings = (mappings in makeSite).value
+      val projectMapping = (mappings in makeSite in p).value
+
+      // this is to copy latest version of documentation to top level as well as inside corresponding version directory at gh-pages branch
+      globalMappings ++
+      globalMappings.map { case (file, output) => (file, "/" + version.value + output) } ++
+      projectMapping ++
+      projectMapping.map { case (file, output) => (file, "/" + version.value + output) }
     }
 
   def docExclusions(projects: Seq[ProjectReference]): Seq[Setting[_]] =
