@@ -9,8 +9,8 @@ import akka.typed.scaladsl.AskPattern._
 import akka.util.Timeout
 import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Error}
-import csw.messages.ccs.commands.matchers.{Matcher, StateMatcher}
 import csw.messages.ccs.commands.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
+import csw.messages.ccs.commands.matchers.{Matcher, StateMatcher}
 import csw.messages.params.models.Id
 import csw.messages.{CommandResponseManagerMessage, ComponentMessage}
 
@@ -82,7 +82,7 @@ case class ComponentRef(value: ActorRef[ComponentMessage]) {
    * @param commandRunId the runId of the command for which response is required
    * @return a CommandResponse as a Future value.
    */
-  def query(commandRunId: RunId)(implicit timeout: Timeout, scheduler: Scheduler): Future[CommandResponse] =
+  def query(commandRunId: Id)(implicit timeout: Timeout, scheduler: Scheduler): Future[CommandResponse] =
     value ? (CommandResponseManagerMessage.Query(commandRunId, _))
 
   /**

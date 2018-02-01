@@ -78,7 +78,7 @@ case class JComponentRef(value: ActorRef[ComponentMessage]) {
    * @param commandRunId the runId of the command for which response is required
    * @return a CommandResponse as a CompletableFuture
    */
-  def query(commandRunId: RunId, timeout: Timeout, scheduler: Scheduler): CompletableFuture[CommandResponse] =
+  def query(commandRunId: Id, timeout: Timeout, scheduler: Scheduler): CompletableFuture[CommandResponse] =
     componentRef.query(commandRunId)(timeout, scheduler).toJava.toCompletableFuture
 
   /**
