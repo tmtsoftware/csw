@@ -93,7 +93,7 @@ public class JEventsTest {
         Assert.assertEquals(new HashSet<>(Arrays.asList(22)), new HashSet<>(v1));
         Assert.assertEquals(new HashSet<>(Arrays.asList(44)), new HashSet<>(v2));
         Assert.assertEquals(new HashSet<>(Arrays.asList(missingKeys)), new HashSet<>(Arrays.asList(missingKeys)));
-        Assert.assertNotEquals(oc2, oc4);
+        Assert.assertNotEquals(oc3.eventId(), oc4.eventId()); //Test unique id when parameters are removed
     }
 
     @Test
@@ -136,7 +136,7 @@ public class JEventsTest {
         Set<String> missingKeys = se3.jMissingKeys(k1, k2, k3, k4);
 
         //remove keys
-        SystemEvent oc4 = se3.remove(k3);
+        SystemEvent se4 = se3.remove(k3);
         //#systemevent
 
         Assert.assertTrue(k1Exists);
@@ -144,7 +144,7 @@ public class JEventsTest {
         Assert.assertEquals(new HashSet<>(Arrays.asList(22)), new HashSet<>(v1));
         Assert.assertEquals(new HashSet<>(Arrays.asList(44)), new HashSet<>(v2));
         Assert.assertEquals(new HashSet<>(Arrays.asList(missingKeys)), new HashSet<>(Arrays.asList(missingKeys)));
-        Assert.assertNotEquals(se2, oc4);
+        Assert.assertNotEquals(se3.eventId(), se4.eventId()); //Test unique id when parameters are removed
     }
 
     @Test

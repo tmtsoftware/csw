@@ -1,13 +1,13 @@
 package csw.messages.ccs.events
 
-import java.time.{Clock, Instant}
+import java.time.Instant
 
 import com.google.protobuf.timestamp.Timestamp
-import scalapb.TypeMapper
 import csw.messages.params.pb.Implicits.instantMapper
 import play.api.libs.json._
 
 import scala.language.implicitConversions
+import scalapb.TypeMapper
 
 case class EventTime(time: Instant = Instant.now()) {
   override def toString: String = time.toString

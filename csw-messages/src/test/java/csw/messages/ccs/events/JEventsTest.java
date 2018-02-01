@@ -93,4 +93,20 @@ public class JEventsTest {
         Assert.assertNotNull(systemEvent.eventTime());
     }
 
+
+    @Test
+    public void shouldHaveUniqueIdWhenParametersAreAddedOrRemovedForSystem() {
+        SystemEvent systemEvent1 = new SystemEvent(prefix, new EventName("filter wheel")).add(encoderParam).add(epochStringParam);
+        SystemEvent systemEvent2 = systemEvent1.add(epochIntParam);
+        assertOnEventsAPI(systemEvent1);
+        Assert.assertNotEquals(systemEvent1.eventId(), systemEvent2.eventId());
+    }
+
+    @Test
+    public void shouldHaveUniqueIdWhenParametersAreAddedOrRemovedForObserve() {
+        ObserveEvent observeEvent1 = new ObserveEvent(prefix, new EventName("filter wheel")).add(encoderParam).add(epochStringParam);
+        ObserveEvent observeEvent2 = observeEvent1.add(epochIntParam);
+        assertOnEventsAPI(observeEvent1);
+        Assert.assertNotEquals(observeEvent1.eventId(), observeEvent2.eventId());
+    }
 }

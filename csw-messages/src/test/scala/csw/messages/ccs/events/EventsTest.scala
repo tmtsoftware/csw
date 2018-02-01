@@ -58,6 +58,21 @@ class EventsTest extends FunSpec with Matchers {
 
       assert(!mutatedOc1.exists(k1))
       assert(mutatedOc1.size == 1)
+      assert(mutatedOc1.eventId != oc1.eventId)
+    }
+
+    it("Should allow adding") {
+      val i1  = k1.set(22)
+      val i2  = k2.set(44)
+      val oc1 = ObserveEvent(prefix, eventName).madd(i1)
+
+      assert(oc1.size == 1)
+      assert(oc1.exists(k1))
+
+      val mutatedOc1 = oc1.add(i2)
+
+      assert(mutatedOc1.size == 2)
+      assert(mutatedOc1.eventId != oc1.eventId)
     }
   }
 
@@ -106,6 +121,21 @@ class EventsTest extends FunSpec with Matchers {
       assert(!mutatedSc1.exists(k1))
       assert(mutatedSc1.size == 1)
     }
+
+    it("Should allow adding") {
+      val i1  = k1.set(22)
+      val i2  = k2.set(44)
+      val sc1 = SystemEvent(prefix, eventName).madd(i1)
+
+      assert(sc1.size == 1)
+      assert(sc1.exists(k1))
+
+      val mutatedSc1 = sc1.add(i2)
+
+      assert(mutatedSc1.size == 2)
+      assert(mutatedSc1.eventId != sc1.eventId)
+    }
+
   }
 
   describe("Check equal for events") {
