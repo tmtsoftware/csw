@@ -121,6 +121,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       val assemblyLocF                    = locationService.resolve(AkkaConnection(ComponentId("Assembly", ComponentType.Assembly)), 5.seconds)
       val assemblyComponent: ComponentRef = Await.result(assemblyLocF, 10.seconds).map(_.component).get
 
+      // DEOPSCSW-233: Hide implementation by having a CCS API
       // short running command
       val shortCommandResponse = Await.result(assemblyComponent.submit(Setup(prefix, invalidCmd, obsId)), timeout.duration)
       shortCommandResponse shouldBe a[Invalid]
@@ -141,6 +142,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       // long running command which does not use matcher
       val setupWithoutMatcher = Setup(prefix, withoutMatcherCmd, obsId)
 
+      // DEOPSCSW-233: Hide implementation by having a CCS API
       val eventualLongCommandResponse = async {
         val initialCommandResponse = await(assemblyComponent.submit(setupWithoutMatcher))
         initialCommandResponse shouldBe an[Accepted]
@@ -195,6 +197,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       val eventualResponse1: Future[CommandResponse] = assemblyComponent.onewayAndMatch(setupWithMatcher, demandMatcher)
       //#onewayAndMatch
 
+      // DEOPSCSW-233: Hide implementation by having a CCS API
       // DEOPSCSW-317: Use state values of HCD to determine command completion
       // simulate a scenario where timeout occurs while matching demand state vs current state
       // 1. Demand matcher expect matching to be done in 500 millis
