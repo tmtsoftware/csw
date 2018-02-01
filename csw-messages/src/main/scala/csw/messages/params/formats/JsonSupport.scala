@@ -17,11 +17,12 @@ trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
 
   // JSON formats
   lazy val paramSetFormat: Format[Set[Parameter[_]]] = implicitly[Format[Set[Parameter[_]]]]
-  lazy val runIdFormat: Format[Id]                   = implicitly[Format[Id]]
+  lazy val idFormat: Format[Id]                      = implicitly[Format[Id]]
   lazy val obsIdFormat: Format[Option[ObsId]]        = implicitly[Format[Option[ObsId]]]
   lazy val prefixFormat: Format[Prefix]              = implicitly[Format[Prefix]]
   lazy val commandTypeFormat: Format[CommandName]    = implicitly[Format[CommandName]]
-  lazy val eventInfoFormat: Format[EventInfo]        = implicitly[Format[EventInfo]]
+  lazy val eventTimeFormat: Format[EventTime]        = implicitly[Format[EventTime]]
+  lazy val eventNameFormat: Format[EventName]        = implicitly[Format[EventName]]
 
   // config and event type JSON tags
   private val setupType        = classOf[Setup].getSimpleName
@@ -45,7 +46,7 @@ trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
     JsObject(
       Seq(
         "type"        → JsString(result.typeName),
-        "runId"       → runIdFormat.writes(result.runId),
+        "runId"       → idFormat.writes(result.runId),
         "source"      → prefixFormat.writes(result.source),
         "commandName" → commandTypeFormat.writes(result.commandName),
         "obsId"       → obsIdFormat.writes(result.maybeObsId),
@@ -143,10 +144,10 @@ trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
     JsObject(
       Seq(
         "type"      → JsString(event.paramType.typeName),
-        "eventId"   → Id.format.writes(event.eventId),
-        "source"    → Prefix.format.writes(event.source),
-        "name"      → JsString(event.name),
-        "eventTime" → EventTime.format.writes(event.eventTime),
+        "eventId"   → idFormat.writes(event.eventId),
+        "source"    → prefixFormat.writes(event.source),
+        "eventName" → eventNameFormat.writes(event.eventName),
+        "eventTime" → eventTimeFormat.writes(event.eventTime),
         "paramSet"  → Json.toJson(event.paramSet)
       )
     )
@@ -162,14 +163,14 @@ trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
   def readEvent[A <: Event](json: JsValue): A = {
     json match {
       case JsObject(fields) =>
-        (fields("type"), fields("eventId"), fields("source"), fields("name"), fields("eventTime"), fields("paramSet")) match {
-          case (JsString(typeName), eventId, source, JsString(name), eventTime, paramSet) =>
+        (fields("type"), fields("eventId"), fields("source"), fields("eventName"), fields("eventTime"), fields("paramSet")) match {
+          case (JsString(typeName), eventId, source, name, eventTime, paramSet) =>
             typeName match {
               case `observeEventType` =>
                 ObserveEvent(
                   eventId.as[Id],
                   source.as[Prefix],
-                  name,
+                  name.as[EventName],
                   eventTime.as[EventTime],
                   paramSet.as[Set[Parameter[_]]]
                 ).asInstanceOf[A]
@@ -177,7 +178,7 @@ trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
                 SystemEvent(
                   eventId.as[Id],
                   source.as[Prefix],
-                  name,
+                  name.as[EventName],
                   eventTime.as[EventTime],
                   paramSet.as[Set[Parameter[_]]]
                 ).asInstanceOf[A]

@@ -5,6 +5,7 @@ import akka.typed.javadsl.Actor;
 import csw.messages.ccs.commands.Observe;
 import csw.messages.ccs.commands.Setup;
 import csw.messages.ccs.commands.Wait;
+import csw.messages.ccs.events.EventName;
 import csw.messages.ccs.events.SystemEvent;
 import csw.messages.params.generics.JKeyTypes;
 import csw.messages.params.generics.Key;
@@ -23,7 +24,7 @@ public abstract class JavaCommandHandler {
     static final Parameter<Integer> encoderParam = encoderIntKey.set(55, 66);
     static final Parameter<String> epochStringParam = epochStringKey.set("Event1", "Event2");
 
-    private static SystemEvent systemEvent = new SystemEvent(prefix, "").add(encoderParam).add(epochStringParam);
+    private static SystemEvent systemEvent = new SystemEvent(prefix, new EventName("")).add(encoderParam).add(epochStringParam);
 
     private JavaCommandHandler() {
     }

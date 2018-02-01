@@ -12,7 +12,7 @@ class ProtobufSerializationTest extends FunSpec with Matchers with BeforeAndAfte
 
   describe("Test protobuf serialization of Events") {
     val prefix: Prefix = Prefix("wfos.blue.filter")
-    val eventName      = "filter wheel"
+    val eventName      = EventName("filter wheel")
 
     it("should serialize ObserveEvent") {
 

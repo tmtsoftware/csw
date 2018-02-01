@@ -3,7 +3,7 @@ package csw.messages.params.generics
 import java.time.Instant
 
 import csw.messages.ccs.commands.{CommandName, Observe, Setup, Wait}
-import csw.messages.ccs.events.{Event, SystemEvent}
+import csw.messages.ccs.events.{Event, EventName, SystemEvent}
 import csw.messages.params.models.{ObsId, Prefix}
 import csw.messages.params.states.{CurrentState, CurrentStates}
 import org.scalatest.FunSuite
@@ -78,7 +78,7 @@ class SerializationTest extends FunSuite {
 
   test("System event kryo serialization") {
     import csw.messages.params.generics.ParamSetSerializer._
-    val event = SystemEvent(fqn1prefix, "filter wheel")
+    val event = SystemEvent(fqn1prefix, EventName("filter wheel"))
       .add(ra.set("12:32:11"))
       .add(dec.set("30:22:22"))
 

@@ -1,7 +1,6 @@
 package csw.services.messages
 
 import java.time.Instant
-import java.util.UUID
 
 import csw.messages.ccs.events._
 import csw.messages.params.formats.JsonSupport
@@ -37,38 +36,6 @@ class EventsTest extends FunSpec with Matchers {
     }
   }
 
-  describe("Examples of EventInfo") {
-    it("should show usage of utility functions") {
-
-      //#eventinfo
-      //with only a subsystem, time will default to now
-      val info1: EventInfo = EventInfo("wfos.blue.filter")
-
-      //given subsystem and time is an hour ago
-      val info2: EventInfo = EventInfo("wfos.blue.filter", EventTime(Instant.now().minusSeconds(3600)))
-
-      //supply subsystem, time, ObsId
-      val info3 = EventInfo(
-        "wfos.blue.filter",
-        EventTime(),
-        ObsId("Obs001")
-      )
-
-      //with all values
-      val info4 = EventInfo(
-        Prefix("wfos.prog.cloudcover"),
-        Instant.now(),
-        Some(ObsId("Obs001")),
-        UUID.randomUUID().toString
-      )
-      //#eventinfo
-
-      //validations
-      assert(info1.equals(info2))
-      assert(!info3.equals(info4))
-    }
-  }
-
   describe("Examples of Events") {
     it("should show usages of ObserveEvent") {
 
@@ -81,9 +48,9 @@ class EventsTest extends FunSpec with Matchers {
 
       //prefixes
       val ck1   = Prefix("wfos.prog.cloudcover")
-      val name1 = "filter wheel"
+      val name1 = EventName("filter wheel")
       val ck3   = Prefix("wfos.red.detector")
-      val name3 = "iris"
+      val name3 = EventName("iris")
 
       //parameters
       val p1: Parameter[Int]    = k1.set(22)
@@ -134,9 +101,9 @@ class EventsTest extends FunSpec with Matchers {
 
       //prefixes
       val ck1   = Prefix("wfos.prog.cloudcover")
-      val name1 = "filter wheel"
+      val name1 = EventName("filter wheel")
       val ck3   = Prefix("wfos.red.detector")
-      val name3 = "iris"
+      val name3 = EventName("iris")
 
       //parameters
       val p1: Parameter[Int]    = k1.set(22)
@@ -194,19 +161,21 @@ class EventsTest extends FunSpec with Matchers {
 
       //key
       val k1: Key[MatrixData[Double]] = DoubleMatrixKey.make("myMatrix")
+
+      val name1  = EventName("filter wheel")
+      val prefix = Prefix("wfos.blue.filter")
+
       //values
       val m1: MatrixData[Double] = MatrixData.fromArrays(
         Array(1.0, 2.0, 3.0),
         Array(4.1, 5.1, 6.1),
         Array(7.2, 8.2, 9.2)
       )
-
       //parameter
       val i1: Parameter[MatrixData[Double]] = k1.set(m1)
-
       //events
-      val observeEvent: ObserveEvent = ObserveEvent("wfos.blue.filter", "filter wheel").add(i1)
-      val systemEvent: SystemEvent   = SystemEvent("wfos.blue.filter", "filter wheel").add(i1)
+      val observeEvent: ObserveEvent = ObserveEvent(prefix, name1).add(i1)
+      val systemEvent: SystemEvent   = SystemEvent(prefix, name1).add(i1)
 
       //json support - write
       val observeJson: JsValue = JsonSupport.writeEvent(observeEvent)
@@ -240,25 +209,24 @@ class EventsTest extends FunSpec with Matchers {
       val miscKey: Key[Int]    = KeyType.IntKey.make("misc.")
 
       //prefix
-      val prefix = "wfos.blue.filter"
+      val prefix = Prefix("wfos.blue.filter")
+
+      val name1 = EventName("filter wheel")
 
       //params
       val encParam1 = encoderKey.set(1)
       val encParam2 = encoderKey.set(2)
-      val encParam3 = encoderKey.set(3)
 
+      val encParam3    = encoderKey.set(3)
       val filterParam1 = filterKey.set(1)
       val filterParam2 = filterKey.set(2)
+
       val filterParam3 = filterKey.set(3)
 
       val miscParam1 = miscKey.set(100)
-
       //StatusEvent with duplicate key via constructor
-      val systemEvent = SystemEvent(
-        prefix,
-        "filter wheel",
-        Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3)
-      )
+      val systemEvent =
+        SystemEvent(prefix, name1, Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
       //four duplicate keys are removed; now contains one Encoder and one Filter key
       val uniqueKeys1 = systemEvent.paramSet.toList.map(_.keyName)
 
@@ -299,11 +267,13 @@ class EventsTest extends FunSpec with Matchers {
       //parameters
       val param = raDecKey.set(raDec1, raDec2).withUnits(arcmin)
 
+      val prefix = Prefix("wfos.blue.filter")
+      val name   = EventName("filter wheel")
       //events
-      val observeEvent: ObserveEvent = ObserveEvent("wfos.blue.filter", "filter wheel").add(param)
-      val systemEvent1: SystemEvent  = SystemEvent("wfos.blue.filter", "filter wheel").add(param)
+      val observeEvent: ObserveEvent = ObserveEvent(prefix, name).add(param)
+      val systemEvent1: SystemEvent  = SystemEvent(prefix, name).add(param)
       val systemEvent2: SystemEvent =
-        SystemEvent(Id(), "wfos.blue.filter", "filter wheel", EventTime(Instant.now().minusSeconds(3600)), Set.empty).add(param)
+        SystemEvent(prefix, name).add(param)
 
       //convert events to protobuf bytestring
       val byteArray2: Array[Byte] = observeEvent.toPb

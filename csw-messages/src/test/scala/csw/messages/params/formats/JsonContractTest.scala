@@ -25,7 +25,7 @@ class JsonContractTest extends FunSpec with Matchers {
   private val instantStr: String   = "2017-08-09T06:40:00.898Z"
   private val eventId: Id          = Id("7a4cd6ab-6077-476d-a035-6f83be1de42c")
   private val eventTime: EventTime = EventTime(Instant.parse(instantStr))
-  private val eventName: String    = "filter wheel"
+  private val eventName: EventName = EventName("filter wheel")
 
   describe("Test Sequence Commands") {
 

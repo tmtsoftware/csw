@@ -177,7 +177,9 @@ class UniqueKeyVerificationTest extends FunSpec with Matchers {
 
       //parameters with duplicate key via constructor
       val event =
-        ObserveEvent(prefix, "filter wheel", Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
+        ObserveEvent(prefix,
+                     EventName("filter wheel"),
+                     Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
       event.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
 
       //parameters with duplicate key via add + madd
@@ -195,7 +197,9 @@ class UniqueKeyVerificationTest extends FunSpec with Matchers {
 
       //parameters with duplicate key via constructor
       val event =
-        SystemEvent(prefix, "filter wheel", Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
+        SystemEvent(prefix,
+                    EventName("filter wheel"),
+                    Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
       event.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
 
       //parameters with duplicate key via add + madd

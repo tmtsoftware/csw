@@ -1,9 +1,6 @@
 package csw.services.messages;
 
-import csw.messages.ccs.events.EventInfo;
-import csw.messages.ccs.events.EventTime;
-import csw.messages.ccs.events.ObserveEvent;
-import csw.messages.ccs.events.SystemEvent;
+import csw.messages.ccs.events.*;
 import csw.messages.javadsl.JUnits;
 import csw.messages.params.formats.JavaJsonSupport;
 import csw.messages.params.generics.JKeyTypes;
@@ -49,27 +46,6 @@ public class JEventsTest {
     }
 
     @Test
-    public void showUsageOfEventInfo() {
-        //#eventinfo
-        //with only a subsystem, time will default to now
-        EventInfo eventInfo1 = EventInfo.apply("wfos.blue.filter");
-
-        //given subsystem and time is now
-        EventInfo eventInfo2 = EventInfo.apply("wfos.blue.filter", EventTime.apply(Instant.now()));
-
-        //supply subsystem, time, ObsId
-        EventInfo eventInfo3 = EventInfo.apply("wfos.blue.filter", EventTime.apply(), ObsId.apply("Obs001"));
-
-        //with all values
-        EventInfo eventInfo4 = EventInfo.apply(new Prefix("wfos.prog.cloudcover"), EventTime.apply(), ObsId.apply("Obs001").asOption(), UUID.randomUUID().toString());
-        //#eventinfo
-
-        //validations
-        Assert.assertEquals(eventInfo1, eventInfo2);
-        Assert.assertNotEquals(eventInfo3, eventInfo4);
-    }
-
-    @Test
     public void showUsageOfObserveEvent() {
         //#observeevent
         //keys
@@ -80,9 +56,9 @@ public class JEventsTest {
 
         //prefixes
         Prefix prefix1 = new Prefix("wfos.prog.cloudcover");
-        String name1 = "filter wheel";
+        EventName name1 = new EventName("filter wheel");
         Prefix prefix2 = new Prefix("wfos.red.detector");
-        String name2 = "iris";
+        EventName name2 = new EventName("iris");
 
         //parameters
         Parameter<Integer> p1 = k1.set(22);
@@ -131,9 +107,9 @@ public class JEventsTest {
 
         //prefixes
         Prefix prefix1 = new Prefix("wfos.prog.cloudcover");
-        String name1 = "filter wheel";
+        EventName name1 = new EventName("filter wheel");
         Prefix prefix2 = new Prefix("wfos.red.detector");
-        String name2 = "iris";
+        EventName name2 = new EventName("iris");
 
         //parameters
         Parameter<Integer> p1 = k1.set(22);
@@ -179,7 +155,7 @@ public class JEventsTest {
 
         //prefixes
         Prefix prefix1 = new Prefix("wfos.blue.filter");
-        String name1 = "filter wheel";
+        EventName name1 = new EventName("filter wheel");
 
         //values
         Double[][] doubles = {{1.0, 2.0, 3.0}, {4.1, 5.1, 6.1}, {7.2, 8.2, 9.2}};
@@ -224,7 +200,7 @@ public class JEventsTest {
 
         //prefix
         Prefix prefix1 = new Prefix("wfos.blue.filter");
-        String name1 = "filter wheel";
+        EventName name1 = new EventName("filter wheel");
 
         //params
         Parameter<Integer> encParam1 = encoderKey.set(1);
@@ -271,9 +247,9 @@ public class JEventsTest {
 
         //prefixes
         Prefix prefix1 = new Prefix("wfos.blue.filter");
-        String name1 = "filter wheel";
+        EventName name1 = new EventName("filter wheel");
         Prefix prefix2 = new Prefix("wfos.prog.cloudcover");
-        String name2 = "iris";
+        EventName name2 = new EventName("iris");
 
         //Key
         Key<RaDec> raDecKey = JKeyTypes.RaDecKey().make("raDecKey");

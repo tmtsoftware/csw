@@ -18,7 +18,7 @@ import csw.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.messages.ccs.CommandIssue
 import csw.messages.ccs.commands.CommandResponse._
 import csw.messages.ccs.commands._
-import csw.messages.ccs.events.{EventTime, ObserveEvent, SystemEvent}
+import csw.messages.ccs.events.{EventName, EventTime, ObserveEvent, SystemEvent}
 import csw.messages.framework.LocationServiceUsage.DoNotRegister
 import csw.messages.framework.{ComponentInfo, ContainerLifecycleState, SupervisorLifecycleState}
 import csw.messages.location.ComponentType.HCD
@@ -109,7 +109,7 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
 
       val param = choiceKey.set(jupiter, pluto).withUnits(arcmin)
 
-      val observeEvent: ObserveEvent = ObserveEvent(Id(), prefix, "filter wheel", EventTime(), Set.empty).add(param)
+      val observeEvent: ObserveEvent = ObserveEvent(Id(), prefix, EventName("filter wheel"), EventTime(), Set.empty).add(param)
       val observeEventSerializer     = serialization.findSerializerFor(observeEvent)
 
       observeEventSerializer.getClass shouldBe classOf[AkkaSerializer]
@@ -128,7 +128,7 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
 
       val param = structKey.set(struct).withUnits(joule)
 
-      val systemEvent: SystemEvent = SystemEvent(Id(), prefix, "filter wheel", EventTime(), Set.empty).add(param)
+      val systemEvent: SystemEvent = SystemEvent(Id(), prefix, EventName("filter wheel"), EventTime(), Set.empty).add(param)
       val systemEventSerializer    = serialization.findSerializerFor(systemEvent)
 
       systemEventSerializer.getClass shouldBe classOf[AkkaSerializer]

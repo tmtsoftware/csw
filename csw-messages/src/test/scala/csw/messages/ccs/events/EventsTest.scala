@@ -12,7 +12,7 @@ class EventsTest extends FunSpec with Matchers {
   private val s1Key = KeyType.IntKey.make(s1)
 
   private val ck        = Prefix("wfos.blue.filter")
-  private val eventName = "filter wheel"
+  private val eventName = EventName("filter wheel")
 
   describe("ObserveEvent Test") {
     val k1     = KeyType.IntKey.make("encoder")

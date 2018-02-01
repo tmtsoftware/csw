@@ -74,21 +74,21 @@ public class JEventsTest {
 
     @Test
     public void shouldAbleToCreateAndAccessObserveEvent() {
-        ObserveEvent observeEvent = new ObserveEvent(prefix, "filter wheel").add(encoderParam).add(epochStringParam);
+        ObserveEvent observeEvent = new ObserveEvent(prefix, new EventName("filter wheel")).add(encoderParam).add(epochStringParam);
         assertOnEventsAPI(observeEvent);
     }
 
     @Test
     public void shouldAbleToCreateAndAccessSystemEvent() {
-        SystemEvent systemEvent = new SystemEvent(prefix, "filter wheel").add(encoderParam).add(epochStringParam);
+        SystemEvent systemEvent = new SystemEvent(prefix, new EventName("filter wheel")).add(encoderParam).add(epochStringParam);
         assertOnEventsAPI(systemEvent);
     }
 
     @Test
     public void shouldAbleToCreateAndAccessSystemEventWithCustomInfo() {
-        SystemEvent systemEvent = new SystemEvent(prefix, "filter wheel").add(encoderParam).add(epochStringParam);
+        SystemEvent systemEvent = new SystemEvent(prefix, new EventName("filter wheel")).add(encoderParam).add(epochStringParam);
         Assert.assertEquals(prefix, systemEvent.source());
-        Assert.assertEquals("filter wheel", systemEvent.name());
+        Assert.assertEquals(new EventName("filter wheel"), systemEvent.eventName());
         Assert.assertNotNull(systemEvent.eventId());
         Assert.assertNotNull(systemEvent.eventTime());
     }

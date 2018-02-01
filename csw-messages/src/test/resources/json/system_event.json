@@ -5,7 +5,9 @@
     "subsystem": "wfos",
     "prefix": "wfos.blue.filter"
   },
-  "name": "filter wheel",
+  "eventName": {
+    "name": "filter wheel"
+  },
   "eventTime": "2017-08-09T06:40:00.898Z",
   "paramSet": [
     {
