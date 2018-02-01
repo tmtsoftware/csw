@@ -102,8 +102,7 @@ object SystemEvent {
       eventName: EventName,
       eventTime: EventTime,
       paramSet: Set[Parameter[_]]
-  ) =
-    new SystemEvent(eventId, source, eventName, eventTime, paramSet)
+  ) = new SystemEvent(eventId, source, eventName, eventTime, paramSet)
 
   def apply(source: Prefix, eventName: EventName): SystemEvent = apply(Id(), source, eventName, EventTime(), Set.empty)
 
@@ -151,8 +150,7 @@ object ObserveEvent {
       eventName: EventName,
       eventTime: EventTime,
       paramSet: Set[Parameter[_]]
-  ) =
-    new ObserveEvent(eventId, source, eventName, eventTime, paramSet)
+  ) = new ObserveEvent(eventId, source, eventName, eventTime, paramSet)
 
   def apply(source: Prefix, eventName: EventName): ObserveEvent = apply(Id(), source, eventName, EventTime(), Set.empty)
 

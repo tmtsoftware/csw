@@ -120,6 +120,7 @@ class EventsTest extends FunSpec with Matchers {
 
       assert(!mutatedSc1.exists(k1))
       assert(mutatedSc1.size == 1)
+      assert(mutatedSc1.eventId != sc1.eventId)
     }
 
     it("Should allow adding") {
