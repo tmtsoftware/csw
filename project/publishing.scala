@@ -24,7 +24,7 @@ object PublishBintray extends AutoPlugin {
   )
 }
 
-object GhPagesPublish extends AutoPlugin {
+object GithubPublishDocs extends AutoPlugin {
   import com.typesafe.sbt.SbtGit.GitKeys
   import com.typesafe.sbt.sbtghpages.GhpagesPlugin
   import GhpagesPlugin.autoImport._

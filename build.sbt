@@ -42,7 +42,7 @@ lazy val githubReleases: Seq[ProjectReference] = Seq(
 //Root project
 lazy val `csw-prod` = project
   .in(file("."))
-  .enablePlugins(UnidocSite, PublishGithub, GitBranchPrompt, GithubRelease)
+  .enablePlugins(UnidocSite, GithubPublishDocs, GitBranchPrompt, GithubRelease)
   .aggregate(aggregatedProjects: _*)
   .settings(GithubRelease.githubReleases(githubReleases))
   .settings(Settings.mergeSiteWith(docs))
