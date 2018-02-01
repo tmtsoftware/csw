@@ -18,22 +18,7 @@ Scala
 
 Java
 :   @@snip [JEventsTest.java](../../../../../examples/src/test/java/csw/services/messages/JEventsTest.java) { #eventtime }
-  
-### EventInfo
-
-It captures all the relevant information about an event that occurred during observation. An event can be created by supplying following inputs:
-
- * **source** which is a [Prefix](commands.html#Prefix) 
- * **eventTime** which is an [EventTime](events.html#EventTime) 
- * **obsId** which is an [ObsId](commands.html#ObsId)
- * **eventId** which is a String representing unique identifier(UUID) which is generated automatically if not supplied.
- 
-Scala
-:   @@snip [EventsTest.scala](../../../../../examples/src/test/scala/csw/services/messages/EventsTest.scala) { #eventinfo }
-
-Java
-:   @@snip [JEventsTest.java](../../../../../examples/src/test/java/csw/services/messages/JEventsTest.java) { #eventinfo }
- 
+   
 ### Observe Event
 
 ObserveEvent is used to describe an event within a standardized data acquisition process. Published only by Science Detector Assemblies, who emit ObserveEvents during their exposures to signal the occurrence of specific activities/actions during the acquisition of data. Observe Events are published by the detector system using the Event Service.
