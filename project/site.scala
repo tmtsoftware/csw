@@ -15,9 +15,9 @@ object UnidocSite extends AutoPlugin {
   def excludeScaladoc: String     = Seq("csw_protobuf", "akka").mkString(":")
 
   override def projectSettings: Seq[Setting[_]] = Seq(
-    siteSubdirName in ScalaUnidoc := "api/scala",
+    siteSubdirName in ScalaUnidoc := "/api/scala",
     addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), siteSubdirName in ScalaUnidoc),
-    siteSubdirName in JavaUnidoc := "api/java",
+    siteSubdirName in JavaUnidoc := "/api/java",
     filterNotSources(sources in (JavaUnidoc, unidoc), excludeJavadoc),
     addMappingsToSiteDir(mappings in (JavaUnidoc, packageDoc), siteSubdirName in JavaUnidoc),
     scalacOptions in (ScalaUnidoc, unidoc) ++= Seq("-skip-packages", excludeScaladoc),
@@ -43,9 +43,9 @@ object ParadoxSite extends AutoPlugin {
     paradoxProperties in Paradox ++= Map(
       "version"                -> version.value,
       "scala.binaryVersion"    -> scalaBinaryVersion.value,
-      "scaladoc.base_url"      -> "https://tmtsoftware.github.io/csw-prod/api/scala",
-      "javadoc.base_url"       -> "https://tmtsoftware.github.io/csw-prod/api/java",
-      "extref.manual.base_url" -> "https://tmtsoftware.github.io/csw-prod/manual/index.html",
+      "scaladoc.base_url"      -> s"https://tmtsoftware.github.io/csw-prod/${version.value}/api/scala",
+      "javadoc.base_url"       -> s"https://tmtsoftware.github.io/csw-prod/${version.value}/api/java",
+      "extref.manual.base_url" -> s"https://tmtsoftware.github.io/csw-prod/${version.value}/manual/index.html",
       "github.base_url"        -> s"https://github.com/tmtsoftware/csw-prod/tree/master"
     )
   )

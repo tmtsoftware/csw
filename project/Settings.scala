@@ -8,7 +8,11 @@ import sbtunidoc.ScalaUnidocPlugin.autoImport.ScalaUnidoc
 object Settings {
   def mergeSiteWith(p: Project): Setting[Task[Seq[(File, String)]]] =
     (mappings in makeSite) := {
-      (mappings in makeSite).value ++ (mappings in makeSite in p).value
+      (mappings in makeSite).value.map {
+        case (file, output) => (file, "/" + version.value + output)
+      } ++ (mappings in makeSite in p).value.map {
+        case (file, output) => (file, "/" + version.value + output)
+      }
     }
 
   def docExclusions(projects: Seq[ProjectReference]): Seq[Setting[_]] =

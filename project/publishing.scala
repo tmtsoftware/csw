@@ -25,15 +25,17 @@ object PublishBintray extends AutoPlugin {
 }
 
 object PublishGithub extends AutoPlugin {
+  import com.typesafe.sbt.SbtGit.GitKeys
   import com.typesafe.sbt.sbtghpages.GhpagesPlugin
   import GhpagesPlugin.autoImport._
-  import com.typesafe.sbt.SbtGit.GitKeys
 
   override def requires: Plugins = GhpagesPlugin
 
   override def projectSettings: Seq[Setting[_]] = Seq(
-    GitKeys.gitRemoteRepo := "git@github.com:tmtsoftware/csw-prod.git",
-    ghpagesNoJekyll := true
+    includeFilter in ghpagesCleanSite := new FileFilter {
+      override def accept(pathname: File): Boolean = pathname.getAbsolutePath.contains(s"/${version.value}")
+    },
+    GitKeys.gitRemoteRepo := "git@github.com:tmtsoftware/csw-prod.git"
   )
 }
 
