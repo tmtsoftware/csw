@@ -148,6 +148,7 @@ object Dependencies {
     Libs.`scala-async`,
     Akka.`akka-stream`,
     Akka.`akka-typed`,
+    Libs.`lettuce`,
     Akka.`akka-typed-testkit`  % Test,
     Akka.`akka-stream-testkit` % Test,
     Libs.`scalatest`           % Test,
