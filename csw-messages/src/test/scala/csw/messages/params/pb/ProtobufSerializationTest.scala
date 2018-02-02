@@ -8,6 +8,8 @@ import csw.messages.params.models._
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
 
 // DEOPSCSW-297: Merge protobuf branch in master
+// DEOPSCSW-327: Define Event Data Structure
+// DEOPSCSW-328: Basic information of Event needed for routing and Diagnostic use
 class ProtobufSerializationTest extends FunSpec with Matchers with BeforeAndAfterAll {
 
   describe("Test protobuf serialization of Events") {

@@ -1,13 +1,15 @@
 package csw.services.messages;
 
-import csw.messages.ccs.events.*;
+import csw.messages.ccs.events.EventName;
+import csw.messages.ccs.events.EventTime;
+import csw.messages.ccs.events.ObserveEvent;
+import csw.messages.ccs.events.SystemEvent;
 import csw.messages.javadsl.JUnits;
 import csw.messages.params.formats.JavaJsonSupport;
 import csw.messages.params.generics.JKeyTypes;
 import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.models.MatrixData;
-import csw.messages.params.models.ObsId;
 import csw.messages.params.models.Prefix;
 import csw.messages.params.models.RaDec;
 import org.junit.Assert;
@@ -19,6 +21,9 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
+// DEOPSCSW-327: Define Event Data Structure
+// DEOPSCSW-328: Basic information of Event needed for routing and Diagnostic use
+// DEOPSCSW-329: Providing Mandatory information during Event Creation
 public class JEventsTest {
 
     @Test
@@ -43,57 +48,6 @@ public class JEventsTest {
         Assert.assertTrue(now.time().isAfter(anHourAgo.time()));
         Assert.assertTrue(anHourAgo.time().isAfter(aDayAgo.time()));
         Assert.assertTrue(currentTime.time().isAfter(anHourAgo.time()));
-    }
-
-    @Test
-    public void showUsageOfObserveEvent() {
-        //#observeevent
-        //keys
-        Key<Integer> k1 = JKeyTypes.IntKey().make("encoder");
-        Key<Integer> k2 = JKeyTypes.IntKey().make("windspeed");
-        Key<String> k3 = JKeyTypes.StringKey().make("filter");
-        Key<Integer> k4 = JKeyTypes.IntKey().make("notUsed");
-
-        //prefixes
-        Prefix prefix1 = new Prefix("wfos.prog.cloudcover");
-        EventName name1 = new EventName("filter wheel");
-        Prefix prefix2 = new Prefix("wfos.red.detector");
-        EventName name2 = new EventName("iris");
-
-        //parameters
-        Parameter<Integer> p1 = k1.set(22);
-        Parameter<Integer> p2 = k2.set(44);
-        Parameter<String> p3 = k3.set("A", "B", "C", "D");
-
-        //Create ObserveEvent using madd
-        ObserveEvent oc1 = new ObserveEvent(prefix1, name1).madd(p1, p2);
-        //Create ObserveEvent using add
-        ObserveEvent oc2 = new ObserveEvent(prefix2, name2).add(p1).add(p2);
-        //Create ObserveEvent and use add
-        ObserveEvent oc3 = new ObserveEvent(prefix2, name2).add(p1).add(p2).add(p3);
-
-        //access keys
-        Boolean k1Exists = oc1.exists(k1); //true
-
-        //access Parameters
-        Optional<Parameter<Integer>> p4 = oc1.jGet(k1);
-
-        //access values
-        List<Integer> v1 = oc1.jGet(k1).get().jValues();
-        List<Integer> v2 = oc2.parameter(k2).jValues();
-        //k4 is missing
-        Set<String> missingKeys = oc3.jMissingKeys(k1, k2, k3, k4);
-
-        //remove keys
-        ObserveEvent oc4 = oc3.remove(k3);
-        //#observeevent
-
-        Assert.assertTrue(k1Exists);
-        Assert.assertTrue(p4.get() == p1);
-        Assert.assertEquals(new HashSet<>(Arrays.asList(22)), new HashSet<>(v1));
-        Assert.assertEquals(new HashSet<>(Arrays.asList(44)), new HashSet<>(v2));
-        Assert.assertEquals(new HashSet<>(Arrays.asList(missingKeys)), new HashSet<>(Arrays.asList(missingKeys)));
-        Assert.assertNotEquals(oc3.eventId(), oc4.eventId()); //Test unique id when parameters are removed
     }
 
     @Test
@@ -144,7 +98,66 @@ public class JEventsTest {
         Assert.assertEquals(new HashSet<>(Arrays.asList(22)), new HashSet<>(v1));
         Assert.assertEquals(new HashSet<>(Arrays.asList(44)), new HashSet<>(v2));
         Assert.assertEquals(new HashSet<>(Arrays.asList(missingKeys)), new HashSet<>(Arrays.asList(missingKeys)));
+        Assert.assertNotNull(se1.eventId());
+        Assert.assertNotNull(se1.eventTime());
+        Assert.assertEquals(name1, se1.eventName());
+        Assert.assertEquals(prefix1, se1.source());
         Assert.assertNotEquals(se3.eventId(), se4.eventId()); //Test unique id when parameters are removed
+    }
+    
+    @Test
+    public void showUsageOfObserveEvent() {
+        //#observeevent
+        //keys
+        Key<Integer> k1 = JKeyTypes.IntKey().make("encoder");
+        Key<Integer> k2 = JKeyTypes.IntKey().make("windspeed");
+        Key<String> k3 = JKeyTypes.StringKey().make("filter");
+        Key<Integer> k4 = JKeyTypes.IntKey().make("notUsed");
+
+        //prefixes
+        Prefix prefix1 = new Prefix("wfos.prog.cloudcover");
+        EventName name1 = new EventName("filter wheel");
+        Prefix prefix2 = new Prefix("wfos.red.detector");
+        EventName name2 = new EventName("iris");
+
+        //parameters
+        Parameter<Integer> p1 = k1.set(22);
+        Parameter<Integer> p2 = k2.set(44);
+        Parameter<String> p3 = k3.set("A", "B", "C", "D");
+
+        //Create ObserveEvent using madd
+        ObserveEvent oc1 = new ObserveEvent(prefix1, name1).madd(p1, p2);
+        //Create ObserveEvent using add
+        ObserveEvent oc2 = new ObserveEvent(prefix2, name2).add(p1).add(p2);
+        //Create ObserveEvent and use add
+        ObserveEvent oc3 = new ObserveEvent(prefix2, name2).add(p1).add(p2).add(p3);
+
+        //access keys
+        Boolean k1Exists = oc1.exists(k1); //true
+
+        //access Parameters
+        Optional<Parameter<Integer>> p4 = oc1.jGet(k1);
+
+        //access values
+        List<Integer> v1 = oc1.jGet(k1).get().jValues();
+        List<Integer> v2 = oc2.parameter(k2).jValues();
+        //k4 is missing
+        Set<String> missingKeys = oc3.jMissingKeys(k1, k2, k3, k4);
+
+        //remove keys
+        ObserveEvent oc4 = oc3.remove(k3);
+        //#observeevent
+
+        Assert.assertTrue(k1Exists);
+        Assert.assertTrue(p4.get() == p1);
+        Assert.assertEquals(new HashSet<>(Arrays.asList(22)), new HashSet<>(v1));
+        Assert.assertEquals(new HashSet<>(Arrays.asList(44)), new HashSet<>(v2));
+        Assert.assertEquals(new HashSet<>(Arrays.asList(missingKeys)), new HashSet<>(Arrays.asList(missingKeys)));
+        Assert.assertNotNull(oc1.eventId());
+        Assert.assertNotNull(oc1.eventTime());
+        Assert.assertEquals(name1, oc1.eventName());
+        Assert.assertEquals(prefix1, oc1.source());
+        Assert.assertNotEquals(oc3.eventId(), oc4.eventId()); //Test unique id when parameters are removed
     }
 
     @Test

@@ -39,6 +39,9 @@ sealed trait Command { self: ParameterSetType[_] ⇒
 
   val maybeObsId: Option[ObsId]
   def jMaybeObsId: Optional[ObsId] = maybeObsId.asJava
+
+  override def toString =
+    s"$typeName(runId=$runId, paramSet=$paramSet, source=$source, commandName=$commandName, maybeObsId=$maybeObsId)"
 }
 
 /**

@@ -22,6 +22,15 @@ sealed trait Event {
   val eventTime: EventTime
 
   val paramSet: Set[Parameter[_]]
+
+  /**
+   * A name identifying the type of parameter set, such as "SystemEvent", "ObserveEvent".
+   * This is used in the JSON and toString output.
+   */
+  def typeName: String
+
+  override def toString =
+    s"$typeName(eventId=$eventId, source=$source, eventName=$eventName, eventTime=$eventTime, paramSet=$paramSet)"
 }
 
 object Event {
