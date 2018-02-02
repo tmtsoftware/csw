@@ -6,6 +6,9 @@ import org.scalatest.{FunSpec, Matchers}
 
 // DEOPSCSW-183: Configure attributes and values
 // DEOPSCSW-185: Easy to Use Syntax/Api
+// DEOPSCSW-327: Define Event Data Structure
+// DEOPSCSW-328: Basic information of Event needed for routing and Diagnostic use
+// DEOPSCSW-329: Providing Mandatory information during Event Creation
 class EventsTest extends FunSpec with Matchers {
   private val s1: String = "encoder"
 
@@ -14,8 +17,6 @@ class EventsTest extends FunSpec with Matchers {
   private val ck        = Prefix("wfos.blue.filter")
   private val eventName = EventName("filter wheel")
 
-  // DEOPSCSW-327: Define Event Data Structure
-  // DEOPSCSW-329: Providing Mandatory information during Event Creation
   describe("SystemEvent Test") {
     val k1     = KeyType.IntKey.make("encoder")
     val k2     = KeyType.IntKey.make("windspeed")
@@ -47,7 +48,7 @@ class EventsTest extends FunSpec with Matchers {
       assert(sc1(k2).head == 44)
       assert(sc1.missingKeys(k1, k2, k3) == Set(k3.keyName))
     }
-    // DEOPSCSW-328: Basic information of Event needed for routing and Diagnostic use
+
     it("Should allow removing") {
       val i1  = k1.set(22)
       val i2  = k2.set(44)
@@ -77,7 +78,6 @@ class EventsTest extends FunSpec with Matchers {
       assert(mutatedSc1.eventId != sc1.eventId)
     }
 
-    // DEOPSCSW-328: Basic information of Event needed for routing and Diagnostic use
     it("Should access metadata fields") {
       val i1  = k1.set(22)
       val sc1 = SystemEvent(prefix, eventName).madd(i1)
@@ -90,10 +90,24 @@ class EventsTest extends FunSpec with Matchers {
       sc1.source shouldEqual prefix
 
     }
+
+    it("each event created should be unique") {
+      val ev1 = SystemEvent(ck, eventName)
+      val ev2 = ev1.add(s1Key -> 2)
+      val ev3 = ev2.remove(s1Key)
+
+      ev1.eventId should not equal ev2.eventId
+      ev1.eventTime should not equal ev2.eventTime
+      ev1.eventName shouldEqual ev2.eventName
+      ev1.source shouldEqual ev2.source
+
+      ev3.eventId should not equal ev2.eventId
+      ev3.eventTime should not equal ev2.eventTime
+      ev3.eventName shouldEqual ev2.eventName
+      ev3.source shouldEqual ev2.source
+    }
   }
 
-  // DEOPSCSW-327: Define Event Data Structure
-  // DEOPSCSW-329: Providing Mandatory information during Event Creation
   describe("ObserveEvent Test") {
     val k1     = KeyType.IntKey.make("encoder")
     val k2     = KeyType.IntKey.make("windspeed")
@@ -155,7 +169,6 @@ class EventsTest extends FunSpec with Matchers {
       assert(mutatedOc1.eventId != oc1.eventId)
     }
 
-    // DEOPSCSW-328: Basic information of Event needed for routing and Diagnostic use
     it("Should access metadata fields") {
       val i1  = k1.set(22)
       val oc1 = ObserveEvent(prefix, eventName).madd(i1)
@@ -168,21 +181,21 @@ class EventsTest extends FunSpec with Matchers {
       oc1.source shouldEqual prefix
 
     }
-  }
 
-  describe("Check equal for events") {
     it("each event created should be unique") {
+      val ev1 = ObserveEvent(ck, eventName)
+      val ev2 = ev1.add(s1Key -> 2)
+      val ev3 = ev2.remove(s1Key)
 
-      //Every event should be unique because every event creation will create new eventId
-      val ev1 = SystemEvent(ck, eventName).add(s1Key -> 2)
+      ev1.eventId should not equal ev2.eventId
+      ev1.eventTime should not equal ev2.eventTime
+      ev1.eventName shouldEqual ev2.eventName
+      ev1.source shouldEqual ev2.source
 
-      val ev2 = SystemEvent(ck, eventName).add(s1Key -> 2)
-
-      val ev3 = SystemEvent(ck, eventName).add(s1Key -> 22)
-
-      ev1 should not equal ev2
-      ev1 should not equal ev3
+      ev3.eventId should not equal ev2.eventId
+      ev3.eventTime should not equal ev2.eventTime
+      ev3.eventName shouldEqual ev2.eventName
+      ev3.source shouldEqual ev2.source
     }
   }
-
 }

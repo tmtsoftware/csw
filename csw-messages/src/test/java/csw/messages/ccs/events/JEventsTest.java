@@ -108,18 +108,39 @@ public class JEventsTest {
     }
 
     @Test
-    public void shouldHaveUniqueIdWhenParametersAreAddedOrRemovedForSystem() {
+    public void shouldBeUniqueWhenParametersAreAddedOrRemovedForSystem() {
         SystemEvent systemEvent1 = new SystemEvent(prefix, new EventName("filter wheel")).add(encoderParam).add(epochStringParam);
         SystemEvent systemEvent2 = systemEvent1.add(epochIntParam);
+        SystemEvent systemEvent3 = systemEvent2.remove(epochIntKey);
+
         assertOnEventsAPI(systemEvent1);
         Assert.assertNotEquals(systemEvent1.eventId(), systemEvent2.eventId());
+        Assert.assertNotEquals(systemEvent1.eventTime(), systemEvent2.eventTime());
+        Assert.assertEquals(systemEvent1.eventName(), systemEvent2.eventName());
+        Assert.assertEquals(systemEvent1.source(), systemEvent2.source());
+
+        Assert.assertNotEquals(systemEvent3.eventId(), systemEvent2.eventId());
+        Assert.assertNotEquals(systemEvent3.eventTime(), systemEvent2.eventTime());
+        Assert.assertEquals(systemEvent3.eventName(), systemEvent2.eventName());
+        Assert.assertEquals(systemEvent3.source(), systemEvent2.source());
     }
 
     @Test
-    public void shouldHaveUniqueIdWhenParametersAreAddedOrRemovedForObserve() {
+    public void shouldBeUniqueIdWhenParametersAreAddedOrRemovedForObserve() {
         ObserveEvent observeEvent1 = new ObserveEvent(prefix, new EventName("filter wheel")).add(encoderParam).add(epochStringParam);
         ObserveEvent observeEvent2 = observeEvent1.add(epochIntParam);
+        ObserveEvent observeEvent3 = observeEvent2.remove(epochIntKey);
+
         assertOnEventsAPI(observeEvent1);
         Assert.assertNotEquals(observeEvent1.eventId(), observeEvent2.eventId());
+        Assert.assertNotEquals(observeEvent1.eventTime(), observeEvent2.eventTime());
+        Assert.assertEquals(observeEvent1.eventName(), observeEvent2.eventName());
+        Assert.assertEquals(observeEvent1.source(), observeEvent2.source());
+
+        Assert.assertNotEquals(observeEvent3.eventId(), observeEvent2.eventId());
+        Assert.assertNotEquals(observeEvent3.eventTime(), observeEvent2.eventTime());
+        Assert.assertEquals(observeEvent3.eventName(), observeEvent2.eventName());
+        Assert.assertEquals(observeEvent3.source(), observeEvent2.source());
+
     }
 }

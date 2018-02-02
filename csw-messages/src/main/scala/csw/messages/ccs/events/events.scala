@@ -96,7 +96,9 @@ case class SystemEvent private (
     with Event {
 
   def this(source: Prefix, eventName: EventName) = this(Id(), source, eventName, EventTime(), Set.empty) // Java API
-  override protected def create(data: Set[Parameter[_]]): SystemEvent = copy(eventId = Id(), paramSet = data)
+
+  override protected def create(data: Set[Parameter[_]]): SystemEvent =
+    copy(eventId = Id(), eventTime = EventTime(), paramSet = data)
 
   /**
    * Returns Protobuf representation of SystemEvent
@@ -143,7 +145,9 @@ case class ObserveEvent private (
     with Event {
 
   def this(source: Prefix, eventName: EventName) = this(Id(), source, eventName, EventTime(), Set.empty) //   Java API
-  override protected def create(data: Set[Parameter[_]]): ObserveEvent = copy(eventId = Id(), paramSet = data)
+
+  override protected def create(data: Set[Parameter[_]]): ObserveEvent =
+    copy(eventId = Id(), eventTime = EventTime(), paramSet = data)
 
   /**
    * Returns Protobuf representation of ObserveEvent
