@@ -13,6 +13,9 @@ import java.util.stream.Collectors;
 
 // DEOPSCSW-183: Configure attributes and values
 // DEOPSCSW-185: Easy to Use Syntax/Api
+// DEOPSCSW-327: Define Event Data Structure
+// DEOPSCSW-328: Basic information of Event needed for routing and Diagnostic use
+// DEOPSCSW-329: Providing Mandatory information during Event Creation
 public class JEventsTest {
     private final Key<Integer> encoderIntKey = JKeyTypes.IntKey().make("encoder");
     private final Key<String> epochStringKey = JKeyTypes.StringKey().make("epoch");
@@ -26,8 +29,12 @@ public class JEventsTest {
     private final Prefix prefix = new Prefix("wfos.red.detector");
 
     private<T extends ParameterSetType & Event> void assertOnEventsAPI(T event) {
-        // eventInfo, prefix, subsystem, source
+
+        // metadata (eventId, source, eventName, eventTime)
+        Assert.assertNotNull(event.eventId());
         Assert.assertEquals(prefix, event.source());
+        Assert.assertEquals(new EventName("filter wheel"), event.eventName());
+        Assert.assertNotNull(event.eventTime());
 
         // contains and exists
         Assert.assertFalse(event.contains(notUsedKey));
@@ -73,26 +80,32 @@ public class JEventsTest {
     }
 
     @Test
-    public void shouldAbleToCreateAndAccessObserveEvent() {
-        ObserveEvent observeEvent = new ObserveEvent(prefix, new EventName("filter wheel")).add(encoderParam).add(epochStringParam);
-        assertOnEventsAPI(observeEvent);
-    }
-
-    @Test
     public void shouldAbleToCreateAndAccessSystemEvent() {
         SystemEvent systemEvent = new SystemEvent(prefix, new EventName("filter wheel")).add(encoderParam).add(epochStringParam);
         assertOnEventsAPI(systemEvent);
     }
 
     @Test
-    public void shouldAbleToCreateAndAccessSystemEventWithCustomInfo() {
-        SystemEvent systemEvent = new SystemEvent(prefix, new EventName("filter wheel")).add(encoderParam).add(epochStringParam);
-        Assert.assertEquals(prefix, systemEvent.source());
-        Assert.assertEquals(new EventName("filter wheel"), systemEvent.eventName());
-        Assert.assertNotNull(systemEvent.eventId());
-        Assert.assertNotNull(systemEvent.eventTime());
+    public void shouldAbleToCreateAndAccessObserveEvent() {
+        ObserveEvent observeEvent = new ObserveEvent(prefix, new EventName("filter wheel")).add(encoderParam).add(epochStringParam);
+        assertOnEventsAPI(observeEvent);
     }
 
+    @Test
+    public void shouldAbleToRemoveParamsInSystemEvent() {
+        SystemEvent systemEvent = new SystemEvent(prefix, new EventName("filter wheel")).add(encoderParam);
+        Assert.assertEquals(1, systemEvent.size());
+        SystemEvent mutatedEvent = systemEvent.remove(encoderParam);
+        Assert.assertEquals(0, mutatedEvent.size());
+    }
+
+    @Test
+    public void shouldAbleToRemoveParamsInObserveEvent() {
+        ObserveEvent observeEvent = new ObserveEvent(prefix, new EventName("filter wheel")).add(encoderParam);
+        Assert.assertEquals(1, observeEvent.size());
+        ObserveEvent mutatedEvent = observeEvent.remove(encoderParam);
+        Assert.assertEquals(0, mutatedEvent.size());
+    }
 
     @Test
     public void shouldHaveUniqueIdWhenParametersAreAddedOrRemovedForSystem() {

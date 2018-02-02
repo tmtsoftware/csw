@@ -21,9 +21,6 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
-// DEOPSCSW-327: Define Event Data Structure
-// DEOPSCSW-328: Basic information of Event needed for routing and Diagnostic use
-// DEOPSCSW-329: Providing Mandatory information during Event Creation
 public class JEventsTest {
 
     @Test
@@ -98,13 +95,9 @@ public class JEventsTest {
         Assert.assertEquals(new HashSet<>(Arrays.asList(22)), new HashSet<>(v1));
         Assert.assertEquals(new HashSet<>(Arrays.asList(44)), new HashSet<>(v2));
         Assert.assertEquals(new HashSet<>(Arrays.asList(missingKeys)), new HashSet<>(Arrays.asList(missingKeys)));
-        Assert.assertNotNull(se1.eventId());
-        Assert.assertNotNull(se1.eventTime());
-        Assert.assertEquals(name1, se1.eventName());
-        Assert.assertEquals(prefix1, se1.source());
         Assert.assertNotEquals(se3.eventId(), se4.eventId()); //Test unique id when parameters are removed
     }
-    
+
     @Test
     public void showUsageOfObserveEvent() {
         //#observeevent
@@ -153,10 +146,6 @@ public class JEventsTest {
         Assert.assertEquals(new HashSet<>(Arrays.asList(22)), new HashSet<>(v1));
         Assert.assertEquals(new HashSet<>(Arrays.asList(44)), new HashSet<>(v2));
         Assert.assertEquals(new HashSet<>(Arrays.asList(missingKeys)), new HashSet<>(Arrays.asList(missingKeys)));
-        Assert.assertNotNull(oc1.eventId());
-        Assert.assertNotNull(oc1.eventTime());
-        Assert.assertEquals(name1, oc1.eventName());
-        Assert.assertEquals(prefix1, oc1.source());
         Assert.assertNotEquals(oc3.eventId(), oc4.eventId()); //Test unique id when parameters are removed
     }
 
