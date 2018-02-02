@@ -20,11 +20,13 @@ public class JEventsTest {
     private final Key<Integer> encoderIntKey = JKeyTypes.IntKey().make("encoder");
     private final Key<String> epochStringKey = JKeyTypes.StringKey().make("epoch");
     private final Key<Integer> epochIntKey = JKeyTypes.IntKey().make("epoch");
+    private final Key<java.lang.Byte> epochByteKey = JKeyTypes.ByteKey().make("epoch");
     private final Key<Integer> notUsedKey = JKeyTypes.IntKey().make("notUsed");
 
     private final Parameter<Integer> encoderParam = encoderIntKey.set(22, 33);
     private final Parameter<String> epochStringParam = epochStringKey.set("A", "B");
     private final Parameter<Integer> epochIntParam = epochIntKey.set(44, 55);
+    private final Parameter<Byte> epochByteParam = epochByteKey.set(new Byte[]{10, 20});
 
     private final Prefix prefix = new Prefix("wfos.red.detector");
 
@@ -93,18 +95,20 @@ public class JEventsTest {
 
     @Test
     public void shouldAbleToRemoveParamsInSystemEvent() {
-        SystemEvent systemEvent = new SystemEvent(prefix, new EventName("filter wheel")).add(encoderParam);
-        Assert.assertEquals(1, systemEvent.size());
+        SystemEvent systemEvent = new SystemEvent(prefix, new EventName("filter wheel")).add(encoderParam).add(epochByteParam);
+        Assert.assertEquals(2, systemEvent.size());
+        Assert.assertArrayEquals(new Byte[]{10, 20}, systemEvent.jGet(epochByteKey).get().jValues().toArray());
         SystemEvent mutatedEvent = systemEvent.remove(encoderParam);
-        Assert.assertEquals(0, mutatedEvent.size());
+        Assert.assertEquals(1, mutatedEvent.size());
     }
 
     @Test
     public void shouldAbleToRemoveParamsInObserveEvent() {
-        ObserveEvent observeEvent = new ObserveEvent(prefix, new EventName("filter wheel")).add(encoderParam);
-        Assert.assertEquals(1, observeEvent.size());
+        ObserveEvent observeEvent = new ObserveEvent(prefix, new EventName("filter wheel")).add(encoderParam).add(epochByteParam);
+        Assert.assertEquals(2, observeEvent.size());
+        Assert.assertArrayEquals(new Byte[]{10, 20}, observeEvent.jGet(epochByteKey).get().jValues().toArray());
         ObserveEvent mutatedEvent = observeEvent.remove(encoderParam);
-        Assert.assertEquals(0, mutatedEvent.size());
+        Assert.assertEquals(1, mutatedEvent.size());
     }
 
     @Test

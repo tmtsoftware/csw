@@ -21,6 +21,7 @@ class EventsTest extends FunSpec with Matchers {
     val k1     = KeyType.IntKey.make("encoder")
     val k2     = KeyType.IntKey.make("windspeed")
     val k3     = KeyType.IntKey.make("notUsed")
+    val k4     = KeyType.ByteKey.make("image")
     val prefix = Prefix("wfos.prog.cloudcover")
 
     it("should create with prefix and eventName") {
@@ -39,13 +40,16 @@ class EventsTest extends FunSpec with Matchers {
     it("should create with prefix, eventName, paramSet") {
       val i1 = k1.set(22)
       val i2 = k2.set(44)
+      val i4 = k4.set("sensor image".getBytes)
 
-      val sc1 = SystemEvent(prefix, eventName, Set(i1, i2)).madd(i1, i2)
-      assert(sc1.size == 2)
+      val sc1 = SystemEvent(prefix, eventName, Set(i1, i2, i4))
+      assert(sc1.size == 3)
       assert(sc1.exists(k1))
       assert(sc1.exists(k2))
+      assert(sc1.exists(k4))
       assert(sc1(k1).head == 22)
       assert(sc1(k2).head == 44)
+      assert(sc1(k4).values === "sensor image".getBytes)
       assert(sc1.missingKeys(k1, k2, k3) == Set(k3.keyName))
     }
 
@@ -112,6 +116,7 @@ class EventsTest extends FunSpec with Matchers {
     val k1     = KeyType.IntKey.make("encoder")
     val k2     = KeyType.IntKey.make("windspeed")
     val k3     = KeyType.IntKey.make("notUsed")
+    val k4     = KeyType.ByteKey.make("image")
     val prefix = Prefix("wfos.prog.cloudcover")
 
     it("should create with prefix and eventName") {
@@ -130,13 +135,16 @@ class EventsTest extends FunSpec with Matchers {
     it("should create with prefix, eventName and paramSet") {
       val i1 = k1.set(22)
       val i2 = k2.set(44)
+      val i4 = k4.set("sensor image".getBytes)
 
-      val sc1 = ObserveEvent(prefix, eventName, Set(i1, i2))
-      assert(sc1.size == 2)
+      val sc1 = ObserveEvent(prefix, eventName, Set(i1, i2, i4))
+      assert(sc1.size == 3)
       assert(sc1.exists(k1))
       assert(sc1.exists(k2))
+      assert(sc1.exists(k4))
       assert(sc1(k1).head == 22)
       assert(sc1(k2).head == 44)
+      assert(sc1(k4).values === "sensor image".getBytes)
       assert(sc1.missingKeys(k1, k2, k3) == Set(k3.keyName))
     }
 
