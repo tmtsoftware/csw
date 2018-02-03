@@ -101,7 +101,6 @@ class EventsTest extends FunSpec with Matchers {
       val ev3 = ev2.remove(s1Key)
 
       ev1.eventId should not equal ev2.eventId
-      ev1.eventTime should not equal ev2.eventTime
       ev1.eventName shouldEqual ev2.eventName
       ev1.source shouldEqual ev2.source
 
@@ -195,7 +194,6 @@ class EventsTest extends FunSpec with Matchers {
       val ev3 = ev2.remove(s1Key)
 
       ev1.eventId should not equal ev2.eventId
-      ev1.eventTime should not equal ev2.eventTime
       ev1.eventName shouldEqual ev2.eventName
       ev1.source shouldEqual ev2.source
 
