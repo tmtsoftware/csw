@@ -106,7 +106,6 @@ class EventsTest extends FunSpec with Matchers {
       ev1.source shouldEqual ev2.source
 
       ev3.eventId should not equal ev2.eventId
-      ev3.eventTime should not equal ev2.eventTime
       ev3.eventName shouldEqual ev2.eventName
       ev3.source shouldEqual ev2.source
     }
@@ -201,7 +200,6 @@ class EventsTest extends FunSpec with Matchers {
       ev1.source shouldEqual ev2.source
 
       ev3.eventId should not equal ev2.eventId
-      ev3.eventTime should not equal ev2.eventTime
       ev3.eventName shouldEqual ev2.eventName
       ev3.source shouldEqual ev2.source
     }
