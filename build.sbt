@@ -42,11 +42,12 @@ lazy val githubReleases: Seq[ProjectReference] = Seq(
 //Root project
 lazy val `csw-prod` = project
   .in(file("."))
-  .enablePlugins(UnidocSite, GithubPublishDocs, GitBranchPrompt, GithubRelease)
+  .enablePlugins(NoPublish, UnidocSite, GithubPublishDocs, GitBranchPrompt, GithubRelease)
+  .disablePlugins(BintrayPlugin)
   .aggregate(aggregatedProjects: _*)
-  .settings(GithubRelease.githubReleases(githubReleases))
   .settings(Settings.mergeSiteWith(docs))
   .settings(Settings.docExclusions(unidocExclusions))
+  .settings(GithubRelease.githubReleases(githubReleases))
 
 lazy val `csw-messages` = project
   .enablePlugins(PublishBintray, GenJavadocPlugin)
@@ -63,6 +64,7 @@ lazy val `csw-messages` = project
 
 lazy val `csw-logging-macros` = project
   .enablePlugins(NoPublish)
+  .disablePlugins(BintrayPlugin)
   .settings(
     libraryDependencies += Libs.`scala-reflect`
   )
@@ -199,6 +201,7 @@ lazy val `csw-benchmark` = project
     `csw-command`
   )
   .enablePlugins(NoPublish, JmhPlugin)
+  .disablePlugins(BintrayPlugin)
   .settings(
     libraryDependencies ++= Dependencies.Benchmark
   )
@@ -207,6 +210,7 @@ lazy val `csw-benchmark` = project
 lazy val integration = project
   .dependsOn(`csw-location`, `csw-location-agent`)
   .enablePlugins(NoPublish)
+  .disablePlugins(BintrayPlugin)
   .settings(
     libraryDependencies ++= Dependencies.Integration
   )
