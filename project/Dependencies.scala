@@ -153,7 +153,8 @@ object Dependencies {
     Akka.`akka-stream-testkit` % Test,
     Libs.`scalatest`           % Test,
     Libs.`junit`               % Test,
-    Libs.`junit-interface`     % Test
+    Libs.`junit-interface`     % Test,
+    Libs.`mockito-core`        % Test
   )
 
   val Commons = Seq(

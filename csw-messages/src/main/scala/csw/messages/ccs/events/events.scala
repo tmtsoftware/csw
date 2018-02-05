@@ -29,6 +29,8 @@ sealed trait Event {
    */
   def typeName: String
 
+  def eventKey = EventKey(s"${source.prefix}.$eventName")
+
   override def toString =
     s"$typeName(eventId=$eventId, source=$source, eventName=$eventName, eventTime=$eventTime, paramSet=$paramSet)"
 }

@@ -92,6 +92,7 @@ class EventsTest extends FunSpec with Matchers {
       sc1.eventTime should not equal null
       sc1.eventName shouldEqual eventName
       sc1.source shouldEqual prefix
+      sc1.eventKey.toString shouldEqual s"${prefix.prefix}.$eventName"
 
     }
 
@@ -185,6 +186,7 @@ class EventsTest extends FunSpec with Matchers {
       oc1.eventTime should not equal null
       oc1.eventName shouldEqual eventName
       oc1.source shouldEqual prefix
+      oc1.eventKey.toString shouldEqual s"${prefix.prefix}.$eventName"
 
     }
 
