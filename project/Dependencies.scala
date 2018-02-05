@@ -144,7 +144,7 @@ object Dependencies {
     Libs.`mockito-core`        % Test
   )
 
-  val Event = Seq(
+  val EventImpl = Seq(
     Libs.`scala-async`,
     Akka.`akka-stream`,
     Akka.`akka-typed`,

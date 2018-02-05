@@ -148,13 +148,19 @@ lazy val `csw-vslice` = project
   )
   .enablePlugins(DeployApp)
 
-lazy val `csw-event` = project
+lazy val `csw-event-api` = project
   .dependsOn(
-    `csw-messages`,
+    `csw-messages`
+  )
+  .enablePlugins(GenJavadocPlugin)
+
+lazy val `csw-event-impl` = project
+  .dependsOn(
+    `csw-event-api`,
     `csw-logging`
   )
-  .enablePlugins(AutoMultiJvm, GenJavadocPlugin)
-  .settings(libraryDependencies ++= Dependencies.Event)
+  .enablePlugins(AutoMultiJvm)
+  .settings(libraryDependencies ++= Dependencies.EventImpl)
 
 lazy val `csw-command` = project
   .dependsOn(
