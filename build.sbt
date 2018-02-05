@@ -62,6 +62,7 @@ lazy val `csw-messages` = project
   )
 
 lazy val `csw-logging-macros` = project
+  .enablePlugins(NoPublish)
   .settings(
     libraryDependencies += Libs.`scala-reflect`
   )
@@ -105,7 +106,7 @@ lazy val `csw-location-agent` = project
 
 //Config service related projects
 lazy val `csw-config-api` = project
-  .enablePlugins(GenJavadocPlugin, MaybeCoverage)
+  .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.ConfigApi
   )
@@ -124,7 +125,7 @@ lazy val `csw-config-client` = project
     `csw-config-server` % "test->test",
     `csw-location` % "compile->compile;multi-jvm->multi-jvm"
   )
-  .enablePlugins(AutoMultiJvm, MaybeCoverage)
+  .enablePlugins(PublishBintray, AutoMultiJvm, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.ConfigClient
   )
@@ -135,7 +136,7 @@ lazy val `csw-config-client-cli` = project
     `csw-config-server` % "test->test",
     `csw-location` % "multi-jvm->multi-jvm"
   )
-  .enablePlugins(AutoMultiJvm, DeployApp, MaybeCoverage)
+  .enablePlugins(DeployApp, AutoMultiJvm, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.ConfigClientCli
   )
@@ -160,7 +161,7 @@ lazy val `csw-command` = project
     `csw-messages`,
     `csw-logging`
   )
-  .enablePlugins(AutoMultiJvm, GenJavadocPlugin)
+  .enablePlugins(PublishBintray, AutoMultiJvm, GenJavadocPlugin)
   .settings(libraryDependencies ++= Dependencies.Command)
 
 lazy val `csw-framework` = project
@@ -172,7 +173,7 @@ lazy val `csw-framework` = project
     `csw-location` % "compile->compile;multi-jvm->multi-jvm",
     `csw-config-server` % "multi-jvm->test"
   )
-  .enablePlugins(AutoMultiJvm, GenJavadocPlugin, CswBuildInfo, DeployApp)
+  .enablePlugins(PublishBintray, AutoMultiJvm, GenJavadocPlugin, CswBuildInfo)
   .settings(
     libraryDependencies ++= Dependencies.Framework
   )
@@ -191,7 +192,7 @@ lazy val `csw-benchmark` = project
     `csw-framework` % "compile->compile;test->test",
     `csw-command`
   )
-  .enablePlugins(JmhPlugin)
+  .enablePlugins(NoPublish, JmhPlugin)
   .settings(
     libraryDependencies ++= Dependencies.Benchmark
   )
@@ -199,13 +200,13 @@ lazy val `csw-benchmark` = project
 //Integration test project
 lazy val integration = project
   .dependsOn(`csw-location`, `csw-location-agent`)
-  .enablePlugins(DeployApp)
+  .enablePlugins(NoPublish)
   .settings(
     libraryDependencies ++= Dependencies.Integration
   )
 
 //Docs project
-lazy val docs = project.enablePlugins(ParadoxSite, NoPublish)
+lazy val docs = project.enablePlugins(NoPublish, ParadoxSite)
 
 //Example code
 lazy val examples = project
