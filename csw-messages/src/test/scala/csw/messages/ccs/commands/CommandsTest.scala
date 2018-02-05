@@ -136,6 +136,27 @@ class CommandsTest extends FunSpec {
       assert(sc.get(k1).get.head == 22)
       assert(sc.maybeObsId.isEmpty)
     }
+
+    // DEOPSCSW-369: Unique runId for commands
+    it("Should create new RunId when a parameter is added or removed") {
+      val i1 = k1.set(22)
+
+      val sc1 = Setup(Prefix(ck3), commandName, Some(obsId))
+
+      val mutatedSc1 = sc1.add(i1)
+
+      val mutatedSc2 = mutatedSc1.remove(i1)
+
+      assert(sc1.runId != mutatedSc1.runId)
+      assert(sc1.source == mutatedSc1.source)
+      assert(sc1.commandName == mutatedSc1.commandName)
+      assert(sc1.maybeObsId == mutatedSc1.maybeObsId)
+
+      assert(mutatedSc2.runId != mutatedSc1.runId)
+      assert(mutatedSc2.source == mutatedSc1.source)
+      assert(mutatedSc2.commandName == mutatedSc1.commandName)
+      assert(mutatedSc2.maybeObsId == mutatedSc1.maybeObsId)
+    }
   }
 
   describe("Observe config tests") {
@@ -197,6 +218,110 @@ class CommandsTest extends FunSpec {
       oc1 = oc1.add(k2.set(33).withUnits(NoUnits))
       assert(oc1.exists(k2))
       assert(oc1(k2).values === Array(33))
+    }
+
+    // DEOPSCSW-369: Unique runId for commands
+    it("Should create new RunId when a parameter is added or removed") {
+      val i1 = k1.set(22)
+
+      val oc1 = Observe(Prefix(ck3), commandName, Some(obsId))
+
+      val mutatedOc1 = oc1.add(i1)
+
+      val mutatedOc2 = mutatedOc1.remove(i1)
+
+      assert(oc1.runId != mutatedOc1.runId)
+      assert(oc1.source == mutatedOc1.source)
+      assert(oc1.commandName == mutatedOc1.commandName)
+      assert(oc1.maybeObsId == mutatedOc1.maybeObsId)
+
+      assert(mutatedOc2.runId != mutatedOc1.runId)
+      assert(mutatedOc2.source == mutatedOc1.source)
+      assert(mutatedOc2.commandName == mutatedOc1.commandName)
+      assert(mutatedOc2.maybeObsId == mutatedOc1.maybeObsId)
+    }
+  }
+
+  describe("Wait config tests") {
+
+    val k1 = KeyType.IntKey.make("repeat")
+    val k2 = KeyType.IntKey.make("expTime")
+    it("Should allow adding keys") {
+      val i1  = k1.set(22)
+      val i2  = k2.set(44)
+      val wc1 = Wait(Prefix(ck3), commandName, Some(obsId)).add(i1).add(i2)
+      assert(wc1.size == 2)
+      assert(wc1.exists(k1))
+      assert(wc1.exists(k2))
+      assert(wc1(k1).head == 22)
+      assert(wc1.get(k2).get.head == 44)
+
+      assert(wc1.commandName == commandName)
+    }
+
+    // DEOPSCSW-315: Make ObsID optional in commands
+    it("Should allow setting") {
+      var wc1 = Wait(Prefix(ck3), commandName, Some(obsId))
+      wc1 = wc1.add(k1.set(22)).add(k2.set(44))
+      assert(wc1.size == 2)
+      assert(wc1.maybeObsId.contains(obsId))
+      assert(wc1.exists(k1))
+      assert(wc1.exists(k2))
+    }
+
+    it("Should allow apply") {
+      var wc1 = Wait(Prefix(ck3), commandName, Some(obsId))
+      wc1 = wc1.add(k1.set(22)).add(k2.set(44))
+
+      val v1 = wc1(k1)
+      val v2 = wc1(k2)
+      assert(wc1.get(k1).isDefined)
+      assert(wc1.get(k2).isDefined)
+      assert(v1.values === Array(22))
+      assert(v2.head == 44)
+    }
+
+    it("should update for the same key with set") {
+      var wc1 = Wait(Prefix(ck3), commandName, Some(obsId))
+      wc1 = wc1.add(k2.set(22))
+      assert(wc1.exists(k2))
+      assert(wc1(k2).values === Array(22))
+
+      wc1 = wc1.add(k2.set(33))
+      assert(wc1.exists(k2))
+      assert(wc1(k2).values === Array(33))
+    }
+
+    it("should update for the same key with add") {
+      var wc1 = Wait(Prefix(ck3), commandName, Some(obsId))
+      wc1 = wc1.add(k2.set(22).withUnits(NoUnits))
+      assert(wc1.exists(k2))
+      assert(wc1(k2).values === Array(22))
+
+      wc1 = wc1.add(k2.set(33).withUnits(NoUnits))
+      assert(wc1.exists(k2))
+      assert(wc1(k2).values === Array(33))
+    }
+
+    // DEOPSCSW-369: Unique runId for commands
+    it("Should create new RunId when a parameter is added or removed") {
+      val i1 = k1.set(22)
+
+      val wc1 = Wait(Prefix(ck3), commandName, Some(obsId))
+
+      val mutatedWc1 = wc1.add(i1)
+
+      val mutatedWc2 = mutatedWc1.remove(i1)
+
+      assert(wc1.runId != mutatedWc1.runId)
+      assert(wc1.source == mutatedWc1.source)
+      assert(wc1.commandName == mutatedWc1.commandName)
+      assert(wc1.maybeObsId == mutatedWc1.maybeObsId)
+
+      assert(mutatedWc2.runId != mutatedWc1.runId)
+      assert(mutatedWc2.source == mutatedWc1.source)
+      assert(mutatedWc2.commandName == mutatedWc1.commandName)
+      assert(mutatedWc2.maybeObsId == mutatedWc1.maybeObsId)
     }
   }
 

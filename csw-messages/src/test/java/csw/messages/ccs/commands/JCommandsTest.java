@@ -77,6 +77,7 @@ public class JCommandsTest {
     }
 
     // DEOPSCSW-315: Make ObsID optional in commands
+    // DEOPSCSW-369: Unique runId for commands
     @Test
     public void shouldAbleToCreateAndAccessSetupCommand() {
         Setup setup = new Setup(new Prefix(prefix), commandName, Optional.of(obsId)).add(encoderParam).add(epochStringParam);
@@ -90,9 +91,23 @@ public class JCommandsTest {
 
         // complete API
         assertOnCommandAPI(setup);
+
+        Setup mutatedSetup1 = setup.add(epochIntParam);
+        Assert.assertNotEquals(setup.runId(), mutatedSetup1.runId());
+        Assert.assertEquals(setup.source(), mutatedSetup1.source());
+        Assert.assertEquals(setup.commandName(), mutatedSetup1.commandName());
+        Assert.assertEquals(setup.jMaybeObsId(), mutatedSetup1.jMaybeObsId());
+
+        Setup mutatedSetup2 = mutatedSetup1.remove(epochIntParam);
+        Assert.assertNotEquals(mutatedSetup2.runId(), mutatedSetup1.runId());
+        Assert.assertEquals(mutatedSetup2.source(), mutatedSetup1.source());
+        Assert.assertEquals(mutatedSetup2.commandName(), mutatedSetup1.commandName());
+        Assert.assertEquals(mutatedSetup2.jMaybeObsId(), mutatedSetup1.jMaybeObsId());
+
     }
 
     // DEOPSCSW-315: Make ObsID optional in commands
+    // DEOPSCSW-369: Unique runId for commands
     @Test
     public void shouldAbleToCreateAndAccessObserveCommand() {
         Observe observe = new Observe(new Prefix(prefix), commandName, Optional.empty()).add(encoderParam).add(epochStringParam);
@@ -107,8 +122,21 @@ public class JCommandsTest {
 
         // complete API
         assertOnCommandAPI(observe);
+
+        Observe mutatedSetup1 = observe.add(epochIntParam);
+        Assert.assertNotEquals(observe.runId(), mutatedSetup1.runId());
+        Assert.assertEquals(observe.source(), mutatedSetup1.source());
+        Assert.assertEquals(observe.commandName(), mutatedSetup1.commandName());
+        Assert.assertEquals(observe.jMaybeObsId(), mutatedSetup1.jMaybeObsId());
+
+        Observe mutatedSetup2 = mutatedSetup1.remove(epochIntParam);
+        Assert.assertNotEquals(mutatedSetup2.runId(), mutatedSetup1.runId());
+        Assert.assertEquals(mutatedSetup2.source(), mutatedSetup1.source());
+        Assert.assertEquals(mutatedSetup2.commandName(), mutatedSetup1.commandName());
+        Assert.assertEquals(mutatedSetup2.jMaybeObsId(), mutatedSetup1.jMaybeObsId());
     }
 
+    // DEOPSCSW-369: Unique runId for commands
     @Test
     public void shouldAbleToCreateAndAccessWaitCommand() {
         Wait wait = new Wait(new Prefix(prefix), commandName, Optional.of(obsId)).add(encoderParam).add(epochStringParam);
@@ -123,5 +151,17 @@ public class JCommandsTest {
 
         // complete API
         assertOnCommandAPI(wait);
+
+        Wait mutatedSetup1 = wait.add(epochIntParam);
+        Assert.assertNotEquals(wait.runId(), mutatedSetup1.runId());
+        Assert.assertEquals(wait.source(), mutatedSetup1.source());
+        Assert.assertEquals(wait.commandName(), mutatedSetup1.commandName());
+        Assert.assertEquals(wait.jMaybeObsId(), mutatedSetup1.jMaybeObsId());
+
+        Wait mutatedSetup2 = mutatedSetup1.remove(epochIntParam);
+        Assert.assertNotEquals(mutatedSetup2.runId(), mutatedSetup1.runId());
+        Assert.assertEquals(mutatedSetup2.source(), mutatedSetup1.source());
+        Assert.assertEquals(mutatedSetup2.commandName(), mutatedSetup1.commandName());
+        Assert.assertEquals(mutatedSetup2.jMaybeObsId(), mutatedSetup1.jMaybeObsId());
     }
 }

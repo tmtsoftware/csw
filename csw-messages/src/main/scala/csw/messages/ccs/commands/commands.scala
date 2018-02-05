@@ -75,7 +75,7 @@ case class Setup private (
   def this(source: Prefix, commandName: CommandName, maybeObsId: Optional[ObsId]) =
     this(Id(), source, commandName, maybeObsId.asScala, Set.empty)
 
-  override protected def create(data: Set[Parameter[_]]): Setup = copy(paramSet = data)
+  override protected def create(data: Set[Parameter[_]]): Setup = copy(runId = Id(), paramSet = data)
 }
 
 object Setup {
@@ -116,7 +116,7 @@ case class Observe private (
   def this(source: Prefix, commandName: CommandName, maybeObsId: Optional[ObsId]) =
     this(Id(), source, commandName, maybeObsId.asScala, Set.empty)
 
-  override protected def create(data: Set[Parameter[_]]): Observe = copy(paramSet = data)
+  override protected def create(data: Set[Parameter[_]]): Observe = copy(runId = Id(), paramSet = data)
 }
 
 object Observe {
@@ -154,7 +154,7 @@ case class Wait private (
   def this(source: Prefix, commandName: CommandName, maybeObsId: Optional[ObsId]) =
     this(Id(), source, commandName, maybeObsId.asScala, Set.empty)
 
-  override protected def create(data: Set[Parameter[_]]): Wait = copy(paramSet = data)
+  override protected def create(data: Set[Parameter[_]]): Wait = copy(runId = Id(), paramSet = data)
 }
 
 object Wait {
