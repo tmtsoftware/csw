@@ -33,10 +33,12 @@ public class JEventsTest {
     private<T extends ParameterSetType & Event> void assertOnEventsAPI(T event) {
 
         // metadata (eventId, source, eventName, eventTime)
+        EventName name = new EventName("filter wheel");
         Assert.assertNotNull(event.eventId());
         Assert.assertEquals(prefix, event.source());
-        Assert.assertEquals(new EventName("filter wheel"), event.eventName());
+        Assert.assertEquals(name, event.eventName());
         Assert.assertNotNull(event.eventTime());
+        Assert.assertEquals(event.eventKey().key(), prefix.prefix() + "." + name.name());
 
         // contains and exists
         Assert.assertFalse(event.contains(notUsedKey));
