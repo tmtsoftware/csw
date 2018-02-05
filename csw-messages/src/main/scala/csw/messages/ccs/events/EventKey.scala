@@ -2,8 +2,8 @@ package csw.messages.ccs.events
 
 import play.api.libs.json.{Json, OFormat}
 
-case class EventKey(name: String) {
-  override def toString: String = name
+case class EventKey(key: String) {
+  override def toString: String = key
 }
 
 object EventKey {
