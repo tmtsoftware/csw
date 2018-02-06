@@ -6,7 +6,7 @@ import akka.util.ByteString
 import csw_protobuf.events.PbEvent
 import io.lettuce.core.codec.RedisCodec
 
-class EventServiceCodec extends RedisCodec[String, PbEvent] {
+object EventServiceCodec extends RedisCodec[String, PbEvent] {
 
   override def decodeKey(bytes: ByteBuffer): String = ByteString(bytes).utf8String
 

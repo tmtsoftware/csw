@@ -1,3 +1,11 @@
 package csw.services.event.scaladsl
 
-trait EventSubscription {}
+import csw.messages.ccs.events.EventKey
+
+trait EventSubscription {
+
+  def subscribe(eventKey: EventKey*): Unit
+
+  def unsubscribe(): Unit
+
+}

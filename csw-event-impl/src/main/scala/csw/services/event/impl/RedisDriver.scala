@@ -24,5 +24,4 @@ class RedisDriver(
 
     pubSubCommands.thenCompose[java.lang.Long](command ⇒ command.publish(channel, data).toFuture).toScala.map(_.toLong)
   }
-
 }
