@@ -5,6 +5,6 @@ import scala.concurrent.Future
 
 trait EventPublisher {
 
-  def publish(event: Event): Future[Long]
+  def publish(event: Event): Future[Unit]
 
 }

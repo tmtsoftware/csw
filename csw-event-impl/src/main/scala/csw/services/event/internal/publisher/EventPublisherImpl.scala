@@ -8,7 +8,7 @@ import scala.concurrent.Future
 
 class EventPublisherImpl(eventServiceDriver: EventServiceDriver) extends EventPublisher {
 
-  override def publish(event: Event): Future[Long] = {
+  override def publish(event: Event): Future[Unit] = {
 
     val pbEvent: PbEvent = Event.typeMapper.toBase(event)
 

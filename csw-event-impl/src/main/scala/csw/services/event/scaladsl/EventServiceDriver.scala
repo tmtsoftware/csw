@@ -6,6 +6,6 @@ import scala.concurrent.Future
 
 trait EventServiceDriver {
 
-  def publish(key: String, data: PbEvent): Future[Long]
+  def publish(key: String, data: PbEvent): Future[Unit]
 
 }

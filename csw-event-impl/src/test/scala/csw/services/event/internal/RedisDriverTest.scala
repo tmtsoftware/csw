@@ -9,12 +9,13 @@ import csw.messages.params.models.Prefix
 import csw_protobuf.events.PbEvent
 import io.lettuce.core.pubsub.StatefulRedisPubSubConnection
 import io.lettuce.core.pubsub.api.reactive.RedisPubSubReactiveCommands
-import io.lettuce.core.{ConnectionFuture, RedisClient, RedisURI}
+import io.lettuce.core.{ConnectionFuture, RedisClient, RedisURI, TransactionResult}
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import reactor.core.publisher.Mono
+
 import scala.concurrent.ExecutionContext
 
 class RedisDriverTest extends FunSuite with Matchers with MockitoSugar with BeforeAndAfterAll {
@@ -43,9 +44,14 @@ class RedisDriverTest extends FunSuite with Matchers with MockitoSugar with Befo
 
     when(mockRedisClient.connectPubSubAsync(eventServiceCodec, redisURI)).thenReturn(mockConnectionFuture)
     when(mockConnection.reactive()).thenReturn(mockCommands)
+
+    when(mockCommands.multi()).thenReturn(mock[Mono[String]])
     when(mockCommands.publish(any[String], any[PbEvent])).thenReturn(mockMono)
+    when(mockCommands.set(any[String], any[PbEvent])).thenReturn(mock[Mono[String]])
+    when(mockCommands.exec()).thenReturn(mock[Mono[TransactionResult]])
 
     new RedisDriver(mockRedisClient, redisURI, eventServiceCodec).publish("testChannel", Event.typeMapper.toBase(event))
-    verify(mockCommands).publish(any[String], any[PbEvent])
+
+    verify(mockCommands).multi()
   }
 }

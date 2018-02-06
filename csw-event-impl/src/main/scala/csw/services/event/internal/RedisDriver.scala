@@ -16,12 +16,22 @@ class RedisDriver(
 )(implicit ec: ExecutionContext)
     extends EventServiceDriver {
 
-  override def publish(channel: String, data: PbEvent): Future[Long] = {
+  override def publish(channel: String, data: PbEvent): Future[Unit] = {
 
     val pubSubCommands: ConnectionFuture[RedisPubSubReactiveCommands[String, PbEvent]] = redisClient
       .connectPubSubAsync(redisCodec, redisURI)
       .thenApply(t ⇒ t.reactive())
 
-    pubSubCommands.thenCompose[java.lang.Long](command ⇒ command.publish(channel, data).toFuture).toScala.map(_.toLong)
+    pubSubCommands
+      .thenAccept(command ⇒ {
+        command.multi.subscribe(x ⇒ {
+          command.publish(channel, data).subscribe()
+          command.set(channel, data).subscribe()
+          command.exec().subscribe()
+        })
+      })
+      .toScala
+      .map(_ ⇒ ())
+
   }
 }
