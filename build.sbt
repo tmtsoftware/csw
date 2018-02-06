@@ -209,8 +209,7 @@ lazy val `csw-benchmark` = project
 //Integration test project
 lazy val integration = project
   .dependsOn(`csw-location`, `csw-location-agent`)
-  .enablePlugins(NoPublish)
-  .disablePlugins(BintrayPlugin)
+  .enablePlugins(DeployApp)
   .settings(
     libraryDependencies ++= Dependencies.Integration
   )
