@@ -57,6 +57,12 @@ pipeline {
                 sh "./publish.sh"
             }
         }
+
+        stage('Remote Build Trigger - Acceptance Dev') {
+            steps {
+                sh "curl '$REMOTE_JENKINS_URL/job/acceptance-dev/buildWithParameters?token=$TOKEN&BINTRAY_ARTIFACT_VERSION=0.1-SNAPSHOT'"
+            }
+        }
     }
     post {
         always {
