@@ -6,11 +6,11 @@ import csw_protobuf.events.PbEvent
 
 class EventServiceImpl(eventServiceDriver: EventServiceDriver) extends EventService {
 
-  override def publishEvent(event: Event): Unit = {
+  override def publish(event: Event): Unit = {
 
     val pbEvent: PbEvent = Event.typeMapper.toBase(event)
 
-    eventServiceDriver.publishToChannel(event.eventKey.toString, pbEvent)
+    eventServiceDriver.publish(event.eventKey.toString, pbEvent)
   }
 
   override def subscribeEvent(eventKey: EventKey): Unit = ???
