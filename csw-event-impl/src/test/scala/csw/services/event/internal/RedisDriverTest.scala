@@ -1,4 +1,4 @@
-package csw.services.event.impl
+package csw.services.event.internal
 
 import java.net.SocketAddress
 import java.util.concurrent.CompletableFuture

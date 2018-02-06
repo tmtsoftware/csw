@@ -1,7 +1,8 @@
-package csw.services.event.impl
+package csw.services.event.internal.subscriber
 
 import akka.stream.scaladsl.Source
 import csw.messages.ccs.events.{Event, EventKey}
+import csw.services.event.internal.EventServiceCodec
 import csw.services.event.scaladsl.EventSubscription
 import csw_protobuf.events.PbEvent
 import io.lettuce.core.RedisClient

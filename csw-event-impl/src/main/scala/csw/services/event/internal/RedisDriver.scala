@@ -1,4 +1,4 @@
-package csw.services.event.impl
+package csw.services.event.internal
 
 import csw.services.event.scaladsl.EventServiceDriver
 import csw_protobuf.events.PbEvent

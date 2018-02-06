@@ -1,9 +1,8 @@
-package csw.services.event.impl
+package csw.services.event.internal.subscriber
 
 import akka.typed.ActorRef
 import csw.messages.ccs.events.Event
 import csw.services.event.scaladsl.{EventSubscriber, EventSubscription}
-import io.lettuce.core.RedisClient
 
 class EventSubscriberImpl extends EventSubscriber {
 
