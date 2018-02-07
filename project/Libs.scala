@@ -24,7 +24,7 @@ object Libs {
   val `play-json-extensions`         = "ai.x"                   %% "play-json-extensions"         % "0.10.0" //Simplified BSD License
   val `akka-http-play-json`          = "de.heikoseeberger"      %% "akka-http-play-json"          % "1.18.1" //Apache 2.0
   val `scalapb-runtime`              = "com.thesamet.scalapb"   %% "scalapb-runtime"              % scalapbVersion % "protobuf"
-  val `scalapb-json4s`               = "com.thesamet.scalapb"   %% "scalapb-json4s"               % "0.7.0-rc1"
+  val `scalapb-json4s`               = "com.thesamet.scalapb"   %% "scalapb-json4s"               % "0.7.0-rc2"
   val `lettuce`                      = "io.lettuce"             % "lettuce-core"                  % "5.0.1.RELEASE"
 }
 

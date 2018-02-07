@@ -63,8 +63,6 @@ lazy val `csw-messages` = project
   )
 
 lazy val `csw-logging-macros` = project
-  .enablePlugins(NoPublish)
-  .disablePlugins(BintrayPlugin)
   .settings(
     libraryDependencies += Libs.`scala-reflect`
   )
