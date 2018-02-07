@@ -60,7 +60,9 @@ pipeline {
 
         stage('Remote Build Trigger - Acceptance Dev') {
             steps {
-                sh "curl '$REMOTE_JENKINS_URL/job/acceptance-dev/buildWithParameters?token=$TOKEN&BINTRAY_ARTIFACT_VERSION=0.1-SNAPSHOT'"
+                withCredentials([string(credentialsId: 'TOKEN', variable: 'SECRET')]) {
+                    sh "curl '$REMOTE_JENKINS_URL/job/acceptance-dev/buildWithParameters?token=$SECRET&BINTRAY_ARTIFACT_VERSION=0.1-SNAPSHOT'"
+                }
             }
         }
     }
