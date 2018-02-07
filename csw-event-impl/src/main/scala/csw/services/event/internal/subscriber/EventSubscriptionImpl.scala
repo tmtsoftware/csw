@@ -1,5 +1,6 @@
 package csw.services.event.internal.subscriber
 
+import akka.stream.Materializer
 import akka.stream.scaladsl.Source
 import csw.messages.ccs.events.{Event, EventKey}
 import csw.services.event.internal.EventServiceCodec
@@ -10,7 +11,7 @@ import io.lettuce.core.pubsub.api.reactive.RedisPubSubReactiveCommands
 import io.lettuce.core.{RedisClient, RedisURI}
 import reactor.core.publisher.FluxSink.OverflowStrategy
 
-class EventSubscriptionImpl(callback: Event ⇒ Unit) extends EventSubscription {
+class EventSubscriptionImpl(callback: Event ⇒ Unit)(implicit val mat: Materializer) extends EventSubscription {
 
   private val redisURI: RedisURI = RedisURI.create("redis://localhost/")
 
