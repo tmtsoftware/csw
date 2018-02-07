@@ -7,16 +7,16 @@ import akka.actor.ActorSystem
 import csw.messages.ccs.events.{Event, EventName, SystemEvent}
 import csw.messages.params.models.Prefix
 import csw_protobuf.events.PbEvent
+import io.lettuce.core._
 import io.lettuce.core.pubsub.StatefulRedisPubSubConnection
-import io.lettuce.core.pubsub.api.reactive.RedisPubSubReactiveCommands
-import io.lettuce.core.{ConnectionFuture, RedisClient, RedisURI, TransactionResult}
+import io.lettuce.core.pubsub.api.async.RedisPubSubAsyncCommands
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
-import reactor.core.publisher.Mono
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.duration.DurationDouble
+import scala.concurrent.{Await, ExecutionContext}
 
 class RedisDriverTest extends FunSuite with Matchers with MockitoSugar with BeforeAndAfterAll {
 
@@ -31,10 +31,11 @@ class RedisDriverTest extends FunSuite with Matchers with MockitoSugar with Befo
     val prefix          = Prefix("test.prefix")
     val eventName       = EventName("system")
     val event           = SystemEvent(prefix, eventName)
+    val pbEvent         = Event.typeMapper.toBase(event)
+    val eventKey        = event.eventKey.toString
     val redisURI        = RedisURI.create("redis://test")
     val mockRedisClient = mock[RedisClient]
-    val mockCommands    = mock[RedisPubSubReactiveCommands[String, PbEvent]]
-    val mockMono        = mock[Mono[java.lang.Long]]
+    val mockCommands    = mock[RedisPubSubAsyncCommands[String, PbEvent]]
     val mockConnection  = mock[StatefulRedisPubSubConnection[String, PbEvent]]
     val mockConnectionFuture = ConnectionFuture.from(
       mock[SocketAddress],
@@ -42,15 +43,13 @@ class RedisDriverTest extends FunSuite with Matchers with MockitoSugar with Befo
     )
 
     when(mockRedisClient.connectPubSubAsync(EventServiceCodec, redisURI)).thenReturn(mockConnectionFuture)
-    when(mockConnection.reactive()).thenReturn(mockCommands)
+    when(mockConnection.async()).thenReturn(mockCommands)
 
-    when(mockCommands.multi()).thenReturn(mock[Mono[String]])
-    when(mockCommands.publish(any[String], any[PbEvent])).thenReturn(mockMono)
-    when(mockCommands.set(any[String], any[PbEvent])).thenReturn(mock[Mono[String]])
-    when(mockCommands.exec()).thenReturn(mock[Mono[TransactionResult]])
+    when(mockCommands.publish(any[String], any[PbEvent])).thenReturn(mock[RedisFuture[java.lang.Long]])
+    when(mockCommands.set(any[String], any[PbEvent])).thenReturn(mock[RedisFuture[String]])
 
-    new RedisDriver(mockRedisClient, redisURI, EventServiceCodec).publish("testChannel", Event.typeMapper.toBase(event))
-
-    verify(mockCommands).multi()
+    new RedisDriver(mockRedisClient, redisURI, EventServiceCodec).publish(eventKey, pbEvent)
+    verify(mockCommands).publish(eventKey, pbEvent)
   }
+
 }

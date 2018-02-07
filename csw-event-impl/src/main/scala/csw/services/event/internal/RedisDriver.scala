@@ -3,8 +3,9 @@ package csw.services.event.internal
 import csw.services.event.scaladsl.EventServiceDriver
 import csw_protobuf.events.PbEvent
 import io.lettuce.core.codec.RedisCodec
-import io.lettuce.core.pubsub.api.reactive.RedisPubSubReactiveCommands
-import io.lettuce.core.{ConnectionFuture, RedisClient, RedisURI}
+import io.lettuce.core.pubsub.StatefulRedisPubSubConnection
+import io.lettuce.core.pubsub.api.async.RedisPubSubAsyncCommands
+import io.lettuce.core.{RedisClient, RedisURI}
 
 import scala.compat.java8.FutureConverters.CompletionStageOps
 import scala.concurrent.{ExecutionContext, Future}
@@ -16,22 +17,17 @@ class RedisDriver(
 )(implicit ec: ExecutionContext)
     extends EventServiceDriver {
 
+  private val pubSubCommandsF: Future[StatefulRedisPubSubConnection[String, PbEvent]] =
+    redisClient.connectPubSubAsync(redisCodec, redisURI).toScala
+
+  private val commandsF: Future[RedisPubSubAsyncCommands[String, PbEvent]] = pubSubCommandsF.map(_.async())
+
   override def publish(channel: String, data: PbEvent): Future[Unit] = {
 
-    val pubSubCommands: ConnectionFuture[RedisPubSubReactiveCommands[String, PbEvent]] = redisClient
-      .connectPubSubAsync(redisCodec, redisURI)
-      .thenApply(t ⇒ t.reactive())
-
-    pubSubCommands
-      .thenAccept(command ⇒ {
-        command.multi.subscribe(x ⇒ {
-          command.publish(channel, data).subscribe()
-          command.set(channel, data).subscribe()
-          command.exec().subscribe()
-        })
-      })
-      .toScala
+    commandsF
+      .flatMap { commands ⇒
+        commands.publish(channel, data).toScala.flatMap(_ ⇒ commands.set(channel, data).toScala)
+      }
       .map(_ ⇒ ())
-
   }
 }

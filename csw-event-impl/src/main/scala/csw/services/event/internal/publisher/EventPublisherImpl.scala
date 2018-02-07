@@ -13,6 +13,7 @@ class EventPublisherImpl(eventServiceDriver: EventServiceDriver) extends EventPu
     val pbEvent: PbEvent = Event.typeMapper.toBase(event)
 
     eventServiceDriver.publish(event.eventKey.toString, pbEvent)
+
   }
 
 }
