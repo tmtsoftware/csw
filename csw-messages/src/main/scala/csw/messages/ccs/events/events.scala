@@ -77,6 +77,8 @@ object Event {
         .withEventType(pbEventType)
     }
   }
+
+  def fromPb(pbEvent: PbEvent): Event = Event.typeMapper[Event].toCustom(pbEvent)
 }
 
 /**
@@ -105,7 +107,7 @@ case class SystemEvent private (
   /**
    * Returns Protobuf representation of SystemEvent
    */
-  def toPb: Array[Byte] = Event.typeMapper[SystemEvent].toBase(this).toByteArray
+  def toPb: PbEvent = Event.typeMapper[SystemEvent].toBase(this)
 }
 
 object SystemEvent {
@@ -125,7 +127,7 @@ object SystemEvent {
   /**
    * Constructs from byte array containing Protobuf representation of SystemEvent
    */
-  def fromPb(array: Array[Byte]): SystemEvent = Event.typeMapper[SystemEvent].toCustom(PbEvent.parseFrom(array))
+  def fromPb(pbEvent: PbEvent): SystemEvent = Event.typeMapper[SystemEvent].toCustom(pbEvent)
 }
 
 /**
@@ -154,7 +156,7 @@ case class ObserveEvent private (
   /**
    * Returns Protobuf representation of ObserveEvent
    */
-  def toPb: Array[Byte] = Event.typeMapper[ObserveEvent].toBase(this).toByteArray
+  def toPb: PbEvent = Event.typeMapper[ObserveEvent].toBase(this)
 }
 
 object ObserveEvent {
@@ -175,5 +177,5 @@ object ObserveEvent {
   /**
    * Constructs from byte array containing Protobuf representation of ObserveEvent
    */
-  def fromPb(array: Array[Byte]): ObserveEvent = Event.typeMapper[ObserveEvent].toCustom(PbEvent.parseFrom(array))
+  def fromPb(pbEvent: PbEvent): ObserveEvent = Event.typeMapper[ObserveEvent].toCustom(pbEvent)
 }
