@@ -4,6 +4,7 @@ import java.net.SocketAddress
 import java.util.concurrent.CompletableFuture
 
 import akka.actor.ActorSystem
+import akka.stream.{ActorMaterializer, Materializer}
 import csw.messages.ccs.events.{Event, EventName, SystemEvent}
 import csw.messages.params.models.Prefix
 import csw_protobuf.events.PbEvent
@@ -15,12 +16,12 @@ import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
-import scala.concurrent.duration.DurationDouble
-import scala.concurrent.{Await, ExecutionContext}
+import scala.concurrent.ExecutionContext
 
 class RedisDriverTest extends FunSuite with Matchers with MockitoSugar with BeforeAndAfterAll {
 
   implicit val actorSystem: ActorSystem = ActorSystem()
+  implicit val mat: Materializer        = ActorMaterializer()
   implicit val ec: ExecutionContext     = actorSystem.dispatcher
 
   override def afterAll(): Unit = {
