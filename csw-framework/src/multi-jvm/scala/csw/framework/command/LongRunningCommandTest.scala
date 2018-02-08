@@ -11,7 +11,7 @@ import com.typesafe.config.ConfigFactory
 import csw.common.components.command.ComponentStateForCommand._
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.messages.ComponentCommonMessage.ComponentStateSubscription
-import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed}
+import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Invalid}
 import csw.messages.ccs.commands.{CommandResponse, ComponentRef, Setup}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
@@ -112,8 +112,10 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
 
       val setupAssembly1 = Setup(prefix, moveCmd, Some(obsId))
       val setupAssembly2 = Setup(prefix, initCmd, Some(obsId))
+      val setupAssembly3 = Setup(prefix, invalidCmd, Some(obsId))
       val setupHcd1      = Setup(prefix, shortRunning, Some(obsId))
       val setupHcd2      = Setup(prefix, mediumRunning, Some(obsId))
+      val setupHcd3      = Setup(prefix, failureAfterValidationCmd, Some(obsId))
 
       //#submitAllAndGetResponse
 
@@ -132,6 +134,15 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
 
       whenReady(aggregatedValidationResponse, PatienceConfiguration.Timeout(20.seconds)) { result ⇒
         result shouldBe a[Accepted]
+      }
+
+      // Test failed validation in one more more commands
+      val aggregatedInvalidValidationResponse = CommandDistributor(
+        Map(assemblyComponent → Set(setupAssembly1, setupAssembly2, setupAssembly3), hcdComponent → Set(setupHcd1, setupHcd2))
+      ).aggregatedValidationResponse()
+
+      whenReady(aggregatedInvalidValidationResponse, PatienceConfiguration.Timeout(20.seconds)) { result ⇒
+        result shouldBe a[Invalid]
       }
 
       enterBarrier("multiple-components-submit-multiple-commands")
@@ -153,6 +164,14 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
 
       whenReady(aggregatedResponse, PatienceConfiguration.Timeout(20.seconds)) { result ⇒
         result shouldBe a[Completed]
+      }
+
+      val aggregatedErrorResponse = CommandDistributor(
+        Map(assemblyComponent → Set(setupAssembly1, setupAssembly2), hcdComponent → Set(setupHcd1, setupHcd2, setupHcd3))
+      ).aggregatedCompletionResponse()
+
+      whenReady(aggregatedErrorResponse, PatienceConfiguration.Timeout(20.seconds)) { result ⇒
+        result shouldBe a[CommandResponse.Error]
       }
 
       enterBarrier("multiple-components-submit-subscribe-multiple-commands")

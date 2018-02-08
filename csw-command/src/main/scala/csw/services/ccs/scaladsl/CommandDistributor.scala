@@ -5,6 +5,7 @@ import akka.actor.Scheduler
 import akka.stream.Materializer
 import akka.stream.scaladsl.Source
 import akka.util.Timeout
+import csw.messages.ccs.CommandIssue
 import csw.messages.ccs.commands.CommandResponse.Completed
 import csw.messages.ccs.commands.{CommandResponse, ComponentRef, ControlCommand}
 import csw.messages.params.models.Id
@@ -38,7 +39,7 @@ case class CommandDistributor(componentToCommands: Map[ComponentRef, Set[Control
     )
     CommandResponse.aggregateResponse(commandResponsesF).map {
       case _: Completed  ⇒ CommandResponse.Accepted(Id())
-      case otherResponse ⇒ otherResponse
+      case otherResponse ⇒ CommandResponse.Invalid(Id(), CommandIssue.OtherIssue("One or more commands were Invalid"))
     }
   }
 
