@@ -60,6 +60,7 @@ class ComponentHandlerForCommand(
     case `acceptedCmd`       ⇒ Accepted(controlCommand.runId)
     case `withoutMatcherCmd` ⇒ Accepted(controlCommand.runId)
     case `matcherCmd`        ⇒ Accepted(controlCommand.runId)
+    case `matcherFailedCmd`  ⇒ Accepted(controlCommand.runId)
     case `matcherTimeoutCmd` ⇒ Accepted(controlCommand.runId)
     case `cancelCmd`         ⇒ Accepted(controlCommand.runId)
     case `immediateCmd`      ⇒ Completed(controlCommand.runId)
@@ -77,10 +78,11 @@ class ComponentHandlerForCommand(
   }
 
   override def onOneway(controlCommand: ControlCommand): Unit = controlCommand.commandName match {
-    case `cancelCmd`   ⇒ processAcceptedOnewayCmd(controlCommand)
-    case `matcherCmd`  ⇒ processCommandWithMatcher(controlCommand)
-    case `acceptedCmd` ⇒ //mimic long running process by publishing any state
-    case _             ⇒ CommandNotAvailable(controlCommand.runId)
+    case `cancelCmd`        ⇒ processAcceptedOnewayCmd(controlCommand)
+    case `matcherCmd`       ⇒ processCommandWithMatcher(controlCommand)
+    case `matcherFailedCmd` ⇒ processCommandWithMatcher(controlCommand)
+    case `acceptedCmd`      ⇒ //mimic long running process by publishing any state
+    case _                  ⇒ CommandNotAvailable(controlCommand.runId)
   }
 
   private def processAcceptedSubmitCmd(controlCommand: ControlCommand): Unit =
@@ -117,6 +119,12 @@ class ComponentHandlerForCommand(
 
     controlCommand.commandName match {
       case `matcherTimeoutCmd` ⇒ Thread.sleep(1000)
+      case `matcherFailedCmd` ⇒
+        Source(1 to 10)
+          .map(i ⇒ pubSubRef ! Publish(CurrentState(controlCommand.source, Set(KeyType.IntKey.make("encoder").set(i * 1)))))
+          .throttle(1, 100.millis, 1, ThrottleMode.Shaping)
+          .runWith(Sink.ignore)
+
       case _ ⇒
         Source(1 to 10)
           .map(i ⇒ pubSubRef ! Publish(CurrentState(controlCommand.source, Set(KeyType.IntKey.make("encoder").set(i * 10)))))

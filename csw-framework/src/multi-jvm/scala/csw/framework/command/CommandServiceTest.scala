@@ -196,6 +196,34 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       //#onewayAndMatch
       val eventualResponse1: Future[CommandResponse] = assemblyComponent.onewayAndMatch(setupWithMatcher, demandMatcher)
       //#onewayAndMatch
+      Await.result(eventualResponse1, timeout.duration) shouldBe Completed(setupWithMatcher.runId)
+
+      // Test failed matching
+      val setupWithFailedMatcher = Setup(prefix, matcherFailedCmd, obsId)
+      val failedMatcher          = new Matcher(assemblyComponent.value, demandMatcher)
+
+      val failedMatcherResponseF: Future[MatcherResponse] = failedMatcher.start
+
+      val eventualCommandResponse2: Future[CommandResponse] = async {
+        val initialResponse = await(assemblyComponent.oneway(setupWithFailedMatcher))
+        initialResponse match {
+          case _: Accepted ⇒
+            val matcherResponse = await(failedMatcherResponseF)
+            // create appropriate response if demand state was matched from among the published state or otherwise
+            matcherResponse match {
+              case MatchCompleted  ⇒ Completed(setupWithFailedMatcher.runId)
+              case MatchFailed(ex) ⇒ Error(setupWithFailedMatcher.runId, ex.getMessage)
+            }
+          case invalid: Invalid ⇒
+            matcher.stop()
+            invalid
+          case x ⇒ x
+        }
+      }
+
+      val commandResponse2 = Await.result(eventualCommandResponse2, timeout.duration.+(1.second))
+      commandResponse2 shouldBe an[Error]
+      commandResponse2.runId shouldBe setupWithFailedMatcher.runId
 
       // DEOPSCSW-233: Hide implementation by having a CCS API
       // DEOPSCSW-317: Use state values of HCD to determine command completion
