@@ -74,6 +74,9 @@ public class JLoggerAPITest extends JGenericSimple {
 
     private void testExceptionJsonObject(JsonObject jsonObject) {
         Assert.assertTrue(jsonObject.has("trace"));
+        // DEOPSCSW-325: Include exception stack trace in stdout log message for exceptions
+        Assert.assertTrue(jsonObject.has(LoggingKeys$.MODULE$.PLAINSTACK()));
+
         JsonObject messageBlock = jsonObject.get("trace").getAsJsonObject().get(LoggingKeys$.MODULE$.MESSAGE()).getAsJsonObject();
         Assert.assertEquals(exceptionMessage, messageBlock.get(LoggingKeys$.MODULE$.MESSAGE()).getAsString());
     }

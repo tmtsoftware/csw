@@ -313,6 +313,8 @@ class SimpleLoggingTest extends LoggingTestSuite {
       log(LoggingKeys.SEVERITY) shouldBe ERROR.name
       log(LoggingKeys.CLASS) shouldBe tromboneHcdClassName
       log(LoggingKeys.MESSAGE) shouldBe computationResultMsg
+      // DEOPSCSW-325: Include exception stack trace in stdout log message for exceptions
+      log.contains(LoggingKeys.PLAINSTACK) shouldBe true
 
       log.contains("trace") shouldBe true
       val traceBlock = log("trace").asInstanceOf[JsonObject]
@@ -323,6 +325,10 @@ class SimpleLoggingTest extends LoggingTestSuite {
       traceMsgBlock.contains(LoggingKeys.EX) shouldBe true
       traceMsgBlock.contains(LoggingKeys.MESSAGE) shouldBe true
     }
+
+    // DEOPSCSW-325: Include exception stack trace in stdout log message for exceptions
+    val plainstack = logBuffer.head(LoggingKeys.PLAINSTACK).toString
+    plainstack.startsWith("java.lang.ArithmeticException: / by zero") shouldBe true
   }
 
 }
