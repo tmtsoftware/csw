@@ -1,20 +1,18 @@
 package csw.services.location
 
-import akka.actor.{Actor, ActorSystem, Props}
+import akka.actor.ActorSystem
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
 import akka.typed.Behavior
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
-import csw.messages.RunningMessage.DomainMessage
-import csw.messages.TMTSerializable
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location._
 import csw.services.location.commons.RegistrationFactory
 import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.location.helpers.{LSNodeSpec, OneMemberAndSeed}
-import csw.services.location.scaladsl.LocationService
 import org.scalatest.BeforeAndAfterEach
 
+import scala.collection.immutable.Set
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
@@ -112,63 +110,4 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
     }
     enterBarrier("after-3")
   }
-
-  test(
-    "ensure that component is able to resolve and send message to remote actor created through separate actor system than LocationService actor system"
-  ) {
-
-    val tcpConnection  = TcpConnection(ComponentId("redis1", ComponentType.Service))
-    val akkaConnection = AkkaConnection(ComponentId("Assembly1", ComponentType.Assembly))
-
-    runOn(seed) {
-      val tcpPort         = 470
-      val tcpRegistration = RegistrationFactory.tcp(tcpConnection, tcpPort)
-
-      locationService.register(tcpRegistration).await
-      enterBarrier("Registration")
-
-      val resolvedLocation = Await.result(locationService.resolve(akkaConnection, 5.seconds), 5.seconds).get
-
-      val assemblyActorRef = resolvedLocation.component.value
-
-      assemblyActorRef ! UnregisterConnection(akkaConnection)
-      Thread.sleep(2000)
-      enterBarrier("Unregistration")
-
-      val locations                    = locationService.list.await
-      val connections: Set[Connection] = locations.map(_.connection).toSet
-
-      locations.size shouldBe 1
-      connections shouldBe Set(tcpConnection)
-    }
-
-    runOn(member) {
-      val actorRef = assemblyActorSystem.actorOf(AssemblyActor.props(locationService), "assembly-actor")
-      import akka.typed.scaladsl.adapter._
-      locationService.register(RegistrationFactory.akka(akkaConnection, actorRef)).await
-
-      enterBarrier("Registration")
-
-      Thread.sleep(2000)
-
-      enterBarrier("Unregistration")
-    }
-
-    enterBarrier("after-4")
-  }
-
-}
-
-case class UnregisterConnection(akkaConnection: AkkaConnection) extends DomainMessage with TMTSerializable
-
-class AssemblyActor(locationService: LocationService) extends Actor {
-  override def receive: Receive = {
-    case UnregisterConnection(akkaConnection) => {
-      Await.result(locationService.unregister(akkaConnection), 10.seconds)
-    }
-  }
-}
-
-object AssemblyActor {
-  def props(locationService: LocationService): Props = Props(new AssemblyActor(locationService))
 }

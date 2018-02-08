@@ -5,10 +5,10 @@ import akka.typed.{ActorRef, Behavior, PostStop, Signal}
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
-import csw.messages.TopLevelActorCommonMessage.{TrackingEventReceived, UnderlyingHookFailed}
 import csw.messages.FromComponentLifecycleMessage.Running
+import csw.messages.RunningMessage.Lifecycle
+import csw.messages.TopLevelActorCommonMessage.{TrackingEventReceived, UnderlyingHookFailed}
 import csw.messages.TopLevelActorIdleMessage.Initialize
-import csw.messages.RunningMessage.{DomainMessage, Lifecycle}
 import csw.messages._
 import csw.messages.ccs.commands.CommandResponse
 import csw.messages.ccs.commands.CommandResponse.Accepted
@@ -22,7 +22,6 @@ import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 import scala.async.Async.{async, await}
 import scala.concurrent.Await
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
-import scala.reflect.ClassTag
 import scala.util.control.NonFatal
 
 /**
@@ -34,13 +33,12 @@ import scala.util.control.NonFatal
  * @param lifecycleHandlers    The implementation of handlers which defines the domain actions to be performed by this
  *                             component
  * @param locationService      The single instance of Location service created for a running application
- * @tparam Msg                 The type of messages created for domain specific message hierarchy of any component
  */
-class ComponentBehavior[Msg <: DomainMessage: ClassTag](
+class ComponentBehavior(
     ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
     supervisor: ActorRef[FromComponentLifecycleMessage],
-    lifecycleHandlers: ComponentHandlers[Msg],
+    lifecycleHandlers: ComponentHandlers,
     commandResponseManager: ActorRef[CommandResponseManagerMessage],
     locationService: LocationService,
     loggerFactory: LoggerFactory
@@ -134,11 +132,8 @@ class ComponentBehavior[Msg <: DomainMessage: ClassTag](
    */
   private def onRun(runningMessage: RunningMessage): Unit = runningMessage match {
     case Lifecycle(message) ⇒ onLifecycle(message)
-    case x: Msg ⇒
-      log.info(s"Invoking lifecycle handler's onDomainMsg hook with msg :[$x]")
-      lifecycleHandlers.onDomainMsg(x)
-    case x: CommandMessage ⇒ onRunningCompCommandMessage(x)
-    case msg               ⇒ log.error(s"Component TLA cannot handle message :[$msg]")
+    case x: CommandMessage  ⇒ onRunningCompCommandMessage(x)
+    case msg                ⇒ log.error(s"Component TLA cannot handle message :[$msg]")
   }
 
   /**

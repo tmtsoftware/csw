@@ -4,7 +4,7 @@ import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import akka.typed
 import akka.typed.Behavior
 import akka.typed.scaladsl.adapter._
-import csw.messages.RunningMessage.DomainMessage
+import csw.messages.ccs.commands.Setup
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
@@ -31,7 +31,6 @@ object TromboneHCD {
   println("Trombone HCD registered")
 
   def main(args: Array[String]): Unit = {}
-  case class Unregister() extends DomainMessage
 }
 
 class TromboneHCD extends Actor {
@@ -39,6 +38,7 @@ class TromboneHCD extends Actor {
   import cswCluster._
 
   override def receive: Receive = {
-    case Unregister => registrationResult.unregister().onComplete(_ => locationService.shutdown(TestFinishedReason))
+    case setup: Setup if setup.commandName.name == "Unregister" =>
+      registrationResult.unregister().onComplete(_ => locationService.shutdown(TestFinishedReason))
   }
 }

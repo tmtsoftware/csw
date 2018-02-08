@@ -51,7 +51,7 @@ import java.util.concurrent.TimeUnit;
 public class JLocationServiceExampleClient extends AbstractActor {
 
     private ILogger log = new JLoggerFactory("my-component-name").getLogger(context(), getClass());
-//#actor-mixin
+    //#actor-mixin
     //#create-location-service
     private ILocationService locationService = JLocationServiceFactory.make();
     //#create-location-service
@@ -84,7 +84,8 @@ public class JLocationServiceExampleClient extends AbstractActor {
         trackingAndSubscribingBlocking();
     }
 
-    private class AllDone {}
+    private class AllDone {
+    }
 
     private void registerConnectionsBlocking() throws ExecutionException, InterruptedException {
         //#Components-Connections-Registrations
@@ -93,7 +94,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
         akka.typed.ActorRef<LogControlMessages> logAdminActorRef = LogAdminActorFactory.make(context().system());
 
         // dummy http connection
-        HttpConnection httpConnection   = new HttpConnection(new ComponentId("configuration", JComponentType.Service));
+        HttpConnection httpConnection = new HttpConnection(new ComponentId("configuration", JComponentType.Service));
         HttpRegistration httpRegistration = new HttpRegistration(httpConnection, 8080, "path123", logAdminActorRef);
         httpRegResult = locationService.register(httpRegistration).get();
 
@@ -189,11 +190,11 @@ public class JLocationServiceExampleClient extends AbstractActor {
         }
         //#resolve
 
-       // example code showing how to get the actorRef for remote component and send it a message
-         if (resolveResult.isPresent()) {
+        // example code showing how to get the actorRef for remote component and send it a message
+        if (resolveResult.isPresent()) {
             AkkaLocation loc = resolveResult.get();
-                ActorRef actorRef = Adapter.toUntyped(loc.actorRef());
-                actorRef.tell(LocationServiceExampleComponent.ClientMessage$.MODULE$, getSelf());
+            ActorRef actorRef = Adapter.toUntyped(loc.actorRef());
+            actorRef.tell(LocationServiceExampleComponent.ClientMessage$.MODULE$, getSelf());
         }
     }
 
@@ -202,7 +203,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
         // list connections in location service
         List<Location> connectionList = locationService.list().get();
         log.info("All Registered Connections:");
-        for (Location loc: connectionList) {
+        for (Location loc : connectionList) {
             log.info("--- " + connectionInfo(loc.connection()));
         }
         //#list
@@ -211,7 +212,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
         // filter connections based on component type
         List<Location> componentList = locationService.list(JComponentType.Assembly).get();
         log.info("Registered Assemblies:");
-        for (Location loc: componentList) {
+        for (Location loc : componentList) {
             log.info("--- " + connectionInfo(loc.connection()));
         }
         //#filtering-component
@@ -250,9 +251,9 @@ public class JLocationServiceExampleClient extends AbstractActor {
         //in this case track a connection for 5 seconds, after that schedule switching off the stream
         Pair pair = locationService.track(exampleConnection).toMat(Sink.ignore(), Keep.both()).run(mat);
         context().system().scheduler().scheduleOnce(
-            Duration.create(5, TimeUnit.SECONDS),
-            () -> ((KillSwitch)pair.first()).shutdown(),
-            context().system().dispatcher());
+                Duration.create(5, TimeUnit.SECONDS),
+                () -> ((KillSwitch) pair.first()).shutdown(),
+                context().system().dispatcher());
 
         // subscribe to LocationServiceExampleComponent events
         log.info("Starting a subscription to " + exampleConnection);
@@ -268,7 +269,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
 
     private String connectionInfo(Connection connection) {
         // construct string with useful information about a connection
-        return connection.name()+", component type="+connection.componentId().componentType()+", connection type="+connection.connectionType();
+        return connection.name() + ", component type=" + connection.componentId().componentType() + ", connection type=" + connection.connectionType();
     }
 
     @Override
@@ -283,7 +284,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
             //#shutdown
             locationService.shutdown(CoordinatedShutdownReasons.actorTerminatedReason()).get();
             //#shutdown
-        // #log-info-error
+            // #log-info-error
         } catch (InterruptedException | ExecutionException ex) {
             log.info(ex.getMessage(), ex);
             throw ex;

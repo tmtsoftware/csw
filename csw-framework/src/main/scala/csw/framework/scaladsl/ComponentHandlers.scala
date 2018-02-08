@@ -3,7 +3,6 @@ package csw.framework.scaladsl
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.messages.TopLevelActorCommonMessage.TrackingEventReceived
-import csw.messages.RunningMessage.DomainMessage
 import csw.messages.ccs.commands.{CommandResponse, ControlCommand}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.{Connection, TrackingEvent}
@@ -14,7 +13,6 @@ import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
 
 import scala.concurrent.Future
-import scala.reflect.ClassTag
 
 /**
  * Base class for component handlers which will be used by the component actor
@@ -22,9 +20,8 @@ import scala.reflect.ClassTag
  * @param componentInfo     Component related information as described in the configuration file
  * @param pubSubRef         The pub sub actor to publish state represented by [[csw.messages.params.states.CurrentState]] for this component
  * @param locationService   The single instance of Location service created for a running application
- * @tparam Msg              The type of messages created for domain specific message hierarchy of any component
  */
-abstract class ComponentHandlers[Msg <: DomainMessage: ClassTag](
+abstract class ComponentHandlers(
     ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
     commandResponseManager: ActorRef[CommandResponseManagerMessage],
@@ -36,7 +33,6 @@ abstract class ComponentHandlers[Msg <: DomainMessage: ClassTag](
 
   def initialize(): Future[Unit]
   def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit
-  def onDomainMsg(msg: Msg): Unit
   def validateCommand(controlCommand: ControlCommand): CommandResponse
   def onSubmit(controlCommand: ControlCommand): Unit
   def onOneway(controlCommand: ControlCommand): Unit

@@ -49,7 +49,7 @@ class RedisDriverTest extends FunSuite with Matchers with MockitoSugar with Befo
     when(mockCommands.publish(any[String], any[PbEvent])).thenReturn(mock[RedisFuture[java.lang.Long]])
     when(mockCommands.set(any[String], any[PbEvent])).thenReturn(mock[RedisFuture[String]])
 
-    new RedisDriver(mockRedisClient, redisURI, EventServiceCodec).publish(eventKey, pbEvent)
+    new RedisDriver(mockRedisClient, redisURI).publish(eventKey, pbEvent)
     verify(mockCommands).publish(eventKey, pbEvent)
   }
 

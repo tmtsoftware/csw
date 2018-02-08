@@ -1,4 +1,5 @@
 import sbt._
+
 import scalapb.compiler.Version.scalapbVersion
 
 object Libs {

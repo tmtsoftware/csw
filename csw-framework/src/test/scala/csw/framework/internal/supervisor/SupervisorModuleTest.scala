@@ -1,15 +1,13 @@
 package csw.framework.internal.supervisor
 
 import akka.typed.testkit.scaladsl.TestProbe
-import csw.common.components.framework.TopLevelActorStatistics
 import csw.framework.ComponentInfos._
 import csw.framework.FrameworkTestSuite
 import csw.framework.javadsl.commons.JComponentInfos.{jHcdInfo, jHcdInfoWithInitializeTimeout}
-import csw.framework.javadsl.components.JTopLevelActorDomainMessage
 import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.ComponentCommonMessage.GetSupervisorLifecycleState
 import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
-import csw.messages.RunningMessage.{DomainMessage, Lifecycle}
+import csw.messages.RunningMessage.Lifecycle
 import csw.messages.SupervisorContainerCommonMessages.Restart
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Invalid}
 import csw.messages.ccs.commands._
@@ -62,32 +60,6 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
         containerIdleMessageProbe.expectMsg(SupervisorLifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
         verify(locationService).register(akkaRegistration)
-      }
-    }
-  }
-
-  // DEOPSCSW-179: Unique Action for a component
-  test("onDomainMsg hook of comp handlers should be invoked when supervisor receives Domain message") {
-    val testData = Table(
-      ("componentInfo", "domainMessage"),
-      (hcdInfo, TopLevelActorStatistics(1)),
-      (jHcdInfo, new JTopLevelActorDomainMessage())
-    )
-
-    forAll(testData) { (info: ComponentInfo, domainMessage: DomainMessage) =>
-      {
-        val mocks = frameworkTestMocks()
-        import mocks._
-        val supervisorRef = createSupervisorAndStartTLA(info, mocks)
-
-        compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
-        lifecycleStateProbe.expectMsg(Publish(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
-
-        supervisorRef ! domainMessage
-
-        val domainCurrentState = compStateProbe.expectMsgType[Publish[CurrentState]]
-        val domainDemandState  = DemandState(prefix, Set(choiceKey.set(domainChoice)))
-        DemandMatcher(domainDemandState, timeout = 5.seconds).check(domainCurrentState.data) shouldBe true
       }
     }
   }

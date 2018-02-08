@@ -1,7 +1,7 @@
 package csw.services.commons.genericlogger;
 
 import akka.typed.javadsl.ActorContext;
-import csw.services.commons.TopLevelActorDomainMessage;
+import csw.messages.ComponentMessage;
 import csw.services.logging.javadsl.ILogger;
 import csw.services.logging.javadsl.JGenericLoggerFactory;
 
@@ -28,7 +28,7 @@ class JGenericActor extends akka.actor.AbstractActor {
 //#generic-logger-typed-actor
 class JGenericTypedActor {
 
-    public JGenericTypedActor(ActorContext<TopLevelActorDomainMessage> ctx) {
+    public JGenericTypedActor(ActorContext<ComponentMessage> ctx) {
         ILogger log = JGenericLoggerFactory.getLogger(ctx, getClass());
     }
 }

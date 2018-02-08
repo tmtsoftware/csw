@@ -19,13 +19,13 @@ class ComponentBehaviorTest extends FrameworkTestSuite with MockitoSugar {
 
   class TestData(supervisorProbe: TestProbe[FromComponentLifecycleMessage]) {
 
-    val sampleComponentHandler: ComponentHandlers[TopLevelActorDomainMessage] =
-      mock[ComponentHandlers[TopLevelActorDomainMessage]]
+    val sampleComponentHandler: ComponentHandlers =
+      mock[ComponentHandlers]
     when(sampleComponentHandler.initialize()).thenReturn(Future.unit)
     val locationService: LocationService = mock[LocationService]
     val ctx                              = new StubbedActorContext[TopLevelActorMessage]("test-component", 100, system)
     val componentBehavior =
-      new ComponentBehavior[TopLevelActorDomainMessage](
+      new ComponentBehavior(
         ctx,
         ComponentInfos.hcdInfo,
         supervisorProbe.ref,

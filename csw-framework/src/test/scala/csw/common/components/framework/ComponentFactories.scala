@@ -10,7 +10,7 @@ import csw.messages.{CommandResponseManagerMessage, TopLevelActorMessage}
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
 
-class SampleComponentBehaviorFactory extends ComponentBehaviorFactory[TopLevelActorDomainMessage] {
+class SampleComponentBehaviorFactory extends ComponentBehaviorFactory {
   override def handlers(
       ctx: ActorContext[TopLevelActorMessage],
       componentInfo: ComponentInfo,
@@ -18,11 +18,11 @@ class SampleComponentBehaviorFactory extends ComponentBehaviorFactory[TopLevelAc
       pubSubRef: ActorRef[PubSub.PublisherMessage[CurrentState]],
       locationService: LocationService,
       loggerFactory: LoggerFactory
-  ): ComponentHandlers[TopLevelActorDomainMessage] =
+  ): ComponentHandlers =
     new SampleComponentHandlers(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory)
 }
 
-class ComponentBehaviorFactoryToSimulateFailure extends ComponentBehaviorFactory[TopLevelActorDomainMessage] {
+class ComponentBehaviorFactoryToSimulateFailure extends ComponentBehaviorFactory {
   override def handlers(
       ctx: ActorContext[TopLevelActorMessage],
       componentInfo: ComponentInfo,
@@ -30,6 +30,6 @@ class ComponentBehaviorFactoryToSimulateFailure extends ComponentBehaviorFactory
       pubSubRef: ActorRef[PubSub.PublisherMessage[CurrentState]],
       locationService: LocationService,
       loggerFactory: LoggerFactory
-  ): ComponentHandlers[TopLevelActorDomainMessage] =
+  ): ComponentHandlers =
     new ComponentHandlerToSimulateFailure(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory)
 }

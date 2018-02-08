@@ -33,7 +33,7 @@ class ComponentHandlerForCommand(
     pubSubRef: ActorRef[PublisherMessage[CurrentState]],
     locationService: LocationService,
     loggerFactory: LoggerFactory
-) extends ComponentHandlers[TopLevelActorDomainMessage](
+) extends ComponentHandlers(
       ctx,
       componentInfo,
       commandResponseManager,
@@ -53,8 +53,6 @@ class ComponentHandlerForCommand(
   override def initialize(): Future[Unit] = Future.unit
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = ???
-
-  override def onDomainMsg(msg: TopLevelActorDomainMessage): Unit = ???
 
   override def validateCommand(controlCommand: ControlCommand): CommandResponse = controlCommand.commandName match {
     case `acceptedCmd`       ⇒ Accepted(controlCommand.runId)

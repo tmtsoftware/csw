@@ -1,7 +1,7 @@
 package csw.services.commons.componentlogger;
 
 import akka.typed.javadsl.ActorContext;
-import csw.services.commons.TopLevelActorDomainMessage;
+import csw.messages.ComponentMessage;
 import csw.services.logging.javadsl.ILogger;
 import csw.services.logging.javadsl.JLoggerFactory;
 import csw.services.logging.scaladsl.LoggerFactory;
@@ -34,7 +34,7 @@ class JSampleActor extends akka.actor.AbstractActor {
 //#component-logger-typed-actor
 class JSampleTypedActor {
 
-    public JSampleTypedActor(JLoggerFactory loggerFactory, ActorContext<TopLevelActorDomainMessage> ctx) {
+    public JSampleTypedActor(JLoggerFactory loggerFactory, ActorContext<ComponentMessage> ctx) {
         ILogger log = loggerFactory.getLogger(ctx, getClass());
     }
 }

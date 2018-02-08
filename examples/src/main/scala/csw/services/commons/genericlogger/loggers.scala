@@ -1,7 +1,7 @@
 package csw.services.commons.genericlogger
 
 import akka.typed.scaladsl.ActorContext
-import csw.services.commons.TopLevelActorDomainMessage
+import csw.messages.ComponentMessage
 import csw.services.logging.scaladsl.{GenericLoggerFactory, Logger}
 
 //#generic-logger-class
@@ -22,7 +22,7 @@ class GenericActor extends akka.actor.AbstractActor {
 //#generic-logger-actor
 
 //#generic-logger-typed-actor
-class GenericTypedActor(ctx: ActorContext[TopLevelActorDomainMessage]) {
+class GenericTypedActor(ctx: ActorContext[ComponentMessage]) {
 
   val log: Logger = GenericLoggerFactory.getLogger(ctx)
 }

@@ -2,11 +2,6 @@ package csw.common.components.command
 
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
-import csw.common.components.command.TopLevelActorDomainMessage.{
-  LongCommandCompleted,
-  MediumCommandCompleted,
-  ShortCommandCompleted
-}
 import csw.common.components.command.ComponentStateForCommand._
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
@@ -21,7 +16,6 @@ import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
 
 import scala.concurrent.Future
-import scala.concurrent.duration.DurationLong
 
 class McsHcdComponentHandlers(
     ctx: ActorContext[TopLevelActorMessage],
@@ -30,7 +24,7 @@ class McsHcdComponentHandlers(
     pubSubRef: ActorRef[PubSub.PublisherMessage[CurrentState]],
     locationService: LocationService,
     loggerFactory: LoggerFactory
-) extends ComponentHandlers[TopLevelActorDomainMessage](
+) extends ComponentHandlers(
       ctx,
       componentInfo,
       commandResponseManager,
@@ -43,16 +37,6 @@ class McsHcdComponentHandlers(
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = ???
 
-  override def onDomainMsg(msg: TopLevelActorDomainMessage): Unit = msg match {
-    case LongCommandCompleted(commandResponse) =>
-      commandResponseManager ! AddOrUpdateCommand(commandResponse.runId, commandResponse)
-    case MediumCommandCompleted(commandResponse) =>
-      commandResponseManager ! AddOrUpdateCommand(commandResponse.runId, commandResponse)
-    case ShortCommandCompleted(commandResponse) =>
-      commandResponseManager ! AddOrUpdateCommand(commandResponse.runId, commandResponse)
-    case _ ⇒
-  }
-
   override def validateCommand(controlCommand: ControlCommand): CommandResponse = {
     controlCommand.commandName match {
       case `longRunning`   ⇒ Accepted(controlCommand.runId)
@@ -64,10 +48,13 @@ class McsHcdComponentHandlers(
 
   override def onSubmit(controlCommand: ControlCommand): Unit = {
     controlCommand.commandName match {
-      case `longRunning`   ⇒ ctx.schedule(5.seconds, ctx.self, LongCommandCompleted(Completed(controlCommand.runId)))
-      case `mediumRunning` ⇒ ctx.schedule(3.seconds, ctx.self, MediumCommandCompleted(Completed(controlCommand.runId)))
-      case `shortRunning`  ⇒ ctx.schedule(1.seconds, ctx.self, ShortCommandCompleted(Completed(controlCommand.runId)))
-      case _               ⇒
+      case `longRunning` ⇒
+        Thread.sleep(5000); commandResponseManager ! AddOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId))
+      case `mediumRunning` ⇒
+        Thread.sleep(3000); commandResponseManager ! AddOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId))
+      case `shortRunning` ⇒
+        Thread.sleep(1000); commandResponseManager ! AddOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId))
+      case _ ⇒
     }
   }
 

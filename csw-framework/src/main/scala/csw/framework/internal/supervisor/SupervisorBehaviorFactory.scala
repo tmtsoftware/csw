@@ -24,7 +24,7 @@ object SupervisorBehaviorFactory {
 
     val componentWiringClass = Class.forName(componentInfo.behaviorFactoryClassName)
     val componentBehaviorFactory =
-      componentWiringClass.getDeclaredConstructor().newInstance().asInstanceOf[ComponentBehaviorFactory[_]]
+      componentWiringClass.getDeclaredConstructor().newInstance().asInstanceOf[ComponentBehaviorFactory]
     val loggerFactory = new LoggerFactory(componentInfo.name)
 
     make(
@@ -44,7 +44,7 @@ object SupervisorBehaviorFactory {
       locationService: LocationService,
       registrationFactory: RegistrationFactory,
       pubSubBehaviorFactory: PubSubBehaviorFactory,
-      componentBehaviorFactory: ComponentBehaviorFactory[_],
+      componentBehaviorFactory: ComponentBehaviorFactory,
       loggerFactory: LoggerFactory
   ): Behavior[ComponentMessage] = {
     Actor

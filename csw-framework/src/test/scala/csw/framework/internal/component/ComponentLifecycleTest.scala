@@ -8,8 +8,8 @@ import csw.framework.{ComponentInfos, FrameworkTestSuite}
 import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
 import csw.messages.FromComponentLifecycleMessage.Running
-import csw.messages.TopLevelActorIdleMessage.Initialize
 import csw.messages.RunningMessage.Lifecycle
+import csw.messages.TopLevelActorIdleMessage.Initialize
 import csw.messages._
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Error}
 import csw.messages.ccs.commands.{CommandName, CommandResponse, Observe, Setup}
@@ -34,12 +34,12 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
   ) {
     private val ctx = new StubbedActorContext[TopLevelActorMessage]("test-component", 100, system)
 
-    val locationService: LocationService                                = mock[LocationService]
-    val sampleHcdHandler: ComponentHandlers[TopLevelActorDomainMessage] = mock[ComponentHandlers[TopLevelActorDomainMessage]]
+    val locationService: LocationService    = mock[LocationService]
+    val sampleHcdHandler: ComponentHandlers = mock[ComponentHandlers]
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
     when(sampleHcdHandler.onShutdown()).thenReturn(Future.unit)
     val behavior =
-      new ComponentBehavior[TopLevelActorDomainMessage](
+      new ComponentBehavior(
         ctx,
         ComponentInfos.hcdInfo,
         supervisorProbe.ref,
@@ -49,7 +49,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
         frameworkTestMocks().loggerFactory
       )
 
-    val runningComponentBehavior: ComponentBehavior[TopLevelActorDomainMessage] = {
+    val runningComponentBehavior: ComponentBehavior = {
       behavior.onMessage(Initialize)
       supervisorProbe.expectMsgType[Running]
       behavior

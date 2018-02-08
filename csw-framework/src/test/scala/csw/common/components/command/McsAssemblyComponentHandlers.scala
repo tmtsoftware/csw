@@ -5,7 +5,6 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import akka.util.Timeout
 import csw.common.components.command.ComponentStateForCommand._
-import csw.common.components.command.TopLevelActorDomainMessage.CommandCompleted
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed}
@@ -30,7 +29,7 @@ class McsAssemblyComponentHandlers(
     pubSubRef: ActorRef[PubSub.PublisherMessage[CurrentState]],
     locationService: LocationService,
     loggerFactory: LoggerFactory
-) extends ComponentHandlers[TopLevelActorDomainMessage](
+) extends ComponentHandlers(
       ctx,
       componentInfo,
       commandResponseManager,
@@ -60,25 +59,6 @@ class McsAssemblyComponentHandlers(
     }
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = Unit
-
-  override def onDomainMsg(msg: TopLevelActorDomainMessage): Unit = msg match {
-    case CommandCompleted(response) ⇒
-      response.runId match {
-        case id if id == shortSetup.runId ⇒
-          pubSubRef ! Publish(CurrentState(shortSetup.source, Set(choiceKey.set(shortCmdCompleted))))
-        case id if id == mediumSetup.runId ⇒
-          pubSubRef ! Publish(CurrentState(mediumSetup.source, Set(choiceKey.set(mediumCmdCompleted))))
-        case id if id == longSetup.runId ⇒
-          pubSubRef ! Publish(CurrentState(longSetup.source, Set(choiceKey.set(longCmdCompleted))))
-      }
-
-      completedCommands += 1
-      if (completedCommands == 3) {
-        commandResponseManager ! AddOrUpdateCommand(commandId, Completed(commandId))
-        completedCommands = 0
-      }
-    case _ ⇒
-  }
 
   override def validateCommand(controlCommand: ControlCommand): CommandResponse = {
     controlCommand.commandName match {
@@ -117,8 +97,22 @@ class McsAssemblyComponentHandlers(
       .map {
         case _: Accepted ⇒
           hcdComponent.subscribe(controlCommand.runId).map {
-            case _: Completed ⇒ ctx.self ! CommandCompleted(Completed(controlCommand.runId))
-            case _            ⇒ // Do nothing
+            case _: Completed ⇒
+              controlCommand.runId match {
+                case id if id == shortSetup.runId ⇒
+                  pubSubRef ! Publish(CurrentState(shortSetup.source, Set(choiceKey.set(shortCmdCompleted))))
+                case id if id == mediumSetup.runId ⇒
+                  pubSubRef ! Publish(CurrentState(mediumSetup.source, Set(choiceKey.set(mediumCmdCompleted))))
+                case id if id == longSetup.runId ⇒
+                  pubSubRef ! Publish(CurrentState(longSetup.source, Set(choiceKey.set(longCmdCompleted))))
+              }
+
+              completedCommands += 1
+              if (completedCommands == 3) {
+                commandResponseManager ! AddOrUpdateCommand(commandId, Completed(commandId))
+                completedCommands = 0
+              }
+            case _ ⇒ // Do nothing
           }
         case _ ⇒ // Do nothing
       }

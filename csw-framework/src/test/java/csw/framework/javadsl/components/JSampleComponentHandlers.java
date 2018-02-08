@@ -39,7 +39,7 @@ import static csw.common.components.command.ComponentStateForCommand.immediateRe
 import static csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand;
 import static csw.messages.ccs.commands.CommandResponse.*;
 
-public class JSampleComponentHandlers extends JComponentHandlers<JTopLevelActorDomainMessage> {
+public class JSampleComponentHandlers extends JComponentHandlers {
 
     // Demonstrating logger accessibility in Java Component handlers
     private ILogger log;
@@ -54,10 +54,9 @@ public class JSampleComponentHandlers extends JComponentHandlers<JTopLevelActorD
             ActorRef<CommandResponseManagerMessage> commandResponseManager,
             ActorRef<PubSub.PublisherMessage<CurrentState>> pubSubRef,
             ILocationService locationService,
-            JLoggerFactory loggerFactory,
-            Class<JTopLevelActorDomainMessage> klass
+            JLoggerFactory loggerFactory
     ) {
-        super(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory, klass);
+        super(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory);
         this.pubSubRef = pubSubRef;
         this.log = loggerFactory.getLogger(getClass());
         this.commandResponseManagerRef = commandResponseManager;
@@ -82,14 +81,6 @@ public class JSampleComponentHandlers extends JComponentHandlers<JTopLevelActorD
     @Override
     public void onLocationTrackingEvent(TrackingEvent trackingEvent) {
 
-    }
-
-    @Override
-    public void onDomainMsg(JTopLevelActorDomainMessage hcdDomainMsg) {
-        CurrentState domainState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.domainChoice()));
-        Publish<CurrentState> publish = new Publish<>(domainState);
-
-        pubSubRef.tell(publish);
     }
 
     @Override

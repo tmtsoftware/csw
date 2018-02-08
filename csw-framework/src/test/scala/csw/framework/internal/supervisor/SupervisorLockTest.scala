@@ -2,8 +2,7 @@ package csw.framework.internal.supervisor
 
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.scaladsl.TestProbe
-import csw.common.components.framework.SampleComponentState.{choiceKey, domainChoice, initChoice, prefix}
-import csw.common.components.framework.TopLevelActorStatistics
+import csw.common.components.framework.SampleComponentState.{choiceKey, initChoice, prefix}
 import csw.common.utils.LockCommandFactory
 import csw.framework.ComponentInfos.assemblyInfo
 import csw.framework.FrameworkTestSuite
@@ -146,10 +145,6 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     // Client 1 will lock an assembly
     supervisorRef ! LockCommandFactory.make(sourcePrefix, lockingStateProbe.ref)
     lockingStateProbe.expectMsg(LockAcquired)
-
-    // Ensure Domain messages can be sent to component even in locked state
-    supervisorRef ! TopLevelActorStatistics(1)
-    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(domainChoice)))))
 
     // Client 1 sends submit command with tokenId in parameter set
     val setup = Setup(sourcePrefix, commandName, Some(obsId))

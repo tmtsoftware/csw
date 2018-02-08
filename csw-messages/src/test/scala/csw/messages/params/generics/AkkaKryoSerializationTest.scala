@@ -13,7 +13,7 @@ import com.twitter.chill.akka.AkkaSerializer
 import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
 import csw.messages.ComponentMessage
 import csw.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
-import csw.messages.RunningMessage.{DomainMessage, Lifecycle}
+import csw.messages.RunningMessage.Lifecycle
 import csw.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.messages.ccs.CommandIssue
 import csw.messages.ccs.commands.CommandResponse._
@@ -186,11 +186,6 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
     it("should serialize ToComponentLifecycle messages") {
       serialization.findSerializerFor(GoOffline).getClass shouldBe classOf[AkkaSerializer]
       serialization.findSerializerFor(GoOnline).getClass shouldBe classOf[AkkaSerializer]
-    }
-
-    it("should serialize DomainMessage messages") {
-      case object MyDomainMsg extends DomainMessage
-      serialization.findSerializerFor(MyDomainMsg).getClass shouldBe classOf[AkkaSerializer]
     }
 
     it("should serialize Lifecycle messages") {

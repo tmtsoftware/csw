@@ -175,14 +175,14 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   }
   //#resolve
 
-  // example code showing how to get the actorReg for remote component and send it a message
-  if (resolveResult.isDefined) {
-    resolveResult.get match {
-      case c: AkkaLocation =>
-        c.component.value ! LocationServiceExampleComponent.ClientMessage
-      case x => log.error(s"Received unexpected location type: $x")
-    }
-  }
+  // example code showing how to get the actorRef for remote component and send it a message
+//  if (resolveResult.isDefined) {
+//    resolveResult.get match {
+//      case c: AkkaLocation =>
+//        c.component.value ! LocationServiceExampleComponent.ClientMessage
+//      case x => log.error(s"Received unexpected location type: $x")
+//    }
+//  }
 
   //#list
   // list connections in location service

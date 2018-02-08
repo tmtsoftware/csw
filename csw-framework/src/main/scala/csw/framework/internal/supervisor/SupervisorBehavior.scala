@@ -72,7 +72,7 @@ class SupervisorBehavior(
     timerScheduler: TimerScheduler[SupervisorMessage],
     maybeContainerRef: Option[ActorRef[ContainerIdleMessage]],
     componentInfo: ComponentInfo,
-    componentBehaviorFactory: ComponentBehaviorFactory[_],
+    componentBehaviorFactory: ComponentBehaviorFactory,
     pubSubBehaviorFactory: PubSubBehaviorFactory,
     registrationFactory: RegistrationFactory,
     locationService: LocationService,

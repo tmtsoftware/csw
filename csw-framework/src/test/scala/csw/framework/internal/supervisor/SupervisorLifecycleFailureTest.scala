@@ -7,7 +7,6 @@ import akka.typed.testkit.scaladsl.TestProbe
 import com.persist.JsonOps
 import com.persist.JsonOps.JsonObject
 import csw.common.FrameworkAssertions._
-import csw.common.components.framework.TopLevelActorDomainMessage
 import csw.common.components.framework.SampleComponentState._
 import csw.common.utils.TestAppender
 import csw.exceptions.{FailureRestart, FailureStop}
@@ -81,7 +80,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
       "SampleHcd",
       failureStopExMsg,
       ERROR,
-      classOf[ComponentBehavior[TopLevelActorDomainMessage]].getName,
+      classOf[ComponentBehavior].getName,
       TestFailureStop.getClass.getName,
       failureStopExMsg
     )
@@ -138,7 +137,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
       "SampleHcd",
       failureRestartExMsg,
       ERROR,
-      classOf[ComponentBehavior[TopLevelActorDomainMessage]].getName,
+      classOf[ComponentBehavior].getName,
       TestFailureRestart.getClass.getName,
       failureRestartExMsg
     )
@@ -194,7 +193,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
 
   private def createSupervisorAndStartTLA(
       testMocks: FrameworkTestMocks,
-      componentHandlers: ComponentHandlers[TopLevelActorDomainMessage]
+      componentHandlers: ComponentHandlers
   ): Unit = {
     import testMocks._
 
@@ -217,7 +216,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
 
     createAnswers(compStateProbe)
 
-    val componentHandlers = mock[ComponentHandlers[TopLevelActorDomainMessage]]
+    val componentHandlers = mock[ComponentHandlers]
     when(componentHandlers.initialize()).thenAnswer(initializeAnswer)
     when(componentHandlers.onShutdown()).thenAnswer(shutdownAnswer)
     componentHandlers
@@ -230,8 +229,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
   }
 }
 
-class SampleBehaviorFactory(componentHandlers: ComponentHandlers[TopLevelActorDomainMessage])
-    extends ComponentBehaviorFactory[TopLevelActorDomainMessage] {
+class SampleBehaviorFactory(componentHandlers: ComponentHandlers) extends ComponentBehaviorFactory {
   override protected[framework] def handlers(
       ctx: ActorContext[TopLevelActorMessage],
       componentInfo: ComponentInfo,
@@ -239,7 +237,7 @@ class SampleBehaviorFactory(componentHandlers: ComponentHandlers[TopLevelActorDo
       pubSubRef: ActorRef[PublisherMessage[CurrentState]],
       locationService: LocationService,
       loggerFactory: LoggerFactory
-  ): ComponentHandlers[TopLevelActorDomainMessage] = componentHandlers
+  ): ComponentHandlers = componentHandlers
 }
 
 case class TestFailureStop(msg: String)    extends FailureStop(msg)

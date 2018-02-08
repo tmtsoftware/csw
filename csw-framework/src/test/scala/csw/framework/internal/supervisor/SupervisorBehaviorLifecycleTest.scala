@@ -4,16 +4,15 @@ import akka.typed.Terminated
 import akka.typed.scaladsl.TimerScheduler
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.testkit.{Inbox, StubbedActorContext}
-import csw.common.components.framework.TopLevelActorDomainMessage
 import csw.exceptions.{FailureStop, InitializationFailed}
 import csw.framework.ComponentInfos._
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.messages.CommandResponseManagerMessage.Query
-import csw.messages.FromComponentLifecycleMessage.Running
-import csw.messages.RunningMessage.{DomainMessage, Lifecycle}
 import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
+import csw.messages.FromComponentLifecycleMessage.Running
+import csw.messages.RunningMessage.Lifecycle
 import csw.messages.SupervisorContainerCommonMessages.Restart
 import csw.messages.SupervisorIdleMessage.InitializeTimeout
 import csw.messages.SupervisorInternalRunningMessage.{RegistrationNotRequired, RegistrationSuccess}
@@ -26,7 +25,6 @@ import csw.messages.models.{LifecycleStateChanged, PubSub}
 import csw.messages.params.models.Id
 import csw.messages.params.states.CurrentState
 import csw.messages.{models, _}
-import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 
@@ -38,10 +36,10 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     val testMocks: FrameworkTestMocks = frameworkTestMocks()
     import testMocks._
 
-    val sampleHcdHandler: ComponentHandlers[TopLevelActorDomainMessage] = mock[ComponentHandlers[TopLevelActorDomainMessage]]
-    val ctx                                                             = new StubbedActorContext[SupervisorMessage]("test-supervisor", 100, system)
-    val timer: TimerScheduler[SupervisorMessage]                        = mock[TimerScheduler[SupervisorMessage]]
-    val containerIdleMessageProbe: TestProbe[ContainerIdleMessage]      = TestProbe[ContainerIdleMessage]
+    val sampleHcdHandler: ComponentHandlers                        = mock[ComponentHandlers]
+    val ctx                                                        = new StubbedActorContext[SupervisorMessage]("test-supervisor", 100, system)
+    val timer: TimerScheduler[SupervisorMessage]                   = mock[TimerScheduler[SupervisorMessage]]
+    val containerIdleMessageProbe: TestProbe[ContainerIdleMessage] = TestProbe[ContainerIdleMessage]
 
     val supervisor =
       new SupervisorBehavior(
@@ -220,66 +218,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     childComponentInbox.receiveAll() should contain(Lifecycle(GoOnline))
   }
 
-  test("supervisor should accept and forward Domain message to a TLA") {
-    val testData = new TestData(hcdInfo)
-    import testData._
-
-    sealed trait TestDomainMessage extends DomainMessage
-    case object TestCompMessage$   extends TestDomainMessage
-
-    val childRef = childComponentInbox.ref.upcast
-
-    supervisor.onMessage(Running(childRef))
-    supervisor.onMessage(RegistrationSuccess(childRef))
-    supervisor.onMessage(TestCompMessage$)
-    childComponentInbox.receiveMsg() shouldBe TestCompMessage$
-  }
   // *************** End of testing onRunning Messages ***************
-
-  test("should not forward Domain message to a TLA when supervisor is in Idle lifecycle state") {
-    val testData = new TestData(hcdInfo)
-    import testData._
-
-    sealed trait TestDomainMessage extends DomainMessage
-    case object TestCompMessage    extends TestDomainMessage
-
-    // TestCompMessage (DomainMessage) is sent to supervisor when lifecycle state is Idle
-    // in this case, verify that log.error is called once
-    supervisor.lifecycleState shouldBe SupervisorLifecycleState.Idle
-    supervisor.onMessage(TestCompMessage)
-    supervisor.runningComponent shouldBe empty
-    verify(supervisor.log, times(1)).error(any())
-  }
-
-  test("should not forward Domain message to a TLA when supervisor is in Restart lifecycle state") {
-    val testData = new TestData(hcdInfo)
-    import testData._
-    val childRef = childComponentInbox.ref.upcast
-
-    sealed trait TestDomainMessage extends DomainMessage
-    case object TestCompMessage    extends TestDomainMessage
-
-    supervisor.lifecycleState shouldBe SupervisorLifecycleState.Idle
-
-    supervisor.onMessage(Running(childRef))
-    supervisor.onMessage(RegistrationSuccess(childRef))
-    supervisor.lifecycleState shouldBe SupervisorLifecycleState.Running
-
-    // TestCompMessage (DomainMessage) is sent to supervisor when lifecycle state is running
-    // in this case, verify that log.error is never called
-    supervisor.onMessage(TestCompMessage)
-    verify(supervisor.log, never()).error(any())
-    childComponentInbox.receiveMsg() shouldBe TestCompMessage
-
-    // TestCompMessage (DomainMessage) is sent to supervisor when lifecycle state is Restart
-    // in this case, verify that log.error is called once and
-    // TLA does not receive any message
-    supervisor.onMessage(Restart)
-    supervisor.lifecycleState shouldBe SupervisorLifecycleState.Restart
-    supervisor.onMessage(TestCompMessage)
-    childComponentInbox.receiveAll() shouldBe Seq.empty
-    verify(supervisor.log, times(1)).error(any())
-  }
 
   test("supervisor should handle Terminated signal for Idle lifecycle state") {
     val testData = new TestData(hcdInfo)

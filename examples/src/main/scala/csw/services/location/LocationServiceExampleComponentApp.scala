@@ -7,7 +7,6 @@ import akka.stream.ActorMaterializer
 import akka.typed
 import akka.typed.Behavior
 import akka.typed.scaladsl.adapter._
-import csw.messages.RunningMessage.DomainMessage
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.services.location.commons.ActorSystemFactory
@@ -46,7 +45,7 @@ object LocationServiceExampleComponent {
   val connection = AkkaConnection(componentId)
 
   // Message sent from client once location has been resolved
-  case object ClientMessage extends DomainMessage
+  case object ClientMessage
 }
 
 /**

@@ -1,7 +1,7 @@
 package csw.services.commons.componentlogger
 
 import akka.typed.scaladsl.ActorContext
-import csw.services.commons.TopLevelActorDomainMessage
+import csw.messages.ComponentMessage
 import csw.services.logging.javadsl.JLoggerFactory
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
@@ -23,7 +23,7 @@ class SampleActor(loggerFactory: LoggerFactory) extends akka.actor.Actor {
 //#component-logger-actor
 
 //#component-logger-typed-actor
-class SampleTypedActor(loggerFactory: LoggerFactory, ctx: ActorContext[TopLevelActorDomainMessage]) {
+class SampleTypedActor(loggerFactory: LoggerFactory, ctx: ActorContext[ComponentMessage]) {
 
   val log: Logger = loggerFactory.getLogger(ctx)
 }

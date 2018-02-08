@@ -43,7 +43,7 @@ object MotionWorkerMsgs {
 
 ////////////////
 
-sealed trait TromboneMessage extends DomainMessage
+sealed trait TromboneMessage
 
 sealed trait TromboneEngineering extends TromboneMessage
 object TromboneEngineering {

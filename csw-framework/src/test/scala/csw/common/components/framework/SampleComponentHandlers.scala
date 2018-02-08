@@ -25,7 +25,7 @@ class SampleComponentHandlers(
     pubSubRef: ActorRef[PublisherMessage[CurrentState]],
     locationService: LocationService,
     loggerFactory: LoggerFactory
-) extends ComponentHandlers[TopLevelActorDomainMessage](
+) extends ComponentHandlers(
       ctx,
       componentInfo,
       commandResponseManager,
@@ -53,9 +53,6 @@ class SampleComponentHandlers(
   override def onGoOffline(): Unit = pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(offlineChoice))))
 
   override def onGoOnline(): Unit = pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(onlineChoice))))
-
-  override def onDomainMsg(msg: TopLevelActorDomainMessage): Unit =
-    pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(domainChoice))))
 
   override def onSubmit(controlCommand: ControlCommand): Unit = {
     // Adding passed in parameter to see if data is transferred properly

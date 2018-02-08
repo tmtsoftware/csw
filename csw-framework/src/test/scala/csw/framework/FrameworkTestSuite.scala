@@ -7,7 +7,6 @@ import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
-import csw.common.components.framework.TopLevelActorDomainMessage
 import csw.framework.internal.supervisor.SupervisorBehaviorFactory
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.messages.framework.ComponentInfo
@@ -35,25 +34,19 @@ abstract class FrameworkTestSuite extends FunSuite with Matchers with BeforeAndA
   }
 
   def getSampleHcdWiring(
-      componentHandlers: ComponentHandlers[TopLevelActorDomainMessage]
-  ): ComponentBehaviorFactory[TopLevelActorDomainMessage] =
-    new ComponentBehaviorFactory[TopLevelActorDomainMessage] {
-
-      override def handlers(
-          ctx: ActorContext[TopLevelActorMessage],
-          componentInfo: ComponentInfo,
-          commandResponseManager: ActorRef[CommandResponseManagerMessage],
-          pubSubRef: ActorRef[PublisherMessage[CurrentState]],
-          locationService: LocationService,
-          loggerFactory: LoggerFactory
-      ): ComponentHandlers[TopLevelActorDomainMessage] =
-        componentHandlers
-    }
+      componentHandlers: ComponentHandlers
+  ): ComponentBehaviorFactory =
+    (ctx: ActorContext[TopLevelActorMessage],
+     componentInfo: ComponentInfo,
+     commandResponseManager: ActorRef[CommandResponseManagerMessage],
+     pubSubRef: ActorRef[PublisherMessage[CurrentState]],
+     locationService: LocationService,
+     loggerFactory: LoggerFactory) => componentHandlers
 
   def getSampleAssemblyWiring(
-      assemblyHandlers: ComponentHandlers[TopLevelActorDomainMessage]
-  ): ComponentBehaviorFactory[TopLevelActorDomainMessage] =
-    new ComponentBehaviorFactory[TopLevelActorDomainMessage] {
+      assemblyHandlers: ComponentHandlers
+  ): ComponentBehaviorFactory =
+    new ComponentBehaviorFactory {
       override def handlers(
           ctx: ActorContext[TopLevelActorMessage],
           componentInfo: ComponentInfo,
@@ -61,7 +54,7 @@ abstract class FrameworkTestSuite extends FunSuite with Matchers with BeforeAndA
           pubSubRef: ActorRef[PublisherMessage[CurrentState]],
           locationService: LocationService,
           loggerFactory: LoggerFactory
-      ): ComponentHandlers[TopLevelActorDomainMessage] =
+      ): ComponentHandlers =
         assemblyHandlers
     }
 

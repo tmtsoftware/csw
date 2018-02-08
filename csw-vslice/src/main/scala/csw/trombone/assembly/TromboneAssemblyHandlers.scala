@@ -33,7 +33,7 @@ import scala.concurrent.duration.DurationLong
 import scala.concurrent.{ExecutionContext, Future}
 
 //#component-factory
-class TromboneAssemblyBehaviorFactory extends ComponentBehaviorFactory[DiagPublisherMessages] {
+class TromboneAssemblyBehaviorFactory extends ComponentBehaviorFactory {
   override def handlers(
       ctx: ActorContext[TopLevelActorMessage],
       componentInfo: ComponentInfo,
@@ -41,7 +41,7 @@ class TromboneAssemblyBehaviorFactory extends ComponentBehaviorFactory[DiagPubli
       pubSubRef: ActorRef[PublisherMessage[CurrentState]],
       locationService: LocationService,
       loggerFactory: LoggerFactory
-  ): ComponentHandlers[DiagPublisherMessages] =
+  ): ComponentHandlers =
     new TromboneAssemblyHandlers(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory)
 }
 //#component-factory
@@ -54,7 +54,7 @@ class TromboneAssemblyHandlers(
     pubSubRef: ActorRef[PublisherMessage[CurrentState]],
     locationService: LocationService,
     loggerFactory: LoggerFactory
-) extends ComponentHandlers[DiagPublisherMessages](
+) extends ComponentHandlers(
       ctx,
       componentInfo,
       commandResponseManager,
@@ -69,7 +69,7 @@ class TromboneAssemblyHandlers(
   private var commandHandler: ActorRef[AssemblyCommandHandlerMsgs] = _
   private var runningHcds: Map[Connection, Option[ComponentRef]]   = Map.empty
 
-  private val commandResponseAdapter: ActorRef[CommandResponse] = ctx.spawnAdapter(CommandResponseE)
+  private val commandResponseAdapter: ActorRef[CommandResponse] = ctx.spawnAdapter()
 
   private val configClient = ConfigClientFactory.clientApi(ctx.system.toUntyped, locationService)
 

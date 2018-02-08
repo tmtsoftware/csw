@@ -55,7 +55,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
         val componentInfo        = invocation.getArgument[ComponentInfo](1)
         val componentWiringClass = Class.forName(componentInfo.behaviorFactoryClassName)
         val componentBehaviorFactory =
-          componentWiringClass.getDeclaredConstructor().newInstance().asInstanceOf[ComponentBehaviorFactory[_]]
+          componentWiringClass.getDeclaredConstructor().newInstance().asInstanceOf[ComponentBehaviorFactory]
 
         val supervisorBehaviorFactory = SupervisorBehaviorFactory.make(
           Some(ctx.self),

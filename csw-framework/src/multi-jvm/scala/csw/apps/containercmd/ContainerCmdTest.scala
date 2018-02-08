@@ -9,7 +9,6 @@ import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.{ActorRef, ActorSystem}
 import com.typesafe.config.ConfigFactory
 import csw.common.FrameworkAssertions._
-import csw.common.components.framework.TopLevelActorStatistics
 import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState}
 import csw.messages.ContainerCommonMessage.GetComponents
@@ -142,7 +141,7 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       val eatonCompStateProbe    = TestProbe[CurrentState]
 
       etonSupervisorTypedRef ! ComponentStateSubscription(Subscribe(eatonCompStateProbe.ref))
-      etonSupervisorTypedRef ! TopLevelActorStatistics(1)
+//      etonSupervisorTypedRef ! TopLevelActorStatistics(1)
 
       import csw.common.components.framework.SampleComponentState._
       eatonCompStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(domainChoice))))

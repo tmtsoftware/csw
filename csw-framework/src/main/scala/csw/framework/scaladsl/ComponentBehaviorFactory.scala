@@ -3,7 +3,6 @@ package csw.framework.scaladsl
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
 import csw.framework.internal.component.ComponentBehavior
-import csw.messages.RunningMessage.DomainMessage
 import csw.messages.framework.ComponentInfo
 import csw.messages.models.PubSub.PublisherMessage
 import csw.messages.params.states.CurrentState
@@ -11,13 +10,10 @@ import csw.messages.{CommandResponseManagerMessage, FromComponentLifecycleMessag
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
 
-import scala.reflect.ClassTag
-
 /**
  * Base class for the factory for creating the behavior representing a component actor
- * @tparam Msg  The type of messages created for domain specific message hierarchy of the component
  */
-abstract class ComponentBehaviorFactory[Msg <: DomainMessage: ClassTag] {
+abstract class ComponentBehaviorFactory {
 
   /**
    * Implement this method for providing the component handlers to be used by component actor
@@ -35,7 +31,7 @@ abstract class ComponentBehaviorFactory[Msg <: DomainMessage: ClassTag] {
       pubSubRef: ActorRef[PublisherMessage[CurrentState]],
       locationService: LocationService,
       loggerFactory: LoggerFactory
-  ): ComponentHandlers[Msg]
+  ): ComponentHandlers
 
   /**
    * Creates the [[akka.typed.scaladsl.Actor.MutableBehavior]] of the component
@@ -57,7 +53,7 @@ abstract class ComponentBehaviorFactory[Msg <: DomainMessage: ClassTag] {
     Actor
       .mutable[TopLevelActorMessage](
         ctx ⇒
-          new ComponentBehavior[Msg](
+          new ComponentBehavior(
             ctx,
             componentInfo,
             supervisor,

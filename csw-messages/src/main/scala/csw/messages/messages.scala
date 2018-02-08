@@ -46,7 +46,6 @@ object SupervisorLockMessage {
 sealed trait RunningMessage extends TopLevelActorMessage with SupervisorRunningMessage
 object RunningMessage {
   case class Lifecycle(message: ToComponentLifecycleMessage) extends RunningMessage with ContainerExternalMessage
-  trait DomainMessage                                        extends RunningMessage with SupervisorLockMessage
 }
 
 sealed trait CommonMessage extends ComponentCommonMessage with ContainerCommonMessage

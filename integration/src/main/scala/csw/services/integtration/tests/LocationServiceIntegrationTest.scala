@@ -1,19 +1,25 @@
 package csw.services.integtration.tests
 
-import akka.actor.{ActorSystem, Props}
+import akka.actor.{ActorSystem, Props, Scheduler}
 import akka.testkit.{ImplicitSender, TestKit}
+import akka.typed
 import akka.typed.Behavior
 import akka.typed.scaladsl.adapter._
+import akka.util.Timeout
+import csw.messages.ccs.commands.{CommandName, Setup}
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
 import csw.messages.location.{AkkaLocation, ComponentId, ComponentType, HttpLocation}
 import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
+import csw.messages.params.models.Prefix
 import csw.services.integtration.apps.TromboneHCD
-import csw.services.integtration.apps.TromboneHCD.Unregister
 import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.exceptions.OtherLocationIsRegistered
 import csw.services.location.models._
-import csw.services.location.scaladsl.LocationServiceFactory
+import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
+import csw.services.logging.internal.LogControlMessages
 import org.scalatest._
+
+import scala.concurrent.duration.DurationLong
 
 class LocationServiceIntegrationTest
     extends TestKit(ActorSystem("location-testkit"))
@@ -23,7 +29,11 @@ class LocationServiceIntegrationTest
     with BeforeAndAfter
     with BeforeAndAfterAll {
 
-  val locationService = LocationServiceFactory.make()
+  val locationService: LocationService                 = LocationServiceFactory.make()
+  val actorSystem                                      = ActorSystem("test")
+  implicit val typedSystem: typed.ActorSystem[Nothing] = actorSystem.toTyped
+  implicit val sched: Scheduler                        = actorSystem.scheduler
+  implicit val timeout: Timeout                        = Timeout(5.seconds)
 
   override protected def afterAll(): Unit = {
     locationService.shutdown(TestFinishedReason)
@@ -31,10 +41,10 @@ class LocationServiceIntegrationTest
   }
 
   test("should not allow duplicate akka registration") {
-    val tromboneHcdActorRef = system.actorOf(Props[TromboneHCD], "trombone-hcd")
-    val logAdminActorRef    = system.spawn(Behavior.empty, "trombone-admin")
-    val componentId         = ComponentId("trombonehcd", ComponentType.HCD)
-    val connection          = AkkaConnection(componentId)
+    val tromboneHcdActorRef                                  = system.actorOf(Props[TromboneHCD], "trombone-hcd")
+    val logAdminActorRef: typed.ActorRef[LogControlMessages] = system.spawn(Behavior.empty, "trombone-admin")
+    val componentId                                          = ComponentId("trombonehcd", ComponentType.HCD)
+    val connection                                           = AkkaConnection(componentId)
 
     val registration = AkkaRegistration(connection, Some("nfiraos.ncc.trombone"), tromboneHcdActorRef, logAdminActorRef)
     Thread.sleep(4000)
@@ -53,8 +63,7 @@ class LocationServiceIntegrationTest
 
     val hcdAkkaLocation = hcdLocation.asInstanceOf[AkkaLocation]
 
-    hcdAkkaLocation.component.value ! Unregister()
-
+    hcdAkkaLocation.component.submit(Setup(Prefix("wfos.prog.cloudcover"), CommandName("Unregister"), None))
     Thread.sleep(3000)
 
     locationService.list.await should have size 1

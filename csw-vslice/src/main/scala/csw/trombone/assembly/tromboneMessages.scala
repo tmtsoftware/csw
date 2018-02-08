@@ -3,7 +3,6 @@ package csw.trombone.assembly
 import akka.typed.ActorRef
 import csw.messages.CommandMessage
 import csw.messages.CommandMessage.Submit
-import csw.messages.RunningMessage.DomainMessage
 import csw.messages.ccs.commands.{CommandResponse, ComponentRef}
 import csw.messages.ccs.events.EventTime
 import csw.messages.location.Connection
@@ -69,7 +68,7 @@ object TromboneControlMsg {
 
 /////////////////////
 
-sealed trait DiagPublisherMessages extends DomainMessage
+sealed trait DiagPublisherMessages
 object DiagPublisherMessages {
   final case class TimeForAxisStats(periodInseconds: Int)           extends DiagPublisherMessages
   final case object DiagnosticState                                 extends DiagPublisherMessages
