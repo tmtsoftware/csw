@@ -3,7 +3,6 @@ package csw.services.ccs.perf.component
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.messages.RunningMessage.DomainMessage
 import csw.messages.ccs.commands.CommandResponse.Completed
 import csw.messages.ccs.commands._
 import csw.messages.framework.ComponentInfo
@@ -24,7 +23,7 @@ class ActionLessHandlers(
     pubSubRef: ActorRef[PublisherMessage[CurrentState]],
     locationService: LocationService,
     loggerFactory: LoggerFactory
-) extends ComponentHandlers[DomainMessage](
+) extends ComponentHandlers(
       ctx,
       componentInfo,
       commandResponseManager,
@@ -38,8 +37,6 @@ class ActionLessHandlers(
   override def initialize(): Future[Unit] = Future.successful(Unit)
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = ???
-
-  override def onDomainMsg(msg: DomainMessage): Unit = ???
 
   override def validateCommand(controlCommand: ControlCommand): CommandResponse = Completed(Id())
 

@@ -16,6 +16,7 @@ import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
 
 import scala.concurrent.Future
+import scala.concurrent.duration.DurationLong
 
 class McsHcdComponentHandlers(
     ctx: ActorContext[TopLevelActorMessage],
@@ -49,11 +50,11 @@ class McsHcdComponentHandlers(
   override def onSubmit(controlCommand: ControlCommand): Unit = {
     controlCommand.commandName match {
       case `longRunning` ⇒
-        Thread.sleep(5000); commandResponseManager ! AddOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId))
+        ctx.schedule(5.seconds, commandResponseManager, AddOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId)))
       case `mediumRunning` ⇒
-        Thread.sleep(3000); commandResponseManager ! AddOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId))
+        ctx.schedule(3.seconds, commandResponseManager, AddOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId)))
       case `shortRunning` ⇒
-        Thread.sleep(1000); commandResponseManager ! AddOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId))
+        ctx.schedule(1.seconds, commandResponseManager, AddOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId)))
       case _ ⇒
     }
   }

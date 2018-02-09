@@ -9,10 +9,13 @@ import csw.apps.clusterseed.admin.internal.AdminWiring
 import csw.apps.clusterseed.components.StartLogging
 import csw.common.FrameworkAssertions.assertThatContainerIsRunning
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
+import csw.messages.CommandMessage.Oneway
 import csw.messages.ContainerCommonMessage.GetComponents
 import csw.messages.ContainerMessage
+import csw.messages.ccs.commands.{CommandName, CommandResponse, Setup}
 import csw.messages.framework.ContainerLifecycleState
 import csw.messages.models.{Component, Components}
+import csw.messages.params.models.Prefix
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.logging.scaladsl.{LoggerFactory, LoggingSystemFactory}
 
@@ -52,6 +55,10 @@ object DemoApp extends App {
   implicit val typedSystem: ActorSystem[Nothing] = frameworkWiring.actorSystem.toTyped
   implicit val testKitSettings: TestKitSettings  = TestKitSettings(typedSystem)
 
+  private val cmdResponseProbe = TestProbe[CommandResponse]
+  private val startLoggingCmd  = CommandName("StartLogging")
+  private val prefix           = Prefix("iris.command")
+
   private def startSeed() = {
     LoggingSystemFactory.start("logging", "version", ClusterAwareSettings.hostname, adminWiring.actorSystem)
     adminWiring.locationService
@@ -80,7 +87,7 @@ object DemoApp extends App {
 
   while (true) {
     println("------------------------------------")
-    laserComponent.supervisor ! StartLogging()
+    laserComponent.supervisor ! Oneway(Setup(prefix, startLoggingCmd, None), cmdResponseProbe.ref)
     println("------------------------------------")
     Thread.sleep(1000)
   }

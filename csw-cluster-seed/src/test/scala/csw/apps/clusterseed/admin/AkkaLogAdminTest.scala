@@ -10,17 +10,19 @@ import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.{ActorRef, ActorSystem}
 import com.typesafe.config.ConfigFactory
 import csw.apps.clusterseed.admin.http.HttpSupport
-import csw.apps.clusterseed.components.StartLogging
 import csw.apps.clusterseed.utils.AdminLogTestSuite
 import csw.common.FrameworkAssertions.assertThatContainerIsRunning
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
+import csw.messages.CommandMessage.Oneway
 import csw.messages.ContainerCommonMessage.GetComponents
 import csw.messages.ContainerMessage
+import csw.messages.ccs.commands.{CommandName, CommandResponse, Setup}
 import csw.messages.framework.ContainerLifecycleState
 import csw.messages.location.ComponentId
 import csw.messages.location.ComponentType.{Assembly, HCD}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.models.{Component, Components}
+import csw.messages.params.models.Prefix
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.logging.internal.LoggingLevels.{ERROR, Level, WARN}
 import csw.services.logging.internal._
@@ -45,6 +47,9 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
 
   private var laserComponent: Component = _
   private var galilComponent: Component = _
+  private val probe                     = TestProbe[CommandResponse]
+  private val startLoggingCmd           = CommandName("StartLogging")
+  private val prefix                    = Prefix("iris.command")
 
   override protected def beforeAll(): Unit = {
     super.beforeAll()
@@ -129,8 +134,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
   // DEOPSCSW-127: Runtime update for logging characteristics
   // DEOPSCSW-168: Actors can receive and handle runtime update for logging characteristics
   test("should able to set log level of the component dynamically through http end point") {
-
-    laserComponent.supervisor ! StartLogging()
+    laserComponent.supervisor ! Oneway(Setup(prefix, startLoggingCmd, None), probe.ref)
     Thread.sleep(100)
 
     // default logging level for Laser component is info
@@ -163,8 +167,9 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
     // laser and galil components, start logging messages at all log levels
     // and expected is that, laser component logs messages at and above Error level
     // and galil component  still logs messages at and above Info level
-    laserComponent.supervisor ! StartLogging()
-    galilComponent.supervisor ! StartLogging()
+
+    laserComponent.supervisor ! Oneway(Setup(prefix, startLoggingCmd, None), probe.ref)
+    galilComponent.supervisor ! Oneway(Setup(prefix, startLoggingCmd, None), probe.ref)
     Thread.sleep(100)
 
     val groupByAfterFilter       = logBuffer.groupBy(json ⇒ json("@componentName").toString)

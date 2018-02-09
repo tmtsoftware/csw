@@ -141,10 +141,8 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       val eatonCompStateProbe    = TestProbe[CurrentState]
 
       etonSupervisorTypedRef ! ComponentStateSubscription(Subscribe(eatonCompStateProbe.ref))
-//      etonSupervisorTypedRef ! TopLevelActorStatistics(1)
 
       import csw.common.components.framework.SampleComponentState._
-      eatonCompStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(domainChoice))))
 
       val obsId: ObsId          = ObsId("Obs001")
       val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(22)

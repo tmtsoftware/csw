@@ -3,7 +3,6 @@ package csw.apps.clusterseed.components
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.messages.RunningMessage.DomainMessage
 import csw.messages._
 import csw.messages.ccs.commands.CommandResponse.Accepted
 import csw.messages.ccs.commands.{CommandResponse, ControlCommand}
@@ -16,7 +15,7 @@ import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
 import scala.concurrent.Future
 
-case class StartLogging() extends DomainMessage
+case class StartLogging()
 
 class GalilComponentHandlers(
     ctx: ActorContext[TopLevelActorMessage],
@@ -25,14 +24,14 @@ class GalilComponentHandlers(
     pubSubRef: ActorRef[PublisherMessage[CurrentState]],
     locationService: LocationService,
     loggerFactory: LoggerFactory
-) extends ComponentHandlers[StartLogging](ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory) {
+) extends ComponentHandlers(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory) {
   val log: Logger = new LoggerFactory(componentInfo.name).getLogger
 
   override def initialize(): Future[Unit] = Future.successful(())
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = ()
 
-  override def onDomainMsg(msg: StartLogging): Unit = {
+  private def startLogging(): Unit = {
     log.trace("Level is trace")
     log.debug("Level is debug")
     log.info("Level is info")
@@ -45,7 +44,8 @@ class GalilComponentHandlers(
 
   override def onSubmit(controlCommand: ControlCommand): Unit = ()
 
-  override def onOneway(controlCommand: ControlCommand): Unit = ()
+  override def onOneway(controlCommand: ControlCommand): Unit =
+    if (controlCommand.commandName.name == "StartLogging") startLogging()
 
   override def onShutdown(): Future[Unit] = Future.successful(())
 
