@@ -8,6 +8,7 @@ import csw.messages.params.generics.KeyType.{DoubleMatrixKey, RaDecKey}
 import csw.messages.params.generics.{Key, KeyType, Parameter}
 import csw.messages.params.models.Units.arcmin
 import csw.messages.params.models._
+import csw_protobuf.events.PbEvent
 import org.scalatest.{FunSpec, Matchers}
 
 class EventsTest extends FunSpec with Matchers {
@@ -276,9 +277,9 @@ class EventsTest extends FunSpec with Matchers {
         SystemEvent(prefix, name).add(param)
 
       //convert events to protobuf bytestring
-      val byteArray2: Array[Byte] = observeEvent.toPb
-      val byteArray3: Array[Byte] = systemEvent1.toPb
-      val byteArray4: Array[Byte] = systemEvent2.toPb
+      val byteArray2: PbEvent = observeEvent.toPb
+      val byteArray3: PbEvent = systemEvent1.toPb
+      val byteArray4: PbEvent = systemEvent2.toPb
 
       //convert protobuf bytestring to events
       val pbObserveEvent: ObserveEvent = ObserveEvent.fromPb(byteArray2)
