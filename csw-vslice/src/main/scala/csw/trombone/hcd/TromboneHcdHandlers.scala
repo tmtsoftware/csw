@@ -4,6 +4,8 @@ import akka.actor.Scheduler
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.AskPattern.Askable
+import akka.typed.testkit.TestKitSettings
+import akka.typed.testkit.scaladsl.TestProbe
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
@@ -21,14 +23,13 @@ import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
 import csw.trombone.hcd.AxisRequests.{CancelMove, Datum, Home, Move, _}
 import csw.trombone.hcd.AxisResponse._
-import csw.trombone.hcd.TromboneEngineering.{GetAxisConfig, GetAxisStats, GetAxisUpdate, GetAxisUpdateNow}
 
 import scala.async.Async._
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
 //#component-factory
-class TromboneHcdBehaviorFactory extends ComponentBehaviorFactory[TromboneMessage] {
+class TromboneHcdBehaviorFactory extends ComponentBehaviorFactory {
   override def handlers(
       ctx: ActorContext[TopLevelActorMessage],
       componentInfo: ComponentInfo,
@@ -36,7 +37,7 @@ class TromboneHcdBehaviorFactory extends ComponentBehaviorFactory[TromboneMessag
       pubSubRef: ActorRef[PublisherMessage[CurrentState]],
       locationService: LocationService,
       loggerFactory: LoggerFactory
-  ): ComponentHandlers[TromboneMessage] =
+  ): ComponentHandlers =
     new TromboneHcdHandlers(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory)
 }
 //#component-factory
@@ -49,7 +50,7 @@ class TromboneHcdHandlers(
     pubSubRef: ActorRef[PublisherMessage[CurrentState]],
     locationService: LocationService,
     loggerFactory: LoggerFactory
-) extends ComponentHandlers[TromboneMessage](
+) extends ComponentHandlers(
       ctx,
       componentInfo,
       commandResponseManager,
@@ -75,7 +76,7 @@ class TromboneHcdHandlers(
     axisConfig = await(getAxisConfig)
 
     // create a worker actor which is used by this hcd
-    tromboneAxis = ctx.spawnAnonymous(AxisSimulator.behavior(axisConfig, ctx.self))
+    tromboneAxis = ctx.spawnAnonymous(AxisSimulator.behavior(axisConfig))
 
     // initialise some state by using the worker actor created above
     current = await(tromboneAxis ? InitialState)
@@ -104,15 +105,14 @@ class TromboneHcdHandlers(
     println(s"Trombone process received sc: $sc")
 
     sc.commandName match {
-      case `axisMoveCK` =>
-        tromboneAxis ! Move(sc(positionKey).head, diagFlag = true)
-      case `axisDatumCK` =>
-        println("Received Datum")
-        tromboneAxis ! Datum
-      case `axisHomeCK` =>
-        tromboneAxis ! Home
-      case `axisCancelCK` =>
-        tromboneAxis ! CancelMove
+      case `axisMoveCK`   => tromboneAxis ! Move(sc(positionKey).head, diagFlag = true)
+      case `axisDatumCK`  => println("Received Datum"); tromboneAxis ! Datum
+      case `axisHomeCK`   => tromboneAxis ! Home
+      case `axisCancelCK` => tromboneAxis ! CancelMove
+
+      case x @ (`getAxisConfigCK` | `getAxisUpdateCK` | `getAxisStatsCK`) => onEngMsg(x, None)
+      case x @ `getAxisUpdateNowCK`                                       => onEngMsg(x, Some(TestProbe[AxisUpdate]()(ctx.system, TestKitSettings(ctx.system)).ref))
+
       case x => println(s"Unknown config key $x")
     }
   }
@@ -140,27 +140,29 @@ class TromboneHcdHandlers(
   //#onOneway-handler
 
   def onDomainMsg(tromboneMsg: TromboneMessage): Unit = tromboneMsg match {
-    case x: TromboneEngineering => onEngMsg(x)
-    case x: AxisResponse        => onAxisResponse(x)
+//    case x: TromboneEngineering => onEngMsg(x)
+    case x: AxisResponse => onAxisResponse(x)
   }
 
-  private def onEngMsg(tromboneEngineering: TromboneEngineering): Unit = tromboneEngineering match {
-    case GetAxisStats              => tromboneAxis ! GetStatistics(ctx.self)
-    case GetAxisUpdate             => tromboneAxis ! PublishAxisUpdate
-    case GetAxisUpdateNow(replyTo) => replyTo ! current
-    case GetAxisConfig =>
-      import csw.trombone.hcd.TromboneHcdState._
-      val axisConfigState = defaultConfigState.madd(
-        lowLimitKey    -> axisConfig.lowLimit,
-        lowUserKey     -> axisConfig.lowUser,
-        highUserKey    -> axisConfig.highUser,
-        highLimitKey   -> axisConfig.highLimit,
-        homeValueKey   -> axisConfig.home,
-        startValueKey  -> axisConfig.startPosition,
-        stepDelayMSKey -> axisConfig.stepDelayMS
-      )
-      pubSubRef ! PubSub.Publish(axisConfigState)
-  }
+  private def onEngMsg(tromboneEngineeringCK: CommandName, replyTo: Option[ActorRef[AxisUpdate]]): Unit =
+    tromboneEngineeringCK match {
+      case getAxisStatsCK =>
+        tromboneAxis ! GetStatistics(TestProbe[AxisStatistics]()(ctx.system, TestKitSettings(ctx.system)).ref)
+      case getAxisUpdateCK    => tromboneAxis ! PublishAxisUpdate
+      case getAxisUpdateNowCK => replyTo.foreach(_ ! current)
+      case getAxisConfigCK =>
+        import csw.trombone.hcd.TromboneHcdState._
+        val axisConfigState = defaultConfigState.madd(
+          lowLimitKey    -> axisConfig.lowLimit,
+          lowUserKey     -> axisConfig.lowUser,
+          highUserKey    -> axisConfig.highUser,
+          highLimitKey   -> axisConfig.highLimit,
+          homeValueKey   -> axisConfig.home,
+          startValueKey  -> axisConfig.startPosition,
+          stepDelayMSKey -> axisConfig.stepDelayMS
+        )
+        pubSubRef ! PubSub.Publish(axisConfigState)
+    }
 
   private def onAxisResponse(axisResponse: AxisResponse): Unit = axisResponse match {
     case AxisStarted          =>

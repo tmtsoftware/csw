@@ -7,6 +7,8 @@ import akka.stream.{ActorMaterializer, Materializer}
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.adapter._
+import akka.typed.testkit.TestKitSettings
+import akka.typed.testkit.scaladsl.TestProbe
 import com.typesafe.config.ConfigFactory
 import csw.exceptions.{FailureRestart, FailureStop}
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
@@ -24,7 +26,6 @@ import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
 import csw.trombone.assembly.AssemblyCommandHandlerMsgs.CommandMessageE
 import csw.trombone.assembly.CommonMsgs.UpdateHcdLocations
-import csw.trombone.assembly.DiagPublisherMessages.{CommandResponseE, DiagnosticState, OperationsState}
 import csw.trombone.assembly.ParamValidation._
 import csw.trombone.assembly.actors.{DiagPublisher, TromboneAssemblyCommandBehaviorFactory, TrombonePublisher}
 
@@ -69,7 +70,9 @@ class TromboneAssemblyHandlers(
   private var commandHandler: ActorRef[AssemblyCommandHandlerMsgs] = _
   private var runningHcds: Map[Connection, Option[ComponentRef]]   = Map.empty
 
-  private val commandResponseAdapter: ActorRef[CommandResponse] = ctx.spawnAdapter()
+  implicit val typed                                            = ctx.system
+  implicit val settings                                         = TestKitSettings(typed)
+  private val commandResponseAdapter: ActorRef[CommandResponse] = TestProbe[CommandResponse].ref
 
   private val configClient = ConfigClientFactory.clientApi(ctx.system.toUntyped, locationService)
 
@@ -133,11 +136,6 @@ class TromboneAssemblyHandlers(
     // do something when going online
   }
   //#onGoOnline-handler
-
-  def onDomainMsg(mode: DiagPublisherMessages): Unit = mode match {
-    case (DiagnosticState | OperationsState) => diagPublisher ! mode
-    case _                                   ⇒
-  }
 
   // #validateCommand-handler
   override def validateCommand(controlCommand: ControlCommand): CommandResponse = controlCommand match {

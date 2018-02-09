@@ -6,16 +6,19 @@ import java.util.Optional
 import akka.actor.Cancellable
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
+import akka.typed.testkit.TestKitSettings
+import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.{ActorRef, Behavior}
-import csw.messages.ccs.commands.ComponentRef
+import csw.messages.CommandMessage.Oneway
+import csw.messages.ccs.commands.{CommandName, CommandResponse, ComponentRef, Setup}
 import csw.messages.models.PubSub
+import csw.messages.params.models.Prefix
 import csw.messages.params.states.CurrentState
 import csw.trombone.assembly.DiagPublisherMessages._
 import csw.trombone.assembly.TrombonePublisherMsg.{AxisStateUpdate, AxisStatsUpdate}
 import csw.trombone.assembly.actors.DiagPublisher.Mode.{Diagnostic, Operations}
 import csw.trombone.assembly.actors.DiagPublisher.{Mode, _}
 import csw.trombone.assembly.{AssemblyContext, DiagPublisherMessages, TrombonePublisherMsg}
-import csw.trombone.hcd.TromboneEngineering.GetAxisStats
 import csw.trombone.hcd.TromboneHcdState
 
 import scala.compat.java8.OptionConverters.RichOptionalGeneric
@@ -108,7 +111,10 @@ class DiagPublisher(
       publishStatsUpdate(cs)
 
     case TimeForAxisStats(periodInSeconds) =>
-      running.foreach(_.value ! GetAxisStats)
+      running.foreach(
+        _.value ! Oneway(Setup(Prefix(""), CommandName("GetAxisStats"), None),
+                         TestProbe[CommandResponse]()(ctx.system, TestKitSettings(ctx.system)).ref)
+      )
       val canceltoken: Cancellable =
         ctx.schedule(Instant.now().plusSeconds(periodInSeconds).toEpochMilli.millis, ctx.self, TimeForAxisStats(periodInSeconds))
       this.cancelToken = canceltoken

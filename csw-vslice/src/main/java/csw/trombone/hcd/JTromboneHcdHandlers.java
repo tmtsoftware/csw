@@ -29,7 +29,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 //#jcomponent-handlers-class
-public class JTromboneHcdHandlers extends JComponentHandlers<TromboneMessage> {
+public class JTromboneHcdHandlers extends JComponentHandlers {
 
     // private state of this component
     private ILogger log;
@@ -45,10 +45,9 @@ public class JTromboneHcdHandlers extends JComponentHandlers<TromboneMessage> {
             ActorRef<CommandResponseManagerMessage> commandResponseManager,
             ActorRef<PubSub.PublisherMessage<CurrentState>> pubSubRef,
             ILocationService locationService,
-            JLoggerFactory loggerFactory,
-            Class<TromboneMessage> klass
+            JLoggerFactory loggerFactory
     ) {
-        super(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory, klass);
+        super(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory);
         this.ctx = ctx;
         this.log = loggerFactory.getLogger(getClass());
     }
@@ -62,7 +61,7 @@ public class JTromboneHcdHandlers extends JComponentHandlers<TromboneMessage> {
                 .thenAccept(config -> {
                     axisConfig = config;
                     // create a worker actor which is used by this hcd
-                    tromboneAxis = ctx.spawnAnonymous(AxisSimulator.behavior(axisConfig, ctx.getSelf().narrow()));
+                    tromboneAxis = ctx.spawnAnonymous(AxisSimulator.behavior(axisConfig));
                 });
 
         // initialise some state by using the worker actor created above
@@ -101,11 +100,6 @@ public class JTromboneHcdHandlers extends JComponentHandlers<TromboneMessage> {
         }
     }
     //#onLocationTrackingEvent-handler
-
-    @Override
-    public void onDomainMsg(TromboneMessage tromboneMessage) {
-
-    }
 
     // #validateCommand-handler
     @Override

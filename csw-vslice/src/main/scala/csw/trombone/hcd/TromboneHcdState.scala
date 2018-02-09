@@ -80,8 +80,12 @@ object TromboneHcdState {
     axisNameKey -> tromboneAxisName
   )
 
-  val axisMoveCK: CommandName = CommandName("move")
-  val sourcePrefix            = Prefix("sourcePrefix")
+  val axisMoveCK: CommandName         = CommandName("move")
+  val getAxisStatsCK: CommandName     = CommandName("GetAxisStats")
+  val getAxisUpdateCK: CommandName    = CommandName("GetAxisUpdate")
+  val getAxisUpdateNowCK: CommandName = CommandName("GetAxisUpdateNow")
+  val getAxisConfigCK: CommandName    = CommandName("GetAxisConfig")
+  val sourcePrefix                    = Prefix("sourcePrefix")
 
   def positionSC(runId: Id, obsId: ObsId, value: Int): Setup =
     Setup(sourcePrefix, axisMoveCK, Some(obsId)).add(positionKey -> value withUnits encoder)

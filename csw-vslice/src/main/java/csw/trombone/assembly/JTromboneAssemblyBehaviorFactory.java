@@ -13,14 +13,10 @@ import csw.services.location.javadsl.ILocationService;
 import csw.services.logging.javadsl.JLoggerFactory;
 
 //#jcomponent-factory
-public class JTromboneAssemblyBehaviorFactory extends JComponentBehaviorFactory<DiagPublisherMessages> {
-
-    public JTromboneAssemblyBehaviorFactory() {
-        super(DiagPublisherMessages.class);
-    }
+public class JTromboneAssemblyBehaviorFactory extends JComponentBehaviorFactory {
 
     @Override
-    public JComponentHandlers<DiagPublisherMessages> jHandlers(
+    public JComponentHandlers jHandlers(
             ActorContext<TopLevelActorMessage> ctx,
             ComponentInfo componentInfo,
             ActorRef<CommandResponseManagerMessage> commandResponseManager,
@@ -28,7 +24,7 @@ public class JTromboneAssemblyBehaviorFactory extends JComponentBehaviorFactory<
             ILocationService locationService,
             JLoggerFactory loggerFactory
     ) {
-        return new JTromboneAssemblyHandlers(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory, DiagPublisherMessages.class);
+        return new JTromboneAssemblyHandlers(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory);
     }
 }
 //#jcomponent-factory

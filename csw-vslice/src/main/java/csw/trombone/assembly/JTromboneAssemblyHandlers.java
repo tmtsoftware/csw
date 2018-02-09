@@ -6,6 +6,8 @@ import akka.stream.Materializer;
 import akka.typed.ActorRef;
 import akka.typed.javadsl.ActorContext;
 import akka.typed.javadsl.Adapter;
+import akka.typed.testkit.TestKitSettings;
+import akka.typed.testkit.javadsl.TestProbe;
 import com.typesafe.config.ConfigFactory;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.messages.CommandResponseManagerMessage;
@@ -39,7 +41,7 @@ import static csw.messages.CommandMessage.Submit;
 import static csw.trombone.assembly.AssemblyCommandHandlerMsgs.CommandMessageE;
 
 //#jcomponent-handlers-class
-public class JTromboneAssemblyHandlers extends JComponentHandlers<DiagPublisherMessages> {
+public class JTromboneAssemblyHandlers extends JComponentHandlers {
 
     // private state of this component
     private AssemblyContext ac;
@@ -60,16 +62,15 @@ public class JTromboneAssemblyHandlers extends JComponentHandlers<DiagPublisherM
             ActorRef<CommandResponseManagerMessage> commandResponseManager,
             ActorRef<PubSub.PublisherMessage<CurrentState>> pubSubRef,
             ILocationService locationService,
-            JLoggerFactory loggerFactory,
-            Class<DiagPublisherMessages> klass
+            JLoggerFactory loggerFactory
 
     ) {
-        super(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory, klass);
+        super(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory);
         this.componentInfo = componentInfo;
         this.ctx = ctx;
         this.locationService = locationService;
         runningHcds = new HashMap<>();
-        commandResponseAdapter = ctx.spawnAdapter(DiagPublisherMessages.CommandResponseE::new);
+        commandResponseAdapter = new TestProbe<CommandResponse>(ctx.getSystem(), TestKitSettings.apply(ctx.getSystem())).ref();
         actorSystem = Adapter.toUntyped(ctx.getSystem());
         mat = ActorMaterializer.create(actorSystem);
         configClient = JConfigClientFactory.clientApi(actorSystem, locationService);
@@ -127,11 +128,6 @@ public class JTromboneAssemblyHandlers extends JComponentHandlers<DiagPublisherM
         }
     }
     //#onLocationTrackingEvent-handler
-
-    @Override
-    public void onDomainMsg(DiagPublisherMessages diagPublisherMessages) {
-
-    }
 
     // #validateCommand-handler
     @Override

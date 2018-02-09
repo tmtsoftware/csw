@@ -13,14 +13,10 @@ import csw.services.location.javadsl.ILocationService;
 import csw.services.logging.javadsl.JLoggerFactory;
 
 //#jcomponent-factory
-public class JTromboneHcdBehaviorFactory extends JComponentBehaviorFactory<TromboneMessage> {
-
-    public JTromboneHcdBehaviorFactory() {
-        super(TromboneMessage.class);
-    }
+public class JTromboneHcdBehaviorFactory extends JComponentBehaviorFactory {
 
     @Override
-    public JComponentHandlers<TromboneMessage> jHandlers(
+    public JComponentHandlers jHandlers(
             ActorContext<TopLevelActorMessage> ctx,
             ComponentInfo componentInfo,
             ActorRef<CommandResponseManagerMessage> commandResponseManager,
