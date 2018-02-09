@@ -52,7 +52,7 @@ class McsAssemblyComponentHandlers(
     componentInfo.connections.headOption match {
       case Some(hcd) ⇒
         locationService.resolve(hcd.of[AkkaLocation], 5.seconds).map {
-          case Some(akkaLocation) ⇒ hcdComponent = akkaLocation.component
+          case Some(akkaLocation) ⇒ hcdComponent = new ComponentRef(akkaLocation)(ctx.system)
           case None               ⇒ throw new RuntimeException("Could not resolve hcd location, Initialization failure.")
         }
       case None ⇒ Future.successful(Unit)

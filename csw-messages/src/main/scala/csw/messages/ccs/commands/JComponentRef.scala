@@ -4,12 +4,13 @@ import java.util.concurrent.CompletableFuture
 
 import akka.NotUsed
 import akka.actor.Scheduler
-import akka.stream.Materializer
 import akka.stream.javadsl.Source
-import akka.typed.ActorRef
+import akka.stream.{ActorMaterializer, Materializer}
+import akka.typed.ActorSystem
+import akka.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.util.Timeout
-import csw.messages.ComponentMessage
 import csw.messages.ccs.commands.matchers.StateMatcher
+import csw.messages.location.AkkaLocation
 import csw.messages.params.models.Id
 
 import scala.collection.JavaConverters.iterableAsScalaIterableConverter
@@ -19,8 +20,13 @@ import scala.concurrent.ExecutionContext
 /**
  * Java API for [[csw.messages.ccs.commands.ComponentRef]]
  */
-case class JComponentRef(value: ActorRef[ComponentMessage]) {
-  private val componentRef = ComponentRef(value)
+class JComponentRef(akkaLocation: AkkaLocation, actorSystem: ActorSystem[_]) {
+
+  implicit val ec: ExecutionContext = actorSystem.executionContext
+  implicit val mat: Materializer    = ActorMaterializer()(actorSystem.toUntyped)
+  implicit val scheduler: Scheduler = actorSystem.scheduler
+
+  val sComponentRef: ComponentRef = new ComponentRef(akkaLocation)(actorSystem)
 
   /**
    * Submit a command and get a [[csw.messages.ccs.commands.CommandResponse]] as a Future. The CommandResponse can be a response
@@ -29,8 +35,8 @@ case class JComponentRef(value: ActorRef[ComponentMessage]) {
    * @param controlCommand the [[csw.messages.ccs.commands.ControlCommand]] payload
    * @return a CommandResponse as a CompletableFuture
    */
-  def submit(controlCommand: ControlCommand, timeout: Timeout, scheduler: Scheduler): CompletableFuture[CommandResponse] =
-    componentRef.submit(controlCommand)(timeout, scheduler).toJava.toCompletableFuture
+  def submit(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[CommandResponse] =
+    sComponentRef.submit(controlCommand)(timeout).toJava.toCompletableFuture
 
   /**
    * Submit multiple commands and get a Source of [[csw.messages.ccs.commands.CommandResponse]] for all commands. The CommandResponse can be a response
@@ -38,10 +44,8 @@ case class JComponentRef(value: ActorRef[ComponentMessage]) {
    * @param controlCommands the set of [[csw.messages.ccs.commands.ControlCommand]] payloads
    * @return a Source of CommandResponse as a stream of CommandResponses for all commands
    */
-  def submitAll(controlCommands: java.util.Set[ControlCommand],
-                timeout: Timeout,
-                scheduler: Scheduler): Source[CommandResponse, NotUsed] =
-    componentRef.submitAll(controlCommands.asScala.toSet)(timeout, scheduler).asJava
+  def submitAll(controlCommands: java.util.Set[ControlCommand], timeout: Timeout): Source[CommandResponse, NotUsed] =
+    sComponentRef.submitAll(controlCommands.asScala.toSet)(timeout).asJava
 
   /**
    * Submit multiple commands and get one CommandResponse as a Future of [[csw.messages.ccs.commands.CommandResponse]] for all commands. If all the commands were successful,
@@ -52,12 +56,9 @@ case class JComponentRef(value: ActorRef[ComponentMessage]) {
    */
   def submitAllAndGetResponse(
       controlCommands: java.util.Set[ControlCommand],
-      timeout: Timeout,
-      scheduler: Scheduler,
-      ec: ExecutionContext,
-      mat: Materializer
+      timeout: Timeout
   ): CompletableFuture[CommandResponse] =
-    componentRef.submitAllAndGetResponse(controlCommands.asScala.toSet)(timeout, scheduler, ec, mat).toJava.toCompletableFuture
+    sComponentRef.submitAllAndGetResponse(controlCommands.asScala.toSet)(timeout).toJava.toCompletableFuture
 
   /**
    * Send a command as a Oneway and get a [[csw.messages.ccs.commands.CommandResponse]] as a Future. The CommandResponse can be a response
@@ -65,37 +66,32 @@ case class JComponentRef(value: ActorRef[ComponentMessage]) {
    * @param controlCommand the [[csw.messages.ccs.commands.ControlCommand]] payload
    * @return a CommandResponse as a CompletableFuture
    */
-  def oneway(controlCommand: ControlCommand, timeout: Timeout, scheduler: Scheduler): CompletableFuture[CommandResponse] =
-    componentRef.submit(controlCommand)(timeout, scheduler).toJava.toCompletableFuture
+  def oneway(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[CommandResponse] =
+    sComponentRef.submit(controlCommand)(timeout).toJava.toCompletableFuture
 
   /**
    * Subscribe for the result of a long running command which was sent as Submit to get a [[csw.messages.ccs.commands.CommandResponse]] as a Future.
    * @param commandRunId the runId of the command for which response is required
    * @return a CommandResponse as a CompletableFuture
    */
-  def subscribe(commandRunId: Id, timeout: Timeout, scheduler: Scheduler): CompletableFuture[CommandResponse] =
-    componentRef.subscribe(commandRunId)(timeout, scheduler).toJava.toCompletableFuture
+  def subscribe(commandRunId: Id, timeout: Timeout): CompletableFuture[CommandResponse] =
+    sComponentRef.subscribe(commandRunId)(timeout).toJava.toCompletableFuture
 
   /**
    * Query for the result of a long running command which was sent as Submit to get a [[csw.messages.ccs.commands.CommandResponse]] as a Future.
    * @param commandRunId the runId of the command for which response is required
    * @return a CommandResponse as a CompletableFuture
    */
-  def query(commandRunId: Id, timeout: Timeout, scheduler: Scheduler): CompletableFuture[CommandResponse] =
-    componentRef.query(commandRunId)(timeout, scheduler).toJava.toCompletableFuture
+  def query(commandRunId: Id, timeout: Timeout): CompletableFuture[CommandResponse] =
+    sComponentRef.query(commandRunId)(timeout).toJava.toCompletableFuture
 
   /**
    * Submit a command and Subscribe for the result if it was successfully validated as `Accepted` to get a final [[csw.messages.ccs.commands.CommandResponse]] as a Future.
    * @param controlCommand the [[csw.messages.ccs.commands.ControlCommand]] payload.
    * @return a CommandResponse as a CompletableFuture
    */
-  def submitAndSubscribe(
-      controlCommand: ControlCommand,
-      timeout: Timeout,
-      scheduler: Scheduler,
-      ec: ExecutionContext
-  ): CompletableFuture[CommandResponse] =
-    componentRef.submitAndSubscribe(controlCommand)(timeout, scheduler, ec).toJava.toCompletableFuture
+  def submitAndSubscribe(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[CommandResponse] =
+    sComponentRef.submitAndSubscribe(controlCommand)(timeout).toJava.toCompletableFuture
 
   /**
    * Submit a command and match the published state from the component using a [[csw.messages.ccs.commands.matchers.StateMatcher]]. If the match is successful a `Completed` response is
@@ -107,12 +103,9 @@ case class JComponentRef(value: ActorRef[ComponentMessage]) {
   def onewayAndMatch(
       controlCommand: ControlCommand,
       stateMatcher: StateMatcher,
-      timeout: Timeout,
-      scheduler: Scheduler,
-      ec: ExecutionContext,
-      mat: Materializer
+      timeout: Timeout
   ): CompletableFuture[CommandResponse] =
-    componentRef.onewayAndMatch(controlCommand, stateMatcher)(timeout, scheduler, ec, mat).toJava.toCompletableFuture
+    sComponentRef.onewayAndMatch(controlCommand, stateMatcher)(timeout).toJava.toCompletableFuture
 
   /**
    * Submit multiple commands and get final CommandResponse for all as a stream of CommandResponse. For long running commands, it will subscribe for the
@@ -120,13 +113,8 @@ case class JComponentRef(value: ActorRef[ComponentMessage]) {
    * @param controlCommands the [[csw.messages.ccs.commands.ControlCommand]] payload.
    * @return a Source of CommandResponse as a stream of CommandResponses for all commands
    */
-  def submitAllAndSubscribe(
-      controlCommands: java.util.Set[ControlCommand],
-      timeout: Timeout,
-      scheduler: Scheduler,
-      ec: ExecutionContext
-  ): Source[CommandResponse, NotUsed] =
-    componentRef.submitAllAndSubscribe(controlCommands.asScala.toSet)(timeout, scheduler, ec).asJava
+  def submitAllAndSubscribe(controlCommands: java.util.Set[ControlCommand], timeout: Timeout): Source[CommandResponse, NotUsed] =
+    sComponentRef.submitAllAndSubscribe(controlCommands.asScala.toSet)(timeout).asJava
 
   /**
    * Submit multiple commands and get final CommandResponse for all as one CommandResponse. If all the commands were successful, a CommandResponse as
@@ -137,13 +125,10 @@ case class JComponentRef(value: ActorRef[ComponentMessage]) {
    */
   def submitAllAndGetFinalResponse(
       controlCommands: java.util.Set[ControlCommand],
-      timeout: Timeout,
-      scheduler: Scheduler,
-      ec: ExecutionContext,
-      mat: Materializer
+      timeout: Timeout
   ): CompletableFuture[CommandResponse] =
-    componentRef
-      .submitAllAndGetFinalResponse(controlCommands.asScala.toSet)(timeout, scheduler, ec, mat)
+    sComponentRef
+      .submitAllAndGetFinalResponse(controlCommands.asScala.toSet)(timeout)
       .toJava
       .toCompletableFuture
 }

@@ -11,6 +11,7 @@ import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.{ActorRef, Behavior}
 import csw.messages.CommandMessage.Oneway
 import csw.messages.ccs.commands.{CommandName, CommandResponse, ComponentRef, Setup}
+import csw.messages.ccs.commands.{ComponentRef, JComponentRef}
 import csw.messages.models.PubSub
 import csw.messages.params.models.Prefix
 import csw.messages.params.states.CurrentState
@@ -35,10 +36,12 @@ object DiagPublisher {
 
   def jMake(
       assemblyContext: AssemblyContext,
-      runningIn: Optional[ComponentRef],
+      runningIn: Optional[JComponentRef],
       eventPublisher: Optional[ActorRef[TrombonePublisherMsg]]
   ): Behavior[DiagPublisherMessages] =
-    Actor.mutable(ctx ⇒ new DiagPublisher(ctx, assemblyContext, runningIn.asScala, eventPublisher.asScala))
+    Actor.mutable(
+      ctx ⇒ new DiagPublisher(ctx, assemblyContext, runningIn.map[ComponentRef](_.sComponentRef).asScala, eventPublisher.asScala)
+    )
 
   sealed trait Mode
   object Mode {
@@ -112,8 +115,8 @@ class DiagPublisher(
 
     case TimeForAxisStats(periodInSeconds) =>
       running.foreach(
-        _.value ! Oneway(Setup(Prefix(""), CommandName("GetAxisStats"), None),
-                         TestProbe[CommandResponse]()(ctx.system, TestKitSettings(ctx.system)).ref)
+        _.component ! Oneway(Setup(Prefix(""), CommandName("GetAxisStats"), None),
+                             TestProbe[CommandResponse]()(ctx.system, TestKitSettings(ctx.system)).ref)
       )
       val canceltoken: Cancellable =
         ctx.schedule(Instant.now().plusSeconds(periodInSeconds).toEpochMilli.millis, ctx.self, TimeForAxisStats(periodInSeconds))

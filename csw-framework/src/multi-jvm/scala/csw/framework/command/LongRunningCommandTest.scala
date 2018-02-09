@@ -14,7 +14,7 @@ import csw.messages.ComponentCommonMessage.ComponentStateSubscription
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Invalid}
 import csw.messages.ccs.commands.{CommandResponse, ComponentRef, Setup}
 import csw.messages.location.Connection.AkkaConnection
-import csw.messages.location.{ComponentId, ComponentType}
+import csw.messages.location.{AkkaLocation, ComponentId, ComponentType}
 import csw.messages.models.PubSub.Subscribe
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.CurrentState
@@ -55,11 +55,12 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
           AkkaConnection(ComponentId("Test_Component_Running_Long_Command", ComponentType.Assembly)),
           5.seconds
         )
-      val assemblyComponent: ComponentRef = Await.result(assemblyLocF, 5.seconds).map(_.component).get
+      val assemblyLocation: AkkaLocation = Await.result(assemblyLocF, 10.seconds).get
+      val assemblyComponent              = new ComponentRef(assemblyLocation)
 
       val setup = Setup(prefix, longRunning, Some(obsId))
       val probe = TestProbe[CurrentState]
-      assemblyComponent.value ! ComponentStateSubscription(Subscribe(probe.ref))
+      assemblyLocation.componentRef ! ComponentStateSubscription(Subscribe(probe.ref))
 
       // send submit with setup to assembly running in JVM-2
       // then assembly will split it into three sub commands [McsAssemblyComponentHandlers]
@@ -108,7 +109,8 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
           AkkaConnection(ComponentId("Test_Component_Running_Long_Command", ComponentType.HCD)),
           5.seconds
         )
-      val hcdComponent: ComponentRef = Await.result(hcdLocF, 5.seconds).map(_.component).get
+      val hcdLocation: AkkaLocation = Await.result(hcdLocF, 10.seconds).get
+      val hcdComponent              = new ComponentRef(hcdLocation)
 
       val setupAssembly1 = Setup(prefix, moveCmd, Some(obsId))
       val setupAssembly2 = Setup(prefix, initCmd, Some(obsId))

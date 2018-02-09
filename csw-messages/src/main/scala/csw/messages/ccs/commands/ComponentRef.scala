@@ -2,15 +2,17 @@ package csw.messages.ccs.commands
 
 import akka.NotUsed
 import akka.actor.Scheduler
-import akka.stream.Materializer
 import akka.stream.scaladsl.Source
-import akka.typed.ActorRef
+import akka.stream.{ActorMaterializer, Materializer}
 import akka.typed.scaladsl.AskPattern._
+import akka.typed.scaladsl.adapter._
+import akka.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Error}
 import csw.messages.ccs.commands.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
 import csw.messages.ccs.commands.matchers.{Matcher, StateMatcher}
+import csw.messages.location.AkkaLocation
 import csw.messages.params.models.Id
 import csw.messages.{CommandResponseManagerMessage, ComponentMessage}
 
@@ -18,9 +20,15 @@ import scala.concurrent.{ExecutionContext, Future}
 
 /**
  * A wrapper of an ActorRef of a csw component. This model provides method based APIs for command interactions with a component.
- * @param value ActorRef[ComponentMessage] of underlying component
+ * @param akkaLocation [[AkkaLocation]] of the component
  */
-case class ComponentRef(value: ActorRef[ComponentMessage]) {
+class ComponentRef(akkaLocation: AkkaLocation)(implicit val actorSystem: ActorSystem[_]) {
+
+  private implicit val ec: ExecutionContext = actorSystem.executionContext
+  private implicit val mat: Materializer    = ActorMaterializer()(actorSystem.toUntyped)
+  private implicit val scheduler: Scheduler = actorSystem.scheduler
+
+  val component: ActorRef[ComponentMessage] = akkaLocation.componentRef
 
   private val parallelism = 10
 
@@ -31,8 +39,8 @@ case class ComponentRef(value: ActorRef[ComponentMessage]) {
    * @param controlCommand the [[csw.messages.ccs.commands.ControlCommand]] payload
    * @return a CommandResponse as a Future value.
    */
-  def submit(controlCommand: ControlCommand)(implicit timeout: Timeout, scheduler: Scheduler): Future[CommandResponse] =
-    value ? (Submit(controlCommand, _))
+  def submit(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[CommandResponse] =
+    component ? (Submit(controlCommand, _))
 
   /**
    * Submit multiple commands and get a Source of [[csw.messages.ccs.commands.CommandResponse]] for all commands. The CommandResponse can be a response
@@ -42,7 +50,7 @@ case class ComponentRef(value: ActorRef[ComponentMessage]) {
    */
   def submitAll(
       controlCommands: Set[ControlCommand]
-  )(implicit timeout: Timeout, scheduler: Scheduler): Source[CommandResponse, NotUsed] = {
+  )(implicit timeout: Timeout): Source[CommandResponse, NotUsed] = {
     Source(controlCommands).mapAsyncUnordered(parallelism)(submit)
   }
 
@@ -55,7 +63,7 @@ case class ComponentRef(value: ActorRef[ComponentMessage]) {
    */
   def submitAllAndGetResponse(
       controlCommands: Set[ControlCommand]
-  )(implicit timeout: Timeout, scheduler: Scheduler, ec: ExecutionContext, mat: Materializer): Future[CommandResponse] = {
+  )(implicit timeout: Timeout): Future[CommandResponse] = {
     val value = Source(controlCommands).mapAsyncUnordered(parallelism)(submit)
     CommandResponse.aggregateResponse(value).map {
       case _: Completed  ⇒ CommandResponse.Accepted(Id())
@@ -69,24 +77,24 @@ case class ComponentRef(value: ActorRef[ComponentMessage]) {
    * @param controlCommand the [[csw.messages.ccs.commands.ControlCommand]] payload
    * @return a CommandResponse as a Future value.
    */
-  def oneway(controlCommand: ControlCommand)(implicit timeout: Timeout, scheduler: Scheduler): Future[CommandResponse] =
-    value ? (Oneway(controlCommand, _))
+  def oneway(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[CommandResponse] =
+    component ? (Oneway(controlCommand, _))
 
   /**
    * Subscribe for the result of a long running command which was sent as Submit to get a [[csw.messages.ccs.commands.CommandResponse]] as a Future.
    * @param commandRunId the runId of the command for which response is required
    * @return a CommandResponse as a Future value.
    */
-  def subscribe(commandRunId: Id)(implicit timeout: Timeout, scheduler: Scheduler): Future[CommandResponse] =
-    value ? (CommandResponseManagerMessage.Subscribe(commandRunId, _))
+  def subscribe(commandRunId: Id)(implicit timeout: Timeout): Future[CommandResponse] =
+    component ? (CommandResponseManagerMessage.Subscribe(commandRunId, _))
 
   /**
    * Query for the result of a long running command which was sent as Submit to get a [[csw.messages.ccs.commands.CommandResponse]] as a Future.
    * @param commandRunId the runId of the command for which response is required
    * @return a CommandResponse as a Future value.
    */
-  def query(commandRunId: Id)(implicit timeout: Timeout, scheduler: Scheduler): Future[CommandResponse] =
-    value ? (CommandResponseManagerMessage.Query(commandRunId, _))
+  def query(commandRunId: Id)(implicit timeout: Timeout): Future[CommandResponse] =
+    component ? (CommandResponseManagerMessage.Query(commandRunId, _))
 
   /**
    * Submit a command and Subscribe for the result if it was successfully validated as `Accepted` to get a final [[csw.messages.ccs.commands.CommandResponse]] as a Future.
@@ -95,7 +103,7 @@ case class ComponentRef(value: ActorRef[ComponentMessage]) {
    */
   def submitAndSubscribe(
       controlCommand: ControlCommand
-  )(implicit timeout: Timeout, scheduler: Scheduler, ec: ExecutionContext): Future[CommandResponse] =
+  )(implicit timeout: Timeout): Future[CommandResponse] =
     submit(controlCommand).flatMap {
       case _: Accepted ⇒ subscribe(controlCommand.runId)
       case x           ⇒ Future.successful(x)
@@ -111,8 +119,8 @@ case class ComponentRef(value: ActorRef[ComponentMessage]) {
   def onewayAndMatch(
       controlCommand: ControlCommand,
       stateMatcher: StateMatcher
-  )(implicit timeout: Timeout, scheduler: Scheduler, ec: ExecutionContext, mat: Materializer): Future[CommandResponse] = {
-    val matcher          = new Matcher(value, stateMatcher)
+  )(implicit timeout: Timeout): Future[CommandResponse] = {
+    val matcher          = new Matcher(component, stateMatcher)
     val matcherResponseF = matcher.start
     oneway(controlCommand).flatMap {
       case _: Accepted ⇒
@@ -134,7 +142,7 @@ case class ComponentRef(value: ActorRef[ComponentMessage]) {
    */
   def submitAllAndSubscribe(
       controlCommands: Set[ControlCommand]
-  )(implicit timeout: Timeout, scheduler: Scheduler, ec: ExecutionContext): Source[CommandResponse, NotUsed] = {
+  )(implicit timeout: Timeout): Source[CommandResponse, NotUsed] = {
     Source(controlCommands).mapAsyncUnordered(parallelism)(submitAndSubscribe)
   }
 
@@ -147,7 +155,7 @@ case class ComponentRef(value: ActorRef[ComponentMessage]) {
    */
   def submitAllAndGetFinalResponse(
       controlCommands: Set[ControlCommand]
-  )(implicit timeout: Timeout, scheduler: Scheduler, ec: ExecutionContext, mat: Materializer): Future[CommandResponse] = {
+  )(implicit timeout: Timeout): Future[CommandResponse] = {
     val value = Source(controlCommands).mapAsyncUnordered(parallelism)(submitAndSubscribe)
     CommandResponse.aggregateResponse(value)
   }

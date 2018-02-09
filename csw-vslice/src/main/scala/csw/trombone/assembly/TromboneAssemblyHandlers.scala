@@ -106,7 +106,7 @@ class TromboneAssemblyHandlers(
         // #failureRestart-Exception
         locationService.resolve(hcd.of[AkkaLocation], 5.seconds).map {
           case Some(akkaLocation) ⇒
-            runningHcds = runningHcds.updated(hcdConnection.get, Some(akkaLocation.component))
+            runningHcds = runningHcds.updated(hcdConnection.get, Some(new ComponentRef(akkaLocation)))
             diagPublisher = ctx.spawnAnonymous(DiagPublisher.make(ac, runningHcds(maybeConnection.get), Some(eventPublisher)))
             commandHandler =
               ctx.spawnAnonymous(new TromboneAssemblyCommandBehaviorFactory().make(ac, runningHcds, Some(eventPublisher)))
@@ -181,7 +181,7 @@ class TromboneAssemblyHandlers(
     trackingEvent match {
       case LocationUpdated(location) =>
         runningHcds = runningHcds + (location.connection → Some(
-          location.asInstanceOf[AkkaLocation].component
+          new ComponentRef(location.asInstanceOf[AkkaLocation])
         ))
       case LocationRemoved(connection) =>
         runningHcds = runningHcds + (connection → None)

@@ -12,8 +12,11 @@ import csw.messages.ComponentCommonMessage.GetSupervisorLifecycleState
 import csw.messages.ContainerCommonMessage.GetContainerLifecycleState
 import csw.messages.ccs.commands.ComponentRef
 import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState}
+import csw.messages.location.{AkkaLocation, ComponentId, ComponentType}
+import csw.messages.location.Connection.AkkaConnection
 import csw.messages.{ComponentMessage, ContainerExternalMessage}
 import csw.services.location.commons.BlockingUtils
+import csw.services.location.scaladsl.LocationServiceFactory
 
 import scala.concurrent.Await
 import scala.concurrent.duration.{Duration, DurationDouble}
@@ -21,15 +24,20 @@ import scala.concurrent.duration.{Duration, DurationDouble}
 object BenchmarkHelpers {
 
   def spawnStandaloneComponent(actorSystem: ActorSystem, config: Config): ComponentRef = {
-    val wiring: FrameworkWiring                          = FrameworkWiring.make(actorSystem)
+    val locationService                                  = LocationServiceFactory.withSystem(actorSystem)
+    val wiring: FrameworkWiring                          = FrameworkWiring.make(actorSystem, locationService)
     implicit val typedSystem: typed.ActorSystem[Nothing] = actorSystem.toTyped
     implicit val settings: TestKitSettings               = TestKitSettings(typedSystem)
 
     val probe = TestProbe[SupervisorLifecycleState]
 
-    val actorRef = Await.result(Standalone.spawn(config, wiring), 5.seconds)
-    assertThatSupervisorIsRunning(actorRef, probe, 5.seconds)
-    ComponentRef(actorRef)
+    Standalone.spawn(config, wiring)
+    val akkaLocation: AkkaLocation =
+      Await.result(locationService.resolve(AkkaConnection(ComponentId("Perf", ComponentType.HCD)), 5.seconds), 5.seconds).get
+
+    assertThatSupervisorIsRunning(akkaLocation.componentRef, probe, 5.seconds)
+
+    new ComponentRef(akkaLocation)
   }
 
   def assertThatContainerIsRunning(

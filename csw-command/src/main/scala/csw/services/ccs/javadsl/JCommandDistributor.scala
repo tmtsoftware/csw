@@ -6,7 +6,7 @@ import java.util.concurrent.CompletableFuture
 import akka.actor.Scheduler
 import akka.stream.Materializer
 import akka.util.Timeout
-import csw.messages.ccs.commands.{CommandResponse, ComponentRef, ControlCommand, JComponentRef}
+import csw.messages.ccs.commands.{CommandResponse, ControlCommand, JComponentRef}
 import csw.services.ccs.scaladsl.CommandDistributor
 
 import scala.collection.JavaConverters.{collectionAsScalaIterableConverter, mapAsScalaMapConverter}
@@ -32,7 +32,7 @@ case class JCommandDistributor(componentToCommands: util.Map[JComponentRef, util
   ): CompletableFuture[CommandResponse] = {
 
     val sComponentToCommands = componentToCommands.asScala.toMap.map {
-      case (component, commands) ⇒ ComponentRef(component.value) -> commands.asScala.toSet
+      case (component, commands) ⇒ component.sComponentRef -> commands.asScala.toSet
     }
     CommandDistributor(sComponentToCommands)
       .aggregatedValidationResponse()(timeout, scheduler, ec, mat)
@@ -54,7 +54,7 @@ case class JCommandDistributor(componentToCommands: util.Map[JComponentRef, util
   ): CompletableFuture[CommandResponse] = {
 
     val sComponentToCommands = componentToCommands.asScala.toMap.map {
-      case (component, commands) ⇒ ComponentRef(component.value) -> commands.asScala.toSet
+      case (component, commands) ⇒ component.sComponentRef -> commands.asScala.toSet
     }
 
     CommandDistributor(sComponentToCommands)

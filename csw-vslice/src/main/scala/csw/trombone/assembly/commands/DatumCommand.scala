@@ -4,10 +4,9 @@ import akka.actor
 import akka.actor.Scheduler
 import akka.stream.ActorMaterializer
 import akka.typed.ActorRef
+import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.util.Timeout
-import csw.messages.CommandMessage.Submit
 import csw.messages.ccs.CommandIssue.{RequiredHCDUnavailableIssue, WrongInternalStateIssue}
 import csw.messages.ccs.commands.CommandResponse.{Completed, NoLongerValid}
 import csw.messages.ccs.commands.{CommandResponse, ComponentRef, Setup}
@@ -62,7 +61,7 @@ class DatumCommand(
 
   def stopCommand(): Unit = {
     tromboneHCD.foreach(
-      _.value ! Submit(TromboneHcdState.cancelSC(Id(), s.maybeObsId.getOrElse(ObsId.empty)), ctx.spawnAnonymous(Actor.ignore))
+      _.submit(TromboneHcdState.cancelSC(Id(), s.maybeObsId.getOrElse(ObsId.empty)))
     )
   }
 

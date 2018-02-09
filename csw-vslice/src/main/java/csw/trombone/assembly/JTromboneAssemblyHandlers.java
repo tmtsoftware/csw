@@ -102,9 +102,11 @@ public class JTromboneAssemblyHandlers extends JComponentHandlers {
             return eventualEventPublisher.thenAcceptBoth(eventualHcdLocation, (eventPublisher, hcdLocation) -> {
                 if(!hcdLocation.isPresent())
                     throw new HcdNotFoundException();
-                else
-                    runningHcds.put(connection, Optional.of(hcdLocation.get().jComponent()));
-                    diagPublisher = ctx.spawnAnonymous(DiagPublisher.jMake(ac, Optional.of(hcdLocation.get().component()), Optional.of(eventPublisher)));
+                else {
+                    JComponentRef jComponentRef = new JComponentRef(hcdLocation.get(), akka.typed.ActorSystem.wrap(actorSystem));
+                    runningHcds.put(connection, Optional.of(jComponentRef));
+                    diagPublisher = ctx.spawnAnonymous(DiagPublisher.jMake(ac, Optional.of(jComponentRef), Optional.of(eventPublisher)));
+                }
                 });
             });
         // #failureRestart-Exception

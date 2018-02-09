@@ -12,9 +12,9 @@ import io.lettuce.core.{RedisClient, RedisURI}
 
 import scala.async.Async.{async, await}
 import scala.compat.java8.FutureConverters.CompletionStageOps
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class EventSubscriberImpl(implicit val mat: Materializer) extends EventSubscriber {
+class EventSubscriberImpl(implicit val mat: Materializer, ec: ExecutionContext) extends EventSubscriber {
 
   val redisURI: RedisURI = RedisURI.create("redis://localhost/")
 

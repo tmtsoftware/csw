@@ -72,7 +72,7 @@ class PositionCommand(
 
   def stopCommand(): Unit = {
     tromboneHCD.foreach(
-      _.value ! Submit(TromboneHcdState.cancelSC(Id(), s.maybeObsId.getOrElse(ObsId.empty)), ctx.spawnAnonymous(Actor.ignore))
+      _.component ! Submit(TromboneHcdState.cancelSC(Id(), s.maybeObsId.getOrElse(ObsId.empty)), ctx.spawnAnonymous(Actor.ignore))
     )
   }
 

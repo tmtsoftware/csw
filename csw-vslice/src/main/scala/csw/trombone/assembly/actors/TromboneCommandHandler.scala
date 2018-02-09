@@ -98,7 +98,7 @@ class TromboneCommandHandler(ctx: ActorContext[AssemblyCommandHandlerMsgs],
         case ac.followCK =>
           val nssItem = s(ac.nssInUseKey)
           followCommandActor = ctx.spawnAnonymous(
-            FollowCommandActor.make(ac, setElevationItem, nssItem, hcds.head._2.map(_.value), allEventPublisher)
+            FollowCommandActor.make(ac, setElevationItem, nssItem, hcds.head._2.map(_.component), allEventPublisher)
           )
           AssemblyCommandState(
             Some(

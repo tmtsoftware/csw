@@ -3,7 +3,6 @@ package csw.messages.location
 import java.net.URI
 
 import akka.typed.ActorRef
-import csw.messages.ccs.commands.{ComponentRef, JComponentRef}
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.{ComponentMessage, ContainerExternalMessage, TMTSerializable}
 
@@ -44,8 +43,7 @@ final case class AkkaLocation(
   }
 
   // If the component type is HCD or Assembly, use this to get the correct ActorRef
-  lazy val component: ComponentRef   = ComponentRef(typedRef[ComponentMessage])
-  lazy val jComponent: JComponentRef = JComponentRef(typedRef[ComponentMessage])
+  def componentRef: ActorRef[ComponentMessage] = typedRef[ComponentMessage]
 
   // If the component type is Container, use this to get the correct ActorRef
   def containerRef: ActorRef[ContainerExternalMessage] = typedRef[ContainerExternalMessage]
