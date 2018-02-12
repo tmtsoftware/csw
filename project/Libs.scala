@@ -27,6 +27,7 @@ object Libs {
   val `scalapb-runtime`              = "com.thesamet.scalapb"   %% "scalapb-runtime"              % scalapbVersion % "protobuf"
   val `scalapb-json4s`               = "com.thesamet.scalapb"   %% "scalapb-json4s"               % "0.7.0-rc2"
   val `lettuce`                      = "io.lettuce"             % "lettuce-core"                  % "5.0.1.RELEASE"
+  val `scala-compiler` = "org.scala-lang" % "scala-compiler" % ScalaVersion
 }
 
 object Jackson {
@@ -66,4 +67,10 @@ object AkkaHttp {
   val Version             = "10.0.10"
   val `akka-http`         = "com.typesafe.akka" %% "akka-http" % Version //ApacheV2
   val `akka-http-testkit` = "com.typesafe.akka" %% "akka-http-testkit" % Version //ApacheV2
+}
+
+object Ammonite {
+  val Version = "1.0.3"
+  val `ammonite` = "com.lihaoyi" % "ammonite" % Version cross CrossVersion.full
+  val `ammonite-sshd` = "com.lihaoyi" % "ammonite-sshd" % Version cross CrossVersion.full
 }

@@ -173,4 +173,15 @@ object Dependencies {
     Libs.`junit`           % Test,
     Libs.`junit-interface` % Test
   )
+
+  val SequencerPrototype = Seq(
+    Libs.`scalatest` % Test,
+    Akka.`akka-stream`,
+    Akka.`akka-typed`,
+    Akka.`akka-typed-testkit`,
+    Libs.`scala-reflect`,
+    Libs.`scala-compiler`,
+    Ammonite.`ammonite`,
+    Ammonite.`ammonite-sshd`
+  )
 }

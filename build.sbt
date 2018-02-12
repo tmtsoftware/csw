@@ -224,3 +224,8 @@ lazy val examples = project
   .settings(
     libraryDependencies ++= Dependencies.Examples
   )
+
+lazy val `sequencer-prototype` = project
+  .settings(
+    libraryDependencies ++= Dependencies.SequencerPrototype
+  )
