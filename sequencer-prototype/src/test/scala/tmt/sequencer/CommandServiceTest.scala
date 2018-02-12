@@ -29,6 +29,7 @@ class CommandServiceTest extends org.scalatest.FunSuite with Matchers {
         Command("setup-assemblies-parallel", List(1, 2, 3, 10, 20, 30))
       )
     )
+
     println(engine.hasNext)
     println(engine.pullNext())
 
@@ -49,13 +50,5 @@ class CommandServiceTest extends org.scalatest.FunSuite with Matchers {
 
     engine.pause()
 
-    engine.push(Command("setup-assembly1", List(1, 2, 3)))
-
-    engine.hasNext
-    engine.pullNext()
-
-    Thread.sleep(5000)
-    engine.resume()
-    Thread.sleep(1000)
   }
 }
