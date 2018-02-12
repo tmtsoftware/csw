@@ -1,4 +1,4 @@
-package csw.services.component.hcd
+package csw.framework.components.hcd
 
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext

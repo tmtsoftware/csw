@@ -1,4 +1,4 @@
-package csw.services.component.assembly
+package csw.framework.components.assembly
 
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext

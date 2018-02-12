@@ -4,13 +4,13 @@ A component is implemented by extending the `ComponentHandlers` base class. Thes
 defined in the framework which handles the lifecycle and supervision of this component.
 
 Assembly/Scala
-:   @@snip [TromboneAssemblyHandlers.scala](../../../../examples/src/main/scala/csw/services/component/assembly/AssemblyComponentHandlers.scala) { #component-handlers-class }
+:   @@snip [TromboneAssemblyHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/AssemblyComponentHandlers.scala) { #component-handlers-class }
 
 Assembly/Java
 :   @@snip [JTromboneAssemblyHandlers.java](../../../../csw-vslice/src/main/java/csw/trombone/assembly/JTromboneAssemblyHandlers.java) { #jcomponent-handlers-class }
 
 Hcd/Scala
-:   @@snip [TromboneHcdHandlers.scala](../../../../examples/src/main/scala/csw/services/component/hcd/HcdComponentHandlers.scala) { #component-handlers-class }
+:   @@snip [TromboneHcdHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/hcd/HcdComponentHandlers.scala) { #component-handlers-class }
 
 Hcd/Java
 :   @@snip [JTromboneHcdHandlers.java](../../../../csw-vslice/src/main/java/csw/trombone/hcd/JTromboneHcdHandlers.java) { #jcomponent-handlers-class }
@@ -32,13 +32,13 @@ methods in java which can be used by adding the following import
 A component can be created by a factory which extends `ComponentBehaviorFactory` base class and provides a definition of `handlers` method to return the appropriate implementation of `ComponentHandlers`.
 
 Assembly/Scala
-:   @@snip [TromboneAssemblyHandlers.scala](../../../../examples/src/main/scala/csw/services/component/assembly/AssemblyComponentBehaviorFactory.scala) { #component-factory }
+:   @@snip [TromboneAssemblyHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/AssemblyComponentBehaviorFactory.scala) { #component-factory }
 
 Assembly/Java
 :   @@snip [JTromboneAssemblyBehaviorFactory.java](../../../../csw-vslice/src/main/java/csw/trombone/assembly/JTromboneAssemblyBehaviorFactory.java) { #jcomponent-factory }
 
 Hcd/Scala
-:   @@snip [TromboneHcdHandlers.scala](../../../../examples/src/main/scala/csw/services/component/hcd/HcdComponentBehaviorFactory.scala) { #component-factory }
+:   @@snip [TromboneHcdHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/hcd/HcdComponentBehaviorFactory.scala) { #component-factory }
 
 Hcd/Java
 :   @@snip [JTromboneHcdBehaviorFactory.java](../../../../csw-vslice/src/main/java/csw/trombone/hcd/JTromboneHcdBehaviorFactory.java) { #jcomponent-factory }
