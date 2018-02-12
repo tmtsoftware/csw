@@ -1,9 +1,12 @@
 package tmt.sequencer
 
+import csw.services.location.commons.ClusterSettings
+
 import scala.language.implicitConversions
 
 object Dsl extends ControlDsl {
-  private[tmt] val wiring = new Wiring
+  lazy val actorSystem    = ClusterSettings().onPort(3552).system
+  private[tmt] val wiring = Wiring.make(actorSystem)
   private[tmt] def init(): Unit = {
     //touch system so that main does not exit
     wiring.system

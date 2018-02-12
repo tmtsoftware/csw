@@ -13,11 +13,16 @@ import scala.concurrent.duration.DurationDouble
 class Wiring {
   implicit lazy val timeout: Timeout          = Timeout(5.seconds)
   lazy val system: typed.ActorSystem[Nothing] = ActorSystem("test").toTyped
-
   lazy val engineActor: ActorRef[EngineBehaviour.EngineAction] =
     Await.result(system.systemActorOf(EngineBehaviour.behaviour, "engine"), timeout.duration)
   lazy val engine = new Engine(engineActor, system)
 
   lazy val locationService = new LocationService(system)
   lazy val commandService  = new CommandService(locationService)(system.executionContext)
+}
+
+object Wiring {
+  def make(_actorSystem: ActorSystem) = new Wiring {
+    override lazy val system: typed.ActorSystem[Nothing] = _actorSystem.toTyped
+  }
 }

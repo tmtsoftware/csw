@@ -234,6 +234,9 @@ lazy val examples = project
   )
 
 lazy val `sequencer-prototype` = project
+  .dependsOn(
+    `csw-location`
+  )
   .settings(
     libraryDependencies ++= Dependencies.SequencerPrototype
   )
