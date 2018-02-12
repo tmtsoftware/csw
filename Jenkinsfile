@@ -52,9 +52,9 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+        stage('Publish Local') {
             steps {
-                sh "./publish.sh"
+                sh "sbt publishLocal"
             }
         }
 
