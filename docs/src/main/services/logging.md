@@ -226,13 +226,6 @@ Java Typed Actor
 
 `log` variable is now available in scala and java classes to write log statements as explained in next segment.
 
-@@@ note { title="The `ComponentDomainMessage` shown in above examples is defiined as follows"}
-
-Scala
-:   @@snip [messages](../../../../examples/src/main/scala/csw/services/commons/messages.scala) { #message-hierarchy }
-
-@@@
-
 ## Log statements
 
 Logging statements are used very much like existing logging services such as log4j.  For Java, there is an additional way of writing log messages using Supplier methods (lambdas).  The use of lambdas is more efficient since the computations in a message (e.g. string concatenation) are not performed unless the message is actually being logged.  Therefore, these supplier methods should be used in cases where high performance is required (see [performance results below](#java-logging-string-vs-supplier-api-performance)).
