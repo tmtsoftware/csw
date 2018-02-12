@@ -13,12 +13,14 @@ class CommandServiceTest extends org.scalatest.FunSuite with Matchers {
     CommandResponse("Some Command Response")
   }
 
-  test("dd") {
+  /* Ignoring for time being till we have some asserts here */
+
+  ignore("dd") {
     val dsl = new CommandService(null)
     println(par(x, x))
   }
 
-  test("engine pull push") {
+  ignore("engine pull push") {
     val wiring = new Wiring()
     import wiring.engine
     engine.pushAll(
@@ -49,6 +51,5 @@ class CommandServiceTest extends org.scalatest.FunSuite with Matchers {
     println(engine.pullNext())
 
     engine.pause()
-
   }
 }

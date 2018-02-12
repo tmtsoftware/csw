@@ -1,7 +1,6 @@
 package csw.framework.integration
 
 import akka.actor
-import akka.actor.Scheduler
 import akka.pattern.AskTimeoutException
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.typed.ActorSystem

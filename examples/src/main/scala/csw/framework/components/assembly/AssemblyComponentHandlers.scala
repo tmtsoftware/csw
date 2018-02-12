@@ -14,7 +14,7 @@ import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
 import scala.async.Async.async
-import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
+import scala.concurrent.{ExecutionContextExecutor, Future}
 
 //#component-handlers-class
 class AssemblyComponentHandlers(
