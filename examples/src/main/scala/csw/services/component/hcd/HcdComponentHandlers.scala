@@ -14,7 +14,7 @@ import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
 import scala.async.Async.async
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContextExecutor, Future}
 
 //#component-handlers-class
 class HcdComponentHandlers(
@@ -36,6 +36,8 @@ class HcdComponentHandlers(
     {
 
   val log: Logger = new LoggerFactory(componentInfo.name).getLogger(ctx)
+
+  implicit val ec: ExecutionContextExecutor = ctx.executionContext
 
   //#initialize-handler
   override def initialize(): Future[Unit] = async {
