@@ -20,7 +20,8 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-messages`,
   `csw-commons`,
   `integration`,
-  `examples`
+  `examples`,
+  `sequencer-prototype`
 )
 
 lazy val unidocExclusions: Seq[ProjectReference] = Seq(
