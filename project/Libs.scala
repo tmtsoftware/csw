@@ -27,7 +27,8 @@ object Libs {
   val `scalapb-runtime`              = "com.thesamet.scalapb"   %% "scalapb-runtime"              % scalapbVersion % "protobuf"
   val `scalapb-json4s`               = "com.thesamet.scalapb"   %% "scalapb-json4s"               % "0.7.0-rc2"
   val `lettuce`                      = "io.lettuce"             % "lettuce-core"                  % "5.0.1.RELEASE"
-  val `scala-compiler` = "org.scala-lang" % "scala-compiler" % ScalaVersion
+  val `scala-compiler`               = "org.scala-lang"         % "scala-compiler"                % ScalaVersion
+  val `embedded-redis`               = "com.github.sebruck"     %% "scalatest-embedded-redis"     % "0.3.0"
 }
 
 object Jackson {
@@ -70,7 +71,7 @@ object AkkaHttp {
 }
 
 object Ammonite {
-  val Version = "1.0.3"
-  val `ammonite` = "com.lihaoyi" % "ammonite" % Version cross CrossVersion.full
+  val Version         = "1.0.3"
+  val `ammonite`      = "com.lihaoyi" % "ammonite" % Version cross CrossVersion.full
   val `ammonite-sshd` = "com.lihaoyi" % "ammonite-sshd" % Version cross CrossVersion.full
 }

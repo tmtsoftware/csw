@@ -1,24 +1,21 @@
 package csw.services.event.internal
 
-import java.net.SocketAddress
-import java.util.concurrent.CompletableFuture
-
 import akka.actor.ActorSystem
 import akka.stream.{ActorMaterializer, Materializer}
+import com.github.sebruck.EmbeddedRedis
 import csw.messages.ccs.events.{Event, EventName, SystemEvent}
 import csw.messages.params.models.Prefix
 import csw_protobuf.events.PbEvent
 import io.lettuce.core._
-import io.lettuce.core.pubsub.StatefulRedisPubSubConnection
-import io.lettuce.core.pubsub.api.async.RedisPubSubAsyncCommands
-import org.mockito.ArgumentMatchers._
-import org.mockito.Mockito._
+import io.lettuce.core.pubsub.{RedisPubSubListener, StatefulRedisPubSubConnection}
+import io.lettuce.core.pubsub.api.sync.RedisPubSubCommands
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{Await, ExecutionContext}
+import scala.concurrent.duration.DurationDouble
 
-class RedisDriverTest extends FunSuite with Matchers with MockitoSugar with BeforeAndAfterAll {
+class RedisDriverTest extends FunSuite with Matchers with MockitoSugar with BeforeAndAfterAll with EmbeddedRedis {
 
   implicit val actorSystem: ActorSystem = ActorSystem()
   implicit val mat: Materializer        = ActorMaterializer()
@@ -29,28 +26,26 @@ class RedisDriverTest extends FunSuite with Matchers with MockitoSugar with Befo
   }
 
   test("publish to redis") {
-    val prefix          = Prefix("test.prefix")
-    val eventName       = EventName("system")
-    val event           = SystemEvent(prefix, eventName)
-    val pbEvent         = Event.typeMapper.toBase(event)
-    val eventKey        = event.eventKey.toString
-    val redisURI        = RedisURI.create("redis://test")
-    val mockRedisClient = mock[RedisClient]
-    val mockCommands    = mock[RedisPubSubAsyncCommands[String, PbEvent]]
-    val mockConnection  = mock[StatefulRedisPubSubConnection[String, PbEvent]]
-    val mockConnectionFuture = ConnectionFuture.from(
-      mock[SocketAddress],
-      CompletableFuture.completedFuture(mockConnection)
-    )
+    val prefix    = Prefix("test.prefix")
+    val eventName = EventName("system")
+    val event     = SystemEvent(prefix, eventName)
+    val pbEvent   = Event.typeMapper.toBase(event)
+    val eventKey  = event.eventKey.toString
 
-    when(mockRedisClient.connectPubSubAsync(EventServiceCodec, redisURI)).thenReturn(mockConnectionFuture)
-    when(mockConnection.async()).thenReturn(mockCommands)
+    withRedis() { port ⇒
+      val redisURI                                                   = RedisURI.create("localhost", port)
+      val redisClient                                                = RedisClient.create(redisURI)
+      val connection: StatefulRedisPubSubConnection[String, PbEvent] = redisClient.connectPubSub(EventServiceCodec, redisURI)
+      val listener                                                   = new TestRedisPubSubListener
+      val pubSubCommands: RedisPubSubCommands[String, PbEvent]       = connection.sync()
 
-    when(mockCommands.publish(any[String], any[PbEvent])).thenReturn(mock[RedisFuture[java.lang.Long]])
-    when(mockCommands.set(any[String], any[PbEvent])).thenReturn(mock[RedisFuture[String]])
+      pubSubCommands.subscribe(eventKey)
 
-    new RedisDriver(mockRedisClient, redisURI).publish(eventKey, pbEvent)
-    verify(mockCommands).publish(eventKey, pbEvent)
+      connection.addListener(listener)
+    }
+
+//    val unit = Await.result(new RedisDriver(redisClient, redisURI).publish(eventKey, pbEvent), 5.seconds)
+
   }
 
 }

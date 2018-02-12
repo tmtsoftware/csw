@@ -154,7 +154,8 @@ object Dependencies {
     Libs.`scalatest`           % Test,
     Libs.`junit`               % Test,
     Libs.`junit-interface`     % Test,
-    Libs.`mockito-core`        % Test
+    Libs.`mockito-core`        % Test,
+    Libs.`embedded-redis`      % Test
   )
 
   val Commons = Seq(
