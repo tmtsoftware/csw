@@ -220,7 +220,14 @@ lazy val docs = project.enablePlugins(NoPublish, ParadoxSite)
 
 //Example code
 lazy val examples = project
-  .dependsOn(`csw-location`, `csw-config-client`, `csw-config-server` % "test->test", `csw-logging`, `csw-messages`)
+  .dependsOn(
+    `csw-location`,
+    `csw-config-client`,
+    `csw-config-server` % "test->test",
+    `csw-logging`,
+    `csw-messages`,
+    `csw-framework`
+  )
   .enablePlugins(DeployApp)
   .settings(
     libraryDependencies ++= Dependencies.Examples
