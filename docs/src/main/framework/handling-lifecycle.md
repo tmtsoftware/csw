@@ -7,13 +7,13 @@ asynchronous operations. The component can initialize state such as configuratio
 location of components or services to be fetched from location service etc. These vary from component to component.
 
 Assembly/Scala
-:   @@snip [TromboneAssemblyHandlers.scala](../../../../csw-vslice/src/main/scala/csw/trombone/assembly/TromboneAssemblyHandlers.scala) { #initialize-handler }
+:   @@snip [TromboneAssemblyHandlers.scala](../../../../examples/src/main/scala/csw/services/component/assembly/AssemblyComponentHandlers.scala) { #initialize-handler }
 
 Assembly/Java
 :   @@snip [JTromboneAssemblyHandlers.java](../../../../csw-vslice/src/main/java/csw/trombone/assembly/JTromboneAssemblyHandlers.java) { #jInitialize-handler }
 
 Hcd/Scala
-:   @@snip [TromboneHcdHandlers.scala](../../../../csw-vslice/src/main/scala/csw/trombone/hcd/TromboneHcdHandlers.scala) { #initialize-handler }
+:   @@snip [TromboneHcdHandlers.scala](../../../../examples/src/main/scala/csw/services/component/hcd/HcdComponentHandlers.scala) { #initialize-handler }
 
 Hcd/Java
 :   @@snip [JTromboneHcdHandlers.java](../../../../csw-vslice/src/main/java/csw/trombone/hcd/JTromboneHcdHandlers.java) { #jInitialize-handler }
@@ -31,13 +31,13 @@ A component has access to `isOnline` boolean flag which can be used to determine
 A component can be notified to run in offline mode in case it is not in use. The component can change its behavior if needed as a part of this handler.
 
 Assembly/Scala
-:   @@snip [TromboneAssemblyHandlers.scala](../../../../csw-vslice/src/main/scala/csw/trombone/assembly/TromboneAssemblyHandlers.scala) { #onGoOffline-handler }
+:   @@snip [TromboneAssemblyHandlers.scala](../../../../examples/src/main/scala/csw/services/component/assembly/AssemblyComponentHandlers.scala) { #onGoOffline-handler }
 
 Assembly/Java
 :   @@snip [JTromboneAssemblyHandlers.java](../../../../csw-vslice/src/main/java/csw/trombone/assembly/JTromboneAssemblyHandlers.java) { #onGoOffline-handler }
 
 Hcd/Scala
-:   @@snip [TromboneHcdHandlers.scala](../../../../csw-vslice/src/main/scala/csw/trombone/hcd/TromboneHcdHandlers.scala) { #onGoOffline-handler }
+:   @@snip [TromboneHcdHandlers.scala](../../../../examples/src/main/scala/csw/services/component/hcd/HcdComponentHandlers.scala) { #onGoOffline-handler }
 
 Hcd/Java
 :   @@snip [JTromboneHcdHandlers.java](../../../../csw-vslice/src/main/java/csw/trombone/hcd/JTromboneHcdHandlers.java) { #onGoOffline-handler }
@@ -47,13 +47,13 @@ Hcd/Java
 A component can be notified to run in online mode again in case it was put to run in offline mode. The component can change its behavior if needed as a part of this handler.
 
 Assembly/Scala
-:   @@snip [TromboneAssemblyHandlers.scala](../../../../csw-vslice/src/main/scala/csw/trombone/assembly/TromboneAssemblyHandlers.scala) { #onGoOnline-handler }
+:   @@snip [TromboneAssemblyHandlers.scala](../../../../examples/src/main/scala/csw/services/component/assembly/AssemblyComponentHandlers.scala) { #onGoOnline-handler }
 
 Assembly/Java
 :   @@snip [JTromboneAssemblyHandlers.java](../../../../csw-vslice/src/main/java/csw/trombone/assembly/JTromboneAssemblyHandlers.java) { #onGoOnline-handler }
 
 Hcd/Scala
-:   @@snip [TromboneHcdHandlers.scala](../../../../csw-vslice/src/main/scala/csw/trombone/hcd/TromboneHcdHandlers.scala) { #onGoOnline-handler }
+:   @@snip [TromboneHcdHandlers.scala](../../../../examples/src/main/scala/csw/services/component/hcd/HcdComponentHandlers.scala) { #onGoOnline-handler }
 
 Hcd/Java
 :   @@snip [JTromboneHcdHandlers.java](../../../../csw-vslice/src/main/java/csw/trombone/hcd/JTromboneHcdHandlers.java) { #onGoOnline-handler }
@@ -68,13 +68,13 @@ and return a validation result as `Accepted` or `Invalid`. The final response fo
 subscribing for this response to the component as described here. 
 
 Assembly/Scala
-:   @@snip [TromboneAssemblyHandlers.scala](../../../../csw-vslice/src/main/scala/csw/trombone/assembly/TromboneAssemblyHandlers.scala) { #validateCommand-handler }
+:   @@snip [TromboneAssemblyHandlers.scala](../../../../examples/src/main/scala/csw/services/component/assembly/AssemblyComponentHandlers.scala) { #validateCommand-handler }
 
 Assembly/Java
 :   @@snip [JTromboneAssemblyHandlers.java](../../../../csw-vslice/src/main/java/csw/trombone/assembly/JTromboneAssemblyHandlers.java) { #validateCommand-handler }
 
 Hcd/Scala
-:   @@snip [TromboneHcdHandlers.scala](../../../../csw-vslice/src/main/scala/csw/trombone/hcd/TromboneHcdHandlers.scala) { #validateCommand-handler }
+:   @@snip [TromboneHcdHandlers.scala](../../../../examples/src/main/scala/csw/services/component/hcd/HcdComponentHandlers.scala) { #validateCommand-handler }
 
 Hcd/Java
 :   @@snip [JTromboneHcdHandlers.java](../../../../csw-vslice/src/main/java/csw/trombone/hcd/JTromboneHcdHandlers.java) { #validateCommand-handler }
@@ -88,13 +88,13 @@ is received as a submit, command response should be updated in the `CommandRespo
 is available in the `ComponentHandlers`. 
 
 Assembly/Scala
-:   @@snip [TromboneAssemblyHandlers.scala](../../../../csw-vslice/src/main/scala/csw/trombone/assembly/TromboneAssemblyHandlers.scala) { #onSubmit-handler }
+:   @@snip [TromboneAssemblyHandlers.scala](../../../../examples/src/main/scala/csw/services/component/assembly/AssemblyComponentHandlers.scala) { #onSubmit-handler }
 
 Assembly/Java
 :   @@snip [JTromboneAssemblyHandlers.java](../../../../csw-vslice/src/main/java/csw/trombone/assembly/JTromboneAssemblyHandlers.java) { #onSubmit-handler }
 
 Hcd/Scala
-:   @@snip [TromboneHcdHandlers.scala](../../../../csw-vslice/src/main/scala/csw/trombone/hcd/TromboneHcdHandlers.scala) { #onSubmit-handler }
+:   @@snip [TromboneHcdHandlers.scala](../../../../examples/src/main/scala/csw/services/component/hcd/HcdComponentHandlers.scala) { #onSubmit-handler }
 
 Hcd/Java
 :   @@snip [JTromboneHcdHandlers.java](../../../../csw-vslice/src/main/java/csw/trombone/hcd/JTromboneHcdHandlers.java) { #onSubmit-handler }
@@ -105,13 +105,13 @@ On receiving a command as `Oneway`, the `onOneway` handler is invoked for a comp
 is received as a oneway, command response should not be provided to the sender.
 
 Assembly/Scala
-:   @@snip [TromboneAssemblyHandlers.scala](../../../../csw-vslice/src/main/scala/csw/trombone/assembly/TromboneAssemblyHandlers.scala) { #onOneway-handler }
+:   @@snip [TromboneAssemblyHandlers.scala](../../../../examples/src/main/scala/csw/services/component/assembly/AssemblyComponentHandlers.scala) { #onOneway-handler }
 
 Assembly/Java
 :   @@snip [JTromboneAssemblyHandlers.java](../../../../csw-vslice/src/main/java/csw/trombone/assembly/JTromboneAssemblyHandlers.java) { #onOneway-handler }
 
 Hcd/Scala
-:   @@snip [TromboneHcdHandlers.scala](../../../../csw-vslice/src/main/scala/csw/trombone/hcd/TromboneHcdHandlers.scala) { #onOneway-handler }
+:   @@snip [TromboneHcdHandlers.scala](../../../../examples/src/main/scala/csw/services/component/hcd/HcdComponentHandlers.scala) { #onOneway-handler }
 
 Hcd/Java
 :   @@snip [JTromboneHcdHandlers.java](../../../../csw-vslice/src/main/java/csw/trombone/hcd/JTromboneHcdHandlers.java) { #onOneway-handler }
