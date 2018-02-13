@@ -7,13 +7,15 @@ import csw.messages.ccs.events.{Event, EventName, SystemEvent}
 import csw.messages.params.models.Prefix
 import csw_protobuf.events.PbEvent
 import io.lettuce.core._
-import io.lettuce.core.pubsub.{RedisPubSubListener, StatefulRedisPubSubConnection}
+import io.lettuce.core.api.StatefulRedisConnection
+import io.lettuce.core.api.sync.RedisCommands
+import io.lettuce.core.pubsub.StatefulRedisPubSubConnection
 import io.lettuce.core.pubsub.api.sync.RedisPubSubCommands
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
-import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration.DurationDouble
+import scala.concurrent.{Await, ExecutionContext}
 
 class RedisDriverTest extends FunSuite with Matchers with MockitoSugar with BeforeAndAfterAll with EmbeddedRedis {
 
@@ -33,19 +35,23 @@ class RedisDriverTest extends FunSuite with Matchers with MockitoSugar with Befo
     val eventKey  = event.eventKey.toString
 
     withRedis() { port ⇒
-      val redisURI                                                   = RedisURI.create("localhost", port)
-      val redisClient                                                = RedisClient.create(redisURI)
-      val connection: StatefulRedisPubSubConnection[String, PbEvent] = redisClient.connectPubSub(EventServiceCodec, redisURI)
-      val listener                                                   = new TestRedisPubSubListener
-      val pubSubCommands: RedisPubSubCommands[String, PbEvent]       = connection.sync()
+      val redisURI    = RedisURI.create("localhost", port)
+      val redisClient = RedisClient.create(redisURI)
+      val pubSubConnection: StatefulRedisPubSubConnection[String, PbEvent] =
+        redisClient.connectPubSub(EventServiceCodec, redisURI)
+      val basicConnection: StatefulRedisConnection[String, PbEvent] = redisClient.connect(EventServiceCodec, redisURI)
+      val pubSubCommands: RedisPubSubCommands[String, PbEvent]      = pubSubConnection.sync()
+      val basicCommands: RedisCommands[String, PbEvent]             = basicConnection.sync()
+      val listener                                                  = new TestRedisPubSubListener
 
       pubSubCommands.subscribe(eventKey)
+      pubSubConnection.addListener(listener)
 
-      connection.addListener(listener)
+      Await.result(new RedisDriver(redisClient, redisURI).publish(eventKey, pbEvent), 5.seconds)
+
+      listener.messages should contain(pbEvent)
+      basicCommands.get(eventKey) shouldBe pbEvent
+
     }
-
-//    val unit = Await.result(new RedisDriver(redisClient, redisURI).publish(eventKey, pbEvent), 5.seconds)
-
   }
-
 }
