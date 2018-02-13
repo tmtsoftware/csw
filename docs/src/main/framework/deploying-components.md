@@ -12,10 +12,10 @@ application expects a configuration file describing a container component and wi
 components as described in the file.
 
 Scala
-:   @@snip [TromboneContainerCmdApp.scala](../../../../csw-vslice/src/main/scala/csw/trombone/TromboneContainerCmdApp.scala) { #container-app }
+:   @@snip [ContainerCmdApp.scala](../../../../examples/src/main/scala/csw/framework/ContainerCmdApp.scala) { #container-app }
 
 Java
-:   @@snip [JTromboneContainerCmdApp](../../../../csw-vslice/src/main/java/csw/trombone/JTromboneContainerCmdApp.java) { #container-app }
+:   @@snip [JContainerCmdApp](../../../../examples/src/main/java/csw/framework/JContainerCmdApp.java) { #container-app }
 
 Starting a **standalone** component from a **local** configuration file
 

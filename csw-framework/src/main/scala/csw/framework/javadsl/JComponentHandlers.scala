@@ -43,6 +43,9 @@ abstract class JComponentHandlers(
   def jInitialize(): CompletableFuture[Unit]
   def jOnShutdown(): CompletableFuture[Unit]
 
+  // do not override this from java class
   override def initialize(): Future[Unit] = jInitialize().toScala
+
+  // do not override this from java class
   override def onShutdown(): Future[Unit] = jOnShutdown().toScala
 }

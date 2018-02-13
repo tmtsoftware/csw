@@ -10,10 +10,10 @@ This application will start multiple containers on a given host machine and each
 
 ## How to create
 Scala
-:   @@snip [TromboneHostConfigApp.scala](../../../../csw-vslice/src/main/scala/csw/trombone/TromboneHostConfigApp.scala) { #trombone-host-app }
+:   @@snip [HostConfigApp.scala](../../../../examples/src/main/scala/csw/framework/HostConfigApp.scala) { #host-config-app }
 
 Java
-:   @@snip [JConfigClientExampleTest.java](../../../../csw-vslice/src/main/java/csw/trombone/JTromboneHostConfigApp.java) { #jtrombone-host-app }
+:   @@snip [JHostConfigApp.java](../../../../examples/src/main/java/csw/framework/JHostConfigApp.java) { #jhost-config-app }
 
 ## Command line parameter options
 
@@ -40,7 +40,7 @@ then invoke trombone-container-cmd-app script per container configuration which 
 ## Custom Host Configuration
 
 hostconfig.conf
-:   @@snip [hostconfig.conf](../../../../csw-vslice/src/main/resources/hostConfig.conf) { #host-conf }
+:   @@snip [hostconfig.conf](../../../../examples/src/main/resources/hostConfig.conf) { #host-conf }
 
 ## Help
 Use the following command to get help on the options available with this app
