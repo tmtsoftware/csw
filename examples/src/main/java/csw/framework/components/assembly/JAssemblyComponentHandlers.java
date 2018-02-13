@@ -2,26 +2,27 @@ package csw.framework.components.assembly;
 
 import akka.typed.ActorRef;
 import akka.typed.javadsl.ActorContext;
+import csw.exceptions.FailureRestart;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.messages.CommandResponseManagerMessage;
 import csw.messages.TopLevelActorMessage;
 import csw.messages.ccs.CommandIssue;
-import csw.messages.ccs.commands.CommandResponse;
-import csw.messages.ccs.commands.ControlCommand;
-import csw.messages.ccs.commands.Observe;
-import csw.messages.ccs.commands.Setup;
+import csw.messages.ccs.commands.*;
 import csw.messages.framework.ComponentInfo;
-import csw.messages.location.LocationRemoved;
-import csw.messages.location.LocationUpdated;
-import csw.messages.location.TrackingEvent;
+import csw.messages.location.*;
 import csw.messages.models.PubSub;
 import csw.messages.params.states.CurrentState;
 import csw.services.location.javadsl.ILocationService;
+import csw.services.location.javadsl.JComponentType;
 import csw.services.logging.javadsl.ILogger;
 import csw.services.logging.javadsl.JLoggerFactory;
+import scala.Option;
+import scala.concurrent.duration.FiniteDuration;
 import scala.runtime.BoxedUnit;
 
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 //#jcomponent-handlers-class
 public class JAssemblyComponentHandlers extends JComponentHandlers {
@@ -87,9 +88,9 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     @Override
     public void onSubmit(ControlCommand controlCommand) {
         if (controlCommand instanceof Setup)
-            submitSetup((Setup) controlCommand);
+            submitSetup((Setup) controlCommand); // includes logic to handle Submit with Setup config command
         else if (controlCommand instanceof Observe)
-            submitObserve((Observe) controlCommand);
+            submitObserve((Observe) controlCommand); // includes logic to handle Submit with Observe config command
     }
     //#onSubmit-handler
 
@@ -97,9 +98,9 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     @Override
     public void onOneway(ControlCommand controlCommand) {
         if (controlCommand instanceof Setup)
-            onewaySetup((Setup) controlCommand);
+            onewaySetup((Setup) controlCommand); // includes logic to handle Oneway with Setup config command
         else if (controlCommand instanceof Observe)
-            onewayObserve((Observe) controlCommand);
+            onewayObserve((Observe) controlCommand); // includes logic to handle Oneway with Observe config command
     }
     //#onOneway-handler
 
@@ -171,4 +172,5 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     private void onewayObserve(Observe observe) {
         processObserve(observe);
     }
+
 }

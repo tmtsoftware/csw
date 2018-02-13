@@ -1,19 +1,25 @@
 package csw.framework.components.assembly
 
+import java.nio.file.Paths
+
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
+import akka.typed.scaladsl.adapter.TypedActorSystemOps
+import csw.exceptions.{FailureRestart, FailureStop}
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.ccs.commands.CommandResponse.Accepted
-import csw.messages.ccs.commands.{CommandResponse, ControlCommand, Observe, Setup}
+import csw.messages.ccs.commands._
 import csw.messages.framework.ComponentInfo
-import csw.messages.location.{LocationRemoved, LocationUpdated, TrackingEvent}
+import csw.messages.location._
 import csw.messages.models.PubSub.PublisherMessage
 import csw.messages.params.states.CurrentState
 import csw.messages.{CommandResponseManagerMessage, TopLevelActorMessage}
+import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
 import scala.async.Async.async
+import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
 //#component-handlers-class
@@ -39,6 +45,8 @@ class AssemblyComponentHandlers(
 
   implicit val ec: ExecutionContextExecutor = ctx.executionContext
 
+  val configClient = ConfigClientFactory.clientApi(ctx.system.toUntyped, locationService)
+
   //#initialize-handler
   override def initialize(): Future[Unit] = async {
 
@@ -63,15 +71,15 @@ class AssemblyComponentHandlers(
 
   //#onSubmit-handler
   override def onSubmit(controlCommand: ControlCommand): Unit = controlCommand match {
-    case setup: Setup     ⇒ submitSetup(setup)
-    case observe: Observe ⇒ submitObserve(observe)
+    case setup: Setup     ⇒ submitSetup(setup) // includes logic to handle Submit with Setup config command
+    case observe: Observe ⇒ submitObserve(observe) // includes logic to handle Submit with Observe config command
   }
   //#onSubmit-handler
 
   //#onOneway-handler
   override def onOneway(controlCommand: ControlCommand): Unit = controlCommand match {
-    case setup: Setup     ⇒ onewaySetup(setup)
-    case observe: Observe ⇒ onewayObserve(observe)
+    case setup: Setup     ⇒ onewaySetup(setup) // includes logic to handle Oneway with Setup config command
+    case observe: Observe ⇒ onewayObserve(observe) // includes logic to handle Oneway with Observe config command
   }
   //#onOneway-handler
 
@@ -125,4 +133,42 @@ class AssemblyComponentHandlers(
   private def onewaySetup(setup: Setup): Unit = processSetup(setup)
 
   private def onewayObserve(observe: Observe): Unit = processObserve(observe)
+
+  /**
+   * Below methods are just here to show how exceptions can be used to either restart or stop supervisor
+   * This are snipped in paradox documentation
+   * */
+  private def resolveHcd() = {
+    val maybeConnection = componentInfo.connections.find(connection ⇒ connection.componentId.componentType == ComponentType.HCD)
+    maybeConnection match {
+      case hcdConnection @ Some(hcd) ⇒
+        //#failureRestart-Exception
+        case class HcdNotFoundException() extends FailureRestart("Could not resolve hcd location. Initialization failure.")
+
+        locationService.resolve(hcd.of[AkkaLocation], 5.seconds).map {
+          case Some(akkaLocation) ⇒
+          case None               ⇒
+            // Hcd connection could not be resolved for this Assembly. One option to handle this could be to automatic restart which can give enough time
+            // for the Hcd to be available
+            throw HcdNotFoundException()
+        }
+      //#failureRestart-Exception
+      case None ⇒ Future.successful(Unit)
+    }
+  }
+
+  private def getAssemblyConfigs() = {
+    // #failureStop-Exception
+    case class ConfigNotAvailableException() extends FailureStop("Configuration not available. Initialization failure.")
+
+    configClient.getActive(Paths.get("tromboneAssemblyContext.conf")).flatMap {
+      case Some(config) ⇒ ??? // do work
+      case None         ⇒
+        // required configuration could not be found in the configuration service. Component can choose to stop until the configuration is made available in the
+        // configuration service and started again
+        throw ConfigNotAvailableException()
+    }
+    // #failureStop-Exception
+  }
+
 }

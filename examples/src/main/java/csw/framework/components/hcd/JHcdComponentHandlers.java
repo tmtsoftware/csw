@@ -88,9 +88,9 @@ public class JHcdComponentHandlers extends JComponentHandlers {
     @Override
     public void onSubmit(ControlCommand controlCommand) {
         if (controlCommand instanceof Setup)
-            submitSetup((Setup) controlCommand);
+            submitSetup((Setup) controlCommand); // includes logic to handle Submit with Setup config command
         else if (controlCommand instanceof Observe)
-            submitObserve((Observe) controlCommand);
+            submitObserve((Observe) controlCommand); // includes logic to handle Submit with Observe config command
     }
     //#onSubmit-handler
 
@@ -98,9 +98,9 @@ public class JHcdComponentHandlers extends JComponentHandlers {
     @Override
     public void onOneway(ControlCommand controlCommand) {
         if (controlCommand instanceof Setup)
-            onewaySetup((Setup) controlCommand);
+            onewaySetup((Setup) controlCommand); // includes logic to handle Oneway with Setup config command
         else if (controlCommand instanceof Observe)
-            onewayObserve((Observe) controlCommand);
+            onewayObserve((Observe) controlCommand); // includes logic to handle Oneway with Observe config command
     }
     //#onOneway-handler
 
