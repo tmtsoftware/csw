@@ -5,7 +5,6 @@ import csw_protobuf.events.PbEvent
 import scala.concurrent.Future
 
 trait EventServiceDriver {
-
   def publish(key: String, data: PbEvent): Future[Unit]
-
+  def set(key: String, data: PbEvent): Future[Unit]
 }
