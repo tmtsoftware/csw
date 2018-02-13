@@ -1,7 +1,6 @@
 package csw.services.integtration.tests
 
 import akka.actor.{ActorSystem, Props, Scheduler}
-import akka.testkit.{ImplicitSender, TestKit}
 import akka.typed
 import akka.typed.Behavior
 import akka.typed.scaladsl.adapter._
@@ -13,36 +12,30 @@ import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.params.models.Prefix
 import csw.services.integtration.apps.TromboneHCD
 import csw.services.integtration.common.TestFutureExtension.RichFuture
+import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.exceptions.OtherLocationIsRegistered
 import csw.services.location.models._
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import csw.services.logging.internal.LogControlMessages
 import org.scalatest._
 
+import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
 
-class LocationServiceIntegrationTest
-    extends TestKit(ActorSystem("location-testkit"))
-    with ImplicitSender
-    with FunSuiteLike
-    with Matchers
-    with BeforeAndAfter
-    with BeforeAndAfterAll {
+class LocationServiceIntegrationTest extends FunSuite with Matchers with BeforeAndAfter with BeforeAndAfterAll {
 
-  val locationService: LocationService                 = LocationServiceFactory.make()
-  implicit val actorSystem: ActorSystem                = ActorSystem("test")
+  implicit val actorSystem: ActorSystem                = ClusterAwareSettings.system
+  val locationService: LocationService                 = LocationServiceFactory.withSystem(actorSystem)
   implicit val typedSystem: typed.ActorSystem[Nothing] = actorSystem.toTyped
   implicit val sched: Scheduler                        = actorSystem.scheduler
   implicit val timeout: Timeout                        = Timeout(5.seconds)
 
-  override protected def afterAll(): Unit = {
-    locationService.shutdown(TestFinishedReason)
-    TestKit.shutdownActorSystem(system)
-  }
+  override protected def afterAll(): Unit =
+    Await.result(locationService.shutdown(TestFinishedReason), 5.seconds)
 
   test("should not allow duplicate akka registration") {
-    val tromboneHcdActorRef                                  = system.actorOf(Props[TromboneHCD], "trombone-hcd")
-    val logAdminActorRef: typed.ActorRef[LogControlMessages] = system.spawn(Behavior.empty, "trombone-admin")
+    val tromboneHcdActorRef                                  = actorSystem.actorOf(Props[TromboneHCD], "trombone-hcd")
+    val logAdminActorRef: typed.ActorRef[LogControlMessages] = actorSystem.spawn(Behavior.empty, "trombone-admin")
     val componentId                                          = ComponentId("trombonehcd", ComponentType.HCD)
     val connection                                           = AkkaConnection(componentId)
 

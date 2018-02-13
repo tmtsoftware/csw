@@ -1,31 +1,29 @@
 package csw.services.integtration.apps
 
 import akka.actor.{Actor, ActorRef, ActorSystem, Props}
-import akka.typed
-import akka.typed.Behavior
 import akka.typed.scaladsl.adapter._
-import csw.messages.ccs.commands.Setup
+import csw.messages.CommandMessage.Submit
+import csw.messages.ccs.commands.{CommandName, Setup}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.integtration.common.TestFutureExtension.RichFuture
-import csw.services.location.commons.CswCluster
+import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
 import csw.services.location.scaladsl.LocationServiceFactory
-import csw.services.logging.internal.LogControlMessages
+
+import scala.concurrent.ExecutionContextExecutor
 
 object TromboneHCD {
-  private val cswCluster = CswCluster.make()
+  val hcdActorSystem: ActorSystem           = ClusterAwareSettings.system
+  implicit val ec: ExecutionContextExecutor = hcdActorSystem.toTyped.executionContext
 
-  val hcdActorSystem = ActorSystem("trombone-hcd-system")
+  val tromboneHcdActorRef: ActorRef = hcdActorSystem.actorOf(Props[TromboneHCD], "trombone-hcd")
+  val componentId                   = ComponentId("trombonehcd", ComponentType.HCD)
+  val connection                    = AkkaConnection(componentId)
 
-  val tromboneHcdActorRef: ActorRef                        = hcdActorSystem.actorOf(Props[TromboneHCD], "trombone-hcd")
-  val logAdminActorRef: typed.ActorRef[LogControlMessages] = hcdActorSystem.spawn(Behavior.empty, "trombone-hcd-admin")
-  val componentId                                          = ComponentId("trombonehcd", ComponentType.HCD)
-  val connection                                           = AkkaConnection(componentId)
-
-  val registration                           = AkkaRegistration(connection, Some("nfiraos.ncc.trombone"), tromboneHcdActorRef, logAdminActorRef)
-  private val locationService                = LocationServiceFactory.withCluster(cswCluster)
+  val registration                           = AkkaRegistration(connection, Some("nfiraos.ncc.trombone"), tromboneHcdActorRef, null)
+  private val locationService                = LocationServiceFactory.withSystem(hcdActorSystem)
   val registrationResult: RegistrationResult = locationService.register(registration).await
 
   println("Trombone HCD registered")
@@ -35,10 +33,9 @@ object TromboneHCD {
 
 class TromboneHCD extends Actor {
   import TromboneHCD._
-  import cswCluster._
 
   override def receive: Receive = {
-    case setup: Setup if setup.commandName.name == "Unregister" =>
+    case Submit(Setup(_, _, CommandName("Unregister"), None, _), _) ⇒
       registrationResult.unregister().onComplete(_ => locationService.shutdown(TestFinishedReason))
   }
 }
