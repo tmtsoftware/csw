@@ -15,7 +15,7 @@ object EventServiceCodec extends RedisCodec[String, PbEvent] {
   override def encodeValue(value: PbEvent): ByteBuffer = ByteBuffer.wrap(value.toByteArray)
 
   override def decodeValue(byteBuf: ByteBuffer): PbEvent = {
-    var bytes: Array[Byte] = new Array[Byte](byteBuf.remaining())
+    val bytes: Array[Byte] = new Array[Byte](byteBuf.remaining())
     byteBuf.get(bytes)
     PbEvent.parseFrom(bytes)
   }
