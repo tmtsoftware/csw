@@ -12,16 +12,16 @@ import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 class LockManager(val lockPrefix: Option[Prefix], loggerFactory: LoggerFactory) {
   val log: Logger = loggerFactory.getLogger
 
-  def lockComponent(prefix: Prefix, replyTo: ActorRef[LockingResponse])(startTimer: ⇒ Unit): LockManager = lockPrefix match {
-    case None                ⇒ onAcquiringLock(prefix, replyTo, startTimer)
-    case Some(`prefix`)      ⇒ onReAcquiringLock(prefix, replyTo, startTimer)
-    case Some(currentPrefix) ⇒ onAcquiringFailed(replyTo, prefix, currentPrefix)
+  def lockComponent(source: Prefix, replyTo: ActorRef[LockingResponse])(startTimer: ⇒ Unit): LockManager = lockPrefix match {
+    case None                ⇒ onAcquiringLock(source, replyTo, startTimer)
+    case Some(`source`)      ⇒ onReAcquiringLock(source, replyTo, startTimer)
+    case Some(currentPrefix) ⇒ onAcquiringFailed(replyTo, source, currentPrefix)
   }
 
-  def unlockComponent(prefix: Prefix, replyTo: ActorRef[LockingResponse])(stopTimer: ⇒ Unit): LockManager = lockPrefix match {
-    case Some(`prefix`)      ⇒ onLockReleased(prefix, replyTo, stopTimer)
-    case Some(currentPrefix) ⇒ onLockReleaseFailed(replyTo, prefix, currentPrefix)
-    case None                ⇒ onLockAlreadyReleased(prefix, replyTo)
+  def unlockComponent(source: Prefix, replyTo: ActorRef[LockingResponse])(stopTimer: ⇒ Unit): LockManager = lockPrefix match {
+    case Some(`source`)      ⇒ onLockReleased(source, replyTo, stopTimer)
+    case Some(currentPrefix) ⇒ onLockReleaseFailed(replyTo, source, currentPrefix)
+    case None                ⇒ onLockAlreadyReleased(source, replyTo)
   }
 
   def releaseLockOnTimeout(): LockManager = new LockManager(None, loggerFactory)
@@ -45,43 +45,43 @@ class LockManager(val lockPrefix: Option[Prefix], loggerFactory: LoggerFactory) 
 
   def isUnLocked: Boolean = lockPrefix.isEmpty
 
-  private def onAcquiringLock(prefix: Prefix, replyTo: ActorRef[LockingResponse], startTimer: ⇒ Unit): LockManager = {
-    log.info(s"The lock is successfully acquired by component: $prefix")
+  private def onAcquiringLock(source: Prefix, replyTo: ActorRef[LockingResponse], startTimer: ⇒ Unit): LockManager = {
+    log.info(s"The lock is successfully acquired by component: $source")
     replyTo ! LockAcquired
     startTimer
-    new LockManager(Some(prefix), loggerFactory)
+    new LockManager(Some(source), loggerFactory)
   }
 
-  private def onReAcquiringLock(prefix: Prefix, replyTo: ActorRef[LockingResponse], startTimer: ⇒ Unit): LockManager = {
-    log.info(s"The lock is re-acquired by component: $prefix")
+  private def onReAcquiringLock(source: Prefix, replyTo: ActorRef[LockingResponse], startTimer: ⇒ Unit): LockManager = {
+    log.info(s"The lock is re-acquired by component: $source")
     replyTo ! LockAcquired
     startTimer
     this
   }
 
-  private def onAcquiringFailed(replyTo: ActorRef[LockingResponse], prefix: Prefix, currentPrefix: Prefix) = {
-    val failureReason = s"Invalid prefix $prefix for acquiring lock. Currently it is acquired by component: $currentPrefix"
+  private def onAcquiringFailed(replyTo: ActorRef[LockingResponse], source: Prefix, currentPrefix: Prefix) = {
+    val failureReason = s"Invalid source $source for acquiring lock. Currently it is acquired by component: $currentPrefix"
     log.error(failureReason)
     replyTo ! AcquiringLockFailed(failureReason)
     this
   }
 
-  private def onLockReleased(prefix: Prefix, replyTo: ActorRef[LockingResponse], stopTimer: ⇒ Unit): LockManager = {
-    log.info(s"The lock is successfully released by component: $prefix")
+  private def onLockReleased(source: Prefix, replyTo: ActorRef[LockingResponse], stopTimer: ⇒ Unit): LockManager = {
+    log.info(s"The lock is successfully released by component: $source")
     replyTo ! LockReleased
     stopTimer
     new LockManager(None, loggerFactory)
   }
 
-  private def onLockReleaseFailed(replyTo: ActorRef[LockingResponse], prefix: Prefix, currentPrefix: Prefix) = {
-    val failureReason = s"Invalid prefix $prefix for releasing lock. Currently it is acquired by component: $currentPrefix"
+  private def onLockReleaseFailed(replyTo: ActorRef[LockingResponse], source: Prefix, currentPrefix: Prefix) = {
+    val failureReason = s"Invalid source $source for releasing lock. Currently it is acquired by component: $currentPrefix"
     log.error(failureReason)
     replyTo ! ReleasingLockFailed(failureReason)
     this
   }
 
-  private def onLockAlreadyReleased(prefix: Prefix, replyTo: ActorRef[LockingResponse]): LockManager = {
-    log.warn(s"Cannot release lock for $prefix as it is already released")
+  private def onLockAlreadyReleased(source: Prefix, replyTo: ActorRef[LockingResponse]): LockManager = {
+    log.warn(s"Cannot release lock for $source as it is already released")
     replyTo ! LockAlreadyReleased
     this
   }
