@@ -44,7 +44,7 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     supervisorRef ! LockCommandFactory.make("wfos.prog.cloudcover.Client2", lockingStateProbe.ref)
     lockingStateProbe.expectMsg(
       AcquiringLockFailed(
-        s"Invalid prefix [WFOS, wfos.prog.cloudcover.Client2] for acquiring lock. Currently it is acquired by component: [WFOS, wfos.prog.cloudcover.Client1]"
+        s"Invalid source [WFOS, wfos.prog.cloudcover.Client2] for acquiring lock. Currently it is acquired by component: [WFOS, wfos.prog.cloudcover.Client1]"
       )
     )
 
@@ -56,7 +56,7 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     supervisorRef ! Unlock("wfos.prog.cloudcover.Client2", lockingStateProbe.ref)
     lockingStateProbe.expectMsg(
       ReleasingLockFailed(
-        s"Invalid prefix [WFOS, wfos.prog.cloudcover.Client2] for releasing lock. Currently it is acquired by component: [WFOS, wfos.prog.cloudcover.Client1]"
+        s"Invalid source [WFOS, wfos.prog.cloudcover.Client2] for releasing lock. Currently it is acquired by component: [WFOS, wfos.prog.cloudcover.Client1]"
       )
     )
 
