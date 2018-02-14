@@ -14,6 +14,7 @@ import csw.messages.location._
 import csw.messages.models.PubSub.PublisherMessage
 import csw.messages.params.states.CurrentState
 import csw.messages.{CommandResponseManagerMessage, TopLevelActorMessage}
+import csw.services.config.api.scaladsl.ConfigClientService
 import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
@@ -41,11 +42,10 @@ class AssemblyComponentHandlers(
 //#component-handlers-class
     {
 
-  val log: Logger = new LoggerFactory(componentInfo.name).getLogger(ctx)
-
   implicit val ec: ExecutionContextExecutor = ctx.executionContext
 
-  val configClient = ConfigClientFactory.clientApi(ctx.system.toUntyped, locationService)
+  private val log: Logger                       = new LoggerFactory(componentInfo.name).getLogger(ctx)
+  private val configClient: ConfigClientService = ConfigClientFactory.clientApi(ctx.system.toUntyped, locationService)
 
   //#initialize-handler
   override def initialize(): Future[Unit] = async {
@@ -138,13 +138,13 @@ class AssemblyComponentHandlers(
    * Below methods are just here to show how exceptions can be used to either restart or stop supervisor
    * This are snipped in paradox documentation
    * */
+  //#failureRestart-Exception
+  case class HcdNotFoundException() extends FailureRestart("Could not resolve hcd location. Initialization failure.")
+
   private def resolveHcd() = {
     val maybeConnection = componentInfo.connections.find(connection ⇒ connection.componentId.componentType == ComponentType.HCD)
     maybeConnection match {
       case hcdConnection @ Some(hcd) ⇒
-        //#failureRestart-Exception
-        case class HcdNotFoundException() extends FailureRestart("Could not resolve hcd location. Initialization failure.")
-
         locationService.resolve(hcd.of[AkkaLocation], 5.seconds).map {
           case Some(akkaLocation) ⇒
           case None               ⇒
@@ -152,14 +152,15 @@ class AssemblyComponentHandlers(
             // for the Hcd to be available
             throw HcdNotFoundException()
         }
-      //#failureRestart-Exception
       case None ⇒ Future.successful(Unit)
     }
   }
+  //#failureRestart-Exception
+
+  // #failureStop-Exception
+  case class ConfigNotAvailableException() extends FailureStop("Configuration not available. Initialization failure.")
 
   private def getAssemblyConfigs() = {
-    // #failureStop-Exception
-    case class ConfigNotAvailableException() extends FailureStop("Configuration not available. Initialization failure.")
 
     configClient.getActive(Paths.get("tromboneAssemblyContext.conf")).flatMap {
       case Some(config) ⇒ ??? // do work
@@ -168,7 +169,7 @@ class AssemblyComponentHandlers(
         // configuration service and started again
         throw ConfigNotAvailableException()
     }
-    // #failureStop-Exception
   }
+  // #failureStop-Exception
 
 }

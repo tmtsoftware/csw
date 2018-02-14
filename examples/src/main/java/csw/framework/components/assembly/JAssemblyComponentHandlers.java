@@ -2,7 +2,9 @@ package csw.framework.components.assembly;
 
 import akka.typed.ActorRef;
 import akka.typed.javadsl.ActorContext;
+import akka.typed.javadsl.Adapter;
 import csw.exceptions.FailureRestart;
+import csw.exceptions.FailureStop;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.messages.CommandResponseManagerMessage;
 import csw.messages.TopLevelActorMessage;
@@ -12,6 +14,10 @@ import csw.messages.framework.ComponentInfo;
 import csw.messages.location.*;
 import csw.messages.models.PubSub;
 import csw.messages.params.states.CurrentState;
+import csw.services.config.api.javadsl.IConfigClientService;
+import csw.services.config.api.models.ConfigData;
+import csw.services.config.client.internal.ConfigClient;
+import csw.services.config.client.javadsl.JConfigClientFactory;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.location.javadsl.JComponentType;
 import csw.services.logging.javadsl.ILogger;
@@ -20,9 +26,12 @@ import scala.Option;
 import scala.concurrent.duration.FiniteDuration;
 import scala.runtime.BoxedUnit;
 
+import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+
 
 //#jcomponent-handlers-class
 public class JAssemblyComponentHandlers extends JComponentHandlers {
@@ -33,6 +42,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     private final ActorRef<PubSub.PublisherMessage<CurrentState>> pubSubRef;
     private final ILocationService locationService;
     private ILogger log;
+    private IConfigClientService configClient;
 
     public JAssemblyComponentHandlers(
             akka.typed.javadsl.ActorContext<TopLevelActorMessage> ctx,
@@ -50,6 +60,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
         this.pubSubRef = pubSubRef;
         this.locationService = locationService;
         log = loggerFactory.getLogger(this.getClass());
+        configClient = JConfigClientFactory.clientApi(Adapter.toUntyped(ctx.getSystem()), locationService);
     }
     //#jcomponent-handlers-class
 
@@ -172,5 +183,52 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     private void onewayObserve(Observe observe) {
         processObserve(observe);
     }
+
+    /**
+     * Below methods are just here to show how exceptions can be used to either restart or stop supervisor
+     * This are snipped in paradox documentation
+     * */
+
+    // #failureRestart-Exception
+    class HcdNotFoundException extends FailureRestart {
+        HcdNotFoundException() {
+            super("Could not resolve hcd location. Initialization failure.");
+        }
+    }
+
+    private void resolveHcd() {
+        // find a Hcd connection from the connections provided in componentInfo
+        Optional<Connection> mayBeConnection = componentInfo.getConnections().stream()
+                .filter(connection -> connection.componentId().componentType() == JComponentType.HCD)
+                .findFirst();
+
+        // If an Hcd is found as a connection, resolve its location from location service and create other
+        // required worker actors required by this assembly
+        mayBeConnection.ifPresent(connection -> {
+            CompletableFuture<Optional<AkkaLocation>> eventualHcdLocation = locationService.resolve(connection.<AkkaLocation>of(), FiniteDuration.apply(5, TimeUnit.SECONDS));
+            try {
+                AkkaLocation hcdLocation = eventualHcdLocation.get().orElseThrow(HcdNotFoundException::new);
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+    // #failureRestart-Exception
+
+    // #failureStop-Exception
+    class ConfigNotAvailableException extends FailureStop {
+        ConfigNotAvailableException() {
+            super("Configuration not available. Initialization failure.");
+        }
+    }
+
+    private CompletableFuture<ConfigData> getAssemblyConfigs() {
+        // required configuration could not be found in the configuration service. Component can choose to stop until the configuration is made available in the
+        // configuration service and started again
+        return configClient.getActive(Paths.get("tromboneAssemblyContext.conf")).thenApply((maybeConfigData) -> {
+            return maybeConfigData.orElseThrow(ConfigNotAvailableException::new);
+        });
+    }
+    // #failureStop-Exception
 
 }
