@@ -16,7 +16,6 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-location`,
   `csw-location-agent`,
   `csw-benchmark`,
-  `csw-vslice`,
   `csw-messages`,
   `csw-commons`,
   `integration`,
@@ -31,7 +30,6 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
   `csw-config-server`,
   `csw-config-client-cli`,
   `csw-benchmark`,
-  `csw-vslice`,
   `integration`,
   `examples`
 )
@@ -143,13 +141,6 @@ lazy val `csw-config-client-cli` = project
   .settings(
     libraryDependencies ++= Dependencies.ConfigClientCli
   )
-
-lazy val `csw-vslice` = project
-  .dependsOn(
-    `csw-framework`,
-    `csw-command`
-  )
-  .enablePlugins(DeployApp)
 
 lazy val `csw-event-api` = project
   .dependsOn(
