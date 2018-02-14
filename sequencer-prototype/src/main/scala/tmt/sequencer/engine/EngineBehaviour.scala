@@ -1,9 +1,9 @@
-package tmt.sequencer
+package tmt.sequencer.engine
 
+import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
-import akka.typed.scaladsl.Actor.MutableBehavior
-import tmt.sequencer.EngineBehaviour._
+import tmt.sequencer.engine.EngineBehaviour._
 import tmt.services.Command
 
 import scala.collection.immutable.Queue

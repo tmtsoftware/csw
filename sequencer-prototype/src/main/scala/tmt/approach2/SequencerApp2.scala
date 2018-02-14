@@ -2,11 +2,10 @@ package tmt.approach2
 
 import java.io.File
 
-import tmt.sequencer.RemoteRepl
+import tmt.sequencer.repl.RemoteRepl
+import tmt.sequencer.dsl.Dsl._
 
 object SequencerApp2 extends App {
-
-  import tmt.sequencer.Dsl._
 
   init()
 

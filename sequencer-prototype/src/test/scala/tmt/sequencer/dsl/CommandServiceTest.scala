@@ -1,12 +1,16 @@
-package tmt.sequencer
+package tmt.sequencer.dsl
 
 import org.scalatest.Matchers
-import Dsl._
-import tmt.services.CommandResponse
+import tmt.sequencer.Wiring
+import tmt.sequencer.engine.Engine
+import tmt.services.{Command, CommandResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class CommandServiceTest extends org.scalatest.FunSuite with Matchers {
+class CommandServiceTest extends org.scalatest.FunSuite with Matchers with ControlDsl {
+
+  val wiring              = new Wiring()
+  lazy val engine: Engine = wiring.engine
 
   def x: CommandResponse = {
     println("blocking")
@@ -21,8 +25,6 @@ class CommandServiceTest extends org.scalatest.FunSuite with Matchers {
   }
 
   ignore("engine pull push") {
-    val wiring = new Wiring()
-    import wiring.engine
     engine.pushAll(
       List(
         Command("setup-assembly1", List(1, 2, 3)),

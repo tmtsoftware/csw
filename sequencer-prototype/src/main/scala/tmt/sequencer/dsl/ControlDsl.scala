@@ -1,11 +1,12 @@
-package tmt.sequencer
+package tmt.sequencer.dsl
 
-import tmt.sequencer.FutureExt.RichFuture
+import tmt.sequencer.util.FutureExt.RichFuture
+import tmt.sequencer.engine.Engine
 import tmt.services.{Command, CommandResponse}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.language.implicitConversions
-import scala.concurrent.ExecutionContext.Implicits.global
 
 trait ControlDsl {
   def engine: Engine

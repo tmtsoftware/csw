@@ -1,8 +1,8 @@
-package tmt.sequencer
+package tmt.sequencer.dsl
 
 import csw.services.location.commons.ClusterSettings
-
-import scala.language.implicitConversions
+import tmt.sequencer.Wiring
+import tmt.sequencer.engine.Engine
 
 object Dsl extends ControlDsl {
   lazy val actorSystem    = ClusterSettings().onPort(3552).system

@@ -1,4 +1,4 @@
-package tmt.sequencer
+package tmt.sequencer.repl
 
 import ammonite.sshd._
 import org.apache.sshd.server.auth.password.AcceptAllPasswordAuthenticator

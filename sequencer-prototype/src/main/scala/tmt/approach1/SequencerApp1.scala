@@ -1,10 +1,10 @@
 package tmt.approach1
 
-import tmt.sequencer.RemoteRepl
+import tmt.sequencer.repl.RemoteRepl
+import tmt.services.Command
+import tmt.sequencer.dsl.Dsl._
 
 object SequencerApp1 extends App {
-
-  import tmt.sequencer.Dsl._
 
   init()
 

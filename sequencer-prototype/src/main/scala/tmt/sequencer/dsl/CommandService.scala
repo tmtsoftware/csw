@@ -1,6 +1,6 @@
-package tmt.sequencer
+package tmt.sequencer.dsl
 
-import tmt.sequencer.FutureExt.RichFuture
+import tmt.sequencer.util.FutureExt.RichFuture
 import tmt.services.{Command, CommandResponse, LocationService}
 
 import scala.concurrent.ExecutionContext
