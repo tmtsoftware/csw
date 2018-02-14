@@ -35,7 +35,7 @@ Assembly/Scala
 :   @@snip [AssemblyComponentBehaviorFactory.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/AssemblyComponentBehaviorFactory.scala) { #component-factory }
 
 Assembly/Java
-:   @@snip [JHcdComponentBehaviourFactory.java](../../../../examples/src/main/java/csw/framework/components/assembly/JAssemblyComponentBehaviourFactory.java) { #jcomponent-factory }
+:   @@snip [JAssemblyComponentBehaviourFactory.java](../../../../examples/src/main/java/csw/framework/components/assembly/JAssemblyComponentBehaviourFactory.java) { #jcomponent-factory }
 
 Hcd/Scala
 :   @@snip [HcdComponentBehaviorFactory.scala](../../../../examples/src/main/scala/csw/framework/components/hcd/HcdComponentBehaviorFactory.scala) { #component-factory }

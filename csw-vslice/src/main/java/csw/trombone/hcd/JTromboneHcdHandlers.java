@@ -23,7 +23,6 @@ import csw.messages.params.states.CurrentState;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.logging.javadsl.ILogger;
 import csw.services.logging.javadsl.JLoggerFactory;
-import scala.runtime.BoxedUnit;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -55,7 +54,7 @@ public class JTromboneHcdHandlers extends JComponentHandlers {
 
     //#jInitialize-handler
     @Override
-    public CompletableFuture<BoxedUnit> jInitialize() {
+    public CompletableFuture<Void> jInitialize() {
         // fetch config (preferably from configuration service)
         CompletableFuture<Void> configInitialisation = getAxisConfig()
                 .thenAccept(config -> {
@@ -80,13 +79,13 @@ public class JTromboneHcdHandlers extends JComponentHandlers {
                 ctx.getSystem().scheduler()
         ).thenAccept(axisStatistics -> stats = axisStatistics).toCompletableFuture();
 
-        return CompletableFuture.allOf(configInitialisation, initialAxisStats, initialAxisState).thenApply(x -> BoxedUnit.UNIT);
+        return CompletableFuture.allOf(configInitialisation, initialAxisStats, initialAxisState);
     }
     //#jInitialize-handler
 
     @Override
-    public CompletableFuture<BoxedUnit> jOnShutdown() {
-        return null;
+    public CompletableFuture<Void> jOnShutdown() {
+        return CompletableFuture.runAsync(() -> {});
     }
 
     //#onLocationTrackingEvent-handler

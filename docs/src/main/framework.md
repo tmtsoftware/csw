@@ -43,6 +43,13 @@ gradle
 * [Handling Exceptions](framework/handling-exceptions.md)
 * [Deployment](framework/deploying-components.md)
 @@@
+
+## Source code for examples
+
+* @github[Assembly Scala Example](/examples/src/main/scala/csw/framework/components/assembly/AssemblyComponentHandlers.scala)
+* @github[HCD Scala Example](/examples/src/main/scala/csw/framework/components/hcd/HcdComponentHandlers.scala)
+* @github[Assembly Java Example](/examples/src/main/java/csw/framework/components/assembly/JAssemblyComponentHandlers.java)
+* @github[HCD Java Example](/examples/src/main/java/csw/framework/components/hcd/JHcdComponentHandlers.java)
     
 
 

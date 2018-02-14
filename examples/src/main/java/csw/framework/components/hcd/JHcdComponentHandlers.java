@@ -5,7 +5,6 @@ import akka.typed.javadsl.ActorContext;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.messages.CommandResponseManagerMessage;
 import csw.messages.TopLevelActorMessage;
-import csw.messages.ccs.CommandIssue;
 import csw.messages.ccs.commands.CommandResponse;
 import csw.messages.ccs.commands.ControlCommand;
 import csw.messages.ccs.commands.Observe;
@@ -17,10 +16,8 @@ import csw.messages.location.TrackingEvent;
 import csw.messages.models.PubSub;
 import csw.messages.params.states.CurrentState;
 import csw.services.location.javadsl.ILocationService;
-import csw.services.logging.internal.JLogger;
 import csw.services.logging.javadsl.ILogger;
 import csw.services.logging.javadsl.JLoggerFactory;
-import csw.services.logging.scaladsl.LoggerImpl;
 import scala.runtime.BoxedUnit;
 
 import java.util.concurrent.CompletableFuture;
@@ -57,15 +54,15 @@ public class JHcdComponentHandlers extends JComponentHandlers {
 
     //#jInitialize-handler
     @Override
-    public CompletableFuture<BoxedUnit> jInitialize() {
-        /*
-         * Initialization could include following steps :
-         * 1. fetch config (preferably from configuration service)
-         * 2. create a worker actor which is used by this hcd
-         * 3. initialise some state by using the worker actor created above
-         * */
-
-        return CompletableFuture.completedFuture(BoxedUnit.UNIT);
+    public CompletableFuture<Void> jInitialize() {
+        return CompletableFuture.runAsync(() -> {
+            /*
+             * Initialization could include following steps :
+             * 1. fetch config (preferably from configuration service)
+             * 2. create a worker actor which is used by this hcd
+             * 3. initialise some state by using the worker actor created above
+             * */
+        });
     }
     //#jInitialize-handler
 
@@ -120,9 +117,10 @@ public class JHcdComponentHandlers extends JComponentHandlers {
 
     //#onShutdown-handler
     @Override
-    public CompletableFuture<BoxedUnit> jOnShutdown() {
-        // clean up resources
-        return CompletableFuture.completedFuture(BoxedUnit.UNIT);
+    public CompletableFuture<Void> jOnShutdown() {
+        return CompletableFuture.runAsync(() -> {
+            // clean up resources
+        });
     }
     //#onShutdown-handler
 

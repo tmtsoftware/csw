@@ -28,7 +28,6 @@ import csw.trombone.HcdNotFoundException;
 import csw.trombone.assembly.actors.DiagPublisher;
 import csw.trombone.assembly.actors.TrombonePublisher;
 import scala.concurrent.duration.FiniteDuration;
-import scala.runtime.BoxedUnit;
 
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -79,7 +78,7 @@ public class JTromboneAssemblyHandlers extends JComponentHandlers {
     //#jcomponent-handlers-class
     //#jInitialize-handler
     @Override
-    public CompletableFuture<BoxedUnit> jInitialize() {
+    public CompletableFuture<Void> jInitialize() {
         // fetch config (preferably from configuration service)
         CompletableFuture<AssemblyContext> assemblyContextCompletableFuture = getAssemblyLocalCalculationConfig()
                 .thenCombine(getAssemblyLocalControlConfig(),
@@ -111,13 +110,13 @@ public class JTromboneAssemblyHandlers extends JComponentHandlers {
             });
         // #failureRestart-Exception
 
-        return voidCompletableFuture.get().thenApply(x -> BoxedUnit.UNIT);
+        return voidCompletableFuture.get();
     }
     //#jInitialize-handler
 
     @Override
-    public CompletableFuture<BoxedUnit> jOnShutdown() {
-        return null;
+    public CompletableFuture<Void> jOnShutdown() {
+        return CompletableFuture.runAsync(() -> {});
     }
 
     //#onLocationTrackingEvent-handler

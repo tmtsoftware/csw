@@ -40,12 +40,12 @@ abstract class JComponentHandlers(
 
   implicit val ec: ExecutionContextExecutor = ctx.getExecutionContext
 
-  def jInitialize(): CompletableFuture[Unit]
-  def jOnShutdown(): CompletableFuture[Unit]
+  def jInitialize(): CompletableFuture[Void]
+  def jOnShutdown(): CompletableFuture[Void]
 
   // do not override this from java class
-  override def initialize(): Future[Unit] = jInitialize().toScala
+  override def initialize(): Future[Unit] = jInitialize().toScala.map(_ ⇒ Unit)
 
   // do not override this from java class
-  override def onShutdown(): Future[Unit] = jOnShutdown().toScala
+  override def onShutdown(): Future[Unit] = jOnShutdown().toScala.map(_ ⇒ Unit)
 }

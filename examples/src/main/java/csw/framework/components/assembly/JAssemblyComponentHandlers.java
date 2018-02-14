@@ -16,15 +16,12 @@ import csw.messages.models.PubSub;
 import csw.messages.params.states.CurrentState;
 import csw.services.config.api.javadsl.IConfigClientService;
 import csw.services.config.api.models.ConfigData;
-import csw.services.config.client.internal.ConfigClient;
 import csw.services.config.client.javadsl.JConfigClientFactory;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.location.javadsl.JComponentType;
 import csw.services.logging.javadsl.ILogger;
 import csw.services.logging.javadsl.JLoggerFactory;
-import scala.Option;
 import scala.concurrent.duration.FiniteDuration;
-import scala.runtime.BoxedUnit;
 
 import java.nio.file.Paths;
 import java.util.Optional;
@@ -66,7 +63,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
 
     //#jInitialize-handler
     @Override
-    public CompletableFuture<BoxedUnit> jInitialize() {
+    public CompletableFuture<Void> jInitialize() {
         /*
          * Initialization could include following steps :
          * 1. fetch config (preferably from configuration service)
@@ -76,7 +73,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
          *    required worker actors required by this assembly
          * */
 
-        return CompletableFuture.completedFuture(BoxedUnit.UNIT);
+        return new CompletableFuture<>();
     }
     //#jInitialize-handler
 
@@ -131,9 +128,9 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
 
     //#onShutdown-handler
     @Override
-    public CompletableFuture<BoxedUnit> jOnShutdown() {
+    public CompletableFuture<Void> jOnShutdown() {
         // clean up resources
-        return CompletableFuture.completedFuture(BoxedUnit.UNIT);
+        return new CompletableFuture<>();
     }
     //#onShutdown-handler
 

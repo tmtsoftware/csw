@@ -21,7 +21,6 @@ import csw.messages.location.TrackingEvent;
 import csw.messages.models.PubSub;
 import csw.messages.models.PubSub.Publish;
 import csw.messages.params.generics.JKeyTypes;
-import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.states.CurrentState;
 import csw.services.location.javadsl.ILocationService;
@@ -64,17 +63,16 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     }
 
     @Override
-    public CompletableFuture<BoxedUnit> jInitialize() {
+    public CompletableFuture<Void> jInitialize() {
         log.debug("Initializing Sample component");
         try {
             Thread.sleep(100);
         } catch (InterruptedException ignored) {
         }
-        return CompletableFuture.supplyAsync(() -> {
+        return CompletableFuture.runAsync(() -> {
             CurrentState initState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.initChoice()));
             Publish<CurrentState> publish = new Publish<>(initState);
             pubSubRef.tell(publish);
-            return BoxedUnit.UNIT;
         });
     }
 
@@ -167,13 +165,12 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     }
 
     @Override
-    public CompletableFuture<BoxedUnit> jOnShutdown() {
-        return CompletableFuture.supplyAsync(() -> {
+    public CompletableFuture<Void> jOnShutdown() {
+        return CompletableFuture.runAsync(() -> {
             CurrentState shutdownState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.shutdownChoice()));
             Publish<CurrentState> publish = new Publish<>(shutdownState);
 
             pubSubRef.tell(publish);
-            return BoxedUnit.UNIT;
         });
     }
 
