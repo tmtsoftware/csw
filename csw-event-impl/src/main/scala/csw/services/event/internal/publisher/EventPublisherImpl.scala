@@ -1,5 +1,6 @@
 package csw.services.event.internal.publisher
 
+import akka.Done
 import akka.stream.{Materializer, OverflowStrategy}
 import akka.stream.scaladsl.{Sink, Source, SourceQueueWithComplete}
 import csw.messages.ccs.events.Event
@@ -12,9 +13,12 @@ import scala.util.Try
 class EventPublisherImpl(eventServiceDriver: EventServiceDriver)(implicit ec: ExecutionContext, mat: Materializer)
     extends EventPublisher {
 
+  private val bufferSize    = 4096
+  private val maxSubstreams = 1024
+
   private lazy val eventQueue: SourceQueueWithComplete[StreamElement] = Source
-    .queue[StreamElement](4096, OverflowStrategy.dropHead)
-    .groupBy(1024, _.key)
+    .queue[StreamElement](bufferSize, OverflowStrategy.dropHead)
+    .groupBy(maxSubstreams, _.key)
     .mapAsync(1) { element ⇒
       eventServiceDriver
         .publish(element.key, element.value)
@@ -24,19 +28,19 @@ class EventPublisherImpl(eventServiceDriver: EventServiceDriver)(implicit ec: Ex
     .to(Sink.ignore)
     .run()
 
-  override def publish(event: Event): Future[Unit] = {
-    val element = StreamElement(event)
+  override def publish(event: Event): Future[Done] = {
+    val element = new StreamElement(event)
     eventQueue.offer(element)
     element.future
   }
 
-  private case class StreamElement(event: Event) {
-    val p: Promise[Unit]     = Promise[Unit]
+  private class StreamElement(event: Event) {
+    val p: Promise[Done]     = Promise[Done]
     val key: String          = event.eventKey.toString
     val value: PbEvent       = Event.typeMapper.toBase(event)
-    val future: Future[Unit] = p.future
+    val future: Future[Done] = p.future
 
-    def complete(t: Try[Unit]): Future[Unit] = p.complete(t).future
+    def complete(t: Try[Done]): Future[Done] = p.complete(t).future
   }
 
 }

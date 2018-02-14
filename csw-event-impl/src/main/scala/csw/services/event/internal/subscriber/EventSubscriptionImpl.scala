@@ -1,25 +1,31 @@
 package csw.services.event.internal.subscriber
 
-import akka.stream.Materializer
-import akka.stream.scaladsl.Source
+import akka.Done
+import akka.stream.scaladsl.{Keep, Sink}
+import akka.stream.{KillSwitches, Materializer, UniqueKillSwitch}
 import csw.messages.ccs.events.{Event, EventKey}
-import csw.services.event.scaladsl.EventSubscription
-import csw_protobuf.events.PbEvent
-import io.lettuce.core.pubsub.api.reactive.RedisPubSubReactiveCommands
-import reactor.core.publisher.FluxSink.OverflowStrategy
+import csw.services.event.scaladsl.{EventServiceDriver, EventSubscription}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 class EventSubscriptionImpl(
-    reactiveCommands: RedisPubSubReactiveCommands[String, PbEvent],
+    eventServiceDriver: EventServiceDriver,
     callback: Event ⇒ Unit,
     eventKeys: Seq[EventKey]
-)(implicit val mat: Materializer)
+)(implicit val mat: Materializer, ec: ExecutionContext)
     extends EventSubscription {
 
-  reactiveCommands.subscribe(eventKeys.map(_.toString): _*).subscribe()
+  private lazy val (signal, switch): (Future[Done], UniqueKillSwitch) = eventServiceDriver
+    .subscribe(eventKeys.map(_.toString))
+    .viaMat(KillSwitches.single)(Keep.both)
+    .to(Sink.foreach(ch ⇒ callback(Event.fromPb(ch.getMessage))))
+    .run
 
-  Source
-    .fromPublisher(reactiveCommands.observeChannels(OverflowStrategy.DROP))
-    .runForeach(ch ⇒ callback(Event.fromPb(ch.getMessage)))
+  def subscribe(): Future[Done] = signal.map(x => Done)
 
-  override def unsubscribe(): Unit = reactiveCommands.unsubscribe(eventKeys.map(_.toString): _*)
+  override def unsubscribe(): Future[Done] = {
+    eventServiceDriver
+      .unsubscribe(eventKeys.map(_.toString))
+      .transform(x ⇒ { switch.shutdown(); x }, ex ⇒ { switch.abort(ex); ex })
+  }
 }
