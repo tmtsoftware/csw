@@ -1,15 +1,16 @@
-package csw.services.event.scaladsl
+package csw.services.event.internal.api
 
 import akka.Done
+import akka.stream.KillSwitch
 import akka.stream.scaladsl.Source
+import csw.services.event.scaladsl.EventMessage
 import csw_protobuf.events.PbEvent
-import io.lettuce.core.pubsub.api.reactive.ChannelMessage
 
 import scala.concurrent.Future
 
-trait EventServiceDriver {
+trait EventBusDriver {
   def publish(key: String, data: PbEvent): Future[Done]
   def set(key: String, data: PbEvent): Future[Done]
-  def subscribe(keys: Seq[String]): Source[ChannelMessage[String, PbEvent], Future[Done]]
+  def subscribe(keys: String*): Source[EventMessage[String, PbEvent], KillSwitch]
   def unsubscribe(keys: Seq[String]): Future[Done]
 }

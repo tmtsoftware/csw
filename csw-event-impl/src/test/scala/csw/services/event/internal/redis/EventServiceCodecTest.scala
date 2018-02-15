@@ -1,4 +1,4 @@
-package csw.services.event.internal
+package csw.services.event.internal.redis
 
 import java.nio.ByteBuffer
 

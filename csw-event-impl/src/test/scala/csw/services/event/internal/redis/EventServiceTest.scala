@@ -1,4 +1,4 @@
-package csw.services.event.internal
+package csw.services.event.internal.redis
 
 import java.io.IOException
 import java.net.ServerSocket
@@ -9,8 +9,7 @@ import akka.testkit.TestProbe
 import com.github.sebruck.EmbeddedRedis
 import csw.messages.ccs.events.{Event, EventKey, EventName, SystemEvent}
 import csw.messages.params.models.Prefix
-import csw.services.event.internal.publisher.EventPublisherImpl
-import csw.services.event.internal.subscriber.EventSubscriptionImpl
+import csw.services.event.internal.pubsub.{EventPublisherImpl, EventSubscriberImpl}
 import csw_protobuf.events.PbEvent
 import io.lettuce.core._
 import org.scalatest.mockito.MockitoSugar
@@ -29,7 +28,7 @@ class EventServiceTest extends FunSuite with Matchers with MockitoSugar with Bef
   implicit val ec: ExecutionContext     = actorSystem.dispatcher
 
   var redis: RedisServer = _
-  var redisPort: Int     = _
+  var redisPort: Int     = 4545
 
   lazy val redisURI: RedisURI       = RedisURI.create("localhost", redisPort)
   lazy val redisClient: RedisClient = RedisClient.create(redisURI)
@@ -41,7 +40,7 @@ class EventServiceTest extends FunSuite with Matchers with MockitoSugar with Bef
   val eventKey: EventKey = event.eventKey
 
   override def beforeAll(): Unit = {
-    redisPort = freePort
+//    redisPort = freePort
     redis = RedisServer.builder().setting("bind 127.0.0.1").port(redisPort).build()
     redis.start()
   }
@@ -66,14 +65,27 @@ class EventServiceTest extends FunSuite with Matchers with MockitoSugar with Bef
   test("test subscribe with callback") {
     val testProbe = TestProbe()
 
-    val subscriptionImpl: EventSubscriptionImpl =
-      new EventSubscriptionImpl(new ScalaRedisDriver(redisClient, redisURI), e ⇒ testProbe.ref ! e, Seq(eventKey))
+    val subscriptionImpl: EventSubscriberImpl = new EventSubscriberImpl(new RedisEventBusDriver(redisClient, redisURI))
 
-    subscriptionImpl.subscribe()
+    subscriptionImpl.subscribe(e ⇒ testProbe.ref ! e, eventKey)
 
-    val publisherImpl = new EventPublisherImpl(new ScalaRedisDriver(redisClient, redisURI))
+    val publisherImpl = new EventPublisherImpl(new RedisEventBusDriver(redisClient, redisURI))
     Await.result(publisherImpl.publish(event), 5.seconds)
 
     testProbe.expectMsg(event)
+  }
+
+  test("sub-unsub") {
+    val driver = new RedisEventBusDriver(redisClient, redisURI)
+    driver.subscribe("abc").runForeach(println)
+    Thread.sleep(2000)
+    driver.publish("abc", pbEvent)
+    Thread.sleep(2000)
+    //    Thread.sleep(100)
+//    driver.publish("abc", pbEvent)
+//    Thread.sleep(100)
+//    driver.x.dispose()
+//    driver.publish("abc", pbEvent)
+//    Thread.sleep(10000)
   }
 }

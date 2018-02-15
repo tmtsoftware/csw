@@ -1,16 +1,17 @@
-package csw.services.event.internal.publisher
+package csw.services.event.internal.pubsub
 
 import akka.Done
-import akka.stream.{Materializer, OverflowStrategy}
 import akka.stream.scaladsl.{Sink, Source, SourceQueueWithComplete}
+import akka.stream.{Materializer, OverflowStrategy}
 import csw.messages.ccs.events.Event
-import csw.services.event.scaladsl.{EventPublisher, EventServiceDriver}
+import csw.services.event.internal.api.EventBusDriver
+import csw.services.event.scaladsl.EventPublisher
 import csw_protobuf.events.PbEvent
 
 import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.util.Try
 
-class EventPublisherImpl(eventServiceDriver: EventServiceDriver)(implicit ec: ExecutionContext, mat: Materializer)
+class EventPublisherImpl(eventServiceDriver: EventBusDriver)(implicit ec: ExecutionContext, mat: Materializer)
     extends EventPublisher {
 
   private val bufferSize    = 4096
