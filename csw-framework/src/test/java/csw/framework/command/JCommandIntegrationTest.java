@@ -275,7 +275,7 @@ public class JCommandIntegrationTest {
         //#aggregated-validation
         CompletableFuture<CommandResponse> cmdValidationResponseF =
                 new JCommandDistributor(componentsToCommands).
-                        aggregatedValidationResponse(timeout, hcdActorSystem.scheduler(), ec, mat);
+                        aggregatedValidationResponse(timeout, ec, mat);
         //#aggregated-validation
 
         Assert.assertTrue(cmdValidationResponseF.get() instanceof CommandResponse.Accepted);
@@ -283,7 +283,7 @@ public class JCommandIntegrationTest {
         //#aggregated-completion
         CompletableFuture<CommandResponse> cmdCompletionResponseF =
                 new JCommandDistributor(componentsToCommands).
-                        aggregatedCompletionResponse(timeout, hcdActorSystem.scheduler(), ec, mat);
+                        aggregatedCompletionResponse(timeout, ec, mat);
         //#aggregated-completion
 
         Assert.assertTrue(cmdCompletionResponseF.get() instanceof CommandResponse.Completed);

@@ -26,7 +26,6 @@ case class JCommandDistributor(componentToCommands: util.Map[JCommandService, ut
    */
   def aggregatedValidationResponse(
       timeout: Timeout,
-      scheduler: Scheduler,
       ec: ExecutionContext,
       mat: Materializer
   ): CompletableFuture[CommandResponse] = {
@@ -35,7 +34,7 @@ case class JCommandDistributor(componentToCommands: util.Map[JCommandService, ut
       case (component, commands) ⇒ component.sComponentRef -> commands.asScala.toSet
     }
     CommandDistributor(sComponentToCommands)
-      .aggregatedValidationResponse()(timeout, scheduler, ec, mat)
+      .aggregatedValidationResponse()(timeout, ec, mat)
       .toJava
       .toCompletableFuture
   }
@@ -48,7 +47,6 @@ case class JCommandDistributor(componentToCommands: util.Map[JCommandService, ut
    */
   def aggregatedCompletionResponse(
       timeout: Timeout,
-      scheduler: Scheduler,
       ec: ExecutionContext,
       mat: Materializer
   ): CompletableFuture[CommandResponse] = {
@@ -58,7 +56,7 @@ case class JCommandDistributor(componentToCommands: util.Map[JCommandService, ut
     }
 
     CommandDistributor(sComponentToCommands)
-      .aggregatedCompletionResponse()(timeout, scheduler, ec, mat)
+      .aggregatedCompletionResponse()(timeout, ec, mat)
       .toJava
       .toCompletableFuture
   }

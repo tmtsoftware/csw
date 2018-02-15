@@ -1,7 +1,6 @@
 package csw.services.ccs.scaladsl
 
 import akka.NotUsed
-import akka.actor.Scheduler
 import akka.stream.Materializer
 import akka.stream.scaladsl.Source
 import akka.util.Timeout
@@ -28,7 +27,6 @@ case class CommandDistributor(componentToCommands: Map[CommandService, Set[Contr
    */
   def aggregatedValidationResponse()(
       implicit timeout: Timeout,
-      scheduler: Scheduler,
       ec: ExecutionContext,
       mat: Materializer
   ): Future[CommandResponse] = {
@@ -51,7 +49,6 @@ case class CommandDistributor(componentToCommands: Map[CommandService, Set[Contr
    */
   def aggregatedCompletionResponse()(
       implicit timeout: Timeout,
-      scheduler: Scheduler,
       ec: ExecutionContext,
       mat: Materializer
   ): Future[CommandResponse] = {
