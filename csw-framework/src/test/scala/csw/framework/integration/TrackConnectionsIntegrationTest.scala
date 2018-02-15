@@ -15,7 +15,7 @@ import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.messages.ComponentCommonMessage.ComponentStateSubscription
 import csw.messages.SupervisorContainerCommonMessages.Shutdown
 import csw.messages.ccs.commands
-import csw.messages.ccs.commands.{CommandName, CommandService}
+import csw.messages.ccs.commands.CommandName
 import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState}
 import csw.messages.location.ComponentId
 import csw.messages.location.ComponentType.{Assembly, HCD}
@@ -23,6 +23,7 @@ import csw.messages.location.Connection.AkkaConnection
 import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.models.PubSub.Subscribe
 import csw.messages.params.states.CurrentState
+import csw.services.ccs.scaladsl.CommandService
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.models.{HttpRegistration, TcpRegistration}
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}

@@ -10,11 +10,11 @@ import com.typesafe.config.Config
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.messages.ComponentCommonMessage.GetSupervisorLifecycleState
 import csw.messages.ContainerCommonMessage.GetContainerLifecycleState
-import csw.messages.ccs.commands.CommandService
 import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState}
 import csw.messages.location.{AkkaLocation, ComponentId, ComponentType}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.{ComponentMessage, ContainerExternalMessage}
+import csw.services.ccs.scaladsl.CommandService
 import csw.services.location.commons.BlockingUtils
 import csw.services.location.scaladsl.LocationServiceFactory
 

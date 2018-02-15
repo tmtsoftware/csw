@@ -1,4 +1,4 @@
-package csw.messages.ccs.commands
+package csw.services.ccs.scaladsl
 
 import akka.NotUsed
 import akka.actor.Scheduler
@@ -12,6 +12,7 @@ import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Error}
 import csw.messages.ccs.commands.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
 import csw.messages.ccs.commands.matchers.{Matcher, StateMatcher}
+import csw.messages.ccs.commands.{CommandResponse, ControlCommand}
 import csw.messages.location.AkkaLocation
 import csw.messages.params.models.Id
 import csw.messages.{CommandResponseManagerMessage, ComponentMessage}

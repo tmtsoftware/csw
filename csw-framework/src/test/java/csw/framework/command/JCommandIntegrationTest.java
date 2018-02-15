@@ -15,7 +15,7 @@ import csw.messages.ccs.CommandIssue;
 import csw.messages.ccs.commands.CommandResponse;
 import csw.messages.ccs.commands.CommandResponse.Completed;
 import csw.messages.ccs.commands.ControlCommand;
-import csw.messages.ccs.commands.JCommandService;
+import csw.services.ccs.javadsl.JCommandService;
 import csw.messages.ccs.commands.Setup;
 import csw.messages.ccs.commands.matchers.*;
 import csw.messages.location.AkkaLocation;

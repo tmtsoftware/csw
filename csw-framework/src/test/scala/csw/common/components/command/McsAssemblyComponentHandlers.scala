@@ -8,7 +8,7 @@ import csw.common.components.command.ComponentStateForCommand._
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed}
-import csw.messages.ccs.commands.{CommandResponse, CommandService, ControlCommand, Setup}
+import csw.messages.ccs.commands.{CommandResponse, ControlCommand, Setup}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.{AkkaLocation, TrackingEvent}
 import csw.messages.models.PubSub
@@ -16,6 +16,7 @@ import csw.messages.models.PubSub.Publish
 import csw.messages.params.models.Id
 import csw.messages.params.states.CurrentState
 import csw.messages.{CommandResponseManagerMessage, TopLevelActorMessage}
+import csw.services.ccs.scaladsl.CommandService
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
 

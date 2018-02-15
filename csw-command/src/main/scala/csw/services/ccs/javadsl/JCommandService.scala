@@ -1,4 +1,4 @@
-package csw.messages.ccs.commands
+package csw.services.ccs.javadsl
 
 import java.util.concurrent.CompletableFuture
 
@@ -10,15 +10,17 @@ import akka.typed.ActorSystem
 import akka.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.util.Timeout
 import csw.messages.ccs.commands.matchers.StateMatcher
+import csw.messages.ccs.commands.{CommandResponse, ControlCommand}
 import csw.messages.location.AkkaLocation
 import csw.messages.params.models.Id
+import csw.services.ccs.scaladsl.CommandService
 
 import scala.collection.JavaConverters.iterableAsScalaIterableConverter
 import scala.compat.java8.FutureConverters.FutureOps
 import scala.concurrent.ExecutionContext
 
 /**
- * Java API for [[csw.messages.ccs.commands.CommandService]]
+ * Java API for [[CommandService]]
  */
 class JCommandService(akkaLocation: AkkaLocation, actorSystem: ActorSystem[_]) {
 

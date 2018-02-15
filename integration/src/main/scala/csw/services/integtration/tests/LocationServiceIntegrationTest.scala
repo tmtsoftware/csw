@@ -4,8 +4,11 @@ import akka.actor.{ActorSystem, Props, Scheduler}
 import akka.typed
 import akka.typed.Behavior
 import akka.typed.scaladsl.adapter._
+import akka.typed.testkit.TestKitSettings
+import akka.typed.testkit.scaladsl.TestProbe
 import akka.util.Timeout
-import csw.messages.ccs.commands.{CommandName, CommandService, Setup}
+import csw.messages.CommandMessage.Submit
+import csw.messages.ccs.commands.{CommandName, Setup}
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
 import csw.messages.location.{AkkaLocation, ComponentId, ComponentType, HttpLocation}
 import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
@@ -29,6 +32,7 @@ class LocationServiceIntegrationTest extends FunSuite with Matchers with BeforeA
   implicit val typedSystem: typed.ActorSystem[Nothing] = actorSystem.toTyped
   implicit val sched: Scheduler                        = actorSystem.scheduler
   implicit val timeout: Timeout                        = Timeout(5.seconds)
+  implicit val testKitSettings: TestKitSettings        = TestKitSettings(typedSystem)
 
   override protected def afterAll(): Unit =
     Await.result(locationService.shutdown(TestFinishedReason), 5.seconds)
@@ -56,7 +60,7 @@ class LocationServiceIntegrationTest extends FunSuite with Matchers with BeforeA
 
     val hcdAkkaLocation = hcdLocation.asInstanceOf[AkkaLocation]
 
-    new CommandService(hcdAkkaLocation).submit(Setup(Prefix("wfos.prog.cloudcover"), CommandName("Unregister"), None))
+    hcdAkkaLocation.componentRef ! Submit(Setup(Prefix("wfos.prog.cloudcover"), CommandName("Unregister"), None), TestProbe().ref)
     Thread.sleep(3000)
 
     locationService.list.await should have size 1
