@@ -11,6 +11,6 @@ import scala.concurrent.Future
 trait EventBusDriver {
   def publish(key: String, data: PbEvent): Future[Done]
   def set(key: String, data: PbEvent): Future[Done]
-  def subscribe(keys: String*): Source[EventMessage[String, PbEvent], KillSwitch]
+  def subscribe(keys: Seq[String]): Source[EventMessage[String, PbEvent], KillSwitch]
   def unsubscribe(keys: Seq[String]): Future[Done]
 }

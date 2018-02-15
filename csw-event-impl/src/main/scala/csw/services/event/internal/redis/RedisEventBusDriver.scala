@@ -6,8 +6,7 @@ import akka.stream.{KillSwitch, KillSwitches}
 import csw.services.event.internal.api.EventBusDriver
 import csw.services.event.scaladsl.EventMessage
 import csw_protobuf.events.PbEvent
-import io.lettuce.core.pubsub.StatefulRedisPubSubConnection
-import io.lettuce.core.pubsub.api.async.RedisPubSubAsyncCommands
+import io.lettuce.core.api.async.RedisAsyncCommands
 import io.lettuce.core.pubsub.api.reactive.RedisPubSubReactiveCommands
 import io.lettuce.core.{RedisClient, RedisURI}
 import reactor.core.publisher.FluxSink.OverflowStrategy
@@ -18,14 +17,11 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class RedisEventBusDriver(redisClient: RedisClient, redisURI: RedisURI)(implicit ec: ExecutionContext) extends EventBusDriver {
 
-  private val pubSubConnectionF: Future[StatefulRedisPubSubConnection[String, PbEvent]] =
-    redisClient.connectPubSubAsync(EventServiceCodec, redisURI).toScala
+  private val reactiveCommandsF: Future[RedisPubSubReactiveCommands[String, PbEvent]] =
+    redisClient.connectPubSubAsync(EventServiceCodec, redisURI).toScala.map(_.reactive())
 
-  private val pubSubConnectionF2: Future[StatefulRedisPubSubConnection[String, PbEvent]] =
-    redisClient.connectPubSubAsync(EventServiceCodec, redisURI).toScala
-
-  private val asyncCommandsF: Future[RedisPubSubAsyncCommands[String, PbEvent]]       = pubSubConnectionF2.map(_.async())
-  private val reactiveCommandsF: Future[RedisPubSubReactiveCommands[String, PbEvent]] = pubSubConnectionF.map(_.reactive())
+  private val asyncCommandsF: Future[RedisAsyncCommands[String, PbEvent]] =
+    redisClient.connectAsync(EventServiceCodec, redisURI).toScala.map(_.async())
 
   def publish(channel: String, data: PbEvent): Future[Done] = async {
     val commands = await(asyncCommandsF)

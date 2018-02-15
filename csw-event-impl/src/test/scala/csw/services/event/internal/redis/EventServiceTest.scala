@@ -1,37 +1,30 @@
 package csw.services.event.internal.redis
 
-import java.io.IOException
-import java.net.ServerSocket
-
-import akka.actor.ActorSystem
-import akka.stream.{ActorMaterializer, Materializer}
 import akka.testkit.TestProbe
 import com.github.sebruck.EmbeddedRedis
 import csw.messages.ccs.events.{Event, EventKey, EventName, SystemEvent}
 import csw.messages.params.models.Prefix
+import csw.services.event.helpers.PortHelper
+import csw.services.event.internal.Wiring
 import csw.services.event.internal.pubsub.{EventPublisherImpl, EventSubscriberImpl}
 import csw_protobuf.events.PbEvent
-import io.lettuce.core._
-import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import redis.embedded.RedisServer
 
-import scala.annotation.tailrec
+import scala.compat.java8.FutureConverters.CompletionStageOps
+import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
-import scala.concurrent.{Await, ExecutionContext}
-import scala.util.{Failure, Success, Try}
 
-class EventServiceTest extends FunSuite with Matchers with MockitoSugar with BeforeAndAfterAll with EmbeddedRedis {
+class EventServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with EmbeddedRedis {
 
-  implicit val actorSystem: ActorSystem = ActorSystem()
-  implicit val mat: Materializer        = ActorMaterializer()
-  implicit val ec: ExecutionContext     = actorSystem.dispatcher
+  private val port: Port = PortHelper.freePort
+  private val wiring     = new Wiring(port)
+  println(s"starting redis on $port")
 
-  var redis: RedisServer = _
-  var redisPort: Int     = 4545
+  import wiring._
+  lazy val redis: RedisServer = RedisServer.builder().setting("bind 127.0.0.1").port(port).build()
 
-  lazy val redisURI: RedisURI       = RedisURI.create("localhost", redisPort)
-  lazy val redisClient: RedisClient = RedisClient.create(redisURI)
+  redis.start()
 
   val prefix             = Prefix("test.prefix")
   val eventName          = EventName("system")
@@ -39,27 +32,10 @@ class EventServiceTest extends FunSuite with Matchers with MockitoSugar with Bef
   val pbEvent: PbEvent   = Event.typeMapper.toBase(event)
   val eventKey: EventKey = event.eventKey
 
-  override def beforeAll(): Unit = {
-//    redisPort = freePort
-    redis = RedisServer.builder().setting("bind 127.0.0.1").port(redisPort).build()
-    redis.start()
-  }
-
-  @tailrec
-  private final def freePort: Int = {
-    Try(new ServerSocket(0)) match {
-      case Success(socket) =>
-        val port = socket.getLocalPort
-        socket.close()
-        port
-      case Failure(e: IOException) ⇒ freePort
-      case Failure(e)              ⇒ throw e
-    }
-  }
-
   override def afterAll(): Unit = {
-    redis.stop()
+    Await.result(redisClient.shutdownAsync().toCompletableFuture.toScala, 5.seconds)
     Await.result(actorSystem.terminate(), 5.seconds)
+    redis.stop()
   }
 
   test("test subscribe with callback") {
@@ -67,7 +43,7 @@ class EventServiceTest extends FunSuite with Matchers with MockitoSugar with Bef
 
     val subscriptionImpl: EventSubscriberImpl = new EventSubscriberImpl(new RedisEventBusDriver(redisClient, redisURI))
 
-    subscriptionImpl.subscribe(e ⇒ testProbe.ref ! e, eventKey)
+    subscriptionImpl.subscribe(e ⇒ testProbe.ref ! e, Seq(eventKey))
 
     val publisherImpl = new EventPublisherImpl(new RedisEventBusDriver(redisClient, redisURI))
     Await.result(publisherImpl.publish(event), 5.seconds)
@@ -75,17 +51,9 @@ class EventServiceTest extends FunSuite with Matchers with MockitoSugar with Bef
     testProbe.expectMsg(event)
   }
 
-  test("sub-unsub") {
-    val driver = new RedisEventBusDriver(redisClient, redisURI)
-    driver.subscribe("abc").runForeach(println)
-    Thread.sleep(2000)
-    driver.publish("abc", pbEvent)
-    Thread.sleep(2000)
-    //    Thread.sleep(100)
-//    driver.publish("abc", pbEvent)
-//    Thread.sleep(100)
-//    driver.x.dispose()
-//    driver.publish("abc", pbEvent)
-//    Thread.sleep(10000)
+  test("pub-sub") {
+    subscriberImpl.subscribe(e => println(e), Seq(eventKey))
+    publisherImpl
   }
+
 }

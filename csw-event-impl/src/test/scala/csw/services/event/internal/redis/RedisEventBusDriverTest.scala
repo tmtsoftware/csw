@@ -1,47 +1,30 @@
 package csw.services.event.internal.redis
 
-import java.io.IOException
-import java.net.ServerSocket
-
+import akka.stream.scaladsl.{Keep, Sink}
 import com.github.sebruck.EmbeddedRedis
 import csw.messages.ccs.events.{Event, EventKey, EventName, SystemEvent}
 import csw.messages.params.models.Prefix
+import csw.services.event.helpers.TestFutureExt.RichFuture
+import csw.services.event.helpers.PortHelper
 import csw.services.event.internal.Wiring
 import csw_protobuf.events.PbEvent
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import redis.embedded.RedisServer
 
-import scala.annotation.tailrec
 import scala.compat.java8.FutureConverters.CompletionStageOps
-import scala.concurrent.duration.{Duration, DurationDouble}
-import scala.concurrent.{Await, Future}
-import scala.util.{Failure, Success, Try}
+import scala.concurrent.Await
+import scala.concurrent.duration.DurationDouble
 
 class RedisEventBusDriverTest extends FunSuite with Matchers with BeforeAndAfterAll with EmbeddedRedis {
 
-  private val wiring = new Wiring()
+  private val port: Port = PortHelper.freePort
+  private val wiring     = new Wiring(port)
+  println(s"starting redis on $port")
+
   import wiring._
-  lazy val redis: RedisServer = RedisServer.builder().setting("bind 127.0.0.1").port(redisPort).build()
+  lazy val redis: RedisServer = RedisServer.builder().setting("bind 127.0.0.1").port(port).build()
 
   redis.start()
-
-  val prefix             = Prefix("test.prefix")
-  val eventName          = EventName("system")
-  val event              = SystemEvent(prefix, eventName)
-  val pbEvent: PbEvent   = Event.typeMapper.toBase(event)
-  val eventKey: EventKey = event.eventKey
-
-  @tailrec
-  private final def freePort: Int = {
-    Try(new ServerSocket(0)) match {
-      case Success(socket) =>
-        val port = socket.getLocalPort
-        socket.close()
-        port
-      case Failure(e: IOException) ⇒ freePort
-      case Failure(e)              ⇒ throw e
-    }
-  }
 
   override def afterAll(): Unit = {
     Await.result(redisClient.shutdownAsync().toCompletableFuture.toScala, 5.seconds)
@@ -49,19 +32,16 @@ class RedisEventBusDriverTest extends FunSuite with Matchers with BeforeAndAfter
     redis.stop()
   }
 
-  test("abc") {
-    println()
-    eventBusDriver.subscribe("abc").runForeach(println)
-    eventBusDriver.publish("abc", pbEvent).await
-    eventBusDriver.unsubscribe(Seq("abc")).await
-    Thread.sleep(1000)
-    eventBusDriver.publish("abc", pbEvent).await
-    Thread.sleep(1000)
-  }
-
-  implicit class RichFuture[T](f: Future[T]) {
-    def await(duration: Duration): T = Await.result(f, duration)
-    def await: T                     = await(Duration.Inf)
+  test("pub-sub") {
+    val key                = "abc"
+    val (killSwitch, seqF) = eventBusDriver.subscribe(key).toMat(Sink.seq)(Keep.both).run()
+    Thread.sleep(10)
+    eventBusDriver.publish(key, PbEvent().withEventId("1")).await
+    eventBusDriver.publish(key, PbEvent().withEventId("2")).await
+    eventBusDriver.unsubscribe(Seq(key)).await
+    eventBusDriver.publish(key, PbEvent().withEventId("3")).await
+    killSwitch.shutdown()
+    seqF.await.map(_.value) shouldBe Seq(PbEvent().withEventId("1"), PbEvent().withEventId("2"))
   }
 
 }
