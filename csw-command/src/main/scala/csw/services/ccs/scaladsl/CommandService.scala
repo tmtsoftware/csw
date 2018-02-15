@@ -1,37 +1,54 @@
 package csw.services.ccs.scaladsl
 
-import akka.NotUsed
+import akka.{Done, NotUsed}
 import akka.actor.Scheduler
-import akka.stream.scaladsl.Source
-import akka.stream.{ActorMaterializer, Materializer}
+import akka.stream.scaladsl.{Keep, Sink, Source}
+import akka.stream.{ActorMaterializer, KillSwitches, Materializer, OverflowStrategy}
 import akka.typed.scaladsl.AskPattern._
 import akka.typed.scaladsl.adapter._
 import akka.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import csw.messages.CommandMessage.{Oneway, Submit}
+import csw.messages.ComponentCommonMessage.ComponentStateSubscription
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Error}
 import csw.messages.ccs.commands.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
 import csw.messages.ccs.commands.matchers.{Matcher, StateMatcher}
 import csw.messages.ccs.commands.{CommandResponse, ControlCommand}
 import csw.messages.location.AkkaLocation
-import csw.messages.params.models.Id
+import csw.messages.models.PubSub.Subscribe
+import csw.messages.params.models.{Id, Prefix}
+import csw.messages.params.states.CurrentState
 import csw.messages.{CommandResponseManagerMessage, ComponentMessage}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
- * A wrapper of an ActorRef of a csw component. This model provides method based APIs for command interactions with a component.
- * @param akkaLocation [[AkkaLocation]] of the component
+ * A Command Service API of a csw component. This model provides method based APIs for command interactions with a component.
+ * @param componentLocation [[AkkaLocation]] of the component
  */
-class CommandService(akkaLocation: AkkaLocation)(implicit val actorSystem: ActorSystem[_]) {
+class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: ActorSystem[_]) {
 
   private implicit val ec: ExecutionContext = actorSystem.executionContext
   private implicit val mat: Materializer    = ActorMaterializer()(actorSystem.toUntyped)
   private implicit val scheduler: Scheduler = actorSystem.scheduler
 
-  val component: ActorRef[ComponentMessage] = akkaLocation.componentRef
+  val component: ActorRef[ComponentMessage] = componentLocation.componentRef
 
   private val parallelism = 10
+
+  private def source: Source[CurrentState, Unit] = {
+    val bufferSize = 256
+    Source
+      .actorRef[CurrentState](bufferSize, OverflowStrategy.dropHead)
+      .mapMaterializedValue { ref ⇒
+        component ! ComponentStateSubscription(Subscribe(ref))
+      }
+  }
+
+  private lazy val (killSwitch, currentStateF) = source
+    .viaMat(KillSwitches.single)(Keep.right)
+    .toMat(Sink.head)(Keep.both)
+    .run()
 
   /**
    * Submit a command and get a [[csw.messages.ccs.commands.CommandResponse]] as a Future. The CommandResponse can be a response
@@ -160,4 +177,21 @@ class CommandService(akkaLocation: AkkaLocation)(implicit val actorSystem: Actor
     val value = Source(controlCommands).mapAsyncUnordered(parallelism)(submitAndSubscribe)
     CommandResponse.aggregateResponse(value)
   }
+
+  /**
+   * Subscribe to the current state of a component corresponding to the [[AkkaLocation]] of the component
+   * @param callback the action to be applied on the CurrentState element received as a result of subscription
+   */
+  def subscribeCurrentState(callback: CurrentState ⇒ Unit)(implicit mat: Materializer): Future[Done] = {
+    currentStateF
+      .map { x ⇒
+        callback(x)
+        Done
+      }
+  }
+
+  /*
+   * UnSubscribe to the current state of a component corresponding that was subscribed using `subscribeCurrentState` method.
+   */
+  def unSubscribeCurrentState(): Unit = killSwitch.shutdown()
 }
