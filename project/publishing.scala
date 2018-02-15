@@ -12,6 +12,19 @@ object NoPublish extends AutoPlugin {
   )
 }
 
+object PublishTests extends AutoPlugin {
+
+  override def trigger: PluginTrigger = allRequirements
+
+  override def projectSettings: Seq[Setting[_]] = Seq(
+    publishArtifact in (Test, packageBin) := true,
+    artifactPath in (Test, packageBin) := {
+      val _artifact = artifact.value
+      baseDirectory.value.getParentFile / "target" / "tests" / (_artifact.name + "-" + version.value + "-tests." + _artifact.extension)
+    }
+  )
+}
+
 object PublishBintray extends AutoPlugin {
   import bintray.BintrayPlugin
   import BintrayPlugin.autoImport._
