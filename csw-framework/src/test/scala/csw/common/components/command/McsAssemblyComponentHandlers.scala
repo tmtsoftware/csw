@@ -8,7 +8,7 @@ import csw.common.components.command.ComponentStateForCommand._
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed}
-import csw.messages.ccs.commands.{CommandResponse, ComponentRef, ControlCommand, Setup}
+import csw.messages.ccs.commands.{CommandResponse, CommandService, ControlCommand, Setup}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.{AkkaLocation, TrackingEvent}
 import csw.messages.models.PubSub
@@ -42,7 +42,7 @@ class McsAssemblyComponentHandlers(
   implicit val scheduler: Scheduler = ctx.system.scheduler
   implicit val ec: ExecutionContext = ctx.executionContext
   var completedCommands: Int        = 0
-  var hcdComponent: ComponentRef    = _
+  var hcdComponent: CommandService  = _
   var commandId: Id                 = _
   var shortSetup: Setup             = _
   var mediumSetup: Setup            = _
@@ -52,7 +52,7 @@ class McsAssemblyComponentHandlers(
     componentInfo.connections.headOption match {
       case Some(hcd) ⇒
         locationService.resolve(hcd.of[AkkaLocation], 5.seconds).map {
-          case Some(akkaLocation) ⇒ hcdComponent = new ComponentRef(akkaLocation)(ctx.system)
+          case Some(akkaLocation) ⇒ hcdComponent = new CommandService(akkaLocation)(ctx.system)
           case None               ⇒ throw new RuntimeException("Could not resolve hcd location, Initialization failure.")
         }
       case None ⇒ Future.successful(Unit)

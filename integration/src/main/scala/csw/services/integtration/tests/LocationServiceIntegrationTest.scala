@@ -5,7 +5,7 @@ import akka.typed
 import akka.typed.Behavior
 import akka.typed.scaladsl.adapter._
 import akka.util.Timeout
-import csw.messages.ccs.commands.{CommandName, ComponentRef, Setup}
+import csw.messages.ccs.commands.{CommandName, CommandService, Setup}
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
 import csw.messages.location.{AkkaLocation, ComponentId, ComponentType, HttpLocation}
 import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
@@ -56,7 +56,7 @@ class LocationServiceIntegrationTest extends FunSuite with Matchers with BeforeA
 
     val hcdAkkaLocation = hcdLocation.asInstanceOf[AkkaLocation]
 
-    new ComponentRef(hcdAkkaLocation).submit(Setup(Prefix("wfos.prog.cloudcover"), CommandName("Unregister"), None))
+    new CommandService(hcdAkkaLocation).submit(Setup(Prefix("wfos.prog.cloudcover"), CommandName("Unregister"), None))
     Thread.sleep(3000)
 
     locationService.list.await should have size 1

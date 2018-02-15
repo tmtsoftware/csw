@@ -18,15 +18,15 @@ import scala.compat.java8.FutureConverters.FutureOps
 import scala.concurrent.ExecutionContext
 
 /**
- * Java API for [[csw.messages.ccs.commands.ComponentRef]]
+ * Java API for [[csw.messages.ccs.commands.CommandService]]
  */
-class JComponentRef(akkaLocation: AkkaLocation, actorSystem: ActorSystem[_]) {
+class JCommandService(akkaLocation: AkkaLocation, actorSystem: ActorSystem[_]) {
 
   implicit val ec: ExecutionContext = actorSystem.executionContext
   implicit val mat: Materializer    = ActorMaterializer()(actorSystem.toUntyped)
   implicit val scheduler: Scheduler = actorSystem.scheduler
 
-  val sComponentRef: ComponentRef = new ComponentRef(akkaLocation)(actorSystem)
+  val sComponentRef: CommandService = new CommandService(akkaLocation)(actorSystem)
 
   /**
    * Submit a command and get a [[csw.messages.ccs.commands.CommandResponse]] as a Future. The CommandResponse can be a response

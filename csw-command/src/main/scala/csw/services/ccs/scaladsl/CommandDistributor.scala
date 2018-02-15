@@ -7,7 +7,7 @@ import akka.stream.scaladsl.Source
 import akka.util.Timeout
 import csw.messages.ccs.CommandIssue
 import csw.messages.ccs.commands.CommandResponse.Completed
-import csw.messages.ccs.commands.{CommandResponse, ComponentRef, ControlCommand}
+import csw.messages.ccs.commands.{CommandResponse, CommandService, ControlCommand}
 import csw.messages.params.models.Id
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -17,7 +17,7 @@ import scala.concurrent.{ExecutionContext, Future}
  * response as a final response
  * @param componentToCommands a map of Component and the set of commands to be sent to that component
  */
-case class CommandDistributor(componentToCommands: Map[ComponentRef, Set[ControlCommand]]) {
+case class CommandDistributor(componentToCommands: Map[CommandService, Set[ControlCommand]]) {
 
   private val breadth = 10
 

@@ -121,7 +121,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       // resolve assembly running in jvm-3 and send setup command expecting immediate command completion response
       val assemblyLocF                   = locationService.resolve(AkkaConnection(ComponentId("Assembly", ComponentType.Assembly)), 5.seconds)
       val assemblyLocation: AkkaLocation = Await.result(assemblyLocF, 10.seconds).get
-      val assemblyComponent              = new ComponentRef(assemblyLocation)
+      val assemblyComponent              = new CommandService(assemblyLocation)
 
       // DEOPSCSW-233: Hide implementation by having a CCS API
       // short running command

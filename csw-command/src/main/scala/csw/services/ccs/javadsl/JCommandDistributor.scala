@@ -6,7 +6,7 @@ import java.util.concurrent.CompletableFuture
 import akka.actor.Scheduler
 import akka.stream.Materializer
 import akka.util.Timeout
-import csw.messages.ccs.commands.{CommandResponse, ControlCommand, JComponentRef}
+import csw.messages.ccs.commands.{CommandResponse, ControlCommand, JCommandService}
 import csw.services.ccs.scaladsl.CommandDistributor
 
 import scala.collection.JavaConverters.{collectionAsScalaIterableConverter, mapAsScalaMapConverter}
@@ -17,7 +17,7 @@ import scala.concurrent.ExecutionContext
  * Java API for [[csw.services.ccs.scaladsl.CommandDistributor]]
  * @param componentToCommands a map of Component and the set of commands to be sent to that component
  */
-case class JCommandDistributor(componentToCommands: util.Map[JComponentRef, util.Set[ControlCommand]]) {
+case class JCommandDistributor(componentToCommands: util.Map[JCommandService, util.Set[ControlCommand]]) {
 
   /**
    * Submit multiple long running commands to components and get an aggregated response as `Accepted` if all the commands

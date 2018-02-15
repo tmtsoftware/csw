@@ -10,7 +10,7 @@ import com.typesafe.config.Config
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.messages.ComponentCommonMessage.GetSupervisorLifecycleState
 import csw.messages.ContainerCommonMessage.GetContainerLifecycleState
-import csw.messages.ccs.commands.ComponentRef
+import csw.messages.ccs.commands.CommandService
 import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState}
 import csw.messages.location.{AkkaLocation, ComponentId, ComponentType}
 import csw.messages.location.Connection.AkkaConnection
@@ -23,7 +23,7 @@ import scala.concurrent.duration.{Duration, DurationDouble}
 
 object BenchmarkHelpers {
 
-  def spawnStandaloneComponent(actorSystem: ActorSystem, config: Config): ComponentRef = {
+  def spawnStandaloneComponent(actorSystem: ActorSystem, config: Config): CommandService = {
     val locationService                                  = LocationServiceFactory.withSystem(actorSystem)
     val wiring: FrameworkWiring                          = FrameworkWiring.make(actorSystem, locationService)
     implicit val typedSystem: typed.ActorSystem[Nothing] = actorSystem.toTyped
@@ -37,7 +37,7 @@ object BenchmarkHelpers {
 
     assertThatSupervisorIsRunning(akkaLocation.componentRef, probe, 5.seconds)
 
-    new ComponentRef(akkaLocation)
+    new CommandService(akkaLocation)
   }
 
   def assertThatContainerIsRunning(

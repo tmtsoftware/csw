@@ -15,7 +15,7 @@ import csw.messages.ccs.CommandIssue;
 import csw.messages.ccs.commands.CommandResponse;
 import csw.messages.ccs.commands.CommandResponse.Completed;
 import csw.messages.ccs.commands.ControlCommand;
-import csw.messages.ccs.commands.JComponentRef;
+import csw.messages.ccs.commands.JCommandService;
 import csw.messages.ccs.commands.Setup;
 import csw.messages.ccs.commands.matchers.*;
 import csw.messages.location.AkkaLocation;
@@ -63,14 +63,14 @@ public class JCommandIntegrationTest {
 
     private ExecutionContext ec = hcdActorSystem.dispatcher();
     private Materializer mat = ActorMaterializer.create(hcdActorSystem);
-    private static JComponentRef hcdComponent;
+    private static JCommandService hcdComponent;
     private static AkkaLocation hcdLocation;
     private Timeout timeout = new Timeout(5, TimeUnit.SECONDS);
 
     @BeforeClass
     public static void setup() throws Exception {
         hcdLocation = getLocation();
-        hcdComponent = new JComponentRef(hcdLocation, akka.typed.ActorSystem.wrap(hcdActorSystem));
+        hcdComponent = new JCommandService(hcdLocation, akka.typed.ActorSystem.wrap(hcdActorSystem));
     }
 
     @AfterClass
@@ -266,7 +266,7 @@ public class JCommandIntegrationTest {
         Setup setupHcd1 = new Setup(prefix(), shortRunning(), Optional.empty()).add(encoderParam);
         Setup setupHcd2 = new Setup(prefix(), mediumRunning(), Optional.empty()).add(encoderParam);
 
-        HashMap<JComponentRef, Set<ControlCommand>> componentsToCommands = new HashMap<JComponentRef, Set<ControlCommand>>() {
+        HashMap<JCommandService, Set<ControlCommand>> componentsToCommands = new HashMap<JCommandService, Set<ControlCommand>>() {
             {
                 put(hcdComponent, new HashSet<ControlCommand>(Arrays.asList(setupHcd1, setupHcd2)));
             }
@@ -322,7 +322,7 @@ public class JCommandIntegrationTest {
         Setup setupHcd1 = new Setup(prefix(), shortRunning(), Optional.empty()).add(encoderParam);
         Setup setupHcd2 = new Setup(prefix(), mediumRunning(), Optional.empty()).add(encoderParam);
 
-        HashMap<JComponentRef, Set<ControlCommand>> componentsToCommands = new HashMap<JComponentRef, Set<ControlCommand>>() {
+        HashMap<JCommandService, Set<ControlCommand>> componentsToCommands = new HashMap<JCommandService, Set<ControlCommand>>() {
             {
                 put(hcdComponent, new HashSet<ControlCommand>(Arrays.asList(setupHcd1, setupHcd2)));
             }
@@ -347,7 +347,7 @@ public class JCommandIntegrationTest {
         Setup setupHcd1 = new Setup(prefix(), shortRunning(), Optional.empty()).add(encoderParam);
         Setup setupHcd2 = new Setup(prefix(), mediumRunning(), Optional.empty()).add(encoderParam);
 
-        HashMap<JComponentRef, Set<ControlCommand>> componentsToCommands = new HashMap<JComponentRef, Set<ControlCommand>>() {
+        HashMap<JCommandService, Set<ControlCommand>> componentsToCommands = new HashMap<JCommandService, Set<ControlCommand>>() {
             {
                 put(hcdComponent, new HashSet<ControlCommand>(Arrays.asList(setupHcd1, setupHcd2)));
             }

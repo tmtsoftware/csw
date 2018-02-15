@@ -6,7 +6,7 @@ import akka.actor.{ActorSystem, Scheduler}
 import akka.util
 import com.typesafe.config.ConfigFactory
 import csw.messages.ccs.commands
-import csw.messages.ccs.commands.{CommandName, CommandResponse, ComponentRef}
+import csw.messages.ccs.commands.{CommandName, CommandResponse, CommandService}
 import csw.messages.params.models.Prefix
 import csw.services.ccs.perf.BenchmarkHelpers.spawnStandaloneComponent
 import csw.services.location.commons.ClusterAwareSettings
@@ -36,7 +36,7 @@ class CommandServiceBenchmark {
   implicit var timeout: util.Timeout    = _
   implicit var scheduler: Scheduler     = _
   var setupCommand: commands.Setup      = _
-  var componentRef: ComponentRef        = _
+  var componentRef: CommandService      = _
 
   @Setup(Level.Trial)
   def setup(): Unit = {

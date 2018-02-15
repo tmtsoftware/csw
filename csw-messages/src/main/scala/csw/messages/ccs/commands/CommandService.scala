@@ -22,7 +22,7 @@ import scala.concurrent.{ExecutionContext, Future}
  * A wrapper of an ActorRef of a csw component. This model provides method based APIs for command interactions with a component.
  * @param akkaLocation [[AkkaLocation]] of the component
  */
-class ComponentRef(akkaLocation: AkkaLocation)(implicit val actorSystem: ActorSystem[_]) {
+class CommandService(akkaLocation: AkkaLocation)(implicit val actorSystem: ActorSystem[_]) {
 
   private implicit val ec: ExecutionContext = actorSystem.executionContext
   private implicit val mat: Materializer    = ActorMaterializer()(actorSystem.toUntyped)
