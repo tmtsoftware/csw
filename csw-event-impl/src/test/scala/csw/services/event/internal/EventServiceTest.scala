@@ -13,10 +13,6 @@ import csw.services.event.internal.publisher.EventPublisherImpl
 import csw.services.event.internal.subscriber.EventSubscriptionImpl
 import csw_protobuf.events.PbEvent
 import io.lettuce.core._
-import io.lettuce.core.api.StatefulRedisConnection
-import io.lettuce.core.api.sync.RedisCommands
-import io.lettuce.core.pubsub.StatefulRedisPubSubConnection
-import io.lettuce.core.pubsub.api.sync.RedisPubSubCommands
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import redis.embedded.RedisServer

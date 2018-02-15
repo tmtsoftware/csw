@@ -3,9 +3,9 @@ package tmt.sequencer.component
 import java.nio.file.Paths
 
 import akka.stream.ActorMaterializer
-import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.ccs.commands.{CommandResponse, ControlCommand}
@@ -19,8 +19,10 @@ import csw.services.config.api.scaladsl.ConfigClientService
 import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
+import tmt.sequencer.dsl.{CommandService, ControlDsl}
 import tmt.sequencer.engine.EngineBehaviour.EngineAction
 import tmt.sequencer.engine.{Engine, EngineBehaviour}
+import tmt.services
 
 import scala.async.Async.{async, await}
 import scala.concurrent.duration.DurationDouble
@@ -54,7 +56,7 @@ class SequencerHandlers(
 
     val outPutFilePath = await {
       maybeData match {
-        case Some(configData) => configData.toPath(Paths.get(""))
+        case Some(configData) => configData.toPath(Paths.get(s"scripts/${componentInfo.name}.sc"))
         case None             => ??? // TODO
       }
     }
@@ -63,12 +65,13 @@ class SequencerHandlers(
 
     val engineActor: ActorRef[EngineAction] = await(ctx.system.systemActorOf(EngineBehaviour.behaviour, "engine"))
 
-    val engine = new Engine(engineActor, ctx.system) //TODO: what to do if engine dies ? Decide in handlers.
-
+    ctx.watch(engineActor)
+    val engine1 = SequencerHandlers.dd(ctx.system, engineActor) //TODO: what to do if engine actor dies ? Decide in handlers.
+//SequencerHandlers.engine = engine1
     // Load script
-    val params = Array("scripts/ocs-sequencer.sc")
+    val params: List[String] = List(s"scripts/${componentInfo.name}.sc")
     // Run script using ammonite
-    ammonite.Main.main0(params.toList, System.in, System.out, System.err)
+    ammonite.Main.main0(params, System.in, System.out, System.err)
 
 //    implicit lazy val timeout: Timeout = Timeout(5.seconds)
 
@@ -90,4 +93,16 @@ class SequencerHandlers(
   override def onGoOffline(): Unit = ???
 
   override def onGoOnline(): Unit = ???
+}
+
+object SequencerHandlers extends ControlDsl {
+  var engine1: Engine = _
+  def dd(system: ActorSystem[Nothing], engineActor: ActorRef[EngineAction]): Engine = {
+    val cs: CommandService = new CommandService(new services.LocationService(system))(system.executionContext) //TODO: fix location service
+    engine1 = new Engine(engineActor, system)
+
+    engine1
+  }
+
+  override def engine: Engine = engine1
 }
