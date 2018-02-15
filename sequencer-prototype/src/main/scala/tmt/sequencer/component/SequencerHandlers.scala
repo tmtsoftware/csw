@@ -1,11 +1,12 @@
 package tmt.sequencer.component
 
-import java.nio.file.Paths
+import java.nio.charset.StandardCharsets
+import java.nio.file.{Files, Paths}
 
 import akka.stream.ActorMaterializer
+import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.ccs.commands.{CommandResponse, ControlCommand}
@@ -19,10 +20,8 @@ import csw.services.config.api.scaladsl.ConfigClientService
 import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
-import tmt.sequencer.dsl.{CommandService, ControlDsl}
+import tmt.sequencer.engine.EngineBehaviour
 import tmt.sequencer.engine.EngineBehaviour.EngineAction
-import tmt.sequencer.engine.{Engine, EngineBehaviour}
-import tmt.services
 
 import scala.async.Async.{async, await}
 import scala.concurrent.duration.DurationDouble
@@ -54,30 +53,30 @@ class SequencerHandlers(
 
     val maybeData: Option[ConfigData] = await(configClient.getActive(Paths.get(s"/${componentInfo.name}.sc")))
 
-    val outPutFilePath = await {
+    val scriptContent: String = await {
       maybeData match {
-        case Some(configData) => configData.toPath(Paths.get(s"scripts/${componentInfo.name}.sc"))
+        case Some(configData) => configData.toStringF
         case None             => ??? // TODO
       }
     }
+
+    val updatedScript = scriptContent.replace("import tmt.sequencer.dsl.Dsl._", "")
+
+    val path = Files.write(Paths.get(s"scripts/${componentInfo.name}.sc"), updatedScript.getBytes(StandardCharsets.UTF_8)) //TODO: decide on centos charset code
 
     implicit lazy val timeout: Timeout = Timeout(5.seconds)
 
     val engineActor: ActorRef[EngineAction] = await(ctx.system.systemActorOf(EngineBehaviour.behaviour, "engine"))
 
-    ctx.watch(engineActor)
-    val engine1 = SequencerHandlers.dd(ctx.system, engineActor) //TODO: what to do if engine actor dies ? Decide in handlers.
-//SequencerHandlers.engine = engine1
+    ctx.watch(engineActor) //TODO: what to do if engine actor dies ? Decide in handlers.
+
+    Dsl.make(ctx.system, engineActor)
+
     // Load script
-    val params: List[String] = List(s"scripts/${componentInfo.name}.sc")
+    val params: List[String] = List(path.toString)
+
     // Run script using ammonite
     ammonite.Main.main0(params, System.in, System.out, System.err)
-
-//    implicit lazy val timeout: Timeout = Timeout(5.seconds)
-
-//    lazy val engineActor: ActorRef[EngineAction] =
-//      Await.result(ctx.system.systemActorOf(EngineBehaviour.behaviour, "engine"), timeout.duration)
-//    lazy val engine = new Engine(engineActor, ctx.system)
   }
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = ???
@@ -93,16 +92,4 @@ class SequencerHandlers(
   override def onGoOffline(): Unit = ???
 
   override def onGoOnline(): Unit = ???
-}
-
-object SequencerHandlers extends ControlDsl {
-  var engine1: Engine = _
-  def dd(system: ActorSystem[Nothing], engineActor: ActorRef[EngineAction]): Engine = {
-    val cs: CommandService = new CommandService(new services.LocationService(system))(system.executionContext) //TODO: fix location service
-    engine1 = new Engine(engineActor, system)
-
-    engine1
-  }
-
-  override def engine: Engine = engine1
 }

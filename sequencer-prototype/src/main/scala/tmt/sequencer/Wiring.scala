@@ -5,7 +5,6 @@ import akka.typed
 import akka.typed.ActorRef
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.util.Timeout
-import tmt.sequencer.component.SequencerHandlers
 import tmt.sequencer.dsl.CommandService
 import tmt.sequencer.engine.EngineBehaviour.EngineAction
 import tmt.sequencer.engine.{Engine, EngineBehaviour}
@@ -20,11 +19,11 @@ class Wiring {
   lazy val system: typed.ActorSystem[Nothing] = ActorSystem("test").toTyped
   lazy val engineActor: ActorRef[EngineAction] =
     Await.result(system.systemActorOf(EngineBehaviour.behaviour, "engine"), timeout.duration)
-//  lazy val engine = new Engine(engineActor, system)
+
+  lazy val engine = new Engine(engineActor, system)
 
   lazy val locationService = new LocationService(system)
   lazy val commandService  = new CommandService(locationService)(system.executionContext)
-  val engine               = SequencerHandlers.dd(system, engineActor)
 }
 
 object Wiring {
