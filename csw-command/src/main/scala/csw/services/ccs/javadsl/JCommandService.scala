@@ -2,18 +2,19 @@ package csw.services.ccs.javadsl
 
 import java.util.concurrent.CompletableFuture
 
+import akka.NotUsed
 import akka.actor.Scheduler
 import akka.stream.javadsl.Source
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.typed.ActorSystem
 import akka.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.util.Timeout
-import akka.{Done, NotUsed}
 import csw.messages.ccs.commands.matchers.StateMatcher
 import csw.messages.ccs.commands.{CommandResponse, ControlCommand}
 import csw.messages.location.AkkaLocation
 import csw.messages.params.models.Id
 import csw.messages.params.states.CurrentState
+import csw.services.ccs.internal.CurrentStateSubscription
 import csw.services.ccs.scaladsl.CommandService
 
 import scala.collection.JavaConverters.iterableAsScalaIterableConverter
@@ -135,8 +136,7 @@ class JCommandService(akkaLocation: AkkaLocation, actorSystem: ActorSystem[_]) {
       .toJava
       .toCompletableFuture
 
-  def subscribeCurrentState(callback: CurrentState ⇒ Void): CompletableFuture[Done] =
-    sComponentRef.subscribeCurrentState(callback.andThen(_ ⇒ ())).toJava.toCompletableFuture
+  def subscribeCurrentState(callback: CurrentState ⇒ Void): CurrentStateSubscription =
+    sComponentRef.subscribeCurrentState(callback.andThen(() ⇒ _))
 
-  def unSubscribeCurrentState(): Void = sComponentRef.unSubscribeCurrentState().asInstanceOf
 }
