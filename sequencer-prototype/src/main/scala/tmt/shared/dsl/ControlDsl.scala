@@ -1,7 +1,7 @@
 package tmt.shared.dsl
 
 import tmt.shared.util.FutureExt.RichFuture
-import tmt.shared.engine.Engine
+import tmt.shared.engine.EngineDsl
 import tmt.shared.services.{Command, CommandResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -9,7 +9,7 @@ import scala.concurrent.Future
 import scala.language.implicitConversions
 
 trait ControlDsl {
-  def engine: Engine
+  def engine: EngineDsl
 
   implicit def toFuture(x: => CommandResponse): Future[CommandResponse] = Future(x)
 

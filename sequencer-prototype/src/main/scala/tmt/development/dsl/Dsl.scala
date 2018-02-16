@@ -3,7 +3,7 @@ package tmt.development.dsl
 import csw.services.location.commons.ClusterSettings
 import tmt.development.Wiring
 import tmt.shared.dsl.{CommandService, ControlDsl}
-import tmt.shared.engine.Engine
+import tmt.shared.engine.EngineDsl
 
 object Dsl extends ControlDsl {
   lazy val actorSystem    = ClusterSettings().onPort(3552).system
@@ -14,7 +14,7 @@ object Dsl extends ControlDsl {
   }
 
   lazy val cs: CommandService = wiring.commandService
-  lazy val engine: Engine     = wiring.engine
+  lazy val engine: EngineDsl  = wiring.engine
 
   val Command = tmt.shared.services.Command
   type Command = tmt.shared.services.Command

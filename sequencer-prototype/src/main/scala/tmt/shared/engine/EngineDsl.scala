@@ -11,15 +11,15 @@ import tmt.shared.services.Command
 
 import scala.concurrent.duration.DurationLong
 
-class Engine(engine: ActorRef[EngineAction], system: ActorSystem[_]) {
+class EngineDsl(engineRef: ActorRef[EngineAction], system: ActorSystem[_]) {
   private implicit val timeout: Timeout     = Timeout(10.hour)
   private implicit val scheduler: Scheduler = system.scheduler
 
-  def pullNext(): Command                    = (engine ? Pull).await
-  def push(command: Command): Unit           = engine ! Push(command)
+  def pullNext(): Command                    = (engineRef ? Pull).await
+  def push(command: Command): Unit           = engineRef ! Push(command)
   def pushAll(commands: List[Command]): Unit = commands.foreach(push)
-  def hasNext: Boolean                       = (engine ? HasNext).await
-  def pause(): Unit                          = engine ! Pause
-  def resume(): Unit                         = engine ! Resume
-  def reset(): Unit                          = engine ! Reset
+  def hasNext: Boolean                       = (engineRef ? HasNext).await
+  def pause(): Unit                          = engineRef ! Pause
+  def resume(): Unit                         = engineRef ! Resume
+  def reset(): Unit                          = engineRef ! Reset
 }

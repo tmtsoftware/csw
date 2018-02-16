@@ -2,15 +2,15 @@ package tmt.shared.dsl
 
 import org.scalatest.Matchers
 import tmt.development.Wiring
-import tmt.shared.engine.Engine
+import tmt.shared.engine.EngineDsl
 import tmt.shared.services.{Command, CommandResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class CommandServiceTest extends org.scalatest.FunSuite with Matchers with ControlDsl {
 
-  val wiring              = new Wiring()
-  lazy val engine: Engine = wiring.engine
+  val wiring                 = new Wiring()
+  lazy val engine: EngineDsl = wiring.engine
 
   def x: CommandResponse = {
     println("blocking")
