@@ -14,8 +14,6 @@ import csw.messages.framework.ComponentInfo
 import csw.messages.location.TrackingEvent
 import csw.messages.{CommandResponseManagerMessage, TopLevelActorMessage}
 import csw.services.config.api.models.ConfigData
-import csw.services.config.api.scaladsl.ConfigClientService
-import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
 import tmt.shared.engine.EngineBehaviour
