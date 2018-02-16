@@ -5,14 +5,12 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import akka.util.Timeout
 import csw.common.components.command.ComponentStateForCommand._
-import csw.framework.scaladsl.ComponentHandlers
+import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
 import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed}
 import csw.messages.ccs.commands.{CommandResponse, ControlCommand, Setup}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.{AkkaLocation, TrackingEvent}
-import csw.messages.models.PubSub
-import csw.messages.models.PubSub.Publish
 import csw.messages.params.models.Id
 import csw.messages.params.states.CurrentState
 import csw.messages.{CommandResponseManagerMessage, TopLevelActorMessage}
@@ -27,17 +25,10 @@ class McsAssemblyComponentHandlers(
     ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
     commandResponseManager: ActorRef[CommandResponseManagerMessage],
-    pubSubRef: ActorRef[PubSub.PublisherMessage[CurrentState]],
+    currentStatePublisher: CurrentStatePublisher,
     locationService: LocationService,
     loggerFactory: LoggerFactory
-) extends ComponentHandlers(
-      ctx,
-      componentInfo,
-      commandResponseManager,
-      pubSubRef,
-      locationService,
-      loggerFactory
-    ) {
+) extends ComponentHandlers(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, loggerFactory) {
 
   implicit val timeout: Timeout     = 10.seconds
   implicit val scheduler: Scheduler = ctx.system.scheduler
@@ -101,11 +92,11 @@ class McsAssemblyComponentHandlers(
             case _: Completed ⇒
               controlCommand.runId match {
                 case id if id == shortSetup.runId ⇒
-                  pubSubRef ! Publish(CurrentState(shortSetup.source, Set(choiceKey.set(shortCmdCompleted))))
+                  currentStatePublisher.publish(CurrentState(shortSetup.source, Set(choiceKey.set(shortCmdCompleted))))
                 case id if id == mediumSetup.runId ⇒
-                  pubSubRef ! Publish(CurrentState(mediumSetup.source, Set(choiceKey.set(mediumCmdCompleted))))
+                  currentStatePublisher.publish(CurrentState(mediumSetup.source, Set(choiceKey.set(mediumCmdCompleted))))
                 case id if id == longSetup.runId ⇒
-                  pubSubRef ! Publish(CurrentState(longSetup.source, Set(choiceKey.set(longCmdCompleted))))
+                  currentStatePublisher.publish(CurrentState(longSetup.source, Set(choiceKey.set(longCmdCompleted))))
               }
 
               completedCommands += 1

@@ -2,10 +2,8 @@ package csw.framework.javadsl
 
 import akka.typed.javadsl.ActorContext
 import akka.typed.{scaladsl, ActorRef}
-import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
+import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers, CurrentStatePublisher}
 import csw.messages.framework.ComponentInfo
-import csw.messages.models.PubSub
-import csw.messages.params.states.CurrentState
 import csw.messages.{CommandResponseManagerMessage, TopLevelActorMessage}
 import csw.services.location.javadsl.ILocationService
 import csw.services.location.scaladsl.LocationService
@@ -21,17 +19,24 @@ abstract class JComponentBehaviorFactory extends ComponentBehaviorFactory() {
       ctx: scaladsl.ActorContext[TopLevelActorMessage],
       componentInfo: ComponentInfo,
       commandResponseManager: ActorRef[CommandResponseManagerMessage],
-      pubSubRef: ActorRef[PubSub.PublisherMessage[CurrentState]],
+      currentStatePublisher: CurrentStatePublisher,
       locationService: LocationService,
       loggerFactory: LoggerFactory
   ): ComponentHandlers =
-    jHandlers(ctx.asJava, componentInfo, commandResponseManager, pubSubRef, locationService.asJava, loggerFactory.asJava)
+    jHandlers(
+      ctx.asJava,
+      componentInfo,
+      commandResponseManager,
+      currentStatePublisher,
+      locationService.asJava,
+      loggerFactory.asJava
+    )
 
   protected[framework] def jHandlers(
       ctx: ActorContext[TopLevelActorMessage],
       componentInfo: ComponentInfo,
       commandResponseManager: ActorRef[CommandResponseManagerMessage],
-      pubSubRef: ActorRef[PubSub.PublisherMessage[CurrentState]],
+      currentStatePublisher: CurrentStatePublisher,
       locationService: ILocationService,
       loggerFactory: JLoggerFactory
   ): JComponentHandlers

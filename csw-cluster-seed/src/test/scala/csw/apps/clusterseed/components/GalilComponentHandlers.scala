@@ -2,14 +2,12 @@ package csw.apps.clusterseed.components
 
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
-import csw.framework.scaladsl.ComponentHandlers
+import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
 import csw.messages._
 import csw.messages.ccs.commands.CommandResponse.Accepted
 import csw.messages.ccs.commands.{CommandResponse, ControlCommand}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.TrackingEvent
-import csw.messages.models.PubSub.PublisherMessage
-import csw.messages.params.states.CurrentState
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
@@ -21,10 +19,10 @@ class GalilComponentHandlers(
     ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
     commandResponseManager: ActorRef[CommandResponseManagerMessage],
-    pubSubRef: ActorRef[PublisherMessage[CurrentState]],
+    currentStatePublisher: CurrentStatePublisher,
     locationService: LocationService,
     loggerFactory: LoggerFactory
-) extends ComponentHandlers(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory) {
+) extends ComponentHandlers(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, loggerFactory) {
   val log: Logger = new LoggerFactory(componentInfo.name).getLogger
 
   override def initialize(): Future[Unit] = Future.successful(())

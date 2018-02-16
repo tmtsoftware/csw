@@ -2,9 +2,8 @@ package csw.common.components.framework
 
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
+import csw.framework.scaladsl.CurrentStatePublisher
 import csw.messages.framework.ComponentInfo
-import csw.messages.models.PubSub.PublisherMessage
-import csw.messages.params.states.CurrentState
 import csw.messages.{CommandResponseManagerMessage, TopLevelActorMessage}
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
@@ -15,14 +14,14 @@ class ComponentHandlerToSimulateFailure(
     ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
     commandResponseManager: ActorRef[CommandResponseManagerMessage],
-    pubSubRef: ActorRef[PublisherMessage[CurrentState]],
+    currentStatePublisher: CurrentStatePublisher,
     locationService: LocationService,
     loggerFactory: LoggerFactory
 ) extends SampleComponentHandlers(
       ctx,
       componentInfo,
       commandResponseManager,
-      pubSubRef,
+      currentStatePublisher,
       locationService,
       loggerFactory: LoggerFactory
     ) {

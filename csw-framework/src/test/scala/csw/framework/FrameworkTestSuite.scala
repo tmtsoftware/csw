@@ -8,10 +8,8 @@ import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import csw.framework.internal.supervisor.SupervisorBehaviorFactory
-import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
+import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers, CurrentStatePublisher}
 import csw.messages.framework.ComponentInfo
-import csw.messages.models.PubSub.PublisherMessage
-import csw.messages.params.states.CurrentState
 import csw.messages.{CommandResponseManagerMessage, ComponentMessage, ContainerIdleMessage, TopLevelActorMessage}
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.scaladsl.LocationService
@@ -39,24 +37,19 @@ abstract class FrameworkTestSuite extends FunSuite with Matchers with BeforeAndA
     (ctx: ActorContext[TopLevelActorMessage],
      componentInfo: ComponentInfo,
      commandResponseManager: ActorRef[CommandResponseManagerMessage],
-     pubSubRef: ActorRef[PublisherMessage[CurrentState]],
+     currentStatePublisher: CurrentStatePublisher,
      locationService: LocationService,
      loggerFactory: LoggerFactory) => componentHandlers
 
   def getSampleAssemblyWiring(
       assemblyHandlers: ComponentHandlers
   ): ComponentBehaviorFactory =
-    new ComponentBehaviorFactory {
-      override def handlers(
-          ctx: ActorContext[TopLevelActorMessage],
-          componentInfo: ComponentInfo,
-          commandResponseManager: ActorRef[CommandResponseManagerMessage],
-          pubSubRef: ActorRef[PublisherMessage[CurrentState]],
-          locationService: LocationService,
-          loggerFactory: LoggerFactory
-      ): ComponentHandlers =
-        assemblyHandlers
-    }
+    (ctx: ActorContext[TopLevelActorMessage],
+     componentInfo: ComponentInfo,
+     commandResponseManager: ActorRef[CommandResponseManagerMessage],
+     currentStatePublisher: CurrentStatePublisher,
+     locationService: LocationService,
+     loggerFactory: LoggerFactory) => assemblyHandlers
 
   def createSupervisorAndStartTLA(
       componentInfo: ComponentInfo,

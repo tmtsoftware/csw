@@ -8,12 +8,10 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.util.Timeout
-import csw.framework.scaladsl.ComponentHandlers
+import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
 import csw.messages.ccs.commands.{CommandResponse, ControlCommand}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.TrackingEvent
-import csw.messages.models.PubSub.PublisherMessage
-import csw.messages.params.states.CurrentState
 import csw.messages.{CommandResponseManagerMessage, TopLevelActorMessage}
 import csw.services.config.api.models.ConfigData
 import csw.services.config.api.scaladsl.ConfigClientService
@@ -31,14 +29,14 @@ class SequencerHandlers(
     ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
     commandResponseManager: ActorRef[CommandResponseManagerMessage],
-    pubSubRef: ActorRef[PublisherMessage[CurrentState]],
+    currentStatePublisher: CurrentStatePublisher,
     locationService: LocationService,
     loggerFactory: LoggerFactory
 ) extends ComponentHandlers(
       ctx,
       componentInfo,
       commandResponseManager,
-      pubSubRef,
+      currentStatePublisher,
       locationService,
       loggerFactory: LoggerFactory
     ) {

@@ -8,7 +8,7 @@ import akka.typed.scaladsl.{Actor, ActorContext, TimerScheduler}
 import akka.typed.{ActorRef, Behavior, PostStop, Signal, SupervisorStrategy, Terminated}
 import csw.exceptions.{FailureRestart, InitializationFailed}
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
-import csw.framework.scaladsl.ComponentBehaviorFactory
+import csw.framework.scaladsl.{ComponentBehaviorFactory, CurrentStatePublisher}
 import csw.messages.CommandResponseManagerMessage.{Query, Subscribe, Unsubscribe}
 import csw.messages.ComponentCommonMessage._
 import csw.messages.FromComponentLifecycleMessage.Running
@@ -90,7 +90,7 @@ class SupervisorBehavior(
   val akkaRegistration: AkkaRegistration = registrationFactory.akkaTyped(akkaConnection, ctx.self)
   val isStandalone: Boolean              = maybeContainerRef.isEmpty
 
-  val pubSubComponent: ActorRef[PubSub[CurrentState]]                 = makePubSubComponent()
+  val pubSubComponentActor: ActorRef[PubSub[CurrentState]]            = makePubSubComponent()
   val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]]        = makePubSubLifecycle()
   val commandResponseManager: ActorRef[CommandResponseManagerMessage] = makeCommandResponseManager()
 
@@ -152,7 +152,7 @@ class SupervisorBehavior(
    */
   private def onCommon(commonMessage: ComponentCommonMessage): Unit = commonMessage match {
     case LifecycleStateSubscription(subscriberMessage) ⇒ pubSubLifecycle ! subscriberMessage
-    case ComponentStateSubscription(subscriberMessage) ⇒ pubSubComponent ! subscriberMessage
+    case ComponentStateSubscription(subscriberMessage) ⇒ pubSubComponentActor ! subscriberMessage
     case GetSupervisorLifecycleState(replyTo)          ⇒ replyTo ! lifecycleState
     case Restart                                       ⇒ onRestart()
     case Shutdown                                      ⇒ onShutdown()
@@ -307,7 +307,12 @@ class SupervisorBehavior(
     val behavior = Actor
       .supervise[Nothing](
         componentBehaviorFactory
-          .make(componentInfo, ctx.self, pubSubComponent, commandResponseManager, locationService, loggerFactory)
+          .make(componentInfo,
+                ctx.self,
+                new CurrentStatePublisher(pubSubComponentActor),
+                commandResponseManager,
+                locationService,
+                loggerFactory)
       )
       .onFailure[FailureRestart](SupervisorStrategy.restartWithLimit(3, Duration.Zero).withLoggingEnabled(true))
 

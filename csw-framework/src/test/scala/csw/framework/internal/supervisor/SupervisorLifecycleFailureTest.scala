@@ -12,14 +12,14 @@ import csw.common.utils.TestAppender
 import csw.exceptions.{FailureRestart, FailureStop}
 import csw.framework.ComponentInfos._
 import csw.framework.internal.component.ComponentBehavior
-import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
+import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers, CurrentStatePublisher}
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.messages.CommandMessage.Submit
 import csw.messages.ComponentCommonMessage.GetSupervisorLifecycleState
 import csw.messages.SupervisorContainerCommonMessages.Restart
 import csw.messages.ccs.commands.{CommandName, CommandResponse, ControlCommand, Setup}
 import csw.messages.framework.{ComponentInfo, SupervisorLifecycleState}
-import csw.messages.models.PubSub.{Publish, PublisherMessage}
+import csw.messages.models.PubSub.Publish
 import csw.messages.models.{LifecycleStateChanged, PubSub}
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.ObsId
@@ -234,7 +234,7 @@ class SampleBehaviorFactory(componentHandlers: ComponentHandlers) extends Compon
       ctx: ActorContext[TopLevelActorMessage],
       componentInfo: ComponentInfo,
       commandResponseManager: ActorRef[CommandResponseManagerMessage],
-      pubSubRef: ActorRef[PublisherMessage[CurrentState]],
+      currentStatePublisher: CurrentStatePublisher,
       locationService: LocationService,
       loggerFactory: LoggerFactory
   ): ComponentHandlers = componentHandlers

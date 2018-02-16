@@ -6,13 +6,11 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.adapter.TypedActorSystemOps
 import csw.exceptions.{FailureRestart, FailureStop}
-import csw.framework.scaladsl.ComponentHandlers
+import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
 import csw.messages.ccs.commands.CommandResponse.Accepted
 import csw.messages.ccs.commands._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location._
-import csw.messages.models.PubSub.PublisherMessage
-import csw.messages.params.states.CurrentState
 import csw.messages.{CommandResponseManagerMessage, TopLevelActorMessage}
 import csw.services.config.api.scaladsl.ConfigClientService
 import csw.services.config.client.scaladsl.ConfigClientFactory
@@ -28,14 +26,14 @@ class AssemblyComponentHandlers(
     ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
     commandResponseManager: ActorRef[CommandResponseManagerMessage],
-    pubSubRef: ActorRef[PublisherMessage[CurrentState]],
+    currentStatePublisher: CurrentStatePublisher,
     locationService: LocationService,
     loggerFactory: LoggerFactory
 ) extends ComponentHandlers(
       ctx,
       componentInfo,
       commandResponseManager,
-      pubSubRef,
+      currentStatePublisher,
       locationService,
       loggerFactory: LoggerFactory
     )

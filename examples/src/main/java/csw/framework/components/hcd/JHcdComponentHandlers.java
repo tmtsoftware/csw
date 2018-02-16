@@ -3,6 +3,7 @@ package csw.framework.components.hcd;
 import akka.typed.ActorRef;
 import akka.typed.javadsl.ActorContext;
 import csw.framework.javadsl.JComponentHandlers;
+import csw.framework.scaladsl.CurrentStatePublisher;
 import csw.messages.CommandResponseManagerMessage;
 import csw.messages.TopLevelActorMessage;
 import csw.messages.ccs.commands.CommandResponse;
@@ -13,12 +14,9 @@ import csw.messages.framework.ComponentInfo;
 import csw.messages.location.LocationRemoved;
 import csw.messages.location.LocationUpdated;
 import csw.messages.location.TrackingEvent;
-import csw.messages.models.PubSub;
-import csw.messages.params.states.CurrentState;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.logging.javadsl.ILogger;
 import csw.services.logging.javadsl.JLoggerFactory;
-import scala.runtime.BoxedUnit;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -28,7 +26,7 @@ public class JHcdComponentHandlers extends JComponentHandlers {
     private final ActorContext<TopLevelActorMessage> ctx;
     private final ComponentInfo componentInfo;
     private final ActorRef<CommandResponseManagerMessage> commandResponseManager;
-    private final ActorRef<PubSub.PublisherMessage<CurrentState>> pubSubRef;
+    private final CurrentStatePublisher currentStatePublisher;
     private final ILocationService locationService;
     private ILogger log;
 
@@ -36,16 +34,16 @@ public class JHcdComponentHandlers extends JComponentHandlers {
             akka.typed.javadsl.ActorContext<TopLevelActorMessage> ctx,
             ComponentInfo componentInfo,
             ActorRef<CommandResponseManagerMessage> commandResponseManager,
-            ActorRef<PubSub.PublisherMessage<CurrentState>> pubSubRef,
+            CurrentStatePublisher currentStatePublisher,
             ILocationService locationService,
             JLoggerFactory loggerFactory
 
     ) {
-        super(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory);
+        super(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, loggerFactory);
         this.ctx = ctx;
         this.componentInfo = componentInfo;
         this.commandResponseManager = commandResponseManager;
-        this.pubSubRef = pubSubRef;
+        this.currentStatePublisher = currentStatePublisher;
         this.locationService = locationService;
         log = loggerFactory.getLogger(this.getClass());
     }

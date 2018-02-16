@@ -8,7 +8,7 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.util.Timeout
-import csw.framework.scaladsl.ComponentHandlers
+import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
 import csw.messages.CommandResponseManagerMessage.{AddOrUpdateCommand, Query}
 import csw.messages._
 import csw.messages.ccs.CommandIssue.{OtherIssue, WrongPrefixIssue}
@@ -16,7 +16,6 @@ import csw.messages.ccs.commands.CommandResponse._
 import csw.messages.ccs.commands._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location._
-import csw.messages.models.PubSub.{Publish, PublisherMessage}
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.Id
 import csw.messages.params.states.CurrentState
@@ -30,17 +29,10 @@ class ComponentHandlerForCommand(
     ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
     commandResponseManager: ActorRef[CommandResponseManagerMessage],
-    pubSubRef: ActorRef[PublisherMessage[CurrentState]],
+    currentStatePublisher: CurrentStatePublisher,
     locationService: LocationService,
     loggerFactory: LoggerFactory
-) extends ComponentHandlers(
-      ctx,
-      componentInfo,
-      commandResponseManager,
-      pubSubRef,
-      locationService,
-      loggerFactory
-    ) {
+) extends ComponentHandlers(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, loggerFactory) {
 
   val log: Logger = loggerFactory.getLogger(ctx)
   val cancelCmdId = KeyType.StringKey.make("cancelCmdId")
@@ -119,13 +111,18 @@ class ComponentHandlerForCommand(
       case `matcherTimeoutCmd` ⇒ Thread.sleep(1000)
       case `matcherFailedCmd` ⇒
         Source(1 to 10)
-          .map(i ⇒ pubSubRef ! Publish(CurrentState(controlCommand.source, Set(KeyType.IntKey.make("encoder").set(i * 1)))))
+          .map(
+            i ⇒ currentStatePublisher.publish(CurrentState(controlCommand.source, Set(KeyType.IntKey.make("encoder").set(i * 1))))
+          )
           .throttle(1, 100.millis, 1, ThrottleMode.Shaping)
           .runWith(Sink.ignore)
 
       case _ ⇒
         Source(1 to 10)
-          .map(i ⇒ pubSubRef ! Publish(CurrentState(controlCommand.source, Set(KeyType.IntKey.make("encoder").set(i * 10)))))
+          .map(
+            i ⇒
+              currentStatePublisher.publish(CurrentState(controlCommand.source, Set(KeyType.IntKey.make("encoder").set(i * 10))))
+          )
           .throttle(1, 100.millis, 1, ThrottleMode.Shaping)
           .runWith(Sink.ignore)
     }

@@ -4,11 +4,10 @@ import akka.typed.ActorRef;
 import akka.typed.javadsl.ActorContext;
 import csw.framework.javadsl.JComponentBehaviorFactory;
 import csw.framework.javadsl.JComponentHandlers;
+import csw.framework.scaladsl.CurrentStatePublisher;
 import csw.messages.CommandResponseManagerMessage;
 import csw.messages.TopLevelActorMessage;
 import csw.messages.framework.ComponentInfo;
-import csw.messages.models.PubSub;
-import csw.messages.params.states.CurrentState;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.logging.javadsl.JLoggerFactory;
 
@@ -20,11 +19,11 @@ public class JHcdComponentBehaviourFactory extends JComponentBehaviorFactory {
             ActorContext<TopLevelActorMessage> ctx,
             ComponentInfo componentInfo,
             ActorRef<CommandResponseManagerMessage> commandResponseManager,
-            ActorRef<PubSub.PublisherMessage<CurrentState>> pubSubRef,
+            CurrentStatePublisher currentStatePublisher,
             ILocationService locationService,
             JLoggerFactory loggerFactory
     ) {
-        return new JHcdComponentHandlers(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory);
+        return new JHcdComponentHandlers(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, loggerFactory);
     }
 }
 //#jcomponent-factory

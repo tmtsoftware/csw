@@ -2,13 +2,11 @@ package csw.framework.components.hcd
 
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
-import csw.framework.scaladsl.ComponentHandlers
+import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
 import csw.messages.ccs.commands.CommandResponse.Accepted
 import csw.messages.ccs.commands.{CommandResponse, ControlCommand, Observe, Setup}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.{LocationRemoved, LocationUpdated, TrackingEvent}
-import csw.messages.models.PubSub.PublisherMessage
-import csw.messages.params.states.CurrentState
 import csw.messages.{CommandResponseManagerMessage, TopLevelActorMessage}
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
@@ -21,14 +19,14 @@ class HcdComponentHandlers(
     ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
     commandResponseManager: ActorRef[CommandResponseManagerMessage],
-    pubSubRef: ActorRef[PublisherMessage[CurrentState]],
+    currentStatePublisher: CurrentStatePublisher,
     locationService: LocationService,
     loggerFactory: LoggerFactory
 ) extends ComponentHandlers(
       ctx,
       componentInfo,
       commandResponseManager,
-      pubSubRef,
+      currentStatePublisher,
       locationService,
       loggerFactory: LoggerFactory
     )

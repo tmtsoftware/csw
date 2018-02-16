@@ -6,14 +6,16 @@ import akka.typed.javadsl.Adapter;
 import csw.exceptions.FailureRestart;
 import csw.exceptions.FailureStop;
 import csw.framework.javadsl.JComponentHandlers;
+import csw.framework.scaladsl.CurrentStatePublisher;
 import csw.messages.CommandResponseManagerMessage;
 import csw.messages.TopLevelActorMessage;
 import csw.messages.ccs.CommandIssue;
-import csw.messages.ccs.commands.*;
+import csw.messages.ccs.commands.CommandResponse;
+import csw.messages.ccs.commands.ControlCommand;
+import csw.messages.ccs.commands.Observe;
+import csw.messages.ccs.commands.Setup;
 import csw.messages.framework.ComponentInfo;
 import csw.messages.location.*;
-import csw.messages.models.PubSub;
-import csw.messages.params.states.CurrentState;
 import csw.services.config.api.javadsl.IConfigClientService;
 import csw.services.config.api.models.ConfigData;
 import csw.services.config.client.javadsl.JConfigClientFactory;
@@ -36,7 +38,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     private final ActorContext<TopLevelActorMessage> ctx;
     private final ComponentInfo componentInfo;
     private final ActorRef<CommandResponseManagerMessage> commandResponseManager;
-    private final ActorRef<PubSub.PublisherMessage<CurrentState>> pubSubRef;
+    private final CurrentStatePublisher currentStatePublisher;
     private final ILocationService locationService;
     private ILogger log;
     private IConfigClientService configClient;
@@ -45,16 +47,16 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
             akka.typed.javadsl.ActorContext<TopLevelActorMessage> ctx,
             ComponentInfo componentInfo,
             ActorRef<CommandResponseManagerMessage> commandResponseManager,
-            ActorRef<PubSub.PublisherMessage<CurrentState>> pubSubRef,
+            CurrentStatePublisher currentStatePublisher,
             ILocationService locationService,
             JLoggerFactory loggerFactory
 
     ) {
-        super(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory);
+        super(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, loggerFactory);
         this.ctx = ctx;
         this.componentInfo = componentInfo;
         this.commandResponseManager = commandResponseManager;
-        this.pubSubRef = pubSubRef;
+        this.currentStatePublisher = currentStatePublisher;
         this.locationService = locationService;
         log = loggerFactory.getLogger(this.getClass());
         configClient = JConfigClientFactory.clientApi(Adapter.toUntyped(ctx.getSystem()), locationService);

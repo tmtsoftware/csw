@@ -9,6 +9,7 @@ import akka.typed.javadsl.ActorContext;
 import csw.common.components.command.ComponentStateForCommand;
 import csw.common.components.framework.SampleComponentState;
 import csw.framework.javadsl.JComponentHandlers;
+import csw.framework.scaladsl.CurrentStatePublisher;
 import csw.messages.CommandResponseManagerMessage;
 import csw.messages.TopLevelActorMessage;
 import csw.messages.ccs.CommandIssue;
@@ -18,8 +19,6 @@ import csw.messages.ccs.commands.Result;
 import csw.messages.ccs.commands.Setup;
 import csw.messages.framework.ComponentInfo;
 import csw.messages.location.TrackingEvent;
-import csw.messages.models.PubSub;
-import csw.messages.models.PubSub.Publish;
 import csw.messages.params.generics.JKeyTypes;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.states.CurrentState;
@@ -27,14 +26,11 @@ import csw.services.location.javadsl.ILocationService;
 import csw.services.logging.javadsl.ILogger;
 import csw.services.logging.javadsl.JLoggerFactory;
 import scala.concurrent.duration.Duration;
-import scala.runtime.BoxedUnit;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-import static csw.common.components.command.ComponentStateForCommand.failureAfterValidationCmd;
-import static csw.common.components.command.ComponentStateForCommand.immediateCmd;
-import static csw.common.components.command.ComponentStateForCommand.immediateResCmd;
+import static csw.common.components.command.ComponentStateForCommand.*;
 import static csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand;
 import static csw.messages.ccs.commands.CommandResponse.*;
 
@@ -43,7 +39,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     // Demonstrating logger accessibility in Java Component handlers
     private ILogger log;
     private ActorRef<CommandResponseManagerMessage> commandResponseManagerRef;
-    private ActorRef<PubSub.PublisherMessage<CurrentState>> pubSubRef;
+    private CurrentStatePublisher currentStatePublisher;
     private CurrentState currentState = new CurrentState(SampleComponentState.prefix().prefix());
     private ActorContext<TopLevelActorMessage> actorContext;
 
@@ -51,12 +47,12 @@ public class JSampleComponentHandlers extends JComponentHandlers {
             ActorContext<TopLevelActorMessage> ctx,
             ComponentInfo componentInfo,
             ActorRef<CommandResponseManagerMessage> commandResponseManager,
-            ActorRef<PubSub.PublisherMessage<CurrentState>> pubSubRef,
+            CurrentStatePublisher currentStatePublisher,
             ILocationService locationService,
             JLoggerFactory loggerFactory
     ) {
-        super(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory);
-        this.pubSubRef = pubSubRef;
+        super(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, loggerFactory);
+        this.currentStatePublisher = currentStatePublisher;
         this.log = loggerFactory.getLogger(getClass());
         this.commandResponseManagerRef = commandResponseManager;
         this.actorContext = ctx;
@@ -71,8 +67,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
         }
         return CompletableFuture.runAsync(() -> {
             CurrentState initState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.initChoice()));
-            Publish<CurrentState> publish = new Publish<>(initState);
-            pubSubRef.tell(publish);
+            currentStatePublisher.publish(initState);
         });
     }
 
@@ -85,8 +80,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     public void onSubmit(ControlCommand controlCommand) {
         // Adding item from CommandMessage paramset to ensure things are working
         CurrentState submitState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.submitCommandChoice()));
-        Publish<CurrentState> publish = new Publish<>(submitState);
-        pubSubRef.tell(publish);
+        currentStatePublisher.publish(submitState);
         processCommand(controlCommand);
     }
 
@@ -94,16 +88,14 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     public void onOneway(ControlCommand controlCommand) {
         // Adding item from CommandMessage paramset to ensure things are working
         CurrentState onewayState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.oneWayCommandChoice()));
-        Publish<CurrentState> publish = new Publish<>(onewayState);
-        pubSubRef.tell(publish);
+        currentStatePublisher.publish(onewayState);
         processCommand(controlCommand);
     }
 
     @Override
     public CommandResponse validateCommand(ControlCommand controlCommand) {
         CurrentState submitState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.commandValidationChoice()));
-        Publish<CurrentState> publish = new Publish<>(submitState);
-        pubSubRef.tell(publish);
+        currentStatePublisher.publish(submitState);
 
         if (controlCommand.commandName().equals(immediateCmd())) {
             return new Completed(controlCommand.runId());
@@ -133,7 +125,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     private void processCommandWithMatcher(ControlCommand controlCommand) {
         Source.range(1, 10)
                 .map(i -> {
-                    pubSubRef.tell(new Publish(new CurrentState(controlCommand.source().prefix()).add(JKeyTypes.IntKey().make("encoder").set(i * 10))));
+                    currentStatePublisher.publish(new CurrentState(controlCommand.source().prefix()).add(JKeyTypes.IntKey().make("encoder").set(i * 10)));
                     return i;
                 })
                 .throttle(1, Duration.create(100, TimeUnit.MILLISECONDS), 1, ThrottleMode.shaping())
@@ -160,33 +152,26 @@ public class JSampleComponentHandlers extends JComponentHandlers {
         else
             commandState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.observeConfigChoice())).add(controlCommand.paramSet().head());
 
-        Publish<CurrentState> publish = new Publish<>(commandState);
-        pubSubRef.tell(publish);
+        currentStatePublisher.publish(commandState);;
     }
 
     @Override
     public CompletableFuture<Void> jOnShutdown() {
         return CompletableFuture.runAsync(() -> {
             CurrentState shutdownState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.shutdownChoice()));
-            Publish<CurrentState> publish = new Publish<>(shutdownState);
-
-            pubSubRef.tell(publish);
+            currentStatePublisher.publish(shutdownState);
         });
     }
 
     @Override
     public void onGoOffline() {
         CurrentState offlineState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.offlineChoice()));
-        Publish<CurrentState> publish = new Publish<>(offlineState);
-
-        pubSubRef.tell(publish);
+        currentStatePublisher.publish(offlineState);
     }
 
     @Override
     public void onGoOnline() {
         CurrentState onlineState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.onlineChoice()));
-        Publish<CurrentState> publish = new Publish<>(onlineState);
-
-        pubSubRef.tell(publish);
+        currentStatePublisher.publish(onlineState);
     }
 }

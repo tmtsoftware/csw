@@ -2,7 +2,7 @@ package csw.common.components.framework
 
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
-import csw.framework.scaladsl.ComponentHandlers
+import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
 import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
 import csw.messages.ccs.CommandIssue.OtherIssue
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Invalid}
@@ -10,7 +10,6 @@ import csw.messages.ccs.commands._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location.{LocationRemoved, LocationUpdated, TrackingEvent}
-import csw.messages.models.PubSub.{Publish, PublisherMessage}
 import csw.messages.params.states.CurrentState
 import csw.messages.{CommandResponseManagerMessage, TopLevelActorMessage}
 import csw.services.location.scaladsl.LocationService
@@ -22,14 +21,14 @@ class SampleComponentHandlers(
     ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
     commandResponseManager: ActorRef[CommandResponseManagerMessage],
-    pubSubRef: ActorRef[PublisherMessage[CurrentState]],
+    currentStatePublisher: CurrentStatePublisher,
     locationService: LocationService,
     loggerFactory: LoggerFactory
 ) extends ComponentHandlers(
       ctx,
       componentInfo,
       commandResponseManager,
-      pubSubRef,
+      currentStatePublisher,
       locationService,
       loggerFactory: LoggerFactory
     ) {
@@ -42,7 +41,7 @@ class SampleComponentHandlers(
     // DEOPSCSW-153: Accessibility of logging service to other CSW components
     log.info("Initializing Component TLA")
     Thread.sleep(100)
-    pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(initChoice))))
+    currentStatePublisher.publish(CurrentState(prefix, Set(choiceKey.set(initChoice))))
 
     // DEOPSCSW-219: Discover component connection using HTTP protocol
     trackConnection(httpConnection)
@@ -50,40 +49,40 @@ class SampleComponentHandlers(
     Future.unit
   }
 
-  override def onGoOffline(): Unit = pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(offlineChoice))))
+  override def onGoOffline(): Unit = currentStatePublisher.publish(CurrentState(prefix, Set(choiceKey.set(offlineChoice))))
 
-  override def onGoOnline(): Unit = pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(onlineChoice))))
+  override def onGoOnline(): Unit = currentStatePublisher.publish(CurrentState(prefix, Set(choiceKey.set(onlineChoice))))
 
   override def onSubmit(controlCommand: ControlCommand): Unit = {
     // Adding passed in parameter to see if data is transferred properly
     commandResponseManager ! AddOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId))
-    pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(submitCommandChoice))))
+    currentStatePublisher.publish(CurrentState(prefix, Set(choiceKey.set(submitCommandChoice))))
     processCommand(controlCommand)
   }
 
   override def onOneway(controlCommand: ControlCommand): Unit = {
     // Adding passed in parameter to see if data is transferred properly
-    pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(oneWayCommandChoice))))
+    currentStatePublisher.publish(CurrentState(prefix, Set(choiceKey.set(oneWayCommandChoice))))
     processCommand(controlCommand)
   }
 
   private def processCommand(controlCommand: ControlCommand): Unit =
     controlCommand match {
       case Setup(_, somePrefix, _, _, _) ⇒
-        pubSubRef ! Publish(CurrentState(somePrefix, controlCommand.paramSet + choiceKey.set(setupConfigChoice)))
+        currentStatePublisher.publish(CurrentState(somePrefix, controlCommand.paramSet + choiceKey.set(setupConfigChoice)))
       case Observe(_, somePrefix, _, _, _) ⇒
-        pubSubRef ! Publish(CurrentState(somePrefix, controlCommand.paramSet + choiceKey.set(observeConfigChoice)))
+        currentStatePublisher.publish(CurrentState(somePrefix, controlCommand.paramSet + choiceKey.set(observeConfigChoice)))
       case _ ⇒
     }
 
   def validateCommand(command: ControlCommand): CommandResponse = {
-    pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(commandValidationChoice))))
+    currentStatePublisher.publish(CurrentState(prefix, Set(choiceKey.set(commandValidationChoice))))
     if (command.commandName.name.contains("success")) Accepted(command.runId)
     else Invalid(command.runId, OtherIssue("Testing: Received failure, will return Invalid."))
   }
 
   override def onShutdown(): Future[Unit] = {
-    pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
+    currentStatePublisher.publish(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
     Thread.sleep(100)
     Future.unit
   }
@@ -92,20 +91,20 @@ class SampleComponentHandlers(
     case LocationUpdated(location) ⇒
       location.connection match {
         case _: AkkaConnection =>
-          pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(akkaLocationUpdatedChoice))))
+          currentStatePublisher.publish(CurrentState(prefix, Set(choiceKey.set(akkaLocationUpdatedChoice))))
         case _: HttpConnection =>
-          pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(httpLocationUpdatedChoice))))
+          currentStatePublisher.publish(CurrentState(prefix, Set(choiceKey.set(httpLocationUpdatedChoice))))
         case _: TcpConnection =>
-          pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(tcpLocationUpdatedChoice))))
+          currentStatePublisher.publish(CurrentState(prefix, Set(choiceKey.set(tcpLocationUpdatedChoice))))
       }
     case LocationRemoved(connection) ⇒
       connection match {
         case _: AkkaConnection =>
-          pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(akkaLocationRemovedChoice))))
+          currentStatePublisher.publish(CurrentState(prefix, Set(choiceKey.set(akkaLocationRemovedChoice))))
         case _: HttpConnection =>
-          pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(httpLocationRemovedChoice))))
+          currentStatePublisher.publish(CurrentState(prefix, Set(choiceKey.set(httpLocationRemovedChoice))))
         case _: TcpConnection =>
-          pubSubRef ! Publish(CurrentState(prefix, Set(choiceKey.set(tcpLocationRemovedChoice))))
+          currentStatePublisher.publish(CurrentState(prefix, Set(choiceKey.set(tcpLocationRemovedChoice))))
       }
   }
 }

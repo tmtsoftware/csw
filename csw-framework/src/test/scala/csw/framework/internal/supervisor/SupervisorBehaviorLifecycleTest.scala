@@ -58,7 +58,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
 
     val childComponentInbox: Inbox[TopLevelActorMessage]                = ctx.childInbox(supervisor.component.get.upcast)
     val childPubSubLifecycleInbox: Inbox[PubSub[LifecycleStateChanged]] = ctx.childInbox(supervisor.pubSubLifecycle)
-    val childPubSubCompStateInbox: Inbox[PubSub[CurrentState]]          = ctx.childInbox(supervisor.pubSubComponent)
+    val childPubSubCompStateInbox: Inbox[PubSub[CurrentState]]          = ctx.childInbox(supervisor.pubSubComponentActor)
     val childCmdResponseMgrInbox: Inbox[CommandResponseManagerMessage]  = ctx.childInbox(supervisor.commandResponseManager)
   }
 

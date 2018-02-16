@@ -2,10 +2,8 @@ package csw.common.components.command
 
 import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
-import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
+import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers, CurrentStatePublisher}
 import csw.messages.framework.ComponentInfo
-import csw.messages.models.PubSub
-import csw.messages.params.states.CurrentState
 import csw.messages.{CommandResponseManagerMessage, TopLevelActorMessage}
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
@@ -15,11 +13,18 @@ class ComponentBehaviorFactoryForCommand extends ComponentBehaviorFactory {
       ctx: ActorContext[TopLevelActorMessage],
       componentInfo: ComponentInfo,
       commandResponseManager: ActorRef[CommandResponseManagerMessage],
-      pubSubRef: ActorRef[PubSub.PublisherMessage[CurrentState]],
+      currentStatePublisher: CurrentStatePublisher,
       locationService: LocationService,
       loggerFactory: LoggerFactory
   ): ComponentHandlers =
-    new ComponentHandlerForCommand(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory)
+    new ComponentHandlerForCommand(
+      ctx,
+      componentInfo,
+      commandResponseManager,
+      currentStatePublisher,
+      locationService,
+      loggerFactory
+    )
 }
 
 class McsAssemblyBehaviorFactory extends ComponentBehaviorFactory {
@@ -27,11 +32,18 @@ class McsAssemblyBehaviorFactory extends ComponentBehaviorFactory {
       ctx: ActorContext[TopLevelActorMessage],
       componentInfo: ComponentInfo,
       commandResponseManager: ActorRef[CommandResponseManagerMessage],
-      pubSubRef: ActorRef[PubSub.PublisherMessage[CurrentState]],
+      currentStatePublisher: CurrentStatePublisher,
       locationService: LocationService,
       loggerFactory: LoggerFactory
   ): ComponentHandlers =
-    new McsAssemblyComponentHandlers(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory)
+    new McsAssemblyComponentHandlers(
+      ctx,
+      componentInfo,
+      commandResponseManager,
+      currentStatePublisher,
+      locationService,
+      loggerFactory
+    )
 }
 
 class McsHcdBehaviorFactory extends ComponentBehaviorFactory {
@@ -39,9 +51,9 @@ class McsHcdBehaviorFactory extends ComponentBehaviorFactory {
       ctx: ActorContext[TopLevelActorMessage],
       componentInfo: ComponentInfo,
       commandResponseManager: ActorRef[CommandResponseManagerMessage],
-      pubSubRef: ActorRef[PubSub.PublisherMessage[CurrentState]],
+      currentStatePublisher: CurrentStatePublisher,
       locationService: LocationService,
       loggerFactory: LoggerFactory
   ): ComponentHandlers =
-    new McsHcdComponentHandlers(ctx, componentInfo, commandResponseManager, pubSubRef, locationService, loggerFactory)
+    new McsHcdComponentHandlers(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, loggerFactory)
 }
