@@ -1,10 +1,9 @@
 package tmt.development.approach1
 
-import java.io.File
-
+import tmt.development.dsl.Dsl._
+import tmt.development.dsl.Dsl.wiring._
 import tmt.shared.repl.RemoteRepl
 import tmt.shared.services.Command
-import tmt.development.dsl.Dsl._
 
 object SequencerApp1 extends App {
 

@@ -4,6 +4,7 @@ import java.io.File
 
 import tmt.shared.repl.RemoteRepl
 import tmt.development.dsl.Dsl._
+import tmt.development.dsl.Dsl.wiring._
 
 object SequencerApp2 extends App {
 

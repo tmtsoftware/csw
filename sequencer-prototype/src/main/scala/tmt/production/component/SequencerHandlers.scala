@@ -16,6 +16,7 @@ import csw.messages.{CommandResponseManagerMessage, TopLevelActorMessage}
 import csw.services.config.api.models.ConfigData
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
+import tmt.shared.Wiring
 import tmt.shared.engine.EngineBehaviour
 import tmt.shared.engine.EngineBehaviour.EngineAction
 
@@ -42,11 +43,12 @@ class SequencerHandlers(
   implicit val ct: ActorContext[TopLevelActorMessage] = ctx
   implicit val ec: ExecutionContextExecutor           = ctx.executionContext
   implicit val mat: ActorMaterializer                 = ActorMaterializer()(ctx.system.toUntyped)
+  implicit val timeout: Timeout                       = Timeout(5.seconds)
 
   override def initialize(): Future[Unit] = async {
 
     val dummyConfigData: ConfigData =
-      ConfigData.fromPath(Paths.get("/Users/poorav/TMT/csw-prod/sequencer-prototype/scripts/ocs-sequencer.sc"))
+      ConfigData.fromPath(Paths.get("/Users/bharats/projects/csw-prod/sequencer-prototype/scripts/ocs-sequencer.sc"))
 //  val configClient: ConfigClientService = ConfigClientFactory.clientApi(ctx.system.toUntyped, locationService)
 
     val maybeData: Option[ConfigData] = Some(dummyConfigData)
@@ -59,23 +61,24 @@ class SequencerHandlers(
       }
     }
 
-    val updatedScript = scriptContent.replace("import tmt.development.dsl.Dsl._", "import tmt.production.component.Dsl._")
+    val updatedScript = scriptContent.replace("import tmt.development.dsl.Dsl.wiring._", "")
 
     val path = Files.write(Paths.get(s"scripts/${componentInfo.name}.sc"), updatedScript.getBytes(StandardCharsets.UTF_8)) //TODO: decide on centos charset code
 
-    implicit lazy val timeout: Timeout = Timeout(5.seconds)
-
     val engineActor: ActorRef[EngineAction] = await(ctx.system.systemActorOf(EngineBehaviour.behaviour, "engine"))
+
+    val wiring = new Wiring(ctx.system, engineActor)
 
     ctx.watch(engineActor) //TODO: what to do if engine actor dies ? Decide in handlers.
 
-    Dsl.make(ctx.system, engineActor)
+//    Dsl.make(ctx.system, engineActor)
 
     // Load script
     val params: List[String] = List(path.toString)
 
-    // Run script using ammonite
-    ammonite.Main.main0(params, System.in, System.out, System.err)
+    ammonite
+      .Main(predefCode = "import wiring._")
+      .run("wiring" -> wiring) //TODO: decide on main and main0
   }
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = {}

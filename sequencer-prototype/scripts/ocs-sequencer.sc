@@ -1,4 +1,4 @@
-import tmt.development.dsl.Dsl._
+import tmt.development.dsl.Dsl.wiring._
 
 forEach { command =>
   if (command.name == "setup-assembly1") {

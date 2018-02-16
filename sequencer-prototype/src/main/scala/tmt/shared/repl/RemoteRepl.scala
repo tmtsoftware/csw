@@ -15,7 +15,7 @@ object RemoteRepl {
 
   private def initialCommands: String =
     """
-      |import tmt.development.dsl.Dsl._
+      |import tmt.development.dsl.Dsl.wiring._
       |def setFlags() = repl.compiler.settings.Ydelambdafy.value = "inline"
     """.stripMargin
 
