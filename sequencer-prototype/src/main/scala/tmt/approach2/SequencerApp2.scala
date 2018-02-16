@@ -2,8 +2,8 @@ package tmt.approach2
 
 import java.io.File
 
-import tmt.sequencer.repl.RemoteRepl
-import tmt.sequencer.dsl.Dsl._
+import tmt.shared.repl.RemoteRepl
+import tmt.development.dsl.Dsl._
 
 object SequencerApp2 extends App {
 

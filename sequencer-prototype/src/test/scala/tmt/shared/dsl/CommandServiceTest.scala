@@ -1,9 +1,9 @@
-package tmt.sequencer.dsl
+package tmt.shared.dsl
 
 import org.scalatest.Matchers
-import tmt.sequencer.Wiring
-import tmt.sequencer.engine.Engine
-import tmt.services.{Command, CommandResponse}
+import tmt.development.Wiring
+import tmt.shared.engine.Engine
+import tmt.shared.services.{Command, CommandResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 

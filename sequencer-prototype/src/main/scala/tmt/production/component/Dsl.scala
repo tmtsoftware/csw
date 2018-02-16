@@ -1,10 +1,10 @@
-package tmt.sequencer.component
+package tmt.production.component
 
 import akka.typed.{ActorRef, ActorSystem}
-import tmt.sequencer.dsl.{CommandService, ControlDsl}
-import tmt.sequencer.engine.Engine
-import tmt.sequencer.engine.EngineBehaviour.EngineAction
-import tmt.services
+import tmt.shared.dsl.{CommandService, ControlDsl}
+import tmt.shared.engine.Engine
+import tmt.shared.engine.EngineBehaviour.EngineAction
+import tmt.shared.services
 
 object Dsl extends ControlDsl {
   var engine1: Engine = _

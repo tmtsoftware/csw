@@ -1,4 +1,4 @@
-package tmt.sequencer.util
+package tmt.shared.util
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}

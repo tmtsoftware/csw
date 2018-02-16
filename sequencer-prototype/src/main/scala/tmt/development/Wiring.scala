@@ -1,14 +1,14 @@
-package tmt.sequencer
+package tmt.development
 
 import akka.actor.ActorSystem
 import akka.typed
 import akka.typed.ActorRef
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.util.Timeout
-import tmt.sequencer.dsl.CommandService
-import tmt.sequencer.engine.EngineBehaviour.EngineAction
-import tmt.sequencer.engine.{Engine, EngineBehaviour}
-import tmt.services.LocationService
+import tmt.shared.dsl.CommandService
+import tmt.shared.engine.EngineBehaviour.EngineAction
+import tmt.shared.engine.{Engine, EngineBehaviour}
+import tmt.shared.services.LocationService
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble

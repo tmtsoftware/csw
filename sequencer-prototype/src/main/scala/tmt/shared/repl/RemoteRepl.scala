@@ -1,4 +1,4 @@
-package tmt.sequencer.repl
+package tmt.shared.repl
 
 import ammonite.sshd._
 import org.apache.sshd.server.auth.password.AcceptAllPasswordAuthenticator
@@ -15,7 +15,7 @@ object RemoteRepl {
 
   private def initialCommands: String =
     """
-      |import tmt.sequencer.Dsl._
+      |import tmt.development.dsl.Dsl._
       |def setFlags() = repl.compiler.settings.Ydelambdafy.value = "inline"
     """.stripMargin
 

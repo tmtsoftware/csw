@@ -1,4 +1,4 @@
-package tmt.services
+package tmt.shared.services
 
 import akka.typed.ActorSystem
 

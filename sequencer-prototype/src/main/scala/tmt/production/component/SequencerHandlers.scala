@@ -1,4 +1,4 @@
-package tmt.sequencer.component
+package tmt.production.component
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Paths}
@@ -20,8 +20,8 @@ import csw.services.config.api.scaladsl.ConfigClientService
 import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
-import tmt.sequencer.engine.EngineBehaviour
-import tmt.sequencer.engine.EngineBehaviour.EngineAction
+import tmt.shared.engine.EngineBehaviour
+import tmt.shared.engine.EngineBehaviour.EngineAction
 
 import scala.async.Async.{async, await}
 import scala.concurrent.duration.DurationDouble

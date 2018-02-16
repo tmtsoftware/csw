@@ -1,8 +1,9 @@
-package tmt.sequencer.dsl
+package tmt.development.dsl
 
 import csw.services.location.commons.ClusterSettings
-import tmt.sequencer.Wiring
-import tmt.sequencer.engine.Engine
+import tmt.development.Wiring
+import tmt.shared.dsl.{CommandService, ControlDsl}
+import tmt.shared.engine.Engine
 
 object Dsl extends ControlDsl {
   lazy val actorSystem    = ClusterSettings().onPort(3552).system
@@ -15,6 +16,6 @@ object Dsl extends ControlDsl {
   lazy val cs: CommandService = wiring.commandService
   lazy val engine: Engine     = wiring.engine
 
-  val Command = tmt.services.Command
-  type Command = tmt.services.Command
+  val Command = tmt.shared.services.Command
+  type Command = tmt.shared.services.Command
 }
