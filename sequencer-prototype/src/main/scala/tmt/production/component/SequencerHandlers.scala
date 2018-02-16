@@ -49,9 +49,12 @@ class SequencerHandlers(
 
   override def initialize(): Future[Unit] = async {
 
-    val configClient: ConfigClientService = ConfigClientFactory.clientApi(ctx.system.toUntyped, locationService)
+    val dummyConfigData: ConfigData =
+      ConfigData.fromPath(Paths.get("/Users/poorav/TMT/csw-prod/sequencer-prototype/scripts/ocs-sequencer.sc"))
+//  val configClient: ConfigClientService = ConfigClientFactory.clientApi(ctx.system.toUntyped, locationService)
 
-    val maybeData: Option[ConfigData] = await(configClient.getActive(Paths.get(s"/${componentInfo.name}.sc")))
+    val maybeData: Option[ConfigData] = Some(dummyConfigData)
+//  val maybeData: Option[ConfigData] = await(configClient.getActive(Paths.get(s"/${componentInfo.name}.sc")))
 
     val scriptContent: String = await {
       maybeData match {
@@ -60,7 +63,7 @@ class SequencerHandlers(
       }
     }
 
-    val updatedScript = scriptContent.replace("import tmt.sequencer.dsl.Dsl._", "")
+    val updatedScript = scriptContent.replace("import tmt.development.dsl.Dsl._", "import tmt.production.component.Dsl._")
 
     val path = Files.write(Paths.get(s"scripts/${componentInfo.name}.sc"), updatedScript.getBytes(StandardCharsets.UTF_8)) //TODO: decide on centos charset code
 
@@ -79,17 +82,19 @@ class SequencerHandlers(
     ammonite.Main.main0(params, System.in, System.out, System.err)
   }
 
-  override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = ???
+  override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = {}
 
-  override def validateCommand(controlCommand: ControlCommand): CommandResponse = ???
+  override def validateCommand(controlCommand: ControlCommand): CommandResponse = {
+    CommandResponse.Accepted(controlCommand.runId)
+  }
 
-  override def onSubmit(controlCommand: ControlCommand): Unit = ???
+  override def onSubmit(controlCommand: ControlCommand): Unit = {}
 
-  override def onOneway(controlCommand: ControlCommand): Unit = ???
+  override def onOneway(controlCommand: ControlCommand): Unit = {}
 
-  override def onShutdown(): Future[Unit] = ??? //TODO: clean up engine and other relevant instances
+  override def onShutdown(): Future[Unit] = { Future.successful(()) } //TODO: clean up engine and other relevant instances
 
-  override def onGoOffline(): Unit = ???
+  override def onGoOffline(): Unit = {}
 
-  override def onGoOnline(): Unit = ???
+  override def onGoOnline(): Unit = {}
 }
