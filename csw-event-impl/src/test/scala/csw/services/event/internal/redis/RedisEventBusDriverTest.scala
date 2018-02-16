@@ -33,7 +33,7 @@ class RedisEventBusDriverTest extends FunSuite with Matchers with BeforeAndAfter
   test("pub-sub") {
     val key                = "abc"
     val (killSwitch, seqF) = eventBusDriver.subscribe(Seq(key)).toMat(Sink.seq)(Keep.both).run()
-    Thread.sleep(10)
+    Thread.sleep(1000)
     eventBusDriver.publish(key, PbEvent().withEventId("1")).await
     eventBusDriver.publish(key, PbEvent().withEventId("2")).await
     eventBusDriver.unsubscribe(Seq(key)).await
