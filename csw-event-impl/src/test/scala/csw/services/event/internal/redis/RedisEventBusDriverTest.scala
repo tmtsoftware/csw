@@ -2,10 +2,8 @@ package csw.services.event.internal.redis
 
 import akka.stream.scaladsl.{Keep, Sink}
 import com.github.sebruck.EmbeddedRedis
-import csw.messages.ccs.events.{Event, EventKey, EventName, SystemEvent}
-import csw.messages.params.models.Prefix
-import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.helpers.PortHelper
+import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.internal.Wiring
 import csw_protobuf.events.PbEvent
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
@@ -34,7 +32,7 @@ class RedisEventBusDriverTest extends FunSuite with Matchers with BeforeAndAfter
 
   test("pub-sub") {
     val key                = "abc"
-    val (killSwitch, seqF) = eventBusDriver.subscribe(key).toMat(Sink.seq)(Keep.both).run()
+    val (killSwitch, seqF) = eventBusDriver.subscribe(Seq(key)).toMat(Sink.seq)(Keep.both).run()
     Thread.sleep(10)
     eventBusDriver.publish(key, PbEvent().withEventId("1")).await
     eventBusDriver.publish(key, PbEvent().withEventId("2")).await

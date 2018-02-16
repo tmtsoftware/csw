@@ -3,8 +3,7 @@ package csw.services.event.internal.redis
 import akka.Done
 import akka.stream.scaladsl.{Keep, Source}
 import akka.stream.{KillSwitch, KillSwitches}
-import csw.services.event.internal.api.EventBusDriver
-import csw.services.event.scaladsl.EventMessage
+import csw.services.event.internal.api.{EventBusDriver, EventMessage}
 import csw_protobuf.events.PbEvent
 import io.lettuce.core.api.async.RedisAsyncCommands
 import io.lettuce.core.pubsub.api.reactive.RedisPubSubReactiveCommands
@@ -17,11 +16,11 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class RedisEventBusDriver(redisClient: RedisClient, redisURI: RedisURI)(implicit ec: ExecutionContext) extends EventBusDriver {
 
-  private val reactiveCommandsF: Future[RedisPubSubReactiveCommands[String, PbEvent]] =
-    redisClient.connectPubSubAsync(EventServiceCodec, redisURI).toScala.map(_.reactive())
-
   private val asyncCommandsF: Future[RedisAsyncCommands[String, PbEvent]] =
     redisClient.connectAsync(EventServiceCodec, redisURI).toScala.map(_.async())
+
+  private val reactiveCommandsF: Future[RedisPubSubReactiveCommands[String, PbEvent]] =
+    redisClient.connectPubSubAsync(EventServiceCodec, redisURI).toScala.map(_.reactive())
 
   def publish(channel: String, data: PbEvent): Future[Done] = async {
     val commands = await(asyncCommandsF)
@@ -35,7 +34,7 @@ class RedisEventBusDriver(redisClient: RedisClient, redisURI: RedisURI)(implicit
     Done
   }
 
-  def subscribe(channels: String*): Source[EventMessage[String, PbEvent], KillSwitch] = {
+  def subscribe(channels: Seq[String]): Source[EventMessage[String, PbEvent], KillSwitch] = {
     val sourceF = async {
       val commands = await(reactiveCommandsF)
       commands.subscribe(channels: _*).subscribe()
@@ -44,7 +43,7 @@ class RedisEventBusDriver(redisClient: RedisClient, redisURI: RedisURI)(implicit
 
     Source
       .fromFutureSource(sourceF)
-      .map(RedisEventMessage.from)
+      .map(EventMessage.from)
       .viaMat(KillSwitches.single)(Keep.right)
   }
 

@@ -1,6 +1,5 @@
 package csw.services.event.internal.redis
 
-import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Supervision}
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import com.github.sebruck.EmbeddedRedis
 import csw.messages.ccs.events.{Event, EventKey, EventName, SystemEvent}
@@ -8,12 +7,11 @@ import csw.messages.params.models.Prefix
 import csw.services.event.helpers.PortHelper
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.internal.Wiring
-import csw_protobuf.events.PbEvent
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import redis.embedded.RedisServer
 
 import scala.compat.java8.FutureConverters.CompletionStageOps
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
 
 class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with EmbeddedRedis {
@@ -34,13 +32,11 @@ class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with Embe
   }
 
   test("pub-sub") {
-    val prefix    = Prefix("test.prefix")
-    val eventName = EventName("system")
+    val prefix             = Prefix("test.prefix")
+    val eventName          = EventName("system")
+    val event              = SystemEvent(prefix, eventName)
+    val eventKey: EventKey = event.eventKey
 
-    val event            = SystemEvent(prefix, eventName)
-    val pbEvent: PbEvent = Event.typeMapper.toBase(event)
-
-    val eventKey: EventKey   = event.eventKey
     val (subscription, seqF) = subscriberImpl.subscribe(Seq(eventKey)).toMat(Sink.seq)(Keep.both).run()
 
     Thread.sleep(10)
@@ -53,8 +49,7 @@ class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with Embe
     val prefix    = Prefix("test.prefix")
     val eventName = EventName("system")
 
-    def event            = SystemEvent(prefix, eventName)
-    def pbEvent: PbEvent = Event.typeMapper.toBase(event)
+    def event: Event = SystemEvent(prefix, eventName)
 
     val eventKey: EventKey = event.eventKey
     subscriberImpl.subscribe(Seq(eventKey)).runForeach { x =>

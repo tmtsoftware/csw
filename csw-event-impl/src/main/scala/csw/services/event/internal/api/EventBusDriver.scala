@@ -3,7 +3,6 @@ package csw.services.event.internal.api
 import akka.Done
 import akka.stream.KillSwitch
 import akka.stream.scaladsl.Source
-import csw.services.event.scaladsl.EventMessage
 import csw_protobuf.events.PbEvent
 
 import scala.concurrent.Future

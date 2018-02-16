@@ -43,7 +43,7 @@ class EventServiceTest extends FunSuite with Matchers with BeforeAndAfterAll wit
 
     val subscriptionImpl: EventSubscriberImpl = new EventSubscriberImpl(new RedisEventBusDriver(redisClient, redisURI))
 
-    subscriptionImpl.subscribe(e ⇒ testProbe.ref ! e, Seq(eventKey))
+    subscriptionImpl.subscribe(Seq(eventKey), e ⇒ testProbe.ref ! e)
 
     val publisherImpl = new EventPublisherImpl(new RedisEventBusDriver(redisClient, redisURI))
     Await.result(publisherImpl.publish(event), 5.seconds)
@@ -52,7 +52,7 @@ class EventServiceTest extends FunSuite with Matchers with BeforeAndAfterAll wit
   }
 
   test("pub-sub") {
-    subscriberImpl.subscribe(e => println(e), Seq(eventKey))
+    subscriberImpl.subscribe(Seq(eventKey), e => println(e))
     publisherImpl
   }
 

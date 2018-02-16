@@ -1,5 +1,6 @@
 package csw.services.event.internal.pubsub
 
+import akka.Done
 import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{KillSwitch, Materializer}
 import akka.typed.ActorRef
@@ -7,7 +8,7 @@ import csw.messages.ccs.events.{Event, EventKey}
 import csw.services.event.internal.api.EventBusDriver
 import csw.services.event.scaladsl.{EventSubscriber, EventSubscription}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class EventSubscriberImpl(eventBusDriver: EventBusDriver)(implicit val mat: Materializer, ec: ExecutionContext)
     extends EventSubscriber {
@@ -21,17 +22,20 @@ class EventSubscriberImpl(eventBusDriver: EventBusDriver)(implicit val mat: Mate
       .mapMaterializedValue(killSwitch => createSubscription(keys, killSwitch))
   }
 
-  def subscribe(callback: Event ⇒ Unit, eventKeys: Seq[EventKey]): EventSubscription = {
-    subscribe(eventKeys).to(Sink.foreach(callback)).run
+  def subscribe(eventKeys: Seq[EventKey], callback: Event => Unit): EventSubscription = {
+    subscribe(eventKeys).to(Sink.foreach(callback)).run()
   }
 
-  def subscribe(actorRef: ActorRef[Event], eventKeys: Seq[EventKey]): EventSubscription = {
-    subscribe(event => actorRef ! event, eventKeys)
+  def subscribe(eventKeys: Seq[EventKey], actorRef: ActorRef[Event]): EventSubscription = {
+    subscribe(eventKeys, event => actorRef ! event)
   }
 
-  private def createSubscription(keys: Seq[String], killSwitch: KillSwitch): EventSubscription = { () =>
-    eventBusDriver
-      .unsubscribe(keys)
-      .transform(x ⇒ { killSwitch.shutdown(); x }, ex ⇒ { killSwitch.abort(ex); ex })
-  }
+  private def createSubscription(keys: Seq[String], killSwitch: KillSwitch): EventSubscription =
+    new EventSubscription {
+      override def unsubscribe(): Future[Done] =
+        eventBusDriver
+          .unsubscribe(keys)
+          .transform(x ⇒ { killSwitch.shutdown(); x }, ex ⇒ { killSwitch.abort(ex); ex })
+
+    }
 }
