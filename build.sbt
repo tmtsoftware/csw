@@ -20,7 +20,8 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-commons`,
   `integration`,
   `examples`,
-  `sequencer-prototype`
+  `sequencer-prototype`,
+  `acceptance-tests`
 )
 
 lazy val unidocExclusions: Seq[ProjectReference] = Seq(
@@ -78,7 +79,11 @@ lazy val `csw-logging` = project
 
 //Location service related projects
 lazy val `csw-location` = project
-  .dependsOn(`csw-logging`, `csw-messages`)
+  .dependsOn(
+    `csw-logging`,
+    `csw-messages`,
+    `csw-commons` % "test->test"
+  )
   .enablePlugins(PublishBintray, GenJavadocPlugin, AutoMultiJvm, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.Location
@@ -89,7 +94,7 @@ lazy val `csw-cluster-seed` = project
   .dependsOn(
     `csw-messages`,
     `csw-location`,
-    `csw-commons`,
+    `csw-commons` % "compile->compile;test->test",
     `csw-framework` % "test->test",
     `csw-config-server` % "test->test",
   )
@@ -99,7 +104,10 @@ lazy val `csw-cluster-seed` = project
   )
 
 lazy val `csw-location-agent` = project
-  .dependsOn(`csw-location`)
+  .dependsOn(
+    `csw-location`,
+    `csw-commons` % "test->test"
+  )
   .enablePlugins(DeployApp, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.LocationAgent
@@ -113,7 +121,11 @@ lazy val `csw-config-api` = project
   )
 
 lazy val `csw-config-server` = project
-  .dependsOn(`csw-location`, `csw-config-api`, `csw-commons`)
+  .dependsOn(
+    `csw-location`,
+    `csw-config-api`,
+    `csw-commons` % "compile->compile;test->test"
+  )
   .enablePlugins(DeployApp, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.ConfigServer
@@ -122,9 +134,9 @@ lazy val `csw-config-server` = project
 lazy val `csw-config-client` = project
   .dependsOn(
     `csw-config-api`,
-    `csw-commons`,
-    `csw-config-server` % "test->test",
-    `csw-location` % "compile->compile;multi-jvm->multi-jvm"
+    `csw-commons` % "compile->compile;test->test",
+    `csw-location` % "compile->compile;multi-jvm->multi-jvm",
+    `csw-config-server` % "test->test"
   )
   .enablePlugins(PublishBintray, AutoMultiJvm, MaybeCoverage)
   .settings(
@@ -135,7 +147,8 @@ lazy val `csw-config-client-cli` = project
   .dependsOn(
     `csw-config-client`,
     `csw-config-server` % "test->test",
-    `csw-location` % "multi-jvm->multi-jvm"
+    `csw-location` % "multi-jvm->multi-jvm",
+    `csw-commons` % "test->test"
   )
   .enablePlugins(DeployApp, AutoMultiJvm, MaybeCoverage)
   .settings(
@@ -143,24 +156,16 @@ lazy val `csw-config-client-cli` = project
   )
 
 lazy val `csw-event-api` = project
-  .dependsOn(
-    `csw-messages`
-  )
+  .dependsOn(`csw-messages`)
   .enablePlugins(GenJavadocPlugin)
 
 lazy val `csw-event-impl` = project
-  .dependsOn(
-    `csw-event-api`,
-    `csw-logging`
-  )
+  .dependsOn(`csw-event-api`, `csw-logging`)
   .enablePlugins(AutoMultiJvm)
   .settings(libraryDependencies ++= Dependencies.EventImpl)
 
 lazy val `csw-command` = project
-  .dependsOn(
-    `csw-messages`,
-    `csw-logging`
-  )
+  .dependsOn(`csw-messages`, `csw-logging`)
   .enablePlugins(PublishBintray, AutoMultiJvm, GenJavadocPlugin)
   .settings(libraryDependencies ++= Dependencies.Command)
 
@@ -171,7 +176,8 @@ lazy val `csw-framework` = project
     `csw-logging`,
     `csw-command`,
     `csw-location` % "compile->compile;multi-jvm->multi-jvm",
-    `csw-config-server` % "multi-jvm->test"
+    `csw-config-server` % "multi-jvm->test",
+    `csw-commons` % "test->test"
   )
   .enablePlugins(PublishBintray, AutoMultiJvm, GenJavadocPlugin, CswBuildInfo)
   .settings(
@@ -234,4 +240,23 @@ lazy val `sequencer-prototype` = project
   )
   .settings(
     libraryDependencies ++= Dependencies.SequencerPrototype
+  )
+
+lazy val `acceptance-tests` = project
+  .dependsOn(
+    `csw-cluster-seed` % "compile->test",
+    `csw-location` % "compile->test",
+    `csw-location-agent` % "compile->test",
+    `csw-config-server` % "compile->test",
+    `csw-config-client` % "compile->test",
+    `csw-config-client-cli` % "compile->test",
+    `csw-logging` % "compile->test",
+    `csw-framework` % "compile->test",
+    `csw-messages` % "compile->test",
+    `csw-event-impl` % "compile->test",
+    `examples` % "compile->test"
+  )
+  .enablePlugins(DeployApp)
+  .settings(
+    libraryDependencies ++= Dependencies.AcceptanceTests
   )

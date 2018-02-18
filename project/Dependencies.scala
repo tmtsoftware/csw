@@ -161,7 +161,8 @@ object Dependencies {
   val Commons = Seq(
     Akka.`akka-stream`,
     AkkaHttp.`akka-http`,
-    Libs.`play-json`
+    Libs.`play-json`,
+    Libs.`scalatest` % Test
   )
 
   val Deploy = Seq(
@@ -184,5 +185,9 @@ object Dependencies {
     Libs.`scala-compiler`,
     Ammonite.`ammonite`,
     Ammonite.`ammonite-sshd`
+  )
+
+  val AcceptanceTests = Seq(
+    Libs.`scalatest`
   )
 }
