@@ -1,5 +1,7 @@
 package csw.services.ccs.scaladsl
 
+import java.util.concurrent.CompletableFuture
+
 import akka.actor.Scheduler
 import akka.typed.ActorRef
 import akka.typed.scaladsl.AskPattern._
@@ -8,6 +10,7 @@ import csw.messages.CommandResponseManagerMessage
 import csw.messages.CommandResponseManagerMessage.{AddOrUpdateCommand, AddSubCommand, Query, UpdateSubCommand}
 import csw.messages.ccs.commands.CommandResponse
 import csw.messages.params.models.Id
+import scala.compat.java8.FutureConverters._
 
 import scala.concurrent.Future
 
@@ -26,5 +29,9 @@ class CommandResponseManager(val commandResponseManagerActor: ActorRef[CommandRe
 
   def query(runId: Id)(implicit timeout: Timeout): Future[CommandResponse] =
     commandResponseManagerActor ? (Query(runId, _))
+
+  def jQuery(runId: Id, timeout: Timeout): CompletableFuture[CommandResponse] = {
+    query(runId)(timeout).toJava.toCompletableFuture
+  }
 
 }

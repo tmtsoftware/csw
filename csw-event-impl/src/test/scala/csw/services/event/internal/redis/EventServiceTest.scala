@@ -48,6 +48,7 @@ class EventServiceTest extends FunSuite with Matchers with BeforeAndAfterAll wit
     val publisherImpl = new EventPublisherImpl(new RedisEventBusDriver(redisClient, redisURI))
     Await.result(publisherImpl.publish(event), 5.seconds)
 
+    Thread.sleep(1000)
     testProbe.expectMsg(event)
   }
 
