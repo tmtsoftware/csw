@@ -7,9 +7,8 @@ import akka.{Done, NotUsed}
 import csw.messages.ccs.events.Event
 import csw.services.event.internal.api.EventPublishDriver
 import csw.services.event.scaladsl.EventPublisher
-import csw_protobuf.events.PbEvent
-import async.Async._
 
+import scala.async.Async._
 import scala.concurrent.Future
 
 class EventPublisherImpl(eventPublishDriver: EventPublishDriver)(implicit system: ActorSystem) extends EventPublisher {
@@ -22,9 +21,7 @@ class EventPublisherImpl(eventPublishDriver: EventPublishDriver)(implicit system
   override def publish(source: Source[Event, NotUsed]): Future[Done] = source.mapAsync(1)(publish).runWith(Sink.ignore)
 
   override def publish(event: Event): Future[Done] = async {
-    val key: String    = event.eventKey.key
-    val value: PbEvent = Event.typeMapper.toBase(event)
-    await(eventPublishDriver.publish(key, value))
-    await(eventPublishDriver.set(key, value))
+    await(eventPublishDriver.publish(event.eventKey, event))
+    await(eventPublishDriver.set(event.eventKey, event))
   }
 }

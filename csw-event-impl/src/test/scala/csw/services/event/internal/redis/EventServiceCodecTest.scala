@@ -3,7 +3,7 @@ package csw.services.event.internal.redis
 import java.nio.ByteBuffer
 
 import akka.util.ByteString
-import csw.messages.ccs.events.{Event, EventName, SystemEvent}
+import csw.messages.ccs.events.{Event, EventKey, EventName, SystemEvent}
 import csw.messages.params.models.Prefix
 import org.scalatest.{FunSuite, Matchers}
 
@@ -14,22 +14,22 @@ class EventServiceCodecTest extends FunSuite with Matchers {
   val pbEvent   = Event.typeMapper.toBase(event)
 
   test("testDecodeKey") {
-    val byteBuf = ByteString("test").asByteBuffer
-    EventServiceCodec.decodeKey(byteBuf) shouldBe "test"
+    val byteBuf = ByteString("testKey").asByteBuffer
+    EventServiceCodec.decodeKey(byteBuf) shouldBe EventKey("testKey")
   }
 
   test("testEncodeKey") {
-    val byteBuf = ByteString("test").asByteBuffer
-    EventServiceCodec.encodeKey("test") shouldBe byteBuf
+    val byteBuf = ByteString("testKey").asByteBuffer
+    EventServiceCodec.encodeKey(EventKey("testKey")) shouldBe byteBuf
   }
 
   test("testEncodeValue") {
     val byteBuf = ByteBuffer.wrap(pbEvent.toByteArray)
-    EventServiceCodec.encodeValue(pbEvent) shouldBe byteBuf
+    EventServiceCodec.encodeValue(event) shouldBe byteBuf
   }
 
   test("testDecodeValue") {
     val byteBuf = ByteBuffer.wrap(pbEvent.toByteArray)
-    EventServiceCodec.decodeValue(byteBuf) shouldBe pbEvent
+    EventServiceCodec.decodeValue(byteBuf) shouldBe event
   }
 }

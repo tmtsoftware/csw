@@ -7,13 +7,11 @@ import csw.messages.params.models.Prefix
 import csw.services.event.helpers.PortHelper
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.internal.Wiring
-import csw.services.event.scaladsl.EventSubscription
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import redis.embedded.RedisServer
 
-import scala.collection.immutable
 import scala.compat.java8.FutureConverters.CompletionStageOps
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
 
 class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with EmbeddedRedis {

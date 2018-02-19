@@ -3,18 +3,18 @@ package csw.services.event.internal.api
 import akka.Done
 import akka.stream.KillSwitch
 import akka.stream.scaladsl.Source
-import csw_protobuf.events.PbEvent
+import csw.messages.ccs.events.{Event, EventKey}
 
 import scala.concurrent.Future
 
 trait EventPublishDriver {
-  def publish(key: String, data: PbEvent): Future[Done]
-  def set(key: String, data: PbEvent): Future[Done]
+  def publish(eventKey: EventKey, event: Event): Future[Done]
+  def set(eventKey: EventKey, event: Event): Future[Done]
 }
 
 trait EventSubscriberDriver {
-  def subscribe(keys: Seq[String]): Source[EventMessage[String, PbEvent], KillSwitch]
-  def unsubscribe(keys: Seq[String]): Future[Done]
+  def subscribe(eventKeys: Seq[EventKey]): Source[EventMessage[EventKey, Event], KillSwitch]
+  def unsubscribe(eventKeys: Seq[EventKey]): Future[Done]
 }
 
 trait EventSubscriberDriverFactory {

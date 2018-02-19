@@ -17,12 +17,10 @@ class EventSubscriberImpl(eventSubscriberDriverFactory: EventSubscriberDriverFac
   def subscribe(eventKeys: Seq[EventKey]): Source[Event, EventSubscription] = {
     val subscriberDriver = eventSubscriberDriverFactory.make()
 
-    val keys = eventKeys.map(_.toString)
-
     subscriberDriver
-      .subscribe(keys)
-      .map(x => Event.fromPb(x.value))
-      .mapMaterializedValue(killSwitch => createSubscription(keys, killSwitch, subscriberDriver))
+      .subscribe(eventKeys)
+      .map(x => x.value)
+      .mapMaterializedValue(killSwitch => createSubscription(eventKeys, killSwitch, subscriberDriver))
   }
 
   def subscribe(eventKeys: Seq[EventKey], callback: Event => Unit): EventSubscription = {
@@ -33,13 +31,13 @@ class EventSubscriberImpl(eventSubscriberDriverFactory: EventSubscriberDriverFac
     subscribe(eventKeys, event => actorRef ! event)
   }
 
-  private def createSubscription(keys: Seq[String],
+  private def createSubscription(eventKeys: Seq[EventKey],
                                  killSwitch: KillSwitch,
                                  subscriberDriver: EventSubscriberDriver): EventSubscription =
     new EventSubscription {
       override def unsubscribe(): Future[Done] =
         subscriberDriver
-          .unsubscribe(keys)
+          .unsubscribe(eventKeys)
           .transform(x ⇒ { killSwitch.shutdown(); x }, ex ⇒ { killSwitch.abort(ex); ex })
 
     }

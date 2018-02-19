@@ -2,10 +2,11 @@ package csw.services.event.internal.redis
 
 import akka.stream.scaladsl.{Keep, Sink}
 import com.github.sebruck.EmbeddedRedis
+import csw.messages.ccs.events.{EventName, SystemEvent}
+import csw.messages.params.models.Prefix
 import csw.services.event.helpers.PortHelper
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.internal.Wiring
-import csw_protobuf.events.PbEvent
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import redis.embedded.RedisServer
 
@@ -30,15 +31,26 @@ class RedisEventSubscriberDriverTest extends FunSuite with Matchers with BeforeA
   }
 
   test("pub-sub") {
-    val key                = "abc"
-    val (killSwitch, seqF) = subscriberDriver.subscribe(Seq(key)).toMat(Sink.seq)(Keep.both).run()
+    val prefix    = Prefix("test.prefix")
+    val eventName = EventName("one")
+    val event1    = SystemEvent(prefix, eventName)
+    val event2    = SystemEvent(prefix, eventName)
+    val event3    = SystemEvent(prefix, eventName)
+    val eventKey  = event1.eventKey
+
+    val (killSwitch, seqF) = subscriberDriver.subscribe(Seq(eventKey)).toMat(Sink.seq)(Keep.both).run()
     Thread.sleep(1000)
-    publisherDriver.publish(key, PbEvent().withEventId("1")).await
-    publisherDriver.publish(key, PbEvent().withEventId("2")).await
-    subscriberDriver.unsubscribe(Seq(key)).await
-    publisherDriver.publish(key, PbEvent().withEventId("3")).await
+
+    publisherDriver.publish(eventKey, event1).await
+    publisherDriver.publish(eventKey, event2).await
+
+    subscriberDriver.unsubscribe(Seq(eventKey)).await
+
+    publisherDriver.publish(eventKey, event3).await
+
     killSwitch.shutdown()
-    seqF.await.map(_.value) shouldBe Seq(PbEvent().withEventId("1"), PbEvent().withEventId("2"))
+
+    seqF.await.map(_.value) shouldBe Seq(event1, event2)
   }
 
 }

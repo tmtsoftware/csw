@@ -3,8 +3,8 @@ package csw.services.event.internal.redis
 import akka.Done
 import akka.stream.scaladsl.{Keep, Source}
 import akka.stream.{KillSwitch, KillSwitches}
+import csw.messages.ccs.events.{Event, EventKey}
 import csw.services.event.internal.api.{EventMessage, EventSubscriberDriver}
-import csw_protobuf.events.PbEvent
 import io.lettuce.core.pubsub.api.reactive.RedisPubSubReactiveCommands
 import io.lettuce.core.{RedisClient, RedisURI}
 import reactor.core.publisher.FluxSink.OverflowStrategy
@@ -16,10 +16,10 @@ import scala.concurrent.{ExecutionContext, Future}
 class RedisEventSubscriberDriver(redisClient: RedisClient, redisURI: RedisURI)(implicit ec: ExecutionContext)
     extends EventSubscriberDriver {
 
-  private val reactiveCommandsF: Future[RedisPubSubReactiveCommands[String, PbEvent]] =
+  private val reactiveCommandsF: Future[RedisPubSubReactiveCommands[EventKey, Event]] =
     redisClient.connectPubSubAsync(EventServiceCodec, redisURI).toScala.map(_.reactive())
 
-  def subscribe(channels: Seq[String]): Source[EventMessage[String, PbEvent], KillSwitch] = {
+  def subscribe(channels: Seq[EventKey]): Source[EventMessage[EventKey, Event], KillSwitch] = {
     val sourceF = async {
       val commands = await(reactiveCommandsF)
       commands.subscribe(channels: _*).subscribe()
@@ -32,7 +32,7 @@ class RedisEventSubscriberDriver(redisClient: RedisClient, redisURI: RedisURI)(i
       .viaMat(KillSwitches.single)(Keep.right)
   }
 
-  def unsubscribe(channels: Seq[String]): Future[Done] = async {
+  def unsubscribe(channels: Seq[EventKey]): Future[Done] = async {
     val commands = await(reactiveCommandsF)
     await(commands.unsubscribe(channels: _*).toFuture.toScala)
     Done
