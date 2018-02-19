@@ -45,7 +45,7 @@ lazy val githubReleases: Seq[ProjectReference] = Seq(
 lazy val `csw-prod` = project
   .in(file("."))
   .enablePlugins(NoPublish, UnidocSite, GithubPublishDocs, GitBranchPrompt, GithubRelease)
-  .disablePlugins(BintrayPlugin, PublishTests)
+  .disablePlugins(BintrayPlugin)
   .aggregate(aggregatedProjects: _*)
   .settings(Settings.mergeSiteWith(docs))
   .settings(Settings.docExclusions(unidocExclusions))
@@ -199,7 +199,7 @@ lazy val `csw-benchmark` = project
     `csw-command`
   )
   .enablePlugins(NoPublish, JmhPlugin)
-  .disablePlugins(BintrayPlugin, PublishTests)
+  .disablePlugins(BintrayPlugin)
   .settings(
     libraryDependencies ++= Dependencies.Benchmark
   )
@@ -208,7 +208,6 @@ lazy val `csw-benchmark` = project
 lazy val integration = project
   .dependsOn(`csw-location`, `csw-location-agent`)
   .enablePlugins(DeployApp)
-  .disablePlugins(PublishTests)
   .settings(
     libraryDependencies ++= Dependencies.Integration
   )
