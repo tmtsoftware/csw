@@ -5,6 +5,7 @@ import java.nio.file.Paths
 
 import akka.typed.ActorRef
 import com.typesafe.config.ConfigFactory
+import csw.commons.tagobjects.ClasspathSensitive
 import csw.messages.location.Connection.TcpConnection
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
@@ -25,7 +26,7 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterAll with Before
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
   InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
 
-  private val clusterSettings: ClusterSettings = ClusterAwareSettings.onPort(3552)
+  private val clusterSettings: ClusterSettings = ClusterAwareSettings.onPort(3559)
   private val locationService                  = LocationServiceFactory.withSystem(clusterSettings.system)
 
   override protected def afterAll(): Unit = locationService.shutdown(TestFinishedReason).await
@@ -37,7 +38,7 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterAll with Before
     testWith(args, name, port)
   }
 
-  test("Test with config file") {
+  test("Test with config file", ClasspathSensitive) {
     val name       = "test2"
     val url        = getClass.getResource("/test2.conf")
     val configFile = Paths.get(url.toURI).toFile
@@ -49,7 +50,7 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterAll with Before
   }
 
   private def testWith(args: Array[String], name: String, port: Int) = {
-    val trackLocationApp = new Main(ClusterAwareSettings.joinLocal(3552))
+    val trackLocationApp = new Main(ClusterAwareSettings.joinLocal(3559))
     val process          = trackLocationApp.start(args).get
 
     val connection       = TcpConnection(ComponentId(name, ComponentType.Service))

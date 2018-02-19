@@ -3,7 +3,6 @@ package csw.services.ccs.javadsl
 import java.util
 import java.util.concurrent.CompletableFuture
 
-import akka.actor.Scheduler
 import akka.stream.Materializer
 import akka.util.Timeout
 import csw.messages.ccs.commands.{CommandResponse, ControlCommand}

@@ -5,7 +5,7 @@ import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.config.server.ServerWiring
 import csw.services.config.server.commons.{ConfigServiceConnection, RegistrationFactory}
 import csw.services.config.server.commons.TestFutureExtension.RichFuture
-import csw.services.location.commons.ClusterSettings
+import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.location.exceptions.OtherLocationIsRegistered
 import csw.services.location.internal.Networks
 import csw.services.location.scaladsl.LocationServiceFactory
@@ -16,7 +16,8 @@ import scala.util.control.NonFatal
 class HttpServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
 
   test("should start the http server and register with location service") {
-    val serverWiring = new ServerWiring
+    val _servicePort = 4005
+    val serverWiring = ServerWiring.make(ClusterAwareSettings, Some(_servicePort))
     import serverWiring._
     val (binding, registrationResult) = httpService.registeredLazyBinding.await
     locationService.find(ConfigServiceConnection.value).await.get.connection shouldBe ConfigServiceConnection.value
@@ -27,7 +28,7 @@ class HttpServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
   }
 
   test("should not register with location service if server binding fails") {
-    val _servicePort     = 4001
+    val _servicePort     = 4006
     val locationService1 = LocationServiceFactory.withSettings(ClusterSettings().onPort(_servicePort))
     val _clusterSettings = ClusterSettings().joinLocal(_servicePort)
     val serverWiring     = ServerWiring.make(_clusterSettings, Some(_servicePort))
@@ -43,7 +44,8 @@ class HttpServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
   }
 
   test("should not start server if registration with location service fails") {
-    val serverWiring = new ServerWiring
+    val _servicePort = 4007
+    val serverWiring = ServerWiring.make(ClusterAwareSettings, Some(_servicePort))
     import serverWiring._
     locationService.register(RegistrationFactory.http(ConfigServiceConnection.value, 21212, "")).await
 

@@ -3,8 +3,10 @@ package csw.services.tracklocation.models
 import java.io.File
 import java.nio.file.Paths
 
+import csw.commons.tags.ClasspathSensitive
 import org.scalatest.{FunSuite, Matchers}
 
+@ClasspathSensitive
 class CommandTest extends FunSuite with Matchers {
 
   test("testParse with no options should return command with default values") {
@@ -51,7 +53,7 @@ class CommandTest extends FunSuite with Matchers {
     c.commandText shouldBe "false"
   }
 
-  test("testParse with config file port, command parameters are overrideable from command line") {
+  test("testParse with config file port, command parameters are overridable from command line") {
     val url            = getClass.getResource("/redisTest.conf")
     val configFilePath = Paths.get(url.toURI).toFile.getAbsolutePath
     val configFile     = new File(configFilePath)

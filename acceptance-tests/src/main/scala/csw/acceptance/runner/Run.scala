@@ -2,8 +2,8 @@ package csw.acceptance.runner
 
 import org.scalatest.tools.Runner
 
-object TestRunner {
+object Run {
   def main(args: Array[String]): Unit = {
-    Runner.run(args)
+    Runner.main(args)
   }
 }

@@ -4,8 +4,10 @@ import java.io.File
 import java.nio.file.Paths
 
 import com.typesafe.config.Config
+import csw.commons.tags.ClasspathSensitive
 import org.scalatest.{FunSuite, Matchers}
 
+@ClasspathSensitive
 class UtilsTest extends FunSuite with Matchers {
 
   test("testGetFreePort") {

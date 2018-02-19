@@ -38,8 +38,8 @@ import scala.concurrent.duration.DurationLong
 // DEOPSCSW-216: Locate and connect components to send AKKA commands
 class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
-  implicit val seedActorSystem: actor.ActorSystem     = ClusterSettings().onPort(3552).system
-  private val containerActorSystem: actor.ActorSystem = ClusterSettings().joinLocal(3552).system
+  implicit val seedActorSystem: actor.ActorSystem     = ClusterSettings().onPort(3555).system
+  private val containerActorSystem: actor.ActorSystem = ClusterSettings().joinLocal(3555).system
 
   implicit val typedSystem: ActorSystem[_]      = seedActorSystem.toTyped
   implicit val testKitSettings: TestKitSettings = TestKitSettings(typedSystem)

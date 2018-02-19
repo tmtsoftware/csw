@@ -44,6 +44,7 @@ object Common extends AutoPlugin {
       // -a Show stack traces and exception class name for AssertionErrors.
       Tests.Argument(TestFrameworks.JUnit, "-v", "-a")
     ),
+    publishArtifact in (Test, packageBin) := true,
     version := {
       sys.props.get("prod.publish") match {
         case Some("true") => version.value

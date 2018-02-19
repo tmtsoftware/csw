@@ -33,7 +33,7 @@ import scala.concurrent.duration.DurationLong
 
 class TrackConnectionsIntegrationTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
-  implicit val seedActorSystem: actor.ActorSystem = ClusterSettings().onPort(3552).system
+  implicit val seedActorSystem: actor.ActorSystem = ClusterSettings().onPort(3554).system
 
   implicit val typedSystem: ActorSystem[_]      = seedActorSystem.toTyped
   implicit val testKitSettings: TestKitSettings = TestKitSettings(typedSystem)
@@ -53,7 +53,7 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Before
   // DEOPSCSW-220: Access and Monitor components for current values
   // DEOPSCSW-221: Avoid sending commands to non-executing components
   test("should track connections when locationServiceUsage is RegisterAndTrackServices") {
-    val containerActorSystem: actor.ActorSystem = ClusterSettings().joinLocal(3552).system
+    val containerActorSystem: actor.ActorSystem = ClusterSettings().joinLocal(3554).system
     val wiring: FrameworkWiring                 = FrameworkWiring.make(containerActorSystem)
     // start a container and verify it moves to running lifecycle state
     val containerRef =
@@ -101,7 +101,7 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Before
    * */
   //DEOPSCSW-219 Discover component connection using HTTP protocol
   test("component should be able to track http and tcp connections") {
-    val actorSystem: actor.ActorSystem = ClusterSettings().joinLocal(3552).system
+    val actorSystem: actor.ActorSystem = ClusterSettings().joinLocal(3554).system
     val wiring: FrameworkWiring        = FrameworkWiring.make(actorSystem)
     // start component in standalone mode
     Standalone.spawn(ConfigFactory.load("standalone.conf"), wiring)

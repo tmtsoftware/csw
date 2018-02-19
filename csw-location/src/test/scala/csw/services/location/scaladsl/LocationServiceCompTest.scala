@@ -7,7 +7,6 @@ import akka.stream.{ActorMaterializer, Materializer}
 import akka.testkit.TestProbe
 import akka.typed.Behavior
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
-import csw.commons.tags.AcceptanceTest
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location._
 import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
@@ -21,7 +20,6 @@ import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 import scala.concurrent.duration.DurationInt
 
-@AcceptanceTest
 class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
 
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'

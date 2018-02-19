@@ -15,11 +15,11 @@ import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 // DEOPSCSW-43: Access Configuration service from any CSW component
 class CommandLineRunnerTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
 
-  private val serverWiring = ServerWiring.make(ClusterAwareSettings.onPort(3552))
+  private val serverWiring = ServerWiring.make(ClusterAwareSettings.onPort(3560))
   private val httpService  = serverWiring.httpService
   httpService.registeredLazyBinding.await
 
-  private val wiring = ClientCliWiring.noPrinting(ClusterAwareSettings.joinLocal(3552))
+  private val wiring = ClientCliWiring.noPrinting(ClusterAwareSettings.joinLocal(3560))
   import wiring.commandLineRunner
 
   private val testFileUtils = new TestFileUtils(serverWiring.settings)

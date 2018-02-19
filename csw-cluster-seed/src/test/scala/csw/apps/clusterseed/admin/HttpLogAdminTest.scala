@@ -9,6 +9,7 @@ import akka.typed.testkit.TestKitSettings
 import com.typesafe.config.ConfigFactory
 import csw.apps.clusterseed.admin.http.HttpSupport
 import csw.apps.clusterseed.utils.AdminLogTestSuite
+import csw.commons.tags.ClasspathSensitive
 import csw.services.config.server.{ServerWiring, Settings}
 import csw.services.config.server.commons.{ConfigServiceConnection, TestFileUtils}
 import csw.services.location.commons.ClusterAwareSettings
@@ -20,6 +21,7 @@ import scala.collection.JavaConverters.mapAsScalaMapConverter
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
 
+@ClasspathSensitive
 class HttpLogAdminTest extends AdminLogTestSuite with HttpSupport {
 
   import adminWiring.actorRuntime._

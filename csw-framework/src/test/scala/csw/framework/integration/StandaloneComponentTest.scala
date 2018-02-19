@@ -15,6 +15,7 @@ import csw.common.FrameworkAssertions._
 import csw.common.components.framework.SampleComponentHandlers
 import csw.common.components.framework.SampleComponentState._
 import csw.common.utils.TestAppender
+import csw.commons.tags.ClasspathSensitive
 import csw.framework.internal.component.ComponentBehavior
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.messages.SupervisorContainerCommonMessages.Shutdown
@@ -37,17 +38,18 @@ import scala.concurrent.duration.DurationLong
 // DEOPSCSW-167: Creation and Deployment of Standalone Components
 // DEOPSCSW-177: Hooks for lifecycle management
 // DEOPSCSW-216: Locate and connect components to send AKKA commands
+@ClasspathSensitive
 class StandaloneComponentTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
   // ActorSystem for testing. This acts as a seed node
-  implicit val seedActorSystem: actor.ActorSystem = ClusterSettings().onPort(3552).system
+  implicit val seedActorSystem: actor.ActorSystem = ClusterSettings().onPort(3553).system
   implicit val typedSystem: ActorSystem[_]        = seedActorSystem.toTyped
   implicit val testKitSettings: TestKitSettings   = TestKitSettings(typedSystem)
   implicit val mat: Materializer                  = ActorMaterializer()
   private val locationService: LocationService    = LocationServiceFactory.withSystem(seedActorSystem)
 
   // ActorSystem for standalone component. Component will join seed node created above.
-  private val hcdActorSystem: actor.ActorSystem = ClusterSettings().joinLocal(3552).system
+  private val hcdActorSystem: actor.ActorSystem = ClusterSettings().joinLocal(3553).system
 
   // all log messages will be captured in log buffer
   private val logBuffer          = mutable.Buffer.empty[JsonObject]

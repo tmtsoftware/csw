@@ -17,7 +17,6 @@ class RedisEventBusDriverTest extends FunSuite with Matchers with BeforeAndAfter
 
   private val port: Port = PortHelper.freePort
   private val wiring     = new Wiring(port)
-  println(s"starting redis on $port")
 
   import wiring._
   lazy val redis: RedisServer = RedisServer.builder().setting("bind 127.0.0.1").port(port).build()

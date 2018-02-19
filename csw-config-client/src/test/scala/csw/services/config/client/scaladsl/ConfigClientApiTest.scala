@@ -16,9 +16,9 @@ import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 // DEOPSCSW-80: HTTP based access for configuration file
 class ConfigClientApiTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
 
-  private val clientLocationService = LocationServiceFactory.withSettings(ClusterAwareSettings.onPort(3552))
+  private val clientLocationService = LocationServiceFactory.withSettings(ClusterAwareSettings.onPort(3558))
 
-  private val serverWiring = ServerWiring.make(ClusterAwareSettings.joinLocal(3552))
+  private val serverWiring = ServerWiring.make(ClusterAwareSettings.joinLocal(3558), Some(4002))
   private val httpService  = serverWiring.httpService
 
   private val testFileUtils = new TestFileUtils(serverWiring.settings)

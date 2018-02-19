@@ -52,6 +52,7 @@ lazy val `csw-prod` = project
   .settings(GithubRelease.githubReleases(githubReleases))
 
 lazy val `csw-messages` = project
+  .dependsOn(`csw-commons` % "test->test")
   .enablePlugins(PublishBintray, GenJavadocPlugin)
   .settings(
     libraryDependencies ++= Dependencies.Messages
@@ -249,13 +250,13 @@ lazy val `acceptance-tests` = project
     `csw-config-server` % "compile->test",
     `csw-config-client` % "compile->test",
     `csw-config-client-cli` % "compile->test",
-    `csw-logging` % "compile->test",
     `csw-framework` % "compile->test",
     `csw-messages` % "compile->test",
     `csw-event-impl` % "compile->test",
-    `examples` % "compile->test"
+    `examples` % "compile->test",
+    `csw-commons` % "compile->test"
   )
-  .enablePlugins(DeployApp)
+  .enablePlugins(PublishTests)
   .settings(
     libraryDependencies ++= Dependencies.AcceptanceTests
   )

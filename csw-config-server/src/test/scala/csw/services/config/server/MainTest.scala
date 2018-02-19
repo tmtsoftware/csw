@@ -6,6 +6,7 @@ import akka.http.scaladsl.model.Uri.Path
 import akka.http.scaladsl.model.{HttpRequest, StatusCodes, Uri}
 import akka.stream.{ActorMaterializer, Materializer}
 import com.typesafe.config.ConfigFactory
+import csw.commons.tags.ClasspathSensitive
 import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.config.server.commons.TestFutureExtension.RichFuture
 import csw.services.config.server.commons.{ConfigServiceConnection, TestFileUtils}
@@ -17,6 +18,7 @@ import org.tmatesoft.svn.core.SVNException
 import scala.concurrent.duration._
 
 // DEOPSCSW-130: Command line App for HTTP server
+@ClasspathSensitive
 class MainTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
   implicit val actorSystem: ActorSystem = ActorSystem("config-server")
   implicit val mat: Materializer        = ActorMaterializer()

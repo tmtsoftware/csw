@@ -6,6 +6,7 @@ import java.time.Instant
 
 import akka.stream.scaladsl.StreamConverters
 import com.typesafe.config.{Config, ConfigFactory}
+import csw.commons.tagobjects.ClasspathSensitive
 import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound}
 import csw.services.config.api.models._
@@ -914,7 +915,8 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
   // DEOPSCSW-27: Storing binary component configurations
   // DEOPSCSW-81: Storing large files in the configuration service
   // DEOPSCSW-131: Detect and handle oversize files
-  test("should be able to store and retrieve text file from annex store when size is greater than configured size") {
+  test("should be able to store and retrieve text file from annex store when size is greater than configured size",
+       ClasspathSensitive) {
     val fileName              = "tromboneContainer.conf"
     val path                  = Paths.get(getClass.getClassLoader.getResource(fileName).toURI)
     val configData            = ConfigData.fromPath(path)

@@ -12,6 +12,7 @@ import com.typesafe.config.ConfigFactory
 import csw.apps.clusterseed.admin.http.HttpSupport
 import csw.apps.clusterseed.utils.AdminLogTestSuite
 import csw.common.FrameworkAssertions.assertThatContainerIsRunning
+import csw.commons.tags.ClasspathSensitive
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.messages.CommandMessage.Oneway
 import csw.messages.ContainerCommonMessage.GetComponents
@@ -32,6 +33,7 @@ import scala.collection.JavaConverters.mapAsScalaMapConverter
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
 
+@ClasspathSensitive
 class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
 
   import adminWiring.actorRuntime._
@@ -54,10 +56,10 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
   override protected def beforeAll(): Unit = {
     super.beforeAll()
 
-    // this will start seed on port 3552 and log admin server on 7878
+    // this will start seed on port 3557 and log admin server on 7878
     adminWiring.locationService
 
-    containerActorSystem = ClusterSettings().joinLocal(3552).system
+    containerActorSystem = ClusterSettings().joinLocal(3557).system
 
     // this will start container on random port and join seed and form a cluster
     val containerRef = startContainerAndWaitForRunning()
