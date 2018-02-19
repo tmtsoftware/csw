@@ -22,6 +22,18 @@ Hcd/Java
 
 The `onShutdown` handler can be used for carrying out the tasks which will allow the component to shutdown gracefully. 
 
+Assembly/Scala
+:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/AssemblyComponentHandlers.scala) { #onShutdown-handler }
+
+Assembly/Java
+:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JAssemblyComponentHandlers.java) { #onShutdown-handler }
+
+Hcd/Scala
+:   @@snip [HcdComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/hcd/HcdComponentHandlers.scala) { #onShutdown-handler }
+
+Hcd/Java
+:   @@snip [JHcdComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/hcd/JHcdComponentHandlers.java) { #onShutdown-handler }
+
 ### isOnline
 
 A component has access to `isOnline` boolean flag which can be used to determine if the component is online or offline state.
