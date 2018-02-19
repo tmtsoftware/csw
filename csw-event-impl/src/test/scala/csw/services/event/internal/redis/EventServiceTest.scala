@@ -6,7 +6,6 @@ import csw.messages.ccs.events.{Event, EventKey, EventName, SystemEvent}
 import csw.messages.params.models.Prefix
 import csw.services.event.helpers.PortHelper
 import csw.services.event.internal.Wiring
-import csw.services.event.internal.pubsub.{EventPublisherImpl, EventSubscriberImpl}
 import csw_protobuf.events.PbEvent
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import redis.embedded.RedisServer
@@ -40,11 +39,8 @@ class EventServiceTest extends FunSuite with Matchers with BeforeAndAfterAll wit
   test("test subscribe with callback") {
     val testProbe = TestProbe()
 
-    val subscriptionImpl: EventSubscriberImpl = new EventSubscriberImpl(new RedisEventBusDriver(redisClient, redisURI))
+    subscriberImpl.subscribe(Seq(eventKey), e ⇒ testProbe.ref ! e)
 
-    subscriptionImpl.subscribe(Seq(eventKey), e ⇒ testProbe.ref ! e)
-
-    val publisherImpl = new EventPublisherImpl(new RedisEventBusDriver(redisClient, redisURI))
     Await.result(publisherImpl.publish(event), 5.seconds)
 
     Thread.sleep(1000)

@@ -5,18 +5,18 @@ import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{KillSwitch, Materializer}
 import akka.typed.ActorRef
 import csw.messages.ccs.events.{Event, EventKey}
-import csw.services.event.internal.api.EventBusDriver
+import csw.services.event.internal.api.EventSubscriberDriver
 import csw.services.event.scaladsl.{EventSubscriber, EventSubscription}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class EventSubscriberImpl(eventBusDriver: EventBusDriver)(implicit val mat: Materializer, ec: ExecutionContext)
+class EventSubscriberImpl(eventSubscriberDriver: EventSubscriberDriver)(implicit val mat: Materializer, ec: ExecutionContext)
     extends EventSubscriber {
 
   def subscribe(eventKeys: Seq[EventKey]): Source[Event, EventSubscription] = {
     val keys = eventKeys.map(_.toString)
 
-    eventBusDriver
+    eventSubscriberDriver
       .subscribe(keys)
       .map(x => Event.fromPb(x.value))
       .mapMaterializedValue(killSwitch => createSubscription(keys, killSwitch))
@@ -33,7 +33,7 @@ class EventSubscriberImpl(eventBusDriver: EventBusDriver)(implicit val mat: Mate
   private def createSubscription(keys: Seq[String], killSwitch: KillSwitch): EventSubscription =
     new EventSubscription {
       override def unsubscribe(): Future[Done] =
-        eventBusDriver
+        eventSubscriberDriver
           .unsubscribe(keys)
           .transform(x ⇒ { killSwitch.shutdown(); x }, ex ⇒ { killSwitch.abort(ex); ex })
 

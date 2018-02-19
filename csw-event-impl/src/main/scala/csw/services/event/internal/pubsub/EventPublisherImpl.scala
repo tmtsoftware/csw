@@ -5,14 +5,14 @@ import akka.actor.ActorSystem
 import akka.stream._
 import akka.stream.scaladsl.{Sink, Source, SourceQueueWithComplete}
 import csw.messages.ccs.events.Event
-import csw.services.event.internal.api.EventBusDriver
+import csw.services.event.internal.api.{EventPublishDriver, EventSubscriberDriver}
 import csw.services.event.scaladsl.EventPublisher
 import csw_protobuf.events.PbEvent
 
 import scala.concurrent.{Future, Promise}
 import scala.util.Try
 
-class EventPublisherImpl(eventServiceDriver: EventBusDriver)(implicit system: ActorSystem) extends EventPublisher {
+class EventPublisherImpl(eventPublishDriver: EventPublishDriver)(implicit system: ActorSystem) extends EventPublisher {
 
   private val bufferSize    = 4096
   private val maxSubStreams = 1024
@@ -26,9 +26,9 @@ class EventPublisherImpl(eventServiceDriver: EventBusDriver)(implicit system: Ac
     .queue[StreamElement](bufferSize, OverflowStrategy.dropHead)
     .groupBy(maxSubStreams, _.key)
     .mapAsync(1) { element ⇒
-      eventServiceDriver
+      eventPublishDriver
         .publish(element.key, element.value)
-        .flatMap(_ ⇒ eventServiceDriver.set(element.key, element.value))
+        .flatMap(_ ⇒ eventPublishDriver.set(element.key, element.value))
         .transformWith(element.complete)
     }
     .to(Sink.ignore)

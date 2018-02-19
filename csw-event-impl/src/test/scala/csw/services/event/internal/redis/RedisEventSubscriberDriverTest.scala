@@ -13,7 +13,7 @@ import scala.compat.java8.FutureConverters.CompletionStageOps
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
 
-class RedisEventBusDriverTest extends FunSuite with Matchers with BeforeAndAfterAll with EmbeddedRedis {
+class RedisEventSubscriberDriverTest extends FunSuite with Matchers with BeforeAndAfterAll with EmbeddedRedis {
 
   private val port: Port = PortHelper.freePort
   private val wiring     = new Wiring(port)
@@ -31,12 +31,12 @@ class RedisEventBusDriverTest extends FunSuite with Matchers with BeforeAndAfter
 
   test("pub-sub") {
     val key                = "abc"
-    val (killSwitch, seqF) = eventBusDriver.subscribe(Seq(key)).toMat(Sink.seq)(Keep.both).run()
+    val (killSwitch, seqF) = subscriberDriver.subscribe(Seq(key)).toMat(Sink.seq)(Keep.both).run()
     Thread.sleep(1000)
-    eventBusDriver.publish(key, PbEvent().withEventId("1")).await
-    eventBusDriver.publish(key, PbEvent().withEventId("2")).await
-    eventBusDriver.unsubscribe(Seq(key)).await
-    eventBusDriver.publish(key, PbEvent().withEventId("3")).await
+    publisherDriver.publish(key, PbEvent().withEventId("1")).await
+    publisherDriver.publish(key, PbEvent().withEventId("2")).await
+    subscriberDriver.unsubscribe(Seq(key)).await
+    publisherDriver.publish(key, PbEvent().withEventId("3")).await
     killSwitch.shutdown()
     seqF.await.map(_.value) shouldBe Seq(PbEvent().withEventId("1"), PbEvent().withEventId("2"))
   }
