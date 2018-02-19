@@ -11,7 +11,7 @@ import com.typesafe.config.ConfigFactory
 import csw.common.FrameworkAssertions._
 import csw.common.components.framework.SampleComponentState._
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
-import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
+import csw.messages.ComponentCommonMessage.{GetSupervisorLifecycleState, LifecycleStateSubscription}
 import csw.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.messages.RunningMessage.Lifecycle
 import csw.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
@@ -24,6 +24,7 @@ import csw.messages.models.PubSub.Subscribe
 import csw.messages.models.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.messages.models.{Components, LifecycleStateChanged}
 import csw.messages.params.states.CurrentState
+import csw.services.ccs.scaladsl.CommandService
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
@@ -101,10 +102,14 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
     val filterSupervisor    = instrumentHcdLocation.get.componentRef
     val disperserSupervisor = disperserHcdLocation.get.componentRef
 
+    val assemblyCommandService  = new CommandService(filterAssemblyLocation.get)
+    val filterCommandService    = new CommandService(instrumentHcdLocation.get)
+    val disperserCommandService = new CommandService(disperserHcdLocation.get)
+
     // Subscribe to component's current state
-    assemblySupervisor ! ComponentStateSubscription(Subscribe(assemblyProbe.ref))
-    filterSupervisor ! ComponentStateSubscription(Subscribe(filterProbe.ref))
-    disperserSupervisor ! ComponentStateSubscription(Subscribe(disperserProbe.ref))
+    assemblyCommandService.subscribeCurrentState(assemblyProbe.ref ! _)
+    filterCommandService.subscribeCurrentState(filterProbe.ref ! _)
+    disperserCommandService.subscribeCurrentState(disperserProbe.ref ! _)
 
     // Subscribe to component's lifecycle state
     assemblySupervisor ! LifecycleStateSubscription(Subscribe(assemblyLifecycleStateProbe.ref))

@@ -10,12 +10,10 @@ import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.common.components.command.ComponentStateForCommand._
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
-import csw.messages.ComponentCommonMessage.ComponentStateSubscription
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Invalid}
 import csw.messages.ccs.commands.{CommandResponse, Setup}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{AkkaLocation, ComponentId, ComponentType}
-import csw.messages.models.PubSub.Subscribe
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.CurrentState
 import csw.services.ccs.scaladsl.{CommandDistributor, CommandService}
@@ -60,7 +58,7 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
 
       val setup = Setup(prefix, longRunning, Some(obsId))
       val probe = TestProbe[CurrentState]
-      assemblyLocation.componentRef ! ComponentStateSubscription(Subscribe(probe.ref))
+      assemblyComponent.subscribeCurrentState(probe.ref ! _)
 
       // send submit with setup to assembly running in JVM-2
       // then assembly will split it into three sub commands [McsAssemblyComponentHandlers]

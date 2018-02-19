@@ -12,7 +12,6 @@ import com.typesafe.config.ConfigFactory
 import csw.common.FrameworkAssertions._
 import csw.common.components.framework.SampleComponentState._
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
-import csw.messages.ComponentCommonMessage.ComponentStateSubscription
 import csw.messages.SupervisorContainerCommonMessages.Shutdown
 import csw.messages.ccs.commands
 import csw.messages.ccs.commands.CommandName
@@ -21,7 +20,6 @@ import csw.messages.location.ComponentId
 import csw.messages.location.ComponentType.{Assembly, HCD}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
-import csw.messages.models.PubSub.Subscribe
 import csw.messages.params.states.CurrentState
 import csw.services.ccs.scaladsl.CommandService
 import csw.services.location.commons.ClusterSettings
@@ -72,12 +70,14 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Before
     val filterAssemblyLocation = Await.result(locationService.find(filterAssemblyConnection), 5.seconds)
     val disperserHcdLocation   = Await.result(locationService.find(disperserHcdConnection), 5.seconds)
 
-    val assemblySupervisor    = filterAssemblyLocation.get.componentRef
-    val disperserComponentRef = disperserHcdLocation.get.componentRef
-    val disperserComponent    = new CommandService(disperserHcdLocation.get)
+    val assemblySupervisor     = filterAssemblyLocation.get.componentRef
+    val assemblyCommandService = new CommandService(filterAssemblyLocation.get)
+
+    val disperserComponentRef   = disperserHcdLocation.get.componentRef
+    val disperserCommandService = new CommandService(disperserHcdLocation.get)
 
     // Subscribe to component's current state
-    assemblySupervisor ! ComponentStateSubscription(Subscribe(assemblyProbe.ref))
+    assemblyCommandService.subscribeCurrentState(assemblyProbe.ref ! _)
 
     // assembly is tracking two HCD's, hence assemblyProbe will receive LocationUpdated event from two HCD's
     assemblyProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(akkaLocationUpdatedChoice))))
@@ -89,7 +89,7 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Before
 
     implicit val timeout: Timeout = Timeout(100.millis)
     intercept[AskTimeoutException] {
-      Await.result(disperserComponent.submit(commands.Setup(prefix, CommandName("isAlive"), None)), 200.millis)
+      Await.result(disperserCommandService.submit(commands.Setup(prefix, CommandName("isAlive"), None)), 200.millis)
     }
 
     Await.result(wiring.locationService.shutdown(TestFinishedReason), 5.seconds)
@@ -121,10 +121,10 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Before
     val assemblySupervisor = resolvedAkkaLocation.componentRef
     assertThatSupervisorIsRunning(assemblySupervisor, supervisorLifecycleStateProbe, 5.seconds)
 
-    val assemblyProbe = TestProbe[CurrentState]("assembly-state-probe")
-
+    val assemblyProbe          = TestProbe[CurrentState]("assembly-state-probe")
+    val assemblyCommandService = new CommandService(resolvedAkkaLocation)
     // Subscribe to component's current state
-    assemblySupervisor ! ComponentStateSubscription(Subscribe(assemblyProbe.ref))
+    assemblyCommandService.subscribeCurrentState(assemblyProbe.ref ! _)
 
     // register http connection
     Await.result(

@@ -7,15 +7,15 @@ import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.{ActorRef, ActorSystem}
+import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.common.FrameworkAssertions._
-import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState}
 import csw.messages.ContainerCommonMessage.GetComponents
 import csw.messages.RunningMessage.Lifecycle
 import csw.messages.SupervisorContainerCommonMessages.Shutdown
 import csw.messages.ccs.commands.CommandResponse.Invalid
-import csw.messages.ccs.commands.{CommandName, CommandResponse, Setup}
+import csw.messages.ccs.commands.{CommandName, Setup}
 import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
@@ -26,6 +26,7 @@ import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.CurrentState
 import csw.messages.{ComponentMessage, ContainerExternalMessage}
+import csw.services.ccs.scaladsl.CommandService
 import csw.services.config.api.models.ConfigData
 import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.config.server.commons.TestFileUtils
@@ -56,6 +57,7 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
   implicit val actorSystem: ActorSystem[_]  = system.toTyped
   implicit val ec: ExecutionContextExecutor = actorSystem.executionContext
   implicit val testkit: TestKitSettings     = TestKitSettings(actorSystem)
+  implicit val timeout: Timeout             = 5.seconds
 
   private val testFileUtils = new TestFileUtils(new Settings(ConfigFactory.load()))
 
@@ -139,8 +141,9 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
 
       val etonSupervisorTypedRef = etonSupervisorLocation.componentRef
       val eatonCompStateProbe    = TestProbe[CurrentState]
+      val etonCommandService     = new CommandService(etonSupervisorLocation)
 
-      etonSupervisorTypedRef ! ComponentStateSubscription(Subscribe(eatonCompStateProbe.ref))
+      etonCommandService.subscribeCurrentState(eatonCompStateProbe.ref ! _)
 
       import csw.common.components.framework.SampleComponentState._
 
@@ -152,15 +155,19 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
 
       val laserAssemblySupervisor = laserContainerComponents.head.supervisor
       val laserCompStateProbe     = TestProbe[CurrentState]
-      val commandResponseProbe    = TestProbe[CommandResponse]
-      etonSupervisorTypedRef ! Submit(setupFailure, commandResponseProbe.ref)
-      eatonCompStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(commandValidationChoice))))
-      commandResponseProbe.expectMsgType[Invalid]
 
-      etonSupervisorTypedRef ! Oneway(setupSuccess, commandResponseProbe.ref)
-      eatonCompStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(commandValidationChoice))))
-      eatonCompStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(oneWayCommandChoice))))
-      eatonCompStateProbe.expectMsg(CurrentState(successPrefix, Set(choiceKey.set(setupConfigChoice), param)))
+      etonCommandService.submit(setupFailure).map { commandResponse ⇒
+        commandResponse shouldBe Invalid
+        eatonCompStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(commandValidationChoice))))
+      }
+
+      etonCommandService.oneway(setupSuccess).map { _ ⇒
+        eatonCompStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(commandValidationChoice))))
+        eatonCompStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(oneWayCommandChoice))))
+        eatonCompStateProbe.expectMsg(CurrentState(successPrefix, Set(choiceKey.set(setupConfigChoice), param)))
+      }
+
+      Thread.sleep(50)
 
       etonSupervisorTypedRef ! Lifecycle(GoOffline)
       enterBarrier("offline")

@@ -17,14 +17,13 @@ import csw.common.components.framework.SampleComponentState._
 import csw.common.utils.TestAppender
 import csw.framework.internal.component.ComponentBehavior
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
-import csw.messages.ComponentCommonMessage.ComponentStateSubscription
 import csw.messages.SupervisorContainerCommonMessages.Shutdown
 import csw.messages.framework.SupervisorLifecycleState
 import csw.messages.location.ComponentType.HCD
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, LocationRemoved, LocationUpdated, TrackingEvent}
-import csw.messages.models.PubSub.Subscribe
 import csw.messages.params.states.CurrentState
+import csw.services.ccs.scaladsl.CommandService
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import csw.services.logging.internal.LoggingLevels.INFO
@@ -79,12 +78,14 @@ class StandaloneComponentTest extends FunSuite with Matchers with BeforeAndAfter
     val supervisorRef = resolvedAkkaLocation.componentRef
     assertThatSupervisorIsRunning(supervisorRef, supervisorLifecycleStateProbe, 5.seconds)
 
+    val supervisorCommandService = new CommandService(resolvedAkkaLocation)
+
     val (_, akkaProbe) =
       locationService.track(akkaConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
     akkaProbe.requestNext() shouldBe a[LocationUpdated]
 
     // on shutdown, component unregisters from location service
-    supervisorRef ! ComponentStateSubscription(Subscribe(supervisorStateProbe.ref))
+    supervisorCommandService.subscribeCurrentState(supervisorStateProbe.ref ! _)
     supervisorRef ! Shutdown
 
     // this proves that ComponentBehaviors postStop signal gets invoked

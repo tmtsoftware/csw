@@ -8,9 +8,11 @@ import csw.messages.ComponentCommonMessage.ComponentStateSubscription
 import csw.messages.models.PubSub.Subscribe
 import csw.messages.params.states.CurrentState
 
-class CurrentStateSubscription(publisher: ActorRef[ComponentStateSubscription], callback: CurrentState ⇒ Unit)(
-    implicit val mat: Materializer
-) {
+class CurrentStateSubscription(
+    publisher: ActorRef[ComponentStateSubscription],
+    callback: CurrentState ⇒ Unit
+)(implicit val mat: Materializer) {
+
   private def source: Source[CurrentState, Unit] = {
     val bufferSize = 256
     Source
@@ -23,7 +25,7 @@ class CurrentStateSubscription(publisher: ActorRef[ComponentStateSubscription], 
   private val (killSwitch, currentStateF) = source
     .map(callback)
     .viaMat(KillSwitches.single)(Keep.right)
-    .toMat(Sink.head)(Keep.both)
+    .toMat(Sink.ignore)(Keep.both)
     .run()
 
   def stop(): Unit = killSwitch.shutdown()
