@@ -1,7 +1,6 @@
 package tmt.shared.dsl
 
 import tmt.shared.util.FutureExt.RichFuture
-import tmt.shared.engine.EngineDsl
 import tmt.shared.services.{Command, CommandResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global

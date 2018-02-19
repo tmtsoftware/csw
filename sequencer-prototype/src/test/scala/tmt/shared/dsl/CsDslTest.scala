@@ -1,12 +1,11 @@
 package tmt.shared.dsl
 
 import org.scalatest.Matchers
-import tmt.shared.engine.EngineDsl
 import tmt.shared.services.{Command, CommandResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class CommandServiceTest extends org.scalatest.FunSuite with Matchers with ControlDsl {
+class CsDslTest extends org.scalatest.FunSuite with Matchers with ControlDsl {
 
 //  val wiring                 = new Wiring()
   lazy val engine: EngineDsl = ???
@@ -19,7 +18,7 @@ class CommandServiceTest extends org.scalatest.FunSuite with Matchers with Contr
   /* Ignoring for time being till we have some asserts here */
 
   ignore("dd") {
-    val dsl = new CommandService(null)
+    val dsl = new CsDsl(null)
     println(par(x, x))
   }
 

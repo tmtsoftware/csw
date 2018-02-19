@@ -16,6 +16,7 @@ import csw.messages.{CommandResponseManagerMessage, TopLevelActorMessage}
 import csw.services.config.api.models.ConfigData
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
+import tmt.production.dsl.Dsl
 import tmt.shared.Wiring
 import tmt.shared.engine.EngineBehaviour
 import tmt.shared.engine.EngineBehaviour.EngineAction
@@ -61,24 +62,21 @@ class SequencerHandlers(
       }
     }
 
-    val updatedScript = scriptContent.replace("import tmt.development.dsl.Dsl.wiring._", "")
+    //TODO: deal with ownPackage
+    val updatedScript = scriptContent.replace(
+      "import tmt.development.dsl.Dsl.wiring._",
+      "val wiring = tmt.production.dsl.Dsl.wiring; import wiring._"
+    )
 
     val path = Files.write(Paths.get(s"scripts/${componentInfo.name}.sc"), updatedScript.getBytes(StandardCharsets.UTF_8)) //TODO: decide on centos charset code
 
     val engineActor: ActorRef[EngineAction] = await(ctx.system.systemActorOf(EngineBehaviour.behaviour, "engine"))
-
-    val wiring = new Wiring(ctx.system, engineActor)
+    Dsl.wiring = new Wiring(ctx.system, engineActor)
 
     ctx.watch(engineActor) //TODO: what to do if engine actor dies ? Decide in handlers.
 
-//    Dsl.make(ctx.system, engineActor)
-
-    // Load script
     val params: List[String] = List(path.toString)
-
-    ammonite
-      .Main(predefCode = "import wiring._")
-      .run("wiring" -> wiring) //TODO: decide on main and main0
+    ammonite.Main.main0(params, System.in, System.out, System.err) //TODO: decide on main and main0
   }
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = {}

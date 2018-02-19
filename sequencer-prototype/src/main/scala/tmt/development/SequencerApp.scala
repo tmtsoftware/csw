@@ -1,12 +1,11 @@
-package tmt.approach2
+package tmt.development
 
-import java.io.File
-
-import tmt.shared.repl.RemoteRepl
 import tmt.development.dsl.Dsl._
 import tmt.development.dsl.Dsl.wiring._
+import tmt.shared.repl.RemoteRepl
+import tmt.shared.services.Command
 
-object SequencerApp2 extends App {
+object SequencerApp extends App {
 
   init()
 
@@ -15,5 +14,7 @@ object SequencerApp2 extends App {
   engine.push(Command("setup-assemblies-parallel", List(1, 2, 3, 10, 20, 30)))
 
   val params = if (args.isEmpty) Array("scripts/ocs-sequencer.sc") else args
-  ScriptLoader.fromFile(new File(params(0))).run()
+  ammonite.Main.main0(params.toList, System.in, System.out, System.err)
+
+  println("sequencer script loaded and running")
 }

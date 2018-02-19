@@ -5,7 +5,7 @@ import tmt.shared.services.{Command, CommandResponse, LocationService}
 
 import scala.concurrent.ExecutionContext
 
-class CommandService(locationService: LocationService)(implicit ec: ExecutionContext) {
+class CsDsl(locationService: LocationService)(implicit ec: ExecutionContext) {
   def setup(componentName: String, command: Command): CommandResponse = {
     locationService.resolve(componentName).setup(command)
   }.await
