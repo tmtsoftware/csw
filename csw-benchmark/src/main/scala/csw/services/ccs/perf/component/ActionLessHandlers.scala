@@ -1,14 +1,14 @@
 package csw.services.ccs.perf.component
 
-import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
+import csw.messages.TopLevelActorMessage
 import csw.messages.ccs.commands.CommandResponse.Completed
 import csw.messages.ccs.commands._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.TrackingEvent
 import csw.messages.params.models.Id
-import csw.messages.{CommandResponseManagerMessage, TopLevelActorMessage}
+import csw.services.ccs.scaladsl.CommandResponseManager
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
@@ -17,7 +17,7 @@ import scala.concurrent.Future
 class ActionLessHandlers(
     ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
-    commandResponseManager: ActorRef[CommandResponseManagerMessage],
+    commandResponseManager: CommandResponseManager,
     currentStatePublisher: CurrentStatePublisher,
     locationService: LocationService,
     loggerFactory: LoggerFactory

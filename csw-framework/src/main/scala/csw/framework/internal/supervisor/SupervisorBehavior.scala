@@ -33,6 +33,7 @@ import csw.messages.models.{LifecycleStateChanged, LockingResponse, PubSub, ToCo
 import csw.messages.params.models.Prefix
 import csw.messages.params.states.CurrentState
 import csw.services.ccs.internal.CommandResponseManagerFactory
+import csw.services.ccs.scaladsl.CommandResponseManager
 import csw.services.location.models.AkkaRegistration
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
@@ -42,13 +43,13 @@ import scala.concurrent.duration.{Duration, FiniteDuration}
 import scala.util.{Failure, Success}
 
 object SupervisorBehavior {
-  val PubSubComponentActor        = "pub-sub-component"
-  val PubSubLifecycleActor        = "pub-sub-lifecycle"
-  val InitializeTimerKey          = "initialize-timer"
-  val ComponentActorNameSuffix    = "component-actor"
-  val CommandResponseManagerActor = "command-response-manager"
-  val lockNotificationKey         = "lockNotification"
-  val lockExpirationKey           = "lockExpiration"
+  val PubSubComponentActor            = "pub-sub-component"
+  val PubSubLifecycleActor            = "pub-sub-lifecycle"
+  val InitializeTimerKey              = "initialize-timer"
+  val ComponentActorNameSuffix        = "component-actor"
+  val CommandResponseManagerActorName = "command-response-manager"
+  val lockNotificationKey             = "lockNotification"
+  val lockExpirationKey               = "lockExpiration"
 }
 
 /**
@@ -90,9 +91,9 @@ class SupervisorBehavior(
   val akkaRegistration: AkkaRegistration = registrationFactory.akkaTyped(akkaConnection, ctx.self)
   val isStandalone: Boolean              = maybeContainerRef.isEmpty
 
-  val pubSubComponentActor: ActorRef[PubSub[CurrentState]]            = makePubSubComponent()
-  val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]]        = makePubSubLifecycle()
-  val commandResponseManager: ActorRef[CommandResponseManagerMessage] = makeCommandResponseManager()
+  val pubSubComponentActor: ActorRef[PubSub[CurrentState]]     = makePubSubComponent()
+  val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]] = makePubSubLifecycle()
+  val commandResponseManager: CommandResponseManager           = makeCommandResponseManager()
 
   var lifecycleState: SupervisorLifecycleState           = Idle
   var runningComponent: Option[ActorRef[RunningMessage]] = None
@@ -199,9 +200,9 @@ class SupervisorBehavior(
    * @param runningMessage Message representing a message received in [[SupervisorLifecycleState.Running]] state
    */
   private def onRunning(runningMessage: SupervisorRunningMessage): Unit = runningMessage match {
-    case Query(commandId, replyTo)            ⇒ commandResponseManager ! Query(commandId, replyTo)
-    case Subscribe(commandId, replyTo)        ⇒ commandResponseManager ! Subscribe(commandId, replyTo)
-    case Unsubscribe(commandId, replyTo)      ⇒ commandResponseManager ! Unsubscribe(commandId, replyTo)
+    case Query(commandId, replyTo)            ⇒ commandResponseManager.commandResponseManagerActor ! Query(commandId, replyTo)
+    case Subscribe(commandId, replyTo)        ⇒ commandResponseManager.commandResponseManagerActor ! Subscribe(commandId, replyTo)
+    case Unsubscribe(commandId, replyTo)      ⇒ commandResponseManager.commandResponseManagerActor ! Unsubscribe(commandId, replyTo)
     case Lock(source, replyTo, leaseDuration) ⇒ lockComponent(source, replyTo, leaseDuration)
     case Unlock(source, replyTo)              ⇒ unlockComponent(source, replyTo)
     case command: CommandMessage              ⇒ if (lockManager.allowCommand(command)) runningComponent.get ! command
@@ -327,7 +328,8 @@ class SupervisorBehavior(
   private def makePubSubLifecycle(): ActorRef[PubSub[LifecycleStateChanged]] =
     pubSubBehaviorFactory.make(ctx, PubSubLifecycleActor, loggerFactory)
 
-  private def makeCommandResponseManager() = CommandResponseManagerFactory.make(ctx, CommandResponseManagerActor, loggerFactory)
+  private def makeCommandResponseManager() =
+    CommandResponseManagerFactory.make(ctx, CommandResponseManagerActorName, loggerFactory)
 
   private def ignore(message: SupervisorMessage): Unit =
     log.error(s"Unexpected message :[$message] received by supervisor in lifecycle state :[$lifecycleState]")

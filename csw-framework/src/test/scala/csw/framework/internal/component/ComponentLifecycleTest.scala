@@ -16,6 +16,7 @@ import csw.messages.ccs.commands.{CommandName, CommandResponse, Observe, Setup}
 import csw.messages.models.ToComponentLifecycleMessages._
 import csw.messages.params.generics.KeyType
 import csw.messages.params.models.{ObsId, Prefix}
+import csw.services.ccs.scaladsl.CommandResponseManager
 import csw.services.location.scaladsl.LocationService
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
@@ -34,7 +35,10 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
   ) {
     private val ctx = new StubbedActorContext[TopLevelActorMessage]("test-component", 100, system)
 
-    val locationService: LocationService    = mock[LocationService]
+    val locationService: LocationService               = mock[LocationService]
+    val commandResponseManager: CommandResponseManager = mock[CommandResponseManager]
+    when(commandResponseManager.commandResponseManagerActor).thenReturn(commandStatusServiceProbe.ref)
+
     val sampleHcdHandler: ComponentHandlers = mock[ComponentHandlers]
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
     when(sampleHcdHandler.onShutdown()).thenReturn(Future.unit)
@@ -44,7 +48,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
         ComponentInfos.hcdInfo,
         supervisorProbe.ref,
         sampleHcdHandler,
-        commandStatusServiceProbe.ref,
+        commandResponseManager,
         locationService,
         frameworkTestMocks().loggerFactory
       )

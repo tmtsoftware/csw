@@ -1,15 +1,12 @@
 package csw.common.components.command
 
 import akka.actor
-import akka.actor.Scheduler
 import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{ActorMaterializer, ThrottleMode}
-import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.util.Timeout
 import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
-import csw.messages.CommandResponseManagerMessage.{AddOrUpdateCommand, Query}
 import csw.messages._
 import csw.messages.ccs.CommandIssue.{OtherIssue, WrongPrefixIssue}
 import csw.messages.ccs.commands.CommandResponse._
@@ -19,6 +16,7 @@ import csw.messages.location._
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.Id
 import csw.messages.params.states.CurrentState
+import csw.services.ccs.scaladsl.CommandResponseManager
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
@@ -28,7 +26,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ComponentHandlerForCommand(
     ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
-    commandResponseManager: ActorRef[CommandResponseManagerMessage],
+    commandResponseManager: CommandResponseManager,
     currentStatePublisher: CurrentStatePublisher,
     locationService: LocationService,
     loggerFactory: LoggerFactory
@@ -86,22 +84,20 @@ class ComponentHandlerForCommand(
   private def processCommandWithoutMatcher(controlCommand: ControlCommand): Unit = {
     val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(20)
     val result                = Result(controlCommand.source, Set(param))
-    commandResponseManager ! AddOrUpdateCommand(controlCommand.runId, CompletedWithResult(controlCommand.runId, result))
+    commandResponseManager.addOrUpdateCommand(controlCommand.runId, CompletedWithResult(controlCommand.runId, result))
   }
 
   private def processCancelCommand(runId: Id, cancelId: Id): Unit = {
     processOriginalCommand(cancelId)
-    commandResponseManager ! AddOrUpdateCommand(runId, Completed(runId))
+    commandResponseManager.addOrUpdateCommand(runId, Completed(runId))
   }
 
   private def processOriginalCommand(cancelId: Id): Unit = {
-    import akka.typed.scaladsl.AskPattern._
-    implicit val timeout: Timeout     = 5.seconds
-    implicit val scheduler: Scheduler = ctx.system.scheduler
+    implicit val timeout: Timeout = 5.seconds
 
-    val eventualResponse: Future[CommandResponse] = commandResponseManager ? (Query(cancelId, _))
+    val eventualResponse: Future[CommandResponse] = commandResponseManager.query(cancelId)
     eventualResponse.foreach { _ ⇒
-      commandResponseManager ! AddOrUpdateCommand(cancelId, Cancelled(cancelId))
+      commandResponseManager.addOrUpdateCommand(cancelId, Cancelled(cancelId))
     }
   }
 

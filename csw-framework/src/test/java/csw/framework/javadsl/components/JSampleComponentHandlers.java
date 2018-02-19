@@ -4,7 +4,6 @@ import akka.stream.ActorMaterializer;
 import akka.stream.ThrottleMode;
 import akka.stream.javadsl.Sink;
 import akka.stream.javadsl.Source;
-import akka.typed.ActorRef;
 import akka.typed.javadsl.ActorContext;
 import csw.common.components.command.ComponentStateForCommand;
 import csw.common.components.framework.SampleComponentState;
@@ -22,6 +21,7 @@ import csw.messages.location.TrackingEvent;
 import csw.messages.params.generics.JKeyTypes;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.states.CurrentState;
+import csw.services.ccs.scaladsl.CommandResponseManager;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.logging.javadsl.ILogger;
 import csw.services.logging.javadsl.JLoggerFactory;
@@ -38,7 +38,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
 
     // Demonstrating logger accessibility in Java Component handlers
     private ILogger log;
-    private ActorRef<CommandResponseManagerMessage> commandResponseManagerRef;
+    private CommandResponseManager commandResponseManager;
     private CurrentStatePublisher currentStatePublisher;
     private CurrentState currentState = new CurrentState(SampleComponentState.prefix().prefix());
     private ActorContext<TopLevelActorMessage> actorContext;
@@ -46,7 +46,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     JSampleComponentHandlers(
             ActorContext<TopLevelActorMessage> ctx,
             ComponentInfo componentInfo,
-            ActorRef<CommandResponseManagerMessage> commandResponseManager,
+            CommandResponseManager commandResponseManager,
             CurrentStatePublisher currentStatePublisher,
             ILocationService locationService,
             JLoggerFactory loggerFactory
@@ -54,7 +54,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
         super(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, loggerFactory);
         this.currentStatePublisher = currentStatePublisher;
         this.log = loggerFactory.getLogger(getClass());
-        this.commandResponseManagerRef = commandResponseManager;
+        this.commandResponseManager = commandResponseManager;
         this.actorContext = ctx;
     }
 
@@ -135,11 +135,10 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     private void processCommandWithoutMatcher(ControlCommand controlCommand) {
 
         if (controlCommand.commandName().equals(failureAfterValidationCmd())) {
-            CommandResponseManagerMessage updateCommand = new AddOrUpdateCommand(controlCommand.runId(), new CommandResponse.Error(controlCommand.runId(), "Unknown Error occurred"));
-            commandResponseManagerRef.tell(updateCommand);
+            commandResponseManager.addOrUpdateCommand(controlCommand.runId(), new CommandResponse.Error(controlCommand.runId(), "Unknown Error occurred"));
         } else {
             CommandResponseManagerMessage updateCommand = new AddOrUpdateCommand(controlCommand.runId(), new Completed(controlCommand.runId()));
-            commandResponseManagerRef.tell(updateCommand);
+            commandResponseManager.addOrUpdateCommand(controlCommand.runId(), new Completed(controlCommand.runId()));
         }
 
     }

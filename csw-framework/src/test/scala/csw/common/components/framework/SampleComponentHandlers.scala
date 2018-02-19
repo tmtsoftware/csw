@@ -1,9 +1,8 @@
 package csw.common.components.framework
 
-import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
-import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
+import csw.messages.TopLevelActorMessage
 import csw.messages.ccs.CommandIssue.OtherIssue
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Invalid}
 import csw.messages.ccs.commands._
@@ -11,7 +10,7 @@ import csw.messages.framework.ComponentInfo
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location.{LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.messages.params.states.CurrentState
-import csw.messages.{CommandResponseManagerMessage, TopLevelActorMessage}
+import csw.services.ccs.scaladsl.CommandResponseManager
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
@@ -20,7 +19,7 @@ import scala.concurrent.Future
 class SampleComponentHandlers(
     ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
-    commandResponseManager: ActorRef[CommandResponseManagerMessage],
+    commandResponseManager: CommandResponseManager,
     currentStatePublisher: CurrentStatePublisher,
     locationService: LocationService,
     loggerFactory: LoggerFactory
@@ -55,7 +54,7 @@ class SampleComponentHandlers(
 
   override def onSubmit(controlCommand: ControlCommand): Unit = {
     // Adding passed in parameter to see if data is transferred properly
-    commandResponseManager ! AddOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId))
+    commandResponseManager.addOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId))
     currentStatePublisher.publish(CurrentState(prefix, Set(choiceKey.set(submitCommandChoice))))
     processCommand(controlCommand)
   }

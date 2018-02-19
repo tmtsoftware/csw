@@ -2,16 +2,16 @@ package csw.framework.components.assembly
 
 import java.nio.file.Paths
 
-import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.adapter.TypedActorSystemOps
 import csw.exceptions.{FailureRestart, FailureStop}
 import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
+import csw.messages.TopLevelActorMessage
 import csw.messages.ccs.commands.CommandResponse.Accepted
 import csw.messages.ccs.commands._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location._
-import csw.messages.{CommandResponseManagerMessage, TopLevelActorMessage}
+import csw.services.ccs.scaladsl.CommandResponseManager
 import csw.services.config.api.scaladsl.ConfigClientService
 import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.location.scaladsl.LocationService
@@ -25,7 +25,7 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
 class AssemblyComponentHandlers(
     ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
-    commandResponseManager: ActorRef[CommandResponseManagerMessage],
+    commandResponseManager: CommandResponseManager,
     currentStatePublisher: CurrentStatePublisher,
     locationService: LocationService,
     loggerFactory: LoggerFactory

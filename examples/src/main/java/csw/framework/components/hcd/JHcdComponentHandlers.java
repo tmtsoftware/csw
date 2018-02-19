@@ -1,10 +1,8 @@
 package csw.framework.components.hcd;
 
-import akka.typed.ActorRef;
 import akka.typed.javadsl.ActorContext;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.scaladsl.CurrentStatePublisher;
-import csw.messages.CommandResponseManagerMessage;
 import csw.messages.TopLevelActorMessage;
 import csw.messages.ccs.commands.CommandResponse;
 import csw.messages.ccs.commands.ControlCommand;
@@ -14,6 +12,7 @@ import csw.messages.framework.ComponentInfo;
 import csw.messages.location.LocationRemoved;
 import csw.messages.location.LocationUpdated;
 import csw.messages.location.TrackingEvent;
+import csw.services.ccs.scaladsl.CommandResponseManager;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.logging.javadsl.ILogger;
 import csw.services.logging.javadsl.JLoggerFactory;
@@ -25,7 +24,7 @@ public class JHcdComponentHandlers extends JComponentHandlers {
 
     private final ActorContext<TopLevelActorMessage> ctx;
     private final ComponentInfo componentInfo;
-    private final ActorRef<CommandResponseManagerMessage> commandResponseManager;
+    private final CommandResponseManager commandResponseManager;
     private final CurrentStatePublisher currentStatePublisher;
     private final ILocationService locationService;
     private ILogger log;
@@ -33,7 +32,7 @@ public class JHcdComponentHandlers extends JComponentHandlers {
     public JHcdComponentHandlers(
             akka.typed.javadsl.ActorContext<TopLevelActorMessage> ctx,
             ComponentInfo componentInfo,
-            ActorRef<CommandResponseManagerMessage> commandResponseManager,
+            CommandResponseManager commandResponseManager,
             CurrentStatePublisher currentStatePublisher,
             ILocationService locationService,
             JLoggerFactory loggerFactory

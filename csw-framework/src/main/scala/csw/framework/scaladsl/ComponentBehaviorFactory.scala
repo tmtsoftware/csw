@@ -4,7 +4,8 @@ import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
 import csw.framework.internal.component.ComponentBehavior
 import csw.messages.framework.ComponentInfo
-import csw.messages.{CommandResponseManagerMessage, FromComponentLifecycleMessage, TopLevelActorMessage}
+import csw.messages.{FromComponentLifecycleMessage, TopLevelActorMessage}
+import csw.services.ccs.scaladsl.CommandResponseManager
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
 
@@ -22,10 +23,10 @@ abstract class ComponentBehaviorFactory {
    * @param locationService          The single instance of Location service created for a running application
    * @return                         ComponentHandlers to be used by this component
    */
-  protected[framework] def handlers(
+  protected def handlers(
       ctx: ActorContext[TopLevelActorMessage],
       componentInfo: ComponentInfo,
-      commandResponseManager: ActorRef[CommandResponseManagerMessage],
+      commandResponseManager: CommandResponseManager,
       currentStatePublisher: CurrentStatePublisher,
       locationService: LocationService,
       loggerFactory: LoggerFactory
@@ -44,7 +45,7 @@ abstract class ComponentBehaviorFactory {
       componentInfo: ComponentInfo,
       supervisor: ActorRef[FromComponentLifecycleMessage],
       currentStatePublisher: CurrentStatePublisher,
-      commandResponseManager: ActorRef[CommandResponseManagerMessage],
+      commandResponseManager: CommandResponseManager,
       locationService: LocationService,
       loggerFactory: LoggerFactory
   ): Behavior[Nothing] =

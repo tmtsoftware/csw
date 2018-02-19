@@ -1,10 +1,10 @@
 package csw.common.components.framework
 
-import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.framework.scaladsl.CurrentStatePublisher
+import csw.messages.TopLevelActorMessage
 import csw.messages.framework.ComponentInfo
-import csw.messages.{CommandResponseManagerMessage, TopLevelActorMessage}
+import csw.services.ccs.scaladsl.CommandResponseManager
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
 
@@ -13,7 +13,7 @@ import scala.concurrent.Future
 class ComponentHandlerToSimulateFailure(
     ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
-    commandResponseManager: ActorRef[CommandResponseManagerMessage],
+    commandResponseManager: CommandResponseManager,
     currentStatePublisher: CurrentStatePublisher,
     locationService: LocationService,
     loggerFactory: LoggerFactory

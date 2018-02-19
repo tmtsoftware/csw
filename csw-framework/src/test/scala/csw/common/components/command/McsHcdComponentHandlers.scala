@@ -1,15 +1,15 @@
 package csw.common.components.command
 
-import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.common.components.command.ComponentStateForCommand._
 import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
 import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
+import csw.messages.TopLevelActorMessage
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed}
 import csw.messages.ccs.commands.{CommandResponse, ControlCommand}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.TrackingEvent
-import csw.messages.{CommandResponseManagerMessage, TopLevelActorMessage}
+import csw.services.ccs.scaladsl.CommandResponseManager
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
 
@@ -19,7 +19,7 @@ import scala.concurrent.duration.DurationLong
 class McsHcdComponentHandlers(
     ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
-    commandResponseManager: ActorRef[CommandResponseManagerMessage],
+    commandResponseManager: CommandResponseManager,
     currentStatePublisher: CurrentStatePublisher,
     locationService: LocationService,
     loggerFactory: LoggerFactory
@@ -48,11 +48,17 @@ class McsHcdComponentHandlers(
   override def onSubmit(controlCommand: ControlCommand): Unit = {
     controlCommand.commandName match {
       case `longRunning` ⇒
-        ctx.schedule(5.seconds, commandResponseManager, AddOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId)))
+        ctx.schedule(5.seconds,
+                     commandResponseManager.commandResponseManagerActor,
+                     AddOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId)))
       case `mediumRunning` ⇒
-        ctx.schedule(3.seconds, commandResponseManager, AddOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId)))
+        ctx.schedule(3.seconds,
+                     commandResponseManager.commandResponseManagerActor,
+                     AddOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId)))
       case `shortRunning` ⇒
-        ctx.schedule(1.seconds, commandResponseManager, AddOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId)))
+        ctx.schedule(1.seconds,
+                     commandResponseManager.commandResponseManagerActor,
+                     AddOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId)))
       case _ ⇒
     }
   }

@@ -10,7 +10,8 @@ import akka.util.Timeout
 import csw.framework.internal.supervisor.SupervisorBehaviorFactory
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers, CurrentStatePublisher}
 import csw.messages.framework.ComponentInfo
-import csw.messages.{CommandResponseManagerMessage, ComponentMessage, ContainerIdleMessage, TopLevelActorMessage}
+import csw.messages.{ComponentMessage, ContainerIdleMessage, TopLevelActorMessage}
+import csw.services.ccs.scaladsl.CommandResponseManager
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
@@ -36,7 +37,7 @@ abstract class FrameworkTestSuite extends FunSuite with Matchers with BeforeAndA
   ): ComponentBehaviorFactory =
     (ctx: ActorContext[TopLevelActorMessage],
      componentInfo: ComponentInfo,
-     commandResponseManager: ActorRef[CommandResponseManagerMessage],
+     commandResponseManager: CommandResponseManager,
      currentStatePublisher: CurrentStatePublisher,
      locationService: LocationService,
      loggerFactory: LoggerFactory) => componentHandlers
@@ -46,7 +47,7 @@ abstract class FrameworkTestSuite extends FunSuite with Matchers with BeforeAndA
   ): ComponentBehaviorFactory =
     (ctx: ActorContext[TopLevelActorMessage],
      componentInfo: ComponentInfo,
-     commandResponseManager: ActorRef[CommandResponseManagerMessage],
+     commandResponseManager: CommandResponseManager,
      currentStatePublisher: CurrentStatePublisher,
      locationService: LocationService,
      loggerFactory: LoggerFactory) => assemblyHandlers

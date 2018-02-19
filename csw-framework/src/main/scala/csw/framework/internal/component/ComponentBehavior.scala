@@ -16,6 +16,7 @@ import csw.messages.framework.ComponentInfo
 import csw.messages.framework.LocationServiceUsage.RegisterAndTrackServices
 import csw.messages.models.ToComponentLifecycleMessage
 import csw.messages.models.ToComponentLifecycleMessages.{GoOffline, GoOnline}
+import csw.services.ccs.scaladsl.CommandResponseManager
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
@@ -39,7 +40,7 @@ class ComponentBehavior(
     componentInfo: ComponentInfo,
     supervisor: ActorRef[FromComponentLifecycleMessage],
     lifecycleHandlers: ComponentHandlers,
-    commandResponseManager: ActorRef[CommandResponseManagerMessage],
+    commandResponseManager: CommandResponseManager,
     locationService: LocationService,
     loggerFactory: LoggerFactory
 ) extends Actor.MutableBehavior[TopLevelActorMessage] {
@@ -171,7 +172,8 @@ class ComponentBehavior(
     val validationResponse = lifecycleHandlers.validateCommand(commandMessage.command)
 
     commandMessage match {
-      case _: Submit ⇒ commandResponseManager ! AddOrUpdateCommand(commandMessage.command.runId, validationResponse)
+      case _: Submit ⇒
+        commandResponseManager.commandResponseManagerActor ! AddOrUpdateCommand(commandMessage.command.runId, validationResponse)
       case _: Oneway ⇒ //Oneway command should not be added to CommandResponseManager
     }
 

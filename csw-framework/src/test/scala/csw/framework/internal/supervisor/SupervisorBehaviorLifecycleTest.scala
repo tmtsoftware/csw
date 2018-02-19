@@ -59,7 +59,8 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     val childComponentInbox: Inbox[TopLevelActorMessage]                = ctx.childInbox(supervisor.component.get.upcast)
     val childPubSubLifecycleInbox: Inbox[PubSub[LifecycleStateChanged]] = ctx.childInbox(supervisor.pubSubLifecycle)
     val childPubSubCompStateInbox: Inbox[PubSub[CurrentState]]          = ctx.childInbox(supervisor.pubSubComponentActor)
-    val childCmdResponseMgrInbox: Inbox[CommandResponseManagerMessage]  = ctx.childInbox(supervisor.commandResponseManager)
+    val childCmdResponseMgrInbox: Inbox[CommandResponseManagerMessage] =
+      ctx.childInbox(supervisor.commandResponseManager.commandResponseManagerActor)
   }
 
   test("supervisor should start in Idle lifecycle state and spawn four actors") {

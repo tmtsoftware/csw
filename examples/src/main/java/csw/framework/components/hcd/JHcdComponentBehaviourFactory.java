@@ -8,6 +8,7 @@ import csw.framework.scaladsl.CurrentStatePublisher;
 import csw.messages.CommandResponseManagerMessage;
 import csw.messages.TopLevelActorMessage;
 import csw.messages.framework.ComponentInfo;
+import csw.services.ccs.scaladsl.CommandResponseManager;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.logging.javadsl.JLoggerFactory;
 
@@ -18,7 +19,7 @@ public class JHcdComponentBehaviourFactory extends JComponentBehaviorFactory {
     public JComponentHandlers jHandlers(
             ActorContext<TopLevelActorMessage> ctx,
             ComponentInfo componentInfo,
-            ActorRef<CommandResponseManagerMessage> commandResponseManager,
+            CommandResponseManager commandResponseManager,
             CurrentStatePublisher currentStatePublisher,
             ILocationService locationService,
             JLoggerFactory loggerFactory

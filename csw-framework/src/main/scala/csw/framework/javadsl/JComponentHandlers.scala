@@ -2,11 +2,11 @@ package csw.framework.javadsl
 
 import java.util.concurrent.CompletableFuture
 
-import akka.typed.ActorRef
 import akka.typed.javadsl.ActorContext
 import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
+import csw.messages.TopLevelActorMessage
 import csw.messages.framework.ComponentInfo
-import csw.messages.{CommandResponseManagerMessage, TopLevelActorMessage}
+import csw.services.ccs.scaladsl.CommandResponseManager
 import csw.services.location.javadsl.ILocationService
 import csw.services.logging.javadsl.JLoggerFactory
 
@@ -23,7 +23,7 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
 abstract class JComponentHandlers(
     ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
-    commandResponseManager: ActorRef[CommandResponseManagerMessage],
+    commandResponseManager: CommandResponseManager,
     currentStatePublisher: CurrentStatePublisher,
     locationService: ILocationService,
     loggerFactory: JLoggerFactory

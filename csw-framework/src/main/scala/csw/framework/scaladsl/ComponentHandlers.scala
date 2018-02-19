@@ -1,12 +1,12 @@
 package csw.framework.scaladsl
 
-import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import csw.messages.TopLevelActorCommonMessage.TrackingEventReceived
+import csw.messages.TopLevelActorMessage
 import csw.messages.ccs.commands.{CommandResponse, ControlCommand}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.{Connection, TrackingEvent}
-import csw.messages.{CommandResponseManagerMessage, TopLevelActorMessage}
+import csw.services.ccs.scaladsl.CommandResponseManager
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
 
@@ -23,7 +23,7 @@ import scala.concurrent.Future
 abstract class ComponentHandlers(
     ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
-    commandResponseManager: ActorRef[CommandResponseManagerMessage],
+    commandResponseManager: CommandResponseManager,
     currentStatePublisher: CurrentStatePublisher,
     locationService: LocationService,
     loggerFactory: LoggerFactory

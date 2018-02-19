@@ -1,20 +1,18 @@
 package csw.common.components.command
 
 import akka.actor.Scheduler
-import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import akka.util.Timeout
 import csw.common.components.command.ComponentStateForCommand._
 import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
-import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
+import csw.messages.TopLevelActorMessage
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed}
 import csw.messages.ccs.commands.{CommandResponse, ControlCommand, Setup}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.{AkkaLocation, TrackingEvent}
 import csw.messages.params.models.Id
 import csw.messages.params.states.CurrentState
-import csw.messages.{CommandResponseManagerMessage, TopLevelActorMessage}
-import csw.services.ccs.scaladsl.CommandService
+import csw.services.ccs.scaladsl.{CommandResponseManager, CommandService}
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
 
@@ -24,7 +22,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class McsAssemblyComponentHandlers(
     ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
-    commandResponseManager: ActorRef[CommandResponseManagerMessage],
+    commandResponseManager: CommandResponseManager,
     currentStatePublisher: CurrentStatePublisher,
     locationService: LocationService,
     loggerFactory: LoggerFactory
@@ -77,8 +75,8 @@ class McsAssemblyComponentHandlers(
         processCommand(shortSetup)
         processCommand(mediumSetup)
 
-      case `initCmd` ⇒ commandResponseManager ! AddOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId))
-      case `moveCmd` ⇒ commandResponseManager ! AddOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId))
+      case `initCmd` ⇒ commandResponseManager.addOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId))
+      case `moveCmd` ⇒ commandResponseManager.addOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId))
       case _         ⇒ //do nothing
     }
   }
@@ -101,7 +99,7 @@ class McsAssemblyComponentHandlers(
 
               completedCommands += 1
               if (completedCommands == 3) {
-                commandResponseManager ! AddOrUpdateCommand(commandId, Completed(commandId))
+                commandResponseManager.addOrUpdateCommand(commandId, Completed(commandId))
                 completedCommands = 0
               }
             case _ ⇒ // Do nothing

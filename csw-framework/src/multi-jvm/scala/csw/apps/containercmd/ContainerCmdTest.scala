@@ -167,9 +167,8 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
         eatonCompStateProbe.expectMsg(CurrentState(successPrefix, Set(choiceKey.set(setupConfigChoice), param)))
       }
 
-      Thread.sleep(50)
-
       etonSupervisorTypedRef ! Lifecycle(GoOffline)
+      Thread.sleep(500)
       enterBarrier("offline")
 
       enterBarrier("before-shutdown")

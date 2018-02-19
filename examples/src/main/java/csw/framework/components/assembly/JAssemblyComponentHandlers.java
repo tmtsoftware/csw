@@ -1,13 +1,11 @@
 package csw.framework.components.assembly;
 
-import akka.typed.ActorRef;
 import akka.typed.javadsl.ActorContext;
 import akka.typed.javadsl.Adapter;
 import csw.exceptions.FailureRestart;
 import csw.exceptions.FailureStop;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.scaladsl.CurrentStatePublisher;
-import csw.messages.CommandResponseManagerMessage;
 import csw.messages.TopLevelActorMessage;
 import csw.messages.ccs.CommandIssue;
 import csw.messages.ccs.commands.CommandResponse;
@@ -16,6 +14,7 @@ import csw.messages.ccs.commands.Observe;
 import csw.messages.ccs.commands.Setup;
 import csw.messages.framework.ComponentInfo;
 import csw.messages.location.*;
+import csw.services.ccs.scaladsl.CommandResponseManager;
 import csw.services.config.api.javadsl.IConfigClientService;
 import csw.services.config.api.models.ConfigData;
 import csw.services.config.client.javadsl.JConfigClientFactory;
@@ -37,7 +36,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
 
     private final ActorContext<TopLevelActorMessage> ctx;
     private final ComponentInfo componentInfo;
-    private final ActorRef<CommandResponseManagerMessage> commandResponseManager;
+    private final CommandResponseManager commandResponseManager;
     private final CurrentStatePublisher currentStatePublisher;
     private final ILocationService locationService;
     private ILogger log;
@@ -46,7 +45,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     public JAssemblyComponentHandlers(
             akka.typed.javadsl.ActorContext<TopLevelActorMessage> ctx,
             ComponentInfo componentInfo,
-            ActorRef<CommandResponseManagerMessage> commandResponseManager,
+            CommandResponseManager commandResponseManager,
             CurrentStatePublisher currentStatePublisher,
             ILocationService locationService,
             JLoggerFactory loggerFactory

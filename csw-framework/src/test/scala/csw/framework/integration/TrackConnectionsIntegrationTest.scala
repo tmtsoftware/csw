@@ -70,7 +70,6 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Before
     val filterAssemblyLocation = Await.result(locationService.find(filterAssemblyConnection), 5.seconds)
     val disperserHcdLocation   = Await.result(locationService.find(disperserHcdConnection), 5.seconds)
 
-    val assemblySupervisor     = filterAssemblyLocation.get.componentRef
     val assemblyCommandService = new CommandService(filterAssemblyLocation.get)
 
     val disperserComponentRef   = disperserHcdLocation.get.componentRef

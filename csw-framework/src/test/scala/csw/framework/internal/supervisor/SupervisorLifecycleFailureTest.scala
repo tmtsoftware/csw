@@ -25,6 +25,7 @@ import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.CurrentState
 import csw.messages.{models, _}
+import csw.services.ccs.scaladsl.CommandResponseManager
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.internal.LoggingLevels.ERROR
 import csw.services.logging.internal.LoggingSystem
@@ -230,14 +231,12 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
 }
 
 class SampleBehaviorFactory(componentHandlers: ComponentHandlers) extends ComponentBehaviorFactory {
-  override protected[framework] def handlers(
-      ctx: ActorContext[TopLevelActorMessage],
-      componentInfo: ComponentInfo,
-      commandResponseManager: ActorRef[CommandResponseManagerMessage],
-      currentStatePublisher: CurrentStatePublisher,
-      locationService: LocationService,
-      loggerFactory: LoggerFactory
-  ): ComponentHandlers = componentHandlers
+  override protected def handlers(ctx: ActorContext[TopLevelActorMessage],
+                                  componentInfo: ComponentInfo,
+                                  commandResponseManager: CommandResponseManager,
+                                  currentStatePublisher: CurrentStatePublisher,
+                                  locationService: LocationService,
+                                  loggerFactory: LoggerFactory): ComponentHandlers = componentHandlers
 }
 
 case class TestFailureStop(msg: String)    extends FailureStop(msg)

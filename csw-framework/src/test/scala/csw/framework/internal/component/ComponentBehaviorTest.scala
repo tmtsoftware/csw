@@ -7,6 +7,7 @@ import csw.framework.{ComponentInfos, FrameworkTestSuite}
 import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages.TopLevelActorIdleMessage.Initialize
 import csw.messages.{CommandResponseManagerMessage, FromComponentLifecycleMessage, TopLevelActorMessage}
+import csw.services.ccs.scaladsl.CommandResponseManager
 import csw.services.location.scaladsl.LocationService
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
@@ -19,9 +20,11 @@ class ComponentBehaviorTest extends FrameworkTestSuite with MockitoSugar {
 
   class TestData(supervisorProbe: TestProbe[FromComponentLifecycleMessage]) {
 
-    val sampleComponentHandler: ComponentHandlers =
-      mock[ComponentHandlers]
+    val sampleComponentHandler: ComponentHandlers = mock[ComponentHandlers]
     when(sampleComponentHandler.initialize()).thenReturn(Future.unit)
+
+    val commandResponseManager: CommandResponseManager = mock[CommandResponseManager]
+    when(commandResponseManager.commandResponseManagerActor).thenReturn(TestProbe[CommandResponseManagerMessage].ref)
     val locationService: LocationService = mock[LocationService]
     val ctx                              = new StubbedActorContext[TopLevelActorMessage]("test-component", 100, system)
     val componentBehavior =
@@ -30,7 +33,7 @@ class ComponentBehaviorTest extends FrameworkTestSuite with MockitoSugar {
         ComponentInfos.hcdInfo,
         supervisorProbe.ref,
         sampleComponentHandler,
-        TestProbe[CommandResponseManagerMessage].ref,
+        commandResponseManager,
         locationService,
         frameworkTestMocks().loggerFactory
       )
