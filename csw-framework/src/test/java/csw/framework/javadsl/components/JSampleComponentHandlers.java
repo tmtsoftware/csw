@@ -66,8 +66,10 @@ public class JSampleComponentHandlers extends JComponentHandlers {
         } catch (InterruptedException ignored) {
         }
         return CompletableFuture.runAsync(() -> {
+            //#currentStatePublisher
             CurrentState initState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.initChoice()));
             currentStatePublisher.publish(initState);
+            //#currentStatePublisher
         });
     }
 

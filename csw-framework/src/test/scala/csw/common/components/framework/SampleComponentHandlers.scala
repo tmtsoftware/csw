@@ -40,7 +40,10 @@ class SampleComponentHandlers(
     // DEOPSCSW-153: Accessibility of logging service to other CSW components
     log.info("Initializing Component TLA")
     Thread.sleep(100)
+
+    //#currentStatePublisher
     currentStatePublisher.publish(CurrentState(prefix, Set(choiceKey.set(initChoice))))
+    //#currentStatePublisher
 
     // DEOPSCSW-219: Discover component connection using HTTP protocol
     trackConnection(httpConnection)

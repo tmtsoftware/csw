@@ -1,7 +1,6 @@
 package csw.services.ccs.internal
 
 import akka.typed.scaladsl.{Actor, ActorContext}
-import akka.util.Timeout
 import csw.messages.{CommandResponseManagerMessage, SupervisorMessage}
 import csw.services.ccs.scaladsl.CommandResponseManager
 import csw.services.logging.scaladsl.LoggerFactory
