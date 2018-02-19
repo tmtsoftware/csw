@@ -5,21 +5,24 @@ import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{KillSwitch, Materializer}
 import akka.typed.ActorRef
 import csw.messages.ccs.events.{Event, EventKey}
-import csw.services.event.internal.api.EventSubscriberDriver
+import csw.services.event.internal.api.{EventSubscriberDriver, EventSubscriberDriverFactory}
 import csw.services.event.scaladsl.{EventSubscriber, EventSubscription}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class EventSubscriberImpl(eventSubscriberDriver: EventSubscriberDriver)(implicit val mat: Materializer, ec: ExecutionContext)
+class EventSubscriberImpl(eventSubscriberDriverFactory: EventSubscriberDriverFactory)(implicit val mat: Materializer,
+                                                                                      ec: ExecutionContext)
     extends EventSubscriber {
 
   def subscribe(eventKeys: Seq[EventKey]): Source[Event, EventSubscription] = {
+    val subscriberDriver = eventSubscriberDriverFactory.make()
+
     val keys = eventKeys.map(_.toString)
 
-    eventSubscriberDriver
+    subscriberDriver
       .subscribe(keys)
       .map(x => Event.fromPb(x.value))
-      .mapMaterializedValue(killSwitch => createSubscription(keys, killSwitch))
+      .mapMaterializedValue(killSwitch => createSubscription(keys, killSwitch, subscriberDriver))
   }
 
   def subscribe(eventKeys: Seq[EventKey], callback: Event => Unit): EventSubscription = {
@@ -30,10 +33,12 @@ class EventSubscriberImpl(eventSubscriberDriver: EventSubscriberDriver)(implicit
     subscribe(eventKeys, event => actorRef ! event)
   }
 
-  private def createSubscription(keys: Seq[String], killSwitch: KillSwitch): EventSubscription =
+  private def createSubscription(keys: Seq[String],
+                                 killSwitch: KillSwitch,
+                                 subscriberDriver: EventSubscriberDriver): EventSubscription =
     new EventSubscription {
       override def unsubscribe(): Future[Done] =
-        eventSubscriberDriver
+        subscriberDriver
           .unsubscribe(keys)
           .transform(x ⇒ { killSwitch.shutdown(); x }, ex ⇒ { killSwitch.abort(ex); ex })
 

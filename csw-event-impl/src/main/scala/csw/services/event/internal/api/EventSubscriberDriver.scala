@@ -7,12 +7,16 @@ import csw_protobuf.events.PbEvent
 
 import scala.concurrent.Future
 
+trait EventPublishDriver {
+  def publish(key: String, data: PbEvent): Future[Done]
+  def set(key: String, data: PbEvent): Future[Done]
+}
+
 trait EventSubscriberDriver {
   def subscribe(keys: Seq[String]): Source[EventMessage[String, PbEvent], KillSwitch]
   def unsubscribe(keys: Seq[String]): Future[Done]
 }
 
-trait EventPublishDriver {
-  def publish(key: String, data: PbEvent): Future[Done]
-  def set(key: String, data: PbEvent): Future[Done]
+trait EventSubscriberDriverFactory {
+  def make(): EventSubscriberDriver
 }

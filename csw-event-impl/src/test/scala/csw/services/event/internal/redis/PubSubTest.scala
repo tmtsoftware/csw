@@ -7,11 +7,13 @@ import csw.messages.params.models.Prefix
 import csw.services.event.helpers.PortHelper
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.internal.Wiring
+import csw.services.event.scaladsl.EventSubscription
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import redis.embedded.RedisServer
 
+import scala.collection.immutable
 import scala.compat.java8.FutureConverters.CompletionStageOps
-import scala.concurrent.Await
+import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.DurationDouble
 
 class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with EmbeddedRedis {
@@ -64,4 +66,27 @@ class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with Embe
       .runForeach(_ => ())
       .await
   }
+
+  test("independent subscriptions") {
+    val prefix        = Prefix("test.prefix")
+    val prefix2       = Prefix("test.prefix2")
+    val eventName     = EventName("system")
+    val event: Event  = SystemEvent(prefix, eventName)
+    val event2: Event = SystemEvent(prefix2, eventName)
+
+    val (subscription, seqF) = subscriberImpl.subscribe(Seq(event.eventKey)).toMat(Sink.seq)(Keep.both).run()
+    Thread.sleep(1000)
+    publisherImpl.publish(event).await
+
+    val (subscription2, seqF2) = subscriberImpl.subscribe(Seq(event2.eventKey)).toMat(Sink.seq)(Keep.both).run()
+    Thread.sleep(1000)
+    publisherImpl.publish(event2).await
+
+    subscription.unsubscribe().await
+    subscription2.unsubscribe().await
+
+    seqF.await shouldBe Seq(event)
+    seqF2.await shouldBe Seq(event2)
+  }
+
 }
