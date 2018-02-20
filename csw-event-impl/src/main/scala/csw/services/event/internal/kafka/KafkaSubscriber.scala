@@ -1,0 +1,36 @@
+package csw.services.event.internal.kafka
+
+import akka.Done
+import akka.kafka.scaladsl.Consumer
+import akka.kafka.{AutoSubscription, ConsumerSettings, Subscriptions}
+import akka.stream.Materializer
+import akka.stream.scaladsl.{Sink, Source}
+import akka.typed.ActorRef
+import csw.messages.ccs.events.{Event, EventKey}
+import csw.services.event.scaladsl.{EventSubscriber, EventSubscription}
+import csw_protobuf.events.PbEvent
+
+import scala.concurrent.Future
+
+class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(implicit mat: Materializer)
+    extends EventSubscriber {
+
+  override def subscribe(eventKeys: Set[EventKey]): Source[Event, EventSubscription] = {
+    val subscription: AutoSubscription = Subscriptions.topics(eventKeys.map(_.key))
+    Consumer
+      .plainSource(consumerSettings, subscription)
+      .map(record => Event.fromPb(PbEvent.parseFrom(record.value())))
+      .mapMaterializedValue { control =>
+        new EventSubscription {
+          override def unsubscribe(): Future[Done] = control.shutdown()
+        }
+      }
+  }
+
+  override def subscribe(eventKeys: Set[EventKey], callback: Event => Unit): EventSubscription =
+    subscribe(eventKeys).to(Sink.foreach(callback)).run()
+
+  override def subscribe(eventKeys: Set[EventKey], actorRef: ActorRef[Event]): EventSubscription =
+    subscribe(eventKeys, event => actorRef ! event)
+
+}

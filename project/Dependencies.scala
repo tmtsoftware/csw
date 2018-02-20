@@ -147,15 +147,17 @@ object Dependencies {
   val EventImpl = Seq(
     Libs.`scala-async`,
     Akka.`akka-stream`,
+    Libs.`akka-stream-kafka`,
     Akka.`akka-typed`,
     Libs.`lettuce`,
-    Akka.`akka-typed-testkit`  % Test,
-    Akka.`akka-stream-testkit` % Test,
-    Libs.`scalatest`           % Test,
-    Libs.`junit`               % Test,
-    Libs.`junit-interface`     % Test,
-    Libs.`mockito-core`        % Test,
-    Libs.`embedded-redis`      % Test
+    Akka.`akka-typed-testkit`       % Test,
+    Akka.`akka-stream-testkit`      % Test,
+    Libs.`scalatest`                % Test,
+    Libs.`junit`                    % Test,
+    Libs.`junit-interface`          % Test,
+    Libs.`mockito-core`             % Test,
+    Libs.`embedded-redis`           % Test,
+    Libs.`scalatest-embedded-kafka` % Test
   )
 
   val Commons = Seq(

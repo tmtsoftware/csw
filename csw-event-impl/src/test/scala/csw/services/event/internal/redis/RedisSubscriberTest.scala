@@ -14,7 +14,7 @@ import scala.compat.java8.FutureConverters.CompletionStageOps
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
 
-class RedisEventSubscriberDriverTest extends FunSuite with Matchers with BeforeAndAfterAll with EmbeddedRedis {
+class RedisSubscriberTest extends FunSuite with Matchers with BeforeAndAfterAll with EmbeddedRedis {
 
   private val port: Port = PortHelper.freePort
   private val wiring     = new Wiring(port)
@@ -38,19 +38,17 @@ class RedisEventSubscriberDriverTest extends FunSuite with Matchers with BeforeA
     val event3    = SystemEvent(prefix, eventName)
     val eventKey  = event1.eventKey
 
-    val (killSwitch, seqF) = subscriberDriver.subscribe(Seq(eventKey)).toMat(Sink.seq)(Keep.both).run()
+    val (subscription, seqF) = redisSubscriber.subscribe(Set(eventKey)).toMat(Sink.seq)(Keep.both).run()
     Thread.sleep(1000)
 
-    publisherDriver.publish(eventKey, event1).await
-    publisherDriver.publish(eventKey, event2).await
+    redisPublisher.publish(event1).await
+    redisPublisher.publish(event2).await
 
-    subscriberDriver.unsubscribe(Seq(eventKey)).await
+    subscription.unsubscribe().await
 
-    publisherDriver.publish(eventKey, event3).await
+    redisPublisher.publish(event3).await
 
-    killSwitch.shutdown()
-
-    seqF.await.map(_.value) shouldBe Seq(event1, event2)
+    seqF.await shouldBe List(event1, event2)
   }
 
 }

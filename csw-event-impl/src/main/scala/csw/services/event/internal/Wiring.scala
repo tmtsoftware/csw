@@ -1,33 +1,43 @@
 package csw.services.event.internal
 
 import akka.actor.ActorSystem
+import akka.kafka.{ConsumerSettings, ProducerSettings}
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Materializer, Supervision}
-import csw.services.event.internal.pubsub.{EventPublisherImpl, EventSubscriberImpl}
-import csw.services.event.internal.redis.{
-  RedisEventPublisherDriver,
-  RedisEventSubscriberDriver,
-  RedisEventSubscriberDriverFactory
-}
+import csw.services.event.internal.kafka.{KafkaPublisher, KafkaSubscriber}
+import csw.services.event.internal.redis.{RedisPublisher, RedisSubscriber}
 import io.lettuce.core.{RedisClient, RedisURI}
+import org.apache.kafka.clients.consumer.ConsumerConfig
+import org.apache.kafka.common.serialization._
 
 import scala.concurrent.ExecutionContext
 
-class Wiring(redisPort: Int) {
-  lazy val redisURI: RedisURI       = RedisURI.create("localhost", redisPort)
-  lazy val redisClient: RedisClient = RedisClient.create(redisURI)
+class Wiring(redisPort: Int = 6379) {
 
   implicit lazy val actorSystem: ActorSystem = ActorSystem()
   implicit lazy val ec: ExecutionContext     = actorSystem.dispatcher
   implicit lazy val mat: Materializer        = ActorMaterializer()
 
-  lazy val publisherDriver            = new RedisEventPublisherDriver(redisClient, redisURI)
-  lazy val subscriberDriver           = new RedisEventSubscriberDriver(redisClient, redisURI)
-  private val subscriberDriverFactory = new RedisEventSubscriberDriverFactory(redisClient, redisURI)
-
   lazy val settings: ActorMaterializerSettings =
     ActorMaterializerSettings(actorSystem).withSupervisionStrategy(Supervision.getResumingDecider)
   lazy val resumingMat: Materializer = ActorMaterializer(settings)
 
-  lazy val publisherImpl  = new EventPublisherImpl(publisherDriver)(ec, resumingMat)
-  lazy val subscriberImpl = new EventSubscriberImpl(subscriberDriverFactory)(ec, resumingMat)
+  //Redis
+  lazy val redisURI: RedisURI       = RedisURI.create("localhost", redisPort)
+  lazy val redisClient: RedisClient = RedisClient.create(redisURI)
+  lazy val redisPublisher           = new RedisPublisher(redisClient, redisURI)(ec, resumingMat)
+  lazy val redisSubscriber          = new RedisSubscriber(redisClient, redisURI)(ec, resumingMat)
+
+  //kafka
+  lazy val producerSettings: ProducerSettings[String, Array[Byte]] =
+    ProducerSettings(actorSystem, new StringSerializer, new ByteArraySerializer)
+      .withBootstrapServers("localhost:9092")
+
+  lazy val consumerSettings: ConsumerSettings[String, Array[Byte]] =
+    ConsumerSettings(actorSystem, new StringDeserializer, new ByteArrayDeserializer)
+      .withBootstrapServers("localhost:9092")
+      .withGroupId("group1")
+      .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest")
+
+  lazy val kafkaPublisher  = new KafkaPublisher(producerSettings)
+  lazy val kafkaSubscriber = new KafkaSubscriber(consumerSettings)
 }

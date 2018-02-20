@@ -36,12 +36,12 @@ class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with Embe
     val event              = SystemEvent(prefix, eventName)
     val eventKey: EventKey = event.eventKey
 
-    val (subscription, seqF) = subscriberImpl.subscribe(Seq(eventKey)).toMat(Sink.seq)(Keep.both).run()
+    val (subscription, seqF) = redisSubscriber.subscribe(Set(eventKey)).toMat(Sink.seq)(Keep.both).run()
+    Thread.sleep(1000)
 
-    Thread.sleep(10)
-    publisherImpl.publish(event).await
+    redisPublisher.publish(event).await
     subscription.unsubscribe().await
-    seqF.await shouldBe Seq(event)
+    seqF.await shouldBe List(event)
   }
 
   ignore("perf") {
@@ -51,7 +51,7 @@ class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with Embe
     def event: Event = SystemEvent(prefix, eventName)
 
     val eventKey: EventKey = event.eventKey
-    subscriberImpl.subscribe(Seq(eventKey)).runForeach { x =>
+    redisSubscriber.subscribe(Set(eventKey)).runForeach { x =>
       val begin = x.eventTime.time.toEpochMilli
       println(System.currentTimeMillis() - begin)
     }
@@ -60,7 +60,7 @@ class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with Embe
 
     Source
       .fromIterator(() => Iterator.continually(event))
-      .mapAsync(1)(publisherImpl.publish)
+      .mapAsync(1)(redisPublisher.publish)
       .runForeach(_ => ())
       .await
   }
@@ -72,19 +72,40 @@ class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with Embe
     val event: Event  = SystemEvent(prefix, eventName)
     val event2: Event = SystemEvent(prefix2, eventName)
 
-    val (subscription, seqF) = subscriberImpl.subscribe(Seq(event.eventKey)).toMat(Sink.seq)(Keep.both).run()
+    val (subscription, seqF) = redisSubscriber.subscribe(Set(event.eventKey)).toMat(Sink.seq)(Keep.both).run()
     Thread.sleep(1000)
-    publisherImpl.publish(event).await
+    redisPublisher.publish(event).await
 
-    val (subscription2, seqF2) = subscriberImpl.subscribe(Seq(event2.eventKey)).toMat(Sink.seq)(Keep.both).run()
+    val (subscription2, seqF2) = redisSubscriber.subscribe(Set(event2.eventKey)).toMat(Sink.seq)(Keep.both).run()
     Thread.sleep(1000)
-    publisherImpl.publish(event2).await
+    redisPublisher.publish(event2).await
 
     subscription.unsubscribe().await
     subscription2.unsubscribe().await
 
-    seqF.await shouldBe Seq(event)
-    seqF2.await shouldBe Seq(event2)
+    seqF.await shouldBe List(event)
+    seqF2.await shouldBe List(event2)
+  }
+
+  ignore("multiple publishers") {
+    val prefix    = Prefix("test.prefix")
+    val eventName = EventName("system")
+
+    def event: Event = SystemEvent(prefix, eventName)
+
+    val eventKey: EventKey = event.eventKey
+
+    redisSubscriber.subscribe(Set(eventKey)).runForeach { x =>
+      val begin = x.eventTime.time.toEpochMilli
+      println(System.currentTimeMillis() - begin)
+    }
+
+    Thread.sleep(10)
+
+    redisPublisher.publish(Source.fromIterator(() => Iterator.continually(event)).map(x => { println(s"from 1 -> $x"); x }))
+    redisPublisher
+      .publish(Source.fromIterator(() => Iterator.continually(event)).map(x => { println(s"from 2            -> $x"); x }))
+      .await
   }
 
 }
