@@ -153,7 +153,8 @@ public class JSampleComponentHandlers extends JComponentHandlers {
         else
             commandState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.observeConfigChoice())).add(controlCommand.paramSet().head());
 
-        currentStatePublisher.publish(commandState);;
+        // DEOPSCSW-372: Provide an API for PubSubActor that hides actor based interaction
+        currentStatePublisher.publish(commandState);
     }
 
     @Override

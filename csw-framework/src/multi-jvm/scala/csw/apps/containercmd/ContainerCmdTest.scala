@@ -143,6 +143,7 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       val eatonCompStateProbe    = TestProbe[CurrentState]
       val etonCommandService     = new CommandService(etonSupervisorLocation)
 
+      // DEOPSCSW-372: Provide an API for PubSubActor that hides actor based interaction
       etonCommandService.subscribeCurrentState(eatonCompStateProbe.ref ! _)
 
       import csw.common.components.framework.SampleComponentState._

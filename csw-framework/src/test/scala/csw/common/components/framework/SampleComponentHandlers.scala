@@ -68,6 +68,7 @@ class SampleComponentHandlers(
     processCommand(controlCommand)
   }
 
+  // DEOPSCSW-372: Provide an API for PubSubActor that hides actor based interaction
   private def processCommand(controlCommand: ControlCommand): Unit =
     controlCommand match {
       case Setup(_, somePrefix, _, _, _) ⇒

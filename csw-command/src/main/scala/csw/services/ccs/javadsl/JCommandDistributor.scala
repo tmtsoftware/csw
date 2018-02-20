@@ -30,7 +30,7 @@ case class JCommandDistributor(componentToCommands: util.Map[JCommandService, ut
   ): CompletableFuture[CommandResponse] = {
 
     val sComponentToCommands = componentToCommands.asScala.toMap.map {
-      case (component, commands) ⇒ component.sComponentRef -> commands.asScala.toSet
+      case (jCommandService, commands) ⇒ jCommandService.sCommandService -> commands.asScala.toSet
     }
     CommandDistributor(sComponentToCommands)
       .aggregatedValidationResponse()(timeout, ec, mat)
@@ -51,7 +51,7 @@ case class JCommandDistributor(componentToCommands: util.Map[JCommandService, ut
   ): CompletableFuture[CommandResponse] = {
 
     val sComponentToCommands = componentToCommands.asScala.toMap.map {
-      case (component, commands) ⇒ component.sComponentRef -> commands.asScala.toSet
+      case (jCommandService, commands) ⇒ jCommandService.sCommandService -> commands.asScala.toSet
     }
 
     CommandDistributor(sComponentToCommands)

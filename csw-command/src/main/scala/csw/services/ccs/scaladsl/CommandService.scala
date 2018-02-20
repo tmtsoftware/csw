@@ -51,11 +51,8 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
    * @param controlCommands the set of [[csw.messages.ccs.commands.ControlCommand]] payloads
    * @return a Source of CommandResponse as a stream of CommandResponses for all commands
    */
-  def submitAll(
-      controlCommands: Set[ControlCommand]
-  )(implicit timeout: Timeout): Source[CommandResponse, NotUsed] = {
+  def submitAll(controlCommands: Set[ControlCommand])(implicit timeout: Timeout): Source[CommandResponse, NotUsed] =
     Source(controlCommands).mapAsyncUnordered(parallelism)(submit)
-  }
 
   /**
    * Submit multiple commands and get one CommandResponse as a Future of [[csw.messages.ccs.commands.CommandResponse]] for all commands. If all the commands were successful,
@@ -64,9 +61,7 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
    * @param controlCommands the set of [[csw.messages.ccs.commands.ControlCommand]] payloads
    * @return [[csw.messages.ccs.commands.CommandResponse.Accepted]] or [[csw.messages.ccs.commands.CommandResponse.Error]] CommandResponse as a Future.
    */
-  def submitAllAndGetResponse(
-      controlCommands: Set[ControlCommand]
-  )(implicit timeout: Timeout): Future[CommandResponse] = {
+  def submitAllAndGetResponse(controlCommands: Set[ControlCommand])(implicit timeout: Timeout): Future[CommandResponse] = {
     val value = Source(controlCommands).mapAsyncUnordered(parallelism)(submit)
     CommandResponse.aggregateResponse(value).map {
       case _: Completed  ⇒ CommandResponse.Accepted(Id())
@@ -104,9 +99,7 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
    * @param controlCommand the [[csw.messages.ccs.commands.ControlCommand]] payload.
    * @return a CommandResponse as a Future value.
    */
-  def submitAndSubscribe(
-      controlCommand: ControlCommand
-  )(implicit timeout: Timeout): Future[CommandResponse] =
+  def submitAndSubscribe(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[CommandResponse] =
     submit(controlCommand).flatMap {
       case _: Accepted ⇒ subscribe(controlCommand.runId)
       case x           ⇒ Future.successful(x)
@@ -143,11 +136,8 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
    * @param controlCommands the [[csw.messages.ccs.commands.ControlCommand]] payload.
    * @return a Source of CommandResponse as a stream of CommandResponses for all commands
    */
-  def submitAllAndSubscribe(
-      controlCommands: Set[ControlCommand]
-  )(implicit timeout: Timeout): Source[CommandResponse, NotUsed] = {
+  def submitAllAndSubscribe(controlCommands: Set[ControlCommand])(implicit timeout: Timeout): Source[CommandResponse, NotUsed] =
     Source(controlCommands).mapAsyncUnordered(parallelism)(submitAndSubscribe)
-  }
 
   /**
    * Submit multiple commands and get final CommandResponse for all as one CommandResponse. If all the commands were successful, a CommandResponse as
@@ -156,9 +146,7 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
    * @param controlCommands the [[csw.messages.ccs.commands.ControlCommand]] payload.
    * @return a CommandResponse as a Future value.
    */
-  def submitAllAndGetFinalResponse(
-      controlCommands: Set[ControlCommand]
-  )(implicit timeout: Timeout): Future[CommandResponse] = {
+  def submitAllAndGetFinalResponse(controlCommands: Set[ControlCommand])(implicit timeout: Timeout): Future[CommandResponse] = {
     val value = Source(controlCommands).mapAsyncUnordered(parallelism)(submitAndSubscribe)
     CommandResponse.aggregateResponse(value)
   }

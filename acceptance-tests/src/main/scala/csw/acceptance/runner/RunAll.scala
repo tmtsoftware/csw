@@ -1,8 +1,6 @@
 package csw.acceptance.runner
 
 import java.net.URLClassLoader
-
-import csw.commons.tagobjects.ClasspathSensitive
 import org.scalatest.tools.Runner
 
 object RunAll {
@@ -15,7 +13,7 @@ object RunAll {
       .filter(_.contains("tests.jar"))
       .mkString("\"", " ", "\"")
 
-    val params = Array("-o", "-l", ClasspathSensitive.name, "-R", testJarsRunpath)
+    val params = Array("-o", "-l", "csw.commons.tags.ClasspathSensitive", "-R", testJarsRunpath)
 
     Runner.main(params)
   }

@@ -8,6 +8,7 @@ import akka.typed.testkit.TestKitSettings;
 import akka.typed.testkit.javadsl.TestProbe;
 import akka.util.Timeout;
 import com.typesafe.config.ConfigFactory;
+import csw.common.components.framework.SampleComponentState;
 import csw.framework.internal.wiring.FrameworkWiring;
 import csw.framework.internal.wiring.Standalone;
 import csw.messages.SupervisorLockMessage;
@@ -15,6 +16,8 @@ import csw.messages.ccs.CommandIssue;
 import csw.messages.ccs.commands.CommandResponse;
 import csw.messages.ccs.commands.CommandResponse.Completed;
 import csw.messages.ccs.commands.ControlCommand;
+import csw.messages.params.states.CurrentState;
+import csw.services.ccs.internal.CurrentStateSubscription;
 import csw.services.ccs.javadsl.JCommandService;
 import csw.messages.ccs.commands.Setup;
 import csw.messages.ccs.commands.matchers.*;
@@ -63,14 +66,14 @@ public class JCommandIntegrationTest {
 
     private ExecutionContext ec = hcdActorSystem.dispatcher();
     private Materializer mat = ActorMaterializer.create(hcdActorSystem);
-    private static JCommandService hcdComponent;
+    private static JCommandService hcdCmdService;
     private static AkkaLocation hcdLocation;
     private Timeout timeout = new Timeout(5, TimeUnit.SECONDS);
 
     @BeforeClass
     public static void setup() throws Exception {
         hcdLocation = getLocation();
-        hcdComponent = new JCommandService(hcdLocation, akka.typed.ActorSystem.wrap(hcdActorSystem));
+        hcdCmdService = new JCommandService(hcdLocation, akka.typed.ActorSystem.wrap(hcdActorSystem));
     }
 
     @AfterClass
@@ -99,7 +102,7 @@ public class JCommandIntegrationTest {
         Parameter<Integer> intParameter1 = intKey1.set(22, 23);
         Setup imdResCommand = new Setup(prefix(), immediateResCmd(), Optional.empty()).add(intParameter1);
 
-        CompletableFuture<CommandResponse> imdResCmdResponseCompletableFuture = hcdComponent.submit(imdResCommand, timeout);
+        CompletableFuture<CommandResponse> imdResCmdResponseCompletableFuture = hcdCmdService.submit(imdResCommand, timeout);
         CommandResponse actualImdCmdResponse = imdResCmdResponseCompletableFuture.get();
         Assert.assertTrue(actualImdCmdResponse instanceof CommandResponse.CompletedWithResult);
 
@@ -110,7 +113,7 @@ public class JCommandIntegrationTest {
 
         //#immediate-response
         CompletableFuture<CommandResponse> eventualCommandResponse =
-                hcdComponent
+                hcdCmdService
                         .submit(imdInvalidCommand, timeout)
                         .thenApply(
                                 response -> {
@@ -122,7 +125,7 @@ public class JCommandIntegrationTest {
                         );
         //#immediate-response
 
-        CompletableFuture<CommandResponse> imdInvalidCmdResponseCompletableFuture = hcdComponent.submit(imdInvalidCommand, timeout);
+        CompletableFuture<CommandResponse> imdInvalidCmdResponseCompletableFuture = hcdCmdService.submit(imdInvalidCommand, timeout);
         CommandResponse actualImdInvalidCmdResponse = imdInvalidCmdResponseCompletableFuture.get();
         Assert.assertTrue(actualImdInvalidCmdResponse instanceof CommandResponse.Invalid);
 
@@ -132,20 +135,20 @@ public class JCommandIntegrationTest {
         Setup controlCommand = new Setup(prefix(), withoutMatcherCmd(), Optional.empty()).add(parameter);
 
         //#query-response
-        hcdComponent.submit(controlCommand, timeout);
+        hcdCmdService.submit(controlCommand, timeout);
 
         // do some work before querying for the result of above command as needed
 
-        CompletableFuture<CommandResponse> queryResponse = hcdComponent.query(controlCommand.runId(), timeout);
+        CompletableFuture<CommandResponse> queryResponse = hcdCmdService.query(controlCommand.runId(), timeout);
         //#query-response
 
         //#subscribe-for-result
         CompletableFuture<CommandResponse> testCommandResponse =
-                hcdComponent
+                hcdCmdService
                         .submit(controlCommand, timeout)
                         .thenCompose(commandResponse -> {
                             if (commandResponse instanceof CommandResponse.Accepted)
-                                return hcdComponent.subscribe(commandResponse.runId(), timeout);
+                                return hcdCmdService.subscribe(commandResponse.runId(), timeout);
                             else
                                 return CompletableFuture.completedFuture(new CommandResponse.Error(commandResponse.runId(), "test error"));
                         });
@@ -172,7 +175,7 @@ public class JCommandIntegrationTest {
         CompletableFuture<MatcherResponse> matcherResponseFuture = matcher.jStart();
 
         // submit command and if the command is successfully validated, check for matching of demand state against current state
-        CompletableFuture<CommandResponse> commandResponseToBeMatched = hcdComponent
+        CompletableFuture<CommandResponse> commandResponseToBeMatched = hcdCmdService
                 .oneway(setup, timeout)
                 .thenCompose(initialCommandResponse -> {
                     if (initialCommandResponse instanceof CommandResponse.Accepted) {
@@ -194,7 +197,7 @@ public class JCommandIntegrationTest {
         //#matcher
 
         //#oneway
-        CompletableFuture onewayCommandResponseF = hcdComponent
+        CompletableFuture onewayCommandResponseF = hcdCmdService
                 .oneway(setup, timeout)
                 .thenAccept(initialCommandResponse -> {
                     if (initialCommandResponse instanceof CommandResponse.Accepted) {
@@ -218,7 +221,7 @@ public class JCommandIntegrationTest {
         CompletableFuture<MatcherResponse> matcherResponse = matcher1.jStart();
 
         CompletableFuture<CommandResponse> matchedCommandResponse =
-                hcdComponent.onewayAndMatch(setup, stateMatcher, timeout);
+                hcdCmdService.onewayAndMatch(setup, stateMatcher, timeout);
 
         //#onewayAndMatch
 
@@ -243,7 +246,7 @@ public class JCommandIntegrationTest {
 
         // Send command to locked component and verify that it is not allowed
         Setup imdSetupCommand = new Setup(invalidPrefix(), immediateCmd(), Optional.empty()).add(intParameter2);
-        CompletableFuture<CommandResponse> lockedCmdResCompletableFuture = hcdComponent.submit(imdSetupCommand, timeout);
+        CompletableFuture<CommandResponse> lockedCmdResCompletableFuture = hcdCmdService.submit(imdSetupCommand, timeout);
         CommandResponse actualLockedCmdResponse = lockedCmdResCompletableFuture.get();
 
         String reason = "This component is locked by component " + prefix();
@@ -254,7 +257,7 @@ public class JCommandIntegrationTest {
         hcdLocation.componentRef().tell(new SupervisorLockMessage.Unlock(prefix(), probe.ref()));
         probe.expectMsg(LockingResponses.lockReleased());
 
-        CompletableFuture<CommandResponse> cmdAfterUnlockResCompletableFuture = hcdComponent.submit(imdSetupCommand, timeout);
+        CompletableFuture<CommandResponse> cmdAfterUnlockResCompletableFuture = hcdCmdService.submit(imdSetupCommand, timeout);
         CommandResponse actualCmdResponseAfterUnlock = cmdAfterUnlockResCompletableFuture.get();
         Assert.assertTrue(actualCmdResponseAfterUnlock instanceof CommandResponse.Completed);
     }
@@ -268,7 +271,7 @@ public class JCommandIntegrationTest {
 
         HashMap<JCommandService, Set<ControlCommand>> componentsToCommands = new HashMap<JCommandService, Set<ControlCommand>>() {
             {
-                put(hcdComponent, new HashSet<ControlCommand>(Arrays.asList(setupHcd1, setupHcd2)));
+                put(hcdCmdService, new HashSet<ControlCommand>(Arrays.asList(setupHcd1, setupHcd2)));
             }
         };
 
@@ -299,7 +302,7 @@ public class JCommandIntegrationTest {
         akka.typed.ActorSystem<?> typedSystem = ActorSystemAdapter.apply(hcdActorSystem);
 
         //#submitAndSubscribe
-        CompletableFuture<CommandResponse> finalResponseCompletableFuture = hcdComponent.submitAndSubscribe(failureResCommand1, timeout);
+        CompletableFuture<CommandResponse> finalResponseCompletableFuture = hcdCmdService.submitAndSubscribe(failureResCommand1, timeout);
         CommandResponse actualValidationResponse = finalResponseCompletableFuture.get();
         //#submitAndSubscribe
 
@@ -307,10 +310,10 @@ public class JCommandIntegrationTest {
 
         // using separate submit and subscribe API
         Setup failureResCommand2 = new Setup(prefix(), failureAfterValidationCmd(), Optional.empty()).add(intParameter1);
-        CompletableFuture<CommandResponse> validationResponse = hcdComponent.submit(failureResCommand2, timeout);
+        CompletableFuture<CommandResponse> validationResponse = hcdCmdService.submit(failureResCommand2, timeout);
         Assert.assertTrue(validationResponse.get() instanceof CommandResponse.Accepted);
 
-        CompletableFuture<CommandResponse> finalResponse = hcdComponent.subscribe(failureResCommand1.runId(), timeout);
+        CompletableFuture<CommandResponse> finalResponse = hcdCmdService.subscribe(failureResCommand1.runId(), timeout);
         Assert.assertTrue(finalResponse.get() instanceof CommandResponse.Error);
     }
 
@@ -324,11 +327,11 @@ public class JCommandIntegrationTest {
 
         HashMap<JCommandService, Set<ControlCommand>> componentsToCommands = new HashMap<JCommandService, Set<ControlCommand>>() {
             {
-                put(hcdComponent, new HashSet<ControlCommand>(Arrays.asList(setupHcd1, setupHcd2)));
+                put(hcdCmdService, new HashSet<ControlCommand>(Arrays.asList(setupHcd1, setupHcd2)));
             }
         };
 
-        CompletableFuture<CommandResponse> commandResponse = hcdComponent
+        CompletableFuture<CommandResponse> commandResponse = hcdCmdService
                 .submitAllAndGetResponse(
                         new HashSet<ControlCommand>(Arrays.asList(setupHcd1, setupHcd2)),
                         timeout
@@ -349,11 +352,11 @@ public class JCommandIntegrationTest {
 
         HashMap<JCommandService, Set<ControlCommand>> componentsToCommands = new HashMap<JCommandService, Set<ControlCommand>>() {
             {
-                put(hcdComponent, new HashSet<ControlCommand>(Arrays.asList(setupHcd1, setupHcd2)));
+                put(hcdCmdService, new HashSet<ControlCommand>(Arrays.asList(setupHcd1, setupHcd2)));
             }
         };
 
-        CompletableFuture<CommandResponse> finalCommandResponse = hcdComponent
+        CompletableFuture<CommandResponse> finalCommandResponse = hcdCmdService
                 .submitAllAndGetFinalResponse(
                         new HashSet<ControlCommand>(Arrays.asList(setupHcd1, setupHcd2)),
                         timeout
@@ -361,6 +364,30 @@ public class JCommandIntegrationTest {
         //#submitAllAndGetFinalResponse
 
         Assert.assertTrue(finalCommandResponse.get() instanceof CommandResponse.Completed);
+    }
 
+    @Test
+    public void testSubscribeCurrentState() {
+        Key<Integer> intKey1 = JKeyTypes.IntKey().make("encoder");
+        Parameter<Integer> intParameter1 = intKey1.set(22, 23);
+        Setup setup = new Setup(prefix(), acceptedCmd(), Optional.empty()).add(intParameter1);
+
+        akka.typed.ActorSystem<?> typedSystem = ActorSystemAdapter.apply(hcdActorSystem);
+        TestKitSettings settings = new TestKitSettings(hcdActorSystem.settings().config());
+        TestProbe<CurrentState> probe = new TestProbe<>(typedSystem, settings);
+
+        // DEOPSCSW-372: Provide an API for PubSubActor that hides actor based interaction
+        CurrentStateSubscription subscription = hcdCmdService.subscribeCurrentState(currentState -> probe.ref().tell(currentState));
+
+        hcdCmdService.submit(setup, timeout);
+
+        CurrentState currentState = new CurrentState(SampleComponentState.prefix().prefix());
+        CurrentState expectedValidationCurrentState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.commandValidationChoice()));
+        CurrentState expectedSubmitCurrentState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.submitCommandChoice()));
+
+        probe.expectMsg(expectedValidationCurrentState);
+        probe.expectMsg(expectedSubmitCurrentState);
+
+        subscription.stop();
     }
 }

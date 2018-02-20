@@ -101,8 +101,7 @@ class ComponentHandlerForCommand(
     }
   }
 
-  private def processCommandWithMatcher(controlCommand: ControlCommand): Unit = {
-
+  private def processCommandWithMatcher(controlCommand: ControlCommand): Unit =
     controlCommand.commandName match {
       case `matcherTimeoutCmd` ⇒ Thread.sleep(1000)
       case `matcherFailedCmd` ⇒
@@ -122,8 +121,6 @@ class ComponentHandlerForCommand(
           .throttle(1, 100.millis, 1, ThrottleMode.Shaping)
           .runWith(Sink.ignore)
     }
-
-  }
 
   override def onShutdown(): Future[Unit] = ???
 

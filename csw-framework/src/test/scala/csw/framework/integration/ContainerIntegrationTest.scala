@@ -106,6 +106,7 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
     val filterCommandService    = new CommandService(instrumentHcdLocation.get)
     val disperserCommandService = new CommandService(disperserHcdLocation.get)
 
+    // DEOPSCSW-372: Provide an API for PubSubActor that hides actor based interaction
     // Subscribe to component's current state
     assemblyCommandService.subscribeCurrentState(assemblyProbe.ref ! _)
     filterCommandService.subscribeCurrentState(filterProbe.ref ! _)
