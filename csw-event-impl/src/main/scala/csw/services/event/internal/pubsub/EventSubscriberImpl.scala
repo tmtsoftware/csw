@@ -10,8 +10,8 @@ import csw.services.event.scaladsl.{EventSubscriber, EventSubscription}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class EventSubscriberImpl(eventSubscriberDriverFactory: EventSubscriberDriverFactory)(implicit val mat: Materializer,
-                                                                                      ec: ExecutionContext)
+class EventSubscriberImpl(eventSubscriberDriverFactory: EventSubscriberDriverFactory)(implicit ec: ExecutionContext,
+                                                                                      mat: Materializer)
     extends EventSubscriber {
 
   def subscribe(eventKeys: Seq[EventKey]): Source[Event, EventSubscription] = {
