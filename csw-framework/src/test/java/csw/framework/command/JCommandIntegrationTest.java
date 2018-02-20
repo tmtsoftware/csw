@@ -388,10 +388,16 @@ public class JCommandIntegrationTest {
         CurrentState currentState = new CurrentState(SampleComponentState.prefix().prefix());
         CurrentState expectedValidationCurrentState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.commandValidationChoice()));
         CurrentState expectedSubmitCurrentState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.submitCommandChoice()));
+        CurrentState expectedSetupCurrentState = currentState.madd(SampleComponentState.choiceKey().set(SampleComponentState.setupConfigChoice()), intParameter1);
 
         probe.expectMsg(expectedValidationCurrentState);
         probe.expectMsg(expectedSubmitCurrentState);
+        probe.expectMsg(expectedSetupCurrentState);
 
+        // unsubscribe and verify no messages received by probe
         subscription.unsubscribe();
+
+        hcdCmdService.submit(setup, timeout);
+        probe.expectNoMsg(Duration.create(20, TimeUnit.MILLISECONDS));
     }
 }

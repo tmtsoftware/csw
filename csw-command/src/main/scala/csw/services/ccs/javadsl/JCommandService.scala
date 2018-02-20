@@ -1,7 +1,7 @@
 package csw.services.ccs.javadsl
 
 import java.util.concurrent.CompletableFuture
-import java.util.function.{Consumer, Supplier}
+import java.util.function.Consumer
 
 import akka.NotUsed
 import akka.actor.Scheduler
@@ -19,7 +19,7 @@ import csw.services.ccs.internal.CurrentStateSubscription
 import csw.services.ccs.scaladsl.CommandService
 
 import scala.collection.JavaConverters.iterableAsScalaIterableConverter
-import scala.compat.java8.FunctionConverters.{enrichAsScalaFromConsumer, enrichAsScalaFromSupplier}
+import scala.compat.java8.FunctionConverters.enrichAsScalaFromConsumer
 import scala.compat.java8.FutureConverters.FutureOps
 import scala.concurrent.ExecutionContext
 
