@@ -240,6 +240,8 @@ lazy val `sequencer-prototype` = project
     `csw-framework`,
     `csw-command`
   )
+  .enablePlugins(NoPublish)
+  .disablePlugins(BintrayPlugin)
   .settings(
     libraryDependencies ++= Dependencies.SequencerPrototype
   )

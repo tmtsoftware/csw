@@ -60,6 +60,7 @@ object PublishTests extends AutoPlugin {
   override def requires: Plugins = DeployApp
 
   override def projectSettings: Seq[Setting[_]] = Seq(
+    publishArtifact in (Test, packageBin) := true,
     scriptClasspath in bashScriptDefines := {
       val (testJars, compileJars) = (scriptClasspath in bashScriptDefines).value.partition(_.endsWith("tests.jar"))
       testJars ++ compileJars
