@@ -42,6 +42,7 @@ class SampleComponentHandlers(
     Thread.sleep(100)
 
     //#currentStatePublisher
+    // Publish the CurrentState using parameter set created using a sample Choice parameter
     currentStatePublisher.publish(CurrentState(prefix, Set(choiceKey.set(initChoice))))
     //#currentStatePublisher
 
