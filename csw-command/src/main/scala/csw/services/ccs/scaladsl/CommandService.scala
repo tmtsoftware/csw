@@ -23,7 +23,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 /**
  * A Command Service API of a csw component. This model provides method based APIs for command interactions with a component.
- * @param componentLocation [[AkkaLocation]] of the component
+ * @param componentLocation [[csw.messages.location.AkkaLocation]] of the component
  */
 class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: ActorSystem[_]) {
 
@@ -164,7 +164,7 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
   }
 
   /**
-   * Subscribe to the current state of a component corresponding to the [[AkkaLocation]] of the component
+   * Subscribe to the current state of a component corresponding to the [[csw.messages.location.AkkaLocation]] of the component
    * @param callback the action to be applied on the CurrentState element received as a result of subscription
    * @return a CurrentStateSubscription to stop the subscription
    */

@@ -22,7 +22,7 @@ import scala.compat.java8.FutureConverters.FutureOps
 import scala.concurrent.ExecutionContext
 
 /**
- * Java API for [[CommandService]]
+ * Java API for [[csw.services.ccs.scaladsl.CommandService]]
  */
 class JCommandService(akkaLocation: AkkaLocation, actorSystem: ActorSystem[_]) {
 
