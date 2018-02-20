@@ -71,15 +71,13 @@ class SequencerHandlers(
     val path = Files.write(Paths.get(s"scripts/${componentInfo.name}.sc"), updatedScript.getBytes(StandardCharsets.UTF_8)) //TODO: decide on centos charset code
 
     val engineActor: ActorRef[EngineAction] = await(ctx.system.systemActorOf(EngineBehaviour.behaviour, "engine"))
-    Dsl.wiring = new Wiring(ctx.system, engineActor)
+    Dsl.wiring = new Wiring(ctx.system, engineActor, locationService, componentInfo.connections)
 
     ctx.watch(engineActor) //TODO: what to do if engine actor dies ? Decide in handlers.
 
     val params: List[String] = List(path.toString)
     ammonite.Main.main0(params, System.in, System.out, System.err)
   }
-
-  override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = {}
 
   override def validateCommand(controlCommand: ControlCommand): CommandResponse = {
     CommandResponse.Accepted(controlCommand.runId)
@@ -89,7 +87,8 @@ class SequencerHandlers(
 
   override def onShutdown(): Future[Unit] = { Future.successful(()) } //TODO: clean up engine and other relevant instances
 
-  override def onSubmit(controlCommand: ControlCommand): Unit = {}
-  override def onGoOffline(): Unit                            = {}
-  override def onGoOnline(): Unit                             = {}
+  override def onSubmit(controlCommand: ControlCommand): Unit              = {}
+  override def onGoOffline(): Unit                                         = {}
+  override def onGoOnline(): Unit                                          = {}
+  override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = {}
 }

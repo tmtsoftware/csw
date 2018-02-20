@@ -3,8 +3,6 @@ package tmt.shared.dsl
 import org.scalatest.Matchers
 import tmt.shared.services.{Command, CommandResponse}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
 class CsDslTest extends org.scalatest.FunSuite with Matchers with ControlDsl {
 
 //  val wiring                 = new Wiring()
@@ -18,7 +16,7 @@ class CsDslTest extends org.scalatest.FunSuite with Matchers with ControlDsl {
   /* Ignoring for time being till we have some asserts here */
 
   ignore("dd") {
-    val dsl = new CsDsl(null)
+    val dsl = new CsDsl(null, null)(null)
     println(par(x, x))
   }
 
