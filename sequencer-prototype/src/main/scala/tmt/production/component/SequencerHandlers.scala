@@ -63,7 +63,6 @@ class SequencerHandlers(
       }
     }
 
-    //TODO: deal with ownPackage
     val updatedScript = scriptContent.replace(
       "import tmt.development.dsl.Dsl.wiring._",
       "val wiring = tmt.production.dsl.Dsl.wiring; import wiring._"
@@ -77,7 +76,7 @@ class SequencerHandlers(
     ctx.watch(engineActor) //TODO: what to do if engine actor dies ? Decide in handlers.
 
     val params: List[String] = List(path.toString)
-    ammonite.Main.main0(params, System.in, System.out, System.err) //TODO: decide on main and main0
+    ammonite.Main.main0(params, System.in, System.out, System.err)
   }
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = {}
@@ -86,13 +85,11 @@ class SequencerHandlers(
     CommandResponse.Accepted(controlCommand.runId)
   }
 
-  override def onSubmit(controlCommand: ControlCommand): Unit = {}
-
   override def onOneway(controlCommand: ControlCommand): Unit = {}
 
   override def onShutdown(): Future[Unit] = { Future.successful(()) } //TODO: clean up engine and other relevant instances
 
-  override def onGoOffline(): Unit = {}
-
-  override def onGoOnline(): Unit = {}
+  override def onSubmit(controlCommand: ControlCommand): Unit = {}
+  override def onGoOffline(): Unit                            = {}
+  override def onGoOnline(): Unit                             = {}
 }
