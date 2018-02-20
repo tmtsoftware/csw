@@ -32,12 +32,13 @@ gradle
     ```
     @@@
     
-@@toc { depth=1 } 
+@@toc { depth=2 } 
     
 @@@index
 * [Describing Components](framework/describing-components.md)
 * [Creating Components](framework/creating-components.md)
 * [Handling Lifecycle](framework/handling-lifecycle.md)
+* [Managing Command State](framework/managing-command-state.md)
 * [Tracking Connections](framework/tracking-connections.md)
 * [Publishing State](framework/publishing-state.md)
 * [Handling Exceptions](framework/handling-exceptions.md)

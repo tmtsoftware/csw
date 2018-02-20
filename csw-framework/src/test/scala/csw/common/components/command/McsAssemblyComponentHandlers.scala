@@ -31,7 +31,6 @@ class McsAssemblyComponentHandlers(
   implicit val timeout: Timeout     = 10.seconds
   implicit val scheduler: Scheduler = ctx.system.scheduler
   implicit val ec: ExecutionContext = ctx.executionContext
-  var completedCommands: Int        = 0
   var hcdComponent: CommandService  = _
   var commandId: Id                 = _
   var shortSetup: Setup             = _
@@ -52,10 +51,15 @@ class McsAssemblyComponentHandlers(
 
   override def validateCommand(controlCommand: ControlCommand): CommandResponse = {
     controlCommand.commandName match {
-      case `longRunning` ⇒ Accepted(controlCommand.runId)
-      case `moveCmd`     ⇒ Accepted(controlCommand.runId)
-      case `initCmd`     ⇒ Accepted(controlCommand.runId)
-      case _             ⇒ CommandResponse.Error(controlCommand.runId, "")
+      case `longRunning` ⇒
+        //#addOrUpdateCommand
+        // after validation of the controlCommand, update its status of successful validation as Accepted
+        commandResponseManager.addOrUpdateCommand(controlCommand.runId, Accepted(controlCommand.runId))
+        //#addOrUpdateCommand
+        Accepted(controlCommand.runId)
+      case `moveCmd` ⇒ Accepted(controlCommand.runId)
+      case `initCmd` ⇒ Accepted(controlCommand.runId)
+      case _         ⇒ CommandResponse.Error(controlCommand.runId, "")
     }
   }
 
@@ -63,9 +67,17 @@ class McsAssemblyComponentHandlers(
     controlCommand.commandName match {
       case `longRunning` ⇒
         commandId = controlCommand.runId
+
+        //#addSubCommand
         shortSetup = Setup(prefix, shortRunning, controlCommand.maybeObsId)
+        commandResponseManager.addSubCommand(commandId, shortSetup.runId)
+        //#addSubCommand
+
         mediumSetup = Setup(prefix, mediumRunning, controlCommand.maybeObsId)
+        commandResponseManager.addSubCommand(commandId, mediumSetup.runId)
+
         longSetup = Setup(prefix, longRunning, controlCommand.maybeObsId)
+        commandResponseManager.addSubCommand(commandId, longSetup.runId)
 
         // this is to simulate that assembly is splitting command into three sub commands and forwarding same to hcd
         // longSetup takes 5 seconds to finish
@@ -85,23 +97,25 @@ class McsAssemblyComponentHandlers(
     hcdComponent
       .submit(controlCommand)
       .map {
-        case _: Accepted ⇒
+        case response: Accepted ⇒
+          commandResponseManager.updateSubCommand(response.runId, Completed(response.runId))
+          //#updateSubCommand
+          // An original command is split into three sub-commands and sent to an hcdComponent.
+          // As the commands get completed, the results are updated in the commandResponseManager
           hcdComponent.subscribe(controlCommand.runId).map {
             case _: Completed ⇒
               controlCommand.runId match {
                 case id if id == shortSetup.runId ⇒
+                  commandResponseManager.updateSubCommand(id, Completed(id))
                   currentStatePublisher.publish(CurrentState(shortSetup.source, Set(choiceKey.set(shortCmdCompleted))))
                 case id if id == mediumSetup.runId ⇒
+                  commandResponseManager.updateSubCommand(id, Completed(id))
                   currentStatePublisher.publish(CurrentState(mediumSetup.source, Set(choiceKey.set(mediumCmdCompleted))))
                 case id if id == longSetup.runId ⇒
+                  commandResponseManager.updateSubCommand(id, Completed(id))
                   currentStatePublisher.publish(CurrentState(longSetup.source, Set(choiceKey.set(longCmdCompleted))))
               }
-
-              completedCommands += 1
-              if (completedCommands == 3) {
-                commandResponseManager.addOrUpdateCommand(commandId, Completed(commandId))
-                completedCommands = 0
-              }
+            //#updateSubCommand
             case _ ⇒ // Do nothing
           }
         case _ ⇒ // Do nothing
