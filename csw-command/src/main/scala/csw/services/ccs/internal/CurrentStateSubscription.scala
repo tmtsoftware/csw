@@ -8,6 +8,12 @@ import csw.messages.ComponentCommonMessage.ComponentStateSubscription
 import csw.messages.models.PubSub.Subscribe
 import csw.messages.params.states.CurrentState
 
+/**
+ * The handle to the susbscription created for the current state published by the specified publisher
+ * @param publisher the source of the current state
+ * @param callback the action to perform on each received element
+ * @param mat the materializer to materialize the underlying stream
+ */
 class CurrentStateSubscription(
     publisher: ActorRef[ComponentStateSubscription],
     callback: CurrentState ⇒ Unit
@@ -28,5 +34,8 @@ class CurrentStateSubscription(
     .toMat(Sink.ignore)(Keep.both)
     .run()
 
-  def stop(): Unit = killSwitch.shutdown()
+  /**
+   * Unsubscribe to the current state being published
+   */
+  def unsubscribe(): Unit = killSwitch.shutdown()
 }

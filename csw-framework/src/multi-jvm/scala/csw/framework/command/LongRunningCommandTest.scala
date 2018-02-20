@@ -54,11 +54,16 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
           5.seconds
         )
       val assemblyLocation: AkkaLocation = Await.result(assemblyLocF, 10.seconds).get
-      val assemblyComponent              = new CommandService(assemblyLocation)
+      val assemblyCommandService         = new CommandService(assemblyLocation)
 
       val setup = Setup(prefix, longRunning, Some(obsId))
       val probe = TestProbe[CurrentState]
-      assemblyComponent.subscribeCurrentState(probe.ref ! _)
+
+      //#subscribeCurrentState
+      // subscribe to the current state of an assembly component and use a callback which forwards each received
+      // element to a test probe actor
+      assemblyCommandService.subscribeCurrentState(probe.ref ! _)
+      //#subscribeCurrentState
 
       // send submit with setup to assembly running in JVM-2
       // then assembly will split it into three sub commands [McsAssemblyComponentHandlers]
@@ -68,8 +73,8 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
       // 3. mediumSetup which takes 3 seconds to finish
 
       //#subscribe-for-result
-      val eventualCommandResponse = assemblyComponent.submit(setup).flatMap {
-        case _: Accepted ⇒ assemblyComponent.subscribe(setup.runId)
+      val eventualCommandResponse = assemblyCommandService.submit(setup).flatMap {
+        case _: Accepted ⇒ assemblyCommandService.subscribe(setup.runId)
         case _           ⇒ Future(CommandResponse.Error(setup.runId, ""))
       }
       //#subscribe-for-result
@@ -78,7 +83,7 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
 
       //#submitAndSubscribe
       val setupForSubscribe = Setup(prefix, longRunning, Some(obsId))
-      val response          = assemblyComponent.submitAndSubscribe(setupForSubscribe)
+      val response          = assemblyCommandService.submitAndSubscribe(setupForSubscribe)
       //#submitAndSubscribe
 
       Await.result(response, 20.seconds) shouldBe Completed(setupForSubscribe.runId)
@@ -91,11 +96,11 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
 
       //#query-response
       val setupForQuery = Setup(prefix, longRunning, Some(obsId))
-      assemblyComponent.submit(setupForQuery)
+      assemblyCommandService.submit(setupForQuery)
 
       //do some work before querying for the result of above command as needed
 
-      val eventualResponse: Future[CommandResponse] = assemblyComponent.query(setupForQuery.runId)
+      val eventualResponse: Future[CommandResponse] = assemblyCommandService.query(setupForQuery.runId)
       //#query-response
       eventualResponse.map(_ shouldBe Accepted(setupForQuery.runId))
       Thread.sleep(6000)
@@ -128,7 +133,7 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
 
       //#aggregated-validation
       val aggregatedValidationResponse = CommandDistributor(
-        Map(assemblyComponent → Set(setupAssembly1, setupAssembly2), hcdComponent → Set(setupHcd1, setupHcd2))
+        Map(assemblyCommandService → Set(setupAssembly1, setupAssembly2), hcdComponent → Set(setupHcd1, setupHcd2))
       ).aggregatedValidationResponse()
       //#aggregated-validation
 
@@ -138,7 +143,8 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
 
       // Test failed validation in one more more commands
       val aggregatedInvalidValidationResponse = CommandDistributor(
-        Map(assemblyComponent → Set(setupAssembly1, setupAssembly2, setupAssembly3), hcdComponent → Set(setupHcd1, setupHcd2))
+        Map(assemblyCommandService → Set(setupAssembly1, setupAssembly2, setupAssembly3),
+            hcdComponent           → Set(setupHcd1, setupHcd2))
       ).aggregatedValidationResponse()
 
       whenReady(aggregatedInvalidValidationResponse, PatienceConfiguration.Timeout(20.seconds)) { result ⇒
@@ -158,7 +164,7 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
 
       //#aggregated-completion
       val aggregatedResponse = CommandDistributor(
-        Map(assemblyComponent → Set(setupAssembly1, setupAssembly2), hcdComponent → Set(setupHcd1, setupHcd2))
+        Map(assemblyCommandService → Set(setupAssembly1, setupAssembly2), hcdComponent → Set(setupHcd1, setupHcd2))
       ).aggregatedCompletionResponse()
       //#aggregated-completion
 
@@ -167,7 +173,7 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
       }
 
       val aggregatedErrorResponse = CommandDistributor(
-        Map(assemblyComponent → Set(setupAssembly1, setupAssembly2), hcdComponent → Set(setupHcd1, setupHcd2, setupHcd3))
+        Map(assemblyCommandService → Set(setupAssembly1, setupAssembly2), hcdComponent → Set(setupHcd1, setupHcd2, setupHcd3))
       ).aggregatedCompletionResponse()
 
       whenReady(aggregatedErrorResponse, PatienceConfiguration.Timeout(20.seconds)) { result ⇒

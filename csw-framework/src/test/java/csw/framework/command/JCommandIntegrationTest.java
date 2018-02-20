@@ -377,7 +377,11 @@ public class JCommandIntegrationTest {
         TestProbe<CurrentState> probe = new TestProbe<>(typedSystem, settings);
 
         // DEOPSCSW-372: Provide an API for PubSubActor that hides actor based interaction
+        //#subscribeCurrentState
+        // subscribe to the current state of an assembly component and use a callback which forwards each received
+        // element to a test probe actor
         CurrentStateSubscription subscription = hcdCmdService.subscribeCurrentState(currentState -> probe.ref().tell(currentState));
+        //#subscribeCurrentState
 
         hcdCmdService.submit(setup, timeout);
 
@@ -388,6 +392,6 @@ public class JCommandIntegrationTest {
         probe.expectMsg(expectedValidationCurrentState);
         probe.expectMsg(expectedSubmitCurrentState);
 
-        subscription.stop();
+        subscription.unsubscribe();
     }
 }

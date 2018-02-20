@@ -88,10 +88,11 @@ Scala
 Java
 :   @@snip [JCommandIntegrationTest.java](../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #subscribe-for-result }
  
-## ComponentRef
+## CommandService
 
-When a component uses location service to discover another component, it is provided a `ComponentRef` model which not only 
-wraps the actor reference of the component discovered, but also provides methods for communicating with the component using commands.
+The command service for a component can be obtained by creating an instance of `CommandService` using the `AkkaLocation`
+of the component discovered using location service. This command service instance will have methods for communicating with 
+the component using commands.
 The API can be exercised as follows for different scenarios of command based communication:
 
 ### submit
@@ -169,6 +170,16 @@ Scala
 
 Java
 :   @@snip [JCommandIntegrationTest.java](../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #submitAllAndGetFinalResponse }
+
+### subscribeCurrentState
+This method can be used to subscribe to the @ref:[CurrentState](services/messages/states.md) of the component by providing a 
+callback. Subscribing results into a handle of `CurrentStateSubscription` which can be used to unsubscribe the subscription.
+
+Scala
+:   @@snip [CommandServiceTest.scala](../../../csw-framework/src/multi-jvm/scala/csw/framework/command/LongRunningCommandTest.scala) { #subscribeCurrentState }
+
+Java
+:   @@snip [JCommandIntegrationTest.java](../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #subscribeCurrentState }
 
 ## Matching state for command completion
 
