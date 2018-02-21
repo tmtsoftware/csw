@@ -71,7 +71,7 @@ class SequencerHandlers(
     val path = Files.write(Paths.get(s"scripts/${componentInfo.name}.sc"), updatedScript.getBytes(StandardCharsets.UTF_8)) //TODO: decide on centos charset code
 
     val engineActor: ActorRef[EngineAction] = await(ctx.system.systemActorOf(EngineBehavior.behavior, "engine"))
-    Dsl.wiring = new Wiring(ctx.system, engineActor, locationService, componentInfo.connections)
+    Dsl.wiring = new Wiring(ctx.system, engineActor, locationService)
 
     ctx.watch(engineActor) //TODO: what to do if engine actor dies ? Decide in handlers.
 

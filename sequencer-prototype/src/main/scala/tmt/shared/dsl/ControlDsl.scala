@@ -1,8 +1,8 @@
 package tmt.shared.dsl
 
 import csw.messages.ccs.commands.ControlCommand
+import tmt.shared.services.CommandResponse
 import tmt.shared.util.FutureExt.RichFuture
-import tmt.shared.services.{Command, CommandResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

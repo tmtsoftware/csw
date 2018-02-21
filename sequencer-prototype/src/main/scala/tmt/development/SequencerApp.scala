@@ -5,7 +5,6 @@ import csw.messages.params.models.Prefix
 import tmt.development.dsl.Dsl._
 import tmt.development.dsl.Dsl.wiring._
 import tmt.shared.repl.RemoteRepl
-import tmt.shared.services.Command
 
 object SequencerApp extends App {
 

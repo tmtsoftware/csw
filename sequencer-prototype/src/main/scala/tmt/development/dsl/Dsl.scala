@@ -3,7 +3,6 @@ package tmt.development.dsl
 import akka.typed.scaladsl.adapter.{TypedActorSystemOps, UntypedActorSystemOps}
 import akka.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
-import csw.messages.location.Connection
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import tmt.shared.Wiring
@@ -22,7 +21,7 @@ object Dsl extends BaseDsl {
     Await.result(actorSystem.systemActorOf(EngineBehavior.behavior, "engine"), timeout.duration)
   lazy val locationService: LocationService = LocationServiceFactory.withSystem(actorSystem.toUntyped)
 
-  lazy val wiring = new Wiring(actorSystem, engineActor, locationService, Set.empty) //TODO: fix connections
+  lazy val wiring = new Wiring(actorSystem, engineActor, locationService)
 
   private[tmt] def init(): Unit = {
     actorSystem //touch system so that main does not exit

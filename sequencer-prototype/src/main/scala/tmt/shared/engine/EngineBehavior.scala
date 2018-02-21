@@ -5,7 +5,6 @@ import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
 import csw.messages.ccs.commands.ControlCommand
 import tmt.shared.engine.EngineBehavior._
-import tmt.shared.services.Command
 
 import scala.collection.immutable.Queue
 

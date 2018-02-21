@@ -1,5 +1,6 @@
 package tmt.shared.dsl
 
+import akka.stream.KillSwitch
 import akka.typed.ActorSystem
 import akka.util.Timeout
 import csw.messages.ccs.CommandIssue
@@ -12,12 +13,12 @@ import tmt.shared.util.FutureExt.RichFuture
 import scala.concurrent.ExecutionContext
 import scala.util.control.NonFatal
 
-class CsDsl(locationService: LocationService, connections: Set[Connection])(implicit system: ActorSystem[_]) {
+class CswServicesDsl(locationService: LocationService)(implicit system: ActorSystem[_]) {
   implicit val ec: ExecutionContext = system.executionContext
 
   private var components: Map[String, AkkaLocation] = Map.empty //TODO: is there a concurrency problem of map ?
 
-  connections.foreach(locationService.subscribe(_, trackingCallback))
+  def track(connectionName: String): KillSwitch = locationService.subscribe(Connection.from(connectionName), trackingCallback)
 
   def submit(componentName: String, controlCommand: ControlCommand, timeOut: Timeout): CommandResponse = //TODO: create dsl for Timeout and accept as parameter
     components
