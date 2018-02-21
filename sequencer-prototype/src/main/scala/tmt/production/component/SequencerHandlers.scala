@@ -73,22 +73,28 @@ class SequencerHandlers(
     val engineActor: ActorRef[EngineAction] = await(ctx.system.systemActorOf(EngineBehavior.behavior, "engine"))
     Dsl.wiring = new Wiring(ctx.system, engineActor, locationService)
 
-    ctx.watch(engineActor) //TODO: what to do if engine actor dies ? Decide in handlers.
+    ctx.watch(engineActor) //TODO: what to do if engine actor dies ? Decide in handlers. Decide if we need engineActor to be persistent actor
 
     val params: List[String] = List(path.toString)
-    ammonite.Main.main0(params, System.in, System.out, System.err)
+    ammonite.Main
+      .main0(params, System.in, System.out, System.err) //TODO: decide which threadpool to provide for this method's execution
   }
 
-  override def validateCommand(controlCommand: ControlCommand): CommandResponse = {
-    CommandResponse.Accepted(controlCommand.runId)
+  def onCommandsReceived(controlCommands: Seq[ControlCommand]): Unit = {
+    Dsl.wiring.engine.pushAll(controlCommands) //TODO: fix interruption of commands
   }
 
-  override def onOneway(controlCommand: ControlCommand): Unit = {}
-
-  override def onShutdown(): Future[Unit] = { Future.successful(()) } //TODO: clean up engine and other relevant instances
+  override def onShutdown(): Future[Unit] = async {
+    //Delete the script from local disk
+    //kill the ammonite instance
+  } //TODO: clean up engine and other relevant instances and ammonite instance
 
   override def onSubmit(controlCommand: ControlCommand): Unit              = {}
+  override def onOneway(controlCommand: ControlCommand): Unit              = {}
   override def onGoOffline(): Unit                                         = {}
   override def onGoOnline(): Unit                                          = {}
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = {}
+  override def validateCommand(controlCommand: ControlCommand): CommandResponse = {
+    CommandResponse.Accepted(controlCommand.runId)
+  }
 }

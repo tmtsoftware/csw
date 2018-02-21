@@ -14,11 +14,11 @@ class EngineDsl(engineRef: ActorRef[EngineAction], system: ActorSystem[_]) {
   private implicit val timeout: Timeout     = Timeout(10.hour)
   private implicit val scheduler: Scheduler = system.scheduler
 
-  def pullNext(): ControlCommand                    = (engineRef ? Pull).await
-  def push(command: ControlCommand): Unit           = engineRef ! Push(command)
-  def pushAll(commands: List[ControlCommand]): Unit = commands.foreach(push)
-  def hasNext: Boolean                              = (engineRef ? HasNext).await
-  def pause(): Unit                                 = engineRef ! Pause
-  def resume(): Unit                                = engineRef ! Resume
-  def reset(): Unit                                 = engineRef ! Reset
+  def pullNext(): ControlCommand                   = (engineRef ? Pull).await
+  def push(command: ControlCommand): Unit          = engineRef ! Push(command)
+  def pushAll(commands: Seq[ControlCommand]): Unit = commands.foreach(push)
+  def hasNext: Boolean                             = (engineRef ? HasNext).await
+  def pause(): Unit                                = engineRef ! Pause
+  def resume(): Unit                               = engineRef ! Resume
+  def reset(): Unit                                = engineRef ! Reset
 }
