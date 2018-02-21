@@ -207,6 +207,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
       registrationFactory,
       pubSubBehaviorFactory,
       new SampleBehaviorFactory(componentHandlers),
+      commandResponseManagerFactory,
       new LoggerFactory(hcdInfo.name)
     )
 

@@ -8,17 +8,21 @@ import akka.typed.{ActorRef, ActorSystem}
 import akka.{actor, testkit, Done}
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.internal.supervisor.SupervisorBehavior
-import csw.messages.SupervisorMessage
+import csw.messages.{CommandResponseManagerMessage, SupervisorMessage}
+import csw.messages.ccs.commands.CommandResponse
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.models.{LifecycleStateChanged, PubSub}
+import csw.messages.params.models.Id
 import csw.messages.params.states.CurrentState
+import csw.services.ccs.internal.CommandResponseManagerFactory
+import csw.services.ccs.scaladsl.CommandResponseManager
 import csw.services.location.javadsl.ILocationService
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{when, _}
 import org.scalatest.mockito.MockitoSugar
 
 import scala.concurrent.Future
@@ -41,12 +45,19 @@ class FrameworkTestMocks(
   when(locationService.register(akkaRegistration)).thenReturn(Future.successful(registrationResult))
   when(locationService.unregister(any[AkkaConnection])).thenReturn(Future.successful(Done))
   when(locationService.asJava).thenReturn(mock[ILocationService])
-
   ///////////////////////////////////////////////
-  val pubSubBehaviorFactory: PubSubBehaviorFactory                  = mock[PubSubBehaviorFactory]
-  val lifecycleStateProbe: TestProbe[PubSub[LifecycleStateChanged]] = TestProbe[PubSub[LifecycleStateChanged]]
-  val compStateProbe: TestProbe[PubSub[CurrentState]]               = TestProbe[PubSub[CurrentState]]
 
+  val commandResponseManagerActor: TestProbe[CommandResponseManagerMessage] = TestProbe[CommandResponseManagerMessage]
+  val commandResponseManager: CommandResponseManager                        = mock[CommandResponseManager]
+
+  when(commandResponseManager.commandResponseManagerActor).thenReturn(commandResponseManagerActor.ref)
+  doNothing().when(commandResponseManager).addOrUpdateCommand(any[Id], any[CommandResponse])
+
+  val pubSubBehaviorFactory: PubSubBehaviorFactory                  = mock[PubSubBehaviorFactory]
+  val commandResponseManagerFactory: CommandResponseManagerFactory  = mock[CommandResponseManagerFactory]
+  val lifecycleStateProbe: TestProbe[PubSub[LifecycleStateChanged]] = TestProbe[PubSub[LifecycleStateChanged]]
+
+  val compStateProbe: TestProbe[PubSub[CurrentState]] = TestProbe[PubSub[CurrentState]]
   when(
     pubSubBehaviorFactory.make[LifecycleStateChanged](
       any[ActorContext[SupervisorMessage]],
@@ -61,6 +72,13 @@ class FrameworkTestMocks(
       any[LoggerFactory]
     )
   ).thenReturn(compStateProbe.ref)
+  when(
+    commandResponseManagerFactory.make(
+      any[ActorContext[SupervisorMessage]],
+      ArgumentMatchers.eq(SupervisorBehavior.CommandResponseManagerActorName),
+      any[LoggerFactory]
+    )
+  ).thenReturn(commandResponseManager)
 
   ///////////////////////////////////////////////
   val loggerFactory: LoggerFactory = mock[LoggerFactory]

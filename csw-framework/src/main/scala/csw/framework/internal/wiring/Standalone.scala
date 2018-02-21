@@ -23,7 +23,8 @@ object Standalone {
       componentInfo,
       locationService,
       registrationFactory,
-      pubSubBehaviorFactory
+      pubSubBehaviorFactory,
+      commandResponseManagerFactory
     )
     val cswFrameworkSystem = new CswFrameworkSystem(actorSystem)
     cswFrameworkSystem.spawnTyped(supervisorBehavior, componentInfo.name)

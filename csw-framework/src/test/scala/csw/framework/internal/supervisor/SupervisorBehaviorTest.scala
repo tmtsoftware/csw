@@ -57,6 +57,7 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
                   hcdInfo,
                   new SampleComponentBehaviorFactory,
                   new PubSubBehaviorFactory,
+                  commandResponseManagerFactory,
                   registrationFactory,
                   locationService,
                   loggerFactory

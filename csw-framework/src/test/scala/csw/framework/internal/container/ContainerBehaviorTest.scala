@@ -20,6 +20,7 @@ import csw.messages.framework.{ComponentInfo, ContainerLifecycleState, Superviso
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.models.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.messages.models.{Component, Components, SupervisorInfo}
+import csw.services.ccs.internal.CommandResponseManagerFactory
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
@@ -42,14 +43,15 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
   private val mocks                              = new FrameworkTestMocks()
 
   class IdleContainer() {
-    val ctx                                                  = new StubbedActorContext[ContainerMessage]("test-container", 100, typedSystem)
-    val supervisorFactory: SupervisorInfoFactory             = mock[SupervisorInfoFactory]
-    private val testActor: ActorRef[Any]                     = TestProbe("test-probe").testActor
-    val akkaRegistration                                     = AkkaRegistration(mock[AkkaConnection], Some("nfiraos.ncc.trombone"), testActor, testActor)
-    val locationService: LocationService                     = mock[LocationService]
-    val registrationResult: RegistrationResult               = mock[RegistrationResult]
-    private val pubSubBehaviorFactory: PubSubBehaviorFactory = mock[PubSubBehaviorFactory]
-    var supervisorInfos: Set[SupervisorInfo]                 = Set.empty
+    val ctx                                                                  = new StubbedActorContext[ContainerMessage]("test-container", 100, typedSystem)
+    val supervisorFactory: SupervisorInfoFactory                             = mock[SupervisorInfoFactory]
+    private val testActor: ActorRef[Any]                                     = TestProbe("test-probe").testActor
+    val akkaRegistration                                                     = AkkaRegistration(mock[AkkaConnection], Some("nfiraos.ncc.trombone"), testActor, testActor)
+    val locationService: LocationService                                     = mock[LocationService]
+    val registrationResult: RegistrationResult                               = mock[RegistrationResult]
+    private val pubSubBehaviorFactory: PubSubBehaviorFactory                 = mock[PubSubBehaviorFactory]
+    private val commandResponseManagerFactory: CommandResponseManagerFactory = mock[CommandResponseManagerFactory]
+    var supervisorInfos: Set[SupervisorInfo]                                 = Set.empty
     val answer = new Answer[Future[Option[SupervisorInfo]]] {
       override def answer(invocation: InvocationOnMock): Future[Option[SupervisorInfo]] = {
         val componentInfo        = invocation.getArgument[ComponentInfo](1)
@@ -64,6 +66,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
           registrationFactory,
           pubSubBehaviorFactory,
           componentBehaviorFactory,
+          commandResponseManagerFactory,
           mocks.loggerFactory
         )
         val supervisorInfo = SupervisorInfo(

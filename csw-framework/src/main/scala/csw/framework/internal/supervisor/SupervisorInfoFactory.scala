@@ -6,6 +6,7 @@ import csw.framework.internal.wiring.CswFrameworkSystem
 import csw.messages.ContainerIdleMessage
 import csw.messages.framework.ComponentInfo
 import csw.messages.models.{Component, SupervisorInfo}
+import csw.services.ccs.internal.CommandResponseManagerFactory
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
@@ -24,12 +25,13 @@ class SupervisorInfoFactory(containerName: String) {
       containerRef: ActorRef[ContainerIdleMessage],
       componentInfo: ComponentInfo,
       locationService: LocationService,
-      registrationFactory: RegistrationFactory
+      registrationFactory: RegistrationFactory,
   ): Future[Option[SupervisorInfo]] = {
     val system                                = ActorSystemFactory.remote(s"${componentInfo.name}-system")
     implicit val ec: ExecutionContextExecutor = system.dispatcher
     val richSystem                            = new CswFrameworkSystem(system)
     val pubSubBehaviorFactory                 = new PubSubBehaviorFactory
+    val commandResponseManagerFactory         = new CommandResponseManagerFactory
 
     async {
       val supervisorBehavior = {
@@ -38,7 +40,8 @@ class SupervisorInfoFactory(containerName: String) {
           componentInfo,
           locationService,
           registrationFactory,
-          pubSubBehaviorFactory
+          pubSubBehaviorFactory,
+          commandResponseManagerFactory
         )
       }
       val actorRefF = richSystem.spawnTyped(supervisorBehavior, componentInfo.name)

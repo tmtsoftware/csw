@@ -49,6 +49,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
         compInfo,
         getSampleHcdWiring(sampleHcdHandler),
         new PubSubBehaviorFactory,
+        commandResponseManagerFactory,
         registrationFactory,
         locationService,
         loggerFactory
@@ -59,8 +60,6 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     val childComponentInbox: Inbox[TopLevelActorMessage]                = ctx.childInbox(supervisor.component.get.upcast)
     val childPubSubLifecycleInbox: Inbox[PubSub[LifecycleStateChanged]] = ctx.childInbox(supervisor.pubSubLifecycle)
     val childPubSubCompStateInbox: Inbox[PubSub[CurrentState]]          = ctx.childInbox(supervisor.pubSubComponentActor)
-    val childCmdResponseMgrInbox: Inbox[CommandResponseManagerMessage] =
-      ctx.childInbox(supervisor.commandResponseManager.commandResponseManagerActor)
   }
 
   test("supervisor should start in Idle lifecycle state and spawn four actors") {
@@ -68,7 +67,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     import testData._
 
     supervisor.lifecycleState shouldBe SupervisorLifecycleState.Idle
-    ctx.children.size shouldBe 4
+    ctx.children.size shouldBe 3
     verify(timer).startSingleTimer(SupervisorBehavior.InitializeTimerKey, InitializeTimeout, supervisor.initializeTimeout)
   }
 
@@ -242,12 +241,12 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     supervisor.onMessage(Running(childRef))
 
     supervisor.onMessage(Query(testCmdId, subscriberProbe.ref))
-    childCmdResponseMgrInbox.receiveMsg() shouldBe Query(testCmdId, subscriberProbe.ref)
+    testMocks.commandResponseManagerActor.expectMsg(Query(testCmdId, subscriberProbe.ref))
 
     supervisor.onMessage(CommandResponseManagerMessage.Subscribe(testCmdId, subscriberProbe.ref))
-    childCmdResponseMgrInbox.receiveMsg() shouldBe CommandResponseManagerMessage.Subscribe(testCmdId, subscriberProbe.ref)
+    testMocks.commandResponseManagerActor.expectMsg(CommandResponseManagerMessage.Subscribe(testCmdId, subscriberProbe.ref))
 
     supervisor.onMessage(CommandResponseManagerMessage.Unsubscribe(testCmdId, subscriberProbe.ref))
-    childCmdResponseMgrInbox.receiveMsg() shouldBe CommandResponseManagerMessage.Unsubscribe(testCmdId, subscriberProbe.ref)
+    testMocks.commandResponseManagerActor.expectMsg(CommandResponseManagerMessage.Unsubscribe(testCmdId, subscriberProbe.ref))
   }
 }

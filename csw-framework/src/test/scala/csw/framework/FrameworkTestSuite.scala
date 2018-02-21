@@ -64,7 +64,8 @@ abstract class FrameworkTestSuite extends FunSuite with Matchers with BeforeAndA
       componentInfo,
       locationService,
       registrationFactory,
-      pubSubBehaviorFactory
+      pubSubBehaviorFactory,
+      commandResponseManagerFactory
     )
 
     // it creates supervisor which in turn spawns components TLA and sends Initialize and Run message to TLA

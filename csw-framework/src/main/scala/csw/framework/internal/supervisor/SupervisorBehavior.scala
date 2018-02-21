@@ -55,18 +55,20 @@ object SupervisorBehavior {
 /**
  * The Behavior of a Supervisor of a component actor, represented as a mutable behavior.
  *
- * @param ctx                        The Actor Context under which the actor instance of this behavior is created
- * @param timerScheduler             Provides support for scheduled `self` messages in an actor
- * @param maybeContainerRef          The container ref of the container under which this supervisor is started if
- *                                   its not running in standalone mode
- * @param componentInfo              Component related information as described in the configuration file
- * @param componentBehaviorFactory   The factory for creating the component supervised by this Supervisor
- * @param pubSubBehaviorFactory      The factory for creating actor instance of [[csw.framework.internal.pubsub.PubSubBehavior]]
- *                                   for utilising pub-sub of any state of a component
- * @param registrationFactory        The factory for creating a typed [[csw.services.location.models.AkkaRegistration]] from
- *                                   [[csw.messages.location.Connection.AkkaConnection]]
- * @param locationService            The single instance of Location service created for a running application
- * @param loggerFactory              The factory for creating [[csw.services.logging.scaladsl.Logger]] instance
+ * @param ctx                              The Actor Context under which the actor instance of this behavior is created
+ * @param timerScheduler                   Provides support for scheduled `self` messages in an actor
+ * @param maybeContainerRef                The container ref of the container under which this supervisor is started if
+ *                                         its not running in standalone mode
+ * @param componentInfo                    Component related information as described in the configuration file
+ * @param componentBehaviorFactory         The factory for creating the component supervised by this Supervisor
+ * @param pubSubBehaviorFactory            The factory for creating actor instance of [[csw.framework.internal.pubsub.PubSubBehavior]]
+ *                                         for utilising pub-sub of any state of a component
+ * @param commandResponseManagerFactory    The factory for creating actor instance of [[csw.framework.internal.pubsub.PubSubBehavior]]
+ *                                         for utilising pub-sub of any state of a component
+ * @param registrationFactory              The factory for creating a typed [[csw.services.location.models.AkkaRegistration]] from
+ *                                         [[csw.messages.location.Connection.AkkaConnection]]
+ * @param locationService                  The single instance of Location service created for a running application
+ * @param loggerFactory                    The factory for creating [[csw.services.logging.scaladsl.Logger]] instance
  */
 class SupervisorBehavior(
     ctx: ActorContext[SupervisorMessage],
@@ -75,6 +77,7 @@ class SupervisorBehavior(
     componentInfo: ComponentInfo,
     componentBehaviorFactory: ComponentBehaviorFactory,
     pubSubBehaviorFactory: PubSubBehaviorFactory,
+    commandResponseManagerFactory: CommandResponseManagerFactory,
     registrationFactory: RegistrationFactory,
     locationService: LocationService,
     loggerFactory: LoggerFactory
@@ -329,7 +332,7 @@ class SupervisorBehavior(
     pubSubBehaviorFactory.make(ctx, PubSubLifecycleActor, loggerFactory)
 
   private def makeCommandResponseManager() =
-    CommandResponseManagerFactory.make(ctx, CommandResponseManagerActorName, loggerFactory)
+    commandResponseManagerFactory.make(ctx, CommandResponseManagerActorName, loggerFactory)
 
   private def ignore(message: SupervisorMessage): Unit =
     log.error(s"Unexpected message :[$message] received by supervisor in lifecycle state :[$lifecycleState]")

@@ -6,6 +6,7 @@ import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.scaladsl.ComponentBehaviorFactory
 import csw.messages.framework.ComponentInfo
 import csw.messages.{ComponentMessage, ContainerIdleMessage, SupervisorMessage}
+import csw.services.ccs.internal.CommandResponseManagerFactory
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.LoggerFactory
 
@@ -19,7 +20,8 @@ object SupervisorBehaviorFactory {
       componentInfo: ComponentInfo,
       locationService: LocationService,
       registrationFactory: RegistrationFactory,
-      pubSubBehaviorFactory: PubSubBehaviorFactory
+      pubSubBehaviorFactory: PubSubBehaviorFactory,
+      commandResponseManagerFactory: CommandResponseManagerFactory
   ): Behavior[ComponentMessage] = {
 
     val componentWiringClass = Class.forName(componentInfo.behaviorFactoryClassName)
@@ -34,6 +36,7 @@ object SupervisorBehaviorFactory {
       registrationFactory,
       pubSubBehaviorFactory,
       componentBehaviorFactory,
+      commandResponseManagerFactory,
       loggerFactory
     )
   }
@@ -45,6 +48,7 @@ object SupervisorBehaviorFactory {
       registrationFactory: RegistrationFactory,
       pubSubBehaviorFactory: PubSubBehaviorFactory,
       componentBehaviorFactory: ComponentBehaviorFactory,
+      commandResponseManagerFactory: CommandResponseManagerFactory,
       loggerFactory: LoggerFactory
   ): Behavior[ComponentMessage] = {
     Actor
@@ -60,6 +64,7 @@ object SupervisorBehaviorFactory {
                   componentInfo,
                   componentBehaviorFactory,
                   pubSubBehaviorFactory,
+                  commandResponseManagerFactory,
                   registrationFactory,
                   locationService,
                   loggerFactory

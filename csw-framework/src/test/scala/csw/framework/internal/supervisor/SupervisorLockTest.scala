@@ -7,7 +7,7 @@ import csw.common.utils.LockCommandFactory
 import csw.framework.ComponentInfos.assemblyInfo
 import csw.framework.FrameworkTestSuite
 import csw.messages.CommandMessage.Submit
-import csw.messages.CommandResponseManagerMessage.{Query, Subscribe, Unsubscribe}
+import csw.messages.CommandResponseManagerMessage.{AddOrUpdateCommand, Query, Subscribe, Unsubscribe}
 import csw.messages.SupervisorLockMessage.{Lock, Unlock}
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, NotAllowed}
 import csw.messages.ccs.commands.{CommandName, CommandResponse, Setup}
@@ -150,14 +150,15 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     val setup = Setup(sourcePrefix, commandName, Some(obsId))
     supervisorRef ! Submit(setup, commandResponseProbe.ref)
     commandResponseProbe.expectMsgType[Accepted]
+    commandResponseManagerActor.expectMsg(AddOrUpdateCommand(setup.runId, Accepted(setup.runId)))
 
     // Ensure Query can be sent to component even in locked state
     supervisorRef ! Query(setup.runId, commandResponseProbe.ref)
-    commandResponseProbe.expectMsgType[CommandResponse]
+    commandResponseManagerActor.expectMsg(Query(setup.runId, commandResponseProbe.ref))
 
     // Ensure Subscribe can be sent to component even in locked state
     supervisorRef ! Subscribe(setup.runId, commandResponseProbe.ref)
-    commandResponseProbe.expectMsg(Completed(setup.runId))
+    commandResponseManagerActor.expectMsg(Subscribe(setup.runId, commandResponseProbe.ref))
 
     // Ensure Unsubscribe can be sent to component even in locked state
     supervisorRef ! Unsubscribe(setup.runId, commandResponseProbe.ref)
