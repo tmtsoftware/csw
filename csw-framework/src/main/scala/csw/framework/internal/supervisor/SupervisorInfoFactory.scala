@@ -25,7 +25,7 @@ class SupervisorInfoFactory(containerName: String) {
       containerRef: ActorRef[ContainerIdleMessage],
       componentInfo: ComponentInfo,
       locationService: LocationService,
-      registrationFactory: RegistrationFactory,
+      registrationFactory: RegistrationFactory
   ): Future[Option[SupervisorInfo]] = {
     val system                                = ActorSystemFactory.remote(s"${componentInfo.name}-system")
     implicit val ec: ExecutionContextExecutor = system.dispatcher
