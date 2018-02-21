@@ -89,6 +89,9 @@ class McsAssemblyComponentHandlers(
         processCommand(mediumSetup)
         processCommand(shortSetup)
 
+        //#subscribe-to-command-response-manager
+        // subscribe to the status of original command received and publish the state when its status changes to
+        // Completed
         commandResponseManager.subscribe(
           controlCommand.runId, {
             case Completed(_) ⇒
@@ -96,6 +99,7 @@ class McsAssemblyComponentHandlers(
             case _ ⇒
           }
         )
+      //#subscribe-to-command-response-manager
 
       case `initCmd` ⇒ commandResponseManager.addOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId))
       case `moveCmd` ⇒ commandResponseManager.addOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId))

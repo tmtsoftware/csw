@@ -38,3 +38,13 @@ of the parent command directly as required.
 
 ### query
 Query for the result of a command that is already present in the component's CommandResponseManager.
+
+Scala
+:   @@snip [McsAssemblyComponentHandlers.scala](../../../../csw-framework/src/test/scala/csw/common/components/command/McsAssemblyComponentHandlers.scala) { #subscribe-to-command-response-manager }
+
+### subscribe
+Subscribe for the result of a command that is already present in the component's CommandResponseManager and perform action
+on the change in status.
+
+Scala
+:   @@snip [McsAssemblyComponentHandlers.scala](../../../../csw-framework/src/test/scala/csw/common/components/command/McsAssemblyComponentHandlers.scala) { #subscribe-to-command-response-manager }
