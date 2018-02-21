@@ -10,6 +10,7 @@ import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.{ActorRef, ActorSystem}
 import com.typesafe.config.ConfigFactory
 import csw.apps.clusterseed.admin.http.HttpSupport
+import csw.apps.clusterseed.admin.internal.AdminWiring
 import csw.apps.clusterseed.utils.AdminLogTestSuite
 import csw.common.FrameworkAssertions.assertThatContainerIsRunning
 import csw.commons.tags.ClasspathSensitive
@@ -22,12 +23,14 @@ import csw.messages.framework.ContainerLifecycleState
 import csw.messages.location.ComponentId
 import csw.messages.location.ComponentType.{Assembly, HCD}
 import csw.messages.location.Connection.AkkaConnection
+import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.models.{Component, Components}
 import csw.messages.params.models.Prefix
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.logging.internal.LoggingLevels.{ERROR, Level, WARN}
 import csw.services.logging.internal._
 import csw.services.logging.models.LogMetadata
+import csw.services.logging.scaladsl.LoggingSystemFactory
 
 import scala.collection.JavaConverters.mapAsScalaMapConverter
 import scala.concurrent.Await
@@ -36,6 +39,7 @@ import scala.concurrent.duration.DurationDouble
 @ClasspathSensitive
 class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
 
+  private val adminWiring: AdminWiring = AdminWiring.make(ClusterAwareSettings.onPort(3652), Some(7879))
   import adminWiring.actorRuntime._
 
   implicit val typedSystem: ActorSystem[Nothing] = actorSystem.toTyped
@@ -53,21 +57,27 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
   private val startLoggingCmd           = CommandName("StartLogging")
   private val prefix                    = Prefix("iris.command")
 
-  override protected def beforeAll(): Unit = {
-    super.beforeAll()
+  private val loggingSystem = LoggingSystemFactory.start("logging", "version", hostName, adminWiring.actorSystem)
+  loggingSystem.setAppenders(List(testAppender))
 
-    // this will start seed on port 3552 and log admin server on 7878
+  override protected def beforeAll(): Unit = {
+    logBuffer.clear()
+    Await.result(adminWiring.adminHttpService.registeredLazyBinding, 5.seconds)
+
+    // this will start seed on port 3652 and log admin server on 7879
     adminWiring.locationService
 
-    containerActorSystem = ClusterSettings().joinLocal(3552).system
+    containerActorSystem = ClusterSettings().joinLocal(3652).system
 
     // this will start container on random port and join seed and form a cluster
     val containerRef = startContainerAndWaitForRunning()
     extractComponentsFromContainer(containerRef)
   }
 
+  override protected def afterEach(): Unit = logBuffer.clear()
+
   override protected def afterAll(): Unit = {
-    super.afterAll()
+    Await.result(adminWiring.actorRuntime.shutdown(TestFinishedReason), 10.seconds)
     Await.result(containerActorSystem.terminate(), 5.seconds)
   }
 
@@ -98,7 +108,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
     val getLogMetadataUri = Uri.from(
       scheme = "http",
       host = ClusterAwareSettings.hostname,
-      port = 7878,
+      port = 7879,
       path = s"/admin/logging/${motionControllerConnection.name}/level"
     )
 
@@ -153,7 +163,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
     val uri = Uri.from(
       scheme = "http",
       host = ClusterAwareSettings.hostname,
-      port = 7878,
+      port = 7879,
       path = s"/admin/logging/${laserConnection.name}/level",
       queryString = Some("value=error")
     )
@@ -198,7 +208,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
     val getLogMetadataUri = Uri.from(
       scheme = "http",
       host = ClusterAwareSettings.hostname,
-      port = 7878,
+      port = 7879,
       path = s"/admin/logging/abcd-hcd-akka/level"
     )
 
@@ -213,7 +223,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
     val uri = Uri.from(
       scheme = "http",
       host = ClusterAwareSettings.hostname,
-      port = 7878,
+      port = 7879,
       path = s"/admin/logging/${laserConnection.name}/level",
       queryString = Some("value=error1")
     )

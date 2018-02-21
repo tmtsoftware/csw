@@ -8,14 +8,17 @@ import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.TestKitSettings
 import com.typesafe.config.ConfigFactory
 import csw.apps.clusterseed.admin.http.HttpSupport
+import csw.apps.clusterseed.admin.internal.AdminWiring
 import csw.apps.clusterseed.utils.AdminLogTestSuite
 import csw.commons.tags.ClasspathSensitive
-import csw.services.config.server.{ServerWiring, Settings}
+import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.config.server.commons.{ConfigServiceConnection, TestFileUtils}
+import csw.services.config.server.{ServerWiring, Settings}
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.logging.internal.LoggingLevels.{ERROR, Level, WARN}
 import csw.services.logging.internal._
 import csw.services.logging.models.LogMetadata
+import csw.services.logging.scaladsl.LoggingSystemFactory
 
 import scala.collection.JavaConverters.mapAsScalaMapConverter
 import scala.concurrent.Await
@@ -24,6 +27,7 @@ import scala.concurrent.duration.DurationDouble
 @ClasspathSensitive
 class HttpLogAdminTest extends AdminLogTestSuite with HttpSupport {
 
+  private val adminWiring: AdminWiring = AdminWiring.make(ClusterAwareSettings.onPort(3653), Some(7888))
   import adminWiring.actorRuntime._
 
   implicit val typedSystem: ActorSystem[Nothing] = actorSystem.toTyped
@@ -35,15 +39,21 @@ class HttpLogAdminTest extends AdminLogTestSuite with HttpSupport {
 
   private val testFileUtils = new TestFileUtils(new Settings(ConfigFactory.load()))
 
+  private val loggingSystem = LoggingSystemFactory.start("logging", "version", hostName, adminWiring.actorSystem)
+  loggingSystem.setAppenders(List(testAppender))
+
   override protected def beforeAll(): Unit = {
-    super.beforeAll()
-    // this will start seed on port 3552 and log admin server on 7878
+    logBuffer.clear()
+    Await.result(adminWiring.adminHttpService.registeredLazyBinding, 5.seconds)
+    // this will start seed on port 3653 and log admin server on 7888
     adminWiring.locationService
   }
 
+  override protected def afterEach(): Unit = logBuffer.clear()
+
   override protected def afterAll(): Unit = {
     testFileUtils.deleteServerFiles()
-    super.afterAll()
+    Await.result(adminWiring.actorRuntime.shutdown(TestFinishedReason), 10.seconds)
   }
 
   // DEOPSCSW-127: Runtime update for logging characteristics
@@ -54,7 +64,7 @@ class HttpLogAdminTest extends AdminLogTestSuite with HttpSupport {
     val getLogMetadataUri = Uri.from(
       scheme = "http",
       host = ClusterAwareSettings.hostname,
-      port = 7878,
+      port = 7888,
       path = s"/admin/logging/${ConfigServiceConnection.value.name}/level"
     )
 
@@ -86,7 +96,7 @@ class HttpLogAdminTest extends AdminLogTestSuite with HttpSupport {
     val setLogLevelUri = Uri.from(
       scheme = "http",
       host = ClusterAwareSettings.hostname,
-      port = 7878,
+      port = 7888,
       path = s"/admin/logging/${ConfigServiceConnection.value.name}/level",
       queryString = Some("value=error")
     )
