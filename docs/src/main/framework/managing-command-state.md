@@ -9,6 +9,8 @@ Add a new command or update the status of an existing command
 
 Scala
 :   @@snip [McsAssemblyComponentHandlers.scala](../../../../csw-framework/src/test/scala/csw/common/components/command/McsAssemblyComponentHandlers.scala) { #addOrUpdateCommand }
+Java
+:   @@snip [JSampleComponentHandlers.scala](../../../../csw-framework/src/test/java/csw/framework/javadsl/components/JSampleComponentHandlers.java) { #addOrUpdateCommand }
 
 ### addSubCommand
 A received command can be often split into two or more sub-commands. The status of original command can then be derived
@@ -17,7 +19,6 @@ in relation to the parent command using this method.
 
 Scala
 :   @@snip [McsAssemblyComponentHandlers.scala](../../../../csw-framework/src/test/scala/csw/common/components/command/McsAssemblyComponentHandlers.scala) { #addSubCommand }
- 
 
 ### updateSubCommand
 Update the status of the sub-command which would trigger the automatic derivation of the status of the original/parent command when
@@ -40,7 +41,7 @@ of the parent command directly as required.
 Query for the result of a command that is already present in the component's CommandResponseManager.
 
 Scala
-:   @@snip [McsAssemblyComponentHandlers.scala](../../../../csw-framework/src/test/scala/csw/common/components/command/McsAssemblyComponentHandlers.scala) { #subscribe-to-command-response-manager }
+:   @@snip [McsAssemblyComponentHandlers.scala](../../../../csw-framework/src/test/scala/csw/common/components/command/McsAssemblyComponentHandlers.scala) { #query-command-response-manager }
 
 ### subscribe
 Subscribe for the result of a command that is already present in the component's CommandResponseManager and perform action

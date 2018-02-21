@@ -3,7 +3,7 @@ package csw.common.components.command
 import akka.actor.Scheduler
 import akka.typed.scaladsl.ActorContext
 import akka.util.Timeout
-import csw.common.components.command.ComponentStateForCommand._
+import csw.common.components.command.ComponentStateForCommand.{longRunningCmdCompleted, _}
 import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
 import csw.messages.TopLevelActorMessage
 import csw.messages.ccs.CommandIssue
@@ -99,7 +99,16 @@ class McsAssemblyComponentHandlers(
             case _ ⇒
           }
         )
-      //#subscribe-to-command-response-manager
+        //#subscribe-to-command-response-manager
+
+        //#query-command-response-manager
+        // publish the current status of the component based on the current status of a command
+        commandResponseManager
+          .query(controlCommand.runId)
+          .map(
+            _ ⇒ currentStatePublisher.publish(CurrentState(controlCommand.source, Set(choiceKey.set(longRunningCurrentStatus))))
+          )
+      //#query-command-response-manager
 
       case `initCmd` ⇒ commandResponseManager.addOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId))
       case `moveCmd` ⇒ commandResponseManager.addOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId))

@@ -26,11 +26,18 @@ object ComponentStateForCommand {
   val shortRunning  = CommandName("move.shortCmd")
   val mediumRunning = CommandName("move.mediumCmd")
 
-  val longRunningCmdCompleted = Choice("Long Running Cmd Completed")
-  val shortCmdCompleted       = Choice("Short Running Sub Cmd Completed")
-  val mediumCmdCompleted      = Choice("Medium Running Sub Cmd Completed")
-  val longCmdCompleted        = Choice("Long Running Sub Cmd Completed")
+  val longRunningCmdCompleted  = Choice("Long Running Cmd Completed")
+  val longRunningCurrentStatus = Choice("Long Running Cmd Completed")
+  val shortCmdCompleted        = Choice("Short Running Sub Cmd Completed")
+  val mediumCmdCompleted       = Choice("Medium Running Sub Cmd Completed")
+  val longCmdCompleted         = Choice("Long Running Sub Cmd Completed")
 
-  val choices: Choices      = Choices.fromChoices(shortCmdCompleted, mediumCmdCompleted, longCmdCompleted, longRunningCmdCompleted)
+  val choices: Choices = Choices.fromChoices(
+    shortCmdCompleted,
+    mediumCmdCompleted,
+    longCmdCompleted,
+    longRunningCmdCompleted,
+    longRunningCurrentStatus
+  )
   val choiceKey: GChoiceKey = ChoiceKey.make("choiceKey", choices)
 }

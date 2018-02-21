@@ -106,7 +106,12 @@ public class JSampleComponentHandlers extends JComponentHandlers {
             Result result = new Result(controlCommand.source().prefix()).add(param);
             return new CompletedWithResult(controlCommand.runId(), result);
         } else if (controlCommand.commandName().equals(failureAfterValidationCmd())) {
-            return new Accepted(controlCommand.runId());
+            //#addOrUpdateCommand
+            // after validation of the controlCommand, update its status of successful validation as Accepted
+            Accepted accepted = new Accepted(controlCommand.runId());
+            commandResponseManager.addOrUpdateCommand(controlCommand.runId(), accepted);
+            //#addOrUpdateCommand
+            return accepted;
         } else if (controlCommand.commandName().name().contains("failure")) {
             return new Invalid(controlCommand.runId(), new CommandIssue.OtherIssue("Testing: Received failure, will return Invalid."));
         } else {
