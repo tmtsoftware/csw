@@ -93,6 +93,7 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
       probe.expectMsg(CurrentState(prefix, Set(choiceKey.set(shortCmdCompleted))))
       probe.expectMsg(CurrentState(prefix, Set(choiceKey.set(mediumCmdCompleted))))
       probe.expectMsg(CurrentState(prefix, Set(choiceKey.set(longCmdCompleted))))
+      probe.expectMsg(CurrentState(prefix, Set(choiceKey.set(longRunningCmdCompleted))))
 
       //#query-response
       val setupForQuery = Setup(prefix, longRunning, Some(obsId))

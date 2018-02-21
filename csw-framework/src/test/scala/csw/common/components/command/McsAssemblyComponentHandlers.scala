@@ -86,8 +86,16 @@ class McsAssemblyComponentHandlers(
         // shortSetup takes 1 second to finish
         // mediumSetup takes 3 seconds to finish
         processCommand(longSetup)
-        processCommand(shortSetup)
         processCommand(mediumSetup)
+        processCommand(shortSetup)
+
+        commandResponseManager.subscribe(
+          controlCommand.runId, {
+            case Completed(_) ⇒
+              currentStatePublisher.publish(CurrentState(controlCommand.source, Set(choiceKey.set(longRunningCmdCompleted))))
+            case _ ⇒
+          }
+        )
 
       case `initCmd` ⇒ commandResponseManager.addOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId))
       case `moveCmd` ⇒ commandResponseManager.addOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId))
@@ -100,7 +108,7 @@ class McsAssemblyComponentHandlers(
       .submit(controlCommand)
       .map {
         case response: Accepted ⇒
-          commandResponseManager.updateSubCommand(response.runId, Completed(response.runId))
+          commandResponseManager.updateSubCommand(response.runId, Accepted(response.runId))
           //#updateSubCommand
           // An original command is split into three sub-commands and sent to an hcdComponent.
           // As the commands get completed, the results are updated in the commandResponseManager
@@ -108,14 +116,14 @@ class McsAssemblyComponentHandlers(
             case _: Completed ⇒
               controlCommand.runId match {
                 case id if id == shortSetup.runId ⇒
-                  commandResponseManager.updateSubCommand(id, Completed(id))
                   currentStatePublisher.publish(CurrentState(shortSetup.source, Set(choiceKey.set(shortCmdCompleted))))
+                  commandResponseManager.updateSubCommand(id, Completed(id))
                 case id if id == mediumSetup.runId ⇒
-                  commandResponseManager.updateSubCommand(id, Completed(id))
                   currentStatePublisher.publish(CurrentState(mediumSetup.source, Set(choiceKey.set(mediumCmdCompleted))))
-                case id if id == longSetup.runId ⇒
                   commandResponseManager.updateSubCommand(id, Completed(id))
+                case id if id == longSetup.runId ⇒
                   currentStatePublisher.publish(CurrentState(longSetup.source, Set(choiceKey.set(longCmdCompleted))))
+                  commandResponseManager.updateSubCommand(id, Completed(id))
               }
             //#updateSubCommand
             case _ ⇒ // Do nothing

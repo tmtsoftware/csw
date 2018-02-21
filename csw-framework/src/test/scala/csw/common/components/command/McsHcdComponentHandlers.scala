@@ -60,8 +60,9 @@ class McsHcdComponentHandlers(
         ctx.schedule(1.seconds,
                      commandResponseManager.commandResponseManagerActor,
                      AddOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId)))
-      case `failureAfterValidationCmd` ⇒ Error(controlCommand.runId, "Failed command")
-      case _                           ⇒
+      case `failureAfterValidationCmd` ⇒
+        commandResponseManager.addOrUpdateCommand(controlCommand.runId, Error(controlCommand.runId, "Failed command"))
+      case _ ⇒
     }
   }
 

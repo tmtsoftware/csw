@@ -111,7 +111,6 @@ class ComponentHandlerForCommand(
           )
           .throttle(1, 100.millis, 1, ThrottleMode.Shaping)
           .runWith(Sink.ignore)
-
       case _ ⇒
         Source(1 to 10)
           .map(

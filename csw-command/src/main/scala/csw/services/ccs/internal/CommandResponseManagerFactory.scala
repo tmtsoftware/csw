@@ -21,7 +21,7 @@ object CommandResponseManagerFactory {
         Actor.mutable[CommandResponseManagerMessage](ctx ⇒ new CommandResponseManagerBehavior(ctx, loggerFactory)),
         actorName
       )
-    )(ctx.system.scheduler)
+    )(ctx.system)
   }
 
 }
