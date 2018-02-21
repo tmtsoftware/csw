@@ -1,7 +1,7 @@
 package csw.services.event.internal.redis
 
 import akka.stream._
-import akka.stream.scaladsl.{Sink, Source}
+import akka.stream.scaladsl.{Sink, Source, SourceQueueWithComplete}
 import akka.{Done, NotUsed}
 import csw.messages.ccs.events.{Event, EventKey}
 import csw.services.event.scaladsl.EventPublisher
@@ -27,4 +27,10 @@ class RedisPublisher(redisClient: RedisClient, redisURI: RedisURI)(implicit ec: 
     Done
   }
 
+  override def queue(bufferSize: Int, overflowStrategy: OverflowStrategy): SourceQueueWithComplete[Event] =
+    Source
+      .queue[Event](bufferSize, overflowStrategy)
+      .mapAsync(1)(publish)
+      .to(Sink.ignore)
+      .run()
 }

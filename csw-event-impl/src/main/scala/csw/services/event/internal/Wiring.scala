@@ -30,12 +30,11 @@ class Wiring(redisPort: Int = 6379) {
   //kafka
   lazy val producerSettings: ProducerSettings[String, Array[Byte]] =
     ProducerSettings(actorSystem, new StringSerializer, new ByteArraySerializer)
-      .withBootstrapServers("localhost:9092")
+      .withBootstrapServers("localhost:6001")
 
   lazy val consumerSettings: ConsumerSettings[String, Array[Byte]] =
     ConsumerSettings(actorSystem, new StringDeserializer, new ByteArrayDeserializer)
-      .withBootstrapServers("localhost:9092")
-      .withGroupId("group1")
+      .withBootstrapServers("localhost:6001")
       .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest")
 
   lazy val kafkaPublisher  = new KafkaPublisher(producerSettings)
