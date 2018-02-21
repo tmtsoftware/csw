@@ -13,7 +13,7 @@ import csw.services.location.javadsl.ILocationService;
 import csw.services.logging.javadsl.JLoggerFactory;
 
 //#jcomponent-factory
-public class JHcdComponentBehaviourFactory extends JComponentBehaviorFactory {
+public class JHcdComponentBehaviorFactory extends JComponentBehaviorFactory {
 
     @Override
     public JComponentHandlers jHandlers(

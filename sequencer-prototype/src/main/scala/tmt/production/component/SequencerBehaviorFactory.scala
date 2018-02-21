@@ -8,7 +8,7 @@ import csw.services.ccs.scaladsl.CommandResponseManager
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
 
-class SequencerBehaviourFactory extends ComponentBehaviorFactory {
+class SequencerBehaviorFactory extends ComponentBehaviorFactory {
   protected override def handlers(
       ctx: ActorContext[TopLevelActorMessage],
       componentInfo: ComponentInfo,

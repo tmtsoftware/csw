@@ -4,12 +4,12 @@ import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
 import csw.messages.ccs.commands.ControlCommand
-import tmt.shared.engine.EngineBehaviour._
+import tmt.shared.engine.EngineBehavior._
 import tmt.shared.services.Command
 
 import scala.collection.immutable.Queue
 
-class EngineBehaviour(ctx: ActorContext[EngineAction]) extends MutableBehavior[EngineAction] {
+class EngineBehavior(ctx: ActorContext[EngineAction]) extends MutableBehavior[EngineAction] {
 
   var queue: Queue[ControlCommand]          = Queue.empty
   var ref: Option[ActorRef[ControlCommand]] = None
@@ -42,7 +42,7 @@ class EngineBehaviour(ctx: ActorContext[EngineAction]) extends MutableBehavior[E
   def hasNext: Boolean = queue.nonEmpty && !paused
 }
 
-object EngineBehaviour {
+object EngineBehavior {
   sealed trait EngineAction
   case class Push(command: ControlCommand)           extends EngineAction
   case class Pull(replyTo: ActorRef[ControlCommand]) extends EngineAction
@@ -51,5 +51,5 @@ object EngineBehaviour {
   case object Resume                                 extends EngineAction
   case object Reset                                  extends EngineAction
 
-  def behaviour: Behavior[EngineAction] = Actor.mutable(ctx => new EngineBehaviour(ctx))
+  def behavior: Behavior[EngineAction] = Actor.mutable(ctx => new EngineBehavior(ctx))
 }

@@ -19,8 +19,8 @@ import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
 import tmt.production.dsl.Dsl
 import tmt.shared.Wiring
-import tmt.shared.engine.EngineBehaviour
-import tmt.shared.engine.EngineBehaviour.EngineAction
+import tmt.shared.engine.EngineBehavior
+import tmt.shared.engine.EngineBehavior.EngineAction
 
 import scala.async.Async.{async, await}
 import scala.concurrent.duration.DurationDouble
@@ -70,7 +70,7 @@ class SequencerHandlers(
 
     val path = Files.write(Paths.get(s"scripts/${componentInfo.name}.sc"), updatedScript.getBytes(StandardCharsets.UTF_8)) //TODO: decide on centos charset code
 
-    val engineActor: ActorRef[EngineAction] = await(ctx.system.systemActorOf(EngineBehaviour.behaviour, "engine"))
+    val engineActor: ActorRef[EngineAction] = await(ctx.system.systemActorOf(EngineBehavior.behavior, "engine"))
     Dsl.wiring = new Wiring(ctx.system, engineActor, locationService, componentInfo.connections)
 
     ctx.watch(engineActor) //TODO: what to do if engine actor dies ? Decide in handlers.

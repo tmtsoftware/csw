@@ -4,7 +4,7 @@ import akka.typed.{ActorRef, ActorSystem}
 import csw.messages.location.Connection
 import csw.services.location.scaladsl.LocationService
 import tmt.shared.dsl.{ControlDsl, CsDsl, EngineDsl}
-import tmt.shared.engine.EngineBehaviour.EngineAction
+import tmt.shared.engine.EngineBehavior.EngineAction
 
 //TODO: decide better name for wiring
 class Wiring(

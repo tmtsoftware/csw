@@ -8,8 +8,8 @@ import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import tmt.shared.Wiring
 import tmt.shared.dsl.BaseDsl
-import tmt.shared.engine.EngineBehaviour
-import tmt.shared.engine.EngineBehaviour.EngineAction
+import tmt.shared.engine.EngineBehavior
+import tmt.shared.engine.EngineBehavior.EngineAction
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
@@ -19,7 +19,7 @@ object Dsl extends BaseDsl {
 
   lazy val actorSystem: ActorSystem[Nothing] = ClusterSettings().onPort(3552).system.toTyped
   lazy val engineActor: ActorRef[EngineAction] =
-    Await.result(actorSystem.systemActorOf(EngineBehaviour.behaviour, "engine"), timeout.duration)
+    Await.result(actorSystem.systemActorOf(EngineBehavior.behavior, "engine"), timeout.duration)
   lazy val locationService: LocationService = LocationServiceFactory.withSystem(actorSystem.toUntyped)
 
   lazy val wiring = new Wiring(actorSystem, engineActor, locationService, Set.empty) //TODO: fix connections

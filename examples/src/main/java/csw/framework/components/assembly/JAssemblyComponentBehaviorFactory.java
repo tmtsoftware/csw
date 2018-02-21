@@ -11,7 +11,7 @@ import csw.services.location.javadsl.ILocationService;
 import csw.services.logging.javadsl.JLoggerFactory;
 
 //#jcomponent-factory
-public class JAssemblyComponentBehaviourFactory extends JComponentBehaviorFactory {
+public class JAssemblyComponentBehaviorFactory extends JComponentBehaviorFactory {
 
     @Override
     public JComponentHandlers jHandlers(

@@ -1,7 +1,7 @@
 package tmt.shared.dsl
 
 import org.scalatest.Matchers
-import tmt.shared.services.{Command, CommandResponse}
+import tmt.shared.services.CommandResponse
 
 class CsDslTest extends org.scalatest.FunSuite with Matchers with ControlDsl {
 

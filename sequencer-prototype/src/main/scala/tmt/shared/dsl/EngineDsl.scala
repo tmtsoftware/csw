@@ -5,7 +5,7 @@ import akka.typed.scaladsl.AskPattern._
 import akka.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import csw.messages.ccs.commands.ControlCommand
-import tmt.shared.engine.EngineBehaviour._
+import tmt.shared.engine.EngineBehavior._
 import tmt.shared.util.FutureExt.RichFuture
 
 import scala.concurrent.duration.DurationLong
