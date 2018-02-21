@@ -1,5 +1,7 @@
 package tmt.development
 
+import csw.messages.ccs.commands.{CommandName, Setup}
+import csw.messages.params.models.Prefix
 import tmt.development.dsl.Dsl._
 import tmt.development.dsl.Dsl.wiring._
 import tmt.shared.repl.RemoteRepl
@@ -11,7 +13,7 @@ object SequencerApp extends App {
 
   RemoteRepl.server.start()
 
-  engine.push(Command("setup-assemblies-parallel", List(1, 2, 3, 10, 20, 30)))
+  engine.push(Setup(Prefix(""), CommandName("setup-assemblies-parallel"), None, Set.empty))
 
   val params = if (args.isEmpty) Array("scripts/ocs-sequencer.sc") else args
   ammonite.Main.main0(params.toList, System.in, System.out, System.err)

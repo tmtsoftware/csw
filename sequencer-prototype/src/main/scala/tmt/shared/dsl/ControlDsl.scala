@@ -1,5 +1,6 @@
 package tmt.shared.dsl
 
+import csw.messages.ccs.commands.ControlCommand
 import tmt.shared.util.FutureExt.RichFuture
 import tmt.shared.services.{Command, CommandResponse}
 
@@ -12,7 +13,7 @@ trait ControlDsl {
 
   implicit def toFuture(x: => CommandResponse): Future[CommandResponse] = Future(x)
 
-  def forEach(f: Command => Unit): Unit = {
+  def forEach(f: ControlCommand => Unit): Unit = {
     loop(f(engine.pullNext()))
   }
 

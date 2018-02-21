@@ -3,6 +3,7 @@ package tmt.shared.engine
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
+import csw.messages.ccs.commands.ControlCommand
 import tmt.shared.engine.EngineBehaviour._
 import tmt.shared.services.Command
 
@@ -10,9 +11,9 @@ import scala.collection.immutable.Queue
 
 class EngineBehaviour(ctx: ActorContext[EngineAction]) extends MutableBehavior[EngineAction] {
 
-  var queue: Queue[Command]          = Queue.empty
-  var ref: Option[ActorRef[Command]] = None
-  var paused: Boolean                = false
+  var queue: Queue[ControlCommand]          = Queue.empty
+  var ref: Option[ActorRef[ControlCommand]] = None
+  var paused: Boolean                       = false
 
   override def onMessage(msg: EngineAction): Behavior[EngineAction] = {
     msg match {
@@ -43,12 +44,12 @@ class EngineBehaviour(ctx: ActorContext[EngineAction]) extends MutableBehavior[E
 
 object EngineBehaviour {
   sealed trait EngineAction
-  case class Push(command: Command)              extends EngineAction
-  case class Pull(replyTo: ActorRef[Command])    extends EngineAction
-  case class HasNext(replyTo: ActorRef[Boolean]) extends EngineAction
-  case object Pause                              extends EngineAction
-  case object Resume                             extends EngineAction
-  case object Reset                              extends EngineAction
+  case class Push(command: ControlCommand)           extends EngineAction
+  case class Pull(replyTo: ActorRef[ControlCommand]) extends EngineAction
+  case class HasNext(replyTo: ActorRef[Boolean])     extends EngineAction
+  case object Pause                                  extends EngineAction
+  case object Resume                                 extends EngineAction
+  case object Reset                                  extends EngineAction
 
   def behaviour: Behavior[EngineAction] = Actor.mutable(ctx => new EngineBehaviour(ctx))
 }

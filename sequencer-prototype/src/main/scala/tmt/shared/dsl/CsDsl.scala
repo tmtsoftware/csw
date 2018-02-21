@@ -10,7 +10,6 @@ import csw.services.location.scaladsl.LocationService
 import tmt.shared.util.FutureExt.RichFuture
 
 import scala.concurrent.ExecutionContext
-import scala.concurrent.duration.DurationDouble
 import scala.util.control.NonFatal
 
 class CsDsl(locationService: LocationService, connections: Set[Connection])(implicit system: ActorSystem[_]) {
@@ -20,7 +19,7 @@ class CsDsl(locationService: LocationService, connections: Set[Connection])(impl
 
   connections.foreach(locationService.subscribe(_, trackingCallback))
 
-  def submit(componentName: String, controlCommand: ControlCommand): CommandResponse = //TODO: create dsl for Timeout and accept as parameter
+  def submit(componentName: String, controlCommand: ControlCommand, timeOut: Timeout): CommandResponse = //TODO: create dsl for Timeout and accept as parameter
     components
       .get(componentName)
       .fold[CommandResponse] {
@@ -28,9 +27,9 @@ class CsDsl(locationService: LocationService, connections: Set[Connection])(impl
         CommandResponse.Invalid(controlCommand.runId, CommandIssue.OtherIssue(s"Unavailable component $componentName"))
       } { location =>
         new CommandService(location)
-          .submit(controlCommand)(Timeout(5.seconds)) //TODO: use timeout from parameter
+          .submit(controlCommand)(timeOut)
           .recover { case NonFatal(ex) => CommandResponse.Invalid(controlCommand.runId, CommandIssue.OtherIssue(ex.getMessage)) }
-          .await
+          .await(timeOut.duration)
       }
 
   def split(params: List[Int]): (List[Int], List[Int]) = params.partition(_ % 2 != 0)
