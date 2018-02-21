@@ -6,7 +6,8 @@ import akka.util.Timeout
 import csw.common.components.command.ComponentStateForCommand._
 import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
 import csw.messages.TopLevelActorMessage
-import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed}
+import csw.messages.ccs.CommandIssue
+import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Invalid}
 import csw.messages.ccs.commands.{CommandResponse, ControlCommand, Setup}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.{AkkaLocation, TrackingEvent}
@@ -57,9 +58,10 @@ class McsAssemblyComponentHandlers(
         commandResponseManager.addOrUpdateCommand(controlCommand.runId, Accepted(controlCommand.runId))
         //#addOrUpdateCommand
         Accepted(controlCommand.runId)
-      case `moveCmd` ⇒ Accepted(controlCommand.runId)
-      case `initCmd` ⇒ Accepted(controlCommand.runId)
-      case _         ⇒ CommandResponse.Error(controlCommand.runId, "")
+      case `moveCmd`    ⇒ Accepted(controlCommand.runId)
+      case `initCmd`    ⇒ Accepted(controlCommand.runId)
+      case `invalidCmd` ⇒ Invalid(controlCommand.runId, CommandIssue.OtherIssue("Invalid"))
+      case _            ⇒ CommandResponse.Error(controlCommand.runId, "")
     }
   }
 

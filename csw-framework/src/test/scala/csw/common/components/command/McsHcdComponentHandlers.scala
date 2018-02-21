@@ -5,7 +5,7 @@ import csw.common.components.command.ComponentStateForCommand._
 import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
 import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
 import csw.messages.TopLevelActorMessage
-import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed}
+import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Error}
 import csw.messages.ccs.commands.{CommandResponse, ControlCommand}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.TrackingEvent
@@ -38,10 +38,11 @@ class McsHcdComponentHandlers(
 
   override def validateCommand(controlCommand: ControlCommand): CommandResponse = {
     controlCommand.commandName match {
-      case `longRunning`   ⇒ Accepted(controlCommand.runId)
-      case `mediumRunning` ⇒ Accepted(controlCommand.runId)
-      case `shortRunning`  ⇒ Accepted(controlCommand.runId)
-      case _               ⇒ CommandResponse.Error(controlCommand.runId, "")
+      case `longRunning`               ⇒ Accepted(controlCommand.runId)
+      case `mediumRunning`             ⇒ Accepted(controlCommand.runId)
+      case `shortRunning`              ⇒ Accepted(controlCommand.runId)
+      case `failureAfterValidationCmd` ⇒ Accepted(controlCommand.runId)
+      case _                           ⇒ CommandResponse.Error(controlCommand.runId, "")
     }
   }
 
@@ -59,7 +60,8 @@ class McsHcdComponentHandlers(
         ctx.schedule(1.seconds,
                      commandResponseManager.commandResponseManagerActor,
                      AddOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId)))
-      case _ ⇒
+      case `failureAfterValidationCmd` ⇒ Error(controlCommand.runId, "Failed command")
+      case _                           ⇒
     }
   }
 
