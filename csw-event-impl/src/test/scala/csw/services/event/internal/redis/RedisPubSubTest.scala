@@ -83,60 +83,12 @@ class RedisPubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with
 
     redisPublisher.publish(Source.fromIterator(() => Iterator.continually(event)).map(x => { println(s"from 1 -> $x"); x }))
     redisPublisher
-      .publish(Source.fromIterator(() => Iterator.continually(event)).map(x => { println(s"from 2            -> $x"); x }))
+      .publish(
+        Source
+          .fromIterator(() => Iterator.continually(event))
+          .map(x => { println(s"from 2            -> $x"); x })
+          .watchTermination()(Keep.right)
+      )
       .await
   }
-
-  test("throughput") {
-    val subscriber = redisSubscriber
-    val publisher  = redisPublisher
-
-    val prefix    = Prefix("test.prefix")
-    val eventName = EventName("system")
-
-    def event(x: Int): Event = SystemEvent(prefix, eventName).copy(eventId = Id(x.toString))
-
-    val eventKey: EventKey = event(0).eventKey
-
-    val (sub, seqF) = subscriber.subscribe(Set(eventKey)).map(x => { println(x); x }).toMat(Sink.seq)(Keep.both).run()
-
-    Thread.sleep(100)
-
-    val limit = 10
-
-    val stream = Source(1 to limit).map(event)
-
-    publisher.publish(stream).await
-//    stream.mapAsync(10)(publisher.publish).runForeach(_ => ()).await
-
-//    val queue = publisher.queue()
-//    stream.mapAsync(1)(queue.offer).runForeach(_ => ()).await
-//    queue.complete()
-//    queue.watchCompletion().await
-
-    sub.unsubscribe().await
-    seqF.await.map(_.eventId.id.toInt) shouldBe (1 to limit).toList
-  }
-
-  ignore("latency") {
-    val prefix    = Prefix("test.prefix")
-    val eventName = EventName("system")
-
-    def event: Event = SystemEvent(prefix, eventName)
-
-    val eventKey: EventKey = event.eventKey
-    redisSubscriber.subscribe(Set(eventKey)).runForeach { x =>
-      val begin = x.eventTime.time.toEpochMilli
-      println(System.currentTimeMillis() - begin)
-    }
-
-    Thread.sleep(10)
-
-    Source
-      .fromIterator(() => Iterator.continually(event))
-      .mapAsync(1)(redisPublisher.publish)
-      .runForeach(_ => ())
-      .await
-  }
-
 }

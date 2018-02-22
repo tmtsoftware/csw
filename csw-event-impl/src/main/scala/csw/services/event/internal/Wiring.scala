@@ -37,6 +37,6 @@ class Wiring(redisPort: Int = 6379) {
       .withBootstrapServers("localhost:6001")
       .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest")
 
-  lazy val kafkaPublisher  = new KafkaPublisher(producerSettings)
-  lazy val kafkaSubscriber = new KafkaSubscriber(consumerSettings)
+  lazy val kafkaPublisher  = new KafkaPublisher(producerSettings)(resumingMat)
+  lazy val kafkaSubscriber = new KafkaSubscriber(consumerSettings)(resumingMat)
 }
