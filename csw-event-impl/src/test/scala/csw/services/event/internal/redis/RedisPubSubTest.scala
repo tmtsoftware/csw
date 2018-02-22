@@ -3,7 +3,7 @@ package csw.services.event.internal.redis
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import com.github.sebruck.EmbeddedRedis
 import csw.messages.ccs.events.{Event, EventKey, EventName, SystemEvent}
-import csw.messages.params.models.{Id, Prefix}
+import csw.messages.params.models.Prefix
 import csw.services.event.helpers.PortHelper
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.internal.Wiring

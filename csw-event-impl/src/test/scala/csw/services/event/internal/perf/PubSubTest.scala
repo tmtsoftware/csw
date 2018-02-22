@@ -1,6 +1,6 @@
 package csw.services.event.internal.perf
 
-import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
+import akka.stream.scaladsl.{Sink, Source}
 import csw.messages.ccs.events.{Event, EventKey, EventName, SystemEvent}
 import csw.messages.params.models.{Id, Prefix}
 import csw.services.event.helpers.TestFutureExt.RichFuture
@@ -38,74 +38,30 @@ class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with Embe
   def makeEvent(x: Int): Event = SystemEvent(prefix, eventName).copy(eventId = Id(x.toString))
   val eventKey: EventKey       = makeEvent(0).eventKey
 
+  var counter = 0
+  private def eventGenerator() = {
+    counter += 1
+    makeEvent(counter)
+  }
+  private val eventStream = Source.repeat(()).map(_ => eventGenerator())
+
   ignore("redis-throughput-latency") {
-    perf(redisPublisher, redisSubscriber)
+    runPerf(redisPublisher, redisSubscriber)
   }
 
   ignore("kafka-throughput-latency") {
-    perf(kafkaPublisher, kafkaSubscriber)
+    runPerf(kafkaPublisher, kafkaSubscriber)
   }
 
-  private val buckets = List(3, 5, 7, 9)
-
-  private val monitor = Flow[Event].statefulMapConcat { () =>
-    var last      = 0
-    var count     = 0
-    val startTime = System.currentTimeMillis()
-    val latencies = collection.mutable.Map.empty[Long, Long].withDefaultValue(0)
-
-    x =>
-      val eventTime   = x.eventTime.time.toEpochMilli
-      val currentTime = System.currentTimeMillis
-      val latency     = currentTime - eventTime
-      val accTime     = currentTime - startTime
-
-      count += 1
-      val throughput = (count * 1000) / accTime
-
-      val currentId    = x.eventId.id.toInt
-      val isOutOfOrder = (currentId - last) < 1
-      last = currentId
-
-      buckets.foreach { x =>
-        if (latency <= x) {
-          latencies(x) += 1
-        }
-      }
-
-      val latencyStr = latencies.toList.sortBy(_._1).map {
-        case (k, v) =>
-          val percentile = v * 100.0 / count
-          s"${k}ms -> ${f"$percentile%2.2f"}"
-      }
-
-      if (isOutOfOrder) {
-        println(s"event_id=$currentId   throughput=$throughput    latency=$latencyStr   out of order!!!!")
-      } else if (currentId % 1000 == 0) {
-        println(s"event_id=$currentId   throughput=$throughput    latency=$latencyStr")
-      }
-
-      List(x)
-  }
-
-  def perf(publisher: EventPublisher, subscriber: EventSubscriber): Unit = {
-    val (sub, seqF) = subscriber.subscribe(Set(eventKey)).via(monitor).toMat(Sink.seq)(Keep.both).run()
+  def runPerf(publisher: EventPublisher, subscriber: EventSubscriber): Unit = {
+    //subscribe
+    val doneF = subscriber.subscribe(Set(eventKey)).via(Monitor.cumulative).runWith(Sink.ignore)
     Thread.sleep(1000)
 
-    var counter = 0
-    def eventGenerator() = {
-      counter += 1
-      makeEvent(counter)
-    }
+    eventStream.mapAsync(1)(publisher.publish).runWith(Sink.ignore)
+//    publisher.publish(eventStream)
+//    publisher.publish(eventGenerator, 5.millis)
 
-    val eventStream = Source.fromIterator(() => Iterator.from(1)).map(makeEvent).watchTermination()(Keep.right)
-
-//    publisher.publish(eventStream).await
-
-//    eventStream.mapAsync(1)(publisher.publish).runWith(Sink.ignore).await
-
-    val cancellable = publisher.publish(eventGenerator, 1.millis)
-    Thread.sleep(100000)
-    cancellable.cancel()
+    doneF.await
   }
 }

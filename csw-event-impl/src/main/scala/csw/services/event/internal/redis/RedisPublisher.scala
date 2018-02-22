@@ -1,9 +1,8 @@
 package csw.services.event.internal.redis
 
-import akka.actor.Cancellable
+import akka.Done
 import akka.stream._
-import akka.stream.scaladsl.{Sink, Source, SourceQueueWithComplete}
-import akka.{Done, NotUsed}
+import akka.stream.scaladsl.{Sink, Source}
 import csw.messages.ccs.events.{Event, EventKey}
 import csw.services.event.scaladsl.EventPublisher
 import io.lettuce.core.api.async.RedisAsyncCommands
@@ -11,7 +10,6 @@ import io.lettuce.core.{RedisClient, RedisURI}
 
 import scala.async.Async._
 import scala.compat.java8.FutureConverters.CompletionStageOps
-import scala.concurrent.duration.{DurationLong, FiniteDuration}
 import scala.concurrent.{ExecutionContext, Future}
 
 class RedisPublisher(redisClient: RedisClient, redisURI: RedisURI)(implicit ec: ExecutionContext, mat: Materializer)
