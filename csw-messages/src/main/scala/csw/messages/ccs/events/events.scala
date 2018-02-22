@@ -8,8 +8,7 @@ import csw_protobuf.parameter.PbParameter
 
 import scalapb.TypeMapper
 
-sealed trait Event {
-  self: ParameterSetType[_] ⇒
+sealed trait Event { self: ParameterSetType[_] ⇒
 
   def paramType: ParameterSetType[_] = self
 
@@ -29,9 +28,9 @@ sealed trait Event {
    */
   def typeName: String
 
-  def eventKey = EventKey(s"${source.prefix}.$eventName")
+  def eventKey: EventKey = EventKey(s"${source.prefix}.$eventName")
 
-  override def toString =
+  override def toString: String =
     s"$typeName(eventId=$eventId, source=$source, eventName=$eventName, eventTime=$eventTime, paramSet=$paramSet)"
 }
 
@@ -49,9 +48,9 @@ object Event {
   implicit def typeMapper[T <: Event]: TypeMapper[PbEvent, T] = new TypeMapper[PbEvent, T] {
     override def toCustom(base: PbEvent): T = {
       val factory: (Id, Prefix, EventName, EventTime, Set[Parameter[_]]) ⇒ Any = base.eventType match {
-        case PbEventType.SystemEvent      ⇒ SystemEvent.apply
-        case PbEventType.ObserveEvent     ⇒ ObserveEvent.apply
-        case PbEventType.Unrecognized(dd) ⇒ throw new RuntimeException(s"unknown event type=$dd")
+        case PbEventType.SystemEvent     ⇒ SystemEvent.apply
+        case PbEventType.ObserveEvent    ⇒ ObserveEvent.apply
+        case PbEventType.Unrecognized(x) ⇒ throw new RuntimeException(s"unknown event type=[${base.eventType.toString} :$x]")
       }
 
       factory(

@@ -5,6 +5,7 @@ import csw.messages.params.generics.KeyType
 import csw.messages.params.generics.KeyType.{ChoiceKey, StructKey}
 import csw.messages.params.models.Units.{arcmin, joule}
 import csw.messages.params.models._
+import csw_protobuf.events.PbEvent
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
 
 // DEOPSCSW-297: Merge protobuf branch in master
@@ -30,8 +31,10 @@ class ProtobufSerializationTest extends FunSpec with Matchers with BeforeAndAfte
       //able to generate protobuf from event
       ObserveEvent.fromPb(observeEvent.toPb) shouldBe observeEvent
 
+      Event.fromPb(PbEvent.parseFrom(observeEvent.toPb.toByteArray)) shouldBe a[ObserveEvent]
+
       //able to generate event from protobuf byteArray
-      ObserveEvent.fromPb(observeEvent.toPb) shouldBe observeEvent
+      Event.fromPb(PbEvent.parseFrom(observeEvent.toPb.toByteArray)) shouldBe observeEvent
     }
 
     it("should serialize SystemEvent") {
@@ -44,10 +47,15 @@ class ProtobufSerializationTest extends FunSpec with Matchers with BeforeAndAfte
 
       val param = structKey.set(struct).withUnits(joule)
 
-      val systemEvent1: SystemEvent = SystemEvent(prefix, eventName).add(param)
+      val systemEvent: SystemEvent = SystemEvent(prefix, eventName).add(param)
 
       //able to generate protobuf from event
-      SystemEvent.fromPb(systemEvent1.toPb) shouldBe systemEvent1
+      SystemEvent.fromPb(systemEvent.toPb) shouldBe systemEvent
+
+      Event.fromPb(PbEvent.parseFrom(systemEvent.toPb.toByteArray)) shouldBe a[SystemEvent]
+
+      //able to generate event from protobuf byteArray
+      Event.fromPb(PbEvent.parseFrom(systemEvent.toPb.toByteArray)) shouldBe systemEvent
     }
   }
 }

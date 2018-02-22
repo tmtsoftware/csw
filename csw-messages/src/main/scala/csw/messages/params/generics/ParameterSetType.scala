@@ -44,10 +44,7 @@ abstract class ParameterSetType[T <: ParameterSetType[T]] extends TMTSerializabl
    */
   def add[P <: Parameter[_]](parameter: P): T = doAdd(this, parameter)
 
-  private def doAdd[P <: Parameter[_]](c: T, parameter: P): T = {
-    val paramSetRemoved: T = removeByKeyname(c, parameter.keyName)
-    create(paramSetRemoved.paramSet + parameter)
-  }
+  private def doAdd[P <: Parameter[_]](c: T, parameter: P): T = create(removeByKeyname(c, parameter.keyName).paramSet + parameter)
 
   /**
    * Adds several parameters to the parameter set
@@ -60,8 +57,7 @@ abstract class ParameterSetType[T <: ParameterSetType[T]] extends TMTSerializabl
   def madd[P <: Parameter[_]](parametersToAdd: P*): T = madd(parametersToAdd.toSet)
 
   //madd ensures check for duplicate key
-  def madd[P <: Parameter[_]](parametersToAdd: Set[P]): T =
-    parametersToAdd.foldLeft(this)((c, parameter) => doAdd(c, parameter))
+  def madd[P <: Parameter[_]](parametersToAdd: Set[P]): T = parametersToAdd.foldLeft(this)((c, parameter) => doAdd(c, parameter))
 
   /**
    * Returns an Option with the parameter for the key if found, otherwise None
@@ -78,8 +74,8 @@ abstract class ParameterSetType[T <: ParameterSetType[T]] extends TMTSerializabl
   }
   def jGet[S](keyName: String, keyType: KeyType[S]): util.Optional[Parameter[S]] = get(keyName, keyType).asJava
 
-  def find[S](parameter: Parameter[S]): Option[Parameter[S]] =
-    get(parameter.keyName, parameter.keyType)
+  def find[S](parameter: Parameter[S]): Option[Parameter[S]] = get(parameter.keyName, parameter.keyType)
+
   def jFind[S](parameter: Parameter[S]): util.Optional[Parameter[S]] = find(parameter).asJava
 
   /**
