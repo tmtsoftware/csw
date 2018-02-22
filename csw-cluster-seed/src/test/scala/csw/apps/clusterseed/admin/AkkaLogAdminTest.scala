@@ -13,7 +13,7 @@ import csw.apps.clusterseed.admin.http.HttpSupport
 import csw.apps.clusterseed.admin.internal.AdminWiring
 import csw.apps.clusterseed.utils.AdminLogTestSuite
 import csw.common.FrameworkAssertions.assertThatContainerIsRunning
-import csw.commons.tags.ClasspathSensitive
+import csw.commons.tags.LoggingSystemSensitive
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.messages.CommandMessage.Oneway
 import csw.messages.ContainerCommonMessage.GetComponents
@@ -36,7 +36,7 @@ import scala.collection.JavaConverters.mapAsScalaMapConverter
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
 
-@ClasspathSensitive
+@LoggingSystemSensitive
 class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
 
   private val adminWiring: AdminWiring = AdminWiring.make(ClusterAwareSettings.onPort(3652), Some(7879))

@@ -10,7 +10,6 @@ import com.typesafe.config.ConfigFactory
 import csw.apps.clusterseed.admin.http.HttpSupport
 import csw.apps.clusterseed.admin.internal.AdminWiring
 import csw.apps.clusterseed.utils.AdminLogTestSuite
-import csw.commons.tags.ClasspathSensitive
 import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.config.server.commons.{ConfigServiceConnection, TestFileUtils}
 import csw.services.config.server.{ServerWiring, Settings}
@@ -24,7 +23,6 @@ import scala.collection.JavaConverters.mapAsScalaMapConverter
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
 
-@ClasspathSensitive
 class HttpLogAdminTest extends AdminLogTestSuite with HttpSupport {
 
   private val adminWiring: AdminWiring = AdminWiring.make(ClusterAwareSettings.onPort(3653), Some(7888))

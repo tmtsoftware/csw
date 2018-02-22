@@ -3,10 +3,8 @@ package csw.services.tracklocation.models
 import java.io.File
 import java.nio.file.Paths
 
-import csw.commons.tags.ClasspathSensitive
 import org.scalatest.{FunSuite, Matchers}
 
-@ClasspathSensitive
 class CommandTest extends FunSuite with Matchers {
 
   test("testParse with no options should return command with default values") {

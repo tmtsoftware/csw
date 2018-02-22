@@ -28,7 +28,7 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
  * @param host             host name (to log).
  * @param system           actor system which will be used to create log actors
  */
-class LoggingSystem(name: String, version: String, host: String, system: ActorSystem) {
+class LoggingSystem(name: String, version: String, host: String, val system: ActorSystem) {
 
   import LoggingLevels._
 

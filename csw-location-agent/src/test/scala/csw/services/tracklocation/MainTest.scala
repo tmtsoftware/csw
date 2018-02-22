@@ -5,7 +5,6 @@ import java.nio.file.Paths
 
 import akka.typed.ActorRef
 import com.typesafe.config.ConfigFactory
-import csw.commons.tagobjects.ClasspathSensitive
 import csw.messages.location.Connection.TcpConnection
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
@@ -38,7 +37,7 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterAll with Before
     testWith(args, name, port)
   }
 
-  test("Test with config file", ClasspathSensitive) {
+  test("Test with config file") {
     val name       = "test2"
     val url        = getClass.getResource("/test2.conf")
     val configFile = Paths.get(url.toURI).toFile

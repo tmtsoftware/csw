@@ -10,7 +10,7 @@ import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
 import com.twitter.chill.akka.AkkaSerializer
-import csw.commons.tagobjects.ClasspathSensitive
+import csw.commons.tagobjects.FileSystemSensitive
 import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
 import csw.messages.ComponentMessage
 import csw.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
@@ -61,7 +61,7 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
       setupSerializer.fromBinary(setupBytes) shouldBe setup
     }
 
-    it("should serialize Observe", ClasspathSensitive) {
+    it("should serialize Observe", FileSystemSensitive) {
       val keyName                        = "imageKey"
       val imageKey: Key[ArrayData[Byte]] = ByteArrayKey.make(keyName)
 

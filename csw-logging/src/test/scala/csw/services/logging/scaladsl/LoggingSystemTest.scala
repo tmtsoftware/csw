@@ -18,9 +18,7 @@ class LoggingSystemTest extends FunSuite with Matchers with BeforeAndAfterAll {
   private val loggingSystem = LoggingSystemFactory.start()
   private val config        = ConfigFactory.load().getConfig("csw-logging")
 
-  override protected def afterAll(): Unit =
-    Await.result(loggingSystem.stop, 10.seconds)
-  //  Await.result(system.terminate(), 20 seconds)
+  override protected def afterAll(): Unit = Await.result(loggingSystem.system.terminate(), 20.seconds)
 
   test("should load default log level provided in configuration file") {
     loggingSystem.getDefaultLogLevel.default.name shouldBe config

@@ -2,7 +2,7 @@ package csw.services.config.client.scaladsl
 
 import java.nio.file.Paths
 
-import csw.commons.tagobjects.ClasspathSensitive
+import csw.commons.tagobjects.FileSystemSensitive
 import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.config.api.exceptions.InvalidInput
 import csw.services.config.api.models.{ConfigData, FileType}
@@ -53,7 +53,7 @@ class ConfigAdminApiTest extends ConfigServiceTest {
   // DEOPSCSW-27: Storing binary component configurations
   // DEOPSCSW-81: Storing large files in the configuration service
   // DEOPSCSW-131: Detect and handle oversize files
-  test("should be able to store and retrieve binary file in annex dir", ClasspathSensitive) {
+  test("should be able to store and retrieve binary file in annex dir", FileSystemSensitive) {
     val fileName   = "smallBinary.bin"
     val path       = Paths.get(getClass.getClassLoader.getResource(fileName).toURI)
     val configData = ConfigData.fromPath(path)

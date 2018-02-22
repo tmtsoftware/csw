@@ -3,7 +3,7 @@ package csw.messages.params.generics
 import java.nio.file.{Files, Paths}
 import java.time.Instant
 
-import csw.commons.tagobjects.ClasspathSensitive
+import csw.commons.tagobjects.FileSystemSensitive
 import csw.messages.params.generics.KeyType.{
   ByteArrayKey,
   ByteMatrixKey,
@@ -191,7 +191,7 @@ class KeyParameterTest extends FunSpec with Matchers {
     }
 
     // DEOPSCSW-186: Binary value payload
-    it("should able to create parameter representing binary image", ClasspathSensitive) {
+    it("should able to create parameter representing binary image", FileSystemSensitive) {
       val keyName                        = "imageKey"
       val imageKey: Key[ArrayData[Byte]] = ByteArrayKey.make(keyName)
 

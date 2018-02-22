@@ -15,7 +15,7 @@ import csw.common.FrameworkAssertions._
 import csw.common.components.framework.SampleComponentHandlers
 import csw.common.components.framework.SampleComponentState._
 import csw.common.utils.TestAppender
-import csw.commons.tags.ClasspathSensitive
+import csw.commons.tags.LoggingSystemSensitive
 import csw.framework.internal.component.ComponentBehavior
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.messages.SupervisorContainerCommonMessages.Shutdown
@@ -38,7 +38,7 @@ import scala.concurrent.duration.DurationLong
 // DEOPSCSW-167: Creation and Deployment of Standalone Components
 // DEOPSCSW-177: Hooks for lifecycle management
 // DEOPSCSW-216: Locate and connect components to send AKKA commands
-@ClasspathSensitive
+@LoggingSystemSensitive
 class StandaloneComponentTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
   // ActorSystem for testing. This acts as a seed node
@@ -82,8 +82,7 @@ class StandaloneComponentTest extends FunSuite with Matchers with BeforeAndAfter
 
     val supervisorCommandService = new CommandService(resolvedAkkaLocation)
 
-    val (_, akkaProbe) =
-      locationService.track(akkaConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
+    val (_, akkaProbe) = locationService.track(akkaConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
     akkaProbe.requestNext() shouldBe a[LocationUpdated]
 
     // on shutdown, component unregisters from location service
