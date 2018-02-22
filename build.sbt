@@ -32,8 +32,7 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
   `csw-benchmark`,
   `integration`,
   `sequencer-prototype`,
-  `examples`,
-  `acceptance-tests`
+  `examples`
 )
 
 lazy val githubReleases: Seq[ProjectReference] = Seq(
