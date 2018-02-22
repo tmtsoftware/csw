@@ -9,12 +9,14 @@ import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
 
 class ComponentBehaviorFactoryForCommand extends ComponentBehaviorFactory {
-  protected override def handlers(ctx: ActorContext[TopLevelActorMessage],
-                                  componentInfo: ComponentInfo,
-                                  commandResponseManager: CommandResponseManager,
-                                  currentStatePublisher: CurrentStatePublisher,
-                                  locationService: LocationService,
-                                  loggerFactory: LoggerFactory): ComponentHandlers =
+  protected override def handlers(
+      ctx: ActorContext[TopLevelActorMessage],
+      componentInfo: ComponentInfo,
+      commandResponseManager: CommandResponseManager,
+      currentStatePublisher: CurrentStatePublisher,
+      locationService: LocationService,
+      loggerFactory: LoggerFactory
+  ): ComponentHandlers =
     new ComponentHandlerForCommand(
       ctx,
       componentInfo,
@@ -26,12 +28,14 @@ class ComponentBehaviorFactoryForCommand extends ComponentBehaviorFactory {
 }
 
 class McsAssemblyBehaviorFactory extends ComponentBehaviorFactory {
-  protected override def handlers(ctx: ActorContext[TopLevelActorMessage],
-                                  componentInfo: ComponentInfo,
-                                  commandResponseManager: CommandResponseManager,
-                                  currentStatePublisher: CurrentStatePublisher,
-                                  locationService: LocationService,
-                                  loggerFactory: LoggerFactory): ComponentHandlers =
+  protected override def handlers(
+      ctx: ActorContext[TopLevelActorMessage],
+      componentInfo: ComponentInfo,
+      commandResponseManager: CommandResponseManager,
+      currentStatePublisher: CurrentStatePublisher,
+      locationService: LocationService,
+      loggerFactory: LoggerFactory
+  ): ComponentHandlers =
     new McsAssemblyComponentHandlers(
       ctx,
       componentInfo,
@@ -43,11 +47,13 @@ class McsAssemblyBehaviorFactory extends ComponentBehaviorFactory {
 }
 
 class McsHcdBehaviorFactory extends ComponentBehaviorFactory {
-  protected override def handlers(ctx: ActorContext[TopLevelActorMessage],
-                                  componentInfo: ComponentInfo,
-                                  commandResponseManager: CommandResponseManager,
-                                  currentStatePublisher: CurrentStatePublisher,
-                                  locationService: LocationService,
-                                  loggerFactory: LoggerFactory): ComponentHandlers =
+  protected override def handlers(
+      ctx: ActorContext[TopLevelActorMessage],
+      componentInfo: ComponentInfo,
+      commandResponseManager: CommandResponseManager,
+      currentStatePublisher: CurrentStatePublisher,
+      locationService: LocationService,
+      loggerFactory: LoggerFactory
+  ): ComponentHandlers =
     new McsHcdComponentHandlers(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, loggerFactory)
 }

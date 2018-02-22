@@ -9,7 +9,7 @@ import csw.framework.FrameworkTestSuite
 import csw.messages.CommandMessage.Submit
 import csw.messages.CommandResponseManagerMessage.{AddOrUpdateCommand, Query, Subscribe, Unsubscribe}
 import csw.messages.SupervisorLockMessage.{Lock, Unlock}
-import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, NotAllowed}
+import csw.messages.ccs.commands.CommandResponse.{Accepted, NotAllowed}
 import csw.messages.ccs.commands.{CommandName, CommandResponse, Setup}
 import csw.messages.framework.SupervisorLifecycleState
 import csw.messages.models

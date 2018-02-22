@@ -86,8 +86,8 @@ class McsAssemblyComponentHandlers(
         // shortSetup takes 1 second to finish
         // mediumSetup takes 3 seconds to finish
         processCommand(longSetup)
-        processCommand(mediumSetup)
         processCommand(shortSetup)
+        processCommand(mediumSetup)
 
         //#subscribe-to-command-response-manager
         // subscribe to the status of original command received and publish the state when its status changes to
@@ -102,11 +102,11 @@ class McsAssemblyComponentHandlers(
         //#subscribe-to-command-response-manager
 
         //#query-command-response-manager
-        // publish the current status of the component based on the current status of a command
+        // query CommandResponseManager to get the current status of Command, for example: Accepted/Completed/Invalid etc.
         commandResponseManager
           .query(controlCommand.runId)
           .map(
-            _ ⇒ currentStatePublisher.publish(CurrentState(controlCommand.source, Set(choiceKey.set(longRunningCurrentStatus))))
+            _ ⇒ () // may choose to publish current state to subscribers or do other operations
           )
       //#query-command-response-manager
 
