@@ -20,8 +20,7 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-commons`,
   `integration`,
   `examples`,
-  `sequencer-prototype`,
-  `acceptance-tests`
+  `sequencer-prototype`
 )
 
 lazy val unidocExclusions: Seq[ProjectReference] = Seq(
@@ -244,23 +243,4 @@ lazy val `sequencer-prototype` = project
   .disablePlugins(BintrayPlugin)
   .settings(
     libraryDependencies ++= Dependencies.SequencerPrototype
-  )
-
-lazy val `acceptance-tests` = project
-  .dependsOn(
-    `csw-cluster-seed` % "compile->test",
-    `csw-location` % "compile->test",
-    `csw-location-agent` % "compile->test",
-    `csw-config-server` % "compile->test",
-    `csw-config-client` % "compile->test",
-    `csw-config-client-cli` % "compile->test",
-    `csw-framework` % "compile->test",
-    `csw-messages` % "compile->test",
-    `csw-event-impl` % "compile->test",
-    `examples` % "compile->test",
-    `csw-commons` % "compile->test"
-  )
-  .enablePlugins(PublishTests)
-  .settings(
-    libraryDependencies ++= Dependencies.AcceptanceTests
   )
