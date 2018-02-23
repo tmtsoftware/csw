@@ -5,21 +5,23 @@ import akka.stream.scaladsl.Flow
 import csw.messages.ccs.events.Event
 
 object Monitor {
-  private val buckets = List(3, 5, 7, 9)
+  private val buckets = List(3, 5, 7)
 
   val cumulative: Flow[Event, Event, NotUsed] = flow(cumulative = true)
   val resetting: Flow[Event, Event, NotUsed]  = flow(cumulative = false)
 
   private def flow(cumulative: Boolean) = Flow[Event].statefulMapConcat { () =>
-    var lastId = 0
+    val mode = if (cumulative) "Cumulative" else "Resetting"
+    println(s"--------starting run in $mode----------")
 
-    var printTime = 0L
-    var count     = 0
-
-    var startTime       = System.currentTimeMillis()
-    var latencies       = newMap()
+    var lastId          = 0
+    var printTime       = 0L
+    var count           = 0
     var outOfOrderCount = 0
     var lastCurrentId   = 0
+
+    var startTime = System.currentTimeMillis()
+    var latencies = newMap()
 
     event =>
       val eventTime    = event.eventTime.time.toEpochMilli
@@ -44,7 +46,7 @@ object Monitor {
         }
       }
 
-      def throughput = if (accTime != 0) ((count * 1000) / accTime).toString else "unknown"
+      def throughput(cnt: Int) = if (accTime != 0) ((cnt * 1000) / accTime).toString else "unknown"
 
       def latenciesStr = latencies.toList.sortBy(_._1).map {
         case (k, v) =>
@@ -55,7 +57,9 @@ object Monitor {
       def droppedCount = (currentId - lastCurrentId) - count
 
       if (shouldPrint) {
-        println(s"throughput:$throughput    latencies:$latenciesStr     out-of-order:$outOfOrderCount     dropped:$droppedCount")
+        println(
+          s"throughput:${throughput(count)}   latencies:$latenciesStr   out-of-order:$outOfOrderCount   dropThroughput:${throughput(droppedCount)}"
+        )
         if (cumulative) {
           printTime = accTime
         } else {
