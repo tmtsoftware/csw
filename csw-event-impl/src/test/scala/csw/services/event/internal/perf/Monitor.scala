@@ -4,11 +4,14 @@ import akka.NotUsed
 import akka.stream.scaladsl.Flow
 import csw.messages.ccs.events.Event
 
+import scala.collection.mutable
+
 object Monitor {
-  private val buckets = List(3, 5, 7)
 
   val cumulative: Flow[Event, Event, NotUsed] = flow(cumulative = true)
   val resetting: Flow[Event, Event, NotUsed]  = flow(cumulative = false)
+
+  val step = 2000
 
   private def flow(cumulative: Boolean) = Flow[Event].statefulMapConcat { () =>
     val mode = if (cumulative) "Cumulative" else "Resetting"
@@ -28,7 +31,7 @@ object Monitor {
       val currentTime  = System.currentTimeMillis
       val latency      = currentTime - eventTime
       val accTime      = currentTime - startTime
-      val shouldPrint  = (accTime - printTime) > 2000
+      val shouldPrint  = (accTime - printTime) > step
       val currentId    = event.eventId.id.toInt
       val isOutOfOrder = (currentId - lastId) < 1
 
@@ -40,18 +43,14 @@ object Monitor {
         outOfOrderCount += 1
       }
 
-      buckets.foreach { x =>
-        if (latency <= x) {
-          latencies(x) += 1
-        }
-      }
+      latencies(latency) += 1
 
       def throughput(cnt: Int) = if (accTime != 0) ((cnt * 1000) / accTime).toString else "unknown"
 
-      def latenciesStr = latencies.toList.sortBy(_._1).map {
-        case (k, v) =>
-          val percentile = v * 100.0 / count
-          s"${k}ms -> ${f"$percentile%2.2f"}"
+      def latenciesStr = {
+        val percentiles    = Latency.accumulate(latencies).map(_.percentile(count))
+        val stdPercentiles = Percentile.selectStdDeviations(percentiles)
+        stdPercentiles.map(p => s"${f"${p.percentile}%2.1f"} -> ${p.latency}ms").mkString("(", ", ", ")")
       }
 
       def droppedCount = (currentId - lastCurrentId) - count
@@ -74,6 +73,34 @@ object Monitor {
       List(event)
   }
 
-  private def newMap() = collection.mutable.Map.empty[Long, Long].withDefaultValue(0)
+  private def newMap() = mutable.Map.empty[Long, Long].withDefaultValue(0)
 
+}
+
+case class Latency(latency: Long, count: Long) {
+  def +(other: Latency): Latency          = Latency(other.latency, count + other.count)
+  def percentile(total: Long): Percentile = Percentile(latency, count * 100.0 / total)
+}
+
+object Latency {
+  def accumulate(latencies: mutable.Map[Long, Long]): List[Latency] =
+    latencies
+      .map { case (lat, cnt) => Latency(lat, cnt) }
+      .toList
+      .sortBy(_.latency)
+      .scanLeft(Latency(0, 0))(_ + _)
+}
+
+case class Percentile(latency: Long, percentile: Double)
+
+object Percentile {
+  private val standardDeviations = List(95.5, 99.7, 100)
+
+  def selectStdDeviations(percentiles: List[Percentile]): List[Percentile] =
+    standardDeviations
+      .foldLeft(List.empty[Percentile]) { (ps, std) =>
+        val maybeP = percentiles.dropWhile(_.percentile < std).headOption
+        maybeP.map(_.copy(percentile = std)).toList ::: ps
+      }
+      .reverse
 }
