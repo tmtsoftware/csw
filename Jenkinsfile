@@ -101,5 +101,5 @@ def sendNotification(String buildStatus = 'STARTED') {
             )
     }
 
-    slackSend(color: colorCode, message: summary)
+    slackSend(channel: "#csw-build", color: colorCode, message: summary)
 }
