@@ -27,13 +27,13 @@ import scala.async.Async._
 import scala.concurrent.Future
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 
-private[location] class LocationServiceImpl(cswCluster: CswCluster) extends LocationService {
+class LocationServiceImpl private[location] (cswCluster: CswCluster) extends LocationService { //TODO: update doc
   outer ⇒
 
-  val log: Logger = LocationServiceLogger.getLogger
+  private val log: Logger = LocationServiceLogger.getLogger
 
   import cswCluster._
-  implicit val timeout: Timeout = Timeout(5.seconds)
+  private implicit val timeout: Timeout = Timeout(5.seconds)
 
   /**
    * Register a 'connection -> location' entry in CRDT

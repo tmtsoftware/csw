@@ -14,7 +14,7 @@ import csw.services.logging.scaladsl.Logger
  *
  * @param locationService is used to unregister Actors that are no more alive
  */
-class DeathwatchActor(locationService: LocationService) {
+class DeathwatchActor private[location] (locationService: LocationService) { //TODO: update doc
   import DeathwatchActor.Msg
 
   /**
@@ -23,7 +23,7 @@ class DeathwatchActor(locationService: LocationService) {
    *
    * @see [[akka.actor.Terminated]]
    */
-  def behavior(watchedLocations: Set[Location]): Behavior[Msg] =
+  private[location] def behavior(watchedLocations: Set[Location]): Behavior[Msg] =
     Actor.immutable[Msg] { (context, changeMsg) ⇒
       val log: Logger = LocationServiceLogger.getLogger(context)
 
@@ -67,9 +67,9 @@ class DeathwatchActor(locationService: LocationService) {
     }
 }
 
-object DeathwatchActor {
+private[location] object DeathwatchActor {
 
-  val log: Logger = LocationServiceLogger.getLogger
+  private val log: Logger = LocationServiceLogger.getLogger
 
   import akka.typed.scaladsl.adapter._
   //message type handled by the for the typed deathwatch actor

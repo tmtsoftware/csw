@@ -6,7 +6,7 @@ import akka.cluster.Cluster
 import akka.cluster.ClusterEvent._
 import csw.services.location.commons.ClusterConfirmationActor.{HasJoinedCluster, IsMemberUp}
 
-class ClusterConfirmationActor extends Actor {
+private[location] class ClusterConfirmationActor extends Actor { //TODO: add doc
 
   val cluster = Cluster(context.system)
 
@@ -25,7 +25,7 @@ class ClusterConfirmationActor extends Actor {
 
 }
 
-object ClusterConfirmationActor {
+private[location] object ClusterConfirmationActor {
   def props(): Props = Props(new ClusterConfirmationActor)
 
   case object HasJoinedCluster

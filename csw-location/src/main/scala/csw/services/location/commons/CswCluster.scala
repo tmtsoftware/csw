@@ -24,7 +24,7 @@ import scala.util.control.NonFatal
  */
 class CswCluster private (_actorSystem: ActorSystem) {
 
-  val log: Logger = LocationServiceLogger.getLogger
+  private val log: Logger = LocationServiceLogger.getLogger
 
   /**
    * Identifies the hostname where ActorSystem is running
@@ -39,7 +39,7 @@ class CswCluster private (_actorSystem: ActorSystem) {
   /**
    * Gives the replicator for the current ActorSystem
    */
-  val replicator: ActorRef = DistributedData(actorSystem).replicator
+  private[location] val replicator: ActorRef = DistributedData(actorSystem).replicator
 
   /**
    * Gives handle to CoordinatedShutdown extension
@@ -49,13 +49,13 @@ class CswCluster private (_actorSystem: ActorSystem) {
   /**
    * Creates an ActorMaterializer for current ActorSystem
    */
-  def makeMat(): Materializer = ActorMaterializer()
+  private def makeMat(): Materializer = ActorMaterializer()
 
   /**
    * Starts cluster HTTP management service.
    */
   // $COVERAGE-OFF$
-  private def startClusterManagement(): Unit = {
+  private def startClusterManagement(): Unit = { //TODO: add doc
     val startManagement = actorSystem.settings.config.getBoolean("startManagement")
     if (startManagement) {
       val clusterHttpManagement = ClusterHttpManagement(cluster)
@@ -90,7 +90,7 @@ class CswCluster private (_actorSystem: ActorSystem) {
   /**
    * Ensures that data replication is started in Location service cluster by matching replica count with Up members.
    */
-  private def ensureReplication(): Unit = {
+  private def ensureReplication(): Unit = { //TODO: add doc
     implicit val timeout = Timeout(5.seconds)
     import akka.pattern.ask
     def replicaCountF = (replicator ? GetReplicaCount).mapTo[ReplicaCount]
@@ -118,7 +118,7 @@ class CswCluster private (_actorSystem: ActorSystem) {
  */
 object CswCluster {
 
-  val log: Logger = LocationServiceLogger.getLogger
+  private val log: Logger = LocationServiceLogger.getLogger
 
   //do not use the dying actorSystem's dispatcher for scheduling actions after its death.
 
@@ -137,7 +137,7 @@ object CswCluster {
   /**
    * Creates CswCluster with the given ActorSystem
    */
-  def withSystem(actorSystem: ActorSystem): CswCluster = {
+  def withSystem(actorSystem: ActorSystem): CswCluster = { //TODO: add doc
     val cswCluster = new CswCluster(actorSystem)
     try {
       cswCluster.startClusterManagement()

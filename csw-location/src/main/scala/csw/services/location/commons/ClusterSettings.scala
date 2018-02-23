@@ -50,7 +50,7 @@ import scala.collection.JavaConverters._
  *  - the `ClusterSettings` api of providing values should be used for testing purpose only.
  *
  */
-case class ClusterSettings(clusterName: String = Constants.ClusterName, values: Map[String, Any] = Map.empty) {
+case class ClusterSettings(clusterName: String = Constants.ClusterName, values: Map[String, Any] = Map.empty) { //TODO: update doc
   val log: Logger       = LocationServiceLogger.getLogger
   val InterfaceNameKey  = "interfaceName"
   val ClusterSeedsKey   = "clusterSeeds"
@@ -99,7 +99,7 @@ case class ClusterSettings(clusterName: String = Constants.ClusterName, values: 
   private[location] def port: Int = allValues.getOrElse(ClusterPortKey, 0).toString.toInt
 
   //Get the managementPort to start akka cluster management service.
-  def managementPort: Option[Any] = allValues.get(ManagementPortKey)
+  private[location] def managementPort: Option[Any] = allValues.get(ManagementPortKey)
 
   //Prepare a list of seedNodes provided via clusterSeeds
   def seedNodes: List[String] = {
@@ -108,7 +108,7 @@ case class ClusterSettings(clusterName: String = Constants.ClusterName, values: 
   }
 
   //Prepare config for ActorSystem to join csw-cluster
-  def config: Config = {
+  private[location] def config: Config = {
     val computedValues: Map[String, Any] = Map(
       "akka.remote.netty.tcp.hostname"        → hostname,
       "akka.remote.netty.tcp.port"            → port,

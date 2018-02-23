@@ -16,7 +16,7 @@ import scala.concurrent.duration.DurationDouble
  * @tparam K The type of distributed data key
  * @tparam V The type of ReplicatedData
  */
-class Registry[K <: Key[V], V <: ReplicatedData](val Key: K, val EmptyValue: V) {
+class Registry[K <: Key[V], V <: ReplicatedData] private[location] (val Key: K, val EmptyValue: V) {
 
   type Value = V
 
@@ -26,7 +26,7 @@ class Registry[K <: Key[V], V <: ReplicatedData](val Key: K, val EmptyValue: V) 
    * @see [[akka.cluster.ddata.Replicator.Update]]
    * @param f A callback function which is passed to Replicator.Update
    */
-  def update(f: V ⇒ V, initialValue: V = EmptyValue): Update[V] =
+  private[location] def update(f: V ⇒ V, initialValue: V = EmptyValue): Update[V] =
     Update(Key, initialValue, WriteMajority(5.seconds))(f)
 
   /**
@@ -34,7 +34,7 @@ class Registry[K <: Key[V], V <: ReplicatedData](val Key: K, val EmptyValue: V) 
    *
    * @see [[akka.cluster.ddata.Replicator.Get]]
    */
-  def get: Get[V] = Get(Key, ReadLocal)
+  private[location] def get: Get[V] = Get(Key, ReadLocal)
 
   /**
    * Creates a get message for replicator and it ensures that data is read and merged from a majority of replicas,
@@ -42,10 +42,10 @@ class Registry[K <: Key[V], V <: ReplicatedData](val Key: K, val EmptyValue: V) 
    *
    * @see [[akka.cluster.ddata.Replicator.Get]]
    */
-  def getByMajority: Get[V] = Get(Key, ReadMajority(5.seconds))
+  private[location] def getByMajority: Get[V] = Get(Key, ReadMajority(5.seconds))
 }
 
-object Registry {
+private[location] object Registry {
 
   /**
    * AllServices is a distributed map from connection to location.
@@ -70,5 +70,4 @@ object Registry {
         Key = LWWRegisterKey(connection.name),
         EmptyValue = LWWRegister(Option.empty)
       )
-
 }

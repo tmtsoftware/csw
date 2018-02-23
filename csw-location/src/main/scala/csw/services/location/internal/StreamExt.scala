@@ -22,7 +22,7 @@ object StreamExt {
     /**
      * Deduplicate identical elements that consecutively appear in a stream
      */
-    def distinctUntilChanged: Source[Out, Mat] =
+    private[location] def distinctUntilChanged: Source[Out, Mat] =
       source
         .map(Option.apply)
         .prepend(Source.single(None))

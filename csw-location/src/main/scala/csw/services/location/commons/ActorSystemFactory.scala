@@ -12,7 +12,7 @@ import csw.services.logging.scaladsl.Logger
  */
 object ActorSystemFactory {
 
-  val log: Logger = LocationServiceLogger.getLogger
+  private val log: Logger = LocationServiceLogger.getLogger
 
   /**
    * Create an ActorSystem with `Constants.RemoteActorSystemName` as componentName
