@@ -45,11 +45,11 @@ class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with Embe
   }
   private val eventStream = Source.repeat(()).map(_ => eventGenerator())
 
-  ignore("redis-throughput-latency") {
+  test("redis-throughput-latency") {
     runPerf(redisPublisher, redisSubscriber)
   }
 
-  ignore("kafka-throughput-latency") {
+  test("kafka-throughput-latency") {
     runPerf(kafkaPublisher, kafkaSubscriber)
   }
 

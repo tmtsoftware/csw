@@ -1,9 +1,8 @@
 package csw.services.event.internal.redis
 
 import akka.Done
-import akka.stream.scaladsl.{Keep, Sink, Source}
+import akka.stream.scaladsl.{Keep, Source}
 import akka.stream.{KillSwitches, Materializer}
-import akka.typed.ActorRef
 import csw.messages.ccs.events.{Event, EventKey}
 import csw.services.event.scaladsl.{EventSubscriber, EventSubscription}
 import io.lettuce.core.{RedisClient, RedisURI}
@@ -13,7 +12,8 @@ import scala.async.Async._
 import scala.compat.java8.FutureConverters.CompletionStageOps
 import scala.concurrent.{ExecutionContext, Future}
 
-class RedisSubscriber(redisClient: RedisClient, redisURI: RedisURI)(implicit ec: ExecutionContext, mat: Materializer)
+class RedisSubscriber(redisClient: RedisClient, redisURI: RedisURI)(implicit ec: ExecutionContext,
+                                                                    protected val mat: Materializer)
     extends EventSubscriber { outer =>
 
   override def subscribe(eventKeys: Set[EventKey]): Source[Event, EventSubscription] = {
@@ -41,10 +41,4 @@ class RedisSubscriber(redisClient: RedisClient, redisURI: RedisURI)(implicit ec:
           }
       }
   }
-
-  override def subscribe(eventKeys: Set[EventKey], callback: Event => Unit): EventSubscription =
-    subscribe(eventKeys).to(Sink.foreach(callback)).run()
-
-  override def subscribe(eventKeys: Set[EventKey], actorRef: ActorRef[Event]): EventSubscription =
-    subscribe(eventKeys, event => actorRef ! event)
 }

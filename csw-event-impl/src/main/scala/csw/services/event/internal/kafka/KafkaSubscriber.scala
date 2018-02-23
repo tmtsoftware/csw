@@ -13,7 +13,7 @@ import org.apache.kafka.common.TopicPartition
 
 import scala.concurrent.Future
 
-class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(implicit mat: Materializer)
+class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(implicit protected val mat: Materializer)
     extends EventSubscriber {
 
   override def subscribe(eventKeys: Set[EventKey]): Source[Event, EventSubscription] = {
@@ -27,11 +27,4 @@ class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(i
         }
       }
   }
-
-  override def subscribe(eventKeys: Set[EventKey], callback: Event => Unit): EventSubscription =
-    subscribe(eventKeys).to(Sink.foreach(callback)).run()
-
-  override def subscribe(eventKeys: Set[EventKey], actorRef: ActorRef[Event]): EventSubscription =
-    subscribe(eventKeys, event => actorRef ! event)
-
 }
