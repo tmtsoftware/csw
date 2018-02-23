@@ -52,10 +52,14 @@ class StandaloneComponentTest extends FunSuite with Matchers with BeforeAndAfter
   private val hcdActorSystem: actor.ActorSystem = ClusterSettings().joinLocal(3553).system
 
   // all log messages will be captured in log buffer
-  private val logBuffer          = mutable.Buffer.empty[JsonObject]
-  private val testAppender       = new TestAppender(x ⇒ logBuffer += JsonOps.Json(x.toString).asInstanceOf[JsonObject])
-  private lazy val loggingSystem = new LoggingSystem("standalone", "1.0", "localhost", seedActorSystem)
-  loggingSystem.setAppenders(List(testAppender))
+  private val logBuffer                    = mutable.Buffer.empty[JsonObject]
+  private val testAppender                 = new TestAppender(x ⇒ logBuffer += JsonOps.Json(x.toString).asInstanceOf[JsonObject])
+  private var loggingSystem: LoggingSystem = _
+
+  override protected def beforeAll(): Unit = {
+    loggingSystem = new LoggingSystem("standalone", "1.0", "localhost", seedActorSystem)
+    loggingSystem.setAppenders(List(testAppender))
+  }
 
   override protected def afterAll(): Unit = Await.result(seedActorSystem.terminate(), 5.seconds)
 

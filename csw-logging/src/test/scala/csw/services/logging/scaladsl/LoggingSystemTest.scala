@@ -7,6 +7,7 @@ import com.typesafe.config.ConfigFactory
 import csw.services.logging.appenders.{FileAppender, StdOutAppender}
 import csw.services.logging.exceptions.AppenderNotFoundException
 import csw.services.logging.internal.LoggingLevels.Level
+import csw.services.logging.internal.LoggingSystem
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.concurrent.Await
@@ -15,8 +16,10 @@ import scala.concurrent.duration.DurationDouble
 class LoggingSystemTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
   // This will load default configuration in application.conf file if provided
-  private val loggingSystem = LoggingSystemFactory.start()
-  private val config        = ConfigFactory.load().getConfig("csw-logging")
+  private var loggingSystem: LoggingSystem = _
+  private val config                       = ConfigFactory.load().getConfig("csw-logging")
+
+  override protected def beforeAll(): Unit = loggingSystem = LoggingSystemFactory.start()
 
   override protected def afterAll(): Unit = Await.result(loggingSystem.system.terminate(), 20.seconds)
 

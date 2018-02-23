@@ -57,10 +57,12 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
   private val startLoggingCmd           = CommandName("StartLogging")
   private val prefix                    = Prefix("iris.command")
 
-  private val loggingSystem = LoggingSystemFactory.start("logging", "version", hostName, adminWiring.actorSystem)
-  loggingSystem.setAppenders(List(testAppender))
+  private var loggingSystem: LoggingSystem = _
 
   override protected def beforeAll(): Unit = {
+    loggingSystem = LoggingSystemFactory.start("logging", "version", hostName, adminWiring.actorSystem)
+    loggingSystem.setAppenders(List(testAppender))
+
     logBuffer.clear()
     Await.result(adminWiring.adminHttpService.registeredLazyBinding, 5.seconds)
 

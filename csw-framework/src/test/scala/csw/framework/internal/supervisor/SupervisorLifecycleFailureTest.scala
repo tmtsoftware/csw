@@ -51,10 +51,14 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
   var runAnswer: Answer[Future[Unit]]                                    = _
 
   // all log messages will be captured in log buffer
-  private val logBuffer          = mutable.Buffer.empty[JsonObject]
-  private val testAppender       = new TestAppender(x ⇒ logBuffer += JsonOps.Json(x.toString).asInstanceOf[JsonObject])
-  private lazy val loggingSystem = new LoggingSystem("sup-failure", "1.0", "localhost", untypedSystem)
-  loggingSystem.setAppenders(List(testAppender))
+  private val logBuffer                    = mutable.Buffer.empty[JsonObject]
+  private val testAppender                 = new TestAppender(x ⇒ logBuffer += JsonOps.Json(x.toString).asInstanceOf[JsonObject])
+  private var loggingSystem: LoggingSystem = _
+
+  override protected def beforeAll(): Unit = {
+    loggingSystem = new LoggingSystem("sup-failure", "1.0", "localhost", untypedSystem)
+    loggingSystem.setAppenders(List(testAppender))
+  }
 
   override protected def afterEach(): Unit = logBuffer.clear()
 
