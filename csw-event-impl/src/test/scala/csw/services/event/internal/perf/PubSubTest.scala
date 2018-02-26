@@ -4,7 +4,7 @@ import akka.stream.scaladsl.{Sink, Source}
 import csw.messages.ccs.events.{Event, EventKey, EventName, SystemEvent}
 import csw.messages.params.models.{Id, Prefix}
 import csw.services.event.helpers.TestFutureExt.RichFuture
-import csw.services.event.internal.Wiring
+import csw.services.event.internal.{DroppingThrottleStage, Wiring}
 import csw.services.event.scaladsl.{EventPublisher, EventSubscriber}
 import net.manub.embeddedkafka.EmbeddedKafka
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
@@ -54,13 +54,17 @@ class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with Embe
   }
 
   def runPerf(publisher: EventPublisher, subscriber: EventSubscriber): Unit = {
-    //subscribe
-    val doneF = subscriber.subscribe(Set(eventKey)).via(Monitor.cumulative).runWith(Sink.ignore)
+    val doneF = subscriber
+      .subscribe(Set(eventKey))
+      .via(new DroppingThrottleStage(20.millis))
+      .via(Monitor.resetting)
+      .runWith(Sink.ignore)
+
     Thread.sleep(1000)
 
-    eventStream.mapAsync(1)(publisher.publish).runWith(Sink.ignore)
+//    eventStream.mapAsync(1)(publisher.publish).runWith(Sink.ignore)
 //    publisher.publish(eventStream)
-//    publisher.publish(eventGenerator, 5.millis)
+    publisher.publish(eventGenerator, 5.millis)
 
     doneF.await
   }
