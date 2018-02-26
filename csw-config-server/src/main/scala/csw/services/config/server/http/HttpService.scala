@@ -33,9 +33,9 @@ class HttpService(
 
   import actorRuntime._
 
-  val log: Logger = ConfigServerLogger.getLogger
+  private val log: Logger = ConfigServerLogger.getLogger
 
-  lazy val registeredLazyBinding: Future[(ServerBinding, RegistrationResult)] = async {
+  lazy val registeredLazyBinding: Future[(ServerBinding, RegistrationResult)] = async { //TODO: add doc
     val binding            = await(bind())
     val registrationResult = await(register(binding))
 

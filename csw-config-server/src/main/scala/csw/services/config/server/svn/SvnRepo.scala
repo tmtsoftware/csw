@@ -27,7 +27,7 @@ import scala.concurrent.Future
  * @param blockingIoDispatcher      dispatcher to be used for blocking operations
  */
 class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
-  val log: Logger = ConfigServerLogger.getLogger
+  private val log: Logger = ConfigServerLogger.getLogger
 
   private implicit val _blockingIoDispatcher: MessageDispatcher = blockingIoDispatcher
 
@@ -66,6 +66,7 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
 
   // Adds the given file (and dir if needed) to svn.
   // See http://svn.svnkit.com/repos/svnkit/tags/1.3.5/doc/examples/src/org/tmatesoft/svn/examples/repository/Commit.java.
+  //TODO: add more explanation
   def addFile(path: Path, comment: String, data: InputStream): Future[SVNCommitInfo] = Future {
     val svn = svnHandle()
     try {
@@ -106,6 +107,7 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
 
   // Modifies the contents of the given file in the repository.
   // See http://svn.svnkit.com/repos/svnkit/tags/1.3.5/doc/examples/src/org/tmatesoft/svn/examples/repository/Commit.java.
+  //TODO: add more explanation
   def modifyFile(path: Path, comment: String, data: InputStream) = Future {
     val svn = svnHandle()
     try {
@@ -124,6 +126,7 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
     }
   }
 
+  //TODO: update doc
   def delete(path: Path, comment: String): Future[SVNCommitInfo] = Future {
     val svnOperationFactory = new SvnOperationFactory()
     try {
@@ -136,6 +139,7 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
     }
   }
 
+  //TODO: update doc
   def list(fileType: Option[FileType] = None, pattern: Option[String] = None): Future[List[SVNDirEntry]] = Future {
     val svnOperationFactory = new SvnOperationFactory()
     // svn always stores file in the repo without '/' prefix.
@@ -164,6 +168,7 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
     }
   }
 
+  //TODO: update doc
   def hist(path: Path, from: Instant, to: Instant, maxResults: Int): Future[List[SVNLogEntry]] = Future {
     val clientManager = SVNClientManager.newInstance()
     var logEntries    = List[SVNLogEntry]()

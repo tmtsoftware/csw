@@ -21,9 +21,9 @@ class AnnexFileService(settings: Settings, fileRepo: AnnexFileRepo, actorRuntime
 
   import actorRuntime._
 
-  val log: Logger = ConfigServerLogger.getLogger
+  private val log: Logger = ConfigServerLogger.getLogger
 
-  def post(configData: ConfigData): Future[String] = async {
+  def post(configData: ConfigData): Future[String] = async { //TODO: add doc
     log.debug("Creating temporary file and calculating it's sha")
     val (tempFilePath, sha) = await(saveAndSha(configData))
 
@@ -51,7 +51,7 @@ class AnnexFileService(settings: Settings, fileRepo: AnnexFileRepo, actorRuntime
     }
   }
 
-  def get(sha: String): Future[Option[ConfigData]] = async {
+  def get(sha: String): Future[Option[ConfigData]] = async { //TODO: add doc
     val repoFilePath = makePath(settings.`annex-files-dir`, sha)
 
     log.debug(s"Checking if annex file exists at ${repoFilePath.toString}")
@@ -77,11 +77,11 @@ class AnnexFileService(settings: Settings, fileRepo: AnnexFileRepo, actorRuntime
    * @param path the file to check
    * @return true if the file is valid
    */
-  def validate(id: String, path: Path): Future[Boolean] = async {
+  private def validate(id: String, path: Path): Future[Boolean] = async {
     id == await(Sha1.fromPath(path))
   }
 
-  def saveAndSha(configData: ConfigData): Future[(Path, String)] = async {
+  private def saveAndSha(configData: ConfigData): Future[(Path, String)] = async { //TODO: add doc
     val path = await(fileRepo.createTempFile("config-service-overize-", ".tmp"))
     val (resultF, shaF) = configData.source
       .alsoToMat(FileIO.toPath(path))(Keep.right)

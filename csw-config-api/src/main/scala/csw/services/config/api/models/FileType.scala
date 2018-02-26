@@ -9,7 +9,7 @@ import scala.collection.immutable
  */
 sealed abstract class FileType extends EnumEntry with Serializable
 
-object FileType extends Enum[FileType] {
+private[csw] object FileType extends Enum[FileType] {
   override def values: immutable.IndexedSeq[FileType] = findValues
 
   /**

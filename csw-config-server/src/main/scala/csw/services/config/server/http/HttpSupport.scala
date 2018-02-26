@@ -19,8 +19,8 @@ import csw.services.logging.scaladsl.Logger
 /**
  * Helper class for ConfigServiceRoute
  */
-trait HttpSupport extends Directives with JsonSupport {
-  val log: Logger = ConfigServerLogger.getLogger
+trait HttpSupport extends Directives with JsonSupport { //TODO: update doc
+  private val log: Logger = ConfigServerLogger.getLogger
 
   def prefix(prefix: String): Directive1[Path] = path(prefix / Remaining).flatMap { path =>
     validate(PathValidator.isValid(path), PathValidator.message(path)).tmap[Path] { _ =>

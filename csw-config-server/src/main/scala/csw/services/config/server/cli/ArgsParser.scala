@@ -6,7 +6,7 @@ import csw.services.BuildInfo
  * Parses the command line options using `scopt` library.
  */
 class ArgsParser {
-  val parser = new scopt.OptionParser[Options]("scopt") {
+  private val parser = new scopt.OptionParser[Options]("scopt") {
     head(BuildInfo.name, BuildInfo.version)
 
     opt[Unit]("initRepo") action { (x, c) =>

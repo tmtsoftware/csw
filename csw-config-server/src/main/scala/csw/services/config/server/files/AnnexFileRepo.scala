@@ -12,7 +12,7 @@ import scala.concurrent.Future
  */
 class AnnexFileRepo(blockingIoDispatcher: MessageDispatcher) {
 
-  private implicit val _blockingIoDispatcher = blockingIoDispatcher
+  private implicit val _blockingIoDispatcher: MessageDispatcher = blockingIoDispatcher
 
   def exists(path: Path): Future[Boolean]         = Future(Files.exists(path))
   def delete(path: Path): Future[Unit]            = Future(Files.delete(path))

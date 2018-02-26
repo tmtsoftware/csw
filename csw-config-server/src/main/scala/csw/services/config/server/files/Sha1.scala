@@ -11,7 +11,7 @@ import csw.services.config.api.models.ConfigData
 import scala.concurrent.Future
 
 /**
- * Generated SHA1 for file represented as stream
+ * Generated SHA1 for file represented as stream //TODO: update doc
  */
 object Sha1 {
 
@@ -25,7 +25,7 @@ object Sha1 {
     fromSource(FileIO.fromPath(path))
 
   //Keep this a def so that the digester is created anew each time.
-  def sink: Sink[ByteString, Future[String]] = {
+  def sink: Sink[ByteString, Future[String]] = { //TODO: add doc
     val sha1Digester = MessageDigest.getInstance("SHA-1")
     Flow[ByteString]
       .fold(sha1Digester) { (digester, bs) =>

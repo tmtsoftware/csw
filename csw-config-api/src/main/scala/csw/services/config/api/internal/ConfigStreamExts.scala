@@ -9,7 +9,7 @@ import scala.concurrent.{Future, Promise}
 /**
  * Extensions on akka streams
  */
-object ConfigStreamExts {
+private[config] object ConfigStreamExts {
 
   /**
    * RichSource adds extra features on akka streams

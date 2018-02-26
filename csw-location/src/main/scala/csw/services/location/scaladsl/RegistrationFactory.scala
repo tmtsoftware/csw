@@ -5,7 +5,7 @@ import csw.messages.location.Connection.AkkaConnection
 import csw.services.location.models.AkkaRegistration
 import csw.services.logging.internal.LogControlMessages
 
-class RegistrationFactory(logAdminActorRef: ActorRef[LogControlMessages]) {
+class RegistrationFactory(logAdminActorRef: ActorRef[LogControlMessages]) { //TODO: add doc
   def akkaTyped(
       akkaConnection: AkkaConnection,
       prefix: String,

@@ -4,6 +4,7 @@ import java.util.regex.Pattern
 
 object PathValidator {
 
+  //TODO: add doc
   private val invalidChars   = "!#<>$%&'@^`~+,;=\\s"
   private val invalidPattern = Pattern.compile(s"[$invalidChars]+")
 

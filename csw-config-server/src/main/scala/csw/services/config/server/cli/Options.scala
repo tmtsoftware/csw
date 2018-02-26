@@ -4,4 +4,4 @@ package csw.services.config.server.cli
 case class Options(
     initRepo: Boolean = false,
     port: Option[Int] = None
-)
+) //TODO: update doc

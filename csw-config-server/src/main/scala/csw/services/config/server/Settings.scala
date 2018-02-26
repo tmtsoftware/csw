@@ -8,7 +8,7 @@ import org.tmatesoft.svn.core.SVNURL
 
 /**
  * Represents the runtime configuration
- * @param config
+ * @param config //TODO: add more explanation
  */
 class Settings(config: Config) {
 

@@ -25,8 +25,9 @@ import scala.concurrent.Future
  * @param configServiceResolver       ConfigServiceResolver to get the uri of Configuration Service
  * @param actorRuntime                ActorRuntime instance for actor system, execution context and dispatcher
  */
-class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: ActorRuntime) extends ConfigService {
-  val log: Logger = ConfigClientLogger.getLogger
+class ConfigClient private[config] (configServiceResolver: ConfigServiceResolver, actorRuntime: ActorRuntime)
+    extends ConfigService {
+  private val log: Logger = ConfigClientLogger.getLogger
 
   //Importing JsonSupport using an object to prevent JsonSupport methods appearing in ConfigClient scala documentation
   private object JsonSupport extends JsonSupport
@@ -46,24 +47,23 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     await(configServiceResolver.uri).withPath(path)
   }
 
-  override def create(path: jnio.Path, configData: ConfigData, annex: Boolean, comment: String): Future[ConfigId] =
-    async {
-      val (prefix, stitchedSource) = configData.source.prefixAndStitch(1)
-      val isAnnex                  = if (annex) annex else BinaryUtils.isBinary(await(prefix))
-      val uri                      = await(configUri(path)).withQuery(Query("annex" → isAnnex.toString, "comment" → comment))
-      val entity                   = HttpEntity(ContentTypes.`application/octet-stream`, configData.length, stitchedSource)
+  override def create(path: jnio.Path, configData: ConfigData, annex: Boolean, comment: String): Future[ConfigId] = async {
+    val (prefix, stitchedSource) = configData.source.prefixAndStitch(1)
+    val isAnnex                  = if (annex) annex else BinaryUtils.isBinary(await(prefix))
+    val uri                      = await(configUri(path)).withQuery(Query("annex" → isAnnex.toString, "comment" → comment))
+    val entity                   = HttpEntity(ContentTypes.`application/octet-stream`, configData.length, stitchedSource)
 
-      val request = HttpRequest(HttpMethods.POST, uri = uri, entity = entity)
-      log.info("Sending HTTP request", Map("request" → request.toString()))
-      val response = await(Http().singleRequest(request))
+    val request = HttpRequest(HttpMethods.POST, uri = uri, entity = entity)
+    log.info("Sending HTTP request", Map("request" → request.toString()))
+    val response = await(Http().singleRequest(request))
 
-      await(
-        handleResponse(response) {
-          case StatusCodes.Created  ⇒ Unmarshal(response).to[ConfigId]
-          case StatusCodes.Conflict ⇒ throw FileAlreadyExists(path)
-        }
-      )
-    }
+    await(
+      handleResponse(response) {
+        case StatusCodes.Created  ⇒ Unmarshal(response).to[ConfigId]
+        case StatusCodes.Conflict ⇒ throw FileAlreadyExists(path)
+      }
+    )
+  }
 
   override def update(path: jnio.Path, configData: ConfigData, comment: String): Future[ConfigId] = async {
     val entity = HttpEntity(ContentTypes.`application/octet-stream`, configData.length, configData.source)
@@ -125,22 +125,21 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     )
   }
 
-  override def list(fileType: Option[FileType] = None, pattern: Option[String] = None): Future[List[ConfigFileInfo]] =
-    async {
-      val uri =
-        await(listUri).withQuery(Query(fileType.map("type" → _.entryName).toMap ++ pattern.map("pattern" → _).toMap))
+  override def list(fileType: Option[FileType] = None, pattern: Option[String] = None): Future[List[ConfigFileInfo]] = async {
+    val uri =
+      await(listUri).withQuery(Query(fileType.map("type" → _.entryName).toMap ++ pattern.map("pattern" → _).toMap))
 
-      val request = HttpRequest(uri = uri)
-      log.info("Sending HTTP request", Map("request" → request.toString()))
-      val response = await(Http().singleRequest(request))
+    val request = HttpRequest(uri = uri)
+    log.info("Sending HTTP request", Map("request" → request.toString()))
+    val response = await(Http().singleRequest(request))
 
-      await(
-        handleResponse(response) {
-          case StatusCodes.OK ⇒ Unmarshal(response).to[List[ConfigFileInfo]]
-        }
-      )
+    await(
+      handleResponse(response) {
+        case StatusCodes.OK ⇒ Unmarshal(response).to[List[ConfigFileInfo]]
+      }
+    )
 
-    }
+  }
 
   override def history(path: jnio.Path, from: Instant, to: Instant, maxResults: Int): Future[List[ConfigFileRevision]] =
     handleHistory(historyUri(path), from, to, maxResults)
@@ -221,6 +220,26 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     )
   }
 
+  private def handleHistory(
+      uri: Future[Uri],
+      from: Instant,
+      to: Instant,
+      maxResults: Int
+  ): Future[List[ConfigFileRevision]] = async {
+    val _uri =
+      await(uri).withQuery(Query("maxResults" → maxResults.toString, "from" → from.toString, "to" → to.toString))
+
+    val request = HttpRequest(uri = _uri)
+    log.info("Sending HTTP request", Map("request" → request.toString()))
+    val response = await(Http().singleRequest(request))
+
+    await(
+      handleResponse(response) {
+        case StatusCodes.OK ⇒ Unmarshal(response).to[List[ConfigFileRevision]]
+      }
+    )
+  }
+
   private def handleResponse[T](response: HttpResponse)(pf: PartialFunction[StatusCode, Future[T]]): Future[T] = {
     def contentF = Unmarshal(response).to[ErrorResponse]
 
@@ -248,25 +267,4 @@ class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: A
     val handler = pf.orElse(defaultHandler)
     handler(response.status)
   }
-
-  private def handleHistory(
-      uri: Future[Uri],
-      from: Instant,
-      to: Instant,
-      maxResults: Int
-  ): Future[List[ConfigFileRevision]] = async {
-    val _uri =
-      await(uri).withQuery(Query("maxResults" → maxResults.toString, "from" → from.toString, "to" → to.toString))
-
-    val request = HttpRequest(uri = _uri)
-    log.info("Sending HTTP request", Map("request" → request.toString()))
-    val response = await(Http().singleRequest(request))
-
-    await(
-      handleResponse(response) {
-        case StatusCodes.OK ⇒ Unmarshal(response).to[List[ConfigFileRevision]]
-      }
-    )
-  }
-
 }

@@ -13,7 +13,7 @@ import scala.util.control.NonFatal
  * Maps server side exceptions to Http Status codes
  */
 class ConfigHandlers extends Directives with JsonRejectionHandler {
-  val log: Logger = ConfigServerLogger.getLogger
+  private val log: Logger = ConfigServerLogger.getLogger
 
   val jsonExceptionHandler: ExceptionHandler = ExceptionHandler {
     case ex: FileAlreadyExists ⇒

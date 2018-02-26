@@ -15,7 +15,7 @@ import scala.concurrent.duration.DurationDouble
  * Application object to start the ConfigServer from command line.
  */
 class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) {
-  val log: Logger = ConfigServerLogger.getLogger
+  private val log: Logger = ConfigServerLogger.getLogger
 
   def start(args: Array[String]): Option[HttpService] =
     new ArgsParser().parse(args).map {
@@ -43,8 +43,6 @@ class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) {
 
 // $COVERAGE-OFF$
 object Main extends App {
-  val log: Logger = ConfigServerLogger.getLogger
-
   if (ClusterAwareSettings.seedNodes.isEmpty) {
     println(
       "clusterSeeds setting is not specified either as env variable or system property. Please check online documentation for this set-up."

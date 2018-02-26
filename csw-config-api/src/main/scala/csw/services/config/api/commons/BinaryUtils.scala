@@ -5,7 +5,7 @@ import akka.util.ByteString
 /**
  * Utils for binary data
  */
-object BinaryUtils {
+private[config] object BinaryUtils {
 
   /**
    * Identifies if the sequence of ByteString can be treated as binary

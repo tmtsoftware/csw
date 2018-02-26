@@ -19,21 +19,22 @@ import scala.concurrent.Future
 class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorRuntime: ActorRuntime, svnRepo: SvnRepo)
     extends ConfigService {
 
+  //TODO: add doc for all methods explaining logic
+
   import actorRuntime._
 
-  val log: Logger = ConfigServerLogger.getLogger
+  private val log: Logger = ConfigServerLogger.getLogger
 
-  override def create(path: Path, configData: ConfigData, annex: Boolean, comment: String = ""): Future[ConfigId] =
-    async {
-      // If the file already exists in the repo, throw exception
-      if (await(exists(path))) {
-        throw FileAlreadyExists(path)
-      }
-
-      val id = await(createFile(path, configData, annex, comment))
-      await(setActiveVersion(path, id, "initializing active file with the first version"))
-      id
+  override def create(path: Path, configData: ConfigData, annex: Boolean, comment: String = ""): Future[ConfigId] = async {
+    // If the file already exists in the repo, throw exception
+    if (await(exists(path))) {
+      throw FileAlreadyExists(path)
     }
+
+    val id = await(createFile(path, configData, annex, comment))
+    await(setActiveVersion(path, id, "initializing active file with the first version"))
+    id
+  }
 
   private def createFile(path: Path, configData: ConfigData, annex: Boolean = false, comment: String): Future[ConfigId] = {
 
@@ -91,29 +92,24 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
     }
   }
 
-  private def get(path: Path, configId: Option[ConfigId] = None) =
-    async {
-      val svnRevision = await(svnRepo.svnRevision(configId.map(_.id.toLong)))
+  private def get(path: Path, configId: Option[ConfigId] = None) = async {
+    val svnRevision = await(svnRepo.svnRevision(configId.map(_.id.toLong)))
 
-      await(pathStatus(path, configId)) match {
-        case PathStatus.NormalSize ⇒
-          log.info(s"Getting normal file at path ${path.toString}")
-          await(getNormalSize(path, svnRevision))
-        case PathStatus.Annex ⇒
-          log.info(s"Getting annex file at path ${path.toString}")
-          await(getAnnex(path, svnRevision))
-        case PathStatus.Missing ⇒ None
-      }
+    await(pathStatus(path, configId)) match {
+      case PathStatus.NormalSize ⇒
+        log.info(s"Getting normal file at path ${path.toString}")
+        await(getNormalSize(path, svnRevision))
+      case PathStatus.Annex ⇒
+        log.info(s"Getting annex file at path ${path.toString}")
+        await(getAnnex(path, svnRevision))
+      case PathStatus.Missing ⇒ None
     }
-  // If the file exists in the repo, get data of its latest revision
-  override def getLatest(path: Path): Future[Option[ConfigData]] = {
-    get(path)
   }
+  // If the file exists in the repo, get data of its latest revision
+  override def getLatest(path: Path): Future[Option[ConfigData]] = get(path)
 
   // If the version specified by configId for the file exists in the repo, get its data
-  override def getById(path: Path, configId: ConfigId): Future[Option[ConfigData]] = {
-    get(path, Some(configId))
-  }
+  override def getById(path: Path, configId: ConfigId): Future[Option[ConfigData]] = get(path, Some(configId))
 
   override def getByTime(path: Path, time: Instant): Future[Option[ConfigData]] = {
 
@@ -148,40 +144,37 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
     }
   }
 
-  override def list(fileType: Option[FileType] = None, pattern: Option[String] = None): Future[List[ConfigFileInfo]] =
-    async {
-      await(svnRepo.list(fileType, pattern)).map { entry =>
-        ConfigFileInfo(Paths.get(entry.getRelativePath), ConfigId(entry.getRevision), entry.getCommitMessage)
-      }
+  override def list(fileType: Option[FileType] = None, pattern: Option[String] = None): Future[List[ConfigFileInfo]] = async {
+    await(svnRepo.list(fileType, pattern)).map { entry =>
+      ConfigFileInfo(Paths.get(entry.getRelativePath), ConfigId(entry.getRevision), entry.getCommitMessage)
     }
+  }
 
-  override def history(path: Path, from: Instant, to: Instant, maxResults: Int): Future[List[ConfigFileRevision]] =
-    async {
-      await(pathStatus(path)) match {
-        case PathStatus.NormalSize ⇒
-          log.info(s"Fetching history for normal file for path ${path.toString}")
-          await(hist(path, from, to, maxResults))
-        case PathStatus.Annex ⇒
-          log.info(s"Fetching history for annex file for path ${path.toString}")
-          await(hist(shaFilePath(path), from, to, maxResults))
-        case PathStatus.Missing ⇒ throw FileNotFound(path)
-      }
+  override def history(path: Path, from: Instant, to: Instant, maxResults: Int): Future[List[ConfigFileRevision]] = async {
+    await(pathStatus(path)) match {
+      case PathStatus.NormalSize ⇒
+        log.info(s"Fetching history for normal file for path ${path.toString}")
+        await(hist(path, from, to, maxResults))
+      case PathStatus.Annex ⇒
+        log.info(s"Fetching history for annex file for path ${path.toString}")
+        await(hist(shaFilePath(path), from, to, maxResults))
+      case PathStatus.Missing ⇒ throw FileNotFound(path)
     }
+  }
 
-  override def historyActive(path: Path, from: Instant, to: Instant, maxResults: Int): Future[List[ConfigFileRevision]] =
-    async {
-      val activePath = activeFilePath(path)
+  override def historyActive(path: Path, from: Instant, to: Instant, maxResults: Int): Future[List[ConfigFileRevision]] = async {
+    val activePath = activeFilePath(path)
 
-      if (await(exists(activePath))) {
+    if (await(exists(activePath))) {
 
-        val configFileRevisions = await(hist(activePath, from, to, maxResults))
+      val configFileRevisions = await(hist(activePath, from, to, maxResults))
 
-        val history = Future.sequence(configFileRevisions.map(historyActiveRevisions(activePath, _)))
+      val history = Future.sequence(configFileRevisions.map(historyActiveRevisions(activePath, _)))
 
-        await(history)
-      } else
-        throw FileNotFound(path)
-    }
+      await(history)
+    } else
+      throw FileNotFound(path)
+  }
 
   override def setActiveVersion(path: Path, id: ConfigId, comment: String = ""): Future[Unit] = async {
     if (!await(exists(path, Some(id)))) {
@@ -246,11 +239,10 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
                    settings.`max-content-length`)
   }
 
-  private def historyActiveRevisions(path: Path, configFileRevision: ConfigFileRevision): Future[ConfigFileRevision] =
-    async {
-      val configData = await(getById(path, configFileRevision.id))
-      ConfigFileRevision(ConfigId(await(configData.get.toStringF)), configFileRevision.comment, configFileRevision.time)
-    }
+  private def historyActiveRevisions(path: Path, configFileRevision: ConfigFileRevision): Future[ConfigFileRevision] = async {
+    val configData = await(getById(path, configFileRevision.id))
+    ConfigFileRevision(ConfigId(await(configData.get.toStringF)), configFileRevision.comment, configFileRevision.time)
+  }
 
   private def pathStatus(path: Path, id: Option[ConfigId] = None): Future[PathStatus] = async {
     val revision = id.map(_.id.toLong)
@@ -273,19 +265,18 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
    * @param comment    an optional comment to associate with this file
    * @return a future unique id that can be used to refer to the file
    */
-  private def put(path: Path, configData: ConfigData, update: Boolean, comment: String): Future[ConfigId] =
-    async {
-      val inputStream = configData.toInputStream
+  private def put(path: Path, configData: ConfigData, update: Boolean, comment: String): Future[ConfigId] = async {
+    val inputStream = configData.toInputStream
 
-      val commitInfo = if (update) {
-        log.info(s"Updating normal file at path ${path.toString}")
-        await(svnRepo.modifyFile(path, comment, inputStream))
-      } else {
-        log.info(s"Creating normal file at path ${path.toString}")
-        await(svnRepo.addFile(path, comment, inputStream))
-      }
-      ConfigId(commitInfo.getNewRevision)
+    val commitInfo = if (update) {
+      log.info(s"Updating normal file at path ${path.toString}")
+      await(svnRepo.modifyFile(path, comment, inputStream))
+    } else {
+      log.info(s"Creating normal file at path ${path.toString}")
+      await(svnRepo.addFile(path, comment, inputStream))
     }
+    ConfigId(commitInfo.getNewRevision)
+  }
 
   // Returns the current version of the file, if known
   private def getCurrentVersion(path: Path): Future[Option[ConfigId]] = async {
