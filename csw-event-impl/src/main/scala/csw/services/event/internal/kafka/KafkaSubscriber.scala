@@ -4,8 +4,7 @@ import akka.Done
 import akka.kafka.scaladsl.Consumer
 import akka.kafka.{ConsumerSettings, Subscriptions}
 import akka.stream.Materializer
-import akka.stream.scaladsl.{Sink, Source}
-import akka.typed.ActorRef
+import akka.stream.scaladsl.Source
 import csw.messages.ccs.events.{Event, EventKey}
 import csw.services.event.scaladsl.{EventSubscriber, EventSubscription}
 import csw_protobuf.events.PbEvent

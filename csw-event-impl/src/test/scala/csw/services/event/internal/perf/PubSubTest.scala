@@ -55,8 +55,7 @@ class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with Embe
 
   def runPerf(publisher: EventPublisher, subscriber: EventSubscriber): Unit = {
     val doneF = subscriber
-      .subscribe(Set(eventKey))
-      .via(new DroppingThrottleStage(20.millis))
+      .subscribe(Set(eventKey), 20.millis)
       .via(Monitor.resetting)
       .runWith(Sink.ignore)
 

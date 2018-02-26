@@ -1,7 +1,7 @@
 package csw.services.event.internal
 
-import akka.stream.{Attributes, FlowShape, Inlet, Outlet}
 import akka.stream.stage._
+import akka.stream.{Attributes, FlowShape, Inlet, Outlet}
 
 import scala.concurrent.duration.FiniteDuration
 
