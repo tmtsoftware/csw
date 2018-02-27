@@ -12,12 +12,13 @@ import scala.collection.mutable
 /**
  *This class is used to allow the logs logged using SLF4J API to be routed to logback that in turn sends Slf4j messages to the common log.
  */
+//TODO: explain better significance
 private[logging] class Slf4jAppender[E]() extends UnsynchronizedAppenderBase[E] with AppenderAttachable[E] {
   import csw.services.logging.internal.LoggingLevels._
 
-  val log: Logger = GenericLoggerFactory.getLogger
+  private val log: Logger = GenericLoggerFactory.getLogger
 
-  val appenders: mutable.HashSet[Appender[E]] = scala.collection.mutable.HashSet[Appender[E]]()
+  private val appenders: mutable.HashSet[Appender[E]] = scala.collection.mutable.HashSet[Appender[E]]()
 
   def detachAndStopAllAppenders(): Unit = {}
 

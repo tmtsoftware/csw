@@ -12,12 +12,13 @@ import scala.compat.java8.OptionConverters.{RichOptionForJava8, RichOptionalGene
  */
 sealed trait Command { self: ParameterSetType[_] ⇒
 
-  def paramType: ParameterSetType[_] = self
+  def paramType: ParameterSetType[_] = self //TODO: explain more about why do we need paramType as self type
 
   /**
    * A name identifying the type of parameter set, such as "setup", "observe".
    * This is used in the JSON and toString output.
    */
+  //TODO: explain more about why do we need typeName in JSON
   def typeName: String
 
   /**
@@ -35,9 +36,13 @@ sealed trait Command { self: ParameterSetType[_] ⇒
    */
   val source: Prefix
 
+  //TODO: add doc
   val commandName: CommandName
 
+  //TODO: add doc
   val maybeObsId: Option[ObsId]
+
+  //TODO: add doc
   def jMaybeObsId: Optional[ObsId] = maybeObsId.asJava
 
   override def toString =
@@ -47,12 +52,14 @@ sealed trait Command { self: ParameterSetType[_] ⇒
 /**
  * Trait for sequence parameter sets
  */
+//TODO: explain what are Sequence Commands
 sealed trait SequenceCommand extends Command { self: ParameterSetType[_] ⇒
 }
 
 /**
  * Marker trait for control parameter sets
  */
+//TODO: explain what are Control Commands
 sealed trait ControlCommand extends Command { self: ParameterSetType[_] ⇒
 }
 
@@ -72,9 +79,11 @@ case class Setup private (
     with SequenceCommand
     with ControlCommand {
 
+  //TODO: add doc
   def this(source: Prefix, commandName: CommandName, maybeObsId: Optional[ObsId]) =
     this(Id(), source, commandName, maybeObsId.asScala, Set.empty)
 
+  //TODO: add doc why we need create and from where it is coming
   override protected def create(data: Set[Parameter[_]]): Setup = copy(runId = Id(), paramSet = data)
 }
 
@@ -93,6 +102,7 @@ object Setup {
   def apply(source: Prefix, commandName: CommandName, maybeObsId: Option[ObsId]): Setup =
     apply(Id(), source, commandName, maybeObsId, Set.empty)
 
+  //TODO: add doc
   def apply(source: Prefix, commandName: CommandName, maybeObsId: Option[ObsId], paramSet: Set[Parameter[_]]): Setup =
     apply(source, commandName, maybeObsId).madd(paramSet)
 }
@@ -113,9 +123,11 @@ case class Observe private (
     with SequenceCommand
     with ControlCommand {
 
+  //TODO: add doc
   def this(source: Prefix, commandName: CommandName, maybeObsId: Optional[ObsId]) =
     this(Id(), source, commandName, maybeObsId.asScala, Set.empty)
 
+  //TODO: add doc why we need create and from where it is coming
   override protected def create(data: Set[Parameter[_]]): Observe = copy(runId = Id(), paramSet = data)
 }
 

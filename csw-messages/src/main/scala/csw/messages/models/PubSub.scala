@@ -3,6 +3,7 @@ package csw.messages.models
 import akka.typed.ActorRef
 import csw.messages.TMTSerializable
 
+//TODO: what, why, how
 sealed trait PubSub[T] extends TMTSerializable
 object PubSub {
   sealed trait SubscriberMessage[T]           extends PubSub[T]

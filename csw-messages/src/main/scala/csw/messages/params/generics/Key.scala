@@ -21,6 +21,7 @@ case class Key[S: Format: ClassTag: ItemsFactory] private[generics] (keyName: St
 
   def this(keyName: String, keyType: KeyType[S]) = this(keyName, keyType, NoUnits)
 
+  //TODO: add doc
   def set(v: Array[S], units: Units = NoUnits): Parameter[S] = Parameter(keyName, keyType, v, units)
 
   /**
@@ -85,6 +86,7 @@ case class Key[S: Format: ClassTag: ItemsFactory] private[generics] (keyName: St
    */
   override def toString: String = keyName
 
+  //TODO: add doc
   override def equals(that: Any): Boolean = {
     that match {
       case that: Key[S] => this.keyName == that.keyName
@@ -92,5 +94,6 @@ case class Key[S: Format: ClassTag: ItemsFactory] private[generics] (keyName: St
     }
   }
 
+  //TODO: add doc
   override def hashCode: Int = _hashCode(this)
 }

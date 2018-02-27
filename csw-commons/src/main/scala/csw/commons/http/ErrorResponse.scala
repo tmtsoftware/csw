@@ -2,6 +2,7 @@ package csw.commons.http
 
 import play.api.libs.json.{Json, OFormat}
 
+//TODO: add more explanation
 // Two classes are used just to wrap status code and error message inside "error" key in json representation
 case class ErrorResponse(error: ErrorMessage)
 case object ErrorResponse {

@@ -14,6 +14,7 @@ import scala.compat.java8.OptionConverters.RichOptionForJava8
  *
  * @tparam T the subclass of ParameterSetType
  */
+//TODO: add and update doc for each method
 abstract class ParameterSetType[T <: ParameterSetType[T]] extends TMTSerializable { self: T =>
 
   /**

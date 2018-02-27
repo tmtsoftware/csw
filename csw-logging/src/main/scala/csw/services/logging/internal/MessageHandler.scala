@@ -7,6 +7,7 @@ import csw.services.logging.scaladsl.RequestId
 /**
  * Acts as a single point of entry for messages from various loggers and redirects them to the log actor
  */
+//TODO: explain better significance
 object MessageHandler {
 
   /**

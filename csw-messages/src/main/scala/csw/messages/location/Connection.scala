@@ -10,6 +10,7 @@ import play.api.libs.json._
  */
 sealed abstract class Connection(val connectionType: ConnectionType) extends TMTSerializable { self: TypedConnection[_] ⇒
 
+  //TODO: add doc for why we need this
   type L <: Location
 
   /**
@@ -17,6 +18,7 @@ sealed abstract class Connection(val connectionType: ConnectionType) extends TMT
    */
   def componentId: ComponentId
 
+  //TODO: add doc for significance
   def connectionInfo: ConnectionInfo = ConnectionInfo(componentId.name, componentId.componentType, connectionType)
 
   /**
@@ -24,26 +26,31 @@ sealed abstract class Connection(val connectionType: ConnectionType) extends TMT
    */
   def name: String = connectionInfo.toString
 
+  //TODO: add doc for significance
   def of[T <: Location]: TypedConnection[T] = self.asInstanceOf[TypedConnection[T]]
 }
 
+//TODO: add doc for significance
 abstract sealed class TypedConnection[T <: Location](connectionType: ConnectionType) extends Connection(connectionType) {
   override type L = T
 }
 
 object Connection {
 
+  //TODO: add doc for significance
   def from(input: String): Connection = input.split("-") match {
     case Array(name, componentType, connectionType) ⇒
       from(ConnectionInfo(name, ComponentType.withName(componentType), ConnectionType.withName(connectionType)))
     case _ ⇒ throw new IllegalArgumentException(s"Unable to parse '$input' to make Connection object")
   }
 
+  //TODO: add doc for significance
   def from(connectionInfo: ConnectionInfo): Connection = from(
     ComponentId(connectionInfo.name, connectionInfo.componentType),
     connectionInfo.connectionType
   )
 
+  //TODO: add doc for significance
   private def from(componentId: ComponentId, connectionType: ConnectionType): Connection = connectionType match {
     case AkkaType ⇒ AkkaConnection(componentId)
     case TcpType  ⇒ TcpConnection(componentId)

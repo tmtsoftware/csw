@@ -2,6 +2,7 @@ package csw.messages.models
 
 import csw.messages.TMTSerializable
 
+//TODO: what, why, how
 sealed trait LockingResponse extends TMTSerializable
 
 object LockingResponses {

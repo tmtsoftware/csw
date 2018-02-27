@@ -10,17 +10,19 @@ import csw.services.logging.scaladsl.AnyId
 sealed trait LogActorMessages
 
 // Model for common Log messages shared with Log Actor
-case class Log(componentName: Option[String],
-               level: Level,
-               id: AnyId,
-               time: Long,
-               actorName: Option[String],
-               msg: String,
-               map: Map[String, Any],
-               sourceLocation: SourceLocation,
-               ex: Throwable,
-               kind: String = "")
-    extends LogActorMessages
+//TODO: explain better significance
+case class Log(
+    componentName: Option[String],
+    level: Level,
+    id: AnyId,
+    time: Long,
+    actorName: Option[String],
+    msg: String,
+    map: Map[String, Any],
+    sourceLocation: SourceLocation,
+    ex: Throwable,
+    kind: String = ""
+) extends LogActorMessages
 
 case class SetLevel(level: Level) extends LogActorMessages
 

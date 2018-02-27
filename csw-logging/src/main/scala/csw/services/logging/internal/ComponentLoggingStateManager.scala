@@ -26,6 +26,7 @@ private[logging] object ComponentLoggingStateManager {
         .toMap
     }.getOrElse(Map.empty)
 
+  //TODO: explain better significance
   def add(componentName: String, level: Level): Unit = {
     import csw.services.logging.internal.LoggingState._
     componentsLoggingState = componentsLoggingState ++ Map(componentName → ComponentLoggingState(level))

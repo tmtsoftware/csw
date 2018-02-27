@@ -8,6 +8,7 @@ import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.adapter.TypedActorRefOps
 import csw.services.logging.javadsl.JLoggerFactory
 
+//TODO: explain better significance
 private[logging] abstract class BaseLoggerFactory(maybeComponentName: Option[String]) {
   def getLogger[T](ctx: ActorContext[T]): Logger = new LoggerImpl(maybeComponentName, Some(actorPath(ctx.self.toUntyped)))
   def getLogger(ctx: actor.ActorContext): Logger = new LoggerImpl(maybeComponentName, Some(actorPath(ctx.self)))

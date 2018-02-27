@@ -11,6 +11,7 @@ import scala.concurrent.Future
 /**
  * Companion object for the StdOutAppender class.
  */
+//TODO: explain better significance
 object StdOutAppender extends LogAppenderBuilder {
 
   /**
@@ -108,7 +109,7 @@ class StdOutAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg],
     s"[$level$kind] $msg$where$plainStack"
   }
 
-  private def buildSummary(level: String, kind: String) = {
+  private def buildSummary(level: String, kind: String): Unit = {
     val levelCount = levels.getOrElse(level, 0) + 1
     levels += (level -> levelCount)
     if (!kind.isEmpty) {

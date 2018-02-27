@@ -66,13 +66,13 @@ class Matcher(
    */
   def stop(): Unit = killSwitch.abort(MatchAborted(stateMatcher.prefix))
 
-  private lazy val (killSwitch, currentStateF) = source
+  private lazy val (killSwitch, currentStateF) = source //TODO: explain stream with pics maybe
     .viaMat(KillSwitches.single)(Keep.right)
     .toMat(Sink.head)(Keep.both)
     .run()
 
   private def source =
-    Source
+    Source //TODO: explain stream with pics maybe
       .actorRef[CurrentState](256, OverflowStrategy.fail)
       .mapMaterializedValue { ref ⇒
         currentStateSource ! ComponentStateSubscription(Subscribe(ref))

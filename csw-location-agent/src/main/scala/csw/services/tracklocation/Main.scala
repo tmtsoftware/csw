@@ -13,7 +13,7 @@ import scala.sys.process.Process
  * Application object allowing program execution from command line, also facilitates an entry point for Component level testing.
  */
 class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) {
-  val log: Logger = LocationAgentLogger.getLogger
+  private val log: Logger = LocationAgentLogger.getLogger
 
   def start(args: Array[String]): Option[Process] =
     ArgsParser.parse(args).map { options =>
@@ -31,8 +31,6 @@ class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) {
 
 // $COVERAGE-OFF$
 object Main extends App {
-  val log: Logger = LocationAgentLogger.getLogger
-
   if (ClusterAwareSettings.seedNodes.isEmpty) {
     println(
       "clusterSeeds setting is not specified either as env variable or system property. Please check online documentation for this set-up."

@@ -10,6 +10,7 @@ sealed abstract class TrackingEvent {
 /**
  * This event represents modification in location details
  */
+//TODO:explain why we have location in LocationUpdated
 case class LocationUpdated(location: Location) extends TrackingEvent {
   override def connection: Connection = location.connection
 }
@@ -17,4 +18,5 @@ case class LocationUpdated(location: Location) extends TrackingEvent {
 /**
  * This event represents unavailability of a location
  */
+//TODO:explain why we have only Connection in LocationRemoved
 case class LocationRemoved(connection: Connection) extends TrackingEvent

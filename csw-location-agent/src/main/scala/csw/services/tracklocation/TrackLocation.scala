@@ -22,8 +22,9 @@ import scala.util.control.NonFatal
 /**
  * Starts a given external program, registers it with the location service and unregisters it when the program exits.
  */
+//TODO: add doc to explain significance
 class TrackLocation(names: List[String], command: Command, actorSystem: ActorSystem) {
-  val log: Logger = LocationAgentLogger.getLogger
+  private val log: Logger = LocationAgentLogger.getLogger
 
   private val cswCluster      = CswCluster.withSystem(actorSystem)
   private val locationService = LocationServiceFactory.withCluster(cswCluster)

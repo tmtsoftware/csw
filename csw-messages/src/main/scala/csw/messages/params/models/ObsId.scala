@@ -40,6 +40,7 @@ case class ObsId(obsId: String) extends TMTSerializable {
   def asOptional: Optional[ObsId] = Optional.of(new ObsId(obsId))
 }
 
+//TODO: add doc for why, where to use  diff between ObsId and ObsId2
 case class ObsId2(year: String, sem: String, kind: String, prog: String, obs: String, file: Option[String]) {
   // private final val PROG_KIND_INDEX = 6
 

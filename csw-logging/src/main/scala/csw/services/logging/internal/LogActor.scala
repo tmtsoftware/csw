@@ -19,25 +19,29 @@ import scala.concurrent.Promise
  * All log messages are routed to this single Akka Actor. There is one LogActor per logging system.
  * Logging messages from logging API, Java Slf4j and Akka loggers are sent to this actor.
  */
+//TODO: explain better significance
 private[logging] object LogActor {
 
-  def props(done: Promise[Unit],
-            standardHeaders: JsonObject,
-            appends: Seq[LogAppender],
-            initLevel: Level,
-            initSlf4jLevel: Level,
-            initAkkaLevel: Level): Props =
+  def props(
+      done: Promise[Unit],
+      standardHeaders: JsonObject,
+      appends: Seq[LogAppender],
+      initLevel: Level,
+      initSlf4jLevel: Level,
+      initAkkaLevel: Level
+  ): Props =
     Props(new LogActor(done, standardHeaders, appends, initLevel, initSlf4jLevel, initAkkaLevel))
 
 }
 
-private[logging] class LogActor(done: Promise[Unit],
-                                standardHeaders: JsonObject,
-                                initAppenders: Seq[LogAppender],
-                                initLevel: Level,
-                                initSlf4jLevel: Level,
-                                initAkkaLevel: Level)
-    extends Actor
+private[logging] class LogActor(
+    done: Promise[Unit],
+    standardHeaders: JsonObject,
+    initAppenders: Seq[LogAppender],
+    initLevel: Level,
+    initSlf4jLevel: Level,
+    initAkkaLevel: Level
+) extends Actor
     with RequiresMessageQueue[BoundedMessageQueueSemantics] {
 
   private[this] var level: Level                = initLevel
@@ -178,7 +182,7 @@ private[logging] class LogActor(done: Promise[Unit],
     append(jsonObject, logAltMessage.category, LoggingLevels.INFO)
   }
 
-  private def receiveLogSlf4j(logSlf4j: LogSlf4j) =
+  private def receiveLogSlf4j(logSlf4j: LogSlf4j): Unit =
     if (logSlf4j.level.pos >= slf4jLogLevel.pos) {
       var jsonObject = JsonObject(
         LoggingKeys.TIMESTAMP -> TMTDateTimeFormatter.format(logSlf4j.time),
@@ -196,7 +200,7 @@ private[logging] class LogActor(done: Promise[Unit],
       append(jsonObject, Category.Common.name, logSlf4j.level)
     }
 
-  private def receiveLogAkkaMessage(logAkka: LogAkka) =
+  private def receiveLogAkkaMessage(logAkka: LogAkka): Unit =
     if (logAkka.level.pos >= akkaLogLevel.pos) {
       val msg1 = if (logAkka.msg.toString.isEmpty) "UNKNOWN" else logAkka.msg
       var jsonObject = JsonObject(

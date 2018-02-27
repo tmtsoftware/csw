@@ -9,6 +9,7 @@ import scala.annotation.varargs
 import scala.collection.JavaConverters._
 import scala.language.implicitConversions
 
+//TODO: explain better significance for everything
 object StateVariable {
 
   /**

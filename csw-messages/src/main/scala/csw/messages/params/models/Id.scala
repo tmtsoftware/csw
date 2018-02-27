@@ -7,6 +7,7 @@ import play.api.libs.json._
 /**
  * Implementation of unique id fulfilling TMT requirements (returned from a queue submit).
  */
+//TODO: add doc for why, where to use
 case class Id(id: String)
 
 object Id {

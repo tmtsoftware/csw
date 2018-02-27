@@ -7,8 +7,9 @@ import csw.services.logging.scaladsl.Logger
 import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
 import play.api.libs.json._
 
+//TODO: add doc to explain significance
 trait JsonSupport extends PlayJsonSupport {
-  val log: Logger = ClusterSeedLogger.getLogger
+  protected val log: Logger = ClusterSeedLogger.getLogger
 
   implicit val levelFormat: Format[Level] = new Format[Level] {
     override def writes(obj: Level): JsValue = JsString(obj.name)

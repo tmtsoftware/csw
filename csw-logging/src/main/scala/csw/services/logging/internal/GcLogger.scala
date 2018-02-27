@@ -16,9 +16,11 @@ import scala.collection.JavaConverters._
 // $COVERAGE-OFF$
 private[logging] class GcLogger {
 
-  val log: Logger = GenericLoggerFactory.getLogger
+  private val log: Logger = GenericLoggerFactory.getLogger
 
   private[this] val gcbeans = java.lang.management.ManagementFactory.getGarbageCollectorMXBeans
+
+  //TODO: explain better significance
   private[this] val emitters = for (gcbean <- gcbeans.asScala) yield {
     val emitter = gcbean.asInstanceOf[NotificationEmitter]
     val listener = new NotificationListener() {

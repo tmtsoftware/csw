@@ -28,11 +28,12 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
  * @param host             host name (to log).
  * @param system           actor system which will be used to create log actors
  */
+//TODO: explain better significance of everything
 class LoggingSystem(name: String, version: String, host: String, val system: ActorSystem) {
 
   import LoggingLevels._
 
-  val log: Logger = GenericLoggerFactory.getLogger
+  private val log: Logger = GenericLoggerFactory.getLogger
 
   private[this] val loggingConfig = system.settings.config.getConfig("csw-logging")
 

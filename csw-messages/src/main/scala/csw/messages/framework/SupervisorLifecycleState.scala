@@ -5,6 +5,7 @@ import csw.messages.TMTSerializable
 /**
  * Lifecycle state of a Supervisor actor
  */
+//TODO: add doc for significance SupervisorLifecycleState
 sealed trait SupervisorLifecycleState extends TMTSerializable
 object SupervisorLifecycleState {
   case object Idle           extends SupervisorLifecycleState

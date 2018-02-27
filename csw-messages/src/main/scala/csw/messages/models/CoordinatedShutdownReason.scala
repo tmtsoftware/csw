@@ -3,6 +3,7 @@ package csw.messages.models
 import akka.actor.CoordinatedShutdown
 import akka.actor.CoordinatedShutdown.Reason
 
+//TODO: what, why, how
 trait CoordinatedShutdownReason extends CoordinatedShutdown.Reason
 
 object CoordinatedShutdownReasons {

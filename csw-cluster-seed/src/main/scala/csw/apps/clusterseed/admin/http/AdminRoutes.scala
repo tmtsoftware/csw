@@ -5,6 +5,7 @@ import akka.http.scaladsl.server.Route
 import csw.apps.clusterseed.admin.LogAdmin
 import csw.apps.clusterseed.admin.internal.ActorRuntime
 
+//TODO: add doc to explain significance and route example
 class AdminRoutes(adminHandlers: AdminHandlers, logAdmin: LogAdmin, actorRuntime: ActorRuntime) extends HttpSupport {
 
   import actorRuntime._

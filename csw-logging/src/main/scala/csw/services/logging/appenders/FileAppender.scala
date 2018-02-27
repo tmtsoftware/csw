@@ -18,29 +18,13 @@ import scala.concurrent.{ExecutionContextExecutor, Future, Promise}
  * @param path path where the log file will be created
  * @param category category of the log messages
  */
+//TODO: add doc to explain significance for everything
 private[logging] class FileAppenderHelper(path: String, category: String) {
 
   private[this] var fileSpanTimestamp: Option[ZonedDateTime] = None
   private[this] var maybePrintWriter: Option[PrintWriter]    = None
 
   protected val log: Logger = new LoggerImpl(None, None)
-
-  // Initialize writer for log file
-  private def open(maybeTimestamp: Option[ZonedDateTime], rotateFlag: Boolean): Unit = {
-    val dir = s"$path"
-
-    val fileName = if (rotateFlag) {
-      val fileTimestamp = FileAppender.decideTimestampForFile(maybeTimestamp.get)
-      fileSpanTimestamp = Some(fileTimestamp.plusDays(1L))
-      s"$dir/$category.$fileTimestamp.log"
-    } else {
-      s"$dir/$category.log"
-    }
-
-    new File(dir).mkdirs()
-    val printWriter = new PrintWriter(new BufferedOutputStream(new FileOutputStream(fileName, true)))
-    maybePrintWriter = Some(printWriter)
-  }
 
   def appendAdd(maybeTimestamp: Option[ZonedDateTime], line: String, rotateFlag: Boolean): Unit = {
     maybePrintWriter match {
@@ -84,6 +68,23 @@ private[logging] class FileAppenderHelper(path: String, category: String) {
         maybePrintWriter = None
       case None =>
     }
+
+  // Initialize writer for log file
+  private def open(maybeTimestamp: Option[ZonedDateTime], rotateFlag: Boolean): Unit = {
+    val dir = s"$path"
+
+    val fileName = if (rotateFlag) {
+      val fileTimestamp = FileAppender.decideTimestampForFile(maybeTimestamp.get)
+      fileSpanTimestamp = Some(fileTimestamp.plusDays(1L))
+      s"$dir/$category.$fileTimestamp.log"
+    } else {
+      s"$dir/$category.log"
+    }
+
+    new File(dir).mkdirs()
+    val printWriter = new PrintWriter(new BufferedOutputStream(new FileOutputStream(fileName, true)))
+    maybePrintWriter = Some(printWriter)
+  }
 }
 
 /**

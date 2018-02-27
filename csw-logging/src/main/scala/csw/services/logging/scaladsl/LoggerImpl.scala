@@ -23,12 +23,15 @@ class LoggerImpl private[logging] (maybeComponentName: Option[String], actorName
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
   InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
 
-  private def all(level: Level,
-                  id: AnyId,
-                  msg: => String,
-                  map: ⇒ Map[String, Any],
-                  ex: Throwable,
-                  sourceLocation: SourceLocation): Unit = {
+  //TODO: explain better significance of time and other things
+  private def all(
+      level: Level,
+      id: AnyId,
+      msg: ⇒ String,
+      map: ⇒ Map[String, Any],
+      ex: Throwable,
+      sourceLocation: SourceLocation
+  ): Unit = {
     val time = Instant.now().toEpochMilli
     MessageHandler.sendMsg(Log(maybeComponentName, level, id, time, actorName, msg, map, sourceLocation, ex))
   }
@@ -52,28 +55,25 @@ class LoggerImpl private[logging] (maybeComponentName: Option[String], actorName
 
   override def info(msg: ⇒ String, map: ⇒ Map[String, Any], ex: Throwable, id: AnyId)(
       implicit factory: SourceFactory
-  ): Unit =
-    if (componentLoggingState.doInfo || has(id, INFO)) all(INFO, id, msg, map, ex, factory.get())
+  ): Unit = if (componentLoggingState.doInfo || has(id, INFO)) all(INFO, id, msg, map, ex, factory.get())
 
   override def warn(msg: ⇒ String, map: ⇒ Map[String, Any], ex: Throwable, id: AnyId)(
       implicit factory: SourceFactory
-  ): Unit =
-    if (componentLoggingState.doWarn || has(id, WARN)) all(WARN, id, msg, map, ex, factory.get())
+  ): Unit = if (componentLoggingState.doWarn || has(id, WARN)) all(WARN, id, msg, map, ex, factory.get())
 
   override def error(msg: ⇒ String, map: ⇒ Map[String, Any], ex: Throwable, id: AnyId)(
       implicit factory: SourceFactory
-  ): Unit =
-    if (componentLoggingState.doError || has(id, ERROR)) all(ERROR, id, msg, map, ex, factory.get())
+  ): Unit = if (componentLoggingState.doError || has(id, ERROR)) all(ERROR, id, msg, map, ex, factory.get())
 
   override def fatal(msg: ⇒ String, map: ⇒ Map[String, Any], ex: Throwable, id: AnyId)(
       implicit factory: SourceFactory
-  ): Unit =
-    all(FATAL, id, msg, map, ex, factory.get())
+  ): Unit = all(FATAL, id, msg, map, ex, factory.get())
 
-  private[logging] override def alternative(category: String,
-                                            m: Map[String, RichMsg],
-                                            ex: Throwable,
-                                            id: AnyId,
-                                            time: Long): Unit =
-    MessageHandler.sendMsg(LogAltMessage(category, time, m ++ Map(LoggingKeys.CATEGORY -> category), id, ex))
+  private[logging] override def alternative(
+      category: String,
+      m: Map[String, RichMsg],
+      ex: Throwable,
+      id: AnyId,
+      time: Long
+  ): Unit = MessageHandler.sendMsg(LogAltMessage(category, time, m ++ Map(LoggingKeys.CATEGORY -> category), id, ex))
 }

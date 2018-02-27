@@ -1,12 +1,13 @@
 package csw.apps.clusterseed.cli
 
 import csw.services.BuildInfo
+import scopt.OptionParser
 
 /**
  * Parses the command line options using `scopt` library.
  */
 class ArgsParser {
-  val parser = new scopt.OptionParser[Options]("scopt") {
+  private val parser: OptionParser[Options] = new scopt.OptionParser[Options]("scopt") {
     head(BuildInfo.name, BuildInfo.version)
 
     opt[Int]("clusterPort") required () action { (x, c) =>

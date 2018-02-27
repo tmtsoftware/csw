@@ -17,6 +17,7 @@ sealed abstract class Location extends TMTSerializable {
   def logAdminActorRef: ActorRef[Nothing]
 }
 
+//TODO: update below doc and make it scaladoc
 // *************** IMPORTANT ***********************
 // Do not directly access actorRef from constructor,
 // Use one of component(), jComponent() or containerRef() method to get the wrapped component

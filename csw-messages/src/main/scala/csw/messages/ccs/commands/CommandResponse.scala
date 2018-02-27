@@ -53,6 +53,7 @@ object CommandResponse {
    * @param commandResponses a source of stream of CommandResponse
    * @return
    */
+  //TODO: add more details around why and where this method is used
   def aggregateResponse(
       commandResponses: Source[CommandResponse, NotUsed]
   )(implicit ec: ExecutionContext, mat: Materializer): Future[CommandResponse] = {
@@ -72,6 +73,7 @@ object CommandResponse {
  * The nature of CommandResponse as an intermediate response of command execution or a final response which could be
  * positive or negative
  */
+//TODO: explain more details how commandResultType affects the CommandResponse and in decision of making aggregate response
 sealed trait CommandResultType
 object CommandResultType {
   case object Intermediate extends CommandResultType

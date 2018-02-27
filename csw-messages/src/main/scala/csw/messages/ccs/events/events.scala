@@ -10,7 +10,7 @@ import scalapb.TypeMapper
 
 sealed trait Event { self: ParameterSetType[_] ⇒
 
-  def paramType: ParameterSetType[_] = self
+  def paramType: ParameterSetType[_] = self //TODO: explain more about why do we need paramType as self type
 
   val eventId: Id
 

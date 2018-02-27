@@ -13,6 +13,7 @@ object JsonSupport extends JsonSupport with DerivedJsonFormats with WrappedArray
 /**
  * Supports conversion of commands, state variables and events to/from JSON
  */
+//TODO: why we need this and where do we need it
 trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
 
   // JSON formats

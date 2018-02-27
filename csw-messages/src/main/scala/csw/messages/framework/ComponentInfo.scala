@@ -18,6 +18,7 @@ import scala.concurrent.duration.{DurationDouble, FiniteDuration}
  * @param connections                   Set of connections that will be used by this component for interaction
  * @param initializeTimeout             The timeout value used while initializing a component
  */
+//TODO: add where it is used and how
 final case class ComponentInfo(
     name: String,
     componentType: ComponentType,
@@ -36,15 +37,16 @@ final case class ComponentInfo(
 
 case object ComponentInfo {
 
+  //TODO: why do we need below vals and how it is used
+  implicit val finiteDurationReads: Reads[FiniteDuration]   = Reads[FiniteDuration](parseDuration)
+  implicit val finiteDurationWrites: Writes[FiniteDuration] = Writes[FiniteDuration](d ⇒ Json.toJson(d.toString))
+  implicit val componentInfoFormat: OFormat[ComponentInfo]  = Jsonx.formatCaseClassUseDefaults[ComponentInfo]
+
+  //TODO: what is this method and how it is used
   private def parseDuration(json: JsValue): JsResult[FiniteDuration] = json.validate[String].flatMap { str =>
     str.split(" ") match {
       case Array(length: String, unit: String) => JsSuccess(FiniteDuration.apply(length.toLong, unit))
       case _                                   => JsError("error.expected.duration.finite")
     }
   }
-
-  implicit val finiteDurationReads: Reads[FiniteDuration]   = Reads[FiniteDuration](parseDuration)
-  implicit val finiteDurationWrites: Writes[FiniteDuration] = Writes[FiniteDuration](d ⇒ Json.toJson(d.toString))
-
-  implicit val componentInfoFormat: OFormat[ComponentInfo] = Jsonx.formatCaseClassUseDefaults[ComponentInfo]
 }

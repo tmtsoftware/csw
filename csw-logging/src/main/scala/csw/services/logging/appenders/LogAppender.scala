@@ -8,6 +8,7 @@ import scala.concurrent.Future
 /**
  * Trait for log appender companion objects.
  */
+//TODO: add doc to explain significance
 trait LogAppenderBuilder {
 
   /**

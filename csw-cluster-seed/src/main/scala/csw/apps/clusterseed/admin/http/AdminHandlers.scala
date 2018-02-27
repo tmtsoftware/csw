@@ -24,8 +24,9 @@ case object ErrorMessage {
 /**
  * Maps server side exceptions to Http Status codes
  */
+//TODO: add doc to explain significance
 class AdminHandlers extends Directives with JsonRejectionHandler {
-  val log: Logger = ClusterSeedLogger.getLogger
+  private val log: Logger = ClusterSeedLogger.getLogger
 
   val jsonExceptionHandler: ExceptionHandler = ExceptionHandler {
     case ex: UnresolvedAkkaOrHttpLocationException ⇒

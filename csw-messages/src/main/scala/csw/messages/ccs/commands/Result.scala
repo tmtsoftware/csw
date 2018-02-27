@@ -9,11 +9,13 @@ import csw.messages.params.models.Prefix
  * @param prefix   identifies the target subsystem
  * @param paramSet an optional initial set of parameters (keys with values)
  */
+//TODO: add doc with what, why and how of result model
 case class Result private (prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])
     extends ParameterSetType[Result]
     with ParameterSetKeyData {
 
-  override protected def create(data: Set[Parameter[_]]) = new Result(prefix, data)
+  //TODO: add doc why we need create and from where it is coming
+  override protected def create(data: Set[Parameter[_]]): Result = copy(paramSet = data)
 
   // This is here for Java to construct with String
   def this(prefix: String) = this(Prefix(prefix))

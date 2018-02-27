@@ -7,6 +7,7 @@ import csw.services.logging.internal.LoggingLevels.Level
 import csw.services.logging.models.LogMetadata
 import csw.services.logging.scaladsl.{GenericLoggerFactory, Logger}
 
+//TODO: explain better significance
 object LogAdminActor {
   private[logging] def behavior(): Behavior[LogControlMessages] = Actor.immutable[LogControlMessages] { (ctx, msg) ⇒
     val log: Logger = GenericLoggerFactory.getLogger(ctx)

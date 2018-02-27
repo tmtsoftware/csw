@@ -8,6 +8,7 @@ import scala.collection.immutable
 /**
  * Describes how a component uses the location service
  */
+//TODO: add doc for significance of LocationServiceUsage
 sealed abstract class LocationServiceUsage extends EnumEntry with TMTSerializable
 
 object LocationServiceUsage extends Enum[LocationServiceUsage] with PlayJsonEnum[LocationServiceUsage] {

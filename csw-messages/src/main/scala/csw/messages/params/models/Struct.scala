@@ -20,9 +20,10 @@ case class Struct private (paramSet: Set[Parameter[_]]) extends ParameterSetType
    */
   def this() = this(Set.empty[Parameter[_]])
 
+  //TODO: add doc for significance
   override protected def create(data: Set[Parameter[_]]) = new Struct(data)
 
-  override def toString = paramSet.mkString(", ")
+  override def toString: String = paramSet.mkString(", ")
 }
 
 object Struct {

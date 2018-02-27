@@ -2,6 +2,7 @@ package csw.messages.models
 
 import csw.messages.TMTSerializable
 
+//TODO: what, why, how
 sealed trait ToComponentLifecycleMessage extends TMTSerializable
 object ToComponentLifecycleMessages {
   case object GoOffline extends ToComponentLifecycleMessage

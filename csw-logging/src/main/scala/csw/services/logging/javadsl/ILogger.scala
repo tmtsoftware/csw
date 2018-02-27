@@ -5,6 +5,8 @@ import java.util.function.Supplier
 import csw.services.logging.scaladsl.{AnyId, Logger}
 
 // scalastyle:off file.size.limit
+
+//TODO: explain better significance
 trait ILogger {
 
   /**

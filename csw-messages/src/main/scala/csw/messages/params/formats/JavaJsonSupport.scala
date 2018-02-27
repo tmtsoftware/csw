@@ -8,6 +8,7 @@ import play.api.libs.json.JsValue
 /**
  * Json supports for Java to do conversion of commands, state variables and events to/from JSON
  */
+//TODO: why we need this and where do we need it
 object JavaJsonSupport {
 
   /**

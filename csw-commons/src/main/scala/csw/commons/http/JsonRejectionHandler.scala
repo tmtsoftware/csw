@@ -4,6 +4,7 @@ import akka.http.scaladsl.model.{HttpEntity, HttpResponse}
 import akka.http.scaladsl.server.RejectionHandler
 import csw.commons.http.JsonSupport.asJsonEntity
 
+//TODO: add more explanation
 trait JsonRejectionHandler {
 
   implicit def jsonRejectionHandler: RejectionHandler =

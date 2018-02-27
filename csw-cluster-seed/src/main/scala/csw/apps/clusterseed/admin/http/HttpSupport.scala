@@ -12,14 +12,17 @@ import csw.services.logging.scaladsl.Logger
 trait HttpSupport extends Directives with JsonSupport {
   override val log: Logger = ClusterSeedLogger.getLogger
 
+  //TODO: add doc to explain significance
   val logLevelParam: Directive1[Level] = parameter('value).flatMap {
     case value if Level.hasLevel(value) => provide(Level(value))
     case _ =>
       reject(MalformedQueryParamRejection("value", s"Supported logging levels are [${LoggingLevels.stringify()}]"))
   }
 
+  //TODO: add doc to explain significance
+  val routeLogger: Directive0 = DebuggingDirectives.logRequest(LoggingMagnet(_ => logRequest))
+
   private def logRequest(req: HttpRequest): Unit =
     log.info("HTTP Request received",
              Map("url" → req.uri.toString(), "method" → req.method.value, "headers" → req.headers.mkString(",")))
-  val routeLogger: Directive0 = DebuggingDirectives.logRequest(LoggingMagnet(_ => logRequest))
 }

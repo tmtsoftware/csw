@@ -16,6 +16,7 @@ import scalapb.TypeMapper
  *
  * @param data input array of array
  */
+//TODO: add doc for more details in each thing
 case class MatrixData[T](data: mutable.WrappedArray[mutable.WrappedArray[T]])(implicit cTag: ClassTag[T]) {
 
   /**

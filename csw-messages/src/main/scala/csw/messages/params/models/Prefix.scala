@@ -11,6 +11,7 @@ import scala.language.implicitConversions
  * @param subsystem the subsystem that is the target of the command
  * @param prefix    the subsystem's prefix
  */
+//TODO: add doc for significance
 case class Prefix(subsystem: Subsystem, prefix: String) extends TMTSerializable {
   override def toString: String = s"[$subsystem, $prefix]"
 

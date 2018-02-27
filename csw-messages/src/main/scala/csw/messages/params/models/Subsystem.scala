@@ -9,6 +9,7 @@ import scala.collection.immutable
  * Represents a TMT subsystem
  */
 sealed abstract class Subsystem(description: String) extends EnumEntry with Lowercase with Serializable {
+  //TODO: add doc
   def longName: String = entryName + " - " + description
 }
 

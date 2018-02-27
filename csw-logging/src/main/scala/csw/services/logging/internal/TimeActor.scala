@@ -14,7 +14,7 @@ import scala.concurrent.Promise
  */
 private[logging] class TimeActor(tdone: Promise[Unit]) extends Actor {
 
-  val log: Logger = GenericLoggerFactory.getLogger(context)
+  private val log: Logger = GenericLoggerFactory.getLogger(context)
 
   import TimeActorMessages._
 

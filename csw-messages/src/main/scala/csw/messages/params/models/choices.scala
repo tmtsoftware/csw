@@ -9,6 +9,7 @@ import scala.annotation.varargs
 import scala.collection.JavaConverters.seqAsJavaListConverter
 import scala.language.implicitConversions
 
+//TODO: add more details for each thing
 /**
  * Represents a single choice
  */

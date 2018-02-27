@@ -73,6 +73,7 @@ sealed class JMatrixKeyType[S: Format: ClassTag, T: ItemsFactory](
 /**
  * KeyTypes defined for consumption in Scala code
  */
+//TODO: add why do we need it
 object KeyType extends Enum[KeyType[_]] with PlayJsonEnum[KeyType[_]] {
 
   import JsonSupport._

@@ -10,7 +10,11 @@ import scala.collection.immutable
 sealed abstract class Units(name: String, description: String) extends EnumEntry with TMTSerializable {
   // Should parameterize Units so concat can be created concat[A, B]
 //  override def toString: String = "[" + name + "]"
-  def getName: String        = s"[$name]"
+
+  //TODO: add doc for significance
+  def getName: String = s"[$name]"
+
+  //TODO: add doc for significance
   def getDescription: String = description
 }
 

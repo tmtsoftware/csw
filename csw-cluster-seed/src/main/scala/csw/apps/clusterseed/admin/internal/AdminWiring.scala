@@ -23,6 +23,8 @@ class AdminWiring {
   lazy val adminRoutes                        = new AdminRoutes(adminHandlers, logAdmin, actorRuntime)
   lazy val adminHttpService: AdminHttpService = new AdminHttpService(adminRoutes, actorRuntime, settings)
 }
+
+//TODO: add doc to explain significance
 object AdminWiring {
 
   def make(_clusterSettings: ClusterSettings, maybeAdminPort: Option[Int]): AdminWiring =

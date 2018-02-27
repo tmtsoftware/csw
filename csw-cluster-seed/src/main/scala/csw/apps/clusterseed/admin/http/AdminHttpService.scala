@@ -15,8 +15,9 @@ import scala.util.control.NonFatal
 /**
  * Initialise AdminServer
  */
+//TODO: add doc to explain significance
 class AdminHttpService(adminRoutes: AdminRoutes, actorRuntime: ActorRuntime, settings: Settings) {
-  val log: Logger = ClusterSeedLogger.getLogger
+  private val log: Logger = ClusterSeedLogger.getLogger
 
   import actorRuntime._
 

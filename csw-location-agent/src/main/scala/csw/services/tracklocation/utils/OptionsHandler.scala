@@ -6,6 +6,7 @@ import csw.services.tracklocation.models.Options
 /**
  * Exposes utility methods to parse string, int, port options.
  */
+//TODO: add doc to explain significance
 final case class OptionsHandler(options: Options, appConfig: Option[Config]) {
 
   def stringOpt(entry: String, arg: Option[String] = None): Option[String] = {

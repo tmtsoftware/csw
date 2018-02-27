@@ -82,13 +82,14 @@ object Parameter {
   implicit val typeMapper2: TypeMapper[PbParameter, Parameter[_]] =
     TypeMapper[PbParameter, Parameter[_]](p ⇒ p.keyType.typeMapper.toCustom(p))(p => p.toPb)
 
-  def cswItems[T: ClassTag](items: Items): mutable.WrappedArray[T] = items.value match {
+  private def cswItems[T: ClassTag](items: Items): mutable.WrappedArray[T] = items.value match {
     case x: ItemType[_] ⇒ x.asInstanceOf[ItemType[T]].values.toArray[T]
     case x              ⇒ throw new RuntimeException(s"unexpected type ${x.getClass} found, ItemType expected")
   }
 
 }
 
+//TODO: add doc for why
 case class Parameter[S: Format: ClassTag: ItemsFactory] private[messages] (
     keyName: String,
     keyType: KeyType[S],
@@ -96,8 +97,10 @@ case class Parameter[S: Format: ClassTag: ItemsFactory] private[messages] (
     units: Units
 ) extends TMTSerializable {
 
+  //TODO: add doc
   def values: Array[S] = items.array
 
+  //TODO: add doc
   def jValues: util.List[S] = items.asJava
 
   /**
@@ -128,7 +131,9 @@ case class Parameter[S: Format: ClassTag: ItemsFactory] private[messages] (
    * @param index the index of a value
    * @return Some value at the given index as an Option, if the index is in range, otherwise None
    */
-  def get(index: Int): Option[S]    = items.lift(index)
+  def get(index: Int): Option[S] = items.lift(index)
+
+  //TODO: add doc
   def jGet(index: Int): Optional[S] = items.lift(index).asJava
 
   /**

@@ -87,9 +87,11 @@ trait Logger {
    * @param time     the time to be written in the log. If not specified the default is the time this
    *                 method is called.
    */
-  private[logging] def alternative(category: String,
-                                   m: Map[String, RichMsg],
-                                   ex: Throwable = noException,
-                                   id: AnyId = noId,
-                                   time: Long = System.currentTimeMillis()): Unit
+  private[logging] def alternative(
+      category: String,
+      m: Map[String, RichMsg],
+      ex: Throwable = noException,
+      id: AnyId = noId,
+      time: Long = System.currentTimeMillis()
+  ): Unit
 }

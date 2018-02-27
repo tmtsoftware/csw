@@ -1,5 +1,6 @@
 package csw.services.logging.commons
 
+//TODO: explain better significance for singleton state
 private[logging] object LoggingKeys {
 
   // SOURCE

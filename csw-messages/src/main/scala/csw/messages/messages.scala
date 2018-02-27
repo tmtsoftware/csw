@@ -11,6 +11,7 @@ import csw.messages.params.states.CurrentState
 
 import scala.concurrent.duration.FiniteDuration
 
+//TODO: explain better significance for each message hierarchy
 sealed trait TopLevelActorMessage
 
 sealed trait TopLevelActorCommonMessage extends TopLevelActorMessage

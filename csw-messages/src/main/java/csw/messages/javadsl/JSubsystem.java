@@ -2,6 +2,7 @@ package csw.messages.javadsl;
 
 import csw.messages.params.models.Subsystem;
 
+//TODO: explain better significance
 @SuppressWarnings("unused")
 public class JSubsystem {
 

@@ -16,15 +16,18 @@ import scalapb.TypeMapper
  *
  * @param data input array
  */
+//TODO: add doc for why, where to use
 case class ArrayData[T](data: mutable.WrappedArray[T]) {
-  //scala
+  //scala  //TODO: add doc
   def values: Array[T] = data.array
-  //java
+  //java //TODO: add doc
   def jValues: util.List[T] = data.asJava
 
+  //TODO: add doc with example
   override def toString: String = data.mkString("(", ",", ")")
 }
 
+//TODO: add doc for each val and method
 object ArrayData {
   implicit def format[T: Format: ClassTag]: Format[ArrayData[T]] = Json.format[ArrayData[T]]
 
