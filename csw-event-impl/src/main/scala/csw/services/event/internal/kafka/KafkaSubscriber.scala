@@ -20,7 +20,7 @@ class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(i
   private val consumer: KafkaConsumer[String, Array[Byte]] = consumerSettings.createKafkaConsumer()
 
   override def subscribe(eventKeys: Set[EventKey]): Source[Event, EventSubscription] = {
-    val topicPartitions = eventKeys.map(e => new TopicPartition(e.key, 0)).toList.asJava
+    val topicPartitions = eventKeys.map(e => new TopicPartition(e.key, 0)).toList
     val subscription    = Subscriptions.assignmentWithOffset(getLastOffsets(topicPartitions))
 
     Consumer
@@ -33,7 +33,7 @@ class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(i
       }
   }
 
-  private def getLastOffsets(topicPartitions: java.util.List[TopicPartition]): Map[TopicPartition, Long] = {
-    consumer.endOffsets(topicPartitions).asScala.toMap.mapValues(x => if (x == 0) 0L else x.toLong - 1)
+  private def getLastOffsets(topicPartitions: List[TopicPartition]): Map[TopicPartition, Long] = {
+    consumer.endOffsets(topicPartitions.asJava).asScala.toMap.mapValues(x => if (x == 0) 0L else x.toLong - 1)
   }
 }

@@ -10,7 +10,6 @@ import csw.services.event.internal.Wiring
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import redis.embedded.RedisServer
 
-import scala.compat.java8.FutureConverters.CompletionStageOps
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
 
@@ -25,7 +24,7 @@ class RedisPubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with
   redis.start()
 
   override def afterAll(): Unit = {
-    Await.result(redisClient.shutdownAsync().toCompletableFuture.toScala, 5.seconds)
+    Await.result(redisGateway.shutdown(), 5.seconds)
     Await.result(actorSystem.terminate(), 5.seconds)
     redis.stop()
   }

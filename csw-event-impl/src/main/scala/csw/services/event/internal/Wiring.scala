@@ -4,8 +4,8 @@ import akka.actor.ActorSystem
 import akka.kafka.{ConsumerSettings, ProducerSettings}
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Materializer, Supervision}
 import csw.services.event.internal.kafka.{KafkaPublisher, KafkaSubscriber}
-import csw.services.event.internal.redis.{RedisPublisher, RedisSubscriber}
-import io.lettuce.core.{RedisClient, RedisURI}
+import csw.services.event.internal.redis.{RedisGateway, RedisPublisher, RedisSubscriber}
+import io.lettuce.core.RedisURI
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.serialization._
 
@@ -22,10 +22,10 @@ class Wiring(redisPort: Int = 6379) {
   lazy val resumingMat: Materializer = ActorMaterializer(settings)
 
   //Redis
-  lazy val redisURI: RedisURI       = RedisURI.create("localhost", redisPort)
-  lazy val redisClient: RedisClient = RedisClient.create(redisURI)
-  lazy val redisPublisher           = new RedisPublisher(redisClient, redisURI)(ec, resumingMat)
-  lazy val redisSubscriber          = new RedisSubscriber(redisClient, redisURI)(ec, resumingMat)
+  lazy val redisURI: RedisURI = RedisURI.create("localhost", redisPort)
+  lazy val redisGateway       = new RedisGateway(redisURI)
+  lazy val redisPublisher     = new RedisPublisher(redisGateway)(ec, resumingMat)
+  lazy val redisSubscriber    = new RedisSubscriber(redisGateway)(ec, resumingMat)
 
   //kafka
   lazy val producerSettings: ProducerSettings[String, Array[Byte]] =
