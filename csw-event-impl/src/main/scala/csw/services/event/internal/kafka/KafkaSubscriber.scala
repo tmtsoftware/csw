@@ -12,9 +12,10 @@ import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.common.TopicPartition
 
 import scala.collection.JavaConverters._
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(implicit protected val mat: Materializer)
+class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(implicit ec: ExecutionContext,
+                                                                               protected val mat: Materializer)
     extends EventSubscriber {
 
   private val consumer: KafkaConsumer[String, Array[Byte]] = consumerSettings.createKafkaConsumer()
@@ -36,4 +37,6 @@ class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(i
   private def getLastOffsets(topicPartitions: List[TopicPartition]): Map[TopicPartition, Long] = {
     consumer.endOffsets(topicPartitions.asJava).asScala.toMap.mapValues(x => if (x == 0) 0L else x.toLong - 1)
   }
+
+  def shutdown(): Future[Unit] = Future { scala.concurrent.blocking(consumer.close()) }
 }

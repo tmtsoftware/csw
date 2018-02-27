@@ -1,7 +1,5 @@
 package csw.services.event.internal.redis
 
-import java.util.concurrent.CompletableFuture
-
 import csw.messages.ccs.events.{Event, EventKey}
 import io.lettuce.core.api.async.RedisAsyncCommands
 import io.lettuce.core.pubsub.api.reactive.RedisPubSubReactiveCommands

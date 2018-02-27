@@ -1,9 +1,9 @@
 package csw.services.event.internal.perf
 
 import akka.stream.scaladsl.{Sink, Source}
-import csw.messages.ccs.events.{Event, EventKey, EventName, SystemEvent}
-import csw.messages.params.models.{Id, Prefix}
+import csw.messages.ccs.events.EventKey
 import csw.services.event.helpers.TestFutureExt.RichFuture
+import csw.services.event.helpers.Utils._
 import csw.services.event.internal.Wiring
 import csw.services.event.scaladsl.{EventPublisher, EventSubscriber}
 import net.manub.embeddedkafka.EmbeddedKafka
@@ -27,15 +27,14 @@ class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with Embe
 
   override def afterAll(): Unit = {
     Await.result(actorSystem.terminate(), 5.seconds)
+    kafkaPublisher.shutdown().await
+    kafkaSubscriber.shutdown().await
     EmbeddedKafka.stop()
     Await.result(redisGateway.shutdown(), 5.seconds)
     redis.stop()
   }
 
-  val prefix                   = Prefix("test.prefix")
-  val eventName                = EventName("system")
-  def makeEvent(x: Int): Event = SystemEvent(prefix, eventName).copy(eventId = Id(x.toString))
-  val eventKey: EventKey       = makeEvent(0).eventKey
+  val eventKey: EventKey = makeEvent(0).eventKey
 
   var counter = 0
   private def eventGenerator() = {

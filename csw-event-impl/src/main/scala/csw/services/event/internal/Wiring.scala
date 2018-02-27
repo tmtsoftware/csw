@@ -15,17 +15,16 @@ class Wiring(host: String = "localhost", redisPort: Int = 6379, kafkaPort: Int =
 
   implicit lazy val actorSystem: ActorSystem = ActorSystem()
   implicit lazy val ec: ExecutionContext     = actorSystem.dispatcher
-  implicit lazy val mat: Materializer        = ActorMaterializer()
 
   lazy val settings: ActorMaterializerSettings =
     ActorMaterializerSettings(actorSystem).withSupervisionStrategy(Supervision.getResumingDecider)
-  lazy val resumingMat: Materializer = ActorMaterializer(settings)
+  implicit lazy val resumingMat: Materializer = ActorMaterializer(settings)
 
   //Redis
   lazy val redisURI: RedisURI = RedisURI.create(host, redisPort)
   lazy val redisGateway       = new RedisGateway(redisURI)
-  lazy val redisPublisher     = new RedisPublisher(redisGateway)(ec, resumingMat)
-  lazy val redisSubscriber    = new RedisSubscriber(redisGateway)(ec, resumingMat)
+  lazy val redisPublisher     = new RedisPublisher(redisGateway)
+  lazy val redisSubscriber    = new RedisSubscriber(redisGateway)
 
   //kafka
   lazy val producerSettings: ProducerSettings[String, Array[Byte]] =
@@ -37,6 +36,6 @@ class Wiring(host: String = "localhost", redisPort: Int = 6379, kafkaPort: Int =
       .withBootstrapServers(s"$host:$kafkaPort")
       .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest")
 
-  lazy val kafkaPublisher  = new KafkaPublisher(producerSettings)(resumingMat)
-  lazy val kafkaSubscriber = new KafkaSubscriber(consumerSettings)(resumingMat)
+  lazy val kafkaPublisher  = new KafkaPublisher(producerSettings)
+  lazy val kafkaSubscriber = new KafkaSubscriber(consumerSettings)
 }

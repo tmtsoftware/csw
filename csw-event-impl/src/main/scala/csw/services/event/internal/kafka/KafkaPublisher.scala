@@ -9,9 +9,10 @@ import csw.messages.ccs.events.Event
 import csw.services.event.scaladsl.EventPublisher
 import org.apache.kafka.clients.producer.{Callback, ProducerRecord}
 
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.{ExecutionContext, Future, Promise}
 
-class KafkaPublisher(producerSettings: ProducerSettings[String, Array[Byte]])(implicit mat: Materializer) extends EventPublisher {
+class KafkaPublisher(producerSettings: ProducerSettings[String, Array[Byte]])(implicit ec: ExecutionContext, mat: Materializer)
+    extends EventPublisher {
 
   private val kafkaProducer = producerSettings.createKafkaProducer()
   private val kafkaSink     = Producer.plainSink(producerSettings, kafkaProducer)
@@ -31,4 +32,6 @@ class KafkaPublisher(producerSettings: ProducerSettings[String, Array[Byte]])(im
     case (_, null) => p.success(Done)
     case (_, ex)   => p.failure(ex)
   }
+
+  def shutdown(): Future[Unit] = Future { scala.concurrent.blocking(kafkaProducer.close()) }
 }

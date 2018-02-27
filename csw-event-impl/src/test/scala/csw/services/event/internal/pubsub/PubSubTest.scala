@@ -28,6 +28,8 @@ class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with Embe
 
   override def afterAll(): Unit = {
     Await.result(actorSystem.terminate(), 5.seconds)
+    kafkaPublisher.shutdown().await
+    kafkaSubscriber.shutdown().await
     EmbeddedKafka.stop()
     Await.result(redisGateway.shutdown(), 5.seconds)
     redis.stop()
