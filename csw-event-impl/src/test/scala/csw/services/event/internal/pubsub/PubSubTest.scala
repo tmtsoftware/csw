@@ -47,7 +47,7 @@ class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with Embe
     runMultiplePublish(redisPublisher, redisSubscriber)
   }
 
-  ignore("Redis retrieve-recently-published-event-on-subscription") {
+  test("Redis retrieve-recently-published-event-on-subscription") {
     runRetrieveRecentlyPublished(redisPublisher, redisSubscriber)
   }
 
@@ -56,7 +56,7 @@ class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with Embe
   }
 
   test("Kafka independent-subscriptions") {
-    runIndependentSubscriptions(redisPublisher, redisSubscriber)
+    runIndependentSubscriptions(kafkaPublisher, kafkaSubscriber)
   }
 
   ignore("Kafka multiple-publish") {
@@ -92,10 +92,12 @@ class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with Embe
     val (subscription, seqF) = subscriber.subscribe(Set(event1.eventKey)).toMat(Sink.seq)(Keep.both).run()
     Thread.sleep(1000)
     publisher.publish(event1).await
+    Thread.sleep(1000)
 
     val (subscription2, seqF2) = subscriber.subscribe(Set(event2.eventKey)).toMat(Sink.seq)(Keep.both).run()
     Thread.sleep(1000)
     publisher.publish(event2).await
+    Thread.sleep(1000)
 
     subscription.unsubscribe().await
     subscription2.unsubscribe().await
@@ -137,7 +139,7 @@ class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with Embe
     publisher.publish(event2).await
 
     val (subscription, seqF) = subscriber.subscribe(Set(eventKey)).toMat(Sink.seq)(Keep.both).run()
-    Thread.sleep(2000)
+    Thread.sleep(1000)
 
     publisher.publish(event3).await
     Thread.sleep(1000)

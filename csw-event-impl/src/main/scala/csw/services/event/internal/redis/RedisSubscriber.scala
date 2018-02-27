@@ -1,7 +1,7 @@
 package csw.services.event.internal.redis
 
 import akka.Done
-import akka.stream.scaladsl.{Keep, Source}
+import akka.stream.scaladsl.{Concat, Keep, Source}
 import akka.stream.{KillSwitches, Materializer}
 import csw.messages.ccs.events.{Event, EventKey}
 import csw.services.event.scaladsl.{EventSubscriber, EventSubscription}
@@ -13,6 +13,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class RedisSubscriber(redisGateway: RedisGateway)(implicit ec: ExecutionContext, protected val mat: Materializer)
     extends EventSubscriber { outer =>
+  private val asyncConnectionF = redisGateway.asyncConnectionF()
 
   override def subscribe(eventKeys: Set[EventKey]): Source[Event, EventSubscription] = {
     val co̦nnectionF = redisGateway.reactiveConnectionF()
@@ -23,8 +24,11 @@ class RedisSubscriber(redisGateway: RedisGateway)(implicit ec: ExecutionContext,
       Source.fromPublisher(connection.observeChannels(OverflowStrategy.LATEST)).map(_.getMessage)
     }
 
+    val eventStream       = Source.fromFutureSource(sourceF)
+    val latestEventStream = Source.fromFutureSource(get(eventKeys).map(events => Source(events.filterNot(_ == null))))
+
     Source
-      .fromFutureSource(sourceF)
+      .combine(latestEventStream, eventStream)(Concat[Event])
       .viaMat(KillSwitches.single)(Keep.right)
       .watchTermination()(Keep.both)
       .mapMaterializedValue {
@@ -39,4 +43,9 @@ class RedisSubscriber(redisGateway: RedisGateway)(implicit ec: ExecutionContext,
           }
       }
   }
+
+  private def get(eventKeys: Set[EventKey]): Future[Set[Event]] = {
+    asyncConnectionF.flatMap(connection => Future.sequence(eventKeys.map(key => connection.get(key).toScala)))
+  }
+
 }
