@@ -1,5 +1,6 @@
 package csw.services.logging.macros
 
+//TODO: explain better significance
 private[logging] object DefaultSourceLocation extends SourceLocation("", "", "", -1)
 
 /**
@@ -9,4 +10,5 @@ private[logging] object DefaultSourceLocation extends SourceLocation("", "", "",
  * @param className  the name of the enclosing class.
  * @param line  a line number.
  */
+//TODO: explain better significance
 case class SourceLocation(fileName: String, packageName: String, className: String, line: Int)
