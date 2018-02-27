@@ -4,13 +4,12 @@ import akka.stream.scaladsl.{Sink, Source}
 import csw.messages.ccs.events.{Event, EventKey, EventName, SystemEvent}
 import csw.messages.params.models.{Id, Prefix}
 import csw.services.event.helpers.TestFutureExt.RichFuture
-import csw.services.event.internal.{DroppingThrottleStage, Wiring}
+import csw.services.event.internal.Wiring
 import csw.services.event.scaladsl.{EventPublisher, EventSubscriber}
 import net.manub.embeddedkafka.EmbeddedKafka
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import redis.embedded.RedisServer
 
-import scala.compat.java8.FutureConverters.CompletionStageOps
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
 

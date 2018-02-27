@@ -11,7 +11,7 @@ import org.apache.kafka.common.serialization._
 
 import scala.concurrent.ExecutionContext
 
-class Wiring(redisPort: Int = 6379) {
+class Wiring(host: String = "localhost", redisPort: Int = 6379, kafkaPort: Int = 6001) {
 
   implicit lazy val actorSystem: ActorSystem = ActorSystem()
   implicit lazy val ec: ExecutionContext     = actorSystem.dispatcher
@@ -22,7 +22,7 @@ class Wiring(redisPort: Int = 6379) {
   lazy val resumingMat: Materializer = ActorMaterializer(settings)
 
   //Redis
-  lazy val redisURI: RedisURI = RedisURI.create("localhost", redisPort)
+  lazy val redisURI: RedisURI = RedisURI.create(host, redisPort)
   lazy val redisGateway       = new RedisGateway(redisURI)
   lazy val redisPublisher     = new RedisPublisher(redisGateway)(ec, resumingMat)
   lazy val redisSubscriber    = new RedisSubscriber(redisGateway)(ec, resumingMat)
@@ -30,11 +30,11 @@ class Wiring(redisPort: Int = 6379) {
   //kafka
   lazy val producerSettings: ProducerSettings[String, Array[Byte]] =
     ProducerSettings(actorSystem, new StringSerializer, new ByteArraySerializer)
-      .withBootstrapServers("localhost:6001")
+      .withBootstrapServers(s"$host:$kafkaPort")
 
   lazy val consumerSettings: ConsumerSettings[String, Array[Byte]] =
     ConsumerSettings(actorSystem, new StringDeserializer, new ByteArrayDeserializer)
-      .withBootstrapServers("localhost:6001")
+      .withBootstrapServers(s"$host:$kafkaPort")
       .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest")
 
   lazy val kafkaPublisher  = new KafkaPublisher(producerSettings)(resumingMat)
