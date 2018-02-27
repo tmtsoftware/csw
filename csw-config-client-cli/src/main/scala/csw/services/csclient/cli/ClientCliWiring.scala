@@ -7,6 +7,7 @@ import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.location.commons.{ClusterSettings, CswCluster}
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 
+//TODO: explain in brief the use of state defined here
 class ClientCliWiring(actorSystem: ActorSystem) {
   lazy val actorRuntime                     = new ActorRuntime(actorSystem)
   lazy val locationService: LocationService = LocationServiceFactory.withCluster(CswCluster.withSystem(actorSystem))

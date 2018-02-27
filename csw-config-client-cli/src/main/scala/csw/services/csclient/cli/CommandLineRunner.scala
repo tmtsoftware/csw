@@ -164,5 +164,5 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
 
   //command line app is by nature blocking.
   //Do not use such method in library/server side code
-  def await[T](future: Future[T]): T = Await.result(future, Duration.Inf)
+  private def await[T](future: Future[T]): T = Await.result(future, Duration.Inf)
 }
