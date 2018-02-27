@@ -14,8 +14,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class RedisSubscriber(redisGateway: RedisGateway)(implicit ec: ExecutionContext, protected val mat: Materializer)
     extends EventSubscriber { outer =>
 
-  private val asyncConnectionF = redisGateway.asyncConnectionF()
-
   override def subscribe(eventKeys: Set[EventKey]): Source[Event, EventSubscription] = {
     val co̦nnectionF = redisGateway.reactiveConnectionF()
 
