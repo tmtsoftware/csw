@@ -36,7 +36,7 @@ import scala.util.{Failure, Success}
                                     [[csw.messages.location.Connection.AkkaConnection]]
  * @param locationService           The single instance of Location service created for a running application
  */
-class ContainerBehavior(
+class ContainerBehavior private[framework] (
     ctx: ActorContext[ContainerMessage],
     containerInfo: ContainerInfo,
     supervisorInfoFactory: SupervisorInfoFactory,
@@ -46,9 +46,9 @@ class ContainerBehavior(
 ) extends Actor.MutableBehavior[ContainerMessage] {
 
   import ctx.executionContext
-  val log: Logger                        = loggerFactory.getLogger(ctx)
-  val akkaConnection                     = AkkaConnection(ComponentId(containerInfo.name, ComponentType.Container))
-  val akkaRegistration: AkkaRegistration = registrationFactory.akkaTyped(akkaConnection, ctx.self)
+  private val log: Logger                        = loggerFactory.getLogger(ctx)
+  private val akkaConnection                     = AkkaConnection(ComponentId(containerInfo.name, ComponentType.Container))
+  private val akkaRegistration: AkkaRegistration = registrationFactory.akkaTyped(akkaConnection, ctx.self)
 
   // Set of successfully created supervisors for components
   var supervisors: Set[SupervisorInfo] = Set.empty
@@ -83,6 +83,7 @@ class ContainerBehavior(
    * Defines processing for a [[akka.typed.Signal]] received by the actor instance.
    * @return        The existing behavior
    */
+  //TODO: add doc for significance
   override def onSignal: PartialFunction[Signal, Behavior[ContainerMessage]] = {
     case Terminated(supervisor) ⇒
       log.warn(
@@ -104,7 +105,8 @@ class ContainerBehavior(
    * Defines action for messages which can be received in any [[csw.messages.framework.ContainerLifecycleState]] state
    * @param commonMessage Message representing a message received in any lifecycle state
    */
-  def onCommon(commonMessage: ContainerCommonMessage): Unit = commonMessage match {
+  //TODO: add doc for significance
+  private def onCommon(commonMessage: ContainerCommonMessage): Unit = commonMessage match {
     case GetComponents(replyTo) ⇒
       replyTo ! Components(supervisors.map(_.component))
     case GetContainerLifecycleState(replyTo) ⇒
@@ -124,7 +126,8 @@ class ContainerBehavior(
    * Defines action for messages which can be received in [[csw.messages.framework.ContainerLifecycleState.Idle]] state
    * @param idleMessage  Message representing a message received in [[csw.messages.framework.ContainerLifecycleState.Idle]] state
    */
-  def onIdle(idleMessage: ContainerIdleMessage): Unit = idleMessage match {
+  //TODO: add doc for significance
+  private def onIdle(idleMessage: ContainerIdleMessage): Unit = idleMessage match {
     case SupervisorsCreated(supervisorInfos) ⇒
       if (supervisorInfos.isEmpty) {
         log.error(s"Failed to spawn supervisors for ComponentInfo's :[${containerInfo.components.mkString(", ")}]")

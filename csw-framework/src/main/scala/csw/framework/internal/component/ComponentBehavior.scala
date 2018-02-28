@@ -35,7 +35,8 @@ import scala.util.control.NonFatal
  *                             component
  * @param locationService      The single instance of Location service created for a running application
  */
-class ComponentBehavior(
+//TODO: add doc for significance for everything
+class ComponentBehavior private[framework] (
     ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
     supervisor: ActorRef[FromComponentLifecycleMessage],
@@ -47,11 +48,11 @@ class ComponentBehavior(
 
   import ctx.executionContext
 
-  val log: Logger = loggerFactory.getLogger(ctx)
+  private val log: Logger = loggerFactory.getLogger(ctx)
 
-  val shutdownTimeout: FiniteDuration = 10.seconds
+  private val shutdownTimeout: FiniteDuration = 10.seconds
 
-  var lifecycleState: ComponentLifecycleState = ComponentLifecycleState.Idle
+  private[framework] var lifecycleState: ComponentLifecycleState = ComponentLifecycleState.Idle
 
   ctx.self ! Initialize
 
@@ -166,7 +167,7 @@ class ComponentBehavior(
    *
    * @param commandMessage  Message encapsulating a [[csw.messages.ccs.commands.Command]]
    */
-  def onRunningCompCommandMessage(commandMessage: CommandMessage): Unit = {
+  private def onRunningCompCommandMessage(commandMessage: CommandMessage): Unit = {
 
     log.info(s"Invoking lifecycle handler's validateSubmit hook with msg :[$commandMessage]")
     val validationResponse = lifecycleHandlers.validateCommand(commandMessage.command)

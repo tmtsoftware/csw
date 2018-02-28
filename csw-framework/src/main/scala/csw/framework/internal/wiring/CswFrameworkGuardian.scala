@@ -11,7 +11,7 @@ import csw.messages.models.CoordinatedShutdownReasons.ActorTerminatedReason
  * This is because the actor system used in csw is an `untyped` actor system which spawns a typed actor with default
  * supervision strategy of `restart` rather than stopping the actor which is the default in the `typed` actor system.
  */
-object CswFrameworkGuardian {
+private[framework] object CswFrameworkGuardian {
 
   sealed trait GuardianMsg
   case class CreateActor[T](behavior: Behavior[T], name: String, props: Props)(val replyTo: ActorRef[ActorRef[T]])

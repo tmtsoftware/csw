@@ -8,6 +8,7 @@ import csw.messages.params.states.CurrentState
  * Wrapper API for publishing [[csw.messages.params.states.CurrentState]] of a component.
  * @param publisherActor The wrapped actor
  */
+//TODO: add doc for significance
 class CurrentStatePublisher(publisherActor: ActorRef[PublisherMessage[CurrentState]]) {
 
   /**

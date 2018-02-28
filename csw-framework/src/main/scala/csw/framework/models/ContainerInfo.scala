@@ -8,7 +8,7 @@ import play.api.libs.json._
  * @param name         Name of the container
  * @param components   Set of components to be created inside this container
  */
-final case class ContainerInfo(name: String, components: Set[ComponentInfo]) {
+final case class ContainerInfo private[framework] (name: String, components: Set[ComponentInfo]) {
   require(components.nonEmpty, "components can not be empty.")
 }
 

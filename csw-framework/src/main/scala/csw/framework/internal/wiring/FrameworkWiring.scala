@@ -12,7 +12,7 @@ import csw.services.location.scaladsl.{LocationService, LocationServiceFactory, 
 import csw.services.logging.internal.LogControlMessages
 import csw.services.logging.scaladsl.LogAdminActorFactory
 
-class FrameworkWiring {
+private[csw] class FrameworkWiring {
   lazy val clusterSettings: ClusterSettings               = ClusterSettings()
   lazy val actorSystem: ActorSystem                       = clusterSettings.system
   lazy val locationService: LocationService               = LocationServiceFactory.withSystem(actorSystem)
@@ -25,7 +25,7 @@ class FrameworkWiring {
   lazy val configUtils: ConfigUtils                       = new ConfigUtils(configClientService, actorRuntime)
 }
 
-object FrameworkWiring {
+private[csw] object FrameworkWiring {
 
   def make(_actorSystem: ActorSystem): FrameworkWiring = new FrameworkWiring {
     override lazy val actorSystem: ActorSystem = _actorSystem

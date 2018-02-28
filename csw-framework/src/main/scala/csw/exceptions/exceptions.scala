@@ -2,6 +2,8 @@ package csw.exceptions
 
 import java.nio.file.Path
 
+//TODO: add doc for significance for all exception like where is it used etc.
+
 abstract class FailureStop(message: String)    extends RuntimeException(message)
 abstract class FailureRestart(message: String) extends RuntimeException(message)
 

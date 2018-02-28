@@ -8,7 +8,7 @@ import play.api.libs.json._
 /**
  * Parses the information represented in configuration files into respective models
  */
-object ConfigParser {
+private[csw] object ConfigParser {
   def parseContainer(config: Config): ContainerInfo  = parse[ContainerInfo](config)
   def parseStandalone(config: Config): ComponentInfo = parse[ComponentInfo](config)
   def parseHost(config: Config): HostBootstrapInfo   = parse[HostBootstrapInfo](config)

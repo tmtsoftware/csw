@@ -16,12 +16,14 @@ import csw.services.logging.scaladsl.LoggerFactory
  */
 abstract class JComponentBehaviorFactory extends ComponentBehaviorFactory() {
 
-  protected def handlers(ctx: scaladsl.ActorContext[TopLevelActorMessage],
-                         componentInfo: ComponentInfo,
-                         commandResponseManager: CommandResponseManager,
-                         currentStatePublisher: CurrentStatePublisher,
-                         locationService: LocationService,
-                         loggerFactory: LoggerFactory): ComponentHandlers =
+  protected def handlers(
+      ctx: scaladsl.ActorContext[TopLevelActorMessage],
+      componentInfo: ComponentInfo,
+      commandResponseManager: CommandResponseManager,
+      currentStatePublisher: CurrentStatePublisher,
+      locationService: LocationService,
+      loggerFactory: LoggerFactory
+  ): ComponentHandlers =
     jHandlers(
       ctx.asJava,
       componentInfo,

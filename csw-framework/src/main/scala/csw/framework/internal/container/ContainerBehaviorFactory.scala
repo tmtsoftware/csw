@@ -11,7 +11,7 @@ import csw.services.logging.scaladsl.LoggerFactory
 /**
  * Factory for creating [[akka.typed.scaladsl.Actor.MutableBehavior]] of a container component
  */
-object ContainerBehaviorFactory {
+private[framework] object ContainerBehaviorFactory {
   def behavior(
       containerInfo: ContainerInfo,
       locationService: LocationService,

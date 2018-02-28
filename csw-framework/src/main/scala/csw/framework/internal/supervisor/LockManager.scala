@@ -9,8 +9,9 @@ import csw.messages.models.LockingResponses._
 import csw.messages.params.models.Prefix
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
-class LockManager(val lockPrefix: Option[Prefix], loggerFactory: LoggerFactory) {
-  val log: Logger = loggerFactory.getLogger
+//TODO: add doc for significance
+class LockManager private[framework] (val lockPrefix: Option[Prefix], loggerFactory: LoggerFactory) {
+  private val log: Logger = loggerFactory.getLogger
 
   def lockComponent(source: Prefix, replyTo: ActorRef[LockingResponse])(startTimer: ⇒ Unit): LockManager = lockPrefix match {
     case None                ⇒ onAcquiringLock(source, replyTo, startTimer)

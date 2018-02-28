@@ -10,7 +10,7 @@ import scala.collection.immutable
  */
 sealed abstract class ContainerMode extends EnumEntry with TMTSerializable
 
-object ContainerMode extends Enum[ContainerMode] with PlayJsonEnum[ContainerMode] {
+private[csw] object ContainerMode extends Enum[ContainerMode] with PlayJsonEnum[ContainerMode] {
 
   override def values: immutable.IndexedSeq[ContainerMode] = findValues
 

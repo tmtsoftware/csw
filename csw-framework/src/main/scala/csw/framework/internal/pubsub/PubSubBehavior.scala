@@ -13,9 +13,9 @@ import csw.services.logging.scaladsl.{Logger, LoggerFactory}
  * @tparam T              The type of the data which will be published or subscribed to using this actor
  */
 class PubSubBehavior[T](ctx: ActorContext[PubSub[T]], loggerFactory: LoggerFactory) extends Actor.MutableBehavior[PubSub[T]] {
-  val log: Logger = loggerFactory.getLogger(ctx)
+  private val log: Logger = loggerFactory.getLogger(ctx)
   // list of subscribers who subscribe to the component using this pub-sub actor for the data of type [[T]]
-  var subscribers: Set[ActorRef[T]] = Set.empty
+  private[framework] var subscribers: Set[ActorRef[T]] = Set.empty
 
   override def onMessage(msg: PubSub[T]): Behavior[PubSub[T]] = {
     msg match {

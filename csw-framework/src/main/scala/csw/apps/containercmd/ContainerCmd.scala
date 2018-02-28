@@ -32,19 +32,20 @@ object ContainerCmd {
     new ContainerCmd(name, ClusterAwareSettings, true, defaultConfig).start(args)
 }
 
-private[containercmd] class ContainerCmd(
+class ContainerCmd private[containercmd] (
     name: String,
     clusterSettings: ClusterSettings,
     startLogging: Boolean,
     defaultConfig: Option[Config] = None
 ) {
-  val log: Logger = new LoggerFactory(name).getLogger
+  private val log: Logger = new LoggerFactory(name).getLogger
 
-  lazy val actorSystem: ActorSystem = clusterSettings.system
-  lazy val wiring: FrameworkWiring  = FrameworkWiring.make(actorSystem)
+  private lazy val actorSystem: ActorSystem = clusterSettings.system
+  private lazy val wiring: FrameworkWiring  = FrameworkWiring.make(actorSystem)
   import wiring.actorRuntime._
 
-  def start(args: Array[String]): ActorRef[_] = {
+  //TODO: add doc for significance
+  private[containercmd] def start(args: Array[String]): ActorRef[_] = {
     if (clusterSettings.seedNodes.isEmpty)
       throw ClusterSeedsNotFound
     else

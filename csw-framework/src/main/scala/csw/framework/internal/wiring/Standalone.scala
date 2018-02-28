@@ -10,7 +10,7 @@ import scala.concurrent.Future
 /**
  * Start a supervisor actor without a container, in it's own actor system, using the component information provided in a configuration file
  */
-object Standalone {
+private[csw] object Standalone {
 
   def spawn(
       config: com.typesafe.config.Config,

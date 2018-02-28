@@ -2,6 +2,7 @@ package csw.apps.hostconfig
 
 import akka.actor.ActorSystem
 import akka.actor.CoordinatedShutdown.Reason
+import csw.apps.containercmd.cli.Options
 import csw.apps.hostconfig.cli.{ArgsParser, Options}
 import csw.exceptions.{ClusterSeedsNotFound, UnableToParseOptions}
 import csw.framework.internal.configparser.ConfigParser
@@ -31,14 +32,15 @@ object HostConfig {
     new HostConfig(name, ClusterAwareSettings, startLogging = true).start(args)
 }
 
-private[hostconfig] class HostConfig(name: String, clusterSettings: ClusterSettings, startLogging: Boolean = false) {
-  val log: Logger = new LoggerFactory(name).getLogger
+class HostConfig private[hostconfig] (name: String, clusterSettings: ClusterSettings, startLogging: Boolean = false) {
+  private val log: Logger = new LoggerFactory(name).getLogger
 
-  lazy val actorSystem: ActorSystem           = clusterSettings.system
-  lazy val wiring: FrameworkWiring            = FrameworkWiring.make(actorSystem)
+  private lazy val actorSystem: ActorSystem   = clusterSettings.system
+  private lazy val wiring: FrameworkWiring    = FrameworkWiring.make(actorSystem)
   private var processes: Set[process.Process] = _
 
-  def start(args: Array[String]): Unit =
+  //TODO: add doc for significance
+  private[hostconfig] def start(args: Array[String]): Unit =
     if (clusterSettings.seedNodes.isEmpty)
       throw ClusterSeedsNotFound
     else

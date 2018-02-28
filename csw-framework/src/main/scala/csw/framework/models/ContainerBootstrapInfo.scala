@@ -7,7 +7,7 @@ import play.api.libs.json.{Json, OFormat}
  * @param configFilePath            path of configuration file which is provided to container cmd app to start specified components from config
  * @param configFileLocation        indicator to fetch config file either from local machine or from Configuration service
  */
-case class ContainerBootstrapInfo(
+case class ContainerBootstrapInfo private[framework] (
     mode: ContainerMode,
     configFilePath: String,
     configFileLocation: ConfigFileLocation

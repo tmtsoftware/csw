@@ -10,10 +10,12 @@ import csw.services.config.api.scaladsl.ConfigClientService
 import scala.async.Async.{async, await}
 import scala.concurrent.Future
 
-class ConfigUtils(configClientService: ConfigClientService, actorRuntime: ActorRuntime) {
+//TODO: add doc for significance
+class ConfigUtils private[csw] (configClientService: ConfigClientService, actorRuntime: ActorRuntime) {
   import actorRuntime._
 
-  def getConfig(
+  //TODO: add doc for significance
+  private[apps] def getConfig(
       isLocal: Boolean,
       inputFilePath: Option[Path],
       defaultConfig: Option[Config]
@@ -27,12 +29,12 @@ class ConfigUtils(configClientService: ConfigClientService, actorRuntime: ActorR
     } else getConfigFromRemoteFile(inputFilePath.get)
   }
 
-  def getConfigFromLocalFile(inputFilePath: Path): Config = {
+  private def getConfigFromLocalFile(inputFilePath: Path): Config = {
     if (Files.exists(inputFilePath)) ConfigFactory.parseFile(inputFilePath.toFile)
     else throw LocalFileNotFound(inputFilePath)
   }
 
-  def getConfigFromRemoteFile(inputFilePath: Path): Future[Config] =
+  private def getConfigFromRemoteFile(inputFilePath: Path): Future[Config] =
     async {
       await(configClientService.getActive(inputFilePath)) match {
         case Some(configData) ⇒ await(configData.toConfigObject)

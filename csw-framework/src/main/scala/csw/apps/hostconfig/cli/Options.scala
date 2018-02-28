@@ -9,7 +9,7 @@ import java.nio.file.Path
  *                            else, fetch the host configuration file from configuration service
  * @param hostConfigPath      host configuration file path
  */
-case class Options(
+private[hostconfig] case class Options(
     local: Boolean = false,
     hostConfigPath: Option[Path] = None,
     containerCmdAppScript: Option[String] = None

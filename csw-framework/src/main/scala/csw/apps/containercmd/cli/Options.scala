@@ -10,7 +10,7 @@ import java.nio.file.Path
  *                            use ConfigService to fetch the file
  * @param inputFilePath       config file path
  */
-case class Options(
+private[containercmd] case class Options(
     standalone: Boolean = false,
     local: Boolean = false,
     inputFilePath: Option[Path] = None

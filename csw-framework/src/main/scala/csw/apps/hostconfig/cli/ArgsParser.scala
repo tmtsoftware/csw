@@ -8,8 +8,8 @@ import scopt.OptionParser
 /**
  * Parses the command line options using `scopt` library.
  */
-class ArgsParser() {
-  val parser: OptionParser[Options] = new scopt.OptionParser[Options]("scopt") {
+private[hostconfig] class ArgsParser() {
+  private[hostconfig] val parser: OptionParser[Options] = new scopt.OptionParser[Options]("scopt") {
     head(BuildInfo.name, BuildInfo.version)
 
     opt[Unit]("local") action { (_, c) =>
