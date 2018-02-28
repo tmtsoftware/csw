@@ -27,19 +27,19 @@ object Monitor {
     var latencies = newMap()
 
     event =>
-      val eventTime    = event.eventTime.time.toEpochMilli
-      val currentTime  = System.currentTimeMillis
-      val latency      = currentTime - eventTime
-      val accTime      = currentTime - startTime
-      val shouldPrint  = (accTime - printTime) > step
-      val currentId    = event.eventId.id.toInt
-      val isOutOfOrder = (currentId - lastId) < 1
+      val eventTime   = event.eventTime.time.toEpochMilli
+      val currentTime = System.currentTimeMillis
+      val latency     = currentTime - eventTime
+      val accTime     = currentTime - startTime
+      val shouldPrint = (accTime - printTime) > step
+      val currentId   = event.eventId.id.toInt
+      val inOrder     = currentId >= lastId
 
       lastId = currentId
 
       count += 1
 
-      if (isOutOfOrder) {
+      if (!inOrder) {
         outOfOrderCount += 1
       }
 
