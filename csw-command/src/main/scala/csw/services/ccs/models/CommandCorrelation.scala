@@ -8,13 +8,13 @@ import csw.messages.params.models.Id
  * @param parentToChildren a map of parent command to all children command
  * @param childToParent a map of a child command to its parent command
  */
-case class CommandCorrelation(parentToChildren: Map[Id, Set[Id]], childToParent: Map[Id, Id]) {
+case class CommandCorrelation private[ccs] (parentToChildren: Map[Id, Set[Id]], childToParent: Map[Id, Id]) {
 
   /**
    * Add a new command relation
    * @param parentRunId parent command identifier as RunID
    * @param childRunId child command identifier as RunID
-   * @return a new CommandCorrelation model with te added coorelation
+   * @return a new CommandCorrelation model with the added coorelation
    */
   def add(parentRunId: Id, childRunId: Id): CommandCorrelation = CommandCorrelation(
     parentToChildren.updated(parentRunId, parentToChildren.getOrElse(parentRunId, Set()) + childRunId),
@@ -39,6 +39,7 @@ case class CommandCorrelation(parentToChildren: Map[Id, Set[Id]], childToParent:
    */
   def getParent(childRunId: Id): Option[Id] = childToParent.get(childRunId)
 
+  //TODO: add doc for significance
   def hasChildren(parentRunId: Id): Boolean = parentToChildren.get(parentRunId) match {
     case Some(children) => children.nonEmpty
     case None           => false

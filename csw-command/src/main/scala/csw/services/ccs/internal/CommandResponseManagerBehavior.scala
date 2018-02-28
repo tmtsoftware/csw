@@ -18,14 +18,15 @@ import csw.services.logging.scaladsl.{Logger, LoggerFactory}
  * @param ctx             The Actor Context under which the actor instance of this behavior is created
  * @param loggerFactory   The factory for creating [[csw.services.logging.scaladsl.Logger]] instance
  */
-class CommandResponseManagerBehavior(
+//TODO: add doc for significance for every method
+class CommandResponseManagerBehavior private[ccs] (
     ctx: ActorContext[CommandResponseManagerMessage],
     loggerFactory: LoggerFactory
 ) extends Actor.MutableBehavior[CommandResponseManagerMessage] {
-  val log: Logger = loggerFactory.getLogger(ctx)
+  private val log: Logger = loggerFactory.getLogger(ctx)
 
-  var commandStatus: CommandResponseManagerState = CommandResponseManagerState(Map.empty)
-  var commandCoRelation: CommandCorrelation      = CommandCorrelation(Map.empty, Map.empty)
+  private[ccs] var commandStatus: CommandResponseManagerState = CommandResponseManagerState(Map.empty)
+  private[ccs] var commandCoRelation: CommandCorrelation      = CommandCorrelation(Map.empty, Map.empty)
 
   override def onMessage(msg: CommandResponseManagerMessage): Behavior[CommandResponseManagerMessage] = {
     msg match {

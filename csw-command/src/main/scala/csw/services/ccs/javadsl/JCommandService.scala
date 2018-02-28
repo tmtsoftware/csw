@@ -135,6 +135,7 @@ class JCommandService(akkaLocation: AkkaLocation, actorSystem: ActorSystem[_]) {
   ): CompletableFuture[CommandResponse] =
     sCommandService.submitAllAndGetFinalResponse(controlCommands.asScala.toSet)(timeout).toJava.toCompletableFuture
 
+  //TODO: add doc for significance
   def subscribeCurrentState(callback: Consumer[CurrentState]): CurrentStateSubscription =
     sCommandService.subscribeCurrentState(callback.asScala)
 

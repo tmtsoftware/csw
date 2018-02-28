@@ -15,7 +15,8 @@ import csw.messages.params.models.Id
  * @param callback the action to perform on each received element
  * @param mat the materializer to materialize the underlying stream
  */
-class CommandResponseSubscription(
+//TODO: add doc for significance
+class CommandResponseSubscription private[csw] (
     runId: Id,
     commandResponseManagerActor: ActorRef[CommandResponseManagerMessage],
     callback: CommandResponse ⇒ Unit

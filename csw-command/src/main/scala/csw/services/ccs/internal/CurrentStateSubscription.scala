@@ -14,7 +14,7 @@ import csw.messages.params.states.CurrentState
  * @param callback the action to perform on each received element
  * @param mat the materializer to materialize the underlying stream
  */
-class CurrentStateSubscription(
+class CurrentStateSubscription private[ccs] (
     publisher: ActorRef[ComponentStateSubscription],
     callback: CurrentState ⇒ Unit
 )(implicit val mat: Materializer) {

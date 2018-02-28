@@ -31,7 +31,7 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
   private implicit val mat: Materializer    = ActorMaterializer()(actorSystem.toUntyped)
   private implicit val scheduler: Scheduler = actorSystem.scheduler
 
-  val component: ActorRef[ComponentMessage] = componentLocation.componentRef
+  private val component: ActorRef[ComponentMessage] = componentLocation.componentRef
 
   private val parallelism = 10
 
