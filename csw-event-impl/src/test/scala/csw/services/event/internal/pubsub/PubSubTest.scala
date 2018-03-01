@@ -75,6 +75,22 @@ class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with Embe
     retrieveInvalidEvent(kafkaSubscriber)
   }
 
+  test("Kakfa get") {
+    get(kafkaPublisher, kafkaSubscriber)
+  }
+
+  test("Redis get") {
+    get(redisPublisher, redisSubscriber)
+  }
+
+  test("Kakfa get retrieveInvalidEvent") {
+    retrieveInvalidEventOnget(kafkaPublisher, kafkaSubscriber)
+  }
+
+  test("Redis get retrieveInvalidEvent") {
+    retrieveInvalidEventOnget(redisPublisher, redisSubscriber)
+  }
+
   private def pubSub(publisher: EventPublisher, subscriber: EventSubscriber) = {
     val event1             = makeEvent(1)
     val eventKey: EventKey = event1.eventKey
@@ -166,6 +182,24 @@ class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with Embe
     subscription.unsubscribe()
 
     seqF.await shouldBe Seq(Event.invalidEvent)
+  }
+
+  private def get(publisher: EventPublisher, subscriber: EventSubscriber): Unit = {
+    val event1   = makeEvent(1)
+    val eventKey = event1.eventKey
+
+    publisher.publish(event1).await
+
+    val eventF = subscriber.get(eventKey)
+
+    eventF.await shouldBe event1
+  }
+
+  def retrieveInvalidEventOnget(publisher: EventPublisher, subscriber: EventSubscriber): Unit = {
+
+    val eventF = subscriber.get(EventKey("test"))
+
+    eventF.await shouldBe Event.invalidEvent
   }
 
 }
