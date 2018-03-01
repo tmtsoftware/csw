@@ -1,5 +1,7 @@
 package csw.messages.ccs.events
 
+import java.time.Instant
+
 import csw.messages.params.generics.{Parameter, ParameterSetType}
 import csw.messages.params.models.{Id, Prefix}
 import csw_protobuf.events.PbEvent
@@ -78,6 +80,9 @@ object Event {
   }
 
   def fromPb(pbEvent: PbEvent): Event = Event.typeMapper[Event].toCustom(pbEvent)
+
+  val invalidEvent: SystemEvent =
+    SystemEvent(Prefix("invalid"), EventName("invalid")).copy(eventTime = EventTime.toEventTime(Instant.MIN))
 }
 
 /**

@@ -35,39 +35,47 @@ class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with Embe
     redis.stop()
   }
 
-  test("Redis pub-sub") {
-    runPubSub(redisPublisher, redisSubscriber)
+  test("Redis pub sub") {
+    pubSub(redisPublisher, redisSubscriber)
   }
 
-  test("Redis independent-subscriptions") {
-    runIndependentSubscriptions(redisPublisher, redisSubscriber)
+  test("Redis independent subscriptions") {
+    subscribeIndependently(redisPublisher, redisSubscriber)
   }
 
-  ignore("Redis multiple-publish") {
-    runMultiplePublish(redisPublisher, redisSubscriber)
+  ignore("Redis multiple publish") {
+    publishMultiple(redisPublisher, redisSubscriber)
   }
 
-  test("Redis retrieve-recently-published-event-on-subscription") {
-    runRetrieveRecentlyPublished(redisPublisher, redisSubscriber)
+  test("Redis retrieve recently published event on subscription") {
+    retrieveRecentlyPublished(redisPublisher, redisSubscriber)
   }
 
-  test("Kafka pub-sub") {
-    runPubSub(kafkaPublisher, kafkaSubscriber)
+  test("Redis retrieveInvalidEvent") {
+    retrieveInvalidEvent(redisSubscriber)
   }
 
-  test("Kafka independent-subscriptions") {
-    runIndependentSubscriptions(kafkaPublisher, kafkaSubscriber)
+  test("Kafka pub sub") {
+    pubSub(kafkaPublisher, kafkaSubscriber)
   }
 
-  ignore("Kafka multiple-publish") {
-    runMultiplePublish(kafkaPublisher, kafkaSubscriber)
+  test("Kafka independent subscriptions") {
+    subscribeIndependently(kafkaPublisher, kafkaSubscriber)
   }
 
-  test("Kafka retrieve-recently-published-event-on-subscription") {
-    runRetrieveRecentlyPublished(kafkaPublisher, kafkaSubscriber)
+  ignore("Kafka multiple publish") {
+    publishMultiple(kafkaPublisher, kafkaSubscriber)
   }
 
-  private def runPubSub(publisher: EventPublisher, subscriber: EventSubscriber) = {
+  test("Kafka retrieve recently published event on subscription") {
+    retrieveRecentlyPublished(kafkaPublisher, kafkaSubscriber)
+  }
+
+  test("Kafka retrieveInvalidEvent") {
+    retrieveInvalidEvent(kafkaSubscriber)
+  }
+
+  private def pubSub(publisher: EventPublisher, subscriber: EventSubscriber) = {
     val event1             = makeEvent(1)
     val eventKey: EventKey = event1.eventKey
 
@@ -78,10 +86,10 @@ class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with Embe
     Thread.sleep(1000)
 
     subscription.unsubscribe().await
-    seqF.await shouldBe List(event1)
+    seqF.await shouldBe List(Event.invalidEvent, event1)
   }
 
-  private def runIndependentSubscriptions(publisher: EventPublisher, subscriber: EventSubscriber) = {
+  private def subscribeIndependently(publisher: EventPublisher, subscriber: EventSubscriber) = {
 
     val prefix        = Prefix("test.prefix")
     val eventName1    = EventName("system1")
@@ -102,11 +110,11 @@ class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with Embe
     subscription.unsubscribe().await
     subscription2.unsubscribe().await
 
-    seqF.await shouldBe List(event1)
-    seqF2.await shouldBe List(event2)
+    seqF.await shouldBe List(Event.invalidEvent, event1)
+    seqF2.await shouldBe List(Event.invalidEvent, event2)
   }
 
-  private def runMultiplePublish(publisher: EventPublisher, subscriber: EventSubscriber) = {
+  private def publishMultiple(publisher: EventPublisher, subscriber: EventSubscriber) = {
     def event: Event = makeEvent(1)
 
     val eventKey: EventKey = event.eventKey
@@ -129,7 +137,7 @@ class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with Embe
       .await
   }
 
-  private def runRetrieveRecentlyPublished(publisher: EventPublisher, subscriber: EventSubscriber) = {
+  private def retrieveRecentlyPublished(publisher: EventPublisher, subscriber: EventSubscriber) = {
     val event1   = makeEvent(1)
     val event2   = makeEvent(2)
     val event3   = makeEvent(3)
@@ -147,6 +155,17 @@ class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with Embe
     subscription.unsubscribe()
 
     seqF.await shouldBe Seq(event2, event3)
+  }
+
+  private def retrieveInvalidEvent(subscriber: EventSubscriber) = {
+    val eventKey = EventKey("test")
+
+    val (subscription, seqF) = subscriber.subscribe(Set(eventKey)).toMat(Sink.seq)(Keep.both).run()
+    Thread.sleep(1000)
+
+    subscription.unsubscribe()
+
+    seqF.await shouldBe Seq(Event.invalidEvent)
   }
 
 }

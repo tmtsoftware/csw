@@ -29,8 +29,8 @@ class KafkaPublisher(producerSettings: ProducerSettings[String, Array[Byte]])(im
     new ProducerRecord(event.eventKey.key, Event.typeMapper.toBase(event).toByteArray)
 
   private def complete(p: Promise[Done]): Callback = {
-    case (_, null) => p.success(Done)
-    case (_, ex)   => p.failure(ex)
+    case (_, null) ⇒ p.success(Done)
+    case (_, ex)   ⇒ p.failure(ex)
   }
 
   def shutdown(): Future[Unit] = Future { scala.concurrent.blocking(kafkaProducer.close()) }

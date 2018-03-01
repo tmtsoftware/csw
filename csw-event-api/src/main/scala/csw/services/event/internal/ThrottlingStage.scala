@@ -5,7 +5,7 @@ import akka.stream.{Attributes, FlowShape, Inlet, Outlet}
 
 import scala.concurrent.duration.FiniteDuration
 
-class NewDroppingThrottleStage[A](delay: FiniteDuration) extends GraphStage[FlowShape[A, A]] {
+class ThrottlingStage[A](delay: FiniteDuration) extends GraphStage[FlowShape[A, A]] {
   final val in    = Inlet.create[A]("DroppingThrottle.in")
   final val out   = Outlet.create[A]("DroppingThrottle.out")
   final val shape = FlowShape.of(in, out)
