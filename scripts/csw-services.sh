@@ -36,7 +36,7 @@ shouldStartSeed=true
 shouldStartConfig=false
 shouldStartRedis=false
 
-program_name=$0
+script_name=$0
 
 logDir=/tmp/csw-prod/logs
 test -d ${logDir} || mkdir -p ${logDir}
@@ -68,7 +68,7 @@ function checkIfRedisIsInstalled {
     # Look in the default location first, since installing from the source puts it there, otherwise look in the path
     if test ! -x ${redisServer} ; then redisServer=redis-server ; fi
     if ! type ${redisServer} &> /dev/null; then
-      echo "[ERROR] Can't find $redisServer. Please install Redis version $minRedisVersion or greater."
+      echo "[ERROR] Can't find $redisServer. Please install Redis version [$minRedisVersion] or greater."
       return 1
     else
         redis_version=`${redisServer} --version | awk '{sub(/-.*/,"",$3);print $3}' | sed -e 's/v=//'`
@@ -81,6 +81,7 @@ function checkIfRedisIsInstalled {
     fi
 }
 
+# Get the ip address associated with provided interface card
 function getIP {
     local cmd="ifconfig"
 
@@ -108,20 +109,20 @@ function random_unused_port {
 }
 
 function start_seed {
-    echo "[SEED] Starting cluster seed on port $seed_port ..."
-    nohup ./csw-cluster-seed --clusterPort $1 -DclusterSeeds=$2 &> ${seedLogFile} &
+    echo "[SEED] Starting cluster seed on port: [$seed_port] ..."
+    nohup ./csw-cluster-seed --clusterPort ${seed_port} -DclusterSeeds=${seeds} &> ${seedLogFile} &
     echo $! > ${seedPidFile}
 }
 
 function start_config {
-    echo "[CONFIG] Starting config service on port $config_port ..."
-    nohup ./csw-config-server --port $1 -DclusterSeeds=$2 $3 ${initSvnRepo} &> ${configLogFile} &
+    echo "[CONFIG] Starting config service on port: [$config_port] ..."
+    nohup ./csw-config-server --port ${config_port} ${initSvnRepo} -DclusterSeeds=${seeds} &> ${configLogFile} &
     echo $! > ${configPidFile}
 }
 
 function start_redis() {
     if checkIfRedisIsInstalled ; then
-        echo "[REDIS] Starting redis on port $redis_port ..."
+        echo "[REDIS] Starting redis on port: [$redis_port] ..."
         nohup ./csw-location-agent -DclusterSeeds=${seeds} --name "$redisServices" --command "$redisServer --port ${redis_port} --protected-mode no --notify-keyspace-events KEA" > ${redisLogFile} 2>&1 &
         echo $! > ${redisPidFile}
         echo ${redis_port} > ${redisPortFile}
@@ -137,14 +138,14 @@ function enableAllServicesForRunning {
 }
 
 function start_services {
-    if [[ "$shouldStartSeed" = true ]]; then start_seed ${seed_port} ${seeds}; fi
-    if [[ "$shouldStartConfig" = true ]]; then start_config ${config_port} ${seeds}; fi
+    if [[ "$shouldStartSeed" = true ]]; then start_seed ; fi
+    if [[ "$shouldStartConfig" = true ]]; then start_config ; fi
     if [[ "$shouldStartRedis" = true ]]; then start_redis; fi
 }
 
 function usage {
     echo
-    echo -e "usage: $program_name COMMAND [--seed <port>] [--config <port>] [--initRepo] [--redis <port>]\n"
+    echo -e "usage: $script_name COMMAND [--seed <port>] [--config <port>] [--initRepo] [--redis <port>]\n"
 
     echo "Options:"
     echo "  --seed <seedPort>               start seed on provided port, default: 5552"
@@ -203,7 +204,7 @@ function parse_cmd_args {
                             usage
                             ;;
                         *)
-                            echo "[ERROR] Unknown arguments provided for start command. Find usage below :"
+                            echo "[ERROR] Unknown arguments provided for start command. Find usage below:"
                             usage
                             ;;
                     esac
@@ -226,6 +227,8 @@ function parse_cmd_args {
                     exit 1
                 else
                     seeds="${IP}:${seed_port}"
+                    echo "[INFO] Using clusterSeeds=$seeds"
+
                     start_services
                     echo "All the logs are stored at location: [$logDir]"
                 fi

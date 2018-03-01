@@ -41,15 +41,28 @@ object GithubRelease extends AutoPlugin {
   }
 
   private def stageAndZipTask(projects: Seq[ProjectReference]): Def.Initialize[Task[File]] = Def.task {
-    lazy val appsZip  = new File(target.value / "ghrelease", s"csw-apps-${version.value}.zip")
+    val log           = sLog.value
+    val zipFileName   = s"csw-apps-${version.value}"
+    lazy val appsZip  = new File(target.value / "ghrelease", s"$zipFileName.zip")
     val serviceScript = baseDirectory.value / "scripts" / "csw-services.sh"
 
+    log.info("Deleting staging directory ...")
+    // delete older files from staging directory to avoid getting it included in zip
+    // in order to delete directory first and then stage projects, below needs to be a task
+    Def.task {
+      IO.delete(target.value / "universal" / "stage")
+    }.value
+
+    log.info(s"Staging projects: [${projects.mkString(" ,")}]")
     val stagedFiles = projects
       .map(p ⇒ stage in Universal in p)
       .join
       .value
       .flatMap(x ⇒ Path.allSubpaths(x))
-      .distinct :+ ((serviceScript, s"bin/${serviceScript.getName}"))
+      .distinct
+      .map {
+        case (source, dest) ⇒ (source, s"$zipFileName/$dest")
+      } :+ ((serviceScript, s"$zipFileName/bin/${serviceScript.getName}"))
 
     ZipHelper.zipNative(stagedFiles, appsZip)
     appsZip
