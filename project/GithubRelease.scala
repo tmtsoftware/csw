@@ -1,9 +1,10 @@
 import java.io.File
 
-import com.typesafe.sbt.packager.universal.UniversalPlugin.autoImport.Universal
+import com.typesafe.sbt.packager.universal.UniversalPlugin.autoImport._
+import com.typesafe.sbt.packager.universal.ZipHelper
 import ohnosequences.sbt.GithubRelease.keys.{ghreleaseAssets, ghreleaseRepoName, ghreleaseRepoOrg, githubRelease}
 import ohnosequences.sbt.SbtGithubReleasePlugin
-import sbt.Keys.{aggregate, crossTarget, packageBin, target}
+import sbt.Keys._
 import sbt.io.{IO, Path}
 import sbt.{AutoPlugin, Def, Plugins, ProjectReference, Setting, Task, taskKey, _}
 
@@ -27,21 +28,38 @@ object GithubRelease extends AutoPlugin {
   )
 
   private def coverageReportZipTask = Def.task {
-    lazy val coverageReportZip = new File(crossTarget.value, "scoverage-report.zip")
+    lazy val coverageReportZip = new File(target.value / "ghrelease", "scoverage-report.zip")
     IO.zip(Path.allSubpaths(new File(crossTarget.value, "scoverage-report")), coverageReportZip)
     coverageReportZip
   }
 
   private def testReportsZipTask = Def.task {
-    lazy val testReportsZip = new File(target.value, "test-reports.zip")
+    lazy val testReportsZip = new File(target.value / "ghrelease", "test-reports.zip")
     val testXmlReportFiles  = target.all(aggregateFilter).value flatMap (x ⇒ Path.allSubpaths(x / "test-reports"))
     IO.zip(testXmlReportFiles, testReportsZip)
     testReportsZip
   }
 
-  def githubReleases(projects: Seq[ProjectReference]): Setting[Task[Seq[sbt.File]]] =
-    ghreleaseAssets := projects
-      .map(p ⇒ packageBin in Universal in p)
+  private def stageAndZipTask(projects: Seq[ProjectReference]): Def.Initialize[Task[File]] = Def.task {
+    lazy val appsZip  = new File(target.value / "ghrelease", s"csw-apps-${version.value}.zip")
+    val serviceScript = baseDirectory.value / "scripts" / "csw-services.sh"
+
+    val stagedFiles = projects
+      .map(p ⇒ stage in Universal in p)
       .join
-      .value :+ coverageReportZipKey.value :+ testReportZipKey.value
+      .value
+      .flatMap(x ⇒ Path.allSubpaths(x))
+      .distinct :+ ((serviceScript, s"bin/${serviceScript.getName}"))
+
+    ZipHelper.zipNative(stagedFiles, appsZip)
+    appsZip
+  }
+
+  def githubReleases(projects: Seq[ProjectReference]): Setting[Task[Seq[sbt.File]]] =
+    ghreleaseAssets := Seq(
+      stageAndZipTask(projects).value,
+      coverageReportZipKey.value,
+      testReportZipKey.value
+    )
+
 }

@@ -1,9 +1,29 @@
 #!/usr/bin/env bash
-
-YELLOW='\033[1;33m'
-ORANGE='\033[0;33m'
-PURPLE='\033[0;35m'
-NC='\033[0m' # No Color
+#
+# Starts services required by CSW and registers them with the location service.
+# This script uses the csw-location-agent app to start Redis and register it with the Location Service
+#
+# Usage is:
+#   ###########################  IMPORTANT ###########################
+#    1. Before running this script, make sure that you have interfaceName environment variable is set.
+#    2. If env variable is not set, then make sure you pass in --interfaceName or -i <name> to this script to pick the correct
+#      interface where location service gets bind.
+#   ##################################################################
+#
+#   If svn repo does not already exists on local machine and interfaceName env variable is set, then use below command to start all the services:
+#    csw-services.sh start --initRepo     :to start redis, cluster seed application and register the config and event service
+#
+#   If svn repo already exists on local machine and interfaceName env variable is set, then use below command to start all the service:
+#    csw-services.sh start    :to start redis, cluster seed application and register the config and event service
+#
+#   If svn repo already exists on local machine and interfaceName env variable is not set, then use below command to start all the service:
+#    csw-services.sh start --interfaceName eth0   :to start redis, cluster seed application and register the config and event service
+#
+#   In case you do not want to start all the services, then specify supported arguments to start
+#    csw-services.sh start --seed 5552 --config 5555   :this starts cluster seed on port 5552 and config server on port 5555 (does not start redis)
+#
+#    csw-services.sh stop     :to stop redis and unregister the services from the location service
+#
 
 # Setting default values
 seed_port=5552
@@ -38,7 +58,6 @@ redisPidFile=${logDir}/redis.pid
 redisPortFile=${logDir}/redis.port
 
 sortVersion="sort -V"
-
 
 # Make sure we have the min redis version
 function get_version {
@@ -77,11 +96,6 @@ function isPortProvided {
     if ! [[ $1 =~ $re ]] ; then return 1; else return 0; fi
 }
 
-function stage_all_projects {
-    printf "${YELLOW}[STAGE] Staging all the projects.${NC}\n"
-    sbt universal:stage
-}
-
 # Gets a random, unused port
 function random_unused_port {
     local port=$(shuf -i 2000-65000 -n 1)
@@ -94,21 +108,21 @@ function random_unused_port {
 }
 
 function start_seed {
-    printf "${YELLOW}[SEED] Starting cluster seed on port $seed_port ${NC}\n"
-    nohup ./target/universal/stage/bin/csw-cluster-seed --clusterPort $1 -DclusterSeeds=$2 &> ${seedLogFile} &
+    echo "[SEED] Starting cluster seed on port $seed_port ..."
+    nohup ./csw-cluster-seed --clusterPort $1 -DclusterSeeds=$2 &> ${seedLogFile} &
     echo $! > ${seedPidFile}
 }
 
 function start_config {
-    printf "${YELLOW}[CONFIG] Starting config service on port $config_port ${NC}\n"
-    nohup ./target/universal/stage/bin/csw-config-server --port $1 -DclusterSeeds=$2 $3 ${initSvnRepo} &> ${configLogFile} &
+    echo "[CONFIG] Starting config service on port $config_port ..."
+    nohup ./csw-config-server --port $1 -DclusterSeeds=$2 $3 ${initSvnRepo} &> ${configLogFile} &
     echo $! > ${configPidFile}
 }
 
 function start_redis() {
     if checkIfRedisIsInstalled ; then
-        printf "${YELLOW}[REDIS] Starting redis on port $redis_port ${NC}\n"
-        nohup ./target/universal/stage/bin/csw-location-agent -DclusterSeeds=${seeds} --name "$redisServices" --command "$redisServer --port ${redis_port} --protected-mode no --notify-keyspace-events KEA" > ${redisLogFile} 2>&1 &
+        echo "[REDIS] Starting redis on port $redis_port ..."
+        nohup ./csw-location-agent -DclusterSeeds=${seeds} --name "$redisServices" --command "$redisServer --port ${redis_port} --protected-mode no --notify-keyspace-events KEA" > ${redisLogFile} 2>&1 &
         echo $! > ${redisPidFile}
         echo ${redis_port} > ${redisPortFile}
     else
@@ -137,7 +151,7 @@ function usage {
     echo "  --interfaceName | -i <name>     start cluster on ip address associated with provided interface, default: en0"
     echo "  --config <configPort>           start http config server on provided port, default: 5000"
     echo "  --initRepo                      create new svn repo, default: use existing svn repo"
-    echo -e "  --redis <redisPort>          start redis server on provided port, default: 6379 \n"
+    echo -e "  --redis <redisPort>             start redis server on provided port, default: 6379 \n"
 
     echo "Commands:"
     echo "  start      Starts all csw services if no options provided"
@@ -212,8 +226,8 @@ function parse_cmd_args {
                     exit 1
                 else
                     seeds="${IP}:${seed_port}"
-                    stage_all_projects
                     start_services
+                    echo "All the logs are stored at location: [$logDir]"
                 fi
             fi
             ;;
@@ -242,7 +256,7 @@ function parse_cmd_args {
             else
                 local PID=$(cat ${seedPidFile})
                 echo "[SEED] Stopping Cluster Seed application..."
-                kill ${PID}
+                kill ${PID} &> /dev/null
                 rm -f ${seedPidFile} ${seedLogFile}
                 echo "[SEED] Cluster Seed stopped."
             fi
@@ -253,7 +267,7 @@ function parse_cmd_args {
             else
                 local PID=$(cat ${configPidFile})
                 echo "[CONFIG] Stopping Config Service..."
-                kill ${PID}
+                kill ${PID} &> /dev/null
                 rm -f ${configPidFile} ${configLogFile}
                 echo "[CONFIG] Config Service stopped"
             fi
