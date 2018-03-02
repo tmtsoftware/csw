@@ -145,13 +145,14 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     private void processCommandWithoutMatcher(ControlCommand controlCommand) {
 
         if (controlCommand.commandName().equals(failureAfterValidationCmd())) {
-            commandResponseManager.addOrUpdateCommand(controlCommand.runId(), new CommandResponse.Error(controlCommand.runId(), "Unknown Error occurred"));
-        } else {
             // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
-            CompletableFuture<CommandResponse> status = commandResponseManager.jQuery(controlCommand.runId(), Timeout.apply(3, TimeUnit.MILLISECONDS));
+            CompletableFuture<CommandResponse> status = commandResponseManager.jQuery(controlCommand.runId(), Timeout.apply(100, TimeUnit.MILLISECONDS));
             status.thenAccept(response -> {
-                if(response instanceof Accepted) commandResponseManager.addOrUpdateCommand(controlCommand.runId(), new Completed(controlCommand.runId()));
+                if(response instanceof Accepted)
+                    commandResponseManager.addOrUpdateCommand(controlCommand.runId(), new CommandResponse.Error(controlCommand.runId(), "Unknown Error occurred"));
             });
+        } else {
+             commandResponseManager.addOrUpdateCommand(controlCommand.runId(), new Completed(controlCommand.runId()));
         }
 
     }
