@@ -34,9 +34,8 @@ import csw.messages.params.models.Prefix
 import csw.messages.params.states.CurrentState
 import csw.services.ccs.internal.CommandResponseManagerFactory
 import csw.services.ccs.scaladsl.CommandResponseManager
-import csw.services.location.commons.RegistrationFactory
 import csw.services.location.models.AkkaRegistration
-import csw.services.location.scaladsl.LocationService
+import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
 import scala.concurrent.Future

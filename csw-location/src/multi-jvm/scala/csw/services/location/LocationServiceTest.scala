@@ -10,6 +10,7 @@ import csw.messages.location._
 import csw.services.location.commons.RegistrationFactory
 import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.location.helpers.{LSNodeSpec, OneMemberAndSeed}
+import csw.services.location.scaladsl.RegistrationFactory
 import org.scalatest.BeforeAndAfterEach
 
 import scala.collection.immutable.Set

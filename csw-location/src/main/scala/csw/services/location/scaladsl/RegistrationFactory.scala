@@ -1,4 +1,4 @@
-package csw.services.location.commons
+package csw.services.location.scaladsl
 
 import akka.typed.ActorRef
 import csw.messages.location.Connection.AkkaConnection

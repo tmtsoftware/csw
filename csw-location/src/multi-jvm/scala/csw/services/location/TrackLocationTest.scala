@@ -8,6 +8,7 @@ import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConn
 import csw.messages.location._
 import csw.services.location.commons.RegistrationFactory
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
+import csw.services.location.scaladsl.RegistrationFactory
 
 import scala.concurrent.duration.DurationInt
 

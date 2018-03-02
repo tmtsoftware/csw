@@ -7,8 +7,8 @@ import csw.messages.ContainerIdleMessage
 import csw.messages.framework.ComponentInfo
 import csw.messages.models.{Component, SupervisorInfo}
 import csw.services.ccs.internal.CommandResponseManagerFactory
-import csw.services.location.commons.{ActorSystemFactory, RegistrationFactory}
-import csw.services.location.scaladsl.LocationService
+import csw.services.location.commons.ActorSystemFactory
+import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
 import scala.async.Async._

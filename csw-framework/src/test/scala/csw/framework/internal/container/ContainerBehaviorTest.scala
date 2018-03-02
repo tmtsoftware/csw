@@ -21,9 +21,9 @@ import csw.messages.location.Connection.AkkaConnection
 import csw.messages.models.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.messages.models.{Component, Components, SupervisorInfo}
 import csw.services.ccs.internal.CommandResponseManagerFactory
-import csw.services.location.commons.{ActorSystemFactory, RegistrationFactory}
+import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
-import csw.services.location.scaladsl.LocationService
+import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.mockito.invocation.InvocationOnMock

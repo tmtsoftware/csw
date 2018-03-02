@@ -7,8 +7,8 @@ import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.services.ccs.internal.CommandResponseManagerFactory
 import csw.services.config.api.scaladsl.ConfigClientService
 import csw.services.config.client.scaladsl.ConfigClientFactory
-import csw.services.location.commons.{ClusterSettings, RegistrationFactory}
-import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
+import csw.services.location.commons.ClusterSettings
+import csw.services.location.scaladsl.{LocationService, LocationServiceFactory, RegistrationFactory}
 import csw.services.logging.internal.LogControlMessages
 import csw.services.logging.scaladsl.LogAdminActorFactory
 
