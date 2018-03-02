@@ -4,7 +4,7 @@ import java.util.regex.Pattern
 import csw.services.config.api.models.FileType
 import org.tmatesoft.svn.core.{SVNDirEntry, SVNNodeKind}
 
-private[config] object SVNDirEntryExt {
+object SVNDirEntryExt {
 
   /**
    * SVNDirEntryExt provides helper methods to SVNDirEntry

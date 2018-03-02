@@ -11,7 +11,7 @@ import scala.concurrent.Future
  *
  * @param blockingIoDispatcher   Dispatcher to be used for blocking file operations
  */
-class AnnexFileRepo private[config] (blockingIoDispatcher: MessageDispatcher) {
+class AnnexFileRepo(blockingIoDispatcher: MessageDispatcher) {
 
   private implicit val _blockingIoDispatcher: MessageDispatcher = blockingIoDispatcher
 

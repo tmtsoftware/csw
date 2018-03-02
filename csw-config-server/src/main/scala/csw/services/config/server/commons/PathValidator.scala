@@ -5,7 +5,7 @@ import java.util.regex.Pattern
 /**
  * PathValidator is used to validate any requested path against invalid characters at an entry point of config service
  */
-private[config] object PathValidator {
+object PathValidator {
 
   private val invalidChars   = "!#<>$%&'@^`~+,;=\\s"
   private val invalidPattern = Pattern.compile(s"[$invalidChars]+")

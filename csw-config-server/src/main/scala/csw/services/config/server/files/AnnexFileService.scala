@@ -21,7 +21,7 @@ import scala.concurrent.Future
  * @param fileRepo FileRepo performs file operations with a blocking dispatcher
  * @param actorRuntime ActorRuntime provides runtime accessories related to ActorSystem like Materializer, ExecutionContext etc.
  */
-class AnnexFileService private[config] (settings: Settings, fileRepo: AnnexFileRepo, actorRuntime: ActorRuntime) {
+class AnnexFileService(settings: Settings, fileRepo: AnnexFileRepo, actorRuntime: ActorRuntime) {
 
   import actorRuntime._
 
