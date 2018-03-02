@@ -16,4 +16,6 @@ trait EventPublisher {
     val stream = Source.tick(0.millis, every, ()).map(_ => eventGenerator())
     publish(stream)
   }
+
+  def shutdown(): Future[Done]
 }

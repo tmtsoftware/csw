@@ -13,7 +13,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class RedisPublisher(redisGateway: RedisGateway)(implicit ec: ExecutionContext, mat: Materializer) extends EventPublisher {
 
-  private val asyncCommandsF: Future[RedisAsyncCommands[EventKey, Event]] = redisGateway.asyncConnectionF()
+  private lazy val asyncCommandsF: Future[RedisAsyncCommands[EventKey, Event]] = redisGateway.asyncConnectionF()
 
   override def publish[Mat](source: Source[Event, Mat]): Mat = source.mapAsync(1)(publish).to(Sink.ignore).run()
 
@@ -23,4 +23,6 @@ class RedisPublisher(redisGateway: RedisGateway)(implicit ec: ExecutionContext, 
     await(commands.set(event.eventKey, event).toScala)
     Done
   }
+
+  override def shutdown(): Future[Done] = Future.successful(Done)
 }

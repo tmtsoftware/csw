@@ -1,97 +1,49 @@
-package csw.services.event.internal.pubsub
+package csw.services.event.internal
 
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import csw.messages.ccs.events.{Event, EventKey, EventName, SystemEvent}
 import csw.messages.params.models.Prefix
 import csw.services.event.helpers.TestFutureExt.RichFuture
-import csw.services.event.helpers.Utils._
-import csw.services.event.internal.Wiring
+import csw.services.event.helpers.Utils.makeEvent
+import csw.services.event.internal.commons.Wiring
+import csw.services.event.internal.perf.Monitor
 import csw.services.event.scaladsl.{EventPublisher, EventSubscriber}
-import net.manub.embeddedkafka.EmbeddedKafka
-import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
-import redis.embedded.RedisServer
+import org.scalatest.Matchers
 
-import scala.concurrent.Await
-import scala.concurrent.duration.DurationDouble
+import scala.concurrent.duration.DurationLong
 
-class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with EmbeddedKafka {
-
-  private val wiring = new Wiring()
+class EventServicePubSubTestFramework(wiring: Wiring) extends Matchers {
 
   import wiring._
-  lazy val redis: RedisServer = RedisServer.builder().setting("bind 127.0.0.1").port(6379).build()
 
-  override protected def beforeAll(): Unit = {
-    redis.start()
-    EmbeddedKafka.start()
+  val eventKey: EventKey = makeEvent(0).eventKey
+  var counter            = 0
+
+  private val eventStream                 = Source.repeat(()).map(_ => eventGenerator())
+  private val publisher: EventPublisher   = wiring.publisher()
+  private val subscriber: EventSubscriber = wiring.subscriber()
+
+  private def eventGenerator() = {
+    counter += 1
+    makeEvent(counter)
   }
 
-  override def afterAll(): Unit = {
-    Await.result(actorSystem.terminate(), 5.seconds)
-    kafkaPublisher.shutdown().await
-    kafkaSubscriber.shutdown().await
-    EmbeddedKafka.stop()
-    Await.result(redisGateway.shutdown(), 5.seconds)
-    redis.stop()
+  def monitorPerf(): Unit = {
+    val doneF = subscriber
+      .subscribe(Set(eventKey), 20.millis)
+      .via(Monitor.resetting)
+      .runWith(Sink.ignore)
+
+    Thread.sleep(1000)
+
+    //    eventStream.mapAsync(1)(publisher.publish).runWith(Sink.ignore)
+    //    publisher.publish(eventStream)
+    publisher.publish(eventGenerator, 5.millis)
+
+    doneF.await
   }
 
-  test("Redis pub sub") {
-    pubSub(redisPublisher, redisSubscriber)
-  }
-
-  test("Redis independent subscriptions") {
-    subscribeIndependently(redisPublisher, redisSubscriber)
-  }
-
-  ignore("Redis multiple publish") {
-    publishMultiple(redisPublisher, redisSubscriber)
-  }
-
-  test("Redis retrieve recently published event on subscription") {
-    retrieveRecentlyPublished(redisPublisher, redisSubscriber)
-  }
-
-  test("Redis retrieveInvalidEvent") {
-    retrieveInvalidEvent(redisSubscriber)
-  }
-
-  test("Kafka pub sub") {
-    pubSub(kafkaPublisher, kafkaSubscriber)
-  }
-
-  test("Kafka independent subscriptions") {
-    subscribeIndependently(kafkaPublisher, kafkaSubscriber)
-  }
-
-  ignore("Kafka multiple publish") {
-    publishMultiple(kafkaPublisher, kafkaSubscriber)
-  }
-
-  test("Kafka retrieve recently published event on subscription") {
-    retrieveRecentlyPublished(kafkaPublisher, kafkaSubscriber)
-  }
-
-  test("Kafka retrieveInvalidEvent") {
-    retrieveInvalidEvent(kafkaSubscriber)
-  }
-
-  test("Kakfa get") {
-    get(kafkaPublisher, kafkaSubscriber)
-  }
-
-  test("Redis get") {
-    get(redisPublisher, redisSubscriber)
-  }
-
-  test("Kakfa get retrieveInvalidEvent") {
-    retrieveInvalidEventOnget(kafkaPublisher, kafkaSubscriber)
-  }
-
-  test("Redis get retrieveInvalidEvent") {
-    retrieveInvalidEventOnget(redisPublisher, redisSubscriber)
-  }
-
-  private def pubSub(publisher: EventPublisher, subscriber: EventSubscriber) = {
+  def pubSub(): Unit = {
     val event1             = makeEvent(1)
     val eventKey: EventKey = event1.eventKey
 
@@ -105,7 +57,7 @@ class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with Embe
     seqF.await shouldBe List(Event.invalidEvent, event1)
   }
 
-  private def subscribeIndependently(publisher: EventPublisher, subscriber: EventSubscriber) = {
+  def subscribeIndependently(): Unit = {
 
     val prefix        = Prefix("test.prefix")
     val eventName1    = EventName("system1")
@@ -130,7 +82,7 @@ class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with Embe
     seqF2.await shouldBe List(Event.invalidEvent, event2)
   }
 
-  private def publishMultiple(publisher: EventPublisher, subscriber: EventSubscriber) = {
+  def publishMultiple(): Unit = {
     def event: Event = makeEvent(1)
 
     val eventKey: EventKey = event.eventKey
@@ -153,7 +105,7 @@ class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with Embe
       .await
   }
 
-  private def retrieveRecentlyPublished(publisher: EventPublisher, subscriber: EventSubscriber) = {
+  def retrieveRecentlyPublished(): Unit = {
     val event1   = makeEvent(1)
     val event2   = makeEvent(2)
     val event3   = makeEvent(3)
@@ -173,7 +125,7 @@ class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with Embe
     seqF.await shouldBe Seq(event2, event3)
   }
 
-  private def retrieveInvalidEvent(subscriber: EventSubscriber) = {
+  def retrieveInvalidEvent(): Unit = {
     val eventKey = EventKey("test")
 
     val (subscription, seqF) = subscriber.subscribe(Set(eventKey)).toMat(Sink.seq)(Keep.both).run()
@@ -184,7 +136,7 @@ class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with Embe
     seqF.await shouldBe Seq(Event.invalidEvent)
   }
 
-  private def get(publisher: EventPublisher, subscriber: EventSubscriber): Unit = {
+  def get(): Unit = {
     val event1   = makeEvent(1)
     val eventKey = event1.eventKey
 
@@ -195,7 +147,7 @@ class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with Embe
     eventF.await shouldBe event1
   }
 
-  def retrieveInvalidEventOnget(publisher: EventPublisher, subscriber: EventSubscriber): Unit = {
+  def retrieveInvalidEventOnget(): Unit = {
 
     val eventF = subscriber.get(EventKey("test"))
 

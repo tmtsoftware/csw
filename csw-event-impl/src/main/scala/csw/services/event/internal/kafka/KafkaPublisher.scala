@@ -25,6 +25,11 @@ class KafkaPublisher(producerSettings: ProducerSettings[String, Array[Byte]])(im
     p.future
   }
 
+  override def shutdown(): Future[Done] = Future {
+    scala.concurrent.blocking(kafkaProducer.close())
+    Done
+  }
+
   private def convert(event: Event): ProducerRecord[String, Array[Byte]] =
     new ProducerRecord(event.eventKey.key, Event.typeMapper.toBase(event).toByteArray)
 
@@ -33,5 +38,4 @@ class KafkaPublisher(producerSettings: ProducerSettings[String, Array[Byte]])(im
     case (_, ex)   ⇒ p.failure(ex)
   }
 
-  def shutdown(): Future[Unit] = Future { scala.concurrent.blocking(kafkaProducer.close()) }
 }

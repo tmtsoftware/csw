@@ -161,7 +161,7 @@ lazy val `csw-event-api` = project
   .enablePlugins(GenJavadocPlugin)
 
 lazy val `csw-event-impl` = project
-  .dependsOn(`csw-event-api`, `csw-logging`)
+  .dependsOn(`csw-event-api`, `csw-logging`, `csw-location`)
   .enablePlugins(AutoMultiJvm)
   .settings(libraryDependencies ++= Dependencies.EventImpl)
 
