@@ -13,7 +13,7 @@ import scala.concurrent.Future
 /**
  * Generated SHA1 for file represented as stream //TODO: update doc
  */
-object Sha1 {
+private[config] object Sha1 {
 
   private def fromSource(source: Source[ByteString, Any])(implicit mat: Materializer): Future[String] =
     source.runWith(sink)

@@ -16,18 +16,23 @@ import scala.concurrent.Future
  * based on the SHA-1 hash of the file contents (This is the same way Git stores data).
  * The file checked in to the Svn repository is then named ''file''.`sha1` and contains only
  * the SHA-1 hash value.
-  **/
-class AnnexFileService(settings: Settings, fileRepo: AnnexFileRepo, actorRuntime: ActorRuntime) {
+ *
+ * @param annexFilesDir The directory path to store annex files
+ * @param fileRepo FileRepo performs file operations with a blocking dispatcher
+ * @param actorRuntime ActorRuntime provides runtime accessories related to ActorSystem like Materializer, ExecutionContext etc.
+ */
+class AnnexFileService private[config] (annexFilesDir: String, fileRepo: AnnexFileRepo, actorRuntime: ActorRuntime) {
 
   import actorRuntime._
 
   private val log: Logger = ConfigServerLogger.getLogger
 
-  def post(configData: ConfigData): Future[String] = async { //TODO: add doc
+  // The debug statements help understand the flow of the method
+  def post(configData: ConfigData): Future[String] = async {
     log.debug("Creating temporary file and calculating it's sha")
     val (tempFilePath, sha) = await(saveAndSha(configData))
 
-    val outPath = makePath(settings.`annex-files-dir`, sha)
+    val outPath = makePath(annexFilesDir, sha)
 
     if (await(fileRepo.exists(outPath))) {
       log.debug(s"Annex file already exists at path ${outPath.toString}")
@@ -51,8 +56,9 @@ class AnnexFileService(settings: Settings, fileRepo: AnnexFileRepo, actorRuntime
     }
   }
 
-  def get(sha: String): Future[Option[ConfigData]] = async { //TODO: add doc
-    val repoFilePath = makePath(settings.`annex-files-dir`, sha)
+  // The debug statements help understand the flow of the method
+  def get(sha: String): Future[Option[ConfigData]] = async {
+    val repoFilePath = makePath(annexFilesDir, sha)
 
     log.debug(s"Checking if annex file exists at ${repoFilePath.toString}")
     if (await(fileRepo.exists(repoFilePath))) {
@@ -62,8 +68,14 @@ class AnnexFileService(settings: Settings, fileRepo: AnnexFileRepo, actorRuntime
     }
   }
 
-  // Returns the name of the file to use in the configured directory.
-  // Like Git, distribute the files in directories based on the first 2 chars of the SHA-1 hash
+  /**
+   * Returns the name of the file to use in the configured directory.
+   * Like Git, distribute the files in directories based on the first 2 chars of the SHA-1 hash
+   *
+   * @param dir The parent directory of the file to be created
+   * @param file The name of the file to be created
+   * @return The path of the file created
+   */
   private def makePath(dir: String, file: String): Path = {
     log.debug(s"Making annex file path with directory $dir and filename $file")
     val (subdir, name) = file.splitAt(2)
@@ -81,7 +93,14 @@ class AnnexFileService(settings: Settings, fileRepo: AnnexFileRepo, actorRuntime
     id == await(Sha1.fromPath(path))
   }
 
-  private def saveAndSha(configData: ConfigData): Future[(Path, String)] = async { //TODO: add doc
+  /**
+   * The stream of data is branched into two flows, one to dump it in temporary file and other to calculate incremental
+   * sha of data.
+   *
+   * @param configData The data to be saved temporarily
+   * @return The tuple of file path where data is saved temporarily and the sha calculated out of that data
+   */
+  private def saveAndSha(configData: ConfigData): Future[(Path, String)] = async {
     val path = await(fileRepo.createTempFile("config-service-overize-", ".tmp"))
     val (resultF, shaF) = configData.source
       .alsoToMat(FileIO.toPath(path))(Keep.right)

@@ -8,9 +8,10 @@ import csw.services.config.server.ActorRuntime
 
 /**
  * Routes supported by config server
- * @param configService              instance of config service to which the routes will delegate operations
- * @param actorRuntime               actor runtime
- * @param configHandlers     exception handler which maps server side exceptions to Http Status codes
+ *
+ * @param configService  Instance of config service to which the routes will delegate operations
+ * @param actorRuntime   Actor runtime
+ * @param configHandlers Exception handler which maps server side exceptions to Http Status codes
  */
 //TODO: update doc
 class ConfigServiceRoute(configService: ConfigService, actorRuntime: ActorRuntime, configHandlers: ConfigHandlers)
