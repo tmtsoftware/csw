@@ -27,7 +27,7 @@ import scala.async.Async._
 import scala.concurrent.Future
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 
-class LocationServiceImpl private[location] (cswCluster: CswCluster) extends LocationService { //TODO: update doc
+class LocationServiceImpl private[location] (cswCluster: CswCluster) extends LocationService {
   outer ⇒
 
   private val log: Logger = LocationServiceLogger.getLogger
@@ -37,7 +37,7 @@ class LocationServiceImpl private[location] (cswCluster: CswCluster) extends Loc
 
   /**
    * Register a 'connection -> location' entry in CRDT
-    **/
+   */
   def register(registration: Registration): Future[RegistrationResult] = async {
 
     //Get the location from this registration
@@ -124,7 +124,8 @@ class LocationServiceImpl private[location] (cswCluster: CswCluster) extends Loc
 
   /**
    * Unregister all connections from CRDT
-   * Note : This method should be used for testing purpose only
+   *
+   * @note This method should be used for testing purpose only
    */
   def unregisterAll(): Future[Done] = async {
     log.warn("Un-registering all components from location service")
@@ -231,7 +232,8 @@ class LocationServiceImpl private[location] (cswCluster: CswCluster) extends Loc
 
   /**
    * Terminate the ActorSystem and gracefully leave the akka cluster
-   * Note: It is recommended not to perform any operation on LocationService after shutdown
+   *
+   * @note It is recommended not to perform any operation on LocationService after shutdown
    */
   def shutdown(reason: Reason): Future[Done] = cswCluster.shutdown(reason)
 

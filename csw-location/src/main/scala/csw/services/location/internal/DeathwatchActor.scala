@@ -10,11 +10,11 @@ import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.Logger
 
 /**
- * DeathWatchActor tracks the health of all Actors registered with LocationService.
+ * DeathWatchActor tracks the health of all components registered with LocationService.
  *
  * @param locationService is used to unregister Actors that are no more alive
  */
-class DeathwatchActor private[location] (locationService: LocationService) { //TODO: update doc
+class DeathwatchActor private[location] (locationService: LocationService) {
   import DeathwatchActor.Msg
 
   /**
@@ -29,10 +29,11 @@ class DeathwatchActor private[location] (locationService: LocationService) { //T
 
       val allLocations = changeMsg.get(AllServices.Key).entries.values.toSet
 
-      //find out the ones that are not being watched and watch them
+      // Find out the ones that are not being watched and watch them
       val unwatchedLocations = allLocations diff watchedLocations
 
-      //Multiple AkkaLocation can have same logAdminActorRef, hence watch actorRef instead of logAdminActorRef for akka
+      // Multiple AkkaLocations can have same logAdminActorRef, hence watch supervisor actor instead of logAdminActorRef.
+      // In case of HttpLocation or TcpLocation always watch logAdminActorRef.
       unwatchedLocations.foreach(loc ⇒ {
         val actorRefToWatch = loc match {
           case AkkaLocation(_, _, _, actorRef, _)       ⇒ actorRef

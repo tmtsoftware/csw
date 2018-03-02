@@ -19,8 +19,9 @@ import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.models.CoordinatedShutdownReasons.{AllActorsWithinContainerTerminatedReason, FailedToCreateSupervisorsReason}
 import csw.messages.models.{Components, SupervisorInfo}
+import csw.services.location.commons.RegistrationFactory
 import csw.services.location.models._
-import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
+import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
 import scala.concurrent.Future

@@ -18,9 +18,10 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.control.NonFatal
 
 /**
- * CswCluster provides cluster properties to manage distributed data
+ * CswCluster provides cluster properties to manage distributed data. It is created when location service instance is created
+ * in `csw-framework` and joins the cluster.
  *
- * ''Note: '' It is highly recommended that explicit creation of CswCluster should be for advanced usages or testing purposes only
+ * @note It is highly recommended that explicit creation of CswCluster should be for advanced usages or testing purposes only
  */
 class CswCluster private (_actorSystem: ActorSystem) {
 
@@ -52,10 +53,13 @@ class CswCluster private (_actorSystem: ActorSystem) {
   private def makeMat(): Materializer = ActorMaterializer()
 
   /**
-   * Starts cluster HTTP management service.
+   * If `startManagement` flag is set to true then an akka provided HTTP service is started at 7878 (default) port.
+   * It provides services related to akka cluster management e.g see the members of the cluster and their status i.e. up or weakly up etc.
+   * Currently, cluster management service is started on `csw-cluster-seed` which may help in production to monitor cluster status.
+   * But, it can be started on any machine that is a part of akka cluster.
    */
   // $COVERAGE-OFF$
-  private def startClusterManagement(): Unit = { //TODO: add doc
+  private def startClusterManagement(): Unit = {
     val startManagement = actorSystem.settings.config.getBoolean("startManagement")
     if (startManagement) {
       val clusterHttpManagement = ClusterHttpManagement(cluster)
@@ -64,6 +68,8 @@ class CswCluster private (_actorSystem: ActorSystem) {
   }
   // $COVERAGE-ON$
 
+  // When new member tries to join the cluster, location service makes sure that member is weakly up or up before returning handle to location service
+  // TODO: Does it really necessary? can be deleted?
   private def joinCluster(): Done = {
     // Check if seed nodes are provided to join csw-cluster
     val emptySeeds = actorSystem.settings.config.getStringList("akka.cluster.seed-nodes").isEmpty
@@ -90,8 +96,9 @@ class CswCluster private (_actorSystem: ActorSystem) {
   /**
    * Ensures that data replication is started in Location service cluster by matching replica count with Up members.
    */
-  private def ensureReplication(): Unit = { //TODO: add doc
-    implicit val timeout = Timeout(5.seconds)
+  // TODO: Does it really necessary? can be deleted?
+  private def ensureReplication(): Unit = {
+    implicit val timeout: Timeout = Timeout(5.seconds)
     import akka.pattern.ask
     def replicaCountF = (replicator ? GetReplicaCount).mapTo[ReplicaCount]
     def replicaCount  = Await.result(replicaCountF, 5.seconds).n
@@ -114,13 +121,13 @@ class CswCluster private (_actorSystem: ActorSystem) {
 /**
  * Manages initialization and termination of ActorSystem and the Cluster.
  *
- * ''Note: '' The creation of CswCluster will be blocked till the ActorSystem joins csw-cluster successfully
+ * @note The creation of CswCluster will be blocked till the ActorSystem joins csw-cluster successfully
  */
 object CswCluster {
 
   private val log: Logger = LocationServiceLogger.getLogger
 
-  //do not use the dying actorSystem's dispatcher for scheduling actions after its death.
+  //do not use the dying actorSystem's dispatcher for scheduling actions after its death
 
   /**
    * Creates CswCluster with the default cluster settings
@@ -137,7 +144,7 @@ object CswCluster {
   /**
    * Creates CswCluster with the given ActorSystem
    */
-  def withSystem(actorSystem: ActorSystem): CswCluster = { //TODO: add doc
+  def withSystem(actorSystem: ActorSystem): CswCluster = {
     val cswCluster = new CswCluster(actorSystem)
     try {
       cswCluster.startClusterManagement()

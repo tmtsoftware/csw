@@ -27,7 +27,7 @@ object CswCoordinatedShutdown {
     success
   }
 
-  def run(actorSystem: ActorSystem, reason: Reason): Future[Done] = { //TODO: add doc for logic and method
+  def run(actorSystem: ActorSystem, reason: Reason): Future[Done] = {
     if (CswCoordinatedShutdown.isMemberUp(actorSystem)) {
       log.info("Starting csw co-ordinated shutdown")
       CoordinatedShutdown(actorSystem).run(reason)

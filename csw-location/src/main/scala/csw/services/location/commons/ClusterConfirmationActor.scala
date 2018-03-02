@@ -6,9 +6,9 @@ import akka.cluster.Cluster
 import akka.cluster.ClusterEvent._
 import csw.services.location.commons.ClusterConfirmationActor.{HasJoinedCluster, IsMemberUp}
 
-private[location] class ClusterConfirmationActor extends Actor { //TODO: add doc
+private[location] class ClusterConfirmationActor extends Actor {
 
-  val cluster = Cluster(context.system)
+  private val cluster = Cluster(context.system)
 
   override def preStart(): Unit = cluster.subscribe(self, InitialStateAsEvents, classOf[MemberEvent])
   override def postStop(): Unit = cluster.unsubscribe(self)

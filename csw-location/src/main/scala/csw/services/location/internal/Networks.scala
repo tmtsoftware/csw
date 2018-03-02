@@ -7,7 +7,7 @@ import csw.services.logging.scaladsl.Logger
 
 import scala.collection.JavaConverters._
 
-case class NetworkInterfaceNotFound(message: String) extends Exception(message) //TODO: update doc
+case class NetworkInterfaceNotFound(message: String) extends Exception(message)
 
 /**
  * Picks an appropriate ipv4 address to register using the NetworkInterfaceProvider

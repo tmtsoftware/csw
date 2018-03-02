@@ -17,12 +17,17 @@ import csw.services.logging.scaladsl.Logger
  * Registration holds information about a connection and its live location. This model is used to register a connection with LocationService.
  */
 sealed abstract class Registration {
+
+  /**
+   * The `Connection` to register with `LocationService`
+   */
   def connection: Connection
 
   /**
    * A location represents a live connection available for consumption
    *
    * @param hostname Provide a hostname where the connection endpoint is available
+   * @return A location representing a live connection at provided hostname
    */
   def location(hostname: String): Location
 }
@@ -30,8 +35,11 @@ sealed abstract class Registration {
 /**
  * AkkaRegistration holds the information needed to register an akka location
  *
+ * @param connection The `Connection` to register with `LocationService`
+ * @param prefix The optional prefix representing
  * @param actorRef Provide a remote actor that is offering a connection. Local actors cannot be registered since they can't be
  *                 communicated from components across the network
+ * @param logAdminActorRef The ActorRef responsible to handle log level change for a component dynamically
  */
 final case class AkkaRegistration(
     connection: AkkaConnection,
@@ -40,7 +48,7 @@ final case class AkkaRegistration(
     logAdminActorRef: ActorRef[LogControlMessages]
 ) extends Registration {
 
-  val log: Logger = LocationServiceLogger.getLogger
+  private val log: Logger = LocationServiceLogger.getLogger
 
   // ActorPath represents the akka path of an Actor
   private val actorPath = ActorPath.fromString(Serialization.serializedActorPath(actorRef.toUntyped))
@@ -58,6 +66,9 @@ final case class AkkaRegistration(
 
   /**
    * Create a AkkaLocation that represents the live connection offered by the actor
+   *
+   * @param hostname Provide a hostname where the connection endpoint is available
+   * @return An AkkaLocation location representing a live connection at provided hostname
    */
   override def location(hostname: String): Location = AkkaLocation(connection, prefix, uri, actorRef, logAdminActorRef)
 }
@@ -74,6 +85,7 @@ final case class TcpRegistration(connection: TcpConnection, port: Int, logAdminA
    * Create a TcpLocation that represents the live Tcp service
    *
    * @param hostname Provide the hostname where Tcp service is available
+   * @return An TcpLocation location representing a live connection at provided hostname
    */
   override def location(hostname: String): Location =
     TcpLocation(connection, new URI(s"tcp://$hostname:$port"), logAdminActorRef)

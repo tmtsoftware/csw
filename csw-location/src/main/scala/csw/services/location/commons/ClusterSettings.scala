@@ -31,7 +31,7 @@ import scala.collection.JavaConverters._
  *  - `akka.remote.netty.tcp.hostname` will be ipV4 address from [[csw.services.location.internal.Networks]]
  *  - `akka.remote.netty.tcp.port` will be a random port
  *  - `akka.cluster.seed-nodes` will be empty
- * and an `ActorSystem` will be created and a cluster will be formed with no Seed Nodes. It will also self join the cluster.
+ * and an `ActorSystem` will be created and a cluster will be formed with no Seed Nodes. It will self join the cluster.
  *
  * `ClusterSettings` can be given in three ways :
  *  - by using the api
@@ -43,22 +43,24 @@ import scala.collection.JavaConverters._
  *  - then from Environment variable
  *  - and then from `ClusterSettings` api
  *
- * ''Note : '' Although `ClusterSettings` can be added through multiple ways, it is recommended that
+ * @note Although `ClusterSettings` can be added through multiple ways, it is recommended that
  *  -`clusterSeeds` is provided via environment variable,
  *  - `clusterPort` is provided via system properties,
  *  - `interfaceName` is provide via environment variable and
  *  - the `ClusterSettings` api of providing values should be used for testing purpose only.
  *
  */
-case class ClusterSettings(clusterName: String = Constants.ClusterName, values: Map[String, Any] = Map.empty) { //TODO: update doc
-  val log: Logger       = LocationServiceLogger.getLogger
-  val InterfaceNameKey  = "interfaceName"
-  val ClusterSeedsKey   = "clusterSeeds"
-  val ClusterPortKey    = "clusterPort"
-  val ManagementPortKey = "managementPort"
+case class ClusterSettings(clusterName: String = Constants.ClusterName, values: Map[String, Any] = Map.empty) {
+  private val log: Logger       = LocationServiceLogger.getLogger
+  private val InterfaceNameKey  = "interfaceName"
+  private val ClusterSeedsKey   = "clusterSeeds"
+  private val ClusterPortKey    = "clusterPort"
+  private val ManagementPortKey = "managementPort"
 
   private def withEntry(key: String, value: Any): ClusterSettings = copy(values = values + (key → value))
-  def withEntries(entries: Map[String, Any]): ClusterSettings     = copy(values = values ++ entries)
+
+  //This method should be used for testing only.
+  def withEntries(entries: Map[String, Any]): ClusterSettings = copy(values = values ++ entries)
 
   //InterfaceName should be ideally provided via env variables.
   //It should contain the value where csw-cluster has to be started.
@@ -129,4 +131,9 @@ case class ClusterSettings(clusterName: String = Constants.ClusterName, values: 
   def system: ActorSystem = ActorSystem(clusterName, config)
 }
 
+/**
+ * `ClusterAwareSettings` represents `ClusterSettings` with default values. Other helper methods from `ClusterSettings`
+ * can be used to add properties like port, seedNodes etc. `ClusterAwareSettings` is used internally in spawning many csw
+ * apps like `csw-cluster-seed`, `csw-config-client-cli`, `csw-config-server`, etc.
+ */
 object ClusterAwareSettings extends ClusterSettings

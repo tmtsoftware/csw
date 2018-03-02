@@ -16,9 +16,10 @@ import csw.messages.params.models.Id
 import csw.messages.params.states.CurrentState
 import csw.services.ccs.internal.CommandResponseManagerFactory
 import csw.services.ccs.scaladsl.CommandResponseManager
+import csw.services.location.commons.RegistrationFactory
 import csw.services.location.javadsl.ILocationService
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
-import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
+import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any

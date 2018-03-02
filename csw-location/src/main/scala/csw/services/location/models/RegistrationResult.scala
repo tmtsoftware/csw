@@ -6,7 +6,7 @@ import csw.messages.location.Location
 import scala.concurrent.Future
 
 /**
- * RegistrationResult represents successful registration of a location.
+ * RegistrationResult represents successful registration of a location
  */
 trait RegistrationResult {
 
@@ -15,5 +15,10 @@ trait RegistrationResult {
    */
   def unregister(): Future[Done]
 
+  /**
+   * The `unregister` method will use the connection of this location to unregister from `LocationService`
+   *
+   * @return The handle to the `Location` that got registered in `LocationService`
+   */
   def location: Location
 }

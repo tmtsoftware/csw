@@ -36,6 +36,8 @@ case class OtherLocationIsRegistered(location: Location, otherLocation: Location
 
 /**
  * An Exception representing failure in registering non remote actors
+ *
+ * @param actorRef The reference of the Actor that is expected to be remote but instead it is local
  */
 case class LocalAkkaActorRegistrationNotAllowed(actorRef: ActorRef[_])
     extends RuntimeException(
