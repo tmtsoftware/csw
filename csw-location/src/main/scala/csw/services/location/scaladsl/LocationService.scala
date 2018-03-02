@@ -70,7 +70,7 @@ trait LocationService {
   /**
    * Filters all locations registered based on a component type
    *
-   * @param componentType list components of this `componentType`
+   * @param componentType List components of this `componentType`
    * @return A Future which completes with filtered locations
    */
   def list(componentType: ComponentType): Future[List[Location]]
@@ -78,7 +78,7 @@ trait LocationService {
   /**
    * Filters all locations registered based on a hostname
    *
-   * @param hostname list components running on this `hostname`
+   * @param hostname List components running on this `hostname`
    * @return A Future which completes with filtered locations
    */
   def list(hostname: String): Future[List[Location]]
@@ -86,7 +86,7 @@ trait LocationService {
   /**
    * Filters all locations registered based on a connection type
    *
-   * @param connectionType list components of this `connectionType`
+   * @param connectionType List components of this `connectionType`
    * @return A Future which completes with filtered locations
    */
   def list(connectionType: ConnectionType): Future[List[Location]]
@@ -94,9 +94,9 @@ trait LocationService {
   /**
    * Filters all locations registered based on a prefix.
    *
-   * @note that all locations having subsystem prefix that starts with the given prefix
-   * value will be listed.
-   * @param prefix list components by this `prefix`
+   * @note All locations having subsystem prefix that starts with the given prefix
+   *       value will be listed.
+   * @param prefix List components by this `prefix`
    * @return A Future which completes with filtered locations
    */
   def listByPrefix(prefix: String): Future[List[AkkaLocation]]
@@ -124,7 +124,7 @@ trait LocationService {
   /**
    * Shuts down the LocationService
    *
-   * @see terminate method in [[csw.services.location.commons.CswCluster]]
+   * @see Terminate method in [[csw.services.location.commons.CswCluster]]
    * @note It is recommended not to perform any operation on LocationService after calling this method
    * @param reason The reason explaining the shutdown
    * @return A Future which completes when the location service has shutdown successfully

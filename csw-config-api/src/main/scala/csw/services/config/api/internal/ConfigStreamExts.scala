@@ -23,6 +23,7 @@ private[config] object ConfigStreamExts {
     /**
      * Takes up to `n` elements from the stream (less than `n` only if the upstream completes before emitting `n`
      * elements) and returns a pair containing a strict sequence of the taken element and the original stream
+     *
      * @param n number of elements to be extracted as prefix
      */
     def prefixAndStitch(n: Int)(implicit mat: Materializer): (Future[Seq[Out]], Source[Out, Future[NotUsed]]) = {
