@@ -58,13 +58,16 @@ pipeline {
             }
         }
 
-        stage('Remote Build Trigger - Acceptance Dev') {
-            steps {
-                withCredentials([string(credentialsId: 'TOKEN', variable: 'DEV_TOKEN')]) {
-                    sh "curl '$REMOTE_JENKINS_URL/job/acceptance-dev/buildWithParameters?token=$DEV_TOKEN&DEV_VERSION=0.1-SNAPSHOT&BUILD_ENV=DEV'"
-                }
-            }
-        }
+    //    Stop triggering acceptance pipeline on every commit.
+    //    Acceptance pipeline configured to run nightly builds.
+    //    stage('Remote Build Trigger - Acceptance Dev') {
+    //        steps {
+    //            withCredentials([string(credentialsId: 'TOKEN', variable: 'DEV_TOKEN')]) {
+    //                sh "curl '$REMOTE_JENKINS_URL/job/acceptance-dev/buildWithParameters?token=$DEV_TOKEN&DEV_VERSION=0.1-SNAPSHOT&BUILD_ENV=DEV'"
+    //            }
+    //        }
+    //    }
+
     }
     post {
         always {
