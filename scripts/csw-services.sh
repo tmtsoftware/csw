@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # Starts services required by CSW and registers them with the location service.
-# This script uses the csw-location-agent app to start Redis and register it with the Location Service
+# This script uses the csw-location-agent app to start Event Service and register it with the Location Service
 #
 # Usage is:
 #   ###########################  IMPORTANT ###########################
@@ -11,37 +11,36 @@
 #   ##################################################################
 #
 #   If svn repo does not already exists on local machine and interfaceName env variable is set, then use below command to start all the services:
-#    csw-services.sh start --initRepo     :to start redis, cluster seed application and register the config and event service
+#    csw-services.sh start --initRepo     :to start event service, cluster seed application and register the config and event service
 #
 #   If svn repo already exists on local machine and interfaceName env variable is set, then use below command to start all the service:
-#    csw-services.sh start    :to start redis, cluster seed application and register the config and event service
+#    csw-services.sh start    :to start event service, cluster seed application and register the config and event service
 #
 #   If svn repo already exists on local machine and interfaceName env variable is not set, then use below command to start all the service:
-#    csw-services.sh start --interfaceName eth0   :to start redis, cluster seed application and register the config and event service
+#    csw-services.sh start --interfaceName eth0   :to start event service, cluster seed application and register the config and event service
 #
 #   In case you do not want to start all the services, then specify supported arguments to start
 #    csw-services.sh start --seed 5552 --config 5555   :this starts cluster seed on port 5552 and config server on port 5555 (does not start redis)
 #
-#    csw-services.sh stop     :to stop redis and unregister the services from the location service
+#    csw-services.sh stop     :to stop event service and unregister the services from the location service
 #
 
 # Setting default values
 seed_port=5552
 config_port=5000
-redis_port=6379
+event_port=6379
 initSvnRepo=""
 
 # Always start cluster seed application
 shouldStartSeed=true
 shouldStartConfig=false
-shouldStartRedis=false
+shouldStartEvent=false
 
 script_name=$0
 
 logDir=/tmp/csw-prod/logs
 test -d ${logDir} || mkdir -p ${logDir}
 
-redisServices="Event Service"
 # We need at least this version of Redis
 minRedisVersion=3.2.5
 redisServer=/usr/local/bin/redis-server
@@ -53,9 +52,9 @@ seedPidFile=${logDir}/seed.pid
 configLogFile=${logDir}/config.log
 configPidFile=${logDir}/config.pid
 
-redisLogFile=${logDir}/redis.log
-redisPidFile=${logDir}/redis.pid
-redisPortFile=${logDir}/redis.port
+eventLogFile=${logDir}/event.log
+eventPidFile=${logDir}/event.pid
+eventPortFile=${logDir}/event.port
 
 sortVersion="sort -V"
 
@@ -120,12 +119,12 @@ function start_config {
     echo $! > ${configPidFile}
 }
 
-function start_redis() {
+function start_event() {
     if checkIfRedisIsInstalled ; then
-        echo "[REDIS] Starting redis on port: [$redis_port] ..."
-        nohup ./csw-location-agent -DclusterSeeds=${seeds} --name "$redisServices" --command "$redisServer --port ${redis_port} --protected-mode no --notify-keyspace-events KEA" > ${redisLogFile} 2>&1 &
-        echo $! > ${redisPidFile}
-        echo ${redis_port} > ${redisPortFile}
+        echo "[EVENT] Starting Event Service on port: [$event_port] ..."
+        nohup ./csw-location-agent -DclusterSeeds=${seeds} --name "Event Service" --command "$redisServer --port ${event_port} --protected-mode no --notify-keyspace-events KEA" > ${eventLogFile} 2>&1 &
+        echo $! > ${eventPidFile}
+        echo ${event_port} > ${eventPortFile}
     else
         exit 1
     fi
@@ -134,25 +133,25 @@ function start_redis() {
 function enableAllServicesForRunning {
     shouldStartSeed=true
     shouldStartConfig=true
-    shouldStartRedis=true
+    shouldStartEvent=true
 }
 
 function start_services {
     if [[ "$shouldStartSeed" = true ]]; then start_seed ; fi
     if [[ "$shouldStartConfig" = true ]]; then start_config ; fi
-    if [[ "$shouldStartRedis" = true ]]; then start_redis; fi
+    if [[ "$shouldStartEvent" = true ]]; then start_event; fi
 }
 
 function usage {
     echo
-    echo -e "usage: $script_name COMMAND [--seed <port>] [--config <port>] [--initRepo] [--redis <port>]\n"
+    echo -e "usage: $script_name COMMAND [--seed <port>] [--interfaceName | -i <name>] [--config <port>] [--initRepo] [--event | -es <port>]\n"
 
     echo "Options:"
     echo "  --seed <seedPort>               start seed on provided port, default: 5552"
     echo "  --interfaceName | -i <name>     start cluster on ip address associated with provided interface, default: en0"
     echo "  --config <configPort>           start http config server on provided port, default: 5000"
     echo "  --initRepo                      create new svn repo, default: use existing svn repo"
-    echo -e "  --redis <redisPort>             start redis server on provided port, default: 6379 \n"
+    echo -e "  --event | -es <esPort>         start event service on provided port, default: 6379 \n"
 
     echo "Commands:"
     echo "  start      Starts all csw services if no options provided"
@@ -196,9 +195,9 @@ function parse_cmd_args {
                             shouldStartConfig=true
                             initSvnRepo=${key}
                             ;;
-                        --redis)
-                            shouldStartRedis=true
-                            if isPortProvided $2; then redis_port="$2"; shift; fi
+                        --event | -es)
+                            shouldStartEvent=true
+                            if isPortProvided $2; then event_port="$2"; shift; fi
                             ;;
                         --help)
                             usage
@@ -230,27 +229,33 @@ function parse_cmd_args {
                     echo "[INFO] Using clusterSeeds=$seeds"
 
                     start_services
+
+                    echo "================================================================="
                     echo "All the logs are stored at location: [$logDir]"
+                    echo "================================================================="
+                    echo "For assemblies or HCD's to join this cluster and use config and event service from other machine's/nodes, run below command to export env variable:"
+                    echo "export clusterSeeds=$seeds"
+                    echo "================================================================="
                 fi
             fi
             ;;
         stop)
             # Stop Redis
-            if [ ! -f ${redisPidFile} ]
+            if [ ! -f ${eventPidFile} ]
             then
-                echo "[REDIS] Redis $redisPidFile does not exist, process is not running."
+                echo "[EVENT] Event $eventPidFile does not exist, process is not running."
             else
-                local PID=$(cat ${redisPidFile})
-                local redisPort=$(cat ${redisPortFile})
-                echo "[REDIS] Stopping Redis..."
+                local PID=$(cat ${eventPidFile})
+                local redisPort=$(cat ${eventPortFile})
+                echo "[EVENT] Stopping Event Service..."
                 ${redisClient} -p ${redisPort} shutdown
                 while [ -x /proc/${PID} ]
                 do
-                    echo "[REDIS] Waiting for Redis to shutdown ..."
+                    echo "[EVENT] Waiting for Event Service to shutdown ..."
                     sleep 1
                 done
-                echo "[REDIS] Redis stopped."
-                rm -f ${redisLogFile} ${redisPidFile} ${redisPortFile}
+                echo "[EVENT] Event Service stopped."
+                rm -f ${eventLogFile} ${eventPidFile} ${eventPortFile}
             fi
 
             # Stop Cluster Seed application
