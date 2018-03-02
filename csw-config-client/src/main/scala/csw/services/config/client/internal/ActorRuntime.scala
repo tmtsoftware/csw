@@ -16,6 +16,13 @@ class ActorRuntime private[csw] (_actorSystem: ActorSystem = ActorSystem()) {
   implicit val ec: ExecutionContextExecutor = actorSystem.dispatcher
   implicit val mat: Materializer            = ActorMaterializer()
 
-  //TODO: add doc of what will shutdown do and who will use it
+  /**
+   * The shutdown method helps self node to gracefully quit the akka cluster. It is used by `csw-config-client-cli`
+   * to shutdown the the app gracefully. `csw-config-client-cli` becomes the part of akka cluster on booting up and
+   * resolves the config server, using location service, to provide cli features around admin api of config service.
+   *
+   * @param reason The reason for shutdown
+   * @return A future that completes when shutdown is successful
+   */
   def shutdown(reason: Reason): Future[Done] = CswCoordinatedShutdown.run(actorSystem, reason)
 }

@@ -14,8 +14,9 @@ object JConfigClientFactory {
   /**
    * Create ConfigClient instance for admin users.
    *
-   * @param actorSystem        local actor system of the client
-   * @param locationService    location service instance which will be used to resolve the location of config server
+   * @param actorSystem        Local actor system of the client
+   * @param locationService    Location service instance which will be used to resolve the location of config server
+   * @return                   An instance of IConfigService
    */
   def adminApi(actorSystem: ActorSystem, locationService: ILocationService): IConfigService = {
     val configService = ConfigClientFactory.adminApi(actorSystem, locationService.asScala)
@@ -26,8 +27,9 @@ object JConfigClientFactory {
   /**
    * Create ConfigClient instance for non admin users.
    *
-   * @param actorSystem        local actor system of the client
-   * @param locationService    location service instance which will be used to resolve the location of config server
+   * @param actorSystem        Local actor system of the client
+   * @param locationService    Location service instance which will be used to resolve the location of config server
+   * @return                   An instance of IConfigClientService
    */
   def clientApi(actorSystem: ActorSystem, locationService: ILocationService): IConfigClientService =
     adminApi(actorSystem, locationService)
