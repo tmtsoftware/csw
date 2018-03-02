@@ -17,11 +17,11 @@ import scala.concurrent.Future
  * The file checked in to the Svn repository is then named ''file''.`sha1` and contains only
  * the SHA-1 hash value.
  *
- * @param annexFilesDir The directory path to store annex files
+ * @param settings Retrieve the directory path to store annex files from settings
  * @param fileRepo FileRepo performs file operations with a blocking dispatcher
  * @param actorRuntime ActorRuntime provides runtime accessories related to ActorSystem like Materializer, ExecutionContext etc.
  */
-class AnnexFileService private[config] (annexFilesDir: String, fileRepo: AnnexFileRepo, actorRuntime: ActorRuntime) {
+class AnnexFileService private[config] (settings: Settings, fileRepo: AnnexFileRepo, actorRuntime: ActorRuntime) {
 
   import actorRuntime._
 
@@ -32,7 +32,7 @@ class AnnexFileService private[config] (annexFilesDir: String, fileRepo: AnnexFi
     log.debug("Creating temporary file and calculating it's sha")
     val (tempFilePath, sha) = await(saveAndSha(configData))
 
-    val outPath = makePath(annexFilesDir, sha)
+    val outPath = makePath(settings.`annex-files-dir`, sha)
 
     if (await(fileRepo.exists(outPath))) {
       log.debug(s"Annex file already exists at path ${outPath.toString}")
@@ -58,7 +58,7 @@ class AnnexFileService private[config] (annexFilesDir: String, fileRepo: AnnexFi
 
   // The debug statements help understand the flow of the method
   def get(sha: String): Future[Option[ConfigData]] = async {
-    val repoFilePath = makePath(annexFilesDir, sha)
+    val repoFilePath = makePath(settings.`annex-files-dir`, sha)
 
     log.debug(s"Checking if annex file exists at ${repoFilePath.toString}")
     if (await(fileRepo.exists(repoFilePath))) {
