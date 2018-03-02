@@ -7,7 +7,13 @@ import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.location.commons.{ClusterSettings, CswCluster}
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 
-//TODO: explain in brief the use of state defined here
+/**
+ * ClientCliWiring lazily joins the akka cluster and starts the app. After joining the cluster, it first resolves the location
+ * of config server using `ConfigServiceResolver` from `csw-config-client` and then starts the app catering cli features
+ * over admin api of config service.
+ *
+ * @param actorSystem The ActorSystem used to join akka cluster
+ */
 class ClientCliWiring(actorSystem: ActorSystem) {
   lazy val actorRuntime                     = new ActorRuntime(actorSystem)
   lazy val locationService: LocationService = LocationServiceFactory.withCluster(CswCluster.withSystem(actorSystem))
