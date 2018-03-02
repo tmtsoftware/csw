@@ -1,11 +1,9 @@
 package csw.framework.javadsl.components;
 
-import akka.typed.ActorRef;
 import akka.typed.javadsl.ActorContext;
 import csw.framework.javadsl.JComponentBehaviorFactory;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.scaladsl.CurrentStatePublisher;
-import csw.messages.CommandResponseManagerMessage;
 import csw.messages.TopLevelActorMessage;
 import csw.messages.framework.ComponentInfo;
 import csw.services.ccs.scaladsl.CommandResponseManager;

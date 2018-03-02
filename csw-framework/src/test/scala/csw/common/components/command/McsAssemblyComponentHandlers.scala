@@ -76,6 +76,7 @@ class McsAssemblyComponentHandlers(
         //#addSubCommand
 
         mediumSetup = Setup(prefix, mediumRunning, controlCommand.maybeObsId)
+        // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
         commandResponseManager.addSubCommand(commandId, mediumSetup.runId)
 
         longSetup = Setup(prefix, longRunning, controlCommand.maybeObsId)
@@ -89,6 +90,7 @@ class McsAssemblyComponentHandlers(
         processCommand(shortSetup)
         processCommand(mediumSetup)
 
+        // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
         //#subscribe-to-command-response-manager
         // subscribe to the status of original command received and publish the state when its status changes to
         // Completed
@@ -121,6 +123,7 @@ class McsAssemblyComponentHandlers(
       .submit(controlCommand)
       .map {
         case response: Accepted ⇒
+          // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
           commandResponseManager.updateSubCommand(response.runId, Accepted(response.runId))
           //#updateSubCommand
           // An original command is split into three sub-commands and sent to an hcdComponent.

@@ -5,6 +5,8 @@ import akka.stream.ThrottleMode;
 import akka.stream.javadsl.Sink;
 import akka.stream.javadsl.Source;
 import akka.typed.javadsl.ActorContext;
+import akka.typed.javadsl.Adapter;
+import akka.util.Timeout;
 import csw.common.components.command.ComponentStateForCommand;
 import csw.common.components.framework.SampleComponentState;
 import csw.framework.javadsl.JComponentHandlers;
@@ -30,6 +32,7 @@ import scala.concurrent.duration.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
+import static akka.typed.javadsl.Adapter.toUntyped;
 import static csw.common.components.command.ComponentStateForCommand.*;
 import static csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand;
 import static csw.messages.ccs.commands.CommandResponse.*;
@@ -136,7 +139,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
                     return i;
                 })
                 .throttle(1, Duration.create(100, TimeUnit.MILLISECONDS), 1, ThrottleMode.shaping())
-                .runWith(Sink.ignore(), ActorMaterializer.create(akka.typed.javadsl.Adapter.toUntyped(actorContext.getSystem())));
+                .runWith(Sink.ignore(), ActorMaterializer.create(Adapter.toUntyped(actorContext.getSystem())));
     }
 
     private void processCommandWithoutMatcher(ControlCommand controlCommand) {
@@ -144,8 +147,11 @@ public class JSampleComponentHandlers extends JComponentHandlers {
         if (controlCommand.commandName().equals(failureAfterValidationCmd())) {
             commandResponseManager.addOrUpdateCommand(controlCommand.runId(), new CommandResponse.Error(controlCommand.runId(), "Unknown Error occurred"));
         } else {
-            CommandResponseManagerMessage updateCommand = new AddOrUpdateCommand(controlCommand.runId(), new Completed(controlCommand.runId()));
-            commandResponseManager.addOrUpdateCommand(controlCommand.runId(), new Completed(controlCommand.runId()));
+            // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
+            CompletableFuture<CommandResponse> status = commandResponseManager.jQuery(controlCommand.runId(), Timeout.apply(3, TimeUnit.MILLISECONDS));
+            status.thenAccept(response -> {
+                if(response instanceof Accepted) commandResponseManager.addOrUpdateCommand(controlCommand.runId(), new Completed(controlCommand.runId()));
+            });
         }
 
     }

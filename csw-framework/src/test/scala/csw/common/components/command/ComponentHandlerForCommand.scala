@@ -32,8 +32,8 @@ class ComponentHandlerForCommand(
     loggerFactory: LoggerFactory
 ) extends ComponentHandlers(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, loggerFactory) {
 
-  val log: Logger = loggerFactory.getLogger(ctx)
-  val cancelCmdId = KeyType.StringKey.make("cancelCmdId")
+  private val log: Logger = loggerFactory.getLogger(ctx)
+  private val cancelCmdId = KeyType.StringKey.make("cancelCmdId")
 
   import ComponentStateForCommand._
   implicit val actorSystem: actor.ActorSystem = ctx.system.toUntyped
@@ -84,6 +84,8 @@ class ComponentHandlerForCommand(
   private def processCommandWithoutMatcher(controlCommand: ControlCommand): Unit = {
     val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(20)
     val result                = Result(controlCommand.source, Set(param))
+
+    // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
     commandResponseManager.addOrUpdateCommand(controlCommand.runId, CompletedWithResult(controlCommand.runId, result))
   }
 
@@ -95,6 +97,7 @@ class ComponentHandlerForCommand(
   private def processOriginalCommand(cancelId: Id): Unit = {
     implicit val timeout: Timeout = 5.seconds
 
+    // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
     val eventualResponse: Future[CommandResponse] = commandResponseManager.query(cancelId)
     eventualResponse.foreach { _ ⇒
       commandResponseManager.addOrUpdateCommand(cancelId, Cancelled(cancelId))

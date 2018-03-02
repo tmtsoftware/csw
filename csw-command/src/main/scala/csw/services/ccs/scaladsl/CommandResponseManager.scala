@@ -70,9 +70,8 @@ class CommandResponseManager(val commandResponseManagerActor: ActorRef[CommandRe
    * @param timeout   timeout duration until which this operation is expected to wait for providing a value
    * @return
    */
-  def jQuery(runId: Id, timeout: Timeout): CompletableFuture[CommandResponse] = {
+  def jQuery(runId: Id, timeout: Timeout): CompletableFuture[CommandResponse] =
     query(runId)(timeout).toJava.toCompletableFuture
-  }
 
   /**
    * Subscribe to the status of a command to receive the update in status
@@ -80,9 +79,8 @@ class CommandResponseManager(val commandResponseManagerActor: ActorRef[CommandRe
    * @param callback  callback  to take action on the command response received
    * @return a [[csw.services.ccs.internal.CommandResponseSubscription]] to unsubscribe the subscription later
    */
-  def subscribe(runId: Id, callback: CommandResponse ⇒ Unit): CommandResponseSubscription = {
+  def subscribe(runId: Id, callback: CommandResponse ⇒ Unit): CommandResponseSubscription =
     new CommandResponseSubscription(runId, commandResponseManagerActor, callback)
-  }
 
   /**
    * Java API of subscribe
@@ -90,8 +88,7 @@ class CommandResponseManager(val commandResponseManagerActor: ActorRef[CommandRe
    * @param consumer   consumer function to take action on the command response received
    * @return
    */
-  def jSubscribe(runId: Id, consumer: Consumer[CommandResponse]): CommandResponseSubscription = {
+  def jSubscribe(runId: Id, consumer: Consumer[CommandResponse]): CommandResponseSubscription =
     new CommandResponseSubscription(runId, commandResponseManagerActor, consumer.asScala)
-  }
 
 }
