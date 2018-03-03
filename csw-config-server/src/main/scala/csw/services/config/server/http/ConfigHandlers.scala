@@ -10,7 +10,7 @@ import csw.services.logging.scaladsl.Logger
 import scala.util.control.NonFatal
 
 /**
- * Maps server side exceptions to Http Status codes
+ * Maps server side exceptions to Http Status codes and sent to the client
  */
 class ConfigHandlers extends Directives with JsonRejectionHandler {
   private val log: Logger = ConfigServerLogger.getLogger

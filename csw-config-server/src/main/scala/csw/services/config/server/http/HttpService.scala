@@ -19,6 +19,7 @@ import scala.util.control.NonFatal
 
 /**
  * Initialises ConfigServer
+ *
  * @param locationService          LocationService instance to be used for registering this server with the location service
  * @param configServiceRoute       ConfigServiceRoute instance representing the routes supported by this server
  * @param settings                 Runtime configuration of server

@@ -13,7 +13,6 @@ import csw.services.config.server.ActorRuntime
  * @param actorRuntime   Actor runtime
  * @param configHandlers Exception handler which maps server side exceptions to Http Status codes
  */
-//TODO: update doc
 class ConfigServiceRoute(configService: ConfigService, actorRuntime: ActorRuntime, configHandlers: ConfigHandlers)
     extends HttpSupport {
 
