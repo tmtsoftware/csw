@@ -45,4 +45,21 @@ trait EventSubscriber {
   def get(eventKeys: Set[EventKey]): Future[Set[Event]]
 
   def get(eventKey: EventKey): Future[Event]
+
+//  def subscribeWithSinkActorRef(eventKeys: Set[EventKey], every: FiniteDuration): Source[Event, EventSubscription] = {
+//    implicit val timeout: Timeout       = Timeout(10.seconds)
+//    implicit val sender: actor.ActorRef = DummyActor()
+//
+//    val eventStoreActor   = EventStoreActor()
+//    val eventSubscription = subscribe(eventKeys).to(Sink.actorRef(eventStoreActor, "streamCompleted")).run()
+//
+//    def event(): Event = {
+//      val eventualEvent = eventStoreActor ? "getLatest"
+//      Await.result(eventualEvent, every).asInstanceOf[Event]
+//    }
+//    Source
+//      .tick(0.millis, every, ())
+//      .map(_ ⇒ event())
+//      .mapMaterializedValue(_ ⇒ eventSubscription)
+//  }
 }

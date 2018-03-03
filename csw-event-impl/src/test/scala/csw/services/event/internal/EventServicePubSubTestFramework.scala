@@ -31,6 +31,8 @@ class EventServicePubSubTestFramework(wiring: Wiring) extends Matchers {
   def monitorPerf(): Unit = {
     val doneF = subscriber
       .subscribe(Set(eventKey), 20.millis)
+      // uncomment below line and EventSubscriber.subscribeWithSinkActorRef method to see the effects of subscribing with Sink.actorRef
+      //.subscribeWithSinkActorRef(Set(eventKey), 20.millis)
       .via(Monitor.resetting)
       .runWith(Sink.ignore)
 
