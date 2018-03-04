@@ -4,7 +4,7 @@ import akka.stream.Materializer
 import akka.stream.scaladsl.{Sink, Source}
 import akka.typed.ActorRef
 import csw.messages.ccs.events.{Event, EventKey}
-import csw.services.event.internal.ThrottlingStage
+import csw.services.event.internal.RateAdapterStage
 
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
@@ -15,7 +15,7 @@ trait EventSubscriber {
   def subscribe(eventKeys: Set[EventKey]): Source[Event, EventSubscription]
 
   def subscribe(eventKeys: Set[EventKey], every: FiniteDuration): Source[Event, EventSubscription] = {
-    subscribe(eventKeys).via(new ThrottlingStage[Event](every))
+    subscribe(eventKeys).via(new RateAdapterStage[Event](every))
   }
 
   def subscribeAsync(eventKeys: Set[EventKey], callback: Event => Future[_]): EventSubscription = {

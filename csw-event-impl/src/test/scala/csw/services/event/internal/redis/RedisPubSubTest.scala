@@ -2,8 +2,9 @@ package csw.services.event.internal.redis
 
 import akka.actor.ActorSystem
 import com.github.sebruck.EmbeddedRedis
+import csw.messages.ccs.events.Event
 import csw.services.event.helpers.TestFutureExt.RichFuture
-import csw.services.event.internal.EventServicePubSubTestFramework
+import csw.services.event.internal.{EventServicePubSubTestFramework, RateAdapterStage, RateLimiterStage}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import redis.embedded.RedisServer
 
@@ -25,6 +26,14 @@ class RedisPubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with
     publisher.shutdown().await
     redis.stop()
     actorSystem.terminate().await
+  }
+
+  ignore("limiter") {
+    framework.comparePerf(new RateLimiterStage(_))
+  }
+
+  ignore("adapter") {
+    framework.comparePerf(new RateAdapterStage(_))
   }
 
   ignore("redis-throughput-latency") {

@@ -1,6 +1,8 @@
 package csw.services.event.internal
 
+import akka.stream.FlowShape
 import akka.stream.scaladsl.{Keep, Sink, Source}
+import akka.stream.stage.GraphStage
 import csw.messages.ccs.events.{Event, EventKey, EventName, SystemEvent}
 import csw.messages.params.models.Prefix
 import csw.services.event.helpers.TestFutureExt.RichFuture
@@ -10,7 +12,7 @@ import csw.services.event.internal.perf.Monitor
 import csw.services.event.scaladsl.{EventPublisher, EventSubscriber}
 import org.scalatest.Matchers
 
-import scala.concurrent.duration.DurationLong
+import scala.concurrent.duration.{DurationLong, FiniteDuration}
 
 class EventServicePubSubTestFramework(wiring: Wiring) extends Matchers {
 
@@ -29,11 +31,12 @@ class EventServicePubSubTestFramework(wiring: Wiring) extends Matchers {
   }
 
   def monitorPerf(): Unit = {
+    val tickDuration = 20.millis
     val doneF = subscriber
-      .subscribe(Set(eventKey), 20.millis)
-      // uncomment below line and EventSubscriber.subscribeWithSinkActorRef method to see the effects of subscribing with Sink.actorRef
-      //.subscribeWithSinkActorRef(Set(eventKey), 20.millis)
-      .via(Monitor.resetting)
+    // uncomment below line and EventSubscriber.subscribeWithSinkActorRef method to see the effects of subscribing with Sink.actorRef
+    //.subscribeWithSinkActorRef(Set(eventKey), 20.millis)
+      .subscribe(Set(eventKey), tickDuration)
+      .via(new Monitor(tickDuration, reportingDuration = 2.seconds).resetting)
       .runWith(Sink.ignore)
 
     Thread.sleep(1000)
@@ -41,6 +44,24 @@ class EventServicePubSubTestFramework(wiring: Wiring) extends Matchers {
     //    eventStream.mapAsync(1)(publisher.publish).runWith(Sink.ignore)
     //    publisher.publish(eventStream)
     publisher.publish(eventGenerator, 5.millis)
+
+    doneF.await
+  }
+
+  def comparePerf(createStage: FiniteDuration => GraphStage[FlowShape[Event, Event]]): Unit = {
+    val publisherTick  = 5.millis
+    val subscriberTick = 20.millis
+
+    val doneF = subscriber
+      .subscribe(Set(eventKey))
+      .via(createStage(subscriberTick))
+//      .map(x => { println(x.eventId); x })
+      .via(new Monitor(subscriberTick, reportingDuration = 2.seconds).resetting)
+      .runWith(Sink.ignore)
+
+    Thread.sleep(1000)
+
+    publisher.publish(eventGenerator, publisherTick)
 
     doneF.await
   }

@@ -12,6 +12,7 @@ object Dependencies {
     Libs.`scalapb-runtime`,
     Libs.`scalapb-json4s`,
     Akka.`akka-typed`,
+    Akka.`akka-stream`,
     Akka.`akka-cluster-tools` % Test,
     Akka.`akka-typed-testkit` % Test,
     Akka.`akka-actor`         % Test,
