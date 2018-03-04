@@ -81,6 +81,7 @@ object Event {
 
   def fromPb(pbEvent: PbEvent): Event = Event.typeMapper[Event].toCustom(pbEvent)
 
+  // Fixme: Can this take a EventKey and create correct prefix and put it in Events Prefix?
   val invalidEvent: SystemEvent =
     SystemEvent(Prefix("invalid"), EventName("invalid")).copy(eventTime = EventTime.toEventTime(Instant.MIN))
 }

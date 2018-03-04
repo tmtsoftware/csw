@@ -16,10 +16,10 @@ class RedisSubscriber(redisGateway: RedisGateway)(implicit ec: ExecutionContext,
   private lazy val asyncConnectionF = redisGateway.asyncConnectionF()
 
   override def subscribe(eventKeys: Set[EventKey]): Source[Event, EventSubscription] = {
-    val co̦nnectionF = redisGateway.reactiveConnectionF()
+    val connectionF = redisGateway.reactiveConnectionF()
 
     val sourceF = async {
-      val connection = await(co̦nnectionF)
+      val connection = await(connectionF)
       connection.subscribe(eventKeys.toSeq: _*).subscribe()
       Source.fromPublisher(connection.observeChannels(OverflowStrategy.LATEST)).map(_.getMessage)
     }
@@ -35,7 +35,7 @@ class RedisSubscriber(redisGateway: RedisGateway)(implicit ec: ExecutionContext,
         case (killSwitch, doneF) ⇒
           new EventSubscription {
             override def unsubscribe(): Future[Done] = async {
-              val commands = await(co̦nnectionF)
+              val commands = await(connectionF)
               await(commands.unsubscribe(eventKeys.toSeq: _*).toFuture.toScala)
               killSwitch.shutdown()
               await(doneF)
