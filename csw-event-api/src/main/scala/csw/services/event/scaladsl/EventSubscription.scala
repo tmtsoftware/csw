@@ -6,4 +6,5 @@ import scala.concurrent.Future
 
 trait EventSubscription {
   def unsubscribe(): Future[Done]
+  def isReady: Future[Done]
 }

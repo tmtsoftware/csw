@@ -1,7 +1,7 @@
 package csw.services.event.internal.redis
 
 import akka.Done
-import akka.stream.scaladsl.{Concat, Keep, Source}
+import akka.stream.scaladsl.{Keep, Source}
 import akka.stream.{KillSwitches, Materializer}
 import csw.messages.ccs.events._
 import csw.services.event.scaladsl.{EventSubscriber, EventSubscription}
@@ -24,21 +24,23 @@ class RedisSubscriber(redisGateway: RedisGateway)(implicit ec: ExecutionContext,
       Source.fromPublisher(connection.observeChannels(OverflowStrategy.LATEST)).map(_.getMessage)
     }
 
+    val latestEventStream = Source.fromFuture(get(eventKeys)).mapConcat(identity)
     val eventStream       = Source.fromFutureSource(sourceF)
-    val latestEventStream = Source.fromFutureSource(get(eventKeys).map(events ⇒ Source(events.filterNot(_ == null))))
 
-    Source
-      .combine(latestEventStream, eventStream)(Concat[Event])
-      .viaMat(KillSwitches.single)(Keep.right)
+    latestEventStream
+      .concatMat(eventStream)(Keep.right)
+      .viaMat(KillSwitches.single)(Keep.both)
       .watchTermination()(Keep.both)
       .mapMaterializedValue {
-        case (killSwitch, doneF) ⇒
+        case ((eventStreamReady, killSwitch), terminationSignal) ⇒
           new EventSubscription {
+            override def isReady: Future[Done] = eventStreamReady.map(_ ⇒ Done)
+
             override def unsubscribe(): Future[Done] = async {
               val commands = await(connectionF)
               await(commands.unsubscribe(eventKeys.toSeq: _*).toFuture.toScala)
               killSwitch.shutdown()
-              await(doneF)
+              await(terminationSignal)
             }
           }
       }

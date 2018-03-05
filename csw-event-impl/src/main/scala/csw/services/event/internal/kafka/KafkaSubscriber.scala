@@ -32,6 +32,8 @@ class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(i
       .map(record ⇒ Event.fromPb(PbEvent.parseFrom(record.value())))
       .mapMaterializedValue { control ⇒
         new EventSubscription {
+          override def isReady: Future[Done] = Future.successful(Done)
+
           override def unsubscribe(): Future[Done] = control.shutdown()
         }
       }
