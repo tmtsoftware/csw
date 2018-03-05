@@ -7,25 +7,33 @@ import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.internal.EventServicePubSubTestFramework
 import csw.services.event.internal.commons.EventServiceConnection
 import csw.services.location.commons.ClusterAwareSettings
-import csw.services.location.scaladsl.LocationServiceFactory
-import net.manub.embeddedkafka.EmbeddedKafka
+import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
+import net.manub.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 class KafkaLocationServicePubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with EmbeddedKafka {
-  private val seedPort  = 3559
-  private val kafkaPort = 6001
+  private val seedPort         = 3559
+  private val kafkaPort        = 6001
+  private val clusterSettings  = ClusterAwareSettings.joinLocal(seedPort)
+  private val pubSubProperties = Map("bootstrap.servers" → s"${clusterSettings.hostname}:$kafkaPort")
+  private val brokers          = s"PLAINTEXT://${clusterSettings.hostname}:$kafkaPort"
+  private val brokerProperties = Map("listeners" → brokers, "advertised.listeners" → brokers)
 
-  private val clusterSettings                   = ClusterAwareSettings.joinLocal(seedPort)
   private implicit val actorSystem: ActorSystem = clusterSettings.system
-  EmbeddedKafka.start()
+  private val locationService: LocationService  = LocationServiceFactory.withSettings(ClusterAwareSettings.onPort(seedPort))
 
-  private val locationService = LocationServiceFactory.withSettings(ClusterAwareSettings.onPort(seedPort))
+  private val config = EmbeddedKafkaConfig(customConsumerProperties = pubSubProperties,
+                                           customProducerProperties = pubSubProperties,
+                                           customBrokerProperties = brokerProperties)
+
+  EmbeddedKafka.start()(config)
+
   private val kafkaFactory    = new KafkaFactory(locationService, actorSystem)
   private val tcpRegistration = RegistrationFactory.tcp(EventServiceConnection.value, kafkaPort)
   locationService.register(tcpRegistration).await
-  private var publisher  = kafkaFactory.publisher().await
-  private var subscriber = kafkaFactory.subscriber().await
-  private var framework  = new EventServicePubSubTestFramework(publisher, subscriber)
+  private val publisher  = kafkaFactory.publisher().await
+  private val subscriber = kafkaFactory.subscriber().await
+  private val framework  = new EventServicePubSubTestFramework(publisher, subscriber)
 
   override def afterAll(): Unit = {
     publisher.shutdown().await
@@ -33,8 +41,7 @@ class KafkaLocationServicePubSubTest extends FunSuite with Matchers with BeforeA
     actorSystem.terminate().await
   }
 
-  ignore("Pub Sub") {
+  test("Pub Sub") {
     framework.pubSub()
   }
-
 }

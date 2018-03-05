@@ -12,17 +12,15 @@ class RedisPubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with
 
   private implicit val actorSystem: ActorSystem = ActorSystem()
 
-  private val redisPort  = 6379
-  private lazy val redis = RedisServer.builder().setting("bind 127.0.0.1").port(redisPort).build()
+  private val redisPort = 6379
+  private val redis     = RedisServer.builder().setting("bind 127.0.0.1").port(redisPort).build()
+  redis.start()
+
   private val wiring     = new RedisWiring("localhost", redisPort, actorSystem)
   private val publisher  = wiring.publisher()
   private val subscriber = wiring.subscriber()
 
   private val framework = new EventServicePubSubTestFramework(publisher, subscriber)
-
-  override protected def beforeAll(): Unit = {
-    redis.start()
-  }
 
   override def afterAll(): Unit = {
     publisher.shutdown().await
