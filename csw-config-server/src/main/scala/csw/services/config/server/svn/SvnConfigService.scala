@@ -16,35 +16,35 @@ import org.tmatesoft.svn.core.wc.SVNRevision
 import scala.async.Async._
 import scala.concurrent.Future
 
-class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorRuntime: ActorRuntime, svnRepo: SvnRepo)
+class SvnConfigService(settings: Settings, actorRuntime: ActorRuntime, svnRepo: SvnRepo, annexFileService: AnnexFileService)
     extends ConfigService {
-
-  //TODO: add doc for all methods explaining logic
 
   import actorRuntime._
 
   private val log: Logger = ConfigServerLogger.getLogger
 
   override def create(path: Path, configData: ConfigData, annex: Boolean, comment: String = ""): Future[ConfigId] = async {
-    // If the file already exists in the repo, throw exception
+    // if the file already exists in the repo, throw exception
     if (await(exists(path))) {
       throw FileAlreadyExists(path)
     }
 
-    val id = await(createFile(path, configData, annex, comment))
-    await(setActiveVersion(path, id, "initializing active file with the first version"))
+    val id = await(createFile(path, configData, annex, comment)) // create file
+    await(setActiveVersion(path, id, "initializing active file with the first version")) // set the first version of file as active
     id
   }
 
   private def createFile(path: Path, configData: ConfigData, annex: Boolean = false, comment: String): Future[ConfigId] = {
 
+    // Create the annex file on local disk and get it's sha. Then create a file in svn repo storing that sha.
+    // For every annex file there is a file in svn repo. This file is stored at <<annexFilePath>> + settings.`sha1-suffix` in svn repo.
     def createAnnex(): Future[ConfigId] = async {
-      val sha1 = await(fileService.post(configData))
+      val sha1 = await(annexFileService.post(configData))
       await(createFile(shaFilePath(path), ConfigData.fromString(sha1), annex = false, comment))
     }
 
     async {
-      // If the file does not already exists in the repo, create it
+      // if the annex flag is set by the client or file size qualifies for annex then create the file as annex
       if (annex || configData.length > settings.`annex-min-file-size`) {
         log.info(
           s"Either annex=$annex is specified or Input file length ${configData.length} exceeds ${settings.`annex-min-file-size`}; Storing file in Annex"
@@ -58,9 +58,11 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
 
   override def update(path: Path, configData: ConfigData, comment: String): Future[ConfigId] = {
 
+    // Update the content of the annex file in local disk. Then update the file at path <<annexFilePath>> + settings.`sha1-suffix`
+    // in svn repo with new sha calculated after updating annex file.
     def updateAnnex(): Future[ConfigId] = async {
       log.info(s"Updating annex file at path ${path.toString}")
-      val sha1 = await(fileService.post(configData))
+      val sha1 = await(annexFileService.post(configData))
       await(update(shaFilePath(path), ConfigData.fromString(sha1), comment))
     }
 
@@ -74,37 +76,6 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
     }
   }
 
-  // Returns the contents of the given version of the file, if found
-  private def getNormalSize(path: Path, revision: SVNRevision): Future[Option[ConfigData]] = async {
-    val outputStream = new ByteArrayOutputStream()
-    await(svnRepo.getFile(path, revision.getNumber, outputStream))
-    Some(ConfigData.fromBytes(outputStream.toByteArray))
-  }
-
-  // Get annex files that are stored in the annex server
-  private def getAnnex(path: Path, revision: SVNRevision): Future[Option[ConfigData]] = async {
-    await(getNormalSize(shaFilePath(path), revision)) match {
-      case None =>
-        None
-      case Some(configData) =>
-        val sha1 = await(configData.toStringF)
-        await(fileService.get(sha1))
-    }
-  }
-
-  private def get(path: Path, configId: Option[ConfigId] = None) = async {
-    val svnRevision = await(svnRepo.svnRevision(configId.map(_.id.toLong)))
-
-    await(pathStatus(path, configId)) match {
-      case PathStatus.NormalSize ⇒
-        log.info(s"Getting normal file at path ${path.toString}")
-        await(getNormalSize(path, svnRevision))
-      case PathStatus.Annex ⇒
-        log.info(s"Getting annex file at path ${path.toString}")
-        await(getAnnex(path, svnRevision))
-      case PathStatus.Missing ⇒ None
-    }
-  }
   // If the file exists in the repo, get data of its latest revision
   override def getLatest(path: Path): Future[Option[ConfigData]] = get(path)
 
@@ -128,10 +99,50 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
     }
   }
 
+  private def get(path: Path, configId: Option[ConfigId] = None) = async {
+
+    // in case of no configId provided the latest revision for this path is taken
+    val svnRevision = await(svnRepo.svnRevision(configId.map(_.id.toLong)))
+
+    await(pathStatus(path, configId)) match {
+      case PathStatus.NormalSize ⇒
+        log.info(s"Getting normal file at path ${path.toString}")
+        await(getNormal(path, svnRevision))
+      case PathStatus.Annex ⇒
+        log.info(s"Getting annex file at path ${path.toString}")
+        await(getAnnex(path, svnRevision))
+      case PathStatus.Missing ⇒ None
+    }
+  }
+
+  // Returns the content of the given svn revision of the file, if found
+  private def getNormal(path: Path, revision: SVNRevision): Future[Option[ConfigData]] = async {
+    val outputStream = new ByteArrayOutputStream()
+    await(svnRepo.getFile(path, revision.getNumber, outputStream))
+    Some(ConfigData.fromBytes(outputStream.toByteArray))
+  }
+
+  // Get the file stored in svn for this annex file. If the svn file exists then get it's file content, which is nothing but
+  // the sha of annex file and then use it to get the annex file from local disk.
+  private def getAnnex(path: Path, revision: SVNRevision): Future[Option[ConfigData]] = async {
+    await(getNormal(shaFilePath(path), revision)) match {
+      case None =>
+        None
+      case Some(configData) =>
+        val sha1 = await(configData.toStringF)
+        await(annexFileService.get(sha1))
+    }
+  }
+
   override def exists(path: Path, id: Option[ConfigId]): Future[Boolean] = async {
     await(pathStatus(path, id)).isInstanceOf[PathStatus.Present]
   }
 
+  // Find the status of the path (Annex, Normal or Missing) and delete accordingly. If the file is normal simply delete
+  // it from svn. If the file is annex then only delete the svn file having its sha but not the actual annex file
+  // that is on local disk. The actual annex file is kept around so that if there is a feature of reverting a delete operation
+  // ever in future then the revert of any annex file will result in reviving it's corresponding svn file which would be
+  // having its sha.
   override def delete(path: Path, comment: String = "deleted"): Future[Unit] = async {
     await(pathStatus(path)) match {
       case PathStatus.NormalSize ⇒
@@ -144,6 +155,7 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
     }
   }
 
+  // list the file info - (path, id (revision), commit message)
   override def list(fileType: Option[FileType] = None, pattern: Option[String] = None): Future[List[ConfigFileInfo]] = async {
     await(svnRepo.list(fileType, pattern)).map { entry =>
       ConfigFileInfo(Paths.get(entry.getRelativePath), ConfigId(entry.getRevision), entry.getCommitMessage)
@@ -233,10 +245,12 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
   }
 
   override def getMetadata: Future[ConfigMetadata] = Future {
-    ConfigMetadata(settings.`repository-dir`,
-                   settings.`annex-files-dir`,
-                   settings.annexMinFileSizeAsMetaInfo,
-                   settings.`max-content-length`)
+    ConfigMetadata(
+      settings.`repository-dir`,
+      settings.`annex-files-dir`,
+      settings.annexMinFileSizeAsMetaInfo,
+      settings.`max-content-length`
+    )
   }
 
   private def historyActiveRevisions(path: Path, configFileRevision: ConfigFileRevision): Future[ConfigFileRevision] = async {
@@ -244,6 +258,7 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
     ConfigFileRevision(ConfigId(await(configData.get.toStringF)), configFileRevision.comment, configFileRevision.time)
   }
 
+  // determines whether the file at given path and id exists as normal or annex or is missing
   private def pathStatus(path: Path, id: Option[ConfigId] = None): Future[PathStatus] = async {
     val revision = id.map(_.id.toLong)
     if (await(svnRepo.pathExists(path, revision))) {
@@ -291,6 +306,7 @@ class SvnConfigService(settings: Settings, fileService: AnnexFileService, actorR
     }
   }
 
+  // get the file history - (id (revision), comment, time)
   private def hist(path: Path, from: Instant, to: Instant, maxResults: Int): Future[List[ConfigFileRevision]] = async {
     await(svnRepo.hist(path, from, to, maxResults))
       .map(e => ConfigFileRevision(ConfigId(e.getRevision), e.getMessage, e.getDate.toInstant))

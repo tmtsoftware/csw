@@ -18,7 +18,7 @@ import scala.concurrent.Future
 import scala.util.control.NonFatal
 
 /**
- * Initialises ConfigServer
+ * Initialises ConfigServer at given port and register with location service
  *
  * @param locationService          LocationService instance to be used for registering this server with the location service
  * @param configServiceRoute       ConfigServiceRoute instance representing the routes supported by this server
@@ -36,10 +36,17 @@ class HttpService(
 
   private val log: Logger = ConfigServerLogger.getLogger
 
-  lazy val registeredLazyBinding: Future[(ServerBinding, RegistrationResult)] = async { //TODO: add doc
-    val binding            = await(bind())
-    val registrationResult = await(register(binding))
+  lazy val registeredLazyBinding: Future[(ServerBinding, RegistrationResult)] = async {
+    val binding            = await(bind())            // create HttpBinding with appropriate hostname and port
+    val registrationResult = await(register(binding)) // create HttpRegistration and register it with location service
 
+    // Add the task to unregister the HttpRegistration from location service.
+    // This will execute as the first task out of all tasks at the shutdown of ActorSystem.
+    // ActorSystem will shutdown if any SVNException is thrown while running the ConfigService app (refer Main.scala)
+    // If for some reason ActorSystem is not shutdown gracefully then a jvm shutdown hook is in place which will unregister
+    // HttpRegistration from location service.
+    // And if for some reason jvm shutdown hook does not get executed then the DeathWatchActor running in cluster will get notified that config service is down
+    // and it will unregister HttpRegistration from location service.
     coordinatedShutdown.addTask(
       CoordinatedShutdown.PhaseBeforeServiceUnbind,
       s"unregistering-${registrationResult.location}"

@@ -23,7 +23,7 @@ class ServerWiring {
   lazy val svnRepo                  = new SvnRepo(settings, actorRuntime.blockingIoDispatcher)
 
   lazy val annexFileService             = new AnnexFileService(settings, annexFileRepo, actorRuntime)
-  lazy val configService: ConfigService = new SvnConfigService(settings, annexFileService, actorRuntime, svnRepo)
+  lazy val configService: ConfigService = new SvnConfigService(settings, actorRuntime, svnRepo, annexFileService)
 
   lazy val locationService: LocationService = LocationServiceFactory.withSystem(actorSystem)
 
