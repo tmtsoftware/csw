@@ -10,13 +10,15 @@ import redis.embedded.RedisServer
 
 class RedisPubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with EmbeddedRedis {
 
-  private val actorSystem = ActorSystem()
-  private val redisPort   = 6379
-  private lazy val redis  = RedisServer.builder().setting("bind 127.0.0.1").port(redisPort).build()
-  private val wiring      = new RedisWiring("localhost", redisPort, actorSystem)
-  private val publisher   = wiring.publisher()
+  private implicit val actorSystem: ActorSystem = ActorSystem()
 
-  private val framework = new EventServicePubSubTestFramework(wiring)
+  private val redisPort  = 6379
+  private lazy val redis = RedisServer.builder().setting("bind 127.0.0.1").port(redisPort).build()
+  private val wiring     = new RedisWiring("localhost", redisPort, actorSystem)
+  private val publisher  = wiring.publisher()
+  private val subscriber = wiring.subscriber()
+
+  private val framework = new EventServicePubSubTestFramework(publisher, subscriber)
 
   override protected def beforeAll(): Unit = {
     redis.start()

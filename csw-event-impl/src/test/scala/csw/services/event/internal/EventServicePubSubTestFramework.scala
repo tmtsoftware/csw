@@ -1,29 +1,30 @@
 package csw.services.event.internal
 
 import akka.stream.FlowShape
+import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.stage.GraphStage
 import csw.messages.ccs.events.{Event, EventKey, EventName, SystemEvent}
 import csw.messages.params.models.Prefix
+import csw.services.event.helpers.Monitor
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.helpers.Utils.makeEvent
-import csw.services.event.internal.commons.Wiring
-import csw.services.event.internal.perf.Monitor
 import csw.services.event.scaladsl.{EventPublisher, EventSubscriber}
 import org.scalatest.Matchers
 
 import scala.concurrent.duration.{DurationLong, FiniteDuration}
 
-class EventServicePubSubTestFramework(wiring: Wiring) extends Matchers {
+class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: EventSubscriber)(
+    implicit val actorSystem: ActorSystem
+) extends Matchers {
 
-  import wiring._
+  private implicit val mat: ActorMaterializer = ActorMaterializer()
 
   val eventKey: EventKey = makeEvent(0).eventKey
   var counter            = 0
 
-  private val eventStream                 = Source.repeat(()).map(_ => eventGenerator())
-  private val publisher: EventPublisher   = wiring.publisher()
-  private val subscriber: EventSubscriber = wiring.subscriber()
+  private val eventStream = Source.repeat(()).map(_ => eventGenerator())
 
   private def eventGenerator() = {
     counter += 1

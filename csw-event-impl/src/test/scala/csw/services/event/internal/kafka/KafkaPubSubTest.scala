@@ -7,12 +7,13 @@ import net.manub.embeddedkafka.EmbeddedKafka
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
 
 class KafkaPubSubTest extends FunSuite with EmbeddedKafka with BeforeAndAfterAll {
-  private lazy val actorSystem = ActorSystem()
+  private implicit val actorSystem: ActorSystem = ActorSystem()
 
-  private val kafkaPort = 6001
-  private val wiring    = new KafkaWiring("localhost", kafkaPort, actorSystem)
-  private val publisher = wiring.publisher()
-  private val framework = new EventServicePubSubTestFramework(wiring)
+  private val kafkaPort  = 6001
+  private val wiring     = new KafkaWiring("localhost", kafkaPort, actorSystem)
+  private val publisher  = wiring.publisher()
+  private val subscriber = wiring.subscriber()
+  private val framework  = new EventServicePubSubTestFramework(publisher, subscriber)
 
   override protected def beforeAll(): Unit = {
     EmbeddedKafka.start()

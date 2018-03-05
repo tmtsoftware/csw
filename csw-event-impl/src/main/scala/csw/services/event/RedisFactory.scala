@@ -17,14 +17,14 @@ class RedisFactory(locationService: LocationService, actorSystem: ActorSystem) {
 
   def publisher(host: String, port: Int): EventPublisher = new RedisWiring(host, port, actorSystem).publisher()
 
-  def publisher(name: String): Future[EventPublisher] = async {
+  def publisher(): Future[EventPublisher] = async {
     val uri: URI = await(eventServiceResolver.uri)
     RedisWiring(uri, actorSystem).publisher()
   }
 
   def subscriber(host: String, port: Int): EventSubscriber = new RedisWiring(host, port, actorSystem).subscriber()
 
-  def subscriber(name: String): Future[EventSubscriber] = async {
+  def subscriber(): Future[EventSubscriber] = async {
     val uri: URI = await(eventServiceResolver.uri)
     RedisWiring(uri, actorSystem).subscriber()
   }

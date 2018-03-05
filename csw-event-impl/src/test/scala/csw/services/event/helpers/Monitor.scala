@@ -1,4 +1,4 @@
-package csw.services.event.internal.perf
+package csw.services.event.helpers
 
 import akka.NotUsed
 import akka.stream.scaladsl.Flow
