@@ -7,8 +7,11 @@ import csw.services.logging.internal.LoggingLevels.Level
 import csw.services.logging.models.LogMetadata
 import csw.services.logging.scaladsl.{GenericLoggerFactory, Logger}
 
-//TODO: explain better significance
-object LogAdminActor {
+// LogAdminActor is initiated once per jvm. It handles messages to change/read the log level of any component started in same jvm.
+// An http service is started at `cluster-seed`. This http service understands request to change/read log level of any component.
+// Http service then locates the component through location service, get the instance of `LogAdminActor` for that component and
+// set/get the log level for that component by sending appropriate message to this actor.
+private[logging] object LogAdminActor {
   private[logging] def behavior(): Behavior[LogControlMessages] = Actor.immutable[LogControlMessages] { (ctx, msg) ⇒
     val log: Logger = GenericLoggerFactory.getLogger(ctx)
 

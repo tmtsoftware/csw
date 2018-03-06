@@ -11,7 +11,6 @@ import scala.concurrent.Promise
 /**
  * Global state info for logging. Use with care!
  */
-//TODO: explain better significance
 private[logging] object LoggingState {
 
   // This is a default log level applied to all the components, if components does not specify explicitly

@@ -2,7 +2,7 @@ package csw.services.logging.internal
 
 import csw.messages.TMTSerializable
 
-object LoggingLevels {
+private[csw] object LoggingLevels {
 
   private[this] val levels         = Seq(TRACE, DEBUG, INFO, WARN, ERROR, FATAL)
   private[this] val nameToLevelMap = levels.map(level => (level.name, level)).toMap

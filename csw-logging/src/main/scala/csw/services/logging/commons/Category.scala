@@ -5,7 +5,6 @@ import enumeratum.{Enum, EnumEntry}
 
 import scala.collection.immutable
 
-//TODO: explain better significance
 private[logging] sealed abstract class Category extends EnumEntry with Lowercase with Serializable {
   def name: String = entryName
 }

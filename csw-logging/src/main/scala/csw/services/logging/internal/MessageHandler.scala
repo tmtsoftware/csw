@@ -7,12 +7,14 @@ import csw.services.logging.scaladsl.RequestId
 /**
  * Acts as a single point of entry for messages from various loggers and redirects them to the log actor
  */
-//TODO: explain better significance
-object MessageHandler {
+private[logging] object MessageHandler {
 
   /**
-   * Sends message to LogActor or maintains it in a queue till the log actor is not available
-   * @param msg
+   * MessageHandler is a singleton object which will start at the bootup of jvm. If the `LoggingSystem` is not started
+   * (which is also responsible for starting `LogActor`) then all the log messages from akka, slf4j, tmt will be enqueued
+   * in an in-memory mutable.Queue `msgs`. This will result in log messages to NOT appear in file or stdout. Once, the
+   * `LoggingSystem` is instantiated, `msgs` is emptied and log messages are processed by forwarding them to `LogActor`.
+   * As an effect they will now start appearing in file or std out.
    */
   private[logging] def sendMsg(msg: LogActorMessages): Unit =
     if (loggerStopping) {

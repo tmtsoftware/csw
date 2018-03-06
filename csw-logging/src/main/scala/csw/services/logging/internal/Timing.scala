@@ -7,7 +7,7 @@ import scala.util.Random
 /**
  * Include this trait in classes you want to time.
  */
-trait Timing {
+private[logging] trait Timing {
 
   /**
    * This object contains methods used to mark regions to be timed in the timing log.

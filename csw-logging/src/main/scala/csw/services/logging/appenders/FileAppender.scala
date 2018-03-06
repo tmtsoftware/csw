@@ -14,11 +14,11 @@ import csw.services.logging.scaladsl.{Logger, LoggerImpl}
 import scala.concurrent.{ExecutionContextExecutor, Future, Promise}
 
 /**
- * Responsible for writing log messages to a file
- * @param path path where the log file will be created
- * @param category category of the log messages
+ * Responsible for writing log messages to a file on local disk
+ *
+ * @param path     Path where the log file will be created
+ * @param category Category of the log messages
  */
-//TODO: add doc to explain significance for everything
 private[logging] class FileAppenderHelper(path: String, category: String) {
 
   private[this] var fileSpanTimestamp: Option[ZonedDateTime] = None
@@ -26,6 +26,7 @@ private[logging] class FileAppenderHelper(path: String, category: String) {
 
   protected val log: Logger = new LoggerImpl(None, None)
 
+  // The file containing logs is created on local machine. This file is rotated everyday at 12:00:00 hour.
   def appendAdd(maybeTimestamp: Option[ZonedDateTime], line: String, rotateFlag: Boolean): Unit = {
     maybePrintWriter match {
       case Some(w) =>

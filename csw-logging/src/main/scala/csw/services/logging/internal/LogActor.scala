@@ -18,8 +18,8 @@ import scala.concurrent.Promise
 /**
  * All log messages are routed to this single Akka Actor. There is one LogActor per logging system.
  * Logging messages from logging API, Java Slf4j and Akka loggers are sent to this actor.
+ * Messages are then forwarded to one or more configured appenders.
  */
-//TODO: explain better significance
 private[logging] object LogActor {
 
   def props(

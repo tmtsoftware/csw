@@ -2,7 +2,6 @@ package csw.services.logging.models
 
 import csw.services.logging.internal.LoggingLevels._
 
-//TODO: explain better significance
 private[logging] class ComponentLoggingState(level: Level) {
 
   private[logging] var componentLogLevel: Level = level

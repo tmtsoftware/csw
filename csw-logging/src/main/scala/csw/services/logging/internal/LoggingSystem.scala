@@ -22,14 +22,16 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
 
 /**
  * This class is responsible for programmatic interaction with the configuration of the logging system. It initializes
- * the appenders, starts the log actor and manages clean up of logging system.
- * @param name             name of the service (to log).
- * @param version             version of the service (to log).
- * @param host             host name (to log).
- * @param system           actor system which will be used to create log actors
+ * appenders, starts the log actor and manages clean up of logging system. Until and unless this class is instantiated
+ * all(akka, slf4j and tmt) the logs are enqueued in local queue. Once it is instantiated, the queue is emptied and all
+ * the logs are forwarded to configured appenders.
+ *
+ * @param name             Name of the service (to log).
+ * @param version          Version of the service (to log).
+ * @param host             Host name (to log).
+ * @param system           Actor system which will be used to create log actors
  */
-//TODO: explain better significance of everything
-class LoggingSystem(name: String, version: String, host: String, val system: ActorSystem) {
+class LoggingSystem private[csw] (name: String, version: String, host: String, val system: ActorSystem) {
 
   import LoggingLevels._
 

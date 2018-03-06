@@ -9,27 +9,27 @@ import csw.services.logging.internal.LoggingLevels.Level
 import scala.concurrent.Future
 
 /**
- * Companion object for the StdOutAppender class.
+ * Companion object for the StdOutAppender class
  */
-//TODO: explain better significance
 object StdOutAppender extends LogAppenderBuilder {
 
   /**
-   * A constructor for the StdOutAppender class.
+   * A constructor for the StdOutAppender class
    *
-   * @param factory    an Akka factory.
-   * @param stdHeaders the headers that are fixes for this service.
-   * @return the stdout appender.
+   * @param factory    An Akka factory
+   * @param stdHeaders The headers that are fixes for this service
+   * @return The stdout appender
    */
   def apply(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]): StdOutAppender =
     new StdOutAppender(factory, stdHeaders, println)
 }
 
 /**
- * A log appender that write common log messages to stdout.
+ * A log appender that writes common log messages to stdout. Stdout output can be printed as oneLine or pretty.
+ * oneLine will print only the message of the log statement in single line and pretty will print all the information of log statement.
  *
- * @param factory    an Akka factory.
- * @param stdHeaders the headers that are fixes for this service.
+ * @param factory    An Akka factory
+ * @param stdHeaders The headers that are fixes for this service
  */
 class StdOutAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg], logPrinter: Any ⇒ Unit) extends LogAppender {
   private[this] val system = factory match {
@@ -50,10 +50,10 @@ class StdOutAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg],
   private[this] var kinds      = Map.empty[String, Int]
 
   /**
-   * Writes a log message to stdout.
+   * Writes a log message to stdout
    *
-   * @param baseMsg  the message to be logged.
-   * @param category the kinds of log (for example, "common").
+   * @param baseMsg  The message to be logged
+   * @param category The kinds of log (for example, "common")
    */
   def append(baseMsg: Map[String, RichMsg], category: String): Unit = {
     val level = jgetString(baseMsg, LoggingKeys.SEVERITY)
@@ -119,17 +119,17 @@ class StdOutAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg],
   }
 
   /**
-   * Called just before the logger shuts down.
+   * Called just before the logger shuts down
    *
-   * @return a future that is completed when finished.
+   * @return A future that is completed when finished
    */
   def finish(): Future[Unit] =
     Future.successful(())
 
   /**
-   * Closes the stdout appender.
+   * Closes the stdout appender
    *
-   * @return a future that is completed when the close is complete.
+   * @return A future that is completed when the close is complete
    */
   def stop(): Future[Unit] = {
     if (summary) {

@@ -10,9 +10,10 @@ import csw.services.logging.scaladsl.{GenericLoggerFactory, Logger}
 import scala.collection.mutable
 
 /**
- *This class is used to allow the logs logged using SLF4J API to be routed to logback that in turn sends Slf4j messages to the common log.
+ * This class is wired up as appender in `logback.xml`. The instance of this class is created via reflection. When log
+ * statement from SLF4J code is executed, a message is sent to this class. Then this class will simply process the received message
+ * and forward it to underlying logging code.
  */
-//TODO: explain better significance
 private[logging] class Slf4jAppender[E]() extends UnsynchronizedAppenderBase[E] with AppenderAttachable[E] {
   import csw.services.logging.internal.LoggingLevels._
 

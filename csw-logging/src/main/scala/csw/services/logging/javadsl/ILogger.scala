@@ -6,7 +6,6 @@ import csw.services.logging.scaladsl.{AnyId, Logger}
 
 // scalastyle:off file.size.limit
 
-//TODO: explain better significance
 trait ILogger {
 
   /**
@@ -825,5 +824,8 @@ trait ILogger {
    */
   def fatal(msg: String, map: java.util.Map[String, Object], ex: Throwable, id: AnyId): Unit
 
+  /**
+   * Returns the scala API for this instance of ILogger
+   */
   def asScala: Logger
 }
