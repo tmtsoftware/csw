@@ -13,12 +13,14 @@ import net.manub.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
 
 class KafkaPubSubTest extends FunSuite with EmbeddedKafka with BeforeAndAfterAll {
-  private val seedPort                          = 3559
-  private val kafkaPort                         = 6001
-  private val locationService                   = LocationServiceFactory.withSettings(ClusterAwareSettings.onPort(seedPort))
-  private val clusterSettings                   = ClusterAwareSettings.joinLocal(seedPort)
+  private val seedPort        = 3559
+  private val kafkaPort       = 6001
+  private val clusterSettings = ClusterAwareSettings.joinLocal(seedPort)
+  private val locationService = LocationServiceFactory.withSettings(ClusterAwareSettings.onPort(seedPort))
+  private val tcpRegistration = RegistrationFactory.tcp(EventServiceConnection.value, kafkaPort)
+  locationService.register(tcpRegistration).await
+
   private implicit val actorSystem: ActorSystem = clusterSettings.system
-  private val wiring                            = new Wiring(actorSystem)
   private val pubSubProperties                  = Map("bootstrap.servers" → s"${clusterSettings.hostname}:$kafkaPort")
   private val brokers                           = s"PLAINTEXT://${clusterSettings.hostname}:$kafkaPort"
   private val brokerProperties                  = Map("listeners" → brokers, "advertised.listeners" → brokers)
@@ -27,10 +29,9 @@ class KafkaPubSubTest extends FunSuite with EmbeddedKafka with BeforeAndAfterAll
                                            customProducerProperties = pubSubProperties,
                                            customBrokerProperties = brokerProperties)
 
-  private val tcpRegistration = RegistrationFactory.tcp(EventServiceConnection.value, kafkaPort)
-  locationService.register(tcpRegistration).await
   EmbeddedKafka.start()(config)
 
+  private val wiring       = new Wiring(actorSystem)
   private val kafkaFactory = new KafkaFactory(locationService, wiring)
   private val publisher    = kafkaFactory.publisher().await
   private val subscriber   = kafkaFactory.subscriber().await
