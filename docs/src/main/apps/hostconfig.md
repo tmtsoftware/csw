@@ -15,6 +15,12 @@ Scala
 Java
 :   @@snip [JHostConfigApp.java](../../../../examples/src/main/java/csw/framework/JHostConfigApp.java) { #jhost-config-app }
 
+@@@ note
+
+It is not necessary to have name of the application as HostConfigApp/JHostConfigApp, user can choose this name.
+
+@@@
+
 ## Command line parameter options
 
 * **`--local`** It's an optional parameter. When supplied, get the host configuration file from local machine located at hostConfigPath, else fetch it from config service

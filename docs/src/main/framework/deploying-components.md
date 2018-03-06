@@ -1,5 +1,10 @@
 ## Deploying Components
 
+### ContainerCmd
+
+`ContainerCmd` is a helper utility provided as a part of framework. This helps component writers to start their components inside container.
+This support running single component in standa
+
 A main application needs to be created which uses framework provided utility `csw.apps.containercmd.ContainerCmd` 
 to start a container or standalone component. The utility supports following parameters which can be provided as arguments to the
 application :
@@ -17,17 +22,19 @@ Scala
 Java
 :   @@snip [JContainerCmdApp](../../../../examples/src/main/java/csw/framework/JContainerCmdApp.java) { #container-app }
 
+@@@ note
+
+It is not necessary to have name of the application as ContainerCmdApp/JContainerCmdApp, user can choose any name.
+
+@@@
+
 Starting a **standalone** component from a **local** configuration file
 
-    ```
-    SampleAssempbyCmdApp standalone local /tmp/config/assembly.conf
-    ```
+    `./container-cmd-app standalone local /assembly/config/assembly.conf`
     
 Starting a **container** component from a configuration file available in **configuration service**
 
-    ```
-    SampleContainerCmdApp /sample/config/assembly.conf
-    ```
+    `./container-cmd-app /assembly/config/assembly.conf`
 
 ### Container for deployment
 
