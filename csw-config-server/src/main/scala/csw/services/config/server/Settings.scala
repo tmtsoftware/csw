@@ -7,9 +7,9 @@ import com.typesafe.config.Config
 import org.tmatesoft.svn.core.SVNURL
 
 /**
- * Represents the runtime configuration
+ * Represents the runtime configuration for config server
  *
- * @param config //TODO: add more explanation
+ * @param config config representing various properties to start config server
  */
 class Settings(config: Config) {
 

@@ -30,7 +30,10 @@ class SvnConfigService(settings: Settings, actorRuntime: ActorRuntime, svnRepo: 
     }
 
     val id = await(createFile(path, configData, annex, comment)) // create file
-    await(setActiveVersion(path, id, "initializing active file with the first version")) // set the first version of file as active
+    // Set the first version of file as active. A version of the file is set as active by storing its revision
+    // in another file at <<filePath>> + settings.`active-config-suffix`. For every file stored in svn there is a corresponding
+    // file representing the active revision of original svn file.
+    await(setActiveVersion(path, id, "initializing active file with the first version"))
     id
   }
 
@@ -162,6 +165,7 @@ class SvnConfigService(settings: Settings, actorRuntime: ActorRuntime, svnRepo: 
     }
   }
 
+  // get the history (id (revision), comment, time) of the file at given path
   override def history(path: Path, from: Instant, to: Instant, maxResults: Int): Future[List[ConfigFileRevision]] = async {
     await(pathStatus(path)) match {
       case PathStatus.NormalSize ⇒
@@ -169,18 +173,23 @@ class SvnConfigService(settings: Settings, actorRuntime: ActorRuntime, svnRepo: 
         await(hist(path, from, to, maxResults))
       case PathStatus.Annex ⇒
         log.info(s"Fetching history for annex file for path ${path.toString}")
+        // for annex file get it's corresponding svn file and return the (revision, comment, time) of this svn file
         await(hist(shaFilePath(path), from, to, maxResults))
       case PathStatus.Missing ⇒ throw FileNotFound(path)
     }
   }
 
+  // get the history of only active revisions of the file for given path
   override def historyActive(path: Path, from: Instant, to: Instant, maxResults: Int): Future[List[ConfigFileRevision]] = async {
+    // get the file representing active revisions for provided path
     val activePath = activeFilePath(path)
 
     if (await(exists(activePath))) {
 
+      // prepare the history of files representing active revisions (id (revision) of file representing active versions, comment, time)
       val configFileRevisions = await(hist(activePath, from, to, maxResults))
 
+      // map the collected history to (active id (revision) of actual file, comment, time)
       val history = Future.sequence(configFileRevisions.map(historyActiveRevisions(activePath, _)))
 
       await(history)
@@ -188,6 +197,7 @@ class SvnConfigService(settings: Settings, actorRuntime: ActorRuntime, svnRepo: 
       throw FileNotFound(path)
   }
 
+  // add or update the file representing active version of actual file with the provided id (revision)
   override def setActiveVersion(path: Path, id: ConfigId, comment: String = ""): Future[Unit] = async {
     if (!await(exists(path, Some(id)))) {
       throw FileNotFound(path)
@@ -205,6 +215,7 @@ class SvnConfigService(settings: Settings, actorRuntime: ActorRuntime, svnRepo: 
     }
   }
 
+  // reset will set the active version to latest availavble version for the file
   override def resetActiveVersion(path: Path, comment: String): Future[Unit] = async {
     if (!await(exists(path))) {
       throw FileNotFound(path)
@@ -216,9 +227,11 @@ class SvnConfigService(settings: Settings, actorRuntime: ActorRuntime, svnRepo: 
 
   override def getActive(path: Path): Future[Option[ConfigData]] = {
 
+    // Get the latest file representing active versions of this file and get the data from that file. This data is nothing
+    // but the id (revision) marked as active for actual file. Then get the data from actual file for this active id revision.
     def getActiveById(configId: ConfigId): Future[Option[ConfigData]] = async {
-      val d  = await(getLatest(activeFilePath(path)))
-      val id = if (d.isDefined) await(d.get.toStringF) else configId.id
+      val maybeActiveVersion = await(getLatest(activeFilePath(path)))
+      val id                 = if (maybeActiveVersion.isDefined) await(maybeActiveVersion.get.toStringF) else configId.id
       await(getById(path, ConfigId(id)))
     }
 
@@ -230,12 +243,15 @@ class SvnConfigService(settings: Settings, actorRuntime: ActorRuntime, svnRepo: 
     }
   }
 
+  // Get the file representing active versions for the given file path and with the given time. Get the data from this
+  // file which is nothing but the id (revision) marked active for the actual file. Get the data of actual file for this id (revision).
   override def getActiveByTime(path: Path, time: Instant): Future[Option[ConfigData]] = async {
     val activeVersion = await(getByTime(activeFilePath(path), time))
     val activeId      = await(activeVersion.get.toStringF)
     await(getById(path, ConfigId(activeId)))
   }
 
+  // get the id (revision) marked active for given file path
   override def getActiveVersion(path: Path): Future[Option[ConfigId]] = async {
     val configData = await(getLatest(activeFilePath(path)))
     if (configData.isDefined)
@@ -253,6 +269,7 @@ class SvnConfigService(settings: Settings, actorRuntime: ActorRuntime, svnRepo: 
     )
   }
 
+  // get the content of the file representing active revisions and prepare the history view as (id (revision marked active), comment, time)
   private def historyActiveRevisions(path: Path, configFileRevision: ConfigFileRevision): Future[ConfigFileRevision] = async {
     val configData = await(getById(path, configFileRevision.id))
     ConfigFileRevision(ConfigId(await(configData.get.toStringF)), configFileRevision.comment, configFileRevision.time)
