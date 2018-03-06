@@ -2,31 +2,42 @@ package csw.services.event
 
 import java.net.URI
 
-import akka.actor.ActorSystem
-import csw.services.event.internal.commons.EventServiceResolver
-import csw.services.event.internal.kafka.KafkaWiring
+import akka.kafka.{ConsumerSettings, ProducerSettings}
+import csw.services.event.internal.commons.{EventServiceResolver, Wiring}
+import csw.services.event.internal.kafka.{KafkaPublisher, KafkaSubscriber}
 import csw.services.event.scaladsl.{EventPublisher, EventSubscriber}
 import csw.services.location.scaladsl.LocationService
+import org.apache.kafka.clients.consumer.ConsumerConfig
+import org.apache.kafka.common.serialization.{ByteArrayDeserializer, ByteArraySerializer, StringDeserializer, StringSerializer}
 
 import scala.async.Async.{async, await}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
-class KafkaFactory(locationService: LocationService, actorSystem: ActorSystem) {
+class KafkaFactory(locationService: LocationService, wiring: Wiring) {
+  import wiring._
 
-  private implicit val ec: ExecutionContext = actorSystem.dispatcher
-  private val eventServiceResolver          = new EventServiceResolver(locationService)
+  private val eventServiceResolver = new EventServiceResolver(locationService)
 
-  def publisher(host: String, port: Int): EventPublisher = new KafkaWiring(host, port, actorSystem).publisher()
+  private def producerSettings(host: String, port: Int) =
+    ProducerSettings(actorSystem, new StringSerializer, new ByteArraySerializer)
+      .withBootstrapServers(s"$host:$port")
+
+  private def consumerSettings(host: String, port: Int) =
+    ConsumerSettings(actorSystem, new StringDeserializer, new ByteArrayDeserializer)
+      .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest")
+      .withBootstrapServers(s"$host:$port")
+
+  def publisher(host: String, port: Int): EventPublisher = new KafkaPublisher(producerSettings(host, port))
 
   def publisher(): Future[EventPublisher] = async {
     val uri: URI = await(eventServiceResolver.uri)
-    KafkaWiring(uri, actorSystem).publisher()
+    publisher(uri.getHost, uri.getPort)
   }
 
-  def subscriber(host: String, port: Int): EventSubscriber = new KafkaWiring(host, port, actorSystem).subscriber()
+  def subscriber(host: String, port: Int): EventSubscriber = new KafkaSubscriber(consumerSettings(host, port))
 
   def subscriber(): Future[EventSubscriber] = async {
     val uri: URI = await(eventServiceResolver.uri)
-    KafkaWiring(uri, actorSystem).subscriber()
+    subscriber(uri.getHost, uri.getPort)
   }
 }

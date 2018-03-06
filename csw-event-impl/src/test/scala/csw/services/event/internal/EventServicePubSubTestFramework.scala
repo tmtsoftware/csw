@@ -44,7 +44,7 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
 
     //    eventStream.mapAsync(1)(publisher.publish).runWith(Sink.ignore)
     //    publisher.publish(eventStream)
-    publisher.publish(eventGenerator, 5.millis)
+    publisher.publish(eventGenerator _, 5.millis)
 
     doneF.await
   }
@@ -62,7 +62,7 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
 
     Thread.sleep(1000)
 
-    publisher.publish(eventGenerator, publisherTick)
+    publisher.publish(eventGenerator _, publisherTick)
 
     doneF.await
   }

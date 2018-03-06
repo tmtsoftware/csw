@@ -18,11 +18,10 @@ class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(i
                                                                                protected val mat: Materializer)
     extends EventSubscriber {
 
-  private val consumer: KafkaConsumer[String, Array[Byte]] = consumerSettings.createKafkaConsumer()
-
   override def subscribe(eventKeys: Set[EventKey]): Source[Event, EventSubscription] = {
+    val consumer           = consumerSettings.createKafkaConsumer()
     val topicPartitions    = eventKeys.map(e ⇒ new TopicPartition(e.key, 0)).toList
-    val offsets            = getLatestOffsets(topicPartitions)
+    val offsets            = getLatestOffsets(topicPartitions, consumer)
     val subscription       = Subscriptions.assignmentWithOffset(offsets.mapValues(x ⇒ if (x == 0) 0L else x - 1))
     val invalidEventStream = if (isNoEventAvailable(offsets)) Source.single(Event.invalidEvent) else Source.empty
     val eventStream = Consumer
@@ -33,9 +32,8 @@ class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(i
       .concatMat(eventStream)(Keep.right)
       .mapMaterializedValue { control ⇒
         new EventSubscription {
-          override def unsubscribe(): Future[Done] = {
-            shutdown()
-            control.shutdown()
+          override def unsubscribe(): Future[Done] = control.shutdown().map { _ ⇒
+            consumer.close(); Done
           }
         }
       }
@@ -52,10 +50,12 @@ class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(i
 
   override def get(eventKey: EventKey): Future[Event] = get(Set(eventKey)).map(_.head)
 
-  private def shutdown(): Future[Unit] = Future { scala.concurrent.blocking(consumer.close()) }
-
-  private def getLatestOffsets(topicPartitions: List[TopicPartition]): Map[TopicPartition, Long] =
+  private def getLatestOffsets(
+      topicPartitions: List[TopicPartition],
+      consumer: KafkaConsumer[String, Array[Byte]]
+  ): Map[TopicPartition, Long] = {
     consumer.endOffsets(topicPartitions.asJava).asScala.toMap.mapValues(_.toLong)
+  }
 
   private def isNoEventAvailable(offsets: Map[TopicPartition, Long]) = offsets.values.exists(_ == 0)
 
