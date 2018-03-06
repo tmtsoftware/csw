@@ -262,10 +262,12 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       commandResponseOnTimeout.asInstanceOf[Error].message shouldBe timeoutExMsg
 
       //#oneway
+      // `setupWithTimeoutMatcher` is a sample setup payload intended to be used when command response is not determined
+      // using matcher
       val onewayCommandResponseF: Future[Unit] = async {
-        val initialResponse = await(assemblyComponent.oneway(setupWithTimeoutMatcher))
+        val initialResponse: CommandResponse = await(assemblyComponent.oneway(setupWithTimeoutMatcher))
         initialResponse match {
-          case _: Accepted ⇒
+          case accepted: Accepted ⇒
           // do Something
           case invalid: Invalid ⇒
           // do Something
@@ -274,6 +276,22 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
         }
       }
       //#oneway
+
+      //#submit
+      // `setupWithTimeoutMatcher` is a sample setup payload intended to be used when command response is not determined
+      // using matcher
+      val submitCommandResponseF: Future[Unit] = async {
+        val initialResponse: CommandResponse = await(assemblyComponent.submit(setupWithTimeoutMatcher))
+        initialResponse match {
+          case accepted: Accepted ⇒
+          // do Something
+          case invalid: Invalid ⇒
+          // do Something
+          case x ⇒
+          // do Something
+        }
+      }
+      //#submit
 
       enterBarrier("short-long-commands")
 

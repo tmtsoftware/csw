@@ -202,12 +202,29 @@ public class JCommandIntegrationTest {
                 .thenAccept(initialCommandResponse -> {
                     if (initialCommandResponse instanceof CommandResponse.Accepted) {
                         //do something
+                    } else if (initialCommandResponse instanceof CommandResponse.Invalid) {
+                        //do something
                     } else {
                         //do something
                     }
                 });
 
         //#oneway
+
+        //#submit
+        CompletableFuture submitCommandResponseF = hcdCmdService
+                .oneway(setup, timeout)
+                .thenAccept(initialCommandResponse -> {
+                    if (initialCommandResponse instanceof CommandResponse.Accepted) {
+                        //do something
+                    } else if (initialCommandResponse instanceof CommandResponse.Invalid) {
+                        //do something
+                    } else {
+                        //do something
+                    }
+                });
+
+        //#submit
 
         //#onewayAndMatch
 

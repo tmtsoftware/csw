@@ -96,13 +96,20 @@ the component using commands.
 The API can be exercised as follows for different scenarios of command based communication:
 
 ### submit
-Submit a command and get a `CommandResponse` as a Future. The CommandResponse can be a response of validation (Accepted, Invalid) or a final Response.
+Submit a command and get a `CommandResponse` as a Future. The CommandResponse can be a response of validation (Accepted, Invalid) or a final Response
+in case of immediate completion.
 
-Scala
+Scala/immediate-response
 :   @@snip [CommandServiceTest.scala](../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #immediate-response }
 
-Java
+Java/immediate-response
 :   @@snip [JCommandIntegrationTest.java](../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #immediate-response }
+
+Scala/validation-response
+:   @@snip [CommandServiceTest.scala](../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #submit }
+
+Java/validation-response
+:   @@snip [JCommandIntegrationTest.java](../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #submit }
    
 ### oneway
 Send a command as a Oneway and get a `CommandResponse` as a Future. The CommandResponse can be a response of validation (Accepted, Invalid) or a final Response.
