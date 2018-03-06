@@ -16,6 +16,7 @@ The source code of this project can be found [here](https://github.com/tmtsoftwa
 * [CSW Overview](cswOverview.md)
 * [Getting Started](gettingStarted.md)
 * [Creating a Component](createComponent.md)
+* [Working with Multiple Components](multipleComponents.md)
 * [Framework](framework.md)
 * [Services](services.md)
 * [Command](command.md)
