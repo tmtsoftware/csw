@@ -8,8 +8,6 @@ Visit [TMT website](http://www.tmt.org) to know more about Thirty Meter Telescop
 
 The source code of this project can be found [here](https://github.com/tmtsoftware/csw-prod).
 
-###HTTP based services documentation can be found [here](swagger/index.html).
-
 @@ toc { .main depth=2 }
 
 @@@ index
@@ -25,5 +23,7 @@ The source code of this project can be found [here](https://github.com/tmtsoftwa
 * [Manuals](manuals.md)
 
 @@@
+
+###HTTP based services documentation can be found [here](swagger/index.html).
 
 
