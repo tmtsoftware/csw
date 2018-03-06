@@ -13,11 +13,14 @@ The source code of this project can be found [here](https://github.com/tmtsoftwa
 @@ toc { .main depth=2 }
 
 @@@ index
-* [Manuals](manuals.md)
-* [Applications](apps.md)
-* [Services](services.md)
+* [CSW Overview](cswOverview.md)
+* [Getting Started](gettingStarted.md)
+* [Creating a Component](createComponent.md)
 * [Framework](framework.md)
+* [Services](services.md)
 * [Command](command.md)
+* [Applications](apps.md)
+* [Manuals](manuals.md)
 
 @@@
 
