@@ -1,10 +1,11 @@
 package csw.services.event.internal.redis
 
-import akka.Done
 import akka.stream.scaladsl.{Keep, Source}
 import akka.stream.{KillSwitches, Materializer}
+import akka.{Done, NotUsed}
 import csw.messages.ccs.events._
 import csw.services.event.scaladsl.{EventSubscriber, EventSubscription}
+import io.lettuce.core.pubsub.api.reactive.RedisPubSubReactiveCommands
 import reactor.core.publisher.FluxSink.OverflowStrategy
 
 import scala.async.Async._
@@ -16,26 +17,17 @@ class RedisSubscriber(redisGateway: RedisGateway)(implicit ec: ExecutionContext,
   private lazy val asyncConnectionF = redisGateway.asyncConnectionF()
 
   override def subscribe(eventKeys: Set[EventKey]): Source[Event, EventSubscription] = {
-    val connectionF = redisGateway.reactiveConnectionF()
-
-    val sourceF = async {
-      val connection = await(connectionF)
-      connection.subscribe(eventKeys.toSeq: _*).subscribe()
-      Source.fromPublisher(connection.observeChannels(OverflowStrategy.LATEST)).map(_.getMessage)
-    }
-
-    val latestEventStream = Source.fromFuture(get(eventKeys)).mapConcat(identity)
-    val eventStream       = Source.fromFutureSource(sourceF)
+    val connectionF       = redisGateway.reactiveConnectionF()
+    val latestEventStream = Source(eventKeys).mapAsync(eventKeys.size)(get)
+    val eventStream       = Source.fromFuture(connectionF).flatMapConcat(connection ⇒ subscribe(eventKeys, connection))
 
     latestEventStream
-      .concatMat(eventStream)(Keep.right)
-      .viaMat(KillSwitches.single)(Keep.both)
+      .concat(eventStream)
+      .viaMat(KillSwitches.single)(Keep.right)
       .watchTermination()(Keep.both)
       .mapMaterializedValue {
-        case ((eventStreamReady, killSwitch), terminationSignal) ⇒
+        case (killSwitch, terminationSignal) ⇒
           new EventSubscription {
-            override def isReady: Future[Done] = eventStreamReady.map(_ ⇒ Done)
-
             override def unsubscribe(): Future[Done] = async {
               val commands = await(connectionF)
               await(commands.unsubscribe(eventKeys.toSeq: _*).toFuture.toScala)
@@ -56,4 +48,12 @@ class RedisSubscriber(redisGateway: RedisGateway)(implicit ec: ExecutionContext,
 
     if (event == null) Event.invalidEvent else event
   }
+
+  private def subscribe(
+      eventKeys: Set[EventKey],
+      connection: RedisPubSubReactiveCommands[EventKey, Event]
+  ): Source[Event, NotUsed] =
+    Source
+      .fromFuture(connection.subscribe(eventKeys.toSeq: _*).toFuture.toScala.map(_ ⇒ ()))
+      .flatMapConcat(_ ⇒ Source.fromPublisher(connection.observeChannels(OverflowStrategy.LATEST)).map(_.getMessage))
 }
