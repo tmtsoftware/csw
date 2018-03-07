@@ -12,11 +12,12 @@ package csw.services
  * Important classes in this project are:
  *
  * - [[csw.services.command.scaladsl.CommandResponseManager]]
+ *
  * This class wraps CommandResponseManagerActor and provides helpers to interact with actor
  * which is responsible for adding/updating/querying command result.
  * Component writers will get handle to CommandResponseManager in their handlers.
  * When component receives command of type [[csw.messages.CommandMessage.Submit]],
- * then framework (ComponentBehavior - TLA) will add a entry of this command with its validation status into CSRM (CommandResponseManager).
+ * then framework (ComponentBehavior - TLA) will add a entry of this command with its validation status into CommandResponseManager.
  *
  * In case of short running or immediate command,
  * validation response will be of type final result which can either be of type
@@ -30,12 +31,13 @@ package csw.services
  * CommandResponseManager also provides **subscribe** API.
  * One of the use case for this is when Assembly splits top level command into two sub commands and forwards them to two different HCD's.
  * In this case, Assembly can register its interest in the final [[csw.messages.commands.CommandResponse]]
- * from two HCD's when these sub commands completes using **subscribe** API.
+ * from two HCD's when these sub commands completes, using **subscribe** API.
  * And once Assembly receives final command response from both the HCD's
  * then it can update Top level command with final [[csw.messages.commands.CommandResponse]]
  *
  *
  * - [[csw.services.command.scaladsl.CommandService]]
+ *
  * This class wraps the [[csw.messages.location.AkkaLocation]] and provides helpers to send commands to component actor extracted from provided location.
  * Normal component writers workflow would be to first resolve component using location service and then create CommandService instance using resolved location.
  *
@@ -61,6 +63,7 @@ package csw.services
  * }}}
  *
  * - [[csw.services.command.scaladsl.CommandDistributor]]
+ *
  * The ConfigDistributor enables distributing multiple commands to multiple components and get one aggregated command
  * response as a final response.
  *
@@ -72,8 +75,8 @@ package csw.services
  *   // setup1HcdA and setup2HcdA are Setup commands which are targeted to HCD-A
  *   // setup1HcdB and setup2HcdB are Setup commands which are targeted to HCD-B
  *   val aggregatedValidationResponse = CommandDistributor(
- *Map(hcdACommandService → Set(setup1HcdA, setup2HcdA), hcdBCommandService → Set(setup1HcdB, setup2HcdB))
- *).aggregatedValidationResponse()
+ *              Map(hcdACommandService → Set(setup1HcdA, setup2HcdA), hcdBCommandService → Set(setup1HcdB, setup2HcdB))
+ *          ).aggregatedValidationResponse()
  *
  * }}}
  *
