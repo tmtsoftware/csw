@@ -11,7 +11,7 @@ import com.typesafe.config.ConfigFactory
 import csw.common.utils.LockCommandFactory
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.messages.CommandMessage.Submit
-import csw.messages.ccs.CommandIssue.ComponentLockedIssue
+import csw.messages.commands.CommandIssue.ComponentLockedIssue
 import csw.messages.commands.CommandResponse._
 import csw.messages.commands._
 import csw.messages.commands.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
