@@ -18,8 +18,8 @@ object PathValidator {
   /**
    * gets a message for presence of invalid characters in the file path
    *
-   * @param path       String representation of path
-   * @return           Message for presence of invalid characters
+   * @param path string representation of path
+   * @return message for presence of invalid characters
    */
   def message(path: String): String =
     s"Input file path '$path' contains invalid characters. Note, these characters $invalidCharsMessage are not allowed in file path"
@@ -27,8 +27,8 @@ object PathValidator {
   /**
    * validates string representation of path for the presence of unsupported characters in file path
    *
-   * @param path       String representation of path
-   * @return           True if the path does not contain any unsupported character, false otherwise
+   * @param path string representation of path
+   * @return true if the path does not contain any unsupported character, false otherwise
    */
   def isValid(path: String): Boolean = !invalidPattern.matcher(path).find()
 }

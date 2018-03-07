@@ -26,8 +26,8 @@ sealed abstract class Registration {
   /**
    * A location represents a live connection available for consumption
    *
-   * @param hostname Provide a hostname where the connection endpoint is available
-   * @return A location representing a live connection at provided hostname
+   * @param hostname provide a hostname where the connection endpoint is available
+   * @return a location representing a live connection at provided hostname
    */
   def location(hostname: String): Location
 }
@@ -35,11 +35,11 @@ sealed abstract class Registration {
 /**
  * AkkaRegistration holds the information needed to register an akka location
  *
- * @param connection The `Connection` to register with `LocationService`
- * @param prefix The optional prefix representing
+ * @param connection the `Connection` to register with `LocationService`
+ * @param prefix the optional prefix representing
  * @param actorRef Provide a remote actor that is offering a connection. Local actors cannot be registered since they can't be
  *                 communicated from components across the network
- * @param logAdminActorRef The ActorRef responsible to handle log level change for a component dynamically
+ * @param logAdminActorRef the ActorRef responsible to handle log level change for a component dynamically
  */
 final case class AkkaRegistration(
     connection: AkkaConnection,
@@ -67,8 +67,8 @@ final case class AkkaRegistration(
   /**
    * Create a AkkaLocation that represents the live connection offered by the actor
    *
-   * @param hostname Provide a hostname where the connection endpoint is available
-   * @return An AkkaLocation location representing a live connection at provided hostname
+   * @param hostname provide a hostname where the connection endpoint is available
+   * @return an AkkaLocation location representing a live connection at provided hostname
    */
   override def location(hostname: String): Location = AkkaLocation(connection, prefix, uri, actorRef, logAdminActorRef)
 }
@@ -76,7 +76,7 @@ final case class AkkaRegistration(
 /**
  * TcpRegistration holds information needed to register a Tcp service
  *
- * @param port Provide the port where Tcp service is available
+ * @param port provide the port where Tcp service is available
  */
 final case class TcpRegistration(connection: TcpConnection, port: Int, logAdminActorRef: ActorRef[LogControlMessages])
     extends Registration {
@@ -84,8 +84,8 @@ final case class TcpRegistration(connection: TcpConnection, port: Int, logAdminA
   /**
    * Create a TcpLocation that represents the live Tcp service
    *
-   * @param hostname Provide the hostname where Tcp service is available
-   * @return An TcpLocation location representing a live connection at provided hostname
+   * @param hostname provide the hostname where Tcp service is available
+   * @return an TcpLocation location representing a live connection at provided hostname
    */
   override def location(hostname: String): Location =
     TcpLocation(connection, new URI(s"tcp://$hostname:$port"), logAdminActorRef)
@@ -94,8 +94,8 @@ final case class TcpRegistration(connection: TcpConnection, port: Int, logAdminA
 /**
  * HttpRegistration holds information needed to register a Http service
  *
- * @param port Provide the port where Http service is available
- * @param path Provide the path to reach the available http service
+ * @param port provide the port where Http service is available
+ * @param path provide the path to reach the available http service
  */
 final case class HttpRegistration(
     connection: HttpConnection,
@@ -107,7 +107,7 @@ final case class HttpRegistration(
   /**
    * Create a HttpLocation that represents the live Http service
    *
-   * @param hostname  Provide the hostname where Http service is available
+   * @param hostname provide the hostname where Http service is available
    */
   override def location(hostname: String): Location =
     HttpLocation(connection, new URI(s"http://$hostname:$port/$path"), logAdminActorRef)

@@ -9,8 +9,8 @@ object StreamExt {
    * RichSource adds extra features on akka streams
    *
    * @see [[akka.stream.scaladsl.Source]]
-   * @tparam Out The type of values that will flow through this stream
-   * @tparam Mat When the stream starts flowing, the handle to the Mat will be available
+   * @tparam Out the type of values that will flow through this stream
+   * @tparam Mat when the stream starts flowing, the handle to the Mat will be available
    */
   implicit class RichSource[Out, Mat](val source: Source[Out, Mat]) extends AnyVal {
 

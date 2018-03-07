@@ -21,8 +21,8 @@ class ActorRuntime private[csw] (_actorSystem: ActorSystem = ActorSystem()) {
    * to shutdown the the app gracefully. `csw-config-client-cli` becomes the part of akka cluster on booting up and
    * resolves the config server, using location service, to provide cli features around admin api of config service.
    *
-   * @param reason The reason for shutdown
-   * @return A future that completes when shutdown is successful
+   * @param reason the reason for shutdown
+   * @return a future that completes when shutdown is successful
    */
   def shutdown(reason: Reason): Future[Done] = CswCoordinatedShutdown.run(actorSystem, reason)
 }

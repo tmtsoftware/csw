@@ -20,10 +20,10 @@ import scala.util.control.NonFatal
 /**
  * Initialises ConfigServer at given port and register with location service
  *
- * @param locationService          LocationService instance to be used for registering this server with the location service
- * @param configServiceRoute       ConfigServiceRoute instance representing the routes supported by this server
- * @param settings                 Runtime configuration of server
- * @param actorRuntime             ActorRuntime instance wrapper for actor system
+ * @param locationService locationService instance to be used for registering this server with the location service
+ * @param configServiceRoute configServiceRoute instance representing the routes supported by this server
+ * @param settings runtime configuration of server
+ * @param actorRuntime actorRuntime instance wrapper for actor system
  */
 class HttpService(
     locationService: LocationService,

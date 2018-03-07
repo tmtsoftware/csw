@@ -24,8 +24,8 @@ import scala.concurrent.Future
 /**
  * Performs file operations on SVN using SvnKit
  *
- * @param settings                  Server runtime configuration
- * @param blockingIoDispatcher      Dispatcher to be used for blocking operations
+ * @param settings server runtime configuration
+ * @param blockingIoDispatcher dispatcher to be used for blocking operations
  */
 class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
   private val log: Logger = ConfigServerLogger.getLogger

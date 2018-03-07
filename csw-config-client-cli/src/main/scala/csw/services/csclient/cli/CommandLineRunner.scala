@@ -162,7 +162,7 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
     }
   }
 
-  //command line app is by nature blocking.
-  //Do not use such method in library/server side code
+  // command line app is by nature blocking.
+  // Do not use such method in library/server side code
   private def await[T](future: Future[T]): T = Await.result(future, Duration.Inf)
 }

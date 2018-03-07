@@ -13,14 +13,14 @@ trait IRegistrationResult {
   /**
    * The successful registration of location can be unregistered using this method
    *
-   * @return A CompletableFuture which completes when the location is is successfully unregistered
+   * @return a CompletableFuture which completes when the location is is successfully unregistered
    */
   def unregister: CompletableFuture[Done]
 
   /**
    * The `unregister` method will use the connection of this location to unregister from `LocationService`
    *
-   * @return The handle to the `Location` that got registered in `LocationService`
+   * @return the handle to the `Location` that got registered in `LocationService`
    */
   def location: Location
 }

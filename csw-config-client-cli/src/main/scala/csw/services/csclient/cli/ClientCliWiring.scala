@@ -12,7 +12,7 @@ import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
  * of config server using `ConfigServiceResolver` from `csw-config-client` and then starts the app catering cli features
  * over admin api of config service.
  *
- * @param actorSystem The ActorSystem used to join akka cluster
+ * @param actorSystem the ActorSystem used to join akka cluster
  */
 class ClientCliWiring(actorSystem: ActorSystem) {
   lazy val actorRuntime                     = new ActorRuntime(actorSystem)

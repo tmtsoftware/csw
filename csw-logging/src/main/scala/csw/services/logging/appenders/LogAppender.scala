@@ -13,9 +13,9 @@ trait LogAppenderBuilder {
   /**
    * Log appender constructor
    *
-   * @param factory         An Akka factory
-   * @param standardHeaders The headers that are fixes for this service
-   * @return                An appender
+   * @param factory an Akka factory
+   * @param standardHeaders the headers that are fixes for this service
+   * @return an appender
    */
   def apply(factory: ActorRefFactory, standardHeaders: Map[String, RichMsg]): LogAppender
 }
@@ -28,22 +28,22 @@ trait LogAppender {
   /**
    * Appends a new log message
    *
-   * @param baseMsg   The message to be logged
-   * @param category  The kinds of log (for example, "common")
+   * @param baseMsg the message to be logged
+   * @param category the kinds of log (for example, "common")
    */
   def append(baseMsg: Map[String, RichMsg], category: String): Unit
 
   /**
    * Called just before the logger shuts down
    *
-   * @return A future that is completed when finished
+   * @return a future that is completed when finished
    */
   def finish(): Future[Unit]
 
   /**
    * Stops a log appender
    *
-   * @return A future that is completed when stopped
+   * @return a future that is completed when stopped
    */
   def stop(): Future[Unit]
 

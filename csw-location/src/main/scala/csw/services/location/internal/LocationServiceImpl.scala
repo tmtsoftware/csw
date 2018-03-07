@@ -125,7 +125,7 @@ class LocationServiceImpl private[location] (cswCluster: CswCluster) extends Loc
   /**
    * Unregister all connections from CRDT
    *
-   * @note This method should be used for testing purpose only
+   * @note this method should be used for testing purpose only
    */
   def unregisterAll(): Future[Done] = async {
     log.warn("Un-registering all components from location service")
@@ -233,7 +233,7 @@ class LocationServiceImpl private[location] (cswCluster: CswCluster) extends Loc
   /**
    * Terminate the ActorSystem and gracefully leave the akka cluster
    *
-   * @note It is recommended not to perform any operation on LocationService after shutdown
+   * @note it is recommended not to perform any operation on LocationService after shutdown
    */
   def shutdown(reason: Reason): Future[Done] = cswCluster.shutdown(reason)
 

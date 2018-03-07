@@ -26,10 +26,10 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
  * all(akka, slf4j and tmt) the logs are enqueued in local queue. Once it is instantiated, the queue is emptied and all
  * the logs are forwarded to configured appenders.
  *
- * @param name             Name of the service (to log).
- * @param version          Version of the service (to log).
- * @param host             Host name (to log).
- * @param system           Actor system which will be used to create log actors
+ * @param name name of the service (to log).
+ * @param version version of the service (to log).
+ * @param host host name (to log).
+ * @param system an ActorSystem used to create log actors
  */
 class LoggingSystem private[csw] (name: String, version: String, host: String, val system: ActorSystem) {
 
@@ -146,6 +146,7 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
 
   /**
    * Get Akka logging levels
+   *
    * @return the current and default Akka logging levels.
    */
   def getAkkaLevel: Levels = Levels(LoggingState.akkaLogLevel, defaultAkkaLogLevel)
@@ -161,12 +162,14 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
 
   /**
    * Get the Slf4j logging levels.
+   *
    * @return the current and default Slf4j logging levels.
    */
   def getSlf4jLevel: Levels = Levels(LoggingState.slf4jLogLevel, defaultSlf4jLogLevel)
 
   /**
    * Changes the slf4j logging level.
+   *
    * @param level the new logging level for slf4j.
    */
   def setSlf4jLevel(level: Level): Unit = {
@@ -176,12 +179,14 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
 
   /**
    * Get the logging appenders.
+   *
    * @return the current and default logging appenders.
    */
   def getAppenders: List[LogAppenderBuilder] = appenderBuilders
 
   /**
    * Changes the logging appenders.
+   *
    * @param _appenderBuilders the list of new logging appenders.
    */
   def setAppenders(_appenderBuilders: List[LogAppenderBuilder]): Unit = {
@@ -197,6 +202,7 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
 
   /**
    * Get the basic logging configuration values
+   *
    * @return LogMetadata which comprises of current root log level, akka log level, sl4j log level and component log level
    */
   def getLogMetadata(componentName: String): LogMetadata =
@@ -211,6 +217,7 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
 
   /**
    * Shut down the logging system.
+   *
    * @return  future completes when the logging system is shut down.
    */
   def stop: Future[Done] = {

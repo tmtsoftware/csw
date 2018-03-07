@@ -14,7 +14,7 @@ private[logging] object ComponentLoggingStateManager {
    * componentName ->
    *
    * @param loggingConfig the logging configuration object
-   * @return Set of Filters
+   * @return set of Filters
    */
   def from(loggingConfig: Config): Map[String, ComponentLoggingState] =
     Try {
@@ -31,8 +31,8 @@ private[logging] object ComponentLoggingStateManager {
   /**
    * Add the component logging state for a component in map componentName -> ComponentLoggingState
    *
-   * @param componentName The name of the component
-   * @param level The log level for the component
+   * @param componentName the name of the component
+   * @param level the log level for the component
    */
   def add(componentName: String, level: Level): Unit = {
     import csw.services.logging.internal.LoggingState._

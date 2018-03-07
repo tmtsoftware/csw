@@ -6,7 +6,7 @@ import csw.messages.location.{Connection, Location}
 /**
  * An Exception representing failure in registration
  *
- * @param connection A connection for which registration failed
+ * @param connection a connection for which registration failed
  */
 case class RegistrationFailed(connection: Connection)
     extends RuntimeException(
@@ -16,7 +16,7 @@ case class RegistrationFailed(connection: Connection)
 /**
  * An Exception representing failure in un-registration
  *
- * @param connection A connection for which un-registration failed
+ * @param connection a connection for which un-registration failed
  */
 case class UnregistrationFailed(connection: Connection)
     extends RuntimeException(
@@ -26,8 +26,8 @@ case class UnregistrationFailed(connection: Connection)
 /**
  * An Exception representing failure in registration as other location is already registered in place of the given location
  *
- * @param location      The location which is supposed to be registered
- * @param otherLocation The location which already registered
+ * @param location the location which is supposed to be registered
+ * @param otherLocation the location which already registered
  */
 case class OtherLocationIsRegistered(location: Location, otherLocation: Location)
     extends RuntimeException(
@@ -37,7 +37,7 @@ case class OtherLocationIsRegistered(location: Location, otherLocation: Location
 /**
  * An Exception representing failure in registering non remote actors
  *
- * @param actorRef The reference of the Actor that is expected to be remote but instead it is local
+ * @param actorRef the reference of the Actor that is expected to be remote but instead it is local
  */
 case class LocalAkkaActorRegistrationNotAllowed(actorRef: ActorRef[_])
     extends RuntimeException(

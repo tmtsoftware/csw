@@ -11,6 +11,7 @@ object RichException {
 
   /**
    * Apply method for RichException.
+   *
    * @param richMsg the rich exception message.
    * @param cause the optional underlying causing exception.
    * @return the RichException
