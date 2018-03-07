@@ -8,10 +8,10 @@ import csw.messages.params.models.Prefix
 import org.scalatest.{FunSuite, Matchers}
 
 class EventServiceCodecTest extends FunSuite with Matchers {
-  val prefix    = Prefix("test.prefix")
-  val eventName = EventName("system")
-  val event     = SystemEvent(prefix, eventName)
-  val pbEvent   = Event.typeMapper.toBase(event)
+  private val prefix    = Prefix("test.prefix")
+  private val eventName = EventName("system")
+  private val event     = SystemEvent(prefix, eventName)
+  private val pbEvent   = Event.typeMapper.toBase(event)
 
   test("testDecodeKey") {
     val byteBuf = ByteString("testKey").asByteBuffer

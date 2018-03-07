@@ -83,7 +83,8 @@ object Event {
 
   // Fixme: Can this take a EventKey and create correct prefix and put it in Events Prefix?
   val invalidEvent: SystemEvent =
-    SystemEvent(Prefix("invalid"), EventName("invalid")).copy(eventTime = EventTime.toEventTime(Instant.MIN))
+    SystemEvent(Prefix("invalid"), EventName("invalid"))
+      .copy(eventId = Id("-1"), eventTime = EventTime.toEventTime(Instant.ofEpochMilli(Long.MinValue)))
 }
 
 /**

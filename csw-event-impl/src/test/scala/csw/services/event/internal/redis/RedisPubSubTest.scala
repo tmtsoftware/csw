@@ -6,8 +6,8 @@ import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.event.RedisFactory
 import csw.services.event.helpers.RegistrationFactory
 import csw.services.event.helpers.TestFutureExt.RichFuture
+import csw.services.event.internal.EventServicePubSubTestFramework
 import csw.services.event.internal.commons.{EventServiceConnection, Wiring}
-import csw.services.event.internal.{EventServicePubSubTestFramework, RateAdapterStage, RateLimiterStage}
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.scaladsl.LocationServiceFactory
 import io.lettuce.core.RedisClient
@@ -37,18 +37,6 @@ class RedisPubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with
     redisClient.shutdown()
     wiring.shutdown(TestFinishedReason).await
     redis.stop()
-  }
-
-  ignore("limiter") {
-    framework.comparePerf(new RateLimiterStage(_))
-  }
-
-  ignore("adapter") {
-    framework.comparePerf(new RateAdapterStage(_))
-  }
-
-  ignore("redis-throughput-latency") {
-    framework.monitorPerf()
   }
 
   test("Redis pub sub") {

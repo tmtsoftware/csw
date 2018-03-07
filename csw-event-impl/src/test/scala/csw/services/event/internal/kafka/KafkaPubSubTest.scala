@@ -43,10 +43,6 @@ class KafkaPubSubTest extends FunSuite with EmbeddedKafka with BeforeAndAfterAll
     wiring.shutdown(TestFinishedReason).await
   }
 
-  ignore("throughput latency") {
-    framework.monitorPerf()
-  }
-
   test("Kafka pub sub") {
     framework.pubSub()
   }
