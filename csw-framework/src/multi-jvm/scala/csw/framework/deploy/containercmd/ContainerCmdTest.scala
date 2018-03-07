@@ -14,8 +14,8 @@ import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSuper
 import csw.messages.ContainerCommonMessage.GetComponents
 import csw.messages.RunningMessage.Lifecycle
 import csw.messages.SupervisorContainerCommonMessages.Shutdown
-import csw.messages.ccs.commands.CommandResponse.Invalid
-import csw.messages.ccs.commands.{CommandName, Setup}
+import csw.messages.commands.CommandResponse.Invalid
+import csw.messages.commands.{CommandName, Setup}
 import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}

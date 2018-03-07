@@ -3,9 +3,9 @@ package csw.common.components.framework
 import akka.typed.scaladsl.ActorContext
 import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
 import csw.messages.TopLevelActorMessage
-import csw.messages.ccs.CommandIssue.OtherIssue
-import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Invalid}
-import csw.messages.ccs.commands._
+import csw.messages.commands.CommandIssue.OtherIssue
+import csw.messages.commands.CommandResponse.{Accepted, Completed, Invalid}
+import csw.messages.commands._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location.{LocationRemoved, LocationUpdated, TrackingEvent}

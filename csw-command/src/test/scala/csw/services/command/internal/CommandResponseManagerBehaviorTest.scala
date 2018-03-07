@@ -8,8 +8,8 @@ import akka.typed.testkit.{StubbedActorContext, TestKitSettings}
 import akka.{actor, typed}
 import csw.messages.CommandResponseManagerMessage
 import csw.messages.CommandResponseManagerMessage._
-import csw.messages.ccs.commands.CommandResponse
-import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Error}
+import csw.messages.commands.CommandResponse
+import csw.messages.commands.CommandResponse.{Accepted, Completed, Error}
 import csw.messages.params.models.Id
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 import org.mockito.ArgumentMatchers.any

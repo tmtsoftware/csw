@@ -6,9 +6,8 @@ import akka.util.Timeout
 import csw.common.components.command.ComponentStateForCommand.{longRunningCmdCompleted, _}
 import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
 import csw.messages.TopLevelActorMessage
-import csw.messages.ccs.CommandIssue
-import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Invalid}
-import csw.messages.ccs.commands.{CommandResponse, ControlCommand, Setup}
+import csw.messages.commands.CommandResponse.{Accepted, Completed, Invalid}
+import csw.messages.commands.{CommandIssue, CommandResponse, ControlCommand, Setup}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.{AkkaLocation, TrackingEvent}
 import csw.messages.params.models.Id

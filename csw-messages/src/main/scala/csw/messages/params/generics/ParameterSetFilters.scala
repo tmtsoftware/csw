@@ -1,6 +1,6 @@
 package csw.messages.params.generics
 
-import csw.messages.ccs.commands.{Observe, SequenceCommand, Setup, Wait}
+import csw.messages.commands.{Observe, SequenceCommand, Setup, Wait}
 import csw.messages.params.models.Subsystem
 
 /**

@@ -3,8 +3,8 @@ package csw.services.command.perf.component
 import akka.typed.scaladsl.ActorContext
 import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
 import csw.messages.TopLevelActorMessage
-import csw.messages.ccs.commands.CommandResponse.Completed
-import csw.messages.ccs.commands._
+import csw.messages.commands.CommandResponse.Completed
+import csw.messages.commands._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.TrackingEvent
 import csw.messages.params.models.Id

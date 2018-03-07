@@ -8,8 +8,8 @@ import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
-import csw.messages.ccs.commands.{Command, CommandName, Setup}
-import csw.messages.ccs.events.SystemEvent
+import csw.messages.commands.{Command, CommandName, Setup}
+import csw.messages.events.SystemEvent
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.{ObsId, Prefix}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}

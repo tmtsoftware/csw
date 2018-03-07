@@ -13,8 +13,8 @@ import csw.common.FrameworkAssertions._
 import csw.common.components.framework.SampleComponentState._
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.messages.SupervisorContainerCommonMessages.Shutdown
-import csw.messages.ccs.commands
-import csw.messages.ccs.commands.CommandName
+import csw.messages.commands
+import csw.messages.commands.CommandName
 import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState}
 import csw.messages.location.ComponentId
 import csw.messages.location.ComponentType.{Assembly, HCD}

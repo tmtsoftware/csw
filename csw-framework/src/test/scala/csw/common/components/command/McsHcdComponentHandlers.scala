@@ -5,8 +5,8 @@ import csw.common.components.command.ComponentStateForCommand._
 import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
 import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
 import csw.messages.TopLevelActorMessage
-import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Error}
-import csw.messages.ccs.commands.{CommandResponse, ControlCommand}
+import csw.messages.commands.CommandResponse.{Accepted, Completed, Error}
+import csw.messages.commands.{CommandResponse, ControlCommand}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.TrackingEvent
 import csw.services.command.scaladsl.CommandResponseManager

@@ -8,9 +8,9 @@ import akka.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.util.Timeout
 import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
 import csw.messages._
-import csw.messages.ccs.CommandIssue.{OtherIssue, WrongPrefixIssue}
-import csw.messages.ccs.commands.CommandResponse._
-import csw.messages.ccs.commands._
+import csw.messages.commands.CommandIssue.{OtherIssue, WrongPrefixIssue}
+import csw.messages.commands.CommandResponse._
+import csw.messages.commands._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location._
 import csw.messages.params.generics.{KeyType, Parameter}
@@ -18,7 +18,7 @@ import csw.messages.params.models.Id
 import csw.messages.params.states.CurrentState
 import csw.services.command.scaladsl.CommandResponseManager
 import csw.services.location.scaladsl.LocationService
-import csw.services.logging.scaladsl.{Logger, LoggerFactory}
+import csw.services.logging.scaladsl.LoggerFactory
 
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{ExecutionContext, Future}
@@ -32,7 +32,6 @@ class ComponentHandlerForCommand(
     loggerFactory: LoggerFactory
 ) extends ComponentHandlers(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, loggerFactory) {
 
-  private val log: Logger = loggerFactory.getLogger(ctx)
   private val cancelCmdId = KeyType.StringKey.make("cancelCmdId")
 
   import ComponentStateForCommand._

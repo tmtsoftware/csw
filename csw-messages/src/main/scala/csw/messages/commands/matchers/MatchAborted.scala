@@ -1,4 +1,4 @@
-package csw.messages.ccs.commands.matchers
+package csw.messages.commands.matchers
 
 /**
  * An exception depicting a match was aborted

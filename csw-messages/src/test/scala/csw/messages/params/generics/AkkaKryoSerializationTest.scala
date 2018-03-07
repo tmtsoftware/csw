@@ -16,10 +16,9 @@ import csw.messages.ComponentMessage
 import csw.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.messages.RunningMessage.Lifecycle
 import csw.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
-import csw.messages.ccs.CommandIssue
-import csw.messages.ccs.commands.CommandResponse._
-import csw.messages.ccs.commands._
-import csw.messages.ccs.events.{EventName, EventTime, ObserveEvent, SystemEvent}
+import csw.messages.commands.CommandResponse._
+import csw.messages.commands.{CommandIssue, _}
+import csw.messages.events.{EventName, EventTime, ObserveEvent, SystemEvent}
 import csw.messages.framework.LocationServiceUsage.DoNotRegister
 import csw.messages.framework.{ComponentInfo, ContainerLifecycleState, SupervisorLifecycleState}
 import csw.messages.location.ComponentType.HCD

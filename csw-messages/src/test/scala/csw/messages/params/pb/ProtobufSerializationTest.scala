@@ -1,6 +1,6 @@
 package csw.messages.params.pb
 
-import csw.messages.ccs.events._
+import csw.messages.events._
 import csw.messages.params.generics.KeyType
 import csw.messages.params.generics.KeyType.{ChoiceKey, StructKey}
 import csw.messages.params.models.Units.{arcmin, joule}

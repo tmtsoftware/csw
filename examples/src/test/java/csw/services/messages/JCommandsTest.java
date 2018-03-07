@@ -1,9 +1,9 @@
 package csw.services.messages;
 
-import csw.messages.ccs.commands.CommandName;
-import csw.messages.ccs.commands.Observe;
-import csw.messages.ccs.commands.Setup;
-import csw.messages.ccs.commands.Wait;
+import csw.messages.commands.CommandName;
+import csw.messages.commands.Observe;
+import csw.messages.commands.Setup;
+import csw.messages.commands.Wait;
 import csw.messages.javadsl.JSubsystem;
 import csw.messages.javadsl.JUnits;
 import csw.messages.params.formats.JavaJsonSupport;

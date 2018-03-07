@@ -11,8 +11,8 @@ import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages.RunningMessage.Lifecycle
 import csw.messages.TopLevelActorIdleMessage.Initialize
 import csw.messages._
-import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Error}
-import csw.messages.ccs.commands.{CommandName, CommandResponse, Observe, Setup}
+import csw.messages.commands.CommandResponse.{Accepted, Completed, Error}
+import csw.messages.commands.{CommandName, CommandResponse, Observe, Setup}
 import csw.messages.models.ToComponentLifecycleMessages._
 import csw.messages.params.generics.KeyType
 import csw.messages.params.models.{ObsId, Prefix}

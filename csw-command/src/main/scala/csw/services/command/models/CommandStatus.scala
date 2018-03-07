@@ -1,6 +1,6 @@
 package csw.services.command.models
 
-import csw.messages.ccs.commands.CommandResponse
+import csw.messages.commands.CommandResponse
 import csw.messages.params.models.Id
 
 /**

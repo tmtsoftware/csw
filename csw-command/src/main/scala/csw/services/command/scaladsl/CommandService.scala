@@ -9,10 +9,10 @@ import akka.typed.scaladsl.adapter._
 import akka.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import csw.messages.CommandMessage.{Oneway, Submit}
-import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Error}
-import csw.messages.ccs.commands.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
-import csw.messages.ccs.commands.matchers.{Matcher, StateMatcher}
-import csw.messages.ccs.commands.{CommandResponse, ControlCommand}
+import csw.messages.commands.CommandResponse.{Accepted, Completed, Error}
+import csw.messages.commands.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
+import csw.messages.commands.matchers.{Matcher, StateMatcher}
+import csw.messages.commands.{CommandResponse, ControlCommand}
 import csw.messages.location.AkkaLocation
 import csw.messages.params.models.Id
 import csw.messages.params.states.CurrentState
@@ -36,30 +36,33 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
   private val parallelism = 10
 
   /**
-   * Submit a command and get a [[csw.messages.ccs.commands.CommandResponse]] as a Future. The CommandResponse can be a response
+   * Submit a command and get a [[csw.messages.commands.CommandResponse]] as a Future. The CommandResponse can be a response
    * of validation (Accepted, Invalid) or a final Response. In case of response as `Accepted`, final CommandResponse
    * can be obtained by using `subscribe` API.
-   * @param controlCommand the [[csw.messages.ccs.commands.ControlCommand]] payload
+   *
+   * @param controlCommand the [[csw.messages.commands.ControlCommand]] payload
    * @return a CommandResponse as a Future value.
    */
   def submit(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[CommandResponse] =
     component ? (Submit(controlCommand, _))
 
   /**
-   * Submit multiple commands and get a Source of [[csw.messages.ccs.commands.CommandResponse]] for all commands. The CommandResponse can be a response
+   * Submit multiple commands and get a Source of [[csw.messages.commands.CommandResponse]] for all commands. The CommandResponse can be a response
    * of validation (Accepted, Invalid) or a final Response. In case of response as `Accepted`, final CommandResponse can be obtained by using `subscribe` API.
-   * @param controlCommands the set of [[csw.messages.ccs.commands.ControlCommand]] payloads
+   *
+   * @param controlCommands the set of [[csw.messages.commands.ControlCommand]] payloads
    * @return a Source of CommandResponse as a stream of CommandResponses for all commands
    */
   def submitAll(controlCommands: Set[ControlCommand])(implicit timeout: Timeout): Source[CommandResponse, NotUsed] =
     Source(controlCommands).mapAsyncUnordered(parallelism)(submit)
 
   /**
-   * Submit multiple commands and get one CommandResponse as a Future of [[csw.messages.ccs.commands.CommandResponse]] for all commands. If all the commands were successful,
-   * a CommandResponse as [[csw.messages.ccs.commands.CommandResponse.Completed]] will be returned. If any one of the command fails, an [[csw.messages.ccs.commands.CommandResponse.Error]]
+   * Submit multiple commands and get one CommandResponse as a Future of [[csw.messages.commands.CommandResponse]] for all commands. If all the commands were successful,
+   * a CommandResponse as [[csw.messages.commands.CommandResponse.Completed]] will be returned. If any one of the command fails, an [[csw.messages.commands.CommandResponse.Error]]
    * will be returned.
-   * @param controlCommands the set of [[csw.messages.ccs.commands.ControlCommand]] payloads
-   * @return [[csw.messages.ccs.commands.CommandResponse.Accepted]] or [[csw.messages.ccs.commands.CommandResponse.Error]] CommandResponse as a Future.
+   *
+   * @param controlCommands the set of [[csw.messages.commands.ControlCommand]] payloads
+   * @return [[csw.messages.commands.CommandResponse.Accepted]] or [[csw.messages.commands.CommandResponse.Error]] CommandResponse as a Future.
    */
   def submitAllAndGetResponse(controlCommands: Set[ControlCommand])(implicit timeout: Timeout): Future[CommandResponse] = {
     val value = Source(controlCommands).mapAsyncUnordered(parallelism)(submit)
@@ -70,16 +73,18 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
   }
 
   /**
-   * Send a command as a Oneway and get a [[csw.messages.ccs.commands.CommandResponse]] as a Future. The CommandResponse can be a response
+   * Send a command as a Oneway and get a [[csw.messages.commands.CommandResponse]] as a Future. The CommandResponse can be a response
    * of validation (Accepted, Invalid) or a final Response.
-   * @param controlCommand the [[csw.messages.ccs.commands.ControlCommand]] payload
+   *
+   * @param controlCommand the [[csw.messages.commands.ControlCommand]] payload
    * @return a CommandResponse as a Future value.
    */
   def oneway(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[CommandResponse] =
     component ? (Oneway(controlCommand, _))
 
   /**
-   * Subscribe for the result of a long running command which was sent as Submit to get a [[csw.messages.ccs.commands.CommandResponse]] as a Future.
+   * Subscribe for the result of a long running command which was sent as Submit to get a [[csw.messages.commands.CommandResponse]] as a Future.
+   *
    * @param commandRunId the runId of the command for which response is required
    * @return a CommandResponse as a Future value.
    */
@@ -87,7 +92,8 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
     component ? (CommandResponseManagerMessage.Subscribe(commandRunId, _))
 
   /**
-   * Query for the result of a long running command which was sent as Submit to get a [[csw.messages.ccs.commands.CommandResponse]] as a Future.
+   * Query for the result of a long running command which was sent as Submit to get a [[csw.messages.commands.CommandResponse]] as a Future.
+   *
    * @param commandRunId the runId of the command for which response is required
    * @return a CommandResponse as a Future value.
    */
@@ -95,8 +101,9 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
     component ? (CommandResponseManagerMessage.Query(commandRunId, _))
 
   /**
-   * Submit a command and Subscribe for the result if it was successfully validated as `Accepted` to get a final [[csw.messages.ccs.commands.CommandResponse]] as a Future.
-   * @param controlCommand the [[csw.messages.ccs.commands.ControlCommand]] payload.
+   * Submit a command and Subscribe for the result if it was successfully validated as `Accepted` to get a final [[csw.messages.commands.CommandResponse]] as a Future.
+   *
+   * @param controlCommand the [[csw.messages.commands.ControlCommand]] payload.
    * @return a CommandResponse as a Future value.
    */
   def submitAndSubscribe(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[CommandResponse] =
@@ -106,10 +113,11 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
     }
 
   /**
-   * Submit a command and match the published state from the component using a [[csw.messages.ccs.commands.matchers.StateMatcher]]. If the match is successful a `Completed` response is
+   * Submit a command and match the published state from the component using a [[csw.messages.commands.matchers.StateMatcher]]. If the match is successful a `Completed` response is
    * provided as a future. In case of a failure or unmatched state, `Error` CommandResponse is provided as a Future.
-   * @param controlCommand the [[csw.messages.ccs.commands.ControlCommand]] payload.
-   * @param stateMatcher the StateMatcher implementation for matching received state against a demand state.
+   *
+   * @param controlCommand the [[csw.messages.commands.ControlCommand]] payload.
+   * @param stateMatcher   the StateMatcher implementation for matching received state against a demand state.
    * @return a CommandResponse as a Future value.
    */
   def onewayAndMatch(
@@ -133,7 +141,8 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
   /**
    * Submit multiple commands and get final CommandResponse for all as a stream of CommandResponse. For long running commands, it will subscribe for the
    * result of those which were successfully validated as `Accepted` and get the final CommandResponse.
-   * @param controlCommands the [[csw.messages.ccs.commands.ControlCommand]] payload.
+   *
+   * @param controlCommands the [[csw.messages.commands.ControlCommand]] payload.
    * @return a Source of CommandResponse as a stream of CommandResponses for all commands
    */
   def submitAllAndSubscribe(controlCommands: Set[ControlCommand])(implicit timeout: Timeout): Source[CommandResponse, NotUsed] =
@@ -141,9 +150,10 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
 
   /**
    * Submit multiple commands and get final CommandResponse for all as one CommandResponse. If all the commands were successful, a CommandResponse as
-   * [[csw.messages.ccs.commands.CommandResponse.Completed]] will be returned. If any one of the command fails, an [[csw.messages.ccs.commands.CommandResponse.Error]]
+   * [[csw.messages.commands.CommandResponse.Completed]] will be returned. If any one of the command fails, an [[csw.messages.commands.CommandResponse.Error]]
    * will be returned. For long running commands, it will subscribe for the result of those which were successfully validated as `Accepted` and get the final CommandResponse.
-   * @param controlCommands the [[csw.messages.ccs.commands.ControlCommand]] payload.
+   *
+   * @param controlCommands the [[csw.messages.commands.ControlCommand]] payload.
    * @return a CommandResponse as a Future value.
    */
   def submitAllAndGetFinalResponse(controlCommands: Set[ControlCommand])(implicit timeout: Timeout): Future[CommandResponse] = {

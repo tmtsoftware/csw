@@ -6,9 +6,9 @@ import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
 import csw.messages.CommandMessage.Submit
-import csw.messages.ccs.CommandIssue.ComponentLockedIssue
-import csw.messages.ccs.commands.CommandResponse.NotAllowed
-import csw.messages.ccs.commands.{CommandName, CommandResponse, Setup}
+import csw.messages.commands.CommandIssue.ComponentLockedIssue
+import csw.messages.commands.CommandResponse.NotAllowed
+import csw.messages.commands.{CommandName, CommandResponse, Setup}
 import csw.messages.models.LockingResponse
 import csw.messages.models.LockingResponses._
 import csw.messages.params.generics.{KeyType, Parameter}

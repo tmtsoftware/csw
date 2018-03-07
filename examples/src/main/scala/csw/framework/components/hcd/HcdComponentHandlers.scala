@@ -3,8 +3,8 @@ package csw.framework.components.hcd
 import akka.typed.scaladsl.ActorContext
 import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
 import csw.messages.TopLevelActorMessage
-import csw.messages.ccs.commands.CommandResponse.Accepted
-import csw.messages.ccs.commands.{CommandResponse, ControlCommand, Observe, Setup}
+import csw.messages.commands.CommandResponse.Accepted
+import csw.messages.commands.{CommandResponse, ControlCommand, Observe, Setup}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.{LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.services.command.scaladsl.CommandResponseManager

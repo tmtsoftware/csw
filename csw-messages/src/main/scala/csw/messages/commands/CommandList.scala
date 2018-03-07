@@ -1,4 +1,4 @@
-package csw.messages.ccs.commands
+package csw.messages.commands
 
 /**
  * Contains a list of commands that can be sent to a sequencer

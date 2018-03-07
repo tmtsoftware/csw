@@ -11,7 +11,7 @@ import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.messages.CommandMessage.Oneway
 import csw.messages.ContainerCommonMessage.GetComponents
 import csw.messages.ContainerMessage
-import csw.messages.ccs.commands.{CommandName, CommandResponse, Setup}
+import csw.messages.commands.{CommandName, CommandResponse, Setup}
 import csw.messages.framework.ContainerLifecycleState
 import csw.messages.models.{Component, Components}
 import csw.messages.params.models.Prefix

@@ -10,8 +10,8 @@ import csw.messages.RunningMessage.Lifecycle
 import csw.messages.TopLevelActorCommonMessage.{TrackingEventReceived, UnderlyingHookFailed}
 import csw.messages.TopLevelActorIdleMessage.Initialize
 import csw.messages._
-import csw.messages.ccs.commands.CommandResponse
-import csw.messages.ccs.commands.CommandResponse.Accepted
+import csw.messages.commands.CommandResponse
+import csw.messages.commands.CommandResponse.Accepted
 import csw.messages.framework.ComponentInfo
 import csw.messages.framework.LocationServiceUsage.RegisterAndTrackServices
 import csw.messages.models.ToComponentLifecycleMessage
@@ -163,9 +163,9 @@ class ComponentBehavior private[framework] (
     }
 
   /**
-   * Defines action for messages which represent a [[csw.messages.ccs.commands.Command]]
+   * Defines action for messages which represent a [[csw.messages.commands.Command]]
    *
-   * @param commandMessage  Message encapsulating a [[csw.messages.ccs.commands.Command]]
+   * @param commandMessage  Message encapsulating a [[csw.messages.commands.Command]]
    */
   private def onRunningCompCommandMessage(commandMessage: CommandMessage): Unit = {
 

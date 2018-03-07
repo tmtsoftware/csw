@@ -1,4 +1,4 @@
-package csw.messages.ccs.commands
+package csw.messages.commands
 
 import csw.messages.params.generics.{Parameter, ParameterSetKeyData, ParameterSetType}
 import csw.messages.params.models.Prefix

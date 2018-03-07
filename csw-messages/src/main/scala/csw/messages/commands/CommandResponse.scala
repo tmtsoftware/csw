@@ -1,11 +1,10 @@
-package csw.messages.ccs.commands
+package csw.messages.commands
 
 import akka.NotUsed
 import akka.stream.Materializer
 import akka.stream.scaladsl.Source
 import csw.messages.TMTSerializable
-import csw.messages.ccs.CommandIssue
-import csw.messages.ccs.commands.CommandResultType.{Intermediate, Negative, Positive}
+import csw.messages.commands.CommandResultType.{Intermediate, Negative, Positive}
 import csw.messages.params.models.Id
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -13,7 +12,8 @@ import scala.util.{Failure, Success}
 
 /**
  * Parent type of a response of command Execution
- * @param resultType the nature of command response as [[csw.messages.ccs.commands.CommandResultType]]
+ *
+ * @param resultType the nature of command response as [[csw.messages.commands.CommandResultType]]
  */
 sealed abstract class CommandResponse(val resultType: CommandResultType) extends TMTSerializable {
   def runId: Id

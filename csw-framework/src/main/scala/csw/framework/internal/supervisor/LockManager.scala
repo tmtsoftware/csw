@@ -2,8 +2,8 @@ package csw.framework.internal.supervisor
 
 import akka.typed.ActorRef
 import csw.messages.CommandMessage
-import csw.messages.ccs.CommandIssue.ComponentLockedIssue
-import csw.messages.ccs.commands.CommandResponse.NotAllowed
+import csw.messages.commands.CommandIssue.ComponentLockedIssue
+import csw.messages.commands.CommandResponse.NotAllowed
 import csw.messages.models.LockingResponse
 import csw.messages.models.LockingResponses._
 import csw.messages.params.models.Prefix

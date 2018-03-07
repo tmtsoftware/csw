@@ -1,7 +1,7 @@
 package csw.messages
 
 import akka.typed.ActorRef
-import csw.messages.ccs.commands.{CommandResponse, ControlCommand}
+import csw.messages.commands.{CommandResponse, ControlCommand}
 import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState}
 import csw.messages.location.TrackingEvent
 import csw.messages.models.PubSub.SubscriberMessage

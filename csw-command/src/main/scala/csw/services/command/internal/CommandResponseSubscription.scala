@@ -6,7 +6,7 @@ import akka.typed.ActorRef
 import akka.typed.scaladsl.adapter._
 import csw.messages.CommandResponseManagerMessage
 import csw.messages.CommandResponseManagerMessage.Subscribe
-import csw.messages.ccs.commands.CommandResponse
+import csw.messages.commands.CommandResponse
 import csw.messages.params.models.Id
 
 /**

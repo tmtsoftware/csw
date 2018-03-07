@@ -12,11 +12,11 @@ import csw.common.components.framework.SampleComponentState;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.scaladsl.CurrentStatePublisher;
 import csw.messages.TopLevelActorMessage;
-import csw.messages.ccs.CommandIssue;
-import csw.messages.ccs.commands.CommandResponse;
-import csw.messages.ccs.commands.ControlCommand;
-import csw.messages.ccs.commands.Result;
-import csw.messages.ccs.commands.Setup;
+import csw.messages.commands.CommandIssue;
+import csw.messages.commands.CommandResponse;
+import csw.messages.commands.ControlCommand;
+import csw.messages.commands.Result;
+import csw.messages.commands.Setup;
 import csw.messages.framework.ComponentInfo;
 import csw.messages.location.TrackingEvent;
 import csw.messages.params.generics.JKeyTypes;
@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit;
 
 import static akka.typed.javadsl.Adapter.toUntyped;
 import static csw.common.components.command.ComponentStateForCommand.*;
-import static csw.messages.ccs.commands.CommandResponse.*;
+import static csw.messages.commands.CommandResponse.*;
 
 public class JSampleComponentHandlers extends JComponentHandlers {
 

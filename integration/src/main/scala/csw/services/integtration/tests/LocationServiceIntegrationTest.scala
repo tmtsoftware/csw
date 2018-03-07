@@ -8,7 +8,7 @@ import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.util.Timeout
 import csw.messages.CommandMessage.Submit
-import csw.messages.ccs.commands.{CommandName, Setup}
+import csw.messages.commands.{CommandName, Setup}
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
 import csw.messages.location.{AkkaLocation, ComponentId, ComponentType, HttpLocation}
 import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason

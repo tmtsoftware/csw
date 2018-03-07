@@ -1,4 +1,4 @@
-package csw.messages.ccs.commands
+package csw.messages.commands
 
 import play.api.libs.json.{Json, OFormat}
 

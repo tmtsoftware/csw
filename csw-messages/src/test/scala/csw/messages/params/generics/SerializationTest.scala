@@ -2,8 +2,8 @@ package csw.messages.params.generics
 
 import java.time.Instant
 
-import csw.messages.ccs.commands.{CommandName, Observe, Setup, Wait}
-import csw.messages.ccs.events.{Event, EventName, SystemEvent}
+import csw.messages.commands.{CommandName, Observe, Setup, Wait}
+import csw.messages.events.{Event, EventName, SystemEvent}
 import csw.messages.params.models.{ObsId, Prefix}
 import csw.messages.params.states.{CurrentState, CurrentStates}
 import org.scalatest.FunSuite

@@ -1,4 +1,4 @@
-package csw.messages.ccs
+package csw.messages.commands
 
 /**
  * Describes the reason for a setup validation failure

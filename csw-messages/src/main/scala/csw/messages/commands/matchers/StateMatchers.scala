@@ -1,4 +1,4 @@
-package csw.messages.ccs.commands.matchers
+package csw.messages.commands.matchers
 
 import akka.util.Timeout
 import csw.messages.params.generics.Parameter

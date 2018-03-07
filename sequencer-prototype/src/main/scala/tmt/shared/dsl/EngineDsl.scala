@@ -4,7 +4,7 @@ import akka.actor.Scheduler
 import akka.typed.scaladsl.AskPattern._
 import akka.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
-import csw.messages.ccs.commands.ControlCommand
+import csw.messages.commands.ControlCommand
 import tmt.shared.engine.EngineBehavior._
 import tmt.shared.util.FutureExt.RichFuture
 

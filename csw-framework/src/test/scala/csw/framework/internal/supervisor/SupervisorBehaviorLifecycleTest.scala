@@ -16,7 +16,7 @@ import csw.messages.RunningMessage.Lifecycle
 import csw.messages.SupervisorContainerCommonMessages.Restart
 import csw.messages.SupervisorIdleMessage.InitializeTimeout
 import csw.messages.SupervisorInternalRunningMessage.{RegistrationNotRequired, RegistrationSuccess}
-import csw.messages.ccs.commands.CommandResponse
+import csw.messages.commands.CommandResponse
 import csw.messages.framework.LocationServiceUsage.DoNotRegister
 import csw.messages.framework.{ComponentInfo, SupervisorLifecycleState}
 import csw.messages.models.PubSub.{Publish, Subscribe, Unsubscribe}

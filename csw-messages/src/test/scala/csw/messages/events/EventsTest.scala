@@ -1,4 +1,4 @@
-package csw.messages.ccs.events
+package csw.messages.events
 
 import csw.messages.params.generics.KeyType
 import csw.messages.params.models.Prefix

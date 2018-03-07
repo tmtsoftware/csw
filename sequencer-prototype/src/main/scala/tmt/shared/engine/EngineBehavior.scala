@@ -3,7 +3,7 @@ package tmt.shared.engine
 import akka.typed.scaladsl.Actor.MutableBehavior
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
-import csw.messages.ccs.commands.ControlCommand
+import csw.messages.commands.ControlCommand
 import tmt.shared.engine.EngineBehavior._
 
 import scala.collection.immutable.Queue

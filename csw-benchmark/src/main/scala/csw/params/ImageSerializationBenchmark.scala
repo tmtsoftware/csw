@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit
 
 import akka.actor.ActorSystem
 import akka.serialization.{Serialization, SerializationExtension}
-import csw.messages.ccs.commands.{CommandName, Observe}
+import csw.messages.commands.{CommandName, Observe}
 import csw.messages.params.generics.KeyType.ByteArrayKey
 import csw.messages.params.generics.{Key, Parameter}
 import csw.messages.params.models.Units.pascal

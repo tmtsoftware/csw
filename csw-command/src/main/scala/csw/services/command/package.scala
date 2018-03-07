@@ -20,19 +20,19 @@ package csw.services
  *
  * In case of short running or immediate command,
  * validation response will be of type final result which can either be of type
- * [[csw.messages.ccs.commands.CommandResultType.Positive]] or [[csw.messages.ccs.commands.CommandResultType.Negative]]
+ * [[csw.messages.commands.CommandResultType.Positive]] or [[csw.messages.commands.CommandResultType.Negative]]
  *
- * In case of long running command, validation response will be of type [[csw.messages.ccs.commands.CommandResultType.Intermediate]]
+ * In case of long running command, validation response will be of type [[csw.messages.commands.CommandResultType.Intermediate]]
  * then it is the responsibility of component writer to update its final command status later on
- * with [[csw.messages.ccs.commands.CommandResponse]] which should be of type
- * [[csw.messages.ccs.commands.CommandResultType.Positive]] or [[csw.messages.ccs.commands.CommandResultType.Negative]]
+ * with [[csw.messages.commands.CommandResponse]] which should be of type
+ * [[csw.messages.commands.CommandResultType.Positive]] or [[csw.messages.commands.CommandResultType.Negative]]
  *
  * CommandResponseManager also provides **subscribe** API.
  * One of the use case for this is when Assembly splits top level command into two sub commands and forwards them to two different HCD's.
- * In this case, Assembly can register its interest in the final [[csw.messages.ccs.commands.CommandResponse]]
+ * In this case, Assembly can register its interest in the final [[csw.messages.commands.CommandResponse]]
  * from two HCD's when these sub commands completes using **subscribe** API.
  * And once Assembly receives final command response from both the HCD's
- * then it can update Top level command with final [[csw.messages.ccs.commands.CommandResponse]]
+ * then it can update Top level command with final [[csw.messages.commands.CommandResponse]]
  *
  *
  * - [[csw.services.command.scaladsl.CommandService]]
@@ -53,7 +53,7 @@ package csw.services
  *       val initialResponse = await(assemblyConfigService.submit(setupCommand))
  *       // this can be a response of validation (Accepted, Invalid) or a final Response.
  *       // in case of response as `Accepted`, final CommandResponse can be obtained by using `subscribe` API.
-
+ *
  *       // suppose initialResponse is Accepted, then you can use subscribe API to obtain final response
  *       val finalResponse = await(assemblyConfigService.subscribe(setupCommand.runId))
  *    }
@@ -72,8 +72,8 @@ package csw.services
  *   // setup1HcdA and setup2HcdA are Setup commands which are targeted to HCD-A
  *   // setup1HcdB and setup2HcdB are Setup commands which are targeted to HCD-B
  *   val aggregatedValidationResponse = CommandDistributor(
-        Map(hcdACommandService → Set(setup1HcdA, setup2HcdA), hcdBCommandService → Set(setup1HcdB, setup2HcdB))
-      ).aggregatedValidationResponse()
+ *Map(hcdACommandService → Set(setup1HcdA, setup2HcdA), hcdBCommandService → Set(setup1HcdB, setup2HcdB))
+ *).aggregatedValidationResponse()
  *
  * }}}
  *

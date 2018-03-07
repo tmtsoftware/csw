@@ -1,7 +1,7 @@
 package csw.messages.params.formats
 
-import csw.messages.ccs.commands._
-import csw.messages.ccs.events._
+import csw.messages.commands._
+import csw.messages.events._
 import csw.messages.params.generics.Parameter
 import csw.messages.params.models.{Id, ObsId, Prefix}
 import csw.messages.params.states.StateVariable.StateVariable

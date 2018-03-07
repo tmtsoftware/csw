@@ -3,7 +3,7 @@ package csw.services.event.scaladsl
 import akka.Done
 import akka.actor.Cancellable
 import akka.stream.scaladsl.Source
-import csw.messages.ccs.events.Event
+import csw.messages.events.Event
 
 import scala.concurrent.Future
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}

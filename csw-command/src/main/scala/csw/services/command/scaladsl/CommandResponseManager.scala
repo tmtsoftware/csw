@@ -11,7 +11,7 @@ import akka.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import csw.messages.CommandResponseManagerMessage
 import csw.messages.CommandResponseManagerMessage._
-import csw.messages.ccs.commands.CommandResponse
+import csw.messages.commands.CommandResponse
 import csw.messages.params.models.Id
 import csw.services.command.internal.CommandResponseSubscription
 
@@ -33,8 +33,9 @@ class CommandResponseManager(val commandResponseManagerActor: ActorRef[CommandRe
 
   /**
    * Add a new command or update an existing command with the provided status
+   *
    * @param commandId command identifier
-   * @param cmdStatus status of command as [[csw.messages.ccs.commands.CommandResponse]]
+   * @param cmdStatus status of command as [[csw.messages.commands.CommandResponse]]
    */
   def addOrUpdateCommand(commandId: Id, cmdStatus: CommandResponse): Unit =
     commandResponseManagerActor ! AddOrUpdateCommand(commandId, cmdStatus)
@@ -49,8 +50,9 @@ class CommandResponseManager(val commandResponseManagerActor: ActorRef[CommandRe
 
   /**
    * Update the status of a sub-command which will infer the status of the parent command
-   * @param subCommandId  command identifier of sub command
-   * @param cmdStatus     status of command as [[csw.messages.ccs.commands.CommandResponse]]
+   *
+   * @param subCommandId command identifier of sub command
+   * @param cmdStatus    status of command as [[csw.messages.commands.CommandResponse]]
    */
   def updateSubCommand(subCommandId: Id, cmdStatus: CommandResponse): Unit =
     commandResponseManagerActor ! UpdateSubCommand(subCommandId, cmdStatus)

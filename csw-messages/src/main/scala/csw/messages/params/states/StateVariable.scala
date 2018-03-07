@@ -1,6 +1,6 @@
 package csw.messages.params.states
 
-import csw.messages.ccs.commands.Setup
+import csw.messages.commands.Setup
 import csw.messages.params.generics.{Parameter, ParameterSetKeyData, ParameterSetType}
 import csw.messages.params.models.Prefix
 import csw.messages.params.states.StateVariable.StateVariable

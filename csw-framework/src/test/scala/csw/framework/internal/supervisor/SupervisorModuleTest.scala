@@ -9,9 +9,9 @@ import csw.messages.ComponentCommonMessage.GetSupervisorLifecycleState
 import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.messages.RunningMessage.Lifecycle
 import csw.messages.SupervisorContainerCommonMessages.Restart
-import csw.messages.ccs.commands.CommandResponse.{Accepted, Invalid}
-import csw.messages.ccs.commands._
-import csw.messages.ccs.commands.matchers.DemandMatcher
+import csw.messages.commands.CommandResponse.{Accepted, Invalid}
+import csw.messages.commands._
+import csw.messages.commands.matchers.DemandMatcher
 import csw.messages.framework.{ComponentInfo, SupervisorLifecycleState}
 import csw.messages.location.ComponentType.{Assembly, HCD}
 import csw.messages.location.Connection.AkkaConnection

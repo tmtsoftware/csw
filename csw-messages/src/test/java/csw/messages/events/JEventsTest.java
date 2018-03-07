@@ -1,4 +1,4 @@
-package csw.messages.ccs.events;
+package csw.messages.events;
 
 import csw.messages.params.generics.JKeyTypes;
 import csw.messages.params.generics.Key;

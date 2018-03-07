@@ -1,9 +1,9 @@
 package csw.services.messages;
 
-import csw.messages.ccs.events.EventName;
-import csw.messages.ccs.events.EventTime;
-import csw.messages.ccs.events.ObserveEvent;
-import csw.messages.ccs.events.SystemEvent;
+import csw.messages.events.EventName;
+import csw.messages.events.EventTime;
+import csw.messages.events.ObserveEvent;
+import csw.messages.events.SystemEvent;
 import csw.messages.javadsl.JUnits;
 import csw.messages.params.formats.JavaJsonSupport;
 import csw.messages.params.generics.JKeyTypes;
