@@ -20,10 +20,9 @@ class LoggerImpl private[logging] (maybeComponentName: Option[String], actorName
   private[this] def componentLoggingState: ComponentLoggingState =
     componentsLoggingState.getOrElse(componentName, componentsLoggingState(Constants.DEFAULT_KEY))
 
-  // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
+  // fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
   InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
 
-  //TODO: explain better significance of time and other things
   private def all(
       level: Level,
       id: AnyId,
@@ -32,7 +31,7 @@ class LoggerImpl private[logging] (maybeComponentName: Option[String], actorName
       ex: Throwable,
       sourceLocation: SourceLocation
   ): Unit = {
-    val time = Instant.now().toEpochMilli
+    val time = Instant.now().toEpochMilli // The current time being written in logs. In future it has to be fetched from time service
     MessageHandler.sendMsg(Log(maybeComponentName, level, id, time, actorName, msg, map, sourceLocation, ex))
   }
 

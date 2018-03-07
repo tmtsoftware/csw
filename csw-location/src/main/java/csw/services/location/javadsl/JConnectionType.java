@@ -3,7 +3,7 @@ package csw.services.location.javadsl;
 import csw.messages.location.ConnectionType;
 
 /**
- * Java API for connection type. It encapsulates `ConnectionType` which is fundamental to LocationService library.
+ * Helper class for Java to get the handle of `ConnectionType` which is fundamental to LocationService library
  */
 @SuppressWarnings("unused")
 public class JConnectionType {

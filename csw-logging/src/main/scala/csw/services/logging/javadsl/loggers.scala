@@ -23,6 +23,10 @@ private[logging] abstract class JBaseLoggerFactory(maybeComponentName: Option[St
  * When using the `JLoggerFactory`, log statements will have `@componentName` tag with provided `componentName`
  */
 class JLoggerFactory(componentName: String) extends JBaseLoggerFactory(Some(componentName)) {
+
+  /**
+   * Returns the scala API for this instance of JLoggerFactory
+   */
   def asScala: LoggerFactory = new LoggerFactory(componentName)
 }
 
