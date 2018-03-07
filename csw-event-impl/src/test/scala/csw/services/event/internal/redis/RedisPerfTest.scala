@@ -16,7 +16,6 @@ import redis.embedded.RedisServer
 class RedisPerfTest extends FunSuite with Matchers with BeforeAndAfterAll with EmbeddedRedis with MockitoSugar {
   private val redisPort = 6379
   private val redis     = RedisServer.builder().setting("bind 127.0.0.1").port(redisPort).build()
-  redis.start()
 
   private implicit val actorSystem: ActorSystem = ActorSystem()
   private val redisClient                       = RedisClient.create()
@@ -25,6 +24,10 @@ class RedisPerfTest extends FunSuite with Matchers with BeforeAndAfterAll with E
   private val publisher                         = redisFactory.publisher("localhost", redisPort)
   private val subscriber                        = redisFactory.subscriber("localhost", redisPort)
   private val framework                         = new EventServicePerfFramework(publisher, subscriber)
+
+  override def beforeAll(): Unit = {
+    redis.start()
+  }
 
   override def afterAll(): Unit = {
     redisClient.shutdown()

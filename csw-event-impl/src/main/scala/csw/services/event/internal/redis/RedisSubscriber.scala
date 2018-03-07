@@ -19,7 +19,7 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
     protected val mat: Materializer
 ) extends EventSubscriber {
 
-  private val asyncConnectionF: Future[RedisAsyncCommands[EventKey, Event]] =
+  private lazy val asyncConnectionF: Future[RedisAsyncCommands[EventKey, Event]] =
     redisClient.connectAsync(EventServiceCodec, redisURI).toScala.map(_.async())
 
   private def reactiveConnectionF(): Future[RedisPubSubReactiveCommands[EventKey, Event]] =

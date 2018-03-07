@@ -29,13 +29,15 @@ class KafkaPubSubTest extends FunSuite with EmbeddedKafka with BeforeAndAfterAll
                                            customProducerProperties = pubSubProperties,
                                            customBrokerProperties = brokerProperties)
 
-  EmbeddedKafka.start()(config)
-
   private val wiring       = new Wiring(actorSystem)
   private val kafkaFactory = new KafkaFactory(locationService, wiring)
   private val publisher    = kafkaFactory.publisher().await
   private val subscriber   = kafkaFactory.subscriber().await
   private val framework    = new EventServicePubSubTestFramework(publisher, subscriber)
+
+  override def beforeAll(): Unit = {
+    EmbeddedKafka.start()(config)
+  }
 
   override def afterAll(): Unit = {
     publisher.shutdown().await

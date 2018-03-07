@@ -24,13 +24,15 @@ class KafkaPerfTest extends FunSuite with Matchers with BeforeAndAfterAll with E
                                            customProducerProperties = pubSubProperties,
                                            customBrokerProperties = brokerProperties)
 
-  EmbeddedKafka.start()(config)
-
   private val wiring       = new Wiring(actorSystem)
   private val kafkaFactory = new KafkaFactory(mock[LocationService], wiring)
   private val publisher    = kafkaFactory.publisher("localhost", kafkaPort)
   private val subscriber   = kafkaFactory.subscriber("localhost", kafkaPort)
   private val framework    = new EventServicePerfFramework(publisher, subscriber)
+
+  override def beforeAll(): Unit = {
+    EmbeddedKafka.start()(config)
+  }
 
   override def afterAll(): Unit = {
     publisher.shutdown().await
