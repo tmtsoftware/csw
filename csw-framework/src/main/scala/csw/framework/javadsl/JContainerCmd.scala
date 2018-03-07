@@ -4,7 +4,7 @@ import java.util.Optional
 
 import akka.typed.ActorRef
 import com.typesafe.config.Config
-import csw.apps.containercmd.ContainerCmd
+import csw.framework.deploy.containercmd.ContainerCmd
 
 import scala.compat.java8.OptionConverters._
 

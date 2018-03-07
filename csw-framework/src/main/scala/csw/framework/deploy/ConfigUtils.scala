@@ -1,9 +1,9 @@
-package csw.apps.commons
+package csw.framework.deploy
 
 import java.nio.file.{Files, Path}
 
 import com.typesafe.config.{Config, ConfigFactory}
-import csw.exceptions.{FileNotFound, LocalFileNotFound, UnableToParseOptions}
+import csw.framework.exceptions.{FileNotFound, LocalFileNotFound, UnableToParseOptions}
 import csw.framework.internal.wiring.ActorRuntime
 import csw.services.config.api.scaladsl.ConfigClientService
 
@@ -11,11 +11,11 @@ import scala.async.Async.{async, await}
 import scala.concurrent.Future
 
 //TODO: add doc for significance
-class ConfigUtils private[csw] (configClientService: ConfigClientService, actorRuntime: ActorRuntime) {
+class ConfigUtils private[framework] (configClientService: ConfigClientService, actorRuntime: ActorRuntime) {
   import actorRuntime._
 
   //TODO: add doc for significance
-  private[apps] def getConfig(
+  private[deploy] def getConfig(
       isLocal: Boolean,
       inputFilePath: Option[Path],
       defaultConfig: Option[Config]

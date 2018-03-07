@@ -6,7 +6,7 @@ import akka.actor.CoordinatedShutdown.Reason
 import akka.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.typed.scaladsl.{Actor, ActorContext, TimerScheduler}
 import akka.typed.{ActorRef, Behavior, PostStop, Signal, SupervisorStrategy, Terminated}
-import csw.exceptions.{FailureRestart, InitializationFailed}
+import csw.framework.exceptions.{FailureRestart, InitializationFailed}
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.scaladsl.{ComponentBehaviorFactory, CurrentStatePublisher}
 import csw.messages.CommandResponseManagerMessage.{Query, Subscribe, Unsubscribe}

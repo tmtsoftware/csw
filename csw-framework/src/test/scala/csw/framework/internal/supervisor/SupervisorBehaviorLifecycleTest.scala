@@ -4,7 +4,7 @@ import akka.typed.Terminated
 import akka.typed.scaladsl.TimerScheduler
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.testkit.{Inbox, StubbedActorContext}
-import csw.exceptions.{FailureStop, InitializationFailed}
+import csw.framework.exceptions.{FailureStop, InitializationFailed}
 import csw.framework.ComponentInfos._
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.scaladsl.ComponentHandlers

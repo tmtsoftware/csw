@@ -1,6 +1,6 @@
 package csw.framework.javadsl
 
-import csw.apps.hostconfig.HostConfig
+import csw.framework.deploy.hostconfig.HostConfig
 
 object JHostConfig {
 

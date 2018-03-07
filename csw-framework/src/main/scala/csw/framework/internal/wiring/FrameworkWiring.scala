@@ -2,7 +2,7 @@ package csw.framework.internal.wiring
 
 import akka.actor.ActorSystem
 import akka.typed.ActorRef
-import csw.apps.commons.ConfigUtils
+import csw.framework.deploy.ConfigUtils
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.services.ccs.internal.CommandResponseManagerFactory
 import csw.services.config.api.scaladsl.ConfigClientService

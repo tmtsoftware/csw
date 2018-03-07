@@ -2,8 +2,8 @@ package csw.framework.components.assembly;
 
 import akka.typed.javadsl.ActorContext;
 import akka.typed.javadsl.Adapter;
-import csw.exceptions.FailureRestart;
-import csw.exceptions.FailureStop;
+import csw.framework.exceptions.FailureRestart;
+import csw.framework.exceptions.FailureStop;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.scaladsl.CurrentStatePublisher;
 import csw.messages.TopLevelActorMessage;

@@ -1,4 +1,4 @@
-package csw.exceptions
+package csw.framework.exceptions
 
 import java.nio.file.Path
 

@@ -1,4 +1,4 @@
-package csw.apps.hostconfig.cli
+package csw.framework.deploy.hostconfig.cli
 
 import java.io.ByteArrayOutputStream
 import java.nio.file.Paths
