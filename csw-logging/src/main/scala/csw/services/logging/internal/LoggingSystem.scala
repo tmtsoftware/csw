@@ -120,6 +120,7 @@ class LoggingSystem private[csw] (name: String, version: String, host: String, v
   // Deal with messages send before logger was ready
   LoggingState.msgs.synchronized {
     if (LoggingState.msgs.nonEmpty) {
+      // DefaultSourceLocation will have empty `file`, `line` and `class`
       log.info(s"Saw ${LoggingState.msgs.size} messages before logger start")(() => DefaultSourceLocation)
       for (msg <- LoggingState.msgs) {
         MessageHandler.sendMsg(msg)
