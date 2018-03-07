@@ -28,7 +28,8 @@ class Matcher(
 )(implicit ec: ExecutionContext, mat: Materializer) {
 
   /**
-   * start the matching process
+   * Start the matching process
+   *
    * @return the result of matching as a Future value of MatcherResponse
    */
   def start: Future[MatcherResponse] = currentStateF.transform {
@@ -37,13 +38,14 @@ class Matcher(
   }
 
   /**
-   * start the matching process from Java applciation
+   * Start the matching process from Java application
+   *
    * @return the result of matching as a CompletableFuture of MatcherResponse
    */
   def jStart: CompletableFuture[MatcherResponse] = start.toJava.toCompletableFuture
 
   /**
-   * abort the stream of subscribed state in case matching is no longer required. Eg. when composing operations
+   * Abort the stream of subscribed state in case matching is no longer required. Eg. when composing operations
    * in command execution, the matching was started before knowing the actual result of validation and the validation failed.
    *
    * {{{
