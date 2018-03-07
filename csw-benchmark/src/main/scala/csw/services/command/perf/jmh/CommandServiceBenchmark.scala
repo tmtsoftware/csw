@@ -1,4 +1,4 @@
-package csw.services.ccs.perf.jmh
+package csw.services.command.perf.jmh
 
 import java.util.concurrent.TimeUnit
 
@@ -8,8 +8,8 @@ import com.typesafe.config.ConfigFactory
 import csw.messages.ccs.commands
 import csw.messages.ccs.commands.{CommandName, CommandResponse}
 import csw.messages.params.models.Prefix
-import csw.services.ccs.perf.BenchmarkHelpers.spawnStandaloneComponent
-import csw.services.ccs.scaladsl.CommandService
+import csw.services.command.perf.BenchmarkHelpers.spawnStandaloneComponent
+import csw.services.command.scaladsl.CommandService
 import csw.services.location.commons.ClusterAwareSettings
 import org.openjdk.jmh.annotations._
 

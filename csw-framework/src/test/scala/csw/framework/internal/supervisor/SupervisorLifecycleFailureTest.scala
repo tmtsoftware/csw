@@ -26,7 +26,7 @@ import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.CurrentState
 import csw.messages.{models, _}
-import csw.services.ccs.scaladsl.CommandResponseManager
+import csw.services.command.scaladsl.CommandResponseManager
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.internal.LoggingLevels.ERROR
 import csw.services.logging.internal.LoggingSystem

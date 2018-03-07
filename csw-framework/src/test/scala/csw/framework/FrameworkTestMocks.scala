@@ -14,8 +14,8 @@ import csw.messages.location.Connection.AkkaConnection
 import csw.messages.models.{LifecycleStateChanged, PubSub}
 import csw.messages.params.models.Id
 import csw.messages.params.states.CurrentState
-import csw.services.ccs.internal.CommandResponseManagerFactory
-import csw.services.ccs.scaladsl.CommandResponseManager
+import csw.services.command.internal.CommandResponseManagerFactory
+import csw.services.command.scaladsl.CommandResponseManager
 import csw.services.location.javadsl.ILocationService
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}

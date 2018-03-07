@@ -16,7 +16,7 @@ import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{AkkaLocation, ComponentId, ComponentType}
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.CurrentState
-import csw.services.ccs.scaladsl.{CommandDistributor, CommandService}
+import csw.services.command.scaladsl.{CommandDistributor, CommandService}
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import org.scalatest.concurrent.{PatienceConfiguration, ScalaFutures}
 

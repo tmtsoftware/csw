@@ -1,4 +1,4 @@
-package csw.services.ccs.models
+package csw.services.command.models
 
 import akka.typed.ActorRef
 import csw.messages.ccs.commands.CommandResponse
@@ -9,7 +9,7 @@ import csw.messages.params.models.Id
  * Manages state of a given command identified by a RunId
  * @param cmdToCmdStatus a map of runId to CommandState
  */
-case class CommandResponseManagerState private[ccs] (cmdToCmdStatus: Map[Id, CommandState]) {
+case class CommandResponseManagerState private[command] (cmdToCmdStatus: Map[Id, CommandState]) {
   def add(runId: Id, initialState: CommandResponse): CommandResponseManagerState =
     CommandResponseManagerState(cmdToCmdStatus.updated(runId, CommandState.init(runId, initialState)))
 

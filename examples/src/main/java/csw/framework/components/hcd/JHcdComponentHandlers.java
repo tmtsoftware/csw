@@ -12,7 +12,7 @@ import csw.messages.framework.ComponentInfo;
 import csw.messages.location.LocationRemoved;
 import csw.messages.location.LocationUpdated;
 import csw.messages.location.TrackingEvent;
-import csw.services.ccs.scaladsl.CommandResponseManager;
+import csw.services.command.scaladsl.CommandResponseManager;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.logging.javadsl.ILogger;
 import csw.services.logging.javadsl.JLoggerFactory;

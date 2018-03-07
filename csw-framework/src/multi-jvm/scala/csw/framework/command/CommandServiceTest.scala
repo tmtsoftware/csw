@@ -23,7 +23,7 @@ import csw.messages.models.LockingResponses.LockAcquired
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.DemandState
-import csw.services.ccs.scaladsl.CommandService
+import csw.services.command.scaladsl.CommandService
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 
 import scala.async.Async._

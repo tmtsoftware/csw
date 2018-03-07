@@ -1,4 +1,4 @@
-package csw.services.ccs.javadsl
+package csw.services.command.javadsl
 
 import java.util
 import java.util.concurrent.CompletableFuture
@@ -6,14 +6,15 @@ import java.util.concurrent.CompletableFuture
 import akka.stream.Materializer
 import akka.util.Timeout
 import csw.messages.ccs.commands.{CommandResponse, ControlCommand}
-import csw.services.ccs.scaladsl.CommandDistributor
+import csw.services.command.scaladsl.CommandDistributor
 
 import scala.collection.JavaConverters.{collectionAsScalaIterableConverter, mapAsScalaMapConverter}
 import scala.compat.java8.FutureConverters.FutureOps
 import scala.concurrent.ExecutionContext
 
 /**
- * Java API for [[csw.services.ccs.scaladsl.CommandDistributor]]
+ * Java API for [[csw.services.command.scaladsl.CommandDistributor]]
+ *
  * @param componentToCommands a map of Component and the set of commands to be sent to that component
  */
 case class JCommandDistributor(componentToCommands: util.Map[JCommandService, util.Set[ControlCommand]]) {

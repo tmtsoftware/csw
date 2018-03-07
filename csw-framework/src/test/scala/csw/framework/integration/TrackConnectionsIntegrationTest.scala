@@ -21,7 +21,7 @@ import csw.messages.location.ComponentType.{Assembly, HCD}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.params.states.CurrentState
-import csw.services.ccs.scaladsl.CommandService
+import csw.services.command.scaladsl.CommandService
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.models.{HttpRegistration, TcpRegistration}
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}

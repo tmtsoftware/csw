@@ -1,4 +1,4 @@
-package csw.services.ccs.internal
+package csw.services.command.internal
 
 import akka.actor.ActorSystem
 import akka.typed.scaladsl.ActorContext

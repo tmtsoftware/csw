@@ -1,4 +1,4 @@
-package csw.services.ccs.javadsl
+package csw.services.command.javadsl
 
 import java.util.concurrent.CompletableFuture
 import java.util.function.Consumer
@@ -15,8 +15,8 @@ import csw.messages.ccs.commands.{CommandResponse, ControlCommand}
 import csw.messages.location.AkkaLocation
 import csw.messages.params.models.Id
 import csw.messages.params.states.CurrentState
-import csw.services.ccs.internal.CurrentStateSubscription
-import csw.services.ccs.scaladsl.CommandService
+import csw.services.command.internal.CurrentStateSubscription
+import csw.services.command.scaladsl.CommandService
 
 import scala.collection.JavaConverters.iterableAsScalaIterableConverter
 import scala.compat.java8.FunctionConverters.enrichAsScalaFromConsumer
@@ -24,7 +24,7 @@ import scala.compat.java8.FutureConverters.FutureOps
 import scala.concurrent.ExecutionContext
 
 /**
- * Java API for [[csw.services.ccs.scaladsl.CommandService]]
+ * Java API for [[csw.services.command.scaladsl.CommandService]]
  */
 class JCommandService(akkaLocation: AkkaLocation, actorSystem: ActorSystem[_]) {
 
@@ -32,7 +32,7 @@ class JCommandService(akkaLocation: AkkaLocation, actorSystem: ActorSystem[_]) {
   implicit val mat: Materializer    = ActorMaterializer()(actorSystem.toUntyped)
   implicit val scheduler: Scheduler = actorSystem.scheduler
 
-  private[ccs] val sCommandService: CommandService = new CommandService(akkaLocation)(actorSystem)
+  private[command] val sCommandService: CommandService = new CommandService(akkaLocation)(actorSystem)
 
   /**
    * Submit a command and get a [[csw.messages.ccs.commands.CommandResponse]] as a Future. The CommandResponse can be a response

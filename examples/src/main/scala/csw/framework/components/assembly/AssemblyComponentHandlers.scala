@@ -11,7 +11,7 @@ import csw.messages.ccs.commands.CommandResponse.Accepted
 import csw.messages.ccs.commands._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location._
-import csw.services.ccs.scaladsl.CommandResponseManager
+import csw.services.command.scaladsl.CommandResponseManager
 import csw.services.config.api.scaladsl.ConfigClientService
 import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.location.scaladsl.LocationService

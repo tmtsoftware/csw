@@ -1,4 +1,4 @@
-package csw.services.ccs.internal
+package csw.services.command.internal
 
 import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
@@ -8,7 +8,7 @@ import csw.messages.ccs.commands.CommandResponse.CommandNotAvailable
 import csw.messages.ccs.commands.CommandResultType.{Final, Intermediate}
 import csw.messages.ccs.commands.{CommandResponse, CommandResultType}
 import csw.messages.params.models.Id
-import csw.services.ccs.models.{CommandCorrelation, CommandResponseManagerState}
+import csw.services.command.models.{CommandCorrelation, CommandResponseManagerState}
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
 /**
@@ -19,14 +19,14 @@ import csw.services.logging.scaladsl.{Logger, LoggerFactory}
  * @param loggerFactory   The factory for creating [[csw.services.logging.scaladsl.Logger]] instance
  */
 //TODO: add doc for significance for every method
-class CommandResponseManagerBehavior private[ccs] (
+class CommandResponseManagerBehavior private[command] (
     ctx: ActorContext[CommandResponseManagerMessage],
     loggerFactory: LoggerFactory
 ) extends Actor.MutableBehavior[CommandResponseManagerMessage] {
   private val log: Logger = loggerFactory.getLogger(ctx)
 
-  private[ccs] var commandStatus: CommandResponseManagerState = CommandResponseManagerState(Map.empty)
-  private[ccs] var commandCoRelation: CommandCorrelation      = CommandCorrelation(Map.empty, Map.empty)
+  private[command] var commandStatus: CommandResponseManagerState = CommandResponseManagerState(Map.empty)
+  private[command] var commandCoRelation: CommandCorrelation      = CommandCorrelation(Map.empty, Map.empty)
 
   override def onMessage(msg: CommandResponseManagerMessage): Behavior[CommandResponseManagerMessage] = {
     msg match {

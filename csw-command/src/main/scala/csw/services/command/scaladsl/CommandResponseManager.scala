@@ -1,4 +1,4 @@
-package csw.services.ccs.scaladsl
+package csw.services.command.scaladsl
 
 import java.util.concurrent.CompletableFuture
 import java.util.function.Consumer
@@ -13,7 +13,7 @@ import csw.messages.CommandResponseManagerMessage
 import csw.messages.CommandResponseManagerMessage._
 import csw.messages.ccs.commands.CommandResponse
 import csw.messages.params.models.Id
-import csw.services.ccs.internal.CommandResponseSubscription
+import csw.services.command.internal.CommandResponseSubscription
 
 import scala.compat.java8.FunctionConverters.enrichAsScalaFromConsumer
 import scala.compat.java8.FutureConverters._
@@ -75,9 +75,10 @@ class CommandResponseManager(val commandResponseManagerActor: ActorRef[CommandRe
 
   /**
    * Subscribe to the status of a command to receive the update in status
+   *
    * @param runId     command identifier of command
    * @param callback  callback  to take action on the command response received
-   * @return a [[csw.services.ccs.internal.CommandResponseSubscription]] to unsubscribe the subscription later
+   * @return a [[csw.services.command.internal.CommandResponseSubscription]] to unsubscribe the subscription later
    */
   def subscribe(runId: Id, callback: CommandResponse ⇒ Unit): CommandResponseSubscription =
     new CommandResponseSubscription(runId, commandResponseManagerActor, callback)

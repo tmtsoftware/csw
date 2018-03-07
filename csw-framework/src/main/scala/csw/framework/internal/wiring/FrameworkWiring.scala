@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import akka.typed.ActorRef
 import csw.framework.deploy.ConfigUtils
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
-import csw.services.ccs.internal.CommandResponseManagerFactory
+import csw.services.command.internal.CommandResponseManagerFactory
 import csw.services.config.api.scaladsl.ConfigClientService
 import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.location.commons.ClusterSettings

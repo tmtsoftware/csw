@@ -10,7 +10,7 @@ import csw.messages.framework.ComponentInfo
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location.{LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.messages.params.states.CurrentState
-import csw.services.ccs.scaladsl.CommandResponseManager
+import csw.services.command.scaladsl.CommandResponseManager
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 

@@ -24,7 +24,7 @@ import csw.messages.models.PubSub.Subscribe
 import csw.messages.models.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.messages.models.{Components, LifecycleStateChanged}
 import csw.messages.params.states.CurrentState
-import csw.services.ccs.scaladsl.CommandService
+import csw.services.command.scaladsl.CommandService
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}

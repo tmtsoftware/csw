@@ -14,7 +14,7 @@ import csw.messages.ccs.commands.Observe;
 import csw.messages.ccs.commands.Setup;
 import csw.messages.framework.ComponentInfo;
 import csw.messages.location.*;
-import csw.services.ccs.scaladsl.CommandResponseManager;
+import csw.services.command.scaladsl.CommandResponseManager;
 import csw.services.config.api.javadsl.IConfigClientService;
 import csw.services.config.api.models.ConfigData;
 import csw.services.config.client.javadsl.JConfigClientFactory;

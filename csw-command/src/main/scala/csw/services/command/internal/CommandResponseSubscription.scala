@@ -1,4 +1,4 @@
-package csw.services.ccs.internal
+package csw.services.command.internal
 
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.{KillSwitches, Materializer, OverflowStrategy}

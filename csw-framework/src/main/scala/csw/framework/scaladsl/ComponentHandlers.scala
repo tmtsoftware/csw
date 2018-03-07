@@ -6,7 +6,7 @@ import csw.messages.TopLevelActorMessage
 import csw.messages.ccs.commands.{CommandResponse, ControlCommand}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.{Connection, TrackingEvent}
-import csw.services.ccs.scaladsl.CommandResponseManager
+import csw.services.command.scaladsl.CommandResponseManager
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
 

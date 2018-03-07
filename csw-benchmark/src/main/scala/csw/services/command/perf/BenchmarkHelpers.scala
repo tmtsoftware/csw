@@ -1,4 +1,4 @@
-package csw.services.ccs.perf
+package csw.services.command.perf
 
 import akka.actor.ActorSystem
 import akka.typed
@@ -14,7 +14,7 @@ import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState
 import csw.messages.location.{AkkaLocation, ComponentId, ComponentType}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.{ComponentMessage, ContainerExternalMessage}
-import csw.services.ccs.scaladsl.CommandService
+import csw.services.command.scaladsl.CommandService
 import csw.services.location.commons.BlockingUtils
 import csw.services.location.scaladsl.LocationServiceFactory
 

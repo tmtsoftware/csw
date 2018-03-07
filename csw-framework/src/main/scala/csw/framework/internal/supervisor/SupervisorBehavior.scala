@@ -32,8 +32,8 @@ import csw.messages.models.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.messages.models.{LifecycleStateChanged, LockingResponse, PubSub, ToComponentLifecycleMessage}
 import csw.messages.params.models.Prefix
 import csw.messages.params.states.CurrentState
-import csw.services.ccs.internal.CommandResponseManagerFactory
-import csw.services.ccs.scaladsl.CommandResponseManager
+import csw.services.command.internal.CommandResponseManagerFactory
+import csw.services.command.scaladsl.CommandResponseManager
 import csw.services.location.models.AkkaRegistration
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}

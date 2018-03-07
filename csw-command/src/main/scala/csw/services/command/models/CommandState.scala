@@ -1,4 +1,4 @@
-package csw.services.ccs.models
+package csw.services.command.models
 
 import akka.typed.ActorRef
 import csw.messages.ccs.commands.CommandResponse
@@ -9,7 +9,7 @@ import csw.messages.params.models.Id
  * @param commandStatus the current command status
  * @param subscribers the subscriber list for the change in state
  */
-case class CommandState private[ccs] (commandStatus: CommandStatus, subscribers: Set[ActorRef[CommandResponse]]) {
+case class CommandState private[command] (commandStatus: CommandStatus, subscribers: Set[ActorRef[CommandResponse]]) {
 
   /**
    * Add a new subscriber for change in state
@@ -36,7 +36,7 @@ case class CommandState private[ccs] (commandStatus: CommandStatus, subscribers:
 
 }
 
-private[ccs] object CommandState {
+private[command] object CommandState {
 
   /**
    * Inititialize the command state for a given command

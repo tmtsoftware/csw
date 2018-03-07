@@ -26,7 +26,7 @@ import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.CurrentState
 import csw.messages.{ComponentMessage, ContainerExternalMessage}
-import csw.services.ccs.scaladsl.CommandService
+import csw.services.command.scaladsl.CommandService
 import csw.services.config.api.models.ConfigData
 import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.config.server.commons.TestFileUtils

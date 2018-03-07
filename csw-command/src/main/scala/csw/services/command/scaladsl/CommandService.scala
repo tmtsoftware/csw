@@ -1,4 +1,4 @@
-package csw.services.ccs.scaladsl
+package csw.services.command.scaladsl
 
 import akka.NotUsed
 import akka.actor.Scheduler
@@ -17,7 +17,7 @@ import csw.messages.location.AkkaLocation
 import csw.messages.params.models.Id
 import csw.messages.params.states.CurrentState
 import csw.messages.{CommandResponseManagerMessage, ComponentMessage}
-import csw.services.ccs.internal.CurrentStateSubscription
+import csw.services.command.internal.CurrentStateSubscription
 
 import scala.concurrent.{ExecutionContext, Future}
 

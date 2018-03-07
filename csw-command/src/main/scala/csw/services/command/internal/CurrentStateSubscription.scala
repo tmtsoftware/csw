@@ -1,4 +1,4 @@
-package csw.services.ccs.internal
+package csw.services.command.internal
 
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.{KillSwitches, Materializer, OverflowStrategy}
@@ -14,7 +14,7 @@ import csw.messages.params.states.CurrentState
  * @param callback the action to perform on each received element
  * @param mat the materializer to materialize the underlying stream
  */
-class CurrentStateSubscription private[ccs] (
+class CurrentStateSubscription private[command] (
     publisher: ActorRef[ComponentStateSubscription],
     callback: CurrentState ⇒ Unit
 )(implicit val mat: Materializer) {

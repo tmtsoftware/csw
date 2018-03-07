@@ -16,7 +16,7 @@ import csw.messages.ccs.commands.{CommandName, CommandResponse, Observe, Setup}
 import csw.messages.models.ToComponentLifecycleMessages._
 import csw.messages.params.generics.KeyType
 import csw.messages.params.models.{ObsId, Prefix}
-import csw.services.ccs.scaladsl.CommandResponseManager
+import csw.services.command.scaladsl.CommandResponseManager
 import csw.services.location.scaladsl.LocationService
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._

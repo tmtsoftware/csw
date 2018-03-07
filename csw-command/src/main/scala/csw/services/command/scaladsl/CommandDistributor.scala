@@ -1,4 +1,4 @@
-package csw.services.ccs.scaladsl
+package csw.services.command.scaladsl
 
 import akka.NotUsed
 import akka.stream.Materializer

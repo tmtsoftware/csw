@@ -24,7 +24,7 @@ import csw.messages.location.ComponentType.HCD
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.messages.params.states.CurrentState
-import csw.services.ccs.scaladsl.CommandService
+import csw.services.command.scaladsl.CommandService
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import csw.services.logging.internal.LoggingLevels.INFO
