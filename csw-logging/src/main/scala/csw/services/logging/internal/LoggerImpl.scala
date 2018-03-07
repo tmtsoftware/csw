@@ -1,4 +1,4 @@
-package csw.services.logging.scaladsl
+package csw.services.logging.internal
 
 import java.time.Instant
 
@@ -6,9 +6,9 @@ import csw.services.logging.RichMsg
 import csw.services.logging.commons.{Constants, LoggingKeys}
 import csw.services.logging.internal.LoggingLevels._
 import csw.services.logging.internal.LoggingState._
-import csw.services.logging.internal.{Log, LogAltMessage, MessageHandler}
 import csw.services.logging.macros.{SourceFactory, SourceLocation}
 import csw.services.logging.models.ComponentLoggingState
+import csw.services.logging.scaladsl.{AnyId, Logger, RequestId}
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 
 class LoggerImpl private[logging] (maybeComponentName: Option[String], actorName: Option[String]) extends Logger {
@@ -45,6 +45,8 @@ class LoggerImpl private[logging] (maybeComponentName: Option[String], actorName
       case noId => false
     }
 
+  // implicit factory makes `file`, `line` and `class` to appear in log statements
+  // it uses scala macros to capture these details
   def trace(msg: ⇒ String, map: ⇒ Map[String, Any], ex: Throwable, id: AnyId)(implicit factory: SourceFactory): Unit = {
     if (componentLoggingState.doTrace || has(id, TRACE)) all(TRACE, id, msg, map, ex, factory.get())
   }

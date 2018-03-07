@@ -8,8 +8,9 @@ import akka.actor._
 import com.persist.JsonOps._
 import csw.services.logging.RichMsg
 import csw.services.logging.commons.{Category, Constants, LoggingKeys, TMTDateTimeFormatter}
+import csw.services.logging.internal.LoggerImpl
 import csw.services.logging.internal.LoggingLevels.Level
-import csw.services.logging.scaladsl.{Logger, LoggerImpl}
+import csw.services.logging.scaladsl.Logger
 
 import scala.concurrent.{ExecutionContextExecutor, Future, Promise}
 

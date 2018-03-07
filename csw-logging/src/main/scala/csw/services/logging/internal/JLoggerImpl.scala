@@ -9,8 +9,9 @@ import csw.services.logging.scaladsl.{noId, AnyId, Logger}
 
 import scala.collection.JavaConverters.mapAsScalaMapConverter
 
-class JLogger private[logging] (log: Logger, cls: Class[_]) extends ILogger {
+class JLoggerImpl private[logging] (log: Logger, cls: Class[_]) extends ILogger {
 
+  // SourceFactory makes `class` to appear in log statements
   override def trace(msg: Supplier[String]): Unit                = log.trace(msg.get)(SourceFactory.from(cls))
   override def trace(msg: Supplier[String], ex: Throwable): Unit = log.trace(msg.get, ex = ex)(SourceFactory.from(cls))
   override def trace(msg: Supplier[String], id: AnyId): Unit     = log.trace(msg.get, id = id)(SourceFactory.from(cls))

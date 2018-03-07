@@ -6,8 +6,8 @@ import java.util.concurrent.TimeUnit
 import akka.actor.ActorSystem
 import csw.services.logging.appenders.FileAppender
 import csw.services.logging.internal.LoggingLevels.INFO
-import csw.services.logging.internal.LoggingSystem
-import csw.services.logging.scaladsl.{Logger, LoggerImpl}
+import csw.services.logging.internal.{LoggerImpl, LoggingSystem}
+import csw.services.logging.scaladsl.Logger
 import org.openjdk.jmh.annotations._
 
 import scala.concurrent.Await
