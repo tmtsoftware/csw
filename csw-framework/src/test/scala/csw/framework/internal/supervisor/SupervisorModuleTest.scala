@@ -4,12 +4,6 @@ import akka.typed.testkit.scaladsl.TestProbe
 import csw.framework.ComponentInfos._
 import csw.framework.FrameworkTestSuite
 import csw.framework.javadsl.commons.JComponentInfos.{jHcdInfo, jHcdInfoWithInitializeTimeout}
-import csw.messages.CommandMessage.{Oneway, Submit}
-import csw.messages.ComponentCommonMessage.GetSupervisorLifecycleState
-import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
-import csw.messages.RunningMessage.Lifecycle
-import csw.messages.SupervisorContainerCommonMessages.Restart
-import csw.messages._
 import csw.messages.commands.CommandResponse.{Accepted, Invalid}
 import csw.messages.commands._
 import csw.messages.commands.matchers.DemandMatcher
@@ -21,6 +15,12 @@ import csw.messages.location.Connection.AkkaConnection
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.{CurrentState, DemandState}
+import csw.messages.scaladsl.CommandMessage.{Oneway, Submit}
+import csw.messages.scaladsl.ComponentCommonMessage.GetSupervisorLifecycleState
+import csw.messages.scaladsl.ContainerIdleMessage
+import csw.messages.scaladsl.FromSupervisorMessage.SupervisorLifecycleStateChanged
+import csw.messages.scaladsl.RunningMessage.Lifecycle
+import csw.messages.scaladsl.SupervisorContainerCommonMessages.Restart
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach

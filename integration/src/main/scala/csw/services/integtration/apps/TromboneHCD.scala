@@ -2,7 +2,7 @@ package csw.services.integtration.apps
 
 import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import akka.typed.scaladsl.adapter._
-import csw.messages.CommandMessage.Submit
+import csw.messages.scaladsl.CommandMessage.Submit
 import csw.messages.commands.{CommandName, Setup}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}

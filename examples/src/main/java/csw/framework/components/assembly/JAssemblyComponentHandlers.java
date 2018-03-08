@@ -6,7 +6,7 @@ import csw.framework.exceptions.FailureRestart;
 import csw.framework.exceptions.FailureStop;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.scaladsl.CurrentStatePublisher;
-import csw.messages.TopLevelActorMessage;
+import csw.messages.scaladsl.TopLevelActorMessage;
 import csw.messages.commands.CommandIssue;
 import csw.messages.commands.CommandResponse;
 import csw.messages.commands.ControlCommand;

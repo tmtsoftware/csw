@@ -18,7 +18,7 @@ import csw.common.utils.TestAppender
 import csw.commons.tags.LoggingSystemSensitive
 import csw.framework.internal.component.ComponentBehavior
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
-import csw.messages.SupervisorContainerCommonMessages.Shutdown
+import csw.messages.scaladsl.SupervisorContainerCommonMessages.Shutdown
 import csw.messages.framework.SupervisorLifecycleState
 import csw.messages.location.ComponentType.HCD
 import csw.messages.location.Connection.AkkaConnection

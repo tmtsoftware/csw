@@ -1,4 +1,4 @@
-package csw.messages
+package csw.messages.scaladsl
 
 /**
  *

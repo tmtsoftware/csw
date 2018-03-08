@@ -5,13 +5,13 @@ import akka.typed.scaladsl.ActorContext
 import akka.util.Timeout
 import csw.common.components.command.ComponentStateForCommand.{longRunningCmdCompleted, _}
 import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
-import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandResponse.{Accepted, Completed, Invalid}
 import csw.messages.commands.{CommandIssue, CommandResponse, ControlCommand, Setup}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.{AkkaLocation, TrackingEvent}
 import csw.messages.params.models.Id
 import csw.messages.params.states.CurrentState
+import csw.messages.scaladsl.TopLevelActorMessage
 import csw.services.command.scaladsl.{CommandResponseManager, CommandService}
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory

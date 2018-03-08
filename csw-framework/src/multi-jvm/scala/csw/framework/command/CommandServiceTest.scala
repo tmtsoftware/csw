@@ -10,7 +10,7 @@ import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.common.utils.LockCommandFactory
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
-import csw.messages.CommandMessage.Submit
+import csw.messages.scaladsl.CommandMessage.Submit
 import csw.messages.commands.CommandIssue.ComponentLockedIssue
 import csw.messages.commands.CommandResponse._
 import csw.messages.commands._

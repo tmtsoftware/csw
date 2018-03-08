@@ -6,9 +6,9 @@ import csw.common.components.framework.SampleComponentState.{choiceKey, initChoi
 import csw.common.utils.LockCommandFactory
 import csw.framework.ComponentInfos.assemblyInfo
 import csw.framework.FrameworkTestSuite
-import csw.messages.CommandMessage.Submit
-import csw.messages.CommandResponseManagerMessage.{AddOrUpdateCommand, Query, Subscribe, Unsubscribe}
-import csw.messages.SupervisorLockMessage.{Lock, Unlock}
+import csw.messages.scaladsl.CommandMessage.Submit
+import csw.messages.scaladsl.CommandResponseManagerMessage.{AddOrUpdateCommand, Query, Subscribe, Unsubscribe}
+import csw.messages.scaladsl.SupervisorLockMessage.{Lock, Unlock}
 import csw.messages.commands.CommandResponse.{Accepted, NotAllowed}
 import csw.messages.commands.{CommandName, CommandResponse, Setup}
 import csw.messages.framework

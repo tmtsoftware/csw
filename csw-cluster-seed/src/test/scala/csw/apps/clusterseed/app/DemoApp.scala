@@ -8,12 +8,12 @@ import com.typesafe.config.ConfigFactory
 import csw.apps.clusterseed.admin.internal.AdminWiring
 import csw.common.FrameworkAssertions.assertThatContainerIsRunning
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
-import csw.messages.CommandMessage.Oneway
-import csw.messages.ContainerCommonMessage.GetComponents
-import csw.messages.ContainerMessage
 import csw.messages.commands.{CommandName, CommandResponse, Setup}
 import csw.messages.framework.{Component, Components, ContainerLifecycleState}
 import csw.messages.params.models.Prefix
+import csw.messages.scaladsl.CommandMessage.Oneway
+import csw.messages.scaladsl.ContainerCommonMessage.GetComponents
+import csw.messages.scaladsl.ContainerMessage
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.logging.scaladsl.{LoggerFactory, LoggingSystemFactory}
 

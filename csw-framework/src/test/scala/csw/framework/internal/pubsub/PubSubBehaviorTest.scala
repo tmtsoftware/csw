@@ -10,7 +10,8 @@ import akka.typed.testkit.{StubbedActorContext, TestKitSettings}
 import csw.framework.FrameworkTestMocks
 import csw.messages.framework.PubSub.{Publish, Subscribe, Unsubscribe}
 import csw.messages.framework.{LifecycleStateChanged, PubSub, SupervisorLifecycleState}
-import csw.messages.{framework, ComponentMessage}
+import csw.messages.framework
+import csw.messages.scaladsl.ComponentMessage
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.logging.scaladsl.Logger
 import org.scalatest.mockito.MockitoSugar

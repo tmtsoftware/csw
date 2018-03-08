@@ -8,7 +8,6 @@ import akka.typed.scaladsl.AskPattern._
 import akka.typed.scaladsl.adapter._
 import akka.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
-import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.commands.CommandResponse.{Accepted, Completed, Error}
 import csw.messages.commands.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
 import csw.messages.commands.matchers.{Matcher, StateMatcher}
@@ -16,7 +15,8 @@ import csw.messages.commands.{CommandResponse, ControlCommand}
 import csw.messages.location.AkkaLocation
 import csw.messages.params.models.Id
 import csw.messages.params.states.CurrentState
-import csw.messages.{CommandResponseManagerMessage, ComponentMessage}
+import csw.messages.scaladsl.CommandMessage.{Oneway, Submit}
+import csw.messages.scaladsl.{CommandResponseManagerMessage, ComponentMessage}
 import csw.services.command.internal.CurrentStateSubscription
 
 import scala.concurrent.{ExecutionContext, Future}

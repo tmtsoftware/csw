@@ -13,7 +13,7 @@ import csw.messages.framework.{LifecycleStateChanged, PubSub}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.params.models.Id
 import csw.messages.params.states.CurrentState
-import csw.messages.{CommandResponseManagerMessage, SupervisorMessage}
+import csw.messages.scaladsl.{CommandResponseManagerMessage, SupervisorMessage}
 import csw.services.command.internal.CommandResponseManagerFactory
 import csw.services.command.scaladsl.CommandResponseManager
 import csw.services.location.javadsl.ILocationService

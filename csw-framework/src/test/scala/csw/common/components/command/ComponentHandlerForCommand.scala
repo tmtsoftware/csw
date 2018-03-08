@@ -7,7 +7,6 @@ import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.util.Timeout
 import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
-import csw.messages._
 import csw.messages.commands.CommandIssue.{OtherIssue, WrongPrefixIssue}
 import csw.messages.commands.CommandResponse._
 import csw.messages.commands._
@@ -16,6 +15,7 @@ import csw.messages.location._
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.Id
 import csw.messages.params.states.CurrentState
+import csw.messages.scaladsl.TopLevelActorMessage
 import csw.services.command.scaladsl.CommandResponseManager
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory

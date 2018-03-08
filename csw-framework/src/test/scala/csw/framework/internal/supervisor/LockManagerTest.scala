@@ -5,7 +5,7 @@ import akka.typed
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.typed.testkit.TestKitSettings
 import akka.typed.testkit.scaladsl.TestProbe
-import csw.messages.CommandMessage.Submit
+import csw.messages.scaladsl.CommandMessage.Submit
 import csw.messages.commands.CommandIssue.ComponentLockedIssue
 import csw.messages.commands.CommandResponse.NotAllowed
 import csw.messages.commands.{CommandName, CommandResponse, Setup}

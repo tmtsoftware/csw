@@ -33,7 +33,7 @@ package csw
  *  - [[csw.messages.events.ObserveEvent]]
  *
  * Another important feature provided by *commands* package is [[csw.messages.commands.matchers.Matcher]]
- * One of the use case for using matcher is when Assembly sends [[csw.messages.CommandMessage.Oneway]] command to HCD
+ * One of the use case for using matcher is when Assembly sends [[csw.messages.scaladsl.CommandMessage.Oneway]] command to HCD
  * and in response to this command HCD keeps publishing its current state.
  * Then Assembly can use Matcher with the matching definition as provided by [[csw.messages.commands.matchers.StateMatcher]] to
  * match against the current states published by HCD.

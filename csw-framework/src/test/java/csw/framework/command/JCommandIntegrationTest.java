@@ -11,7 +11,7 @@ import com.typesafe.config.ConfigFactory;
 import csw.common.components.framework.SampleComponentState;
 import csw.framework.internal.wiring.FrameworkWiring;
 import csw.framework.internal.wiring.Standalone;
-import csw.messages.SupervisorLockMessage;
+import csw.messages.scaladsl.SupervisorLockMessage;
 import csw.messages.commands.CommandIssue;
 import csw.messages.commands.CommandResponse;
 import csw.messages.commands.CommandResponse.Completed;

@@ -8,16 +8,16 @@ import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior, PostStop, Signal, Terminated}
 import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.framework.models._
-import csw.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
-import csw.messages.ContainerIdleMessage.SupervisorsCreated
-import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
-import csw.messages.RunningMessage.Lifecycle
-import csw.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
-import csw.messages._
 import csw.messages.commons.CoordinatedShutdownReasons.{AllActorsWithinContainerTerminatedReason, FailedToCreateSupervisorsReason}
 import csw.messages.framework._
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
+import csw.messages.scaladsl.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
+import csw.messages.scaladsl.ContainerIdleMessage.SupervisorsCreated
+import csw.messages.scaladsl.FromSupervisorMessage.SupervisorLifecycleStateChanged
+import csw.messages.scaladsl.RunningMessage.Lifecycle
+import csw.messages.scaladsl.SupervisorContainerCommonMessages.{Restart, Shutdown}
+import csw.messages.scaladsl.{ComponentMessage, ContainerCommonMessage, ContainerIdleMessage, ContainerMessage}
 import csw.services.location.models._
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
@@ -62,7 +62,7 @@ class ContainerBehavior private[framework] (
   createComponents(containerInfo.components)
 
   /**
-   * Defines processing for a [[csw.messages.ContainerMessage]] received by the actor instance.
+   * Defines processing for a [[csw.messages.scaladsl.ContainerMessage]] received by the actor instance.
    * @param msg      ContainerMessage received
    * @return         The existing behavior
    */

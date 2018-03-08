@@ -5,17 +5,17 @@ import akka.typed.testkit.StubbedActorContext
 import akka.typed.testkit.scaladsl.TestProbe
 import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{ComponentInfos, FrameworkTestSuite}
-import csw.messages.CommandMessage.{Oneway, Submit}
-import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
-import csw.messages.FromComponentLifecycleMessage.Running
-import csw.messages.RunningMessage.Lifecycle
-import csw.messages.TopLevelActorIdleMessage.Initialize
-import csw.messages._
 import csw.messages.commands.CommandResponse.{Accepted, Completed, Error}
 import csw.messages.commands.{CommandName, CommandResponse, Observe, Setup}
 import csw.messages.framework.ToComponentLifecycleMessages._
 import csw.messages.params.generics.KeyType
 import csw.messages.params.models.{ObsId, Prefix}
+import csw.messages.scaladsl.CommandMessage.{Oneway, Submit}
+import csw.messages.scaladsl.CommandResponseManagerMessage.AddOrUpdateCommand
+import csw.messages.scaladsl.FromComponentLifecycleMessage.Running
+import csw.messages.scaladsl.RunningMessage.Lifecycle
+import csw.messages.scaladsl.TopLevelActorIdleMessage.Initialize
+import csw.messages.scaladsl.{CommandResponseManagerMessage, FromComponentLifecycleMessage, TopLevelActorMessage}
 import csw.services.command.scaladsl.CommandResponseManager
 import csw.services.location.scaladsl.LocationService
 import org.mockito.ArgumentMatchers

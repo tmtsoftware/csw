@@ -4,7 +4,7 @@ import akka.typed.scaladsl.{Actor, ActorContext}
 import akka.typed.{ActorRef, Behavior}
 import csw.framework.internal.component.ComponentBehavior
 import csw.messages.framework.ComponentInfo
-import csw.messages.{FromComponentLifecycleMessage, TopLevelActorMessage}
+import csw.messages.scaladsl.{FromComponentLifecycleMessage, TopLevelActorMessage}
 import csw.services.command.scaladsl.CommandResponseManager
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory

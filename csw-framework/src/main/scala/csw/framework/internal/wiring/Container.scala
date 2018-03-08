@@ -4,7 +4,7 @@ import akka.typed.{ActorRef, Behavior}
 import com.typesafe.config.Config
 import csw.framework.internal.configparser.ConfigParser
 import csw.framework.internal.container.ContainerBehaviorFactory
-import csw.messages.ContainerMessage
+import csw.messages.scaladsl.ContainerMessage
 
 import scala.concurrent.Future
 

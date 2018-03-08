@@ -9,14 +9,6 @@ import csw.framework.exceptions.{FailureStop, InitializationFailed}
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
-import csw.messages.CommandResponseManagerMessage.Query
-import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
-import csw.messages.FromComponentLifecycleMessage.Running
-import csw.messages.RunningMessage.Lifecycle
-import csw.messages.SupervisorContainerCommonMessages.Restart
-import csw.messages.SupervisorIdleMessage.InitializeTimeout
-import csw.messages.SupervisorInternalRunningMessage.{RegistrationNotRequired, RegistrationSuccess}
-import csw.messages._
 import csw.messages.commands.CommandResponse
 import csw.messages.framework.LocationServiceUsage.DoNotRegister
 import csw.messages.framework.PubSub.{Publish, Subscribe, Unsubscribe}
@@ -24,6 +16,14 @@ import csw.messages.framework.ToComponentLifecycleMessages._
 import csw.messages.framework.{ComponentInfo, LifecycleStateChanged, PubSub, SupervisorLifecycleState}
 import csw.messages.params.models.Id
 import csw.messages.params.states.CurrentState
+import csw.messages.scaladsl.CommandResponseManagerMessage.Query
+import csw.messages.scaladsl.ComponentCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
+import csw.messages.scaladsl.FromComponentLifecycleMessage.Running
+import csw.messages.scaladsl.RunningMessage.Lifecycle
+import csw.messages.scaladsl.SupervisorContainerCommonMessages.Restart
+import csw.messages.scaladsl.SupervisorIdleMessage.InitializeTimeout
+import csw.messages.scaladsl.SupervisorInternalRunningMessage.{RegistrationNotRequired, RegistrationSuccess}
+import csw.messages.scaladsl.{CommandResponseManagerMessage, ContainerIdleMessage, SupervisorMessage, TopLevelActorMessage}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 

@@ -16,7 +16,7 @@ package csw.services
  * This class wraps CommandResponseManagerActor and provides helpers to interact with actor
  * which is responsible for adding/updating/querying command result.
  * Component writers will get handle to CommandResponseManager in their handlers.
- * When component receives command of type [[csw.messages.CommandMessage.Submit]],
+ * When component receives command of type [[CommandMessage.Submit]],
  * then framework (ComponentBehavior - TLA) will add a entry of this command with its validation status into CommandResponseManager.
  *
  * In case of short running or immediate command,

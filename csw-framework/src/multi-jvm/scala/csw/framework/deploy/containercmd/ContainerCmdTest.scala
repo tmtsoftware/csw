@@ -10,10 +10,6 @@ import akka.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.common.FrameworkAssertions._
-import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState}
-import csw.messages.ContainerCommonMessage.GetComponents
-import csw.messages.RunningMessage.Lifecycle
-import csw.messages.SupervisorContainerCommonMessages.Shutdown
 import csw.messages.commands.CommandResponse.Invalid
 import csw.messages.commands.{CommandName, Setup}
 import csw.messages.framework.PubSub.Subscribe
@@ -24,7 +20,11 @@ import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.CurrentState
-import csw.messages.{ComponentMessage, ContainerExternalMessage}
+import csw.messages.scaladsl.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState}
+import csw.messages.scaladsl.ContainerCommonMessage.GetComponents
+import csw.messages.scaladsl.RunningMessage.Lifecycle
+import csw.messages.scaladsl.SupervisorContainerCommonMessages.Shutdown
+import csw.messages.scaladsl.{ComponentMessage, ContainerExternalMessage}
 import csw.services.command.scaladsl.CommandService
 import csw.services.config.api.models.ConfigData
 import csw.services.config.client.scaladsl.ConfigClientFactory

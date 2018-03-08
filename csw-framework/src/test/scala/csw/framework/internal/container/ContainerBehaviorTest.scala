@@ -10,15 +10,15 @@ import csw.framework.FrameworkTestMocks
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.internal.supervisor.{SupervisorBehaviorFactory, SupervisorInfoFactory}
 import csw.framework.scaladsl.ComponentBehaviorFactory
-import csw.messages.ContainerCommonMessage.GetComponents
-import csw.messages.ContainerIdleMessage.SupervisorsCreated
-import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
-import csw.messages.RunningMessage.Lifecycle
-import csw.messages.SupervisorContainerCommonMessages.Restart
-import csw.messages._
 import csw.messages.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.messages.framework._
 import csw.messages.location.Connection.AkkaConnection
+import csw.messages.scaladsl.ContainerCommonMessage.GetComponents
+import csw.messages.scaladsl.ContainerIdleMessage.SupervisorsCreated
+import csw.messages.scaladsl.FromSupervisorMessage.SupervisorLifecycleStateChanged
+import csw.messages.scaladsl.RunningMessage.Lifecycle
+import csw.messages.scaladsl.SupervisorContainerCommonMessages.Restart
+import csw.messages.scaladsl.{ComponentMessage, ContainerIdleMessage, ContainerMessage}
 import csw.services.command.internal.CommandResponseManagerFactory
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}

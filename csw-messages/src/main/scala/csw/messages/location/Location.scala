@@ -4,7 +4,8 @@ import java.net.URI
 
 import akka.typed.ActorRef
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
-import csw.messages.{ComponentMessage, ContainerExternalMessage, TMTSerializable}
+import csw.messages.scaladsl.{ComponentMessage, ContainerExternalMessage}
+import csw.messages.TMTSerializable
 
 import scala.reflect.ClassTag
 
