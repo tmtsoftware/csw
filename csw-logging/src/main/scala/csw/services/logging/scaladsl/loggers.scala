@@ -9,7 +9,7 @@ import akka.typed.scaladsl.adapter.TypedActorRefOps
 import csw.services.logging.internal.LoggerImpl
 import csw.services.logging.javadsl.JLoggerFactory
 
-private[logging] abstract class BaseLoggerFactory(maybeComponentName: Option[String]) {
+abstract class BaseLoggerFactory private[logging] (maybeComponentName: Option[String]) {
   def getLogger[T](ctx: ActorContext[T]): Logger = new LoggerImpl(maybeComponentName, Some(actorPath(ctx.self.toUntyped)))
   def getLogger(ctx: actor.ActorContext): Logger = new LoggerImpl(maybeComponentName, Some(actorPath(ctx.self)))
   def getLogger: Logger                          = new LoggerImpl(maybeComponentName, None)
@@ -19,6 +19,8 @@ private[logging] abstract class BaseLoggerFactory(maybeComponentName: Option[Str
 
 /**
  * When using the `LoggerFactory`, log statements will have `@componentName` tag with provided `componentName`
+ *
+ * @param componentName to appear in log statements
  */
 class LoggerFactory(componentName: String) extends BaseLoggerFactory(Some(componentName)) {
 

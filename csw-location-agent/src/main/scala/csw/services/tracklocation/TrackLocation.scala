@@ -9,7 +9,8 @@ import csw.messages.models.CoordinatedShutdownReasons.{FailureReason, ProcessTer
 import csw.services.location.commons.CswCluster
 import csw.services.location.models._
 import csw.services.location.scaladsl.LocationServiceFactory
-import csw.services.logging.scaladsl.{LogAdminActorFactory, Logger}
+import csw.services.logging.commons.LogAdminActorFactory
+import csw.services.logging.scaladsl.Logger
 import csw.services.tracklocation.commons.LocationAgentLogger
 import csw.services.tracklocation.models.Command
 

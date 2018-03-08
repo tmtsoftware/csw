@@ -9,8 +9,8 @@ import csw.services.config.api.scaladsl.ConfigClientService
 import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory, RegistrationFactory}
+import csw.services.logging.commons.LogAdminActorFactory
 import csw.services.logging.internal.LogControlMessages
-import csw.services.logging.scaladsl.LogAdminActorFactory
 
 private[csw] class FrameworkWiring {
   lazy val clusterSettings: ClusterSettings               = ClusterSettings()

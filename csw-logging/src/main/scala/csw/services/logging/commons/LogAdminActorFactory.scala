@@ -1,4 +1,4 @@
-package csw.services.logging.scaladsl
+package csw.services.logging.commons
 
 import akka.actor.ActorSystem
 import akka.typed.ActorRef

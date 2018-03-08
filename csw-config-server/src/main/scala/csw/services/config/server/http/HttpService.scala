@@ -11,7 +11,8 @@ import csw.services.config.server.{ActorRuntime, Settings}
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.models._
 import csw.services.location.scaladsl.LocationService
-import csw.services.logging.scaladsl.{LogAdminActorFactory, Logger}
+import csw.services.logging.commons.LogAdminActorFactory
+import csw.services.logging.scaladsl.Logger
 
 import scala.async.Async._
 import scala.concurrent.Future
