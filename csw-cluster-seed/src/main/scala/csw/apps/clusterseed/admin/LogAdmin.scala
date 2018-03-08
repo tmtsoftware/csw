@@ -1,6 +1,6 @@
 package csw.apps.clusterseed.admin
 
-import akka.typed.scaladsl.AskPattern._
+import akka.actor.typed.scaladsl.AskPattern._
 import akka.util.Timeout
 import csw.apps.clusterseed.admin.exceptions.{InvalidComponentNameException, UnresolvedAkkaOrHttpLocationException}
 import csw.apps.clusterseed.admin.internal.ActorRuntime

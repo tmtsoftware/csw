@@ -5,10 +5,10 @@ import java.time.Instant
 
 import akka.actor.ActorSystem
 import akka.serialization.SerializationExtension
-import akka.typed
-import akka.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.typed.testkit.TestKitSettings
-import akka.typed.testkit.scaladsl.TestProbe
+import akka.actor.typed
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.testkit.typed.TestKitSettings
+import akka.testkit.typed.scaladsl.TestProbe
 import com.twitter.chill.akka.AkkaSerializer
 import csw.commons.tagobjects.FileSystemSensitive
 import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
@@ -182,7 +182,6 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
 
   describe("csw messages") {
     implicit val typedSystem: typed.ActorSystem[Nothing] = system.toTyped
-    implicit val settings: TestKitSettings               = TestKitSettings(typedSystem)
 
     it("should serialize ToComponentLifecycle messages") {
       serialization.findSerializerFor(GoOffline).getClass shouldBe classOf[AkkaSerializer]

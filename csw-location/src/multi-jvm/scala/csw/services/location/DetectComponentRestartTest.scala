@@ -1,8 +1,8 @@
 package csw.services.location
 
 import akka.testkit.TestProbe
-import akka.typed.Behavior
-import akka.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.actor.typed.Behavior
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType, LocationRemoved, LocationUpdated}
 import csw.services.location.commons.CswCluster

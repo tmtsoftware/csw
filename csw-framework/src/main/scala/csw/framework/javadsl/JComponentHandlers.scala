@@ -2,7 +2,7 @@ package csw.framework.javadsl
 
 import java.util.concurrent.CompletableFuture
 
-import akka.typed.javadsl.ActorContext
+import akka.actor.typed.javadsl.ActorContext
 import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
 import csw.messages.TopLevelActorMessage
 import csw.messages.framework.ComponentInfo

@@ -4,8 +4,8 @@ import java.net.URI
 
 import akka.actor.{ActorPath, Address}
 import akka.serialization.Serialization
-import akka.typed.ActorRef
-import akka.typed.scaladsl.adapter.TypedActorRefOps
+import akka.actor.typed.ActorRef
+import akka.actor.typed.scaladsl.adapter.TypedActorRefOps
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location._
 import csw.services.location.commons.LocationServiceLogger

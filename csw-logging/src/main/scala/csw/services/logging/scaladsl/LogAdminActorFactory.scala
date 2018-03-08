@@ -1,8 +1,8 @@
 package csw.services.logging.scaladsl
 
 import akka.actor.ActorSystem
-import akka.typed.ActorRef
-import akka.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.actor.typed.ActorRef
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import csw.services.logging.internal.{LogAdminActor, LogControlMessages}
 
 object LogAdminActorFactory {

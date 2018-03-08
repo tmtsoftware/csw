@@ -1,11 +1,11 @@
 package csw.apps.containercmd.sample
 
 import akka.actor.ActorSystem
-import akka.typed
-import akka.typed.ActorRef
-import akka.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.typed.testkit.TestKitSettings
-import akka.typed.testkit.scaladsl.TestProbe
+import akka.actor.typed
+import akka.actor.typed.ActorRef
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.testkit.typed.TestKitSettings
+import akka.testkit.typed.scaladsl.TestProbe
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.messages.ContainerCommonMessage.GetContainerLifecycleState
@@ -36,5 +36,5 @@ object ContainerApp extends App {
   private val containerLifecycleStateProbe: TestProbe[ContainerLifecycleState] = TestProbe[ContainerLifecycleState]
   ref ! GetContainerLifecycleState(containerLifecycleStateProbe.ref)
 
-  containerLifecycleStateProbe.expectMsg(ContainerLifecycleState.Running)
+  containerLifecycleStateProbe.expectMessage(ContainerLifecycleState.Running)
 }

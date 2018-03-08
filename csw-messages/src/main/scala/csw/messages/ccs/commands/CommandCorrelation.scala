@@ -1,4 +1,4 @@
-package csw.services.ccs.models
+package csw.messages.ccs.commands
 
 import csw.messages.params.models.Id
 
@@ -8,7 +8,7 @@ import csw.messages.params.models.Id
  * @param parentToChildren a map of parent command to all children command
  * @param childToParent a map of a child command to its parent command
  */
-case class CommandCorrelation private[ccs] (parentToChildren: Map[Id, Set[Id]], childToParent: Map[Id, Id]) {
+case class CommandCorrelation private[csw] (parentToChildren: Map[Id, Set[Id]], childToParent: Map[Id, Id]) {
 
   /**
    * Add a new command relation

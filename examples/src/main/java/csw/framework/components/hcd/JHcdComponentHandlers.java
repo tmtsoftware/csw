@@ -1,6 +1,6 @@
 package csw.framework.components.hcd;
 
-import akka.typed.javadsl.ActorContext;
+import akka.actor.typed.javadsl.ActorContext;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.scaladsl.CurrentStatePublisher;
 import csw.messages.TopLevelActorMessage;
@@ -30,7 +30,7 @@ public class JHcdComponentHandlers extends JComponentHandlers {
     private ILogger log;
 
     public JHcdComponentHandlers(
-            akka.typed.javadsl.ActorContext<TopLevelActorMessage> ctx,
+            akka.actor.typed.javadsl.ActorContext<TopLevelActorMessage> ctx,
             ComponentInfo componentInfo,
             CommandResponseManager commandResponseManager,
             CurrentStatePublisher currentStatePublisher,

@@ -1,6 +1,6 @@
 package csw.apps.clusterseed.components
 
-import akka.typed.scaladsl.ActorContext
+import akka.actor.typed.scaladsl.ActorContext
 import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
 import csw.messages._
 import csw.messages.ccs.commands.CommandResponse.Accepted

@@ -1,6 +1,6 @@
 package csw.messages.models
 
-import akka.typed.ActorRef
+import akka.actor.typed.ActorRef
 import csw.messages.framework.SupervisorLifecycleState
 import csw.messages.{ComponentMessage, TMTSerializable}
 

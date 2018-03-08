@@ -2,10 +2,10 @@ package csw.framework.command
 
 import akka.actor.Scheduler
 import akka.stream.{ActorMaterializer, Materializer}
-import akka.typed.ActorSystem
-import akka.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.typed.testkit.TestKitSettings
-import akka.typed.testkit.scaladsl.TestProbe
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.testkit.typed.TestKitSettings
+import akka.testkit.typed.scaladsl.TestProbe
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.common.components.command.ComponentStateForCommand._
@@ -90,10 +90,10 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
 
       // verify that commands gets completed in following sequence
       // ShortSetup => MediumSetup => LongSetup
-      probe.expectMsg(CurrentState(prefix, Set(choiceKey.set(shortCmdCompleted))))
-      probe.expectMsg(CurrentState(prefix, Set(choiceKey.set(mediumCmdCompleted))))
-      probe.expectMsg(CurrentState(prefix, Set(choiceKey.set(longCmdCompleted))))
-      probe.expectMsg(CurrentState(prefix, Set(choiceKey.set(longRunningCmdCompleted))))
+      probe.expectMessage(CurrentState(prefix, Set(choiceKey.set(shortCmdCompleted))))
+      probe.expectMessage(CurrentState(prefix, Set(choiceKey.set(mediumCmdCompleted))))
+      probe.expectMessage(CurrentState(prefix, Set(choiceKey.set(longCmdCompleted))))
+      probe.expectMessage(CurrentState(prefix, Set(choiceKey.set(longRunningCmdCompleted))))
 
       //#query-response
       val setupForQuery = Setup(prefix, longRunning, Some(obsId))

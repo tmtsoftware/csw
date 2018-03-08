@@ -2,10 +2,10 @@ package csw.messages.ccs.commands.matchers
 
 import java.util.concurrent.CompletableFuture
 
+import akka.actor.typed.ActorRef
+import akka.actor.typed.scaladsl.adapter._
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.{KillSwitches, Materializer, OverflowStrategy}
-import akka.typed.ActorRef
-import akka.typed.scaladsl.adapter._
 import csw.messages.ComponentCommonMessage.ComponentStateSubscription
 import csw.messages.models.PubSub.Subscribe
 import csw.messages.params.states.CurrentState

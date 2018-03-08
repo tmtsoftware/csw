@@ -2,7 +2,7 @@ package csw.framework.javadsl
 
 import java.util.Optional
 
-import akka.typed.ActorRef
+import akka.actor.typed.ActorRef
 import com.typesafe.config.Config
 import csw.apps.containercmd.ContainerCmd
 

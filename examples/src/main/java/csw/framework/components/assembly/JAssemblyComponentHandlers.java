@@ -1,7 +1,7 @@
 package csw.framework.components.assembly;
 
-import akka.typed.javadsl.ActorContext;
-import akka.typed.javadsl.Adapter;
+import akka.actor.typed.javadsl.ActorContext;
+import akka.actor.typed.javadsl.Adapter;
 import csw.exceptions.FailureRestart;
 import csw.exceptions.FailureStop;
 import csw.framework.javadsl.JComponentHandlers;
@@ -43,7 +43,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     private IConfigClientService configClient;
 
     public JAssemblyComponentHandlers(
-            akka.typed.javadsl.ActorContext<TopLevelActorMessage> ctx,
+            akka.actor.typed.javadsl.ActorContext<TopLevelActorMessage> ctx,
             ComponentInfo componentInfo,
             CommandResponseManager commandResponseManager,
             CurrentStatePublisher currentStatePublisher,

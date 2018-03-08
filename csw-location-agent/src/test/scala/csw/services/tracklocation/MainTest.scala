@@ -3,7 +3,7 @@ package csw.services.tracklocation
 import java.net.URI
 import java.nio.file.Paths
 
-import akka.typed.ActorRef
+import akka.actor.typed.ActorRef
 import com.typesafe.config.ConfigFactory
 import csw.messages.location.Connection.TcpConnection
 import csw.messages.location.{ComponentId, ComponentType}

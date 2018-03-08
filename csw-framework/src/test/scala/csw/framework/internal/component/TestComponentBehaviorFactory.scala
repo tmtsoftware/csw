@@ -1,4 +1,4 @@
-package csw.framework.components.hcd
+package csw.framework.internal.component
 
 import akka.actor.typed.scaladsl.ActorContext
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers, CurrentStatePublisher}
@@ -8,16 +8,14 @@ import csw.services.ccs.scaladsl.CommandResponseManager
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
 
-//#component-factory
-class HcdComponentBehaviorFactory extends ComponentBehaviorFactory {
-  protected override def handlers(
+class TestComponentBehaviorFactory(componentHandlers: ComponentHandlers) extends ComponentBehaviorFactory {
+
+  override protected def handlers(
       ctx: ActorContext[TopLevelActorMessage],
       componentInfo: ComponentInfo,
       commandResponseManager: CommandResponseManager,
       currentStatePublisher: CurrentStatePublisher,
       locationService: LocationService,
       loggerFactory: LoggerFactory
-  ): ComponentHandlers =
-    new HcdComponentHandlers(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, loggerFactory)
+  ): ComponentHandlers = componentHandlers
 }
-//#component-factory

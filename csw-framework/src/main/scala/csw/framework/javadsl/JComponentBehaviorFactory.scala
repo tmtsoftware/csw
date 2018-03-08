@@ -1,7 +1,7 @@
 package csw.framework.javadsl
 
-import akka.typed.javadsl.ActorContext
-import akka.typed.scaladsl
+import akka.actor.typed.javadsl.ActorContext
+import akka.actor.typed.scaladsl
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers, CurrentStatePublisher}
 import csw.messages.TopLevelActorMessage
 import csw.messages.framework.ComponentInfo

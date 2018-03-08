@@ -2,7 +2,7 @@ package csw.messages.location
 
 import java.net.URI
 
-import akka.typed.ActorRef
+import akka.actor.typed.ActorRef
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.{ComponentMessage, ContainerExternalMessage, TMTSerializable}
 

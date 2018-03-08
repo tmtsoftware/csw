@@ -1,7 +1,7 @@
 package csw.framework.internal.supervisor
 
-import akka.typed.scaladsl.Actor
-import akka.typed.{ActorRef, Behavior}
+import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.{ActorRef, Behavior}
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.scaladsl.ComponentBehaviorFactory
 import csw.messages.framework.ComponentInfo
@@ -11,7 +11,7 @@ import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.LoggerFactory
 
 /**
- * The factory for creating [[akka.typed.scaladsl.Actor.MutableBehavior]] of the supervisor of a component
+ * The factory for creating [[akka.actor.typed.scaladsl.Behaviors.MutableBehavior]] of the supervisor of a component
  */
 //TODO: add doc to explain significance of why we have multiple methods
 private[framework] object SupervisorBehaviorFactory {
@@ -52,10 +52,10 @@ private[framework] object SupervisorBehaviorFactory {
       commandResponseManagerFactory: CommandResponseManagerFactory,
       loggerFactory: LoggerFactory
   ): Behavior[ComponentMessage] = {
-    Actor
+    Behaviors
       .withTimers[SupervisorMessage](
         timerScheduler ⇒
-          Actor
+          Behaviors
             .mutable[SupervisorMessage](
               ctx =>
                 new SupervisorBehavior(

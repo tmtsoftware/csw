@@ -1,15 +1,14 @@
 package csw.framework.internal.pubsub
 
-import akka.typed.ActorRef
-import akka.typed.scaladsl.{Actor, ActorContext}
-import csw.messages.SupervisorMessage
+import akka.actor.typed.Behavior
+import akka.actor.typed.scaladsl.Behaviors
 import csw.messages.models.PubSub
 import csw.services.logging.scaladsl.LoggerFactory
 
 /**
- * Factory for creating [[akka.typed.scaladsl.Actor.MutableBehavior]] of a pub sub actor
+ * Factory for creating [[akka.actor.typed.scaladsl.Behaviors.MutableBehavior]] of a pub sub actor
  */
 private[framework] class PubSubBehaviorFactory() {
-  def make[T](ctx: ActorContext[SupervisorMessage], actorName: String, loggerFactory: LoggerFactory): ActorRef[PubSub[T]] =
-    ctx.spawn(Actor.mutable[PubSub[T]](ctx ⇒ new PubSubBehavior(ctx, loggerFactory)), actorName)
+  def make[T](actorName: String, loggerFactory: LoggerFactory): Behavior[PubSub[T]] =
+    Behaviors.mutable[PubSub[T]](ctx ⇒ new PubSubBehavior(ctx, loggerFactory))
 }

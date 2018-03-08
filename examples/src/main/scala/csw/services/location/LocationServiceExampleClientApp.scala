@@ -5,8 +5,8 @@ import java.net.InetAddress
 import akka.actor.{ActorSystem, Props}
 import akka.stream.scaladsl.{Keep, Sink}
 import akka.stream.{ActorMaterializer, Materializer}
-import akka.typed.scaladsl.Actor
-import akka.typed.{ActorRef, Behavior}
+import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.{ActorRef, Behavior}
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
 import csw.messages.location._
 import csw.messages.models.CoordinatedShutdownReasons.ActorTerminatedReason
@@ -101,7 +101,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   // ************************************************************************************************************
 
   // import scaladsl adapter to implicitly convert UnTyped ActorRefs to Typed ActorRef[Nothing]
-  import akka.typed.scaladsl.adapter._
+  import akka.actor.typed.scaladsl.adapter._
 
   // dummy HCD connection
   val hcdConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
@@ -121,8 +121,8 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
 
   // ************************************************************************************************************
 
-  def behavior(): Behavior[String] = Actor.deferred { ctx =>
-    Actor.same
+  def behavior(): Behavior[String] = Behaviors.setup { ctx =>
+    Behaviors.same
   }
   val typedActorRef: ActorRef[String] = context.system.spawn(behavior(), "typed-actor-ref")
 

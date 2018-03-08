@@ -1,6 +1,5 @@
-package csw.services.ccs.models
+package csw.messages.ccs.commands
 
-import csw.messages.ccs.commands.CommandResponse
 import csw.messages.params.models.Id
 
 /**
@@ -8,6 +7,6 @@ import csw.messages.params.models.Id
  * @param runId command identifier as a RunId
  * @param currentCmdStatus current command response
  */
-case class CommandStatus private[ccs] (runId: Id, currentCmdStatus: CommandResponse) {
+case class CommandStatus private[csw] (runId: Id, currentCmdStatus: CommandResponse) {
   def withCommandResponse(commandResponse: CommandResponse): CommandStatus = copy(currentCmdStatus = commandResponse)
 }

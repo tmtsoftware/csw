@@ -19,13 +19,13 @@ Hcd/Java
 
 **converting typed actor system to untyped actor system** 
 
-The `ctx` available to the component is of type `akka.typed.scaladsl.ActorContext` in scala or `akka.typed.javadsl.ActorContext` 
+The `ctx` available to the component is of type `akka.actor.typed.scaladsl.ActorContext` in scala or `akka.actor.typed.javadsl.ActorContext` 
 in java. This context can be used to get resources such as actor system which is also typed. In order to get the untyped 
 version of actor system or actor references, akka has  provided some implicit extension methods in scala and static
 methods in java which can be used by adding the following import 
 
-`import akka.typed.scaladsl.adapter._`  for scala and,
-`import akka.typed.javadsl.Adapter.*` for java
+`import akka.actor.typed.scaladsl.adapter._`  for scala and,
+`import akka.actor.typed.javadsl.Adapter.*` for java
 
 @@@
 

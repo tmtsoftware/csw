@@ -7,8 +7,8 @@ import akka.NotUsed
 import akka.actor.Scheduler
 import akka.stream.javadsl.Source
 import akka.stream.{ActorMaterializer, Materializer}
-import akka.typed.ActorSystem
-import akka.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.util.Timeout
 import csw.messages.ccs.commands.matchers.StateMatcher
 import csw.messages.ccs.commands.{CommandResponse, ControlCommand}

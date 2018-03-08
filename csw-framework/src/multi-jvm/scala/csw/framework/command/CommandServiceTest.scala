@@ -2,10 +2,10 @@ package csw.framework.command
 
 import akka.actor.Scheduler
 import akka.stream.{ActorMaterializer, Materializer}
-import akka.typed.ActorSystem
-import akka.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.typed.testkit.TestKitSettings
-import akka.typed.testkit.scaladsl.TestProbe
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.testkit.typed.TestKitSettings
+import akka.testkit.typed.scaladsl.TestProbe
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.common.utils.LockCommandFactory
@@ -103,7 +103,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       // try to send a command to assembly which is already locked
       val assemblyObserve = Observe(invalidPrefix, acceptedCmd, Some(ObsId("Obs001")))
       assemblyRef ! Submit(assemblyObserve, cmdResponseProbe.ref)
-      val response = cmdResponseProbe.expectMsgType[NotAllowed]
+      val response = cmdResponseProbe.expectMessageType[NotAllowed]
       response.issue shouldBe an[ComponentLockedIssue]
 
       enterBarrier("command-when-locked")
@@ -298,18 +298,18 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       // acquire lock on assembly
       val lockResponseProbe = TestProbe[LockingResponse]
       assemblyLocation.componentRef ! LockCommandFactory.make(prefix, lockResponseProbe.ref)
-      lockResponseProbe.expectMsg(LockAcquired)
+      lockResponseProbe.expectMessage(LockAcquired)
       enterBarrier("assembly-locked")
 
       // send command with lock token and expect command processing response
       val assemblySetup = Setup(prefix, immediateCmd, obsId)
       assemblyLocation.componentRef ! Submit(assemblySetup, cmdResponseProbe.ref)
-      cmdResponseProbe.expectMsg(5.seconds, Completed(assemblySetup.runId))
+      cmdResponseProbe.expectMessage(5.seconds, Completed(assemblySetup.runId))
 
       // send command with lock token and expect command processing response with result
       val assemblySetup2 = Setup(prefix, immediateResCmd, obsId)
       assemblyLocation.componentRef ! Submit(assemblySetup2, cmdResponseProbe.ref)
-      cmdResponseProbe.expectMsgType[CompletedWithResult](5.seconds)
+      cmdResponseProbe.expectMessageType[CompletedWithResult](5.seconds)
 
       enterBarrier("command-when-locked")
     }

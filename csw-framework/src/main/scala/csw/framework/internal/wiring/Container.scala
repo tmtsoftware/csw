@@ -1,6 +1,6 @@
 package csw.framework.internal.wiring
 
-import akka.typed.{ActorRef, Behavior}
+import akka.actor.typed.{ActorRef, Behavior}
 import com.typesafe.config.Config
 import csw.framework.internal.configparser.ConfigParser
 import csw.framework.internal.container.ContainerBehaviorFactory

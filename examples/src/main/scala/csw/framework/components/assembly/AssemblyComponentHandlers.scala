@@ -2,8 +2,8 @@ package csw.framework.components.assembly
 
 import java.nio.file.Paths
 
-import akka.typed.scaladsl.ActorContext
-import akka.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.actor.typed.scaladsl.ActorContext
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import csw.exceptions.{FailureRestart, FailureStop}
 import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
 import csw.messages.TopLevelActorMessage

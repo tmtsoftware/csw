@@ -1,7 +1,7 @@
 package csw.messages
 
-import akka.typed.ActorRef
-import csw.messages.ccs.commands.{CommandResponse, ControlCommand}
+import akka.actor.typed.ActorRef
+import csw.messages.ccs.commands.{CommandCorrelation, CommandResponse, CommandResponseManagerState, ControlCommand}
 import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState}
 import csw.messages.location.TrackingEvent
 import csw.messages.models.PubSub.SubscriberMessage
@@ -125,6 +125,7 @@ object CommandResponseManagerMessage {
   case class AddOrUpdateCommand(commandId: Id, commandResponse: CommandResponse)  extends CommandResponseManagerMessage
   case class AddSubCommand(commandId: Id, subCommandId: Id)                       extends CommandResponseManagerMessage
   case class UpdateSubCommand(subCommandId: Id, commandResponse: CommandResponse) extends CommandResponseManagerMessage
+  case class SubscriberTerminated(replyTo: ActorRef[CommandResponse])             extends CommandResponseManagerMessage
   case class Query(commandId: Id, replyTo: ActorRef[CommandResponse])
       extends CommandResponseManagerMessage
       with SupervisorLockMessage
@@ -134,4 +135,7 @@ object CommandResponseManagerMessage {
   case class Unsubscribe(commandId: Id, replyTo: ActorRef[CommandResponse])
       extends CommandResponseManagerMessage
       with SupervisorLockMessage
+  private[csw] case class GetCommandCorrelation(replyTo: ActorRef[CommandCorrelation]) extends CommandResponseManagerMessage
+  private[csw] case class GetCommandResponseManagerState(replyTo: ActorRef[CommandResponseManagerState])
+      extends CommandResponseManagerMessage
 }

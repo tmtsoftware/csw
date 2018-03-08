@@ -1,9 +1,9 @@
 package csw.framework.internal.wiring
 
 import akka.actor.{ActorSystem, Scheduler}
-import akka.typed.scaladsl.AskPattern.Askable
-import akka.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.typed.{ActorRef, Behavior, Props}
+import akka.actor.typed.scaladsl.AskPattern.Askable
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.actor.typed.{ActorRef, Behavior, Props}
 import akka.util.Timeout
 import csw.framework.internal.wiring.CswFrameworkGuardian.CreateActor
 

@@ -3,9 +3,9 @@ package csw.framework.internal.container
 import akka.Done
 import akka.actor.CoordinatedShutdown
 import akka.actor.CoordinatedShutdown.Reason
-import akka.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.typed.scaladsl.{Actor, ActorContext}
-import akka.typed.{ActorRef, Behavior, PostStop, Signal, Terminated}
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
+import akka.actor.typed.{ActorRef, Behavior, PostStop, Signal, Terminated}
 import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.framework.models._
 import csw.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
@@ -43,7 +43,7 @@ class ContainerBehavior private[framework] (
     registrationFactory: RegistrationFactory,
     locationService: LocationService,
     loggerFactory: LoggerFactory
-) extends Actor.MutableBehavior[ContainerMessage] {
+) extends Behaviors.MutableBehavior[ContainerMessage] {
 
   import ctx.executionContext
   private val log: Logger                        = loggerFactory.getLogger(ctx)
@@ -80,7 +80,7 @@ class ContainerBehavior private[framework] (
   }
 
   /**
-   * Defines processing for a [[akka.typed.Signal]] received by the actor instance.
+   * Defines processing for a [[akka.actor.typed.Signal]] received by the actor instance.
    * @return        The existing behavior
    */
   //TODO: add doc for significance
@@ -155,7 +155,9 @@ class ContainerBehavior private[framework] (
       .traverse(componentInfos) { ci ⇒
         supervisorInfoFactory.make(ctx.self, ci, locationService, registrationFactory)
       }
-      .foreach(x ⇒ ctx.self ! SupervisorsCreated(x.flatten))
+      .foreach(x ⇒ {
+        ctx.self ! SupervisorsCreated(x.flatten)
+      })
   }
 
   /**

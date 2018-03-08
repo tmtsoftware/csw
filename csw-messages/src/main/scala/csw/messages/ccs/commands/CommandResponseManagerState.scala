@@ -1,7 +1,6 @@
-package csw.services.ccs.models
+package csw.messages.ccs.commands
 
-import akka.typed.ActorRef
-import csw.messages.ccs.commands.CommandResponse
+import akka.actor.typed.ActorRef
 import csw.messages.ccs.commands.CommandResponse.CommandNotAvailable
 import csw.messages.params.models.Id
 
@@ -9,7 +8,7 @@ import csw.messages.params.models.Id
  * Manages state of a given command identified by a RunId
  * @param cmdToCmdStatus a map of runId to CommandState
  */
-case class CommandResponseManagerState private[ccs] (cmdToCmdStatus: Map[Id, CommandState]) {
+case class CommandResponseManagerState private[csw] (cmdToCmdStatus: Map[Id, CommandState]) {
   def add(runId: Id, initialState: CommandResponse): CommandResponseManagerState =
     CommandResponseManagerState(cmdToCmdStatus.updated(runId, CommandState.init(runId, initialState)))
 
@@ -48,6 +47,16 @@ case class CommandResponseManagerState private[ccs] (cmdToCmdStatus: Map[Id, Com
    */
   def unSubscribe(runId: Id, actorRef: ActorRef[CommandResponse]): CommandResponseManagerState =
     update(runId, _.removeSubscriber(actorRef))
+
+  def removeSubscriber(actorRef: ActorRef[CommandResponse]): CommandResponseManagerState = {
+    def remove(ids: List[Id], commandResponseManagerState: CommandResponseManagerState): CommandResponseManagerState = {
+      ids match {
+        case Nil                ⇒ commandResponseManagerState
+        case id :: remainingIds ⇒ remove(remainingIds, unSubscribe(id, actorRef))
+      }
+    }
+    remove(cmdToCmdStatus.keys.toList, this)
+  }
 
   private def update(runId: Id, f: CommandState ⇒ CommandState): CommandResponseManagerState =
     cmdToCmdStatus.get(runId) match {

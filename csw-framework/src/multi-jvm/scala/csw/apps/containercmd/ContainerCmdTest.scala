@@ -3,10 +3,10 @@ package csw.apps.containercmd
 import java.io.FileWriter
 import java.nio.file.{Files, Path, Paths}
 
-import akka.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.typed.testkit.TestKitSettings
-import akka.typed.testkit.scaladsl.TestProbe
-import akka.typed.{ActorRef, ActorSystem}
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.testkit.typed.TestKitSettings
+import akka.testkit.typed.scaladsl.TestProbe
+import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.common.FrameworkAssertions._
@@ -124,14 +124,14 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]
 
       containerRef ! GetComponents(componentsProbe.ref)
-      val laserContainerComponents = componentsProbe.expectMsgType[Components].components
+      val laserContainerComponents = componentsProbe.expectMessageType[Components].components
       laserContainerComponents.size shouldBe 3
 
       // check that all the components within supervisor moves to Running lifecycle state
       laserContainerComponents
         .foreach { component ⇒
           component.supervisor ! GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref)
-          supervisorLifecycleStateProbe.expectMsg(SupervisorLifecycleState.Running)
+          supervisorLifecycleStateProbe.expectMessage(SupervisorLifecycleState.Running)
         }
       enterBarrier("running")
 
@@ -159,13 +159,13 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
 
       etonCommandService.submit(setupFailure).map { commandResponse ⇒
         commandResponse shouldBe Invalid
-        eatonCompStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(commandValidationChoice))))
+        eatonCompStateProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(commandValidationChoice))))
       }
 
       etonCommandService.oneway(setupSuccess).map { _ ⇒
-        eatonCompStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(commandValidationChoice))))
-        eatonCompStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(oneWayCommandChoice))))
-        eatonCompStateProbe.expectMsg(CurrentState(successPrefix, Set(choiceKey.set(setupConfigChoice), param)))
+        eatonCompStateProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(commandValidationChoice))))
+        eatonCompStateProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(oneWayCommandChoice))))
+        eatonCompStateProbe.expectMessage(CurrentState(successPrefix, Set(choiceKey.set(setupConfigChoice), param)))
       }
 
       etonSupervisorTypedRef ! Lifecycle(GoOffline)
@@ -179,7 +179,7 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       // DEOPSCSW-218: Discover component connection information using Akka protocol
       // Laser assembly is tracking Eton Hcd which is running on member2 (different jvm than this)
       // When Eton Hcd shutdowns, laser assembly receives LocationRemoved event
-      laserCompStateProbe.expectMsg(10.seconds, CurrentState(prefix, Set(choiceKey.set(akkaLocationRemovedChoice))))
+      laserCompStateProbe.expectMessage(10.seconds, CurrentState(prefix, Set(choiceKey.set(akkaLocationRemovedChoice))))
     }
 
     runOn(member2) {
@@ -202,7 +202,7 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       enterBarrier("offline")
       Thread.sleep(50)
       supervisorRef ! GetSupervisorLifecycleState(testProbe.ref)
-      testProbe.expectMsg(SupervisorLifecycleState.RunningOffline)
+      testProbe.expectMessage(SupervisorLifecycleState.RunningOffline)
 
       enterBarrier("before-shutdown")
       supervisorRef ! Shutdown

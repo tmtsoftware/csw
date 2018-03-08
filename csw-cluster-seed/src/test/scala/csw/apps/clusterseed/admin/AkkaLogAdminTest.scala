@@ -4,10 +4,10 @@ import akka.actor
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpMethods, HttpRequest, StatusCodes, Uri}
 import akka.http.scaladsl.unmarshalling.Unmarshal
-import akka.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.typed.testkit.TestKitSettings
-import akka.typed.testkit.scaladsl.TestProbe
-import akka.typed.{ActorRef, ActorSystem}
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.testkit.typed.TestKitSettings
+import akka.testkit.typed.scaladsl.TestProbe
+import akka.actor.typed.{ActorRef, ActorSystem}
 import com.typesafe.config.ConfigFactory
 import csw.apps.clusterseed.admin.http.HttpSupport
 import csw.apps.clusterseed.admin.internal.AdminWiring
@@ -96,7 +96,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
   def extractComponentsFromContainer(containerRef: ActorRef[ContainerMessage]): Unit = {
     val probe = TestProbe[Components]
     containerRef ! GetComponents(probe.ref)
-    val components = probe.expectMsgType[Components].components
+    val components = probe.expectMessageType[Components].components
 
     laserComponent = components.find(x ⇒ x.info.name.equals("Laser")).get
     galilComponent = components.find(x ⇒ x.info.name.equals("Galil")).get

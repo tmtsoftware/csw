@@ -1,11 +1,11 @@
 package csw.services.integtration.tests
 
 import akka.actor.{ActorSystem, Props, Scheduler}
-import akka.typed
-import akka.typed.Behavior
-import akka.typed.scaladsl.adapter._
-import akka.typed.testkit.TestKitSettings
-import akka.typed.testkit.scaladsl.TestProbe
+import akka.actor.typed
+import akka.actor.typed.Behavior
+import akka.actor.typed.scaladsl.adapter._
+import akka.testkit.typed.TestKitSettings
+import akka.testkit.typed.scaladsl.TestProbe
 import akka.util.Timeout
 import csw.messages.CommandMessage.Submit
 import csw.messages.ccs.commands.{CommandName, Setup}

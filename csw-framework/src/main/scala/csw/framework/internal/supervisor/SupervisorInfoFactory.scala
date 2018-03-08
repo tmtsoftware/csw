@@ -1,6 +1,6 @@
 package csw.framework.internal.supervisor
 
-import akka.typed.ActorRef
+import akka.actor.typed.ActorRef
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.internal.wiring.CswFrameworkSystem
 import csw.messages.ContainerIdleMessage

@@ -4,8 +4,8 @@ import acyclic.skipped
 import akka.actor
 import akka.actor.{ActorPath, ActorRef}
 import akka.serialization.Serialization
-import akka.typed.scaladsl.ActorContext
-import akka.typed.scaladsl.adapter.TypedActorRefOps
+import akka.actor.typed.scaladsl.ActorContext
+import akka.actor.typed.scaladsl.adapter.TypedActorRefOps
 import csw.services.logging.javadsl.JLoggerFactory
 
 //TODO: explain better significance

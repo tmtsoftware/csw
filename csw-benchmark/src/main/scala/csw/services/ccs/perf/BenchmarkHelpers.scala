@@ -1,11 +1,11 @@
 package csw.services.ccs.perf
 
 import akka.actor.ActorSystem
-import akka.typed
-import akka.typed.ActorRef
-import akka.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.typed.testkit.TestKitSettings
-import akka.typed.testkit.scaladsl.TestProbe
+import akka.actor.typed
+import akka.actor.typed.ActorRef
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.testkit.typed.TestKitSettings
+import akka.testkit.typed.scaladsl.TestProbe
 import com.typesafe.config.Config
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.messages.ComponentCommonMessage.GetSupervisorLifecycleState
@@ -47,7 +47,7 @@ object BenchmarkHelpers {
   ): Unit = {
     def getContainerLifecycleState: ContainerLifecycleState = {
       containerRef ! GetContainerLifecycleState(probe.ref)
-      probe.expectMsgType[ContainerLifecycleState]
+      probe.expectMessageType[ContainerLifecycleState]
     }
 
     assert(
@@ -63,7 +63,7 @@ object BenchmarkHelpers {
   ): Unit = {
     def getSupervisorLifecycleState: SupervisorLifecycleState = {
       actorRef ! GetSupervisorLifecycleState(probe.ref)
-      probe.expectMsgType[SupervisorLifecycleState]
+      probe.expectMessageType[SupervisorLifecycleState]
     }
 
     assert(

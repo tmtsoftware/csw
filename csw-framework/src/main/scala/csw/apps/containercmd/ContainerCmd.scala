@@ -4,7 +4,7 @@ import java.nio.file.Path
 
 import akka.actor.ActorSystem
 import akka.actor.CoordinatedShutdown.Reason
-import akka.typed.ActorRef
+import akka.actor.typed.ActorRef
 import com.typesafe.config.Config
 import csw.apps.containercmd.cli.{ArgsParser, Options}
 import csw.exceptions.{ClusterSeedsNotFound, UnableToParseOptions}

@@ -4,9 +4,9 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Paths}
 
 import akka.stream.ActorMaterializer
-import akka.typed.ActorRef
-import akka.typed.scaladsl.ActorContext
-import akka.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.actor.typed.ActorRef
+import akka.actor.typed.scaladsl.ActorContext
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.util.Timeout
 import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
 import csw.messages.TopLevelActorMessage

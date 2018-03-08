@@ -1,7 +1,7 @@
 package csw.framework.components.hcd;
 
-import akka.typed.ActorRef;
-import akka.typed.javadsl.ActorContext;
+import akka.actor.typed.ActorRef;
+import akka.actor.typed.javadsl.ActorContext;
 import csw.framework.javadsl.JComponentBehaviorFactory;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.scaladsl.CurrentStatePublisher;

@@ -1,8 +1,8 @@
 package tmt.shared.engine
 
-import akka.typed.scaladsl.Actor.MutableBehavior
-import akka.typed.scaladsl.{Actor, ActorContext}
-import akka.typed.{ActorRef, Behavior}
+import akka.actor.typed.scaladsl.Behaviors.MutableBehavior
+import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
+import akka.actor.typed.{ActorRef, Behavior}
 import csw.messages.ccs.commands.ControlCommand
 import tmt.shared.engine.EngineBehavior._
 
@@ -50,5 +50,5 @@ object EngineBehavior {
   case object Resume                                 extends EngineAction
   case object Reset                                  extends EngineAction
 
-  def behavior: Behavior[EngineAction] = Actor.mutable(ctx => new EngineBehavior(ctx))
+  def behavior: Behavior[EngineAction] = Behaviors.mutable(ctx => new EngineBehavior(ctx))
 }

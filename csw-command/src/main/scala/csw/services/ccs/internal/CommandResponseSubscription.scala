@@ -2,8 +2,8 @@ package csw.services.ccs.internal
 
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.{KillSwitches, Materializer, OverflowStrategy}
-import akka.typed.ActorRef
-import akka.typed.scaladsl.adapter._
+import akka.actor.typed.ActorRef
+import akka.actor.typed.scaladsl.adapter._
 import csw.messages.CommandResponseManagerMessage
 import csw.messages.CommandResponseManagerMessage.Subscribe
 import csw.messages.ccs.commands.CommandResponse

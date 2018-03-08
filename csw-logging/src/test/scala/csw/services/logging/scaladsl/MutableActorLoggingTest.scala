@@ -1,7 +1,7 @@
 package csw.services.logging.scaladsl
 
-import akka.typed.Behavior
-import akka.typed.scaladsl.{Actor, ActorContext}
+import akka.actor.typed.Behavior
+import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import csw.services.logging.LogCommand
 import csw.services.logging.internal.LoggingLevels
 import csw.services.logging.internal.LoggingLevels.Level
@@ -10,13 +10,13 @@ import csw.services.logging.utils.LoggingTestSuite
 
 object TromboneMutableActor {
   def beh(componentName: String): Behavior[LogCommand] =
-    Actor.mutable(ctx ⇒ new TromboneMutableActor(ctx, new LoggerFactory(componentName)))
+    Behaviors.mutable[LogCommand](ctx ⇒ new TromboneMutableActor(ctx, new LoggerFactory(componentName)))
 }
 
 class TromboneMutableActor(
     ctx: ActorContext[LogCommand],
     loggerFactory: LoggerFactory
-) extends Actor.MutableBehavior[LogCommand] {
+) extends Behaviors.MutableBehavior[LogCommand] {
   override def onMessage(msg: LogCommand): Behavior[LogCommand] = {
 
     val log: Logger = loggerFactory.getLogger(ctx)
@@ -36,7 +36,7 @@ class TromboneMutableActor(
 
 // DEOPSCSW-280 SPIKE: Introduce Akkatyped in logging
 class MutableActorLoggingTest extends LoggingTestSuite {
-  import akka.typed.scaladsl.adapter._
+  import akka.actor.typed.scaladsl.adapter._
 
   private val tromboneActorRef =
     actorSystem.spawn(TromboneMutableActor.beh("tromboneMutableHcdActor"), "TromboneMutableActor")

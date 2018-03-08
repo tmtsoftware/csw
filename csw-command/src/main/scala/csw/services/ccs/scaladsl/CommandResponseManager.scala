@@ -5,9 +5,9 @@ import java.util.function.Consumer
 
 import akka.actor.Scheduler
 import akka.stream.{ActorMaterializer, Materializer}
-import akka.typed.scaladsl.AskPattern._
-import akka.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.typed.{ActorRef, ActorSystem}
+import akka.actor.typed.scaladsl.AskPattern._
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import csw.messages.CommandResponseManagerMessage
 import csw.messages.CommandResponseManagerMessage._

@@ -1,6 +1,6 @@
 package csw.common.components.command
 
-import akka.typed.scaladsl.ActorContext
+import akka.actor.typed.scaladsl.ActorContext
 import csw.common.components.command.ComponentStateForCommand._
 import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
 import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand

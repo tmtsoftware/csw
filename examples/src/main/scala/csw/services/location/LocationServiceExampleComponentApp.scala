@@ -4,9 +4,9 @@ import java.net.InetAddress
 
 import akka.actor._
 import akka.stream.ActorMaterializer
-import akka.typed
-import akka.typed.Behavior
-import akka.typed.scaladsl.adapter._
+import akka.actor.typed
+import akka.actor.typed.Behavior
+import akka.actor.typed.scaladsl.adapter._
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.services.location.commons.ActorSystemFactory

@@ -3,8 +3,8 @@ package csw.services.location
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
-import akka.typed.Behavior
-import akka.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.actor.typed.Behavior
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location._
 import csw.services.location.commons.RegistrationFactory

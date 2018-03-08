@@ -1,6 +1,6 @@
 package csw.framework.scaladsl
 
-import akka.typed.ActorRef
+import akka.actor.typed.ActorRef
 import csw.messages.models.PubSub.{Publish, PublisherMessage}
 import csw.messages.params.states.CurrentState
 

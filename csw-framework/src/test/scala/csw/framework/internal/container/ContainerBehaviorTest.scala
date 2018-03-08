@@ -1,16 +1,16 @@
 package csw.framework.internal.container
 
-import akka.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.typed.testkit.scaladsl.TestProbe
-import akka.typed.testkit.{StubbedActorContext, TestKitSettings}
-import akka.typed.{ActorRef, ActorSystem}
+import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.actor.typed.{ActorRef, ActorSystem}
+import akka.testkit.typed.TestKitSettings
+import akka.testkit.typed.scaladsl.Effects.Watched
+import akka.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
 import akka.{actor, Done}
 import csw.framework.ComponentInfos._
 import csw.framework.FrameworkTestMocks
-import csw.framework.internal.pubsub.PubSubBehaviorFactory
-import csw.framework.internal.supervisor.{SupervisorBehaviorFactory, SupervisorInfoFactory}
-import csw.framework.scaladsl.ComponentBehaviorFactory
-import csw.messages.ContainerCommonMessage.GetComponents
+import csw.framework.internal.supervisor.SupervisorInfoFactory
+import csw.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.messages.ContainerIdleMessage.SupervisorsCreated
 import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.messages.RunningMessage.Lifecycle
@@ -20,7 +20,6 @@ import csw.messages.framework.{ComponentInfo, ContainerLifecycleState, Superviso
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.models.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.messages.models.{Component, Components, SupervisorInfo}
-import csw.services.ccs.internal.CommandResponseManagerFactory
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
@@ -43,49 +42,34 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
   private val mocks                              = new FrameworkTestMocks()
 
   class IdleContainer() {
-    val ctx                                                                  = new StubbedActorContext[ContainerMessage]("test-container", 100, typedSystem)
-    val supervisorFactory: SupervisorInfoFactory                             = mock[SupervisorInfoFactory]
-    private val testActor: ActorRef[Any]                                     = TestProbe("test-probe").testActor
-    val akkaRegistration                                                     = AkkaRegistration(mock[AkkaConnection], Some("nfiraos.ncc.trombone"), testActor, testActor)
-    val locationService: LocationService                                     = mock[LocationService]
-    val registrationResult: RegistrationResult                               = mock[RegistrationResult]
-    private val pubSubBehaviorFactory: PubSubBehaviorFactory                 = mock[PubSubBehaviorFactory]
-    private val commandResponseManagerFactory: CommandResponseManagerFactory = mock[CommandResponseManagerFactory]
-    var supervisorInfos: Set[SupervisorInfo]                                 = Set.empty
-    val answer = new Answer[Future[Option[SupervisorInfo]]] {
-      override def answer(invocation: InvocationOnMock): Future[Option[SupervisorInfo]] = {
-        val componentInfo        = invocation.getArgument[ComponentInfo](1)
-        val componentWiringClass = Class.forName(componentInfo.behaviorFactoryClassName)
-        val componentBehaviorFactory =
-          componentWiringClass.getDeclaredConstructor().newInstance().asInstanceOf[ComponentBehaviorFactory]
+    private val testActor: ActorRef[Any]                  = TestProbe("test-probe").ref
+    val akkaRegistration                                  = AkkaRegistration(mock[AkkaConnection], Some("nfiraos.ncc.trombone"), testActor, testActor)
+    val locationService: LocationService                  = mock[LocationService]
+    val registrationResult: RegistrationResult            = mock[RegistrationResult]
+    var supervisorInfos: Set[SupervisorInfo]              = Set.empty
+    var componentProbes: Set[TestProbe[ComponentMessage]] = Set.empty
+    val supervisorInfoFactory: SupervisorInfoFactory      = mock[SupervisorInfoFactory]
 
-        val supervisorBehaviorFactory = SupervisorBehaviorFactory.make(
-          Some(ctx.self),
-          componentInfo,
-          locationService,
-          registrationFactory,
-          pubSubBehaviorFactory,
-          componentBehaviorFactory,
-          commandResponseManagerFactory,
-          mocks.loggerFactory
-        )
+    lazy val answer = new Answer[Future[Option[SupervisorInfo]]] {
+      override def answer(invocation: InvocationOnMock): Future[Option[SupervisorInfo]] = {
+        val componentInfo = invocation.getArgument[ComponentInfo](1)
+
+        val componentProbe: TestProbe[ComponentMessage] = TestProbe(componentInfo.name)
         val supervisorInfo = SupervisorInfo(
           untypedSystem,
           Component(
-            ctx.spawn(
-              supervisorBehaviorFactory,
-              componentInfo.name
-            ),
+            componentProbe.ref,
             componentInfo
           )
         )
         supervisorInfos += supervisorInfo
+        componentProbes += componentProbe
         Future.successful(Some(supervisorInfo))
       }
     }
 
     when(
-      supervisorFactory
+      supervisorInfoFactory
         .make(
           any[ActorRef[ContainerIdleMessage]],
           any[ComponentInfo],
@@ -105,128 +89,135 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     when(locationService.register(akkaRegistration)).thenReturn(eventualRegistrationResult)
     when(registrationResult.unregister()).thenReturn(eventualDone)
 
-    val containerBehavior =
-      new ContainerBehavior(ctx, containerInfo, supervisorFactory, registrationFactory, locationService, mocks.loggerFactory)
+//    val containerBehavior =
+//      new ContainerBehavior(ctx, containerInfo, supervisorFactory, registrationFactory, locationService, mocks.loggerFactory)
+
+    val containerBehaviorTestkit: BehaviorTestKit[ContainerMessage] = BehaviorTestKit(
+      Behaviors.mutable(
+        ctx ⇒
+          new ContainerBehavior(
+            ctx,
+            containerInfo,
+            supervisorInfoFactory,
+            registrationFactory,
+            locationService,
+            mocks.loggerFactory
+        )
+      )
+    )
   }
 
   class RunningContainer() extends IdleContainer {
-    containerBehavior.onMessage(SupervisorsCreated(supervisorInfos))
-    ctx.children.map(
-      child ⇒ containerBehavior.onMessage(SupervisorLifecycleStateChanged(child.upcast, SupervisorLifecycleState.Running))
+    containerBehaviorTestkit.run(SupervisorsCreated(supervisorInfos))
+    val components = Components(supervisorInfos.map(_.component))
+    components.components.foreach(
+      component ⇒
+        containerBehaviorTestkit.run(SupervisorLifecycleStateChanged(component.supervisor, SupervisorLifecycleState.Running))
     )
-
-    ctx.children
-      .map(child ⇒ ctx.childInbox(child.upcast))
-      .map(_.receiveAll())
-  }
-
-  test("should start in initialize lifecycle state and should not accept any outside messages") {
-    val idleContainer = new IdleContainer
-    import idleContainer._
-
-    verify(locationService).register(akkaRegistration)
-    containerBehavior.lifecycleState shouldBe ContainerLifecycleState.Idle
   }
 
   test("should change its lifecycle state to running after all components move to running lifecycle state") {
     val idleContainer = new IdleContainer
     import idleContainer._
-
     verify(locationService).register(akkaRegistration)
-    // supervisor per component
-    ctx.children.size shouldBe containerInfo.components.size
-    ctx.selfInbox.receiveMsg() shouldBe a[SupervisorsCreated]
-    containerBehavior.onMessage(SupervisorsCreated(supervisorInfos))
-    containerBehavior.supervisors.size shouldBe 2
-    containerBehavior.supervisors.map(_.component.info) shouldBe containerInfo.components
+
+    val getComponentsProbe           = TestProbe[Components]
+    val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]
+
+    containerBehaviorTestkit.run(GetComponents(getComponentsProbe.ref))
+    getComponentsProbe.expectMessageType[Components]
+
+    // verify that given components in ContainerInfo are created
+    containerBehaviorTestkit.selfInbox().receiveMessage() shouldBe a[SupervisorsCreated]
+
+    containerBehaviorTestkit.run(SupervisorsCreated(supervisorInfos))
+
+    containerBehaviorTestkit.run(GetComponents(getComponentsProbe.ref))
+    val components = Components(supervisorInfos.map(_.component))
+    getComponentsProbe.expectMessage(components)
+
+    // verify that created components are watched by the container
+    containerBehaviorTestkit
+      .retrieveAllEffects() shouldBe components.components.map(component ⇒ Watched(component.supervisor)).toList
 
     // simulate that container receives LifecycleStateChanged to Running message from all components
-    ctx.children.map(
-      child ⇒ containerBehavior.onMessage(SupervisorLifecycleStateChanged(child.upcast, SupervisorLifecycleState.Running))
+    components.components.foreach(
+      component ⇒
+        containerBehaviorTestkit.run(SupervisorLifecycleStateChanged(component.supervisor, SupervisorLifecycleState.Running))
     )
 
-    verify(locationService).register(akkaRegistration)
-    containerBehavior.lifecycleState shouldBe ContainerLifecycleState.Running
+    // verify that Container changes its state to Running after all component supervisors change their state to Running
+    containerBehaviorTestkit.run(GetContainerLifecycleState(containerLifecycleStateProbe.ref))
+    containerLifecycleStateProbe.expectMessage(ContainerLifecycleState.Running)
   }
 
-  test("should handle restart message by changing its lifecycle state to initialize") {
+  test("should handle restart message by changing its lifecycle state to Idle") {
     val runningContainer = new RunningContainer
     import runningContainer._
+    val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]
 
-    containerBehavior.onMessage(Restart)
-    containerBehavior.runningComponents shouldBe Set.empty
-    containerBehavior.lifecycleState shouldBe ContainerLifecycleState.Idle
+    // verify that Container is in Running state before sending Restart
+    containerBehaviorTestkit.run(GetContainerLifecycleState(containerLifecycleStateProbe.ref))
+    containerLifecycleStateProbe.expectMessage(ContainerLifecycleState.Running)
 
-    containerInfo.components.toList
-      .map(component ⇒ ctx.childInbox[ComponentMessage](component.name))
-      .map(_.receiveMsg()) should contain only Restart
+    containerBehaviorTestkit.run(Restart)
+
+    // verify that Container changes its state to Idle after Restart
+    containerBehaviorTestkit.run(GetContainerLifecycleState(containerLifecycleStateProbe.ref))
+    containerLifecycleStateProbe.expectMessage(ContainerLifecycleState.Idle)
+
+    // verify that Container sends Restart message to all component supervisors
+    componentProbes.map(_.expectMessage(Restart))
   }
 
-  test("should change its lifecycle state from restarting to running after all components have restarted") {
+  test("should change its lifecycle state from Idle to Running after all components have restarted") {
     val runningContainer = new RunningContainer
     import runningContainer._
+    val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]
 
-    containerBehavior.onMessage(Restart)
+    containerBehaviorTestkit.run(Restart)
 
-    containerInfo.components.toList
-      .map(component ⇒ ctx.childInbox(component.name))
-      .map(_.receiveAll())
+    // verify that Container changes its state to Idle after Restart
+    containerBehaviorTestkit.run(GetContainerLifecycleState(containerLifecycleStateProbe.ref))
+    containerLifecycleStateProbe.expectMessage(ContainerLifecycleState.Idle)
 
-    ctx.children.map(
-      child ⇒ containerBehavior.onMessage(SupervisorLifecycleStateChanged(child.upcast, SupervisorLifecycleState.Running))
+    // simulate that container receives LifecycleStateChanged to Running message from all components
+    components.components.foreach(
+      component ⇒
+        containerBehaviorTestkit.run(SupervisorLifecycleStateChanged(component.supervisor, SupervisorLifecycleState.Running))
     )
 
-    containerBehavior.lifecycleState shouldBe ContainerLifecycleState.Running
+    // verify that Container changes its state to Running after all component supervisors change their state to Running
+    containerBehaviorTestkit.run(GetContainerLifecycleState(containerLifecycleStateProbe.ref))
+    containerLifecycleStateProbe.expectMessage(ContainerLifecycleState.Running)
+
   }
 
   test("should handle GoOnline and GoOffline Lifecycle messages by forwarding to all components") {
     val runningContainer = new RunningContainer
     import runningContainer._
+    val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]
 
-    val initialLifecycleState = containerBehavior.lifecycleState
+    containerBehaviorTestkit.run(GetContainerLifecycleState(containerLifecycleStateProbe.ref))
+    val initialLifecycleState = containerLifecycleStateProbe.expectMessageType[ContainerLifecycleState]
 
-    containerBehavior.onMessage(Lifecycle(GoOnline))
-    containerInfo.components.toList
-      .map(component ⇒ ctx.childInbox[ComponentMessage](component.name))
-      .map(_.receiveMsg()) should contain only Lifecycle(GoOnline)
+    containerBehaviorTestkit.run(Lifecycle(GoOnline))
 
-    initialLifecycleState shouldBe containerBehavior.lifecycleState
+    // verify that Container sends GoOnline message to all component supervisors
+    componentProbes.map(_.expectMessage(Lifecycle(GoOnline)))
 
-    containerBehavior.onMessage(Lifecycle(GoOffline))
-    containerInfo.components.toList
-      .map(component ⇒ ctx.childInbox[ComponentMessage](component.name))
-      .map(_.receiveMsg()) should contain only Lifecycle(GoOffline)
+    // verify that Container LifecycleState does not change on receiving GoOnline message
+    containerBehaviorTestkit.run(GetContainerLifecycleState(containerLifecycleStateProbe.ref))
+    val newLifecycleState = containerLifecycleStateProbe.expectMessage(initialLifecycleState)
 
-    initialLifecycleState shouldBe containerBehavior.lifecycleState
-  }
+    containerBehaviorTestkit.run(Lifecycle(GoOffline))
 
-  test("container should be able to handle GetAllComponents message by responding with list of all components") {
-    val idleContainer = new IdleContainer
-    import idleContainer._
+    // verify that Container sends GoOffline message to all component supervisors
+    componentProbes.map(_.expectMessage(Lifecycle(GoOffline)))
 
-    verify(locationService).register(akkaRegistration)
-    // Container should handle GetComponents message in Idle lifecycle state
-    containerBehavior.lifecycleState shouldBe ContainerLifecycleState.Idle
-    val probe = TestProbe[Components]
+    // verify that Container LifecycleState does not change on receiving GoOffline message
+    containerBehaviorTestkit.run(GetContainerLifecycleState(containerLifecycleStateProbe.ref))
+    containerLifecycleStateProbe.expectMessage(newLifecycleState)
 
-    containerBehavior.onMessage(GetComponents(probe.ref))
-
-    probe.expectMsg(Components(containerBehavior.supervisors.map(_.component)))
-
-    // Container should handle GetComponents message in Running lifecycle state
-    containerBehavior.onMessage(SupervisorsCreated(supervisorInfos))
-    ctx.children.map(
-      child ⇒ containerBehavior.onMessage(SupervisorLifecycleStateChanged(child.upcast, SupervisorLifecycleState.Running))
-    )
-
-    ctx.children
-      .map(child ⇒ ctx.childInbox(child.upcast))
-      .map(_.receiveAll())
-
-    containerBehavior.lifecycleState shouldBe ContainerLifecycleState.Running
-
-    containerBehavior.onMessage(GetComponents(probe.ref))
-
-    probe.expectMsg(Components(containerBehavior.supervisors.map(_.component)))
   }
 }

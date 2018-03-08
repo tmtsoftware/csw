@@ -53,13 +53,13 @@ object Chill {
 }
 
 object Akka {
-  val Version                   = "2.5.8" //all akka is Apache License 2.0
+  val Version                   = "2.5.11" //all akka is Apache License 2.0
   val `akka-stream`             = "com.typesafe.akka" %% "akka-stream" % Version
   val `akka-remote`             = "com.typesafe.akka" %% "akka-remote" % Version
   val `akka-stream-testkit`     = "com.typesafe.akka" %% "akka-stream-testkit" % Version
   val `akka-actor`              = "com.typesafe.akka" %% "akka-actor" % Version
-  val `akka-typed`              = "com.typesafe.akka" %% "akka-typed" % Version
-  val `akka-typed-testkit`      = "com.typesafe.akka" %% "akka-typed-testkit" % Version
+  val `akka-actor-typed`        = "com.typesafe.akka" %% "akka-actor-typed" % Version
+  val `akka-testkit-typed`      = "com.typesafe.akka" %% "akka-testkit-typed" % Version
   val `akka-distributed-data`   = "com.typesafe.akka" %% "akka-distributed-data" % Version
   val `akka-multi-node-testkit` = "com.typesafe.akka" %% "akka-multi-node-testkit" % Version
   val `akka-cluster-tools`      = "com.typesafe.akka" %% "akka-cluster-tools" % Version

@@ -3,9 +3,9 @@ package csw.framework.internal.supervisor
 import akka.Done
 import akka.actor.CoordinatedShutdown
 import akka.actor.CoordinatedShutdown.Reason
-import akka.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.typed.scaladsl.{Actor, ActorContext, TimerScheduler}
-import akka.typed.{ActorRef, Behavior, PostStop, Signal, SupervisorStrategy, Terminated}
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.actor.typed.scaladsl.{ActorContext, Behaviors, TimerScheduler}
+import akka.actor.typed.{ActorRef, Behavior, PostStop, Signal, SupervisorStrategy, Terminated}
 import csw.exceptions.{FailureRestart, InitializationFailed}
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.scaladsl.{ComponentBehaviorFactory, CurrentStatePublisher}
@@ -82,7 +82,7 @@ class SupervisorBehavior private[framework] (
     registrationFactory: RegistrationFactory,
     locationService: LocationService,
     loggerFactory: LoggerFactory
-) extends Actor.MutableBehavior[SupervisorMessage] {
+) extends Behaviors.MutableBehavior[SupervisorMessage] {
 
   import SupervisorBehavior._
   import ctx.executionContext
@@ -130,7 +130,7 @@ class SupervisorBehavior private[framework] (
   }
 
   /**
-   * Defines processing for a [[akka.typed.Signal]] received by the actor instance.
+   * Defines processing for a [[akka.actor.typed.Signal]] received by the actor instance.
    * @return        The existing behavior
    */
   override def onSignal: PartialFunction[Signal, Behavior[SupervisorMessage]] = {
@@ -309,7 +309,7 @@ class SupervisorBehavior private[framework] (
   }
 
   private def createTLA(): ActorRef[Nothing] = {
-    val behavior = Actor
+    val behavior = Behaviors
       .supervise[Nothing](
         componentBehaviorFactory
           .make(componentInfo,
@@ -327,13 +327,18 @@ class SupervisorBehavior private[framework] (
   private def coordinatedShutdown(reason: Reason): Future[Done] = CoordinatedShutdown(ctx.system.toUntyped).run(reason)
 
   private def makePubSubComponent(): ActorRef[PubSub[CurrentState]] =
-    pubSubBehaviorFactory.make(ctx, PubSubComponentActor, loggerFactory)
+    ctx.spawn(pubSubBehaviorFactory.make[CurrentState](PubSubComponentActor, loggerFactory),
+              SupervisorBehavior.PubSubComponentActor)
 
   private def makePubSubLifecycle(): ActorRef[PubSub[LifecycleStateChanged]] =
-    pubSubBehaviorFactory.make(ctx, PubSubLifecycleActor, loggerFactory)
+    ctx.spawn(pubSubBehaviorFactory.make[LifecycleStateChanged](PubSubComponentActor, loggerFactory),
+              SupervisorBehavior.PubSubLifecycleActor)
 
-  private def makeCommandResponseManager() =
-    commandResponseManagerFactory.make(ctx, CommandResponseManagerActorName, loggerFactory)
+  private def makeCommandResponseManager() = {
+    val commandResponseManagerActor =
+      ctx.spawn(commandResponseManagerFactory.makeBehavior(loggerFactory), CommandResponseManagerActorName)
+    commandResponseManagerFactory.make(ctx, commandResponseManagerActor)
+  }
 
   private def ignore(message: SupervisorMessage): Unit =
     log.error(s"Unexpected message :[$message] received by supervisor in lifecycle state :[$lifecycleState]")

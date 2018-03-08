@@ -2,7 +2,7 @@ package csw.services.location.commons
 
 import java.net.URI
 
-import akka.typed.ActorRef
+import akka.actor.typed.ActorRef
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location.{AkkaLocation, HttpLocation, TcpLocation}
 

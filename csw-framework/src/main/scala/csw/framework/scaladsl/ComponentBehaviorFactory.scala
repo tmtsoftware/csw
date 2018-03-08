@@ -1,7 +1,7 @@
 package csw.framework.scaladsl
 
-import akka.typed.scaladsl.{Actor, ActorContext}
-import akka.typed.{ActorRef, Behavior}
+import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
+import akka.actor.typed.{ActorRef, Behavior}
 import csw.framework.internal.component.ComponentBehavior
 import csw.messages.framework.ComponentInfo
 import csw.messages.{FromComponentLifecycleMessage, TopLevelActorMessage}
@@ -33,7 +33,7 @@ abstract class ComponentBehaviorFactory {
   ): ComponentHandlers
 
   /**
-   * Creates the [[akka.typed.scaladsl.Actor.MutableBehavior]] of the component
+   * Creates the [[akka.actor.typed.scaladsl.Behaviors.MutableBehavior]] of the component
    * @param componentInfo            Component related information as described in the configuration file
    * @param supervisor               The actor reference of the supervisor actor which created this component
    * @param currentStatePublisher    The pub sub actor to publish state represented by [[csw.messages.params.states.CurrentState]]
@@ -49,7 +49,7 @@ abstract class ComponentBehaviorFactory {
       locationService: LocationService,
       loggerFactory: LoggerFactory
   ): Behavior[Nothing] =
-    Actor
+    Behaviors
       .mutable[TopLevelActorMessage](
         ctx ⇒
           new ComponentBehavior(

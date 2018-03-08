@@ -1,7 +1,7 @@
 package tmt.shared.dsl
 
 import akka.stream.KillSwitch
-import akka.typed.ActorSystem
+import akka.actor.typed.ActorSystem
 import akka.util.Timeout
 import csw.messages.ccs.CommandIssue
 import csw.messages.ccs.commands.{CommandResponse, ControlCommand}

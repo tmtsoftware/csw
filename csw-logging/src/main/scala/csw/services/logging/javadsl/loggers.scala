@@ -1,11 +1,11 @@
 package csw.services.logging.javadsl
 
 import acyclic.skipped
-import akka.{actor, typed}
-import akka.actor.{ActorPath, ActorRef}
+import akka.actor
+import akka.actor.{typed, ActorPath, ActorRef}
 import akka.serialization.Serialization
-import akka.typed.javadsl.ActorContext
-import akka.typed.scaladsl.adapter.TypedActorRefOps
+import akka.actor.typed.javadsl.ActorContext
+import akka.actor.typed.scaladsl.adapter.TypedActorRefOps
 import csw.services.logging.internal.JLogger
 import csw.services.logging.scaladsl.{Logger, LoggerFactory, LoggerImpl}
 

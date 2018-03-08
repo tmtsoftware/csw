@@ -11,9 +11,9 @@ import akka.stream.KillSwitch;
 import akka.stream.Materializer;
 import akka.stream.javadsl.Keep;
 import akka.stream.javadsl.Sink;
-import akka.typed.Behavior;
-import akka.typed.javadsl.Actor;
-import akka.typed.javadsl.Adapter;
+import akka.actor.typed.Behavior;
+import akka.actor.typed.javadsl.Behaviors;
+import akka.actor.typed.javadsl.Adapter;
 import csw.messages.ComponentMessage;
 import csw.messages.ContainerExternalMessage;
 import csw.messages.location.*;
@@ -91,7 +91,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
         //#Components-Connections-Registrations
 
         // logAdminActorRef handles dynamically setting/getting log level of the component
-        akka.typed.ActorRef<LogControlMessages> logAdminActorRef = LogAdminActorFactory.make(context().system());
+        akka.actor.typed.ActorRef<LogControlMessages> logAdminActorRef = LogAdminActorFactory.make(context().system());
 
         // dummy http connection
         HttpConnection httpConnection = new HttpConnection(new ComponentId("configuration", JComponentType.Service));
@@ -120,10 +120,10 @@ public class JLocationServiceExampleClient extends AbstractActor {
 
         // ************************************************************************************************************
 
-        Behavior<String> behavior = Actor.deferred(ctx -> {
-            return Actor.same();
+        Behavior<String> behavior = Behaviors.setup(ctx -> {
+            return Behaviors.same();
         });
-        akka.typed.ActorRef<String> typedActorRef = Adapter.spawn(context(), behavior, "typed-actor-ref");
+        akka.actor.typed.ActorRef<String> typedActorRef = Adapter.spawn(context(), behavior, "typed-actor-ref");
 
         AkkaConnection assemblyConnection = new AkkaConnection(new ComponentId("assembly1", JComponentType.Assembly));
 
@@ -160,10 +160,10 @@ public class JLocationServiceExampleClient extends AbstractActor {
         findResult.ifPresent(akkaLocation -> {
             //#typed-ref
             // If the component type is HCD or Assembly, use this to get the correct ActorRef
-            akka.typed.ActorRef<ComponentMessage> typedComponentRef = akkaLocation.componentRef();
+            akka.actor.typed.ActorRef<ComponentMessage> typedComponentRef = akkaLocation.componentRef();
 
             // If the component type is Container, use this to get the correct ActorRef
-            akka.typed.ActorRef<ContainerExternalMessage> typedContainerRef = akkaLocation.containerRef();
+            akka.actor.typed.ActorRef<ContainerExternalMessage> typedContainerRef = akkaLocation.containerRef();
             //#typed-ref
         });
         //#resolve

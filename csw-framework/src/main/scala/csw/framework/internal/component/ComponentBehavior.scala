@@ -1,7 +1,7 @@
 package csw.framework.internal.component
 
-import akka.typed.scaladsl.{Actor, ActorContext}
-import akka.typed.{ActorRef, Behavior, PostStop, Signal}
+import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
+import akka.actor.typed.{ActorRef, Behavior, PostStop, Signal}
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
@@ -44,7 +44,7 @@ class ComponentBehavior private[framework] (
     commandResponseManager: CommandResponseManager,
     locationService: LocationService,
     loggerFactory: LoggerFactory
-) extends Actor.MutableBehavior[TopLevelActorMessage] {
+) extends Behaviors.MutableBehavior[TopLevelActorMessage] {
 
   import ctx.executionContext
 
@@ -74,7 +74,7 @@ class ComponentBehavior private[framework] (
   }
 
   /**
-   * Defines processing for a [[akka.typed.Signal]] received by the actor instance.
+   * Defines processing for a [[akka.actor.typed.Signal]] received by the actor instance.
    * @return        The existing behavior
    */
   override def onSignal: PartialFunction[Signal, Behavior[TopLevelActorMessage]] = {

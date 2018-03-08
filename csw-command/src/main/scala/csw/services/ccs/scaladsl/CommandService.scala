@@ -4,9 +4,9 @@ import akka.NotUsed
 import akka.actor.Scheduler
 import akka.stream.scaladsl.Source
 import akka.stream.{ActorMaterializer, Materializer}
-import akka.typed.scaladsl.AskPattern._
-import akka.typed.scaladsl.adapter._
-import akka.typed.{ActorRef, ActorSystem}
+import akka.actor.typed.scaladsl.AskPattern._
+import akka.actor.typed.scaladsl.adapter._
+import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Error}

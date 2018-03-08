@@ -1,6 +1,6 @@
 package csw.services.ccs.perf.component
 
-import akka.typed.scaladsl.ActorContext
+import akka.actor.typed.scaladsl.ActorContext
 import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
 import csw.messages.TopLevelActorMessage
 import csw.messages.ccs.commands.CommandResponse.Completed

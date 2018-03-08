@@ -1,9 +1,9 @@
 package csw.framework.internal.wiring
 
 import akka.actor.CoordinatedShutdown
-import akka.typed.scaladsl.Actor
-import akka.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.typed.{ActorRef, Behavior, Props, Terminated}
+import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.actor.typed.{ActorRef, Behavior, Props, Terminated}
 import csw.messages.models.CoordinatedShutdownReasons.ActorTerminatedReason
 
 /**
@@ -18,7 +18,7 @@ private[framework] object CswFrameworkGuardian {
       extends GuardianMsg
 
   def behavior: Behavior[GuardianMsg] =
-    Actor.immutable[GuardianMsg] {
+    Behaviors.immutable[GuardianMsg] {
       case (ctx, msg) ⇒
         msg match {
           case create: CreateActor[t] =>
@@ -26,10 +26,10 @@ private[framework] object CswFrameworkGuardian {
             ctx.watch(componentRef)
             create.replyTo ! componentRef
         }
-        Actor.same
+        Behaviors.same
     } onSignal {
       case (ctx, Terminated(_)) ⇒
         CoordinatedShutdown(ctx.system.toUntyped).run(ActorTerminatedReason)
-        Actor.stopped
+        Behaviors.stopped
     }
 }

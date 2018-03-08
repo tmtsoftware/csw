@@ -1,14 +1,13 @@
 package csw.services.ccs.internal
 
-import akka.typed.scaladsl.{Actor, ActorContext}
-import akka.typed.{ActorRef, Behavior}
+import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
+import akka.actor.typed.{ActorRef, Behavior}
 import csw.messages.CommandResponseManagerMessage
 import csw.messages.CommandResponseManagerMessage._
 import csw.messages.ccs.commands.CommandResponse.CommandNotAvailable
 import csw.messages.ccs.commands.CommandResultType.{Final, Intermediate}
-import csw.messages.ccs.commands.{CommandResponse, CommandResultType}
+import csw.messages.ccs.commands.{CommandCorrelation, CommandResponse, CommandResponseManagerState, CommandResultType}
 import csw.messages.params.models.Id
-import csw.services.ccs.models.{CommandCorrelation, CommandResponseManagerState}
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
 /**
@@ -22,35 +21,40 @@ import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 class CommandResponseManagerBehavior private[ccs] (
     ctx: ActorContext[CommandResponseManagerMessage],
     loggerFactory: LoggerFactory
-) extends Actor.MutableBehavior[CommandResponseManagerMessage] {
+) extends Behaviors.MutableBehavior[CommandResponseManagerMessage] {
   private val log: Logger = loggerFactory.getLogger(ctx)
 
-  private[ccs] var commandStatus: CommandResponseManagerState = CommandResponseManagerState(Map.empty)
-  private[ccs] var commandCoRelation: CommandCorrelation      = CommandCorrelation(Map.empty, Map.empty)
+  private[ccs] var commandResponseManagerState: CommandResponseManagerState = CommandResponseManagerState(Map.empty)
+  private[ccs] var commandCoRelation: CommandCorrelation                    = CommandCorrelation(Map.empty, Map.empty)
 
   override def onMessage(msg: CommandResponseManagerMessage): Behavior[CommandResponseManagerMessage] = {
     msg match {
       case AddOrUpdateCommand(commandId, cmdStatus)  ⇒ addOrUpdateCommand(commandId, cmdStatus)
       case AddSubCommand(parentRunId, childRunId)    ⇒ commandCoRelation = commandCoRelation.add(parentRunId, childRunId)
       case UpdateSubCommand(subCommandId, cmdStatus) ⇒ updateSubCommand(subCommandId, cmdStatus)
-      case Query(runId, replyTo)                     ⇒ replyTo ! commandStatus.get(runId)
+      case Query(runId, replyTo)                     ⇒ replyTo ! commandResponseManagerState.get(runId)
       case Subscribe(runId, replyTo)                 ⇒ subscribe(runId, replyTo)
-      case Unsubscribe(runId, subscriber)            ⇒ commandStatus = commandStatus.unSubscribe(runId, subscriber)
+      case Unsubscribe(runId, subscriber) ⇒
+        commandResponseManagerState = commandResponseManagerState.unSubscribe(runId, subscriber)
+      case SubscriberTerminated(subscriber) ⇒
+        commandResponseManagerState = commandResponseManagerState.removeSubscriber(subscriber)
+      case GetCommandCorrelation(replyTo)          ⇒ replyTo ! commandCoRelation
+      case GetCommandResponseManagerState(replyTo) ⇒ replyTo ! commandResponseManagerState
     }
     this
   }
 
   private def addOrUpdateCommand(commandId: Id, commandResponse: CommandResponse): Unit =
-    commandStatus.get(commandId) match {
-      case _: CommandNotAvailable ⇒ commandStatus = commandStatus.add(commandId, commandResponse)
+    commandResponseManagerState.get(commandId) match {
+      case _: CommandNotAvailable ⇒ commandResponseManagerState = commandResponseManagerState.add(commandId, commandResponse)
       case _                      ⇒ updateCommand(commandId, commandResponse)
     }
 
   private def updateCommand(commandId: Id, commandResponse: CommandResponse): Unit = {
-    val currentResponse = commandStatus.get(commandId)
+    val currentResponse = commandResponseManagerState.get(commandId)
     if (currentResponse.resultType == CommandResultType.Intermediate && currentResponse != commandResponse) {
-      commandStatus = commandStatus.updateCommandStatus(commandResponse)
-      publishToSubscribers(commandResponse, commandStatus.cmdToCmdStatus(commandResponse.runId).subscribers)
+      commandResponseManagerState = commandResponseManagerState.updateCommandStatus(commandResponse)
+      publishToSubscribers(commandResponse, commandResponseManagerState.cmdToCmdStatus(commandResponse.runId).subscribers)
     }
   }
 
@@ -62,7 +66,7 @@ class CommandResponseManagerBehavior private[ccs] (
   }
 
   private def updateParent(parentRunId: Id, childCommandResponse: CommandResponse): Unit =
-    (commandStatus.get(parentRunId).resultType, childCommandResponse.resultType) match {
+    (commandResponseManagerState.get(parentRunId).resultType, childCommandResponse.resultType) match {
       // If the child command receives a negative result, the result of the parent command need not wait for the
       // result from other sub commands
       case (CommandResultType.Intermediate, CommandResultType.Negative) ⇒
@@ -85,7 +89,8 @@ class CommandResponseManagerBehavior private[ccs] (
 
   private def publishToSubscribers(commandResponse: CommandResponse, subscribers: Set[ActorRef[CommandResponse]]): Unit = {
     commandResponse.resultType match {
-      case _: Final     ⇒ subscribers.foreach(_ ! commandResponse)
+      case _: Final ⇒
+        subscribers.foreach(_ ! commandResponse)
       case Intermediate ⇒
         // Do not send updates for validation response as it is send by the framework
         log.debug("Validation response will not affect status of Parent command.")
@@ -93,8 +98,8 @@ class CommandResponseManagerBehavior private[ccs] (
   }
 
   private def subscribe(runId: Id, replyTo: ActorRef[CommandResponse]): Unit = {
-    ctx.watchWith(replyTo, Unsubscribe(runId, replyTo))
-    commandStatus = commandStatus.subscribe(runId, replyTo)
-    publishToSubscribers(commandStatus.get(runId), Set(replyTo))
+    ctx.watchWith(replyTo, SubscriberTerminated(replyTo))
+    commandResponseManagerState = commandResponseManagerState.subscribe(runId, replyTo)
+    publishToSubscribers(commandResponseManagerState.get(runId), Set(replyTo))
   }
 }

@@ -1,7 +1,7 @@
 package csw.common.components.command
 
 import akka.actor.Scheduler
-import akka.typed.scaladsl.ActorContext
+import akka.actor.typed.scaladsl.ActorContext
 import akka.util.Timeout
 import csw.common.components.command.ComponentStateForCommand.{longRunningCmdCompleted, _}
 import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}

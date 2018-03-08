@@ -2,9 +2,9 @@ package csw.services.integtration.apps
 
 import akka.actor.{Actor, ActorPath, ActorRef, ActorSystem, Props}
 import akka.serialization.Serialization
-import akka.typed
-import akka.typed.Behavior
-import akka.typed.scaladsl.adapter._
+import akka.actor.typed
+import akka.actor.typed.Behavior
+import akka.actor.typed.scaladsl.adapter._
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.services.integtration.common.TestFutureExtension.RichFuture

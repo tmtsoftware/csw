@@ -1,6 +1,6 @@
 package tmt.production.component
 
-import akka.typed.scaladsl.ActorContext
+import akka.actor.typed.scaladsl.ActorContext
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers, CurrentStatePublisher}
 import csw.messages.TopLevelActorMessage
 import csw.messages.framework.ComponentInfo

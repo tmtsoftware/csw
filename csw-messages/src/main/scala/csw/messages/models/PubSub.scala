@@ -1,6 +1,6 @@
 package csw.messages.models
 
-import akka.typed.ActorRef
+import akka.actor.typed.ActorRef
 import csw.messages.TMTSerializable
 
 //TODO: what, why, how

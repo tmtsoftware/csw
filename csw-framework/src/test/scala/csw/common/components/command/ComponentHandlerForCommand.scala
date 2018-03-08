@@ -1,10 +1,10 @@
 package csw.common.components.command
 
 import akka.actor
+import akka.actor.typed.scaladsl.ActorContext
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{ActorMaterializer, ThrottleMode}
-import akka.typed.scaladsl.ActorContext
-import akka.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.util.Timeout
 import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
 import csw.messages._
@@ -18,7 +18,7 @@ import csw.messages.params.models.Id
 import csw.messages.params.states.CurrentState
 import csw.services.ccs.scaladsl.CommandResponseManager
 import csw.services.location.scaladsl.LocationService
-import csw.services.logging.scaladsl.{Logger, LoggerFactory}
+import csw.services.logging.scaladsl.LoggerFactory
 
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{ExecutionContext, Future}
@@ -32,7 +32,6 @@ class ComponentHandlerForCommand(
     loggerFactory: LoggerFactory
 ) extends ComponentHandlers(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, loggerFactory) {
 
-  private val log: Logger = loggerFactory.getLogger(ctx)
   private val cancelCmdId = KeyType.StringKey.make("cancelCmdId")
 
   import ComponentStateForCommand._
@@ -73,10 +72,11 @@ class ComponentHandlerForCommand(
     case _                  ⇒ CommandNotAvailable(controlCommand.runId)
   }
 
-  private def processAcceptedSubmitCmd(controlCommand: ControlCommand): Unit =
+  private def processAcceptedSubmitCmd(controlCommand: ControlCommand): Unit = {
     controlCommand.paramType.get(cancelCmdId).foreach { param ⇒
       processCancelCommand(controlCommand.runId, Id(param.head))
     }
+  }
 
   private def processAcceptedOnewayCmd(controlCommand: ControlCommand): Unit =
     controlCommand.paramType.get(cancelCmdId).foreach(param ⇒ processOriginalCommand(Id(param.head)))
@@ -94,13 +94,13 @@ class ComponentHandlerForCommand(
     commandResponseManager.addOrUpdateCommand(runId, Completed(runId))
   }
 
-  private def processOriginalCommand(cancelId: Id): Unit = {
+  private def processOriginalCommand(runId: Id): Unit = {
     implicit val timeout: Timeout = 5.seconds
 
     // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
-    val eventualResponse: Future[CommandResponse] = commandResponseManager.query(cancelId)
-    eventualResponse.foreach { _ ⇒
-      commandResponseManager.addOrUpdateCommand(cancelId, Cancelled(cancelId))
+    val eventualResponse: Future[CommandResponse] = commandResponseManager.query(runId)
+    eventualResponse.onComplete { x ⇒
+      commandResponseManager.addOrUpdateCommand(runId, Cancelled(runId))
     }
   }
 
