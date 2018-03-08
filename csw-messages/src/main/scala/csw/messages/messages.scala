@@ -10,7 +10,6 @@ import csw.messages.params.states.CurrentState
 
 import scala.concurrent.duration.FiniteDuration
 
-//TODO: explain better significance for each message hierarchy
 sealed trait TopLevelActorMessage
 
 sealed trait TopLevelActorCommonMessage extends TopLevelActorMessage
@@ -112,9 +111,10 @@ object ContainerIdleMessage {
 
 sealed trait FromSupervisorMessage extends ContainerIdleMessage
 object FromSupervisorMessage {
-  case class SupervisorLifecycleStateChanged(supervisor: ActorRef[ComponentMessage],
-                                             supervisorLifecycleState: SupervisorLifecycleState)
-      extends FromSupervisorMessage
+  case class SupervisorLifecycleStateChanged(
+      supervisor: ActorRef[ComponentMessage],
+      supervisorLifecycleState: SupervisorLifecycleState
+  ) extends FromSupervisorMessage
 }
 
 ////////////////
