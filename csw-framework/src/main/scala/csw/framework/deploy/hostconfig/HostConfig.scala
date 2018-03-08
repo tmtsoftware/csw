@@ -10,7 +10,7 @@ import csw.framework.internal.wiring.FrameworkWiring
 import csw.framework.models.ConfigFileLocation.{Local, Remote}
 import csw.framework.models.ContainerMode.{Container, Standalone}
 import csw.framework.models.{ContainerBootstrapInfo, HostBootstrapInfo}
-import csw.messages.models.CoordinatedShutdownReasons.ApplicationFinishedReason
+import csw.messages.commons.CoordinatedShutdownReasons.ApplicationFinishedReason
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 

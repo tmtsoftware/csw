@@ -4,8 +4,7 @@ import akka.typed.ActorRef
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.internal.wiring.CswFrameworkSystem
 import csw.messages.ContainerIdleMessage
-import csw.messages.framework.ComponentInfo
-import csw.messages.models.{Component, SupervisorInfo}
+import csw.messages.framework.{Component, ComponentInfo, SupervisorInfo}
 import csw.services.command.internal.CommandResponseManagerFactory
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}

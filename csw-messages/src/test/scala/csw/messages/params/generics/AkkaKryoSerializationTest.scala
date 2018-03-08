@@ -20,12 +20,11 @@ import csw.messages.commands.CommandResponse._
 import csw.messages.commands.{CommandIssue, _}
 import csw.messages.events.{EventName, EventTime, ObserveEvent, SystemEvent}
 import csw.messages.framework.LocationServiceUsage.DoNotRegister
-import csw.messages.framework.{ComponentInfo, ContainerLifecycleState, SupervisorLifecycleState}
+import csw.messages.framework.PubSub.Subscribe
+import csw.messages.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
+import csw.messages.framework._
 import csw.messages.location.ComponentType.HCD
 import csw.messages.location.Connection
-import csw.messages.models.PubSub.Subscribe
-import csw.messages.models.ToComponentLifecycleMessages.{GoOffline, GoOnline}
-import csw.messages.models.{Component, Components, LifecycleStateChanged}
 import csw.messages.params.generics.KeyType.{ByteArrayKey, ChoiceKey, DoubleMatrixKey, IntKey, StructKey}
 import csw.messages.params.models.Units.{arcmin, coulomb, encoder, joule, lightyear, meter, pascal, NoUnits}
 import csw.messages.params.models._

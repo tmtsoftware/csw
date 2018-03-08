@@ -13,7 +13,7 @@ import csw.messages.TopLevelActorIdleMessage.Initialize
 import csw.messages._
 import csw.messages.commands.CommandResponse.{Accepted, Completed, Error}
 import csw.messages.commands.{CommandName, CommandResponse, Observe, Setup}
-import csw.messages.models.ToComponentLifecycleMessages._
+import csw.messages.framework.ToComponentLifecycleMessages._
 import csw.messages.params.generics.KeyType
 import csw.messages.params.models.{ObsId, Prefix}
 import csw.services.command.scaladsl.CommandResponseManager

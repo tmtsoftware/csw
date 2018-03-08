@@ -7,9 +7,9 @@ import akka.stream.{ActorMaterializer, Materializer}
 import akka.testkit.TestProbe
 import akka.typed.Behavior
 import akka.typed.scaladsl.adapter.UntypedActorSystemOps
+import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location._
-import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.location.commons.{ActorSystemFactory, RegistrationFactory}
 import csw.services.location.exceptions.OtherLocationIsRegistered

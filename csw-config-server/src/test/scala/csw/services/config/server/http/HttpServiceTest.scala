@@ -1,7 +1,7 @@
 package csw.services.config.server.http
 
 import akka.stream.BindFailedException
-import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
+import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.config.server.ServerWiring
 import csw.services.config.server.commons.{ConfigServiceConnection, RegistrationFactory}
 import csw.services.config.server.commons.TestFutureExtension.RichFuture

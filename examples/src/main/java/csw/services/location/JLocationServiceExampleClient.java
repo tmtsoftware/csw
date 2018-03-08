@@ -19,7 +19,7 @@ import csw.messages.ContainerExternalMessage;
 import csw.messages.location.*;
 import csw.messages.location.Connection.AkkaConnection;
 import csw.messages.location.Connection.HttpConnection;
-import csw.messages.models.CoordinatedShutdownReasons;
+import csw.messages.commons.CoordinatedShutdownReasons;
 import csw.services.location.commons.ActorSystemFactory;
 import csw.services.location.javadsl.*;
 import csw.services.location.models.AkkaRegistration;

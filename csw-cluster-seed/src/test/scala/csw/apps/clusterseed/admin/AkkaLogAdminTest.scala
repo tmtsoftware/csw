@@ -19,12 +19,11 @@ import csw.messages.CommandMessage.Oneway
 import csw.messages.ContainerCommonMessage.GetComponents
 import csw.messages.ContainerMessage
 import csw.messages.commands.{CommandName, CommandResponse, Setup}
-import csw.messages.framework.ContainerLifecycleState
+import csw.messages.framework.{Component, Components, ContainerLifecycleState}
 import csw.messages.location.ComponentId
 import csw.messages.location.ComponentType.{Assembly, HCD}
 import csw.messages.location.Connection.AkkaConnection
-import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
-import csw.messages.models.{Component, Components}
+import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.params.models.Prefix
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.logging.internal.LoggingLevels.{ERROR, Level, WARN}

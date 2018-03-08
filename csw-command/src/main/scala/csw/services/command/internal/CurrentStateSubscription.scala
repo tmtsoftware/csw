@@ -5,7 +5,7 @@ import akka.stream.{KillSwitches, Materializer, OverflowStrategy}
 import akka.typed.ActorRef
 import akka.typed.scaladsl.adapter._
 import csw.messages.ComponentCommonMessage.ComponentStateSubscription
-import csw.messages.models.PubSub.Subscribe
+import csw.messages.framework.PubSub.Subscribe
 import csw.messages.params.states.CurrentState
 
 /**

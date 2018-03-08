@@ -1,7 +1,7 @@
 package csw.services.event.internal.kafka
 
 import akka.actor.ActorSystem
-import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
+import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.event.KafkaFactory
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.internal.commons.Wiring

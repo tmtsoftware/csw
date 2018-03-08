@@ -9,7 +9,7 @@ import akka.typed.scaladsl.Actor
 import akka.typed.{ActorRef, Behavior}
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
 import csw.messages.location._
-import csw.messages.models.CoordinatedShutdownReasons.ActorTerminatedReason
+import csw.messages.commons.CoordinatedShutdownReasons.ActorTerminatedReason
 import csw.messages.{ComponentMessage, ContainerExternalMessage}
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.models._

@@ -5,7 +5,7 @@ import akka.actor.CoordinatedShutdown
 import akka.actor.CoordinatedShutdown.Reason
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
-import csw.messages.models.CoordinatedShutdownReasons.FailureReason
+import csw.messages.commons.CoordinatedShutdownReasons.FailureReason
 import csw.services.config.server.commons.{ConfigServerLogger, ConfigServiceConnection}
 import csw.services.config.server.{ActorRuntime, Settings}
 import csw.services.location.commons.ClusterAwareSettings

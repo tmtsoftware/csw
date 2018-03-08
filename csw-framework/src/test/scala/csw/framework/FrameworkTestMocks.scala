@@ -8,12 +8,12 @@ import akka.typed.{ActorRef, ActorSystem}
 import akka.{actor, testkit, Done}
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.internal.supervisor.SupervisorBehavior
-import csw.messages.{CommandResponseManagerMessage, SupervisorMessage}
 import csw.messages.commands.CommandResponse
+import csw.messages.framework.{LifecycleStateChanged, PubSub}
 import csw.messages.location.Connection.AkkaConnection
-import csw.messages.models.{LifecycleStateChanged, PubSub}
 import csw.messages.params.models.Id
 import csw.messages.params.states.CurrentState
+import csw.messages.{CommandResponseManagerMessage, SupervisorMessage}
 import csw.services.command.internal.CommandResponseManagerFactory
 import csw.services.command.scaladsl.CommandResponseManager
 import csw.services.location.javadsl.ILocationService

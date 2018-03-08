@@ -1,7 +1,7 @@
-package csw.util
+package csw
 
 /**
- * == Utility Classes ==
+ * == Messages ==
  *
  * This project is intended to hold reusable utility classes used throughout the csw source code.
  *

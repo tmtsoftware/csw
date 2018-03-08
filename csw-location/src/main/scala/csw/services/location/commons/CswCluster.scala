@@ -9,7 +9,7 @@ import akka.cluster.http.management.ClusterHttpManagement
 import akka.cluster.{Cluster, MemberStatus}
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
-import csw.messages.models.CoordinatedShutdownReasons.FailureReason
+import csw.messages.commons.CoordinatedShutdownReasons.FailureReason
 import csw.services.location.commons.ClusterConfirmationActor.HasJoinedCluster
 import csw.services.logging.scaladsl.Logger
 

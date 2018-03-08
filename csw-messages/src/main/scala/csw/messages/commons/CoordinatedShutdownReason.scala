@@ -1,4 +1,4 @@
-package csw.messages.models
+package csw.messages.commons
 
 import akka.actor.CoordinatedShutdown
 import akka.actor.CoordinatedShutdown.Reason

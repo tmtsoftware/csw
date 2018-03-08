@@ -15,14 +15,13 @@ import csw.messages.ComponentCommonMessage.{GetSupervisorLifecycleState, Lifecyc
 import csw.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.messages.RunningMessage.Lifecycle
 import csw.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
-import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState}
+import csw.messages.framework
+import csw.messages.framework.PubSub.Subscribe
+import csw.messages.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
+import csw.messages.framework.{Components, ContainerLifecycleState, LifecycleStateChanged, SupervisorLifecycleState}
 import csw.messages.location.ComponentType.{Assembly, HCD}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType, LocationRemoved, TrackingEvent}
-import csw.messages.models
-import csw.messages.models.PubSub.Subscribe
-import csw.messages.models.ToComponentLifecycleMessages.{GoOffline, GoOnline}
-import csw.messages.models.{Components, LifecycleStateChanged}
 import csw.messages.params.states.CurrentState
 import csw.services.command.scaladsl.CommandService
 import csw.services.location.commons.ClusterSettings
@@ -161,13 +160,13 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
     disperserProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(initChoice))))
 
     assemblyLifecycleStateProbe.expectMsg(
-      models.LifecycleStateChanged(assemblySupervisor, SupervisorLifecycleState.Running)
+      LifecycleStateChanged(assemblySupervisor, SupervisorLifecycleState.Running)
     )
     filterLifecycleStateProbe.expectMsg(
-      models.LifecycleStateChanged(filterSupervisor, SupervisorLifecycleState.Running)
+      framework.LifecycleStateChanged(filterSupervisor, SupervisorLifecycleState.Running)
     )
     disperserLifecycleStateProbe.expectMsg(
-      models.LifecycleStateChanged(disperserSupervisor, SupervisorLifecycleState.Running)
+      framework.LifecycleStateChanged(disperserSupervisor, SupervisorLifecycleState.Running)
     )
 
     assertThatContainerIsRunning(resolvedContainerRef, containerLifecycleStateProbe, 2.seconds)

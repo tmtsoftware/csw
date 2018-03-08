@@ -1,4 +1,4 @@
-package csw.messages.models
+package csw.messages.framework
 
 import akka.typed.ActorRef
 import csw.messages.TMTSerializable

@@ -2,7 +2,7 @@ package csw.services.event.internal.redis
 
 import akka.actor.ActorSystem
 import com.github.sebruck.EmbeddedRedis
-import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
+import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.event.RedisFactory
 import csw.services.event.internal.commons.Wiring
 import csw.services.event.internal.perf.EventServicePerfFramework

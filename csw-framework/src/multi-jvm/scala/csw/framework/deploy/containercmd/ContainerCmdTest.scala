@@ -16,12 +16,11 @@ import csw.messages.RunningMessage.Lifecycle
 import csw.messages.SupervisorContainerCommonMessages.Shutdown
 import csw.messages.commands.CommandResponse.Invalid
 import csw.messages.commands.{CommandName, Setup}
-import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState}
+import csw.messages.framework.PubSub.Subscribe
+import csw.messages.framework.ToComponentLifecycleMessages.GoOffline
+import csw.messages.framework.{Components, ContainerLifecycleState, SupervisorLifecycleState}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
-import csw.messages.models.Components
-import csw.messages.models.PubSub.Subscribe
-import csw.messages.models.ToComponentLifecycleMessages.GoOffline
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.CurrentState

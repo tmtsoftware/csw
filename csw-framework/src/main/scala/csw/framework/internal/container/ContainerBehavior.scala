@@ -14,11 +14,10 @@ import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.messages.RunningMessage.Lifecycle
 import csw.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.messages._
-import csw.messages.framework.{ComponentInfo, ContainerLifecycleState, SupervisorLifecycleState}
+import csw.messages.commons.CoordinatedShutdownReasons.{AllActorsWithinContainerTerminatedReason, FailedToCreateSupervisorsReason}
+import csw.messages.framework._
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
-import csw.messages.models.CoordinatedShutdownReasons.{AllActorsWithinContainerTerminatedReason, FailedToCreateSupervisorsReason}
-import csw.messages.models.{Components, SupervisorInfo}
 import csw.services.location.models._
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}

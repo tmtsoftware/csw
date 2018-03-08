@@ -4,8 +4,8 @@ import akka.typed.Terminated
 import akka.typed.scaladsl.TimerScheduler
 import akka.typed.testkit.scaladsl.TestProbe
 import akka.typed.testkit.{Inbox, StubbedActorContext}
-import csw.framework.exceptions.{FailureStop, InitializationFailed}
 import csw.framework.ComponentInfos._
+import csw.framework.exceptions.{FailureStop, InitializationFailed}
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
@@ -16,15 +16,14 @@ import csw.messages.RunningMessage.Lifecycle
 import csw.messages.SupervisorContainerCommonMessages.Restart
 import csw.messages.SupervisorIdleMessage.InitializeTimeout
 import csw.messages.SupervisorInternalRunningMessage.{RegistrationNotRequired, RegistrationSuccess}
+import csw.messages._
 import csw.messages.commands.CommandResponse
 import csw.messages.framework.LocationServiceUsage.DoNotRegister
-import csw.messages.framework.{ComponentInfo, SupervisorLifecycleState}
-import csw.messages.models.PubSub.{Publish, Subscribe, Unsubscribe}
-import csw.messages.models.ToComponentLifecycleMessages._
-import csw.messages.models.{LifecycleStateChanged, PubSub}
+import csw.messages.framework.PubSub.{Publish, Subscribe, Unsubscribe}
+import csw.messages.framework.ToComponentLifecycleMessages._
+import csw.messages.framework.{ComponentInfo, LifecycleStateChanged, PubSub, SupervisorLifecycleState}
 import csw.messages.params.models.Id
 import csw.messages.params.states.CurrentState
-import csw.messages.{models, _}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 
@@ -115,7 +114,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     supervisor.onMessage(RegistrationSuccess(childRef))
 
     childPubSubLifecycleInbox.receiveMsg() shouldBe Publish(
-      models.LifecycleStateChanged(ctx.self, SupervisorLifecycleState.Running)
+      LifecycleStateChanged(ctx.self, SupervisorLifecycleState.Running)
     )
   }
 
@@ -128,9 +127,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     supervisor.onMessage(RegistrationNotRequired(childRef))
 
     supervisor.lifecycleState shouldBe SupervisorLifecycleState.Running
-    childPubSubLifecycleInbox.receiveMsg() shouldBe Publish(
-      models.LifecycleStateChanged(ctx.self, SupervisorLifecycleState.Running)
-    )
+    childPubSubLifecycleInbox.receiveMsg() shouldBe Publish(LifecycleStateChanged(ctx.self, SupervisorLifecycleState.Running))
   }
   // *************** End of testing onInternalMessage ***************
 

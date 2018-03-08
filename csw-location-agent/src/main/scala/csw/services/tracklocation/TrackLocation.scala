@@ -5,7 +5,7 @@ import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.{ActorSystem, CoordinatedShutdown}
 import csw.messages.location.Connection.TcpConnection
 import csw.messages.location.{ComponentId, ComponentType}
-import csw.messages.models.CoordinatedShutdownReasons.{FailureReason, ProcessTerminatedReason}
+import csw.messages.commons.CoordinatedShutdownReasons.{FailureReason, ProcessTerminatedReason}
 import csw.services.location.commons.CswCluster
 import csw.services.location.models._
 import csw.services.location.scaladsl.LocationServiceFactory

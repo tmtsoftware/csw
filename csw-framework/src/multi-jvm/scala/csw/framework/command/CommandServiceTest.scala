@@ -16,10 +16,10 @@ import csw.messages.commands.CommandResponse._
 import csw.messages.commands._
 import csw.messages.commands.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
 import csw.messages.commands.matchers.{DemandMatcher, Matcher, MatcherResponse}
+import csw.messages.framework.LockingResponse
+import csw.messages.framework.LockingResponses.LockAcquired
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{AkkaLocation, ComponentId, ComponentType}
-import csw.messages.models.LockingResponse
-import csw.messages.models.LockingResponses.LockAcquired
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.DemandState

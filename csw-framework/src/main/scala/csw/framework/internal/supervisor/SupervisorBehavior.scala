@@ -20,16 +20,15 @@ import csw.messages.SupervisorInternalRunningMessage.{RegistrationFailed, Regist
 import csw.messages.SupervisorLockMessage.{Lock, Unlock}
 import csw.messages.SupervisorRestartMessage.{UnRegistrationComplete, UnRegistrationFailed}
 import csw.messages._
+import csw.messages.commons.CoordinatedShutdownReasons.ShutdownMessageReceivedReason
 import csw.messages.framework.LocationServiceUsage.DoNotRegister
+import csw.messages.framework.LockingResponses.{LockExpired, LockExpiringShortly}
+import csw.messages.framework.PubSub.Publish
 import csw.messages.framework.SupervisorLifecycleState.{Idle, RunningOffline}
-import csw.messages.framework.{ComponentInfo, SupervisorLifecycleState}
+import csw.messages.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
+import csw.messages.framework._
 import csw.messages.location.ComponentId
 import csw.messages.location.Connection.AkkaConnection
-import csw.messages.models.CoordinatedShutdownReasons.ShutdownMessageReceivedReason
-import csw.messages.models.LockingResponses.{LockExpired, LockExpiringShortly}
-import csw.messages.models.PubSub.Publish
-import csw.messages.models.ToComponentLifecycleMessages.{GoOffline, GoOnline}
-import csw.messages.models.{LifecycleStateChanged, LockingResponse, PubSub, ToComponentLifecycleMessage}
 import csw.messages.params.models.Prefix
 import csw.messages.params.states.CurrentState
 import csw.services.command.internal.CommandResponseManagerFactory

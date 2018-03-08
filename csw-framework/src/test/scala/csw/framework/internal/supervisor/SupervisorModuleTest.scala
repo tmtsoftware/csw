@@ -9,19 +9,18 @@ import csw.messages.ComponentCommonMessage.GetSupervisorLifecycleState
 import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.messages.RunningMessage.Lifecycle
 import csw.messages.SupervisorContainerCommonMessages.Restart
+import csw.messages._
 import csw.messages.commands.CommandResponse.{Accepted, Invalid}
 import csw.messages.commands._
 import csw.messages.commands.matchers.DemandMatcher
-import csw.messages.framework.{ComponentInfo, SupervisorLifecycleState}
+import csw.messages.framework.PubSub.Publish
+import csw.messages.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
+import csw.messages.framework.{ComponentInfo, LifecycleStateChanged, SupervisorLifecycleState}
 import csw.messages.location.ComponentType.{Assembly, HCD}
 import csw.messages.location.Connection.AkkaConnection
-import csw.messages.models.LifecycleStateChanged
-import csw.messages.models.PubSub.Publish
-import csw.messages.models.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.{CurrentState, DemandState}
-import csw.messages.{models, _}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
@@ -95,7 +94,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
         compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
         lifecycleStateProbe.expectMsg(
-          Publish(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
+          Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
         )
 
         val obsId: ObsId          = ObsId("Obs001")
@@ -165,7 +164,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
         compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
         lifecycleStateProbe.expectMsg(
-          Publish(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
+          Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
         )
 
         val obsId: ObsId          = ObsId("Obs001")
@@ -230,7 +229,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         val supervisorRef = createSupervisorAndStartTLA(hcdInfo, mocks)
 
         compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
-        lifecycleStateProbe.expectMsg(Publish(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
+        lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
 
         val obsId: ObsId          = ObsId("Obs001")
         val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(22)
@@ -254,7 +253,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         val supervisorRef = createSupervisorAndStartTLA(info, mocks)
 
         compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
-        lifecycleStateProbe.expectMsg(Publish(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
+        lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
 
         supervisorRef ! Lifecycle(GoOffline)
 
@@ -280,7 +279,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         val supervisorRef             = createSupervisorAndStartTLA(info, mocks, containerIdleMessageProbe.ref)
 
         compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
-        lifecycleStateProbe.expectMsg(Publish(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
+        lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
         containerIdleMessageProbe.expectMsg(SupervisorLifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
 
         supervisorRef ! Restart
@@ -288,7 +287,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(shutdownChoice)))))
         compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
 
-        lifecycleStateProbe.expectMsg(Publish(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
+        lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
         containerIdleMessageProbe.expectMsg(SupervisorLifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
 
         verify(locationService).unregister(any[AkkaConnection])
@@ -305,7 +304,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         val supervisorRef = createSupervisorAndStartTLA(info, mocks)
 
         compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
-        lifecycleStateProbe.expectMsg(Publish(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
+        lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
 
         supervisorRef ! Lifecycle(GoOnline)
         compStateProbe.expectNoMsg(1.seconds)
@@ -321,7 +320,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         val supervisorRef = createSupervisorAndStartTLA(info, mocks)
 
         compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
-        lifecycleStateProbe.expectMsg(Publish(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
+        lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
 
         supervisorRef ! Lifecycle(GoOffline)
         compStateProbe.expectMsgType[Publish[CurrentState]]

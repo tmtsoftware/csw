@@ -4,8 +4,8 @@ import akka.typed.ActorRef
 import csw.messages.CommandMessage
 import csw.messages.commands.CommandIssue.ComponentLockedIssue
 import csw.messages.commands.CommandResponse.NotAllowed
-import csw.messages.models.LockingResponse
-import csw.messages.models.LockingResponses._
+import csw.messages.framework.LockingResponse
+import csw.messages.framework.LockingResponses._
 import csw.messages.params.models.Prefix
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 

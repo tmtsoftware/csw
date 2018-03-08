@@ -19,7 +19,7 @@ import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState
 import csw.messages.location.ComponentId
 import csw.messages.location.ComponentType.{Assembly, HCD}
 import csw.messages.location.Connection.AkkaConnection
-import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
+import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.params.states.CurrentState
 import csw.services.command.scaladsl.CommandService
 import csw.services.location.commons.ClusterSettings

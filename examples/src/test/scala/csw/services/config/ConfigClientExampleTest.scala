@@ -4,7 +4,7 @@ import java.io.InputStream
 import java.nio.file.{Path, Paths}
 import java.time.Instant
 
-import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
+import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.config.api.models.{ConfigData, ConfigId, ConfigMetadata, FileType}
 import csw.services.config.api.scaladsl.{ConfigClientService, ConfigService}
 import csw.services.config.client.scaladsl.ConfigClientFactory
