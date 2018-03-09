@@ -2,6 +2,7 @@ package csw.framework.components.assembly
 
 import java.nio.file.Paths
 
+import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
 import akka.typed.scaladsl.adapter.TypedActorSystemOps
 import csw.framework.exceptions.{FailureRestart, FailureStop}
@@ -10,14 +11,15 @@ import csw.messages.commands.CommandResponse.Accepted
 import csw.messages.commands._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location._
-import csw.messages.scaladsl.TopLevelActorMessage
+import csw.messages.scaladsl.{ComponentMessage, TopLevelActorMessage}
 import csw.services.command.scaladsl.CommandResponseManager
+import csw.services.config.api.models.ConfigData
 import csw.services.config.api.scaladsl.ConfigClientService
 import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
-import scala.async.Async.async
+import scala.async.Async._
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
@@ -42,20 +44,40 @@ class AssemblyComponentHandlers(
 
   implicit val ec: ExecutionContextExecutor = ctx.executionContext
 
-  private val log: Logger                       = new LoggerFactory(componentInfo.name).getLogger(ctx)
-  private val configClient: ConfigClientService = ConfigClientFactory.clientApi(ctx.system.toUntyped, locationService)
+  private val log: Logger                                                      = new LoggerFactory(componentInfo.name).getLogger(ctx)
+  private val configClient: ConfigClientService                                = ConfigClientFactory.clientApi(ctx.system.toUntyped, locationService)
+  private var runningHcds: Map[Connection, Option[ActorRef[ComponentMessage]]] = Map.empty
+  private var diagnosticsPublisher: ActorRef[DiagnosticPublisherMessages]      = _
+  private var commandHandler: ActorRef[CommandHandlerMsgs]                     = _
 
   //#initialize-handler
   override def initialize(): Future[Unit] = async {
 
-    /*
-   * Initialization could include following steps :
-   * 1. fetch config (preferably from configuration service)
-   * 2. create a worker actor which is used by this assembly
-   * 3. find a Hcd connection from the connections provided in componentInfo
-   * 4. If an Hcd is found as a connection, resolve its location from location service and create other
-   *    required worker actors required by this assembly
-   * */
+    // Initialization could include following steps :
+
+    // 1. fetch config (preferably from configuration service)
+    val calculationConfig = await(getAssemblyConfig)
+
+    // 2. create a worker actor which is used by this assembly
+    val worker: ActorRef[WorkerActorMsg] = ctx.spawnAnonymous(WorkerActor.make(calculationConfig))
+
+    // 3. find a Hcd connection from the connections provided in componentInfo
+    val maybeConnection =
+      componentInfo.connections.find(connection ⇒ connection.componentId.componentType == ComponentType.HCD)
+
+    // 4. If an Hcd is found as a connection, resolve its location from location service and create other
+    // required worker actors required by this assembly
+    maybeConnection match {
+      case hcdConnection @ Some(hcd) ⇒
+        locationService.resolve(hcd.of[AkkaLocation], 5.seconds).map {
+          case Some(akkaLocation) ⇒
+            runningHcds = runningHcds.updated(hcdConnection.get, Some(akkaLocation.componentRef))
+            diagnosticsPublisher = ctx.spawnAnonymous(DiagnosticsPublisher.make(runningHcds(maybeConnection.get), Some(worker)))
+            commandHandler = ctx.spawnAnonymous(CommandHandler.make(calculationConfig, runningHcds(maybeConnection.get)))
+          case None ⇒ throw new RuntimeException("Could not resolve hcd location, Initialization failure.")
+        }
+      case None ⇒ Future.successful(Unit)
+    }
 
   }
   //#initialize-handler
@@ -158,10 +180,10 @@ class AssemblyComponentHandlers(
   // #failureStop-Exception
   case class ConfigNotAvailableException() extends FailureStop("Configuration not available. Initialization failure.")
 
-  private def getAssemblyConfigs() = {
+  private def getAssemblyConfig: Future[ConfigData] = {
 
     configClient.getActive(Paths.get("tromboneAssemblyContext.conf")).flatMap {
-      case Some(config) ⇒ ??? // do work
+      case Some(config) ⇒ Future.successful(config) // do work
       case None         ⇒
         // required configuration could not be found in the configuration service. Component can choose to stop until the configuration is made available in the
         // configuration service and started again

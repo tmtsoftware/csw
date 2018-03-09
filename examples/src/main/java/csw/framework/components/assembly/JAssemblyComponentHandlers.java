@@ -1,19 +1,19 @@
 package csw.framework.components.assembly;
 
+import akka.typed.ActorRef;
 import akka.typed.javadsl.ActorContext;
 import akka.typed.javadsl.Adapter;
+import akka.typed.testkit.TestKitSettings;
+import akka.typed.testkit.javadsl.TestProbe;
 import csw.framework.exceptions.FailureRestart;
 import csw.framework.exceptions.FailureStop;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.scaladsl.CurrentStatePublisher;
-import csw.messages.scaladsl.TopLevelActorMessage;
-import csw.messages.commands.CommandIssue;
-import csw.messages.commands.CommandResponse;
-import csw.messages.commands.ControlCommand;
-import csw.messages.commands.Observe;
-import csw.messages.commands.Setup;
+import csw.messages.commands.*;
 import csw.messages.framework.ComponentInfo;
 import csw.messages.location.*;
+import csw.messages.scaladsl.ComponentMessage;
+import csw.messages.scaladsl.TopLevelActorMessage;
 import csw.services.command.scaladsl.CommandResponseManager;
 import csw.services.config.api.javadsl.IConfigClientService;
 import csw.services.config.api.models.ConfigData;
@@ -25,6 +25,8 @@ import csw.services.logging.javadsl.JLoggerFactory;
 import scala.concurrent.duration.FiniteDuration;
 
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -41,6 +43,9 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     private final ILocationService locationService;
     private ILogger log;
     private IConfigClientService configClient;
+    private Map<Connection, Optional<ActorRef<ComponentMessage>>> runningHcds;
+    private ActorRef<DiagnosticPublisherMessages> diagnosticPublisher;
+    private ActorRef<CommandResponse> commandResponseAdapter;
 
     public JAssemblyComponentHandlers(
             akka.typed.javadsl.ActorContext<TopLevelActorMessage> ctx,
@@ -59,22 +64,44 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
         this.locationService = locationService;
         log = loggerFactory.getLogger(this.getClass());
         configClient = JConfigClientFactory.clientApi(Adapter.toUntyped(ctx.getSystem()), locationService);
+
+        runningHcds = new HashMap<>();
+        commandResponseAdapter = new TestProbe<CommandResponse>(ctx.getSystem(), TestKitSettings.apply(ctx.getSystem())).ref();
     }
     //#jcomponent-handlers-class
 
     //#jInitialize-handler
     @Override
     public CompletableFuture<Void> jInitialize() {
-        /*
-         * Initialization could include following steps :
-         * 1. fetch config (preferably from configuration service)
-         * 2. create a worker actor which is used by this assembly
-         * 3. find a Hcd connection from the connections provided in componentInfo
-         * 4. If an Hcd is found as a connection, resolve its location from location service and create other
-         *    required worker actors required by this assembly
-         * */
 
-        return new CompletableFuture<>();
+        // fetch config (preferably from configuration service)
+        CompletableFuture<ConfigData> configDataCompletableFuture = getAssemblyConfig();
+
+        // create a worker actor which is used by this assembly
+        CompletableFuture<ActorRef<WorkerActorMsg>> worker =
+                configDataCompletableFuture.thenApply(config -> ctx.spawnAnonymous(WorkerActor.make(config)));
+
+        // find a Hcd connection from the connections provided in componentInfo
+        Optional<Connection> mayBeConnection = componentInfo.getConnections().stream()
+                .filter(connection -> connection.componentId().componentType() == JComponentType.HCD)
+                .findFirst();
+
+        // If an Hcd is found as a connection, resolve its location from location service and create other
+        // required worker actors required by this assembly
+        Optional<CompletableFuture<Void>> voidCompletableFuture = mayBeConnection.map(connection -> {
+            CompletableFuture<Optional<AkkaLocation>> eventualHcdLocation = locationService.resolve(connection.<AkkaLocation>of(), FiniteDuration.apply(5, TimeUnit.SECONDS));
+            // #failureRestart-Exception
+            return worker.thenAcceptBoth(eventualHcdLocation, (workerActor, hcdLocation) -> {
+                if(!hcdLocation.isPresent())
+                    throw new HcdNotFoundException();
+                else
+                    runningHcds.put(connection, Optional.of(hcdLocation.get().componentRef()));
+                diagnosticPublisher = ctx.spawnAnonymous(DiagnosticsPublisher.jMake(Optional.of(hcdLocation.get().componentRef()), Optional.of(workerActor)));
+            });
+        });
+        // #failureRestart-Exception
+
+        return voidCompletableFuture.get().thenApply(x -> null);
     }
     //#jInitialize-handler
 
@@ -220,12 +247,11 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
         }
     }
 
-    private CompletableFuture<ConfigData> getAssemblyConfigs() {
+    private CompletableFuture<ConfigData> getAssemblyConfig() throws ConfigNotAvailableException {
         // required configuration could not be found in the configuration service. Component can choose to stop until the configuration is made available in the
         // configuration service and started again
-        return configClient.getActive(Paths.get("tromboneAssemblyContext.conf")).thenApply((maybeConfigData) -> {
-            return maybeConfigData.orElseThrow(ConfigNotAvailableException::new);
-        });
+        return configClient.getActive(Paths.get("tromboneAssemblyContext.conf"))
+                .thenApply((maybeConfigData) -> maybeConfigData.<ConfigNotAvailableException>orElseThrow(ConfigNotAvailableException::new));
     }
     // #failureStop-Exception
 

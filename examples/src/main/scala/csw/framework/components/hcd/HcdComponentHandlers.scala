@@ -1,6 +1,16 @@
 package csw.framework.components.hcd
 
+import java.nio.file.Paths
+
+import akka.actor.Scheduler
+import akka.typed.ActorRef
 import akka.typed.scaladsl.ActorContext
+import akka.typed.scaladsl.AskPattern.Askable
+import akka.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.util.Timeout
+import csw.framework.components.ConfigNotAvailableException
+import csw.framework.components.assembly.WorkerActorMsgs.{GetStatistics, InitialState}
+import csw.framework.components.assembly.{WorkerActor, WorkerActorMsg}
 import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
 import csw.messages.commands.CommandResponse.Accepted
 import csw.messages.commands.{CommandResponse, ControlCommand, Observe, Setup}
@@ -8,10 +18,14 @@ import csw.messages.framework.ComponentInfo
 import csw.messages.location.{LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.messages.scaladsl.TopLevelActorMessage
 import csw.services.command.scaladsl.CommandResponseManager
+import csw.services.config.api.models.ConfigData
+import csw.services.config.api.scaladsl.ConfigClientService
+import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
-import scala.async.Async.async
+import scala.async.Async.{async, await}
+import scala.concurrent.duration.DurationLong
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
 //#component-handlers-class
@@ -35,17 +49,25 @@ class HcdComponentHandlers(
 
   val log: Logger = new LoggerFactory(componentInfo.name).getLogger(ctx)
 
-  implicit val ec: ExecutionContextExecutor = ctx.executionContext
+  implicit val ec: ExecutionContextExecutor     = ctx.executionContext
+  implicit val timeout: Timeout                 = 5.seconds
+  implicit val scheduler: Scheduler             = ctx.system.scheduler
+  private val configClient: ConfigClientService = ConfigClientFactory.clientApi(ctx.system.toUntyped, locationService)
+  var current: Int                              = _
+  var stats: Int                                = _
 
   //#initialize-handler
   override def initialize(): Future[Unit] = async {
 
-    /*
-   * Initialization could include following steps :
-   * 1. fetch config (preferably from configuration service)
-   * 2. create a worker actor which is used by this hcd
-   * 3. initialise some state by using the worker actor created above
-   * */
+    // fetch config (preferably from configuration service)
+    val hcdConfig = await(getHcdConfig)
+
+    // create a worker actor which is used by this hcd
+    val worker: ActorRef[WorkerActorMsg] = ctx.spawnAnonymous(WorkerActor.make(hcdConfig))
+
+    // initialise some state by using the worker actor created above
+    current = await(worker ? InitialState)
+    stats = await(worker ? GetStatistics)
 
   }
   //#initialize-handler
@@ -124,4 +146,16 @@ class HcdComponentHandlers(
   private def onewaySetup(setup: Setup): Unit = processSetup(setup)
 
   private def onewayObserve(observe: Observe): Unit = processObserve(observe)
+
+  private def getHcdConfig: Future[ConfigData] = {
+
+    configClient.getActive(Paths.get("tromboneAssemblyContext.conf")).flatMap {
+      case Some(config) ⇒ Future.successful(config) // do work
+      case None         ⇒
+        // required configuration could not be found in the configuration service. Component can choose to stop until the configuration is made available in the
+        // configuration service and started again
+        throw ConfigNotAvailableException()
+    }
+  }
+
 }

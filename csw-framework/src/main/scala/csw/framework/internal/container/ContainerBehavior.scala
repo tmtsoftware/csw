@@ -152,7 +152,9 @@ class ContainerBehavior private[framework] (
     log.info(s"Container is creating following components :[${componentInfos.map(_.name).mkString(", ")}]")
     Future
       .traverse(componentInfos) { ci ⇒
-        supervisorInfoFactory.make(ctx.self, ci, locationService, registrationFactory)
+        val eventualMaybeInfo = supervisorInfoFactory.make(ctx.self, ci, locationService, registrationFactory)
+        eventualMaybeInfo.foreach(x ⇒ x.foreach(println))
+        eventualMaybeInfo
       }
       .foreach(x ⇒ ctx.self ! SupervisorsCreated(x.flatten))
   }
