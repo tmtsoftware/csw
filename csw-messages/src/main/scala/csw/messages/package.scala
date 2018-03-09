@@ -95,80 +95,14 @@ package csw
  *         | Struct       | KeyType.StructKey       | JKeyTypes.StructKey       |
  *         +--------------+-------------------------+---------------------------+
  *
- * Example:
+ * Detailed information about creating Keys and Parameters can be found here:
+ *  https://tmtsoftware.github.io/csw-prod/services/messages/keys-parameters.html
  *
- * - Scala Example:
+ * Detailed information about creating commands can be found here:
+ *  https://tmtsoftware.github.io/csw-prod/services/messages/commands.html
  *
- * {{{
- *
- *   // ============== Shows creation of Keys and Parameters ===================
- *
- *   // making 2 keys
- *   val k1: Key[Boolean] = KeyType.BooleanKey.make("booleanKey")
- *   val k2: Key[Short]   = KeyType.ShortKey.make("shortKey")
- *
- *   // storing a single value
- *   val booleanParam: Parameter[Boolean] = k1.set(true)
- *
- *   // showing different ways for storing multiple values
- *   val paramWithShorts1: Parameter[Short] = k2.set(1, 2, 3, 4)
- *   val paramWithShorts2: Parameter[Short] = k2 -> (1, 2, 3, 4)
- *   val paramWithShorts3: Parameter[Short] = k2 -> Array[Short](1, 2, 3, 4)
- *
- *   // ==========================================================================
- *   // ============== Shows creation of commands and events =====================
- *
- *   val prefix      = Prefix("wfos.prog.cloudcover")
- *   val obsId       = ObsId("Obs001")
- *   val commandName = CommandName("move")
- *
- *   // create setup command with two parameters which are created in earlier section
- *   val setup: Setup = Setup(prefix, commandName, Some(obsId), Set(booleanParam, paramWithShorts1))
- *
- *   val eventName = EventName("filterMoved")
- *
- *   // create observerEvent with two parameters which are created in earlier section
- *   val observerEvent: ObserveEvent = ObserveEvent(prefix, eventName).madd(booleanParam, paramWithShorts1)
- *   // ==========================================================================
- *
- * }}}
- *
- * - Java Example:
- *
- * {{{
- *
- *    // ============== Shows creation of Java Keys and Parameters ===================
- *
- *    // making 2 keys
- *    Key<Boolean> k1 = JKeyTypes.BooleanKey().make("encoder");
- *    Key<Short> k2   = JKeyTypes.ShortKey().make(keyName);
- *
- *    // storing a single value
- *    Parameter<Boolean> booleanParam = k1.set(true);
- *
- *    // showing different ways for storing multiple values
- *    Short[] shortArray = {1, 2, 3, 4};
- *    Parameter<Short> paramWithManyShorts1 = k2.set(shortArray);
- *    Parameter<Short> paramWithManyShorts2 = k2.set((short) 1, (short) 2, (short) 3, (short) 4);
- *
- *    // ===============================================================================
- *    // ============== Shows creation of java commands and events =====================
- *
- *    Prefix prefix           = new Prefix("wfos.prog.cloudcover");
- *    CommandName commandName = new CommandName("move");
- *    ObsId obsId             = new ObsId("obsId");
- *
- *    // create setup command with two parameters which are created in earlier section
- *    Setup setup = new Setup(prefix, commandName, Optional.of(obsId)).madd(booleanParam, paramWithManyShorts1);
- *
- *    EventName eventName = new EventName("filterMoved")
- *
- *    // create observerEvent with two parameters which are created in earlier section
- *    ObserveEvent observeEvent = new ObserveEvent(prefix, eventName).madd(booleanParam, paramWithShorts1);
- *
- *    // ===============================================================================
- *
- * }}}
+ * Detailed information about creating events can be found here:
+ *  https://tmtsoftware.github.io/csw-prod/services/messages/events.html
  *
  */
 package object messages {}
