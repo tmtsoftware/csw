@@ -8,26 +8,32 @@ import csw.messages.params.models.{Id, ObsId, Prefix}
 import scala.compat.java8.OptionConverters.{RichOptionForJava8, RichOptionalGeneric}
 
 /**
- * Common trait for Setup, Observe and Wait commands
+ * Common trait representing commands in TMT like Setup, Observe and Wait
  */
 sealed trait Command { self: ParameterSetType[_] ⇒
 
-  def paramType: ParameterSetType[_] = self //TODO: explain more about why do we need paramType as self type
+  /**
+   * A helper to give access of public members of ParameterSetType
+   *
+   * @return a handle to ParameterSetType extended by concrete implementation of this class
+   */
+  def paramType: ParameterSetType[_] = self
 
   /**
    * A name identifying the type of parameter set, such as "setup", "observe".
-   * This is used in the JSON and toString output.
+   * This is used in toString output and while de-serializing from JSON.
+   *
+   * @return a string representation of concrete type of this class
    */
-  //TODO: explain more about why do we need typeName in JSON
   def typeName: String
 
   /**
-   * unique ID for command parameter set
+   * unique Id for command parameter set
    */
   val runId: Id
 
   /**
-   * an optional initial set of parameters (keys with values)
+   * An optional initial set of parameters (keys with values)
    */
   val paramSet: Set[Parameter[_]]
 
@@ -36,38 +42,46 @@ sealed trait Command { self: ParameterSetType[_] ⇒
    */
   val source: Prefix
 
-  //TODO: add doc
+  /**
+   * The name of command
+   */
   val commandName: CommandName
 
-  //TODO: add doc
+  /**
+   * An optional obsId for command
+   */
   val maybeObsId: Option[ObsId]
 
-  //TODO: add doc
+  /**
+   * A Java helper to acsess optional obsId
+   *
+   * @return an Optional of ObsId
+   */
   def jMaybeObsId: Optional[ObsId] = maybeObsId.asJava
 
-  override def toString =
+  /**
+   * A common toString method for all concrete implementation
+   *
+   * @return the string representation of command
+   */
+  override def toString: String =
     s"$typeName(runId=$runId, paramSet=$paramSet, source=$source, commandName=$commandName, maybeObsId=$maybeObsId)"
 }
 
 /**
- * Trait for sequence parameter sets
+ * Marker trait for sequence parameter sets which is applicable to Sequencer type of components
  */
-//TODO: explain what are Sequence Commands
 sealed trait SequenceCommand extends Command { self: ParameterSetType[_] ⇒
 }
 
 /**
- * Marker trait for control parameter sets
+ * Marker trait for control parameter sets which i applicable to Assembly and HCD type of components
  */
-//TODO: explain what are Control Commands
 sealed trait ControlCommand extends Command { self: ParameterSetType[_] ⇒
 }
 
 /**
  * A parameter set for setting telescope and instrument parameters. Constructor is private to ensure RunId is created internally to guarantee unique value.
- *
- * @param runId unique ID for this parameter set
- * @param paramSet an optional initial set of parameters (keys with values)
  */
 case class Setup private (
     runId: Id,
@@ -79,11 +93,18 @@ case class Setup private (
     with SequenceCommand
     with ControlCommand {
 
-  //TODO: add doc
+  /**
+   * A java helper to construct Setup command
+   */
   def this(source: Prefix, commandName: CommandName, maybeObsId: Optional[ObsId]) =
     this(Id(), source, commandName, maybeObsId.asScala, Set.empty)
 
-  //TODO: add doc why we need create and from where it is coming
+  /**
+   * Create a new Setup instance when a parameter is added or removed
+   *
+   * @param data set of parameters
+   * @return a new instance of Setup with new runId and provided data
+   */
   override protected def create(data: Set[Parameter[_]]): Setup = copy(runId = Id(), paramSet = data)
 }
 
@@ -98,20 +119,32 @@ object Setup {
       paramSet: Set[Parameter[_]]
   ): Setup = new Setup(runId, source, commandName, maybeObsId, paramSet)
 
-  // The apply method is used to create Setup command by end-user. RunId is not accepted and will be created internally to guarantee unique value.
+  /**
+   * The apply method is used to create Setup command by end-user. runId is not accepted and will be created internally to guarantee unique value.
+   *
+   * @param source prefix representing source of the command
+   * @param commandName the name of the command
+   * @param maybeObsId an optional obsId for command
+   * @return a new instance of Setup with auto-generated runId and empty paramSet
+   */
   def apply(source: Prefix, commandName: CommandName, maybeObsId: Option[ObsId]): Setup =
     apply(Id(), source, commandName, maybeObsId, Set.empty)
 
-  //TODO: add doc
+  /**
+   * The apply method is used to create Setup command by end-user. runId is not accepted and will be created internally to guarantee unique value.
+   *
+   * @param source prefix representing source of the command
+   * @param commandName the name of the command
+   * @param maybeObsId an optional obsId for command
+   * @param paramSet an initial set of parameters (keys with values)
+   * @return a new instance of Setup with auto-generated runId
+   */
   def apply(source: Prefix, commandName: CommandName, maybeObsId: Option[ObsId], paramSet: Set[Parameter[_]]): Setup =
     apply(source, commandName, maybeObsId).madd(paramSet)
 }
 
 /**
  * A parameter set for setting telescope and instrument parameters. Constructor is private to ensure RunId is created internally to guarantee unique value.
- *
- * @param runId unique ID for this parameter set
- * @param paramSet an optional initial set of parameters (keys with values)
  */
 case class Observe private (
     runId: Id,
@@ -123,16 +156,24 @@ case class Observe private (
     with SequenceCommand
     with ControlCommand {
 
-  //TODO: add doc
+  /**
+   * A java helper to construct Observe command
+   */
   def this(source: Prefix, commandName: CommandName, maybeObsId: Optional[ObsId]) =
     this(Id(), source, commandName, maybeObsId.asScala, Set.empty)
 
-  //TODO: add doc why we need create and from where it is coming
+  /**
+   * Create a new Observe instance when a parameter is added or removed
+   *
+   * @param data set of parameters
+   * @return a new instance of Observe with new runId and provided data
+   */
   override protected def create(data: Set[Parameter[_]]): Observe = copy(runId = Id(), paramSet = data)
 }
 
 object Observe {
 
+  // The default apply method is used only internally while reading the incoming json and de-serializing it to observe model
   private[messages] def apply(
       runId: Id,
       source: Prefix,
@@ -141,18 +182,32 @@ object Observe {
       paramSet: Set[Parameter[_]]
   ) = new Observe(runId, source, commandName, maybeObsId, paramSet)
 
+  /**
+   * The apply method is used to create Observe command by end-user. runId is not accepted and will be created internally to guarantee unique value.
+   *
+   * @param source prefix representing source of the command
+   * @param commandName the name of the command
+   * @param maybeObsId an optional obsId for command
+   * @return a new instance of Observe with auto-generated runId and empty paramSet
+   */
   def apply(source: Prefix, commandName: CommandName, maybeObsId: Option[ObsId]): Observe =
     apply(Id(), source, commandName, maybeObsId, Set.empty)
 
+  /**
+   * The apply method is used to create Observe command by end-user. runId is not accepted and will be created internally to guarantee unique value.
+   *
+   * @param source prefix representing source of the command
+   * @param commandName the name of the command
+   * @param maybeObsId an optional obsId for command
+   * @param paramSet an initial set of parameters (keys with values)
+   * @return a new instance of Observe with auto-generated runId
+   */
   def apply(source: Prefix, commandName: CommandName, maybeObsId: Option[ObsId], paramSet: Set[Parameter[_]]): Observe =
     apply(source, commandName, maybeObsId).madd(paramSet)
 }
 
 /**
  * A parameter set for setting telescope and instrument parameters. Constructor is private to ensure RunId is created internally to guarantee unique value.
- *
- * @param runId unique ID for this parameter set
- * @param paramSet an optional initial set of parameters (keys with values)
  */
 case class Wait private (
     runId: Id,
@@ -163,14 +218,24 @@ case class Wait private (
 ) extends ParameterSetType[Wait]
     with SequenceCommand {
 
+  /**
+   * A java helper to construct Wait command
+   */
   def this(source: Prefix, commandName: CommandName, maybeObsId: Optional[ObsId]) =
     this(Id(), source, commandName, maybeObsId.asScala, Set.empty)
 
+  /**
+   * Create a new Wait instance when a parameter is added or removed
+   *
+   * @param data set of parameters
+   * @return a new instance of Wait with new runId and provided data
+   */
   override protected def create(data: Set[Parameter[_]]): Wait = copy(runId = Id(), paramSet = data)
 }
 
 object Wait {
 
+  // The default apply method is used only internally while reading the incoming json and de-serializing it to wait model
   private[messages] def apply(
       runId: Id,
       source: Prefix,
@@ -179,9 +244,26 @@ object Wait {
       paramSet: Set[Parameter[_]]
   ) = new Wait(runId, source, commandName, maybeObsId, paramSet)
 
+  /**
+   * The apply method is used to create Wait command by end-user. runId is not accepted and will be created internally to guarantee unique value.
+   *
+   * @param source prefix representing source of the command
+   * @param commandName the name of the command
+   * @param maybeObsId an optional obsId for command
+   * @return a new instance of Wait with auto-generated runId and empty paramSet
+   */
   def apply(source: Prefix, commandName: CommandName, maybeObsId: Option[ObsId]): Wait =
     apply(Id(), source, commandName, maybeObsId, Set.empty)
 
+  /**
+   * The apply method is used to create Wait command by end-user. runId is not accepted and will be created internally to guarantee unique value.
+   *
+   * @param source prefix representing source of the command
+   * @param commandName the name of the command
+   * @param maybeObsId an optional obsId for command
+   * @param paramSet an initial set of parameters (keys with values)
+   * @return a new instance of Wait with auto-generated runId
+   */
   def apply(source: Prefix, commandName: CommandName, maybeObsId: Option[ObsId], paramSet: Set[Parameter[_]]): Wait =
     apply(source, commandName, maybeObsId).madd(paramSet)
 }

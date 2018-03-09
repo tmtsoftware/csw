@@ -16,25 +16,91 @@ import scala.util.{Failure, Success}
  * @param resultType the nature of command response as [[csw.messages.commands.CommandResultType]]
  */
 sealed abstract class CommandResponse(val resultType: CommandResultType) extends TMTSerializable {
+
+  /**
+   * A helper method to get the runId for this command response
+   *
+   * @return the runId of command for which this response is created
+   */
   def runId: Id
 }
 
 object CommandResponse {
-  case class Accepted(runId: Id)                            extends CommandResponse(Intermediate)
-  case class Invalid(runId: Id, issue: CommandIssue)        extends CommandResponse(Negative)
-  case class CompletedWithResult(runId: Id, result: Result) extends CommandResponse(Positive)
-  case class Completed(runId: Id)                           extends CommandResponse(Positive)
-  case class NoLongerValid(runId: Id, issue: CommandIssue)  extends CommandResponse(Negative)
-  case class Error(runId: Id, message: String)              extends CommandResponse(Negative)
-  case class Cancelled(runId: Id)                           extends CommandResponse(Negative)
-  case class CommandNotAvailable(runId: Id)                 extends CommandResponse(Negative)
-  case class NotAllowed(runId: Id, issue: CommandIssue)     extends CommandResponse(Negative)
 
   /**
-   * Transform a given CommandResponse to a response with the provided RunId
+   * Represents an intermediate response stating acceptance of a command received
+   *
+   * @param runId the runId of command for which this response is created
+   */
+  case class Accepted(runId: Id) extends CommandResponse(Intermediate)
+
+  /**
+   * Represents a negative response invalidating a command received
+   *
+   * @param runId of command for which this response is created
+   * @param issue describing the cause of invalidation
+   */
+  case class Invalid(runId: Id, issue: CommandIssue) extends CommandResponse(Negative)
+
+  /**
+   * Represents a positive response stating completion of command
+   *
+   * @param runId of command for which this response is created
+   * @param result describing the result of completion
+   */
+  case class CompletedWithResult(runId: Id, result: Result) extends CommandResponse(Positive)
+
+  /**
+   * Represents a positive response stating completion of command
+   *
+   * @param runId of command for which this response is created
+   */
+  case class Completed(runId: Id) extends CommandResponse(Positive)
+
+  /**
+   * Represents a negative response that states that a command is no longer valid
+   *
+   * @param runId of command for which this response is created
+   * @param issue describing the cause of invalidation
+   */
+  case class NoLongerValid(runId: Id, issue: CommandIssue) extends CommandResponse(Negative)
+
+  /**
+   * Represents a negative response that describes an error in executing the command
+   *
+   * @param runId of command for which this response is created
+   * @param message describing the reason or cause or action item of the error encountered while executing the command
+   */
+  case class Error(runId: Id, message: String) extends CommandResponse(Negative)
+
+  /**
+   * Represents a negative response that describes the cancellation of command
+   *
+   * @param runId of command for which this response is created
+   */
+  case class Cancelled(runId: Id) extends CommandResponse(Negative)
+
+  /**
+   * Represents a negative response stating that a command is not available
+   *
+   * @param runId of command for which this response is created
+   */
+  case class CommandNotAvailable(runId: Id) extends CommandResponse(Negative)
+
+  /**
+   * Represents a negative response stating that a command is not allowed
+   *
+   * @param runId of command for which this response is created
+   * @param issue describing the cause of invalidation
+   */
+  case class NotAllowed(runId: Id, issue: CommandIssue) extends CommandResponse(Negative)
+
+  /**
+   * Transform a given CommandResponse to a response with the provided Id
+   *
    * @param id the RunId for the new CommandResponse
    * @param commandResponse the CommandResponse to be transformed
-   * @return
+   * @return a CommandResponse that has runId as provided id
    */
   def withRunId(id: Id, commandResponse: CommandResponse): CommandResponse = commandResponse match {
     case accepted: Accepted                       ⇒ accepted.copy(runId = id)
@@ -49,11 +115,12 @@ object CommandResponse {
   }
 
   /**
-   * Creates an aggregate response from a stream of CommandResponse.
-   * @param commandResponses a source of stream of CommandResponse
-   * @return
+   * Creates an aggregated response from a collection of CommandResponses received from other components. If one of the
+   * CommandResponses fail, the aggregated response fails and further processing of any more CommandResponse is terminated.
+   *
+   * @param commandResponses a stream of CommandResponses
+   * @return a future of aggregated response
    */
-  //TODO: add more details around why and where this method is used
   def aggregateResponse(
       commandResponses: Source[CommandResponse, NotUsed]
   )(implicit ec: ExecutionContext, mat: Materializer): Future[CommandResponse] = {
@@ -73,11 +140,26 @@ object CommandResponse {
  * The nature of CommandResponse as an intermediate response of command execution or a final response which could be
  * positive or negative
  */
-//TODO: explain more details how commandResultType affects the CommandResponse and in decision of making aggregate response
 sealed trait CommandResultType
 object CommandResultType {
+
+  /**
+   * A CommandResponse of intermediate type
+   */
   case object Intermediate extends CommandResultType
-  sealed trait Final       extends CommandResultType
-  case object Positive     extends Final
-  case object Negative     extends Final
+
+  /**
+   * A CommandResponse of final type. It could be Positive or Negative
+   */
+  sealed trait Final extends CommandResultType
+
+  /**
+   * A Positive CommandResponse of Final type
+   */
+  case object Positive extends Final
+
+  /**
+   * A Negative CommandResponse of Final type
+   */
+  case object Negative extends Final
 }

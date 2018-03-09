@@ -3,13 +3,17 @@ package csw.messages.commons
 import akka.actor.CoordinatedShutdown
 import akka.actor.CoordinatedShutdown.Reason
 
-//TODO: what, why, how
+/**
+ * CoordinatedShutdownReason describes possible reasons for shutting down ActorSystem
+ */
 trait CoordinatedShutdownReason extends CoordinatedShutdown.Reason
 
 object CoordinatedShutdownReasons {
 
   /**
    * The shutdown was initiated by exception
+   *
+   * @param reason represents the cause in terms of exception
    */
   case class FailureReason(reason: Throwable) extends CoordinatedShutdownReason
 

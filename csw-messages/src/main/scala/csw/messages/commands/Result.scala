@@ -4,25 +4,39 @@ import csw.messages.params.generics.{Parameter, ParameterSetKeyData, ParameterSe
 import csw.messages.params.models.Prefix
 
 /**
- * A parameters set for returning results
+ * A result containing parameters for command response
  *
- * @param prefix   identifies the target subsystem
+ * @param prefix   identifies the subsystem that received the command and created command response out of it
  * @param paramSet an optional initial set of parameters (keys with values)
  */
-//TODO: add doc with what, why and how of result model
 case class Result private (prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])
     extends ParameterSetType[Result]
     with ParameterSetKeyData {
 
-  //TODO: add doc why we need create and from where it is coming
+  /**
+   * Create a new Result instance when a parameter is added or removed
+   *
+   * @param data set of parameters
+   * @return a new instance of Result with provided data
+   */
   override protected def create(data: Set[Parameter[_]]): Result = copy(paramSet = data)
 
-  // This is here for Java to construct with String
+  /**
+   * A java helper to construct Result
+   */
   def this(prefix: String) = this(Prefix(prefix))
 
 }
 
 object Result {
+
+  /**
+   * A helper method to create Result instance
+   *
+   * @param prefix identifies the subsystem that received the command and created command response out of it
+   * @param paramSet an optional initial set of parameters (keys with values)
+   * @return a Result instance with provided prefix and paramSet
+   */
   def apply(prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]): Result =
     new Result(prefix).madd(paramSet)
 }

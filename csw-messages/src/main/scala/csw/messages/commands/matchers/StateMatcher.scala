@@ -8,10 +8,16 @@ import csw.messages.params.states.CurrentState
  */
 trait StateMatcher {
 
+  /**
+   * The prefix of the destination component for which the current state is being matched
+   *
+   * @return the prefix of destination component
+   */
   def prefix: String
 
   /**
    * A predicate to match the current state
+   *
    * @param current current state to be matched as represented by [[csw.messages.params.states.CurrentState]]
    * @return true if match is successful, false otherwise
    */

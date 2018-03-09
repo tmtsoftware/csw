@@ -2,7 +2,11 @@ package csw.messages.events
 
 import play.api.libs.json.{Json, OFormat}
 
-//TODO: add doc
+/**
+ * A wrapper class representing the key for an event
+ *
+ * @param key is the combination of prefix and eventName
+ */
 case class EventKey(key: String) {
   override def toString: String = key
 }

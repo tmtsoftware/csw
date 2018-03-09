@@ -69,13 +69,26 @@ class Matcher(
    */
   def stop(): Unit = killSwitch.abort(MatchAborted(stateMatcher.prefix))
 
-  private lazy val (killSwitch, currentStateF) = source //TODO: explain stream with pics maybe
+  /**
+   * +----------------------------+
+   * |  Source ActorRef           |                +---------------+   +----------------------+   +---------------------------+
+   * |                            |                |  filter when  |   | wait for a specific  |   | Sink.head to complete the |
+   * |  on materialization        |                |               |   |                      |   |                           |
+   * |                            |~current state~>|  demand state |~~>| time to match demand |~~>| stream as soon as demand  |
+   * |  subscribe to destination  |                |               |   |                      |   |                           |
+   * |                            |                |  matches      |   | state                |   |  state matches            |
+   * |  component's state         |                +---------------+   +----------------------+   +---------------------------+
+   * |                            |
+   * +----------------------------+
+   *
+   */
+  private lazy val (killSwitch, currentStateF) = source
     .viaMat(KillSwitches.single)(Keep.right)
     .toMat(Sink.head)(Keep.both)
     .run()
 
   private def source =
-    Source //TODO: explain stream with pics maybe
+    Source
       .actorRef[CurrentState](256, OverflowStrategy.fail)
       .mapMaterializedValue { ref ⇒
         currentStateSource ! ComponentStateSubscription(Subscribe(ref))

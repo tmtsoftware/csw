@@ -10,28 +10,63 @@ import csw_protobuf.parameter.PbParameter
 
 import scalapb.TypeMapper
 
+/**
+ * Common trait representing events in TMT like SystemEvent and ObserveEvent
+ */
 sealed trait Event { self: ParameterSetType[_] ⇒
 
-  def paramType: ParameterSetType[_] = self //TODO: explain more about why do we need paramType as self type
+  /**
+   * A helper to give access of public members of ParameterSetType
+   *
+   * @return a handle to ParameterSetType extended by concrete implementation of this class
+   */
+  def paramType: ParameterSetType[_] = self
 
+  /**
+   * unique Id for event
+   */
   val eventId: Id
 
+  /**
+   * Prefix representing source of the event
+   */
   val source: Prefix
 
+  /**
+   * The name of event
+   */
   val eventName: EventName
 
+  /**
+   * The time of event creation
+   */
   val eventTime: EventTime
 
+  /**
+   * An optional initial set of parameters (keys with values)
+   */
   val paramSet: Set[Parameter[_]]
 
   /**
    * A name identifying the type of parameter set, such as "SystemEvent", "ObserveEvent".
    * This is used in the JSON and toString output.
+   *
+   * @return a string representation of concrete type of this class
    */
   def typeName: String
 
+  /**
+   * The EventKey used to publish or subscribe an event
+   *
+   * @return an EventKey formed by combination of prefix and eventName of an event
+   */
   def eventKey: EventKey = EventKey(s"${source.prefix}.$eventName")
 
+  /**
+   * A common toString method for all concrete implementation
+   *
+   * @return the string representation of command
+   */
   override def toString: String =
     s"$typeName(eventId=$eventId, source=$source, eventName=$eventName, eventTime=$eventTime, paramSet=$paramSet)"
 }
@@ -79,6 +114,12 @@ object Event {
     }
   }
 
+  /**
+   * A helper method internally used to create an Event out of provided pbEvent
+   *
+   * @param pbEvent a PbEvent representing Event in protobuf
+   * @return an Event mapped from PbEvent
+   */
   def fromPb(pbEvent: PbEvent): Event = Event.typeMapper[Event].toCustom(pbEvent)
 
   // Fixme: Can this take a EventKey and create correct prefix and put it in Events Prefix?
@@ -88,13 +129,7 @@ object Event {
 }
 
 /**
- * Defines a system event
- *
- * @param eventId
- * @param source
- * @param eventName
- * @param eventTime
- * @param paramSet
+ * Defines a system event. Constructor is private to ensure eventId is created internally to guarantee unique value.
  */
 case class SystemEvent private (
     eventId: Id,
@@ -105,18 +140,31 @@ case class SystemEvent private (
 ) extends ParameterSetType[SystemEvent]
     with Event {
 
-  def this(source: Prefix, eventName: EventName) = this(Id(), source, eventName, EventTime(), Set.empty) // Java API
+  /**
+   * A java helper to construct SystemEvent
+   */
+  def this(source: Prefix, eventName: EventName) = this(Id(), source, eventName, EventTime(), Set.empty)
 
+  /**
+   * Create a new SystemEvent instance when a parameter is added or removed
+   *
+   * @param data set of parameters
+   * @return a new instance of SystemEvent with new eventId, eventTime and provided data
+   */
   override protected def create(data: Set[Parameter[_]]): SystemEvent =
     copy(eventId = Id(), eventTime = EventTime(), paramSet = data)
 
   /**
-   * Returns Protobuf representation of SystemEvent
+   * A helper method to create PbEvent out of this Event
+   *
+   * @return a protobuf representation of SystemEvent
    */
   def toPb: PbEvent = Event.typeMapper[SystemEvent].toBase(this)
 }
 
 object SystemEvent {
+
+  // The default apply method is used only internally while reading the incoming json and de-serializing it to SystemEvent model
   private[messages] def apply(
       eventId: Id,
       source: Prefix,
@@ -125,25 +173,37 @@ object SystemEvent {
       paramSet: Set[Parameter[_]]
   ) = new SystemEvent(eventId, source, eventName, eventTime, paramSet)
 
+  /**
+   * The apply method is used to create SystemEvent command by end-user. eventId is not accepted and will be created internally to guarantee unique value.
+   *
+   * @param source prefix representing source of the event
+   * @param eventName the name of event
+   * @return a new instance of SystemEvent with auto-generated eventId, eventTime and empty paramSet
+   */
   def apply(source: Prefix, eventName: EventName): SystemEvent = apply(Id(), source, eventName, EventTime(), Set.empty)
 
+  /**
+   * The apply method is used to create SystemEvent command by end-user. eventId is not accepted and will be created internally to guarantee unique value.
+   *
+   * @param source prefix representing source of the event
+   * @param eventName the name of event
+   * @param paramSet an initial set of parameters (keys with values)
+   * @return a new instance of SystemEvent with auto-generated eventId and eventTime
+   */
   def apply(source: Prefix, eventName: EventName, paramSet: Set[Parameter[_]]): SystemEvent =
     apply(source, eventName).madd(paramSet)
 
   /**
    * Constructs from byte array containing Protobuf representation of SystemEvent
+   *
+   * @param pbEvent the protobuf representation of an event
+   * @return a SystemEvent mapped from provided pbEvent
    */
   def fromPb(pbEvent: PbEvent): SystemEvent = Event.typeMapper[SystemEvent].toCustom(pbEvent)
 }
 
 /**
- * Defines an observe event
- *
- * @param eventId
- * @param source
- * @param eventName
- * @param eventTime
- * @param paramSet
+ * Defines an observe event. Constructor is private to ensure eventId is created internally to guarantee unique value.
  */
 case class ObserveEvent private (
     eventId: Id,
@@ -154,19 +214,31 @@ case class ObserveEvent private (
 ) extends ParameterSetType[ObserveEvent]
     with Event {
 
-  def this(source: Prefix, eventName: EventName) = this(Id(), source, eventName, EventTime(), Set.empty) //   Java API
+  /**
+   * A java helper to construct ObserveEvent
+   */
+  def this(source: Prefix, eventName: EventName) = this(Id(), source, eventName, EventTime(), Set.empty)
 
+  /**
+   * Create a new ObserveEvent instance when a parameter is added or removed
+   *
+   * @param data set of parameters
+   * @return a new instance of ObserveEvent with new eventId, eventTime and provided data
+   */
   override protected def create(data: Set[Parameter[_]]): ObserveEvent =
     copy(eventId = Id(), eventTime = EventTime(), paramSet = data)
 
   /**
-   * Returns Protobuf representation of ObserveEvent
+   * A helper method to create PbEvent out of this Event
+   *
+   * @return a protobuf representation of ObserveEvent
    */
   def toPb: PbEvent = Event.typeMapper[ObserveEvent].toBase(this)
 }
 
 object ObserveEvent {
 
+  // The default apply method is used only internally while reading the incoming json and de-serializing it to ObserveEvent model
   private[messages] def apply(
       eventId: Id,
       source: Prefix,
@@ -175,13 +247,31 @@ object ObserveEvent {
       paramSet: Set[Parameter[_]]
   ) = new ObserveEvent(eventId, source, eventName, eventTime, paramSet)
 
+  /**
+   * The apply method is used to create ObserveEvent command by end-user. eventId is not accepted and will be created internally to guarantee unique value.
+   *
+   * @param source prefix representing source of the event
+   * @param eventName the name of event
+   * @return a new instance of ObserveEvent with auto-generated eventId, eventTime and empty paramSet
+   */
   def apply(source: Prefix, eventName: EventName): ObserveEvent = apply(Id(), source, eventName, EventTime(), Set.empty)
 
+  /**
+   * The apply method is used to create ObserveEvent command by end-user. eventId is not accepted and will be created internally to guarantee unique value.
+   *
+   * @param source prefix representing source of the event
+   * @param eventName the name of event
+   * @param paramSet an initial set of parameters (keys with values)
+   * @return a new instance of ObserveEvent with auto-generated eventId and eventTime
+   */
   def apply(source: Prefix, eventName: EventName, paramSet: Set[Parameter[_]]): ObserveEvent =
     apply(source, eventName).madd(paramSet)
 
   /**
-   * Constructs from byte array containing Protobuf representation of ObserveEvent
+   * Constructs from byte array containing Protobuf representation of SystemEvent
+   *
+   * @param pbEvent the protobuf representation of an event
+   * @return a ObserveEvent mapped from provided pbEvent
    */
   def fromPb(pbEvent: PbEvent): ObserveEvent = Event.typeMapper[ObserveEvent].toCustom(pbEvent)
 }
