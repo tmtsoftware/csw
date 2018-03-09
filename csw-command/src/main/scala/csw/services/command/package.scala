@@ -6,35 +6,29 @@ package csw.services
  * This project defines the basic classes and traits for the ''Command Service''.
  *
  * Related projects are:
- * - '''csw-messages''': This defines the types of command (Oneway/Submit etc.) and types of ''configurations'' (Setup/Observe/Wait etc.)
- * - '''framework''': This defines the Hcd and Assembly handlers, lifecycle manager and supervisor for components.
+ * - '''csw-messages''':
+ *   - This defines the types of command (Oneway/Submit etc.) and types of ''configurations'' (Setup/Observe/Wait etc.)
+ *   - Complete usage of Messages is available at: https://tmtsoftware.github.io/csw-prod/services/messages.html
+ *
+ * - '''framework''':
+ *   - This defines the Hcd and Assembly handlers, lifecycle manager and supervisor for components.
+ *   - Framework allows component writer to override onValidation, onSubmit and onOneway handlers. (Note it allows overriding other handlers as well.)
+ *   - On every command received by component, onValidation handler gets invoked where received command gets validated and validation response is returned.
+ *   - Based on validation response and command type, onSubmit/onOneway hooks gets invoked where command gets processed.
+ *   - Complete details of handling commands can be found here : https://tmtsoftware.github.io/csw-prod/framework/handling-lifecycle.html#handling-commands
  *
  * Important classes in this project are:
  *
  * - [[csw.services.command.scaladsl.CommandResponseManager]]
  *
- * This class wraps CommandResponseManagerActor and provides helpers to interact with actor
- * which is responsible for adding/updating/querying command result.
+ * This class wraps CommandResponseManagerActor and provides helpers to interact with actor which is responsible for adding/updating/querying command result.
  * Component writers will get handle to CommandResponseManager in their handlers.
- * When component receives command of type [[CommandMessage.Submit]],
- * then framework (ComponentBehavior - TLA) will add a entry of this command with its validation status into CommandResponseManager.
  *
- * In case of short running or immediate command,
- * validation response will be of type final result which can either be of type
- * [[csw.messages.commands.CommandResultType.Positive]] or [[csw.messages.commands.CommandResultType.Negative]]
- *
- * In case of long running command, validation response will be of type [[csw.messages.commands.CommandResultType.Intermediate]]
- * then it is the responsibility of component writer to update its final command status later on
- * with [[csw.messages.commands.CommandResponse]] which should be of type
- * [[csw.messages.commands.CommandResultType.Positive]] or [[csw.messages.commands.CommandResultType.Negative]]
- *
- * CommandResponseManager also provides **subscribe** API.
- * One of the use case for this is when Assembly splits top level command into two sub commands and forwards them to two different HCD's.
- * In this case, Assembly can register its interest in the final [[csw.messages.commands.CommandResponse]]
- * from two HCD's when these sub commands completes, using **subscribe** API.
- * And once Assembly receives final command response from both the HCD's
- * then it can update Top level command with final [[csw.messages.commands.CommandResponse]]
- *
+ * - [[csw.services.command.internal.CommandResponseManagerBehavior]] maintains two states:
+ *  - [[csw.services.command.models.CommandResponseManagerState]]:
+ *      It maintains [[csw.messages.params.models.Id]] of Commands and their corresponding [[csw.services.command.models.CommandState]].
+ *  - [[csw.services.command.models.CommandCorrelation]] :
+ *      It maintains commands [[csw.messages.params.models.Id]] correlation between parent to child and child to parent.
  *
  * - [[csw.services.command.scaladsl.CommandService]]
  *
@@ -43,42 +37,13 @@ package csw.services
  *
  * Using this instance, you can Submit Command/Commands to other component or query for command result or subscribe for long running command result.
  *
- * === Example of CommandService Usage ===
- *
- * {{{
- *
- *    async{
- *       // here assemblyLocation is the resolved assembly location using LocationService
- *       val assemblyConfigService = new CommandService(assemblyLocation)
- *
- *       // here setupCommand is a ControlCommand which is created with prefix, command name, obs id and set of Parameters
- *       val initialResponse = await(assemblyConfigService.submit(setupCommand))
- *       // this can be a response of validation (Accepted, Invalid) or a final Response.
- *       // in case of response as `Accepted`, final CommandResponse can be obtained by using `subscribe` API.
- *
- *       // suppose initialResponse is Accepted, then you can use subscribe API to obtain final response
- *       val finalResponse = await(assemblyConfigService.subscribe(setupCommand.runId))
- *    }
- *
- * }}}
- *
  * - [[csw.services.command.scaladsl.CommandDistributor]]
  *
- * The ConfigDistributor enables distributing multiple commands to multiple components and get one aggregated command
- * response as a final response.
+ * When you have multiple commands targeted to multiple components then you can use ConfigDistributor.
+ * Using CommandDistributor utility you can send all these commands in one go and get aggregated response.
  *
- * === Example of CommandDistributor Usage ===
- *
- * {{{
- *
- *   // here hcdACommandService and hcdBCommandService are instances of CommandService created using HCD-A and HCD-B locations
- *   // setup1HcdA and setup2HcdA are Setup commands which are targeted to HCD-A
- *   // setup1HcdB and setup2HcdB are Setup commands which are targeted to HCD-B
- *   val aggregatedValidationResponse = CommandDistributor(
- *              Map(hcdACommandService → Set(setup1HcdA, setup2HcdA), hcdBCommandService → Set(setup1HcdB, setup2HcdB))
- *          ).aggregatedValidationResponse()
- *
- * }}}
+ * Complete guide of usage of different API's provided by CommandService is available at:
+ * https://tmtsoftware.github.io/csw-prod/command.html
  *
  */
 package object command {}
