@@ -11,11 +11,18 @@ import scala.collection.immutable.IndexedSeq
  * @param entryName A name of the connection type e.g. akka, http or tcp
  */
 sealed abstract class ConnectionType(override val entryName: String) extends EnumEntry with TMTSerializable {
+
+  /**
+   * The name of the connection type
+   */
   def name: String = entryName
 }
 
 object ConnectionType extends Enum[ConnectionType] with PlayJsonEnum[ConnectionType] {
 
+  /**
+   * Returns a sequence of all connection types
+   */
   override def values: IndexedSeq[ConnectionType] = findValues
 
   /**

@@ -7,10 +7,14 @@ import play.api.libs.json._
 
 /**
  * Represents a connection based on a componentId and the type of connection offered by the component
+ *
+ * @param connectionType represents a type of connection offered by the Component
  */
 sealed abstract class Connection(val connectionType: ConnectionType) extends TMTSerializable { self: TypedConnection[_] ⇒
 
-  //TODO: add doc for why we need this
+  /**
+   * A covariant Location type
+   */
   type L <: Location
 
   /**
@@ -18,7 +22,9 @@ sealed abstract class Connection(val connectionType: ConnectionType) extends TMT
    */
   def componentId: ComponentId
 
-  //TODO: add doc for significance
+  /**
+   * Returns a ConnectionInfo which represents component name, component type and connection type for this Connection
+   */
   def connectionInfo: ConnectionInfo = ConnectionInfo(componentId.name, componentId.componentType, connectionType)
 
   /**
@@ -26,31 +32,50 @@ sealed abstract class Connection(val connectionType: ConnectionType) extends TMT
    */
   def name: String = connectionInfo.toString
 
-  //TODO: add doc for significance
+  /**
+   * A helper method to cast this Connection to TypedConnection
+   *
+   * @tparam T A covariant of Location type that TypedConnection uses
+   * @return A TypedConnection casted from this Connection
+   */
   def of[T <: Location]: TypedConnection[T] = self.asInstanceOf[TypedConnection[T]]
 }
 
-//TODO: add doc for significance
+/**
+ * TypedConnection captures the type of Location that concrete connection will resolve to
+ *
+ * @param connectionType represents the type of connection e.g akka, http, tcp
+ * @tparam T represents the type of Location
+ */
 abstract sealed class TypedConnection[T <: Location](connectionType: ConnectionType) extends Connection(connectionType) {
   override type L = T
 }
 
 object Connection {
 
-  //TODO: add doc for significance
+  /**
+   * Create a Connection from provided String input
+   *
+   * @param input is the string representation of connection e.g. TromboneAssembly-assembly-akka
+   * @return a Connection model created from string
+   */
   def from(input: String): Connection = input.split("-") match {
     case Array(name, componentType, connectionType) ⇒
       from(ConnectionInfo(name, ComponentType.withName(componentType), ConnectionType.withName(connectionType)))
     case _ ⇒ throw new IllegalArgumentException(s"Unable to parse '$input' to make Connection object")
   }
 
-  //TODO: add doc for significance
+  /**
+   * Create a Connection from provided ConnectionInfo
+   *
+   * @param connectionInfo represents component name, component type and connection type
+   * @return A Connection created from connectionInfo
+   */
   def from(connectionInfo: ConnectionInfo): Connection = from(
     ComponentId(connectionInfo.name, connectionInfo.componentType),
     connectionInfo.connectionType
   )
 
-  //TODO: add doc for significance
   private def from(componentId: ComponentId, connectionType: ConnectionType): Connection = connectionType match {
     case AkkaType ⇒ AkkaConnection(componentId)
     case TcpType  ⇒ TcpConnection(componentId)

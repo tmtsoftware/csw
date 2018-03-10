@@ -2,12 +2,17 @@ package csw.messages.location
 
 import play.api.libs.json.{Json, OFormat}
 
-//TODO: add doc for significance
+/**
+ * ConnectionInfo represents a component name, component type and connection type
+ *
+ * @param name represents a component name e.g. TromboneAssembly
+ * @param componentType represents the type of component e.g. Assembly, HCD, etc
+ * @param connectionType represents the type of connection e.g. akka, http, tcp
+ */
 private[location] case class ConnectionInfo(name: String, componentType: ComponentType, connectionType: ConnectionType) {
   override def toString: String = s"$name-${componentType.name}-${connectionType.name}"
 }
 
-//TODO: add doc for significance
 private[location] object ConnectionInfo {
   implicit val connectionInfoFormat: OFormat[ConnectionInfo] = Json.format[ConnectionInfo]
 }

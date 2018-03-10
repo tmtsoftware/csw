@@ -10,6 +10,8 @@ import scala.collection.immutable.IndexedSeq
 /**
  * Represents a type of the Component. It should be serializable since it has to be transmittable over the network.
  * The type will always be represented in lower case.
+ *
+ * @param messageManifest represents the class name of message that a component will understand
  */
 sealed abstract class ComponentType(val messageManifest: String) extends EnumEntry with Lowercase with TMTSerializable {
 
@@ -21,6 +23,9 @@ sealed abstract class ComponentType(val messageManifest: String) extends EnumEnt
 
 object ComponentType extends Enum[ComponentType] with PlayJsonEnum[ComponentType] {
 
+  /**
+   * Returns a sequence of all component types
+   */
   def values: IndexedSeq[ComponentType] = findValues
 
   /**
