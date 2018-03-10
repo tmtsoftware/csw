@@ -2,12 +2,30 @@ package csw.messages.framework
 
 import csw.messages.TMTSerializable
 
-//TODO: what, why, how
+/**
+ * Represents protocol or messages sent to underlying TLA component
+ */
 sealed trait ToComponentLifecycleMessage extends TMTSerializable
-object ToComponentLifecycleMessages {
-  case object GoOffline extends ToComponentLifecycleMessage
-  case object GoOnline  extends ToComponentLifecycleMessage
 
+object ToComponentLifecycleMessages {
+
+  /**
+   * Represents an action to go to offline mode
+   */
+  case object GoOffline extends ToComponentLifecycleMessage
+
+  /**
+   * Represents an action to go to online mode
+   */
+  case object GoOnline extends ToComponentLifecycleMessage
+
+  /**
+   * A Java helper representing GoOffline
+   */
   def jGoOffline(): ToComponentLifecycleMessage = GoOffline
-  def jGoOnline(): ToComponentLifecycleMessage  = GoOnline
+
+  /**
+   * A Java helper representing GoOnline
+   */
+  def jGoOnline(): ToComponentLifecycleMessage = GoOnline
 }

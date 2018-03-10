@@ -2,7 +2,9 @@ package csw.messages.framework
 
 import csw.messages.TMTSerializable
 
-//TODO: what, why, how
+/**
+ * LockingResponse represents valid responses when a component requests to lock some component
+ */
 sealed trait LockingResponse extends TMTSerializable
 
 object LockingResponses {
@@ -19,6 +21,8 @@ object LockingResponses {
 
   /**
    * This is sent when lock acquiring fails, e.g. Component A tries to Lock component B which is already locked by Component C
+   *
+   * @param reason describing the failure to acquire lock
    */
   case class AcquiringLockFailed(reason: String) extends LockingResponse
 
@@ -44,6 +48,8 @@ object LockingResponses {
 
   /**
    * This is sent when unlocking component fails, e.g. Component A tries to Unlock component B which is locked by Component C
+   *
+   * @param reason describing the failure to release lock
    */
   case class ReleasingLockFailed(reason: String) extends LockingResponse
 
