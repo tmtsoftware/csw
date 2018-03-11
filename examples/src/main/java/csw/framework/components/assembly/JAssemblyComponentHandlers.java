@@ -87,16 +87,15 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
 
         // If an Hcd is found as a connection, resolve its location from location service and create other
         // required worker actors required by this assembly
-        Optional<CompletableFuture<Void>> voidCompletableFuture = mayBeConnection.map(connection ->
+        return mayBeConnection.map(connection ->
                 worker.thenAcceptBoth(resolveHcd(), (workerActor, hcdLocation) -> {
                     if(!hcdLocation.isPresent())
                         throw new HcdNotFoundException();
                     else
                         runningHcds.put(connection, Optional.of(hcdLocation.get().componentRef()));
                     diagnosticPublisher = ctx.spawnAnonymous(DiagnosticsPublisher.jMake(Optional.of(hcdLocation.get().componentRef()), Optional.of(workerActor)));
-                }));
+                })).get();
 
-        return voidCompletableFuture.get().thenApply(x -> null);
     }
     //#jInitialize-handler
 
