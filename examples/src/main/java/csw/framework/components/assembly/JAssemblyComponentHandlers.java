@@ -29,7 +29,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 
@@ -88,18 +87,14 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
 
         // If an Hcd is found as a connection, resolve its location from location service and create other
         // required worker actors required by this assembly
-        Optional<CompletableFuture<Void>> voidCompletableFuture = mayBeConnection.map(connection -> {
-            CompletableFuture<Optional<AkkaLocation>> eventualHcdLocation = locationService.resolve(connection.<AkkaLocation>of(), FiniteDuration.apply(5, TimeUnit.SECONDS));
-            // #failureRestart-Exception
-            return worker.thenAcceptBoth(eventualHcdLocation, (workerActor, hcdLocation) -> {
-                if(!hcdLocation.isPresent())
-                    throw new HcdNotFoundException();
-                else
-                    runningHcds.put(connection, Optional.of(hcdLocation.get().componentRef()));
-                diagnosticPublisher = ctx.spawnAnonymous(DiagnosticsPublisher.jMake(Optional.of(hcdLocation.get().componentRef()), Optional.of(workerActor)));
-            });
-        });
-        // #failureRestart-Exception
+        Optional<CompletableFuture<Void>> voidCompletableFuture = mayBeConnection.map(connection ->
+                worker.thenAcceptBoth(resolveHcd(), (workerActor, hcdLocation) -> {
+                    if(!hcdLocation.isPresent())
+                        throw new HcdNotFoundException();
+                    else
+                        runningHcds.put(connection, Optional.of(hcdLocation.get().componentRef()));
+                    diagnosticPublisher = ctx.spawnAnonymous(DiagnosticsPublisher.jMake(Optional.of(hcdLocation.get().componentRef()), Optional.of(workerActor)));
+                }));
 
         return voidCompletableFuture.get().thenApply(x -> null);
     }
@@ -221,7 +216,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
         }
     }
 
-    private void resolveHcd() {
+    private CompletableFuture<Optional<AkkaLocation>> resolveHcd() {
         // find a Hcd connection from the connections provided in componentInfo
         Optional<Connection> mayBeConnection = componentInfo.getConnections().stream()
                 .filter(connection -> connection.componentId().componentType() == JComponentType.HCD)
@@ -229,14 +224,17 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
 
         // If an Hcd is found as a connection, resolve its location from location service and create other
         // required worker actors required by this assembly
-        mayBeConnection.ifPresent(connection -> {
-            CompletableFuture<Optional<AkkaLocation>> eventualHcdLocation = locationService.resolve(connection.<AkkaLocation>of(), FiniteDuration.apply(5, TimeUnit.SECONDS));
-            try {
-                AkkaLocation hcdLocation = eventualHcdLocation.get().orElseThrow(HcdNotFoundException::new);
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-        });
+        if(mayBeConnection.isPresent()) {
+            CompletableFuture<Optional<AkkaLocation>> resolve = locationService.resolve(mayBeConnection.get().<AkkaLocation>of(), FiniteDuration.apply(5, TimeUnit.SECONDS));
+            return resolve.thenCompose((Optional<AkkaLocation> resolvedHcd) -> {
+                if(resolvedHcd.isPresent())
+                    return CompletableFuture.completedFuture(resolvedHcd);
+                else
+                    throw new ConfigNotAvailableException();
+            });
+        }
+        else
+            return CompletableFuture.completedFuture(Optional.empty());
     }
     // #failureRestart-Exception
 

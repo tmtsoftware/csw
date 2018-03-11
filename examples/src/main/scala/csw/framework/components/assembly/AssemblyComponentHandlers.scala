@@ -67,14 +67,15 @@ class AssemblyComponentHandlers(
 
     // 4. If an Hcd is found as a connection, resolve its location from location service and create other
     // required worker actors required by this assembly
+
     maybeConnection match {
-      case hcdConnection @ Some(hcd) ⇒
-        locationService.resolve(hcd.of[AkkaLocation], 5.seconds).map {
-          case Some(akkaLocation) ⇒
-            runningHcds = runningHcds.updated(hcdConnection.get, Some(akkaLocation.componentRef))
+      case Some(_) ⇒
+        resolveHcd().map {
+          case Some(hcd) ⇒
+            runningHcds = runningHcds.updated(maybeConnection.get, Some(hcd.componentRef))
             diagnosticsPublisher = ctx.spawnAnonymous(DiagnosticsPublisher.make(runningHcds(maybeConnection.get), Some(worker)))
             commandHandler = ctx.spawnAnonymous(CommandHandler.make(calculationConfig, runningHcds(maybeConnection.get)))
-          case None ⇒ throw new RuntimeException("Could not resolve hcd location, Initialization failure.")
+          case None ⇒ // do something
         }
       case None ⇒ Future.successful(Unit)
     }
@@ -161,18 +162,18 @@ class AssemblyComponentHandlers(
   //#failureRestart-Exception
   case class HcdNotFoundException() extends FailureRestart("Could not resolve hcd location. Initialization failure.")
 
-  private def resolveHcd() = {
+  private def resolveHcd(): Future[Option[AkkaLocation]] = {
     val maybeConnection = componentInfo.connections.find(connection ⇒ connection.componentId.componentType == ComponentType.HCD)
     maybeConnection match {
-      case hcdConnection @ Some(hcd) ⇒
+      case Some(hcd) ⇒
         locationService.resolve(hcd.of[AkkaLocation], 5.seconds).map {
-          case Some(akkaLocation) ⇒
+          case Some(akkaLocation) ⇒ Some(akkaLocation)
           case None               ⇒
             // Hcd connection could not be resolved for this Assembly. One option to handle this could be to automatic restart which can give enough time
             // for the Hcd to be available
             throw HcdNotFoundException()
         }
-      case None ⇒ Future.successful(Unit)
+      case _ ⇒ Future.successful(None)
     }
   }
   //#failureRestart-Exception
