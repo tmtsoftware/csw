@@ -63,6 +63,8 @@ import com.persist.JsonOps._
  *
  * }}}
  *̄
+ * Detailed documentation of Logging Service is available at:
+ * https://tmtsoftware.github.io/csw-prod/services/logging.html
  */
 package object logging {
 

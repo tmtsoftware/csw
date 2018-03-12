@@ -103,6 +103,5 @@ package csw
  *
  * Detailed information about creating events can be found here:
  *  https://tmtsoftware.github.io/csw-prod/services/messages/events.html
- *
  */
 package object messages {}

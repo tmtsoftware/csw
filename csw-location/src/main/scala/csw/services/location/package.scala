@@ -34,7 +34,7 @@ package csw.services
  *
  * Another important actor from LocationService is `DeathwatchActor` [[csw.services.location.internal.DeathwatchActor]]
  * which gets created with LocationService initialization. Job of this actor is to watch health of every component and on termination,
- *  Unregister terminated component from LocationService.
+ * unregister terminated component from LocationService.
  *
  * Complete guide of usage of different API's provided by LocationService is available at:
  * https://tmtsoftware.github.io/csw-prod/services/location.html

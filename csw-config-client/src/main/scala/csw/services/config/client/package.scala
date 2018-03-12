@@ -60,5 +60,7 @@ package csw.services.config
  *   15. exists
  *   16. getActive
  *
- * */
+ * Detailed documentation of Config Client API usage is available at:
+ * https://tmtsoftware.github.io/csw-prod/services/config.html
+ */
 package object client {}
