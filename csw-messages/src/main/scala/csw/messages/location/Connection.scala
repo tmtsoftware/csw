@@ -10,7 +10,8 @@ import play.api.libs.json._
  *
  * @param connectionType represents a type of connection offered by the Component
  */
-sealed abstract class Connection(val connectionType: ConnectionType) extends TMTSerializable { self: TypedConnection[_] ⇒
+sealed abstract class Connection(val connectionType: ConnectionType) extends TMTSerializable {
+  self: TypedConnection[_] ⇒
 
   /**
    * A covariant Location type
@@ -82,8 +83,8 @@ object Connection {
     case HttpType ⇒ HttpConnection(componentId)
   }
 
-  implicit val connectionReads: Reads[Connection]   = ConnectionInfo.connectionInfoFormat.map(Connection.from)
-  implicit val connectionWrites: Writes[Connection] = Writes[Connection](c ⇒ Json.toJson(c.connectionInfo))
+  private[messages] implicit val connectionReads: Reads[Connection]   = ConnectionInfo.connectionInfoFormat.map(Connection.from)
+  private[messages] implicit val connectionWrites: Writes[Connection] = Writes[Connection](c ⇒ Json.toJson(c.connectionInfo))
 
   /**
    * Represents a connection offered by remote Actors

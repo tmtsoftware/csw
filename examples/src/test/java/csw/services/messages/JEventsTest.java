@@ -180,11 +180,11 @@ public class JEventsTest {
         String str = Json.prettyPrint(systemJson);
 
         //construct DemandState from string
-        SystemEvent statusFromPrettyStr = JavaJsonSupport.readEvent(SystemEvent.class, Json.parse(str));
+        SystemEvent statusFromPrettyStr = JavaJsonSupport.readEvent(Json.parse(str));
 
         //json support - read
-        ObserveEvent observeEvent1 = JavaJsonSupport.readEvent(ObserveEvent.class, observeJson);
-        SystemEvent systemEvent1 = JavaJsonSupport.readEvent(SystemEvent.class, systemJson);
+        ObserveEvent observeEvent1 = JavaJsonSupport.readEvent(observeJson);
+        SystemEvent systemEvent1 = JavaJsonSupport.readEvent(systemJson);
         //#json-serialization
 
         //validations

@@ -10,5 +10,5 @@ case class EventName(name: String) {
 }
 
 object EventName {
-  implicit val format: OFormat[EventName] = Json.format[EventName]
+  private[messages] implicit val format: OFormat[EventName] = Json.format[EventName]
 }

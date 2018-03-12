@@ -12,5 +12,5 @@ case class EventKey(key: String) {
 }
 
 object EventKey {
-  implicit val format: OFormat[EventKey] = Json.format[EventKey]
+  private[messages] implicit val format: OFormat[EventKey] = Json.format[EventKey]
 }

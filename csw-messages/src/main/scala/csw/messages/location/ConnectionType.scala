@@ -10,7 +10,7 @@ import scala.collection.immutable.IndexedSeq
  *
  * @param entryName A name of the connection type e.g. akka, http or tcp
  */
-sealed abstract class ConnectionType(override val entryName: String) extends EnumEntry with TMTSerializable {
+sealed abstract class ConnectionType private[messages] (override val entryName: String) extends EnumEntry with TMTSerializable {
 
   /**
    * The name of the connection type

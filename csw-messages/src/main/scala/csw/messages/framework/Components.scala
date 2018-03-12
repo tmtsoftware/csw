@@ -7,4 +7,4 @@ import csw.messages.TMTSerializable
  *
  * @param components a set of components with its supervisor and componentInfo
  */
-case class Components(components: Set[Component]) extends TMTSerializable
+private[csw] case class Components(components: Set[Component]) extends TMTSerializable

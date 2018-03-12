@@ -38,10 +38,11 @@ final case class ComponentInfo(
 case object ComponentInfo {
 
   // specifies how to serialize and de-serialize any FiniteDuration which is initializeTimeout in this case
-  implicit val finiteDurationReads: Reads[FiniteDuration]   = Reads[FiniteDuration](parseDuration)
-  implicit val finiteDurationWrites: Writes[FiniteDuration] = Writes[FiniteDuration](d ⇒ Json.toJson(d.toString))
+  private[csw] implicit val finiteDurationReads: Reads[FiniteDuration] = Reads[FiniteDuration](parseDuration)
+  private[csw] implicit val finiteDurationWrites: Writes[FiniteDuration] =
+    Writes[FiniteDuration](d ⇒ Json.toJson(d.toString))
 
-  implicit val componentInfoFormat: OFormat[ComponentInfo] = Jsonx.formatCaseClassUseDefaults[ComponentInfo]
+  private[csw] implicit val componentInfoFormat: OFormat[ComponentInfo] = Jsonx.formatCaseClassUseDefaults[ComponentInfo]
 
   private def parseDuration(json: JsValue): JsResult[FiniteDuration] = json.validate[String].flatMap { str =>
     str.split(" ") match {

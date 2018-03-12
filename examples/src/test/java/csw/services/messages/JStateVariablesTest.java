@@ -171,11 +171,11 @@ public class JStateVariablesTest {
         String str = Json.prettyPrint(dsJson);
 
         //construct DemandState from string
-        DemandState dsFromPrettyStr = JavaJsonSupport.readStateVariable(DemandState.class, Json.parse(str));
+        DemandState dsFromPrettyStr = JavaJsonSupport.readStateVariable(Json.parse(str));
 
         //json support - read
-        DemandState ds1 = JavaJsonSupport.readStateVariable(DemandState.class, dsJson);
-        CurrentState cs1 = JavaJsonSupport.readStateVariable(CurrentState.class, csJson);
+        DemandState ds1 = JavaJsonSupport.readStateVariable(dsJson);
+        CurrentState cs1 = JavaJsonSupport.readStateVariable(csJson);
         //#json-serialization
 
         //validations

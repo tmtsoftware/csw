@@ -19,6 +19,13 @@ import scala.runtime.ScalaRunTime._
  */
 case class Key[S: Format: ClassTag: ItemsFactory] private[generics] (keyName: String, keyType: KeyType[S], units: Units) {
 
+  /**
+   * An overloaded constructor to create Key with no units
+   *
+   * @param keyName the name of the key
+   * @param keyType reference to an object of type KeyType[S]
+   * @return an instance of Key[S]
+   */
   def this(keyName: String, keyType: KeyType[S]) = this(keyName, keyType, NoUnits)
 
   //TODO: add doc

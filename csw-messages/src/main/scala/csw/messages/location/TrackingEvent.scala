@@ -16,7 +16,7 @@ sealed abstract class TrackingEvent {
  *
  * @param location the updated location for the tracked connection
  */
-case class LocationUpdated(location: Location) extends TrackingEvent {
+case class LocationUpdated private[location] (location: Location) extends TrackingEvent {
 
   /**
    * The connection for which this TrackingEvent is created
@@ -29,4 +29,4 @@ case class LocationUpdated(location: Location) extends TrackingEvent {
  *
  * @param connection for which the location no longer exists
  */
-case class LocationRemoved(connection: Connection) extends TrackingEvent
+case class LocationRemoved private[location] (connection: Connection) extends TrackingEvent

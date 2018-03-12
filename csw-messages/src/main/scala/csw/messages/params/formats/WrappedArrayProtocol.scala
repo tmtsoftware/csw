@@ -8,8 +8,7 @@ import scala.reflect.ClassTag
 /**
  * The serialization and deserialization format for scala.collection.immutable.WrappedArray.
  */
-//TODO: why we need this and where do we need it
-trait WrappedArrayProtocol { self ⇒
+private[messages] trait WrappedArrayProtocol { self ⇒
   implicit def wrappedArrayFormat[T: Format: ClassTag]: Format[mutable.WrappedArray[T]] =
     new Format[mutable.WrappedArray[T]] {
       override def writes(obj: mutable.WrappedArray[T]): JsValue           = Json.toJson(obj.array)

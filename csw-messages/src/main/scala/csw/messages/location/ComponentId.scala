@@ -12,7 +12,7 @@ import play.api.libs.json.{Format, Json}
  *  @param name represents the unique name of the component
  *  @param componentType represents a type of the Component e.g. Assembly, HCD, etc
  */
-case class ComponentId(name: String, componentType: ComponentType) extends TMTSerializable {
+case class ComponentId private[messages] (name: String, componentType: ComponentType) extends TMTSerializable {
 
   /**
    * Represents the name and componentType
@@ -25,5 +25,5 @@ case class ComponentId(name: String, componentType: ComponentType) extends TMTSe
 }
 
 object ComponentId {
-  implicit val format: Format[ComponentId] = Json.format
+  private[messages] implicit val format: Format[ComponentId] = Json.format
 }

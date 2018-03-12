@@ -10,4 +10,4 @@ import akka.actor.ActorSystem
  *               received by a container.
  * @param component represents a supervisor actor reference and componentInfo
  */
-case class SupervisorInfo(system: ActorSystem, component: Component)
+case class SupervisorInfo private[messages] (system: ActorSystem, component: Component)

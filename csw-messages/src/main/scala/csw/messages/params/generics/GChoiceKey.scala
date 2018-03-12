@@ -13,6 +13,8 @@ class GChoiceKey(name: String, keyType: KeyType[Choice], val choices: Choices) e
 
   /**
    * validates the input Seq of choices
+   *
+   * @param xs one or more values
    */
   private def validate(xs: Seq[Choice]): Unit =
     assert(xs.forall(choices.contains), s"Bad choice for key: $keyName which must be one of: $choices")

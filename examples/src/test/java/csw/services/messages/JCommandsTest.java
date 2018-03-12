@@ -243,9 +243,9 @@ public class JCommandsTest {
         String str = Json.prettyPrint(scJson);
 
         //construct command from string
-        Setup sc1 = JavaJsonSupport.readSequenceCommand(Setup.class, Json.parse(str));
-        Observe oc1 = JavaJsonSupport.readSequenceCommand(Observe.class, ocJson);
-        Wait wc1 = JavaJsonSupport.readSequenceCommand(Wait.class, wcJson);
+        Setup sc1 = JavaJsonSupport.readSequenceCommand(Json.parse(str));
+        Observe oc1 = JavaJsonSupport.readSequenceCommand(ocJson);
+        Wait wc1 = JavaJsonSupport.readSequenceCommand(wcJson);
         //#json-serialization
 
         Assert.assertEquals(sc, sc1);

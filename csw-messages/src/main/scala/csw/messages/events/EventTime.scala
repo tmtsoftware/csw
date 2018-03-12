@@ -41,13 +41,13 @@ object EventTime {
    */
   def toCurrent: EventTime = EventTime()
 
-  implicit val format: Format[EventTime] = new Format[EventTime] {
+  private[messages] implicit val format: Format[EventTime] = new Format[EventTime] {
     def writes(et: EventTime): JsValue            = JsString(et.toString)
     def reads(json: JsValue): JsResult[EventTime] = JsSuccess(EventTime.toEventTime(json.as[Instant]))
   }
 
   //used by Protobuf for conversion between Timestamp <==> EventTime
-  implicit val typeMapper: TypeMapper[Timestamp, EventTime] =
+  private[messages] implicit val typeMapper: TypeMapper[Timestamp, EventTime] =
     TypeMapper[Timestamp, EventTime] { x ⇒
       EventTime(instantMapper.toCustom(x))
     } { x ⇒

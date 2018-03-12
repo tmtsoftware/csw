@@ -10,4 +10,5 @@ import csw.messages.scaladsl.ComponentMessage
  * @param publisher the reference of component's supervisor for which the state changed
  * @param state the new state the component went into
  */
-case class LifecycleStateChanged(publisher: ActorRef[ComponentMessage], state: SupervisorLifecycleState) extends TMTSerializable
+case class LifecycleStateChanged private[messages] (publisher: ActorRef[ComponentMessage], state: SupervisorLifecycleState)
+    extends TMTSerializable

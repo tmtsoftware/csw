@@ -19,7 +19,7 @@ object MatcherResponses {
    *
    * @param throwable the error captured in process of matching demand state
    */
-  case class MatchFailed(throwable: Throwable) extends MatcherResponse
+  case class MatchFailed private[messages] (throwable: Throwable) extends MatcherResponse
 
   /**
    * A helper method for java to get the handle of MatchCompleted response

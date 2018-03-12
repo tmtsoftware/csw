@@ -82,7 +82,7 @@ object Event {
   /**
    * TypeMapper definitions are required for to/from conversion PbEvent(Protobuf) <==> System, Observe event.
    */
-  implicit def typeMapper[T <: Event]: TypeMapper[PbEvent, T] = new TypeMapper[PbEvent, T] {
+  private[csw] implicit def typeMapper[T <: Event]: TypeMapper[PbEvent, T] = new TypeMapper[PbEvent, T] {
     override def toCustom(base: PbEvent): T = {
       val factory: (Id, Prefix, EventName, EventTime, Set[Parameter[_]]) ⇒ Any = base.eventType match {
         case PbEventType.SystemEvent     ⇒ SystemEvent.apply
