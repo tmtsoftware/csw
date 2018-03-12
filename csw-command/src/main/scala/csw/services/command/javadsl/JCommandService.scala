@@ -24,7 +24,7 @@ import scala.compat.java8.FutureConverters.FutureOps
 import scala.concurrent.ExecutionContext
 
 /**
- * Java API for [[csw.services.command.scaladsl.CommandService]]
+ * Helper class for Java to get the handle of [[csw.services.command.scaladsl.CommandService]]
  */
 class JCommandService(akkaLocation: AkkaLocation, actorSystem: ActorSystem[_]) {
 
@@ -32,7 +32,7 @@ class JCommandService(akkaLocation: AkkaLocation, actorSystem: ActorSystem[_]) {
   implicit val mat: Materializer    = ActorMaterializer()(actorSystem.toUntyped)
   implicit val scheduler: Scheduler = actorSystem.scheduler
 
-  private[command] val sCommandService: CommandService = new CommandService(akkaLocation)(actorSystem)
+  private[command] val sCommandService = new CommandService(akkaLocation)(actorSystem)
 
   /**
    * Submit a command and get a [[csw.messages.commands.CommandResponse]] as a Future. The CommandResponse can be a response
@@ -145,7 +145,12 @@ class JCommandService(akkaLocation: AkkaLocation, actorSystem: ActorSystem[_]) {
   ): CompletableFuture[CommandResponse] =
     sCommandService.submitAllAndGetFinalResponse(controlCommands.asScala.toSet)(timeout).toJava.toCompletableFuture
 
-  //TODO: add doc for significance
+  /**
+   * Subscribe to the current state of a component corresponding to the [[csw.messages.location.AkkaLocation]] of the component
+   *
+   * @param callback the action to be applied on the CurrentState element received as a result of subscription
+   * @return a CurrentStateSubscription to stop the subscription
+   */
   def subscribeCurrentState(callback: Consumer[CurrentState]): CurrentStateSubscription =
     sCommandService.subscribeCurrentState(callback.asScala)
 

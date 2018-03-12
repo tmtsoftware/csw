@@ -7,14 +7,24 @@ import csw.messages.params.models.Id
 
 /**
  * Manages state of a given command identified by a RunId
+ *
  * @param cmdToCmdStatus a map of runId to CommandState
  */
 case class CommandResponseManagerState private[command] (cmdToCmdStatus: Map[Id, CommandState]) {
+
+  /**
+   * Add the command with some initial state
+   *
+   * @param runId command identifier
+   * @param initialState an initial state
+   * @return a new CommandResponseManagerState instance with updated cmdToCmdStatus
+   */
   def add(runId: Id, initialState: CommandResponse): CommandResponseManagerState =
     CommandResponseManagerState(cmdToCmdStatus.updated(runId, CommandState.init(runId, initialState)))
 
   /**
    * Get the current command response for the command
+   *
    * @param runId command identifier
    * @return current command response
    */
@@ -25,8 +35,9 @@ case class CommandResponseManagerState private[command] (cmdToCmdStatus: Map[Id,
 
   /**
    * Update the current command response for the command
+   *
    * @param commandResponse the command response to be updated for this command
-   * @return current command response
+   * @return a new CommandResponseManagerState instance with updated cmdToCmdStatus
    */
   def updateCommandStatus(commandResponse: CommandResponse): CommandResponseManagerState =
     update(commandResponse.runId, _.withCommandStatus(commandResponse))
@@ -35,16 +46,17 @@ case class CommandResponseManagerState private[command] (cmdToCmdStatus: Map[Id,
    * Subscribe to the change in state of a Command
    * @param runId command identifier
    * @param actorRef the subscriber as an actor to which the updated state will be sent
-   * @return
+   * @return a new CommandResponseManagerState instance with updated cmdToCmdStatus
    */
   def subscribe(runId: Id, actorRef: ActorRef[CommandResponse]): CommandResponseManagerState =
     update(runId, _.addSubscriber(actorRef))
 
   /**
    * UnSubscribe to the change in state of a Command
+   *
    * @param runId command identifier
    * @param actorRef the subscriber as an actor to which the updated state was being sent
-   * @return
+   * @return a new CommandResponseManagerState instance with updated cmdToCmdStatus
    */
   def unSubscribe(runId: Id, actorRef: ActorRef[CommandResponse]): CommandResponseManagerState =
     update(runId, _.removeSubscriber(actorRef))

@@ -11,11 +11,11 @@ import csw.messages.scaladsl.CommandResponseManagerMessage.Subscribe
 
 /**
  * The handle to the subscription created for the current state published by the specified publisher
+ *
  * @param runId the source of the current state
  * @param callback the action to perform on each received element
  * @param mat the materializer to materialize the underlying stream
  */
-//TODO: add doc for significance
 class CommandResponseSubscription private[csw] (
     runId: Id,
     commandResponseManagerActor: ActorRef[CommandResponseManagerMessage],

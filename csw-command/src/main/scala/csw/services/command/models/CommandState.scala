@@ -6,6 +6,7 @@ import csw.messages.params.models.Id
 
 /**
  * Represents the state of a command execution
+ *
  * @param commandStatus the current command status
  * @param subscribers the subscriber list for the change in state
  */
@@ -13,23 +14,26 @@ case class CommandState private[command] (commandStatus: CommandStatus, subscrib
 
   /**
    * Add a new subscriber for change in state
+   *
    * @param subscriber the subscriber as an actor to which the updated state will be sent
-   * @return
+   * @return a new CommandState instance with updated subscribers
    */
   def addSubscriber(subscriber: ActorRef[CommandResponse]): CommandState = copy(subscribers = subscribers + subscriber)
 
   /**
    * Remove a subscriber for change in state
+   *
    * @param subscriber the subscriber as an actor to which the updated state will be sent
-   * @return
+   * @return a new CommandState instance with updated subscribers
    */
   def removeSubscriber(subscriber: ActorRef[CommandResponse]): CommandState =
     copy(subscribers = subscribers - subscriber)
 
   /**
    * Create a new state from `this` state with the provided command response
+   *
    * @param commandResponse the command Response
-   * @return a new command state with the current state as provided command response
+   * @return a new CommandState instance with the current state as provided command response
    */
   def withCommandStatus(commandResponse: CommandResponse): CommandState =
     copy(commandStatus = this.commandStatus.withCommandResponse(commandResponse))
@@ -39,7 +43,8 @@ case class CommandState private[command] (commandStatus: CommandStatus, subscrib
 private[command] object CommandState {
 
   /**
-   * Inititialize the command state for a given command
+   * Initaialize the command state for a given command
+   *
    * @param runId command identifier as a RunId
    * @param initialState initial command response
    * @return a new command state

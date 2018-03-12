@@ -9,7 +9,8 @@ import csw.messages.framework.PubSub.Subscribe
 import csw.messages.params.states.CurrentState
 
 /**
- * The handle to the susbscription created for the current state published by the specified publisher
+ * The handle to the subscription created for the current state published by the specified publisher
+ *
  * @param publisher the source of the current state
  * @param callback the action to perform on each received element
  * @param mat the materializer to materialize the underlying stream

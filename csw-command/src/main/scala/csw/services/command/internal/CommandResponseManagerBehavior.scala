@@ -15,10 +15,10 @@ import csw.services.logging.scaladsl.{Logger, LoggerFactory}
  * The Behavior of a Command Response Manager, represented as a mutable behavior. This behavior will be created as an actor.
  * There will be one CommandResponseManger for a given component which will provide an interface to interact with the status
  * and result of a submitted command
+ *
  * @param ctx             The Actor Context under which the actor instance of this behavior is created
  * @param loggerFactory   The factory for creating [[csw.services.logging.scaladsl.Logger]] instance
  */
-//TODO: add doc for significance for every method
 class CommandResponseManagerBehavior private[command] (
     ctx: ActorContext[CommandResponseManagerMessage],
     loggerFactory: LoggerFactory

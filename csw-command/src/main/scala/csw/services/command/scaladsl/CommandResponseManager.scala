@@ -20,8 +20,9 @@ import scala.compat.java8.FutureConverters._
 import scala.concurrent.Future
 
 /**
- * Wrapper API for interacting with Command Response Manager of a component.
- * @param commandResponseManagerActor The wrapped actor
+ * Wrapper API for interacting with Command Response Manager of a component
+ *
+ * @param commandResponseManagerActor the wrapped actor
  * @param actorSystem actor system for managing stream resources inside
  */
 class CommandResponseManager(val commandResponseManagerActor: ActorRef[CommandResponseManagerMessage])(
@@ -42,8 +43,9 @@ class CommandResponseManager(val commandResponseManagerActor: ActorRef[CommandRe
 
   /**
    * Add a new sub command against another command
-   * @param parentRunId  command identifier of original command
-   * @param childRunId   command identifier of sub command
+   *
+   * @param parentRunId command identifier of original command
+   * @param childRunId command identifier of sub command
    */
   def addSubCommand(parentRunId: Id, childRunId: Id): Unit =
     commandResponseManagerActor ! AddSubCommand(parentRunId, childRunId)
@@ -52,25 +54,27 @@ class CommandResponseManager(val commandResponseManagerActor: ActorRef[CommandRe
    * Update the status of a sub-command which will infer the status of the parent command
    *
    * @param subCommandId command identifier of sub command
-   * @param cmdStatus    status of command as [[csw.messages.commands.CommandResponse]]
+   * @param cmdStatus status of command as [[csw.messages.commands.CommandResponse]]
    */
   def updateSubCommand(subCommandId: Id, cmdStatus: CommandResponse): Unit =
     commandResponseManagerActor ! UpdateSubCommand(subCommandId, cmdStatus)
 
   /**
    * Query the current status of a command
-   * @param runId     command identifier of command
-   * @param timeout   timeout duration until which this operation is expected to wait for providing a value
-   * @return
+   *
+   * @param runId command identifier of command
+   * @param timeout timeout duration until which this operation is expected to wait for providing a value
+   * @return a future of CommandResponse
    */
   def query(runId: Id)(implicit timeout: Timeout): Future[CommandResponse] =
     commandResponseManagerActor ? (Query(runId, _))
 
   /**
-   * Java API of query
-   * @param runId     command identifier of command
-   * @param timeout   timeout duration until which this operation is expected to wait for providing a value
-   * @return
+   * A helper method for Java to query the current status of a command
+   *
+   * @param runId command identifier of command
+   * @param timeout timeout duration until which this operation is expected to wait for providing a value
+   * @return a future of CommandResponse
    */
   def jQuery(runId: Id, timeout: Timeout): CompletableFuture[CommandResponse] =
     query(runId)(timeout).toJava.toCompletableFuture
@@ -78,18 +82,18 @@ class CommandResponseManager(val commandResponseManagerActor: ActorRef[CommandRe
   /**
    * Subscribe to the status of a command to receive the update in status
    *
-   * @param runId     command identifier of command
-   * @param callback  callback  to take action on the command response received
+   * @param runId command identifier of command
+   * @param callback callback  to take action on the command response received
    * @return a [[csw.services.command.internal.CommandResponseSubscription]] to unsubscribe the subscription later
    */
   def subscribe(runId: Id, callback: CommandResponse ⇒ Unit): CommandResponseSubscription =
     new CommandResponseSubscription(runId, commandResponseManagerActor, callback)
 
   /**
-   * Java API of subscribe
-   * @param runId      command identifier of command
-   * @param consumer   consumer function to take action on the command response received
-   * @return
+   * A helper method for Java to subscribe to the status of a command to receive the update in status
+   * @param runId command identifier of command
+   * @param consumer consumer function to take action on the command response received
+   * @return a CommandResponseSubscription that can be used to unsubscribe
    */
   def jSubscribe(runId: Id, consumer: Consumer[CommandResponse]): CommandResponseSubscription =
     new CommandResponseSubscription(runId, commandResponseManagerActor, consumer.asScala)

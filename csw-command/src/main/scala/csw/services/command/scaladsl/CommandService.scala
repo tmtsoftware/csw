@@ -23,6 +23,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 /**
  * A Command Service API of a csw component. This model provides method based APIs for command interactions with a component.
+ *
  * @param componentLocation [[csw.messages.location.AkkaLocation]] of the component
  */
 class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: ActorSystem[_]) {
@@ -117,7 +118,7 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
    * provided as a future. In case of a failure or unmatched state, `Error` CommandResponse is provided as a Future.
    *
    * @param controlCommand the [[csw.messages.commands.ControlCommand]] payload.
-   * @param stateMatcher   the StateMatcher implementation for matching received state against a demand state.
+   * @param stateMatcher the StateMatcher implementation for matching received state against a demand state.
    * @return a CommandResponse as a Future value.
    */
   def onewayAndMatch(
@@ -163,6 +164,7 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
 
   /**
    * Subscribe to the current state of a component corresponding to the [[csw.messages.location.AkkaLocation]] of the component
+   *
    * @param callback the action to be applied on the CurrentState element received as a result of subscription
    * @return a CurrentStateSubscription to stop the subscription
    */

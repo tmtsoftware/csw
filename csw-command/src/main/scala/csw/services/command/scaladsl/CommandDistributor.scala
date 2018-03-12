@@ -22,6 +22,7 @@ case class CommandDistributor(componentToCommands: Map[CommandService, Set[Contr
   /**
    * Submit multiple long running commands to components and get an aggregated response as `Accepted` if all the commands
    * were validated successfully, an `Error` otherwise
+   *
    * @return an aggregated response as Future value of CommandResponse
    */
   def aggregatedValidationResponse()(
@@ -44,6 +45,7 @@ case class CommandDistributor(componentToCommands: Map[CommandService, Set[Contr
    * Submit multiple commands to components and subscribe for the final result for long running commands to create
    * an aggregated response as `Completed` if all the commands completed successfully or `Error` if any one of the
    * commands failed.
+   *
    * @return an aggregated response as Future value of CommandResponse
    */
   def aggregatedCompletionResponse()(

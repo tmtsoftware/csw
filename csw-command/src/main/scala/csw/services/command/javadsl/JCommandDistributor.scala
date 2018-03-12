@@ -13,7 +13,7 @@ import scala.compat.java8.FutureConverters.FutureOps
 import scala.concurrent.ExecutionContext
 
 /**
- * Java API for [[csw.services.command.scaladsl.CommandDistributor]]
+ * Helper class for Java to get the handle of [[csw.services.command.scaladsl.CommandDistributor]]
  *
  * @param componentToCommands a map of Component and the set of commands to be sent to that component
  */
@@ -22,6 +22,7 @@ case class JCommandDistributor(componentToCommands: util.Map[JCommandService, ut
   /**
    * Submit multiple long running commands to components and get an aggregated response as `Accepted` if all the commands
    * were validated successfully, an `Error` otherwise
+   *
    * @return an aggregated response as CompletableFuture of CommandResponse
    */
   def aggregatedValidationResponse(
@@ -43,6 +44,7 @@ case class JCommandDistributor(componentToCommands: util.Map[JCommandService, ut
    * Submit multiple commands to components and subscribe for the final result for long running commands to create
    * an aggregated response as `Completed` if all the commands completed successfully or `Error` if any one of the
    * commands failed.
+   *
    * @return an aggregated response as CompletableFuture of CommandResponse
    */
   def aggregatedCompletionResponse(
