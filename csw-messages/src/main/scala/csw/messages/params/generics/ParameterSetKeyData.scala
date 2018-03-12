@@ -22,6 +22,8 @@ trait ParameterSetKeyData { self: ParameterSetType[_] =>
    */
   final def prefixStr: String = prefix.prefix
 
-  // This is the get for a Setup/Observe/Wait
-  override def toString = s"$typeName([$subsystem, $prefixStr]$dataToString)"
+  /**
+   * A String representation for concrete implementation of this trait
+   */
+  override def toString: String = s"$typeName([$subsystem, $prefixStr]$dataToString)"
 }

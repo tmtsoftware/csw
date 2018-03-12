@@ -14,7 +14,6 @@ import scala.compat.java8.OptionConverters.RichOptionForJava8
  *
  * @tparam T the subclass of ParameterSetType
  */
-//TODO: add and update doc for each method
 abstract class ParameterSetType[T <: ParameterSetType[T]] extends TMTSerializable { self: T =>
 
   /**
@@ -27,6 +26,10 @@ abstract class ParameterSetType[T <: ParameterSetType[T]] extends TMTSerializabl
    * Holds the parameters for this parameter set
    */
   def paramSet: Set[Parameter[_]]
+
+  /**
+   * A Java helper to get parameters for this parameter set
+   */
   def jParamSet: util.Set[Parameter[_]] = paramSet.asJava
 
   /**
@@ -50,6 +53,7 @@ abstract class ParameterSetType[T <: ParameterSetType[T]] extends TMTSerializabl
   /**
    * Adds several parameters to the parameter set
    *
+   * @note madd ensures check for duplicate key
    * @param parametersToAdd the list of parameters to add to the parameter set
    * @tparam P must be a subclass of Parameter
    * @return a new instance of this parameter set with the given parameter added
@@ -57,26 +61,72 @@ abstract class ParameterSetType[T <: ParameterSetType[T]] extends TMTSerializabl
   @varargs
   def madd[P <: Parameter[_]](parametersToAdd: P*): T = madd(parametersToAdd.toSet)
 
-  //madd ensures check for duplicate key
+  /**
+   * Adds several parameters to the parameter set
+   *
+   * @note madd ensures check for duplicate key
+   * @param parametersToAdd the list of parameters to add to the parameter set
+   * @tparam P must be a subclass of Parameter
+   * @return a new instance of this parameter set with the given parameter added
+   */
   def madd[P <: Parameter[_]](parametersToAdd: Set[P]): T = parametersToAdd.foldLeft(this)((c, parameter) => doAdd(c, parameter))
 
   /**
    * Returns an Option with the parameter for the key if found, otherwise None
    *
    * @param key the Key to be used for lookup
+   * @tparam S the value type
    * @return the parameter for the key, if found
-   * @tparam S the Scala value type
    */
-  def get[S](key: Key[S]): Option[Parameter[S]]         = get(key.keyName, key.keyType)
+  def get[S](key: Key[S]): Option[Parameter[S]] = get(key.keyName, key.keyType)
+
+  /**
+   * Returns an Optional with the parameter for the key if found, otherwise empty
+   *
+   * @param key the Key to be used for lookup
+   * @tparam S the value type
+   * @return the parameter for the key, if found
+   */
   def jGet[S](key: Key[S]): util.Optional[Parameter[S]] = get(key).asJava
 
+  /**
+   * Returns an Option with the parameter for the key if found, otherwise None
+   *
+   * @param keyName the keyName for a key
+   * @param keyType the keyType for a key
+   * @tparam S the value type
+   * @return the parameter for the key, if found
+   */
   def get[S](keyName: String, keyType: KeyType[S]): Option[Parameter[S]] = {
     paramSet.find(p ⇒ p.keyName == keyName && p.keyType == keyType).asInstanceOf[Option[Parameter[S]]]
   }
+
+  /**
+   * Returns an Optional with the parameter for the key if found, otherwise empty
+   *
+   * @param keyName the keyName for a key
+   * @param keyType the keyType for a key
+   * @tparam S the value type
+   * @return the parameter for the key, if found
+   */
   def jGet[S](keyName: String, keyType: KeyType[S]): util.Optional[Parameter[S]] = get(keyName, keyType).asJava
 
+  /**
+   * Find a parameter based on it's keyName and keyType
+   *
+   * @param parameter who's keyName and keyType is used to get values and units
+   * @tparam S the type of values the Parameter holds
+   * @return an Option of Parameter[S] if it is found, otherwise None
+   */
   def find[S](parameter: Parameter[S]): Option[Parameter[S]] = get(parameter.keyName, parameter.keyType)
 
+  /**
+   * A Java helper to find a parameter based on it's keyName and keyType
+   *
+   * @param parameter who's keyName and keyType is used to get values and units
+   * @tparam S the type of values the Parameter holds
+   * @return an Optional of Parameter[S] if it is found, otherwise empty
+   */
   def jFind[S](parameter: Parameter[S]): util.Optional[Parameter[S]] = find(parameter).asJava
 
   /**
@@ -166,12 +216,21 @@ abstract class ParameterSetType[T <: ParameterSetType[T]] extends TMTSerializabl
 
   /**
    * Method called by subclass to create a copy with the same key (or other fields) and new parameters. It is protected and
-   * sublclasses should also keep it as protected to avoid receiving duplicate keys.
+   * subclasses should also keep it as protected to avoid receiving duplicate keys.
+   *
+   * @param data a new set of Parameters after addition or deletion
+   * @return a concrete implementation of type T
    */
   protected def create(data: Set[Parameter[_]]): T
 
+  /**
+   * A comma separated string representation of parameters
+   */
   protected def dataToString: String = paramSet.mkString("(", ", ", ")")
 
+  /**
+   * A String representation of concrete implementation of this class
+   */
   override def toString: String = s"$typeName$dataToString"
 
   /**
@@ -183,6 +242,7 @@ abstract class ParameterSetType[T <: ParameterSetType[T]] extends TMTSerializabl
    * Returns a set containing the names of any of the given keys that are missing in the data
    *
    * @param keys one or more keys
+   * @return a Set of key names
    */
   def missingKeys(keys: Key[_]*): Set[String] = {
     val argKeySet        = keys.map(_.keyName).toSet
@@ -191,7 +251,7 @@ abstract class ParameterSetType[T <: ParameterSetType[T]] extends TMTSerializabl
   }
 
   /**
-   * java API: Returns a set containing the names of any of the given keys that are missing in the data
+   * A Java helper that returns a set containing the names of any of the given keys that are missing in the data
    *
    * @param keys one or more keys
    */
@@ -205,6 +265,12 @@ abstract class ParameterSetType[T <: ParameterSetType[T]] extends TMTSerializabl
    */
   def getStringMap: Map[String, String] =
     paramSet.map(i => i.keyName -> i.values.map(_.toString).mkString(",")).toMap
+
+  /**
+   * A Java helper that returns a map based on this object where the keys and values are in string get
+   * (Could be useful for exporting in a get that other languages can read).
+   * Derived classes might want to add values to this map for fixed fields.
+   */
   def jGetStringMap: util.Map[String, String] = getStringMap.asJava
 
 }

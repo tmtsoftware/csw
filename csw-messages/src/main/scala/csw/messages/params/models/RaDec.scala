@@ -12,7 +12,7 @@ case class RaDec(ra: Double, dec: Double)
 case object RaDec {
 
   //used by play-json
-  implicit val raDecFormat: OFormat[RaDec] = Json.format[RaDec]
+  private[messages] implicit val raDecFormat: OFormat[RaDec] = Json.format[RaDec]
 
   //used by Protobuf for conversion between RaDec <=> PbRaDec
   implicit val typeMapper: TypeMapper[PbRaDec, RaDec] =

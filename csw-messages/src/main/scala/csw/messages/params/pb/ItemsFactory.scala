@@ -17,6 +17,7 @@ abstract class ItemsFactory[T] {
 }
 
 object ItemsFactory {
+
   def apply[T](implicit x: ItemsFactory[T]): ItemsFactory[T] = x
 
   def apply[T, I <: ItemType[T]: ItemTypeCompanion](makeItems: I ⇒ Items): ItemsFactory[T] = { xs =>
@@ -54,6 +55,14 @@ object ItemsFactory {
   implicit val FloatMatrixItemsFactory: ItemsFactory[MatrixData[Float]]   = ItemsFactory(Items.FloatMatrixItems)
   implicit val DoubleMatrixItemsFactory: ItemsFactory[MatrixData[Double]] = ItemsFactory(Items.DoubleMatrixItems)
 
+  /**
+   * Convert an ItemsFactory of data from one type to other
+   *
+   * @param conversion a function of type A => B
+   * @tparam A the source type of data
+   * @tparam B the destination type of data
+   * @return a function of type ArrayData[A] ⇒ ArrayData[B]
+   */
   implicit def genericItemsFactory[A: ItemsFactory, B](implicit conversion: A ⇒ B): ItemsFactory[B] =
     ItemsFactory[A].asInstanceOf[ItemsFactory[B]]
 }

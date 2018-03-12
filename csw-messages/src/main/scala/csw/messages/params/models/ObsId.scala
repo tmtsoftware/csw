@@ -21,7 +21,7 @@ case object PreProgrammedQueue extends ProgramKind
 
 object ObsId {
 
-  implicit val format: Format[ObsId] = new Format[ObsId] {
+  private[messages] implicit val format: Format[ObsId] = new Format[ObsId] {
     override def writes(obj: ObsId): JsValue           = JsString(obj.obsId)
     override def reads(json: JsValue): JsResult[ObsId] = JsSuccess(ObsId(json.as[String]))
   }
@@ -32,15 +32,36 @@ object ObsId {
     x.getOrElse(empty).obsId
   }
 
+  /**
+   * Represents an empty ObsId
+   *
+   * @return an ObsId with empty string
+   */
   def empty: ObsId = ObsId("")
 }
 
+/**
+ * Represents a unique observation id
+ *
+ * @param obsId the string representation of obsId
+ */
 case class ObsId(obsId: String) extends TMTSerializable {
-  def asOption: Option[ObsId]     = Some(new ObsId(obsId))
+
+  /**
+   * Returns the ObsId in form of Option
+   *
+   * @return a defined Option with obsId
+   */
+  def asOption: Option[ObsId] = Some(new ObsId(obsId))
+
+  /**
+   * Returns the ObsId in form of Optional
+   *
+   * @return a defined Optional with obsId
+   */
   def asOptional: Optional[ObsId] = Optional.of(new ObsId(obsId))
 }
 
-//TODO: add doc for why, where to use  diff between ObsId and ObsId2
 case class ObsId2(year: String, sem: String, kind: String, prog: String, obs: String, file: Option[String]) {
   // private final val PROG_KIND_INDEX = 6
 
