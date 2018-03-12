@@ -4,7 +4,7 @@ package csw.services
  * == Location Service ==
  *
  * The Location Service implemented in this project is based on CRDT (Conflict Free Replicated Data).
- * The Location Service helps you resolve the hostname and port number for a services which can be used for further communication,
+ * The Location Service helps you resolve the hostname and port number for a service which can be used for further communication,
  * In case of Akka connection, It helps you to resolve component reference with which you can send messages
  * as well as other information for example, logAdminActorRef which is used to dynamically change the log level of component.
  *
@@ -32,7 +32,7 @@ package csw.services
  *  - [[csw.messages.location.Connection.TcpConnection]]
  *  - [[csw.messages.location.Connection.HttpConnection]]
  *
- * Another important actor from LocationService is DeathwatchActor which gets created with LocationService initialization.
+ * Another important actor from LocationService is DeathwatchActor [[csw.services.location.internal.DeathwatchActor]] which gets created with LocationService initialization.
  * Job of this actor is to watch health of every component and on termination, Unregister terminated component from LocationService.
  *
  * Complete guide of usage of different API's provided by LocationService is available at:
