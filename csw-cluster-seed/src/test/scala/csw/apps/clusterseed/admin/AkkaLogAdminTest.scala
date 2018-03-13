@@ -24,7 +24,7 @@ import csw.messages.location.Connection.AkkaConnection
 import csw.messages.params.models.Prefix
 import csw.messages.scaladsl.CommandMessage.Oneway
 import csw.messages.scaladsl.ContainerCommonMessage.GetComponents
-import csw.messages.scaladsl.ContainerMessage
+import csw.messages.scaladsl.ContainerExternalMessage
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.logging.internal.LoggingLevels.{ERROR, Level, WARN}
 import csw.services.logging.internal._
@@ -82,7 +82,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
     Await.result(containerActorSystem.terminate(), 5.seconds)
   }
 
-  def startContainerAndWaitForRunning(): ActorRef[ContainerMessage] = {
+  def startContainerAndWaitForRunning(): ActorRef[ContainerExternalMessage] = {
     val frameworkWiring = FrameworkWiring.make(containerActorSystem)
     val config          = ConfigFactory.load("laser_container.conf")
     val containerRef    = Await.result(Container.spawn(config, frameworkWiring), 5.seconds)
@@ -92,7 +92,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
     containerRef
   }
 
-  def extractComponentsFromContainer(containerRef: ActorRef[ContainerMessage]): Unit = {
+  def extractComponentsFromContainer(containerRef: ActorRef[ContainerExternalMessage]): Unit = {
     val probe = TestProbe[Components]
     containerRef ! GetComponents(probe.ref)
     val components = probe.expectMsgType[Components].components

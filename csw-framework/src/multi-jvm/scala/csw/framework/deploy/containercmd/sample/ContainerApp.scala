@@ -10,7 +10,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.messages.framework.ContainerLifecycleState
 import csw.messages.scaladsl.ContainerCommonMessage.GetContainerLifecycleState
-import csw.messages.scaladsl.ContainerMessage
+import csw.messages.scaladsl.ContainerExternalMessage
 import csw.messages.scaladsl.SupervisorContainerCommonMessages.Restart
 import csw.services.location.commons.ClusterSettings
 
@@ -24,7 +24,7 @@ object ContainerApp extends App {
   implicit val testkit: TestKitSettings                = TestKitSettings(actorSystem)
   private val wiring                                   = FrameworkWiring.make(system)
   private val config: Config                           = ConfigFactory.load("laser_container.conf")
-  private val ref: ActorRef[ContainerMessage] =
+  private val ref: ActorRef[ContainerExternalMessage] =
     Await.result(Container.spawn(config, wiring), 5.seconds)
 
   Thread.sleep(2000)
