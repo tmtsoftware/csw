@@ -14,7 +14,26 @@ import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 /**
  * The Behavior of a Command Response Manager, represented as a mutable behavior. This behavior will be created as an actor.
  * There will be one CommandResponseManger for a given component which will provide an interface to interact with the status
- * and result of a submitted command
+ * and result of a submitted command.
+ *
+ * This class defines the behavior of CommandResponseManagerActor and is responsible for adding/updating/querying command result.
+ * When component receives command of type Submit, then framework (ComponentBehavior - TLA) will add a entry of this command
+ * with its validation status into CommandResponseManager.
+ *
+ * In case of short running or immediate command,
+ * validation response will be of type final result which can either be of type
+ * [[csw.messages.commands.CommandResultType.Positive]] or [[csw.messages.commands.CommandResultType.Negative]]
+ *
+ * In case of long running command, validation response will be of type [[csw.messages.commands.CommandResultType.Intermediate]]
+ * then it is the responsibility of component writer to update its final command status later on
+ * with [[csw.messages.commands.CommandResponse]] which should be of type
+ * [[csw.messages.commands.CommandResultType.Positive]] or [[csw.messages.commands.CommandResultType.Negative]]
+ *
+ * CommandResponseManager also provides subscribe API.
+ * One of the use case for this is when Assembly splits top level command into two sub commands and forwards them to two different HCD's.
+ * In this case, Assembly can register its interest in the final [[csw.messages.commands.CommandResponse]]
+ * from two HCD's when these sub commands completes, using subscribe API. And once Assembly receives final command response
+ * from both the HCD's then it can update Top level command with final [[csw.messages.commands.CommandResponse]]
  *
  * @param ctx             The Actor Context under which the actor instance of this behavior is created
  * @param loggerFactory   The factory for creating [[csw.services.logging.scaladsl.Logger]] instance

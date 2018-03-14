@@ -10,7 +10,7 @@ import csw.messages.params.models.Id
  * @param commandStatus the current command status
  * @param subscribers the subscriber list for the change in state
  */
-case class CommandState private[command] (commandStatus: CommandStatus, subscribers: Set[ActorRef[CommandResponse]]) {
+private[command] case class CommandState(commandStatus: CommandStatus, subscribers: Set[ActorRef[CommandResponse]]) {
 
   /**
    * Add a new subscriber for change in state

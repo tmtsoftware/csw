@@ -22,6 +22,12 @@ class CommandResponseSubscription private[csw] (
     callback: CommandResponse ⇒ Unit
 )(implicit val mat: Materializer) {
 
+  /**
+   * Create a stream of status of a command running on some component. An actorRef plays the source of the stream. When
+   * stream starts running (materialized) the source actorRef subscribes itself to command status of the target component.
+   * Any change in status of the command will push the new status to source actorRef and this will flow though the stream
+   * to sink. The callback provided by component developers is executed for the status flowing through the stream.
+   */
   private def source: Source[CommandResponse, Unit] = {
     val bufferSize = 256
     Source

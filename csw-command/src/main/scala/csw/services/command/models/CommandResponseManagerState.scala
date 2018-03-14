@@ -10,7 +10,7 @@ import csw.messages.params.models.Id
  *
  * @param cmdToCmdStatus a map of runId to CommandState
  */
-case class CommandResponseManagerState private[command] (cmdToCmdStatus: Map[Id, CommandState]) {
+private[command] case class CommandResponseManagerState(cmdToCmdStatus: Map[Id, CommandState]) {
 
   /**
    * Add the command with some initial state

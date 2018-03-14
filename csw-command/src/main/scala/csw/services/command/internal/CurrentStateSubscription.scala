@@ -20,6 +20,12 @@ class CurrentStateSubscription private[command] (
     callback: CurrentState ⇒ Unit
 )(implicit val mat: Materializer) {
 
+  /**
+   * Create a stream of current state change of a component. An actorRef plays the source of the stream. When stream starts
+   * running (materialized) the source actorRef subscribes itself to CurrentState change of the target component. Any change in
+   * current state of target component will push the current state to source actorRef and this will flow though the stream
+   * to sink. The callback provided by component developers is executed for the current state flowing through the stream.
+   */
   private def source: Source[CurrentState, Unit] = {
     val bufferSize = 256
     Source
