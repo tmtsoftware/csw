@@ -9,7 +9,7 @@ import scopt.OptionParser
  * Parses the command line options using `scopt` library.
  */
 private[containercmd] class ArgsParser() {
-  private[containercmd] val parser: OptionParser[Options] = new scopt.OptionParser[Options]("scopt") {
+  val parser: OptionParser[Options] = new scopt.OptionParser[Options]("scopt") {
     head(BuildInfo.name, BuildInfo.version)
 
     opt[Unit]("standalone") action { (_, c) =>

@@ -13,6 +13,7 @@ import scala.concurrent.{ExecutionContext, Future}
 /**
  * The ConfigDistributor enables distributing multiple commands to multiple components and get one aggregated command
  * response as a final response
+ *
  * @param componentToCommands a map of Component and the set of commands to be sent to that component
  */
 case class CommandDistributor(componentToCommands: Map[CommandService, Set[ControlCommand]]) {

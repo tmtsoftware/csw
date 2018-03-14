@@ -32,7 +32,7 @@ object HostConfig {
     new HostConfig(name, ClusterAwareSettings, startLogging = true).start(args)
 }
 
-class HostConfig private[hostconfig] (name: String, clusterSettings: ClusterSettings, startLogging: Boolean = false) {
+private[hostconfig] class HostConfig(name: String, clusterSettings: ClusterSettings, startLogging: Boolean = false) {
   private val log: Logger = new LoggerFactory(name).getLogger
 
   private lazy val actorSystem: ActorSystem   = clusterSettings.system
@@ -40,7 +40,7 @@ class HostConfig private[hostconfig] (name: String, clusterSettings: ClusterSett
   private var processes: Set[process.Process] = _
 
   //TODO: add doc for significance
-  private[hostconfig] def start(args: Array[String]): Unit =
+  def start(args: Array[String]): Unit =
     if (clusterSettings.seedNodes.isEmpty)
       throw ClusterSeedsNotFound
     else

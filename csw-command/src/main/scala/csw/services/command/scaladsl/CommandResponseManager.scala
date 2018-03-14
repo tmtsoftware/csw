@@ -25,7 +25,7 @@ import scala.concurrent.Future
  * @param commandResponseManagerActor the wrapped actor
  * @param actorSystem actor system for managing stream resources inside
  */
-class CommandResponseManager(val commandResponseManagerActor: ActorRef[CommandResponseManagerMessage])(
+class CommandResponseManager private[command] (val commandResponseManagerActor: ActorRef[CommandResponseManagerMessage])(
     implicit val actorSystem: ActorSystem[_]
 ) {
 

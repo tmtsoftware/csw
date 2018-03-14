@@ -11,7 +11,7 @@ import scala.async.Async.{async, await}
 import scala.concurrent.Future
 
 //TODO: add doc for significance
-class ConfigUtils private[framework] (configClientService: ConfigClientService, actorRuntime: ActorRuntime) {
+private[framework] class ConfigUtils(configClientService: ConfigClientService, actorRuntime: ActorRuntime) {
   import actorRuntime._
 
   //TODO: add doc for significance

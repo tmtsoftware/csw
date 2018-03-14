@@ -32,7 +32,7 @@ object ContainerCmd {
     new ContainerCmd(name, ClusterAwareSettings, true, defaultConfig).start(args)
 }
 
-class ContainerCmd private[containercmd] (
+private[containercmd] class ContainerCmd(
     name: String,
     clusterSettings: ClusterSettings,
     startLogging: Boolean,
@@ -45,7 +45,7 @@ class ContainerCmd private[containercmd] (
   import wiring.actorRuntime._
 
   //TODO: add doc for significance
-  private[containercmd] def start(args: Array[String]): ActorRef[_] = {
+  def start(args: Array[String]): ActorRef[_] = {
     if (clusterSettings.seedNodes.isEmpty)
       throw ClusterSeedsNotFound
     else

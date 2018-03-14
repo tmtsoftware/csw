@@ -28,14 +28,14 @@ import scala.util.{Failure, Success}
 /**
  * The Behavior of a Container of one or more components, represented as a mutable behavior.
  *
- * @param ctx                       The Actor Context under which the actor instance of this behavior is created
- * @param containerInfo             Container related information as described in the configuration file
- * @param supervisorInfoFactory     The factory for creating the Supervisors for components described in ContainerInfo
- * @param registrationFactory       The factory for creating a typed [[csw.services.location.models.AkkaRegistration]] from
-                                    [[csw.messages.location.Connection.AkkaConnection]]
- * @param locationService           The single instance of Location service created for a running application
+ * @param ctx the ActorContext under which the actor instance of this behavior is created
+ * @param containerInfo container related information as described in the configuration file
+ * @param supervisorInfoFactory the factory for creating the Supervisors for components described in ContainerInfo
+ * @param registrationFactory the factory for creating a typed [[csw.services.location.models.AkkaRegistration]] from
+                              [[csw.messages.location.Connection.AkkaConnection]]
+ * @param locationService the single instance of Location service created for a running application
  */
-class ContainerBehavior private[framework] (
+final class ContainerBehavior private[framework] (
     ctx: ActorContext[ContainerActorMessage],
     containerInfo: ContainerInfo,
     supervisorInfoFactory: SupervisorInfoFactory,
@@ -64,8 +64,8 @@ class ContainerBehavior private[framework] (
   /**
    * Defines processing for a [[csw.messages.scaladsl.ContainerActorMessage]] received by the actor instance.
    *
-   * @param msg      ContainerMessage received
-   * @return         The existing behavior
+   * @param msg containerMessage received
+   * @return the existing behavior
    */
   override def onMessage(msg: ContainerActorMessage): Behavior[ContainerActorMessage] = {
     log.debug(s"Container in lifecycle state :[$lifecycleState] received message :[$msg]")
@@ -80,10 +80,10 @@ class ContainerBehavior private[framework] (
   }
 
   /**
-   * Defines processing for a [[akka.actor.typed.Signal]] received by the actor instance.
-   * @return        The existing behavior
+   * Defines processing for a [[akka.actor.typed.Signal]] received by the actor instance
+   *
+   * @return the existing behavior
    */
-  //TODO: add doc for significance
   override def onSignal: PartialFunction[Signal, Behavior[ContainerActorMessage]] = {
     case Terminated(supervisor) ⇒
       log.warn(
@@ -103,9 +103,9 @@ class ContainerBehavior private[framework] (
 
   /**
    * Defines action for messages which can be received in any [[csw.messages.framework.ContainerLifecycleState]] state
-   * @param commonMessage Message representing a message received in any lifecycle state
+   *
+   * @param commonMessage message representing a message received in any lifecycle state
    */
-  //TODO: add doc for significance
   private def onCommon(commonMessage: ContainerCommonMessage): Unit = commonMessage match {
     case GetComponents(replyTo) ⇒
       replyTo ! Components(supervisors.map(_.component))
@@ -124,9 +124,9 @@ class ContainerBehavior private[framework] (
 
   /**
    * Defines action for messages which can be received in [[csw.messages.framework.ContainerLifecycleState.Idle]] state
-   * @param idleMessage  Message representing a message received in [[csw.messages.framework.ContainerLifecycleState.Idle]] state
+   *
+   * @param idleMessage message representing a message received in [[csw.messages.framework.ContainerLifecycleState.Idle]] state
    */
-  //TODO: add doc for significance
   private def onIdle(idleMessage: ContainerIdleMessage): Unit = idleMessage match {
     case SupervisorsCreated(supervisorInfos) ⇒
       if (supervisorInfos.isEmpty) {
@@ -147,7 +147,8 @@ class ContainerBehavior private[framework] (
 
   /**
    * Create supervisors for all components and return a set of all successfully created supervisors as a message to self
-   * @param componentInfos Components to be created as specified in the configuration file
+   *
+   * @param componentInfos components to be created as specified in the configuration file
    */
   private def createComponents(componentInfos: Set[ComponentInfo]): Unit = {
     log.info(s"Container is creating following components :[${componentInfos.map(_.name).mkString(", ")}]")

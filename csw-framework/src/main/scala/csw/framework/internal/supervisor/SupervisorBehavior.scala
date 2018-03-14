@@ -56,25 +56,24 @@ private[framework] object SupervisorBehavior {
 }
 
 /**
- * The Behavior of a Supervisor of a component actor, represented as a mutable behavior.
+ * The Behavior of a Supervisor of a component actor, represented as a mutable behavior
  *
- * @param ctx                              The Actor Context under which the actor instance of this behavior is created
- * @param timerScheduler                   Provides support for scheduled `self` messages in an actor
- * @param maybeContainerRef                The container ref of the container under which this supervisor is started if
- *                                         its not running in standalone mode
- * @param componentInfo                    Component related information as described in the configuration file
- * @param componentBehaviorFactory         The factory for creating the component supervised by this Supervisor
- * @param pubSubBehaviorFactory            The factory for creating actor instance of [[csw.framework.internal.pubsub.PubSubBehavior]]
- *                                         for utilising pub-sub of any state of a component
- * @param commandResponseManagerFactory    The factory for creating actor instance of [[csw.framework.internal.pubsub.PubSubBehavior]]
- *                                         for utilising pub-sub of any state of a component
- * @param registrationFactory              The factory for creating a typed [[csw.services.location.models.AkkaRegistration]] from
- *                                         [[csw.messages.location.Connection.AkkaConnection]]
- * @param locationService                  The single instance of Location service created for a running application
- * @param loggerFactory                    The factory for creating [[csw.services.logging.scaladsl.Logger]] instance
+ * @param ctx the ActorContext under which the actor instance of this behavior is created
+ * @param timerScheduler provides support for scheduled `self` messages in an actor
+ * @param maybeContainerRef the container ref of the container under which this supervisor is started if
+ *                          its not running in standalone mode
+ * @param componentInfo component related information as described in the configuration file
+ * @param componentBehaviorFactory the factory for creating the component supervised by this Supervisor
+ * @param pubSubBehaviorFactory the factory for creating actor instance of [[csw.framework.internal.pubsub.PubSubBehavior]]
+ *                              for utilising pub-sub of any state of a component
+ * @param commandResponseManagerFactory the factory for creating actor instance of [[csw.framework.internal.pubsub.PubSubBehavior]]
+ *                                      for utilising pub-sub of any state of a component
+ * @param registrationFactory the factory for creating a typed [[csw.services.location.models.AkkaRegistration]] from
+ *                            [[csw.messages.location.Connection.AkkaConnection]]
+ * @param locationService the single instance of Location service created for a running application
+ * @param loggerFactory the factory for creating [[csw.services.logging.scaladsl.Logger]] instance
  */
-//TODO: add doc for significance
-class SupervisorBehavior private[framework] (
+final class SupervisorBehavior private[framework] (
     ctx: ActorContext[SupervisorMessage],
     timerScheduler: TimerScheduler[SupervisorMessage],
     maybeContainerRef: Option[ActorRef[ContainerIdleMessage]],
@@ -110,9 +109,10 @@ class SupervisorBehavior private[framework] (
   spawnAndWatchComponent()
 
   /**
-   * Defines processing for a [[csw.messages.scaladsl.SupervisorMessage]] received by the actor instance.
-   * @param msg      SupervisorMessage received
-   * @return         The existing behavior
+   * Defines processing for a [[csw.messages.scaladsl.SupervisorMessage]] received by the actor instance
+   *
+   * @param msg supervisorMessage received
+   * @return the existing behavior
    */
   override def onMessage(msg: SupervisorMessage): Behavior[SupervisorMessage] = {
     log.debug(s"Supervisor in lifecycle state :[$lifecycleState] received message :[$msg]")
@@ -133,8 +133,9 @@ class SupervisorBehavior private[framework] (
   }
 
   /**
-   * Defines processing for a [[akka.actor.typed.Signal]] received by the actor instance.
-   * @return        The existing behavior
+   * Defines processing for a [[akka.actor.typed.Signal]] received by the actor instance
+   *
+   * @return the existing behavior
    */
   override def onSignal: PartialFunction[Signal, Behavior[SupervisorMessage]] = {
     case Terminated(componentRef) ⇒
@@ -156,7 +157,8 @@ class SupervisorBehavior private[framework] (
 
   /**
    * Defines action for messages which can be received in any [[SupervisorLifecycleState]] state
-   * @param commonMessage Message representing a message received in any lifecycle state
+   *
+   * @param commonMessage message representing a message received in any lifecycle state
    */
   private def onCommon(commonMessage: ComponentCommonMessage): Unit = commonMessage match {
     case LifecycleStateSubscription(subscriberMessage) ⇒ pubSubLifecycle ! subscriberMessage
@@ -169,7 +171,7 @@ class SupervisorBehavior private[framework] (
   /**
    * Defines action for messages which can be received in [[SupervisorLifecycleState.Idle]] state
    *
-   * @param idleMessage  Message representing a message received in [[SupervisorLifecycleState.Idle]] state
+   * @param idleMessage message representing a message received in [[SupervisorLifecycleState.Idle]] state
    */
   private def onIdle(idleMessage: SupervisorIdleMessage): Unit = idleMessage match {
     case Running(componentRef) ⇒ onComponentRunning(componentRef)
@@ -179,7 +181,7 @@ class SupervisorBehavior private[framework] (
   /**
    * Defines action for messages which can be received in [[SupervisorLifecycleState.Restart]] state
    *
-   * @param restartMessage  Message representing a message received in [[SupervisorLifecycleState.Restart]] state
+   * @param restartMessage message representing a message received in [[SupervisorLifecycleState.Restart]] state
    */
   private def onRestarting(restartMessage: SupervisorRestartMessage): Unit = restartMessage match {
     case UnRegistrationComplete ⇒
@@ -193,7 +195,7 @@ class SupervisorBehavior private[framework] (
   /**
    * Defines action for messages which can be received in [[SupervisorLifecycleState.Running]] state
    *
-   * @param internalRunningMessage Message representing a message received in [[SupervisorLifecycleState.Running]] state
+   * @param internalRunningMessage message representing a message received in [[SupervisorLifecycleState.Running]] state
    */
   private def onInternalRunning(internalRunningMessage: SupervisorInternalRunningMessage): Unit = internalRunningMessage match {
     case RegistrationSuccess(componentRef)     ⇒ onRegistrationComplete(componentRef)
@@ -204,7 +206,7 @@ class SupervisorBehavior private[framework] (
   /**
    * Defines action for messages which can be received in [[SupervisorLifecycleState.Running]] state
    *
-   * @param runningMessage Message representing a message received in [[SupervisorLifecycleState.Running]] state
+   * @param runningMessage message representing a message received in [[SupervisorLifecycleState.Running]] state
    */
   private def onRunning(runningMessage: SupervisorRunningMessage): Unit = runningMessage match {
     case Query(commandId, replyTo)            ⇒ commandResponseManager.commandResponseManagerActor ! Query(commandId, replyTo)

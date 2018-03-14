@@ -38,7 +38,7 @@ import csw.services.logging.scaladsl.{Logger, LoggerFactory}
  * @param ctx             The Actor Context under which the actor instance of this behavior is created
  * @param loggerFactory   The factory for creating [[csw.services.logging.scaladsl.Logger]] instance
  */
-final class CommandResponseManagerBehavior private[command] (
+private[command] class CommandResponseManagerBehavior(
     ctx: ActorContext[CommandResponseManagerMessage],
     loggerFactory: LoggerFactory
 ) extends Behaviors.MutableBehavior[CommandResponseManagerMessage] {

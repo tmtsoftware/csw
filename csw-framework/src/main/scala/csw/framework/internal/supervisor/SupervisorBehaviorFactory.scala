@@ -13,7 +13,6 @@ import csw.services.logging.scaladsl.LoggerFactory
 /**
  * The factory for creating [[akka.actor.typed.scaladsl.Behaviors.MutableBehavior]] of the supervisor of a component
  */
-//TODO: add doc to explain significance of why we have multiple methods
 private[framework] object SupervisorBehaviorFactory {
 
   def make(
@@ -42,6 +41,7 @@ private[framework] object SupervisorBehaviorFactory {
     )
   }
 
+  // This method is used by test
   def make(
       containerRef: Option[ActorRef[ContainerIdleMessage]],
       componentInfo: ComponentInfo,

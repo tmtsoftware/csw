@@ -17,8 +17,7 @@ import scala.util.control.NonFatal
 /**
  * The factory for creating supervisor actors of a component specified by [[csw.messages.framework.ComponentInfo]]
  */
-//TODO: add doc to explain significance
-class SupervisorInfoFactory private[framework] (containerName: String) {
+private[framework] class SupervisorInfoFactory(containerName: String) {
   private val log: Logger = new LoggerFactory(containerName).getLogger
 
   def make(
