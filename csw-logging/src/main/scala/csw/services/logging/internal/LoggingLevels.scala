@@ -15,7 +15,8 @@ private[csw] object LoggingLevels {
   object Level {
 
     /**
-     *  Level constructor.
+     * Level constructor.
+     *
      * @param name a level name. Case is ignored.
      * @return the corresponding Level if there is one for that name. Otherwise WARN.
      */
@@ -23,8 +24,9 @@ private[csw] object LoggingLevels {
 
     /**
      * Checks if a level name exists.
+     *
      * @param name the level name.
-     * @return  true if a level with that name exists.
+     * @return true if a level with that name exists.
      */
     def hasLevel(name: String): Boolean = nameToLevelMap.get(name.toUpperCase).isDefined
   }
@@ -126,6 +128,7 @@ private[csw] object LoggingLevels {
 
   /**
    * Current and default logging levels.
+   *
    * @param current the current logging level.
    * @param default the default logging level.
    */

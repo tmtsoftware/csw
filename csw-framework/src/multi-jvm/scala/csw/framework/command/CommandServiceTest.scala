@@ -10,20 +10,20 @@ import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.common.utils.LockCommandFactory
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
-import csw.messages.CommandMessage.Submit
-import csw.messages.ccs.CommandIssue.ComponentLockedIssue
-import csw.messages.ccs.commands.CommandResponse._
-import csw.messages.ccs.commands._
-import csw.messages.ccs.commands.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
-import csw.messages.ccs.commands.matchers.{DemandMatcher, Matcher, MatcherResponse}
+import csw.messages.commands.CommandIssue.ComponentLockedIssue
+import csw.messages.commands.CommandResponse._
+import csw.messages.commands._
+import csw.messages.commands.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
+import csw.messages.commands.matchers.{DemandMatcher, Matcher, MatcherResponse}
+import csw.messages.framework.LockingResponse
+import csw.messages.framework.LockingResponses.LockAcquired
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{AkkaLocation, ComponentId, ComponentType}
-import csw.messages.models.LockingResponse
-import csw.messages.models.LockingResponses.LockAcquired
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.DemandState
-import csw.services.ccs.scaladsl.CommandService
+import csw.messages.scaladsl.CommandMessage.Submit
+import csw.services.command.scaladsl.CommandService
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 
 import scala.async.Async._

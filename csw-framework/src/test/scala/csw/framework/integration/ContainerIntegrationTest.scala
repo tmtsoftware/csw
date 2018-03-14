@@ -1,9 +1,9 @@
 package csw.framework.integration
 
-import akka.stream.scaladsl.{Keep, Sink}
-import akka.stream.{ActorMaterializer, Materializer}
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.stream.scaladsl.{Keep, Sink}
+import akka.stream.{ActorMaterializer, Materializer}
 import akka.testkit.typed.TestKitSettings
 import akka.testkit.typed.scaladsl.TestProbe
 import akka.{actor, testkit}
@@ -11,20 +11,19 @@ import com.typesafe.config.ConfigFactory
 import csw.common.FrameworkAssertions._
 import csw.common.components.framework.SampleComponentState._
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
-import csw.messages.ComponentCommonMessage.{GetSupervisorLifecycleState, LifecycleStateSubscription}
-import csw.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
-import csw.messages.RunningMessage.Lifecycle
-import csw.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
-import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState}
+import csw.messages.framework
+import csw.messages.framework.PubSub.Subscribe
+import csw.messages.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
+import csw.messages.framework.{Components, ContainerLifecycleState, LifecycleStateChanged, SupervisorLifecycleState}
 import csw.messages.location.ComponentType.{Assembly, HCD}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType, LocationRemoved, TrackingEvent}
-import csw.messages.models
-import csw.messages.models.PubSub.Subscribe
-import csw.messages.models.ToComponentLifecycleMessages.{GoOffline, GoOnline}
-import csw.messages.models.{Components, LifecycleStateChanged}
 import csw.messages.params.states.CurrentState
-import csw.services.ccs.scaladsl.CommandService
+import csw.messages.scaladsl.ComponentCommonMessage.{GetSupervisorLifecycleState, LifecycleStateSubscription}
+import csw.messages.scaladsl.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
+import csw.messages.scaladsl.RunningMessage.Lifecycle
+import csw.messages.scaladsl.SupervisorContainerCommonMessages.{Restart, Shutdown}
+import csw.services.command.scaladsl.CommandService
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
@@ -161,13 +160,13 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
     disperserProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(initChoice))))
 
     assemblyLifecycleStateProbe.expectMessage(
-      models.LifecycleStateChanged(assemblySupervisor, SupervisorLifecycleState.Running)
+      LifecycleStateChanged(assemblySupervisor, SupervisorLifecycleState.Running)
     )
     filterLifecycleStateProbe.expectMessage(
-      models.LifecycleStateChanged(filterSupervisor, SupervisorLifecycleState.Running)
+      framework.LifecycleStateChanged(filterSupervisor, SupervisorLifecycleState.Running)
     )
     disperserLifecycleStateProbe.expectMessage(
-      models.LifecycleStateChanged(disperserSupervisor, SupervisorLifecycleState.Running)
+      framework.LifecycleStateChanged(disperserSupervisor, SupervisorLifecycleState.Running)
     )
 
     assertThatContainerIsRunning(resolvedContainerRef, containerLifecycleStateProbe, 2.seconds)

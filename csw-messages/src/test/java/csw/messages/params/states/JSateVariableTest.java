@@ -1,7 +1,7 @@
 package csw.messages.params.states;
 
-import csw.messages.ccs.commands.CommandName;
-import csw.messages.ccs.commands.Setup;
+import csw.messages.commands.CommandName;
+import csw.messages.commands.Setup;
 import csw.messages.params.generics.JKeyTypes;
 import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;

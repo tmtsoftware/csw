@@ -2,7 +2,7 @@ package csw.services.integtration.tests
 
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{AkkaLocation, ComponentId, ComponentType}
-import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
+import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.commons.CswCluster
 import csw.services.location.scaladsl.LocationServiceFactory

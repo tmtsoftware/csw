@@ -3,7 +3,7 @@ package csw.services.csclient.cli
 import java.nio.file.{Files, Paths}
 import java.time.Instant
 
-import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
+import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.config.api.models.ConfigId
 import csw.services.config.server.ServerWiring
 import csw.services.csclient.commons.TestFutureExtension.RichFuture

@@ -18,7 +18,7 @@ trait RegistrationResult {
   /**
    * The `unregister` method will use the connection of this location to unregister from `LocationService`
    *
-   * @return The handle to the `Location` that got registered in `LocationService`
+   * @return the handle to the `Location` that got registered in `LocationService`
    */
   def location: Location
 }

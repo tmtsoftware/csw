@@ -71,7 +71,6 @@ trait HttpSupport extends Directives with JsonSupport {
     case None ⇒ provide(None)
   }
 
-  //TODO: add doc
   val configDataEntity: Directive1[ConfigData] = extractRequestEntity.flatMap {
     case entity if entity.contentLengthOption.isDefined ⇒
       provide(ConfigData.from(entity.dataBytes, entity.contentLengthOption.get))
@@ -79,7 +78,7 @@ trait HttpSupport extends Directives with JsonSupport {
       reject(UnsupportedRequestEncodingRejection(HttpEncoding("All encodings with contentLength value")))
   }
 
-  //This marshaller is used to create a response stream for get/getActive requests
+  // This marshaller is used to create a response stream for get/getActive requests
   implicit val configDataMarshaller: ToEntityMarshaller[ConfigData] = Marshaller.opaque { configData =>
     HttpEntity(ContentTypes.`application/octet-stream`, configData.length, configData.source)
   }

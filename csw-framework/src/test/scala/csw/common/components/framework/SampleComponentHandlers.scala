@@ -2,15 +2,15 @@ package csw.common.components.framework
 
 import akka.actor.typed.scaladsl.ActorContext
 import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
-import csw.messages.TopLevelActorMessage
-import csw.messages.ccs.CommandIssue.OtherIssue
-import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Invalid}
-import csw.messages.ccs.commands._
+import csw.messages.commands.CommandIssue.OtherIssue
+import csw.messages.commands.CommandResponse.{Accepted, Completed, Invalid}
+import csw.messages.commands._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location.{LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.messages.params.states.CurrentState
-import csw.services.ccs.scaladsl.CommandResponseManager
+import csw.messages.scaladsl.TopLevelActorMessage
+import csw.services.command.scaladsl.CommandResponseManager
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 

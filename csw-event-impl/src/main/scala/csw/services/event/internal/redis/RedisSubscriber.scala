@@ -3,7 +3,7 @@ package csw.services.event.internal.redis
 import akka.stream.scaladsl.{Keep, Source}
 import akka.stream.{KillSwitches, Materializer}
 import akka.{Done, NotUsed}
-import csw.messages.ccs.events._
+import csw.messages.events._
 import csw.services.event.scaladsl.{EventSubscriber, EventSubscription}
 import io.lettuce.core.{RedisClient, RedisURI}
 import io.lettuce.core.api.async.RedisAsyncCommands
@@ -19,7 +19,7 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
     protected val mat: Materializer
 ) extends EventSubscriber {
 
-  private val asyncConnectionF: Future[RedisAsyncCommands[EventKey, Event]] =
+  private lazy val asyncConnectionF: Future[RedisAsyncCommands[EventKey, Event]] =
     redisClient.connectAsync(EventServiceCodec, redisURI).toScala.map(_.async())
 
   private def reactiveConnectionF(): Future[RedisPubSubReactiveCommands[EventKey, Event]] =

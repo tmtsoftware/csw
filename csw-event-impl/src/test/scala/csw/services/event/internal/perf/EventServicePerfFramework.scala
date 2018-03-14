@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import akka.stream.scaladsl.Sink
 import akka.stream.stage.GraphStage
 import akka.stream.{ActorMaterializer, FlowShape}
-import csw.messages.ccs.events.{Event, EventKey}
+import csw.messages.events.{Event, EventKey}
 import csw.services.event.helpers.Monitor
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.helpers.Utils.makeEvent

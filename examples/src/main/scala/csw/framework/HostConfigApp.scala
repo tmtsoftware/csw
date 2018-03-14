@@ -1,6 +1,6 @@
 package csw.framework
 
-import csw.apps.hostconfig.HostConfig
+import csw.framework.deploy.hostconfig.HostConfig
 
 //#host-config-app
 object HostConfigApp extends App {

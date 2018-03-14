@@ -2,22 +2,24 @@ package csw.framework.components.assembly
 
 import java.nio.file.Paths
 
+import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import csw.exceptions.{FailureRestart, FailureStop}
+import csw.framework.exceptions.{FailureRestart, FailureStop}
 import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
-import csw.messages.TopLevelActorMessage
-import csw.messages.ccs.commands.CommandResponse.Accepted
-import csw.messages.ccs.commands._
+import csw.messages.commands.CommandResponse.Accepted
+import csw.messages.commands._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location._
-import csw.services.ccs.scaladsl.CommandResponseManager
+import csw.messages.scaladsl.{ComponentMessage, TopLevelActorMessage}
+import csw.services.command.scaladsl.CommandResponseManager
+import csw.services.config.api.models.ConfigData
 import csw.services.config.api.scaladsl.ConfigClientService
 import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
-import scala.async.Async.async
+import scala.async.Async._
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
@@ -42,20 +44,41 @@ class AssemblyComponentHandlers(
 
   implicit val ec: ExecutionContextExecutor = ctx.executionContext
 
-  private val log: Logger                       = new LoggerFactory(componentInfo.name).getLogger(ctx)
-  private val configClient: ConfigClientService = ConfigClientFactory.clientApi(ctx.system.toUntyped, locationService)
+  private val log: Logger                                                      = new LoggerFactory(componentInfo.name).getLogger(ctx)
+  private val configClient: ConfigClientService                                = ConfigClientFactory.clientApi(ctx.system.toUntyped, locationService)
+  private var runningHcds: Map[Connection, Option[ActorRef[ComponentMessage]]] = Map.empty
+  private var diagnosticsPublisher: ActorRef[DiagnosticPublisherMessages]      = _
+  private var commandHandler: ActorRef[CommandHandlerMsgs]                     = _
 
   //#initialize-handler
   override def initialize(): Future[Unit] = async {
 
-    /*
-   * Initialization could include following steps :
-   * 1. fetch config (preferably from configuration service)
-   * 2. create a worker actor which is used by this assembly
-   * 3. find a Hcd connection from the connections provided in componentInfo
-   * 4. If an Hcd is found as a connection, resolve its location from location service and create other
-   *    required worker actors required by this assembly
-   * */
+    // Initialization could include following steps :
+
+    // 1. fetch config (preferably from configuration service)
+    val calculationConfig = await(getAssemblyConfig)
+
+    // 2. create a worker actor which is used by this assembly
+    val worker: ActorRef[WorkerActorMsg] = ctx.spawnAnonymous(WorkerActor.make(calculationConfig))
+
+    // 3. find a Hcd connection from the connections provided in componentInfo
+    val maybeConnection =
+      componentInfo.connections.find(connection ⇒ connection.componentId.componentType == ComponentType.HCD)
+
+    // 4. If an Hcd is found as a connection, resolve its location from location service and create other
+    // required worker actors required by this assembly
+
+    maybeConnection match {
+      case Some(_) ⇒
+        resolveHcd().map {
+          case Some(hcd) ⇒
+            runningHcds = runningHcds.updated(maybeConnection.get, Some(hcd.componentRef))
+            diagnosticsPublisher = ctx.spawnAnonymous(DiagnosticsPublisher.make(runningHcds(maybeConnection.get), Some(worker)))
+            commandHandler = ctx.spawnAnonymous(CommandHandler.make(calculationConfig, runningHcds(maybeConnection.get)))
+          case None ⇒ // do something
+        }
+      case None ⇒ Future.successful(Unit)
+    }
 
   }
   //#initialize-handler
@@ -139,18 +162,18 @@ class AssemblyComponentHandlers(
   //#failureRestart-Exception
   case class HcdNotFoundException() extends FailureRestart("Could not resolve hcd location. Initialization failure.")
 
-  private def resolveHcd() = {
+  private def resolveHcd(): Future[Option[AkkaLocation]] = {
     val maybeConnection = componentInfo.connections.find(connection ⇒ connection.componentId.componentType == ComponentType.HCD)
     maybeConnection match {
-      case hcdConnection @ Some(hcd) ⇒
+      case Some(hcd) ⇒
         locationService.resolve(hcd.of[AkkaLocation], 5.seconds).map {
-          case Some(akkaLocation) ⇒
+          case Some(akkaLocation) ⇒ Some(akkaLocation)
           case None               ⇒
             // Hcd connection could not be resolved for this Assembly. One option to handle this could be to automatic restart which can give enough time
             // for the Hcd to be available
             throw HcdNotFoundException()
         }
-      case None ⇒ Future.successful(Unit)
+      case _ ⇒ Future.successful(None)
     }
   }
   //#failureRestart-Exception
@@ -158,10 +181,10 @@ class AssemblyComponentHandlers(
   // #failureStop-Exception
   case class ConfigNotAvailableException() extends FailureStop("Configuration not available. Initialization failure.")
 
-  private def getAssemblyConfigs() = {
+  private def getAssemblyConfig: Future[ConfigData] = {
 
     configClient.getActive(Paths.get("tromboneAssemblyContext.conf")).flatMap {
-      case Some(config) ⇒ ??? // do work
+      case Some(config) ⇒ Future.successful(config) // do work
       case None         ⇒
         // required configuration could not be found in the configuration service. Component can choose to stop until the configuration is made available in the
         // configuration service and started again

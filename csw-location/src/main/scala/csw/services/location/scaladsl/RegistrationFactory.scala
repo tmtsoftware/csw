@@ -10,7 +10,7 @@ import csw.services.logging.internal.LogControlMessages
  * `csw-framework` to register different components on jvm boot-up. `csw-framework` creates a single `logAdminActorRef`
  * per jvm and injects it in `RegistrationFactory` to register all components with same `logAdminActorRef`.
  *
- * @param logAdminActorRef The ActorRef responsible to change the log level of multiple components started in single
+ * @param logAdminActorRef the ActorRef responsible to change the log level of multiple components started in single
  *                         jvm at runtime
  */
 class RegistrationFactory(logAdminActorRef: ActorRef[LogControlMessages]) {
@@ -18,10 +18,10 @@ class RegistrationFactory(logAdminActorRef: ActorRef[LogControlMessages]) {
   /**
    * Creates an AkkaRegistration from provided parameters. Currently, it is used to register components except Container
    *
-   * @param akkaConnection The AkkaConnection representing the component
-   * @param prefix The prefix of the component
-   * @param actorRef The supervisor actorref of the component
-   * @return A handle to the AkkaRegistration that is used to register in location service
+   * @param akkaConnection the AkkaConnection representing the component
+   * @param prefix the prefix of the component
+   * @param actorRef the supervisor actorref of the component
+   * @return a handle to the AkkaRegistration that is used to register in location service
    */
   def akkaTyped(
       akkaConnection: AkkaConnection,
@@ -33,9 +33,9 @@ class RegistrationFactory(logAdminActorRef: ActorRef[LogControlMessages]) {
    * Creates an AkkaRegistration from provided parameters. Currently, it is used to register Container as it does not
    * have any prefix like other components e.g. Assembly, HCD.
    *
-   * @param akkaConnection The AkkaConnection representing the component
-   * @param actorRef The supervisor actorref of the component
-   * @return A handle to the AkkaRegistration that is used to register in location service
+   * @param akkaConnection the AkkaConnection representing the component
+   * @param actorRef the supervisor actorref of the component
+   * @return a handle to the AkkaRegistration that is used to register in location service
    */
   def akkaTyped(
       akkaConnection: AkkaConnection,

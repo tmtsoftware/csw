@@ -2,11 +2,11 @@ package csw.messages.params;
 
 import akka.actor.typed.Behavior;
 import akka.actor.typed.javadsl.Behaviors;
-import csw.messages.ccs.commands.Observe;
-import csw.messages.ccs.commands.Setup;
-import csw.messages.ccs.commands.Wait;
-import csw.messages.ccs.events.EventName;
-import csw.messages.ccs.events.SystemEvent;
+import csw.messages.commands.Observe;
+import csw.messages.commands.Setup;
+import csw.messages.commands.Wait;
+import csw.messages.events.EventName;
+import csw.messages.events.SystemEvent;
 import csw.messages.params.generics.JKeyTypes;
 import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;

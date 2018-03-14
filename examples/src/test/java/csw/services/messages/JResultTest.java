@@ -1,6 +1,6 @@
 package csw.services.messages;
 
-import csw.messages.ccs.commands.Result;
+import csw.messages.commands.Result;
 import csw.messages.params.formats.JavaJsonSupport;
 import csw.messages.params.generics.JKeyTypes;
 import csw.messages.params.generics.Key;

@@ -3,7 +3,7 @@ package csw.services.event.internal.redis
 import akka.Done
 import akka.stream._
 import akka.stream.scaladsl.{Sink, Source}
-import csw.messages.ccs.events.{Event, EventKey}
+import csw.messages.events.{Event, EventKey}
 import csw.services.event.scaladsl.EventPublisher
 import io.lettuce.core.api.async.RedisAsyncCommands
 import io.lettuce.core.{RedisClient, RedisURI}

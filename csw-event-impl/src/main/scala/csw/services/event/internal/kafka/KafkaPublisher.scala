@@ -5,7 +5,7 @@ import akka.kafka.ProducerSettings
 import akka.kafka.scaladsl.Producer
 import akka.stream.Materializer
 import akka.stream.scaladsl.Source
-import csw.messages.ccs.events.Event
+import csw.messages.events.Event
 import csw.services.event.scaladsl.EventPublisher
 import org.apache.kafka.clients.producer.{Callback, ProducerRecord}
 

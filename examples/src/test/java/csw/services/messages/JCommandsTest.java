@@ -1,9 +1,9 @@
 package csw.services.messages;
 
-import csw.messages.ccs.commands.CommandName;
-import csw.messages.ccs.commands.Observe;
-import csw.messages.ccs.commands.Setup;
-import csw.messages.ccs.commands.Wait;
+import csw.messages.commands.CommandName;
+import csw.messages.commands.Observe;
+import csw.messages.commands.Setup;
+import csw.messages.commands.Wait;
 import csw.messages.javadsl.JSubsystem;
 import csw.messages.javadsl.JUnits;
 import csw.messages.params.formats.JavaJsonSupport;
@@ -243,9 +243,9 @@ public class JCommandsTest {
         String str = Json.prettyPrint(scJson);
 
         //construct command from string
-        Setup sc1 = JavaJsonSupport.readSequenceCommand(Setup.class, Json.parse(str));
-        Observe oc1 = JavaJsonSupport.readSequenceCommand(Observe.class, ocJson);
-        Wait wc1 = JavaJsonSupport.readSequenceCommand(Wait.class, wcJson);
+        Setup sc1 = JavaJsonSupport.readSequenceCommand(Json.parse(str));
+        Observe oc1 = JavaJsonSupport.readSequenceCommand(ocJson);
+        Wait wc1 = JavaJsonSupport.readSequenceCommand(wcJson);
         //#json-serialization
 
         Assert.assertEquals(sc, sc1);

@@ -13,25 +13,38 @@ import scala.runtime.ScalaRunTime._
  * A generic Key class. Never meant to be instantiated directly. [[csw.messages.params.generics.KeyType]] exposes
  * allowed types of Keys and make method to create instances of Key.
  *
- * @param keyName  the name of the key
+ * @param keyName the name of the key
  * @param keyType reference to an object of type KeyType[S]
  * @param units applicable units
  */
 case class Key[S: Format: ClassTag: ItemsFactory] private[generics] (keyName: String, keyType: KeyType[S], units: Units) {
 
+  /**
+   * An overloaded constructor to create Key with no units
+   *
+   * @param keyName the name of the key
+   * @param keyType reference to an object of type KeyType[S]
+   * @return an instance of Key[S]
+   */
   def this(keyName: String, keyType: KeyType[S]) = this(keyName, keyType, NoUnits)
 
-  //TODO: add doc
-  def set(v: Array[S], units: Units = NoUnits): Parameter[S] = Parameter(keyName, keyType, v, units)
+  /**
+   * Set values against this key
+   *
+   * @param values an Array of values
+   * @param units applicable units
+   * @return an instance of Parameter[S] containing the key name, values (call withUnits() on the result to set the units)
+   */
+  def set(values: Array[S], units: Units = NoUnits): Parameter[S] = Parameter(keyName, keyType, values, units)
 
   /**
    * Sets the values for the key using a variable number of arguments
    *
-   * @param xs one or more values
-   * @return a parameter containing the key name, values (call withUnits() on the result to set the units)
+   * @param values one or more values
+   * @return an instance of Parameter[S] containing the key name, values (call withUnits() on the result to set the units)
    */
   @varargs
-  def set(xs: S*): Parameter[S] = Parameter(keyName, keyType, xs.toArray[S], units)
+  def set(values: S*): Parameter[S] = Parameter(keyName, keyType, values.toArray[S], units)
 
   /**
    * Sets the values for the key
@@ -44,10 +57,10 @@ case class Key[S: Format: ClassTag: ItemsFactory] private[generics] (keyName: St
    *   )
    * }}}
    *
-   * @param v the value
+   * @param values one or more values
    * @return a parameter containing the key name and one value (call withUnits() on the result to set the units)
    */
-  def ->(v: S*): Parameter[S] = set(v: _*)
+  def ->(values: S*): Parameter[S] = set(values: _*)
 
   /**
    * Sets the value and units for the key
@@ -60,10 +73,10 @@ case class Key[S: Format: ClassTag: ItemsFactory] private[generics] (keyName: St
    *   )
    * }}}
    *
-   * @param v a pair containing a single value for the key and the units of the value
+   * @param values a pair containing a single value for the key and the units of the value
    * @return a parameter containing the key name, values and units
    */
-  def ->(v: (S, Units)): Parameter[S] = set(Array(v._1), v._2)
+  def ->(values: (S, Units)): Parameter[S] = set(Array(values._1), values._2)
 
   /**
    * Sets the values for the key as a Scala Vector
@@ -75,18 +88,22 @@ case class Key[S: Format: ClassTag: ItemsFactory] private[generics] (keyName: St
    *   )
    * }}}
    *
-   * @param v a vector of values
+   * @param values an Array of values
    * @return a parameter containing the key name and values (call withUnits() on the result to set the units)
    */
-  def ->(v: Array[S]): Parameter[S] = set(v)
+  def ->(values: Array[S]): Parameter[S] = set(values)
 
   /**
-   * Returns a string representation of the object.
-   * @return String
+   * Returns a string representation of Key as keyName
    */
   override def toString: String = keyName
 
-  //TODO: add doc
+  /**
+   * Equals this Key instance with other by the keyName
+   *
+   * @param that the other Key instance that is to be equated against this Key instance
+   * @return a Boolean indicating whether two Key instances are equal or not
+   */
   override def equals(that: Any): Boolean = {
     that match {
       case that: Key[S] => this.keyName == that.keyName
@@ -94,6 +111,5 @@ case class Key[S: Format: ClassTag: ItemsFactory] private[generics] (keyName: St
     }
   }
 
-  //TODO: add doc
   override def hashCode: Int = _hashCode(this)
 }

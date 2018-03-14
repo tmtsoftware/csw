@@ -1,7 +1,7 @@
 package csw.services.event.internal.kafka
 
 import akka.actor.ActorSystem
-import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
+import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.event.KafkaFactory
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.internal.commons.Wiring
@@ -24,13 +24,15 @@ class KafkaPerfTest extends FunSuite with Matchers with BeforeAndAfterAll with E
                                            customProducerProperties = pubSubProperties,
                                            customBrokerProperties = brokerProperties)
 
-  EmbeddedKafka.start()(config)
-
   private val wiring       = new Wiring(actorSystem)
   private val kafkaFactory = new KafkaFactory(mock[LocationService], wiring)
   private val publisher    = kafkaFactory.publisher("localhost", kafkaPort)
   private val subscriber   = kafkaFactory.subscriber("localhost", kafkaPort)
   private val framework    = new EventServicePerfFramework(publisher, subscriber)
+
+  override def beforeAll(): Unit = {
+    EmbeddedKafka.start()(config)
+  }
 
   override def afterAll(): Unit = {
     publisher.shutdown().await

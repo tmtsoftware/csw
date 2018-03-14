@@ -3,7 +3,6 @@ package csw.services.logging.macros
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
 
-//TODO: explain better significance
 trait SourceFactory {
   def get(): SourceLocation
 }

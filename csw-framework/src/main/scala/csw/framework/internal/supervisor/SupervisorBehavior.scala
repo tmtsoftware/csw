@@ -6,34 +6,37 @@ import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors, TimerScheduler}
 import akka.actor.typed.{ActorRef, Behavior, PostStop, Signal, SupervisorStrategy, Terminated}
-import csw.exceptions.{FailureRestart, InitializationFailed}
+import csw.framework.exceptions.{FailureRestart, InitializationFailed}
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.scaladsl.{ComponentBehaviorFactory, CurrentStatePublisher}
-import csw.messages.CommandResponseManagerMessage.{Query, Subscribe, Unsubscribe}
-import csw.messages.ComponentCommonMessage._
-import csw.messages.FromComponentLifecycleMessage.Running
-import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
-import csw.messages.RunningMessage.Lifecycle
-import csw.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
-import csw.messages.SupervisorIdleMessage._
-import csw.messages.SupervisorInternalRunningMessage.{RegistrationFailed, RegistrationNotRequired, RegistrationSuccess}
-import csw.messages.SupervisorLockMessage.{Lock, Unlock}
-import csw.messages.SupervisorRestartMessage.{UnRegistrationComplete, UnRegistrationFailed}
-import csw.messages._
+import csw.messages.commons.CoordinatedShutdownReasons.ShutdownMessageReceivedReason
 import csw.messages.framework.LocationServiceUsage.DoNotRegister
+import csw.messages.framework.LockingResponses.{LockExpired, LockExpiringShortly}
+import csw.messages.framework.PubSub.Publish
 import csw.messages.framework.SupervisorLifecycleState.{Idle, RunningOffline}
-import csw.messages.framework.{ComponentInfo, SupervisorLifecycleState}
+import csw.messages.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
+import csw.messages.framework._
 import csw.messages.location.ComponentId
 import csw.messages.location.Connection.AkkaConnection
-import csw.messages.models.CoordinatedShutdownReasons.ShutdownMessageReceivedReason
-import csw.messages.models.LockingResponses.{LockExpired, LockExpiringShortly}
-import csw.messages.models.PubSub.Publish
-import csw.messages.models.ToComponentLifecycleMessages.{GoOffline, GoOnline}
-import csw.messages.models.{LifecycleStateChanged, LockingResponse, PubSub, ToComponentLifecycleMessage}
 import csw.messages.params.models.Prefix
 import csw.messages.params.states.CurrentState
-import csw.services.ccs.internal.CommandResponseManagerFactory
-import csw.services.ccs.scaladsl.CommandResponseManager
+import csw.messages.scaladsl.CommandResponseManagerMessage.{Query, Subscribe, Unsubscribe}
+import csw.messages.scaladsl.ComponentCommonMessage.{
+  ComponentStateSubscription,
+  GetSupervisorLifecycleState,
+  LifecycleStateSubscription
+}
+import csw.messages.scaladsl.FromComponentLifecycleMessage.Running
+import csw.messages.scaladsl.FromSupervisorMessage.SupervisorLifecycleStateChanged
+import csw.messages.scaladsl.RunningMessage.Lifecycle
+import csw.messages.scaladsl.SupervisorContainerCommonMessages.{Restart, Shutdown}
+import csw.messages.scaladsl.SupervisorIdleMessage.InitializeTimeout
+import csw.messages.scaladsl.SupervisorInternalRunningMessage.{RegistrationFailed, RegistrationNotRequired, RegistrationSuccess}
+import csw.messages.scaladsl.SupervisorLockMessage.{Lock, Unlock}
+import csw.messages.scaladsl.SupervisorRestartMessage.{UnRegistrationComplete, UnRegistrationFailed}
+import csw.messages.scaladsl._
+import csw.services.command.internal.CommandResponseManagerFactory
+import csw.services.command.scaladsl.CommandResponseManager
 import csw.services.location.models.AkkaRegistration
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
@@ -107,7 +110,7 @@ class SupervisorBehavior private[framework] (
   spawnAndWatchComponent()
 
   /**
-   * Defines processing for a [[csw.messages.SupervisorMessage]] received by the actor instance.
+   * Defines processing for a [[csw.messages.scaladsl.SupervisorMessage]] received by the actor instance.
    * @param msg      SupervisorMessage received
    * @return         The existing behavior
    */

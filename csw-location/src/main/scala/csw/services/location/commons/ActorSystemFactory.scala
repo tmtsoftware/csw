@@ -8,7 +8,7 @@ import csw.services.logging.scaladsl.Logger
  * ActorSystemFactory creates a remote ActorSystem on the interface where csw-cluster is running. The ActorSystem starts on a
  * random port.
  *
- * @note It is recommended to create actors via this factory if it has to be registered with LocationService
+ * @note it is recommended to create actors via this factory if it has to be registered with LocationService
  */
 object ActorSystemFactory {
 
@@ -22,7 +22,7 @@ object ActorSystemFactory {
   /**
    * Create an ActorSystem with the given name and remote properties
    *
-   * @note Even if the custom configuration is provided for the given name of ActorSystem, it will be simply
+   * @note even if the custom configuration is provided for the given name of ActorSystem, it will be simply
    *       ignored, instead default remote configuration will be used while creating ActorSystem
    */
   def remote(componentName: String): ActorSystem = {

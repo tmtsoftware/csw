@@ -1,7 +1,7 @@
 package csw.services.event.internal.kafka
 
 import akka.actor.ActorSystem
-import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
+import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.event.KafkaFactory
 import csw.services.event.helpers.RegistrationFactory
 import csw.services.event.helpers.TestFutureExt.RichFuture
@@ -29,13 +29,15 @@ class KafkaPubSubTest extends FunSuite with EmbeddedKafka with BeforeAndAfterAll
                                            customProducerProperties = pubSubProperties,
                                            customBrokerProperties = brokerProperties)
 
-  EmbeddedKafka.start()(config)
-
   private val wiring       = new Wiring(actorSystem)
   private val kafkaFactory = new KafkaFactory(locationService, wiring)
   private val publisher    = kafkaFactory.publisher().await
   private val subscriber   = kafkaFactory.subscriber().await
   private val framework    = new EventServicePubSubTestFramework(publisher, subscriber)
+
+  override def beforeAll(): Unit = {
+    EmbeddedKafka.start()(config)
+  }
 
   override def afterAll(): Unit = {
     publisher.shutdown().await

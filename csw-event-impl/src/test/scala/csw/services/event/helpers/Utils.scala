@@ -1,6 +1,6 @@
 package csw.services.event.helpers
 
-import csw.messages.ccs.events.{Event, EventName, SystemEvent}
+import csw.messages.events.{Event, EventName, SystemEvent}
 import csw.messages.params.models.{Id, Prefix}
 
 object Utils {

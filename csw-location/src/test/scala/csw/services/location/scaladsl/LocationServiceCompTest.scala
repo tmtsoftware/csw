@@ -1,15 +1,15 @@
 package csw.services.location.scaladsl
 
+import akka.actor.typed.Behavior
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.{ActorSystem, PoisonPill}
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.testkit.TestProbe
-import akka.actor.typed.Behavior
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location._
-import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.location.commons.{ActorSystemFactory, RegistrationFactory}
 import csw.services.location.exceptions.OtherLocationIsRegistered

@@ -13,30 +13,32 @@ class GChoiceKey(name: String, keyType: KeyType[Choice], val choices: Choices) e
 
   /**
    * validates the input Seq of choices
+   *
+   * @param values one or more values
    */
-  private def validate(xs: Seq[Choice]): Unit =
-    assert(xs.forall(choices.contains), s"Bad choice for key: $keyName which must be one of: $choices")
+  private def validate(values: Seq[Choice]): Unit =
+    assert(values.forall(choices.contains), s"Bad choice for key: $keyName which must be one of: $choices")
 
   /**
    * Sets the values for the key using a variable number of arguments
    *
-   * @param xs one or more values
+   * @param values one or more values
    * @return a parameter containing the key name, values
    */
-  override def set(xs: Choice*): Parameter[Choice] = {
-    validate(xs)
-    super.set(xs: _*)
+  override def set(values: Choice*): Parameter[Choice] = {
+    validate(values)
+    super.set(values: _*)
   }
 
   /**
    * Sets the values for the key using an Array and Units
    *
-   * @param v Array of Choice
-   * @param units Units
+   * @param values Array of Choice
+   * @param units applicable Units
    * @return a parameter containing the key name, values, specified unit
    */
-  override def set(v: Array[Choice], units: Units): Parameter[Choice] = {
-    validate(v)
-    super.set(v, units)
+  override def set(values: Array[Choice], units: Units): Parameter[Choice] = {
+    validate(values)
+    super.set(values, units)
   }
 }

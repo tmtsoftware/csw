@@ -4,7 +4,7 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
 import csw.apps.clusterseed.admin.internal.{ActorRuntime, Settings}
 import csw.apps.clusterseed.commons.ClusterSeedLogger
-import csw.messages.models.CoordinatedShutdownReasons.FailureReason
+import csw.messages.commons.CoordinatedShutdownReasons.FailureReason
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.logging.scaladsl.Logger
 

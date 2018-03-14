@@ -1,30 +1,33 @@
 package csw.framework.internal.supervisor
 
-import akka.actor.typed.{ActorRef, Terminated}
 import akka.actor.typed.scaladsl.{Behaviors, TimerScheduler}
+import akka.actor.typed.{ActorRef, Terminated}
 import akka.testkit.typed.scaladsl.Effects.Spawned
 import akka.testkit.typed.scaladsl.{BehaviorTestKit, TestInbox, TestProbe}
 import csw.common.components.framework.SampleComponentBehaviorFactory
-import csw.exceptions.{FailureStop, InitializationFailed}
 import csw.framework.ComponentInfos._
+import csw.framework.exceptions.{FailureStop, InitializationFailed}
 import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
-import csw.messages.CommandResponseManagerMessage.Query
-import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
-import csw.messages.FromComponentLifecycleMessage.Running
-import csw.messages.RunningMessage.Lifecycle
-import csw.messages.SupervisorContainerCommonMessages.Restart
-import csw.messages.SupervisorIdleMessage.InitializeTimeout
-import csw.messages.SupervisorInternalRunningMessage.{RegistrationNotRequired, RegistrationSuccess}
-import csw.messages._
-import csw.messages.ccs.commands.CommandResponse
+import csw.messages.commands.CommandResponse
 import csw.messages.framework.LocationServiceUsage.DoNotRegister
-import csw.messages.framework.{ComponentInfo, SupervisorLifecycleState}
-import csw.messages.models.PubSub.{Publish, Subscribe, Unsubscribe}
-import csw.messages.models.ToComponentLifecycleMessages.{GoOffline, GoOnline}
-import csw.messages.models.{LifecycleStateChanged, PubSub}
+import csw.messages.framework.PubSub.{Publish, Subscribe, Unsubscribe}
+import csw.messages.framework.ToComponentLifecycleMessages._
+import csw.messages.framework.{ComponentInfo, LifecycleStateChanged, PubSub, SupervisorLifecycleState}
 import csw.messages.params.models.Id
 import csw.messages.params.states.CurrentState
+import csw.messages.scaladsl.CommandResponseManagerMessage.Query
+import csw.messages.scaladsl.ComponentCommonMessage.{
+  ComponentStateSubscription,
+  GetSupervisorLifecycleState,
+  LifecycleStateSubscription
+}
+import csw.messages.scaladsl.FromComponentLifecycleMessage.Running
+import csw.messages.scaladsl.RunningMessage.Lifecycle
+import csw.messages.scaladsl.SupervisorContainerCommonMessages.Restart
+import csw.messages.scaladsl.SupervisorIdleMessage.InitializeTimeout
+import csw.messages.scaladsl.SupervisorInternalRunningMessage.{RegistrationNotRequired, RegistrationSuccess}
+import csw.messages.scaladsl.{CommandResponseManagerMessage, ContainerIdleMessage, SupervisorMessage, TopLevelActorMessage}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 
@@ -140,7 +143,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
       supervisorBehaviorKit.childInbox(SupervisorBehavior.PubSubLifecycleActor)
 
     childPubSubLifecycleInbox.receiveMessage() shouldBe Publish(
-      models.LifecycleStateChanged(supervisorBehaviorKit.selfInbox().ref, SupervisorLifecycleState.Running)
+      LifecycleStateChanged(supervisorBehaviorKit.selfInbox().ref, SupervisorLifecycleState.Running)
     )
   }
 
@@ -160,7 +163,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
       supervisorBehaviorKit.childInbox(SupervisorBehavior.PubSubLifecycleActor)
 
     childPubSubLifecycleInbox.receiveMessage() shouldBe Publish(
-      models.LifecycleStateChanged(supervisorBehaviorKit.selfInbox().ref, SupervisorLifecycleState.Running)
+      LifecycleStateChanged(supervisorBehaviorKit.selfInbox().ref, SupervisorLifecycleState.Running)
     )
   }
   // *************** End of testing onInternalMessage ***************

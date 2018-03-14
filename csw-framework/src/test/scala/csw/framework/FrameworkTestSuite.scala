@@ -11,8 +11,8 @@ import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.internal.supervisor.SupervisorBehaviorFactory
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers, CurrentStatePublisher}
 import csw.messages.framework.ComponentInfo
-import csw.messages.{ComponentMessage, ContainerIdleMessage, TopLevelActorMessage}
-import csw.services.ccs.scaladsl.CommandResponseManager
+import csw.messages.scaladsl.{ComponentMessage, ContainerIdleMessage, TopLevelActorMessage}
+import csw.services.command.scaladsl.CommandResponseManager
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory

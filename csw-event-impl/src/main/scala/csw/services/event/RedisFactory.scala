@@ -13,7 +13,7 @@ import scala.concurrent.Future
 
 class RedisFactory(redisClient: RedisClient, locationService: LocationService, wiring: Wiring) {
   import wiring._
-  private lazy val eventServiceResolver = new EventServiceResolver(locationService)
+  private val eventServiceResolver = new EventServiceResolver(locationService)
 
   def publisher(host: String, port: Int): EventPublisher = {
     val redisURI = RedisURI.create(host, port)

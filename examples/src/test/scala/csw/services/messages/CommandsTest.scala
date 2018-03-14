@@ -2,7 +2,7 @@ package csw.services.messages
 
 import java.time.Instant
 
-import csw.messages.ccs.commands.{CommandName, Observe, Setup, Wait}
+import csw.messages.commands.{CommandName, Observe, Setup, Wait}
 import csw.messages.params.formats.JsonSupport
 import csw.messages.params.generics.KeyType.{ByteKey, DoubleMatrixKey}
 import csw.messages.params.generics.{Key, KeyType, Parameter}

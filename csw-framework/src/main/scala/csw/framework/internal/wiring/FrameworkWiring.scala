@@ -2,15 +2,15 @@ package csw.framework.internal.wiring
 
 import akka.actor.ActorSystem
 import akka.actor.typed.ActorRef
-import csw.apps.commons.ConfigUtils
+import csw.framework.deploy.ConfigUtils
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
-import csw.services.ccs.internal.CommandResponseManagerFactory
+import csw.services.command.internal.CommandResponseManagerFactory
 import csw.services.config.api.scaladsl.ConfigClientService
 import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory, RegistrationFactory}
+import csw.services.logging.commons.LogAdminActorFactory
 import csw.services.logging.internal.LogControlMessages
-import csw.services.logging.scaladsl.LogAdminActorFactory
 
 private[csw] class FrameworkWiring {
   lazy val clusterSettings: ClusterSettings               = ClusterSettings()

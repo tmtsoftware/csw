@@ -3,20 +3,19 @@ package csw.framework.internal.component
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.actor.typed.{ActorRef, Behavior, PostStop, Signal}
 import csw.framework.scaladsl.ComponentHandlers
-import csw.messages.CommandMessage.{Oneway, Submit}
-import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
-import csw.messages.FromComponentLifecycleMessage.Running
-import csw.messages.RunningMessage.Lifecycle
-import csw.messages.TopLevelActorCommonMessage.{TrackingEventReceived, UnderlyingHookFailed}
-import csw.messages.TopLevelActorIdleMessage.Initialize
-import csw.messages._
-import csw.messages.ccs.commands.CommandResponse
-import csw.messages.ccs.commands.CommandResponse.Accepted
-import csw.messages.framework.ComponentInfo
+import csw.messages.commands.CommandResponse
+import csw.messages.commands.CommandResponse.Accepted
 import csw.messages.framework.LocationServiceUsage.RegisterAndTrackServices
-import csw.messages.models.ToComponentLifecycleMessage
-import csw.messages.models.ToComponentLifecycleMessages.{GoOffline, GoOnline}
-import csw.services.ccs.scaladsl.CommandResponseManager
+import csw.messages.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
+import csw.messages.framework.{ComponentInfo, ToComponentLifecycleMessage}
+import csw.messages.scaladsl.CommandMessage.{Oneway, Submit}
+import csw.messages.scaladsl.CommandResponseManagerMessage.AddOrUpdateCommand
+import csw.messages.scaladsl.FromComponentLifecycleMessage.Running
+import csw.messages.scaladsl.RunningMessage.Lifecycle
+import csw.messages.scaladsl.TopLevelActorCommonMessage.{TrackingEventReceived, UnderlyingHookFailed}
+import csw.messages.scaladsl.TopLevelActorIdleMessage.Initialize
+import csw.messages.scaladsl._
+import csw.services.command.scaladsl.CommandResponseManager
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
@@ -57,7 +56,7 @@ class ComponentBehavior private[framework] (
   ctx.self ! Initialize
 
   /**
-   * Defines processing for a [[csw.messages.TopLevelActorMessage]] received by the actor instance.
+   * Defines processing for a [[TopLevelActorMessage]] received by the actor instance.
    *
    * @param msg      ComponentMessage received from supervisor
    * @return         The existing behavior
@@ -163,9 +162,9 @@ class ComponentBehavior private[framework] (
     }
 
   /**
-   * Defines action for messages which represent a [[csw.messages.ccs.commands.Command]]
+   * Defines action for messages which represent a [[csw.messages.commands.Command]]
    *
-   * @param commandMessage  Message encapsulating a [[csw.messages.ccs.commands.Command]]
+   * @param commandMessage  Message encapsulating a [[csw.messages.commands.Command]]
    */
   private def onRunningCompCommandMessage(commandMessage: CommandMessage): Unit = {
 

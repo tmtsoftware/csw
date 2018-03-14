@@ -1,7 +1,7 @@
 package csw.messages.params.generics
 
-import csw.messages.ccs.commands._
-import csw.messages.ccs.events._
+import csw.messages.commands._
+import csw.messages.events._
 import csw.messages.params.models.{Id, ObsId, Prefix, Struct}
 import csw.messages.params.states.{CurrentState, DemandState}
 import org.scalatest.{FunSpec, Matchers}

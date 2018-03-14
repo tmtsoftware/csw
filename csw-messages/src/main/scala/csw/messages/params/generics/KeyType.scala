@@ -17,24 +17,45 @@ import scala.reflect.ClassTag
 
 /**
  * Generic marker class for creating various types of Keys.
+ *
+ * @tparam S the type of values that will sit against the key in Parameter
  */
 sealed class KeyType[S: Format: ClassTag: ItemsFactory] extends EnumEntry with Serializable {
-  def paramFormat: Format[Parameter[S]]                 = Parameter[S]
-  def typeMapper: TypeMapper[PbParameter, Parameter[S]] = Parameter.typeMapper
+  private[messages] def paramFormat: Format[Parameter[S]]                 = Parameter[S]
+  private[messages] def typeMapper: TypeMapper[PbParameter, Parameter[S]] = Parameter.typeMapper
 }
 
 /**
  * SimpleKeyType with a name. Holds instances of primitives such as char, int, String etc.
+ *
+ * @tparam S the type of values that will sit against the key in Parameter
  */
 sealed class SimpleKeyType[S: Format: ClassTag: ItemsFactory] extends KeyType[S] {
+
+  /**
+   * Make a Key from provided name
+   *
+   * @param name represents keyName in Key
+   * @return a Key[S] with NoUnits where S is the type of values that will sit against the key in Parameter
+   */
   def make(name: String): Key[S] = new Key[S](name, this)
 }
 
 /**
  * A KeyType that allows name and unit to be specified during creation. Holds instances of primitives such as
  * char, int, String etc.
+ *
+ * @param defaultUnits applicable units
+ * @tparam S the type of values that will sit against the key in Parameter
  */
 sealed class SimpleKeyTypeWithUnits[S: Format: ClassTag: ItemsFactory](defaultUnits: Units) extends KeyType[S] {
+
+  /**
+   * Make a Key from provided name
+   *
+   * @param name represents keyName in Key
+   * @return a Key[S] with defaultUnits where S is the type of values that will sit against the key in Parameter
+   */
   def make(name: String): Key[S] = new Key[S](name, this, defaultUnits)
 }
 
@@ -73,11 +94,13 @@ sealed class JMatrixKeyType[S: Format: ClassTag, T: ItemsFactory](
 /**
  * KeyTypes defined for consumption in Scala code
  */
-//TODO: add why do we need it
 object KeyType extends Enum[KeyType[_]] with PlayJsonEnum[KeyType[_]] {
 
   import JsonSupport._
 
+  /**
+   * values return a Seq of all KeyTypes provided by `csw-messages`
+   */
   override def values: immutable.IndexedSeq[KeyType[_]] = findValues
 
   case object ChoiceKey extends KeyType[Choice] {

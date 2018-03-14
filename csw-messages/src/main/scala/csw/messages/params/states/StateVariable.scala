@@ -1,6 +1,6 @@
 package csw.messages.params.states
 
-import csw.messages.ccs.commands.Setup
+import csw.messages.commands.Setup
 import csw.messages.params.generics.{Parameter, ParameterSetKeyData, ParameterSetType}
 import csw.messages.params.models.Prefix
 import csw.messages.params.states.StateVariable.StateVariable
@@ -9,7 +9,6 @@ import scala.annotation.varargs
 import scala.collection.JavaConverters._
 import scala.language.implicitConversions
 
-//TODO: explain better significance for everything
 object StateVariable {
 
   /**
@@ -43,7 +42,7 @@ object StateVariable {
   /**
    * The default matcher for state variables tests for an exact match
    *
-   * @param demand  the demand state
+   * @param demand the demand state
    * @param current the current state
    * @return true if the demand and current states match (in this case, are equal)
    */
@@ -51,7 +50,7 @@ object StateVariable {
     demand.prefixStr == current.prefixStr && demand.paramSet == current.paramSet
 
   /**
-   * For the Java API
+   * A Java helper method to create CurrentState
    *
    * @param states one or more CurrentState objects
    * @return a new CurrentStates object containing all the given CurrentState objects
@@ -60,7 +59,7 @@ object StateVariable {
   def createCurrentStates(states: CurrentState*): CurrentStates = CurrentStates(states)
 
   /**
-   * For the Java API
+   * A Java helper method to create CurrentState
    *
    * @param states one or more CurrentState objects
    * @return a new CurrentStates object containing all the given CurrentState objects
@@ -72,22 +71,28 @@ object StateVariable {
  * A state variable that indicates the ''demand'' or requested state.
  *
  * @param prefix identifies the target subsystem
- * @param paramSet     an optional initial set of items (keys with values)
+ * @param paramSet an optional initial set of items (keys with values)
  */
 case class DemandState private (prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]])
     extends ParameterSetType[DemandState]
     with ParameterSetKeyData
     with StateVariable {
 
-  override protected def create(data: Set[Parameter[_]]) = new DemandState(prefix, data)
+  /**
+   * Create a new DemandState instance when a parameter is added or removed
+   *
+   * @param data set of parameters
+   * @return a new instance of DemandState with provided data
+   */
+  override protected def create(data: Set[Parameter[_]]): DemandState = copy(paramSet = data)
 
   /**
-   * This is here for Java to construct with String
+   * A Java helper method to construct with String
    */
   def this(prefix: String) = this(Prefix(prefix))
 
   /**
-   * Java API to create a DemandState from a Setup
+   * A Java helper method to create a DemandState from a Setup
    */
   def this(command: Setup) = this(command.source, command.paramSet)
 }
@@ -99,6 +104,13 @@ object DemandState {
    */
   implicit def apply(command: Setup): DemandState = DemandState(command.source, command.paramSet)
 
+  /**
+   * A helper method to create DemandState
+   *
+   * @param prefix identifies the target subsystem
+   * @param paramSet an optional initial set of items (keys with values)
+   * @return an instance of DemandState
+   */
   def apply(prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]): DemandState =
     new DemandState(prefix).madd(paramSet)
 }
@@ -114,20 +126,34 @@ case class CurrentState private (prefix: Prefix, paramSet: Set[Parameter[_]] = S
     with ParameterSetKeyData
     with StateVariable {
 
-  override protected def create(data: Set[Parameter[_]]) = new CurrentState(prefix, data)
+  /**
+   * Create a new CurrentState instance when a parameter is added or removed
+   *
+   * @param data set of parameters
+   * @return a new instance of CurrentState with provided data
+   */
+  override protected def create(data: Set[Parameter[_]]): CurrentState = copy(paramSet = data)
 
   /**
-   * This is here for Java to construct with String
+   * A Java helper method to construct with String
    */
   def this(prefix: String) = this(Prefix(prefix))
 
   /**
-   * Java API to create a DemandState from a Setup
+   * A Java helper method to create a DemandState from a Setup
    */
   def this(command: Setup) = this(command.source, command.paramSet)
 }
 
 object CurrentState {
+
+  /**
+   * A helper method to create CurrentState
+   *
+   * @param prefix identifies the target subsystem
+   * @param paramSet an optional initial set of items (keys with values)
+   * @return an instance of CurrentState
+   */
   def apply(prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]): CurrentState =
     new CurrentState(prefix).madd(paramSet)
 }

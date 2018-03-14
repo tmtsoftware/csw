@@ -1,6 +1,6 @@
 package csw.services.config.server
 
-import csw.messages.models.CoordinatedShutdownReasons.FailureReason
+import csw.messages.commons.CoordinatedShutdownReasons.FailureReason
 import csw.services.config.server.cli.{ArgsParser, Options}
 import csw.services.config.server.commons.ConfigServerLogger
 import csw.services.config.server.http.HttpService

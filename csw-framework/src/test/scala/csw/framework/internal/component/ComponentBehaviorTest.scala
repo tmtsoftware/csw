@@ -4,10 +4,10 @@ import akka.actor.typed.Behavior
 import akka.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
 import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
 import csw.framework.{ComponentInfos, FrameworkTestSuite}
-import csw.messages.FromComponentLifecycleMessage.Running
-import csw.messages.TopLevelActorIdleMessage.Initialize
-import csw.messages.{CommandResponseManagerMessage, FromComponentLifecycleMessage, TopLevelActorMessage}
-import csw.services.ccs.scaladsl.CommandResponseManager
+import csw.messages.scaladsl.FromComponentLifecycleMessage.Running
+import csw.messages.scaladsl.TopLevelActorIdleMessage.Initialize
+import csw.messages.scaladsl.{CommandResponseManagerMessage, FromComponentLifecycleMessage, TopLevelActorMessage}
+import csw.services.command.scaladsl.CommandResponseManager
 import csw.services.location.scaladsl.LocationService
 import org.mockito.Mockito._
 import org.scalatest.Matchers

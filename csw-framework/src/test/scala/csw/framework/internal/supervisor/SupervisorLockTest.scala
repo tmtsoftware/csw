@@ -6,18 +6,17 @@ import csw.common.components.framework.SampleComponentState.{choiceKey, initChoi
 import csw.common.utils.LockCommandFactory
 import csw.framework.ComponentInfos.assemblyInfo
 import csw.framework.FrameworkTestSuite
-import csw.messages.CommandMessage.Submit
-import csw.messages.CommandResponseManagerMessage.{AddOrUpdateCommand, Query, Unsubscribe}
-import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
-import csw.messages.SupervisorLockMessage.{Lock, Unlock}
-import csw.messages.ccs.commands.CommandResponse.{Accepted, NotAllowed}
-import csw.messages.ccs.commands.{CommandName, CommandResponse, Setup}
-import csw.messages.framework.SupervisorLifecycleState
-import csw.messages.models.LockingResponses._
-import csw.messages.models.{LockingResponse, PubSub}
+import csw.messages.commands.CommandResponse.{Accepted, NotAllowed}
+import csw.messages.commands.{CommandName, CommandResponse, Setup}
+import csw.messages.framework.LockingResponses._
+import csw.messages.framework.{LifecycleStateChanged, LockingResponse, PubSub, SupervisorLifecycleState}
 import csw.messages.params.models.{ObsId, Prefix}
 import csw.messages.params.states.CurrentState
-import csw.messages.{models, CommandResponseManagerMessage ⇒ CRM}
+import csw.messages.scaladsl.CommandMessage.Submit
+import csw.messages.scaladsl.{CommandResponseManagerMessage ⇒ CRM}
+import CRM.{AddOrUpdateCommand, Query, Unsubscribe}
+import csw.messages.scaladsl.ComponentCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
+import csw.messages.scaladsl.SupervisorLockMessage.{Lock, Unlock}
 import org.scalatest.BeforeAndAfterEach
 
 import scala.concurrent.duration.DurationDouble
@@ -37,7 +36,7 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
     // Assure that component is in running state
     compStateProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(initChoice))))
-    lifecycleStateProbe.expectMessage(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
+    lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
 
     // Client 1 will lock an assembly
     supervisorRef ! LockCommandFactory.make("wfos.prog.cloudcover.Client1", lockingStateProbe.ref)
@@ -98,7 +97,7 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
     // Assure that component is in running state
     compStateProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(initChoice))))
-    lifecycleStateProbe.expectMessage(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
+    lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
 
     // Client 1 will lock an assembly
     supervisorRef ! LockCommandFactory.make(source1Prefix, lockingStateProbe.ref)
@@ -149,7 +148,7 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
     // Assure that component is in running state
     compStateProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(initChoice))))
-    lifecycleStateProbe.expectMessage(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
+    lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
 
     // Client 1 will lock an assembly
     supervisorRef ! LockCommandFactory.make(sourcePrefix, lockingStateProbe.ref)
@@ -198,7 +197,7 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
     // Assure that component is in running state
     compStateProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(initChoice))))
-    lifecycleStateProbe.expectMessage(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
+    lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
 
     // Client 1 will lock an assembly
     supervisorRef ! Lock(source1Prefix, lockingStateProbe.ref, 100.millis)
@@ -238,7 +237,7 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
     // Assure that component is in running state
     compStateProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(initChoice))))
-    lifecycleStateProbe.expectMessage(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
+    lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
 
     // Client 1 will lock an assembly
     supervisorRef ! Lock(client1Prefix, lockingStateProbe.ref, 100.millis)

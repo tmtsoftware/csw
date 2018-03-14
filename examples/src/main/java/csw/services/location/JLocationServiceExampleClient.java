@@ -4,6 +4,9 @@ import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
+import akka.actor.typed.Behavior;
+import akka.actor.typed.javadsl.Adapter;
+import akka.actor.typed.javadsl.Behaviors;
 import akka.japi.Pair;
 import akka.japi.pf.ReceiveBuilder;
 import akka.stream.ActorMaterializer;
@@ -11,27 +14,24 @@ import akka.stream.KillSwitch;
 import akka.stream.Materializer;
 import akka.stream.javadsl.Keep;
 import akka.stream.javadsl.Sink;
-import akka.actor.typed.Behavior;
-import akka.actor.typed.javadsl.Behaviors;
-import akka.actor.typed.javadsl.Adapter;
-import csw.messages.ComponentMessage;
-import csw.messages.ContainerExternalMessage;
+import csw.messages.commons.CoordinatedShutdownReasons;
 import csw.messages.location.*;
 import csw.messages.location.Connection.AkkaConnection;
 import csw.messages.location.Connection.HttpConnection;
-import csw.messages.models.CoordinatedShutdownReasons;
+import csw.messages.scaladsl.ComponentMessage;
+import csw.messages.scaladsl.ContainerMessage;
 import csw.services.location.commons.ActorSystemFactory;
 import csw.services.location.javadsl.*;
 import csw.services.location.models.AkkaRegistration;
 import csw.services.location.models.HttpRegistration;
 import csw.services.location.scaladsl.RegistrationFactory;
+import csw.services.logging.commons.LogAdminActorFactory;
 import csw.services.logging.internal.LogControlMessages;
 import csw.services.logging.internal.LoggingSystem;
 import csw.services.logging.javadsl.ILogger;
 import csw.services.logging.javadsl.JKeys;
 import csw.services.logging.javadsl.JLoggerFactory;
 import csw.services.logging.javadsl.JLoggingSystemFactory;
-import csw.services.logging.scaladsl.LogAdminActorFactory;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 
@@ -163,7 +163,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
             akka.actor.typed.ActorRef<ComponentMessage> typedComponentRef = akkaLocation.componentRef();
 
             // If the component type is Container, use this to get the correct ActorRef
-            akka.actor.typed.ActorRef<ContainerExternalMessage> typedContainerRef = akkaLocation.containerRef();
+            akka.actor.typed.ActorRef<ContainerMessage> typedContainerRef = akkaLocation.containerRef();
             //#typed-ref
         });
         //#resolve

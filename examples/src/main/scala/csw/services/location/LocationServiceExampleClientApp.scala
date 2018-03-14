@@ -2,18 +2,19 @@ package csw.services.location
 
 import java.net.InetAddress
 
+import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.{ActorRef, Behavior}
 import akka.actor.{ActorSystem, Props}
 import akka.stream.scaladsl.{Keep, Sink}
 import akka.stream.{ActorMaterializer, Materializer}
-import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.{ActorRef, Behavior}
+import csw.messages.commons.CoordinatedShutdownReasons.ActorTerminatedReason
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
 import csw.messages.location._
-import csw.messages.models.CoordinatedShutdownReasons.ActorTerminatedReason
-import csw.messages.{ComponentMessage, ContainerExternalMessage}
+import csw.messages.scaladsl.{ComponentMessage, ContainerMessage}
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.models._
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory, RegistrationFactory}
+import csw.services.logging.commons.LogAdminActorFactory
 import csw.services.logging.internal.{LogControlMessages, LoggingSystem}
 import csw.services.logging.scaladsl._
 
@@ -157,7 +158,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
     val typedComponentRef: ActorRef[ComponentMessage] = akkaLocation.componentRef
 
     // If the component type is Container, use this to get the correct ActorRef
-    val typedContainerRef: ActorRef[ContainerExternalMessage] = akkaLocation.containerRef
+    val typedContainerRef: ActorRef[ContainerMessage] = akkaLocation.containerRef
     //#typed-ref
   })
   //#resolve

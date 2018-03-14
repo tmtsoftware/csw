@@ -9,9 +9,9 @@ import csw.services.config.server.ActorRuntime
 /**
  * Routes supported by config server
  *
- * @param configService  Instance of config service to which the routes will delegate operations
- * @param actorRuntime   ActorRuntime provides runtime accessories related to ActorSystem like Materializer, ExecutionContext etc.
- * @param configHandlers Exception handler which maps server side exceptions to Http Status codes
+ * @param configService instance of config service to which the routes will delegate operations
+ * @param actorRuntime actorRuntime provides runtime accessories related to ActorSystem like Materializer, ExecutionContext etc.
+ * @param configHandlers exception handler which maps server side exceptions to Http Status codes
  */
 class ConfigServiceRoute(configService: ConfigService, actorRuntime: ActorRuntime, configHandlers: ConfigHandlers)
     extends HttpSupport {

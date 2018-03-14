@@ -9,7 +9,7 @@ import akka.cluster.http.management.ClusterHttpManagement
 import akka.cluster.{Cluster, MemberStatus}
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
-import csw.messages.models.CoordinatedShutdownReasons.FailureReason
+import csw.messages.commons.CoordinatedShutdownReasons.FailureReason
 import csw.services.location.commons.ClusterConfirmationActor.HasJoinedCluster
 import csw.services.logging.scaladsl.Logger
 
@@ -21,7 +21,7 @@ import scala.util.control.NonFatal
  * CswCluster provides cluster properties to manage distributed data. It is created when location service instance is created
  * in `csw-framework` and joins the cluster.
  *
- * @note It is highly recommended that explicit creation of CswCluster should be for advanced usages or testing purposes only
+ * @note it is highly recommended that explicit creation of CswCluster should be for advanced usages or testing purposes only
  */
 class CswCluster private (_actorSystem: ActorSystem) {
 
@@ -121,7 +121,7 @@ class CswCluster private (_actorSystem: ActorSystem) {
 /**
  * Manages initialization and termination of ActorSystem and the Cluster.
  *
- * @note The creation of CswCluster will be blocked till the ActorSystem joins csw-cluster successfully
+ * @note the creation of CswCluster will be blocked till the ActorSystem joins csw-cluster successfully
  */
 object CswCluster {
 

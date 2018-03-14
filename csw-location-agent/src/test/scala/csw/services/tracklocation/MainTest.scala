@@ -7,7 +7,7 @@ import akka.actor.typed.ActorRef
 import com.typesafe.config.ConfigFactory
 import csw.messages.location.Connection.TcpConnection
 import csw.messages.location.{ComponentId, ComponentType}
-import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
+import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.location.internal.Networks
 import csw.services.location.scaladsl.LocationServiceFactory

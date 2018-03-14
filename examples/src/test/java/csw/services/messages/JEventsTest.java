@@ -1,9 +1,9 @@
 package csw.services.messages;
 
-import csw.messages.ccs.events.EventName;
-import csw.messages.ccs.events.EventTime;
-import csw.messages.ccs.events.ObserveEvent;
-import csw.messages.ccs.events.SystemEvent;
+import csw.messages.events.EventName;
+import csw.messages.events.EventTime;
+import csw.messages.events.ObserveEvent;
+import csw.messages.events.SystemEvent;
 import csw.messages.javadsl.JUnits;
 import csw.messages.params.formats.JavaJsonSupport;
 import csw.messages.params.generics.JKeyTypes;
@@ -180,11 +180,11 @@ public class JEventsTest {
         String str = Json.prettyPrint(systemJson);
 
         //construct DemandState from string
-        SystemEvent statusFromPrettyStr = JavaJsonSupport.readEvent(SystemEvent.class, Json.parse(str));
+        SystemEvent statusFromPrettyStr = JavaJsonSupport.readEvent(Json.parse(str));
 
         //json support - read
-        ObserveEvent observeEvent1 = JavaJsonSupport.readEvent(ObserveEvent.class, observeJson);
-        SystemEvent systemEvent1 = JavaJsonSupport.readEvent(SystemEvent.class, systemJson);
+        ObserveEvent observeEvent1 = JavaJsonSupport.readEvent(observeJson);
+        SystemEvent systemEvent1 = JavaJsonSupport.readEvent(systemJson);
         //#json-serialization
 
         //validations

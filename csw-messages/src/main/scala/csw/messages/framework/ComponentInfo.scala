@@ -9,16 +9,16 @@ import scala.collection.JavaConverters._
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 
 /**
- * The information needed to create a component
- * @param name                          The name of the component
- * @param componentType                 The type of the component as defined by [[csw.messages.location.ComponentType]]
- * @param prefix                        Identifies the subsystem
- * @param behaviorFactoryClassName      Specifies the component to be created by name of the class of it's factory
- * @param locationServiceUsage          Specifies component's usage of location service
- * @param connections                   Set of connections that will be used by this component for interaction
- * @param initializeTimeout             The timeout value used while initializing a component
+ * The information needed to create a component. This class is created after de-serializing the config file for the component.
+ *
+ * @param name the name of the component
+ * @param componentType the type of the component as defined by [[csw.messages.location.ComponentType]]
+ * @param prefix identifies the subsystem
+ * @param behaviorFactoryClassName specifies the component to be created by name of the class of it's factory
+ * @param locationServiceUsage specifies component's usage of location service
+ * @param connections set of connections that will be used by this component for interaction
+ * @param initializeTimeout the timeout value used while initializing a component
  */
-//TODO: add where it is used and how
 final case class ComponentInfo(
     name: String,
     componentType: ComponentType,
@@ -37,12 +37,13 @@ final case class ComponentInfo(
 
 case object ComponentInfo {
 
-  //TODO: why do we need below vals and how it is used
-  implicit val finiteDurationReads: Reads[FiniteDuration]   = Reads[FiniteDuration](parseDuration)
-  implicit val finiteDurationWrites: Writes[FiniteDuration] = Writes[FiniteDuration](d ⇒ Json.toJson(d.toString))
-  implicit val componentInfoFormat: OFormat[ComponentInfo]  = Jsonx.formatCaseClassUseDefaults[ComponentInfo]
+  // specifies how to serialize and de-serialize any FiniteDuration which is initializeTimeout in this case
+  private[csw] implicit val finiteDurationReads: Reads[FiniteDuration] = Reads[FiniteDuration](parseDuration)
+  private[csw] implicit val finiteDurationWrites: Writes[FiniteDuration] =
+    Writes[FiniteDuration](d ⇒ Json.toJson(d.toString))
 
-  //TODO: what is this method and how it is used
+  private[csw] implicit val componentInfoFormat: OFormat[ComponentInfo] = Jsonx.formatCaseClassUseDefaults[ComponentInfo]
+
   private def parseDuration(json: JsValue): JsResult[FiniteDuration] = json.validate[String].flatMap { str =>
     str.split(" ") match {
       case Array(length: String, unit: String) => JsSuccess(FiniteDuration.apply(length.toLong, unit))

@@ -7,11 +7,10 @@ import scala.collection.JavaConverters.seqAsJavaListConverter
  *
  * @param states one or more CurrentStates
  */
-//TODO: explain better significance
 final case class CurrentStates(states: Seq[CurrentState]) {
 
   /**
-   * Java API: Returns the list of CurrentState objects
+   * A Java helper that returns the list of CurrentState objects
    */
   def jStates: java.util.List[CurrentState] = states.asJava
 }

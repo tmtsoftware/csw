@@ -10,16 +10,15 @@ import akka.{actor, Done}
 import csw.framework.ComponentInfos._
 import csw.framework.FrameworkTestMocks
 import csw.framework.internal.supervisor.SupervisorInfoFactory
-import csw.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
-import csw.messages.ContainerIdleMessage.SupervisorsCreated
-import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
-import csw.messages.RunningMessage.Lifecycle
-import csw.messages.SupervisorContainerCommonMessages.Restart
-import csw.messages._
-import csw.messages.framework.{ComponentInfo, ContainerLifecycleState, SupervisorLifecycleState}
+import csw.messages.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
+import csw.messages.framework.{ComponentInfo, ContainerLifecycleState, SupervisorLifecycleState, _}
 import csw.messages.location.Connection.AkkaConnection
-import csw.messages.models.ToComponentLifecycleMessages.{GoOffline, GoOnline}
-import csw.messages.models.{Component, Components, SupervisorInfo}
+import csw.messages.scaladsl.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
+import csw.messages.scaladsl.ContainerIdleMessage.SupervisorsCreated
+import csw.messages.scaladsl.FromSupervisorMessage.SupervisorLifecycleStateChanged
+import csw.messages.scaladsl.RunningMessage.Lifecycle
+import csw.messages.scaladsl.SupervisorContainerCommonMessages.Restart
+import csw.messages.scaladsl.{ComponentMessage, ContainerActorMessage, ContainerIdleMessage}
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
@@ -51,6 +50,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     val supervisorInfoFactory: SupervisorInfoFactory      = mock[SupervisorInfoFactory]
 
     lazy val answer = new Answer[Future[Option[SupervisorInfo]]] {
+
       override def answer(invocation: InvocationOnMock): Future[Option[SupervisorInfo]] = {
         val componentInfo = invocation.getArgument[ComponentInfo](1)
 
@@ -92,7 +92,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
 //    val containerBehavior =
 //      new ContainerBehavior(ctx, containerInfo, supervisorFactory, registrationFactory, locationService, mocks.loggerFactory)
 
-    val containerBehaviorTestkit: BehaviorTestKit[ContainerMessage] = BehaviorTestKit(
+    val containerBehaviorTestkit: BehaviorTestKit[ContainerActorMessage] = BehaviorTestKit(
       Behaviors.mutable(
         ctx ⇒
           new ContainerBehavior(

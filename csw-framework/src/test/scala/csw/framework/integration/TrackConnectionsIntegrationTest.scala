@@ -11,20 +11,20 @@ import com.typesafe.config.ConfigFactory
 import csw.common.FrameworkAssertions._
 import csw.common.components.framework.SampleComponentState._
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
-import csw.messages.SupervisorContainerCommonMessages.Shutdown
-import csw.messages.ccs.commands
-import csw.messages.ccs.commands.CommandName
+import csw.messages.scaladsl.SupervisorContainerCommonMessages.Shutdown
+import csw.messages.commands
+import csw.messages.commands.CommandName
 import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState}
 import csw.messages.location.ComponentId
 import csw.messages.location.ComponentType.{Assembly, HCD}
 import csw.messages.location.Connection.AkkaConnection
-import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
+import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.params.states.CurrentState
-import csw.services.ccs.scaladsl.CommandService
+import csw.services.command.scaladsl.CommandService
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.models.{HttpRegistration, TcpRegistration}
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
-import csw.services.logging.scaladsl.LogAdminActorFactory
+import csw.services.logging.commons.LogAdminActorFactory
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.concurrent.duration.DurationLong

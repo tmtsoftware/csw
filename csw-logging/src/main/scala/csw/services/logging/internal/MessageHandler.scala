@@ -6,6 +6,16 @@ import csw.services.logging.scaladsl.RequestId
 
 /**
  * Acts as a single point of entry for messages from various loggers and redirects them to the log actor
+ *
+ *                      +-------------------------+                                    +------------------+
+ *  --- akka logs ----> |     MessageHandler      |                                    |                  | --- forward to FileAppender ----->
+ *                      |   (Singleton object)    |                                    |     LogActor     |
+ *  --- slf4j logs ---> |                         | --- when LoggingSystem starts ---> |                  | --- forward to StdOutAppender --->
+ *                      |   starts on jvm bootup  |                                    |                  |
+ *  --- tmt logs -----> |                         |                                    |                  | --- forward to custom appender -->
+ *                      | stores all logs in an   |                                    |                  |
+ *                      | in-memory queue `msgs`  |                                    |                  |
+ *                      +-------------------------+                                    +------------------+
  */
 private[logging] object MessageHandler {
 

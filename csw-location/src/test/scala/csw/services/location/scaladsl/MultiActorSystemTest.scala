@@ -2,7 +2,7 @@ package csw.services.location.scaladsl
 
 import csw.messages.location.Connection.TcpConnection
 import csw.messages.location.{ComponentId, ComponentType}
-import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
+import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.location.commons.{ClusterSettings, CswCluster, RegistrationFactory}
 import csw.services.location.internal.Networks

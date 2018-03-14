@@ -2,7 +2,7 @@ package csw.services.event.internal.redis
 
 import akka.actor.ActorSystem
 import com.github.sebruck.EmbeddedRedis
-import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
+import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.event.RedisFactory
 import csw.services.event.helpers.RegistrationFactory
 import csw.services.event.helpers.TestFutureExt.RichFuture
@@ -23,7 +23,6 @@ class RedisPubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with
   locationService.register(tcpRegistration).await
 
   private val redis = RedisServer.builder().setting(s"bind ${clusterSettings.hostname}").port(redisPort).build()
-  redis.start()
 
   private implicit val actorSystem: ActorSystem = clusterSettings.system
   private val redisClient                       = RedisClient.create()
@@ -32,6 +31,10 @@ class RedisPubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with
   private val publisher                         = redisFactory.publisher().await
   private val subscriber                        = redisFactory.subscriber().await
   private val framework                         = new EventServicePubSubTestFramework(publisher, subscriber)
+
+  override def beforeAll(): Unit = {
+    redis.start()
+  }
 
   override def afterAll(): Unit = {
     redisClient.shutdown()

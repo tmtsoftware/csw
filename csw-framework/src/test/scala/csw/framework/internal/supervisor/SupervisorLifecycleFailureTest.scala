@@ -10,22 +10,25 @@ import csw.common.FrameworkAssertions._
 import csw.common.components.framework.SampleComponentState._
 import csw.common.utils.TestAppender
 import csw.commons.tags.LoggingSystemSensitive
-import csw.exceptions.{FailureRestart, FailureStop}
 import csw.framework.ComponentInfos._
+import csw.framework.exceptions.{FailureRestart, FailureStop}
 import csw.framework.internal.component.ComponentBehavior
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers, CurrentStatePublisher}
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
-import csw.messages.CommandMessage.Submit
-import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
-import csw.messages.SupervisorContainerCommonMessages.Restart
-import csw.messages.ccs.commands.{CommandName, CommandResponse, ControlCommand, Setup}
-import csw.messages.framework.{ComponentInfo, SupervisorLifecycleState}
-import csw.messages.models.{LifecycleStateChanged, PubSub}
+import csw.messages.commands.{CommandName, CommandResponse, ControlCommand, Setup}
+import csw.messages.framework.{ComponentInfo, LifecycleStateChanged, PubSub, SupervisorLifecycleState}
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.CurrentState
-import csw.messages.{models, _}
-import csw.services.ccs.scaladsl.CommandResponseManager
+import csw.messages.scaladsl.CommandMessage.Submit
+import csw.messages.scaladsl.ComponentCommonMessage.{
+  ComponentStateSubscription,
+  GetSupervisorLifecycleState,
+  LifecycleStateSubscription
+}
+import csw.messages.scaladsl.SupervisorContainerCommonMessages.Restart
+import csw.messages.scaladsl.{ComponentMessage, ContainerIdleMessage, TopLevelActorMessage}
+import csw.services.command.scaladsl.CommandResponseManager
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.internal.LoggingLevels.ERROR
 import csw.services.logging.internal.LoggingSystem
@@ -138,7 +141,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
 
     // TLA sends `Running` message to supervisor which changes the lifecycle state of supervisor to `Running`
     lifecycleStateProbe.expectMessage(
-      models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)
+      LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)
     )
 
     Thread.sleep(100)
@@ -186,7 +189,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
 
     // TLA sends `Running` message to supervisor which changes the lifecycle state of supervisor to `Running`
     lifecycleStateProbe.expectMessage(
-      models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)
+      LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)
     )
 
     // Supervisor sends component a submit command which will fail with FailureRestart exception on calling onSubmit Handler

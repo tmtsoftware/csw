@@ -17,7 +17,7 @@ import scala.concurrent.Future
  * The file checked in to the Svn repository is then named ''file''.`sha1` and contains only
  * the SHA-1 hash value.
  *
- * @param settings Retrieve the directory path to store annex files from settings
+ * @param settings retrieve the directory path to store annex files from settings
  * @param fileRepo FileRepo performs file operations with a blocking dispatcher
  * @param actorRuntime ActorRuntime provides runtime accessories related to ActorSystem like Materializer, ExecutionContext etc.
  */

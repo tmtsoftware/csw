@@ -10,14 +10,19 @@ import csw.services.logging.{noException, RichMsg}
 object RichException {
 
   /**
-   * Apply method for RichException.
-   * @param richMsg the rich exception message.
-   * @param cause the optional underlying causing exception.
+   * Apply method for RichException
+   *
+   * @param richMsg the rich exception message
+   * @param cause the optional underlying causing exception
    * @return the RichException
    */
-  def apply(richMsg: RichMsg, cause: Throwable = noException) = new RichException(richMsg, cause)
+  def apply(richMsg: RichMsg, cause: Throwable = noException): RichException = new RichException(richMsg, cause)
 
-  /** The unapply for matching the RichException trait.
+  /**
+   * The unapply for matching the RichException trait
+   *
+   * @param f the RichException
+   * @return option of any after unapplying the RichException
    */
   def unapply(f: RichException): Option[(Any)] = Some(f.richMsg)
 
@@ -31,7 +36,7 @@ object RichException {
 /**
  * The common parent of all rich exceptions.
  *
- * @param richMsg the rich exception message.
- * @param cause the optional underlying causing exception.
+ * @param richMsg the rich exception message
+ * @param cause the optional underlying causing exception
  */
 class RichException(val richMsg: RichMsg, val cause: Throwable = noException) extends Exception(RichException.stringify(richMsg))

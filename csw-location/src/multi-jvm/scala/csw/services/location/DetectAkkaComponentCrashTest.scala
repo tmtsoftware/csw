@@ -9,7 +9,7 @@ import csw.messages.location._
 import csw.services.location.commons.{ActorSystemFactory, RegistrationFactory}
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.services.location.models.HttpRegistration
-import csw.services.logging.scaladsl.LogAdminActorFactory
+import csw.services.logging.commons.LogAdminActorFactory
 
 import scala.concurrent.Await
 import scala.concurrent.duration._

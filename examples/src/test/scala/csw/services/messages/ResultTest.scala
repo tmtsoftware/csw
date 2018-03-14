@@ -1,6 +1,6 @@
 package csw.services.messages
 
-import csw.messages.ccs.commands.Result
+import csw.messages.commands.Result
 import csw.messages.params.formats.JsonSupport
 import csw.messages.params.generics.KeyType.DoubleMatrixKey
 import csw.messages.params.generics.{Key, KeyType, Parameter}

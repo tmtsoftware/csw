@@ -1,37 +1,53 @@
-package csw.util
+package csw
 
 /**
- * == Utility Classes ==
+ * == Messages ==
  *
- * This project is intended to hold reusable utility classes used throughout the csw source code.
+ * This project is intended to hold reusable models and messages used throughout the csw source code.
  *
- * === Commands and Events ===
+ * This also provides out of the box support to cater to the diverse communication requirements.
+ * Consumer of this library will be able to create Commands, Events, States to store ParameterSets.
  *
- * This project contains classes and traits used for *commands* and *events*.
+ * == Imp Packages ==
+ *
+ * === commands and events ===
+ *
+ * This packages contains classes, traits and models used to create *commands* and *events*.
  * These are all based on type-safe keys and items (a set of values with optional units).
  * Each key has a specific type and the key's values must be of that type.
  *
- * There are a variety of similar classes, used for different purposes:
+ * Two types of [[csw.messages.commands.Command]] are supported:
+ *   - [[csw.messages.commands.SequenceCommand]]
+ *     - This commands are targeted to Sequencer. Subtypes of this are: Setup, Observe and Wait.
  *
- * Commands:
+ *   - [[csw.messages.commands.ControlCommand]]
+ *     - This commands are targeted to Assemblies and HCD's. Subtypes of this are: Setup and Observe.
  *
- * - Setup
- * - Observe
+ * Following are the concrete commands supported by csw:
+ *  - [[csw.messages.commands.Setup]]
+ *  - [[csw.messages.commands.Observe]]
+ *  - [[csw.messages.commands.Wait]]
  *
- * Events:
+ * Two types of [[csw.messages.events.Event]] are supported:
+ *  - [[csw.messages.events.SystemEvent]]
+ *  - [[csw.messages.events.ObserveEvent]]
  *
- * - StatusEvent
- * - ObserveEvent
- * - SystemEvent
+ * Another important feature provided by *commands* package is [[csw.messages.commands.matchers.Matcher]]
+ * One of the use case for using matcher is when Assembly sends [[csw.messages.scaladsl.CommandMessage.Oneway]] command to HCD
+ * and in response to this command HCD keeps publishing its current state.
+ * Then Assembly can use Matcher with the matching definition as provided by [[csw.messages.commands.matchers.StateMatcher]] to
+ * match against the current states published by HCD.
  *
- * State Variables:
+ * === location and framework ===
  *
- * - CurrentState
- * - DemandState
+ * This packages contains reusable classes, traits and models.
  *
- * The key/value store and event service make use of these classes, which need to be
- * serialized and deserialized for external storage (in Redis or Hornetq, for example).
- * The [[csw.messages.ParamSetSerializer]] class provides support for this.
+ * === params ===
+ *
+ * This package supports serialization and deserialization of commands, events and state variables in following formats:
+ *  - JSON : [[csw.messages.params.formats.JsonSupport]]
+ *  - Kryo : [[csw.messages.params.generics.ParamSetSerializer]]
+ *  - Protobuf : package pb contains utility and directory protobuf contains proto schema files.
  *
  * === Scala and Java APIs ===
  *
@@ -42,128 +58,50 @@ package csw.util
  * === Key Types ===
  *
  * A set of standard key types and matching items are defined. Each key accepts one or more values
- * of the given type. The values are stored internally in a Vector:
+ * of the given type.
  *
- * - Integer
+ * Following [[csw.messages.params.generics.KeyType]] are supported by csw:
  *
- * - ShortKey
+ *         +--------------+-------------------------+---------------------------+
+ *         |  Primitive   |      Scala KeyType      |       Java KeyType        |
+ *         +--------------+-------------------------+---------------------------+
+ *         | Boolean      | KeyType.BooleanKey      | JKeyTypes.BooleanKey      |
+ *         | Character    | KeyType.CharKey         | JKeyTypes.JCharKey        |
+ *         | Byte         | KeyType.ByteKey         | JKeyTypes.ByteKey         |
+ *         | Short        | KeyType.ShortKey        | JKeyTypes.ShortKey        |
+ *         | Long         | KeyType.LongKey         | JKeyTypes.LongKey         |
+ *         | Int          | KeyType.IntKey          | JKeyTypes.IntKey          |
+ *         | Float        | KeyType.FloatKey        | JKeyTypes.FloatKey        |
+ *         | Double       | KeyType.DoubleKey       | JKeyTypes.DoubleKey       |
+ *         | String       | KeyType.StringKey       | JKeyTypes.StringKey       |
+ *         | Timestamp    | KeyType.TimestampKey    | JKeyTypes.TimestampKey    |
+ *         | ----------   | ----------              | ----------                |
+ *         | ByteArray    | KeyType.ByteArrayKey    | JKeyTypes.ByteArrayKey    |
+ *         | ShortArray   | KeyType.ShortArrayKey   | JKeyTypes.ShortArrayKey   |
+ *         | LongArray    | KeyType.LongArrayKey    | JKeyTypes.LongArrayKey    |
+ *         | IntArray     | KeyType.IntArrayKey     | JKeyTypes.IntArrayKey     |
+ *         | FloatArray   | KeyType.FloatArrayKey   | JKeyTypes.FloatArrayKey   |
+ *         | DoubleArray  | KeyType.DoubleArrayKey  | JKeyTypes.DoubleArrayKey  |
+ *         | ----------   | ----------              | ----------                |
+ *         | ByteMatrix   | KeyType.ByteMatrixKey   | JKeyTypes.ByteMatrixKey   |
+ *         | ShortMatrix  | KeyType.ShortMatrixKey  | JKeyTypes.ShortMatrixKey  |
+ *         | LongMatrix   | KeyType.LongMatrixKey   | JKeyTypes.LongMatrixKey   |
+ *         | IntMatrix    | KeyType.IntMatrixKey    | JKeyTypes.IntMatrixKey    |
+ *         | FloatMatrix  | KeyType.FloatMatrixKey  | JKeyTypes.FloatMatrixKey  |
+ *         | DoubleMatrix | KeyType.DoubleMatrixKey | JKeyTypes.DoubleMatrixKey |
+ *         | ----------   | ----------              | ----------                |
+ *         | Choice       | KeyType.ChoiceKey       | JKeyTypes.ChoiceKey       |
+ *         | RaDec        | KeyType.RaDecKey        | JKeyTypes.RaDecKey        |
+ *         | Struct       | KeyType.StructKey       | JKeyTypes.StructKey       |
+ *         +--------------+-------------------------+---------------------------+
  *
- * - LongKey
+ * Detailed information about creating Keys and Parameters can be found here:
+ *  https://tmtsoftware.github.io/csw-prod/services/messages/keys-parameters.html
  *
- * - FloatKey
+ * Detailed information about creating commands can be found here:
+ *  https://tmtsoftware.github.io/csw-prod/services/messages/commands.html
  *
- * - DoubleKey
- *
- * - StringKey
- *
- * - CharKey
- *
- * - Boolean
- *
- * The following keys support one or more values that are each one or two dimensional arrays (stored internally as Arrays):
- *
- * - IntArrayKey, IntMatrixKey
- *
- * - ShortArrayKey, ShortMatrixKey
- *
- * - LongArrayKey, LongMatrixKey
- *
- * - FloatArrayKey, FloatMatrixKey
- *
- * - DoubleArrayKey, DoubleMatrixKey
- *
- * In addition there is a GKey class that can be used for custom types. It is however recommended to
- * use only the standard key types, in oder to ensure that binary and JSON serialization and deserialization
- * works everywhere.
- *
- * Example:
- *
- * {{{
- *   val commandInfo = CommandInfo(ObsId("001"))
- *
- *   // Define a key for an event id
- *   val eventNum = Integer("eventNum")
- *
- *   val exposureTime = DoubleKey("exposureTime")
- *
- *   // Define a key for image data
- *   val imageData = IntArrayKey("imageData")
- *
- *   // Dummy image data
- *   val testImageData = IntArray(Array.ofDim[Int](10000))
- *
- *   val prefix = "tcs.mobie.red.dat.exposureInfo"
- *
- *   // ...
- *
- *     val config = Setup(commandInfo, prefix)
- *       .add(eventNum.set(num))
- *       .add(exposureTime.set(1.0))
- *       .add(imageData.set(testImageData))
- *
- *   // Or you can use the Scala DSL to do the same thing:
- *
- *     import csw.util.config.ConfigDSL._
- *
- *     sc(commandInfo, prefix,
- *        eventNum -> num,
- *        exposureTime -> 1.0,
- *        imageData -> testImageData)
- *
- * }}}
- *
- * Java Example:
- *
- * {{{
- *     import static javacsw.util.config.JItems.*;
- *     import static javacsw.util.config.JConfigDSL.*;
- *
- *     static final Parameters.CommandInfo info = new CommandInfo("Obs001");
- *     static final DoubleKey exposureTime = new DoubleKey("exposureTime");
- *
- *     // Define a key for an event id
- *     static final Integer eventNum = new Integer("eventNum");
- *
- *     // Define a key for image data
- *     static final IntArrayKey imageData = new IntArrayKey("imageData");
- *
- *     // Dummy image data
- *     static final JIntArray testImageData = JIntArray.fromArray(new int[10000]);
- *
- *     // Prefix to use for the event
- *     static final String prefix = "tcs.mobie.red.dat.exposureInfo";
- *
- *     // ...
- *
- *       Setup config = new Setup(commandInfo, prefix)
- *         .add(jset(eventNum, num))
- *         .add(jset(exposureTime, 1.0))
- *         .add(jset(imageData, testImageData));
- *
- *       // Alternative syntax
- *       Setup config = jadd(sc(commandInfo, prefix,
- *         jset(eventNum, num),
- *         jset(exposureTime, 1.0),
- *         jset(imageData, testImageData));
- * }}}
- *
- * Scala Example using a matrix as the key value:
- * {{{
- *     val k1 = DoubleMatrixKey("myMatrix")
- *     val dm1 = DoubleMatrix(Array(Array[Double](1, 2, 3), Array[Double](2, 3, 6), Array[Double](4, 6, 12)))
- *     val sc1 = sc(commandInfo, "test", k1 -> dm1 withUnits UnitsOfMeasure.Deg)
- *     assert(sc1.get(k1).get.head(0, 0) == 1)
- * }}}
- *
- * Java Example:
- *
- * {{{
- *    final DoubleMatrixKey k1 = DoubleMatrixKey("matrixTest");
- *    double[][] m1 = {{1., 2., 3.}, {4., 5., 6.}, {7., 8., 9.}};
- *    DoubleMatrix dm1 = DoubleMatrix(m1);
- *    Setup sc1 = jadd(sc(commandInfo, "test"), jset(k1, dm1));
- *    assertTrue(jvalue(jitem(sc1, k1)).apply(0, 0) == 1);
- * }}}
- *
+ * Detailed information about creating events can be found here:
+ *  https://tmtsoftware.github.io/csw-prod/services/messages/events.html
  */
 package object messages {}
