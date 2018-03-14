@@ -73,7 +73,7 @@ class AssemblyComponentHandlers(
         resolveHcd().map {
           case Some(hcd) ⇒
             runningHcds = runningHcds.updated(maybeConnection.get, Some(new CommandService(hcd)(ctx.system)))
-            diagnosticsPublisher = ctx.spawnAnonymous(DiagnosticsPublisher.make(runningHcds(maybeConnection.get), Some(worker)))
+            diagnosticsPublisher = ctx.spawnAnonymous(DiagnosticsPublisher.make(runningHcds(maybeConnection.get).get, worker))
             commandHandler = ctx.spawnAnonymous(CommandHandler.make(calculationConfig, runningHcds(maybeConnection.get)))
           case None ⇒ // do something
         }

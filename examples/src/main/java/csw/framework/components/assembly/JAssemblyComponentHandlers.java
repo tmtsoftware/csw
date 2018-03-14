@@ -92,7 +92,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
                         throw new HcdNotFoundException();
                     else
                         runningHcds.put(connection, Optional.of(new JCommandService(hcdLocation.get(), ctx.getSystem())));
-                    diagnosticPublisher = ctx.spawnAnonymous(JDiagnosticsPublisherFactory.make(Optional.of(new JCommandService(hcdLocation.get(), ctx.getSystem())), Optional.of(workerActor)));
+                    diagnosticPublisher = ctx.spawnAnonymous(JDiagnosticsPublisherFactory.make(new JCommandService(hcdLocation.get(), ctx.getSystem()), workerActor));
                 })).get();
 
     }

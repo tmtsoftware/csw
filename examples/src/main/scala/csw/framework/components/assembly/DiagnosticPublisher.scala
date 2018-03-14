@@ -8,17 +8,15 @@ import csw.services.command.scaladsl.CommandService
 trait DiagnosticPublisherMessages
 
 object DiagnosticsPublisher {
-  def make(
-      runningIn: Option[CommandService],
-      worker: Option[ActorRef[WorkerActorMsg]]
-  ): Behavior[DiagnosticPublisherMessages] =
+
+  def make(runningIn: CommandService, worker: ActorRef[WorkerActorMsg]): Behavior[DiagnosticPublisherMessages] =
     Behaviors.mutable(ctx ⇒ new DiagnosticsPublisher(ctx, runningIn, worker))
 }
 
 class DiagnosticsPublisher(
     ctx: ActorContext[DiagnosticPublisherMessages],
-    runningIn: Option[CommandService],
-    worker: Option[ActorRef[WorkerActorMsg]]
+    runningIn: CommandService,
+    worker: ActorRef[WorkerActorMsg]
 ) extends MutableBehavior[DiagnosticPublisherMessages] {
   override def onMessage(msg: DiagnosticPublisherMessages): Behavior[DiagnosticPublisherMessages] = ???
 }
