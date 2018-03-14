@@ -53,6 +53,7 @@ object Dependencies {
     Akka.`akka-distributed-data`,
     Akka.`akka-remote`,
     Akka.`akka-cluster-tools`,
+    Akka.`akka-cluster-typed`,
     Libs.`scala-java8-compat`,
     Libs.`scala-async`,
     Enumeratum.`enumeratum`,
