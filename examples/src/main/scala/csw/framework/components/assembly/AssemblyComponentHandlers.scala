@@ -11,8 +11,8 @@ import csw.messages.commands.CommandResponse.Accepted
 import csw.messages.commands._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location._
-import csw.messages.scaladsl.{ComponentMessage, TopLevelActorMessage}
-import csw.services.command.scaladsl.CommandResponseManager
+import csw.messages.scaladsl.TopLevelActorMessage
+import csw.services.command.scaladsl.{CommandResponseManager, CommandService}
 import csw.services.config.api.models.ConfigData
 import csw.services.config.api.scaladsl.ConfigClientService
 import csw.services.config.client.scaladsl.ConfigClientFactory
@@ -44,11 +44,11 @@ class AssemblyComponentHandlers(
 
   implicit val ec: ExecutionContextExecutor = ctx.executionContext
 
-  private val log: Logger                                                      = new LoggerFactory(componentInfo.name).getLogger(ctx)
-  private val configClient: ConfigClientService                                = ConfigClientFactory.clientApi(ctx.system.toUntyped, locationService)
-  private var runningHcds: Map[Connection, Option[ActorRef[ComponentMessage]]] = Map.empty
-  private var diagnosticsPublisher: ActorRef[DiagnosticPublisherMessages]      = _
-  private var commandHandler: ActorRef[CommandHandlerMsgs]                     = _
+  private val log: Logger                                                 = new LoggerFactory(componentInfo.name).getLogger(ctx)
+  private val configClient: ConfigClientService                           = ConfigClientFactory.clientApi(ctx.system.toUntyped, locationService)
+  private var runningHcds: Map[Connection, Option[CommandService]]        = Map.empty
+  private var diagnosticsPublisher: ActorRef[DiagnosticPublisherMessages] = _
+  private var commandHandler: ActorRef[CommandHandlerMsgs]                = _
 
   //#initialize-handler
   override def initialize(): Future[Unit] = async {
@@ -72,7 +72,7 @@ class AssemblyComponentHandlers(
       case Some(_) ⇒
         resolveHcd().map {
           case Some(hcd) ⇒
-            runningHcds = runningHcds.updated(maybeConnection.get, Some(hcd.componentRef))
+            runningHcds = runningHcds.updated(maybeConnection.get, Some(new CommandService(hcd)(ctx.system)))
             diagnosticsPublisher = ctx.spawnAnonymous(DiagnosticsPublisher.make(runningHcds(maybeConnection.get), Some(worker)))
             commandHandler = ctx.spawnAnonymous(CommandHandler.make(calculationConfig, runningHcds(maybeConnection.get)))
           case None ⇒ // do something

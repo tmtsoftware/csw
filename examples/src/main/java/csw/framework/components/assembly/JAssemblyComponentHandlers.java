@@ -11,8 +11,8 @@ import csw.framework.scaladsl.CurrentStatePublisher;
 import csw.messages.commands.*;
 import csw.messages.framework.ComponentInfo;
 import csw.messages.location.*;
-import csw.messages.scaladsl.ComponentMessage;
 import csw.messages.scaladsl.TopLevelActorMessage;
+import csw.services.command.javadsl.JCommandService;
 import csw.services.command.scaladsl.CommandResponseManager;
 import csw.services.config.api.javadsl.IConfigClientService;
 import csw.services.config.api.models.ConfigData;
@@ -41,7 +41,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     private final ILocationService locationService;
     private ILogger log;
     private IConfigClientService configClient;
-    private Map<Connection, Optional<ActorRef<ComponentMessage>>> runningHcds;
+    private Map<Connection, Optional<JCommandService>> runningHcds;
     private ActorRef<DiagnosticPublisherMessages> diagnosticPublisher;
     private ActorRef<CommandResponse> commandResponseAdapter;
 
@@ -91,8 +91,8 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
                     if(!hcdLocation.isPresent())
                         throw new HcdNotFoundException();
                     else
-                        runningHcds.put(connection, Optional.of(hcdLocation.get().componentRef()));
-                    diagnosticPublisher = ctx.spawnAnonymous(DiagnosticsPublisher.jMake(Optional.of(hcdLocation.get().componentRef()), Optional.of(workerActor)));
+                        runningHcds.put(connection, Optional.of(new JCommandService(hcdLocation.get(), ctx.getSystem())));
+                    diagnosticPublisher = ctx.spawnAnonymous(JDiagnosticsPublisherFactory.make(Optional.of(new JCommandService(hcdLocation.get(), ctx.getSystem())), Optional.of(workerActor)));
                 })).get();
 
     }
