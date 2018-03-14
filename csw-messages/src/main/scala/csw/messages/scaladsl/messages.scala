@@ -101,7 +101,7 @@ object RunningMessage {
    * @param message represents the command a component should honour and transit itself to a new lifecycle state
    *                e.g. GoOffline or GoOnline
    */
-  case class Lifecycle(message: ToComponentLifecycleMessage) extends RunningMessage with ContainerExternalMessage
+  case class Lifecycle(message: ToComponentLifecycleMessage) extends RunningMessage with ContainerMessage
 }
 
 /**
@@ -202,17 +202,17 @@ private[csw] object FromComponentLifecycleMessage {
 }
 
 ///////////////////
-private[csw] sealed trait ContainerMessage
+private[csw] sealed trait ContainerActorMessage
 
 /**
  * Represents messages a container can receive in it's whole lifecycle
  */
-sealed trait ContainerExternalMessage extends ContainerMessage with TMTSerializable
+sealed trait ContainerMessage extends ContainerActorMessage with TMTSerializable
 
 /**
  * Represents messages a container can receive in any state
  */
-sealed trait ContainerCommonMessage extends ContainerExternalMessage
+sealed trait ContainerCommonMessage extends ContainerMessage
 object ContainerCommonMessage {
 
   /**
@@ -230,7 +230,7 @@ object ContainerCommonMessage {
   case class GetContainerLifecycleState(replyTo: ActorRef[ContainerLifecycleState]) extends ContainerCommonMessage
 }
 
-private[csw] sealed trait ContainerIdleMessage extends ContainerMessage
+private[csw] sealed trait ContainerIdleMessage extends ContainerActorMessage
 private[csw] object ContainerIdleMessage {
   case class SupervisorsCreated(supervisors: Set[SupervisorInfo]) extends ContainerIdleMessage
 }

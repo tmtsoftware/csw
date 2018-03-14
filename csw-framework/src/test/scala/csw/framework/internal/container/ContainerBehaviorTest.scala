@@ -18,7 +18,7 @@ import csw.messages.scaladsl.ContainerIdleMessage.SupervisorsCreated
 import csw.messages.scaladsl.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.messages.scaladsl.RunningMessage.Lifecycle
 import csw.messages.scaladsl.SupervisorContainerCommonMessages.Restart
-import csw.messages.scaladsl.{ComponentMessage, ContainerIdleMessage, ContainerMessage}
+import csw.messages.scaladsl.{ComponentMessage, ContainerActorMessage, ContainerIdleMessage}
 import csw.services.command.internal.CommandResponseManagerFactory
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
@@ -42,7 +42,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
   private val mocks                              = new FrameworkTestMocks()
 
   class IdleContainer() {
-    val ctx                                                                  = new StubbedActorContext[ContainerMessage]("test-container", 100, typedSystem)
+    val ctx                                                                  = new StubbedActorContext[ContainerActorMessage]("test-container", 100, typedSystem)
     val supervisorFactory: SupervisorInfoFactory                             = mock[SupervisorInfoFactory]
     private val testActor: ActorRef[Any]                                     = TestProbe("test-probe").testActor
     val akkaRegistration                                                     = AkkaRegistration(mock[AkkaConnection], Some("nfiraos.ncc.trombone"), testActor, testActor)

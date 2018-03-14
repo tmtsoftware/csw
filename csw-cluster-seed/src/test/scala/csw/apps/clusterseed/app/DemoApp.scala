@@ -13,7 +13,7 @@ import csw.messages.framework.{Component, Components, ContainerLifecycleState}
 import csw.messages.params.models.Prefix
 import csw.messages.scaladsl.CommandMessage.Oneway
 import csw.messages.scaladsl.ContainerCommonMessage.GetComponents
-import csw.messages.scaladsl.ContainerExternalMessage
+import csw.messages.scaladsl.ContainerMessage
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.logging.scaladsl.{LoggerFactory, LoggingSystemFactory}
 
@@ -63,7 +63,7 @@ object DemoApp extends App {
     Await.result(adminWiring.adminHttpService.registeredLazyBinding, 5.seconds)
   }
 
-  private def spawnContainer(): ActorRef[ContainerExternalMessage] = {
+  private def spawnContainer(): ActorRef[ContainerMessage] = {
 
     val config       = ConfigFactory.load("laser_container.conf")
     val containerRef = Await.result(Container.spawn(config, frameworkWiring), 5.seconds)
@@ -75,7 +75,7 @@ object DemoApp extends App {
 
   startSeed()
 
-  private val containerRef: ActorRef[ContainerExternalMessage] = spawnContainer()
+  private val containerRef: ActorRef[ContainerMessage] = spawnContainer()
 
   val probe = TestProbe[Components]
   containerRef ! GetComponents(probe.ref)

@@ -24,7 +24,7 @@ import csw.messages.scaladsl.ComponentCommonMessage.{ComponentStateSubscription,
 import csw.messages.scaladsl.ContainerCommonMessage.GetComponents
 import csw.messages.scaladsl.RunningMessage.Lifecycle
 import csw.messages.scaladsl.SupervisorContainerCommonMessages.Shutdown
-import csw.messages.scaladsl.{ComponentMessage, ContainerExternalMessage}
+import csw.messages.scaladsl.{ComponentMessage, ContainerMessage}
 import csw.services.command.scaladsl.CommandService
 import csw.services.config.api.models.ConfigData
 import csw.services.config.client.scaladsl.ConfigClientFactory
@@ -115,7 +115,7 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       // and will be considered as container configuration.
       val args = Array("/laser_container.conf")
       val containerRef =
-        containerCmd.start(args).asInstanceOf[ActorRef[ContainerExternalMessage]]
+        containerCmd.start(args).asInstanceOf[ActorRef[ContainerMessage]]
 
       assertThatContainerIsRunning(containerRef, testProbe, 5.seconds)
 

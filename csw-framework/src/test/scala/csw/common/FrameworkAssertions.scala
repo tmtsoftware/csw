@@ -6,7 +6,7 @@ import com.persist.JsonOps.JsonObject
 import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState}
 import csw.messages.scaladsl.ComponentCommonMessage.GetSupervisorLifecycleState
 import csw.messages.scaladsl.ContainerCommonMessage.GetContainerLifecycleState
-import csw.messages.scaladsl.{ComponentMessage, ContainerExternalMessage}
+import csw.messages.scaladsl.{ComponentMessage, ContainerMessage}
 import csw.services.location.commons.BlockingUtils
 import csw.services.logging.internal.LoggingLevels.Level
 import org.scalatest.Matchers
@@ -17,7 +17,7 @@ import scala.concurrent.duration.Duration
 object FrameworkAssertions extends Matchers {
 
   def assertThatContainerIsRunning(
-      containerRef: ActorRef[ContainerExternalMessage],
+      containerRef: ActorRef[ContainerMessage],
       probe: TestProbe[ContainerLifecycleState],
       duration: Duration
   ): Unit = {

@@ -17,7 +17,7 @@ import csw.messages.scaladsl.ContainerIdleMessage.SupervisorsCreated
 import csw.messages.scaladsl.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.messages.scaladsl.RunningMessage.Lifecycle
 import csw.messages.scaladsl.SupervisorContainerCommonMessages.{Restart, Shutdown}
-import csw.messages.scaladsl.{ComponentMessage, ContainerCommonMessage, ContainerIdleMessage, ContainerMessage}
+import csw.messages.scaladsl.{ComponentMessage, ContainerActorMessage, ContainerCommonMessage, ContainerIdleMessage}
 import csw.services.location.models._
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
@@ -36,13 +36,13 @@ import scala.util.{Failure, Success}
  * @param locationService           The single instance of Location service created for a running application
  */
 class ContainerBehavior private[framework] (
-    ctx: ActorContext[ContainerMessage],
+    ctx: ActorContext[ContainerActorMessage],
     containerInfo: ContainerInfo,
     supervisorInfoFactory: SupervisorInfoFactory,
     registrationFactory: RegistrationFactory,
     locationService: LocationService,
     loggerFactory: LoggerFactory
-) extends Actor.MutableBehavior[ContainerMessage] {
+) extends Actor.MutableBehavior[ContainerActorMessage] {
 
   import ctx.executionContext
   private val log: Logger                        = loggerFactory.getLogger(ctx)
@@ -62,11 +62,12 @@ class ContainerBehavior private[framework] (
   createComponents(containerInfo.components)
 
   /**
-   * Defines processing for a [[csw.messages.scaladsl.ContainerMessage]] received by the actor instance.
+   * Defines processing for a [[csw.messages.scaladsl.ContainerActorMessage]] received by the actor instance.
+   *
    * @param msg      ContainerMessage received
    * @return         The existing behavior
    */
-  override def onMessage(msg: ContainerMessage): Behavior[ContainerMessage] = {
+  override def onMessage(msg: ContainerActorMessage): Behavior[ContainerActorMessage] = {
     log.debug(s"Container in lifecycle state :[$lifecycleState] received message :[$msg]")
     (lifecycleState, msg) match {
       case (_, msg: ContainerCommonMessage)                          ⇒ onCommon(msg)
@@ -83,7 +84,7 @@ class ContainerBehavior private[framework] (
    * @return        The existing behavior
    */
   //TODO: add doc for significance
-  override def onSignal: PartialFunction[Signal, Behavior[ContainerMessage]] = {
+  override def onSignal: PartialFunction[Signal, Behavior[ContainerActorMessage]] = {
     case Terminated(supervisor) ⇒
       log.warn(
         s"Container in lifecycle state :[$lifecycleState] received terminated signal from supervisor :[$supervisor]"

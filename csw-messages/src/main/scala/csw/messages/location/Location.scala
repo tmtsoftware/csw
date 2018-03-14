@@ -4,7 +4,7 @@ import java.net.URI
 
 import akka.typed.ActorRef
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
-import csw.messages.scaladsl.{ComponentMessage, ContainerExternalMessage}
+import csw.messages.scaladsl.{ComponentMessage, ContainerMessage}
 import csw.messages.TMTSerializable
 
 import scala.reflect.ClassTag
@@ -76,9 +76,9 @@ final case class AkkaLocation(
   /**
    * If the component type is Container, use this to get the correct ActorRef
    *
-   * @return a typed ActorRef that understands only ContainerExternalMessage
+   * @return a typed ActorRef that understands only ContainerMessage
    */
-  def containerRef: ActorRef[ContainerExternalMessage] = typedRef[ContainerExternalMessage]
+  def containerRef: ActorRef[ContainerMessage] = typedRef[ContainerMessage]
 }
 
 /**

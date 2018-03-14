@@ -4,7 +4,7 @@ import akka.typed.Behavior
 import akka.typed.scaladsl.Actor
 import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.framework.models.ContainerInfo
-import csw.messages.scaladsl.ContainerMessage
+import csw.messages.scaladsl.ContainerActorMessage
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.LoggerFactory
 
@@ -16,7 +16,7 @@ private[framework] object ContainerBehaviorFactory {
       containerInfo: ContainerInfo,
       locationService: LocationService,
       registrationFactory: RegistrationFactory
-  ): Behavior[ContainerMessage] = {
+  ): Behavior[ContainerActorMessage] = {
     val supervisorFactory = new SupervisorInfoFactory(containerInfo.name)
     val loggerFactory     = new LoggerFactory(containerInfo.name)
     Actor.mutable(

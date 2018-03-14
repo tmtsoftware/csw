@@ -4,7 +4,7 @@ import akka.typed.{ActorRef, Behavior}
 import com.typesafe.config.Config
 import csw.framework.internal.configparser.ConfigParser
 import csw.framework.internal.container.ContainerBehaviorFactory
-import csw.messages.scaladsl.{ContainerExternalMessage, ContainerMessage}
+import csw.messages.scaladsl.{ContainerActorMessage, ContainerMessage}
 
 import scala.concurrent.Future
 
@@ -13,10 +13,10 @@ import scala.concurrent.Future
  */
 //TODO: add doc for significance
 private[csw] object Container {
-  def spawn(config: Config, wiring: FrameworkWiring): Future[ActorRef[ContainerExternalMessage]] = {
+  def spawn(config: Config, wiring: FrameworkWiring): Future[ActorRef[ContainerMessage]] = {
     import wiring._
     val containerInfo = ConfigParser.parseContainer(config)
-    val containerBehavior: Behavior[ContainerMessage] =
+    val containerBehavior: Behavior[ContainerActorMessage] =
       ContainerBehaviorFactory.behavior(containerInfo, locationService, registrationFactory)
     val cswFrameworkSystem = new CswFrameworkSystem(actorSystem)
     cswFrameworkSystem.spawnTyped(containerBehavior, containerInfo.name)
