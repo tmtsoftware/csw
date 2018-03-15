@@ -372,12 +372,13 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
       {
         val mocks = frameworkTestMocks()
         import mocks._
-        val supervisorRef = createSupervisorAndStartTLA(info, mocks)
+        val componentStateProbe: TestProbe[CurrentState] = TestProbe[CurrentState]
 
-        supervisorRef ! ComponentStateSubscription(Subscribe(compStateProbe.ref))
+        val supervisorRef = createSupervisorAndStartTLA(info, mocks)
+        supervisorRef ! ComponentStateSubscription(Subscribe(componentStateProbe.ref))
         supervisorRef ! LifecycleStateSubscription(Subscribe(lifecycleStateProbe.ref))
 
-        compStateProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
+        componentStateProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
 
         supervisorRef ! GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref)
         supervisorLifecycleStateProbe.expectMessage(SupervisorLifecycleState.Idle)
