@@ -14,11 +14,13 @@ class LocationServiceMultipleNICTest(cswCluster: CswCluster)
     extends FunSuite
     with Matchers
     with BeforeAndAfter
-    with BeforeAndAfterAll with Eventually{
+    with BeforeAndAfterAll
+    with Eventually {
 
   private val locationService = LocationServiceFactory.withCluster(cswCluster)
 
-  implicit val patience: PatienceConfig = PatienceConfig(Span(5, org.scalatest.time.Seconds), Span(100, org.scalatest.time.Millis))
+  implicit val patience: PatienceConfig =
+    PatienceConfig(Span(5, org.scalatest.time.Seconds), Span(100, org.scalatest.time.Millis))
 
   override protected def afterAll(): Unit =
     locationService.shutdown(TestFinishedReason)
