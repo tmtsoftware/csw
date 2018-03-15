@@ -54,7 +54,6 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
               None,
               compInfo,
               new SampleComponentBehaviorFactory,
-              pubSubBehaviorFactory,
               commandResponseManagerFactory,
               registrationFactory,
               locationService,
@@ -176,13 +175,13 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     val subscriberProbe               = TestProbe[LifecycleStateChanged]
 
     supervisorBehaviorKit.run(GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref))
-    val previousSupervisorLifecyleState = supervisorLifecycleStateProbe.expectMessageType[SupervisorLifecycleState]
+    val previousSupervisorLifecycleState = supervisorLifecycleStateProbe.expectMessageType[SupervisorLifecycleState]
 
     // Subscribe
     supervisorBehaviorKit.run(LifecycleStateSubscription(Subscribe(subscriberProbe.ref)))
 
     supervisorBehaviorKit.run(GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref))
-    supervisorLifecycleStateProbe.expectMessage(previousSupervisorLifecyleState)
+    supervisorLifecycleStateProbe.expectMessage(previousSupervisorLifecycleState)
 
     val childPubSubLifecycleInbox: TestInbox[PubSub[LifecycleStateChanged]] =
       supervisorBehaviorKit.childInbox(SupervisorBehavior.PubSubLifecycleActor)
@@ -194,7 +193,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     supervisorBehaviorKit.run(LifecycleStateSubscription(Unsubscribe[LifecycleStateChanged](subscriberProbe.ref)))
 
     supervisorBehaviorKit.run(GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref))
-    supervisorLifecycleStateProbe.expectMessage(previousSupervisorLifecyleState)
+    supervisorLifecycleStateProbe.expectMessage(previousSupervisorLifecycleState)
 
     val unsubscribeMessage = childPubSubLifecycleInbox.receiveMessage()
     unsubscribeMessage shouldBe Unsubscribe[LifecycleStateChanged](subscriberProbe.ref)
@@ -208,12 +207,12 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     val subscriberProbe               = TestProbe[CurrentState]
 
     supervisorBehaviorKit.run(GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref))
-    val previousSupervisorLifecyleState = supervisorLifecycleStateProbe.expectMessageType[SupervisorLifecycleState]
+    val previousSupervisorLifecycleState = supervisorLifecycleStateProbe.expectMessageType[SupervisorLifecycleState]
 
     // Subscribe
     supervisorBehaviorKit.run(ComponentStateSubscription(Subscribe[CurrentState](subscriberProbe.ref)))
     supervisorBehaviorKit.run(GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref))
-    supervisorLifecycleStateProbe.expectMessage(previousSupervisorLifecyleState)
+    supervisorLifecycleStateProbe.expectMessage(previousSupervisorLifecycleState)
 
     val childPubSubComponentStateInbox: TestInbox[PubSub[CurrentState]] =
       supervisorBehaviorKit.childInbox(SupervisorBehavior.PubSubComponentActor)
@@ -224,7 +223,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     // Unsubscribe
     supervisorBehaviorKit.run(ComponentStateSubscription(Unsubscribe[CurrentState](subscriberProbe.ref)))
     supervisorBehaviorKit.run(GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref))
-    supervisorLifecycleStateProbe.expectMessage(previousSupervisorLifecyleState)
+    supervisorLifecycleStateProbe.expectMessage(previousSupervisorLifecycleState)
 
     val unsubscribeMessage = childPubSubComponentStateInbox.receiveMessage()
     unsubscribeMessage shouldBe Unsubscribe[CurrentState](subscriberProbe.ref)

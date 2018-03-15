@@ -20,7 +20,6 @@ private[framework] object SupervisorBehaviorFactory {
       componentInfo: ComponentInfo,
       locationService: LocationService,
       registrationFactory: RegistrationFactory,
-      pubSubBehaviorFactory: PubSubBehaviorFactory,
       commandResponseManagerFactory: CommandResponseManagerFactory
   ): Behavior[ComponentMessage] = {
 
@@ -34,7 +33,6 @@ private[framework] object SupervisorBehaviorFactory {
       componentInfo,
       locationService,
       registrationFactory,
-      pubSubBehaviorFactory,
       componentBehaviorFactory,
       commandResponseManagerFactory,
       loggerFactory
@@ -47,7 +45,6 @@ private[framework] object SupervisorBehaviorFactory {
       componentInfo: ComponentInfo,
       locationService: LocationService,
       registrationFactory: RegistrationFactory,
-      pubSubBehaviorFactory: PubSubBehaviorFactory,
       componentBehaviorFactory: ComponentBehaviorFactory,
       commandResponseManagerFactory: CommandResponseManagerFactory,
       loggerFactory: LoggerFactory
@@ -64,7 +61,6 @@ private[framework] object SupervisorBehaviorFactory {
                   containerRef,
                   componentInfo,
                   componentBehaviorFactory,
-                  pubSubBehaviorFactory,
                   commandResponseManagerFactory,
                   registrationFactory,
                   locationService,

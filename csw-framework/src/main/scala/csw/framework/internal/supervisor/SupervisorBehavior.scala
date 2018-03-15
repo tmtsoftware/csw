@@ -64,8 +64,6 @@ private[framework] object SupervisorBehavior {
  *                          its not running in standalone mode
  * @param componentInfo component related information as described in the configuration file
  * @param componentBehaviorFactory the factory for creating the component supervised by this Supervisor
- * @param pubSubBehaviorFactory the factory for creating actor instance of [[csw.framework.internal.pubsub.PubSubBehavior]]
- *                              for utilising pub-sub of any state of a component
  * @param commandResponseManagerFactory the factory for creating actor instance of [[csw.framework.internal.pubsub.PubSubBehavior]]
  *                                      for utilising pub-sub of any state of a component
  * @param registrationFactory the factory for creating a typed [[csw.services.location.models.AkkaRegistration]] from
@@ -79,7 +77,6 @@ final class SupervisorBehavior private[framework] (
     maybeContainerRef: Option[ActorRef[ContainerIdleMessage]],
     componentInfo: ComponentInfo,
     componentBehaviorFactory: ComponentBehaviorFactory,
-    pubSubBehaviorFactory: PubSubBehaviorFactory,
     commandResponseManagerFactory: CommandResponseManagerFactory,
     registrationFactory: RegistrationFactory,
     locationService: LocationService,
@@ -98,6 +95,7 @@ final class SupervisorBehavior private[framework] (
   private[framework] val initializeTimeout: FiniteDuration = componentInfo.initializeTimeout
 
   private val commandResponseManager: CommandResponseManager                      = makeCommandResponseManager()
+  private val pubSubBehaviorFactory: PubSubBehaviorFactory                        = new PubSubBehaviorFactory
   private[framework] val pubSubComponentActor: ActorRef[PubSub[CurrentState]]     = makePubSubComponent()
   private[framework] val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]] = makePubSubLifecycle()
 

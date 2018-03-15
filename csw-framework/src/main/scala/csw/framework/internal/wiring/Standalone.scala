@@ -23,7 +23,6 @@ private[csw] object Standalone {
       componentInfo,
       locationService,
       registrationFactory,
-      pubSubBehaviorFactory,
       commandResponseManagerFactory
     )
     val cswFrameworkSystem = new CswFrameworkSystem(actorSystem)

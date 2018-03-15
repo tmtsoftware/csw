@@ -8,8 +8,6 @@ import akka.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
 import csw.common.components.framework.SampleComponentBehaviorFactory
 import csw.framework.ComponentInfos._
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
-import csw.messages.framework.PubSub
-import csw.messages.params.states.CurrentState
 import csw.messages.scaladsl.{ComponentMessage, ContainerIdleMessage, SupervisorMessage}
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
@@ -38,9 +36,6 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
 
   val supervisorBehavior: Behavior[ComponentMessage] = createBehavior(timerScheduler)
   val componentTLAName                               = s"${hcdInfo.name}-${SupervisorBehavior.ComponentActorNameSuffix}"
-
-  val pubSubBehavior: Behavior[PubSub[CurrentState]] =
-    pubSubBehaviorFactory.make(SupervisorBehavior.PubSubComponentActor, testMocks.loggerFactory)
 
   test("Supervisor should create child actors for TLA, pub-sub actor for lifecycle and component state") {
     val supervisorBehaviorTestKit = BehaviorTestKit(supervisorBehavior)
@@ -82,7 +77,6 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
             None,
             hcdInfo,
             new SampleComponentBehaviorFactory,
-            pubSubBehaviorFactory,
             commandResponseManagerFactory,
             registrationFactory,
             locationService,

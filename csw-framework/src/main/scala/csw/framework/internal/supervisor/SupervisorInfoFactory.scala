@@ -1,7 +1,6 @@
 package csw.framework.internal.supervisor
 
 import akka.actor.typed.ActorRef
-import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.internal.wiring.CswFrameworkSystem
 import csw.messages.framework.{Component, ComponentInfo, SupervisorInfo}
 import csw.messages.scaladsl.ContainerIdleMessage
@@ -29,7 +28,6 @@ private[framework] class SupervisorInfoFactory(containerName: String) {
     val system                                = ActorSystemFactory.remote(s"${componentInfo.name}-system")
     implicit val ec: ExecutionContextExecutor = system.dispatcher
     val richSystem                            = new CswFrameworkSystem(system)
-    val pubSubBehaviorFactory                 = new PubSubBehaviorFactory
     val commandResponseManagerFactory         = new CommandResponseManagerFactory
 
     async {
@@ -39,7 +37,6 @@ private[framework] class SupervisorInfoFactory(containerName: String) {
           componentInfo,
           locationService,
           registrationFactory,
-          pubSubBehaviorFactory,
           commandResponseManagerFactory
         )
       }
