@@ -2,7 +2,6 @@ package csw.framework.internal.supervisor
 
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior}
-import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.scaladsl.ComponentBehaviorFactory
 import csw.messages.framework.ComponentInfo
 import csw.messages.scaladsl.{ComponentMessage, ContainerIdleMessage, SupervisorMessage}

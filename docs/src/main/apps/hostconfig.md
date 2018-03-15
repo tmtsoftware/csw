@@ -61,7 +61,7 @@ and if you notice, `trombone-container-cmd-app` does not take container configur
 `hostconfig.conf` passed to `trombone-host-config-app` contains location of container configuration files. Host config app internally parses `hostconfig.conf` and passes container configuration file
 location to `trombone-container-cmd-app`.
 
-Find more details of ContainerCmd application [here](../framework/deploying-components.md).
+Find more details of ContainerCmd application @ref:[here](../framework/deploying-components.md).
 
 @@@
 
