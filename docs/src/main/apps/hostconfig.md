@@ -38,7 +38,8 @@ It is not necessary to have a name of the application as HostConfigApp/JHostConf
 * Unzip file created with projects name
 * Navigate to `bin` directory from unzipped content
 
-Sbt task: `sbt project/universal:packageBin` creates following four scripts in `bin` directory, 
+Sbt task: `sbt project/universal:packageBin` creates following four scripts in `bin` directory:
+ 
 * `trombone-host-config-app` : Responsible for starting multiple containers. It takes `hostconfig.conf` file as an argument which contains list of container specifications.
 * `trombone-container-cmd-app` : Responsible for starting single container or component in standalone mode. It takes `containerConfig.conf` file as an argument which contains single container specifications.
 * `trombone-host-config-app.bat` : For windows machine.
@@ -55,10 +56,12 @@ then invoke trombone-container-cmd-app script per container configuration which 
 
 @@@ note
 
-In above examples, we are passing this argument `-s ./trombone-container-cmd-app` to `./trombone-host-config-app`. `-s` stands for script and following to that is script name, in our case its `trombone-container-cmd-app`.
-Here `trombone-container-cmd-app` does not take container configuration.
-`hostconfig.conf` passed to `trombone-host-config-app` contains location of container configuration files. Host config app internally parses `hostconfig.conf` and passes container configuration
+In above examples, we are passing argument: `-s ./trombone-container-cmd-app` to `./trombone-host-config-app`. here `-s` stands for script and following to that is script name, in our case its `trombone-container-cmd-app`.
+and if you notice, `trombone-container-cmd-app` does not take container configuration file.
+`hostconfig.conf` passed to `trombone-host-config-app` contains location of container configuration files. Host config app internally parses `hostconfig.conf` and passes container configuration file
 location to `trombone-container-cmd-app`.
+
+Find more details of ContainerCmd application [here](../framework/deploying-components.md).
 
 @@@
 
