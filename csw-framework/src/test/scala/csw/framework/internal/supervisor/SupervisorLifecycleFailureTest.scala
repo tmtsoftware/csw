@@ -40,6 +40,7 @@ import org.scalatest.BeforeAndAfterEach
 
 import scala.collection.mutable
 import scala.concurrent.Future
+import scala.concurrent.duration.DurationDouble
 
 // DEOPSCSW-178: Lifecycle success/failure notification
 @LoggingSystemSensitive
@@ -110,7 +111,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     compStateProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(initChoice))))
 
     // TLA sends `Running` message to supervisor which changes the lifecycle state of supervisor to `Running`
-    lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
+    lifecycleStateProbe.expectMessage(5.seconds, LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
 
     // Supervisor registers itself only after successful initialization of TLA. In this test the TLA successfully
     // initializes after Restart message, after which Supervisor registers itself.
@@ -140,9 +141,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     compStateProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(initChoice))))
 
     // TLA sends `Running` message to supervisor which changes the lifecycle state of supervisor to `Running`
-    lifecycleStateProbe.expectMessage(
-      LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)
-    )
+    lifecycleStateProbe.expectMessage(5.seconds, LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
 
     Thread.sleep(100)
     // DEOPSCSW-180: Generic and Specific Log messages
@@ -188,9 +187,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     compStateProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(initChoice))))
 
     // TLA sends `Running` message to supervisor which changes the lifecycle state of supervisor to `Running`
-    lifecycleStateProbe.expectMessage(
-      LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)
-    )
+    lifecycleStateProbe.expectMessage(5.seconds, LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
 
     // Supervisor sends component a submit command which will fail with FailureRestart exception on calling onSubmit Handler
     supervisorRef ! Submit(setup, TestProbe[CommandResponse].ref)
@@ -201,7 +198,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     supervisorRef ! GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref)
 
     // Supervisor is still in the Running lifecycle state
-    supervisorLifecycleStateProbe.expectMessage(SupervisorLifecycleState.Running)
+    supervisorLifecycleStateProbe.expectMessage(5.seconds, SupervisorLifecycleState.Running)
 
     Thread.sleep(100)
 
