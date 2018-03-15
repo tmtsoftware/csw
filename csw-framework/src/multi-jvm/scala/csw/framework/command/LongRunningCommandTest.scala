@@ -104,8 +104,6 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
       val eventualResponse: Future[CommandResponse] = assemblyCommandService.query(setupForQuery.runId)
       //#query-response
       eventualResponse.map(_ shouldBe Accepted(setupForQuery.runId))
-      Thread.sleep(6000)
-
       enterBarrier("long-commands")
 
       val hcdLocF =
