@@ -44,7 +44,6 @@ private[containercmd] class ContainerCmd(
   private lazy val wiring: FrameworkWiring  = FrameworkWiring.make(actorSystem)
   import wiring.actorRuntime._
 
-  //TODO: add doc for significance
   def start(args: Array[String]): ActorRef[_] = {
     if (clusterSettings.seedNodes.isEmpty)
       throw ClusterSeedsNotFound
@@ -69,6 +68,7 @@ private[containercmd] class ContainerCmd(
       }
   }
 
+  // fetch config file and start components in container mode or a single component in standalone mode
   private def createF(
       standalone: Boolean,
       isLocal: Boolean,

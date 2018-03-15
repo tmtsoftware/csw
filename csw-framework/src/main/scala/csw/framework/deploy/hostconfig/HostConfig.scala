@@ -39,7 +39,6 @@ private[hostconfig] class HostConfig(name: String, clusterSettings: ClusterSetti
   private lazy val wiring: FrameworkWiring    = FrameworkWiring.make(actorSystem)
   private var processes: Set[process.Process] = _
 
-  //TODO: add doc for significance
   def start(args: Array[String]): Unit =
     if (clusterSettings.seedNodes.isEmpty)
       throw ClusterSeedsNotFound
@@ -81,6 +80,7 @@ private[hostconfig] class HostConfig(name: String, clusterSettings: ClusterSetti
           executeScript(containerScript, s"$configPath --local --standalone")
       }
 
+  // spawn a child process and start a container
   private def executeScript(containerScript: String, args: String): process.Process = {
     val command = s"$containerScript $args"
     log.info(s"Executing command : $command")

@@ -10,11 +10,10 @@ import csw.services.config.api.scaladsl.ConfigClientService
 import scala.async.Async.{async, await}
 import scala.concurrent.Future
 
-//TODO: add doc for significance
 private[framework] class ConfigUtils(configClientService: ConfigClientService, actorRuntime: ActorRuntime) {
   import actorRuntime._
 
-  //TODO: add doc for significance
+  // fetch config file either from config server or local disk
   private[deploy] def getConfig(
       isLocal: Boolean,
       inputFilePath: Option[Path],
