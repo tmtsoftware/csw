@@ -1,11 +1,11 @@
 package csw.framework.components.assembly;
 
-import akka.typed.ActorRef;
-import akka.typed.javadsl.Actor;
-import akka.typed.javadsl.ActorContext;
+import akka.actor.typed.ActorRef;
+import akka.actor.typed.javadsl.ActorContext;
+import akka.actor.typed.javadsl.Behaviors;
 import csw.services.command.javadsl.JCommandService;
 
-public class JDiagnosticsPublisher extends Actor.MutableBehavior<DiagnosticPublisherMessages> {
+public class JDiagnosticsPublisher extends Behaviors.MutableBehavior<DiagnosticPublisherMessages> {
 
     private ActorContext<DiagnosticPublisherMessages> ctx;
     JCommandService runningComponent;
@@ -18,7 +18,7 @@ public class JDiagnosticsPublisher extends Actor.MutableBehavior<DiagnosticPubli
     }
 
     @Override
-    public Actor.Receive<DiagnosticPublisherMessages> createReceive() {
+    public Behaviors.Receive<DiagnosticPublisherMessages> createReceive() {
         return null;
     }
 }

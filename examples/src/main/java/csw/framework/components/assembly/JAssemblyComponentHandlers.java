@@ -247,7 +247,9 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
         // required configuration could not be found in the configuration service. Component can choose to stop until the configuration is made available in the
         // configuration service and started again
         return configClient.getActive(Paths.get("tromboneAssemblyContext.conf"))
-                .thenApply((maybeConfigData) -> maybeConfigData.<ConfigNotAvailableException>orElseThrow(ConfigNotAvailableException::new));
+                .thenApply((Optional<ConfigData> maybeConfigData) -> {
+                    return maybeConfigData.<ConfigNotAvailableException>orElseThrow(() -> new ConfigNotAvailableException());
+                });
     }
     // #failureStop-Exception
 
