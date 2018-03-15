@@ -1,10 +1,8 @@
 package csw.services.command.perf
 
-import akka.actor.ActorSystem
-import akka.actor.typed
+import akka.actor.{typed, ActorSystem}
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.testkit.typed.TestKitSettings
 import akka.testkit.typed.scaladsl.TestProbe
 import com.typesafe.config.Config
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
