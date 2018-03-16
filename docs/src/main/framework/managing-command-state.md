@@ -9,8 +9,9 @@ Add a new command or update the status of an existing command
 
 Scala
 :   @@snip [McsAssemblyComponentHandlers.scala](../../../../csw-framework/src/test/scala/csw/common/components/command/McsAssemblyComponentHandlers.scala) { #addOrUpdateCommand }
+
 Java
-:   @@snip [JSampleComponentHandlers.scala](../../../../csw-framework/src/test/java/csw/framework/javadsl/components/JSampleComponentHandlers.java) { #addOrUpdateCommand }
+:   @@snip [JSampleComponentHandlers.java](../../../../csw-framework/src/test/java/csw/framework/javadsl/components/JSampleComponentHandlers.java) { #addOrUpdateCommand }
 
 ### addSubCommand
 A received command can be often split into two or more sub-commands. The status of original command can then be derived
