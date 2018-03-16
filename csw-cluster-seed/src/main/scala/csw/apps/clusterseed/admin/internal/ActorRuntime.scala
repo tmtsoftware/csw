@@ -11,13 +11,13 @@ import csw.services.logging.scaladsl.LoggingSystemFactory
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
-class ActorRuntime(_actorSystem: ActorSystem) {
+private[clusterseed] class ActorRuntime(_actorSystem: ActorSystem) {
   implicit val actorSystem: ActorSystem     = _actorSystem
   implicit val ec: ExecutionContextExecutor = actorSystem.dispatcher
   implicit val mat: Materializer            = ActorMaterializer()
   implicit val scheduler: Scheduler         = actorSystem.scheduler
 
-  val coordinatedShutdown = CoordinatedShutdown(actorSystem)
+  private val coordinatedShutdown = CoordinatedShutdown(actorSystem)
 
   def startLogging(): LoggingSystem =
     LoggingSystemFactory.start(BuildInfo.name, BuildInfo.version, ClusterAwareSettings.hostname, actorSystem)

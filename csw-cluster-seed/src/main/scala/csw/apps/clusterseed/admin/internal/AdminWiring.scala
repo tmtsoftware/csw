@@ -8,7 +8,7 @@ import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 
 // $COVERAGE-OFF$
-class AdminWiring {
+private[clusterseed] class AdminWiring {
   lazy val config: Config                     = ConfigFactory.load()
   lazy val settings                           = new Settings(config)
   lazy val clusterSettings                    = ClusterSettings()
@@ -21,7 +21,7 @@ class AdminWiring {
   lazy val adminHttpService: AdminHttpService = new AdminHttpService(adminRoutes, actorRuntime, settings)
 }
 
-object AdminWiring {
+private[clusterseed] object AdminWiring {
 
   def make(_clusterSettings: ClusterSettings, maybeAdminPort: Option[Int]): AdminWiring =
     new AdminWiring {

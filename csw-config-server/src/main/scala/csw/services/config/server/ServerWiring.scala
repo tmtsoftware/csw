@@ -12,7 +12,7 @@ import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 /**
  * Server configuration
  */
-class ServerWiring {
+private[csw] class ServerWiring {
   lazy val config: Config = ConfigFactory.load()
   lazy val settings       = new Settings(config)
 
@@ -33,7 +33,7 @@ class ServerWiring {
   lazy val httpService: HttpService = new HttpService(locationService, configServiceRoute, settings, actorRuntime)
 }
 
-object ServerWiring {
+private[csw] object ServerWiring {
 
   def make(_locationService: LocationService): ServerWiring = new ServerWiring {
     override lazy val locationService: LocationService = _locationService

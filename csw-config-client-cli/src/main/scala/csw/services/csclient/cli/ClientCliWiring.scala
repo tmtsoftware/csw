@@ -14,7 +14,7 @@ import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
  *
  * @param actorSystem the ActorSystem used to join akka cluster
  */
-class ClientCliWiring(actorSystem: ActorSystem) {
+private[csclient] class ClientCliWiring(actorSystem: ActorSystem) {
   lazy val actorRuntime                     = new ActorRuntime(actorSystem)
   lazy val locationService: LocationService = LocationServiceFactory.withCluster(CswCluster.withSystem(actorSystem))
   lazy val configService: ConfigService     = ConfigClientFactory.adminApi(actorRuntime.actorSystem, locationService)
@@ -23,7 +23,7 @@ class ClientCliWiring(actorSystem: ActorSystem) {
   lazy val cliApp                           = new CliApp(commandLineRunner)
 }
 
-object ClientCliWiring {
+private[csclient] object ClientCliWiring {
   def noPrinting(_clusterSettings: ClusterSettings): ClientCliWiring = new ClientCliWiring(_clusterSettings.system) {
     override lazy val printLine: Any ⇒ Unit = _ ⇒ ()
   }
