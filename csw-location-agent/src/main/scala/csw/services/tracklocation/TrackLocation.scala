@@ -21,9 +21,8 @@ import scala.sys.process._
 import scala.util.control.NonFatal
 
 /**
- * Starts a given external program, registers it with the location service and unregisters it when the program exits.
+ * Starts a given external program ([[TcpConnection]]), registers it with the location service and unregisters it when the program exits.
  */
-//TODO: add doc to explain significance
 class TrackLocation(names: List[String], command: Command, actorSystem: ActorSystem) {
   private val log: Logger = LocationAgentLogger.getLogger
 
@@ -31,6 +30,8 @@ class TrackLocation(names: List[String], command: Command, actorSystem: ActorSys
   private val locationService = LocationServiceFactory.withCluster(cswCluster)
   import cswCluster._
 
+  // registers provided list of service names with location service
+  // and starts a external program in child process using provided command
   def run(): Process =
     try {
       Thread.sleep(command.delay)
@@ -43,21 +44,20 @@ class TrackLocation(names: List[String], command: Command, actorSystem: ActorSys
         throw ex
     }
 
-  /**
-   * INTERNAL API : Registers a single service as a TCP service.
-   */
+  // ================= INTERNAL API =================
+
+  // Registers a single service as a TCP service
   private def registerName(name: String): Future[RegistrationResult] = {
     val componentId = ComponentId(name, ComponentType.Service)
     val connection  = TcpConnection(componentId)
     locationService.register(TcpRegistration(connection, command.port, LogAdminActorFactory.make(actorSystem)))
   }
 
-  /**
-   * INTERNAL API : Registers a shutdownHook to handle service un-registration during abnormal exit. Then, executes user
-   * specified command and awaits its termination.
-   */
+  // Registers a shutdownHook to handle service un-registration during abnormal exit
   private def unregisterOnTermination(results: Seq[RegistrationResult]): Process = {
 
+    // Add task to unregister the TcpRegistration from location service
+    // This task will get invoked before shutting down actor system
     coordinatedShutdown.addTask(
       CoordinatedShutdown.PhaseBeforeServiceUnbind,
       "unregistering"
@@ -65,13 +65,12 @@ class TrackLocation(names: List[String], command: Command, actorSystem: ActorSys
 
     log.info(s"Executing specified command: ${command.commandText}")
     val process = command.commandText.run()
+
+    // shutdown location agent on termination of external program started using provided command
     Future(process.exitValue()).onComplete(_ ⇒ shutdown(ProcessTerminatedReason))
     process
   }
 
-  /**
-   * INTERNAL API : Unregisters a service.
-   */
   private def unregisterServices(results: Seq[RegistrationResult]): Future[Done] = {
     log.info("Shutdown hook reached, un-registering connections", Map("services" → results.map(_.location.connection.name)))
     Future.traverse(results)(_.unregister()).map { _ =>

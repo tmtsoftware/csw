@@ -17,13 +17,14 @@ import scala.async.Async._
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationDouble
 
-//TODO: add doc to explain significance
+/**
+ * Utility to resolve and get the actorRef of LogAdminActor for the component using location service
+ */
 class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) {
   private val log: Logger = ClusterSeedLogger.getLogger
 
   import actorRuntime._
 
-  //TODO: add doc to explain significance
   def getLogMetadata(componentFullName: String): Future[LogMetadata] = async {
     implicit val timeout: Timeout = Timeout(5.seconds)
     await(getLocation(componentFullName)) match {
@@ -43,7 +44,6 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) {
     }
   }
 
-  //TODO: add doc to explain significance
   def setLogLevel(componentFullName: String, logLevel: Level): Future[Unit] =
     async {
       await(getLocation(componentFullName)) match {
@@ -63,7 +63,6 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) {
       }
     }
 
-  //TODO: add doc to explain significance
   private def getLocation(componentFullName: String): Future[Option[Location]] =
     async {
       Connection.from(componentFullName) match {

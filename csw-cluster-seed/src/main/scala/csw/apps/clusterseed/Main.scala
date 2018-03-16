@@ -9,7 +9,10 @@ import scala.concurrent.duration.DurationInt
 
 // $COVERAGE-OFF$
 class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) {
-  //TODO: add doc to explain working
+
+  // responsible for starting following:
+  // 1. location service on provided port (this is required to bootstrap akka cluster, initially cluster will have single seed node)
+  // 2. http server which exposes http end point to change/get the log level of components dynamically
   def start(args: Array[String]): Unit =
     new ArgsParser().parse(args).map {
       case Options(clusterPort, maybeAdminPort) =>

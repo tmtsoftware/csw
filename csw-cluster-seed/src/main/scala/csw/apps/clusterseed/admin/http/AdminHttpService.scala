@@ -13,9 +13,8 @@ import scala.concurrent.Future
 import scala.util.control.NonFatal
 
 /**
- * Initialise AdminServer
+ * Start AdminServer on a given port which is responsible for handling log level change/get requests
  */
-//TODO: add doc to explain significance
 class AdminHttpService(adminRoutes: AdminRoutes, actorRuntime: ActorRuntime, settings: Settings) {
   private val log: Logger = ClusterSeedLogger.getLogger
 
@@ -34,6 +33,6 @@ class AdminHttpService(adminRoutes: AdminRoutes, actorRuntime: ActorRuntime, set
   private def bind() = Http().bindAndHandle(
     handler = adminRoutes.route,
     interface = ClusterAwareSettings.hostname,
-    port = settings.`admin-port`
+    port = settings.adminPort
   )
 }

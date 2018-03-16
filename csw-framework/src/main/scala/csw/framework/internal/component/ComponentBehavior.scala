@@ -34,7 +34,7 @@ import scala.util.control.NonFatal
  *                          component
  * @param locationService the single instance of Location service created for a running application
  */
-final class ComponentBehavior private[framework] (
+private[framework] final class ComponentBehavior(
     ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
     supervisor: ActorRef[FromComponentLifecycleMessage],

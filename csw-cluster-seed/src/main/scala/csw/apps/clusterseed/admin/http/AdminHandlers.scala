@@ -24,7 +24,6 @@ case object ErrorMessage {
 /**
  * Maps server side exceptions to Http Status codes
  */
-//TODO: add doc to explain significance
 class AdminHandlers extends Directives with JsonRejectionHandler {
   private val log: Logger = ClusterSeedLogger.getLogger
 

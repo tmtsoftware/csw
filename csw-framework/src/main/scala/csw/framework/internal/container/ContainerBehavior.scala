@@ -35,7 +35,7 @@ import scala.util.{Failure, Success}
                               [[csw.messages.location.Connection.AkkaConnection]]
  * @param locationService the single instance of Location service created for a running application
  */
-final class ContainerBehavior private[framework] (
+private[framework] final class ContainerBehavior(
     ctx: ActorContext[ContainerActorMessage],
     containerInfo: ContainerInfo,
     supervisorInfoFactory: SupervisorInfoFactory,

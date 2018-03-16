@@ -71,7 +71,7 @@ private[framework] object SupervisorBehavior {
  * @param locationService the single instance of Location service created for a running application
  * @param loggerFactory the factory for creating [[csw.services.logging.scaladsl.Logger]] instance
  */
-final class SupervisorBehavior private[framework] (
+private[framework] final class SupervisorBehavior(
     ctx: ActorContext[SupervisorMessage],
     timerScheduler: TimerScheduler[SupervisorMessage],
     maybeContainerRef: Option[ActorRef[ContainerIdleMessage]],

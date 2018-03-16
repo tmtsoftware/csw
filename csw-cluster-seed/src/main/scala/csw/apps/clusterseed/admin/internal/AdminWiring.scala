@@ -7,9 +7,6 @@ import csw.apps.clusterseed.admin.http.{AdminHandlers, AdminHttpService, AdminRo
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 
-/**
- * Admin app wiring
- */
 // $COVERAGE-OFF$
 class AdminWiring {
   lazy val config: Config                     = ConfigFactory.load()
@@ -20,11 +17,10 @@ class AdminWiring {
   lazy val locationService: LocationService   = LocationServiceFactory.withSystem(actorSystem)
   lazy val logAdmin: LogAdmin                 = new LogAdmin(locationService, actorRuntime)
   lazy val adminHandlers                      = new AdminHandlers
-  lazy val adminRoutes                        = new AdminRoutes(adminHandlers, logAdmin, actorRuntime)
+  lazy val adminRoutes                        = new AdminRoutes(logAdmin, actorRuntime, adminHandlers)
   lazy val adminHttpService: AdminHttpService = new AdminHttpService(adminRoutes, actorRuntime, settings)
 }
 
-//TODO: add doc to explain significance
 object AdminWiring {
 
   def make(_clusterSettings: ClusterSettings, maybeAdminPort: Option[Int]): AdminWiring =
@@ -32,7 +28,7 @@ object AdminWiring {
       override lazy val clusterSettings: ClusterSettings = _clusterSettings
 
       override lazy val settings: Settings = new Settings(config) {
-        override val `admin-port`: Int = maybeAdminPort.getOrElse(super.`admin-port`)
+        override val adminPort: Int = maybeAdminPort.getOrElse(super.adminPort)
       }
     }
 
