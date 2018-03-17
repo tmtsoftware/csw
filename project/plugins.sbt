@@ -13,6 +13,7 @@ addSbtPlugin("com.typesafe.sbt"                  % "sbt-native-packager"    % "1
 addSbtPlugin("com.typesafe.sbt"                  % "sbt-multi-jvm"          % "0.4.0")
 addSbtPlugin("com.eed3si9n"                      % "sbt-buildinfo"          % "0.8.0")
 addSbtPlugin("pl.project13.scala"                % "sbt-jmh"                % "0.3.3")
+addSbtPlugin("com.orrsella"                      % "sbt-stats"              % "1.0.7")
 
 resolvers += "Jenkins repo" at "http://repo.jenkins-ci.org/public/"
 addSbtPlugin("ohnosequences" % "sbt-github-release" % "0.7.0")
