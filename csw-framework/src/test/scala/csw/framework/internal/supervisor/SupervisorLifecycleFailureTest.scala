@@ -39,8 +39,8 @@ import org.mockito.stubbing.Answer
 import org.scalatest.BeforeAndAfterEach
 
 import scala.collection.mutable
-import scala.concurrent.Future
 import scala.concurrent.duration.DurationDouble
+import scala.concurrent.{ExecutionContext, Future}
 
 // DEOPSCSW-178: Lifecycle success/failure notification
 @LoggingSystemSensitive
@@ -52,6 +52,8 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
   var submitAnswer: Answer[Future[Unit]]                                 = _
   var shutdownAnswer: Answer[Future[Unit]]                               = _
   var runAnswer: Answer[Future[Unit]]                                    = _
+
+  implicit val ec: ExecutionContext = typedSystem.executionContext
 
   // all log messages will be captured in log buffer
   private val logBuffer                    = mutable.Buffer.empty[JsonObject]
@@ -183,7 +185,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     supervisorRef ! ComponentStateSubscription(PubSub.Subscribe(compStateProbe.ref))
     supervisorRef ! LifecycleStateSubscription(PubSub.Subscribe(lifecycleStateProbe.ref))
 
-    // component Intializes succesfully
+    // component Initializes successfully
     compStateProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(initChoice))))
 
     // TLA sends `Running` message to supervisor which changes the lifecycle state of supervisor to `Running`
@@ -238,7 +240,14 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
   }
 
   private def createAnswers(compStateProbe: TestProbe[CurrentState]): Unit = {
-    initializeAnswer = (_) ⇒ Future.successful(compStateProbe.ref ! CurrentState(prefix, Set(choiceKey.set(initChoice))))
+    initializeAnswer = (_) ⇒
+      Future {
+        // small sleep is required in order for test probe to subscribe for component state and lifecycle state
+        // before component actually gets initialized
+        Thread.sleep(200)
+        compStateProbe.ref ! CurrentState(prefix, Set(choiceKey.set(initChoice)))
+    }
+
     shutdownAnswer = (_) ⇒ Future.successful(compStateProbe.ref ! CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
   }
 }

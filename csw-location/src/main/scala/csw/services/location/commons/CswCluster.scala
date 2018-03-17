@@ -69,7 +69,6 @@ class CswCluster private (_actorSystem: ActorSystem) {
   // $COVERAGE-ON$
 
   // When new member tries to join the cluster, location service makes sure that member is weakly up or up before returning handle to location service
-  // TODO: Does it really necessary? can be deleted?
   private def joinCluster(): Done = {
     // Check if seed nodes are provided to join csw-cluster
     val emptySeeds = actorSystem.settings.config.getStringList("akka.cluster.seed-nodes").isEmpty
@@ -96,7 +95,6 @@ class CswCluster private (_actorSystem: ActorSystem) {
   /**
    * Ensures that data replication is started in Location service cluster by matching replica count with Up members.
    */
-  // TODO: Does it really necessary? can be deleted?
   private def ensureReplication(): Unit = {
     implicit val timeout: Timeout = Timeout(5.seconds)
     import akka.pattern.ask
