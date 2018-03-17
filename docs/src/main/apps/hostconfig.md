@@ -73,7 +73,7 @@ Find more details of ContainerCmd application @ref:[here](../framework/deploying
 ## Custom Host Configuration
 
 hostconfig.conf
-:   @@snip [hostconfig.conf](../../../../examples/src/main/resources/hostconfig.conf) { #host-conf }
+:   @@snip [hostConfig.conf](../../../../examples/src/main/resources/hostConfig.conf) { #host-conf }
 
 ## Help
 Use the following command to get help on the options available with this app
