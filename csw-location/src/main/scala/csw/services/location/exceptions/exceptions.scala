@@ -6,17 +6,9 @@ import csw.messages.location.{Connection, Location}
 /**
  * An Exception representing failure in registration
  *
- * @param cause the reason or cause of the exception
+ * @param connection a connection for which registration failed
  */
-case class RegistrationFailed(cause: String) extends RuntimeException(cause) {
-
-  /**
-   * An Exception representing failure in registration
-   * @param connection a connection for which registration failed
-   * @return an instance of RegistrationFailed exception
-   */
-  def this(connection: Connection) = this(s"unable to register $connection")
-}
+case class RegistrationFailed(connection: Connection) extends RuntimeException(s"unable to register $connection")
 
 /**
  * An Exception representing failure in un-registration
