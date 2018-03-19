@@ -15,6 +15,10 @@ object LocationServiceFactory {
   /**
    * Create a LocationService instance to manage registrations
    *
+   * @throws csw.services.location.exceptions.CouldNotEnsureDataReplication represents if the distributed data is not confirmed
+   *                                                                        to be replicated on current node
+   * @throws csw.services.location.exceptions.CouldNotJoinCluster represents the current node is not able to join the cluster
+   * @throws scala.util.control.NonFatal represents any non fatal exception occurred while joining the cluster
    * @return an instance of `LocationService`
    */
   def make(): LocationService = withCluster(CswCluster.make())
@@ -23,6 +27,9 @@ object LocationServiceFactory {
    * Create an LocationService instance to manage registrations
    *
    * @param actorSystem the actorSystem used to feed in `CswCluster` and use it's config properties to join the cluster
+   * @throws csw.services.location.exceptions.CouldNotEnsureDataReplication represents if the distributed data is not confirmed to be replicated on current node
+   * @throws csw.services.location.exceptions.CouldNotJoinCluster represents the current node is not able to join the cluster
+   * @throws scala.util.control.NonFatal represents any non fatal exception occurred while joining the cluster
    * @return an instance of `LocationService`
    */
   def withSystem(actorSystem: ActorSystem): LocationService =
@@ -33,6 +40,9 @@ object LocationServiceFactory {
    *
    * @note it is highly recommended to use this method for testing purpose only
    * @param clusterSettings the custom clusterSettings used to join the cluster
+   * @throws csw.services.location.exceptions.CouldNotEnsureDataReplication represents if the distributed data is not confirmed to be replicated on current node
+   * @throws csw.services.location.exceptions.CouldNotJoinCluster represents the current node is not able to join the cluster
+   * @throws scala.util.control.NonFatal represents any non fatal exception occurred while joining the cluster
    * @return an instance of `LocationService`
    */
   def withSettings(clusterSettings: ClusterSettings): LocationService =
@@ -43,6 +53,9 @@ object LocationServiceFactory {
    *
    * @note it is highly recommended to use it for testing purpose only
    * @param cswCluster the cswCluster instance used to join the cluster
+   * @throws csw.services.location.exceptions.CouldNotEnsureDataReplication represents if the distributed data is not confirmed to be replicated on current node
+   * @throws csw.services.location.exceptions.CouldNotJoinCluster represents the current node is not able to join the cluster
+   * @throws scala.util.control.NonFatal represents any non fatal exception occurred while joining the cluster
    * @return an instance of `LocationService`
    */
   def withCluster(cswCluster: CswCluster): LocationService = {

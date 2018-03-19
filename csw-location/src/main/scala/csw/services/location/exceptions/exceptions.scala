@@ -6,12 +6,17 @@ import csw.messages.location.{Connection, Location}
 /**
  * An Exception representing failure in registration
  *
- * @param connection a connection for which registration failed
+ * @param cause the reason or cause of the exception
  */
-case class RegistrationFailed(connection: Connection)
-    extends RuntimeException(
-      s"unable to register $connection"
-    )
+case class RegistrationFailed(cause: String) extends RuntimeException(cause) {
+
+  /**
+   * An Exception representing failure in registration
+   * @param connection a connection for which registration failed
+   * @return an instance of RegistrationFailed exception
+   */
+  def this(connection: Connection) = this(s"unable to register $connection")
+}
 
 /**
  * An Exception representing failure in un-registration
@@ -50,4 +55,20 @@ case class LocalAkkaActorRegistrationNotAllowed(actorRef: ActorRef[_])
 case object RegistrationListingFailed
     extends RuntimeException(
       s"unable to get the list of registered locations"
+    )
+
+/**
+ * Represents if the distributed data is not confirmed to be replicated on current node
+ */
+case object CouldNotEnsureDataReplication
+    extends RuntimeException(
+      "could not ensure that the data is replicated in location service cluster"
+    )
+
+/**
+ * Represents the current node is not able to join the cluster
+ */
+case object CouldNotJoinCluster
+    extends RuntimeException(
+      "could not join cluster"
     )

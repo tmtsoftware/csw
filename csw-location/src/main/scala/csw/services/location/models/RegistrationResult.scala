@@ -12,6 +12,9 @@ trait RegistrationResult {
 
   /**
    * The successful registration of location can be unregistered using this method
+   *
+   * @return a future which completes when un-registrstion is done successfully or fails with
+   *         [[csw.services.location.exceptions.UnregistrationFailed]]
    */
   def unregister(): Future[Done]
 

@@ -11,6 +11,7 @@ import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
 import csw.messages.commons.CoordinatedShutdownReasons.FailureReason
 import csw.services.location.commons.ClusterConfirmationActor.HasJoinedCluster
+import csw.services.location.exceptions.{CouldNotEnsureDataReplication, CouldNotJoinCluster}
 import csw.services.logging.scaladsl.Logger
 
 import scala.concurrent.duration.DurationInt
@@ -84,9 +85,8 @@ class CswCluster private (_actorSystem: ActorSystem) {
     def status  = Await.result(statusF, 5.seconds)
     val success = BlockingUtils.poll(status.isDefined, 20.seconds)
     if (!success) {
-      val runtimeException = new RuntimeException("could not join cluster")
-      log.error(runtimeException.getMessage, ex = runtimeException)
-      throw runtimeException
+      log.error(CouldNotJoinCluster.getMessage, ex = CouldNotJoinCluster)
+      throw CouldNotJoinCluster
     }
     confirmationActor ! PoisonPill
     Done
@@ -103,10 +103,8 @@ class CswCluster private (_actorSystem: ActorSystem) {
     def upMembers     = cluster.state.members.count(_.status == MemberStatus.Up)
     val success       = BlockingUtils.poll(replicaCount >= upMembers, 10.seconds)
     if (!success) {
-      val runtimeException =
-        new RuntimeException("could not ensure that the data is replicated in location service cluster")
-      log.error(runtimeException.getMessage, ex = runtimeException)
-      throw runtimeException
+      log.error(CouldNotEnsureDataReplication.getMessage, ex = CouldNotEnsureDataReplication)
+      throw CouldNotEnsureDataReplication
     }
   }
 
@@ -125,22 +123,34 @@ object CswCluster {
 
   private val log: Logger = LocationServiceLogger.getLogger
 
-  //do not use the dying actorSystem's dispatcher for scheduling actions after its death
-
   /**
    * Creates CswCluster with the default cluster settings
    *
    * @see [[csw.services.location.commons.ClusterSettings]]
+   * @throws csw.services.location.exceptions.CouldNotEnsureDataReplication represents if the distributed data is not confirmed to be replicated on current node
+   * @throws csw.services.location.exceptions.CouldNotJoinCluster represents the current node is not able to join the cluster
+   * @throws scala.util.control.NonFatal represents any non fatal exception occurred while joining the cluster
+   * @return an instance of CswCluster
    */
   def make(): CswCluster = withSettings(ClusterSettings())
 
   /**
    * Creates CswCluster with the given customized settings
+   *
+   * @throws csw.services.location.exceptions.CouldNotEnsureDataReplication represents if the distributed data is not confirmed to be replicated on current node
+   * @throws csw.services.location.exceptions.CouldNotJoinCluster represents the current node is not able to join the cluster
+   * @throws scala.util.control.NonFatal represents any non fatal exception occurred while joining the cluster
+   * @return an instance of CswCluster
    */
   def withSettings(settings: ClusterSettings): CswCluster = withSystem(settings.system)
 
   /**
    * Creates CswCluster with the given ActorSystem
+   *
+   * @throws csw.services.location.exceptions.CouldNotEnsureDataReplication represents if the distributed data is not confirmed to be replicated on current node
+   * @throws csw.services.location.exceptions.CouldNotJoinCluster represents the current node is not able to join the cluster
+   * @throws scala.util.control.NonFatal represents any non fatal exception occurred while joining the cluster
+   * @return an instance of CswCluster
    */
   def withSystem(actorSystem: ActorSystem): CswCluster = {
     val cswCluster = new CswCluster(actorSystem)

@@ -15,6 +15,10 @@ object JLocationServiceFactory {
   /**
    * Create an ILocationService instance to manage registrations
    *
+   * @throws csw.services.location.exceptions.CouldNotEnsureDataReplication represents if the distributed data is not confirmed
+   *                                                                        to be replicated on current node
+   * @throws csw.services.location.exceptions.CouldNotJoinCluster represents the current node is not able to join the cluster
+   * @throws scala.util.control.NonFatal represents any non fatal exception occurred while joining the cluster
    * @return an instance of `ILocationService`
    */
   def make(): ILocationService = withCluster(CswCluster.make())
@@ -24,6 +28,10 @@ object JLocationServiceFactory {
    *
    * @note it is highly recommended to use this method for testing purpose only
    * @param clusterSettings the custom clusterSettings used to join the cluster
+   * @throws csw.services.location.exceptions.CouldNotEnsureDataReplication represents if the distributed data is not confirmed
+   *                                                                        to be replicated on current node
+   * @throws csw.services.location.exceptions.CouldNotJoinCluster represents the current node is not able to join the cluster
+   * @throws scala.util.control.NonFatal represents any non fatal exception occurred while joining the cluster
    * @return an instance of `ILocationService`
    */
   def withSettings(clusterSettings: ClusterSettings): ILocationService =
@@ -34,6 +42,10 @@ object JLocationServiceFactory {
    *
    * @note it is highly recommended to use it for testing purpose only
    * @param cswCluster the cswCluster instance used to join the cluster
+   * @throws csw.services.location.exceptions.CouldNotEnsureDataReplication represents if the distributed data is not confirmed
+   *                                                                        to be replicated on current node
+   * @throws csw.services.location.exceptions.CouldNotJoinCluster represents the current node is not able to join the cluster
+   * @throws scala.util.control.NonFatal represents any non fatal exception occurred while joining the cluster
    * @return an instance of `ILocationService`
    */
   def withCluster(cswCluster: CswCluster): ILocationService = {

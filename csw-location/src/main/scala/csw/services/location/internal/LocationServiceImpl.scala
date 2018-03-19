@@ -81,15 +81,15 @@ class LocationServiceImpl private[location] (cswCluster: CswCluster) extends Loc
             )
             registrationResult(location)
           case _ ⇒
-            val registrationFailed = RegistrationFailed(registration.connection)
+            val registrationFailed = new RegistrationFailed(registration.connection)
             log.error(registrationFailed.getMessage, ex = registrationFailed)
             throw registrationFailed
         }
       case ModifyFailure(service.Key, _, cause, _) ⇒
         log.error(cause.getMessage, ex = cause)
-        throw cause
+        throw RegistrationFailed(cause.getMessage)
       case _ ⇒
-        val registrationFailed = RegistrationFailed(registration.connection)
+        val registrationFailed = new RegistrationFailed(registration.connection)
         log.error(registrationFailed.getMessage, ex = registrationFailed)
         throw registrationFailed
     }
