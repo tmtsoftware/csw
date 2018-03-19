@@ -81,7 +81,7 @@ class LocationServiceImpl private[location] (cswCluster: CswCluster) extends Loc
             )
             registrationResult(location)
           case _ ⇒
-            val registrationFailed = new RegistrationFailed(registration.connection)
+            val registrationFailed = RegistrationFailed(registration.connection)
             log.error(registrationFailed.getMessage, ex = registrationFailed)
             throw registrationFailed
         }
@@ -89,7 +89,7 @@ class LocationServiceImpl private[location] (cswCluster: CswCluster) extends Loc
         log.error(cause.getMessage, ex = cause)
         throw cause // this exception gets mapped onto OtherLocationIsRegistered
       case _ ⇒
-        val registrationFailed = new RegistrationFailed(registration.connection)
+        val registrationFailed = RegistrationFailed(registration.connection)
         log.error(registrationFailed.getMessage, ex = registrationFailed)
         throw registrationFailed
     }

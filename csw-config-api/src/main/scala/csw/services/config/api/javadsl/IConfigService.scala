@@ -22,7 +22,9 @@ trait IConfigService extends IConfigClientService {
    * @param configData contents of the file
    * @param annex true if the file requires special handling (external storage)
    * @param comment comment to associate with this operation
-   * @return a unique id that can be used to refer to the file
+   * @return a CompletableFuture that completes with unique id that can be used to refer to the file or fail with
+   *         [[csw.services.config.api.exceptions.FileAlreadyExists]] or [[csw.services.config.api.exceptions.InvalidInput]]
+   *         or [[csw.services.config.api.exceptions.FileNotFound]] or [[RuntimeException]]
    */
   def create(path: Path, configData: ConfigData, annex: Boolean, comment: String): CompletableFuture[ConfigId]
 
@@ -33,7 +35,9 @@ trait IConfigService extends IConfigClientService {
    * @param path the file path relative to the repository root
    * @param configData contents of the file
    * @param comment comment to associate with this operation
-   * @return a unique id that can be used to refer to the file
+   * @return a CompletableFuture that completes with unique id that can be used to refer to the file or fail with
+   *         [[csw.services.config.api.exceptions.FileAlreadyExists]] or [[csw.services.config.api.exceptions.InvalidInput]]
+   *         or [[csw.services.config.api.exceptions.FileNotFound]] or [[RuntimeException]]
    */
   def create(path: Path, configData: ConfigData, comment: String): CompletableFuture[ConfigId]
 
@@ -44,7 +48,9 @@ trait IConfigService extends IConfigClientService {
    * @param path the file path relative to the repository root
    * @param configData contents of the file
    * @param comment comment to associate with this file
-   * @return a unique id that can be used to refer to the file
+   * @return a CompletableFuture that completes with unique id that can be used to refer to the file or fails with
+   *         [[csw.services.config.api.exceptions.InvalidInput]] or [[csw.services.config.api.exceptions.FileNotFound]]
+   *         or [[RuntimeException]]
    */
   def update(path: Path, configData: ConfigData, comment: String): CompletableFuture[ConfigId]
 
@@ -53,7 +59,9 @@ trait IConfigService extends IConfigClientService {
    *
    * @param path the file path relative to the repository root
    * @param id an id used to specify a specific version to fetch
-   * @return a future object that can be used to access the file's data, if found
+   * @return a CompletableFuture that can be used to access the file's data, if found or fails with
+   *         [[csw.services.config.api.exceptions.EmptyResponse]] or [[csw.services.config.api.exceptions.InvalidInput]]
+   *         or [[csw.services.config.api.exceptions.FileNotFound]] or [[RuntimeException]]
    */
   def getById(path: Path, id: ConfigId): CompletableFuture[Optional[ConfigData]]
 
@@ -61,7 +69,9 @@ trait IConfigService extends IConfigClientService {
    * Gets and returns the latest file at the given path.
    *
    * @param path the file path relative to the repository root
-   * @return a future object that can be used to access the file's data, if found
+   * @return a CompletableFuture that can be used to access the file's data, if found or fails with
+   *         [[csw.services.config.api.exceptions.EmptyResponse]] or [[csw.services.config.api.exceptions.InvalidInput]]
+   *         or [[csw.services.config.api.exceptions.FileNotFound]] or [[RuntimeException]]
    */
   def getLatest(path: Path): CompletableFuture[Optional[ConfigData]]
 
@@ -72,7 +82,9 @@ trait IConfigService extends IConfigClientService {
    *
    * @param path the file path relative to the repository root
    * @param time the target date
-   * @return a future object that can be used to access the file's data, if found
+   * @return a CompletableFuture that can be used to access the file's data, if found or fails with
+   *         [[csw.services.config.api.exceptions.EmptyResponse]] or [[csw.services.config.api.exceptions.InvalidInput]]
+   *         or [[csw.services.config.api.exceptions.FileNotFound]] or [[RuntimeException]]
    */
   def getByTime(path: Path, time: Instant): CompletableFuture[Optional[ConfigData]]
 
@@ -81,6 +93,8 @@ trait IConfigService extends IConfigClientService {
    *
    * @param path the file path relative to the repository root
    * @param comment comment to associate with this operation
+   * @return a CompletableFuture that completes on deletion of file or fails with [[csw.services.config.api.exceptions.InvalidInput]]
+   *         or [[csw.services.config.api.exceptions.FileNotFound]] or [[RuntimeException]]
    */
   def delete(path: Path, comment: String): CompletableFuture[Unit]
 
@@ -89,7 +103,9 @@ trait IConfigService extends IConfigClientService {
    *
    * @param fileType the file type(Annex or Normal)
    * @param pattern pattern to match against the file name
-   * @return a list containing one ConfigFileInfo object for each known config file
+   * @return a CompletableFuture that completes ith a list containing one ConfigFileInfo object for each known config file or fails with
+   *         [[csw.services.config.api.exceptions.InvalidInput]] or [[csw.services.config.api.exceptions.FileNotFound]]
+   *         or [[RuntimeException]]
    */
   def list(fileType: FileType, pattern: String): CompletableFuture[ju.List[ConfigFileInfo]]
 
@@ -97,7 +113,9 @@ trait IConfigService extends IConfigClientService {
    * Returns a list containing all of the known config files of given type(Annex or Normal)
    *
    * @param fileType the file type(Annex or Normal)
-   * @return a list containing one ConfigFileInfo object for each config file
+   * @return a CompletableFuture that completes ith a list containing one ConfigFileInfo object for each known config file or fails with
+   *         [[csw.services.config.api.exceptions.InvalidInput]] or [[csw.services.config.api.exceptions.FileNotFound]]
+   *         or [[RuntimeException]]
    */
   def list(fileType: FileType): CompletableFuture[ju.List[ConfigFileInfo]]
 
@@ -105,14 +123,18 @@ trait IConfigService extends IConfigClientService {
    * Returns a list containing all of the known config files whose name matches the provided pattern
    *
    * @param pattern pattern to match against the file name
-   * @return a list containing one ConfigFileInfo object for each config file
+   * @return a CompletableFuture that completes ith a list containing one ConfigFileInfo object for each known config file or fails with
+   *         [[csw.services.config.api.exceptions.InvalidInput]] or [[csw.services.config.api.exceptions.FileNotFound]]
+   *         or [[RuntimeException]]
    */
   def list(pattern: String): CompletableFuture[ju.List[ConfigFileInfo]]
 
   /**
    * Returns a list containing all of the known config files
    *
-   * @return a list containing one ConfigFileInfo object for each config file
+   * @return a CompletableFuture that completes ith a list containing one ConfigFileInfo object for each known config file or fails with
+   *         [[csw.services.config.api.exceptions.InvalidInput]] or [[csw.services.config.api.exceptions.FileNotFound]]
+   *         or [[RuntimeException]]
    */
   def list(): CompletableFuture[ju.List[ConfigFileInfo]]
 
@@ -124,7 +146,9 @@ trait IConfigService extends IConfigClientService {
    * @param from the start of the history range
    * @param to the end of the history range
    * @param maxResults the maximum number of history results to return (default: unlimited)
-   * @return a list containing one ConfigFileHistory object for each version of path
+   * @return a CompletableFuture that completes with a list containing one ConfigFileHistory object for each version of path or fails with
+   *         [[csw.services.config.api.exceptions.InvalidInput]] or [[csw.services.config.api.exceptions.FileNotFound]]
+   *         or [[RuntimeException]]
    */
   def history(path: Path, from: Instant, to: Instant, maxResults: Int): CompletableFuture[ju.List[ConfigFileRevision]]
 
@@ -134,7 +158,9 @@ trait IConfigService extends IConfigClientService {
    * @param path the file path relative to the repository root
    * @param from the start of the history range
    * @param to the end of the history range
-   * @return a list containing one ConfigFileHistory object for each version of path
+   * @return a CompletableFuture that completes with a list containing one ConfigFileHistory object for each version of path or fails with
+   *         [[csw.services.config.api.exceptions.InvalidInput]] or [[csw.services.config.api.exceptions.FileNotFound]]
+   *         or [[RuntimeException]]
    */
   def history(path: Path, from: Instant, to: Instant): CompletableFuture[ju.List[ConfigFileRevision]]
 
@@ -143,7 +169,9 @@ trait IConfigService extends IConfigClientService {
    *
    * @param path the file path relative to the repository root
    * @param maxResults the maximum number of history results to return
-   * @return a list containing one ConfigFileHistory object for each version of path
+   * @return a CompletableFuture that completes with a list containing one ConfigFileHistory object for each version of path or fails with
+   *         [[csw.services.config.api.exceptions.InvalidInput]] or [[csw.services.config.api.exceptions.FileNotFound]]
+   *         or [[RuntimeException]]
    */
   def history(path: Path, maxResults: Int): CompletableFuture[ju.List[ConfigFileRevision]]
 
@@ -151,7 +179,9 @@ trait IConfigService extends IConfigClientService {
    * Returns the history of versions of the file at given path
    *
    * @param path the file path relative to the repository root
-   * @return a list containing one ConfigFileHistory object for each version of path
+   * @return a CompletableFuture that completes with a list containing one ConfigFileHistory object for each version of path or fails with
+   *         [[csw.services.config.api.exceptions.InvalidInput]] or [[csw.services.config.api.exceptions.FileNotFound]]
+   *         or [[RuntimeException]]
    */
   def history(path: Path): CompletableFuture[ju.List[ConfigFileRevision]]
 
@@ -162,7 +192,9 @@ trait IConfigService extends IConfigClientService {
    * @param path the file path relative to the repository root
    * @param from the start of the history range
    * @param maxResults the maximum number of results to return
-   * @return a list containing one ConfigFileHistory object for each version of path
+   * @return a CompletableFuture that completes with a list containing one ConfigFileHistory object for each version of path or fails with
+   *         [[csw.services.config.api.exceptions.InvalidInput]] or [[csw.services.config.api.exceptions.FileNotFound]]
+   *         or [[RuntimeException]]
    */
   def historyFrom(path: Path, from: Instant, maxResults: Int): CompletableFuture[ju.List[ConfigFileRevision]]
 
@@ -171,7 +203,9 @@ trait IConfigService extends IConfigClientService {
    *
    * @param path the file path relative to the repository root
    * @param from the start of the history range
-   * @return a list containing one ConfigFileHistory object for each version of path
+   * @return a CompletableFuture that completes with a list containing one ConfigFileHistory object for each version of path or fails with
+   *         [[csw.services.config.api.exceptions.InvalidInput]] or [[csw.services.config.api.exceptions.FileNotFound]]
+   *         or [[RuntimeException]]
    */
   def historyFrom(path: Path, from: Instant): CompletableFuture[ju.List[ConfigFileRevision]]
 
@@ -182,7 +216,9 @@ trait IConfigService extends IConfigClientService {
    * @param path the file path relative to the repository root
    * @param upTo the end of the history range
    * @param maxResults the maximum number of history results to return (default: unlimited)
-   * @return a list containing one ConfigFileHistory object for each version of path
+   * @return a CompletableFuture that completes with a list containing one ConfigFileHistory object for each version of path or fails with
+   *         [[csw.services.config.api.exceptions.InvalidInput]] or [[csw.services.config.api.exceptions.FileNotFound]]
+   *         or [[RuntimeException]]
    */
   def historyUpTo(path: Path, upTo: Instant, maxResults: Int): CompletableFuture[ju.List[ConfigFileRevision]]
 
@@ -191,7 +227,9 @@ trait IConfigService extends IConfigClientService {
    *
    * @param path the file path relative to the repository root
    * @param upTo the end of the history range
-   * @return a list containing one ConfigFileHistory object for each version of path
+   * @return a CompletableFuture that completes with a list containing one ConfigFileHistory object for each version of path or fails with
+   *         [[csw.services.config.api.exceptions.InvalidInput]] or [[csw.services.config.api.exceptions.FileNotFound]]
+   *         or [[RuntimeException]]
    */
   def historyUpTo(path: Path, upTo: Instant): CompletableFuture[ju.List[ConfigFileRevision]]
 
@@ -203,7 +241,9 @@ trait IConfigService extends IConfigClientService {
    * @param from the start of the history range
    * @param to the end of the history range
    * @param maxResults the maximum number of history results to return (default: unlimited)
-   * @return a list containing one ConfigFileHistory object for each version of path
+   * @return a CompletableFuture that completes with a list containing one ConfigFileHistory object for each version of path or fails with
+   *         [[csw.services.config.api.exceptions.InvalidInput]] or [[csw.services.config.api.exceptions.FileNotFound]]
+   *         or [[RuntimeException]]
    */
   def historyActive(path: Path, from: Instant, to: Instant, maxResults: Int): CompletableFuture[ju.List[ConfigFileRevision]]
 
@@ -213,7 +253,9 @@ trait IConfigService extends IConfigClientService {
    * @param path the file path relative to the repository root
    * @param from the start of the history range
    * @param to the end of the history range
-   * @return a list containing one ConfigFileHistory object for each version of path
+   * @return a CompletableFuture that completes with a list containing one ConfigFileHistory object for each version of path or fails with
+   *         [[csw.services.config.api.exceptions.InvalidInput]] or [[csw.services.config.api.exceptions.FileNotFound]]
+   *         or [[RuntimeException]]
    */
   def historyActive(path: Path, from: Instant, to: Instant): CompletableFuture[ju.List[ConfigFileRevision]]
 
@@ -222,7 +264,9 @@ trait IConfigService extends IConfigClientService {
    *
    * @param path the file path relative to the repository root
    * @param maxResults the maximum number of history results to return
-   * @return a list containing one ConfigFileHistory object for each version of path
+   * @return a CompletableFuture that completes with a list containing one ConfigFileHistory object for each version of path or fails with
+   *         [[csw.services.config.api.exceptions.InvalidInput]] or [[csw.services.config.api.exceptions.FileNotFound]]
+   *         or [[RuntimeException]]
    */
   def historyActive(path: Path, maxResults: Int): CompletableFuture[ju.List[ConfigFileRevision]]
 
@@ -230,7 +274,9 @@ trait IConfigService extends IConfigClientService {
    * Returns the history of active versions of the file at given path
    *
    * @param path the file path relative to the repository root
-   * @return a list containing one ConfigFileHistory object for each version of path
+   * @return a CompletableFuture that completes with a list containing one ConfigFileHistory object for each version of path or fails with
+   *         [[csw.services.config.api.exceptions.InvalidInput]] or [[csw.services.config.api.exceptions.FileNotFound]]
+   *         or [[RuntimeException]]
    */
   def historyActive(path: Path): CompletableFuture[ju.List[ConfigFileRevision]]
 
@@ -241,7 +287,9 @@ trait IConfigService extends IConfigClientService {
    * @param path the file path relative to the repository root
    * @param from the start of the history range
    * @param maxResults the maximum number of results to return
-   * @return a list containing one ConfigFileHistory object for each version of path
+   * @return a CompletableFuture that completes with a list containing one ConfigFileHistory object for each version of path or fails with
+   *         [[csw.services.config.api.exceptions.InvalidInput]] or [[csw.services.config.api.exceptions.FileNotFound]]
+   *         or [[RuntimeException]]
    */
   def historyActiveFrom(path: Path, from: Instant, maxResults: Int): CompletableFuture[ju.List[ConfigFileRevision]]
 
@@ -250,7 +298,9 @@ trait IConfigService extends IConfigClientService {
    *
    * @param path the file path relative to the repository root
    * @param from the start of the history range
-   * @return a list containing one ConfigFileHistory object for each version of path
+   * @return a CompletableFuture that completes with a list containing one ConfigFileHistory object for each version of path or fails with
+   *         [[csw.services.config.api.exceptions.InvalidInput]] or [[csw.services.config.api.exceptions.FileNotFound]]
+   *         or [[RuntimeException]]
    */
   def historyActiveFrom(path: Path, from: Instant): CompletableFuture[ju.List[ConfigFileRevision]]
 
@@ -261,7 +311,9 @@ trait IConfigService extends IConfigClientService {
    * @param path the file path relative to the repository root
    * @param upTo the end of the history range
    * @param maxResults the maximum number of history results to return (default: unlimited)
-   * @return a list containing one ConfigFileHistory object for each version of path
+   * @return a CompletableFuture that completes with a list containing one ConfigFileHistory object for each version of path or fails with
+   *         [[csw.services.config.api.exceptions.InvalidInput]] or [[csw.services.config.api.exceptions.FileNotFound]]
+   *         or [[RuntimeException]]
    */
   def historyActiveUpTo(path: Path, upTo: Instant, maxResults: Int): CompletableFuture[ju.List[ConfigFileRevision]]
 
@@ -270,7 +322,9 @@ trait IConfigService extends IConfigClientService {
    *
    * @param path the file path relative to the repository root
    * @param upTo the end of the history range
-   * @return a list containing one ConfigFileHistory object for each version of path
+   * @return a CompletableFuture that completes with a list containing one ConfigFileHistory object for each version of path or fails with
+   *         [[csw.services.config.api.exceptions.InvalidInput]] or [[csw.services.config.api.exceptions.FileNotFound]]
+   *         or [[RuntimeException]]
    */
   def historyActiveUpTo(path: Path, upTo: Instant): CompletableFuture[ju.List[ConfigFileRevision]]
 
@@ -283,7 +337,8 @@ trait IConfigService extends IConfigClientService {
    * @param id an id used to specify a specific version
    *           (by default the id of the version with which the file was created i.e. 1)
    * @param comment comment to associate with this operation
-   * @return a future result
+   * @return a CompletableFuture that completes when active version is set or fails with [[csw.services.config.api.exceptions.InvalidInput]]
+   *         or [[csw.services.config.api.exceptions.FileNotFound]] or [[RuntimeException]]
    */
   def setActiveVersion(path: Path, id: ConfigId, comment: String): CompletableFuture[Unit]
 
@@ -292,7 +347,8 @@ trait IConfigService extends IConfigClientService {
    *
    * @param path the file path relative to the repository root
    * @param comment comment to associate with this operation
-   * @return a future result
+   * @return a CompletableFuture that completes when active version is reset or fails with [[csw.services.config.api.exceptions.InvalidInput]]
+   *         or [[csw.services.config.api.exceptions.FileNotFound]] or [[RuntimeException]]
    */
   def resetActiveVersion(path: Path, comment: String): CompletableFuture[Unit]
 
@@ -300,7 +356,9 @@ trait IConfigService extends IConfigClientService {
    * Returns the version which represents the "active version" of the file at the given path.
    *
    * @param path the file path relative to the repository root
-   * @return id which represents the current active version
+   * @return a CompletableFuture that completes with id representing the current active version or fails with
+   *         [[csw.services.config.api.exceptions.InvalidInput]] or [[csw.services.config.api.exceptions.FileNotFound]]
+   *         or [[RuntimeException]]
    */
   def getActiveVersion(path: Path): CompletableFuture[Optional[ConfigId]]
 
@@ -309,14 +367,19 @@ trait IConfigService extends IConfigClientService {
    *
    * @param path the file path relative to the repository root
    * @param time the target instant
-   * @return a future object that can be used to access the file's data, if found
+   * @return a CompletableFuture object that can be used to access the file's data, if found or fails with
+   *         [[csw.services.config.api.exceptions.EmptyResponse]] or [[csw.services.config.api.exceptions.InvalidInput]]
+   *         or [[csw.services.config.api.exceptions.FileNotFound]]
+   *         or [[RuntimeException]]
    */
   def getActiveByTime(path: Path, time: Instant): CompletableFuture[Optional[ConfigData]]
 
   /**
    * Query the metadata of config server
    *
-   * @return a future object containing config server's metadata
+   * @return a CompletableFuture that completes with an object containing config server's metadata or fails with
+   *         [[csw.services.config.api.exceptions.InvalidInput]] or [[csw.services.config.api.exceptions.FileNotFound]]
+   *         or [[RuntimeException]]
    */
   def getMetadata: CompletableFuture[ConfigMetadata]
 

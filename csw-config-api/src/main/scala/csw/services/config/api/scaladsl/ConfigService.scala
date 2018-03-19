@@ -20,7 +20,9 @@ trait ConfigService extends ConfigClientService {
    * @param configData contents of the file
    * @param annex true if the file is annex and requires special handling (external storage)
    * @param comment comment to associate with this operation
-   * @return a unique id that can be used to refer to the file
+   * @return a future which completes with unique id that can be used to refer to the file or fails with
+   *         [[csw.services.config.api.exceptions.FileAlreadyExists]] or [[csw.services.config.api.exceptions.InvalidInput]]
+   *         or [[csw.services.config.api.exceptions.FileNotFound]] or [[RuntimeException]]
    */
   def create(path: Path, configData: ConfigData, annex: Boolean = false, comment: String): Future[ConfigId]
 
@@ -31,7 +33,9 @@ trait ConfigService extends ConfigClientService {
    * @param path the file path relative to the repository root
    * @param configData contents of the file
    * @param comment comment to associate with this operation
-   * @return a unique id that can be used to refer to the file
+   * @return a future that completes with a unique id that can be used to refer to the file or fails with
+   *         [[csw.services.config.api.exceptions.InvalidInput]] or [[csw.services.config.api.exceptions.FileNotFound]]
+   *         or [[RuntimeException]]
    */
   def update(path: Path, configData: ConfigData, comment: String): Future[ConfigId]
 
@@ -40,7 +44,9 @@ trait ConfigService extends ConfigClientService {
    *
    * @param path the file path relative to the repository root
    * @param id id used to specify a specific version to fetch
-   * @return a future object that can be used to access the file's data, if found
+   * @return a future object that can be used to access the file's data, if found or fails with
+   *         [[csw.services.config.api.exceptions.EmptyResponse]] or [[csw.services.config.api.exceptions.InvalidInput]]
+   *         or [[csw.services.config.api.exceptions.FileNotFound]] or [[RuntimeException]]
    */
   def getById(path: Path, id: ConfigId): Future[Option[ConfigData]]
 
@@ -48,7 +54,9 @@ trait ConfigService extends ConfigClientService {
    * Gets and returns the latest file at the given path.
    *
    * @param path the file path relative to the repository root
-   * @return a future object that can be used to access the file's data, if found
+   * @return a future object that can be used to access the file's data, if found or fails with
+   *         [[csw.services.config.api.exceptions.EmptyResponse]] or [[csw.services.config.api.exceptions.InvalidInput]]
+   *         or [[csw.services.config.api.exceptions.FileNotFound]] or [[RuntimeException]]
    */
   def getLatest(path: Path): Future[Option[ConfigData]]
 
@@ -59,7 +67,9 @@ trait ConfigService extends ConfigClientService {
    *
    * @param path the file path relative to the repository root
    * @param time the target instant
-   * @return a future object that can be used to access the file's data, if found
+   * @return a future object that can be used to access the file's data, if found or fails with
+   *         [[csw.services.config.api.exceptions.EmptyResponse]] or [[csw.services.config.api.exceptions.InvalidInput]]
+   *         or [[csw.services.config.api.exceptions.FileNotFound]] or [[RuntimeException]]
    */
   def getByTime(path: Path, time: Instant): Future[Option[ConfigData]]
 
@@ -68,6 +78,8 @@ trait ConfigService extends ConfigClientService {
    *
    * @param path the file path relative to the repository root
    * @param comment comment to associate with this operation
+   * @return a future that completes on deletion of file or fails with [[csw.services.config.api.exceptions.InvalidInput]]
+   *         or [[csw.services.config.api.exceptions.FileNotFound]] or [[RuntimeException]]
    */
   def delete(path: Path, comment: String): Future[Unit]
 
@@ -76,7 +88,9 @@ trait ConfigService extends ConfigClientService {
    *
    * @param fileType optional file type(Annex or Normal)
    * @param pattern optional pattern to match against the file name
-   * @return a list containing one ConfigFileInfo object for each known config file
+   * @return a future that completes with a list containing one ConfigFileInfo object for each known config file or fails with
+   *         [[csw.services.config.api.exceptions.InvalidInput]] or [[csw.services.config.api.exceptions.FileNotFound]]
+   *         or [[RuntimeException]]
    */
   def list(fileType: Option[FileType] = None, pattern: Option[String] = None): Future[List[ConfigFileInfo]]
 
@@ -88,7 +102,9 @@ trait ConfigService extends ConfigClientService {
    * @param from the start of the history range
    * @param to the end of the history range
    * @param maxResults the maximum number of history results to return (default: unlimited)
-   * @return a list containing one ConfigFileHistory object for each version of path
+   * @return a future that completes with a list containing one ConfigFileHistory object for each version of path or fails with
+   *         [[csw.services.config.api.exceptions.InvalidInput]] or [[csw.services.config.api.exceptions.FileNotFound]]
+   *         or [[RuntimeException]]
    */
   def history(
       path: Path,
@@ -105,7 +121,9 @@ trait ConfigService extends ConfigClientService {
    * @param from the start of the history range
    * @param to the end of the history range
    * @param maxResults the maximum number of history results to return (default: unlimited)
-   * @return a list containing one ConfigFileHistory object for each version of path
+   * @return a future that completes with a list containing one ConfigFileHistory object for each version of path or fails with
+   *         [[csw.services.config.api.exceptions.InvalidInput]] or [[csw.services.config.api.exceptions.FileNotFound]]
+   *         or [[RuntimeException]]
    */
   def historyActive(
       path: Path,
@@ -123,7 +141,8 @@ trait ConfigService extends ConfigClientService {
    * @param id an id used to specify a specific version
    *           (by default the id of the version with which the file was created i.e. 1)
    * @param comment comment to associate with this operation
-   * @return a future result
+   * @return a future that completes when active version is set or fails with [[csw.services.config.api.exceptions.InvalidInput]]
+   *         or [[csw.services.config.api.exceptions.FileNotFound]] or [[RuntimeException]]
    */
   def setActiveVersion(path: Path, id: ConfigId, comment: String): Future[Unit]
 
@@ -132,7 +151,8 @@ trait ConfigService extends ConfigClientService {
    *
    * @param path the file path relative to the repository root
    * @param comment comment to associate with this operation
-   * @return a future result
+   * @return a future that completes when active version is reset or fails with [[csw.services.config.api.exceptions.InvalidInput]]
+   *         or [[csw.services.config.api.exceptions.FileNotFound]] or [[RuntimeException]]
    */
   def resetActiveVersion(path: Path, comment: String): Future[Unit]
 
@@ -140,7 +160,9 @@ trait ConfigService extends ConfigClientService {
    * Returns the version which represents the "active version" of the file at the given path.
    *
    * @param path the file path relative to the repository root
-   * @return id which represents the current active version
+   * @return a future that completes with id representing the current active version or fails with
+   *         [[csw.services.config.api.exceptions.InvalidInput]] or [[csw.services.config.api.exceptions.FileNotFound]]
+   *         or [[RuntimeException]]
    */
   def getActiveVersion(path: Path): Future[Option[ConfigId]]
 
@@ -149,14 +171,19 @@ trait ConfigService extends ConfigClientService {
    *
    * @param path the file path relative to the repository root
    * @param time the target instant
-   * @return a future object that can be used to access the file's data, if found
+   * @return a future object that can be used to access the file's data, if found or fails with
+   *         [[csw.services.config.api.exceptions.EmptyResponse]] or [[csw.services.config.api.exceptions.InvalidInput]]
+   *         or [[csw.services.config.api.exceptions.FileNotFound]]
+   *         or [[RuntimeException]]
    */
   def getActiveByTime(path: Path, time: Instant): Future[Option[ConfigData]]
 
   /**
    * Query the metadata of config server
    *
-   * @return future of object containing config server's metadata
+   * @return a future that completes with an object containing config server's metadata or fails with
+   *         [[csw.services.config.api.exceptions.InvalidInput]] or [[csw.services.config.api.exceptions.FileNotFound]]
+   *         or [[RuntimeException]]
    */
   def getMetadata: Future[ConfigMetadata]
 

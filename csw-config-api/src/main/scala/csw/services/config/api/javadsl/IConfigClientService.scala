@@ -17,7 +17,9 @@ trait IConfigClientService {
    * Returns true if the given path exists and is being managed
    *
    * @param path the file path relative to the repository root
-   * @return true if the file exists, false otherwise
+   * @return a CompletableFuture that completes with true if the file exists, false otherwise. It can fail with
+   *         [[csw.services.config.api.exceptions.InvalidInput]] or [[csw.services.config.api.exceptions.FileNotFound]]
+   *         or [[RuntimeException]]
    */
   def exists(path: Path): CompletableFuture[jl.Boolean]
 
@@ -26,7 +28,9 @@ trait IConfigClientService {
    *
    * @param path the file path relative to the repository root
    * @param id revision of the file
-   * @return true if the file exists, false otherwise
+   * @return a CompletableFuture that completes with true if the file exists, false otherwise. It can fail with
+   *         [[csw.services.config.api.exceptions.InvalidInput]] or [[csw.services.config.api.exceptions.FileNotFound]]
+   *         or [[RuntimeException]]
    */
   def exists(path: Path, id: ConfigId): CompletableFuture[jl.Boolean]
 
@@ -34,7 +38,9 @@ trait IConfigClientService {
    * Gets and returns the content of active version of the file stored under the given path.
    *
    * @param path the file path relative to the repository root
-   * @return a future object that can be used to access the file's data, if found
+   * @return a CompletableFuture that can be used to access the file's data, if found. It can fail with
+   *         [[csw.services.config.api.exceptions.EmptyResponse]] or [[csw.services.config.api.exceptions.InvalidInput]]
+   *         or [[csw.services.config.api.exceptions.FileNotFound]] or [[RuntimeException]]
    */
   def getActive(path: Path): CompletableFuture[Optional[ConfigData]]
 
