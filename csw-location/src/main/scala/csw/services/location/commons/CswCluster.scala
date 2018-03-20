@@ -126,10 +126,7 @@ object CswCluster {
   /**
    * Creates CswCluster with the default cluster settings
    *
-   * @see [[csw.services.location.commons.ClusterSettings]]
-   * @throws csw.services.location.exceptions.CouldNotEnsureDataReplication represents if the distributed data is not confirmed to be replicated on current node
-   * @throws csw.services.location.exceptions.CouldNotJoinCluster represents the current node is not able to join the cluster
-   * @throws scala.util.control.NonFatal represents any non fatal exception occurred while joining the cluster
+   * @see [[csw.services.location.commons.ClusterSettings]] same as [[csw.services.location.commons.CswCluster.withSettings()]]
    * @return an instance of CswCluster
    */
   def make(): CswCluster = withSettings(ClusterSettings())
@@ -137,9 +134,6 @@ object CswCluster {
   /**
    * Creates CswCluster with the given customized settings
    *
-   * @throws csw.services.location.exceptions.CouldNotEnsureDataReplication represents if the distributed data is not confirmed to be replicated on current node
-   * @throws csw.services.location.exceptions.CouldNotJoinCluster represents the current node is not able to join the cluster
-   * @throws scala.util.control.NonFatal represents any non fatal exception occurred while joining the cluster
    * @return an instance of CswCluster
    */
   def withSettings(settings: ClusterSettings): CswCluster = withSystem(settings.system)
@@ -147,9 +141,6 @@ object CswCluster {
   /**
    * Creates CswCluster with the given ActorSystem
    *
-   * @throws csw.services.location.exceptions.CouldNotEnsureDataReplication represents if the distributed data is not confirmed to be replicated on current node
-   * @throws csw.services.location.exceptions.CouldNotJoinCluster represents the current node is not able to join the cluster
-   * @throws scala.util.control.NonFatal represents any non fatal exception occurred while joining the cluster
    * @return an instance of CswCluster
    */
   def withSystem(actorSystem: ActorSystem): CswCluster = {
