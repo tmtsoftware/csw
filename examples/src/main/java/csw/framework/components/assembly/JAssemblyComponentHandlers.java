@@ -4,6 +4,7 @@ import akka.actor.typed.ActorRef;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Adapter;
 import akka.testkit.typed.javadsl.TestProbe;
+import akka.util.Timeout;
 import csw.framework.exceptions.FailureRestart;
 import csw.framework.exceptions.FailureStop;
 import csw.framework.javadsl.JComponentHandlers;
@@ -11,6 +12,10 @@ import csw.framework.scaladsl.CurrentStatePublisher;
 import csw.messages.commands.*;
 import csw.messages.framework.ComponentInfo;
 import csw.messages.location.*;
+import csw.messages.params.generics.JKeyTypes;
+import csw.messages.params.generics.Key;
+import csw.messages.params.models.Prefix;
+import csw.messages.params.states.CurrentState;
 import csw.messages.scaladsl.TopLevelActorMessage;
 import csw.services.command.javadsl.JCommandService;
 import csw.services.command.scaladsl.CommandResponseManager;
@@ -103,6 +108,11 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     public CommandResponse validateCommand(ControlCommand controlCommand) {
         if (controlCommand instanceof Setup) {
             // validation for setup goes here
+            //#addOrUpdateCommand
+            // after validation of the controlCommand, update its status of successful validation as Accepted
+            CommandResponse.Accepted accepted = new CommandResponse.Accepted(controlCommand.runId());
+            commandResponseManager.addOrUpdateCommand(controlCommand.runId(), accepted);
+            //#addOrUpdateCommand
             return new CommandResponse.Accepted(controlCommand.runId());
         } else if (controlCommand instanceof Observe) {
             // validation for observe goes here
@@ -169,6 +179,57 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     private void processSetup(Setup sc) {
         switch (sc.commandName().name()) {
             case "forwardToWorker":
+                //#addSubCommand
+                Prefix prefix = new Prefix("wfos.red.detector");
+                Setup subCommand = new Setup(prefix, new CommandName("sub-command-1"), sc.jMaybeObsId());
+                commandResponseManager.addSubCommand(sc.runId(), subCommand.runId());
+
+                Setup subCommand2 = new Setup(prefix, new CommandName("sub-command-2"), sc.jMaybeObsId());
+                commandResponseManager.addSubCommand(sc.runId(), subCommand2.runId());
+
+                //#addSubCommand
+
+                //#subscribe-to-command-response-manager
+                // subscribe to the status of original command received and publish the state when its status changes to
+                // Completed
+                commandResponseManager.jSubscribe(subCommand.runId(), commandResponse -> {
+                    if(commandResponse.resultType() instanceof CommandResponse.Completed) {
+                        Key<String> stringKey = JKeyTypes.StringKey().make("sub-command-status");
+                        CurrentState currentState = new CurrentState(sc.source().prefix());
+                        currentStatePublisher.publish(currentState.madd(stringKey.set("complete")));
+                    }
+                    else {
+                        // do something
+                    }
+                });
+                //#subscribe-to-command-response-manager
+
+                //#updateSubCommand
+                // An original command is split into sub-commands and sent to a component. The result of the command is
+                // obtained by subscribing to the component with the sub command id.
+                JCommandService componentCommandService = runningHcds.get(componentInfo.getConnections().get(0)).get();
+                componentCommandService.subscribe(subCommand2.runId(), Timeout.durationToTimeout(FiniteDuration.apply(5, TimeUnit.SECONDS)))
+                        .thenAccept(commandResponse -> {
+                            if(commandResponse.resultType() instanceof CommandResponse.Completed) {
+                                // As the commands get completed, the results are updated in the commandResponseManager
+                                commandResponseManager.updateSubCommand(subCommand2.runId(), commandResponse);
+                            }
+                            else {
+                                // do something
+                            }
+                });
+                //#updateSubCommand
+
+                //#query-command-response-manager
+                // query CommandResponseManager to get the current status of Command, for example: Accepted/Completed/Invalid etc.
+                commandResponseManager
+                        .jQuery(subCommand.runId(), Timeout.durationToTimeout(FiniteDuration.apply(5, "seconds")))
+                        .thenAccept(commandResponse -> {
+                            // may choose to publish current state to subscribers or do other operations
+                        });
+
+                //#query-command-response-manager
+
             default:
                 log.error("Invalid command [" + sc + "] received.");
         }

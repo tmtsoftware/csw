@@ -125,13 +125,14 @@ class McsAssemblyComponentHandlers(
           // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
           commandResponseManager.updateSubCommand(response.runId, Accepted(response.runId))
           //#updateSubCommand
-          // An original command is split into three sub-commands and sent to an hcdComponent.
-          // As the commands get completed, the results are updated in the commandResponseManager
+          // An original command is split into sub-commands and sent to a component. The result of the command is
+          // obtained by subscribing to the component with the sub command id.
           hcdComponent.subscribe(controlCommand.runId).map {
             case _: Completed ⇒
               controlCommand.runId match {
                 case id if id == shortSetup.runId ⇒
                   currentStatePublisher.publish(CurrentState(shortSetup.source, Set(choiceKey.set(shortCmdCompleted))))
+                  // As the commands get completed, the results are updated in the commandResponseManager
                   commandResponseManager.updateSubCommand(id, Completed(id))
                 case id if id == mediumSetup.runId ⇒
                   currentStatePublisher.publish(CurrentState(mediumSetup.source, Set(choiceKey.set(mediumCmdCompleted))))

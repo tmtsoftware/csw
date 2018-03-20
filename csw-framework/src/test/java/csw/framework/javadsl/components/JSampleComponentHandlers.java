@@ -1,27 +1,23 @@
 package csw.framework.javadsl.components;
 
+import akka.actor.typed.javadsl.ActorContext;
+import akka.actor.typed.javadsl.Adapter;
 import akka.stream.ActorMaterializer;
 import akka.stream.ThrottleMode;
 import akka.stream.javadsl.Sink;
 import akka.stream.javadsl.Source;
-import akka.actor.typed.javadsl.ActorContext;
-import akka.actor.typed.javadsl.Adapter;
 import akka.util.Timeout;
 import csw.common.components.command.ComponentStateForCommand;
 import csw.common.components.framework.SampleComponentState;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.scaladsl.CurrentStatePublisher;
-import csw.messages.scaladsl.TopLevelActorMessage;
-import csw.messages.commands.CommandIssue;
-import csw.messages.commands.CommandResponse;
-import csw.messages.commands.ControlCommand;
-import csw.messages.commands.Result;
-import csw.messages.commands.Setup;
+import csw.messages.commands.*;
 import csw.messages.framework.ComponentInfo;
 import csw.messages.location.TrackingEvent;
 import csw.messages.params.generics.JKeyTypes;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.states.CurrentState;
+import csw.messages.scaladsl.TopLevelActorMessage;
 import csw.services.command.scaladsl.CommandResponseManager;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.logging.javadsl.ILogger;
@@ -31,7 +27,6 @@ import scala.concurrent.duration.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-import static akka.actor.typed.javadsl.Adapter.toUntyped;
 import static csw.common.components.command.ComponentStateForCommand.*;
 import static csw.messages.commands.CommandResponse.*;
 
@@ -107,11 +102,8 @@ public class JSampleComponentHandlers extends JComponentHandlers {
             Result result = new Result(controlCommand.source().prefix()).add(param);
             return new CompletedWithResult(controlCommand.runId(), result);
         } else if (controlCommand.commandName().equals(failureAfterValidationCmd())) {
-            //#addOrUpdateCommand
-            // after validation of the controlCommand, update its status of successful validation as Accepted
             Accepted accepted = new Accepted(controlCommand.runId());
             commandResponseManager.addOrUpdateCommand(controlCommand.runId(), accepted);
-            //#addOrUpdateCommand
             return accepted;
         } else if (controlCommand.commandName().name().contains("failure")) {
             return new Invalid(controlCommand.runId(), new CommandIssue.OtherIssue("Testing: Received failure, will return Invalid."));

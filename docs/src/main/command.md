@@ -2,6 +2,9 @@
 
 **csw-command** library provides support for command based communication between components. 
 
+This section describes how to communicate with any other component using commands. To check how to manage commands
+received, please visit @ref:[Managing Command State](framework/managing-command-state.md)
+
 ## Artifacts
 
 sbt
