@@ -33,7 +33,7 @@ sealed abstract class Registration {
 }
 
 /**
- * AkkaRegistration holds the information needed to register an akka location. A [[LocalAkkaActorRegistrationNotAllowed]]
+ * AkkaRegistration holds the information needed to register an akka location. A [[csw.services.location.exceptions.LocalAkkaActorRegistrationNotAllowed]]
  * is thrown if the actorRef provided is not a remote actorRef
  *
  * @param connection the `Connection` to register with `LocationService`

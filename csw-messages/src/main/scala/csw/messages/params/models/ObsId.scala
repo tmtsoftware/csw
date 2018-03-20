@@ -62,7 +62,8 @@ case class ObsId(obsId: String) extends TMTSerializable {
   def asOptional: Optional[ObsId] = Optional.of(new ObsId(obsId))
 }
 
-case class ObsId2(year: String, sem: String, kind: String, prog: String, obs: String, file: Option[String]) {
+//FIXME: whether this model is required or not?
+private[params] case class ObsId2(year: String, sem: String, kind: String, prog: String, obs: String, file: Option[String]) {
   // private final val PROG_KIND_INDEX = 6
 
   //def isQueue = obsId.charAt(PROG_KIND_INDEX) == PreProgrammedQueueKindLetter
@@ -76,7 +77,7 @@ case class ObsId2(year: String, sem: String, kind: String, prog: String, obs: St
  */
 }
 
-object ObsId2 {
+private[params] object ObsId2 {
   val BAD_OBSID: ObsId2 = ObsId2("bad", "obs", "id", "bad", "obs", Some("id"))
 
   //YYYY(A|B|E)-(Q|C)-PXXX-OXXX-XXXX
