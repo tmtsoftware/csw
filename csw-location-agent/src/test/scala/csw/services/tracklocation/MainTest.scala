@@ -9,7 +9,6 @@ import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.location.Connection.TcpConnection
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
-import csw.services.location.internal.Networks
 import csw.services.location.scaladsl.LocationServiceFactory
 import csw.services.tracklocation.common.TestFutureExtension.RichFuture
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
@@ -59,7 +58,7 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterAll with Before
     val resolvedLocation = locationService.resolve(connection, 5.seconds).await.get
 
     resolvedLocation.connection shouldBe connection
-    resolvedLocation.uri shouldBe new URI(s"tcp://${new Networks().hostname()}:$port")
+    resolvedLocation.uri shouldBe new URI(s"tcp://${ClusterAwareSettings.hostname}:$port")
     resolvedLocation.logAdminActorRef.isInstanceOf[ActorRef[_]] shouldBe true
 
     process.destroy()

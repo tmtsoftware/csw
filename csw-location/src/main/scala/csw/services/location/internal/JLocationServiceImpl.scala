@@ -20,7 +20,7 @@ import scala.compat.java8.FutureConverters._
 import scala.compat.java8.OptionConverters._
 import scala.concurrent.duration.FiniteDuration
 
-class JLocationServiceImpl private[location] (locationService: LocationService, cswCluster: CswCluster) extends ILocationService {
+private[location] class JLocationServiceImpl(locationService: LocationService, cswCluster: CswCluster) extends ILocationService {
 
   import cswCluster._
 

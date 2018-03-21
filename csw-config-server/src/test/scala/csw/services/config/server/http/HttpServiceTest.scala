@@ -3,11 +3,10 @@ package csw.services.config.server.http
 import akka.stream.BindFailedException
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.config.server.ServerWiring
-import csw.services.config.server.commons.{ConfigServiceConnection, RegistrationFactory}
 import csw.services.config.server.commons.TestFutureExtension.RichFuture
+import csw.services.config.server.commons.{ConfigServiceConnection, RegistrationFactory}
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.location.exceptions.OtherLocationIsRegistered
-import csw.services.location.internal.Networks
 import csw.services.location.scaladsl.LocationServiceFactory
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
@@ -22,7 +21,7 @@ class HttpServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
     val (binding, registrationResult) = httpService.registeredLazyBinding.await
     locationService.find(ConfigServiceConnection.value).await.get.connection shouldBe ConfigServiceConnection.value
 
-    binding.localAddress.getAddress.getHostAddress shouldBe new Networks().hostname()
+    binding.localAddress.getAddress.getHostAddress shouldBe ClusterAwareSettings.hostname
     registrationResult.location.connection shouldBe ConfigServiceConnection.value
     actorRuntime.shutdown(TestFinishedReason).await
   }

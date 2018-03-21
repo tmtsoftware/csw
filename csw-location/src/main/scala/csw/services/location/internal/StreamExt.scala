@@ -3,7 +3,7 @@ package csw.services.location.internal
 import akka.stream.scaladsl.{Keep, Source}
 import akka.stream.{KillSwitch, KillSwitches}
 
-object StreamExt {
+private[location] object StreamExt {
 
   /**
    * RichSource adds extra features on akka streams

@@ -14,7 +14,7 @@ import csw.services.logging.scaladsl.Logger
  *
  * @param locationService is used to unregister Actors that are no more alive
  */
-class DeathwatchActor private[location] (locationService: LocationService) {
+private[location] class DeathwatchActor(locationService: LocationService) {
   import DeathwatchActor.Msg
 
   /**

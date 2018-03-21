@@ -16,7 +16,7 @@ import scala.concurrent.duration.DurationDouble
  * @tparam K the type of distributed data key
  * @tparam V the type of ReplicatedData
  */
-class Registry[K <: Key[V], V <: ReplicatedData] private[location] (val Key: K, val EmptyValue: V) {
+private[location] class Registry[K <: Key[V], V <: ReplicatedData](val Key: K, val EmptyValue: V) {
 
   type Value = V
 

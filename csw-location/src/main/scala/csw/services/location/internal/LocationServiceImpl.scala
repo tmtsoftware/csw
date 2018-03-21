@@ -27,7 +27,7 @@ import scala.async.Async._
 import scala.concurrent.Future
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 
-class LocationServiceImpl private[location] (cswCluster: CswCluster) extends LocationService {
+private[location] class LocationServiceImpl(cswCluster: CswCluster) extends LocationService {
   outer ⇒
 
   private val log: Logger = LocationServiceLogger.getLogger

@@ -7,14 +7,14 @@ import csw.services.logging.scaladsl.Logger
 
 import scala.collection.JavaConverters._
 
-case class NetworkInterfaceNotFound(message: String) extends Exception(message)
+private[location] case class NetworkInterfaceNotFound(message: String) extends Exception(message)
 
 /**
  * Picks an appropriate ipv4 address to register using the NetworkInterfaceProvider
  *
  * @param interfaceName provide the name of network interface where csw cluster is running
  */
-class Networks private[location] (interfaceName: String, networkProvider: NetworkInterfaceProvider) {
+private[location] class Networks(interfaceName: String, networkProvider: NetworkInterfaceProvider) {
 
   /**
    * Picks an appropriate ipv4 address from the network interface provided
