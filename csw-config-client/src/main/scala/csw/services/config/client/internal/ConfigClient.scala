@@ -26,7 +26,7 @@ import scala.concurrent.Future
  * @param configServiceResolver ConfigServiceResolver to get the uri of Configuration Service
  * @param actorRuntime ActorRuntime instance for actor system, execution context and dispatcher
  */
-class ConfigClient private[config] (configServiceResolver: ConfigServiceResolver, actorRuntime: ActorRuntime)
+private[config] class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: ActorRuntime)
     extends ConfigService {
 
   private val log: Logger = ConfigClientLogger.getLogger

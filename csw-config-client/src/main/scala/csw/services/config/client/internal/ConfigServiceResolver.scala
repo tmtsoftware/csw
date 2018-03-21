@@ -15,7 +15,7 @@ import scala.concurrent.duration.DurationDouble
  * @param actorRuntime ActorRuntime provides the execution context for doing the job of asynchronously resolving config
  *                     server from location service
  */
-class ConfigServiceResolver(locationService: LocationService, actorRuntime: ActorRuntime) {
+private[config] class ConfigServiceResolver(locationService: LocationService, actorRuntime: ActorRuntime) {
   import actorRuntime.ec
 
   /**
