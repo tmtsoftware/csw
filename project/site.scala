@@ -11,6 +11,7 @@ object UnidocSite extends AutoPlugin {
   override def requires: Plugins = ScalaUnidocPlugin && JavaUnidocPlugin
 
   def excludeJavadoc: Set[String] = Set("internal", "scaladsl", "csw_protobuf")
+  def excludeScaladoc: String     = Seq("csw_protobuf", "akka").mkString(":")
 
   override def projectSettings: Seq[Setting[_]] = Seq(
     siteSubdirName in ScalaUnidoc := "/api/scala",
@@ -18,6 +19,7 @@ object UnidocSite extends AutoPlugin {
     siteSubdirName in JavaUnidoc := "/api/java",
     filterNotSources(sources in (JavaUnidoc, unidoc), excludeJavadoc),
     addMappingsToSiteDir(mappings in (JavaUnidoc, packageDoc), siteSubdirName in JavaUnidoc),
+    scalacOptions in (ScalaUnidoc, unidoc) ++= Seq("-skip-packages", excludeScaladoc),
     autoAPIMappings := true
   )
 
