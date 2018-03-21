@@ -41,9 +41,28 @@ package csw
  * === Location and Framework ===
  *
  * These packages contain reusable classes, traits and models. We are keeping all the models which are getting transferred over the wire and
- * requires serialization in `csw-messages` project. All the models are marked with [[csw.messages.TMTSerializable]].
+ * requires serialization and deserialization in `csw-messages` project. All the models are marked with [[csw.messages.TMTSerializable]].
+ * [[csw.messages.TMTSerializable]] is a marker trait which extends [[Serializable]]. This is configured to use `kryo` serialization.
  * Also these models are being shared between multiple projects. `csw-location`, `csw-framework` and `csw-logging` depends on `csw-messages` project
  * which uses these models.
+ *
+ * Location Service uses [[csw.messages.location.Connection]] model to register component/container of type:
+ *   - [[csw.messages.location.ComponentType.Assembly]]
+ *   - [[csw.messages.location.ComponentType.HCD]]
+ *   - [[csw.messages.location.ComponentType.Service]]
+ *   - [[csw.messages.location.ComponentType.Container]]
+ *
+ * When you resolve/find a [[csw.messages.location.Connection]], you get [[csw.messages.location.Location]] in return which can be one of below type:
+ *   - [[csw.messages.location.AkkaLocation]]
+ *   - [[csw.messages.location.TcpLocation]]
+ *   - [[csw.messages.location.HttpLocation]]
+ *
+ * Framework package contains following actor messages:
+ *  - Messages of type [[csw.messages.framework.PubSub]] are supported by PubSubActor
+ *  - Below Lifecycle messages can be sent to component when component is in [[csw.messages.framework.SupervisorLifecycleState.Running]] state,
+ *  note that these messages should be wrapped inside [[csw.messages.scaladsl.RunningMessage.Lifecycle]] before sending it to Supervisor actor.
+ *   - [[csw.messages.framework.ToComponentLifecycleMessages.GoOnline]]
+ *   - [[csw.messages.framework.ToComponentLifecycleMessages.GoOffline]]
  *
  * === Params ===
  *
