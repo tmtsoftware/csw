@@ -30,16 +30,11 @@ sealed abstract class Location extends TMTSerializable {
   def logAdminActorRef: ActorRef[Nothing]
 }
 
-//*************** IMPORTANT ***********************
-//Do not directly access actorRef from constructor,
-//Use one of component(), jComponent() or containerRef() method to get the wrapped component
-//and then use wrappedComponent.ref to get correct actor reference.
-//*************************************************
 /**
  * Represents a live Akka connection of an Actor
  *
- * @note Do not directly access actorRef from constructor, sse one of component(), jComponent() or containerRef() method
- *       to get the wrapped component and then use wrappedComponent.ref to get correct actor reference.
+ * @note Do not directly access actorRef from constructor, use one of component() or containerRef() method
+ *       to get the correctly typed actor reference.
  * @param connection represents a connection based on a componentId and the type of connection offered by the component
  * @param maybePrefix an optional prefix of the component. In case of container this option remains none.
  * @param uri represents the URI of the component. URI is not significant for AkkaLocation as actorRef serves the purpose
