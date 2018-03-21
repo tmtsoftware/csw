@@ -2,7 +2,8 @@ package csw.services.logging.compat
 
 import akka.actor.Actor
 import akka.event.Logging._
-import csw.services.logging.internal.{LogAkka, MessageHandler}
+import csw.services.logging.internal.LogActorMessages.LogAkka
+import csw.services.logging.internal.MessageHandler
 
 /**
  * This actor is wired up as akka logger in `logging.conf`. The instance of this actor is created via reflection. When log

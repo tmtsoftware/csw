@@ -10,7 +10,7 @@ import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConn
 import csw.messages.location._
 import csw.services.location.commons.LocationServiceLogger
 import csw.services.location.exceptions.LocalAkkaActorRegistrationNotAllowed
-import csw.services.logging.internal.LogControlMessages
+import csw.services.logging.messages.LogControlMessages
 import csw.services.logging.scaladsl.Logger
 
 /**

@@ -1,4 +1,4 @@
-package csw.services.logging.internal
+package csw.services.logging.messages
 
 import akka.actor.typed.ActorRef
 import csw.messages.TMTSerializable

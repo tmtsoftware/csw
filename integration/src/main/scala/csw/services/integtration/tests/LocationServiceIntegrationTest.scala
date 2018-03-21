@@ -19,7 +19,7 @@ import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.exceptions.OtherLocationIsRegistered
 import csw.services.location.models._
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
-import csw.services.logging.internal.LogControlMessages
+import csw.services.logging.messages.LogControlMessages
 import org.scalatest._
 
 import scala.concurrent.Await

@@ -9,6 +9,7 @@ import com.persist.JsonOps._
 import csw.services.logging._
 import csw.services.logging.appenders.LogAppender
 import csw.services.logging.commons.{Category, LoggingKeys, TMTDateTimeFormatter}
+import csw.services.logging.internal.LogActorMessages._
 import csw.services.logging.internal.LoggingLevels.Level
 import csw.services.logging.macros.DefaultSourceLocation
 import csw.services.logging.scaladsl.{RequestId, RichException}

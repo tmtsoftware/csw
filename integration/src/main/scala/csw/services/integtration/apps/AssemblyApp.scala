@@ -11,7 +11,7 @@ import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.commons.{ActorSystemFactory, ClusterSettings, CswCluster}
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
 import csw.services.location.scaladsl.LocationServiceFactory
-import csw.services.logging.internal.LogControlMessages
+import csw.services.logging.messages.LogControlMessages
 
 object AssemblyApp {
   private val cswCluster = CswCluster.withSettings(ClusterSettings().withInterface("eth1"))

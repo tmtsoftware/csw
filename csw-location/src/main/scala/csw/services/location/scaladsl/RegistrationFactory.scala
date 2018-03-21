@@ -3,7 +3,7 @@ package csw.services.location.scaladsl
 import akka.actor.typed.ActorRef
 import csw.messages.location.Connection.AkkaConnection
 import csw.services.location.models.AkkaRegistration
-import csw.services.logging.internal.LogControlMessages
+import csw.services.logging.messages.LogControlMessages
 
 /**
  * `RegistrationFactory` helps creating an AkkaRegistration with the provided `logAdminActorRef`. It is currently used by

@@ -10,6 +10,7 @@ import csw.services.logging.RichMsg
 import csw.services.logging.appenders.LogAppenderBuilder
 import csw.services.logging.commons.{Constants, LoggingKeys}
 import csw.services.logging.exceptions.AppenderNotFoundException
+import csw.services.logging.internal.LogActorMessages._
 import csw.services.logging.internal.TimeActorMessages.TimeDone
 import csw.services.logging.macros.DefaultSourceLocation
 import csw.services.logging.models.LogMetadata
@@ -31,7 +32,7 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
  * @param host host name (to log).
  * @param system an ActorSystem used to create log actors
  */
-class LoggingSystem private[csw] (name: String, version: String, host: String, val system: ActorSystem) {
+private[csw] class LoggingSystem(name: String, version: String, host: String, val system: ActorSystem) {
 
   import LoggingLevels._
 

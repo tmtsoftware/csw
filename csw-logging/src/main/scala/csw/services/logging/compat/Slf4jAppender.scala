@@ -2,7 +2,8 @@ package csw.services.logging.compat
 
 import ch.qos.logback.core.spi.AppenderAttachable
 import ch.qos.logback.core.{Appender, UnsynchronizedAppenderBase}
-import csw.services.logging.internal.{LogSlf4j, MessageHandler}
+import csw.services.logging.internal.LogActorMessages.LogSlf4j
+import csw.services.logging.internal.MessageHandler
 import csw.services.logging.macros.DefaultSourceLocation
 import csw.services.logging.noException
 import csw.services.logging.scaladsl.{GenericLoggerFactory, Logger}

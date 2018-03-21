@@ -15,7 +15,8 @@ import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.models._
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory, RegistrationFactory}
 import csw.services.logging.commons.LogAdminActorFactory
-import csw.services.logging.internal.{LogControlMessages, LoggingSystem}
+import csw.services.logging.internal.LoggingSystem
+import csw.services.logging.messages.LogControlMessages
 import csw.services.logging.scaladsl._
 
 import scala.async.Async._

@@ -12,7 +12,7 @@ import csw.messages.location.{ComponentId, ComponentType}
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
-import csw.services.logging.internal.LogControlMessages
+import csw.services.logging.messages.LogControlMessages
 import csw.services.logging.scaladsl.{Logger, LoggerFactory, LoggingSystemFactory}
 
 import scala.concurrent.duration._

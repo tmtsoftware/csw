@@ -26,7 +26,7 @@ import csw.services.location.models.AkkaRegistration;
 import csw.services.location.models.HttpRegistration;
 import csw.services.location.scaladsl.RegistrationFactory;
 import csw.services.logging.commons.LogAdminActorFactory;
-import csw.services.logging.internal.LogControlMessages;
+import csw.services.logging.messages.LogControlMessages;
 import csw.services.logging.internal.LoggingSystem;
 import csw.services.logging.javadsl.ILogger;
 import csw.services.logging.javadsl.JKeys;

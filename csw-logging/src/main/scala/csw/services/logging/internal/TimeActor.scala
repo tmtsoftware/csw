@@ -13,7 +13,7 @@ import scala.concurrent.Promise
  *
  * @param tdone a promise to let the caller know when this actors responsibility is done
  */
-class TimeActor private[logging] (tdone: Promise[Unit]) extends Actor {
+private[logging] class TimeActor(tdone: Promise[Unit]) extends Actor {
 
   private val log: Logger = GenericLoggerFactory.getLogger(context)
 

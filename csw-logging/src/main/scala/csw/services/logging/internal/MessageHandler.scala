@@ -1,7 +1,8 @@
 package csw.services.logging.internal
 
-import TimeActorMessages.{TimeEnd, TimeStart}
+import csw.services.logging.internal.LogActorMessages.LogAkka
 import csw.services.logging.internal.LoggingState._
+import csw.services.logging.internal.TimeActorMessages.{TimeEnd, TimeStart}
 import csw.services.logging.scaladsl.RequestId
 
 /**
