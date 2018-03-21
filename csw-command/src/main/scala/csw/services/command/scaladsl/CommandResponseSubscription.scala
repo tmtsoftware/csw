@@ -1,4 +1,4 @@
-package csw.services.command.internal
+package csw.services.command.scaladsl
 
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.adapter._

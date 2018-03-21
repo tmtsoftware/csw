@@ -13,7 +13,6 @@ import csw.messages.commands.CommandResponse
 import csw.messages.params.models.Id
 import csw.messages.scaladsl.CommandResponseManagerMessage
 import csw.messages.scaladsl.CommandResponseManagerMessage.{AddOrUpdateCommand, AddSubCommand, Query, UpdateSubCommand}
-import csw.services.command.internal.CommandResponseSubscription
 
 import scala.compat.java8.FunctionConverters.enrichAsScalaFromConsumer
 import scala.compat.java8.FutureConverters._
@@ -84,7 +83,7 @@ class CommandResponseManager private[command] (val commandResponseManagerActor: 
    *
    * @param runId command identifier of command
    * @param callback callback  to take action on the command response received
-   * @return a [[csw.services.command.internal.CommandResponseSubscription]] to unsubscribe the subscription later
+   * @return a [[csw.services.command.scaladsl.CommandResponseSubscription]] to unsubscribe the subscription later
    */
   def subscribe(runId: Id, callback: CommandResponse ⇒ Unit): CommandResponseSubscription =
     new CommandResponseSubscription(runId, commandResponseManagerActor, callback)

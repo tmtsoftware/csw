@@ -17,7 +17,6 @@ import csw.messages.params.models.Id
 import csw.messages.params.states.CurrentState
 import csw.messages.scaladsl.CommandMessage.{Oneway, Submit}
 import csw.messages.scaladsl.{CommandResponseManagerMessage, ComponentMessage}
-import csw.services.command.internal.CurrentStateSubscription
 
 import scala.concurrent.{ExecutionContext, Future}
 

@@ -15,8 +15,7 @@ import csw.messages.commands.{CommandResponse, ControlCommand}
 import csw.messages.location.AkkaLocation
 import csw.messages.params.models.Id
 import csw.messages.params.states.CurrentState
-import csw.services.command.internal.CurrentStateSubscription
-import csw.services.command.scaladsl.CommandService
+import csw.services.command.scaladsl.{CommandService, CurrentStateSubscription}
 
 import scala.collection.JavaConverters.iterableAsScalaIterableConverter
 import scala.compat.java8.FunctionConverters.enrichAsScalaFromConsumer
