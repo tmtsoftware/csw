@@ -3,7 +3,8 @@
 The Location Service handles component (i.e., Applications, Sequencers, Assemblies, HCDs, and Services) registration 
 and discovery in the distributed TMT software system.  
 
-TODO Link to detailed design (e.g. what is seed?)
+CSW Location Service cluster seed must be running, and appropriate environment variables set to run apps.
+See https://tmtsoftware.github.io/csw-prod/apps/cswclusterseed.html.
 
 A component’s location information can be used by other components and services to connect to it and use it. 
 An example of location information is:

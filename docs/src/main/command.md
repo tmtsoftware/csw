@@ -5,7 +5,7 @@
 This section describes how to communicate with any other component using commands. To check how to manage commands
 received, please visit @ref:[Managing Command State](framework/managing-command-state.md)
 
-## Artifacts
+## Dependencies
 
 sbt
 :   @@@vars
@@ -14,27 +14,6 @@ sbt
     ```
     @@@
 
-maven
-:   @@@vars
-    ```xml
-    <dependency>
-     <groupId>org.tmt</groupId>
-     <artifactId>csw-command_$scala.binaryVersion$</artifactId>
-     <version>$version$</version>
-     <type>pom</type>
-    </dependency>
-    ```
-    @@@
-
-gradle
-:   @@@vars
-    ```gradle
-    dependencies {
-      compile group: "org.tmt", name: "csw-command_$scala.binaryVersion$", version: "$version$"
-    }
-    ```
-    @@@
-    
 ## Command based communication between components
 
 A component can send @ref:[Commands](services/messages/commands.md) to other components. The commands can be sent as following 
