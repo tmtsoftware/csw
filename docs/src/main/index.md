@@ -1,14 +1,14 @@
 # TMT Common Software (CSW)
 
 @@@ index
- - [CSW Overview](cswOverview.md)
- - [Getting Started](gettingStarted.md)
- - [Creating a Component](createComponent.md)
- - [Working with Multiple Components](multipleComponents.md)
+ - [CSW Overview](csw-overview.md)
+ - [Getting Started](getting-started.md)
+ - [Creating a Component](create-component.md)
+ - [Working with Multiple Components](multiple-components.md)
  - [Framework](framework.md)
  - [Services](services.md)
  - [Command](command.md)
- - [Creating Tests](creatingTests.md)
+ - [Creating Tests](creating-tests.md)
  - [Applications](apps.md)
  - [Manuals](manuals.md)
 @@@
