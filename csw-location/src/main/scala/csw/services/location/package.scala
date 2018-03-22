@@ -4,7 +4,7 @@ package csw.services
  * == Location Service ==
  *
  * The Location Service implemented in this project is based on CRDT (Conflict Free Replicated Data).
- * The Location Service helps you resolve the hostname and port number for a service which can be used for further communication,
+ * The Location Service helps you resolve the hostname and port number for a service which can be used for further communication.
  * In case of Akka connection, It helps you to resolve component reference with which you can send messages
  * as well as other information for example, logAdminActorRef which is used to dynamically change the log level of component.
  *
