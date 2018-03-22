@@ -30,7 +30,7 @@ It is not necessary to have name of the application as ContainerCmdApp/JContaine
 
 Starting a **standalone** component from a **local** configuration file
 
-    `./container-cmd-app standalone local /assembly/config/assembly.conf`
+    `./container-cmd-app --standalone --local /assembly/config/assembly.conf`
     
 Starting a **container** component from a configuration file available in **configuration service**
 
