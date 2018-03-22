@@ -14,33 +14,14 @@ Component developers can use the csw-config-client library in their code.
 The library wraps the low level communication with ConfigServer and exposes simple to use methods to access and 
 manage configuration files.
 
-## Artifacts
+## Dependencies
+
+To use the Configuration service without using the framework, add this to your `build.sbt` file:
 
 sbt
 :   @@@vars
     ```scala
     libraryDependencies += "org.tmt" %% "csw-config-client" % "$version$"
-    ```
-    @@@
-
-maven
-:   @@@vars
-    ```xml
-    <dependency>
-     <groupId>org.tmt</groupId>
-     <artifactId>csw-config-client_$scala.binaryVersion$</artifactId>
-     <version>$version$</version>
-     <type>pom</type>
-    </dependency>
-    ```
-    @@@
-
-gradle
-:   @@@vars
-    ```gradle
-    dependencies {
-      compile group: "org.tmt", name: "csw-config-client_$scala.binaryVersion$", version: "$version$"
-    }
     ```
     @@@
 

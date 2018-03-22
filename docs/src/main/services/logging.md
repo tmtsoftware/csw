@@ -2,33 +2,14 @@
 
 Logging Service library provides an advanced logging facility for csw components and services. 
     
-## Artifacts
+## Dependencies
+
+To use the Logging service without using the framework, add this to your `build.sbt` file:
 
 sbt
 :   @@@vars
     ```scala
     libraryDependencies += "org.tmt" %% "csw-logging" % "$version$"
-    ```
-    @@@
-
-maven
-:   @@@vars
-    ```xml
-    <dependency>
-     <groupId>org.tmt</groupId>
-     <artifactId>csw-logging_$scala.binaryVersion$</artifactId>
-     <version>$version$</version>
-     <type>pom</type>
-    </dependency>
-    ```
-    @@@
-
-gradle
-:   @@@vars
-    ```gradle
-    dependencies {
-      compile group: "org.tmt", name: "csw-logging_$scala.binaryVersion$", version: "$version$"
-    }
     ```
     @@@
     

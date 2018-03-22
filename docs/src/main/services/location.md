@@ -1,7 +1,4 @@
-
-# Location Service
-
-## Overview
+# Location service
 
 The Location Service handles component (i.e., Applications, Sequencers, Assemblies, HCDs, and Services) registration 
 and discovery in the distributed TMT software system.  
@@ -26,13 +23,17 @@ An example of location information is:
  * **Java blocking example:** The code snippets use `CompletableFuture` using `get` blocking call. This style blocks the calling thread till the Future is complete.
     
 @@@
+
 ## Dependencies
 
-To use the Location Service without using the framework, add this to your `build.sbt` file:
+To use the Location service without using the framework, add this to your `build.sbt` file:
 
-```
+sbt
+:   @@@vars
+    ```scala
     libraryDependencies += "org.tmt" %% "csw-location" % "$version$"
-```
+    ```
+    @@@
 
 
 ## Create LocationService
