@@ -6,20 +6,43 @@ import enumeratum.{Enum, EnumEntry, PlayJsonEnum}
 import scala.collection.immutable
 
 /**
- * Describes how a component uses the location service
+ * Describes what action to take for a component on its boot-up regarding its registration with location service. This information
+ * is read from the config file for the component and used by `csw-framework` while spawning it.
  */
-//TODO: add doc for significance of LocationServiceUsage
 sealed abstract class LocationServiceUsage extends EnumEntry with TMTSerializable
 
 object LocationServiceUsage extends Enum[LocationServiceUsage] with PlayJsonEnum[LocationServiceUsage] {
 
   override def values: immutable.IndexedSeq[LocationServiceUsage] = findValues
 
-  case object DoNotRegister            extends LocationServiceUsage
-  case object RegisterOnly             extends LocationServiceUsage
+  /**
+   * Represents the action to skip registration with location service
+   */
+  case object DoNotRegister extends LocationServiceUsage
+
+  /**
+   * Represents the action to register with location service. Mostly this is used by HCDs.
+   */
+  case object RegisterOnly extends LocationServiceUsage
+
+  /**
+   * Represents the action to register with location service and track other components. Mostly this is used by
+   * Sequencers and Assemblies.
+   */
   case object RegisterAndTrackServices extends LocationServiceUsage
 
-  val JDoNotRegister: LocationServiceUsage            = DoNotRegister
-  val JRegisterOnly: LocationServiceUsage             = RegisterOnly
+  /**
+   * A Java helper representing DoNotRegister action
+   */
+  val JDoNotRegister: LocationServiceUsage = DoNotRegister
+
+  /**
+   * A Java helper representing RegisterOnly action
+   */
+  val JRegisterOnly: LocationServiceUsage = RegisterOnly
+
+  /**
+   * A Java helper representing RegisterAndTrackServices action
+   */
   val JRegisterAndTrackServices: LocationServiceUsage = RegisterAndTrackServices
 }

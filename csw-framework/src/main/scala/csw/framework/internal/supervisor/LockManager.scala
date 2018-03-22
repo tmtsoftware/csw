@@ -1,16 +1,15 @@
 package csw.framework.internal.supervisor
 
-import akka.typed.ActorRef
-import csw.messages.CommandMessage
-import csw.messages.ccs.CommandIssue.ComponentLockedIssue
-import csw.messages.ccs.commands.CommandResponse.NotAllowed
-import csw.messages.models.LockingResponse
-import csw.messages.models.LockingResponses._
+import akka.actor.typed.ActorRef
+import csw.messages.commands.CommandIssue.ComponentLockedIssue
+import csw.messages.commands.CommandResponse.NotAllowed
+import csw.messages.framework.LockingResponse
+import csw.messages.framework.LockingResponses._
 import csw.messages.params.models.Prefix
+import csw.messages.scaladsl.CommandMessage
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
-//TODO: add doc for significance
-class LockManager private[framework] (val lockPrefix: Option[Prefix], loggerFactory: LoggerFactory) {
+private[framework] class LockManager(val lockPrefix: Option[Prefix], loggerFactory: LoggerFactory) {
   private val log: Logger = loggerFactory.getLogger
 
   def lockComponent(source: Prefix, replyTo: ActorRef[LockingResponse])(startTimer: ⇒ Unit): LockManager = lockPrefix match {

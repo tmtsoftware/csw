@@ -4,7 +4,7 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
 import csw.apps.clusterseed.admin.internal.{ActorRuntime, Settings}
 import csw.apps.clusterseed.commons.ClusterSeedLogger
-import csw.messages.models.CoordinatedShutdownReasons.FailureReason
+import csw.messages.commons.CoordinatedShutdownReasons.FailureReason
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.logging.scaladsl.Logger
 
@@ -13,9 +13,8 @@ import scala.concurrent.Future
 import scala.util.control.NonFatal
 
 /**
- * Initialise AdminServer
+ * Start AdminServer on a given port which is responsible for handling log level change/get requests
  */
-//TODO: add doc to explain significance
 class AdminHttpService(adminRoutes: AdminRoutes, actorRuntime: ActorRuntime, settings: Settings) {
   private val log: Logger = ClusterSeedLogger.getLogger
 
@@ -34,6 +33,6 @@ class AdminHttpService(adminRoutes: AdminRoutes, actorRuntime: ActorRuntime, set
   private def bind() = Http().bindAndHandle(
     handler = adminRoutes.route,
     interface = ClusterAwareSettings.hostname,
-    port = settings.`admin-port`
+    port = settings.adminPort
   )
 }

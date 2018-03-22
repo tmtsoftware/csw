@@ -2,7 +2,9 @@ package csw.messages.javadsl;
 
 import csw.messages.params.models.Subsystem;
 
-//TODO: explain better significance
+/**
+ * Helper class for Java to get handle of TMT subsystem
+ */
 @SuppressWarnings("unused")
 public class JSubsystem {
 

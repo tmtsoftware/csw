@@ -1,12 +1,12 @@
 package csw.messages.params;
 
-import akka.typed.Behavior;
-import akka.typed.javadsl.Actor;
-import csw.messages.ccs.commands.Observe;
-import csw.messages.ccs.commands.Setup;
-import csw.messages.ccs.commands.Wait;
-import csw.messages.ccs.events.EventName;
-import csw.messages.ccs.events.SystemEvent;
+import akka.actor.typed.Behavior;
+import akka.actor.typed.javadsl.Behaviors;
+import csw.messages.commands.Observe;
+import csw.messages.commands.Setup;
+import csw.messages.commands.Wait;
+import csw.messages.events.EventName;
+import csw.messages.events.SystemEvent;
 import csw.messages.params.generics.JKeyTypes;
 import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;
@@ -30,25 +30,25 @@ public abstract class JavaCommandHandler {
     }
 
     public static Behavior<CommandMsg> behavior() {
-        return Actor.immutable(CommandMsg.class)
+        return Behaviors.immutable(CommandMsg.class)
                 .onMessage(CommandMsg.class, msg -> msg.command().getClass().isAssignableFrom(Setup.class),(ctx, msg) -> {
                     Set<Parameter<?>> jParamSet = ((Setup) msg.command()).jParamSet();
                     msg.ackTo().tell(jParamSet);
                     msg.replyTo().tell(systemEvent);
                     msg.obsIdAck().tell(msg.command().jMaybeObsId());
-                    return Actor.same();
+                    return Behaviors.same();
                 })
                 .onMessage(CommandMsg.class, msg -> msg.command().getClass().isAssignableFrom(Wait.class),(ctx, msg) -> {
                     Set<Parameter<?>> jParamSet = ((Setup) msg.command()).jParamSet();
                     msg.ackTo().tell(jParamSet);
                     msg.obsIdAck().tell(msg.command().jMaybeObsId());
-                    return Actor.same();
+                    return Behaviors.same();
                 })
                 .onMessage(CommandMsg.class, msg -> msg.command().getClass().isAssignableFrom(Observe.class),(ctx, msg) -> {
                     Set<Parameter<?>> jParamSet = ((Setup) msg.command()).jParamSet();
                     msg.ackTo().tell(jParamSet);
                     msg.obsIdAck().tell(msg.command().jMaybeObsId());
-                    return Actor.same();
+                    return Behaviors.same();
                 })
                 .build();
     }

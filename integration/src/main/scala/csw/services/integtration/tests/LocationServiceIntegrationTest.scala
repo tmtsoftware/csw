@@ -1,17 +1,17 @@
 package csw.services.integtration.tests
 
 import akka.actor.{ActorSystem, Props, Scheduler}
-import akka.typed
-import akka.typed.Behavior
-import akka.typed.scaladsl.adapter._
-import akka.typed.testkit.TestKitSettings
-import akka.typed.testkit.scaladsl.TestProbe
+import akka.actor.typed
+import akka.actor.typed.Behavior
+import akka.actor.typed.scaladsl.adapter._
+import akka.testkit.typed.TestKitSettings
+import akka.testkit.typed.scaladsl.TestProbe
 import akka.util.Timeout
-import csw.messages.CommandMessage.Submit
-import csw.messages.ccs.commands.{CommandName, Setup}
+import csw.messages.scaladsl.CommandMessage.Submit
+import csw.messages.commands.{CommandName, Setup}
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
 import csw.messages.location.{AkkaLocation, ComponentId, ComponentType, HttpLocation}
-import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
+import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.params.models.Prefix
 import csw.services.integtration.apps.TromboneHCD
 import csw.services.integtration.common.TestFutureExtension.RichFuture
@@ -19,7 +19,7 @@ import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.exceptions.OtherLocationIsRegistered
 import csw.services.location.models._
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
-import csw.services.logging.internal.LogControlMessages
+import csw.services.logging.messages.LogControlMessages
 import org.scalatest._
 
 import scala.concurrent.Await

@@ -4,8 +4,8 @@ import java.net.URI
 
 import akka.actor.{ActorPath, ActorSystem}
 import akka.serialization.Serialization
-import akka.typed.Behavior
-import akka.typed.scaladsl.adapter.{TypedActorRefOps, UntypedActorSystemOps}
+import akka.actor.typed.Behavior
+import akka.actor.typed.scaladsl.adapter.{TypedActorRefOps, UntypedActorSystemOps}
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location._

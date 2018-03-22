@@ -1,6 +1,6 @@
 package tmt.shared.services
 
-import akka.typed.ActorSystem
+import akka.actor.typed.ActorSystem
 
 import scala.concurrent.{ExecutionContext, Future}
 

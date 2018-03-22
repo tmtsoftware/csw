@@ -3,34 +3,33 @@ package csw.framework.command;
 import akka.actor.ActorSystem;
 import akka.stream.ActorMaterializer;
 import akka.stream.Materializer;
-import akka.typed.internal.adapter.ActorSystemAdapter;
-import akka.typed.testkit.TestKitSettings;
-import akka.typed.testkit.javadsl.TestProbe;
+import akka.actor.typed.internal.adapter.ActorSystemAdapter;
+import akka.testkit.typed.javadsl.TestProbe;
 import akka.util.Timeout;
 import com.typesafe.config.ConfigFactory;
 import csw.common.components.framework.SampleComponentState;
 import csw.framework.internal.wiring.FrameworkWiring;
 import csw.framework.internal.wiring.Standalone;
-import csw.messages.SupervisorLockMessage;
-import csw.messages.ccs.CommandIssue;
-import csw.messages.ccs.commands.CommandResponse;
-import csw.messages.ccs.commands.CommandResponse.Completed;
-import csw.messages.ccs.commands.ControlCommand;
-import csw.messages.ccs.commands.Setup;
-import csw.messages.ccs.commands.matchers.*;
+import csw.messages.scaladsl.SupervisorLockMessage;
+import csw.messages.commands.CommandIssue;
+import csw.messages.commands.CommandResponse;
+import csw.messages.commands.CommandResponse.Completed;
+import csw.messages.commands.ControlCommand;
+import csw.messages.commands.Setup;
+import csw.messages.commands.matchers.*;
+import csw.messages.commons.CoordinatedShutdownReasons;
+import csw.messages.framework.LockingResponse;
+import csw.messages.framework.LockingResponses;
 import csw.messages.location.AkkaLocation;
 import csw.messages.location.ComponentId;
-import csw.messages.models.CoordinatedShutdownReasons;
-import csw.messages.models.LockingResponse;
-import csw.messages.models.LockingResponses;
 import csw.messages.params.generics.JKeyTypes;
 import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.states.CurrentState;
 import csw.messages.params.states.DemandState;
-import csw.services.ccs.internal.CurrentStateSubscription;
-import csw.services.ccs.javadsl.JCommandDistributor;
-import csw.services.ccs.javadsl.JCommandService;
+import csw.services.command.scaladsl.CurrentStateSubscription;
+import csw.services.command.javadsl.JCommandDistributor;
+import csw.services.command.javadsl.JCommandService;
 import csw.services.location.commons.ClusterAwareSettings;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.location.javadsl.JLocationServiceFactory;
@@ -73,7 +72,7 @@ public class JCommandIntegrationTest {
     @BeforeClass
     public static void setup() throws Exception {
         hcdLocation = getLocation();
-        hcdCmdService = new JCommandService(hcdLocation, akka.typed.ActorSystem.wrap(hcdActorSystem));
+        hcdCmdService = new JCommandService(hcdLocation, akka.actor.typed.ActorSystem.wrap(hcdActorSystem));
     }
 
     @AfterClass
@@ -202,12 +201,29 @@ public class JCommandIntegrationTest {
                 .thenAccept(initialCommandResponse -> {
                     if (initialCommandResponse instanceof CommandResponse.Accepted) {
                         //do something
+                    } else if (initialCommandResponse instanceof CommandResponse.Invalid) {
+                        //do something
                     } else {
                         //do something
                     }
                 });
 
         //#oneway
+
+        //#submit
+        CompletableFuture submitCommandResponseF = hcdCmdService
+                .oneway(setup, timeout)
+                .thenAccept(initialCommandResponse -> {
+                    if (initialCommandResponse instanceof CommandResponse.Accepted) {
+                        //do something
+                    } else if (initialCommandResponse instanceof CommandResponse.Invalid) {
+                        //do something
+                    } else {
+                        //do something
+                    }
+                });
+
+        //#submit
 
         //#onewayAndMatch
 
@@ -232,14 +248,13 @@ public class JCommandIntegrationTest {
     @Test
     public void testSupervisorLock() throws ExecutionException, InterruptedException {
         // Lock scenarios
-        akka.typed.ActorSystem<?> typedSystem = ActorSystemAdapter.apply(hcdActorSystem);
-        TestKitSettings settings = new TestKitSettings(hcdActorSystem.settings().config());
-        TestProbe<LockingResponse> probe = new TestProbe<>(typedSystem, settings);
+        akka.actor.typed.ActorSystem<?> typedSystem = ActorSystemAdapter.apply(hcdActorSystem);
+        TestProbe<LockingResponse> probe = TestProbe.create(typedSystem);
         FiniteDuration duration = new FiniteDuration(5, TimeUnit.SECONDS);
 
         // Lock component
         hcdLocation.componentRef().tell(new SupervisorLockMessage.Lock(prefix(), probe.ref(), duration));
-        probe.expectMsg(LockingResponses.lockAcquired());
+        probe.expectMessage(LockingResponses.lockAcquired());
 
         Key<Integer> intKey2 = JKeyTypes.IntKey().make("encoder");
         Parameter<Integer> intParameter2 = intKey2.set(22, 23);
@@ -255,7 +270,7 @@ public class JCommandIntegrationTest {
 
         // Unlock component
         hcdLocation.componentRef().tell(new SupervisorLockMessage.Unlock(prefix(), probe.ref()));
-        probe.expectMsg(LockingResponses.lockReleased());
+        probe.expectMessage(LockingResponses.lockReleased());
 
         CompletableFuture<CommandResponse> cmdAfterUnlockResCompletableFuture = hcdCmdService.submit(imdSetupCommand, timeout);
         CommandResponse actualCmdResponseAfterUnlock = cmdAfterUnlockResCompletableFuture.get();
@@ -299,7 +314,7 @@ public class JCommandIntegrationTest {
         Key<Integer> intKey1 = JKeyTypes.IntKey().make("encoder");
         Parameter<Integer> intParameter1 = intKey1.set(22, 23);
         Setup failureResCommand1 = new Setup(prefix(), failureAfterValidationCmd(), Optional.empty()).add(intParameter1);
-        akka.typed.ActorSystem<?> typedSystem = ActorSystemAdapter.apply(hcdActorSystem);
+        akka.actor.typed.ActorSystem<?> typedSystem = ActorSystemAdapter.apply(hcdActorSystem);
 
         //#submitAndSubscribe
         CompletableFuture<CommandResponse> finalResponseCompletableFuture = hcdCmdService.submitAndSubscribe(failureResCommand1, timeout);
@@ -372,9 +387,8 @@ public class JCommandIntegrationTest {
         Parameter<Integer> intParameter1 = intKey1.set(22, 23);
         Setup setup = new Setup(prefix(), acceptedCmd(), Optional.empty()).add(intParameter1);
 
-        akka.typed.ActorSystem<?> typedSystem = ActorSystemAdapter.apply(hcdActorSystem);
-        TestKitSettings settings = new TestKitSettings(hcdActorSystem.settings().config());
-        TestProbe<CurrentState> probe = new TestProbe<>(typedSystem, settings);
+        akka.actor.typed.ActorSystem<?> typedSystem = ActorSystemAdapter.apply(hcdActorSystem);
+        TestProbe<CurrentState> probe = TestProbe.create(typedSystem);
 
         // DEOPSCSW-372: Provide an API for PubSubActor that hides actor based interaction
         //#subscribeCurrentState
@@ -390,14 +404,14 @@ public class JCommandIntegrationTest {
         CurrentState expectedSubmitCurrentState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.submitCommandChoice()));
         CurrentState expectedSetupCurrentState = currentState.madd(SampleComponentState.choiceKey().set(SampleComponentState.setupConfigChoice()), intParameter1);
 
-        probe.expectMsg(expectedValidationCurrentState);
-        probe.expectMsg(expectedSubmitCurrentState);
-        probe.expectMsg(expectedSetupCurrentState);
+        probe.expectMessage(expectedValidationCurrentState);
+        probe.expectMessage(expectedSubmitCurrentState);
+        probe.expectMessage(expectedSetupCurrentState);
 
         // unsubscribe and verify no messages received by probe
         subscription.unsubscribe();
 
         hcdCmdService.submit(setup, timeout);
-        probe.expectNoMsg(Duration.create(20, TimeUnit.MILLISECONDS));
+        probe.expectNoMessage(Duration.create(20, TimeUnit.MILLISECONDS));
     }
 }

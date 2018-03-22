@@ -4,7 +4,8 @@ import com.persist.JsonOps.JsonObject
 import csw.services.logging.RichMsg
 import csw.services.logging.appenders.LogAppender
 import csw.services.logging.commons.{Category, LoggingKeys, TMTDateTimeFormatter}
-import csw.services.logging.internal.{Log, LoggingLevels}
+import csw.services.logging.internal.LogActorMessages.Log
+import csw.services.logging.internal.LoggingLevels
 import csw.services.logging.macros.SourceLocation
 import csw.services.logging.scaladsl.noId
 

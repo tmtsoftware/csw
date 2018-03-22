@@ -1,19 +1,17 @@
 package csw.framework.internal.supervisor
 
-import akka.typed.scaladsl.Actor
-import akka.typed.{ActorRef, Behavior}
-import csw.framework.internal.pubsub.PubSubBehaviorFactory
+import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.{ActorRef, Behavior}
 import csw.framework.scaladsl.ComponentBehaviorFactory
 import csw.messages.framework.ComponentInfo
-import csw.messages.{ComponentMessage, ContainerIdleMessage, SupervisorMessage}
-import csw.services.ccs.internal.CommandResponseManagerFactory
+import csw.messages.scaladsl.{ComponentMessage, ContainerIdleMessage, SupervisorMessage}
+import csw.services.command.internal.CommandResponseManagerFactory
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.LoggerFactory
 
 /**
- * The factory for creating [[akka.typed.scaladsl.Actor.MutableBehavior]] of the supervisor of a component
+ * The factory for creating [[akka.actor.typed.scaladsl.Behaviors.MutableBehavior]] of the supervisor of a component
  */
-//TODO: add doc to explain significance of why we have multiple methods
 private[framework] object SupervisorBehaviorFactory {
 
   def make(
@@ -21,7 +19,6 @@ private[framework] object SupervisorBehaviorFactory {
       componentInfo: ComponentInfo,
       locationService: LocationService,
       registrationFactory: RegistrationFactory,
-      pubSubBehaviorFactory: PubSubBehaviorFactory,
       commandResponseManagerFactory: CommandResponseManagerFactory
   ): Behavior[ComponentMessage] = {
 
@@ -35,27 +32,26 @@ private[framework] object SupervisorBehaviorFactory {
       componentInfo,
       locationService,
       registrationFactory,
-      pubSubBehaviorFactory,
       componentBehaviorFactory,
       commandResponseManagerFactory,
       loggerFactory
     )
   }
 
+  // This method is used by test
   def make(
       containerRef: Option[ActorRef[ContainerIdleMessage]],
       componentInfo: ComponentInfo,
       locationService: LocationService,
       registrationFactory: RegistrationFactory,
-      pubSubBehaviorFactory: PubSubBehaviorFactory,
       componentBehaviorFactory: ComponentBehaviorFactory,
       commandResponseManagerFactory: CommandResponseManagerFactory,
       loggerFactory: LoggerFactory
   ): Behavior[ComponentMessage] = {
-    Actor
+    Behaviors
       .withTimers[SupervisorMessage](
         timerScheduler ⇒
-          Actor
+          Behaviors
             .mutable[SupervisorMessage](
               ctx =>
                 new SupervisorBehavior(
@@ -64,7 +60,6 @@ private[framework] object SupervisorBehaviorFactory {
                   containerRef,
                   componentInfo,
                   componentBehaviorFactory,
-                  pubSubBehaviorFactory,
                   commandResponseManagerFactory,
                   registrationFactory,
                   locationService,

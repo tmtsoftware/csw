@@ -11,12 +11,12 @@ import scala.concurrent.duration.DurationDouble
 /**
  * Registry is used to create distributed data and manage its update and get messages for replicator
  *
- * @param Key        The distributed data key
- * @param EmptyValue The default value of distributed data key
- * @tparam K The type of distributed data key
- * @tparam V The type of ReplicatedData
+ * @param Key the distributed data key
+ * @param EmptyValue the default value of distributed data key
+ * @tparam K the type of distributed data key
+ * @tparam V the type of ReplicatedData
  */
-class Registry[K <: Key[V], V <: ReplicatedData] private[location] (val Key: K, val EmptyValue: V) {
+private[location] class Registry[K <: Key[V], V <: ReplicatedData](val Key: K, val EmptyValue: V) {
 
   type Value = V
 
@@ -24,7 +24,7 @@ class Registry[K <: Key[V], V <: ReplicatedData] private[location] (val Key: K, 
    * Creates an update message for replicator and it ensures that the response goes out only after majority nodes are written to
    *
    * @see [[akka.cluster.ddata.Replicator.Update]]
-   * @param f A callback function which is passed to Replicator.Update
+   * @param f a callback function which is passed to Replicator.Update
    */
   private[location] def update(f: V ⇒ V, initialValue: V = EmptyValue): Update[V] =
     Update(Key, initialValue, WriteMajority(5.seconds))(f)
@@ -62,8 +62,8 @@ private[location] object Registry {
    * At times, a location may not be available for a given connection-name, hence the location is an optional value.
    * It is used to track a single connection by subscribing events generated when associated location changes.
    *
-   * @note Service has key as LWWRegisterKey[Option[Location]] as it represents the type of value that LWWRegister will hold.
-   * But the value of LWWRegisterKey will still be connection-name.
+   * @note service has key as LWWRegisterKey[Option[Location]] as it represents the type of value that LWWRegister will hold
+   *       but the value of LWWRegisterKey will still be connection-name
    */
   class Service(connection: Connection)(implicit cluster: Cluster)
       extends Registry[LWWRegisterKey[Option[Location]], LWWRegister[Option[Location]]](

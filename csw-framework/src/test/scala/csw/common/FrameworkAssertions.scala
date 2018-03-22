@@ -1,12 +1,12 @@
 package csw.common
 
-import akka.typed.ActorRef
-import akka.typed.testkit.scaladsl.TestProbe
+import akka.actor.typed.ActorRef
+import akka.testkit.typed.scaladsl.TestProbe
 import com.persist.JsonOps.JsonObject
-import csw.messages.ContainerCommonMessage.GetContainerLifecycleState
-import csw.messages.ComponentCommonMessage.GetSupervisorLifecycleState
 import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState}
-import csw.messages.{ComponentMessage, ContainerExternalMessage}
+import csw.messages.scaladsl.ComponentCommonMessage.GetSupervisorLifecycleState
+import csw.messages.scaladsl.ContainerCommonMessage.GetContainerLifecycleState
+import csw.messages.scaladsl.{ComponentMessage, ContainerMessage}
 import csw.services.location.commons.BlockingUtils
 import csw.services.logging.internal.LoggingLevels.Level
 import org.scalatest.Matchers
@@ -17,13 +17,13 @@ import scala.concurrent.duration.Duration
 object FrameworkAssertions extends Matchers {
 
   def assertThatContainerIsRunning(
-      containerRef: ActorRef[ContainerExternalMessage],
+      containerRef: ActorRef[ContainerMessage],
       probe: TestProbe[ContainerLifecycleState],
       duration: Duration
   ): Unit = {
     def getContainerLifecycleState: ContainerLifecycleState = {
       containerRef ! GetContainerLifecycleState(probe.ref)
-      probe.expectMsgType[ContainerLifecycleState]
+      probe.expectMessageType[ContainerLifecycleState]
     }
 
     assert(
@@ -39,7 +39,7 @@ object FrameworkAssertions extends Matchers {
   ): Unit = {
     def getSupervisorLifecycleState: SupervisorLifecycleState = {
       actorRef ! GetSupervisorLifecycleState(probe.ref)
-      probe.expectMsgType[SupervisorLifecycleState]
+      probe.expectMessageType[SupervisorLifecycleState]
     }
 
     assert(

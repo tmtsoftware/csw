@@ -3,7 +3,7 @@ package csw.services.config.api.javadsl;
 import csw.services.config.api.models.FileType;
 
 /**
- * Java API for FileType.
+ * Helper class for Java to get the handle of file types
  */
 public class JFileType {
     /**

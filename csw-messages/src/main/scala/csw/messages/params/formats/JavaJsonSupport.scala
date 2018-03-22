@@ -1,21 +1,20 @@
 package csw.messages.params.formats
 
-import csw.messages.ccs.commands._
-import csw.messages.ccs.events._
+import csw.messages.commands._
+import csw.messages.events._
 import csw.messages.params.states.StateVariable.StateVariable
 import play.api.libs.json.JsValue
 
 /**
  * Json supports for Java to do conversion of commands, state variables and events to/from JSON
  */
-//TODO: why we need this and where do we need it
 object JavaJsonSupport {
 
   /**
    * Writes a SequenceParameterSet to JSON
    *
    * @param result any instance of SequenceCommand
-   * @tparam A the type of the command (implied)
+   * @tparam A the type of the command (implied) that is returned after de-serializing json
    * @return a JsValue object representing the SequenceCommand
    */
   def writeSequenceCommand[A <: SequenceCommand](result: A): JsValue = JsonSupport.writeSequenceCommand(result)
@@ -24,9 +23,10 @@ object JavaJsonSupport {
    * Reads a SequenceCommand back from JSON
    *
    * @param json the parsed JSON
+   * @tparam A a type of SequenceCommand (implied) that is returned after de-serializing json
    * @return an instance of the given SequenceCommand type, or an exception if the JSON is not valid for that type
    */
-  def readSequenceCommand[A <: SequenceCommand](klass: Class[A], json: JsValue): A = JsonSupport.readSequenceCommand[A](json)
+  def readSequenceCommand[A <: SequenceCommand](json: JsValue): A = JsonSupport.readSequenceCommand[A](json)
 
   /**
    * Writes a state variable to JSON
@@ -41,9 +41,10 @@ object JavaJsonSupport {
    * Reads a StateVariable back from JSON
    *
    * @param json the parsed JSON
+   * @tparam A a type of StateVariable (implied) that is returned after de-serializing json
    * @return an instance of the given StateVariable, or an exception if the JSON is not valid for that type
    */
-  def readStateVariable[A <: StateVariable](klass: Class[A], json: JsValue): A = JsonSupport.readStateVariable[A](json)
+  def readStateVariable[A <: StateVariable](json: JsValue): A = JsonSupport.readStateVariable[A](json)
 
   /**
    * Writes an event to JSON
@@ -61,7 +62,7 @@ object JavaJsonSupport {
    * @tparam A the type of the event (use Any and match on the type if you don't know)
    * @return an instance of the given event type, or an exception if the JSON is not valid for that type
    */
-  def readEvent[A <: Event](klass: Class[A], json: JsValue): A = JsonSupport.readEvent[A](json)
+  def readEvent[A <: Event](json: JsValue): A = JsonSupport.readEvent[A](json)
 
   /**
    * Writes a Result to JSON

@@ -1,6 +1,6 @@
 package tmt.shared
 
-import akka.typed.{ActorRef, ActorSystem}
+import akka.actor.typed.{ActorRef, ActorSystem}
 import csw.services.location.scaladsl.LocationService
 import tmt.shared.dsl.{ControlDsl, CswServicesDsl, EngineDsl}
 import tmt.shared.engine.EngineBehavior.EngineAction

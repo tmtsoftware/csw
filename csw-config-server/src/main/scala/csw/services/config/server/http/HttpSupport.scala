@@ -19,7 +19,7 @@ import csw.services.logging.scaladsl.Logger
 /**
  * Helper class for ConfigServiceRoute
  */
-trait HttpSupport extends Directives with JsonSupport { //TODO: update doc
+trait HttpSupport extends Directives with JsonSupport {
   private val log: Logger = ConfigServerLogger.getLogger
 
   def prefix(prefix: String): Directive1[Path] = path(prefix / Remaining).flatMap { path =>
@@ -28,6 +28,7 @@ trait HttpSupport extends Directives with JsonSupport { //TODO: update doc
     }
   }
 
+  // log every request when received at HttpServer
   private def logRequest(req: HttpRequest): Unit =
     log.info(
       "HTTP request received",
@@ -35,8 +36,6 @@ trait HttpSupport extends Directives with JsonSupport { //TODO: update doc
     )
   val routeLogger: Directive0 = DebuggingDirectives.logRequest(LoggingMagnet(_ => logRequest))
 
-  val pathParam: Directive1[Path]            = parameter('path).map(filePath ⇒ Paths.get(filePath))
-  val latestParam: Directive1[Boolean]       = parameter('latest.as[Boolean] ? false)
   val idParam: Directive1[Option[ConfigId]]  = parameter('id.?).map(_.map(new ConfigId(_)))
   val dateParam: Directive1[Option[Instant]] = parameter('date.?).map(_.map(Instant.parse))
   val fromParam: Directive1[Instant]         = parameter('from.?).map(_.map(Instant.parse).getOrElse(Instant.MIN))
@@ -45,6 +44,9 @@ trait HttpSupport extends Directives with JsonSupport { //TODO: update doc
   val commentParam: Directive1[String]       = parameter('comment ? "")
   val annexParam: Directive1[Boolean]        = parameter('annex.as[Boolean] ? false)
 
+  // pattern is an optional parameter coming with list request
+  // for list request if the pattern is provided, then it is first compiled and then forwarded to business code to process the request
+  // if the pattern provided throws `PatternSyntaxException` then immediate response of `BadRequest` is sent back to client
   val patternParam: Directive1[Option[String]] = parameter('pattern.?).flatMap {
     case p @ Some(pattern) ⇒
       try {
@@ -56,6 +58,10 @@ trait HttpSupport extends Directives with JsonSupport { //TODO: update doc
     case None ⇒ provide(None)
   }
 
+  // type is an optional parameter coming with list request
+  // for list request if the type is provided, then it is first casted to one of the available types ('Annex' and 'Normal')
+  // and then forwarded to business code to process the request
+  // if the type provided throws `PatternSyntaxException` then immediate response of `BadRequest` is sent back to client
   val typeParam: Directive1[Option[FileType]] = parameter('type.?).flatMap {
     case Some(fileType) ⇒
       FileType.withNameInsensitiveOption(fileType) match {
@@ -72,7 +78,7 @@ trait HttpSupport extends Directives with JsonSupport { //TODO: update doc
       reject(UnsupportedRequestEncodingRejection(HttpEncoding("All encodings with contentLength value")))
   }
 
-  //This marshaller is used to create a response stream for get/getActive requests
+  // This marshaller is used to create a response stream for get/getActive requests
   implicit val configDataMarshaller: ToEntityMarshaller[ConfigData] = Marshaller.opaque { configData =>
     HttpEntity(ContentTypes.`application/octet-stream`, configData.length, configData.source)
   }

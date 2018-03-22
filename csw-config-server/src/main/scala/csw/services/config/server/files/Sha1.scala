@@ -21,10 +21,10 @@ object Sha1 {
   /**
    * Create the sha digest of the data from the given configData model.
    *
-   * @param configData The configData model to get the data from
-   * @param mat An akka materializer required to start the stream of data that will incrementally calculate the sha digest
+   * @param configData the configData model to get the data from
+   * @param mat an akka materializer required to start the stream of data that will incrementally calculate the sha digest
    *            of it
-   * @return A future that completes with calculated sha value of the data
+   * @return a future that completes with calculated sha value of the data
    */
   def fromConfigData(configData: ConfigData)(implicit mat: Materializer): Future[String] =
     fromSource(configData.source)
@@ -34,10 +34,10 @@ object Sha1 {
    * data is first stored at temporary location and then at final location. This method helps to validate the sha of data
    * stored both places and find out discrepancies if any.
    *
-   * @param path The path to get the data from
-   * @param mat An akka materializer required to start the stream of data that will incrementally calculate the sha digest
+   * @param path the path to get the data from
+   * @param mat an akka materializer required to start the stream of data that will incrementally calculate the sha digest
    *            of it
-   * @return A future that completes with calculated sha value of the data
+   * @return a future that completes with calculated sha value of the data
    */
   def fromPath(path: Path)(implicit mat: Materializer): Future[String] =
     fromSource(FileIO.fromPath(path))
@@ -45,8 +45,8 @@ object Sha1 {
   /**
    * Create a sink that incrementally calculates the sha digest for the data
    *
-   * @note Keep this a def so that the digester is created anew each time
-   * @return A Sink which accepts byte data and gives a future of calculated sha
+   * @note keep this a def so that the digester is created anew each time
+   * @return a Sink which accepts byte data and gives a future of calculated sha
    */
   def sink: Sink[ByteString, Future[String]] = {
     val sha1Digester = MessageDigest.getInstance("SHA-1")

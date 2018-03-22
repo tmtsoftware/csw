@@ -23,8 +23,9 @@ import scala.concurrent.Future
 
 /**
  * Performs file operations on SVN using SvnKit
- * @param settings                  server runtime configuration
- * @param blockingIoDispatcher      dispatcher to be used for blocking operations
+ *
+ * @param settings server runtime configuration
+ * @param blockingIoDispatcher dispatcher to be used for blocking operations
  */
 class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
   private val log: Logger = ConfigServerLogger.getLogger
@@ -66,7 +67,6 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
 
   // Adds the given file (and dir if needed) to svn.
   // See http://svn.svnkit.com/repos/svnkit/tags/1.3.5/doc/examples/src/org/tmatesoft/svn/examples/repository/Commit.java.
-  //TODO: add more explanation
   def addFile(path: Path, comment: String, data: InputStream): Future[SVNCommitInfo] = Future {
     val svn = svnHandle()
     try {
@@ -107,7 +107,6 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
 
   // Modifies the contents of the given file in the repository.
   // See http://svn.svnkit.com/repos/svnkit/tags/1.3.5/doc/examples/src/org/tmatesoft/svn/examples/repository/Commit.java.
-  //TODO: add more explanation
   def modifyFile(path: Path, comment: String, data: InputStream) = Future {
     val svn = svnHandle()
     try {
@@ -126,7 +125,6 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
     }
   }
 
-  //TODO: update doc
   def delete(path: Path, comment: String): Future[SVNCommitInfo] = Future {
     val svnOperationFactory = new SvnOperationFactory()
     try {
@@ -139,13 +137,18 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
     }
   }
 
-  //TODO: update doc
   def list(fileType: Option[FileType] = None, pattern: Option[String] = None): Future[List[SVNDirEntry]] = Future {
     val svnOperationFactory = new SvnOperationFactory()
     // svn always stores file in the repo without '/' prefix.
     // Hence if input pattern is provided like '/root/', then prefix '/' need to be striped to get the list of files from root folder.
     val compiledPattern            = pattern.map(pat ⇒ Pattern.compile(pat.stripPrefix("/")))
     var entries: List[SVNDirEntry] = List.empty
+
+    // if the fileType(Annex or Normal) is defined then filter the list of files with this type
+    // for all files representing annex file, strip the suffix settings.`sha1-suffix`
+    // if the pattern is defined then filter the list matching this pattern
+    // it is important that we first strip the suffix settings.`sha1-suffix` before matching the pattern so that pattern
+    // is properly matched on exact name of file name
     val receiver: ISvnObjectReceiver[SVNDirEntry] = { (_, entry: SVNDirEntry) ⇒
       if (entry.isFile && entry.isNotActiveFile(settings.`active-config-suffix`) && entry
             .matchesFileType(fileType, settings.`sha1-suffix`)) {
@@ -168,7 +171,6 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
     }
   }
 
-  //TODO: update doc
   def hist(path: Path, from: Instant, to: Instant, maxResults: Int): Future[List[SVNLogEntry]] = Future {
     val clientManager = SVNClientManager.newInstance()
     var logEntries    = List[SVNLogEntry]()
@@ -200,9 +202,8 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
     checkPath(path, SVNNodeKind.FILE, id.getOrElse(SVNRepository.INVALID_REVISION))
   }
 
-  // True if the directory path exists in the repository
-  private def dirExists(path: Path): Boolean =
-    checkPath(path, SVNNodeKind.DIR, SVNRepository.INVALID_REVISION)
+  // true if the directory path exists in the repository
+  private def dirExists(path: Path): Boolean = checkPath(path, SVNNodeKind.DIR, SVNRepository.INVALID_REVISION)
 
   private def checkPath(path: Path, kind: SVNNodeKind, revision: Long): Boolean = {
     val svn = svnHandle()
@@ -215,7 +216,7 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
     }
   }
 
-  // Gets an object for accessing the svn repository (not reusing a single instance since not thread safe)
+  // gets an object for accessing the svn repository (not reusing a single instance since not thread safe)
   private def svnHandle(): SVNRepository = {
     val svn         = SVNRepositoryFactory.create(settings.svnUrl)
     val authManager = BasicAuthenticationManager.newInstance(settings.`svn-user-name`, Array[Char]())
@@ -223,7 +224,7 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
     svn
   }
 
-  // Test if there're no problems with accessing a repository
+  // test if there're no problems with accessing a repository
   def testConnection(): Unit = {
     val svn = svnHandle()
     try {

@@ -9,7 +9,7 @@ import scala.concurrent.Future
 /**
  * Represents file based repository for large/binary/annex files
  *
- * @param blockingIoDispatcher   Dispatcher to be used for blocking file operations
+ * @param blockingIoDispatcher dispatcher to be used for blocking file operations
  */
 class AnnexFileRepo(blockingIoDispatcher: MessageDispatcher) {
 

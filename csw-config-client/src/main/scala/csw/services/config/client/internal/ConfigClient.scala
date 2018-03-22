@@ -9,7 +9,7 @@ import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import csw.commons.http.ErrorResponse
 import csw.services.config.api.commons.BinaryUtils
-import csw.services.config.api.exceptions.{FileAlreadyExists, FileNotFound, InvalidInput}
+import csw.services.config.api.exceptions.{EmptyResponse, FileAlreadyExists, FileNotFound, InvalidInput}
 import csw.services.config.api.internal.ConfigStreamExts.RichSource
 import csw.services.config.api.internal.JsonSupport
 import csw.services.config.api.models._
@@ -23,10 +23,10 @@ import scala.concurrent.Future
 /**
  * Scala Client for using configuration service
  *
- * @param configServiceResolver       ConfigServiceResolver to get the uri of Configuration Service
- * @param actorRuntime                ActorRuntime instance for actor system, execution context and dispatcher
+ * @param configServiceResolver ConfigServiceResolver to get the uri of Configuration Service
+ * @param actorRuntime ActorRuntime instance for actor system, execution context and dispatcher
  */
-class ConfigClient private[config] (configServiceResolver: ConfigServiceResolver, actorRuntime: ActorRuntime)
+private[config] class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: ActorRuntime)
     extends ConfigService {
 
   private val log: Logger = ConfigClientLogger.getLogger
@@ -214,9 +214,8 @@ class ConfigClient private[config] (configServiceResolver: ConfigServiceResolver
         case StatusCodes.OK ⇒
           //Not consuming the file content will block the connection.
           response.entity.discardBytes()
-          val runtimeException = new RuntimeException("response must have content-length")
-          log.error(runtimeException.getMessage, ex = runtimeException)
-          throw runtimeException
+          log.error(EmptyResponse.getMessage, ex = EmptyResponse)
+          throw EmptyResponse
         case StatusCodes.NotFound ⇒ Future.successful(None)
       }
     )

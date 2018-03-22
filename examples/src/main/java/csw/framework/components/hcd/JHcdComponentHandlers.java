@@ -1,23 +1,35 @@
 package csw.framework.components.hcd;
 
-import akka.typed.javadsl.ActorContext;
+import akka.actor.typed.ActorRef;
+import akka.actor.typed.javadsl.ActorContext;
+import akka.actor.typed.javadsl.AskPattern;
+import akka.util.Timeout;
+import csw.framework.components.ConfigNotAvailableException;
+import csw.framework.components.assembly.WorkerActor;
+import csw.framework.components.assembly.WorkerActorMsg;
+import csw.framework.components.assembly.WorkerActorMsgs;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.scaladsl.CurrentStatePublisher;
-import csw.messages.TopLevelActorMessage;
-import csw.messages.ccs.commands.CommandResponse;
-import csw.messages.ccs.commands.ControlCommand;
-import csw.messages.ccs.commands.Observe;
-import csw.messages.ccs.commands.Setup;
+import csw.messages.commands.CommandResponse;
+import csw.messages.commands.ControlCommand;
+import csw.messages.commands.Observe;
+import csw.messages.commands.Setup;
 import csw.messages.framework.ComponentInfo;
 import csw.messages.location.LocationRemoved;
 import csw.messages.location.LocationUpdated;
 import csw.messages.location.TrackingEvent;
-import csw.services.ccs.scaladsl.CommandResponseManager;
+import csw.messages.scaladsl.TopLevelActorMessage;
+import csw.services.command.scaladsl.CommandResponseManager;
+import csw.services.config.api.javadsl.IConfigClientService;
+import csw.services.config.api.models.ConfigData;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.logging.javadsl.ILogger;
 import csw.services.logging.javadsl.JLoggerFactory;
 
+import java.nio.file.Paths;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
+import java.util.concurrent.TimeUnit;
 
 //#jcomponent-handlers-class
 public class JHcdComponentHandlers extends JComponentHandlers {
@@ -28,9 +40,14 @@ public class JHcdComponentHandlers extends JComponentHandlers {
     private final CurrentStatePublisher currentStatePublisher;
     private final ILocationService locationService;
     private ILogger log;
+    private IConfigClientService configClient;
+    private ConfigData hcdConfig;
+    private ActorRef<WorkerActorMsg> worker;
+    private int current;
+    private int stats;
 
     public JHcdComponentHandlers(
-            akka.typed.javadsl.ActorContext<TopLevelActorMessage> ctx,
+            akka.actor.typed.javadsl.ActorContext<TopLevelActorMessage> ctx,
             ComponentInfo componentInfo,
             CommandResponseManager commandResponseManager,
             CurrentStatePublisher currentStatePublisher,
@@ -52,17 +69,23 @@ public class JHcdComponentHandlers extends JComponentHandlers {
     //#jInitialize-handler
     @Override
     public CompletableFuture<Void> jInitialize() {
-        return CompletableFuture.runAsync(() -> {
-            /*
-             * Initialization could include following steps :
-             * 1. fetch config (preferably from configuration service)
-             * 2. create a worker actor which is used by this hcd
-             * 3. initialise some state by using the worker actor created above
-             * */
-        });
+
+        // fetch config (preferably from configuration service)
+        getConfig().thenAccept(config -> hcdConfig = config);
+
+        // create a worker actor which is used by this hcd
+        worker = ctx.spawnAnonymous(WorkerActor.make(hcdConfig));
+
+        // initialise some state by using the worker actor created above
+        CompletionStage<Integer> askCurrent = AskPattern.ask(worker, WorkerActorMsgs.JInitialState::new, new Timeout(5, TimeUnit.SECONDS), ctx.getSystem().scheduler());
+        CompletableFuture<Void> currentFuture = askCurrent.thenAccept(c -> current = c).toCompletableFuture();
+
+        CompletionStage<Integer> askStats = AskPattern.ask(worker, WorkerActorMsgs.JInitialState::new, new Timeout(5, TimeUnit.SECONDS), ctx.getSystem().scheduler());
+        CompletableFuture<Void> statsFuture = askStats.thenAccept(s -> stats = s).toCompletableFuture();
+
+        return CompletableFuture.allOf(currentFuture, statsFuture);
     }
     //#jInitialize-handler
-
     //#validateCommand-handler
     @Override
     public CommandResponse validateCommand(ControlCommand controlCommand) {
@@ -169,5 +192,11 @@ public class JHcdComponentHandlers extends JComponentHandlers {
 
     private void onewayObserve(Observe observe) {
         processObserve(observe);
+    }
+
+    private CompletableFuture<ConfigData> getConfig() {
+        // required configuration could not be found in the configuration service. Component can choose to stop until the configuration is made available in the
+        // configuration service and started again
+        return configClient.getActive(Paths.get("tromboneAssemblyContext.conf")).thenApply((maybeConfigData) -> maybeConfigData.<ConfigNotAvailableException>orElseThrow(ConfigNotAvailableException::new));
     }
 }

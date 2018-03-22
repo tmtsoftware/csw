@@ -1,7 +1,7 @@
 package tmt.development.dsl
 
-import akka.typed.scaladsl.adapter.{TypedActorSystemOps, UntypedActorSystemOps}
-import akka.typed.{ActorRef, ActorSystem}
+import akka.actor.typed.scaladsl.adapter.{TypedActorSystemOps, UntypedActorSystemOps}
+import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}

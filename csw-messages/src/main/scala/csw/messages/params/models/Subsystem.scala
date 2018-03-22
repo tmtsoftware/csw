@@ -7,9 +7,14 @@ import scala.collection.immutable
 
 /**
  * Represents a TMT subsystem
+ *
+ * @param description of subsystem
  */
 sealed abstract class Subsystem(description: String) extends EnumEntry with Lowercase with Serializable {
-  //TODO: add doc
+
+  /**
+   * Represents a string with entryName and description of a subsystem
+   */
   def longName: String = entryName + " - " + description
 }
 

@@ -9,8 +9,9 @@ import akka.cluster.http.management.ClusterHttpManagement
 import akka.cluster.{Cluster, MemberStatus}
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
-import csw.messages.models.CoordinatedShutdownReasons.FailureReason
+import csw.messages.commons.CoordinatedShutdownReasons.FailureReason
 import csw.services.location.commons.ClusterConfirmationActor.HasJoinedCluster
+import csw.services.location.exceptions.{CouldNotEnsureDataReplication, CouldNotJoinCluster}
 import csw.services.logging.scaladsl.Logger
 
 import scala.concurrent.duration.DurationInt
@@ -21,7 +22,7 @@ import scala.util.control.NonFatal
  * CswCluster provides cluster properties to manage distributed data. It is created when location service instance is created
  * in `csw-framework` and joins the cluster.
  *
- * @note It is highly recommended that explicit creation of CswCluster should be for advanced usages or testing purposes only
+ * @note it is highly recommended that explicit creation of CswCluster should be for advanced usages or testing purposes only
  */
 class CswCluster private (_actorSystem: ActorSystem) {
 
@@ -53,10 +54,10 @@ class CswCluster private (_actorSystem: ActorSystem) {
   private def makeMat(): Materializer = ActorMaterializer()
 
   /**
-   * If `startManagement` flag is set to true then an akka provided HTTP service is started at 7878 (default) port.
-   * It provides services related to akka cluster management e.g see the members of the cluster and their status i.e. up or weakly up etc.
-   * Currently, cluster management service is started on `csw-cluster-seed` which may help in production to monitor cluster status.
-   * But, it can be started on any machine that is a part of akka cluster.
+   * If `startManagement` flag is set to true (which is true only when a managementPort is defined in ClusterSettings)
+   * then an akka provided HTTP service is started at provided port. It provides services related to akka cluster management e.g see the members of the cluster and their status i.e. up or weakly up etc.
+   * Currently, cluster management service is started on `csw-cluster-seed` which may help in production to monitor
+   * cluster status. But, it can be started on any machine that is a part of akka cluster.
    */
   // $COVERAGE-OFF$
   private def startClusterManagement(): Unit = {
@@ -69,7 +70,6 @@ class CswCluster private (_actorSystem: ActorSystem) {
   // $COVERAGE-ON$
 
   // When new member tries to join the cluster, location service makes sure that member is weakly up or up before returning handle to location service
-  // TODO: Does it really necessary? can be deleted?
   private def joinCluster(): Done = {
     // Check if seed nodes are provided to join csw-cluster
     val emptySeeds = actorSystem.settings.config.getStringList("akka.cluster.seed-nodes").isEmpty
@@ -85,9 +85,8 @@ class CswCluster private (_actorSystem: ActorSystem) {
     def status  = Await.result(statusF, 5.seconds)
     val success = BlockingUtils.poll(status.isDefined, 20.seconds)
     if (!success) {
-      val runtimeException = new RuntimeException("could not join cluster")
-      log.error(runtimeException.getMessage, ex = runtimeException)
-      throw runtimeException
+      log.error(CouldNotJoinCluster.getMessage, ex = CouldNotJoinCluster)
+      throw CouldNotJoinCluster
     }
     confirmationActor ! PoisonPill
     Done
@@ -96,7 +95,6 @@ class CswCluster private (_actorSystem: ActorSystem) {
   /**
    * Ensures that data replication is started in Location service cluster by matching replica count with Up members.
    */
-  // TODO: Does it really necessary? can be deleted?
   private def ensureReplication(): Unit = {
     implicit val timeout: Timeout = Timeout(5.seconds)
     import akka.pattern.ask
@@ -105,10 +103,8 @@ class CswCluster private (_actorSystem: ActorSystem) {
     def upMembers     = cluster.state.members.count(_.status == MemberStatus.Up)
     val success       = BlockingUtils.poll(replicaCount >= upMembers, 10.seconds)
     if (!success) {
-      val runtimeException =
-        new RuntimeException("could not ensure that the data is replicated in location service cluster")
-      log.error(runtimeException.getMessage, ex = runtimeException)
-      throw runtimeException
+      log.error(CouldNotEnsureDataReplication.getMessage, ex = CouldNotEnsureDataReplication)
+      throw CouldNotEnsureDataReplication
     }
   }
 
@@ -121,28 +117,31 @@ class CswCluster private (_actorSystem: ActorSystem) {
 /**
  * Manages initialization and termination of ActorSystem and the Cluster.
  *
- * @note The creation of CswCluster will be blocked till the ActorSystem joins csw-cluster successfully
+ * @note the creation of CswCluster will be blocked till the ActorSystem joins csw-cluster successfully
  */
 object CswCluster {
 
   private val log: Logger = LocationServiceLogger.getLogger
 
-  //do not use the dying actorSystem's dispatcher for scheduling actions after its death
-
   /**
    * Creates CswCluster with the default cluster settings
    *
-   * @see [[csw.services.location.commons.ClusterSettings]]
+   * @see [[csw.services.location.commons.ClusterSettings]] same as [[csw.services.location.commons.CswCluster.withSettings()]]
+   * @return an instance of CswCluster
    */
   def make(): CswCluster = withSettings(ClusterSettings())
 
   /**
    * Creates CswCluster with the given customized settings
+   *
+   * @return an instance of CswCluster
    */
   def withSettings(settings: ClusterSettings): CswCluster = withSystem(settings.system)
 
   /**
    * Creates CswCluster with the given ActorSystem
+   *
+   * @return an instance of CswCluster
    */
   def withSystem(actorSystem: ActorSystem): CswCluster = {
     val cswCluster = new CswCluster(actorSystem)

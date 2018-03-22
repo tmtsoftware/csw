@@ -1,11 +1,11 @@
 package csw.framework.javadsl
 
-import akka.typed.javadsl.ActorContext
-import akka.typed.scaladsl
+import akka.actor.typed.javadsl.ActorContext
+import akka.actor.typed.scaladsl
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers, CurrentStatePublisher}
-import csw.messages.TopLevelActorMessage
 import csw.messages.framework.ComponentInfo
-import csw.services.ccs.scaladsl.CommandResponseManager
+import csw.messages.scaladsl.TopLevelActorMessage
+import csw.services.command.scaladsl.CommandResponseManager
 import csw.services.location.javadsl.ILocationService
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.javadsl.JLoggerFactory

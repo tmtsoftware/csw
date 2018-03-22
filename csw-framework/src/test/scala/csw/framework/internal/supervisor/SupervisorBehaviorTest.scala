@@ -1,16 +1,20 @@
 package csw.framework.internal.supervisor
 
-import akka.typed.scaladsl.Actor
-import akka.typed.testkit.Effect._
-import akka.typed.testkit.EffectfulActorContext
-import akka.typed.testkit.scaladsl.TestProbe
-import akka.typed.{Behavior, Props}
+import akka.actor.typed.Behavior
+import akka.actor.typed.scaladsl.{Behaviors, TimerScheduler}
+import akka.testkit.typed.Effect
+import akka.testkit.typed.scaladsl.Effects.{Spawned, Watched}
+import akka.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
 import csw.common.components.framework.SampleComponentBehaviorFactory
 import csw.framework.ComponentInfos._
-import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
-import csw.messages.{ComponentMessage, ContainerIdleMessage, SupervisorMessage}
+import csw.messages.scaladsl.{ComponentMessage, ContainerIdleMessage, SupervisorMessage}
+import org.mockito.ArgumentMatchers
+import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
+
+import scala.collection.immutable
+import scala.concurrent.duration.FiniteDuration
 
 // DEOPSCSW-163: Provide admin facilities in the framework through Supervisor role
 class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
@@ -18,51 +22,66 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
   import testMocks._
 
   val containerIdleMessageProbe: TestProbe[ContainerIdleMessage] = TestProbe[ContainerIdleMessage]
-  val supervisorBehavior: Behavior[ComponentMessage]             = createBehavior()
-  val componentTLAName                                           = s"${hcdInfo.name}-${SupervisorBehavior.ComponentActorNameSuffix}"
+  val timerScheduler                                             = mock[TimerScheduler[SupervisorMessage]]
+
+  doNothing()
+    .when(timerScheduler)
+    .startSingleTimer(
+      ArgumentMatchers.eq(SupervisorBehavior.InitializeTimerKey),
+      ArgumentMatchers.any[SupervisorMessage],
+      ArgumentMatchers.any[FiniteDuration]
+    )
+
+  doNothing().when(timerScheduler).cancel(eq(SupervisorBehavior.InitializeTimerKey))
+
+  val supervisorBehavior: Behavior[ComponentMessage] = createBehavior(timerScheduler)
+  val componentTLAName                               = s"${hcdInfo.name}-${SupervisorBehavior.ComponentActorNameSuffix}"
 
   test("Supervisor should create child actors for TLA, pub-sub actor for lifecycle and component state") {
-    val ctx = new EffectfulActorContext[ComponentMessage]("supervisor", supervisorBehavior, 100, system)
+    val supervisorBehaviorTestKit = BehaviorTestKit(supervisorBehavior)
 
-    ctx.getAllEffects() should contain allOf (
-      Spawned(componentTLAName, Props.empty),
-      Spawned(SupervisorBehavior.PubSubLifecycleActor, Props.empty),
-      Spawned(SupervisorBehavior.PubSubComponentActor, Props.empty)
+    val effects: immutable.Seq[Effect] = supervisorBehaviorTestKit.retrieveAllEffects()
+
+    val spawnedEffects = effects.map {
+      case s: Spawned[_] ⇒ s.childName
+      case _             ⇒ ""
+    }
+
+    spawnedEffects should contain allOf (
+      componentTLAName,
+      SupervisorBehavior.PubSubLifecycleActor,
+      SupervisorBehavior.PubSubComponentActor
     )
   }
 
   test("Supervisor should watch child component actor [TLA]") {
-    val ctx = new EffectfulActorContext[ComponentMessage]("supervisor", supervisorBehavior, 100, system)
+    val supervisorBehaviorTestKit = BehaviorTestKit(supervisorBehavior)
 
-    val componentActor       = ctx.childInbox(componentTLAName).ref
-    val pubSubLifecycleActor = ctx.childInbox(SupervisorBehavior.PubSubLifecycleActor).ref
-    val pubSubComponentActor = ctx.childInbox(SupervisorBehavior.PubSubComponentActor).ref
+    val componentActor       = supervisorBehaviorTestKit.childInbox(componentTLAName).ref
+    val pubSubLifecycleActor = supervisorBehaviorTestKit.childInbox(SupervisorBehavior.PubSubLifecycleActor).ref
+    val pubSubComponentActor = supervisorBehaviorTestKit.childInbox(SupervisorBehavior.PubSubComponentActor).ref
 
-    ctx.getAllEffects() should contain(Watched(componentActor))
-    ctx.getAllEffects() should not contain Watched(pubSubLifecycleActor)
-    ctx.getAllEffects() should not contain Watched(pubSubComponentActor)
+    supervisorBehaviorTestKit.retrieveAllEffects() should contain(Watched(componentActor))
+    supervisorBehaviorTestKit.retrieveAllEffects() should not contain Watched(pubSubLifecycleActor)
+    supervisorBehaviorTestKit.retrieveAllEffects() should not contain Watched(pubSubComponentActor)
   }
 
-  private def createBehavior(): Behavior[ComponentMessage] = {
-    Actor
-      .withTimers[SupervisorMessage](
-        timerScheduler ⇒
-          Actor
-            .mutable[SupervisorMessage](
-              ctx =>
-                new SupervisorBehavior(
-                  ctx,
-                  timerScheduler,
-                  None,
-                  hcdInfo,
-                  new SampleComponentBehaviorFactory,
-                  new PubSubBehaviorFactory,
-                  commandResponseManagerFactory,
-                  registrationFactory,
-                  locationService,
-                  loggerFactory
-              )
-          )
+  private def createBehavior(timerScheduler: TimerScheduler[SupervisorMessage]): Behavior[ComponentMessage] = {
+
+    Behaviors
+      .mutable[SupervisorMessage](
+        ctx =>
+          new SupervisorBehavior(
+            ctx,
+            timerScheduler,
+            None,
+            hcdInfo,
+            new SampleComponentBehaviorFactory,
+            commandResponseManagerFactory,
+            registrationFactory,
+            locationService,
+            loggerFactory
+        )
       )
       .narrow
   }

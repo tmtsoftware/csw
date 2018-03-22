@@ -10,8 +10,8 @@ private[config] object BinaryUtils {
   /**
    * Identifies if the sequence of ByteString can be treated as binary
    *
-   * @param byteStrings A sequence of ByteString to be tested for binary content
-   * @return Boolean value indicating if the the byteString represents binary content
+   * @param byteStrings a sequence of ByteString to be tested for binary content
+   * @return boolean value indicating if the the byteString represents binary content
    */
   def isBinary(byteStrings: Seq[ByteString]): Boolean = {
     val bs = byteStrings.foldLeft(ByteString.empty)((bs, d) ⇒ bs ++ d)
@@ -25,8 +25,8 @@ private[config] object BinaryUtils {
    * Identifies if the byte array can be treated as text or not by checking if binary content is more than 15% i.e.
    * ASCII printable content is more than 85%
    *
-   * @param bytes A connection to resolve to with its registered location
-   * @return Boolean value indicating if the bytes represents text content
+   * @param bytes a connection to resolve to with its registered location
+   * @return boolean value indicating if the bytes represents text content
    */
   def isNotText(bytes: Array[Byte]): Boolean = {
     val binaryCount = bytes.count(b ⇒ b < 0x08 || (b > 0x0d && b < 0x20) || b > 0x7F)

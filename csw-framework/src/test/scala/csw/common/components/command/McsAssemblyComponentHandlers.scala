@@ -1,19 +1,18 @@
 package csw.common.components.command
 
 import akka.actor.Scheduler
-import akka.typed.scaladsl.ActorContext
+import akka.actor.typed.scaladsl.ActorContext
 import akka.util.Timeout
 import csw.common.components.command.ComponentStateForCommand.{longRunningCmdCompleted, _}
 import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
-import csw.messages.TopLevelActorMessage
-import csw.messages.ccs.CommandIssue
-import csw.messages.ccs.commands.CommandResponse.{Accepted, Completed, Invalid}
-import csw.messages.ccs.commands.{CommandResponse, ControlCommand, Setup}
+import csw.messages.commands.CommandResponse.{Accepted, Completed, Invalid}
+import csw.messages.commands.{CommandIssue, CommandResponse, ControlCommand, Setup}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.{AkkaLocation, TrackingEvent}
 import csw.messages.params.models.Id
 import csw.messages.params.states.CurrentState
-import csw.services.ccs.scaladsl.{CommandResponseManager, CommandService}
+import csw.messages.scaladsl.TopLevelActorMessage
+import csw.services.command.scaladsl.{CommandResponseManager, CommandService}
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
 
@@ -126,13 +125,14 @@ class McsAssemblyComponentHandlers(
           // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
           commandResponseManager.updateSubCommand(response.runId, Accepted(response.runId))
           //#updateSubCommand
-          // An original command is split into three sub-commands and sent to an hcdComponent.
-          // As the commands get completed, the results are updated in the commandResponseManager
+          // An original command is split into sub-commands and sent to a component. The result of the command is
+          // obtained by subscribing to the component with the sub command id.
           hcdComponent.subscribe(controlCommand.runId).map {
             case _: Completed ⇒
               controlCommand.runId match {
                 case id if id == shortSetup.runId ⇒
                   currentStatePublisher.publish(CurrentState(shortSetup.source, Set(choiceKey.set(shortCmdCompleted))))
+                  // As the commands get completed, the results are updated in the commandResponseManager
                   commandResponseManager.updateSubCommand(id, Completed(id))
                 case id if id == mediumSetup.runId ⇒
                   currentStatePublisher.publish(CurrentState(mediumSetup.source, Set(choiceKey.set(mediumCmdCompleted))))

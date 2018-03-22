@@ -10,7 +10,6 @@ object Utils {
   /**
    * Finds a random, free port to use
    */
-  //TODO: add doc to explain significance
   def getFreePort: Int = {
     val sock = new ServerSocket(0)
     val port = sock.getLocalPort
@@ -21,7 +20,6 @@ object Utils {
   /**
    * Returns an `Option` of `Config` pointed by the file parameter, else None.
    */
-  //TODO: add doc to explain significance
   def getAppConfig(file: File): Option[Config] =
     if (file.exists()) Some(ConfigFactory.parseFileAnySyntax(file).resolve(ConfigResolveOptions.noSystem())) else None
 }

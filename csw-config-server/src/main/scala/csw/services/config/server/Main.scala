@@ -1,6 +1,6 @@
 package csw.services.config.server
 
-import csw.messages.models.CoordinatedShutdownReasons.FailureReason
+import csw.messages.commons.CoordinatedShutdownReasons.FailureReason
 import csw.services.config.server.cli.{ArgsParser, Options}
 import csw.services.config.server.commons.ConfigServerLogger
 import csw.services.config.server.http.HttpService
@@ -27,12 +27,12 @@ class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) {
         if (init) svnRepo.initSvnRepo()
 
         try {
-          svnRepo.testConnection()
-          Await.result(httpService.registeredLazyBinding, 15.seconds)
+          svnRepo.testConnection()                                    // first test if the svn repo can be accessed successfully
+          Await.result(httpService.registeredLazyBinding, 15.seconds) // then start the config server and register it with location service
           httpService
         } catch {
           case ex: SVNException ⇒
-            Await.result(actorRuntime.shutdown(FailureReason(ex)), 10.seconds)
+            Await.result(actorRuntime.shutdown(FailureReason(ex)), 10.seconds) // actorRuntime.shutdown will gracefully quit the self node from cluster
             val runtimeException =
               new RuntimeException(s"Could not open repository located at : ${settings.svnUrl}", ex)
             log.error(runtimeException.getMessage, ex = runtimeException)

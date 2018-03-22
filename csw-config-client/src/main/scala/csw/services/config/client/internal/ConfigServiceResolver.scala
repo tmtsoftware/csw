@@ -11,11 +11,11 @@ import scala.concurrent.duration.DurationDouble
 /**
  * Resolves the location of server hosting the configuration service
  *
- * @param locationService An instance of location service that provides api to resolve config server
+ * @param locationService an instance of location service that provides api to resolve config server
  * @param actorRuntime ActorRuntime provides the execution context for doing the job of asynchronously resolving config
  *                     server from location service
  */
-class ConfigServiceResolver(locationService: LocationService, actorRuntime: ActorRuntime) {
+private[config] class ConfigServiceResolver(locationService: LocationService, actorRuntime: ActorRuntime) {
   import actorRuntime.ec
 
   /**

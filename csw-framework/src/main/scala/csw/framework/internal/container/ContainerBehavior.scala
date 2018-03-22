@@ -3,22 +3,21 @@ package csw.framework.internal.container
 import akka.Done
 import akka.actor.CoordinatedShutdown
 import akka.actor.CoordinatedShutdown.Reason
-import akka.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.typed.scaladsl.{Actor, ActorContext}
-import akka.typed.{ActorRef, Behavior, PostStop, Signal, Terminated}
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
+import akka.actor.typed.{ActorRef, Behavior, PostStop, Signal, Terminated}
 import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.framework.models._
-import csw.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
-import csw.messages.ContainerIdleMessage.SupervisorsCreated
-import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
-import csw.messages.RunningMessage.Lifecycle
-import csw.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
-import csw.messages._
-import csw.messages.framework.{ComponentInfo, ContainerLifecycleState, SupervisorLifecycleState}
+import csw.messages.commons.CoordinatedShutdownReasons.{AllActorsWithinContainerTerminatedReason, FailedToCreateSupervisorsReason}
+import csw.messages.framework._
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
-import csw.messages.models.CoordinatedShutdownReasons.{AllActorsWithinContainerTerminatedReason, FailedToCreateSupervisorsReason}
-import csw.messages.models.{Components, SupervisorInfo}
+import csw.messages.scaladsl.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
+import csw.messages.scaladsl.ContainerIdleMessage.SupervisorsCreated
+import csw.messages.scaladsl.FromSupervisorMessage.SupervisorLifecycleStateChanged
+import csw.messages.scaladsl.RunningMessage.Lifecycle
+import csw.messages.scaladsl.SupervisorContainerCommonMessages.{Restart, Shutdown}
+import csw.messages.scaladsl.{ComponentMessage, ContainerActorMessage, ContainerCommonMessage, ContainerIdleMessage}
 import csw.services.location.models._
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
@@ -29,21 +28,21 @@ import scala.util.{Failure, Success}
 /**
  * The Behavior of a Container of one or more components, represented as a mutable behavior.
  *
- * @param ctx                       The Actor Context under which the actor instance of this behavior is created
- * @param containerInfo             Container related information as described in the configuration file
- * @param supervisorInfoFactory     The factory for creating the Supervisors for components described in ContainerInfo
- * @param registrationFactory       The factory for creating a typed [[csw.services.location.models.AkkaRegistration]] from
-                                    [[csw.messages.location.Connection.AkkaConnection]]
- * @param locationService           The single instance of Location service created for a running application
+ * @param ctx the ActorContext under which the actor instance of this behavior is created
+ * @param containerInfo container related information as described in the configuration file
+ * @param supervisorInfoFactory the factory for creating the Supervisors for components described in ContainerInfo
+ * @param registrationFactory the factory for creating a typed [[csw.services.location.models.AkkaRegistration]] from
+                              [[csw.messages.location.Connection.AkkaConnection]]
+ * @param locationService the single instance of Location service created for a running application
  */
-class ContainerBehavior private[framework] (
-    ctx: ActorContext[ContainerMessage],
+private[framework] final class ContainerBehavior(
+    ctx: ActorContext[ContainerActorMessage],
     containerInfo: ContainerInfo,
     supervisorInfoFactory: SupervisorInfoFactory,
     registrationFactory: RegistrationFactory,
     locationService: LocationService,
     loggerFactory: LoggerFactory
-) extends Actor.MutableBehavior[ContainerMessage] {
+) extends Behaviors.MutableBehavior[ContainerActorMessage] {
 
   import ctx.executionContext
   private val log: Logger                        = loggerFactory.getLogger(ctx)
@@ -63,11 +62,12 @@ class ContainerBehavior private[framework] (
   createComponents(containerInfo.components)
 
   /**
-   * Defines processing for a [[csw.messages.ContainerMessage]] received by the actor instance.
-   * @param msg      ContainerMessage received
-   * @return         The existing behavior
+   * Defines processing for a [[csw.messages.scaladsl.ContainerActorMessage]] received by the actor instance.
+   *
+   * @param msg containerMessage received
+   * @return the existing behavior
    */
-  override def onMessage(msg: ContainerMessage): Behavior[ContainerMessage] = {
+  override def onMessage(msg: ContainerActorMessage): Behavior[ContainerActorMessage] = {
     log.debug(s"Container in lifecycle state :[$lifecycleState] received message :[$msg]")
     (lifecycleState, msg) match {
       case (_, msg: ContainerCommonMessage)                          ⇒ onCommon(msg)
@@ -80,11 +80,11 @@ class ContainerBehavior private[framework] (
   }
 
   /**
-   * Defines processing for a [[akka.typed.Signal]] received by the actor instance.
-   * @return        The existing behavior
+   * Defines processing for a [[akka.actor.typed.Signal]] received by the actor instance
+   *
+   * @return the existing behavior
    */
-  //TODO: add doc for significance
-  override def onSignal: PartialFunction[Signal, Behavior[ContainerMessage]] = {
+  override def onSignal: PartialFunction[Signal, Behavior[ContainerActorMessage]] = {
     case Terminated(supervisor) ⇒
       log.warn(
         s"Container in lifecycle state :[$lifecycleState] received terminated signal from supervisor :[$supervisor]"
@@ -103,9 +103,9 @@ class ContainerBehavior private[framework] (
 
   /**
    * Defines action for messages which can be received in any [[csw.messages.framework.ContainerLifecycleState]] state
-   * @param commonMessage Message representing a message received in any lifecycle state
+   *
+   * @param commonMessage message representing a message received in any lifecycle state
    */
-  //TODO: add doc for significance
   private def onCommon(commonMessage: ContainerCommonMessage): Unit = commonMessage match {
     case GetComponents(replyTo) ⇒
       replyTo ! Components(supervisors.map(_.component))
@@ -124,9 +124,9 @@ class ContainerBehavior private[framework] (
 
   /**
    * Defines action for messages which can be received in [[csw.messages.framework.ContainerLifecycleState.Idle]] state
-   * @param idleMessage  Message representing a message received in [[csw.messages.framework.ContainerLifecycleState.Idle]] state
+   *
+   * @param idleMessage message representing a message received in [[csw.messages.framework.ContainerLifecycleState.Idle]] state
    */
-  //TODO: add doc for significance
   private def onIdle(idleMessage: ContainerIdleMessage): Unit = idleMessage match {
     case SupervisorsCreated(supervisorInfos) ⇒
       if (supervisorInfos.isEmpty) {
@@ -147,7 +147,8 @@ class ContainerBehavior private[framework] (
 
   /**
    * Create supervisors for all components and return a set of all successfully created supervisors as a message to self
-   * @param componentInfos Components to be created as specified in the configuration file
+   *
+   * @param componentInfos components to be created as specified in the configuration file
    */
   private def createComponents(componentInfos: Set[ComponentInfo]): Unit = {
     log.info(s"Container is creating following components :[${componentInfos.map(_.name).mkString(", ")}]")
@@ -155,7 +156,9 @@ class ContainerBehavior private[framework] (
       .traverse(componentInfos) { ci ⇒
         supervisorInfoFactory.make(ctx.self, ci, locationService, registrationFactory)
       }
-      .foreach(x ⇒ ctx.self ! SupervisorsCreated(x.flatten))
+      .foreach(x ⇒ {
+        ctx.self ! SupervisorsCreated(x.flatten)
+      })
   }
 
   /**

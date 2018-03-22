@@ -28,6 +28,6 @@ public class JComponentInfos {
             "csw.framework.javadsl.components.JSampleComponentBehaviorFactory",
             LocationServiceUsage.JRegisterOnly(),
             Collections.emptySet(),
-            new FiniteDuration(0, TimeUnit.SECONDS)
+            new FiniteDuration(50, TimeUnit.MILLISECONDS)
     );
 }

@@ -8,17 +8,18 @@ import akka.actor._
 import com.persist.JsonOps._
 import csw.services.logging.RichMsg
 import csw.services.logging.commons.{Category, Constants, LoggingKeys, TMTDateTimeFormatter}
+import csw.services.logging.internal.LoggerImpl
 import csw.services.logging.internal.LoggingLevels.Level
-import csw.services.logging.scaladsl.{Logger, LoggerImpl}
+import csw.services.logging.scaladsl.Logger
 
 import scala.concurrent.{ExecutionContextExecutor, Future, Promise}
 
 /**
- * Responsible for writing log messages to a file
+ * Responsible for writing log messages to a file on local disk
+ *
  * @param path path where the log file will be created
  * @param category category of the log messages
  */
-//TODO: add doc to explain significance for everything
 private[logging] class FileAppenderHelper(path: String, category: String) {
 
   private[this] var fileSpanTimestamp: Option[ZonedDateTime] = None
@@ -26,6 +27,7 @@ private[logging] class FileAppenderHelper(path: String, category: String) {
 
   protected val log: Logger = new LoggerImpl(None, None)
 
+  // The file containing logs is created on local machine. This file is rotated everyday at 12:00:00 hour.
   def appendAdd(maybeTimestamp: Option[ZonedDateTime], line: String, rotateFlag: Boolean): Unit = {
     maybePrintWriter match {
       case Some(w) =>
@@ -89,6 +91,7 @@ private[logging] class FileAppenderHelper(path: String, category: String) {
 
 /**
  * Responsible for creating an FileAppenderHelper which manages the file resource
+ *
  * @param path log file path
  * @param category log category
  */
@@ -114,9 +117,8 @@ object FileAppender extends LogAppenderBuilder {
   /**
    * Constructor for a file appender.
    *
-   * @param factory    an Akka factory.
+   * @param factory an Akka factory.
    * @param stdHeaders the headers that are fixes for this service.
-   * @return
    */
   def apply(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]): FileAppender =
     new FileAppender(factory, stdHeaders)
@@ -167,7 +169,7 @@ class FileAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]) e
   /**
    * Write the log message to a file.
    *
-   * @param baseMsg  the message to be logged.
+   * @param baseMsg the message to be logged.
    * @param category the kinds of log (for example, "common").
    */
   def append(baseMsg: Map[String, RichMsg], category: String): Unit =

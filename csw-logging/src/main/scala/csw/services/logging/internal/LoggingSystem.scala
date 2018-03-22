@@ -10,6 +10,7 @@ import csw.services.logging.RichMsg
 import csw.services.logging.appenders.LogAppenderBuilder
 import csw.services.logging.commons.{Constants, LoggingKeys}
 import csw.services.logging.exceptions.AppenderNotFoundException
+import csw.services.logging.internal.LogActorMessages._
 import csw.services.logging.internal.TimeActorMessages.TimeDone
 import csw.services.logging.macros.DefaultSourceLocation
 import csw.services.logging.models.LogMetadata
@@ -22,14 +23,16 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
 
 /**
  * This class is responsible for programmatic interaction with the configuration of the logging system. It initializes
- * the appenders, starts the log actor and manages clean up of logging system.
- * @param name             name of the service (to log).
- * @param version             version of the service (to log).
- * @param host             host name (to log).
- * @param system           actor system which will be used to create log actors
+ * appenders, starts the log actor and manages clean up of logging system. Until and unless this class is instantiated
+ * all(akka, slf4j and tmt) the logs are enqueued in local queue. Once it is instantiated, the queue is emptied and all
+ * the logs are forwarded to configured appenders.
+ *
+ * @param name name of the service (to log).
+ * @param version version of the service (to log).
+ * @param host host name (to log).
+ * @param system an ActorSystem used to create log actors
  */
-//TODO: explain better significance of everything
-class LoggingSystem(name: String, version: String, host: String, val system: ActorSystem) {
+private[csw] class LoggingSystem(name: String, version: String, host: String, val system: ActorSystem) {
 
   import LoggingLevels._
 
@@ -118,6 +121,7 @@ class LoggingSystem(name: String, version: String, host: String, val system: Act
   // Deal with messages send before logger was ready
   LoggingState.msgs.synchronized {
     if (LoggingState.msgs.nonEmpty) {
+      // DefaultSourceLocation will have empty `file`, `line` and `class`
       log.info(s"Saw ${LoggingState.msgs.size} messages before logger start")(() => DefaultSourceLocation)
       for (msg <- LoggingState.msgs) {
         MessageHandler.sendMsg(msg)
@@ -143,6 +147,7 @@ class LoggingSystem(name: String, version: String, host: String, val system: Act
 
   /**
    * Get Akka logging levels
+   *
    * @return the current and default Akka logging levels.
    */
   def getAkkaLevel: Levels = Levels(LoggingState.akkaLogLevel, defaultAkkaLogLevel)
@@ -158,12 +163,14 @@ class LoggingSystem(name: String, version: String, host: String, val system: Act
 
   /**
    * Get the Slf4j logging levels.
+   *
    * @return the current and default Slf4j logging levels.
    */
   def getSlf4jLevel: Levels = Levels(LoggingState.slf4jLogLevel, defaultSlf4jLogLevel)
 
   /**
    * Changes the slf4j logging level.
+   *
    * @param level the new logging level for slf4j.
    */
   def setSlf4jLevel(level: Level): Unit = {
@@ -173,12 +180,14 @@ class LoggingSystem(name: String, version: String, host: String, val system: Act
 
   /**
    * Get the logging appenders.
+   *
    * @return the current and default logging appenders.
    */
   def getAppenders: List[LogAppenderBuilder] = appenderBuilders
 
   /**
    * Changes the logging appenders.
+   *
    * @param _appenderBuilders the list of new logging appenders.
    */
   def setAppenders(_appenderBuilders: List[LogAppenderBuilder]): Unit = {
@@ -194,6 +203,7 @@ class LoggingSystem(name: String, version: String, host: String, val system: Act
 
   /**
    * Get the basic logging configuration values
+   *
    * @return LogMetadata which comprises of current root log level, akka log level, sl4j log level and component log level
    */
   def getLogMetadata(componentName: String): LogMetadata =
@@ -208,6 +218,7 @@ class LoggingSystem(name: String, version: String, host: String, val system: Act
 
   /**
    * Shut down the logging system.
+   *
    * @return  future completes when the logging system is shut down.
    */
   def stop: Future[Done] = {

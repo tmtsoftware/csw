@@ -1,8 +1,8 @@
 package csw.services.location
 
 import akka.testkit.TestProbe
-import akka.typed.Behavior
-import akka.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.actor.typed.Behavior
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType, LocationRemoved, LocationUpdated}
 import csw.services.location.commons.CswCluster
@@ -32,10 +32,12 @@ class DetectComponentRestartTest(ignore: Int) extends LSNodeSpec(config = new Tw
     runOn(member1) {
       locationService
         .register(
-          AkkaRegistration(akkaConnection,
-                           Some("nfiraos.ncc.trombone"),
-                           system.spawnAnonymous(Behavior.empty),
-                           system.spawnAnonymous(Behavior.empty))
+          AkkaRegistration(
+            akkaConnection,
+            Some("nfiraos.ncc.trombone"),
+            system.spawnAnonymous(Behavior.empty),
+            system.spawnAnonymous(Behavior.empty)
+          )
         )
         .await
       enterBarrier("location-registered")

@@ -1,6 +1,6 @@
 package tmt.production
 
-import csw.apps.containercmd.ContainerCmd
+import csw.framework.deploy.containercmd.ContainerCmd
 
 object SequencerApp extends App {
 

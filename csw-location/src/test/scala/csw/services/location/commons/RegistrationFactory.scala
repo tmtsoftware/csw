@@ -1,6 +1,6 @@
 package csw.services.location.commons
 
-import akka.typed.ActorRef
+import akka.actor.typed.ActorRef
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.models.{AkkaRegistration, HttpRegistration, TcpRegistration}
 

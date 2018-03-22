@@ -4,10 +4,10 @@ import akka.actor
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
 import akka.stream.{ActorMaterializer, Materializer}
-import akka.typed.ActorSystem
-import akka.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.typed.testkit.TestKitSettings
-import akka.typed.testkit.scaladsl.TestProbe
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.testkit.typed.TestKitSettings
+import akka.testkit.typed.scaladsl.TestProbe
 import com.persist.JsonOps
 import com.persist.JsonOps.JsonObject
 import com.typesafe.config.ConfigFactory
@@ -18,13 +18,13 @@ import csw.common.utils.TestAppender
 import csw.commons.tags.LoggingSystemSensitive
 import csw.framework.internal.component.ComponentBehavior
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
-import csw.messages.SupervisorContainerCommonMessages.Shutdown
+import csw.messages.scaladsl.SupervisorContainerCommonMessages.Shutdown
 import csw.messages.framework.SupervisorLifecycleState
 import csw.messages.location.ComponentType.HCD
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.messages.params.states.CurrentState
-import csw.services.ccs.scaladsl.CommandService
+import csw.services.command.scaladsl.CommandService
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import csw.services.logging.internal.LoggingLevels.INFO
@@ -95,7 +95,7 @@ class StandaloneComponentTest extends FunSuite with Matchers with BeforeAndAfter
 
     // this proves that ComponentBehaviors postStop signal gets invoked
     // as onShutdownHook of TLA gets invoked from postStop signal
-    supervisorStateProbe.expectMsg(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
+    supervisorStateProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
 
     // this proves that postStop signal of supervisor gets invoked
     // as supervisor gets unregistered in postStop signal

@@ -1,23 +1,22 @@
 package csw.framework.internal.supervisor
 
-import akka.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.typed.testkit.scaladsl.TestProbe
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.testkit.typed.scaladsl.TestProbe
 import csw.common.components.framework.SampleComponentState.{choiceKey, initChoice, prefix}
 import csw.common.utils.LockCommandFactory
 import csw.framework.ComponentInfos.assemblyInfo
 import csw.framework.FrameworkTestSuite
-import csw.messages.CommandMessage.Submit
-import csw.messages.CommandResponseManagerMessage.{AddOrUpdateCommand, Query, Subscribe, Unsubscribe}
-import csw.messages.SupervisorLockMessage.{Lock, Unlock}
-import csw.messages.ccs.commands.CommandResponse.{Accepted, NotAllowed}
-import csw.messages.ccs.commands.{CommandName, CommandResponse, Setup}
-import csw.messages.framework.SupervisorLifecycleState
-import csw.messages.models
-import csw.messages.models.LockingResponse
-import csw.messages.models.LockingResponses._
-import csw.messages.models.PubSub.Publish
+import csw.messages.commands.CommandResponse.{Accepted, NotAllowed}
+import csw.messages.commands.{CommandName, CommandResponse, Setup}
+import csw.messages.framework.LockingResponses._
+import csw.messages.framework.{LifecycleStateChanged, LockingResponse, PubSub, SupervisorLifecycleState}
 import csw.messages.params.models.{ObsId, Prefix}
 import csw.messages.params.states.CurrentState
+import csw.messages.scaladsl.CommandMessage.Submit
+import csw.messages.scaladsl.{CommandResponseManagerMessage ⇒ CRM}
+import CRM.{AddOrUpdateCommand, Query, Unsubscribe}
+import csw.messages.scaladsl.ComponentCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
+import csw.messages.scaladsl.SupervisorLockMessage.{Lock, Unlock}
 import org.scalatest.BeforeAndAfterEach
 
 import scala.concurrent.duration.DurationDouble
@@ -32,17 +31,20 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
     val supervisorRef = createSupervisorAndStartTLA(assemblyInfo, mocks)
 
+    supervisorRef ! ComponentStateSubscription(PubSub.Subscribe(compStateProbe.ref))
+    supervisorRef ! LifecycleStateSubscription(PubSub.Subscribe(lifecycleStateProbe.ref))
+
     // Assure that component is in running state
-    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
-    lifecycleStateProbe.expectMsg(Publish(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
+    compStateProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(initChoice))))
+    lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
 
     // Client 1 will lock an assembly
     supervisorRef ! LockCommandFactory.make("wfos.prog.cloudcover.Client1", lockingStateProbe.ref)
-    lockingStateProbe.expectMsg(LockAcquired)
+    lockingStateProbe.expectMessage(LockAcquired)
 
     // Client 2 tries to lock the assembly while Client 1 already has the lock
     supervisorRef ! LockCommandFactory.make("wfos.prog.cloudcover.Client2", lockingStateProbe.ref)
-    lockingStateProbe.expectMsg(
+    lockingStateProbe.expectMessage(
       AcquiringLockFailed(
         s"Invalid source [WFOS, wfos.prog.cloudcover.Client2] for acquiring lock. Currently it is acquired by component: [WFOS, wfos.prog.cloudcover.Client1]"
       )
@@ -50,11 +52,11 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
     // Client 1 re-acquires the lock by sending the same token again
     supervisorRef ! LockCommandFactory.make("wfos.prog.cloudcover.Client1", lockingStateProbe.ref)
-    lockingStateProbe.expectMsg(LockAcquired)
+    lockingStateProbe.expectMessage(LockAcquired)
 
     // Client 2 tries to unlock the assembly while Client 1 already has the lock
     supervisorRef ! Unlock("wfos.prog.cloudcover.Client2", lockingStateProbe.ref)
-    lockingStateProbe.expectMsg(
+    lockingStateProbe.expectMessage(
       ReleasingLockFailed(
         s"Invalid source [WFOS, wfos.prog.cloudcover.Client2] for releasing lock. Currently it is acquired by component: [WFOS, wfos.prog.cloudcover.Client1]"
       )
@@ -62,15 +64,15 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
     // Client 1 unlocks the assembly successfully
     supervisorRef ! Unlock("wfos.prog.cloudcover.Client1", lockingStateProbe.ref)
-    lockingStateProbe.expectMsg(LockReleased)
+    lockingStateProbe.expectMessage(LockReleased)
 
     // Client 1 tries to unlock the same assembly again while the lock is already released
     supervisorRef ! Unlock("wfos.prog.cloudcover.Client1", lockingStateProbe.ref)
-    lockingStateProbe.expectMsg(LockAlreadyReleased)
+    lockingStateProbe.expectMessage(LockAlreadyReleased)
 
     // Client 2 tries to unlock the same assembly while the lock is already released
     supervisorRef ! Unlock("wfos.prog.cloudcover.Client2", lockingStateProbe.ref)
-    lockingStateProbe.expectMsg(LockAlreadyReleased)
+    lockingStateProbe.expectMessage(LockAlreadyReleased)
   }
 
   // DEOPSCSW-222: Locking a component for a specific duration
@@ -90,44 +92,47 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
     val supervisorRef = createSupervisorAndStartTLA(assemblyInfo, mocks)
 
+    supervisorRef ! ComponentStateSubscription(PubSub.Subscribe(compStateProbe.ref))
+    supervisorRef ! LifecycleStateSubscription(PubSub.Subscribe(lifecycleStateProbe.ref))
+
     // Assure that component is in running state
-    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
-    lifecycleStateProbe.expectMsg(Publish(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
+    compStateProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(initChoice))))
+    lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
 
     // Client 1 will lock an assembly
     supervisorRef ! LockCommandFactory.make(source1Prefix, lockingStateProbe.ref)
-    lockingStateProbe.expectMsg(LockAcquired)
+    lockingStateProbe.expectMessage(LockAcquired)
 
     // Client 1 sends submit command with tokenId in parameter set
     supervisorRef ! Submit(Setup(source1Prefix, commandName1, Some(obsId)), commandResponseProbe.ref)
-    commandResponseProbe.expectMsgType[Accepted]
+    commandResponseProbe.expectMessageType[Accepted]
 
     // Client 2 tries to send submit command while Client 1 has the lock
     supervisorRef ! Submit(Setup(source2Prefix, commandName2, Some(obsId)), commandResponseProbe.ref)
-    commandResponseProbe.expectMsgType[NotAllowed]
+    commandResponseProbe.expectMessageType[NotAllowed]
 
     // Client 1 unlocks the assembly
     supervisorRef ! Unlock(source1Prefix, lockingStateProbe.ref)
-    lockingStateProbe.expectMsg(LockReleased)
+    lockingStateProbe.expectMessage(LockReleased)
 
     // Client 2 tries to send submit command again after lock is released
     supervisorRef ! Submit(Setup(source2Prefix, commandName2, Some(obsId)), commandResponseProbe.ref)
-    commandResponseProbe.expectMsgType[Accepted]
+    commandResponseProbe.expectMessageType[Accepted]
 
     // Client 2 will lock an assembly
     supervisorRef ! LockCommandFactory.make("wfos.prog.cloudcover.Client2", lockingStateProbe.ref)
-    lockingStateProbe.expectMsg(LockAcquired)
+    lockingStateProbe.expectMessage(LockAcquired)
 
     // Client 1 tries to send submit command while Client 2 has the lock
     supervisorRef ! Submit(Setup(source1Prefix, commandName1, Some(obsId)), commandResponseProbe.ref)
-    commandResponseProbe.expectMsgType[NotAllowed]
+    commandResponseProbe.expectMessageType[NotAllowed]
   }
 
   // DEOPSCSW-222: Locking a component for a specific duration
   // DEOPSCSW-301: Support UnLocking
   test("should forward messages that are of type SupervisorLockMessage to TLA") {
     val lockingStateProbe    = TestProbe[LockingResponse]
-    val commandResponseProbe = TestProbe[CommandResponse]()(untypedSystem.toTyped, settings)
+    val commandResponseProbe = TestProbe[CommandResponse]()(untypedSystem.toTyped)
 
     val sourcePrefix = Prefix("wfos.prog.cloudcover.source")
     val commandName  = CommandName("move.Client1.success")
@@ -138,35 +143,38 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
     val supervisorRef = createSupervisorAndStartTLA(assemblyInfo, mocks)
 
+    supervisorRef ! ComponentStateSubscription(PubSub.Subscribe(compStateProbe.ref))
+    supervisorRef ! LifecycleStateSubscription(PubSub.Subscribe(lifecycleStateProbe.ref))
+
     // Assure that component is in running state
-    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
-    lifecycleStateProbe.expectMsg(Publish(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
+    compStateProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(initChoice))))
+    lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
 
     // Client 1 will lock an assembly
     supervisorRef ! LockCommandFactory.make(sourcePrefix, lockingStateProbe.ref)
-    lockingStateProbe.expectMsg(LockAcquired)
+    lockingStateProbe.expectMessage(LockAcquired)
 
     // Client 1 sends submit command with tokenId in parameter set
     val setup = Setup(sourcePrefix, commandName, Some(obsId))
     supervisorRef ! Submit(setup, commandResponseProbe.ref)
-    commandResponseProbe.expectMsgType[Accepted]
-    commandResponseManagerActor.expectMsg(AddOrUpdateCommand(setup.runId, Accepted(setup.runId)))
+    commandResponseProbe.expectMessageType[Accepted]
+    commandResponseManagerActor.expectMessage(AddOrUpdateCommand(setup.runId, Accepted(setup.runId)))
 
     // Ensure Query can be sent to component even in locked state
     supervisorRef ! Query(setup.runId, commandResponseProbe.ref)
-    commandResponseManagerActor.expectMsg(Query(setup.runId, commandResponseProbe.ref))
+    commandResponseManagerActor.expectMessage(Query(setup.runId, commandResponseProbe.ref))
 
     // Ensure Subscribe can be sent to component even in locked state
-    supervisorRef ! Subscribe(setup.runId, commandResponseProbe.ref)
-    commandResponseManagerActor.expectMsg(Subscribe(setup.runId, commandResponseProbe.ref))
+    supervisorRef ! CRM.Subscribe(setup.runId, commandResponseProbe.ref)
+    commandResponseManagerActor.expectMessage(CRM.Subscribe(setup.runId, commandResponseProbe.ref))
 
     // Ensure Unsubscribe can be sent to component even in locked state
     supervisorRef ! Unsubscribe(setup.runId, commandResponseProbe.ref)
     // to prove un-subscribe is handled, sending a same setup command with the same runId again
     // now that we have un-subscribed, commandResponseProbe is not expecting command completion result (validation ll be received)
     supervisorRef ! Submit(setup, commandResponseProbe.ref)
-    commandResponseProbe.expectMsgType[Accepted]
-    commandResponseProbe.expectNoMsg(200.millis)
+    commandResponseProbe.expectMessageType[Accepted]
+    commandResponseProbe.expectNoMessage(200.millis)
   }
 
   // DEOPSCSW-223 Expiry of component Locking mode
@@ -184,31 +192,34 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
     val supervisorRef = createSupervisorAndStartTLA(assemblyInfo, mocks)
 
+    supervisorRef ! ComponentStateSubscription(PubSub.Subscribe(compStateProbe.ref))
+    supervisorRef ! LifecycleStateSubscription(PubSub.Subscribe(lifecycleStateProbe.ref))
+
     // Assure that component is in running state
-    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
-    lifecycleStateProbe.expectMsg(Publish(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
+    compStateProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(initChoice))))
+    lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
 
     // Client 1 will lock an assembly
     supervisorRef ! Lock(source1Prefix, lockingStateProbe.ref, 100.millis)
-    lockingStateProbe.expectMsg(LockAcquired)
-    lockingStateProbe.expectMsg(LockExpiringShortly)
+    lockingStateProbe.expectMessage(LockAcquired)
+    lockingStateProbe.expectMessage(LockExpiringShortly)
 
     // Client 2 tries to send submit command while Client 1 has the lock
     supervisorRef ! Submit(Setup(source2Prefix, commandName, Some(obsId)), commandResponseProbe.ref)
-    commandResponseProbe.expectMsgType[NotAllowed]
+    commandResponseProbe.expectMessageType[NotAllowed]
 
     // Reacquire lock before it gets expired
     supervisorRef ! Lock(source1Prefix, lockingStateProbe.ref, 100.millis)
-    lockingStateProbe.expectMsg(LockAcquired)
+    lockingStateProbe.expectMessage(LockAcquired)
 
     // this is to prove that timeout gets reset after renewing lock
-    lockingStateProbe.expectNoMsg(50.millis)
-    lockingStateProbe.expectMsg(LockExpiringShortly)
-    lockingStateProbe.expectMsg(LockExpired)
+    lockingStateProbe.expectNoMessage(50.millis)
+    lockingStateProbe.expectMessage(LockExpiringShortly)
+    lockingStateProbe.expectMessage(LockExpired)
 
     // Client 2 tries to send submit command again after lock is released
     supervisorRef ! Submit(Setup(source2Prefix, commandName, Some(obsId)), commandResponseProbe.ref)
-    commandResponseProbe.expectMsgType[Accepted]
+    commandResponseProbe.expectMessageType[Accepted]
   }
 
   // DEOPSCSW-223 Expiry of component Locking mode
@@ -221,15 +232,18 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
     val supervisorRef = createSupervisorAndStartTLA(assemblyInfo, mocks)
 
+    supervisorRef ! ComponentStateSubscription(PubSub.Subscribe(compStateProbe.ref))
+    supervisorRef ! LifecycleStateSubscription(PubSub.Subscribe(lifecycleStateProbe.ref))
+
     // Assure that component is in running state
-    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
-    lifecycleStateProbe.expectMsg(Publish(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
+    compStateProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(initChoice))))
+    lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
 
     // Client 1 will lock an assembly
     supervisorRef ! Lock(client1Prefix, lockingStateProbe.ref, 100.millis)
-    lockingStateProbe.expectMsg(LockAcquired)
+    lockingStateProbe.expectMessage(LockAcquired)
     supervisorRef ! Unlock(client1Prefix, lockingStateProbe.ref)
-    lockingStateProbe.expectMsg(LockReleased)
-    lockingStateProbe.expectNoMsg(100.millis)
+    lockingStateProbe.expectMessage(LockReleased)
+    lockingStateProbe.expectNoMessage(100.millis)
   }
 }

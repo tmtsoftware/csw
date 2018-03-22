@@ -2,7 +2,7 @@ package csw.services.messages
 
 import java.time.Instant
 
-import csw.messages.ccs.events._
+import csw.messages.events._
 import csw.messages.params.formats.JsonSupport
 import csw.messages.params.generics.KeyType.{DoubleMatrixKey, RaDecKey}
 import csw.messages.params.generics.{Key, KeyType, Parameter}

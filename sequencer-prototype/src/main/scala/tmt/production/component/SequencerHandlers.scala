@@ -4,16 +4,16 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Paths}
 
 import akka.stream.ActorMaterializer
-import akka.typed.ActorRef
-import akka.typed.scaladsl.ActorContext
-import akka.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.actor.typed.ActorRef
+import akka.actor.typed.scaladsl.ActorContext
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.util.Timeout
 import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
-import csw.messages.TopLevelActorMessage
-import csw.messages.ccs.commands.{CommandResponse, ControlCommand}
+import csw.messages.commands.{CommandResponse, ControlCommand}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.TrackingEvent
-import csw.services.ccs.scaladsl.CommandResponseManager
+import csw.messages.scaladsl.TopLevelActorMessage
+import csw.services.command.scaladsl.CommandResponseManager
 import csw.services.config.api.models.ConfigData
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory

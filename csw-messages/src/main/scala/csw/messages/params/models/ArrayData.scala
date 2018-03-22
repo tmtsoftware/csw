@@ -16,30 +16,64 @@ import scalapb.TypeMapper
  *
  * @param data input array
  */
-//TODO: add doc for why, where to use
 case class ArrayData[T](data: mutable.WrappedArray[T]) {
-  //scala  //TODO: add doc
+
+  /**
+   * An Array of values this parameter holds
+   */
   def values: Array[T] = data.array
-  //java //TODO: add doc
+
+  /**
+   * A Java helper that returns an Array of values this parameter holds
+   */
   def jValues: util.List[T] = data.asJava
 
-  //TODO: add doc with example
+  /**
+   * A comma separated string representation of all values this ArrayData holds
+   */
   override def toString: String = data.mkString("(", ",", ")")
 }
 
-//TODO: add doc for each val and method
 object ArrayData {
-  implicit def format[T: Format: ClassTag]: Format[ArrayData[T]] = Json.format[ArrayData[T]]
+  private[messages] implicit def format[T: Format: ClassTag]: Format[ArrayData[T]] = Json.format[ArrayData[T]]
 
-  implicit def fromArray[T](xs: Array[T]): ArrayData[T] = new ArrayData(xs)
+  /**
+   * Create an ArrayData from one or more values
+   *
+   * @param values an Array of one or more values
+   * @tparam T the type of values
+   * @return an instance of ArrayData
+   */
+  implicit def fromArray[T](values: Array[T]): ArrayData[T] = new ArrayData(values)
 
-  //scala
-  def fromArray[T: ClassTag](xs: T*): ArrayData[T] = new ArrayData(xs.toArray[T])
-  //A Java helper to instantiate ArrayData
-  def fromJavaArray[T](array: Array[T]): ArrayData[T] = ArrayData.fromArray(array)
+  /**
+   * Create an ArrayData from one or more values
+   *
+   * @param values one or more values
+   * @tparam T the type of values
+   * @return an instance of ArrayData
+   */
+  def fromArray[T: ClassTag](values: T*): ArrayData[T] = new ArrayData(values.toArray[T])
+
+  /**
+   * A Java helper to create an ArrayData from one or more values
+   *
+   * @param values an Array of one or more values
+   * @tparam T the type of values
+   * @return an instance of ArrayData
+   */
+  def fromJavaArray[T](values: Array[T]): ArrayData[T] = ArrayData.fromArray(values)
 
   implicit def typeMapper[T: ClassTag, S <: ItemType[T]: ItemTypeCompanion]: TypeMapper[S, ArrayData[T]] =
     TypeMapper[S, ArrayData[T]](x ⇒ ArrayData(x.values.toArray[T]))(x ⇒ ItemTypeCompanion.make(x.data))
 
+  /**
+   * Convert an Array of data from one type to other
+   *
+   * @param conversion a function of type A => B
+   * @tparam A the source type of data
+   * @tparam B the destination type of data
+   * @return a function of type ArrayData[A] ⇒ ArrayData[B]
+   */
   implicit def conversion[A, B](implicit conversion: A ⇒ B): ArrayData[A] ⇒ ArrayData[B] = _.asInstanceOf[ArrayData[B]]
 }

@@ -4,15 +4,15 @@ import java.net.InetAddress
 
 import akka.actor._
 import akka.stream.ActorMaterializer
-import akka.typed
-import akka.typed.Behavior
-import akka.typed.scaladsl.adapter._
+import akka.actor.typed
+import akka.actor.typed.Behavior
+import akka.actor.typed.scaladsl.adapter._
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
-import csw.services.logging.internal.LogControlMessages
+import csw.services.logging.messages.LogControlMessages
 import csw.services.logging.scaladsl.{Logger, LoggerFactory, LoggingSystemFactory}
 
 import scala.concurrent.duration._

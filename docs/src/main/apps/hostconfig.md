@@ -15,23 +15,56 @@ Scala
 Java
 :   @@snip [JHostConfigApp.java](../../../../examples/src/main/java/csw/framework/JHostConfigApp.java) { #jhost-config-app }
 
+@@@ note
+
+It is not necessary to have a name of the application as HostConfigApp/JHostConfigApp, user can choose this name.
+
+@@@
+
 ## Command line parameter options
 
 * **`--local`** It's an optional parameter. When supplied, get the host configuration file from local machine located at hostConfigPath, else fetch it from config service
 * **`<file>`** It's mandatory parameter. It specifies Host configuration file path
-* **`-s, --container-script <script-path>`** It specifies the path of generated shell script of container command app from task `universal:publish` (sbt-native-packager task)
+* **`-s, --container-script <script-path>`** It specifies the path of generated shell script of container command app from task `universal:packageBin` (sbt-native-packager task)
 * **`--help`** Prints the help of the application.
 * **`--version`** Prints the version of the application.
 
 ## Examples
 
-**Example:** `./trombone-host-config-app hostConfig.conf -s ./trombone-container-cmd-app`  
-**Explanation:** Fetch hostconfig.conf from configuration service which contains multiple container configuration, 
+### Pre-requisites
+
+* Run `sbt project/universal:packageBin` command. Here project contains HostConfigApp and ContainerCmdApp and it depends on required components. Ex. Hcd's, Assembly's etc.
+* Navigate to `project/target/universal` directory
+* Unzip file created with projects name
+* Navigate to `bin` directory from unzipped content
+
+Sbt task: `sbt project/universal:packageBin` creates following four scripts in `bin` directory:
+ 
+* `trombone-host-config-app` : Responsible for starting multiple containers. It takes `hostconfig.conf` file as an argument which contains list of container specifications.
+* `trombone-container-cmd-app` : Responsible for starting single container or component in standalone mode. It takes `containerConfig.conf` file as an argument which contains single container specifications.
+* `trombone-host-config-app.bat` : For windows machine.
+* `trombone-container-cmd-app.bat` : For windows machine.
+
+**Example:** `./trombone-host-config-app hostconfig.conf -s ./trombone-container-cmd-app`  
+**Explanation:** Fetch `hostconfig.conf` from configuration service which contains multiple container configuration, 
 then invoke trombone-container-cmd-app script per container configuration which spawns container
 
-**Example:** `./trombone-host-config-app --local hostConfig.conf -s ./trombone-container-cmd-app`  
-**Explanation:** Fetch and parse hostconfig.conf from current directory which contains multiple container configuration, 
+**Example:** `./trombone-host-config-app --local hostconfig.conf -s ./trombone-container-cmd-app`  
+**Explanation:** Fetch and parse `hostconfig.conf` from current directory which contains multiple container configuration, 
 then invoke trombone-container-cmd-app script per container configuration which spawns container
+ 
+
+@@@ note
+
+In above examples, we are passing argument: `-s ./trombone-container-cmd-app` to `./trombone-host-config-app`. here `-s` stands for script and following to that is script name, in our case its `trombone-container-cmd-app`.
+and if you notice, `trombone-container-cmd-app` does not take container configuration file.
+`hostconfig.conf` passed to `trombone-host-config-app` contains location of container configuration files. Host config app internally parses `hostconfig.conf` and passes container configuration file
+location to `trombone-container-cmd-app`.
+
+Find more details of ContainerCmd application @ref:[here](../framework/deploying-components.md).
+
+@@@
+
  
 ## Where does it fit in overall deployment strategy (may change)
 
@@ -40,7 +73,7 @@ then invoke trombone-container-cmd-app script per container configuration which 
 ## Custom Host Configuration
 
 hostconfig.conf
-:   @@snip [hostconfig.conf](../../../../examples/src/main/resources/hostConfig.conf) { #host-conf }
+:   @@snip [hostConfig.conf](../../../../examples/src/main/resources/hostConfig.conf) { #host-conf }
 
 ## Help
 Use the following command to get help on the options available with this app

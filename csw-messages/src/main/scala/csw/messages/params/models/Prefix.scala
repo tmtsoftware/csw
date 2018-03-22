@@ -11,7 +11,6 @@ import scala.language.implicitConversions
  * @param subsystem the subsystem that is the target of the command
  * @param prefix    the subsystem's prefix
  */
-//TODO: add doc for significance
 case class Prefix(subsystem: Subsystem, prefix: String) extends TMTSerializable {
   override def toString: String = s"[$subsystem, $prefix]"
 
@@ -28,6 +27,12 @@ case class Prefix(subsystem: Subsystem, prefix: String) extends TMTSerializable 
 object Prefix {
   private val SEPARATOR = '.'
 
+  /**
+   * A helper method to create Prefix from given string
+   *
+   * @param prefix a string representation of prefix of a component with it's subsystem and name
+   * @return an instance of Prefix
+   */
   implicit def apply(prefix: String): Prefix = Prefix(subsystem(prefix), prefix)
 
   private def subsystem(keyText: String): Subsystem = {
@@ -35,5 +40,5 @@ object Prefix {
     Subsystem.withNameOption(keyText.splitAt(keyText.indexOf(SEPARATOR))._1).getOrElse(Subsystem.BAD)
   }
 
-  implicit val format: OFormat[Prefix] = Json.format[Prefix]
+  private[messages] implicit val format: OFormat[Prefix] = Json.format[Prefix]
 }

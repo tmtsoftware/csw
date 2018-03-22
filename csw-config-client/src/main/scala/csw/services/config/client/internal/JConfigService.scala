@@ -17,7 +17,7 @@ import scala.compat.java8.OptionConverters._
 /**
  * Java Client for using configuration service
  */
-class JConfigService(configService: ConfigService, actorRuntime: ActorRuntime) extends IConfigService {
+private[config] class JConfigService(configService: ConfigService, actorRuntime: ActorRuntime) extends IConfigService {
 
   import actorRuntime._
 

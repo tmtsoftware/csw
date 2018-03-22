@@ -2,7 +2,9 @@ package csw.messages.javadsl;
 
 import csw.messages.params.models.Units;
 
-//TODO: explain better significance
+/**
+ * Helper class for Java to get handle of TMT Units
+ */
 @SuppressWarnings("unused")
 public class JUnits {
 

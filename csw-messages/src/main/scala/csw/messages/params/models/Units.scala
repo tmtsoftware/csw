@@ -7,20 +7,34 @@ import enumeratum.{Enum, EnumEntry, PlayJsonEnum}
 
 import scala.collection.immutable
 
+/**
+ * A class representing units for TMT
+ *
+ * @param name of the unit
+ * @param description of the unit
+ */
 sealed abstract class Units(name: String, description: String) extends EnumEntry with TMTSerializable {
   // Should parameterize Units so concat can be created concat[A, B]
 //  override def toString: String = "[" + name + "]"
 
-  //TODO: add doc for significance
+  /**
+   * The name of the unit
+   */
   def getName: String = s"[$name]"
 
-  //TODO: add doc for significance
+  /**
+   *The description of unit
+   */
   def getDescription: String = description
 }
 
 object Units extends Enum[Units] with PlayJsonEnum[Units] {
 
+  /**
+   * A Seq of all values that are Units
+   */
   override def values: immutable.IndexedSeq[Units] = findValues
+
   implicit val typeMapper: TypeMapper[PbUnits, Units] =
     TypeMapper[PbUnits, Units](x ⇒ Units.withName(x.toString()))(x ⇒ PbUnits.fromName(x.toString).get)
 

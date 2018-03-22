@@ -9,6 +9,7 @@ import com.persist.JsonOps._
 import csw.services.logging._
 import csw.services.logging.appenders.LogAppender
 import csw.services.logging.commons.{Category, LoggingKeys, TMTDateTimeFormatter}
+import csw.services.logging.internal.LogActorMessages._
 import csw.services.logging.internal.LoggingLevels.Level
 import csw.services.logging.macros.DefaultSourceLocation
 import csw.services.logging.scaladsl.{RequestId, RichException}
@@ -18,8 +19,8 @@ import scala.concurrent.Promise
 /**
  * All log messages are routed to this single Akka Actor. There is one LogActor per logging system.
  * Logging messages from logging API, Java Slf4j and Akka loggers are sent to this actor.
+ * Messages are then forwarded to one or more configured appenders.
  */
-//TODO: explain better significance
 private[logging] object LogActor {
 
   def props(

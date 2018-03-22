@@ -18,14 +18,14 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
 /**
  * A convenient class wrapping actor system and providing handles for execution context, materializer and clean up of actor system
  */
-class ActorRuntime private[config] (_actorSystem: ActorSystem, settings: Settings) {
+private[config] class ActorRuntime(_actorSystem: ActorSystem, settings: Settings) {
   implicit val actorSystem: ActorSystem     = _actorSystem
   implicit val ec: ExecutionContextExecutor = actorSystem.dispatcher
   implicit val mat: Materializer            = ActorMaterializer()
 
-  val blockingIoDispatcher: MessageDispatcher = actorSystem.dispatchers.lookup(settings.`blocking-io-dispatcher`)
-
   val coordinatedShutdown = CoordinatedShutdown(actorSystem)
+
+  val blockingIoDispatcher: MessageDispatcher = actorSystem.dispatchers.lookup(settings.`blocking-io-dispatcher`)
 
   def startLogging(): LoggingSystem =
     LoggingSystemFactory.start(BuildInfo.name, BuildInfo.version, ClusterAwareSettings.hostname, actorSystem)

@@ -2,28 +2,28 @@ package csw.framework.command
 
 import akka.actor.Scheduler
 import akka.stream.{ActorMaterializer, Materializer}
-import akka.typed.ActorSystem
-import akka.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.typed.testkit.TestKitSettings
-import akka.typed.testkit.scaladsl.TestProbe
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.testkit.typed.TestKitSettings
+import akka.testkit.typed.scaladsl.TestProbe
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.common.utils.LockCommandFactory
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
-import csw.messages.CommandMessage.Submit
-import csw.messages.ccs.CommandIssue.ComponentLockedIssue
-import csw.messages.ccs.commands.CommandResponse._
-import csw.messages.ccs.commands._
-import csw.messages.ccs.commands.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
-import csw.messages.ccs.commands.matchers.{DemandMatcher, Matcher, MatcherResponse}
+import csw.messages.commands.CommandIssue.ComponentLockedIssue
+import csw.messages.commands.CommandResponse._
+import csw.messages.commands._
+import csw.messages.commands.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
+import csw.messages.commands.matchers.{DemandMatcher, Matcher, MatcherResponse}
+import csw.messages.framework.LockingResponse
+import csw.messages.framework.LockingResponses.LockAcquired
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{AkkaLocation, ComponentId, ComponentType}
-import csw.messages.models.LockingResponse
-import csw.messages.models.LockingResponses.LockAcquired
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.DemandState
-import csw.services.ccs.scaladsl.CommandService
+import csw.messages.scaladsl.CommandMessage.Submit
+import csw.services.command.scaladsl.CommandService
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 
 import scala.async.Async._
@@ -103,7 +103,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       // try to send a command to assembly which is already locked
       val assemblyObserve = Observe(invalidPrefix, acceptedCmd, Some(ObsId("Obs001")))
       assemblyRef ! Submit(assemblyObserve, cmdResponseProbe.ref)
-      val response = cmdResponseProbe.expectMsgType[NotAllowed]
+      val response = cmdResponseProbe.expectMessageType[NotAllowed]
       response.issue shouldBe an[ComponentLockedIssue]
 
       enterBarrier("command-when-locked")
@@ -262,10 +262,12 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       commandResponseOnTimeout.asInstanceOf[Error].message shouldBe timeoutExMsg
 
       //#oneway
+      // `setupWithTimeoutMatcher` is a sample setup payload intended to be used when command response is not determined
+      // using matcher
       val onewayCommandResponseF: Future[Unit] = async {
-        val initialResponse = await(assemblyComponent.oneway(setupWithTimeoutMatcher))
+        val initialResponse: CommandResponse = await(assemblyComponent.oneway(setupWithTimeoutMatcher))
         initialResponse match {
-          case _: Accepted ⇒
+          case accepted: Accepted ⇒
           // do Something
           case invalid: Invalid ⇒
           // do Something
@@ -275,23 +277,39 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       }
       //#oneway
 
+      //#submit
+      // `setupWithTimeoutMatcher` is a sample setup payload intended to be used when command response is not determined
+      // using matcher
+      val submitCommandResponseF: Future[Unit] = async {
+        val initialResponse: CommandResponse = await(assemblyComponent.submit(setupWithTimeoutMatcher))
+        initialResponse match {
+          case accepted: Accepted ⇒
+          // do Something
+          case invalid: Invalid ⇒
+          // do Something
+          case x ⇒
+          // do Something
+        }
+      }
+      //#submit
+
       enterBarrier("short-long-commands")
 
       // acquire lock on assembly
       val lockResponseProbe = TestProbe[LockingResponse]
       assemblyLocation.componentRef ! LockCommandFactory.make(prefix, lockResponseProbe.ref)
-      lockResponseProbe.expectMsg(LockAcquired)
+      lockResponseProbe.expectMessage(LockAcquired)
       enterBarrier("assembly-locked")
 
       // send command with lock token and expect command processing response
       val assemblySetup = Setup(prefix, immediateCmd, obsId)
       assemblyLocation.componentRef ! Submit(assemblySetup, cmdResponseProbe.ref)
-      cmdResponseProbe.expectMsg(5.seconds, Completed(assemblySetup.runId))
+      cmdResponseProbe.expectMessage(5.seconds, Completed(assemblySetup.runId))
 
       // send command with lock token and expect command processing response with result
       val assemblySetup2 = Setup(prefix, immediateResCmd, obsId)
       assemblyLocation.componentRef ! Submit(assemblySetup2, cmdResponseProbe.ref)
-      cmdResponseProbe.expectMsgType[CompletedWithResult](5.seconds)
+      cmdResponseProbe.expectMessageType[CompletedWithResult](5.seconds)
 
       enterBarrier("command-when-locked")
     }

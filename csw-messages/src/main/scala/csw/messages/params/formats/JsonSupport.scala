@@ -1,7 +1,7 @@
 package csw.messages.params.formats
 
-import csw.messages.ccs.commands._
-import csw.messages.ccs.events._
+import csw.messages.commands._
+import csw.messages.events._
 import csw.messages.params.generics.Parameter
 import csw.messages.params.models.{Id, ObsId, Prefix}
 import csw.messages.params.states.StateVariable.StateVariable
@@ -13,8 +13,7 @@ object JsonSupport extends JsonSupport with DerivedJsonFormats with WrappedArray
 /**
  * Supports conversion of commands, state variables and events to/from JSON
  */
-//TODO: why we need this and where do we need it
-trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
+private[messages] trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
 
   // JSON formats
   lazy val paramSetFormat: Format[Set[Parameter[_]]] = implicitly[Format[Set[Parameter[_]]]]
@@ -60,6 +59,7 @@ trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
    * Reads a SequenceCommand back from JSON
    *
    * @param json the parsed JSON
+   * @tparam A the type of the command (implied)
    * @return an instance of the given SequenceCommand type, or an exception if the JSON is not valid for that type
    */
   def readSequenceCommand[A <: SequenceCommand](json: JsValue): A = {
@@ -115,6 +115,7 @@ trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
    * Reads a StateVariable back from JSON
    *
    * @param json the parsed JSON
+   * @tparam A the type of the StateVariable (implied)
    * @return an instance of the given StateVariable, or an exception if the JSON is not valid for that type
    */
   def readStateVariable[A <: StateVariable](json: JsValue): A = {

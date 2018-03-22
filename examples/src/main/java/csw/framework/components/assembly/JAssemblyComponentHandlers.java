@@ -1,20 +1,24 @@
 package csw.framework.components.assembly;
 
-import akka.typed.javadsl.ActorContext;
-import akka.typed.javadsl.Adapter;
-import csw.exceptions.FailureRestart;
-import csw.exceptions.FailureStop;
+import akka.actor.typed.ActorRef;
+import akka.actor.typed.javadsl.ActorContext;
+import akka.actor.typed.javadsl.Adapter;
+import akka.testkit.typed.javadsl.TestProbe;
+import akka.util.Timeout;
+import csw.framework.exceptions.FailureRestart;
+import csw.framework.exceptions.FailureStop;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.scaladsl.CurrentStatePublisher;
-import csw.messages.TopLevelActorMessage;
-import csw.messages.ccs.CommandIssue;
-import csw.messages.ccs.commands.CommandResponse;
-import csw.messages.ccs.commands.ControlCommand;
-import csw.messages.ccs.commands.Observe;
-import csw.messages.ccs.commands.Setup;
+import csw.messages.commands.*;
 import csw.messages.framework.ComponentInfo;
 import csw.messages.location.*;
-import csw.services.ccs.scaladsl.CommandResponseManager;
+import csw.messages.params.generics.JKeyTypes;
+import csw.messages.params.generics.Key;
+import csw.messages.params.models.Prefix;
+import csw.messages.params.states.CurrentState;
+import csw.messages.scaladsl.TopLevelActorMessage;
+import csw.services.command.javadsl.JCommandService;
+import csw.services.command.scaladsl.CommandResponseManager;
 import csw.services.config.api.javadsl.IConfigClientService;
 import csw.services.config.api.models.ConfigData;
 import csw.services.config.client.javadsl.JConfigClientFactory;
@@ -25,9 +29,10 @@ import csw.services.logging.javadsl.JLoggerFactory;
 import scala.concurrent.duration.FiniteDuration;
 
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 
@@ -41,9 +46,12 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     private final ILocationService locationService;
     private ILogger log;
     private IConfigClientService configClient;
+    private Map<Connection, Optional<JCommandService>> runningHcds;
+    private ActorRef<DiagnosticPublisherMessages> diagnosticPublisher;
+    private ActorRef<CommandResponse> commandResponseAdapter;
 
     public JAssemblyComponentHandlers(
-            akka.typed.javadsl.ActorContext<TopLevelActorMessage> ctx,
+            akka.actor.typed.javadsl.ActorContext<TopLevelActorMessage> ctx,
             ComponentInfo componentInfo,
             CommandResponseManager commandResponseManager,
             CurrentStatePublisher currentStatePublisher,
@@ -59,22 +67,39 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
         this.locationService = locationService;
         log = loggerFactory.getLogger(this.getClass());
         configClient = JConfigClientFactory.clientApi(Adapter.toUntyped(ctx.getSystem()), locationService);
+
+        runningHcds = new HashMap<>();
+        commandResponseAdapter = TestProbe.<CommandResponse>create(ctx.getSystem()).ref();
     }
     //#jcomponent-handlers-class
 
     //#jInitialize-handler
     @Override
     public CompletableFuture<Void> jInitialize() {
-        /*
-         * Initialization could include following steps :
-         * 1. fetch config (preferably from configuration service)
-         * 2. create a worker actor which is used by this assembly
-         * 3. find a Hcd connection from the connections provided in componentInfo
-         * 4. If an Hcd is found as a connection, resolve its location from location service and create other
-         *    required worker actors required by this assembly
-         * */
 
-        return new CompletableFuture<>();
+        // fetch config (preferably from configuration service)
+        CompletableFuture<ConfigData> configDataCompletableFuture = getAssemblyConfig();
+
+        // create a worker actor which is used by this assembly
+        CompletableFuture<ActorRef<WorkerActorMsg>> worker =
+                configDataCompletableFuture.thenApply(config -> ctx.spawnAnonymous(WorkerActor.make(config)));
+
+        // find a Hcd connection from the connections provided in componentInfo
+        Optional<Connection> mayBeConnection = componentInfo.getConnections().stream()
+                .filter(connection -> connection.componentId().componentType() == JComponentType.HCD)
+                .findFirst();
+
+        // If an Hcd is found as a connection, resolve its location from location service and create other
+        // required worker actors required by this assembly
+        return mayBeConnection.map(connection ->
+                worker.thenAcceptBoth(resolveHcd(), (workerActor, hcdLocation) -> {
+                    if(!hcdLocation.isPresent())
+                        throw new HcdNotFoundException();
+                    else
+                        runningHcds.put(connection, Optional.of(new JCommandService(hcdLocation.get(), ctx.getSystem())));
+                    diagnosticPublisher = ctx.spawnAnonymous(JDiagnosticsPublisherFactory.make(new JCommandService(hcdLocation.get(), ctx.getSystem()), workerActor));
+                })).get();
+
     }
     //#jInitialize-handler
 
@@ -83,6 +108,11 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     public CommandResponse validateCommand(ControlCommand controlCommand) {
         if (controlCommand instanceof Setup) {
             // validation for setup goes here
+            //#addOrUpdateCommand
+            // after validation of the controlCommand, update its status of successful validation as Accepted
+            CommandResponse.Accepted accepted = new CommandResponse.Accepted(controlCommand.runId());
+            commandResponseManager.addOrUpdateCommand(controlCommand.runId(), accepted);
+            //#addOrUpdateCommand
             return new CommandResponse.Accepted(controlCommand.runId());
         } else if (controlCommand instanceof Observe) {
             // validation for observe goes here
@@ -149,6 +179,57 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     private void processSetup(Setup sc) {
         switch (sc.commandName().name()) {
             case "forwardToWorker":
+                //#addSubCommand
+                Prefix prefix = new Prefix("wfos.red.detector");
+                Setup subCommand = new Setup(prefix, new CommandName("sub-command-1"), sc.jMaybeObsId());
+                commandResponseManager.addSubCommand(sc.runId(), subCommand.runId());
+
+                Setup subCommand2 = new Setup(prefix, new CommandName("sub-command-2"), sc.jMaybeObsId());
+                commandResponseManager.addSubCommand(sc.runId(), subCommand2.runId());
+
+                //#addSubCommand
+
+                //#subscribe-to-command-response-manager
+                // subscribe to the status of original command received and publish the state when its status changes to
+                // Completed
+                commandResponseManager.jSubscribe(subCommand.runId(), commandResponse -> {
+                    if(commandResponse.resultType() instanceof CommandResponse.Completed) {
+                        Key<String> stringKey = JKeyTypes.StringKey().make("sub-command-status");
+                        CurrentState currentState = new CurrentState(sc.source().prefix());
+                        currentStatePublisher.publish(currentState.madd(stringKey.set("complete")));
+                    }
+                    else {
+                        // do something
+                    }
+                });
+                //#subscribe-to-command-response-manager
+
+                //#updateSubCommand
+                // An original command is split into sub-commands and sent to a component. The result of the command is
+                // obtained by subscribing to the component with the sub command id.
+                JCommandService componentCommandService = runningHcds.get(componentInfo.getConnections().get(0)).get();
+                componentCommandService.subscribe(subCommand2.runId(), Timeout.durationToTimeout(FiniteDuration.apply(5, TimeUnit.SECONDS)))
+                        .thenAccept(commandResponse -> {
+                            if(commandResponse.resultType() instanceof CommandResponse.Completed) {
+                                // As the commands get completed, the results are updated in the commandResponseManager
+                                commandResponseManager.updateSubCommand(subCommand2.runId(), commandResponse);
+                            }
+                            else {
+                                // do something
+                            }
+                });
+                //#updateSubCommand
+
+                //#query-command-response-manager
+                // query CommandResponseManager to get the current status of Command, for example: Accepted/Completed/Invalid etc.
+                commandResponseManager
+                        .jQuery(subCommand.runId(), Timeout.durationToTimeout(FiniteDuration.apply(5, "seconds")))
+                        .thenAccept(commandResponse -> {
+                            // may choose to publish current state to subscribers or do other operations
+                        });
+
+                //#query-command-response-manager
+
             default:
                 log.error("Invalid command [" + sc + "] received.");
         }
@@ -194,7 +275,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
         }
     }
 
-    private void resolveHcd() {
+    private CompletableFuture<Optional<AkkaLocation>> resolveHcd() {
         // find a Hcd connection from the connections provided in componentInfo
         Optional<Connection> mayBeConnection = componentInfo.getConnections().stream()
                 .filter(connection -> connection.componentId().componentType() == JComponentType.HCD)
@@ -202,14 +283,17 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
 
         // If an Hcd is found as a connection, resolve its location from location service and create other
         // required worker actors required by this assembly
-        mayBeConnection.ifPresent(connection -> {
-            CompletableFuture<Optional<AkkaLocation>> eventualHcdLocation = locationService.resolve(connection.<AkkaLocation>of(), FiniteDuration.apply(5, TimeUnit.SECONDS));
-            try {
-                AkkaLocation hcdLocation = eventualHcdLocation.get().orElseThrow(HcdNotFoundException::new);
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-        });
+        if(mayBeConnection.isPresent()) {
+            CompletableFuture<Optional<AkkaLocation>> resolve = locationService.resolve(mayBeConnection.get().<AkkaLocation>of(), FiniteDuration.apply(5, TimeUnit.SECONDS));
+            return resolve.thenCompose((Optional<AkkaLocation> resolvedHcd) -> {
+                if(resolvedHcd.isPresent())
+                    return CompletableFuture.completedFuture(resolvedHcd);
+                else
+                    throw new ConfigNotAvailableException();
+            });
+        }
+        else
+            return CompletableFuture.completedFuture(Optional.empty());
     }
     // #failureRestart-Exception
 
@@ -220,12 +304,13 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
         }
     }
 
-    private CompletableFuture<ConfigData> getAssemblyConfigs() {
+    private CompletableFuture<ConfigData> getAssemblyConfig() throws ConfigNotAvailableException {
         // required configuration could not be found in the configuration service. Component can choose to stop until the configuration is made available in the
         // configuration service and started again
-        return configClient.getActive(Paths.get("tromboneAssemblyContext.conf")).thenApply((maybeConfigData) -> {
-            return maybeConfigData.orElseThrow(ConfigNotAvailableException::new);
-        });
+        return configClient.getActive(Paths.get("tromboneAssemblyContext.conf"))
+                .thenApply((Optional<ConfigData> maybeConfigData) -> {
+                    return maybeConfigData.<ConfigNotAvailableException>orElseThrow(() -> new ConfigNotAvailableException());
+                });
     }
     // #failureStop-Exception
 

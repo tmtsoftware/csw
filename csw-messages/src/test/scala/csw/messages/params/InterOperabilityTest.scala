@@ -3,13 +3,13 @@ package csw.messages.params
 import java.util.Optional
 
 import akka.actor
-import akka.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.typed.testkit.TestKitSettings
-import akka.typed.testkit.scaladsl.TestProbe
-import akka.typed.{ActorRef, ActorSystem}
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.actor.typed.{ActorRef, ActorSystem}
+import akka.testkit.typed.TestKitSettings
+import akka.testkit.typed.scaladsl.TestProbe
 import akka.util.Timeout
-import csw.messages.ccs.commands.{Command, CommandName, Setup}
-import csw.messages.ccs.events.SystemEvent
+import csw.messages.commands.{Command, CommandName, Setup}
+import csw.messages.events.SystemEvent
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.{ObsId, Prefix}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
@@ -59,13 +59,13 @@ class InterOperabilityTest extends FunSuite with Matchers with BeforeAndAfterAll
 
     jCommandHandlerActor ! CommandMsg(scalaSetup, ackProbe.ref, replyToProbe.ref, obsIdProbe.ref)
 
-    val set = ackProbe.expectMsgType[java.util.Set[Parameter[_]]]
+    val set = ackProbe.expectMessageType[java.util.Set[Parameter[_]]]
     set.asScala.toSet shouldBe Set(intParam, stringParam)
 
-    val eventFromJava = replyToProbe.expectMsgType[SystemEvent]
+    val eventFromJava = replyToProbe.expectMessageType[SystemEvent]
     eventFromJava.paramSet shouldBe Set(JavaCommandHandler.encoderParam, JavaCommandHandler.epochStringParam)
 
-    obsIdProbe.expectMsgType[Optional[ObsId]]
+    obsIdProbe.expectMessageType[Optional[ObsId]]
   }
 
 }

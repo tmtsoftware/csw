@@ -11,7 +11,6 @@ import scala.concurrent.Promise
 /**
  * Global state info for logging. Use with care!
  */
-//TODO: explain better significance
 private[logging] object LoggingState {
 
   // This is a default log level applied to all the components, if components does not specify explicitly
@@ -21,18 +20,20 @@ private[logging] object LoggingState {
   private[logging] var logLevel: Level      = _
   private[logging] var akkaLogLevel: Level  = _
   private[logging] var slf4jLogLevel: Level = _
-  // Queue of messages sent before logger is started
+  // queue of messages sent before logger is started
   private[logging] val msgs = new mutable.Queue[LogActorMessages]()
 
+  // LogActor that gets instantiated when LoggingSystem starts
   private[logging] var maybeLogActor: Option[ActorRef] = None
   @volatile private[logging] var loggerStopping        = false
 
   private[logging] var doTime: Boolean                   = false
   private[logging] var timeActorOption: Option[ActorRef] = None
 
-  // Use to sync akka logging actor shutdown
+  // use to sync akka logging actor shutdown
   private[logging] val akkaStopPromise = Promise[Unit]
 
+  // a map of componentName -> LoggingState
   var componentsLoggingState: Map[String, ComponentLoggingState] =
     Map(Constants.DEFAULT_KEY → ComponentLoggingState(defaultLogLevel))
 }

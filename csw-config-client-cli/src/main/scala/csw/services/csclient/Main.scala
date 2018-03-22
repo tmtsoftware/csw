@@ -1,6 +1,6 @@
 package csw.services.csclient
 
-import csw.messages.models.CoordinatedShutdownReasons.ApplicationFinishedReason
+import csw.messages.commons.CoordinatedShutdownReasons.ApplicationFinishedReason
 import csw.services.BuildInfo
 import csw.services.csclient.cli.{ArgsParser, ClientCliWiring, Options}
 import csw.services.location.commons.ClusterAwareSettings

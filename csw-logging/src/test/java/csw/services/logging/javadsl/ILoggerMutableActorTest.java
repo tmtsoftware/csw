@@ -1,8 +1,8 @@
 package csw.services.logging.javadsl;
 
 import akka.actor.ActorSystem;
-import akka.typed.ActorRef;
-import akka.typed.javadsl.Adapter;
+import akka.actor.typed.ActorRef;
+import akka.actor.typed.javadsl.Adapter;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -85,7 +85,7 @@ public class ILoggerMutableActorTest {
         });
     }
 
-    private static void sendLogMsgToTypedActorInBulk(akka.typed.ActorRef<LogCommand> actorRef) {
+    private static void sendLogMsgToTypedActorInBulk(akka.actor.typed.ActorRef<LogCommand> actorRef) {
         actorRef.tell(JLogCommand.LogTrace);
         actorRef.tell(JLogCommand.LogDebug);
         actorRef.tell(JLogCommand.LogInfo);

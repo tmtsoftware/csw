@@ -3,10 +3,9 @@ import sbt._
 
 object UnidocSite extends AutoPlugin {
   import sbtunidoc.{BaseUnidocPlugin, JavaUnidocPlugin, ScalaUnidocPlugin}
+  import BaseUnidocPlugin.autoImport.unidoc
   import JavaUnidocPlugin.autoImport._
   import ScalaUnidocPlugin.autoImport._
-  import BaseUnidocPlugin.autoImport.unidoc
-
   import com.typesafe.sbt.site.SitePlugin.autoImport._
 
   override def requires: Plugins = ScalaUnidocPlugin && JavaUnidocPlugin
@@ -22,7 +21,6 @@ object UnidocSite extends AutoPlugin {
     addMappingsToSiteDir(mappings in (JavaUnidoc, packageDoc), siteSubdirName in JavaUnidoc),
     scalacOptions in (ScalaUnidoc, unidoc) ++= Seq("-skip-packages", excludeScaladoc),
     autoAPIMappings := true
-    //      apiURL := Some(url(s"http://tmtsoftware.github.io/csw-prod/api/${version.value}"))
   )
 
   def filterNotSources(filesKey: TaskKey[Seq[File]], subPaths: Set[String]): Setting[Task[Seq[File]]] = {

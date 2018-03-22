@@ -1,6 +1,6 @@
 package tmt.development
 
-import csw.messages.ccs.commands.{CommandName, Setup}
+import csw.messages.commands.{CommandName, Setup}
 import csw.messages.params.models.Prefix
 import tmt.development.dsl.Dsl._
 import tmt.development.dsl.Dsl.wiring._

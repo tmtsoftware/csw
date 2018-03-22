@@ -1,6 +1,6 @@
 package csw.apps.clusterseed.admin
 
-import akka.typed.scaladsl.AskPattern._
+import akka.actor.typed.scaladsl.AskPattern._
 import akka.util.Timeout
 import csw.apps.clusterseed.admin.exceptions.{InvalidComponentNameException, UnresolvedAkkaOrHttpLocationException}
 import csw.apps.clusterseed.admin.internal.ActorRuntime
@@ -9,7 +9,7 @@ import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
 import csw.messages.location.{Connection, Location}
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.internal.LoggingLevels.Level
-import csw.services.logging.internal.{GetComponentLogMetadata, LogControlMessages, SetComponentLogLevel}
+import csw.services.logging.messages.{GetComponentLogMetadata, LogControlMessages, SetComponentLogLevel}
 import csw.services.logging.models.LogMetadata
 import csw.services.logging.scaladsl.Logger
 
@@ -17,13 +17,14 @@ import scala.async.Async._
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationDouble
 
-//TODO: add doc to explain significance
+/**
+ * Utility to resolve and get the actorRef of LogAdminActor for the component using location service
+ */
 class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) {
   private val log: Logger = ClusterSeedLogger.getLogger
 
   import actorRuntime._
 
-  //TODO: add doc to explain significance
   def getLogMetadata(componentFullName: String): Future[LogMetadata] = async {
     implicit val timeout: Timeout = Timeout(5.seconds)
     await(getLocation(componentFullName)) match {
@@ -43,7 +44,6 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) {
     }
   }
 
-  //TODO: add doc to explain significance
   def setLogLevel(componentFullName: String, logLevel: Level): Future[Unit] =
     async {
       await(getLocation(componentFullName)) match {
@@ -63,7 +63,6 @@ class LogAdmin(locationService: LocationService, actorRuntime: ActorRuntime) {
       }
     }
 
-  //TODO: add doc to explain significance
   private def getLocation(componentFullName: String): Future[Option[Location]] =
     async {
       Connection.from(componentFullName) match {

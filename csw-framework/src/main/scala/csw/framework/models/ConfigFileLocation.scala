@@ -8,7 +8,7 @@ import scala.collection.immutable
 /**
  * This is used as indicator for command line applications to fetch configuration files either from local machine or from Configuration service
  */
-sealed abstract class ConfigFileLocation extends EnumEntry with TMTSerializable
+private[csw] sealed abstract class ConfigFileLocation extends EnumEntry with TMTSerializable
 
 private[csw] object ConfigFileLocation extends Enum[ConfigFileLocation] with PlayJsonEnum[ConfigFileLocation] {
 

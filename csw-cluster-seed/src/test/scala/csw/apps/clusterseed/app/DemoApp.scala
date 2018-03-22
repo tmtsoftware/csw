@@ -1,20 +1,19 @@
 package csw.apps.clusterseed.app
 
-import akka.typed.scaladsl.adapter._
-import akka.typed.testkit.TestKitSettings
-import akka.typed.testkit.scaladsl.TestProbe
-import akka.typed.{ActorRef, ActorSystem}
+import akka.actor.typed.scaladsl.adapter._
+import akka.testkit.typed.TestKitSettings
+import akka.testkit.typed.scaladsl.TestProbe
+import akka.actor.typed.{ActorRef, ActorSystem}
 import com.typesafe.config.ConfigFactory
 import csw.apps.clusterseed.admin.internal.AdminWiring
 import csw.common.FrameworkAssertions.assertThatContainerIsRunning
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
-import csw.messages.CommandMessage.Oneway
-import csw.messages.ContainerCommonMessage.GetComponents
-import csw.messages.ContainerMessage
-import csw.messages.ccs.commands.{CommandName, CommandResponse, Setup}
-import csw.messages.framework.ContainerLifecycleState
-import csw.messages.models.{Component, Components}
+import csw.messages.commands.{CommandName, CommandResponse, Setup}
+import csw.messages.framework.{Component, Components, ContainerLifecycleState}
 import csw.messages.params.models.Prefix
+import csw.messages.scaladsl.CommandMessage.Oneway
+import csw.messages.scaladsl.ContainerCommonMessage.GetComponents
+import csw.messages.scaladsl.ContainerMessage
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.logging.scaladsl.{LoggerFactory, LoggingSystemFactory}
 
@@ -80,7 +79,7 @@ object DemoApp extends App {
 
   val probe = TestProbe[Components]
   containerRef ! GetComponents(probe.ref)
-  val components = probe.expectMsgType[Components].components
+  val components = probe.expectMessageType[Components].components
 
   private val laserComponent: Component = components.find(x ⇒ x.info.name.equals("Laser")).get
 

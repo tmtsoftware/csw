@@ -26,7 +26,7 @@ object Parameter {
   ): Parameter[S] =
     new Parameter(keyName, keyType, items, units)
 
-  implicit def parameterFormat2: Format[Parameter[_]] = new Format[Parameter[_]] {
+  private[messages] implicit def parameterFormat2: Format[Parameter[_]] = new Format[Parameter[_]] {
     override def writes(obj: Parameter[_]): JsValue = obj.toJson
 
     override def reads(json: JsValue): JsResult[Parameter[_]] = {
@@ -35,7 +35,7 @@ object Parameter {
     }
   }
 
-  implicit def parameterFormat[T: Format: ClassTag: ItemsFactory]: Format[Parameter[T]] =
+  private[messages] implicit def parameterFormat[T: Format: ClassTag: ItemsFactory]: Format[Parameter[T]] =
     new Format[Parameter[T]] {
       override def writes(obj: Parameter[T]): JsValue = {
         JsObject(
@@ -62,7 +62,7 @@ object Parameter {
 
   def apply[T](implicit x: Format[Parameter[T]]): Format[Parameter[T]] = x
 
-  implicit def typeMapper[S: ClassTag: Format: ItemsFactory]: TypeMapper[PbParameter, Parameter[S]] =
+  private[messages] implicit def typeMapper[S: ClassTag: Format: ItemsFactory]: TypeMapper[PbParameter, Parameter[S]] =
     new TypeMapper[PbParameter, Parameter[S]] {
       override def toCustom(pbParameter: PbParameter): Parameter[S] = Parameter(
         pbParameter.name,
@@ -79,7 +79,7 @@ object Parameter {
           .withItems(ItemsFactory[S].make(x.items))
     }
 
-  implicit val typeMapper2: TypeMapper[PbParameter, Parameter[_]] =
+  private[messages] implicit val typeMapper2: TypeMapper[PbParameter, Parameter[_]] =
     TypeMapper[PbParameter, Parameter[_]](p ⇒ p.keyType.typeMapper.toCustom(p))(p => p.toPb)
 
   private def cswItems[T: ClassTag](items: Items): mutable.WrappedArray[T] = items.value match {
@@ -89,7 +89,16 @@ object Parameter {
 
 }
 
-//TODO: add doc for why
+/**
+ * Parameter represents a KeyName, KeyType, array of values and units applicable to values. Parameter sits as payload for
+ * sending commands and events between components.
+ *
+ * @param keyName the name of the key
+ * @param keyType reference to an object of type KeyType[S]
+ * @param items an Array of values of type S
+ * @param units applicable units
+ * @tparam S the type of items this parameter holds
+ */
 case class Parameter[S: Format: ClassTag: ItemsFactory] private[messages] (
     keyName: String,
     keyType: KeyType[S],
@@ -97,10 +106,14 @@ case class Parameter[S: Format: ClassTag: ItemsFactory] private[messages] (
     units: Units
 ) extends TMTSerializable {
 
-  //TODO: add doc
+  /**
+   * An Array of values this parameter holds
+   */
   def values: Array[S] = items.array
 
-  //TODO: add doc
+  /**
+   * A Java helper that returns a List of values this parameter holds
+   */
   def jValues: util.List[S] = items.asJava
 
   /**
@@ -128,12 +141,19 @@ case class Parameter[S: Format: ClassTag: ItemsFactory] private[messages] (
   def value(index: Int): S = items(index)
 
   /**
+   * Get method returns an option of value if present at the given index else none
+   *
    * @param index the index of a value
-   * @return Some value at the given index as an Option, if the index is in range, otherwise None
+   * @return some value at the given index as an Option, if the index is in range, otherwise None
    */
   def get(index: Int): Option[S] = items.lift(index)
 
-  //TODO: add doc
+  /**
+   * A Java helper that returns an option of value if present at the given index else empty
+   *
+   * @param index the index of a value
+   * @return value at the given index as an Optional, if the index is in range, otherwise empty
+   */
   def jGet(index: Int): Optional[S] = items.lift(index).asJava
 
   /**
@@ -152,20 +172,17 @@ case class Parameter[S: Format: ClassTag: ItemsFactory] private[messages] (
   def withUnits(unitsIn: Units): Parameter[S] = copy(units = unitsIn)
 
   /**
-   * Returns a formatted string representation
-   * @return String
+   * A comma separated string representation of all values this parameter holds
    */
   def valuesToString: String = items.mkString("(", ",", ")")
 
   /**
    * Returns a formatted string representation with a KeyName
-   * @return String
    */
   override def toString: String = s"$keyName($valuesToString$units)"
 
   /**
-   * Returns a JSON representation
-   * @return String
+   * Returns a JSON representation of this parameter
    */
   def toJson: JsValue = Parameter[S].writes(this)
 

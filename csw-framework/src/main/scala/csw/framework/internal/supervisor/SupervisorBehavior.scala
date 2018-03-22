@@ -3,37 +3,40 @@ package csw.framework.internal.supervisor
 import akka.Done
 import akka.actor.CoordinatedShutdown
 import akka.actor.CoordinatedShutdown.Reason
-import akka.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.typed.scaladsl.{Actor, ActorContext, TimerScheduler}
-import akka.typed.{ActorRef, Behavior, PostStop, Signal, SupervisorStrategy, Terminated}
-import csw.exceptions.{FailureRestart, InitializationFailed}
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.actor.typed.scaladsl.{ActorContext, Behaviors, TimerScheduler}
+import akka.actor.typed.{ActorRef, Behavior, PostStop, Signal, SupervisorStrategy, Terminated}
+import csw.framework.exceptions.{FailureRestart, InitializationFailed}
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.scaladsl.{ComponentBehaviorFactory, CurrentStatePublisher}
-import csw.messages.CommandResponseManagerMessage.{Query, Subscribe, Unsubscribe}
-import csw.messages.ComponentCommonMessage._
-import csw.messages.FromComponentLifecycleMessage.Running
-import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
-import csw.messages.RunningMessage.Lifecycle
-import csw.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
-import csw.messages.SupervisorIdleMessage._
-import csw.messages.SupervisorInternalRunningMessage.{RegistrationFailed, RegistrationNotRequired, RegistrationSuccess}
-import csw.messages.SupervisorLockMessage.{Lock, Unlock}
-import csw.messages.SupervisorRestartMessage.{UnRegistrationComplete, UnRegistrationFailed}
-import csw.messages._
+import csw.messages.commons.CoordinatedShutdownReasons.ShutdownMessageReceivedReason
 import csw.messages.framework.LocationServiceUsage.DoNotRegister
+import csw.messages.framework.LockingResponses.{LockExpired, LockExpiringShortly}
+import csw.messages.framework.PubSub.Publish
 import csw.messages.framework.SupervisorLifecycleState.{Idle, RunningOffline}
-import csw.messages.framework.{ComponentInfo, SupervisorLifecycleState}
+import csw.messages.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
+import csw.messages.framework._
 import csw.messages.location.ComponentId
 import csw.messages.location.Connection.AkkaConnection
-import csw.messages.models.CoordinatedShutdownReasons.ShutdownMessageReceivedReason
-import csw.messages.models.LockingResponses.{LockExpired, LockExpiringShortly}
-import csw.messages.models.PubSub.Publish
-import csw.messages.models.ToComponentLifecycleMessages.{GoOffline, GoOnline}
-import csw.messages.models.{LifecycleStateChanged, LockingResponse, PubSub, ToComponentLifecycleMessage}
 import csw.messages.params.models.Prefix
 import csw.messages.params.states.CurrentState
-import csw.services.ccs.internal.CommandResponseManagerFactory
-import csw.services.ccs.scaladsl.CommandResponseManager
+import csw.messages.scaladsl.CommandResponseManagerMessage.{Query, Subscribe, Unsubscribe}
+import csw.messages.scaladsl.ComponentCommonMessage.{
+  ComponentStateSubscription,
+  GetSupervisorLifecycleState,
+  LifecycleStateSubscription
+}
+import csw.messages.scaladsl.FromComponentLifecycleMessage.Running
+import csw.messages.scaladsl.FromSupervisorMessage.SupervisorLifecycleStateChanged
+import csw.messages.scaladsl.RunningMessage.Lifecycle
+import csw.messages.scaladsl.SupervisorContainerCommonMessages.{Restart, Shutdown}
+import csw.messages.scaladsl.SupervisorIdleMessage.InitializeTimeout
+import csw.messages.scaladsl.SupervisorInternalRunningMessage.{RegistrationFailed, RegistrationNotRequired, RegistrationSuccess}
+import csw.messages.scaladsl.SupervisorLockMessage.{Lock, Unlock}
+import csw.messages.scaladsl.SupervisorRestartMessage.{UnRegistrationComplete, UnRegistrationFailed}
+import csw.messages.scaladsl._
+import csw.services.command.internal.CommandResponseManagerFactory
+import csw.services.command.scaladsl.CommandResponseManager
 import csw.services.location.models.AkkaRegistration
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
@@ -53,36 +56,32 @@ private[framework] object SupervisorBehavior {
 }
 
 /**
- * The Behavior of a Supervisor of a component actor, represented as a mutable behavior.
+ * The Behavior of a Supervisor of a component actor, represented as a mutable behavior
  *
- * @param ctx                              The Actor Context under which the actor instance of this behavior is created
- * @param timerScheduler                   Provides support for scheduled `self` messages in an actor
- * @param maybeContainerRef                The container ref of the container under which this supervisor is started if
- *                                         its not running in standalone mode
- * @param componentInfo                    Component related information as described in the configuration file
- * @param componentBehaviorFactory         The factory for creating the component supervised by this Supervisor
- * @param pubSubBehaviorFactory            The factory for creating actor instance of [[csw.framework.internal.pubsub.PubSubBehavior]]
- *                                         for utilising pub-sub of any state of a component
- * @param commandResponseManagerFactory    The factory for creating actor instance of [[csw.framework.internal.pubsub.PubSubBehavior]]
- *                                         for utilising pub-sub of any state of a component
- * @param registrationFactory              The factory for creating a typed [[csw.services.location.models.AkkaRegistration]] from
- *                                         [[csw.messages.location.Connection.AkkaConnection]]
- * @param locationService                  The single instance of Location service created for a running application
- * @param loggerFactory                    The factory for creating [[csw.services.logging.scaladsl.Logger]] instance
+ * @param ctx the ActorContext under which the actor instance of this behavior is created
+ * @param timerScheduler provides support for scheduled `self` messages in an actor
+ * @param maybeContainerRef the container ref of the container under which this supervisor is started if
+ *                          its not running in standalone mode
+ * @param componentInfo component related information as described in the configuration file
+ * @param componentBehaviorFactory the factory for creating the component supervised by this Supervisor
+ * @param commandResponseManagerFactory the factory for creating actor instance of [[csw.framework.internal.pubsub.PubSubBehavior]]
+ *                                      for utilising pub-sub of any state of a component
+ * @param registrationFactory the factory for creating a typed [[csw.services.location.models.AkkaRegistration]] from
+ *                            [[csw.messages.location.Connection.AkkaConnection]]
+ * @param locationService the single instance of Location service created for a running application
+ * @param loggerFactory the factory for creating [[csw.services.logging.scaladsl.Logger]] instance
  */
-//TODO: add doc for significance
-class SupervisorBehavior private[framework] (
+private[framework] final class SupervisorBehavior(
     ctx: ActorContext[SupervisorMessage],
     timerScheduler: TimerScheduler[SupervisorMessage],
     maybeContainerRef: Option[ActorRef[ContainerIdleMessage]],
     componentInfo: ComponentInfo,
     componentBehaviorFactory: ComponentBehaviorFactory,
-    pubSubBehaviorFactory: PubSubBehaviorFactory,
     commandResponseManagerFactory: CommandResponseManagerFactory,
     registrationFactory: RegistrationFactory,
     locationService: LocationService,
     loggerFactory: LoggerFactory
-) extends Actor.MutableBehavior[SupervisorMessage] {
+) extends Behaviors.MutableBehavior[SupervisorMessage] {
 
   import SupervisorBehavior._
   import ctx.executionContext
@@ -96,6 +95,7 @@ class SupervisorBehavior private[framework] (
   private[framework] val initializeTimeout: FiniteDuration = componentInfo.initializeTimeout
 
   private val commandResponseManager: CommandResponseManager                      = makeCommandResponseManager()
+  private val pubSubBehaviorFactory: PubSubBehaviorFactory                        = new PubSubBehaviorFactory
   private[framework] val pubSubComponentActor: ActorRef[PubSub[CurrentState]]     = makePubSubComponent()
   private[framework] val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]] = makePubSubLifecycle()
 
@@ -107,9 +107,10 @@ class SupervisorBehavior private[framework] (
   spawnAndWatchComponent()
 
   /**
-   * Defines processing for a [[csw.messages.SupervisorMessage]] received by the actor instance.
-   * @param msg      SupervisorMessage received
-   * @return         The existing behavior
+   * Defines processing for a [[csw.messages.scaladsl.SupervisorMessage]] received by the actor instance
+   *
+   * @param msg supervisorMessage received
+   * @return the existing behavior
    */
   override def onMessage(msg: SupervisorMessage): Behavior[SupervisorMessage] = {
     log.debug(s"Supervisor in lifecycle state :[$lifecycleState] received message :[$msg]")
@@ -130,8 +131,9 @@ class SupervisorBehavior private[framework] (
   }
 
   /**
-   * Defines processing for a [[akka.typed.Signal]] received by the actor instance.
-   * @return        The existing behavior
+   * Defines processing for a [[akka.actor.typed.Signal]] received by the actor instance
+   *
+   * @return the existing behavior
    */
   override def onSignal: PartialFunction[Signal, Behavior[SupervisorMessage]] = {
     case Terminated(componentRef) ⇒
@@ -153,7 +155,8 @@ class SupervisorBehavior private[framework] (
 
   /**
    * Defines action for messages which can be received in any [[SupervisorLifecycleState]] state
-   * @param commonMessage Message representing a message received in any lifecycle state
+   *
+   * @param commonMessage message representing a message received in any lifecycle state
    */
   private def onCommon(commonMessage: ComponentCommonMessage): Unit = commonMessage match {
     case LifecycleStateSubscription(subscriberMessage) ⇒ pubSubLifecycle ! subscriberMessage
@@ -166,7 +169,7 @@ class SupervisorBehavior private[framework] (
   /**
    * Defines action for messages which can be received in [[SupervisorLifecycleState.Idle]] state
    *
-   * @param idleMessage  Message representing a message received in [[SupervisorLifecycleState.Idle]] state
+   * @param idleMessage message representing a message received in [[SupervisorLifecycleState.Idle]] state
    */
   private def onIdle(idleMessage: SupervisorIdleMessage): Unit = idleMessage match {
     case Running(componentRef) ⇒ onComponentRunning(componentRef)
@@ -176,7 +179,7 @@ class SupervisorBehavior private[framework] (
   /**
    * Defines action for messages which can be received in [[SupervisorLifecycleState.Restart]] state
    *
-   * @param restartMessage  Message representing a message received in [[SupervisorLifecycleState.Restart]] state
+   * @param restartMessage message representing a message received in [[SupervisorLifecycleState.Restart]] state
    */
   private def onRestarting(restartMessage: SupervisorRestartMessage): Unit = restartMessage match {
     case UnRegistrationComplete ⇒
@@ -190,7 +193,7 @@ class SupervisorBehavior private[framework] (
   /**
    * Defines action for messages which can be received in [[SupervisorLifecycleState.Running]] state
    *
-   * @param internalRunningMessage Message representing a message received in [[SupervisorLifecycleState.Running]] state
+   * @param internalRunningMessage message representing a message received in [[SupervisorLifecycleState.Running]] state
    */
   private def onInternalRunning(internalRunningMessage: SupervisorInternalRunningMessage): Unit = internalRunningMessage match {
     case RegistrationSuccess(componentRef)     ⇒ onRegistrationComplete(componentRef)
@@ -201,7 +204,7 @@ class SupervisorBehavior private[framework] (
   /**
    * Defines action for messages which can be received in [[SupervisorLifecycleState.Running]] state
    *
-   * @param runningMessage Message representing a message received in [[SupervisorLifecycleState.Running]] state
+   * @param runningMessage message representing a message received in [[SupervisorLifecycleState.Running]] state
    */
   private def onRunning(runningMessage: SupervisorRunningMessage): Unit = runningMessage match {
     case Query(commandId, replyTo)            ⇒ commandResponseManager.commandResponseManagerActor ! Query(commandId, replyTo)
@@ -309,7 +312,7 @@ class SupervisorBehavior private[framework] (
   }
 
   private def createTLA(): ActorRef[Nothing] = {
-    val behavior = Actor
+    val behavior = Behaviors
       .supervise[Nothing](
         componentBehaviorFactory
           .make(componentInfo,
@@ -327,13 +330,18 @@ class SupervisorBehavior private[framework] (
   private def coordinatedShutdown(reason: Reason): Future[Done] = CoordinatedShutdown(ctx.system.toUntyped).run(reason)
 
   private def makePubSubComponent(): ActorRef[PubSub[CurrentState]] =
-    pubSubBehaviorFactory.make(ctx, PubSubComponentActor, loggerFactory)
+    ctx.spawn(pubSubBehaviorFactory.make[CurrentState](PubSubComponentActor, loggerFactory),
+              SupervisorBehavior.PubSubComponentActor)
 
   private def makePubSubLifecycle(): ActorRef[PubSub[LifecycleStateChanged]] =
-    pubSubBehaviorFactory.make(ctx, PubSubLifecycleActor, loggerFactory)
+    ctx.spawn(pubSubBehaviorFactory.make[LifecycleStateChanged](PubSubComponentActor, loggerFactory),
+              SupervisorBehavior.PubSubLifecycleActor)
 
-  private def makeCommandResponseManager() =
-    commandResponseManagerFactory.make(ctx, CommandResponseManagerActorName, loggerFactory)
+  private def makeCommandResponseManager() = {
+    val commandResponseManagerActor =
+      ctx.spawn(commandResponseManagerFactory.makeBehavior(loggerFactory), CommandResponseManagerActorName)
+    commandResponseManagerFactory.make(ctx, commandResponseManagerActor)
+  }
 
   private def ignore(message: SupervisorMessage): Unit =
     log.error(s"Unexpected message :[$message] received by supervisor in lifecycle state :[$lifecycleState]")

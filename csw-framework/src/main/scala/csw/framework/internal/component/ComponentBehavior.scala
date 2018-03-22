@@ -1,22 +1,21 @@
 package csw.framework.internal.component
 
-import akka.typed.scaladsl.{Actor, ActorContext}
-import akka.typed.{ActorRef, Behavior, PostStop, Signal}
+import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
+import akka.actor.typed.{ActorRef, Behavior, PostStop, Signal}
 import csw.framework.scaladsl.ComponentHandlers
-import csw.messages.CommandMessage.{Oneway, Submit}
-import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
-import csw.messages.FromComponentLifecycleMessage.Running
-import csw.messages.RunningMessage.Lifecycle
-import csw.messages.TopLevelActorCommonMessage.{TrackingEventReceived, UnderlyingHookFailed}
-import csw.messages.TopLevelActorIdleMessage.Initialize
-import csw.messages._
-import csw.messages.ccs.commands.CommandResponse
-import csw.messages.ccs.commands.CommandResponse.Accepted
-import csw.messages.framework.ComponentInfo
+import csw.messages.commands.CommandResponse
+import csw.messages.commands.CommandResponse.Accepted
 import csw.messages.framework.LocationServiceUsage.RegisterAndTrackServices
-import csw.messages.models.ToComponentLifecycleMessage
-import csw.messages.models.ToComponentLifecycleMessages.{GoOffline, GoOnline}
-import csw.services.ccs.scaladsl.CommandResponseManager
+import csw.messages.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
+import csw.messages.framework.{ComponentInfo, ToComponentLifecycleMessage}
+import csw.messages.scaladsl.CommandMessage.{Oneway, Submit}
+import csw.messages.scaladsl.CommandResponseManagerMessage.AddOrUpdateCommand
+import csw.messages.scaladsl.FromComponentLifecycleMessage.Running
+import csw.messages.scaladsl.RunningMessage.Lifecycle
+import csw.messages.scaladsl.TopLevelActorCommonMessage.{TrackingEventReceived, UnderlyingHookFailed}
+import csw.messages.scaladsl.TopLevelActorIdleMessage.Initialize
+import csw.messages.scaladsl._
+import csw.services.command.scaladsl.CommandResponseManager
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
@@ -28,15 +27,14 @@ import scala.util.control.NonFatal
 /**
  * The Behavior of a component actor, represented as a mutable behavior
  *
- * @param ctx                  The Actor Context under which the actor instance of this behavior is created
- * @param componentInfo        Component related information as described in the configuration file
- * @param supervisor           The actor reference of the supervisor actor which created this component
- * @param lifecycleHandlers    The implementation of handlers which defines the domain actions to be performed by this
- *                             component
- * @param locationService      The single instance of Location service created for a running application
+ * @param ctx the ActorContext under which the actor instance of this behavior is created
+ * @param componentInfo component related information as described in the configuration file
+ * @param supervisor the actor reference of the supervisor actor which created this component
+ * @param lifecycleHandlers the implementation of handlers which defines the domain actions to be performed by this
+ *                          component
+ * @param locationService the single instance of Location service created for a running application
  */
-//TODO: add doc for significance for everything
-class ComponentBehavior private[framework] (
+private[framework] final class ComponentBehavior(
     ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
     supervisor: ActorRef[FromComponentLifecycleMessage],
@@ -44,7 +42,7 @@ class ComponentBehavior private[framework] (
     commandResponseManager: CommandResponseManager,
     locationService: LocationService,
     loggerFactory: LoggerFactory
-) extends Actor.MutableBehavior[TopLevelActorMessage] {
+) extends Behaviors.MutableBehavior[TopLevelActorMessage] {
 
   import ctx.executionContext
 
@@ -57,10 +55,10 @@ class ComponentBehavior private[framework] (
   ctx.self ! Initialize
 
   /**
-   * Defines processing for a [[csw.messages.TopLevelActorMessage]] received by the actor instance.
+   * Defines processing for a [[TopLevelActorMessage]] received by the actor instance.
    *
-   * @param msg      ComponentMessage received from supervisor
-   * @return         The existing behavior
+   * @param msg componentMessage received from supervisor
+   * @return the existing behavior
    */
   def onMessage(msg: TopLevelActorMessage): Behavior[TopLevelActorMessage] = {
     log.debug(s"Component TLA in lifecycle state :[$lifecycleState] received message :[$msg]")
@@ -74,8 +72,9 @@ class ComponentBehavior private[framework] (
   }
 
   /**
-   * Defines processing for a [[akka.typed.Signal]] received by the actor instance.
-   * @return        The existing behavior
+   * Defines processing for a [[akka.actor.typed.Signal]] received by the actor instance
+   *
+   * @return the existing behavior
    */
   override def onSignal: PartialFunction[Signal, Behavior[TopLevelActorMessage]] = {
     case PostStop ⇒
@@ -91,7 +90,8 @@ class ComponentBehavior private[framework] (
 
   /**
    * Defines action for messages which can be received in any [[ComponentLifecycleState]] state
-   * @param commonMessage Message representing a message received in any lifecycle state
+   *
+   * @param commonMessage message representing a message received in any lifecycle state
    */
   private def onCommon(commonMessage: TopLevelActorCommonMessage): Unit = commonMessage match {
     case UnderlyingHookFailed(exception) ⇒
@@ -103,7 +103,8 @@ class ComponentBehavior private[framework] (
 
   /**
    * Defines action for messages which can be received in [[ComponentLifecycleState.Idle]] state
-   * @param idleMessage  Message representing a message received in [[ComponentLifecycleState.Idle]] state
+   *
+   * @param idleMessage message representing a message received in [[ComponentLifecycleState.Idle]] state
    */
   private def onIdle(idleMessage: TopLevelActorIdleMessage): Unit = idleMessage match {
     case Initialize ⇒
@@ -130,7 +131,8 @@ class ComponentBehavior private[framework] (
 
   /**
    * Defines action for messages which can be received in [[ComponentLifecycleState.Running]] state
-   * @param runningMessage  Message representing a message received in [[ComponentLifecycleState.Running]] state
+   *
+   * @param runningMessage message representing a message received in [[ComponentLifecycleState.Running]] state
    */
   private def onRun(runningMessage: RunningMessage): Unit = runningMessage match {
     case Lifecycle(message) ⇒ onLifecycle(message)
@@ -140,7 +142,8 @@ class ComponentBehavior private[framework] (
 
   /**
    * Defines action for messages which alter the [[ComponentLifecycleState]] state
-   * @param toComponentLifecycleMessage  Message representing a lifecycle message sent by the supervisor to the component
+   *
+   * @param toComponentLifecycleMessage message representing a lifecycle message sent by the supervisor to the component
    */
   private def onLifecycle(toComponentLifecycleMessage: ToComponentLifecycleMessage): Unit =
     toComponentLifecycleMessage match {
@@ -163,9 +166,9 @@ class ComponentBehavior private[framework] (
     }
 
   /**
-   * Defines action for messages which represent a [[csw.messages.ccs.commands.Command]]
+   * Defines action for messages which represent a [[csw.messages.commands.Command]]
    *
-   * @param commandMessage  Message encapsulating a [[csw.messages.ccs.commands.Command]]
+   * @param commandMessage message encapsulating a [[csw.messages.commands.Command]]
    */
   private def onRunningCompCommandMessage(commandMessage: CommandMessage): Unit = {
 

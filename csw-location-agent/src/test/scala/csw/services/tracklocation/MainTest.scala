@@ -3,16 +3,16 @@ package csw.services.tracklocation
 import java.net.URI
 import java.nio.file.Paths
 
-import akka.typed.ActorRef
+import akka.actor.typed.ActorRef
 import com.typesafe.config.ConfigFactory
+import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.location.Connection.TcpConnection
 import csw.messages.location.{ComponentId, ComponentType}
-import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
-import csw.services.location.internal.Networks
 import csw.services.location.scaladsl.LocationServiceFactory
 import csw.services.tracklocation.common.TestFutureExtension.RichFuture
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
+import org.scalatest.concurrent.Eventually
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 import scala.concurrent.duration._
@@ -20,7 +20,7 @@ import scala.concurrent.duration._
 /**
  * Test the csw-location-agent app in-line
  */
-class MainTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
+class MainTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach with Eventually {
 
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
   InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
@@ -28,12 +28,14 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterAll with Before
   private val clusterSettings: ClusterSettings = ClusterAwareSettings.onPort(3559)
   private val locationService                  = LocationServiceFactory.withSystem(clusterSettings.system)
 
+  implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 100.millis)
+
   override protected def afterAll(): Unit = locationService.shutdown(TestFinishedReason).await
 
   test("Test with command line args") {
     val name = "test1"
     val port = 9999
-    val args = Array("--name", name, "--command", "sleep 1000", "--port", port.toString, "--no-exit")
+    val args = Array("--name", name, "--command", "sleep 200", "--port", port.toString, "--no-exit")
     testWith(args, name, port)
   }
 
@@ -56,11 +58,10 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterAll with Before
     val resolvedLocation = locationService.resolve(connection, 5.seconds).await.get
 
     resolvedLocation.connection shouldBe connection
-    resolvedLocation.uri shouldBe new URI(s"tcp://${new Networks().hostname()}:$port")
+    resolvedLocation.uri shouldBe new URI(s"tcp://${ClusterAwareSettings.hostname}:$port")
     resolvedLocation.logAdminActorRef.isInstanceOf[ActorRef[_]] shouldBe true
 
     process.destroy()
-    Thread.sleep(1000)
-    locationService.list.await shouldBe List.empty
+    eventually(locationService.list.await shouldBe List.empty)
   }
 }

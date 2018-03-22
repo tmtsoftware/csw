@@ -1,7 +1,7 @@
 package csw.messages.params.formats
 
-import csw.messages.ccs.commands._
-import csw.messages.ccs.events.{EventName, ObserveEvent, SystemEvent}
+import csw.messages.commands._
+import csw.messages.events.{EventName, ObserveEvent, SystemEvent}
 import csw.messages.params.formats.JsonSupport._
 import csw.messages.params.generics.KeyType.{
   ByteMatrixKey,

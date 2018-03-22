@@ -3,14 +3,14 @@ package csw.apps.clusterseed.admin
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpMethods, HttpRequest, StatusCodes, Uri}
 import akka.http.scaladsl.unmarshalling.Unmarshal
-import akka.typed.ActorSystem
-import akka.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.typed.testkit.TestKitSettings
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.testkit.typed.TestKitSettings
 import com.typesafe.config.ConfigFactory
 import csw.apps.clusterseed.admin.http.HttpSupport
 import csw.apps.clusterseed.admin.internal.AdminWiring
 import csw.apps.clusterseed.utils.AdminLogTestSuite
-import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
+import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.config.server.commons.{ConfigServiceConnection, TestFileUtils}
 import csw.services.config.server.{ServerWiring, Settings}
 import csw.services.location.commons.ClusterAwareSettings

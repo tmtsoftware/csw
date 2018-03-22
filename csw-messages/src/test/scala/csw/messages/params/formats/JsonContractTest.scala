@@ -2,8 +2,8 @@ package csw.messages.params.formats
 
 import java.time.Instant
 
-import csw.messages.ccs.commands.{CommandName, Observe, Setup, Wait}
-import csw.messages.ccs.events._
+import csw.messages.commands.{CommandName, Observe, Setup, Wait}
+import csw.messages.events._
 import csw.messages.params.generics.KeyType
 import csw.messages.params.generics.KeyType.{LongMatrixKey, StructKey}
 import csw.messages.params.models.Units.{encoder, meter, second, NoUnits}

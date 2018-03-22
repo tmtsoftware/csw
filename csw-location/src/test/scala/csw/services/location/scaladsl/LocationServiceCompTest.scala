@@ -1,26 +1,28 @@
 package csw.services.location.scaladsl
 
+import akka.actor.typed.Behavior
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.{ActorSystem, PoisonPill}
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.testkit.TestProbe
-import akka.typed.Behavior
-import akka.typed.scaladsl.adapter.UntypedActorSystemOps
+import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location._
-import csw.messages.models.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.location.commons.{ActorSystemFactory, RegistrationFactory}
 import csw.services.location.exceptions.OtherLocationIsRegistered
 import csw.services.location.internal.Networks
 import csw.services.location.models._
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
+import org.scalatest.concurrent.Eventually
+import org.scalatest.time.Span
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 import scala.concurrent.duration.DurationInt
 
-class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
+class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach with Eventually {
 
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
   InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
@@ -29,6 +31,9 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
 
   implicit val actorSystem: ActorSystem = ActorSystemFactory.remote("test")
   implicit val mat: Materializer        = ActorMaterializer()
+
+  implicit val patience: PatienceConfig =
+    PatienceConfig(Span(5, org.scalatest.time.Seconds), Span(100, org.scalatest.time.Millis))
 
   override protected def afterEach(): Unit =
     locationService.unregisterAll().await
@@ -137,9 +142,7 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
 
     actorRef ! PoisonPill
 
-    Thread.sleep(2000)
-
-    locationService.list.await shouldBe List.empty
+    eventually(locationService.list.await shouldBe List.empty)
   }
 
   test(

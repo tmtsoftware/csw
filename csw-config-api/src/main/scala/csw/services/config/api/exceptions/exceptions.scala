@@ -26,3 +26,11 @@ object FileNotFound {
  * @param message exception message containing invalid pattern
  */
 case class InvalidInput(message: String) extends RuntimeException(message)
+
+/**
+ * An Exception representing undefined response content
+ */
+case object EmptyResponse
+    extends RuntimeException(
+      "response must have content-length"
+    )

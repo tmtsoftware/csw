@@ -2,42 +2,44 @@ package csw.services.event.internal.redis
 
 import akka.actor.ActorSystem
 import com.github.sebruck.EmbeddedRedis
-import csw.messages.ccs.events.Event
+import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
+import csw.services.event.RedisFactory
+import csw.services.event.helpers.RegistrationFactory
 import csw.services.event.helpers.TestFutureExt.RichFuture
-import csw.services.event.internal.{EventServicePubSubTestFramework, RateAdapterStage, RateLimiterStage}
+import csw.services.event.internal.EventServicePubSubTestFramework
+import csw.services.event.internal.commons.{EventServiceConnection, Wiring}
+import csw.services.location.commons.ClusterAwareSettings
+import csw.services.location.scaladsl.LocationServiceFactory
+import io.lettuce.core.RedisClient
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import redis.embedded.RedisServer
 
 class RedisPubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with EmbeddedRedis {
+  private val seedPort        = 3558
+  private val redisPort       = 6379
+  private val clusterSettings = ClusterAwareSettings.joinLocal(seedPort)
+  private val locationService = LocationServiceFactory.withSettings(ClusterAwareSettings.onPort(seedPort))
+  private val tcpRegistration = RegistrationFactory.tcp(EventServiceConnection.value, redisPort)
+  locationService.register(tcpRegistration).await
 
-  private implicit val actorSystem: ActorSystem = ActorSystem()
+  private val redis = RedisServer.builder().setting(s"bind ${clusterSettings.hostname}").port(redisPort).build()
 
-  private val redisPort = 6379
-  private val redis     = RedisServer.builder().setting("bind 127.0.0.1").port(redisPort).build()
-  redis.start()
+  private implicit val actorSystem: ActorSystem = clusterSettings.system
+  private val redisClient                       = RedisClient.create()
+  private val wiring                            = new Wiring(actorSystem)
+  private val redisFactory                      = new RedisFactory(redisClient, locationService, wiring)
+  private val publisher                         = redisFactory.publisher().await
+  private val subscriber                        = redisFactory.subscriber().await
+  private val framework                         = new EventServicePubSubTestFramework(publisher, subscriber)
 
-  private val wiring     = new RedisWiring("localhost", redisPort, actorSystem)
-  private val publisher  = wiring.publisher()
-  private val subscriber = wiring.subscriber()
-
-  private val framework = new EventServicePubSubTestFramework(publisher, subscriber)
+  override def beforeAll(): Unit = {
+    redis.start()
+  }
 
   override def afterAll(): Unit = {
-    publisher.shutdown().await
+    redisClient.shutdown()
+    wiring.shutdown(TestFinishedReason).await
     redis.stop()
-    actorSystem.terminate().await
-  }
-
-  ignore("limiter") {
-    framework.comparePerf(new RateLimiterStage(_))
-  }
-
-  ignore("adapter") {
-    framework.comparePerf(new RateAdapterStage(_))
-  }
-
-  ignore("redis-throughput-latency") {
-    framework.monitorPerf()
   }
 
   test("Redis pub sub") {

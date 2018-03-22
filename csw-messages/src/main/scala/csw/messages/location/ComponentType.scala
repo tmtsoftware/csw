@@ -1,6 +1,7 @@
 package csw.messages.location
 
-import csw.messages.{ComponentMessage, ContainerExternalMessage, TMTSerializable}
+import csw.messages.scaladsl.{ComponentMessage, ContainerMessage}
+import csw.messages.TMTSerializable
 import enumeratum.EnumEntry.Lowercase
 import enumeratum.{Enum, EnumEntry, PlayJsonEnum}
 
@@ -9,6 +10,8 @@ import scala.collection.immutable.IndexedSeq
 /**
  * Represents a type of the Component. It should be serializable since it has to be transmittable over the network.
  * The type will always be represented in lower case.
+ *
+ * @param messageManifest represents the class name of message that a component will understand
  */
 sealed abstract class ComponentType(val messageManifest: String) extends EnumEntry with Lowercase with TMTSerializable {
 
@@ -20,12 +23,15 @@ sealed abstract class ComponentType(val messageManifest: String) extends EnumEnt
 
 object ComponentType extends Enum[ComponentType] with PlayJsonEnum[ComponentType] {
 
+  /**
+   * Returns a sequence of all component types
+   */
   def values: IndexedSeq[ComponentType] = findValues
 
   /**
    * Represents a container for components e.g assemblies and HCDs
    */
-  case object Container extends ComponentType(classOf[ContainerExternalMessage].getSimpleName)
+  case object Container extends ComponentType(classOf[ContainerMessage].getSimpleName)
 
   /**
    * Represents a component that controls a hardware device

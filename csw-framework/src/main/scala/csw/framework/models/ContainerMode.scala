@@ -8,7 +8,7 @@ import scala.collection.immutable
 /**
  * This is used to tell container cmd line app to start components in either container mode or standalone mode
  */
-sealed abstract class ContainerMode extends EnumEntry with TMTSerializable
+private[framework] sealed abstract class ContainerMode extends EnumEntry with TMTSerializable
 
 private[csw] object ContainerMode extends Enum[ContainerMode] with PlayJsonEnum[ContainerMode] {
 

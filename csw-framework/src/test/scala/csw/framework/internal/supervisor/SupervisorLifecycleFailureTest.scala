@@ -1,32 +1,34 @@
 package csw.framework.internal.supervisor
 
-import akka.typed.ActorRef
-import akka.typed.scaladsl.ActorContext
-import akka.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.typed.testkit.scaladsl.TestProbe
+import akka.actor.typed.ActorRef
+import akka.actor.typed.scaladsl.ActorContext
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.testkit.typed.scaladsl.TestProbe
 import com.persist.JsonOps
 import com.persist.JsonOps.JsonObject
 import csw.common.FrameworkAssertions._
 import csw.common.components.framework.SampleComponentState._
 import csw.common.utils.TestAppender
 import csw.commons.tags.LoggingSystemSensitive
-import csw.exceptions.{FailureRestart, FailureStop}
 import csw.framework.ComponentInfos._
+import csw.framework.exceptions.{FailureRestart, FailureStop}
 import csw.framework.internal.component.ComponentBehavior
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers, CurrentStatePublisher}
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
-import csw.messages.CommandMessage.Submit
-import csw.messages.ComponentCommonMessage.GetSupervisorLifecycleState
-import csw.messages.SupervisorContainerCommonMessages.Restart
-import csw.messages.ccs.commands.{CommandName, CommandResponse, ControlCommand, Setup}
-import csw.messages.framework.{ComponentInfo, SupervisorLifecycleState}
-import csw.messages.models.PubSub.Publish
-import csw.messages.models.{LifecycleStateChanged, PubSub}
+import csw.messages.commands.{CommandName, CommandResponse, ControlCommand, Setup}
+import csw.messages.framework.{ComponentInfo, LifecycleStateChanged, PubSub, SupervisorLifecycleState}
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.CurrentState
-import csw.messages.{models, _}
-import csw.services.ccs.scaladsl.CommandResponseManager
+import csw.messages.scaladsl.CommandMessage.Submit
+import csw.messages.scaladsl.ComponentCommonMessage.{
+  ComponentStateSubscription,
+  GetSupervisorLifecycleState,
+  LifecycleStateSubscription
+}
+import csw.messages.scaladsl.SupervisorContainerCommonMessages.Restart
+import csw.messages.scaladsl.{ComponentMessage, ContainerIdleMessage, TopLevelActorMessage}
+import csw.services.command.scaladsl.CommandResponseManager
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.internal.LoggingLevels.ERROR
 import csw.services.logging.internal.LoggingSystem
@@ -37,7 +39,8 @@ import org.mockito.stubbing.Answer
 import org.scalatest.BeforeAndAfterEach
 
 import scala.collection.mutable
-import scala.concurrent.Future
+import scala.concurrent.duration.DurationDouble
+import scala.concurrent.{ExecutionContext, Future}
 
 // DEOPSCSW-178: Lifecycle success/failure notification
 @LoggingSystemSensitive
@@ -49,6 +52,8 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
   var submitAnswer: Answer[Future[Unit]]                                 = _
   var shutdownAnswer: Answer[Future[Unit]]                               = _
   var runAnswer: Answer[Future[Unit]]                                    = _
+
+  implicit val ec: ExecutionContext = typedSystem.executionContext
 
   // all log messages will be captured in log buffer
   private val logBuffer                    = mutable.Buffer.empty[JsonObject]
@@ -74,10 +79,13 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
 
     createSupervisorAndStartTLA(testMocks, componentHandlers)
 
+    supervisorRef ! ComponentStateSubscription(PubSub.Subscribe(compStateProbe.ref))
+    supervisorRef ! LifecycleStateSubscription(PubSub.Subscribe(lifecycleStateProbe.ref))
+
     // Component fails to initialize with `FailureStop`. The default akka supervision strategy kills the TLA
     // and triggers the PostStop signal of TLA. The post stop signal has `onShutdown` handler of the component which is
     // mocked in the test to publish a `shutdownChoice`.
-    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(shutdownChoice)))))
+    compStateProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
 
     // DEOPSCSW-180: Generic and Specific Log messages
     // component handlers initialize block throws FailureStop exception which we expect akka logs it
@@ -95,17 +103,17 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     supervisorRef ! GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref)
 
     // Supervisor is still in the Idle lifecycle state
-    supervisorLifecycleStateProbe.expectMsg(SupervisorLifecycleState.Idle)
+    supervisorLifecycleStateProbe.expectMessage(SupervisorLifecycleState.Idle)
 
     // External entity sends restart to supervisor with the intent to restart TLA
     supervisorRef ! Restart
 
     // TLA initialises successfully the second time due to the defined mock behavior. The `initialize` handler of the
     // component is mocked in the test to publish a `initChoice` in the second attempt.
-    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
+    compStateProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(initChoice))))
 
     // TLA sends `Running` message to supervisor which changes the lifecycle state of supervisor to `Running`
-    lifecycleStateProbe.expectMsg(Publish(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running)))
+    lifecycleStateProbe.expectMessage(5.seconds, LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
 
     // Supervisor registers itself only after successful initialization of TLA. In this test the TLA successfully
     // initializes after Restart message, after which Supervisor registers itself.
@@ -127,14 +135,15 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     doThrow(TestFailureRestart(failureRestartExMsg)).doAnswer(initializeAnswer).when(componentHandlers).initialize()
     createSupervisorAndStartTLA(testMocks, componentHandlers)
 
+    supervisorRef ! ComponentStateSubscription(PubSub.Subscribe(compStateProbe.ref))
+    supervisorRef ! LifecycleStateSubscription(PubSub.Subscribe(lifecycleStateProbe.ref))
+
     // component fails to initialize with `FailureRestart`. The akka supervision strategy specified in SupervisorBehavior
     // restarts the TLA. The `initialize` handler of the component is mocked in the test to publish a `initChoice` in the second attempt.
-    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
+    compStateProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(initChoice))))
 
     // TLA sends `Running` message to supervisor which changes the lifecycle state of supervisor to `Running`
-    lifecycleStateProbe.expectMsg(
-      Publish(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
-    )
+    lifecycleStateProbe.expectMessage(5.seconds, LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
 
     Thread.sleep(100)
     // DEOPSCSW-180: Generic and Specific Log messages
@@ -173,24 +182,25 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
 
     createSupervisorAndStartTLA(testMocks, componentHandlers)
 
-    // component Intializes succesfully
-    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
+    supervisorRef ! ComponentStateSubscription(PubSub.Subscribe(compStateProbe.ref))
+    supervisorRef ! LifecycleStateSubscription(PubSub.Subscribe(lifecycleStateProbe.ref))
+
+    // component Initializes successfully
+    compStateProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(initChoice))))
 
     // TLA sends `Running` message to supervisor which changes the lifecycle state of supervisor to `Running`
-    lifecycleStateProbe.expectMsg(
-      Publish(models.LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
-    )
+    lifecycleStateProbe.expectMessage(5.seconds, LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
 
     // Supervisor sends component a submit command which will fail with FailureRestart exception on calling onSubmit Handler
     supervisorRef ! Submit(setup, TestProbe[CommandResponse].ref)
 
     // Component initializes again by the akka framework without termination
-    compStateProbe.expectMsg(Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
+    compStateProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(initChoice))))
 
     supervisorRef ! GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref)
 
     // Supervisor is still in the Running lifecycle state
-    supervisorLifecycleStateProbe.expectMsg(SupervisorLifecycleState.Running)
+    supervisorLifecycleStateProbe.expectMessage(5.seconds, SupervisorLifecycleState.Running)
 
     Thread.sleep(100)
 
@@ -209,7 +219,6 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
       hcdInfo,
       locationService,
       registrationFactory,
-      pubSubBehaviorFactory,
       new SampleBehaviorFactory(componentHandlers),
       commandResponseManagerFactory,
       new LoggerFactory(hcdInfo.name)
@@ -230,10 +239,16 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     componentHandlers
   }
 
-  private def createAnswers(compStateProbe: TestProbe[PubSub[CurrentState]]): Unit = {
-    initializeAnswer = (_) ⇒ Future.successful(compStateProbe.ref ! Publish(CurrentState(prefix, Set(choiceKey.set(initChoice)))))
-    shutdownAnswer = (_) ⇒
-      Future.successful(compStateProbe.ref ! Publish(CurrentState(prefix, Set(choiceKey.set(shutdownChoice)))))
+  private def createAnswers(compStateProbe: TestProbe[CurrentState]): Unit = {
+    initializeAnswer = (_) ⇒
+      Future {
+        // small sleep is required in order for test probe to subscribe for component state and lifecycle state
+        // before component actually gets initialized
+        Thread.sleep(200)
+        compStateProbe.ref ! CurrentState(prefix, Set(choiceKey.set(initChoice)))
+    }
+
+    shutdownAnswer = (_) ⇒ Future.successful(compStateProbe.ref ! CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
   }
 }
 

@@ -7,7 +7,7 @@ import scala.util.Random
 /**
  * Include this trait in classes you want to time.
  */
-trait Timing {
+private[logging] trait Timing {
 
   /**
    * This object contains methods used to mark regions to be timed in the timing log.
@@ -16,6 +16,7 @@ trait Timing {
 
     /**
      * Call this method to start timing a region of code for the time log.
+     *
      * @param id the request id to be timed.
      * @param name each region to be timed must have a different name.
      * @return a unique token to passed to the Timing.end call.
@@ -29,6 +30,7 @@ trait Timing {
     /**
      * Call this method to end timing a region of code for the time log.
      * The id, name, and uid must match the corresponding start.
+     *
      * @param id the request id to be timed.
      * @param name each region to be timed must have a different name.
      * @param token the token returned by the Timing.start call.
@@ -39,6 +41,7 @@ trait Timing {
 
   /**
    * This method wraps a section of code, so that timings for it will appear in the time log.
+   *
    * @param id the requestId to be timed.
    * @param name  each region to be timed must have a different name.
    * @param body  the code to be timed.

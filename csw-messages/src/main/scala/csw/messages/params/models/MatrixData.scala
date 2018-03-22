@@ -16,46 +16,65 @@ import scalapb.TypeMapper
  *
  * @param data input array of array
  */
-//TODO: add doc for more details in each thing
 case class MatrixData[T](data: mutable.WrappedArray[mutable.WrappedArray[T]])(implicit cTag: ClassTag[T]) {
 
   /**
-   * returns a value stored at position represented by [row][col]
+   * Returns a value stored at position represented by [row][col]
    *
    * @return a value represented by T
    */
   def apply(row: Int, col: Int): T = data(row)(col)
 
-  //scala
+  /**
+   * An Array of values this parameter holds
+   */
   def values: Array[Array[T]] = data.array.map(_.array)
-  //java
+
+  /**
+   * A Java helper that returns an Array of values this parameter holds
+   */
   def jValues: util.List[util.List[T]] = data.map(_.asJava).asJava
 
+  /**
+   * A comma separated string representation of all values this MatrixData holds
+   */
   override def toString: String = (for (l <- data) yield l.mkString("(", ",", ")")).mkString("(", ",", ")")
 }
 
 object MatrixData {
 
   //play-json formatter
-  implicit def format[T: Format: ClassTag]: Format[MatrixData[T]] = Json.format[MatrixData[T]]
+  private[messages] implicit def format[T: Format: ClassTag]: Format[MatrixData[T]] = Json.format[MatrixData[T]]
 
   /**
-   * constructs a MatrixData from a given Array[Array[T]]
+   * Create a MatrixData from one or more arrays of Array[T]
+   *
+   * @param values one or more arrays
+   * @tparam T the type of values
+   * @return an instance of MatrixData
    */
-  implicit def fromArrays[T: ClassTag](xs: Array[Array[T]]): MatrixData[T] =
-    new MatrixData[T](xs.map(x ⇒ x: mutable.WrappedArray[T]))
+  implicit def fromArrays[T: ClassTag](values: Array[Array[T]]): MatrixData[T] =
+    new MatrixData[T](values.map(x ⇒ x: mutable.WrappedArray[T]))
 
   /**
-   * constructs a MatrixData from a given Array[T]
+   * Create a MatrixData from Array[T]
+   *
+   * @param values one or more arrays
+   * @tparam T the type of values
+   * @return an instance of MatrixData
    */
-  def fromArrays[T: ClassTag](xs: Array[T]*): MatrixData[T] =
-    new MatrixData[T](xs.toArray.map(x ⇒ x: mutable.WrappedArray[T]))
+  def fromArrays[T: ClassTag](values: Array[T]*): MatrixData[T] =
+    new MatrixData[T](values.toArray.map(x ⇒ x: mutable.WrappedArray[T]))
 
   /**
-   * Java helper to construct a MatrixData from a given Array[T]
+   * A Java helper to create an MatrixData from one or more arrays
+   *
+   * @param values an Array of one or more array of values
+   * @tparam T the type of values
+   * @return an instance of MatrixData
    */
-  def fromJavaArrays[T](klass: Class[T], xs: Array[Array[T]]): MatrixData[T] =
-    new MatrixData[T](xs.map(x ⇒ x: mutable.WrappedArray[T]))(ClassTag(klass))
+  def fromJavaArrays[T](klass: Class[T], values: Array[Array[T]]): MatrixData[T] =
+    new MatrixData[T](values.map(x ⇒ x: mutable.WrappedArray[T]))(ClassTag(klass))
 
   //Protobuf converter
   implicit def typeMapper[T: ClassTag, S <: ItemType[ArrayData[T]]: ItemTypeCompanion]: TypeMapper[S, MatrixData[T]] =
@@ -63,6 +82,14 @@ object MatrixData {
       x ⇒ ItemTypeCompanion.make(x.data.map(ArrayData.apply))
     )
 
+  /**
+   * Convert a Matrix of data from one type to other
+   *
+   * @param conversion a function of type A => B
+   * @tparam A the source type of data
+   * @tparam B the destination type of data
+   * @return a function of type MatrixData[A] ⇒ MatrixData[B]
+   */
   implicit def conversion[A, B](implicit conversion: A ⇒ B): MatrixData[A] ⇒ MatrixData[B] =
     _.asInstanceOf[MatrixData[B]]
 }

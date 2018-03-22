@@ -1,8 +1,8 @@
 package csw.services.location.internal
 
 import akka.cluster.ddata.Replicator.{Changed, Subscribe}
-import akka.typed.scaladsl.Actor
-import akka.typed.{ActorRef, Behavior, Terminated}
+import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.{ActorRef, Behavior, Terminated}
 import csw.messages.location.{AkkaLocation, HttpLocation, Location, TcpLocation}
 import csw.services.location.commons.{CswCluster, LocationServiceLogger}
 import csw.services.location.internal.Registry.AllServices
@@ -14,7 +14,7 @@ import csw.services.logging.scaladsl.Logger
  *
  * @param locationService is used to unregister Actors that are no more alive
  */
-class DeathwatchActor private[location] (locationService: LocationService) {
+private[location] class DeathwatchActor(locationService: LocationService) {
   import DeathwatchActor.Msg
 
   /**
@@ -24,7 +24,7 @@ class DeathwatchActor private[location] (locationService: LocationService) {
    * @see [[akka.actor.Terminated]]
    */
   private[location] def behavior(watchedLocations: Set[Location]): Behavior[Msg] =
-    Actor.immutable[Msg] { (context, changeMsg) ⇒
+    Behaviors.immutable[Msg] { (context, changeMsg) ⇒
       val log: Logger = LocationServiceLogger.getLogger(context)
 
       val allLocations = changeMsg.get(AllServices.Key).entries.values.toSet
@@ -63,7 +63,7 @@ class DeathwatchActor private[location] (locationService: LocationService) {
             behavior(watchedLocations - location)
           case None ⇒
             //if deadActorRef does not match any location, don't change a thing!
-            Actor.same
+            Behaviors.same
         }
     }
 }
@@ -72,7 +72,7 @@ private[location] object DeathwatchActor {
 
   private val log: Logger = LocationServiceLogger.getLogger
 
-  import akka.typed.scaladsl.adapter._
+  import akka.actor.typed.scaladsl.adapter._
   //message type handled by the for the typed deathwatch actor
   type Msg = Changed[AllServices.Value]
 

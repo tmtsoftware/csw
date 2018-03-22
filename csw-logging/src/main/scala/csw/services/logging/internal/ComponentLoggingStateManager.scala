@@ -10,9 +10,11 @@ import scala.util.Try
 private[logging] object ComponentLoggingStateManager {
 
   /**
-   * Extracts the component-log-levels from logging configuration
+   * Extracts the component-log-levels from logging configuration. It takes the config properties and stores in the map
+   * componentName ->
+   *
    * @param loggingConfig the logging configuration object
-   * @return Set of Filters
+   * @return set of Filters
    */
   def from(loggingConfig: Config): Map[String, ComponentLoggingState] =
     Try {
@@ -26,7 +28,12 @@ private[logging] object ComponentLoggingStateManager {
         .toMap
     }.getOrElse(Map.empty)
 
-  //TODO: explain better significance
+  /**
+   * Add the component logging state for a component in map componentName -> ComponentLoggingState
+   *
+   * @param componentName the name of the component
+   * @param level the log level for the component
+   */
   def add(componentName: String, level: Level): Unit = {
     import csw.services.logging.internal.LoggingState._
     componentsLoggingState = componentsLoggingState ++ Map(componentName → ComponentLoggingState(level))

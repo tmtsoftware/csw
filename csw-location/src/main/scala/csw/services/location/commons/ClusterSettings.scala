@@ -43,11 +43,11 @@ import scala.collection.JavaConverters._
  *  - then from Environment variable
  *  - and then from `ClusterSettings` api
  *
- * @note Although `ClusterSettings` can be added through multiple ways, it is recommended that
+ * @note although `ClusterSettings` can be added through multiple ways, it is recommended that
  *  -`clusterSeeds` is provided via environment variable,
  *  - `clusterPort` is provided via system properties,
  *  - `interfaceName` is provide via environment variable and
- *  - the `ClusterSettings` api of providing values should be used for testing purpose only.
+ *  - the `ClusterSettings` api of providing values should be used for testing purpose only
  *
  */
 case class ClusterSettings(clusterName: String = Constants.ClusterName, values: Map[String, Any] = Map.empty) {
@@ -116,7 +116,7 @@ case class ClusterSettings(clusterName: String = Constants.ClusterName, values: 
       "akka.remote.netty.tcp.port"            → port,
       "akka.cluster.seed-nodes"               → seedNodes.asJava,
       "akka.cluster.http.management.hostname" → hostname,
-      "akka.cluster.http.management.port"     → managementPort.getOrElse(19999),
+      "akka.cluster.http.management.port"     → managementPort.getOrElse(19999), //management port will never start at 19999
       "startManagement"                       → managementPort.isDefined
     )
 

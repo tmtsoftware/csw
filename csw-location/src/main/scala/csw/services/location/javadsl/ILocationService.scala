@@ -24,90 +24,100 @@ trait ILocationService {
   /**
    * Registers a connection to location
    *
-   * @param registration The Registration holding connection and it's corresponding location to register with `LocationService`
-   * @return A CompletableFuture which completes with Registration result
+   * @param registration the Registration holding connection and it's corresponding location to register with `LocationService`
+   * @return a CompletableFuture which completes with Registration result or can fail with
+   *         [[csw.services.location.exceptions.RegistrationFailed]] or [[csw.services.location.exceptions.OtherLocationIsRegistered]]
    */
   def register(registration: Registration): CompletableFuture[IRegistrationResult]
 
   /**
    * Unregisters the connection
    *
-   * @param connection An already registered connection
-   * @return A CompletableFuture which completes after un-registration happens successfully and fails otherwise
+   * @param connection an already registered connection
+   * @return a CompletableFuture which completes after un-registration happens successfully and fails otherwise with
+   *         [[csw.services.location.exceptions.UnregistrationFailed]]
    */
   def unregister(connection: Connection): CompletableFuture[Done]
 
   /**
    * Unregisters all connections registered
    *
-   * @note It is highly recommended to use this method for testing purpose only
-   * @return A CompletableFuture which completes after all connections are unregistered successfully or fails otherwise
+   * @note it is highly recommended to use this method for testing purpose only
+   * @return a CompletableFuture which completes after all connections are unregistered successfully or fails otherwise
+   *         with [[csw.services.location.exceptions.RegistrationListingFailed]]
    */
   def unregisterAll(): CompletableFuture[Done]
 
   /**
    * Resolve the location for a connection from the local cache
    *
-   * @param connection A connection to resolve to with its registered location
-   * @return A CompletableFuture which completes with the resolved location if found or Empty otherwise.
+   * @param connection a connection to resolve to with its registered location
+   * @return a CompletableFuture which completes with the resolved location if found or Empty otherwise. It can fail with
+   *         [[csw.services.location.exceptions.RegistrationListingFailed]].
    */
   def find[L <: Location](connection: TypedConnection[L]): CompletableFuture[Optional[L]]
 
   /**
    * Resolves the location based on the given connection
    *
-   * @param connection A connection to resolve to with its registered location
-   * @param within The time for which a connection is looked-up within `LocationService`
-   * @tparam L The concrete Location type returned once the connection is resolved
-   * @return A CompletableFuture which completes with the resolved location if found or None otherwise.
+   * @param connection a connection to resolve to with its registered location
+   * @param within the time for which a connection is looked-up within `LocationService`
+   * @tparam L the concrete Location type returned once the connection is resolved
+   * @return a CompletableFuture which completes with the resolved location if found or None otherwise. It can fail with
+   *         [[csw.services.location.exceptions.RegistrationListingFailed]].
    */
   def resolve[L <: Location](connection: TypedConnection[L], within: FiniteDuration): CompletableFuture[Optional[L]]
 
   /**
    * Lists all locations registered
    *
-   * @return A CompletableFuture which completes with a List of all registered locations
+   * @return a CompletableFuture which completes with a List of all registered locations or can fail with
+   *         [[csw.services.location.exceptions.RegistrationListingFailed]]
    */
   def list: CompletableFuture[ju.List[Location]]
 
   /**
    * Filters all locations registered based on a component type
    *
-   * @param componentType List components of this `componentType`
-   * @return A CompletableFuture which completes with filtered locations
+   * @param componentType list components of this `componentType`
+   * @return a CompletableFuture which completes with filtered locations or can fail with
+   *         [[csw.services.location.exceptions.RegistrationListingFailed]]
    */
   def list(componentType: ComponentType): CompletableFuture[ju.List[Location]]
 
   /**
    * Filters all locations registered based on a hostname
    *
-   * @param hostname List components running on this `hostname`
-   * @return A CompletableFuture which completes with filtered locations
+   * @param hostname list components running on this `hostname`
+   * @return a CompletableFuture which completes with filtered locations or can fail with
+   *         [[csw.services.location.exceptions.RegistrationListingFailed]]
    */
   def list(hostname: String): CompletableFuture[ju.List[Location]]
 
   /**
    * Filters all locations registered based on a connection type
    *
-   * @param connectionType List components of this `connectionType`
-   * @return A CompletableFuture which completes with filtered locations
+   * @param connectionType list components of this `connectionType`
+   * @return a CompletableFuture which completes with filtered locations or can fail with
+   *         [[csw.services.location.exceptions.RegistrationListingFailed]]
    */
   def list(connectionType: ConnectionType): CompletableFuture[ju.List[Location]]
 
   /**
    * Filters all locations registered based on a prefix.
    *
-   * @note All locations having subsystem prefix that starts with the given prefix
-   *       value will be listed.
-   * @param prefix List components by this `prefix`
-   * @return A Future which completes with filtered locations
+   * @note all locations having subsystem prefix that starts with the given prefix
+   *       value will be listed
+   * @param prefix list components by this `prefix`
+   * @return a CompletableFuture which completes with filtered locations or can fail with
+   *         [[csw.services.location.exceptions.RegistrationListingFailed]]
    */
   def listByPrefix(prefix: String): CompletableFuture[ju.List[AkkaLocation]]
 
   /**
    * Tracks the connection and send events for modification or removal of its location
    *
-   * @param connection The `connection` that is to be tracked
+   * @param connection the `connection` that is to be tracked
    * @return A stream that emits events related to the connection. It can be cancelled using KillSwitch. This will stop giving
    *         events for earlier tracked connection
    */
@@ -118,19 +128,19 @@ trait ILocationService {
    * For each event accept method of consumer interface is invoked.
    * Use this method if you do not want to handle materialization and happy with a side-effecting callback instead
    *
-   * @param connection The `connection` that is to be tracked
-   * @param consumer The `Consumer` function that consumes `TrakingEvent`
-   * @return A killswitch which can be shutdown to unsubscribe the consumer.
+   * @param connection the `connection` that is to be tracked
+   * @param consumer the `Consumer` function that consumes `TrakingEvent`
+   * @return a killswitch which can be shutdown to unsubscribe the consumer
    */
   def subscribe(connection: Connection, consumer: Consumer[TrackingEvent]): KillSwitch
 
   /**
    * Shuts down the LocationService
    *
-   * @see Terminate method in [[csw.services.location.commons.CswCluster]]
-   * @note It is recommended not to perform any operation on LocationService after calling this method
-   * @param reason The reason explaining the shutdown
-   * @return A CompletableFuture which completes when the location service has shutdown successfully
+   * @see terminate method in [[csw.services.location.commons.CswCluster]]
+   * @note it is recommended not to perform any operation on LocationService after calling this method
+   * @param reason the reason explaining the shutdown
+   * @return a CompletableFuture which completes when the location service has shutdown successfully
    */
   def shutdown(reason: Reason): CompletableFuture[Done]
 
