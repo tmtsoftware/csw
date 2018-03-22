@@ -1,7 +1,6 @@
-package csw.messages.ccs.commands
+package csw.messages.commands
 
 import akka.actor.typed.ActorRef
-import csw.messages.commands.CommandResponse
 import csw.messages.commands.CommandResponse.CommandNotAvailable
 import csw.messages.params.models.Id
 

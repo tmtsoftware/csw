@@ -2,8 +2,7 @@ package csw.messages.scaladsl
 
 import akka.actor.typed.ActorRef
 import csw.messages._
-import csw.messages.ccs.commands.{CommandCorrelation, CommandResponseManagerState}
-import csw.messages.commands.{CommandResponse, ControlCommand}
+import csw.messages.commands.{CommandCorrelation, CommandResponse, CommandResponseManagerState, ControlCommand}
 import csw.messages.framework.PubSub.SubscriberMessage
 import csw.messages.framework._
 import csw.messages.location.TrackingEvent
