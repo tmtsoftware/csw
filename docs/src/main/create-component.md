@@ -15,36 +15,34 @@ A component consists of a supervisor actor, a top level actor, a component handl
 provides supervisor actor, a top level actor and abstract class of handlers. Component developers are expected to implement this handler which also
 acts as a gateway from framework to component code.   
      
-### Supervisor, TLA, Handlers
-
-#### Supervisor
+### Supervisor
 
 A Supervisor actor is the actor first started for any component. Two main responsibilities that supervisor performs is as follows:
 
-Spawn a top level actor for the component and start watching it
-Register itself with location service
+-   Spawn a top level actor for the component and start watching it
+-   Register itself with location service
 
 @@@ note { title=Note }
 
-Supervisor registers itself with location service. That means supervisor acts as a gateway for external component/entity to talk to.
+Supervisor registers itself with location service. That means supervisor acts as a gateway for external component/entity to talk to this component.
 
 @@@
 
 The source code of supervisor actor can be referred [here](https://github.com/tmtsoftware/csw-prod/blob/master/csw-framework/src/main/scala/csw/framework/internal/supervisor/SupervisorBehavior.scala)
 
-#### Top level actor
+### Top level actor
 
 A top level actor is started by supervisor actor for any component. It takes a handler implementation (an instance of ComponentHandlers) as constructor parameter.
 The handler implementation would be written by component developer.
 
 Whenever a message is received by top level actor, it calls an appropriate method of handlers which we refer as hooks in further explanation. For e.g.
-if top level actor receives `Initialize` message it will call `initialize()` method of handlers.
+if top level actor receives `Initialize` message it will call `initialize()` hook of handlers.
 
-The source code if top level actor can be referred [here](https://github.com/tmtsoftware/csw-prod/blob/master/csw-framework/src/main/scala/csw/framework/internal/component/ComponentBehavior.scala).
+The source code of top level actor can be referred [here](https://github.com/tmtsoftware/csw-prod/blob/master/csw-framework/src/main/scala/csw/framework/internal/component/ComponentBehavior.scala).
 
-#### Handlers
+### Handlers
 
-A `ComponentHandlers` is an abstract class provided by `csw-framework`. It provides a list of methods that a component developer should implement which is as follows:
+A `ComponentHandlers` is an abstract class provided by `csw-framework`. It provides a list of methods that a component developer should implement:
 
 -   initialize
 -   validateCommand
@@ -69,16 +67,18 @@ which is `JComponentHandlers`. The source code of `JComponentHandlers` can be re
 
 ## Constructing the Component
 
-In order to wire up a component with framework, developer needs to implement a `ComponentBehaviorFactory`. Then the factory needs to be configured in configuration file for
-that component. The `csw-framework` picks up the full path of `ComponentBehaviorFactory` from configuration file and spawn concrete component handlers while spawning the 
-component using java reflection.
+After writing the handlers, component developer needs to wire them up with framework. In order to do this, developer 
+needs to implement a `ComponentBehaviorFactory`. This factory should to be configured in configuration file for
+the component. The sample of configuration file is discussed next. The `csw-framework` then picks up the full path of
+`ComponentBehaviorFactory` from configuration file and spawn the component handlers using this factory as a process of
+booting a component. The factory is instantiated using java reflection.
 
 The sample code to implement the `ComponentBehaviorFactory` can be referred [here](https://tmtsoftware.github.io/csw-prod/framework/creating-components.html) 
 
 ### Component Configuration (ComponentInfo)
 
-Component configuration contains details needed to spawn a component. This configuration resides in a configuration file for a particular component. The sample for a HCD
-is as follows:
+Component configuration contains details needed to spawn a component. This configuration resides in a configuration file
+for a particular component. The sample for a HCD is as follows:
 
 ```
 {
