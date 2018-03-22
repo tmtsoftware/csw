@@ -15,6 +15,7 @@ The source code of this project can be found [here](https://github.com/tmtsoftwa
 * [Getting Started](getting-started.md)
 * [Creating a Component](create-component.md)
 * [Working with Multiple Components](multiple-components.md)
+* [Messages](services/messages.md)
 * [Framework](framework.md)
 * [Services](services.md)
 * [Command](command.md)

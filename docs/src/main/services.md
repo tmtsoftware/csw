@@ -6,5 +6,4 @@
 * [Location service](services/location.md)
 * [Configuration service](services/config.md)
 * [Logging service](services/logging.md)
-* [messages](services/messages.md)
 @@@
