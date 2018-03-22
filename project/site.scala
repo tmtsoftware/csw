@@ -31,20 +31,28 @@ object UnidocSite extends AutoPlugin {
 object ParadoxSite extends AutoPlugin {
   import com.typesafe.sbt.site.paradox.ParadoxSitePlugin
   import ParadoxSitePlugin.autoImport._
+  import _root_.io.github.jonas.paradox.material.theme.ParadoxMaterialThemePlugin
+  import ParadoxMaterialThemePlugin.autoImport._
   import com.lightbend.paradox.sbt.ParadoxPlugin.autoImport._
 
-  override def requires: Plugins = ParadoxSitePlugin
+  override def requires: Plugins = ParadoxSitePlugin && ParadoxMaterialThemePlugin
 
-  override def projectSettings: Seq[Setting[_]] = Seq(
-    sourceDirectory in Paradox := baseDirectory.value / "src" / "main",
-    paradoxTheme := Some("io.github.jonas" % "paradox-material-theme" % "0.2.0"),
-    paradoxProperties in Paradox ++= Map(
-      "version"                -> version.value,
-      "scala.binaryVersion"    -> scalaBinaryVersion.value,
-      "scaladoc.base_url"      -> s"https://tmtsoftware.github.io/csw-prod/${version.value}/api/scala",
-      "javadoc.base_url"       -> s"https://tmtsoftware.github.io/csw-prod/${version.value}/api/java",
-      "extref.manual.base_url" -> s"https://tmtsoftware.github.io/csw-prod/${version.value}/manual/index.html",
-      "github.base_url"        -> s"https://github.com/tmtsoftware/csw-prod/tree/master"
+  override def projectSettings: Seq[Setting[_]] =
+    ParadoxMaterialThemePlugin.paradoxMaterialThemeSettings(Paradox) ++
+    Seq(
+      sourceDirectory in Paradox := baseDirectory.value / "src" / "main",
+      sourceDirectory in (Paradox, paradoxTheme) := (sourceDirectory in Paradox).value / "_template",
+      paradoxMaterialTheme in Paradox ~= {
+        _.withFavicon("assets/tmt_favicon.ico")
+          .withRepository(new URI("https://github.com/tmtsoftware/csw-prod"))
+      },
+      paradoxProperties in Paradox ++= Map(
+        "version"                -> version.value,
+        "scala.binaryVersion"    -> scalaBinaryVersion.value,
+        "scaladoc.base_url"      -> s"https://tmtsoftware.github.io/csw-prod/${version.value}/api/scala",
+        "javadoc.base_url"       -> s"https://tmtsoftware.github.io/csw-prod/${version.value}/api/java",
+        "extref.manual.base_url" -> s"https://tmtsoftware.github.io/csw-prod/${version.value}/manual/index.html",
+        "github.base_url"        -> "https://github.com/tmtsoftware/csw-prod/tree/master"
+      )
     )
-  )
 }
