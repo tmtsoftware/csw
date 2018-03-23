@@ -89,9 +89,6 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     when(locationService.register(akkaRegistration)).thenReturn(eventualRegistrationResult)
     when(registrationResult.unregister()).thenReturn(eventualDone)
 
-//    val containerBehavior =
-//      new ContainerBehavior(ctx, containerInfo, supervisorFactory, registrationFactory, locationService, mocks.loggerFactory)
-
     val containerBehaviorTestkit: BehaviorTestKit[ContainerActorMessage] = BehaviorTestKit(
       Behaviors.mutable(
         ctx ⇒
