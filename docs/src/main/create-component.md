@@ -1,11 +1,5 @@
 # Creating a Component
 
-TODO This page should at least mention all of the features of CSW a developer might want to use,
-but only give details on the most commonly used.  Links/references should be provided for 
-the other features.
-
-This gives a walkthrough of creating an HCD. 
-
 This tutorial helps in creating a HCD in Scala/Java. In order to create a HCD one needs to depend on `csw-framework`
 which can be referred [here](https://tmtsoftware.github.io/csw-prod/framework.html). This tutorial can be referred for creating an Assembly as well.
 
@@ -60,14 +54,15 @@ More details about handler significance and invocation can be referred [here](ht
 
 @@@ note { title=Note }
 
-If the component developer wishes to write the handler implementation as java code, then he/she needs to implement the java version of `ComponentHandlers`
-which is `JComponentHandlers`. The source code of `JComponentHandlers` can be referred [here](https://github.com/tmtsoftware/csw-prod/blob/master/csw-framework/src/main/scala/csw/framework/javadsl/JComponentHandlers.scala). 
+If the component developer wishes to write the handler implementation in java, then he/she needs to implement the java version of `ComponentHandlers`
+which is `JComponentHandlers`. The source code of `JComponentHandlers` can be referred [here](https://github.com/tmtsoftware/csw-prod/blob/master/csw-framework/src/main/scala/csw/framework/javadsl/JComponentHandlers.scala).
+Any further reference to `ComponentHandlers` should implicitly also apply to `JComponentHandlers`.
 
 @@@
 
 ## Constructing the Component
 
-After writing the handlers, component developer needs to wire them up with framework. In order to do this, developer 
+After writing the handlers, component developer needs to wire it up with framework. In order to do this, developer 
 needs to implement a `ComponentBehaviorFactory`. This factory should to be configured in configuration file for
 the component. The sample of configuration file is discussed next. The `csw-framework` then picks up the full path of
 `ComponentBehaviorFactory` from configuration file and spawn the component handlers using this factory as a process of
@@ -78,7 +73,7 @@ The sample code to implement the `ComponentBehaviorFactory` can be referred [her
 ### Component Configuration (ComponentInfo)
 
 Component configuration contains details needed to spawn a component. This configuration resides in a configuration file
-for a particular component. The sample for a HCD is as follows:
+for a particular component. The sample for HCD is as follows:
 
 ```
 {
@@ -108,11 +103,84 @@ A sample configuration file can be referred [here](https://github.com/tmtsoftwar
 
 ## Lifecycle 
 
-Describe lifecycle states, transitions, etc.
-- Registration in Location Service (other Location Service details are in the next part)
-- Loading a Configuration from Config Service (Again, details are in next part)
+A component can be in one of the following states of lifecycle:
+
+-   Idle
+-   Running
+-   RunningOffline
+-   Restart
+-   Shutdown
+-   Lock
+
+### Idle
+
+The component initializes in idle state. Top level actor calls the `initialize` hook of `ComponentHandlers` as first thing of boot-up.
+Component developers write their initialization logic in this hook. The logic could also be like accessing the configuration service
+and fetch the hardware configurations to set the hardware to default positions.
+
+After the initialization, if the component would have configured `RegisterAndTrack` for `locationServiceUsage` then the top level actor will start tracking
+the `connections` configured for that component. This use case is mostly applicable for Sequencers and Assemblies. HCDs mostly will have `RegisterOnly`
+configured for `locationServiceUsage`.
+
+Supervisor actor will now register itself with location service and transition to `Running` state. Registering with location service will notify other components
+tracking this component of `LocationUpdated` event with actorRef of supervisor actor.
+
+Other components can now start sending commands to this component.      
+ 
+### Running
+
+When the supervisor actor receives `Initialized` message from top level actor after successful initialization, it registers itself with location service and transits
+the component to `Running` state. Running state signifies that the component is accessible via location service. Any commands received by supervisor actor will be
+forwarded to top level actor. Top level actor will then call `validateCommand` hook of `ComponentHandlers` where component developers are expected to write validation
+logic for the received command.
+
+More details around receiving command is provided in subsequent sections.
+
+### RunningOffline
+
+When the supervisor actor receives `GoOffline` message it transits the component to `RunningOffline` state and forward it to top level actor. Top level actor then calls
+`onGoOffline` hook of `ComponentHandlers`.
+
+If `GoOnline` message is received by supervisor actor then it transits the component back to `Running` state and forward it to top level actor. Top level actor then calls
+`onGoOnline` hook of `ComponentHandlkers`.
+
+@@@ note { title=Note }
+
+In `RunningOffline` state if any command is received then it is forwarded to underlying component hook through top level actor. It is then the responsibility of
+component developer to check the `isOnline` flag provided by `csw-framework` in the logic and process the command accordingly.  
+
+@@@
+
+### Restart
+
+When the supervisor actor receives a `Restart` message, it will transit the component to `Restart` state. Then it will unregister itself from location service so that other components
+tracking this component will be notified and no commands are received while restart is in progress.
+
+Then the top level actor is stopped and postStop hook of top level actor will call the `onShutdown` hook of `ComponentHandlers`. Component developers are expected to write 
+any cleanup of resources or logic that should be executed for graceful shutdown of component in this hook.  
+
+After successful shutdown of component, supervisor actor will create the top level actor all together. This will cause the `initialize` hook of `ComponentHandlers` to be called
+again. After successful initialization of component, supervisor actor will register itself with location service.
+
+### Shutdown
+
+When the supervisor actor receives a `Shutdown` message, it transit the component to `Shutdown` state so that any commands received while shutdown is in progress will be ignored.
+Then it stop will the top level actor. The postStop hook of top level actor will call the `onShutdown` hook of `ComponentHandlers`. Component developers are expected to write 
+any cleanup of resources or logic that should be executed for graceful shutdown of component in this hook.
+
+### Lock
+
+When the supervisor actor receives a `Lock` message, it transit the component to `Lock` state. Post locking, supervisor will forward the commands received from the component
+that locked this component and ignore others.
+
+In `Lock` state messages like `Shutdown` and `Restart` will be ignored. So, if these messages need to be send to the component, then it has to be first unlocked.
 
 ## Logging
+
+`csw-framework` will provide a `LoggerFactory` as dependency injection in constructor of `ComponentHandlers`. The `LoggerFactory` will have the component's name predefined in
+it. The component developer is expected to use this factory to log statements.
+
+More details on how to use `LoggerFactory` can be referred [here](https://tmtsoftware.github.io/csw-prod/services/logging.html#enable-component-logging). 
 
 ## Receiving Commands
 
