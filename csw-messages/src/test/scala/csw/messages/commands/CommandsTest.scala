@@ -5,6 +5,7 @@ import csw.messages.params.generics._
 import csw.messages.params.models.Units.{degree, meter, NoUnits}
 import csw.messages.params.models.{ArrayData, ObsId, Prefix}
 import org.scalatest.FunSpec
+import org.scalatest.prop.TableDrivenPropertyChecks._
 
 import scala.util.Try
 
@@ -584,6 +585,37 @@ class CommandsTest extends FunSpec {
       assert(sc1.get(k2).isEmpty)
       assert(sc1.get(k3).isEmpty)
       assert(sc1.get(k4).isEmpty)
+    }
+  }
+
+  describe("clone command test") {
+    val k1 = KeyType.IntKey.make("itest")
+    val k2 = KeyType.DoubleKey.make("dtest")
+    val k3 = KeyType.StringKey.make("stest")
+    val k4 = KeyType.LongArrayKey.make("lartest")
+
+    val i1      = k1.set(1, 2, 3).withUnits(degree)
+    val i2      = k2.set(1.0, 2.0, 3.0).withUnits(meter)
+    val i3      = k3.set("A", "B", "C")
+    val i4      = k4.set(ArrayData(Array.fill[Long](100)(10)), ArrayData(Array.fill[Long](100)(100)))
+    val setup   = Setup(Prefix(ck3), commandName, Some(obsId)).madd(i1, i2, i3, i4)
+    val observe = Observe(Prefix(ck3), commandName, Some(obsId)).madd(i1, i2, i3, i4)
+    val wait    = Wait(Prefix(ck3), commandName, Some(obsId)).madd(i1, i2, i3, i4)
+    val testData = Table(
+      ("controlCommand", "controlCommandClone"),
+      (setup, setup.cloneCommand),
+      (observe, observe.cloneCommand),
+      (wait, wait.cloneCommand)
+    )
+    it("clone command creates a command from existing command with a new RunId for Setup, Observe or Wait") {
+      forAll(testData) { (command, commandClone) ⇒
+        assert(command.runId != commandClone.runId)
+        assert(command.commandName == commandClone.commandName)
+        assert(command.maybeObsId == commandClone.maybeObsId)
+        assert(command.source == commandClone.source)
+        assert(command.paramSet == commandClone.paramSet)
+      }
+
     }
   }
 }

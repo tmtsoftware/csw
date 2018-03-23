@@ -106,6 +106,13 @@ case class Setup private (
    * @return a new instance of Setup with new runId and provided data
    */
   override protected def create(data: Set[Parameter[_]]): Setup = copy(runId = Id(), paramSet = data)
+
+  /**
+   * Create a new Setup instance from an existing instance
+   *
+   * @return a new instance of Setup with new runId and copied data
+   */
+  def cloneCommand: Setup = copy(Id())
 }
 
 object Setup {
@@ -169,6 +176,13 @@ case class Observe private (
    * @return a new instance of Observe with new runId and provided data
    */
   override protected def create(data: Set[Parameter[_]]): Observe = copy(runId = Id(), paramSet = data)
+
+  /**
+   * Create a new Observer instance from an existing instance
+   *
+   * @return a new instance of Observe with new runId and copied data
+   */
+  def cloneCommand: Observe = copy(Id())
 }
 
 object Observe {
@@ -231,6 +245,13 @@ case class Wait private (
    * @return a new instance of Wait with new runId and provided data
    */
   override protected def create(data: Set[Parameter[_]]): Wait = copy(runId = Id(), paramSet = data)
+
+  /**
+   * Create a new Wait instance from an existing instance
+   *
+   * @return a new instance of Wait with new runId and copied data
+   */
+  def cloneCommand: Wait = copy(Id())
 }
 
 object Wait {
