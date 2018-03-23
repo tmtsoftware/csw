@@ -6,7 +6,9 @@ import csw.messages.commands.{CommandName, Observe, Setup, Wait}
 import csw.messages.params.formats.JsonSupport
 import csw.messages.params.generics.KeyType.{ByteKey, DoubleMatrixKey}
 import csw.messages.params.generics.{Key, KeyType, Parameter}
+import csw.messages.params.models.Units.{degree, meter}
 import csw.messages.params.models._
+import org.scalatest.prop.TableDrivenPropertyChecks.forAll
 import org.scalatest.{FunSpec, Matchers}
 
 import scala.util.Try
@@ -291,6 +293,44 @@ class CommandsTest extends FunSpec with Matchers {
       uniqueKeys1 should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
       uniqueKeys2 should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
       uniqueKeys3 should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName, miscKey.keyName)
+    }
+  }
+
+  describe("Examples of clone command") {
+    val k1          = KeyType.IntKey.make("itest")
+    val commandName = CommandName("command-name")
+
+    val i1 = k1.set(1, 2, 3).withUnits(degree)
+
+    it("clone command creates a command from existing command with a new RunId for Setup, Observe or Wait") {
+      //#clone-command
+      val setup  = Setup(prefix, commandName, Some(obsId)).madd(i1)
+      val setup2 = setup.cloneCommand
+
+      val observe  = Observe(prefix, commandName, Some(obsId)).madd(i1)
+      val observe2 = observe.cloneCommand
+
+      val wait  = Wait(prefix, commandName, Some(obsId)).madd(i1)
+      val wait2 = wait.cloneCommand
+      //#clone-command
+
+      assert(setup.runId != setup2.runId)
+      assert(setup.commandName == setup2.commandName)
+      assert(setup.maybeObsId == setup2.maybeObsId)
+      assert(setup.source == setup2.source)
+      assert(setup.paramSet == setup2.paramSet)
+
+      assert(observe.runId != observe2.runId)
+      assert(observe.commandName == observe2.commandName)
+      assert(observe.maybeObsId == observe2.maybeObsId)
+      assert(observe.source == observe2.source)
+      assert(observe.paramSet == observe2.paramSet)
+
+      assert(wait.runId != wait2.runId)
+      assert(wait.commandName == wait2.commandName)
+      assert(wait.maybeObsId == wait2.maybeObsId)
+      assert(wait.source == wait2.source)
+      assert(wait.paramSet == wait2.paramSet)
     }
   }
 }

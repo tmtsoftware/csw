@@ -5,6 +5,7 @@
  - [Getting Started](getting-started.md)
  - [Creating a Component](create-component.md)
  - [Working with Multiple Components](multiple-components.md)
+ - [Messages](messages.md)
  - [Framework](framework.md)
  - [Services](services.md)
  - [Command](command.md)

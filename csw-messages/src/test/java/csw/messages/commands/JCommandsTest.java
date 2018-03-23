@@ -164,4 +164,31 @@ public class JCommandsTest {
         Assert.assertEquals(mutatedSetup2.commandName(), mutatedSetup1.commandName());
         Assert.assertEquals(mutatedSetup2.jMaybeObsId(), mutatedSetup1.jMaybeObsId());
     }
+
+    @Test
+    public void shoulRdAbleToCloneAnExistingCommand() {
+        Setup setup = new Setup(new Prefix(prefix), commandName, Optional.of(obsId)).add(encoderParam).add(epochStringParam);
+        Setup setup2 = setup.cloneCommand();
+        Assert.assertNotEquals(setup.runId(), setup2.runId());
+        Assert.assertEquals(setup.commandName(), setup2.commandName());
+        Assert.assertEquals(setup.jMaybeObsId(), setup2.jMaybeObsId());
+        Assert.assertEquals(setup.jParamSet(), setup2.jParamSet());
+        Assert.assertEquals(setup.source(), setup2.source());
+
+        Observe observe = new Observe(new Prefix(prefix), commandName, Optional.empty()).add(encoderParam).add(epochStringParam);
+        Observe observe2 = observe.cloneCommand();
+        Assert.assertNotEquals(observe.runId(), observe2.runId());
+        Assert.assertEquals(observe.commandName(), observe2.commandName());
+        Assert.assertEquals(observe.jMaybeObsId(), observe2.jMaybeObsId());
+        Assert.assertEquals(observe.jParamSet(), observe2.jParamSet());
+        Assert.assertEquals(observe.source(), observe2.source());
+
+        Wait wait = new Wait(new Prefix(prefix), commandName, Optional.of(obsId)).add(encoderParam).add(epochStringParam);
+        Wait wait2 = wait.cloneCommand();
+        Assert.assertNotEquals(wait.runId(), wait2.runId());
+        Assert.assertEquals(wait.commandName(), wait2.commandName());
+        Assert.assertEquals(wait.jMaybeObsId(), wait2.jMaybeObsId());
+        Assert.assertEquals(wait.jParamSet(), wait2.jParamSet());
+        Assert.assertEquals(wait.source(), wait2.source());
+    }
 }

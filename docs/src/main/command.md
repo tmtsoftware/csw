@@ -16,7 +16,7 @@ sbt
 
 ## Command based communication between components
 
-A component can send @ref:[Commands](services/messages/commands.md) to other components. The commands can be sent as following 
+A component can send @ref:[Commands](messages/commands.md) to other components. The commands can be sent as following 
 two types of messages: 
 
 * **Submit** - A command is sent as Submit when the result of completion is desired.
@@ -161,7 +161,7 @@ Java
 :   @@snip [JCommandIntegrationTest.java](../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #submitAllAndGetFinalResponse }
 
 ### subscribeCurrentState
-This method can be used to subscribe to the @ref:[CurrentState](services/messages/states.md) of the component by providing a 
+This method can be used to subscribe to the @ref:[CurrentState](messages/states.md) of the component by providing a 
 callback. Subscribing results into a handle of `CurrentStateSubscription` which can be used to unsubscribe the subscription.
 
 Scala

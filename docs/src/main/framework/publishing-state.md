@@ -1,6 +1,6 @@
 ## Publishing State
 
-A component has access to `currentStatePublisher` which can be used to publish its @ref:[CurrentState](../services/messages/states.md). Any subscriber of this component will receive the 
+A component has access to `currentStatePublisher` which can be used to publish its @ref:[CurrentState](../messages/states.md). Any subscriber of this component will receive the 
 published state. 
 
 Scala
