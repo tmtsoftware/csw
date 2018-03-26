@@ -12,16 +12,14 @@ Unit testing simple scala/java classes or objects is straight forward. You can m
 
 Follow below guides for testing your application which uses different modules of akka:
 
-- [Akka Untyped Actors](https://doc.akka.io/docs/akka/2.5/testing.html)
-- [Akka Typed Actors](https://doc.akka.io/docs/akka/2.5/typed/testing.html)
-- [Akka Streams](https://doc.akka.io/docs/akka/2.5.3/scala/stream/stream-testkit.html)
-
+- [Akka Untyped Actors](https://doc.akka.io/docs/akka/current/testing.html)
+- [Akka Typed Actors](https://doc.akka.io/docs/akka/current/typed/testing.html)
+- [Akka Streams](https://doc.akka.io/docs/akka/current/scala/stream/stream-testkit.html)
 
 ## Acceptance Tests
 
 This section explains how and where csw-prod maintains and execute acceptance tests. 
-If you are a component writer and want to maintain acceptance tests, you can create a repo similar to [csw-acceptance](https://github.com/tmtsoftware/csw-acceptance).  
-and update dependencies, projects as per your need. 
+If you are a component writer and want to maintain acceptance tests, you can create a repo similar to [csw-acceptance](https://github.com/tmtsoftware/csw-acceptance) and update dependencies, projects as per your need. 
 
 As part of acceptance tests, we run all the existing java and scala tests from [csw-prod](https://github.com/tmtsoftware/csw-prod) repo on published bintray binaries rather than directly on source code.
 
@@ -29,19 +27,39 @@ More information can be found [here](https://github.com/tmtsoftware/csw-acceptan
 
 Below are the two separate jenkins pipelines to run `csw-prod` acceptance tests:
 
-- [acceptance-dev-nightly-build](http://ec2-35-154-215-191.ap-south-1.compute.amazonaws.com:8080/job/acceptance-dev-nightly-build/)
+1. [Acceptance Dev Pipeline](http://ec2-35-154-215-191.ap-south-1.compute.amazonaws.com:8080/job/acceptance-dev-nightly-build/)
     - Auto triggered every night to get fast feedback and intended for developer's visibility.
     
-- [acceptance-release](http://ec2-35-154-215-191.ap-south-1.compute.amazonaws.com:8080/job/acceptance-release/)
+2. [Acceptance Release Pipeline](http://ec2-35-154-215-191.ap-south-1.compute.amazonaws.com:8080/job/acceptance-release/)
     - Auto triggered on completion of [csw-prod-release](http://ec2-35-154-215-191.ap-south-1.compute.amazonaws.com:8080/job/csw-prod-release/) pipeline.
     - Admin needs to manually trigger `csw-prod-release` pipeline.
-    
+
+Acceptance pipelines are enabled to be triggered remotely. This is required, so that `csw-prod-release` pipeline can trigger `acceptance-release` pipeline which would be created in different jenkins server hosted in STILL environment. 
+In case you want to trigger it via http end point, first you need to have security `token` configured in jenkins pipeline to trigger the job remotely and then run `curl` cmd as shown below:
+
+- For triggering [acceptance-dev](http://ec2-35-154-215-191.ap-south-1.compute.amazonaws.com:8080/job/acceptance-dev-nightly-build/) pipeline, run below
+
+```
+curl -G 'http://ec2-35-154-215-191.ap-south-1.compute.amazonaws.com:8080/job/acceptance-dev/buildWithParameters'  \
+    --data-urlencode token=$DEV_TOKEN \
+    --data-urlencode DEV_VERSION=0.1-SNAPSHOT \
+    --data-urlencode BUILD_ENV=DEV
+```
+
+- For triggering `acceptance-release` pipeline, run below: (Modify parameters as applicable)
+
+```
+curl -G '$REMOTE_JENKINS_URL/job/$JOB_NAME/buildWithParameters' \
+    --data-urlencode token=$RELEASE_TOKEN \
+    --data-urlencode RELEASE_VERSION=$RELEASE_VERSION \
+    --data-urlencode BUILD_ENV=PROD
+```
+
 @@@ note { title=Note }
 
 [csw-prod-release](http://ec2-35-154-215-191.ap-south-1.compute.amazonaws.com:8080/job/csw-prod-release/) pipeline is responsible for following tasks:
 
-- build `csw-prod`
-- run tests
+- build and run `csw-prod` tests
 - publish binaries to bintray
 - publish paradox documentation
 - publish apps and release notes to github releases
@@ -55,25 +73,11 @@ Testing asynchronous distributed systems requires special tooling/framework supp
 Sbt has a plugin called [sbt-multi-jvm](https://github.com/sbt/sbt-multi-jvm) which helps to test systems across multiple JVMs or machines.
 This is especially useful for integration testing where multiple systems communicate with each other.
 
-You can find more details on multi jvm tests [here](https://doc.akka.io/docs/akka/2.5/multi-jvm-testing.html).
+You can find more details on multi jvm tests [here](https://doc.akka.io/docs/akka/current/multi-jvm-testing.html).
 
-You can also refer [csw-prod](https://github.com/tmtsoftware/csw-prod) for writing your own multi JVM tests.
+You can also refer [csw-prod](https://github.com/tmtsoftware/csw-prod) for writing your own multi JVM tests. For example: @github[CommandServiceTest.scala](/csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala)  
 
-For example: @github[CommandServiceTest.scala](/csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala)  
-
-In case you want to run your Multi-JVM tests across machines, you need to add below dependency in `build.sbt`:
-
-`libraryDependencies    += "com.typesafe.akka" %% "akka-multi-node-testkit" % "2.5.11" % Test`
-
-Then you can simply run following command to execute tests across machines:
-
-`sbt <project>/multiNodeTest`
-
-One of the pre-requisite before running above command is that, you should have a file named `multi-node-test.hosts` at root level 
-which contains a sequence of hosts to use for running the test, on the form `user@host:java` where host is the only required part.
-Also make sure, you are able to `ssh` to these machines without password (password less ssh should be enabled).
-
-Refer multi node testing guide for more details [here](https://doc.akka.io/docs/akka/2.5/multi-node-testing.html). 
+In case you want to run your multi jvm tests across machines, refer this multi node testing guide [here](https://doc.akka.io/docs/akka/current/multi-node-testing.html). 
 
 ## Mockito
 
