@@ -170,7 +170,7 @@ any cleanup of resources or logic that should be executed for graceful shutdown 
 
 ### Lock
 
-When the supervisor actor receives a `Lock` message, it transit the component to `Lock` state. Post locking, supervisor will forward the commands received from the component
+When the supervisor actor receives a `Lock` message, it transit the component to `Lock` state. Post locking, supervisor will only forward the commands received from the component
 that locked this component and ignore others.
 
 In `Lock` state messages like `Shutdown` and `Restart` will be ignored. So, if these messages need to be send to the component, then it has to be first unlocked.
@@ -196,7 +196,8 @@ More details about creating commands can be referred [here](https://tmtsoftware.
 Whenever a command is sent to a component it is wrapped inside a command wrapper. There are two kinds of command wrapper:
 
 -   Submit: A command is wrapped in submit when the completion result is expected from receiver component 
--   Oneway: A command is wrapped in oneway when the completion of command is not expected from receiver component but is determined by sender component by subscribing to it's state
+-   Oneway: A command is wrapped in oneway when the completion of command is not expected from receiver component but is determined by sender component by subscribing to receiver component's
+            state
 
 ### Validation
 
@@ -214,27 +215,39 @@ Different types of command responses and their significance can be referred [her
 ### Command Response
 
 The response returned from `validateCommand` hook of `ComponentHandlers` will be received by top level actor. Top level actor then sends response back to sender. Next, if the
-response returned was `Accepted` then, it either calls `onSubmit` hook or `onOneway` hook of `ComponentHandlers` depending on the wrapper in which the command is received. 
+response returned was `Accepted` then, it either calls `onSubmit` hook or `onOneway` hook of `ComponentHandlers` depending on the wrapper(submit or oneway) in which the command
+is received. 
 
 If the command is received in submit kind of a wrapper, then top level actor adds the response returned from `validateCommand` hook in `CommandResponseManager` and then it checks
-if the response is `Accepted` to call the `onSubmit` hook of `ComponentHandlers`.  
+if the response was `Accepted` to call the `onSubmit` hook of `ComponentHandlers`.  
 
-In case the command is received in oneway kind of wrapper then, the response returned from `validateCommand` hook will be sent to sender directly and the `onOneway` hook of
- `ComponentHandlers` will be called.
+In case the command received by a component is in oneway kind of wrapper then, the response returned from `validateCommand` hook will be sent directly to sender and the `onOneway`
+hook of `ComponentHandlers` will be called.
 
-The `CommandResponseManager` is responsible for managing and bookkeeping the command status received in submit kind of wrapper. The sender of the command can query the status
-or subscribe to changes in status using `CommandService`. `CommandService` provides helper methods for communicating with other components.
+The `CommandResponseManager` is responsible for managing and bookkeeping the command status of the command received in submit kind of wrapper by a component. The sender of the
+command can query the status or subscribe to changes in status using `CommandService`. `CommandService` provides helper methods for communicating with other components.
 
-Creation of `CommandService` instance can be referred [here](https://tmtsoftware.github.io/csw-prod/command.html#commandservice).
+Creation of `CommandService` instance and it's usage can be referred [here](https://tmtsoftware.github.io/csw-prod/command.html#commandservice).
 
 When `onSubmit` hook is called, it is the responsibility of component developers to update the status of received command in `CommandResponseManager` as it changes. The instance
-of commandResponseManager is provided in `ComponentHandlers` which should be injected in any worker actor or other actor/class created.   
+of commandResponseManager is provided in `ComponentHandlers` which should be injected in any worker actor or other actor/class created for the component.   
 
 More details on methods available in `CommandResponseManager` can be referred [here](https://tmtsoftware.github.io/csw-prod/framework/managing-command-state.html).
 
-## Building, Staging, PublishLocal 
+## Building and Running component in standalone mode
 
-Just for this in Standlone mode, but link to reference
+Once the component is ready, it need to start `ContainerCmd`. The details about starting the `ContainerCmd` in standalone mode can be referred [here](https://tmtsoftware.github.io/csw-prod/framework/deploying-components.html).
 
-## Running Component (Standalone mode)
+Next, to run the component refer the following steps:
+
+-   Run `sbt <project>/universal:packageBin`. This will create self contained zip in `<project>/target/universal` directory
+-   Unzip generated zip file and enter into bin directory
+-   Run the `./<project>-cmd-app --local --standalone <path-to-local-config-file-to-start-the-component>`
+
+@@@ note { title=Note }
+
+CSW Location Service cluster seed must be running, and appropriate environment variables set to run apps.
+See https://tmtsoftware.github.io/csw-prod/apps/cswclusterseed.html.
+
+@@@
 
