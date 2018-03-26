@@ -14,7 +14,7 @@ import scala.concurrent.Future
 
 /**
  * This class represents the contents of the files being managed.
- * It is wraps an Akka streams of ByteString
+ * It wraps an Akka streams of ByteString.
  *
  * @param source an akka source that materializes to stream of bytes
  * @param length the length representing number of bytes
