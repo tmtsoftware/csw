@@ -3,7 +3,6 @@
 ### ContainerCmd
 
 `ContainerCmd` is a helper utility provided as a part of framework. This helps component writers to start their components inside container.
-This support running single component in standa
 
 A main application needs to be created which uses framework provided utility `csw.framework.deploy.containercmd.ContainerCmd` 
 to start a container or standalone component. The utility supports following parameters which can be provided as arguments to the

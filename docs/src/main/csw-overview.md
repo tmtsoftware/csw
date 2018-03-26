@@ -20,7 +20,10 @@ All versions of configuration files are retained, providing a historical record 
 Logging Service library provides an advanced logging facility for csw components and services.
 
 ### [Commands Service](command.md)
-Commands service provide support for receiving, sending, and completing commands in the form of configurations
+Commands service provide support for receiving, sending, and completing @ref:[commands](messages/commands.md) in the form of 
+configurations
 
 ### [Framework](framework.md)
-The framework provides templates for the kind of software components defined by TMT as well as service access interfaces.
+The framework provides templates for @ref:[creating](create-component.md) and running the kind of software components 
+defined by TMT as well as service access interfaces for these components. It also provides support @ref:[application](apps/hostconfig.md) 
+for running multiple components on a host machine.
