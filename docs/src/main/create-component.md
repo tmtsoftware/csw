@@ -184,9 +184,53 @@ More details on how to use `LoggerFactory` can be referred [here](https://tmtsof
 
 ## Receiving Commands
 
-### Command types, and Implementing Handler stubs
+A command is something that carries some metadata and a set of parameters. A component sends message to other components using `commands`.
+Various kinds of commands are as follows:
+
+-   Setup : A sequencer or an assembly will send a setup kind of command
+-   Observe: A Sequencer or an assembly will send a observe kind of command
+-   Wait: A Sequencer can receive a wait kind of command
+
+More details about creating commands can be referred [here](https://tmtsoftware.github.io/csw-prod/messages/commands.html#setup-command).
+
+Whenever a command is sent to a component it is wrapped inside a command wrapper. There are two kinds of command wrapper:
+
+-   Submit: A command is wrapped in submit when the completion result is expected from receiver component 
+-   Oneway: A command is wrapped in oneway when the completion of command is not expected from receiver component but is determined by sender component by subscribing to it's state
+
 ### Validation
-### CSRM
+
+When a command is received by a component, top level actor will call the `validateCommand` hook of `ComponentHandlers`. Component developers are expected to perform appropriate
+validation of command, whether it is valid to execute, and return a `CommandResponse`. The `CommandResponse` returned from this hook will be sent back to sender directly by `csw-framework`.
+
+The logic in `validateCommand` hook can determine whether the command received will be executed shortly or will it take longer. If the command could be executed shortly, then
+component developer can return a final response directly or if the command will take longer to execute, then component developer can return an intermediate response `Accepted`
+or `Invalid` specifying whether the command is valid to be executed or not.
+
+Whether the command execution will take longer or not is subjective to each component. 
+
+Different types of command responses and their significance can be referred [here](https://tmtsoftware.github.io/csw-prod/command.html#command-based-communication-between-components).
+
+### Command Response
+
+The response returned from `validateCommand` hook of `ComponentHandlers` will be received by top level actor. Top level actor then sends response back to sender. Next, if the
+response returned was `Accepted` then, it either calls `onSubmit` hook or `onOneway` hook of `ComponentHandlers` depending on the wrapper in which the command is received. 
+
+If the command is received in submit kind of a wrapper, then top level actor adds the response returned from `validateCommand` hook in `CommandResponseManager` and then it checks
+if the response is `Accepted` to call the `onSubmit` hook of `ComponentHandlers`.  
+
+In case the command is received in oneway kind of wrapper then, the response returned from `validateCommand` hook will be sent to sender directly and the `onOneway` hook of
+ `ComponentHandlers` will be called.
+
+The `CommandResponseManager` is responsible for managing and bookkeeping the command status received in submit kind of wrapper. The sender of the command can query the status
+or subscribe to changes in status using `CommandService`. `CommandService` provides helper methods for communicating with other components.
+
+Creation of `CommandService` instance can be referred [here](https://tmtsoftware.github.io/csw-prod/command.html#commandservice).
+
+When `onSubmit` hook is called, it is the responsibility of component developers to update the status of received command in `CommandResponseManager` as it changes. The instance
+of commandResponseManager is provided in `ComponentHandlers` which should be injected in any worker actor or other actor/class created.   
+
+More details on methods available in `CommandResponseManager` can be referred [here](https://tmtsoftware.github.io/csw-prod/framework/managing-command-state.html).
 
 ## Building, Staging, PublishLocal 
 
