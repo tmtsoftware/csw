@@ -1,8 +1,8 @@
 # Creating a Component
 
 This tutorial helps in creating a CSW component in Scala/Java. CSW components depend on the `csw-framework` package,
-which can be referred [here](https://tmtsoftware.github.io/csw-prod/framework.html). This tutorial discusses constructing an HCD, 
-but the principles apply to an Assembly as well.  We wil be constructing the Assembly on the next tutorial section [Working with Mulitple Components](multiple-components.md). 
+which can be referred @ref:[here](./framework.md). This tutorial discusses constructing an HCD, 
+but the principles apply to an Assembly as well.  We wil be constructing the Assembly on the next tutorial section @ref:[Working with Mulitple Components](./multiple-components.md). 
 
 ## Anatomy of Component
     
@@ -14,7 +14,7 @@ acts as a gateway from framework to component code.
 
 A Supervisor actor is the actor first started for any component. The main responsibilities that supervisor performs is as follows:
 
--   Implement and manage the component lifecycle for the TLA and for the rest of the system (see [Lifecycle](#Lifecycle) below).
+-   Implement and manage the component lifecycle for the TLA and for the rest of the system (see [Lifecycle](#lifecycle) below).
 -   Register itself with location service.
 -   Provide an administrative interface to the component to the rest of the system. For
 instance, the Container can perform certain administrative communication with the Supervisor such as restart or shutdown.
@@ -49,12 +49,12 @@ The following hooks should be overridden in your ComponentHandlers implementatio
 -   `onOneway`: called on Oneway command if validateCommand returns `Accepted`.
 -   `onGoOffline`: called when component receives external message to go offline.
 -   `onGoOnline`: called when component receives external message to go online.
--   `onLocationTrackingEvent`: called when a tracked dependency changes location state. (see [Tracking Dependencies](multiple-components/#tracking-dependencies))
+-   `onLocationTrackingEvent`: called when a tracked dependency changes location state. (see @ref:[Tracking Dependencies](./multiple-components.md#tracking-dependencies))
 -   `onShutdown`: called when component is shutting down.
 
 The source code of `ComponentHandlers` can be referred [here](https://github.com/tmtsoftware/csw-prod/blob/master/csw-framework/src/main/scala/csw/framework/scaladsl/ComponentHandlers.scala). 
 
-More details about handler significance and invocation can be referred [here](https://tmtsoftware.github.io/csw-prod/framework/handling-lifecycle.html)
+More details about handler significance and invocation can be referred @ref:[here](./framework.md#handling-lifecycle)
 
 @@@ note { title=Note }
 
@@ -78,7 +78,7 @@ If using the giter8 template, this factory class will be implemented for you.
 
 @@@
 
-The sample code to implement the `ComponentBehaviorFactory` can be referred [here](https://tmtsoftware.github.io/csw-prod/framework/creating-components.html) 
+The sample code to implement the `ComponentBehaviorFactory` can be referred @ref:[here](./framework.md#creating-components) 
 
 ### Component Configuration (ComponentInfo)
 
@@ -107,9 +107,9 @@ The `locationServiceUsage` is referred by the Supervisor actor to decide whether
   
 The configuration file is parsed to a `ComponentInfo` object and injected in the Supervisor actor. It is then injected in `ComponentHandlers` while spawning a component.
 
-The configuration can also contain a list of components and services it wishes to track as dependencies.  See [Tracking Dependencies](multiple-components/#tracking-dependencies).
+The configuration can also contain a list of components and services it wishes to track as dependencies.  See @ref:[Tracking Dependencies](./multiple-components.md#tracking-dependencies).
 
-More details about `ComponentInfo` can be referred [here](https://tmtsoftware.github.io/csw-prod/framework/describing-components.html).
+More details about `ComponentInfo` can be referred @ref:[here](./framework.md#describing-components).
 
 A sample configuration file can be referred [here](https://github.com/tmtsoftware/csw-prod/blob/master/csw-benchmark/src/main/resources/container.conf).
 
@@ -193,7 +193,7 @@ will automatically be unlocked.  A component can be manually unlocked by sending
 `csw-framework` will provide a `LoggerFactory` as dependency injection in constructor of `ComponentHandlers`. The `LoggerFactory` will have the component's name predefined in
 it. The component developer is expected to use this factory to log statements.
 
-More details on how to use `LoggerFactory` can be referred [here](https://tmtsoftware.github.io/csw-prod/services/logging.html#enable-component-logging). 
+More details on how to use `LoggerFactory` can be referred @ref:[here](./services/logging.md#enable-component-logging). 
 
 ## Receiving Commands
 
@@ -207,7 +207,7 @@ Various kinds of commands are as follows:
              by the ESW for the ESW PDR.
 -   Wait: Sequencer only.  Instructs a sequencer to pause until told to continue.
 
-More details about creating commands can be referred [here](https://tmtsoftware.github.io/csw-prod/messages/commands.html#setup-command).
+More details about creating commands can be referred @ref:[here](./messages.md#setup-command).
 
 Whenever a command is sent to a component it is wrapped inside a command wrapper. There are two kinds of command wrapper:
 
@@ -226,7 +226,7 @@ This should be only used for commands that require a very small amount of time t
 If the command will take longer, then component developer should return an intermediate response `Accepted`
 or `Invalid` specifying whether the command is valid to be executed or not, and process the command in the `onSubmit` or `onOneway` handlers (see [Command Response](#command-response)).
 
-Different types of command responses and their significance can be referred [here](https://tmtsoftware.github.io/csw-prod/command.html#command-based-communication-between-components).
+Different types of command responses and their significance can be referred @ref:[here](./command.md#command-based-communication-between-components).
 
 ### Command Response
 
@@ -244,12 +244,12 @@ The `CommandResponseManager` is responsible for managing and bookkeeping the com
 The sender of the command (and any component, really) can query the command statuses or subscribe to changes in command statuses using `CommandService`. 
 
 The `CommandService` class provides helper methods for communicating with other components, and should be a component's primary means of sending
-commands to other components.  This will be described in the next tutorial section, [Sending Commands](multiple-components.html/#sending-commands).
+commands to other components.  This will be described in the next tutorial section, @ref:[Sending Commands](./multiple-components.md#sending-commands).
 
 When the `onSubmit` hook is called, it is the responsibility of component developers to update the status of the received command in the `CommandResponseManager` as it changes. The instance
 of commandResponseManager is provided in `ComponentHandlers` which should be injected in any worker actor or other actor/class created for the component.   
 
-More details on methods available in `CommandResponseManager` can be referred [here](https://tmtsoftware.github.io/csw-prod/framework/managing-command-state.html).
+More details on methods available in `CommandResponseManager` can be referred @ref:[here](./framework.md#managing-command-state).
 
 ## Building and Running component in standalone mode
 

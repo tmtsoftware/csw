@@ -8,7 +8,7 @@ The goal of unit testing is to segregate smallest testable units of your applica
 It is always good idea to write more number of unit test cases and relatively less component and integration tests.
 If you want to get an idea of how many tests you should have in different types of testing phases (Unit/Component/Integration), refer this [blog](https://martinfowler.com/articles/practical-test-pyramid.html)
 
-Unit testing simple scala/java classes or objects is straight forward. You can mock external dependencies using Mockito. Refer @ref:[Mockito](./testing.md#mockito) section for more details.
+Unit testing simple scala/java classes or objects is straight forward. You can mock external dependencies using Mockito. Refer [Mockito](#mockito) section for more details. 
 
 Follow below guides for testing your application which uses different modules of akka:
 
