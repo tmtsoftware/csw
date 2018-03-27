@@ -44,7 +44,9 @@ The Assembly has multiple `connections` of HCDs that it will track in it's life 
 
 @@@
 
-More details about each configuration and it's significance can be referred @ref:[here](./create-component.md#component-configuration-(componentinfo)).  
+More details about each configuration and it's significance can be referred @ref:[here](./create-component.md#component-configuration-componentinfo-).
+
+A sample configuration file can be referred [here](https://github.com/tmtsoftware/csw-prod/blob/master/csw-benchmark/src/main/resources/container.conf).  
 
 ## Tracking Dependencies
 
@@ -133,22 +135,15 @@ use `subscribeCurrentState` method of `CommandService`. More details about the u
 If a component wants to publish it's current state then it can use the `currentStatePublisher` provided by `csw-framework` in `ComponentHandlers`. More details about the usage
 of `currentStatePublisher` can ber referred @ref:[here](./framework/publishing-state.md).
 
-## Deploying Multiple Components in a Container
-
-## Running components in a Container
-
-
-NOTE: the following was moved from the getting starting page. I thought it was more appropriate here, 
-but I just cut/paste for now, expecting some of this info will be integrated into this page. -- JLW
 ## Deploying and Running Components
 
 ### Pre-requisite
 
-`galil-deploy` project contains applications (ContainerCmd and HostConfig) to run your components, make sure you add necessary dependencies in `galil-deploy` project.
-
+A project let's say with name `galil-deploy` contains applications (ContainerCmd and HostConfig coming from `csw-framework`) to run components. Make sure that necessary 
+dependencies are added in the `galil-deploy`.
 
 ### Run
-As seen above `galil-deploy` depends on `galil-assembly` and `galil-hcd`, now if you want to start these Assembly and HCD, follow below steps:
+Assuming that `galil-deploy` depends on `galil-assembly` and `galil-hcd`, to start the Assembly and HCD, follow below steps:
 
  - Run `sbt galil-deploy/universal:packageBin`, this will create self contained zip in `galil-deploy/target/universal` directory
  - Unzip generated zip file and enter into `bin` directory
