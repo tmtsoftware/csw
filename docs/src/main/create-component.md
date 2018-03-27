@@ -1,7 +1,7 @@
 # Creating a Component
 
 This tutorial helps in creating a CSW component in Scala/Java. CSW components depend on the `csw-framework` package,
-which can be referred @ref:[here](./framework.md). This tutorial discusses constructing a HCD, 
+which can be found @ref:[here](./framework.md). This tutorial discusses constructing a HCD, 
 but the principles apply to an Assembly as well. We will be constructing the Assembly in the next tutorial section @ref:[Working with Mulitple Components](./multiple-components.md). 
 
 ## Anatomy of Component
@@ -27,7 +27,7 @@ Because the Supervisor registers itself with location service, it serves as the 
 
 @@@
 
-The source code of supervisor actor can be referred [here](https://github.com/tmtsoftware/csw-prod/blob/master/csw-framework/src/main/scala/csw/framework/internal/supervisor/SupervisorBehavior.scala)
+The source code of supervisor actor can be found [here](https://github.com/tmtsoftware/csw-prod/blob/master/csw-framework/src/main/scala/csw/framework/internal/supervisor/SupervisorBehavior.scala)
 
 ### Top level actor
 
@@ -37,7 +37,7 @@ However, the developer is not expected to implement TLA code directly.  Instead,
 implementing the `ComponentHandlers` abstract class, consisting of a list of a methods, or `hooks`, called by the TLA during specific lifecycle and command events (see [Handlers](#handlers)).
 The `ComponentHandlers` implementation is specified during constructing using that factory (see [Constructing The Component](#constructing-the-component)) 
 
-The source code of the Top Level Actor can be referred [here](https://github.com/tmtsoftware/csw-prod/blob/master/csw-framework/src/main/scala/csw/framework/internal/component/ComponentBehavior.scala).
+The source code of the Top Level Actor can be found [here](https://github.com/tmtsoftware/csw-prod/blob/master/csw-framework/src/main/scala/csw/framework/internal/component/ComponentBehavior.scala).
 
 ### Handlers
 
@@ -52,14 +52,14 @@ The following hooks should be overridden in your ComponentHandlers implementatio
 -   `onLocationTrackingEvent`: called when a tracked dependency changes location state. (see @ref:[Tracking Dependencies](./multiple-components.md#tracking-dependencies))
 -   `onShutdown`: called when component is shutting down.
 
-The source code of `ComponentHandlers` can be referred [here](https://github.com/tmtsoftware/csw-prod/blob/master/csw-framework/src/main/scala/csw/framework/scaladsl/ComponentHandlers.scala). 
+The source code of `ComponentHandlers` can be found [here](https://github.com/tmtsoftware/csw-prod/blob/master/csw-framework/src/main/scala/csw/framework/scaladsl/ComponentHandlers.scala). 
 
-More details about handler significance and invocation can be referred @ref:[here](./framework.md#handling-lifecycle)
+More details about handler significance and invocation can be found @ref:[here](./framework.md#handling-lifecycle)
 
 @@@ note { title=Note }
 
 If the component developer wishes to write the handler implementation in java, then he/she needs to implement the java version of `ComponentHandlers`
-which is `JComponentHandlers`. The source code of `JComponentHandlers` can be referred [here](https://github.com/tmtsoftware/csw-prod/blob/master/csw-framework/src/main/scala/csw/framework/javadsl/JComponentHandlers.scala).
+which is `JComponentHandlers`. The source code of `JComponentHandlers` can be found [here](https://github.com/tmtsoftware/csw-prod/blob/master/csw-framework/src/main/scala/csw/framework/javadsl/JComponentHandlers.scala).
 Any further reference to `ComponentHandlers` should implicitly also apply to `JComponentHandlers`.
 
 @@@
@@ -78,7 +78,7 @@ If using the gitter8 template, this factory class will be implemented for you.
 
 @@@
 
-The sample code to implement the `ComponentBehaviorFactory` can be referred @ref:[here](./framework.md#creating-components) 
+The sample code to implement the `ComponentBehaviorFactory` can be found @ref:[here](./framework.md#creating-components) 
 
 ### Component Configuration (ComponentInfo)
 
@@ -103,15 +103,15 @@ for a particular component. The sample for HCD is as follows:
 
 The `name` and `componentType` is used to create the `ComponentId` representing a unique component in location service.
 
-The `locationServiceUsage` is referred by the Supervisor actor to decide whether to only register a component with location service or register and track other components.
+The `locationServiceUsage` is used by the Supervisor actor to decide whether to only register a component with location service or register and track other components.
   
 The configuration file is parsed to a `ComponentInfo` object and injected in the Supervisor actor. It is then injected in `ComponentHandlers` while spawning a component.
 
 The configuration can also contain a list of components and services it wishes to track as dependencies. See @ref:[Tracking Dependencies](./multiple-components.md#tracking-dependencies).
 
-More details about `ComponentInfo` can be referred @ref:[here](./framework.md#describing-components).
+More details about `ComponentInfo` can be found @ref:[here](./framework.md#describing-components).
 
-A sample configuration file can be referred [here](https://github.com/tmtsoftware/csw-prod/blob/master/csw-benchmark/src/main/resources/container.conf).
+A sample configuration file can be found [here](https://github.com/tmtsoftware/csw-prod/blob/master/csw-benchmark/src/main/resources/container.conf).
 
 ## Lifecycle 
 
@@ -193,7 +193,7 @@ will automatically be unlocked.  A component can be manually unlocked by sending
 `csw-framework` will provide a `LoggerFactory` as dependency injection in constructor of `ComponentHandlers`. The `LoggerFactory` will have the component's name predefined in
 it. The component developer is expected to use this factory to log statements.
 
-More details on how to use `LoggerFactory` can be referred @ref:[here](./services/logging.md#enable-component-logging). 
+More details on how to use `LoggerFactory` can be found @ref:[here](./services/logging.md#enable-component-logging). 
 
 ## Receiving Commands
 
@@ -207,7 +207,7 @@ Various kinds of commands are as follows:
              by the ESW for the ESW PDR.
 -   Wait: Sequencer only.  Instructs a sequencer to pause until told to continue.
 
-More details about creating commands can be referred @ref:[here](./messages.md#setup-command).
+More details about creating commands can be found @ref:[here](./messages.md#setup-command).
 
 Whenever a command is sent to a component it is wrapped inside a command wrapper. There are two kinds of command wrapper:
 
@@ -226,7 +226,7 @@ This should be only used for commands that require a very small amount of time t
 If the command will take longer, then component developer should return an intermediate response `Accepted`
 or `Invalid` specifying whether the command is valid to be executed or not, and process the command in the `onSubmit` or `onOneway` handlers (see [Command Response](#command-response)).
 
-Different types of command responses and their significance can be referred @ref:[here](./command.md#command-based-communication-between-components).
+Different types of command responses and their significance can be found @ref:[here](./command.md#command-based-communication-between-components).
 
 ### Command Response
 
@@ -249,11 +249,11 @@ commands to other components. This will be described in the next tutorial sectio
 When the `onSubmit` hook is called, it is the responsibility of component developers to update the status of the received command in the `CommandResponseManager` as it changes. The instance
 of commandResponseManager is provided in `ComponentHandlers` which should be injected in any worker actor or other actor/class created for the component.   
 
-More details on methods available in `CommandResponseManager` can be referred @ref:[here](./framework.md#managing-command-state).
+More details on methods available in `CommandResponseManager` can be found @ref:[here](./framework.md#managing-command-state).
 
 ## Building and Running component in standalone mode
 
-Once the component is ready, it is started using the `ContainerCmd` object in standalone mode. The details about starting the `ContainerCmd` in standalone mode can be referred [here](https://tmtsoftware.github.io/csw-prod/framework/deploying-components.html).
+Once the component is ready, it is started using the `ContainerCmd` object in standalone mode. The details about starting the `ContainerCmd` in standalone mode can be found [here](https://tmtsoftware.github.io/csw-prod/framework/deploying-components.html).
 
 To run the component using the deployment package, perform the following steps:
 

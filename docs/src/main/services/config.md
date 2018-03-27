@@ -177,7 +177,7 @@ Java
 
 ## Managing active versions
 
-Following API functions are available to manage the active version of a config file. In it's lifetime a config file undergoes many revisions. An active version is a specific revision from a file's history and it is set by administrators.   
+Following API functions are available to manage the active version of a config file. In its lifetime a config file undergoes many revisions. An active version is a specific revision from a file's history and it is set by administrators.   
 
 * **historyActive** : Returns the history of active revisions of the file at the given path for a range of period specified by `from` and `to`. The size of the list can be restricted using `maxResults`.    
 * **setActiveVersion** : Sets the "active version" to be the version provided for the file at the given path. If this method is never called in a config's lifetime, the active version will always be the version returned by `create` function.    

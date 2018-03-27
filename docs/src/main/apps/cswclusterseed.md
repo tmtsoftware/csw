@@ -11,7 +11,7 @@ the machines hosting the seed crashes.
 
 The command `sbt csw-cluster-seed/universal:publishLocal` will publish necessary artifacts to run csw-cluster-seed application. 
 
-The target of above command is a zip file titled "csw-cluster-seed.zip" and it's path will be printed on console. Unzip this file and switch current
+The target of above command is a zip file titled "csw-cluster-seed.zip" and its path will be printed on console. Unzip this file and switch current
 working directory to the extracted folder. Choose appropriate instructions from below based on requirement ie single seed or multiple seeds.
 
 ## If deploying single seed application

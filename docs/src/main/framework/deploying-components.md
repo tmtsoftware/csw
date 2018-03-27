@@ -89,7 +89,7 @@ SampleContainerInfo
     
 ### Standalone components
 
-A component can be run alone in a Standalone mode without sharing it's jvm space with any other component. 
+A component can be run alone in a Standalone mode without sharing its jvm space with any other component. 
 
 Sample Info for an assembly
 :   @@@vars

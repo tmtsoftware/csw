@@ -353,7 +353,7 @@ Java (Supplier)
     @@@
 
     
-Library allows to log an error with it's full stacktrace as follows:
+Library allows to log an error with its full stacktrace as follows:
  
 Scala
   :   @@snip [LocationServiceExampleClientApp](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #log-error }
