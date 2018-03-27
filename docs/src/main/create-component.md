@@ -1,8 +1,8 @@
 # Creating a Component
 
 This tutorial helps in creating a CSW component in Scala/Java. CSW components depend on the `csw-framework` package,
-which can be referred @ref:[here](./framework.md). This tutorial discusses constructing an HCD, 
-but the principles apply to an Assembly as well.  We wil be constructing the Assembly on the next tutorial section @ref:[Working with Mulitple Components](./multiple-components.md). 
+which can be referred @ref:[here](./framework.md). This tutorial discusses constructing a HCD, 
+but the principles apply to an Assembly as well. We will be constructing the Assembly in the next tutorial section @ref:[Working with Mulitple Components](./multiple-components.md). 
 
 ## Anatomy of Component
     
@@ -74,7 +74,7 @@ booting a component. The factory is instantiated using java reflection.
 
 @@@ note { title=Note }
 
-If using the giter8 template, this factory class will be implemented for you.
+If using the gitter8 template, this factory class will be implemented for you.
 
 @@@
 
@@ -107,7 +107,7 @@ The `locationServiceUsage` is referred by the Supervisor actor to decide whether
   
 The configuration file is parsed to a `ComponentInfo` object and injected in the Supervisor actor. It is then injected in `ComponentHandlers` while spawning a component.
 
-The configuration can also contain a list of components and services it wishes to track as dependencies.  See @ref:[Tracking Dependencies](./multiple-components.md#tracking-dependencies).
+The configuration can also contain a list of components and services it wishes to track as dependencies. See @ref:[Tracking Dependencies](./multiple-components.md#tracking-dependencies).
 
 More details about `ComponentInfo` can be referred @ref:[here](./framework.md#describing-components).
 
@@ -244,7 +244,7 @@ The `CommandResponseManager` is responsible for managing and bookkeeping the com
 The sender of the command (and any component, really) can query the command statuses or subscribe to changes in command statuses using `CommandService`. 
 
 The `CommandService` class provides helper methods for communicating with other components, and should be a component's primary means of sending
-commands to other components.  This will be described in the next tutorial section, @ref:[Sending Commands](./multiple-components.md#sending-commands).
+commands to other components. This will be described in the next tutorial section, @ref:[Sending Commands](./multiple-components.md#sending-commands).
 
 When the `onSubmit` hook is called, it is the responsibility of component developers to update the status of the received command in the `CommandResponseManager` as it changes. The instance
 of commandResponseManager is provided in `ComponentHandlers` which should be injected in any worker actor or other actor/class created for the component.   
