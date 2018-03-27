@@ -12,6 +12,7 @@
  - [Testing](testing.md)
  - [Applications](apps.md)
  - [Manuals](manuals.md)
+ - [sbt tasks](sbt-tasks.md)
 @@@
 
 ## Documentation
