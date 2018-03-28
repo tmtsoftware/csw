@@ -154,6 +154,7 @@ object Dependencies {
     Libs.`akka-stream-kafka`,
     Akka.`akka-actor-typed`,
     Libs.`lettuce`,
+    Akka.`akka-remote`              % Test,
     Akka.`akka-testkit-typed`       % Test,
     Akka.`akka-stream-testkit`      % Test,
     Libs.`scalatest`                % Test,
@@ -161,7 +162,9 @@ object Dependencies {
     Libs.`junit-interface`          % Test,
     Libs.`mockito-core`             % Test,
     Libs.`embedded-redis`           % Test,
-    Libs.`scalatest-embedded-kafka` % Test
+    Libs.`scalatest-embedded-kafka` % Test,
+    Akka.`akka-multi-node-testkit`  % Test,
+    Libs.`hdr-histogram`            % Test
   )
 
   val Commons = Seq(

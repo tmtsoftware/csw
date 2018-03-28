@@ -31,6 +31,7 @@ object Libs {
   val `scalatest-embedded-kafka`     = "net.manub"              %% "scalatest-embedded-kafka"     % "1.1.0"
   val `scala-compiler`               = "org.scala-lang"         % "scala-compiler"                % ScalaVersion
   val `embedded-redis`               = "com.github.sebruck"     %% "scalatest-embedded-redis"     % "0.3.0"
+  val `hdr-histogram`                = "org.hdrhistogram"       % "HdrHistogram"                  % "2.1.10"
 }
 
 object Jackson {
