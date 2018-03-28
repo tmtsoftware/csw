@@ -8,7 +8,7 @@ integrating individual components in the large observatory software architecture
 loosely coupled services, each autonomous with a well-defined interface that hides the service implementation. It also   
 provides a standardized communication with the services.
   
-### [Location service](services/location.md)
+### [Location service](../services/location.md)
 The Location Service of TMT Common Software handles application, component, and service registration and discovery
 in the distributed TMT software system. When a component (i.e. an Sequencer, Assembly, or HCD) is initializing, it registers
 its name along with other information such as interface type and connection information to the
@@ -20,7 +20,7 @@ component. In this case the first component uses the Location Service to get inf
 the second component, and uses that information to make a connection. Discovered information
 might include a protocol (e.g., HTTP), interface type (e.g., command), or host and port.
 
-### [Configuration service](services/config.md)
+### [Configuration service](../services/config.md)
 The Configuration Service (CS) provides a centralized persistent store for “configuration files”
 used in the TMT Software System. In this context, a configuration file is a set of values
 describing state, initialization values, or other information useful to a component or set of
@@ -38,7 +38,7 @@ be lost. If the configuration of a component is inadvertently lost, it will be p
 restore to the most recently saved version or a default version.
 
 
-### [Logging service](services/logging.md)
+### [Logging service](../services/logging.md)
 Logging is the ability of a software component to output a message, usually for diagnostic
 purposes. TMT Common Software will provide a Logging Service. Logging should not be
 confused with “data logging”, which is usually collection of measured values. 
@@ -82,7 +82,7 @@ Assemblies, HCDs and hardware in a hierarchy.
 
 ### [Framework](framework.md)
 The framework provides templates for @ref:[creating](create-component.md) and running the kind of software components 
-defined by TMT as well as service access interfaces for these components. It also provides @ref:[application](apps/hostconfig.md) support
+defined by TMT as well as service access interfaces for these components. It also provides @ref:[application](../apps/hostconfig.md) support
 for running multiple components on a host machine.
 
 The framework also contains the structures that are common to components, such as commands and event structures.

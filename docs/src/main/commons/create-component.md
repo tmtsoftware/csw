@@ -193,7 +193,7 @@ will automatically be unlocked.  A component can be manually unlocked by sending
 `csw-framework` will provide a `LoggerFactory` as dependency injection in constructor of `ComponentHandlers`. The `LoggerFactory` will have the component's name predefined in
 it. The component developer is expected to use this factory to log statements.
 
-More details on how to use `LoggerFactory` can be found @ref:[here](./services/logging.md#enable-component-logging). 
+More details on how to use `LoggerFactory` can be found @ref:[here](../services/logging.md#enable-component-logging). 
 
 ## Receiving Commands
 

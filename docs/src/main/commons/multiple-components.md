@@ -69,7 +69,7 @@ The `Location` object has one of the following types:
 -   HttpLocation: Holds the HTTP URI of the web server, e.g. Configuration Service
 -   TcpLocation: Represents a TCP URI of the server, e.g. Event Service 
 
-More details about tracking a component using the location service can be found @ref:[here](./services/location.md#tracking-and-subscribing).
+More details about tracking a component using the location service can be found @ref:[here](../services/location.md#tracking-and-subscribing).
  
 ### onLocationTrackingEvent Handler
 
@@ -81,12 +81,12 @@ For all the tracked connections, whenever a location is changed, one of the foll
 Whenever such an event is generated, the Top level actor will call the `onLocationTrackingEvent` hook of `ComponentHandlers` with the event(LocationUpdated or LocationRemoved)
 as parameter of the hook.
 
-More details about tracking connections can be found @ref:[here](./framework/tracking-connections.md).
+More details about tracking connections can be found @ref:[here](../framework/tracking-connections.md).
 
 ### trackConnection
 
 If the component developer wants to track a connection that is not configured in its configuration file then it can use the `trackConnection` method provided by `csw-framework`
-in `ComponentHandlers`. The `trackConnection` method will take the `Connection` instance. Information on how to create a connection instance can be found @ref:[here](./services/location.md#creating-components-connections-and-registrations).
+in `ComponentHandlers`. The `trackConnection` method will take the `Connection` instance. Information on how to create a connection instance can be found @ref:[here](../services/location.md#creating-components-connections-and-registrations).
 
 @@@ note { title=Note }
 
@@ -133,7 +133,7 @@ A component might need to subscribe to the current state of any other component 
 use the `subscribeCurrentState` method of the `CommandService`. More details about the usage of `subscribeCurrentState` can ber found @ref:[here](./command.md#subscribecurrentstate).
 
 If a component wants to publish its current state then it can use the `currentStatePublisher` provided by `csw-framework` in `ComponentHandlers`. More details about the usage
-of `currentStatePublisher` can ber found @ref:[here](./framework/publishing-state.md).
+of `currentStatePublisher` can ber found @ref:[here](../framework/publishing-state.md).
 
 ## Deploying and Running Components
 
@@ -148,8 +148,8 @@ Assuming that `galil-deploy` depends on `galil-assembly` and `galil-hcd`, to sta
  - Run `sbt galil-deploy/universal:packageBin`, this will create self contained zip in `galil-deploy/target/universal` directory.
  - Unzip the generated zip file and enter into `bin` directory.
  - You will see four scripts in the `bin` directory (two bash scripts and two windows scripts).
- - If you want to start multiple containers on a host machine, follow this guide @ref:[here](apps/hostconfig.md#examples).
- - If you want to start multiple components in container mode or single component in standalone mode, follow this guide @ref:[here](framework/deploying-components.md).
+ - If you want to start multiple containers on a host machine, follow this guide @ref:[here](../apps/hostconfig.md#examples).
+ - If you want to start multiple components in container mode or single component in standalone mode, follow this guide @ref:[here](../framework/deploying-components.md).
  - Example to run container:    `./galil-container-cmd-app --local ../../../../galil-deploy/src/main/resources/GalilAssemblyContainer.conf`
  - Example to run host config:  `./galil-host-config-app --local ../../../../galil-deploy/src/main/resources/GalilHostConfig.conf -s ./galil-container-cmd-app`
 

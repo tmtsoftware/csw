@@ -16,11 +16,11 @@ sbt
 @@toc { depth=2 }
 
 @@@ index
-* [Keys and Parameters](messages/keys-parameters.md)
-* [Units](messages/units.md)
-* [Subsystem](messages/subsystem.md)
-* [Commands](messages/commands.md)
-* [Events](messages/events.md)
-* [States](messages/states.md)
-* [Result](messages/result.md)
+* [Keys and Parameters](../messages/keys-parameters.md)
+* [Units](../messages/units.md)
+* [Subsystem](../messages/subsystem.md)
+* [Commands](../messages/commands.md)
+* [Events](../messages/events.md)
+* [States](../messages/states.md)
+* [Result](../messages/result.md)
 @@@

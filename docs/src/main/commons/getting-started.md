@@ -43,14 +43,14 @@ In this example, a project was created with default parameters. The complete pro
     - `galil-hcd`
     - `galil-deploy`
     
-![galil-project-structure](./images/gettingstarted/galil-project.png)
+![galil-project-structure](../images/gettingstarted/galil-project.png)
 2.  `galil-deploy` project is used to create a concrete implementation.  This allows for the construction of a complete binary
 package bundled with all dependencies, and a launching application.
 
-![galil-deploy](./images/gettingstarted/galil-deploy.png)
+![galil-deploy](../images/gettingstarted/galil-deploy.png)
 3.  Template comes with `csw-prod` and other useful library dependencies. It also includes bunch of plugins as explained in below snapshot
 
-![galil-project](./images/gettingstarted/project.png)
+![galil-project](../images/gettingstarted/project.png)
 
 ## Add new sbt project module
 
