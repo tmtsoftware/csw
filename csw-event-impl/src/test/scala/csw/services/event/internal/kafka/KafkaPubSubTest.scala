@@ -45,7 +45,8 @@ class KafkaPubSubTest extends FunSuite with EmbeddedKafka with BeforeAndAfterAll
     wiring.shutdown(TestFinishedReason).await
   }
 
-  test("Kafka pub sub") {
+  // DEOPSCSW-334 : Publish an event
+  test("should be able to publish and subscribe an event") {
     framework.pubSub()
   }
 
@@ -53,7 +54,7 @@ class KafkaPubSubTest extends FunSuite with EmbeddedKafka with BeforeAndAfterAll
     framework.subscribeIndependently()
   }
 
-  ignore("Kafka multiple publish") {
+  test("should be able to publish concurrently to the same channel") {
     framework.publishMultiple()
   }
 
@@ -65,7 +66,8 @@ class KafkaPubSubTest extends FunSuite with EmbeddedKafka with BeforeAndAfterAll
     framework.retrieveInvalidEvent()
   }
 
-  test("Kakfa get") {
+  // DEOPSCSW-334 : Publish an event
+  test("should be able to get an event without subscribing for it") {
     framework.get()
   }
 

@@ -6,9 +6,11 @@ import akka.stream.scaladsl.{Keep, Sink, Source}
 import csw.messages.events.{Event, EventKey, EventName, SystemEvent}
 import csw.messages.params.models.Prefix
 import csw.services.event.helpers.TestFutureExt.RichFuture
-import csw.services.event.helpers.Utils.makeEvent
+import csw.services.event.helpers.Utils.{makeDistinctEvent, makeEvent}
 import csw.services.event.scaladsl.{EventPublisher, EventSubscriber}
 import org.scalatest.Matchers
+
+import scala.collection.{immutable, mutable}
 
 class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: EventSubscriber)(
     implicit val actorSystem: ActorSystem
@@ -16,8 +18,9 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
 
   private implicit val mat: ActorMaterializer = ActorMaterializer()
 
+  // DEOPSCSW-334 : Publish an event
   def pubSub(): Unit = {
-    val event1             = makeEvent(1)
+    val event1             = makeDistinctEvent(1)
     val eventKey: EventKey = event1.eventKey
 
     val (subscription, seqF) = subscriber.subscribe(Set(eventKey)).toMat(Sink.seq)(Keep.both).run()
@@ -56,26 +59,26 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
   }
 
   def publishMultiple(): Unit = {
-    def event: Event = makeEvent(1)
+    val queue: mutable.Queue[Event] = new mutable.Queue[Event]()
+    val eventKey: EventKey          = makeEvent(0).eventKey
 
-    val eventKey: EventKey = event.eventKey
+    val events: immutable.Seq[Event] = for (i ← 1 to 10) yield makeEvent(i)
 
     subscriber.subscribe(Set(eventKey)).runForeach { x =>
-      val begin = x.eventTime.time.toEpochMilli
-      println(System.currentTimeMillis() - begin)
+      queue.enqueue(x)
     }
 
     Thread.sleep(10)
 
-    publisher.publish(Source.fromIterator(() => Iterator.continually(event)).map(x => { println(s"from 1 -> $x"); x }))
-    publisher
-      .publish(
-        Source
-          .fromIterator(() => Iterator.continually(event))
-          .map(x => { println(s"from 2            -> $x"); x })
-          .watchTermination()(Keep.right)
-      )
-      .await
+    publisher.publish(Source.fromIterator(() ⇒ events.toIterator))
+
+    Thread.sleep(1000)
+
+    // subscriber will receive an invalid event first as subscription happened before publishing started.
+    // The 10 published events will follow
+    queue.size shouldBe 11
+
+    queue should contain allElementsOf Seq(Event.invalidEvent) ++ events
   }
 
   def retrieveRecentlyPublished(): Unit = {

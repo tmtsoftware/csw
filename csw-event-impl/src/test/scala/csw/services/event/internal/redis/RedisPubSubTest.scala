@@ -3,14 +3,16 @@ package csw.services.event.internal.redis
 import akka.actor.ActorSystem
 import com.github.sebruck.EmbeddedRedis
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
+import csw.messages.events.EventKey
 import csw.services.event.RedisFactory
 import csw.services.event.helpers.RegistrationFactory
 import csw.services.event.helpers.TestFutureExt.RichFuture
+import csw.services.event.helpers.Utils.makeEvent
 import csw.services.event.internal.EventServicePubSubTestFramework
 import csw.services.event.internal.commons.{EventServiceConnection, Wiring}
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.scaladsl.LocationServiceFactory
-import io.lettuce.core.RedisClient
+import io.lettuce.core.{RedisClient, RedisURI}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import redis.embedded.RedisServer
 
@@ -42,7 +44,8 @@ class RedisPubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with
     redis.stop()
   }
 
-  test("Redis pub sub") {
+  // DEOPSCSW-334 : Publish an event
+  test("should be able to publish and subscribe an event") {
     framework.pubSub()
   }
 
@@ -50,7 +53,7 @@ class RedisPubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with
     framework.subscribeIndependently()
   }
 
-  ignore("Redis multiple publish") {
+  test("should be able to publish concurrently to the same channel") {
     framework.publishMultiple()
   }
 
@@ -62,7 +65,8 @@ class RedisPubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with
     framework.retrieveInvalidEvent()
   }
 
-  test("Redis get") {
+  // DEOPSCSW-334 : Publish an event
+  test("should be able to get an event without subscribing for it") {
     framework.get()
   }
 
@@ -70,4 +74,16 @@ class RedisPubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with
     framework.retrieveInvalidEventOnget()
   }
 
+  // DEOPSCSW-334 : Publish an event
+  test("publishing an event also persists the event in DB against the same key as channel name") {
+    val event1             = makeEvent(1)
+    val eventKey: EventKey = event1.eventKey
+    val redisCommands =
+      redisClient.connect(EventServiceCodec, RedisURI.create(clusterSettings.hostname, redisPort)).sync()
+
+    publisher.publish(event1).await
+
+    Thread.sleep(1000)
+    redisCommands.get(eventKey) shouldBe event1
+  }
 }

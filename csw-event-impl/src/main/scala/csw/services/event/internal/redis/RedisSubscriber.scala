@@ -31,7 +31,7 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
     val eventStream       = Source.fromFuture(connectionF).flatMapConcat(connection ⇒ subscribe(eventKeys, connection))
 
     latestEventStream
-      .concat(eventStream)
+      .merge(eventStream)
       .viaMat(KillSwitches.single)(Keep.right)
       .watchTermination()(Keep.both)
       .mapMaterializedValue {
@@ -54,7 +54,6 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
   override def get(eventKey: EventKey): Future[Event] = async {
     val connection = await(asyncConnectionF)
     val event      = await(connection.get(eventKey).toScala)
-
     if (event == null) Event.invalidEvent else event
   }
 

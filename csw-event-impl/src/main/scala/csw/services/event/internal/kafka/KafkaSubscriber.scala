@@ -29,7 +29,7 @@ class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(i
       .map(record ⇒ Event.fromPb(PbEvent.parseFrom(record.value())))
 
     invalidEventStream
-      .concatMat(eventStream)(Keep.right)
+      .mergeMat(eventStream)(Keep.right)
       .mapMaterializedValue { control ⇒
         new EventSubscription {
           override def unsubscribe(): Future[Done] = control.shutdown().map { _ ⇒
