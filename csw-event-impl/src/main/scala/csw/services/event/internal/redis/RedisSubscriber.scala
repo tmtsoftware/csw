@@ -31,7 +31,7 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
     val eventStream       = Source.fromFuture(connectionF).flatMapConcat(connection ⇒ subscribe(eventKeys, connection))
 
     latestEventStream
-      .merge(eventStream)
+      .concat(eventStream)
       .viaMat(KillSwitches.single)(Keep.right)
       .watchTermination()(Keep.both)
       .mapMaterializedValue {
