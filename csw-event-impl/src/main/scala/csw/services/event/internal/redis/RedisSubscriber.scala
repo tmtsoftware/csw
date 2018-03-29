@@ -26,9 +26,10 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
     redisClient.connectPubSubAsync(EventServiceCodec, redisURI).toScala.map(_.reactive())
 
   override def subscribe(eventKeys: Set[EventKey]): Source[Event, EventSubscription] = {
-    val connectionF       = reactiveConnectionF()
-    val latestEventStream = Source(eventKeys).mapAsync(eventKeys.size)(get)
-    val eventStream       = Source.fromFuture(connectionF).flatMapConcat(connection ⇒ subscribe(eventKeys, connection))
+    val connectionF                                          = reactiveConnectionF()
+    val latestEventStream: Source[Event, NotUsed]            = Source.fromFuture(get(eventKeys)).mapConcat(identity)
+    val futureSourceOfEvents: Future[Source[Event, NotUsed]] = connectionF.map(subscribe(eventKeys, _))
+    val eventStream: Source[Event, Future[NotUsed]]          = Source.fromFutureSource(futureSourceOfEvents)
 
     latestEventStream
       .concat(eventStream)
@@ -48,7 +49,8 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
   }
 
   override def get(eventKeys: Set[EventKey]): Future[Set[Event]] = {
-    Future.sequence(eventKeys.map(get))
+    val eventualSet: Future[Set[Event]] = Future.sequence(eventKeys.map(get))
+    eventualSet.map(set ⇒ if (set.size > 1 && set.contains(Event.invalidEvent)) set - Event.invalidEvent else set)
   }
 
   override def get(eventKey: EventKey): Future[Event] = async {

@@ -57,6 +57,10 @@ class RedisPubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with
     framework.publishMultiple()
   }
 
+  test("should be able to publish concurrently to the different channel") {
+    framework.publishMultipleToDifferentChannels()
+  }
+
   test("Redis retrieve recently published event on subscription") {
     framework.retrieveRecentlyPublished()
   }

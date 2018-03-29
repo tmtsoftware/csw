@@ -72,13 +72,34 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
 
     publisher.publish(Source.fromIterator(() ⇒ events.toIterator))
 
-    Thread.sleep(1000)
+    Thread.sleep(1000) //TODO : Try to replace with Await
 
     // subscriber will receive an invalid event first as subscription happened before publishing started.
     // The 10 published events will follow
     queue.size shouldBe 11
 
     queue should contain allElementsOf Seq(Event.invalidEvent) ++ events
+  }
+
+  def publishMultipleToDifferentChannels(): Unit = {
+    val queue: mutable.Queue[Event]  = new mutable.Queue[Event]()
+    val events: immutable.Seq[Event] = for (i ← 101 to 110) yield makeDistinctEvent(i)
+
+    subscriber.subscribe(events.map(_.eventKey).toSet).runForeach { x =>
+      queue.enqueue(x)
+    }
+
+    Thread.sleep(500)
+
+    publisher.publish(Source.fromIterator(() ⇒ events.toIterator))
+
+    Thread.sleep(1000)
+
+    // subscriber will receive an invalid event first as subscription happened before publishing started.
+    // The 10 published events will follow
+    queue.size shouldBe 11
+
+    queue should contain theSameElementsAs Seq(Event.invalidEvent) ++ events
   }
 
   def retrieveRecentlyPublished(): Unit = {

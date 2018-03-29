@@ -58,6 +58,10 @@ class KafkaPubSubTest extends FunSuite with EmbeddedKafka with BeforeAndAfterAll
     framework.publishMultiple()
   }
 
+  test("should be able to publish concurrently to the different channel") {
+    framework.publishMultipleToDifferentChannels()
+  }
+
   test("Kafka retrieve recently published event on subscription") {
     framework.retrieveRecentlyPublished()
   }
