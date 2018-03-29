@@ -4,7 +4,7 @@ import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import csw.messages.events._
 import csw.services.event.RedisFactory
 import csw.services.event.internal.commons.Wiring
-import csw.services.event.perf.Helpers.{eventKeys, warmupEventName}
+import csw.services.event.perf.EventUtils._
 import csw.services.location.scaladsl.LocationService
 import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar
@@ -33,28 +33,33 @@ class SubscribingActor(reporter: RateReporter, payloadSize: Int, printTaskRunner
 
   private def startSubscription(eventKeys: Set[EventKey]) = subscriber.subscribeCallback(eventKeys, onEvent)
 
-  private def onEvent(event: Event): Unit = event match {
-    case SystemEvent(_, _, `warmupEventName`, _, _)  ⇒
-    case ObserveEvent(_, _, `warmupEventName`, _, _) ⇒
-    case _: Event                                    ⇒ report()
+  private def onEvent(event: Event): Unit = {
+    event match {
+      case SystemEvent(_, _, `warmupEventName`, _, _) ⇒
+      case SystemEvent(_, _, `startEventName`, _, _)  ⇒ correspondingSender ! Start
+      case SystemEvent(_, _, `endEventName`, _, _) if endMessagesMissing > 1 ⇒
+        endMessagesMissing -= 1 // wait for End message from all senders
+
+      case SystemEvent(_, _, `endEventName`, _, _) ⇒
+        if (printTaskRunnerMetrics)
+          taskRunnerMetrics.printHistograms()
+        correspondingSender ! EndResult(eventsReceived)
+        context.stop(self)
+
+      case SystemEvent(id, _, `flowControlEventName`, _, paramSet) ⇒
+        val flowCtlId      = id.id.toInt
+        val burstStartTime = paramSet.head.value(0).asInstanceOf[Long]
+        correspondingSender ! FlowControl(flowCtlId, burstStartTime)
+
+      case Event.invalidEvent ⇒
+      case _: Event           ⇒ report()
+    }
   }
 
   def receive: PartialFunction[Any, Unit] = {
-    case Start(corresponding) ⇒
+    case Init(corresponding) ⇒
       if (corresponding == self) correspondingSender = sender()
-      sender() ! Start
-
-    case End if endMessagesMissing > 1 ⇒
-      endMessagesMissing -= 1 // wait for End message from all senders
-
-    case End ⇒
-      if (printTaskRunnerMetrics)
-        taskRunnerMetrics.printHistograms()
-      correspondingSender ! EndResult(eventsReceived)
-      context.stop(self)
-
-    case m: Echo ⇒
-      sender() ! m
+      sender() ! Initialized
   }
 
   def report(): Unit = {
@@ -65,7 +70,7 @@ class SubscribingActor(reporter: RateReporter, payloadSize: Int, printTaskRunner
 
 object SubscribingActor {
 
-  def receiverProps(reporter: RateReporter, payloadSize: Int, printTaskRunnerMetrics: Boolean, numSenders: Int): Props =
+  def props(reporter: RateReporter, payloadSize: Int, printTaskRunnerMetrics: Boolean, numSenders: Int): Props =
     Props(new SubscribingActor(reporter, payloadSize, printTaskRunnerMetrics, numSenders))
       .withDispatcher("akka.remote.default-remote-dispatcher")
 }

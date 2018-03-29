@@ -22,7 +22,7 @@ trait BenchmarkFileReporter {
 }
 object BenchmarkFileReporter {
   val targetDirectory = {
-    val target = new File("akka-stream-tests/target/benchmark-results")
+    val target = new File("csw-event-impl/target/benchmark-results")
     target.mkdirs()
     target
   }

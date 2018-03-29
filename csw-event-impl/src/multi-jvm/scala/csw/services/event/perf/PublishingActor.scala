@@ -3,17 +3,18 @@ package csw.services.event.perf
 import java.util.concurrent.TimeUnit.NANOSECONDS
 
 import akka.actor._
+import akka.stream.ActorMaterializer
+import akka.stream.scaladsl.{Sink, Source}
 import csw.services.event.RedisFactory
 import csw.services.event.internal.commons.Wiring
-import csw.services.event.perf.Helpers.{makeEvent, warmupEvent}
+import csw.services.event.perf.EventUtils._
+import csw.services.event.perf.MaxThroughputSpec.Target
 import csw.services.location.scaladsl.LocationService
 import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar
 
-sealed trait Target {
-  def tell(msg: Any, sender: ActorRef): Unit
-  def ref: ActorRef
-}
+import scala.concurrent.Await
+import scala.concurrent.duration.DurationInt
 
 class PublishingActor(
     target: Target,
@@ -41,6 +42,8 @@ class PublishingActor(
 
   private implicit val actorSystem: ActorSystem = context.system
 
+  private implicit val mat: ActorMaterializer = ActorMaterializer()
+
   private val redisHost    = "localhost"
   private val redisPort    = 6379
   private val redisClient  = RedisClient.create()
@@ -49,12 +52,14 @@ class PublishingActor(
   private val publisher    = redisFactory.publisher(redisHost, redisPort)
 
   def receive: Receive = {
-    case Run ⇒ runWarmup()
+    case Init ⇒ targets.foreach(_.tell(Init(target.ref), self)) // then Start, which will echo back here
+
+    case Initialized ⇒ runWarmup()
   }
 
   def runWarmup(): Unit = {
-    sendBatch(warmup = true)                         // first some warmup
-    targets.foreach(_.tell(Start(target.ref), self)) // then Start, which will echo back here
+    sendBatch(warmup = true) // first some warmup
+    publisher.publish(makeEvent(startEventName))
     context.become(warmup)
   }
 
@@ -76,8 +81,6 @@ class PublishingActor(
       }
 
       context.become(active)
-
-    case _: Warmup ⇒
   }
 
   def active: Receive = {
@@ -96,8 +99,9 @@ class PublishingActor(
         pendingFlowControl = pendingFlowControl.updated(id, targetCount - 1)
       }
   }
+  val sent = new Array[Long](targets.length)
 
-  val waitingForEndResult: Receive = {
+  def waitingForEndResult: Receive = {
     case EndResult(totalReceived) ⇒
       val took       = NANOSECONDS.toMillis(System.nanoTime - startTime)
       val throughput = totalReceived * 1000.0 / took
@@ -112,7 +116,8 @@ class PublishingActor(
         s"burst size $burstSize, " +
         s"payload size $payloadSize, " +
         s"total size ${totalSize(context.system)}, " +
-        s"$took ms to deliver $totalReceived messages."
+        s"$took ms to deliver $totalReceived messages." +
+        s"Total events sent by publisher to subscribers: ${sent.mkString(",")}"
       )
 
       if (printTaskRunnerMetrics)
@@ -123,30 +128,58 @@ class PublishingActor(
 
   }
 
-  val sent = new Array[Long](targets.length)
   def sendBatch(warmup: Boolean): Unit = {
     val batchSize = math.min(remaining, burstSize)
-    var i         = 0
+
+    Await.result(
+      Source(0 until batchSize.toInt)
+        .map { counter ⇒
+          sent(counter % numTargets) += 1
+          if (warmup) makeEvent(warmupEventName) else makeEvent(eventName, totalMessages - remaining + counter)
+        }
+        .mapAsync(1)(publisher.publish)
+        .runWith(Sink.ignore),
+      10.seconds
+    )
+
+    /*
+    var i = 0
     while (i < batchSize) {
       // Fixme: create event of size = payload size
-      val msg1 = if (warmup) warmupEvent else makeEvent(totalMessages - remaining + i)
+      val msg1 = if (warmup) makeEvent(warmupEventName) else makeEvent(eventName, totalMessages - remaining + i)
 
-      publisher.publish(msg1)
+      Await.result(publisher.publish(msg1), 5.seconds)
       sent(i % numTargets) += 1
       i += 1
     }
+     */
+
     remaining -= batchSize
   }
 
   def sendFlowControl(t0: Long): Unit = {
     if (remaining <= 0) {
       context.become(waitingForEndResult)
-      targets.foreach(_.tell(End, self))
+      publisher.publish(makeEvent(endEventName))
     } else {
       flowControlId += 1
       pendingFlowControl = pendingFlowControl.updated(flowControlId, targets.size)
-      val flowControlMsg = FlowControl(flowControlId, t0)
-      targets.foreach(_.tell(flowControlMsg, self))
+      val flowControlMsg = makeFlowCtlEvent(flowControlId, t0)
+      publisher.publish(flowControlMsg)
     }
   }
+}
+
+object PublishingActor {
+
+  def props(
+      mainTarget: Target,
+      targets: Array[Target],
+      testSettings: TestSettings,
+      plotRef: ActorRef,
+      printTaskRunnerMetrics: Boolean,
+      reporter: BenchmarkFileReporter
+  ): Props =
+    Props(new PublishingActor(mainTarget, targets, testSettings, plotRef, printTaskRunnerMetrics, reporter))
+
 }
