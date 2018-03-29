@@ -17,7 +17,7 @@ class CommandsTest extends FunSpec with Matchers {
   //#obsid
   val obsId: ObsId = ObsId("Obs001")
   //#obsid
-  val prefix: Prefix = Prefix("wfos.red.detector")
+
 
   describe("Examples of Prefix") {
     it("should show usage of utility functions") {
@@ -55,6 +55,9 @@ class CommandsTest extends FunSpec with Matchers {
       val k2bad: Key[Int] = KeyType.IntKey.make("missingKey")
       val k3: Key[Int]    = KeyType.IntKey.make("filter")
       val k4: Key[Float]  = KeyType.FloatKey.make("correction")
+
+      //prefix
+      val prefix: Prefix = Prefix("wfos.red.detector")
 
       //parameters
       val i1: Parameter[Int]    = k1.set(22)
@@ -112,6 +115,9 @@ class CommandsTest extends FunSpec with Matchers {
       val k3: Key[Int]     = KeyType.IntKey.make("filter")
       val k4: Key[Instant] = KeyType.TimestampKey.make("creation-time")
 
+      //prefix
+      val prefix: Prefix = Prefix("wfos.red.detector")
+
       //parameters
       val i1: Parameter[Boolean] = k1.set(true, false, true, false)
       val i2: Parameter[Int]     = k2.set(1, 2, 3, 4)
@@ -161,6 +167,9 @@ class CommandsTest extends FunSpec with Matchers {
       val i1: Parameter[Boolean] = k1.set(true, false, true, false)
       val i2: Parameter[Int]     = k2.set(1, 2, 3, 4)
 
+      //prefix
+      val prefix: Prefix = Prefix("wfos.red.detector")
+
       //create wait, add sequentially using add
       val wc1: Wait = Wait(prefix, CommandName("move"), Some(obsId)).add(i1).add(i2)
 
@@ -209,6 +218,9 @@ class CommandsTest extends FunSpec with Matchers {
         Array(7.2, 8.2, 9.2)
       )
 
+      //prefix
+      val prefix: Prefix = Prefix("wfos.red.detector")
+
       //parameter
       val i1: Parameter[MatrixData[Double]] = k1.set(m1)
 
@@ -250,6 +262,9 @@ class CommandsTest extends FunSpec with Matchers {
       val encoderKey: Key[Int] = KeyType.IntKey.make("encoder")
       val filterKey: Key[Int]  = KeyType.IntKey.make("filter")
       val miscKey: Key[Int]    = KeyType.IntKey.make("misc.")
+
+      //prefix
+      val prefix: Prefix = Prefix("wfos.red.detector")
 
       //params
       val encParam1: Parameter[Int] = encoderKey.set(1)
@@ -298,6 +313,7 @@ class CommandsTest extends FunSpec with Matchers {
   describe("Examples of clone command") {
     val k1          = KeyType.IntKey.make("itest")
     val commandName = CommandName("command-name")
+    val prefix: Prefix = Prefix("wfos.red.detector")
 
     val i1 = k1.set(1, 2, 3).withUnits(degree)
 
