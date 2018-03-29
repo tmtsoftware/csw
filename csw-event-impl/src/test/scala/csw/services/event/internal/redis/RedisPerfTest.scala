@@ -4,6 +4,7 @@ import akka.actor.ActorSystem
 import com.github.sebruck.EmbeddedRedis
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.event.RedisFactory
+import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.internal.commons.Wiring
 import csw.services.event.internal.perf.EventServicePerfFramework
 import csw.services.event.internal.{RateAdapterStage, RateLimiterStage}
@@ -32,7 +33,7 @@ class RedisPerfTest extends FunSuite with Matchers with BeforeAndAfterAll with E
   override def afterAll(): Unit = {
     redisClient.shutdown()
     redis.stop()
-    wiring.shutdown(TestFinishedReason)
+    wiring.shutdown(TestFinishedReason).await
   }
 
   ignore("limiter") {

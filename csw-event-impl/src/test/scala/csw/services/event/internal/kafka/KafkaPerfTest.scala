@@ -37,7 +37,7 @@ class KafkaPerfTest extends FunSuite with Matchers with BeforeAndAfterAll with E
   override def afterAll(): Unit = {
     publisher.shutdown().await
     EmbeddedKafka.stop()
-    wiring.shutdown(TestFinishedReason)
+    wiring.shutdown(TestFinishedReason).await
   }
 
   ignore("limiter") {

@@ -6,10 +6,12 @@ import akka.kafka.scaladsl.Producer
 import akka.stream.Materializer
 import akka.stream.scaladsl.Source
 import csw.messages.events.Event
+import csw.services.event.exceptions.PublishFailed
 import csw.services.event.scaladsl.EventPublisher
 import org.apache.kafka.clients.producer.{Callback, ProducerRecord}
 
 import scala.concurrent.{ExecutionContext, Future, Promise}
+import scala.util.control.NonFatal
 
 class KafkaPublisher(producerSettings: ProducerSettings[String, Array[Byte]])(implicit ec: ExecutionContext, mat: Materializer)
     extends EventPublisher {
@@ -21,7 +23,11 @@ class KafkaPublisher(producerSettings: ProducerSettings[String, Array[Byte]])(im
 
   override def publish(event: Event): Future[Done] = {
     val p: Promise[Done] = Promise()
-    kafkaProducer.send(convert(event), complete(p))
+    try {
+      kafkaProducer.send(convert(event), complete(event, p))
+    } catch {
+      case NonFatal(ex) ⇒ p.failure(PublishFailed(event, ex.getMessage))
+    }
     p.future
   }
 
@@ -33,9 +39,9 @@ class KafkaPublisher(producerSettings: ProducerSettings[String, Array[Byte]])(im
   private def convert(event: Event): ProducerRecord[String, Array[Byte]] =
     new ProducerRecord(event.eventKey.key, Event.typeMapper.toBase(event).toByteArray)
 
-  private def complete(p: Promise[Done]): Callback = {
-    case (_, null) ⇒ p.success(Done)
-    case (_, ex)   ⇒ p.failure(ex)
+  private def complete(event: Event, p: Promise[Done]): Callback = {
+    case (_, null)          ⇒ p.success(Done)
+    case (_, ex: Exception) ⇒ p.failure(PublishFailed(event, ex.getMessage))
   }
 
 }
