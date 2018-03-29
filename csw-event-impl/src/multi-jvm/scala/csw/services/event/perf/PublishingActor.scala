@@ -8,7 +8,7 @@ import akka.stream.scaladsl.{Sink, Source}
 import csw.services.event.RedisFactory
 import csw.services.event.internal.commons.Wiring
 import csw.services.event.perf.EventUtils._
-import csw.services.event.perf.MaxThroughputSpec.Target
+import csw.services.event.perf.EventThroughputSpec.Target
 import csw.services.location.scaladsl.LocationService
 import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar
@@ -41,8 +41,7 @@ class PublishingActor(
   import Messages._
 
   private implicit val actorSystem: ActorSystem = context.system
-
-  private implicit val mat: ActorMaterializer = ActorMaterializer()
+  private implicit val mat: ActorMaterializer   = ActorMaterializer()
 
   private val redisHost    = "localhost"
   private val redisPort    = 6379
@@ -52,8 +51,7 @@ class PublishingActor(
   private val publisher    = redisFactory.publisher(redisHost, redisPort)
 
   def receive: Receive = {
-    case Init ⇒ targets.foreach(_.tell(Init(target.ref), self)) // then Start, which will echo back here
-
+    case Init        ⇒ targets.foreach(_.tell(Init(target.ref), self))
     case Initialized ⇒ runWarmup()
   }
 
@@ -65,6 +63,7 @@ class PublishingActor(
 
   def warmup: Receive = {
     case Start ⇒
+      println("======================================")
       println(
         s"${self.path.name}: Starting benchmark of $totalMessages messages with burst size " +
         s"$burstSize and payload size $payloadSize"
@@ -106,6 +105,7 @@ class PublishingActor(
       val took       = NANOSECONDS.toMillis(System.nanoTime - startTime)
       val throughput = totalReceived * 1000.0 / took
 
+      println("======================================")
       reporter.reportResults(
         s"=== ${reporter.testName} ${self.path.name}: " +
         f"throughput ${throughput * testSettings.senderReceiverPairs}%,.0f msg/s, " +
@@ -116,7 +116,7 @@ class PublishingActor(
         s"burst size $burstSize, " +
         s"payload size $payloadSize, " +
         s"total size ${totalSize(context.system)}, " +
-        s"$took ms to deliver $totalReceived messages." +
+        s"$took ms to deliver $totalReceived messages, " +
         s"Total events sent by publisher to subscribers: ${sent.mkString(",")}"
       )
 
@@ -135,24 +135,13 @@ class PublishingActor(
       Source(0 until batchSize.toInt)
         .map { counter ⇒
           sent(counter % numTargets) += 1
-          if (warmup) makeEvent(warmupEventName) else makeEvent(eventName, totalMessages - remaining + counter)
+          if (warmup) makeEvent(warmupEventName, payload = payload)
+          else makeEvent(eventName, totalMessages - remaining + counter, payload)
         }
         .mapAsync(1)(publisher.publish)
         .runWith(Sink.ignore),
       10.seconds
     )
-
-    /*
-    var i = 0
-    while (i < batchSize) {
-      // Fixme: create event of size = payload size
-      val msg1 = if (warmup) makeEvent(warmupEventName) else makeEvent(eventName, totalMessages - remaining + i)
-
-      Await.result(publisher.publish(msg1), 5.seconds)
-      sent(i % numTargets) += 1
-      i += 1
-    }
-     */
 
     remaining -= batchSize
   }
@@ -164,8 +153,8 @@ class PublishingActor(
     } else {
       flowControlId += 1
       pendingFlowControl = pendingFlowControl.updated(flowControlId, targets.size)
-      val flowControlMsg = makeFlowCtlEvent(flowControlId, t0)
-      publisher.publish(flowControlMsg)
+      val flowControlEvent = makeFlowCtlEvent(flowControlId, t0)
+      publisher.publish(flowControlEvent)
     }
   }
 }

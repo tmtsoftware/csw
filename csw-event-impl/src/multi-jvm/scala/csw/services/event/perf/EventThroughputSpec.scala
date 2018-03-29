@@ -1,21 +1,19 @@
 package csw.services.event.perf
 
-import java.nio.ByteBuffer
 import java.util.concurrent.Executors
 
 import akka.actor._
 import akka.remote.testconductor.RoleName
 import akka.remote.testkit.MultiNodeConfig
-import akka.serialization.{ByteBufferSerializer, SerializerWithStringManifest}
 import akka.testkit._
 import com.typesafe.config.ConfigFactory
-import csw.services.event.perf.Messages.{FlowControl, Init}
+import csw.services.event.perf.Messages.Init
 import csw.services.logging.appenders.StdOutAppender
 import csw.services.logging.scaladsl.LoggingSystemFactory
 
 import scala.concurrent.duration._
 
-object MaxThroughputSpec extends MultiNodeConfig {
+object EventThroughputSpec extends MultiNodeConfig {
   val first  = role("first")
   val second = role("second")
 
@@ -25,9 +23,8 @@ object MaxThroughputSpec extends MultiNodeConfig {
      include "logging.conf"
 
      # for serious measurements you should increase the totalMessagesFactor (20)
-     akka.test.MaxThroughputSpec.totalMessagesFactor = 1.0
-     akka.test.MaxThroughputSpec.real-message = on
-     akka.test.MaxThroughputSpec.actor-selection = off
+     csw.test.EventMaxThroughputSpec.totalMessagesFactor = 1.0
+     csw.test.EventMaxThroughputSpec.actor-selection = off
      akka {
        loglevel = INFO
        log-dead-letters = 100
@@ -40,33 +37,10 @@ object MaxThroughputSpec extends MultiNodeConfig {
          allow-java-serialization = on
 
          serializers {
-           test = "csw.services.event.perf.MaxThroughputSpec$$TestSerializer"
            kryo = "com.twitter.chill.akka.AkkaSerializer"
          }
          serialization-bindings {
-           "csw.services.event.perf.Messages$$FlowControl" = test
            "csw.messages.TMTSerializable" = kryo
-         }
-       }
-       remote.artery {
-         enabled = off
-
-         # for serious measurements when running this test on only one machine
-         # it is recommended to use external media driver
-         # See akka-remote/src/test/resources/aeron.properties
-         # advanced.embedded-media-driver = off
-         # advanced.aeron-dir = "target/aeron"
-         # on linux, use directory on ram disk, instead
-         # advanced.aeron-dir = "/dev/shm/aeron"
-
-         advanced.compression {
-           actor-refs.advertisement-interval = 2 second
-           manifests.advertisement-interval = 2 second
-         }
-
-         advanced {
-           # inbound-lanes = 1
-           # buffer-pool-size = 512
          }
        }
      }
@@ -96,56 +70,17 @@ object MaxThroughputSpec extends MultiNodeConfig {
   final case class ActorSelectionTarget(sel: ActorSelection, override val ref: ActorRef) extends Target {
     override def tell(msg: Any, sender: ActorRef) = sel.tell(msg, sender)
   }
-
-  class TestSerializer(val system: ExtendedActorSystem) extends SerializerWithStringManifest with ByteBufferSerializer {
-
-    val FlowControlManifest = "A"
-
-    override val identifier: Int = 100
-
-    override def manifest(o: AnyRef): String =
-      o match {
-        case _: FlowControl ⇒ FlowControlManifest
-      }
-
-    override def toBinary(o: AnyRef, buf: ByteBuffer): Unit =
-      o match {
-        case FlowControl(id, burstStartTime) ⇒
-          buf.putInt(id)
-          buf.putLong(burstStartTime)
-      }
-
-    override def fromBinary(buf: ByteBuffer, manifest: String): AnyRef =
-      manifest match {
-        case FlowControlManifest ⇒ FlowControl(buf.getInt, buf.getLong)
-      }
-
-    override def toBinary(o: AnyRef): Array[Byte] = o match {
-      case FlowControl(id, burstStartTime) ⇒
-        val buf = ByteBuffer.allocate(12)
-        toBinary(o, buf)
-        buf.flip()
-        val bytes = new Array[Byte](buf.remaining)
-        buf.get(bytes)
-        bytes
-    }
-
-    override def fromBinary(bytes: Array[Byte], manifest: String): AnyRef =
-      fromBinary(ByteBuffer.wrap(bytes), manifest)
-  }
-
 }
 
-class MaxThroughputSpecMultiJvmNode1 extends MaxThroughputSpec
-class MaxThroughputSpecMultiJvmNode2 extends MaxThroughputSpec
+class EventThroughputSpecMultiJvmNode1 extends EventThroughputSpec
+class EventThroughputSpecMultiJvmNode2 extends EventThroughputSpec
 
-abstract class MaxThroughputSpec extends RemotingMultiNodeSpec(MaxThroughputSpec) {
+abstract class EventThroughputSpec extends RemotingMultiNodeSpec(EventThroughputSpec) {
 
-  import MaxThroughputSpec._
+  import EventThroughputSpec._
 
-  val totalMessagesFactor = system.settings.config.getDouble("akka.test.MaxThroughputSpec.totalMessagesFactor")
-  val realMessage         = system.settings.config.getBoolean("akka.test.MaxThroughputSpec.real-message")
-  val actorSelection      = system.settings.config.getBoolean("akka.test.MaxThroughputSpec.actor-selection")
+  val totalMessagesFactor = system.settings.config.getDouble("csw.test.EventMaxThroughputSpec.totalMessagesFactor")
+  val actorSelection      = system.settings.config.getBoolean("csw.test.EventMaxThroughputSpec.actor-selection")
 
   var plot = PlotResult()
 
@@ -183,39 +118,37 @@ abstract class MaxThroughputSpec extends RemotingMultiNodeSpec(MaxThroughputSpec
                  totalMessages = adjustedTotalMessages(10000),
                  burstSize = 1000,
                  payloadSize = 100,
-                 senderReceiverPairs = 1,
-                 realMessage),
+                 senderReceiverPairs = 1),
     TestSettings(testName = "1-to-1",
                  totalMessages = adjustedTotalMessages(50000),
                  burstSize = 1000,
                  payloadSize = 100,
-                 senderReceiverPairs = 1,
-                 realMessage),
+                 senderReceiverPairs = 1),
     TestSettings(testName = "1-to-1-size-1k",
-                 totalMessages = adjustedTotalMessages(20000),
+                 totalMessages = adjustedTotalMessages(50000),
                  burstSize = 1000,
                  payloadSize = 1000,
-                 senderReceiverPairs = 1,
-                 realMessage),
+                 senderReceiverPairs = 1),
     TestSettings(testName = "1-to-1-size-10k",
-                 totalMessages = adjustedTotalMessages(5000),
+                 totalMessages = adjustedTotalMessages(20000),
                  burstSize = 1000,
                  payloadSize = 10000,
-                 senderReceiverPairs = 1,
-                 realMessage),
-    TestSettings(
-      testName = "5-to-5",
-      totalMessages = adjustedTotalMessages(20000),
-      burstSize = 200, /* don't exceed the send queue capacity 200*5*3=3000*/
-      payloadSize = 100,
-      senderReceiverPairs = 5,
-      realMessage
-    )
+                 senderReceiverPairs = 1),
+    TestSettings(testName = "5-to-5",
+                 totalMessages = adjustedTotalMessages(20000),
+                 burstSize = 200,
+                 payloadSize = 100,
+                 senderReceiverPairs = 5),
+    TestSettings(testName = "10-to-10",
+                 totalMessages = adjustedTotalMessages(10000),
+                 burstSize = 1000,
+                 payloadSize = 100,
+                 senderReceiverPairs = 10)
   )
 
   def test(testSettings: TestSettings, resultReporter: BenchmarkFileReporter): Unit = {
     import testSettings._
-    val receiverName = testName + "-rcv"
+    val receiverName = testName + "-subscriber"
 
 //    runPerfFlames(first, second)(delay = 5.seconds, time = 15.seconds)
 
@@ -250,7 +183,7 @@ abstract class MaxThroughputSpec extends RemotingMultiNodeSpec(MaxThroughputSpec
             printTaskRunnerMetrics = n == 1,
             resultReporter
           ),
-          testName + "-snd" + n
+          testName + "-publisher" + n
         )
         val terminationProbe = TestProbe()
         terminationProbe.watch(snd)
@@ -271,7 +204,7 @@ abstract class MaxThroughputSpec extends RemotingMultiNodeSpec(MaxThroughputSpec
     enterBarrier("after-" + testName)
   }
 
-  "Max throughput of Artery" must {
+  "Max throughput of Event Service" must {
     val reporter = BenchmarkFileReporter("MaxThroughputSpec", system)
     for (s ← scenarios) {
       s"be great for ${s.testName}, burstSize = ${s.burstSize}, payloadSize = ${s.payloadSize}" in test(s, reporter)

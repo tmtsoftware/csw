@@ -39,7 +39,7 @@ object BenchmarkFileReporter {
       }
       val testResultFile: File = {
         val timestamp = formatter.format(LocalDateTime.ofInstant(Instant.now(), ZoneId.systemDefault()))
-        val fileName  = s"$timestamp-Artery-$testName-$gitCommit-results.txt"
+        val fileName  = s"$timestamp-$testName-$gitCommit-results.txt"
         new File(targetDirectory, fileName)
       }
       val config = system.settings.config
@@ -49,16 +49,9 @@ object BenchmarkFileReporter {
 
       val settingsToReport =
         Seq(
-          "akka.test.MaxThroughputSpec.totalMessagesFactor",
-          "akka.test.MaxThroughputSpec.real-message",
+          "csw.test.EventMaxThroughputSpec.totalMessagesFactor",
           "akka.test.LatencySpec.totalMessagesFactor",
           "akka.test.LatencySpec.repeatCount",
-          "akka.test.LatencySpec.real-message",
-          "akka.remote.artery.enabled",
-          "akka.remote.artery.advanced.inbound-lanes",
-          "akka.remote.artery.advanced.idle-cpu-level",
-          "akka.remote.artery.advanced.buffer-pool-size",
-          "akka.remote.artery.advanced.embedded-media-driver",
           "akka.remote.default-remote-dispatcher.throughput",
           "akka.remote.default-remote-dispatcher.fork-join-executor.parallelism-factor",
           "akka.remote.default-remote-dispatcher.fork-join-executor.parallelism-min",
