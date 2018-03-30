@@ -1,6 +1,6 @@
 package csw.services.event.internal
 
-import akka.actor.ActorSystem
+import akka.actor.{ActorSystem, Cancellable}
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import csw.messages.events.{Event, EventKey, EventName, SystemEvent}
@@ -11,6 +11,7 @@ import csw.services.event.scaladsl.{EventPublisher, EventSubscriber}
 import org.scalatest.Matchers
 
 import scala.collection.{immutable, mutable}
+import scala.concurrent.duration.DurationLong
 
 class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: EventSubscriber)(
     implicit val actorSystem: ActorSystem
@@ -58,11 +59,19 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     seqF2.await shouldBe List(Event.invalidEvent, event2)
   }
 
+  var cancellable: Cancellable = _
   def publishMultiple(): Unit = {
+    var counter                      = -1
+    val events: immutable.Seq[Event] = for (i ← 1 to 10) yield makeEvent(i)
+
+    def eventGenerator(): Event = {
+      counter += 1
+      if (counter == 10) cancellable.cancel()
+      events(counter)
+    }
+
     val queue: mutable.Queue[Event] = new mutable.Queue[Event]()
     val eventKey: EventKey          = makeEvent(0).eventKey
-
-    val events: immutable.Seq[Event] = for (i ← 1 to 10) yield makeEvent(i)
 
     subscriber.subscribe(Set(eventKey)).runForeach { x =>
       queue.enqueue(x)
@@ -70,7 +79,7 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
 
     Thread.sleep(10)
 
-    publisher.publish(Source.fromIterator(() ⇒ events.toIterator))
+    cancellable = publisher.publish(eventGenerator, 2.millis)
 
     Thread.sleep(1000) //TODO : Try to replace with Await
 

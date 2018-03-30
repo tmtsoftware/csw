@@ -41,7 +41,7 @@ class EventServicePerfFramework(publisher: EventPublisher, subscriber: EventSubs
 
     //    eventStream.mapAsync(1)(publisher.publish).runWith(Sink.ignore)
     //    publisher.publish(eventStream)
-    publisher.publish(eventGenerator _, 5.millis)
+    publisher.publish(eventGenerator, 5.millis)
 
     doneF.await
   }
@@ -59,7 +59,7 @@ class EventServicePerfFramework(publisher: EventPublisher, subscriber: EventSubs
 
     Thread.sleep(1000)
 
-    publisher.publish(eventGenerator _, publisherTick)
+    publisher.publish(eventGenerator, publisherTick)
 
     doneF.await
   }
