@@ -9,7 +9,7 @@ import csw.services.location.scaladsl.LocationService
 import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar
 
-class SubscribingActor(reporter: RateReporter, payloadSize: Int, printTaskRunnerMetrics: Boolean, numSenders: Int)
+class SubscribingActor(reporter: RateReporter, payloadSize: Int, printTaskRunnerMetrics: Boolean, numSenders: Int, id: Int)
     extends Actor
     with MockitoSugar {
 
@@ -29,7 +29,8 @@ class SubscribingActor(reporter: RateReporter, payloadSize: Int, printTaskRunner
   private val redisFactory = new RedisFactory(redisClient, mock[LocationService], wiring)
   private val subscriber   = redisFactory.subscriber(redisHost, redisPort)
 
-  startSubscription(eventKeys)
+  private val keys: Set[EventKey] = eventKeys + EventKey(s"$eventKey.$id")
+  startSubscription(keys)
 
   private def startSubscription(eventKeys: Set[EventKey]) = subscriber.subscribeCallback(eventKeys, onEvent)
 
@@ -70,7 +71,7 @@ class SubscribingActor(reporter: RateReporter, payloadSize: Int, printTaskRunner
 
 object SubscribingActor {
 
-  def props(reporter: RateReporter, payloadSize: Int, printTaskRunnerMetrics: Boolean, numSenders: Int): Props =
-    Props(new SubscribingActor(reporter, payloadSize, printTaskRunnerMetrics, numSenders))
+  def props(reporter: RateReporter, payloadSize: Int, printTaskRunnerMetrics: Boolean, numSenders: Int, id: Int): Props =
+    Props(new SubscribingActor(reporter, payloadSize, printTaskRunnerMetrics, numSenders, id))
       .withDispatcher("akka.remote.default-remote-dispatcher")
 }

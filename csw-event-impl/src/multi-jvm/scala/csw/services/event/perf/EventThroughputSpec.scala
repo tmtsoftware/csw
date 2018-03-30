@@ -23,8 +23,8 @@ object EventThroughputSpec extends MultiNodeConfig {
      include "logging.conf"
 
      # for serious measurements you should increase the totalMessagesFactor (20)
-     csw.test.EventMaxThroughputSpec.totalMessagesFactor = 1.0
-     csw.test.EventMaxThroughputSpec.actor-selection = off
+     csw.test.EventThroughputSpec.totalMessagesFactor = 1.0
+     csw.test.EventThroughputSpec.actor-selection = off
      akka {
        loglevel = INFO
        log-dead-letters = 100
@@ -79,8 +79,8 @@ abstract class EventThroughputSpec extends RemotingMultiNodeSpec(EventThroughput
 
   import EventThroughputSpec._
 
-  val totalMessagesFactor = system.settings.config.getDouble("csw.test.EventMaxThroughputSpec.totalMessagesFactor")
-  val actorSelection      = system.settings.config.getBoolean("csw.test.EventMaxThroughputSpec.actor-selection")
+  val totalMessagesFactor = system.settings.config.getDouble("csw.test.EventThroughputSpec.totalMessagesFactor")
+  val actorSelection      = system.settings.config.getBoolean("csw.test.EventThroughputSpec.actor-selection")
 
   var plot = PlotResult()
 
@@ -156,7 +156,7 @@ abstract class EventThroughputSpec extends RemotingMultiNodeSpec(EventThroughput
       val rep = reporter(testName)
       val receivers = (1 to senderReceiverPairs).map { n ⇒
         system.actorOf(
-          SubscribingActor.props(rep, payloadSize, printTaskRunnerMetrics = n == 1, senderReceiverPairs),
+          SubscribingActor.props(rep, payloadSize, printTaskRunnerMetrics = n == 1, senderReceiverPairs, n),
           receiverName + n
         )
       }
@@ -168,7 +168,6 @@ abstract class EventThroughputSpec extends RemotingMultiNodeSpec(EventThroughput
 
     runOn(first) {
       enterBarrier(receiverName + "-started")
-      val ignore    = TestProbe()
       val receivers = (for (n ← 1 to senderReceiverPairs) yield identifyReceiver(receiverName + n)).toArray
       val senders = for (n ← 1 to senderReceiverPairs) yield {
         val receiver = receivers(n - 1)

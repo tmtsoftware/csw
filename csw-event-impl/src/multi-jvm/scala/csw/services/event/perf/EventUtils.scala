@@ -7,7 +7,8 @@ import csw.messages.params.models.{ArrayData, Id, Prefix}
 
 object EventUtils {
   val prefix               = Prefix("tcs.mobie.filter")
-  val eventName            = EventName("filter")
+  val eventName            = "move"
+  val eventKey             = s"${prefix.prefix}.$eventName"
   val warmupEventName      = EventName("warmup")
   val startEventName       = EventName("start")
   val endEventName         = EventName("end")
@@ -18,7 +19,6 @@ object EventUtils {
 
   val eventKeys: Set[EventKey] =
     Set(
-      EventKey(s"${prefix.prefix}.$eventName"),
       EventKey(s"${prefix.prefix}.$warmupEventName"),
       EventKey(s"${prefix.prefix}.$flowControlEventName"),
       EventKey(s"${prefix.prefix}.$startEventName"),

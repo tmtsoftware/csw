@@ -3,12 +3,13 @@ package csw.services.event.perf
 import java.util.concurrent.TimeUnit.NANOSECONDS
 
 import akka.actor._
-import akka.stream.ActorMaterializer
+import akka.stream.{ActorMaterializer, ThrottleMode}
 import akka.stream.scaladsl.{Sink, Source}
+import csw.messages.events.EventName
 import csw.services.event.RedisFactory
 import csw.services.event.internal.commons.Wiring
-import csw.services.event.perf.EventUtils._
 import csw.services.event.perf.EventThroughputSpec.Target
+import csw.services.event.perf.EventUtils._
 import csw.services.location.scaladsl.LocationService
 import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar
@@ -26,7 +27,7 @@ class PublishingActor(
 ) extends Actor
     with MockitoSugar {
 
-  val numTargets = targets.size
+  val numTargets = targets.length
 
   import testSettings._
   val payload            = ("0" * testSettings.payloadSize).getBytes("utf-8")
@@ -111,7 +112,7 @@ class PublishingActor(
         f"throughput ${throughput * testSettings.senderReceiverPairs}%,.0f msg/s, " +
         f"${throughput * payloadSize * testSettings.senderReceiverPairs}%,.0f bytes/s (payload), " +
         f"${throughput * totalSize(context.system) * testSettings.senderReceiverPairs}%,.0f bytes/s (total" +
-        (if (testSettings.senderReceiverPairs == 1) s"dropped ${totalMessages - totalReceived}, " else "") +
+        s"dropped ${totalMessages - totalReceived}, " +
         s"max round-trip $maxRoundTripMillis ms, " +
         s"burst size $burstSize, " +
         s"payload size $payloadSize, " +
@@ -134,13 +135,15 @@ class PublishingActor(
     Await.result(
       Source(0 until batchSize.toInt)
         .map { counter ⇒
-          sent(counter % numTargets) += 1
+          val id = counter % numTargets
+          sent(id) += 1
+
           if (warmup) makeEvent(warmupEventName, payload = payload)
-          else makeEvent(eventName, totalMessages - remaining + counter, payload)
+          else makeEvent(EventName(s"$eventName.${id + 1}"), totalMessages - remaining + counter, payload)
         }
         .mapAsync(1)(publisher.publish)
         .runWith(Sink.ignore),
-      10.seconds
+      5.minutes
     )
 
     remaining -= batchSize
@@ -152,7 +155,7 @@ class PublishingActor(
       publisher.publish(makeEvent(endEventName))
     } else {
       flowControlId += 1
-      pendingFlowControl = pendingFlowControl.updated(flowControlId, targets.size)
+      pendingFlowControl = pendingFlowControl.updated(flowControlId, targets.length)
       val flowControlEvent = makeFlowCtlEvent(flowControlId, t0)
       publisher.publish(flowControlEvent)
     }

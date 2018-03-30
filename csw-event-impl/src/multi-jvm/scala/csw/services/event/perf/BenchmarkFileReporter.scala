@@ -49,7 +49,7 @@ object BenchmarkFileReporter {
 
       val settingsToReport =
         Seq(
-          "csw.test.EventMaxThroughputSpec.totalMessagesFactor",
+          "csw.test.EventThroughputSpec.totalMessagesFactor",
           "akka.test.LatencySpec.totalMessagesFactor",
           "akka.test.LatencySpec.repeatCount",
           "akka.remote.default-remote-dispatcher.throughput",
