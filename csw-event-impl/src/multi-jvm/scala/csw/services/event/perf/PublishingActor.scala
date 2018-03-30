@@ -73,14 +73,12 @@ class PublishingActor(
       startTime = System.nanoTime
       remaining = totalMessages
       sent.indices.foreach(i ⇒ sent(i) = 0)
-      // have a few batches in flight to make sure there are always messages to send
-      (1 to 3).foreach { _ ⇒
-        val t0 = System.nanoTime()
-        sendBatch(warmup = false)
-        sendFlowControl(t0)
-      }
 
       context.become(active)
+      val t0 = System.nanoTime()
+      sendBatch(warmup = false)
+      sendFlowControl(t0)
+
   }
 
   def active: Receive = {
@@ -134,6 +132,7 @@ class PublishingActor(
 
     Await.result(
       Source(0 until batchSize.toInt)
+        .throttle(1000, 1.second, 1000, ThrottleMode.Shaping)
         .map { counter ⇒
           val id = counter % numTargets
           sent(id) += 1
@@ -141,7 +140,7 @@ class PublishingActor(
           if (warmup) makeEvent(warmupEventName, payload = payload)
           else makeEvent(EventName(s"$eventName.${id + 1}"), totalMessages - remaining + counter, payload)
         }
-        .mapAsync(1)(publisher.publish)
+        .map(publisher.publish)
         .runWith(Sink.ignore),
       5.minutes
     )
