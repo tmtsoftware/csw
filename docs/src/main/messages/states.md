@@ -1,6 +1,9 @@
 ## State variables
 
-States represent a component's state which can be either a present state or a desired state. They all share same structural features. All events have **[Prefix](commands.html#Prefix)** and **ParameterSet**.
+A states represent a component's internal state. There are two types called `CurrentState` and `DemandState`. 
+They both share the same structural features. All state variables have **[Prefix](commands.html#Prefix)** and **ParameterSet**.
+
+The PubSub feature of the HCD provides `CurrentState` values to the PubSub subscriber.
 
 ### DemandState
 

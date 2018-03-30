@@ -1,6 +1,6 @@
 ## Creating an Assembly or Hcd Component
 
-A component is implemented by extending the `ComponentHandlers` base class. These handlers are executed under an actor (Top Level Actor or TLA)
+An Assembly or HCD is implemented by extending the `ComponentHandlers` base class. These handlers are executed by an Akka Actor (Top Level Actor or TLA)
 defined in the framework which handles the lifecycle and supervision of this component.
 
 Assembly/Scala
@@ -17,15 +17,15 @@ Hcd/Java
 
 @@@ note { title=Note }
 
-**converting typed actor system to untyped actor system** 
+**Converting a typed actor system to an untyped actor system** 
 
-The `ctx` available to the component is of type `akka.actor.typed.scaladsl.ActorContext` in scala or `akka.actor.typed.javadsl.ActorContext` 
-in java. This context can be used to get resources such as actor system which is also typed. In order to get the untyped 
-version of actor system or actor references, akka has  provided some implicit extension methods in scala and static
-methods in java which can be used by adding the following import 
+The `ctx` available to the component is of type `akka.actor.typed.scaladsl.ActorContext` in Scala or `akka.actor.typed.javadsl.ActorContext` 
+in Java. This context can be used to get resources such as actor system which is also typed. In order to get the untyped 
+version of an actor system or actor references, Akka has  provided some implicit extension methods in Scala and static
+methods in Java which can be used by adding the following import: 
 
-`import akka.actor.typed.scaladsl.adapter._`  for scala and,
-`import akka.actor.typed.javadsl.Adapter.*` for java
+`import akka.actor.typed.scaladsl.adapter._`  for Scala and,
+`import akka.actor.typed.javadsl.Adapter.*` for Java
 
 @@@
 

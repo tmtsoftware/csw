@@ -1,4 +1,4 @@
-# Location service
+# Location Service
 
 The Location Service handles component (i.e., Applications, Sequencers, Assemblies, HCDs, and Services) registration 
 and discovery in the distributed TMT software system.
@@ -27,7 +27,7 @@ An example of location information is:
 
 ## Dependencies
 
-To use the Location service without using the framework, add this to your `build.sbt` file:
+To use the Location Service without using the framework, add this to your `build.sbt` file:
 
 sbt
 :   @@@vars
@@ -37,7 +37,7 @@ sbt
     @@@
 
 
-## Create LocationService
+## Create Location Service
 
 Note that before using this API, the [csw-cluster-seed](../apps/cswclusterseed.html) application 
 (the main seed node for the location service cluster) should be running at a known location in the 
@@ -55,9 +55,9 @@ Java
 :   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #create-location-service }
 
 
-## Shutdown LocationService
+## Shutdown Location Service
 
-This example demonstrates how to disconnect from the location service. 
+This example demonstrates how to disconnect from the Location Service. 
 `Shutdown` will terminate the application's ActorSystem leave the cluster.  
 
 **Note:** All the services registered via this instance of LocationService will continue to be available for other cluster members. 
@@ -68,16 +68,16 @@ Scala
 Java
 :   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #shutdown }
 
-## Creating components, connections and registrations
+## Creating Components, Connections and Registrations
 
 An Application, Sequencer, Assembly, HCD, or Service component may need to be used by another component as part of normal observatory operations. 
-It must register its location information with Location service so that other components can find it.
+It must register its location information with Location Service so that other components can find it.
 
 **Components** have a name and a type, such as Container, HCD, Assembly, Service.
    
 **Connections** are the means to reach components and are categorized as `Akka`, `HTTP`, or `Tcp` type connections.
 
-**Registrations** are service endpoints stored in LocationService.
+**Registrations** are service endpoints stored in Location Service.
 
 The `register` API takes a `Registration` parameter and returns a future registration result. 
 If registration fails for some reason, the returned future will fail with an exception. 
@@ -109,7 +109,7 @@ Also, note that for components, the registration will be taken care of via `csw-
 So, above demonstration of registering connections is for explanatory and testing purpose only.  
 @@@
 
-## Creating ActorRef for registration
+## Creating ActorRef for Registration
 
 Make sure the ActorSystem used to start actors using the location service is created using `ActorSystemFactory` as follows:
  
@@ -126,7 +126,7 @@ that are part of csw-cluster.
 
 ## Resolving Connections
 
-The `list` API returns a list of the currently registered connections from the LocationService.
+The `list` API returns a list of the currently registered connections from the Location Service.
   
 A connection of interest can be looked up using the `resolve` or `find` methods:   
 
@@ -187,7 +187,7 @@ Java
 @@@ 
 ## Filtering
 
-The `list` API and its variants offer means to inquire about available connections with the LocationService. 
+The `list` API and its variants offer means to inquire about available connections with the Location Service. 
 The **parameter-less** `list` returns all available connections
 
 Scala
@@ -261,7 +261,7 @@ The log output should contain:
 
 The lifecycle of a connection of interest can be followed using either the `track` API or the `subscribe` API.  
 
-These methods take a `Connection` instance as a parameter. **A `Connection` need not already be registered with LocationService.** 
+These methods take a `Connection` instance as a parameter. **A `Connection` need not already be registered with Location Service.** 
 It's alright to track connections that will be registered in future. 
 
 A `track` API returns two values:     

@@ -1,6 +1,7 @@
 ## Units
 
-Listed below are Units of Measurement, supported by TMT observatory framework and are available as Enumerated values. *Units* are optionally attached to Keys.
+Listed below are Units of Measurement, supported by TMT observatory framework and are available as Enumerated values. 
+`Units` are optionally attached to `Parameter` Keys.
 
 @@@ note
 
@@ -11,7 +12,13 @@ Units are made available via separate files, for consumption in Scala and Java c
 
 @@@
 
-### Default units for Keys
+@@@ note
+
+The set of supported Units will be modified as more required Units are discovered.
+
+@@@ 
+
+### Default Units for Keys
 
 The default unit for `TimestampKey`(in Scala and Java both) is `second`. For all the remaining keys, default unit is NoUnits.  
 

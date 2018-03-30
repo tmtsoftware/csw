@@ -5,7 +5,7 @@ On receiving a command as a part of `onSubmit`, the component framework adds the
 The component should then update the status of the command using the following API provided in `commandResponseManager`:
 
 ### addOrUpdateCommand
-Add a new command or update the status of an existing command
+Add a new command or update the status of an existing command.
 
 Scala
 :   @@snip [McsAssemblyComponentHandlers.scala](../../../../csw-framework/src/test/scala/csw/common/components/command/McsAssemblyComponentHandlers.scala) { #addOrUpdateCommand }
@@ -25,8 +25,8 @@ Java
 :   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JAssemblyComponentHandlers.java) { #addSubCommand }
 
 ### updateSubCommand
-Update the status of the sub-command which would trigger the automatic derivation of the status of the original/parent command when
-status of all the sub-commands have been updated. A status indicating failure such as `Invalid` or `Error` in any one 
+Update the `CommandResponse` of the sub-command which would trigger the automatic derivation of the status of the original/parent command when
+status of all the sub-commands have been updated. A `CommandResponse` indicating failure such as `Invalid` or `Error` in any one 
 of the sub-commands would result in the error status of the parent command. Status of any other sub-commands wil not be 
 considered in this case.
 

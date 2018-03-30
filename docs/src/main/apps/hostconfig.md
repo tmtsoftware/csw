@@ -1,9 +1,9 @@
 # csw-host-config
 
-This is just a helper to create host configuration application. 
-Every component/subsystem is expected to create their own host configuration application using this helper, 
+This is just a helper to create a host configuration application. 
+A component/subsystem is can create their own host configuration application using this helper, 
 to be more precise every github repository should have one host configuration application. 
-Reason for having one app per repo is, when you run `universal:publish` task,
+The reason for having one app per repo is, when you run `universal:publish` task,
 it will generate zip which will be self contained (will have all the required dependencies) and can be deployed independently on any machine.
 
 This application will start multiple containers on a given host machine and each container will have single/multiple components.
@@ -23,11 +23,11 @@ It is not necessary to have a name of the application as HostConfigApp/JHostConf
 
 ## Command line parameter options
 
-* **`--local`** It's an optional parameter. When supplied, get the host configuration file from local machine located at hostConfigPath, else fetch it from config service
-* **`<file>`** It's mandatory parameter. It specifies Host configuration file path
-* **`-s, --container-script <script-path>`** It specifies the path of generated shell script of container command app from task `universal:packageBin` (sbt-native-packager task)
-* **`--help`** Prints the help of the application.
-* **`--version`** Prints the version of the application.
+* **`--local`** is an optional parameter. When supplied, get the host configuration file from local machine located at hostConfigPath, else fetch it from config service
+* **`<file>`** is a mandatory parameter. It specifies Host configuration file path
+* **`-s, --container-script <script-path>`** specifies the path of generated shell script of container command app from task `universal:packageBin` (sbt-native-packager task)
+* **`--help`** prints the help of the application.
+* **`--version`** prints the version of the application.
 
 ## Examples
 

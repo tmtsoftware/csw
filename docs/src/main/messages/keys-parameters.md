@@ -1,13 +1,22 @@
 ## Keys and Parameters
 
-Library offers a flexible and typesafe means to create Parameters to store values  like **primitive types, collection types or domain specific types**. 
+Library offers a flexible and typesafe means to create Parameters to store values like **primitive types, collection types or domain specific types**. 
 
-A **Parameter** is a collection of Keys and values or binary data. A key is **unique** in a Parameter. A Parameter is **immutable**, in a sense, a modification to an existing Parameter will return a new instance.  
+A **Parameter** is a Key and Value where the Value must be from a set of defined primitive types including binary data.
+The Value of a `Parameter` is always considered to be an Array of the type (i.e. if a single value is stored it is at array location 0). 
+A `Parameter` is **immutable**; a modification to an existing `Parameter` will return a new instance. 
+
+A Value can also have `Units`, which must be of the defined types. See @ref:[Units](./units.md) for more information. At this time
+Units are informational only--no calculation or conversion support is provided. Some systems may provide a key value with different
+units, and receiver can inspect the `Units` to make a decision on how to handle the value.
+
+A **ParameterSet** is a Set of `Parameter`. Various other message types include a `ParameterSet` (e.g. Setup, Event). 
+A key is **unique** in a `ParameterSet` since it is a Set. 
 
 ### How to create a Parameter
  
- * choose appropriate KeyType from below tables for your language(Scala/Java).    
- * calling `make` function on KeyType and supplying a String keyName will return a suitably typed Key instance.    
+ * choose an appropriate KeyType from below tables for your language(Scala/Java).    
+ * calling the `make` method on KeyType and supplying a String keyName will return a suitably typed Key instance.    
  * explore the overloaded `set` and `->` methods, which will allow you to store values of the based on chosen KeyType. e.g. `JKeyTypes.BooleanKey` will allow storing only `java.lang.Boolean` values.
  
 ### Primitive datatypes

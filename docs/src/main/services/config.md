@@ -1,22 +1,22 @@
-# Configuration service
+# Configuration Service
 
 Configuration Service provides a centralized persistent store for any configuration file used in the TMT Software System. 
 All versions of configuration files are retained, providing a historical record of each configuration file.
 
-Note that in order to use the APIs described here, the [location service](../services/location.html)
+Note that in order to use the APIs described here, the [Location Service](../services/location.html)
 ([csw-cluster-seed](../apps/cswclusterseed.html))
-and [config service server](../apps/cswonfigserverapp.html) need to be running somewhere in the local network
+and [Configuration Service Server](../apps/cswonfigserverapp.html) needs to be running somewhere in the local network
 and the necessary configuration, environment variables or system properties should be defined to point to the 
-correct host and port number(s) for the location service seed nodes.
+correct host and port number(s) for the Location Service seed nodes.
 
-This service will be part of the observatory cluster and exposes Rest endpoints that can be accessed over HTTP. 
-Component developers can use the csw-config-client library in their code. 
-The library wraps the low level communication with ConfigServer and exposes simple to use methods to access and 
+This service will be part of the observatory cluster and exposes Rest endpoints that can be accessed over HTTP.
+Component developers can use the csw-config-client library in their code.
+The library wraps the low level communication with Configuration Service Server and exposes simple to use methods to access and
 manage configuration files.
 
 ## Dependencies
 
-To use the Configuration service without using the framework, add this to your `build.sbt` file:
+To use the Configuration Service without using the framework, add this to your `build.sbt` file:
 
 sbt
 :   @@@vars
@@ -25,13 +25,13 @@ sbt
     ```
     @@@
 
-## Rules and checks
+## Rules and Checks
 * The config file path must not contain `!#<>$%&'@^``~+,;=` or `any whitespace character`    
 * If the input file is > 10MB or has lot of non ASCII characters, then for optimization, server will archive it in `annex` store.
 * Large and binary files can be forced to go to 'annex' store by using a `annex=true` flag in `create` operation. 
 * API functions accept date-time values in UTC timezone. (e.g. 2017-05-17T08:00:24.246Z) 
 
-## Model classes
+## Model Classes
 * **ConfigData** : Represents the contents of the files being managed. It wraps stream of ByteString.    
 * **ConfigFileInfo** : Represents information about a config file stored in the config service.    
 * **ConfigFileRevision** : Represents information about a specific version of a config file.    
@@ -39,27 +39,35 @@ sbt
 * **ConfigMetadata** : Represents metadata information about ConfigServer.    
 * **FileType** : Represents the type of storage for a configuration file. Currently two types are supported `Normal`(small, text files) and `Annex`(Large, Binary files).
  
-## API flavors
+## API Flavors
 
 The Configuration Service is used to provide the runtime settings for components.  When a component is started, it will 
 use a limited "clientAPI" to obtain the "active" configuration from the Configuration Service, and use those settings 
-for its execution.  To change the active configuration, an administrative tool with access to the full "admin API" must 
-be used.  These tools would have the ability to create, delete, and update configurations, as well as retrieve past 
-configurations and their history.  Any time a new configuration is to be used by a component, the user must use one of 
+for its execution.
+
+To change the active configuration, an administrative tool with access to the full "admin API" must 
+be used. These tools would have the ability to create, delete, and update configurations, as well as retrieve past 
+configurations and their history. Any time a new configuration is to be used by a component, the user must use one of 
 these tools (via CLI, perhaps) to set the active configuration for a component.  Since a history of active configurations 
 is maintained by the service, the settings of each component each time it is run can be retrieved, and the system 
 configuration at any moment can be recreated.
 
-* **clientAPI** : Expected to be consumed by component developers. Available functions are: `{exists | getActive}`    
-* **adminAPI**  : Full functionality exposed by ConfigServer is available with this API. Expected to be used administrators. Available functions are: `{create | update | getById | getLatest | getByTime | delete | list | history | historyActive | setActiveVersion | resetActiveVersion | getActiveVersion | getActiveByTime | getMetadata | exists | getActive}`
+* **clientAPI** : Must be used in Assembly and HCD components. Available functions are: `{exists | getActive}`    
+* **adminAPI**  : Full functionality exposed by Configuration Service Server is available with this API. Expected to be used administrators. Available functions are: `{create | update | getById | getLatest | getByTime | delete | list | history | historyActive | setActiveVersion | resetActiveVersion | getActiveVersion | getActiveByTime | getMetadata | exists | getActive}`
 
-@@@ warning { title="Component developers are recommended to use clientAPI." }
+@@@ warning { title="Component developers must use clientAPI." }
     
 @@@
 
 ## Accessing clientAPI and adminAPI
 
-ConfigClientFactory exposes functions to get clientAPI and adminAPI. Both the functions require LocationService instance which is used to resolve ConfigServer.
+ConfigClientFactory exposes functions to get clientAPI and adminAPI. Both the functions require Location Service instance which is used to resolve ConfigServer.
+
+@@@ note
+
+Components should only use the client API.  The Admin API may be used from an engineering user interface.
+
+@@@
 
 Scala
 :   @@snip [ConfigClientExampleTest.scala](../../../../examples/src/test/scala/csw/services/config/ConfigClientExampleTest.scala) { #create-api }

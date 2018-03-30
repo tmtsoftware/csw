@@ -44,6 +44,7 @@ In this example, a project was created with default parameters. The complete pro
     - `galil-deploy`
     
 ![galil-project-structure](../images/gettingstarted/galil-project.png)
+
 2.  `galil-deploy` project is used to create a concrete implementation.  This allows for the construction of a complete binary
 package bundled with all dependencies, and a launching application.
 

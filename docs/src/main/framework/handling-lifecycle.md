@@ -3,8 +3,8 @@
 ### initialize
 
 The `initialize` handler is invoked when the component is created. This is different than constructor initialization to allow non-blocking 
-asynchronous operations. The component can initialize state such as configuration to be fetched from configuration service, 
-location of components or services to be fetched from location service etc. These vary from component to component.
+asynchronous operations. The component can initialize state such as configuration to be fetched from Configuration Service, 
+location of components or services to be fetched from Location Service etc. These vary from component to component.
 
 Assembly/Scala
 :   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/AssemblyComponentHandlers.scala) { #initialize-handler }

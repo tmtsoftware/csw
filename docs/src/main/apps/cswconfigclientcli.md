@@ -1,16 +1,16 @@
 # csw-config-client-cli
 
-A command line application that facilitates interaction with config service. It accepts various commands to store, retrieve, list and manage configuration files.
+A command line application that facilitates interaction with Configuration Service. It accepts various commands to store, retrieve, list and manage configuration files.
 
 ## Supported Commands
 
 Note: Exactly one operation must be specified from this list - `{create | update | get | delete | list | history | setActiveVersion | resetActiveVersion | getActiveVersion | getActiveByTime | getMetadata | exists | getActive}`
 
 ## Admin API
-Below listed commands will be used by administrators and maintainers of Config service.
+The commands listed below will be used by administrators and maintainers of Configuration Service.
 
 ### create
-takes input source file and creates the configuration in the repository at a specified path
+Takes an input source file and creates the configuration in the repository at a specified path.
 
  * 'relativeRepoPath' is path in the repository
  * `-i`, `--in` is input file path
@@ -18,77 +18,77 @@ takes input source file and creates the configuration in the repository at a spe
  * `-c, --comment` optional create comment
  
 ### update
-overwrites the file specified in the repository by the input file
+Overwrites the file specified in the repository by the input file.
 
  * 'path' is path in the repository
  * `-i`, `--in` is input file path
  * `-c, --comment` optional create comment
  
 ### get
-retrieves a file for a given path and saves it to the output file. Latest file is fetched if neither date nor id is specified.
+Retrieves a file for a given path and saves it to the output file. The latest file is fetched if neither date nor id is specified.
 
- * 'relativeRepoPath' is path in the repository
+ * 'relativeRepoPath' is path in the repository.
  * `-o`, `--out` is output file path
  * `--id` optional. if specified this id will be matched
  * `--date` optional. if specified will get the file matching this date. Format: 2017-04-16T16:15:23.503Z
  
 ### delete
- deletes the file at specified path in the repository
+Deletes the file at the specified path in the repository.
  
   * 'relativeRepoPath' is path in the repository
   * `-c, --comment` optional delete comment
   
 ### list
-lists the files in the repository. Can't use '--annex' and '--normal' together.
+Lists the files in the repository. Can't use '--annex' and '--normal' together.
 
  * `--annex` optional parameter. List all files that are of annex type. 
  * `--normal` optional parameter. List all files that are of normal type. 
  * `--pattern` optional parameter. List all files whose path matches the given pattern. e.g. "/path/hcd/*.*", "a/b/c/d.*", ".*.conf", ".*hcd.*"
  
 ### history
-shows versioning history of the file in the repository
+Shows the version history of the file in the repository.
 
 * 'relativeRepoPath' is path in the repository
 * `--max` optional parameter. maximum no of files to be retrieved
 
 ### setActiveVersion
-sets active version of the file in the repository
+Sets the active version of the file in the repository.
 
  * 'relativeRepoPath' is path in the repository
  * `--id` optional parameter. version id of the repository file to set as active.
  * `-c, --comment` optional delete comment
 
 ### resetActiveVersion
-resets the active version to the latest version for the specified file
+Resets the active version to the latest version for the specified file path.
 
   * 'relativeRepoPath' is path in the repository
   * `-c, --comment` optional reset comment
   
 ### getActiveVersion
-gets the id of the active version of the file in the repository
+Gets the id of the active version of the file in the repository.
 
  * 'relativeRepoPath' is path in the repository
  
 ### getActiveByTime
-gets the file that was active at a specified time
+Gets the file that was active at a specified time.
 
   * 'relativeRepoPath' is path in the repository
   * `-o`, `--out` is output file path
   * `--date` optional. if specified will get the active file matching this date. Format: 2017-04-16T16:15:23.503Z
   
 ### getMetadata
-gets the metadata of config server e.g. repository directory, annex directory, min annex file size, max config file size
+Gets the metadata of Configuration Service server e.g. repository directory, annex directory, min annex file size, max config file size.
 
 ## Client API
-Below listed commands are recommended for component developers.
+The following commands are available for component developers.
 
 ### exists
-checks if the file exists at specified path in the repository
+Checks if the file exists at specified path in the repository.
 
  * 'relativeRepoPath' is path in the repository
  
 ### getActive
-retrieves active file for a given path from config service, and writes it to the output file
+Retrieves active file for a given path from Configuration Service and writes it to the output file.
   * 'relativeRepoPath' is path in the repository
   * `-o`, `--out` is output file path
   

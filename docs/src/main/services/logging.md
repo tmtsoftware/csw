@@ -1,10 +1,17 @@
-# Logging service
+# Logging Service
 
 Logging Service library provides an advanced logging facility for csw components and services. 
+
+@@@note
+
+With this release of CSW, only the local logging is provided.  A future release will provide
+the centralized logging facility.
+
+@@@
     
 ## Dependencies
 
-To use the Logging service without using the framework, add this to your `build.sbt` file:
+To use the Logging Service without using the framework, add this to your `build.sbt` file:
 
 sbt
 :   @@@vars
@@ -151,7 +158,7 @@ All messages are logged by default as Json. Logs can contain following fields:
 
 @@@
 
-## Enable component logging
+## Enable Component Logging
 Component developers will have an instance of `LoggerFactory` available from `csw-framework`. This instance will already have a `componentName` set by `csw-framework` which will
 appear in log statements against `@componentName` tag. Next, to get the `Logger` from `LoggerFactory` use one of the following ways:  
 
@@ -181,7 +188,7 @@ The `LoggerFactory` can be changed to `JLoggerFactory` by using `asJava` method 
 
 @@@
 
-## Enable generic logging
+## Enable Generic Logging
 In case there is a need to log statements without `@componentName` tag, which can be due to unavailability of componentName in some utility code, then use the `GenericLoggerFactory`
 as follows:
 
@@ -207,7 +214,7 @@ Java Typed Actor
 
 `log` variable is now available in scala and java classes to write log statements as explained in next segment.
 
-## Log statements
+## Log Statements
 
 Logging statements are used very much like existing logging services such as log4j.  For Java, there is an additional way of writing log messages using Supplier methods (lambdas).  The use of lambdas is more efficient since the computations in a message (e.g. string concatenation) are not performed unless the message is actually being logged.  Therefore, these supplier methods should be used in cases where high performance is required (see [performance results below](#java-logging-string-vs-supplier-api-performance)).
 

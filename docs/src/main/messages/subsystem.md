@@ -1,6 +1,7 @@
 ## Subsystem
 
-TMT Observatory system is composed of many subsystems. The subsystems that are known participants in the TMT Software System are predefined and the list is covered under `Subsystem` enumeration. They are identified using a 3 letter abbreviation. 
+TMT Observatory system is composed of many subsystems. The subsystems that are known participants in the TMT Software System are predefined and the list is covered under the `Subsystem` enumeration. 
+They are identified using a 3 or 4 letter abbreviation. 
 
 **Susbsystem** values are used to construct **[Prefix](commands.html#Prefix)** and are used in communication vehicles such as Commands, Events and States.
 

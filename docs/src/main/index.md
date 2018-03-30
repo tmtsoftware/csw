@@ -6,7 +6,7 @@
  - [Working with Multiple Components](commons/multiple-components.md)
  - [Messages](commons/messages.md)
  - [Framework](commons/framework.md)
- - [Command](commons/command.md)
+ - [Commands](commons/command.md)
  - [Services](commons/services.md)
  - [Applications](commons/apps.md)
  - [Testing](commons/testing.md)
@@ -14,23 +14,65 @@
  - [Manuals](commons/manuals.md)
 @@@
 
-## Documentation
-
 Common Software is the package of services and infrastructure software that integrates the TMT software systems.
 
 Visit [TMT website](http://www.tmt.org) to know more about Thirty Meter Telescope.
 
-### HTTP based services documentation can be found [here](swagger/index.html).
+## Common Software Architecture
 
-## OSW Architecture
+CSW is designed to support the Observing Mode-Oriented Architecture (OMOA). An observing mode is a well-defined 
+instrument observing task and an associated set of owned resources, procedures, and capabilities that implement the mode. 
+An example observing mode is: IRIS multi-filter integral field spectroscopy using the NFIRAOS adaptive optics unit 
+with AO laser guide star correction. An instrument will generally have several associated observing modes 
+for acquisition, science objects, and calibrations. Examples of observing mode resources could be an instrument’s hardware 
+devices, or the use of a larger system such as the Laser Guide Star Facility.
+
+OMOA structures the software as the layers in the following figure. Each layer contains components with specific responsibilities 
+described in the following sections. OMOA bypasses the use of standalone “subsystems” (large principal systems) 
+for a flatter system that requires less code and allows the software system for an observing mode to optionally 
+be more flexibly composed at run-time.
+
+![layers](./images/top/OMOALayers2.png)
+
+#### Layer 0 - Obseratory Hardware
+Layer 0 represents the actual hardware being controlled and the hardware controllers that interface the hardware to the computer systems.
+#### Layer 1 - Hardware Control Layer
+The lowest layer in the OMOA software system, the Hardware Control Layer, consists of all the controllable hardware that is available 
+for use by higher levels of software. A sea of similar software components called Hardware Control Daemons (HCD) at layer 1 
+controls the low-level hardware of the telescope, adaptive optics, and instruments.
+
+An HCD is similar to the device driver found in many systems. Each HCD is associated with a networked motion controller, a PLC/PAC, 
+or other low-level hardware controller present in Layer 0. Some hardware controllers will support multiple channels. 
+An HCD may support a highly cohesive, related set of functionality. 
+For instance, one motion controller with 8 axes might handle all the slow moving filters and gratings of an instrument. 
+In other cases, the channels of the controller hardware could be associated with unrelated devices. 
+If the hardware controller has multiple channels, the HCD supports access to all the channels and must multiplex 
+access to the controller and coordinate requests and replies among the clients.
+#### Layer 2 - Assembly Layer
+The Assembly Layer exists just above the Hardware Control Layer at Layer 2. Software at this layer consists 
+of components called Assemblies.
+In OMOA, an Assembly represents a device as a collection of hardware that makes sense at the user level. 
+Examples of instrument devices are a filter wheel, a deformable mirror, or a detector controller. 
+Assemblies often represent user-oriented devices in the software system, but it is not necessary that an Assembly control HCDs.
+#### Layer 3 - Sequencing Layer
+The Sequencing Layer is Layer 3 in the figure above. Components at this level are called Sequencers or Sequence Components because 
+they take complex descriptions of tasks and control and synchronize the actions of the Assemblies to accomplish the tasks.
+
+Sequence Components in this layer share a software interface that allows them to be plugged together to form the sequencing hierarchy 
+for a specific observing mode. Individual Sequencers can provide higher-level control of a set of distributed hardware (e.g., init). 
+Individual sequencers can be programmable using scripts. There can be one or many Sequence Components in an observing mode sequencer. 
+#### Layer 4 - Monitoring and Control Layer
+The Monitoring/Control Layer is the layer of software that contains the user interface programs that are used to observe with the telescope. 
+At TMT there will be graphical user interfaces for use by observers during observing. 
+These applications use the CSW services to control and monitor the system.
 
 ## CSW Services
 CSW or Common Software provides a shared software infrastructure based on a set of services and associated software for 
-integrating individual components in the large observatory software architecture. The client applications use a set of 
+integrating individual components in the large observatory software architecture. The components and client applications use a set of 
 loosely coupled services, each autonomous with a well-defined interface that hides the service implementation. It also   
 provides a standardized communication with the services.
   
-### @ref:[Location service](services/location.md)
+### @ref:[Location Service](services/location.md)
 The Location Service of TMT Common Software handles application, component, and service registration and discovery
 in the distributed TMT software system. When a component (i.e. an Sequencer, Assembly, or HCD) is initializing, it registers
 its name along with other information such as interface type and connection information to the
@@ -42,7 +84,7 @@ component. In this case the first component uses the Location Service to get inf
 the second component, and uses that information to make a connection. Discovered information
 might include a protocol (e.g., HTTP), interface type (e.g., command), or host and port.
 
-### @ref:[Configuration service](services/config.md)
+### @ref:[Configuration Service](services/config.md)
 The Configuration Service (CS) provides a centralized persistent store for “configuration files”
 used in the TMT Software System. In this context, a configuration file is a set of values
 describing state, initialization values, or other information useful to a component or set of
@@ -60,7 +102,7 @@ be lost. If the configuration of a component is inadvertently lost, it will be p
 restore to the most recently saved version or a default version.
 
 
-### @ref:[Logging service](services/logging.md)
+### @ref:[Logging Service](services/logging.md)
 Logging is the ability of a software component to output a message, usually for diagnostic
 purposes. TMT Common Software will provide a Logging Service. Logging should not be
 confused with “data logging”, which is usually collection of measured values. 
@@ -109,3 +151,4 @@ for running multiple components on a host machine.
 
 The framework also contains the structures that are common to components, such as commands and event structures.
 
+####HTTP-based services API documentation can be found [here](swagger/index.html).

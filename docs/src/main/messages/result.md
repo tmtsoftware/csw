@@ -1,6 +1,6 @@
 ## Result
 
-Components use **Results** to return results in the form of a **ParameterSet**. 
+Components use **Results** to return results in the form of a **ParameterSet**.
 
 Creating a Result requires:
 
