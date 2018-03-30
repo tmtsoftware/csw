@@ -17,6 +17,7 @@ class SubscribingActor(reporter: RateReporter, payloadSize: Int, printTaskRunner
   private val taskRunnerMetrics             = new TaskRunnerMetrics(context.system)
   private var endMessagesMissing            = numSenders
   private var correspondingSender: ActorRef = null // the Actor which send the Start message will also receive the report
+  private var publishers: List[ActorRef]    = Nil // the Actor which send the Start message will also receive the report
 
   import Messages._
 
@@ -36,21 +37,24 @@ class SubscribingActor(reporter: RateReporter, payloadSize: Int, printTaskRunner
 
   private def onEvent(event: Event): Unit = {
     event match {
-      case SystemEvent(_, _, `warmupEventName`, _, _) ⇒
-      case SystemEvent(_, _, `startEventName`, _, _)  ⇒ correspondingSender ! Start
-      case SystemEvent(_, _, `endEventName`, _, _) if endMessagesMissing > 1 ⇒
+      case SystemEvent(_, _, `warmupEvent`, _, _) ⇒
+      case SystemEvent(_, _, `startEvent`, _, _)  ⇒ correspondingSender ! Start
+      case SystemEvent(_, _, `endEvent`, _, _) if endMessagesMissing > 1 ⇒
         endMessagesMissing -= 1 // wait for End message from all senders
 
-      case SystemEvent(_, _, `endEventName`, _, _) ⇒
+      case SystemEvent(_, _, `endEvent`, _, _) ⇒
         if (printTaskRunnerMetrics)
           taskRunnerMetrics.printHistograms()
         correspondingSender ! EndResult(eventsReceived)
         context.stop(self)
 
-      case SystemEvent(id, _, `flowControlEventName`, _, paramSet) ⇒
-        val flowCtlId      = id.id.toInt
-        val burstStartTime = paramSet.head.value(0).asInstanceOf[Long]
-        correspondingSender ! FlowControl(flowCtlId, burstStartTime)
+      case event @ SystemEvent(_, _, `flowControlEvent`, _, _) ⇒
+        val flowCtlId      = event.eventId.id.toInt
+        val burstStartTime = event.get(flowctlKey).get.value(0)
+        val publisher      = event.get(publisherKey).get.value(0)
+
+        val sender = publishers.find(_.path.name.equalsIgnoreCase(publisher)).get
+        sender ! FlowControl(flowCtlId, burstStartTime)
 
       case Event.invalidEvent ⇒
       case _: Event           ⇒ report()
@@ -60,6 +64,8 @@ class SubscribingActor(reporter: RateReporter, payloadSize: Int, printTaskRunner
   def receive: PartialFunction[Any, Unit] = {
     case Init(corresponding) ⇒
       if (corresponding == self) correspondingSender = sender()
+
+      publishers = sender() :: publishers
       sender() ! Initialized
   }
 

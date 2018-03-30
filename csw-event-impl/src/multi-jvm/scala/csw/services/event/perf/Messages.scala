@@ -1,14 +1,14 @@
 package csw.services.event.perf
 
 import akka.actor.ActorRef
-import akka.testkit.JavaSerializable
+import csw.messages.TMTSerializable
 
 object Messages {
 
-  case class Init(correspondingReceiver: ActorRef)            extends JavaSerializable
-  case object Initialized                                     extends JavaSerializable
-  final case object Start                                     extends JavaSerializable
-  final case class EndResult(totalReceived: Long)             extends JavaSerializable
-  final case class FlowControl(id: Int, burstStartTime: Long) extends JavaSerializable
+  case class Init(correspondingReceiver: ActorRef)            extends TMTSerializable
+  case object Initialized                                     extends TMTSerializable
+  final case object Start                                     extends TMTSerializable
+  final case class EndResult(totalReceived: Long)             extends TMTSerializable
+  final case class FlowControl(id: Int, burstStartTime: Long) extends TMTSerializable
 
 }
