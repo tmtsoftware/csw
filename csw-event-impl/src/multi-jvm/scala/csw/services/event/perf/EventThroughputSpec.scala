@@ -1,60 +1,24 @@
 package csw.services.event.perf
 
-import java.util.concurrent.Executors
+import java.util.concurrent.{ExecutorService, Executors}
 
 import akka.actor._
 import akka.remote.testconductor.RoleName
 import akka.remote.testkit.MultiNodeConfig
 import akka.testkit._
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{Config, ConfigFactory}
 import csw.services.event.perf.Messages.Init
-import csw.services.logging.appenders.StdOutAppender
 import csw.services.logging.scaladsl.LoggingSystemFactory
 
 import scala.concurrent.duration._
 
 object EventThroughputSpec extends MultiNodeConfig {
-  val first  = role("first")
-  val second = role("second")
+  val first: RoleName  = role("first")
+  val second: RoleName = role("second")
 
-  val barrierTimeout = 5.minutes
+  val barrierTimeout: FiniteDuration = 5.minutes
 
-  val cfg = ConfigFactory.parseString(s"""
-     include "logging.conf"
-
-     # for serious measurements you should increase the totalMessagesFactor (20)
-     csw.test.EventThroughputSpec.totalMessagesFactor = 1.0
-     csw.test.EventThroughputSpec.actor-selection = off
-     akka {
-       loglevel = INFO
-       log-dead-letters = 100
-       # avoid TestEventListener
-       testconductor.barrier-timeout = ${barrierTimeout.toSeconds}s
-       actor {
-         provider = remote
-         serialize-creators = false
-         serialize-messages = false
-         allow-java-serialization = on
-
-         serializers {
-           kryo = "com.twitter.chill.akka.AkkaSerializer"
-         }
-         serialization-bindings {
-           "csw.messages.TMTSerializable" = kryo
-         }
-       }
-     }
-     akka.remote.default-remote-dispatcher {
-       fork-join-executor {
-         # parallelism-factor = 0.5
-         parallelism-min = 4
-         parallelism-max = 4
-       }
-       # Set to 10 by default. Might be worthwhile to experiment with.
-       # throughput = 100
-     }
-
-     """)
+  val cfg: Config = ConfigFactory.load()
 
   commonConfig(debugConfig(on = false).withFallback(cfg).withFallback(RemotingMultiNodeSpec.commonConfig))
 
@@ -79,18 +43,19 @@ abstract class EventThroughputSpec extends RemotingMultiNodeSpec(EventThroughput
 
   import EventThroughputSpec._
 
-  val totalMessagesFactor = system.settings.config.getDouble("csw.test.EventThroughputSpec.totalMessagesFactor")
-  val actorSelection      = system.settings.config.getBoolean("csw.test.EventThroughputSpec.actor-selection")
+  val totalMessagesFactor: Double = system.settings.config.getDouble("csw.test.EventThroughputSpec.totalMessagesFactor")
+  val actorSelection: Boolean     = system.settings.config.getBoolean("csw.test.EventThroughputSpec.actor-selection")
+  val batching: Boolean           = system.settings.config.getBoolean("csw.test.EventThroughputSpec.batching")
 
   var plot = PlotResult()
 
-  LoggingSystemFactory.start("", "", "", system).setAppenders(List(StdOutAppender))
+  LoggingSystemFactory.start("perf", "", "", system)
 
   def adjustedTotalMessages(n: Long): Long = (n * totalMessagesFactor).toLong
 
-  override def initialParticipants = roles.size
+  override def initialParticipants: Int = roles.size
 
-  lazy val reporterExecutor = Executors.newFixedThreadPool(1)
+  lazy val reporterExecutor: ExecutorService = Executors.newFixedThreadPool(1)
   def reporter(name: String): TestRateReporter = {
     val r = new TestRateReporter(name)
     reporterExecutor.execute(r)
@@ -114,36 +79,36 @@ abstract class EventThroughputSpec extends RemotingMultiNodeSpec(EventThroughput
   }
 
   val scenarios = List(
-    TestSettings(testName = "warmup",
-                 totalMessages = adjustedTotalMessages(10000),
-                 burstSize = 1000,
-                 payloadSize = 100,
-                 senderReceiverPairs = 1),
     TestSettings(testName = "1-to-1",
-                 totalMessages = adjustedTotalMessages(50000),
+                 totalMessages = adjustedTotalMessages(20000),
                  burstSize = 1000,
                  payloadSize = 100,
-                 senderReceiverPairs = 1),
+                 senderReceiverPairs = 1,
+                 batching),
     TestSettings(testName = "1-to-1-size-1k",
-                 totalMessages = adjustedTotalMessages(50000),
+                 totalMessages = adjustedTotalMessages(20000),
                  burstSize = 1000,
                  payloadSize = 1000,
-                 senderReceiverPairs = 1),
+                 senderReceiverPairs = 1,
+                 batching),
     TestSettings(testName = "1-to-1-size-10k",
                  totalMessages = adjustedTotalMessages(20000),
                  burstSize = 1000,
                  payloadSize = 10000,
-                 senderReceiverPairs = 1),
+                 senderReceiverPairs = 1,
+                 batching),
     TestSettings(testName = "5-to-5",
                  totalMessages = adjustedTotalMessages(20000),
                  burstSize = 200,
                  payloadSize = 100,
-                 senderReceiverPairs = 5),
+                 senderReceiverPairs = 5,
+                 batching),
     TestSettings(testName = "10-to-10",
-                 totalMessages = adjustedTotalMessages(10000),
-                 burstSize = 1000,
+                 totalMessages = adjustedTotalMessages(20000),
+                 burstSize = 100,
                  payloadSize = 100,
-                 senderReceiverPairs = 10)
+                 senderReceiverPairs = 10,
+                 batching)
   )
 
   def test(testSettings: TestSettings, resultReporter: BenchmarkFileReporter): Unit = {

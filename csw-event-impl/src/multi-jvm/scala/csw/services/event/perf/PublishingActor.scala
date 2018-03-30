@@ -1,10 +1,11 @@
 package csw.services.event.perf
 
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeUnit.NANOSECONDS
 
 import akka.actor._
-import akka.stream.{ActorMaterializer, ThrottleMode}
 import akka.stream.scaladsl.{Sink, Source}
+import akka.stream.{ActorMaterializer, ThrottleMode}
 import csw.messages.events.EventName
 import csw.services.event.RedisFactory
 import csw.services.event.internal.commons.Wiring
@@ -15,7 +16,7 @@ import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar
 
 import scala.concurrent.Await
-import scala.concurrent.duration.DurationInt
+import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
 class PublishingActor(
     target: Target,
@@ -27,14 +28,14 @@ class PublishingActor(
 ) extends Actor
     with MockitoSugar {
 
-  val numTargets = targets.length
+  val numTargets: Int = targets.length
 
   import testSettings._
-  val payload            = ("0" * testSettings.payloadSize).getBytes("utf-8")
-  var startTime          = 0L
-  var remaining          = totalMessages
-  var maxRoundTripMillis = 0L
-  val taskRunnerMetrics  = new TaskRunnerMetrics(context.system)
+  val payload: Array[Byte] = ("0" * testSettings.payloadSize).getBytes("utf-8")
+  var startTime            = 0L
+  var remaining: Long      = totalMessages
+  var maxRoundTripMillis   = 0L
+  val taskRunnerMetrics    = new TaskRunnerMetrics(context.system)
 
   var flowControlId      = 0
   var pendingFlowControl = Map.empty[Int, Int]
@@ -51,6 +52,12 @@ class PublishingActor(
   private val redisFactory = new RedisFactory(redisClient, mock[LocationService], wiring)
   private val publisher    = redisFactory.publisher(redisHost, redisPort)
 
+  val throttlingElements: Int = actorSystem.settings.config.getInt("csw.test.EventThroughputSpec.throttling.elements")
+  val throttlingDuration: FiniteDuration = {
+    val d = actorSystem.settings.config.getDuration("csw.test.EventThroughputSpec.throttling.per")
+    FiniteDuration(d.toNanos, TimeUnit.NANOSECONDS)
+  }
+
   def receive: Receive = {
     case Init        ⇒ targets.foreach(_.tell(Init(target.ref), self))
     case Initialized ⇒ runWarmup()
@@ -58,7 +65,7 @@ class PublishingActor(
 
   def runWarmup(): Unit = {
     sendBatch(warmup = true) // first some warmup
-    publisher.publish(makeEvent(startEventName))
+    publisher.publish(makeEvent(startEvent))
     context.become(warmup)
   }
 
@@ -66,8 +73,10 @@ class PublishingActor(
     case Start ⇒
       println("======================================")
       println(
-        s"${self.path.name}: Starting benchmark of $totalMessages messages with burst size " +
-        s"$burstSize and payload size $payloadSize"
+        s"${self.path.name}: Starting benchmark of $totalMessages messages with " +
+        s"${if (batching) s"burst size $burstSize"
+        else s"throttling of ${throttlingElements}msgs/${throttlingDuration.toSeconds}s"} " +
+        s"and payload size $payloadSize"
       )
 
       startTime = System.nanoTime
@@ -78,7 +87,6 @@ class PublishingActor(
       val t0 = System.nanoTime()
       sendBatch(warmup = false)
       sendFlowControl(t0)
-
   }
 
   def active: Receive = {
@@ -115,8 +123,7 @@ class PublishingActor(
         s"burst size $burstSize, " +
         s"payload size $payloadSize, " +
         s"total size ${totalSize(context.system)}, " +
-        s"$took ms to deliver $totalReceived messages, " +
-        s"Total events sent by publisher to subscribers: ${sent.mkString(",")}"
+        s"$took ms to deliver $totalReceived messages"
       )
 
       if (printTaskRunnerMetrics)
@@ -128,35 +135,56 @@ class PublishingActor(
   }
 
   def sendBatch(warmup: Boolean): Unit = {
-    val batchSize = math.min(remaining, burstSize)
 
-    Await.result(
-      Source(0 until batchSize.toInt)
-        .throttle(1000, 1.second, 1000, ThrottleMode.Shaping)
-        .map { counter ⇒
-          val id = counter % numTargets
-          sent(id) += 1
+    def event(counter: Int, id: Int) = {
+      if (warmup) makeEvent(warmupEvent, payload = payload)
+      else makeEvent(EventName(s"$testEvent.${id + 1}"), totalMessages - remaining + counter, payload)
+    }
 
-          if (warmup) makeEvent(warmupEventName, payload = payload)
-          else makeEvent(EventName(s"$eventName.${id + 1}"), totalMessages - remaining + counter, payload)
-        }
-        .map(publisher.publish)
-        .runWith(Sink.ignore),
-      5.minutes
-    )
+    val batchSize =
+      if (warmup) 1000
+      else if (batching) math.min(remaining, burstSize)
+      else totalMessages
 
-    remaining -= batchSize
+    if (batching) {
+      var i = 0
+      while (i < batchSize) {
+        val id = i % numTargets
+        sent(id) += 1
+
+        Await.result(publisher.publish(event(i, id)), 5.seconds)
+        i += 1
+      }
+      remaining -= batchSize
+    } else {
+
+      Await.result(
+        Source(0 until batchSize.toInt)
+          .throttle(throttlingElements, throttlingDuration, throttlingElements, ThrottleMode.Shaping)
+          .map { counter ⇒
+            val id = counter % numTargets
+            sent(id) += 1
+
+            event(counter, id)
+          }
+          .map(publisher.publish)
+          .runWith(Sink.ignore),
+        5.minutes
+      )
+
+      remaining -= totalMessages
+    }
   }
 
   def sendFlowControl(t0: Long): Unit = {
     if (remaining <= 0) {
       context.become(waitingForEndResult)
-      publisher.publish(makeEvent(endEventName))
+      publisher.publish(makeEvent(endEvent))
     } else {
       flowControlId += 1
       pendingFlowControl = pendingFlowControl.updated(flowControlId, targets.length)
-      val flowControlEvent = makeFlowCtlEvent(flowControlId, t0)
-      publisher.publish(flowControlEvent)
+      val flowControlEvent = makeFlowCtlEvent(flowControlId, t0, self.path.name)
+      Await.result(publisher.publish(flowControlEvent), 5.seconds)
     }
   }
 }

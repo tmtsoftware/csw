@@ -2,33 +2,38 @@ package csw.services.event.perf
 
 import csw.messages.events.{Event, EventKey, EventName, SystemEvent}
 import csw.messages.params.generics.Key
-import csw.messages.params.generics.KeyType.{ByteArrayKey, ByteKey, LongKey}
-import csw.messages.params.models.{ArrayData, Id, Prefix}
+import csw.messages.params.generics.KeyType.{ByteKey, LongKey, StringKey}
+import csw.messages.params.models.{Id, Prefix}
 
 object EventUtils {
-  val prefix               = Prefix("tcs.mobie.filter")
-  val eventName            = "move"
-  val eventKey             = s"${prefix.prefix}.$eventName"
-  val warmupEventName      = EventName("warmup")
-  val startEventName       = EventName("start")
-  val endEventName         = EventName("end")
-  val flowControlEventName = EventName("flowcontrol")
+  val prefix           = Prefix("tcs.mobie.filter")
+  val testEvent        = "move"
+  val eventKey         = s"${prefix.prefix}.$testEvent"
+  val warmupEvent      = EventName("warmup")
+  val startEvent       = EventName("start")
+  val endEvent         = EventName("end")
+  val flowControlEvent = EventName("flowcontrol")
 
-  private val flowctlKey: Key[Long]   = LongKey.make("flowctl")
-  private val byteArrayKey: Key[Byte] = ByteKey.make("byteKey")
+  val flowctlKey: Key[Long]     = LongKey.make("flowctl")
+  val byteKey: Key[Byte]        = ByteKey.make("byteKey")
+  val publisherKey: Key[String] = StringKey.make("pubKey")
 
   val eventKeys: Set[EventKey] =
     Set(
-      EventKey(s"${prefix.prefix}.$warmupEventName"),
-      EventKey(s"${prefix.prefix}.$flowControlEventName"),
-      EventKey(s"${prefix.prefix}.$startEventName"),
-      EventKey(s"${prefix.prefix}.$endEventName")
+      EventKey(s"${prefix.prefix}.$warmupEvent"),
+      EventKey(s"${prefix.prefix}.$flowControlEvent"),
+      EventKey(s"${prefix.prefix}.$startEvent"),
+      EventKey(s"${prefix.prefix}.$endEvent")
     )
 
   def makeEvent(name: EventName, id: Long = -1, payload: Array[Byte] = Array.emptyByteArray): Event =
-    SystemEvent(prefix, name).copy(eventId = Id(id.toString), paramSet = Set(byteArrayKey.set(payload)))
+    SystemEvent(prefix, name).copy(eventId = Id(id.toString), paramSet = Set(byteKey.set(payload)))
 
-  def makeFlowCtlEvent(id: Int, time: Long): Event =
-    SystemEvent(prefix, flowControlEventName).copy(eventId = Id(id.toString), paramSet = Set(flowctlKey.set(time)))
+  def makeFlowCtlEvent(id: Int, time: Long, name: String): Event =
+    SystemEvent(prefix, flowControlEvent)
+      .copy(
+        eventId = Id(id.toString),
+        paramSet = Set(flowctlKey.set(time), publisherKey.set(name))
+      )
 
 }
