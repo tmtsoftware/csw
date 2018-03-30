@@ -45,6 +45,7 @@ abstract class EventThroughputSpec extends RemotingMultiNodeSpec(EventThroughput
 
   val totalMessagesFactor: Double = system.settings.config.getDouble("csw.test.EventThroughputSpec.totalMessagesFactor")
   val actorSelection: Boolean     = system.settings.config.getBoolean("csw.test.EventThroughputSpec.actor-selection")
+  val batching: Boolean           = system.settings.config.getBoolean("csw.test.EventThroughputSpec.batching")
 
   var plot = PlotResult()
 
@@ -79,30 +80,35 @@ abstract class EventThroughputSpec extends RemotingMultiNodeSpec(EventThroughput
 
   val scenarios = List(
     TestSettings(testName = "1-to-1",
-                 totalMessages = adjustedTotalMessages(10000),
-                 burstSize = 10000,
+                 totalMessages = adjustedTotalMessages(20000),
+                 burstSize = 1000,
                  payloadSize = 100,
-                 senderReceiverPairs = 1),
+                 senderReceiverPairs = 1,
+                 batching),
     TestSettings(testName = "1-to-1-size-1k",
-                 totalMessages = adjustedTotalMessages(10000),
-                 burstSize = 10000,
+                 totalMessages = adjustedTotalMessages(20000),
+                 burstSize = 1000,
                  payloadSize = 1000,
-                 senderReceiverPairs = 1),
+                 senderReceiverPairs = 1,
+                 batching),
     TestSettings(testName = "1-to-1-size-10k",
-                 totalMessages = adjustedTotalMessages(10000),
-                 burstSize = 10000,
+                 totalMessages = adjustedTotalMessages(20000),
+                 burstSize = 1000,
                  payloadSize = 10000,
-                 senderReceiverPairs = 1),
+                 senderReceiverPairs = 1,
+                 batching),
     TestSettings(testName = "5-to-5",
-                 totalMessages = adjustedTotalMessages(10000),
-                 burstSize = 10000,
+                 totalMessages = adjustedTotalMessages(20000),
+                 burstSize = 200,
                  payloadSize = 100,
-                 senderReceiverPairs = 5),
+                 senderReceiverPairs = 5,
+                 batching),
     TestSettings(testName = "10-to-10",
-                 totalMessages = adjustedTotalMessages(10000),
-                 burstSize = 10000,
+                 totalMessages = adjustedTotalMessages(20000),
+                 burstSize = 100,
                  payloadSize = 100,
-                 senderReceiverPairs = 10)
+                 senderReceiverPairs = 10,
+                 batching)
   )
 
   def test(testSettings: TestSettings, resultReporter: BenchmarkFileReporter): Unit = {

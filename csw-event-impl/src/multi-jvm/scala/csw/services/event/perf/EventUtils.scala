@@ -30,6 +30,10 @@ object EventUtils {
     SystemEvent(prefix, name).copy(eventId = Id(id.toString), paramSet = Set(byteKey.set(payload)))
 
   def makeFlowCtlEvent(id: Int, time: Long, name: String): Event =
-    SystemEvent(prefix, flowControlEvent).copy(eventId = Id(id.toString), paramSet = Set(flowctlKey.set(time)))
+    SystemEvent(prefix, flowControlEvent)
+      .copy(
+        eventId = Id(id.toString),
+        paramSet = Set(flowctlKey.set(time), publisherKey.set(name))
+      )
 
 }
