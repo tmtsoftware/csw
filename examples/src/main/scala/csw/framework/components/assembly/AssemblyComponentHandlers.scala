@@ -2,7 +2,7 @@ package csw.framework.components.assembly
 
 import java.nio.file.Paths
 
-import akka.actor.typed.ActorRef
+import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import csw.framework.exceptions.{FailureRestart, FailureStop}
@@ -198,6 +198,8 @@ class AssemblyComponentHandlers(
     val hcdConnection       = componentInfo.connections.find(connection ⇒ connection.componentId.componentType == ComponentType.HCD).get
 
     // #resolve-hcd-and-create-commandservice
+    implicit val system: ActorSystem[Nothing] = ctx.system
+
     val eventualCommandService: Future[CommandService] = locationService.resolve(hcdConnection.of[AkkaLocation], 5.seconds).map {
       case Some(hcdLocation: AkkaLocation) => new CommandService(hcdLocation)
       case _                               => throw HcdNotFoundException()
