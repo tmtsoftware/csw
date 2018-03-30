@@ -84,7 +84,16 @@ Java
 
 ### Unique Key constraint
 
-By choice, a ParameterSet in either **Setup, Observe,** or **Wait** command will be optimized to store only unique keys. In other words, trying to store multiple keys with same name, will be automatically optimized by removing duplicates.
+By choice, a ParameterSet in either **Setup, Observe,** or **Wait** command will be optimized to store only unique keys. 
+While using `add` or `madd` methods on commands to add new parameters, if the parameter being added has a key which is already present in the `paramSet`,
+then the already stored parameter will be replaced by the given parameter. 
+ 
+@@@ note
+
+If the `Set` is created by component developers and given directly while creating a command, then it will be the responsibility of component developers to maintain uniqueness with
+parameters based on key.
+
+@@@ 
 
 @@@ note
 
