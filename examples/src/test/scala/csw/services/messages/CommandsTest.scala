@@ -18,7 +18,6 @@ class CommandsTest extends FunSpec with Matchers {
   val obsId: ObsId = ObsId("Obs001")
   //#obsid
 
-
   describe("Examples of Prefix") {
     it("should show usage of utility functions") {
 
@@ -311,8 +310,8 @@ class CommandsTest extends FunSpec with Matchers {
   }
 
   describe("Examples of clone command") {
-    val k1          = KeyType.IntKey.make("itest")
-    val commandName = CommandName("command-name")
+    val k1             = KeyType.IntKey.make("itest")
+    val commandName    = CommandName("command-name")
     val prefix: Prefix = Prefix("wfos.red.detector")
 
     val i1 = k1.set(1, 2, 3).withUnits(degree)

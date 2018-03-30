@@ -45,14 +45,14 @@ class FailureTest extends FunSuite with Matchers with MockitoSugar with BeforeAn
     redis.stop()
   }
 
-  test("failure in redis publishing") {
+  test("failure in redis publishing should fail future with PublishFailed exception") {
+
     publisher.publish(Utils.makeEvent(1)).await
 
-    redis.stop()
+    publisher.shutdown().await
 
     intercept[PublishFailed] {
       publisher.publish(Utils.makeEvent(2)).await
     }
   }
-
 }
