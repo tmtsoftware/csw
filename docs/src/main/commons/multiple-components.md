@@ -1,52 +1,67 @@
 # Multiple Components
 
-Deploying multiple components (in Container), and having them communicate with each other. This tutorial discusses constructing an Assembly.
+In this part of the tutorial, we will demonstrate functionality involving multiple components.  
+We will do this by creating an Assembly, demonstrating how to deploy start the Assembly and an HCD in a container, and 
+having them communicate with each other.
 
 ## Creating an Assembly
 
-To create an assembly, the component developer needs to implement the `ComponentHandlers`. More details about implementing ComponentHandlers can be found @ref:[here](./create-component.md#handlers). 
+Similar to the HCD in the previous page, to create an assembly, the component developer needs to implement the `ComponentHandlers`. More details about implementing ComponentHandlers can be found @ref:[here](./create-component.md#handlers). 
 
 ## Component Configuration (ComponentInfo)
 
-A component configuration contains details needed to spawn a component. This configuration resides in a configuration file
-for a particular component. An example for an Assembly is below:
+Also similar  to the HCD, we will need to create a ComponentInfo file for the Assembly.  The following shows an example 
+ComponentInfo file for an Assembly:
 
 ```
-{
-    name = "Laser"
+name = "GalilAssembly"
+componentType = assembly
+behaviorFactoryClassName = "org.tmt.nfiraos.galilassembly.GalilAssemblyBehaviorFactory"
+prefix = "galil.assembly"
+locationServiceUsage = RegisterAndTrackServices
+connections = [
+  {
+    name: "GalilHcd"
+    componentType: hcd
+    connectionType: akka
+  }
+]
+```
+Note that there is a section for listing connections.   These are the connections that the component will automatically track, and can be other components or services.
+When available, it may make sense to track things like the Event Service.  These connections can also be specified for HCDs, but of course, the should not have any component dependencies.
+
+The above show a configuration file for running in standalone mode.  If we want to run both the assembly and HCD in a container, the file would look like this:
+
+```
+name = "GalilAssemblyContainer"
+components: [
+  {
+    name = "GalilAssembly"
     componentType = assembly
-    behaviorFactoryClassName = csw.common.components.framework.SampleComponentBehaviorFactory
-    prefix = tcs.mobie.blue.filter
+    behaviorFactoryClassName = "org.tmt.nfiraos.galilassembly.GalilAssemblyBehaviorFactory"
+    prefix = "galil.assembly"
     locationServiceUsage = RegisterAndTrackServices
     connections = [
       {
-        name: Motion_Controller
-        componentType: hcd
-        connectionType: akka
-      },
-      {
-        name: Galil
-        componentType: hcd
-        connectionType: akka
-      },
-      {
-        name: Eton
+        name: "GalilHcd"
         componentType: hcd
         connectionType: akka
       }
     ]
-}
+  },
+  {
+    name = "GalilHcd"
+    componentType = hcd
+    behaviorFactoryClassName = "org.tmt.nfiraos.galilhcd.GalilHcdBehaviorFactory"
+    prefix = "galil.hcd"
+    locationServiceUsage = RegisterOnly
+  }
+]
 ```
-
-@@@ note { title=Note }
-
-The Assembly has multiple `connections` to HCDs that it will track in its life span.
-
-@@@
 
 More details about each configuration and its significance can be found @ref:[here](./create-component.md#component-configuration-componentinfo-).
 
-A sample configuration file can be found [here](https://github.com/tmtsoftware/csw-prod/blob/master/csw-benchmark/src/main/resources/container.conf).  
+Another sample container configuration file can be found [here](https://github.com/tmtsoftware/csw-prod/blob/master/csw-benchmark/src/main/resources/container.conf).  
 
 ## Tracking Dependencies
 
@@ -54,9 +69,9 @@ The connections that are defined in the configuration file for an assembly will 
 
 ```
 {
-  name: Eton
-  componentType: hcd
-  connectionType: akka
+    name: "GalilHcd"
+    componentType: hcd
+    connectionType: akka
 }
 ``` 
 
@@ -73,7 +88,7 @@ More details about tracking a component using the location service can be found 
  
 ### onLocationTrackingEvent Handler
 
-For all the tracked connections, whenever a location is changed, one of the following events is generated:
+For all the tracked connections, whenever a location is changed, added, or removed, one of the following events is generated:
 
 -   LocationUpdated: a location was added or changed
 -   LocationRemoved: a location is no longer available on the network
@@ -97,7 +112,29 @@ hook of `ComponentHandlers`.
 
 ## Sending Commands
 
-If a component wants to send a command to another component, it may use a `CommandService` instance. The creation of a`CommandService` instance and its usage can be found
+From the location information obtained either by tracking dependencies or manually resolving a location, a `CommandService` instance
+can be created to provide a command interface to the component.
+
+```
+implicit val actorSystem = ctx.system
+val hcd = locationService.resolve(hcd.of[AkkaLocation], 5.seconds).map {
+    case hcdLocation: Some(AkkaLocation) => new CommandService(hcdLocation)
+    case _ => throw HcdNotFoundException()
+}
+```
+
+or in Java:
+```java
+JCommandService hcd;
+CompletableFuture<Optional<AkkaLocation>> resolve = locationService.resolve(mayBeConnection.get().<AkkaLocation>of(), FiniteDuration.apply(5, TimeUnit.SECONDS));
+Optional<AkkaLocatoin> resolveHcd = resolve.get();
+if(resolvedHcd.isPresent())
+    hcd = new JCommandService(hcdLocation.get(), ctx.getSystem());
+else
+    throw new HcdNotFoundException();
+```
+
+If a component wants to send a command to another component, it uses a `CommandService` instance. The creation of a`CommandService` instance and its usage can be found
 @ref:[here](./command.md#commandservice).
 
 If a component wants to send multiple commands in response to a single received command, then it can use a `CommandDistributor` instance. The CommandDistributor will help in

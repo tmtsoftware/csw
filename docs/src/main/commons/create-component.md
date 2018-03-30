@@ -86,18 +86,16 @@ Component configuration contains details needed to spawn a component. This confi
 for a particular component. The sample for HCD is as follows:
 
 ```
-{
-    name = "Motion_Controller"
-    componentType = hcd
-    behaviorFactoryClassName = tcs.hcd.SampleComponentBehaviorFactory
-    prefix = tcs.mobie.blue.filter
-    locationServiceUsage = RegisterOnly
-}
+name = "GalilHcd"
+componentType = hcd
+behaviorFactoryClassName = "org.tmt.nfiraos.galilhcd.GalilHcdBehaviorFactory"
+prefix = "galil.hcd"
+locationServiceUsage = RegisterOnly
 ``` 
 
 @@@ note { title=Note }
 
-`behaviorFactoryClassName` refers to class name of the concrete implementation of `ComponentBehaviorFactory`, which is `SampleComponentBehaviorFactory` in above sample.
+`behaviorFactoryClassName` refers to class name of the concrete implementation of `ComponentBehaviorFactory`, which is `GalilHcdBehaviorFactory` in above example.
 
 @@@
 
