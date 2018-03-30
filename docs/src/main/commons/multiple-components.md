@@ -1,3 +1,4 @@
+
 # Multiple Components
 
 In this part of the tutorial, we will demonstrate functionality involving multiple components.  
@@ -6,11 +7,12 @@ having them communicate with each other.
 
 ## Creating an Assembly
 
-Similar to the HCD in the previous page, to create an assembly, the component developer needs to implement the `ComponentHandlers`. More details about implementing ComponentHandlers can be found @ref:[here](./create-component.md#handlers). 
+Similar to the HCD in the previous page, to create an assembly, the component developer needs to implement the `ComponentHandlers`.
+More details about implementing ComponentHandlers can be found @ref:[here](./create-component.md#handlers). 
 
 ## Component Configuration (ComponentInfo)
 
-Also similar  to the HCD, we will need to create a ComponentInfo file for the Assembly.  The following shows an example 
+Also similar  to the HCD, we will need to create a ComponentInfo file for the Assembly. The following shows an example of 
 ComponentInfo file for an Assembly:
 
 ```
@@ -27,10 +29,15 @@ connections = [
   }
 ]
 ```
-Note that there is a section for listing connections.   These are the connections that the component will automatically track, and can be other components or services.
-When available, it may make sense to track things like the Event Service.  These connections can also be specified for HCDs, but of course, the should not have any component dependencies.
 
-The above show a configuration file for running in standalone mode.  If we want to run both the assembly and HCD in a container, the file would look like this:
+@@@ note { title=Note }
+
+There is a section for listing connections. These are the connections that the component will automatically track, and can be other components or services.
+When available, it may make sense to track things like the Event Service. These connections can also be specified for HCDs, but of course, they should not have any component dependencies.
+
+@@@
+
+The above shows a configuration file for running in standalone mode.  If we want to run both the assembly and HCD in a container, the file would look like this:
 
 ```
 name = "GalilAssemblyContainer"
@@ -115,24 +122,12 @@ hook of `ComponentHandlers`.
 From the location information obtained either by tracking dependencies or manually resolving a location, a `CommandService` instance
 can be created to provide a command interface to the component.
 
-```
-implicit val actorSystem = ctx.system
-val hcd = locationService.resolve(hcd.of[AkkaLocation], 5.seconds).map {
-    case hcdLocation: Some(AkkaLocation) => new CommandService(hcdLocation)
-    case _ => throw HcdNotFoundException()
-}
-```
+Scala
+:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/AssemblyComponentHandlers.scala) { #resolve-hcd-and-create-commandservice }
 
-or in Java:
-```java
-JCommandService hcd;
-CompletableFuture<Optional<AkkaLocation>> resolve = locationService.resolve(mayBeConnection.get().<AkkaLocation>of(), FiniteDuration.apply(5, TimeUnit.SECONDS));
-Optional<AkkaLocatoin> resolveHcd = resolve.get();
-if(resolvedHcd.isPresent())
-    hcd = new JCommandService(hcdLocation.get(), ctx.getSystem());
-else
-    throw new HcdNotFoundException();
-```
+Java
+:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JAssemblyComponentHandlers.java) { #resolve-hcd-and-create-commandservice }
+
 
 If a component wants to send a command to another component, it uses a `CommandService` instance. The creation of a`CommandService` instance and its usage can be found
 @ref:[here](./command.md#commandservice).

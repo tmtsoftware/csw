@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 
@@ -93,7 +94,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
         // required worker actors required by this assembly
         return mayBeConnection.map(connection ->
                 worker.thenAcceptBoth(resolveHcd(), (workerActor, hcdLocation) -> {
-                    if(!hcdLocation.isPresent())
+                    if (!hcdLocation.isPresent())
                         throw new HcdNotFoundException();
                     else
                         runningHcds.put(connection, Optional.of(new JCommandService(hcdLocation.get(), ctx.getSystem())));
@@ -193,12 +194,11 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
                 // subscribe to the status of original command received and publish the state when its status changes to
                 // Completed
                 commandResponseManager.jSubscribe(subCommand.runId(), commandResponse -> {
-                    if(commandResponse.resultType() instanceof CommandResponse.Completed) {
+                    if (commandResponse.resultType() instanceof CommandResponse.Completed) {
                         Key<String> stringKey = JKeyTypes.StringKey().make("sub-command-status");
                         CurrentState currentState = new CurrentState(sc.source().prefix());
                         currentStatePublisher.publish(currentState.madd(stringKey.set("complete")));
-                    }
-                    else {
+                    } else {
                         // do something
                     }
                 });
@@ -210,14 +210,13 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
                 JCommandService componentCommandService = runningHcds.get(componentInfo.getConnections().get(0)).get();
                 componentCommandService.subscribe(subCommand2.runId(), Timeout.durationToTimeout(FiniteDuration.apply(5, TimeUnit.SECONDS)))
                         .thenAccept(commandResponse -> {
-                            if(commandResponse.resultType() instanceof CommandResponse.Completed) {
+                            if (commandResponse.resultType() instanceof CommandResponse.Completed) {
                                 // As the commands get completed, the results are updated in the commandResponseManager
                                 commandResponseManager.updateSubCommand(subCommand2.runId(), commandResponse);
-                            }
-                            else {
+                            } else {
                                 // do something
                             }
-                });
+                        });
                 //#updateSubCommand
 
                 //#query-command-response-manager
@@ -266,7 +265,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     /**
      * Below methods are just here to show how exceptions can be used to either restart or stop supervisor
      * This are snipped in paradox documentation
-     * */
+     */
 
     // #failureRestart-Exception
     class HcdNotFoundException extends FailureRestart {
@@ -283,16 +282,15 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
 
         // If an Hcd is found as a connection, resolve its location from location service and create other
         // required worker actors required by this assembly
-        if(mayBeConnection.isPresent()) {
+        if (mayBeConnection.isPresent()) {
             CompletableFuture<Optional<AkkaLocation>> resolve = locationService.resolve(mayBeConnection.get().<AkkaLocation>of(), FiniteDuration.apply(5, TimeUnit.SECONDS));
             return resolve.thenCompose((Optional<AkkaLocation> resolvedHcd) -> {
-                if(resolvedHcd.isPresent())
+                if (resolvedHcd.isPresent())
                     return CompletableFuture.completedFuture(resolvedHcd);
                 else
                     throw new ConfigNotAvailableException();
             });
-        }
-        else
+        } else
             return CompletableFuture.completedFuture(Optional.empty());
     }
     // #failureRestart-Exception
@@ -314,4 +312,24 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     }
     // #failureStop-Exception
 
+    private JCommandService hcd = null;
+    private void resolveHcdAndCreateCommandService() throws ExecutionException, InterruptedException {
+
+        TypedConnection<AkkaLocation> hcdConnection = componentInfo.getConnections().stream()
+                .filter(connection -> connection.componentId().componentType() == JComponentType.HCD)
+                .findFirst().get().<AkkaLocation>of();
+
+        // #resolve-hcd-and-create-commandservice
+        CompletableFuture<Optional<AkkaLocation>> resolvedHcdLocation = locationService.resolve(hcdConnection, FiniteDuration.apply(5, TimeUnit.SECONDS));
+
+        CompletableFuture<JCommandService> eventualCommandService = resolvedHcdLocation.thenApply((Optional<AkkaLocation> hcdLocation) -> {
+            if (hcdLocation.isPresent())
+                return new JCommandService(hcdLocation.get(), ctx.getSystem());
+            else
+                throw new HcdNotFoundException();
+        });
+
+        eventualCommandService.thenAccept((jcommandService) -> hcd = jcommandService);
+        // #resolve-hcd-and-create-commandservice
+    }
 }

@@ -167,8 +167,8 @@ class AssemblyComponentHandlers(
     maybeConnection match {
       case Some(hcd) ⇒
         locationService.resolve(hcd.of[AkkaLocation], 5.seconds).map {
-          case Some(akkaLocation) ⇒ Some(akkaLocation)
-          case None               ⇒
+          case loc @ Some(akkaLocation) ⇒ loc
+          case None                     ⇒
             // Hcd connection could not be resolved for this Assembly. One option to handle this could be to automatic restart which can give enough time
             // for the Hcd to be available
             throw HcdNotFoundException()
@@ -193,4 +193,19 @@ class AssemblyComponentHandlers(
   }
   // #failureStop-Exception
 
+  private def resolveHcdAndCreateCommandService(): Unit = {
+    var hcd: CommandService = null
+    val hcdConnection       = componentInfo.connections.find(connection ⇒ connection.componentId.componentType == ComponentType.HCD).get
+
+    // #resolve-hcd-and-create-commandservice
+    val eventualCommandService: Future[CommandService] = locationService.resolve(hcdConnection.of[AkkaLocation], 5.seconds).map {
+      case Some(hcdLocation: AkkaLocation) => new CommandService(hcdLocation)
+      case _                               => throw HcdNotFoundException()
+    }
+
+    eventualCommandService.foreach { commandService ⇒
+      hcd = commandService
+    }
+    // #resolve-hcd-and-create-commandservice
+  }
 }
