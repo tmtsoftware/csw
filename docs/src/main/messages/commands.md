@@ -2,6 +2,7 @@
 
 Commands are parameter sets called Setup, Observe, and Wait. A command is created with the source of the command, 
 given by a prefix, the name of the command, and an optional ObsId. Parameters are added to the command as needed.
+As the ESW design is developed, these command structures may evolve.
 
 ### ObsId
 
@@ -54,8 +55,7 @@ Java
  
 ### Observe Command
 
-This command describes a science observation. Sent only to Science Detector Assemblies and Sequencers. This
-commands will be more fully defined as part of ESW.
+This command describes a science observation. Sent only to Science Detector Assemblies and Sequencers.
 
 Scala
 :   @@snip [CommandsTest.scala](../../../../examples/src/test/scala/csw/services/messages/CommandsTest.scala) { #observe }
@@ -65,7 +65,7 @@ Java
 
 ### Wait Command
 
-This command causes a Sequencer to wait until notified. This command will be defined as part of ESW.
+This command causes a Sequencer to wait until notified.
 
 Scala
 :   @@snip [CommandsTest.scala](../../../../examples/src/test/scala/csw/services/messages/CommandsTest.scala) { #wait }
@@ -84,9 +84,9 @@ Java
 
 ### Unique Key constraint
 
-By choice, a ParameterSet in either **Setup, Observe,** or **Wait** command will be optimized to store only unique keys. 
-While using `add` or `madd` methods on commands to add new parameters, if the parameter being added has a key which is already present in the `paramSet`,
-then the already stored parameter will be replaced by the given parameter. 
+By design, a ParameterSet in a **Setup, Observe,** or **Wait** command is optimized to store only unique keys. 
+When using `add` or `madd` methods on commands to add new parameters, if the parameter being added has a key which is already present in the `paramSet`,
+the already stored parameter will be replaced by the given parameter. 
  
 @@@ note
 
@@ -94,12 +94,6 @@ If the `Set` is created by component developers and given directly while creatin
 parameters based on key.
 
 @@@ 
-
-@@@ note
-
-Parameters are stored in a Set, which is an unordered collection of items. Hence, it's not predictable whether first or last duplicate copy will be retained. Hence, cautiously avoid adding duplicate keys.
-
-@@@    
 
 Here are some examples that illustrate this point:
 
@@ -111,18 +105,9 @@ Java
 
 ### Cloning a command
 
-Every command that is sent must have a new, unique RunId. A `cloneCommand` method is available for all commands 
-which can be used to create a new command from existing parameters, but with a new RunId. 
-This is needed in the case where a Setup is defined once because it has no fields that change. Before submitting
-get a copy with a new RunId using `cloneCommand`. If a new Setup is created for each use, this command is not
-needed.
-
-@@@ note
-
-Any command that is sent needs to have a unique Id as this Id is the one against which the status of the command is 
-maintained at the recipient end. This Id can thus be used to query and subscribe the status of the respective command.
-
-@@@  
+In order to track the completion of a command, every command that is sent must have a unique RunId.
+If you wish to resubmit a previously sent Setup, the `cloneCommand` method must be used prior to submission
+to create a new command from existing parameters, but with a new RunId.
 
 Scala
 :   @@snip [CommandsTest.scala](../../../../examples/src/test/scala/csw/services/messages/CommandsTest.scala) { #clone-command }
