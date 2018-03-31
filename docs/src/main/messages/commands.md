@@ -103,7 +103,7 @@ Scala
 Java
 :   @@snip [JCommandsTest.java](../../../../examples/src/test/java/csw/services/messages/JCommandsTest.java) { #unique-key }
 
-### Cloning a command
+### Cloning a Command
 
 In order to track the completion of a command, every command that is sent must have a unique RunId.
 If you wish to resubmit a previously sent Setup, the `cloneCommand` method must be used prior to submission
@@ -116,7 +116,7 @@ Java
 :   @@snip [JCommandsTest.java](../../../../examples/src/test/java/csw/services/messages/JCommandsTest.java) { #clone-command }
 
 
-## Source code for examples
+## Source Code for Examples
 
 * @github[Scala Example](/examples/src/test/scala/csw/services/messages/CommandsTest.scala)
 * @github[Java Example](/examples/src/test/java/csw/services/messages/JCommandsTest.java)

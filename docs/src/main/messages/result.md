@@ -2,7 +2,7 @@
 
 Components use **Results** to return results in the form of a **ParameterSet**.
 
-Creating a Result requires:
+Creating a Result Requires:
 
  * **[Prefix](commands.html#Prefix)**
  * **[Set[Parameter]](keys-parameters.html)**
@@ -22,7 +22,7 @@ Scala
 Java
 :   @@snip [JResultTest.java](../../../../examples/src/test/java/csw/services/messages/JResultTest.java) { #json-serialization }
 
-### Unique Key constraint
+### Unique Key Constraint
 
 By choice, a ParameterSet in **Result** will be optimized to store only unique keys. In other words, trying to store multiple keys with same name, will be automatically optimized by removing duplicates.
 
@@ -40,7 +40,7 @@ Scala
 Java
 :   @@snip [JResultTest.java](../../../../examples/src/test/java/csw/services/messages/JResultTest.java) { #unique-key }
 
-## Source code for examples
+## Source Code for Examples
 
 * @github[Scala Example](/examples/src/test/scala/csw/services/messages/ResultTest.scala)
 * @github[Java Example](/examples/src/test/java/csw/services/messages/JResultTest.java)

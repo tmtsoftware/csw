@@ -52,5 +52,5 @@ Subsystems are made available via separate files, for consumption in Scala and J
 |  TEST           | Testing System |
 |  BAD            | Unknown/default Subsystem |
 
-### Usage examples
+### Usage Examples
 The usage examples can be found in [Events](events.html), [Commands](commands.html), [States](states.html)

@@ -13,13 +13,13 @@ units, and receiver can inspect the `Units` to make a decision on how to handle 
 A **ParameterSet** is a Set of `Parameter`. Various other message types include a `ParameterSet` (e.g. Setup, Event). 
 A key is **unique** in a `ParameterSet` since it is a Set. 
 
-### How to create a Parameter
+### How to Create a Parameter
  
  * choose an appropriate KeyType from below tables for your language(Scala/Java).    
  * calling the `make` method on KeyType and supplying a String keyName will return a suitably typed Key instance.    
  * explore the overloaded `set` and `->` methods, which will allow you to store values of the based on chosen KeyType. e.g. `JKeyTypes.BooleanKey` will allow storing only `java.lang.Boolean` values.
  
-### Primitive datatypes
+### Primitive Datatypes
 
 | Primitive       | Scala KeyType               | Java KeyType                   |
 | :-------------: |:--------------------------: | :-----------------------------:| 
@@ -115,7 +115,7 @@ Scala
 Java
 :   @@snip [JKeysAndParametersTest.java](../../../../examples/src/test/java/csw/services/messages/JKeysAndParametersTest.java) { #struct }
 
-## Source code for examples
+## Source Code for Examples
 
 * @github[Scala Example](/examples/src/test/scala/csw/services/messages/KeysAndParametersTest.scala)
 * @github[Java Example](/examples/src/test/java/csw/services/messages/JKeysAndParametersTest.java)

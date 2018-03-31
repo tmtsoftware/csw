@@ -42,7 +42,7 @@ Java
 :   @@snip [JEventsTest.java](../../../../examples/src/test/java/csw/services/messages/JEventsTest.java) { #systemevent }
 
 
-### JSON serialization
+### JSON Serialization
 Events can be serialized to JSON. The library has provided **JsonSupport** helper class and methods to serialize Status, Observe and System events.
 
 Scala
@@ -51,7 +51,7 @@ Scala
 Java
 :   @@snip [JEventsTest.java](../../../../examples/src/test/java/csw/services/messages/JEventsTest.java) { #json-serialization }
 
-### Unique Key constraint
+### Unique Key Constraint
 
 By choice, a ParameterSet in either **ObserveEvent** or **SystemEvent** event will be optimized to store only unique keys. 
 While using `add` or `madd` methods on events to add new parameters, if the parameter being added has a key which is already present in the `paramSet`,
@@ -94,7 +94,7 @@ Scala
 Java
 :   @@snip [JEventsTest.java](../../../../examples/src/test/java/csw/services/messages/JEventsTest.java) { #protobuf }
 
-## Source code for examples
+## Source Code for Examples
 
 * @github[Scala Example](/examples/src/test/scala/csw/services/messages/EventsTest.scala)
 * @github[Java Example](/examples/src/test/java/csw/services/messages/JEventsTest.java)
