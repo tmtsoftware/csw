@@ -109,7 +109,7 @@ Scala
 Java
 :   @@snip [JCommandsTest.java](../../../../examples/src/test/java/csw/services/messages/JCommandsTest.java) { #unique-key }
 
-### Cloning a command
+### Cloning a Command
 
 Every command that is sent must have a new, unique RunId. A `cloneCommand` method is available for all commands 
 which can be used to create a new command from existing parameters, but with a new RunId. 
@@ -131,7 +131,7 @@ Java
 :   @@snip [JCommandsTest.java](../../../../examples/src/test/java/csw/services/messages/JCommandsTest.java) { #clone-command }
 
 
-## Source code for examples
+## Source Code for Examples
 
 * @github[Scala Example](/examples/src/test/scala/csw/services/messages/CommandsTest.scala)
 * @github[Java Example](/examples/src/test/java/csw/services/messages/JCommandsTest.java)

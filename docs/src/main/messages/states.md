@@ -1,4 +1,4 @@
-## State variables
+## State Variables
 
 A states represent a component's internal state. There are two types called `CurrentState` and `DemandState`. 
 They both share the same structural features. All state variables have **[Prefix](commands.html#Prefix)** and **ParameterSet**.
@@ -27,7 +27,7 @@ Java
 :   @@snip [JStateVariablesTest.java](../../../../examples/src/test/java/csw/services/messages/JStateVariablesTest.java) { #currentstate }
 
 
-### JSON serialization
+### JSON Serialization
 State variables can be serialized to JSON. The library has provided **JsonSupport** helper class and methods to serialize DemandState and CurrentState.
 
 Scala
@@ -36,7 +36,7 @@ Scala
 Java
 :   @@snip [JStateVariablesTest.java](../../../../examples/src/test/java/csw/services/messages/JStateVariablesTest.java) { #json-serialization }
 
-### Unique Key constraint
+### Unique Key Constraint
 
 By choice, a ParameterSet in either **DemandState** or **CurrentState** will be optimized to store only unique keys. In other words, trying to store multiple keys with same name, will be automatically optimized by removing duplicates.
 
@@ -54,7 +54,7 @@ Scala
 Java
 :   @@snip [JStateVariablesTest.java](../../../../examples/src/test/java/csw/services/messages/JStateVariablesTest.java) { #unique-key }
 
-## Source code for examples
+## Source Code for Examples
 
 * @github[Scala Example](/examples/src/test/scala/csw/services/messages/StateVariablesTest.scala)
 * @github[Java Example](/examples/src/test/java/csw/services/messages/JStateVariablesTest.java)
