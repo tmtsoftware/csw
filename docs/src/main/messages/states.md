@@ -1,5 +1,8 @@
 ## State Variables
 
+These state variables are used when an Assembly wants to track the status of a command sent to an HCD using
+a matcher.  For more information, see [Publishing State](../framework/publishing-state.md).
+
 A states represent a component's internal state. There are two types called `CurrentState` and `DemandState`. 
 They both share the same structural features. All state variables have **[Prefix](commands.html#Prefix)** and **ParameterSet**.
 
@@ -38,11 +41,14 @@ Java
 
 ### Unique Key Constraint
 
-By choice, a ParameterSet in either **DemandState** or **CurrentState** will be optimized to store only unique keys. In other words, trying to store multiple keys with same name, will be automatically optimized by removing duplicates.
-
+By design, a ParameterSet in either **DemandState** or **CurrentState** will be optimized to store only unique keys.
+When using `add` or `madd` methods on events to add new parameters, if the parameter being added has a key which is already present in the `paramSet`,
+the already stored parameter will be replaced by the given parameter. 
+ 
 @@@ note
 
-Parameters are stored in a Set, which is an unordered collection of items. Hence, it's not predictable whether first or last duplicate copy will be retained. Hence, cautiously avoid adding duplicate keys.
+If the `Set` is created by component developers and given directly while creating an event, then it will be the responsibility of component developers to maintain uniqueness with
+parameters based on key.
 
 @@@    
 

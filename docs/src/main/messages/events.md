@@ -54,8 +54,8 @@ Java
 ### Unique Key Constraint
 
 By choice, a ParameterSet in either **ObserveEvent** or **SystemEvent** event will be optimized to store only unique keys. 
-While using `add` or `madd` methods on events to add new parameters, if the parameter being added has a key which is already present in the `paramSet`,
-then the already stored parameter will be replaced by the given parameter. 
+When using `add` or `madd` methods on events to add new parameters, if the parameter being added has a key which is already present in the `paramSet`,
+the already stored parameter will be replaced by the given parameter. 
  
 @@@ note
 
