@@ -34,5 +34,4 @@ class RedisFactory(redisClient: RedisClient, locationService: LocationService, w
     val uri: URI = await(eventServiceResolver.uri)
     subscriber(uri.getHost, uri.getPort)
   }
-
 }
