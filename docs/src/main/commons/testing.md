@@ -4,13 +4,14 @@ This page will help you getting started with testing your applications.
 
 ## Unit Tests
 
-The goal of unit testing is to segregate smallest testable units of your application and test that it is working correctly. 
-It is always good idea to write more number of unit test cases and relatively less component and integration tests.
+The goal of unit testing is to break you application into the smallest testable units, and test them individually, isolating 
+a specific piece of functionality and ensuring it is working correctly. 
+It is always good idea to write more unit test cases and relatively fewer component and integration tests.
 If you want to get an idea of how many tests you should have in different types of testing phases (Unit/Component/Integration), refer this [blog](https://martinfowler.com/articles/practical-test-pyramid.html)
 
-Unit testing simple scala/java classes or objects is straight forward. You can mock external dependencies using Mockito. Refer [Mockito](#mockito) section for more details. 
+Unit testing simple scala/java classes or objects is straight forward. You can mock external dependencies using Mockito. Refer to the [Mockito](#mockito) section for more details. 
 
-Follow below guides for testing your application which uses different modules of akka:
+The folloowing links provide guides for testing applications using different modules of Akka:
 
 - [Akka Untyped Actors](https://doc.akka.io/docs/akka/current/testing.html)
 - [Akka Typed Actors](https://doc.akka.io/docs/akka/current/typed/testing.html)
@@ -18,10 +19,10 @@ Follow below guides for testing your application which uses different modules of
 
 ## Acceptance Tests
 
-This section explains how and where csw-prod maintains and execute acceptance tests. 
+This section explains how and where csw-prod maintains and executes acceptance tests. 
 If you are a component writer and want to maintain acceptance tests, you can create a repo similar to [csw-acceptance](https://github.com/tmtsoftware/csw-acceptance) and update dependencies, projects as per your need. 
 
-As part of acceptance tests, we run all the existing java and scala tests from [csw-prod](https://github.com/tmtsoftware/csw-prod) repo on published bintray binaries rather than directly on source code.
+As required by TMT Systems Engineering, the acceptance pipeline runs all the existing Java and Scala tests from [csw-prod](https://github.com/tmtsoftware/csw-prod) repo on published bintray binaries rather than directly on source code.
 
 More information can be found [here](https://github.com/tmtsoftware/csw-acceptance/blob/master/README.md).
 
