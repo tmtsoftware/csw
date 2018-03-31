@@ -22,15 +22,7 @@ two types of messages:
 * **Submit** - A command is sent as Submit when the result of completion is desired.
 * **Oneway** - A command is sent as Oneway when the result of completion is not desired.
 
-A `Oneway` should only be used between an Assembly and an HCD, when it is known that no long-running actions need
-to be tracked.
-
-@@@ note { title=Note }
-
-The `Oneway` command may be removed in an update since it's behavior has been subsumed by Immediate Completion with submit.
-
-@@@ 
-
+A `Oneway` should only be used between an Assembly and an HCD.  It is also used when tracking completion using a Matcher (see below).
 
 The following responses can be received as a `CommandResponse` after sending a command with `Submit` or `Oneway`:
 
