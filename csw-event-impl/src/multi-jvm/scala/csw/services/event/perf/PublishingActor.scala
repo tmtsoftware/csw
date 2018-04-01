@@ -65,7 +65,7 @@ class PublishingActor(
 
   def runWarmup(): Unit = {
     sendBatch(warmup = true) // first some warmup
-    publisher.publish(makeEvent(startEvent))
+    publisher.publish(event(startEvent))
     context.become(warmup)
   }
 
@@ -137,8 +137,8 @@ class PublishingActor(
   def sendBatch(warmup: Boolean): Unit = {
 
     def event(counter: Int, id: Int) = {
-      if (warmup) makeEvent(warmupEvent, payload = payload)
-      else makeEvent(EventName(s"$testEvent.${id + 1}"), totalMessages - remaining + counter, payload)
+      if (warmup) event(warmupEvent, payload = payload)
+      else event(EventName(s"$testEvent.${id + 1}"), totalMessages - remaining + counter, payload)
     }
 
     val batchSize =
@@ -179,11 +179,11 @@ class PublishingActor(
   def sendFlowControl(t0: Long): Unit = {
     if (remaining <= 0) {
       context.become(waitingForEndResult)
-      publisher.publish(makeEvent(endEvent))
+      publisher.publish(event(endEvent))
     } else {
       flowControlId += 1
       pendingFlowControl = pendingFlowControl.updated(flowControlId, targets.length)
-      val flowControlEvent = makeFlowCtlEvent(flowControlId, t0, self.path.name)
+      val flowControlEvent = flowCtlEvent(flowControlId, t0, self.path.name)
       Await.result(publisher.publish(flowControlEvent), 5.seconds)
     }
   }

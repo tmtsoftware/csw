@@ -8,15 +8,18 @@ import csw.messages.params.models.{Id, Prefix}
 object EventUtils {
   val prefix           = Prefix("tcs.mobie.filter")
   val testEvent        = "move"
-  val eventKey         = s"${prefix.prefix}.$testEvent"
+  val testEventKey     = s"${prefix.prefix}.$testEvent"
   val warmupEvent      = EventName("warmup")
   val startEvent       = EventName("start")
   val endEvent         = EventName("end")
   val flowControlEvent = EventName("flowcontrol")
 
-  val flowctlKey: Key[Long]     = LongKey.make("flowctl")
-  val byteKey: Key[Byte]        = ByteKey.make("byteKey")
+  val flowCtlKey: Key[Long]     = LongKey.make("flowCtlKey")
+  val payloadKey: Key[Byte]     = ByteKey.make("payloadKey")
   val publisherKey: Key[String] = StringKey.make("pubKey")
+
+  val baseFlowControlEvent = SystemEvent(prefix, flowControlEvent)
+  val baseTestEvent        = SystemEvent(prefix, EventName(testEvent))
 
   val eventKeys: Set[EventKey] =
     Set(
@@ -26,14 +29,16 @@ object EventUtils {
       EventKey(s"${prefix.prefix}.$endEvent")
     )
 
-  def makeEvent(name: EventName, id: Long = -1, payload: Array[Byte] = Array.emptyByteArray): Event =
-    SystemEvent(prefix, name).copy(eventId = Id(id.toString), paramSet = Set(byteKey.set(payload)))
+  def event(name: EventName, id: Long = -1, payload: Array[Byte] = Array.emptyByteArray): Event = {
+    baseTestEvent.copy(eventId = Id(id.toString), eventName = name, paramSet = Set(payloadKey.set(payload)))
+  }
 
-  def makeFlowCtlEvent(id: Int, time: Long, name: String): Event =
-    SystemEvent(prefix, flowControlEvent)
+  def flowCtlEvent(id: Int, time: Long, name: String): Event = {
+    baseFlowControlEvent
       .copy(
         eventId = Id(id.toString),
-        paramSet = Set(flowctlKey.set(time), publisherKey.set(name))
+        paramSet = Set(flowCtlKey.set(time), publisherKey.set(name))
       )
+  }
 
 }

@@ -30,7 +30,7 @@ class SubscribingActor(reporter: RateReporter, payloadSize: Int, printTaskRunner
   private val redisFactory = new RedisFactory(redisClient, mock[LocationService], wiring)
   private val subscriber   = redisFactory.subscriber(redisHost, redisPort)
 
-  private val keys: Set[EventKey] = eventKeys + EventKey(s"$eventKey.$id")
+  private val keys: Set[EventKey] = eventKeys + EventKey(s"$testEventKey.$id")
   startSubscription(keys)
 
   private def startSubscription(eventKeys: Set[EventKey]) = subscriber.subscribeCallback(eventKeys, onEvent)
@@ -50,7 +50,7 @@ class SubscribingActor(reporter: RateReporter, payloadSize: Int, printTaskRunner
 
       case event @ SystemEvent(_, _, `flowControlEvent`, _, _) ⇒
         val flowCtlId      = event.eventId.id.toInt
-        val burstStartTime = event.get(flowctlKey).get.value(0)
+        val burstStartTime = event.get(flowCtlKey).get.value(0)
         val publisher      = event.get(publisherKey).get.value(0)
 
         val sender = publishers.find(_.path.name.equalsIgnoreCase(publisher)).get

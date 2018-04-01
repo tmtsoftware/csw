@@ -8,6 +8,7 @@ import akka.remote.testkit.MultiNodeConfig
 import akka.testkit._
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.services.event.perf.Messages.Init
+import csw.services.event.perf.testkit.{PerfFlamesSupport, RemotingMultiNodeSpec}
 import csw.services.logging.scaladsl.LoggingSystemFactory
 
 import scala.concurrent.duration._
@@ -39,7 +40,7 @@ object EventThroughputSpec extends MultiNodeConfig {
 class EventThroughputSpecMultiJvmNode1 extends EventThroughputSpec
 class EventThroughputSpecMultiJvmNode2 extends EventThroughputSpec
 
-abstract class EventThroughputSpec extends RemotingMultiNodeSpec(EventThroughputSpec) {
+abstract class EventThroughputSpec extends RemotingMultiNodeSpec(EventThroughputSpec) with PerfFlamesSupport {
 
   import EventThroughputSpec._
 
@@ -115,7 +116,7 @@ abstract class EventThroughputSpec extends RemotingMultiNodeSpec(EventThroughput
     import testSettings._
     val receiverName = testName + "-subscriber"
 
-//    runPerfFlames(first, second)(delay = 5.seconds, time = 15.seconds)
+    runPerfFlames(first, second)(delay = 5.seconds, time = 15.seconds)
 
     runOn(second) {
       val rep = reporter(testName)

@@ -1,6 +1,6 @@
 package csw.services.event.perf
 
-import java.io.File
+import java.io.{File, OutputStream}
 import java.nio.file.Files
 import java.time.Instant
 import java.time.LocalDateTime
@@ -8,6 +8,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 import akka.actor.ActorSystem
+import com.typesafe.config.Config
 
 import scala.util.Try
 
@@ -21,19 +22,19 @@ trait BenchmarkFileReporter {
   def close(): Unit
 }
 object BenchmarkFileReporter {
-  val targetDirectory = {
+  val targetDirectory: File = {
     val target = new File("csw-event-impl/target/benchmark-results")
     target.mkdirs()
     target
   }
 
-  val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")
+  val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")
 
   def apply(test: String, system: ActorSystem): BenchmarkFileReporter =
     new BenchmarkFileReporter {
-      override val testName = test
+      override val testName: String = test
 
-      val gitCommit = {
+      val gitCommit: String = {
         import sys.process._
         Try("git describe".!!.trim).getOrElse("[unknown]")
       }
@@ -42,9 +43,9 @@ object BenchmarkFileReporter {
         val fileName  = s"$timestamp-$testName-$gitCommit-results.txt"
         new File(targetDirectory, fileName)
       }
-      val config = system.settings.config
+      val config: Config = system.settings.config
 
-      val fos = Files.newOutputStream(testResultFile.toPath)
+      val fos: OutputStream = Files.newOutputStream(testResultFile.toPath)
       reportResults(s"Git commit: $gitCommit")
 
       val settingsToReport =
