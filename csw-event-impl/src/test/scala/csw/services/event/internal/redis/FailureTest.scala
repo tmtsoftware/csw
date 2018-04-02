@@ -47,8 +47,8 @@ class FailureTest extends FunSuite with Matchers with MockitoSugar with BeforeAn
 
   override def afterAll(): Unit = {
     redisClient.shutdown()
-    wiring.shutdown(TestFinishedReason).await
     redis.stop()
+    wiring.shutdown(TestFinishedReason).await
   }
 
   test("failure in redis publishing should fail future with PublishFailed exception") {

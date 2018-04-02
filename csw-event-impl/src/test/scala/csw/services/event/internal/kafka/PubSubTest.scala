@@ -12,7 +12,7 @@ import csw.services.location.scaladsl.LocationServiceFactory
 import net.manub.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
 
-class KafkaPubSubTest extends FunSuite with EmbeddedKafka with BeforeAndAfterAll {
+class PubSubTest extends FunSuite with EmbeddedKafka with BeforeAndAfterAll {
   private val seedPort        = 3561
   private val kafkaPort       = 6001
   private val clusterSettings = ClusterAwareSettings.joinLocal(seedPort)

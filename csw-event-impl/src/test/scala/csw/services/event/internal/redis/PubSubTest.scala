@@ -16,7 +16,7 @@ import io.lettuce.core.{RedisClient, RedisURI}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import redis.embedded.RedisServer
 
-class RedisPubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with EmbeddedRedis {
+class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with EmbeddedRedis {
   private val seedPort        = 3558
   private val redisPort       = 6379
   private val clusterSettings = ClusterAwareSettings.joinLocal(seedPort)
@@ -40,8 +40,8 @@ class RedisPubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with
 
   override def afterAll(): Unit = {
     redisClient.shutdown()
-    wiring.shutdown(TestFinishedReason).await
     redis.stop()
+    wiring.shutdown(TestFinishedReason).await
   }
 
   // DEOPSCSW-334 : Publish an event

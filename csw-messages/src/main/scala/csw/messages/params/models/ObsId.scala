@@ -2,12 +2,9 @@ package csw.messages.params.models
 
 import java.util.Optional
 
-import scalapb.TypeMapper
 import csw.messages.TMTSerializable
 import play.api.libs.json._
-
-import scala.language.implicitConversions
-import scala.util.matching.Regex
+import scalapb.TypeMapper
 
 object ObsId {
 

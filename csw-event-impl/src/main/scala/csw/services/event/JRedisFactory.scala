@@ -4,8 +4,8 @@ import java.net.URI
 import java.util.concurrent.CompletableFuture
 
 import csw.services.event.internal.commons.{EventServiceResolver, Wiring}
-import csw.services.event.internal.redis.{JRedisPublisher, RedisPublisher, RedisSubscriber}
-import csw.services.event.javadsl.IEventPublisher
+import csw.services.event.internal.redis.{JRedisPublisher, JRedisSubscriber, RedisPublisher, RedisSubscriber}
+import csw.services.event.javadsl.{IEventPublisher, IEventSubscriber}
 import csw.services.event.scaladsl.EventSubscriber
 import csw.services.location.scaladsl.LocationService
 import io.lettuce.core.{RedisClient, RedisURI}
@@ -28,12 +28,13 @@ class JRedisFactory(redisClient: RedisClient, locationService: LocationService, 
       publisher(uri.getHost, uri.getPort)
     }.toJava.toCompletableFuture
 
-  def subscriber(host: String, port: Int): EventSubscriber = {
-    val redisURI = RedisURI.create(host, port)
-    new RedisSubscriber(redisURI, redisClient)
+  def subscriber(host: String, port: Int): IEventSubscriber = {
+    val redisURI        = RedisURI.create(host, port)
+    val redisSubscriber = new RedisSubscriber(redisURI, redisClient)
+    new JRedisSubscriber(redisSubscriber)
   }
 
-  def subscriber(): CompletableFuture[EventSubscriber] =
+  def subscriber(): CompletableFuture[IEventSubscriber] =
     async {
       val uri: URI = await(eventServiceResolver.uri)
       subscriber(uri.getHost, uri.getPort)

@@ -12,7 +12,7 @@ import net.manub.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
-class KafkaPerfTest extends FunSuite with Matchers with BeforeAndAfterAll with EmbeddedKafka with MockitoSugar {
+class PerfTest extends FunSuite with Matchers with BeforeAndAfterAll with EmbeddedKafka with MockitoSugar {
   private val kafkaPort = 6001
 
   private implicit val actorSystem: ActorSystem = ActorSystem()
