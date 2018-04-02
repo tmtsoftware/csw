@@ -40,7 +40,7 @@ trait PerfFlamesSupport { _: MultiNodeSpec ⇒
   }
 
   def perfJavaFlamesPath: String =
-    "/Users/pritamkadam/TMT/perf-map-agent/bin"
+    "/Users/pritamkadam/TMT/perf-map-agent/bin/perf-java-flames"
 
   def isPerfJavaFlamesAvailable: Boolean = {
     val isIt = new File(perfJavaFlamesPath).exists()

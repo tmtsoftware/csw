@@ -17,7 +17,7 @@ class SubscribingActor(reporter: RateReporter, payloadSize: Int, printTaskRunner
   private val taskRunnerMetrics             = new TaskRunnerMetrics(context.system)
   private var endMessagesMissing            = numSenders
   private var correspondingSender: ActorRef = null // the Actor which send the Start message will also receive the report
-  private var publishers: List[ActorRef]    = Nil // the Actor which send the Start message will also receive the report
+  private var publishers: List[ActorRef]    = Nil
 
   import Messages._
 
