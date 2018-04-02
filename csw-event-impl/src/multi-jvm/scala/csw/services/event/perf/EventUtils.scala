@@ -15,10 +15,12 @@ object EventUtils {
   val flowControlEvent = EventName("flowcontrol")
 
   val flowCtlKey: Key[Long]     = LongKey.make("flowCtlKey")
+  val timeNanosKey: Key[Long]   = LongKey.make("eventTime")
   val payloadKey: Key[Byte]     = ByteKey.make("payloadKey")
   val publisherKey: Key[String] = StringKey.make("pubKey")
 
   val baseFlowControlEvent = SystemEvent(prefix, flowControlEvent)
+  val latencyWarmUpEvent   = SystemEvent(prefix, warmupEvent)
   val baseTestEvent        = SystemEvent(prefix, EventName(testEvent))
 
   val eventKeys: Set[EventKey] =
@@ -29,9 +31,20 @@ object EventUtils {
       EventKey(s"${prefix.prefix}.$endEvent")
     )
 
-  def event(name: EventName, id: Long = -1, payload: Array[Byte] = Array.emptyByteArray): Event = {
+  def event(name: EventName, id: Long = -1, payload: Array[Byte] = Array.emptyByteArray): Event =
     baseTestEvent.copy(eventId = Id(id.toString), eventName = name, paramSet = Set(payloadKey.set(payload)))
-  }
+
+  def eventWithNanos(
+      name: EventName,
+      id: Long = -1,
+      payload: Array[Byte] = Array.emptyByteArray,
+      time: Long = System.nanoTime()
+  ): Event =
+    baseTestEvent.copy(
+      eventId = Id(id.toString),
+      eventName = name,
+      paramSet = Set(payloadKey.set(payload), timeNanosKey.set(time))
+    )
 
   def flowCtlEvent(id: Int, time: Long, name: String): Event = {
     baseFlowControlEvent
