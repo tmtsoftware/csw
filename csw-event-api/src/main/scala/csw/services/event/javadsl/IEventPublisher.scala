@@ -1,6 +1,7 @@
 package csw.services.event.javadsl
 
 import java.util.concurrent.CompletableFuture
+import java.util.function.Supplier
 
 import akka.Done
 import akka.actor.Cancellable
@@ -15,7 +16,7 @@ trait IEventPublisher {
 
   def publish(event: Event): CompletableFuture[Done]
 
-  def publish(eventGenerator: () => Event, every: FiniteDuration): Cancellable
+  def publish(eventGenerator: Supplier[Event], every: FiniteDuration): Cancellable
 
   def shutdown(): CompletableFuture[Done]
 
