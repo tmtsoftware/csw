@@ -3,7 +3,6 @@ package csw.services.event.internal.redis;
 import akka.actor.ActorSystem;
 import akka.actor.Cancellable;
 import akka.japi.Pair;
-import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Keep;
 import akka.stream.javadsl.Sink;
 import akka.stream.javadsl.Source;
@@ -24,15 +23,17 @@ import csw.services.location.models.TcpRegistration;
 import csw.services.location.scaladsl.LocationService;
 import csw.services.location.scaladsl.LocationServiceFactory;
 import io.lettuce.core.RedisClient;
-import org.junit.*;
+import io.lettuce.core.RedisURI;
+import io.lettuce.core.api.sync.RedisCommands;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import redis.embedded.RedisServer;
 import scala.concurrent.Await;
 import scala.concurrent.duration.FiniteDuration;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -104,7 +105,7 @@ public class JPubSubTest {
     }
 
     @Test
-    public void redisIndependentSubscriptions() throws InterruptedException, ExecutionException, TimeoutException {
+    public void shouldAbleToMakeIndependentSubscriptions() throws InterruptedException, ExecutionException, TimeoutException {
         Prefix prefix = new Prefix("test.prefix");
         EventName eventName1 = new EventName("system1");
         EventName eventName2 = new EventName("system2");
@@ -153,7 +154,7 @@ public class JPubSubTest {
         eventKeys.add(Utils.makeEvent(0).eventKey());
 
         List<Event> queue = new ArrayList<>();
-        subscriber.subscribe(eventKeys).runForeach(queue::add, ActorMaterializer.create(clusterSettings.system()));
+        subscriber.subscribe(eventKeys).runForeach(queue::add, wiring.resumingMat());
 
         Thread.sleep(10);
 
@@ -182,7 +183,7 @@ public class JPubSubTest {
         }
 
         List<Event> queue = new ArrayList<>();
-        subscriber.subscribe(events.stream().map(Event::eventKey).collect(Collectors.toSet())).runForeach(queue::add, ActorMaterializer.create(clusterSettings.system()));
+        subscriber.subscribe(events.stream().map(Event::eventKey).collect(Collectors.toSet())).runForeach(queue::add, wiring.resumingMat());
 
         Thread.sleep(500);
 
@@ -198,4 +199,73 @@ public class JPubSubTest {
         Assert.assertEquals(events, queue);
     }
 
+    @Test
+    public void shouldBeAbleToRetrieveRecentlyPublishedEventOnSubscription() throws InterruptedException, ExecutionException, TimeoutException {
+        Event event1 = Utils.makeEvent(1);
+        Event event2 = Utils.makeEvent(2);
+        Event event3 = Utils.makeEvent(3);
+        EventKey eventKey = event1.eventKey();
+
+        publisher.publish(event1).get(10, TimeUnit.SECONDS);
+        publisher.publish(event2).get(10, TimeUnit.SECONDS);
+
+        Pair<IEventSubscription, CompletionStage<List<Event>>> pair = subscriber.subscribe(Collections.singleton(eventKey)).toMat(Sink.seq(), Keep.both()).run(wiring.resumingMat());
+        Thread.sleep(1000);
+
+        publisher.publish(event3).get(10, TimeUnit.SECONDS);
+        Thread.sleep(1000);
+
+        pair.first().unsubscribe().get(10, TimeUnit.SECONDS);
+
+        java.util.List<Event> expectedEvents = new ArrayList<>();
+        expectedEvents.add(event2);
+        expectedEvents.add(event3);
+
+        Assert.assertEquals(expectedEvents, pair.second().toCompletableFuture().get(10, TimeUnit.SECONDS));
+    }
+
+    @Test
+    public void shouldBeAbleToRetrieveInvalidEvent() throws InterruptedException, TimeoutException, ExecutionException {
+        EventKey eventKey = new EventKey("test");
+
+        Pair<IEventSubscription, CompletionStage<List<Event>>> pair = subscriber.subscribe(Collections.singleton(eventKey)).toMat(Sink.seq(), Keep.both()).run(wiring.resumingMat());
+        Thread.sleep(1000);
+
+        pair.first().unsubscribe().get(10, TimeUnit.SECONDS);
+
+        Assert.assertEquals(Collections.singletonList(Event$.MODULE$.invalidEvent()), pair.second().toCompletableFuture().get(10, TimeUnit.SECONDS));
+    }
+
+    @Test
+    public void shouldBeAbleToGetAnEventWithoutSubscribingForIt() throws InterruptedException, ExecutionException, TimeoutException {
+        Event event1 = Utils.makeEvent(1);
+        EventKey eventKey = event1.eventKey();
+
+        publisher.publish(event1).get(10, TimeUnit.SECONDS);
+
+        Event event = subscriber.get(eventKey).get(10, TimeUnit.SECONDS);
+
+        Assert.assertEquals(event1, event);
+    }
+
+    @Test
+    public void shouldBeAbleToRetrieveInvalidEventOnGet() throws InterruptedException, ExecutionException, TimeoutException {
+        EventKey eventKey = new EventKey("test");
+        Event event = subscriber.get(eventKey).get(10, TimeUnit.SECONDS);
+
+        Assert.assertEquals(Event$.MODULE$.invalidEvent(), event);
+    }
+
+    @Test
+    public void shouldBeAbleToPersistEventInDBWhilePublishing() throws InterruptedException, ExecutionException, TimeoutException {
+        Event event1 = Utils.makeEvent(1);
+        EventKey eventKey = event1.eventKey();
+        RedisCommands<EventKey, Event> redisCommands =
+                redisClient.connect(EventServiceCodec$.MODULE$, RedisURI.create(clusterSettings.hostname(), redisPort)).sync();
+
+        publisher.publish(event1).get(10, TimeUnit.SECONDS);
+
+        Thread.sleep(1000);
+        Assert.assertEquals(event1, redisCommands.get(eventKey));
+    }
 }

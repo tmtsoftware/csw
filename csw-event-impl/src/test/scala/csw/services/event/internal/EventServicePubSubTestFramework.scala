@@ -126,7 +126,7 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     publisher.publish(event3).await
     Thread.sleep(1000)
 
-    subscription.unsubscribe()
+    subscription.unsubscribe().await
 
     seqF.await shouldBe Seq(event2, event3)
   }
@@ -137,7 +137,7 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     val (subscription, seqF) = subscriber.subscribe(Set(eventKey)).toMat(Sink.seq)(Keep.both).run()
     Thread.sleep(1000)
 
-    subscription.unsubscribe()
+    subscription.unsubscribe().await
 
     seqF.await shouldBe Seq(Event.invalidEvent)
   }
@@ -153,7 +153,7 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     eventF.await shouldBe event1
   }
 
-  def retrieveInvalidEventOnget(): Unit = {
+  def retrieveInvalidEventOnGet(): Unit = {
 
     val eventF = subscriber.get(EventKey("test"))
 

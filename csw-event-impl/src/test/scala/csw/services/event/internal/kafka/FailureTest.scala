@@ -42,7 +42,7 @@ class FailureTest extends FunSuite with Matchers with MockitoSugar with BeforeAn
     wiring.shutdown(TestFinishedReason).await
   }
 
-  test("failure in kafka publishing should fail future with PublishFailed exception") {
+  test("Kafka - failure in publishing should fail future with PublishFailed exception") {
 
     // simulate publishing failure as message size is greater than message.max.bytes(1 byte) configured in broker
     intercept[PublishFailed] {

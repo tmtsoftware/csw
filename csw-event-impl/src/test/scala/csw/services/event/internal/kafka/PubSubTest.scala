@@ -43,37 +43,37 @@ class PubSubTest extends FunSuite with EmbeddedKafka with BeforeAndAfterAll {
   }
 
   // DEOPSCSW-334 : Publish an event
-  test("should be able to publish and subscribe an event") {
+  test("Kafka - should be able to publish and subscribe an event") {
     framework.pubSub()
   }
 
-  test("Kafka independent subscriptions") {
+  test("Kafka - should be able to make independent subscriptions") {
     framework.subscribeIndependently()
   }
 
-  test("should be able to publish concurrently to the same channel") {
+  test("Kafka - should be able to publish concurrently to the same channel") {
     framework.publishMultiple()
   }
 
-  test("should be able to publish concurrently to the different channel") {
+  test("Kafka - should be able to publish concurrently to the different channel") {
     framework.publishMultipleToDifferentChannels()
   }
 
-  test("Kafka retrieve recently published event on subscription") {
+  test("Kafka - should be able to retrieve recently published event on subscription") {
     framework.retrieveRecentlyPublished()
   }
 
-  test("Kafka retrieveInvalidEvent") {
+  test("Kafka - should be able to retrieve InvalidEvent") {
     framework.retrieveInvalidEvent()
   }
 
   // DEOPSCSW-334 : Publish an event
-  test("should be able to get an event without subscribing for it") {
+  test("Kafka - should be able to get an event without subscribing for it") {
     framework.get()
   }
 
-  test("Kakfa get retrieveInvalidEvent") {
-    framework.retrieveInvalidEventOnget()
+  test("Kafka - should be able to get InvalidEvent") {
+    framework.retrieveInvalidEventOnGet()
   }
 
 }

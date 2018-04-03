@@ -45,41 +45,41 @@ class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with Embe
   }
 
   // DEOPSCSW-334 : Publish an event
-  test("should be able to publish and subscribe an event") {
+  test("Redis - should be able to publish and subscribe an event") {
     framework.pubSub()
   }
 
-  test("Redis independent subscriptions") {
+  test("Redis - should be able to make independent subscriptions") {
     framework.subscribeIndependently()
   }
 
-  test("should be able to publish concurrently to the same channel") {
+  test("Redis - should be able to publish concurrently to the same channel") {
     framework.publishMultiple()
   }
 
-  test("should be able to publish concurrently to the different channel") {
+  test("Redis - should be able to publish concurrently to the different channel") {
     framework.publishMultipleToDifferentChannels()
   }
 
-  test("Redis retrieve recently published event on subscription") {
+  test("Redis - should be able to retrieve recently published event on subscription") {
     framework.retrieveRecentlyPublished()
   }
 
-  test("Redis retrieveInvalidEvent") {
+  test("Redis - should be able to retrieve InvalidEvent") {
     framework.retrieveInvalidEvent()
   }
 
   // DEOPSCSW-334 : Publish an event
-  test("should be able to get an event without subscribing for it") {
+  test("Redis - should be able to get an event without subscribing for it") {
     framework.get()
   }
 
-  test("Redis get retrieveInvalidEvent") {
-    framework.retrieveInvalidEventOnget()
+  test("Redis - should be able to get InvalidEvent") {
+    framework.retrieveInvalidEventOnGet()
   }
 
   // DEOPSCSW-334 : Publish an event
-  test("publishing an event also persists the event in DB against the same key as channel name") {
+  test("Redis - should be able to persist the event in DB against the same key as channel name while publishing") {
     val event1             = makeEvent(1)
     val eventKey: EventKey = event1.eventKey
     val redisCommands =
