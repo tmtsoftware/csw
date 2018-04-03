@@ -6,6 +6,7 @@ import akka.japi.Pair;
 import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Keep;
 import akka.stream.javadsl.Sink;
+import akka.stream.javadsl.Source;
 import csw.messages.commons.CoordinatedShutdownReasons;
 import csw.messages.events.*;
 import csw.messages.params.models.Prefix;
@@ -36,13 +37,13 @@ import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 public class JPubSubTest {
     private static int seedPort = 3562;
     private static int redisPort = 6379;
 
     private static ClusterSettings clusterSettings;
-
     private static RedisServer redis;
     private static RedisClient redisClient;
     private static Wiring wiring;
@@ -172,4 +173,29 @@ public class JPubSubTest {
         events.add(0, Event$.MODULE$.invalidEvent());
         Assert.assertEquals(events, queue);
     }
+
+    @Test
+    public void shouldBeAbleToPublishMultipleToDifferentChannels() throws InterruptedException {
+        java.util.List<Event> events = new ArrayList<>();
+        for (int i = 101; i < 111; i++) {
+            events.add(Utils.makeDistinctEvent(i));
+        }
+
+        List<Event> queue = new ArrayList<>();
+        subscriber.subscribe(events.stream().map(Event::eventKey).collect(Collectors.toSet())).runForeach(queue::add, ActorMaterializer.create(clusterSettings.system()));
+
+        Thread.sleep(500);
+
+        publisher.publish(Source.fromIterator(events::iterator));
+
+        Thread.sleep(1000);
+
+        // subscriber will receive an invalid event first as subscription happened before publishing started.
+        // The 10 published events will follow
+        Assert.assertEquals(11, queue.size());
+
+        events.add(0, Event$.MODULE$.invalidEvent());
+        Assert.assertEquals(events, queue);
+    }
+
 }
