@@ -23,7 +23,7 @@ package csw
  * === Important Actors in Framework ===
  *
  * - [[csw.framework.internal.supervisor.SupervisorBehavior]]
- * Each component created by this framework is supervised by this actor.
+ * : Each component created by this framework is supervised by this actor.
  *
  * Default strategy of supervisor is to stop child actor but depending on nature of the failure, the supervisor has a choice of the following two options:
  *  - [[csw.framework.exceptions.FailureRestart]] : Restart the child actor i.e. kill the current child actor that failed and create a new one in its place
@@ -34,14 +34,14 @@ package csw
  * For complete list of supported messages per [[csw.messages.framework.SupervisorLifecycleState]], see `csw-messages` project.
  *
  * - [[csw.framework.internal.component.ComponentBehavior]]
- * Like Supervisor, evey component is associate with this actor which is known as TLA (Top Level Actor)
+ * : Like Supervisor, evey component is associate with this actor which is known as TLA (Top Level Actor)
  * And it also maintains its own state [[csw.framework.internal.component.ComponentLifecycleState]] based on messages it receives.
  *
  * Main purpose of this actor is to invoke component specific code written in their corresponding handlers.
  * This is where framework code meets Component specific code.
  *
  * - [[csw.framework.internal.pubsub.PubSubBehavior]]
- * This actor is created by framework which is wrapped into [[csw.framework.scaladsl.CurrentStatePublisher]] for easy interaction with this actor
+ * : This actor is created by framework which is wrapped into [[csw.framework.scaladsl.CurrentStatePublisher]] for easy interaction with this actor
  * and then passed to component handlers so that component can publish their [[csw.messages.params.states.CurrentState]].
  *
  * If one component (ex. Assembly) is interested in [[csw.messages.params.states.CurrentState]] published by other component (ex. HCD)
@@ -50,7 +50,7 @@ package csw
  * PubSub actor maintains the list of subscribers and keeps publishing [[csw.messages.params.states.CurrentState]] to all subscribers.
  *
  * - [[csw.framework.internal.container.ContainerBehavior]]
- * When multiple components needs to be started in container, then this actor is created.
+ * : When multiple components needs to be started in container, then this actor is created.
  * Job of this actor is just to logically group multiple components and support [[csw.messages.scaladsl.SupervisorContainerCommonMessages]].
  * It receives [[csw.messages.scaladsl.SupervisorContainerCommonMessages.Shutdown]] or [[csw.messages.scaladsl.SupervisorContainerCommonMessages.Restart]] message
  * and forwards it to all the components residing in this container.
@@ -126,7 +126,7 @@ package csw
  * }}}
  *
  * - [[csw.framework.deploy.hostconfig.HostConfig]]
- * This is just a helper to create host configuration application.
+ * : This is just a helper to create host configuration application.
  * This support starting multiple containers on a given host machine and each container will have single/multiple components.
  *
  * === Example of Host Config file ===
