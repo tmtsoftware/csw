@@ -58,7 +58,7 @@ package csw
  * == deploy package ==
  *
  * - [[csw.framework.deploy.containercmd.ContainerCmd]]
- * ContainerCmd is a helper utility provided by framework to start multiple components in container mode
+ * : ContainerCmd is a helper utility provided by framework to start multiple components in container mode
  * or single component in Standalone mode.
  *
  * === Example of Container Config File ===

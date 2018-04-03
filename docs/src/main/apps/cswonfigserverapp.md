@@ -25,5 +25,5 @@ Kindly refer to this [cluster-seed setup](https://tmtsoftware.github.io/csw-prod
 **Example:** csw-config-server --help  
 **Explanation:** Prints help message
 
-**Example:** csw-config-server --version  
+**Example:** csw-config-server --version    
 **Explanation:** Prints application version
