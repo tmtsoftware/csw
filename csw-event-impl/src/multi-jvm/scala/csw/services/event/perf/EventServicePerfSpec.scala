@@ -13,13 +13,53 @@ import csw.services.logging.scaladsl.LoggingSystemFactory
 
 import scala.concurrent.duration._
 
-object EventThroughputSpec extends MultiNodeConfig {
+object EventServicePerfSpec extends MultiNodeConfig {
   val first: RoleName  = role("first")
   val second: RoleName = role("second")
 
   val barrierTimeout: FiniteDuration = 5.minutes
 
-  val cfg: Config = ConfigFactory.load()
+  val cfg: Config = ConfigFactory.parseString(s"""
+       |include "logging.conf"
+       |
+       |csw.test.EventThroughputSpec {
+       |# for serious measurements you should increase the totalMessagesFactor (20)
+       |  totalMessagesFactor = 10.0
+       |  actor-selection = off
+       |  batching = on
+       |
+       |  throttling {
+       |    elements = 300
+       |    per = 1 second
+       |  }
+       |}
+       |
+       |akka {
+       |  log-dead-letters = 100
+       |  testconductor.barrier-timeout = 300s
+       |  actor {
+       |    provider = remote
+       |    serialize-creators = false
+       |    serialize-messages = false
+       |
+       |    serializers {
+       |      kryo = "com.twitter.chill.akka.AkkaSerializer"
+       |    }
+       |    serialization-bindings {
+       |      "csw.messages.TMTSerializable" = kryo
+       |    }
+       |  }
+       |}
+       |akka.remote.default-remote-dispatcher {
+       |  fork-join-executor {
+       |    # parallelism-factor = 0.5
+       |    parallelism-min = 4
+       |    parallelism-max = 4
+       |  }
+       |  # Set to 10 by default. Might be worthwhile to experiment with.
+       |  # throughput = 100
+       |}
+     """.stripMargin)
 
   commonConfig(debugConfig(on = false).withFallback(cfg).withFallback(RemotingMultiNodeSpec.commonConfig))
 
@@ -37,18 +77,19 @@ object EventThroughputSpec extends MultiNodeConfig {
   }
 }
 
-class EventThroughputSpecMultiJvmNode1 extends EventThroughputSpec
-class EventThroughputSpecMultiJvmNode2 extends EventThroughputSpec
+class EventServicePerfSpecMultiJvmNode1 extends EventServicePerfSpec
+class EventServicePerfSpecMultiJvmNode2 extends EventServicePerfSpec
 
-abstract class EventThroughputSpec extends RemotingMultiNodeSpec(EventThroughputSpec) with PerfFlamesSupport {
+abstract class EventServicePerfSpec extends RemotingMultiNodeSpec(EventServicePerfSpec) with PerfFlamesSupport {
 
-  import EventThroughputSpec._
+  import EventServicePerfSpec._
 
   val totalMessagesFactor: Double = system.settings.config.getDouble("csw.test.EventThroughputSpec.totalMessagesFactor")
   val actorSelection: Boolean     = system.settings.config.getBoolean("csw.test.EventThroughputSpec.actor-selection")
   val batching: Boolean           = system.settings.config.getBoolean("csw.test.EventThroughputSpec.batching")
 
-  var plot = PlotResult()
+  var throughputPlot = PlotResult()
+  var latencyPlots   = LatencyPlots()
 
   LoggingSystemFactory.start("perf", "", "", system)
 
@@ -66,7 +107,13 @@ abstract class EventThroughputSpec extends RemotingMultiNodeSpec(EventThroughput
   override def afterAll(): Unit = {
     reporterExecutor.shutdown()
     runOn(first) {
-      println(plot.csv(system.name))
+      println("============= Throughput Results in mb/s =============")
+      println(throughputPlot.csv(system.name))
+      println()
+      println("============= Latency Results in µs =============")
+      println(latencyPlots.plot50.csv(system.name + "50"))
+      println(latencyPlots.plot90.csv(system.name + "90"))
+      println(latencyPlots.plot99.csv(system.name + "99"))
     }
     super.afterAll()
   }
@@ -99,20 +146,20 @@ abstract class EventThroughputSpec extends RemotingMultiNodeSpec(EventThroughput
                  senderReceiverPairs = 1,
                  batching),
     TestSettings(testName = "5-to-5",
-                 totalMessages = adjustedTotalMessages(20000),
+                 totalMessages = adjustedTotalMessages(10000),
                  burstSize = 200,
                  payloadSize = 100,
                  senderReceiverPairs = 5,
                  batching),
     TestSettings(testName = "10-to-10",
-                 totalMessages = adjustedTotalMessages(20000),
+                 totalMessages = adjustedTotalMessages(10000),
                  burstSize = 100,
                  payloadSize = 100,
                  senderReceiverPairs = 10,
                  batching)
   )
 
-  def test(testSettings: TestSettings, resultReporter: BenchmarkFileReporter): Unit = {
+  def test(testSettings: TestSettings, benchmarkFileReporter: BenchmarkFileReporter): Unit = {
     import testSettings._
     val receiverName = testName + "-subscriber"
 
@@ -138,29 +185,37 @@ abstract class EventThroughputSpec extends RemotingMultiNodeSpec(EventThroughput
       val senders = for (n ← 1 to senderReceiverPairs) yield {
         val receiver = receivers(n - 1)
 
-        val plotProbe = TestProbe()
+        val throughputPlotProbe = TestProbe()
+        val latencyPlotProbe    = TestProbe()
         val snd = system.actorOf(
           PublishingActor.props(
             receiver,
             receivers,
             testSettings,
-            plotProbe.ref,
+            throughputPlotProbe.ref,
+            latencyPlotProbe.ref,
             printTaskRunnerMetrics = n == 1,
-            resultReporter
+            benchmarkFileReporter
           ),
           testName + "-publisher" + n
         )
         val terminationProbe = TestProbe()
         terminationProbe.watch(snd)
         snd ! Init
-        (snd, terminationProbe, plotProbe)
+        (snd, terminationProbe, throughputPlotProbe, latencyPlotProbe)
       }
       senders.foreach {
-        case (snd, terminationProbe, plotProbe) ⇒
+        case (snd, terminationProbe, throughputPlotProbe, latencyPlotProbe) ⇒
           terminationProbe.expectTerminated(snd, barrierTimeout)
           if (snd == senders.head._1) {
-            val plotResult = plotProbe.expectMsgType[PlotResult]
-            plot = plot.addAll(plotResult)
+            val throughputPlotResult = throughputPlotProbe.expectMsgType[PlotResult]
+            val latencyPlotResult    = latencyPlotProbe.expectMsgType[LatencyPlots]
+            throughputPlot = throughputPlot.addAll(throughputPlotResult)
+            latencyPlots = latencyPlots.copy(
+              plot50 = latencyPlots.plot50.addAll(latencyPlotResult.plot50),
+              plot90 = latencyPlots.plot90.addAll(latencyPlotResult.plot90),
+              plot99 = latencyPlots.plot99.addAll(latencyPlotResult.plot99)
+            )
           }
       }
       enterBarrier(testName + "-done")
@@ -170,7 +225,7 @@ abstract class EventThroughputSpec extends RemotingMultiNodeSpec(EventThroughput
   }
 
   "Max throughput of Event Service" must {
-    val reporter = BenchmarkFileReporter("MaxThroughputSpec", system)
+    val reporter = BenchmarkFileReporter("EventServicePerfSpec", system)
     for (s ← scenarios) {
       s"be great for ${s.testName}, burstSize = ${s.burstSize}, payloadSize = ${s.payloadSize}" in test(s, reporter)
     }

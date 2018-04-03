@@ -4,25 +4,27 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeUnit.NANOSECONDS
 
 import akka.actor._
-import akka.stream.scaladsl.{Sink, Source}
-import akka.stream.{ActorMaterializer, ThrottleMode}
+import akka.stream.ThrottleMode
+import akka.stream.scaladsl.{Keep, Source}
 import csw.messages.events.EventName
 import csw.services.event.RedisFactory
 import csw.services.event.internal.commons.Wiring
-import csw.services.event.perf.EventThroughputSpec.Target
+import csw.services.event.perf.EventServicePerfSpec.Target
 import csw.services.event.perf.EventUtils._
 import csw.services.location.scaladsl.LocationService
 import io.lettuce.core.RedisClient
+import org.HdrHistogram.Histogram
 import org.scalatest.mockito.MockitoSugar
 
 import scala.concurrent.Await
-import scala.concurrent.duration.{DurationInt, FiniteDuration}
+import scala.concurrent.duration.{DurationInt, DurationLong, FiniteDuration}
 
 class PublishingActor(
     target: Target,
     targets: Array[Target],
     testSettings: TestSettings,
-    plotRef: ActorRef,
+    throughputPlotRef: ActorRef,
+    latencyPlotRef: ActorRef,
     printTaskRunnerMetrics: Boolean,
     reporter: BenchmarkFileReporter
 ) extends Actor
@@ -43,7 +45,6 @@ class PublishingActor(
   import Messages._
 
   private implicit val actorSystem: ActorSystem = context.system
-  private implicit val mat: ActorMaterializer   = ActorMaterializer()
 
   private val redisHost    = "localhost"
   private val redisPort    = 6379
@@ -108,8 +109,8 @@ class PublishingActor(
   val sent = new Array[Long](targets.length)
 
   def waitingForEndResult: Receive = {
-    case EndResult(totalReceived) ⇒
-      val took       = NANOSECONDS.toMillis(System.nanoTime - startTime)
+    case EndResult(totalReceived, histogram, totalTime) ⇒
+      val took       = NANOSECONDS.toMillis(totalTime)
       val throughput = totalReceived * 1000.0 / took
 
       println("======================================")
@@ -129,16 +130,41 @@ class PublishingActor(
       if (printTaskRunnerMetrics)
         taskRunnerMetrics.printHistograms()
 
-      plotRef ! PlotResult().add(testName, throughput * payloadSize * testSettings.senderReceiverPairs / 1024 / 1024)
-      context.stop(self)
+      printLatencyResults(histogram, totalTime)
 
+      throughputPlotRef ! PlotResult().add(testName, throughput * payloadSize * testSettings.senderReceiverPairs / 1024 / 1024)
+      context.stop(self)
+  }
+
+  def printLatencyResults(histogram: Histogram, totalDurationNanos: Long): Unit = {
+    def percentile(p: Double): Double = histogram.getValueAtPercentile(p) / 1000.0
+    val throughput                    = 1000.0 * histogram.getTotalCount / math.max(1, totalDurationNanos.nanos.toMillis)
+
+    reporter.reportResults(
+      s"===== ${reporter.testName} $testName [${self.path.name}]: Latency Results ===== \n" +
+      f"        50%%ile: ${percentile(50.0)}%.0f µs \n" +
+      f"        90%%ile: ${percentile(90.0)}%.0f µs \n" +
+      f"        99%%ile: ${percentile(99.0)}%.0f µs \n" +
+      f"        rate  : $throughput%,.0f msg/s \n" +
+      "=============================================================="
+    )
+    println(s"Histogram of latencies in microseconds (µs) [${self.path.name}].")
+//    histogram.outputPercentileDistribution(System.out, 1000.0)
+
+    val latencyPlots = LatencyPlots(
+      PlotResult().add(testName, percentile(50.0)),
+      PlotResult().add(testName, percentile(90.0)),
+      PlotResult().add(testName, percentile(99.0))
+    )
+
+    latencyPlotRef ! latencyPlots
   }
 
   def sendBatch(warmup: Boolean): Unit = {
 
     def makeEvent(counter: Int, id: Int) = {
       if (warmup) event(warmupEvent, payload = payload)
-      else event(EventName(s"$testEvent.${id + 1}"), totalMessages - remaining + counter, payload)
+      else eventWithNanos(EventName(s"$testEvent.${id + 1}"), totalMessages - remaining + counter, payload)
     }
 
     val batchSize =
@@ -157,21 +183,16 @@ class PublishingActor(
       }
       remaining -= batchSize
     } else {
+      val source = Source(0 until batchSize.toInt)
+        .throttle(throttlingElements, throttlingDuration, throttlingElements, ThrottleMode.Shaping)
+        .map { counter ⇒
+          val id = counter % numTargets
+          sent(id) += 1
+          makeEvent(counter, id)
+        }
+        .watchTermination()(Keep.right)
 
-      Await.result(
-        Source(0 until batchSize.toInt)
-          .throttle(throttlingElements, throttlingDuration, throttlingElements, ThrottleMode.Shaping)
-          .map { counter ⇒
-            val id = counter % numTargets
-            sent(id) += 1
-
-            makeEvent(counter, id)
-          }
-          .map(publisher.publish)
-          .runWith(Sink.ignore),
-        5.minutes
-      )
-
+      Await.result(publisher.publish(source), 5.minutes)
       remaining -= totalMessages
     }
   }
@@ -194,10 +215,13 @@ object PublishingActor {
       mainTarget: Target,
       targets: Array[Target],
       testSettings: TestSettings,
-      plotRef: ActorRef,
+      throughputPlotRef: ActorRef,
+      latencyPlotRef: ActorRef,
       printTaskRunnerMetrics: Boolean,
       reporter: BenchmarkFileReporter
   ): Props =
-    Props(new PublishingActor(mainTarget, targets, testSettings, plotRef, printTaskRunnerMetrics, reporter))
+    Props(
+      new PublishingActor(mainTarget, targets, testSettings, throughputPlotRef, latencyPlotRef, printTaskRunnerMetrics, reporter)
+    )
 
 }

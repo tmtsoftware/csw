@@ -1,5 +1,7 @@
 package csw.services.event.perf
 
+import java.util.concurrent.TimeUnit.SECONDS
+
 import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import csw.messages.events._
 import csw.services.event.RedisFactory
@@ -7,6 +9,7 @@ import csw.services.event.internal.commons.Wiring
 import csw.services.event.perf.EventUtils._
 import csw.services.location.scaladsl.LocationService
 import io.lettuce.core.RedisClient
+import org.HdrHistogram.Histogram
 import org.scalatest.mockito.MockitoSugar
 
 class SubscribingActor(reporter: RateReporter, payloadSize: Int, printTaskRunnerMetrics: Boolean, numSenders: Int, id: Int)
@@ -19,6 +22,8 @@ class SubscribingActor(reporter: RateReporter, payloadSize: Int, printTaskRunner
   private var correspondingSender: ActorRef = null // the Actor which send the Start message will also receive the report
   private var publishers: List[ActorRef]    = Nil
 
+  val histogram = new Histogram(SECONDS.toNanos(10), 3)
+
   import Messages._
 
   private implicit val actorSystem: ActorSystem = context.system
@@ -29,6 +34,8 @@ class SubscribingActor(reporter: RateReporter, payloadSize: Int, printTaskRunner
   private val wiring       = new Wiring(actorSystem)
   private val redisFactory = new RedisFactory(redisClient, mock[LocationService], wiring)
   private val subscriber   = redisFactory.subscriber(redisHost, redisPort)
+  var startTime            = 0L
+  var reportedArrayOOB     = false
 
   private val keys: Set[EventKey] = eventKeys + EventKey(s"$testEventKey.$id")
   startSubscription(keys)
@@ -38,14 +45,17 @@ class SubscribingActor(reporter: RateReporter, payloadSize: Int, printTaskRunner
   private def onEvent(event: Event): Unit = {
     event match {
       case SystemEvent(_, _, `warmupEvent`, _, _) ⇒
-      case SystemEvent(_, _, `startEvent`, _, _)  ⇒ correspondingSender ! Start
+      case SystemEvent(_, _, `startEvent`, _, _) ⇒ {
+        startTime = System.nanoTime()
+        correspondingSender ! Start
+      }
       case SystemEvent(_, _, `endEvent`, _, _) if endMessagesMissing > 1 ⇒
         endMessagesMissing -= 1 // wait for End message from all senders
 
       case SystemEvent(_, _, `endEvent`, _, _) ⇒
         if (printTaskRunnerMetrics)
           taskRunnerMetrics.printHistograms()
-        correspondingSender ! EndResult(eventsReceived)
+        correspondingSender ! EndResult(eventsReceived, histogram, System.nanoTime() - startTime)
         context.stop(self)
 
       case event @ SystemEvent(_, _, `flowControlEvent`, _, _) ⇒
@@ -57,7 +67,7 @@ class SubscribingActor(reporter: RateReporter, payloadSize: Int, printTaskRunner
         sender ! FlowControl(flowCtlId, burstStartTime)
 
       case Event.invalidEvent ⇒
-      case _: Event           ⇒ report()
+      case event: SystemEvent ⇒ report(event.get(timeNanosKey).get.head)
     }
   }
 
@@ -69,9 +79,24 @@ class SubscribingActor(reporter: RateReporter, payloadSize: Int, printTaskRunner
       sender() ! Initialized
   }
 
-  def report(): Unit = {
+  def report(sendTime: Long): Unit = {
+    if (eventsReceived == 0)
+      startTime = System.nanoTime()
+
     reporter.onMessage(1, payloadSize)
     eventsReceived += 1
+
+    val d = System.nanoTime() - sendTime
+    try {
+      histogram.recordValue(d)
+    } catch {
+      case e: ArrayIndexOutOfBoundsException ⇒
+        // Report it only once instead of flooding the console
+        if (!reportedArrayOOB) {
+          e.printStackTrace()
+          reportedArrayOOB = true
+        }
+    }
   }
 }
 

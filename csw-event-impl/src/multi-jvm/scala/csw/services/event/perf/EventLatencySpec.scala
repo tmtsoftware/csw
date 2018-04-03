@@ -1,13 +1,11 @@
 package csw.services.event.perf
 
-import java.util.concurrent.atomic.AtomicLongArray
-import java.util.concurrent.locks.LockSupport
 import java.util.concurrent.{ExecutorService, Executors}
 
 import akka.actor.{PoisonPill, Props, Terminated}
 import akka.remote.testconductor.RoleName
 import akka.remote.testkit.MultiNodeConfig
-import akka.stream.scaladsl.Source
+import akka.stream.scaladsl.{Keep, Source}
 import akka.stream.{ActorMaterializer, ThrottleMode}
 import akka.testkit.TestProbe
 import com.typesafe.config.ConfigFactory
@@ -21,8 +19,8 @@ import io.lettuce.core.RedisClient
 import org.HdrHistogram.Histogram
 import org.scalatest.mockito.MockitoSugar
 
-import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration._
+import scala.concurrent.{Await, ExecutionContext}
 
 object EventLatencySpec extends MultiNodeConfig {
   val first: RoleName  = role("first")
@@ -76,7 +74,7 @@ abstract class EventLatencySpec extends RemotingMultiNodeSpec(EventLatencySpec) 
 
   override def afterAll(): Unit = {
     reporterExecutor.shutdown()
-    runOn(first) {
+    runOn(second) {
       println(plots.plot50.csv(system.name + "50"))
       println(plots.plot90.csv(system.name + "90"))
       println(plots.plot99.csv(system.name + "99"))
@@ -85,15 +83,15 @@ abstract class EventLatencySpec extends RemotingMultiNodeSpec(EventLatencySpec) 
   }
 
   val scenarios = List(
-    LatencyTestSettings(testName = "warmup", messageRate = 500, payloadSize = 100, repeat = repeatCount),
-    LatencyTestSettings(testName = "rate-100-size-100", messageRate = 100, payloadSize = 100, repeat = repeatCount),
-    LatencyTestSettings(testName = "rate-1000-size-100", messageRate = 1000, payloadSize = 100, repeat = repeatCount),
-    LatencyTestSettings(testName = "rate-10000-size-100", messageRate = 10000, payloadSize = 100, repeat = repeatCount),
-    LatencyTestSettings(testName = "rate-20000-size-100", messageRate = 20000, payloadSize = 100, repeat = repeatCount),
-    LatencyTestSettings(testName = "rate-1000-size-1k", messageRate = 1000, payloadSize = 1000, repeat = repeatCount)
+    LatencyTestSettings(testName = "warmup", messageRate = 5000, payloadSize = 100, repeat = repeatCount)
+//    LatencyTestSettings(testName = "rate-100-size-100", messageRate = 100, payloadSize = 100, repeat = repeatCount),
+//    LatencyTestSettings(testName = "rate-1000-size-100", messageRate = 1000, payloadSize = 100, repeat = repeatCount),
+//    LatencyTestSettings(testName = "rate-10000-size-100", messageRate = 10000, payloadSize = 100, repeat = repeatCount),
+//    LatencyTestSettings(testName = "rate-20000-size-100", messageRate = 20000, payloadSize = 100, repeat = repeatCount),
+//    LatencyTestSettings(testName = "rate-1000-size-1k", messageRate = 1000, payloadSize = 1000, repeat = repeatCount)
   )
 
-  def test(testSettings: LatencyTestSettings, BenchmarkFileReporter: BenchmarkFileReporter): Unit = {
+  def test(testSettings: LatencyTestSettings, benchmarkFileReporter: BenchmarkFileReporter): Unit = {
 
     import testSettings._
 
@@ -104,91 +102,46 @@ abstract class EventLatencySpec extends RemotingMultiNodeSpec(EventLatencySpec) 
 
       implicit val ec: ExecutionContext = system.dispatcher
 
-      val redisHost    = "localhost"
-      val redisPort    = 6379
-      val redisClient  = RedisClient.create()
-      val wiring       = new Wiring(system)
-      val redisFactory = new RedisFactory(redisClient, mock[LocationService], wiring)
-      val publisher    = redisFactory.publisher(redisHost, redisPort)
+      val redisHost = "localhost"
+      val redisPort = 6379
+      val publisher = redisFactory.publisher(redisHost, redisPort)
 
       val payload = ("0" * payloadSize).getBytes("utf-8")
-      // by default run for 2 seconds, but can be adjusted with the totalMessagesFactor
-
-      val sendTimes = new AtomicLongArray(totalMessages)
-
-      // increase the rate somewhat to compensate for overhead, based on heuristics
-      // will also be adjusted based on measurement when using > 1 repeat
-      @volatile var adjustRateFactor =
-        if (messageRate <= 100) 1.05
-        else if (messageRate <= 1000) 1.1
-        else if (messageRate <= 10000) 1.2
-        else if (messageRate <= 20000) 1.3
-        else 1.4
-
       enterBarrier("subscribed")
 
-      for (n ← 1 to repeat) {
-        histogram.reset()
-        // warmup for 3 seconds to init compression
-        val warmup = Source(1 to 30)
-          .throttle(10, 1.second, 10, ThrottleMode.Shaping)
-          .runForeach { n ⇒
-            Await.result(publisher.publish(EventUtils.latencyWarmUpEvent), 5.seconds)
-          }
-
-        warmup.foreach { _ ⇒
-          var i           = 0
-          var adjust      = 0L
-          val targetDelay = (SECONDS.toNanos(1) / (messageRate * adjustRateFactor)).toLong
-
-          while (i < totalMessages) {
-            LockSupport.parkNanos(targetDelay - adjust)
-            val now = System.nanoTime()
-            sendTimes.set(i, now)
-            if (i >= 1) {
-              val diff = now - sendTimes.get(i - 1)
-              adjust = math.max(0L, (diff - targetDelay) / 2)
-            }
-
-            val msg = EventUtils.eventWithNanos(EventName(EventUtils.testEvent), i, payload)
-
-            Await.result(publisher.publish(msg), 5.seconds)
-            i += 1
-          }
-
-          println("============ Pub End ======================")
-          Await.result(publisher.publish(event(endEvent)), 5.seconds)
-
-          // measure rate and adjust for next repeat round
-          val d                  = sendTimes.get(totalMessages - 1) - sendTimes.get(0)
-          val measuredRate       = totalMessages * SECONDS.toNanos(1) / math.max(1, d)
-          val previousTargetRate = messageRate * adjustRateFactor
-          adjustRateFactor = previousTargetRate / math.max(1, measuredRate)
-          println(s"Measured send rate $measuredRate msg/s (new adjustment factor: $adjustRateFactor)")
+      // warmup for 3 seconds to init compression
+      val warmup = Source(1 to 30)
+        .throttle(10, 1.second, 10, ThrottleMode.Shaping)
+        .runForeach { n ⇒
+          Await.result(publisher.publish(EventUtils.latencyWarmUpEvent), 5.seconds)
         }
+
+      warmup.foreach { _ ⇒
+        val source = Source(0 until totalMessages)
+          .throttle(messageRate, 1.seconds, messageRate, ThrottleMode.Shaping)
+          .map(i ⇒ eventWithNanos(EventName(testEvent), i, payload))
+          .watchTermination()(Keep.right)
+
+        publisher.publish(source).onComplete(_ ⇒ publisher.publish(event(endEvent)))
       }
       enterBarrier("received-all-events")
     }
 
     runOn(second) {
 
-      val redisHost    = "localhost"
-      val redisPort    = 6379
-      val redisClient  = RedisClient.create()
-      val wiring       = new Wiring(system)
-      val redisFactory = new RedisFactory(redisClient, mock[LocationService], wiring)
-      val subscriber   = redisFactory.subscriber(redisHost, redisPort)
+      val redisHost  = "localhost"
+      val redisPort  = 6379
+      val subscriber = redisFactory.subscriber(redisHost, redisPort)
 
       val testProbe = TestProbe()
       val ref       = system.actorOf(Props.empty)
       testProbe.watch(ref)
 
-      var count             = 0
-      var repeatCount       = 0
-      var startTime: Long   = System.nanoTime()
-      val taskRunnerMetrics = new TaskRunnerMetrics(system)
-      var reportedArrayOOB  = false
-      val rep               = reporter(testName)
+      var count            = 0
+      var repeatCount      = 0
+      var reportedArrayOOB = false
+      val rep              = reporter(testName)
+      var startTime: Long  = System.nanoTime()
 
       val keys: Set[EventKey] = Set(
         EventKey(s"${prefix.prefix}.$warmupEvent"),
@@ -205,12 +158,13 @@ abstract class EventLatencySpec extends RemotingMultiNodeSpec(EventLatencySpec) 
         event match {
           case SystemEvent(_, _, `warmupEvent`, _, _) ⇒
           case SystemEvent(_, _, `endEvent`, _, _) ⇒
-            println("============ Rec End ======================")
-            repeatCount += 1
-            printTotal(testName, payloadSize, histogram, System.nanoTime() - startTime, BenchmarkFileReporter)
-            if (repeatCount >= repeat && count > 10) {
-              println(s" === total events dropped: ${totalMessages - count}")
-              ref ! PoisonPill
+            if (count > 10) {
+              repeatCount += 1
+              printTotal(testName, payloadSize, histogram, System.nanoTime() - startTime, benchmarkFileReporter)
+              if (repeatCount == repeat) {
+                println(s"=== $testName: total events dropped: ${totalMessages - count}")
+                ref ! PoisonPill
+              }
             }
           case Event.invalidEvent ⇒
           case event: SystemEvent ⇒ processEvent(event.get(timeNanosKey).get.head, payloadSize)
@@ -247,16 +201,17 @@ abstract class EventLatencySpec extends RemotingMultiNodeSpec(EventLatencySpec) 
         val throughput                    = 1000.0 * histogram.getTotalCount / math.max(1, totalDurationNanos.nanos.toMillis)
 
         reporter.reportResults(
-          s"=== ${reporter.testName} $testName: RTT " +
-          f"50%%ile: ${percentile(50.0)}%.0f µs, " +
-          f"90%%ile: ${percentile(90.0)}%.0f µs, " +
-          f"99%%ile: ${percentile(99.0)}%.0f µs, " +
-          f"rate: $throughput%,.0f msg/s"
+          s"===== ${reporter.testName} $testName ===== \n" +
+          f"    50%%ile: ${percentile(50.0)}%.0f µs \n" +
+          f"    90%%ile: ${percentile(90.0)}%.0f µs \n" +
+          f"    99%%ile: ${percentile(99.0)}%.0f µs \n" +
+          f"    rate: $throughput%,.0f msg/s \n" +
+          "======================================"
         )
         println("Histogram of RTT latencies in microseconds.")
         histogram.outputPercentileDistribution(System.out, 1000.0)
 
-        taskRunnerMetrics.printHistograms()
+//        taskRunnerMetrics.printHistograms()
 
         val plotsTmp = LatencyPlots(PlotResult().add(testName, percentile(50.0)),
                                     PlotResult().add(testName, percentile(90.0)),
@@ -271,13 +226,20 @@ abstract class EventLatencySpec extends RemotingMultiNodeSpec(EventLatencySpec) 
 
       testProbe.expectMsgType[Terminated](5.minutes)
       enterBarrier("received-all-events")
+      rep.halt()
     }
-
     enterBarrier("after-" + testName)
   }
 
+  private def redisFactory = {
+    val redisClient  = RedisClient.create()
+    val wiring       = new Wiring(system)
+    val redisFactory = new RedisFactory(redisClient, mock[LocationService], wiring)
+    redisFactory
+  }
+
   "Latency of Event Service" must {
-    val reporter = BenchmarkFileReporter("LatencySpec", system)
+    val reporter = BenchmarkFileReporter("EventLatencySpec", system)
 
     for (s ← scenarios) {
       s"be low for ${s.testName}, at ${s.messageRate} msg/s, payloadSize = ${s.payloadSize}" in test(s, reporter)
