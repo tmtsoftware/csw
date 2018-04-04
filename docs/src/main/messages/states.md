@@ -1,7 +1,7 @@
 ## State Variables
 
 These state variables are used when an Assembly wants to track the status of a command sent to an HCD using
-a matcher.  For more information, see [Publishing State](../framework/publishing-state.md).
+a matcher.  For more information, see @ref:[Publishing State](../framework/publishing-state.md).
 
 A states represent a component's internal state. There are two types called `CurrentState` and `DemandState`. 
 They both share the same structural features. All state variables have **[Prefix](commands.html#Prefix)** and **ParameterSet**.

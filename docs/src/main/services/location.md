@@ -17,7 +17,7 @@ An example of location information is:
 @@@ note { title="async handling in scala and java examples." }
 
  * **Scala:** `async` marks a block of asynchronous code and allows to `await` the computation till the Future is complete.
-      For more info, please refer: https://github.com/scala/async
+      For more info, please refer to: https://github.com/scala/async
  
  * **Java non-blocking example:** The code snippets use `CompletableFuture` and its `thenAsync`, `thenApply` methods. This style allows to compose multiple Futures and not block the calling thread till Futures are complete. 
 
