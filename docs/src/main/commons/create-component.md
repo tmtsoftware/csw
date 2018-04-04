@@ -218,7 +218,7 @@ Whenever a command is sent to a component it is wrapped inside a command wrapper
 When a command is received by a component, the Top Level Actor will call the `validateCommand` hook of `ComponentHandlers`. Component developers are expected to perform appropriate
 validation of command, whether it is valid to execute, and return a `CommandResponse`. The `CommandResponse` returned from this hook will be sent back to sender directly by `csw-framework`.
 
-The logic in `validateCommand` hook can used to handle commands of various durations. If the command can be executed immediately, then the
+The logic in `validateCommand` hook can be used to handle commands of various durations. If the command can be executed immediately, then the
 component developer can return a final response directly in the validation step using a `CompletedWithResult` command response.  
 This should be only used for commands that require a very small amount of time to execute. 
 If the command will take longer, then component developer should return an intermediate response `Accepted`
@@ -258,6 +258,8 @@ To run the component using the deployment package, perform the following steps:
 -   Run `sbt <project>/universal:packageBin`. This will create self contained zip in `<project>/target/universal` directory
 -   Unzip generated zip file and enter into bin directory
 -   Run the `./<project>-cmd-app --local --standalone <path-to-local-config-file-to-start-the-component>`
+
+Alternatively, you can run `sbt stage`, which installs the application under target/universal/stage/bin.
 
 @@@ note { title=Note }
 
