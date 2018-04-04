@@ -2,11 +2,11 @@ package csw.services.event.internal.kafka
 
 import akka.actor.ActorSystem
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
-import csw.services.event.KafkaFactory
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.internal.commons.Wiring
 import csw.services.event.internal.perf.EventServicePerfFramework
 import csw.services.event.internal.{RateAdapterStage, RateLimiterStage}
+import csw.services.event.scaladsl.KafkaFactory
 import csw.services.location.scaladsl.LocationService
 import net.manub.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
 import org.scalatest.mockito.MockitoSugar

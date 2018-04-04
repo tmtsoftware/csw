@@ -1,12 +1,10 @@
-package csw.services.event
+package csw.services.event.javadsl
 
 import java.net.URI
 import java.util.concurrent.CompletableFuture
 
 import csw.services.event.internal.commons.{EventServiceResolver, Wiring}
 import csw.services.event.internal.redis.{JRedisPublisher, JRedisSubscriber, RedisPublisher, RedisSubscriber}
-import csw.services.event.javadsl.{IEventPublisher, IEventSubscriber}
-import csw.services.event.scaladsl.EventSubscriber
 import csw.services.location.scaladsl.LocationService
 import io.lettuce.core.{RedisClient, RedisURI}
 

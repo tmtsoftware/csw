@@ -2,19 +2,30 @@ package csw.services.event.javadsl
 
 import java.util.concurrent.CompletableFuture
 
+import akka.Done
 import akka.actor.typed.ActorRef
 import akka.stream.Materializer
 import akka.stream.javadsl.Source
 import akka.stream.scaladsl.Sink
 import csw.messages.events.{Event, EventKey}
 import csw.services.event.internal.RateAdapterStage
+import csw.services.event.scaladsl.EventSubscriber
 
-import scala.compat.java8.FutureConverters.CompletionStageOps
+import scala.collection.JavaConverters.{asScalaSetConverter, setAsJavaSetConverter}
+import scala.compat.java8.FutureConverters.{CompletionStageOps, FutureOps}
 import scala.concurrent.duration.FiniteDuration
 
-trait IEventSubscriber {
+abstract class IEventSubscriber(eventSubscriber: EventSubscriber) {
 
-  def subscribe(eventKeys: java.util.Set[EventKey]): Source[Event, IEventSubscription]
+  def subscribe(eventKeys: java.util.Set[EventKey]): Source[Event, IEventSubscription] =
+    eventSubscriber
+      .subscribe(eventKeys.asScala.toSet)
+      .asJava
+      .mapMaterializedValue { eventSubscription ⇒
+        new IEventSubscription {
+          override def unsubscribe(): CompletableFuture[Done] = eventSubscription.unsubscribe().toJava.toCompletableFuture
+        }
+      }
 
   def subscribe(eventKeys: java.util.Set[EventKey], every: FiniteDuration): Source[Event, IEventSubscription] = {
     subscribe(eventKeys).via(new RateAdapterStage[Event](every))
@@ -63,7 +74,10 @@ trait IEventSubscriber {
     subscribeCallback(eventKeys, event => actorRef ! event, every, mat)
   }
 
-  def get(eventKeys: java.util.Set[EventKey]): CompletableFuture[java.util.Set[Event]]
+  def get(eventKeys: java.util.Set[EventKey]): CompletableFuture[java.util.Set[Event]] =
+    eventSubscriber.get(eventKeys.asScala.toSet).toJava.toCompletableFuture.thenApply(_.asJava)
 
-  def get(eventKey: EventKey): CompletableFuture[Event]
+  def get(eventKey: EventKey): CompletableFuture[Event] = eventSubscriber.get(eventKey).toJava.toCompletableFuture
+
+  def asScala: EventSubscriber = eventSubscriber
 }

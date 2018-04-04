@@ -4,9 +4,9 @@ import java.util.concurrent.TimeUnit.SECONDS
 
 import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import csw.messages.events._
-import csw.services.event.RedisFactory
 import csw.services.event.internal.commons.Wiring
 import csw.services.event.perf.EventUtils._
+import csw.services.event.scaladsl.RedisFactory
 import csw.services.location.scaladsl.LocationService
 import io.lettuce.core.RedisClient
 import org.HdrHistogram.Histogram

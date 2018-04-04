@@ -3,11 +3,11 @@ package csw.services.event.internal.redis
 import akka.actor.ActorSystem
 import com.github.sebruck.EmbeddedRedis
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
-import csw.services.event.RedisFactory
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.internal.commons.Wiring
 import csw.services.event.internal.perf.EventServicePerfFramework
 import csw.services.event.internal.{RateAdapterStage, RateLimiterStage}
+import csw.services.event.scaladsl.RedisFactory
 import csw.services.location.scaladsl.LocationService
 import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar

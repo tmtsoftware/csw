@@ -21,9 +21,9 @@ class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(i
   override def subscribe(eventKeys: Set[EventKey]): Source[Event, EventSubscription] = {
     val consumer           = consumerSettings.createKafkaConsumer()
     val topicPartitions    = eventKeys.map(e ⇒ new TopicPartition(e.key, 0)).toList
-    val offsets            = getLatestOffsets(topicPartitions, consumer)
-    val subscription       = Subscriptions.assignmentWithOffset(offsets.mapValues(x ⇒ if (x == 0) 0L else x - 1))
-    val invalidEventStream = if (isNoEventAvailable(offsets)) Source.single(Event.invalidEvent) else Source.empty
+    val partitionToOffsets = getLatestOffsets(topicPartitions, consumer)
+    val subscription       = Subscriptions.assignmentWithOffset(partitionToOffsets.mapValues(x ⇒ if (x == 0) 0L else x - 1))
+    val invalidEventStream = if (isNoEventAvailable(partitionToOffsets)) Source.single(Event.invalidEvent) else Source.empty
     val eventStream = Consumer
       .plainSource(consumerSettings, subscription)
       .map(record ⇒ Event.fromPb(PbEvent.parseFrom(record.value())))

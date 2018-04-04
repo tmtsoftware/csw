@@ -4,11 +4,11 @@ import java.util.concurrent.TimeUnit
 
 import akka.actor.ActorSystem
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
-import csw.services.event.RedisFactory
 import csw.services.event.exceptions.PublishFailed
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.helpers.{RegistrationFactory, Utils}
 import csw.services.event.internal.commons.{EventServiceConnection, Wiring}
+import csw.services.event.scaladsl.RedisFactory
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.scaladsl.LocationServiceFactory
 import csw.services.logging.scaladsl.LoggingSystemFactory

@@ -43,5 +43,4 @@ class KafkaPublisher(producerSettings: ProducerSettings[String, Array[Byte]])(im
     case (_, null)          ⇒ p.success(Done)
     case (_, ex: Exception) ⇒ p.failure(PublishFailed(event, ex.getMessage))
   }
-
 }

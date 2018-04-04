@@ -7,10 +7,10 @@ import akka.actor._
 import akka.stream.ThrottleMode
 import akka.stream.scaladsl.{Keep, Source}
 import csw.messages.events.EventName
-import csw.services.event.RedisFactory
 import csw.services.event.internal.commons.Wiring
 import csw.services.event.perf.EventServicePerfSpec.Target
 import csw.services.event.perf.EventUtils._
+import csw.services.event.scaladsl.RedisFactory
 import csw.services.location.scaladsl.LocationService
 import io.lettuce.core.RedisClient
 import org.HdrHistogram.Histogram

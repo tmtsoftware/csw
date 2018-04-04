@@ -4,12 +4,12 @@ import akka.actor.ActorSystem
 import com.github.sebruck.EmbeddedRedis
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.events.EventKey
-import csw.services.event.RedisFactory
 import csw.services.event.helpers.RegistrationFactory
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.helpers.Utils.makeEvent
 import csw.services.event.internal.EventServicePubSubTestFramework
 import csw.services.event.internal.commons.{EventServiceConnection, Wiring}
+import csw.services.event.scaladsl.RedisFactory
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.scaladsl.LocationServiceFactory
 import io.lettuce.core.{RedisClient, RedisURI}

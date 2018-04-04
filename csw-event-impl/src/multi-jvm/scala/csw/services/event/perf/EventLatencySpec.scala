@@ -10,10 +10,10 @@ import akka.stream.{ActorMaterializer, ThrottleMode}
 import akka.testkit.TestProbe
 import com.typesafe.config.ConfigFactory
 import csw.messages.events.{Event, EventKey, EventName, SystemEvent}
-import csw.services.event.RedisFactory
 import csw.services.event.internal.commons.Wiring
 import csw.services.event.perf.EventUtils._
 import csw.services.event.perf.testkit.RemotingMultiNodeSpec
+import csw.services.event.scaladsl.RedisFactory
 import csw.services.location.scaladsl.LocationService
 import io.lettuce.core.RedisClient
 import org.HdrHistogram.Histogram

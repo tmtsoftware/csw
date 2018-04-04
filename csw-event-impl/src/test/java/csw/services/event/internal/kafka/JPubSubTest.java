@@ -1,30 +1,25 @@
-package csw.services.event.internal.redis;
+package csw.services.event.internal.kafka;
 
 import akka.actor.ActorSystem;
 import csw.messages.commons.CoordinatedShutdownReasons;
-import csw.messages.events.Event;
-import csw.messages.events.EventKey;
 import csw.services.event.helpers.RegistrationFactory;
-import csw.services.event.helpers.Utils;
 import csw.services.event.internal.JEventServicePubSubTestFramework;
+import csw.services.event.internal.commons.EmbeddedKafkaWiring$;
 import csw.services.event.internal.commons.EventServiceConnection;
 import csw.services.event.internal.commons.Wiring;
 import csw.services.event.javadsl.IEventPublisher;
 import csw.services.event.javadsl.IEventSubscriber;
-import csw.services.event.javadsl.JRedisFactory;
+import csw.services.event.javadsl.JKafkaFactory;
 import csw.services.location.commons.ClusterAwareSettings;
 import csw.services.location.commons.ClusterSettings;
 import csw.services.location.models.TcpRegistration;
 import csw.services.location.scaladsl.LocationService;
 import csw.services.location.scaladsl.LocationServiceFactory;
-import io.lettuce.core.RedisClient;
-import io.lettuce.core.RedisURI;
-import io.lettuce.core.api.sync.RedisCommands;
+import net.manub.embeddedkafka.EmbeddedKafka$;
+import net.manub.embeddedkafka.EmbeddedKafkaConfig;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import redis.embedded.RedisServer;
 import scala.concurrent.Await;
 import scala.concurrent.duration.FiniteDuration;
 
@@ -33,48 +28,47 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 public class JPubSubTest {
-    private static int seedPort = 3562;
-    private static int redisPort = 6379;
+    private static int seedPort = 3563;
+    private static int kafkaPort = 6001;
 
-    private static ClusterSettings clusterSettings;
-    private static RedisServer redis;
-    private static RedisClient redisClient;
-    private static Wiring wiring;
     private static IEventPublisher publisher;
+    private static Wiring wiring;
+
     private static JEventServicePubSubTestFramework framework;
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        clusterSettings = ClusterAwareSettings.joinLocal(seedPort);
-        redis = RedisServer.builder().setting("bind " + clusterSettings.hostname()).port(redisPort).build();
 
-        TcpRegistration tcpRegistration = RegistrationFactory.tcp(EventServiceConnection.value(), redisPort);
+        ClusterSettings clusterSettings = ClusterAwareSettings.joinLocal(seedPort);
+
         LocationService locationService = LocationServiceFactory.withSettings(ClusterAwareSettings.onPort(seedPort));
+        TcpRegistration tcpRegistration = RegistrationFactory.tcp(EventServiceConnection.value(), kafkaPort);
         Await.result(locationService.register(tcpRegistration), new FiniteDuration(10, TimeUnit.SECONDS));
 
-        redisClient = RedisClient.create();
         ActorSystem actorSystem = clusterSettings.system();
-        wiring = new Wiring(actorSystem);
-        JRedisFactory redisFactory = new JRedisFactory(redisClient, locationService, wiring);
 
-        publisher = redisFactory.publisher().get();
-        IEventSubscriber subscriber = redisFactory.subscriber().get();
+        EmbeddedKafkaConfig config = EmbeddedKafkaWiring$.MODULE$.embeddedKafkaConfig(clusterSettings);
+
+        wiring = new Wiring(actorSystem);
+        JKafkaFactory kafkaFactory = new JKafkaFactory(locationService, wiring);
+        publisher = kafkaFactory.publisher().get(10, TimeUnit.SECONDS);
+        IEventSubscriber subscriber = kafkaFactory.subscriber().get(10, TimeUnit.SECONDS);
 
         framework = new JEventServicePubSubTestFramework(publisher, subscriber, wiring.resumingMat());
 
-        redis.start();
+        EmbeddedKafka$.MODULE$.start(config);
     }
 
     @AfterClass
     public static void afterClass() throws Exception {
-        redisClient.shutdown();
-        redis.stop();
+        publisher.shutdown().get(10, TimeUnit.SECONDS);
+        EmbeddedKafka$.MODULE$.stop();
         Await.result(wiring.shutdown(CoordinatedShutdownReasons.TestFinishedReason$.MODULE$), new FiniteDuration(10, TimeUnit.SECONDS));
     }
 
     @Test
     public void shouldBeAbleToPublishAndSubscribeAnEvent() throws InterruptedException, TimeoutException, ExecutionException {
-       framework.pubsub();
+        framework.pubsub();
     }
 
     @Test
@@ -110,18 +104,5 @@ public class JPubSubTest {
     @Test
     public void shouldBeAbleToRetrieveInvalidEventOnGet() throws InterruptedException, ExecutionException, TimeoutException {
         framework.retrieveInvalidEventOnGet();
-    }
-
-    @Test
-    public void shouldBeAbleToPersistEventInDBWhilePublishing() throws InterruptedException, ExecutionException, TimeoutException {
-        Event event1 = Utils.makeEvent(1);
-        EventKey eventKey = event1.eventKey();
-        RedisCommands<EventKey, Event> redisCommands =
-                redisClient.connect(EventServiceCodec$.MODULE$, RedisURI.create(clusterSettings.hostname(), redisPort)).sync();
-
-        publisher.publish(event1).get(10, TimeUnit.SECONDS);
-
-        Thread.sleep(1000);
-        Assert.assertEquals(event1, redisCommands.get(eventKey));
     }
 }

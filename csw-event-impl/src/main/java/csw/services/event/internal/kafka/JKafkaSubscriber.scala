@@ -1,3 +1,5 @@
 package csw.services.event.internal.kafka
 
-class JKafkaSubscriber {}
+import csw.services.event.javadsl.IEventSubscriber
+
+class JKafkaSubscriber(kafkaSubscriber: KafkaSubscriber) extends IEventSubscriber(kafkaSubscriber)
