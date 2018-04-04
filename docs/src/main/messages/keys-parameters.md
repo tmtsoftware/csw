@@ -1,6 +1,6 @@
 ## Keys and Parameters
 
-Library offers a flexible and typesafe means to create Parameters to store values like **primitive types, collection types or domain specific types**. 
+The library offers a flexible and typesafe means to create Parameters to store values like **primitive types, collection types or domain specific types**. 
 
 A **Parameter** is a Key and Value where the Value must be from a set of defined primitive types including binary data.
 The Value of a `Parameter` is always considered to be an Array of the type (i.e. if a single value is stored it is at array location 0). 
@@ -15,7 +15,7 @@ A key is **unique** in a `ParameterSet` since it is a Set.
 
 ### How to Create a Parameter
  
- * choose an appropriate KeyType from below tables for your language(Scala/Java).    
+ * choose an appropriate KeyType from the tables below for your language(Scala/Java).    
  * calling the `make` method on KeyType and supplying a String keyName will return a suitably typed Key instance.    
  * explore the overloaded `set` and `->` methods, which will allow you to store values of the based on chosen KeyType. e.g. `JKeyTypes.BooleanKey` will allow storing only `java.lang.Boolean` values.
  
