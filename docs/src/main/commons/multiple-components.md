@@ -188,6 +188,6 @@ Assuming that `galil-deploy` depends on `galil-assembly` and `galil-hcd`, to sta
 @@@ note { title=Note }
 
 The CSW Location Service cluster seed must be running and appropriate environment variables set to run the apps.
-See https://tmtsoftware.github.io/csw-prod/apps/cswclusterseed.html.
+See @ref:[CSW Cluster Seed](../apps/cswclusterseed.md).
 
 @@@

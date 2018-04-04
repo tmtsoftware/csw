@@ -264,7 +264,7 @@ Alternatively, you can run `sbt stage`, which installs the application under tar
 @@@ note { title=Note }
 
 CSW Location Service cluster seed must be running, and appropriate environment variables set to run apps.
-See https://tmtsoftware.github.io/csw-prod/apps/cswclusterseed.html.
+See @ref:[CSW Cluster Seed](../apps/cswclusterseed.md).
 
 @@@
 
