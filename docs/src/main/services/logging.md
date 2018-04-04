@@ -1,6 +1,6 @@
 # Logging Service
 
-Logging Service library provides an advanced logging facility for csw components and services. 
+The Logging Service library provides an advanced logging facility for csw components and services. 
 
 @@@note
 
@@ -56,7 +56,7 @@ all components will log at level specified by `csw-logging.logLevel`.
 
 @@@
 
-Library provides `StdOutAppender` as default logging appender. To use `FileAppender` or some custom appender along-with 
+The library provides `StdOutAppender` as default logging appender. To use `FileAppender` or some custom appender along-with 
 `StdOutAppender`, override `appenders` property to include multiple appender in csv format as follows:
  
 ```
@@ -129,7 +129,7 @@ Following Log levels are supported by csw-logging library
 * DEBUG
 * TRACE
 
-Library allows separate log levels for the logging API(logLevel), Akka logging(akkaLogLevel), and Slf4J(slf4jLogLevel). The initial values of these are set in the configuration file as seen above. These can be overriden in the application.conf file.
+The library allows separate log levels for the logging API(logLevel), Akka logging(akkaLogLevel), and Slf4J(slf4jLogLevel). The initial values of these are set in the configuration file as seen above. These can be overriden in the application.conf file.
 
 These values can also be changed dynamically by calling methods on `LoggingSystem` class.
 
@@ -284,7 +284,7 @@ Java (Supplier)
     ```
     @@@
 
-Library allows usage of `Map` in message as follows:
+The library allows usage of `Map` in message as follows:
 
 Scala
  :   @@snip [LocationServiceExampleClientApp](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #log-info-map }
@@ -360,7 +360,7 @@ Java (Supplier)
     @@@
 
     
-Library allows to log an error with its full stacktrace as follows:
+The library allows you to log an error with its full stacktrace as follows:
  
 Scala
   :   @@snip [LocationServiceExampleClientApp](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #log-error }

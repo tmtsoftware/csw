@@ -14,6 +14,9 @@ The command `sbt csw-cluster-seed/universal:publishLocal` will publish necessary
 The target of above command is a zip file titled "csw-cluster-seed.zip" and its path will be printed on console. Unzip this file and switch current
 working directory to the extracted folder. Choose appropriate instructions from below based on requirement ie single seed or multiple seeds.
 
+Note: An alternative method is to run `sbt publishLocal stage`, which installs all the dependencies locally and also installs all the csw applications
+ in `target/universal/stage/bin`.
+
 ## If Deploying a Single Seed Application
 The steps below describe how to run cluster seed on a single machine. This can be a requirement for testing or demo purpose.
 

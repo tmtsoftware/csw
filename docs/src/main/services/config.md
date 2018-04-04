@@ -1,6 +1,6 @@
 # Configuration Service
 
-Configuration Service provides a centralized persistent store for any configuration file used in the TMT Software System. 
+The Configuration Service provides a centralized persistent store for any configuration file used in the TMT Software System. 
 All versions of configuration files are retained, providing a historical record of each configuration file.
 
 Note that in order to use the APIs described here, the [Location Service](../services/location.html)
