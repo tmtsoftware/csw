@@ -1,7 +1,5 @@
 package csw.services.event.internal.redis
 
-import java.util.concurrent.TimeUnit
-
 import akka.actor.ActorSystem
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.event.exceptions.PublishFailed
@@ -48,7 +46,7 @@ class FailureTest extends FunSuite with Matchers with MockitoSugar with BeforeAn
   }
 
   override def afterAll(): Unit = {
-    redisClient.shutdown(0, 10, TimeUnit.SECONDS)
+    redisClient.shutdown
     redis.stop()
     wiring.shutdown(TestFinishedReason).await
   }
