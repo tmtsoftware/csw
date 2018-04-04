@@ -40,7 +40,8 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
 lazy val githubReleases: Seq[ProjectReference] = Seq(
   `csw-cluster-seed`,
   `csw-location-agent`,
-  `csw-config-server`
+  `csw-config-server`,
+  `csw-config-client-cli`
 )
 
 //Root project
@@ -158,19 +159,6 @@ lazy val `csw-config-client-cli` = project
     libraryDependencies ++= Dependencies.ConfigClientCli
   )
 
-lazy val `csw-event-api` = project
-  .dependsOn(`csw-messages`)
-  .enablePlugins(GenJavadocPlugin)
-
-lazy val `csw-event-impl` = project
-  .dependsOn(
-    `csw-event-api`,
-    `csw-logging`,
-    `csw-location` % "compile->compile;multi-jvm->multi-jvm"
-  )
-  .enablePlugins(AutoMultiJvm)
-  .settings(libraryDependencies ++= Dependencies.EventImpl)
-
 lazy val `csw-command` = project
   .dependsOn(`csw-messages`, `csw-logging`)
   .enablePlugins(PublishBintray, AutoMultiJvm, GenJavadocPlugin)
@@ -191,6 +179,18 @@ lazy val `csw-framework` = project
     libraryDependencies ++= Dependencies.Framework
   )
 
+lazy val `csw-event-api` = project
+  .dependsOn(`csw-messages`)
+  .enablePlugins(GenJavadocPlugin)
+
+lazy val `csw-event-impl` = project
+  .dependsOn(
+    `csw-event-api`,
+    `csw-logging`,
+    `csw-location` % "compile->compile;multi-jvm->multi-jvm"
+  )
+  .enablePlugins(AutoMultiJvm)
+  .settings(libraryDependencies ++= Dependencies.EventImpl)
 
 lazy val `csw-commons` = project
   .enablePlugins(PublishBintray, GenJavadocPlugin)

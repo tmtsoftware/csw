@@ -1,0 +1,10 @@
+## CSW - TMT Common Software v0.4.0-RC1
+
+This is release v0.4.0-RC1 of the TMT Common Software.
+
+The API documentation can be found at:
+Java API : https://tmtsoftware.github.io/csw-prod/0.4.0-RC1/api/java/?/index.html
+Scala API : https://tmtsoftware.github.io/csw-prod/0.4.0-RC1/api/scala/index.html
+
+Paradox documentation can be found at:
+https://tmtsoftware.github.io/csw-prod/0.4.0-RC1/
