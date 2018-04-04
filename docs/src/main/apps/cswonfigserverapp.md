@@ -16,14 +16,26 @@ Kindly refer to this [cluster-seed setup](https://tmtsoftware.github.io/csw-prod
 
 ## Examples
 
-**Example:** csw-config-server --initRepo  
-**Explanation:** Start HTTP server on default port 4000. Initialize repository if it does not exist and register it with Location Service
+1. 
+```
+csw-config-server --initRepo
+```  
+Start HTTP server on default port 4000. Initialize repository if it does not exist and register it with Location Service
  
-**Example:** csw-config-server --initRepo --port 4001  
-**Explanation:** Start HTTP server on port 4001. Initialize repository if it does not exist and register it with Location Service 
+2. 
+```
+csw-config-server --initRepo --port 4001
+```  
+Start HTTP server on port 4001. Initialize repository if it does not exist and register it with Location Service 
 
-**Example:** csw-config-server --help  
-**Explanation:** Prints help message
+3. 
+```
+csw-config-server --help
+```  
+Prints help message
 
-**Example:** csw-config-server --version    
-**Explanation:** Prints application version
+4. 
+```
+csw-config-server --version
+```    
+Prints application version

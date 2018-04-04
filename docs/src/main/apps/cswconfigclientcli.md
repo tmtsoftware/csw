@@ -102,45 +102,86 @@ Prints the version of the application.
 
 ## Examples
 
-**Example:** csw-config-client-cli "create" "/path/hcd/trombone.conf" -i "/Users/admin/configs/trombone.conf" -c "Initial version"   
-**Explanation:** Creates a config file at path '/path/hcd/trombone.conf', using local file at "/Users/admin/configs/trombone.conf", with "Initial version" as a comment.
+1. 
+```
+csw-config-client-cli create /path/hcd/trombone.conf -i /Users/admin/configs/trombone.conf -c "Initial version"
+```   
+Creates a config file at path `/path/hcd/trombone.conf`, using local file at `/Users/admin/configs/trombone.conf`, with `Initial version` as a comment.
 
-**Example:** csw-config-client-cli "create" "/path/hcd/trombone.conf" -i "/Users/admin/large-configs/bigBinary.conf" --annex   
-**Explanation:** Creates a config file at path '/path/hcd/trombone.conf', using local file at "/Users/admin/large-configs/bigBinary.conf", file will be stored in annex store.
+2. 
+```
+csw-config-client-cli create /path/hcd/trombone.conf -i /Users/admin/large-configs/bigBinary.conf --annex
+```   
+Creates a config file at path `/path/hcd/trombone.conf`, using local file at `/Users/admin/large-configs/bigBinary.conf`, file will be stored in annex store.
 
-**Example:** csw-config-client-cli "update" "/path/hcd/trombone.conf" -i "/Users/foo/new_trombone.conf" -c "new conf for next observation"    
-**Explanation:** Updates repository file "/path/hcd/trombone.conf", with a local file at "/Users/foo/new_trombone.conf", using a specified comment.
+3. 
+```
+csw-config-client-cli update /path/hcd/trombone.conf -i /Users/foo/new_trombone.conf -c "new conf for next observation"
+```    
+Updates repository file `/path/hcd/trombone.conf`, with a local file at `/Users/foo/new_trombone.conf`, using a specified comment.
 
-**Example:** csw-config-client-cli "get" "/path/hcd/trombone.conf" -o "/Users/bar/temp/latest_trombone.conf"    
-**Explanation:** Gets repository file "/path/hcd/trombone.conf", stores at local disk location "/Users/bar/temp/latest_trombone.conf"
+4. 
+```
+csw-config-client-cli get /path/hcd/trombone.conf -o /Users/bar/temp/latest_trombone.conf
+```    
+Gets repository file `/path/hcd/trombone.conf`, stores at local disk location `/Users/bar/temp/latest_trombone.conf`
 
-**Example:** csw-config-client-cli "get" "/path/hcd/trombone.conf" -o "/Users/bar/temp/old_trombone.conf" --id "10"    
-**Explanation:** Gets version revision 10 of repository file "/path/hcd/trombone.conf", stores at local disk location "/Users/bar/temp/old_trombone.conf"
+5. 
+```
+csw-config-client-cli get /path/hcd/trombone.conf -o /Users/bar/temp/old_trombone.conf --id 10
+```    
+Gets version revision 10 of repository file `/path/hcd/trombone.conf`, stores at local disk location `/Users/bar/temp/old_trombone.conf`
 
-**Example:** csw-config-client-cli "getActive" "/path/hcd/trombone.conf" -o "/Users/bar/temp/scheduled_trombone.conf"    
-**Explanation:** Gets currently active version of repository file "/path/hcd/trombone.conf", stores at local disk location "/Users/bar/temp/scheduled_trombone.conf"
+6. 
+```
+csw-config-client-cli getActive /path/hcd/trombone.conf -o /Users/bar/temp/scheduled_trombone.conf
+```    
+Gets currently active version of repository file `/path/hcd/trombone.conf`, stores at local disk location `/Users/bar/temp/scheduled_trombone.conf`
 
-**Example:** csw-config-client-cli "exists" "/path/hcd/trombone.conf"    
-**Explanation:** True if repository file "/path/hcd/trombone.conf" exists, false otherwise
+7. 
+```
+csw-config-client-cli exists /path/hcd/trombone.conf
+```    
+True if repository file `/path/hcd/trombone.conf` exists, false otherwise
 
-**Example:** csw-config-client-cli "delete" "/path/hcd/outdated_trombone.conf" -c "monthly maintainance activity"    
-**Explanation:** Deletes repository file "/path/hcd/outdated_trombone.conf" if it exists using a comment
+8. 
+```
+csw-config-client-cli delete /path/hcd/outdated_trombone.conf -c monthly maintainance activity
+```    
+Deletes repository file `/path/hcd/outdated_trombone.conf` if it exists using a comment
 
-**Example:** csw-config-client-cli "history" "/path/hcd/trombone.conf" "--max" 25    
-**Explanation:** Prints history of repository file "/path/hcd/trombone.conf", with only 25 entries.
+9. 
+```
+csw-config-client-cli history /path/hcd/trombone.conf --max 25
+```    
+Prints history of repository file `/path/hcd/trombone.conf`, with only 25 entries.
 
-**Example:** csw-config-client-cli "setActiveVersion" "/path/hcd/trombone.conf" --id "4" -c "restoring last successful version."    
-**Explanation:** Sets revision 4 to be active for repository file "/path/hcd/trombone.conf", using a comment.
+10. 
+```
+csw-config-client-cli setActiveVersion /path/hcd/trombone.conf --id 4 -c restoring last successful version.
+```    
+Sets revision 4 to be active for repository file `/path/hcd/trombone.conf`, using a comment.
 
-**Example:** csw-config-client-cli "resetActiveVersion" "/path/hcd/trombone.conf" -c "testing most recent config"    
-**Explanation:** Sets latest revision to be active for repository file "/path/hcd/trombone.conf", using a comment.
+11. 
+```
+csw-config-client-cli resetActiveVersion /path/hcd/trombone.conf -c testing most recent config
+```    
+Sets latest revision to be active for repository file `/path/hcd/trombone.conf`, using a comment.
 
-**Example:** csw-config-client-cli "getActiveVersion" "/path/hcd/trombone.conf"    
-**Explanation:** Gets active version ID for repository file "/path/hcd/trombone.conf".
+12. 
+```
+csw-config-client-cli getActiveVersion /path/hcd/trombone.conf
+```    
+Gets active version ID for repository file `/path/hcd/trombone.conf`.
 
-**Example:** csw-config-client-cli "getActiveByTime" "/path/hcd/trombone.conf" -o "/usr/tmp/last_week_trombone.conf" --date "2017-05-09T07:29:53.242Z"    
-**Explanation:** Gets version of repository file "/path/hcd/trombone.conf", that was active on "2017-05-09T07:29:53.242Z" and saves it on local disk.
+13. 
+```
+csw-config-client-cli getActiveByTime /path/hcd/trombone.conf -o /usr/tmp/last_week_trombone.conf --date 2017-05-09T07:29:53.242Z
+```    
+Gets version of repository file `/path/hcd/trombone.conf`, that was active on `2017-05-09T07:29:53.242Z` and saves it on local disk.
 
-**Example:** csw-config-client-cli "getMetadata"    
-**Explanation:** Prins the metadata on screen.
-
+14. 
+```
+csw-config-client-cli getMetadata
+```    
+Prints the metadata on screen.

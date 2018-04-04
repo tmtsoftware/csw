@@ -45,12 +45,20 @@ Sbt task: `sbt project/universal:packageBin` creates following four scripts in `
 * `trombone-host-config-app.bat` : For windows machine.
 * `trombone-container-cmd-app.bat` : For windows machine.
 
-**Example:** `./trombone-host-config-app hostconfig.conf -s ./trombone-container-cmd-app`  
-**Explanation:** Fetch `hostconfig.conf` from configuration service which contains multiple container configuration, 
+**Examples:**
+ 
+1. 
+```
+./trombone-host-config-app hostconfig.conf -s ./trombone-container-cmd-app
+```  
+Fetch `hostconfig.conf` from configuration service which contains multiple container configuration, 
 then invoke trombone-container-cmd-app script per container configuration which spawns container
 
-**Example:** `./trombone-host-config-app --local hostconfig.conf -s ./trombone-container-cmd-app`  
-**Explanation:** Fetch and parse `hostconfig.conf` from current directory which contains multiple container configuration, 
+2. 
+```
+./trombone-host-config-app --local hostconfig.conf -s ./trombone-container-cmd-app
+```  
+Fetch and parse `hostconfig.conf` from current directory which contains multiple container configuration, 
 then invoke trombone-container-cmd-app script per container configuration which spawns container
  
 

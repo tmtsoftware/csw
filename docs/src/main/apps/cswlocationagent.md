@@ -15,17 +15,32 @@ A utility application that starts a given external program, registers a comma se
 
 ## Examples
 
-**Example:** csw-location-agent --name "redis" --command "redis-server /usr/local/etc/redis.conf" --port 6379  
-**Explanation:** Application will start redis server on port 6379(default redis port) and will register a TcpConnection for the same with Location Service 
+1. 
+```
+csw-location-agent --name "redis" --command "redis-server /usr/local/etc/redis.conf" --port 6379
+```  
+Application will start redis server on port 6379(default redis port) and will register a TcpConnection for the same with Location Service 
 
-**Example:** csw-location-agent --name "foo" --command "sleep 30"  
-**Explanation:** **Explanation:** Application will sleep for 30 seconds. Then, will register a service named foo on a random port with Location Service. Once sleep is over after 30 seconds, will unregister foo service.
+2. 
+```
+csw-location-agent --name "foo" --command "sleep 30"
+```
+Application will sleep for 30 seconds. Then, will register a service named foo on a random port with Location Service. Once sleep is over after 30 seconds, will unregister foo service.
 
-**Example:** csw-location-agent --name "myHttpService" --command "python -m SimpleHTTPServer 8080" --port 8080  
-**Explanation:** Application will start a simple HTTP service on port 8080. Then, will register myHttpService as a TCP service with Location Service.
+3. 
+```
+csw-location-agent --name "myHttpService" --command "python -m SimpleHTTPServer 8080" --port 8080
+```  
+Application will start a simple HTTP service on port 8080. Then, will register myHttpService as a TCP service with Location Service.
 
-**Example:** csw-location-agent --help  
-**Explanation:** Prints help message
+4. 
+```
+csw-location-agent --help
+```  
+Prints help message
 
-**Example:** csw-location-agent --version  
-**Explanation:** Prints application version
+5. 
+```
+csw-location-agent --version
+```  
+Prints application version
