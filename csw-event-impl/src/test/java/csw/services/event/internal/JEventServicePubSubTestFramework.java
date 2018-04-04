@@ -134,7 +134,7 @@ public class JEventServicePubSubTestFramework {
             events.add(Utils.makeDistinctEvent(i));
         }
 
-        List<Event> queue = new ArrayList<>();
+        Set<Event> queue = new HashSet<>();
         subscriber.subscribe(events.stream().map(Event::eventKey).collect(Collectors.toSet())).runForeach(queue::add, mat);
 
         Thread.sleep(500);
@@ -148,7 +148,7 @@ public class JEventServicePubSubTestFramework {
         Assert.assertEquals(11, queue.size());
 
         events.add(0, Event$.MODULE$.invalidEvent());
-        Assert.assertEquals(events, queue);
+        Assert.assertEquals(new HashSet<>(events), queue);
     }
     
     public void retrieveRecentlyPublished() throws InterruptedException, ExecutionException, TimeoutException {
