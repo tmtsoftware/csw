@@ -14,7 +14,7 @@ import csw.services.command.scaladsl.CommandResponseManager
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class SampleComponentHandlers(
     ctx: ActorContext[TopLevelActorMessage],
@@ -32,7 +32,8 @@ class SampleComponentHandlers(
       loggerFactory: LoggerFactory
     ) {
 
-  val log: Logger = new LoggerFactory(componentInfo.name).getLogger(ctx)
+  val log: Logger                   = new LoggerFactory(componentInfo.name).getLogger(ctx)
+  implicit val ec: ExecutionContext = ctx.executionContext
 
   import SampleComponentState._
 
@@ -95,7 +96,10 @@ class SampleComponentHandlers(
     case LocationUpdated(location) ⇒
       location.connection match {
         case _: AkkaConnection =>
-          currentStatePublisher.publish(CurrentState(prefix, Set(choiceKey.set(akkaLocationUpdatedChoice))))
+          Future {
+            Thread.sleep(100)
+            currentStatePublisher.publish(CurrentState(prefix, Set(choiceKey.set(akkaLocationUpdatedChoice))))
+          }
         case _: HttpConnection =>
           currentStatePublisher.publish(CurrentState(prefix, Set(choiceKey.set(httpLocationUpdatedChoice))))
         case _: TcpConnection =>

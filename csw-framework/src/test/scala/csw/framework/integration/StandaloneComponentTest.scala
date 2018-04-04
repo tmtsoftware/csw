@@ -99,7 +99,7 @@ class StandaloneComponentTest extends FunSuite with Matchers with BeforeAndAfter
 
     // this proves that postStop signal of supervisor gets invoked
     // as supervisor gets unregistered in postStop signal
-    akkaProbe.requestNext(LocationRemoved(akkaConnection))
+    akkaProbe.requestNext(10.seconds) shouldBe LocationRemoved(akkaConnection)
 
     // this proves that on shutdown message, supervisor's actor system gets terminated
     // if it does not get terminated in 5 seconds, future will fail which in turn fail this test
