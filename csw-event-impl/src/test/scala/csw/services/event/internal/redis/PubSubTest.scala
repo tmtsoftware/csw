@@ -69,6 +69,10 @@ class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with Embe
     framework.retrieveInvalidEvent()
   }
 
+  test("Redis - should be able to retrieve only valid events when one of the subscribed events keys has published events") {
+    framework.retrieveMultipleSubscribedEvents()
+  }
+
   // DEOPSCSW-334 : Publish an event
   test("Redis - should be able to get an event without subscribing for it") {
     framework.get()
@@ -76,6 +80,10 @@ class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with Embe
 
   test("Redis - should be able to get InvalidEvent") {
     framework.retrieveInvalidEventOnGet()
+  }
+
+  test("Redis - should be able to get events for multiple event keys") {
+    framework.retrieveEventsForMultipleEventKeysOnGet()
   }
 
   // DEOPSCSW-334 : Publish an event

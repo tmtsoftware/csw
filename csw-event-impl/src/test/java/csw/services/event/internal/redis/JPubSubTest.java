@@ -103,6 +103,11 @@ public class JPubSubTest {
     }
 
     @Test
+    public void shouldBeAbleToRetrieveOnlyValidEventsWhenOneOfTheSubscribedEventsKeysHasPublishedEvents() throws InterruptedException, ExecutionException, TimeoutException {
+        framework.retrieveMultipleSubscribedEvents();
+    }
+
+    @Test
     public void shouldBeAbleToGetAnEventWithoutSubscribingForIt() throws InterruptedException, ExecutionException, TimeoutException {
         framework.get();
     }

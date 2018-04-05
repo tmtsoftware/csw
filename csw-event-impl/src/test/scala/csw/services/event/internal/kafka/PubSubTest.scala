@@ -67,6 +67,10 @@ class PubSubTest extends FunSuite with EmbeddedKafka with BeforeAndAfterAll {
     framework.retrieveInvalidEvent()
   }
 
+  test("Kafka - should be able to retrieve only valid events when one of the subscribed events keys has published events") {
+    framework.retrieveMultipleSubscribedEvents()
+  }
+
   // DEOPSCSW-334 : Publish an event
   test("Kafka - should be able to get an event without subscribing for it") {
     framework.get()
@@ -76,4 +80,7 @@ class PubSubTest extends FunSuite with EmbeddedKafka with BeforeAndAfterAll {
     framework.retrieveInvalidEventOnGet()
   }
 
+  ignore("Kafka - should be able to get events for multiple event keys") {
+    framework.retrieveEventsForMultipleEventKeysOnGet()
+  }
 }

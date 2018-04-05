@@ -186,6 +186,29 @@ public class JEventServicePubSubTestFramework {
         Assert.assertEquals(Collections.singletonList(Event$.MODULE$.invalidEvent()), pair.second().toCompletableFuture().get(10, TimeUnit.SECONDS));
     }
 
+    public void retrieveMultipleSubscribedEvents() throws InterruptedException, ExecutionException, TimeoutException {
+        Event distinctEvent1 = Utils.makeDistinctEvent(201);
+        Event distinctEvent2 = Utils.makeDistinctEvent(202);
+
+        EventKey eventKey1 = distinctEvent1.eventKey();
+        EventKey eventKey2 = distinctEvent2.eventKey();
+
+        publisher.publish(distinctEvent1).get(10, TimeUnit.SECONDS);
+        Thread.sleep(1000);
+
+        Set<EventKey> eventKeys = new HashSet<>();
+        eventKeys.add(eventKey1);
+        eventKeys.add(eventKey2);
+
+        Pair<IEventSubscription, CompletionStage<List<Event>>> pair = subscriber.subscribe(eventKeys).toMat(Sink.seq(), Keep.both()).run(mat);
+        Thread.sleep(1000);
+
+        pair.first().unsubscribe().get(10, TimeUnit.SECONDS);
+
+        Set<Event> actualEvents = new HashSet<>(pair.second().toCompletableFuture().get(10, TimeUnit.SECONDS));
+        Assert.assertEquals(Collections.singleton(distinctEvent1), actualEvents);
+    }
+
     public void get() throws InterruptedException, ExecutionException, TimeoutException {
         Event event1 = Utils.makeEvent(1);
         EventKey eventKey = event1.eventKey();

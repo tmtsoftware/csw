@@ -142,6 +142,24 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     seqF.await shouldBe Seq(Event.invalidEvent)
   }
 
+  def retrieveMultipleSubscribedEvents(): Unit = {
+    val distinctEvent1 = makeDistinctEvent(201)
+    val distinctEvent2 = makeDistinctEvent(202)
+
+    val eventKey1 = distinctEvent1.eventKey
+    val eventKey2 = distinctEvent2.eventKey
+
+    publisher.publish(distinctEvent1).await
+    Thread.sleep(1000)
+
+    val (subscription, seqF) = subscriber.subscribe(Set(eventKey1, eventKey2)).toMat(Sink.seq)(Keep.both).run()
+    Thread.sleep(1000)
+
+    subscription.unsubscribe().await
+
+    seqF.await shouldBe Seq(distinctEvent1) //no
+  }
+
   def get(): Unit = {
     val event1   = makeEvent(1)
     val eventKey = event1.eventKey
@@ -160,4 +178,19 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     eventF.await shouldBe Event.invalidEvent
   }
 
+  def retrieveEventsForMultipleEventKeysOnGet(): Unit = {
+    val event1    = makeEvent(1)
+    val event2    = makeEvent(2)
+    val eventKey1 = event1.eventKey
+
+    val event3    = makeDistinctEvent(3)
+    val eventKey3 = event3.eventKey
+
+    publisher.publish(event1).await
+    publisher.publish(event2).await
+
+    val eventsF = subscriber.get(Set(eventKey1, eventKey3))
+
+    eventsF.await shouldBe Set(event2)
+  }
 }

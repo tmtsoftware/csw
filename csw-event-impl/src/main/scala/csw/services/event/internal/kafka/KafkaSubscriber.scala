@@ -57,6 +57,6 @@ class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(i
     consumer.endOffsets(topicPartitions.asJava).asScala.toMap.mapValues(_.toLong)
   }
 
-  private def isNoEventAvailable(offsets: Map[TopicPartition, Long]) = offsets.values.exists(_ == 0)
+  private def isNoEventAvailable(offsets: Map[TopicPartition, Long]) = offsets.values.forall(_ == 0)
 
 }
