@@ -27,6 +27,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+//DEOPSCSW-335: Model for EventName that encapsulates the topic(or channel ) name
+//DEOPSCSW-334: Publish an event
+//DEOPSCSW-335: Model for EventName that encapsulates the topic(or channel ) name
+//DEOPSCSW-337: Subscribe to an event based on prefix
 public class JPubSubTest {
     private static int seedPort = 3563;
     private static int kafkaPort = 6001;
@@ -86,16 +90,19 @@ public class JPubSubTest {
         framework.publishMultipleToDifferentChannels();
     }
 
+    //DEOPSCSW-340: Provide most recently published event for subscribed prefix and name
     @Test
     public void shouldBeAbleToRetrieveRecentlyPublishedEventOnSubscription() throws InterruptedException, ExecutionException, TimeoutException {
         framework.retrieveRecentlyPublished();
     }
 
+    //DEOPSCSW-340: Provide most recently published event for subscribed prefix and name
     @Test
     public void shouldBeAbleToRetrieveInvalidEvent() throws InterruptedException, TimeoutException, ExecutionException {
         framework.retrieveInvalidEvent();
     }
 
+    //DEOPSCSW-340: Provide most recently published event for subscribed prefix and name
     @Test
     public void shouldBeAbleToRetrieveOnlyValidEventsWhenOneOfTheSubscribedEventsKeysHasPublishedEvents() throws InterruptedException, ExecutionException, TimeoutException {
         framework.retrieveMultipleSubscribedEvents();

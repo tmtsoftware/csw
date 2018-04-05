@@ -12,6 +12,10 @@ import csw.services.location.scaladsl.LocationServiceFactory
 import net.manub.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
 
+//DEOPSCSW-335: Model for EventName that encapsulates the topic(or channel ) name
+//DEOPSCSW-334: Publish an event
+//DEOPSCSW-335: Model for EventName that encapsulates the topic(or channel ) name
+//DEOPSCSW-337: Subscribe to an event based on prefix
 class PubSubTest extends FunSuite with EmbeddedKafka with BeforeAndAfterAll {
   private val seedPort        = 3561
   private val kafkaPort       = 6001
@@ -42,7 +46,6 @@ class PubSubTest extends FunSuite with EmbeddedKafka with BeforeAndAfterAll {
     wiring.shutdown(TestFinishedReason).await
   }
 
-  // DEOPSCSW-334 : Publish an event
   test("Kafka - should be able to publish and subscribe an event") {
     framework.pubSub()
   }
@@ -59,19 +62,21 @@ class PubSubTest extends FunSuite with EmbeddedKafka with BeforeAndAfterAll {
     framework.publishMultipleToDifferentChannels()
   }
 
+  //DEOPSCSW-340: Provide most recently published event for subscribed prefix and name
   test("Kafka - should be able to retrieve recently published event on subscription") {
     framework.retrieveRecentlyPublished()
   }
 
+  //DEOPSCSW-340: Provide most recently published event for subscribed prefix and name
   test("Kafka - should be able to retrieve InvalidEvent") {
     framework.retrieveInvalidEvent()
   }
 
+  //DEOPSCSW-340: Provide most recently published event for subscribed prefix and name
   test("Kafka - should be able to retrieve only valid events when one of the subscribed events keys has published events") {
     framework.retrieveMultipleSubscribedEvents()
   }
 
-  // DEOPSCSW-334 : Publish an event
   test("Kafka - should be able to get an event without subscribing for it") {
     framework.get()
   }

@@ -9,6 +9,8 @@ import org.scalatest.{FunSpec, Matchers}
 // DEOPSCSW-327: Define Event Data Structure
 // DEOPSCSW-328: Basic information of Event needed for routing and Diagnostic use
 // DEOPSCSW-329: Providing Mandatory information during Event Creation
+// DEOPSCSW-330: Include complex payloads - paramset in Event and ObserveEvent
+// DEOPSCSW-331: Complex payload - Include byte in paramset for Event and ObserveEvent
 class EventsTest extends FunSpec with Matchers {
   private val s1: String = "encoder"
 

@@ -16,6 +16,10 @@ import io.lettuce.core.{RedisClient, RedisURI}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import redis.embedded.RedisServer
 
+//DEOPSCSW-335: Model for EventName that encapsulates the topic(or channel ) name
+//DEOPSCSW-334: Publish an event
+//DEOPSCSW-335: Model for EventName that encapsulates the topic(or channel ) name
+//DEOPSCSW-337: Subscribe to an event based on prefix
 class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with EmbeddedRedis {
   private val seedPort        = 3558
   private val redisPort       = 6379
@@ -44,7 +48,6 @@ class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with Embe
     wiring.shutdown(TestFinishedReason).await
   }
 
-  // DEOPSCSW-334 : Publish an event
   test("Redis - should be able to publish and subscribe an event") {
     framework.pubSub()
   }
@@ -61,19 +64,21 @@ class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with Embe
     framework.publishMultipleToDifferentChannels()
   }
 
+  //DEOPSCSW-340: Provide most recently published event for subscribed prefix and name
   test("Redis - should be able to retrieve recently published event on subscription") {
     framework.retrieveRecentlyPublished()
   }
 
+  //DEOPSCSW-340: Provide most recently published event for subscribed prefix and name
   test("Redis - should be able to retrieve InvalidEvent") {
     framework.retrieveInvalidEvent()
   }
 
+  //DEOPSCSW-340: Provide most recently published event for subscribed prefix and name
   test("Redis - should be able to retrieve only valid events when one of the subscribed events keys has published events") {
     framework.retrieveMultipleSubscribedEvents()
   }
 
-  // DEOPSCSW-334 : Publish an event
   test("Redis - should be able to get an event without subscribing for it") {
     framework.get()
   }
@@ -86,7 +91,6 @@ class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with Embe
     framework.retrieveEventsForMultipleEventKeysOnGet()
   }
 
-  // DEOPSCSW-334 : Publish an event
   test("Redis - should be able to persist the event in DB against the same key as channel name while publishing") {
     val event1             = makeEvent(1)
     val eventKey: EventKey = event1.eventKey
