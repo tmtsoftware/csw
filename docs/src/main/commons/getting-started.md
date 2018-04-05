@@ -68,7 +68,7 @@ package bundled with all dependencies, and a launching application.
 
 ## Add new sbt project module
 
-If you want to add a new project with name `galil-io`, then follow below steps:
+If you want to add another component to the project, for example, with the name `galil-io`, you have to create a new sbt module:
 
 1. Add external library dependencies required by `galil-io` in `Libs.scala` file, if it does not exist.
 ```
