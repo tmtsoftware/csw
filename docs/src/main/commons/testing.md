@@ -4,14 +4,14 @@ This page will help you getting started with testing your applications.
 
 ## Unit Tests
 
-The goal of unit testing is to break you application into the smallest testable units, and test them individually, isolating 
+The goal of unit testing is to break your application into the smallest testable units, and test them individually, isolating 
 a specific piece of functionality and ensuring it is working correctly. 
-It is always good idea to write more unit test cases and relatively fewer component and integration tests.
+It is always a good idea to write more unit test cases and relatively fewer component and integration tests.
 If you want to get an idea of how many tests you should have in different types of testing phases (Unit/Component/Integration), refer this [blog](https://martinfowler.com/articles/practical-test-pyramid.html)
 
 Unit testing simple scala/java classes or objects is straight forward. You can mock external dependencies using Mockito. Refer to the [Mockito](#mockito) section for more details. 
 
-The folloowing links provide guides for testing applications using different modules of Akka:
+The following links provide guides for testing applications using different modules of Akka:
 
 - [Akka Untyped Actors](https://doc.akka.io/docs/akka/current/testing.html)
 - [Akka Typed Actors](https://doc.akka.io/docs/akka/current/typed/testing.html)
