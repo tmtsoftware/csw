@@ -29,10 +29,8 @@ class FailureTest extends FunSuite with Matchers with MockitoSugar with BeforeAn
 
   private implicit val actorSystem: ActorSystem = clusterSettings.system
 
-  //TODO: Logging is kept on to debug the flaky test on jenkins
-  LoggingSystemFactory.start("", "", "", actorSystem)
-
   private val redisClient = RedisClient.create()
+
   redisClient.setOptions(
     ClientOptions.builder().autoReconnect(false).disconnectedBehavior(DisconnectedBehavior.REJECT_COMMANDS).build()
   )
@@ -46,7 +44,7 @@ class FailureTest extends FunSuite with Matchers with MockitoSugar with BeforeAn
   }
 
   override def afterAll(): Unit = {
-    redisClient.shutdown
+    redisClient.shutdown()
     redis.stop()
     wiring.shutdown(TestFinishedReason).await
   }
@@ -56,6 +54,8 @@ class FailureTest extends FunSuite with Matchers with MockitoSugar with BeforeAn
     publisher.publish(Utils.makeEvent(1)).await
 
     publisher.shutdown().await
+
+    Thread.sleep(1000) // wait till the publisher is shutdown successfully
 
     intercept[PublishFailed] {
       publisher.publish(Utils.makeEvent(2)).await
