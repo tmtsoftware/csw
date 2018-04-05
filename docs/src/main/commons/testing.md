@@ -1,6 +1,6 @@
 # Testing
 
-This page will help you getting started with testing your applications. 
+This page will help you in getting started with testing your applications. 
 
 ## Unit Tests
 
