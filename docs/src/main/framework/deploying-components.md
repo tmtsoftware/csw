@@ -1,6 +1,6 @@
-## Deploying Components
+# Deploying Components
 
-### ContainerCmd
+## ContainerCmd
 
 `ContainerCmd` is a helper utility provided as a part of framework. This helps component writers to start their components inside container.
 
@@ -35,7 +35,7 @@ Starting a **container** component from a configuration file available in **conf
 
     `./container-cmd-app /assembly/config/assembly.conf`
 
-### Container for deployment
+## Container for deployment
 
 A container is a component which starts one or more Components and keeps track of the components within a single JVM process. When started, the container also registers itself with the Location Service.
 The components to be hosted by the container is defined using a `ContainerInfo` model which has a set of ComponentInfo objects. It is usually described as a configuration file but can also be created programmatically.
@@ -87,7 +87,7 @@ SampleContainerInfo
     ```
     @@@
     
-### Standalone components
+## Standalone components
 
 A component can be run alone in a Standalone mode without sharing its jvm space with any other component. 
 

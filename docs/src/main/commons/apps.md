@@ -1,4 +1,4 @@
-## Applications
+# Applications
 
 @@ toc { .main depth=1 }
 

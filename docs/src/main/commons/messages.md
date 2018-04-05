@@ -1,8 +1,8 @@
-## Messages
+# Messages
 
 In the distributed environment of TMT observatory, **Components** communicate with each other by sending asynchrnous **Messages**. These messages have a **Command** payload, which flows down through the sequencer components to the Assemblies, HCDs and finally to the hardware. At each hop Commands are validated, interpreted and further propagated making their journey to its destination. Commands provide flexible placeholders to store values to convey precise intent of the sender component.
 
-### Dependencies
+## Dependencies
 
 sbt
 :   @@@vars

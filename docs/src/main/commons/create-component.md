@@ -10,7 +10,7 @@ A component consists of a supervisor actor, a Top Level Actor, a component handl
 provides supervisor actor, a Top Level Actor and abstract class of handlers. Component developers are expected to implement this handler which also
 acts as a gateway from framework to component code.   
      
-### Supervisor
+## Supervisor
 
 A Supervisor actor is the actor first started for any component. The main responsibilities that supervisor performs is as follows:
 
@@ -29,7 +29,7 @@ Because the Supervisor registers itself with location service, it serves as the 
 
 The source code of supervisor actor can be found [here](https://github.com/tmtsoftware/csw-prod/blob/master/csw-framework/src/main/scala/csw/framework/internal/supervisor/SupervisorBehavior.scala)
 
-### Top level actor
+## Top level actor
 
 While the Supervisor works as the external interface for the component and the manager of Lifecycle, the functional implementation
 of a component is implemented in a Top Level Actor (TLA), spawned by supervisor actor for any component. 
@@ -39,7 +39,7 @@ The `ComponentHandlers` implementation is specified during constructing using th
 
 The source code of the Top Level Actor can be found [here](https://github.com/tmtsoftware/csw-prod/blob/master/csw-framework/src/main/scala/csw/framework/internal/component/ComponentBehavior.scala).
 
-### Handlers
+## Handlers
 
 The following hooks should be overridden in your ComponentHandlers implementation class:
 
@@ -80,7 +80,7 @@ If using the gitter8 template, this factory class will be implemented for you.
 
 The sample code to implement the `ComponentBehaviorFactory` can be found @ref:[here](./framework.md#creating-components) 
 
-### Component Configuration (ComponentInfo)
+## Component Configuration (ComponentInfo)
 
 Component configuration contains details needed to spawn a component. This configuration resides in a configuration file
 for a particular component. The sample for HCD is as follows:
@@ -122,7 +122,7 @@ A component can be in one of the following states of lifecycle:
 -   Shutdown
 -   Lock
 
-### Idle
+## Idle
 
 The component initializes in the idle state. Top level actor calls the `initialize` hook of `ComponentHandlers` as first thing on boot-up.
 Component developers write their initialization logic in this hook. The logic could also do things like accessing the configuration service
@@ -159,7 +159,7 @@ the component developer to check the `isOnline` flag provided by `csw-framework`
 
 @@@
 
-### Restart
+## Restart
 
 When the Supervisor actor receives a `Restart` message, it will transit the component to the `Restart` state. Then, it will unregister itself from location service so that other components
 tracking this component will be notified and no commands are received while restart is in progress.
@@ -170,13 +170,13 @@ any cleanup of resources or logic that should be executed for graceful shutdown 
 After successful shutdown of component, the Supervisor actor will create the Top Level Actor again from scratch.  This will cause the `initialize` hook of `ComponentHandlers` to be called
 again. After successful initialization of component, the Supervisor actor will register itself with location service.
 
-### Shutdown
+## Shutdown
 
 When the Supervisor actor receives a `Shutdown` message, it transitions the component to the `Shutdown` state.  Any commands received while shutdown is in progress will be ignored.
 Then, it will stop the Top Level Actor. The postStop hook of the Top Level Actor will call the `onShutdown` hook of `ComponentHandlers`. Component developers are expected to write 
 any cleanup of resources or logic that should be executed for graceful shutdown of component in this hook.
 
-### Lock
+## Lock
 
 When the Supervisor actor receives a `Lock` message, it transitions the component to the `Lock` state. Upon locking, the Supervisor will only accept the commands received from the component
 that locked the component and ignore all others.
@@ -213,7 +213,7 @@ Whenever a command is sent to a component it is wrapped inside a command wrapper
 -   Oneway: A command is wrapped in oneway when the completion of command is not expected from receiver component but is determined by sender component by subscribing to receiver component's
             state
 
-### Validation
+## Validation
 
 When a command is received by a component, the Top Level Actor will call the `validateCommand` hook of `ComponentHandlers`. Component developers are expected to perform appropriate
 validation of command, whether it is valid to execute, and return a `CommandResponse`. The `CommandResponse` returned from this hook will be sent back to sender directly by `csw-framework`.
@@ -226,7 +226,7 @@ or `Invalid` specifying whether the command is valid to be executed or not, and 
 
 Different types of command responses and their significance can be found @ref:[here](./command.md#command-based-communication-between-components).
 
-### Command Response
+## Command Response
 
 The response returned from `validateCommand` hook of `ComponentHandlers` will be received by the Top Level Actor, who then sends the response back to sender. If the
 response returned was `Accepted`, then it either calls the `onSubmit` hook or the `onOneway` hook of `ComponentHandlers` depending on the wrapper(submit or oneway) in which the command

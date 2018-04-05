@@ -1,4 +1,4 @@
-## Units
+# Units
 
 Listed below are Units of Measurement, supported by TMT observatory framework and are available as Enumerated values. 
 `Units` are optionally attached to `Parameter` Keys.
@@ -18,11 +18,11 @@ The set of supported Units will be modified as more required Units are discovere
 
 @@@ 
 
-### Default Units for Keys
+## Default Units for Keys
 
 The default unit for `TimestampKey`(in Scala and Java both) is `second`. For all the remaining keys, default unit is NoUnits.  
 
-### SI Units
+## SI Units
 
 | Name          | Abbreviation    | Description                                                                |
 | :-----------: |:--------------: | :--------------------------------------------------------------------------|
@@ -59,14 +59,14 @@ The default unit for `TimestampKey`(in Scala and Java both) is `second`. For all
 | week        | wk                | week - 7 d |
 | year        | yr                | year - 3.6525x10+2 d |
 
-### CGS Units
+## CGS Units
 | Name          | Abbreviation    | Description               |
 | :-----------: |:--------------: | :-------------------------|
 | coulomb    | C                  | coulomb: electric charge |
 | centimeter | cm                 | centimeter |
 | erg        | erg                | erg: CGS unit of energy |
 
-### Astrophysical Units
+## Astrophysical Units
 | Name          | Abbreviation    | Description                                                                |
 | :-----------: |:--------------: | :--------------------------------------------------------------------------|
 | au         | AU                 | astronomical unit: approximately the mean Earth-Sun distance |
@@ -75,7 +75,7 @@ The default unit for `TimestampKey`(in Scala and Java both) is `second`. For all
 | mag        | mag                | stellar magnitude |
 
 
-### Imperial Units
+## Imperial Units
 | Name          | Abbreviation    | Description                                                                |
 | :-----------: |:--------------: | :--------------------------------------------------------------------------|
 | cal        | cal                | thermochemical calorie: pre-SI metric unit of energy |
@@ -87,7 +87,7 @@ The default unit for `TimestampKey`(in Scala and Java both) is `second`. For all
 | yard       | yd                 | international yard - 3 ft |
 
 
-### Others - Engineering
+## Others - Engineering
 | Name          | Abbreviation    | Description                                                                |
 | :-----------: |:--------------: | :--------------------------------------------------------------------------|
 | NoUnits    | none               | scalar - no units specified |
@@ -95,7 +95,7 @@ The default unit for `TimestampKey`(in Scala and Java both) is `second`. For all
 | count      | ct                 | counts as for an encoder or detector |
 | pix        | pix                | pixel |
 
-### Usage Examples
+## Usage Examples
 
 Scala
 :   @@snip [KeysAndParametersTest.scala](../../../../examples/src/test/scala/csw/services/messages/KeysAndParametersTest.scala) { #units }

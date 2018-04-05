@@ -1,4 +1,3 @@
-
 # Multiple Components
 
 In this part of the tutorial, we will demonstrate functionality involving multiple components.  
@@ -93,7 +92,7 @@ The `Location` object has one of the following types:
 
 More details about tracking a component using the location service can be found @ref:[here](../services/location.md#tracking-and-subscribing).
  
-### onLocationTrackingEvent Handler
+## onLocationTrackingEvent Handler
 
 For all the tracked connections, whenever a location is changed, added, or removed, one of the following events is generated:
 
@@ -105,7 +104,7 @@ as parameter of the hook.
 
 More details about tracking connections can be found @ref:[here](../framework/tracking-connections.md).
 
-### trackConnection
+## trackConnection
 
 If the component developer wants to track a connection that is not configured in its configuration file then it can use the `trackConnection` method provided by `csw-framework`
 in `ComponentHandlers`. The `trackConnection` method will take the `Connection` instance. Information on how to create a connection instance can be found @ref:[here](../services/location.md#creating-components-connections-and-registrations).
@@ -144,14 +143,14 @@ More details about creating a `CommandDistributor` instance and its usage can be
 
 @@@
 
-### Tracking Long Running Commands
+## Tracking Long Running Commands
 
 A command sent in a `Submit` wrapper that receives an `Accepted` response in return is considered as a long running command.
   
 When a component sends a long running command to another component, it may be interested in knowing the status of the command and take decisions based on that. In order to subscribe
 to the changes in command status, the sender component will have to use the `subscribe` method after `submit` or use `submitAndSubscribe` in `CommandService`.
 
-### Matchers
+## Matchers
 
 When a component sends a command as `Oneway` to another component, it may be interested in knowing the receiver component's `CurrentState` and match it against a desired state.
 In order to do that, the component developer can use the `onewayAndMatch` method of `CommandService` or use `oneway` and then use a `Matcher` explicitly to match a desired
@@ -159,7 +158,7 @@ state with current state.
 
 More details on how to use `Matcher` can  be found @ref:[here](./command.md#matching-state-for-command-completion). 
 
-### PubSub Connection
+## PubSub Connection
 
 A component might need to subscribe to the current state of any other component provided it knows the location of that component. In order to subscribe to current state, it may
 use the `subscribeCurrentState` method of the `CommandService`. More details about the usage of `subscribeCurrentState` can ber found @ref:[here](./command.md#subscribecurrentstate).
@@ -169,12 +168,12 @@ of `currentStatePublisher` can ber found @ref:[here](../framework/publishing-sta
 
 ## Deploying and Running Components
 
-### Pre-requisite
+## Pre-requisite
 
 A project, for example with the name `galil-deploy`, contains applications (ContainerCmd and HostConfig coming from `csw-framework`) to run components. Make sure that the necessary 
 dependencies are added in the `galil-deploy`.
 
-### Run
+## Run
 Assuming that `galil-deploy` depends on `galil-assembly` and `galil-hcd`, to start the Assembly and HCD, follow the steps below:
 
  - Run `sbt galil-deploy/universal:packageBin`, this will create self contained zip in `galil-deploy/target/universal` directory.

@@ -1,4 +1,4 @@
-## State Variables
+# State Variables
 
 These state variables are used when an Assembly wants to track the status of a command sent to an HCD using
 a matcher.  For more information, see @ref:[Publishing State](../framework/publishing-state.md).
@@ -8,7 +8,7 @@ They both share the same structural features. All state variables have **[Prefix
 
 The PubSub feature of the HCD provides `CurrentState` values to the PubSub subscriber.
 
-### DemandState
+## DemandState
 
 A state variable that indicates the demand or requested state.
 
@@ -19,7 +19,7 @@ Java
 :   @@snip [JStateVariablesTest.java](../../../../examples/src/test/java/csw/services/messages/JStateVariablesTest.java) { #demandstate }
 
 
-### CurrentState
+## CurrentState
 
 A state variable that is published by a component that describes its internal state. Used by Assemblies to determine command completion in Command Service.
 
@@ -30,7 +30,7 @@ Java
 :   @@snip [JStateVariablesTest.java](../../../../examples/src/test/java/csw/services/messages/JStateVariablesTest.java) { #currentstate }
 
 
-### JSON Serialization
+## JSON Serialization
 State variables can be serialized to JSON. The library has provided **JsonSupport** helper class and methods to serialize DemandState and CurrentState.
 
 Scala
@@ -39,7 +39,7 @@ Scala
 Java
 :   @@snip [JStateVariablesTest.java](../../../../examples/src/test/java/csw/services/messages/JStateVariablesTest.java) { #json-serialization }
 
-### Unique Key Constraint
+## Unique Key Constraint
 
 By design, a ParameterSet in either **DemandState** or **CurrentState** will be optimized to store only unique keys.
 When using `add` or `madd` methods on events to add new parameters, if the parameter being added has a key which is already present in the `paramSet`,

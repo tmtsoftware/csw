@@ -1,4 +1,4 @@
-## Events
+# Events
 
 Events are the most basic type of asynchronous notification in TMT when an activity occurs somewhere in the TMT system and other components need to be notified. Each type of event has a unique purpose and unique information, but they all share same structural features. All events have **EventInfo** and **ParameterSet**.
 
@@ -10,7 +10,7 @@ For more on this [Protobuf support](events.html#protobuf) section below.
 
 @@@
 
-### EventTime
+## EventTime
 It captures the instance of a time in UTC format. To create current instance of time use default constructor. For other utility functions, see below examples:
 
 Scala
@@ -19,7 +19,7 @@ Scala
 Java
 :   @@snip [JEventsTest.java](../../../../examples/src/test/java/csw/services/messages/JEventsTest.java) { #eventtime }
    
-### Observe Event
+## Observe Event
 
 ObserveEvent is used to describe an event within a standardized data acquisition process. Published only by Science Detector Assemblies, who emit ObserveEvents during their exposures to signal the occurrence of specific activities/actions during the acquisition of data. Observe Events are published by the detector system using the Event Service.
 
@@ -30,7 +30,7 @@ Java
 :   @@snip [JEventsTest.java](../../../../examples/src/test/java/csw/services/messages/JEventsTest.java) { #observeevent }
 
 
-### System Event
+## System Event
 
 SystemEvent is used to describe a demand or other algorithm input from one component to the other. It is also used to publish internal state or status values of a component
 that may be of interest to other components in the system.
@@ -42,7 +42,7 @@ Java
 :   @@snip [JEventsTest.java](../../../../examples/src/test/java/csw/services/messages/JEventsTest.java) { #systemevent }
 
 
-### JSON Serialization
+## JSON Serialization
 Events can be serialized to JSON. The library has provided **JsonSupport** helper class and methods to serialize Status, Observe and System events.
 
 Scala
@@ -51,7 +51,7 @@ Scala
 Java
 :   @@snip [JEventsTest.java](../../../../examples/src/test/java/csw/services/messages/JEventsTest.java) { #json-serialization }
 
-### Unique Key Constraint
+## Unique Key Constraint
 
 By choice, a ParameterSet in either **ObserveEvent** or **SystemEvent** event will be optimized to store only unique keys. 
 When using `add` or `madd` methods on events to add new parameters, if the parameter being added has a key which is already present in the `paramSet`,
@@ -72,7 +72,7 @@ Scala
 Java
 :   @@snip [JEventsTest.java](../../../../examples/src/test/java/csw/services/messages/JEventsTest.java) { #unique-key }
 
-### Protobuf
+## Protobuf
 
 Protobuf aka Protocol buffers, are a language-neutral, platform-neutral extensible mechanism for serializing structured data. For more, visit [Protobuf home page](https://developers.google.com/protocol-buffers/)
 
@@ -94,7 +94,7 @@ Scala
 Java
 :   @@snip [JEventsTest.java](../../../../examples/src/test/java/csw/services/messages/JEventsTest.java) { #protobuf }
 
-## Source Code for Examples
+# Source Code for Examples
 
 * @github[Scala Example](/examples/src/test/scala/csw/services/messages/EventsTest.scala)
 * @github[Java Example](/examples/src/test/java/csw/services/messages/JEventsTest.java)

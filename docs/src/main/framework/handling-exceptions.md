@@ -1,4 +1,4 @@
-## Handling Exceptions
+# Handling Exceptions
 
 A component should create exceptions belonging to following two types:
 

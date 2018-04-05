@@ -1,4 +1,4 @@
-## ComponentInfo
+# ComponentInfo
 
 `ComponentInfo` model describes a component by specifying following details
 It is usually described as a configuration file but can also be created programmatically.

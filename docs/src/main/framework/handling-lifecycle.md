@@ -1,6 +1,6 @@
-## Lifecycle support
+# Lifecycle support
 
-### initialize
+## initialize
 
 The `initialize` handler is invoked when the component is created. This is different than constructor initialization to allow non-blocking 
 asynchronous operations. The component can initialize state such as configuration to be fetched from Configuration Service, 
@@ -18,7 +18,7 @@ Hcd/Scala
 Hcd/Java
 :   @@snip [JHcdComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/hcd/JHcdComponentHandlers.java) { #jInitialize-handler }
 
-### onShutdown
+## onShutdown
 
 The `onShutdown` handler can be used for carrying out the tasks which will allow the component to shutdown gracefully. 
 
@@ -34,11 +34,11 @@ Hcd/Scala
 Hcd/Java
 :   @@snip [JHcdComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/hcd/JHcdComponentHandlers.java) { #onShutdown-handler }
 
-### isOnline
+## isOnline
 
 A component has access to `isOnline` boolean flag which can be used to determine if the component is online or offline state.
 
-### onGoOffline
+## onGoOffline
 
 A component can be notified to run in offline mode in case it is not in use. The component can change its behavior if needed as a part of this handler.
 
@@ -54,7 +54,7 @@ Hcd/Scala
 Hcd/Java
 :   @@snip [JHcdComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/hcd/JHcdComponentHandlers.java) { #onGoOffline-handler }
 
-### onGoOnline
+## onGoOnline
 
 A component can be notified to run in online mode again in case it was put to run in offline mode. The component can change its behavior if needed as a part of this handler.
 
@@ -70,9 +70,9 @@ Hcd/Scala
 Hcd/Java
 :   @@snip [JHcdComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/hcd/JHcdComponentHandlers.java) { #onGoOnline-handler }
 
-### Handling commands
+## Handling commands
 
-#### validateCommand
+### validateCommand
 
 A command can be sent as a `Submit` or `Oneway` message to the component actor. If a command can be completed immediately, a `CommandResponse` indicating 
 the final response for the command can be returned. If a command requires time for processing, the component is required to validate the `ControlCommand` received
@@ -93,7 +93,7 @@ Hcd/Java
  
 If a response can be provided immediately, a final `CommandResponse` such as `CommandCompleted` or `Error` can be sent from this handler.
 
-#### onSubmit
+### onSubmit
 
 On receiving a command as `Submit`, the `onSubmit` handler is invoked for a component only if the `validateCommand` handler returns `Accepted`. In case a command 
 is received as a submit, command response should be updated in the `CommandResponseManager`. `CommandResponseManager` is an actor whose reference `commandResponseManager` 
@@ -111,7 +111,7 @@ Hcd/Scala
 Hcd/Java
 :   @@snip [JHcdComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/hcd/JHcdComponentHandlers.java) { #onSubmit-handler }
 
-#### onOneway
+### onOneway
 
 On receiving a command as `Oneway`, the `onOneway` handler is invoked for a component only if the `validateCommand` handler returns `Accepted`.In case a command 
 is received as a oneway, command response should not be provided to the sender.

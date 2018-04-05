@@ -1,9 +1,9 @@
-## Tracking Connections
+# Tracking Connections
 
 The component framework tracks the set of connections specified for a component in `ComponentInfo` if the `locationServiceUsage` property is set to `RegisterAndTrackServices`.
 The framework also provides a helper `trackConnection` method to track any connection other than those present in `ComponentInfo`.
 
-### onLocationTrackingEvent
+## onLocationTrackingEvent
 The `onLocationTrackingEvent` handler can be used to take action on the `TrackingEvent` for a particular connection. This event could be for the connections in 
 `ComponentInfo` tracked automatically or for the connections tracked explicitly using `trackConnection` method.
 

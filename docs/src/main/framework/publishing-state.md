@@ -1,4 +1,4 @@
-## Publishing State
+# Publishing State
 
 A component has access to a `currentStatePublisher` Actor, which can be used to publish its @ref:[CurrentState](../messages/states.md). Any subscriber of this component will receive the 
 published state. 

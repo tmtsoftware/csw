@@ -1,4 +1,4 @@
-## Keys and Parameters
+# Keys and Parameters
 
 The library offers a flexible and typesafe means to create Parameters to store values like **primitive types, collection types or domain specific types**. 
 
@@ -13,13 +13,13 @@ units, and receiver can inspect the `Units` to make a decision on how to handle 
 A **ParameterSet** is a Set of `Parameter`. Various other message types include a `ParameterSet` (e.g. Setup, Event). 
 A key is **unique** in a `ParameterSet` since it is a Set. 
 
-### How to Create a Parameter
+## How to Create a Parameter
  
  * choose an appropriate KeyType from the tables below for your language(Scala/Java).    
  * calling the `make` method on KeyType and supplying a String keyName will return a suitably typed Key instance.    
  * explore the overloaded `set` and `->` methods, which will allow you to store values of the based on chosen KeyType. e.g. `JKeyTypes.BooleanKey` will allow storing only `java.lang.Boolean` values.
  
-### Primitive Datatypes
+## Primitive Datatypes
 
 | Primitive       | Scala KeyType               | Java KeyType                   |
 | :-------------: |:--------------------------: | :-----------------------------:| 
@@ -40,7 +40,7 @@ Scala
 Java
 :   @@snip [JKeysAndParametersTest.java](../../../../examples/src/test/java/csw/services/messages/JKeysAndParametersTest.java) { #primitives }
 
-### Arrays
+## Arrays
 
 | Primitive       | Scala KeyType               | Java KeyType                   |
 | :-------------: |:--------------------------: | :-----------------------------:| 
@@ -57,7 +57,7 @@ Scala
 Java
 :   @@snip [JKeysAndParametersTest.java](../../../../examples/src/test/java/csw/services/messages/JKeysAndParametersTest.java) { #arrays }
 
-### Matrices
+## Matrices
 
 | Primitive       | Scala KeyType               | Java KeyType                   |
 | :-------------: |:--------------------------: | :-----------------------------:| 
@@ -75,7 +75,7 @@ Java
 :   @@snip [JKeysAndParametersTest.java](../../../../examples/src/test/java/csw/services/messages/JKeysAndParametersTest.java) { #matrices }
 
 
-### Domain Specific Types
+## Domain Specific Types
 
 | Primitive       | Scala KeyType               | Java KeyType                   | 
 | :-------------: |:--------------------------: | :-----------------------------:|  
@@ -83,7 +83,7 @@ Java
 | RaDec           | KeyType.RaDecKey            | JKeyTypes.RaDecKey             |
 | Struct          | KeyType.StructKey           | JKeyTypes.StructKey            |
 
-#### Choice
+### Choice
 
 A key for a choice item similar to an enumeration.
 
@@ -94,7 +94,7 @@ Java
 :   @@snip [JKeysAndParametersTest.java](../../../../examples/src/test/java/csw/services/messages/JKeysAndParametersTest.java) { #choice }
 
 
-#### RaDec
+### RaDec
 
 Holds Ra(Right Ascension) and Dec(Declination) values
 
@@ -105,7 +105,7 @@ Java
 :   @@snip [JKeysAndParametersTest.java](../../../../examples/src/test/java/csw/services/messages/JKeysAndParametersTest.java) { #radec }
 
 
-#### Struct
+### Struct
 
 Stores a set of Parameters for telescope and instrument control. Lot of utility functions available for store, add, remove, list Keys and Paramete
 

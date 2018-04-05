@@ -1,4 +1,4 @@
-## Result
+# Result
 
 Components use **Results** to return results in the form of a **ParameterSet**.
 
@@ -13,7 +13,7 @@ Scala
 Java
 :   @@snip [JResultTest.java](../../../../examples/src/test/java/csw/services/messages/JResultTest.java) { #result }
 
-### JSON serialization
+## JSON serialization
 State variables can be serialized to JSON. The library has provided **JsonSupport** helper class and methods to serialize DemandState and CurrentState.
 
 Scala
@@ -22,7 +22,7 @@ Scala
 Java
 :   @@snip [JResultTest.java](../../../../examples/src/test/java/csw/services/messages/JResultTest.java) { #json-serialization }
 
-### Unique Key Constraint
+## Unique Key Constraint
 
 By choice, a ParameterSet in **Result** will be optimized to store only unique keys. In other words, trying to store multiple keys with same name, will be automatically optimized by removing duplicates.
 

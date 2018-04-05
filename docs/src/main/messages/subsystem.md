@@ -1,4 +1,4 @@
-## Subsystem
+# Subsystem
 
 TMT Observatory system is composed of many subsystems. The subsystems that are known participants in the TMT Software System are predefined and the list is covered under the `Subsystem` enumeration. 
 They are identified using a 3 or 4 letter abbreviation. 
@@ -14,7 +14,7 @@ Subsystems are made available via separate files, for consumption in Scala and J
 
 @@@
 
-### List of Subsystems
+## List of Subsystems
  
 | Abbreviation    | Susbsystem name             |
 | :-------------: |:----------------------------| 
@@ -52,5 +52,5 @@ Subsystems are made available via separate files, for consumption in Scala and J
 |  TEST           | Testing System |
 |  BAD            | Unknown/default Subsystem |
 
-### Usage Examples
+## Usage Examples
 The usage examples can be found in [Events](events.html), [Commands](commands.html), [States](states.html)
