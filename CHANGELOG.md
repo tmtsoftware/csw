@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 
 
-## [v0.4.0-RC1] - 2018-04-04
+## [CSW v0.4.0-RC1] - 2018-04-04
 
 This is a major reimplementation/refactoring in a new repository: [csw-prod](https://github.com/tmtsoftware/csw-prod), including changes to most public APIs.
 See [here](https://tmtsoftware.github.io/csw-prod/0.4.0-RC1/) for a detailed description of this version of the CSW software.
