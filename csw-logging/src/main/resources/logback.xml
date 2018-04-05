@@ -3,7 +3,7 @@
     <appender name="svc_appender" class="csw.services.logging.compat.Slf4jAppender">
     </appender>
 
-    <root level="${SLF4J_LEVEL:-WARN}">
+    <root level="${SLF4J_LEVEL:-DEBUG}">
         <appender-ref ref="svc_appender"/>
     </root>
 

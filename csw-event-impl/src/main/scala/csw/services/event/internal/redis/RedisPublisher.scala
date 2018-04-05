@@ -28,9 +28,9 @@ class RedisPublisher(redisURI: RedisURI, redisClient: RedisClient)(implicit ec: 
       await(commands.publish(event.eventKey, event).toScala)
       await(commands.set(event.eventKey, event).toScala)
       Done
-    }.transform(identity, {
-      case NonFatal(ex) ⇒ PublishFailed(event, ex.getMessage)
-    })
+    } recover {
+      case NonFatal(ex) ⇒ throw PublishFailed(event, ex.getMessage)
+    }
 
   override def shutdown(): Future[Done] = asyncConnectionF.flatMap(_.quit().toScala).map(_ ⇒ Done)
 }
