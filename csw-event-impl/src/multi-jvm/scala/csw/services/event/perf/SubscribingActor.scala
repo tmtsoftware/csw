@@ -4,35 +4,27 @@ import java.util.concurrent.TimeUnit.SECONDS
 
 import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import csw.messages.events._
-import csw.services.event.internal.commons.Wiring
 import csw.services.event.perf.EventUtils._
-import csw.services.event.scaladsl.RedisFactory
-import csw.services.location.scaladsl.LocationService
-import io.lettuce.core.RedisClient
+import csw.services.event.scaladsl.EventSubscriber
 import org.HdrHistogram.Histogram
 import org.scalatest.mockito.MockitoSugar
 
 class SubscribingActor(reporter: RateReporter, payloadSize: Int, numSenders: Int, id: Int) extends Actor with MockitoSugar {
+
+  private implicit val actorSystem: ActorSystem = context.system
 
   private var eventsReceived                = 0L
   private var endMessagesMissing            = numSenders
   private var correspondingSender: ActorRef = null // the Actor which send the Start message will also receive the report
   private var publishers: List[ActorRef]    = Nil
 
-  val histogram = new Histogram(SECONDS.toNanos(10), 3)
+  var startTime        = 0L
+  var reportedArrayOOB = false
 
   import Messages._
 
-  private implicit val actorSystem: ActorSystem = context.system
-
-  private val redisHost    = "localhost"
-  private val redisPort    = 6379
-  private val redisClient  = RedisClient.create()
-  private val wiring       = new Wiring(actorSystem)
-  private val redisFactory = new RedisFactory(redisClient, mock[LocationService], wiring)
-  private val subscriber   = redisFactory.subscriber(redisHost, redisPort)
-  var startTime            = 0L
-  var reportedArrayOOB     = false
+  val subscriber: EventSubscriber = new TestWiring(actorSystem).subscriber
+  val histogram: Histogram        = new Histogram(SECONDS.toNanos(10), 3)
 
   private val keys: Set[EventKey] = eventKeys + EventKey(s"$testEventKey.$id")
   startSubscription(keys)

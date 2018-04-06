@@ -7,13 +7,11 @@ import java.util.concurrent.TimeUnit.{NANOSECONDS, SECONDS}
 import akka.actor._
 import akka.stream.ThrottleMode
 import akka.stream.scaladsl.{Keep, Source}
+import com.typesafe.config.Config
 import csw.messages.events.EventName
-import csw.services.event.internal.commons.Wiring
 import csw.services.event.perf.EventServicePerfSpec.Target
 import csw.services.event.perf.EventUtils._
-import csw.services.event.scaladsl.RedisFactory
-import csw.services.location.scaladsl.LocationService
-import io.lettuce.core.RedisClient
+import csw.services.event.scaladsl.EventPublisher
 import org.HdrHistogram.Histogram
 import org.scalatest.mockito.MockitoSugar
 
@@ -45,18 +43,14 @@ class PublishingActor(
 
   private implicit val actorSystem: ActorSystem = context.system
 
-  private val redisHost    = "localhost"
-  private val redisPort    = 6379
-  private val redisClient  = RedisClient.create()
-  private val wiring       = new Wiring(actorSystem)
-  private val redisFactory = new RedisFactory(redisClient, mock[LocationService], wiring)
-  private val publisher    = redisFactory.publisher(redisHost, redisPort)
-
-  val throttlingElements: Int = actorSystem.settings.config.getInt("csw.test.EventThroughputSpec.throttling.elements")
-  val throttlingDuration: FiniteDuration = {
-    val d = actorSystem.settings.config.getDuration("csw.test.EventThroughputSpec.throttling.per")
+  private val config: Config          = actorSystem.settings.config
+  private val throttlingElements: Int = config.getInt("csw.test.EventThroughputSpec.throttling.elements")
+  private val throttlingDuration: FiniteDuration = {
+    val d = config.getDuration("csw.test.EventThroughputSpec.throttling.per")
     FiniteDuration(d.toNanos, TimeUnit.NANOSECONDS)
   }
+
+  val publisher: EventPublisher = new TestWiring(actorSystem).publisher
 
   def receive: Receive = {
     case Init        ⇒ targets.foreach(_.tell(Init(target.ref), self))

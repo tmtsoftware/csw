@@ -6,10 +6,9 @@ import akka.actor._
 import akka.remote.testconductor.RoleName
 import akka.remote.testkit.MultiNodeConfig
 import akka.testkit._
-import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.config.ConfigFactory
 import csw.services.event.perf.Messages.Init
 import csw.services.event.perf.testkit.{PerfFlamesSupport, RemotingMultiNodeSpec}
-import csw.services.logging.scaladsl.LoggingSystemFactory
 
 import scala.concurrent.duration._
 
@@ -19,49 +18,7 @@ object EventServicePerfSpec extends MultiNodeConfig {
 
   val barrierTimeout: FiniteDuration = 5.minutes
 
-  val cfg: Config = ConfigFactory.parseString(s"""
-       |include "logging.conf"
-       |
-       |csw.test.EventThroughputSpec {
-       |# for serious measurements you should increase the totalMessagesFactor (20)
-       |  totalMessagesFactor = 1.0
-       |  actor-selection = off
-       |  batching = off
-       |
-       |  throttling {
-       |    elements = 300
-       |    per = 1 second
-       |  }
-       |}
-       |
-       |akka {
-       |  log-dead-letters = 100
-       |  testconductor.barrier-timeout = 300s
-       |  actor {
-       |    provider = remote
-       |    serialize-creators = false
-       |    serialize-messages = false
-       |
-       |    serializers {
-       |      kryo = "com.twitter.chill.akka.AkkaSerializer"
-       |    }
-       |    serialization-bindings {
-       |      "csw.messages.TMTSerializable" = kryo
-       |    }
-       |  }
-       |}
-       |akka.remote.default-remote-dispatcher {
-       |  fork-join-executor {
-       |    # parallelism-factor = 0.5
-       |    parallelism-min = 4
-       |    parallelism-max = 4
-       |  }
-       |  # Set to 10 by default. Might be worthwhile to experiment with.
-       |  # throughput = 100
-       |}
-     """.stripMargin)
-
-  commonConfig(debugConfig(on = false).withFallback(cfg).withFallback(RemotingMultiNodeSpec.commonConfig))
+  commonConfig(debugConfig(on = false).withFallback(ConfigFactory.load()))
 
   sealed trait Target {
     def tell(msg: Any, sender: ActorRef): Unit
@@ -90,8 +47,6 @@ abstract class EventServicePerfSpec extends RemotingMultiNodeSpec(EventServicePe
 
   var throughputPlot = PlotResult()
   var latencyPlots   = LatencyPlots()
-
-  LoggingSystemFactory.start("perf", "", "", system)
 
   def adjustedTotalMessages(n: Long): Long = (n * totalMessagesFactor).toLong
 
