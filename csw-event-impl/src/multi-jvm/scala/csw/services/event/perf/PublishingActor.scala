@@ -1,7 +1,8 @@
 package csw.services.event.perf
 
+import java.io.PrintStream
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.TimeUnit.NANOSECONDS
+import java.util.concurrent.TimeUnit.{NANOSECONDS, SECONDS}
 
 import akka.actor._
 import akka.stream.ThrottleMode
@@ -25,7 +26,6 @@ class PublishingActor(
     testSettings: TestSettings,
     throughputPlotRef: ActorRef,
     latencyPlotRef: ActorRef,
-    printTaskRunnerMetrics: Boolean,
     reporter: BenchmarkFileReporter
 ) extends Actor
     with MockitoSugar {
@@ -37,7 +37,6 @@ class PublishingActor(
   var startTime            = 0L
   var remaining: Long      = totalMessages
   var maxRoundTripMillis   = 0L
-  val taskRunnerMetrics    = new TaskRunnerMetrics(context.system)
 
   var flowControlId      = 0
   var pendingFlowControl = Map.empty[Int, Int]
@@ -108,32 +107,53 @@ class PublishingActor(
   }
   val sent = new Array[Long](targets.length)
 
+  var noOfEndResultReceived   = 0
+  var aggregatedTotalReceived = 0L
+  var endResultMsgRecTime     = 0L
+  var aggregatedHistogram     = new Histogram(SECONDS.toNanos(10), 3)
+
   def waitingForEndResult: Receive = {
     case EndResult(totalReceived, histogram, totalTime) ⇒
-      val took       = NANOSECONDS.toMillis(totalTime)
-      val throughput = totalReceived * 1000.0 / took
+      if (!singlePublisher) {
+        printThroughputResult(totalReceived, histogram, totalTime)
+        context.stop(self)
+      } else {
+        noOfEndResultReceived += 1
+        aggregatedTotalReceived += totalReceived
+        endResultMsgRecTime = Math.max(endResultMsgRecTime, totalTime)
+        aggregatedHistogram.add(histogram)
+        if (noOfEndResultReceived == publisherSubscriberPairs) {
+          printThroughputResult(aggregatedTotalReceived, aggregatedHistogram, endResultMsgRecTime)
+          context.stop(self)
+        }
+      }
+  }
 
-      println("======================================")
-      reporter.reportResults(
-        s"=== ${reporter.testName} ${self.path.name}: " +
-        f"throughput ${throughput * testSettings.senderReceiverPairs}%,.0f msg/s, " +
-        f"${throughput * payloadSize * testSettings.senderReceiverPairs}%,.0f bytes/s (payload), " +
-        f"${throughput * totalSize(context.system) * testSettings.senderReceiverPairs}%,.0f bytes/s (total" +
-        s"dropped ${totalMessages - totalReceived}, " +
-        s"max round-trip $maxRoundTripMillis ms, " +
-        s"burst size $burstSize, " +
-        s"payload size $payloadSize, " +
-        s"total size ${totalSize(context.system)}, " +
-        s"$took ms to deliver $totalReceived messages"
-      )
+  private def printThroughputResult(totalReceived: Long, histogram: Histogram, totalTime: Long): Unit = {
+    val took = NANOSECONDS.toMillis(totalTime)
+    val throughput =
+      if (singlePublisher) totalReceived * 1000.0 / took else totalReceived * publisherSubscriberPairs * 1000.0 / took
 
-      if (printTaskRunnerMetrics)
-        taskRunnerMetrics.printHistograms()
+    val totalDropped =
+      if (singlePublisher) totalMessages * publisherSubscriberPairs - totalReceived
+      else totalMessages - totalReceived
 
-      printLatencyResults(histogram, totalTime)
+    println("======================================")
+    reporter.reportResults(
+      s"=== ${reporter.testName} ${self.path.name}: " +
+      f"throughput $throughput%,.0f msg/s, " +
+      f"${throughput * payloadSize}%,.0f bytes/s (payload), " +
+      f"${throughput * totalSize(context.system)}%,.0f bytes/s (total" +
+      s"dropped $totalDropped, " +
+      s"burst size $burstSize, " +
+      s"payload size $payloadSize, " +
+      s"total size ${totalSize(context.system)}, " +
+      s"$took ms to deliver $totalReceived messages"
+    )
 
-      throughputPlotRef ! PlotResult().add(testName, throughput * payloadSize * testSettings.senderReceiverPairs / 1024 / 1024)
-      context.stop(self)
+    printLatencyResults(histogram, totalTime)
+
+    throughputPlotRef ! PlotResult().add(testName, throughput * payloadSize * testSettings.publisherSubscriberPairs / 1024 / 1024)
   }
 
   def printLatencyResults(histogram: Histogram, totalDurationNanos: Long): Unit = {
@@ -149,7 +169,11 @@ class PublishingActor(
       "=============================================================="
     )
     println(s"Histogram of latencies in microseconds (µs) [${self.path.name}].")
-//    histogram.outputPercentileDistribution(System.out, 1000.0)
+
+    histogram.outputPercentileDistribution(
+      new PrintStream(BenchmarkFileReporter.apply(s"${self.path.name}", actorSystem, logSettings = false).fos),
+      1000.0
+    )
 
     val latencyPlots = LatencyPlots(
       PlotResult().add(testName, percentile(50.0)),
@@ -172,10 +196,12 @@ class PublishingActor(
       else if (batching) math.min(remaining, burstSize)
       else totalMessages
 
+    def eventId(i: Int) = if (singlePublisher) 0 else i % numTargets
+
     if (batching) {
       var i = 0
       while (i < batchSize) {
-        val id = i % numTargets
+        val id = eventId(i)
         sent(id) += 1
 
         Await.result(publisher.publish(makeEvent(i, id)), 5.seconds)
@@ -186,7 +212,7 @@ class PublishingActor(
       val source = Source(0 until batchSize.toInt)
         .throttle(throttlingElements, throttlingDuration, throttlingElements, ThrottleMode.Shaping)
         .map { counter ⇒
-          val id = counter % numTargets
+          val id = eventId(counter)
           sent(id) += 1
           makeEvent(counter, id)
         }
@@ -217,11 +243,8 @@ object PublishingActor {
       testSettings: TestSettings,
       throughputPlotRef: ActorRef,
       latencyPlotRef: ActorRef,
-      printTaskRunnerMetrics: Boolean,
       reporter: BenchmarkFileReporter
-  ): Props =
-    Props(
-      new PublishingActor(mainTarget, targets, testSettings, throughputPlotRef, latencyPlotRef, printTaskRunnerMetrics, reporter)
-    )
+  ) =
+    Props(new PublishingActor(mainTarget, targets, testSettings, throughputPlotRef, latencyPlotRef, reporter))
 
 }

@@ -24,9 +24,9 @@ object EventServicePerfSpec extends MultiNodeConfig {
        |
        |csw.test.EventThroughputSpec {
        |# for serious measurements you should increase the totalMessagesFactor (20)
-       |  totalMessagesFactor = 10.0
+       |  totalMessagesFactor = 1.0
        |  actor-selection = off
-       |  batching = on
+       |  batching = off
        |
        |  throttling {
        |    elements = 300
@@ -118,7 +118,7 @@ abstract class EventServicePerfSpec extends RemotingMultiNodeSpec(EventServicePe
     super.afterAll()
   }
 
-  def identifyReceiver(name: String, r: RoleName = second): Target = {
+  def identifySubscriber(name: String, r: RoleName = second): Target = {
     val sel = system.actorSelection(node(r) / "user" / name)
     sel ! Identify(None)
     val ref = expectMsgType[ActorIdentity](10.seconds).ref.get
@@ -127,74 +127,108 @@ abstract class EventServicePerfSpec extends RemotingMultiNodeSpec(EventServicePe
   }
 
   val scenarios = List(
-    TestSettings(testName = "1-to-1",
-                 totalMessages = adjustedTotalMessages(20000),
-                 burstSize = 1000,
-                 payloadSize = 100,
-                 senderReceiverPairs = 1,
-                 batching),
-    TestSettings(testName = "1-to-1-size-1k",
-                 totalMessages = adjustedTotalMessages(20000),
-                 burstSize = 1000,
-                 payloadSize = 1000,
-                 senderReceiverPairs = 1,
-                 batching),
-    TestSettings(testName = "1-to-1-size-10k",
-                 totalMessages = adjustedTotalMessages(20000),
-                 burstSize = 1000,
-                 payloadSize = 10000,
-                 senderReceiverPairs = 1,
-                 batching),
-    TestSettings(testName = "5-to-5",
-                 totalMessages = adjustedTotalMessages(10000),
-                 burstSize = 200,
-                 payloadSize = 100,
-                 senderReceiverPairs = 5,
-                 batching),
-    TestSettings(testName = "10-to-10",
-                 totalMessages = adjustedTotalMessages(10000),
-                 burstSize = 100,
-                 payloadSize = 100,
-                 senderReceiverPairs = 10,
-                 batching)
+    TestSettings(
+      testName = "1-to-1",
+      totalMessages = adjustedTotalMessages(10000),
+      burstSize = 1000,
+      payloadSize = 100,
+      publisherSubscriberPairs = 1,
+      batching,
+      singlePublisher = false
+    ),
+    TestSettings(
+      testName = "1-to-1-size-1k",
+      totalMessages = adjustedTotalMessages(10000),
+      burstSize = 1000,
+      payloadSize = 1000,
+      publisherSubscriberPairs = 1,
+      batching,
+      singlePublisher = false
+    ),
+    TestSettings(
+      testName = "1-to-1-size-10k",
+      totalMessages = adjustedTotalMessages(10000),
+      burstSize = 1000,
+      payloadSize = 10000,
+      publisherSubscriberPairs = 1,
+      batching,
+      singlePublisher = false
+    ),
+    TestSettings(
+      testName = "5-to-5",
+      totalMessages = adjustedTotalMessages(10000),
+      burstSize = 200,
+      payloadSize = 100,
+      publisherSubscriberPairs = 5,
+      batching,
+      singlePublisher = false
+    ),
+    TestSettings(
+      testName = "10-to-10",
+      totalMessages = adjustedTotalMessages(10000),
+      burstSize = 100,
+      payloadSize = 100,
+      publisherSubscriberPairs = 10,
+      batching,
+      singlePublisher = false
+    ),
+    TestSettings(
+      testName = "1-to-5",
+      totalMessages = adjustedTotalMessages(10000),
+      burstSize = 100,
+      payloadSize = 100,
+      publisherSubscriberPairs = 5,
+      batching,
+      singlePublisher = true
+    ),
+    TestSettings(
+      testName = "1-to-10",
+      totalMessages = adjustedTotalMessages(10000),
+      burstSize = 100,
+      payloadSize = 100,
+      publisherSubscriberPairs = 10,
+      batching,
+      singlePublisher = true
+    )
   )
 
   def test(testSettings: TestSettings, benchmarkFileReporter: BenchmarkFileReporter): Unit = {
     import testSettings._
-    val receiverName = testName + "-subscriber"
+    val subscriberName = testName + "-subscriber"
 
     runPerfFlames(first, second)(delay = 5.seconds, time = 15.seconds)
 
     runOn(second) {
       val rep = reporter(testName)
-      val receivers = (1 to senderReceiverPairs).map { n ⇒
+      val subscribers = (1 to publisherSubscriberPairs).map { n ⇒
+        val (noOfPublishers, id) = if (testSettings.singlePublisher) (1, 1) else (publisherSubscriberPairs, n)
         system.actorOf(
-          SubscribingActor.props(rep, payloadSize, printTaskRunnerMetrics = n == 1, senderReceiverPairs, n),
-          receiverName + n
+          SubscribingActor.props(rep, payloadSize, noOfPublishers, id),
+          subscriberName + n
         )
       }
-      enterBarrier(receiverName + "-started")
+      enterBarrier(subscriberName + "-started")
       enterBarrier(testName + "-done")
-      receivers.foreach(_ ! PoisonPill)
+      subscribers.foreach(_ ! PoisonPill)
       rep.halt()
     }
 
     runOn(first) {
-      enterBarrier(receiverName + "-started")
-      val receivers = (for (n ← 1 to senderReceiverPairs) yield identifyReceiver(receiverName + n)).toArray
-      val senders = for (n ← 1 to senderReceiverPairs) yield {
-        val receiver = receivers(n - 1)
+      val noOfPublishers = if (testSettings.singlePublisher) 1 else publisherSubscriberPairs
+      enterBarrier(subscriberName + "-started")
+      val subscribers = (for (n ← 1 to publisherSubscriberPairs) yield identifySubscriber(subscriberName + n)).toArray
+      val publishers = for (n ← 1 to noOfPublishers) yield {
+        val subscriber = subscribers(n - 1)
 
         val throughputPlotProbe = TestProbe()
         val latencyPlotProbe    = TestProbe()
         val snd = system.actorOf(
           PublishingActor.props(
-            receiver,
-            receivers,
+            subscriber,
+            subscribers,
             testSettings,
             throughputPlotProbe.ref,
             latencyPlotProbe.ref,
-            printTaskRunnerMetrics = n == 1,
             benchmarkFileReporter
           ),
           testName + "-publisher" + n
@@ -204,10 +238,10 @@ abstract class EventServicePerfSpec extends RemotingMultiNodeSpec(EventServicePe
         snd ! Init
         (snd, terminationProbe, throughputPlotProbe, latencyPlotProbe)
       }
-      senders.foreach {
+      publishers.foreach {
         case (snd, terminationProbe, throughputPlotProbe, latencyPlotProbe) ⇒
           terminationProbe.expectTerminated(snd, barrierTimeout)
-          if (snd == senders.head._1) {
+          if (snd == publishers.head._1) {
             val throughputPlotResult = throughputPlotProbe.expectMsgType[PlotResult]
             val latencyPlotResult    = latencyPlotProbe.expectMsgType[LatencyPlots]
             throughputPlot = throughputPlot.addAll(throughputPlotResult)

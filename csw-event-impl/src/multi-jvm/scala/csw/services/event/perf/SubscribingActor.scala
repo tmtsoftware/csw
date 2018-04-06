@@ -12,12 +12,9 @@ import io.lettuce.core.RedisClient
 import org.HdrHistogram.Histogram
 import org.scalatest.mockito.MockitoSugar
 
-class SubscribingActor(reporter: RateReporter, payloadSize: Int, printTaskRunnerMetrics: Boolean, numSenders: Int, id: Int)
-    extends Actor
-    with MockitoSugar {
+class SubscribingActor(reporter: RateReporter, payloadSize: Int, numSenders: Int, id: Int) extends Actor with MockitoSugar {
 
   private var eventsReceived                = 0L
-  private val taskRunnerMetrics             = new TaskRunnerMetrics(context.system)
   private var endMessagesMissing            = numSenders
   private var correspondingSender: ActorRef = null // the Actor which send the Start message will also receive the report
   private var publishers: List[ActorRef]    = Nil
@@ -53,8 +50,6 @@ class SubscribingActor(reporter: RateReporter, payloadSize: Int, printTaskRunner
         endMessagesMissing -= 1 // wait for End message from all senders
 
       case SystemEvent(_, _, `endEvent`, _, _) ⇒
-        if (printTaskRunnerMetrics)
-          taskRunnerMetrics.printHistograms()
         correspondingSender ! EndResult(eventsReceived, histogram, System.nanoTime() - startTime)
         context.stop(self)
 
@@ -73,7 +68,7 @@ class SubscribingActor(reporter: RateReporter, payloadSize: Int, printTaskRunner
 
   def receive: PartialFunction[Any, Unit] = {
     case Init(corresponding) ⇒
-      if (corresponding == self) correspondingSender = sender()
+      if (corresponding == self || numSenders == 1) correspondingSender = sender()
 
       publishers = sender() :: publishers
       sender() ! Initialized
@@ -102,7 +97,6 @@ class SubscribingActor(reporter: RateReporter, payloadSize: Int, printTaskRunner
 
 object SubscribingActor {
 
-  def props(reporter: RateReporter, payloadSize: Int, printTaskRunnerMetrics: Boolean, numSenders: Int, id: Int): Props =
-    Props(new SubscribingActor(reporter, payloadSize, printTaskRunnerMetrics, numSenders, id))
-      .withDispatcher("akka.remote.default-remote-dispatcher")
+  def props(reporter: RateReporter, payloadSize: Int, numSenders: Int, id: Int): Props =
+    Props(new SubscribingActor(reporter, payloadSize, numSenders, id)).withDispatcher("akka.remote.default-remote-dispatcher")
 }

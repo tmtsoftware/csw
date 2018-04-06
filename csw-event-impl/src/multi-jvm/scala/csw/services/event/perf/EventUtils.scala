@@ -1,6 +1,6 @@
 package csw.services.event.perf
 
-import csw.messages.events.{Event, EventKey, EventName, SystemEvent}
+import csw.messages.events.{EventKey, EventName, SystemEvent}
 import csw.messages.params.generics.Key
 import csw.messages.params.generics.KeyType.{ByteKey, LongKey, StringKey}
 import csw.messages.params.models.{Id, Prefix}
@@ -31,7 +31,7 @@ object EventUtils {
       EventKey(s"${prefix.prefix}.$endEvent")
     )
 
-  def event(name: EventName, id: Long = -1, payload: Array[Byte] = Array.emptyByteArray): Event =
+  def event(name: EventName, id: Long = -1, payload: Array[Byte] = Array.emptyByteArray): SystemEvent =
     baseTestEvent.copy(eventId = Id(id.toString), eventName = name, paramSet = Set(payloadKey.set(payload)))
 
   def eventWithNanos(
@@ -39,14 +39,14 @@ object EventUtils {
       id: Long = -1,
       payload: Array[Byte] = Array.emptyByteArray,
       time: Long = System.nanoTime()
-  ): Event =
+  ): SystemEvent =
     baseTestEvent.copy(
       eventId = Id(id.toString),
       eventName = name,
       paramSet = Set(payloadKey.set(payload), timeNanosKey.set(time))
     )
 
-  def flowCtlEvent(id: Int, time: Long, name: String): Event = {
+  def flowCtlEvent(id: Int, time: Long, name: String): SystemEvent = {
     baseFlowControlEvent
       .copy(
         eventId = Id(id.toString),
