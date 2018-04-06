@@ -34,6 +34,19 @@ Supported Operating Systems are: CentOS and MacOS
     If above command fails to pull template, then try running with full path `sbt new https://github.com/tmtsoftware/csw.g8`
 3.  Provide input details when prompted. Follow the template [readme.md](https://github.com/tmtsoftware/csw.g8/blob/master/README.md) for detailed information about input parameters.
 
+
+To open the project in IntelliJ, start IntelliJ and click on Import Project in the Intro dialog.  If you have a project already open, click on File -> New -> Project from Existing Sources...   
+
+![intellijIntro](../images/gettingstarted/intellijIntro.png)
+
+Then select the directory created by the template and click Open.
+
+You will then see a dialog asking how to import the project.  
+
+![intellijImport](../images/gettingstarted/intellijImport.png)
+
+Be sure the Import project from external model radio button and sbt options are selected and click Next.  Then click Finish on the next dialog to accept the defaults.
+
 Let’s take a look at what just got generated:
 
 In this example, a project was created with default parameters. The complete project structure looks like this:
@@ -55,7 +68,7 @@ package bundled with all dependencies, and a launching application.
 
 ## Add new sbt project module
 
-If you want to add a new project with name `galil-io`, then follow below steps:
+If you want to add another component to the project, for example, with the name `galil-io`, you have to create a new sbt module:
 
 1. Add external library dependencies required by `galil-io` in `Libs.scala` file, if it does not exist.
 ```
