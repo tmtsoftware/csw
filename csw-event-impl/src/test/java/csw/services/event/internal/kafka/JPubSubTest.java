@@ -108,6 +108,18 @@ public class JPubSubTest {
         framework.retrieveMultipleSubscribedEvents();
     }
 
+    //DEOPSCSW-338: Provide callback for Event alerts
+    @Test
+    public void shouldBeAbleToSubscribeWithCallback() throws InterruptedException, ExecutionException, TimeoutException {
+        framework.retrieveEventUsingCallback();
+    }
+
+    //DEOPSCSW-338: Provide callback for Event alerts
+    @Test
+    public void shouldBeAbleToSubscribeWithAsyncCallback() throws InterruptedException, ExecutionException, TimeoutException {
+        framework.retrieveEventUsingAsyncCallback();
+    }
+
     @Test
     public void shouldBeAbleToGetAnEventWithoutSubscribingForIt() throws InterruptedException, ExecutionException, TimeoutException {
         framework.get();

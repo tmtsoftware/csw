@@ -11,6 +11,7 @@ import csw.services.event.scaladsl.{EventPublisher, EventSubscriber}
 import org.scalatest.Matchers
 
 import scala.collection.{immutable, mutable}
+import scala.concurrent.Future
 import scala.concurrent.duration.DurationLong
 
 class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: EventSubscriber)(
@@ -158,6 +159,42 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     subscription.unsubscribe().await
 
     seqF.await shouldBe Seq(distinctEvent1) //no
+  }
+
+  var receivedEvent: Event = _
+  def retrieveEventUsingCallback(): Unit = {
+    val event1 = makeEvent(203)
+
+    val callback: Event ⇒ Unit = receivedEvent = _
+
+    val subscription = subscriber.subscribeCallback(Set(event1.eventKey), callback)
+    Thread.sleep(1000)
+
+    publisher.publish(event1).await
+    Thread.sleep(1000)
+
+    subscription.unsubscribe().await
+
+    receivedEvent shouldBe event1
+  }
+
+  def retrieveEventUsingAsyncCallback(): Unit = {
+    val event1 = makeEvent(204)
+
+    val callback: Event ⇒ Future[Event] = (event) ⇒ {
+      receivedEvent = event
+      Future.successful(receivedEvent)
+    }
+
+    val subscription = subscriber.subscribeAsync(Set(event1.eventKey), callback)
+    Thread.sleep(1000)
+
+    publisher.publish(event1).await
+    Thread.sleep(1000)
+
+    subscription.unsubscribe().await
+
+    receivedEvent shouldBe event1
   }
 
   def get(): Unit = {

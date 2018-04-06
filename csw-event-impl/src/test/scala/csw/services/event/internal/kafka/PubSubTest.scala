@@ -77,6 +77,16 @@ class PubSubTest extends FunSuite with EmbeddedKafka with BeforeAndAfterAll {
     framework.retrieveMultipleSubscribedEvents()
   }
 
+  //DEOPSCSW-338: Provide callback for Event alerts
+  test("Kafka - should be able to subscribe with callback") {
+    framework.retrieveEventUsingCallback()
+  }
+
+  //DEOPSCSW-338: Provide callback for Event alerts
+  test("Kafka - should be able to subscribe with async callback") {
+    framework.retrieveEventUsingAsyncCallback()
+  }
+
   test("Kafka - should be able to get an event without subscribing for it") {
     framework.get()
   }

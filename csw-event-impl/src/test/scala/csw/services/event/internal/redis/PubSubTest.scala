@@ -79,6 +79,16 @@ class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with Embe
     framework.retrieveMultipleSubscribedEvents()
   }
 
+  //DEOPSCSW-338: Provide callback for Event alerts
+  test("Redis - should be able to subscribe with callback") {
+    framework.retrieveEventUsingCallback()
+  }
+
+  //DEOPSCSW-338: Provide callback for Event alerts
+  test("Redis - should be able to subscribe with async callback") {
+    framework.retrieveEventUsingAsyncCallback()
+  }
+
   test("Redis - should be able to get an event without subscribing for it") {
     framework.get()
   }

@@ -13,13 +13,11 @@ import csw.services.event.javadsl.IEventPublisher;
 import csw.services.event.javadsl.IEventSubscriber;
 import csw.services.event.javadsl.IEventSubscription;
 import org.junit.Assert;
+import scala.Function1;
 import scala.concurrent.duration.FiniteDuration;
 
 import java.util.*;
-import java.util.concurrent.CompletionStage;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 public class JEventServicePubSubTestFramework {
@@ -207,6 +205,39 @@ public class JEventServicePubSubTestFramework {
 
         Set<Event> actualEvents = new HashSet<>(pair.second().toCompletableFuture().get(10, TimeUnit.SECONDS));
         Assert.assertEquals(Collections.singleton(distinctEvent1), actualEvents);
+    }
+
+    Event receivedEvent;
+    public void retrieveEventUsingCallback() throws InterruptedException, TimeoutException, ExecutionException {
+        Event event1 = Utils.makeEvent(303);
+
+        IEventSubscription subscription = subscriber.subscribeCallback(Collections.singleton(event1.eventKey()), event -> receivedEvent = event, mat);
+        Thread.sleep(1000);
+
+        publisher.publish(event1).get(10, TimeUnit.SECONDS);
+        Thread.sleep(1000);
+
+        subscription.unsubscribe().get(10, TimeUnit.SECONDS);
+
+        Assert.assertEquals(event1, receivedEvent);
+    }
+
+    public void retrieveEventUsingAsyncCallback() throws InterruptedException, TimeoutException, ExecutionException {
+        Event event1 = Utils.makeEvent(304);
+
+        Function1<Event, CompletableFuture<?>> asyncCallback = event -> {
+            receivedEvent = event;
+            return CompletableFuture.completedFuture(event);
+        };
+        IEventSubscription subscription = subscriber.subscribeAsync(Collections.singleton(event1.eventKey()), asyncCallback, mat);
+        Thread.sleep(1000);
+
+        publisher.publish(event1).get(10, TimeUnit.SECONDS);
+        Thread.sleep(1000);
+
+        subscription.unsubscribe().get(10, TimeUnit.SECONDS);
+
+        Assert.assertEquals(event1, receivedEvent);
     }
 
     public void get() throws InterruptedException, ExecutionException, TimeoutException {

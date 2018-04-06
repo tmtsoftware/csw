@@ -13,10 +13,12 @@ object Utils {
   val event                   = SystemEvent(prefix, eventName)
   val timeNanosKey: Key[Long] = LongKey.make("eventTime")
 
-  def makeEvent(id: Int): Event = {
+  def makeEvent(id: Int): Event = event.copy(
+    eventId = Id(id.toString),
+    eventTime = EventTime(Instant.now()),
+    paramSet = Set(timeNanosKey.set(System.nanoTime()))
+  )
 
-    event.copy(eventId = Id(id.toString),eventTime = EventTime(Instant.now()) , paramSet = Set(timeNanosKey.set(System.nanoTime())))
-  }
   def makeDistinctEvent(id: Int): Event = {
     val eventName = EventName(s"system_$id")
 

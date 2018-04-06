@@ -9,7 +9,6 @@ import csw.services.event.internal.commons.{EventServiceConnection, Wiring}
 import csw.services.event.scaladsl.RedisFactory
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.scaladsl.LocationServiceFactory
-import csw.services.logging.scaladsl.LoggingSystemFactory
 import io.lettuce.core.ClientOptions.DisconnectedBehavior
 import io.lettuce.core.{ClientOptions, RedisClient}
 import org.scalatest.mockito.MockitoSugar
