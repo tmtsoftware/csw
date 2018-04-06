@@ -97,8 +97,8 @@ A component may be restarted by an external administrative program whether it is
 A restart may occur when the component is `Running`/`onLine` or `offLine` (see below).
 
 A `restart` causes the component to be destroyed and re-created with a new TLA. The `onShutdown`
-handler is called to allow the component to tidy up, it is destroyed. Then the Supervisor
-creates a new TLA and the startup proceeds as with `initialie` above.ß
+handler is called to allow the component to tidy up before it is destroyed. Then the Supervisor
+creates a new TLA and the startup proceeds as with `initialize` above.
 
 ## Component Online and Offline
 `Online` describes a component that is currently part of the observing system that is in use. 
