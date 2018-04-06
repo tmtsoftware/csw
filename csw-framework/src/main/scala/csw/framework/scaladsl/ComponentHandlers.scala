@@ -28,6 +28,10 @@ abstract class ComponentHandlers(
     locationService: LocationService,
     loggerFactory: LoggerFactory
 ) {
+
+  /**
+   * A component can access this flag, which can be used to determine if the component is in the online or offline state.
+   */
   var isOnline: Boolean = false
 
   /**

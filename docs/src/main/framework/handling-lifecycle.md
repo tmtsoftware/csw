@@ -115,7 +115,7 @@ handler is called. The component should make any changes in its operation needed
 
 ### isOnline
 
-A component has access to `isOnline` boolean flag which can be used to determine if the component is in the online or offline state.
+A component has access to the `isOnline` boolean flag, which can be used to determine if the component is in the online or offline state.
 
 ### onGoOffline
 
@@ -183,8 +183,7 @@ If a response can be provided immediately, a final `CommandResponse` such as `Co
 ### onSubmit
 
 On receiving a command as `Submit`, the `onSubmit` handler is invoked for a component only if the `validateCommand` handler returns `Accepted`. In case a command 
-is received as a submit, command response should be updated in the `CommandResponseManager`. `CommandResponseManager` is an actor whose reference `commandResponseManager` 
-is available in the `ComponentHandlers`. 
+is received as a submit, the command response should be updated in the `CommandResponseManager`, which is an actor (A reference to it is passed to the component handler constructor). 
 
 Assembly/Scala
 :   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/AssemblyComponentHandlers.scala) { #onSubmit-handler }
