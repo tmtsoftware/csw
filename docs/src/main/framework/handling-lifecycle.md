@@ -1,6 +1,37 @@
-# Lifecycle support
+# Component Handlers
+A component developer creates a Top Level Actor (TLA) by inheriting from an abstract class 
+@scaladoc[ComponentHandlers](csw.framework.scaladsl.ComponentHandlers) or 
+@javadoc[JComponentHandlers](csw.framework.javadsl.JComponentHandlers) for Scala or Java, respectively. 
+Each of these abstract classes provides several **handler** methods that can be overridden by the developer to provide
+component-specific code as described below.  
 
-## initialize
+## Component Lifecycle
+For each component, the CSW framework creates a `Supervisor` that creates the TLA, and along with the abstract behavior
+class provided by the framework, it starts up and intiailizes the component in a standardized way. At the conclusion of 
+the startup of the component, it is ready to receive commands from the outside world. The following figure is used to 
+describe the startup lifecycle interactions between the framework and the TLA.
+
+![lifecycle](../images/framework/Lifecycle.png)
+
+As described in @ref:[Creating a Component](../commons/create-component.md), in either standalone or when running within 
+a container, a `Supervisor` is created with a @ref:[ComponentInfo](describing-components.md) file. The figure shows
+that the Supervisor in the framework creates the specified TLA. Once the TLA is created, the framework calls the `initialize`
+handler. This is the oportunity for the component to perform initialization needed before it is ready to receive commands.
+
+The TLA indicates a successful `initialize` by returning. If it cannot initialize, it can throw an exception, which will be
+caught and logged. The Supervisor will retry the creation and initialization of the TLA three times. If it fails after
+three times processing stops.
+
+@@@ note
+After failing to create and initialize three times, the Supervisor will log a message and stop. In the future when the 
+Alarm Service exists, there
+will probably be an alarm that will be set to notify the operator of a failure since there is serious problem.
+@@@
+
+When `initialize` succeeds, the Supervisor in the framework and the component itself enter the Running state. When in
+the Running state, commands received from outside the component are passed to the TLA (see below).
+
+### initialize
 
 The `initialize` handler is invoked when the component is created. This is different than constructor initialization to allow non-blocking 
 asynchronous operations. The component can initialize state such as configuration to be fetched from Configuration Service, 
@@ -18,7 +49,34 @@ Hcd/Scala
 Hcd/Java
 :   @@snip [JHcdComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/hcd/JHcdComponentHandlers.java) { #jInitialize-handler }
 
-## onShutdown
+
+####Creation Timeout
+The `Supervisor` waits for the `initialize` to complete. If it times out, it will retry the creation of the TLA
+3 times in the same way as with initialize failures. The timeout value is configurable by the TLA by setting the
+`initializeTimeout` value in @ref:[ComponentInfo](describing-components.md).
+
+####Location Service Interactions
+Once the Supervisor and TLA are in the Running state, the Supervisor registers the component with the Location Service.
+This allows the component to be located so it can be contacted. Registration with Location Service happens only if
+locationServiceUsage in @ref:[ComponentInfo](describing-components.md) is not set to `DoNotRegister`.
+
+If the component has connections and locationServiceUsage in @ref:[ComponentInfo](describing-components.md) is set to
+`RegisterAndTrackServices`, the framework will resolve the components and deliver `TrackingEvent`s to the TLA through
+the `onTrackingEvent` @ref:[`onTrackingEvent`](tracking-connections.md) handler. 
+
+
+## Shutting Down
+A component may be shutdown by an external administrative program whether it is deployed in a container or standalone.
+Shutting down may occur when the component is `Running`/`onLine` or `offLine` (see below).
+
+The TLA provides a handler called `onShutdown` that is called by the Supervisor when shutting down to give the TLA an opportunity to perform
+any clean up it may require such as freeing resources.
+
+As with `initialize` the framework will only wait for 10 seconds for the component to return from `doShutdown`.
+If it does not return, it is assumed the TLA is damaged. After successful return from `doShutdown`, the
+Supervisor deletes the component. The `doShutdown` timeout cannot be changed.
+
+### onShutdown
 
 The `onShutdown` handler can be used for carrying out the tasks which will allow the component to shutdown gracefully. 
 
@@ -34,11 +92,32 @@ Hcd/Scala
 Hcd/Java
 :   @@snip [JHcdComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/hcd/JHcdComponentHandlers.java) { #onShutdown-handler }
 
-## isOnline
+### Restarting
+A component may be restarted by an external administrative program whether it is deployed in a container or standalone.
+A restart may occur when the component is `Running`/`onLine` or `offLine` (see below).
 
-A component has access to `isOnline` boolean flag which can be used to determine if the component is online or offline state.
+A `restart` causes the component to be destroyed and re-created with a new TLA. The `onShutdown`
+handler is called to allow the component to tidy up, it is destroyed. Then the Supervisor
+creates a new TLA and the startup proceeds as with `initialie` above.ß
 
-## onGoOffline
+## Component Online and Offline
+`Online` describes a component that is currently part of the observing system that is in use. 
+When a component enters the Running state it is also "online".
+
+A component is `offline` when it is operating and available for active observing but is not currently
+in use.
+
+If a component is to transition from the online state to the offline state, the `onGoOffLine`
+handler is called. The component should make any changes in its operation for offline use.
+
+If a component is to transition from the offline state to the online state, the `onGoOnline`
+handler is called. The component should make any changes in its operation needed for online use.
+
+### isOnline
+
+A component has access to `isOnline` boolean flag which can be used to determine if the component is in the online or offline state.
+
+### onGoOffline
 
 A component can be notified to run in offline mode in case it is not in use. The component can change its behavior if needed as a part of this handler.
 
@@ -54,7 +133,7 @@ Hcd/Scala
 Hcd/Java
 :   @@snip [JHcdComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/hcd/JHcdComponentHandlers.java) { #onGoOffline-handler }
 
-## onGoOnline
+### onGoOnline
 
 A component can be notified to run in online mode again in case it was put to run in offline mode. The component can change its behavior if needed as a part of this handler.
 
@@ -70,11 +149,19 @@ Hcd/Scala
 Hcd/Java
 :   @@snip [JHcdComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/hcd/JHcdComponentHandlers.java) { #onGoOnline-handler }
 
+
 ## Handling commands
+
+The remaining handlers are associated with handling incoming commands. There is a handler
+for submit commands called `onSubmit` and a handler for oneway called `onOneway`.
 
 ### validateCommand
 
-A command can be sent as a `Submit` or `Oneway` message to the component actor. If a command can be completed immediately, a `CommandResponse` indicating 
+Whenever a command is received by a component it is first validated. The component should
+inspect the command and its parameters to determine if the actions related to the command
+can be executed or started.
+
+A command can be sent as a `Submit` or `Oneway` message to the component. If a command can be completed immediately, a `CommandResponse` indicating 
 the final response for the command can be returned. If a command requires time for processing, the component is required to validate the `ControlCommand` received
 and return a validation result as `Accepted` or `Invalid`. The final response for a command sent as `Submit` can be obtained by the sender command by querying or
 subscribing for this response to the component as described here. 
