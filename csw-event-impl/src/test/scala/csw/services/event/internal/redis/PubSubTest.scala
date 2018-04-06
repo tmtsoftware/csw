@@ -89,6 +89,11 @@ class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with Embe
     framework.retrieveEventUsingAsyncCallback()
   }
 
+  //DEOPSCSW-339: Provide actor ref to alert about Event arrival
+  test("Redis - should be able to subscribe with an ActorRef") {
+    framework.retrieveEventUsingActorRef()
+  }
+
   test("Redis - should be able to get an event without subscribing for it") {
     framework.get()
   }

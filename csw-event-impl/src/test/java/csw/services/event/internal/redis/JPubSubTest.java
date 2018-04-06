@@ -64,7 +64,7 @@ public class JPubSubTest {
         publisher = redisFactory.publisher().get();
         IEventSubscriber subscriber = redisFactory.subscriber().get();
 
-        framework = new JEventServicePubSubTestFramework(publisher, subscriber, wiring.resumingMat());
+        framework = new JEventServicePubSubTestFramework(publisher, subscriber, actorSystem, wiring.resumingMat());
 
         redis.start();
     }
@@ -124,6 +124,12 @@ public class JPubSubTest {
     @Test
     public void shouldBeAbleToSubscribeWithAsyncCallback() throws InterruptedException, ExecutionException, TimeoutException {
         framework.retrieveEventUsingAsyncCallback();
+    }
+
+    //DEOPSCSW-339: Provide actor ref to alert about Event arrival
+    @Test
+    public void shouldBeAbleToSubscribeWithAnActorRef() throws InterruptedException, ExecutionException, TimeoutException {
+        framework.retrieveEventUsingActorRef();
     }
 
     @Test

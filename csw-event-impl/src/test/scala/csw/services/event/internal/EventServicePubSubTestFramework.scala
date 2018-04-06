@@ -1,8 +1,10 @@
 package csw.services.event.internal
 
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.{ActorSystem, Cancellable}
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Keep, Sink, Source}
+import akka.testkit.typed.scaladsl.TestProbe
 import csw.messages.events.{Event, EventKey, EventName, SystemEvent}
 import csw.messages.params.models.Prefix
 import csw.services.event.helpers.TestFutureExt.RichFuture
@@ -163,14 +165,14 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
 
   var receivedEvent: Event = _
   def retrieveEventUsingCallback(): Unit = {
-    val event1 = makeEvent(203)
+    val event1 = makeDistinctEvent(203)
 
     val callback: Event ⇒ Unit = receivedEvent = _
 
-    val subscription = subscriber.subscribeCallback(Set(event1.eventKey), callback)
+    publisher.publish(event1).await
     Thread.sleep(1000)
 
-    publisher.publish(event1).await
+    val subscription = subscriber.subscribeCallback(Set(event1.eventKey), callback)
     Thread.sleep(1000)
 
     subscription.unsubscribe().await
@@ -179,22 +181,38 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
   }
 
   def retrieveEventUsingAsyncCallback(): Unit = {
-    val event1 = makeEvent(204)
+    val event1 = makeDistinctEvent(204)
 
     val callback: Event ⇒ Future[Event] = (event) ⇒ {
       receivedEvent = event
       Future.successful(receivedEvent)
     }
 
-    val subscription = subscriber.subscribeAsync(Set(event1.eventKey), callback)
+    publisher.publish(event1).await
     Thread.sleep(1000)
 
-    publisher.publish(event1).await
+    val subscription = subscriber.subscribeAsync(Set(event1.eventKey), callback)
     Thread.sleep(1000)
 
     subscription.unsubscribe().await
 
     receivedEvent shouldBe event1
+  }
+
+  def retrieveEventUsingActorRef(): Unit = {
+    val event1 = makeDistinctEvent(205)
+
+    val probe = TestProbe[Event]()(actorSystem.toTyped)
+
+    publisher.publish(event1).await
+    Thread.sleep(1000)
+
+    val subscription = subscriber.subscribeActorRef(Set(event1.eventKey), probe.ref)
+    Thread.sleep(1000)
+
+    subscription.unsubscribe().await
+
+    probe.expectMessage(event1)
   }
 
   def get(): Unit = {

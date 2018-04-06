@@ -87,6 +87,11 @@ class PubSubTest extends FunSuite with EmbeddedKafka with BeforeAndAfterAll {
     framework.retrieveEventUsingAsyncCallback()
   }
 
+  //DEOPSCSW-339: Provide actor ref to alert about Event arrival
+  test("Kafka - should be able to subscribe with an ActorRef") {
+    framework.retrieveEventUsingActorRef()
+  }
+
   test("Kafka - should be able to get an event without subscribing for it") {
     framework.get()
   }

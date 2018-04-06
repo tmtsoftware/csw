@@ -58,7 +58,7 @@ public class JPubSubTest {
         publisher = kafkaFactory.publisher().get(10, TimeUnit.SECONDS);
         IEventSubscriber subscriber = kafkaFactory.subscriber().get(10, TimeUnit.SECONDS);
 
-        framework = new JEventServicePubSubTestFramework(publisher, subscriber, wiring.resumingMat());
+        framework = new JEventServicePubSubTestFramework(publisher, subscriber, actorSystem, wiring.resumingMat());
 
         EmbeddedKafka$.MODULE$.start(config);
     }
@@ -118,6 +118,12 @@ public class JPubSubTest {
     @Test
     public void shouldBeAbleToSubscribeWithAsyncCallback() throws InterruptedException, ExecutionException, TimeoutException {
         framework.retrieveEventUsingAsyncCallback();
+    }
+
+    //DEOPSCSW-339: Provide actor ref to alert about Event arrival
+    @Test
+    public void shouldBeAbleToSubscribeWithAnActorRef() throws InterruptedException, ExecutionException, TimeoutException {
+        framework.retrieveEventUsingActorRef();
     }
 
     @Test

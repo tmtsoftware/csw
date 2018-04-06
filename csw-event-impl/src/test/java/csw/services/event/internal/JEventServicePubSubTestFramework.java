@@ -1,11 +1,14 @@
 package csw.services.event.internal;
 
+import akka.actor.ActorSystem;
 import akka.actor.Cancellable;
+import akka.actor.typed.javadsl.Adapter;
 import akka.japi.Pair;
 import akka.stream.Materializer;
 import akka.stream.javadsl.Keep;
 import akka.stream.javadsl.Sink;
 import akka.stream.javadsl.Source;
+import akka.testkit.typed.javadsl.TestProbe;
 import csw.messages.events.*;
 import csw.messages.params.models.Prefix;
 import csw.services.event.helpers.Utils;
@@ -25,14 +28,16 @@ public class JEventServicePubSubTestFramework {
     private IEventPublisher publisher;
     private IEventSubscriber subscriber;
     private Materializer mat;
+    private ActorSystem actorSystem;
 
     private int counter = -1;
     private Cancellable cancellable;
 
-    public JEventServicePubSubTestFramework(IEventPublisher publisher, IEventSubscriber subscriber, Materializer mat) {
+    public JEventServicePubSubTestFramework(IEventPublisher publisher, IEventSubscriber subscriber, ActorSystem actorSystem, Materializer mat) {
         this.publisher = publisher;
         this.subscriber = subscriber;
         this.mat = mat;
+        this.actorSystem = actorSystem;
     }
 
     public void pubsub() throws InterruptedException, ExecutionException, TimeoutException {
@@ -94,7 +99,7 @@ public class JEventServicePubSubTestFramework {
         expectedEvents2.add(event2);
         Assert.assertEquals(expectedEvents2, pair2.second().toCompletableFuture().get());
     }
-    
+
     public void publishMultiple() throws InterruptedException {
         java.util.List<Event> events = new ArrayList<>();
         for (int i = 1; i < 11; i++) {
@@ -125,7 +130,7 @@ public class JEventServicePubSubTestFramework {
         events.add(0, Event$.MODULE$.invalidEvent());
         Assert.assertEquals(events, queue);
     }
-    
+
     public void publishMultipleToDifferentChannels() throws InterruptedException {
         java.util.List<Event> events = new ArrayList<>();
         for (int i = 101; i < 111; i++) {
@@ -148,7 +153,7 @@ public class JEventServicePubSubTestFramework {
         events.add(0, Event$.MODULE$.invalidEvent());
         Assert.assertEquals(new HashSet<>(events), queue);
     }
-    
+
     public void retrieveRecentlyPublished() throws InterruptedException, ExecutionException, TimeoutException {
         Event event1 = Utils.makeEvent(1);
         Event event2 = Utils.makeEvent(2);
@@ -172,7 +177,7 @@ public class JEventServicePubSubTestFramework {
 
         Assert.assertEquals(expectedEvents, pair.second().toCompletableFuture().get(10, TimeUnit.SECONDS));
     }
-    
+
     public void retrieveInvalidEvent() throws InterruptedException, ExecutionException, TimeoutException {
         EventKey eventKey = new EventKey("test");
 
@@ -185,8 +190,8 @@ public class JEventServicePubSubTestFramework {
     }
 
     public void retrieveMultipleSubscribedEvents() throws InterruptedException, ExecutionException, TimeoutException {
-        Event distinctEvent1 = Utils.makeDistinctEvent(201);
-        Event distinctEvent2 = Utils.makeDistinctEvent(202);
+        Event distinctEvent1 = Utils.makeDistinctEvent(301);
+        Event distinctEvent2 = Utils.makeDistinctEvent(302);
 
         EventKey eventKey1 = distinctEvent1.eventKey();
         EventKey eventKey2 = distinctEvent2.eventKey();
@@ -207,14 +212,15 @@ public class JEventServicePubSubTestFramework {
         Assert.assertEquals(Collections.singleton(distinctEvent1), actualEvents);
     }
 
-    Event receivedEvent;
-    public void retrieveEventUsingCallback() throws InterruptedException, TimeoutException, ExecutionException {
-        Event event1 = Utils.makeEvent(303);
+    private Event receivedEvent;
 
-        IEventSubscription subscription = subscriber.subscribeCallback(Collections.singleton(event1.eventKey()), event -> receivedEvent = event, mat);
-        Thread.sleep(1000);
+    public void retrieveEventUsingCallback() throws InterruptedException, TimeoutException, ExecutionException {
+        Event event1 = Utils.makeDistinctEvent(303);
 
         publisher.publish(event1).get(10, TimeUnit.SECONDS);
+        Thread.sleep(1000);
+
+        IEventSubscription subscription = subscriber.subscribeCallback(Collections.singleton(event1.eventKey()), event -> receivedEvent = event, mat);
         Thread.sleep(1000);
 
         subscription.unsubscribe().get(10, TimeUnit.SECONDS);
@@ -223,21 +229,38 @@ public class JEventServicePubSubTestFramework {
     }
 
     public void retrieveEventUsingAsyncCallback() throws InterruptedException, TimeoutException, ExecutionException {
-        Event event1 = Utils.makeEvent(304);
+        Event event1 = Utils.makeDistinctEvent(304);
 
         Function1<Event, CompletableFuture<?>> asyncCallback = event -> {
             receivedEvent = event;
             return CompletableFuture.completedFuture(event);
         };
-        IEventSubscription subscription = subscriber.subscribeAsync(Collections.singleton(event1.eventKey()), asyncCallback, mat);
-        Thread.sleep(1000);
 
         publisher.publish(event1).get(10, TimeUnit.SECONDS);
+        Thread.sleep(1000);
+
+        IEventSubscription subscription = subscriber.subscribeAsync(Collections.singleton(event1.eventKey()), asyncCallback, mat);
         Thread.sleep(1000);
 
         subscription.unsubscribe().get(10, TimeUnit.SECONDS);
 
         Assert.assertEquals(event1, receivedEvent);
+    }
+
+    public void retrieveEventUsingActorRef() throws InterruptedException, ExecutionException, TimeoutException {
+        Event event1 = Utils.makeDistinctEvent(305);
+
+        TestProbe probe = TestProbe.create(Adapter.toTyped(actorSystem));
+
+        publisher.publish(event1).get(10, TimeUnit.SECONDS);
+        Thread.sleep(1000);
+
+        IEventSubscription subscription = subscriber.subscribeActorRef(Collections.singleton(event1.eventKey()), probe.ref(), mat);
+        Thread.sleep(1000);
+
+        subscription.unsubscribe().get(10, TimeUnit.SECONDS);
+
+        probe.expectMessage(event1);
     }
 
     public void get() throws InterruptedException, ExecutionException, TimeoutException {
