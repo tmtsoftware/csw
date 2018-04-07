@@ -1,4 +1,4 @@
-package csw.services.event.perf.testkit
+package csw.services.event.perf
 
 import java.io.File
 

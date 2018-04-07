@@ -4,11 +4,11 @@ import java.util.concurrent.{ExecutorService, Executors}
 
 import akka.actor._
 import akka.remote.testconductor.RoleName
-import akka.remote.testkit.MultiNodeConfig
+import akka.remote.testkit.{MultiNodeConfig, MultiNodeSpec, MultiNodeSpecCallbacks}
 import akka.testkit._
 import com.typesafe.config.ConfigFactory
 import csw.services.event.perf.Messages.Init
-import csw.services.event.perf.testkit.{PerfFlamesSupport, RemotingMultiNodeSpec}
+import org.scalatest._
 
 import scala.concurrent.duration._
 
@@ -37,7 +37,14 @@ object EventServicePerfSpec extends MultiNodeConfig {
 class EventServicePerfSpecMultiJvmNode1 extends EventServicePerfSpec
 class EventServicePerfSpecMultiJvmNode2 extends EventServicePerfSpec
 
-abstract class EventServicePerfSpec extends RemotingMultiNodeSpec(EventServicePerfSpec) with PerfFlamesSupport {
+class EventServicePerfSpec
+    extends MultiNodeSpec(EventServicePerfSpec)
+    with MultiNodeSpecCallbacks
+    with FunSuiteLike
+    with Matchers
+    with ImplicitSender
+    with PerfFlamesSupport
+    with BeforeAndAfterAll {
 
   import EventServicePerfSpec._
 
@@ -59,6 +66,8 @@ abstract class EventServicePerfSpec extends RemotingMultiNodeSpec(EventServicePe
     r
   }
 
+  override def beforeAll(): Unit = multiNodeSpecBeforeAll()
+
   override def afterAll(): Unit = {
     reporterExecutor.shutdown()
     runOn(first) {
@@ -70,7 +79,7 @@ abstract class EventServicePerfSpec extends RemotingMultiNodeSpec(EventServicePe
       println(latencyPlots.plot90.csv(system.name + "90"))
       println(latencyPlots.plot99.csv(system.name + "99"))
     }
-    super.afterAll()
+    multiNodeSpecAfterAll()
   }
 
   def identifySubscriber(name: String, r: RoleName = second): Target = {
@@ -147,7 +156,7 @@ abstract class EventServicePerfSpec extends RemotingMultiNodeSpec(EventServicePe
     )
   )
 
-  def test(testSettings: TestSettings, benchmarkFileReporter: BenchmarkFileReporter): Unit = {
+  def testScenario(testSettings: TestSettings, benchmarkFileReporter: BenchmarkFileReporter): Unit = {
     import testSettings._
     val subscriberName = testName + "-subscriber"
 
@@ -209,14 +218,16 @@ abstract class EventServicePerfSpec extends RemotingMultiNodeSpec(EventServicePe
       }
       enterBarrier(testName + "-done")
     }
-
     enterBarrier("after-" + testName)
   }
 
-  "Max throughput of Event Service" must {
-    val reporter = BenchmarkFileReporter("EventServicePerfSpec", system)
-    for (s ← scenarios) {
-      s"be great for ${s.testName}, burstSize = ${s.burstSize}, payloadSize = ${s.payloadSize}" in test(s, reporter)
+  val reporter = BenchmarkFileReporter("EventServicePerfSpec", system)
+  for (s ← scenarios) {
+    test(
+      s"Perf must be great for ${s.testName}," + s"${if (s.batching) s"burst size = ${s.burstSize}, " else " "}payloadSize = ${s.payloadSize}"
+    ) {
+      testScenario(s, reporter)
     }
   }
+
 }

@@ -12,5 +12,5 @@ final case class TestSettings(
     singlePublisher: Boolean
 ) {
   // data based on measurement
-  def totalSize(system: ActorSystem): Int = payloadSize + 197
+  def totalSize(system: ActorSystem): Int = payloadSize + 97
 }
