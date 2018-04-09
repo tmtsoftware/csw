@@ -92,15 +92,18 @@ class PubSubTest extends FunSuite with EmbeddedKafka with BeforeAndAfterAll {
     framework.retrieveEventUsingActorRef()
   }
 
+  //DEOPSCSW-344: Retrieve recently published event using prefix and eventname
   test("Kafka - should be able to get an event without subscribing for it") {
     framework.get()
   }
 
+  //DEOPSCSW-344: Retrieve recently published event using prefix and eventname
   test("Kafka - should be able to get InvalidEvent") {
     framework.retrieveInvalidEventOnGet()
   }
 
-  ignore("Kafka - should be able to get events for multiple event keys") {
+  //DEOPSCSW-344: Retrieve recently published event using prefix and eventname
+  test("Kafka - should be able to get events for multiple event keys") {
     framework.retrieveEventsForMultipleEventKeysOnGet()
   }
 }

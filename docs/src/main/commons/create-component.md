@@ -1,8 +1,8 @@
 # Creating a Component
 
-This tutorial helps in creating a CSW component in Scala/Java. CSW components depend on the `csw-framework` package,
-which can be found @ref:[here](./framework.md). This tutorial discusses constructing a HCD, 
-but the principles apply to an Assembly as well. We will be constructing the Assembly in the next tutorial section @ref:[Working with Mulitple Components](./multiple-components.md). 
+This walkthrough helps in creating a CSW component in Scala/Java. CSW components depend on the `csw-framework` package,
+which can be found @ref:[here](./framework.md). This section discusses constructing a HCD, 
+but the principles apply to an Assembly as well. We will be constructing the Assembly in the next section @ref:[Working with Mulitple Components](./multiple-components.md). 
 
 ## Anatomy of Component
     
@@ -255,7 +255,7 @@ Once the component is ready, it is started using the `ContainerCmd` object in st
 
 To run the component using the deployment package, perform the following steps:
 
--   Run `sbt <project>/universal:packageBin`. This will create self contained zip in `<project>/target/universal` directory
+-   Run `sbt <project>/universal:packageBin`, where `<project>` is your deployment module (e.g. `galil-deploy`). This will create self contained zip in `<project>/target/universal` directory
 -   Unzip generated zip file and enter into bin directory
 -   Run the `./<project>-cmd-app --local --standalone <path-to-local-config-file-to-start-the-component>`
 
