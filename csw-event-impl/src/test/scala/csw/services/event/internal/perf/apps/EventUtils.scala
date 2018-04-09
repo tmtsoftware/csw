@@ -1,4 +1,4 @@
-package csw.services.event.perf
+package csw.services.event.internal.perf.apps
 
 import csw.messages.events.{EventKey, EventName, EventTime, SystemEvent}
 import csw.messages.params.generics.Key
@@ -12,6 +12,7 @@ object EventUtils {
   val warmupEvent      = EventName("warmup")
   val startEvent       = EventName("start")
   val endEvent         = EventName("end")
+  val endEventS        = "end"
   val flowControlEvent = EventName("flowcontrol")
 
   val flowCtlKey: Key[Long]     = LongKey.make("flowCtlKey")
