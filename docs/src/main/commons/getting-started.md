@@ -83,7 +83,7 @@ val GalilIO = Seq( Libs.`akka-actor` )
 lazy val `galil-io` = project
   .settings( libraryDependencies ++= Dependencies.GalilIO )
 ``` 
-4. If you new module depends on code from other modules within this project, use `.dependsOn` in your build.sbt file:
+4. If your new module depends on code from other modules within this project, use `.dependsOn` in your build.sbt file:
 ``` 
 lazy val `galil-io` = project
   .settings( libraryDependencies ++= Dependencies.GalilIO )
