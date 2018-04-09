@@ -234,18 +234,16 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
   }
 
   def retrieveEventsForMultipleEventKeysOnGet(): Unit = {
-    val event1    = makeEvent(1)
-    val event2    = makeEvent(2)
+    val event1    = makeDistinctEvent(206)
     val eventKey1 = event1.eventKey
 
-    val event3    = makeDistinctEvent(3)
-    val eventKey3 = event3.eventKey
+    val event2    = makeDistinctEvent(207)
+    val eventKey2 = event2.eventKey
 
     publisher.publish(event1).await
-    publisher.publish(event2).await
 
-    val eventsF = subscriber.get(Set(eventKey1, eventKey3))
+    val eventsF = subscriber.get(Set(eventKey1, eventKey2))
 
-    eventsF.await shouldBe Set(event2)
+    eventsF.await shouldBe Set(event1)
   }
 }

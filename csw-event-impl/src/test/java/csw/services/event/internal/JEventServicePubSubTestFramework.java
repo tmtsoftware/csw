@@ -280,4 +280,22 @@ public class JEventServicePubSubTestFramework {
 
         Assert.assertEquals(Event$.MODULE$.invalidEvent(), event);
     }
+
+    public void retrieveEventsForMultipleEventKeysOnGet() throws InterruptedException, ExecutionException, TimeoutException {
+        Event event1    = Utils.makeDistinctEvent(306);
+        EventKey eventKey1 = event1.eventKey();
+
+        Event event2    = Utils.makeDistinctEvent(307);
+        EventKey eventKey2 = event2.eventKey();
+
+        publisher.publish(event1).get(10, TimeUnit.SECONDS);
+
+        HashSet<EventKey> keys = new HashSet<>();
+        keys.add(eventKey1);
+        keys.add(eventKey2);
+
+        CompletableFuture<Set<Event>> eventsF = subscriber.get(keys);
+
+        Assert.assertEquals(Collections.singleton(event1), eventsF.get(10, TimeUnit.SECONDS));
+    }
 }

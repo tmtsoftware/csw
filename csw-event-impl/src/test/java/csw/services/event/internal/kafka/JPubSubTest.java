@@ -126,13 +126,21 @@ public class JPubSubTest {
         framework.retrieveEventUsingActorRef();
     }
 
+    //DEOPSCSW-344: Retrieve recently published event using prefix and eventname
     @Test
     public void shouldBeAbleToGetAnEventWithoutSubscribingForIt() throws InterruptedException, ExecutionException, TimeoutException {
         framework.get();
     }
 
+    //DEOPSCSW-344: Retrieve recently published event using prefix and eventname
     @Test
     public void shouldBeAbleToRetrieveInvalidEventOnGet() throws InterruptedException, ExecutionException, TimeoutException {
         framework.retrieveInvalidEventOnGet();
+    }
+
+    //DEOPSCSW-344: Retrieve recently published event using prefix and eventname
+    @Test
+    public void shouldBeAbleToRetrieveEventsForMultipleEventKeysOnGet() throws InterruptedException, ExecutionException, TimeoutException {
+        framework.retrieveEventsForMultipleEventKeysOnGet();
     }
 }
