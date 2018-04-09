@@ -100,7 +100,7 @@ class PubSubTest extends FunSuite with EmbeddedKafka with BeforeAndAfterAll {
     framework.retrieveInvalidEventOnGet()
   }
 
-  ignore("Kafka - should be able to get events for multiple event keys") {
+  test("Kafka - should be able to get events for multiple event keys") {
     framework.retrieveEventsForMultipleEventKeysOnGet()
   }
 }

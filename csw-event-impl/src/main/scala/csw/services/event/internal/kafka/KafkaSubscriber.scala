@@ -18,33 +18,52 @@ class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(i
                                                                                protected val mat: Materializer)
     extends EventSubscriber {
 
+  val consumer: KafkaConsumer[String, Array[Byte]] = consumerSettings.createKafkaConsumer()
+
   override def subscribe(eventKeys: Set[EventKey]): Source[Event, EventSubscription] = {
-    val consumer           = consumerSettings.createKafkaConsumer()
     val topicPartitions    = eventKeys.map(e ⇒ new TopicPartition(e.key, 0)).toList
     val partitionToOffsets = getLatestOffsets(topicPartitions, consumer)
-    val subscription       = Subscriptions.assignmentWithOffset(partitionToOffsets.mapValues(x ⇒ if (x == 0) 0L else x - 1))
+    val manualSubscription = Subscriptions.assignmentWithOffset(partitionToOffsets.mapValues(x ⇒ if (x == 0) 0L else x - 1))
     val invalidEventStream = if (isNoEventAvailable(partitionToOffsets)) Source.single(Event.invalidEvent) else Source.empty
     val eventStream = Consumer
-      .plainSource(consumerSettings, subscription)
+      .plainSource(consumerSettings, manualSubscription)
       .map(record ⇒ Event.fromPb(PbEvent.parseFrom(record.value())))
 
     invalidEventStream
       .concatMat(eventStream)(Keep.right)
       .mapMaterializedValue { control ⇒
         new EventSubscription {
-          override def unsubscribe(): Future[Done] = control.shutdown().map { _ ⇒
-            consumer.close(); Done
-          }
+          override def unsubscribe(): Future[Done] = control.shutdown().map(_ ⇒ Done)
         }
       }
   }
 
   override def get(eventKeys: Set[EventKey]): Future[Set[Event]] = {
-    val (subscription, eventsF) = subscribe(eventKeys).take(eventKeys.size).toMat(Sink.seq)(Keep.both).run()
+    val topicPartitions    = eventKeys.map(e ⇒ new TopicPartition(e.key, 0)).toList
+    val partitionToOffsets = getLatestOffsets(topicPartitions, consumer)
+    val manualSubscription = Subscriptions.assignmentWithOffset(partitionToOffsets.mapValues(x ⇒ if (x == 0) 0L else x - 1))
+    val publishedKeyCount  = partitionToOffsets.values.count(_ != 0)
 
-    eventsF.map { events ⇒
-      subscription.unsubscribe()
-      events.toSet
+    if (publishedKeyCount == 0) Future.successful(Set(Event.invalidEvent))
+    else {
+      val eventStream = Consumer
+        .plainSource(consumerSettings, manualSubscription)
+        .map(record ⇒ Event.fromPb(PbEvent.parseFrom(record.value())))
+
+      val (subscription, eventsF) = eventStream
+        .mapMaterializedValue { control ⇒
+          new EventSubscription {
+            override def unsubscribe(): Future[Done] = control.shutdown().map(_ ⇒ Done)
+          }
+        }
+        .take(publishedKeyCount)
+        .toMat(Sink.seq)(Keep.both)
+        .run()
+
+      eventsF.map { events ⇒
+        subscription.unsubscribe()
+        events.toSet
+      }
     }
   }
 
