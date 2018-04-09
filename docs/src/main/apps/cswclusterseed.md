@@ -9,13 +9,17 @@ the machines hosting the seed crashes.
 
 ## Prerequisite
 
-The command `sbt csw-cluster-seed/universal:publishLocal` will publish necessary artifacts to run csw-cluster-seed application. 
+The CSW cluster seed application can be installed as binaries or constructed from source.  To download the application,
+go to the [CSW Release page](https://tmtsoftware.github.com/csw-prod/releases/) and follow instructions.
 
-The target of above command is a zip file titled "csw-cluster-seed.zip" and its path will be printed on console. Unzip this file and switch current
-working directory to the extracted folder. Choose appropriate instructions from below based on requirement ie single seed or multiple seeds.
+To install from source, the command `sbt csw-cluster-seed/universal:publishLocal` will publish necessary artifacts to run csw-cluster-seed application. 
+The target of above command is a zip file titled "csw-cluster-seed.zip" and its path will be printed on console. 
 
 Note: An alternative method is to run `sbt publishLocal stage`, which installs all the dependencies locally and also installs all the csw applications
  in `target/universal/stage/bin`.
+
+Unzip either the downloaded or constructed zip file and switch current
+working directory to the extracted folder. Choose appropriate instructions from below based on requirement ie single seed or multiple seeds.
  
 # Environment Variables
 
