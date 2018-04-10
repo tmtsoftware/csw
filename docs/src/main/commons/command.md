@@ -14,7 +14,7 @@ sbt
     ```
     @@@
 
-## Command based communication between components
+## Command-based Communication Between Components
 
 A component can send @ref:[Commands](../messages/commands.md) to other components. The commands can be sent as following 
 two types of messages: 
@@ -22,7 +22,8 @@ two types of messages:
 * **submit** - A command is sent as Submit when the result of completion is desired.
 * **oneway** - A command is sent as Oneway when the result of completion is not desired.
 
-A `oneway` should only be used between an Assembly and an HCD.  It is also used when tracking completion using a Matcher (see below).
+A `oneway` is meant to be used between an Assembly and an HCD.  It is also used when tracking completion using a Matcher 
+and current state values (see below).
 
 @@@ warning { title='Feedback Needed on Future of Oneway' }
 
