@@ -1,27 +1,43 @@
 # Change Log
+
+CSW Common Software is a reimplementation/refactoring of the prototype CSW code [here](https://github.com/tmtsoftware/csw) 
+developed during the CSW design phase with changes to make the code and public APIs
+more robust and resilient and to improve its usability and performance for use at the
+TMT Observatory.
+
+The product is in a new repository: [csw-prod](https://github.com/tmtsoftware/csw-prod).
+
 All notable changes to this project will be documented in this file.
+
+## [CSW v0.4.0] - 2018-04-11
+
+This is the first early release of the TMT Common Software for project stakeholders. 
+See [here](https://tmtsoftware.github.io/csw-prod/0.4.0/) for a detailed description of this version of the CSW software.
+
+See the notes for [CSW v0.4.0-RC1] for release changes.
 
 
 ## [CSW v0.4.0-RC1] - 2018-04-04
 
-This is a major reimplementation/refactoring in a new repository: [csw-prod](https://github.com/tmtsoftware/csw-prod), including changes to most public APIs.
+This is the release candidate 1 of the first release of the TMT Common Software for project stakeholders. 
 See [here](https://tmtsoftware.github.io/csw-prod/0.4.0-RC1/) for a detailed description of this version of the CSW software.
- 
 
 ### Changed
 
-- Location Service is now based on Akka cluster
-- New Command Service APIs
-- Config Service API changes
+- Updated Location Service implementation is now based on Akka cluster for higher performance and proper operation in all required scenarios
+- New Command Service APIs - FDR version was based on Akka messages
+- Significant updates to Configuration Service implementation with some API changes
 - New Logging APIs
-- Updated to use latest Scala version and dependencies
+- Updated to use latest Scala and Java versions and dependencies
 
-### Missing in this Version (Coming Soon...)
+### Planned for the Next Release (Coming Soon...)
 
 - Event Service
 - Alarm Service
 
-## [CSW v0.3-PDR] - 2016-12-03
+## [CSW v0.3-FDR] - 2016-12-03
+
+This prototype version was provided as part of the CSW Final Design Review 
 
 ### Added
 
@@ -99,3 +115,4 @@ The main difference between Request and Submit is that Request can return a valu
 
 ## [CSW v0.2-PDR] - 2015-11-19
 
+This prototype version was provided as part of the CSW Preliminary Design Review 
