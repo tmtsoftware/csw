@@ -102,7 +102,7 @@ class PerfSpec
 
       val subscribers = for (n ← 1 to publisherSubscriberPairs) yield {
         val id         = if (testSettings.singlePublisher) 1 else n
-        val subscriber = new SimpleSubscriber(testSettings, rep, id, benchmarkFileReporter)
+        val subscriber = new SimpleSubscriber(testSettings, rep, id)
         (subscriber.startSubscription(), subscriber)
       }
 
