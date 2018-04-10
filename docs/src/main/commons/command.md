@@ -19,10 +19,42 @@ sbt
 A component can send @ref:[Commands](../messages/commands.md) to other components. The commands can be sent as following 
 two types of messages: 
 
-* **Submit** - A command is sent as Submit when the result of completion is desired.
-* **Oneway** - A command is sent as Oneway when the result of completion is not desired.
+* **submit** - A command is sent as Submit when the result of completion is desired.
+* **oneway** - A command is sent as Oneway when the result of completion is not desired.
 
-A `Oneway` should only be used between an Assembly and an HCD.  It is also used when tracking completion using a Matcher (see below).
+A `oneway` should only be used between an Assembly and an HCD.  It is also used when tracking completion using a Matcher (see below).
+
+@@@ warning { title='Feedback Needed on Future of Oneway' }
+
+In the FDR prototype version of CSW, the `oneway` message was used between an Assembly and HCD to "fire and forget". 
+A `oneway` command was sent to the destination and no validation or command completion is provided in order 
+to be as efficient as possible. In this case completion information is provided through Command Service
+pubsub and current state values.
+
+In this release version of CSW, `oneway` _does_ provide validation to the caller, and this version of CSW Command Service 
+also reinstates immediate completion, which was dropped in the CSW prototype release. The only feature left from the 
+FDR version is that `oneway` tells the sender that there is no completion information provided.
+ 
+Given these two changes, the use of `oneway` is not sufficiently different from submit. With this in mind we 
+anticipate one of the two possibly futures for `oneway`:
+
+1. `Oneway` should provide a clear difference with `submit` and go back to its original features with no
+validation or command completion.
+2. `Oneway` could be removed simplifying the command API to just `submit`.
+
+The reason for `oneway` case 1 is to provide the best possible performance. A scenario is an actor that
+is subscribed to a 20 Hz demand event and sends out motion commands to one or more HCDs based on a calculation 
+using data in this event. At 20 Hz, it's probably not useful to get validation information. Nothing can be
+done anyway. The receiver could log a message.  
+
+However, maybe even in this case validation is useful and can be used by the sender to
+understand problems in the receiver, so providing only `submit` is adequate.
+
+We are looking for feedback.  Do you see a continued role for `oneway`?  Maybe there is another scenario
+for `oneway`?  Please write us if with your recommendation for oneway -- and be warned that it may change
+behavior or disappear in the next release based on feedback.
+
+@@@
 
 The following responses can be received as a `CommandResponse` after sending a command with `Submit` or `Oneway`:
 
