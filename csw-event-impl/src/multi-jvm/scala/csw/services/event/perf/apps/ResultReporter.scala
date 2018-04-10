@@ -6,7 +6,9 @@ import akka.actor.ActorSystem
 import csw.services.event.perf.{BenchmarkFileReporter, LatencyPlots, PlotResult, TestSettings}
 import org.HdrHistogram.Histogram
 
-class ResultReporter(reporter: BenchmarkFileReporter, actorSystem: ActorSystem) {
+class ResultReporter(name: String, actorSystem: ActorSystem) {
+
+  val reporter = BenchmarkFileReporter(name, actorSystem)
 
   def printThroughputResult(
       testSettings: TestSettings,
@@ -18,7 +20,8 @@ class ResultReporter(reporter: BenchmarkFileReporter, actorSystem: ActorSystem) 
     import testSettings._
 
     val throughput =
-      if (singlePublisher) totalReceived * 1000.0 / totalTime else totalReceived * publisherSubscriberPairs * 1000.0 / totalTime
+      if (singlePublisher) totalReceived / nanosToSeconds(totalTime)
+      else totalReceived * publisherSubscriberPairs / nanosToSeconds(totalTime)
 
     val totalDropped =
       if (singlePublisher) totalMessages * publisherSubscriberPairs - totalReceived
@@ -29,13 +32,13 @@ class ResultReporter(reporter: BenchmarkFileReporter, actorSystem: ActorSystem) 
       s"=== ${reporter.testName} : " +
       f"throughput $throughput%,.0f msg/s, " +
       f"${throughput * payloadSize}%,.0f bytes/s (payload), " +
-      f"${throughput * totalSize}%,.0f bytes/s" +
+      f"${throughput * totalSize}%,.0f bytes/s, " +
       s"total dropped $totalDropped, " +
       s"total out of order $outOfOrderCount, " +
       s"burst size $burstSize, " +
       s"payload size $payloadSize, " +
       s"total size $totalSize, " +
-      s"$totalTime ms to deliver $totalReceived messages"
+      s"${totalTime / Math.pow(10, 6)} ms to deliver $totalReceived messages"
     )
   }
 
@@ -46,8 +49,8 @@ class ResultReporter(reporter: BenchmarkFileReporter, actorSystem: ActorSystem) 
   ): Unit = {
 
     import testSettings._
-    def percentile(p: Double): Double = histogram.getValueAtPercentile(p) / 1000
-    val throughput                    = 1000.0 * histogram.getTotalCount / math.max(1, totalTime)
+    def percentile(p: Double) = histogram.getValueAtPercentile(p) / 1000.0
+    val throughput            = histogram.getTotalCount / math.max(1, nanosToSeconds(totalTime))
 
     reporter.reportResults(
       s"===== ${reporter.testName} $testName : Latency Results ===== \n" +
@@ -72,6 +75,9 @@ class ResultReporter(reporter: BenchmarkFileReporter, actorSystem: ActorSystem) 
 
 //      latencyPlotRef ! latencyPlots
   }
+
+  def nanosToMillis(nanos: Double): Double  = nanos / Math.pow(10, 6)
+  def nanosToSeconds(nanos: Double): Double = nanos / Math.pow(10, 9)
 
 //    throughputPlotRef ! PlotResult().add(testName, throughput * payloadSize * testSettings.publisherSubscriberPairs / 1024 / 1024)
 

@@ -15,12 +15,7 @@ import org.HdrHistogram.Histogram
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
-class SimpleSubscriber(
-    testSettings: TestSettings,
-    reporter: TestRateReporter,
-    id: Int,
-    benchmarkFileReporter: BenchmarkFileReporter
-)(implicit val system: ActorSystem) {
+class SimpleSubscriber(testSettings: TestSettings, reporter: TestRateReporter, id: Int)(implicit val system: ActorSystem) {
 
   import testSettings._
 
@@ -29,7 +24,7 @@ class SimpleSubscriber(
 
   private val subscriber: EventSubscriber = new TestWiring(system).subscriber
   private val histogram: Histogram        = new Histogram(SECONDS.toNanos(10), 3)
-  private val resultReporter              = new ResultReporter(benchmarkFileReporter, system)
+  private val resultReporter              = new ResultReporter(testName, system)
 
   private val warmupCount = 1000
 
@@ -58,10 +53,10 @@ class SimpleSubscriber(
   private def report(event: Event): Unit = {
 
     if (eventsReceived == 0)
-      startTime = System.currentTimeMillis()
+      startTime = getNanosFromInstant(Instant.now()).toLong
 
     eventsReceived += 1
-    val currentTime = System.currentTimeMillis()
+    val currentTime = getNanosFromInstant(Instant.now()).toLong
     totalTime = currentTime - startTime
 
     val latency = (getNanosFromInstant(Instant.now()) - getNanosFromInstant(event.eventTime.time)).toLong
