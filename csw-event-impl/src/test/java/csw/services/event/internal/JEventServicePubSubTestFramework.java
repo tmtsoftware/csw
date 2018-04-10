@@ -44,22 +44,25 @@ public class JEventServicePubSubTestFramework {
         Event event1 = Utils.makeDistinctEvent(1);
         EventKey eventKey = event1.eventKey();
 
+        TestProbe probe = TestProbe.create(Adapter.toTyped(actorSystem));
+
         java.util.Set<EventKey> set = new HashSet<>();
         set.add(eventKey);
 
-        Pair<IEventSubscription, CompletionStage<List<Event>>> pair = subscriber.subscribe(set).toMat(Sink.seq(), Keep.both()).run(mat);
+        IEventSubscription subscription = subscriber.subscribe(set).take(2).toMat(Sink.foreach(event -> probe.ref().tell(event)), Keep.left()).run(mat);
         Thread.sleep(2000);
 
         publisher.publish(event1).get(10, TimeUnit.SECONDS);
         Thread.sleep(1000);
 
-        pair.first().unsubscribe().get(10, TimeUnit.SECONDS);
+        probe.expectMessage(Event$.MODULE$.invalidEvent());
+        probe.expectMessage(event1);
 
-        List<Event> expectedEvents = new ArrayList<>();
-        expectedEvents.add(Event$.MODULE$.invalidEvent());
-        expectedEvents.add(event1);
+        subscription.unsubscribe().get(10, TimeUnit.SECONDS);
 
-        Assert.assertEquals(expectedEvents, pair.second().toCompletableFuture().get());
+        publisher.publish(event1).get(10, TimeUnit.SECONDS);
+
+        probe.expectNoMessage(new FiniteDuration(2, TimeUnit.SECONDS));
     }
 
     public void subscribeIndependently() throws InterruptedException, ExecutionException, TimeoutException {
@@ -213,27 +216,33 @@ public class JEventServicePubSubTestFramework {
         Assert.assertEquals(Collections.singleton(distinctEvent1), actualEvents);
     }
 
-    private Event receivedEvent;
-
     public void retrieveEventUsingCallback() throws InterruptedException, TimeoutException, ExecutionException {
         Event event1 = Utils.makeDistinctEvent(303);
+
+        TestProbe probe = TestProbe.create(Adapter.toTyped(actorSystem));
 
         publisher.publish(event1).get(10, TimeUnit.SECONDS);
         Thread.sleep(1000);
 
-        IEventSubscription subscription = subscriber.subscribeCallback(Collections.singleton(event1.eventKey()), event -> receivedEvent = event, mat);
+        IEventSubscription subscription = subscriber.subscribeCallback(Collections.singleton(event1.eventKey()), event -> probe.ref().tell(event), mat);
         Thread.sleep(1000);
+
+        probe.expectMessage(event1);
 
         subscription.unsubscribe().get(10, TimeUnit.SECONDS);
 
-        Assert.assertEquals(event1, receivedEvent);
+        publisher.publish(event1).get(10, TimeUnit.SECONDS);
+
+        probe.expectNoMessage(new FiniteDuration(2, TimeUnit.SECONDS));
     }
 
     public void retrieveEventUsingAsyncCallback() throws InterruptedException, TimeoutException, ExecutionException {
         Event event1 = Utils.makeDistinctEvent(304);
 
+        TestProbe probe = TestProbe.create(Adapter.toTyped(actorSystem));
+
         Function1<Event, CompletableFuture<?>> asyncCallback = event -> {
-            receivedEvent = event;
+            probe.ref().tell(event);
             return CompletableFuture.completedFuture(event);
         };
 
@@ -243,9 +252,14 @@ public class JEventServicePubSubTestFramework {
         IEventSubscription subscription = subscriber.subscribeAsync(Collections.singleton(event1.eventKey()), asyncCallback, mat);
         Thread.sleep(1000);
 
+        probe.expectMessage(event1);
+
         subscription.unsubscribe().get(10, TimeUnit.SECONDS);
 
-        Assert.assertEquals(event1, receivedEvent);
+        publisher.publish(event1).get(10, TimeUnit.SECONDS);
+
+        probe.expectNoMessage(new FiniteDuration(2, TimeUnit.SECONDS));
+
     }
 
     public void retrieveEventUsingActorRef() throws InterruptedException, ExecutionException, TimeoutException {
@@ -259,9 +273,13 @@ public class JEventServicePubSubTestFramework {
         IEventSubscription subscription = subscriber.subscribeActorRef(Collections.singleton(event1.eventKey()), probe.ref(), mat);
         Thread.sleep(1000);
 
+        probe.expectMessage(event1);
+
         subscription.unsubscribe().get(10, TimeUnit.SECONDS);
 
-        probe.expectMessage(event1);
+        publisher.publish(event1).get(10, TimeUnit.SECONDS);
+
+        probe.expectNoMessage(new FiniteDuration(2, TimeUnit.SECONDS));
     }
 
     public void get() throws InterruptedException, ExecutionException, TimeoutException {
