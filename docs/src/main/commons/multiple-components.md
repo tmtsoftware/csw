@@ -9,6 +9,17 @@ having them communicate with each other.
 Similar to the HCD in the previous page, to create an assembly, the component developer needs to implement the `ComponentHandlers`.
 More details about implementing ComponentHandlers can be found @ref:[here](./create-component.md#handlers). 
 
+#### *Tutorial: Developing an Assembly*
+
+If using the giter8 template with the default parameters, our `ComponentHandlers` class will be the `GalilAssemblyHandlers` class,
+and the factory will be `GalilAssemblyBehaviorFactory`.
+
+Like we did for the HCD, let's add some log messages for the `initialize` and `onShutdown` hooks, but not the 
+`onTrackingLocationEvent` hook.  We'll cover that in more detail later.
+
+Scala
+:   @@snip [GalilAssemblyHandlers.scala](../../../../examples/src/main/scala/org/tmt/nfiraos/galilassembly/GalilAssemblyHandlers.scala) { #initialize }
+
 ## Component Configuration (ComponentInfo)
 
 Also similar  to the HCD, we will need to create a ComponentInfo file for the Assembly. The following shows an example of 
@@ -104,6 +115,18 @@ as parameter of the hook.
 
 More details about tracking connections can be found @ref:[here](../framework/tracking-connections.md).
 
+#### *Tutorial: Developing an Assembly*
+
+For our sample component, we will set it up so that when the HCD is found by the location service, we will immediately send a command to it.  We
+will do this by using the location to obtain a `CommandService` reference (see @ref:[below](multiple-components.md#sending-commands)) to the HCD, and then pass this reference to a worker actor
+to send and monitor the command (we will get more into this command actor later), so that we don't block our Assembly from receiving messages.  
+If we are notified that the HCD is removed, log a message.  
+
+Scala
+:   @@snip [GalilAssemblyHandlers.scala](../../../../examples/src/main/scala/org/tmt/nfiraos/galilassembly/GalilAssemblyHandlers.scala) { #track-location }
+
+
+
 ## trackConnection
 
 If the component developer wants to track a connection that is not configured in its configuration file then it can use the `trackConnection` method provided by `csw-framework`
@@ -119,7 +142,7 @@ hook of `ComponentHandlers`.
 ## Sending Commands
 
 From the location information obtained either by tracking dependencies or manually resolving a location, a `CommandService` instance
-can be created to provide a command interface to the component.
+can be created to provide a command interface to the component (the following snippet is not from our tutorial).
 
 Scala
 :   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/AssemblyComponentHandlers.scala) { #resolve-hcd-and-create-commandservice }
@@ -150,6 +173,14 @@ A command sent in a `Submit` wrapper that receives an `Accepted` response in ret
 When a component sends a long running command to another component, it may be interested in knowing the status of the command and take decisions based on that. In order to subscribe
 to the changes in command status, the sender component will have to use the `subscribe` method after `submit` or use `submitAndSubscribe` in `CommandService`.
 
+#### *Tutorial: Developing an Assembly*
+
+We use our worker actor to submit the command to the HCD, and then subscribe to the HCD's `CommandResponseManager` for command completion.
+
+Scala
+:   @@snip [GalilAssemblyHandlers.scala](../../../../examples/src/main/scala/org/tmt/nfiraos/galilassembly/GalilAssemblyHandlers.scala) { #worker-actor }
+
+
 ## Matchers
 
 When a component sends a command as `Oneway` to another component, it may be interested in knowing the receiver component's `CurrentState` and match it against a desired state.
@@ -174,8 +205,24 @@ A project, for example with the name `galil-deploy`, contains applications (Cont
 dependencies are added in the `galil-deploy`.
 
 ## Run
-Assuming that `galil-deploy` depends on `galil-assembly` and `galil-hcd`, to start the Assembly and HCD, follow the steps below:
+To start the Assembly and HCD, `sbt runMain` can be used as with the HCD, but with slightly different options.  
+Now, we do not want to run in standalone mode, and we need to make sure to pass the container configuration file.
 
+Go to the project root directory and type `sbt "<deploy-module>/runMain <mainClass> --local <path-to-config-file>"`, where
+ 
+- `<deploy-module>` is the name of the deployment module created by the template (`galil-deploy` if using defaults) 
+- `<mainClass>` is the full class name of our ContainerCmd application, which the template names `<prefix>.<name>deploy.<Name>ContainerCmdApp`.
+If you accept the defaults for the template, it will be `org.tmt.nfiraos.galildeploy.GalilContainerCmdApp`.  If you are having problems
+determining the class name, use `sbt run` and it will prompt you the possibilities.
+- `<path-to-config-file>` is the filename, which can be an absolute path or relative to the directory of the deployment module.  If using defaults,
+this would be `src/main/resources/GalilAssemblyContainer.conf`.
+
+So if using the template defaults, the full command would be 
+`sbt "galil-deploy/runMain org.tmt.nfiraos.galildeploy.GalilContainerCmdApp --local src/main/resources/GalilAssemblyContainer.conf"`
+
+Like with the HCD, the `sbt stage` command can also be used to create binaries in the `target/universal/stage/bin` directories of the root project.
+
+To run using the deployment packaging, follow the steps below:
  - Run `sbt galil-deploy/universal:packageBin`, this will create self contained zip in `galil-deploy/target/universal` directory.
  - Unzip the generated zip file and enter into `bin` directory.
  - You will see four scripts in the `bin` directory (two bash scripts and two windows scripts).
