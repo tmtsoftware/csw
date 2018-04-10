@@ -331,19 +331,29 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
                      """.stripMargin)
         .withFallback(ConfigFactory.load)
 
-    lazy val loggingSystem = LoggingSystemFactory.start(loggingSystemName, version, hostname, actorSystem)
-    lazy val actorSystem   = ActorSystem("test", config)
+    lazy val loggingSystem               = LoggingSystemFactory.start(loggingSystemName, version, hostname, actorSystem)
+    lazy val actorSystem                 = ActorSystem("test", config)
+    var expectedTimestamp: ZonedDateTime = null
 
     Console.withOut(os) {
       loggingSystem
+      expectedTimestamp = ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC))
       doLogging()
       Thread.sleep(100)
     }
     loggingSystem.getAppenders shouldBe List(StdOutAppender)
 
-    val expectedOneLineLog = "[INFO] Sample log message (LoggingConfigurationTest.scala 94)"
+    val expectedOneLineLog = " INFO   (LoggingConfigurationTest.scala 94) - Sample log message"
 
-    os.toString.trim shouldBe expectedOneLineLog
+    val (timestamp, message) = os.toString.trim.splitAt(24)
+
+    message shouldBe expectedOneLineLog
+
+    // This assert's that, ISO_INSTANT parser should not throw exception while parsing timestamp from log message
+    // If timestamp is in other than UTC(ISO_FORMAT) format, DateTimeFormatter.ISO_INSTANT will throw DateTimeParseException
+    noException shouldBe thrownBy(DateTimeFormatter.ISO_INSTANT.parse(timestamp))
+    val actualDateTime = TMTDateTimeFormatter.parse(timestamp)
+    ChronoUnit.MILLIS.between(expectedTimestamp, actualDateTime) <= 50 shouldBe true
 
     // clean up
     os.flush()

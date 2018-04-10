@@ -99,14 +99,16 @@ class StdOutAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg],
       case s: String => s
       case x: Any    => Compact(x, safe = true)
     }
-    val kind  = if (!maybeKind.isEmpty) s":$maybeKind" else ""
-    val file  = jgetString(baseMsg, LoggingKeys.FILE)
-    val where = if (!file.isEmpty) s" ($file ${jgetInt(baseMsg, LoggingKeys.LINE)})" else ""
+    val kind      = if (!maybeKind.isEmpty) s":$maybeKind" else ""
+    val file      = jgetString(baseMsg, LoggingKeys.FILE)
+    val where     = if (!file.isEmpty) s" ($file ${jgetInt(baseMsg, LoggingKeys.LINE)})" else ""
+    val comp      = jgetString(baseMsg, LoggingKeys.COMPONENT_NAME)
+    val timestamp = jgetString(baseMsg, LoggingKeys.TIMESTAMP)
 
     val plainStack =
       if (baseMsg.contains(LoggingKeys.PLAINSTACK)) " [Stacktrace] " ++ jgetString(baseMsg, LoggingKeys.PLAINSTACK) else ""
 
-    s"[$level$kind] $msg$where$plainStack"
+    f"$timestamp $level%-5s$kind $comp$where - $msg$plainStack"
   }
 
   private def buildSummary(level: String, kind: String): Unit = {

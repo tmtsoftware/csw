@@ -33,7 +33,7 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
       |    "version": "SNAPSHOT-1.0"
       |  },
       |  "${LoggingKeys.SEVERITY}": "ERROR",
-      |  "${LoggingKeys.TIMESTAMP}": "2017-06-19T16:10:19.397000000+05:30",
+      |  "${LoggingKeys.TIMESTAMP}": "2017-06-19T16:10:19.397Z",
       |  "${LoggingKeys.VERSION}": 1,
       |  "${LoggingKeys.CLASS}": "csw.services.logging.appenders.FileAppenderTest",
       |  "${LoggingKeys.FILE}": "FileAppenderTest.scala",
@@ -96,7 +96,9 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
     val fileName              = expectedLogJson(LoggingKeys.FILE)
     val lineNumber            = s"${expectedLogJson(LoggingKeys.LINE)}"
     val plainStack            = s"${expectedLogJson(LoggingKeys.PLAINSTACK)}"
-    val expectedOneLineLogMsg = s"[$severity] $msg ($fileName $lineNumber) [Stacktrace] $plainStack"
+    val timestamp             = s"${expectedLogJson(LoggingKeys.TIMESTAMP)}"
+    val component             = s"${expectedLogJson(LoggingKeys.COMPONENT_NAME)}"
+    val expectedOneLineLogMsg = f"$timestamp $severity%-5s $component ($fileName $lineNumber) - $msg [Stacktrace] $plainStack"
 
     actualOneLineLogMsg shouldBe expectedOneLineLogMsg
 
