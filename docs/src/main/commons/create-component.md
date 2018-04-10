@@ -47,8 +47,8 @@ The following hooks should be overridden in your ComponentHandlers implementatio
 -   `validateCommand`: called when component receives a command.  (see [Validation](#validation))  
 -   `onSubmit`: called on Submit command if validateCommand returns `Accepted`.
 -   `onOneway`: called on Oneway command if validateCommand returns `Accepted`.
--   `onGoOffline`: called when component receives external message to go offline.
--   `onGoOnline`: called when component receives external message to go online.
+-   `onGoOffline`: called when component receives external message from an administrative client to go offline.
+-   `onGoOnline`: called when component receives external message from an administrative client to go online. 
 -   `onLocationTrackingEvent`: called when a tracked dependency changes location state. (see @ref:[Tracking Dependencies](./multiple-components.md#tracking-dependencies))
 -   `onShutdown`: called when component is shutting down.
 
@@ -74,7 +74,7 @@ booting a component. The factory is instantiated using java reflection.
 
 @@@ note { title=Note }
 
-If using the gitter8 template, this factory class will be implemented for you.
+If using the giter8 template, this factory class will be implemented for you.
 
 @@@
 
@@ -83,7 +83,7 @@ The sample code to implement the `ComponentBehaviorFactory` can be found @ref:[h
 ## Component Configuration (ComponentInfo)
 
 Component configuration contains details needed to spawn a component. This configuration resides in a configuration file
-for a particular component. The sample for HCD is as follows:
+for a particular component. The template creates one for our sample HCD as follows:
 
 ```
 name = "GalilHcd"
@@ -113,7 +113,7 @@ A sample configuration file can be found [here](https://github.com/tmtsoftware/c
 
 ## Lifecycle 
 
-A component can be in one of the following states of lifecycle:
+The Supervisor of a component manages its lifecycle state, which can be one of the following:
 
 -   Idle
 -   Running
@@ -122,7 +122,10 @@ A component can be in one of the following states of lifecycle:
 -   Shutdown
 -   Lock
 
-## Idle
+The state the component is in dictates the actions it can take when it receives a message or command, and how those actions are carried out.
+
+
+### Idle
 
 The component initializes in the idle state. Top level actor calls the `initialize` hook of `ComponentHandlers` as first thing on boot-up.
 Component developers write their initialization logic in this hook. The logic could also do things like accessing the configuration service
@@ -159,7 +162,7 @@ the component developer to check the `isOnline` flag provided by `csw-framework`
 
 @@@
 
-## Restart
+### Restart
 
 When the Supervisor actor receives a `Restart` message, it will transit the component to the `Restart` state. Then, it will unregister itself from location service so that other components
 tracking this component will be notified and no commands are received while restart is in progress.
@@ -170,13 +173,13 @@ any cleanup of resources or logic that should be executed for graceful shutdown 
 After successful shutdown of component, the Supervisor actor will create the Top Level Actor again from scratch.  This will cause the `initialize` hook of `ComponentHandlers` to be called
 again. After successful initialization of component, the Supervisor actor will register itself with location service.
 
-## Shutdown
+### Shutdown
 
 When the Supervisor actor receives a `Shutdown` message, it transitions the component to the `Shutdown` state.  Any commands received while shutdown is in progress will be ignored.
 Then, it will stop the Top Level Actor. The postStop hook of the Top Level Actor will call the `onShutdown` hook of `ComponentHandlers`. Component developers are expected to write 
 any cleanup of resources or logic that should be executed for graceful shutdown of component in this hook.
 
-## Lock
+### Lock
 
 When the Supervisor actor receives a `Lock` message, it transitions the component to the `Lock` state. Upon locking, the Supervisor will only accept the commands received from the component
 that locked the component and ignore all others.
@@ -252,6 +255,24 @@ More details on methods available in `CommandResponseManager` can be found @ref:
 ## Building and Running component in standalone mode
 
 Once the component is ready, it is started using the `ContainerCmd` object in standalone mode. The details about starting the `ContainerCmd` in standalone mode can be found [here](https://tmtsoftware.github.io/csw-prod/framework/deploying-components.html).
+
+There are various ways to build and run the project.  A simple way during development is to to use sbt to run it. 
+The sbt command `runMain` can be used to specify an application with a main method and run it with arguments specified at the command line.  When this
+command is executed, sbt will take care of any downloading of dependencies, compiling, or building necessary to run
+your application. 
+
+Our template includes a wrapper application around ContainerCmd that we can use in the deployment module.  To run our HCD in standalone mode,
+go to the project root directory and type `sbt "<deploy-module>/runMain <mainClass> --local --standalone <path-to-config-file>"`, where
+ 
+- `<deploy-module>` is the name of the deployment module created by the template (`galil-deploy` if using defaults) 
+- `<mainClass>` is the full class name of our ContainerCmd application, which the template names `<prefix>.<name>deploy.<Name>ContainerCmdApp`.
+If you accept the defaults for the template, it will be `org.tmt.nfiraos.galildeploy.GalilContainerCmdApp`.  If you are having problems
+determining the class name, use `sbt run` and it will prompt you the possibilities.
+- `<path-to-config-file>` is the filename, which can be an absolute path or relative to the directory of the deployment module.  If using defaults,
+this would be `src/main/resources/GalilHcdStandalone.conf`.
+
+So if using the template defaults, the full command would be 
+`sbt "galil-deploy/runMain org.tmt.nfiraos.galildeploy.GalilContainerCmdApp --local --standalone src/main/resources/GalilHcdStandalone.conf"`
 
 To run the component using the deployment package, perform the following steps:
 
