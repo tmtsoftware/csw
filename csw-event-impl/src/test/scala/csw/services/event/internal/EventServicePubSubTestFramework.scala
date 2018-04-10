@@ -22,19 +22,24 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
 
   private implicit val mat: ActorMaterializer = ActorMaterializer()
 
-  // DEOPSCSW-334 : Publish an event
   def pubSub(): Unit = {
     val event1             = makeDistinctEvent(1)
     val eventKey: EventKey = event1.eventKey
+    val testProbe          = TestProbe[Event]()(actorSystem.toTyped)
+    val subscription       = subscriber.subscribe(Set(eventKey)).take(2).toMat(Sink.foreach(testProbe.ref ! _))(Keep.left).run()
 
-    val (subscription, seqF) = subscriber.subscribe(Set(eventKey)).toMat(Sink.seq)(Keep.both).run()
     Thread.sleep(2000)
 
     publisher.publish(event1).await
     Thread.sleep(1000)
 
+    testProbe.expectMessage(Event.invalidEvent)
+    testProbe.expectMessage(event1)
+
     subscription.unsubscribe().await
-    seqF.await shouldBe List(Event.invalidEvent, event1)
+
+    publisher.publish(event1).await
+    testProbe.expectNoMessage(2.seconds)
   }
 
   def subscribeIndependently(): Unit = {
@@ -164,11 +169,11 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     seqF.await shouldBe Seq(distinctEvent1) //no
   }
 
-  var receivedEvent: Event = _
   def retrieveEventUsingCallback(): Unit = {
     val event1 = makeDistinctEvent(203)
 
-    val callback: Event ⇒ Unit = receivedEvent = _
+    val testProbe              = TestProbe[Event]()(actorSystem.toTyped)
+    val callback: Event ⇒ Unit = testProbe.ref ! _
 
     publisher.publish(event1).await
     Thread.sleep(1000)
@@ -176,18 +181,19 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     val subscription = subscriber.subscribeCallback(Set(event1.eventKey), callback)
     Thread.sleep(1000)
 
+    testProbe.expectMessage(event1)
     subscription.unsubscribe().await
 
-    receivedEvent shouldBe event1
+    publisher.publish(event1).await
+    testProbe.expectNoMessage(2.seconds)
   }
 
   def retrieveEventUsingAsyncCallback(): Unit = {
-    val event1 = makeDistinctEvent(204)
+    val event1    = makeDistinctEvent(204)
+    val testProbe = TestProbe[Event]()(actorSystem.toTyped)
+    import actorSystem.dispatcher
 
-    val callback: Event ⇒ Future[Event] = (event) ⇒ {
-      receivedEvent = event
-      Future.successful(receivedEvent)
-    }
+    val callback: Event ⇒ Future[Event] = (event) ⇒ Future.successful(testProbe.ref ! event).map(_ ⇒ event)
 
     publisher.publish(event1).await
     Thread.sleep(1000)
@@ -195,15 +201,17 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     val subscription = subscriber.subscribeAsync(Set(event1.eventKey), callback)
     Thread.sleep(1000)
 
-    subscription.unsubscribe().await
+    testProbe.expectMessage(event1)
 
-    receivedEvent shouldBe event1
+    subscription.unsubscribe().await
+    publisher.publish(event1).await
+
+    testProbe.expectNoMessage(2.seconds)
   }
 
   def retrieveEventUsingActorRef(): Unit = {
     val event1 = makeDistinctEvent(205)
-
-    val probe = TestProbe[Event]()(actorSystem.toTyped)
+    val probe  = TestProbe[Event]()(actorSystem.toTyped)
 
     publisher.publish(event1).await
     Thread.sleep(1000)
@@ -211,9 +219,13 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     val subscription = subscriber.subscribeActorRef(Set(event1.eventKey), probe.ref)
     Thread.sleep(1000)
 
+    probe.expectMessage(event1)
+
     subscription.unsubscribe().await
 
-    probe.expectMessage(event1)
+    publisher.publish(event1)
+
+    probe.expectNoMessage(2.seconds)
   }
 
   def get(): Unit = {
