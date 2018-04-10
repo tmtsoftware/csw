@@ -114,17 +114,17 @@ private[framework] final class SupervisorBehavior(
   override def onMessage(msg: SupervisorMessage): Behavior[SupervisorMessage] = {
     log.debug(s"Supervisor in lifecycle state :[$lifecycleState] received message :[$msg]")
     (lifecycleState, msg) match {
-      case (SupervisorLifecycleState.Lock, LockAboutToTimeout(replyTo))                  ⇒ replyTo ! LockExpiringShortly
-      case (SupervisorLifecycleState.Lock, LockTimedout(replyTo))                        ⇒ replyTo ! LockExpired; onLockTimeout()
-      case (SupervisorLifecycleState.Lock, lockMessage: SupervisorLockMessage)           ⇒ onRunning(lockMessage)
-      case (SupervisorLifecycleState.Lock, message)                                      ⇒ ignore(message)
-      case (_, commonMessage: ComponentCommonMessage)                                    ⇒ onCommon(commonMessage)
-      case (SupervisorLifecycleState.Idle, idleMessage: SupervisorIdleMessage)           ⇒ onIdle(idleMessage)
-      case (SupervisorLifecycleState.Restart, restartMessage: SupervisorRestartMessage)  ⇒ onRestarting(restartMessage)
-      case (SupervisorLifecycleState.Running, message: SupervisorInternalRunningMessage) ⇒ onInternalRunning(message)
-      case (SupervisorLifecycleState.Running, runningMessage: SupervisorRunningMessage)  ⇒ onRunning(runningMessage)
-      case (SupervisorLifecycleState.RunningOffline, runningMessage: SupervisorRunningMessage)                    ⇒ onRunning(runningMessage)
-      case (_, message)                                                                  ⇒ ignore(message)
+      case (SupervisorLifecycleState.Lock, LockAboutToTimeout(replyTo))                        ⇒ replyTo ! LockExpiringShortly
+      case (SupervisorLifecycleState.Lock, LockTimedout(replyTo))                              ⇒ replyTo ! LockExpired; onLockTimeout()
+      case (SupervisorLifecycleState.Lock, lockMessage: SupervisorLockMessage)                 ⇒ onRunning(lockMessage)
+      case (SupervisorLifecycleState.Lock, message)                                            ⇒ ignore(message)
+      case (_, commonMessage: ComponentCommonMessage)                                          ⇒ onCommon(commonMessage)
+      case (SupervisorLifecycleState.Idle, idleMessage: SupervisorIdleMessage)                 ⇒ onIdle(idleMessage)
+      case (SupervisorLifecycleState.Restart, restartMessage: SupervisorRestartMessage)        ⇒ onRestarting(restartMessage)
+      case (SupervisorLifecycleState.Running, message: SupervisorInternalRunningMessage)       ⇒ onInternalRunning(message)
+      case (SupervisorLifecycleState.Running, runningMessage: SupervisorRunningMessage)        ⇒ onRunning(runningMessage)
+      case (SupervisorLifecycleState.RunningOffline, runningMessage: SupervisorRunningMessage) ⇒ onRunning(runningMessage)
+      case (_, message)                                                                        ⇒ ignore(message)
     }
     this
   }
@@ -272,8 +272,10 @@ private[framework] final class SupervisorBehavior(
   }
 
   private def onLifeCycle(message: ToComponentLifecycleMessage): Unit = message match {
-    case GoOffline ⇒ if (lifecycleState == SupervisorLifecycleState.Running) updateLifecycleState(SupervisorLifecycleState.RunningOffline)
-    case GoOnline  ⇒ if (lifecycleState == SupervisorLifecycleState.RunningOffline) updateLifecycleState(SupervisorLifecycleState.Running)
+    case GoOffline ⇒
+      if (lifecycleState == SupervisorLifecycleState.Running) updateLifecycleState(SupervisorLifecycleState.RunningOffline)
+    case GoOnline ⇒
+      if (lifecycleState == SupervisorLifecycleState.RunningOffline) updateLifecycleState(SupervisorLifecycleState.Running)
   }
 
   private def registerWithLocationService(componentRef: ActorRef[RunningMessage]): Unit = {
