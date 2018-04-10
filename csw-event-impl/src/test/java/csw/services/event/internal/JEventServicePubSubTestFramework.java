@@ -161,7 +161,7 @@ public class JEventServicePubSubTestFramework {
         EventKey eventKey = event1.eventKey();
 
         publisher.publish(event1).get(10, TimeUnit.SECONDS);
-        publisher.publish(event2).get(10, TimeUnit.SECONDS);
+        publisher.publish(event2).get(10, TimeUnit.SECONDS); // latest event before subscribing
 
         Pair<IEventSubscription, CompletionStage<List<Event>>> pair = subscriber.subscribe(Collections.singleton(eventKey)).toMat(Sink.seq(), Keep.both()).run(mat);
         Thread.sleep(1000);
@@ -175,6 +175,7 @@ public class JEventServicePubSubTestFramework {
         expectedEvents.add(event2);
         expectedEvents.add(event3);
 
+        // assertion against a list ensures that the latest event before subscribing arrives earlier in the stream
         Assert.assertEquals(expectedEvents, pair.second().toCompletableFuture().get(10, TimeUnit.SECONDS));
     }
 
