@@ -1,5 +1,7 @@
 package csw.services.event.perf
 
+import java.time.Instant
+
 import csw.messages.events.{EventKey, EventName, EventTime, SystemEvent}
 import csw.messages.params.generics.Key
 import csw.messages.params.generics.KeyType.{ByteKey, LongKey, StringKey}
@@ -12,6 +14,7 @@ object EventUtils {
   val warmupEvent      = EventName("warmup")
   val startEvent       = EventName("start")
   val endEvent         = EventName("end")
+  val endEventS        = "end"
   val flowControlEvent = EventName("flowcontrol")
 
   val flowCtlKey: Key[Long]     = LongKey.make("flowCtlKey")
@@ -59,5 +62,7 @@ object EventUtils {
         paramSet = Set(flowCtlKey.set(time), publisherKey.set(name))
       )
   }
+
+  def getNanosFromInstant(instant: Instant) = instant.getEpochSecond * Math.pow(10, 9) + instant.getNano
 
 }

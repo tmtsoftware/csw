@@ -17,6 +17,8 @@ Version History
 | 2015-11-18 | v0.2-PDR | [API](https://cdn.rawgit.com/tmtsoftware/csw/CSW-API-0.2-PDR/index.html) | [csw-0.2](https://github.com/tmtsoftware/csw/tree/v0.2-PDR)| Source: [tar.gz](https://github.com/tmtsoftware/csw/archive/v0.2-PDR.tar.gz), [zip](https://github.com/tmtsoftware/csw/archive/v0.2-PDR.zip), API Docs: [tar.gz](https://github.com/tmtsoftware/csw/archive/CSW-API-0.2-PDR.tar.gz), [zip](https://github.com/tmtsoftware/csw/archive/CSW-API-0.2-PDR.zip) |
 
 
+To get started using the CSW APIs, see [Getting Started](https://tmtsoftware.github.io/csw-prod/commons/getting-started.html).
+
 Example code can be found in the [documentation](https://tmtsoftware.github.io/csw-prod/) and in the [examples](examples) subproject.
 
 You can find the Scala API documentation for CSW [here](https://tmtsoftware.github.io/csw-prod/api/scala/csw/index.html).

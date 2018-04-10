@@ -2,7 +2,8 @@ package csw.services.event.internal.kafka
 
 import akka.Done
 import akka.kafka.scaladsl.Consumer
-import akka.kafka.{ConsumerSettings, Subscriptions}
+import akka.kafka.scaladsl.Consumer.Control
+import akka.kafka.{ConsumerSettings, ManualSubscription, Subscription, Subscriptions}
 import akka.stream.Materializer
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import csw.messages.events._
@@ -21,41 +22,27 @@ class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(i
   val consumer: KafkaConsumer[String, Array[Byte]] = consumerSettings.createKafkaConsumer()
 
   override def subscribe(eventKeys: Set[EventKey]): Source[Event, EventSubscription] = {
-    val topicPartitions    = eventKeys.map(e ⇒ new TopicPartition(e.key, 0)).toList
-    val partitionToOffsets = getLatestOffsets(topicPartitions, consumer)
-    val manualSubscription = Subscriptions.assignmentWithOffset(partitionToOffsets.mapValues(x ⇒ if (x == 0) 0L else x - 1))
-    val invalidEventStream = if (isNoEventAvailable(partitionToOffsets)) Source.single(Event.invalidEvent) else Source.empty
-    val eventStream = Consumer
-      .plainSource(consumerSettings, manualSubscription)
-      .map(record ⇒ Event.fromPb(PbEvent.parseFrom(record.value())))
+    val partitionToOffsets                     = getLatestOffsets(eventKeys)
+    val manualSubscription: ManualSubscription = getSubscription(partitionToOffsets)
+    val invalidEventStream                     = if (getPublishedCount(partitionToOffsets) == 0) Source.single(Event.invalidEvent) else Source.empty
+    val eventStream                            = getEventStream(manualSubscription)
 
     invalidEventStream
       .concatMat(eventStream)(Keep.right)
-      .mapMaterializedValue { control ⇒
-        new EventSubscription {
-          override def unsubscribe(): Future[Done] = control.shutdown().map(_ ⇒ Done)
-        }
-      }
+      .mapMaterializedValue(eventSubscriptionForControl)
   }
 
   override def get(eventKeys: Set[EventKey]): Future[Set[Event]] = {
-    val topicPartitions    = eventKeys.map(e ⇒ new TopicPartition(e.key, 0)).toList
-    val partitionToOffsets = getLatestOffsets(topicPartitions, consumer)
-    val manualSubscription = Subscriptions.assignmentWithOffset(partitionToOffsets.mapValues(x ⇒ if (x == 0) 0L else x - 1))
-    val publishedKeyCount  = partitionToOffsets.values.count(_ != 0)
+    val partitionToOffsets = getLatestOffsets(eventKeys)
+    val manualSubscription = getSubscription(partitionToOffsets)
+    val publishedKeyCount  = getPublishedCount(partitionToOffsets)
 
     if (publishedKeyCount == 0) Future.successful(Set(Event.invalidEvent))
     else {
-      val eventStream = Consumer
-        .plainSource(consumerSettings, manualSubscription)
-        .map(record ⇒ Event.fromPb(PbEvent.parseFrom(record.value())))
+      val eventStream = getEventStream(manualSubscription)
 
       val (subscription, eventsF) = eventStream
-        .mapMaterializedValue { control ⇒
-          new EventSubscription {
-            override def unsubscribe(): Future[Done] = control.shutdown().map(_ ⇒ Done)
-          }
-        }
+        .mapMaterializedValue(eventSubscriptionForControl)
         .take(publishedKeyCount)
         .toMat(Sink.seq)(Keep.both)
         .run()
@@ -69,13 +56,24 @@ class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(i
 
   override def get(eventKey: EventKey): Future[Event] = get(Set(eventKey)).map(_.head)
 
-  private def getLatestOffsets(
-      topicPartitions: List[TopicPartition],
-      consumer: KafkaConsumer[String, Array[Byte]]
-  ): Map[TopicPartition, Long] = {
+  private def eventSubscriptionForControl(control: Control): EventSubscription = () => control.shutdown().map(_ ⇒ Done)
+
+  private def getSubscription(partitionToOffsets: Map[TopicPartition, Long]) = {
+    val manualSubscription = Subscriptions.assignmentWithOffset(partitionToOffsets.mapValues(x ⇒ if (x == 0) 0L else x - 1))
+    manualSubscription
+  }
+
+  private def getEventStream(subscription: Subscription) = {
+    Consumer
+      .plainSource(consumerSettings, subscription)
+      .map(record ⇒ Event.fromPb(PbEvent.parseFrom(record.value())))
+  }
+
+  private def getLatestOffsets(eventKeys: Set[EventKey]): Map[TopicPartition, Long] = {
+    val topicPartitions = eventKeys.map(e ⇒ new TopicPartition(e.key, 0)).toList
     consumer.endOffsets(topicPartitions.asJava).asScala.toMap.mapValues(_.toLong)
   }
 
-  private def isNoEventAvailable(offsets: Map[TopicPartition, Long]) = offsets.values.forall(_ == 0)
+  private def getPublishedCount(offsets: Map[TopicPartition, Long]) = offsets.values.count(_ != 0)
 
 }

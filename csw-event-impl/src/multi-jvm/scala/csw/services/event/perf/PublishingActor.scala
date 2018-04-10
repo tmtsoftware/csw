@@ -137,11 +137,11 @@ class PublishingActor(
       s"=== ${reporter.testName} ${self.path.name}: " +
       f"throughput $throughput%,.0f msg/s, " +
       f"${throughput * payloadSize}%,.0f bytes/s (payload), " +
-      f"${throughput * totalSize(context.system)}%,.0f bytes/s (total" +
+      f"${throughput * totalSize}%,.0f bytes/s (total" +
       s"dropped $totalDropped, " +
       s"burst size $burstSize, " +
       s"payload size $payloadSize, " +
-      s"total size ${totalSize(context.system)}, " +
+      s"total size ${totalSize}, " +
       s"$took ms to deliver $totalReceived messages"
     )
 
