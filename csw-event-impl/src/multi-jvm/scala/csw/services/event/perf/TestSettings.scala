@@ -1,7 +1,5 @@
 package csw.services.event.perf
 
-import akka.actor.ActorSystem
-
 final case class TestSettings(
     testName: String,
     totalMessages: Long,
@@ -12,5 +10,5 @@ final case class TestSettings(
     singlePublisher: Boolean
 ) {
   // data based on measurement
-  def totalSize(system: ActorSystem): Int = payloadSize + 97
+  def totalSize: Int = payloadSize + 97
 }

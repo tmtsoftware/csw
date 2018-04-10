@@ -28,10 +28,6 @@ object EventServicePerfSpec extends MultiNodeConfig {
   final case class ActorRefTarget(override val ref: ActorRef) extends Target {
     override def tell(msg: Any, sender: ActorRef) = ref.tell(msg, sender)
   }
-
-  final case class ActorSelectionTarget(sel: ActorSelection, override val ref: ActorRef) extends Target {
-    override def tell(msg: Any, sender: ActorRef) = sel.tell(msg, sender)
-  }
 }
 
 class EventServicePerfSpecMultiJvmNode1 extends EventServicePerfSpec
@@ -86,8 +82,7 @@ class EventServicePerfSpec
     val sel = system.actorSelection(node(r) / "user" / name)
     sel ! Identify(None)
     val ref = expectMsgType[ActorIdentity](10.seconds).ref.get
-    if (actorSelection) ActorSelectionTarget(sel, ref)
-    else ActorRefTarget(ref)
+    ActorRefTarget(ref)
   }
 
   val scenarios = List(
