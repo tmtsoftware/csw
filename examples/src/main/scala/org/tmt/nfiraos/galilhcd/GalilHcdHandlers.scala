@@ -38,15 +38,14 @@ class GalilHcdHandlers(
   sealed trait WorkerCommand
   case class Sleep(runId: Id, timeInMillis: Long) extends WorkerCommand
 
-  val workerActor = ctx.spawn(
+  private val workerActor = ctx.spawn(
     Behaviors.immutable[WorkerCommand]((_, msg) => {
       msg match {
-        case s: Sleep => {
+        case s: Sleep =>
           log.trace(s"WorkerActor received sleep command with time of ${s.timeInMillis} ms")
           // simulate long running command
           Thread.sleep(s.timeInMillis)
           commandResponseManager.addOrUpdateCommand(s.runId, CommandResponse.Completed(s.runId))
-        }
         case _ => log.error("Unsupported messsage type")
       }
       Behaviors.same
@@ -97,7 +96,7 @@ class GalilHcdHandlers(
     // values of parameters are arrays.  get the first one (the only one in our case)
     val sleepTimeInMillis = longParam.values.head
 
-    log.info(s"command payload: ${longParam.keyName} = ${sleepTimeInMillis}")
+    log.info(s"command payload: ${longParam.keyName} = $sleepTimeInMillis")
 
     workerActor ! Sleep(setup.runId, sleepTimeInMillis)
   }

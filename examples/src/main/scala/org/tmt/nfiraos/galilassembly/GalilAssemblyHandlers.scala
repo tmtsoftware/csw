@@ -41,13 +41,12 @@ class GalilAssemblyHandlers(
   sealed trait WorkerCommand
   case class SendCommand(hcd: CommandService) extends WorkerCommand
 
-  val commandSender = ctx.spawn(
+  private val commandSender = ctx.spawn(
     Behaviors.immutable[WorkerCommand]((_, msg) => {
       msg match {
-        case s: SendCommand => {
+        case s: SendCommand =>
           log.trace(s"WorkerActor received SendCommand message.")
           sendCommand(s.hcd)
-        }
         case _ => log.error("Unsupported messsage type")
       }
       Behaviors.same
@@ -55,7 +54,7 @@ class GalilAssemblyHandlers(
     "CommandSender"
   )
 
-  implicit val submitTimeout = Timeout(1000.millis)
+  private implicit val submitTimeout: Timeout = Timeout(1000.millis)
   def sendCommand(galilHcd: CommandService): Unit = {
 
     // Construct Setup command
