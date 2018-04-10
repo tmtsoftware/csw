@@ -102,8 +102,6 @@ class GalilHcdHandlers(
   }
   //#onSetup
 
-
-
   override def onOneway(controlCommand: ControlCommand): Unit = ???
 
   override def onGoOffline(): Unit = ???

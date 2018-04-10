@@ -83,7 +83,6 @@ class GalilAssemblyHandlers(
   }
   //#worker-actor
 
-
   //#initialize
   override def initialize(): Future[Unit] = {
     log.info("In Assembly initialize")
@@ -112,7 +111,6 @@ class GalilAssemblyHandlers(
   override def onSubmit(controlCommand: ControlCommand): Unit = ???
 
   override def onOneway(controlCommand: ControlCommand): Unit = ???
-
 
   override def onGoOffline(): Unit = ???
 
