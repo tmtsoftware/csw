@@ -51,8 +51,8 @@ component-log-levels {
 ```
 @@@ note
 
-Here `tromboneHcd` and `tromboneAssembly` is the name of component that will be registered with `LocationService`. By default
-all components will log at level specified by `csw-logging.logLevel`. 
+Here `tromboneHcd` and `tromboneAssembly` is the name of component that will be registered with `LocationService`, 
+which is the `name` field in the ComponentInfo file (see @ref:[DeployingComponents](../framework/deploying-components.md)). By default, all components will log at level specified by `csw-logging.logLevel`. 
 
 @@@
 
@@ -373,7 +373,12 @@ Java (Supplier)
  
 
 ## Create LoggerFactory
-### Available for test/understanding purpose
+@@@ note
+
+This functionality is included in the framework code and users should not have to implement it themselves.  Documentation is included for testing or further understanding.
+
+@@@
+
 In order to create a LoggerFactory with a custom componentName refer the following code:
  
 Scala
@@ -384,7 +389,12 @@ Java
 
  
 ## Create LoggingSystem 
-### Available for test/understanding purpose
+@@@ note
+
+This functionality is included in the framework code and users should not have to implement it themselves.  Documentation is included for testing or further understanding.
+
+@@@
+
 For logging statements to appear in the program, start `LoggingSystem` at an earliest location in an application.
 **Also note, `LoggingSystem` should be started only once in an application.** The name used while creating `LoggingSystem` will be used to create
 the folder and dump all logging files.
@@ -402,7 +412,12 @@ Java
 @@@
 
 ## Stop LoggingSystem
-### Available for test/understanding purpose
+@@@ note
+
+This functionality is included in the framework code and users should not have to implement it themselves.  Documentation is included for testing or further understanding.
+
+@@@
+
 Please ensure to stop `LoggingSystem` before application exits.
 
 Scala
