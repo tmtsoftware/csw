@@ -13,7 +13,6 @@ import csw.messages.commons.CoordinatedShutdownReasons.ShutdownMessageReceivedRe
 import csw.messages.framework.LocationServiceUsage.DoNotRegister
 import csw.messages.framework.LockingResponses.{LockExpired, LockExpiringShortly}
 import csw.messages.framework.PubSub.Publish
-import csw.messages.framework.SupervisorLifecycleState.{Idle, RunningOffline}
 import csw.messages.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.messages.framework._
 import csw.messages.location.ComponentId
@@ -101,7 +100,7 @@ private[framework] final class SupervisorBehavior(
 
   private var runningComponent: Option[ActorRef[RunningMessage]]  = None
   private var lockManager: LockManager                            = new LockManager(None, loggerFactory)
-  private[framework] var lifecycleState: SupervisorLifecycleState = Idle
+  private[framework] var lifecycleState: SupervisorLifecycleState = SupervisorLifecycleState.Idle
   private[framework] var component: Option[ActorRef[Nothing]]     = None
 
   spawnAndWatchComponent()
@@ -124,7 +123,7 @@ private[framework] final class SupervisorBehavior(
       case (SupervisorLifecycleState.Restart, restartMessage: SupervisorRestartMessage)  ⇒ onRestarting(restartMessage)
       case (SupervisorLifecycleState.Running, message: SupervisorInternalRunningMessage) ⇒ onInternalRunning(message)
       case (SupervisorLifecycleState.Running, runningMessage: SupervisorRunningMessage)  ⇒ onRunning(runningMessage)
-      case (RunningOffline, runningMessage: SupervisorRunningMessage)                    ⇒ onRunning(runningMessage)
+      case (SupervisorLifecycleState.RunningOffline, runningMessage: SupervisorRunningMessage)                    ⇒ onRunning(runningMessage)
       case (_, message)                                                                  ⇒ ignore(message)
     }
     this
@@ -268,13 +267,13 @@ private[framework] final class SupervisorBehavior(
   }
 
   private def spawn(): Unit = {
-    updateLifecycleState(Idle)
+    updateLifecycleState(SupervisorLifecycleState.Idle)
     spawnAndWatchComponent()
   }
 
   private def onLifeCycle(message: ToComponentLifecycleMessage): Unit = message match {
-    case GoOffline ⇒ if (lifecycleState == SupervisorLifecycleState.Running) updateLifecycleState(RunningOffline)
-    case GoOnline  ⇒ if (lifecycleState == RunningOffline) updateLifecycleState(SupervisorLifecycleState.Running)
+    case GoOffline ⇒ if (lifecycleState == SupervisorLifecycleState.Running) updateLifecycleState(SupervisorLifecycleState.RunningOffline)
+    case GoOnline  ⇒ if (lifecycleState == SupervisorLifecycleState.RunningOffline) updateLifecycleState(SupervisorLifecycleState.Running)
   }
 
   private def registerWithLocationService(componentRef: ActorRef[RunningMessage]): Unit = {
