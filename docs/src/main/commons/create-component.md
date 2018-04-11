@@ -100,7 +100,7 @@ for a particular component. The template creates one for our sample HCD as follo
 name = "SampleHcd"
 componentType = hcd
 behaviorFactoryClassName = "org.tmt.nfiraos.samplehcd.SampleHcdBehaviorFactory"
-prefix = "tmt.nfiraos.samplehcd"
+prefix = "nfiraos.samplehcd"
 locationServiceUsage = RegisterOnly
 ``` 
 

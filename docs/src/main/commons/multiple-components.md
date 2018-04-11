@@ -29,7 +29,7 @@ ComponentInfo file for an Assembly:
 name = "SampleAssembly"
 componentType = assembly
 behaviorFactoryClassName = "org.tmt.nfiraos.sampleassembly.SampleAssemblyBehaviorFactory"
-prefix = "tmt.nfiraos.sample"
+prefix = "nfiraos.sample"
 locationServiceUsage = RegisterAndTrackServices
 connections = [
   {
@@ -56,7 +56,7 @@ components: [
     name = "SampleAssembly"
     componentType = assembly
     behaviorFactoryClassName = "org.tmt.nfiraos.sampleassembly.SampleAssemblyBehaviorFactory"
-    prefix = "tmt.nfiraos.sample"
+    prefix = "nfiraos.sample"
     locationServiceUsage = RegisterAndTrackServices
     connections = [
       {
@@ -70,7 +70,7 @@ components: [
     name = "SampleHcd"
     componentType = hcd
     behaviorFactoryClassName = "org.tmt.nfiraos.samplehcd.SampleHcdBehaviorFactory"
-    prefix = "tmt.nfiraos.samplehcd"
+    prefix = "nfiraos.samplehcd"
     locationServiceUsage = RegisterOnly
   }
 ]
