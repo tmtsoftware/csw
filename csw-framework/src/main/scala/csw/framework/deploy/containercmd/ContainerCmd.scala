@@ -51,7 +51,7 @@ private[containercmd] class ContainerCmd(
       new ArgsParser(name).parse(args) match {
         case None ⇒ throw UnableToParseOptions
         case Some(Options(standalone, isLocal, inputFilePath)) =>
-          if (startLogging) wiring.actorRuntime.startLogging()
+          if (startLogging) wiring.actorRuntime.startLogging(name)
 
           log.debug(s"$name started with following arguments [${args.mkString(",")}]")
 

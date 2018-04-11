@@ -13,14 +13,15 @@ import scala.sys.process.Process
  * Application object allowing program execution from command line, also facilitates an entry point for Component level testing.
  */
 class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) {
+  private val name        = "csw-location-agent"
   private val log: Logger = LocationAgentLogger.getLogger
 
   def start(args: Array[String]): Option[Process] =
-    ArgsParser.parse(args).map { options =>
+    new ArgsParser(name).parse(args).map { options =>
       val actorSystem = clusterSettings.system
 
       if (startLogging)
-        LoggingSystemFactory.start(BuildInfo.name, BuildInfo.version, clusterSettings.hostname, actorSystem)
+        LoggingSystemFactory.start(name, BuildInfo.version, clusterSettings.hostname, actorSystem)
 
       val command = Command.parse(options)
       log.info(s"commandText: ${command.commandText}, command: ${command.toString}")

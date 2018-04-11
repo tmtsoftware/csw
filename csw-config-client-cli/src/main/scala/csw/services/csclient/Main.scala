@@ -8,12 +8,14 @@ import csw.services.logging.scaladsl.LoggingSystemFactory
 
 // $COVERAGE-OFF$
 object Main extends App {
+  private val name = "csw-config-client-cli"
+
   if (ClusterAwareSettings.seedNodes.isEmpty) {
     println(
       "clusterSeeds setting is not specified either as env variable or system property. Please check online documentation for this set-up."
     )
   } else {
-    ArgsParser.parse(args) match {
+    new ArgsParser(name).parse(args) match {
       case None          ⇒
       case Some(options) ⇒ run(options)
     }
@@ -21,7 +23,7 @@ object Main extends App {
 
   private def run(options: Options): Unit = {
     val actorSystem = ClusterAwareSettings.system
-    LoggingSystemFactory.start(BuildInfo.name, BuildInfo.version, ClusterAwareSettings.hostname, actorSystem)
+    LoggingSystemFactory.start(name, BuildInfo.version, ClusterAwareSettings.hostname, actorSystem)
 
     val wiring = new ClientCliWiring(actorSystem)
     try {

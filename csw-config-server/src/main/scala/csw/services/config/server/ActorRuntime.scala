@@ -27,8 +27,8 @@ private[config] class ActorRuntime(_actorSystem: ActorSystem, settings: Settings
 
   val blockingIoDispatcher: MessageDispatcher = actorSystem.dispatchers.lookup(settings.`blocking-io-dispatcher`)
 
-  def startLogging(): LoggingSystem =
-    LoggingSystemFactory.start(BuildInfo.name, BuildInfo.version, ClusterAwareSettings.hostname, actorSystem)
+  def startLogging(name: String): LoggingSystem =
+    LoggingSystemFactory.start(name, BuildInfo.version, ClusterAwareSettings.hostname, actorSystem)
 
   def shutdown(reason: Reason): Future[Done] = coordinatedShutdown.run(reason)
 

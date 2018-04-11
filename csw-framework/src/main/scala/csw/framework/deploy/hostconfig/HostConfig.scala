@@ -46,7 +46,7 @@ private[hostconfig] class HostConfig(name: String, clusterSettings: ClusterSetti
       new ArgsParser(name).parse(args) match {
         case Some(Options(isLocal, hostConfigPath, Some(containerScript))) =>
           try {
-            if (startLogging) wiring.actorRuntime.startLogging()
+            if (startLogging) wiring.actorRuntime.startLogging(name)
 
             val hostConfig    = Await.result(wiring.configUtils.getConfig(isLocal, hostConfigPath, None), 10.seconds)
             val bootstrapInfo = ConfigParser.parseHost(hostConfig)

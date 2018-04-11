@@ -19,7 +19,7 @@ class ArgsParserTest extends FunSuite with Matchers with BeforeAndAfterEach {
   def silentParse(args: Array[String]): Option[Options] =
     Console.withOut(outCapture) {
       Console.withErr(errCapture) {
-        ArgsParser.parser.parse(args, Options())
+        new ArgsParser("csw-location-agent").parser.parse(args, Options())
       }
     }
 
@@ -29,7 +29,7 @@ class ArgsParserTest extends FunSuite with Matchers with BeforeAndAfterEach {
     val args     = Array("--name", services, "--port", port.toString, "--command", "sleep 5")
 
     val x: Option[Options] = silentParse(args)
-    x should contain(new Options(List("redis", "alarm", "watchdog"), Some("sleep 5"), Some(port), None, None, false))
+    x should contain(Options(List("redis", "alarm", "watchdog"), Some("sleep 5"), Some(port), None, None, false))
   }
 
   test("test parser with invalid service name combinations") {

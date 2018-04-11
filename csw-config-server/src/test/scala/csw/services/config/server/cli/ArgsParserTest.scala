@@ -18,7 +18,7 @@ class ArgsParserTest extends FunSuite with Matchers with BeforeAndAfterEach {
   def silentParse(argv: Array[String]): Option[Options] =
     Console.withOut(outCapture) {
       Console.withErr(errCapture) {
-        new ArgsParser().parse(argv)
+        new ArgsParser("csw-config-server").parse(argv)
       }
     }
 

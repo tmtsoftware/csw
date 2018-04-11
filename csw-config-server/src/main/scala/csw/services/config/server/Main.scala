@@ -15,15 +15,16 @@ import scala.concurrent.duration.DurationDouble
  * Application object to start the ConfigServer from command line.
  */
 class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) {
+  private val name        = "csw-config-server"
   private val log: Logger = ConfigServerLogger.getLogger
 
   def start(args: Array[String]): Option[HttpService] =
-    new ArgsParser().parse(args).map {
+    new ArgsParser(name).parse(args).map {
       case Options(init, maybePort) =>
         val wiring = ServerWiring.make(clusterSettings, maybePort)
         import wiring._
 
-        if (startLogging) actorRuntime.startLogging()
+        if (startLogging) actorRuntime.startLogging(name)
         if (init) svnRepo.initSvnRepo()
 
         try {

@@ -19,8 +19,8 @@ private[clusterseed] class ActorRuntime(_actorSystem: ActorSystem) {
 
   private val coordinatedShutdown = CoordinatedShutdown(actorSystem)
 
-  def startLogging(): LoggingSystem =
-    LoggingSystemFactory.start(BuildInfo.name, BuildInfo.version, ClusterAwareSettings.hostname, actorSystem)
+  def startLogging(name: String): LoggingSystem =
+    LoggingSystemFactory.start(name, BuildInfo.version, ClusterAwareSettings.hostname, actorSystem)
 
   def shutdown(reason: Reason): Future[Done] = coordinatedShutdown.run(reason)
 }

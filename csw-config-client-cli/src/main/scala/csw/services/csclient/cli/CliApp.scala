@@ -5,8 +5,8 @@ package csw.services.csclient.cli
  */
 // $COVERAGE-OFF$
 class CliApp(commandLineRunner: CommandLineRunner) {
-  def start(args: Array[String]): Unit =
-    ArgsParser.parse(args).foreach { options ⇒
+  def start(name: String, args: Array[String]): Unit =
+    new ArgsParser(name).parse(args).foreach { options ⇒
       start(options)
     }
 

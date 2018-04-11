@@ -9,11 +9,10 @@ import scopt.OptionParser
 /**
  * Parses the command line options using `scopt` library.
  */
-object ArgsParser {
-  private val programName = "csw-location-agent"
+class ArgsParser(name: String) {
 
-  val parser: OptionParser[Options] = new scopt.OptionParser[Options](programName) {
-    head(programName, BuildInfo.version)
+  val parser: OptionParser[Options] = new scopt.OptionParser[Options](name) {
+    head(name, BuildInfo.version)
 
     def acceptableServiceNames(services: Seq[String]): Either[String, Unit] = {
       val allValid = services.forall { service =>

@@ -9,7 +9,8 @@ import scopt.OptionParser
  * Parses the command line options using `scopt` library.
  */
 private[hostconfig] class ArgsParser(name: String) {
-  private[hostconfig] val parser: OptionParser[Options] = new scopt.OptionParser[Options]("scopt") {
+
+  private[hostconfig] val parser: OptionParser[Options] = new scopt.OptionParser[Options](name) {
     head(name, BuildInfo.version)
 
     opt[Unit]("local") action { (_, c) =>
