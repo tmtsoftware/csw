@@ -35,7 +35,7 @@ class SampleAssemblyHandlers(
 ) extends ComponentHandlers(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, loggerFactory) {
 
   implicit val ec: ExecutionContextExecutor = ctx.executionContext
-  private val log = loggerFactory.getLogger
+  private val log                           = loggerFactory.getLogger
 
   //#worker-actor
   sealed trait WorkerCommand
