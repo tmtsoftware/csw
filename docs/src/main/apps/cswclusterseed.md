@@ -21,11 +21,11 @@ Note: An alternative method is to run `sbt publishLocal stage`, which installs a
 Unzip either the downloaded or constructed zip file and switch current
 working directory to the extracted folder. Choose appropriate instructions from below based on requirement ie single seed or multiple seeds.
  
-# Environment Variables
+## Environment Variables
 
 Note that before running any CSW applications that use the location service  (including HCDs, assemblies and other services), some environment variables or system properties will need to be set to indicate the correct cluster seeds and possibly the network interface to use. More detailed comments on this can be found in the [ClusterSettings](https://tmtsoftware.github.io/csw-prod/api/scala/csw/services/location/commons/ClusterSettings.html) API documentation.
 
-## If Deploying a Single Seed Application
+### If Deploying a Single Seed Application
 The steps below describe how to run cluster seed on a single machine. This can be a requirement for testing or demo purpose.
 
 **Preparation**:
@@ -36,7 +36,7 @@ Make sure you have the environment variable clusterSeeds set to the IP address a
 
 **Running**: Switch to application directory and run this command - `./bin/csw-cluster-seed --clusterPort=3552`
 
-## If Deploying Two Seed Applications
+### If Deploying Two Seed Applications
 The steps below describe how to run cluster seed on multiple machines, which is the recommended set-up for production usage.
 
 **Preparation**:
@@ -54,12 +54,12 @@ In this case, you can set the environment variable `interfaceName` to the name o
 or pass the `--interfaceName=...` command line option.
 Use `ifconfig -a` to see a list of the available network interfaces.
 
-## Help
+### Help
 Use the following command to get help on the options available with this app.
   
 `./bin/csw-cluster-seed --help`
 
-## Version
+### Version
 Use the following command to get version information for this app.
   
 `./bin/csw-cluster-seed --version`
