@@ -4,6 +4,7 @@ import java.util.concurrent.TimeUnit.SECONDS
 
 import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import csw.messages.events._
+import csw.messages.params.models.Id
 import csw.services.event.perf.EventUtils._
 import csw.services.event.scaladsl.EventSubscriber
 import org.HdrHistogram.Histogram
@@ -53,8 +54,8 @@ class SubscribingActor(reporter: RateReporter, payloadSize: Int, numSenders: Int
         val sender = publishers.find(_.path.name.equalsIgnoreCase(publisher)).get
         sender ! FlowControl(flowCtlId, burstStartTime)
 
-      case Event.invalidEvent ⇒
-      case event: SystemEvent ⇒ report(event.get(timeNanosKey).get.head)
+      case SystemEvent(Id("-1"), _, _, _, _) ⇒
+      case event: SystemEvent                ⇒ report(event.get(timeNanosKey).get.head)
     }
   }
 

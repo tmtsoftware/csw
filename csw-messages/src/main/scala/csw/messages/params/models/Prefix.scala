@@ -25,7 +25,7 @@ case class Prefix(subsystem: Subsystem, prefix: String) extends TMTSerializable 
 }
 
 object Prefix {
-  private val SEPARATOR = '.'
+  private val SEPARATOR = "."
 
   /**
    * A helper method to create Prefix from given string
@@ -36,7 +36,7 @@ object Prefix {
   implicit def apply(prefix: String): Prefix = Prefix(subsystem(prefix), prefix)
 
   private def subsystem(keyText: String): Subsystem = {
-    assert(keyText != null)
+    require(keyText != null)
     Subsystem.withNameOption(keyText.splitAt(keyText.indexOf(SEPARATOR))._1).getOrElse(Subsystem.BAD)
   }
 

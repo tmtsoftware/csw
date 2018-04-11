@@ -159,6 +159,8 @@ case class SystemEvent private (
    * @return a protobuf representation of SystemEvent
    */
   def toPb: PbEvent = Event.typeMapper[SystemEvent].toBase(this)
+
+  def isInvalid: Boolean = eventTime == EventTime.toEventTime(Instant.ofEpochMilli(-1))
 }
 
 object SystemEvent {

@@ -48,15 +48,12 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
       }
   }
 
-  override def get(eventKeys: Set[EventKey]): Future[Set[Event]] = {
-    val eventualSet: Future[Set[Event]] = Future.sequence(eventKeys.map(get))
-    eventualSet.map(set ⇒ if (set.size > 1 && set.contains(Event.invalidEvent)) set - Event.invalidEvent else set)
-  }
+  override def get(eventKeys: Set[EventKey]): Future[Set[Event]] = Future.sequence(eventKeys.map(get))
 
   override def get(eventKey: EventKey): Future[Event] = async {
     val connection = await(asyncConnectionF)
     val event      = await(connection.get(eventKey).toScala)
-    if (event == null) Event.invalidEvent else event
+    if (event == null) Event.invalidEvent(eventKey) else event
   }
 
   private def subscribe(

@@ -33,7 +33,7 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     publisher.publish(event1).await
     Thread.sleep(1000)
 
-    testProbe.expectMessage(Event.invalidEvent)
+    testProbe.expectMessageType[SystemEvent].isInvalid shouldBe true
     testProbe.expectMessage(event1)
 
     subscription.unsubscribe().await
@@ -63,8 +63,8 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     subscription.unsubscribe().await
     subscription2.unsubscribe().await
 
-    seqF.await shouldBe List(Event.invalidEvent, event1)
-    seqF2.await shouldBe List(Event.invalidEvent, event2)
+    seqF.await.toSet shouldBe Set(Event.invalidEvent(event1.eventKey), event1)
+    seqF2.await.toSet shouldBe Set(Event.invalidEvent(event2.eventKey), event2)
   }
 
   var cancellable: Cancellable = _
@@ -95,7 +95,7 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     // The 10 published events will follow
     queue.size shouldBe 11
 
-    queue should contain allElementsOf Seq(Event.invalidEvent) ++ events
+    queue should contain allElementsOf Seq(Event.invalidEvent(eventKey)) ++ events
   }
 
   def publishMultipleToDifferentChannels(): Unit = {
@@ -114,9 +114,9 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
 
     // subscriber will receive an invalid event first as subscription happened before publishing started.
     // The 10 published events will follow
-    queue.size shouldBe 11
+    queue.size shouldBe 20
 
-    queue should contain theSameElementsAs Seq(Event.invalidEvent) ++ events
+    queue should contain theSameElementsAs events.map(x ⇒ Event.invalidEvent(x.eventKey)) ++ events
   }
 
   def retrieveRecentlyPublished(): Unit = {
@@ -148,7 +148,7 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
 
     subscription.unsubscribe().await
 
-    seqF.await shouldBe Seq(Event.invalidEvent)
+    seqF.await shouldBe Seq(Event.invalidEvent(eventKey))
   }
 
   def retrieveMultipleSubscribedEvents(): Unit = {
@@ -166,7 +166,7 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
 
     subscription.unsubscribe().await
 
-    seqF.await shouldBe Seq(distinctEvent1) //no
+    seqF.await.toSet shouldBe Set(Event.invalidEvent(eventKey2), distinctEvent1)
   }
 
   def retrieveEventUsingCallback(): Unit = {
@@ -243,7 +243,7 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
 
     val eventF = subscriber.get(EventKey("test"))
 
-    eventF.await shouldBe Event.invalidEvent
+    eventF.await.asInstanceOf[SystemEvent].isInvalid shouldBe true
   }
 
   def retrieveEventsForMultipleEventKeysOnGet(): Unit = {
@@ -257,6 +257,6 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
 
     val eventsF = subscriber.get(Set(eventKey1, eventKey2))
 
-    eventsF.await shouldBe Set(event1)
+    eventsF.await shouldBe Set(Event.invalidEvent(eventKey2), event1)
   }
 }

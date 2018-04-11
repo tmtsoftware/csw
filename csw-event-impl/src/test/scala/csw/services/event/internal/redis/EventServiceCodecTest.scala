@@ -20,8 +20,8 @@ class EventServiceCodecTest extends FunSuite with Matchers {
 
   // DEOPSCSW-334 : Publish an event
   test("event key is encoded as bytes from string") {
-    val byteBuf = ByteString("testKey").asByteBuffer
-    EventServiceCodec.encodeKey(EventKey("testKey")) shouldBe byteBuf
+    val byteBuf = ByteString("testPrefix.testName").asByteBuffer
+    EventServiceCodec.encodeKey(EventKey("testPrefix.testName")) shouldBe byteBuf
   }
 
   // DEOPSCSW-334 : Publish an event

@@ -22,6 +22,7 @@ import scala.concurrent.duration.FiniteDuration;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class JEventServicePubSubTestFramework {
 
@@ -55,7 +56,7 @@ public class JEventServicePubSubTestFramework {
         publisher.publish(event1).get(10, TimeUnit.SECONDS);
         Thread.sleep(1000);
 
-        probe.expectMessage(Event$.MODULE$.invalidEvent());
+        probe.expectMessage(Event$.MODULE$.invalidEvent(eventKey));
         probe.expectMessage(event1);
 
         subscription.unsubscribe().get(10, TimeUnit.SECONDS);
@@ -72,18 +73,12 @@ public class JEventServicePubSubTestFramework {
         Event event1 = new SystemEvent(prefix, eventName1);
         Event event2 = new SystemEvent(prefix, eventName2);
 
-        java.util.Set<EventKey> set = new HashSet<>();
-        set.add(event1.eventKey());
-
-        Pair<IEventSubscription, CompletionStage<List<Event>>> pair = subscriber.subscribe(set).toMat(Sink.seq(), Keep.both()).run(mat);
+        Pair<IEventSubscription, CompletionStage<List<Event>>> pair = subscriber.subscribe(Collections.singleton(event1.eventKey())).toMat(Sink.seq(), Keep.both()).run(mat);
         Thread.sleep(1000);
         publisher.publish(event1).get(10, TimeUnit.SECONDS);
         Thread.sleep(1000);
 
-        java.util.Set<EventKey> set2 = new HashSet<>();
-        set2.add(event2.eventKey());
-
-        Pair<IEventSubscription, CompletionStage<List<Event>>> pair2 = subscriber.subscribe(set2).toMat(Sink.seq(), Keep.both()).run(mat);
+        Pair<IEventSubscription, CompletionStage<List<Event>>> pair2 = subscriber.subscribe(Collections.singleton(event2.eventKey())).toMat(Sink.seq(), Keep.both()).run(mat);
         Thread.sleep(1000);
         publisher.publish(event2).get(10, TimeUnit.SECONDS);
         Thread.sleep(1000);
@@ -91,16 +86,16 @@ public class JEventServicePubSubTestFramework {
         pair.first().unsubscribe().get(10, TimeUnit.SECONDS);
         pair2.first().unsubscribe().get(10, TimeUnit.SECONDS);
 
-        List<Event> expectedEvents = new ArrayList<>();
-        expectedEvents.add(Event$.MODULE$.invalidEvent());
+        Set<Event> expectedEvents = new HashSet<>();
+        expectedEvents.add(Event$.MODULE$.invalidEvent(event1.eventKey()));
         expectedEvents.add(event1);
 
-        Assert.assertEquals(expectedEvents, pair.second().toCompletableFuture().get());
+        Assert.assertEquals(expectedEvents, new HashSet<>(pair.second().toCompletableFuture().get()));
 
-        List<Event> expectedEvents2 = new ArrayList<>();
-        expectedEvents2.add(Event$.MODULE$.invalidEvent());
+        Set<Event> expectedEvents2 = new HashSet<>();
+        expectedEvents2.add(Event$.MODULE$.invalidEvent(event2.eventKey()));
         expectedEvents2.add(event2);
-        Assert.assertEquals(expectedEvents2, pair2.second().toCompletableFuture().get());
+        Assert.assertEquals(expectedEvents2, new HashSet<>(pair2.second().toCompletableFuture().get()));
     }
 
     public void publishMultiple() throws InterruptedException {
@@ -109,11 +104,10 @@ public class JEventServicePubSubTestFramework {
             events.add(Utils.makeEvent(i));
         }
 
-        Set<EventKey> eventKeys = new HashSet<>();
-        eventKeys.add(Utils.makeEvent(0).eventKey());
+        EventKey eventKey = Utils.makeEvent(0).eventKey();
 
         List<Event> queue = new ArrayList<>();
-        subscriber.subscribe(eventKeys).runForeach(queue::add, mat);
+        subscriber.subscribe(Collections.singleton(eventKey)).runForeach(queue::add, mat);
 
         Thread.sleep(10);
 
@@ -123,14 +117,13 @@ public class JEventServicePubSubTestFramework {
             return events.get(counter);
         }, new FiniteDuration(2, TimeUnit.MILLISECONDS));
 
-
         Thread.sleep(1000); //TODO : Try to replace with Await
 
         // subscriber will receive an invalid event first as subscription happened before publishing started.
         // The 10 published events will follow
         Assert.assertEquals(11, queue.size());
 
-        events.add(0, Event$.MODULE$.invalidEvent());
+        events.add(0, Event$.MODULE$.invalidEvent(eventKey));
         Assert.assertEquals(events, queue);
     }
 
@@ -151,10 +144,11 @@ public class JEventServicePubSubTestFramework {
 
         // subscriber will receive an invalid event first as subscription happened before publishing started.
         // The 10 published events will follow
-        Assert.assertEquals(11, queue.size());
+        Assert.assertEquals(20, queue.size());
 
-        events.add(0, Event$.MODULE$.invalidEvent());
-        Assert.assertEquals(new HashSet<>(events), queue);
+        List<Event> expectedEvents = events.stream().map(event -> Event$.MODULE$.invalidEvent(event.eventKey())).collect(Collectors.toList());
+        expectedEvents.addAll(events);
+        Assert.assertEquals(new HashSet<>(expectedEvents), queue);
     }
 
     public void retrieveRecentlyPublished() throws InterruptedException, ExecutionException, TimeoutException {
@@ -183,14 +177,14 @@ public class JEventServicePubSubTestFramework {
     }
 
     public void retrieveInvalidEvent() throws InterruptedException, ExecutionException, TimeoutException {
-        EventKey eventKey = new EventKey("test");
+        EventKey eventKey = EventKey.apply(Prefix.apply("test"), EventName.apply("test"));
 
         Pair<IEventSubscription, CompletionStage<List<Event>>> pair = subscriber.subscribe(Collections.singleton(eventKey)).toMat(Sink.seq(), Keep.both()).run(mat);
         Thread.sleep(1000);
 
         pair.first().unsubscribe().get(10, TimeUnit.SECONDS);
 
-        Assert.assertEquals(Collections.singletonList(Event$.MODULE$.invalidEvent()), pair.second().toCompletableFuture().get(10, TimeUnit.SECONDS));
+        Assert.assertEquals(Collections.singletonList(Event$.MODULE$.invalidEvent(eventKey)), pair.second().toCompletableFuture().get(10, TimeUnit.SECONDS));
     }
 
     public void retrieveMultipleSubscribedEvents() throws InterruptedException, ExecutionException, TimeoutException {
@@ -213,7 +207,12 @@ public class JEventServicePubSubTestFramework {
         pair.first().unsubscribe().get(10, TimeUnit.SECONDS);
 
         Set<Event> actualEvents = new HashSet<>(pair.second().toCompletableFuture().get(10, TimeUnit.SECONDS));
-        Assert.assertEquals(Collections.singleton(distinctEvent1), actualEvents);
+
+        HashSet<Event> expectedEvents = new HashSet<>();
+        expectedEvents.add(Event$.MODULE$.invalidEvent(distinctEvent2.eventKey()));
+        expectedEvents.add(distinctEvent1);
+
+        Assert.assertEquals(expectedEvents, actualEvents);
     }
 
     public void retrieveEventUsingCallback() throws InterruptedException, TimeoutException, ExecutionException {
@@ -294,17 +293,17 @@ public class JEventServicePubSubTestFramework {
     }
 
     public void retrieveInvalidEventOnGet() throws InterruptedException, ExecutionException, TimeoutException {
-        EventKey eventKey = new EventKey("test");
+        EventKey eventKey = EventKey.apply(Prefix.apply("test"), EventName.apply("test"));
         Event event = subscriber.get(eventKey).get(10, TimeUnit.SECONDS);
 
-        Assert.assertEquals(Event$.MODULE$.invalidEvent(), event);
+        Assert.assertEquals(Event$.MODULE$.invalidEvent(eventKey), event);
     }
 
     public void retrieveEventsForMultipleEventKeysOnGet() throws InterruptedException, ExecutionException, TimeoutException {
-        Event event1    = Utils.makeDistinctEvent(306);
+        Event event1 = Utils.makeDistinctEvent(306);
         EventKey eventKey1 = event1.eventKey();
 
-        Event event2    = Utils.makeDistinctEvent(307);
+        Event event2 = Utils.makeDistinctEvent(307);
         EventKey eventKey2 = event2.eventKey();
 
         publisher.publish(event1).get(10, TimeUnit.SECONDS);
@@ -315,6 +314,10 @@ public class JEventServicePubSubTestFramework {
 
         CompletableFuture<Set<Event>> eventsF = subscriber.get(keys);
 
-        Assert.assertEquals(Collections.singleton(event1), eventsF.get(10, TimeUnit.SECONDS));
+        HashSet<Event> expectedEvents = new HashSet<>();
+        expectedEvents.add(Event$.MODULE$.invalidEvent(eventKey2));
+        expectedEvents.add(event1);
+
+        Assert.assertEquals(expectedEvents, eventsF.get(10, TimeUnit.SECONDS));
     }
 }
