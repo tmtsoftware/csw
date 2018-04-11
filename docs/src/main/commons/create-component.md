@@ -303,7 +303,7 @@ In our example, the `sleep` command has one parameter called `SleepTime`.  We re
 by creating a `Key` to this parameter using the name and type, and then calling an `apply` method on the `Setup` (the `setup(longkey)` shorthand)
 which finds the matching `Parameter` in the `Setup`'s `ParameterSet`.  By doing this, the `Parameter` is returned with the proper typing, and 
 so the values retrieved from the `Parameter` are typed as well.  Note, all values are stored as an array, so we get our single value for `SleepTime` by using
-the `head` method.
+the `head` method available as a convenience method on `ParameterSet`.
 
 At this point, to prevent our HCD from blocking while handling the command, we pass it off to a worker actor, which we will specify somewhere in this class.
 This could be defined in a separate class, but writing it as an internal class allows us to use the logging facility and `CommandResponseManager` without 
@@ -312,7 +312,7 @@ having to inject them into our new Actor class.
 Scala
 :   @@snip [SampleHcdHandlers.scala](../../../../examples/src/main/scala/org/tmt/nfiraos/samplehcd/SampleHcdHandlers.scala) { #worker-actor }
 
-This worker actor simply takes the time passed in in the message, sleeps that amount, and then updates the `CommandResponseManager` that the command is complete.
+This worker actor simply takes the time passed in the message, sleeps that amount, and then updates the `CommandResponseManager` that the command is complete.
 
 
 ## Building and Running component in standalone mode

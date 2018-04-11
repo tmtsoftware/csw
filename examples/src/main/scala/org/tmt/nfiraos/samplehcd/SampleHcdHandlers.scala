@@ -5,7 +5,7 @@ import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
 import csw.messages.commands._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.TrackingEvent
-import csw.messages.params.generics.KeyType
+import csw.messages.params.generics.{Key, KeyType, Parameter}
 import csw.messages.params.models.Id
 import csw.messages.scaladsl.TopLevelActorMessage
 import csw.services.command.scaladsl.CommandResponseManager
@@ -16,9 +16,9 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
 
 /**
  * Domain specific logic should be written in below handlers.
- * This handlers gets invoked when component receives messages/commands from other component/entity.
- * For example, if one component sends Submit(Setup(args)) command to SampleHcd,
- * This will be first validated in the supervisor and then forwarded to Component TLA which first invokes validateCommand hook
+ * These handlers get invoked when component receives messages/commands from other component/entity.
+ * For example, if one component sends Submit(Setup(args)) command to SampleHcd, these will be first validated in the
+ * supervisor and then forwarded to Component TLA which first invokes validateCommand hook
  * and if validation is successful, then onSubmit hook gets invoked.
  * You can find more information on this here : https://tmtsoftware.github.io/csw-prod/framework.html
  */
@@ -38,20 +38,21 @@ class SampleHcdHandlers(
   sealed trait WorkerCommand
   case class Sleep(runId: Id, timeInMillis: Long) extends WorkerCommand
 
-  private val workerActor = ctx.spawn(
-    Behaviors.immutable[WorkerCommand]((_, msg) => {
-      msg match {
-        case s: Sleep =>
-          log.trace(s"WorkerActor received sleep command with time of ${s.timeInMillis} ms")
-          // simulate long running command
-          Thread.sleep(s.timeInMillis)
-          commandResponseManager.addOrUpdateCommand(s.runId, CommandResponse.Completed(s.runId))
-        case _ => log.error("Unsupported messsage type")
-      }
-      Behaviors.same
-    }),
-    "WorkerActor"
-  )
+  private val workerActor =
+    ctx.spawn(
+      Behaviors.immutable[WorkerCommand]((_, msg) => {
+        msg match {
+          case sleep: Sleep =>
+            log.trace(s"WorkerActor received sleep command with time of ${sleep.timeInMillis} ms")
+            // simulate long running command
+            Thread.sleep(sleep.timeInMillis)
+            commandResponseManager.addOrUpdateCommand(sleep.runId, CommandResponse.Completed(sleep.runId))
+          case _ => log.error("Unsupported message type")
+        }
+        Behaviors.same
+      }),
+      "WorkerActor"
+    )
   //#worker-actor
 
   //#initialize
@@ -83,20 +84,21 @@ class SampleHcdHandlers(
     log.info(s"Handling command: ${controlCommand.commandName}")
 
     controlCommand match {
-      case s: Setup   => onSetup(s)
-      case o: Observe => // implement (or not)
+      case setupCommand: Setup     => onSetup(setupCommand)
+      case observeCommand: Observe => // implement (or not)
     }
   }
 
   def onSetup(setup: Setup): Unit = {
-    val longKey = KeyType.LongKey.make("SleepTime")
+    val sleepTimeKey: Key[Long] = KeyType.LongKey.make("SleepTime")
 
     // get param from the Parameter Set in the Setup
-    val longParam = setup(longKey)
-    // values of parameters are arrays.  get the first one (the only one in our case)
-    val sleepTimeInMillis = longParam.values.head
+    val sleepTimeParam: Parameter[Long] = setup(sleepTimeKey)
 
-    log.info(s"command payload: ${longParam.keyName} = $sleepTimeInMillis")
+    // values of parameters are arrays. Get the first one (the only one in our case) using `head` method available as a convenience method on `Parameter`.
+    val sleepTimeInMillis: Long = sleepTimeParam.head
+
+    log.info(s"command payload: ${sleepTimeParam.keyName} = $sleepTimeInMillis")
 
     workerActor ! Sleep(setup.runId, sleepTimeInMillis)
   }
