@@ -48,11 +48,11 @@ private[command] class CommandResponseManagerBehavior(
 
   override def onMessage(msg: CommandResponseManagerMessage): Behavior[CommandResponseManagerMessage] = {
     msg match {
-      case AddOrUpdateCommand(commandId, cmdStatus)  ⇒ addOrUpdateCommand(commandId, cmdStatus)
-      case AddSubCommand(parentRunId, childRunId)    ⇒ commandCoRelation = commandCoRelation.add(parentRunId, childRunId)
-      case UpdateSubCommand(subCommandId, cmdStatus) ⇒ updateSubCommand(subCommandId, cmdStatus)
-      case Query(runId, replyTo)                     ⇒ replyTo ! commandResponseManagerState.get(runId)
-      case Subscribe(runId, replyTo)                 ⇒ subscribe(runId, replyTo)
+      case AddOrUpdateCommand(runId, cmdStatus)         ⇒ addOrUpdateCommand(runId, cmdStatus)
+      case AddSubCommand(parentRunId, childRunId)       ⇒ commandCoRelation = commandCoRelation.add(parentRunId, childRunId)
+      case UpdateSubCommand(subCommandRunId, cmdStatus) ⇒ updateSubCommand(subCommandRunId, cmdStatus)
+      case Query(runId, replyTo)                        ⇒ replyTo ! commandResponseManagerState.get(runId)
+      case Subscribe(runId, replyTo)                    ⇒ subscribe(runId, replyTo)
       case Unsubscribe(runId, subscriber) ⇒
         commandResponseManagerState = commandResponseManagerState.unSubscribe(runId, subscriber)
       case SubscriberTerminated(subscriber) ⇒
@@ -63,21 +63,21 @@ private[command] class CommandResponseManagerBehavior(
     this
   }
 
-  private def addOrUpdateCommand(commandId: Id, commandResponse: CommandResponse): Unit =
-    commandResponseManagerState.get(commandId) match {
-      case _: CommandNotAvailable ⇒ commandResponseManagerState = commandResponseManagerState.add(commandId, commandResponse)
-      case _                      ⇒ updateCommand(commandId, commandResponse)
+  private def addOrUpdateCommand(runId: Id, commandResponse: CommandResponse): Unit =
+    commandResponseManagerState.get(runId) match {
+      case _: CommandNotAvailable ⇒ commandResponseManagerState = commandResponseManagerState.add(runId, commandResponse)
+      case _                      ⇒ updateCommand(runId, commandResponse)
     }
 
-  private def updateCommand(commandId: Id, commandResponse: CommandResponse): Unit = {
-    val currentResponse = commandResponseManagerState.get(commandId)
+  private def updateCommand(runId: Id, commandResponse: CommandResponse): Unit = {
+    val currentResponse = commandResponseManagerState.get(runId)
     if (currentResponse.resultType == CommandResultType.Intermediate && currentResponse != commandResponse) {
       commandResponseManagerState = commandResponseManagerState.updateCommandStatus(commandResponse)
       publishToSubscribers(commandResponse, commandResponseManagerState.cmdToCmdStatus(commandResponse.runId).subscribers)
     }
   }
 
-  private def updateSubCommand(subCommandId: Id, commandResponse: CommandResponse): Unit = {
+  private def updateSubCommand(subCommandRunId: Id, commandResponse: CommandResponse): Unit = {
     // If the sub command has a parent command, fetch the current status of parent command from command status service
     commandCoRelation
       .getParent(commandResponse.runId)

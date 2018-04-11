@@ -206,9 +206,9 @@ private[framework] final class SupervisorBehavior(
    * @param runningMessage message representing a message received in [[SupervisorLifecycleState.Running]] state
    */
   private def onRunning(runningMessage: SupervisorRunningMessage): Unit = runningMessage match {
-    case Query(commandId, replyTo)            ⇒ commandResponseManager.commandResponseManagerActor ! Query(commandId, replyTo)
-    case Subscribe(commandId, replyTo)        ⇒ commandResponseManager.commandResponseManagerActor ! Subscribe(commandId, replyTo)
-    case Unsubscribe(commandId, replyTo)      ⇒ commandResponseManager.commandResponseManagerActor ! Unsubscribe(commandId, replyTo)
+    case Query(runId, replyTo)                ⇒ commandResponseManager.commandResponseManagerActor ! Query(runId, replyTo)
+    case Subscribe(runId, replyTo)            ⇒ commandResponseManager.commandResponseManagerActor ! Subscribe(runId, replyTo)
+    case Unsubscribe(runId, replyTo)          ⇒ commandResponseManager.commandResponseManagerActor ! Unsubscribe(runId, replyTo)
     case Lock(source, replyTo, leaseDuration) ⇒ lockComponent(source, replyTo, leaseDuration)
     case Unlock(source, replyTo)              ⇒ unlockComponent(source, replyTo)
     case command: CommandMessage              ⇒ if (lockManager.allowCommand(command)) runningComponent.get ! command
