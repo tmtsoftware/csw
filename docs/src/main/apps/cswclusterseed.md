@@ -48,11 +48,15 @@ Make sure you have the environment variable clusterSeeds set to `192.168.1.21:35
 
 Switch to application directory and run this command on **machine1 and machine2** - `./bin/csw-cluster-seed --clusterPort=3552`
 
-Note: In some cases it may be necessary to also specify the network interface to use, 
+@@@ note { title=Note }
+
+In some cases it may be necessary to also specify the network interface to use, 
 for example, if the host has multiple network interfaces and the correct one is not used automatically.
 In this case, you can set the environment variable `interfaceName` to the name of the network interface to use 
 or pass the `--interfaceName=...` command line option.
 Use `ifconfig -a` to see a list of the available network interfaces.
+
+@@@
 
 ### Help
 Use the following command to get help on the options available with this app.
