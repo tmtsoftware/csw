@@ -137,76 +137,76 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
     val behaviorTestKit      = createBehaviorTestKit()
     val commandResponseProbe = TestProbe[CommandResponse]
 
-    val commandId    = Id()
+    val runId        = Id()
     val subCommandId = Id()
 
-    behaviorTestKit.run(AddOrUpdateCommand(commandId, Accepted(commandId)))
-    behaviorTestKit.run(Subscribe(commandId, commandResponseProbe.ref))
+    behaviorTestKit.run(AddOrUpdateCommand(runId, Accepted(runId)))
+    behaviorTestKit.run(Subscribe(runId, commandResponseProbe.ref))
 
-    behaviorTestKit.run(AddSubCommand(commandId, subCommandId))
+    behaviorTestKit.run(AddSubCommand(runId, subCommandId))
 
     behaviorTestKit.run(UpdateSubCommand(subCommandId, Completed(subCommandId)))
 
     // Update of a sub command status(above) should update the status of parent command
-    commandResponseProbe.expectMessage(Completed(commandId))
+    commandResponseProbe.expectMessage(Completed(runId))
   }
 
 //  // DEOPSCSW-208: Report failure on Configuration Completion command
   test("should be able to update command status with the status of subcommand if one of the subcommand fails") {
     val behaviorTestKit      = createBehaviorTestKit()
     val commandResponseProbe = TestProbe[CommandResponse]
-    val commandId            = Id()
+    val runId                = Id()
     val subCommandId1        = Id()
     val subCommandId2        = Id()
 
-    behaviorTestKit.run(AddOrUpdateCommand(commandId, Accepted(commandId)))
-    behaviorTestKit.run(Subscribe(commandId, commandResponseProbe.ref))
+    behaviorTestKit.run(AddOrUpdateCommand(runId, Accepted(runId)))
+    behaviorTestKit.run(Subscribe(runId, commandResponseProbe.ref))
 
-    behaviorTestKit.run(AddSubCommand(commandId, subCommandId1))
-    behaviorTestKit.run(AddSubCommand(commandId, subCommandId2))
+    behaviorTestKit.run(AddSubCommand(runId, subCommandId1))
+    behaviorTestKit.run(AddSubCommand(runId, subCommandId2))
 
     behaviorTestKit.run(UpdateSubCommand(subCommandId1, Error(subCommandId1, "Sub command 1 failed")))
     behaviorTestKit.run(UpdateSubCommand(subCommandId2, Completed(subCommandId2)))
 
     // Update of a failed sub command status(above) should update the status of parent command as failed irrespective
     // of the result of other sub command
-    commandResponseProbe.expectMessage(Error(commandId, "Sub command 1 failed"))
+    commandResponseProbe.expectMessage(Error(runId, "Sub command 1 failed"))
   }
 
 //  // DEOPSCSW-207: Report on Configuration Command Completion
   test("should be able to update successful command status when all the subcommand completes with success") {
     val behaviorTestKit      = createBehaviorTestKit()
     val commandResponseProbe = TestProbe[CommandResponse]
-    val commandId            = Id()
+    val runId                = Id()
     val subCommandId1        = Id()
     val subCommandId2        = Id()
 
-    behaviorTestKit.run(AddOrUpdateCommand(commandId, Accepted(commandId)))
-    behaviorTestKit.run(Subscribe(commandId, commandResponseProbe.ref))
+    behaviorTestKit.run(AddOrUpdateCommand(runId, Accepted(runId)))
+    behaviorTestKit.run(Subscribe(runId, commandResponseProbe.ref))
 
-    behaviorTestKit.run(AddSubCommand(commandId, subCommandId1))
-    behaviorTestKit.run(AddSubCommand(commandId, subCommandId2))
+    behaviorTestKit.run(AddSubCommand(runId, subCommandId1))
+    behaviorTestKit.run(AddSubCommand(runId, subCommandId2))
 
     // Update status of sub command 1 as completed
     behaviorTestKit.run(UpdateSubCommand(subCommandId1, Completed(subCommandId1)))
 
     // Status update of sub command 1 does not make the parent command complete
-    behaviorTestKit.run(Query(commandId, commandResponseProbe.ref))
-    commandResponseProbe.expectMessage(Accepted(commandId))
+    behaviorTestKit.run(Query(runId, commandResponseProbe.ref))
+    commandResponseProbe.expectMessage(Accepted(runId))
 
     // Update status of sub command 2 with some intermediate status
     behaviorTestKit.run(UpdateSubCommand(subCommandId2, Accepted(subCommandId2)))
 
     // Status update of sub command 2  with intermediate does not make the parent command complete
-    behaviorTestKit.run(Query(commandId, commandResponseProbe.ref))
-    commandResponseProbe.expectMessage(Accepted(commandId))
+    behaviorTestKit.run(Query(runId, commandResponseProbe.ref))
+    commandResponseProbe.expectMessage(Accepted(runId))
 
     // Update status of sub command 2 as completed
     behaviorTestKit.run(UpdateSubCommand(subCommandId2, Completed(subCommandId2)))
 
     // Update of final sub command as Completed where other sub commands have completed earlier
     // should update the status of parent command as Completed
-    commandResponseProbe.expectMessage(Completed(commandId))
+    commandResponseProbe.expectMessage(Completed(runId))
   }
 
   private def getMockedLogger: LoggerFactory = {

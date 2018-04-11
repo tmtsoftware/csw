@@ -32,7 +32,7 @@ class McsAssemblyComponentHandlers(
   implicit val scheduler: Scheduler = ctx.system.scheduler
   implicit val ec: ExecutionContext = ctx.executionContext
   var hcdComponent: CommandService  = _
-  var commandId: Id                 = _
+  var runId: Id                     = _
   var shortSetup: Setup             = _
   var mediumSetup: Setup            = _
   var longSetup: Setup              = _
@@ -67,19 +67,19 @@ class McsAssemblyComponentHandlers(
   override def onSubmit(controlCommand: ControlCommand): Unit = {
     controlCommand.commandName match {
       case `longRunning` ⇒
-        commandId = controlCommand.runId
+        runId = controlCommand.runId
 
         //#addSubCommand
         shortSetup = Setup(prefix, shortRunning, controlCommand.maybeObsId)
-        commandResponseManager.addSubCommand(commandId, shortSetup.runId)
+        commandResponseManager.addSubCommand(runId, shortSetup.runId)
         //#addSubCommand
 
         mediumSetup = Setup(prefix, mediumRunning, controlCommand.maybeObsId)
         // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
-        commandResponseManager.addSubCommand(commandId, mediumSetup.runId)
+        commandResponseManager.addSubCommand(runId, mediumSetup.runId)
 
         longSetup = Setup(prefix, longRunning, controlCommand.maybeObsId)
-        commandResponseManager.addSubCommand(commandId, longSetup.runId)
+        commandResponseManager.addSubCommand(runId, longSetup.runId)
 
         // this is to simulate that assembly is splitting command into three sub commands and forwarding same to hcd
         // longSetup takes 5 seconds to finish

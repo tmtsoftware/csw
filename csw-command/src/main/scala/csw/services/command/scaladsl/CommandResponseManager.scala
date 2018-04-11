@@ -34,11 +34,11 @@ class CommandResponseManager private[command] (val commandResponseManagerActor: 
   /**
    * Add a new command or update an existing command with the provided status
    *
-   * @param commandId command identifier
+   * @param runId command identifier
    * @param cmdStatus status of command as [[csw.messages.commands.CommandResponse]]
    */
-  def addOrUpdateCommand(commandId: Id, cmdStatus: CommandResponse): Unit =
-    commandResponseManagerActor ! AddOrUpdateCommand(commandId, cmdStatus)
+  def addOrUpdateCommand(runId: Id, cmdStatus: CommandResponse): Unit =
+    commandResponseManagerActor ! AddOrUpdateCommand(runId, cmdStatus)
 
   /**
    * Add a new sub command against another command
