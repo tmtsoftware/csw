@@ -13,17 +13,17 @@ class TestWiring(actorSystem: ActorSystem) extends MockitoSugar {
   lazy val config: Config = actorSystem.settings.config
   lazy val wiring: Wiring = new Wiring(actorSystem)
 
-  lazy val redisEnabled: Boolean = config.getBoolean("csw.test.EventThroughputSpec.redis-enabled")
+  lazy val redisEnabled: Boolean = config.getBoolean("csw.test.EventServicePerfTest.redis-enabled")
 
   //################### Redis Configuration ###################
-  lazy val redisHost: String          = config.getString("csw.test.EventThroughputSpec.redis.host")
-  lazy val redisPort: Int             = config.getInt("csw.test.EventThroughputSpec.redis.port")
+  lazy val redisHost: String          = config.getString("csw.test.EventServicePerfTest.redis.host")
+  lazy val redisPort: Int             = config.getInt("csw.test.EventServicePerfTest.redis.port")
   lazy val redisClient: RedisClient   = RedisClient.create()
   lazy val redisFactory: RedisFactory = new RedisFactory(redisClient, mock[LocationService], wiring)
 
   //################### Kafka Configuration ###################
-  lazy val kafkaHost: String          = config.getString("csw.test.EventThroughputSpec.kafka.host")
-  lazy val kafkaPort: Int             = config.getInt("csw.test.EventThroughputSpec.kafka.port")
+  lazy val kafkaHost: String          = config.getString("csw.test.EventServicePerfTest.kafka.host")
+  lazy val kafkaPort: Int             = config.getInt("csw.test.EventServicePerfTest.kafka.port")
   lazy val kafkaFactory: KafkaFactory = new KafkaFactory(mock[LocationService], wiring)
 
   def publisher: EventPublisher =

@@ -1,4 +1,4 @@
-package csw.services.event.perf.apps
+package csw.services.event.perf
 
 import java.time.Instant
 import java.util.concurrent.TimeUnit.SECONDS
@@ -9,7 +9,6 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Keep, Source}
 import csw.messages.events.{Event, EventKey, EventName, SystemEvent}
 import csw.services.event.perf.EventUtils._
-import csw.services.event.perf._
 import csw.services.event.scaladsl.{EventSubscriber, EventSubscription}
 import org.HdrHistogram.Histogram
 
@@ -23,7 +22,7 @@ class SimpleSubscriber(testSettings: TestSettings, reporter: TestRateReporter, i
   implicit val ec: ExecutionContextExecutor = system.dispatcher
 
   private val subscriber: EventSubscriber = new TestWiring(system).subscriber
-  private val histogram: Histogram        = new Histogram(SECONDS.toNanos(10), 3)
+  val histogram: Histogram                = new Histogram(SECONDS.toNanos(10), 3)
   private val resultReporter              = new ResultReporter(testName, system)
 
   private val warmupCount = 1000
@@ -78,8 +77,7 @@ class SimpleSubscriber(testSettings: TestSettings, reporter: TestRateReporter, i
   }
 
   def printResult(): Unit = {
-    resultReporter.printThroughputResult(testSettings, histogram, eventsReceived, totalTime, outOfOrderCount)
-    resultReporter.printLatencyResults(testSettings, histogram, totalTime)
+    resultReporter.printResult(id, testSettings, histogram, eventsReceived, totalTime, outOfOrderCount)
   }
 
 }
