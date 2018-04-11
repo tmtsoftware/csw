@@ -1,14 +1,16 @@
 package csw.messages.events
 
+import csw.messages.params.models.Prefix
 import play.api.libs.json.{Json, OFormat}
 
 /**
  * A wrapper class representing the key for an event
  *
- * @param key is the combination of prefix and eventName
+ * @param source
+ * @param eventName
  */
-case class EventKey(key: String) {
-  override def toString: String = key
+case class EventKey(source: Prefix, eventName: EventName) {
+  override def toString: String = s"${source.prefix}.$eventName"
 }
 
 object EventKey {

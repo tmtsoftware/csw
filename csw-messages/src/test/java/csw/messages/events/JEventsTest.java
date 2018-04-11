@@ -38,7 +38,7 @@ public class JEventsTest {
         Assert.assertEquals(prefix, event.source());
         Assert.assertEquals(name, event.eventName());
         Assert.assertNotNull(event.eventTime());
-        Assert.assertEquals(event.eventKey().key(), prefix.prefix() + "." + name.name());
+        Assert.assertEquals(event.eventKey().toString(), prefix.prefix() + "." + name.name());
 
         // contains and exists
         Assert.assertFalse(event.contains(notUsedKey));

@@ -60,7 +60,7 @@ sealed trait Event { self: ParameterSetType[_] ⇒
    *
    * @return an EventKey formed by combination of prefix and eventName of an event
    */
-  def eventKey: EventKey = EventKey(s"${source.prefix}.$eventName")
+  def eventKey: EventKey = EventKey(source, eventName)
 
   /**
    * A common toString method for all concrete implementation
@@ -122,9 +122,8 @@ object Event {
    */
   def fromPb(pbEvent: PbEvent): Event = Event.typeMapper[Event].toCustom(pbEvent)
 
-  // Fixme: Can this take a EventKey and create correct prefix and put it in Events Prefix?
-  val invalidEvent: SystemEvent =
-    SystemEvent(Prefix("invalid"), EventName("invalid"))
+  def invalidEvent(eventKey: EventKey): SystemEvent =
+    SystemEvent(eventKey.source, eventKey.eventName)
       .copy(eventId = Id("-1"), eventTime = EventTime.toEventTime(Instant.ofEpochMilli(-1)))
 }
 
