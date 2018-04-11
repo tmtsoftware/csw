@@ -10,7 +10,7 @@ import play.api.libs.json.{Format, Json}
  *  - leading or trailing spaces
  *  - and hyphen (-)
  *  @param name represents the unique name of the component
- *  @param componentType represents a type of the Component e.g. Assembly, HCD, etc
+ *  @param componentType represents a type of the Component e.g. Assembly, HCD, Sequencer etc
  */
 case class ComponentId private[messages] (name: String, componentType: ComponentType) extends TMTSerializable {
 

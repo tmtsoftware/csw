@@ -71,13 +71,22 @@ Java
 ## Creating Components, Connections and Registrations
 
 An Application, Sequencer, Assembly, HCD, or Service component may need to be used by another component as part of normal observatory operations. 
-It must register its location information with Location Service so that other components can find it.
+It must register its location information with Location Service so that other components can find it. A location information comprises of:
 
-**Components** have a name and a type, such as Container, HCD, Assembly, Service.
+* **ComponentId** : A component id comprises of 
+    * **ComponentName** : a name depicting the component.
+    * **ComponentType** : such as Container, Sequencer, HCD, Assembly, Service.
    
-**Connections** are the means to reach components and are categorized as `Akka`, `HTTP`, or `Tcp` type connections.
+* **ConnectionType** : the means to reach components. These are categorized as `Akka`, `HTTP`, or `Tcp` type connections.
 
-**Registrations** are service endpoints stored in Location Service.
+The location information is stored in Location Service as **Registrations**.
+
+Some of the examples of string representation of a connection are:
+ 
+* TromboneAssembly-assembly-akka 
+* TromboneHcd-hcd-akka 
+* ConfigServer-service-http 
+* EventService-service-tcp
 
 The `register` API takes a `Registration` parameter and returns a future registration result. 
 If registration fails for some reason, the returned future will fail with an exception. 

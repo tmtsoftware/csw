@@ -87,17 +87,17 @@ object Connection {
   private[messages] implicit val connectionWrites: Writes[Connection] = Writes[Connection](c ⇒ Json.toJson(c.connectionInfo))
 
   /**
-   * Represents a connection offered by remote Actors
+   * Represents a connection offered by remote Actors e.g. TromboneAssembly-assembly-akka or TromboneHcd-hcd-akka
    */
   case class AkkaConnection(componentId: ComponentId) extends TypedConnection[AkkaLocation](AkkaType)
 
   /**
-   * Represents a http connection provided by the component
+   * Represents a http connection provided by the component e.g. ConfigServer-service-http
    */
   case class HttpConnection(componentId: ComponentId) extends TypedConnection[HttpLocation](HttpType)
 
   /**
-   * represents a tcp connection provided by the component
+   * represents a tcp connection provided by the component e.g. EventService-service-tcp
    */
   case class TcpConnection(componentId: ComponentId) extends TypedConnection[TcpLocation](TcpType)
 }
