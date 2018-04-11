@@ -20,7 +20,7 @@ class ArgsParserTest extends org.scalatest.FunSuite with Matchers with BeforeAnd
   def silentParse(args: Array[String]): Option[Options] =
     Console.withOut(outCapture) {
       Console.withErr(errCapture) {
-        new ArgsParser().parser.parse(args, Options())
+        new ArgsParser("container-cmd").parser.parse(args, Options())
       }
     }
 

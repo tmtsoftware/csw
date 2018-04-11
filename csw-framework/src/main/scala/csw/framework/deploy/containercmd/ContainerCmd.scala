@@ -48,7 +48,7 @@ private[containercmd] class ContainerCmd(
     if (clusterSettings.seedNodes.isEmpty)
       throw ClusterSeedsNotFound
     else
-      new ArgsParser().parse(args) match {
+      new ArgsParser(name).parse(args) match {
         case None ⇒ throw UnableToParseOptions
         case Some(Options(standalone, isLocal, inputFilePath)) =>
           if (startLogging) wiring.actorRuntime.startLogging()

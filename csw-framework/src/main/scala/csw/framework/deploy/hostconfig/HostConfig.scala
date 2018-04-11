@@ -43,7 +43,7 @@ private[hostconfig] class HostConfig(name: String, clusterSettings: ClusterSetti
     if (clusterSettings.seedNodes.isEmpty)
       throw ClusterSeedsNotFound
     else
-      new ArgsParser().parse(args) match {
+      new ArgsParser(name).parse(args) match {
         case Some(Options(isLocal, hostConfigPath, Some(containerScript))) =>
           try {
             if (startLogging) wiring.actorRuntime.startLogging()

@@ -8,21 +8,22 @@ import scopt.OptionParser
 /**
  * Parses the command line options using `scopt` library.
  */
-private[containercmd] class ArgsParser() {
-  val parser: OptionParser[Options] = new scopt.OptionParser[Options]("scopt") {
-    head(BuildInfo.name, BuildInfo.version)
+private[containercmd] class ArgsParser(name: String) {
+
+  val parser: OptionParser[Options] = new scopt.OptionParser[Options](name) {
+    head(name, BuildInfo.version)
 
     opt[Unit]("standalone") action { (_, c) =>
       c.copy(standalone = true)
-    } text "run component in standalone mode, without a container"
+    } text "Optional: if provided then run component in standalone mode else run in container"
 
     opt[Unit]("local") action { (_, c) =>
       c.copy(local = true)
-    } text "run using the file on local file system without fetching file from config service"
+    } text "Optional: if provided then run using the file on local file system else fetch it from config service"
 
-    arg[String]("<file>") maxOccurs 1 minOccurs 0 action { (x, c) =>
+    arg[String]("<file>") required () action { (x, c) =>
       c.copy(inputFilePath = Some(Paths.get(x)))
-    } text "config file path"
+    } text "specifies config file path which gets fetched from config service or local file system based on other options"
 
     help("help")
     version("version")

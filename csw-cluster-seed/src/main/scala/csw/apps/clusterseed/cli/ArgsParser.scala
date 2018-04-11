@@ -7,8 +7,10 @@ import scopt.OptionParser
  * Parses the command line options using `scopt` library.
  */
 class ArgsParser {
-  private val parser: OptionParser[Options] = new scopt.OptionParser[Options]("scopt") {
-    head(BuildInfo.name, BuildInfo.version)
+  private val programName = "csw-cluster-seed"
+
+  private val parser: OptionParser[Options] = new scopt.OptionParser[Options](programName) {
+    head(programName, BuildInfo.version)
 
     opt[Int]("clusterPort") required () action { (x, c) =>
       c.copy(clusterPort = x)

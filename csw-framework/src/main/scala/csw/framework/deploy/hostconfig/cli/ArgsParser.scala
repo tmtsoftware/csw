@@ -8,9 +8,9 @@ import scopt.OptionParser
 /**
  * Parses the command line options using `scopt` library.
  */
-private[hostconfig] class ArgsParser() {
+private[hostconfig] class ArgsParser(name: String) {
   private[hostconfig] val parser: OptionParser[Options] = new scopt.OptionParser[Options]("scopt") {
-    head(BuildInfo.name, BuildInfo.version)
+    head(name, BuildInfo.version)
 
     opt[Unit]("local") action { (_, c) =>
       c.copy(local = true)

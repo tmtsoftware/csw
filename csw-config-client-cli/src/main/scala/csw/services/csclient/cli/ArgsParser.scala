@@ -10,9 +10,10 @@ import scopt.OptionParser
  * Parses the command line options using `scopt` library.
  */
 object ArgsParser {
+  private val programName = "csw-config-client-cli"
 
-  val parser: OptionParser[Options] = new scopt.OptionParser[Options]("csw-config-client-cli") {
-    head(BuildInfo.name, BuildInfo.version)
+  val parser: OptionParser[Options] = new scopt.OptionParser[Options](programName) {
+    head(programName, BuildInfo.version)
 
     //create operation
     cmd("create") action { (_, c) =>
