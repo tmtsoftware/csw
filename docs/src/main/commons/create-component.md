@@ -97,16 +97,16 @@ Component configuration contains details needed to spawn a component. This confi
 for a particular component. The template creates one for our sample HCD as follows:
 
 ```
-name = "GalilHcd"
+name = "SampleHcd"
 componentType = hcd
-behaviorFactoryClassName = "org.tmt.nfiraos.galilhcd.GalilHcdBehaviorFactory"
-prefix = "galil.hcd"
+behaviorFactoryClassName = "org.tmt.nfiraos.samplehcd.SampleHcdBehaviorFactory"
+prefix = "tmt.nfiraos.samplehcd"
 locationServiceUsage = RegisterOnly
 ``` 
 
 @@@ note { title=Note }
 
-`behaviorFactoryClassName` refers to class name of the concrete implementation of `ComponentBehaviorFactory`, which is `GalilHcdBehaviorFactory` in above example.
+`behaviorFactoryClassName` refers to class name of the concrete implementation of `ComponentBehaviorFactory`, which is `SampleHcdBehaviorFactory` in above example.
 
 @@@
 
@@ -215,7 +215,7 @@ Let's use logging to flesh out some of our command handlers.  Add some simple lo
 and to the `onLocationTrackingEvent` hook as well, although we won't be using it for this HCD:
 
 Scala
-:   @@snip [GalilHcdHandlers.scala](../../../../examples/src/main/scala/org/tmt/nfiraos/galilhcd/GalilHcdHandlers.scala) { #initialize }
+:   @@snip [SampleHcdHandlers.scala](../../../../examples/src/main/scala/org/tmt/nfiraos/samplehcd/SampleHcdHandlers.scala) { #initialize }
 
 
 Next we'll add some command handling.
@@ -263,7 +263,7 @@ imagine much more checking could be added, such as checking the types and values
 we will keep it simple for our demonstration.
 
 Scala
-:   @@snip [GalilHcdHandlers.scala](../../../../examples/src/main/scala/org/tmt/nfiraos/galilhcd/GalilHcdHandlers.scala) { #validate }
+:   @@snip [SampleHcdHandlers.scala](../../../../examples/src/main/scala/org/tmt/nfiraos/samplehcd/SampleHcdHandlers.scala) { #validate }
 
 
 ## Command Response
@@ -296,7 +296,7 @@ can be either a `Setup` or an `Observe`.  We will use pattern matching to handle
 handling method.  `Observe` commands will be ignored.  
 
 Scala
-:   @@snip [GalilHcdHandlers.scala](../../../../examples/src/main/scala/org/tmt/nfiraos/galilhcd/GalilHcdHandlers.scala) { #onSetup }
+:   @@snip [SampleHcdHandlers.scala](../../../../examples/src/main/scala/org/tmt/nfiraos/samplehcd/SampleHcdHandlers.scala) { #onSetup }
 
 
 In our example, the `sleep` command has one parameter called `SleepTime`.  We retrieve this parameter from the `Setup` 
@@ -310,7 +310,7 @@ This could be defined in a separate class, but writing it as an internal class a
 having to inject them into our new Actor class.
 
 Scala
-:   @@snip [GalilHcdHandlers.scala](../../../../examples/src/main/scala/org/tmt/nfiraos/galilhcd/GalilHcdHandlers.scala) { #worker-actor }
+:   @@snip [SampleHcdHandlers.scala](../../../../examples/src/main/scala/org/tmt/nfiraos/samplehcd/SampleHcdHandlers.scala) { #worker-actor }
 
 This worker actor simply takes the time passed in in the message, sleeps that amount, and then updates the `CommandResponseManager` that the command is complete.
 
@@ -327,19 +327,19 @@ your application.
 Our template includes a wrapper application around ContainerCmd that we can use in the deployment module.  To run our HCD in standalone mode,
 go to the project root directory and type `sbt "<deploy-module>/runMain <mainClass> --local --standalone <path-to-config-file>"`, where
  
-- `<deploy-module>` is the name of the deployment module created by the template (`galil-deploy` if using defaults) 
+- `<deploy-module>` is the name of the deployment module created by the template (`sample-deploy` if using defaults) 
 - `<mainClass>` is the full class name of our ContainerCmd application, which the template names `<prefix>.<name>deploy.<Name>ContainerCmdApp`.
-If you accept the defaults for the template, it will be `org.tmt.nfiraos.galildeploy.GalilContainerCmdApp`.  If you are having problems
+If you accept the defaults for the template, it will be `org.tmt.nfiraos.sampledeploy.SampleContainerCmdApp`.  If you are having problems
 determining the class name, use `sbt run` and it will prompt you the possibilities.
 - `<path-to-config-file>` is the filename, which can be an absolute path or relative to the directory of the deployment module.  If using defaults,
-this would be `src/main/resources/GalilHcdStandalone.conf`.
+this would be `src/main/resources/SampleHcdStandalone.conf`.
 
 So if using the template defaults, the full command would be 
-`sbt "galil-deploy/runMain org.tmt.nfiraos.galildeploy.GalilContainerCmdApp --local --standalone src/main/resources/GalilHcdStandalone.conf"`
+`sbt "sample-deploy/runMain org.tmt.nfiraos.sampledeploy.SampleContainerCmdApp --local --standalone src/main/resources/SampleHcdStandalone.conf"`
 
 To run the component using the deployment package, perform the following steps:
 
--   Run `sbt <project>/universal:packageBin`, where `<project>` is your deployment module (e.g. `galil-deploy`). This will create self contained zip in `<project>/target/universal` directory
+-   Run `sbt <project>/universal:packageBin`, where `<project>` is your deployment module (e.g. `sample-deploy`). This will create self contained zip in `<project>/target/universal` directory
 -   Unzip generated zip file and enter into bin directory
 -   Run the `./<project>-cmd-app --local --standalone <path-to-local-config-file-to-start-the-component>`
 

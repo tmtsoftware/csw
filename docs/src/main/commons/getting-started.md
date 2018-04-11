@@ -52,53 +52,53 @@ Let’s take a look at what just got generated:
 In this example, a project was created with default parameters. The complete project structure looks like this:
 
 1.  As you can see in below snapshot, template will create three projects:
-    - `galil-assembly`
-    - `galil-hcd`
-    - `galil-deploy`
+    - `sample-assembly`
+    - `sample-hcd`
+    - `sample-deploy`
     
-![galil-project-structure](../images/gettingstarted/galil-project.png)
+![sample-project-structure](../images/gettingstarted/sampleProjectLayout.png)
 
-2.  `galil-deploy` project is used to create a concrete implementation.  This allows for the construction of a complete binary
+2.  `sample-deploy` project is used to create a concrete implementation.  This allows for the construction of a complete binary
 package bundled with all dependencies, and a launching application.
 
-![galil-deploy](../images/gettingstarted/galil-deploy.png)
+![sample-deploy](../images/gettingstarted/sampleDeploy.png)
 3.  Template comes with `csw-prod` and other useful library dependencies. It also includes bunch of plugins as explained in below snapshot
 
-![galil-project](../images/gettingstarted/project.png)
+![sample-project](../images/gettingstarted/sampleProjectFolder.png)
 
 ## Add new sbt project module
 
-If you want to add another component to the project, for example, with the name `galil-io`, you have to create a new sbt module:
+If you want to add another component to the project, for example, with the name `sample-io`, you have to create a new sbt module:
 
-1. Add external library dependencies required by `galil-io` in `Libs.scala` file, if it does not exist.
+1. Add external library dependencies required by `sample-io` in `Libs.scala` file, if it does not exist.
 ```
 val `akka-actor` = "com.typesafe.akka" %% "akka-actor" % "2.5.11"
 ```
 2. Map new/existing library dependencies in `Dependencies.scala` file against new project.
 ```
-val GalilIO = Seq( Libs.`akka-actor` )
+val SampleIO = Seq( Libs.`akka-actor` )
 ```
 3. Include below snippet in `build.sbt` file, this will create new sbt project module.
 ```
-lazy val `galil-io` = project
-  .settings( libraryDependencies ++= Dependencies.GalilIO )
+lazy val `sample-io` = project
+  .settings( libraryDependencies ++= Dependencies.SampleIO )
 ``` 
 4. If your new module depends on code from other modules within this project, use `.dependsOn` in your build.sbt file:
 ``` 
-lazy val `galil-io` = project
-  .settings( libraryDependencies ++= Dependencies.GalilIO )
+lazy val `sample-io` = project
+  .settings( libraryDependencies ++= Dependencies.SampleIO )
   .dependsOn(
-    `galil-assembly`,
-    `galil-hcd`
+    `sample-assembly`,
+    `sample-hcd`
   )
 ```
 5. Update the deployment dependencies:
 ``` 
-lazy val `galil-deploy` = project
+lazy val `sample-deploy` = project
   .dependsOn(
-    `galil-assembly`,
-    `galil-hcd`,
-    `galil-io`
+    `sample-assembly`,
+    `sample-hcd`,
+    `sample-io`
   )
 ```
 
