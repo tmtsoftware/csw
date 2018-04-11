@@ -27,7 +27,7 @@ final case class LatencyPlots(
     plot90: PlotResult = PlotResult(),
     plot99: PlotResult = PlotResult()
 ) {
-  def printTable(name: String) = {
+  def printTable(name: String): Unit = {
     println("         " + plot50.labelsStr)
     println("50%tile: " + plot50.resultsStr)
     println("90%tile: " + plot90.resultsStr)

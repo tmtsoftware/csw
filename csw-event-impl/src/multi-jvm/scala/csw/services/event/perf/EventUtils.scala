@@ -63,6 +63,9 @@ object EventUtils {
       )
   }
 
-  def getNanosFromInstant(instant: Instant) = instant.getEpochSecond * Math.pow(10, 9) + instant.getNano
+  def getNanosFromInstant(instant: Instant): Double = instant.getEpochSecond * Math.pow(10, 9) + instant.getNano
+  def nanosToMicros(nanos: Double): Double          = nanos / Math.pow(10, 3)
+  def nanosToMillis(nanos: Double): Double          = nanos / Math.pow(10, 6)
+  def nanosToSeconds(nanos: Double): Double         = nanos / Math.pow(10, 9)
 
 }

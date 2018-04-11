@@ -14,7 +14,7 @@ import org.HdrHistogram.Histogram
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
-class SimpleSubscriber(testSettings: TestSettings, reporter: TestRateReporter, id: Int)(implicit val system: ActorSystem) {
+class Subscriber(testSettings: TestSettings, reporter: TestRateReporter, id: Int)(implicit val system: ActorSystem) {
 
   import testSettings._
 

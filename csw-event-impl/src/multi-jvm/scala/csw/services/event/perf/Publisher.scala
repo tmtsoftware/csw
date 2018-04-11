@@ -10,7 +10,7 @@ import csw.services.event.scaladsl.EventPublisher
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
-class SimplePublisher(testSettings: TestSettings, testConfigs: TestConfigs, id: Int)(implicit val system: ActorSystem) {
+class Publisher(testSettings: TestSettings, testConfigs: TestConfigs, id: Int)(implicit val system: ActorSystem) {
   import testSettings._
 
   implicit val ec: ExecutionContextExecutor = system.dispatcher

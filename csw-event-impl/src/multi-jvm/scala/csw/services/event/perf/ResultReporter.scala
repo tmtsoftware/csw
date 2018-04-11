@@ -1,9 +1,8 @@
 package csw.services.event.perf
 
-import java.io.PrintStream
-
 import akka.actor.ActorSystem
 import org.HdrHistogram.Histogram
+import EventUtils._
 
 class ResultReporter(name: String, actorSystem: ActorSystem) {
 
@@ -46,12 +45,5 @@ class ResultReporter(name: String, actorSystem: ActorSystem) {
       f"          99%%ile: ${percentile(99.0)}%.0f µs \n" +
       f"          rate  : $throughput%,.0f msg/s \n"
     )
-
   }
-
-  def nanosToMillis(nanos: Double): Double  = nanos / Math.pow(10, 6)
-  def nanosToSeconds(nanos: Double): Double = nanos / Math.pow(10, 9)
-
-//    throughputPlotRef ! PlotResult().add(testName, throughput * payloadSize * testSettings.publisherSubscriberPairs / 1024 / 1024)
-
 }

@@ -8,6 +8,7 @@ import akka.remote.testconductor.RoleName
 import akka.remote.testkit.{MultiNodeConfig, MultiNodeSpec, MultiNodeSpecCallbacks}
 import akka.testkit._
 import com.typesafe.config.ConfigFactory
+import csw.services.event.perf.EventUtils.{nanosToMicros, nanosToSeconds}
 import org.HdrHistogram.Histogram
 import org.scalatest._
 
@@ -37,7 +38,7 @@ class EventServicePerfTest
 
   import EventServicePerfTest._
 
-  val testConfigs = new TestConfigs()
+  val testConfigs = new TestConfigs(system.settings.config)
   import testConfigs._
 
   var throughputPlots: PlotResult    = PlotResult()
@@ -82,9 +83,9 @@ class EventServicePerfTest
   val scenarios = List(
     TestSettings(
       testName = "1-to-1",
-      totalMessages = adjustedTotalMessages(1000),
+      totalMessages = adjustedTotalMessages(10000),
       payloadSize = 100,
-      publisherSubscriberPairs = 5,
+      publisherSubscriberPairs = 1,
       singlePublisher = false
     ),
     TestSettings(
@@ -103,28 +104,28 @@ class EventServicePerfTest
     ),
     TestSettings(
       testName = "5-to-5",
-      totalMessages = adjustedTotalMessages(10000),
+      totalMessages = adjustedTotalMessages(5000),
       payloadSize = 100,
       publisherSubscriberPairs = 5,
       singlePublisher = false
     ),
     TestSettings(
       testName = "10-to-10",
-      totalMessages = adjustedTotalMessages(10000),
+      totalMessages = adjustedTotalMessages(5000),
       payloadSize = 100,
       publisherSubscriberPairs = 10,
       singlePublisher = false
     ),
     TestSettings(
       testName = "1-to-5",
-      totalMessages = adjustedTotalMessages(10000),
+      totalMessages = adjustedTotalMessages(5000),
       payloadSize = 100,
       publisherSubscriberPairs = 5,
       singlePublisher = true
     ),
     TestSettings(
       testName = "1-to-10",
-      totalMessages = adjustedTotalMessages(10000),
+      totalMessages = adjustedTotalMessages(5000),
       payloadSize = 100,
       publisherSubscriberPairs = 10,
       singlePublisher = true
@@ -145,7 +146,7 @@ class EventServicePerfTest
 
       val subscribers = for (n ← 1 to publisherSubscriberPairs) yield {
         val id         = if (testSettings.singlePublisher) 1 else n
-        val subscriber = new SimpleSubscriber(testSettings, rep, id)
+        val subscriber = new Subscriber(testSettings, rep, id)
         (subscriber.startSubscription(), subscriber)
       }
 
@@ -180,7 +181,7 @@ class EventServicePerfTest
       println("=============================================================================================================")
 
       val publishers = for (n ← 1 to noOfPublishers) yield {
-        new SimplePublisher(testSettings, testConfigs, n).start()
+        new Publisher(testSettings, testConfigs, n).start()
       }
 
       Await.result(Future.sequence(publishers), 5.minute)
@@ -191,11 +192,11 @@ class EventServicePerfTest
 
   private def aggregateResult(testSettings: TestSettings, aggregatedEventsReceived: Long): Unit = {
     import testSettings._
-    val throughput = aggregatedEventsReceived / (totalTime / Math.pow(10, 9))
+    val throughput = aggregatedEventsReceived / nanosToSeconds(totalTime)
 
     throughputPlots = throughputPlots.addAll(PlotResult().add(testName, throughput))
 
-    def percentile(p: Double): Double = aggregatedHistogram.getValueAtPercentile(p) / 1000.0
+    def percentile(p: Double): Double = nanosToMicros(aggregatedHistogram.getValueAtPercentile(p))
 
     val latencyPlotsTmp = LatencyPlots(
       PlotResult().add(testName, percentile(50.0)),

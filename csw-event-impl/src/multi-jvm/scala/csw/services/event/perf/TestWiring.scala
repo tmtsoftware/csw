@@ -10,20 +10,13 @@ import org.scalatest.mockito.MockitoSugar
 
 class TestWiring(actorSystem: ActorSystem) extends MockitoSugar {
 
-  lazy val config: Config = actorSystem.settings.config
+  lazy val testConfigs = new TestConfigs(actorSystem.settings.config)
+  import testConfigs._
+
   lazy val wiring: Wiring = new Wiring(actorSystem)
 
-  lazy val redisEnabled: Boolean = config.getBoolean("csw.test.EventServicePerfTest.redis-enabled")
-
-  //################### Redis Configuration ###################
-  lazy val redisHost: String          = config.getString("csw.test.EventServicePerfTest.redis.host")
-  lazy val redisPort: Int             = config.getInt("csw.test.EventServicePerfTest.redis.port")
   lazy val redisClient: RedisClient   = RedisClient.create()
   lazy val redisFactory: RedisFactory = new RedisFactory(redisClient, mock[LocationService], wiring)
-
-  //################### Kafka Configuration ###################
-  lazy val kafkaHost: String          = config.getString("csw.test.EventServicePerfTest.kafka.host")
-  lazy val kafkaPort: Int             = config.getInt("csw.test.EventServicePerfTest.kafka.port")
   lazy val kafkaFactory: KafkaFactory = new KafkaFactory(mock[LocationService], wiring)
 
   def publisher: EventPublisher =
