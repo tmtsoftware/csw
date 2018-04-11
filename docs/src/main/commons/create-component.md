@@ -2,7 +2,7 @@
 
 This walkthrough helps in creating a CSW component in Scala/Java. CSW components depend on the `csw-framework` package,
 which can be found @ref:[here](./framework.md). This section discusses constructing a HCD, 
-but the principles apply to an Assembly as well. We will be constructing the Assembly in the next section @ref:[Working with Mulitple Components](./multiple-components.md). 
+but the principles apply to an Assembly as well. We will be constructing the Assembly in the next section @ref:[Working with Multiple Components](./multiple-components.md). 
 
 #### *Tutorial: Developing an HCD*
 
