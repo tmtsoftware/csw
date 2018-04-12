@@ -19,7 +19,7 @@ abstract class IEventPublisher(eventPublisher: EventPublisher) {
   def publish(event: Event): CompletableFuture[Done] = eventPublisher.publish(event).toJava.toCompletableFuture
 
   def publish(eventGenerator: Supplier[Event], every: FiniteDuration): Cancellable =
-    eventPublisher.publish(eventGenerator.asScala, every)
+    eventPublisher.publish(eventGenerator.asScala.apply(), every)
 
   def shutdown(): CompletableFuture[Done] = eventPublisher.shutdown().toJava.toCompletableFuture
 

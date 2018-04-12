@@ -1,7 +1,11 @@
 package csw.services.event.internal.redis
 
 import akka.actor.ActorSystem
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.stream.scaladsl.Source
+import akka.testkit.typed.scaladsl.TestProbe
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
+import csw.messages.events.Event
 import csw.services.event.exceptions.PublishFailed
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.helpers.{RegistrationFactory, Utils}
@@ -15,6 +19,9 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import redis.embedded.RedisServer
 
+import scala.concurrent.duration.DurationInt
+
+//DEOPSCSW-398: Propagate failure for publish api (eventGenerator)
 class FailureTest extends FunSuite with Matchers with MockitoSugar with BeforeAndAfterAll {
 
   private val seedPort        = 3560
@@ -36,7 +43,8 @@ class FailureTest extends FunSuite with Matchers with MockitoSugar with BeforeAn
 
   private val wiring       = new Wiring(actorSystem)
   private val redisFactory = new RedisFactory(redisClient, locationService, wiring)
-  private val publisher    = redisFactory.publisher().await
+
+  case class FailedEvent(event: Event, throwable: Throwable)
 
   override def beforeAll(): Unit = {
     redis.start()
@@ -49,6 +57,7 @@ class FailureTest extends FunSuite with Matchers with MockitoSugar with BeforeAn
   }
 
   test("Redis - failure in publishing should fail future with PublishFailed exception") {
+    val publisher = redisFactory.publisher().await
 
     publisher.publish(Utils.makeEvent(1)).await
 
@@ -59,5 +68,46 @@ class FailureTest extends FunSuite with Matchers with MockitoSugar with BeforeAn
     intercept[PublishFailed] {
       publisher.publish(Utils.makeEvent(2)).await
     }
+  }
+
+  test("Redis - handle failed publish event with a callback") {
+    val publisher = redisFactory.publisher().await
+
+    val testProbe = TestProbe[FailedEvent]()(actorSystem.toTyped)
+    publisher.publish(Utils.makeEvent(1)).await
+
+    publisher.shutdown().await
+
+    Thread.sleep(1000) // wait till the publisher is shutdown successfully
+
+    val event       = Utils.makeEvent(1)
+    val eventStream = Source.single(event)
+
+    publisher.publish(eventStream, (event, ex) ⇒ testProbe.ref ! FailedEvent(event, ex))
+
+    val failedEvent = testProbe.expectMessageType[FailedEvent]
+
+    failedEvent.event shouldBe event
+    failedEvent.throwable shouldBe a[PublishFailed]
+  }
+
+  test("Redis - handle failed publish event with an eventGenerator and a callback") {
+    val publisher = redisFactory.publisher().await
+
+    val testProbe = TestProbe[FailedEvent]()(actorSystem.toTyped)
+    publisher.publish(Utils.makeEvent(1)).await
+
+    publisher.shutdown().await
+
+    Thread.sleep(1000) // wait till the publisher is shutdown successfully
+
+    val event = Utils.makeEvent(1)
+
+    publisher.publish(event, 20.millis, (event, ex) ⇒ testProbe.ref ! FailedEvent(event, ex))
+
+    val failedEvent = testProbe.expectMessageType[FailedEvent]
+
+    failedEvent.event shouldBe event
+    failedEvent.throwable shouldBe a[PublishFailed]
   }
 }
