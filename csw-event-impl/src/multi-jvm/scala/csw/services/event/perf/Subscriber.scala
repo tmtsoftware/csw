@@ -41,14 +41,14 @@ class Subscriber(testSettings: TestSettings,
   val subscription: Source[Event, EventSubscription] =
     subscriber.subscribe(Set(EventKey(s"$testEventKey-$publisherId"), EventKey(s"${prefix.prefix}.$endEventS-$publisherId")))
 
-  val endEvent = EventName(s"${EventUtils.endEventS}-$publisherId")
+  val endEventName = EventName(s"${EventUtils.endEventS}-$publisherId")
 
   def startSubscription(): Future[Done] = {
     subscription
       .drop(warmupCount)
       .takeWhile {
-        case SystemEvent(_, _, `endEvent`, _, _) ⇒ false
-        case _                                   => true
+        case SystemEvent(_, _, `endEventName`, _, _) ⇒ false
+        case _                                       => true
       }
       .watchTermination()(Keep.right)
       .runForeach(report)

@@ -12,7 +12,6 @@ object EventUtils {
   val testEventS   = "move"
   val testEventKey = s"${prefix.prefix}.$testEventS"
   val endEventS    = "end"
-  val endEvent     = EventName(endEventS)
 
   val payloadKey: Key[Byte] = ByteKey.make("payloadKey")
 
