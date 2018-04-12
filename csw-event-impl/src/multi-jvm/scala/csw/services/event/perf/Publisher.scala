@@ -21,16 +21,16 @@ class Publisher(testSettings: TestSettings, testConfigs: TestConfigs, id: Int)(i
   private val publisher: EventPublisher = wiring.publisher
 
   private def source(eventName: EventName): Source[SystemEvent, Future[Done]] =
-    Source(1L to totalMessages + warmup)
+    Source(1L to totalMessages + warmupCount)
       .throttle(throttlingElements, throttlingDuration, throttlingElements, ThrottleMode.shaping)
       .map { id ⇒
-        eventWithNanos(eventName, id, payload)
+        event(eventName, id, payload)
       }
       .watchTermination()(Keep.right)
 
-  def start(): Future[Done] =
+  def startPublishing(): Future[Done] =
     for {
-      _   ← publisher.publish(source(EventName(s"$testEvent-$id")))
+      _   ← publisher.publish(source(EventName(s"$testEventS-$id")))
       end ← publisher.publish(event(EventName(s"$endEventS-$id")))
     } yield end
 

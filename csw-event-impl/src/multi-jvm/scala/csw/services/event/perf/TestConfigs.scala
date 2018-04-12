@@ -14,7 +14,7 @@ class TestConfigs(config: Config) {
     val d = config.getDuration("csw.test.EventServicePerfTest.throttling.per")
     FiniteDuration(d.toNanos, TimeUnit.NANOSECONDS)
   }
-  val warmup: Int                 = config.getInt("csw.test.EventServicePerfTest.warmup")
+  val warmupCount: Int            = config.getInt("csw.test.EventServicePerfTest.warmup")
   val totalMessagesFactor: Double = config.getDouble("csw.test.EventServicePerfTest.totalMessagesFactor")
 
   //################### Redis Configuration ###################

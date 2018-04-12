@@ -135,8 +135,8 @@ class EventServicePerfTest
       val aggregatedHistogram: Histogram = new Histogram(SECONDS.toNanos(10), 3)
 
       val subscribers = for (n ← 1 to publisherSubscriberPairs) yield {
-        val id         = if (testSettings.singlePublisher) 1 else n
-        val subscriber = new Subscriber(testSettings, rep, id)
+        val publisherId = if (testSettings.singlePublisher) 1 else n
+        val subscriber  = new Subscriber(testSettings, testConfigs, rep, publisherId, n)
         (subscriber.startSubscription(), subscriber)
       }
 
@@ -160,21 +160,25 @@ class EventServicePerfTest
 
     runOn(first) {
       val noOfPublishers = if (testSettings.singlePublisher) 1 else publisherSubscriberPairs
-      enterBarrier(subscriberName + "-started")
-
-      println("=============================================================================================================")
+      println(
+        "================================================================================================================================================"
+      )
       println(
         s"[$testName]: Starting benchmark with $noOfPublishers publishers & $publisherSubscriberPairs subscribers $totalMessages messages with " +
         s"throttling of $throttlingElements msgs/${throttlingDuration.toSeconds}s " +
-        s"and payload size $payloadSize"
+        s"and payload size $payloadSize bytes"
       )
-      println("=============================================================================================================")
+      println(
+        "================================================================================================================================================"
+      )
+
+      enterBarrier(subscriberName + "-started")
 
       val publishers = for (n ← 1 to noOfPublishers) yield {
-        new Publisher(testSettings, testConfigs, n).start()
+        new Publisher(testSettings, testConfigs, n).startPublishing()
       }
 
-      Await.result(Future.sequence(publishers), 5.minute)
+      Await.result(Future.sequence(publishers), 5.minutes)
       enterBarrier(testName + "-done")
     }
     enterBarrier("after-" + testName)

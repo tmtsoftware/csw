@@ -10,7 +10,7 @@ class TestRateReporter(name: String)
           println(
             name +
             f": $messagesPerSec%,.0f msgs/sec, $bytesPerSec%,.0f bytes/sec, " +
-            f"totals $totalMessages%,d messages ${totalBytes / (1024 * 1024)}%,d MB"
+            f"$totalMessages%,d total messages ${totalBytes / (1024 * 1024)}%,d MB total payload"
           )
         }
       }
