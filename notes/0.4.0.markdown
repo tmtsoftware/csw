@@ -1,0 +1,21 @@
+## CSW - TMT Common Software v0.4.0
+
+This is release v0.4.0 of the TMT Common Software.
+
+See [CHANGELOG.md](../CHANGELOG.md) for details of all releases.
+
+### Changed from FDR
+- Updated Location Service implementation is now based on [Akka Cluster](https://doc.akka.io/docs/akka/2.5/cluster-usage.html) and [Distributed Data](https://doc.akka.io/docs/akka/2.5/distributed-data.html) for higher performance and proper operation in all required scenarios
+- New Command Service APIs - FDR version was based on Akka messages
+- Significant updates to Configuration Service implementation with some API changes
+- New Logging APIs
+- Updated to use latest Scala and Java versions and dependencies
+
+### Planned for the Next Release
+- Event Service
+- Alarm Service
+
+### Documentation
+- Reference paradox documentation: https://tmtsoftware.github.io/csw-prod/0.4.0/
+- Scaladoc: https://tmtsoftware.github.io/csw-prod/0.4.0/api/scala/index.html
+- Javadoc: https://tmtsoftware.github.io/csw-prod/0.4.0/api/java/?/index.html
