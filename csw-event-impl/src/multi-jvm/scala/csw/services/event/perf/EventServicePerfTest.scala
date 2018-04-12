@@ -41,10 +41,9 @@ class EventServicePerfTest
   val testConfigs = new TestConfigs(system.settings.config)
   import testConfigs._
 
-  var throughputPlots: PlotResult    = PlotResult()
-  var latencyPlots: LatencyPlots     = LatencyPlots()
-  var aggregatedHistogram: Histogram = new Histogram(SECONDS.toNanos(10), 3)
-  var totalTime                      = 0L
+  var throughputPlots: PlotResult = PlotResult()
+  var latencyPlots: LatencyPlots  = LatencyPlots()
+  var totalTime                   = 0L
 
   def adjustedTotalMessages(n: Long): Long = (n * totalMessagesFactor).toLong
 
@@ -62,20 +61,10 @@ class EventServicePerfTest
   override def afterAll(): Unit = {
     reporterExecutor.shutdown()
     runOn(second) {
-      println("============= Throughput Results in mb/s =============")
-      println(throughputPlots.labelsStr)
-      println(throughputPlots.resultsStr)
+      println("================================ Throughput msgs/s ================================")
+      throughputPlots.printTable()
       println()
-
-      println("============= Latency Results in µs =============")
       latencyPlots.printTable(system.name)
-
-      println(s"Histogram of latencies in microseconds (µs) [${self.path.name}].")
-      aggregatedHistogram.outputPercentileDistribution(
-        new PrintStream(BenchmarkFileReporter.apply(s"PerfSpec", system, logSettings = false).fos),
-        1000.0
-      )
-
     }
     multiNodeSpecAfterAll()
   }
@@ -142,7 +131,8 @@ class EventServicePerfTest
     implicit val ec: ExecutionContext = system.dispatcher
 
     runOn(second) {
-      val rep = reporter(testName)
+      val rep                            = reporter(testName)
+      val aggregatedHistogram: Histogram = new Histogram(SECONDS.toNanos(10), 3)
 
       val subscribers = for (n ← 1 to publisherSubscriberPairs) yield {
         val id         = if (testSettings.singlePublisher) 1 else n
@@ -162,7 +152,7 @@ class EventServicePerfTest
           totalTime = Math.max(totalTime, subscriber.totalTime)
       }
 
-      aggregateResult(testSettings, aggregatedEventsReceived)
+      aggregateResult(testSettings, aggregatedEventsReceived, aggregatedHistogram)
       enterBarrier(testName + "-done")
 
       rep.halt()
@@ -190,7 +180,11 @@ class EventServicePerfTest
     enterBarrier("after-" + testName)
   }
 
-  private def aggregateResult(testSettings: TestSettings, aggregatedEventsReceived: Long): Unit = {
+  private def aggregateResult(
+      testSettings: TestSettings,
+      aggregatedEventsReceived: Long,
+      aggregatedHistogram: Histogram
+  ): Unit = {
     import testSettings._
     val throughput = aggregatedEventsReceived / nanosToSeconds(totalTime)
 
@@ -208,6 +202,12 @@ class EventServicePerfTest
       plot50 = latencyPlots.plot50.addAll(latencyPlotsTmp.plot50),
       plot90 = latencyPlots.plot90.addAll(latencyPlotsTmp.plot90),
       plot99 = latencyPlots.plot99.addAll(latencyPlotsTmp.plot99)
+    )
+
+//    println(s"Histogram of latencies in microseconds (µs) [${self.path.name}].")
+    aggregatedHistogram.outputPercentileDistribution(
+      new PrintStream(BenchmarkFileReporter.apply(s"PerfSpec", system, logSettings = false).fos),
+      1000.0
     )
   }
 
