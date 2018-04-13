@@ -2,7 +2,7 @@ package csw.services.event.perf
 
 final case class TestSettings(
     testName: String,
-    totalMessages: Long,
+    totalTestMsgs: Long,
     payloadSize: Int,
     publisherSubscriberPairs: Int,
     singlePublisher: Boolean

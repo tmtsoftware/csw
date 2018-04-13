@@ -4,17 +4,20 @@ import java.util.concurrent.TimeUnit
 
 import com.typesafe.config.Config
 
-import scala.concurrent.duration.FiniteDuration
+import scala.concurrent.duration.{DurationLong, FiniteDuration}
 
 class TestConfigs(config: Config) {
 
   //################### Common Configuration ###################
-  val throttlingElements: Int = config.getInt("csw.test.EventServicePerfTest.throttling.elements")
-  val throttlingDuration: FiniteDuration = {
-    val d = config.getDuration("csw.test.EventServicePerfTest.throttling.per")
+  val elements: Int = config.getInt("csw.test.EventServicePerfTest.publish-frequency.elements")
+  val per: FiniteDuration = {
+    val d = config.getDuration("csw.test.EventServicePerfTest.publish-frequency.per")
     FiniteDuration(d.toNanos, TimeUnit.NANOSECONDS)
   }
-  val warmupCount: Int            = config.getInt("csw.test.EventServicePerfTest.warmup")
+
+  val publishFrequency: FiniteDuration = (per.toMillis / elements).millis
+
+  val warmupMsgs: Int             = config.getInt("csw.test.EventServicePerfTest.warmup")
   val totalMessagesFactor: Double = config.getDouble("csw.test.EventServicePerfTest.totalMessagesFactor")
 
   //################### Redis Configuration ###################

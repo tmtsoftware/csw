@@ -34,3 +34,4 @@ shared/.jvm
 bin/
 journal
 snapshots
+dump.rdb

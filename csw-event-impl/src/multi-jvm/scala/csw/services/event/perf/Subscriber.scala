@@ -32,27 +32,28 @@ class Subscriber(testSettings: TestSettings,
   val histogram: Histogram                = new Histogram(SECONDS.toNanos(10), 3)
   private val resultReporter              = new ResultReporter(testName, system)
 
-  var startTime       = 0L
-  var totalTime       = 0L
-  var eventsReceived  = 0L
-  var lastId          = 0
-  var outOfOrderCount = 0
-  var lastCurrentId   = 0
+  var startTime         = 0L
+  var totalTime         = 0L
+  var eventsReceived    = 0L
+  var lastId            = 0
+  var outOfOrderCount   = 0
+  var lastCurrentId     = 0
+  private val eventKeys = Set(EventKey(s"$testEventKey-$publisherId"), EventKey(s"${prefix.prefix}.$endEventS-$publisherId"))
   val subscription: Source[Event, EventSubscription] =
-    subscriber.subscribe(Set(EventKey(s"$testEventKey-$publisherId"), EventKey(s"${prefix.prefix}.$endEventS-$publisherId")))
+    subscriber.subscribe(eventKeys)
 
   val endEventName = EventName(s"${EventUtils.endEventS}-$publisherId")
 
-  def startSubscription(): Future[Done] = {
+  private val eventsToDrop = warmupMsgs + eventKeys.size //inclusive of latest events from subscription
+  def startSubscription(): Future[Done] =
     subscription
-      .drop(warmupCount)
+      .drop(eventsToDrop)
       .takeWhile {
         case SystemEvent(_, _, `endEventName`, _, _) ⇒ false
-        case _                                       => true
+        case _                                       ⇒ true
       }
       .watchTermination()(Keep.right)
       .runForeach(report)
-  }
 
   private def report(event: Event): Unit = {
 
@@ -81,8 +82,7 @@ class Subscriber(testSettings: TestSettings,
     }
   }
 
-  def printResult(): Unit = {
+  def printResult(): Unit =
     resultReporter.printResult(subscriberId, testSettings, histogram, eventsReceived, totalTime, outOfOrderCount)
-  }
 
 }

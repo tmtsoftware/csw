@@ -71,50 +71,57 @@ class EventServicePerfTest
 
   val scenarios = List(
     TestSettings(
+      testName = "warmup",
+      totalTestMsgs = adjustedTotalMessages(10000),
+      payloadSize = 100,
+      publisherSubscriberPairs = 1,
+      singlePublisher = false
+    ),
+    TestSettings(
       testName = "1-to-1",
-      totalMessages = adjustedTotalMessages(10000),
+      totalTestMsgs = adjustedTotalMessages(10000),
       payloadSize = 100,
       publisherSubscriberPairs = 1,
       singlePublisher = false
     ),
     TestSettings(
       testName = "1-to-1-size-1k",
-      totalMessages = adjustedTotalMessages(10000),
+      totalTestMsgs = adjustedTotalMessages(10000),
       payloadSize = 1000,
       publisherSubscriberPairs = 1,
       singlePublisher = false
     ),
     TestSettings(
       testName = "1-to-1-size-10k",
-      totalMessages = adjustedTotalMessages(10000),
+      totalTestMsgs = adjustedTotalMessages(10000),
       payloadSize = 10000,
       publisherSubscriberPairs = 1,
       singlePublisher = false
     ),
     TestSettings(
       testName = "5-to-5",
-      totalMessages = adjustedTotalMessages(5000),
+      totalTestMsgs = adjustedTotalMessages(5000),
       payloadSize = 100,
       publisherSubscriberPairs = 5,
       singlePublisher = false
     ),
     TestSettings(
       testName = "10-to-10",
-      totalMessages = adjustedTotalMessages(5000),
+      totalTestMsgs = adjustedTotalMessages(5000),
       payloadSize = 100,
       publisherSubscriberPairs = 10,
       singlePublisher = false
     ),
     TestSettings(
       testName = "1-to-5",
-      totalMessages = adjustedTotalMessages(5000),
+      totalTestMsgs = adjustedTotalMessages(5000),
       payloadSize = 100,
       publisherSubscriberPairs = 5,
       singlePublisher = true
     ),
     TestSettings(
       testName = "1-to-10",
-      totalMessages = adjustedTotalMessages(5000),
+      totalTestMsgs = adjustedTotalMessages(5000),
       payloadSize = 100,
       publisherSubscriberPairs = 10,
       singlePublisher = true
@@ -164,8 +171,8 @@ class EventServicePerfTest
         "================================================================================================================================================"
       )
       println(
-        s"[$testName]: Starting benchmark with $noOfPublishers publishers & $publisherSubscriberPairs subscribers $totalMessages messages with " +
-        s"throttling of $throttlingElements msgs/${throttlingDuration.toSeconds}s " +
+        s"[$testName]: Starting benchmark with $noOfPublishers publishers & $publisherSubscriberPairs subscribers $totalTestMsgs messages with " +
+        s"throttling of $elements msgs/${per.toSeconds}s " +
         s"and payload size $payloadSize bytes"
       )
       println(
@@ -174,11 +181,10 @@ class EventServicePerfTest
 
       enterBarrier(subscriberName + "-started")
 
-      val publishers = for (n ← 1 to noOfPublishers) yield {
+      for (n ← 1 to noOfPublishers) yield {
         new Publisher(testSettings, testConfigs, n).startPublishing()
       }
 
-      Await.result(Future.sequence(publishers), 5.minutes)
       enterBarrier(testName + "-done")
     }
     enterBarrier("after-" + testName)

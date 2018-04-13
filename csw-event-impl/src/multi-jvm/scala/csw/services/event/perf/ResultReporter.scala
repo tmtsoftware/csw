@@ -22,7 +22,7 @@ class ResultReporter(name: String, actorSystem: ActorSystem) {
       if (singlePublisher) totalReceived / nanosToSeconds(totalTime)
       else totalReceived * publisherSubscriberPairs / nanosToSeconds(totalTime)
 
-    val totalDropped = Math.max(0, totalMessages - totalReceived)
+    val totalDropped = totalTestMsgs - totalReceived
 
     def percentile(p: Double) = histogram.getValueAtPercentile(p) / 1000.0
 

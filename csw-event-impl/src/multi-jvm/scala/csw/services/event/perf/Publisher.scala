@@ -1,34 +1,34 @@
 package csw.services.event.perf
 
-import akka.Done
-import akka.actor.ActorSystem
-import akka.stream.ThrottleMode
-import akka.stream.scaladsl.{Keep, Source}
-import csw.messages.events.{EventName, SystemEvent}
+import akka.actor.{ActorSystem, Cancellable}
+import csw.messages.events.{Event, EventName}
 import csw.services.event.perf.EventUtils._
 import csw.services.event.scaladsl.EventPublisher
 
-import scala.concurrent.{ExecutionContextExecutor, Future}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.duration.DurationLong
 
 class Publisher(testSettings: TestSettings, testConfigs: TestConfigs, id: Int)(implicit val system: ActorSystem) {
-  import testSettings._
   import testConfigs._
+  import testSettings._
 
-  implicit val ec: ExecutionContextExecutor = system.dispatcher
+  private implicit val ec: ExecutionContext = system.dispatcher
+  private val wiring                        = new TestWiring(system)
 
-  private val wiring = new TestWiring(system)
-
+  private val totalMessages             = totalTestMsgs + warmupMsgs + 1 //inclusive of end-event
   private val payload: Array[Byte]      = ("0" * payloadSize).getBytes("utf-8")
   private val publisher: EventPublisher = wiring.publisher
   private val endEvent                  = event(EventName(s"${EventUtils.endEventS}-$id"))
+  private val eventName                 = EventName(s"$testEventS-$id")
+  private var counter                   = 0
+  private var cancellable: Cancellable  = _
 
-  private def source(eventName: EventName): Source[SystemEvent, Future[Done]] =
-    Source(1L to totalMessages + warmupCount)
-      .throttle(throttlingElements, throttlingDuration, throttlingElements, ThrottleMode.shaping)
-      .map(id ⇒ event(eventName, id, payload))
-      .concat(Source.single(endEvent))
-      .watchTermination()(Keep.right)
+  private def eventGenerator(): Event = {
+    counter += 1
+    if (counter > totalMessages) cancellable.cancel()
+    if (counter < totalMessages) event(eventName, counter, payload) else endEvent
+  }
 
-  def startPublishing(): Future[Done] = publisher.publish(source(EventName(s"$testEventS-$id"))).map(end => end)
+  def startPublishing(): Unit = { cancellable = publisher.publish(eventGenerator, publishFrequency) }
 
 }
