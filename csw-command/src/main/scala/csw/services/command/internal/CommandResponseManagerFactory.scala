@@ -17,6 +17,6 @@ private[csw] class CommandResponseManagerFactory {
   ): CommandResponseManager = new CommandResponseManager(commandResponseManagerActor)(ctx.system)
 
   def makeBehavior(loggerFactory: LoggerFactory): Behavior[CommandResponseManagerMessage] =
-    Behaviors.mutable[CommandResponseManagerMessage](ctx ⇒ new CommandResponseManagerBehavior(ctx, loggerFactory))
+    Behaviors.setup[CommandResponseManagerMessage](ctx ⇒ new CommandResponseManagerBehavior(ctx, loggerFactory))
 
 }

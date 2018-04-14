@@ -1,6 +1,6 @@
 package csw.services.command.internal
 
-import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
+import akka.actor.typed.scaladsl.{ActorContext, MutableBehavior}
 import akka.actor.typed.{ActorRef, Behavior}
 import csw.messages.commands.CommandResponse.CommandNotAvailable
 import csw.messages.commands.CommandResultType.{Final, Intermediate}
@@ -40,7 +40,7 @@ import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 private[command] class CommandResponseManagerBehavior(
     ctx: ActorContext[CommandResponseManagerMessage],
     loggerFactory: LoggerFactory
-) extends Behaviors.MutableBehavior[CommandResponseManagerMessage] {
+) extends MutableBehavior[CommandResponseManagerMessage] {
   private val log: Logger = loggerFactory.getLogger(ctx)
 
   private[command] var commandResponseManagerState: CommandResponseManagerState = CommandResponseManagerState(Map.empty)

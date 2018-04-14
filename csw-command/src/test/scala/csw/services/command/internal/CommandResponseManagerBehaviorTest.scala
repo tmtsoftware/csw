@@ -26,7 +26,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
   implicit val testKitSettings: TestKitSettings  = TestKitSettings(typedSystem)
 
   def createBehaviorTestKit() = BehaviorTestKit(
-    Behaviors.mutable[CommandResponseManagerMessage](ctx ⇒ new CommandResponseManagerBehavior(ctx, getMockedLogger))
+    Behaviors.setup[CommandResponseManagerMessage](ctx ⇒ new CommandResponseManagerBehavior(ctx, getMockedLogger))
   )
 
   test("should be able to add command entry in Command Response Manager") {

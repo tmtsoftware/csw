@@ -90,7 +90,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     when(registrationResult.unregister()).thenReturn(eventualDone)
 
     val containerBehaviorTestkit: BehaviorTestKit[ContainerActorMessage] = BehaviorTestKit(
-      Behaviors.mutable(
+      Behaviors.setup(
         ctx ⇒
           new ContainerBehavior(
             ctx,

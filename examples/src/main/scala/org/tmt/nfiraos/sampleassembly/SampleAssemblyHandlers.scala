@@ -43,7 +43,7 @@ class SampleAssemblyHandlers(
 
   private val commandSender =
     ctx.spawn(
-      Behaviors.immutable[WorkerCommand]((_, msg) => {
+      Behaviors.receiveMessage[WorkerCommand](msg => {
         msg match {
           case command: SendCommand =>
             log.trace(s"WorkerActor received SendCommand message.")

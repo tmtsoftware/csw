@@ -19,6 +19,7 @@ import org.junit.Assert;
 import scala.Function1;
 import scala.concurrent.duration.FiniteDuration;
 
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
@@ -63,7 +64,7 @@ public class JEventServicePubSubTestFramework {
 
         publisher.publish(event1).get(10, TimeUnit.SECONDS);
 
-        probe.expectNoMessage(new FiniteDuration(2, TimeUnit.SECONDS));
+        probe.expectNoMessage(Duration.ofSeconds(2));
     }
 
     public void subscribeIndependently() throws InterruptedException, ExecutionException, TimeoutException {
@@ -232,7 +233,7 @@ public class JEventServicePubSubTestFramework {
 
         publisher.publish(event1).get(10, TimeUnit.SECONDS);
 
-        probe.expectNoMessage(new FiniteDuration(2, TimeUnit.SECONDS));
+        probe.expectNoMessage(Duration.ofSeconds(2));
     }
 
     public void retrieveEventUsingAsyncCallback() throws InterruptedException, TimeoutException, ExecutionException {
@@ -257,7 +258,7 @@ public class JEventServicePubSubTestFramework {
 
         publisher.publish(event1).get(10, TimeUnit.SECONDS);
 
-        probe.expectNoMessage(new FiniteDuration(2, TimeUnit.SECONDS));
+        probe.expectNoMessage(Duration.ofSeconds(2));
 
     }
 
@@ -278,7 +279,7 @@ public class JEventServicePubSubTestFramework {
 
         publisher.publish(event1).get(10, TimeUnit.SECONDS);
 
-        probe.expectNoMessage(new FiniteDuration(2, TimeUnit.SECONDS));
+        probe.expectNoMessage(Duration.ofSeconds(2));
     }
 
     public void get() throws InterruptedException, ExecutionException, TimeoutException {

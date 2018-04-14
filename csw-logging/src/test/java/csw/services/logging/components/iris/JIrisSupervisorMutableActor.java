@@ -2,8 +2,8 @@ package csw.services.logging.components.iris;
 
 import akka.actor.typed.Behavior;
 import akka.actor.typed.javadsl.Behaviors;
-import akka.actor.typed.javadsl.Behaviors.MutableBehavior;
 import akka.actor.typed.javadsl.ActorContext;
+import akka.actor.typed.javadsl.MutableBehavior;
 import akka.actor.typed.javadsl.ReceiveBuilder;
 import csw.services.logging.LogCommand;
 import csw.services.logging.javadsl.ILogger;
@@ -20,7 +20,7 @@ public class JIrisSupervisorMutableActor extends MutableBehavior<LogCommand> {
     }
 
     public static <LogCommand> Behavior<LogCommand> irisBeh(String componentName) {
-        return Behaviors.mutable(ctx -> {
+        return Behaviors.setup(ctx -> {
             JLoggerFactory loggerFactory = new JLoggerFactory(componentName);
             return (MutableBehavior<LogCommand>) new JIrisSupervisorMutableActor((ActorContext<csw.services.logging.LogCommand>) ctx, loggerFactory);
         });

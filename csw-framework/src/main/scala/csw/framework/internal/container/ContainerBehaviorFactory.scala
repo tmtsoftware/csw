@@ -9,7 +9,7 @@ import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.LoggerFactory
 
 /**
- * Factory for creating [[akka.actor.typed.scaladsl.Behaviors.MutableBehavior]] of a container component
+ * Factory for creating [[akka.actor.typed.scaladsl.MutableBehavior]] of a container component
  */
 private[framework] object ContainerBehaviorFactory {
   def behavior(
@@ -19,7 +19,7 @@ private[framework] object ContainerBehaviorFactory {
   ): Behavior[ContainerActorMessage] = {
     val supervisorFactory = new SupervisorInfoFactory(containerInfo.name)
     val loggerFactory     = new LoggerFactory(containerInfo.name)
-    Behaviors.mutable(
+    Behaviors.setup(
       ctx ⇒ new ContainerBehavior(ctx, containerInfo, supervisorFactory, registrationFactory, locationService, loggerFactory)
     )
   }

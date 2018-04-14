@@ -24,7 +24,7 @@ private[location] class DeathwatchActor(locationService: LocationService) {
    * @see [[akka.actor.Terminated]]
    */
   private[location] def behavior(watchedLocations: Set[Location]): Behavior[Msg] =
-    Behaviors.immutable[Msg] { (context, changeMsg) ⇒
+    Behaviors.receive[Msg] { (context, changeMsg) ⇒
       val log: Logger = LocationServiceLogger.getLogger(context)
 
       val allLocations = changeMsg.get(AllServices.Key).entries.values.toSet
@@ -44,7 +44,7 @@ private[location] class DeathwatchActor(locationService: LocationService) {
       })
       //all locations are now watched
       behavior(allLocations)
-    } onSignal {
+    } receiveSignal {
       case (ctx, Terminated(deadActorRef)) ⇒
         val log: Logger = LocationServiceLogger.getLogger(ctx)
 

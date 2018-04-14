@@ -46,7 +46,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
 
     val supervisorBehaviorKit = BehaviorTestKit(
       Behaviors
-        .mutable[SupervisorMessage](
+        .setup[SupervisorMessage](
           ctx =>
             new SupervisorBehavior(
               ctx,

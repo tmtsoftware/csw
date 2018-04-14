@@ -30,7 +30,7 @@ public abstract class JavaCommandHandler {
     }
 
     public static Behavior<CommandMsg> behavior() {
-        return Behaviors.immutable(CommandMsg.class)
+        return Behaviors.receive(CommandMsg.class)
                 .onMessage(CommandMsg.class, msg -> msg.command().getClass().isAssignableFrom(Setup.class),(ctx, msg) -> {
                     Set<Parameter<?>> jParamSet = ((Setup) msg.command()).jParamSet();
                     msg.ackTo().tell(jParamSet);

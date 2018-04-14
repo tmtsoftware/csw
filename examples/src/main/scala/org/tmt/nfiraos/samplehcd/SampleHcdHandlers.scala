@@ -40,7 +40,7 @@ class SampleHcdHandlers(
 
   private val workerActor =
     ctx.spawn(
-      Behaviors.immutable[WorkerCommand]((_, msg) => {
+      Behaviors.receiveMessage[WorkerCommand](msg => {
         msg match {
           case sleep: Sleep =>
             log.trace(s"WorkerActor received sleep command with time of ${sleep.timeInMillis} ms")

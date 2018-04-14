@@ -1,8 +1,6 @@
 package csw.framework.components.assembly
 
-import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.scaladsl.ActorContext
-import akka.actor.typed.scaladsl.Behaviors.MutableBehavior
+import akka.actor.typed.scaladsl.{ActorContext, Behaviors, MutableBehavior}
 import akka.actor.typed.{ActorRef, Behavior}
 import csw.services.config.api.models.ConfigData
 
@@ -15,7 +13,7 @@ object WorkerActorMsgs {
 
 object WorkerActor {
   def make(configData: ConfigData): Behavior[WorkerActorMsg] =
-    Behaviors.mutable(ctx ⇒ new WorkerActor(ctx, configData: ConfigData))
+    Behaviors.setup(ctx ⇒ new WorkerActor(ctx, configData: ConfigData))
 }
 
 class WorkerActor(ctx: ActorContext[WorkerActorMsg], configData: ConfigData) extends MutableBehavior[WorkerActorMsg] {

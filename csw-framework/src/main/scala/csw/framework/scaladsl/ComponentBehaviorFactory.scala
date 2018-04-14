@@ -34,7 +34,7 @@ abstract class ComponentBehaviorFactory {
   ): ComponentHandlers
 
   /**
-   * Creates the [[akka.actor.typed.scaladsl.Behaviors.MutableBehavior]] of the component
+   * Creates the [[akka.actor.typed.scaladsl.MutableBehavior]] of the component
    *
    * @param componentInfo component related information as described in the configuration file
    * @param supervisor the actor reference of the supervisor actor which created this component
@@ -52,7 +52,7 @@ abstract class ComponentBehaviorFactory {
       loggerFactory: LoggerFactory
   ): Behavior[Nothing] =
     Behaviors
-      .mutable[TopLevelActorMessage](
+      .setup[TopLevelActorMessage](
         ctx ⇒
           new ComponentBehavior(
             ctx,

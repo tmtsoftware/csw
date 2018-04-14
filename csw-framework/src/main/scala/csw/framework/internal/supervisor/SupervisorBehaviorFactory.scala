@@ -10,7 +10,7 @@ import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.LoggerFactory
 
 /**
- * The factory for creating [[akka.actor.typed.scaladsl.Behaviors.MutableBehavior]] of the supervisor of a component
+ * The factory for creating [[akka.actor.typed.scaladsl.MutableBehavior]] of the supervisor of a component
  */
 private[framework] object SupervisorBehaviorFactory {
 
@@ -52,7 +52,7 @@ private[framework] object SupervisorBehaviorFactory {
       .withTimers[SupervisorMessage](
         timerScheduler ⇒
           Behaviors
-            .mutable[SupervisorMessage](
+            .setup[SupervisorMessage](
               ctx =>
                 new SupervisorBehavior(
                   ctx,

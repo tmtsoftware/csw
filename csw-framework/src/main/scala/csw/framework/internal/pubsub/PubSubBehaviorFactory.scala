@@ -6,9 +6,9 @@ import csw.messages.framework.PubSub
 import csw.services.logging.scaladsl.LoggerFactory
 
 /**
- * Factory for creating [[akka.actor.typed.scaladsl.Behaviors.MutableBehavior]] of a pub sub actor
+ * Factory for creating [[akka.actor.typed.scaladsl.MutableBehavior]] of a pub sub actor
  */
 private[framework] class PubSubBehaviorFactory() {
   def make[T](actorName: String, loggerFactory: LoggerFactory): Behavior[PubSub[T]] =
-    Behaviors.mutable[PubSub[T]](ctx ⇒ new PubSubBehavior(ctx, loggerFactory))
+    Behaviors.setup[PubSub[T]](ctx ⇒ new PubSubBehavior(ctx, loggerFactory))
 }

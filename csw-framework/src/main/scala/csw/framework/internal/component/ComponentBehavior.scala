@@ -1,6 +1,6 @@
 package csw.framework.internal.component
 
-import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
+import akka.actor.typed.scaladsl.{ActorContext, MutableBehavior}
 import akka.actor.typed.{ActorRef, Behavior, PostStop, Signal}
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.commands.CommandResponse
@@ -42,7 +42,7 @@ private[framework] final class ComponentBehavior(
     commandResponseManager: CommandResponseManager,
     locationService: LocationService,
     loggerFactory: LoggerFactory
-) extends Behaviors.MutableBehavior[TopLevelActorMessage] {
+) extends MutableBehavior[TopLevelActorMessage] {
 
   import ctx.executionContext
 

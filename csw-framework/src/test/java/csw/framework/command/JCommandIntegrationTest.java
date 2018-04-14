@@ -1,16 +1,15 @@
 package csw.framework.command;
 
 import akka.actor.ActorSystem;
+import akka.actor.typed.internal.adapter.ActorSystemAdapter;
 import akka.stream.ActorMaterializer;
 import akka.stream.Materializer;
-import akka.actor.typed.internal.adapter.ActorSystemAdapter;
 import akka.testkit.typed.javadsl.TestProbe;
 import akka.util.Timeout;
 import com.typesafe.config.ConfigFactory;
 import csw.common.components.framework.SampleComponentState;
 import csw.framework.internal.wiring.FrameworkWiring;
 import csw.framework.internal.wiring.Standalone;
-import csw.messages.scaladsl.SupervisorLockMessage;
 import csw.messages.commands.CommandIssue;
 import csw.messages.commands.CommandResponse;
 import csw.messages.commands.CommandResponse.Completed;
@@ -27,9 +26,10 @@ import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.states.CurrentState;
 import csw.messages.params.states.DemandState;
-import csw.services.command.scaladsl.CurrentStateSubscription;
+import csw.messages.scaladsl.SupervisorLockMessage;
 import csw.services.command.javadsl.JCommandDistributor;
 import csw.services.command.javadsl.JCommandService;
+import csw.services.command.scaladsl.CurrentStateSubscription;
 import csw.services.location.commons.ClusterAwareSettings;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.location.javadsl.JLocationServiceFactory;
@@ -412,6 +412,6 @@ public class JCommandIntegrationTest {
         subscription.unsubscribe();
 
         hcdCmdService.submit(setup, timeout);
-        probe.expectNoMessage(Duration.create(20, TimeUnit.MILLISECONDS));
+        probe.expectNoMessage(java.time.Duration.ofMillis(20));
     }
 }

@@ -1,6 +1,6 @@
 package csw.framework.internal.pubsub
 
-import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
+import akka.actor.typed.scaladsl.{ActorContext, MutableBehavior}
 import akka.actor.typed.{ActorRef, Behavior, Signal, Terminated}
 import csw.messages.framework.PubSub
 import csw.messages.framework.PubSub.{Publish, Subscribe, Unsubscribe}
@@ -14,7 +14,7 @@ import csw.services.logging.scaladsl.{Logger, LoggerFactory}
  * @tparam T the type of the data which will be published or subscribed to using this actor
  */
 private[framework] class PubSubBehavior[T](ctx: ActorContext[PubSub[T]], loggerFactory: LoggerFactory)
-    extends Behaviors.MutableBehavior[PubSub[T]] {
+    extends MutableBehavior[PubSub[T]] {
   private val log: Logger = loggerFactory.getLogger(ctx)
 
   // list of subscribers who subscribe to the component using this pub-sub actor for the data of type [[T]]

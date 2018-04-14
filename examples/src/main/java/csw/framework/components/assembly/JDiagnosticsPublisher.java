@@ -3,9 +3,10 @@ package csw.framework.components.assembly;
 import akka.actor.typed.ActorRef;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
+import akka.actor.typed.javadsl.MutableBehavior;
 import csw.services.command.javadsl.JCommandService;
 
-public class JDiagnosticsPublisher extends Behaviors.MutableBehavior<DiagnosticPublisherMessages> {
+public class JDiagnosticsPublisher extends MutableBehavior<DiagnosticPublisherMessages> {
 
     private ActorContext<DiagnosticPublisherMessages> ctx;
     JCommandService runningComponent;

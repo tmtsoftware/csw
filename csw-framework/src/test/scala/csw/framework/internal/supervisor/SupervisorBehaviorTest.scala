@@ -69,7 +69,7 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
   private def createBehavior(timerScheduler: TimerScheduler[SupervisorMessage]): Behavior[ComponentMessage] = {
 
     Behaviors
-      .mutable[SupervisorMessage](
+      .setup[SupervisorMessage](
         ctx =>
           new SupervisorBehavior(
             ctx,

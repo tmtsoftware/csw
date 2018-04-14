@@ -309,8 +309,6 @@ class CommandsTest extends FunSpec with Matchers {
     }
   }
 
-
-
   // DEOPSCSW-392: Provide a helper method in commands to create unique runId
   describe("Examples of clone command") {
     val k1             = KeyType.IntKey.make("itest")

@@ -1,22 +1,22 @@
 package csw.services.logging.scaladsl
 
 import akka.actor.typed.Behavior
-import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
+import akka.actor.typed.scaladsl.{ActorContext, Behaviors, MutableBehavior}
 import csw.services.logging.LogCommand
+import csw.services.logging.LogCommand._
 import csw.services.logging.internal.LoggingLevels
 import csw.services.logging.internal.LoggingLevels.Level
-import csw.services.logging.LogCommand._
 import csw.services.logging.utils.LoggingTestSuite
 
 object TromboneMutableActor {
   def beh(componentName: String): Behavior[LogCommand] =
-    Behaviors.mutable[LogCommand](ctx ⇒ new TromboneMutableActor(ctx, new LoggerFactory(componentName)))
+    Behaviors.setup[LogCommand](ctx ⇒ new TromboneMutableActor(ctx, new LoggerFactory(componentName)))
 }
 
 class TromboneMutableActor(
     ctx: ActorContext[LogCommand],
     loggerFactory: LoggerFactory
-) extends Behaviors.MutableBehavior[LogCommand] {
+) extends MutableBehavior[LogCommand] {
   override def onMessage(msg: LogCommand): Behavior[LogCommand] = {
 
     val log: Logger = loggerFactory.getLogger(ctx)
