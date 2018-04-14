@@ -11,6 +11,7 @@ import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.helpers.Utils.{makeDistinctEvent, makeEvent}
 import csw.services.event.scaladsl.{EventPublisher, EventSubscriber}
 import org.scalatest.Matchers
+import org.scalatest.concurrent.Eventually
 
 import scala.collection.{immutable, mutable}
 import scala.concurrent.Future
@@ -18,9 +19,11 @@ import scala.concurrent.duration.DurationLong
 
 class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: EventSubscriber)(
     implicit val actorSystem: ActorSystem
-) extends Matchers {
+) extends Matchers
+    with Eventually {
 
   private implicit val mat: ActorMaterializer = ActorMaterializer()
+  implicit val patience: PatienceConfig       = PatienceConfig(5.seconds, 10.millis)
 
   def pubSub(): Unit = {
     val event1             = makeDistinctEvent(1)
@@ -28,10 +31,8 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     val testProbe          = TestProbe[Event]()(actorSystem.toTyped)
     val subscription       = subscriber.subscribe(Set(eventKey)).take(2).toMat(Sink.foreach(testProbe.ref ! _))(Keep.left).run()
 
-    Thread.sleep(2000)
-
-    publisher.publish(event1).await
     Thread.sleep(1000)
+    publisher.publish(event1).await
 
     testProbe.expectMessageType[SystemEvent].isInvalid shouldBe true
     testProbe.expectMessage(event1)
@@ -53,12 +54,10 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     val (subscription, seqF) = subscriber.subscribe(Set(event1.eventKey)).toMat(Sink.seq)(Keep.both).run()
     Thread.sleep(1000)
     publisher.publish(event1).await
-    Thread.sleep(1000)
 
     val (subscription2, seqF2) = subscriber.subscribe(Set(event2.eventKey)).toMat(Sink.seq)(Keep.both).run()
     Thread.sleep(1000)
     publisher.publish(event2).await
-    Thread.sleep(1000)
 
     subscription.unsubscribe().await
     subscription2.unsubscribe().await
@@ -85,15 +84,14 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
       queue.enqueue(x)
     }
 
-    Thread.sleep(10)
+    Thread.sleep(100)
 
-    cancellable = publisher.publish(eventGenerator, 2.millis)
-
-    Thread.sleep(1000) //TODO : Try to replace with Await
+    cancellable = publisher.publish(eventGenerator(), 2.millis)
+    Thread.sleep(500)
 
     // subscriber will receive an invalid event first as subscription happened before publishing started.
     // The 10 published events will follow
-    queue.size shouldBe 11
+    eventually(queue.size shouldBe 11)
 
     queue should contain allElementsOf Seq(Event.invalidEvent(eventKey)) ++ events
   }
@@ -105,16 +103,13 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     subscriber.subscribe(events.map(_.eventKey).toSet).runForeach { x =>
       queue.enqueue(x)
     }
-
     Thread.sleep(500)
 
     publisher.publish(Source.fromIterator(() ⇒ events.toIterator))
 
-    Thread.sleep(1000)
-
     // subscriber will receive an invalid event first as subscription happened before publishing started.
     // The 10 published events will follow
-    queue.size shouldBe 20
+    eventually(queue.size shouldBe 20)
 
     queue should contain theSameElementsAs events.map(x ⇒ Event.invalidEvent(x.eventKey)) ++ events
   }
@@ -132,7 +127,7 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     Thread.sleep(1000)
 
     publisher.publish(event3).await
-    Thread.sleep(1000)
+    Thread.sleep(500)
 
     subscription.unsubscribe().await
 
@@ -159,7 +154,6 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     val eventKey2 = distinctEvent2.eventKey
 
     publisher.publish(distinctEvent1).await
-    Thread.sleep(1000)
 
     val (subscription, seqF) = subscriber.subscribe(Set(eventKey1, eventKey2)).toMat(Sink.seq)(Keep.both).run()
     Thread.sleep(1000)
@@ -176,7 +170,6 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     val callback: Event ⇒ Unit = testProbe.ref ! _
 
     publisher.publish(event1).await
-    Thread.sleep(1000)
 
     val subscription = subscriber.subscribeCallback(Set(event1.eventKey), callback)
     Thread.sleep(1000)
@@ -196,7 +189,6 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     val callback: Event ⇒ Future[Event] = (event) ⇒ Future.successful(testProbe.ref ! event).map(_ ⇒ event)
 
     publisher.publish(event1).await
-    Thread.sleep(1000)
 
     val subscription = subscriber.subscribeAsync(Set(event1.eventKey), callback)
     Thread.sleep(1000)
@@ -214,7 +206,6 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     val probe  = TestProbe[Event]()(actorSystem.toTyped)
 
     publisher.publish(event1).await
-    Thread.sleep(1000)
 
     val subscription = subscriber.subscribeActorRef(Set(event1.eventKey), probe.ref)
     Thread.sleep(1000)

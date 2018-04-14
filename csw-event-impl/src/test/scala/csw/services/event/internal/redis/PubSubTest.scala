@@ -13,13 +13,15 @@ import csw.services.event.scaladsl.RedisFactory
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.scaladsl.LocationServiceFactory
 import io.lettuce.core.{RedisClient, RedisURI}
+import org.scalatest.concurrent.Eventually
+import org.scalatest.time.SpanSugar.convertDoubleToGrainOfTime
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import redis.embedded.RedisServer
 
 //DEOPSCSW-334: Publish an event
 //DEOPSCSW-335: Model for EventName that encapsulates the topic(or channel ) name
 //DEOPSCSW-337: Subscribe to an event based on prefix
-class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with EmbeddedRedis {
+class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with EmbeddedRedis with Eventually {
   private val seedPort        = 3558
   private val redisPort       = 6379
   private val clusterSettings = ClusterAwareSettings.joinLocal(seedPort)
@@ -30,12 +32,14 @@ class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with Embe
   private val redis = RedisServer.builder().setting(s"bind ${clusterSettings.hostname}").port(redisPort).build()
 
   private implicit val actorSystem: ActorSystem = clusterSettings.system
-  private val redisClient                       = RedisClient.create()
-  private val wiring                            = new Wiring(actorSystem)
-  private val redisFactory                      = new RedisFactory(redisClient, locationService, wiring)
-  private val publisher                         = redisFactory.publisher().await
-  private val subscriber                        = redisFactory.subscriber().await
-  private val framework                         = new EventServicePubSubTestFramework(publisher, subscriber)
+  implicit val patience: PatienceConfig         = PatienceConfig(5.seconds, 10.millis)
+
+  private val redisClient  = RedisClient.create()
+  private val wiring       = new Wiring(actorSystem)
+  private val redisFactory = new RedisFactory(redisClient, locationService, wiring)
+  private val publisher    = redisFactory.publisher().await
+  private val subscriber   = redisFactory.subscriber().await
+  private val framework    = new EventServicePubSubTestFramework(publisher, subscriber)
 
   override def beforeAll(): Unit = {
     redis.start()
@@ -116,7 +120,6 @@ class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with Embe
 
     publisher.publish(event1).await
 
-    Thread.sleep(1000)
-    redisCommands.get(eventKey) shouldBe event1
+    eventually(redisCommands.get(eventKey) shouldBe event1)
   }
 }
