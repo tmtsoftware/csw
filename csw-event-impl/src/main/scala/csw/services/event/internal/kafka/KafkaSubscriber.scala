@@ -1,14 +1,13 @@
 package csw.services.event.internal.kafka
 
 import akka.Done
-import akka.kafka.scaladsl.Consumer
-import akka.kafka.{ConsumerSettings, Subscription, Subscriptions}
+import akka.kafka.{scaladsl, ConsumerSettings, Subscription, Subscriptions}
 import akka.stream.Materializer
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import csw.messages.events._
 import csw.services.event.scaladsl.{EventSubscriber, EventSubscription}
 import csw_protobuf.events.PbEvent
-import org.apache.kafka.clients.consumer.KafkaConsumer
+import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.common.TopicPartition
 
 import scala.collection.JavaConverters._
@@ -18,7 +17,7 @@ class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(i
                                                                                protected val mat: Materializer)
     extends EventSubscriber {
 
-  val consumer: KafkaConsumer[String, Array[Byte]] = consumerSettings.createKafkaConsumer()
+  val consumer: Consumer[String, Array[Byte]] = consumerSettings.createKafkaConsumer()
 
   override def subscribe(eventKeys: Set[EventKey]): Source[Event, EventSubscription] = {
     val partitionToOffsets = getLatestOffsets(eventKeys)
@@ -50,7 +49,7 @@ class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(i
   override def get(eventKey: EventKey): Future[Event] = get(Set(eventKey)).map(_.head)
 
   private def getEventStream(subscription: Subscription) =
-    Consumer
+    scaladsl.Consumer
       .plainSource(consumerSettings, subscription)
       .map(record ⇒ Event.fromPb(PbEvent.parseFrom(record.value())))
 
