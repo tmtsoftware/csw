@@ -16,7 +16,6 @@ import io.lettuce.core.{RedisClient, RedisURI}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import redis.embedded.RedisServer
 
-//DEOPSCSW-335: Model for EventName that encapsulates the topic(or channel ) name
 //DEOPSCSW-334: Publish an event
 //DEOPSCSW-335: Model for EventName that encapsulates the topic(or channel ) name
 //DEOPSCSW-337: Subscribe to an event based on prefix

@@ -32,7 +32,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-//DEOPSCSW-335: Model for EventName that encapsulates the topic(or channel ) name
 //DEOPSCSW-334: Publish an event
 //DEOPSCSW-335: Model for EventName that encapsulates the topic(or channel ) name
 //DEOPSCSW-337: Subscribe to an event based on prefix

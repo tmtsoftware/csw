@@ -12,7 +12,6 @@ import csw.services.location.scaladsl.LocationServiceFactory
 import net.manub.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
 
-//DEOPSCSW-335: Model for EventName that encapsulates the topic(or channel ) name
 //DEOPSCSW-334: Publish an event
 //DEOPSCSW-335: Model for EventName that encapsulates the topic(or channel ) name
 //DEOPSCSW-337: Subscribe to an event based on prefix
