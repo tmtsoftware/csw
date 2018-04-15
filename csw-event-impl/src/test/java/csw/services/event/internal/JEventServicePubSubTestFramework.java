@@ -297,6 +297,7 @@ public class JEventServicePubSubTestFramework {
         EventKey eventKey = EventKey.apply(Prefix.apply("test"), EventName.apply("test"));
         Event event = subscriber.get(eventKey).get(10, TimeUnit.SECONDS);
 
+        Assert.assertTrue(((SystemEvent) event).isInvalid());
         Assert.assertEquals(Event$.MODULE$.invalidEvent(eventKey), event);
     }
 

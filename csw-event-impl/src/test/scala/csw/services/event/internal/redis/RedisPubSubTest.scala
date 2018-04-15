@@ -21,7 +21,7 @@ import redis.embedded.RedisServer
 //DEOPSCSW-334: Publish an event
 //DEOPSCSW-335: Model for EventName that encapsulates the topic(or channel ) name
 //DEOPSCSW-337: Subscribe to an event based on prefix
-class PubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with EmbeddedRedis with Eventually {
+class RedisPubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with EmbeddedRedis with Eventually {
   private val seedPort        = 3558
   private val redisPort       = 6379
   private val clusterSettings = ClusterAwareSettings.joinLocal(seedPort)

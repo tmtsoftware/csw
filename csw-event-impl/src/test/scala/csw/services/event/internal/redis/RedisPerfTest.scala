@@ -14,7 +14,7 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import redis.embedded.RedisServer
 
-class PerfTest extends FunSuite with Matchers with BeforeAndAfterAll with EmbeddedRedis with MockitoSugar {
+class RedisPerfTest extends FunSuite with Matchers with BeforeAndAfterAll with EmbeddedRedis with MockitoSugar {
   private val redisPort = 6379
   private val redis     = RedisServer.builder().setting("bind 127.0.0.1").port(redisPort).build()
 

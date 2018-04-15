@@ -1,4 +1,4 @@
-package csw.services.event.internal.kafka
+package csw.services.event.internal.redis
 
 import akka.actor.ActorSystem
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
@@ -10,58 +10,76 @@ import csw.services.event.exceptions.PublishFailed
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.helpers.{RegistrationFactory, Utils}
 import csw.services.event.internal.commons.{EventServiceConnection, Wiring}
-import csw.services.event.scaladsl.KafkaFactory
+import csw.services.event.scaladsl.RedisFactory
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.scaladsl.LocationServiceFactory
-import net.manub.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
+import io.lettuce.core.ClientOptions.DisconnectedBehavior
+import io.lettuce.core.{ClientOptions, RedisClient}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
+import redis.embedded.RedisServer
 
 import scala.concurrent.duration.DurationInt
 
 //DEOPSCSW-398: Propagate failure for publish api (eventGenerator)
-class FailureTest extends FunSuite with Matchers with MockitoSugar with BeforeAndAfterAll {
-  private val seedPort        = 3559
-  private val kafkaPort       = 6001
+class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with BeforeAndAfterAll {
+
+  private val seedPort        = 3560
+  private val redisPort       = 6379
   private val clusterSettings = ClusterAwareSettings.joinLocal(seedPort)
   private val locationService = LocationServiceFactory.withSettings(ClusterAwareSettings.onPort(seedPort))
-  private val tcpRegistration = RegistrationFactory.tcp(EventServiceConnection.value, kafkaPort)
+  private val tcpRegistration = RegistrationFactory.tcp(EventServiceConnection.value, redisPort)
   locationService.register(tcpRegistration).await
+
+  private val redis = RedisServer.builder().setting(s"bind ${clusterSettings.hostname}").port(redisPort).build()
 
   private implicit val actorSystem: ActorSystem = clusterSettings.system
 
-  private val brokers          = s"PLAINTEXT://${clusterSettings.hostname}:$kafkaPort"
-  private val brokerProperties = Map("listeners" → brokers, "advertised.listeners" → brokers, "message.max.bytes" → "1")
+  private val redisClient = RedisClient.create()
 
-  private val config = EmbeddedKafkaConfig(customBrokerProperties = brokerProperties)
+  redisClient.setOptions(
+    ClientOptions.builder().autoReconnect(false).disconnectedBehavior(DisconnectedBehavior.REJECT_COMMANDS).build()
+  )
 
   private val wiring       = new Wiring(actorSystem)
-  private val kafkaFactory = new KafkaFactory(locationService, wiring)
-  private val publisher    = kafkaFactory.publisher().await
+  private val redisFactory = new RedisFactory(redisClient, locationService, wiring)
 
   case class FailedEvent(event: Event, throwable: Throwable)
 
   override def beforeAll(): Unit = {
-    EmbeddedKafka.start()(config)
+    redis.start()
   }
 
   override def afterAll(): Unit = {
-    publisher.shutdown().await
-    EmbeddedKafka.stop()
+    redisClient.shutdown()
+    redis.stop()
     wiring.shutdown(TestFinishedReason).await
   }
 
-  test("Kafka - failure in publishing should fail future with PublishFailed exception") {
+  test("Redis - failure in publishing should fail future with PublishFailed exception") {
+    val publisher = redisFactory.publisher().await
 
-    // simulate publishing failure as message size is greater than message.max.bytes(1 byte) configured in broker
+    publisher.publish(Utils.makeEvent(1)).await
+
+    publisher.shutdown().await
+
+    Thread.sleep(1000) // wait till the publisher is shutdown successfully
+
     intercept[PublishFailed] {
       publisher.publish(Utils.makeEvent(2)).await
     }
   }
 
-  test("Kafka - handle failed publish event with a callback") {
+  test("Redis - handle failed publish event with a callback") {
+    val publisher = redisFactory.publisher().await
 
-    val testProbe   = TestProbe[FailedEvent]()(actorSystem.toTyped)
+    val testProbe = TestProbe[FailedEvent]()(actorSystem.toTyped)
+    publisher.publish(Utils.makeEvent(1)).await
+
+    publisher.shutdown().await
+
+    Thread.sleep(1000) // wait till the publisher is shutdown successfully
+
     val event       = Utils.makeEvent(1)
     val eventStream = Source.single(event)
 
@@ -73,9 +91,17 @@ class FailureTest extends FunSuite with Matchers with MockitoSugar with BeforeAn
     failedEvent.throwable shouldBe a[PublishFailed]
   }
 
-  test("Kafka - handle failed publish event with an eventGenerator and a callback") {
+  test("Redis - handle failed publish event with an eventGenerator and a callback") {
+    val publisher = redisFactory.publisher().await
+
     val testProbe = TestProbe[FailedEvent]()(actorSystem.toTyped)
-    val event     = Utils.makeEvent(1)
+    publisher.publish(Utils.makeEvent(1)).await
+
+    publisher.shutdown().await
+
+    Thread.sleep(1000) // wait till the publisher is shutdown successfully
+
+    val event = Utils.makeEvent(1)
 
     publisher.publish(event, 20.millis, (event, ex) ⇒ testProbe.ref ! FailedEvent(event, ex))
 

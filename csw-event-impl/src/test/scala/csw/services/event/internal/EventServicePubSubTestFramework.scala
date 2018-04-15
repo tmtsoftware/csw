@@ -231,10 +231,14 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
   }
 
   def retrieveInvalidEventOnGet(): Unit = {
+    val prefix    = Prefix("wfos.blue.test_filter")
+    val eventName = EventName("move")
+    val eventF    = subscriber.get(EventKey(prefix, eventName))
+    val event     = eventF.await.asInstanceOf[SystemEvent]
 
-    val eventF = subscriber.get(EventKey("test"))
-
-    eventF.await.asInstanceOf[SystemEvent].isInvalid shouldBe true
+    event.isInvalid shouldBe true
+    event.source shouldBe prefix
+    event.eventName shouldBe eventName
   }
 
   def retrieveEventsForMultipleEventKeysOnGet(): Unit = {

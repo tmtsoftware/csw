@@ -15,7 +15,7 @@ import org.scalatest.{BeforeAndAfterAll, FunSuite}
 //DEOPSCSW-334: Publish an event
 //DEOPSCSW-335: Model for EventName that encapsulates the topic(or channel ) name
 //DEOPSCSW-337: Subscribe to an event based on prefix
-class PubSubTest extends FunSuite with EmbeddedKafka with BeforeAndAfterAll {
+class KafkaPubSubTest extends FunSuite with EmbeddedKafka with BeforeAndAfterAll {
   private val seedPort        = 3561
   private val kafkaPort       = 6001
   private val clusterSettings = ClusterAwareSettings.joinLocal(seedPort)
