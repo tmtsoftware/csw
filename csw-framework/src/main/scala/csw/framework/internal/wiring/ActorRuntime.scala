@@ -11,6 +11,7 @@ import csw.services.logging.scaladsl.LoggingSystemFactory
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
+// $COVERAGE-OFF$
 /**
  * A convenient class wrapping actor system and providing handles for execution context, materializer and clean up of actor system
  */
@@ -26,3 +27,4 @@ private[framework] class ActorRuntime(_actorSystem: ActorSystem) {
 
   def shutdown(reason: Reason): Future[Done] = coordinatedShutdown.run(reason)
 }
+// $COVERAGE-ON$

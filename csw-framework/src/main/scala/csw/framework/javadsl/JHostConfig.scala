@@ -2,6 +2,7 @@ package csw.framework.javadsl
 
 import csw.framework.deploy.hostconfig.HostConfig
 
+// $COVERAGE-OFF$
 /**
  * Helper instance for Java to start [[csw.framework.deploy.hostconfig.HostConfig]] app
  */
@@ -16,3 +17,4 @@ object JHostConfig {
   def start(name: String, args: Array[String]): Unit = HostConfig.start(name: String, args: Array[String])
 
 }
+// $COVERAGE-ON$

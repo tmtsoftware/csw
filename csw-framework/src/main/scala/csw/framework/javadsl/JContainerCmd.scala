@@ -8,6 +8,7 @@ import csw.framework.deploy.containercmd.ContainerCmd
 
 import scala.compat.java8.OptionConverters._
 
+// $COVERAGE-OFF$
 /**
  * Helper instance for Java to start [[csw.framework.deploy.containercmd.ContainerCmd]] app
  */
@@ -25,3 +26,4 @@ object JContainerCmd {
   def start(name: String, args: Array[String], defaultConfig: Optional[Config]): ActorRef[_] =
     ContainerCmd.start(name, args, defaultConfig.asScala)
 }
+// $COVERAGE-ON$

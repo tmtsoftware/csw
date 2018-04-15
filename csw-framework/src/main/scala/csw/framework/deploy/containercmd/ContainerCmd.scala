@@ -18,6 +18,7 @@ import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{Await, Future}
 import scala.util.control.NonFatal
 
+// $COVERAGE-OFF$
 object ContainerCmd {
 
   /**
@@ -94,3 +95,4 @@ private[containercmd] class ContainerCmd(
 
   private def shutdown(reason: Reason) = Await.result(wiring.actorRuntime.shutdown(reason), 10.seconds)
 }
+// $COVERAGE-ON$
