@@ -23,7 +23,6 @@ import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class JEventServicePubSubTestFramework {
 
@@ -52,10 +51,9 @@ public class JEventServicePubSubTestFramework {
         set.add(eventKey);
 
         IEventSubscription subscription = subscriber.subscribe(set).take(2).toMat(Sink.foreach(event -> probe.ref().tell(event)), Keep.left()).run(mat);
-        Thread.sleep(2000);
+        Thread.sleep(500);
 
         publisher.publish(event1).get(10, TimeUnit.SECONDS);
-        Thread.sleep(1000);
 
         probe.expectMessage(Event$.MODULE$.invalidEvent(eventKey));
         probe.expectMessage(event1);
@@ -63,8 +61,7 @@ public class JEventServicePubSubTestFramework {
         subscription.unsubscribe().get(10, TimeUnit.SECONDS);
 
         publisher.publish(event1).get(10, TimeUnit.SECONDS);
-
-        probe.expectNoMessage(Duration.ofSeconds(2));
+        probe.expectNoMessage(Duration.ofMillis(200));
     }
 
     public void subscribeIndependently() throws InterruptedException, ExecutionException, TimeoutException {
@@ -75,14 +72,13 @@ public class JEventServicePubSubTestFramework {
         Event event2 = new SystemEvent(prefix, eventName2);
 
         Pair<IEventSubscription, CompletionStage<List<Event>>> pair = subscriber.subscribe(Collections.singleton(event1.eventKey())).toMat(Sink.seq(), Keep.both()).run(mat);
-        Thread.sleep(1000);
+        Thread.sleep(500);
         publisher.publish(event1).get(10, TimeUnit.SECONDS);
-        Thread.sleep(1000);
 
         Pair<IEventSubscription, CompletionStage<List<Event>>> pair2 = subscriber.subscribe(Collections.singleton(event2.eventKey())).toMat(Sink.seq(), Keep.both()).run(mat);
-        Thread.sleep(1000);
+        Thread.sleep(500);
         publisher.publish(event2).get(10, TimeUnit.SECONDS);
-        Thread.sleep(1000);
+        Thread.sleep(500);
 
         pair.first().unsubscribe().get(10, TimeUnit.SECONDS);
         pair2.first().unsubscribe().get(10, TimeUnit.SECONDS);
@@ -162,10 +158,10 @@ public class JEventServicePubSubTestFramework {
         publisher.publish(event2).get(10, TimeUnit.SECONDS); // latest event before subscribing
 
         Pair<IEventSubscription, CompletionStage<List<Event>>> pair = subscriber.subscribe(Collections.singleton(eventKey)).toMat(Sink.seq(), Keep.both()).run(mat);
-        Thread.sleep(1000);
+        Thread.sleep(500);
 
         publisher.publish(event3).get(10, TimeUnit.SECONDS);
-        Thread.sleep(1000);
+        Thread.sleep(500);
 
         pair.first().unsubscribe().get(10, TimeUnit.SECONDS);
 
@@ -181,7 +177,7 @@ public class JEventServicePubSubTestFramework {
         EventKey eventKey = EventKey.apply(Prefix.apply("test"), EventName.apply("test"));
 
         Pair<IEventSubscription, CompletionStage<List<Event>>> pair = subscriber.subscribe(Collections.singleton(eventKey)).toMat(Sink.seq(), Keep.both()).run(mat);
-        Thread.sleep(1000);
+        Thread.sleep(500);
 
         pair.first().unsubscribe().get(10, TimeUnit.SECONDS);
 
@@ -196,14 +192,14 @@ public class JEventServicePubSubTestFramework {
         EventKey eventKey2 = distinctEvent2.eventKey();
 
         publisher.publish(distinctEvent1).get(10, TimeUnit.SECONDS);
-        Thread.sleep(1000);
+        Thread.sleep(500);
 
         Set<EventKey> eventKeys = new HashSet<>();
         eventKeys.add(eventKey1);
         eventKeys.add(eventKey2);
 
         Pair<IEventSubscription, CompletionStage<List<Event>>> pair = subscriber.subscribe(eventKeys).toMat(Sink.seq(), Keep.both()).run(mat);
-        Thread.sleep(1000);
+        Thread.sleep(500);
 
         pair.first().unsubscribe().get(10, TimeUnit.SECONDS);
 
@@ -222,18 +218,15 @@ public class JEventServicePubSubTestFramework {
         TestProbe probe = TestProbe.create(Adapter.toTyped(actorSystem));
 
         publisher.publish(event1).get(10, TimeUnit.SECONDS);
-        Thread.sleep(1000);
+        Thread.sleep(500);
 
         IEventSubscription subscription = subscriber.subscribeCallback(Collections.singleton(event1.eventKey()), event -> probe.ref().tell(event), mat);
-        Thread.sleep(1000);
-
         probe.expectMessage(event1);
 
         subscription.unsubscribe().get(10, TimeUnit.SECONDS);
 
         publisher.publish(event1).get(10, TimeUnit.SECONDS);
-
-        probe.expectNoMessage(Duration.ofSeconds(2));
+        probe.expectNoMessage(Duration.ofMillis(200));
     }
 
     public void retrieveEventUsingAsyncCallback() throws InterruptedException, TimeoutException, ExecutionException {
@@ -250,15 +243,12 @@ public class JEventServicePubSubTestFramework {
         Thread.sleep(1000);
 
         IEventSubscription subscription = subscriber.subscribeAsync(Collections.singleton(event1.eventKey()), asyncCallback, mat);
-        Thread.sleep(1000);
-
         probe.expectMessage(event1);
 
         subscription.unsubscribe().get(10, TimeUnit.SECONDS);
 
         publisher.publish(event1).get(10, TimeUnit.SECONDS);
-
-        probe.expectNoMessage(Duration.ofSeconds(2));
+        probe.expectNoMessage(Duration.ofMillis(200));
 
     }
 
@@ -271,15 +261,12 @@ public class JEventServicePubSubTestFramework {
         Thread.sleep(1000);
 
         IEventSubscription subscription = subscriber.subscribeActorRef(Collections.singleton(event1.eventKey()), probe.ref(), mat);
-        Thread.sleep(1000);
-
         probe.expectMessage(event1);
 
         subscription.unsubscribe().get(10, TimeUnit.SECONDS);
 
         publisher.publish(event1).get(10, TimeUnit.SECONDS);
-
-        probe.expectNoMessage(Duration.ofSeconds(2));
+        probe.expectNoMessage(Duration.ofMillis(200));
     }
 
     public void get() throws InterruptedException, ExecutionException, TimeoutException {
