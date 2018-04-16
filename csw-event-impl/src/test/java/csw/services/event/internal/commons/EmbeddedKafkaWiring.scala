@@ -5,11 +5,17 @@ import net.manub.embeddedkafka.EmbeddedKafkaConfig
 
 object EmbeddedKafkaWiring {
 
-  def embeddedKafkaConfig(clusterSettings: ClusterSettings): EmbeddedKafkaConfig = {
-    val kafkaPort        = 6001
-    val brokers          = s"PLAINTEXT://${clusterSettings.hostname}:$kafkaPort"
-    val brokerProperties = Map("listeners" → brokers, "advertised.listeners" → brokers)
+  val kafkaPort = 6001
 
-    EmbeddedKafkaConfig(customBrokerProperties = brokerProperties)
+  def embeddedKafkaConfig(clusterSettings: ClusterSettings): EmbeddedKafkaConfig =
+    EmbeddedKafkaConfig(customBrokerProperties = defaultBrokerProperties(clusterSettings.hostname))
+
+  def embeddedKafkaConfigForFailure(clusterSettings: ClusterSettings): EmbeddedKafkaConfig = EmbeddedKafkaConfig(
+    customBrokerProperties = defaultBrokerProperties(clusterSettings.hostname) + ("message.max.bytes" → "1")
+  )
+
+  private def defaultBrokerProperties(hostName: String) = {
+    val brokers = s"PLAINTEXT://$hostName:$kafkaPort"
+    Map("listeners" → brokers, "advertised.listeners" → brokers)
   }
 }

@@ -5,11 +5,10 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.scaladsl.Source
 import akka.testkit.typed.scaladsl.TestProbe
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
-import csw.messages.events.Event
 import csw.services.event.exceptions.PublishFailed
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.helpers.{RegistrationFactory, Utils}
-import csw.services.event.internal.commons.{EventServiceConnection, Wiring}
+import csw.services.event.internal.commons.{EventServiceConnection, FailedEvent, Wiring}
 import csw.services.event.scaladsl.KafkaFactory
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.scaladsl.LocationServiceFactory
@@ -38,8 +37,6 @@ class KafkaFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
   private val wiring       = new Wiring(actorSystem)
   private val kafkaFactory = new KafkaFactory(locationService, wiring)
   private val publisher    = kafkaFactory.publisher().await
-
-  case class FailedEvent(event: Event, throwable: Throwable)
 
   override def beforeAll(): Unit = {
     EmbeddedKafka.start()(config)

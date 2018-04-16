@@ -16,10 +16,10 @@ trait EventPublisher {
 
   def publish[Mat](source: Source[Event, Mat], onError: (Event, Throwable) ⇒ Unit): Mat
 
+  def publish(eventGenerator: => Event, every: FiniteDuration): Cancellable = publish(eventStream(eventGenerator, every))
+
   def publish(eventGenerator: => Event, every: FiniteDuration, onError: (Event, Throwable) ⇒ Unit): Cancellable =
     publish(eventStream(eventGenerator, every), onError)
-
-  def publish(eventGenerator: => Event, every: FiniteDuration): Cancellable = publish(eventStream(eventGenerator, every))
 
   def shutdown(): Future[Done]
 
