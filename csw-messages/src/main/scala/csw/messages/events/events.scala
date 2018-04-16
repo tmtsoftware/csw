@@ -124,7 +124,7 @@ object Event {
 
   def invalidEvent(eventKey: EventKey): SystemEvent =
     SystemEvent(eventKey.source, eventKey.eventName)
-      .copy(eventId = Id("-1"), eventTime = EventTime.toEventTime(Instant.ofEpochMilli(-1)))
+      .copy(eventId = Id("-1"), eventTime = EventTime(Instant.ofEpochMilli(-1)))
 }
 
 /**
@@ -160,7 +160,7 @@ case class SystemEvent private (
    */
   def toPb: PbEvent = Event.typeMapper[SystemEvent].toBase(this)
 
-  def isInvalid: Boolean = eventTime == EventTime.toEventTime(Instant.ofEpochMilli(-1))
+  def isInvalid: Boolean = eventTime == EventTime(Instant.ofEpochMilli(-1))
 }
 
 object SystemEvent {

@@ -26,24 +26,9 @@ object EventTime {
    */
   def apply(): EventTime = new EventTime(Instant.now(Clock.systemUTC()))
 
-  /**
-   * Creates an EventTime out of provided time
-   *
-   * @param time an Instant which is fed to create an EventTime
-   * @return an instance of EventTime
-   */
-  def toEventTime(time: Instant): EventTime = EventTime(time)
-
-  /**
-   * Creates an EventTime out of current Instant
-   *
-   * @return an instance of EventTime
-   */
-  def toCurrent: EventTime = EventTime()
-
   private[messages] implicit val format: Format[EventTime] = new Format[EventTime] {
     def writes(et: EventTime): JsValue            = JsString(et.toString)
-    def reads(json: JsValue): JsResult[EventTime] = JsSuccess(EventTime.toEventTime(json.as[Instant]))
+    def reads(json: JsValue): JsResult[EventTime] = JsSuccess(EventTime(json.as[Instant]))
   }
 
   //used by Protobuf for conversion between Timestamp <==> EventTime
