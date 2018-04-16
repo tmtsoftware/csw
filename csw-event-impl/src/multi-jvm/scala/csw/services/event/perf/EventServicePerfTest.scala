@@ -13,7 +13,7 @@ import org.HdrHistogram.Histogram
 import org.scalatest._
 
 import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext}
 
 object EventServicePerfTest extends MultiNodeConfig {
   val first: RoleName  = role("first")
@@ -68,65 +68,6 @@ class EventServicePerfTest
     }
     multiNodeSpecAfterAll()
   }
-
-  val scenarios = List(
-    TestSettings(
-      testName = "warmup",
-      totalTestMsgs = adjustedTotalMessages(10000),
-      payloadSize = 100,
-      publisherSubscriberPairs = 1,
-      singlePublisher = false
-    ),
-    TestSettings(
-      testName = "1-to-1",
-      totalTestMsgs = adjustedTotalMessages(10000),
-      payloadSize = 100,
-      publisherSubscriberPairs = 1,
-      singlePublisher = false
-    ),
-    TestSettings(
-      testName = "1-to-1-size-1k",
-      totalTestMsgs = adjustedTotalMessages(10000),
-      payloadSize = 1000,
-      publisherSubscriberPairs = 1,
-      singlePublisher = false
-    ),
-    TestSettings(
-      testName = "1-to-1-size-10k",
-      totalTestMsgs = adjustedTotalMessages(10000),
-      payloadSize = 10000,
-      publisherSubscriberPairs = 1,
-      singlePublisher = false
-    ),
-    TestSettings(
-      testName = "5-to-5",
-      totalTestMsgs = adjustedTotalMessages(5000),
-      payloadSize = 100,
-      publisherSubscriberPairs = 5,
-      singlePublisher = false
-    ),
-    TestSettings(
-      testName = "10-to-10",
-      totalTestMsgs = adjustedTotalMessages(5000),
-      payloadSize = 100,
-      publisherSubscriberPairs = 10,
-      singlePublisher = false
-    ),
-    TestSettings(
-      testName = "1-to-5",
-      totalTestMsgs = adjustedTotalMessages(5000),
-      payloadSize = 100,
-      publisherSubscriberPairs = 5,
-      singlePublisher = true
-    ),
-    TestSettings(
-      testName = "1-to-10",
-      totalTestMsgs = adjustedTotalMessages(5000),
-      payloadSize = 100,
-      publisherSubscriberPairs = 10,
-      singlePublisher = true
-    )
-  )
 
   def testScenario(testSettings: TestSettings, benchmarkFileReporter: BenchmarkFileReporter): Unit = {
     import testSettings._
@@ -214,16 +155,17 @@ class EventServicePerfTest
       plot99 = latencyPlots.plot99.addAll(latencyPlotsTmp.plot99)
     )
 
-//    println(s"Histogram of latencies in microseconds (µs) [${self.path.name}].")
     aggregatedHistogram.outputPercentileDistribution(
-      new PrintStream(BenchmarkFileReporter.apply(s"PerfSpec", system, logSettings = false).fos),
+      new PrintStream(BenchmarkFileReporter.apply(s"Aggregated-$testName", system, logSettings = false).fos),
       1000.0
     )
   }
 
-  val reporter = BenchmarkFileReporter("PerfSpec", system)
-  for (s ← scenarios) {
-    test(s"Perf results must be great for ${s.testName} with payloadSize = ${s.payloadSize}") {
+  private val reporter  = BenchmarkFileReporter("PerfSpec", system)
+  private val scenarios = new Scenarios(testConfigs)
+
+  for (s ← scenarios.warmUp :: scenarios.all) {
+    ignore(s"Perf results must be great for ${s.testName} with payloadSize = ${s.payloadSize}") {
       testScenario(s, reporter)
     }
   }

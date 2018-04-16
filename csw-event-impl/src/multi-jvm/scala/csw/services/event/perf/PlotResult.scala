@@ -41,7 +41,7 @@ final case class LatencyPlots(
 
     plot50.labels.zipWithIndex.foreach {
       case (label, index) ⇒
-        println(s"$label: ${if (label.length < 7) "\t\t" else "\t"} ${plot50.results(index)} \t\t ${plot90
+        println(s"$label: ${if (label.length < 6) "\t\t" else "\t"} ${plot50.results(index)} \t\t ${plot90
           .results(index)} \t\t ${plot99.results(index)} \t")
     }
     println("===================================================================================")

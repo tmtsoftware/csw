@@ -2,9 +2,9 @@ package csw.services.event.perf
 
 import java.time.Instant
 
-import csw.messages.events.{EventKey, EventName, EventTime, SystemEvent}
+import csw.messages.events.{EventName, EventTime, SystemEvent}
 import csw.messages.params.generics.Key
-import csw.messages.params.generics.KeyType.{ByteKey, LongKey, StringKey}
+import csw.messages.params.generics.KeyType.ByteKey
 import csw.messages.params.models.{Id, Prefix}
 
 object EventUtils {

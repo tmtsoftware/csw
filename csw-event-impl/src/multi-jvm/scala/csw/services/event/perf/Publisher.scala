@@ -6,7 +6,6 @@ import csw.services.event.perf.EventUtils._
 import csw.services.event.scaladsl.EventPublisher
 
 import scala.concurrent.ExecutionContext
-import scala.concurrent.duration.DurationLong
 
 class Publisher(testSettings: TestSettings, testConfigs: TestConfigs, id: Int)(implicit val system: ActorSystem) {
   import testConfigs._

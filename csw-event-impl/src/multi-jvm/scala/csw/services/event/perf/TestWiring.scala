@@ -1,7 +1,6 @@
 package csw.services.event.perf
 
 import akka.actor.ActorSystem
-import com.typesafe.config.Config
 import csw.services.event.internal.commons.Wiring
 import csw.services.event.scaladsl.{EventPublisher, EventSubscriber, KafkaFactory, RedisFactory}
 import csw.services.location.scaladsl.LocationService

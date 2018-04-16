@@ -6,7 +6,7 @@ import EventUtils._
 
 class ResultReporter(name: String, actorSystem: ActorSystem) {
 
-  val reporter = BenchmarkFileReporter(name, actorSystem)
+  val reporter = BenchmarkFileReporter(name, actorSystem, logSettings = false)
 
   def printResult(
       id: Int,
