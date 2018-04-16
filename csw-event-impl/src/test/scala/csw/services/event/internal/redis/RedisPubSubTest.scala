@@ -51,68 +51,68 @@ class RedisPubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with
     wiring.shutdown(TestFinishedReason).await
   }
 
-  test("Redis - should be able to publish and subscribe an event") {
+  test("should be able to publish and subscribe an event") {
     framework.pubSub()
   }
 
-  test("Redis - should be able to make independent subscriptions") {
+  test("should be able to make independent subscriptions") {
     framework.subscribeIndependently()
   }
 
-  test("Redis - should be able to publish concurrently to the same channel") {
+  test("should be able to publish concurrently to the same channel") {
     framework.publishMultiple()
   }
 
-  test("Redis - should be able to publish concurrently to the different channel") {
+  test("should be able to publish concurrently to the different channel") {
     framework.publishMultipleToDifferentChannels()
   }
 
   //DEOPSCSW-340: Provide most recently published event for subscribed prefix and name
-  test("Redis - should be able to retrieve recently published event on subscription") {
+  test("should be able to retrieve recently published event on subscription") {
     framework.retrieveRecentlyPublished()
   }
 
   //DEOPSCSW-340: Provide most recently published event for subscribed prefix and name
-  test("Redis - should be able to retrieve InvalidEvent") {
+  test("should be able to retrieve InvalidEvent") {
     framework.retrieveInvalidEvent()
   }
 
   //DEOPSCSW-340: Provide most recently published event for subscribed prefix and name
-  test("Redis - should be able to retrieve only valid events when one of the subscribed events keys has published events") {
+  test("should be able to retrieve only valid events when one of the subscribed events keys has published events") {
     framework.retrieveMultipleSubscribedEvents()
   }
 
   //DEOPSCSW-338: Provide callback for Event alerts
-  test("Redis - should be able to subscribe with callback") {
+  test("should be able to subscribe with callback") {
     framework.retrieveEventUsingCallback()
   }
 
   //DEOPSCSW-338: Provide callback for Event alerts
-  test("Redis - should be able to subscribe with async callback") {
+  test("should be able to subscribe with async callback") {
     framework.retrieveEventUsingAsyncCallback()
   }
 
   //DEOPSCSW-339: Provide actor ref to alert about Event arrival
-  test("Redis - should be able to subscribe with an ActorRef") {
+  test("should be able to subscribe with an ActorRef") {
     framework.retrieveEventUsingActorRef()
   }
 
   //DEOPSCSW-344: Retrieve recently published event using prefix and eventname
-  test("Redis - should be able to get an event without subscribing for it") {
+  test("should be able to get an event without subscribing for it") {
     framework.get()
   }
 
   //DEOPSCSW-344: Retrieve recently published event using prefix and eventname
-  test("Redis - should be able to get InvalidEvent") {
+  test("should be able to get InvalidEvent") {
     framework.retrieveInvalidEventOnGet()
   }
 
   //DEOPSCSW-344: Retrieve recently published event using prefix and eventname
-  test("Redis - should be able to get events for multiple event keys") {
+  test("should be able to get events for multiple event keys") {
     framework.retrieveEventsForMultipleEventKeysOnGet()
   }
 
-  test("Redis - should be able to persist the event in DB against the same key as channel name while publishing") {
+  test("should be able to persist the event in DB against the same key as channel name while publishing") {
     val event1             = makeEvent(1)
     val eventKey: EventKey = event1.eventKey
     val redisCommands =
