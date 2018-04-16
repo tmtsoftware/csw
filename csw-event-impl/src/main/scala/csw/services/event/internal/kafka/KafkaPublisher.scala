@@ -19,7 +19,7 @@ class KafkaPublisher(producerSettings: ProducerSettings[String, Array[Byte]])(im
 
   private val kafkaProducer = producerSettings.createKafkaProducer()
 
-  override def publish[Mat](stream: Source[Event, Mat], onError: (Event, Throwable) ⇒ Unit): Mat =
+  override def publish[Mat](stream: Source[Event, Mat], onError: (Event, PublishFailed) ⇒ Unit): Mat =
     publishWithOptionalRecovery(stream, Some(onError))
 
   override def publish(event: Event): Future[Done] = {
@@ -47,7 +47,10 @@ class KafkaPublisher(producerSettings: ProducerSettings[String, Array[Byte]])(im
 
   override def publish[Mat](source: Source[Event, Mat]): Mat = publishWithOptionalRecovery(source, None)
 
-  private def publishWithOptionalRecovery[Mat](source: Source[Event, Mat], maybeOnError: Option[(Event, Throwable) ⇒ Unit]): Mat =
+  private def publishWithOptionalRecovery[Mat](
+      source: Source[Event, Mat],
+      maybeOnError: Option[(Event, PublishFailed) ⇒ Unit]
+  ): Mat =
     source
       .mapAsync(1) {
         maybeOnError match {

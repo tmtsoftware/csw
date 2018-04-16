@@ -22,16 +22,17 @@ class RedisPublisher(redisURI: RedisURI, redisClient: RedisClient)(implicit ec: 
   private lazy val asyncConnectionF: Future[RedisAsyncCommands[EventKey, Event]] =
     redisClient.connectAsync(EventServiceCodec, redisURI).toScala.map(_.async())
 
-  override def publish[Mat](source: Source[Event, Mat], onError: (Event, Throwable) ⇒ Unit): Mat =
+  override def publish[Mat](source: Source[Event, Mat], onError: (Event, PublishFailed) ⇒ Unit): Mat =
     publishWithOptionalRecovery(source, Some(onError))
 
   override def publish[Mat](source: Source[Event, Mat]): Mat = publishWithOptionalRecovery(source, None)
 
+  // publish api will fail only if `publish` fails on redis-server and not if `publish` is successful and `set` fails on redis-server
   override def publish(event: Event): Future[Done] =
     async {
       val commands = await(asyncConnectionF)
       await(commands.publish(event.eventKey, event).toScala)
-      await(commands.set(event.eventKey, event).toScala)
+      await(commands.set(event.eventKey, event).toScala.recover { case NonFatal(ex) ⇒ logger.error(ex.getMessage, ex = ex) })
       Done
     } recover {
       case NonFatal(ex) ⇒ throw PublishFailed(event, ex.getMessage)
@@ -39,7 +40,10 @@ class RedisPublisher(redisURI: RedisURI, redisClient: RedisClient)(implicit ec: 
 
   override def shutdown(): Future[Done] = asyncConnectionF.flatMap(_.quit().toScala).map(_ ⇒ Done)
 
-  private def publishWithOptionalRecovery[Mat](source: Source[Event, Mat], maybeOnError: Option[(Event, Throwable) ⇒ Unit]): Mat =
+  private def publishWithOptionalRecovery[Mat](
+      source: Source[Event, Mat],
+      maybeOnError: Option[(Event, PublishFailed) ⇒ Unit]
+  ): Mat =
     source
       .mapAsync(1) {
         maybeOnError match {

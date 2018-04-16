@@ -7,6 +7,7 @@ import akka.Done
 import akka.actor.Cancellable
 import akka.stream.javadsl.Source
 import csw.messages.events.Event
+import csw.services.event.exceptions.PublishFailed
 import csw.services.event.scaladsl.EventPublisher
 
 import scala.compat.java8.FunctionConverters.{enrichAsScalaFromBiConsumer, enrichAsScalaFromSupplier}
@@ -18,13 +19,13 @@ abstract class IEventPublisher(eventPublisher: EventPublisher) {
 
   def publish[Mat](source: Source[Event, Mat]): Mat = eventPublisher.publish(source.asScala)
 
-  def publish[Mat](source: Source[Event, Mat], onError: BiConsumer[Event, Throwable]): Mat =
+  def publish[Mat](source: Source[Event, Mat], onError: BiConsumer[Event, PublishFailed]): Mat =
     eventPublisher.publish(source.asScala, onError.asScala)
 
   def publish(eventGenerator: Supplier[Event], every: FiniteDuration): Cancellable =
     eventPublisher.publish(eventGenerator.asScala.apply(), every)
 
-  def publish(eventGenerator: Supplier[Event], every: FiniteDuration, onError: BiConsumer[Event, Throwable]): Cancellable =
+  def publish(eventGenerator: Supplier[Event], every: FiniteDuration, onError: BiConsumer[Event, PublishFailed]): Cancellable =
     eventPublisher.publish(eventGenerator.asScala.apply(), every, onError.asScala)
 
   def shutdown(): CompletableFuture[Done] = eventPublisher.shutdown().toJava.toCompletableFuture
