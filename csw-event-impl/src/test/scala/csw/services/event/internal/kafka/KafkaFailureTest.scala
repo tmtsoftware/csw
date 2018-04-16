@@ -51,7 +51,7 @@ class KafkaFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
     wiring.shutdown(TestFinishedReason).await
   }
 
-  test("Kafka - failure in publishing should fail future with PublishFailed exception") {
+  test("failure in publishing should fail future with PublishFailed exception") {
 
     // simulate publishing failure as message size is greater than message.max.bytes(1 byte) configured in broker
     intercept[PublishFailed] {
@@ -59,7 +59,7 @@ class KafkaFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
     }
   }
 
-  test("Kafka - handle failed publish event with a callback") {
+  test("handle failed publish event with a callback") {
 
     val testProbe   = TestProbe[FailedEvent]()(actorSystem.toTyped)
     val event       = Utils.makeEvent(1)
@@ -73,7 +73,7 @@ class KafkaFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
     failedEvent.throwable shouldBe a[PublishFailed]
   }
 
-  test("Kafka - handle failed publish event with an eventGenerator and a callback") {
+  test("handle failed publish event with an eventGenerator and a callback") {
     val testProbe = TestProbe[FailedEvent]()(actorSystem.toTyped)
     val event     = Utils.makeEvent(1)
 

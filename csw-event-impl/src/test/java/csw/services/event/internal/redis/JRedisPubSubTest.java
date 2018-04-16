@@ -35,7 +35,7 @@ import java.util.concurrent.TimeoutException;
 //DEOPSCSW-334: Publish an event
 //DEOPSCSW-335: Model for EventName that encapsulates the topic(or channel ) name
 //DEOPSCSW-337: Subscribe to an event based on prefix
-public class JPubSubTest {
+public class JRedisPubSubTest {
     private static int seedPort = 3562;
     private static int redisPort = 6379;
 
