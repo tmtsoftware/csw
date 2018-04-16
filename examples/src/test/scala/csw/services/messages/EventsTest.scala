@@ -23,10 +23,10 @@ class EventsTest extends FunSpec with Matchers {
       val anHourAgo: EventTime = EventTime(Instant.now().minusSeconds(3600))
 
       //current event time using utility function
-      val currentTime: EventTime = EventTime.toCurrent
+      val currentTime: EventTime = EventTime()
 
       //some past time using utility function
-      val aDayAgo = EventTime.toEventTime(Instant.now.minusSeconds(86400))
+      val aDayAgo = EventTime(Instant.now.minusSeconds(86400))
 
       //#eventtime
 
