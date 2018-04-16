@@ -34,7 +34,7 @@ be more flexibly composed at run-time.
 
 ![layers](./images/top/OMOALayers2.png)
 
-#### Layer 0 - Obseratory Hardware
+#### Layer 0 - Observatory Hardware
 Layer 0 represents the actual hardware being controlled and the hardware controllers that interface the hardware to the computer systems.
 #### Layer 1 - Hardware Control Layer
 The lowest layer in the OMOA software system, the Hardware Control Layer, consists of all the controllable hardware that is available 
