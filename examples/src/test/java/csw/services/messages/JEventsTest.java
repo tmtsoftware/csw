@@ -35,10 +35,10 @@ public class JEventsTest {
         EventTime anHourAgo = new EventTime(Instant.now().minusSeconds(3600));
 
         //return current time in UTC
-        EventTime currentTime = EventTime.toCurrent();
+        EventTime currentTime = EventTime.apply();
 
         //some past time using utility function
-        EventTime aDayAgo = EventTime.toEventTime(Instant.now().minusSeconds(86400));
+        EventTime aDayAgo = EventTime.apply(Instant.now().minusSeconds(86400));
 
         //#eventtime
 
