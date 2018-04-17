@@ -43,7 +43,6 @@ class EventServicePerfTest
 
   var throughputPlots: PlotResult = PlotResult()
   var latencyPlots: LatencyPlots  = LatencyPlots()
-  var totalTime                   = 0L
 
   def adjustedTotalMessages(n: Long): Long = (n * totalMessagesFactor).toLong
 
@@ -73,6 +72,7 @@ class EventServicePerfTest
     import testSettings._
     val subscriberName           = testName + "-subscriber"
     var aggregatedEventsReceived = 0L
+    var totalTime                = 0L
 
     runPerfFlames(first, second)(delay = 5.seconds, time = 40.seconds)
 
@@ -100,7 +100,7 @@ class EventServicePerfTest
           totalTime = Math.max(totalTime, subscriber.totalTime)
       }
 
-      aggregateResult(testSettings, aggregatedEventsReceived, aggregatedHistogram)
+      aggregateResult(testSettings, aggregatedEventsReceived, totalTime, aggregatedHistogram)
       enterBarrier(testName + "-done")
 
       rep.halt()
@@ -134,6 +134,7 @@ class EventServicePerfTest
   private def aggregateResult(
       testSettings: TestSettings,
       aggregatedEventsReceived: Long,
+      totalTime: Long,
       aggregatedHistogram: Histogram
   ): Unit = {
     import testSettings._
@@ -164,8 +165,8 @@ class EventServicePerfTest
   private val reporter  = BenchmarkFileReporter("PerfSpec", system)
   private val scenarios = new Scenarios(testConfigs)
 
-  for (s ← scenarios.warmUp :: scenarios.all) {
-    ignore(s"Perf results must be great for ${s.testName} with payloadSize = ${s.payloadSize}") {
+  for (s ← scenarios.warmUp :: scenarios.normal) {
+    test(s"Perf results must be great for ${s.testName} with payloadSize = ${s.payloadSize}") {
       testScenario(s, reporter)
     }
   }

@@ -18,9 +18,7 @@ class ResultReporter(name: String, actorSystem: ActorSystem) {
   ): Unit = {
     import testSettings._
 
-    val throughput =
-      if (singlePublisher) totalReceived / nanosToSeconds(totalTime)
-      else totalReceived * publisherSubscriberPairs / nanosToSeconds(totalTime)
+    val throughput = totalReceived / nanosToSeconds(totalTime)
 
     val totalDropped = totalTestMsgs - totalReceived
 

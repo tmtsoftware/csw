@@ -160,5 +160,57 @@ class Scenarios(testConfigs: TestConfigs) {
     )
   )
 
+  val normal = List(
+    TestSettings(
+      testName = "1-to-1",
+      totalTestMsgs = adjustedTotalMessages(5000),
+      payloadSize = 100,
+      publisherSubscriberPairs = 1,
+      singlePublisher = false
+    ),
+    TestSettings(
+      testName = "1-to-1-size-1k",
+      totalTestMsgs = adjustedTotalMessages(5000),
+      payloadSize = 1000,
+      publisherSubscriberPairs = 1,
+      singlePublisher = false
+    ),
+    TestSettings(
+      testName = "1-to-1-size-10k",
+      totalTestMsgs = adjustedTotalMessages(5000),
+      payloadSize = 1000,
+      publisherSubscriberPairs = 1,
+      singlePublisher = false
+    ),
+    TestSettings(
+      testName = "5-to-5",
+      totalTestMsgs = adjustedTotalMessages(5000),
+      payloadSize = 100,
+      publisherSubscriberPairs = 5,
+      singlePublisher = false
+    ),
+    TestSettings(
+      testName = "10-to-10",
+      totalTestMsgs = adjustedTotalMessages(5000),
+      payloadSize = 100,
+      publisherSubscriberPairs = 10,
+      singlePublisher = false
+    ),
+    TestSettings(
+      testName = "1-to-5",
+      totalTestMsgs = adjustedTotalMessages(5000),
+      payloadSize = 100,
+      publisherSubscriberPairs = 5,
+      singlePublisher = true
+    ),
+    TestSettings(
+      testName = "1-to-10",
+      totalTestMsgs = adjustedTotalMessages(5000),
+      payloadSize = 100,
+      publisherSubscriberPairs = 10,
+      singlePublisher = true
+    )
+  )
+
   val all: List[TestSettings] = payload ++ oneToMany ++ manyToMany
 }
