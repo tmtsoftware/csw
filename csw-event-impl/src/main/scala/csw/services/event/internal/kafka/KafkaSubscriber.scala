@@ -33,6 +33,8 @@ class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(i
       .mapMaterializedValue { control ⇒
         new EventSubscription {
           override def unsubscribe(): Future[Done] = control.shutdown().map(_ ⇒ Done)
+
+          override def isReady: Future[Done] = Future.successful(Done)
         }
       }
   }
@@ -48,7 +50,7 @@ class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(i
 
   override def get(eventKey: EventKey): Future[Event] = get(Set(eventKey)).map(_.head)
 
-  private def getEventStream(subscription: Subscription) =
+  private def getEventStream(subscription: Subscription): Source[Event, scaladsl.Consumer.Control] =
     scaladsl.Consumer
       .plainSource(consumerSettings, subscription)
       .map(record ⇒ Event.fromPb(PbEvent.parseFrom(record.value())))

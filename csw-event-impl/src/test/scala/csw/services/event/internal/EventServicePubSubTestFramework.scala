@@ -29,9 +29,10 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     val event1             = makeDistinctEvent(1)
     val eventKey: EventKey = event1.eventKey
     val testProbe          = TestProbe[Event]()(actorSystem.toTyped)
-    val subscription       = subscriber.subscribe(Set(eventKey)).take(2).toMat(Sink.foreach(testProbe.ref ! _))(Keep.left).run()
+    val subscription       = subscriber.subscribe(Set(eventKey)).toMat(Sink.foreach(testProbe.ref ! _))(Keep.left).run()
 
-    Thread.sleep(1000)
+    subscription.isReady.await
+    Thread.sleep(100)
     publisher.publish(event1).await
 
     testProbe.expectMessageType[SystemEvent].isInvalid shouldBe true
@@ -52,11 +53,11 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     val event2: Event = SystemEvent(prefix, eventName2)
 
     val (subscription, seqF) = subscriber.subscribe(Set(event1.eventKey)).toMat(Sink.seq)(Keep.both).run()
-    Thread.sleep(1000)
+    subscription.isReady.await
     publisher.publish(event1).await
 
     val (subscription2, seqF2) = subscriber.subscribe(Set(event2.eventKey)).toMat(Sink.seq)(Keep.both).run()
-    Thread.sleep(1000)
+    subscription2.isReady.await
     publisher.publish(event2).await
 
     subscription.unsubscribe().await
@@ -80,9 +81,8 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     val queue: mutable.Queue[Event] = new mutable.Queue[Event]()
     val eventKey: EventKey          = makeEvent(0).eventKey
 
-    subscriber.subscribe(Set(eventKey)).runForeach(queue.enqueue(_))
-
-    Thread.sleep(100)
+    val subscription = subscriber.subscribe(Set(eventKey)).to(Sink.foreach[Event](queue.enqueue(_))).run()
+    subscription.isReady.await
 
     cancellable = publisher.publish(eventGenerator(), 2.millis)
 
@@ -97,8 +97,8 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     val queue: mutable.Queue[Event]  = new mutable.Queue[Event]()
     val events: immutable.Seq[Event] = for (i ← 101 to 110) yield makeDistinctEvent(i)
 
-    subscriber.subscribe(events.map(_.eventKey).toSet).runForeach(queue.enqueue(_))
-    Thread.sleep(500)
+    val subscription = subscriber.subscribe(events.map(_.eventKey).toSet).to(Sink.foreach(queue.enqueue(_))).run()
+    subscription.isReady.await
 
     publisher.publish(Source.fromIterator(() ⇒ events.toIterator))
 
@@ -119,10 +119,9 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     publisher.publish(event2).await // latest event before subscribing
 
     val (subscription, seqF) = subscriber.subscribe(Set(eventKey)).toMat(Sink.seq)(Keep.both).run()
-    Thread.sleep(1000)
+    subscription.isReady.await
 
     publisher.publish(event3).await
-    Thread.sleep(500)
 
     subscription.unsubscribe().await
 
@@ -133,9 +132,7 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
   def retrieveInvalidEvent(): Unit = {
     val eventKey = EventKey("test")
 
-    val (subscription, seqF) = subscriber.subscribe(Set(eventKey)).toMat(Sink.seq)(Keep.both).run()
-    Thread.sleep(500)
-    subscription.unsubscribe().await
+    val (subscription, seqF) = subscriber.subscribe(Set(eventKey)).take(1).toMat(Sink.seq)(Keep.both).run()
 
     seqF.await shouldBe Seq(Event.invalidEvent(eventKey))
   }
@@ -149,9 +146,7 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
 
     publisher.publish(distinctEvent1).await
 
-    val (subscription, seqF) = subscriber.subscribe(Set(eventKey1, eventKey2)).toMat(Sink.seq)(Keep.both).run()
-    Thread.sleep(500)
-    subscription.unsubscribe().await
+    val (subscription, seqF) = subscriber.subscribe(Set(eventKey1, eventKey2)).take(2).toMat(Sink.seq)(Keep.both).run()
 
     seqF.await.toSet shouldBe Set(Event.invalidEvent(eventKey2), distinctEvent1)
   }
