@@ -80,12 +80,12 @@ public class JKafkaPubSubTest {
     }
 
     @Test
-    public void shouldBeAbleToPublishConcurrentlyToTheSameChannel() throws InterruptedException {
+    public void shouldBeAbleToPublishConcurrentlyToTheSameChannel() throws InterruptedException, TimeoutException, ExecutionException {
         framework.publishMultiple();
     }
 
     @Test
-    public void shouldBeAbleToPublishMultipleToDifferentChannels() throws InterruptedException {
+    public void shouldBeAbleToPublishMultipleToDifferentChannels() throws InterruptedException, TimeoutException, ExecutionException {
         framework.publishMultipleToDifferentChannels();
     }
 

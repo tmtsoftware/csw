@@ -5,9 +5,9 @@ import akka.stream.{KillSwitches, Materializer}
 import akka.{Done, NotUsed}
 import csw.messages.events._
 import csw.services.event.scaladsl.{EventSubscriber, EventSubscription}
-import io.lettuce.core.{RedisClient, RedisURI}
 import io.lettuce.core.api.async.RedisAsyncCommands
 import io.lettuce.core.pubsub.api.reactive.RedisPubSubReactiveCommands
+import io.lettuce.core.{RedisClient, RedisURI}
 import reactor.core.publisher.FluxSink.OverflowStrategy
 
 import scala.async.Async._

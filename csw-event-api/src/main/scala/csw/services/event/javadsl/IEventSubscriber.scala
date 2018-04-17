@@ -25,6 +25,8 @@ abstract class IEventSubscriber(eventSubscriber: EventSubscriber) {
       .mapMaterializedValue { eventSubscription ⇒
         new IEventSubscription {
           override def unsubscribe(): CompletableFuture[Done] = eventSubscription.unsubscribe().toJava.toCompletableFuture
+
+          override def isReady(): CompletableFuture[Done] = eventSubscription.isReady.toJava.toCompletableFuture
         }
       }
 
