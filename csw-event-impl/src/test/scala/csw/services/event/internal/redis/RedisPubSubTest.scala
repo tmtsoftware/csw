@@ -78,7 +78,7 @@ class RedisPubSubTest extends FunSuite with Matchers with BeforeAndAfterAll with
   }
 
   //DEOPSCSW-340: Provide most recently published event for subscribed prefix and name
-  test("should be able to retrieve only valid events when one of the subscribed events keys has published events") {
+  test("should be able to retrieve valid as well as invalid event when events are published for some and not for other keys") {
     framework.retrieveMultipleSubscribedEvents()
   }
 

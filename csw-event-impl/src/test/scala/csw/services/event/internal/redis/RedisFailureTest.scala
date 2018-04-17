@@ -53,7 +53,7 @@ class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
     wiring.shutdown(TestFinishedReason).await
   }
 
-  test("failure in publishing should fail future with PublishFailed exception") {
+  test("should throw PublishFailed exception on publish failure") {
     val publisher = redisFactory.publisher().await
 
     publisher.publish(Utils.makeEvent(1)).await
@@ -67,7 +67,7 @@ class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
     }
   }
 
-  test("handle failed publish event with a callback") {
+  test("should invoke onError callback on publish failure [stream API]") {
     val publisher = redisFactory.publisher().await
 
     val testProbe = TestProbe[FailedEvent]()(actorSystem.toTyped)
@@ -88,7 +88,7 @@ class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
     failedEvent.throwable shouldBe a[PublishFailed]
   }
 
-  test("handle failed publish event with an eventGenerator and a callback") {
+  test("should invoke onError callback on publish failure [eventGenerator API]") {
     val publisher = redisFactory.publisher().await
 
     val testProbe = TestProbe[FailedEvent]()(actorSystem.toTyped)
