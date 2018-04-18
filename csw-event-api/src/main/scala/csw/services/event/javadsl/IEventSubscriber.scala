@@ -10,7 +10,7 @@ import akka.stream.javadsl.Source
 import akka.stream.scaladsl.Sink
 import csw.messages.events.{Event, EventKey}
 import csw.services.event.internal.RateAdapterStage
-import csw.services.event.scaladsl.{EventSubscriber, EventSubscription}
+import csw.services.event.scaladsl.EventSubscriber
 
 import scala.collection.JavaConverters.{asScalaSetConverter, setAsJavaSetConverter}
 import scala.compat.java8.FutureConverters.{CompletionStageOps, FutureOps}
@@ -21,7 +21,7 @@ abstract class IEventSubscriber(eventSubscriber: EventSubscriber) {
   def subscribe(eventKeys: java.util.Set[EventKey]): Source[Event, IEventSubscription] =
     eventSubscriber
       .subscribe(eventKeys.asScala.toSet)
-      .asJava[Event, EventSubscription]
+      .asJava
       .mapMaterializedValue { eventSubscription ⇒
         new IEventSubscription {
           override def unsubscribe(): CompletableFuture[Done] = eventSubscription.unsubscribe().toJava.toCompletableFuture
