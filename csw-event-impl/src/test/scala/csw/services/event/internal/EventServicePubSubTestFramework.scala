@@ -52,16 +52,13 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     val event1: Event = SystemEvent(prefix, eventName1)
     val event2: Event = SystemEvent(prefix, eventName2)
 
-    val (subscription, seqF) = subscriber.subscribe(Set(event1.eventKey)).toMat(Sink.seq)(Keep.both).run()
+    val (subscription, seqF) = subscriber.subscribe(Set(event1.eventKey)).take(2).toMat(Sink.seq)(Keep.both).run()
     subscription.isReady.await
     publisher.publish(event1).await
 
-    val (subscription2, seqF2) = subscriber.subscribe(Set(event2.eventKey)).toMat(Sink.seq)(Keep.both).run()
+    val (subscription2, seqF2) = subscriber.subscribe(Set(event2.eventKey)).take(2).toMat(Sink.seq)(Keep.both).run()
     subscription2.isReady.await
     publisher.publish(event2).await
-
-    subscription.unsubscribe().await
-    subscription2.unsubscribe().await
 
     seqF.await.toSet shouldBe Set(Event.invalidEvent(event1.eventKey), event1)
     seqF2.await.toSet shouldBe Set(Event.invalidEvent(event2.eventKey), event2)
@@ -118,12 +115,10 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     publisher.publish(event1).await
     publisher.publish(event2).await // latest event before subscribing
 
-    val (subscription, seqF) = subscriber.subscribe(Set(eventKey)).toMat(Sink.seq)(Keep.both).run()
+    val (subscription, seqF) = subscriber.subscribe(Set(eventKey)).take(2).toMat(Sink.seq)(Keep.both).run()
     subscription.isReady.await
 
     publisher.publish(event3).await
-
-    subscription.unsubscribe().await
 
     // assertion against a sequence ensures that the latest event before subscribing arrives earlier in the stream
     seqF.await shouldBe Seq(event2, event3)

@@ -24,7 +24,7 @@ import scala.concurrent.duration.DurationInt
 class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with BeforeAndAfterAll {
 
   private val seedPort        = 3560
-  private val redisPort       = 6379
+  private val redisPort       = 6380
   private val clusterSettings = ClusterAwareSettings.joinLocal(seedPort)
   private val locationService = LocationServiceFactory.withSettings(ClusterAwareSettings.onPort(seedPort))
   private val tcpRegistration = RegistrationFactory.tcp(EventServiceConnection.value, redisPort)
