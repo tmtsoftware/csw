@@ -1,18 +1,23 @@
 package csw.services.event.perf
 
 import java.io.PrintStream
+import java.nio.ByteBuffer
 import java.util.concurrent.TimeUnit.SECONDS
 import java.util.concurrent.{ExecutorService, Executors}
 
+import akka.remote.testconductor.RoleName
 import akka.remote.testkit.{MultiNodeConfig, MultiNodeSpec, MultiNodeSpecCallbacks}
 import akka.testkit._
+import akka.util.ByteString
 import com.typesafe.config.ConfigFactory
+import csw.messages.events.{Event, SystemEvent}
 import csw.services.event.perf.EventUtils.{nanosToMicros, nanosToSeconds}
 import org.HdrHistogram.Histogram
 import org.scalatest._
 
+import scala.collection.immutable
+import scala.concurrent.Await
 import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContext}
 
 object EventServiceScalabilityTest extends MultiNodeConfig {
 
@@ -24,7 +29,7 @@ object EventServiceScalabilityTest extends MultiNodeConfig {
 
   for (n ← 1 to totalNumberOfNodes) role("node-" + n)
 
-  val barrierTimeout: FiniteDuration = 5.minutes
+  val barrierTimeout: FiniteDuration = 15.minutes
 
   commonConfig(debugConfig(on = false).withFallback(ConfigFactory.load()))
 }
@@ -54,6 +59,9 @@ class EventServiceScalabilityTest
   val testConfigs = new TestConfigs(system.settings.config)
   import testConfigs._
 
+  val wiring = new TestWiring(system)
+  import wiring._
+
   var throughputPlots: PlotResult = PlotResult()
   var latencyPlots: LatencyPlots  = LatencyPlots()
 
@@ -68,45 +76,78 @@ class EventServiceScalabilityTest
     r
   }
 
+  val publisherNodes: immutable.Seq[RoleName]  = roles.take(roles.size / 2)
+  val subscriberNodes: immutable.Seq[RoleName] = roles.takeRight(roles.size / 2)
+
   override def beforeAll(): Unit = multiNodeSpecBeforeAll()
 
   override def afterAll(): Unit = {
     reporterExecutor.shutdown()
-//    runOn(second) {
-//      println("================================ Throughput msgs/s ================================")
-//      throughputPlots.printTable()
-//      println()
-//      latencyPlots.printTable(system.name)
-//    }
+    runOn(subscriberNodes.head) {
+      println("================================ Throughput msgs/s ================================")
+      throughputPlots.printTable()
+      println()
+      latencyPlots.printTable(system.name)
+    }
     multiNodeSpecAfterAll()
   }
 
   def testScenario(testSettings: TestSettings, benchmarkFileReporter: BenchmarkFileReporter): Unit = {
     import testSettings._
-    val subscriberName           = testName + "-subscriber"
-    var aggregatedEventsReceived = 0L
-    var totalTime                = 0L
+    val subscriberName = testName + "-subscriber"
 
-    val publisherNodes  = roles.take(roles.size / 2)
-    val subscriberNodes = roles.takeRight(roles.size / 2)
+    val nodeId = myself.name.split("-").tail.head.toInt
 
-    implicit val ec: ExecutionContext = system.dispatcher
+    val pubSubAllocationPerNode =
+      (1 to publisherSubscriberPairs)
+        .grouped((publisherSubscriberPairs.toFloat / (totalNumberOfNodes.toFloat / 2)).ceil.toInt)
+        .toList
 
-    val id = myself.name.split("-").tail.head.toInt
+    val (activeSubscriberNodes, inactiveSubscriberNodes) = {
+      if (subscriberNodes.size > pubSubAllocationPerNode.size)
+        (subscriberNodes.take(pubSubAllocationPerNode.size),
+         subscriberNodes.takeRight(subscriberNodes.size - pubSubAllocationPerNode.size))
+      else (subscriberNodes, Seq.empty)
+    }
 
-    val allPairs = (1 to publisherSubscriberPairs).grouped(publisherSubscriberPairs / (totalNumberOfNodes / 2)).toList
+    runOn(activeSubscriberNodes: _*) {
+      val subIds          = pubSubAllocationPerNode(nodeId - totalNumberOfNodes / 2 - 1)
+      val rep             = reporter(testName)
+      val completionProbe = TestProbe()
 
-    runOn(subscriberNodes: _*) {
-      val subIds                         = allPairs(id - totalNumberOfNodes / 2 - 1)
-      val rep                            = reporter(testName)
-      val aggregatedHistogram: Histogram = new Histogram(SECONDS.toNanos(10), 3)
+      var totalTimePerNode            = 0L
+      var eventsReceivedPerNode       = 0L
+      val histogramPerNode: Histogram = new Histogram(SECONDS.toNanos(10), 3)
+
+      var aggregatedTotalTime: Long      = 0L
+      var aggregatedEventsReceived: Long = 0L
+      var aggregatedHistogram: Histogram = null
+
+      runOn(activeSubscriberNodes.head) {
+        aggregatedHistogram = new Histogram(SECONDS.toNanos(10), 3)
+        var flag                   = false
+        var receivedPerfEventCount = 0
+
+        def onEvent(event: Event): Unit = event match {
+          case event: SystemEvent if flag ⇒
+            receivedPerfEventCount += 1
+            val histogramBuffer = ByteString(event.get(EventUtils.histogramKey).get.values).asByteBuffer
+            aggregatedHistogram.add(Histogram.decodeFromByteBuffer(histogramBuffer, SECONDS.toNanos(10)))
+            aggregatedTotalTime = Math.max(aggregatedTotalTime, event.get(EventUtils.totalTimeKey).get.head)
+            aggregatedEventsReceived += event.get(EventUtils.eventsReceivedKey).get.head
+            if (receivedPerfEventCount == activeSubscriberNodes.size) completionProbe.ref ! "completed"
+          case _ ⇒ flag = true
+        }
+
+        val eventSubscription = subscriber.subscribeCallback(Set(EventUtils.perfEventKey), onEvent)
+        Await.result(eventSubscription.isReady, 5.seconds)
+      }
 
       val subscribers = subIds.map { n ⇒
         val subscriber = new Subscriber(testSettings, testConfigs, rep, n, n)
         val doneF      = subscriber.startSubscription()
         (doneF, subscriber)
       }
-
       enterBarrier(subscriberName + "-started")
 
       subscribers.foreach {
@@ -114,20 +155,41 @@ class EventServiceScalabilityTest
           Await.result(doneF, 5.minute)
           subscriber.printResult()
 
-          aggregatedHistogram.add(subscriber.histogram)
-          aggregatedEventsReceived += subscriber.eventsReceived
-          totalTime = Math.max(totalTime, subscriber.totalTime)
+          histogramPerNode.add(subscriber.histogram)
+          eventsReceivedPerNode += subscriber.eventsReceived
+          totalTimePerNode = Math.max(totalTimePerNode, subscriber.totalTime)
       }
 
-      aggregateResult(testSettings, aggregatedEventsReceived, totalTime, aggregatedHistogram)
+      val byteBuffer: ByteBuffer = ByteBuffer.allocate(1358140)
+      histogramPerNode.encodeIntoByteBuffer(byteBuffer)
+      Await.result(
+        publisher.publish(EventUtils.perfResultEvent(byteBuffer.array(), eventsReceivedPerNode, totalTimePerNode)),
+        5.seconds
+      )
+
+      runOn(activeSubscriberNodes.head) {
+        completionProbe.receiveOne(5.seconds)
+        aggregateResult(testSettings, aggregatedEventsReceived, aggregatedTotalTime, aggregatedHistogram)
+      }
 
       enterBarrier(testName + "-done")
       rep.halt()
-
     }
 
-    runOn(publisherNodes: _*) {
-      val pubIds = allPairs(id - 1)
+    runOn(inactiveSubscriberNodes: _*) {
+      enterBarrier(subscriberName + "-started")
+      enterBarrier(testName + "-done")
+    }
+
+    val (activePublisherNodes, inactivePublisherNodes) = {
+      if (publisherNodes.size > pubSubAllocationPerNode.size)
+        (publisherNodes.take(pubSubAllocationPerNode.size),
+         publisherNodes.takeRight(publisherNodes.size - pubSubAllocationPerNode.size))
+      else (publisherNodes, Seq.empty)
+    }
+
+    runOn(activePublisherNodes: _*) {
+      val pubIds = pubSubAllocationPerNode(nodeId - 1)
       println(
         "================================================================================================================================================"
       )
@@ -144,6 +206,11 @@ class EventServiceScalabilityTest
 
       pubIds.foreach(id ⇒ new Publisher(testSettings, testConfigs, id).startPublishing())
 
+      enterBarrier(testName + "-done")
+    }
+
+    runOn(inactivePublisherNodes: _*) {
+      enterBarrier(subscriberName + "-started")
       enterBarrier(testName + "-done")
     }
     enterBarrier("after-" + testName)

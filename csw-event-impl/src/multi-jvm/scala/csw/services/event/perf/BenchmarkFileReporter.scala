@@ -33,7 +33,7 @@ object BenchmarkFileReporter {
 
       val testResultFile: File = {
         val timestamp = formatter.format(LocalDateTime.ofInstant(Instant.now(), ZoneId.systemDefault()))
-        val fileName  = s"$timestamp-$testName-results.txt"
+        val fileName  = s"$testName-results.txt"
         new File(targetDirectory, fileName)
       }
       val config: Config = system.settings.config
