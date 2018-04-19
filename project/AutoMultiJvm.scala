@@ -14,7 +14,8 @@ object AutoMultiJvm extends AutoPlugin {
     },
     multiNodeHosts in MultiJvm := multiNodeHostNames,
     assemblyMergeStrategy in assembly in MultiJvm := {
-      case "application.conf" => MergeStrategy.concat
+      case "application.conf"                    => MergeStrategy.concat
+      case x if x.contains("version.properties") => MergeStrategy.discard
       case x =>
         val oldStrategy = (assemblyMergeStrategy in assembly in MultiJvm).value
         oldStrategy(x)
