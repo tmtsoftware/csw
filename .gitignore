@@ -17,6 +17,7 @@ dist
 .settings
 .DS_Store
 integration/project/build.properties
+csw-event-impl/test-output
 
 # hidden cross project folders
 shared/.js
