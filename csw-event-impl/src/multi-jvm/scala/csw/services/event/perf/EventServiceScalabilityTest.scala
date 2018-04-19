@@ -92,7 +92,7 @@ class EventServiceScalabilityTest
     multiNodeSpecAfterAll()
   }
 
-  def testScenario(testSettings: TestSettings, benchmarkFileReporter: BenchmarkFileReporter): Unit = {
+  def testScenario(testSettings: TestSettings): Unit = {
     import testSettings._
     val subscriberName = testName + "-subscriber"
 
@@ -103,12 +103,19 @@ class EventServiceScalabilityTest
         .grouped((publisherSubscriberPairs.toFloat / (totalNumberOfNodes.toFloat / 2)).ceil.toInt)
         .toList
 
-    val (activeSubscriberNodes, inactiveSubscriberNodes) = {
+    val (activeSubscriberNodes, inactiveSubscriberNodes) =
       if (subscriberNodes.size > pubSubAllocationPerNode.size)
         (subscriberNodes.take(pubSubAllocationPerNode.size),
          subscriberNodes.takeRight(subscriberNodes.size - pubSubAllocationPerNode.size))
       else (subscriberNodes, Seq.empty)
-    }
+
+    val (activePublisherNodes, inactivePublisherNodes) =
+      if (publisherNodes.size > pubSubAllocationPerNode.size)
+        (publisherNodes.take(pubSubAllocationPerNode.size),
+         publisherNodes.takeRight(publisherNodes.size - pubSubAllocationPerNode.size))
+      else (publisherNodes, Seq.empty)
+
+    val inactiveNodes = inactivePublisherNodes ++ inactiveSubscriberNodes
 
     runOn(activeSubscriberNodes: _*) {
       val subIds          = pubSubAllocationPerNode(nodeId - totalNumberOfNodes / 2 - 1)
@@ -176,18 +183,6 @@ class EventServiceScalabilityTest
       rep.halt()
     }
 
-    runOn(inactiveSubscriberNodes: _*) {
-      enterBarrier(subscriberName + "-started")
-      enterBarrier(testName + "-done")
-    }
-
-    val (activePublisherNodes, inactivePublisherNodes) = {
-      if (publisherNodes.size > pubSubAllocationPerNode.size)
-        (publisherNodes.take(pubSubAllocationPerNode.size),
-         publisherNodes.takeRight(publisherNodes.size - pubSubAllocationPerNode.size))
-      else (publisherNodes, Seq.empty)
-    }
-
     runOn(activePublisherNodes: _*) {
       val pubIds = pubSubAllocationPerNode(nodeId - 1)
       println(
@@ -209,10 +204,11 @@ class EventServiceScalabilityTest
       enterBarrier(testName + "-done")
     }
 
-    runOn(inactivePublisherNodes: _*) {
+    runOn(inactiveNodes: _*) {
       enterBarrier(subscriberName + "-started")
       enterBarrier(testName + "-done")
     }
+
     enterBarrier("after-" + testName)
   }
 
@@ -242,17 +238,16 @@ class EventServiceScalabilityTest
     )
 
     aggregatedHistogram.outputPercentileDistribution(
-      new PrintStream(BenchmarkFileReporter.apply(s"Aggregated-$testName", system, logSettings = false).fos),
+      new PrintStream(BenchmarkFileReporter(s"Aggregated-$testName", system, logSettings = false).fos),
       1000.0
     )
   }
 
-  private val reporter  = BenchmarkFileReporter("PerfSpec", system)
   private val scenarios = new Scenarios(testConfigs)
 
   for (s ← scenarios.payload) {
     test(s"Perf results must be great for ${s.testName} with payloadSize = ${s.payloadSize}") {
-      testScenario(s, reporter)
+      testScenario(s)
     }
   }
 
