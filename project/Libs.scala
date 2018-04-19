@@ -26,12 +26,13 @@ object Libs {
   val `akka-http-play-json`          = "de.heikoseeberger"      %% "akka-http-play-json"          % "1.20.0" //Apache 2.0
   val `scalapb-runtime`              = "com.thesamet.scalapb"   %% "scalapb-runtime"              % scalapbVersion % "protobuf"
   val `scalapb-json4s`               = "com.thesamet.scalapb"   %% "scalapb-json4s"               % "0.7.0"
-  val `lettuce`                      = "io.lettuce"             % "lettuce-core"                  % "5.0.2.RELEASE"
+  val `lettuce`                      = "io.lettuce"             % "lettuce-core"                  % "5.0.3.RELEASE"
   val `akka-stream-kafka`            = "com.typesafe.akka"      %% "akka-stream-kafka"            % "0.20"
   val `scalatest-embedded-kafka`     = "net.manub"              %% "scalatest-embedded-kafka"     % "1.1.0"
   val `scala-compiler`               = "org.scala-lang"         % "scala-compiler"                % ScalaVersion
-  val `embedded-redis`               = "com.github.sebruck"     %% "scalatest-embedded-redis"     % "0.3.0"
-  val `hdr-histogram`                = "org.hdrhistogram"       % "HdrHistogram"                  % "2.1.10"
+  val `scalatest-embedded-redis`     = "com.github.sebruck"     %% "scalatest-embedded-redis"     % "0.3.0"
+  val `HdrHistogram`                 = "org.hdrhistogram"       % "HdrHistogram"                  % "2.1.10"
+  val `testng`                       = "org.testng"             % "testng"                        % "6.14.3"
 }
 
 object Jackson {

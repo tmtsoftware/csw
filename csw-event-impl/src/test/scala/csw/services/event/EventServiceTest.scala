@@ -1,38 +1,65 @@
-package csw.services.event.internal
+package csw.services.event
 
+import akka.actor.Cancellable
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.actor.{ActorSystem, Cancellable}
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.testkit.typed.scaladsl.TestProbe
+import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.events.{Event, EventKey, EventName, SystemEvent}
 import csw.messages.params.models.Prefix
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.helpers.Utils.{makeDistinctEvent, makeEvent}
-import csw.services.event.scaladsl.{EventPublisher, EventSubscriber}
+import csw.services.event.internal.commons._
+import net.manub.embeddedkafka.EmbeddedKafka
 import org.scalatest.Matchers
 import org.scalatest.concurrent.Eventually
+import org.scalatest.testng.TestNGSuite
+import org.testng.annotations._
 
 import scala.collection.{immutable, mutable}
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationLong
 
-class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: EventSubscriber)(
-    implicit val actorSystem: ActorSystem
-) extends Matchers
-    with Eventually {
+class EventServiceTest extends TestNGSuite with Matchers with Eventually with EmbeddedKafka {
 
-  private implicit val mat: ActorMaterializer = ActorMaterializer()
-  implicit val patience: PatienceConfig       = PatienceConfig(5.seconds, 10.millis)
+  implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 10.millis)
 
-  def pubSub(): Unit = {
+  @BeforeSuite
+  def beforeAll(): Unit = {
+    RedisTestProperties.redis.start()
+    EmbeddedKafka.start()(KafkaTestProperties.config)
+  }
+
+  @AfterSuite
+  def afterAll(): Unit = {
+    RedisTestProperties.redisClient.shutdown()
+    RedisTestProperties.redis.stop()
+    RedisTestProperties.wiring.shutdown(TestFinishedReason).await
+
+    KafkaTestProperties.publisher.shutdown().await
+    EmbeddedKafka.stop()
+    KafkaTestProperties.wiring.shutdown(TestFinishedReason).await
+  }
+
+  @DataProvider(name = "event-service-provider")
+  def pubSubProvider: Array[Array[_ <: BaseProperties]] = Array(
+    Array(RedisTestProperties),
+    Array(KafkaTestProperties)
+  )
+
+  @Test(dataProvider = "event-service-provider")
+  def should_be_able_to_publish_and_subscribe_an_event(baseProperties: BaseProperties): Unit = {
+
+    import baseProperties._
+    implicit val mat: ActorMaterializer = ActorMaterializer()(actorSystem)
+
     val event1             = makeDistinctEvent(1)
     val eventKey: EventKey = event1.eventKey
     val testProbe          = TestProbe[Event]()(actorSystem.toTyped)
-    val subscription       = subscriber.subscribe(Set(eventKey)).toMat(Sink.foreach(testProbe.ref ! _))(Keep.left).run()
+    val subscription       = subscriber.subscribe(Set(eventKey)).toMat(Sink.foreach(testProbe.ref ! _))(Keep.left).run()(mat)
 
     subscription.isReady.await
-    Thread.sleep(100)
     publisher.publish(event1).await
 
     testProbe.expectMessageType[SystemEvent].isInvalid shouldBe true
@@ -44,7 +71,9 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     testProbe.expectNoMessage(2.seconds)
   }
 
-  def subscribeIndependently(): Unit = {
+  @Test(dataProvider = "event-service-provider")
+  def should_be_able_to_make_independent_subscriptions(baseProperties: BaseProperties): Unit = {
+    import baseProperties._
 
     val prefix        = Prefix("test.prefix")
     val eventName1    = EventName("system1")
@@ -52,11 +81,11 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     val event1: Event = SystemEvent(prefix, eventName1)
     val event2: Event = SystemEvent(prefix, eventName2)
 
-    val (subscription, seqF) = subscriber.subscribe(Set(event1.eventKey)).take(2).toMat(Sink.seq)(Keep.both).run()
+    val (subscription, seqF) = subscriber.subscribe(Set(event1.eventKey)).take(2).toMat(Sink.seq)(Keep.both).run()(mat)
     subscription.isReady.await
     publisher.publish(event1).await
 
-    val (subscription2, seqF2) = subscriber.subscribe(Set(event2.eventKey)).take(2).toMat(Sink.seq)(Keep.both).run()
+    val (subscription2, seqF2) = subscriber.subscribe(Set(event2.eventKey)).take(2).toMat(Sink.seq)(Keep.both).run()(mat)
     subscription2.isReady.await
     publisher.publish(event2).await
 
@@ -65,7 +94,10 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
   }
 
   var cancellable: Cancellable = _
-  def publishMultiple(): Unit = {
+  @Test(dataProvider = "event-service-provider")
+  def should_be_able_to_publish_concurrently_to_the_same_channel(baseProperties: BaseProperties): Unit = {
+    import baseProperties._
+
     var counter                      = -1
     val events: immutable.Seq[Event] = for (i ← 1 to 10) yield makeEvent(i)
 
@@ -78,7 +110,7 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     val queue: mutable.Queue[Event] = new mutable.Queue[Event]()
     val eventKey: EventKey          = makeEvent(0).eventKey
 
-    val subscription = subscriber.subscribe(Set(eventKey)).to(Sink.foreach[Event](queue.enqueue(_))).run()
+    val subscription = subscriber.subscribe(Set(eventKey)).to(Sink.foreach[Event](queue.enqueue(_))).run()(mat)
     subscription.isReady.await
 
     cancellable = publisher.publish(eventGenerator(), 2.millis)
@@ -90,11 +122,14 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     queue should contain allElementsOf Seq(Event.invalidEvent(eventKey)) ++ events
   }
 
-  def publishMultipleToDifferentChannels(): Unit = {
+  @Test(dataProvider = "event-service-provider")
+  def should_be_able_to_publish_concurrently_to_the_different_channel(baseProperties: BaseProperties): Unit = {
+    import baseProperties._
+
     val queue: mutable.Queue[Event]  = new mutable.Queue[Event]()
     val events: immutable.Seq[Event] = for (i ← 101 to 110) yield makeDistinctEvent(i)
 
-    val subscription = subscriber.subscribe(events.map(_.eventKey).toSet).to(Sink.foreach(queue.enqueue(_))).run()
+    val subscription = subscriber.subscribe(events.map(_.eventKey).toSet).to(Sink.foreach(queue.enqueue(_))).run()(mat)
     subscription.isReady.await
 
     publisher.publish(Source.fromIterator(() ⇒ events.toIterator))
@@ -106,7 +141,10 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     queue should contain theSameElementsAs events.map(x ⇒ Event.invalidEvent(x.eventKey)) ++ events
   }
 
-  def retrieveRecentlyPublished(): Unit = {
+  @Test(dataProvider = "event-service-provider")
+  def should_be_able_to_retrieve_recently_published_event_on_subscription(baseProperties: BaseProperties): Unit = {
+    import baseProperties._
+
     val event1   = makeEvent(1)
     val event2   = makeEvent(2)
     val event3   = makeEvent(3)
@@ -115,7 +153,7 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     publisher.publish(event1).await
     publisher.publish(event2).await // latest event before subscribing
 
-    val (subscription, seqF) = subscriber.subscribe(Set(eventKey)).take(2).toMat(Sink.seq)(Keep.both).run()
+    val (subscription, seqF) = subscriber.subscribe(Set(eventKey)).take(2).toMat(Sink.seq)(Keep.both).run()(mat)
     subscription.isReady.await
 
     publisher.publish(event3).await
@@ -124,15 +162,21 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     seqF.await shouldBe Seq(event2, event3)
   }
 
-  def retrieveInvalidEvent(): Unit = {
+  @Test(dataProvider = "event-service-provider")
+  def should_be_able_to_retrieve_InvalidEvent(baseProperties: BaseProperties): Unit = {
+    import baseProperties._
     val eventKey = EventKey("test")
 
-    val (subscription, seqF) = subscriber.subscribe(Set(eventKey)).take(1).toMat(Sink.seq)(Keep.both).run()
+    val (subscription, seqF) = subscriber.subscribe(Set(eventKey)).take(1).toMat(Sink.seq)(Keep.both).run()(mat)
 
     seqF.await shouldBe Seq(Event.invalidEvent(eventKey))
   }
 
-  def retrieveMultipleSubscribedEvents(): Unit = {
+  @Test(dataProvider = "event-service-provider")
+  def should_be_able_to_retrieve_valid_as_well_as_invalid_event_when_events_are_published_for_some_and_not_for_other_keys(
+      baseProperties: BaseProperties
+  ): Unit = {
+    import baseProperties._
     val distinctEvent1 = makeDistinctEvent(201)
     val distinctEvent2 = makeDistinctEvent(202)
 
@@ -141,12 +185,14 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
 
     publisher.publish(distinctEvent1).await
 
-    val (subscription, seqF) = subscriber.subscribe(Set(eventKey1, eventKey2)).take(2).toMat(Sink.seq)(Keep.both).run()
+    val (subscription, seqF) = subscriber.subscribe(Set(eventKey1, eventKey2)).take(2).toMat(Sink.seq)(Keep.both).run()(mat)
 
     seqF.await.toSet shouldBe Set(Event.invalidEvent(eventKey2), distinctEvent1)
   }
 
-  def retrieveEventUsingCallback(): Unit = {
+  @Test(dataProvider = "event-service-provider")
+  def should_be_able_to_subscribe_with_callback(baseProperties: BaseProperties): Unit = {
+    import baseProperties._
     val event1 = makeDistinctEvent(203)
 
     val testProbe              = TestProbe[Event]()(actorSystem.toTyped)
@@ -162,12 +208,13 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     testProbe.expectNoMessage(200.millis)
   }
 
-  def retrieveEventUsingAsyncCallback(): Unit = {
+  @Test(dataProvider = "event-service-provider")
+  def should_be_able_to_subscribe_with_async_callback(baseProperties: BaseProperties): Unit = {
+    import baseProperties._
     val event1    = makeDistinctEvent(204)
     val testProbe = TestProbe[Event]()(actorSystem.toTyped)
-    import actorSystem.dispatcher
 
-    val callback: Event ⇒ Future[Event] = (event) ⇒ Future.successful(testProbe.ref ! event).map(_ ⇒ event)
+    val callback: Event ⇒ Future[Event] = (event) ⇒ Future.successful(testProbe.ref ! event).map(_ ⇒ event)(ec)
 
     publisher.publish(event1).await
 
@@ -179,7 +226,10 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     testProbe.expectNoMessage(200.millis)
   }
 
-  def retrieveEventUsingActorRef(): Unit = {
+  @Test(dataProvider = "event-service-provider")
+  def should_be_able_to_subscribe_with_an_ActorRef(baseProperties: BaseProperties): Unit = {
+    import baseProperties._
+
     val event1 = makeDistinctEvent(205)
     val probe  = TestProbe[Event]()(actorSystem.toTyped)
 
@@ -193,8 +243,11 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     probe.expectNoMessage(200.millis)
   }
 
-  def get(): Unit = {
-    val event1   = makeEvent(1)
+  @Test(dataProvider = "event-service-provider")
+  def should_be_able_to_get_an_event_without_subscribing_for_it(baseProperties: BaseProperties): Unit = {
+    import baseProperties._
+
+    val event1   = makeDistinctEvent(301)
     val eventKey = event1.eventKey
 
     publisher.publish(event1).await
@@ -203,7 +256,10 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     eventF.await shouldBe event1
   }
 
-  def retrieveInvalidEventOnGet(): Unit = {
+  @Test(dataProvider = "event-service-provider")
+  def should_be_able_to_get_InvalidEvent(baseProperties: BaseProperties): Unit = {
+    import baseProperties._
+
     val prefix    = Prefix("wfos.blue.test_filter")
     val eventName = EventName("move")
     val eventF    = subscriber.get(EventKey(prefix, eventName))
@@ -214,7 +270,10 @@ class EventServicePubSubTestFramework(publisher: EventPublisher, subscriber: Eve
     event.eventName shouldBe eventName
   }
 
-  def retrieveEventsForMultipleEventKeysOnGet(): Unit = {
+  @Test(dataProvider = "event-service-provider")
+  def should_be_able_to_get_events_for_multiple_event_keys(baseProperties: BaseProperties): Unit = {
+    import baseProperties._
+
     val event1    = makeDistinctEvent(206)
     val eventKey1 = event1.eventKey
 

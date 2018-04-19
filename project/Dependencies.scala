@@ -160,10 +160,11 @@ object Dependencies {
     Libs.`junit`                    % Test,
     Libs.`junit-interface`          % Test,
     Libs.`mockito-core`             % Test,
-    Libs.`embedded-redis`           % Test,
+    Libs.`scalatest-embedded-redis` % Test,
     Libs.`scalatest-embedded-kafka` % Test,
     Akka.`akka-multi-node-testkit`  % Test,
-    Libs.`hdr-histogram`            % Test
+    Libs.HdrHistogram               % Test,
+    Libs.testng                     % Test
   )
 
   val Commons = Seq(
