@@ -83,6 +83,7 @@ class EventServiceTest extends TestNGSuite with Matchers with Eventually with Em
 
     val (subscription, seqF) = subscriber.subscribe(Set(event1.eventKey)).take(2).toMat(Sink.seq)(Keep.both).run()(mat)
     subscription.isReady.await
+    Thread.sleep(100)
     publisher.publish(event1).await
 
     val (subscription2, seqF2) = subscriber.subscribe(Set(event2.eventKey)).take(2).toMat(Sink.seq)(Keep.both).run()(mat)
