@@ -21,6 +21,9 @@ import scala.collection.{immutable, mutable}
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationLong
 
+//DEOPSCSW-334: Publish an event
+//DEOPSCSW-335: Model for EventName that encapsulates the topic(or channel ) name
+//DEOPSCSW-337: Subscribe to an event based on prefix
 class EventServiceTest extends TestNGSuite with Matchers with Eventually with EmbeddedKafka {
 
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 10.millis)
@@ -142,6 +145,7 @@ class EventServiceTest extends TestNGSuite with Matchers with Eventually with Em
     queue should contain theSameElementsAs events.map(x ⇒ Event.invalidEvent(x.eventKey)) ++ events
   }
 
+  //DEOPSCSW-340: Provide most recently published event for subscribed prefix and name
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_retrieve_recently_published_event_on_subscription(baseProperties: BaseProperties): Unit = {
     import baseProperties._
@@ -163,6 +167,7 @@ class EventServiceTest extends TestNGSuite with Matchers with Eventually with Em
     seqF.await shouldBe Seq(event2, event3)
   }
 
+  //DEOPSCSW-340: Provide most recently published event for subscribed prefix and name
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_retrieve_InvalidEvent(baseProperties: BaseProperties): Unit = {
     import baseProperties._
@@ -173,6 +178,7 @@ class EventServiceTest extends TestNGSuite with Matchers with Eventually with Em
     seqF.await shouldBe Seq(Event.invalidEvent(eventKey))
   }
 
+  //DEOPSCSW-340: Provide most recently published event for subscribed prefix and name
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_retrieve_valid_as_well_as_invalid_event_when_events_are_published_for_some_and_not_for_other_keys(
       baseProperties: BaseProperties
@@ -191,6 +197,7 @@ class EventServiceTest extends TestNGSuite with Matchers with Eventually with Em
     seqF.await.toSet shouldBe Set(Event.invalidEvent(eventKey2), distinctEvent1)
   }
 
+  //DEOPSCSW-338: Provide callback for Event alerts
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_subscribe_with_callback(baseProperties: BaseProperties): Unit = {
     import baseProperties._
@@ -209,6 +216,7 @@ class EventServiceTest extends TestNGSuite with Matchers with Eventually with Em
     testProbe.expectNoMessage(200.millis)
   }
 
+  //DEOPSCSW-338: Provide callback for Event alerts
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_subscribe_with_async_callback(baseProperties: BaseProperties): Unit = {
     import baseProperties._
@@ -227,6 +235,7 @@ class EventServiceTest extends TestNGSuite with Matchers with Eventually with Em
     testProbe.expectNoMessage(200.millis)
   }
 
+  //DEOPSCSW-339: Provide actor ref to alert about Event arrival
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_subscribe_with_an_ActorRef(baseProperties: BaseProperties): Unit = {
     import baseProperties._
@@ -244,6 +253,7 @@ class EventServiceTest extends TestNGSuite with Matchers with Eventually with Em
     probe.expectNoMessage(200.millis)
   }
 
+  //DEOPSCSW-344: Retrieve recently published event using prefix and eventname
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_get_an_event_without_subscribing_for_it(baseProperties: BaseProperties): Unit = {
     import baseProperties._
@@ -257,6 +267,7 @@ class EventServiceTest extends TestNGSuite with Matchers with Eventually with Em
     eventF.await shouldBe event1
   }
 
+  //DEOPSCSW-344: Retrieve recently published event using prefix and eventname
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_get_InvalidEvent(baseProperties: BaseProperties): Unit = {
     import baseProperties._
@@ -271,6 +282,7 @@ class EventServiceTest extends TestNGSuite with Matchers with Eventually with Em
     event.eventName shouldBe eventName
   }
 
+  //DEOPSCSW-344: Retrieve recently published event using prefix and eventname
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_get_events_for_multiple_event_keys(baseProperties: BaseProperties): Unit = {
     import baseProperties._
