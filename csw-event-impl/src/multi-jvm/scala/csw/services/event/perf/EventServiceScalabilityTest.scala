@@ -29,8 +29,6 @@ object EventServiceScalabilityTest extends MultiNodeConfig {
 
   for (n ← 1 to totalNumberOfNodes) role("node-" + n)
 
-  val barrierTimeout: FiniteDuration = 15.minutes
-
   commonConfig(debugConfig(on = false).withFallback(ConfigFactory.load()))
 }
 
@@ -54,16 +52,10 @@ class EventServiceScalabilityTest
     with PerfFlamesSupport
     with BeforeAndAfterAll {
 
-  import EventServiceScalabilityTest._
-
   val testConfigs = new TestConfigs(system.settings.config)
+  val wiring      = new TestWiring(system)
   import testConfigs._
-
-  val wiring = new TestWiring(system)
   import wiring._
-
-  var throughputPlots: PlotResult = PlotResult()
-  var latencyPlots: LatencyPlots  = LatencyPlots()
 
   def adjustedTotalMessages(n: Long): Long = (n * totalMessagesFactor).toLong
 
@@ -76,8 +68,11 @@ class EventServiceScalabilityTest
     r
   }
 
-  val publisherNodes: immutable.Seq[RoleName]  = roles.take(roles.size / 2)
-  val subscriberNodes: immutable.Seq[RoleName] = roles.takeRight(roles.size / 2)
+  var throughputPlots: PlotResult = PlotResult()
+  var latencyPlots: LatencyPlots  = LatencyPlots()
+
+  var publisherNodes: immutable.Seq[RoleName]  = roles.take(roles.size / 2)
+  var subscriberNodes: immutable.Seq[RoleName] = roles.takeRight(roles.size / 2)
 
   override def beforeAll(): Unit = multiNodeSpecBeforeAll()
 
@@ -95,30 +90,30 @@ class EventServiceScalabilityTest
   def testScenario(testSettings: TestSettings): Unit = {
     import testSettings._
     val subscriberName = testName + "-subscriber"
+    if (singlePublisher) {
+      publisherNodes = List(roles.head)
+      subscriberNodes = roles.tail
+    }
 
     val nodeId = myself.name.split("-").tail.head.toInt
 
     val pubSubAllocationPerNode =
       (1 to publisherSubscriberPairs)
-        .grouped((publisherSubscriberPairs.toFloat / (totalNumberOfNodes.toFloat / 2)).ceil.toInt)
+        .grouped((publisherSubscriberPairs.toFloat / subscriberNodes.size.toFloat).ceil.toInt)
         .toList
 
     val (activeSubscriberNodes, inactiveSubscriberNodes) =
-      if (subscriberNodes.size > pubSubAllocationPerNode.size)
-        (subscriberNodes.take(pubSubAllocationPerNode.size),
-         subscriberNodes.takeRight(subscriberNodes.size - pubSubAllocationPerNode.size))
+      if (subscriberNodes.size > pubSubAllocationPerNode.size) subscriberNodes.splitAt(pubSubAllocationPerNode.size)
       else (subscriberNodes, Seq.empty)
 
     val (activePublisherNodes, inactivePublisherNodes) =
-      if (publisherNodes.size > pubSubAllocationPerNode.size)
-        (publisherNodes.take(pubSubAllocationPerNode.size),
-         publisherNodes.takeRight(publisherNodes.size - pubSubAllocationPerNode.size))
+      if (publisherNodes.size > pubSubAllocationPerNode.size) publisherNodes.splitAt(pubSubAllocationPerNode.size)
       else (publisherNodes, Seq.empty)
 
     val inactiveNodes = inactivePublisherNodes ++ inactiveSubscriberNodes
 
     runOn(activeSubscriberNodes: _*) {
-      val subIds          = pubSubAllocationPerNode(nodeId - totalNumberOfNodes / 2 - 1)
+      val subIds          = pubSubAllocationPerNode(nodeId - publisherNodes.size - 1)
       val rep             = reporter(testName)
       val completionProbe = TestProbe()
 
@@ -132,18 +127,20 @@ class EventServiceScalabilityTest
 
       runOn(activeSubscriberNodes.head) {
         aggregatedHistogram = new Histogram(SECONDS.toNanos(10), 3)
-        var flag                   = false
+        var newEvent               = false
         var receivedPerfEventCount = 0
 
         def onEvent(event: Event): Unit = event match {
-          case event: SystemEvent if flag ⇒
+          case event: SystemEvent if newEvent ⇒
             receivedPerfEventCount += 1
             val histogramBuffer = ByteString(event.get(EventUtils.histogramKey).get.values).asByteBuffer
+
             aggregatedHistogram.add(Histogram.decodeFromByteBuffer(histogramBuffer, SECONDS.toNanos(10)))
             aggregatedTotalTime = Math.max(aggregatedTotalTime, event.get(EventUtils.totalTimeKey).get.head)
             aggregatedEventsReceived += event.get(EventUtils.eventsReceivedKey).get.head
+
             if (receivedPerfEventCount == activeSubscriberNodes.size) completionProbe.ref ! "completed"
-          case _ ⇒ flag = true
+          case _ ⇒ newEvent = true
         }
 
         val eventSubscription = subscriber.subscribeCallback(Set(EventUtils.perfEventKey), onEvent)
@@ -151,7 +148,8 @@ class EventServiceScalabilityTest
       }
 
       val subscribers = subIds.map { n ⇒
-        val subscriber = new Subscriber(testSettings, testConfigs, rep, n, n)
+        val pubId      = if (singlePublisher) 1 else n
+        val subscriber = new Subscriber(testSettings, testConfigs, rep, pubId, n)
         val doneF      = subscriber.startSubscription()
         (doneF, subscriber)
       }
@@ -184,12 +182,13 @@ class EventServiceScalabilityTest
     }
 
     runOn(activePublisherNodes: _*) {
-      val pubIds = pubSubAllocationPerNode(nodeId - 1)
+      val pubIds = if (singlePublisher) List(1) else pubSubAllocationPerNode(nodeId - 1)
+
       println(
         "================================================================================================================================================"
       )
       println(
-        s"[$testName]: Starting benchmark with ${totalNumberOfNodes / 2} publishers & ${totalNumberOfNodes / 2} subscribers $totalTestMsgs messages with " +
+        s"[$testName]: Starting benchmark with ${if (singlePublisher) 1 else publisherSubscriberPairs} publishers & $publisherSubscriberPairs subscribers $totalTestMsgs messages with " +
         s"throttling of $elements msgs/${per.toSeconds}s " +
         s"and payload size $payloadSize bytes"
       )
