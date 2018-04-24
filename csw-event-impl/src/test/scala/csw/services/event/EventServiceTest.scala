@@ -2,7 +2,6 @@ package csw.services.event
 
 import akka.actor.Cancellable
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.testkit.typed.scaladsl.TestProbe
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
@@ -28,39 +27,43 @@ class EventServiceTest extends TestNGSuite with Matchers with Eventually with Em
 
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 10.millis)
 
+  var redisTestProps: RedisTestProps = _
+  var kafkaTestProps: KafkaTestProps = _
+
   @BeforeSuite
   def beforeAll(): Unit = {
-    RedisTestProperties.redis.start()
-    EmbeddedKafka.start()(KafkaTestProperties.config)
+    redisTestProps = BaseProperties.createRedisProperties(3558, 6384)
+    kafkaTestProps = BaseProperties.createKafkaProperties(3561, 6001)
+    redisTestProps.redis.start()
+    EmbeddedKafka.start()(kafkaTestProps.config)
   }
 
   @AfterSuite
   def afterAll(): Unit = {
-    RedisTestProperties.redisClient.shutdown()
-    RedisTestProperties.redis.stop()
-    RedisTestProperties.wiring.shutdown(TestFinishedReason).await
+    redisTestProps.redisClient.shutdown()
+    redisTestProps.redis.stop()
+    redisTestProps.wiring.shutdown(TestFinishedReason).await
 
-    KafkaTestProperties.publisher.shutdown().await
+    kafkaTestProps.publisher.shutdown().await
     EmbeddedKafka.stop()
-    KafkaTestProperties.wiring.shutdown(TestFinishedReason).await
+    kafkaTestProps.wiring.shutdown(TestFinishedReason).await
   }
 
   @DataProvider(name = "event-service-provider")
   def pubSubProvider: Array[Array[_ <: BaseProperties]] = Array(
-    Array(RedisTestProperties),
-    Array(KafkaTestProperties)
+    Array(redisTestProps),
+    Array(kafkaTestProps)
   )
 
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_publish_and_subscribe_an_event(baseProperties: BaseProperties): Unit = {
-
     import baseProperties._
-    implicit val mat: ActorMaterializer = ActorMaterializer()(actorSystem)
+    import baseProperties.wiring._
 
     val event1             = makeDistinctEvent(1)
     val eventKey: EventKey = event1.eventKey
     val testProbe          = TestProbe[Event]()(actorSystem.toTyped)
-    val subscription       = subscriber.subscribe(Set(eventKey)).toMat(Sink.foreach(testProbe.ref ! _))(Keep.left).run()(mat)
+    val subscription       = subscriber.subscribe(Set(eventKey)).toMat(Sink.foreach(testProbe.ref ! _))(Keep.left).run()
 
     subscription.isReady.await
     publisher.publish(event1).await
@@ -77,6 +80,7 @@ class EventServiceTest extends TestNGSuite with Matchers with Eventually with Em
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_make_independent_subscriptions(baseProperties: BaseProperties): Unit = {
     import baseProperties._
+    import baseProperties.wiring._
 
     val prefix        = Prefix("test.prefix")
     val eventName1    = EventName("system1")
@@ -84,12 +88,12 @@ class EventServiceTest extends TestNGSuite with Matchers with Eventually with Em
     val event1: Event = SystemEvent(prefix, eventName1)
     val event2: Event = SystemEvent(prefix, eventName2)
 
-    val (subscription, seqF) = subscriber.subscribe(Set(event1.eventKey)).take(2).toMat(Sink.seq)(Keep.both).run()(mat)
+    val (subscription, seqF) = subscriber.subscribe(Set(event1.eventKey)).take(2).toMat(Sink.seq)(Keep.both).run()
     subscription.isReady.await
     Thread.sleep(100)
     publisher.publish(event1).await
 
-    val (subscription2, seqF2) = subscriber.subscribe(Set(event2.eventKey)).take(2).toMat(Sink.seq)(Keep.both).run()(mat)
+    val (subscription2, seqF2) = subscriber.subscribe(Set(event2.eventKey)).take(2).toMat(Sink.seq)(Keep.both).run()
     subscription2.isReady.await
     publisher.publish(event2).await
 
@@ -101,6 +105,7 @@ class EventServiceTest extends TestNGSuite with Matchers with Eventually with Em
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_publish_concurrently_to_the_same_channel(baseProperties: BaseProperties): Unit = {
     import baseProperties._
+    import baseProperties.wiring._
 
     var counter                      = -1
     val events: immutable.Seq[Event] = for (i ← 1 to 10) yield makeEvent(i)
@@ -114,7 +119,7 @@ class EventServiceTest extends TestNGSuite with Matchers with Eventually with Em
     val queue: mutable.Queue[Event] = new mutable.Queue[Event]()
     val eventKey: EventKey          = makeEvent(0).eventKey
 
-    val subscription = subscriber.subscribe(Set(eventKey)).to(Sink.foreach[Event](queue.enqueue(_))).run()(mat)
+    val subscription = subscriber.subscribe(Set(eventKey)).to(Sink.foreach[Event](queue.enqueue(_))).run()
     subscription.isReady.await
 
     cancellable = publisher.publish(eventGenerator(), 2.millis)
@@ -129,11 +134,12 @@ class EventServiceTest extends TestNGSuite with Matchers with Eventually with Em
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_publish_concurrently_to_the_different_channel(baseProperties: BaseProperties): Unit = {
     import baseProperties._
+    import baseProperties.wiring._
 
     val queue: mutable.Queue[Event]  = new mutable.Queue[Event]()
     val events: immutable.Seq[Event] = for (i ← 101 to 110) yield makeDistinctEvent(i)
 
-    val subscription = subscriber.subscribe(events.map(_.eventKey).toSet).to(Sink.foreach(queue.enqueue(_))).run()(mat)
+    val subscription = subscriber.subscribe(events.map(_.eventKey).toSet).to(Sink.foreach(queue.enqueue(_))).run()
     subscription.isReady.await
 
     publisher.publish(Source.fromIterator(() ⇒ events.toIterator))
@@ -149,6 +155,7 @@ class EventServiceTest extends TestNGSuite with Matchers with Eventually with Em
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_retrieve_recently_published_event_on_subscription(baseProperties: BaseProperties): Unit = {
     import baseProperties._
+    import baseProperties.wiring._
 
     val event1   = makeEvent(1)
     val event2   = makeEvent(2)
@@ -158,7 +165,7 @@ class EventServiceTest extends TestNGSuite with Matchers with Eventually with Em
     publisher.publish(event1).await
     publisher.publish(event2).await // latest event before subscribing
 
-    val (subscription, seqF) = subscriber.subscribe(Set(eventKey)).take(2).toMat(Sink.seq)(Keep.both).run()(mat)
+    val (subscription, seqF) = subscriber.subscribe(Set(eventKey)).take(2).toMat(Sink.seq)(Keep.both).run()
     subscription.isReady.await
 
     publisher.publish(event3).await
@@ -171,9 +178,10 @@ class EventServiceTest extends TestNGSuite with Matchers with Eventually with Em
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_retrieve_InvalidEvent(baseProperties: BaseProperties): Unit = {
     import baseProperties._
+    import baseProperties.wiring._
     val eventKey = EventKey("test")
 
-    val (subscription, seqF) = subscriber.subscribe(Set(eventKey)).take(1).toMat(Sink.seq)(Keep.both).run()(mat)
+    val (subscription, seqF) = subscriber.subscribe(Set(eventKey)).take(1).toMat(Sink.seq)(Keep.both).run()
 
     seqF.await shouldBe Seq(Event.invalidEvent(eventKey))
   }
@@ -184,6 +192,7 @@ class EventServiceTest extends TestNGSuite with Matchers with Eventually with Em
       baseProperties: BaseProperties
   ): Unit = {
     import baseProperties._
+    import baseProperties.wiring._
     val distinctEvent1 = makeDistinctEvent(201)
     val distinctEvent2 = makeDistinctEvent(202)
 
@@ -192,7 +201,7 @@ class EventServiceTest extends TestNGSuite with Matchers with Eventually with Em
 
     publisher.publish(distinctEvent1).await
 
-    val (subscription, seqF) = subscriber.subscribe(Set(eventKey1, eventKey2)).take(2).toMat(Sink.seq)(Keep.both).run()(mat)
+    val (subscription, seqF) = subscriber.subscribe(Set(eventKey1, eventKey2)).take(2).toMat(Sink.seq)(Keep.both).run()
 
     seqF.await.toSet shouldBe Set(Event.invalidEvent(eventKey2), distinctEvent1)
   }
@@ -201,6 +210,8 @@ class EventServiceTest extends TestNGSuite with Matchers with Eventually with Em
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_subscribe_with_callback(baseProperties: BaseProperties): Unit = {
     import baseProperties._
+    import baseProperties.wiring._
+
     val event1 = makeDistinctEvent(203)
 
     val testProbe              = TestProbe[Event]()(actorSystem.toTyped)
@@ -220,6 +231,8 @@ class EventServiceTest extends TestNGSuite with Matchers with Eventually with Em
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_subscribe_with_async_callback(baseProperties: BaseProperties): Unit = {
     import baseProperties._
+    import baseProperties.wiring._
+
     val event1    = makeDistinctEvent(204)
     val testProbe = TestProbe[Event]()(actorSystem.toTyped)
 
@@ -241,7 +254,9 @@ class EventServiceTest extends TestNGSuite with Matchers with Eventually with Em
     import baseProperties._
 
     val event1 = makeDistinctEvent(205)
-    val probe  = TestProbe[Event]()(actorSystem.toTyped)
+    import baseProperties.wiring._
+
+    val probe = TestProbe[Event]()(actorSystem.toTyped)
 
     publisher.publish(event1).await
 
