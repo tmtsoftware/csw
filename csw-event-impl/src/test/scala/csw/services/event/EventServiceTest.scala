@@ -10,6 +10,8 @@ import csw.messages.params.models.Prefix
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.helpers.Utils.{makeDistinctEvent, makeEvent}
 import csw.services.event.internal.commons._
+import csw.services.event.internal.kafka.KafkaTestProps
+import csw.services.event.internal.redis.RedisTestProps
 import net.manub.embeddedkafka.EmbeddedKafka
 import org.scalatest.Matchers
 import org.scalatest.concurrent.Eventually
@@ -32,8 +34,8 @@ class EventServiceTest extends TestNGSuite with Matchers with Eventually with Em
 
   @BeforeSuite
   def beforeAll(): Unit = {
-    redisTestProps = BaseProperties.createRedisProperties(3558, 6384)
-    kafkaTestProps = BaseProperties.createKafkaProperties(3561, 6001)
+    redisTestProps = RedisTestProps.createRedisProperties(3558, 6384)
+    kafkaTestProps = KafkaTestProps.createKafkaProperties(3561, 6001)
     redisTestProps.redis.start()
     EmbeddedKafka.start()(kafkaTestProps.config)
   }
