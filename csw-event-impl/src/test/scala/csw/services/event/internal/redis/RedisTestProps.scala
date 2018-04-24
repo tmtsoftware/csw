@@ -5,13 +5,19 @@ import csw.services.event.internal.commons.{BaseProperties, Wiring}
 import csw.services.event.scaladsl.{EventPublisher, EventSubscriber, RedisFactory}
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.LocationService
-import io.lettuce.core.RedisClient
+import io.lettuce.core.{ClientOptions, RedisClient}
 import redis.embedded.RedisServer
 
-class RedisTestProps(redisPort: Int, clusterSettings: ClusterSettings, locationService: LocationService) extends BaseProperties {
-  val wiring                      = new Wiring(clusterSettings.system)
-  val redis: RedisServer          = RedisServer.builder().setting(s"bind ${clusterSettings.hostname}").port(redisPort).build()
-  val redisClient: RedisClient    = RedisClient.create()
+class RedisTestProps(
+    redisPort: Int,
+    clusterSettings: ClusterSettings,
+    locationService: LocationService,
+    clientOptions: ClientOptions
+) extends BaseProperties {
+  val wiring                   = new Wiring(clusterSettings.system)
+  val redis: RedisServer       = RedisServer.builder().setting(s"bind ${clusterSettings.hostname}").port(redisPort).build()
+  val redisClient: RedisClient = RedisClient.create()
+  redisClient.setOptions(clientOptions)
   val redisFactory                = new RedisFactory(redisClient, locationService, wiring)
   val publisher: EventPublisher   = redisFactory.publisher().await
   val subscriber: EventSubscriber = redisFactory.subscriber().await
@@ -20,8 +26,12 @@ class RedisTestProps(redisPort: Int, clusterSettings: ClusterSettings, locationS
 }
 
 object RedisTestProps {
-  def createRedisProperties(seedPort: Int, serverPort: Int): RedisTestProps = {
+  def createRedisProperties(
+      seedPort: Int,
+      serverPort: Int,
+      clientOptions: ClientOptions = ClientOptions.create()
+  ): RedisTestProps = {
     val (clusterSettings: ClusterSettings, locationService: LocationService) = BaseProperties.createInfra(seedPort, serverPort)
-    new RedisTestProps(serverPort, clusterSettings, locationService)
+    new RedisTestProps(serverPort, clusterSettings, locationService, clientOptions)
   }
 }

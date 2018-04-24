@@ -1,47 +1,33 @@
 package csw.services.event.internal.redis
 
-import akka.actor.ActorSystem
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.scaladsl.Source
 import akka.testkit.typed.scaladsl.TestProbe
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.event.exceptions.PublishFailed
 import csw.services.event.helpers.TestFutureExt.RichFuture
-import csw.services.event.helpers.{RegistrationFactory, Utils}
-import csw.services.event.internal.commons.{EventServiceConnection, FailedEvent, Wiring}
-import csw.services.event.scaladsl.RedisFactory
-import csw.services.location.commons.ClusterAwareSettings
-import csw.services.location.scaladsl.LocationServiceFactory
+import csw.services.event.helpers.Utils
+import csw.services.event.internal.commons.FailedEvent
+import io.lettuce.core.ClientOptions
 import io.lettuce.core.ClientOptions.DisconnectedBehavior
-import io.lettuce.core.{ClientOptions, RedisClient}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
-import redis.embedded.RedisServer
 
 import scala.concurrent.duration.DurationInt
 
 //DEOPSCSW-398: Propagate failure for publish api (eventGenerator)
 class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with BeforeAndAfterAll {
 
-  private val seedPort        = 3560
-  private val redisPort       = 6380
-  private val clusterSettings = ClusterAwareSettings.joinLocal(seedPort)
-  private val locationService = LocationServiceFactory.withSettings(ClusterAwareSettings.onPort(seedPort))
-  private val tcpRegistration = RegistrationFactory.tcp(EventServiceConnection.value, redisPort)
-  locationService.register(tcpRegistration).await
+  private val redisClientOptions = ClientOptions
+    .builder()
+    .autoReconnect(false)
+    .disconnectedBehavior(DisconnectedBehavior.REJECT_COMMANDS)
+    .build
 
-  private val redis = RedisServer.builder().setting(s"bind ${clusterSettings.hostname}").port(redisPort).build()
+  private val redisTestProps: RedisTestProps = RedisTestProps.createRedisProperties(3560, 6380, redisClientOptions)
 
-  private implicit val actorSystem: ActorSystem = clusterSettings.system
-
-  private val redisClient = RedisClient.create()
-
-  redisClient.setOptions(
-    ClientOptions.builder().autoReconnect(false).disconnectedBehavior(DisconnectedBehavior.REJECT_COMMANDS).build()
-  )
-
-  private val wiring       = new Wiring(actorSystem)
-  private val redisFactory = new RedisFactory(redisClient, locationService, wiring)
+  import redisTestProps._
+  import redisTestProps.wiring._
 
   override def beforeAll(): Unit = {
     redis.start()

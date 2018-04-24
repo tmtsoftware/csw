@@ -8,9 +8,14 @@ import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.LocationService
 import net.manub.embeddedkafka.EmbeddedKafkaConfig
 
-class KafkaTestProps(kafkaPort: Int, clusterSettings: ClusterSettings, locationService: LocationService) extends BaseProperties {
-  val brokers                     = s"PLAINTEXT://${clusterSettings.hostname}:$kafkaPort"
-  val brokerProperties            = Map("listeners" → brokers, "advertised.listeners" → brokers)
+class KafkaTestProps(
+    kafkaPort: Int,
+    clusterSettings: ClusterSettings,
+    locationService: LocationService,
+    additionalBrokerProps: Map[String, String]
+) extends BaseProperties {
+  private val brokers             = s"PLAINTEXT://${clusterSettings.hostname}:$kafkaPort"
+  private val brokerProperties    = Map("listeners" → brokers, "advertised.listeners" → brokers) ++ additionalBrokerProps
   val config                      = EmbeddedKafkaConfig(customBrokerProperties = brokerProperties)
   val wiring                      = new Wiring(clusterSettings.system)
   val kafkaFactory                = new KafkaFactory(locationService, wiring)
@@ -21,8 +26,12 @@ class KafkaTestProps(kafkaPort: Int, clusterSettings: ClusterSettings, locationS
 }
 
 object KafkaTestProps {
-  def createKafkaProperties(seedPort: Int, serverPort: Int): KafkaTestProps = {
+  def createKafkaProperties(
+      seedPort: Int,
+      serverPort: Int,
+      additionalBrokerProps: Map[String, String] = Map.empty
+  ): KafkaTestProps = {
     val (clusterSettings: ClusterSettings, locationService: LocationService) = createInfra(seedPort, serverPort)
-    new KafkaTestProps(serverPort, clusterSettings, locationService)
+    new KafkaTestProps(serverPort, clusterSettings, locationService, additionalBrokerProps)
   }
 }

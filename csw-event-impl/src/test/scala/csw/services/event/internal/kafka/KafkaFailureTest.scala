@@ -1,18 +1,14 @@
 package csw.services.event.internal.kafka
 
-import akka.actor.ActorSystem
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.scaladsl.Source
 import akka.testkit.typed.scaladsl.TestProbe
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.event.exceptions.PublishFailed
 import csw.services.event.helpers.TestFutureExt.RichFuture
-import csw.services.event.helpers.{RegistrationFactory, Utils}
-import csw.services.event.internal.commons.{EventServiceConnection, FailedEvent, Wiring}
-import csw.services.event.scaladsl.KafkaFactory
-import csw.services.location.commons.ClusterAwareSettings
-import csw.services.location.scaladsl.LocationServiceFactory
-import net.manub.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
+import csw.services.event.helpers.Utils
+import csw.services.event.internal.commons.FailedEvent
+import net.manub.embeddedkafka.EmbeddedKafka
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
@@ -20,23 +16,10 @@ import scala.concurrent.duration.DurationInt
 
 //DEOPSCSW-398: Propagate failure for publish api (eventGenerator)
 class KafkaFailureTest extends FunSuite with Matchers with MockitoSugar with BeforeAndAfterAll {
-  private val seedPort        = 3559
-  private val kafkaPort       = 6001
-  private val clusterSettings = ClusterAwareSettings.joinLocal(seedPort)
-  private val locationService = LocationServiceFactory.withSettings(ClusterAwareSettings.onPort(seedPort))
-  private val tcpRegistration = RegistrationFactory.tcp(EventServiceConnection.value, kafkaPort)
-  locationService.register(tcpRegistration).await
 
-  private implicit val actorSystem: ActorSystem = clusterSettings.system
-
-  private val brokers          = s"PLAINTEXT://${clusterSettings.hostname}:$kafkaPort"
-  private val brokerProperties = Map("listeners" → brokers, "advertised.listeners" → brokers, "message.max.bytes" → "1")
-
-  private val config = EmbeddedKafkaConfig(customBrokerProperties = brokerProperties)
-
-  private val wiring       = new Wiring(actorSystem)
-  private val kafkaFactory = new KafkaFactory(locationService, wiring)
-  private val publisher    = kafkaFactory.publisher().await
+  val kafkaTestProps: KafkaTestProps = KafkaTestProps.createKafkaProperties(3559, 6001, Map("message.max.bytes" → "1"))
+  import kafkaTestProps._
+  import kafkaTestProps.wiring._
 
   override def beforeAll(): Unit = {
     EmbeddedKafka.start()(config)

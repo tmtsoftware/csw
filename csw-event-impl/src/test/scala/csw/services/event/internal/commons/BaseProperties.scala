@@ -2,7 +2,6 @@ package csw.services.event.internal.commons
 
 import csw.services.event.helpers.RegistrationFactory
 import csw.services.event.helpers.TestFutureExt.RichFuture
-import csw.services.event.internal.kafka.KafkaTestProps
 import csw.services.event.scaladsl.{EventPublisher, EventSubscriber}
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
