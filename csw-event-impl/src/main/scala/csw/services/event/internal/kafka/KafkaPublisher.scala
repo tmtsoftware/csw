@@ -1,5 +1,6 @@
 package csw.services.event.internal.kafka
 
+import acyclic.skipped
 import akka.Done
 import akka.kafka.ProducerSettings
 import akka.stream.Materializer
@@ -7,6 +8,7 @@ import akka.stream.scaladsl.{Sink, Source}
 import csw.messages.events.Event
 import csw.services.event.commons.EventServiceLogger
 import csw.services.event.exceptions.PublishFailed
+import csw.services.event.javadsl.IEventPublisher
 import csw.services.event.scaladsl.EventPublisher
 import org.apache.kafka.clients.producer.{Callback, ProducerRecord}
 
@@ -47,6 +49,8 @@ class KafkaPublisher(producerSettings: ProducerSettings[String, Array[Byte]])(im
 
   override def publish[Mat](source: Source[Event, Mat]): Mat = publishWithOptionalRecovery(source, None)
 
+  override def asJava: IEventPublisher = new JKafkaPublisher(this)
+
   private def publishWithOptionalRecovery[Mat](
       source: Source[Event, Mat],
       maybeOnError: Option[(Event, PublishFailed) ⇒ Unit]
@@ -65,5 +69,4 @@ class KafkaPublisher(producerSettings: ProducerSettings[String, Array[Byte]])(im
       }
       .to(Sink.ignore)
       .run()
-
 }

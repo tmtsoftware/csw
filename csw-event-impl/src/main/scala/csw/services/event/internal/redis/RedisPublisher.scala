@@ -1,11 +1,13 @@
 package csw.services.event.internal.redis
 
+import acyclic.skipped
 import akka.Done
 import akka.stream._
 import akka.stream.scaladsl.{Sink, Source}
 import csw.messages.events.{Event, EventKey}
 import csw.services.event.commons.EventServiceLogger
 import csw.services.event.exceptions.PublishFailed
+import csw.services.event.javadsl.IEventPublisher
 import csw.services.event.scaladsl.EventPublisher
 import io.lettuce.core.api.async.RedisAsyncCommands
 import io.lettuce.core.{RedisClient, RedisURI}
@@ -39,6 +41,8 @@ class RedisPublisher(redisURI: RedisURI, redisClient: RedisClient)(implicit ec: 
     }
 
   override def shutdown(): Future[Done] = asyncConnectionF.flatMap(_.quit().toScala).map(_ ⇒ Done)
+
+  override def asJava: IEventPublisher = new JRedisPublisher(this)
 
   private def publishWithOptionalRecovery[Mat](
       source: Source[Event, Mat],

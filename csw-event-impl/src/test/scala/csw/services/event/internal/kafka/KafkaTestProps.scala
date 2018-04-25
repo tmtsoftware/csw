@@ -8,6 +8,8 @@ import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.LocationService
 import net.manub.embeddedkafka.EmbeddedKafkaConfig
 
+import scala.collection.JavaConverters.mapAsScalaMapConverter
+
 class KafkaTestProps(
     kafkaPort: Int,
     clusterSettings: ClusterSettings,
@@ -26,12 +28,22 @@ class KafkaTestProps(
 }
 
 object KafkaTestProps {
+
   def createKafkaProperties(
       seedPort: Int,
       serverPort: Int,
       additionalBrokerProps: Map[String, String] = Map.empty
   ): KafkaTestProps = {
-    val (clusterSettings: ClusterSettings, locationService: LocationService) = createInfra(seedPort, serverPort)
+    val (clusterSettings, locationService) = createInfra(seedPort, serverPort)
     new KafkaTestProps(serverPort, clusterSettings, locationService, additionalBrokerProps)
+  }
+
+  def jCreateKafkaProperties(
+      seedPort: Int,
+      serverPort: Int,
+      additionalBrokerProps: java.util.Map[String, String]
+  ): KafkaTestProps = {
+    val (clusterSettings, locationService) = createInfra(seedPort, serverPort)
+    new KafkaTestProps(serverPort, clusterSettings, locationService, additionalBrokerProps.asScala.toMap)
   }
 }

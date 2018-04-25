@@ -2,6 +2,7 @@ package csw.services.event.internal.commons
 
 import csw.services.event.helpers.RegistrationFactory
 import csw.services.event.helpers.TestFutureExt.RichFuture
+import csw.services.event.javadsl.{IEventPublisher, IEventSubscriber}
 import csw.services.event.scaladsl.{EventPublisher, EventSubscriber}
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
@@ -10,6 +11,8 @@ trait BaseProperties {
   val wiring: Wiring
   def publisher: EventPublisher
   def subscriber: EventSubscriber
+  def jPublisher: IEventPublisher   = publisher.asJava
+  def jSubscriber: IEventSubscriber = subscriber.asJava
 }
 
 object BaseProperties {

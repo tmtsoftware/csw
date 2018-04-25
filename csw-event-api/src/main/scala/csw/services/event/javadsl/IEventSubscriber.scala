@@ -1,5 +1,6 @@
 package csw.services.event.javadsl
 
+import acyclic.skipped
 import java.util.concurrent.CompletableFuture
 import java.util.function.Consumer
 

@@ -11,7 +11,7 @@ import redis.embedded.RedisServer
 class RedisTestProps(
     redisPort: Int,
     clusterSettings: ClusterSettings,
-    locationService: LocationService,
+    val locationService: LocationService,
     clientOptions: ClientOptions
 ) extends BaseProperties {
   val wiring                   = new Wiring(clusterSettings.system)
@@ -31,7 +31,7 @@ object RedisTestProps {
       serverPort: Int,
       clientOptions: ClientOptions = ClientOptions.create()
   ): RedisTestProps = {
-    val (clusterSettings: ClusterSettings, locationService: LocationService) = BaseProperties.createInfra(seedPort, serverPort)
+    val (clusterSettings, locationService) = BaseProperties.createInfra(seedPort, serverPort)
     new RedisTestProps(serverPort, clusterSettings, locationService, clientOptions)
   }
 }

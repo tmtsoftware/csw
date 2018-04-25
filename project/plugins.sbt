@@ -15,6 +15,7 @@ addSbtPlugin("com.eed3si9n"                      % "sbt-buildinfo"              
 addSbtPlugin("pl.project13.scala"                % "sbt-jmh"                    % "0.3.3")
 addSbtPlugin("com.orrsella"                      % "sbt-stats"                  % "1.0.7")
 addSbtPlugin("io.github.jonas"                   % "sbt-paradox-material-theme" % "0.4.0")
+addSbtPlugin("de.johoop"                         % "sbt-testng-plugin"          % "3.1.1")
 
 resolvers += "Jenkins repo" at "http://repo.jenkins-ci.org/public/"
 addSbtPlugin("ohnosequences" % "sbt-github-release" % "0.7.0")
