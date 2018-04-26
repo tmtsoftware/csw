@@ -18,8 +18,8 @@ import csw.services.event.javadsl.IEventPublisher;
 import csw.services.event.javadsl.IEventSubscription;
 import io.lettuce.core.ClientOptions;
 import net.manub.embeddedkafka.EmbeddedKafka$;
+import org.scalatest.testng.TestNGSuite;
 import org.testng.Assert;
-import org.testng.TestNG;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.DataProvider;
@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 //DEOPSCSW-334: Publish an event
 //DEOPSCSW-335: Model for EventName that encapsulates the topic(or channel ) name
 //DEOPSCSW-337: Subscribe to an event based on prefix
-public class JEventServiceTest {
+public class JEventServiceTest extends TestNGSuite {
 
     private RedisTestProps redisTestProps;
     private KafkaTestProps kafkaTestProps;
@@ -101,6 +101,7 @@ public class JEventServiceTest {
 
         Pair<IEventSubscription, CompletionStage<List<Event>>> pair = baseProperties.jSubscriber().subscribe(Collections.singleton(event1.eventKey())).take(2).toMat(Sink.seq(), Keep.both()).run(baseProperties.wiring().resumingMat());
         pair.first().isReady().get(10, TimeUnit.SECONDS);
+        Thread.sleep(100);
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
 
         Pair<IEventSubscription, CompletionStage<List<Event>>> pair2 = baseProperties.jSubscriber().subscribe(Collections.singleton(event2.eventKey())).take(2).toMat(Sink.seq(), Keep.both()).run(baseProperties.wiring().resumingMat());
