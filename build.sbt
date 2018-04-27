@@ -1,4 +1,4 @@
-val enableCoverage = sys.props.get("enableCoverage").contains("true")
+val enableCoverage         = sys.props.get("enableCoverage").contains("true")
 val MaybeCoverage: Plugins = if (enableCoverage) Coverage else Plugins.empty
 
 lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
@@ -63,7 +63,7 @@ lazy val `csw-messages` = project
   .settings(
     Common.detectCycles := false,
     PB.targets in Compile := Seq(
-      PB.gens.java -> (sourceManaged in Compile).value,
+      PB.gens.java                        -> (sourceManaged in Compile).value,
       scalapb.gen(javaConversions = true) -> (sourceManaged in Compile).value
     )
   )
@@ -98,8 +98,8 @@ lazy val `csw-cluster-seed` = project
   .dependsOn(
     `csw-messages`,
     `csw-location`,
-    `csw-commons` % "compile->compile;test->test",
-    `csw-framework` % "test->test",
+    `csw-commons`       % "compile->compile;test->test",
+    `csw-framework`     % "test->test",
     `csw-config-server` % "test->test",
   )
   .enablePlugins(DeployApp, MaybeCoverage)
@@ -138,8 +138,8 @@ lazy val `csw-config-server` = project
 lazy val `csw-config-client` = project
   .dependsOn(
     `csw-config-api`,
-    `csw-commons` % "compile->compile;test->test",
-    `csw-location` % "compile->compile;multi-jvm->multi-jvm",
+    `csw-commons`       % "compile->compile;test->test",
+    `csw-location`      % "compile->compile;multi-jvm->multi-jvm",
     `csw-config-server` % "test->test"
   )
   .enablePlugins(PublishBintray, AutoMultiJvm, MaybeCoverage)
@@ -151,8 +151,8 @@ lazy val `csw-config-client-cli` = project
   .dependsOn(
     `csw-config-client`,
     `csw-config-server` % "test->test",
-    `csw-location` % "multi-jvm->multi-jvm",
-    `csw-commons` % "test->test"
+    `csw-location`      % "multi-jvm->multi-jvm",
+    `csw-commons`       % "test->test"
   )
   .enablePlugins(DeployApp, AutoMultiJvm, MaybeCoverage)
   .settings(
@@ -170,9 +170,9 @@ lazy val `csw-framework` = project
     `csw-config-client`,
     `csw-logging`,
     `csw-command`,
-    `csw-location` % "compile->compile;multi-jvm->multi-jvm",
+    `csw-location`      % "compile->compile;multi-jvm->multi-jvm",
     `csw-config-server` % "multi-jvm->test",
-    `csw-commons` % "test->test"
+    `csw-commons`       % "test->test"
   )
   .enablePlugins(PublishBintray, AutoMultiJvm, GenJavadocPlugin, CswBuildInfo, MaybeCoverage)
   .settings(
@@ -182,6 +182,7 @@ lazy val `csw-framework` = project
 lazy val `csw-event-api` = project
   .dependsOn(`csw-messages`)
   .enablePlugins(GenJavadocPlugin)
+  .settings(Common.detectCycles := false)
 
 lazy val `csw-event-impl` = project
   .dependsOn(
@@ -190,8 +191,7 @@ lazy val `csw-event-impl` = project
     `csw-location` % "compile->compile;multi-jvm->multi-jvm"
   )
   .enablePlugins(AutoMultiJvm, MaybeCoverage)
-  .settings(libraryDependencies ++= Dependencies.EventImpl,
-    Common.detectCycles := false)
+  .settings(libraryDependencies ++= Dependencies.EventImpl, Common.detectCycles := false)
 
 lazy val `csw-commons` = project
   .enablePlugins(PublishBintray, GenJavadocPlugin)
