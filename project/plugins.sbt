@@ -1,6 +1,6 @@
 addSbtPlugin("com.thesamet"                      % "sbt-protoc"                 % "0.99.18")
 addSbtPlugin("org.scalastyle"                    %% "scalastyle-sbt-plugin"     % "1.0.0")
-addSbtPlugin("com.geirsson"                      % "sbt-scalafmt"               % "1.4.0")
+addSbtPlugin("com.geirsson"                      % "sbt-scalafmt"               % "1.5.0")
 addSbtPlugin("com.dwijnand"                      % "sbt-dynver"                 % "3.0.0")
 addSbtPlugin("com.eed3si9n"                      % "sbt-unidoc"                 % "0.4.1")
 addSbtPlugin("com.thoughtworks.sbt-api-mappings" % "sbt-api-mappings"           % "2.0.1")
