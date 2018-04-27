@@ -95,6 +95,8 @@ class EventServiceScalabilityTest
       subscriberNodes = roles.tail
     }
 
+//    runPerfFlames(roles: _*)(delay = 5.seconds, time = 40.seconds)
+
     val nodeId = myself.name.split("-").tail.head.toInt
 
     val pubSubAllocationPerNode =
@@ -121,8 +123,7 @@ class EventServiceScalabilityTest
       var eventsReceivedPerNode       = 0L
       val histogramPerNode: Histogram = new Histogram(SECONDS.toNanos(10), 3)
 
-      var aggregatedTotalTime: Long      = 0L
-      var aggregatedEventsReceived: Long = 0L
+      var aggregatedThroughput: Double   = 0
       var aggregatedHistogram: Histogram = null
 
       runOn(activeSubscriberNodes.head) {
@@ -134,10 +135,9 @@ class EventServiceScalabilityTest
           case event: SystemEvent if newEvent ⇒
             receivedPerfEventCount += 1
             val histogramBuffer = ByteString(event.get(EventUtils.histogramKey).get.values).asByteBuffer
-
             aggregatedHistogram.add(Histogram.decodeFromByteBuffer(histogramBuffer, SECONDS.toNanos(10)))
-            aggregatedTotalTime = Math.max(aggregatedTotalTime, event.get(EventUtils.totalTimeKey).get.head)
-            aggregatedEventsReceived += event.get(EventUtils.eventsReceivedKey).get.head
+
+            aggregatedThroughput += event.get(EventUtils.throughputKey).get.head
 
             if (receivedPerfEventCount == activeSubscriberNodes.size) completionProbe.ref ! "completed"
           case _ ⇒ newEvent = true
@@ -167,14 +167,17 @@ class EventServiceScalabilityTest
 
       val byteBuffer: ByteBuffer = ByteBuffer.allocate(1358140)
       histogramPerNode.encodeIntoByteBuffer(byteBuffer)
+
       Await.result(
-        publisher.publish(EventUtils.perfResultEvent(byteBuffer.array(), eventsReceivedPerNode, totalTimePerNode)),
+        publisher.publish(
+          EventUtils.perfResultEvent(byteBuffer.array(), eventsReceivedPerNode / nanosToSeconds(totalTimePerNode))
+        ),
         5.seconds
       )
 
       runOn(activeSubscriberNodes.head) {
         completionProbe.receiveOne(5.seconds)
-        aggregateResult(testSettings, aggregatedEventsReceived, aggregatedTotalTime, aggregatedHistogram)
+        aggregateResult(testSettings, aggregatedThroughput, aggregatedHistogram)
       }
 
       enterBarrier(testName + "-done")
@@ -213,12 +216,10 @@ class EventServiceScalabilityTest
 
   private def aggregateResult(
       testSettings: TestSettings,
-      aggregatedEventsReceived: Long,
-      totalTime: Long,
+      throughput: Double,
       aggregatedHistogram: Histogram
   ): Unit = {
     import testSettings._
-    val throughput = aggregatedEventsReceived / nanosToSeconds(totalTime)
 
     throughputPlots = throughputPlots.addAll(PlotResult().add(testName, throughput))
 

@@ -4,7 +4,7 @@ import java.time.Instant
 
 import csw.messages.events.{EventKey, EventName, EventTime, SystemEvent}
 import csw.messages.params.generics.Key
-import csw.messages.params.generics.KeyType.{ByteKey, LongKey}
+import csw.messages.params.generics.KeyType.{ByteKey, DoubleKey, LongKey}
 import csw.messages.params.models.{Id, Prefix}
 
 object EventUtils {
@@ -13,20 +13,17 @@ object EventUtils {
   val testEventKey = s"${prefix.prefix}.$testEventS"
   val endEventS    = "end"
 
-  val payloadKey: Key[Byte]        = ByteKey.make("payloadKey")
-  val histogramKey: Key[Byte]      = ByteKey.make("histogramKey")
-  val eventsReceivedKey: Key[Long] = LongKey.make("eventsRecdKey")
-  val totalTimeKey: Key[Long]      = LongKey.make("totalTimeKey")
+  val payloadKey: Key[Byte]      = ByteKey.make("payloadKey")
+  val histogramKey: Key[Byte]    = ByteKey.make("histogramKey")
+  val throughputKey: Key[Double] = DoubleKey.make("throughputKey")
 
   val baseTestEvent = SystemEvent(prefix, EventName(testEventS))
 
   val basePerfEvent          = SystemEvent(prefix, EventName("perf"))
   val perfEventKey: EventKey = basePerfEvent.eventKey
 
-  def perfResultEvent(payload: Array[Byte], eventsReceived: Long, totalTime: Long): SystemEvent =
-    basePerfEvent.copy(
-      paramSet = Set(histogramKey.set(payload), eventsReceivedKey.set(eventsReceived), totalTimeKey.set(totalTime))
-    )
+  def perfResultEvent(payload: Array[Byte], throughput: Double): SystemEvent =
+    basePerfEvent.copy(paramSet = Set(histogramKey.set(payload), throughputKey.set(throughput)))
 
   def event(name: EventName, id: Long = -1, payload: Array[Byte] = Array.emptyByteArray): SystemEvent =
     baseTestEvent.copy(
