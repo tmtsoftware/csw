@@ -8,7 +8,7 @@ import csw.messages.commons.CoordinatedShutdownReasons;
 import csw.messages.events.Event;
 import csw.services.event.exceptions.PublishFailed;
 import csw.services.event.helpers.Utils;
-import csw.services.event.internal.commons.FailedEvent;
+import csw.services.event.internal.wiring.FailedEvent;
 import csw.services.event.javadsl.IEventPublisher;
 import csw.services.event.javadsl.JRedisFactory;
 import io.lettuce.core.ClientOptions;

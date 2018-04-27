@@ -1,6 +1,5 @@
 package csw.services.event.internal.kafka
 
-import acyclic.skipped
 import akka.Done
 import akka.kafka.ProducerSettings
 import akka.stream.Materializer
@@ -8,15 +7,15 @@ import akka.stream.scaladsl.{Sink, Source}
 import csw.messages.events.Event
 import csw.services.event.commons.EventServiceLogger
 import csw.services.event.exceptions.PublishFailed
+import csw.services.event.internal.pubsub.BaseEventPublisher
 import csw.services.event.javadsl.IEventPublisher
-import csw.services.event.scaladsl.EventPublisher
 import org.apache.kafka.clients.producer.{Callback, ProducerRecord}
 
 import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.util.control.NonFatal
 
 class KafkaPublisher(producerSettings: ProducerSettings[String, Array[Byte]])(implicit ec: ExecutionContext, mat: Materializer)
-    extends EventPublisher {
+    extends BaseEventPublisher {
   private val logger = EventServiceLogger.getLogger
 
   private val kafkaProducer = producerSettings.createKafkaProducer()
@@ -56,7 +55,7 @@ class KafkaPublisher(producerSettings: ProducerSettings[String, Array[Byte]])(im
       maybeOnError: Option[(Event, PublishFailed) ⇒ Unit]
   ): Mat =
     source
-      .mapAsync(1) {
+      .mapAsync(100) {
         maybeOnError match {
           case Some(onError) ⇒ publish(_).recover { case ex @ PublishFailed(event, _) ⇒ onError(event, ex) }
           case None          ⇒ publish

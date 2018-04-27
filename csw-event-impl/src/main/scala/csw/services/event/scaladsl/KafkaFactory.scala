@@ -3,8 +3,8 @@ package csw.services.event.scaladsl
 import java.net.URI
 
 import akka.kafka.{ConsumerSettings, ProducerSettings}
-import csw.services.event.internal.commons.{EventServiceResolver, Wiring}
 import csw.services.event.internal.kafka.{KafkaPublisher, KafkaSubscriber}
+import csw.services.event.internal.wiring.{EventServiceResolver, Wiring}
 import csw.services.location.scaladsl.LocationService
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.serialization.{ByteArrayDeserializer, ByteArraySerializer, StringDeserializer, StringSerializer}

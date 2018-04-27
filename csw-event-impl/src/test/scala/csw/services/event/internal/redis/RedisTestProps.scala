@@ -1,7 +1,7 @@
 package csw.services.event.internal.redis
 
 import csw.services.event.helpers.TestFutureExt.RichFuture
-import csw.services.event.internal.commons.{BaseProperties, Wiring}
+import csw.services.event.internal.wiring.{BaseProperties, Wiring}
 import csw.services.event.scaladsl.{EventPublisher, EventSubscriber, RedisFactory}
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.LocationService

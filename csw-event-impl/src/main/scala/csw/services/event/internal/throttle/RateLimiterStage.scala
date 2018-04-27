@@ -1,22 +1,20 @@
-package csw.services.event.internal
+package csw.services.event.internal.throttle
 
 import akka.stream.stage._
 import akka.stream.{Attributes, FlowShape, Inlet, Outlet}
 
 import scala.concurrent.duration.FiniteDuration
 
-class RateAdapterStage[A](delay: FiniteDuration) extends GraphStage[FlowShape[A, A]] {
+class RateLimiterStage[A](delay: FiniteDuration) extends GraphStage[FlowShape[A, A]] {
   final val in    = Inlet.create[A]("DroppingThrottle.in")
   final val out   = Outlet.create[A]("DroppingThrottle.out")
   final val shape = FlowShape.of(in, out)
 
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = new TimerGraphStageLogic(shape) {
-    private var isPulled             = false
-    private var maybeElem: Option[A] = None
+    private var open = false
 
     override def preStart(): Unit = {
       schedulePeriodically(None, delay)
-      pull(in)
     }
 
     setHandler(
@@ -24,8 +22,12 @@ class RateAdapterStage[A](delay: FiniteDuration) extends GraphStage[FlowShape[A,
       new InHandler {
         override def onPush(): Unit = {
           val elem = grab(in)
-          maybeElem = Some(elem)
-          pull(in) //drop
+          if (open) {
+            pull(in) //drop
+          } else {
+            push(out, elem)
+            open = true
+          }
         }
       }
     )
@@ -34,18 +36,13 @@ class RateAdapterStage[A](delay: FiniteDuration) extends GraphStage[FlowShape[A,
       out,
       new OutHandler {
         override def onPull(): Unit = {
-          isPulled = true
+          pull(in)
         }
       }
     )
 
     override def onTimer(key: Any): Unit = {
-      if (isPulled) {
-        maybeElem.foreach { x =>
-          isPulled = false
-          push(out, x)
-        }
-      }
+      open = false
     }
   }
 }

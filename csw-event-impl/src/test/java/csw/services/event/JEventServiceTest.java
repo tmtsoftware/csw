@@ -11,7 +11,7 @@ import csw.messages.commons.CoordinatedShutdownReasons;
 import csw.messages.events.*;
 import csw.messages.params.models.Prefix;
 import csw.services.event.helpers.Utils;
-import csw.services.event.internal.commons.BaseProperties;
+import csw.services.event.internal.wiring.BaseProperties;
 import csw.services.event.internal.kafka.KafkaTestProps;
 import csw.services.event.internal.redis.RedisTestProps;
 import csw.services.event.javadsl.IEventPublisher;

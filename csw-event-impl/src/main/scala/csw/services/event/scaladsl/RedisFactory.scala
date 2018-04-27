@@ -2,8 +2,8 @@ package csw.services.event.scaladsl
 
 import java.net.URI
 
-import csw.services.event.internal.commons.{EventServiceResolver, Wiring}
 import csw.services.event.internal.redis.{RedisPublisher, RedisSubscriber}
+import csw.services.event.internal.wiring.{EventServiceResolver, Wiring}
 import csw.services.location.scaladsl.LocationService
 import io.lettuce.core.{RedisClient, RedisURI}
 

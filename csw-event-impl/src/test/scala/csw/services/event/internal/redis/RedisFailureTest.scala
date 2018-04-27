@@ -7,7 +7,7 @@ import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.event.exceptions.PublishFailed
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.helpers.Utils
-import csw.services.event.internal.commons.FailedEvent
+import csw.services.event.internal.wiring.FailedEvent
 import io.lettuce.core.ClientOptions
 import io.lettuce.core.ClientOptions.DisconnectedBehavior
 import org.scalatest.mockito.MockitoSugar

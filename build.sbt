@@ -190,7 +190,8 @@ lazy val `csw-event-impl` = project
     `csw-location` % "compile->compile;multi-jvm->multi-jvm"
   )
   .enablePlugins(AutoMultiJvm, MaybeCoverage)
-  .settings(libraryDependencies ++= Dependencies.EventImpl)
+  .settings(libraryDependencies ++= Dependencies.EventImpl,
+    Common.detectCycles := false)
 
 lazy val `csw-commons` = project
   .enablePlugins(PublishBintray, GenJavadocPlugin)

@@ -1,6 +1,5 @@
 package csw.services.event.scaladsl
 
-import acyclic.skipped
 import akka.Done
 import akka.actor.Cancellable
 import akka.stream.scaladsl.Source
@@ -9,7 +8,7 @@ import csw.services.event.exceptions.PublishFailed
 import csw.services.event.javadsl.IEventPublisher
 
 import scala.concurrent.Future
-import scala.concurrent.duration.{DurationDouble, FiniteDuration}
+import scala.concurrent.duration.FiniteDuration
 
 trait EventPublisher {
 
@@ -19,15 +18,11 @@ trait EventPublisher {
 
   def publish[Mat](source: Source[Event, Mat], onError: (Event, PublishFailed) ⇒ Unit): Mat
 
-  def publish(eventGenerator: => Event, every: FiniteDuration): Cancellable = publish(eventStream(eventGenerator, every))
+  def publish(eventGenerator: => Event, every: FiniteDuration): Cancellable
 
-  def publish(eventGenerator: ⇒ Event, every: FiniteDuration, onError: (Event, PublishFailed) ⇒ Unit): Cancellable =
-    publish(eventStream(eventGenerator, every), onError)
+  def publish(eventGenerator: ⇒ Event, every: FiniteDuration, onError: (Event, PublishFailed) ⇒ Unit): Cancellable
 
   def shutdown(): Future[Done]
 
   def asJava: IEventPublisher
-
-  private def eventStream(eventGenerator: => Event, every: FiniteDuration): Source[Event, Cancellable] =
-    Source.tick(0.millis, every, ()).map(_ => eventGenerator)
 }

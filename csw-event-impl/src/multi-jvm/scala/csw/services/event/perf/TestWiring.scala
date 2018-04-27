@@ -1,7 +1,7 @@
 package csw.services.event.perf
 
 import akka.actor.ActorSystem
-import csw.services.event.internal.commons.Wiring
+import csw.services.event.internal.wiring.Wiring
 import csw.services.event.scaladsl.{EventPublisher, EventSubscriber, KafkaFactory, RedisFactory}
 import csw.services.location.scaladsl.LocationService
 import io.lettuce.core.RedisClient

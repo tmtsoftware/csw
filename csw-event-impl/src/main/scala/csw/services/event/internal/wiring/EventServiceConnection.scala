@@ -1,4 +1,4 @@
-package csw.services.event.internal.commons
+package csw.services.event.internal.wiring
 
 import csw.messages.location.Connection.TcpConnection
 import csw.messages.location.{ComponentId, ComponentType}

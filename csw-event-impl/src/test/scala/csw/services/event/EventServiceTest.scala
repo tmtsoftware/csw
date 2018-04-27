@@ -9,7 +9,7 @@ import csw.messages.events.{Event, EventKey, EventName, SystemEvent}
 import csw.messages.params.models.Prefix
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.helpers.Utils.{makeDistinctEvent, makeEvent}
-import csw.services.event.internal.commons._
+import csw.services.event.internal.wiring._
 import csw.services.event.internal.kafka.KafkaTestProps
 import csw.services.event.internal.redis.RedisTestProps
 import net.manub.embeddedkafka.EmbeddedKafka

@@ -1,13 +1,13 @@
 package csw.services.event.internal.kafka
 
-import acyclic.skipped
 import akka.Done
 import akka.kafka.{scaladsl, ConsumerSettings, Subscription, Subscriptions}
 import akka.stream.Materializer
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import csw.messages.events._
+import csw.services.event.internal.pubsub.BaseEventSubscriber
 import csw.services.event.javadsl.IEventSubscriber
-import csw.services.event.scaladsl.{EventSubscriber, EventSubscription}
+import csw.services.event.scaladsl.EventSubscription
 import csw_protobuf.events.PbEvent
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.common.TopicPartition
@@ -17,7 +17,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(implicit ec: ExecutionContext,
                                                                                protected val mat: Materializer)
-    extends EventSubscriber {
+    extends BaseEventSubscriber {
 
   val consumer: Consumer[String, Array[Byte]] = consumerSettings.createKafkaConsumer()
 

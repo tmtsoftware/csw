@@ -3,9 +3,8 @@ package csw.services.event.scaladsl
 import acyclic.skipped
 import akka.actor.typed.ActorRef
 import akka.stream.Materializer
-import akka.stream.scaladsl.{Sink, Source}
+import akka.stream.scaladsl.Source
 import csw.messages.events.{Event, EventKey}
-import csw.services.event.internal.RateAdapterStage
 import csw.services.event.javadsl.IEventSubscriber
 
 import scala.concurrent.Future
@@ -16,47 +15,23 @@ trait EventSubscriber {
 
   def subscribe(eventKeys: Set[EventKey]): Source[Event, EventSubscription]
 
-  def subscribe(eventKeys: Set[EventKey], every: FiniteDuration): Source[Event, EventSubscription] =
-    subscribe(eventKeys).via(new RateAdapterStage[Event](every))
+  def subscribe(eventKeys: Set[EventKey], every: FiniteDuration): Source[Event, EventSubscription]
 
-  def subscribeAsync(eventKeys: Set[EventKey], callback: Event => Future[_]): EventSubscription =
-    subscribe(eventKeys).mapAsync(1)(x => callback(x)).to(Sink.ignore).run()
+  def subscribeAsync(eventKeys: Set[EventKey], callback: Event => Future[_]): EventSubscription
 
-  def subscribeAsync(eventKeys: Set[EventKey], callback: Event => Future[_], every: FiniteDuration): EventSubscription =
-    subscribe(eventKeys, every).mapAsync(1)(x => callback(x)).to(Sink.ignore).run()
+  def subscribeAsync(eventKeys: Set[EventKey], callback: Event => Future[_], every: FiniteDuration): EventSubscription
 
-  def subscribeCallback(eventKeys: Set[EventKey], callback: Event => Unit): EventSubscription =
-    subscribe(eventKeys).to(Sink.foreach(callback)).run()
+  def subscribeCallback(eventKeys: Set[EventKey], callback: Event => Unit): EventSubscription
 
-  def subscribeCallback(eventKeys: Set[EventKey], callback: Event => Unit, every: FiniteDuration): EventSubscription =
-    subscribe(eventKeys, every).to(Sink.foreach(callback)).run()
+  def subscribeCallback(eventKeys: Set[EventKey], callback: Event => Unit, every: FiniteDuration): EventSubscription
 
-  def subscribeActorRef(eventKeys: Set[EventKey], actorRef: ActorRef[Event]): EventSubscription =
-    subscribeCallback(eventKeys, event => actorRef ! event)
+  def subscribeActorRef(eventKeys: Set[EventKey], actorRef: ActorRef[Event]): EventSubscription
 
-  def subscribeActorRef(eventKeys: Set[EventKey], actorRef: ActorRef[Event], every: FiniteDuration): EventSubscription =
-    subscribeCallback(eventKeys, event => actorRef ! event, every)
+  def subscribeActorRef(eventKeys: Set[EventKey], actorRef: ActorRef[Event], every: FiniteDuration): EventSubscription
 
   def get(eventKeys: Set[EventKey]): Future[Set[Event]]
 
   def get(eventKey: EventKey): Future[Event]
 
   def asJava: IEventSubscriber
-
-//  def subscribeWithSinkActorRef(eventKeys: Set[EventKey], every: FiniteDuration): Source[Event, EventSubscription] = {
-//    implicit val timeout: Timeout       = Timeout(10.seconds)
-//    implicit val sender: actor.ActorRef = DummyActor()
-//
-//    val eventStoreActor   = EventStoreActor()
-//    val eventSubscription = subscribe(eventKeys).to(Sink.actorRef(eventStoreActor, "streamCompleted")).run()
-//
-//    def event(): Event = {
-//      val eventualEvent = eventStoreActor ? "getLatest"
-//      Await.result(eventualEvent, every).asInstanceOf[Event]
-//    }
-//    Source
-//      .tick(0.millis, every, ())
-//      .map(_ ⇒ event())
-//      .mapMaterializedValue(_ ⇒ eventSubscription)
-//  }
 }

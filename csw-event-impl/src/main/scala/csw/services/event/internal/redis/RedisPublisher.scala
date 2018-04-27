@@ -1,14 +1,13 @@
 package csw.services.event.internal.redis
 
-import acyclic.skipped
 import akka.Done
 import akka.stream._
 import akka.stream.scaladsl.{Sink, Source}
 import csw.messages.events.{Event, EventKey}
 import csw.services.event.commons.EventServiceLogger
 import csw.services.event.exceptions.PublishFailed
+import csw.services.event.internal.pubsub.BaseEventPublisher
 import csw.services.event.javadsl.IEventPublisher
-import csw.services.event.scaladsl.EventPublisher
 import io.lettuce.core.api.async.RedisAsyncCommands
 import io.lettuce.core.{RedisClient, RedisURI}
 
@@ -18,7 +17,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
 class RedisPublisher(redisURI: RedisURI, redisClient: RedisClient)(implicit ec: ExecutionContext, mat: Materializer)
-    extends EventPublisher {
+    extends BaseEventPublisher {
   private val logger = EventServiceLogger.getLogger
 
   private lazy val asyncConnectionF: Future[RedisAsyncCommands[EventKey, Event]] =
