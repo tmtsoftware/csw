@@ -76,8 +76,6 @@ class EventServicePerfTest
 
     runPerfFlames(first, second)(delay = 5.seconds, time = 40.seconds)
 
-    implicit val ec: ExecutionContext = system.dispatcher
-
     runOn(second) {
       val rep                            = reporter(testName)
       val aggregatedHistogram: Histogram = new Histogram(SECONDS.toNanos(10), 3)
