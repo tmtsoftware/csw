@@ -53,7 +53,6 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
               timerScheduler,
               None,
               compInfo,
-              new SampleComponentBehaviorFactory,
               commandResponseManagerFactory,
               registrationFactory,
               locationService,

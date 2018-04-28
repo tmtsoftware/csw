@@ -22,7 +22,7 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
   import testMocks._
 
   val containerIdleMessageProbe: TestProbe[ContainerIdleMessage] = TestProbe[ContainerIdleMessage]
-  val timerScheduler                                             = mock[TimerScheduler[SupervisorMessage]]
+  private val timerScheduler                                             = mock[TimerScheduler[SupervisorMessage]]
 
   doNothing()
     .when(timerScheduler)
@@ -76,7 +76,6 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
             timerScheduler,
             None,
             hcdInfo,
-            new SampleComponentBehaviorFactory,
             commandResponseManagerFactory,
             registrationFactory,
             locationService,

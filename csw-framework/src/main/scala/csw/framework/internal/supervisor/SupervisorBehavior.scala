@@ -62,7 +62,6 @@ private[framework] object SupervisorBehavior {
  * @param maybeContainerRef the container ref of the container under which this supervisor is started if
  *                          its not running in standalone mode
  * @param componentInfo component related information as described in the configuration file
- * @param componentBehaviorFactory the factory for creating the component supervised by this Supervisor
  * @param commandResponseManagerFactory the factory for creating actor instance of [[csw.framework.internal.pubsub.PubSubBehavior]]
  *                                      for utilising pub-sub of any state of a component
  * @param registrationFactory the factory for creating a typed [[csw.services.location.models.AkkaRegistration]] from
@@ -75,7 +74,6 @@ private[framework] final class SupervisorBehavior(
     timerScheduler: TimerScheduler[SupervisorMessage],
     maybeContainerRef: Option[ActorRef[ContainerIdleMessage]],
     componentInfo: ComponentInfo,
-    componentBehaviorFactory: ComponentBehaviorFactory,
     commandResponseManagerFactory: CommandResponseManagerFactory,
     registrationFactory: RegistrationFactory,
     locationService: LocationService,
@@ -315,7 +313,7 @@ private[framework] final class SupervisorBehavior(
   private def createTLA(): ActorRef[Nothing] = {
     val behavior = Behaviors
       .supervise[Nothing](
-        componentBehaviorFactory
+        ComponentBehaviorFactory
           .make(componentInfo,
                 ctx.self,
                 new CurrentStatePublisher(pubSubComponentActor),

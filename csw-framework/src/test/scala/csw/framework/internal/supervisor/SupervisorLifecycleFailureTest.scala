@@ -219,7 +219,6 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
       hcdInfo,
       locationService,
       registrationFactory,
-      new SampleBehaviorFactory(componentHandlers),
       commandResponseManagerFactory,
       new LoggerFactory(hcdInfo.name)
     )
@@ -240,7 +239,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
   }
 
   private def createAnswers(compStateProbe: TestProbe[CurrentState]): Unit = {
-    initializeAnswer = (_) ⇒
+    initializeAnswer = _ ⇒
       Future {
         // small sleep is required in order for test probe to subscribe for component state and lifecycle state
         // before component actually gets initialized
@@ -248,17 +247,8 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
         compStateProbe.ref ! CurrentState(prefix, Set(choiceKey.set(initChoice)))
     }
 
-    shutdownAnswer = (_) ⇒ Future.successful(compStateProbe.ref ! CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
+    shutdownAnswer = _ ⇒ Future.successful(compStateProbe.ref ! CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
   }
-}
-
-class SampleBehaviorFactory(componentHandlers: ComponentHandlers) extends ComponentBehaviorFactory {
-  override protected def handlers(ctx: ActorContext[TopLevelActorMessage],
-                                  componentInfo: ComponentInfo,
-                                  commandResponseManager: CommandResponseManager,
-                                  currentStatePublisher: CurrentStatePublisher,
-                                  locationService: LocationService,
-                                  loggerFactory: LoggerFactory): ComponentHandlers = componentHandlers
 }
 
 case class TestFailureStop(msg: String)    extends FailureStop(msg)

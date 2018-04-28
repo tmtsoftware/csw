@@ -2,7 +2,6 @@ package csw.framework.internal.supervisor
 
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior}
-import csw.framework.scaladsl.ComponentBehaviorFactory
 import csw.messages.framework.ComponentInfo
 import csw.messages.scaladsl.{ComponentMessage, ContainerIdleMessage, SupervisorMessage}
 import csw.services.command.internal.CommandResponseManagerFactory
@@ -22,9 +21,6 @@ private[framework] object SupervisorBehaviorFactory {
       commandResponseManagerFactory: CommandResponseManagerFactory
   ): Behavior[ComponentMessage] = {
 
-    val componentWiringClass = Class.forName(componentInfo.behaviorFactoryClassName)
-    val componentBehaviorFactory =
-      componentWiringClass.getDeclaredConstructor().newInstance().asInstanceOf[ComponentBehaviorFactory]
     val loggerFactory = new LoggerFactory(componentInfo.name)
 
     make(
@@ -32,7 +28,6 @@ private[framework] object SupervisorBehaviorFactory {
       componentInfo,
       locationService,
       registrationFactory,
-      componentBehaviorFactory,
       commandResponseManagerFactory,
       loggerFactory
     )
@@ -44,7 +39,6 @@ private[framework] object SupervisorBehaviorFactory {
       componentInfo: ComponentInfo,
       locationService: LocationService,
       registrationFactory: RegistrationFactory,
-      componentBehaviorFactory: ComponentBehaviorFactory,
       commandResponseManagerFactory: CommandResponseManagerFactory,
       loggerFactory: LoggerFactory
   ): Behavior[ComponentMessage] = {
@@ -59,7 +53,6 @@ private[framework] object SupervisorBehaviorFactory {
                   timerScheduler,
                   containerRef,
                   componentInfo,
-                  componentBehaviorFactory,
                   commandResponseManagerFactory,
                   registrationFactory,
                   locationService,
