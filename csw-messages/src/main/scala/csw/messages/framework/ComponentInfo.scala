@@ -15,8 +15,8 @@ import scala.concurrent.duration.{DurationDouble, FiniteDuration}
  * @param componentType
  *  : the type of the component as defined by [[csw.messages.location.ComponentType]]
  * @param prefix identifies the subsystem
- * @param behaviorFactoryClassName
- *  : specifies the component to be created by name of the class of it's factory
+ * @param handlersClassName
+ *  : specifies the name of component handlers class
  * @param locationServiceUsage
  *  : specifies component's usage of location service
  * @param connections : set of connections that will be used by this component for interaction
@@ -27,7 +27,7 @@ final case class ComponentInfo(
     name: String,
     componentType: ComponentType,
     prefix: String,
-    behaviorFactoryClassName: String,
+    handlersClassName: String,
     locationServiceUsage: LocationServiceUsage,
     connections: Set[Connection] = Set.empty,
     initializeTimeout: FiniteDuration = 10.seconds
