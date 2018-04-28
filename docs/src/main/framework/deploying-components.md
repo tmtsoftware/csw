@@ -48,7 +48,7 @@ SampleContainerInfo
       {
         name = "SampleAssembly"
         componentType = assembly
-        behaviorFactoryClassName = package.component.SampleAssembly
+        handlersClassName = package.component.SampleAssemblyHandlers
         prefix = abc.sample.prefix
         locationServiceUsage = RegisterAndTrackServices
         connections = [
@@ -72,14 +72,14 @@ SampleContainerInfo
       {
         name = "Sample_Hcd_1"
         componentType = hcd
-        behaviorFactoryClassName = package.component.SampleHcd
+        handlersClassName = package.component.SampleHcdHandlers
         prefix = abc.sample.prefix
         locationServiceUsage = RegisterOnly
       },
       {
         name = "Sample_Hcd_2"
         componentType: hcd
-        behaviorFactoryClassName: package.component.SampleHcd
+        handlersClassName: package.component.SampleHcdHandlers
         prefix: abc.sample.prefix
         locationServiceUsage = RegisterOnly
       }
@@ -96,7 +96,7 @@ Sample Info for an assembly
     ```
     name = "Monitor_Assembly"
     componentType = assembly
-    behaviorFactoryClassName = csw.common.components.command.ComponentBehaviorFactoryForCommand
+    handlersClassName = csw.common.components.command.MyComponentHandlers
     prefix = tcs.mobie.blue.monitor
     locationServiceUsage = RegisterOnly
     ```

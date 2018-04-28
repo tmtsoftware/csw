@@ -40,7 +40,7 @@ While the Supervisor works as the external interface for the component and the m
 of a component is implemented in a Top Level Actor (TLA), spawned by supervisor actor for any component. 
 However, the developer is not expected to implement TLA code directly.  Instead, the functionality of the TLA is added by
 implementing the `ComponentHandlers` abstract class, consisting of a list of a methods, or `hooks`, called by the TLA during specific lifecycle and command events (see [Handlers](#handlers)).
-The `ComponentHandlers` implementation is specified during constructing using that factory (see [Constructing The Component](#constructing-the-component)) 
+The `ComponentHandlers` implementation is specified in the `ComponentInfo` file (see [Constructing The Component](#constructing-the-component)). 
 
 The source code of the Top Level Actor can be found [here](https://github.com/tmtsoftware/csw-prod/blob/master/csw-framework/src/main/scala/csw/framework/internal/component/ComponentBehavior.scala).
 
@@ -75,22 +75,6 @@ As seen in the @ref:[Getting Started](getting-started.md) page, if you are using
 We will walkthough filling them in below.
 
 
-## Constructing the Component
-
-After writing the handlers, component developer needs to wire it up with framework. In order to do this, developer 
-needs to implement a `ComponentBehaviorFactory`. This factory should to be configured in configuration file for
-the component (see example below). The `csw-framework` then picks up the full path of
-`ComponentBehaviorFactory` from configuration file and spawns the component handlers using this factory as a process of
-booting a component. The factory is instantiated using java reflection.
-
-Additional sample code to implement the `ComponentBehaviorFactory` can be found @ref:[here](./framework.md#creating-components) 
-
-#### *Tutorial: Developing an HCD*
-
-As seen in the @ref:[Getting Started](getting-started.md) page, if using the template, this factory class will be implemented for you.
-
-
-
 ## Component Configuration (ComponentInfo)
 
 Component configuration contains details needed to spawn a component. This configuration resides in a configuration file
@@ -99,14 +83,14 @@ for a particular component. The template creates one for our sample HCD as follo
 ```
 name = "SampleHcd"
 componentType = hcd
-behaviorFactoryClassName = "org.tmt.nfiraos.samplehcd.SampleHcdBehaviorFactory"
+handlersClassName = "org.tmt.nfiraos.samplehcd.SampleHcdHandlers"
 prefix = "nfiraos.samplehcd"
 locationServiceUsage = RegisterOnly
 ``` 
 
 @@@ note { title=Note }
 
-`behaviorFactoryClassName` refers to class name of the concrete implementation of `ComponentBehaviorFactory`, which is `SampleHcdBehaviorFactory` in above example.
+`handlersClassName` refers to class name of the concrete implementation of `ComponentHandlers`, which is `SampleHcdHandlers` in above example.
 
 @@@
 

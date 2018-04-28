@@ -11,8 +11,7 @@ More details about implementing ComponentHandlers can be found @ref:[here](./cre
 
 #### *Tutorial: Developing an Assembly*
 
-If using the giter8 template with the default parameters, our `ComponentHandlers` class will be the `SampleAssemblyHandlers` class,
-and the factory will be `SampleAssemblyBehaviorFactory`.
+If using the giter8 template with the default parameters, our `ComponentHandlers` class will be the `SampleAssemblyHandlers` class.
 
 Like we did for the HCD, let's add some log messages for the `initialize` and `onShutdown` hooks, but not the 
 `onTrackingLocationEvent` hook.  We'll cover that in more detail later.
@@ -28,7 +27,7 @@ ComponentInfo file for an Assembly:
 ```
 name = "SampleAssembly"
 componentType = assembly
-behaviorFactoryClassName = "org.tmt.nfiraos.sampleassembly.SampleAssemblyBehaviorFactory"
+handlersClassName = "org.tmt.nfiraos.sampleassembly.SampleAssemblyHandlers"
 prefix = "nfiraos.sample"
 locationServiceUsage = RegisterAndTrackServices
 connections = [
@@ -55,7 +54,7 @@ components: [
   {
     name = "SampleAssembly"
     componentType = assembly
-    behaviorFactoryClassName = "org.tmt.nfiraos.sampleassembly.SampleAssemblyBehaviorFactory"
+    handlersClassName = "org.tmt.nfiraos.sampleassembly.SampleAssemblyHandlers"
     prefix = "nfiraos.sample"
     locationServiceUsage = RegisterAndTrackServices
     connections = [
@@ -69,7 +68,7 @@ components: [
   {
     name = "SampleHcd"
     componentType = hcd
-    behaviorFactoryClassName = "org.tmt.nfiraos.samplehcd.SampleHcdBehaviorFactory"
+    handlersClassName = "org.tmt.nfiraos.samplehcd.SampleHcdHandlers"
     prefix = "nfiraos.samplehcd"
     locationServiceUsage = RegisterOnly
   }

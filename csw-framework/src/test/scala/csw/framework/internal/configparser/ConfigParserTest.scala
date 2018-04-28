@@ -98,7 +98,7 @@ class ConfigParserTest extends FunSuite with Matchers {
     ConfigParser.parseStandalone(config) shouldEqual assemblyInfo
   }
 
-  test("should able to throw error when 'behaviorFactoryClassName' is missing for assembly") {
+  test("should able to throw error when 'handlersClassName' is missing for assembly") {
     val config = ConfigFactory.parseResources(getClass, "/parsing_test_conf/assembly/missing_classname.conf")
 
     intercept[java.lang.RuntimeException] {
@@ -147,7 +147,7 @@ class ConfigParserTest extends FunSuite with Matchers {
     }
   }
 
-  test("should able to throw error when 'behaviorFactoryClassName' is missing for hcd") {
+  test("should able to throw error when 'handlersClassName' is missing for hcd") {
     val config = ConfigFactory.parseResources(getClass, "/parsing_test_conf/hcd/missing_classname.conf")
 
     intercept[java.lang.RuntimeException] {

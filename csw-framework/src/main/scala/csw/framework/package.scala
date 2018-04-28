@@ -65,7 +65,7 @@ package csw
  *
  * Here is an example of a config file for creating a container with the name ''IRIS_Container'' that
  * contains one assembly (named ''Filter'') and depends on the services of two HCDs (''Instrument_Filter'' and ''Disperser'').
- * Factory class for assembly is `csw.common.components.framework.SampleComponentBehaviorFactory`.
+ * The assembly handlers class is `csw.common.components.framework.SampleComponentHandlers`.
  * A `Supervisor` actor will be created to manage the assembly, which includes registering it with the
  * location service, using the given name and prefix. The prefix can be used to distribute parts of the
  * configurations to different HCDs. HCDs register themselves with the Location Service and specify a unique
@@ -78,7 +78,7 @@ package csw
  *      {
  *        name = "Filter"
  *        componentType = assembly
- *        behaviorFactoryClassName = csw.common.components.framework.SampleComponentBehaviorFactory
+ *        handlersClassName = csw.common.components.framework.SampleComponentHandlers
  *        prefix = tcs.mobie.blue.filter
  *        locationServiceUsage = RegisterOnly
  *        connections = [
@@ -97,14 +97,14 @@ package csw
  *      {
  *        name = "Instrument_Filter"
  *        componentType = hcd
- *        behaviorFactoryClassName = csw.common.components.framework.SampleComponentBehaviorFactory
+ *        handlersClassName = csw.common.components.framework.SampleComponentHandlers
  *        prefix = tcs.mobie.blue.filter
  *        locationServiceUsage = RegisterOnly
  *      },
  *      {
  *        name = "Disperser"
  *        componentType: hcd
- *        behaviorFactoryClassName: csw.common.components.framework.SampleComponentBehaviorFactory
+ *        handlersClassName: csw.common.components.framework.SampleComponentHandlers
  *        prefix: tcs.mobie.blue.disperser
  *        locationServiceUsage = RegisterOnly
  *      }
@@ -118,7 +118,7 @@ package csw
  *
  *    name = "IFS_Detector"
  *    componentType = hcd
- *    behaviorFactoryClassName = csw.common.components.framework.SampleComponentBehaviorFactory
+ *    handlersClassName = csw.common.components.framework.SampleComponentHandlers
  *    prefix = iris.ifs
  *    locationServiceUsage = RegisterOnly
  *    connections = []

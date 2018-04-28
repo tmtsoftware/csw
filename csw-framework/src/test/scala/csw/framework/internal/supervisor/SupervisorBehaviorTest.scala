@@ -5,7 +5,6 @@ import akka.actor.typed.scaladsl.{Behaviors, TimerScheduler}
 import akka.testkit.typed.Effect
 import akka.testkit.typed.scaladsl.Effects.{Spawned, Watched}
 import akka.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
-import csw.common.components.framework.SampleComponentBehaviorFactory
 import csw.framework.ComponentInfos._
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.messages.scaladsl.{ComponentMessage, ContainerIdleMessage, SupervisorMessage}
@@ -22,7 +21,7 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
   import testMocks._
 
   val containerIdleMessageProbe: TestProbe[ContainerIdleMessage] = TestProbe[ContainerIdleMessage]
-  private val timerScheduler                                             = mock[TimerScheduler[SupervisorMessage]]
+  private val timerScheduler                                     = mock[TimerScheduler[SupervisorMessage]]
 
   doNothing()
     .when(timerScheduler)

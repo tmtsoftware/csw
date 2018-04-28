@@ -8,7 +8,7 @@ AssemblyInfo
     ```
     name = "Sample_Assembly"
     componentType = assembly
-    behaviorFactoryClassName = package.component.SampleAssembly
+    handlersClassName = package.component.SampleAssemblyHandlers
     prefix = abc.sample.prefix
     locationServiceUsage = RegisterAndTrackServices
     connections = [
@@ -26,7 +26,7 @@ HcdInfo
     ```
     name = "Sample_Hcd"
     componentType = hcd
-    behaviorFactoryClassName = package.component.SampleHcd
+    handlersClassName = package.component.SampleHcdHandlers
     prefix = abc.sample.prefix
     locationServiceUsage = RegisterOnly
     ```
@@ -36,7 +36,7 @@ Following is the summary of properties in the ComponentInfo config/model:
 
 * **name** : The name of the component
 * **componentType** : The type of the component which could be `Container`, `Assembly`, `Hcd` or `Service`
-* **behaviorFactoryClassName** : The fully qualified name of the class which extends the factory class `ComponentBehaviorFactory`
+* **handlersClassName** : The fully qualified name of the class which extends the class `ComponentHandlers`
 * **prefix** : A valid subsystem to which this component belongs.
 * **connections** : A collection of `connections` of the components or services which will be used by this component. This information can 
 be used in accordance with the `locationServiceUsage` property to track these components or services by the framework.

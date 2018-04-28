@@ -2,7 +2,7 @@ package csw.framework.internal.component
 
 import akka.actor.typed.Behavior
 import akka.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
-import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
+import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers, CurrentStatePublisher}
 import csw.framework.{ComponentInfos, FrameworkTestSuite}
 import csw.messages.scaladsl.FromComponentLifecycleMessage.Running
 import csw.messages.scaladsl.TopLevelActorIdleMessage.Initialize
@@ -28,9 +28,7 @@ class ComponentBehaviorTest extends FrameworkTestSuite with MockitoSugar with Ma
     when(commandResponseManager.commandResponseManagerActor).thenReturn(TestProbe[CommandResponseManagerMessage].ref)
     val locationService: LocationService = mock[LocationService]
 
-    val factory = new TestComponentBehaviorFactory(sampleComponentHandler)
-
-    private val behavior: Behavior[Nothing] = factory.make(ComponentInfos.hcdInfo,
+    private val behavior: Behavior[Nothing] = ComponentBehaviorFactory.make(ComponentInfos.hcdInfo,
                                                            supervisorProbe.ref,
                                                            mock[CurrentStatePublisher],
                                                            commandResponseManager,

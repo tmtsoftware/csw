@@ -15,7 +15,7 @@ public class JComponentInfos {
             "JSampleHcd",
             JComponentType.HCD,
             "wfos",
-            "csw.framework.javadsl.components.JSampleComponentBehaviorFactory",
+            "csw.framework.javadsl.components.JSampleComponentHandlers",
             LocationServiceUsage.JRegisterOnly(),
             Collections.emptySet(),
             new FiniteDuration(10, TimeUnit.SECONDS)
@@ -25,7 +25,7 @@ public class JComponentInfos {
             "trombone",
             JComponentType.HCD,
             "wfos",
-            "csw.framework.javadsl.components.JSampleComponentBehaviorFactory",
+            "csw.framework.javadsl.components.JSampleComponentHandlers",
             LocationServiceUsage.JRegisterOnly(),
             Collections.emptySet(),
             new FiniteDuration(50, TimeUnit.MILLISECONDS)

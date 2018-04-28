@@ -27,18 +27,3 @@ methods in Java which can be used by adding the following import:
 `import akka.actor.typed.scaladsl.adapter._`  for Scala and,
 `import akka.actor.typed.javadsl.Adapter.*` for Java
 
-@@@
-
-A component can be created by a factory which extends `ComponentBehaviorFactory` base class and provides a definition of `handlers` method to return the appropriate implementation of `ComponentHandlers`.
-
-Assembly/Scala
-:   @@snip [AssemblyComponentBehaviorFactory.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/AssemblyComponentBehaviorFactory.scala) { #component-factory }
-
-Assembly/Java
-:   @@snip [JAssemblyComponentBehaviorFactory.java](../../../../examples/src/main/java/csw/framework/components/assembly/JAssemblyComponentBehaviorFactory.java) { #jcomponent-factory }
-
-Hcd/Scala
-:   @@snip [HcdComponentBehaviorFactory.scala](../../../../examples/src/main/scala/csw/framework/components/hcd/HcdComponentBehaviorFactory.scala) { #component-factory }
-
-Hcd/Java
-:   @@snip [JHcdComponentBehaviorFactory.java](../../../../examples/src/main/java/csw/framework/components/hcd/JHcdComponentBehaviorFactory.java) { #jcomponent-factory }

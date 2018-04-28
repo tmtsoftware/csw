@@ -32,6 +32,7 @@ abstract class FrameworkTestSuite extends FunSuite with Matchers with BeforeAndA
     Await.result(typedSystem.terminate(), 5.seconds)
   }
 
+  /*  TODO is this needed? - JLW
   def getSampleHcdWiring(
       componentHandlers: ComponentHandlers
   ): ComponentBehaviorFactory =
@@ -51,7 +52,7 @@ abstract class FrameworkTestSuite extends FunSuite with Matchers with BeforeAndA
      currentStatePublisher: CurrentStatePublisher,
      locationService: LocationService,
      loggerFactory: LoggerFactory) => assemblyHandlers
-
+*/
   def createSupervisorAndStartTLA(
       componentInfo: ComponentInfo,
       testMocks: FrameworkTestMocks,

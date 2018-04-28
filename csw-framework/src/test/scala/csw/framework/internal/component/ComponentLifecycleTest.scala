@@ -2,7 +2,7 @@ package csw.framework.internal.component
 
 import akka.actor.typed.{Behavior, PostStop}
 import akka.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
-import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
+import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers, CurrentStatePublisher}
 import csw.framework.{ComponentInfos, FrameworkTestSuite}
 import csw.messages.commands.CommandResponse.{Accepted, Completed, Error}
 import csw.messages.commands.{CommandName, CommandResponse, Observe, Setup}
@@ -39,9 +39,8 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     val sampleHcdHandler: ComponentHandlers = mock[ComponentHandlers]
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
     when(sampleHcdHandler.onShutdown()).thenReturn(Future.unit)
-    val factory = new TestComponentBehaviorFactory(sampleHcdHandler)
 
-    private val behavior: Behavior[Nothing] = factory.make(ComponentInfos.hcdInfo,
+    private val behavior: Behavior[Nothing] = ComponentBehaviorFactory.make(ComponentInfos.hcdInfo,
                                                            supervisorProbe.ref,
                                                            mock[CurrentStatePublisher],
                                                            commandResponseManager,
