@@ -12,6 +12,7 @@ import akka.util.ByteString
 import com.typesafe.config.ConfigFactory
 import csw.messages.events.{Event, SystemEvent}
 import csw.services.event.perf.EventUtils.{nanosToMicros, nanosToSeconds}
+import io.lettuce.core.RedisClient
 import org.HdrHistogram.Histogram
 import org.scalatest._
 
@@ -52,9 +53,12 @@ class EventServiceScalabilityTest
     with PerfFlamesSupport
     with BeforeAndAfterAll {
 
-  val testConfigs = new TestConfigs(system.settings.config)
-  val wiring      = new TestWiring(system)
+  private val testConfigs = new TestConfigs(system.settings.config)
   import testConfigs._
+
+  // create single redis client per jvm if running redis benchmarks
+  private val mayBeRedisClient = if (redisEnabled) Some(RedisClient.create()) else None
+  private val wiring           = new TestWiring(system, mayBeRedisClient)
   import wiring._
 
   def adjustedTotalMessages(n: Long): Long = (n * totalMessagesFactor).toLong
@@ -144,12 +148,12 @@ class EventServiceScalabilityTest
         }
 
         val eventSubscription = subscriber.subscribeCallback(Set(EventUtils.perfEventKey), onEvent)
-        Await.result(eventSubscription.ready, 5.seconds)
+        Await.result(eventSubscription.ready(), 30.seconds)
       }
 
       val subscribers = subIds.map { n ⇒
         val pubId      = if (singlePublisher) 1 else n
-        val subscriber = new Subscriber(testSettings, testConfigs, rep, pubId, n)
+        val subscriber = new Subscriber(testSettings, testConfigs, rep, pubId, n, mayBeRedisClient)
         val doneF      = subscriber.startSubscription()
         (doneF, subscriber)
       }
@@ -157,7 +161,7 @@ class EventServiceScalabilityTest
 
       subscribers.foreach {
         case (doneF, subscriber) ⇒
-          Await.result(doneF, 5.minute)
+          Await.result(doneF, 20.minute)
           subscriber.printResult()
 
           histogramPerNode.add(subscriber.histogram)
@@ -172,11 +176,11 @@ class EventServiceScalabilityTest
         publisher.publish(
           EventUtils.perfResultEvent(byteBuffer.array(), eventsReceivedPerNode / nanosToSeconds(totalTimePerNode))
         ),
-        5.seconds
+        30.seconds
       )
 
       runOn(activeSubscriberNodes.head) {
-        completionProbe.receiveOne(5.seconds)
+        completionProbe.receiveOne(30.seconds)
         aggregateResult(testSettings, aggregatedThroughput, aggregatedHistogram)
       }
 
@@ -201,7 +205,7 @@ class EventServiceScalabilityTest
 
       enterBarrier(subscriberName + "-started")
 
-      pubIds.foreach(id ⇒ new Publisher(testSettings, testConfigs, id).startPublishing())
+      pubIds.foreach(id ⇒ new Publisher(testSettings, testConfigs, id, mayBeRedisClient).startPublishing())
 
       enterBarrier(testName + "-done")
     }

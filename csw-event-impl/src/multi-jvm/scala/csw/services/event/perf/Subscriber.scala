@@ -10,17 +10,19 @@ import akka.stream.scaladsl.{Keep, Source}
 import csw.messages.events.{Event, EventKey, EventName, SystemEvent}
 import csw.services.event.perf.EventUtils._
 import csw.services.event.scaladsl.{EventSubscriber, EventSubscription}
+import io.lettuce.core.RedisClient
 import org.HdrHistogram.Histogram
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
-class Subscriber(testSettings: TestSettings,
-                 testConfigs: TestConfigs,
-                 reporter: TestRateReporter,
-                 publisherId: Int,
-                 subscriberId: Int)(
-    implicit val system: ActorSystem
-) {
+class Subscriber(
+    testSettings: TestSettings,
+    testConfigs: TestConfigs,
+    reporter: TestRateReporter,
+    publisherId: Int,
+    subscriberId: Int,
+    mayBeRedisClient: Option[RedisClient]
+)(implicit val system: ActorSystem) {
 
   import testSettings._
   import testConfigs._
@@ -28,7 +30,7 @@ class Subscriber(testSettings: TestSettings,
   implicit val mat: ActorMaterializer       = ActorMaterializer()
   implicit val ec: ExecutionContextExecutor = system.dispatcher
 
-  private val subscriber: EventSubscriber = new TestWiring(system).subscriber
+  private val subscriber: EventSubscriber = new TestWiring(system, mayBeRedisClient).subscriber
   val histogram: Histogram                = new Histogram(SECONDS.toNanos(10), 3)
   private val resultReporter              = new ResultReporter(testName, system)
 

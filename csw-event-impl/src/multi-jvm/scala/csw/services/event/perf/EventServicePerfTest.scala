@@ -9,11 +9,12 @@ import akka.remote.testkit.{MultiNodeConfig, MultiNodeSpec, MultiNodeSpecCallbac
 import akka.testkit._
 import com.typesafe.config.ConfigFactory
 import csw.services.event.perf.EventUtils.{nanosToMicros, nanosToSeconds}
+import io.lettuce.core.RedisClient
 import org.HdrHistogram.Histogram
 import org.scalatest._
 
+import scala.concurrent.Await
 import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContext}
 
 object EventServicePerfTest extends MultiNodeConfig {
   val first: RoleName  = role("first")
@@ -40,6 +41,7 @@ class EventServicePerfTest
 
   val testConfigs = new TestConfigs(system.settings.config)
   import testConfigs._
+  private val mayBeRedisClient = if (redisEnabled) Some(RedisClient.create()) else None
 
   var throughputPlots: PlotResult = PlotResult()
   var latencyPlots: LatencyPlots  = LatencyPlots()
@@ -82,7 +84,7 @@ class EventServicePerfTest
 
       val subscribers = for (n ← 1 to publisherSubscriberPairs) yield {
         val publisherId = if (testSettings.singlePublisher) 1 else n
-        val subscriber  = new Subscriber(testSettings, testConfigs, rep, publisherId, n)
+        val subscriber  = new Subscriber(testSettings, testConfigs, rep, publisherId, n, mayBeRedisClient)
         (subscriber.startSubscription(), subscriber)
       }
 
@@ -121,7 +123,7 @@ class EventServicePerfTest
       enterBarrier(subscriberName + "-started")
 
       for (n ← 1 to noOfPublishers) yield {
-        new Publisher(testSettings, testConfigs, n).startPublishing()
+        new Publisher(testSettings, testConfigs, n, mayBeRedisClient).startPublishing()
       }
 
       enterBarrier(testName + "-done")
