@@ -18,22 +18,25 @@ import scala.util.control.NonFatal
 
 class RedisPublisher(redisURI: RedisURI, redisClient: RedisClient)(implicit ec: ExecutionContext, mat: Materializer)
     extends BaseEventPublisher {
+
   private val logger = EventServiceLogger.getLogger
 
   private lazy val asyncConnectionF: Future[RedisAsyncCommands[EventKey, Event]] =
     redisClient.connectAsync(EventServiceCodec, redisURI).toScala.map(_.async())
 
   override def publish[Mat](source: Source[Event, Mat], onError: (Event, PublishFailed) ⇒ Unit): Mat =
-    publishWithOptionalRecovery(source, Some(onError))
+    publishWithRecovery(source, Some(onError))
 
-  override def publish[Mat](source: Source[Event, Mat]): Mat = publishWithOptionalRecovery(source, None)
+  override def publish[Mat](source: Source[Event, Mat]): Mat = publishWithRecovery(source, None)
 
-  // publish api will fail only if `publish` fails on redis-server and not if `publish` is successful and `set` fails on redis-server
   override def publish(event: Event): Future[Done] =
     async {
       val commands = await(asyncConnectionF)
       await(commands.publish(event.eventKey, event).toScala)
-      await(commands.set(event.eventKey, event).toScala.recover { case NonFatal(ex) ⇒ logger.error(ex.getMessage, ex = ex) })
+      await(
+        commands.set(event.eventKey, event).toScala
+        recover { case NonFatal(ex) ⇒ logger.error(ex.getMessage, ex = ex) } // publish api will fail only if `publish` fails on redis-server and not if `publish` is successful and `set` fails on redis-server
+      )
       Done
     } recover {
       case NonFatal(ex) ⇒ throw PublishFailed(event, ex.getMessage)
@@ -43,10 +46,7 @@ class RedisPublisher(redisURI: RedisURI, redisClient: RedisClient)(implicit ec: 
 
   override def asJava: IEventPublisher = new JRedisPublisher(this)
 
-  private def publishWithOptionalRecovery[Mat](
-      source: Source[Event, Mat],
-      maybeOnError: Option[(Event, PublishFailed) ⇒ Unit]
-  ): Mat =
+  private def publishWithRecovery[Mat](source: Source[Event, Mat], maybeOnError: Option[(Event, PublishFailed) ⇒ Unit]): Mat =
     source
       .mapAsync(1) {
         maybeOnError match {

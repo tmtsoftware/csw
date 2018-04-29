@@ -67,7 +67,7 @@ class EventServiceTest extends TestNGSuite with Matchers with Eventually with Em
     val testProbe          = TestProbe[Event]()(actorSystem.toTyped)
     val subscription       = subscriber.subscribe(Set(eventKey)).toMat(Sink.foreach(testProbe.ref ! _))(Keep.left).run()
 
-    subscription.isReady.await
+    subscription.ready.await
     publisher.publish(event1).await
 
     testProbe.expectMessageType[SystemEvent].isInvalid shouldBe true
@@ -91,12 +91,12 @@ class EventServiceTest extends TestNGSuite with Matchers with Eventually with Em
     val event2: Event = SystemEvent(prefix, eventName2)
 
     val (subscription, seqF) = subscriber.subscribe(Set(event1.eventKey)).take(2).toMat(Sink.seq)(Keep.both).run()
-    subscription.isReady.await
+    subscription.ready.await
     Thread.sleep(100)
     publisher.publish(event1).await
 
     val (subscription2, seqF2) = subscriber.subscribe(Set(event2.eventKey)).take(2).toMat(Sink.seq)(Keep.both).run()
-    subscription2.isReady.await
+    subscription2.ready.await
     publisher.publish(event2).await
 
     seqF.await.toSet shouldBe Set(Event.invalidEvent(event1.eventKey), event1)
@@ -122,7 +122,7 @@ class EventServiceTest extends TestNGSuite with Matchers with Eventually with Em
     val eventKey: EventKey          = makeEvent(0).eventKey
 
     val subscription = subscriber.subscribe(Set(eventKey)).to(Sink.foreach[Event](queue.enqueue(_))).run()
-    subscription.isReady.await
+    subscription.ready.await
 
     cancellable = publisher.publish(eventGenerator(), 2.millis)
 
@@ -142,7 +142,7 @@ class EventServiceTest extends TestNGSuite with Matchers with Eventually with Em
     val events: immutable.Seq[Event] = for (i ← 101 to 110) yield makeDistinctEvent(i)
 
     val subscription = subscriber.subscribe(events.map(_.eventKey).toSet).to(Sink.foreach(queue.enqueue(_))).run()
-    subscription.isReady.await
+    subscription.ready.await
 
     publisher.publish(Source.fromIterator(() ⇒ events.toIterator))
 
@@ -168,7 +168,7 @@ class EventServiceTest extends TestNGSuite with Matchers with Eventually with Em
     publisher.publish(event2).await // latest event before subscribing
 
     val (subscription, seqF) = subscriber.subscribe(Set(eventKey)).take(2).toMat(Sink.seq)(Keep.both).run()
-    subscription.isReady.await
+    subscription.ready.await
 
     publisher.publish(event3).await
 

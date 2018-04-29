@@ -13,6 +13,7 @@ import scala.compat.java8.FutureConverters.FutureOps
 
 class JRedisFactory(redisClient: RedisClient, locationService: LocationService, wiring: Wiring) {
   import wiring._
+
   private val eventServiceResolver = new EventServiceResolver(locationService)
 
   def publisher(host: String, port: Int): IEventPublisher = {

@@ -6,5 +6,5 @@ import akka.Done
 
 trait IEventSubscription {
   def unsubscribe(): CompletableFuture[Done]
-  def isReady(): CompletableFuture[Done]
+  def ready(): CompletableFuture[Done]
 }

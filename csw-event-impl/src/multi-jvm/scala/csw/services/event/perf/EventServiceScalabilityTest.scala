@@ -144,7 +144,7 @@ class EventServiceScalabilityTest
         }
 
         val eventSubscription = subscriber.subscribeCallback(Set(EventUtils.perfEventKey), onEvent)
-        Await.result(eventSubscription.isReady, 5.seconds)
+        Await.result(eventSubscription.ready, 5.seconds)
       }
 
       val subscribers = subIds.map { n ⇒

@@ -16,21 +16,22 @@ import scala.util.control.NonFatal
 
 class KafkaPublisher(producerSettings: ProducerSettings[String, Array[Byte]])(implicit ec: ExecutionContext, mat: Materializer)
     extends BaseEventPublisher {
+
   private val logger = EventServiceLogger.getLogger
 
   private val kafkaProducer = producerSettings.createKafkaProducer()
 
   override def publish[Mat](stream: Source[Event, Mat], onError: (Event, PublishFailed) ⇒ Unit): Mat =
-    publishWithOptionalRecovery(stream, Some(onError))
+    publishWithRecovery(stream, Some(onError))
 
   override def publish(event: Event): Future[Done] = {
-    val p: Promise[Done] = Promise()
+    val promisedDone: Promise[Done] = Promise()
     try {
-      kafkaProducer.send(convert(event), complete(event, p))
+      kafkaProducer.send(eventToProducerRecord(event), completePromise(event, promisedDone))
     } catch {
-      case NonFatal(ex) ⇒ p.failure(PublishFailed(event, ex.getMessage))
+      case NonFatal(ex) ⇒ promisedDone.failure(PublishFailed(event, ex.getMessage))
     }
-    p.future
+    promisedDone.future
   }
 
   override def shutdown(): Future[Done] = Future {
@@ -38,22 +39,19 @@ class KafkaPublisher(producerSettings: ProducerSettings[String, Array[Byte]])(im
     Done
   }
 
-  private def convert(event: Event): ProducerRecord[String, Array[Byte]] =
+  private def eventToProducerRecord(event: Event): ProducerRecord[String, Array[Byte]] =
     new ProducerRecord(event.eventKey.key, Event.typeMapper.toBase(event).toByteArray)
 
-  private def complete(event: Event, p: Promise[Done]): Callback = {
-    case (_, null)          ⇒ p.success(Done)
-    case (_, ex: Exception) ⇒ p.failure(PublishFailed(event, ex.getMessage))
+  private def completePromise(event: Event, promisedDone: Promise[Done]): Callback = {
+    case (_, null)          ⇒ promisedDone.success(Done)
+    case (_, ex: Exception) ⇒ promisedDone.failure(PublishFailed(event, ex.getMessage))
   }
 
-  override def publish[Mat](source: Source[Event, Mat]): Mat = publishWithOptionalRecovery(source, None)
+  override def publish[Mat](source: Source[Event, Mat]): Mat = publishWithRecovery(source, None)
 
   override def asJava: IEventPublisher = new JKafkaPublisher(this)
 
-  private def publishWithOptionalRecovery[Mat](
-      source: Source[Event, Mat],
-      maybeOnError: Option[(Event, PublishFailed) ⇒ Unit]
-  ): Mat =
+  private def publishWithRecovery[Mat](source: Source[Event, Mat], maybeOnError: Option[(Event, PublishFailed) ⇒ Unit]): Mat =
     source
       .mapAsync(100) {
         maybeOnError match {

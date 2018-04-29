@@ -3,8 +3,8 @@ package csw.services.event.internal.wiring
 import java.util.concurrent.CompletableFuture
 
 import akka.Done
-import akka.actor.{ActorSystem, CoordinatedShutdown}
 import akka.actor.CoordinatedShutdown.Reason
+import akka.actor.{ActorSystem, CoordinatedShutdown}
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Materializer, Supervision}
 
 import scala.compat.java8.FutureConverters.FutureOps

@@ -19,33 +19,21 @@ class RateAdapterStage[A](delay: FiniteDuration) extends GraphStage[FlowShape[A,
       pull(in)
     }
 
-    setHandler(
-      in,
-      new InHandler {
-        override def onPush(): Unit = {
-          val elem = grab(in)
-          maybeElem = Some(elem)
-          pull(in) //drop
-        }
+    setHandler(in, new InHandler {
+      override def onPush(): Unit = {
+        maybeElem = Some(grab(in))
+        pull(in) //drop
       }
-    )
+    })
 
-    setHandler(
-      out,
-      new OutHandler {
-        override def onPull(): Unit = {
-          isPulled = true
-        }
-      }
-    )
+    setHandler(out, new OutHandler {
+      override def onPull(): Unit =
+        isPulled = true
+    })
 
-    override def onTimer(key: Any): Unit = {
-      if (isPulled) {
-        maybeElem.foreach { x =>
-          isPulled = false
-          push(out, x)
-        }
-      }
+    override def onTimer(key: Any): Unit = if (isPulled) maybeElem.foreach { x =>
+      isPulled = false
+      push(out, x)
     }
   }
 }

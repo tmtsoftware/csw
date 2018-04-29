@@ -16,6 +16,8 @@ import scala.compat.java8.FutureConverters.FutureOps
 class JKafkaFactory(locationService: LocationService, wiring: Wiring) {
   import wiring._
 
+  private val eventServiceResolver = new EventServiceResolver(locationService)
+
   def publisher(host: String, port: Int): IEventPublisher = {
     val kafkaPublisher = new KafkaPublisher(producerSettings(host, port))
     new JKafkaPublisher(kafkaPublisher)
@@ -38,14 +40,12 @@ class JKafkaFactory(locationService: LocationService, wiring: Wiring) {
       subscriber(uri.getHost, uri.getPort)
     }.toJava.toCompletableFuture
 
-  private def consumerSettings(host: String, port: Int) =
-    ConsumerSettings(actorSystem, new StringDeserializer, new ByteArrayDeserializer)
-      .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest")
-      .withBootstrapServers(s"$host:$port")
-
   private def producerSettings(host: String, port: Int) =
     ProducerSettings(actorSystem, new StringSerializer, new ByteArraySerializer)
       .withBootstrapServers(s"$host:$port")
 
-  private val eventServiceResolver = new EventServiceResolver(locationService)
+  private def consumerSettings(host: String, port: Int) =
+    ConsumerSettings(actorSystem, new StringDeserializer, new ByteArrayDeserializer)
+      .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest")
+      .withBootstrapServers(s"$host:$port")
 }

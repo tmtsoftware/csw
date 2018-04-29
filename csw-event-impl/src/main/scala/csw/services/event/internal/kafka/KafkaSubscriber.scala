@@ -12,6 +12,7 @@ import csw_protobuf.events.PbEvent
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.common.TopicPartition
 
+import scala.async.Async.{async, await}
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -19,7 +20,7 @@ class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(i
                                                                                protected val mat: Materializer)
     extends BaseEventSubscriber {
 
-  val consumer: Consumer[String, Array[Byte]] = consumerSettings.createKafkaConsumer()
+  private val consumer: Consumer[String, Array[Byte]] = consumerSettings.createKafkaConsumer()
 
   override def subscribe(eventKeys: Set[EventKey]): Source[Event, EventSubscription] = {
     val partitionToOffsets = getLatestOffsets(eventKeys)
@@ -36,7 +37,7 @@ class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(i
         new EventSubscription {
           override def unsubscribe(): Future[Done] = control.shutdown().map(_ ⇒ Done)
 
-          override def isReady: Future[Done] = Future.successful(Done)
+          override def ready(): Future[Done] = Future.successful(Done)
         }
       }
   }
@@ -44,8 +45,9 @@ class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(i
   override def get(eventKeys: Set[EventKey]): Future[Set[Event]] = {
     val (subscription, eventsF) = subscribe(eventKeys).take(eventKeys.size).toMat(Sink.seq)(Keep.both).run()
 
-    eventsF.map { events ⇒
-      subscription.unsubscribe()
+    async {
+      val events = await(eventsF)
+      await(subscription.unsubscribe())
       events.toSet
     }
   }
