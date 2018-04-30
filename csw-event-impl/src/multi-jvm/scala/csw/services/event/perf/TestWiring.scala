@@ -7,18 +7,12 @@ import csw.services.location.scaladsl.LocationService
 import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar
 
-class TestWiring(actorSystem: ActorSystem, mayBeRedisClient: Option[RedisClient] = None) extends MockitoSugar {
+class TestWiring(actorSystem: ActorSystem, val wiring: Wiring) extends MockitoSugar {
 
   lazy val testConfigs = new TestConfigs(actorSystem.settings.config)
   import testConfigs._
 
-  lazy val wiring: Wiring = new Wiring(actorSystem)
-
-  lazy val redisFactory: RedisFactory = new RedisFactory(
-    mayBeRedisClient.getOrElse(throw new RuntimeException("Redis client not initialized.")),
-    mock[LocationService],
-    wiring
-  )
+  lazy val redisFactory: RedisFactory = new RedisFactory(RedisClient.create(), mock[LocationService], wiring)
   lazy val kafkaFactory: KafkaFactory = new KafkaFactory(mock[LocationService], wiring)
 
   def publisher: EventPublisher =
