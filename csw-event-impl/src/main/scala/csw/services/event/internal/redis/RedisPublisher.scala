@@ -32,11 +32,11 @@ class RedisPublisher(redisURI: RedisURI, redisClient: RedisClient)(implicit ec: 
   override def publish(event: Event): Future[Done] =
     async {
       val commands = await(asyncConnectionF)
-      await(commands.publish(event.eventKey, event).toScala)
-      await(
-        commands.set(event.eventKey, event).toScala
-        recover { case NonFatal(ex) ⇒ logger.error(ex.getMessage, ex = ex) } // publish api will fail only if `publish` fails on redis-server and not if `publish` is successful and `set` fails on redis-server
-      )
+      // allow publish and set to run in parallel
+      val publishF = commands.publish(event.eventKey, event).toScala
+      val setF     = commands.set(event.eventKey, event).toScala
+      await(publishF)
+      await(setF.recover { case NonFatal(ex) ⇒ logger.error(ex.getMessage, ex = ex) }) // publish api will fail only if `publish` fails on redis-server and not if `publish` is successful and `set` fails on redis-server)
       Done
     } recover {
       case NonFatal(ex) ⇒ throw PublishFailed(event, ex.getMessage)
