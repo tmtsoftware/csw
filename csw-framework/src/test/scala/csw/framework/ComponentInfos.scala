@@ -58,5 +58,34 @@ object ComponentInfos {
     5.seconds
   )
 
+  val initFailureHcdInfo =
+    ComponentInfo(
+      "SampleHcd",
+      HCD,
+      "wfos",
+      "csw.common.components.framework.InitFailureComponentHandlers",
+      RegisterOnly,
+      Set.empty
+    )
+
+  val initFailureRestartHcdInfo =
+    ComponentInfo(
+      "SampleHcd",
+      HCD,
+      "wfos",
+      "csw.common.components.framework.InitFailureRestartComponentHandlers",
+      RegisterOnly,
+      Set.empty
+    )
+
+  val validateFailureRestartHcdInfo =
+    ComponentInfo(
+      "SampleHcd",
+      HCD,
+      "wfos",
+      "csw.common.components.framework.ValidateFailureRestartComponentHandlers",
+      RegisterOnly,
+      Set.empty
+    )
   val containerInfo: ContainerInfo = ContainerInfo("container", Set(hcdInfo, assemblyInfo))
 }

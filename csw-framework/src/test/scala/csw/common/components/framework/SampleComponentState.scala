@@ -1,5 +1,6 @@
 package csw.common.components.framework
 
+import csw.framework.exceptions.{FailureRestart, FailureStop}
 import csw.messages.location.Connection.{HttpConnection, TcpConnection}
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.params.generics.GChoiceKey
@@ -51,4 +52,9 @@ object SampleComponentState {
   val choiceKey: GChoiceKey          = ChoiceKey.make("choiceKey", choices)
   val httpConnection: HttpConnection = HttpConnection(ComponentId("exampleHTTPService", ComponentType.Service))
   val tcpConnection: TcpConnection   = TcpConnection(ComponentId("exampleTcpService", ComponentType.Service))
+
+  case class TestFailureStop(msg: String)    extends FailureStop(msg)
+  case class TestFailureRestart(msg: String) extends FailureRestart(msg)
+  var testRestart = true
+
 }

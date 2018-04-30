@@ -311,6 +311,7 @@ private[framework] final class SupervisorBehavior(
   }
 
   private def createTLA(): ActorRef[Nothing] = {
+
     val behavior = Behaviors
       .supervise[Nothing](
         ComponentBehaviorFactory

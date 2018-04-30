@@ -1,7 +1,6 @@
 package csw.framework.internal.supervisor
 
 import akka.actor.typed.ActorRef
-import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.testkit.typed.scaladsl.TestProbe
 import com.persist.JsonOps
@@ -11,29 +10,20 @@ import csw.common.components.framework.SampleComponentState._
 import csw.common.utils.TestAppender
 import csw.commons.tags.LoggingSystemSensitive
 import csw.framework.ComponentInfos._
-import csw.framework.exceptions.{FailureRestart, FailureStop}
 import csw.framework.internal.component.ComponentBehavior
-import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers, CurrentStatePublisher}
-import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
-import csw.messages.commands.{CommandName, CommandResponse, ControlCommand, Setup}
+import csw.framework.{ComponentInfos, FrameworkTestMocks, FrameworkTestSuite}
+import csw.messages.commands.{CommandName, CommandResponse, Setup}
 import csw.messages.framework.{ComponentInfo, LifecycleStateChanged, PubSub, SupervisorLifecycleState}
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.CurrentState
 import csw.messages.scaladsl.CommandMessage.Submit
-import csw.messages.scaladsl.ComponentCommonMessage.{
-  ComponentStateSubscription,
-  GetSupervisorLifecycleState,
-  LifecycleStateSubscription
-}
+import csw.messages.scaladsl.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
 import csw.messages.scaladsl.SupervisorContainerCommonMessages.Restart
-import csw.messages.scaladsl.{ComponentMessage, ContainerIdleMessage, TopLevelActorMessage}
-import csw.services.command.scaladsl.CommandResponseManager
-import csw.services.location.scaladsl.LocationService
+import csw.messages.scaladsl.{ComponentMessage, ContainerIdleMessage}
 import csw.services.logging.internal.LoggingLevels.ERROR
 import csw.services.logging.internal.LoggingSystem
 import csw.services.logging.scaladsl.LoggerFactory
-import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.mockito.stubbing.Answer
 import org.scalatest.BeforeAndAfterEach
@@ -47,17 +37,17 @@ import scala.concurrent.{ExecutionContext, Future}
 class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
   val supervisorLifecycleStateProbe: TestProbe[SupervisorLifecycleState] = TestProbe[SupervisorLifecycleState]
-  var supervisorRef: ActorRef[ComponentMessage]                          = _
-  var initializeAnswer: Answer[Future[Unit]]                             = _
-  var submitAnswer: Answer[Future[Unit]]                                 = _
-  var shutdownAnswer: Answer[Future[Unit]]                               = _
-  var runAnswer: Answer[Future[Unit]]                                    = _
+  var supervisorRef: ActorRef[ComponentMessage] = _
+  var initializeAnswer: Answer[Future[Unit]] = _
+  var submitAnswer: Answer[Future[Unit]] = _
+  var shutdownAnswer: Answer[Future[Unit]] = _
+  var runAnswer: Answer[Future[Unit]] = _
 
   implicit val ec: ExecutionContext = typedSystem.executionContext
 
   // all log messages will be captured in log buffer
-  private val logBuffer                    = mutable.Buffer.empty[JsonObject]
-  private val testAppender                 = new TestAppender(x ⇒ logBuffer += JsonOps.Json(x.toString).asInstanceOf[JsonObject])
+  private val logBuffer = mutable.Buffer.empty[JsonObject]
+  private val testAppender = new TestAppender(x ⇒ logBuffer += JsonOps.Json(x.toString).asInstanceOf[JsonObject])
   private var loggingSystem: LoggingSystem = _
 
   override protected def beforeAll(): Unit = {
@@ -71,13 +61,10 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     val testMocks = frameworkTestMocks()
     import testMocks._
 
-    val componentHandlers = createComponentHandlers(testMocks)
 
     val failureStopExMsg = "testing FailureStop"
-    // Throw a `FailureStop` on the first attempt to initialize but initialize successfully on the next attempt
-    doThrow(TestFailureStop(failureStopExMsg)).doAnswer(initializeAnswer).when(componentHandlers).initialize()
 
-    createSupervisorAndStartTLA(testMocks, componentHandlers)
+    createSupervisorAndStartTLA(testMocks, ComponentInfos.initFailureHcdInfo)
 
     supervisorRef ! ComponentStateSubscription(PubSub.Subscribe(compStateProbe.ref))
     supervisorRef ! LifecycleStateSubscription(PubSub.Subscribe(lifecycleStateProbe.ref))
@@ -128,12 +115,10 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     val testMocks = frameworkTestMocks()
     import testMocks._
 
-    val componentHandlers   = createComponentHandlers(testMocks)
     val failureRestartExMsg = "testing FailureRestart"
 
     // Throw a `FailureRestart` on the first attempt to initialize but initialize successfully on the next attempt
-    doThrow(TestFailureRestart(failureRestartExMsg)).doAnswer(initializeAnswer).when(componentHandlers).initialize()
-    createSupervisorAndStartTLA(testMocks, componentHandlers)
+    createSupervisorAndStartTLA(testMocks, ComponentInfos.initFailureRestartHcdInfo)
 
     supervisorRef ! ComponentStateSubscription(PubSub.Subscribe(compStateProbe.ref))
     supervisorRef ! LifecycleStateSubscription(PubSub.Subscribe(lifecycleStateProbe.ref))
@@ -168,19 +153,13 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     val testMocks = frameworkTestMocks()
     import testMocks._
 
-    val componentHandlers   = createComponentHandlers(testMocks)
-    val failureRestartExMsg = "testing FailureRestart"
-    val unexpectedMessage   = "Unexpected message :[Running"
+    val unexpectedMessage = "Unexpected message :[Running"
 
-    val obsId: ObsId          = ObsId("Obs001")
+    val obsId: ObsId = ObsId("Obs001")
     val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(22)
-    val setup: Setup          = Setup(prefix, CommandName("move"), Some(obsId), Set(param))
+    val setup: Setup = Setup(prefix, CommandName("move"), Some(obsId), Set(param))
 
-    doThrow(TestFailureRestart(failureRestartExMsg))
-      .when(componentHandlers)
-      .validateCommand(any[ControlCommand])
-
-    createSupervisorAndStartTLA(testMocks, componentHandlers)
+    createSupervisorAndStartTLA(testMocks, ComponentInfos.validateFailureRestartHcdInfo)
 
     supervisorRef ! ComponentStateSubscription(PubSub.Subscribe(compStateProbe.ref))
     supervisorRef ! LifecycleStateSubscription(PubSub.Subscribe(lifecycleStateProbe.ref))
@@ -208,15 +187,14 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     assertThatExceptionIsNotLogged(logBuffer, unexpectedMessage)
   }
 
-  private def createSupervisorAndStartTLA(
-      testMocks: FrameworkTestMocks,
-      componentHandlers: ComponentHandlers
-  ): Unit = {
+  private def createSupervisorAndStartTLA(testMocks: FrameworkTestMocks,
+                                           componentInfo: ComponentInfo
+                                         ): Unit = {
     import testMocks._
 
     val supervisorBehavior = SupervisorBehaviorFactory.make(
       Some(mock[ActorRef[ContainerIdleMessage]]),
-      hcdInfo,
+      componentInfo,
       locationService,
       registrationFactory,
       commandResponseManagerFactory,
@@ -226,30 +204,4 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     // it creates supervisor which in turn spawns components TLA and sends Initialize and Run message to TLA
     supervisorRef = untypedSystem.spawnAnonymous(supervisorBehavior)
   }
-
-  private def createComponentHandlers(testMocks: FrameworkTestMocks) = {
-    import testMocks._
-
-    createAnswers(compStateProbe)
-
-    val componentHandlers = mock[ComponentHandlers]
-    when(componentHandlers.initialize()).thenAnswer(initializeAnswer)
-    when(componentHandlers.onShutdown()).thenAnswer(shutdownAnswer)
-    componentHandlers
-  }
-
-  private def createAnswers(compStateProbe: TestProbe[CurrentState]): Unit = {
-    initializeAnswer = _ ⇒
-      Future {
-        // small sleep is required in order for test probe to subscribe for component state and lifecycle state
-        // before component actually gets initialized
-        Thread.sleep(200)
-        compStateProbe.ref ! CurrentState(prefix, Set(choiceKey.set(initChoice)))
-    }
-
-    shutdownAnswer = _ ⇒ Future.successful(compStateProbe.ref ! CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
-  }
 }
-
-case class TestFailureStop(msg: String)    extends FailureStop(msg)
-case class TestFailureRestart(msg: String) extends FailureRestart(msg)

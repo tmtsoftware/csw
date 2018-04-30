@@ -4,7 +4,7 @@ import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.adapter._
 import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.testkit.typed.scaladsl.TestProbe
-import akka.{actor, testkit, Done}
+import akka.{Done, actor, testkit}
 import csw.messages.commands.CommandResponse
 import csw.messages.framework.LifecycleStateChanged
 import csw.messages.location.Connection.AkkaConnection
@@ -16,6 +16,7 @@ import csw.services.command.scaladsl.CommandResponseManager
 import csw.services.location.javadsl.ILocationService
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
+import csw.services.logging.javadsl.JLoggerFactory
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{when, _}
@@ -63,4 +64,6 @@ class FrameworkTestMocks(implicit untypedSystem: actor.ActorSystem, system: Acto
   when(loggerFactory.getLogger).thenReturn(logger)
   when(loggerFactory.getLogger(any[actor.ActorContext])).thenReturn(logger)
   when(loggerFactory.getLogger(any[ActorContext[_]])).thenReturn(logger)
+  when(loggerFactory.asJava).thenReturn(mock[JLoggerFactory])
+
 }

@@ -1,8 +1,9 @@
 package csw.framework.internal.component
 
+import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{Behavior, PostStop}
 import akka.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
-import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers, CurrentStatePublisher}
+import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{ComponentInfos, FrameworkTestSuite}
 import csw.messages.commands.CommandResponse.{Accepted, Completed, Error}
 import csw.messages.commands.{CommandName, CommandResponse, Observe, Setup}
@@ -40,12 +41,21 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     when(sampleHcdHandler.initialize()).thenReturn(Future.unit)
     when(sampleHcdHandler.onShutdown()).thenReturn(Future.unit)
 
-    private val behavior: Behavior[Nothing] = ComponentBehaviorFactory.make(ComponentInfos.hcdInfo,
-                                                           supervisorProbe.ref,
-                                                           mock[CurrentStatePublisher],
-                                                           commandResponseManager,
-                                                           locationService,
-                                                           frameworkTestMocks().loggerFactory)
+    // TODO: verify this is still valid test - JLW
+    private val behavior: Behavior[Nothing] = Behaviors
+      .setup[TopLevelActorMessage](
+        ctx ⇒
+          new ComponentBehavior(
+            ctx,
+            ComponentInfos.hcdInfo,
+            supervisorProbe.ref,
+            sampleHcdHandler,
+            commandResponseManager,
+            locationService,
+            frameworkTestMocks().loggerFactory
+        )
+      )
+      .narrow
 
     val componentBehaviorTestKit: BehaviorTestKit[TopLevelActorMessage] =
       BehaviorTestKit(behavior.asInstanceOf[Behavior[TopLevelActorMessage]])

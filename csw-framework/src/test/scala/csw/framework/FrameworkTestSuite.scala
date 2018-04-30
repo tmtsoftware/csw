@@ -1,20 +1,16 @@
 package csw.framework
 
 import akka.actor
+import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.testkit.typed.TestKitSettings
 import akka.testkit.typed.scaladsl.TestProbe
 import akka.util.Timeout
 import csw.framework.internal.supervisor.SupervisorBehaviorFactory
-import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers, CurrentStatePublisher}
 import csw.messages.framework.ComponentInfo
-import csw.messages.scaladsl.{ComponentMessage, ContainerIdleMessage, TopLevelActorMessage}
-import csw.services.command.scaladsl.CommandResponseManager
+import csw.messages.scaladsl.{ComponentMessage, ContainerIdleMessage}
 import csw.services.location.commons.ActorSystemFactory
-import csw.services.location.scaladsl.LocationService
-import csw.services.logging.scaladsl.LoggerFactory
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.concurrent.Await
@@ -52,7 +48,8 @@ abstract class FrameworkTestSuite extends FunSuite with Matchers with BeforeAndA
      currentStatePublisher: CurrentStatePublisher,
      locationService: LocationService,
      loggerFactory: LoggerFactory) => assemblyHandlers
-*/
+   */
+
   def createSupervisorAndStartTLA(
       componentInfo: ComponentInfo,
       testMocks: FrameworkTestMocks,

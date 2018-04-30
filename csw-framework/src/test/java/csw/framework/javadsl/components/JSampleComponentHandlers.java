@@ -39,7 +39,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     private CurrentState currentState = new CurrentState(SampleComponentState.prefix().prefix());
     private ActorContext<TopLevelActorMessage> actorContext;
 
-    JSampleComponentHandlers(
+    public JSampleComponentHandlers(
             ActorContext<TopLevelActorMessage> ctx,
             ComponentInfo componentInfo,
             CommandResponseManager commandResponseManager,
