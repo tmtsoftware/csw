@@ -26,10 +26,11 @@ abstract class JBaseEventPublisher(eventPublisher: EventPublisher) extends IEven
   override def publish(eventGenerator: Supplier[Event], every: FiniteDuration): Cancellable =
     eventPublisher.publish(eventGenerator.asScala.apply(), every)
 
-  override def publish(eventGenerator: Supplier[Event],
-                       every: FiniteDuration,
-                       onError: BiConsumer[Event, PublishFailed]): Cancellable =
-    eventPublisher.publish(eventGenerator.asScala.apply(), every, onError.asScala)
+  override def publish(
+      eventGenerator: Supplier[Event],
+      every: FiniteDuration,
+      onError: BiConsumer[Event, PublishFailed]
+  ): Cancellable = eventPublisher.publish(eventGenerator.asScala.apply(), every, onError.asScala)
 
   override def shutdown(): CompletableFuture[Done] = eventPublisher.shutdown().toJava.toCompletableFuture
 

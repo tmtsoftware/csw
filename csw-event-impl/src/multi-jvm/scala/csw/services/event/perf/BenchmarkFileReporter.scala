@@ -2,8 +2,6 @@ package csw.services.event.perf
 
 import java.io.{File, OutputStream}
 import java.nio.file.Files
-import java.time.{Instant, LocalDateTime, ZoneId}
-import java.time.format.DateTimeFormatter
 
 import akka.actor.ActorSystem
 import com.typesafe.config.Config
@@ -25,15 +23,12 @@ object BenchmarkFileReporter {
     target
   }
 
-  val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")
-
   def apply(test: String, system: ActorSystem, logSettings: Boolean = true): BenchmarkFileReporter =
     new BenchmarkFileReporter {
       override val testName: String = test
 
       val testResultFile: File = {
-        val timestamp = formatter.format(LocalDateTime.ofInstant(Instant.now(), ZoneId.systemDefault()))
-        val fileName  = s"$testName-results.txt"
+        val fileName = s"$testName-results.txt"
         new File(targetDirectory, fileName)
       }
       val config: Config = system.settings.config

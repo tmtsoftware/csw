@@ -190,7 +190,7 @@ lazy val `csw-event-impl` = project
     `csw-logging`,
     `csw-location` % "compile->compile;multi-jvm->multi-jvm"
   )
-  .enablePlugins(AutoMultiJvm, MaybeCoverage)
+  .enablePlugins(AutoMultiJvm)
   .settings(libraryDependencies ++= Dependencies.EventImpl, Common.detectCycles := false)
 
 lazy val `csw-commons` = project

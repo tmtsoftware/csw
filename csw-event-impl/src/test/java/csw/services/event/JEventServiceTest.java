@@ -78,7 +78,7 @@ public class JEventServiceTest extends TestNGSuite {
         set.add(eventKey);
 
         IEventSubscription subscription = baseProperties.jSubscriber().subscribe(set).take(2).toMat(Sink.foreach(event -> probe.ref().tell(event)), Keep.left()).run(baseProperties.wiring().resumingMat());
-        subscription.isReady().get(10, TimeUnit.SECONDS);
+        subscription.ready().get(10, TimeUnit.SECONDS);
 
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
 
@@ -100,12 +100,12 @@ public class JEventServiceTest extends TestNGSuite {
         Event event2 = new SystemEvent(prefix, eventName2);
 
         Pair<IEventSubscription, CompletionStage<List<Event>>> pair = baseProperties.jSubscriber().subscribe(Collections.singleton(event1.eventKey())).take(2).toMat(Sink.seq(), Keep.both()).run(baseProperties.wiring().resumingMat());
-        pair.first().isReady().get(10, TimeUnit.SECONDS);
+        pair.first().ready().get(10, TimeUnit.SECONDS);
         Thread.sleep(100);
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
 
         Pair<IEventSubscription, CompletionStage<List<Event>>> pair2 = baseProperties.jSubscriber().subscribe(Collections.singleton(event2.eventKey())).take(2).toMat(Sink.seq(), Keep.both()).run(baseProperties.wiring().resumingMat());
-        pair2.first().isReady().get(10, TimeUnit.SECONDS);
+        pair2.first().ready().get(10, TimeUnit.SECONDS);
         baseProperties.jPublisher().publish(event2).get(10, TimeUnit.SECONDS);
 
         Set<Event> expectedEvents = new HashSet<>();
@@ -132,7 +132,7 @@ public class JEventServiceTest extends TestNGSuite {
 
         List<Event> queue = new ArrayList<>();
         IEventSubscription subscription = baseProperties.jSubscriber().subscribe(Collections.singleton(eventKey)).toMat(Sink.foreach(queue::add), Keep.left()).run(baseProperties.wiring().resumingMat());
-        subscription.isReady().get(10, TimeUnit.SECONDS);
+        subscription.ready().get(10, TimeUnit.SECONDS);
 
         IEventPublisher publisher = baseProperties.jPublisher();
         counter = -1;
@@ -161,7 +161,7 @@ public class JEventServiceTest extends TestNGSuite {
 
         Set<Event> queue = new HashSet<>();
         IEventSubscription subscription = baseProperties.jSubscriber().subscribe(events.stream().map(Event::eventKey).collect(Collectors.toSet())).toMat(Sink.foreach(queue::add), Keep.left()).run(baseProperties.wiring().resumingMat());
-        subscription.isReady().get(10, TimeUnit.SECONDS);
+        subscription.ready().get(10, TimeUnit.SECONDS);
 
         baseProperties.jPublisher().publish(Source.fromIterator(events::iterator));
         Thread.sleep(1000);
@@ -187,7 +187,7 @@ public class JEventServiceTest extends TestNGSuite {
         baseProperties.jPublisher().publish(event2).get(10, TimeUnit.SECONDS); // latest event before subscribing
 
         Pair<IEventSubscription, CompletionStage<List<Event>>> pair = baseProperties.jSubscriber().subscribe(Collections.singleton(eventKey)).take(2).toMat(Sink.seq(), Keep.both()).run(baseProperties.wiring().resumingMat());
-        pair.first().isReady().get(10, TimeUnit.SECONDS);
+        pair.first().ready().get(10, TimeUnit.SECONDS);
 
         baseProperties.jPublisher().publish(event3).get(10, TimeUnit.SECONDS);
 

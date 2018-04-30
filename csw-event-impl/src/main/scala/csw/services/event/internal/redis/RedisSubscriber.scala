@@ -47,7 +47,7 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
               await(terminationSignal)
             }
 
-            override def isReady: Future[Done] = subscriptionF.map(_ ⇒ Done)
+            override def ready(): Future[Done] = subscriptionF.map(_ ⇒ Done)
           }
       }
   }

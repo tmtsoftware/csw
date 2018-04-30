@@ -4,15 +4,15 @@ import akka.actor.{ActorSystem, Cancellable}
 import csw.messages.events.{Event, EventName}
 import csw.services.event.perf.EventUtils._
 import csw.services.event.scaladsl.EventPublisher
+import io.lettuce.core.RedisClient
 
-import scala.concurrent.ExecutionContext
-
-class Publisher(testSettings: TestSettings, testConfigs: TestConfigs, id: Int)(implicit val system: ActorSystem) {
+class Publisher(testSettings: TestSettings, testConfigs: TestConfigs, id: Int, mayBeRedisClient: Option[RedisClient])(
+    implicit val system: ActorSystem
+) {
   import testConfigs._
   import testSettings._
 
-  private implicit val ec: ExecutionContext = system.dispatcher
-  private val wiring                        = new TestWiring(system)
+  private val wiring = new TestWiring(system, mayBeRedisClient)
 
   private val totalMessages             = totalTestMsgs + warmupMsgs + 1 //inclusive of end-event
   private val payload: Array[Byte]      = ("0" * payloadSize).getBytes("utf-8")

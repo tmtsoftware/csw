@@ -4,7 +4,7 @@ import java.time.Instant
 
 import csw.messages.events.{EventKey, EventName, EventTime, SystemEvent}
 import csw.messages.params.generics.Key
-import csw.messages.params.generics.KeyType.{ByteKey, DoubleKey, LongKey}
+import csw.messages.params.generics.KeyType.{ByteKey, DoubleKey}
 import csw.messages.params.models.{Id, Prefix}
 
 object EventUtils {

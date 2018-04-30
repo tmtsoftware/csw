@@ -17,15 +17,6 @@ class KafkaFactory(locationService: LocationService, wiring: Wiring) {
 
   private val eventServiceResolver = new EventServiceResolver(locationService)
 
-  private def producerSettings(host: String, port: Int) =
-    ProducerSettings(actorSystem, new StringSerializer, new ByteArraySerializer)
-      .withBootstrapServers(s"$host:$port")
-
-  private def consumerSettings(host: String, port: Int) =
-    ConsumerSettings(actorSystem, new StringDeserializer, new ByteArrayDeserializer)
-      .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest")
-      .withBootstrapServers(s"$host:$port")
-
   def publisher(host: String, port: Int): EventPublisher = new KafkaPublisher(producerSettings(host, port))
 
   def publisher(): Future[EventPublisher] = async {
@@ -39,4 +30,13 @@ class KafkaFactory(locationService: LocationService, wiring: Wiring) {
     val uri: URI = await(eventServiceResolver.uri)
     subscriber(uri.getHost, uri.getPort)
   }
+
+  private def producerSettings(host: String, port: Int) =
+    ProducerSettings(actorSystem, new StringSerializer, new ByteArraySerializer)
+      .withBootstrapServers(s"$host:$port")
+
+  private def consumerSettings(host: String, port: Int) =
+    ConsumerSettings(actorSystem, new StringDeserializer, new ByteArrayDeserializer)
+      .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest")
+      .withBootstrapServers(s"$host:$port")
 }
