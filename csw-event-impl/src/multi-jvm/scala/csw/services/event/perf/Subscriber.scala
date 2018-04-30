@@ -29,19 +29,19 @@ class Subscriber(
   val histogram: Histogram                = new Histogram(SECONDS.toNanos(10), 3)
   private val resultReporter              = new ResultReporter(testName, actorSystem)
 
-  var startTime         = 0L
-  var totalTime         = 0L
-  var eventsReceived    = 0L
-  var lastId            = 0
-  var outOfOrderCount   = 0
-  var lastCurrentId     = 0
-  private val eventKeys = Set(EventKey(s"$testEventKey-$publisherId"), EventKey(s"${prefix.prefix}.$endEventS-$publisherId"))
-  val subscription: Source[Event, EventSubscription] =
-    subscriber.subscribe(eventKeys)
+  var startTime       = 0L
+  var totalTime       = 0L
+  var eventsReceived  = 0L
+  var lastId          = 0
+  var outOfOrderCount = 0
+  var lastCurrentId   = 0
 
-  val endEventName = EventName(s"${EventUtils.endEventS}-$publisherId")
-
+  private val eventKeys    = Set(EventKey(s"$testEventKey-$publisherId"), EventKey(s"${prefix.prefix}.$endEventS-$publisherId"))
   private val eventsToDrop = warmupMsgs + eventKeys.size //inclusive of latest events from subscription
+
+  val subscription: Source[Event, EventSubscription] = subscriber.subscribe(eventKeys)
+  val endEventName                                   = EventName(s"${EventUtils.endEventS}-$publisherId")
+
   def startSubscription(): Future[Done] =
     subscription
       .drop(eventsToDrop)
@@ -61,9 +61,9 @@ class Subscriber(
     val currentTime = getNanos(Instant.now()).toLong
     totalTime = currentTime - startTime
 
-    val latency = (getNanos(Instant.now()) - getNanos(event.eventTime.time)).toLong
     reporter.onMessage(1, payloadSize)
 
+    val latency = (getNanos(Instant.now()) - getNanos(event.eventTime.time)).toLong
     try {
       histogram.recordValue(latency)
     } catch {

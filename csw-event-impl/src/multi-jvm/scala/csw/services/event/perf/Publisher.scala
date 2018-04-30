@@ -1,13 +1,18 @@
 package csw.services.event.perf
 
+import akka.Done
 import akka.actor.Cancellable
-import csw.messages.events.{Event, EventName}
+import akka.stream.scaladsl.{Keep, Source}
+import csw.messages.events.{Event, EventName, SystemEvent}
 import csw.services.event.perf.EventUtils._
 import csw.services.event.scaladsl.EventPublisher
+
+import scala.concurrent.Future
 
 class Publisher(testSettings: TestSettings, testConfigs: TestConfigs, id: Int, testWiring: TestWiring) {
   import testConfigs._
   import testSettings._
+  import testWiring.wiring._
 
   private val totalMessages             = totalTestMsgs + warmupMsgs + 1 //inclusive of end-event
   private val payload: Array[Byte]      = ("0" * payloadSize).getBytes("utf-8")
@@ -23,6 +28,19 @@ class Publisher(testSettings: TestSettings, testConfigs: TestConfigs, id: Int, t
     if (counter < totalMessages) event(eventName, counter, payload) else endEvent
   }
 
-  def startPublishing(): Unit = { cancellable = publisher.publish(eventGenerator(), publishFrequency) }
+  private def source(eventName: EventName): Source[SystemEvent, Future[Done]] =
+    Source(1L to totalMessages)
+      .map { id ⇒
+        event(eventName, id, payload)
+      }
+      .watchTermination()(Keep.right)
+
+  def startPublishingWithEventGenerator(): Unit = { cancellable = publisher.publish(eventGenerator(), publishFrequency) }
+
+  def startPublishingWithSource(): Future[Done] =
+    for {
+      _   ← publisher.publish(source(EventName(s"$testEventS-$id")))
+      end ← publisher.publish(event(EventName(s"$endEventS-$id")))
+    } yield end
 
 }

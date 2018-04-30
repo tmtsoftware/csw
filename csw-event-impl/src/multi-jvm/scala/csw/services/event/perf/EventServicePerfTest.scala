@@ -35,8 +35,8 @@ object EventServicePerfTest extends MultiNodeConfig {
 
 class EventServicePerfTestMultiJvmNode1 extends EventServicePerfTest
 class EventServicePerfTestMultiJvmNode2 extends EventServicePerfTest
-class EventServicePerfTestMultiJvmNode3 extends EventServicePerfTest
-class EventServicePerfTestMultiJvmNode4 extends EventServicePerfTest
+//class EventServicePerfTestMultiJvmNode3 extends EventServicePerfTest
+//class EventServicePerfTestMultiJvmNode4 extends EventServicePerfTest
 //class EventServicePerfTestMultiJvmNode5 extends EventServicePerfTest
 //class EventServicePerfTestMultiJvmNode6 extends EventServicePerfTest
 //class EventServicePerfTestMultiJvmNode7  extends EventServicePerfTest
@@ -203,7 +203,7 @@ class EventServicePerfTest
 
       enterBarrier(subscriberName + "-started")
 
-      pubIds.foreach(id ⇒ new Publisher(testSettings, testConfigs, id, testWiring).startPublishing())
+      pubIds.foreach(id ⇒ new Publisher(testSettings, testConfigs, id, testWiring).startPublishingWithEventGenerator())
 
       enterBarrier(testName + "-done")
     }
