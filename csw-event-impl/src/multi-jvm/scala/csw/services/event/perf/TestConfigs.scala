@@ -18,6 +18,7 @@ class TestConfigs(config: Config) {
   val publishFrequency: FiniteDuration = (per.toMillis / elements).millis
 
   val warmupMsgs: Int             = config.getInt("csw.test.EventServicePerfTest.warmup")
+  val burstSize: Int              = config.getInt("csw.test.EventServicePerfTest.burst-size")
   val totalMessagesFactor: Double = config.getDouble("csw.test.EventServicePerfTest.totalMessagesFactor")
 
   //################### Redis Configuration ###################

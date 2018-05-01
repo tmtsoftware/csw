@@ -24,7 +24,7 @@ object EventServicePerfTest extends MultiNodeConfig {
 
   val totalNumberOfNodes: Int =
     System.getProperty("akka.test.FanInThroughputSpec.nrOfNodes") match {
-      case null  ⇒ 4
+      case null  ⇒ 2
       case value ⇒ value.toInt
     }
 
