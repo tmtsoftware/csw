@@ -203,7 +203,7 @@ class EventServicePerfTest
 
       enterBarrier(subscriberName + "-started")
 
-      pubIds.foreach(id ⇒ new Publisher(testSettings, testConfigs, id, testWiring).startPublishingWithEventGenerator())
+      pubIds.foreach(id ⇒ new Publisher(testSettings, testConfigs, id, testWiring).startPublishingInBatches())
 
       enterBarrier(testName + "-done")
     }

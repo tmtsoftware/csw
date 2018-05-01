@@ -16,51 +16,51 @@ class Scenarios(testConfigs: TestConfigs) {
       testName = "1-to-1-size-100",
       totalTestMsgs = adjustedTotalMessages(10000),
       payloadSize = 100,
-      publisherSubscriberPairs = 1,
-      singlePublisher = false
-    ),
-    TestSettings(
-      testName = "1-to-1-size-1KB",
-      totalTestMsgs = adjustedTotalMessages(10000),
-      payloadSize = 1024,
-      publisherSubscriberPairs = 1,
-      singlePublisher = false
-    ),
-    TestSettings(
-      testName = "1-to-1-size-10KB",
-      totalTestMsgs = adjustedTotalMessages(10000),
-      payloadSize = 10 * 1024,
-      publisherSubscriberPairs = 1,
-      singlePublisher = false
-    ),
-    TestSettings(
-      testName = "1-to-1-size-100KB",
-      totalTestMsgs = adjustedTotalMessages(10000),
-      payloadSize = 100 * 1024,
-      publisherSubscriberPairs = 1,
-      singlePublisher = false
-    ),
-    TestSettings(
-      testName = "1-to-1-size-300KB",
-      totalTestMsgs = adjustedTotalMessages(10000),
-      payloadSize = 300 * 1024,
-      publisherSubscriberPairs = 1,
-      singlePublisher = false
-    ),
-    TestSettings(
-      testName = "1-to-1-size-500KB",
-      totalTestMsgs = adjustedTotalMessages(10000),
-      payloadSize = 500 * 1024,
-      publisherSubscriberPairs = 1,
-      singlePublisher = false
-    ),
-    TestSettings(
-      testName = "1-to-1-size-600KB",
-      totalTestMsgs = adjustedTotalMessages(10000),
-      payloadSize = 600 * 1024,
-      publisherSubscriberPairs = 1,
+      publisherSubscriberPairs = 40,
       singlePublisher = false
     )
+//    TestSettings(
+//      testName = "1-to-1-size-1KB",
+//      totalTestMsgs = adjustedTotalMessages(10000),
+//      payloadSize = 1024,
+//      publisherSubscriberPairs = 1,
+//      singlePublisher = false
+//    ),
+//    TestSettings(
+//      testName = "1-to-1-size-10KB",
+//      totalTestMsgs = adjustedTotalMessages(10000),
+//      payloadSize = 10 * 1024,
+//      publisherSubscriberPairs = 1,
+//      singlePublisher = false
+//    ),
+//    TestSettings(
+//      testName = "1-to-1-size-100KB",
+//      totalTestMsgs = adjustedTotalMessages(10000),
+//      payloadSize = 100 * 1024,
+//      publisherSubscriberPairs = 1,
+//      singlePublisher = false
+//    ),
+//    TestSettings(
+//      testName = "1-to-1-size-300KB",
+//      totalTestMsgs = adjustedTotalMessages(10000),
+//      payloadSize = 300 * 1024,
+//      publisherSubscriberPairs = 1,
+//      singlePublisher = false
+//    ),
+//    TestSettings(
+//      testName = "1-to-1-size-500KB",
+//      totalTestMsgs = adjustedTotalMessages(10000),
+//      payloadSize = 500 * 1024,
+//      publisherSubscriberPairs = 1,
+//      singlePublisher = false
+//    ),
+//    TestSettings(
+//      testName = "1-to-1-size-600KB",
+//      totalTestMsgs = adjustedTotalMessages(10000),
+//      payloadSize = 600 * 1024,
+//      publisherSubscriberPairs = 1,
+//      singlePublisher = false
+//    )
   )
 
   val oneToMany = List(
