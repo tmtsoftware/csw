@@ -39,6 +39,7 @@ class KafkaFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
     }
   }
 
+  //DEOPSCSW-334: Publish an event
   test("handle failed publish event with a callback") {
 
     val testProbe   = TestProbe[FailedEvent]()(actorSystem.toTyped)
@@ -53,6 +54,7 @@ class KafkaFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
     failedEvent.throwable shouldBe a[PublishFailed]
   }
 
+  //DEOPSCSW-334: Publish an event
   test("handle failed publish event with an eventGenerator and a callback") {
     val testProbe = TestProbe[FailedEvent]()(actorSystem.toTyped)
     val event     = Utils.makeEvent(1)

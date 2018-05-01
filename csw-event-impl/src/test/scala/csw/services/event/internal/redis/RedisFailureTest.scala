@@ -53,6 +53,7 @@ class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
     }
   }
 
+  //DEOPSCSW-334: Publish an event
   test("should invoke onError callback on publish failure [stream API]") {
     val publisher = redisFactory.publisher().await
 
@@ -74,6 +75,7 @@ class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
     failedEvent.throwable shouldBe a[PublishFailed]
   }
 
+  //DEOPSCSW-334: Publish an event
   test("should invoke onError callback on publish failure [eventGenerator API]") {
     val publisher = redisFactory.publisher().await
 
