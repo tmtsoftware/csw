@@ -21,13 +21,15 @@ class TestConfigs(config: Config) {
   val burstSize: Int              = config.getInt("csw.test.EventServicePerfTest.burst-size")
   val totalMessagesFactor: Double = config.getDouble("csw.test.EventServicePerfTest.totalMessagesFactor")
 
+  val shareConnection: Boolean = config.getBoolean("csw.test.EventServicePerfTest.one-connection-per-jvm")
+
   //################### Redis Configuration ###################
-  lazy val redisEnabled: Boolean = config.getBoolean("csw.test.EventServicePerfTest.redis-enabled")
-  lazy val redisHost: String     = config.getString("csw.test.EventServicePerfTest.redis.host")
-  lazy val redisPort: Int        = config.getInt("csw.test.EventServicePerfTest.redis.port")
+  val redisEnabled: Boolean = config.getBoolean("csw.test.EventServicePerfTest.redis-enabled")
+  val redisHost: String     = config.getString("csw.test.EventServicePerfTest.redis.host")
+  val redisPort: Int        = config.getInt("csw.test.EventServicePerfTest.redis.port")
 
   //################### Kafka Configuration ###################
-  lazy val kafkaHost: String = config.getString("csw.test.EventServicePerfTest.kafka.host")
-  lazy val kafkaPort: Int    = config.getInt("csw.test.EventServicePerfTest.kafka.port")
+  val kafkaHost: String = config.getString("csw.test.EventServicePerfTest.kafka.host")
+  val kafkaPort: Int    = config.getInt("csw.test.EventServicePerfTest.kafka.port")
 
 }

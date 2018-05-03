@@ -10,19 +10,28 @@ import csw.services.event.scaladsl.EventPublisher
 import scala.async.Async.{async, await}
 import scala.concurrent.Future
 
-class Publisher(testSettings: TestSettings, testConfigs: TestConfigs, id: Int, testWiring: TestWiring) {
+class Publisher(
+    testSettings: TestSettings,
+    testConfigs: TestConfigs,
+    id: Int,
+    testWiring: TestWiring,
+    sharedPublisher: EventPublisher
+) {
   import testConfigs._
   import testSettings._
   import testWiring.wiring._
 
-  private val totalMessages             = totalTestMsgs + warmupMsgs + 1 //inclusive of end-event
-  private val payload: Array[Byte]      = ("0" * payloadSize).getBytes("utf-8")
-  private val publisher: EventPublisher = testWiring.publisher
-  private val endEvent                  = event(EventName(s"${EventUtils.endEventS}-$id"))
-  private val eventName                 = EventName(s"$testEventS-$id")
-  private var eventId                   = 0
-  private var cancellable: Cancellable  = _
-  private var remaining: Long           = totalMessages
+  private val totalMessages        = totalTestMsgs + warmupMsgs + 1 //inclusive of end-event
+  private val payload: Array[Byte] = ("0" * payloadSize).getBytes("utf-8")
+
+  private val publisher: EventPublisher =
+    if (shareConnection) sharedPublisher else testWiring.publisher
+
+  private val endEvent                 = event(EventName(s"${EventUtils.endEventS}-$id"))
+  private val eventName                = EventName(s"$testEventS-$id")
+  private var eventId                  = 0
+  private var cancellable: Cancellable = _
+  private var remaining: Long          = totalMessages
 
   private def eventGenerator(): Event = {
     eventId += 1

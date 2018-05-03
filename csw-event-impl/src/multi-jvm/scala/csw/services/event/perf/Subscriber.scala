@@ -18,16 +18,19 @@ class Subscriber(
     reporter: TestRateReporter,
     publisherId: Int,
     subscriberId: Int,
-    testWiring: TestWiring
+    testWiring: TestWiring,
+    sharedSubscriber: EventSubscriber
 ) {
 
   import testConfigs._
   import testSettings._
   import testWiring.wiring._
 
-  private val subscriber: EventSubscriber = testWiring.subscriber
-  val histogram: Histogram                = new Histogram(SECONDS.toNanos(10), 3)
-  private val resultReporter              = new ResultReporter(testName, actorSystem)
+  private val subscriber: EventSubscriber =
+    if (shareConnection) sharedSubscriber else testWiring.subscriber
+
+  val histogram: Histogram   = new Histogram(SECONDS.toNanos(10), 3)
+  private val resultReporter = new ResultReporter(testName, actorSystem)
 
   var startTime       = 0L
   var totalTime       = 0L
@@ -67,7 +70,7 @@ class Subscriber(
     try {
       histogram.recordValue(latency)
     } catch {
-      case e: ArrayIndexOutOfBoundsException ⇒
+      case _: ArrayIndexOutOfBoundsException ⇒
     }
 
     val currentId = event.eventId.id.toInt

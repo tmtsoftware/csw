@@ -13,6 +13,7 @@ import com.typesafe.config.ConfigFactory
 import csw.messages.events.{Event, SystemEvent}
 import csw.services.event.internal.wiring.Wiring
 import csw.services.event.perf.EventUtils.{nanosToMicros, nanosToSeconds}
+import csw.services.event.scaladsl.{EventPublisher, EventSubscriber}
 import org.HdrHistogram.Histogram
 import org.scalatest._
 
@@ -58,6 +59,9 @@ class EventServicePerfTest
 
   private val testWiring = new TestWiring(system, new Wiring(system))
   import testWiring._
+
+  lazy val sharedPublisher: EventPublisher   = publisher
+  lazy val sharedSubscriber: EventSubscriber = subscriber
 
   def adjustedTotalMessages(n: Long): Long = (n * totalMessagesFactor).toLong
 
@@ -151,7 +155,7 @@ class EventServicePerfTest
 
       val subscribers = subIds.map { n ⇒
         val pubId      = if (singlePublisher) 1 else n
-        val subscriber = new Subscriber(testSettings, testConfigs, rep, pubId, n, testWiring)
+        val subscriber = new Subscriber(testSettings, testConfigs, rep, pubId, n, testWiring, sharedSubscriber)
         val doneF      = subscriber.startSubscription()
         (doneF, subscriber)
       }
@@ -203,7 +207,9 @@ class EventServicePerfTest
 
       enterBarrier(subscriberName + "-started")
 
-      pubIds.foreach(id ⇒ new Publisher(testSettings, testConfigs, id, testWiring).startPublishingInBatches())
+      pubIds.foreach(
+        id ⇒ new Publisher(testSettings, testConfigs, id, testWiring, sharedPublisher).startPublishingWithEventGenerator()
+      )
 
       enterBarrier(testName + "-done")
     }
@@ -216,11 +222,7 @@ class EventServicePerfTest
     enterBarrier("after-" + testName)
   }
 
-  private def aggregateResult(
-      testSettings: TestSettings,
-      throughput: Double,
-      aggregatedHistogram: Histogram
-  ): Unit = {
+  private def aggregateResult(testSettings: TestSettings, throughput: Double, aggregatedHistogram: Histogram): Unit = {
     import testSettings._
 
     throughputPlots = throughputPlots.addAll(PlotResult().add(testName, throughput))
