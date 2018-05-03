@@ -167,7 +167,7 @@ class EventServicePerfTest
           totalTimePerNode = Math.max(totalTimePerNode, subscriber.totalTime)
       }
 
-      val byteBuffer: ByteBuffer = ByteBuffer.allocate(1358140)
+      val byteBuffer: ByteBuffer = ByteBuffer.allocate(326942)
       histogramPerNode.encodeIntoByteBuffer(byteBuffer)
 
       Await.result(
