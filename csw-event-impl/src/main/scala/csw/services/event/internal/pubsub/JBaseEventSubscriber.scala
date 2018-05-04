@@ -18,7 +18,7 @@ import scala.collection.JavaConverters.{asScalaSetConverter, setAsJavaSetConvert
 import scala.compat.java8.FutureConverters.{CompletionStageOps, FutureOps}
 import scala.concurrent.duration.FiniteDuration
 
-abstract class JBaseEventSubscriber(eventSubscriber: EventSubscriber) extends IEventSubscriber {
+class JBaseEventSubscriber(eventSubscriber: EventSubscriber) extends IEventSubscriber {
 
   def subscribe(eventKeys: util.Set[EventKey]): Source[Event, IEventSubscription] =
     eventSubscriber

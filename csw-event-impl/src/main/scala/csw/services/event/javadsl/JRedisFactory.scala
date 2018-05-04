@@ -3,6 +3,7 @@ package csw.services.event.javadsl
 import java.net.URI
 import java.util.concurrent.CompletableFuture
 
+import csw.services.event.internal.pubsub.{JBaseEventPublisher, JBaseEventSubscriber}
 import csw.services.event.internal.redis._
 import csw.services.event.internal.wiring.{EventServiceResolver, Wiring}
 import csw.services.location.scaladsl.LocationService
@@ -18,7 +19,7 @@ class JRedisFactory(redisClient: RedisClient, locationService: LocationService, 
 
   def publisher(host: String, port: Int): IEventPublisher = {
     val redisURI = RedisURI.create(host, port)
-    new JRedisPublisher(new RedisPublisher(redisURI, redisClient))
+    new JBaseEventPublisher(new RedisPublisher(redisURI, redisClient))
   }
 
   def publisher(): CompletableFuture[IEventPublisher] =
@@ -30,7 +31,7 @@ class JRedisFactory(redisClient: RedisClient, locationService: LocationService, 
   def subscriber(host: String, port: Int): IEventSubscriber = {
     val redisURI        = RedisURI.create(host, port)
     val redisSubscriber = new RedisSubscriber(redisURI, redisClient)
-    new JRedisSubscriber(redisSubscriber)
+    new JBaseEventSubscriber(redisSubscriber)
   }
 
   def subscriber(): CompletableFuture[IEventSubscriber] =

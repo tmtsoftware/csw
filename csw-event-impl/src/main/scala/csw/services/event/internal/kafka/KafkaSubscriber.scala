@@ -5,7 +5,7 @@ import akka.kafka.{scaladsl, ConsumerSettings, Subscription, Subscriptions}
 import akka.stream.Materializer
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import csw.messages.events._
-import csw.services.event.internal.pubsub.BaseEventSubscriber
+import csw.services.event.internal.pubsub.{BaseEventSubscriber, JBaseEventSubscriber}
 import csw.services.event.javadsl.IEventSubscriber
 import csw.services.event.scaladsl.EventSubscription
 import csw_protobuf.events.PbEvent
@@ -54,7 +54,7 @@ class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(i
 
   override def get(eventKey: EventKey): Future[Event] = get(Set(eventKey)).map(_.head)
 
-  override def asJava: IEventSubscriber = new JKafkaSubscriber(this)
+  override def asJava: IEventSubscriber = new JBaseEventSubscriber(this)
 
   private def getEventStream(subscription: Subscription): Source[Event, scaladsl.Consumer.Control] =
     scaladsl.Consumer

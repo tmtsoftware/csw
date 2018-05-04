@@ -15,7 +15,7 @@ import scala.compat.java8.FunctionConverters.{enrichAsScalaFromBiConsumer, enric
 import scala.compat.java8.FutureConverters.FutureOps
 import scala.concurrent.duration.FiniteDuration
 
-abstract class JBaseEventPublisher(eventPublisher: EventPublisher) extends IEventPublisher {
+class JBaseEventPublisher(eventPublisher: EventPublisher) extends IEventPublisher {
   override def publish(event: Event): CompletableFuture[Done] = eventPublisher.publish(event).toJava.toCompletableFuture
 
   override def publish[Mat](source: Source[Event, Mat]): Mat = eventPublisher.publish(source.asScala)

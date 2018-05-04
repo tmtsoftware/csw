@@ -4,7 +4,8 @@ import java.net.URI
 import java.util.concurrent.CompletableFuture
 
 import akka.kafka.{ConsumerSettings, ProducerSettings}
-import csw.services.event.internal.kafka.{JKafkaPublisher, JKafkaSubscriber, KafkaPublisher, KafkaSubscriber}
+import csw.services.event.internal.kafka.{KafkaPublisher, KafkaSubscriber}
+import csw.services.event.internal.pubsub.{JBaseEventPublisher, JBaseEventSubscriber}
 import csw.services.event.internal.wiring.{EventServiceResolver, Wiring}
 import csw.services.location.scaladsl.LocationService
 import org.apache.kafka.clients.consumer.ConsumerConfig
@@ -20,7 +21,7 @@ class JKafkaFactory(locationService: LocationService, wiring: Wiring) {
 
   def publisher(host: String, port: Int): IEventPublisher = {
     val kafkaPublisher = new KafkaPublisher(producerSettings(host, port))
-    new JKafkaPublisher(kafkaPublisher)
+    new JBaseEventPublisher(kafkaPublisher)
   }
 
   def publisher(): CompletableFuture[IEventPublisher] =
@@ -31,7 +32,7 @@ class JKafkaFactory(locationService: LocationService, wiring: Wiring) {
 
   def subscriber(host: String, port: Int): IEventSubscriber = {
     val kafkaSubscriber = new KafkaSubscriber(consumerSettings(host, port))
-    new JKafkaSubscriber(kafkaSubscriber)
+    new JBaseEventSubscriber(kafkaSubscriber)
   }
 
   def subscriber(): CompletableFuture[IEventSubscriber] =

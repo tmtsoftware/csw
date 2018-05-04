@@ -4,7 +4,7 @@ import akka.stream.scaladsl.{Keep, Source}
 import akka.stream.{KillSwitches, Materializer}
 import akka.{Done, NotUsed}
 import csw.messages.events._
-import csw.services.event.internal.pubsub.BaseEventSubscriber
+import csw.services.event.internal.pubsub.{BaseEventSubscriber, JBaseEventSubscriber}
 import csw.services.event.javadsl.IEventSubscriber
 import csw.services.event.scaladsl.EventSubscription
 import io.lettuce.core.api.async.RedisAsyncCommands
@@ -60,7 +60,7 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
     if (event == null) Event.invalidEvent(eventKey) else event
   }
 
-  override def asJava: IEventSubscriber = new JRedisSubscriber(this)
+  override def asJava: IEventSubscriber = new JBaseEventSubscriber(this)
 
   private def subscribe(
       eventKeys: Set[EventKey],
