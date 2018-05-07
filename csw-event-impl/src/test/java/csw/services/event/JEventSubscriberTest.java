@@ -161,6 +161,7 @@ public class JEventSubscriberTest extends TestNGSuite {
         EventKey eventKey2 = distinctEvent2.eventKey();
 
         baseProperties.jPublisher().publish(distinctEvent1).get(10, TimeUnit.SECONDS);
+        Thread.sleep(500);
 
         Set<EventKey> eventKeys = new HashSet<>();
         eventKeys.add(eventKey1);
