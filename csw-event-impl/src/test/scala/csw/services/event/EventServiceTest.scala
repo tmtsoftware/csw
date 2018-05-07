@@ -29,22 +29,28 @@ class EventServiceTest extends TestNGSuite with Matchers with Eventually with Em
 
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 10.millis)
 
-  var redisTestProps: RedisTestProps = _
-  var kafkaTestProps: KafkaTestProps = _
+  var redisTestProps: RedisTestProps                      = _
+  var redisTestPropsWithSetActorPublisher: RedisTestProps = _
+  var kafkaTestProps: KafkaTestProps                      = _
 
   @BeforeSuite
   def beforeAll(): Unit = {
     redisTestProps = RedisTestProps.createRedisProperties(3558, 6384)
     kafkaTestProps = KafkaTestProps.createKafkaProperties(3561, 6001)
+    redisTestPropsWithSetActorPublisher = RedisTestProps.createRedisWithSetActorProperties(3555, 6388)
     redisTestProps.redis.start()
+    redisTestPropsWithSetActorPublisher.redis.start()
     EmbeddedKafka.start()(kafkaTestProps.config)
   }
 
   @AfterSuite
   def afterAll(): Unit = {
     redisTestProps.redisClient.shutdown()
+    redisTestPropsWithSetActorPublisher.redisClient.shutdown()
     redisTestProps.redis.stop()
+    redisTestPropsWithSetActorPublisher.redis.stop()
     redisTestProps.wiring.shutdown(TestFinishedReason).await
+    redisTestPropsWithSetActorPublisher.wiring.shutdown(TestFinishedReason).await
 
     kafkaTestProps.publisher.shutdown().await
     EmbeddedKafka.stop()
@@ -54,6 +60,7 @@ class EventServiceTest extends TestNGSuite with Matchers with Eventually with Em
   @DataProvider(name = "event-service-provider")
   def pubSubProvider: Array[Array[_ <: BaseProperties]] = Array(
     Array(redisTestProps),
+    Array(redisTestPropsWithSetActorPublisher),
     Array(kafkaTestProps)
   )
 
@@ -279,6 +286,7 @@ class EventServiceTest extends TestNGSuite with Matchers with Eventually with Em
     val eventKey = event1.eventKey
 
     publisher.publish(event1).await
+    Thread.sleep(500)
 
     val eventF = subscriber.get(eventKey)
     eventF.await shouldBe event1
@@ -311,6 +319,7 @@ class EventServiceTest extends TestNGSuite with Matchers with Eventually with Em
     val eventKey2 = event2.eventKey
 
     publisher.publish(event1).await
+    Thread.sleep(500)
 
     val eventsF = subscriber.get(Set(eventKey1, eventKey2))
     eventsF.await shouldBe Set(Event.invalidEvent(eventKey2), event1)
