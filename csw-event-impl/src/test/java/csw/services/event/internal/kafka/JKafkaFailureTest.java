@@ -32,7 +32,7 @@ public class JKafkaFailureTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        kafkaTestProps = KafkaTestProps.jCreateKafkaProperties(3564, 6001, Collections.singletonMap("message.max.bytes", "1"));
+        kafkaTestProps = KafkaTestProps.jCreateKafkaProperties(4560, 7001, Collections.singletonMap("message.max.bytes", "1"));
         publisher = kafkaTestProps.jPublisher();
         EmbeddedKafka$.MODULE$.start(kafkaTestProps.config());
     }

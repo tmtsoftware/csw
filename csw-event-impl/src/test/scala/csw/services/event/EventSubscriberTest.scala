@@ -25,7 +25,7 @@ import scala.concurrent.duration.DurationLong
 //DEOPSCSW-334: Publish an event
 //DEOPSCSW-335: Model for EventName that encapsulates the topic(or channel ) name
 //DEOPSCSW-337: Subscribe to an event based on prefix
-class EventServiceTest extends TestNGSuite with Matchers with Eventually with EmbeddedKafka {
+class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with EmbeddedKafka {
 
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 10.millis)
 
@@ -35,9 +35,9 @@ class EventServiceTest extends TestNGSuite with Matchers with Eventually with Em
 
   @BeforeSuite
   def beforeAll(): Unit = {
-    redisTestProps = RedisTestProps.createRedisProperties(3558, 6384)
-    kafkaTestProps = KafkaTestProps.createKafkaProperties(3561, 6001)
-    redisTestPropsWithSetActorPublisher = RedisTestProps.createRedisWithSetActorProperties(3555, 6388)
+    redisTestProps = RedisTestProps.createRedisProperties(3564, 6383)
+    kafkaTestProps = KafkaTestProps.createKafkaProperties(3565, 6003)
+    redisTestPropsWithSetActorPublisher = RedisTestProps.createRedisWithSetActorProperties(3566, 6384)
     redisTestProps.redis.start()
     redisTestPropsWithSetActorPublisher.redis.start()
     EmbeddedKafka.start()(kafkaTestProps.config)
@@ -64,6 +64,7 @@ class EventServiceTest extends TestNGSuite with Matchers with Eventually with Em
     Array(kafkaTestProps)
   )
 
+  //DEOPSCSW-346: Subscribe to event irrespective of Publisher's existence
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_publish_and_subscribe_an_event(baseProperties: BaseProperties): Unit = {
     import baseProperties._
@@ -108,56 +109,6 @@ class EventServiceTest extends TestNGSuite with Matchers with Eventually with Em
 
     seqF.await.toSet shouldBe Set(Event.invalidEvent(event1.eventKey), event1)
     seqF2.await.toSet shouldBe Set(Event.invalidEvent(event2.eventKey), event2)
-  }
-
-  var cancellable: Cancellable = _
-  @Test(dataProvider = "event-service-provider")
-  def should_be_able_to_publish_concurrently_to_the_same_channel(baseProperties: BaseProperties): Unit = {
-    import baseProperties._
-    import baseProperties.wiring._
-
-    var counter                      = -1
-    val events: immutable.Seq[Event] = for (i ← 1 to 10) yield makeEvent(i)
-
-    def eventGenerator(): Event = {
-      counter += 1
-      if (counter == 10) cancellable.cancel()
-      events(counter)
-    }
-
-    val queue: mutable.Queue[Event] = new mutable.Queue[Event]()
-    val eventKey: EventKey          = makeEvent(0).eventKey
-
-    val subscription = subscriber.subscribe(Set(eventKey)).to(Sink.foreach[Event](queue.enqueue(_))).run()
-    subscription.ready.await
-
-    cancellable = publisher.publish(eventGenerator(), 2.millis)
-
-    // subscriber will receive an invalid event first as subscription happened before publishing started.
-    // The 10 published events will follow
-    eventually(queue.size shouldBe 11)
-
-    queue should contain allElementsOf Seq(Event.invalidEvent(eventKey)) ++ events
-  }
-
-  @Test(dataProvider = "event-service-provider")
-  def should_be_able_to_publish_concurrently_to_the_different_channel(baseProperties: BaseProperties): Unit = {
-    import baseProperties._
-    import baseProperties.wiring._
-
-    val queue: mutable.Queue[Event]  = new mutable.Queue[Event]()
-    val events: immutable.Seq[Event] = for (i ← 101 to 110) yield makeDistinctEvent(i)
-
-    val subscription = subscriber.subscribe(events.map(_.eventKey).toSet).to(Sink.foreach(queue.enqueue(_))).run()
-    subscription.ready.await
-
-    publisher.publish(Source.fromIterator(() ⇒ events.toIterator))
-
-    // subscriber will receive an invalid event first as subscription happened before publishing started.
-    // The 10 published events will follow
-    eventually(queue.size shouldBe 20)
-
-    queue should contain theSameElementsAs events.map(x ⇒ Event.invalidEvent(x.eventKey)) ++ events
   }
 
   //DEOPSCSW-340: Provide most recently published event for subscribed prefix and name

@@ -45,8 +45,8 @@ public class JEventServiceTest extends TestNGSuite {
 
     @BeforeSuite
     public void beforeAll() {
-        redisTestProps = RedisTestProps.createRedisProperties(3562, 6379, ClientOptions.create());
-        kafkaTestProps = KafkaTestProps.jCreateKafkaProperties(3563, 6001, Collections.EMPTY_MAP);
+        redisTestProps = RedisTestProps.createRedisProperties(4562, 7381, ClientOptions.create());
+        kafkaTestProps = KafkaTestProps.jCreateKafkaProperties(4563, 7002, Collections.EMPTY_MAP);
         redisTestProps.redis().start();
         EmbeddedKafka$.MODULE$.start(kafkaTestProps.config());
     }

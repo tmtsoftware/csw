@@ -35,7 +35,7 @@ public class JRedisFailureTest {
     @BeforeClass
     public static void beforeClass() throws Exception {
         ClientOptions clientOptions = ClientOptions.builder().autoReconnect(false).disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS).build();
-        redisTestProps = RedisTestProps.createRedisProperties(3565, 6381, clientOptions);
+        redisTestProps = RedisTestProps.createRedisProperties(4561, 7380, clientOptions);
         jRedisFactory = new JRedisFactory(redisTestProps.redisClient(), redisTestProps.locationService(), redisTestProps.wiring());
         redisTestProps.redis().start();
     }
