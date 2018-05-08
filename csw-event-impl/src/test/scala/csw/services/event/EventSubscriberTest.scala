@@ -126,7 +126,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
     val callback: Event ⇒ Future[Event] = (event) ⇒ Future.successful(testProbe.ref ! event).map(_ ⇒ event)(ec)
 
     publisher.publish(event1).await
-
+    Thread.sleep(500) // Needed for redis publisher with set actor
     val subscription = subscriber.subscribeAsync(Set(event1.eventKey), callback)
     testProbe.expectMessage(event1)
     subscription.unsubscribe().await
@@ -171,7 +171,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
     val callback: Event ⇒ Unit = testProbe.ref ! _
 
     publisher.publish(event1).await
-
+    Thread.sleep(500) // Needed for redis publisher with set actor
     val subscription = subscriber.subscribeCallback(Set(event1.eventKey), callback)
     testProbe.expectMessage(event1)
     subscription.unsubscribe().await
@@ -278,6 +278,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
     publisher.publish(event1).await
     publisher.publish(event2).await // latest event before subscribing
 
+    Thread.sleep(500) // Needed for redis publisher with set actor
     val (subscription, seqF) = subscriber.subscribe(Set(eventKey)).take(2).toMat(Sink.seq)(Keep.both).run()
     subscription.ready.await
 
