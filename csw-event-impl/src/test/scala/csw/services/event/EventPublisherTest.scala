@@ -5,8 +5,7 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.testkit.typed.scaladsl.TestProbe
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
-import csw.messages.events.{Event, EventKey, EventName, SystemEvent}
-import csw.messages.params.models.Prefix
+import csw.messages.events.{Event, EventKey}
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.helpers.Utils.{makeDistinctEvent, makeEvent}
 import csw.services.event.internal.kafka.KafkaTestProps
@@ -19,7 +18,6 @@ import org.scalatest.testng.TestNGSuite
 import org.testng.annotations._
 
 import scala.collection.{immutable, mutable}
-import scala.concurrent.Future
 import scala.concurrent.duration.DurationLong
 
 //DEOPSCSW-334: Publish an event

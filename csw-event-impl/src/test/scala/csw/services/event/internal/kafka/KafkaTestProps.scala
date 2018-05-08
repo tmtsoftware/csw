@@ -2,7 +2,7 @@ package csw.services.event.internal.kafka
 
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.internal.wiring.BaseProperties.createInfra
-import csw.services.event.internal.wiring.{BaseProperties, Wiring}
+import csw.services.event.internal.wiring.{BaseProperties, EventServiceResolver, Wiring}
 import csw.services.event.scaladsl.{EventPublisher, EventSubscriber, KafkaFactory}
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.LocationService
@@ -16,11 +16,12 @@ class KafkaTestProps(
     locationService: LocationService,
     additionalBrokerProps: Map[String, String]
 ) extends BaseProperties {
-  private val brokers             = s"PLAINTEXT://${clusterSettings.hostname}:$kafkaPort"
-  private val brokerProperties    = Map("listeners" → brokers, "advertised.listeners" → brokers) ++ additionalBrokerProps
-  val config                      = EmbeddedKafkaConfig(customBrokerProperties = brokerProperties)
-  val wiring                      = new Wiring(clusterSettings.system)
-  val kafkaFactory                = new KafkaFactory(locationService, wiring)
+  private val brokers          = s"PLAINTEXT://${clusterSettings.hostname}:$kafkaPort"
+  private val brokerProperties = Map("listeners" → brokers, "advertised.listeners" → brokers) ++ additionalBrokerProps
+  val config                   = EmbeddedKafkaConfig(customBrokerProperties = brokerProperties)
+  val wiring                   = new Wiring(clusterSettings.system)
+  import wiring._
+  val kafkaFactory                = new KafkaFactory(new EventServiceResolver(locationService))
   val publisher: EventPublisher   = kafkaFactory.publisher().await
   val subscriber: EventSubscriber = kafkaFactory.subscriber().await
 
