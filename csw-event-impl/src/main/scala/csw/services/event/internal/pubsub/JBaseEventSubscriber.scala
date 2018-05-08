@@ -9,9 +9,8 @@ import akka.Done
 import akka.actor.typed.ActorRef
 import akka.stream.Materializer
 import akka.stream.javadsl.Source
-import akka.stream.scaladsl.Sink
 import csw.messages.events.{Event, EventKey}
-import csw.services.event.internal.throttle.RateAdapterStage
+import csw.services.event.internal.EventServiceExts.RichEventSubscription
 import csw.services.event.javadsl.{IEventSubscriber, IEventSubscription}
 import csw.services.event.scaladsl.{EventSubscriber, EventSubscription}
 
@@ -34,40 +33,40 @@ class JBaseEventSubscriber(eventSubscriber: EventSubscriber) extends IEventSubsc
       }
 
   def subscribe(eventKeys: util.Set[EventKey], every: Duration): Source[Event, IEventSubscription] =
-    subscribe(eventKeys).via(new RateAdapterStage[Event](every.toScala))
+    eventSubscriber.subscribe(eventKeys.asScala.toSet, every.toScala).mapMaterializedValue(_.asJava).asJava
 
   def subscribeAsync(
       eventKeys: util.Set[EventKey],
       callback: Event ⇒ CompletableFuture[_],
       mat: Materializer
-  ): IEventSubscription = subscribe(eventKeys).asScala.mapAsync(1)(callback(_).toScala).to(Sink.ignore).run()(mat)
+  ): IEventSubscription = eventSubscriber.subscribeAsync(eventKeys.asScala.toSet, e ⇒ callback(e).toScala).asJava
 
   def subscribeAsync(
       eventKeys: util.Set[EventKey],
       callback: Event => CompletableFuture[_],
       every: Duration,
       mat: Materializer
-  ): IEventSubscription = subscribe(eventKeys, every).asScala.mapAsync(1)(callback(_).toScala).to(Sink.ignore).run()(mat)
+  ): IEventSubscription = eventSubscriber.subscribeAsync(eventKeys.asScala.toSet, e ⇒ callback(e).toScala, every.toScala).asJava
 
   def subscribeCallback(eventKeys: util.Set[EventKey], callback: Consumer[Event], mat: Materializer): IEventSubscription =
-    subscribe(eventKeys).asScala.to(Sink.foreach(callback.accept)).run()(mat)
+    eventSubscriber.subscribeCallback(eventKeys.asScala.toSet, e ⇒ callback.accept(e)).asJava
 
   def subscribeCallback(
       eventKeys: util.Set[EventKey],
       callback: Consumer[Event],
       every: Duration,
       mat: Materializer
-  ): IEventSubscription = subscribe(eventKeys, every).asScala.to(Sink.foreach(callback.accept)).run()(mat)
+  ): IEventSubscription = eventSubscriber.subscribeCallback(eventKeys.asScala.toSet, e ⇒ callback.accept(e), every.toScala).asJava
 
   def subscribeActorRef(eventKeys: util.Set[EventKey], actorRef: ActorRef[Event], mat: Materializer): IEventSubscription =
-    subscribeCallback(eventKeys, event => actorRef ! event, mat)
+    eventSubscriber.subscribeActorRef(eventKeys.asScala.toSet, actorRef).asJava
 
   def subscribeActorRef(
       eventKeys: util.Set[EventKey],
       actorRef: ActorRef[Event],
       every: Duration,
       mat: Materializer
-  ): IEventSubscription = subscribeCallback(eventKeys, event => actorRef ! event, every, mat)
+  ): IEventSubscription = eventSubscriber.subscribeActorRef(eventKeys.asScala.toSet, actorRef, every.toScala).asJava
 
   def get(eventKeys: util.Set[EventKey]): CompletableFuture[util.Set[Event]] =
     eventSubscriber.get(eventKeys.asScala.toSet).toJava.toCompletableFuture.thenApply(_.asJava)
