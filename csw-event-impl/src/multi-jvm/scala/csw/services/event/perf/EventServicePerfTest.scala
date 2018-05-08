@@ -11,7 +11,6 @@ import akka.testkit._
 import akka.util.ByteString
 import com.typesafe.config.ConfigFactory
 import csw.messages.events.{Event, SystemEvent}
-import csw.services.event.internal.wiring.Wiring
 import csw.services.event.perf.EventUtils.{nanosToMicros, nanosToSeconds}
 import csw.services.event.scaladsl.{EventPublisher, EventSubscriber}
 import org.HdrHistogram.Histogram
@@ -57,7 +56,7 @@ class EventServicePerfTest
   private val testConfigs = new TestConfigs(system.settings.config)
   import testConfigs._
 
-  private val testWiring = new TestWiring(system, new Wiring(system))
+  private val testWiring = new TestWiring(system)
   import testWiring._
 
   lazy val sharedPublisher: EventPublisher   = publisher

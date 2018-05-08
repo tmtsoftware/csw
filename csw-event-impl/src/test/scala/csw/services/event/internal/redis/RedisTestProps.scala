@@ -1,7 +1,7 @@
 package csw.services.event.internal.redis
 
 import csw.services.event.helpers.TestFutureExt.RichFuture
-import csw.services.event.internal.wiring.{BaseProperties, Wiring}
+import csw.services.event.internal.wiring.{BaseProperties, EventServiceResolver, Wiring}
 import csw.services.event.scaladsl.{EventPublisher, EventSubscriber, RedisFactory, RedisFactoryForPublisherWithActor}
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.LocationService
@@ -34,7 +34,8 @@ object RedisTestProps {
     val (clusterSettings, locationService) = BaseProperties.createInfra(seedPort, serverPort)
     val redisClient: RedisClient           = RedisClient.create()
     val wiring                             = new Wiring(clusterSettings.system)
-    val redisFactory                       = new RedisFactory(redisClient, locationService, wiring)
+    import wiring._
+    val redisFactory = new RedisFactory(redisClient, new EventServiceResolver(locationService))
     redisClient.setOptions(clientOptions)
     new RedisTestProps("Redis", serverPort, clusterSettings, redisFactory, locationService, wiring, redisClient)
   }
@@ -47,7 +48,8 @@ object RedisTestProps {
     val (clusterSettings, locationService) = BaseProperties.createInfra(seedPort, serverPort)
     val redisClient: RedisClient           = RedisClient.create()
     val wiring                             = new Wiring(clusterSettings.system)
-    val redisFactory                       = new RedisFactoryForPublisherWithActor(redisClient, locationService, wiring)
+    import wiring._
+    val redisFactory = new RedisFactoryForPublisherWithActor(redisClient, new EventServiceResolver(locationService))
     redisClient.setOptions(clientOptions)
     new RedisTestProps("Redis with set actor", serverPort, clusterSettings, redisFactory, locationService, wiring, redisClient)
   }
