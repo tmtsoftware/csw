@@ -201,6 +201,7 @@ public class JEventSubscriberTest extends TestNGSuite {
         probe.expectNoMessage(Duration.ofMillis(200));
     }
 
+    //DEOPSCSW-339: Provide actor ref to alert about Event arrival
     @Test(dataProvider = "event-service-provider")
     public void should_be_able_to_subscribe_with_an_ActorRef_with_duration(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
         Event event1 = Utils.makeDistinctEvent(305);

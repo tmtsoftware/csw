@@ -135,6 +135,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
     testProbe.expectNoMessage(200.millis)
   }
 
+  //DEOPSCSW-338: Provide callback for Event alerts
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_subscribe_with_async_callback_with_duration(baseProperties: BaseProperties): Unit = {
     import baseProperties._
