@@ -215,7 +215,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
     val probe = TestProbe[Event]()(actorSystem.toTyped)
 
     publisher.publish(event1).await
-
+    Thread.sleep(500) // Needed for redis publisher with set actor
     val subscription = subscriber.subscribeActorRef(Set(event1.eventKey), probe.ref)
     probe.expectMessage(event1)
     subscription.unsubscribe().await
@@ -232,7 +232,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
     val event1 = makeEvent(205)
 
     publisher.publish(event1).await
-
+    Thread.sleep(500) // Needed for redis publisher with set actor
     val subscription = subscriber.subscribeActorRef(Set(event1.eventKey), inbox.ref, 300.millis)
     Thread.sleep(1000)
     subscription.unsubscribe().await
