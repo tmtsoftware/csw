@@ -2,19 +2,23 @@ package csw.services.event.internal.redis;
 
 import akka.NotUsed;
 import akka.actor.typed.javadsl.Adapter;
+import akka.stream.Materializer;
 import akka.stream.javadsl.Source;
 import akka.testkit.typed.javadsl.TestProbe;
 import csw.messages.commons.CoordinatedShutdownReasons;
 import csw.messages.events.Event;
 import csw.services.event.exceptions.PublishFailed;
 import csw.services.event.helpers.Utils;
+import csw.services.event.internal.wiring.EventServiceResolver;
 import csw.services.event.internal.wiring.FailedEvent;
 import csw.services.event.javadsl.IEventPublisher;
 import csw.services.event.javadsl.JRedisFactory;
+import csw.services.event.scaladsl.RedisFactory;
 import io.lettuce.core.ClientOptions;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 import scala.concurrent.Await;
+import scala.concurrent.ExecutionContext;
 import scala.concurrent.duration.FiniteDuration;
 
 import java.util.concurrent.ExecutionException;
@@ -33,10 +37,14 @@ public class JRedisFailureTest {
     public final ExpectedException exception = ExpectedException.none();
 
     @BeforeClass
-    public static void beforeClass() throws Exception {
+    public static void beforeClass() {
         ClientOptions clientOptions = ClientOptions.builder().autoReconnect(false).disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS).build();
         redisTestProps = RedisTestProps.createRedisProperties(4561, 7380, clientOptions);
-        jRedisFactory = new JRedisFactory(redisTestProps.redisClient(), redisTestProps.locationService(), redisTestProps.wiring());
+        ExecutionContext executionContext = redisTestProps.wiring().ec();
+        EventServiceResolver eventServiceResolver = new EventServiceResolver(redisTestProps.locationService(), executionContext);
+        Materializer materializer = redisTestProps.wiring().resumingMat();
+        RedisFactory redisFactory = new RedisFactory(redisTestProps.redisClient(), eventServiceResolver, executionContext, materializer);
+        jRedisFactory = new JRedisFactory(redisFactory, executionContext, materializer);
         redisTestProps.redis().start();
     }
 
