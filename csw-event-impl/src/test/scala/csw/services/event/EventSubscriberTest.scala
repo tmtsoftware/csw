@@ -193,7 +193,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
     val callback2: Event ⇒ Unit = queue2.enqueue(_)
 
     publisher.publish(Source.repeat(event1))
-
+    Thread.sleep(500) // Needed for redis publisher with set actor
     val subscription  = subscriber.subscribeCallback(Set(event1.eventKey), callback, 300.millis)
     val subscription2 = subscriber.subscribeCallback(Set(event1.eventKey), callback2, 400.millis)
     Thread.sleep(1000)
