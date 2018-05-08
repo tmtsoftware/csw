@@ -1,26 +1,26 @@
 package csw.services.event
 
-import akka.actor.Cancellable
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.scaladsl.{Keep, Sink, Source}
-import akka.testkit.typed.scaladsl.TestProbe
+import akka.testkit.typed.scaladsl.{TestInbox, TestProbe}
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.events.{Event, EventKey, EventName, SystemEvent}
 import csw.messages.params.models.Prefix
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.helpers.Utils.{makeDistinctEvent, makeEvent}
-import csw.services.event.internal.wiring._
 import csw.services.event.internal.kafka.KafkaTestProps
 import csw.services.event.internal.redis.RedisTestProps
+import csw.services.event.internal.wiring._
 import net.manub.embeddedkafka.EmbeddedKafka
 import org.scalatest.Matchers
 import org.scalatest.concurrent.Eventually
 import org.scalatest.testng.TestNGSuite
 import org.testng.annotations._
 
-import scala.collection.{immutable, mutable}
+import scala.collection.mutable
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationLong
+import scala.util.Random
 
 //DEOPSCSW-334: Publish an event
 //DEOPSCSW-335: Model for EventName that encapsulates the topic(or channel ) name
@@ -85,6 +85,161 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
 
     publisher.publish(event1).await
     testProbe.expectNoMessage(2.seconds)
+  }
+
+  @Test(dataProvider = "event-service-provider")
+  def should_be_able_to_publish_and_subscribe_an_event_with_duration(baseProperties: BaseProperties): Unit = {
+    import baseProperties._
+    import baseProperties.wiring._
+
+    val queue: mutable.Queue[Event]  = new mutable.Queue[Event]()
+    val queue2: mutable.Queue[Event] = new mutable.Queue[Event]()
+    val event1                       = makeDistinctEvent(Random.nextInt())
+    val eventKey: EventKey           = event1.eventKey
+
+    publisher.publish(Source.repeat(event1))
+    val subscription = subscriber.subscribe(Set(eventKey), 300.millis).to(Sink.foreach[Event](queue.enqueue(_))).run()
+
+    subscription.ready().await
+
+    val subscription2 = subscriber.subscribe(Set(eventKey), 400.millis).to(Sink.foreach[Event](queue2.enqueue(_))).run()
+    subscription2.ready().await
+
+    Thread.sleep(1000)
+    subscription.unsubscribe().await
+
+    subscription2.unsubscribe().await
+
+    queue.size shouldBe 3
+    queue2.size shouldBe 2
+  }
+
+  //DEOPSCSW-338: Provide callback for Event alerts
+  @Test(dataProvider = "event-service-provider")
+  def should_be_able_to_subscribe_with_async_callback(baseProperties: BaseProperties): Unit = {
+    import baseProperties._
+    import baseProperties.wiring._
+
+    val event1    = makeDistinctEvent(204)
+    val testProbe = TestProbe[Event]()(actorSystem.toTyped)
+
+    val callback: Event ⇒ Future[Event] = (event) ⇒ Future.successful(testProbe.ref ! event).map(_ ⇒ event)(ec)
+
+    publisher.publish(event1).await
+
+    val subscription = subscriber.subscribeAsync(Set(event1.eventKey), callback)
+    testProbe.expectMessage(event1)
+    subscription.unsubscribe().await
+
+    publisher.publish(event1).await
+    testProbe.expectNoMessage(200.millis)
+  }
+
+  @Test(dataProvider = "event-service-provider")
+  def should_be_able_to_subscribe_with_async_callback_with_duration(baseProperties: BaseProperties): Unit = {
+    import baseProperties._
+    import baseProperties.wiring._
+
+    val queue: mutable.Queue[Event]  = new mutable.Queue[Event]()
+    val queue2: mutable.Queue[Event] = new mutable.Queue[Event]()
+    val event1                       = makeEvent(1)
+
+    val callback: Event ⇒ Future[Event]  = (event) ⇒ Future.successful(queue.enqueue(event)).map(_ ⇒ event)(ec)
+    val callback2: Event ⇒ Future[Event] = (event) ⇒ Future.successful(queue2.enqueue(event)).map(_ ⇒ event)(ec)
+
+    publisher.publish(Source.repeat(event1))
+
+    val subscription  = subscriber.subscribeAsync(Set(event1.eventKey), callback, 300.millis)
+    val subscription2 = subscriber.subscribeAsync(Set(event1.eventKey), callback2, 400.millis)
+    Thread.sleep(1000) // Future in callback needs time to execute
+    subscription.unsubscribe().await
+    subscription2.unsubscribe().await
+
+    queue.size shouldBe 3
+    queue2.size shouldBe 2
+  }
+
+  //DEOPSCSW-338: Provide callback for Event alerts
+  @Test(dataProvider = "event-service-provider")
+  def should_be_able_to_subscribe_with_callback(baseProperties: BaseProperties): Unit = {
+    import baseProperties._
+    import baseProperties.wiring._
+
+    val event1 = makeDistinctEvent(203)
+
+    val testProbe              = TestProbe[Event]()(actorSystem.toTyped)
+    val callback: Event ⇒ Unit = testProbe.ref ! _
+
+    publisher.publish(event1).await
+
+    val subscription = subscriber.subscribeCallback(Set(event1.eventKey), callback)
+    testProbe.expectMessage(event1)
+    subscription.unsubscribe().await
+
+    publisher.publish(event1).await
+    testProbe.expectNoMessage(200.millis)
+  }
+
+  //DEOPSCSW-338: Provide callback for Event alerts
+  @Test(dataProvider = "event-service-provider")
+  def should_be_able_to_subscribe_with_callback_with_duration(baseProperties: BaseProperties): Unit = {
+    import baseProperties._
+
+    val queue: mutable.Queue[Event]  = new mutable.Queue[Event]()
+    val queue2: mutable.Queue[Event] = new mutable.Queue[Event]()
+    val event1                       = makeEvent(1)
+
+    val callback: Event ⇒ Unit  = queue.enqueue(_)
+    val callback2: Event ⇒ Unit = queue2.enqueue(_)
+
+    publisher.publish(Source.repeat(event1))
+
+    val subscription  = subscriber.subscribeCallback(Set(event1.eventKey), callback, 300.millis)
+    val subscription2 = subscriber.subscribeCallback(Set(event1.eventKey), callback2, 400.millis)
+    Thread.sleep(1000)
+    subscription.unsubscribe().await
+    subscription2.unsubscribe().await
+
+    queue.size shouldBe 3
+    queue2.size shouldBe 2
+  }
+
+  //DEOPSCSW-339: Provide actor ref to alert about Event arrival
+  @Test(dataProvider = "event-service-provider")
+  def should_be_able_to_subscribe_with_an_ActorRef(baseProperties: BaseProperties): Unit = {
+    import baseProperties._
+
+    val event1 = makeDistinctEvent(205)
+    import baseProperties.wiring._
+
+    val probe = TestProbe[Event]()(actorSystem.toTyped)
+
+    publisher.publish(event1).await
+
+    val subscription = subscriber.subscribeActorRef(Set(event1.eventKey), probe.ref)
+    probe.expectMessage(event1)
+    subscription.unsubscribe().await
+
+    publisher.publish(event1)
+    probe.expectNoMessage(200.millis)
+  }
+
+  //DEOPSCSW-339: Provide actor ref to alert about Event arrival
+  @Test(dataProvider = "event-service-provider")
+  def should_be_able_to_subscribe_with_an_ActorRef_with_duration(baseProperties: BaseProperties): Unit = {
+    import baseProperties._
+    val inbox  = TestInbox[Event]()
+    val event1 = makeEvent(205)
+
+    publisher.publish(event1).await
+
+    val subscription = subscriber.subscribeActorRef(Set(event1.eventKey), inbox.ref, 300.millis)
+    Thread.sleep(1000)
+    subscription.unsubscribe().await
+
+    val events = inbox.receiveAll()
+    Thread.sleep(500)
+    events.size shouldBe 3
   }
 
   @Test(dataProvider = "event-service-provider")
@@ -165,68 +320,6 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
     val (subscription, seqF) = subscriber.subscribe(Set(eventKey1, eventKey2)).take(2).toMat(Sink.seq)(Keep.both).run()
 
     seqF.await.toSet shouldBe Set(Event.invalidEvent(eventKey2), distinctEvent1)
-  }
-
-  //DEOPSCSW-338: Provide callback for Event alerts
-  @Test(dataProvider = "event-service-provider")
-  def should_be_able_to_subscribe_with_callback(baseProperties: BaseProperties): Unit = {
-    import baseProperties._
-    import baseProperties.wiring._
-
-    val event1 = makeDistinctEvent(203)
-
-    val testProbe              = TestProbe[Event]()(actorSystem.toTyped)
-    val callback: Event ⇒ Unit = testProbe.ref ! _
-
-    publisher.publish(event1).await
-
-    val subscription = subscriber.subscribeCallback(Set(event1.eventKey), callback)
-    testProbe.expectMessage(event1)
-    subscription.unsubscribe().await
-
-    publisher.publish(event1).await
-    testProbe.expectNoMessage(200.millis)
-  }
-
-  //DEOPSCSW-338: Provide callback for Event alerts
-  @Test(dataProvider = "event-service-provider")
-  def should_be_able_to_subscribe_with_async_callback(baseProperties: BaseProperties): Unit = {
-    import baseProperties._
-    import baseProperties.wiring._
-
-    val event1    = makeDistinctEvent(204)
-    val testProbe = TestProbe[Event]()(actorSystem.toTyped)
-
-    val callback: Event ⇒ Future[Event] = (event) ⇒ Future.successful(testProbe.ref ! event).map(_ ⇒ event)(ec)
-
-    publisher.publish(event1).await
-
-    val subscription = subscriber.subscribeAsync(Set(event1.eventKey), callback)
-    testProbe.expectMessage(event1)
-    subscription.unsubscribe().await
-
-    publisher.publish(event1).await
-    testProbe.expectNoMessage(200.millis)
-  }
-
-  //DEOPSCSW-339: Provide actor ref to alert about Event arrival
-  @Test(dataProvider = "event-service-provider")
-  def should_be_able_to_subscribe_with_an_ActorRef(baseProperties: BaseProperties): Unit = {
-    import baseProperties._
-
-    val event1 = makeDistinctEvent(205)
-    import baseProperties.wiring._
-
-    val probe = TestProbe[Event]()(actorSystem.toTyped)
-
-    publisher.publish(event1).await
-
-    val subscription = subscriber.subscribeActorRef(Set(event1.eventKey), probe.ref)
-    probe.expectMessage(event1)
-    subscription.unsubscribe().await
-
-    publisher.publish(event1)
-    probe.expectNoMessage(200.millis)
   }
 
   //DEOPSCSW-344: Retrieve recently published event using prefix and eventname
