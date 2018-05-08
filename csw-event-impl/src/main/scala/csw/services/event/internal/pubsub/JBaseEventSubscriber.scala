@@ -1,5 +1,6 @@
 package csw.services.event.internal.pubsub
 
+import java.time.Duration
 import java.util
 import java.util.concurrent.CompletableFuture
 import java.util.function.Consumer
@@ -15,8 +16,8 @@ import csw.services.event.javadsl.{IEventSubscriber, IEventSubscription}
 import csw.services.event.scaladsl.{EventSubscriber, EventSubscription}
 
 import scala.collection.JavaConverters.{asScalaSetConverter, setAsJavaSetConverter}
+import scala.compat.java8.DurationConverters.DurationOps
 import scala.compat.java8.FutureConverters.{CompletionStageOps, FutureOps}
-import scala.concurrent.duration.FiniteDuration
 
 class JBaseEventSubscriber(eventSubscriber: EventSubscriber) extends IEventSubscriber {
 
@@ -32,8 +33,8 @@ class JBaseEventSubscriber(eventSubscriber: EventSubscriber) extends IEventSubsc
         }
       }
 
-  def subscribe(eventKeys: util.Set[EventKey], every: FiniteDuration): Source[Event, IEventSubscription] =
-    subscribe(eventKeys).via(new RateAdapterStage[Event](every))
+  def subscribe(eventKeys: util.Set[EventKey], every: Duration): Source[Event, IEventSubscription] =
+    subscribe(eventKeys).via(new RateAdapterStage[Event](every.toScala))
 
   def subscribeAsync(
       eventKeys: util.Set[EventKey],
@@ -44,7 +45,7 @@ class JBaseEventSubscriber(eventSubscriber: EventSubscriber) extends IEventSubsc
   def subscribeAsync(
       eventKeys: util.Set[EventKey],
       callback: Event => CompletableFuture[_],
-      every: FiniteDuration,
+      every: Duration,
       mat: Materializer
   ): IEventSubscription = subscribe(eventKeys, every).asScala.mapAsync(1)(callback(_).toScala).to(Sink.ignore).run()(mat)
 
@@ -54,7 +55,7 @@ class JBaseEventSubscriber(eventSubscriber: EventSubscriber) extends IEventSubsc
   def subscribeCallback(
       eventKeys: util.Set[EventKey],
       callback: Consumer[Event],
-      every: FiniteDuration,
+      every: Duration,
       mat: Materializer
   ): IEventSubscription = subscribe(eventKeys, every).asScala.to(Sink.foreach(callback.accept)).run()(mat)
 
@@ -64,7 +65,7 @@ class JBaseEventSubscriber(eventSubscriber: EventSubscriber) extends IEventSubsc
   def subscribeActorRef(
       eventKeys: util.Set[EventKey],
       actorRef: ActorRef[Event],
-      every: FiniteDuration,
+      every: Duration,
       mat: Materializer
   ): IEventSubscription = subscribeCallback(eventKeys, event => actorRef ! event, every, mat)
 

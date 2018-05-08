@@ -237,9 +237,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
     Thread.sleep(1000)
     subscription.unsubscribe().await
 
-    val events = inbox.receiveAll()
-    Thread.sleep(500)
-    events.size shouldBe 3
+    inbox.receiveAll().size shouldBe 3
   }
 
   @Test(dataProvider = "event-service-provider")

@@ -5,6 +5,7 @@ import akka.actor.typed.javadsl.Adapter;
 import akka.japi.Pair;
 import akka.stream.javadsl.Keep;
 import akka.stream.javadsl.Sink;
+import akka.testkit.typed.javadsl.TestInbox;
 import akka.testkit.typed.javadsl.TestProbe;
 import csw.messages.commons.CoordinatedShutdownReasons;
 import csw.messages.events.*;
@@ -22,7 +23,6 @@ import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-import scala.Function1;
 
 import java.time.Duration;
 import java.util.*;
@@ -85,6 +85,134 @@ public class JEventSubscriberTest extends TestNGSuite {
 
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
         probe.expectNoMessage(Duration.ofMillis(200));
+    }
+
+    @Test(dataProvider = "event-service-provider")
+    public void should_be_able_to_publish_and_subscribe_an_event_with_duration(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
+        Event event1 = Utils.makeDistinctEvent(1);
+        EventKey eventKey = event1.eventKey();
+
+        java.util.Set<EventKey> set = new HashSet<>();
+        set.add(eventKey);
+
+        List<Event> queue = new ArrayList<>();
+
+        baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
+
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(set, Duration.ZERO.plusMillis(300)).toMat(Sink.foreach(queue::add), Keep.left()).run(baseProperties.wiring().resumingMat());
+        subscription.ready().get(10, TimeUnit.SECONDS);
+
+        Thread.sleep(1000);
+        subscription.unsubscribe().get(10, TimeUnit.SECONDS);
+
+        Assert.assertEquals(queue.size(), 3);
+    }
+
+    //DEOPSCSW-338: Provide callback for Event alerts
+    @Test(dataProvider = "event-service-provider")
+    public void should_be_able_to_subscribe_with_async_callback(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
+        Event event1 = Utils.makeDistinctEvent(304);
+
+        TestProbe probe = TestProbe.create(Adapter.toTyped(baseProperties.wiring().actorSystem()));
+
+        baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
+
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribeAsync(Collections.singleton(event1.eventKey()), event -> {
+            probe.ref().tell(event);
+            return CompletableFuture.completedFuture(event);
+        }, baseProperties.wiring().resumingMat());
+        probe.expectMessage(event1);
+
+        subscription.unsubscribe().get(10, TimeUnit.SECONDS);
+
+        baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
+        probe.expectNoMessage(Duration.ofMillis(200));
+
+    }
+
+    //DEOPSCSW-338: Provide callback for Event alerts
+    @Test(dataProvider = "event-service-provider")
+    public void should_be_able_to_subscribe_with_async_callback_with_duration(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
+        Event event1 = Utils.makeDistinctEvent(304);
+        List<Event> queue = new ArrayList<>();
+
+        baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
+
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribeAsync(Collections.singleton(event1.eventKey()), event -> {
+            queue.add(event);
+            return CompletableFuture.completedFuture(event);
+        }, Duration.ofMillis(300), baseProperties.wiring().resumingMat());
+
+        Thread.sleep(1000);
+        subscription.unsubscribe().get(10, TimeUnit.SECONDS);
+
+        Assert.assertEquals(queue.size(), 3);
+    }
+
+    //DEOPSCSW-338: Provide callback for Event alerts
+    @Test(dataProvider = "event-service-provider")
+    public void should_be_able_to_subscribe_with_callback(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
+        Event event1 = Utils.makeDistinctEvent(303);
+
+        TestProbe probe = TestProbe.create(Adapter.toTyped(baseProperties.wiring().actorSystem()));
+
+        baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
+
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribeCallback(Collections.singleton(event1.eventKey()), event -> probe.ref().tell(event), baseProperties.wiring().resumingMat());
+        probe.expectMessage(event1);
+
+        subscription.unsubscribe().get(10, TimeUnit.SECONDS);
+
+        baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
+        probe.expectNoMessage(Duration.ofMillis(200));
+    }
+
+    //DEOPSCSW-338: Provide callback for Event alerts
+    @Test(dataProvider = "event-service-provider")
+    public void should_be_able_to_subscribe_with_callback_with_duration(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
+        Event event1 = Utils.makeDistinctEvent(303);
+
+        List<Event> queue = new ArrayList<>();
+
+        baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
+
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribeCallback(Collections.singleton(event1.eventKey()), queue::add, Duration.ofMillis(300), baseProperties.wiring().resumingMat());
+        Thread.sleep(1000);
+        subscription.unsubscribe().get(10, TimeUnit.SECONDS);
+
+        Assert.assertEquals(queue.size(), 3);
+    }
+
+    //DEOPSCSW-339: Provide actor ref to alert about Event arrival
+    @Test(dataProvider = "event-service-provider")
+    public void should_be_able_to_subscribe_with_an_ActorRef(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
+        Event event1 = Utils.makeDistinctEvent(305);
+
+        TestProbe probe = TestProbe.create(Adapter.toTyped(baseProperties.wiring().actorSystem()));
+
+        baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
+
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribeActorRef(Collections.singleton(event1.eventKey()), probe.ref(), baseProperties.wiring().resumingMat());
+        probe.expectMessage(event1);
+
+        subscription.unsubscribe().get(10, TimeUnit.SECONDS);
+
+        baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
+        probe.expectNoMessage(Duration.ofMillis(200));
+    }
+
+    @Test(dataProvider = "event-service-provider")
+    public void should_be_able_to_subscribe_with_an_ActorRef_with_duration(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
+        Event event1 = Utils.makeDistinctEvent(305);
+
+        TestInbox<Event> inbox = TestInbox.create();
+
+        baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
+
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribeActorRef(Collections.singleton(event1.eventKey()), inbox.getRef(), Duration.ofMillis(300), baseProperties.wiring().resumingMat());
+        Thread.sleep(1000);
+        subscription.unsubscribe().get(10, TimeUnit.SECONDS);
+        Assert.assertEquals(inbox.getAllReceived().size(), 3);
     }
 
     @Test(dataProvider = "event-service-provider")
@@ -176,66 +304,6 @@ public class JEventSubscriberTest extends TestNGSuite {
         expectedEvents.add(distinctEvent1);
 
         Assert.assertEquals(expectedEvents, actualEvents);
-    }
-
-    //DEOPSCSW-338: Provide callback for Event alerts
-    @Test(dataProvider = "event-service-provider")
-    public void should_be_able_to_subscribe_with_callback(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
-        Event event1 = Utils.makeDistinctEvent(303);
-
-        TestProbe probe = TestProbe.create(Adapter.toTyped(baseProperties.wiring().actorSystem()));
-
-        baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
-
-        IEventSubscription subscription = baseProperties.jSubscriber().subscribeCallback(Collections.singleton(event1.eventKey()), event -> probe.ref().tell(event), baseProperties.wiring().resumingMat());
-        probe.expectMessage(event1);
-
-        subscription.unsubscribe().get(10, TimeUnit.SECONDS);
-
-        baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
-        probe.expectNoMessage(Duration.ofMillis(200));
-    }
-
-    //DEOPSCSW-338: Provide callback for Event alerts
-    @Test(dataProvider = "event-service-provider")
-    public void should_be_able_to_subscribe_with_async_callback(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
-        Event event1 = Utils.makeDistinctEvent(304);
-
-        TestProbe probe = TestProbe.create(Adapter.toTyped(baseProperties.wiring().actorSystem()));
-
-        Function1<Event, CompletableFuture<?>> asyncCallback = event -> {
-            probe.ref().tell(event);
-            return CompletableFuture.completedFuture(event);
-        };
-
-        baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
-
-        IEventSubscription subscription = baseProperties.jSubscriber().subscribeAsync(Collections.singleton(event1.eventKey()), asyncCallback, baseProperties.wiring().resumingMat());
-        probe.expectMessage(event1);
-
-        subscription.unsubscribe().get(10, TimeUnit.SECONDS);
-
-        baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
-        probe.expectNoMessage(Duration.ofMillis(200));
-
-    }
-
-    //DEOPSCSW-339: Provide actor ref to alert about Event arrival
-    @Test(dataProvider = "event-service-provider")
-    public void should_be_able_to_subscribe_with_an_ActorRef(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
-        Event event1 = Utils.makeDistinctEvent(305);
-
-        TestProbe probe = TestProbe.create(Adapter.toTyped(baseProperties.wiring().actorSystem()));
-
-        baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
-
-        IEventSubscription subscription = baseProperties.jSubscriber().subscribeActorRef(Collections.singleton(event1.eventKey()), probe.ref(), baseProperties.wiring().resumingMat());
-        probe.expectMessage(event1);
-
-        subscription.unsubscribe().get(10, TimeUnit.SECONDS);
-
-        baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
-        probe.expectNoMessage(Duration.ofMillis(200));
     }
 
     //DEOPSCSW-344: Retrieve recently published event using prefix and eventname
