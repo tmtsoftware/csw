@@ -28,10 +28,10 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
     redisClient.connectPubSubAsync(EventServiceCodec, redisURI).toScala.map(_.reactive())
 
   override def subscribe(eventKeys: Set[EventKey]): Source[Event, EventSubscription] = {
-    val connectionF                                          = reactiveConnectionF()
-    val latestEventStream: Source[Event, NotUsed]            = Source.fromFuture(get(eventKeys)).mapConcat(identity)
-    val futureSourceOfEvents: Future[Source[Event, NotUsed]] = connectionF.flatMap(subscribe(eventKeys, _))
-    val eventStream: Source[Event, Future[NotUsed]]          = Source.fromFutureSource(futureSourceOfEvents)
+    val connectionF                                  = reactiveConnectionF()
+    val latestEventStream: Source[Event, NotUsed]    = Source.fromFuture(get(eventKeys)).mapConcat(identity)
+    val eventStreamF: Future[Source[Event, NotUsed]] = connectionF.flatMap(subscribe(eventKeys, _))
+    val eventStream: Source[Event, Future[NotUsed]]  = Source.fromFutureSource(eventStreamF)
 
     latestEventStream
       .concatMat(eventStream)(Keep.right)

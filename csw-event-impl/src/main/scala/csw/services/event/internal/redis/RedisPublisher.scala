@@ -25,9 +25,9 @@ class RedisPublisher(redisURI: RedisURI, redisClient: RedisClient)(implicit ec: 
     redisClient.connectAsync(EventServiceCodec, redisURI).toScala.map(_.async())
 
   override def publish[Mat](source: Source[Event, Mat], onError: (Event, PublishFailed) ⇒ Unit): Mat =
-    publishWithRecovery(source, Some(onError))
+    publishEvent(source, Some(onError))
 
-  override def publish[Mat](source: Source[Event, Mat]): Mat = publishWithRecovery(source, None)
+  override def publish[Mat](source: Source[Event, Mat]): Mat = publishEvent(source, None)
 
   override def publish(event: Event): Future[Done] =
     async {
@@ -45,14 +45,9 @@ class RedisPublisher(redisURI: RedisURI, redisClient: RedisClient)(implicit ec: 
 
   override def asJava: IEventPublisher = new JAbstractEventPublisher(this)
 
-  private def publishWithRecovery[Mat](source: Source[Event, Mat], maybeOnError: Option[(Event, PublishFailed) ⇒ Unit]): Mat =
+  private def publishEvent[Mat](source: Source[Event, Mat], maybeOnError: Option[(Event, PublishFailed) ⇒ Unit]): Mat =
     source
-      .mapAsync(1) {
-        maybeOnError match {
-          case Some(onError) ⇒ publish(_).recover { case ex @ PublishFailed(event, _) ⇒ onError(event, ex) }
-          case None          ⇒ publish
-        }
-      }
+      .mapAsync(1) { publishWithRecovery(maybeOnError) }
       .mapError {
         case NonFatal(ex) ⇒
           logger.error(ex.getMessage, ex = ex)
@@ -60,4 +55,10 @@ class RedisPublisher(redisURI: RedisURI, redisClient: RedisClient)(implicit ec: 
       }
       .to(Sink.ignore)
       .run()
+
+  private def publishWithRecovery(maybeOnError: Option[(Event, PublishFailed) ⇒ Unit]) = { e: Event ⇒
+      case ex @ PublishFailed(event, _) ⇒ maybeOnError.foreach(onError ⇒ { onError(event, ex) })
+    publish(e).recover {
+    }
+  }
 }
