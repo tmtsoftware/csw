@@ -1,7 +1,7 @@
 package csw.services.event.perf
 
 import java.io.{File, OutputStream}
-import java.nio.file.Files
+import java.nio.file.{Files, StandardOpenOption}
 
 import akka.actor.ActorSystem
 import com.typesafe.config.Config
@@ -16,6 +16,7 @@ trait BenchmarkFileReporter {
   def reportResults(result: String): Unit
   def close(): Unit
 }
+
 object BenchmarkFileReporter {
   val targetDirectory: File = {
     val target = new File("csw-event-impl/target/benchmark-results")
@@ -29,11 +30,14 @@ object BenchmarkFileReporter {
 
       val testResultFile: File = {
         val fileName = s"$testName-results.txt"
-        new File(targetDirectory, fileName)
+        val file     = new File(targetDirectory, fileName)
+        Files.deleteIfExists(file.toPath)
+        file.createNewFile()
+        file
       }
       val config: Config = system.settings.config
 
-      override val fos: OutputStream = Files.newOutputStream(testResultFile.toPath)
+      override val fos: OutputStream = Files.newOutputStream(testResultFile.toPath, StandardOpenOption.APPEND)
 
       val settingsToReport =
         Seq(

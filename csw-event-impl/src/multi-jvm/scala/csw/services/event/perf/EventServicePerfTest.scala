@@ -23,7 +23,7 @@ import scala.concurrent.duration._
 object EventServicePerfTest extends MultiNodeConfig {
 
   val totalNumberOfNodes: Int =
-    System.getProperty("akka.test.FanInThroughputSpec.nrOfNodes") match {
+    System.getProperty("csw.test.EventServicePerfTest.nrOfNodes") match {
       case null  ⇒ 2
       case value ⇒ value.toInt
     }
@@ -102,7 +102,7 @@ class EventServicePerfTest
 
 //    runPerfFlames(roles: _*)(delay = 5.seconds, time = 40.seconds)
 
-    val nodeId = myself.name.split("-").tail.head.toInt
+    val nodeId = myself.name.split("-").last.toInt
 
     val pubSubAllocationPerNode =
       (1 to publisherSubscriberPairs)
