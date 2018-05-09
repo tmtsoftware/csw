@@ -5,9 +5,8 @@ import akka.stream.javadsl.Source;
 import akka.testkit.typed.javadsl.TestProbe;
 import csw.messages.commons.CoordinatedShutdownReasons;
 import csw.messages.events.Event;
-import csw.services.event.exceptions.PublishFailed;
+import csw.services.event.exceptions.PublishFailedException;
 import csw.services.event.helpers.Utils;
-import csw.services.event.internal.wiring.FailedEvent;
 import csw.services.event.javadsl.IEventPublisher;
 import net.manub.embeddedkafka.EmbeddedKafka$;
 import org.junit.*;
@@ -46,7 +45,7 @@ public class JKafkaFailureTest {
 
     @Test
     public void failureInPublishingShouldFailFutureWithPublishFailedException() throws InterruptedException, ExecutionException, TimeoutException {
-        exception.expectCause(isA(PublishFailed.class));
+        exception.expectCause(isA(PublishFailedException.class));
 
         // simulate publishing failure as message size is greater than message.max.bytes(1 byte) configured in broker
         publisher.publish(Utils.makeEvent(2)).get(10, TimeUnit.SECONDS);
@@ -56,15 +55,12 @@ public class JKafkaFailureTest {
     public void handleFailedPublishEventWithACallback() {
 
         TestProbe testProbe = TestProbe.create(Adapter.toTyped(kafkaTestProps.wiring().actorSystem()));
-        Event event = Utils.makeEvent(1);
-        Source eventStream = Source.single(event);
+        Event eventSent = Utils.makeEvent(1);
+        Source eventStream = Source.single(eventSent);
 
-        publisher.publish(eventStream, (event1, ex) -> testProbe.ref().tell(new FailedEvent(event1, ex)));
+        publisher.publish(eventStream, event1 -> testProbe.ref().tell(event1));
 
-        FailedEvent failedEvent = (FailedEvent) testProbe.expectMessageClass(FailedEvent.class);
-
-        Assert.assertEquals(event, failedEvent.event());
-        Assert.assertTrue(failedEvent.throwable() instanceof PublishFailed);
+        testProbe.expectMessage(eventSent);
     }
 
     @Test
@@ -72,11 +68,8 @@ public class JKafkaFailureTest {
         TestProbe testProbe = TestProbe.create(Adapter.toTyped(kafkaTestProps.wiring().actorSystem()));
         Event event = Utils.makeEvent(1);
 
-        publisher.publish(() -> event, new FiniteDuration(20, TimeUnit.MILLISECONDS), (event1, ex) -> testProbe.ref().tell(new FailedEvent(event1, ex)));
+        publisher.publish(() -> event, new FiniteDuration(20, TimeUnit.MILLISECONDS), event1 -> testProbe.ref().tell(event1));
 
-        FailedEvent failedEvent = (FailedEvent) testProbe.expectMessageClass(FailedEvent.class);
-
-        Assert.assertEquals(event, failedEvent.event());
-        Assert.assertTrue(failedEvent.throwable() instanceof PublishFailed);
+        testProbe.expectMessage(event);
     }
 }

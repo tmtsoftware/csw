@@ -7,10 +7,9 @@ import akka.stream.javadsl.Source;
 import akka.testkit.typed.javadsl.TestProbe;
 import csw.messages.commons.CoordinatedShutdownReasons;
 import csw.messages.events.Event;
-import csw.services.event.exceptions.PublishFailed;
+import csw.services.event.exceptions.PublishFailedException;
 import csw.services.event.helpers.Utils;
 import csw.services.event.internal.wiring.EventServiceResolver;
-import csw.services.event.internal.wiring.FailedEvent;
 import csw.services.event.javadsl.IEventPublisher;
 import csw.services.event.javadsl.JRedisFactory;
 import csw.services.event.scaladsl.RedisFactory;
@@ -64,7 +63,7 @@ public class JRedisFailureTest {
 
         Thread.sleep(1000); // wait till the publisher is shutdown successfully
 
-        exception.expectCause(isA(PublishFailed.class));
+        exception.expectCause(isA(PublishFailedException.class));
         publisher.publish(Utils.makeEvent(2)).get(10, TimeUnit.SECONDS);
     }
 
@@ -82,12 +81,9 @@ public class JRedisFailureTest {
         Event event = Utils.makeEvent(1);
         Source<Event, NotUsed> eventStream = Source.single(event);
 
-        publisher.publish(eventStream, (event1, ex) -> testProbe.ref().tell(new FailedEvent(event1, ex)));
+        publisher.publish(eventStream, event1 -> testProbe.ref().tell(event1));
 
-        FailedEvent failedEvent = (FailedEvent) testProbe.expectMessageClass(FailedEvent.class);
-
-        Assert.assertEquals(event, failedEvent.event());
-        Assert.assertTrue(failedEvent.throwable() instanceof PublishFailed);
+        testProbe.expectMessage(event);
     }
 
     @Test
@@ -103,11 +99,8 @@ public class JRedisFailureTest {
 
         Event event = Utils.makeEvent(1);
 
-        publisher.publish(() -> event, new FiniteDuration(20, TimeUnit.MILLISECONDS), (event1, ex) -> testProbe.ref().tell(new FailedEvent(event1, ex)));
+        publisher.publish(() -> event, new FiniteDuration(20, TimeUnit.MILLISECONDS), event1 -> testProbe.ref().tell(event1));
 
-        FailedEvent failedEvent = (FailedEvent) testProbe.expectMessageClass(FailedEvent.class);
-
-        Assert.assertEquals(event, failedEvent.event());
-        Assert.assertTrue(failedEvent.throwable() instanceof PublishFailed);
+        testProbe.expectMessage(event);
     }
 }
