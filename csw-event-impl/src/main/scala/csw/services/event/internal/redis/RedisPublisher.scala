@@ -2,10 +2,9 @@ package csw.services.event.internal.redis
 
 import akka.Done
 import akka.stream._
-import akka.stream.scaladsl.{Sink, Source}
+import akka.stream.scaladsl.Source
 import csw.messages.events.{Event, EventKey}
 import csw.services.event.exceptions.PublishFailedException
-import csw.services.event.internal.commons.EventServiceLogger
 import csw.services.event.internal.pubsub.{AbstractEventPublisher, JAbstractEventPublisher}
 import csw.services.event.javadsl.IEventPublisher
 import io.lettuce.core.api.async.RedisAsyncCommands
@@ -19,15 +18,15 @@ import scala.util.control.NonFatal
 class RedisPublisher(redisURI: RedisURI, redisClient: RedisClient)(implicit ec: ExecutionContext, mat: Materializer)
     extends AbstractEventPublisher {
 
-  private val logger = EventServiceLogger.getLogger
+  private val parallelism = 1
 
   private lazy val asyncConnectionF: Future[RedisAsyncCommands[EventKey, Event]] =
     redisClient.connectAsync(EventServiceCodec, redisURI).toScala.map(_.async())
 
   override def publish[Mat](source: Source[Event, Mat], onError: Event ⇒ Unit): Mat =
-    publishEvent(source, Some(onError))
+    publishEvent(source, parallelism, Some(onError))
 
-  override def publish[Mat](source: Source[Event, Mat]): Mat = publishEvent(source, None)
+  override def publish[Mat](source: Source[Event, Mat]): Mat = publishEvent(source, parallelism, None)
 
   override def publish(event: Event): Future[Done] =
     async {
@@ -44,21 +43,4 @@ class RedisPublisher(redisURI: RedisURI, redisClient: RedisClient)(implicit ec: 
   override def shutdown(): Future[Done] = asyncConnectionF.flatMap(_.quit().toScala).map(_ ⇒ Done)
 
   override def asJava: IEventPublisher = new JAbstractEventPublisher(this)
-
-  private def publishEvent[Mat](source: Source[Event, Mat], maybeOnError: Option[Event ⇒ Unit]): Mat =
-    source
-      .mapAsync(1) { publishWithRecovery(maybeOnError) }
-      .mapError {
-        case NonFatal(ex) ⇒
-          logger.error(ex.getMessage, ex = ex)
-          ex
-      }
-      .to(Sink.ignore)
-      .run()
-
-  private def publishWithRecovery(maybeOnError: Option[Event ⇒ Unit]) = { e: Event ⇒
-    publish(e).recover {
-      case _ @PublishFailedException(event) ⇒ maybeOnError.foreach(onError ⇒ onError(event))
-    }
-  }
 }
