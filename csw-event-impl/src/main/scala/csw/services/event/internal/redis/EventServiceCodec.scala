@@ -1,25 +1,31 @@
 package csw.services.event.internal.redis
 
 import java.nio.ByteBuffer
+import java.nio.charset.Charset
 
-import akka.util.ByteString
 import csw.messages.events.{Event, EventKey}
 import csw_protobuf.events.PbEvent
 import io.lettuce.core.codec.RedisCodec
 
 object EventServiceCodec extends RedisCodec[EventKey, Event] {
 
-  override def encodeKey(eventKey: EventKey): ByteBuffer = ByteString(eventKey.key).asByteBuffer
+  private val utf8Charset: Charset = Charset.forName("utf8")
 
-  override def decodeKey(bytes: ByteBuffer): EventKey = EventKey(ByteString(bytes).utf8String)
+  override def encodeKey(eventKey: EventKey): ByteBuffer =
+    utf8Charset.encode(eventKey.key)
+
+  override def decodeKey(byteBuf: ByteBuffer): EventKey =
+    EventKey(utf8Charset.decode(byteBuf).toString)
 
   override def encodeValue(event: Event): ByteBuffer = {
     val pbEvent = Event.typeMapper.toBase(event)
-    ByteString(pbEvent.toByteArray).asByteBuffer
+    ByteBuffer.wrap(pbEvent.toByteArray)
   }
 
   override def decodeValue(byteBuf: ByteBuffer): Event = {
-    val pbEvent = PbEvent.parseFrom(ByteString(byteBuf).toArray)
+    val bytes = new Array[Byte](byteBuf.remaining)
+    byteBuf.get(bytes)
+    val pbEvent = PbEvent.parseFrom(bytes)
     Event.fromPb(pbEvent)
   }
 }
