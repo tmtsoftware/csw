@@ -78,6 +78,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
     testProbe.expectNoMessage(2.seconds)
   }
 
+  //DEOPSCSW-345: Publish events irrespective of subscriber existence
   var cancellable: Cancellable = _
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_publish_concurrently_to_the_same_channel(baseProperties: BaseProperties): Unit = {

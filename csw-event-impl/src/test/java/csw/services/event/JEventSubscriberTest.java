@@ -116,7 +116,7 @@ public class JEventSubscriberTest extends TestNGSuite {
         TestProbe probe = TestProbe.create(Adapter.toTyped(baseProperties.wiring().actorSystem()));
 
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
-
+        Thread.sleep(500); // Needed for redis set which is fire and forget operation
         IEventSubscription subscription = baseProperties.jSubscriber().subscribeAsync(Collections.singleton(event1.eventKey()), event -> {
             probe.ref().tell(event);
             return CompletableFuture.completedFuture(event);
@@ -157,7 +157,7 @@ public class JEventSubscriberTest extends TestNGSuite {
         TestProbe probe = TestProbe.create(Adapter.toTyped(baseProperties.wiring().actorSystem()));
 
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
-
+        Thread.sleep(500); // Needed for redis set which is fire and forget operation
         IEventSubscription subscription = baseProperties.jSubscriber().subscribeCallback(Collections.singleton(event1.eventKey()), event -> probe.ref().tell(event));
         probe.expectMessage(event1);
 
@@ -175,7 +175,7 @@ public class JEventSubscriberTest extends TestNGSuite {
         List<Event> queue = new ArrayList<>();
 
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
-
+        Thread.sleep(500); // Needed for redis set which is fire and forget operation
         IEventSubscription subscription = baseProperties.jSubscriber().subscribeCallback(Collections.singleton(event1.eventKey()), queue::add, Duration.ofMillis(300));
         Thread.sleep(1000);
         subscription.unsubscribe().get(10, TimeUnit.SECONDS);
@@ -191,7 +191,7 @@ public class JEventSubscriberTest extends TestNGSuite {
         TestProbe probe = TestProbe.create(Adapter.toTyped(baseProperties.wiring().actorSystem()));
 
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
-
+        Thread.sleep(500); // Needed for redis set which is fire and forget operation
         IEventSubscription subscription = baseProperties.jSubscriber().subscribeActorRef(Collections.singleton(event1.eventKey()), probe.ref(), baseProperties.wiring().resumingMat());
         probe.expectMessage(event1);
 
@@ -209,7 +209,7 @@ public class JEventSubscriberTest extends TestNGSuite {
         TestInbox<Event> inbox = TestInbox.create();
 
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
-
+        Thread.sleep(500); // Needed for redis set which is fire and forget operation
         IEventSubscription subscription = baseProperties.jSubscriber().subscribeActorRef(Collections.singleton(event1.eventKey()), inbox.getRef(), Duration.ofMillis(300));
         Thread.sleep(1000);
         subscription.unsubscribe().get(10, TimeUnit.SECONDS);
@@ -261,7 +261,7 @@ public class JEventSubscriberTest extends TestNGSuite {
         pair.first().ready().get(10, TimeUnit.SECONDS);
 
         baseProperties.jPublisher().publish(event3).get(10, TimeUnit.SECONDS);
-
+        Thread.sleep(500); // Needed for redis set which is fire and forget operation
         java.util.List<Event> expectedEvents = new ArrayList<>();
         expectedEvents.add(event2);
         expectedEvents.add(event3);
@@ -314,7 +314,7 @@ public class JEventSubscriberTest extends TestNGSuite {
         EventKey eventKey = event1.eventKey();
 
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
-
+        Thread.sleep(500); // Needed for redis set which is fire and forget operation
         Event event = baseProperties.jSubscriber().get(eventKey).get(10, TimeUnit.SECONDS);
 
         Assert.assertEquals(event1, event);
@@ -340,7 +340,7 @@ public class JEventSubscriberTest extends TestNGSuite {
         EventKey eventKey2 = event2.eventKey();
 
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
-
+        Thread.sleep(500); // Needed for redis set which is fire and forget operation
         HashSet<EventKey> keys = new HashSet<>();
         keys.add(eventKey1);
         keys.add(eventKey2);

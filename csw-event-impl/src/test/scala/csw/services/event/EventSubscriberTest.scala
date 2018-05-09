@@ -80,6 +80,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
     testProbe.expectNoMessage(2.seconds)
   }
 
+  //DEOPSCSW-346: Subscribe to event irrespective of Publisher's existence
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_publish_and_subscribe_an_event_with_duration(baseProperties: BaseProperties): Unit = {
     import baseProperties._
@@ -119,7 +120,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
     val callback: Event ⇒ Future[Event] = (event) ⇒ Future.successful(testProbe.ref ! event).map(_ ⇒ event)(ec)
 
     publisher.publish(event1).await
-    Thread.sleep(500) // Needed for redis set which is fire and forget operation
+
     val subscription = subscriber.subscribeAsync(Set(event1.eventKey), callback)
     testProbe.expectMessage(event1)
     subscription.unsubscribe().await
