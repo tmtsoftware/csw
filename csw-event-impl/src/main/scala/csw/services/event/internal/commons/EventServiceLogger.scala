@@ -1,4 +1,4 @@
-package csw.services.event.commons
+package csw.services.event.internal.commons
 
 import csw.services.logging.scaladsl.LoggerFactory
 

@@ -4,7 +4,7 @@ import akka.Done
 import akka.stream._
 import akka.stream.scaladsl.{Sink, Source}
 import csw.messages.events.{Event, EventKey}
-import csw.services.event.commons.EventServiceLogger
+import csw.services.event.internal.commons.EventServiceLogger
 import csw.services.event.exceptions.PublishFailed
 import csw.services.event.internal.pubsub.{AbstractEventPublisher, JAbstractEventPublisher}
 import csw.services.event.javadsl.IEventPublisher

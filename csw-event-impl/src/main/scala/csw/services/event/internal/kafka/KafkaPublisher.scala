@@ -5,7 +5,7 @@ import akka.kafka.ProducerSettings
 import akka.stream.Materializer
 import akka.stream.scaladsl.{Sink, Source}
 import csw.messages.events.Event
-import csw.services.event.commons.EventServiceLogger
+import csw.services.event.internal.commons.EventServiceLogger
 import csw.services.event.exceptions.PublishFailed
 import csw.services.event.internal.pubsub.{AbstractEventPublisher, JAbstractEventPublisher}
 import csw.services.event.javadsl.IEventPublisher
