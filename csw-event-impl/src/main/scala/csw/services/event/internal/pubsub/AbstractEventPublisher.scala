@@ -8,7 +8,7 @@ import csw.services.event.scaladsl.EventPublisher
 
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 
-abstract class BaseEventPublisher extends EventPublisher {
+abstract class AbstractEventPublisher extends EventPublisher {
 
   override def publish(eventGenerator: => Event, every: FiniteDuration): Cancellable = publish(eventStream(eventGenerator, every))
 

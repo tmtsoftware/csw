@@ -7,7 +7,7 @@ import akka.stream.scaladsl.{Sink, Source}
 import csw.messages.events.Event
 import csw.services.event.commons.EventServiceLogger
 import csw.services.event.exceptions.PublishFailed
-import csw.services.event.internal.pubsub.{BaseEventPublisher, JBaseEventPublisher}
+import csw.services.event.internal.pubsub.{AbstractEventPublisher, JAbstractEventPublisher}
 import csw.services.event.javadsl.IEventPublisher
 import org.apache.kafka.clients.producer.{Callback, ProducerRecord}
 
@@ -15,7 +15,7 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.util.control.NonFatal
 
 class KafkaPublisher(producerSettings: ProducerSettings[String, Array[Byte]])(implicit ec: ExecutionContext, mat: Materializer)
-    extends BaseEventPublisher {
+    extends AbstractEventPublisher {
 
   private val logger = EventServiceLogger.getLogger
 
@@ -49,7 +49,7 @@ class KafkaPublisher(producerSettings: ProducerSettings[String, Array[Byte]])(im
 
   override def publish[Mat](source: Source[Event, Mat]): Mat = publishWithRecovery(source, None)
 
-  override def asJava: IEventPublisher = new JBaseEventPublisher(this)
+  override def asJava: IEventPublisher = new JAbstractEventPublisher(this)
 
   private def publishWithRecovery[Mat](source: Source[Event, Mat], maybeOnError: Option[(Event, PublishFailed) ⇒ Unit]): Mat =
     source

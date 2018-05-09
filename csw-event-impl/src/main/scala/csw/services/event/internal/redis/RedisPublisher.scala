@@ -6,7 +6,7 @@ import akka.stream.scaladsl.{Sink, Source}
 import csw.messages.events.{Event, EventKey}
 import csw.services.event.commons.EventServiceLogger
 import csw.services.event.exceptions.PublishFailed
-import csw.services.event.internal.pubsub.{BaseEventPublisher, JBaseEventPublisher}
+import csw.services.event.internal.pubsub.{AbstractEventPublisher, JAbstractEventPublisher}
 import csw.services.event.javadsl.IEventPublisher
 import io.lettuce.core.api.async.RedisAsyncCommands
 import io.lettuce.core.{RedisClient, RedisURI}
@@ -17,7 +17,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
 class RedisPublisher(redisURI: RedisURI, redisClient: RedisClient)(implicit ec: ExecutionContext, mat: Materializer)
-    extends BaseEventPublisher {
+    extends AbstractEventPublisher {
 
   private val logger = EventServiceLogger.getLogger
 
@@ -44,7 +44,7 @@ class RedisPublisher(redisURI: RedisURI, redisClient: RedisClient)(implicit ec: 
 
   override def shutdown(): Future[Done] = asyncConnectionF.flatMap(_.quit().toScala).map(_ ⇒ Done)
 
-  override def asJava: IEventPublisher = new JBaseEventPublisher(this)
+  override def asJava: IEventPublisher = new JAbstractEventPublisher(this)
 
   private def publishWithRecovery[Mat](source: Source[Event, Mat], maybeOnError: Option[(Event, PublishFailed) ⇒ Unit]): Mat =
     source

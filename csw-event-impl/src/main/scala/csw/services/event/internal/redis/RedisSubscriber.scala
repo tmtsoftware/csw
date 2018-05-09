@@ -4,7 +4,7 @@ import akka.stream.scaladsl.{Keep, Source}
 import akka.stream.{KillSwitches, Materializer}
 import akka.{Done, NotUsed}
 import csw.messages.events._
-import csw.services.event.internal.pubsub.{BaseEventSubscriber, JBaseEventSubscriber}
+import csw.services.event.internal.pubsub.{AbstractEventSubscriber, JAbstractEventSubscriber}
 import csw.services.event.javadsl.IEventSubscriber
 import csw.services.event.scaladsl.EventSubscription
 import io.lettuce.core.api.async.RedisAsyncCommands
@@ -19,7 +19,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
     implicit ec: ExecutionContext,
     protected val mat: Materializer
-) extends BaseEventSubscriber {
+) extends AbstractEventSubscriber {
 
   private lazy val asyncConnectionF: Future[RedisAsyncCommands[EventKey, Event]] =
     redisClient.connectAsync(EventServiceCodec, redisURI).toScala.map(_.async())
@@ -60,7 +60,7 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
     if (event == null) Event.invalidEvent(eventKey) else event
   }
 
-  override def asJava: IEventSubscriber = new JBaseEventSubscriber(this)
+  override def asJava: IEventSubscriber = new JAbstractEventSubscriber(this)
 
   private def subscribe(
       eventKeys: Set[EventKey],

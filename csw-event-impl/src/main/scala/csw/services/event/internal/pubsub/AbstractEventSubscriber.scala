@@ -10,7 +10,7 @@ import csw.services.event.scaladsl.{EventSubscriber, EventSubscription}
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 
-abstract class BaseEventSubscriber extends EventSubscriber {
+abstract class AbstractEventSubscriber extends EventSubscriber {
 
   implicit protected def mat: Materializer
 

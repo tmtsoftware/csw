@@ -8,7 +8,7 @@ import akka.stream.scaladsl.{Sink, Source}
 import csw.messages.events.{Event, EventKey}
 import csw.services.event.commons.EventServiceLogger
 import csw.services.event.exceptions.PublishFailed
-import csw.services.event.internal.pubsub.{BaseEventPublisher, JBaseEventPublisher}
+import csw.services.event.internal.pubsub.{AbstractEventPublisher, JAbstractEventPublisher}
 import csw.services.event.javadsl.IEventPublisher
 import io.lettuce.core.api.async.RedisAsyncCommands
 import io.lettuce.core.{RedisClient, RedisURI}
@@ -23,7 +23,7 @@ class RedisPublisherWithSetActor(
     redisClient: RedisClient,
     system: ActorSystem
 )(implicit ec: ExecutionContext, mat: Materializer)
-    extends BaseEventPublisher {
+    extends AbstractEventPublisher {
 
   private val logger = EventServiceLogger.getLogger
 
@@ -67,5 +67,5 @@ class RedisPublisherWithSetActor(
       .to(Sink.ignore)
       .run()
 
-  override def asJava: IEventPublisher = new JBaseEventPublisher(this) {}
+  override def asJava: IEventPublisher = new JAbstractEventPublisher(this) {}
 }
