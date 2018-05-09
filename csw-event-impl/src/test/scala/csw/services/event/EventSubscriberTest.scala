@@ -29,28 +29,22 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
 
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 10.millis)
 
-  var redisTestProps: RedisTestProps                      = _
-  var redisTestPropsWithSetActorPublisher: RedisTestProps = _
-  var kafkaTestProps: KafkaTestProps                      = _
+  var redisTestProps: RedisTestProps = _
+  var kafkaTestProps: KafkaTestProps = _
 
   @BeforeSuite
   def beforeAll(): Unit = {
     redisTestProps = RedisTestProps.createRedisProperties(3564, 6383)
     kafkaTestProps = KafkaTestProps.createKafkaProperties(3565, 6003)
-    redisTestPropsWithSetActorPublisher = RedisTestProps.createRedisWithSetActorProperties(3566, 6384)
     redisTestProps.redis.start()
-    redisTestPropsWithSetActorPublisher.redis.start()
     EmbeddedKafka.start()(kafkaTestProps.config)
   }
 
   @AfterSuite
   def afterAll(): Unit = {
     redisTestProps.redisClient.shutdown()
-    redisTestPropsWithSetActorPublisher.redisClient.shutdown()
     redisTestProps.redis.stop()
-    redisTestPropsWithSetActorPublisher.redis.stop()
     redisTestProps.wiring.shutdown(TestFinishedReason).await
-    redisTestPropsWithSetActorPublisher.wiring.shutdown(TestFinishedReason).await
 
     kafkaTestProps.publisher.shutdown().await
     EmbeddedKafka.stop()
@@ -60,7 +54,6 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
   @DataProvider(name = "event-service-provider")
   def pubSubProvider: Array[Array[_ <: BaseProperties]] = Array(
     Array(redisTestProps),
-    Array(redisTestPropsWithSetActorPublisher),
     Array(kafkaTestProps)
   )
 
@@ -126,7 +119,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
     val callback: Event ⇒ Future[Event] = (event) ⇒ Future.successful(testProbe.ref ! event).map(_ ⇒ event)(ec)
 
     publisher.publish(event1).await
-    Thread.sleep(500) // Needed for redis publisher with set actor
+    Thread.sleep(500) // Needed for redis set which is fire and forget operation
     val subscription = subscriber.subscribeAsync(Set(event1.eventKey), callback)
     testProbe.expectMessage(event1)
     subscription.unsubscribe().await
@@ -172,7 +165,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
     val callback: Event ⇒ Unit = testProbe.ref ! _
 
     publisher.publish(event1).await
-    Thread.sleep(500) // Needed for redis publisher with set actor
+    Thread.sleep(500) // Needed for redis set which is fire and forget operation
     val subscription = subscriber.subscribeCallback(Set(event1.eventKey), callback)
     testProbe.expectMessage(event1)
     subscription.unsubscribe().await
@@ -194,7 +187,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
     val callback2: Event ⇒ Unit = queue2.enqueue(_)
 
     publisher.publish(Source.repeat(event1))
-    Thread.sleep(500) // Needed for redis publisher with set actor
+    Thread.sleep(500) // Needed for redis set which is fire and forget operation
     val subscription  = subscriber.subscribeCallback(Set(event1.eventKey), callback, 300.millis)
     val subscription2 = subscriber.subscribeCallback(Set(event1.eventKey), callback2, 400.millis)
     Thread.sleep(1000)
@@ -216,7 +209,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
     val probe = TestProbe[Event]()(actorSystem.toTyped)
 
     publisher.publish(event1).await
-    Thread.sleep(500) // Needed for redis publisher with set actor
+    Thread.sleep(500) // Needed for redis set which is fire and forget operation
     val subscription = subscriber.subscribeActorRef(Set(event1.eventKey), probe.ref)
     probe.expectMessage(event1)
     subscription.unsubscribe().await
@@ -233,7 +226,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
     val event1 = makeEvent(205)
 
     publisher.publish(event1).await
-    Thread.sleep(500) // Needed for redis publisher with set actor
+    Thread.sleep(500) // Needed for redis set which is fire and forget operation
     val subscription = subscriber.subscribeActorRef(Set(event1.eventKey), inbox.ref, 300.millis)
     Thread.sleep(1000)
     subscription.unsubscribe().await
@@ -279,7 +272,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
     publisher.publish(event1).await
     publisher.publish(event2).await // latest event before subscribing
 
-    Thread.sleep(500) // Needed for redis publisher with set actor
+    Thread.sleep(500) // Needed for redis set which is fire and forget operation
     val (subscription, seqF) = subscriber.subscribe(Set(eventKey)).take(2).toMat(Sink.seq)(Keep.both).run()
     subscription.ready.await
 

@@ -27,28 +27,22 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
 
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 10.millis)
 
-  var redisTestProps: RedisTestProps                      = _
-  var redisTestPropsWithSetActorPublisher: RedisTestProps = _
-  var kafkaTestProps: KafkaTestProps                      = _
+  var redisTestProps: RedisTestProps = _
+  var kafkaTestProps: KafkaTestProps = _
 
   @BeforeSuite
   def beforeAll(): Unit = {
     redisTestProps = RedisTestProps.createRedisProperties(3561, 6381)
     kafkaTestProps = KafkaTestProps.createKafkaProperties(3562, 6002)
-    redisTestPropsWithSetActorPublisher = RedisTestProps.createRedisWithSetActorProperties(3563, 6382)
     redisTestProps.redis.start()
-    redisTestPropsWithSetActorPublisher.redis.start()
     EmbeddedKafka.start()(kafkaTestProps.config)
   }
 
   @AfterSuite
   def afterAll(): Unit = {
     redisTestProps.redisClient.shutdown()
-    redisTestPropsWithSetActorPublisher.redisClient.shutdown()
     redisTestProps.redis.stop()
-    redisTestPropsWithSetActorPublisher.redis.stop()
     redisTestProps.wiring.shutdown(TestFinishedReason).await
-    redisTestPropsWithSetActorPublisher.wiring.shutdown(TestFinishedReason).await
 
     kafkaTestProps.publisher.shutdown().await
     EmbeddedKafka.stop()
@@ -58,7 +52,6 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
   @DataProvider(name = "event-service-provider")
   def pubSubProvider: Array[Array[_ <: BaseProperties]] = Array(
     Array(redisTestProps),
-    Array(redisTestPropsWithSetActorPublisher),
     Array(kafkaTestProps)
   )
 
