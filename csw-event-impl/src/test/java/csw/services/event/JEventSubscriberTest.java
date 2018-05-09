@@ -120,7 +120,7 @@ public class JEventSubscriberTest extends TestNGSuite {
         IEventSubscription subscription = baseProperties.jSubscriber().subscribeAsync(Collections.singleton(event1.eventKey()), event -> {
             probe.ref().tell(event);
             return CompletableFuture.completedFuture(event);
-        }, baseProperties.wiring().resumingMat());
+        });
         probe.expectMessage(event1);
 
         subscription.unsubscribe().get(10, TimeUnit.SECONDS);
@@ -141,7 +141,7 @@ public class JEventSubscriberTest extends TestNGSuite {
         IEventSubscription subscription = baseProperties.jSubscriber().subscribeAsync(Collections.singleton(event1.eventKey()), event -> {
             queue.add(event);
             return CompletableFuture.completedFuture(event);
-        }, Duration.ofMillis(300), baseProperties.wiring().resumingMat());
+        }, Duration.ofMillis(300));
 
         Thread.sleep(1000);
         subscription.unsubscribe().get(10, TimeUnit.SECONDS);
@@ -158,7 +158,7 @@ public class JEventSubscriberTest extends TestNGSuite {
 
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
 
-        IEventSubscription subscription = baseProperties.jSubscriber().subscribeCallback(Collections.singleton(event1.eventKey()), event -> probe.ref().tell(event), baseProperties.wiring().resumingMat());
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribeCallback(Collections.singleton(event1.eventKey()), event -> probe.ref().tell(event));
         probe.expectMessage(event1);
 
         subscription.unsubscribe().get(10, TimeUnit.SECONDS);
@@ -176,7 +176,7 @@ public class JEventSubscriberTest extends TestNGSuite {
 
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
 
-        IEventSubscription subscription = baseProperties.jSubscriber().subscribeCallback(Collections.singleton(event1.eventKey()), queue::add, Duration.ofMillis(300), baseProperties.wiring().resumingMat());
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribeCallback(Collections.singleton(event1.eventKey()), queue::add, Duration.ofMillis(300));
         Thread.sleep(1000);
         subscription.unsubscribe().get(10, TimeUnit.SECONDS);
 
@@ -210,7 +210,7 @@ public class JEventSubscriberTest extends TestNGSuite {
 
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
 
-        IEventSubscription subscription = baseProperties.jSubscriber().subscribeActorRef(Collections.singleton(event1.eventKey()), inbox.getRef(), Duration.ofMillis(300), baseProperties.wiring().resumingMat());
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribeActorRef(Collections.singleton(event1.eventKey()), inbox.getRef(), Duration.ofMillis(300));
         Thread.sleep(1000);
         subscription.unsubscribe().get(10, TimeUnit.SECONDS);
         Assert.assertEquals(inbox.getAllReceived().size(), 3);

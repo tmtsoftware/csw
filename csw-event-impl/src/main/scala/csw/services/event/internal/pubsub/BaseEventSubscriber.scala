@@ -1,6 +1,7 @@
 package csw.services.event.internal.pubsub
 
 import akka.actor.typed.ActorRef
+import akka.stream.Materializer
 import akka.stream.scaladsl.{Sink, Source}
 import csw.messages.events.{Event, EventKey}
 import csw.services.event.internal.throttle.RateAdapterStage
@@ -10,6 +11,9 @@ import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 
 abstract class BaseEventSubscriber extends EventSubscriber {
+
+  implicit protected def mat: Materializer
+
   override def subscribe(eventKeys: Set[EventKey], every: FiniteDuration): Source[Event, EventSubscription] =
     subscribe(eventKeys).via(new RateAdapterStage[Event](every))
 

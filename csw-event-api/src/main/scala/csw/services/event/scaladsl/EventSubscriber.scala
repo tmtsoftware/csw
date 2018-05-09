@@ -1,7 +1,6 @@
 package csw.services.event.scaladsl
 
 import akka.actor.typed.ActorRef
-import akka.stream.Materializer
 import akka.stream.scaladsl.Source
 import csw.messages.events.{Event, EventKey}
 import csw.services.event.javadsl.IEventSubscriber
@@ -10,7 +9,6 @@ import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 
 trait EventSubscriber {
-  implicit protected def mat: Materializer
 
   def subscribe(eventKeys: Set[EventKey]): Source[Event, EventSubscription]
 
