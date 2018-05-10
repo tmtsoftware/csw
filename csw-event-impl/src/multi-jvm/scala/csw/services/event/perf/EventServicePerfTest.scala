@@ -1,16 +1,16 @@
 package csw.services.event.perf
 
-import java.io.PrintStream
 import java.nio.ByteBuffer
 import java.util.concurrent.TimeUnit.SECONDS
 import java.util.concurrent.{ExecutorService, Executors}
 
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.remote.testconductor.RoleName
-import akka.remote.testkit.{MultiNodeSpec, MultiNodeSpecCallbacks}
+import akka.remote.testkit.{MultiNodeConfig, MultiNodeSpec, MultiNodeSpecCallbacks}
 import akka.testkit._
 import akka.testkit.typed.scaladsl
-import csw.services.event.perf.EventUtils.{nanosToMicros, nanosToSeconds}
+import com.typesafe.config.ConfigFactory
+import csw.services.event.perf.EventUtils.nanosToSeconds
 import csw.services.event.scaladsl.{EventPublisher, EventSubscriber}
 import org.HdrHistogram.Histogram
 import org.scalatest._
@@ -18,6 +18,20 @@ import org.scalatest._
 import scala.collection.immutable
 import scala.concurrent.Await
 import scala.concurrent.duration._
+
+object EventServiceMultiNodeConfig extends MultiNodeConfig {
+
+  val totalNumberOfNodes: Int =
+    System.getProperty("csw.event.perf.nodes") match {
+      case null  ⇒ 2
+      case value ⇒ value.toInt
+    }
+
+  for (n ← 1 to totalNumberOfNodes) role("node-" + n)
+
+  commonConfig(debugConfig(on = false).withFallback(ConfigFactory.load()))
+
+}
 
 class EventServicePerfTestMultiJvmNode1 extends EventServicePerfTest
 class EventServicePerfTestMultiJvmNode2 extends EventServicePerfTest
@@ -31,7 +45,7 @@ class EventServicePerfTestMultiJvmNode2 extends EventServicePerfTest
 //class EventServicePerfTestMultiJvmNode10 extends EventServicePerfTest
 
 class EventServicePerfTest
-    extends MultiNodeSpec(PerfMultiNodeConfig)
+    extends MultiNodeSpec(EventServiceMultiNodeConfig)
     with MultiNodeSpecCallbacks
     with FunSuiteLike
     with Matchers
@@ -193,31 +207,6 @@ class EventServicePerfTest
     }
 
     enterBarrier("after-" + testName)
-  }
-
-  private def aggregateResult(testSettings: TestSettings, throughput: Double, aggregatedHistogram: Histogram): Unit = {
-    import testSettings._
-
-    throughputPlots = throughputPlots.addAll(PlotResult().add(testName, throughput))
-
-    def percentile(p: Double): Double = nanosToMicros(aggregatedHistogram.getValueAtPercentile(p))
-
-    val latencyPlotsTmp = LatencyPlots(
-      PlotResult().add(testName, percentile(50.0)),
-      PlotResult().add(testName, percentile(90.0)),
-      PlotResult().add(testName, percentile(99.0))
-    )
-
-    latencyPlots = latencyPlots.copy(
-      plot50 = latencyPlots.plot50.addAll(latencyPlotsTmp.plot50),
-      plot90 = latencyPlots.plot90.addAll(latencyPlotsTmp.plot90),
-      plot99 = latencyPlots.plot99.addAll(latencyPlotsTmp.plot99)
-    )
-
-    aggregatedHistogram.outputPercentileDistribution(
-      new PrintStream(BenchmarkFileReporter(s"Aggregated-$testName", system, logSettings = false).fos),
-      1000.0
-    )
   }
 
   private val scenarios = new Scenarios(testConfigs)

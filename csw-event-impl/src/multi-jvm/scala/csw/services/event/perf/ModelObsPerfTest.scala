@@ -1,15 +1,15 @@
 package csw.services.event.perf
 
-import java.io.PrintStream
 import java.nio.ByteBuffer
 import java.util.concurrent.TimeUnit.SECONDS
 import java.util.concurrent.{ExecutorService, Executors}
 
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.remote.testkit.{MultiNodeSpec, MultiNodeSpecCallbacks}
+import akka.remote.testkit.{MultiNodeConfig, MultiNodeSpec, MultiNodeSpecCallbacks}
 import akka.testkit.ImplicitSender
 import akka.testkit.typed.scaladsl
-import csw.services.event.perf.EventUtils.{nanosToMicros, nanosToSeconds}
+import com.typesafe.config.ConfigFactory
+import csw.services.event.perf.EventUtils.nanosToSeconds
 import org.HdrHistogram.Histogram
 import org.scalatest.{BeforeAndAfterAll, FunSuiteLike, Matchers}
 
@@ -33,11 +33,25 @@ case class JvmSetting(name: String, pubSettings: List[PubSetting], subSettings: 
 
 case class ModelObservatoryTestSettings(jvmSettings: List[JvmSetting])
 
+object ModelObsMultiNodeConfig extends MultiNodeConfig {
+
+  val totalNumberOfNodes: Int =
+    System.getProperty("csw.event.perf.model-obs.nodes") match {
+      case null  ⇒ 5
+      case value ⇒ value.toInt
+    }
+
+  for (n ← 1 to totalNumberOfNodes) role("node-" + n)
+
+  commonConfig(debugConfig(on = false).withFallback(ConfigFactory.load()))
+
+}
+
 class ModelObsPerfTestMultiJvmNode1 extends ModelObsPerfTest
 class ModelObsPerfTestMultiJvmNode2 extends ModelObsPerfTest
-//class ModelObsPerfTestMultiJvmNode3  extends ModelObsPerfTest
-//class ModelObsPerfTestMultiJvmNode4  extends ModelObsPerfTest
-//class ModelObsPerfTestMultiJvmNode5  extends ModelObsPerfTest
+class ModelObsPerfTestMultiJvmNode3 extends ModelObsPerfTest
+class ModelObsPerfTestMultiJvmNode4 extends ModelObsPerfTest
+class ModelObsPerfTestMultiJvmNode5 extends ModelObsPerfTest
 //class ModelObsPerfTestMultiJvmNode6  extends ModelObsPerfTest
 //class ModelObsPerfTestMultiJvmNode7  extends ModelObsPerfTest
 //class ModelObsPerfTestMultiJvmNode8  extends ModelObsPerfTest
@@ -56,7 +70,7 @@ class ModelObsPerfTestMultiJvmNode2 extends ModelObsPerfTest
 //class ModelObsPerfTestMultiJvmNode21 extends ModelObsPerfTest
 
 class ModelObsPerfTest
-    extends MultiNodeSpec(PerfMultiNodeConfig)
+    extends MultiNodeSpec(ModelObsMultiNodeConfig)
     with MultiNodeSpecCallbacks
     with FunSuiteLike
     with Matchers
@@ -174,7 +188,7 @@ class ModelObsPerfTest
   private val scenarios = new ModelObsScenarios(testConfigs)
 
   test("Perf results must be great for model observatory use case") {
-    runScenario(scenarios.idealMultiNodeModelObsScenario)
+    runScenario(scenarios.modelObsScenarioWithFiveProcesses)
   }
 
 }
