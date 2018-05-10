@@ -10,8 +10,6 @@ import akka.testkit.{ImplicitSender, TestProbe}
 import akka.util.ByteString
 import com.typesafe.config.ConfigFactory
 import csw.messages.events.{Event, SystemEvent}
-import csw.messages.params.models.Subsystem.{AOESW, IRIS, NFIRAOS, TCS, WFOS}
-import csw.services.event.internal.wiring.Wiring
 import csw.services.event.perf.EventUtils.{nanosToMicros, nanosToSeconds}
 import org.HdrHistogram.Histogram
 import org.scalatest.{BeforeAndAfterAll, FunSuiteLike, Matchers}
@@ -40,37 +38,37 @@ object ModelObservatoryTest extends MultiNodeConfig {
 
   val totalNumberOfNodes: Int =
     System.getProperty("csw.event.ModelObservatoryTest.nrOfNodes") match {
-      case null  ⇒ 21
+      case null  ⇒ 5
       case value ⇒ value.toInt
     }
 
-  for (n ← 0 until totalNumberOfNodes) role("node-" + n)
+  for (n ← 1 to totalNumberOfNodes) role("node-" + n)
 
   commonConfig(debugConfig(on = false).withFallback(ConfigFactory.load()))
 
 }
 
-class ModelObservatoryTestMultiJvmNode1  extends ModelObservatoryTest
-class ModelObservatoryTestMultiJvmNode2  extends ModelObservatoryTest
-class ModelObservatoryTestMultiJvmNode3  extends ModelObservatoryTest
-class ModelObservatoryTestMultiJvmNode4  extends ModelObservatoryTest
-class ModelObservatoryTestMultiJvmNode5  extends ModelObservatoryTest
-class ModelObservatoryTestMultiJvmNode6  extends ModelObservatoryTest
-class ModelObservatoryTestMultiJvmNode7  extends ModelObservatoryTest
-class ModelObservatoryTestMultiJvmNode8  extends ModelObservatoryTest
-class ModelObservatoryTestMultiJvmNode9  extends ModelObservatoryTest
-class ModelObservatoryTestMultiJvmNode10 extends ModelObservatoryTest
-class ModelObservatoryTestMultiJvmNode11 extends ModelObservatoryTest
-class ModelObservatoryTestMultiJvmNode12 extends ModelObservatoryTest
-class ModelObservatoryTestMultiJvmNode13 extends ModelObservatoryTest
-class ModelObservatoryTestMultiJvmNode14 extends ModelObservatoryTest
-class ModelObservatoryTestMultiJvmNode15 extends ModelObservatoryTest
-class ModelObservatoryTestMultiJvmNode16 extends ModelObservatoryTest
-class ModelObservatoryTestMultiJvmNode17 extends ModelObservatoryTest
-class ModelObservatoryTestMultiJvmNode18 extends ModelObservatoryTest
-class ModelObservatoryTestMultiJvmNode19 extends ModelObservatoryTest
-class ModelObservatoryTestMultiJvmNode20 extends ModelObservatoryTest
-class ModelObservatoryTestMultiJvmNode21 extends ModelObservatoryTest
+class ModelObservatoryTestMultiJvmNode1 extends ModelObservatoryTest
+class ModelObservatoryTestMultiJvmNode2 extends ModelObservatoryTest
+class ModelObservatoryTestMultiJvmNode3 extends ModelObservatoryTest
+class ModelObservatoryTestMultiJvmNode4 extends ModelObservatoryTest
+class ModelObservatoryTestMultiJvmNode5 extends ModelObservatoryTest
+//class ModelObservatoryTestMultiJvmNode6  extends ModelObservatoryTest
+//class ModelObservatoryTestMultiJvmNode7  extends ModelObservatoryTest
+//class ModelObservatoryTestMultiJvmNode8  extends ModelObservatoryTest
+//class ModelObservatoryTestMultiJvmNode9  extends ModelObservatoryTest
+//class ModelObservatoryTestMultiJvmNode10 extends ModelObservatoryTest
+//class ModelObservatoryTestMultiJvmNode11 extends ModelObservatoryTest
+//class ModelObservatoryTestMultiJvmNode12 extends ModelObservatoryTest
+//class ModelObservatoryTestMultiJvmNode13 extends ModelObservatoryTest
+//class ModelObservatoryTestMultiJvmNode14 extends ModelObservatoryTest
+//class ModelObservatoryTestMultiJvmNode15 extends ModelObservatoryTest
+//class ModelObservatoryTestMultiJvmNode16 extends ModelObservatoryTest
+//class ModelObservatoryTestMultiJvmNode17 extends ModelObservatoryTest
+//class ModelObservatoryTestMultiJvmNode18 extends ModelObservatoryTest
+//class ModelObservatoryTestMultiJvmNode19 extends ModelObservatoryTest
+//class ModelObservatoryTestMultiJvmNode20 extends ModelObservatoryTest
+//class ModelObservatoryTestMultiJvmNode21 extends ModelObservatoryTest
 
 class ModelObservatoryTest
     extends MultiNodeSpec(ModelObservatoryTest)
@@ -82,10 +80,7 @@ class ModelObservatoryTest
     with BeforeAndAfterAll {
 
   private val testConfigs = new TestConfigs(system.settings.config)
-  import testConfigs._
-  private val testWiring = new TestWiring(system, new Wiring(system))
-
-  def adjustedTotalMessages(n: Long): Long = (n * totalMessagesFactor).toLong
+  private val testWiring  = new TestWiring(system)
 
   override def initialParticipants: Int = roles.size
 
@@ -112,66 +107,11 @@ class ModelObservatoryTest
     multiNodeSpecAfterAll()
   }
 
-  val settings: List[JvmSetting] =
-  JvmSetting(
-    TCS.entryName,
-    List(
-      PubSetting(s"${TCS.entryName}-1", noOfPubs = 3, adjustedTotalMessages(6000), rate = 100, payloadSize = 128),
-      PubSetting(s"${TCS.entryName}-1", noOfPubs = 25, adjustedTotalMessages(1200), rate = 20, payloadSize = 128),
-      PubSetting(s"${TCS.entryName}-1", noOfPubs = 250, adjustedTotalMessages(60), rate = 1, payloadSize = 128)
-    ),
-    List(
-      SubSetting(s"${TCS.entryName}-1", noOfSubs = 3, adjustedTotalMessages(6000), rate = 100, payloadSize = 128),
-      SubSetting(s"${TCS.entryName}-1", noOfSubs = 25, adjustedTotalMessages(1200), rate = 20, payloadSize = 128),
-      SubSetting(s"${TCS.entryName}-1", noOfSubs = 250, adjustedTotalMessages(60), rate = 1, payloadSize = 128)
-    )
-  ) ::
-  List(AOESW, IRIS, NFIRAOS, WFOS).flatMap { subsystem ⇒
-    val subsystemName = subsystem.entryName
-
-    (0 to 5).map { n ⇒
-      JvmSetting(
-        subsystemName,
-        List(
-          PubSetting(s"$subsystemName-$n", noOfPubs = 5, adjustedTotalMessages(1200), rate = 20, payloadSize = 128),
-          PubSetting(s"$subsystemName-$n", noOfPubs = 50, adjustedTotalMessages(60), rate = 1, payloadSize = 128)
-        ),
-        subsystem match {
-          case AOESW ⇒
-            List(
-              SubSetting(s"${IRIS.entryName}-$n", noOfSubs = 5, adjustedTotalMessages(1200), rate = 20, payloadSize = 128),
-              SubSetting(s"${IRIS.entryName}-$n", noOfSubs = 50, adjustedTotalMessages(60), rate = 1, payloadSize = 128)
-            )
-          case IRIS ⇒
-            List(
-//              SubSetting(s"${TCS.entryName}-1", noOfSubs = 1, adjustedTotalMessages(6000), rate = 100, payloadSize = 128),
-              SubSetting(s"${AOESW.entryName}-$n", noOfSubs = 5, adjustedTotalMessages(1200), rate = 20, payloadSize = 128),
-              SubSetting(s"${AOESW.entryName}-$n", noOfSubs = 50, adjustedTotalMessages(60), rate = 1, payloadSize = 128)
-            )
-          case NFIRAOS ⇒
-            List(
-//              SubSetting(s"${TCS.entryName}-1", noOfSubs = 1, adjustedTotalMessages(6000), rate = 100, payloadSize = 128),
-              SubSetting(s"${WFOS.entryName}-$n", noOfSubs = 5, adjustedTotalMessages(1200), rate = 20, payloadSize = 128),
-              SubSetting(s"${WFOS.entryName}-$n", noOfSubs = 50, adjustedTotalMessages(60), rate = 1, payloadSize = 128)
-            )
-          case WFOS ⇒
-            List(
-//              SubSetting(s"${TCS.entryName}-1", noOfSubs = 3, adjustedTotalMessages(6000), rate = 100, payloadSize = 128),
-              SubSetting(s"${NFIRAOS.entryName}-$n", noOfSubs = 5, adjustedTotalMessages(1200), rate = 20, payloadSize = 128),
-              SubSetting(s"${NFIRAOS.entryName}-$n", noOfSubs = 50, adjustedTotalMessages(60), rate = 1, payloadSize = 128)
-            )
-        }
-      )
-    }
-  }
-
-  val testSettings = ModelObservatoryTestSettings(settings)
-
-  test("model observatory test") {
+  def runScenario(testSettings: ModelObservatoryTestSettings) {
     val nodeId = myself.name.split("-").tail.head.toInt
 
     runOn(roles: _*) {
-      val jvmSetting = testSettings.jvmSettings(nodeId)
+      val jvmSetting = testSettings.jvmSettings(nodeId - 1)
       import jvmSetting._
 
       val rep = reporter(s"ModelObsTest-$nodeId")
@@ -251,7 +191,7 @@ class ModelObservatoryTest
       )
 
       runOn(roles.last) {
-        completionProbe.receiveOne(30.seconds)
+        completionProbe.receiveOne(Duration.Inf)
         aggregateResult("ModelObsTest", aggregatedThroughput, aggregatedHistogram)
       }
 
@@ -281,6 +221,12 @@ class ModelObservatoryTest
       new PrintStream(BenchmarkFileReporter(s"Aggregated-$testName", system, logSettings = false).fos),
       1000.0
     )
+  }
+
+  private val scenarios = new ModelObsScenarios(testConfigs)
+
+  test("Perf results must be great for model observatory use case") {
+    runScenario(scenarios.modelObsScenarioWithFiveProcesses)
   }
 
 }
