@@ -73,6 +73,6 @@ class ModelObsSubscriber(subscribeKey: String, subSetting: SubSetting, reporter:
   }
 
   def printResult(): Unit =
-    resultReporter.printModelObsResult(subSetting, subId, histogram, eventsReceived, totalTime, outOfOrderCount)
+    resultReporter.printResult(subId, totalTestMsgs, payloadSize, histogram, eventsReceived, totalTime, outOfOrderCount)
 
 }

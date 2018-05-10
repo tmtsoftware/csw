@@ -5,12 +5,11 @@ import java.nio.ByteBuffer
 import java.util.concurrent.TimeUnit.SECONDS
 import java.util.concurrent.{ExecutorService, Executors}
 
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.remote.testconductor.RoleName
-import akka.remote.testkit.{MultiNodeConfig, MultiNodeSpec, MultiNodeSpecCallbacks}
+import akka.remote.testkit.{MultiNodeSpec, MultiNodeSpecCallbacks}
 import akka.testkit._
-import akka.util.ByteString
-import com.typesafe.config.ConfigFactory
-import csw.messages.events.{Event, SystemEvent}
+import akka.testkit.typed.scaladsl
 import csw.services.event.perf.EventUtils.{nanosToMicros, nanosToSeconds}
 import csw.services.event.scaladsl.{EventPublisher, EventSubscriber}
 import org.HdrHistogram.Histogram
@@ -19,19 +18,6 @@ import org.scalatest._
 import scala.collection.immutable
 import scala.concurrent.Await
 import scala.concurrent.duration._
-
-object EventServicePerfTest extends MultiNodeConfig {
-
-  val totalNumberOfNodes: Int =
-    System.getProperty("csw.test.EventServicePerfTest.nrOfNodes") match {
-      case null  ⇒ 2
-      case value ⇒ value.toInt
-    }
-
-  for (n ← 1 to totalNumberOfNodes) role("node-" + n)
-
-  commonConfig(debugConfig(on = false).withFallback(ConfigFactory.load()))
-}
 
 class EventServicePerfTestMultiJvmNode1 extends EventServicePerfTest
 class EventServicePerfTestMultiJvmNode2 extends EventServicePerfTest
@@ -45,7 +31,7 @@ class EventServicePerfTestMultiJvmNode2 extends EventServicePerfTest
 //class EventServicePerfTestMultiJvmNode10 extends EventServicePerfTest
 
 class EventServicePerfTest
-    extends MultiNodeSpec(EventServicePerfTest)
+    extends MultiNodeSpec(PerfMultiNodeConfig)
     with MultiNodeSpecCallbacks
     with FunSuiteLike
     with Matchers
@@ -122,34 +108,15 @@ class EventServicePerfTest
     runOn(activeSubscriberNodes: _*) {
       val subIds          = pubSubAllocationPerNode(nodeId - publisherNodes.size - 1)
       val rep             = reporter(testName)
-      val completionProbe = TestProbe()
+      val completionProbe = scaladsl.TestProbe[AggregatedResult]()(system.toTyped)
 
       var totalTimePerNode            = 0L
       var eventsReceivedPerNode       = 0L
       val histogramPerNode: Histogram = new Histogram(SECONDS.toNanos(10), 3)
 
-      var aggregatedThroughput: Double   = 0
-      var aggregatedHistogram: Histogram = null
-
       runOn(activeSubscriberNodes.head) {
-        aggregatedHistogram = new Histogram(SECONDS.toNanos(10), 3)
-        var newEvent               = false
-        var receivedPerfEventCount = 0
-
-        def onEvent(event: Event): Unit = event match {
-          case event: SystemEvent if newEvent ⇒
-            receivedPerfEventCount += 1
-            val histogramBuffer = ByteString(event.get(EventUtils.histogramKey).get.values).asByteBuffer
-            aggregatedHistogram.add(Histogram.decodeFromByteBuffer(histogramBuffer, SECONDS.toNanos(10)))
-
-            aggregatedThroughput += event.get(EventUtils.throughputKey).get.head
-
-            if (receivedPerfEventCount == activeSubscriberNodes.size) completionProbe.ref ! "completed"
-          case _ ⇒ newEvent = true
-        }
-
-        val eventSubscription = subscriber.subscribeCallback(Set(EventUtils.perfEventKey), onEvent)
-        Await.result(eventSubscription.ready(), 30.seconds)
+        val resultAggregator = new ResultAggregator(testName, subscriber, activeSubscriberNodes.size, completionProbe.ref)
+        Await.result(resultAggregator.startSubscription().ready(), 30.seconds)
       }
 
       val subscribers = subIds.map { n ⇒
@@ -181,8 +148,15 @@ class EventServicePerfTest
       )
 
       runOn(activeSubscriberNodes.head) {
-        completionProbe.receiveOne(30.seconds)
-        aggregateResult(testSettings, aggregatedThroughput, aggregatedHistogram)
+        val aggregatedResult = completionProbe.expectMessageType[AggregatedResult](5.minute)
+
+        latencyPlots = latencyPlots.copy(
+          plot50 = latencyPlots.plot50.addAll(aggregatedResult.latencyPlots.plot50),
+          plot90 = latencyPlots.plot90.addAll(aggregatedResult.latencyPlots.plot90),
+          plot99 = latencyPlots.plot99.addAll(aggregatedResult.latencyPlots.plot99)
+        )
+
+        throughputPlots = throughputPlots.addAll(aggregatedResult.throughputPlots)
       }
 
       enterBarrier(testName + "-done")

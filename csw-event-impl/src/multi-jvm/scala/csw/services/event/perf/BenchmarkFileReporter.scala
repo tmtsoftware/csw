@@ -41,7 +41,7 @@ object BenchmarkFileReporter {
 
       val settingsToReport =
         Seq(
-          "csw.test.EventServicePerfTest.totalMessagesFactor",
+          "csw.event.perf.totalMessagesFactor",
           "akka.remote.default-remote-dispatcher.throughput",
           "akka.remote.default-remote-dispatcher.fork-join-executor.parallelism-factor",
           "akka.remote.default-remote-dispatcher.fork-join-executor.parallelism-min",

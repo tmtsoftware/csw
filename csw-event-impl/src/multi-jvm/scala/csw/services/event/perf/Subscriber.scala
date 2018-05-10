@@ -83,6 +83,6 @@ class Subscriber(
   }
 
   def printResult(): Unit =
-    resultReporter.printResult(subscriberId, testSettings, histogram, eventsReceived, totalTime, outOfOrderCount)
+    resultReporter.printResult(subscriberId, totalTestMsgs, payloadSize, histogram, eventsReceived, totalTime, outOfOrderCount)
 
 }
