@@ -121,6 +121,8 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
 
     publisher.publish(event1).await
 
+    Thread.sleep(500) // Needed for redis set which is fire and forget operation
+
     val subscription = subscriber.subscribeAsync(Set(event1.eventKey), callback)
     testProbe.expectMessage(event1)
     subscription.unsubscribe().await
