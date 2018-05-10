@@ -33,27 +33,27 @@ case class JvmSetting(name: String, pubSettings: List[PubSetting], subSettings: 
 
 case class ModelObservatoryTestSettings(jvmSettings: List[JvmSetting])
 
-class ModelObsPerfTestMultiJvmNode1  extends ModelObsPerfTest
-class ModelObsPerfTestMultiJvmNode2  extends ModelObsPerfTest
-class ModelObsPerfTestMultiJvmNode3  extends ModelObsPerfTest
-class ModelObsPerfTestMultiJvmNode4  extends ModelObsPerfTest
-class ModelObsPerfTestMultiJvmNode5  extends ModelObsPerfTest
-class ModelObsPerfTestMultiJvmNode6  extends ModelObsPerfTest
-class ModelObsPerfTestMultiJvmNode7  extends ModelObsPerfTest
-class ModelObsPerfTestMultiJvmNode8  extends ModelObsPerfTest
-class ModelObsPerfTestMultiJvmNode9  extends ModelObsPerfTest
-class ModelObsPerfTestMultiJvmNode10 extends ModelObsPerfTest
-class ModelObsPerfTestMultiJvmNode11 extends ModelObsPerfTest
-class ModelObsPerfTestMultiJvmNode12 extends ModelObsPerfTest
-class ModelObsPerfTestMultiJvmNode13 extends ModelObsPerfTest
-class ModelObsPerfTestMultiJvmNode14 extends ModelObsPerfTest
-class ModelObsPerfTestMultiJvmNode15 extends ModelObsPerfTest
-class ModelObsPerfTestMultiJvmNode16 extends ModelObsPerfTest
-class ModelObsPerfTestMultiJvmNode17 extends ModelObsPerfTest
-class ModelObsPerfTestMultiJvmNode18 extends ModelObsPerfTest
-class ModelObsPerfTestMultiJvmNode19 extends ModelObsPerfTest
-class ModelObsPerfTestMultiJvmNode20 extends ModelObsPerfTest
-class ModelObsPerfTestMultiJvmNode21 extends ModelObsPerfTest
+class ModelObsPerfTestMultiJvmNode1 extends ModelObsPerfTest
+class ModelObsPerfTestMultiJvmNode2 extends ModelObsPerfTest
+//class ModelObsPerfTestMultiJvmNode3  extends ModelObsPerfTest
+//class ModelObsPerfTestMultiJvmNode4  extends ModelObsPerfTest
+//class ModelObsPerfTestMultiJvmNode5  extends ModelObsPerfTest
+//class ModelObsPerfTestMultiJvmNode6  extends ModelObsPerfTest
+//class ModelObsPerfTestMultiJvmNode7  extends ModelObsPerfTest
+//class ModelObsPerfTestMultiJvmNode8  extends ModelObsPerfTest
+//class ModelObsPerfTestMultiJvmNode9  extends ModelObsPerfTest
+//class ModelObsPerfTestMultiJvmNode10 extends ModelObsPerfTest
+//class ModelObsPerfTestMultiJvmNode11 extends ModelObsPerfTest
+//class ModelObsPerfTestMultiJvmNode12 extends ModelObsPerfTest
+//class ModelObsPerfTestMultiJvmNode13 extends ModelObsPerfTest
+//class ModelObsPerfTestMultiJvmNode14 extends ModelObsPerfTest
+//class ModelObsPerfTestMultiJvmNode15 extends ModelObsPerfTest
+//class ModelObsPerfTestMultiJvmNode16 extends ModelObsPerfTest
+//class ModelObsPerfTestMultiJvmNode17 extends ModelObsPerfTest
+//class ModelObsPerfTestMultiJvmNode18 extends ModelObsPerfTest
+//class ModelObsPerfTestMultiJvmNode19 extends ModelObsPerfTest
+//class ModelObsPerfTestMultiJvmNode20 extends ModelObsPerfTest
+//class ModelObsPerfTestMultiJvmNode21 extends ModelObsPerfTest
 
 class ModelObsPerfTest
     extends MultiNodeSpec(PerfMultiNodeConfig)
