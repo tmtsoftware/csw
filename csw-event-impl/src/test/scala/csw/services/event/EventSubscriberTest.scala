@@ -58,6 +58,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
   )
 
   //DEOPSCSW-346: Subscribe to event irrespective of Publisher's existence
+  //DEOPSCSW-343: Unsubscribe based on prefix and event name
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_publish_and_subscribe_an_event(baseProperties: BaseProperties): Unit = {
     import baseProperties._
@@ -109,6 +110,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
   }
 
   //DEOPSCSW-338: Provide callback for Event alerts
+  //DEOPSCSW-343: Unsubscribe based on prefix and event name
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_subscribe_with_async_callback(baseProperties: BaseProperties): Unit = {
     import baseProperties._
