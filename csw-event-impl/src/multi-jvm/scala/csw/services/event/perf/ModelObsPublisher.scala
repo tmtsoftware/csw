@@ -10,14 +10,19 @@ import csw.services.event.scaladsl.EventPublisher
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationDouble
 
-class ModelObsPublisher(publishKey: String, pubSetting: PubSetting, testWiring: TestWiring) {
+class ModelObsPublisher(publishKey: String,
+                        pubSetting: PubSetting,
+                        testConfig: TestConfigs,
+                        testWiring: TestWiring,
+                        sharedPublisher: EventPublisher) {
   import pubSetting._
   import testWiring.wiring._
 
   private val totalMessages        = totalTestMsgs + warmup + 1 //inclusive of end-event
   private val payload: Array[Byte] = ("0" * payloadSize).getBytes("utf-8")
 
-  private val publisher: EventPublisher = testWiring.publisher
+  import testConfig._
+  private val publisher: EventPublisher = if (shareConnection) sharedPublisher else testWiring.publisher
 
   private val endEvent                 = event(EventName(s"${EventUtils.endEventS}-$publishKey"))
   private val eventName                = EventName(s"$testEventS-$publishKey")

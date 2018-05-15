@@ -10,6 +10,7 @@ import akka.testkit.ImplicitSender
 import akka.testkit.typed.scaladsl
 import com.typesafe.config.ConfigFactory
 import csw.services.event.perf.EventUtils.nanosToSeconds
+import csw.services.event.scaladsl.EventPublisher
 import org.HdrHistogram.Histogram
 import org.scalatest.{BeforeAndAfterAll, FunSuiteLike, Matchers}
 
@@ -81,6 +82,11 @@ class ModelObsPerfTest
   private val testConfigs = new TestConfigs(system.settings.config)
   private val testWiring  = new TestWiring(system)
 
+  import testWiring._
+
+  lazy val sharedPublisher: EventPublisher = publisher
+//  lazy val sharedSubscriber: EventSubscriber = subscriber
+
   override def initialParticipants: Int = roles.size
 
   lazy val reporterExecutor: ExecutorService = Executors.newFixedThreadPool(1)
@@ -141,7 +147,7 @@ class ModelObsPerfTest
       pubSettings.foreach { pubSetting ⇒
         import pubSetting._
         (1 to noOfPubs).foreach { pubId ⇒
-          new ModelObsPublisher(s"${pubSetting.key}-$pubId", pubSetting, testWiring)
+          new ModelObsPublisher(s"${pubSetting.key}-$pubId", pubSetting, testConfigs, testWiring, sharedPublisher)
             .startPublishingWithEventGenerator()
         }
       }
