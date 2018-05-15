@@ -9,12 +9,13 @@ import csw.messages.commons.CoordinatedShutdownReasons;
 import csw.messages.events.Event;
 import csw.services.event.exceptions.PublishFailedException;
 import csw.services.event.helpers.Utils;
-import csw.services.event.internal.wiring.EventServiceResolver;
 import csw.services.event.javadsl.IEventPublisher;
 import csw.services.event.javadsl.JRedisFactory;
-import csw.services.event.scaladsl.RedisFactory;
 import io.lettuce.core.ClientOptions;
-import org.junit.*;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import scala.concurrent.Await;
 import scala.concurrent.ExecutionContext;
@@ -23,6 +24,7 @@ import scala.concurrent.duration.FiniteDuration;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Consumer;
 
 import static org.hamcrest.CoreMatchers.isA;
 
@@ -40,10 +42,8 @@ public class JRedisFailureTest {
         ClientOptions clientOptions = ClientOptions.builder().autoReconnect(false).disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS).build();
         redisTestProps = RedisTestProps.createRedisProperties(4561, 7380, clientOptions);
         ExecutionContext executionContext = redisTestProps.wiring().ec();
-        EventServiceResolver eventServiceResolver = new EventServiceResolver(redisTestProps.locationService(), executionContext);
         Materializer materializer = redisTestProps.wiring().resumingMat();
-        RedisFactory redisFactory = new RedisFactory(redisTestProps.redisClient(), eventServiceResolver, executionContext, materializer);
-        jRedisFactory = new JRedisFactory(redisFactory, executionContext, materializer);
+        jRedisFactory = new JRedisFactory(redisTestProps.redisClient(), redisTestProps.locationService().asJava(), executionContext, materializer);
         redisTestProps.redis().start();
     }
 
@@ -71,7 +71,7 @@ public class JRedisFailureTest {
     public void handleFailedPublishEventWithACallback() throws InterruptedException, ExecutionException, TimeoutException {
         publisher = jRedisFactory.publisher().get(10, TimeUnit.SECONDS);
 
-        TestProbe testProbe = TestProbe.create(Adapter.toTyped(redisTestProps.wiring().actorSystem()));
+        TestProbe testProbe = TestProbe.<Event>create(Adapter.toTyped(redisTestProps.wiring().actorSystem()));
         publisher.publish(Utils.makeEvent(1)).get(10, TimeUnit.SECONDS);
 
         publisher.shutdown().get(10, TimeUnit.SECONDS);
@@ -83,7 +83,7 @@ public class JRedisFailureTest {
 
         publisher.publish(eventStream, event1 -> testProbe.ref().tell(event1));
 
-        testProbe.expectMessage(event);
+        testProbe.<Event>expectMessage(event);
     }
 
     @Test
@@ -101,6 +101,6 @@ public class JRedisFailureTest {
 
         publisher.publish(() -> event, new FiniteDuration(20, TimeUnit.MILLISECONDS), event1 -> testProbe.ref().tell(event1));
 
-        testProbe.expectMessage(event);
+        testProbe.<Event>expectMessage(event);
     }
 }

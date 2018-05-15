@@ -6,8 +6,9 @@ import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.internal.perf.EventServicePerfFramework
 import csw.services.event.internal.throttle.{RateAdapterStage, RateLimiterStage}
-import csw.services.event.internal.wiring.{EventServiceResolver, Wiring}
+import csw.services.event.internal.wiring.Wiring
 import csw.services.event.scaladsl.RedisFactory
+import csw.services.location.scaladsl.LocationService
 import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
@@ -21,7 +22,7 @@ class RedisPerfTest extends FunSuite with Matchers with BeforeAndAfterAll with E
   private val wiring                            = new Wiring(actorSystem)
   import wiring._
   private val redisClient  = RedisClient.create()
-  private val redisFactory = new RedisFactory(redisClient, mock[EventServiceResolver])
+  private val redisFactory = new RedisFactory(redisClient, mock[LocationService])
   private val publisher    = redisFactory.publisher("localhost", redisPort)
   private val subscriber   = redisFactory.subscriber("localhost", redisPort)
   private val framework    = new EventServicePerfFramework(publisher, subscriber)

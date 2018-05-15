@@ -7,17 +7,20 @@ import akka.kafka.{ConsumerSettings, ProducerSettings}
 import akka.stream.Materializer
 import csw.services.event.internal.kafka.{KafkaPublisher, KafkaSubscriber}
 import csw.services.event.internal.wiring.EventServiceResolver
+import csw.services.location.scaladsl.LocationService
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.serialization.{ByteArrayDeserializer, ByteArraySerializer, StringDeserializer, StringSerializer}
 
 import scala.async.Async.{async, await}
 import scala.concurrent.{ExecutionContext, Future}
 
-class KafkaFactory(eventServiceResolver: EventServiceResolver)(
+class KafkaFactory(locationService: LocationService)(
     implicit actorSystem: ActorSystem,
     ec: ExecutionContext,
     mat: Materializer
 ) {
+
+  private val eventServiceResolver = new EventServiceResolver(locationService)
 
   def publisher(host: String, port: Int): EventPublisher = new KafkaPublisher(producerSettings(host, port))
 
