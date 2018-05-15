@@ -9,7 +9,6 @@ import akka.actor.typed.ActorRef
 import akka.stream.Materializer
 import akka.stream.javadsl.Source
 import csw.messages.events.{Event, EventKey}
-import csw.services.event.scaladsl.EventSubscriber
 
 trait IEventSubscriber {
 
@@ -32,6 +31,4 @@ trait IEventSubscriber {
   def get(eventKeys: util.Set[EventKey]): CompletableFuture[util.Set[Event]]
 
   def get(eventKey: EventKey): CompletableFuture[Event]
-
-  def asScala: EventSubscriber
 }

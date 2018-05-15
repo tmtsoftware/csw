@@ -1,5 +1,6 @@
 package csw.services.event.internal.pubsub
 
+import akka.Done
 import akka.actor.Cancellable
 import akka.stream.Materializer
 import akka.stream.scaladsl.{Sink, Source}
@@ -8,7 +9,7 @@ import csw.services.event.exceptions.PublishFailedException
 import csw.services.event.internal.commons.EventServiceLogger
 import csw.services.event.scaladsl.EventPublisher
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 import scala.util.control.NonFatal
 
@@ -35,9 +36,11 @@ abstract class AbstractEventPublisher(implicit ec: ExecutionContext, mat: Materi
       .to(Sink.ignore)
       .run()
 
-  private def publishWithRecovery(maybeOnError: Option[Event ⇒ Unit]) = { e: Event ⇒
-    publish(e).recover {
-      case _ @PublishFailedException(event) ⇒ maybeOnError.foreach(onError ⇒ onError(event))
+  private def publishWithRecovery(maybeOnError: Option[Event ⇒ Unit]): Event ⇒ Future[Done] = { e: Event ⇒
+    publish(e).recover[Done] {
+      case _ @PublishFailedException(event) ⇒
+        maybeOnError.foreach(onError ⇒ onError(event))
+        Done
     }
   }
 }

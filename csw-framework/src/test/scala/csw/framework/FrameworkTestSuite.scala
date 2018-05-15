@@ -20,7 +20,7 @@ import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
 
-abstract class FrameworkTestSuite extends FunSuite with Matchers with BeforeAndAfterAll {
+private[csw] abstract class FrameworkTestSuite extends FunSuite with Matchers with BeforeAndAfterAll {
   implicit val untypedSystem: actor.ActorSystem  = ActorSystemFactory.remote()
   implicit val typedSystem: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "testHcd")
   implicit val settings: TestKitSettings         = TestKitSettings(typedSystem)

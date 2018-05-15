@@ -182,7 +182,6 @@ lazy val `csw-framework` = project
 lazy val `csw-event-api` = project
   .dependsOn(`csw-messages`)
   .enablePlugins(GenJavadocPlugin)
-  .settings(Common.detectCycles := false)
 
 lazy val `csw-event-impl` = project
   .dependsOn(
@@ -191,7 +190,7 @@ lazy val `csw-event-impl` = project
     `csw-location` % "compile->compile;multi-jvm->multi-jvm"
   )
   .enablePlugins(AutoMultiJvm)
-  .settings(libraryDependencies ++= Dependencies.EventImpl, Common.detectCycles := false)
+  .settings(libraryDependencies ++= Dependencies.EventImpl)
 
 lazy val `csw-commons` = project
   .enablePlugins(PublishBintray, GenJavadocPlugin)

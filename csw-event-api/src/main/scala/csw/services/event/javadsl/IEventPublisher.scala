@@ -7,7 +7,6 @@ import akka.Done
 import akka.actor.Cancellable
 import akka.stream.javadsl.Source
 import csw.messages.events.Event
-import csw.services.event.scaladsl.EventPublisher
 
 import scala.concurrent.duration.FiniteDuration
 
@@ -24,6 +23,4 @@ trait IEventPublisher {
   def publish(eventGenerator: Supplier[Event], every: FiniteDuration, onError: Consumer[Event]): Cancellable
 
   def shutdown(): CompletableFuture[Done]
-
-  def asScala: EventPublisher
 }
