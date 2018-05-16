@@ -111,6 +111,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
     queue should contain allElementsOf Seq(Event.invalidEvent(eventKey)) ++ events
   }
 
+  //DEOPSCSW-341: Allow to reuse single connection for subscribing to multiple EventKeys
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_publish_concurrently_to_the_different_channel(baseProperties: BaseProperties): Unit = {
     import baseProperties._

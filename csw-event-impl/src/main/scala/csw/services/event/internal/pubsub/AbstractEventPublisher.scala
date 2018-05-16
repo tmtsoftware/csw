@@ -22,17 +22,21 @@ abstract class AbstractEventPublisher(implicit ec: ExecutionContext, mat: Materi
   override def publish(eventGenerator: ⇒ Event, every: FiniteDuration, onError: Event ⇒ Unit): Cancellable =
     publish(eventStream(eventGenerator, every), onError)
 
-  private def eventStream(eventGenerator: => Event, every: FiniteDuration): Source[Event, Cancellable] =
-    Source.tick(0.millis, every, ()).map(_ => eventGenerator)
+  private def withErrorLogging(eventGenerator: => Event): Event =
+    try {
+      eventGenerator
+    } catch {
+      case NonFatal(ex) ⇒
+        logger.error(ex.getMessage, ex = ex)
+        throw ex
+    }
 
-  def publishEvent[Mat](source: Source[Event, Mat], parallelism: Int, maybeOnError: Option[Event ⇒ Unit]): Mat =
+  private def eventStream(eventGenerator: => Event, every: FiniteDuration): Source[Event, Cancellable] =
+    Source.tick(0.millis, every, ()).map(_ => withErrorLogging(eventGenerator))
+
+  protected def publishEvent[Mat](source: Source[Event, Mat], parallelism: Int, maybeOnError: Option[Event ⇒ Unit]): Mat =
     source
       .mapAsync(parallelism) { publishWithRecovery(maybeOnError) }
-      .mapError {
-        case NonFatal(ex) ⇒
-          logger.error(ex.getMessage, ex = ex)
-          ex
-      }
       .to(Sink.ignore)
       .run()
 

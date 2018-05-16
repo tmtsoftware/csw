@@ -123,6 +123,7 @@ public class JEventPublisherTest extends TestNGSuite {
         Assert.assertEquals(events, queue);
     }
 
+    //DEOPSCSW-341: Allow to reuse single connection for subscribing to multiple EventKeys
     @Test(dataProvider = "event-service-provider")
     public void should_be_able_to_publish_concurrently_to_the_different_channel(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
         List<Event> events = new ArrayList<>();
