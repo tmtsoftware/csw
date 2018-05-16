@@ -1,6 +1,5 @@
 package csw.services.event;
 
-import akka.actor.Cancellable;
 import akka.actor.typed.javadsl.Adapter;
 import akka.japi.Pair;
 import akka.stream.javadsl.Keep;
@@ -36,9 +35,6 @@ public class JEventSubscriberTest extends TestNGSuite {
     private RedisTestProps redisTestProps;
     private KafkaTestProps kafkaTestProps;
 
-    private int counter = -1;
-    private Cancellable cancellable;
-
     @BeforeSuite
     public void beforeAll() {
         redisTestProps = RedisTestProps.createRedisProperties(4564, 7382, ClientOptions.create());
@@ -63,6 +59,8 @@ public class JEventSubscriberTest extends TestNGSuite {
         return new Object[]{redisTestProps, kafkaTestProps};
     }
 
+    //DEOPSCSW-346: Subscribe to event irrespective of Publisher's existence
+    //DEOPSCSW-343: Unsubscribe based on prefix and event name
     @Test(dataProvider = "event-service-provider")
     public void should_be_able_to_publish_and_subscribe_an_event(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
         Event event1 = Utils.makeDistinctEvent(1);
@@ -87,6 +85,8 @@ public class JEventSubscriberTest extends TestNGSuite {
         probe.expectNoMessage(Duration.ofMillis(200));
     }
 
+    //DEOPSCSW-346: Subscribe to event irrespective of Publisher's existence
+    //DEOPSCSW-342: Subscription with consumption frequency
     @Test(dataProvider = "event-service-provider")
     public void should_be_able_to_publish_and_subscribe_an_event_with_duration(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
         Event event1 = Utils.makeDistinctEvent(1);
@@ -131,6 +131,7 @@ public class JEventSubscriberTest extends TestNGSuite {
     }
 
     //DEOPSCSW-338: Provide callback for Event alerts
+    //DEOPSCSW-342: Subscription with consumption frequency
     @Test(dataProvider = "event-service-provider")
     public void should_be_able_to_subscribe_with_async_callback_with_duration(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
         Event event1 = Utils.makeDistinctEvent(304);
@@ -168,6 +169,7 @@ public class JEventSubscriberTest extends TestNGSuite {
     }
 
     //DEOPSCSW-338: Provide callback for Event alerts
+    //DEOPSCSW-342: Subscription with consumption frequency
     @Test(dataProvider = "event-service-provider")
     public void should_be_able_to_subscribe_with_callback_with_duration(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
         Event event1 = Utils.makeDistinctEvent(303);
@@ -202,6 +204,7 @@ public class JEventSubscriberTest extends TestNGSuite {
     }
 
     //DEOPSCSW-339: Provide actor ref to alert about Event arrival
+    //DEOPSCSW-342: Subscription with consumption frequency
     @Test(dataProvider = "event-service-provider")
     public void should_be_able_to_subscribe_with_an_ActorRef_with_duration(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
         Event event1 = Utils.makeDistinctEvent(305);
@@ -256,12 +259,13 @@ public class JEventSubscriberTest extends TestNGSuite {
 
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
         baseProperties.jPublisher().publish(event2).get(10, TimeUnit.SECONDS); // latest event before subscribing
+        Thread.sleep(500); // Needed for redis set which is fire and forget operation
 
         Pair<IEventSubscription, CompletionStage<List<Event>>> pair = baseProperties.jSubscriber().subscribe(Collections.singleton(eventKey)).take(2).toMat(Sink.seq(), Keep.both()).run(baseProperties.wiring().resumingMat());
         pair.first().ready().get(10, TimeUnit.SECONDS);
+        Thread.sleep(500);
 
         baseProperties.jPublisher().publish(event3).get(10, TimeUnit.SECONDS);
-        Thread.sleep(500); // Needed for redis set which is fire and forget operation
         java.util.List<Event> expectedEvents = new ArrayList<>();
         expectedEvents.add(event2);
         expectedEvents.add(event3);

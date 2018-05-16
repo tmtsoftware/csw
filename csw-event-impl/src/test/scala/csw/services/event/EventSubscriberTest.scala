@@ -82,6 +82,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
   }
 
   //DEOPSCSW-346: Subscribe to event irrespective of Publisher's existence
+  //DEOPSCSW-342: Subscription with consumption frequency
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_publish_and_subscribe_an_event_with_duration(baseProperties: BaseProperties): Unit = {
     import baseProperties._
@@ -134,6 +135,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
   }
 
   //DEOPSCSW-338: Provide callback for Event alerts
+  //DEOPSCSW-342: Subscription with consumption frequency
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_subscribe_with_async_callback_with_duration(baseProperties: BaseProperties): Unit = {
     import baseProperties._
@@ -180,6 +182,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
   }
 
   //DEOPSCSW-338: Provide callback for Event alerts
+  //DEOPSCSW-342: Subscription with consumption frequency
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_subscribe_with_callback_with_duration(baseProperties: BaseProperties): Unit = {
     import baseProperties._
@@ -224,6 +227,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
   }
 
   //DEOPSCSW-339: Provide actor ref to alert about Event arrival
+  //DEOPSCSW-342: Subscription with consumption frequency
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_subscribe_with_an_ActorRef_with_duration(baseProperties: BaseProperties): Unit = {
     import baseProperties._

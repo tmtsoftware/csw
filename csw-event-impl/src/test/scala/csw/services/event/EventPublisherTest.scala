@@ -66,6 +66,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
     val testProbe          = TestProbe[Event]()(actorSystem.toTyped)
 
     publisher.publish(event1).await
+    Thread.sleep(500) // Needed for redis set which is fire and forget operation
 
     val subscription = subscriber.subscribe(Set(eventKey)).toMat(Sink.foreach(testProbe.ref ! _))(Keep.left).run()
     subscription.ready().await
@@ -81,7 +82,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
   //DEOPSCSW-345: Publish events irrespective of subscriber existence
   var cancellable: Cancellable = _
   @Test(dataProvider = "event-service-provider")
-  def should_be_able_to_publish_concurrently_to_the_same_channel(baseProperties: BaseProperties): Unit = {
+  def should_be_able_to_publish_an_event_with_duration(baseProperties: BaseProperties): Unit = {
     import baseProperties._
     import baseProperties.wiring._
 
@@ -90,7 +91,6 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
 
     def eventGenerator(): Event = {
       counter += 1
-      if (counter == 10) cancellable.cancel()
       events(counter)
     }
 
@@ -100,7 +100,9 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
     val subscription = subscriber.subscribe(Set(eventKey)).to(Sink.foreach[Event](queue.enqueue(_))).run()
     subscription.ready.await
 
-    cancellable = publisher.publish(eventGenerator(), 2.millis)
+    cancellable = publisher.publish(eventGenerator, 2.millis)
+    Thread.sleep(1000)
+    cancellable.cancel()
 
     // subscriber will receive an invalid event first as subscription happened before publishing started.
     // The 10 published events will follow

@@ -79,6 +79,7 @@ public class JEventPublisherTest extends TestNGSuite {
         set.add(eventKey);
 
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
+        Thread.sleep(500); // Needed for redis set which is fire and forget operation
 
         IEventSubscription subscription = baseProperties.jSubscriber().subscribe(set).take(2).toMat(Sink.foreach(event -> probe.ref().tell(event)), Keep.left()).run(baseProperties.wiring().resumingMat());
         subscription.ready().get(10, TimeUnit.SECONDS);
@@ -92,7 +93,7 @@ public class JEventPublisherTest extends TestNGSuite {
     }
 
     @Test(dataProvider = "event-service-provider")
-    public void should_be_able_to_publish_concurrently_to_the_same_channel(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
+    public void should_be_able_to_publish_an_event_with_duration(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
         List<Event> events = new ArrayList<>();
         for (int i = 11; i < 21; i++) {
             events.add(Utils.makeEvent(i));
@@ -108,11 +109,11 @@ public class JEventPublisherTest extends TestNGSuite {
         counter = -1;
         cancellable = publisher.publish(() -> {
             counter += 1;
-            if (counter == 10) cancellable.cancel();
             return events.get(counter);
-        }, new FiniteDuration(2, TimeUnit.MILLISECONDS));
+        }, new FiniteDuration(10, TimeUnit.MILLISECONDS));
 
         Thread.sleep(1000);
+        cancellable.cancel();
 
         // subscriber will receive an invalid event first as subscription happened before publishing started.
         // The 10 published events will follow
