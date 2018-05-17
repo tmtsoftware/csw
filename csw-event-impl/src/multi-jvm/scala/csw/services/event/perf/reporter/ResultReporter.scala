@@ -1,8 +1,8 @@
-package csw.services.event.perf
+package csw.services.event.perf.reporter
 
 import akka.actor.ActorSystem
+import csw.services.event.perf.utils.EventUtils._
 import org.HdrHistogram.Histogram
-import EventUtils._
 
 class ResultReporter(name: String, actorSystem: ActorSystem) {
 

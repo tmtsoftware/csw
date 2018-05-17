@@ -1,10 +1,12 @@
-package csw.services.event.perf
+package csw.services.event.perf.model_obs
 
 import akka.Done
 import akka.actor.Cancellable
 import akka.stream.scaladsl.{Keep, Source}
 import csw.messages.events.{Event, EventName, SystemEvent}
-import csw.services.event.perf.EventUtils._
+import csw.services.event.perf.utils.EventUtils
+import csw.services.event.perf.utils.EventUtils._
+import csw.services.event.perf.wiring.{TestConfigs, TestWiring}
 import csw.services.event.scaladsl.EventPublisher
 
 import scala.concurrent.Future

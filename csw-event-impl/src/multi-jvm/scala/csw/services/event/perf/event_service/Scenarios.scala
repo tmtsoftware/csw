@@ -1,4 +1,6 @@
-package csw.services.event.perf
+package csw.services.event.perf.event_service
+
+import csw.services.event.perf.wiring.TestConfigs
 
 class Scenarios(testConfigs: TestConfigs) {
   import testConfigs._

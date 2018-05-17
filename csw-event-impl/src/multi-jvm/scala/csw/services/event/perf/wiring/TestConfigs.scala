@@ -1,4 +1,4 @@
-package csw.services.event.perf
+package csw.services.event.perf.wiring
 
 import java.util.concurrent.TimeUnit
 

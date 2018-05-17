@@ -1,4 +1,4 @@
-package csw.services.event.perf
+package csw.services.event.perf.reporter
 
 import java.io.PrintStream
 import java.util.concurrent.TimeUnit.SECONDS
@@ -7,7 +7,8 @@ import akka.actor.ActorSystem
 import akka.actor.typed.ActorRef
 import akka.util.ByteString
 import csw.messages.events.{Event, SystemEvent}
-import csw.services.event.perf.EventUtils.nanosToMicros
+import csw.services.event.perf.utils.EventUtils
+import csw.services.event.perf.utils.EventUtils.nanosToMicros
 import csw.services.event.scaladsl.{EventSubscriber, EventSubscription}
 import org.HdrHistogram.Histogram
 

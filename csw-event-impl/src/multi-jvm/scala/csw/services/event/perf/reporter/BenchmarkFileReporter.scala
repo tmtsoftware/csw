@@ -1,4 +1,4 @@
-package csw.services.event.perf
+package csw.services.event.perf.reporter
 
 import java.io.{File, OutputStream}
 import java.nio.file.{Files, StandardOpenOption}

@@ -1,4 +1,4 @@
-package csw.services.event.perf
+package csw.services.event.perf.event_service
 
 import java.nio.ByteBuffer
 import java.util.concurrent.TimeUnit.SECONDS
@@ -10,7 +10,10 @@ import akka.remote.testkit.{MultiNodeConfig, MultiNodeSpec, MultiNodeSpecCallbac
 import akka.testkit._
 import akka.testkit.typed.scaladsl
 import com.typesafe.config.ConfigFactory
-import csw.services.event.perf.EventUtils.nanosToSeconds
+import csw.services.event.perf.reporter._
+import csw.services.event.perf.utils.EventUtils.nanosToSeconds
+import csw.services.event.perf.utils.{EventUtils, PerfFlamesSupport}
+import csw.services.event.perf.wiring.{TestConfigs, TestWiring}
 import csw.services.event.scaladsl.{EventPublisher, EventSubscriber}
 import org.HdrHistogram.Histogram
 import org.scalatest._

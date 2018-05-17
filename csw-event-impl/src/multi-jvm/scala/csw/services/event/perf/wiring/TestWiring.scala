@@ -1,4 +1,4 @@
-package csw.services.event.perf
+package csw.services.event.perf.wiring
 
 import akka.actor.ActorSystem
 import csw.services.event.internal.wiring.Wiring

@@ -1,4 +1,4 @@
-package csw.services.event.perf
+package csw.services.event.perf.reporter
 
 final case class PlotResult(values: Vector[(String, Number)] = Vector.empty) {
 

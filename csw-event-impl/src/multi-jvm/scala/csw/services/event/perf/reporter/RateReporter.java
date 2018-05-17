@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package csw.services.event.perf;
+package csw.services.event.perf.reporter;
 
 import java.util.concurrent.locks.LockSupport;
 
