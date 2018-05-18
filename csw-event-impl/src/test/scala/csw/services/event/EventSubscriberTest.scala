@@ -1,7 +1,7 @@
 package csw.services.event
 
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.stream.scaladsl.{Keep, Sink, Source}
+import akka.stream.scaladsl.{Keep, Sink}
 import akka.testkit.typed.scaladsl.{TestInbox, TestProbe}
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.events.{Event, EventKey, EventName, SystemEvent}
@@ -11,13 +11,14 @@ import csw.services.event.helpers.Utils.{makeDistinctEvent, makeEvent}
 import csw.services.event.internal.kafka.KafkaTestProps
 import csw.services.event.internal.redis.RedisTestProps
 import csw.services.event.internal.wiring._
+import csw.services.event.scaladsl.SubscriptionMode
 import net.manub.embeddedkafka.EmbeddedKafka
 import org.scalatest.Matchers
 import org.scalatest.concurrent.Eventually
 import org.scalatest.testng.TestNGSuite
 import org.testng.annotations._
 
-import scala.collection.mutable
+import scala.collection.{immutable, mutable}
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationLong
 import scala.util.Random
@@ -57,6 +58,14 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
     Array(kafkaTestProps)
   )
 
+  val events: immutable.Seq[Event] = for (i ← 1 to 1500) yield makeEvent(i)
+
+  def eventGenerator(beginAt: Int): Event = {
+    var counter = beginAt
+    counter += 1
+    events(counter)
+  }
+
   //DEOPSCSW-346: Subscribe to event irrespective of Publisher's existence
   //DEOPSCSW-343: Unsubscribe based on prefix and event name
   @Test(dataProvider = "event-service-provider")
@@ -93,18 +102,25 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
     val event1                       = makeDistinctEvent(Random.nextInt())
     val eventKey: EventKey           = event1.eventKey
 
-    publisher.publish(Source.repeat(event1))
-    val subscription = subscriber.subscribe(Set(eventKey), 300.millis).to(Sink.foreach[Event](queue.enqueue(_))).run()
+    val cancellable = publisher.publish(eventGenerator(0), 1.millis)
+    val subscription = subscriber
+      .subscribe(Set(eventKey), 300.millis, SubscriptionMode.RateAdapterMode)
+      .to(Sink.foreach[Event](queue.enqueue(_)))
+      .run()
 
     subscription.ready().await
 
-    val subscription2 = subscriber.subscribe(Set(eventKey), 400.millis).to(Sink.foreach[Event](queue2.enqueue(_))).run()
+    val subscription2 = subscriber
+      .subscribe(Set(eventKey), 400.millis, SubscriptionMode.RateAdapterMode)
+      .to(Sink.foreach[Event](queue2.enqueue(_)))
+      .run()
     subscription2.ready().await
 
     Thread.sleep(1000)
-    subscription.unsubscribe().await
 
+    subscription.unsubscribe().await
     subscription2.unsubscribe().await
+    cancellable.cancel()
 
     queue.size shouldBe 3
     queue2.size shouldBe 2
@@ -148,14 +164,15 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
     val callback: Event ⇒ Future[Event]  = (event) ⇒ Future.successful(queue.enqueue(event)).map(_ ⇒ event)(ec)
     val callback2: Event ⇒ Future[Event] = (event) ⇒ Future.successful(queue2.enqueue(event)).map(_ ⇒ event)(ec)
 
-    publisher.publish(Source.repeat(event1))
+    val cancellable = publisher.publish(eventGenerator(0), 1.millis)
 
-    val subscription  = subscriber.subscribeAsync(Set(event1.eventKey), callback, 300.millis)
-    val subscription2 = subscriber.subscribeAsync(Set(event1.eventKey), callback2, 400.millis)
+    val subscription  = subscriber.subscribeAsync(Set(event1.eventKey), callback, 300.millis, SubscriptionMode.RateAdapterMode)
+    val subscription2 = subscriber.subscribeAsync(Set(event1.eventKey), callback2, 400.millis, SubscriptionMode.RateAdapterMode)
     Thread.sleep(1000) // Future in callback needs time to execute
     subscription.unsubscribe().await
     subscription2.unsubscribe().await
 
+    cancellable.cancel()
     queue.size shouldBe 3
     queue2.size shouldBe 2
   }
@@ -194,14 +211,16 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
     val callback: Event ⇒ Unit  = queue.enqueue(_)
     val callback2: Event ⇒ Unit = queue2.enqueue(_)
 
-    publisher.publish(Source.repeat(event1))
+    val cancellable = publisher.publish(eventGenerator(0), 1.millis)
     Thread.sleep(500) // Needed for redis set which is fire and forget operation
-    val subscription  = subscriber.subscribeCallback(Set(event1.eventKey), callback, 300.millis)
-    val subscription2 = subscriber.subscribeCallback(Set(event1.eventKey), callback2, 400.millis)
+    val subscription = subscriber.subscribeCallback(Set(event1.eventKey), callback, 300.millis, SubscriptionMode.RateAdapterMode)
+    val subscription2 =
+      subscriber.subscribeCallback(Set(event1.eventKey), callback2, 400.millis, SubscriptionMode.RateAdapterMode)
     Thread.sleep(1000)
     subscription.unsubscribe().await
     subscription2.unsubscribe().await
 
+    cancellable.cancel()
     queue.size shouldBe 3
     queue2.size shouldBe 2
   }
@@ -236,11 +255,26 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
 
     publisher.publish(event1).await
     Thread.sleep(500) // Needed for redis set which is fire and forget operation
-    val subscription = subscriber.subscribeActorRef(Set(event1.eventKey), inbox.ref, 300.millis)
+    val subscription = subscriber.subscribeActorRef(Set(event1.eventKey), inbox.ref, 300.millis, SubscriptionMode.RateAdapterMode)
     Thread.sleep(1000)
     subscription.unsubscribe().await
 
     inbox.receiveAll().size shouldBe 3
+  }
+
+  //DEOPSCSW-342: Subscription with consumption frequency
+  @Test(dataProvider = "event-service-provider")
+  def should_be_able_to_subscribe_with_rate_limiter_mode(baseProperties: BaseProperties): Unit = {
+    import baseProperties._
+    val inbox = TestInbox[Event]()
+
+    val cancellable = publisher.publish(eventGenerator(1), 200.millis)
+    val subscription =
+      subscriber.subscribeActorRef(events.map(_.eventKey).toSet, inbox.ref, 100.millis, SubscriptionMode.RateLimiterMode)
+    Thread.sleep(900)
+    subscription.unsubscribe().await
+    cancellable.cancel()
+    inbox.receiveAll().size shouldBe 5
   }
 
   @Test(dataProvider = "event-service-provider")

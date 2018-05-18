@@ -6,10 +6,9 @@ import java.util.concurrent.TimeUnit.SECONDS
 import akka.Done
 import akka.stream.scaladsl.{Keep, Source}
 import csw.messages.events.{Event, EventKey, EventName, SystemEvent}
-import csw.services.event.perf.utils.EventUtils._
-import csw.services.event.perf._
 import csw.services.event.perf.reporter.{ResultReporter, TestRateReporter}
 import csw.services.event.perf.utils.EventUtils
+import csw.services.event.perf.utils.EventUtils._
 import csw.services.event.perf.wiring.TestWiring
 import csw.services.event.scaladsl.{EventSubscriber, EventSubscription}
 import org.HdrHistogram.Histogram

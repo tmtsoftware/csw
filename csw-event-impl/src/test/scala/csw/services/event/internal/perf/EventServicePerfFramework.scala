@@ -8,7 +8,7 @@ import csw.messages.events.{Event, EventKey}
 import csw.services.event.helpers.Monitor
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.helpers.Utils.makeEvent
-import csw.services.event.scaladsl.{EventPublisher, EventSubscriber}
+import csw.services.event.scaladsl.{EventPublisher, EventSubscriber, SubscriptionMode}
 import org.scalatest.Matchers
 
 import scala.concurrent.duration.{DurationLong, FiniteDuration}
@@ -33,7 +33,7 @@ class EventServicePerfFramework(publisher: EventPublisher, subscriber: EventSubs
     val doneF = subscriber
     // uncomment below line and EventSubscriber.subscribeWithSinkActorRef method to see the effects of subscribing with Sink.actorRef
     //.subscribeWithSinkActorRef(Set(eventKey), 20.millis)
-      .subscribe(Set(eventKey), tickDuration)
+      .subscribe(Set(eventKey), tickDuration, SubscriptionMode.RateAdapterMode)
       .via(new Monitor(tickDuration, reportingDuration = 2.seconds).resetting)
       .runWith(Sink.ignore)
 
