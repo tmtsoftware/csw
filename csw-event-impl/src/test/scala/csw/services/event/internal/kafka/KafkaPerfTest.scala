@@ -5,9 +5,8 @@ import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.internal.perf.EventServicePerfFramework
 import csw.services.event.internal.throttle.{RateAdapterStage, RateLimiterStage}
-import csw.services.event.internal.wiring.Wiring
+import csw.services.event.internal.wiring.{EventServiceResolver, Wiring}
 import csw.services.event.scaladsl.KafkaFactory
-import csw.services.location.scaladsl.LocationService
 import net.manub.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
@@ -26,7 +25,7 @@ class KafkaPerfTest extends FunSuite with Matchers with BeforeAndAfterAll with E
 
   private val wiring = new Wiring(actorSystem)
   import wiring._
-  private val kafkaFactory = new KafkaFactory(mock[LocationService])
+  private val kafkaFactory = new KafkaFactory(mock[EventServiceResolver])
   private val publisher    = kafkaFactory.publisher("localhost", kafkaPort)
   private val subscriber   = kafkaFactory.subscriber("localhost", kafkaPort)
   private val framework    = new EventServicePerfFramework(publisher, subscriber)
