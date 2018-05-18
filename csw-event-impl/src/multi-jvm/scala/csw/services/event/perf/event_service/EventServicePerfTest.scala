@@ -78,6 +78,8 @@ class EventServicePerfTest
 
   var throughputPlots: PlotResult = PlotResult()
   var latencyPlots: LatencyPlots  = LatencyPlots()
+  var dropped: Int                = 0
+  var outOfOrder: Int             = 0
 
   var publisherNodes: immutable.Seq[RoleName]  = roles.take(roles.size / 2)
   var subscriberNodes: immutable.Seq[RoleName] = roles.takeRight(roles.size / 2)
@@ -97,30 +99,14 @@ class EventServicePerfTest
 
   def testScenario(testSettings: TestSettings): Unit = {
     import testSettings._
-    val subscriberName = testName + "-subscriber"
-    if (singlePublisher) {
-      publisherNodes = List(roles.head)
-      subscriberNodes = roles.tail
-    }
+    updatePubSubNodes(singlePublisher)
 
-//    runPerfFlames(roles: _*)(delay = 5.seconds, time = 40.seconds)
-
-    val nodeId = myself.name.split("-").last.toInt
-
-    val pubSubAllocationPerNode =
-      (1 to publisherSubscriberPairs)
-        .grouped((publisherSubscriberPairs.toFloat / subscriberNodes.size.toFloat).ceil.toInt)
-        .toList
-
-    val (activeSubscriberNodes, inactiveSubscriberNodes) =
-      if (subscriberNodes.size > pubSubAllocationPerNode.size) subscriberNodes.splitAt(pubSubAllocationPerNode.size)
-      else (subscriberNodes, Seq.empty)
-
-    val (activePublisherNodes, inactivePublisherNodes) =
-      if (publisherNodes.size > pubSubAllocationPerNode.size) publisherNodes.splitAt(pubSubAllocationPerNode.size)
-      else (publisherNodes, Seq.empty)
-
-    val inactiveNodes = inactivePublisherNodes ++ inactiveSubscriberNodes
+    val subscriberName                                   = testName + "-subscriber"
+    val nodeId                                           = myself.name.split("-").last.toInt
+    val pubSubAllocationPerNode                          = getPubSubAllocationPerNode(publisherSubscriberPairs)
+    val (activeSubscriberNodes, inactiveSubscriberNodes) = activeInactiveSubNodes(pubSubAllocationPerNode)
+    val (activePublisherNodes, inactivePublisherNodes)   = activeInactivePubNodes(pubSubAllocationPerNode)
+    val inactiveNodes                                    = inactivePublisherNodes ++ inactiveSubscriberNodes
 
     runOn(activeSubscriberNodes: _*) {
       val subIds          = pubSubAllocationPerNode(nodeId - publisherNodes.size - 1)
@@ -139,8 +125,7 @@ class EventServicePerfTest
       val subscribers = subIds.map { n ⇒
         val pubId      = if (singlePublisher) 1 else n
         val subscriber = new Subscriber(testSettings, testConfigs, rep, pubId, n, testWiring, sharedSubscriber)
-        val doneF      = subscriber.startSubscription()
-        (doneF, subscriber)
+        (subscriber.startSubscription(), subscriber)
       }
       enterBarrier(subscriberName + "-started")
 
@@ -181,10 +166,8 @@ class EventServicePerfTest
     }
 
     runOn(activePublisherNodes: _*) {
-      val pubIds = if (singlePublisher) List(1) else pubSubAllocationPerNode(nodeId - 1)
-
       println(
-        "================================================================================================================================================"
+        "========================================================================================================================================="
       )
       println(
         s"[$testName]: Starting benchmark with ${if (singlePublisher) 1 else publisherSubscriberPairs} publishers & $publisherSubscriberPairs subscribers $totalTestMsgs messages with " +
@@ -192,11 +175,12 @@ class EventServicePerfTest
         s"and payload size $payloadSize bytes"
       )
       println(
-        "================================================================================================================================================"
+        "========================================================================================================================================="
       )
 
       enterBarrier(subscriberName + "-started")
 
+      val pubIds = if (singlePublisher) List(1) else pubSubAllocationPerNode(nodeId - 1)
       pubIds.foreach(
         id ⇒ new Publisher(testSettings, testConfigs, id, testWiring, sharedPublisher).startPublishingWithEventGenerator()
       )
@@ -210,6 +194,29 @@ class EventServicePerfTest
     }
 
     enterBarrier("after-" + testName)
+  }
+
+  private def activeInactivePubNodes(pubSubAllocationPerNode: List[immutable.IndexedSeq[Int]]) = {
+    if (publisherNodes.size > pubSubAllocationPerNode.size) publisherNodes.splitAt(pubSubAllocationPerNode.size)
+    else (publisherNodes, Seq.empty)
+  }
+
+  private def activeInactiveSubNodes(pubSubAllocationPerNode: List[immutable.IndexedSeq[Int]]) = {
+    if (subscriberNodes.size > pubSubAllocationPerNode.size) subscriberNodes.splitAt(pubSubAllocationPerNode.size)
+    else (subscriberNodes, Seq.empty)
+  }
+
+  private def updatePubSubNodes(singlePublisher: Boolean): Unit = {
+    if (singlePublisher) {
+      publisherNodes = List(roles.head)
+      subscriberNodes = roles.tail
+    }
+  }
+
+  private def getPubSubAllocationPerNode(publisherSubscriberPairs: Int): List[immutable.IndexedSeq[Int]] = {
+    (1 to publisherSubscriberPairs)
+      .grouped((publisherSubscriberPairs.toFloat / subscriberNodes.size.toFloat).ceil.toInt)
+      .toList
   }
 
   private val scenarios = new Scenarios(testConfigs)
