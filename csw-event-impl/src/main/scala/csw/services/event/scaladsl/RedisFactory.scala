@@ -5,18 +5,13 @@ import java.net.URI
 import akka.stream.Materializer
 import csw.services.event.internal.redis.{RedisPublisher, RedisSubscriber}
 import csw.services.event.internal.wiring.EventServiceResolver
-import csw.services.location.scaladsl.LocationService
 import io.lettuce.core.{RedisClient, RedisURI}
 
 import scala.async.Async._
 import scala.concurrent.{ExecutionContext, Future}
 
-class RedisFactory(
-    redisClient: RedisClient,
-    locationService: LocationService
-)(implicit ec: ExecutionContext, mat: Materializer) {
-
-  private val eventServiceResolver = new EventServiceResolver(locationService)
+class RedisFactory(redisClient: RedisClient, eventServiceResolver: EventServiceResolver)(implicit ec: ExecutionContext,
+                                                                                         mat: Materializer) {
 
   def publisher(host: String, port: Int): EventPublisher = {
     val redisURI = RedisURI.create(host, port)

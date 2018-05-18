@@ -1,7 +1,7 @@
 package csw.services.event.perf.wiring
 
 import akka.actor.ActorSystem
-import csw.services.event.internal.wiring.Wiring
+import csw.services.event.internal.wiring.{EventServiceResolver, Wiring}
 import csw.services.event.scaladsl.{EventPublisher, EventSubscriber, KafkaFactory, RedisFactory}
 import csw.services.location.scaladsl.LocationService
 import io.lettuce.core.RedisClient
@@ -14,7 +14,7 @@ class TestWiring(actorSystem: ActorSystem) extends MockitoSugar {
   val wiring = new Wiring(actorSystem)
   import wiring._
 
-  lazy val redisFactory: RedisFactory = new RedisFactory(RedisClient.create(), mock[LocationService])
+  lazy val redisFactory: RedisFactory = new RedisFactory(RedisClient.create(), mock[EventServiceResolver])
   lazy val kafkaFactory: KafkaFactory = new KafkaFactory(mock[LocationService])(actorSystem, ec, resumingMat)
 
   def publisher: EventPublisher =
