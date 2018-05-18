@@ -75,7 +75,8 @@ class ModelObsSubscriber(subscribeKey: String, subSetting: SubSetting, reporter:
     if (!inOrder) outOfOrderCount += 1
   }
 
-  def printResult(): Unit =
-    resultReporter.printResult(subId, totalTestMsgs, payloadSize, histogram, eventsReceived, totalTime, outOfOrderCount)
+  def totalDropped(): Long = totalTestMsgs - eventsReceived
 
+  def printResult(): Unit =
+    resultReporter.printResult(subId, totalDropped(), payloadSize, histogram, eventsReceived, totalTime, outOfOrderCount)
 }

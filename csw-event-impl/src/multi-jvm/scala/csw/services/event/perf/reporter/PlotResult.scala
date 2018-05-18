@@ -21,10 +21,12 @@ final case class PlotResult(values: Vector[(String, Number)] = Vector.empty) {
   def resultsStr: String = results.map(x ⇒ f"${x.doubleValue()}%.2f").mkString("        ")
 
   def printTable(): Unit = {
+    println("================================ Throughput msgs/s ================================")
     this.labels.zipWithIndex.foreach {
       case (label, index) ⇒
         println(s"$label: ${if (label.length < 7) "\t\t" else "\t"} ${this.results(index)}")
     }
+    println("\n")
   }
 
 }
@@ -34,7 +36,7 @@ final case class LatencyPlots(
     plot90: PlotResult = PlotResult(),
     plot99: PlotResult = PlotResult()
 ) {
-  def printTable(name: String): Unit = {
+  def printTable(): Unit = {
     println("================================== Latency in µs ==================================")
     println("\t\t\t 50%tile \t\t 90%tile \t\t 99%tile \t")
     println("===================================================================================")
@@ -44,6 +46,6 @@ final case class LatencyPlots(
         println(s"$label: ${if (label.length < 6) "\t\t" else "\t"} ${plot50.results(index)} \t\t ${plot90
           .results(index)} \t\t ${plot99.results(index)} \t")
     }
-    println("===================================================================================")
+    println("\n")
   }
 }

@@ -87,30 +87,31 @@ class ModelObsPerfTest
 
   import testWiring._
 
-  lazy val sharedPublisher: EventPublisher = publisher
-//  lazy val sharedSubscriber: EventSubscriber = subscriber
+  lazy val sharedPublisher: EventPublisher   = publisher
+  lazy val reporterExecutor: ExecutorService = Executors.newFixedThreadPool(1)
+
+  var throughputPlots: PlotResult        = PlotResult()
+  var latencyPlots: LatencyPlots         = LatencyPlots()
+  var totalDropped: Map[String, Long]    = Map.empty
+  var outOfOrderCount: Map[String, Long] = Map.empty
 
   override def initialParticipants: Int = roles.size
 
-  lazy val reporterExecutor: ExecutorService = Executors.newFixedThreadPool(1)
   def reporter(name: String): TestRateReporter = {
     val r = new TestRateReporter(name)
     reporterExecutor.execute(r)
     r
   }
 
-  var throughputPlots: PlotResult = PlotResult()
-  var latencyPlots: LatencyPlots  = LatencyPlots()
-
   override def beforeAll(): Unit = multiNodeSpecBeforeAll()
 
   override def afterAll(): Unit = {
     reporterExecutor.shutdown()
     runOn(roles.last) {
-      println("================================ Throughput msgs/s ================================")
       throughputPlots.printTable()
-      println()
-      latencyPlots.printTable(system.name)
+      latencyPlots.printTable()
+      printTotalDropped()
+      printTotalOutOfOrderCount()
     }
     multiNodeSpecAfterAll()
   }
@@ -127,9 +128,8 @@ class ModelObsPerfTest
       val subscribers = subSettings.flatMap { subSetting ⇒
         import subSetting._
         (1 to noOfSubs).map { subId ⇒
-          val subscriber =
-            new ModelObsSubscriber(s"${subSetting.key}-$subId", subSetting, rep, testWiring)
-          val doneF = subscriber.startSubscription()
+          val subscriber = new ModelObsSubscriber(s"${subSetting.key}-$subId", subSetting, rep, testWiring)
+          val doneF      = subscriber.startSubscription()
           (doneF, subscriber)
         }
       }
@@ -157,10 +157,16 @@ class ModelObsPerfTest
 
       enterBarrier("publishers-started")
 
+      var totalDroppedPerSubscriber: Long    = 0L
+      var outOfOrderCountPerSubscriber: Long = 0L
+
       subscribers.foreach {
         case (doneF, subscriber) ⇒
           Await.result(doneF, Duration.Inf)
           subscriber.printResult()
+
+          totalDroppedPerSubscriber += subscriber.totalDropped()
+          outOfOrderCountPerSubscriber += subscriber.outOfOrderCount
 
           histogramPerNode.add(subscriber.histogram)
           eventsReceivedPerNode += subscriber.eventsReceived
@@ -173,24 +179,36 @@ class ModelObsPerfTest
       val publisher = testWiring.publisher
       Await.result(
         publisher.publish(
-          EventUtils.perfResultEvent(byteBuffer.array(), eventsReceivedPerNode / nanosToSeconds(totalTimePerNode))
+          EventUtils.perfResultEvent(
+            byteBuffer.array(),
+            eventsReceivedPerNode / nanosToSeconds(totalTimePerNode),
+            totalDroppedPerSubscriber,
+            outOfOrderCountPerSubscriber
+          )
         ),
         30.seconds
       )
 
       runOn(roles.last) {
-        val aggregatedResult = completionProbe.expectMessageType[AggregatedResult](5.minute)
-        latencyPlots = latencyPlots.copy(
-          plot50 = latencyPlots.plot50.addAll(aggregatedResult.latencyPlots.plot50),
-          plot90 = latencyPlots.plot90.addAll(aggregatedResult.latencyPlots.plot90),
-          plot99 = latencyPlots.plot99.addAll(aggregatedResult.latencyPlots.plot99)
-        )
-
-        throughputPlots = throughputPlots.addAll(aggregatedResult.throughputPlots)
+        completionProbe.expectMessageType[AggregatedResult](5.minute)
       }
 
       enterBarrier("done")
       rep.halt()
+    }
+  }
+
+  private def printTotalOutOfOrderCount(): Unit = {
+    println("================================ Out of order ================================")
+    outOfOrderCount.foreach {
+      case (testName, outOfOrder) ⇒ println(s"$testName: ${if (testName.length < 7) "\t\t" else "\t"} $outOfOrder")
+    }
+  }
+
+  private def printTotalDropped(): Unit = {
+    println("================================ Total dropped ================================")
+    totalDropped.foreach {
+      case (testName, totalDroppedCount) ⇒ println(s"$testName: ${if (testName.length < 7) "\t\t" else "\t"} $totalDroppedCount")
     }
   }
 

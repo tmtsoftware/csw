@@ -17,14 +17,16 @@ class ResultAggregator(
     subscriber: EventSubscriber,
     expPerfEventCount: Int,
     actorRef: ActorRef[AggregatedResult]
-)(
-    implicit val system: ActorSystem
-) {
+)(implicit val system: ActorSystem) {
 
   private val histogram              = new Histogram(SECONDS.toNanos(10), 3)
+  var throughputPlots: PlotResult    = PlotResult()
+  var latencyPlots: LatencyPlots     = LatencyPlots()
   private var throughput             = 0d
   private var newEvent               = false
   private var receivedPerfEventCount = 0
+  private var totalDropped           = 0L
+  private var outOfOrderCount        = 0L
 
   def startSubscription(): EventSubscription = subscriber.subscribeCallback(Set(EventUtils.perfEventKey), onEvent)
 
@@ -35,10 +37,12 @@ class ResultAggregator(
       histogram.add(Histogram.decodeFromByteBuffer(histogramBuffer, SECONDS.toNanos(10)))
 
       throughput += event.get(EventUtils.throughputKey).get.head
+      outOfOrderCount += event.get(EventUtils.totalOutOfOrderKey).get.head
+      totalDropped += event.get(EventUtils.totalDroppedKey).get.head
 
       if (receivedPerfEventCount == expPerfEventCount) {
         val (latencyPlots, throughputPlots) = aggregateResult()
-        actorRef ! AggregatedResult(latencyPlots, throughputPlots)
+        actorRef ! AggregatedResult(latencyPlots, throughputPlots, totalDropped, outOfOrderCount)
       }
     case _ ⇒ newEvent = true
   }
@@ -64,4 +68,4 @@ class ResultAggregator(
 
 }
 
-case class AggregatedResult(latencyPlots: LatencyPlots, throughputPlots: PlotResult)
+case class AggregatedResult(latencyPlots: LatencyPlots, throughputPlots: PlotResult, totalDropped: Long, outOfOrderCount: Long)

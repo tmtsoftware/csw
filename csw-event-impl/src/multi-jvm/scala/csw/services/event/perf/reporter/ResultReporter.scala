@@ -10,7 +10,7 @@ class ResultReporter(name: String, actorSystem: ActorSystem) {
 
   def printResult(
       id: Int,
-      totalTestMsgs: Long,
+      totalDropped: Long,
       payloadSize: Int,
       histogram: Histogram,
       totalReceived: Long,
@@ -19,8 +19,6 @@ class ResultReporter(name: String, actorSystem: ActorSystem) {
   ): Unit = {
 
     val throughput = totalReceived / nanosToSeconds(totalTime)
-
-    val totalDropped = totalTestMsgs - totalReceived
 
     def percentile(p: Double) = histogram.getValueAtPercentile(p) / 1000.0
 

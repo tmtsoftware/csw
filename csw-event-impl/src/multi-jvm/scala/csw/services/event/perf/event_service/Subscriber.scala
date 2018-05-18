@@ -85,7 +85,9 @@ class Subscriber(
     }
   }
 
+  def totalDropped(): Long = totalTestMsgs - eventsReceived
+
   def printResult(): Unit =
-    resultReporter.printResult(subscriberId, totalTestMsgs, payloadSize, histogram, eventsReceived, totalTime, outOfOrderCount)
+    resultReporter.printResult(subscriberId, totalDropped(), payloadSize, histogram, eventsReceived, totalTime, outOfOrderCount)
 
 }

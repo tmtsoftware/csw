@@ -33,7 +33,6 @@ object EventServiceMultiNodeConfig extends MultiNodeConfig {
   for (n ← 1 to totalNumberOfNodes) role("node-" + n)
 
   commonConfig(debugConfig(on = false).withFallback(ConfigFactory.load()))
-
 }
 
 class EventServicePerfTestMultiJvmNode1 extends EventServicePerfTest
@@ -57,42 +56,40 @@ class EventServicePerfTest
     with BeforeAndAfterAll {
 
   private val testConfigs = new TestConfigs(system.settings.config)
+  private val testWiring  = new TestWiring(system)
   import testConfigs._
-
-  private val testWiring = new TestWiring(system)
   import testWiring._
 
   lazy val sharedPublisher: EventPublisher   = publisher
   lazy val sharedSubscriber: EventSubscriber = subscriber
+  lazy val reporterExecutor: ExecutorService = Executors.newFixedThreadPool(1)
+
+  var throughputPlots: PlotResult              = PlotResult()
+  var latencyPlots: LatencyPlots               = LatencyPlots()
+  var totalDropped: Map[String, Long]          = Map.empty
+  var outOfOrderCount: Map[String, Long]       = Map.empty
+  var publisherNodes: immutable.Seq[RoleName]  = roles.take(roles.size / 2)
+  var subscriberNodes: immutable.Seq[RoleName] = roles.takeRight(roles.size / 2)
 
   def adjustedTotalMessages(n: Long): Long = (n * totalMessagesFactor).toLong
 
   override def initialParticipants: Int = roles.size
 
-  lazy val reporterExecutor: ExecutorService = Executors.newFixedThreadPool(1)
   def reporter(name: String): TestRateReporter = {
     val r = new TestRateReporter(name)
     reporterExecutor.execute(r)
     r
   }
 
-  var throughputPlots: PlotResult = PlotResult()
-  var latencyPlots: LatencyPlots  = LatencyPlots()
-  var dropped: Int                = 0
-  var outOfOrder: Int             = 0
-
-  var publisherNodes: immutable.Seq[RoleName]  = roles.take(roles.size / 2)
-  var subscriberNodes: immutable.Seq[RoleName] = roles.takeRight(roles.size / 2)
-
   override def beforeAll(): Unit = multiNodeSpecBeforeAll()
 
   override def afterAll(): Unit = {
     reporterExecutor.shutdown()
     runOn(subscriberNodes.head) {
-      println("================================ Throughput msgs/s ================================")
       throughputPlots.printTable()
-      println()
-      latencyPlots.printTable(system.name)
+      latencyPlots.printTable()
+      printTotalDropped()
+      printTotalOutOfOrderCount()
     }
     multiNodeSpecAfterAll()
   }
@@ -129,10 +126,16 @@ class EventServicePerfTest
       }
       enterBarrier(subscriberName + "-started")
 
+      var totalDroppedPerSubscriber: Long    = 0L
+      var outOfOrderCountPerSubscriber: Long = 0L
+
       subscribers.foreach {
         case (doneF, subscriber) ⇒
           Await.result(doneF, 20.minute)
           subscriber.printResult()
+
+          outOfOrderCountPerSubscriber += subscriber.outOfOrderCount
+          totalDroppedPerSubscriber += subscriber.totalDropped()
 
           histogramPerNode.add(subscriber.histogram)
           eventsReceivedPerNode += subscriber.eventsReceived
@@ -144,7 +147,10 @@ class EventServicePerfTest
 
       Await.result(
         publisher.publish(
-          EventUtils.perfResultEvent(byteBuffer.array(), eventsReceivedPerNode / nanosToSeconds(totalTimePerNode))
+          EventUtils.perfResultEvent(byteBuffer.array(),
+                                     eventsReceivedPerNode / nanosToSeconds(totalTimePerNode),
+                                     totalDroppedPerSubscriber,
+                                     outOfOrderCountPerSubscriber)
         ),
         30.seconds
       )
@@ -159,6 +165,9 @@ class EventServicePerfTest
         )
 
         throughputPlots = throughputPlots.addAll(aggregatedResult.throughputPlots)
+
+        totalDropped = totalDropped + (testName       → aggregatedResult.totalDropped)
+        outOfOrderCount = outOfOrderCount + (testName → aggregatedResult.outOfOrderCount)
       }
 
       enterBarrier(testName + "-done")
@@ -194,6 +203,22 @@ class EventServicePerfTest
     }
 
     enterBarrier("after-" + testName)
+  }
+
+  private def printTotalOutOfOrderCount(): Unit = {
+    println("================================ Out of order ================================")
+    outOfOrderCount.foreach {
+      case (testName, outOfOrder) ⇒ println(s"$testName: ${if (testName.length < 7) "\t\t" else "\t"} $outOfOrder")
+    }
+    println("\n")
+  }
+
+  private def printTotalDropped(): Unit = {
+    println("================================ Total dropped ================================")
+    totalDropped.foreach {
+      case (testName, totalDroppedCount) ⇒ println(s"$testName: ${if (testName.length < 7) "\t\t" else "\t"} $totalDroppedCount")
+    }
+    println("\n")
   }
 
   private def activeInactivePubNodes(pubSubAllocationPerNode: List[immutable.IndexedSeq[Int]]) = {
