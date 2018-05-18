@@ -9,7 +9,6 @@ import csw.messages.commons.CoordinatedShutdownReasons;
 import csw.messages.events.Event;
 import csw.services.event.exceptions.PublishFailedException;
 import csw.services.event.helpers.Utils;
-import csw.services.event.internal.wiring.EventServiceResolver;
 import csw.services.event.javadsl.IEventPublisher;
 import csw.services.event.javadsl.JRedisFactory;
 import io.lettuce.core.ClientOptions;
@@ -25,7 +24,6 @@ import scala.concurrent.duration.FiniteDuration;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.function.Consumer;
 
 import static org.hamcrest.CoreMatchers.isA;
 
@@ -44,7 +42,7 @@ public class JRedisFailureTest {
         redisTestProps = RedisTestProps.createRedisProperties(4561, 7380, clientOptions);
         ExecutionContext executionContext = redisTestProps.wiring().ec();
         Materializer materializer = redisTestProps.wiring().resumingMat();
-        jRedisFactory = new JRedisFactory(redisTestProps.redisClient(), new EventServiceResolver(redisTestProps.locationService(), executionContext), executionContext, materializer);
+        jRedisFactory = new JRedisFactory(redisTestProps.redisFactory(), executionContext, materializer);
         redisTestProps.redis().start();
     }
 
