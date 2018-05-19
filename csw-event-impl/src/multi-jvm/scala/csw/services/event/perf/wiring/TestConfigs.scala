@@ -32,4 +32,5 @@ class TestConfigs(config: Config) {
   val kafkaHost: String = config.getString("csw.event.perf.kafka.host")
   val kafkaPort: Int    = config.getInt("csw.event.perf.kafka.port")
 
+  val systemMonitoring: Boolean = config.getBoolean("csw.event.perf.system-monitoring")
 }

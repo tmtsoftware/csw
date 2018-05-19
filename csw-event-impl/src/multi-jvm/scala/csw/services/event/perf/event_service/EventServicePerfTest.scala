@@ -11,8 +11,8 @@ import akka.testkit._
 import akka.testkit.typed.scaladsl
 import com.typesafe.config.ConfigFactory
 import csw.services.event.perf.reporter._
+import csw.services.event.perf.utils.{EventUtils, SystemMonitoringSupport}
 import csw.services.event.perf.utils.EventUtils.nanosToSeconds
-import csw.services.event.perf.utils.{EventUtils, PerfFlamesSupport}
 import csw.services.event.perf.wiring.{TestConfigs, TestWiring}
 import csw.services.event.scaladsl.{EventPublisher, EventSubscriber}
 import org.HdrHistogram.Histogram
@@ -21,6 +21,7 @@ import org.scalatest._
 import scala.collection.immutable
 import scala.concurrent.Await
 import scala.concurrent.duration._
+import scala.sys.process.Process
 
 object EventServiceMultiNodeConfig extends MultiNodeConfig {
 
@@ -52,7 +53,7 @@ class EventServicePerfTest
     with FunSuiteLike
     with Matchers
     with ImplicitSender
-    with PerfFlamesSupport
+    with SystemMonitoringSupport
     with BeforeAndAfterAll {
 
   private val testConfigs = new TestConfigs(system.settings.config)
@@ -63,6 +64,8 @@ class EventServicePerfTest
   lazy val sharedPublisher: EventPublisher   = publisher
   lazy val sharedSubscriber: EventSubscriber = subscriber
   lazy val reporterExecutor: ExecutorService = Executors.newFixedThreadPool(1)
+
+  var topProcess: Option[Process] = None
 
   var throughputPlots: PlotResult              = PlotResult()
   var latencyPlots: LatencyPlots               = LatencyPlots()
@@ -91,11 +94,14 @@ class EventServicePerfTest
       printTotalDropped()
       printTotalOutOfOrderCount()
     }
+    topProcess.foreach(_.destroy())
     multiNodeSpecAfterAll()
   }
 
   def testScenario(testSettings: TestSettings): Unit = {
     import testSettings._
+    if (testConfigs.systemMonitoring) startSystemMonitoring()
+
     updatePubSubNodes(singlePublisher)
 
     val subscriberName                                   = testName + "-subscriber"
@@ -203,6 +209,12 @@ class EventServicePerfTest
     }
 
     enterBarrier("after-" + testName)
+  }
+
+  private def startSystemMonitoring(): Unit = {
+    topProcess = Some(runTop())
+    runJstat()
+    runPerfFlames(roles: _*)(delay = 15.seconds, time = 60.seconds)
   }
 
   private def printTotalOutOfOrderCount(): Unit = {

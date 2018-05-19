@@ -119,4 +119,42 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
       }
     )
 
+  val modelObsScenarioWithTwoProcesses: ModelObservatoryTestSettings =
+    ModelObservatoryTestSettings(
+      JvmSetting(
+        TCS.entryName,
+        List(
+          PubSetting(s"${TCS.entryName}-1", noOfPubs = 1, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
+          PubSetting(s"${TCS.entryName}-1", noOfPubs = 10, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+          PubSetting(s"${TCS.entryName}-1", noOfPubs = 30, adjustedTotalMsgs(5), rate = 5, payloadSize = 128)
+        ),
+        List(
+          SubSetting(s"${TCS.entryName}-1", noOfSubs = 1, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
+          SubSetting(s"${TCS.entryName}-1", noOfSubs = 10, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+          SubSetting(s"${TCS.entryName}-1", noOfSubs = 30, adjustedTotalMsgs(5), rate = 5, payloadSize = 128)
+        )
+      ) ::
+      List(AOESW).flatMap { subsystem ⇒
+        val subsystemName = subsystem.entryName
+
+        (1 to 1).map {
+          n ⇒
+            JvmSetting(
+              subsystemName,
+              List(
+                PubSetting(s"$subsystemName-$n", noOfPubs = 10, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+                PubSetting(s"$subsystemName-$n", noOfPubs = 30, adjustedTotalMsgs(5), rate = 5, payloadSize = 128)
+              ),
+              subsystem match {
+                case AOESW ⇒
+                  List(
+                    SubSetting(s"${AOESW.entryName}-$n", noOfSubs = 10, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+                    SubSetting(s"${AOESW.entryName}-$n", noOfSubs = 30, adjustedTotalMsgs(5), rate = 5, payloadSize = 128)
+                  )
+              }
+            )
+        }
+      }
+    )
+
 }
