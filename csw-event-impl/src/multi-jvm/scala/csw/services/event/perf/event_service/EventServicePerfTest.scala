@@ -2,26 +2,21 @@ package csw.services.event.perf.event_service
 
 import java.nio.ByteBuffer
 import java.util.concurrent.TimeUnit.SECONDS
-import java.util.concurrent.{ExecutorService, Executors}
 
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.remote.testconductor.RoleName
-import akka.remote.testkit.{MultiNodeConfig, MultiNodeSpec, MultiNodeSpecCallbacks}
-import akka.testkit._
+import akka.remote.testkit.MultiNodeConfig
 import akka.testkit.typed.scaladsl
 import com.typesafe.config.ConfigFactory
+import csw.services.event.perf.BasePerfSuite
 import csw.services.event.perf.reporter._
-import csw.services.event.perf.utils.{EventUtils, SystemMonitoringSupport}
+import csw.services.event.perf.utils.EventUtils
 import csw.services.event.perf.utils.EventUtils.nanosToSeconds
-import csw.services.event.perf.wiring.{TestConfigs, TestWiring}
-import csw.services.event.scaladsl.{EventPublisher, EventSubscriber}
 import org.HdrHistogram.Histogram
-import org.scalatest._
 
 import scala.collection.immutable
 import scala.concurrent.Await
 import scala.concurrent.duration._
-import scala.sys.process.Process
 
 object EventServiceMultiNodeConfig extends MultiNodeConfig {
 
@@ -47,44 +42,15 @@ class EventServicePerfTestMultiJvmNode2 extends EventServicePerfTest
 //class EventServicePerfTestMultiJvmNode9  extends EventServicePerfTest
 //class EventServicePerfTestMultiJvmNode10 extends EventServicePerfTest
 
-class EventServicePerfTest
-    extends MultiNodeSpec(EventServiceMultiNodeConfig)
-    with MultiNodeSpecCallbacks
-    with FunSuiteLike
-    with Matchers
-    with ImplicitSender
-    with SystemMonitoringSupport
-    with BeforeAndAfterAll {
+class EventServicePerfTest extends BasePerfSuite {
 
-  private val testConfigs = new TestConfigs(system.settings.config)
-  private val testWiring  = new TestWiring(system)
   import testConfigs._
   import testWiring._
 
-  lazy val sharedPublisher: EventPublisher   = publisher
-  lazy val sharedSubscriber: EventSubscriber = subscriber
-  lazy val reporterExecutor: ExecutorService = Executors.newFixedThreadPool(1)
-
-  var topProcess: Option[Process] = None
-
-  var throughputPlots: PlotResult              = PlotResult()
-  var latencyPlots: LatencyPlots               = LatencyPlots()
-  var totalDropped: Map[String, Long]          = Map.empty
-  var outOfOrderCount: Map[String, Long]       = Map.empty
   var publisherNodes: immutable.Seq[RoleName]  = roles.take(roles.size / 2)
   var subscriberNodes: immutable.Seq[RoleName] = roles.takeRight(roles.size / 2)
 
   def adjustedTotalMessages(n: Long): Long = (n * totalMessagesFactor).toLong
-
-  override def initialParticipants: Int = roles.size
-
-  def reporter(name: String): TestRateReporter = {
-    val r = new TestRateReporter(name)
-    reporterExecutor.execute(r)
-    r
-  }
-
-  override def beforeAll(): Unit = multiNodeSpecBeforeAll()
 
   override def afterAll(): Unit = {
     reporterExecutor.shutdown()
@@ -100,7 +66,7 @@ class EventServicePerfTest
 
   def testScenario(testSettings: TestSettings): Unit = {
     import testSettings._
-    if (testConfigs.systemMonitoring) startSystemMonitoring()
+    if (systemMonitoring) startSystemMonitoring()
 
     updatePubSubNodes(singlePublisher)
 
@@ -153,27 +119,19 @@ class EventServicePerfTest
 
       Await.result(
         publisher.publish(
-          EventUtils.perfResultEvent(byteBuffer.array(),
-                                     eventsReceivedPerNode / nanosToSeconds(totalTimePerNode),
-                                     totalDroppedPerSubscriber,
-                                     outOfOrderCountPerSubscriber)
+          EventUtils.perfResultEvent(
+            byteBuffer.array(),
+            eventsReceivedPerNode / nanosToSeconds(totalTimePerNode),
+            totalDroppedPerSubscriber,
+            outOfOrderCountPerSubscriber
+          )
         ),
         30.seconds
       )
 
       runOn(activeSubscriberNodes.head) {
         val aggregatedResult = completionProbe.expectMessageType[AggregatedResult](5.minute)
-
-        latencyPlots = latencyPlots.copy(
-          plot50 = latencyPlots.plot50.addAll(aggregatedResult.latencyPlots.plot50),
-          plot90 = latencyPlots.plot90.addAll(aggregatedResult.latencyPlots.plot90),
-          plot99 = latencyPlots.plot99.addAll(aggregatedResult.latencyPlots.plot99)
-        )
-
-        throughputPlots = throughputPlots.addAll(aggregatedResult.throughputPlots)
-
-        totalDropped = totalDropped + (testName       → aggregatedResult.totalDropped)
-        outOfOrderCount = outOfOrderCount + (testName → aggregatedResult.outOfOrderCount)
+        aggregateResult(testName, aggregatedResult)
       }
 
       enterBarrier(testName + "-done")
@@ -209,28 +167,6 @@ class EventServicePerfTest
     }
 
     enterBarrier("after-" + testName)
-  }
-
-  private def startSystemMonitoring(): Unit = {
-    topProcess = Some(runTop())
-    runJstat()
-    runPerfFlames(roles: _*)(delay = 15.seconds, time = 60.seconds)
-  }
-
-  private def printTotalOutOfOrderCount(): Unit = {
-    println("================================ Out of order ================================")
-    outOfOrderCount.foreach {
-      case (testName, outOfOrder) ⇒ println(s"$testName: ${if (testName.length < 7) "\t\t" else "\t"} $outOfOrder")
-    }
-    println("\n")
-  }
-
-  private def printTotalDropped(): Unit = {
-    println("================================ Total dropped ================================")
-    totalDropped.foreach {
-      case (testName, totalDroppedCount) ⇒ println(s"$testName: ${if (testName.length < 7) "\t\t" else "\t"} $totalDroppedCount")
-    }
-    println("\n")
   }
 
   private def activeInactivePubNodes(pubSubAllocationPerNode: List[immutable.IndexedSeq[Int]]) = {
