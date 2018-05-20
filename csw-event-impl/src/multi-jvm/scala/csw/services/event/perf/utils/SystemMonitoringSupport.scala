@@ -21,9 +21,11 @@ trait SystemMonitoringSupport { _: MultiNodeSpec ⇒
     name.substring(0, name.indexOf('@')).toInt
   }
 
-  val perfJavaFlamesPath = "/Users/pritamkadam/TMT/perf-map-agent/bin/perf-java-flames"
-  val topResultsPath     = s"~/perf/top_${Instant.now()}.log"
-  val jstatResultsPath   = s"~/perf/jstat_${pid}_${Instant.now()}.log"
+  val perfJavaFlamesPath = "$$HOME/TMT/perf-map-agent/bin/perf-java-flames"
+  val topResultsPath     = s"$$HOME/perf/top_${Instant.now()}.log"
+  val jstatResultsPath   = s"$$HOME/perf/jstat_${pid}_${Instant.now()}.log"
+  val cpuUsagePath       = s"$$HOME/perf/cpu_usage_${Instant.now()}.log"
+  val cpuUsageGraphPath  = s"$$HOME/perf/cpu_usage_plot_${Instant.now()}.png"
 
   val topScript: String =
     s"""
@@ -64,16 +66,53 @@ trait SystemMonitoringSupport { _: MultiNodeSpec ⇒
       |
     """.stripMargin
 
+  val plotCpuUsageGraphScript: String =
+    s"""
+       |#!/usr/bin/env bash
+       |
+       |timestamp=`date +%F_%H-%M-%S`
+       |
+       |if [ ! -f $topResultsPath ]; then
+       |  exit 1
+       |fi
+       |
+       |echo "Extracting CPU usage from [ $topResultsPath ]"
+       |awk '/CPU/ {printf ("%s\\t%s\\t%s\\t%s\\n", i++, $$3, $$5, $$7)}'  $topResultsPath >> $cpuUsagePath
+       |
+       |echo "Adding headers in [$cpuUsagePath]"
+       |sed -i 1i"seconds\\tUser\\tSystem\\tIdle" $cpuUsagePath
+       |
+       |echo "==========================================="
+       |echo "Plotting CPU usage graph using gnuplot ..."
+       |echo "==========================================="
+       |gnuplot <<-EOFMarker
+       |    set xlabel "Seconds"
+       |    set ylabel "% CPU Usage"
+       |    set title "CPU Usage"
+       |    set term pngcairo size 1680,1050 enhanced font 'Verdana,18'
+       |    set output "$cpuUsageGraphPath"
+       |    plot for [col=2:4] "$cpuUsagePath" using 1:col with lines title columnheader
+       |EOFMarker
+       |
+       |echo "CPU usage graph plotted and saved at [$cpuUsageGraphPath]"
+       |
+     """.stripMargin
+
   def runTop(): process.Process = {
     Thread.sleep(Random.nextInt(2) * 1000)
 
-    val topCommand = createExecutableShellScript("top", topScript)
+    val topCommand = createExecutableScript("top", topScript)
     executeCmd(topCommand)
   }
 
   def runJstat(): process.Process = {
-    val jstatScriptPath = createExecutableShellScript("jstat", jstatScript)
+    val jstatScriptPath = createExecutableScript("jstat", jstatScript)
     executeCmd(s"$jstatScriptPath $pid")
+  }
+
+  def plotCpuUsageGraph(): process.Process = {
+    val plotCmd = createExecutableScript("cpu_plot", plotCpuUsageGraphScript)
+    executeCmd(plotCmd)
   }
 
   /**
@@ -102,7 +141,7 @@ trait SystemMonitoringSupport { _: MultiNodeSpec ⇒
     isIt
   }
 
-  private def createExecutableShellScript(name: String, content: String): String = {
+  private def createExecutableScript(name: String, content: String): String = {
     val topTmpPath = Files.createTempFile(name, ".sh")
     val topTmpFile = topTmpPath.toFile
     topTmpFile.deleteOnExit()

@@ -60,7 +60,10 @@ class BasePerfSuite
       printTotalDropped()
       printTotalOutOfOrderCount()
     }
-    topProcess.foreach(_.destroy())
+    topProcess.foreach { top ⇒
+      top.destroy()
+      plotCpuUsageGraph()
+    }
     multiNodeSpecAfterAll()
   }
 
