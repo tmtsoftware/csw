@@ -50,7 +50,10 @@ class BasePerfSuite
     r
   }
 
-  override def beforeAll(): Unit = multiNodeSpecBeforeAll()
+  override def beforeAll(): Unit = {
+    multiNodeSpecBeforeAll()
+    if (testConfigs.systemMonitoring) startSystemMonitoring()
+  }
 
   override def afterAll(): Unit = {
     reporterExecutor.shutdown()
@@ -64,6 +67,7 @@ class BasePerfSuite
       top.destroy()
       plotCpuUsageGraph()
       plotMemoryUsageGraph()
+      plotLatencyHistogram()
     }
     multiNodeSpecAfterAll()
   }

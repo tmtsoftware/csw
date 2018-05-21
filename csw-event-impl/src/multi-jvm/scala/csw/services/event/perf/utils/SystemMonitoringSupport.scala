@@ -5,6 +5,7 @@ import java.time.Instant
 
 import akka.remote.testconductor.RoleName
 import akka.remote.testkit.MultiNodeSpec
+import csw.services.event.perf.reporter.BenchmarkFileReporter
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -34,6 +35,8 @@ trait SystemMonitoringSupport { _: MultiNodeSpec ⇒
 
   def plotCpuUsageGraph(): process.Process    = executeCmd(s"$perfScriptsDir/cpu_plot.sh $topResultsPath")
   def plotMemoryUsageGraph(): process.Process = executeCmd(s"$perfScriptsDir/memory_plot.sh $topResultsPath")
+  def plotLatencyHistogram(): process.Process =
+    executeCmd(s"$perfScriptsDir/hist_plot.sh ${BenchmarkFileReporter.targetDirectory.toPath}/Aggregated-*")
 
   /**
    * Runs `perf-java-flames` script on given node (JVM process).

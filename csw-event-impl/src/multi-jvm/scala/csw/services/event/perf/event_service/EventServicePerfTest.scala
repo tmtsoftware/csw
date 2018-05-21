@@ -60,13 +60,17 @@ class EventServicePerfTest extends BasePerfSuite {
       printTotalDropped()
       printTotalOutOfOrderCount()
     }
-    topProcess.foreach(_.destroy())
+    topProcess.foreach { top ⇒
+      top.destroy()
+      plotCpuUsageGraph()
+      plotMemoryUsageGraph()
+      plotLatencyHistogram()
+    }
     multiNodeSpecAfterAll()
   }
 
   def testScenario(testSettings: TestSettings): Unit = {
     import testSettings._
-    if (systemMonitoring) startSystemMonitoring()
 
     updatePubSubNodes(singlePublisher)
 

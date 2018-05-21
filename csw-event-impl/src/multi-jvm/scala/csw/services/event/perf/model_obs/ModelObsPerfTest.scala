@@ -74,8 +74,6 @@ class ModelObsPerfTest extends BasePerfSuite {
   def runScenario(testSettings: ModelObservatoryTestSettings): Unit = {
     val nodeId = myself.name.split("-").tail.head.toInt
 
-    if (testConfigs.systemMonitoring) startSystemMonitoring()
-
     runOn(roles: _*) {
       val jvmSetting = testSettings.jvmSettings(nodeId - 1)
       import jvmSetting._

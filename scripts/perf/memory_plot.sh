@@ -57,7 +57,14 @@ gnuplot <<-EOFMarker
     set xlabel "Seconds"
     set ylabel "Memory Usage (MB)"
     set title "Memory Usage"
+    set style line 1 lc rgb '#8b1a0e' pt 1 ps 1 lt 2 lw 4
+    set style line 2 lc rgb '#5e9c36' pt 6 ps 1 lt 2 lw 4
+    set style line 11 lc rgb '#808080' lt 1
+    set border 3 back ls 11
+    set tics nomirror
+    set style line 12 lc rgb '#808080' lt 0 lw 1
+    set grid back ls 12
     set term pngcairo size 1680,1050 enhanced font 'Verdana,18'
     set output "${memoryUsageGraphPath}"
-    plot "${memoryUsagePath}" using 1:2 with lines title columnheader
+    plot "${memoryUsagePath}" using 1:2 w lp lw 3 pt 5 ps 1 title columnheader
 EOFMarker
