@@ -32,7 +32,8 @@ trait SystemMonitoringSupport { _: MultiNodeSpec ⇒
 
   def runJstat(): process.Process = executeCmd(s"$perfScriptsDir/jstat.sh $pid")
 
-  def plotCpuUsageGraph(): process.Process = executeCmd(s"$perfScriptsDir/plot.sh $topResultsPath")
+  def plotCpuUsageGraph(): process.Process    = executeCmd(s"$perfScriptsDir/cpu_plot.sh $topResultsPath")
+  def plotMemoryUsageGraph(): process.Process = executeCmd(s"$perfScriptsDir/memory_plot.sh $topResultsPath")
 
   /**
    * Runs `perf-java-flames` script on given node (JVM process).

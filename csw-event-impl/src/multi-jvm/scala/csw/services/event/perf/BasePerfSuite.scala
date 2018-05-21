@@ -63,6 +63,7 @@ class BasePerfSuite
     topProcess.foreach { top ⇒
       top.destroy()
       plotCpuUsageGraph()
+      plotMemoryUsageGraph()
     }
     multiNodeSpecAfterAll()
   }

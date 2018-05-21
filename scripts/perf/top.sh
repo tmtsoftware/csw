@@ -5,11 +5,6 @@ pname=$(basename $0)
 if [[ $# != 1 ]]; then
     echo "[ERROR] Argument missing! Results path not provided."
     exit 1
-else
-    if [[ ! -f $1 ]]; then
-        echo "[ERROR] $1 is either directory or not a valid file path."
-        exit 1
-    fi
 fi
 
 topResultsPath=$1

@@ -31,8 +31,14 @@ if [ ! -f ${topResultsPath} ]; then
   exit 1
 fi
 
+os=`uname`
+
 echo "Extracting CPU usage from [$topResultsPath]"
-`awk '/CPU/ {printf ("%s\\t%s\\t%s\\t%s\\n", i++, $3, $5, $7)}' ${topResultsPath} >> ${cpuUsagePath}`
+if [[ ${os} == "Darwin" ]]; then
+    `awk '/CPU/ {printf ("%s\\t%s\\t%s\\t%s\\n", i++, $3, $5, $7)}' ${topResultsPath} >> ${cpuUsagePath}`
+else
+    `awk '/%Cpu(s)/ {printf ("%s\\t%s\\t%s\\t%s\\n", i++, $2, $4, $8)}' ${topResultsPath} >> ${cpuUsagePath}`
+fi
 
 echo "Adding headers in [$cpuUsagePath]"
 sed -i 1i"seconds\\tUser\\tSystem\\tIdle" ${cpuUsagePath}
