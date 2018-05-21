@@ -1,12 +1,13 @@
 package csw.services.event.internal.redis
 
+import akka.actor.typed.ActorRef
 import akka.stream.scaladsl.{Keep, Source}
 import akka.stream.{KillSwitches, Materializer}
 import akka.{Done, NotUsed}
 import csw.messages.events._
-import csw.services.event.internal.pubsub.{AbstractEventSubscriber, JAbstractEventSubscriber}
+import csw.services.event.internal.pubsub.{EventSubscriberUtil, JEventSubscriber}
 import csw.services.event.javadsl.IEventSubscriber
-import csw.services.event.scaladsl.EventSubscription
+import csw.services.event.scaladsl.{EventSubscriber, EventSubscription, SubscriptionMode}
 import io.lettuce.core.api.async.RedisAsyncCommands
 import io.lettuce.core.pubsub.api.reactive.RedisPubSubReactiveCommands
 import io.lettuce.core.{RedisClient, RedisURI}
@@ -14,12 +15,15 @@ import reactor.core.publisher.FluxSink.OverflowStrategy
 
 import scala.async.Async._
 import scala.compat.java8.FutureConverters.CompletionStageOps
+import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ExecutionContext, Future}
 
-class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
-    implicit ec: ExecutionContext,
-    protected val mat: Materializer
-) extends AbstractEventSubscriber {
+class RedisSubscriber(
+    redisURI: RedisURI,
+    redisClient: RedisClient,
+    eventSubscriberUtil: EventSubscriberUtil
+)(implicit ec: ExecutionContext, mat: Materializer)
+    extends EventSubscriber {
 
   private lazy val asyncConnectionF: Future[RedisAsyncCommands[EventKey, Event]] =
     redisClient.connectAsync(EventServiceCodec, redisURI).toScala.map(_.async())
@@ -52,6 +56,46 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
       }
   }
 
+  override def subscribe(
+      eventKeys: Set[EventKey],
+      every: FiniteDuration,
+      mode: SubscriptionMode
+  ): Source[Event, EventSubscription] = subscribe(eventKeys).via(eventSubscriberUtil.subscriptionModeStage(every, mode))
+
+  override def subscribeAsync(eventKeys: Set[EventKey], callback: Event => Future[_]): EventSubscription =
+    eventSubscriberUtil.subscribeAsync(subscribe(eventKeys), callback)
+
+  override def subscribeAsync(
+      eventKeys: Set[EventKey],
+      callback: Event => Future[_],
+      every: FiniteDuration,
+      mode: SubscriptionMode
+  ): EventSubscription =
+    eventSubscriberUtil
+      .subscribeAsync(subscribe(eventKeys).via(eventSubscriberUtil.subscriptionModeStage(every, mode)), callback)
+
+  override def subscribeCallback(eventKeys: Set[EventKey], callback: Event => Unit): EventSubscription =
+    eventSubscriberUtil.subscribeCallback(subscribe(eventKeys), callback)
+
+  override def subscribeCallback(
+      eventKeys: Set[EventKey],
+      callback: Event => Unit,
+      every: FiniteDuration,
+      mode: SubscriptionMode
+  ): EventSubscription =
+    eventSubscriberUtil
+      .subscribeCallback(subscribe(eventKeys).via(eventSubscriberUtil.subscriptionModeStage(every, mode)), callback)
+
+  override def subscribeActorRef(eventKeys: Set[EventKey], actorRef: ActorRef[Event]): EventSubscription =
+    subscribeCallback(eventKeys, eventSubscriberUtil.actorCallback(actorRef))
+
+  override def subscribeActorRef(
+      eventKeys: Set[EventKey],
+      actorRef: ActorRef[Event],
+      every: FiniteDuration,
+      mode: SubscriptionMode
+  ): EventSubscription = subscribeCallback(eventKeys, eventSubscriberUtil.actorCallback(actorRef), every, mode)
+
   override def get(eventKeys: Set[EventKey]): Future[Set[Event]] = Future.sequence(eventKeys.map(get))
 
   override def get(eventKey: EventKey): Future[Event] = async {
@@ -60,7 +104,7 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
     if (event == null) Event.invalidEvent(eventKey) else event
   }
 
-  override def asJava: IEventSubscriber = new JAbstractEventSubscriber(this)
+  override def asJava: IEventSubscriber = new JEventSubscriber(this)
 
   private def subscribe(
       eventKeys: Set[EventKey],

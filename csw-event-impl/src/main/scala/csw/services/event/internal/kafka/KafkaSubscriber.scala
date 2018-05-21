@@ -1,24 +1,28 @@
 package csw.services.event.internal.kafka
 
 import akka.Done
+import akka.actor.typed.ActorRef
 import akka.kafka.{scaladsl, ConsumerSettings, Subscription, Subscriptions}
 import akka.stream.Materializer
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import csw.messages.events._
-import csw.services.event.internal.pubsub.{AbstractEventSubscriber, JAbstractEventSubscriber}
+import csw.services.event.internal.pubsub.{EventSubscriberUtil, JEventSubscriber}
 import csw.services.event.javadsl.IEventSubscriber
-import csw.services.event.scaladsl.EventSubscription
+import csw.services.event.scaladsl.{EventSubscriber, EventSubscription, SubscriptionMode}
 import csw_protobuf.events.PbEvent
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.common.TopicPartition
 
 import scala.async.Async.{async, await}
 import scala.collection.JavaConverters._
+import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ExecutionContext, Future}
 
-class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(implicit ec: ExecutionContext,
-                                                                               protected val mat: Materializer)
-    extends AbstractEventSubscriber {
+class KafkaSubscriber(
+    consumerSettings: ConsumerSettings[String, Array[Byte]],
+    eventSubscriberUtil: EventSubscriberUtil
+)(implicit ec: ExecutionContext, mat: Materializer)
+    extends EventSubscriber {
 
   private val consumer: Consumer[String, Array[Byte]] = consumerSettings.createKafkaConsumer()
 
@@ -52,9 +56,51 @@ class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(i
     }
   }
 
+  override def subscribe(
+      eventKeys: Set[EventKey],
+      every: FiniteDuration,
+      mode: SubscriptionMode
+  ): Source[Event, EventSubscription] =
+    subscribe(eventKeys).via(eventSubscriberUtil.subscriptionModeStage(every, mode))
+
+  override def subscribeAsync(eventKeys: Set[EventKey], callback: Event => Future[_]): EventSubscription =
+    eventSubscriberUtil.subscribeAsync(subscribe(eventKeys), callback)
+
+  override def subscribeAsync(
+      eventKeys: Set[EventKey],
+      callback: Event => Future[_],
+      every: FiniteDuration,
+      mode: SubscriptionMode
+  ): EventSubscription =
+    eventSubscriberUtil
+      .subscribeAsync(subscribe(eventKeys).via(eventSubscriberUtil.subscriptionModeStage(every, mode)), callback)
+
+  override def subscribeCallback(eventKeys: Set[EventKey], callback: Event => Unit): EventSubscription =
+    eventSubscriberUtil
+      .subscribeCallback(subscribe(eventKeys), callback)
+
+  override def subscribeCallback(
+      eventKeys: Set[EventKey],
+      callback: Event => Unit,
+      every: FiniteDuration,
+      mode: SubscriptionMode
+  ): EventSubscription =
+    eventSubscriberUtil
+      .subscribeCallback(subscribe(eventKeys).via(eventSubscriberUtil.subscriptionModeStage(every, mode)), callback)
+
+  override def subscribeActorRef(eventKeys: Set[EventKey], actorRef: ActorRef[Event]): EventSubscription =
+    subscribeCallback(eventKeys, eventSubscriberUtil.actorCallback(actorRef))
+
+  override def subscribeActorRef(
+      eventKeys: Set[EventKey],
+      actorRef: ActorRef[Event],
+      every: FiniteDuration,
+      mode: SubscriptionMode
+  ): EventSubscription = subscribeCallback(eventKeys, eventSubscriberUtil.actorCallback(actorRef), every, mode)
+
   override def get(eventKey: EventKey): Future[Event] = get(Set(eventKey)).map(_.head)
 
-  override def asJava: IEventSubscriber = new JAbstractEventSubscriber(this)
+  override def asJava: IEventSubscriber = new JEventSubscriber(this)
 
   private def getEventStream(subscription: Subscription): Source[Event, scaladsl.Consumer.Control] =
     scaladsl.Consumer

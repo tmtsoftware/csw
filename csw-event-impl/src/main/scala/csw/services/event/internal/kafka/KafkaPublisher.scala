@@ -1,27 +1,33 @@
 package csw.services.event.internal.kafka
 
 import akka.Done
+import akka.actor.Cancellable
 import akka.kafka.ProducerSettings
 import akka.stream.Materializer
 import akka.stream.scaladsl.Source
 import csw.messages.events.Event
 import csw.services.event.exceptions.PublishFailedException
-import csw.services.event.internal.pubsub.{AbstractEventPublisher, JAbstractEventPublisher}
+import csw.services.event.internal.pubsub.{EventPublisherUtil, JEventPublisher}
 import csw.services.event.javadsl.IEventPublisher
+import csw.services.event.scaladsl.EventPublisher
 import org.apache.kafka.clients.producer.{Callback, ProducerRecord}
 
+import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.util.control.NonFatal
 
-class KafkaPublisher(producerSettings: ProducerSettings[String, Array[Byte]])(implicit ec: ExecutionContext, mat: Materializer)
-    extends AbstractEventPublisher {
+class KafkaPublisher(
+    producerSettings: ProducerSettings[String, Array[Byte]],
+    eventPublisherUtil: EventPublisherUtil
+)(implicit ec: ExecutionContext, mat: Materializer)
+    extends EventPublisher {
 
   private val kafkaProducer = producerSettings.createKafkaProducer()
 
   private val parallelism = 100
 
   override def publish[Mat](stream: Source[Event, Mat], onError: Event ⇒ Unit): Mat =
-    publishEvent(stream, parallelism, Some(onError))
+    eventPublisherUtil.publishFromSource(stream, parallelism, publish, Some(onError))
 
   override def publish(event: Event): Future[Done] = {
     val promisedDone: Promise[Done] = Promise()
@@ -46,7 +52,14 @@ class KafkaPublisher(producerSettings: ProducerSettings[String, Array[Byte]])(im
     case (_, ex: Exception) ⇒ promisedDone.failure(PublishFailedException(event))
   }
 
-  override def publish[Mat](source: Source[Event, Mat]): Mat = publishEvent(source, parallelism, None)
+  override def publish[Mat](source: Source[Event, Mat]): Mat =
+    eventPublisherUtil.publishFromSource(source, parallelism, publish, None)
 
-  override def asJava: IEventPublisher = new JAbstractEventPublisher(this)
+  override def asJava: IEventPublisher = new JEventPublisher(this)
+
+  override def publish(eventGenerator: ⇒ Event, every: FiniteDuration): Cancellable =
+    publish(eventPublisherUtil.eventSource(eventGenerator, every))
+
+  override def publish(eventGenerator: ⇒ Event, every: FiniteDuration, onError: Event ⇒ Unit): Cancellable =
+    publish(eventPublisherUtil.eventSource(eventGenerator, every), onError)
 }

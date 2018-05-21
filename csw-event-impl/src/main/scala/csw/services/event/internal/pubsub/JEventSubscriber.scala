@@ -18,7 +18,7 @@ import scala.collection.JavaConverters.{asScalaSetConverter, setAsJavaSetConvert
 import scala.compat.java8.DurationConverters.DurationOps
 import scala.compat.java8.FutureConverters.{CompletionStageOps, FutureOps}
 
-class JAbstractEventSubscriber(eventSubscriber: EventSubscriber) extends IEventSubscriber {
+class JEventSubscriber(eventSubscriber: EventSubscriber) extends IEventSubscriber {
 
   def subscribe(eventKeys: util.Set[EventKey]): Source[Event, IEventSubscription] =
     eventSubscriber

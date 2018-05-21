@@ -3,6 +3,7 @@ package csw.services.event.scaladsl
 import java.net.URI
 
 import akka.stream.Materializer
+import csw.services.event.internal.pubsub.{EventPublisherUtil, EventSubscriberUtil}
 import csw.services.event.internal.redis.{RedisPublisher, RedisSubscriber}
 import csw.services.event.internal.wiring.EventServiceResolver
 import io.lettuce.core.{RedisClient, RedisURI}
@@ -12,12 +13,14 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class RedisSentinelFactory(
     redisClient: RedisClient,
-    eventServiceResolver: EventServiceResolver
+    eventServiceResolver: EventServiceResolver,
+    eventPublisherUtil: EventPublisherUtil,
+    eventSubscriberUtil: EventSubscriberUtil
 )(implicit ec: ExecutionContext, mat: Materializer) {
 
   def publisher(host: String, port: Int, masterId: String): EventPublisher = {
     val redisURI = RedisURI.Builder.sentinel(host, port, masterId).build()
-    new RedisPublisher(redisURI, redisClient)
+    new RedisPublisher(redisURI, redisClient, eventPublisherUtil)
   }
 
   def publisher(masterId: String): Future[EventPublisher] = async {
@@ -27,7 +30,7 @@ class RedisSentinelFactory(
 
   def subscriber(host: String, port: Int, masterId: String): EventSubscriber = {
     val redisURI = RedisURI.Builder.sentinel(host, port, masterId).build()
-    new RedisSubscriber(redisURI, redisClient)
+    new RedisSubscriber(redisURI, redisClient, eventSubscriberUtil)
   }
 
   def subscriber(masterId: String): Future[EventSubscriber] = async {

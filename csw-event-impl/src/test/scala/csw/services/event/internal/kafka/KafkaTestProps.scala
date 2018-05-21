@@ -1,6 +1,7 @@
 package csw.services.event.internal.kafka
 
 import csw.services.event.helpers.TestFutureExt.RichFuture
+import csw.services.event.internal.pubsub.{EventPublisherUtil, EventSubscriberUtil}
 import csw.services.event.internal.wiring.BaseProperties.createInfra
 import csw.services.event.internal.wiring.{BaseProperties, EventServiceResolver, Wiring}
 import csw.services.event.scaladsl.{EventPublisher, EventSubscriber, KafkaFactory}
@@ -21,7 +22,9 @@ class KafkaTestProps(
   val config                   = EmbeddedKafkaConfig(customBrokerProperties = brokerProperties)
   val wiring                   = new Wiring(clusterSettings.system)
   import wiring._
-  val kafkaFactory                = new KafkaFactory(new EventServiceResolver(locationService))
+  private val eventPublisherUtil  = new EventPublisherUtil()
+  private val eventSubscriberUtil = new EventSubscriberUtil()
+  val kafkaFactory                = new KafkaFactory(new EventServiceResolver(locationService), eventPublisherUtil, eventSubscriberUtil)
   val publisher: EventPublisher   = kafkaFactory.publisher().await
   val subscriber: EventSubscriber = kafkaFactory.subscriber().await
 
