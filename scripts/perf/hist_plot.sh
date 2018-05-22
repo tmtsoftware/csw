@@ -2,16 +2,16 @@
 
 timestamp=`date +%F_%H-%M-%S`
 
-output_path="$HOME/perf/histogram_plot_$timestamp.png"
 
 os=`uname`
 
-echo "============================================================================="
-echo "Plotting CPU usage graph using gnuplot at [$output_path]"
-echo "============================================================================="
-
-#histogram_files="/Users/pritamkadam/TMT/tmtsoftware/csw-prod/csw-event-impl/target/benchmark-results/Aggregated-*"
 histogram_files=$1
+parentdir="$(basename $(dirname "$histogram_files"))"
+output_path="$HOME/perf/${parentdir}_histogram_$timestamp.png"
+
+echo "============================================================================="
+echo "Plotting Histogram from files matching : [$histogram_files] at [$output_path]"
+echo "============================================================================="
 
 gnuplot <<- EOF
     FILES = system("ls -1 ${histogram_files}")

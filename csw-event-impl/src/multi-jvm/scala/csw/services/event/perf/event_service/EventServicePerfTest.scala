@@ -64,12 +64,12 @@ class EventServicePerfTest extends BasePerfSuite {
       top.destroy()
       plotCpuUsageGraph()
       plotMemoryUsageGraph()
-      plotLatencyHistogram()
+      scenarios.foreach(s ⇒ plotLatencyHistogram(s"${BenchmarkFileReporter.targetDirectory.toPath}/${s.name}/Aggregated-*"))
     }
     multiNodeSpecAfterAll()
   }
 
-  def testScenario(testSettings: TestSettings): Unit = {
+  def testScenario(scenarioName: String, testSettings: TestSettings): Unit = {
     import testSettings._
 
     updatePubSubNodes(singlePublisher)
@@ -91,7 +91,8 @@ class EventServicePerfTest extends BasePerfSuite {
       val histogramPerNode: Histogram = new Histogram(SECONDS.toNanos(10), 3)
 
       runOn(activeSubscriberNodes.head) {
-        val resultAggregator = new ResultAggregator(testName, subscriber, activeSubscriberNodes.size, completionProbe.ref)
+        val resultAggregator =
+          new ResultAggregator(scenarioName, testName, subscriber, activeSubscriberNodes.size, completionProbe.ref)
         Await.result(resultAggregator.startSubscription().ready(), 30.seconds)
       }
 
@@ -196,12 +197,15 @@ class EventServicePerfTest extends BasePerfSuite {
       .toList
   }
 
-  private val scenarios = new Scenarios(testConfigs)
+  private val scens     = new Scenarios(testConfigs)
+  private val scenarios = List(scens.payloadOneToOne, scens.payloadOneToMany)
 
-  for (s ← scenarios.payload) {
-    test(s"Perf results must be great for ${s.testName} with payloadSize = ${s.payloadSize}") {
-      testScenario(s)
-    }
+  for (scenario ← scenarios) {
+    val scenarioName = scenario.name
+    for (currentTest ← scenario.testSettings)
+      test(s"Perf results must be great for ${currentTest.testName} with payloadSize = ${currentTest.payloadSize}") {
+        testScenario(scenarioName, currentTest)
+      }
   }
 
 }

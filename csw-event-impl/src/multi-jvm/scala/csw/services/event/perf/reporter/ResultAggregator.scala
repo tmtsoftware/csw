@@ -13,6 +13,7 @@ import csw.services.event.scaladsl.{EventSubscriber, EventSubscription}
 import org.HdrHistogram.Histogram
 
 class ResultAggregator(
+    scenarioName: String,
     testName: String,
     subscriber: EventSubscriber,
     expPerfEventCount: Int,
@@ -60,7 +61,7 @@ class ResultAggregator(
     )
 
     histogram.outputPercentileDistribution(
-      new PrintStream(BenchmarkFileReporter(s"Aggregated-$testName", system, logSettings = false).fos),
+      new PrintStream(BenchmarkFileReporter(s"$scenarioName/Aggregated-$testName", system, logSettings = false).fos),
       1000.0
     )
     (latencyPlots, throughputPlots)

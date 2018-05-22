@@ -5,7 +5,6 @@ import java.time.Instant
 
 import akka.remote.testconductor.RoleName
 import akka.remote.testkit.MultiNodeSpec
-import csw.services.event.perf.reporter.BenchmarkFileReporter
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -26,17 +25,19 @@ trait SystemMonitoringSupport { _: MultiNodeSpec ⇒
   val perfJavaFlamesPath     = s"$homeDir/TMT/perf-map-agent/bin/perf-java-flames"
   val topResultsPath         = s"$homeDir/perf/top_${Instant.now()}.log"
 
-  def runTop(): process.Process = {
+  def runTop(): Option[process.Process] = {
     Thread.sleep(Random.nextInt(2) * 1000)
-    executeCmd(s"$perfScriptsDir/top.sh $topResultsPath")
+    val process = executeCmd(s"$perfScriptsDir/top.sh $topResultsPath")
+    Thread.sleep(1000)
+    if (process.isAlive()) Some(process)
+    else None
   }
 
   def runJstat(): process.Process = executeCmd(s"$perfScriptsDir/jstat.sh $pid")
 
-  def plotCpuUsageGraph(): process.Process    = executeCmd(s"$perfScriptsDir/cpu_plot.sh $topResultsPath")
-  def plotMemoryUsageGraph(): process.Process = executeCmd(s"$perfScriptsDir/memory_plot.sh $topResultsPath")
-  def plotLatencyHistogram(): process.Process =
-    executeCmd(s"$perfScriptsDir/hist_plot.sh ${BenchmarkFileReporter.targetDirectory.toPath}/Aggregated-*")
+  def plotCpuUsageGraph(): process.Process                          = executeCmd(s"$perfScriptsDir/cpu_plot.sh $topResultsPath")
+  def plotMemoryUsageGraph(): process.Process                       = executeCmd(s"$perfScriptsDir/memory_plot.sh $topResultsPath")
+  def plotLatencyHistogram(inputFilesPath: String): process.Process = executeCmd(s"$perfScriptsDir/hist_plot.sh $inputFilesPath")
 
   /**
    * Runs `perf-java-flames` script on given node (JVM process).

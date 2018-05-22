@@ -5,7 +5,7 @@ import java.util.concurrent.{ExecutorService, Executors}
 import akka.remote.testkit.{MultiNodeSpec, MultiNodeSpecCallbacks}
 import akka.testkit.ImplicitSender
 import csw.services.event.perf.model_obs.ModelObsMultiNodeConfig
-import csw.services.event.perf.reporter.{AggregatedResult, LatencyPlots, PlotResult, TestRateReporter}
+import csw.services.event.perf.reporter._
 import csw.services.event.perf.utils.SystemMonitoringSupport
 import csw.services.event.perf.wiring.{TestConfigs, TestWiring}
 import csw.services.event.scaladsl.{EventPublisher, EventSubscriber}
@@ -67,15 +67,14 @@ class BasePerfSuite
       top.destroy()
       plotCpuUsageGraph()
       plotMemoryUsageGraph()
-      plotLatencyHistogram()
     }
     multiNodeSpecAfterAll()
   }
 
   def startSystemMonitoring(): Unit = {
-    topProcess = Some(runTop())
     runJstat()
     runPerfFlames(roles: _*)(delay = 15.seconds, time = 60.seconds)
+    topProcess = runTop()
   }
 
   def aggregateResult(testName: String, aggregatedResult: AggregatedResult): Unit = {

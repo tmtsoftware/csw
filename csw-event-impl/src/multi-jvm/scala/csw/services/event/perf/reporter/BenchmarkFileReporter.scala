@@ -23,15 +23,18 @@ object BenchmarkFileReporter {
     target.mkdirs()
     target
   }
+  val dir = "csw-event-impl/target/benchmark-results"
 
   def apply(test: String, system: ActorSystem, logSettings: Boolean = true): BenchmarkFileReporter =
     new BenchmarkFileReporter {
       override val testName: String = test
 
       val testResultFile: File = {
-        val fileName = s"$testName-results.txt"
-        val file     = new File(targetDirectory, fileName)
+        val fileName  = s"$testName-results.txt"
+        val fileName1 = s"$dir/$testName-results.txt"
+        val file      = new File(fileName1)
         Files.deleteIfExists(file.toPath)
+        file.getParentFile.mkdirs()
         file.createNewFile()
         file
       }

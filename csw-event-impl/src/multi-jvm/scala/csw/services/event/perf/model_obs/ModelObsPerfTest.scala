@@ -71,6 +71,11 @@ class ModelObsPerfTestMultiJvmNode2 extends ModelObsPerfTest
 
 class ModelObsPerfTest extends BasePerfSuite {
 
+  override def afterAll(): Unit = {
+    if (topProcess.isDefined) plotLatencyHistogram(s"${BenchmarkFileReporter.targetDirectory.toPath}/$scenarioName/Aggregated-*")
+    super.afterAll()
+  }
+
   def runScenario(testSettings: ModelObservatoryTestSettings): Unit = {
     val nodeId = myself.name.split("-").tail.head.toInt
 
@@ -96,7 +101,8 @@ class ModelObsPerfTest extends BasePerfSuite {
       val histogramPerNode: Histogram = new Histogram(SECONDS.toNanos(10), 3)
 
       runOn(roles.last) {
-        val resultAggregator = new ResultAggregator("ModelObsPerfTest", testWiring.subscriber, roles.size, completionProbe.ref)
+        val resultAggregator =
+          new ResultAggregator(scenarioName, "ModelObsPerfTest", testWiring.subscriber, roles.size, completionProbe.ref)
         Await.result(resultAggregator.startSubscription().ready(), defaultTimeout)
       }
 
@@ -155,6 +161,7 @@ class ModelObsPerfTest extends BasePerfSuite {
   }
 
   private val scenarios = new ModelObsScenarios(testConfigs)
+  val scenarioName      = "Model-Obs"
 
   test("Perf results must be great for model observatory use case") {
     runScenario(scenarios.modelObsScenarioWithTwoProcesses)
