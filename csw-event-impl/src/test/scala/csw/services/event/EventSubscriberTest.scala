@@ -278,6 +278,30 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
   }
 
   @Test(dataProvider = "event-service-provider")
+  def should_be_able_to_subscribe_with_pattern(baseProperties: BaseProperties): Unit = {
+    import baseProperties._
+    import baseProperties.wiring._
+
+    val event1 = makeEvent(1)
+    println("Event Key : " + event1.eventKey)
+    val eventKey: EventKey = event1.eventKey
+    val testProbe          = TestProbe[Event]()(actorSystem.toTyped)
+    val subscription =
+      subscriber.pSubscribe("*tcs*").toMat(Sink.foreach(e ⇒ { println(e); testProbe.ref ! e }))(Keep.left).run()
+
+    subscription.ready.await
+    publisher.publish(event1).await
+
+//    testProbe.expectMessageType[SystemEvent].isInvalid shouldBe true
+    testProbe.expectMessage(event1)
+
+    subscription.unsubscribe().await
+
+    publisher.publish(event1).await
+    testProbe.expectNoMessage(2.seconds)
+  }
+
+  @Test(dataProvider = "event-service-provider")
   def should_be_able_to_make_independent_subscriptions(baseProperties: BaseProperties): Unit = {
     import baseProperties._
     import baseProperties.wiring._

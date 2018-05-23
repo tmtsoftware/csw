@@ -41,6 +41,8 @@ trait EventSubscriber {
       mode: SubscriptionMode
   ): EventSubscription
 
+  def pSubscribe(pattern: String): Source[Event, EventSubscription] = ???
+
   def get(eventKeys: Set[EventKey]): Future[Set[Event]]
 
   def get(eventKey: EventKey): Future[Event]

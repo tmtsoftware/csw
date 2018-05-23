@@ -34,11 +34,18 @@ class ModelObsSubscriber(subscribeKey: String, subSetting: SubSetting, reporter:
   var outOfOrderCount = 0
   var lastCurrentId   = 0
 
-  private val eventKeys    = Set(EventKey(s"$testEventKey-$subscribeKey"), EventKey(s"${prefix.prefix}.$endEventS-$subscribeKey"))
-  private val eventsToDrop = warmup + eventKeys.size //inclusive of latest events from subscription
+  private val eventKeys       = Set(EventKey(s"$testEventKey-$subscribeKey"), EventKey(s"${prefix.prefix}.$endEventS-$subscribeKey"))
+  private val eventPattern    = s"*$testEventKey-$subscribeKey"
+  private val endEventPattern = s"*${EventUtils.endEventS}-$subscribeKey"
 
-  val subscription: Source[Event, EventSubscription] = subscriber.subscribe(eventKeys)
-  val endEventName                                   = EventName(s"${EventUtils.endEventS}-$subscribeKey")
+  private val eventsToDrop = warmup + eventKeys.size //inclusive of latest events from subscription
+  def subscription: Source[Event, EventSubscription] = {
+    if (subId % 2 == 0) {
+      subscriber.pSubscribe(eventPattern).mergeMat(subscriber.pSubscribe(endEventPattern))(Keep.right)
+    } else subscriber.subscribe(eventKeys)
+//    subscriber.subscribe(eventKeys)
+  }
+  val endEventName = EventName(s"${EventUtils.endEventS}-$subscribeKey")
 
   def startSubscription(): Future[Done] =
     subscription

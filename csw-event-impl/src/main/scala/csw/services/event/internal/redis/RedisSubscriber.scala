@@ -31,6 +31,9 @@ class RedisSubscriber(
   private def reactiveConnectionF(): Future[RedisPubSubReactiveCommands[EventKey, Event]] =
     redisClient.connectPubSubAsync(EventServiceCodec, redisURI).toScala.map(_.reactive())
 
+  private def patternBasedReactiveConnection(): Future[RedisPubSubReactiveCommands[String, Event]] =
+    redisClient.connectPubSubAsync(PatternBasedEventServiceCodec, redisURI).toScala.map(_.reactive())
+
   override def subscribe(eventKeys: Set[EventKey]): Source[Event, EventSubscription] = {
     val connectionF                                  = reactiveConnectionF()
     val latestEventStream: Source[Event, NotUsed]    = Source.fromFuture(get(eventKeys)).mapConcat(identity)
@@ -96,6 +99,29 @@ class RedisSubscriber(
       mode: SubscriptionMode
   ): EventSubscription = subscribeCallback(eventKeys, eventSubscriberUtil.actorCallback(actorRef), every, mode)
 
+  override def pSubscribe(pattern: String): Source[Event, EventSubscription] = {
+    val connectionF = patternBasedReactiveConnection()
+    val eventStream: Source[Event, Future[NotUsed]] =
+      Source.fromFutureSource(patternBasedReactiveConnection().flatMap(c ⇒ pSubscribe(pattern, c)))
+
+    eventStream
+      .viaMat(KillSwitches.single)(Keep.both)
+      .watchTermination()(Keep.both)
+      .mapMaterializedValue {
+        case ((subscriptionF, killSwitch), terminationSignal) ⇒
+          new EventSubscription {
+            override def unsubscribe(): Future[Done] = async {
+              val commands = await(connectionF)
+              await(commands.punsubscribe(pattern.toString()).toFuture.toScala)
+              killSwitch.shutdown()
+              await(terminationSignal)
+            }
+
+            override def ready(): Future[Done] = subscriptionF.map(_ ⇒ Done)
+          }
+      }
+  }
+
   override def get(eventKeys: Set[EventKey]): Future[Set[Event]] = Future.sequence(eventKeys.map(get))
 
   override def get(eventKey: EventKey): Future[Event] = async {
@@ -115,4 +141,14 @@ class RedisSubscriber(
       .toFuture
       .toScala
       .map(_ ⇒ Source.fromPublisher(reactiveCommands.observeChannels(OverflowStrategy.LATEST)).map(_.getMessage))
+
+  private def pSubscribe(
+      eventKey: String,
+      reactiveCommands: RedisPubSubReactiveCommands[String, Event]
+  ): Future[Source[Event, NotUsed]] =
+    reactiveCommands
+      .psubscribe(eventKey)
+      .toFuture
+      .toScala
+      .map(_ ⇒ Source.fromPublisher(reactiveCommands.observePatterns(OverflowStrategy.LATEST)).map(_.getMessage))
 }

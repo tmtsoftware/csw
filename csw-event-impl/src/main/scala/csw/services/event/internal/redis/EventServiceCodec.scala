@@ -29,3 +29,26 @@ object EventServiceCodec extends RedisCodec[EventKey, Event] {
     Event.fromPb(pbEvent)
   }
 }
+
+object PatternBasedEventServiceCodec extends RedisCodec[String, Event] {
+
+  private val utf8Charset: Charset = Charset.forName("utf8")
+
+  override def encodeKey(eventKey: String): ByteBuffer =
+    utf8Charset.encode(eventKey)
+
+  override def decodeKey(byteBuf: ByteBuffer): String =
+    utf8Charset.decode(byteBuf).toString
+
+  override def encodeValue(event: Event): ByteBuffer = {
+    val pbEvent = Event.typeMapper.toBase(event)
+    ByteBuffer.wrap(pbEvent.toByteArray)
+  }
+
+  override def decodeValue(byteBuf: ByteBuffer): Event = {
+    val bytes = new Array[Byte](byteBuf.remaining)
+    byteBuf.get(bytes)
+    val pbEvent = PbEvent.parseFrom(bytes)
+    Event.fromPb(pbEvent)
+  }
+}
