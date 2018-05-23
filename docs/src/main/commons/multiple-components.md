@@ -36,7 +36,7 @@ Scala
 name = "SampleAssembly"
 componentType = assembly
 behaviorFactoryClassName = "org.tmt.nfiraos.sampleassembly.SampleAssemblyBehaviorFactory"
-prefix = "sample.assembly"
+prefix = "nfiraos.sample"
 locationServiceUsage = RegisterAndTrackServices
 connections = [
   {
@@ -53,7 +53,7 @@ Java
 name = "JSampleAssembly"
 componentType = assembly
 behaviorFactoryClassName = "org.tmt.nfiraos.sampleassembly.JSampleAssemblyBehaviorFactory"
-prefix = "sample.assembly"
+prefix = "nfiraos.sample"
 locationServiceUsage = RegisterAndTrackServices
 connections = [
   {
