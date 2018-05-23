@@ -75,10 +75,10 @@ The above shows a configuration file for running in standalone mode.  If we want
 
 
 Scala
-:   @@snip [SampleAssemblyContainer.conf](../../../../examples/src/main/resources/SampleAssemblyContainer.conf)
+:   @@snip [SampleContainer.conf](../../../../examples/src/main/resources/SampleContainer.conf)
 
 Java
-:   @@snip [JSampleAssemblyContainer.conf](../../../../examples/src/main/resources/JSampleAssemblyContainer.conf)
+:   @@snip [JSampleContainer.conf](../../../../examples/src/main/resources/JSampleContainer.conf)
 
 
 More details about each configuration and its significance can be found @ref:[here](./create-component.md#component-configuration-componentinfo-).
@@ -239,20 +239,20 @@ Go to the project root directory and type `sbt "<deploy-module>/runMain <mainCla
 If you accept the defaults for the template, it will be `org.tmt.nfiraos.sampledeploy.SampleContainerCmdApp`.  If you are having problems
 determining the class name, use `sbt run` and it will prompt you the possibilities.
 - `<path-to-config-file>` is the filename, which can be an absolute path or relative to the directory of the deployment module.  If using defaults,
-this would be `src/main/resources/SampleAssemblyContainer.conf` for Scala, and `src/main/resources/JSampleAssemblyContainer.conf` for Java.
+this would be `src/main/resources/SampleContainer.conf` for Scala, and `src/main/resources/JSampleContainer.conf` for Java.
 
 So if using the template defaults, the full command would be 
 
 Scala
 :    
 ```
-sbt "sample-deploy/runMain org.tmt.nfiraos.sampledeploy.SampleContainerCmdApp --local src/main/resources/SampleAssemblyContainer.conf"
+sbt "sample-deploy/runMain org.tmt.nfiraos.sampledeploy.SampleContainerCmdApp --local src/main/resources/SampleContainer.conf"
 ```
 
 Java
 :    
 ```
-sbt "sample-deploy/runMain org.tmt.nfiraos.sampledeploy.SampleContainerCmdApp --local src/main/resources/JSampleAssemblyContainer.conf"
+sbt "sample-deploy/runMain org.tmt.nfiraos.sampledeploy.SampleContainerCmdApp --local src/main/resources/JSampleContainer.conf"
 ```
 
 Like with the HCD, the `sbt stage` command can also be used to create binaries in the `target/universal/stage/bin` directories of the root project.
@@ -264,7 +264,7 @@ To run using the deployment packaging, follow the steps below:
 - You will see four scripts in the `bin` directory (two bash scripts and two windows scripts).
 - If you want to start multiple containers on a host machine, follow this guide @ref:[here](../apps/hostconfig.md#examples).
 - If you want to start multiple components in container mode or single component in standalone mode, follow this guide @ref:[here](../framework/deploying-components.md).
-- Example to run container:    `./sample-container-cmd-app --local ../../../../sample-deploy/src/main/resources/SampleAssemblyContainer.conf`
+- Example to run container:    `./sample-container-cmd-app --local ../../../../sample-deploy/src/main/resources/SampleContainer.conf`
 - Example to run host config:  `./sample-host-config-app --local ../../../../sample-deploy/src/main/resources/SampleHostConfig.conf -s ./sample-container-cmd-app`
 
 @@@ note { title=Note }
