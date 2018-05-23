@@ -33,7 +33,7 @@ trait SystemMonitoringSupport { _: MultiNodeSpec ⇒
     else None
   }
 
-  def runJstat(): process.Process = executeCmd(s"$perfScriptsDir/jstat.sh $pid")
+  def runJstat(): process.Process = executeCmd(s"$perfScriptsDir/jstat.sh $pid ${myself.name}")
 
   def plotCpuUsageGraph(): process.Process                          = executeCmd(s"$perfScriptsDir/cpu_plot.sh $topResultsPath")
   def plotMemoryUsageGraph(): process.Process                       = executeCmd(s"$perfScriptsDir/memory_plot.sh $topResultsPath")

@@ -24,9 +24,10 @@ topResultsPath=$1
 
 timestamp=`date +%F_%H-%M-%S`
 
-memoryUsagePath="$HOME/perf/memory_usage_$timestamp.log"
-tmpFile="$HOME/perf/memory_usage_$timestamp.tmp"
-memoryUsageGraphPath="$HOME/perf/memory_usage_plot_$timestamp.png"
+memoryUsagePath="$HOME/perf/memory/memory_usage_$timestamp.log"
+tmpFile="$HOME/perf/memory/memory_usage_$timestamp.tmp"
+memoryUsageGraphPath="$HOME/perf/memory/memory_usage_plot_$timestamp.png"
+mkdir -p $(dirname "$memoryUsagePath")
 
 if [ ! -f ${topResultsPath} ]; then
   exit 1

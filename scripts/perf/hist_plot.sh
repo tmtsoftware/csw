@@ -7,7 +7,8 @@ os=`uname`
 
 histogram_files=$1
 parentdir="$(basename $(dirname "$histogram_files"))"
-output_path="$HOME/perf/${parentdir}_histogram_$timestamp.png"
+output_path="$HOME/perf/histograms/${parentdir}_histogram_$timestamp.png"
+mkdir -p $(dirname "$output_path")
 
 echo "============================================================================="
 echo "Plotting Histogram from files matching : [$histogram_files] at [$output_path]"

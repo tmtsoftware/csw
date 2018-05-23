@@ -24,8 +24,9 @@ topResultsPath=$1
 
 timestamp=`date +%F_%H-%M-%S`
 
-cpuUsagePath="$HOME/perf/cpu_usage_$timestamp.log"
-cpuUsageGraphPath="$HOME/perf/cpu_usage_plot_$timestamp.png"
+cpuUsagePath="$HOME/perf/cpu/cpu_usage_$timestamp.log"
+cpuUsageGraphPath="$HOME/perf/cpu/cpu_usage_plot_$timestamp.png"
+mkdir -p $(dirname "$cpuUsagePath")
 
 if [ ! -f ${topResultsPath} ]; then
   exit 1
