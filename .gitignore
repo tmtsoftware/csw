@@ -18,6 +18,7 @@ dist
 .DS_Store
 integration/project/build.properties
 test-output/
+.java-version
 
 # hidden cross project folders
 shared/.js

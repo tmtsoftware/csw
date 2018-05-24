@@ -25,11 +25,19 @@ trait SystemMonitoringSupport { _: MultiNodeSpec ⇒
   val perfJavaFlamesPath     = s"$homeDir/TMT/perf-map-agent/bin/perf-java-flames"
   val topResultsPath         = s"$homeDir/perf/top_${Instant.now()}.log"
   val jstatResultsPath       = s"$homeDir/perf/jstat/${myself.name}_jstat_${pid}_${Instant.now()}.log"
-  val jstatPlotPath          = "/Users/pritamkadam/TMT/pritam/jstatplot/target/universal/stage/bin/jstatplot"
+  val jstatPlotPath          = s"$homeDir/TMT/pritam/jstatplot/target/universal/stage/bin/jstatplot"
 
   def plotCpuUsageGraph(): process.Process                          = executeCmd(s"$perfScriptsDir/cpu_plot.sh $topResultsPath")
   def plotMemoryUsageGraph(): process.Process                       = executeCmd(s"$perfScriptsDir/memory_plot.sh $topResultsPath")
   def plotLatencyHistogram(inputFilesPath: String): process.Process = executeCmd(s"$perfScriptsDir/hist_plot.sh $inputFilesPath")
+
+  /**
+   * Make sure you have followed below steps before plotting:
+   *  1. git clone https://github.com/kpritam/jstatplot.git
+   *  2. sbt stage
+   *  3. update value of jstatPlotPath from SystemMontoringSupport class with the generated path
+   *      ex. $HOME/jstatplot/target/universal/stage/bin/jstatplot
+   */
   def plotJstat(): Option[process.Process] =
     if (exist(jstatPlotPath)) Some(executeCmd(s"$jstatPlotPath -m $jstatResultsPath")) else None
 
