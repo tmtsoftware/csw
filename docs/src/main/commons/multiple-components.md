@@ -11,8 +11,8 @@ More details about implementing ComponentHandlers can be found @ref:[here](./cre
 
 #### *Tutorial: Developing an Assembly*
 
-If using the giter8 template with the default parameters, our `ComponentHandlers` class will be the `SampleAssemblyHandlers` class,
-and the factory will be `SampleAssemblyBehaviorFactory`.
+If using the giter8 template with the default parameters, our `ComponentHandlers` class will be the `SampleAssemblyHandlers` class (`JSampleAssemblyHandlers` in Java),
+and the factory will be `SampleAssemblyBehaviorFactory` (`JSampleAssemblyBehaviorFactory` in Java).
 
 Like we did for the HCD, let's add some log messages for the `initialize` and `onShutdown` hooks, but not the 
 `onTrackingLocationEvent` hook.  We'll cover that in more detail later.
@@ -20,11 +20,18 @@ Like we did for the HCD, let's add some log messages for the `initialize` and `o
 Scala
 :   @@snip [SampleAssemblyHandlers.scala](../../../../examples/src/main/scala/org/tmt/nfiraos/sampleassembly/SampleAssemblyHandlers.scala) { #initialize }
 
+Java
+:   @@snip [JSampleAssemblyHandlers.java](../../../../examples/src/main/java/org/tmt/nfiraos/sampleassembly/JSampleAssemblyHandlers.java) { #initialize }
+
 ## Component Configuration (ComponentInfo)
 
 Also similar  to the HCD, we will need to create a ComponentInfo file for the Assembly. The following shows an example of 
 ComponentInfo file for an Assembly:
 
+
+
+Scala
+:    
 ```
 name = "SampleAssembly"
 componentType = assembly
@@ -33,9 +40,26 @@ prefix = "nfiraos.sample"
 locationServiceUsage = RegisterAndTrackServices
 connections = [
   {
-    name: "SampleHcd"
-    componentType: hcd
-    connectionType: akka
+        name: "SampleHcd"
+        componentType: hcd
+        connectionType: akka
+  }
+]
+```
+
+Java
+:    
+```
+name = "JSampleAssembly"
+componentType = assembly
+behaviorFactoryClassName = "org.tmt.nfiraos.sampleassembly.JSampleAssemblyBehaviorFactory"
+prefix = "nfiraos.sample"
+locationServiceUsage = RegisterAndTrackServices
+connections = [
+  {
+        name: "JSampleHcd"
+        componentType: hcd
+        connectionType: akka
   }
 ]
 ```
@@ -49,32 +73,13 @@ When available, it may make sense to track things like the Event Service. These 
 
 The above shows a configuration file for running in standalone mode.  If we want to run both the assembly and HCD in a container, the file would look like this:
 
-```
-name = "SampleAssemblyContainer"
-components: [
-  {
-    name = "SampleAssembly"
-    componentType = assembly
-    behaviorFactoryClassName = "org.tmt.nfiraos.sampleassembly.SampleAssemblyBehaviorFactory"
-    prefix = "nfiraos.sample"
-    locationServiceUsage = RegisterAndTrackServices
-    connections = [
-      {
-        name: "SampleHcd"
-        componentType: hcd
-        connectionType: akka
-      }
-    ]
-  },
-  {
-    name = "SampleHcd"
-    componentType = hcd
-    behaviorFactoryClassName = "org.tmt.nfiraos.samplehcd.SampleHcdBehaviorFactory"
-    prefix = "nfiraos.samplehcd"
-    locationServiceUsage = RegisterOnly
-  }
-]
-```
+
+Scala
+:   @@snip [SampleContainer.conf](../../../../examples/src/main/resources/SampleContainer.conf)
+
+Java
+:   @@snip [JSampleContainer.conf](../../../../examples/src/main/resources/JSampleContainer.conf)
+
 
 More details about each configuration and its significance can be found @ref:[here](./create-component.md#component-configuration-componentinfo-).
 
@@ -84,9 +89,21 @@ Another sample container configuration file can be found [here](https://github.c
 
 The connections that are defined in the configuration file for an assembly will be tracked by the `csw-framework`. For each connection the following details are configured:
 
+Scala
+:    
 ```
 {
     name: "SampleHcd"
+    componentType: hcd
+    connectionType: akka
+}
+``` 
+
+Java
+:    
+```
+{
+    name: "JSampleHcd"
     componentType: hcd
     connectionType: akka
 }
@@ -124,6 +141,9 @@ messages.  If we are notified that the HCD is removed, log a message.
 
 Scala
 :   @@snip [SampleAssemblyHandlers.scala](../../../../examples/src/main/scala/org/tmt/nfiraos/sampleassembly/SampleAssemblyHandlers.scala) { #track-location }
+
+Java
+:   @@snip [JSampleAssemblyHandlers.java](../../../../examples/src/main/java/org/tmt/nfiraos/sampleassembly/JSampleAssemblyHandlers.java) { #track-location }
 
 
 
@@ -181,6 +201,9 @@ We use our worker actor to submit the command to the HCD, and then subscribe to 
 Scala
 :   @@snip [SampleAssemblyHandlers.scala](../../../../examples/src/main/scala/org/tmt/nfiraos/sampleassembly/SampleAssemblyHandlers.scala) { #worker-actor }
 
+Java
+:   @@snip [SampleAssemblyHandlers.java](../../../../examples/src/main/java/org/tmt/nfiraos/sampleassembly/JSampleAssemblyHandlers.java) { #worker-actor }
+
 
 ## Matchers
 
@@ -216,21 +239,33 @@ Go to the project root directory and type `sbt "<deploy-module>/runMain <mainCla
 If you accept the defaults for the template, it will be `org.tmt.nfiraos.sampledeploy.SampleContainerCmdApp`.  If you are having problems
 determining the class name, use `sbt run` and it will prompt you the possibilities.
 - `<path-to-config-file>` is the filename, which can be an absolute path or relative to the directory of the deployment module.  If using defaults,
-this would be `src/main/resources/SampleAssemblyContainer.conf`.
+this would be `src/main/resources/SampleContainer.conf` for Scala, and `src/main/resources/JSampleContainer.conf` for Java.
 
 So if using the template defaults, the full command would be 
-`sbt "sample-deploy/runMain org.tmt.nfiraos.sampledeploy.SampleContainerCmdApp --local src/main/resources/SampleAssemblyContainer.conf"`
+
+Scala
+:    
+```
+sbt "sample-deploy/runMain org.tmt.nfiraos.sampledeploy.SampleContainerCmdApp --local src/main/resources/SampleContainer.conf"
+```
+
+Java
+:    
+```
+sbt "sample-deploy/runMain org.tmt.nfiraos.sampledeploy.SampleContainerCmdApp --local src/main/resources/JSampleContainer.conf"
+```
 
 Like with the HCD, the `sbt stage` command can also be used to create binaries in the `target/universal/stage/bin` directories of the root project.
 
 To run using the deployment packaging, follow the steps below:
- - Run `sbt sample-deploy/universal:packageBin`, this will create self contained zip in `sample-deploy/target/universal` directory.
- - Unzip the generated zip file and enter into `bin` directory.
- - You will see four scripts in the `bin` directory (two bash scripts and two windows scripts).
- - If you want to start multiple containers on a host machine, follow this guide @ref:[here](../apps/hostconfig.md#examples).
- - If you want to start multiple components in container mode or single component in standalone mode, follow this guide @ref:[here](../framework/deploying-components.md).
- - Example to run container:    `./sample-container-cmd-app --local ../../../../sample-deploy/src/main/resources/SampleAssemblyContainer.conf`
- - Example to run host config:  `./sample-host-config-app --local ../../../../sample-deploy/src/main/resources/SampleHostConfig.conf -s ./sample-container-cmd-app`
+
+- Run `sbt sample-deploy/universal:packageBin`, this will create self contained zip in `sample-deploy/target/universal` directory.
+- Unzip the generated zip file and enter into `bin` directory.
+- You will see four scripts in the `bin` directory (two bash scripts and two windows scripts).
+- If you want to start multiple containers on a host machine, follow this guide @ref:[here](../apps/hostconfig.md#examples).
+- If you want to start multiple components in container mode or single component in standalone mode, follow this guide @ref:[here](../framework/deploying-components.md).
+- Example to run container:    `./sample-container-cmd-app --local ../../../../sample-deploy/src/main/resources/SampleContainer.conf`
+- Example to run host config:  `./sample-host-config-app --local ../../../../sample-deploy/src/main/resources/SampleHostConfig.conf -s ./sample-container-cmd-app`
 
 @@@ note { title=Note }
 

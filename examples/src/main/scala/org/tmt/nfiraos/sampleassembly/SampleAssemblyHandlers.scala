@@ -63,7 +63,7 @@ class SampleAssemblyHandlers(
     val sleepTimeParam: Parameter[Long] = sleepTimeKey.set(5000).withUnits(Units.millisecond)
     val setupCommand                    = Setup(componentInfo.prefix, CommandName("sleep"), Some(ObsId("2018A-001"))).add(sleepTimeParam)
 
-    // Submit command, and handle validation response.  Final response is returned as a Future
+    // Submit command, and handle validation response. Final response is returned as a Future
     val submitCommandResponseF: Future[CommandResponse] = hcd.submit(setupCommand).flatMap {
       case _: Accepted =>
         // If valid, subscribe to the HCD's CommandResponseManager
@@ -88,6 +88,7 @@ class SampleAssemblyHandlers(
     log.info("In Assembly initialize")
     Future.unit
   }
+
   override def onShutdown(): Future[Unit] = {
     log.info("Assembly is shutting down.")
     Future.unit
