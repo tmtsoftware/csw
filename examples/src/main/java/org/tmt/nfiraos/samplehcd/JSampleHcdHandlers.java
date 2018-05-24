@@ -75,7 +75,7 @@ public class JSampleHcdHandlers extends JComponentHandlers {
 
     private ActorRef<WorkerCommand> createWorkerActor() {
         return actorContext.spawn(
-                Behaviors.immutable((ctx, msg) -> {
+                Behaviors.receiveMessage(msg -> {
                     if (msg instanceof Sleep) {
                         Sleep sleep = (Sleep) msg;
                         log.trace(() -> "WorkerActor received sleep command with time of " + sleep.timeInMillis + " ms");
