@@ -9,7 +9,7 @@ import akka.remote.testkit.MultiNodeSpec
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.sys.process
-import scala.sys.process.{stringToProcess, ProcessLogger}
+import scala.sys.process.{stringToProcess, FileProcessLogger, ProcessLogger}
 import scala.util.Random
 
 trait SystemMonitoringSupport { _: MultiNodeSpec ⇒
@@ -24,6 +24,14 @@ trait SystemMonitoringSupport { _: MultiNodeSpec ⇒
   val perfScriptsDir: String = System.getProperty("user.dir") + "/scripts/perf"
   val perfJavaFlamesPath     = s"$homeDir/TMT/perf-map-agent/bin/perf-java-flames"
   val topResultsPath         = s"$homeDir/perf/top_${Instant.now()}.log"
+  val jstatResultsPath       = s"$homeDir/perf/jstat/${myself.name}_jstat_${pid}_${Instant.now()}.log"
+  val jstatPlotPath          = "/Users/pritamkadam/TMT/pritam/jstatplot/target/universal/stage/bin/jstatplot"
+
+  def plotCpuUsageGraph(): process.Process                          = executeCmd(s"$perfScriptsDir/cpu_plot.sh $topResultsPath")
+  def plotMemoryUsageGraph(): process.Process                       = executeCmd(s"$perfScriptsDir/memory_plot.sh $topResultsPath")
+  def plotLatencyHistogram(inputFilesPath: String): process.Process = executeCmd(s"$perfScriptsDir/hist_plot.sh $inputFilesPath")
+  def plotJstat(): Option[process.Process] =
+    if (exist(jstatPlotPath)) Some(executeCmd(s"$jstatPlotPath -m $jstatResultsPath")) else None
 
   def runTop(): Option[process.Process] = {
     Thread.sleep(Random.nextInt(2) * 1000)
@@ -33,11 +41,17 @@ trait SystemMonitoringSupport { _: MultiNodeSpec ⇒
     else None
   }
 
-  def runJstat(): process.Process = executeCmd(s"$perfScriptsDir/jstat.sh $pid ${myself.name}")
+  def runJstat(): Option[FileProcessLogger] = {
+    val outFile: File = new File(jstatResultsPath)
+    outFile.getParentFile.mkdirs()
+    outFile.createNewFile()
 
-  def plotCpuUsageGraph(): process.Process                          = executeCmd(s"$perfScriptsDir/cpu_plot.sh $topResultsPath")
-  def plotMemoryUsageGraph(): process.Process                       = executeCmd(s"$perfScriptsDir/memory_plot.sh $topResultsPath")
-  def plotLatencyHistogram(inputFilesPath: String): process.Process = executeCmd(s"$perfScriptsDir/hist_plot.sh $inputFilesPath")
+    val cmd = s"jstat -gc -t $pid 1s"
+    println(s"[Info] Executing command : [$cmd]")
+    val processLogger = ProcessLogger(outFile)
+    if (cmd.run(processLogger).isAlive()) Some(processLogger)
+    else None
+  }
 
   /**
    * Runs `perf-java-flames` script on given node (JVM process).
@@ -46,31 +60,30 @@ trait SystemMonitoringSupport { _: MultiNodeSpec ⇒
    * Options are currently to be passed in via `export PERF_MAP_OPTIONS` etc.
    */
   def runPerfFlames(nodes: RoleName*)(delay: FiniteDuration, time: FiniteDuration = 15.seconds): Unit = {
-    if (isPerfJavaFlamesAvailable && isNode(nodes: _*)) {
+    if (exist(perfJavaFlamesPath) && isNode(nodes: _*)) {
       import scala.concurrent.ExecutionContext.Implicits.global
 
       val afterDelay = akka.pattern.after(delay, system.scheduler)(Future.successful("GO!"))
       afterDelay onComplete { it ⇒
         val perfCommand = s"$perfJavaFlamesPath $pid"
-        println(s"[perf @ $myself($pid)][OUT]: " + perfCommand)
+        println(s"[perf @ ${myself.name}($pid)][OUT]: " + perfCommand)
 
         executeCmd(perfCommand)
       }
     }
   }
 
-  def isPerfJavaFlamesAvailable: Boolean = {
-    val isIt = new File(perfJavaFlamesPath).exists()
-    if (!isIt) println(s"[Warning] perf-java-flames not available under [$perfJavaFlamesPath]! Skipping perf profiling.")
+  private def exist(file: String): Boolean = {
+    val isIt = new File(file).exists()
+    if (!isIt) println(s"[Warning] $file does not exist.")
     isIt
   }
 
   private def executeCmd(cmd: String): process.Process = {
+    println(s"[Info] Executing command : [$cmd]")
     cmd.run(new ProcessLogger {
-      override def buffer[T](f: ⇒ T): T = f
-
+      override def buffer[T](f: ⇒ T): T   = f
       override def out(s: ⇒ String): Unit = println(s"[perf @ $myself($pid)][OUT] " + s)
-
       override def err(s: ⇒ String): Unit = println(s"[perf @ $myself($pid)][ERR] " + s)
     })
   }

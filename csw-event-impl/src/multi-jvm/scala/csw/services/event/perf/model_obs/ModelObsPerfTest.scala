@@ -72,7 +72,13 @@ class ModelObsPerfTestMultiJvmNode2 extends ModelObsPerfTest
 class ModelObsPerfTest extends BasePerfSuite {
 
   override def afterAll(): Unit = {
-    if (topProcess.isDefined) plotLatencyHistogram(s"${BenchmarkFileReporter.targetDirectory.toPath}/$scenarioName/Aggregated-*")
+    runOn(roles.last) {
+      throughputPlots.printTable()
+      latencyPlots.printTable()
+      printTotalDropped()
+      printTotalOutOfOrderCount()
+    }
+    topProcess.foreach(_ ⇒ plotLatencyHistogram(s"${BenchmarkFileReporter.targetDirectory.toPath}/$scenarioName/Aggregated-*"))
     super.afterAll()
   }
 

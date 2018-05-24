@@ -30,9 +30,8 @@ object BenchmarkFileReporter {
       override val testName: String = test
 
       val testResultFile: File = {
-        val fileName  = s"$testName-results.txt"
-        val fileName1 = s"$dir/$testName-results.txt"
-        val file      = new File(fileName1)
+        val fileName = s"$dir/$testName-results.txt"
+        val file     = new File(fileName)
         Files.deleteIfExists(file.toPath)
         file.getParentFile.mkdirs()
         file.createNewFile()

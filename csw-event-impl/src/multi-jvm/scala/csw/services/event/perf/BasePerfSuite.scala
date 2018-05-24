@@ -12,7 +12,7 @@ import csw.services.event.scaladsl.{EventPublisher, EventSubscriber}
 import org.scalatest.{BeforeAndAfterAll, FunSuiteLike, Matchers}
 
 import scala.concurrent.duration.{Duration, DurationDouble, FiniteDuration}
-import scala.sys.process.Process
+import scala.sys.process.{FileProcessLogger, Process}
 
 class BasePerfSuite
     extends MultiNodeSpec(ModelObsMultiNodeConfig)
@@ -34,10 +34,11 @@ class BasePerfSuite
 
   var topProcess: Option[Process] = None
 
-  var throughputPlots: PlotResult        = PlotResult()
-  var latencyPlots: LatencyPlots         = LatencyPlots()
-  var totalDropped: Map[String, Long]    = Map.empty
-  var outOfOrderCount: Map[String, Long] = Map.empty
+  var throughputPlots: PlotResult                   = PlotResult()
+  var latencyPlots: LatencyPlots                    = LatencyPlots()
+  var totalDropped: Map[String, Long]               = Map.empty
+  var outOfOrderCount: Map[String, Long]            = Map.empty
+  var jstatProcessLogger: Option[FileProcessLogger] = None
 
   val defaultTimeout: Duration   = 1.minute
   val maxTimeout: FiniteDuration = 1.hour
@@ -57,22 +58,21 @@ class BasePerfSuite
 
   override def afterAll(): Unit = {
     reporterExecutor.shutdown()
-    runOn(roles.last) {
-      throughputPlots.printTable()
-      latencyPlots.printTable()
-      printTotalDropped()
-      printTotalOutOfOrderCount()
+    jstatProcessLogger.foreach { p ⇒
+      p.flush()
+      p.close()
     }
     topProcess.foreach { top ⇒
       top.destroy()
       plotCpuUsageGraph()
       plotMemoryUsageGraph()
     }
+    plotJstat().foreach(_.exitValue())
     multiNodeSpecAfterAll()
   }
 
   def startSystemMonitoring(): Unit = {
-    runJstat()
+    jstatProcessLogger = runJstat()
     runPerfFlames(roles: _*)(delay = 15.seconds, time = 60.seconds)
     topProcess = runTop()
   }

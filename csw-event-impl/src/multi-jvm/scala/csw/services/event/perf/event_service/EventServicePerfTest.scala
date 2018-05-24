@@ -53,20 +53,16 @@ class EventServicePerfTest extends BasePerfSuite {
   def adjustedTotalMessages(n: Long): Long = (n * totalMessagesFactor).toLong
 
   override def afterAll(): Unit = {
-    reporterExecutor.shutdown()
     runOn(subscriberNodes.head) {
       throughputPlots.printTable()
       latencyPlots.printTable()
       printTotalDropped()
       printTotalOutOfOrderCount()
     }
-    topProcess.foreach { top ⇒
-      top.destroy()
-      plotCpuUsageGraph()
-      plotMemoryUsageGraph()
-      scenarios.foreach(s ⇒ plotLatencyHistogram(s"${BenchmarkFileReporter.targetDirectory.toPath}/${s.name}/Aggregated-*"))
-    }
-    multiNodeSpecAfterAll()
+    topProcess.foreach(
+      _ ⇒ scenarios.foreach(s ⇒ plotLatencyHistogram(s"${BenchmarkFileReporter.targetDirectory.toPath}/${s.name}/Aggregated-*"))
+    )
+    super.afterAll()
   }
 
   def testScenario(scenarioName: String, testSettings: TestSettings): Unit = {
