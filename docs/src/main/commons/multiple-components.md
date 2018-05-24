@@ -40,9 +40,9 @@ prefix = "nfiraos.sample"
 locationServiceUsage = RegisterAndTrackServices
 connections = [
   {
-    name: "SampleHcd"
-    componentType: hcd
-    connectionType: akka
+        name: "SampleHcd"
+        componentType: hcd
+        connectionType: akka
   }
 ]
 ```
@@ -57,9 +57,9 @@ prefix = "nfiraos.sample"
 locationServiceUsage = RegisterAndTrackServices
 connections = [
   {
-    name: "JSampleHcd"
-    componentType: hcd
-    connectionType: akka
+        name: "JSampleHcd"
+        componentType: hcd
+        connectionType: akka
   }
 ]
 ```

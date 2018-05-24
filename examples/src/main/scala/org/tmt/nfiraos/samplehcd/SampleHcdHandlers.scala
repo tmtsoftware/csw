@@ -60,9 +60,11 @@ class SampleHcdHandlers(
     log.info("In HCD initialize")
     Future.unit
   }
+
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = {
     log.debug(s"TrackingEvent received: ${trackingEvent.connection.name}")
   }
+
   override def onShutdown(): Future[Unit] = {
     log.info("HCD is shutting down")
     Future.unit

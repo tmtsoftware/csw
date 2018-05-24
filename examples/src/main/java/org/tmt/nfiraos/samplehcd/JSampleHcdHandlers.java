@@ -60,10 +60,10 @@ public class JSampleHcdHandlers extends JComponentHandlers {
     }
 
     //#worker-actor
-    private static class WorkerCommand {
+    private interface WorkerCommand {
     }
 
-    private static final class Sleep extends WorkerCommand {
+    private static final class Sleep implements WorkerCommand {
         private final Id runId;
         private final long timeInMillis;
 
@@ -78,12 +78,12 @@ public class JSampleHcdHandlers extends JComponentHandlers {
                 Behaviors.immutable((ctx, msg) -> {
                     if (msg instanceof Sleep) {
                         Sleep sleep = (Sleep) msg;
-                        log.trace("WorkerActor received sleep command with time of " + sleep.timeInMillis + " ms");
+                        log.trace(() -> "WorkerActor received sleep command with time of " + sleep.timeInMillis + " ms");
                         // simulate long running command
                         Thread.sleep(sleep.timeInMillis);
                         commandResponseManager.addOrUpdateCommand(sleep.runId, new CommandResponse.Completed(sleep.runId));
                     } else {
-                        log.error("Unsupported messsage type");
+                        log.error("Unsupported message type");
                     }
                     return Behaviors.same();
                 }),
@@ -96,21 +96,17 @@ public class JSampleHcdHandlers extends JComponentHandlers {
     //#initialize
     @Override
     public CompletableFuture<Void> jInitialize() {
-        return CompletableFuture.runAsync(() -> {
-            log.info("In HCD initialize");
-        });
-    }
-
-    @Override
-    public CompletableFuture<Void> jOnShutdown() {
-        return CompletableFuture.runAsync(() -> {
-            log.info("HCD is shutting down");
-        });
+        return CompletableFuture.runAsync(() -> log.info("In HCD initialize"));
     }
 
     @Override
     public void onLocationTrackingEvent(TrackingEvent trackingEvent) {
-        log.debug("TrackingEvent received: " + trackingEvent.connection().name());
+        log.debug(() -> "TrackingEvent received: " + trackingEvent.connection().name());
+    }
+
+    @Override
+    public CompletableFuture<Void> jOnShutdown() {
+        return CompletableFuture.runAsync(() -> log.info("HCD is shutting down"));
     }
     //#initialize
 
@@ -118,7 +114,7 @@ public class JSampleHcdHandlers extends JComponentHandlers {
     @Override
     public CommandResponse validateCommand(ControlCommand controlCommand) {
         String commandName = controlCommand.commandName().name();
-        log.info("Validating command: " + commandName);
+        log.info(() -> "Validating command: " + commandName);
         if (commandName.equals("sleep")) {
             return new CommandResponse.Accepted(controlCommand.runId());
         }
@@ -130,11 +126,11 @@ public class JSampleHcdHandlers extends JComponentHandlers {
     //#onSetup
     @Override
     public void onSubmit(ControlCommand controlCommand) {
-        log.info("Handling command: " + controlCommand.commandName());
+        log.info(() -> "Handling command: " + controlCommand.commandName());
 
         if (controlCommand instanceof Setup) {
             onSetup((Setup) controlCommand);
-        } else if (controlCommand instanceof Observe){
+        } else if (controlCommand instanceof Observe) {
             // implement (or not)
         }
     }
@@ -150,7 +146,7 @@ public class JSampleHcdHandlers extends JComponentHandlers {
             Parameter<Long> sleepTimeParam = sleepTimeParamOption.get();
             long sleepTimeInMillis = sleepTimeParam.head();
 
-            log.info("command payload: " + sleepTimeParam.keyName() + " = " + sleepTimeInMillis);
+            log.info(() -> "command payload: " + sleepTimeParam.keyName() + " = " + sleepTimeInMillis);
 
             workerActor.tell(new Sleep(setup.runId(), sleepTimeInMillis));
         }
@@ -160,16 +156,13 @@ public class JSampleHcdHandlers extends JComponentHandlers {
 
     @Override
     public void onOneway(ControlCommand controlCommand) {
-
     }
 
     @Override
     public void onGoOffline() {
-
     }
 
     @Override
     public void onGoOnline() {
-
     }
 }

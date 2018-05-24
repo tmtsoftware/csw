@@ -46,6 +46,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
     private ActorContext<TopLevelActorMessage> actorContext;
     private ILocationService locationService;
     private ComponentInfo componentInfo;
+
     private final ActorRef<WorkerCommand> commandSender;
 
     JSampleAssemblyHandlers(
@@ -64,14 +65,13 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
         this.locationService = locationService;
         this.componentInfo = componentInfo;
         this.commandSender = createWorkerActor();
-
     }
 
     //#worker-actor
-    private static class WorkerCommand {
+    private interface WorkerCommand {
     }
 
-    private static final class SendCommand extends WorkerCommand {
+    private static final class SendCommand implements WorkerCommand {
         private final JCommandService hcd;
 
         private SendCommand(JCommandService hcd) {
@@ -100,11 +100,13 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
         // Construct Setup command
         Key<Long> sleepTimeKey = JKeyTypes.LongKey().make("SleepTime");
         Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L).withUnits(JUnits.millisecond);
+
         Setup setupCommand = new Setup(new Prefix(componentInfo.prefix()), new CommandName("sleep"), Optional.of(new ObsId("2018A-001"))).add(sleepTimeParam);
+
         Timeout submitTimeout = new Timeout(1, TimeUnit.SECONDS);
         Timeout commandResponseTimeout = new Timeout(10, TimeUnit.SECONDS);
 
-        // Submit command, and handle validation response.  Final response is returned as a Future
+        // Submit command, and handle validation response. Final response is returned as a Future
         CompletableFuture<CommandResponse> submitCommandResponseF = hcd.submit(setupCommand, submitTimeout)
                 .thenCompose(commandResponse -> {
                     if (commandResponse instanceof CommandResponse.Accepted) {
@@ -117,51 +119,42 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
 
 
         // Wait for final response, and log result
-        try {
-            CommandResponse commandResponse = submitCommandResponseF.get();
+        submitCommandResponseF.toCompletableFuture().thenAccept(commandResponse -> {
             if (commandResponse instanceof CommandResponse.Completed) {
                 log.info("Command completed successfully");
             } else if (commandResponse instanceof CommandResponse.Error) {
                 CommandResponse.Error x = (CommandResponse.Error) commandResponse;
-                log.error("Command Completed with error: " + x.message());
+                log.error(() -> "Command Completed with error: " + x.message());
+            } else {
+                log.error("Command failed");
             }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            log.error("Command was interrupted");
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-            log.error("Command was not completed due to error: " + e.getMessage());
-        }
+        });
     }
     //#worker-actor
 
     //#initialize
     @Override
     public CompletableFuture<Void> jInitialize() {
-        return CompletableFuture.runAsync(() -> {
-            log.info("In Assembly initialize");
-        });
+        return CompletableFuture.runAsync(() -> log.info("In Assembly initialize"));
     }
 
     @Override
     public CompletableFuture<Void> jOnShutdown() {
-        return CompletableFuture.runAsync(() -> {
-            log.info("Assembly is shutting down.");
-        });
+        return CompletableFuture.runAsync(() -> log.info("Assembly is shutting down."));
     }
     //#initialize
 
     //#track-location
     @Override
     public void onLocationTrackingEvent(TrackingEvent trackingEvent) {
-        log.debug("onLocationTrackingEvent called: "+ trackingEvent.toString());
+        log.debug(() -> "onLocationTrackingEvent called: " + trackingEvent.toString());
         if (trackingEvent instanceof LocationUpdated) {
             LocationUpdated updated = (LocationUpdated) trackingEvent;
             Location location = updated.location();
             JCommandService hcd = new JCommandService((AkkaLocation) (location), actorContext.getSystem());
             commandSender.tell(new SendCommand(hcd));
         } else if (trackingEvent instanceof LocationRemoved) {
-           log.info("HCD no longer available");
+            log.info("HCD no longer available");
         }
     }
     //#track-location
@@ -173,21 +166,17 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
 
     @Override
     public void onSubmit(ControlCommand controlCommand) {
-
     }
 
     @Override
     public void onOneway(ControlCommand controlCommand) {
-
     }
 
     @Override
     public void onGoOffline() {
-
     }
 
     @Override
     public void onGoOnline() {
-
     }
 }

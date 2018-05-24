@@ -106,7 +106,7 @@ Java
 
 @@@ note { title=Note }
 
-`behaviorFactoryClassName` refers to class name of the concrete implementation of `ComponentBehaviorFactory`, which is `SampleHcdBehaviorFactory` for Scala in above example, `JSampleBHcdBehaviorFactory` for Java.
+`behaviorFactoryClassName` refers to class name of the concrete implementation of `ComponentBehaviorFactory`, which is `SampleHcdBehaviorFactory` for Scala in above example, `JSampleHcdBehaviorFactory` for Java.
 
 @@@
 
