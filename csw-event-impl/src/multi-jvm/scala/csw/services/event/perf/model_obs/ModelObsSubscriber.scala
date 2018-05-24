@@ -9,15 +9,22 @@ import csw.messages.events.{Event, EventKey, EventName, SystemEvent}
 import csw.services.event.perf.reporter.{ResultReporter, TestRateReporter}
 import csw.services.event.perf.utils.EventUtils
 import csw.services.event.perf.utils.EventUtils._
-import csw.services.event.perf.wiring.TestWiring
+import csw.services.event.perf.wiring.{TestConfigs, TestWiring}
 import csw.services.event.scaladsl.{EventSubscriber, EventSubscription}
 import org.HdrHistogram.Histogram
 
 import scala.concurrent.Future
 
-class ModelObsSubscriber(subscribeKey: String, subSetting: SubSetting, reporter: TestRateReporter, testWiring: TestWiring) {
+class ModelObsSubscriber(
+    subscribeKey: String,
+    subSetting: SubSetting,
+    reporter: TestRateReporter,
+    testConfig: TestConfigs,
+    testWiring: TestWiring
+) {
 
   import subSetting._
+  import testConfig._
   import testWiring.wiring._
 
   private val subscriber: EventSubscriber = testWiring.subscriber
@@ -34,11 +41,17 @@ class ModelObsSubscriber(subscribeKey: String, subSetting: SubSetting, reporter:
   var outOfOrderCount = 0
   var lastCurrentId   = 0
 
-  private val eventKeys    = Set(EventKey(s"$testEventKey-$subscribeKey"), EventKey(s"${prefix.prefix}.$endEventS-$subscribeKey"))
-  private val eventsToDrop = warmup + eventKeys.size //inclusive of latest events from subscription
+  private val eventKeys       = Set(EventKey(s"$testEventKey-$subscribeKey"), EventKey(s"${prefix.prefix}.$endEventS-$subscribeKey"))
+  private val eventPattern    = s"*$testEventKey-$subscribeKey"
+  private val endEventPattern = s"*${EventUtils.endEventS}-$subscribeKey"
 
-  val subscription: Source[Event, EventSubscription] = subscriber.subscribe(eventKeys)
-  val endEventName                                   = EventName(s"${EventUtils.endEventS}-$subscribeKey")
+  private val eventsToDrop = warmup + eventKeys.size //inclusive of latest events from subscription
+  def subscription: Source[Event, EventSubscription] =
+    if (patternBasedSubscription & subId % patternsFactor == 0) {
+      subscriber.pSubscribe(eventPattern).mergeMat(subscriber.pSubscribe(endEventPattern))(Keep.right)
+    } else subscriber.subscribe(eventKeys)
+
+  val endEventName = EventName(s"${EventUtils.endEventS}-$subscribeKey")
 
   def startSubscription(): Future[Done] =
     subscription

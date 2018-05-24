@@ -88,7 +88,7 @@ class ModelObsPerfTest extends BasePerfSuite {
       val subscribers = subSettings.flatMap { subSetting ⇒
         import subSetting._
         (1 to noOfSubs).map { subId ⇒
-          val subscriber = new ModelObsSubscriber(s"${subSetting.key}-$subId", subSetting, rep, testWiring)
+          val subscriber = new ModelObsSubscriber(s"${subSetting.key}-$subId", subSetting, rep, testConfigs, testWiring)
           val doneF      = subscriber.startSubscription()
           (doneF, subscriber)
         }
