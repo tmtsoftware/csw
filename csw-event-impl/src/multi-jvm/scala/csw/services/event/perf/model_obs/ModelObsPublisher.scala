@@ -12,11 +12,13 @@ import csw.services.event.scaladsl.EventPublisher
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationDouble
 
-class ModelObsPublisher(publishKey: String,
-                        pubSetting: PubSetting,
-                        testConfig: TestConfigs,
-                        testWiring: TestWiring,
-                        sharedPublisher: EventPublisher) {
+class ModelObsPublisher(
+    publishKey: String,
+    pubSetting: PubSetting,
+    testConfig: TestConfigs,
+    testWiring: TestWiring,
+    sharedPublisher: EventPublisher
+) {
   import pubSetting._
   import testWiring.wiring._
 

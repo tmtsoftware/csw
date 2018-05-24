@@ -9,15 +9,22 @@ import csw.messages.events.{Event, EventKey, EventName, SystemEvent}
 import csw.services.event.perf.reporter.{ResultReporter, TestRateReporter}
 import csw.services.event.perf.utils.EventUtils
 import csw.services.event.perf.utils.EventUtils._
-import csw.services.event.perf.wiring.TestWiring
+import csw.services.event.perf.wiring.{TestConfigs, TestWiring}
 import csw.services.event.scaladsl.{EventSubscriber, EventSubscription}
 import org.HdrHistogram.Histogram
 
 import scala.concurrent.Future
 
-class ModelObsSubscriber(subscribeKey: String, subSetting: SubSetting, reporter: TestRateReporter, testWiring: TestWiring) {
+class ModelObsSubscriber(
+    subscribeKey: String,
+    subSetting: SubSetting,
+    reporter: TestRateReporter,
+    testConfig: TestConfigs,
+    testWiring: TestWiring
+) {
 
   import subSetting._
+  import testConfig._
   import testWiring.wiring._
 
   private val subscriber: EventSubscriber = testWiring.subscriber
@@ -39,12 +46,11 @@ class ModelObsSubscriber(subscribeKey: String, subSetting: SubSetting, reporter:
   private val endEventPattern = s"*${EventUtils.endEventS}-$subscribeKey"
 
   private val eventsToDrop = warmup + eventKeys.size //inclusive of latest events from subscription
-  def subscription: Source[Event, EventSubscription] = {
-    if (subId % 2 == 0) {
+  def subscription: Source[Event, EventSubscription] =
+    if (patternBasedSubscription & subId % patternsFactor == 0) {
       subscriber.pSubscribe(eventPattern).mergeMat(subscriber.pSubscribe(endEventPattern))(Keep.right)
     } else subscriber.subscribe(eventKeys)
-//    subscriber.subscribe(eventKeys)
-  }
+
   val endEventName = EventName(s"${EventUtils.endEventS}-$subscribeKey")
 
   def startSubscription(): Future[Done] =
