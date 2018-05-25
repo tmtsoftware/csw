@@ -18,6 +18,7 @@ import org.scalatest.concurrent.Eventually
 import org.scalatest.testng.TestNGSuite
 import org.testng.annotations._
 
+import scala.collection.mutable.ArrayBuffer
 import scala.collection.{immutable, mutable}
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationLong
@@ -161,8 +162,8 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
     val queue2: mutable.Queue[Event] = new mutable.Queue[Event]()
     val event1                       = makeEvent(1)
 
-    val callback: Event ⇒ Future[Event]  = (event) ⇒ Future.successful(queue.enqueue(event)).map(_ ⇒ event)(ec)
-    val callback2: Event ⇒ Future[Event] = (event) ⇒ Future.successful(queue2.enqueue(event)).map(_ ⇒ event)(ec)
+    val callback: Event ⇒ Future[Event]  = event ⇒ Future.successful(queue.enqueue(event)).map(_ ⇒ event)(ec)
+    val callback2: Event ⇒ Future[Event] = event ⇒ Future.successful(queue2.enqueue(event)).map(_ ⇒ event)(ec)
 
     val cancellable = publisher.publish(eventGenerator(0), 1.millis)
 
@@ -178,23 +179,30 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
   }
 
   //DEOPSCSW-338: Provide callback for Event alerts
+  //DEOPSCSW-346: Subscribe to event irrespective of Publisher's existence
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_subscribe_with_callback(baseProperties: BaseProperties): Unit = {
     import baseProperties._
     import baseProperties.wiring._
 
-    val event1 = makeDistinctEvent(203)
+    var listOfPublishedEvents: ArrayBuffer[Event] = ArrayBuffer.empty
 
     val testProbe              = TestProbe[Event]()(actorSystem.toTyped)
     val callback: Event ⇒ Unit = testProbe.ref ! _
 
-    publisher.publish(event1).await
+    // all events are published to same topic with different id's
+    (1 to 5).foreach { id ⇒
+      val event = makeEvent(id)
+      listOfPublishedEvents += event
+      publisher.publish(event).await
+    }
+
     Thread.sleep(500) // Needed for redis set which is fire and forget operation
-    val subscription = subscriber.subscribeCallback(Set(event1.eventKey), callback)
-    testProbe.expectMessage(event1)
+    val subscription = subscriber.subscribeCallback(Set(listOfPublishedEvents.head.eventKey), callback)
+    testProbe.expectMessage(listOfPublishedEvents.last)
     subscription.unsubscribe().await
 
-    publisher.publish(event1).await
+    publisher.publish(listOfPublishedEvents.last).await
     testProbe.expectNoMessage(200.millis)
   }
 

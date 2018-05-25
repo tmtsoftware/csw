@@ -49,7 +49,7 @@ trait SystemMonitoringSupport { _: MultiNodeSpec ⇒
         .getLines()
         .zipWithIndex
         .map {
-          case (line, n) ⇒ if (n == 0) s"Timestamp $line" else s"$n \t $line"
+          case (line, n) ⇒ if (n == 0) s"Timestamp $line" else s"$n \t\t $line"
         }
         .foreach(w.println)
       w.close()
