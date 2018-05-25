@@ -109,8 +109,8 @@ trait SystemMonitoringSupport { _: MultiNodeSpec ⇒
     println(s"[Info] Executing command : [$cmd]")
     cmd.run(new ProcessLogger {
       override def buffer[T](f: ⇒ T): T   = f
-      override def out(s: ⇒ String): Unit = println(s"[perf @ $myself($pid)][OUT] " + s)
-      override def err(s: ⇒ String): Unit = println(s"[perf @ $myself($pid)][ERR] " + s)
+      override def out(s: ⇒ String): Unit = println(s"[Info @ ${myself.name}($pid)] " + s)
+      override def err(s: ⇒ String): Unit = println(s"[Error @ ${myself.name}($pid)] " + s)
     })
   }
 

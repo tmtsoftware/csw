@@ -1,4 +1,4 @@
-package csw.services.event.perf.event_service
+package csw.services.event.perf.commons
 
 import java.time.Instant
 import java.util.concurrent.TimeUnit.SECONDS
@@ -15,25 +15,26 @@ import org.HdrHistogram.Histogram
 
 import scala.concurrent.Future
 
-class Subscriber(
-    testSettings: TestSettings,
-    testConfigs: TestConfigs,
-    reporter: TestRateReporter,
-    publisherId: Int,
+class PerfSubscriber(
+    name: String,
     subscriberId: Int,
-    testWiring: TestWiring,
-    sharedSubscriber: EventSubscriber
+    subscribeKey: String,
+    eventsSetting: EventsSetting,
+    reporter: TestRateReporter,
+    sharedSubscriber: EventSubscriber,
+    testConfigs: TestConfigs,
+    testWiring: TestWiring
 ) {
 
+  import eventsSetting._
   import testConfigs._
-  import testSettings._
   import testWiring.wiring._
 
   private val subscriber: EventSubscriber =
-    if (shareConnection) sharedSubscriber else testWiring.subscriber
+    if (testConfigs.shareConnection) sharedSubscriber else testWiring.subscriber
 
   val histogram: Histogram   = new Histogram(SECONDS.toNanos(10), 3)
-  private val resultReporter = new ResultReporter(testName, actorSystem)
+  private val resultReporter = new ResultReporter(name, actorSystem)
 
   var startTime       = 0L
   var totalTime       = 0L
@@ -42,11 +43,18 @@ class Subscriber(
   var outOfOrderCount = 0
   var lastCurrentId   = 0
 
-  private val eventKeys    = Set(EventKey(s"$testEventKey-$publisherId"), EventKey(s"${prefix.prefix}.$endEventS-$publisherId"))
-  private val eventsToDrop = warmupMsgs + eventKeys.size //inclusive of latest events from subscription
+  private val eventKeys       = Set(EventKey(s"$testEventKey-$subscribeKey"), EventKey(s"${prefix.prefix}.$endEventS-$subscribeKey"))
+  private val eventPattern    = s"*$testEventKey-$subscribeKey"
+  private val endEventPattern = s"*${EventUtils.endEventS}-$subscribeKey"
 
-  val subscription: Source[Event, EventSubscription] = subscriber.subscribe(eventKeys)
-  val endEventName                                   = EventName(s"${EventUtils.endEventS}-$publisherId")
+  private val eventsToDrop = warmup + eventKeys.size //inclusive of latest events from subscription
+
+  val endEventName = EventName(s"${EventUtils.endEventS}-$subscribeKey")
+
+  def subscription: Source[Event, EventSubscription] =
+    if (patternBasedSubscription & subscriberId % patternsFactor == 0) {
+      subscriber.pSubscribe(eventPattern).mergeMat(subscriber.pSubscribe(endEventPattern))(Keep.right)
+    } else subscriber.subscribe(eventKeys)
 
   def startSubscription(): Future[Done] =
     subscription
@@ -59,9 +67,7 @@ class Subscriber(
       .runForeach(report)
 
   private def report(event: Event): Unit = {
-
-    if (eventsReceived == 0)
-      startTime = getNanos(Instant.now()).toLong
+    if (eventsReceived == 0) startTime = getNanos(Instant.now()).toLong
 
     eventsReceived += 1
     val currentTime = getNanos(Instant.now()).toLong
@@ -80,9 +86,7 @@ class Subscriber(
     val inOrder   = currentId >= lastId
     lastId = currentId
 
-    if (!inOrder) {
-      outOfOrderCount += 1
-    }
+    if (!inOrder) outOfOrderCount += 1
   }
 
   def totalDropped(): Long = totalTestMsgs - eventsReceived

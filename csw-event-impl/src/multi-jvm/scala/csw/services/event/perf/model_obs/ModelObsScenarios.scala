@@ -1,6 +1,7 @@
 package csw.services.event.perf.model_obs
 
 import csw.messages.params.models.Subsystem.{AOESW, IRIS, NFIRAOS, TCS, WFOS}
+import csw.services.event.perf.model_obs.BaseSetting.{PubSetting, SubSetting}
 import csw.services.event.perf.wiring.TestConfigs
 
 class ModelObsScenarios(testConfigs: TestConfigs) {

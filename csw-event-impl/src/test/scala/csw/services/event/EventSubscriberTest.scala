@@ -185,7 +185,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
     import baseProperties._
     import baseProperties.wiring._
 
-    var listOfPublishedEvents: ArrayBuffer[Event] = ArrayBuffer.empty
+    val listOfPublishedEvents: ArrayBuffer[Event] = ArrayBuffer.empty
 
     val testProbe              = TestProbe[Event]()(actorSystem.toTyped)
     val callback: Event ⇒ Unit = testProbe.ref ! _
@@ -290,9 +290,8 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
     import redisProps._
     import redisProps.wiring._
 
-    val event1             = makeEvent(1)
-    val eventKey: EventKey = event1.eventKey
-    val testProbe          = TestProbe[Event]()(actorSystem.toTyped)
+    val event1    = makeEvent(1)
+    val testProbe = TestProbe[Event]()(actorSystem.toTyped)
     val subscription =
       subscriber.pSubscribe("*test*").toMat(Sink.foreach(e ⇒ { println(e); testProbe.ref ! e }))(Keep.left).run()
 

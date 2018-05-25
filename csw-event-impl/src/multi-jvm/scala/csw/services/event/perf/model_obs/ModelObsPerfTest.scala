@@ -8,6 +8,7 @@ import akka.remote.testkit.MultiNodeConfig
 import akka.testkit.typed.scaladsl
 import com.typesafe.config.ConfigFactory
 import csw.services.event.perf.BasePerfSuite
+import csw.services.event.perf.commons.{EventsSetting, PerfPublisher, PerfSubscriber}
 import csw.services.event.perf.reporter._
 import csw.services.event.perf.utils.EventUtils
 import csw.services.event.perf.utils.EventUtils.nanosToSeconds
@@ -15,23 +16,6 @@ import org.HdrHistogram.Histogram
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
-
-sealed trait BaseSetting {
-  def subsystem: String
-  def totalTestMsgs: Long
-  def rate: Int
-  def payloadSize: Int
-
-  val warmup: Int = rate * 20
-  val key         = s"$subsystem-${rate}Hz"
-}
-
-case class PubSetting(subsystem: String, noOfPubs: Int, totalTestMsgs: Long, rate: Int, payloadSize: Int) extends BaseSetting
-case class SubSetting(subsystem: String, noOfSubs: Int, totalTestMsgs: Long, rate: Int, payloadSize: Int) extends BaseSetting
-
-case class JvmSetting(name: String, pubSettings: List[PubSetting], subSettings: List[SubSetting])
-
-case class ModelObservatoryTestSettings(jvmSettings: List[JvmSetting])
 
 object ModelObsMultiNodeConfig extends MultiNodeConfig {
 
@@ -96,8 +80,17 @@ class ModelObsPerfTest extends BasePerfSuite {
       val subscribers = subSettings.flatMap { subSetting ⇒
         import subSetting._
         (1 to noOfSubs).map { subId ⇒
-          val subscriber = new ModelObsSubscriber(s"${subSetting.key}-$subId", subSetting, rep, testConfigs, testWiring)
-          val doneF      = subscriber.startSubscription()
+          val subscriber = new PerfSubscriber(
+            subsystem,
+            subId,
+            s"${subSetting.key}-$subId",
+            EventsSetting(totalTestMsgs, payloadSize, warmup, rate),
+            rep,
+            sharedSubscriber,
+            testConfigs,
+            testWiring
+          )
+          val doneF = subscriber.startSubscription()
           (doneF, subscriber)
         }
       }
@@ -119,8 +112,13 @@ class ModelObsPerfTest extends BasePerfSuite {
       pubSettings.foreach { pubSetting ⇒
         import pubSetting._
         (1 to noOfPubs).foreach { pubId ⇒
-          new ModelObsPublisher(s"${pubSetting.key}-$pubId", pubSetting, testConfigs, testWiring, sharedPublisher)
-            .startPublishingWithEventGenerator()
+          new PerfPublisher(
+            s"${pubSetting.key}-$pubId",
+            EventsSetting(totalTestMsgs, payloadSize, warmup, rate),
+            testConfigs,
+            testWiring,
+            sharedPublisher
+          ).startPublishingWithEventGenerator()
         }
       }
 
