@@ -60,7 +60,12 @@ class EventServicePerfTest extends BasePerfSuite {
       printTotalOutOfOrderCount()
     }
     topProcess.foreach(
-      _ ⇒ scenarios.foreach(s ⇒ plotLatencyHistogram(s"${BenchmarkFileReporter.targetDirectory.toPath}/${s.name}/Aggregated-*"))
+      _ ⇒
+        scenarios.foreach(
+          s ⇒
+            plotLatencyHistogram(s"${BenchmarkFileReporter.targetDirectory.toPath}/${s.name}/Aggregated-*",
+                                 s"(${s.name.split("-").last})")
+      )
     )
     super.afterAll()
   }

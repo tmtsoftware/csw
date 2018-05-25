@@ -27,9 +27,10 @@ trait SystemMonitoringSupport { _: MultiNodeSpec ⇒
   val jstatResultsPath       = s"$homeDir/perf/jstat/${myself.name}_jstat_${pid}_${Instant.now()}.log"
   val jstatPlotPath          = s"$homeDir/TMT/pritam/jstatplot/target/universal/stage/bin/jstatplot"
 
-  def plotCpuUsageGraph(): process.Process                          = executeCmd(s"$perfScriptsDir/cpu_plot.sh $topResultsPath")
-  def plotMemoryUsageGraph(): process.Process                       = executeCmd(s"$perfScriptsDir/memory_plot.sh $topResultsPath")
-  def plotLatencyHistogram(inputFilesPath: String): process.Process = executeCmd(s"$perfScriptsDir/hist_plot.sh $inputFilesPath")
+  def plotCpuUsageGraph(): process.Process    = executeCmd(s"$perfScriptsDir/cpu_plot.sh $topResultsPath")
+  def plotMemoryUsageGraph(): process.Process = executeCmd(s"$perfScriptsDir/memory_plot.sh $topResultsPath")
+  def plotLatencyHistogram(inputFilesPath: String, publishFreq: String): process.Process =
+    executeCmd(s"$perfScriptsDir/hist_plot.sh $inputFilesPath $publishFreq")
 
   /**
    * Make sure you have followed below steps before plotting:

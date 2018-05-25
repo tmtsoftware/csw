@@ -42,7 +42,7 @@ else
 fi
 
 echo "Adding headers in [$cpuUsagePath]"
-sed -i 1i"seconds\\tUser\\tSystem\\tIdle" ${cpuUsagePath}
+echo 'seconds   User    System  Idle' | cat - ${cpuUsagePath} > /tmp/$$ && mv /tmp/$$ ${cpuUsagePath}
 
 echo "============================================================================="
 echo "Plotting CPU usage graph using gnuplot at [$cpuUsageGraphPath]"
