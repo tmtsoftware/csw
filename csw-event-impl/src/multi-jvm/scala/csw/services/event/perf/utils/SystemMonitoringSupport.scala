@@ -1,6 +1,6 @@
 package csw.services.event.perf.utils
 
-import java.io.File
+import java.io.{File, PrintWriter}
 import java.time.Instant
 
 import akka.remote.testconductor.RoleName
@@ -38,8 +38,25 @@ trait SystemMonitoringSupport { _: MultiNodeSpec ⇒
    *  3. update value of jstatPlotPath from SystemMontoringSupport class with the generated path
    *      ex. $HOME/jstatplot/target/universal/stage/bin/jstatplot
    */
-  def plotJstat(): Option[process.Process] =
-    if (exist(jstatPlotPath)) Some(executeCmd(s"$jstatPlotPath -m $jstatResultsPath")) else None
+  def plotJstat(): Option[process.Process] = {
+    if (exist(jstatPlotPath)) {
+      val originalFile = new File(jstatResultsPath)
+      val tmpFile      = new File(s"$jstatResultsPath.tmp")
+      val w            = new PrintWriter(tmpFile)
+      scala.io.Source
+        .fromFile(new File(jstatResultsPath))
+        .getLines()
+        .zipWithIndex
+        .map {
+          case (line, n) ⇒ if (n == 0) s"Timestamp $line" else s"$n \t $line"
+        }
+        .foreach(w.println)
+      w.close()
+      tmpFile.renameTo(originalFile)
+
+      Some(executeCmd(s"$jstatPlotPath -m $jstatResultsPath"))
+    } else None
+  }
 
   def runTop(): Option[process.Process] = {
     Thread.sleep(Random.nextInt(2) * 1000)
@@ -54,7 +71,7 @@ trait SystemMonitoringSupport { _: MultiNodeSpec ⇒
     outFile.getParentFile.mkdirs()
     outFile.createNewFile()
 
-    val cmd = s"jstat -gc -t $pid 1s"
+    val cmd = s"jstat -gc $pid 1s"
     println(s"[Info] Executing command : [$cmd]")
     val processLogger = ProcessLogger(outFile)
     if (cmd.run(processLogger).isAlive()) Some(processLogger)

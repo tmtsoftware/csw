@@ -20,6 +20,8 @@ gnuplot <<- EOF
     set xlabel "Latency Percentiles"
     set ylabel "Latency in us"
     set title "Latency Plot"
+    set key out vert
+    set key right
     set style line 1 lc rgb '#8b1a0e' pt 1 ps 1 lt 2 lw 4
     set style line 2 lc rgb '#5e9c36' pt 6 ps 1 lt 2 lw 4
     set style line 11 lc rgb '#808080' lt 1

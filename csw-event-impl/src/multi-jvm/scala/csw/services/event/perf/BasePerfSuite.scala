@@ -58,16 +58,18 @@ class BasePerfSuite
 
   override def afterAll(): Unit = {
     reporterExecutor.shutdown()
-    jstatProcessLogger.foreach { p ⇒
-      p.flush()
-      p.close()
+    if (testConfigs.systemMonitoring) {
+      topProcess.foreach { top ⇒
+        top.destroy()
+        plotCpuUsageGraph()
+        plotMemoryUsageGraph()
+      }
+      jstatProcessLogger.foreach { p ⇒
+        p.flush()
+        p.close()
+      }
+      plotJstat().foreach(_.exitValue())
     }
-    topProcess.foreach { top ⇒
-      top.destroy()
-      plotCpuUsageGraph()
-      plotMemoryUsageGraph()
-    }
-    plotJstat().foreach(_.exitValue())
     multiNodeSpecAfterAll()
   }
 
