@@ -1,0 +1,7 @@
+-Dfile.encoding=UTF8
+-Xms1G
+-Xmx2G
+-Xss6M
+
+# Uncomment below jvm option if you are using jdk9
+#--add-modules=java.xml.bind,java.activation
