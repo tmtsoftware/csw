@@ -58,7 +58,7 @@ class EventServicePerfTest extends BasePerfSuite {
         scenarios.foreach(
           s ⇒
             plotLatencyHistogram(s"${BenchmarkFileReporter.targetDirectory.toPath}/${s.name}/Aggregated-*",
-                                 s"(${s.name.split("-").last})")
+                                 s"[${testConfigs.frequency}Hz]")
       )
     )
     super.afterAll()
