@@ -1,17 +1,25 @@
 package csw.services.event.perf
 
+import java.nio.ByteBuffer
+import java.util.concurrent.TimeUnit.SECONDS
 import java.util.concurrent.{ExecutorService, Executors}
 
+import akka.Done
 import akka.remote.testkit.{MultiNodeSpec, MultiNodeSpecCallbacks}
 import akka.testkit.ImplicitSender
+import csw.services.event.perf.commons.PerfSubscriber
 import csw.services.event.perf.model_obs.ModelObsMultiNodeConfig
 import csw.services.event.perf.reporter._
-import csw.services.event.perf.utils.SystemMonitoringSupport
+import csw.services.event.perf.utils.EventUtils.nanosToSeconds
+import csw.services.event.perf.utils.{EventUtils, SystemMonitoringSupport}
 import csw.services.event.perf.wiring.{TestConfigs, TestWiring}
 import csw.services.event.scaladsl.{EventPublisher, EventSubscriber}
+import org.HdrHistogram.Histogram
 import org.scalatest.{BeforeAndAfterAll, FunSuiteLike, Matchers}
 
+import scala.collection.immutable
 import scala.concurrent.duration.{Duration, DurationDouble, FiniteDuration}
+import scala.concurrent.{Await, Future}
 import scala.sys.process.{FileProcessLogger, Process}
 
 class BasePerfSuite
@@ -75,6 +83,45 @@ class BasePerfSuite
     jstatProcessLogger = runJstat()
     runPerfFlames(roles: _*)(delay = 15.seconds, time = 60.seconds)
     topProcess = runTop()
+  }
+
+  def waitForResultsFromAllSubscribers(subscribers: immutable.Seq[(Future[Done], PerfSubscriber)]): Unit = {
+    val histogramPerNode       = new Histogram(SECONDS.toNanos(10), 3)
+    var totalTimePerNode       = 0L
+    var eventsReceivedPerNode  = 0L
+    var totalDroppedPerNode    = 0L
+    var outOfOrderCountPerNode = 0L
+    var avgLatencyPerNode      = 0L
+
+    subscribers.foreach {
+      case (doneF, subscriber) ⇒
+        Await.result(doneF, Duration.Inf)
+        subscriber.printResult()
+
+        outOfOrderCountPerNode += subscriber.outOfOrderCount
+        totalDroppedPerNode += subscriber.totalDropped()
+        avgLatencyPerNode = if (avgLatencyPerNode == 0) subscriber.avgLatency else (avgLatencyPerNode + subscriber.avgLatency) / 2
+
+        histogramPerNode.add(subscriber.histogram)
+        eventsReceivedPerNode += subscriber.eventsReceived
+        totalTimePerNode = Math.max(totalTimePerNode, subscriber.totalTime)
+    }
+
+    val byteBuffer: ByteBuffer = ByteBuffer.allocate(326942)
+    histogramPerNode.encodeIntoByteBuffer(byteBuffer)
+
+    Await.result(
+      publisher.publish(
+        EventUtils.perfResultEvent(
+          byteBuffer.array(),
+          eventsReceivedPerNode / nanosToSeconds(totalTimePerNode),
+          totalDroppedPerNode,
+          outOfOrderCountPerNode,
+          avgLatencyPerNode
+        )
+      ),
+      defaultTimeout
+    )
   }
 
   def aggregateResult(testName: String, aggregatedResult: AggregatedResult): Unit = {

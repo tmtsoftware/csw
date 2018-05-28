@@ -1,8 +1,5 @@
 package csw.services.event.perf.model_obs
 
-import java.nio.ByteBuffer
-import java.util.concurrent.TimeUnit.SECONDS
-
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.remote.testkit.MultiNodeConfig
 import akka.testkit.typed.scaladsl
@@ -10,12 +7,8 @@ import com.typesafe.config.ConfigFactory
 import csw.services.event.perf.BasePerfSuite
 import csw.services.event.perf.commons.{EventsSetting, PerfPublisher, PerfSubscriber}
 import csw.services.event.perf.reporter._
-import csw.services.event.perf.utils.EventUtils
-import csw.services.event.perf.utils.EventUtils.nanosToSeconds
-import org.HdrHistogram.Histogram
 
 import scala.concurrent.Await
-import scala.concurrent.duration.Duration
 
 object ModelObsMultiNodeConfig extends MultiNodeConfig {
 
@@ -95,10 +88,6 @@ class ModelObsPerfTest extends BasePerfSuite {
 
       val completionProbe = scaladsl.TestProbe[AggregatedResult]()(system.toTyped)
 
-      var totalTimePerNode            = 0L
-      var eventsReceivedPerNode       = 0L
-      val histogramPerNode: Histogram = new Histogram(SECONDS.toNanos(10), 3)
-
       runOn(roles.last) {
         val resultAggregator =
           new ResultAggregator(scenarioName, "ModelObsPerfTest", testWiring.subscriber, roles.size, completionProbe.ref)
@@ -122,41 +111,7 @@ class ModelObsPerfTest extends BasePerfSuite {
 
       enterBarrier("publishers-started")
 
-      var totalDroppedPerNode: Long    = 0L
-      var outOfOrderCountPerNode: Long = 0L
-      var avgLatencyPerNode: Long      = 0L
-
-      subscribers.foreach {
-        case (doneF, subscriber) ⇒
-          Await.result(doneF, Duration.Inf)
-          subscriber.printResult()
-
-          totalDroppedPerNode += subscriber.totalDropped()
-          outOfOrderCountPerNode += subscriber.outOfOrderCount
-          avgLatencyPerNode =
-            if (avgLatencyPerNode == 0) subscriber.avgLatency else (avgLatencyPerNode + subscriber.avgLatency) / 2
-
-          histogramPerNode.add(subscriber.histogram)
-          eventsReceivedPerNode += subscriber.eventsReceived
-          totalTimePerNode = Math.max(totalTimePerNode, subscriber.totalTime)
-      }
-
-      val byteBuffer: ByteBuffer = ByteBuffer.allocate(326942)
-      histogramPerNode.encodeIntoByteBuffer(byteBuffer)
-
-      val publisher = testWiring.publisher
-      Await.result(
-        publisher.publish(
-          EventUtils.perfResultEvent(
-            byteBuffer.array(),
-            eventsReceivedPerNode / nanosToSeconds(totalTimePerNode),
-            totalDroppedPerNode,
-            outOfOrderCountPerNode,
-            avgLatencyPerNode
-          )
-        ),
-        defaultTimeout
-      )
+      waitForResultsFromAllSubscribers(subscribers)
 
       runOn(roles.last) {
         val aggregatedResult = completionProbe.expectMessageType[AggregatedResult](maxTimeout)
