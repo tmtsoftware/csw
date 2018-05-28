@@ -115,16 +115,19 @@ class EventServicePerfTest extends BasePerfSuite {
       }
       enterBarrier(subscriberName + "-started")
 
-      var totalDroppedPerSubscriber: Long    = 0L
-      var outOfOrderCountPerSubscriber: Long = 0L
+      var totalDroppedPerNode: Long    = 0L
+      var outOfOrderCountPerNode: Long = 0L
+      var avgLatencyPerNode: Long      = 0L
 
       subscribers.foreach {
         case (doneF, subscriber) ⇒
           Await.result(doneF, 20.minute)
           subscriber.printResult()
 
-          outOfOrderCountPerSubscriber += subscriber.outOfOrderCount
-          totalDroppedPerSubscriber += subscriber.totalDropped()
+          outOfOrderCountPerNode += subscriber.outOfOrderCount
+          totalDroppedPerNode += subscriber.totalDropped()
+          avgLatencyPerNode =
+            if (avgLatencyPerNode == 0) subscriber.avgLatency else (avgLatencyPerNode + subscriber.avgLatency) / 2
 
           histogramPerNode.add(subscriber.histogram)
           eventsReceivedPerNode += subscriber.eventsReceived
@@ -139,8 +142,9 @@ class EventServicePerfTest extends BasePerfSuite {
           EventUtils.perfResultEvent(
             byteBuffer.array(),
             eventsReceivedPerNode / nanosToSeconds(totalTimePerNode),
-            totalDroppedPerSubscriber,
-            outOfOrderCountPerSubscriber
+            totalDroppedPerNode,
+            outOfOrderCountPerNode,
+            avgLatencyPerNode
           )
         ),
         30.seconds

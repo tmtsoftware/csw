@@ -124,16 +124,19 @@ class ModelObsPerfTest extends BasePerfSuite {
 
       enterBarrier("publishers-started")
 
-      var totalDroppedPerSubscriber: Long    = 0L
-      var outOfOrderCountPerSubscriber: Long = 0L
+      var totalDroppedPerNode: Long    = 0L
+      var outOfOrderCountPerNode: Long = 0L
+      var avgLatencyPerNode: Long      = 0L
 
       subscribers.foreach {
         case (doneF, subscriber) ⇒
           Await.result(doneF, Duration.Inf)
           subscriber.printResult()
 
-          totalDroppedPerSubscriber += subscriber.totalDropped()
-          outOfOrderCountPerSubscriber += subscriber.outOfOrderCount
+          totalDroppedPerNode += subscriber.totalDropped()
+          outOfOrderCountPerNode += subscriber.outOfOrderCount
+          avgLatencyPerNode =
+            if (avgLatencyPerNode == 0) subscriber.avgLatency else (avgLatencyPerNode + subscriber.avgLatency) / 2
 
           histogramPerNode.add(subscriber.histogram)
           eventsReceivedPerNode += subscriber.eventsReceived
@@ -149,8 +152,9 @@ class ModelObsPerfTest extends BasePerfSuite {
           EventUtils.perfResultEvent(
             byteBuffer.array(),
             eventsReceivedPerNode / nanosToSeconds(totalTimePerNode),
-            totalDroppedPerSubscriber,
-            outOfOrderCountPerSubscriber
+            totalDroppedPerNode,
+            outOfOrderCountPerNode,
+            avgLatencyPerNode
           )
         ),
         defaultTimeout

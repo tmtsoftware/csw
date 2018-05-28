@@ -39,6 +39,7 @@ class PerfSubscriber(
 
   var startTime       = 0L
   var totalTime       = 0L
+  var avgLatency      = 0L
   var eventsReceived  = 0L
   var lastId          = 0
   var outOfOrderCount = 0
@@ -68,15 +69,20 @@ class PerfSubscriber(
       .runForeach(report)
 
   private def report(event: Event): Unit = {
-    if (eventsReceived == 0) startTime = getNanos(Instant.now()).toLong
+    val currentTime          = getNanos(Instant.now()).toLong
+    val eventOriginationTime = getNanos(event.eventTime.time).toLong
+    val latency              = currentTime - eventOriginationTime
+
+    if (eventsReceived == 0) {
+      startTime = currentTime.toLong
+      avgLatency = latency
+    }
 
     eventsReceived += 1
-    val currentTime = getNanos(Instant.now()).toLong
     totalTime = currentTime - startTime
 
     reporter.onMessage(1, payloadSize)
 
-    val latency = (getNanos(Instant.now()) - getNanos(event.eventTime.time)).toLong
     try {
       histogram.recordValue(latency)
     } catch {
@@ -88,11 +94,22 @@ class PerfSubscriber(
     lastId = currentId
 
     if (!inOrder) outOfOrderCount += 1
+
+    avgLatency = (avgLatency + latency) / 2
   }
 
   def totalDropped(): Long = totalTestMsgs - eventsReceived
 
   def printResult(): Unit =
-    resultReporter.printResult(subscriberId, totalDropped(), payloadSize, histogram, eventsReceived, totalTime, outOfOrderCount)
+    resultReporter.printResult(
+      subscriberId,
+      totalDropped(),
+      payloadSize,
+      histogram,
+      eventsReceived,
+      totalTime,
+      outOfOrderCount,
+      avgLatency
+    )
 
 }

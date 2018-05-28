@@ -28,6 +28,7 @@ class ResultAggregator(
   private var receivedPerfEventCount = 0
   private var totalDropped           = 0L
   private var outOfOrderCount        = 0L
+  private var avgLatency             = 0L
 
   def startSubscription(): EventSubscription = subscriber.subscribeCallback(Set(EventUtils.perfEventKey), onEvent)
 
@@ -40,6 +41,8 @@ class ResultAggregator(
       throughput += event.get(EventUtils.throughputKey).get.head
       outOfOrderCount += event.get(EventUtils.totalOutOfOrderKey).get.head
       totalDropped += event.get(EventUtils.totalDroppedKey).get.head
+      val avgLatencyTmp = event.get(EventUtils.avgLatencyKey).get.head
+      avgLatency = if (avgLatency == 0) avgLatencyTmp else (avgLatency + avgLatencyTmp) / 2
 
       if (receivedPerfEventCount == expPerfEventCount) {
         val (latencyPlots, throughputPlots) = aggregateResult()
@@ -57,7 +60,8 @@ class ResultAggregator(
     val latencyPlots = LatencyPlots(
       PlotResult().add(testName, percentile(50.0)),
       PlotResult().add(testName, percentile(90.0)),
-      PlotResult().add(testName, percentile(99.0))
+      PlotResult().add(testName, percentile(99.0)),
+      PlotResult().add(testName, nanosToMicros(avgLatency))
     )
 
     histogram.outputPercentileDistribution(

@@ -83,7 +83,8 @@ class BasePerfSuite
     latencyPlots = latencyPlots.copy(
       plot50 = latencyPlots.plot50.addAll(aggregatedResult.latencyPlots.plot50),
       plot90 = latencyPlots.plot90.addAll(aggregatedResult.latencyPlots.plot90),
-      plot99 = latencyPlots.plot99.addAll(aggregatedResult.latencyPlots.plot99)
+      plot99 = latencyPlots.plot99.addAll(aggregatedResult.latencyPlots.plot99),
+      avg = latencyPlots.avg.addAll(aggregatedResult.latencyPlots.avg)
     )
 
     throughputPlots = throughputPlots.addAll(aggregatedResult.throughputPlots)

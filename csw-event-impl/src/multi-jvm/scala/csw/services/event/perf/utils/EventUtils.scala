@@ -18,18 +18,28 @@ object EventUtils {
   val throughputKey: Key[Double]    = DoubleKey.make("throughputKey")
   val totalDroppedKey: Key[Long]    = LongKey.make("totalDroppedKey")
   val totalOutOfOrderKey: Key[Long] = LongKey.make("totalOutOfOrderKey")
+  val avgLatencyKey: Key[Long]      = LongKey.make("avgLatencyKey")
 
   val baseTestEvent = SystemEvent(prefix, EventName(testEventS))
 
   val basePerfEvent          = SystemEvent(prefix, EventName("perf"))
   val perfEventKey: EventKey = basePerfEvent.eventKey
 
-  def perfResultEvent(payload: Array[Byte], throughput: Double, totalDropped: Long, totalOutOfOrder: Long): SystemEvent =
+  def perfResultEvent(
+      payload: Array[Byte],
+      throughput: Double,
+      totalDropped: Long,
+      totalOutOfOrder: Long,
+      avgLatency: Long
+  ): SystemEvent =
     basePerfEvent.copy(
-      paramSet = Set(histogramKey.set(payload),
-                     throughputKey.set(throughput),
-                     totalDroppedKey.set(totalDropped),
-                     totalOutOfOrderKey.set(totalOutOfOrder))
+      paramSet = Set(
+        histogramKey.set(payload),
+        throughputKey.set(throughput),
+        totalDroppedKey.set(totalDropped),
+        totalOutOfOrderKey.set(totalOutOfOrder),
+        avgLatencyKey.set(avgLatency)
+      )
     )
 
   def event(name: EventName, id: Long = -1, payload: Array[Byte] = Array.emptyByteArray): SystemEvent =
