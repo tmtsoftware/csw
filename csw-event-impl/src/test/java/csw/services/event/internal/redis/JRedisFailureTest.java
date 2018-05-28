@@ -39,10 +39,11 @@ public class JRedisFailureTest {
     @BeforeClass
     public static void beforeClass() {
         ClientOptions clientOptions = ClientOptions.builder().autoReconnect(false).disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS).build();
-        redisTestProps = RedisTestProps.createRedisProperties(4561, 7380, clientOptions);
+        redisTestProps = RedisTestProps.createRedisProperties(4561, 27380, 7380, clientOptions);
         ExecutionContext executionContext = redisTestProps.wiring().ec();
         Materializer materializer = redisTestProps.wiring().resumingMat();
         jRedisFactory = new JRedisFactory(redisTestProps.redisFactory(), executionContext, materializer);
+        redisTestProps.redisSentinel().start();
         redisTestProps.redis().start();
     }
 
@@ -50,12 +51,13 @@ public class JRedisFailureTest {
     public static void afterClass() throws Exception {
         redisTestProps.redisClient().shutdown();
         redisTestProps.redis().stop();
+        redisTestProps.redisSentinel().stop();
         Await.result(redisTestProps.wiring().shutdown(CoordinatedShutdownReasons.TestFinishedReason$.MODULE$), new FiniteDuration(10, TimeUnit.SECONDS));
     }
 
     @Test
     public void failureInPublishingShouldFailFutureWithPublishFailedException() throws InterruptedException, ExecutionException, TimeoutException {
-        publisher = jRedisFactory.publisher().get(10, TimeUnit.SECONDS);
+        publisher = jRedisFactory.publisher("mymaster").get(10, TimeUnit.SECONDS);
         publisher.publish(Utils.makeEvent(2)).get(10, TimeUnit.SECONDS);
 
         publisher.shutdown().get(10, TimeUnit.SECONDS);
@@ -68,7 +70,7 @@ public class JRedisFailureTest {
 
     @Test
     public void handleFailedPublishEventWithACallback() throws InterruptedException, ExecutionException, TimeoutException {
-        publisher = jRedisFactory.publisher().get(10, TimeUnit.SECONDS);
+        publisher = jRedisFactory.publisher("mymaster").get(10, TimeUnit.SECONDS);
 
         TestProbe testProbe = TestProbe.<Event>create(Adapter.toTyped(redisTestProps.wiring().actorSystem()));
         publisher.publish(Utils.makeEvent(1)).get(10, TimeUnit.SECONDS);
@@ -87,7 +89,7 @@ public class JRedisFailureTest {
 
     @Test
     public void handleFailedPublishEventWithAnEventGeneratorAndACallback() throws InterruptedException, ExecutionException, TimeoutException {
-        publisher = jRedisFactory.publisher().get(10, TimeUnit.SECONDS);
+        publisher = jRedisFactory.publisher("mymaster").get(10, TimeUnit.SECONDS);
 
         TestProbe testProbe = TestProbe.create(Adapter.toTyped(redisTestProps.wiring().actorSystem()));
         publisher.publish(Utils.makeEvent(1)).get(10, TimeUnit.SECONDS);

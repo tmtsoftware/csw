@@ -3,25 +3,32 @@ package csw.services.event.internal.redis
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.internal.pubsub.{EventPublisherUtil, EventSubscriberUtil}
 import csw.services.event.internal.wiring.{BaseProperties, EventServiceResolver, Wiring}
-import csw.services.event.scaladsl.{EventPublisher, EventSubscriber, RedisFactory}
+import csw.services.event.scaladsl.{EventPublisher, EventSubscriber, RedisSentinelFactory}
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.LocationService
 import io.lettuce.core.{ClientOptions, RedisClient}
-import redis.embedded.RedisServer
+import redis.embedded.{RedisSentinel, RedisServer}
 
 class RedisTestProps(
     name: String,
-    redisPort: Int,
+    sentinelPort: Int,
+    serverPort: Int,
     clusterSettings: ClusterSettings,
-    val redisFactory: RedisFactory,
+    val redisFactory: RedisSentinelFactory,
     val locationService: LocationService,
     val wiring: Wiring,
     val redisClient: RedisClient
 ) extends BaseProperties {
-  val redis: RedisServer = RedisServer.builder().setting(s"bind ${clusterSettings.hostname}").port(redisPort).build()
+  val redis: RedisServer = RedisServer.builder().port(serverPort).build()
+  val redisSentinel: RedisSentinel = RedisSentinel
+    .builder()
+    .port(sentinelPort)
+    .masterPort(serverPort)
+    .quorumSize(1)
+    .build()
 
-  val publisher: EventPublisher   = redisFactory.publisher().await
-  val subscriber: EventSubscriber = redisFactory.subscriber().await
+  val publisher: EventPublisher   = redisFactory.publisher("mymaster").await
+  val subscriber: EventSubscriber = redisFactory.subscriber("mymaster").await
 
   override def toString: String = name
 }
@@ -29,10 +36,11 @@ class RedisTestProps(
 object RedisTestProps {
   def createRedisProperties(
       seedPort: Int,
+      sentinelPort: Int,
       serverPort: Int,
       clientOptions: ClientOptions = ClientOptions.create()
   ): RedisTestProps = {
-    val (clusterSettings, locationService) = BaseProperties.createInfra(seedPort, serverPort)
+    val (clusterSettings, locationService) = BaseProperties.createInfra(seedPort, sentinelPort)
     val redisClient: RedisClient           = RedisClient.create()
     val wiring                             = new Wiring(clusterSettings.system)
     import wiring._
@@ -40,8 +48,8 @@ object RedisTestProps {
     val eventSubscriberUtil = new EventSubscriberUtil()
 
     val redisFactory =
-      new RedisFactory(redisClient, new EventServiceResolver(locationService), eventPublisherUtil, eventSubscriberUtil)
+      new RedisSentinelFactory(redisClient, new EventServiceResolver(locationService), eventPublisherUtil, eventSubscriberUtil)
     redisClient.setOptions(clientOptions)
-    new RedisTestProps("Redis", serverPort, clusterSettings, redisFactory, locationService, wiring, redisClient)
+    new RedisTestProps("Redis", sentinelPort, serverPort, clusterSettings, redisFactory, locationService, wiring, redisClient)
   }
 }

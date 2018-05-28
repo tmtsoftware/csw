@@ -24,23 +24,25 @@ class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
     .disconnectedBehavior(DisconnectedBehavior.REJECT_COMMANDS)
     .build
 
-  private val redisTestProps: RedisTestProps = RedisTestProps.createRedisProperties(3560, 6380, redisClientOptions)
+  private val redisTestProps: RedisTestProps = RedisTestProps.createRedisProperties(3560, 26380, 6380, redisClientOptions)
 
   import redisTestProps._
   import redisTestProps.wiring._
 
   override def beforeAll(): Unit = {
+    redisSentinel.start()
     redis.start()
   }
 
   override def afterAll(): Unit = {
     redisClient.shutdown()
     redis.stop()
+    redisSentinel.stop()
     wiring.shutdown(TestFinishedReason).await
   }
 
   test("should throw PublishFailed exception on publish failure") {
-    val publisher = redisFactory.publisher().await
+    val publisher = redisFactory.publisher("mymaster").await
 
     publisher.publish(Utils.makeEvent(1)).await
 
@@ -55,7 +57,7 @@ class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
 
   //DEOPSCSW-334: Publish an event
   test("should invoke onError callback on publish failure [stream API]") {
-    val publisher = redisFactory.publisher().await
+    val publisher = redisFactory.publisher("mymaster").await
 
     val testProbe = TestProbe[Event]()(actorSystem.toTyped)
     publisher.publish(Utils.makeEvent(1)).await
@@ -74,7 +76,7 @@ class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
 
   //DEOPSCSW-334: Publish an event
   test("should invoke onError callback on publish failure [eventGenerator API]") {
-    val publisher = redisFactory.publisher().await
+    val publisher = redisFactory.publisher("mymaster").await
 
     val testProbe = TestProbe[Event]()(actorSystem.toTyped)
     publisher.publish(Utils.makeEvent(1)).await

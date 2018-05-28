@@ -36,8 +36,9 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
 
   @BeforeSuite
   def beforeAll(): Unit = {
-    redisTestProps = RedisTestProps.createRedisProperties(3564, 6383)
+    redisTestProps = RedisTestProps.createRedisProperties(3564, 26383, 6383)
     kafkaTestProps = KafkaTestProps.createKafkaProperties(3565, 6003)
+    redisTestProps.redisSentinel.start()
     redisTestProps.redis.start()
     EmbeddedKafka.start()(kafkaTestProps.config)
   }
@@ -46,6 +47,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
   def afterAll(): Unit = {
     redisTestProps.redisClient.shutdown()
     redisTestProps.redis.stop()
+    redisTestProps.redisSentinel.stop()
     redisTestProps.wiring.shutdown(TestFinishedReason).await
 
     kafkaTestProps.publisher.shutdown().await
