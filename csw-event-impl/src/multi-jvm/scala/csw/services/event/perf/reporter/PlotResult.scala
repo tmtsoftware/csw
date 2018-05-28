@@ -19,16 +19,25 @@ final case class PlotResult(values: Vector[(String, Number)] = Vector.empty) {
 
   def labelsStr: String  = labels.mkString(",")
   def resultsStr: String = results.map(x ⇒ f"${x.doubleValue()}%.2f").mkString("        ")
+}
 
+final case class ThroughputPlots(
+    throughput: PlotResult = PlotResult(),
+    dropped: PlotResult = PlotResult(),
+    outOfOrder: PlotResult = PlotResult()
+) {
   def printTable(): Unit = {
-    println("================================ Throughput msgs/s ================================")
-    this.labels.zipWithIndex.foreach {
+    println("=================================== Throughput =================================================")
+    println("\t\t\t Throughput(msgs/s) \t\tTotal Dropped \t\t Out Of Order \t")
+    println("================================================================================================")
+    throughput.labels.zipWithIndex.foreach {
       case (label, index) ⇒
-        println(s"$label: ${if (label.length < 7) "\t\t" else "\t"} ${this.results(index)}")
+        println(s"$label: ${if (label.length < 7) "\t\t\t" else "\t\t"} ${throughput.results(index).intValue()} \t\t\t ${dropped
+          .results(index)
+          .intValue()} \t\t\t ${outOfOrder.results(index).intValue()} \t")
     }
     println("\n")
   }
-
 }
 
 final case class LatencyPlots(

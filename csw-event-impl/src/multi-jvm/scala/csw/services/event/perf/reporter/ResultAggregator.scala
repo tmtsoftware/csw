@@ -46,16 +46,20 @@ class ResultAggregator(
 
       if (receivedPerfEventCount == expPerfEventCount) {
         val (latencyPlots, throughputPlots) = aggregateResult()
-        actorRef ! AggregatedResult(latencyPlots, throughputPlots, totalDropped, outOfOrderCount)
+        actorRef ! AggregatedResult(latencyPlots, throughputPlots)
       }
     case _ ⇒ newEvent = true
   }
 
-  private def aggregateResult(): (LatencyPlots, PlotResult) = {
+  private def aggregateResult(): (LatencyPlots, ThroughputPlots) = {
 
     def percentile(p: Double): Double = nanosToMicros(histogram.getValueAtPercentile(p))
 
-    val throughputPlots = PlotResult().add(testName, throughput)
+    val throughputPlots = ThroughputPlots(
+      PlotResult().add(testName, throughput),
+      PlotResult().add(testName, totalDropped),
+      PlotResult().add(testName, outOfOrderCount)
+    )
 
     val latencyPlots = LatencyPlots(
       PlotResult().add(testName, percentile(50.0)),
@@ -73,4 +77,4 @@ class ResultAggregator(
 
 }
 
-case class AggregatedResult(latencyPlots: LatencyPlots, throughputPlots: PlotResult, totalDropped: Long, outOfOrderCount: Long)
+case class AggregatedResult(latencyPlots: LatencyPlots, throughputPlots: ThroughputPlots)

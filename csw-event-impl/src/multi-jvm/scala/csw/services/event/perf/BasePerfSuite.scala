@@ -34,10 +34,8 @@ class BasePerfSuite
 
   var topProcess: Option[Process] = None
 
-  var throughputPlots: PlotResult                   = PlotResult()
+  var throughputPlots: ThroughputPlots              = ThroughputPlots()
   var latencyPlots: LatencyPlots                    = LatencyPlots()
-  var totalDropped: Map[String, Long]               = Map.empty
-  var outOfOrderCount: Map[String, Long]            = Map.empty
   var jstatProcessLogger: Option[FileProcessLogger] = None
 
   val defaultTimeout: Duration   = 1.minute
@@ -87,24 +85,11 @@ class BasePerfSuite
       avg = latencyPlots.avg.addAll(aggregatedResult.latencyPlots.avg)
     )
 
-    throughputPlots = throughputPlots.addAll(aggregatedResult.throughputPlots)
-
-    totalDropped = totalDropped + (testName       → aggregatedResult.totalDropped)
-    outOfOrderCount = outOfOrderCount + (testName → aggregatedResult.outOfOrderCount)
-  }
-
-  def printTotalOutOfOrderCount(): Unit = {
-    println("================================ Out of order =================================")
-    outOfOrderCount.foreach {
-      case (testName, outOfOrder) ⇒ println(s"$testName: ${if (testName.length < 7) "\t\t" else "\t"} $outOfOrder")
-    }
-  }
-
-  def printTotalDropped(): Unit = {
-    println("================================ Total dropped ================================")
-    totalDropped.foreach {
-      case (testName, totalDroppedCount) ⇒ println(s"$testName: ${if (testName.length < 7) "\t\t" else "\t"} $totalDroppedCount")
-    }
+    throughputPlots = throughputPlots.copy(
+      throughput = throughputPlots.throughput.addAll(aggregatedResult.throughputPlots.throughput),
+      dropped = throughputPlots.dropped.addAll(aggregatedResult.throughputPlots.dropped),
+      outOfOrder = throughputPlots.outOfOrder.addAll(aggregatedResult.throughputPlots.outOfOrder)
+    )
   }
 
 }

@@ -57,8 +57,6 @@ class EventServicePerfTest extends BasePerfSuite {
     runOn(subscriberNodes.head) {
       throughputPlots.printTable()
       latencyPlots.printTable()
-      printTotalDropped()
-      printTotalOutOfOrderCount()
     }
     topProcess.foreach(
       _ ⇒

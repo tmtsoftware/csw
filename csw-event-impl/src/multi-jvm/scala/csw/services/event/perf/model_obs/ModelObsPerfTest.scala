@@ -59,8 +59,6 @@ class ModelObsPerfTest extends BasePerfSuite {
     runOn(roles.last) {
       throughputPlots.printTable()
       latencyPlots.printTable()
-      printTotalDropped()
-      printTotalOutOfOrderCount()
     }
     topProcess.foreach(
       _ ⇒ plotLatencyHistogram(s"${BenchmarkFileReporter.targetDirectory.toPath}/$scenarioName/Aggregated-*", "")
