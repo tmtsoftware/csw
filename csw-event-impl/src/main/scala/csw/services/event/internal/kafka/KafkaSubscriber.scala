@@ -98,7 +98,7 @@ class KafkaSubscriber(
       mode: SubscriptionMode
   ): EventSubscription = subscribeCallback(eventKeys, eventSubscriberUtil.actorCallback(actorRef), every, mode)
 
-  override def pSubscribe(pattern: String): Source[Event, EventSubscription] = ???
+  override def pSubscribe(pattern: Set[String]): Source[Event, EventSubscription] = ???
 
   override def get(eventKey: EventKey): Future[Event] = get(Set(eventKey)).map(_.head)
 

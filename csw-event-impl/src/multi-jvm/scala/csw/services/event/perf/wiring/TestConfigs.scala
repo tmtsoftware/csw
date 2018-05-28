@@ -13,7 +13,6 @@ class TestConfigs(config: Config) {
 
   val shareConnection: Boolean          = config.getBoolean("csw.event.perf.one-connection-per-jvm")
   val patternBasedSubscription: Boolean = config.getBoolean("csw.event.perf.pattern-based-subscription")
-  val patternsFactor: Int               = config.getInt("csw.event.perf.patterns-factor")
 
   //################### Redis Configuration ###################
   val redisEnabled: Boolean = config.getBoolean("csw.event.perf.redis-enabled")
