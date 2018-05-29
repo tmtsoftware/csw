@@ -92,6 +92,7 @@ public class JEventPublisherTest extends TestNGSuite {
         probe.expectNoMessage(Duration.ofMillis(200));
     }
 
+    //DEOPSCSW-345: Publish events irrespective of subscriber existence
     @Test(dataProvider = "event-service-provider")
     public void should_be_able_to_publish_an_event_with_duration(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
         List<Event> events = new ArrayList<>();
