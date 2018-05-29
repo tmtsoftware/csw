@@ -38,7 +38,9 @@ class PerfPublisher(
 
   private def eventGenerator(): Event = {
     eventId += 1
-    if (eventId > totalMessages) cancellable.cancel()
+    // send extra two end envents in case one goes missing
+    // subscriber stops listening on receiving firs end event, hence not affected by publisher publishing multiple end events
+    if (eventId > totalMessages + 2) cancellable.cancel()
     if (eventId < totalMessages) event(eventName, eventId, payload) else endEvent
   }
 

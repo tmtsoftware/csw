@@ -49,15 +49,17 @@ class EventServicePerfTest extends BasePerfSuite {
   def adjustedTotalMessages(n: Long): Long = (n * totalMessagesFactor).toLong
 
   override def afterAll(): Unit = {
+    enterBarrier("start-printing")
     runOn(subscriberNodes.head) {
       throughputPlots.printTable()
       latencyPlots.printTable()
     }
+    enterBarrier("results-printed")
     topProcess.foreach(
       _ ⇒
         scenarios.foreach(
           s ⇒
-            plotLatencyHistogram(s"${BenchmarkFileReporter.targetDirectory.toPath}/${s.name}/Aggregated-*",
+            plotLatencyHistogram(s"${BenchmarkFileReporter.targetDirectory.getAbsolutePath}/${s.name}/Aggregated-*",
                                  s"[${testConfigs.frequency}Hz]")
       )
     )
@@ -105,6 +107,9 @@ class EventServicePerfTest extends BasePerfSuite {
       enterBarrier(subscriberName + "-started")
 
       waitForResultsFromAllSubscribers(subscribers)
+      rep.halt()
+
+      subscribers.foreach { case (_, subscriber) if !subscriber.isPatternSubscriber ⇒ subscriber.printResult() }
 
       runOn(activeSubscriberNodes.head) {
         val aggregatedResult = completionProbe.expectMessageType[AggregatedResult](5.minute)
@@ -112,7 +117,6 @@ class EventServicePerfTest extends BasePerfSuite {
       }
 
       enterBarrier(testName + "-done")
-      rep.halt()
     }
 
     runOn(activePublisherNodes: _*) {

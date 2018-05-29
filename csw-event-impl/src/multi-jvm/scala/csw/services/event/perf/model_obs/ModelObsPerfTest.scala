@@ -49,12 +49,14 @@ class ModelObsPerfTestMultiJvmNode2 extends ModelObsPerfTest
 class ModelObsPerfTest extends BasePerfSuite {
 
   override def afterAll(): Unit = {
+    enterBarrier("start-printing")
     runOn(roles.last) {
       throughputPlots.printTable()
       latencyPlots.printTable()
     }
+    enterBarrier("results-printed")
     topProcess.foreach(
-      _ ⇒ plotLatencyHistogram(s"${BenchmarkFileReporter.targetDirectory.toPath}/$scenarioName/Aggregated-*", "")
+      _ ⇒ plotLatencyHistogram(s"${BenchmarkFileReporter.targetDirectory.getAbsolutePath}/$scenarioName/Aggregated-*", "")
     )
     super.afterAll()
   }
@@ -112,6 +114,9 @@ class ModelObsPerfTest extends BasePerfSuite {
       enterBarrier("publishers-started")
 
       waitForResultsFromAllSubscribers(subscribers)
+      rep.halt()
+
+      subscribers.foreach { case (_, subscriber) if !subscriber.isPatternSubscriber ⇒ subscriber.printResult() }
 
       runOn(roles.last) {
         val aggregatedResult = completionProbe.expectMessageType[AggregatedResult](maxTimeout)
@@ -119,7 +124,6 @@ class ModelObsPerfTest extends BasePerfSuite {
       }
 
       enterBarrier("done")
-      rep.halt()
     }
   }
 

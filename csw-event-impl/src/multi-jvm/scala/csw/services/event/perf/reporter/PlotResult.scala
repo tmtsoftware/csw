@@ -10,15 +10,6 @@ final case class PlotResult(values: Vector[(String, Number)] = Vector.empty) {
 
   val (labels, results) = values.unzip
 
-  def csvLabels: String = labels.mkString("\"", "\",\"", "\"")
-
-  def csvValues: String = values.mkString("\"", "\",\"", "\"")
-
-  // this can be split to two lines with bash: cut -d':' -f2,3 | tr ':' $'\n'
-  def csv(name: String): String = s"PLOT_$name:$csvLabels:$csvValues"
-
-  def labelsStr: String  = labels.mkString(",")
-  def resultsStr: String = results.map(x ⇒ f"${x.doubleValue()}%.2f").mkString("        ")
 }
 
 final case class ThroughputPlots(
