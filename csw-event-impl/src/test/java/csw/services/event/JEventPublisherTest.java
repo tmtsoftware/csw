@@ -59,7 +59,7 @@ public class JEventPublisherTest extends TestNGSuite {
         redisTestProps.redisSentinel().stop();
         redisTestProps.wiring().jShutdown(CoordinatedShutdownReasons.TestFinishedReason$.MODULE$).get(10, TimeUnit.SECONDS);
 
-        kafkaTestProps.publisher().asJava().shutdown().get(10, TimeUnit.SECONDS);
+        kafkaTestProps.jPublisher().shutdown().get(10, TimeUnit.SECONDS);
         EmbeddedKafka$.MODULE$.stop();
         kafkaTestProps.wiring().jShutdown(CoordinatedShutdownReasons.TestFinishedReason$.MODULE$).get(10, TimeUnit.SECONDS);
     }

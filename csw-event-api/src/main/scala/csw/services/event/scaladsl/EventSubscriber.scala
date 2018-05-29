@@ -3,7 +3,6 @@ package csw.services.event.scaladsl
 import akka.actor.typed.ActorRef
 import akka.stream.scaladsl.Source
 import csw.messages.events.{Event, EventKey}
-import csw.services.event.javadsl.IEventSubscriber
 
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
@@ -46,6 +45,4 @@ trait EventSubscriber {
   def get(eventKeys: Set[EventKey]): Future[Set[Event]]
 
   def get(eventKey: EventKey): Future[Event]
-
-  def asJava: IEventSubscriber
 }

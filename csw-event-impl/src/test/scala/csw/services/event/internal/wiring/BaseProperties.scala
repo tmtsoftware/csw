@@ -11,8 +11,8 @@ trait BaseProperties {
   val wiring: Wiring
   def publisher: EventPublisher
   def subscriber: EventSubscriber
-  def jPublisher: IEventPublisher   = publisher.asJava
-  def jSubscriber: IEventSubscriber = subscriber.asJava
+  def jPublisher[T <: EventPublisher]: IEventPublisher
+  def jSubscriber[T <: EventSubscriber]: IEventSubscriber
 }
 
 object BaseProperties {

@@ -102,8 +102,6 @@ class KafkaSubscriber(
 
   override def get(eventKey: EventKey): Future[Event] = get(Set(eventKey)).map(_.head)
 
-  override def asJava: IEventSubscriber = new JEventSubscriber(this)
-
   private def getEventStream(subscription: Subscription): Source[Event, scaladsl.Consumer.Control] =
     scaladsl.Consumer
       .plainSource(consumerSettings, subscription)

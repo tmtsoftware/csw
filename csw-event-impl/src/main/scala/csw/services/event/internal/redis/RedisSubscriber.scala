@@ -130,8 +130,6 @@ class RedisSubscriber(
     if (event == null) Event.invalidEvent(eventKey) else event
   }
 
-  override def asJava: IEventSubscriber = new JEventSubscriber(this)
-
   private def subscribe(
       eventKeys: Set[EventKey],
       reactiveCommands: RedisPubSubReactiveCommands[EventKey, Event]
