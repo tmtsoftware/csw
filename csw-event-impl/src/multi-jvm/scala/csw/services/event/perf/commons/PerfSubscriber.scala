@@ -53,7 +53,7 @@ class PerfSubscriber(
   val endEventName = EventName(s"${EventUtils.endEventS}-$subscribeKey")
 
   def subscription: Source[Event, EventSubscription] =
-    if (patternBasedSubscription & name.contains("pattern")) {
+    if (isPatternSubscriber) {
       subscriber.pSubscribe(eventPatterns.toSet)
     } else subscriber.subscribe(eventKeys)
 
@@ -63,10 +63,10 @@ class PerfSubscriber(
       .takeWhile {
         case SystemEvent(_, _, `endEventName`, _, _) ⇒ false
         case e @ _ ⇒
-          if (name.contains("pattern") & e.eventKey.key.contains("end")) false else true
+          if (isPatternSubscriber & e.eventKey.key.contains("end")) false else true
       }
       .watchTermination()(Keep.right)
-      .runForeach(report)
+      .runForeach(if (isPatternSubscriber) _ ⇒ () else report)
 
   private def report(event: Event): Unit = {
     val currentTime          = getNanos(Instant.now()).toLong
@@ -111,5 +111,7 @@ class PerfSubscriber(
       outOfOrderCount,
       avgLatency
     )
+
+  def isPatternSubscriber: Boolean = patternBasedSubscription & name.contains("pattern")
 
 }

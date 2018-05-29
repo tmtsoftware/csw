@@ -96,15 +96,18 @@ class BasePerfSuite
     subscribers.foreach {
       case (doneF, subscriber) ⇒
         Await.result(doneF, Duration.Inf)
-        subscriber.printResult()
+        if (!subscriber.isPatternSubscriber) {
+          subscriber.printResult()
 
-        outOfOrderCountPerNode += subscriber.outOfOrderCount
-        totalDroppedPerNode += subscriber.totalDropped()
-        avgLatencyPerNode = if (avgLatencyPerNode == 0) subscriber.avgLatency else (avgLatencyPerNode + subscriber.avgLatency) / 2
+          outOfOrderCountPerNode += subscriber.outOfOrderCount
+          totalDroppedPerNode += subscriber.totalDropped()
+          avgLatencyPerNode =
+            if (avgLatencyPerNode == 0) subscriber.avgLatency else (avgLatencyPerNode + subscriber.avgLatency) / 2
 
-        histogramPerNode.add(subscriber.histogram)
-        eventsReceivedPerNode += subscriber.eventsReceived
-        totalTimePerNode = Math.max(totalTimePerNode, subscriber.totalTime)
+          histogramPerNode.add(subscriber.histogram)
+          eventsReceivedPerNode += subscriber.eventsReceived
+          totalTimePerNode = Math.max(totalTimePerNode, subscriber.totalTime)
+        }
     }
 
     val byteBuffer: ByteBuffer = ByteBuffer.allocate(326942)
