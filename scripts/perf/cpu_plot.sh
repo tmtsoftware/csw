@@ -42,16 +42,18 @@ else
 fi
 
 echo "Adding headers in [$cpuUsagePath]"
-sed -i 1i"seconds\\tUser\\tSystem\\tIdle" ${cpuUsagePath}
+echo 'seconds   User    System  Idle' | cat - ${cpuUsagePath} > /tmp/$$ && mv /tmp/$$ ${cpuUsagePath}
 
 echo "============================================================================="
 echo "Plotting CPU usage graph using gnuplot at [$cpuUsageGraphPath]"
 echo "============================================================================="
 
 gnuplot <<-EOFMarker
-    set xlabel "Seconds"
+    set xlabel "Timestamp (sec)"
     set ylabel "% CPU Usage"
     set title "CPU Usage"
+    set key out vert
+    set key right
     set style line 1 lc rgb '#8b1a0e' pt 1 ps 1 lt 2 lw 4
     set style line 2 lc rgb '#5e9c36' pt 6 ps 1 lt 2 lw 4
     set style line 11 lc rgb '#808080' lt 1
@@ -61,5 +63,5 @@ gnuplot <<-EOFMarker
     set grid back ls 12
     set term pngcairo size 1680,1050 enhanced font 'Verdana,18'
     set output "${cpuUsageGraphPath}"
-    plot for [col=2:4] "${cpuUsagePath}" using 1:col w lp lw 3 pt 5 ps 1 title columnheader
+    plot for [col=2:4] "${cpuUsagePath}" using 1:col w l lw 3 title columnheader
 EOFMarker

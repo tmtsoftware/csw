@@ -1,9 +1,7 @@
 -Dfile.encoding=UTF8
--Xms1g
--Xmx1g
+-Xms1G
+-Xmx2G
 -Xss6M
--XX:+CMSClassUnloadingEnabled
--XX:+UseConcMarkSweepGC
 
 # Uncomment below jvm option if you are using jdk9
 #--add-modules=java.xml.bind,java.activation

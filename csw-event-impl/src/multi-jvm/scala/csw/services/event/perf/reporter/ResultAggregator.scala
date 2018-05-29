@@ -28,6 +28,7 @@ class ResultAggregator(
   private var receivedPerfEventCount = 0
   private var totalDropped           = 0L
   private var outOfOrderCount        = 0L
+  private var avgLatency             = 0L
 
   def startSubscription(): EventSubscription = subscriber.subscribeCallback(Set(EventUtils.perfEventKey), onEvent)
 
@@ -40,24 +41,31 @@ class ResultAggregator(
       throughput += event.get(EventUtils.throughputKey).get.head
       outOfOrderCount += event.get(EventUtils.totalOutOfOrderKey).get.head
       totalDropped += event.get(EventUtils.totalDroppedKey).get.head
+      val avgLatencyTmp = event.get(EventUtils.avgLatencyKey).get.head
+      avgLatency = if (avgLatency == 0) avgLatencyTmp else (avgLatency + avgLatencyTmp) / 2
 
       if (receivedPerfEventCount == expPerfEventCount) {
         val (latencyPlots, throughputPlots) = aggregateResult()
-        actorRef ! AggregatedResult(latencyPlots, throughputPlots, totalDropped, outOfOrderCount)
+        actorRef ! AggregatedResult(latencyPlots, throughputPlots)
       }
     case _ ⇒ newEvent = true
   }
 
-  private def aggregateResult(): (LatencyPlots, PlotResult) = {
+  private def aggregateResult(): (LatencyPlots, ThroughputPlots) = {
 
     def percentile(p: Double): Double = nanosToMicros(histogram.getValueAtPercentile(p))
 
-    val throughputPlots = PlotResult().add(testName, throughput)
+    val throughputPlots = ThroughputPlots(
+      PlotResult().add(testName, throughput),
+      PlotResult().add(testName, totalDropped),
+      PlotResult().add(testName, outOfOrderCount)
+    )
 
     val latencyPlots = LatencyPlots(
       PlotResult().add(testName, percentile(50.0)),
       PlotResult().add(testName, percentile(90.0)),
-      PlotResult().add(testName, percentile(99.0))
+      PlotResult().add(testName, percentile(99.0)),
+      PlotResult().add(testName, nanosToMicros(avgLatency))
     )
 
     histogram.outputPercentileDistribution(
@@ -69,4 +77,4 @@ class ResultAggregator(
 
 }
 
-case class AggregatedResult(latencyPlots: LatencyPlots, throughputPlots: PlotResult, totalDropped: Long, outOfOrderCount: Long)
+case class AggregatedResult(latencyPlots: LatencyPlots, throughputPlots: ThroughputPlots)

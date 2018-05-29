@@ -6,6 +6,7 @@ timestamp=`date +%F_%H-%M-%S`
 os=`uname`
 
 histogram_files=$1
+publish_freq=$2
 parentdir="$(basename $(dirname "$histogram_files"))"
 output_path="$HOME/perf/histograms/${parentdir}_histogram_$timestamp.png"
 mkdir -p $(dirname "$output_path")
@@ -19,7 +20,9 @@ gnuplot <<- EOF
     LABEL = system("ls -1 ${histogram_files} | sed -e 's:.*/::' -e 's/Aggregated-//' -e 's/-results.txt//' ")
     set xlabel "Latency Percentiles"
     set ylabel "Latency in us"
-    set title "Latency Plot"
+    set title "Latency Plot ${publish_freq}"
+    set key out vert
+    set key right
     set style line 1 lc rgb '#8b1a0e' pt 1 ps 1 lt 2 lw 4
     set style line 2 lc rgb '#5e9c36' pt 6 ps 1 lt 2 lw 4
     set style line 11 lc rgb '#808080' lt 1

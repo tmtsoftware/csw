@@ -3,7 +3,7 @@ package csw.services.event.perf.wiring
 import akka.actor.ActorSystem
 import csw.services.event.internal.pubsub.{EventPublisherUtil, EventSubscriberUtil}
 import csw.services.event.internal.wiring.{EventServiceResolver, Wiring}
-import csw.services.event.scaladsl.{EventPublisher, EventSubscriber, KafkaFactory, RedisFactory}
+import csw.services.event.scaladsl._
 import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar
 
@@ -16,17 +16,17 @@ class TestWiring(actorSystem: ActorSystem) extends MockitoSugar {
 
   private val eventPublisherUtil  = new EventPublisherUtil()
   private val eventSubscriberUtil = new EventSubscriberUtil()
-  lazy val redisFactory: RedisFactory =
-    new RedisFactory(RedisClient.create(), mock[EventServiceResolver], eventPublisherUtil, eventSubscriberUtil)
+  lazy val redisFactory: RedisSentinelFactory =
+    new RedisSentinelFactory(RedisClient.create(), mock[EventServiceResolver], eventPublisherUtil, eventSubscriberUtil)
   lazy val kafkaFactory: KafkaFactory =
     new KafkaFactory(mock[EventServiceResolver], eventPublisherUtil, eventSubscriberUtil)(actorSystem, ec, resumingMat)
 
   def publisher: EventPublisher =
-    if (redisEnabled) redisFactory.publisher(redisHost, redisPort)
+    if (redisEnabled) redisFactory.publisher(redisHost, redisPort, "mymaster")
     else kafkaFactory.publisher(kafkaHost, kafkaPort)
 
   def subscriber: EventSubscriber =
-    if (redisEnabled) redisFactory.subscriber(redisHost, redisPort)
+    if (redisEnabled) redisFactory.subscriber(redisHost, redisPort, "mymaster")
     else kafkaFactory.subscriber(kafkaHost, kafkaPort)
 
 }

@@ -1,17 +1,25 @@
 package csw.services.event.perf
 
+import java.nio.ByteBuffer
+import java.util.concurrent.TimeUnit.SECONDS
 import java.util.concurrent.{ExecutorService, Executors}
 
+import akka.Done
 import akka.remote.testkit.{MultiNodeSpec, MultiNodeSpecCallbacks}
 import akka.testkit.ImplicitSender
+import csw.services.event.perf.commons.PerfSubscriber
 import csw.services.event.perf.model_obs.ModelObsMultiNodeConfig
 import csw.services.event.perf.reporter._
-import csw.services.event.perf.utils.SystemMonitoringSupport
+import csw.services.event.perf.utils.EventUtils.nanosToSeconds
+import csw.services.event.perf.utils.{EventUtils, SystemMonitoringSupport}
 import csw.services.event.perf.wiring.{TestConfigs, TestWiring}
 import csw.services.event.scaladsl.{EventPublisher, EventSubscriber}
+import org.HdrHistogram.Histogram
 import org.scalatest.{BeforeAndAfterAll, FunSuiteLike, Matchers}
 
+import scala.collection.immutable
 import scala.concurrent.duration.{Duration, DurationDouble, FiniteDuration}
+import scala.concurrent.{Await, Future}
 import scala.sys.process.{FileProcessLogger, Process}
 
 class BasePerfSuite
@@ -34,10 +42,8 @@ class BasePerfSuite
 
   var topProcess: Option[Process] = None
 
-  var throughputPlots: PlotResult                   = PlotResult()
+  var throughputPlots: ThroughputPlots              = ThroughputPlots()
   var latencyPlots: LatencyPlots                    = LatencyPlots()
-  var totalDropped: Map[String, Long]               = Map.empty
-  var outOfOrderCount: Map[String, Long]            = Map.empty
   var jstatProcessLogger: Option[FileProcessLogger] = None
 
   val defaultTimeout: Duration   = 1.minute
@@ -58,16 +64,18 @@ class BasePerfSuite
 
   override def afterAll(): Unit = {
     reporterExecutor.shutdown()
-    jstatProcessLogger.foreach { p ⇒
-      p.flush()
-      p.close()
+    if (testConfigs.systemMonitoring) {
+      topProcess.foreach { top ⇒
+        top.destroy()
+        plotCpuUsageGraph()
+        plotMemoryUsageGraph()
+      }
+      jstatProcessLogger.foreach { p ⇒
+        p.flush()
+        p.close()
+      }
+      plotJstat().foreach(_.exitValue())
     }
-    topProcess.foreach { top ⇒
-      top.destroy()
-      plotCpuUsageGraph()
-      plotMemoryUsageGraph()
-    }
-    plotJstat().foreach(_.exitValue())
     multiNodeSpecAfterAll()
   }
 
@@ -77,31 +85,61 @@ class BasePerfSuite
     topProcess = runTop()
   }
 
+  def waitForResultsFromAllSubscribers(subscribers: immutable.Seq[(Future[Done], PerfSubscriber)]): Unit = {
+    val histogramPerNode       = new Histogram(SECONDS.toNanos(10), 3)
+    var totalTimePerNode       = 0L
+    var eventsReceivedPerNode  = 0L
+    var totalDroppedPerNode    = 0L
+    var outOfOrderCountPerNode = 0L
+    var avgLatencyPerNode      = 0L
+
+    subscribers.foreach {
+      case (doneF, subscriber) ⇒
+        Await.result(doneF, Duration.Inf)
+        if (!subscriber.isPatternSubscriber) {
+          subscriber.printResult()
+
+          outOfOrderCountPerNode += subscriber.outOfOrderCount
+          totalDroppedPerNode += subscriber.totalDropped()
+          avgLatencyPerNode =
+            if (avgLatencyPerNode == 0) subscriber.avgLatency else (avgLatencyPerNode + subscriber.avgLatency) / 2
+
+          histogramPerNode.add(subscriber.histogram)
+          eventsReceivedPerNode += subscriber.eventsReceived
+          totalTimePerNode = Math.max(totalTimePerNode, subscriber.totalTime)
+        }
+    }
+
+    val byteBuffer: ByteBuffer = ByteBuffer.allocate(326942)
+    histogramPerNode.encodeIntoByteBuffer(byteBuffer)
+
+    Await.result(
+      publisher.publish(
+        EventUtils.perfResultEvent(
+          byteBuffer.array(),
+          eventsReceivedPerNode / nanosToSeconds(totalTimePerNode),
+          totalDroppedPerNode,
+          outOfOrderCountPerNode,
+          avgLatencyPerNode
+        )
+      ),
+      defaultTimeout
+    )
+  }
+
   def aggregateResult(testName: String, aggregatedResult: AggregatedResult): Unit = {
     latencyPlots = latencyPlots.copy(
       plot50 = latencyPlots.plot50.addAll(aggregatedResult.latencyPlots.plot50),
       plot90 = latencyPlots.plot90.addAll(aggregatedResult.latencyPlots.plot90),
-      plot99 = latencyPlots.plot99.addAll(aggregatedResult.latencyPlots.plot99)
+      plot99 = latencyPlots.plot99.addAll(aggregatedResult.latencyPlots.plot99),
+      avg = latencyPlots.avg.addAll(aggregatedResult.latencyPlots.avg)
     )
 
-    throughputPlots = throughputPlots.addAll(aggregatedResult.throughputPlots)
-
-    totalDropped = totalDropped + (testName       → aggregatedResult.totalDropped)
-    outOfOrderCount = outOfOrderCount + (testName → aggregatedResult.outOfOrderCount)
-  }
-
-  def printTotalOutOfOrderCount(): Unit = {
-    println("================================ Out of order =================================")
-    outOfOrderCount.foreach {
-      case (testName, outOfOrder) ⇒ println(s"$testName: ${if (testName.length < 7) "\t\t" else "\t"} $outOfOrder")
-    }
-  }
-
-  def printTotalDropped(): Unit = {
-    println("================================ Total dropped ================================")
-    totalDropped.foreach {
-      case (testName, totalDroppedCount) ⇒ println(s"$testName: ${if (testName.length < 7) "\t\t" else "\t"} $totalDroppedCount")
-    }
+    throughputPlots = throughputPlots.copy(
+      throughput = throughputPlots.throughput.addAll(aggregatedResult.throughputPlots.throughput),
+      dropped = throughputPlots.dropped.addAll(aggregatedResult.throughputPlots.dropped),
+      outOfOrder = throughputPlots.outOfOrder.addAll(aggregatedResult.throughputPlots.outOfOrder)
+    )
   }
 
 }

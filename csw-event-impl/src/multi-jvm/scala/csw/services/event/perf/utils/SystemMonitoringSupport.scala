@@ -1,6 +1,6 @@
 package csw.services.event.perf.utils
 
-import java.io.File
+import java.io.{File, PrintWriter}
 import java.time.Instant
 
 import akka.remote.testconductor.RoleName
@@ -27,9 +27,10 @@ trait SystemMonitoringSupport { _: MultiNodeSpec ⇒
   val jstatResultsPath       = s"$homeDir/perf/jstat/${myself.name}_jstat_${pid}_${Instant.now()}.log"
   val jstatPlotPath          = s"$homeDir/TMT/pritam/jstatplot/target/universal/stage/bin/jstatplot"
 
-  def plotCpuUsageGraph(): process.Process                          = executeCmd(s"$perfScriptsDir/cpu_plot.sh $topResultsPath")
-  def plotMemoryUsageGraph(): process.Process                       = executeCmd(s"$perfScriptsDir/memory_plot.sh $topResultsPath")
-  def plotLatencyHistogram(inputFilesPath: String): process.Process = executeCmd(s"$perfScriptsDir/hist_plot.sh $inputFilesPath")
+  def plotCpuUsageGraph(): process.Process    = executeCmd(s"$perfScriptsDir/cpu_plot.sh $topResultsPath")
+  def plotMemoryUsageGraph(): process.Process = executeCmd(s"$perfScriptsDir/memory_plot.sh $topResultsPath")
+  def plotLatencyHistogram(inputFilesPath: String, publishFreq: String): process.Process =
+    executeCmd(s"$perfScriptsDir/hist_plot.sh $inputFilesPath $publishFreq")
 
   /**
    * Make sure you have followed below steps before plotting:
@@ -38,8 +39,25 @@ trait SystemMonitoringSupport { _: MultiNodeSpec ⇒
    *  3. update value of jstatPlotPath from SystemMontoringSupport class with the generated path
    *      ex. $HOME/jstatplot/target/universal/stage/bin/jstatplot
    */
-  def plotJstat(): Option[process.Process] =
-    if (exist(jstatPlotPath)) Some(executeCmd(s"$jstatPlotPath -m $jstatResultsPath")) else None
+  def plotJstat(): Option[process.Process] = {
+    if (exist(jstatPlotPath)) {
+      val originalFile = new File(jstatResultsPath)
+      val tmpFile      = new File(s"$jstatResultsPath.tmp")
+      val w            = new PrintWriter(tmpFile)
+      scala.io.Source
+        .fromFile(new File(jstatResultsPath))
+        .getLines()
+        .zipWithIndex
+        .map {
+          case (line, n) ⇒ if (n == 0) s"Timestamp $line" else s"$n \t\t $line"
+        }
+        .foreach(w.println)
+      w.close()
+      tmpFile.renameTo(originalFile)
+
+      Some(executeCmd(s"$jstatPlotPath -m $jstatResultsPath"))
+    } else None
+  }
 
   def runTop(): Option[process.Process] = {
     Thread.sleep(Random.nextInt(2) * 1000)
@@ -54,7 +72,7 @@ trait SystemMonitoringSupport { _: MultiNodeSpec ⇒
     outFile.getParentFile.mkdirs()
     outFile.createNewFile()
 
-    val cmd = s"jstat -gc -t $pid 1s"
+    val cmd = s"jstat -gc $pid 1s"
     println(s"[Info] Executing command : [$cmd]")
     val processLogger = ProcessLogger(outFile)
     if (cmd.run(processLogger).isAlive()) Some(processLogger)
@@ -91,8 +109,8 @@ trait SystemMonitoringSupport { _: MultiNodeSpec ⇒
     println(s"[Info] Executing command : [$cmd]")
     cmd.run(new ProcessLogger {
       override def buffer[T](f: ⇒ T): T   = f
-      override def out(s: ⇒ String): Unit = println(s"[perf @ $myself($pid)][OUT] " + s)
-      override def err(s: ⇒ String): Unit = println(s"[perf @ $myself($pid)][ERR] " + s)
+      override def out(s: ⇒ String): Unit = println(s"[Info @ ${myself.name}($pid)] " + s)
+      override def err(s: ⇒ String): Unit = println(s"[Error @ ${myself.name}($pid)] " + s)
     })
   }
 

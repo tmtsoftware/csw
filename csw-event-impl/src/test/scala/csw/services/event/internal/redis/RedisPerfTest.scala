@@ -8,7 +8,7 @@ import csw.services.event.internal.perf.EventServicePerfFramework
 import csw.services.event.internal.pubsub.{EventPublisherUtil, EventSubscriberUtil}
 import csw.services.event.internal.throttle.{RateAdapterStage, RateLimiterStage}
 import csw.services.event.internal.wiring.{EventServiceResolver, Wiring}
-import csw.services.event.scaladsl.{KafkaFactory, RedisFactory}
+import csw.services.event.scaladsl.RedisFactory
 import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}

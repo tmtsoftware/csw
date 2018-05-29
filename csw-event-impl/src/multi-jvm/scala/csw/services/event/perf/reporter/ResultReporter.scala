@@ -15,7 +15,8 @@ class ResultReporter(name: String, actorSystem: ActorSystem) {
       histogram: Histogram,
       totalReceived: Long,
       totalTime: Double,
-      outOfOrderCount: Long
+      outOfOrderCount: Long,
+      avgLatency: Long
   ): Unit = {
 
     val throughput = totalReceived / nanosToSeconds(totalTime)
@@ -32,9 +33,10 @@ class ResultReporter(name: String, actorSystem: ActorSystem) {
       s"          Dropped:      $totalDropped \n" +
       s"          Out of order: $outOfOrderCount \n" +
       "Latency: \n" +
-      f"          50%%ile: ${percentile(50.0)}%.0f µs \n" +
-      f"          90%%ile: ${percentile(90.0)}%.0f µs \n" +
-      f"          99%%ile: ${percentile(99.0)}%.0f µs \n"
+      f"          50%%ile : ${percentile(50.0)}%.0f µs \n" +
+      f"          90%%ile : ${percentile(90.0)}%.0f µs \n" +
+      f"          99%%ile : ${percentile(99.0)}%.0f µs \n" +
+      f"          Average: ${nanosToMicros(avgLatency)}%.0f µs \n"
     )
   }
 

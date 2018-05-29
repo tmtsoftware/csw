@@ -37,8 +37,9 @@ public class JEventSubscriberTest extends TestNGSuite {
 
     @BeforeSuite
     public void beforeAll() {
-        redisTestProps = RedisTestProps.createRedisProperties(4564, 7382, ClientOptions.create());
+        redisTestProps = RedisTestProps.createRedisProperties(4564, 27382, 7382, ClientOptions.create());
         kafkaTestProps = KafkaTestProps.jCreateKafkaProperties(4565, 7003, Collections.EMPTY_MAP);
+        redisTestProps.redisSentinel().start();
         redisTestProps.redis().start();
         EmbeddedKafka$.MODULE$.start(kafkaTestProps.config());
     }
@@ -47,6 +48,7 @@ public class JEventSubscriberTest extends TestNGSuite {
     public void afterAll() throws InterruptedException, ExecutionException, TimeoutException {
         redisTestProps.redisClient().shutdown();
         redisTestProps.redis().stop();
+        redisTestProps.redisSentinel().stop();
         redisTestProps.wiring().jShutdown(CoordinatedShutdownReasons.TestFinishedReason$.MODULE$).get(10, TimeUnit.SECONDS);
 
         kafkaTestProps.publisher().asJava().shutdown().get(10, TimeUnit.SECONDS);
