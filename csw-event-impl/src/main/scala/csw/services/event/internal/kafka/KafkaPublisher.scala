@@ -55,8 +55,6 @@ class KafkaPublisher(
   override def publish[Mat](source: Source[Event, Mat]): Mat =
     eventPublisherUtil.publishFromSource(source, parallelism, publish, None)
 
-  override def asJava: IEventPublisher = new JEventPublisher(this)
-
   override def publish(eventGenerator: ⇒ Event, every: FiniteDuration): Cancellable =
     publish(eventPublisherUtil.eventSource(eventGenerator, every))
 

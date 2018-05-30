@@ -8,7 +8,7 @@ import akka.actor.typed.ActorRef
 import akka.util.ByteString
 import csw.messages.events.{Event, SystemEvent}
 import csw.services.event.perf.utils.EventUtils
-import csw.services.event.perf.utils.EventUtils.nanosToMicros
+import csw.services.event.perf.utils.EventUtils._
 import csw.services.event.scaladsl.{EventSubscriber, EventSubscription}
 import org.HdrHistogram.Histogram
 
@@ -21,8 +21,6 @@ class ResultAggregator(
 )(implicit val system: ActorSystem) {
 
   private val histogram              = new Histogram(SECONDS.toNanos(10), 3)
-  var throughputPlots: PlotResult    = PlotResult()
-  var latencyPlots: LatencyPlots     = LatencyPlots()
   private var throughput             = 0d
   private var newEvent               = false
   private var receivedPerfEventCount = 0
@@ -35,13 +33,13 @@ class ResultAggregator(
   private def onEvent(event: Event): Unit = event match {
     case event: SystemEvent if newEvent ⇒
       receivedPerfEventCount += 1
-      val histogramBuffer = ByteString(event.get(EventUtils.histogramKey).get.values).asByteBuffer
+      val histogramBuffer = ByteString(event.get(histogramKey).get.values).asByteBuffer
       histogram.add(Histogram.decodeFromByteBuffer(histogramBuffer, SECONDS.toNanos(10)))
 
-      throughput += event.get(EventUtils.throughputKey).get.head
-      outOfOrderCount += event.get(EventUtils.totalOutOfOrderKey).get.head
-      totalDropped += event.get(EventUtils.totalDroppedKey).get.head
-      val avgLatencyTmp = event.get(EventUtils.avgLatencyKey).get.head
+      throughput += event.get(throughputKey).get.head
+      outOfOrderCount += event.get(totalOutOfOrderKey).get.head
+      totalDropped += event.get(totalDroppedKey).get.head
+      val avgLatencyTmp = event.get(avgLatencyKey).get.head
       avgLatency = if (avgLatency == 0) avgLatencyTmp else (avgLatency + avgLatencyTmp) / 2
 
       if (receivedPerfEventCount == expPerfEventCount) {

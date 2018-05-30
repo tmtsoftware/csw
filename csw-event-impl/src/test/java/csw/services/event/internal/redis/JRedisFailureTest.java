@@ -2,7 +2,6 @@ package csw.services.event.internal.redis;
 
 import akka.NotUsed;
 import akka.actor.typed.javadsl.Adapter;
-import akka.stream.Materializer;
 import akka.stream.javadsl.Source;
 import akka.testkit.typed.javadsl.TestProbe;
 import csw.messages.commons.CoordinatedShutdownReasons;
@@ -10,7 +9,7 @@ import csw.messages.events.Event;
 import csw.services.event.exceptions.PublishFailedException;
 import csw.services.event.helpers.Utils;
 import csw.services.event.javadsl.IEventPublisher;
-import csw.services.event.javadsl.JRedisFactory;
+import csw.services.event.javadsl.JRedisSentinelFactory;
 import io.lettuce.core.ClientOptions;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -30,7 +29,7 @@ import static org.hamcrest.CoreMatchers.isA;
 public class JRedisFailureTest {
 
     private static RedisTestProps redisTestProps;
-    private static JRedisFactory jRedisFactory;
+    private static JRedisSentinelFactory jRedisSentinelFactory;
     private IEventPublisher publisher;
 
     @Rule
@@ -41,8 +40,7 @@ public class JRedisFailureTest {
         ClientOptions clientOptions = ClientOptions.builder().autoReconnect(false).disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS).build();
         redisTestProps = RedisTestProps.createRedisProperties(4561, 27380, 7380, clientOptions);
         ExecutionContext executionContext = redisTestProps.wiring().ec();
-        Materializer materializer = redisTestProps.wiring().resumingMat();
-        jRedisFactory = new JRedisFactory(redisTestProps.redisFactory(), executionContext, materializer);
+        jRedisSentinelFactory = new JRedisSentinelFactory(redisTestProps.redisFactory(), executionContext);
         redisTestProps.redisSentinel().start();
         redisTestProps.redis().start();
     }
@@ -57,7 +55,7 @@ public class JRedisFailureTest {
 
     @Test
     public void failureInPublishingShouldFailFutureWithPublishFailedException() throws InterruptedException, ExecutionException, TimeoutException {
-        publisher = jRedisFactory.publisher("mymaster").get(10, TimeUnit.SECONDS);
+        publisher = jRedisSentinelFactory.publisher("mymaster").get(10, TimeUnit.SECONDS);
         publisher.publish(Utils.makeEvent(2)).get(10, TimeUnit.SECONDS);
 
         publisher.shutdown().get(10, TimeUnit.SECONDS);
@@ -70,7 +68,7 @@ public class JRedisFailureTest {
 
     @Test
     public void handleFailedPublishEventWithACallback() throws InterruptedException, ExecutionException, TimeoutException {
-        publisher = jRedisFactory.publisher("mymaster").get(10, TimeUnit.SECONDS);
+        publisher = jRedisSentinelFactory.publisher("mymaster").get(10, TimeUnit.SECONDS);
 
         TestProbe testProbe = TestProbe.<Event>create(Adapter.toTyped(redisTestProps.wiring().actorSystem()));
         publisher.publish(Utils.makeEvent(1)).get(10, TimeUnit.SECONDS);
@@ -89,7 +87,7 @@ public class JRedisFailureTest {
 
     @Test
     public void handleFailedPublishEventWithAnEventGeneratorAndACallback() throws InterruptedException, ExecutionException, TimeoutException {
-        publisher = jRedisFactory.publisher("mymaster").get(10, TimeUnit.SECONDS);
+        publisher = jRedisSentinelFactory.publisher("mymaster").get(10, TimeUnit.SECONDS);
 
         TestProbe testProbe = TestProbe.create(Adapter.toTyped(redisTestProps.wiring().actorSystem()));
         publisher.publish(Utils.makeEvent(1)).get(10, TimeUnit.SECONDS);

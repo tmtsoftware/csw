@@ -25,7 +25,7 @@ class Scenarios(testConfigs: TestConfigs) {
         payloadSize = 100,
         publisherSubscriberPairs = 1,
         singlePublisher = false
-      ),
+      )
 //      TestSettings(
 //        testName = "1-to-1-size-1KB",
 //        totalTestMsgs = adjustedTotalMessages(2000),

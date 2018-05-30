@@ -4,6 +4,7 @@ import java.util.concurrent.CompletableFuture
 
 import akka.actor.ActorSystem
 import akka.stream.Materializer
+import csw.services.event.internal.commons.EventServiceAdapter
 import csw.services.event.scaladsl.KafkaFactory
 
 import scala.compat.java8.FutureConverters.FutureOps
@@ -11,9 +12,23 @@ import scala.concurrent.ExecutionContext
 
 class JKafkaFactory(kafkaFactory: KafkaFactory)(implicit val actorSystem: ActorSystem, ec: ExecutionContext, mat: Materializer) {
 
-  def publisher(host: String, port: Int): IEventPublisher = kafkaFactory.publisher(host, port).asJava
-  def publisher(): CompletableFuture[IEventPublisher]     = kafkaFactory.publisher().map(_.asJava).toJava.toCompletableFuture
+  def publisher(host: String, port: Int): IEventPublisher =
+    EventServiceAdapter.asJava(kafkaFactory.publisher(host, port))
 
-  def subscriber(host: String, port: Int): IEventSubscriber = kafkaFactory.subscriber(host, port).asJava
-  def subscriber(): CompletableFuture[IEventSubscriber]     = kafkaFactory.subscriber().map(_.asJava).toJava.toCompletableFuture
+  def publisher(): CompletableFuture[IEventPublisher] =
+    kafkaFactory
+      .publisher()
+      .map(EventServiceAdapter.asJava)
+      .toJava
+      .toCompletableFuture
+
+  def subscriber(host: String, port: Int): IEventSubscriber =
+    EventServiceAdapter.asJava(kafkaFactory.subscriber(host, port))
+
+  def subscriber(): CompletableFuture[IEventSubscriber] =
+    kafkaFactory
+      .subscriber()
+      .map(EventServiceAdapter.asJava)
+      .toJava
+      .toCompletableFuture
 }

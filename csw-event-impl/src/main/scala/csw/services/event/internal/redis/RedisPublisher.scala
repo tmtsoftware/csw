@@ -54,6 +54,4 @@ class RedisPublisher(
     publish(eventPublisherUtil.eventSource(eventGenerator, every), onError)
 
   override def shutdown(): Future[Done] = asyncConnectionF.flatMap(_.quit().toScala).map(_ ⇒ Done)
-
-  override def asJava: IEventPublisher = new JEventPublisher(this)
 }

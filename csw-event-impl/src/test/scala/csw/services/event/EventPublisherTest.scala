@@ -101,8 +101,9 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
 
     val subscription = subscriber.subscribe(Set(eventKey)).to(Sink.foreach[Event](queue.enqueue(_))).run()
     subscription.ready.await
+    Thread.sleep(500) // Needed for getting the latest event
 
-    cancellable = publisher.publish(eventGenerator, 2.millis)
+    cancellable = publisher.publish(eventGenerator, 100.millis)
     Thread.sleep(1000)
     cancellable.cancel()
 

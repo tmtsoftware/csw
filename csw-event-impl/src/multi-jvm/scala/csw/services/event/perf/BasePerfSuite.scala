@@ -97,8 +97,6 @@ class BasePerfSuite
       case (doneF, subscriber) ⇒
         Await.result(doneF, Duration.Inf)
         if (!subscriber.isPatternSubscriber) {
-          subscriber.printResult()
-
           outOfOrderCountPerNode += subscriber.outOfOrderCount
           totalDroppedPerNode += subscriber.totalDropped()
           avgLatencyPerNode =
