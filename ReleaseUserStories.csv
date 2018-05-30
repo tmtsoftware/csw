@@ -1,0 +1,266 @@
+Key,Epic Link,Summary,Status,Updated
+DEOPSCSW-2,CSW-I0,Setup github repo,Done,3/1/17 2:12
+DEOPSCSW-3,CSW-I0,Setup the project template with build.sbt,Done,3/13/17 21:40
+DEOPSCSW-4,CSW-I0,Setup JIRA,Done,2/23/17 20:53
+DEOPSCSW-5,CSW-I0,Integration coverage tool in build (scoverage),Done,2/23/17 21:47
+DEOPSCSW-6,CSW-I0,Spike on other static analysis tools,Done,2/28/17 5:32
+DEOPSCSW-7,CSW-I0,Integrate scalafmt - basic setup,Done,3/1/17 2:13
+DEOPSCSW-8,CSW-I0,package and publish library jar,Done,3/8/17 21:39
+DEOPSCSW-9,CSW-I0,Document details on router configuration for jmDNS,Done,3/12/17 23:40
+DEOPSCSW-10,CSW-I0,Setup paradox/tut for documentation,Done,4/14/17 3:18
+DEOPSCSW-12,Location Service,Create location service API,Done,4/14/17 3:18
+DEOPSCSW-13,Location Service,Java API for location service,Done,4/18/17 10:56
+DEOPSCSW-14,Location Service,Codec for data model,Done,4/14/17 14:41
+DEOPSCSW-15,Location Service,Spike jmDNS/CRDT perf,Done,4/18/17 12:35
+DEOPSCSW-16,Location Service,Register a component,Done,4/14/17 15:04
+DEOPSCSW-17,Location Service,List registered services,Done,4/4/17 22:57
+DEOPSCSW-18,Location Service,Validate unique registrations,Done,4/17/17 19:17
+DEOPSCSW-19,Location Service,CRDT with Multiple NICs,Done,4/19/17 10:37
+DEOPSCSW-20,Location Service,Register a service,Done,4/17/17 2:01
+DEOPSCSW-22,Location Service,jmDNS with Multiple subnets,STIL validation,12/13/17 15:28
+DEOPSCSW-23,Location Service,Unregister a comp/service,Done,4/18/17 10:46
+DEOPSCSW-24,Location Service,Filter by comp/service type,Done,4/4/17 21:28
+DEOPSCSW-26,Location Service,Track a connection,Done,4/18/17 11:59
+DEOPSCSW-27,Configuration Service,Storing binary component configurations,Done,5/10/17 1:57
+DEOPSCSW-31,Location Service,Filter by hostname,Done,4/6/17 1:44
+DEOPSCSW-32,Location Service,Filter by connection type,Done,4/6/17 2:06
+DEOPSCSW-34,Location Service,Resolve a connection,Done,4/17/17 12:18
+DEOPSCSW-35,Location Service,CRDT detects comp/service crash,Done,4/18/17 12:23
+DEOPSCSW-36,Location Service,Track a crashed service/comp,Done,6/13/17 6:59
+DEOPSCSW-37,,TMT-CSW Inception,Done,2/28/17 5:15
+DEOPSCSW-39,Location Service,examples of Location Service,Done,7/20/17 13:47
+DEOPSCSW-40,Location Service,Location service programming documentation,Done,6/21/17 7:14
+DEOPSCSW-42,Configuration Service,Storing text based component configuration,Done,5/2/17 21:29
+DEOPSCSW-43,Configuration Service,Access Configuration service from any CSW component,Done,12/4/17 2:39
+DEOPSCSW-45,Configuration Service,Saving version information for config. file,Done,5/10/17 1:39
+DEOPSCSW-46,Configuration Service,Unique identifier for configuration file version,Done,5/4/17 7:39
+DEOPSCSW-47,Configuration Service,Unique name for configuration file,Done,5/4/17 7:58
+DEOPSCSW-48,Configuration Service,Store new configuration file in Config. service,Done,5/10/17 2:07
+DEOPSCSW-49,Configuration Service,Update an Existing File with a New Version,Done,5/16/17 11:01
+DEOPSCSW-50,Location Service,Create skeleton project structure for writing integration tests,Done,3/20/17 3:02
+DEOPSCSW-55,,Spike mDNS on AWS,Done,3/17/17 2:15
+DEOPSCSW-63,Configuration Service,Add comment while creating or updating a configuration file,Done,5/8/17 13:39
+DEOPSCSW-67,CSW-I0,Setup Jenkins build on AWS,Done,4/6/17 21:33
+DEOPSCSW-70,Configuration Service,Retrieve the current/most recent version of an existing configuration file,Done,5/16/17 10:35
+DEOPSCSW-71,Configuration Service,Retrieve any version of a configuration file using its unique id,Done,5/12/17 13:43
+DEOPSCSW-72,Configuration Service,Retrieve a configuration file to a specified file location on a local disk,Done,5/16/17 14:03
+DEOPSCSW-73,Configuration Service,Retrieve a configuration file to memory,Done,5/17/17 7:51
+DEOPSCSW-74,Configuration Service,Check config file existence by unique name,Done,5/4/17 8:23
+DEOPSCSW-75,Configuration Service,List the names of configuration files that match a path,Done,5/8/17 14:28
+DEOPSCSW-76,Configuration Service,Access a list of all the versions of a stored configuration file,Done,5/8/17 13:40
+DEOPSCSW-77,Configuration Service,Set default version of configuration file in config. service,Done,5/16/17 10:35
+DEOPSCSW-78,Configuration Service,Get the default version of a configuration file,Done,5/16/17 10:35
+DEOPSCSW-79,Configuration Service,Reset the default version of a configuration file,Done,5/12/17 14:38
+DEOPSCSW-80,Configuration Service,HTTP based access for configuration file,Done,5/30/17 9:46
+DEOPSCSW-81,Configuration Service,Storing large files in the configuration service,Done,5/12/17 14:43
+DEOPSCSW-82,Configuration Service,Define a standard format for configuration files,Done,6/22/17 23:23
+DEOPSCSW-83,Configuration Service,Retrieve file based on range of time for being most recent version,Done,5/26/17 10:32
+DEOPSCSW-84,Configuration Service,Scalable configuration service,Done,6/21/17 8:39
+DEOPSCSW-85,Configuration Service,Record of time and date when config file is created/updated,Done,5/16/17 11:35
+DEOPSCSW-86,Configuration Service,Retrieve a version of a configuration file based on time range for being default version,Done,5/26/17 10:36
+DEOPSCSW-88,Configuration Service,Config service API implementation details need to be hidden from component developer,Done,5/22/17 14:47
+DEOPSCSW-89,Configuration Service,Examples of Configuration Service usage in Java and Scala,Done,7/25/17 4:32
+DEOPSCSW-90,Configuration Service,Config service programming documentation,Done,6/21/17 8:01
+DEOPSCSW-93,Location Service,CRDT API definition,Done,3/23/17 21:38
+DEOPSCSW-94,Location Service,CRDT API implementation,Done,4/6/17 2:20
+DEOPSCSW-95,Location Service,Merge CRDT code from branch to master,Done,3/23/17 21:36
+DEOPSCSW-100,Configuration Service,Spike - Migration of current config service implementation,Done,4/24/17 0:22
+DEOPSCSW-103,Configuration Service,Java API for Configuration service,Done,5/30/17 9:43
+DEOPSCSW-112,Configuration Service,Command line interface client for Configuration service,Done,6/20/17 14:04
+DEOPSCSW-114,Logging Service,Inherit the code base from persist-logger project,Done,6/26/17 22:50
+DEOPSCSW-115,Logging Service,Format and control logging content,Done,7/18/17 8:11
+DEOPSCSW-116,Logging Service,Make log messages identifiable with components,Done,6/20/17 21:44
+DEOPSCSW-117,Logging Service,Provide unique name for each logging instance of components,Done,7/14/17 9:19
+DEOPSCSW-118,Logging Service,Provide UTC time for each log message,Done,7/19/17 14:24
+DEOPSCSW-119,Logging Service,Associate source with each log message,Done,7/6/17 13:09
+DEOPSCSW-121,Logging Service,Define structured tags for log messages,Done,7/11/17 16:21
+DEOPSCSW-122,Logging Service,Allow local component logs to be output to STDOUT,Done,7/19/17 14:33
+DEOPSCSW-123,Logging Service,Allow local component logs to be output to a file,Done,7/19/17 14:34
+DEOPSCSW-124,Logging Service,Define severity levels for log messages,Done,7/6/17 16:21
+DEOPSCSW-125,Logging Service,Define severity levels for specific components/log instances,Done,7/6/17 16:21
+DEOPSCSW-126,Logging Service,Configurability of logging characteristics for component / log instance,Done,7/21/17 11:58
+DEOPSCSW-127,Logging Service,Runtime update for logging characteristics,Done,9/19/17 22:17
+DEOPSCSW-130,Configuration Service,Command line App for HTTP server,Done,5/8/17 14:22
+DEOPSCSW-131,Configuration Service,Detect and handle oversize files,Done,5/22/17 13:19
+DEOPSCSW-132,Configuration Service,List oversize and normal sized files,Done,5/10/17 1:54
+DEOPSCSW-133,Configuration Service,Provide meta config for normal and oversize repo,Done,5/10/17 1:59
+DEOPSCSW-135,Configuration Service,Validation of suffix for active and sha files,Done,5/8/17 14:28
+DEOPSCSW-139,Configuration Service,Provide new routes to get/set the current active version of the file,Done,5/16/17 12:28
+DEOPSCSW-140,Configuration Service,Provide new routes to get active file as of date,Done,5/16/17 12:19
+DEOPSCSW-142,Logging Service,Flexibility of logging approaches,Done,7/21/17 11:58
+DEOPSCSW-148,Configuration Service,Performance of config service,Done,6/21/17 8:05
+DEOPSCSW-151,Logging Service,Manage log file size,Done,7/21/17 9:00
+DEOPSCSW-153,Logging Service,Accessibility of logging service to other CSW components,Done,11/14/17 7:51
+DEOPSCSW-154,Logging Service,Examples of Logging Service usage in Java and Scala,Done,8/1/17 8:08
+DEOPSCSW-155,Logging Service,Logging service programming documentation,Done,8/1/17 8:08
+DEOPSCSW-158,Logging Service,Logging service API implementation details to be hidden from component developer,Done,7/6/17 13:06
+DEOPSCSW-159,Logging Service,Support logging for existing CSW implementation,Done,7/19/17 20:16
+DEOPSCSW-160,Framework Service,Config(HTTP) Service can receive and handle runtime update for logging characteristics,Done,11/23/17 21:46
+DEOPSCSW-163,Framework Service,Provide admin facilities in the framework through Supervisor role,Done,9/18/17 14:40
+DEOPSCSW-165,Framework Service,CSW Assembly Creation,Done,9/18/17 11:34
+DEOPSCSW-166,Framework Service,CSW HCD Creation,Done,9/18/17 11:35
+DEOPSCSW-167,Framework Service,Creation and Deployment of Standalone Components,Done,10/10/17 16:12
+DEOPSCSW-168,Framework Service,Actors can receive and handle runtime update for logging characteristics,Done,11/26/17 20:16
+DEOPSCSW-169,Framework Service,Creation of Multiple Components,Done,9/18/17 17:11
+DEOPSCSW-170,Framework Service,Starting component using a file format,Done,9/12/17 7:38
+DEOPSCSW-171,Framework Service,Starting component from command line,Done,10/31/17 7:44
+DEOPSCSW-172,Framework Service,Starting a container from configuration file,Done,9/26/17 8:57
+DEOPSCSW-173,Framework Service,Host Configuration in file format,Done,11/20/17 4:54
+DEOPSCSW-174,Framework Service,Starting Multiple Containers with an init Script,Done,3/1/18 7:25
+DEOPSCSW-175,Framework Service,Starting multiple containers from command Line,Done,11/21/17 7:30
+DEOPSCSW-176,Framework Service,Provide Infrastructure to manage TMT lifecycle,Done,9/18/17 12:55
+DEOPSCSW-177,Framework Service,Hooks for lifecycle management,Done,9/18/17 9:53
+DEOPSCSW-178,Framework Service,Lifecycle success/failure notification,Done,10/10/17 8:16
+DEOPSCSW-179,Framework Service,Unique Action for a component,Done,10/3/17 8:47
+DEOPSCSW-180,Framework Service,Generic and Specific Log messages,Done,10/10/17 8:40
+DEOPSCSW-181,Framework Service,Multiple Examples for Lifecycle Support,Done,3/20/18 9:10
+DEOPSCSW-182,Framework Service,Control Life Cycle of Components,Done,9/18/17 17:58
+DEOPSCSW-183,Framework Service,Configure attributes and values,Done,8/30/17 4:13
+DEOPSCSW-184,Framework Service,Change configurations - attributes and values,Done,9/15/17 15:47
+DEOPSCSW-185,Framework Service,Easy to Use Syntax/Api,Done,8/29/17 9:06
+DEOPSCSW-186,Framework Service,Binary value payload,Done,8/29/17 8:26
+DEOPSCSW-187,Framework Service,Efficient serialization to/from binary,Done,8/30/17 10:24
+DEOPSCSW-188,Framework Service,Efficient Serialization to/from JSON,Done,9/12/17 7:41
+DEOPSCSW-189,Framework Service,SPIKE: Investigate best Unit solutions,Done,7/28/17 4:31
+DEOPSCSW-190,Framework Service,Implement Unit Support,Done,8/8/17 8:11
+DEOPSCSW-192,Framework Service,CSW programming document,Done,11/14/17 9:11
+DEOPSCSW-194,Connections and Command Service,Support long running actions asynchronously,Done,12/19/17 7:40
+DEOPSCSW-196,Connections and Command Service,Command Payloads for variable command content,Done,12/13/17 3:28
+DEOPSCSW-198,Connections and Command Service,Enable Assembly to accept a Setup or an Observe configuration,Done,11/21/17 8:45
+DEOPSCSW-199,Connections and Command Service,Enable HCD to accept a Setup configuration,Done,11/21/17 8:45
+DEOPSCSW-200,Connections and Command Service,Send Submit Configuration command,Done,10/20/17 10:27
+DEOPSCSW-201,Connections and Command Service,Destination component to receive a submit command,Done,11/28/17 8:18
+DEOPSCSW-202,Connections and Command Service,Verification of submit commands,Done,1/30/18 7:27
+DEOPSCSW-203,Connections and Command Service,Write component-specific verification code,Done,11/21/17 8:28
+DEOPSCSW-204,Connections and Command Service,Sender to know that Submit configuration command's validation was successful,Done,10/19/17 17:20
+DEOPSCSW-205,Connections and Command Service,Create unique id(runId) on command creation,Done,12/6/17 1:05
+DEOPSCSW-206,Connections and Command Service,Sender to know that Submit configuration command's validation failed,Done,10/20/17 10:30
+DEOPSCSW-207,Connections and Command Service,Report on Configuration Command Completion,Done,12/19/17 15:09
+DEOPSCSW-208,Connections and Command Service,Report failure on Configuration Completion command,Done,1/30/18 7:29
+DEOPSCSW-211,Connections and Command Service,Notification of Interrupted Message,Done,1/30/18 8:04
+DEOPSCSW-212,Connections and Command Service,Send oneway command,Done,10/20/17 10:26
+DEOPSCSW-213,Connections and Command Service,Sender to know that oneway configuration command's validation was successful,Done,10/19/17 17:19
+DEOPSCSW-214,Connections and Command Service,Sender to know that oneway configuration command's validation failed,Done,10/20/17 10:31
+DEOPSCSW-215,Connections and Command Service,Update location service documentation,Done,11/28/17 7:38
+DEOPSCSW-216,Connections and Command Service,Locate and connect components to send AKKA commands,Done,11/28/17 8:13
+DEOPSCSW-217,Connections and Command Service,Execute RPC like commands,Done,12/19/17 8:01
+DEOPSCSW-218,Connections and Command Service,Discover component connection information using Akka protocol,Done,11/28/17 8:12
+DEOPSCSW-219,Connections and Command Service,Discover component connection using HTTP protocol,Done,11/28/17 8:10
+DEOPSCSW-220,Connections and Command Service,Access and Monitor components for current values,Done,11/28/17 8:42
+DEOPSCSW-221,Connections and Command Service,Avoid sending commands to non-executing components,Done,12/14/17 10:44
+DEOPSCSW-222,Connections and Command Service,Locking a component for a specific duration,Done,12/12/17 8:11
+DEOPSCSW-223,Connections and Command Service,Expiry of component Locking mode,Done,12/15/17 0:26
+DEOPSCSW-224,Connections and Command Service,Inter component command sending,Done,1/23/18 7:46
+DEOPSCSW-225,Connections and Command Service,Allow components to receive commands,Done,1/23/18 7:45
+DEOPSCSW-227,Connections and Command Service,Distribute commands to multiple destinations,Done,3/6/18 8:11
+DEOPSCSW-228,Connections and Command Service,Assist Components with command completion,Done,12/19/17 8:15
+DEOPSCSW-229,Connections and Command Service,Provide matchers infrastructure for comparison,Done,12/19/17 15:08
+DEOPSCSW-231,Connections and Command Service,Measure Performance of Command Service,Done,1/30/18 8:26
+DEOPSCSW-233,Connections and Command Service,Hide implementation by having a CCS API,Done,3/6/18 8:25
+DEOPSCSW-234,Connections and Command Service,CCS accessibility to all CSW component builders,Done,2/6/18 8:17
+DEOPSCSW-235,Connections and Command Service,Example of CCS in Java and Scala,Done,4/12/18 7:43
+DEOPSCSW-236,Connections and Command Service,Update Documentation for sections and content of CCS,Done,3/13/18 8:05
+DEOPSCSW-271,Logging Service,API change,Done,7/19/17 14:41
+DEOPSCSW-272,Logging Service,Choose Appenders from Conf file,Done,7/25/17 8:59
+DEOPSCSW-273,Logging Service,Change API to have keys from constants,Done,7/25/17 8:37
+DEOPSCSW-274,Logging Service,Write New formatter,Done,4/12/18 8:31
+DEOPSCSW-275,Logging Service,Improve performance implication of changing logLevel of just one comp,Done,7/25/17 8:36
+DEOPSCSW-278,Logging Service,Create Java API without arguments as suppliers,Done,7/25/17 8:36
+DEOPSCSW-279,Logging Service,Test logging performance,Done,7/25/17 9:00
+DEOPSCSW-280,Framework Service,SPIKE: Introduce Akkatyped in logging,Done,7/27/17 3:22
+DEOPSCSW-281,Logging Service,Rolling File Configuration,Done,7/25/17 7:59
+DEOPSCSW-282,Framework Service,Add a timestamp Key and Parameter,Done,9/7/17 10:13
+DEOPSCSW-283,Framework Service,Parsing HOCON conf file,Done,9/12/17 7:04
+DEOPSCSW-284,Framework Service,Move Timeouts to Config file,Done,10/5/17 8:01
+DEOPSCSW-286,Framework Service,Protobuf Spike,Done,9/19/17 21:53
+DEOPSCSW-287,Framework Service,"Spike: Verify Protobuf support for Keys, Keytype, Parameters, Events, Units",Done,9/20/17 21:36
+DEOPSCSW-289,Framework Service,Migrate csw-prod to SBT 1.0.2,Done,9/20/17 21:40
+DEOPSCSW-291,Framework Service,Pull framework messages out in csw-param,Done,10/10/17 9:19
+DEOPSCSW-292,Framework Service,Pull LocationService models out in csw-param,Done,10/10/17 9:20
+DEOPSCSW-293,Connections and Command Service,Sanitise handlers in Component Handlers,Done,10/19/17 16:45
+DEOPSCSW-296,Framework Service,Update documentation of logging,Done,11/29/17 0:21
+DEOPSCSW-297,Framework Service,Merge protobuf branch in master,Done,10/31/17 17:53
+DEOPSCSW-298,Framework Service,DeathWatch Http components,Done,11/21/17 7:58
+DEOPSCSW-299,Framework Service,CSW-Vslice clean up,Done,10/21/17 9:55
+DEOPSCSW-300,Framework Service,DeathWatch tcp components,Done,11/21/17 7:59
+DEOPSCSW-301,Connections and Command Service,Support UnLocking,Done,12/12/17 8:12
+DEOPSCSW-303,Connections and Command Service,Spike Command service in component,Done,11/1/17 2:41
+DEOPSCSW-305,Framework Service,Spike immutable component handlers,Done,11/1/17 8:44
+DEOPSCSW-306,Connections and Command Service,Include runId in Command response,Done,12/12/17 9:11
+DEOPSCSW-307,Framework Service,Replace spray-json with play-json,Done,11/14/17 8:25
+DEOPSCSW-308,Connections and Command Service,Add prefix in Location service models,Done,12/6/17 0:54
+DEOPSCSW-309,Framework Service,Documentation of csw-messages(params/units/protobuf),Done,12/6/17 6:26
+DEOPSCSW-310,Framework Service,Documentation of HostConfiguration application and Init.d configuration.,Done,3/27/18 7:11
+DEOPSCSW-312,Monitoring App,Spike - Monitoring app setup,Done,11/13/17 20:14
+DEOPSCSW-313,Connections and Command Service,Support short running actions by providing immediate response,Done,1/23/18 8:05
+DEOPSCSW-315,Connections and Command Service,Make ObsID optional in commands,Done,12/6/17 6:42
+DEOPSCSW-316,Connections and Command Service,Improve Logger accessibility for component developers,Done,12/12/17 7:09
+DEOPSCSW-317,Connections and Command Service,Use state values of HCD to determine command completion,Done,3/1/18 7:46
+DEOPSCSW-320,Connections and Command Service,"Add command type in Setup, observe and wait",Done,12/19/17 14:02
+DEOPSCSW-321,Connections and Command Service,AkkaLocation provides wrapper for ActorRef[ComponentMessage],Done,12/19/17 7:36
+DEOPSCSW-325,Logging Service,Include exception stack trace in stdout log message for exceptions,Done,2/13/18 7:24
+DEOPSCSW-327,Event Services,Define Event Data Structure,Done,3/6/18 8:48
+DEOPSCSW-328,Event Services,Basic information of Event needed for routing and Diagnostic use,Done,4/19/18 7:57
+DEOPSCSW-332,Event Services,SPIKE - Kafka Latency performance,Done,2/8/18 0:38
+DEOPSCSW-333,Event Services,SPIKE: Redis spike for performance and driver,Done,2/8/18 0:38
+DEOPSCSW-334,Event Services,Publish an Event,Done,5/1/18 8:57
+DEOPSCSW-335,Event Services,Model for EventName that encapsulates the topic(or channel ) name,Done,4/19/18 8:42
+DEOPSCSW-336,Event Services,Pattern based subscription,In Analysis,5/30/18 6:00
+DEOPSCSW-337,Event Services,Subscribe to an event based on prefix,Done,4/24/18 9:44
+DEOPSCSW-338,Event Services,Provide callback for Event alerts,Done,5/8/18 8:46
+DEOPSCSW-339,Event Services,Provide actor ref to alert about Event arrival,Done,5/8/18 9:04
+DEOPSCSW-340,Event Services,Provide most recently published event for subscribed prefix and name,Done,4/24/18 9:44
+DEOPSCSW-341,Event Services,Allow to reuse single connection for subscribing to multiple EventKeys,TMT PO Validation,5/30/18 6:01
+DEOPSCSW-342,Event Services,Subscription with consumption frequency,STIL validation,5/20/18 20:48
+DEOPSCSW-343,Event Services,Unsubscribe based on prefix and event name,Done,5/24/18 8:49
+DEOPSCSW-344,Event Services,Retrieve recently published event using prefix and eventname,Done,4/24/18 9:44
+DEOPSCSW-345,Event Services,Publish events irrespective of subscriber existence,Done,5/24/18 9:19
+DEOPSCSW-346,Event Services,Subscribe to event irrespective of Publisher's existence,Done,5/24/18 8:54
+DEOPSCSW-352,Formal Release 1,SPIKE: large file storage on github,Done,1/30/18 5:49
+DEOPSCSW-353,Formal Release 1,Implement provision to auto deploy application zips and sources to github,Done,3/13/18 22:21
+DEOPSCSW-354,Formal Release 1,Process for Consumers to view changelog,Done,3/13/18 8:25
+DEOPSCSW-355,Formal Release 1,Start csw-prod services by a single script,Done,3/13/18 13:23
+DEOPSCSW-356,Formal Release 1,SPIKE: Jenkins Acceptance Pipeline,Done,3/20/18 9:30
+DEOPSCSW-357,Formal Release 1,SPIKE: Execute regression suite against published binaries,Done,2/22/18 21:21
+DEOPSCSW-358,Formal Release 1,Create independent github repository to pull csw libs from bintray and run acceptance tests against it,Done,3/13/18 13:02
+DEOPSCSW-359,Formal Release 1,SPIKE: Paradox document versioning,Done,2/4/18 21:11
+DEOPSCSW-360,Formal Release 1,Implement Paradox doc versioning,Done,3/13/18 13:03
+DEOPSCSW-369,Connections and Command Service,Unique runId for commands,Done,2/13/18 7:49
+DEOPSCSW-370,Framework Service,Remove DomainMsg from Framework,Done,2/21/18 23:27
+DEOPSCSW-371,Connections and Command Service,Provide an API for CommandResponseManager that hides actor based interaction,Done,3/6/18 8:33
+DEOPSCSW-372,Connections and Command Service,Provide an API for PubSubActor that hides actor based interaction,Done,3/6/18 8:33
+DEOPSCSW-373,Framework Service,Update documentation after removing domainMsg,Done,3/1/18 7:41
+DEOPSCSW-374,Formal Release 1,Identify non-public code and make it private,Done,3/13/18 8:09
+DEOPSCSW-375,Formal Release 1,Document exceptions for services and apps,Done,4/12/18 7:41
+DEOPSCSW-376,Formal Release 1,Update Readme for main and modules,Done,3/27/18 7:51
+DEOPSCSW-377,Formal Release 1,Documentation for package/module,Done,3/22/18 8:17
+DEOPSCSW-379,Event Services,Remove ccs package from csw.messages,Done,3/22/18 8:06
+DEOPSCSW-380,Formal Release 1,Create csw template project using giter8,Done,4/12/18 7:41
+DEOPSCSW-381,Formal Release 1,Write documentation for messages,Done,4/12/18 7:38
+DEOPSCSW-382,Formal Release 1,"Write documentation for framework, commands and apps",Done,4/12/18 7:39
+DEOPSCSW-383,Formal Release 1,"Write documentation for location, config modules and logging",Done,4/12/18 7:40
+DEOPSCSW-384,Formal Release 1,Upgrade Akka to 2.5.11,Done,3/27/18 7:48
+DEOPSCSW-385,Formal Release 1,Upgrade Akka-HTTP to 10.1.0,Done,3/22/18 8:50
+DEOPSCSW-387,Formal Release 1,Add getting started guide for csw-prod consumers,Done,3/27/18 7:13
+DEOPSCSW-388,Formal Release 1,Add create component guide for csw-prod consumers,Done,3/27/18 7:26
+DEOPSCSW-389,Formal Release 1,Add guide for creating tests,Done,4/12/18 7:39
+DEOPSCSW-390,Formal Release 1,Add overview of csw services,Done,4/12/18 7:40
+DEOPSCSW-391,Formal Release 1,Add guide to create multiple components,Done,4/12/18 7:41
+DEOPSCSW-392,Connections and Command Service,Provide a helper method in commands to create unique runId,Done,4/12/18 7:55
+DEOPSCSW-394,Formal Release 1,Add guide for different sbt tasks,Done,3/27/18 7:22
+DEOPSCSW-395,Event Services,Provide EventService handle to component developers,In Analysis,5/28/18 4:07
+DEOPSCSW-396,Event Services,SPIKE: Setup test infrastructure for measuring throughput of event service,Done,4/6/18 9:56
+DEOPSCSW-397,Event Services,SPIKE: Setup test infrastructure for measuring latency of event service,Done,4/5/18 3:48
+DEOPSCSW-398,Event Services,Propagate failure for publish api (eventGenerator),Done,5/8/18 9:19
+DEOPSCSW-399,Event Services,Propagate failure for publish api when redis/kafka server is down,In Analysis,5/29/18 1:20
+DEOPSCSW-402,Event Services,Setup EC2 instances for measuring event service performance,Done,5/2/18 22:28
+DEOPSCSW-403,Formal Release 1,Showcase for formal release 0.4.0,Done,5/1/18 22:27
+DEOPSCSW-404,Event Services,Spike TestNG for event servicetest,Done,5/8/18 8:16
+DEOPSCSW-405,Event Services,[Redis]Measure performance of model observatory scenario,In Dev,5/30/18 5:30
+DEOPSCSW-406,Event Services,[Kafka]Measure performance of model observatory scenario,In Dev,5/20/18 20:48
+DEOPSCSW-407,Event Services,Create infra suite for running multiple pubs/subs with different rates in multiple processes,STIL validation,5/20/18 20:48
+DEOPSCSW-408,Event Services,[1-to-1]Measure performance of event service with varying payload sizes,In Dev,5/29/18 0:20
+DEOPSCSW-410,Event Services,"SPIKE: Gather system statistics while running perf tests for hours, this includes:",STIL validation,5/24/18 23:51
+DEOPSCSW-412,Event Services,Spike Redis Sentinel and compare its performance to Redis Single Server,STIL validation,5/22/18 0:07
+DEOPSCSW-413,Formal Release 1,Review and merge v4.0.1-JavaTutorial,TMT PO Validation,5/29/18 5:05
+Generated at Wed May 30 20:52:13 UTC 2018 by Jason Weiss using Jira 1001.0.0-SNAPSHOT#100086-sha1:eabe2b7b3e68d5819500750c754590843458404e. ,,,,
