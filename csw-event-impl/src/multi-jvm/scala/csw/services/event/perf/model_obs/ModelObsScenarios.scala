@@ -65,7 +65,7 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
       }
     )
 
-  val idealMultiNodeModelObsWithPatternScenario: ModelObservatoryTestSettings =
+  val idealMultiNodePatternModelObsScenario: ModelObservatoryTestSettings =
     ModelObservatoryTestSettings(
       JvmSetting(
         TCS.entryName,
@@ -78,7 +78,7 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
           SubSetting(s"${TCS.entryName}-1", noOfSubs = 3, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
           SubSetting(s"${TCS.entryName}-1", noOfSubs = 25, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
           SubSetting(s"${TCS.entryName}-1", noOfSubs = 250, adjustedTotalMsgs(1), rate = 1, payloadSize = 128),
-          SubSetting(s"${TCS.entryName}-pattern-1", noOfSubs = 1, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
+          SubSetting(s"${TCS.entryName}-all-1", noOfSubs = 2, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
         )
       ) ::
       List(AOESW, IRIS, NFIRAOS, WFOS).flatMap { subsystem ⇒
@@ -97,26 +97,31 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
                   List(
                     SubSetting(s"${IRIS.entryName}-$n", noOfSubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
                     SubSetting(s"${IRIS.entryName}-$n", noOfSubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128),
-                    SubSetting(s"${IRIS.entryName}-pattern-$n", noOfSubs = 1, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
+                    SubSetting(s"${IRIS.entryName}-pattern-$n", noOfSubs = 3, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
                   )
                 case IRIS ⇒
                   List(
                     //              SubSetting(s"${TCS.entryName}-1", noOfSubs = 1, adjustedTotalMessages(6000), rate = 100, payloadSize = 128),
                     SubSetting(s"${AOESW.entryName}-$n", noOfSubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
                     SubSetting(s"${AOESW.entryName}-$n", noOfSubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128),
-                    SubSetting(s"${AOESW.entryName}-pattern-$n", noOfSubs = 1, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
+                    SubSetting(s"${AOESW.entryName}-pattern-$n", noOfSubs = 3, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
                   )
                 case NFIRAOS ⇒
                   List(
                     //              SubSetting(s"${TCS.entryName}-1", noOfSubs = 1, adjustedTotalMessages(6000), rate = 100, payloadSize = 128),
                     SubSetting(s"${WFOS.entryName}-$n", noOfSubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
-                    SubSetting(s"${WFOS.entryName}-$n", noOfSubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
+                    SubSetting(s"${WFOS.entryName}-$n", noOfSubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128),
+                    SubSetting(s"${WFOS.entryName}-pattern-$n", noOfSubs = 2, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
                   )
                 case WFOS ⇒
                   List(
                     //              SubSetting(s"${TCS.entryName}-1", noOfSubs = 3, adjustedTotalMessages(6000), rate = 100, payloadSize = 128),
                     SubSetting(s"${NFIRAOS.entryName}-$n", noOfSubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
-                    SubSetting(s"${NFIRAOS.entryName}-$n", noOfSubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
+                    SubSetting(s"${NFIRAOS.entryName}-pattern-$n",
+                               noOfSubs = 2,
+                               adjustedTotalMsgs(1),
+                               rate = 1,
+                               payloadSize = 128)
                   )
               }
             )
@@ -217,7 +222,7 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
       }
     )
 
-  val modelObsScenarioWithTwoProcessesWithPattern: ModelObservatoryTestSettings =
+  val modelObsScenarioPatternWithTwoProcesses: ModelObservatoryTestSettings =
     ModelObservatoryTestSettings(
       JvmSetting(
         TCS.entryName,
@@ -230,7 +235,7 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
           SubSetting(s"${TCS.entryName}-1", noOfSubs = 1, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
           SubSetting(s"${TCS.entryName}-1", noOfSubs = 10, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
           SubSetting(s"${TCS.entryName}-1", noOfSubs = 30, adjustedTotalMsgs(5), rate = 5, payloadSize = 128),
-          SubSetting(s"${TCS.entryName}-pattern-1", noOfSubs = 1, adjustedTotalMsgs(5), rate = 5, payloadSize = 128)
+          SubSetting(s"${TCS.entryName}-all-1", noOfSubs = 1, adjustedTotalMsgs(5), rate = 5, payloadSize = 128)
         )
       ) ::
       List(AOESW).flatMap { subsystem ⇒

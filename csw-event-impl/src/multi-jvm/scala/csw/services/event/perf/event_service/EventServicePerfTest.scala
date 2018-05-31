@@ -109,7 +109,7 @@ class EventServicePerfTest extends BasePerfSuite {
       waitForResultsFromAllSubscribers(subscribers)
       rep.halt()
 
-      subscribers.foreach { case (_, subscriber) if !subscriber.isPatternSubscriber ⇒ subscriber.printResult() }
+      subscribers.foreach { case (_, subscriber) ⇒ subscriber.printResult() }
 
       runOn(activeSubscriberNodes.head) {
         val aggregatedResult = completionProbe.expectMessageType[AggregatedResult](5.minute)

@@ -116,7 +116,7 @@ class ModelObsPerfTest extends BasePerfSuite {
       waitForResultsFromAllSubscribers(subscribers)
       rep.halt()
 
-      subscribers.foreach { case (_, subscriber) if !subscriber.isPatternSubscriber ⇒ subscriber.printResult() }
+      subscribers.foreach { case (_, subscriber) ⇒ subscriber.printResult() }
 
       runOn(roles.last) {
         val aggregatedResult = completionProbe.expectMessageType[AggregatedResult](maxTimeout)
