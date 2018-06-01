@@ -86,12 +86,12 @@ class BasePerfSuite
   }
 
   def waitForResultsFromAllSubscribers(subscribers: immutable.Seq[(Future[Done], PerfSubscriber)]): Unit = {
-    val histogramPerNode       = new Histogram(SECONDS.toNanos(10), 3)
-    var totalTimePerNode       = 0L
-    var eventsReceivedPerNode  = 0L
-    var totalDroppedPerNode    = 0L
-    var outOfOrderCountPerNode = 0L
-    var avgLatencyPerNode      = 0L
+    val histogramPerNode         = new Histogram(SECONDS.toNanos(10), 3)
+    var totalTimePerNode         = 0L
+    var eventsReceivedPerNode    = 0L
+    var totalDroppedPerNode      = 0L
+    var outOfOrderCountPerNode   = 0L
+    var aggregatedLatencyPerNode = 0L
 
     subscribers.foreach {
       case (doneF, subscriber) ⇒
@@ -99,9 +99,7 @@ class BasePerfSuite
         if (!subscriber.isPatternSubscriber) {
           outOfOrderCountPerNode += subscriber.outOfOrderCount
           totalDroppedPerNode += subscriber.totalDropped()
-          avgLatencyPerNode =
-            if (avgLatencyPerNode == 0) subscriber.avgLatency else (avgLatencyPerNode + subscriber.avgLatency) / 2
-
+          aggregatedLatencyPerNode += subscriber.avgLatency()
           histogramPerNode.add(subscriber.histogram)
           eventsReceivedPerNode += subscriber.eventsReceived
           totalTimePerNode = Math.max(totalTimePerNode, subscriber.totalTime)
@@ -118,7 +116,7 @@ class BasePerfSuite
           eventsReceivedPerNode / nanosToSeconds(totalTimePerNode),
           totalDroppedPerNode,
           outOfOrderCountPerNode,
-          avgLatencyPerNode
+          aggregatedLatencyPerNode / subscribers.size
         )
       ),
       defaultTimeout

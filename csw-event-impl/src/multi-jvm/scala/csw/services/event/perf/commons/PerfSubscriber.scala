@@ -36,13 +36,13 @@ class PerfSubscriber(
   val histogram: Histogram   = new Histogram(SECONDS.toNanos(10), 3)
   private val resultReporter = new ResultReporter(name, actorSystem)
 
-  var startTime       = 0L
-  var totalTime       = 0L
-  var avgLatency      = 0L
-  var eventsReceived  = 0L
-  var lastId          = 0
-  var outOfOrderCount = 0
-  var lastCurrentId   = 0
+  var startTime         = 0L
+  var totalTime         = 0L
+  var aggregatedLatency = 0L
+  var eventsReceived    = 0L
+  var lastId            = 0
+  var outOfOrderCount   = 0
+  var lastCurrentId     = 0
 
   private val eventKeys = Set(EventKey(s"$testEventKey-$subscribeKey"), EventKey(s"${prefix.prefix}.$endEventS-$subscribeKey"))
 
@@ -70,11 +70,9 @@ class PerfSubscriber(
     val currentTime          = getNanos(Instant.now()).toLong
     val eventOriginationTime = getNanos(event.eventTime.time).toLong
     val latency              = currentTime - eventOriginationTime
+    aggregatedLatency += latency
 
-    if (eventsReceived == 0) {
-      startTime = currentTime.toLong
-      avgLatency = latency
-    }
+    if (eventsReceived == 0) startTime = currentTime.toLong
 
     eventsReceived += 1
     totalTime = currentTime - startTime
@@ -92,11 +90,10 @@ class PerfSubscriber(
     lastId = currentId
 
     if (!inOrder) outOfOrderCount += 1
-
-    avgLatency = (avgLatency + latency) / 2
   }
 
   def totalDropped(): Long = totalTestMsgs - eventsReceived
+  def avgLatency(): Long   = aggregatedLatency / eventsReceived
 
   def printResult(): Unit =
     resultReporter.printResult(
@@ -107,7 +104,7 @@ class PerfSubscriber(
       eventsReceived,
       totalTime,
       outOfOrderCount,
-      avgLatency
+      avgLatency()
     )
 
   private def isSubsystemPatternSubscriber: Boolean = patternBasedSubscription & name.contains("pattern")
