@@ -14,19 +14,22 @@ class TestWiring(actorSystem: ActorSystem) extends MockitoSugar {
   val wiring = new Wiring(actorSystem)
   import wiring._
 
+  private val masterId            = "mymaster"
   private val eventPublisherUtil  = new EventPublisherUtil()
   private val eventSubscriberUtil = new EventSubscriberUtil()
+
   lazy val redisFactory: RedisSentinelFactory =
     new RedisSentinelFactory(RedisClient.create(), mock[EventServiceResolver], eventPublisherUtil, eventSubscriberUtil)
+
   lazy val kafkaFactory: KafkaFactory =
     new KafkaFactory(mock[EventServiceResolver], eventPublisherUtil, eventSubscriberUtil)(actorSystem, ec, resumingMat)
 
   def publisher: EventPublisher =
-    if (redisEnabled) redisFactory.publisher(redisHost, redisPort, "mymaster")
+    if (redisEnabled) redisFactory.publisher(redisHost, redisPort, masterId)
     else kafkaFactory.publisher(kafkaHost, kafkaPort)
 
   def subscriber: EventSubscriber =
-    if (redisEnabled) redisFactory.subscriber(redisHost, redisPort, "mymaster")
+    if (redisEnabled) redisFactory.subscriber(redisHost, redisPort, masterId)
     else kafkaFactory.subscriber(kafkaHost, kafkaPort)
 
 }

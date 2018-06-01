@@ -3,12 +3,10 @@ package csw.services.event.internal.kafka
 import akka.Done
 import akka.actor.Cancellable
 import akka.kafka.ProducerSettings
-import akka.stream.Materializer
 import akka.stream.scaladsl.Source
 import csw.messages.events.Event
 import csw.services.event.exceptions.PublishFailedException
-import csw.services.event.internal.pubsub.{EventPublisherUtil, JEventPublisher}
-import csw.services.event.javadsl.IEventPublisher
+import csw.services.event.internal.pubsub.EventPublisherUtil
 import csw.services.event.scaladsl.EventPublisher
 import org.apache.kafka.clients.producer.{Callback, ProducerRecord}
 
@@ -19,7 +17,7 @@ import scala.util.control.NonFatal
 class KafkaPublisher(
     producerSettings: ProducerSettings[String, Array[Byte]],
     eventPublisherUtil: EventPublisherUtil
-)(implicit ec: ExecutionContext, mat: Materializer)
+)(implicit ec: ExecutionContext)
     extends EventPublisher {
 
   private val kafkaProducer = producerSettings.createKafkaProducer()

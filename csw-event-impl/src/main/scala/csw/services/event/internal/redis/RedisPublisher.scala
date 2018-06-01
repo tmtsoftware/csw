@@ -2,12 +2,10 @@ package csw.services.event.internal.redis
 
 import akka.Done
 import akka.actor.Cancellable
-import akka.stream._
 import akka.stream.scaladsl.Source
 import csw.messages.events.{Event, EventKey}
 import csw.services.event.exceptions.PublishFailedException
-import csw.services.event.internal.pubsub.{EventPublisherUtil, JEventPublisher}
-import csw.services.event.javadsl.IEventPublisher
+import csw.services.event.internal.pubsub.EventPublisherUtil
 import csw.services.event.scaladsl.EventPublisher
 import io.lettuce.core.api.async.RedisAsyncCommands
 import io.lettuce.core.{RedisClient, RedisURI}
@@ -22,7 +20,7 @@ class RedisPublisher(
     redisURI: RedisURI,
     redisClient: RedisClient,
     eventPublisherUtil: EventPublisherUtil
-)(implicit ec: ExecutionContext, mat: Materializer)
+)(implicit ec: ExecutionContext)
     extends EventPublisher {
 
   private val parallelism = 1

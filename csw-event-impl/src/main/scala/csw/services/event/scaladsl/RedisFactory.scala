@@ -2,7 +2,6 @@ package csw.services.event.scaladsl
 
 import java.net.URI
 
-import akka.stream.Materializer
 import csw.services.event.internal.pubsub.{EventPublisherUtil, EventSubscriberUtil}
 import csw.services.event.internal.redis.{RedisPublisher, RedisSubscriber}
 import csw.services.event.internal.wiring.EventServiceResolver
@@ -16,7 +15,7 @@ class RedisFactory(
     eventServiceResolver: EventServiceResolver,
     eventPublisherUtil: EventPublisherUtil,
     eventSubscriberUtil: EventSubscriberUtil
-)(implicit ec: ExecutionContext, mat: Materializer) {
+)(implicit ec: ExecutionContext) {
 
   def publisher(host: String, port: Int): EventPublisher = {
     val redisURI = RedisURI.create(host, port)

@@ -6,8 +6,7 @@ import akka.kafka.{scaladsl, ConsumerSettings, Subscription, Subscriptions}
 import akka.stream.Materializer
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import csw.messages.events._
-import csw.services.event.internal.pubsub.{EventSubscriberUtil, JEventSubscriber}
-import csw.services.event.javadsl.IEventSubscriber
+import csw.services.event.internal.pubsub.EventSubscriberUtil
 import csw.services.event.scaladsl.{EventSubscriber, EventSubscription, SubscriptionMode}
 import csw_protobuf.events.PbEvent
 import org.apache.kafka.clients.consumer.Consumer
@@ -37,13 +36,15 @@ class KafkaSubscriber(
 
     Source(invalidEvents)
       .concatMat(eventStream)(Keep.right)
-      .mapMaterializedValue { control ⇒
-        new EventSubscription {
-          override def unsubscribe(): Future[Done] = control.shutdown().map(_ ⇒ Done)
+      .mapMaterializedValue(eventSubscription)
+  }
 
-          override def ready(): Future[Done] = Future.successful(Done)
-        }
-      }
+  private def eventSubscription(control: scaladsl.Consumer.Control): EventSubscription = {
+    new EventSubscription {
+      override def unsubscribe(): Future[Done] = control.shutdown().map(_ ⇒ Done)
+
+      override def ready(): Future[Done] = Future.successful(Done)
+    }
   }
 
   override def get(eventKeys: Set[EventKey]): Future[Set[Event]] = {

@@ -24,6 +24,8 @@ class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
     .disconnectedBehavior(DisconnectedBehavior.REJECT_COMMANDS)
     .build
 
+  private val masterId = "mymaster"
+
   private val redisTestProps: RedisTestProps = RedisTestProps.createRedisProperties(3560, 26380, 6380, redisClientOptions)
 
   import redisTestProps._
@@ -42,7 +44,7 @@ class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
   }
 
   test("should throw PublishFailed exception on publish failure") {
-    val publisher = redisFactory.publisher("mymaster").await
+    val publisher = redisFactory.publisher(masterId).await
 
     publisher.publish(Utils.makeEvent(1)).await
 
@@ -57,7 +59,7 @@ class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
 
   //DEOPSCSW-334: Publish an event
   test("should invoke onError callback on publish failure [stream API]") {
-    val publisher = redisFactory.publisher("mymaster").await
+    val publisher = redisFactory.publisher(masterId).await
 
     val testProbe = TestProbe[Event]()(actorSystem.toTyped)
     publisher.publish(Utils.makeEvent(1)).await
@@ -76,7 +78,7 @@ class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
 
   //DEOPSCSW-334: Publish an event
   test("should invoke onError callback on publish failure [eventGenerator API]") {
-    val publisher = redisFactory.publisher("mymaster").await
+    val publisher = redisFactory.publisher(masterId).await
 
     val testProbe = TestProbe[Event]()(actorSystem.toTyped)
     publisher.publish(Utils.makeEvent(1)).await

@@ -31,6 +31,7 @@ public class JRedisFailureTest {
     private static RedisTestProps redisTestProps;
     private static JRedisSentinelFactory jRedisSentinelFactory;
     private IEventPublisher publisher;
+    private String masterId = "mymaster";
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
@@ -55,7 +56,7 @@ public class JRedisFailureTest {
 
     @Test
     public void failureInPublishingShouldFailFutureWithPublishFailedException() throws InterruptedException, ExecutionException, TimeoutException {
-        publisher = jRedisSentinelFactory.publisher("mymaster").get(10, TimeUnit.SECONDS);
+        publisher = jRedisSentinelFactory.publisher(masterId).get(10, TimeUnit.SECONDS);
         publisher.publish(Utils.makeEvent(2)).get(10, TimeUnit.SECONDS);
 
         publisher.shutdown().get(10, TimeUnit.SECONDS);
@@ -68,7 +69,7 @@ public class JRedisFailureTest {
 
     @Test
     public void handleFailedPublishEventWithACallback() throws InterruptedException, ExecutionException, TimeoutException {
-        publisher = jRedisSentinelFactory.publisher("mymaster").get(10, TimeUnit.SECONDS);
+        publisher = jRedisSentinelFactory.publisher(masterId).get(10, TimeUnit.SECONDS);
 
         TestProbe testProbe = TestProbe.<Event>create(Adapter.toTyped(redisTestProps.wiring().actorSystem()));
         publisher.publish(Utils.makeEvent(1)).get(10, TimeUnit.SECONDS);
@@ -87,7 +88,7 @@ public class JRedisFailureTest {
 
     @Test
     public void handleFailedPublishEventWithAnEventGeneratorAndACallback() throws InterruptedException, ExecutionException, TimeoutException {
-        publisher = jRedisSentinelFactory.publisher("mymaster").get(10, TimeUnit.SECONDS);
+        publisher = jRedisSentinelFactory.publisher(masterId).get(10, TimeUnit.SECONDS);
 
         TestProbe testProbe = TestProbe.create(Adapter.toTyped(redisTestProps.wiring().actorSystem()));
         publisher.publish(Utils.makeEvent(1)).get(10, TimeUnit.SECONDS);

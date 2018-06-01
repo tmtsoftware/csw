@@ -5,8 +5,7 @@ import akka.stream.KillSwitches
 import akka.stream.scaladsl.{Keep, Source}
 import akka.{Done, NotUsed}
 import csw.messages.events._
-import csw.services.event.internal.pubsub.{EventSubscriberUtil, JEventSubscriber}
-import csw.services.event.javadsl.IEventSubscriber
+import csw.services.event.internal.pubsub.EventSubscriberUtil
 import csw.services.event.scaladsl.{EventSubscriber, EventSubscription, SubscriptionMode}
 import io.lettuce.core.api.async.RedisAsyncCommands
 import io.lettuce.core.pubsub.api.reactive.RedisPubSubReactiveCommands
