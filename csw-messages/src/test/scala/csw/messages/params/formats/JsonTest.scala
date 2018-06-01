@@ -17,7 +17,7 @@ import csw.messages.params.generics.KeyType.{
 import csw.messages.params.generics._
 import csw.messages.params.models.Units.{degree, encoder, meter, NoUnits}
 import csw.messages.params.models._
-import csw.messages.params.states.{CurrentState, DemandState}
+import csw.messages.params.states.{CurrentState, DemandState, StateName}
 import org.scalatest.FunSpec
 import play.api.libs.json.Json
 
@@ -238,7 +238,7 @@ class JsonTest extends FunSpec {
     }
 
     it("Should encode/decode an CurrentState") {
-      val c1 = CurrentState(Prefix(ck)).add(i1).add(i2).add(i3).add(i4).add(i5).add(i6).add(i7)
+      val c1 = CurrentState(Prefix(ck), StateName("testStateName")).add(i1).add(i2).add(i3).add(i4).add(i5).add(i6).add(i7)
       assert(c1.size == 7)
       val c1out = JsonSupport.writeStateVariable(c1)
       val c1in  = JsonSupport.readStateVariable[CurrentState](c1out)
@@ -247,7 +247,7 @@ class JsonTest extends FunSpec {
     }
 
     it("Should encode/decode an DemandState") {
-      val c1 = DemandState(Prefix(ck)).add(i1).add(i2).add(i3).add(i4).add(i5).add(i6).add(i7)
+      val c1 = DemandState(Prefix(ck), StateName("testStateName")).add(i1).add(i2).add(i3).add(i4).add(i5).add(i6).add(i7)
       assert(c1.size == 7)
       val c1out = JsonSupport.writeStateVariable(c1)
       val c1in  = JsonSupport.readStateVariable[DemandState](c1out)

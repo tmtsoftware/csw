@@ -4,6 +4,9 @@
     "subsystem": "wfos",
     "prefix": "wfos.blue.filter"
   },
+  "stateName" : {
+    "name" : "testStateName"
+  },
   "paramSet": [{
     "keyName": "charKey",
     "keyType": "CharKey",

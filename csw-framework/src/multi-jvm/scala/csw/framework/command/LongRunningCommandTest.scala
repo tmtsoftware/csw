@@ -1,9 +1,9 @@
 package csw.framework.command
 
 import akka.actor.Scheduler
-import akka.stream.{ActorMaterializer, Materializer}
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.stream.{ActorMaterializer, Materializer}
 import akka.testkit.typed.TestKitSettings
 import akka.testkit.typed.scaladsl.TestProbe
 import akka.util.Timeout
@@ -15,7 +15,7 @@ import csw.messages.commands.{CommandResponse, Setup}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{AkkaLocation, ComponentId, ComponentType}
 import csw.messages.params.models.ObsId
-import csw.messages.params.states.CurrentState
+import csw.messages.params.states.{CurrentState, StateName}
 import csw.services.command.scaladsl.{CommandDistributor, CommandService}
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import org.scalatest.concurrent.{PatienceConfiguration, ScalaFutures}
@@ -90,10 +90,10 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
 
       // verify that commands gets completed in following sequence
       // ShortSetup => MediumSetup => LongSetup
-      probe.expectMessage(CurrentState(prefix, Set(choiceKey.set(shortCmdCompleted))))
-      probe.expectMessage(CurrentState(prefix, Set(choiceKey.set(mediumCmdCompleted))))
-      probe.expectMessage(CurrentState(prefix, Set(choiceKey.set(longCmdCompleted))))
-      probe.expectMessage(CurrentState(prefix, Set(choiceKey.set(longRunningCmdCompleted))))
+      probe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(shortCmdCompleted))))
+      probe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(mediumCmdCompleted))))
+      probe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(longCmdCompleted))))
+      probe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(longRunningCmdCompleted))))
 
       //#query-response
       val setupForQuery = Setup(prefix, longRunning, Some(obsId))

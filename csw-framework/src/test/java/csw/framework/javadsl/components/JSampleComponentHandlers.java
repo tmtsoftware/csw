@@ -17,6 +17,7 @@ import csw.messages.location.TrackingEvent;
 import csw.messages.params.generics.JKeyTypes;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.states.CurrentState;
+import csw.messages.params.states.StateName;
 import csw.messages.scaladsl.TopLevelActorMessage;
 import csw.services.command.scaladsl.CommandResponseManager;
 import csw.services.location.javadsl.ILocationService;
@@ -36,7 +37,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     private ILogger log;
     private CommandResponseManager commandResponseManager;
     private CurrentStatePublisher currentStatePublisher;
-    private CurrentState currentState = new CurrentState(SampleComponentState.prefix().prefix());
+    private CurrentState currentState = new CurrentState(SampleComponentState.prefix().prefix(), new StateName("testStateName"));
     private ActorContext<TopLevelActorMessage> actorContext;
 
     JSampleComponentHandlers(
@@ -125,7 +126,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     private void processCommandWithMatcher(ControlCommand controlCommand) {
         Source.range(1, 10)
                 .map(i -> {
-                    currentStatePublisher.publish(new CurrentState(controlCommand.source().prefix()).add(JKeyTypes.IntKey().make("encoder").set(i * 10)));
+                    currentStatePublisher.publish(new CurrentState(controlCommand.source().prefix(), new StateName("testStateName")).add(JKeyTypes.IntKey().make("encoder").set(i * 10)));
                     return i;
                 })
                 .throttle(1, Duration.create(100, TimeUnit.MILLISECONDS), 1, ThrottleMode.shaping())

@@ -14,7 +14,7 @@ import csw.messages.framework.ComponentInfo
 import csw.messages.location._
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.Id
-import csw.messages.params.states.CurrentState
+import csw.messages.params.states.{CurrentState, StateName}
 import csw.messages.scaladsl.TopLevelActorMessage
 import csw.services.command.scaladsl.CommandResponseManager
 import csw.services.location.scaladsl.LocationService
@@ -110,7 +110,10 @@ class ComponentHandlerForCommand(
       case `matcherFailedCmd` ⇒
         Source(1 to 10)
           .map(
-            i ⇒ currentStatePublisher.publish(CurrentState(controlCommand.source, Set(KeyType.IntKey.make("encoder").set(i * 1))))
+            i ⇒
+              currentStatePublisher.publish(
+                CurrentState(controlCommand.source, StateName("testStateName"), Set(KeyType.IntKey.make("encoder").set(i * 1)))
+            )
           )
           .throttle(1, 100.millis, 1, ThrottleMode.Shaping)
           .runWith(Sink.ignore)
@@ -118,7 +121,9 @@ class ComponentHandlerForCommand(
         Source(1 to 10)
           .map(
             i ⇒
-              currentStatePublisher.publish(CurrentState(controlCommand.source, Set(KeyType.IntKey.make("encoder").set(i * 10))))
+              currentStatePublisher.publish(
+                CurrentState(controlCommand.source, StateName("testStateName"), Set(KeyType.IntKey.make("encoder").set(i * 10)))
+            )
           )
           .throttle(1, 100.millis, 1, ThrottleMode.Shaping)
           .runWith(Sink.ignore)

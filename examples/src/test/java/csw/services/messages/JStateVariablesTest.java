@@ -8,6 +8,7 @@ import csw.messages.params.models.MatrixData;
 import csw.messages.params.models.ObsId;
 import csw.messages.params.states.CurrentState;
 import csw.messages.params.states.DemandState;
+import csw.messages.params.states.StateName;
 import org.junit.Assert;
 import org.junit.Test;
 import play.api.libs.json.JsValue;
@@ -46,11 +47,11 @@ public class JStateVariablesTest {
         Parameter<Instant> timestamp = timestampKey.set(Instant.now());
 
         //create DemandState and use sequential add
-        DemandState ds1 = new DemandState(prefix).add(charParam).add(intParam);
+        DemandState ds1 = new DemandState(prefix, new StateName("testStateName")).add(charParam).add(intParam);
         //create DemandState and add more than one Parameters using madd
-        DemandState ds2 = new DemandState(prefix).madd(intParam, booleanParam);
+        DemandState ds2 = new DemandState(prefix, new StateName("testStateName")).madd(intParam, booleanParam);
         //create DemandState using apply
-        DemandState ds3 = new DemandState(prefix).add(timestamp);
+        DemandState ds3 = new DemandState(prefix, new StateName("testStateName")).add(timestamp);
 
         //access keys
         Boolean charKeyExists = ds1.exists(charKey); //true
@@ -108,11 +109,11 @@ public class JStateVariablesTest {
         Parameter<Instant> timestamp = timestampKey.set(Instant.now());
 
         //create CurrentState and use sequential add
-        CurrentState cs1 = new CurrentState(prefix).add(charParam).add(intParam);
+        CurrentState cs1 = new CurrentState(prefix, new StateName("testStateName")).add(charParam).add(intParam);
         //create CurrentState and add more than one Parameters using madd
-        CurrentState cs2 = new CurrentState(prefix).madd(intParam, booleanParam);
+        CurrentState cs2 = new CurrentState(prefix, new StateName("testStateName")).madd(intParam, booleanParam);
         //create CurrentState using apply
-        CurrentState cs3 = new CurrentState(prefix).add(timestamp);
+        CurrentState cs3 = new CurrentState(prefix, new StateName("testStateName")).add(timestamp);
 
         //access keys
         Boolean charKeyExists = cs1.exists(charKey); //true
@@ -160,8 +161,8 @@ public class JStateVariablesTest {
         Parameter<MatrixData<Double>> i1 = k1.set(m1);
 
         //state variables
-        DemandState ds = new DemandState("wfos.blue.filter").add(i1);
-        CurrentState cs = new CurrentState("wfos.blue.filter").add(i1);
+        DemandState ds = new DemandState("wfos.blue.filter", new StateName("testStateName")).add(i1);
+        CurrentState cs = new CurrentState("wfos.blue.filter", new StateName("testStateName")).add(i1);
 
         //json support - write
         JsValue dsJson = JavaJsonSupport.writeStateVariable(ds);
@@ -207,7 +208,7 @@ public class JStateVariablesTest {
         Parameter<Integer> miscParam1 = miscKey.set(100);
 
         //Demand state with duplicate key via madd
-        DemandState state = new DemandState(prefix).madd(
+        DemandState state = new DemandState(prefix, new StateName("testStateName")).madd(
                 encParam1,
                 encParam2,
                 encParam3,

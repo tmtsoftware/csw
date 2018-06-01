@@ -5,7 +5,7 @@ import java.time.Instant
 import csw.messages.commands.{CommandName, Observe, Setup, Wait}
 import csw.messages.events.{Event, EventName, SystemEvent}
 import csw.messages.params.models.{ObsId, Prefix}
-import csw.messages.params.states.{CurrentState, CurrentStates}
+import csw.messages.params.states.{CurrentState, CurrentStates, StateName}
 import org.scalatest.FunSuite
 
 // DEOPSCSW-183: Configure attributes and values
@@ -36,7 +36,7 @@ class SerializationTest extends FunSuite {
     timestamp.set(Instant.now)
   ) //.second
 
-  val cs1: CurrentState = CurrentState(Prefix("tcs.pos")).madd(
+  val cs1: CurrentState = CurrentState(Prefix("tcs.pos"), StateName("testStateName")).madd(
     ra.set("12:32:11"),
     dec.set("30:22:22"),
     epoch.set(1950.0),

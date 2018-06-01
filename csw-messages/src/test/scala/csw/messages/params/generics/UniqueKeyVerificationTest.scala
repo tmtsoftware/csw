@@ -3,7 +3,7 @@ package csw.messages.params.generics
 import csw.messages.commands._
 import csw.messages.events._
 import csw.messages.params.models.{Id, ObsId, Prefix, Struct}
-import csw.messages.params.states.{CurrentState, DemandState}
+import csw.messages.params.states.{CurrentState, DemandState, StateName}
 import org.scalatest.{FunSpec, Matchers}
 
 //DEOPSCSW-184: Change configurations - attributes and values
@@ -138,7 +138,9 @@ class UniqueKeyVerificationTest extends FunSpec with Matchers {
     it("DemandState is able to remove duplicate keys") {
 
       //parameters with duplicate key via constructor
-      val state = DemandState("prefix", Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
+      val state = DemandState("prefix",
+                              StateName("testStateName"),
+                              Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
       state.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
 
       //parameters with duplicate key via add + madd
@@ -156,7 +158,9 @@ class UniqueKeyVerificationTest extends FunSpec with Matchers {
 
       //parameters with duplicate key via constructor
       val state =
-        CurrentState("prefix", Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
+        CurrentState("prefix",
+                     StateName("testStateName"),
+                     Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
       state.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
 
       //parameters with duplicate key via add + madd

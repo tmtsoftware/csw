@@ -93,6 +93,6 @@ class Matcher(
       .mapMaterializedValue { ref ⇒
         currentStateSource ! ComponentStateSubscription(Subscribe(ref))
       }
-      .filter(cs ⇒ cs.prefixStr == stateMatcher.prefix && stateMatcher.check(cs))
+      .filter(cs ⇒ cs.stateName.name == stateMatcher.stateName && cs.prefixStr == stateMatcher.prefix && stateMatcher.check(cs))
       .completionTimeout(stateMatcher.timeout.duration)
 }

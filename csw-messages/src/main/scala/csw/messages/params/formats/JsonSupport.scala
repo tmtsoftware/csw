@@ -5,7 +5,7 @@ import csw.messages.events._
 import csw.messages.params.generics.Parameter
 import csw.messages.params.models.{Id, ObsId, Prefix}
 import csw.messages.params.states.StateVariable.StateVariable
-import csw.messages.params.states.{CurrentState, DemandState}
+import csw.messages.params.states.{CurrentState, DemandState, StateName}
 import play.api.libs.json._
 
 object JsonSupport extends JsonSupport with DerivedJsonFormats with WrappedArrayProtocol
@@ -23,6 +23,7 @@ private[messages] trait JsonSupport { self: DerivedJsonFormats with WrappedArray
   lazy val commandTypeFormat: Format[CommandName]    = implicitly[Format[CommandName]]
   lazy val eventTimeFormat: Format[EventTime]        = implicitly[Format[EventTime]]
   lazy val eventNameFormat: Format[EventName]        = implicitly[Format[EventName]]
+  lazy val stateNameFormat: Format[StateName]        = implicitly[Format[StateName]]
 
   // config and event type JSON tags
   private val setupType        = classOf[Setup].getSimpleName
@@ -104,9 +105,10 @@ private[messages] trait JsonSupport { self: DerivedJsonFormats with WrappedArray
   def writeStateVariable[A <: StateVariable](stateVariable: A): JsValue = {
     JsObject(
       Seq(
-        "type"     -> JsString(stateVariable.typeName),
-        "prefix"   -> prefixFormat.writes(stateVariable.prefix),
-        "paramSet" -> Json.toJson(stateVariable.paramSet)
+        "type"      → JsString(stateVariable.typeName),
+        "prefix"    → prefixFormat.writes(stateVariable.prefix),
+        "stateName" → stateNameFormat.writes(stateVariable.stateName),
+        "paramSet"  → Json.toJson(stateVariable.paramSet)
       )
     )
   }
@@ -121,12 +123,13 @@ private[messages] trait JsonSupport { self: DerivedJsonFormats with WrappedArray
   def readStateVariable[A <: StateVariable](json: JsValue): A = {
     json match {
       case JsObject(fields) =>
-        (fields("type"), fields("prefix"), fields("paramSet")) match {
-          case (JsString(typeName), prefix, paramSet) =>
-            val ck = prefix.as[Prefix]
+        (fields("type"), fields("prefix"), fields("stateName"), fields("paramSet")) match {
+          case (JsString(typeName), prefix, stateName, paramSet) =>
+            val ck    = prefix.as[Prefix]
+            val sName = stateName.as[StateName]
             typeName match {
-              case `currentStateType` => CurrentState(ck, paramSetFormat.reads(paramSet).get).asInstanceOf[A]
-              case `demandStateType`  => DemandState(ck, paramSetFormat.reads(paramSet).get).asInstanceOf[A]
+              case `currentStateType` => CurrentState(ck, sName, paramSetFormat.reads(paramSet).get).asInstanceOf[A]
+              case `demandStateType`  => DemandState(ck, sName, paramSetFormat.reads(paramSet).get).asInstanceOf[A]
               case _                  => unexpectedJsValueError(json)
             }
           case _ => unexpectedJsValueError(json)

@@ -16,6 +16,7 @@ import csw.messages.params.generics.JKeyTypes;
 import csw.messages.params.generics.Key;
 import csw.messages.params.models.Prefix;
 import csw.messages.params.states.CurrentState;
+import csw.messages.params.states.StateName;
 import csw.messages.scaladsl.TopLevelActorMessage;
 import csw.services.command.javadsl.JCommandService;
 import csw.services.command.scaladsl.CommandResponseManager;
@@ -196,7 +197,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
                 commandResponseManager.jSubscribe(subCommand.runId(), commandResponse -> {
                     if (commandResponse.resultType() instanceof CommandResponse.Completed) {
                         Key<String> stringKey = JKeyTypes.StringKey().make("sub-command-status");
-                        CurrentState currentState = new CurrentState(sc.source().prefix());
+                        CurrentState currentState = new CurrentState(sc.source().prefix(), new StateName("testStateName"));
                         currentStatePublisher.publish(currentState.madd(stringKey.set("complete")));
                     } else {
                         // do something

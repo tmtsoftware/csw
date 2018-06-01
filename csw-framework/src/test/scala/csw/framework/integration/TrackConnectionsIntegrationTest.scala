@@ -19,7 +19,7 @@ import csw.messages.location.ComponentId
 import csw.messages.location.ComponentType.{Assembly, HCD}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
-import csw.messages.params.states.CurrentState
+import csw.messages.params.states.{CurrentState, StateName}
 import csw.services.command.scaladsl.CommandService
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.models.{HttpRegistration, TcpRegistration}
@@ -78,12 +78,12 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Before
     assemblyCommandService.subscribeCurrentState(assemblyProbe.ref ! _)
 
     // assembly is tracking two HCD's, hence assemblyProbe will receive LocationUpdated event from two HCD's
-    assemblyProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(akkaLocationUpdatedChoice))))
-    assemblyProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(akkaLocationUpdatedChoice))))
+    assemblyProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(akkaLocationUpdatedChoice))))
+    assemblyProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(akkaLocationUpdatedChoice))))
 
     // if one of the HCD shuts down, then assembly should know and receive LocationRemoved event
     disperserComponentRef ! Shutdown
-    assemblyProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(akkaLocationRemovedChoice))))
+    assemblyProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(akkaLocationRemovedChoice))))
 
     implicit val timeout: Timeout = Timeout(100.millis)
     intercept[TimeoutException] {
@@ -133,11 +133,11 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Before
     )
 
     // assembly is tracking HttpConnection that we registered above, hence assemblyProbe will receive LocationUpdated event
-    assemblyProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(httpLocationUpdatedChoice))))
+    assemblyProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(httpLocationUpdatedChoice))))
 
     // On unavailability of HttpConnection, the assembly should know and receive LocationRemoved event
     locationService.unregister(httpConnection)
-    assemblyProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(httpLocationRemovedChoice))))
+    assemblyProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(httpLocationRemovedChoice))))
 
     // register tcp connection
     Await.result(
@@ -146,11 +146,11 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Before
     )
 
     // assembly is tracking TcpConnection that we registered above, hence assemblyProbe will receive LocationUpdated event.
-    assemblyProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(tcpLocationUpdatedChoice))))
+    assemblyProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(tcpLocationUpdatedChoice))))
 
     // On unavailability of TcpConnection, the assembly should know and receive LocationRemoved event
     locationService.unregister(tcpConnection)
-    assemblyProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(tcpLocationRemovedChoice))))
+    assemblyProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(tcpLocationRemovedChoice))))
 
     Await.result(wiring.locationService.shutdown(TestFinishedReason), 5.seconds)
   }

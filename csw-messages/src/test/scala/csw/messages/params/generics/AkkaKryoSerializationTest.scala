@@ -21,7 +21,7 @@ import csw.messages.location.Connection
 import csw.messages.params.generics.KeyType.{ByteArrayKey, ChoiceKey, DoubleMatrixKey, IntKey, StructKey}
 import csw.messages.params.models.Units.{arcmin, coulomb, encoder, joule, lightyear, meter, pascal, NoUnits}
 import csw.messages.params.models._
-import csw.messages.params.states.{CurrentState, DemandState}
+import csw.messages.params.states.{CurrentState, DemandState, StateName}
 import csw.messages.scaladsl.ComponentCommonMessage.{
   ComponentStateSubscription,
   GetSupervisorLifecycleState,
@@ -150,7 +150,7 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
       val charParam     = charKey.set('A', 'B', 'C').withUnits(encoder)
       val intArrayParam = intArrayKey.set(a1, a2).withUnits(meter)
 
-      val currentState           = CurrentState(prefix).madd(charParam, intArrayParam)
+      val currentState           = CurrentState(prefix, StateName("testStateName")).madd(charParam, intArrayParam)
       val currentStateSerializer = serialization.findSerializerFor(currentState)
 
       currentStateSerializer.getClass shouldBe classOf[AkkaSerializer]
@@ -170,7 +170,7 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
       val booleanParam = booleanKey.set(true, false)
       val timestamp    = timestampKey.set(Instant.now)
 
-      val demandState           = DemandState(prefix).madd(charParam, intParam, booleanParam, timestamp)
+      val demandState           = DemandState(prefix, StateName("testStateName")).madd(charParam, intParam, booleanParam, timestamp)
       val demandStateSerializer = serialization.findSerializerFor(demandState)
 
       demandStateSerializer.getClass shouldBe classOf[AkkaSerializer]

@@ -7,7 +7,7 @@ import csw.messages.params.generics.KeyType.DoubleMatrixKey
 import csw.messages.params.generics.{Key, KeyType, Parameter}
 import csw.messages.params.models.Units.{meter, NoUnits}
 import csw.messages.params.models.{MatrixData, Prefix}
-import csw.messages.params.states.{CurrentState, DemandState}
+import csw.messages.params.states.{CurrentState, DemandState, StateName}
 import org.scalatest.{FunSpec, Matchers}
 
 class StateVariablesTest extends FunSpec with Matchers {
@@ -33,11 +33,11 @@ class StateVariablesTest extends FunSpec with Matchers {
       val timestamp: Parameter[Instant]    = timestampKey.set(Instant.now)
 
       //create DemandState and use sequential add
-      val ds1: DemandState = DemandState(prefix).add(charParam).add(intParam)
+      val ds1: DemandState = DemandState(prefix, StateName("testStateName")).add(charParam).add(intParam)
       //create DemandState and add more than one Parameters using madd
-      val ds2: DemandState = DemandState(prefix).madd(intParam, booleanParam)
+      val ds2: DemandState = DemandState(prefix, StateName("testStateName")).madd(intParam, booleanParam)
       //create DemandState using apply
-      val ds3: DemandState = DemandState(prefix, Set(timestamp))
+      val ds3: DemandState = DemandState(prefix, StateName("testStateName"), Set(timestamp))
 
       //access keys
       val charKeyExists: Boolean = ds1.exists(charKey) //true
@@ -94,11 +94,11 @@ class StateVariablesTest extends FunSpec with Matchers {
       val timestamp    = timestampKey.set(Instant.now)
 
       //create CurrentState and use sequential add
-      val cs1 = CurrentState(prefix).add(charParam).add(intParam)
+      val cs1 = CurrentState(prefix, StateName("testStateName")).add(charParam).add(intParam)
       //create CurrentState and add more than one Parameters using madd
-      val cs2 = CurrentState(prefix).madd(intParam, booleanParam)
+      val cs2 = CurrentState(prefix, StateName("testStateName")).madd(intParam, booleanParam)
       //create CurrentState using apply
-      val cs3 = CurrentState(prefix, Set(timestamp))
+      val cs3 = CurrentState(prefix, StateName("testStateName"), Set(timestamp))
 
       //access keys
       val charKeyExists = cs1.exists(charKey) //true
@@ -154,8 +154,8 @@ class StateVariablesTest extends FunSpec with Matchers {
       val p1: Parameter[MatrixData[Double]] = k1.set(m1)
 
       //state variables
-      val ds: DemandState  = DemandState(Prefix("wfos.blue.filter")).add(p1)
-      val cs: CurrentState = CurrentState(Prefix("wfos.blue.filter")).add(p1)
+      val ds: DemandState  = DemandState(Prefix("wfos.blue.filter"), StateName("testStateName")).add(p1)
+      val cs: CurrentState = CurrentState(Prefix("wfos.blue.filter"), StateName("testStateName")).add(p1)
 
       //json support - write
       val dsJson: JsValue = JsonSupport.writeStateVariable(ds)
@@ -205,6 +205,7 @@ class StateVariablesTest extends FunSpec with Matchers {
       //DemandState with duplicate key via constructor
       val statusEvent = DemandState(
         prefix,
+        StateName("testStateName"),
         Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3)
       )
       //four duplicate keys are removed; now contains one Encoder and one Filter key

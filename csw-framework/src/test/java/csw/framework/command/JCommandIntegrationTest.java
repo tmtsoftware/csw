@@ -26,6 +26,7 @@ import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.states.CurrentState;
 import csw.messages.params.states.DemandState;
+import csw.messages.params.states.StateName;
 import csw.messages.scaladsl.SupervisorLockMessage;
 import csw.services.command.javadsl.JCommandDistributor;
 import csw.services.command.javadsl.JCommandService;
@@ -165,7 +166,7 @@ public class JCommandIntegrationTest {
         //#matcher
 
         // create a DemandMatcher which specifies the desired state to be matched.
-        DemandMatcher demandMatcher = new DemandMatcher(new DemandState(prefix().prefix()).add(param), false, timeout);
+        DemandMatcher demandMatcher = new DemandMatcher(new DemandState(prefix().prefix(), new StateName("testStateName")).add(param), false, timeout);
 
         // create matcher instance
         Matcher matcher = new Matcher(hcdLocation.componentRef().narrow(), demandMatcher, ec, mat);
@@ -228,7 +229,7 @@ public class JCommandIntegrationTest {
         //#onewayAndMatch
 
         // create a DemandMatcher which specifies the desired state to be matched.
-        StateMatcher stateMatcher = new DemandMatcher(new DemandState(prefix().prefix()).add(param), false, timeout);
+        StateMatcher stateMatcher = new DemandMatcher(new DemandState(prefix().prefix(), new StateName("testStateName")).add(param), false, timeout);
 
         // create matcher instance
         Matcher matcher1 = new Matcher(hcdLocation.componentRef().narrow(), demandMatcher, ec, mat);
@@ -399,7 +400,7 @@ public class JCommandIntegrationTest {
 
         hcdCmdService.submit(setup, timeout);
 
-        CurrentState currentState = new CurrentState(SampleComponentState.prefix().prefix());
+        CurrentState currentState = new CurrentState(SampleComponentState.prefix().prefix(), new StateName("testStateName"));
         CurrentState expectedValidationCurrentState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.commandValidationChoice()));
         CurrentState expectedSubmitCurrentState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.submitCommandChoice()));
         CurrentState expectedSetupCurrentState = currentState.madd(SampleComponentState.choiceKey().set(SampleComponentState.setupConfigChoice()), intParameter1);

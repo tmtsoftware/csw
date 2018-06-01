@@ -1,9 +1,9 @@
 package csw.framework.command
 
 import akka.actor.Scheduler
-import akka.stream.{ActorMaterializer, Materializer}
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.stream.{ActorMaterializer, Materializer}
 import akka.testkit.typed.TestKitSettings
 import akka.testkit.typed.scaladsl.TestProbe
 import akka.util.Timeout
@@ -21,7 +21,7 @@ import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{AkkaLocation, ComponentId, ComponentType}
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.ObsId
-import csw.messages.params.states.DemandState
+import csw.messages.params.states.{DemandState, StateName}
 import csw.messages.scaladsl.CommandMessage.Submit
 import csw.services.command.scaladsl.CommandService
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
@@ -166,7 +166,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       //#matcher
 
       // create a DemandMatcher which specifies the desired state to be matched.
-      val demandMatcher = DemandMatcher(DemandState(prefix, Set(param)), withUnits = false, timeout)
+      val demandMatcher = DemandMatcher(DemandState(prefix, StateName("testStateName"), Set(param)), withUnits = false, timeout)
 
       // create matcher instance
       val matcher = new Matcher(assemblyLocation.componentRef, demandMatcher)
@@ -234,9 +234,10 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       // 1. Demand matcher expect matching to be done in 500 millis
       // 2. Assembly on receiving setupWithTimeoutMatcher command, sleeps for 1 second
       // 3. This results in Timeout in Matcher
-      val demandMatcherToSimulateTimeout = DemandMatcher(DemandState(prefix, Set(param)), withUnits = false, 500.millis)
-      val setupWithTimeoutMatcher        = Setup(prefix, matcherTimeoutCmd, obsId)
-      val matcherForTimeout              = new Matcher(assemblyLocation.componentRef, demandMatcherToSimulateTimeout)
+      val demandMatcherToSimulateTimeout =
+        DemandMatcher(DemandState(prefix, StateName("testStateName"), Set(param)), withUnits = false, 500.millis)
+      val setupWithTimeoutMatcher = Setup(prefix, matcherTimeoutCmd, obsId)
+      val matcherForTimeout       = new Matcher(assemblyLocation.componentRef, demandMatcherToSimulateTimeout)
 
       val matcherResponseF1: Future[MatcherResponse] = matcherForTimeout.start
 

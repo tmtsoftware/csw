@@ -30,7 +30,7 @@ public class JSateVariableTest {
 
     @Test
     public void shouldAbleToCreateCurrentState() {
-        CurrentState currentState = new CurrentState(prefix).add(encoderParam).add(epochStringParam);
+        CurrentState currentState = new CurrentState(prefix, new StateName("testStateName")).add(encoderParam).add(epochStringParam);
 
         // typeName and prefix
         Assert.assertEquals(CurrentState.class.getSimpleName(), currentState.typeName());
@@ -49,7 +49,7 @@ public class JSateVariableTest {
     public void shouldAbleToCreateCurrentStateFromSetup() {
         Prefix source = new Prefix(prefix);
         Setup setup = new Setup(source, new CommandName("move"), Optional.of(new ObsId("obsId"))).add(encoderParam).add(epochStringParam);
-        CurrentState currentState = new CurrentState(setup);
+        CurrentState currentState = new CurrentState(new StateName("testStateName"), setup);
 
         // typeName and prefix
         Assert.assertEquals(CurrentState.class.getSimpleName(), currentState.typeName());
@@ -66,7 +66,7 @@ public class JSateVariableTest {
 
     @Test
     public void shouldAbleToCreateDemandState() {
-        DemandState demandState = new DemandState(prefix).add(encoderParam).add(epochStringParam);
+        DemandState demandState = new DemandState(prefix, new StateName("testStateName")).add(encoderParam).add(epochStringParam);
 
         // typeName and prefix
         Assert.assertEquals(DemandState.class.getSimpleName(), demandState.typeName());
@@ -85,7 +85,7 @@ public class JSateVariableTest {
     public void shouldAbleToCreateDemandStateFromSetup() {
         Prefix source = new Prefix(prefix);
         Setup setup = new Setup(source, new CommandName("move"), Optional.of(new ObsId("obsId"))).add(encoderParam).add(epochStringParam);
-        DemandState demandState = new DemandState(setup);
+        DemandState demandState = new DemandState(new StateName("testStateName"), setup);
 
         // typeName and prefix
         Assert.assertEquals(DemandState.class.getSimpleName(), demandState.typeName());
@@ -102,17 +102,17 @@ public class JSateVariableTest {
 
     @Test
     public void shouldAbleToMatchWithDefaultMatcher() {
-        CurrentState currentState = new CurrentState(prefix).add(encoderParam).add(epochStringParam);
-        DemandState demandState = new DemandState(prefix).add(encoderParam).add(epochStringParam);
+        CurrentState currentState = new CurrentState(prefix, new StateName("testStateName")).add(encoderParam).add(epochStringParam);
+        DemandState demandState = new DemandState(prefix, new StateName("testStateName")).add(encoderParam).add(epochStringParam);
 
         Assert.assertTrue(StateVariable.defaultMatcher(demandState, currentState));
     }
 
     @Test
     public void shouldAbleToCreateCurrentStatesUsingVargs() {
-        CurrentState currentState1 = new CurrentState(prefix).add(encoderParam);
-        CurrentState currentState2 = new CurrentState(prefix).add(epochStringParam);
-        CurrentState currentState3 = new CurrentState(prefix).add(epochStringParam);
+        CurrentState currentState1 = new CurrentState(prefix, new StateName("testStateName")).add(encoderParam);
+        CurrentState currentState2 = new CurrentState(prefix, new StateName("testStateName")).add(epochStringParam);
+        CurrentState currentState3 = new CurrentState(prefix, new StateName("testStateName")).add(epochStringParam);
         List<CurrentState> expectedCurrentStates = Arrays.asList(currentState1, currentState2, currentState3);
 
         CurrentStates currentStates = StateVariable.createCurrentStates(currentState1, currentState2, currentState3);
@@ -123,9 +123,9 @@ public class JSateVariableTest {
 
     @Test
     public void shouldAbleToCreateCurrentStatesUsingList() {
-        CurrentState currentState1 = new CurrentState(prefix).add(encoderParam);
-        CurrentState currentState2 = new CurrentState(prefix).add(epochStringParam);
-        CurrentState currentState3 = new CurrentState(prefix).add(epochStringParam);
+        CurrentState currentState1 = new CurrentState(prefix, new StateName("testStateName")).add(encoderParam);
+        CurrentState currentState2 = new CurrentState(prefix, new StateName("testStateName")).add(epochStringParam);
+        CurrentState currentState3 = new CurrentState(prefix, new StateName("testStateName")).add(epochStringParam);
         List<CurrentState> expectedCurrentStates = Arrays.asList(currentState1, currentState2, currentState3);
 
         CurrentStates currentStates = StateVariable.createCurrentStates(expectedCurrentStates);

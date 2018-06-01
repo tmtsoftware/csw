@@ -23,7 +23,7 @@ import csw.messages.framework.SupervisorLifecycleState
 import csw.messages.location.ComponentType.HCD
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, LocationRemoved, LocationUpdated, TrackingEvent}
-import csw.messages.params.states.CurrentState
+import csw.messages.params.states.{CurrentState, StateName}
 import csw.services.command.scaladsl.CommandService
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
@@ -95,7 +95,7 @@ class StandaloneComponentTest extends FunSuite with Matchers with BeforeAndAfter
 
     // this proves that ComponentBehaviors postStop signal gets invoked
     // as onShutdownHook of TLA gets invoked from postStop signal
-    supervisorStateProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
+    supervisorStateProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(shutdownChoice))))
 
     // this proves that postStop signal of supervisor gets invoked
     // as supervisor gets unregistered in postStop signal

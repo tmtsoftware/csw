@@ -10,7 +10,7 @@ import csw.messages.commands.{CommandIssue, CommandResponse, ControlCommand, Set
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.{AkkaLocation, TrackingEvent}
 import csw.messages.params.models.Id
-import csw.messages.params.states.CurrentState
+import csw.messages.params.states.{CurrentState, StateName}
 import csw.messages.scaladsl.TopLevelActorMessage
 import csw.services.command.scaladsl.{CommandResponseManager, CommandService}
 import csw.services.location.scaladsl.LocationService
@@ -96,7 +96,9 @@ class McsAssemblyComponentHandlers(
         commandResponseManager.subscribe(
           controlCommand.runId, {
             case Completed(_) ⇒
-              currentStatePublisher.publish(CurrentState(controlCommand.source, Set(choiceKey.set(longRunningCmdCompleted))))
+              currentStatePublisher.publish(
+                CurrentState(controlCommand.source, StateName("testStateName"), Set(choiceKey.set(longRunningCmdCompleted)))
+              )
             case _ ⇒
           }
         )
@@ -131,14 +133,17 @@ class McsAssemblyComponentHandlers(
             case _: Completed ⇒
               controlCommand.runId match {
                 case id if id == shortSetup.runId ⇒
-                  currentStatePublisher.publish(CurrentState(shortSetup.source, Set(choiceKey.set(shortCmdCompleted))))
+                  currentStatePublisher
+                    .publish(CurrentState(shortSetup.source, StateName("testStateName"), Set(choiceKey.set(shortCmdCompleted))))
                   // As the commands get completed, the results are updated in the commandResponseManager
                   commandResponseManager.updateSubCommand(id, Completed(id))
                 case id if id == mediumSetup.runId ⇒
-                  currentStatePublisher.publish(CurrentState(mediumSetup.source, Set(choiceKey.set(mediumCmdCompleted))))
+                  currentStatePublisher
+                    .publish(CurrentState(mediumSetup.source, StateName("testStateName"), Set(choiceKey.set(mediumCmdCompleted))))
                   commandResponseManager.updateSubCommand(id, Completed(id))
                 case id if id == longSetup.runId ⇒
-                  currentStatePublisher.publish(CurrentState(longSetup.source, Set(choiceKey.set(longCmdCompleted))))
+                  currentStatePublisher
+                    .publish(CurrentState(longSetup.source, StateName("testStateName"), Set(choiceKey.set(longCmdCompleted))))
                   commandResponseManager.updateSubCommand(id, Completed(id))
               }
             //#updateSubCommand

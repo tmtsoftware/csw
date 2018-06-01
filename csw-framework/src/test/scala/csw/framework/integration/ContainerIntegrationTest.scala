@@ -18,7 +18,7 @@ import csw.messages.framework.{Components, ContainerLifecycleState, LifecycleSta
 import csw.messages.location.ComponentType.{Assembly, HCD}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType, LocationRemoved, TrackingEvent}
-import csw.messages.params.states.CurrentState
+import csw.messages.params.states.{CurrentState, StateName}
 import csw.messages.scaladsl.ComponentCommonMessage.{GetSupervisorLifecycleState, LifecycleStateSubscription}
 import csw.messages.scaladsl.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.messages.scaladsl.RunningMessage.Lifecycle
@@ -129,15 +129,15 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
     // lifecycle messages gets forwarded to all components and their corresponding handlers gets invoked
     // ********** Message: Lifecycle(GoOffline) **********
     resolvedContainerRef ! Lifecycle(GoOffline)
-    assemblyProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(offlineChoice))))
-    filterProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(offlineChoice))))
-    disperserProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(offlineChoice))))
+    assemblyProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(offlineChoice))))
+    filterProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(offlineChoice))))
+    disperserProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(offlineChoice))))
 
     // Message: Lifecycle(GoOnline)
     resolvedContainerRef ! Lifecycle(GoOnline)
-    assemblyProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(onlineChoice))))
-    filterProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(onlineChoice))))
-    disperserProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(onlineChoice))))
+    assemblyProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(onlineChoice))))
+    filterProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(onlineChoice))))
+    disperserProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(onlineChoice))))
 
     // on Restart message, container falls back to Idle lifecycle state and wait for all the components to get restarted
     // and moves to Running lifecycle state
@@ -151,13 +151,13 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
     resolvedContainerRef ! GetContainerLifecycleState(containerLifecycleStateProbe.ref)
     containerLifecycleStateProbe.expectMessage(ContainerLifecycleState.Idle)
 
-    assemblyProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
-    filterProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
-    disperserProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
+    assemblyProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(shutdownChoice))))
+    filterProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(shutdownChoice))))
+    disperserProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(shutdownChoice))))
 
-    assemblyProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(initChoice))))
-    filterProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(initChoice))))
-    disperserProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(initChoice))))
+    assemblyProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
+    filterProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
+    disperserProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
 
     assemblyLifecycleStateProbe.expectMessage(
       LifecycleStateChanged(assemblySupervisor, SupervisorLifecycleState.Running)
@@ -203,9 +203,9 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
 
     // this proves that ComponentBehaviors postStop signal gets invoked for all components
     // as onShutdownHook of all TLA gets invoked from postStop signal
-    assemblyProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
-    filterProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
-    disperserProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(shutdownChoice))))
+    assemblyProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(shutdownChoice))))
+    filterProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(shutdownChoice))))
+    disperserProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(shutdownChoice))))
 
     // this proves that postStop signal of all supervisor's gets invoked
     // as supervisor gets unregistered in postStop signal

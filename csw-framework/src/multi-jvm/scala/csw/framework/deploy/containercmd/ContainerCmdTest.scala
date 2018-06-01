@@ -19,7 +19,7 @@ import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.ObsId
-import csw.messages.params.states.CurrentState
+import csw.messages.params.states.{CurrentState, StateName}
 import csw.messages.scaladsl.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState}
 import csw.messages.scaladsl.ContainerCommonMessage.GetComponents
 import csw.messages.scaladsl.RunningMessage.Lifecycle
@@ -158,13 +158,17 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
 
       etonCommandService.submit(setupFailure).map { commandResponse ⇒
         commandResponse shouldBe Invalid
-        eatonCompStateProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(commandValidationChoice))))
+        eatonCompStateProbe
+          .expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(commandValidationChoice))))
       }
 
       etonCommandService.oneway(setupSuccess).map { _ ⇒
-        eatonCompStateProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(commandValidationChoice))))
-        eatonCompStateProbe.expectMessage(CurrentState(prefix, Set(choiceKey.set(oneWayCommandChoice))))
-        eatonCompStateProbe.expectMessage(CurrentState(successPrefix, Set(choiceKey.set(setupConfigChoice), param)))
+        eatonCompStateProbe
+          .expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(commandValidationChoice))))
+        eatonCompStateProbe
+          .expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(oneWayCommandChoice))))
+        eatonCompStateProbe
+          .expectMessage(CurrentState(successPrefix, StateName("testStateName"), Set(choiceKey.set(setupConfigChoice), param)))
       }
 
       etonSupervisorTypedRef ! Lifecycle(GoOffline)
@@ -178,7 +182,10 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       // DEOPSCSW-218: Discover component connection information using Akka protocol
       // Laser assembly is tracking Eton Hcd which is running on member2 (different jvm than this)
       // When Eton Hcd shutdowns, laser assembly receives LocationRemoved event
-      laserCompStateProbe.expectMessage(10.seconds, CurrentState(prefix, Set(choiceKey.set(akkaLocationRemovedChoice))))
+      laserCompStateProbe.expectMessage(
+        10.seconds,
+        CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(akkaLocationRemovedChoice)))
+      )
     }
 
     runOn(member2) {

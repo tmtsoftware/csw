@@ -16,6 +16,13 @@ trait StateMatcher {
   def prefix: String
 
   /**
+   * The name of the state to match for
+   *
+   * @return the name of the state
+   */
+  def stateName: String
+
+  /**
    * A predicate to match the current state
    *
    * @param current current state to be matched as represented by [[csw.messages.params.states.CurrentState]]
