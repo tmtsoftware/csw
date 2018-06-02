@@ -46,7 +46,7 @@ class ModelObsPerfTestMultiJvmNode2 extends ModelObsPerfTest
 //class ModelObsPerfTestMultiJvmNode20 extends ModelObsPerfTest
 //class ModelObsPerfTestMultiJvmNode21 extends ModelObsPerfTest
 
-class ModelObsPerfTest extends BasePerfSuite {
+class ModelObsPerfTest extends BasePerfSuite(ModelObsMultiNodeConfig) {
 
   override def afterAll(): Unit = {
     enterBarrier("start-printing")

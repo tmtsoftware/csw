@@ -8,7 +8,7 @@ import csw.messages.params.generics.KeyType.{ByteKey, DoubleKey, LongKey}
 import csw.messages.params.models.{Id, Prefix}
 
 object EventUtils {
-  val prefix       = Prefix("event:tcs.mobie.filter")
+  val prefix       = Prefix("tcs.mobie.filter")
   val testEventS   = "move"
   val testEventKey = s"${prefix.prefix}.$testEventS"
   val endEventS    = "end"

@@ -38,7 +38,7 @@ class EventServicePerfTestMultiJvmNode2 extends EventServicePerfTest
 //class EventServicePerfTestMultiJvmNode9  extends EventServicePerfTest
 //class EventServicePerfTestMultiJvmNode10 extends EventServicePerfTest
 
-class EventServicePerfTest extends BasePerfSuite {
+class EventServicePerfTest extends BasePerfSuite(EventServiceMultiNodeConfig) {
 
   import testConfigs._
   import testWiring._

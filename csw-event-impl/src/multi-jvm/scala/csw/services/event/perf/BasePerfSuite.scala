@@ -5,10 +5,9 @@ import java.util.concurrent.TimeUnit.SECONDS
 import java.util.concurrent.{ExecutorService, Executors}
 
 import akka.Done
-import akka.remote.testkit.{MultiNodeSpec, MultiNodeSpecCallbacks}
+import akka.remote.testkit.{MultiNodeConfig, MultiNodeSpec, MultiNodeSpecCallbacks}
 import akka.testkit.ImplicitSender
 import csw.services.event.perf.commons.PerfSubscriber
-import csw.services.event.perf.model_obs.ModelObsMultiNodeConfig
 import csw.services.event.perf.reporter._
 import csw.services.event.perf.utils.EventUtils.nanosToSeconds
 import csw.services.event.perf.utils.{EventUtils, SystemMonitoringSupport}
@@ -22,8 +21,8 @@ import scala.concurrent.duration.{Duration, DurationDouble, FiniteDuration}
 import scala.concurrent.{Await, Future}
 import scala.sys.process.{FileProcessLogger, Process}
 
-class BasePerfSuite
-    extends MultiNodeSpec(ModelObsMultiNodeConfig)
+class BasePerfSuite(config: MultiNodeConfig)
+    extends MultiNodeSpec(config)
     with MultiNodeSpecCallbacks
     with FunSuiteLike
     with Matchers
