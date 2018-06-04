@@ -18,10 +18,12 @@ class TestConfigs(config: Config) {
   val redisEnabled: Boolean = config.getBoolean("csw.event.perf.redis-enabled")
   val redisHost: String     = config.getString("csw.event.perf.redis.host")
   val redisPort: Int        = config.getInt("csw.event.perf.redis.port")
+  val redisPattern: String  = config.getString("csw.event.perf.redis.pattern-for-subscription")
 
   //################### Kafka Configuration ###################
-  val kafkaHost: String = config.getString("csw.event.perf.kafka.host")
-  val kafkaPort: Int    = config.getInt("csw.event.perf.kafka.port")
+  val kafkaHost: String    = config.getString("csw.event.perf.kafka.host")
+  val kafkaPort: Int       = config.getInt("csw.event.perf.kafka.port")
+  val kafkaPattern: String = config.getString("csw.event.perf.kafka.pattern-for-subscription")
 
   val systemMonitoring: Boolean = config.getBoolean("csw.event.perf.system-monitoring")
 }

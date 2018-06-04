@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit.SECONDS
 import akka.Done
 import akka.stream.scaladsl.{Keep, Source}
 import csw.messages.events.{Event, EventKey, EventName, SystemEvent}
+import csw.messages.params.models.Subsystem
 import csw.services.event.perf.reporter.{ResultReporter, TestRateReporter}
 import csw.services.event.perf.utils.EventUtils
 import csw.services.event.perf.utils.EventUtils._
@@ -44,16 +45,20 @@ class PerfSubscriber(
   var outOfOrderCount   = 0
   var lastCurrentId     = 0
 
-  private val eventKeys = Set(EventKey(s"$testEventKey-$subscribeKey"), EventKey(s"${prefix.prefix}.$endEventS-$subscribeKey"))
+  private val subsystem = subscribeKey.split("-").head
+  private val prefix    = s"$subsystem.prefix"
+
+  private val eventKeys = Set(EventKey(s"$prefix.$testEventS-$subscribeKey"), EventKey(s"$prefix.$endEventS-$subscribeKey"))
 
   private val eventsToDrop = warmup + eventKeys.size //inclusive of latest events from subscription
 
   val endEventName = EventName(s"${EventUtils.endEventS}-$subscribeKey")
 
   def subscription: Source[Event, EventSubscription] =
-    if (isAllPatternSubscriber) subscriber.pSubscribe(Set("event:*"))
-    else if (isSubsystemPatternSubscriber) subscriber.pSubscribe(Set(s"*${name.split("-").head}*"))
-    else subscriber.subscribe(eventKeys)
+    if (isPatternSubscriber) {
+      val pattern = if (redisEnabled) redisPattern else kafkaPattern
+      subscriber.pSubscribe(Subsystem.withName(subsystem), pattern)
+    } else subscriber.subscribe(eventKeys)
 
   def startSubscription(): Future[Done] =
     subscription
@@ -61,7 +66,7 @@ class PerfSubscriber(
       .takeWhile {
         case SystemEvent(_, _, `endEventName`, _, _) ⇒ false
         case e @ _ ⇒
-          if (isPatternSubscriber & e.eventKey.key.contains("end")) false else true
+          if (isPatternSubscriber & e.eventKey.key.contains(endEventS)) false else true
       }
       .watchTermination()(Keep.right)
       .runForeach(report)
@@ -107,8 +112,6 @@ class PerfSubscriber(
       avgLatency()
     )
 
-  private def isSubsystemPatternSubscriber: Boolean = patternBasedSubscription & name.contains("pattern")
-  private def isAllPatternSubscriber: Boolean       = patternBasedSubscription & name.contains("all")
-  def isPatternSubscriber: Boolean                  = isSubsystemPatternSubscriber | isAllPatternSubscriber
+  def isPatternSubscriber: Boolean = patternBasedSubscription & name.contains("pattern")
 
 }

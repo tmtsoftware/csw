@@ -42,9 +42,10 @@ object EventUtils {
       )
     )
 
-  def event(name: EventName, id: Long = -1, payload: Array[Byte] = Array.emptyByteArray): SystemEvent =
+  def event(name: EventName, prefix: Prefix, id: Long = -1, payload: Array[Byte] = Array.emptyByteArray): SystemEvent =
     baseTestEvent.copy(
       eventId = Id(id.toString),
+      source = prefix,
       eventName = name,
       paramSet = Set(payloadKey.set(payload)),
       eventTime = EventTime()

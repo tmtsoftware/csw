@@ -27,10 +27,13 @@ class PerfPublisher(
   private val totalMessages        = totalTestMsgs + warmup + 1 //inclusive of end-event
   private val payload: Array[Byte] = ("0" * payloadSize).getBytes("utf-8")
 
+  private val subsystem = publishKey.split("-").head
+  private val prefix    = s"$subsystem.prefix"
+
   private val publisher: EventPublisher =
     if (shareConnection) sharedPublisher else testWiring.publisher
 
-  private val endEvent                 = event(EventName(s"${EventUtils.endEventS}-$publishKey"))
+  private val endEvent                 = event(EventName(s"${EventUtils.endEventS}-$publishKey"), prefix)
   private val eventName                = EventName(s"$testEventS-$publishKey")
   private var eventId                  = 0
   private var cancellable: Cancellable = _
@@ -38,16 +41,16 @@ class PerfPublisher(
 
   private def eventGenerator(): Event = {
     eventId += 1
-    // send extra two end envents in case one goes missing
-    // subscriber stops listening on receiving firs end event, hence not affected by publisher publishing multiple end events
+    // send extra two end events in case one goes missing
+    // subscriber stops listening on receiving first end event, hence not affected by publisher publishing multiple end events
     if (eventId > totalMessages + 2) cancellable.cancel()
-    if (eventId < totalMessages) event(eventName, eventId, payload) else endEvent
+    if (eventId < totalMessages) event(eventName, prefix, eventId, payload) else endEvent
   }
 
   private def source(eventName: EventName): Source[SystemEvent, Future[Done]] =
     Source(1L to totalMessages)
       .map { id ⇒
-        event(eventName, id, payload)
+        event(eventName, prefix, id, payload)
       }
       .watchTermination()(Keep.right)
 
@@ -56,7 +59,7 @@ class PerfPublisher(
   def startPublishingWithSource(): Future[Done] =
     for {
       _   ← publisher.publish(source(EventName(s"$testEventS-$publishKey")))
-      end ← publisher.publish(event(EventName(s"$endEventS-$publishKey")))
+      end ← publisher.publish(event(EventName(s"$endEventS-$publishKey"), prefix))
     } yield end
 
   def startPublishingInBatches(): Future[Done] = async {
@@ -68,7 +71,7 @@ class PerfPublisher(
       var batchCompletionF: List[Future[Done]] = Nil
 
       while (i < batchSize) {
-        batchCompletionF = publisher.publish(event(eventName, eventId, payload)) :: batchCompletionF
+        batchCompletionF = publisher.publish(event(eventName, prefix, eventId, payload)) :: batchCompletionF
         eventId += 1
         i += 1
       }
@@ -76,7 +79,7 @@ class PerfPublisher(
       await(Future.sequence(batchCompletionF))
     }
 
-    await(publisher.publish(event(EventName(s"$endEventS-$publishKey"))))
+    await(publisher.publish(event(EventName(s"$endEventS-$publishKey"), prefix)))
   }
 
 }

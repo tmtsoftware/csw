@@ -78,7 +78,7 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
           SubSetting(s"${TCS.entryName}-1", noOfSubs = 3, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
           SubSetting(s"${TCS.entryName}-1", noOfSubs = 25, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
           SubSetting(s"${TCS.entryName}-1", noOfSubs = 250, adjustedTotalMsgs(1), rate = 1, payloadSize = 128),
-          SubSetting(s"${TCS.entryName}-all-1", noOfSubs = 2, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
+          SubSetting(s"${TCS.entryName}-1", noOfSubs = 2, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
         )
       ) ::
       List(AOESW, IRIS, NFIRAOS, WFOS).flatMap { subsystem ⇒
@@ -235,7 +235,7 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
           SubSetting(s"${TCS.entryName}-1", noOfSubs = 1, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
           SubSetting(s"${TCS.entryName}-1", noOfSubs = 10, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
           SubSetting(s"${TCS.entryName}-1", noOfSubs = 30, adjustedTotalMsgs(5), rate = 5, payloadSize = 128),
-          SubSetting(s"${TCS.entryName}-all-1", noOfSubs = 1, adjustedTotalMsgs(5), rate = 5, payloadSize = 128)
+          SubSetting(s"${TCS.entryName}-pattern-1", noOfSubs = 1, adjustedTotalMsgs(5), rate = 5, payloadSize = 128)
         )
       ) ::
       List(AOESW).flatMap { subsystem ⇒
