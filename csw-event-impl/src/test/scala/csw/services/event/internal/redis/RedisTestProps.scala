@@ -30,7 +30,8 @@ class RedisTestProps(
     .quorumSize(1)
     .build()
 
-  private val masterId = "mymaster"
+  private val masterId              = "mymaster"
+  override val eventPattern: String = "sys*"
 
   val publisher: EventPublisher   = redisFactory.publisher(masterId).await
   val subscriber: EventSubscriber = redisFactory.subscriber(masterId).await

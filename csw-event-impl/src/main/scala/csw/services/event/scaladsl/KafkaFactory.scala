@@ -1,6 +1,7 @@
 package csw.services.event.scaladsl
 
 import java.net.URI
+import java.util.UUID
 
 import akka.actor.ActorSystem
 import akka.kafka.{ConsumerSettings, ProducerSettings}
@@ -41,6 +42,8 @@ class KafkaFactory(
 
   private def consumerSettings(host: String, port: Int) =
     ConsumerSettings(actorSystem, new StringDeserializer, new ByteArrayDeserializer)
-      .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest")
       .withBootstrapServers(s"$host:$port")
+      .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest")
+      .withProperty(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false")
+      .withGroupId(UUID.randomUUID().toString)
 }

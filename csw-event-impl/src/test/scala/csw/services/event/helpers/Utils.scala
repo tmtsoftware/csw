@@ -19,6 +19,13 @@ object Utils {
     paramSet = Set(timeNanosKey.set(System.nanoTime()))
   )
 
+  def makeEventWithPrefix(id: Int, prefix: Prefix): Event = event.copy(
+    eventId = Id(id.toString),
+    source = prefix,
+    eventTime = EventTime(Instant.now()),
+    paramSet = Set(timeNanosKey.set(System.nanoTime()))
+  )
+
   def makeDistinctEvent(id: Int): Event = {
     val eventName = EventName(s"system_$id")
 

@@ -5,6 +5,7 @@ import akka.stream.KillSwitches
 import akka.stream.scaladsl.{Keep, Source}
 import akka.{Done, NotUsed}
 import csw.messages.events._
+import csw.messages.params.models.Subsystem
 import csw.services.event.internal.pubsub.EventSubscriberUtil
 import csw.services.event.scaladsl.{EventSubscriber, EventSubscription, SubscriptionMode}
 import io.lettuce.core.api.async.RedisAsyncCommands
@@ -98,10 +99,11 @@ class RedisSubscriber(
       mode: SubscriptionMode
   ): EventSubscription = subscribeCallback(eventKeys, eventSubscriberUtil.actorCallback(actorRef), every, mode)
 
-  override def pSubscribe(keyPatterns: Set[String]): Source[Event, EventSubscription] = {
+  override def pSubscribe(subsystem: Subsystem, pattern: String): Source[Event, EventSubscription] = {
     val connectionF = patternBasedReactiveConnection()
+    val keyPattern  = s"${subsystem.entryName}*$pattern"
     val eventStream: Source[Event, Future[NotUsed]] =
-      Source.fromFutureSource(patternBasedReactiveConnection().flatMap(c ⇒ pSubscribe(keyPatterns, c)))
+      Source.fromFutureSource(patternBasedReactiveConnection().flatMap(c ⇒ pSubscribe(keyPattern, c)))
 
     eventStream
       .viaMat(KillSwitches.single)(Keep.both)
@@ -111,7 +113,7 @@ class RedisSubscriber(
           new EventSubscription {
             override def unsubscribe(): Future[Done] = async {
               val commands = await(connectionF)
-              await(commands.punsubscribe(keyPatterns.toString()).toFuture.toScala)
+              await(commands.punsubscribe(pattern.toString).toFuture.toScala)
               killSwitch.shutdown()
               await(terminationSignal)
             }
@@ -139,9 +141,9 @@ class RedisSubscriber(
       .toScala
       .map(_ ⇒ Source.fromPublisher(reactiveCommands.observeChannels(OverflowStrategy.LATEST)).map(_.getMessage))
 
-  private def pSubscribe(keyPatterns: Set[String], reactiveCommands: RedisPubSubReactiveCommands[String, Event]) =
+  private def pSubscribe(pattern: String, reactiveCommands: RedisPubSubReactiveCommands[String, Event]) =
     reactiveCommands
-      .psubscribe(keyPatterns.toSeq: _*)
+      .psubscribe(pattern)
       .toFuture
       .toScala
       .map(_ ⇒ Source.fromPublisher(reactiveCommands.observePatterns(OverflowStrategy.LATEST)).map(_.getMessage))

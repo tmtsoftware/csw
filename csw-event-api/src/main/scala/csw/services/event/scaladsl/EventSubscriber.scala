@@ -3,6 +3,7 @@ package csw.services.event.scaladsl
 import akka.actor.typed.ActorRef
 import akka.stream.scaladsl.Source
 import csw.messages.events.{Event, EventKey}
+import csw.messages.params.models.Subsystem
 
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
@@ -40,7 +41,7 @@ trait EventSubscriber {
       mode: SubscriptionMode
   ): EventSubscription
 
-  def pSubscribe(pattern: Set[String]): Source[Event, EventSubscription]
+  def pSubscribe(subsystem: Subsystem, pattern: String): Source[Event, EventSubscription]
 
   def get(eventKeys: Set[EventKey]): Future[Set[Event]]
 

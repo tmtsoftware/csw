@@ -5,9 +5,9 @@ import akka.stream.scaladsl.{Keep, Sink}
 import akka.testkit.typed.scaladsl.{TestInbox, TestProbe}
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.events.{Event, EventKey, EventName, SystemEvent}
-import csw.messages.params.models.Prefix
+import csw.messages.params.models.{Prefix, Subsystem}
 import csw.services.event.helpers.TestFutureExt.RichFuture
-import csw.services.event.helpers.Utils.{makeDistinctEvent, makeEvent}
+import csw.services.event.helpers.Utils.{makeDistinctEvent, makeEvent, makeEventWithPrefix}
 import csw.services.event.internal.kafka.KafkaTestProps
 import csw.services.event.internal.redis.RedisTestProps
 import csw.services.event.internal.wiring._
@@ -59,6 +59,11 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
   def pubSubProvider: Array[Array[_ <: BaseProperties]] = Array(
     Array(redisTestProps),
     Array(kafkaTestProps)
+  )
+
+  @DataProvider(name = "redis-provider")
+  def redisPubSubProvider: Array[Array[RedisTestProps]] = Array(
+    Array(redisTestProps)
   )
 
   val events: immutable.Seq[Event] = for (i ← 1 to 1500) yield makeEvent(i)
@@ -287,25 +292,25 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
     inbox.receiveAll().size shouldBe 5
   }
 
-  def should_be_able_to_subscribe_with_pattern(): Unit = {
-    val redisProps = redisTestProps
+  @Test(dataProvider = "redis-provider")
+  def should_be_able_to_publish_and_subscribe_an_event_with_pattern(redisProps: RedisTestProps): Unit = {
     import redisProps._
     import redisProps.wiring._
 
-    val event1    = makeEvent(1)
+    val event1    = makeEventWithPrefix(1, Prefix("test.prefix"))
+    val event2    = makeEventWithPrefix(1, Prefix("tcs.prefix"))
     val testProbe = TestProbe[Event]()(actorSystem.toTyped)
-    val subscription =
-      subscriber.pSubscribe(Set("*test*")).toMat(Sink.foreach(e ⇒ { println(e); testProbe.ref ! e }))(Keep.left).run()
 
+    val subscription = subscriber.pSubscribe(Subsystem.TEST, eventPattern).toMat(Sink.foreach(testProbe.ref ! _))(Keep.left).run()
     subscription.ready.await
-    publisher.publish(event1).await
 
+    publisher.publish(event1).await
     testProbe.expectMessage(event1)
 
-    subscription.unsubscribe().await
-
-    publisher.publish(event1).await
+    publisher.publish(event2).await
     testProbe.expectNoMessage(2.seconds)
+
+    subscription.unsubscribe().await
   }
 
   @Test(dataProvider = "event-service-provider")

@@ -6,6 +6,7 @@ import akka.kafka.{scaladsl, ConsumerSettings, Subscription, Subscriptions}
 import akka.stream.Materializer
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import csw.messages.events._
+import csw.messages.params.models.Subsystem
 import csw.services.event.internal.pubsub.EventSubscriberUtil
 import csw.services.event.scaladsl.{EventSubscriber, EventSubscription, SubscriptionMode}
 import csw_protobuf.events.PbEvent
@@ -99,7 +100,11 @@ class KafkaSubscriber(
       mode: SubscriptionMode
   ): EventSubscription = subscribeCallback(eventKeys, eventSubscriberUtil.actorCallback(actorRef), every, mode)
 
-  override def pSubscribe(pattern: Set[String]): Source[Event, EventSubscription] = ???
+  override def pSubscribe(subsystem: Subsystem, pattern: String): Source[Event, EventSubscription] = {
+    val keyPattern   = s"${subsystem.entryName}.*$pattern"
+    val subscription = Subscriptions.topicPattern(keyPattern)
+    getEventStream(subscription).mapMaterializedValue(eventSubscription)
+  }
 
   override def get(eventKey: EventKey): Future[Event] = get(Set(eventKey)).map(_.head)
 

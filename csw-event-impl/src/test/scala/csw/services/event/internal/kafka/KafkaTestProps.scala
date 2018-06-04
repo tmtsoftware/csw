@@ -30,6 +30,8 @@ class KafkaTestProps(
 
   override def toString: String = "Kafka"
 
+  override val eventPattern: String = "sys.*"
+
   override def jPublisher[T <: EventPublisher]: IEventPublisher = jKafkaFactory.publisher().toScala.await
 
   override def jSubscriber[T <: EventSubscriber]: IEventSubscriber = jKafkaFactory.subscriber().toScala.await
