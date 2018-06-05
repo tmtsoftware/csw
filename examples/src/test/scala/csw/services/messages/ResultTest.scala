@@ -24,7 +24,7 @@ class ResultTest extends FunSpec with Matchers {
       val k4: Key[Int]    = KeyType.IntKey.make("notUsed")
 
       //prefixes
-      val prefix = "wfos.prog.cloudcover"
+      val prefix = Prefix("wfos.prog.cloudcover")
 
       //parameters
       val p1: Parameter[Int]    = k1.set(22)
@@ -80,7 +80,7 @@ class ResultTest extends FunSpec with Matchers {
       )
 
       //prefixes
-      val prefix = "wfos.prog.cloudcover"
+      val prefix = Prefix("wfos.prog.cloudcover")
 
       //parameter
       val i1: Parameter[MatrixData[Double]] = k1.set(m1)
@@ -117,7 +117,7 @@ class ResultTest extends FunSpec with Matchers {
       val miscKey: Key[Int]    = KeyType.IntKey.make("misc.")
 
       //prefix
-      val prefix = "wfos.blue.filter"
+      val prefix = Prefix("wfos.blue.filter")
 
       //params
       val encParam1 = encoderKey.set(1)

@@ -189,7 +189,7 @@ class StateVariablesTest extends FunSpec with Matchers {
       val miscKey: Key[Int]    = KeyType.IntKey.make("misc.")
 
       //prefix
-      val prefix = "wfos.blue.filter"
+      val prefix = Prefix("wfos.blue.filter")
 
       //params
       val encParam1 = encoderKey.set(1)

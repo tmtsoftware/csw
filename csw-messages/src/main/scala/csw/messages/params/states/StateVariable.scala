@@ -7,7 +7,6 @@ import csw.messages.params.states.StateVariable.StateVariable
 
 import scala.annotation.varargs
 import scala.collection.JavaConverters._
-import scala.language.implicitConversions
 
 object StateVariable {
 

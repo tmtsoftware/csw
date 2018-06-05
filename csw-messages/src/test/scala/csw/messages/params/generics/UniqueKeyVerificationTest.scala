@@ -138,7 +138,7 @@ class UniqueKeyVerificationTest extends FunSpec with Matchers {
     it("DemandState is able to remove duplicate keys") {
 
       //parameters with duplicate key via constructor
-      val state = DemandState("prefix",
+      val state = DemandState(Prefix("prefix"),
                               StateName("testStateName"),
                               Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
       state.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)
@@ -158,7 +158,7 @@ class UniqueKeyVerificationTest extends FunSpec with Matchers {
 
       //parameters with duplicate key via constructor
       val state =
-        CurrentState("prefix",
+        CurrentState(Prefix("prefix"),
                      StateName("testStateName"),
                      Set(encParam1, encParam2, encParam3, filterParam1, filterParam2, filterParam3))
       state.paramSet.toList.map(_.keyName) should contain theSameElementsAs List(encoderKey.keyName, filterKey.keyName)

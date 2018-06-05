@@ -23,7 +23,7 @@ class CommandsTest extends FunSpec with Matchers {
 
       //#prefix
       //using constructor, supplying subsystem and prefix both
-      val prefix1: Prefix = Prefix(Subsystem.NFIRAOS, "nfiraos.ncc.trombone")
+      val prefix1: Prefix = Prefix("nfiraos.ncc.trombone")
 
       //just by supplying prefix
       val prefix2: Prefix = Prefix("tcs.mobie.blue.filter")
@@ -33,7 +33,7 @@ class CommandsTest extends FunSpec with Matchers {
       val badPrefix: Prefix = Prefix("abcdefgh")
 
       //use implicit conversion to convert from String to Prefix
-      val prefix3: Prefix = "wfos.prog.cloudcover"
+      val prefix3: Prefix = Prefix("wfos.prog.cloudcover")
       //#prefix
 
       //validations

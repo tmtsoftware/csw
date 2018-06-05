@@ -4,8 +4,6 @@ import csw.messages.TMTSerializable
 import csw.messages.params.models.Prefix.SEPARATOR
 import play.api.libs.json.{Json, OFormat}
 
-import scala.language.implicitConversions
-
 /**
  * A top level key for a parameter set: combination of subsystem and the subsystem's prefix
  * Eg. tcs.filter.wheel
