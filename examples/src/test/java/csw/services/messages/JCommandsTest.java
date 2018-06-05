@@ -35,7 +35,7 @@ public class JCommandsTest {
     public void showUsageOfUtilityFunctions() {
         //#prefix
         //using constructor, supplying subsystem and prefix both
-        Prefix prefix1 = new Prefix(JSubsystem.NFIRAOS, "nfiraos.ncc.trombone");
+        Prefix prefix1 = new Prefix("nfiraos.ncc.trombone");
 
         //just by supplying prefix
         Prefix prefix2 = new Prefix("tcs.mobie.blue.filter");
