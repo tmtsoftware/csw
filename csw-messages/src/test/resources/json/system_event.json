@@ -2,7 +2,6 @@
   "type": "SystemEvent",
   "eventId": "7a4cd6ab-6077-476d-a035-6f83be1de42c",
   "source": {
-    "subsystem": "wfos",
     "prefix": "wfos.blue.filter"
   },
   "eventName": {

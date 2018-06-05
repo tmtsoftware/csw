@@ -1,7 +1,6 @@
 {
   "type": "DemandState",
   "prefix": {
-    "subsystem": "wfos",
     "prefix": "wfos.blue.filter"
   },
   "stateName" : {

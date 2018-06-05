@@ -1,7 +1,6 @@
 {
   "type": "CurrentState",
   "prefix": {
-    "subsystem": "wfos",
     "prefix": "wfos.blue.filter"
   },
   "stateName" : {

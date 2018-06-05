@@ -2,7 +2,6 @@
   "type": "Wait",
   "runId": "test-runId",
   "source": {
-    "subsystem": "wfos",
     "prefix": "wfos.blue.filter"
   },
   "commandName": {
