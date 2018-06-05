@@ -292,6 +292,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
     inbox.receiveAll().size shouldBe 5
   }
 
+  //DEOPSCSW-420: Implement Pattern based subscription
   @Test(dataProvider = "redis-provider")
   def should_be_able_to_publish_and_subscribe_an_event_with_pattern(redisProps: RedisTestProps): Unit = {
     import redisProps._
