@@ -74,9 +74,9 @@ class ModelObsPerfTest extends BasePerfSuite(ModelObsMultiNodeConfig) {
         import subSetting._
         (1 to noOfSubs).map { subId ⇒
           val subscriber = new PerfSubscriber(
-            subsystem,
+            newPrefix,
             subId,
-            s"${subSetting.key}-$subId",
+            subId,
             EventsSetting(totalTestMsgs, payloadSize, warmup, rate),
             rep,
             sharedSubscriber,
@@ -102,7 +102,8 @@ class ModelObsPerfTest extends BasePerfSuite(ModelObsMultiNodeConfig) {
         import pubSetting._
         (1 to noOfPubs).foreach { pubId ⇒
           new PerfPublisher(
-            s"${pubSetting.key}-$pubId",
+            newPrefix,
+            pubId,
             EventsSetting(totalTestMsgs, payloadSize, warmup, rate),
             testConfigs,
             testWiring,

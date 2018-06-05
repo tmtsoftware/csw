@@ -4,9 +4,9 @@ import akka.actor.ActorSystem
 import csw.services.event.perf.utils.EventUtils._
 import org.HdrHistogram.Histogram
 
-class ResultReporter(name: String, actorSystem: ActorSystem) {
+class ResultReporter(test: String, actorSystem: ActorSystem) {
 
-  val reporter = BenchmarkFileReporter(name, actorSystem, logSettings = false)
+  val reporter = BenchmarkFileReporter(test, actorSystem, logSettings = false)
 
   def printResult(
       id: Int,
@@ -24,7 +24,7 @@ class ResultReporter(name: String, actorSystem: ActorSystem) {
     def percentile(p: Double) = histogram.getValueAtPercentile(p) / 1000.0
 
     reporter.reportResults(
-      s"================= Results [$name] [Subscriber-$id] =================\n" +
+      s"================= Results [$test] [Subscriber-$id] =================\n" +
       "Throughput: \n" +
       f"          Throughput:   $throughput%,.0f msg/s \n" +
       f"          Payload:      ${throughput * payloadSize}%,.0f bytes/s \n" +

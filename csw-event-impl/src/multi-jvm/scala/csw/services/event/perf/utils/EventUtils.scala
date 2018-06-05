@@ -8,10 +8,9 @@ import csw.messages.params.generics.KeyType.{ByteKey, DoubleKey, LongKey}
 import csw.messages.params.models.{Id, Prefix}
 
 object EventUtils {
-  val prefix       = Prefix("tcs.mobie.filter")
-  val testEventS   = "move"
-  val testEventKey = s"${prefix.prefix}.$testEventS"
-  val endEventS    = "end"
+  private val prefix = Prefix("dummy")
+  val testEventS     = "move"
+  val endEventS      = "end"
 
   val payloadKey: Key[Byte]         = ByteKey.make("payloadKey")
   val histogramKey: Key[Byte]       = ByteKey.make("histogramKey")
@@ -20,8 +19,7 @@ object EventUtils {
   val totalOutOfOrderKey: Key[Long] = LongKey.make("totalOutOfOrderKey")
   val avgLatencyKey: Key[Long]      = LongKey.make("avgLatencyKey")
 
-  val baseTestEvent = SystemEvent(prefix, EventName(testEventS))
-
+  val baseTestEvent          = SystemEvent(prefix, EventName(testEventS))
   val basePerfEvent          = SystemEvent(prefix, EventName("perf"))
   val perfEventKey: EventKey = basePerfEvent.eventKey
 

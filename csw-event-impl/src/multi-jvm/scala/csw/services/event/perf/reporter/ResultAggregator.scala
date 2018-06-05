@@ -7,6 +7,7 @@ import akka.actor.ActorSystem
 import akka.actor.typed.ActorRef
 import akka.util.ByteString
 import csw.messages.events.{Event, SystemEvent}
+import csw.messages.params.models.Prefix
 import csw.services.event.perf.utils.EventUtils
 import csw.services.event.perf.utils.EventUtils._
 import csw.services.event.scaladsl.{EventSubscriber, EventSubscription}

@@ -6,9 +6,8 @@ import java.util.concurrent.TimeUnit.SECONDS
 import akka.Done
 import akka.stream.scaladsl.{Keep, Source}
 import csw.messages.events.{Event, EventKey, EventName, SystemEvent}
-import csw.messages.params.models.Subsystem
+import csw.messages.params.models.Prefix
 import csw.services.event.perf.reporter.{ResultReporter, TestRateReporter}
-import csw.services.event.perf.utils.EventUtils
 import csw.services.event.perf.utils.EventUtils._
 import csw.services.event.perf.wiring.{TestConfigs, TestWiring}
 import csw.services.event.scaladsl.{EventSubscriber, EventSubscription}
@@ -17,9 +16,9 @@ import org.HdrHistogram.Histogram
 import scala.concurrent.Future
 
 class PerfSubscriber(
-    name: String,
-    subscriberId: Int,
-    subscribeKey: String,
+    prefix: Prefix,
+    pubId: Int,
+    subId: Int,
     eventsSetting: EventsSetting,
     reporter: TestRateReporter,
     sharedSubscriber: EventSubscriber,
@@ -35,7 +34,7 @@ class PerfSubscriber(
     if (testConfigs.shareConnection) sharedSubscriber else testWiring.subscriber
 
   val histogram: Histogram   = new Histogram(SECONDS.toNanos(10), 3)
-  private val resultReporter = new ResultReporter(name, actorSystem)
+  private val resultReporter = new ResultReporter(prefix.prefix, actorSystem)
 
   var startTime         = 0L
   var totalTime         = 0L
@@ -45,19 +44,17 @@ class PerfSubscriber(
   var outOfOrderCount   = 0
   var lastCurrentId     = 0
 
-  private val subsystem = subscribeKey.split("-").head
-  private val prefix    = s"$subsystem.prefix"
+  private val testEventName = EventName(s"$testEventS-$pubId")
+  private val endEventName  = EventName(s"$endEventS-$pubId")
 
-  private val eventKeys = Set(EventKey(s"$prefix.$testEventS-$subscribeKey"), EventKey(s"$prefix.$endEventS-$subscribeKey"))
+  private val eventKeys = Set(EventKey(prefix, testEventName), EventKey(prefix, endEventName))
 
   private val eventsToDrop = warmup + eventKeys.size //inclusive of latest events from subscription
-
-  val endEventName = EventName(s"${EventUtils.endEventS}-$subscribeKey")
 
   def subscription: Source[Event, EventSubscription] =
     if (isPatternSubscriber) {
       val pattern = if (redisEnabled) redisPattern else kafkaPattern
-      subscriber.pSubscribe(Subsystem.withName(subsystem), pattern)
+      subscriber.pSubscribe(prefix.subsystem, pattern)
     } else subscriber.subscribe(eventKeys)
 
   def startSubscription(): Future[Done] =
@@ -102,7 +99,7 @@ class PerfSubscriber(
 
   def printResult(): Unit =
     resultReporter.printResult(
-      subscriberId,
+      subId,
       totalDropped(),
       payloadSize,
       histogram,
@@ -112,6 +109,6 @@ class PerfSubscriber(
       avgLatency()
     )
 
-  def isPatternSubscriber: Boolean = patternBasedSubscription & name.contains("pattern")
+  def isPatternSubscriber: Boolean = patternBasedSubscription & prefix.prefix.contains("pattern")
 
 }

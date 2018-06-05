@@ -4,7 +4,7 @@ import akka.Done
 import akka.actor.Cancellable
 import akka.stream.scaladsl.{Keep, Source}
 import csw.messages.events.{Event, EventName, SystemEvent}
-import csw.services.event.perf.utils.EventUtils
+import csw.messages.params.models.Prefix
 import csw.services.event.perf.utils.EventUtils._
 import csw.services.event.perf.wiring.{TestConfigs, TestWiring}
 import csw.services.event.scaladsl.EventPublisher
@@ -14,7 +14,8 @@ import scala.concurrent.Future
 import scala.concurrent.duration.DurationLong
 
 class PerfPublisher(
-    publishKey: String,
+    prefix: Prefix,
+    pubId: Int,
     eventsSetting: EventsSetting,
     testConfigs: TestConfigs,
     testWiring: TestWiring,
@@ -27,14 +28,12 @@ class PerfPublisher(
   private val totalMessages        = totalTestMsgs + warmup + 1 //inclusive of end-event
   private val payload: Array[Byte] = ("0" * payloadSize).getBytes("utf-8")
 
-  private val subsystem = publishKey.split("-").head
-  private val prefix    = s"$subsystem.prefix"
-
   private val publisher: EventPublisher =
     if (shareConnection) sharedPublisher else testWiring.publisher
 
-  private val endEvent                 = event(EventName(s"${EventUtils.endEventS}-$publishKey"), prefix)
-  private val eventName                = EventName(s"$testEventS-$publishKey")
+  private val eventName                = EventName(s"$testEventS-$pubId")
+  private val endEventName             = EventName(s"$endEventS-$pubId")
+  private val endEvent                 = event(endEventName, prefix)
   private var eventId                  = 0
   private var cancellable: Cancellable = _
   private var remaining: Long          = totalMessages
@@ -58,8 +57,8 @@ class PerfPublisher(
 
   def startPublishingWithSource(): Future[Done] =
     for {
-      _   ← publisher.publish(source(EventName(s"$testEventS-$publishKey")))
-      end ← publisher.publish(event(EventName(s"$endEventS-$publishKey"), prefix))
+      _   ← publisher.publish(source(eventName))
+      end ← publisher.publish(endEvent)
     } yield end
 
   def startPublishingInBatches(): Future[Done] = async {
@@ -79,7 +78,7 @@ class PerfPublisher(
       await(Future.sequence(batchCompletionF))
     }
 
-    await(publisher.publish(event(EventName(s"$endEventS-$publishKey"), prefix)))
+    await(publisher.publish(event(eventName, prefix)))
   }
 
 }

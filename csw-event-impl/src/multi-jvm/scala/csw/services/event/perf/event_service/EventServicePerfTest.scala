@@ -6,6 +6,7 @@ import akka.remote.testconductor.RoleName
 import akka.remote.testkit.MultiNodeConfig
 import akka.testkit.typed.scaladsl
 import com.typesafe.config.ConfigFactory
+import csw.messages.params.models.Prefix
 import csw.services.event.perf.BasePerfSuite
 import csw.services.event.perf.commons.{EventsSetting, PerfPublisher, PerfSubscriber}
 import csw.services.event.perf.reporter._
@@ -89,13 +90,13 @@ class EventServicePerfTest extends BasePerfSuite(EventServiceMultiNodeConfig) {
         Await.result(resultAggregator.startSubscription().ready(), defaultTimeout)
       }
 
-      val subscribers: immutable.Seq[(Future[Done], PerfSubscriber)] = subIds.map { n ⇒
-        val pubId = if (singlePublisher) 1 else n
+      val subscribers: immutable.Seq[(Future[Done], PerfSubscriber)] = subIds.map { subId ⇒
+        val pubId = if (singlePublisher) 1 else subId
         val subscriber =
           new PerfSubscriber(
-            testName,
-            n,
-            pubId.toString,
+            Prefix(testName),
+            pubId,
+            subId,
             EventsSetting(totalTestMsgs, payloadSize, warmupMsgs, frequency),
             rep,
             sharedSubscriber,
@@ -138,7 +139,8 @@ class EventServicePerfTest extends BasePerfSuite(EventServiceMultiNodeConfig) {
       pubIds.foreach(
         id ⇒
           new PerfPublisher(
-            id.toString,
+            Prefix(testName),
+            id,
             EventsSetting(totalTestMsgs, payloadSize, warmupMsgs, frequency),
             testConfigs,
             testWiring,
