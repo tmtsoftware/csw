@@ -1,7 +1,7 @@
 package csw.services.event.internal.pubsub
 
 import akka.actor.typed.ActorRef
-import akka.stream.scaladsl.{Sink, Source}
+import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.stage.GraphStage
 import akka.stream.{FlowShape, Materializer}
 import csw.messages.events.Event
@@ -29,4 +29,7 @@ class EventSubscriberUtil(implicit mat: Materializer) {
     eventSource.to(Sink.foreach(callback)).run()
 
   def actorCallback(actorRef: ActorRef[Event]): Event ⇒ Unit = event ⇒ actorRef ! event
+
+  def pSubscribe(stream: Source[Event, EventSubscription], callback: Event ⇒ Unit): EventSubscription =
+    stream.toMat(Sink.foreach(callback))(Keep.left).run()
 }

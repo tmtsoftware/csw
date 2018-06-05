@@ -8,7 +8,7 @@ import csw.messages.commands.{CommandName, CommandResponse, ControlCommand, Setu
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.{AkkaLocation, LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.messages.params.generics.{Key, KeyType, Parameter}
-import csw.messages.params.models.{ObsId, Units}
+import csw.messages.params.models.{ObsId, Prefix, Units}
 import csw.messages.scaladsl.TopLevelActorMessage
 import csw.services.command.scaladsl.{CommandResponseManager, CommandService}
 import csw.services.location.scaladsl.LocationService
@@ -61,7 +61,7 @@ class SampleAssemblyHandlers(
     // Construct Setup command
     val sleepTimeKey: Key[Long]         = KeyType.LongKey.make("SleepTime")
     val sleepTimeParam: Parameter[Long] = sleepTimeKey.set(5000).withUnits(Units.millisecond)
-    val setupCommand                    = Setup(componentInfo.prefix, CommandName("sleep"), Some(ObsId("2018A-001"))).add(sleepTimeParam)
+    val setupCommand                    = Setup(Prefix(componentInfo.prefix), CommandName("sleep"), Some(ObsId("2018A-001"))).add(sleepTimeParam)
 
     // Submit command, and handle validation response. Final response is returned as a Future
     val submitCommandResponseF: Future[CommandResponse] = hcd.submit(setupCommand).flatMap {

@@ -301,7 +301,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
     val event2    = makeEventWithPrefix(1, Prefix("tcs.prefix"))
     val testProbe = TestProbe[Event]()(actorSystem.toTyped)
 
-    val subscription = subscriber.pSubscribe(Subsystem.TEST, eventPattern).toMat(Sink.foreach(testProbe.ref ! _))(Keep.left).run()
+    val subscription = subscriber.pSubscribe(Subsystem.TEST, eventPattern, testProbe.ref ! _)
     subscription.ready.await
 
     publisher.publish(event1).await

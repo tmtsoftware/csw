@@ -43,6 +43,8 @@ trait EventSubscriber {
 
   def pSubscribe(subsystem: Subsystem, pattern: String): Source[Event, EventSubscription]
 
+  def pSubscribe(subsystem: Subsystem, pattern: String, callback: Event ⇒ Unit): EventSubscription
+
   def get(eventKeys: Set[EventKey]): Future[Set[Event]]
 
   def get(eventKey: EventKey): Future[Event]

@@ -99,9 +99,12 @@ class RedisSubscriber(
       mode: SubscriptionMode
   ): EventSubscription = subscribeCallback(eventKeys, eventSubscriberUtil.actorCallback(actorRef), every, mode)
 
+  override def pSubscribe(subsystem: Subsystem, pattern: String, callback: Event ⇒ Unit): EventSubscription =
+    eventSubscriberUtil.pSubscribe(pSubscribe(subsystem, pattern), callback)
+
   override def pSubscribe(subsystem: Subsystem, pattern: String): Source[Event, EventSubscription] = {
     val connectionF = patternBasedReactiveConnection()
-    val keyPattern  = s"${subsystem.entryName}*$pattern"
+    val keyPattern  = s"${subsystem.entryName}.$pattern"
     val eventStream: Source[Event, Future[NotUsed]] =
       Source.fromFutureSource(patternBasedReactiveConnection().flatMap(c ⇒ pSubscribe(keyPattern, c)))
 

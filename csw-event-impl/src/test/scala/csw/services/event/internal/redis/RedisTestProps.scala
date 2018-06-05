@@ -31,7 +31,7 @@ class RedisTestProps(
     .build()
 
   private val masterId              = "mymaster"
-  override val eventPattern: String = "sys*"
+  override val eventPattern: String = "*sys*"
 
   val publisher: EventPublisher   = redisFactory.publisher(masterId).await
   val subscriber: EventSubscriber = redisFactory.subscriber(masterId).await
