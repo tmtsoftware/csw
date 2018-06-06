@@ -15,6 +15,9 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
   private val iris: String    = IRIS.entryName
   private val aoesw: String   = AOESW.entryName
   private val nfiraos: String = NFIRAOS.entryName
+
+  // DEOPSCSW-405: [Redis]Measure performance of model observatory scenario
+  // DEOPSCSW-406: [Kafka]Measure performance of model observatory scenario
   val idealMultiNodeModelObsScenario: ModelObservatoryTestSettings =
     ModelObservatoryTestSettings(
       JvmSetting(

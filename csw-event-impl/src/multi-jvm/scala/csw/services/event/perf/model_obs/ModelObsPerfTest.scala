@@ -46,6 +46,8 @@ class ModelObsPerfTestMultiJvmNode2 extends ModelObsPerfTest
 //class ModelObsPerfTestMultiJvmNode20 extends ModelObsPerfTest
 //class ModelObsPerfTestMultiJvmNode21 extends ModelObsPerfTest
 
+// DEOPSCSW-405: [Redis]Measure performance of model observatory scenario
+// DEOPSCSW-406: [Kafka]Measure performance of model observatory scenario
 class ModelObsPerfTest extends BasePerfSuite(ModelObsMultiNodeConfig) {
 
   override def afterAll(): Unit = {
