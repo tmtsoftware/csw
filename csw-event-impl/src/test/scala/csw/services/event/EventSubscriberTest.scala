@@ -77,7 +77,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
   //DEOPSCSW-346: Subscribe to event irrespective of Publisher's existence
   //DEOPSCSW-343: Unsubscribe based on prefix and event name
   @Test(dataProvider = "event-service-provider")
-  def should_be_able_to_publish_and_subscribe_an_event(baseProperties: BaseProperties): Unit = {
+  def should_be_able_to_subscribe_an_event(baseProperties: BaseProperties): Unit = {
     import baseProperties._
     import baseProperties.wiring._
 
@@ -101,7 +101,9 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
   //DEOPSCSW-346: Subscribe to event irrespective of Publisher's existence
   //DEOPSCSW-342: Subscription with consumption frequency
   @Test(dataProvider = "event-service-provider")
-  def should_be_able_to_publish_and_subscribe_an_event_with_duration(baseProperties: BaseProperties): Unit = {
+  def should_be_able_to_subscribe_an_event_with_duration_with_rate_adapter_for_fast_publisher(
+      baseProperties: BaseProperties
+  ): Unit = {
     import baseProperties._
     import baseProperties.wiring._
 
@@ -279,7 +281,9 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
 
   //DEOPSCSW-342: Subscription with consumption frequency
   @Test(dataProvider = "event-service-provider")
-  def should_be_able_to_subscribe_with_rate_limiter_mode(baseProperties: BaseProperties): Unit = {
+  def should_be_able_to_subscribe_with_duration_with_rate_limiter_mode_for_slow_publisher(
+      baseProperties: BaseProperties
+  ): Unit = {
     import baseProperties._
     val inbox = TestInbox[Event]()
 
@@ -292,9 +296,43 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
     inbox.receiveAll().size shouldBe 5
   }
 
+  //DEOPSCSW-342: Subscription with consumption frequency
+  @Test(dataProvider = "event-service-provider")
+  def should_be_able_to_subscribe_with_duration_with_rate_limiter_mode_for_fast_publisher(
+      baseProperties: BaseProperties
+  ): Unit = {
+    import baseProperties._
+    val inbox = TestInbox[Event]()
+
+    val cancellable = publisher.publish(eventGenerator(1), 100.millis)
+    val subscription =
+      subscriber.subscribeActorRef(events.map(_.eventKey).toSet, inbox.ref, 200.millis, SubscriptionMode.RateLimiterMode)
+    Thread.sleep(900)
+    subscription.unsubscribe().await
+    cancellable.cancel()
+    inbox.receiveAll().size shouldBe 5
+  }
+
+  //DEOPSCSW-342: Subscription with consumption frequency
+  @Test(dataProvider = "event-service-provider")
+  def should_be_able_to_subscribe_with_duration_with_rate_adapter_mode_for_slow_publisher(
+      baseProperties: BaseProperties
+  ): Unit = {
+    import baseProperties._
+    val inbox = TestInbox[Event]()
+
+    val cancellable = publisher.publish(eventGenerator(1), 200.millis)
+    val subscription =
+      subscriber.subscribeActorRef(events.map(_.eventKey).toSet, inbox.ref, 100.millis, SubscriptionMode.RateAdapterMode)
+    Thread.sleep(1050)
+    subscription.unsubscribe().await
+    cancellable.cancel()
+    inbox.receiveAll().size shouldBe 10
+  }
+
   //DEOPSCSW-420: Implement Pattern based subscription
   @Test(dataProvider = "redis-provider")
-  def should_be_able_to_publish_and_subscribe_an_event_with_pattern(redisProps: RedisTestProps): Unit = {
+  def should_be_able_to_subscribe_an_event_with_pattern(redisProps: RedisTestProps): Unit = {
     import redisProps._
     import redisProps.wiring._
 
