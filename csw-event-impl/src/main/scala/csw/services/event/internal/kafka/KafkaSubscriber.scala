@@ -40,24 +40,6 @@ class KafkaSubscriber(
       .mapMaterializedValue(eventSubscription)
   }
 
-  private def eventSubscription(control: scaladsl.Consumer.Control): EventSubscription = {
-    new EventSubscription {
-      override def unsubscribe(): Future[Done] = control.shutdown().map(_ ⇒ Done)
-
-      override def ready(): Future[Done] = Future.successful(Done)
-    }
-  }
-
-  override def get(eventKeys: Set[EventKey]): Future[Set[Event]] = {
-    val (subscription, eventsF) = subscribe(eventKeys).take(eventKeys.size).toMat(Sink.seq)(Keep.both).run()
-
-    async {
-      val events = await(eventsF)
-      await(subscription.unsubscribe())
-      events.toSet
-    }
-  }
-
   override def subscribe(
       eventKeys: Set[EventKey],
       every: FiniteDuration,
@@ -74,12 +56,10 @@ class KafkaSubscriber(
       every: FiniteDuration,
       mode: SubscriptionMode
   ): EventSubscription =
-    eventSubscriberUtil
-      .subscribeAsync(subscribe(eventKeys).via(eventSubscriberUtil.subscriptionModeStage(every, mode)), callback)
+    eventSubscriberUtil.subscribeAsync(subscribe(eventKeys).via(eventSubscriberUtil.subscriptionModeStage(every, mode)), callback)
 
   override def subscribeCallback(eventKeys: Set[EventKey], callback: Event => Unit): EventSubscription =
-    eventSubscriberUtil
-      .subscribeCallback(subscribe(eventKeys), callback)
+    eventSubscriberUtil.subscribeCallback(subscribe(eventKeys), callback)
 
   override def subscribeCallback(
       eventKeys: Set[EventKey],
@@ -109,6 +89,16 @@ class KafkaSubscriber(
   override def pSubscribe(subsystem: Subsystem, pattern: String, callback: Event ⇒ Unit): EventSubscription =
     eventSubscriberUtil.pSubscribe(pSubscribe(subsystem, pattern), callback)
 
+  override def get(eventKeys: Set[EventKey]): Future[Set[Event]] = {
+    val (subscription, eventsF) = subscribe(eventKeys).take(eventKeys.size).toMat(Sink.seq)(Keep.both).run()
+
+    async {
+      val events = await(eventsF)
+      await(subscription.unsubscribe())
+      events.toSet
+    }
+  }
+
   override def get(eventKey: EventKey): Future[Event] = get(Set(eventKey)).map(_.head)
 
   private def getEventStream(subscription: Subscription): Source[Event, scaladsl.Consumer.Control] =
@@ -119,5 +109,13 @@ class KafkaSubscriber(
   private def getLatestOffsets(eventKeys: Set[EventKey]): Map[TopicPartition, Long] = {
     val topicPartitions = eventKeys.map(e ⇒ new TopicPartition(e.key, 0)).toList
     consumer.endOffsets(topicPartitions.asJava).asScala.toMap.mapValues(_.toLong)
+  }
+
+  private def eventSubscription(control: scaladsl.Consumer.Control): EventSubscription = {
+    new EventSubscription {
+      override def unsubscribe(): Future[Done] = control.shutdown().map(_ ⇒ Done)
+
+      override def ready(): Future[Done] = Future.successful(Done)
+    }
   }
 }

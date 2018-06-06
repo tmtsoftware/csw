@@ -22,7 +22,7 @@ class KafkaPublisher(
 
   private val kafkaProducer = producerSettings.createKafkaProducer()
 
-  private val parallelism = 100
+  private val parallelism = 1
 
   override def publish(event: Event): Future[Done] = {
     val promisedDone: Promise[Done] = Promise()

@@ -37,7 +37,7 @@ class RedisSubscriber(
   override def subscribe(eventKeys: Set[EventKey]): Source[Event, EventSubscription] = {
     val connectionF                                  = reactiveConnectionF()
     val latestEventStream: Source[Event, NotUsed]    = Source.fromFuture(get(eventKeys)).mapConcat(identity)
-    val eventStreamF: Future[Source[Event, NotUsed]] = connectionF.flatMap(subscribe(eventKeys, _))
+    val eventStreamF: Future[Source[Event, NotUsed]] = connectionF.flatMap(subscribe_internal(eventKeys, _))
     val eventStream: Source[Event, Future[NotUsed]]  = Source.fromFutureSource(eventStreamF)
 
     latestEventStream
@@ -99,14 +99,11 @@ class RedisSubscriber(
       mode: SubscriptionMode
   ): EventSubscription = subscribeCallback(eventKeys, eventSubscriberUtil.actorCallback(actorRef), every, mode)
 
-  override def pSubscribe(subsystem: Subsystem, pattern: String, callback: Event ⇒ Unit): EventSubscription =
-    eventSubscriberUtil.pSubscribe(pSubscribe(subsystem, pattern), callback)
-
   override def pSubscribe(subsystem: Subsystem, pattern: String): Source[Event, EventSubscription] = {
     val connectionF = patternBasedReactiveConnection()
     val keyPattern  = s"${subsystem.entryName}.$pattern"
     val eventStream: Source[Event, Future[NotUsed]] =
-      Source.fromFutureSource(patternBasedReactiveConnection().flatMap(c ⇒ pSubscribe(keyPattern, c)))
+      Source.fromFutureSource(patternBasedReactiveConnection().flatMap(c ⇒ pSubscribe_internal(keyPattern, c)))
 
     eventStream
       .viaMat(KillSwitches.single)(Keep.both)
@@ -126,6 +123,9 @@ class RedisSubscriber(
       }
   }
 
+  override def pSubscribe(subsystem: Subsystem, pattern: String, callback: Event ⇒ Unit): EventSubscription =
+    eventSubscriberUtil.pSubscribe(pSubscribe(subsystem, pattern), callback)
+
   override def get(eventKeys: Set[EventKey]): Future[Set[Event]] = Future.sequence(eventKeys.map(get))
 
   override def get(eventKey: EventKey): Future[Event] = async {
@@ -134,7 +134,7 @@ class RedisSubscriber(
     if (event == null) Event.invalidEvent(eventKey) else event
   }
 
-  private def subscribe(
+  private def subscribe_internal(
       eventKeys: Set[EventKey],
       reactiveCommands: RedisPubSubReactiveCommands[EventKey, Event]
   ): Future[Source[Event, NotUsed]] =
@@ -144,7 +144,10 @@ class RedisSubscriber(
       .toScala
       .map(_ ⇒ Source.fromPublisher(reactiveCommands.observeChannels(OverflowStrategy.LATEST)).map(_.getMessage))
 
-  private def pSubscribe(pattern: String, reactiveCommands: RedisPubSubReactiveCommands[String, Event]) =
+  private def pSubscribe_internal(
+      pattern: String,
+      reactiveCommands: RedisPubSubReactiveCommands[String, Event]
+  ): Future[Source[Event, NotUsed]] =
     reactiveCommands
       .psubscribe(pattern)
       .toFuture
