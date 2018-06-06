@@ -5,7 +5,7 @@ published state.
 
 @@@ note
 
-This feature is provided for optimized communicaton between an Assembly and an HCD only.  See [Matching state for command completion](../commons/command.md#matching-state-for-command-completion).
+This feature is provided for optimized communicaton between an Assembly and an HCD only.  See @ref:[Matching state for command completion](../commons/command.md#matching-state-for-command-completion).
 
 @@@
 
