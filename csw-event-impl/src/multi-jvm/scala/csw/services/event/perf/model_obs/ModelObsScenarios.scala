@@ -68,6 +68,7 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
                     SubSetting(Prefix(s"$nfiraos-$n"), noOfSubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
                     SubSetting(Prefix(s"$nfiraos-$n"), noOfSubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
                   )
+                case _ ⇒ Nil
               }
             )
         }
@@ -129,6 +130,7 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
                     SubSetting(Prefix(s"$nfiraos-$n"), noOfSubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
                     SubSetting(Prefix(s"$nfiraos-pattern-$n"), noOfSubs = 2, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
                   )
+                case _ ⇒ Nil
               }
             )
         }
@@ -184,6 +186,7 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
                     SubSetting(Prefix(s"$nfiraos-$n"), noOfSubs = 25, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
                     SubSetting(Prefix(s"$nfiraos-$n"), noOfSubs = 100, adjustedTotalMsgs(3), rate = 3, payloadSize = 128)
                   )
+                case _ ⇒ Nil
               }
             )
         }
@@ -222,6 +225,7 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
                     SubSetting(Prefix(s"$aoesw-$n"), noOfSubs = 10, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
                     SubSetting(Prefix(s"$aoesw-$n"), noOfSubs = 30, adjustedTotalMsgs(5), rate = 5, payloadSize = 128)
                   )
+                case _ ⇒ Nil
               }
             )
         }
@@ -262,6 +266,7 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
                     SubSetting(Prefix(s"$aoesw-$n"), noOfSubs = 30, adjustedTotalMsgs(5), rate = 5, payloadSize = 128),
                     SubSetting(Prefix(s"$aoesw-pattern-$n"), noOfSubs = 1, adjustedTotalMsgs(5), rate = 5, payloadSize = 128)
                   )
+                case _ ⇒ Nil
               }
             )
         }

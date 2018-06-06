@@ -6,15 +6,14 @@ import akka.stream.javadsl.Source;
 import akka.testkit.typed.javadsl.TestProbe;
 import csw.messages.commons.CoordinatedShutdownReasons;
 import csw.messages.events.Event;
-import csw.services.event.exceptions.PublishFailedException;
+import csw.services.event.exceptions.PublishFailure;
 import csw.services.event.helpers.Utils;
 import csw.services.event.javadsl.IEventPublisher;
 import csw.services.event.javadsl.JRedisSentinelFactory;
 import io.lettuce.core.ClientOptions;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
+import io.lettuce.core.RedisException;
+import org.hamcrest.Matcher;
+import org.junit.*;
 import org.junit.rules.ExpectedException;
 import scala.concurrent.Await;
 import scala.concurrent.ExecutionContext;
@@ -57,13 +56,14 @@ public class JRedisFailureTest {
     @Test
     public void failureInPublishingShouldFailFutureWithPublishFailedException() throws InterruptedException, ExecutionException, TimeoutException {
         publisher = jRedisSentinelFactory.publisher(masterId).get(10, TimeUnit.SECONDS);
-        publisher.publish(Utils.makeEvent(2)).get(10, TimeUnit.SECONDS);
+        Event event = Utils.makeEvent(2);
+        publisher.publish(event).get(10, TimeUnit.SECONDS);
 
         publisher.shutdown().get(10, TimeUnit.SECONDS);
 
         Thread.sleep(1000); // wait till the publisher is shutdown successfully
 
-        exception.expectCause(isA(PublishFailedException.class));
+        exception.expectCause(isA(PublishFailure.class));
         publisher.publish(Utils.makeEvent(2)).get(10, TimeUnit.SECONDS);
     }
 
@@ -71,7 +71,7 @@ public class JRedisFailureTest {
     public void handleFailedPublishEventWithACallback() throws InterruptedException, ExecutionException, TimeoutException {
         publisher = jRedisSentinelFactory.publisher(masterId).get(10, TimeUnit.SECONDS);
 
-        TestProbe testProbe = TestProbe.<Event>create(Adapter.toTyped(redisTestProps.wiring().actorSystem()));
+        TestProbe<PublishFailure> testProbe = TestProbe.create(Adapter.toTyped(redisTestProps.wiring().actorSystem()));
         publisher.publish(Utils.makeEvent(1)).get(10, TimeUnit.SECONDS);
 
         publisher.shutdown().get(10, TimeUnit.SECONDS);
@@ -81,16 +81,18 @@ public class JRedisFailureTest {
         Event event = Utils.makeEvent(1);
         Source<Event, NotUsed> eventStream = Source.single(event);
 
-        publisher.publish(eventStream, event1 -> testProbe.ref().tell(event1));
+        publisher.publish(eventStream, failure -> testProbe.ref().tell(failure));
 
-        testProbe.<Event>expectMessage(event);
+        PublishFailure failure = testProbe.expectMessageClass(PublishFailure.class);
+        Assert.assertEquals(failure.event(), event);
+        Assert.assertEquals(failure.getCause().getClass(), RedisException.class);
     }
 
     @Test
     public void handleFailedPublishEventWithAnEventGeneratorAndACallback() throws InterruptedException, ExecutionException, TimeoutException {
         publisher = jRedisSentinelFactory.publisher(masterId).get(10, TimeUnit.SECONDS);
 
-        TestProbe testProbe = TestProbe.create(Adapter.toTyped(redisTestProps.wiring().actorSystem()));
+        TestProbe<PublishFailure> testProbe = TestProbe.create(Adapter.toTyped(redisTestProps.wiring().actorSystem()));
         publisher.publish(Utils.makeEvent(1)).get(10, TimeUnit.SECONDS);
 
         publisher.shutdown().get(10, TimeUnit.SECONDS);
@@ -99,8 +101,10 @@ public class JRedisFailureTest {
 
         Event event = Utils.makeEvent(1);
 
-        publisher.publish(() -> event, new FiniteDuration(20, TimeUnit.MILLISECONDS), event1 -> testProbe.ref().tell(event1));
+        publisher.publish(() -> event, new FiniteDuration(20, TimeUnit.MILLISECONDS), failure -> testProbe.ref().tell(failure));
 
-        testProbe.<Event>expectMessage(event);
+        PublishFailure failure = testProbe.expectMessageClass(PublishFailure.class);
+        Assert.assertEquals(failure.event(), event);
+        Assert.assertEquals(failure.getCause().getClass(), RedisException.class);
     }
 }

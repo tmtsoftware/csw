@@ -7,6 +7,7 @@ import akka.Done
 import akka.actor.Cancellable
 import akka.stream.javadsl.Source
 import csw.messages.events.Event
+import csw.services.event.exceptions.PublishFailure
 
 import scala.concurrent.duration.FiniteDuration
 
@@ -16,11 +17,11 @@ trait IEventPublisher {
 
   def publish[Mat](source: Source[Event, Mat]): Mat
 
-  def publish[Mat](source: Source[Event, Mat], onError: Consumer[Event]): Mat
+  def publish[Mat](source: Source[Event, Mat], onError: Consumer[PublishFailure]): Any
 
   def publish(eventGenerator: Supplier[Event], every: FiniteDuration): Cancellable
 
-  def publish(eventGenerator: Supplier[Event], every: FiniteDuration, onError: Consumer[Event]): Cancellable
+  def publish(eventGenerator: Supplier[Event], every: FiniteDuration, onError: Consumer[PublishFailure]): Cancellable
 
   def shutdown(): CompletableFuture[Done]
 }

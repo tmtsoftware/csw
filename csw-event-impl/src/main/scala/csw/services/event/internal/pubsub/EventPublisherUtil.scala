@@ -5,7 +5,7 @@ import akka.actor.Cancellable
 import akka.stream.Materializer
 import akka.stream.scaladsl.{Sink, Source}
 import csw.messages.events.Event
-import csw.services.event.exceptions.PublishFailedException
+import csw.services.event.exceptions.PublishFailure
 import csw.services.event.internal.commons.EventServiceLogger
 
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
@@ -23,7 +23,7 @@ class EventPublisherUtil(implicit ec: ExecutionContext, mat: Materializer) {
       source: Source[Event, Mat],
       parallelism: Int,
       publish: Event ⇒ Future[Done],
-      maybeOnError: Option[Event ⇒ Unit]
+      maybeOnError: Option[PublishFailure ⇒ Unit]
   ): Mat =
     source
       .mapAsync(parallelism) { event ⇒
@@ -32,10 +32,11 @@ class EventPublisherUtil(implicit ec: ExecutionContext, mat: Materializer) {
       .to(Sink.ignore)
       .run()
 
-  private def publishWithRecovery(event: Event, publish: Event ⇒ Future[Done], maybeOnError: Option[Event ⇒ Unit]) =
+  private def publishWithRecovery(event: Event, publish: Event ⇒ Future[Done], maybeOnError: Option[PublishFailure ⇒ Unit]) =
     publish(event).recover[Done] {
-      case _ @PublishFailedException(e) ⇒
-        maybeOnError.foreach(onError ⇒ onError(e))
+      case failure @ PublishFailure(_, _) ⇒
+        logger.error(failure.getMessage, ex = failure)
+        maybeOnError.foreach(onError ⇒ onError(failure))
         Done
     }
 

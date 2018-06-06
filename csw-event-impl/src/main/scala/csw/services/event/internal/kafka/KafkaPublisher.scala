@@ -5,7 +5,7 @@ import akka.actor.Cancellable
 import akka.kafka.ProducerSettings
 import akka.stream.scaladsl.Source
 import csw.messages.events.Event
-import csw.services.event.exceptions.PublishFailedException
+import csw.services.event.exceptions.PublishFailure
 import csw.services.event.internal.pubsub.EventPublisherUtil
 import csw.services.event.scaladsl.EventPublisher
 import org.apache.kafka.clients.producer.{Callback, ProducerRecord}
@@ -29,7 +29,7 @@ class KafkaPublisher(
     try {
       kafkaProducer.send(eventToProducerRecord(event), completePromise(event, promisedDone))
     } catch {
-      case NonFatal(_) ⇒ promisedDone.failure(PublishFailedException(event))
+      case NonFatal(ex) ⇒ promisedDone.failure(PublishFailure(event, ex))
     }
     promisedDone.future
   }
@@ -37,13 +37,13 @@ class KafkaPublisher(
   override def publish[Mat](source: Source[Event, Mat]): Mat =
     eventPublisherUtil.publishFromSource(source, parallelism, publish, None)
 
-  override def publish[Mat](stream: Source[Event, Mat], onError: Event ⇒ Unit): Mat =
+  override def publish[Mat](stream: Source[Event, Mat], onError: PublishFailure ⇒ Unit): Mat =
     eventPublisherUtil.publishFromSource(stream, parallelism, publish, Some(onError))
 
   override def publish(eventGenerator: ⇒ Event, every: FiniteDuration): Cancellable =
     publish(eventPublisherUtil.eventSource(eventGenerator, every))
 
-  override def publish(eventGenerator: ⇒ Event, every: FiniteDuration, onError: Event ⇒ Unit): Cancellable =
+  override def publish(eventGenerator: ⇒ Event, every: FiniteDuration, onError: PublishFailure ⇒ Unit): Cancellable =
     publish(eventPublisherUtil.eventSource(eventGenerator, every), onError)
 
   override def shutdown(): Future[Done] = Future {
@@ -56,6 +56,6 @@ class KafkaPublisher(
 
   private def completePromise(event: Event, promisedDone: Promise[Done]): Callback = {
     case (_, null)          ⇒ promisedDone.success(Done)
-    case (_, ex: Exception) ⇒ promisedDone.failure(PublishFailedException(event))
+    case (_, ex: Exception) ⇒ promisedDone.failure(PublishFailure(event, ex))
   }
 }

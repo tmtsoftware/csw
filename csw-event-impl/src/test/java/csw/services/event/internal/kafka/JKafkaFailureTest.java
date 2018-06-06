@@ -5,10 +5,11 @@ import akka.stream.javadsl.Source;
 import akka.testkit.typed.javadsl.TestProbe;
 import csw.messages.commons.CoordinatedShutdownReasons;
 import csw.messages.events.Event;
-import csw.services.event.exceptions.PublishFailedException;
+import csw.services.event.exceptions.PublishFailure;
 import csw.services.event.helpers.Utils;
 import csw.services.event.javadsl.IEventPublisher;
 import net.manub.embeddedkafka.EmbeddedKafka$;
+import org.apache.kafka.common.errors.RecordTooLargeException;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 import scala.concurrent.Await;
@@ -45,7 +46,7 @@ public class JKafkaFailureTest {
 
     @Test
     public void failureInPublishingShouldFailFutureWithPublishFailedException() throws InterruptedException, ExecutionException, TimeoutException {
-        exception.expectCause(isA(PublishFailedException.class));
+        exception.expectCause(isA(PublishFailure.class));
 
         // simulate publishing failure as message size is greater than message.max.bytes(1 byte) configured in broker
         publisher.publish(Utils.makeEvent(2)).get(10, TimeUnit.SECONDS);
@@ -54,22 +55,27 @@ public class JKafkaFailureTest {
     @Test
     public void handleFailedPublishEventWithACallback() {
 
-        TestProbe testProbe = TestProbe.create(Adapter.toTyped(kafkaTestProps.wiring().actorSystem()));
-        Event eventSent = Utils.makeEvent(1);
+        TestProbe<PublishFailure> testProbe = TestProbe.create(Adapter.toTyped(kafkaTestProps.wiring().actorSystem()));
+        Event event = Utils.makeEvent(1);
+        Event eventSent = event;
         Source eventStream = Source.single(eventSent);
 
-        publisher.publish(eventStream, event1 -> testProbe.ref().tell(event1));
+        publisher.publish(eventStream, failure -> testProbe.ref().tell(failure));
 
-        testProbe.expectMessage(eventSent);
+        PublishFailure failure = testProbe.expectMessageClass(PublishFailure.class);
+        Assert.assertEquals(failure.event(), event);
+        Assert.assertEquals(failure.getCause().getClass(), RecordTooLargeException.class);
     }
 
     @Test
     public void handleFailedPublishEventWithAnEventGeneratorAndACallback() {
-        TestProbe testProbe = TestProbe.create(Adapter.toTyped(kafkaTestProps.wiring().actorSystem()));
+        TestProbe<PublishFailure> testProbe = TestProbe.create(Adapter.toTyped(kafkaTestProps.wiring().actorSystem()));
         Event event = Utils.makeEvent(1);
 
-        publisher.publish(() -> event, new FiniteDuration(20, TimeUnit.MILLISECONDS), event1 -> testProbe.ref().tell(event1));
+        publisher.publish(() -> event, new FiniteDuration(20, TimeUnit.MILLISECONDS), failure -> testProbe.ref().tell(failure));
 
-        testProbe.expectMessage(event);
+        PublishFailure failure = testProbe.expectMessageClass(PublishFailure.class);
+        Assert.assertEquals(failure.event(), event);
+        Assert.assertEquals(failure.getCause().getClass(), RecordTooLargeException.class);
     }
 }
