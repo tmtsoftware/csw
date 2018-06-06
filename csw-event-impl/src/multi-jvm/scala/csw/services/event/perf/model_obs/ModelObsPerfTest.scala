@@ -133,6 +133,7 @@ class ModelObsPerfTest extends BasePerfSuite(ModelObsMultiNodeConfig) {
   private val scenarios = new ModelObsScenarios(testConfigs)
   val scenarioName      = "Model-Obs"
 
+  //DEOPSCSW-336: Pattern based subscription analysis and performance testing
   test("Perf results must be great for model observatory use case") {
     runScenario(scenarios.modelObsScenarioWithTwoProcesses)
   }
