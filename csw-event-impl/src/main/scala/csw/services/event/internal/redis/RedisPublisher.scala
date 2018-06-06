@@ -36,7 +36,10 @@ class RedisPublisher(
       set(event, commands) // set will run in independent of publish
       Done
     } recover {
-      case NonFatal(ex) ⇒ throw PublishFailure(event, ex)
+      case NonFatal(ex) ⇒
+        val failure = PublishFailure(event, ex)
+        eventPublisherUtil.logError(failure)
+        throw failure
     }
 
   override def publish[Mat](source: Source[Event, Mat]): Mat =

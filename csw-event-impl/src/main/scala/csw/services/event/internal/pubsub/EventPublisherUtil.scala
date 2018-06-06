@@ -35,10 +35,13 @@ class EventPublisherUtil(implicit ec: ExecutionContext, mat: Materializer) {
   private def publishWithRecovery(event: Event, publish: Event ⇒ Future[Done], maybeOnError: Option[PublishFailure ⇒ Unit]) =
     publish(event).recover[Done] {
       case failure @ PublishFailure(_, _) ⇒
-        logger.error(failure.getMessage, ex = failure)
         maybeOnError.foreach(onError ⇒ onError(failure))
         Done
     }
+
+  def logError(failure: PublishFailure): Unit = {
+    logger.error(failure.getMessage, ex = failure)
+  }
 
   private def withErrorLogging(eventGenerator: => Event): Event =
     try {
