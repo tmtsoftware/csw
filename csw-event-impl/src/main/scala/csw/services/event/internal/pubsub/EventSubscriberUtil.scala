@@ -6,7 +6,7 @@ import akka.stream.stage.GraphStage
 import akka.stream.{FlowShape, Materializer}
 import csw.messages.events.Event
 import csw.services.event.internal.throttle.{RateAdapterStage, RateLimiterStage}
-import csw.services.event.scaladsl.SubscriptionMode.{RateAdapterMode, RateLimiterMode}
+import csw.services.event.scaladsl.SubscriptionModes.{RateAdapterMode, RateLimiterMode}
 import csw.services.event.scaladsl.{EventSubscription, SubscriptionMode}
 
 import scala.concurrent.Future

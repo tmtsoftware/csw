@@ -8,8 +8,8 @@ package csw.services.event.scaladsl
  * `Interval:` Refers to the duration between two ticks
  *
  * Parameter mode can have two values -
- * - [[SubscriptionMode.RateAdapterMode]]
- * - [[SubscriptionMode.RateLimiterMode]]
+ * - [[SubscriptionModes.RateAdapterMode]]
+ * - [[SubscriptionModes.RateLimiterMode]]
  *
  * ---------------------------------------------------------------------------------------------------------------------
  *                    |                 Rate Adapter                  |                 Rate Limiter
@@ -40,7 +40,7 @@ package csw.services.event.scaladsl
  *                    |                                               |
  * 5. Trade offs      | Latency of events received in this mode will  | The events received will not be in
  *                    | be more than that in                          | synchronization with the subscription frequency.
- *                    | [[SubscriptionMode.RateLimiterMode]].         |
+ *                    | [[SubscriptionModes.RateLimiterMode]].         |
  *                    |                                               | Some intervals might not receive an event.
  *                    |                                               |
  *                    |                                               | Duration observed between events received might
@@ -49,7 +49,10 @@ package csw.services.event.scaladsl
  */
 sealed trait SubscriptionMode
 
-object SubscriptionMode {
+object SubscriptionModes {
   case object RateAdapterMode extends SubscriptionMode
   case object RateLimiterMode extends SubscriptionMode
+
+  val jRateAdapterMode: SubscriptionMode = RateAdapterMode
+  val jRateLimiterMode: SubscriptionMode = RateLimiterMode
 }

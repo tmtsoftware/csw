@@ -11,7 +11,7 @@ import csw.services.event.helpers.Utils.{makeDistinctEvent, makeEvent, makeEvent
 import csw.services.event.internal.kafka.KafkaTestProps
 import csw.services.event.internal.redis.RedisTestProps
 import csw.services.event.internal.wiring._
-import csw.services.event.scaladsl.SubscriptionMode
+import csw.services.event.scaladsl.SubscriptionModes
 import net.manub.embeddedkafka.EmbeddedKafka
 import org.scalatest.Matchers
 import org.scalatest.concurrent.Eventually
@@ -114,14 +114,14 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
 
     val cancellable = publisher.publish(eventGenerator(0), 1.millis)
     val subscription = subscriber
-      .subscribe(Set(eventKey), 300.millis, SubscriptionMode.RateAdapterMode)
+      .subscribe(Set(eventKey), 300.millis, SubscriptionModes.RateAdapterMode)
       .to(Sink.foreach[Event](queue.enqueue(_)))
       .run()
 
     subscription.ready().await
 
     val subscription2 = subscriber
-      .subscribe(Set(eventKey), 400.millis, SubscriptionMode.RateAdapterMode)
+      .subscribe(Set(eventKey), 400.millis, SubscriptionModes.RateAdapterMode)
       .to(Sink.foreach[Event](queue2.enqueue(_)))
       .run()
     subscription2.ready().await
@@ -176,8 +176,8 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
 
     val cancellable = publisher.publish(eventGenerator(0), 1.millis)
 
-    val subscription  = subscriber.subscribeAsync(Set(event1.eventKey), callback, 300.millis, SubscriptionMode.RateAdapterMode)
-    val subscription2 = subscriber.subscribeAsync(Set(event1.eventKey), callback2, 400.millis, SubscriptionMode.RateAdapterMode)
+    val subscription  = subscriber.subscribeAsync(Set(event1.eventKey), callback, 300.millis, SubscriptionModes.RateAdapterMode)
+    val subscription2 = subscriber.subscribeAsync(Set(event1.eventKey), callback2, 400.millis, SubscriptionModes.RateAdapterMode)
     Thread.sleep(1000) // Future in callback needs time to execute
     subscription.unsubscribe().await
     subscription2.unsubscribe().await
@@ -230,9 +230,9 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
 
     val cancellable = publisher.publish(eventGenerator(0), 1.millis)
     Thread.sleep(500) // Needed for redis set which is fire and forget operation
-    val subscription = subscriber.subscribeCallback(Set(event1.eventKey), callback, 300.millis, SubscriptionMode.RateAdapterMode)
+    val subscription = subscriber.subscribeCallback(Set(event1.eventKey), callback, 300.millis, SubscriptionModes.RateAdapterMode)
     val subscription2 =
-      subscriber.subscribeCallback(Set(event1.eventKey), callback2, 400.millis, SubscriptionMode.RateAdapterMode)
+      subscriber.subscribeCallback(Set(event1.eventKey), callback2, 400.millis, SubscriptionModes.RateAdapterMode)
     Thread.sleep(1000)
     subscription.unsubscribe().await
     subscription2.unsubscribe().await
@@ -272,7 +272,8 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
 
     publisher.publish(event1).await
     Thread.sleep(500) // Needed for redis set which is fire and forget operation
-    val subscription = subscriber.subscribeActorRef(Set(event1.eventKey), inbox.ref, 300.millis, SubscriptionMode.RateAdapterMode)
+    val subscription =
+      subscriber.subscribeActorRef(Set(event1.eventKey), inbox.ref, 300.millis, SubscriptionModes.RateAdapterMode)
     Thread.sleep(1000)
     subscription.unsubscribe().await
 
@@ -289,7 +290,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
 
     val cancellable = publisher.publish(eventGenerator(1), 200.millis)
     val subscription =
-      subscriber.subscribeActorRef(events.map(_.eventKey).toSet, inbox.ref, 100.millis, SubscriptionMode.RateLimiterMode)
+      subscriber.subscribeActorRef(events.map(_.eventKey).toSet, inbox.ref, 100.millis, SubscriptionModes.RateLimiterMode)
     Thread.sleep(900)
     subscription.unsubscribe().await
     cancellable.cancel()
@@ -304,9 +305,9 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
     import baseProperties._
     val inbox = TestInbox[Event]()
 
-    val cancellable = publisher.publish(eventGenerator(1), 100.millis)
+    val cancellable = publisher.publish(eventGenerator(1), 105.millis)
     val subscription =
-      subscriber.subscribeActorRef(events.map(_.eventKey).toSet, inbox.ref, 200.millis, SubscriptionMode.RateLimiterMode)
+      subscriber.subscribeActorRef(events.map(_.eventKey).toSet, inbox.ref, 200.millis, SubscriptionModes.RateLimiterMode)
     Thread.sleep(900)
     subscription.unsubscribe().await
     cancellable.cancel()
@@ -323,7 +324,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
 
     val cancellable = publisher.publish(eventGenerator(1), 200.millis)
     val subscription =
-      subscriber.subscribeActorRef(events.map(_.eventKey).toSet, inbox.ref, 100.millis, SubscriptionMode.RateAdapterMode)
+      subscriber.subscribeActorRef(events.map(_.eventKey).toSet, inbox.ref, 100.millis, SubscriptionModes.RateAdapterMode)
     Thread.sleep(1050)
     subscription.unsubscribe().await
     cancellable.cancel()

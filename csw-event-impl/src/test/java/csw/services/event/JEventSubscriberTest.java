@@ -15,6 +15,7 @@ import csw.services.event.internal.kafka.KafkaTestProps;
 import csw.services.event.internal.redis.RedisTestProps;
 import csw.services.event.internal.wiring.BaseProperties;
 import csw.services.event.javadsl.IEventSubscription;
+import csw.services.event.scaladsl.SubscriptionModes;
 import io.lettuce.core.ClientOptions;
 import net.manub.embeddedkafka.EmbeddedKafka$;
 import org.scalatest.testng.TestNGSuite;
@@ -118,10 +119,10 @@ public class JEventSubscriberTest extends TestNGSuite {
 
         Cancellable cancellable = baseProperties.jPublisher().publish(eventGenerator(0), new FiniteDuration(1, TimeUnit.MILLISECONDS));
 
-        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(set, Duration.ZERO.plusMillis(300)).toMat(Sink.foreach(queue::add), Keep.left()).run(baseProperties.wiring().resumingMat());
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(set, Duration.ZERO.plusMillis(300), SubscriptionModes.jRateAdapterMode()).toMat(Sink.foreach(queue::add), Keep.left()).run(baseProperties.wiring().resumingMat());
         subscription.ready().get(10, TimeUnit.SECONDS);
 
-        IEventSubscription subscription2 = baseProperties.jSubscriber().subscribe(set, Duration.ZERO.plusMillis(400)).toMat(Sink.foreach(queue2::add), Keep.left()).run(baseProperties.wiring().resumingMat());
+        IEventSubscription subscription2 = baseProperties.jSubscriber().subscribe(set, Duration.ZERO.plusMillis(400), SubscriptionModes.jRateAdapterMode()).toMat(Sink.foreach(queue2::add), Keep.left()).run(baseProperties.wiring().resumingMat());
         subscription.ready().get(10, TimeUnit.SECONDS);
 
         Thread.sleep(1000);
@@ -131,6 +132,7 @@ public class JEventSubscriberTest extends TestNGSuite {
         cancellable.cancel();
 
         Assert.assertEquals(queue.size(), 3);
+        Assert.assertEquals(queue2.size(), 2);
     }
 
     //DEOPSCSW-338: Provide callback for Event alerts
@@ -168,7 +170,7 @@ public class JEventSubscriberTest extends TestNGSuite {
         IEventSubscription subscription = baseProperties.jSubscriber().subscribeAsync(Collections.singleton(event1.eventKey()), event -> {
             queue.add(event);
             return CompletableFuture.completedFuture(event);
-        }, Duration.ofMillis(300));
+        }, Duration.ofMillis(300), SubscriptionModes.jRateAdapterMode());
 
         Thread.sleep(1000);
         subscription.unsubscribe().get(10, TimeUnit.SECONDS);
@@ -204,7 +206,7 @@ public class JEventSubscriberTest extends TestNGSuite {
 
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
         Thread.sleep(500); // Needed for redis set which is fire and forget operation
-        IEventSubscription subscription = baseProperties.jSubscriber().subscribeCallback(Collections.singleton(event1.eventKey()), queue::add, Duration.ofMillis(300));
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribeCallback(Collections.singleton(event1.eventKey()), queue::add, Duration.ofMillis(300), SubscriptionModes.jRateAdapterMode());
         Thread.sleep(1000);
         subscription.unsubscribe().get(10, TimeUnit.SECONDS);
 
@@ -239,7 +241,7 @@ public class JEventSubscriberTest extends TestNGSuite {
 
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
         Thread.sleep(500); // Needed for redis set which is fire and forget operation
-        IEventSubscription subscription = baseProperties.jSubscriber().subscribeActorRef(Collections.singleton(event1.eventKey()), inbox.getRef(), Duration.ofMillis(300));
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribeActorRef(Collections.singleton(event1.eventKey()), inbox.getRef(), Duration.ofMillis(300), SubscriptionModes.jRateAdapterMode());
         Thread.sleep(1000);
         subscription.unsubscribe().get(10, TimeUnit.SECONDS);
         Assert.assertEquals(inbox.getAllReceived().size(), 3);
