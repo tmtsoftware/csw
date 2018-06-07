@@ -5,7 +5,6 @@ import java.nio.file.{Files, StandardOpenOption}
 
 import akka.actor.ActorSystem
 import com.typesafe.config.Config
-import csw.messages.params.models.Prefix
 
 /**
  * Simple to file logger for benchmark results. Will log relevant settings first to make sure
@@ -20,11 +19,11 @@ trait BenchmarkFileReporter {
 
 object BenchmarkFileReporter {
   val targetDirectory: File = {
-    val target = new File("csw-event-impl/target/benchmark-results")
+    val target = new File("csw-event-client/target/benchmark-results")
     target.mkdirs()
     target
   }
-  val dir = "csw-event-impl/target/benchmark-results"
+  val dir = "csw-event-client/target/benchmark-results"
 
   def apply(test: String, system: ActorSystem, logSettings: Boolean = true): BenchmarkFileReporter =
     new BenchmarkFileReporter {

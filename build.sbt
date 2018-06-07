@@ -12,7 +12,7 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-framework`,
   `csw-command`,
   `csw-event-api`,
-  `csw-event-impl`,
+  `csw-event-client`,
   `csw-location`,
   `csw-location-agent`,
   `csw-benchmark`,
@@ -34,7 +34,7 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
   `sequencer-prototype`,
   `examples`,
   `csw-event-api`,
-  `csw-event-impl`
+  `csw-event-client`
 )
 
 lazy val githubReleases: Seq[ProjectReference] = Seq(
@@ -183,7 +183,7 @@ lazy val `csw-event-api` = project
   .dependsOn(`csw-messages`)
   .enablePlugins(GenJavadocPlugin)
 
-lazy val `csw-event-impl` = project
+lazy val `csw-event-client` = project
   .dependsOn(
     `csw-event-api`,
     `csw-logging`,
