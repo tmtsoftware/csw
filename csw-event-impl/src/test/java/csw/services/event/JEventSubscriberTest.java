@@ -1,5 +1,6 @@
 package csw.services.event;
 
+import akka.actor.Cancellable;
 import akka.actor.typed.javadsl.Adapter;
 import akka.japi.Pair;
 import akka.stream.javadsl.Keep;
@@ -22,10 +23,12 @@ import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+import scala.concurrent.duration.FiniteDuration;
 
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.function.Supplier;
 
 //DEOPSCSW-334: Publish an event
 //DEOPSCSW-335: Model for EventName that encapsulates the topic(or channel ) name
@@ -42,6 +45,19 @@ public class JEventSubscriberTest extends TestNGSuite {
         redisTestProps.redisSentinel().start();
         redisTestProps.redis().start();
         EmbeddedKafka$.MODULE$.start(kafkaTestProps.config());
+    }
+
+    public List<Event> getEvents() {
+        List<Event> events = new ArrayList<>();
+        for(int i = 0; i < 1500; i++) {
+            events.add(Utils.makeEvent(i));
+        }
+        return events;
+    }
+
+    public Supplier<Event> eventGenerator(int beginAt) {
+        final int[] counter = {beginAt};
+        return () -> getEvents().get(counter[0]++);
     }
 
     @AfterSuite
@@ -64,7 +80,7 @@ public class JEventSubscriberTest extends TestNGSuite {
     //DEOPSCSW-346: Subscribe to event irrespective of Publisher's existence
     //DEOPSCSW-343: Unsubscribe based on prefix and event name
     @Test(dataProvider = "event-service-provider")
-    public void should_be_able_to_publish_and_subscribe_an_event(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
+    public void should_be_able_to_subscribe_an_event(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
         Event event1 = Utils.makeDistinctEvent(1);
         EventKey eventKey = event1.eventKey();
 
@@ -90,22 +106,29 @@ public class JEventSubscriberTest extends TestNGSuite {
     //DEOPSCSW-346: Subscribe to event irrespective of Publisher's existence
     //DEOPSCSW-342: Subscription with consumption frequency
     @Test(dataProvider = "event-service-provider")
-    public void should_be_able_to_publish_and_subscribe_an_event_with_duration(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
-        Event event1 = Utils.makeDistinctEvent(1);
+    public void should_be_able_to_subscribe_an_event_with_duration_with_rate_adapter_for_fast_publisher(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
+        Event event1 = Utils.makeDistinctEvent(new Random().nextInt());
         EventKey eventKey = event1.eventKey();
 
         java.util.Set<EventKey> set = new HashSet<>();
         set.add(eventKey);
 
         List<Event> queue = new ArrayList<>();
+        List<Event> queue2 = new ArrayList<>();
 
-        baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
+        Cancellable cancellable = baseProperties.jPublisher().publish(eventGenerator(0), new FiniteDuration(1, TimeUnit.MILLISECONDS));
 
         IEventSubscription subscription = baseProperties.jSubscriber().subscribe(set, Duration.ZERO.plusMillis(300)).toMat(Sink.foreach(queue::add), Keep.left()).run(baseProperties.wiring().resumingMat());
         subscription.ready().get(10, TimeUnit.SECONDS);
 
+        IEventSubscription subscription2 = baseProperties.jSubscriber().subscribe(set, Duration.ZERO.plusMillis(400)).toMat(Sink.foreach(queue2::add), Keep.left()).run(baseProperties.wiring().resumingMat());
+        subscription.ready().get(10, TimeUnit.SECONDS);
+
         Thread.sleep(1000);
+
         subscription.unsubscribe().get(10, TimeUnit.SECONDS);
+        subscription2.unsubscribe().get(10, TimeUnit.SECONDS);
+        cancellable.cancel();
 
         Assert.assertEquals(queue.size(), 3);
     }
