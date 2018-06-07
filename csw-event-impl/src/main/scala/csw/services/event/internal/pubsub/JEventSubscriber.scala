@@ -10,6 +10,7 @@ import akka.actor.typed.ActorRef
 import akka.stream.Materializer
 import akka.stream.javadsl.Source
 import csw.messages.events.{Event, EventKey}
+import csw.messages.params.models.Subsystem
 import csw.services.event.internal.EventServiceExts.RichEventSubscription
 import csw.services.event.javadsl.{IEventSubscriber, IEventSubscription}
 import csw.services.event.scaladsl.{EventSubscriber, EventSubscription, SubscriptionMode}
@@ -74,6 +75,12 @@ class JEventSubscriber(eventSubscriber: EventSubscriber) extends IEventSubscribe
       mode: SubscriptionMode
   ): IEventSubscription =
     eventSubscriber.subscribeActorRef(eventKeys.asScala.toSet, actorRef, every.toScala, mode).asJava
+
+  def pSubscribe(subsystem: Subsystem, pattern: String): Source[Event, IEventSubscription] =
+    eventSubscriber.pSubscribe(subsystem, pattern).mapMaterializedValue(_.asJava).asJava
+
+  def pSubscribe(subsystem: Subsystem, pattern: String, callback: Consumer[Event]): IEventSubscription =
+    eventSubscriber.pSubscribe(subsystem, pattern, e ⇒ callback.accept(e)).asJava
 
   def get(eventKeys: util.Set[EventKey]): CompletableFuture[util.Set[Event]] =
     eventSubscriber.get(eventKeys.asScala.toSet).toJava.toCompletableFuture.thenApply(_.asJava)

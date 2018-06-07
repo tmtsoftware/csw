@@ -9,6 +9,7 @@ import akka.testkit.typed.javadsl.TestInbox;
 import akka.testkit.typed.javadsl.TestProbe;
 import csw.messages.commons.CoordinatedShutdownReasons;
 import csw.messages.events.*;
+import csw.messages.javadsl.JSubsystem;
 import csw.messages.params.models.Prefix;
 import csw.services.event.helpers.Utils;
 import csw.services.event.internal.kafka.KafkaTestProps;
@@ -77,6 +78,12 @@ public class JEventSubscriberTest extends TestNGSuite {
     public Object[] pubsubProvider() {
         return new Object[]{redisTestProps, kafkaTestProps};
     }
+
+    @DataProvider(name = "redis-provider")
+    public Object[] redisPubSubProvider() {
+        return new Object[]{redisTestProps};
+    }
+
 
     //DEOPSCSW-346: Subscribe to event irrespective of Publisher's existence
     //DEOPSCSW-343: Unsubscribe based on prefix and event name
@@ -162,37 +169,51 @@ public class JEventSubscriberTest extends TestNGSuite {
     //DEOPSCSW-342: Subscription with consumption frequency
     @Test(dataProvider = "event-service-provider")
     public void should_be_able_to_subscribe_with_async_callback_with_duration(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
-        Event event1 = Utils.makeDistinctEvent(304);
+        Event event1 = Utils.makeEvent(1);
         List<Event> queue = new ArrayList<>();
+        List<Event> queue2 = new ArrayList<>();
 
-        baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
+        Cancellable cancellable = baseProperties.jPublisher().publish(eventGenerator(0), new FiniteDuration(1, TimeUnit.MILLISECONDS));
 
         IEventSubscription subscription = baseProperties.jSubscriber().subscribeAsync(Collections.singleton(event1.eventKey()), event -> {
             queue.add(event);
             return CompletableFuture.completedFuture(event);
         }, Duration.ofMillis(300), SubscriptionModes.jRateAdapterMode());
 
+        IEventSubscription subscription2 = baseProperties.jSubscriber().subscribeAsync(Collections.singleton(event1.eventKey()), event -> {
+            queue2.add(event);
+            return CompletableFuture.completedFuture(event);
+        }, Duration.ofMillis(400), SubscriptionModes.jRateAdapterMode());
+
         Thread.sleep(1000);
         subscription.unsubscribe().get(10, TimeUnit.SECONDS);
+        subscription2.unsubscribe().get(10, TimeUnit.SECONDS);
 
+        cancellable.cancel();
         Assert.assertEquals(queue.size(), 3);
+        Assert.assertEquals(queue2.size(), 2);
     }
 
     //DEOPSCSW-338: Provide callback for Event alerts
     @Test(dataProvider = "event-service-provider")
     public void should_be_able_to_subscribe_with_callback(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
-        Event event1 = Utils.makeDistinctEvent(303);
 
         TestProbe probe = TestProbe.create(Adapter.toTyped(baseProperties.wiring().actorSystem()));
 
-        baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
+        List<Event> listOfPublishedEvents = new ArrayList<>(5);
+        for(int i = 1; i <= 5; i ++) {
+            Event event = Utils.makeEvent(i);
+            listOfPublishedEvents.add(event);
+            baseProperties.jPublisher().publish(event).get(10, TimeUnit.SECONDS);
+        }
+
         Thread.sleep(500); // Needed for redis set which is fire and forget operation
-        IEventSubscription subscription = baseProperties.jSubscriber().subscribeCallback(Collections.singleton(event1.eventKey()), event -> probe.ref().tell(event));
-        probe.expectMessage(event1);
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribeCallback(Collections.singleton(listOfPublishedEvents.get(0).eventKey()), event -> probe.ref().tell(event));
+        probe.expectMessage(listOfPublishedEvents.get(4));
 
         subscription.unsubscribe().get(10, TimeUnit.SECONDS);
 
-        baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
+        baseProperties.jPublisher().publish(listOfPublishedEvents.get(0)).get(10, TimeUnit.SECONDS);
         probe.expectNoMessage(Duration.ofMillis(200));
     }
 
@@ -200,17 +221,23 @@ public class JEventSubscriberTest extends TestNGSuite {
     //DEOPSCSW-342: Subscription with consumption frequency
     @Test(dataProvider = "event-service-provider")
     public void should_be_able_to_subscribe_with_callback_with_duration(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
-        Event event1 = Utils.makeDistinctEvent(303);
-
+        Event event1 = Utils.makeEvent(1);
         List<Event> queue = new ArrayList<>();
+        List<Event> queue2 = new ArrayList<>();
 
-        baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
-        Thread.sleep(500); // Needed for redis set which is fire and forget operation
+        Cancellable cancellable = baseProperties.jPublisher().publish(eventGenerator(0), new FiniteDuration(1, TimeUnit.MILLISECONDS));
+        Thread.sleep(500);
         IEventSubscription subscription = baseProperties.jSubscriber().subscribeCallback(Collections.singleton(event1.eventKey()), queue::add, Duration.ofMillis(300), SubscriptionModes.jRateAdapterMode());
+
+        IEventSubscription subscription2 = baseProperties.jSubscriber().subscribeCallback(Collections.singleton(event1.eventKey()), queue2::add, Duration.ofMillis(400), SubscriptionModes.jRateAdapterMode());
+
         Thread.sleep(1000);
         subscription.unsubscribe().get(10, TimeUnit.SECONDS);
+        subscription2.unsubscribe().get(10, TimeUnit.SECONDS);
 
+        cancellable.cancel();
         Assert.assertEquals(queue.size(), 3);
+        Assert.assertEquals(queue2.size(), 2);
     }
 
     //DEOPSCSW-339: Provide actor ref to alert about Event arrival
@@ -218,7 +245,7 @@ public class JEventSubscriberTest extends TestNGSuite {
     public void should_be_able_to_subscribe_with_an_ActorRef(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
         Event event1 = Utils.makeDistinctEvent(305);
 
-        TestProbe probe = TestProbe.create(Adapter.toTyped(baseProperties.wiring().actorSystem()));
+        TestProbe<Event> probe = TestProbe.create(Adapter.toTyped(baseProperties.wiring().actorSystem()));
 
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
         Thread.sleep(500); // Needed for redis set which is fire and forget operation
@@ -245,6 +272,72 @@ public class JEventSubscriberTest extends TestNGSuite {
         Thread.sleep(1000);
         subscription.unsubscribe().get(10, TimeUnit.SECONDS);
         Assert.assertEquals(inbox.getAllReceived().size(), 3);
+    }
+
+    //DEOPSCSW-342: Subscription with consumption frequency
+    @Test(dataProvider = "event-service-provider")
+    public void should_be_able_to_subscribe_with_duration_with_rate_limiter_mode_for_slow_publisher(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
+        Event event1 = Utils.makeEvent(1);
+
+        TestInbox<Event> inbox = TestInbox.create();
+
+        Cancellable cancellable = baseProperties.jPublisher().publish(eventGenerator(1), new FiniteDuration(200, TimeUnit.MILLISECONDS));
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribeActorRef(Collections.singleton(event1.eventKey()), inbox.getRef(), Duration.ofMillis(100), SubscriptionModes.jRateLimiterMode());
+        Thread.sleep(900);
+        subscription.unsubscribe().get(10, TimeUnit.SECONDS);
+        cancellable.cancel();
+        Assert.assertEquals(inbox.getAllReceived().size(), 5);
+    }
+
+    //DEOPSCSW-342: Subscription with consumption frequency
+    @Test(dataProvider = "event-service-provider")
+    public void should_be_able_to_subscribe_with_duration_with_rate_limiter_mode_for_fast_publisher(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
+
+        Event event1 = Utils.makeEvent(1);
+
+        TestInbox<Event> inbox = TestInbox.create();
+
+        Cancellable cancellable = baseProperties.jPublisher().publish(eventGenerator(1), new FiniteDuration(105, TimeUnit.MILLISECONDS));
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribeActorRef(Collections.singleton(event1.eventKey()), inbox.getRef(), Duration.ofMillis(200), SubscriptionModes.jRateLimiterMode());
+        Thread.sleep(900);
+        subscription.unsubscribe().get(10, TimeUnit.SECONDS);
+        cancellable.cancel();
+        Assert.assertEquals(inbox.getAllReceived().size(), 5);
+    }
+
+    //DEOPSCSW-342: Subscription with consumption frequency
+    @Test(dataProvider = "event-service-provider")
+    public void should_be_able_to_subscribe_with_duration_with_rate_adapter_mode_for_slow_publisher(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
+        Event event1 = Utils.makeDistinctEvent(305);
+
+        TestInbox<Event> inbox = TestInbox.create();
+
+        Cancellable cancellable = baseProperties.jPublisher().publish(eventGenerator(0), new FiniteDuration(200, TimeUnit.MILLISECONDS));
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribeActorRef(Collections.singleton(event1.eventKey()), inbox.getRef(), Duration.ofMillis(100), SubscriptionModes.jRateAdapterMode());
+        Thread.sleep(1050);
+        subscription.unsubscribe().get(10, TimeUnit.SECONDS);
+        cancellable.cancel();
+        Assert.assertEquals(inbox.getAllReceived().size(), 10);
+    }
+
+    //DEOPSCSW-420: Implement Pattern based subscription
+    @Test(dataProvider = "redis-provider")
+    public void should_be_able_to_subscribe_an_event_with_pattern(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
+        Event event1 = Utils.makeEventWithPrefix(1, new Prefix("test.prefix"));
+        Event event2 = Utils.makeEventWithPrefix(2, new Prefix("tcs.prefix"));
+
+        TestProbe<Event> probe = TestProbe.create(Adapter.toTyped(baseProperties.wiring().actorSystem()));
+
+        IEventSubscription subscription = baseProperties.jSubscriber().pSubscribe(JSubsystem.TEST, baseProperties.eventPattern(), event -> probe.ref().tell(event));
+        subscription.ready().get(10, TimeUnit.SECONDS);
+
+        baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
+        probe.expectMessage(event1);
+
+        baseProperties.jPublisher().publish(event2).get(10, TimeUnit.SECONDS);
+        probe.expectNoMessage(Duration.ofSeconds(2));
+
+        subscription.unsubscribe().get(10, TimeUnit.SECONDS);
     }
 
     @Test(dataProvider = "event-service-provider")

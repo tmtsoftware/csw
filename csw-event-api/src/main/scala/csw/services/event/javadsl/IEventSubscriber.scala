@@ -9,6 +9,7 @@ import akka.actor.typed.ActorRef
 import akka.stream.Materializer
 import akka.stream.javadsl.Source
 import csw.messages.events.{Event, EventKey}
+import csw.messages.params.models.Subsystem
 import csw.services.event.scaladsl.SubscriptionMode
 
 trait IEventSubscriber {
@@ -43,6 +44,10 @@ trait IEventSubscriber {
       every: Duration,
       mode: SubscriptionMode
   ): IEventSubscription
+
+  def pSubscribe(subsystem: Subsystem, pattern: String): Source[Event, IEventSubscription]
+
+  def pSubscribe(subsystem: Subsystem, pattern: String, callback: Consumer[Event]): IEventSubscription
 
   def get(eventKeys: util.Set[EventKey]): CompletableFuture[util.Set[Event]]
 
