@@ -1,4 +1,4 @@
-package csw.services.event.internal.pubsub
+package csw.services.event.internal.commons.javawrappers
 
 import java.util.concurrent.CompletableFuture
 import java.util.function.{Consumer, Supplier}

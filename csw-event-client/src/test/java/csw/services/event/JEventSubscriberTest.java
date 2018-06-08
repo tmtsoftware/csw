@@ -1,13 +1,11 @@
 package csw.services.event;
 
 import akka.actor.Cancellable;
-import akka.actor.typed.javadsl.Adapter;
 import akka.japi.Pair;
 import akka.stream.javadsl.Keep;
 import akka.stream.javadsl.Sink;
 import akka.testkit.typed.javadsl.TestInbox;
 import akka.testkit.typed.javadsl.TestProbe;
-import csw.messages.commons.CoordinatedShutdownReasons;
 import csw.messages.events.*;
 import csw.messages.javadsl.JSubsystem;
 import csw.messages.params.models.Prefix;
@@ -18,7 +16,6 @@ import csw.services.event.internal.wiring.BaseProperties;
 import csw.services.event.javadsl.IEventSubscription;
 import csw.services.event.scaladsl.SubscriptionModes;
 import io.lettuce.core.ClientOptions;
-import net.manub.embeddedkafka.EmbeddedKafka$;
 import org.scalatest.testng.TestNGSuite;
 import org.testng.Assert;
 import org.testng.annotations.AfterSuite;
@@ -44,9 +41,8 @@ public class JEventSubscriberTest extends TestNGSuite {
     public void beforeAll() {
         redisTestProps = RedisTestProps.createRedisProperties(4564, 27382, 7382, ClientOptions.create());
         kafkaTestProps = KafkaTestProps.jCreateKafkaProperties(4565, 7003, Collections.EMPTY_MAP);
-        redisTestProps.redisSentinel().start();
-        redisTestProps.redis().start();
-        EmbeddedKafka$.MODULE$.start(kafkaTestProps.config());
+        redisTestProps.start();
+        kafkaTestProps.start();
     }
 
     public List<Event> getEvents() {
@@ -64,14 +60,8 @@ public class JEventSubscriberTest extends TestNGSuite {
 
     @AfterSuite
     public void afterAll() throws InterruptedException, ExecutionException, TimeoutException {
-        redisTestProps.redisClient().shutdown();
-        redisTestProps.redis().stop();
-        redisTestProps.redisSentinel().stop();
-        redisTestProps.wiring().jShutdown(CoordinatedShutdownReasons.TestFinishedReason$.MODULE$).get(10, TimeUnit.SECONDS);
-
-        kafkaTestProps.jPublisher().shutdown().get(10, TimeUnit.SECONDS);
-        EmbeddedKafka$.MODULE$.stop();
-        kafkaTestProps.wiring().jShutdown(CoordinatedShutdownReasons.TestFinishedReason$.MODULE$).get(10, TimeUnit.SECONDS);
+        redisTestProps.shutdown();
+        kafkaTestProps.shutdown();
     }
 
     @DataProvider(name = "event-service-provider")
@@ -92,12 +82,12 @@ public class JEventSubscriberTest extends TestNGSuite {
         Event event1 = Utils.makeDistinctEvent(1);
         EventKey eventKey = event1.eventKey();
 
-        TestProbe probe = TestProbe.create(Adapter.toTyped(baseProperties.wiring().actorSystem()));
+        TestProbe probe = TestProbe.create(baseProperties.typedActorSystem());
 
         java.util.Set<EventKey> set = new HashSet<>();
         set.add(eventKey);
 
-        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(set).take(2).toMat(Sink.foreach(event -> probe.ref().tell(event)), Keep.left()).run(baseProperties.wiring().resumingMat());
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(set).take(2).toMat(Sink.foreach(event -> probe.ref().tell(event)), Keep.left()).run(baseProperties.resumingMat());
         subscription.ready().get(10, TimeUnit.SECONDS);
 
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
@@ -126,10 +116,10 @@ public class JEventSubscriberTest extends TestNGSuite {
 
         Cancellable cancellable = baseProperties.jPublisher().publish(eventGenerator(0), new FiniteDuration(1, TimeUnit.MILLISECONDS));
 
-        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(set, Duration.ZERO.plusMillis(300), SubscriptionModes.jRateAdapterMode()).toMat(Sink.foreach(queue::add), Keep.left()).run(baseProperties.wiring().resumingMat());
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(set, Duration.ZERO.plusMillis(300), SubscriptionModes.jRateAdapterMode()).toMat(Sink.foreach(queue::add), Keep.left()).run(baseProperties.resumingMat());
         subscription.ready().get(10, TimeUnit.SECONDS);
 
-        IEventSubscription subscription2 = baseProperties.jSubscriber().subscribe(set, Duration.ZERO.plusMillis(400), SubscriptionModes.jRateAdapterMode()).toMat(Sink.foreach(queue2::add), Keep.left()).run(baseProperties.wiring().resumingMat());
+        IEventSubscription subscription2 = baseProperties.jSubscriber().subscribe(set, Duration.ZERO.plusMillis(400), SubscriptionModes.jRateAdapterMode()).toMat(Sink.foreach(queue2::add), Keep.left()).run(baseProperties.resumingMat());
         subscription.ready().get(10, TimeUnit.SECONDS);
 
         Thread.sleep(1000);
@@ -148,7 +138,7 @@ public class JEventSubscriberTest extends TestNGSuite {
     public void should_be_able_to_subscribe_with_async_callback(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
         Event event1 = Utils.makeDistinctEvent(304);
 
-        TestProbe probe = TestProbe.create(Adapter.toTyped(baseProperties.wiring().actorSystem()));
+        TestProbe probe = TestProbe.create(baseProperties.typedActorSystem());
 
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
         Thread.sleep(500); // Needed for redis set which is fire and forget operation
@@ -198,7 +188,7 @@ public class JEventSubscriberTest extends TestNGSuite {
     @Test(dataProvider = "event-service-provider")
     public void should_be_able_to_subscribe_with_callback(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
 
-        TestProbe probe = TestProbe.create(Adapter.toTyped(baseProperties.wiring().actorSystem()));
+        TestProbe probe = TestProbe.create(baseProperties.typedActorSystem());
 
         List<Event> listOfPublishedEvents = new ArrayList<>(5);
         for(int i = 1; i <= 5; i ++) {
@@ -245,11 +235,11 @@ public class JEventSubscriberTest extends TestNGSuite {
     public void should_be_able_to_subscribe_with_an_ActorRef(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
         Event event1 = Utils.makeDistinctEvent(305);
 
-        TestProbe<Event> probe = TestProbe.create(Adapter.toTyped(baseProperties.wiring().actorSystem()));
+        TestProbe probe = TestProbe.create(baseProperties.typedActorSystem());
 
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
         Thread.sleep(500); // Needed for redis set which is fire and forget operation
-        IEventSubscription subscription = baseProperties.jSubscriber().subscribeActorRef(Collections.singleton(event1.eventKey()), probe.ref(), baseProperties.wiring().resumingMat());
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribeActorRef(Collections.singleton(event1.eventKey()), probe.ref(), baseProperties.resumingMat());
         probe.expectMessage(event1);
 
         subscription.unsubscribe().get(10, TimeUnit.SECONDS);
@@ -326,7 +316,7 @@ public class JEventSubscriberTest extends TestNGSuite {
         Event event1 = Utils.makeEventWithPrefix(1, new Prefix("test.prefix"));
         Event event2 = Utils.makeEventWithPrefix(2, new Prefix("tcs.prefix"));
 
-        TestProbe<Event> probe = TestProbe.create(Adapter.toTyped(baseProperties.wiring().actorSystem()));
+        TestProbe<Event> probe = TestProbe.create(baseProperties.typedActorSystem());
 
         IEventSubscription subscription = baseProperties.jSubscriber().pSubscribe(JSubsystem.TEST, baseProperties.eventPattern(), event -> probe.ref().tell(event));
         subscription.ready().get(10, TimeUnit.SECONDS);
@@ -348,12 +338,12 @@ public class JEventSubscriberTest extends TestNGSuite {
         Event event1 = new SystemEvent(prefix, eventName1);
         Event event2 = new SystemEvent(prefix, eventName2);
 
-        Pair<IEventSubscription, CompletionStage<List<Event>>> pair = baseProperties.jSubscriber().subscribe(Collections.singleton(event1.eventKey())).take(2).toMat(Sink.seq(), Keep.both()).run(baseProperties.wiring().resumingMat());
+        Pair<IEventSubscription, CompletionStage<List<Event>>> pair = baseProperties.jSubscriber().subscribe(Collections.singleton(event1.eventKey())).take(2).toMat(Sink.seq(), Keep.both()).run(baseProperties.resumingMat());
         pair.first().ready().get(10, TimeUnit.SECONDS);
         Thread.sleep(100);
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
 
-        Pair<IEventSubscription, CompletionStage<List<Event>>> pair2 = baseProperties.jSubscriber().subscribe(Collections.singleton(event2.eventKey())).take(2).toMat(Sink.seq(), Keep.both()).run(baseProperties.wiring().resumingMat());
+        Pair<IEventSubscription, CompletionStage<List<Event>>> pair2 = baseProperties.jSubscriber().subscribe(Collections.singleton(event2.eventKey())).take(2).toMat(Sink.seq(), Keep.both()).run(baseProperties.resumingMat());
         pair2.first().ready().get(10, TimeUnit.SECONDS);
         baseProperties.jPublisher().publish(event2).get(10, TimeUnit.SECONDS);
 
@@ -382,7 +372,7 @@ public class JEventSubscriberTest extends TestNGSuite {
         baseProperties.jPublisher().publish(event2).get(10, TimeUnit.SECONDS); // latest event before subscribing
         Thread.sleep(500); // Needed for redis set which is fire and forget operation
 
-        Pair<IEventSubscription, CompletionStage<List<Event>>> pair = baseProperties.jSubscriber().subscribe(Collections.singleton(eventKey)).take(2).toMat(Sink.seq(), Keep.both()).run(baseProperties.wiring().resumingMat());
+        Pair<IEventSubscription, CompletionStage<List<Event>>> pair = baseProperties.jSubscriber().subscribe(Collections.singleton(eventKey)).take(2).toMat(Sink.seq(), Keep.both()).run(baseProperties.resumingMat());
         pair.first().ready().get(10, TimeUnit.SECONDS);
         Thread.sleep(500);
 
@@ -400,7 +390,7 @@ public class JEventSubscriberTest extends TestNGSuite {
     public void should_be_able_to_retrieve_InvalidEvent(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
         EventKey eventKey = EventKey.apply(Prefix.apply("test"), EventName.apply("test"));
 
-        Pair<IEventSubscription, CompletionStage<List<Event>>> pair = baseProperties.jSubscriber().subscribe(Collections.singleton(eventKey)).take(1).toMat(Sink.seq(), Keep.both()).run(baseProperties.wiring().resumingMat());
+        Pair<IEventSubscription, CompletionStage<List<Event>>> pair = baseProperties.jSubscriber().subscribe(Collections.singleton(eventKey)).take(1).toMat(Sink.seq(), Keep.both()).run(baseProperties.resumingMat());
 
         Assert.assertEquals(Collections.singletonList(Event$.MODULE$.invalidEvent(eventKey)), pair.second().toCompletableFuture().get(10, TimeUnit.SECONDS));
     }
@@ -421,7 +411,7 @@ public class JEventSubscriberTest extends TestNGSuite {
         eventKeys.add(eventKey1);
         eventKeys.add(eventKey2);
 
-        Pair<IEventSubscription, CompletionStage<List<Event>>> pair = baseProperties.jSubscriber().subscribe(eventKeys).take(2).toMat(Sink.seq(), Keep.both()).run(baseProperties.wiring().resumingMat());
+        Pair<IEventSubscription, CompletionStage<List<Event>>> pair = baseProperties.jSubscriber().subscribe(eventKeys).take(2).toMat(Sink.seq(), Keep.both()).run(baseProperties.resumingMat());
 
         Set<Event> actualEvents = new HashSet<>(pair.second().toCompletableFuture().get(10, TimeUnit.SECONDS));
 

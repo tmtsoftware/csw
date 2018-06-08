@@ -1,4 +1,4 @@
-package csw.services.event.internal.pubsub
+package csw.services.event.internal.commons
 
 import akka.Done
 import akka.actor.Cancellable
@@ -6,7 +6,6 @@ import akka.stream.Materializer
 import akka.stream.scaladsl.{Sink, Source}
 import csw.messages.events.Event
 import csw.services.event.exceptions.PublishFailure
-import csw.services.event.internal.commons.EventServiceLogger
 
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 import scala.concurrent.{ExecutionContext, Future}

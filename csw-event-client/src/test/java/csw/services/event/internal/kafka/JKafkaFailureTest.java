@@ -3,7 +3,6 @@ package csw.services.event.internal.kafka;
 import akka.actor.typed.javadsl.Adapter;
 import akka.stream.javadsl.Source;
 import akka.testkit.typed.javadsl.TestProbe;
-import csw.messages.commons.CoordinatedShutdownReasons;
 import csw.messages.events.Event;
 import csw.services.event.exceptions.PublishFailure;
 import csw.services.event.helpers.Utils;
@@ -12,7 +11,6 @@ import net.manub.embeddedkafka.EmbeddedKafka$;
 import org.apache.kafka.common.errors.RecordTooLargeException;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
-import scala.concurrent.Await;
 import scala.concurrent.duration.FiniteDuration;
 
 import java.util.Collections;
@@ -39,9 +37,7 @@ public class JKafkaFailureTest {
 
     @AfterClass
     public static void afterClass() throws Exception {
-        kafkaTestProps.jPublisher().shutdown().get(10, TimeUnit.SECONDS);
-        EmbeddedKafka$.MODULE$.stop();
-        Await.result(kafkaTestProps.wiring().shutdown(CoordinatedShutdownReasons.TestFinishedReason$.MODULE$), new FiniteDuration(10, TimeUnit.SECONDS));
+        kafkaTestProps.shutdown();
     }
 
     @Test
@@ -55,7 +51,7 @@ public class JKafkaFailureTest {
     @Test
     public void handleFailedPublishEventWithACallback() {
 
-        TestProbe<PublishFailure> testProbe = TestProbe.create(Adapter.toTyped(kafkaTestProps.wiring().actorSystem()));
+        TestProbe<PublishFailure> testProbe = TestProbe.create(Adapter.toTyped(kafkaTestProps.actorSystem()));
         Event event = Utils.makeEvent(1);
         Event eventSent = event;
         Source eventStream = Source.single(eventSent);
@@ -69,7 +65,7 @@ public class JKafkaFailureTest {
 
     @Test
     public void handleFailedPublishEventWithAnEventGeneratorAndACallback() {
-        TestProbe<PublishFailure> testProbe = TestProbe.create(Adapter.toTyped(kafkaTestProps.wiring().actorSystem()));
+        TestProbe<PublishFailure> testProbe = TestProbe.create(Adapter.toTyped(kafkaTestProps.actorSystem()));
         Event event = Utils.makeEvent(1);
 
         publisher.publish(() -> event, new FiniteDuration(20, TimeUnit.MILLISECONDS), failure -> testProbe.ref().tell(failure));

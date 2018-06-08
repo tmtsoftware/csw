@@ -1,4 +1,4 @@
-package csw.services.event.internal.throttle
+package csw.services.event.internal.commons.throttle
 
 import akka.stream.stage._
 import akka.stream.{Attributes, FlowShape, Inlet, Outlet}

@@ -1,40 +1,49 @@
 package csw.services.event.internal.kafka
 
+import akka.actor.{ActorSystem, CoordinatedShutdown}
+import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.event.helpers.TestFutureExt.RichFuture
-import csw.services.event.internal.pubsub.{EventPublisherUtil, EventSubscriberUtil}
+import csw.services.event.internal.wiring.BaseProperties
 import csw.services.event.internal.wiring.BaseProperties.createInfra
-import csw.services.event.internal.wiring.{BaseProperties, EventServiceResolver, Wiring}
-import csw.services.event.javadsl.{IEventPublisher, IEventSubscriber, JKafkaFactory}
-import csw.services.event.scaladsl.{EventPublisher, EventSubscriber, KafkaFactory}
+import csw.services.event.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
+import csw.services.event.scaladsl.{EventPublisher, EventService, EventSubscriber}
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.LocationService
-import net.manub.embeddedkafka.EmbeddedKafkaConfig
+import net.manub.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
 
 import scala.collection.JavaConverters.mapAsScalaMapConverter
 import scala.compat.java8.FutureConverters.CompletionStageOps
 
 class KafkaTestProps(
     kafkaPort: Int,
-    kafkaFactory: KafkaFactory,
-    jKafkaFactory: JKafkaFactory,
     clusterSettings: ClusterSettings,
     locationService: LocationService,
     additionalBrokerProps: Map[String, String]
-) extends BaseProperties {
-  private val brokers             = s"PLAINTEXT://${clusterSettings.hostname}:$kafkaPort"
-  private val brokerProperties    = Map("listeners" → brokers, "advertised.listeners" → brokers) ++ additionalBrokerProps
-  val config                      = EmbeddedKafkaConfig(customBrokerProperties = brokerProperties)
-  val wiring                      = new Wiring(clusterSettings.system)
-  val publisher: EventPublisher   = kafkaFactory.publisher().await
-  val subscriber: EventSubscriber = kafkaFactory.subscriber().await
+)(implicit val actorSystem: ActorSystem)
+    extends BaseProperties {
+  private val brokers          = s"PLAINTEXT://${clusterSettings.hostname}:$kafkaPort"
+  private val brokerProperties = Map("listeners" → brokers, "advertised.listeners" → brokers) ++ additionalBrokerProps
+  val config                   = EmbeddedKafkaConfig(customBrokerProperties = brokerProperties)
+
+  val eventService: EventService   = KafkaEventServiceFactory.make(locationService)(typedActorSystem)
+  val jEventService: IEventService = KafkaEventServiceFactory.jMake(locationService.asJava, typedActorSystem)
+  val publisher: EventPublisher    = eventService.defaultPublisher.await
+  val subscriber: EventSubscriber  = eventService.defaultSubscriber.await
 
   override def toString: String = "Kafka"
 
   override val eventPattern: String = ".*sys.*"
 
-  override def jPublisher[T <: EventPublisher]: IEventPublisher = jKafkaFactory.publisher().toScala.await
+  override def jPublisher[T <: EventPublisher]: IEventPublisher = jEventService.defaultPublisher.toScala.await
 
-  override def jSubscriber[T <: EventSubscriber]: IEventSubscriber = jKafkaFactory.subscriber().toScala.await
+  override def jSubscriber[T <: EventSubscriber]: IEventSubscriber = jEventService.defaultSubscriber.toScala.await
+
+  override def start(): Unit = EmbeddedKafka.start()(config)
+
+  override def shutdown(): Unit = {
+    EmbeddedKafka.stop()
+    CoordinatedShutdown(actorSystem).run(TestFinishedReason).await
+  }
 }
 
 object KafkaTestProps {
@@ -45,14 +54,7 @@ object KafkaTestProps {
       additionalBrokerProps: Map[String, String] = Map.empty
   ): KafkaTestProps = {
     val (clusterSettings, locationService) = createInfra(seedPort, serverPort)
-    val wiring                             = new Wiring(clusterSettings.system)
-    import wiring._
-    val eventPublisherUtil  = new EventPublisherUtil()
-    val eventSubscriberUtil = new EventSubscriberUtil()
-
-    val kafkaFactory  = new KafkaFactory(new EventServiceResolver(locationService), eventPublisherUtil, eventSubscriberUtil)
-    val jKafkaFactory = new JKafkaFactory(kafkaFactory)
-    new KafkaTestProps(serverPort, kafkaFactory, jKafkaFactory, clusterSettings, locationService, additionalBrokerProps)
+    new KafkaTestProps(serverPort, clusterSettings, locationService, additionalBrokerProps)(clusterSettings.system)
   }
 
   def jCreateKafkaProperties(

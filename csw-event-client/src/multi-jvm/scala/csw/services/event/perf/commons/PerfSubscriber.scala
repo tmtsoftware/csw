@@ -28,7 +28,7 @@ class PerfSubscriber(
 
   import eventsSetting._
   import testConfigs._
-  import testWiring.wiring._
+  import testWiring._
 
   private val subscriber: EventSubscriber =
     if (testConfigs.shareConnection) sharedSubscriber else testWiring.subscriber

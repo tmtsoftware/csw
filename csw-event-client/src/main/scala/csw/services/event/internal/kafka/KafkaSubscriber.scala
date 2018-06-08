@@ -7,7 +7,7 @@ import akka.stream.Materializer
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import csw.messages.events._
 import csw.messages.params.models.Subsystem
-import csw.services.event.internal.pubsub.EventSubscriberUtil
+import csw.services.event.internal.commons.EventSubscriberUtil
 import csw.services.event.scaladsl.{EventSubscriber, EventSubscription, SubscriptionMode}
 import csw_protobuf.events.PbEvent
 import org.apache.kafka.clients.consumer.Consumer
@@ -18,13 +18,13 @@ import scala.collection.JavaConverters._
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ExecutionContext, Future}
 
-class KafkaSubscriber(
-    consumerSettings: ConsumerSettings[String, Array[Byte]],
-    eventSubscriberUtil: EventSubscriberUtil
-)(implicit ec: ExecutionContext, mat: Materializer)
-    extends EventSubscriber {
+class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(
+    implicit ec: ExecutionContext,
+    mat: Materializer
+) extends EventSubscriber {
 
   private val consumer: Consumer[String, Array[Byte]] = consumerSettings.createKafkaConsumer()
+  val eventSubscriberUtil                             = new EventSubscriberUtil()
 
   override def subscribe(eventKeys: Set[EventKey]): Source[Event, EventSubscription] = {
     val partitionToOffsets = getLatestOffsets(eventKeys)

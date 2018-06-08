@@ -1,18 +1,15 @@
 package csw.services.event
 
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.scaladsl.{Keep, Sink}
 import akka.testkit.typed.scaladsl.{TestInbox, TestProbe}
-import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.events.{Event, EventKey, EventName, SystemEvent}
 import csw.messages.params.models.{Prefix, Subsystem}
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.helpers.Utils.{makeDistinctEvent, makeEvent, makeEventWithPrefix}
 import csw.services.event.internal.kafka.KafkaTestProps
 import csw.services.event.internal.redis.RedisTestProps
-import csw.services.event.internal.wiring._
+import csw.services.event.internal.wiring.BaseProperties
 import csw.services.event.scaladsl.SubscriptionModes
-import net.manub.embeddedkafka.EmbeddedKafka
 import org.scalatest.Matchers
 import org.scalatest.concurrent.Eventually
 import org.scalatest.testng.TestNGSuite
@@ -27,7 +24,7 @@ import scala.util.Random
 //DEOPSCSW-334: Publish an event
 //DEOPSCSW-335: Model for EventName that encapsulates the topic(or channel ) name
 //DEOPSCSW-337: Subscribe to an event based on prefix
-class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with EmbeddedKafka {
+class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
 
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 10.millis)
 
@@ -38,21 +35,14 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
   def beforeAll(): Unit = {
     redisTestProps = RedisTestProps.createRedisProperties(3564, 26383, 6383)
     kafkaTestProps = KafkaTestProps.createKafkaProperties(3565, 6003)
-    redisTestProps.redisSentinel.start()
-    redisTestProps.redis.start()
-    EmbeddedKafka.start()(kafkaTestProps.config)
+    redisTestProps.start()
+    kafkaTestProps.start()
   }
 
   @AfterSuite
   def afterAll(): Unit = {
-    redisTestProps.redisClient.shutdown()
-    redisTestProps.redis.stop()
-    redisTestProps.redisSentinel.stop()
-    redisTestProps.wiring.shutdown(TestFinishedReason).await
-
-    kafkaTestProps.publisher.shutdown().await
-    EmbeddedKafka.stop()
-    kafkaTestProps.wiring.shutdown(TestFinishedReason).await
+    redisTestProps.shutdown()
+    kafkaTestProps.shutdown()
   }
 
   @DataProvider(name = "event-service-provider")
@@ -79,11 +69,10 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_subscribe_an_event(baseProperties: BaseProperties): Unit = {
     import baseProperties._
-    import baseProperties.wiring._
 
     val event1             = makeDistinctEvent(1)
     val eventKey: EventKey = event1.eventKey
-    val testProbe          = TestProbe[Event]()(actorSystem.toTyped)
+    val testProbe          = TestProbe[Event]()(typedActorSystem)
     val subscription       = subscriber.subscribe(Set(eventKey)).toMat(Sink.foreach(testProbe.ref ! _))(Keep.left).run()
 
     subscription.ready.await
@@ -105,7 +94,6 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
       baseProperties: BaseProperties
   ): Unit = {
     import baseProperties._
-    import baseProperties.wiring._
 
     val queue: mutable.Queue[Event]  = new mutable.Queue[Event]()
     val queue2: mutable.Queue[Event] = new mutable.Queue[Event]()
@@ -141,10 +129,9 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_subscribe_with_async_callback(baseProperties: BaseProperties): Unit = {
     import baseProperties._
-    import baseProperties.wiring._
 
     val event1    = makeDistinctEvent(204)
-    val testProbe = TestProbe[Event]()(actorSystem.toTyped)
+    val testProbe = TestProbe[Event]()(typedActorSystem)
 
     val callback: Event ⇒ Future[Event] = (event) ⇒ Future.successful(testProbe.ref ! event).map(_ ⇒ event)(ec)
 
@@ -165,7 +152,6 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_subscribe_with_async_callback_with_duration(baseProperties: BaseProperties): Unit = {
     import baseProperties._
-    import baseProperties.wiring._
 
     val queue: mutable.Queue[Event]  = new mutable.Queue[Event]()
     val queue2: mutable.Queue[Event] = new mutable.Queue[Event]()
@@ -192,11 +178,10 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_subscribe_with_callback(baseProperties: BaseProperties): Unit = {
     import baseProperties._
-    import baseProperties.wiring._
 
     val listOfPublishedEvents: ArrayBuffer[Event] = ArrayBuffer.empty
 
-    val testProbe              = TestProbe[Event]()(actorSystem.toTyped)
+    val testProbe              = TestProbe[Event]()(typedActorSystem)
     val callback: Event ⇒ Unit = testProbe.ref ! _
 
     // all events are published to same topic with different id's
@@ -248,9 +233,8 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
     import baseProperties._
 
     val event1 = makeDistinctEvent(205)
-    import baseProperties.wiring._
 
-    val probe = TestProbe[Event]()(actorSystem.toTyped)
+    val probe = TestProbe[Event]()(typedActorSystem)
 
     publisher.publish(event1).await
     Thread.sleep(500) // Needed for redis set which is fire and forget operation
@@ -335,11 +319,10 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
   @Test(dataProvider = "redis-provider")
   def should_be_able_to_subscribe_an_event_with_pattern(redisProps: RedisTestProps): Unit = {
     import redisProps._
-    import redisProps.wiring._
 
     val event1    = makeEventWithPrefix(1, Prefix("test.prefix"))
     val event2    = makeEventWithPrefix(1, Prefix("tcs.prefix"))
-    val testProbe = TestProbe[Event]()(actorSystem.toTyped)
+    val testProbe = TestProbe[Event]()(typedActorSystem)
 
     val subscription = subscriber.pSubscribe(Subsystem.TEST, eventPattern, testProbe.ref ! _)
     subscription.ready.await
@@ -356,7 +339,6 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_make_independent_subscriptions(baseProperties: BaseProperties): Unit = {
     import baseProperties._
-    import baseProperties.wiring._
 
     val prefix        = Prefix("test.prefix")
     val eventName1    = EventName("system1")
@@ -381,7 +363,6 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_retrieve_recently_published_event_on_subscription(baseProperties: BaseProperties): Unit = {
     import baseProperties._
-    import baseProperties.wiring._
 
     val event1   = makeEvent(1)
     val event2   = makeEvent(2)
@@ -405,7 +386,6 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
   @Test(dataProvider = "event-service-provider")
   def should_be_able_to_retrieve_InvalidEvent(baseProperties: BaseProperties): Unit = {
     import baseProperties._
-    import baseProperties.wiring._
     val eventKey = EventKey("test")
 
     val (subscription, seqF) = subscriber.subscribe(Set(eventKey)).take(1).toMat(Sink.seq)(Keep.both).run()
@@ -419,7 +399,6 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually with
       baseProperties: BaseProperties
   ): Unit = {
     import baseProperties._
-    import baseProperties.wiring._
     val distinctEvent1 = makeDistinctEvent(201)
     val distinctEvent2 = makeDistinctEvent(202)
 

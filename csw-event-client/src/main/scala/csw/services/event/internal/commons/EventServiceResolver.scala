@@ -1,4 +1,4 @@
-package csw.services.event.internal.wiring
+package csw.services.event.internal.commons
 
 import java.net.URI
 

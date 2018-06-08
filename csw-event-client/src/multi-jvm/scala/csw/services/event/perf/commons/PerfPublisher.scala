@@ -23,7 +23,7 @@ class PerfPublisher(
 ) {
   import eventsSetting._
   import testConfigs._
-  import testWiring.wiring._
+  import testWiring._
 
   private val totalMessages        = totalTestMsgs + warmup + 1 //inclusive of end-event
   private val payload: Array[Byte] = ("0" * payloadSize).getBytes("utf-8")

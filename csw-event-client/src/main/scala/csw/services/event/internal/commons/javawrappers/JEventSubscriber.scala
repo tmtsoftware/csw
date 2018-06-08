@@ -1,4 +1,4 @@
-package csw.services.event.internal.pubsub
+package csw.services.event.internal.commons.javawrappers
 
 import java.time.Duration
 import java.util

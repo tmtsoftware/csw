@@ -2,10 +2,11 @@ package csw.services.event.internal.redis
 
 import akka.Done
 import akka.actor.Cancellable
+import akka.stream.Materializer
 import akka.stream.scaladsl.Source
 import csw.messages.events.{Event, EventKey}
 import csw.services.event.exceptions.PublishFailure
-import csw.services.event.internal.pubsub.EventPublisherUtil
+import csw.services.event.internal.commons.EventPublisherUtil
 import csw.services.event.scaladsl.EventPublisher
 import io.lettuce.core.api.async.RedisAsyncCommands
 import io.lettuce.core.{RedisClient, RedisURI}
@@ -16,14 +17,11 @@ import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
-class RedisPublisher(
-    redisURI: RedisURI,
-    redisClient: RedisClient,
-    eventPublisherUtil: EventPublisherUtil
-)(implicit ec: ExecutionContext)
+class RedisPublisher(redisURI: RedisURI, redisClient: RedisClient)(implicit ec: ExecutionContext, mat: Materializer)
     extends EventPublisher {
 
   private val parallelism = 1
+  val eventPublisherUtil  = new EventPublisherUtil()
 
   private lazy val asyncConnectionF: Future[RedisAsyncCommands[EventKey, Event]] =
     redisClient.connectAsync(EventServiceCodec, redisURI).toScala.map(_.async())
@@ -56,7 +54,6 @@ class RedisPublisher(
 
   override def shutdown(): Future[Done] = asyncConnectionF.flatMap(_.quit().toScala).map(_ ⇒ Done)
 
-  private def set(event: Event, commands: RedisAsyncCommands[EventKey, Event]): Future[Done] = {
+  private def set(event: Event, commands: RedisAsyncCommands[EventKey, Event]): Future[Done] =
     commands.set(event.eventKey, event).toScala.recover { case NonFatal(_) ⇒ Done }.mapTo[Done]
-  }
 }

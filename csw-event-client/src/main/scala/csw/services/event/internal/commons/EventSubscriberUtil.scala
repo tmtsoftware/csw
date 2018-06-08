@@ -1,11 +1,11 @@
-package csw.services.event.internal.pubsub
+package csw.services.event.internal.commons
 
 import akka.actor.typed.ActorRef
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.stage.GraphStage
 import akka.stream.{FlowShape, Materializer}
 import csw.messages.events.Event
-import csw.services.event.internal.throttle.{RateAdapterStage, RateLimiterStage}
+import csw.services.event.internal.commons.throttle.{RateAdapterStage, RateLimiterStage}
 import csw.services.event.scaladsl.SubscriptionModes.{RateAdapterMode, RateLimiterMode}
 import csw.services.event.scaladsl.{EventSubscription, SubscriptionMode}
 

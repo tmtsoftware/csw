@@ -1,19 +1,36 @@
 package csw.services.event.internal.wiring
 
+import akka.actor
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Materializer, Supervision}
 import csw.services.event.helpers.RegistrationFactory
 import csw.services.event.helpers.TestFutureExt.RichFuture
-import csw.services.event.javadsl.{IEventPublisher, IEventSubscriber}
-import csw.services.event.scaladsl.{EventPublisher, EventSubscriber}
+import csw.services.event.internal.commons.EventServiceConnection
+import csw.services.event.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
+import csw.services.event.scaladsl.{EventPublisher, EventService, EventSubscriber}
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 
+import scala.concurrent.ExecutionContext
+
 trait BaseProperties {
-  val wiring: Wiring
   val eventPattern: String
   def publisher: EventPublisher
   def subscriber: EventSubscriber
+  def eventService: EventService
+  def jEventService: IEventService
   def jPublisher[T <: EventPublisher]: IEventPublisher
   def jSubscriber[T <: EventSubscriber]: IEventSubscriber
+  def start(): Unit
+  def shutdown(): Unit
+
+  implicit val actorSystem: actor.ActorSystem
+  implicit val typedActorSystem: ActorSystem[_] = actorSystem.toTyped
+  implicit lazy val ec: ExecutionContext        = actorSystem.dispatcher
+  lazy val settings: ActorMaterializerSettings =
+    ActorMaterializerSettings(actorSystem).withSupervisionStrategy(Supervision.getResumingDecider)
+  implicit lazy val resumingMat: Materializer = ActorMaterializer(settings)
 
 }
 

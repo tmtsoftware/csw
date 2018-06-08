@@ -1,6 +1,6 @@
 package csw.services.event.internal.commons
 
-import csw.services.event.internal.pubsub.{JEventPublisher, JEventSubscriber}
+import csw.services.event.internal.commons.javawrappers.{JEventPublisher, JEventSubscriber}
 import csw.services.event.javadsl.{IEventPublisher, IEventSubscriber}
 import csw.services.event.scaladsl.{EventPublisher, EventSubscriber}
 
