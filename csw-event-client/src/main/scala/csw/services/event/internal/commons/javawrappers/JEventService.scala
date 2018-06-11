@@ -4,9 +4,7 @@ import csw.services.event.internal.commons.EventServiceAdapter
 import csw.services.event.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
 import csw.services.event.scaladsl.EventService
 
-import scala.concurrent.ExecutionContext
-
-class JEventService(eventService: EventService)(implicit ec: ExecutionContext) extends IEventService {
+class JEventService(eventService: EventService) extends IEventService {
 
   override val defaultPublisher: IEventPublisher = EventServiceAdapter.asJava(eventService.defaultPublisher)
 
