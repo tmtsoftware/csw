@@ -59,7 +59,7 @@ public class JEventSubscriberTest extends TestNGSuite {
     }
 
     @AfterSuite
-    public void afterAll() throws InterruptedException, ExecutionException, TimeoutException {
+    public void afterAll() {
         redisTestProps.shutdown();
         kafkaTestProps.shutdown();
     }
