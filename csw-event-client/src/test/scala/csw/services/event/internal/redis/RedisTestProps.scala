@@ -3,14 +3,13 @@ package csw.services.event.internal.redis
 import akka.actor.{ActorSystem, CoordinatedShutdown}
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.event.helpers.TestFutureExt.RichFuture
+import csw.services.event.internal.commons.javawrappers.JEventService
 import csw.services.event.internal.wiring.BaseProperties
 import csw.services.event.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
 import csw.services.event.scaladsl._
 import csw.services.location.scaladsl.LocationService
 import io.lettuce.core.{ClientOptions, RedisClient}
 import redis.embedded.{RedisSentinel, RedisServer}
-
-import scala.compat.java8.FutureConverters.CompletionStageOps
 
 class RedisTestProps(
     name: String,
@@ -22,27 +21,28 @@ class RedisTestProps(
     extends BaseProperties {
 
   private val redis: RedisServer = RedisServer.builder().port(serverPort).build()
+  private val masterId           = "eventServer"
+
   private val redisSentinel: RedisSentinel = RedisSentinel
     .builder()
     .port(sentinelPort)
-    .masterName("eventServer")
+    .masterName(masterId)
     .masterPort(serverPort)
     .quorumSize(1)
     .build()
-
   override val eventPattern: String = "*sys*"
+  private val uri                   = resolveEventService(locationService).await
+  val eventService: EventService    = new RedisEventService(uri.getHost, uri.getPort, masterId, redisClient)
+  val jEventService: IEventService  = new JEventService(eventService)
 
-  val eventService: EventService   = RedisEventServiceFactory.make(locationService, redisClient)
-  val jEventService: IEventService = RedisEventServiceFactory.jMake(locationService.asJava, redisClient, typedActorSystem)
-
-  val publisher: EventPublisher   = eventService.defaultPublisher.await
-  val subscriber: EventSubscriber = eventService.defaultSubscriber.await
+  val publisher: EventPublisher   = eventService.defaultPublisher
+  val subscriber: EventSubscriber = eventService.defaultSubscriber
 
   override def toString: String = name
 
-  override def jPublisher[T <: EventPublisher]: IEventPublisher = jEventService.defaultPublisher.toScala.await
+  override def jPublisher[T <: EventPublisher]: IEventPublisher = jEventService.defaultPublisher
 
-  override def jSubscriber[T <: EventSubscriber]: IEventSubscriber = jEventService.defaultSubscriber.toScala.await
+  override def jSubscriber[T <: EventSubscriber]: IEventSubscriber = jEventService.defaultSubscriber
 
   override def start(): Unit = {
     redisSentinel.start()

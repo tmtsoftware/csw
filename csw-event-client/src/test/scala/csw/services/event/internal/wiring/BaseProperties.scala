@@ -1,18 +1,21 @@
 package csw.services.event.internal.wiring
 
+import java.net.URI
+
 import akka.actor
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Materializer, Supervision}
 import csw.services.event.helpers.RegistrationFactory
 import csw.services.event.helpers.TestFutureExt.RichFuture
-import csw.services.event.internal.commons.EventServiceConnection
+import csw.services.event.internal.commons.{EventServiceConnection, EventServiceResolver}
 import csw.services.event.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
 import csw.services.event.scaladsl.{EventPublisher, EventService, EventSubscriber}
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 
-import scala.concurrent.ExecutionContext
+import scala.async.Async._
+import scala.concurrent.{ExecutionContext, Future}
 
 trait BaseProperties {
   val eventPattern: String
@@ -32,6 +35,10 @@ trait BaseProperties {
     ActorMaterializerSettings(actorSystem).withSupervisionStrategy(Supervision.getResumingDecider)
   implicit lazy val resumingMat: Materializer = ActorMaterializer(settings)
 
+  def resolveEventService(locationService: LocationService): Future[URI] = async {
+    val eventServiceResolver = new EventServiceResolver(locationService)
+    await(eventServiceResolver.uri)
+  }
 }
 
 object BaseProperties {

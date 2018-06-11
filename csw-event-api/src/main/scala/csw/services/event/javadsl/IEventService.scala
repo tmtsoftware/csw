@@ -1,11 +1,9 @@
 package csw.services.event.javadsl
 
-import java.util.concurrent.CompletableFuture
-
 trait IEventService {
-  val defaultPublisher: CompletableFuture[IEventPublisher]
-  val defaultSubscriber: CompletableFuture[IEventSubscriber]
+  val defaultPublisher: IEventPublisher
+  val defaultSubscriber: IEventSubscriber
 
-  def makeNewPublisher(): CompletableFuture[IEventPublisher]
+  def makeNewPublisher(): IEventPublisher
 
 }
