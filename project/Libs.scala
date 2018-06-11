@@ -24,6 +24,7 @@ object Libs {
   val `play-json`                    = "com.typesafe.play"      %% "play-json"                    % "2.6.9" //Apache 2.0
   val `play-json-extensions`         = "ai.x"                   %% "play-json-extensions"         % "0.14.0" //Simplified BSD License
   val `akka-http-play-json`          = "de.heikoseeberger"      %% "akka-http-play-json"          % "1.21.0" //Apache 2.0
+  val `akka-http-circe`              = "de.heikoseeberger"      %% "akka-http-circe"              % "1.21.0" //Apache 2.0
   val `scalapb-runtime`              = "com.thesamet.scalapb"   %% "scalapb-runtime"              % scalapbVersion % "protobuf"
   val `scalapb-json4s`               = "com.thesamet.scalapb"   %% "scalapb-json4s"               % "0.7.1"
   val `lettuce`                      = "io.lettuce"             % "lettuce-core"                  % "5.0.4.RELEASE"
@@ -79,4 +80,11 @@ object Ammonite {
   val Version         = "1.1.2"
   val `ammonite`      = "com.lihaoyi" % "ammonite" % Version cross CrossVersion.full
   val `ammonite-sshd` = "com.lihaoyi" % "ammonite-sshd" % Version cross CrossVersion.full
+}
+
+object Circe {
+  val Version         = "0.9.3"
+  val `circe-core`    = "io.circe" %% "circe-core" % Version
+  val `circe-generic` = "io.circe" %% "circe-generic" % Version
+  val `circe-parser`  = "io.circe" %% "circe-parser" % Version
 }
