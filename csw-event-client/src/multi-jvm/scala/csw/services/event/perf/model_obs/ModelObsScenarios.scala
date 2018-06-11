@@ -1,7 +1,7 @@
 package csw.services.event.perf.model_obs
 
 import csw.messages.params.models.Prefix
-import csw.messages.params.models.Subsystem.{AOESW, IRIS, NFIRAOS, TCS, WFOS}
+import csw.messages.params.models.Subsystem.{AOESW, DMS, IRIS, NFIRAOS, TCS, WFOS}
 import csw.services.event.perf.model_obs.BaseSetting.{PubSetting, SubSetting}
 import csw.services.event.perf.wiring.TestConfigs
 
@@ -15,7 +15,20 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
   private val iris: String    = IRIS.entryName
   private val aoesw: String   = AOESW.entryName
   private val nfiraos: String = NFIRAOS.entryName
+  private val dms: String     = DMS.entryName
 
+  private val peakLoadSettings: List[JvmSetting] = (1 to 4).map { n ⇒
+    JvmSetting(
+      dms,
+      List(PubSetting(Prefix(s"$dms-$n"), noOfPubs = 5, adjustedTotalMsgs(1000), rate = 1000, payloadSize = 64)),
+      List(SubSetting(Prefix(s"$dms-$n"), noOfSubs = 5, adjustedTotalMsgs(1000), rate = 1000, payloadSize = 64))
+    )
+  }.toList
+
+  /**
+   * Don not run below scenarios on local box, as it generates load and requires multiple machines to support.
+   * For Local testing, try runnig scenarios mentioned at the bottom of this file.
+   * */
   // DEOPSCSW-405: [Redis]Measure performance of model observatory scenario
   // DEOPSCSW-406: [Kafka]Measure performance of model observatory scenario
   val idealMultiNodeModelObsScenario: ModelObservatoryTestSettings =
@@ -52,19 +65,16 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
                   )
                 case IRIS ⇒
                   List(
-                    //              SubSetting(Prefix(s"$tcs-1"), noOfSubs = 1, adjustedTotalMessages(6000), rate = 100, payloadSize = 128),
                     SubSetting(Prefix(s"$aoesw-$n"), noOfSubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
                     SubSetting(Prefix(s"$aoesw-$n"), noOfSubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
                   )
                 case NFIRAOS ⇒
                   List(
-                    //              SubSetting(Prefix(s"$tcs-1"), noOfSubs = 1, adjustedTotalMessages(6000), rate = 100, payloadSize = 128),
                     SubSetting(Prefix(s"$wfos-$n"), noOfSubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
                     SubSetting(Prefix(s"$wfos-$n"), noOfSubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
                   )
                 case WFOS ⇒
                   List(
-                    //              SubSetting(Prefix(s"$tcs-1"), noOfSubs = 3, adjustedTotalMessages(6000), rate = 100, payloadSize = 128),
                     SubSetting(Prefix(s"$nfiraos-$n"), noOfSubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
                     SubSetting(Prefix(s"$nfiraos-$n"), noOfSubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
                   )
@@ -112,21 +122,18 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
                   )
                 case IRIS ⇒
                   List(
-                    //              SubSetting(Prefix(s"$tcs-1"), noOfSubs = 1, adjustedTotalMessages(6000), rate = 100, payloadSize = 128),
                     SubSetting(Prefix(s"$aoesw-$n"), noOfSubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
                     SubSetting(Prefix(s"$aoesw-$n"), noOfSubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128),
                     SubSetting(Prefix(s"$aoesw-pattern-$n"), noOfSubs = 3, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
                   )
                 case NFIRAOS ⇒
                   List(
-                    //              SubSetting(Prefix(s"$tcs-1"), noOfSubs = 1, adjustedTotalMessages(6000), rate = 100, payloadSize = 128),
                     SubSetting(Prefix(s"$wfos-$n"), noOfSubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
                     SubSetting(Prefix(s"$wfos-$n"), noOfSubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128),
                     SubSetting(Prefix(s"$wfos-pattern-$n"), noOfSubs = 2, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
                   )
                 case WFOS ⇒
                   List(
-                    //              SubSetting(Prefix(s"$tcs-1"), noOfSubs = 3, adjustedTotalMessages(6000), rate = 100, payloadSize = 128),
                     SubSetting(Prefix(s"$nfiraos-$n"), noOfSubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
                     SubSetting(Prefix(s"$nfiraos-pattern-$n"), noOfSubs = 2, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
                   )
@@ -137,6 +144,45 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
       }
     )
 
+  val idealMultiNodeModelObsWithPeakLoadOf20K =
+    ModelObservatoryTestSettings(
+      JvmSetting(
+        tcs,
+        List(
+          PubSetting(Prefix(s"$tcs-1"), noOfPubs = 3, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
+          PubSetting(Prefix(s"$tcs-1"), noOfPubs = 25, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+          PubSetting(Prefix(s"$tcs-1"), noOfPubs = 250, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
+        ),
+        List(
+          SubSetting(Prefix(s"$tcs-1"), noOfSubs = 3, adjustedTotalMsgs(100), rate = 100, payloadSize = 128),
+          SubSetting(Prefix(s"$tcs-1"), noOfSubs = 25, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+          SubSetting(Prefix(s"$tcs-1"), noOfSubs = 250, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
+        )
+      ) ::
+      List(AOESW, IRIS, NFIRAOS, WFOS).flatMap { subsystem ⇒
+        val subsystemName = subsystem.entryName
+
+        (1 to 5).map {
+          n ⇒
+            JvmSetting(
+              subsystemName,
+              List(
+                PubSetting(Prefix(s"$subsystemName-$n"), noOfPubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+                PubSetting(Prefix(s"$subsystemName-$n"), noOfPubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
+              ),
+              List(
+                SubSetting(Prefix(s"$subsystemName-$n"), noOfSubs = 5, adjustedTotalMsgs(20), rate = 20, payloadSize = 128),
+                SubSetting(Prefix(s"$subsystemName-$n"), noOfSubs = 50, adjustedTotalMsgs(1), rate = 1, payloadSize = 128)
+              )
+            )
+        }
+      } :::
+      peakLoadSettings
+    )
+
+  /**
+   * Scenarios for running on local box
+   * */
   val modelObsScenarioWithFiveProcesses: ModelObservatoryTestSettings =
     ModelObservatoryTestSettings(
       JvmSetting(
