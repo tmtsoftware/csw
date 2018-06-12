@@ -14,6 +14,7 @@ import csw.services.location.models.{Registration, RegistrationResult}
 import csw.services.location.scaladsl.LocationService
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
 import io.circe.generic.auto._
+import io.circe.syntax._
 
 import scala.async.Async._
 import scala.concurrent.Future
@@ -46,42 +47,27 @@ class LocationServiceClient(implicit actorSystem: ActorSystem, mat: Materializer
     await(Unmarshal(responseEntity).to[Done])
   }
 
-  /**
-   * Unregisters all connections
-   *
-   * @note it is highly recommended to use this method for testing purpose only
-   * @return a future which completes after all connections are unregistered successfully or fails otherwise with
-   *         [[csw.services.location.exceptions.RegistrationListingFailed]]
-   */
-  override def unregisterAll(): Future[Done] = ???
+  override def unregisterAll(): Future[Done] = async {
+    val uri            = Uri("http://localhost:7654/location/unregisterAll")
+    val request        = HttpRequest(HttpMethods.POST, uri = uri)
+    val responseEntity = await(Http().singleRequest(request)).entity
+    await(Unmarshal(responseEntity).to[Done])
+  }
 
-  /**
-   * Resolves the location for a connection from the local cache
-   *
-   * @param connection a connection to resolve to with its registered location
-   * @return a future which completes with the resolved location if found or None otherwise. It can fail with
-   *         [[csw.services.location.exceptions.RegistrationListingFailed]].
-   */
-  override def find[L <: Location](connection: TypedConnection[L]): Future[Option[L]] = ???
+  override def find[L <: Location](connection: TypedConnection[L]): Future[Option[L]] = async {
+    val uri            = Uri(s"http://localhost:7654/location/find/${connection.name}")
+    val request        = HttpRequest(HttpMethods.GET, uri = uri)
+    val responseEntity = await(Http().singleRequest(request)).entity
+    await(Unmarshal(responseEntity).to[Option[Location]]).map(_.asInstanceOf[L])
+  }
 
-  /**
-   * Resolves the location for a connection from the local cache, if not found waits for the event to arrive
-   * within specified time limit. Returns None if both fail.
-   *
-   * @param connection a connection to resolve to with its registered location
-   * @param within     max wait time for event to arrive
-   * @tparam L the concrete Location type returned once the connection is resolved
-   * @return a future which completes with the resolved location if found or None otherwise. It can fail with
-   *         [[csw.services.location.exceptions.RegistrationListingFailed]].
-   */
-  override def resolve[L <: Location](connection: TypedConnection[L], within: FiniteDuration): Future[Option[L]] = ???
+  override def resolve[L <: Location](connection: TypedConnection[L], within: FiniteDuration): Future[Option[L]] = async {
+    val uri            = Uri(s"http://localhost:7654/location/resolve/${connection.name}?within=$within")
+    val request        = HttpRequest(HttpMethods.GET, uri = uri)
+    val responseEntity = await(Http().singleRequest(request)).entity
+    await(Unmarshal(responseEntity).to[Option[Location]]).map(_.asInstanceOf[L])
+  }
 
-  /**
-   * Lists all locations registered
-   *
-   * @return a future which completes with a List of all registered locations or can fail with
-   *         [[csw.services.location.exceptions.RegistrationListingFailed]]
-   */
   override def list: Future[List[Location]] = async {
     val uri            = Uri("http://localhost:7654/location/list")
     val request        = HttpRequest(HttpMethods.GET, uri = uri)
@@ -89,43 +75,33 @@ class LocationServiceClient(implicit actorSystem: ActorSystem, mat: Materializer
     await(Unmarshal(responseEntity).to[List[Location]])
   }
 
-  /**
-   * Filters all locations registered based on a component type
-   *
-   * @param componentType list components of this `componentType`
-   * @return a future which completes with filtered locations or can fail with
-   *         [[csw.services.location.exceptions.RegistrationListingFailed]]
-   */
-  override def list(componentType: ComponentType): Future[List[Location]] = ???
+  override def list(componentType: ComponentType): Future[List[Location]] = async {
+    val uri            = Uri(s"http://localhost:7654/location/list?componentType=$componentType")
+    val request        = HttpRequest(HttpMethods.GET, uri = uri)
+    val responseEntity = await(Http().singleRequest(request)).entity
+    await(Unmarshal(responseEntity).to[List[Location]])
+  }
 
-  /**
-   * Filters all locations registered based on a hostname
-   *
-   * @param hostname list components running on this `hostname`
-   * @return a future which completes with filtered locations or can fail with
-   *         [[csw.services.location.exceptions.RegistrationListingFailed]]
-   */
-  override def list(hostname: String): Future[List[Location]] = ???
+  override def list(hostname: String): Future[List[Location]] = async {
+    val uri            = Uri(s"http://localhost:7654/location/list/hostname=$hostname")
+    val request        = HttpRequest(HttpMethods.GET, uri = uri)
+    val responseEntity = await(Http().singleRequest(request)).entity
+    await(Unmarshal(responseEntity).to[List[Location]])
+  }
 
-  /**
-   * Filters all locations registered based on a connection type
-   *
-   * @param connectionType list components of this `connectionType`
-   * @return a future which completes with filtered locations or can fail with
-   *         [[csw.services.location.exceptions.RegistrationListingFailed]]
-   */
-  override def list(connectionType: ConnectionType): Future[List[Location]] = ???
+  override def list(connectionType: ConnectionType): Future[List[Location]] = async {
+    val uri            = Uri(s"http://localhost:7654/location/list/connectionType=$connectionType")
+    val request        = HttpRequest(HttpMethods.GET, uri = uri)
+    val responseEntity = await(Http().singleRequest(request)).entity
+    await(Unmarshal(responseEntity).to[List[Location]])
+  }
 
-  /**
-   * Filters all locations registered based on a prefix.
-   *
-   * @note all locations having subsystem prefix that starts with the given prefix
-   *       value will be listed.
-   * @param prefix list components by this `prefix`
-   * @return a future which completes with filtered locations or can fail with
-   *         [[csw.services.location.exceptions.RegistrationListingFailed]]
-   */
-  override def listByPrefix(prefix: String): Future[List[AkkaLocation]] = ???
+  override def listByPrefix(prefix: String): Future[List[AkkaLocation]] = async {
+    val uri            = Uri(s"http://localhost:7654/location/list/prefix=$prefix")
+    val request        = HttpRequest(HttpMethods.GET, uri = uri)
+    val responseEntity = await(Http().singleRequest(request)).entity
+    await(Unmarshal(responseEntity).to[List[AkkaLocation]])
+  }
 
   /**
    * Tracks the connection and send events for modification or removal of its location

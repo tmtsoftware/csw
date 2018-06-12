@@ -11,7 +11,6 @@ import csw.messages.location.Connection.AkkaConnection
 import csw.services.location.models.AkkaRegistration
 import csw.services.logging.messages.LogControlMessages
 import io.circe._
-import io.circe.generic.auto._
 import io.circe.syntax._
 
 trait LocationJsonSupport {
