@@ -3,12 +3,14 @@ package csw.apps.clusterseed.location
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import csw.apps.clusterseed.admin.internal.ActorRuntime
-import csw.messages.location.Connection
+import csw.messages.location._
 import csw.services.location.internal.LocationJsonSupport
 import csw.services.location.models.Registration
 import csw.services.location.scaladsl.LocationService
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
 import io.circe.generic.auto._
+
+import scala.concurrent.duration.{Duration, FiniteDuration}
 
 class LocationRoutes(locationService: LocationService, actorRuntime: ActorRuntime)
     extends FailFastCirceSupport
@@ -19,7 +21,39 @@ class LocationRoutes(locationService: LocationService, actorRuntime: ActorRuntim
   val routes: Route = pathPrefix("location") {
     get {
       path("list") {
-        complete(locationService.list)
+        parameters(("componentType".?, "connectionType".?, "hostname".?, "prefix".?)) {
+          case (None, None, None, None) =>
+            complete(locationService.list)
+          case (Some(componentName), None, None, None) =>
+            complete(locationService.list(ComponentType.withNameInsensitive(componentName)))
+          case (None, Some(connectionType), None, None) =>
+            complete(locationService.list(ConnectionType.withNameInsensitive(connectionType)))
+          case (None, None, Some(hostname), None) =>
+            complete(locationService.list(hostname))
+          case (None, None, None, Some(prefix)) =>
+            complete(locationService.listByPrefix(prefix))
+          case _ =>
+            complete("asdasd")
+        }
+      } ~
+      path("find" / Segment) { connectionName =>
+        complete(
+          locationService.find(Connection.from(connectionName).asInstanceOf[TypedConnection[Location]])
+        )
+      } ~
+      path("find" / Segment) { connectionName =>
+        complete(
+          locationService.find(Connection.from(connectionName).asInstanceOf[TypedConnection[Location]])
+        )
+      } ~
+      path("resolve" / Segment) { connectionName =>
+        parameter("within".as[String]) { within =>
+          val duration = Duration(within).asInstanceOf[FiniteDuration]
+          complete(
+            locationService.resolve(Connection.from(connectionName).asInstanceOf[TypedConnection[Location]], duration)
+          )
+        }
+
       }
     } ~
     post {
