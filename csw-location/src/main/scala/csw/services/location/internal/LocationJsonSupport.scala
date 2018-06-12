@@ -1,4 +1,5 @@
-package csw.apps.clusterseed.location
+package csw.services.location.internal
+
 import java.net.URI
 
 import akka.actor.ActorSystem
