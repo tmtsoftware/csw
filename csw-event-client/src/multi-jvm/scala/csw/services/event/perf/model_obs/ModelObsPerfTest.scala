@@ -46,6 +46,7 @@ class ModelObsPerfTestMultiJvmNode2 extends ModelObsPerfTest
 //class ModelObsPerfTestMultiJvmNode20 extends ModelObsPerfTest
 //class ModelObsPerfTestMultiJvmNode21 extends ModelObsPerfTest
 
+// DEOPSCSW-362: [Redis]Support publication of 20, 64byte events at 1Khz
 // DEOPSCSW-405: [Redis]Measure performance of model observatory scenario
 // DEOPSCSW-406: [Kafka]Measure performance of model observatory scenario
 class ModelObsPerfTest extends BasePerfSuite(ModelObsMultiNodeConfig) {
