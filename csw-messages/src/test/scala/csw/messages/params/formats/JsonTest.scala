@@ -45,6 +45,18 @@ class JsonTest extends FunSpec {
     }
   }
 
+  describe("Test Prefix") {
+    val prefix: Prefix = Prefix("wfos.filter.wheel")
+
+    it("should encode and decode properly") {
+      val expectedJson = Json.parse("\"wfos.filter.wheel\"")
+      val json         = Json.toJson(prefix)
+      val sub          = json.as[Prefix]
+      assert(sub == prefix)
+      assert(json.equals(expectedJson))
+    }
+  }
+
   describe("Test Units JSON") {
     val encoderUnit: Units = encoder
 

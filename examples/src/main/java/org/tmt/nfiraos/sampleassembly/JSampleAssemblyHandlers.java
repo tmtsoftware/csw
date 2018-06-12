@@ -102,7 +102,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
         Key<Long> sleepTimeKey = JKeyTypes.LongKey().make("SleepTime");
         Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L).withUnits(JUnits.millisecond);
 
-        Setup setupCommand = new Setup(new Prefix(componentInfo.prefix()), new CommandName("sleep"), Optional.of(new ObsId("2018A-001"))).add(sleepTimeParam);
+        Setup setupCommand = new Setup(componentInfo.prefix(), new CommandName("sleep"), Optional.of(new ObsId("2018A-001"))).add(sleepTimeParam);
 
         Timeout submitTimeout = new Timeout(1, TimeUnit.SECONDS);
         Timeout commandResponseTimeout = new Timeout(10, TimeUnit.SECONDS);

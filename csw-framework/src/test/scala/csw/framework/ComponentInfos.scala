@@ -4,6 +4,7 @@ import csw.messages.framework.LocationServiceUsage.{DoNotRegister, RegisterOnly}
 import csw.framework.models.ContainerInfo
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.ComponentType.{Assembly, HCD}
+import csw.messages.params.models.Prefix
 
 import scala.concurrent.duration.DurationDouble
 
@@ -12,7 +13,7 @@ object ComponentInfos {
     ComponentInfo(
       "SampleAssembly",
       Assembly,
-      "wfos",
+      Prefix("wfos"),
       "csw.common.components.framework.SampleComponentBehaviorFactory",
       DoNotRegister,
       Set.empty
@@ -22,7 +23,7 @@ object ComponentInfos {
     ComponentInfo(
       "trombone",
       Assembly,
-      "wfos",
+      Prefix("wfos"),
       "csw.common.components.framework.ComponentBehaviorFactoryToSimulateFailure",
       DoNotRegister,
       Set.empty
@@ -32,7 +33,7 @@ object ComponentInfos {
     ComponentInfo(
       "SampleHcd",
       HCD,
-      "wfos",
+      Prefix("wfos"),
       "csw.common.components.framework.SampleComponentBehaviorFactory",
       RegisterOnly,
       Set.empty
@@ -41,7 +42,7 @@ object ComponentInfos {
   val hcdInfoWithInitializeTimeout = ComponentInfo(
     "SampleHcd",
     HCD,
-    "wfos",
+    Prefix("wfos"),
     "csw.common.components.framework.SampleComponentBehaviorFactory",
     RegisterOnly,
     Set.empty,
@@ -51,7 +52,7 @@ object ComponentInfos {
   val hcdInfoWithRunTimeout = ComponentInfo(
     "SampleHcd",
     HCD,
-    "wfos",
+    Prefix("wfos"),
     "csw.common.components.framework.SampleComponentBehaviorFactory",
     RegisterOnly,
     Set.empty,

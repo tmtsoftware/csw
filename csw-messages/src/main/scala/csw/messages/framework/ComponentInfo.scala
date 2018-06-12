@@ -3,6 +3,7 @@ package csw.messages.framework
 import ai.x.play.json.Jsonx
 import csw.messages.TMTSerializable
 import csw.messages.location.{ComponentType, Connection}
+import csw.messages.params.models.Prefix
 import play.api.libs.json._
 
 import scala.collection.JavaConverters._
@@ -26,7 +27,7 @@ import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 final case class ComponentInfo(
     name: String,
     componentType: ComponentType,
-    prefix: String,
+    prefix: Prefix,
     behaviorFactoryClassName: String,
     locationServiceUsage: LocationServiceUsage,
     connections: Set[Connection] = Set.empty,

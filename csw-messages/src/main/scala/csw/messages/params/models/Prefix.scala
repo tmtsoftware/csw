@@ -2,7 +2,7 @@ package csw.messages.params.models
 
 import csw.messages.TMTSerializable
 import csw.messages.params.models.Prefix.SEPARATOR
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json._
 
 /**
  * A top level key for a parameter set: combination of subsystem and the subsystem's prefix
@@ -20,5 +20,9 @@ case class Prefix(prefix: String) extends TMTSerializable {
 object Prefix {
   private val SEPARATOR = "."
 
-  private[messages] implicit val format: OFormat[Prefix] = Json.format[Prefix]
+  private[messages] implicit val format: Format[Prefix] = new Format[Prefix] {
+    override def writes(obj: Prefix): JsValue           = JsString(obj.prefix)
+    override def reads(json: JsValue): JsResult[Prefix] = JsSuccess(Prefix(json.as[String]))
+  }
+
 }

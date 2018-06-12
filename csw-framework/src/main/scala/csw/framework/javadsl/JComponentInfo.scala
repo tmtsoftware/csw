@@ -4,6 +4,7 @@ import java.util
 
 import csw.messages.framework.{ComponentInfo, LocationServiceUsage}
 import csw.messages.location.{ComponentType, Connection}
+import csw.messages.params.models.Prefix
 
 import scala.collection.JavaConverters.iterableAsScalaIterableConverter
 import scala.concurrent.duration.FiniteDuration
@@ -28,7 +29,7 @@ object JComponentInfo {
   def from(
       name: String,
       componentType: ComponentType,
-      prefix: String,
+      prefix: Prefix,
       className: String,
       locationServiceUsage: LocationServiceUsage,
       connections: util.Set[Connection],

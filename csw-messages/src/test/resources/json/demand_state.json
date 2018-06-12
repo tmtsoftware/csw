@@ -1,8 +1,6 @@
 {
   "type": "DemandState",
-  "prefix": {
-    "prefix": "wfos.blue.filter"
-  },
+  "prefix": "wfos.blue.filter",
   "stateName" : {
     "name" : "testStateName"
   },

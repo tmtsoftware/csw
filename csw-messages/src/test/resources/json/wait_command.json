@@ -1,9 +1,7 @@
 {
   "type": "Wait",
   "runId": "test-runId",
-  "source": {
-    "prefix": "wfos.blue.filter"
-  },
+  "source": "wfos.blue.filter",
   "commandName": {
     "name": "move"
   },

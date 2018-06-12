@@ -8,6 +8,7 @@ import csw.framework.models.{ContainerBootstrapInfo, ContainerInfo, HostBootstra
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.Connection
 import csw.messages.location.ComponentType.{Assembly, HCD}
+import csw.messages.params.models.Prefix
 import org.scalatest.{FunSuite, Matchers}
 
 import scala.concurrent.duration.DurationInt
@@ -20,7 +21,7 @@ class ConfigParserTest extends FunSuite with Matchers {
   private val assemblyInfo = ComponentInfo(
     "Assembly-1",
     Assembly,
-    "tcs.mobie.blue.filter",
+    Prefix("tcs.mobie.blue.filter"),
     "csw.pkgDemo.assembly1.Assembly1",
     DoNotRegister,
     Set(Connection.from("HCD2A-hcd-akka"), Connection.from("HCD2C-hcd-akka")),
@@ -30,7 +31,7 @@ class ConfigParserTest extends FunSuite with Matchers {
     ComponentInfo(
       "HCD-2A",
       HCD,
-      "tcs.mobie.blue.filter",
+      Prefix("tcs.mobie.blue.filter"),
       "csw.pkgDemo.hcd2.Hcd2",
       RegisterOnly,
       Set.empty
@@ -39,7 +40,7 @@ class ConfigParserTest extends FunSuite with Matchers {
     ComponentInfo(
       "HCD-2B",
       HCD,
-      "tcs.mobie.blue.disperser",
+      Prefix("tcs.mobie.blue.disperser"),
       "csw.pkgDemo.hcd2.Hcd2",
       DoNotRegister,
       Set.empty

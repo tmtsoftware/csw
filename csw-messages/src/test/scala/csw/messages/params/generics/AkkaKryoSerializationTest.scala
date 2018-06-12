@@ -221,7 +221,7 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
       val componentInfo = ComponentInfo(
         "name",
         HCD,
-        "prefix",
+        Prefix("prefix"),
         "className",
         DoNotRegister,
         Set(connection),
