@@ -8,6 +8,7 @@ import csw.messages.scaladsl.FromComponentLifecycleMessage.Running
 import csw.messages.scaladsl.TopLevelActorIdleMessage.Initialize
 import csw.messages.scaladsl.{CommandResponseManagerMessage, FromComponentLifecycleMessage, TopLevelActorMessage}
 import csw.services.command.scaladsl.CommandResponseManager
+import csw.services.event.scaladsl.EventService
 import csw.services.location.scaladsl.LocationService
 import org.mockito.Mockito._
 import org.scalatest.Matchers
@@ -27,15 +28,19 @@ class ComponentBehaviorTest extends FrameworkTestSuite with MockitoSugar with Ma
     val commandResponseManager: CommandResponseManager = mock[CommandResponseManager]
     when(commandResponseManager.commandResponseManagerActor).thenReturn(TestProbe[CommandResponseManagerMessage].ref)
     val locationService: LocationService = mock[LocationService]
+    val eventService: EventService       = mock[EventService]
 
     val factory = new TestComponentBehaviorFactory(sampleComponentHandler)
 
-    private val behavior: Behavior[Nothing] = factory.make(ComponentInfos.hcdInfo,
-                                                           supervisorProbe.ref,
-                                                           mock[CurrentStatePublisher],
-                                                           commandResponseManager,
-                                                           locationService,
-                                                           frameworkTestMocks().loggerFactory)
+    private val behavior: Behavior[Nothing] = factory.make(
+      ComponentInfos.hcdInfo,
+      supervisorProbe.ref,
+      mock[CurrentStatePublisher],
+      commandResponseManager,
+      locationService,
+      eventService,
+      frameworkTestMocks().loggerFactory
+    )
     val componentBehaviorTestKit: BehaviorTestKit[TopLevelActorMessage] =
       BehaviorTestKit(behavior.asInstanceOf[Behavior[TopLevelActorMessage]])
   }

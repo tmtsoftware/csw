@@ -5,6 +5,7 @@ import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers, Curr
 import csw.messages.framework.ComponentInfo
 import csw.messages.scaladsl.TopLevelActorMessage
 import csw.services.command.scaladsl.CommandResponseManager
+import csw.services.event.scaladsl.EventService
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
 
@@ -15,7 +16,16 @@ class GalilBehaviorFactory extends ComponentBehaviorFactory {
       commandResponseManager: CommandResponseManager,
       currentStatePublisher: CurrentStatePublisher,
       locationService: LocationService,
+      eventService: EventService,
       loggerFactory: LoggerFactory
   ): ComponentHandlers =
-    new GalilComponentHandlers(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, loggerFactory)
+    new GalilComponentHandlers(
+      ctx,
+      componentInfo,
+      commandResponseManager,
+      currentStatePublisher,
+      locationService,
+      eventService,
+      loggerFactory
+    )
 }

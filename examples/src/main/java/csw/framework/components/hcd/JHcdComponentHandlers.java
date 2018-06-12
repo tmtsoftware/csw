@@ -22,6 +22,7 @@ import csw.messages.scaladsl.TopLevelActorMessage;
 import csw.services.command.scaladsl.CommandResponseManager;
 import csw.services.config.api.javadsl.IConfigClientService;
 import csw.services.config.api.models.ConfigData;
+import csw.services.event.javadsl.IEventService;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.logging.javadsl.ILogger;
 import csw.services.logging.javadsl.JLoggerFactory;
@@ -52,10 +53,11 @@ public class JHcdComponentHandlers extends JComponentHandlers {
             CommandResponseManager commandResponseManager,
             CurrentStatePublisher currentStatePublisher,
             ILocationService locationService,
+            IEventService eventService,
             JLoggerFactory loggerFactory
 
     ) {
-        super(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, loggerFactory);
+        super(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, eventService, loggerFactory);
         this.ctx = ctx;
         this.componentInfo = componentInfo;
         this.commandResponseManager = commandResponseManager;

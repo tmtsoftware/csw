@@ -5,34 +5,37 @@ import java.util.UUID
 import akka.actor.ActorSystem
 import akka.kafka.{ConsumerSettings, ProducerSettings}
 import akka.stream.Materializer
-import csw.services.event.scaladsl.{EventPublisher, EventService, EventSubscriber}
+import csw.services.event.internal.commons.serviceresolver.EventServiceResolver
+import csw.services.event.scaladsl.EventService
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.serialization.{ByteArrayDeserializer, ByteArraySerializer, StringDeserializer, StringSerializer}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
-class KafkaEventService(host: String, port: Int)(
+class KafkaEventService(eventServiceResolver: EventServiceResolver)(
     implicit actorSystem: ActorSystem,
-    ec: ExecutionContext,
+    val executionContext: ExecutionContext,
     mat: Materializer
 ) extends EventService {
 
-  override val defaultPublisher: EventPublisher   = publisher()
-  override val defaultSubscriber: EventSubscriber = subscriber()
+  override val defaultPublisher: Future[KafkaPublisher]   = publisher()
+  override val defaultSubscriber: Future[KafkaSubscriber] = subscriber()
 
-  override def makeNewPublisher(): EventPublisher = publisher()
+  override def makeNewPublisher(): Future[KafkaPublisher] = publisher()
 
-  private lazy val producerSettings =
+  private lazy val producerSettings = eventServiceResolver.uri.map { uri ⇒
     ProducerSettings(actorSystem, new StringSerializer, new ByteArraySerializer)
-      .withBootstrapServers(s"$host:$port")
+      .withBootstrapServers(s"${uri.getHost}:${uri.getPort}")
+  }
 
-  private lazy val consumerSettings =
+  private lazy val consumerSettings = eventServiceResolver.uri.map { uri ⇒
     ConsumerSettings(actorSystem, new StringDeserializer, new ByteArrayDeserializer)
-      .withBootstrapServers(s"$host:$port")
+      .withBootstrapServers(s"${uri.getHost}:${uri.getPort}")
       .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest")
       .withProperty(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false")
       .withGroupId(UUID.randomUUID().toString)
+  }
 
-  private[csw] def publisher(): EventPublisher   = new KafkaPublisher(producerSettings)
-  private[csw] def subscriber(): EventSubscriber = new KafkaSubscriber(consumerSettings)
+  private[csw] def publisher(): Future[KafkaPublisher]   = producerSettings.map(new KafkaPublisher(_))
+  private[csw] def subscriber(): Future[KafkaSubscriber] = consumerSettings.map(new KafkaSubscriber(_))
 }

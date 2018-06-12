@@ -1,53 +1,56 @@
 package csw.services.event.internal.commons
-import java.util.concurrent.CompletableFuture
-
 import akka.actor
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Materializer, Supervision}
 import csw.services.event.internal.commons.javawrappers.JEventService
+import csw.services.event.internal.commons.serviceresolver.{
+  EventServiceHostPortResolver,
+  EventServiceLocationResolver,
+  EventServiceResolver
+}
 import csw.services.event.javadsl.IEventService
 import csw.services.event.scaladsl.EventService
 import csw.services.location.javadsl.ILocationService
 import csw.services.location.scaladsl.LocationService
 
-import scala.async.Async.{async, await}
-import scala.compat.java8.FutureConverters.FutureOps
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 abstract class EventServiceFactory {
-  protected def eventServiceImpl(host: String, port: Int)(
+  protected def eventServiceImpl(eventServiceResolver: EventServiceResolver)(
       implicit actorSystem: actor.ActorSystem,
       ec: ExecutionContext,
       mat: Materializer
   ): EventService
 
-  def make(locationService: LocationService)(implicit actorSystem: ActorSystem[_]): Future[EventService] = {
-    implicit lazy val ec: ExecutionContext = actorSystem.executionContext
-    async {
-      val eventServiceResolver = new EventServiceResolver(locationService)
-      val uri                  = await(eventServiceResolver.uri)
-      make(uri.getHost, uri.getPort)
-    }
+  def make(locationService: LocationService)(implicit system: ActorSystem[_]): EventService = {
+    implicit val untypedActorSystem: actor.ActorSystem = system.toUntyped
+    implicit val ec: ExecutionContext                  = untypedActorSystem.dispatcher
+    implicit val materializer: Materializer            = mat()
+    eventServiceImpl(new EventServiceLocationResolver(locationService))
   }
 
-  def make(host: String, port: Int)(implicit actorSystem: ActorSystem[_]): EventService = {
-    implicit lazy val system: actor.ActorSystem = actorSystem.toUntyped
-    implicit lazy val ec: ExecutionContext      = system.dispatcher
-    val settings                                = ActorMaterializerSettings(system).withSupervisionStrategy(Supervision.getResumingDecider)
-    implicit val resumingMat: ActorMaterializer = ActorMaterializer(settings)
-
-    eventServiceImpl(host, port)
+  def make(host: String, port: Int)(implicit system: ActorSystem[_]): EventService = {
+    implicit val untypedActorSystem: actor.ActorSystem = system.toUntyped
+    implicit val ec: ExecutionContext                  = untypedActorSystem.dispatcher
+    implicit val materializer: Materializer            = mat()
+    eventServiceImpl(new EventServiceHostPortResolver(host, port))
   }
 
-  def jMake(locationService: ILocationService, actorSystem: ActorSystem[_]): CompletableFuture[IEventService] = {
+  def jMake(locationService: ILocationService, actorSystem: ActorSystem[_]): IEventService = {
+    val eventService                  = make(locationService.asScala)(actorSystem)
     implicit val ec: ExecutionContext = actorSystem.executionContext
-    val eventServiceF                 = make(locationService.asScala)(actorSystem)
-    eventServiceF.map[IEventService](new JEventService(_)).toJava.toCompletableFuture
+    new JEventService(eventService)
   }
 
   def jMake(host: String, port: Int, actorSystem: ActorSystem[_]): IEventService = {
-    val eventService = make(host, port)(actorSystem)
+    val eventService                  = make(host, port)(actorSystem)
+    implicit val ec: ExecutionContext = actorSystem.executionContext
     new JEventService(eventService)
+  }
+
+  private def mat()(implicit actorSystem: actor.ActorSystem): Materializer = {
+    val settings = ActorMaterializerSettings(actorSystem).withSupervisionStrategy(Supervision.getResumingDecider)
+    ActorMaterializer(settings)
   }
 }

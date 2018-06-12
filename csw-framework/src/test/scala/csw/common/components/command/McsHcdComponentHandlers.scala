@@ -10,6 +10,7 @@ import csw.messages.location.TrackingEvent
 import csw.messages.scaladsl.CommandResponseManagerMessage.AddOrUpdateCommand
 import csw.messages.scaladsl.TopLevelActorMessage
 import csw.services.command.scaladsl.CommandResponseManager
+import csw.services.event.scaladsl.EventService
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
 
@@ -22,6 +23,7 @@ class McsHcdComponentHandlers(
     commandResponseManager: CommandResponseManager,
     currentStatePublisher: CurrentStatePublisher,
     locationService: LocationService,
+    eventService: EventService,
     loggerFactory: LoggerFactory
 ) extends ComponentHandlers(
       ctx,
@@ -29,6 +31,7 @@ class McsHcdComponentHandlers(
       commandResponseManager,
       currentStatePublisher,
       locationService,
+      eventService,
       loggerFactory: LoggerFactory
     ) {
 

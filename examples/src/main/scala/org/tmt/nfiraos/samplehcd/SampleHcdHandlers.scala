@@ -9,6 +9,7 @@ import csw.messages.params.generics.{Key, KeyType, Parameter}
 import csw.messages.params.models.Id
 import csw.messages.scaladsl.TopLevelActorMessage
 import csw.services.command.scaladsl.CommandResponseManager
+import csw.services.event.scaladsl.EventService
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
 
@@ -28,8 +29,17 @@ class SampleHcdHandlers(
     commandResponseManager: CommandResponseManager,
     currentStatePublisher: CurrentStatePublisher,
     locationService: LocationService,
+    eventService: EventService,
     loggerFactory: LoggerFactory
-) extends ComponentHandlers(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, loggerFactory) {
+) extends ComponentHandlers(
+      ctx,
+      componentInfo,
+      commandResponseManager,
+      currentStatePublisher,
+      locationService,
+      eventService,
+      loggerFactory
+    ) {
 
   implicit val ec: ExecutionContextExecutor = ctx.executionContext
   private val log                           = loggerFactory.getLogger

@@ -6,6 +6,7 @@ import csw.framework.internal.component.ComponentBehavior
 import csw.messages.framework.ComponentInfo
 import csw.messages.scaladsl.{FromComponentLifecycleMessage, TopLevelActorMessage}
 import csw.services.command.scaladsl.CommandResponseManager
+import csw.services.event.scaladsl.EventService
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
 
@@ -30,6 +31,7 @@ abstract class ComponentBehaviorFactory {
       commandResponseManager: CommandResponseManager,
       currentStatePublisher: CurrentStatePublisher,
       locationService: LocationService,
+      eventService: EventService,
       loggerFactory: LoggerFactory
   ): ComponentHandlers
 
@@ -49,6 +51,7 @@ abstract class ComponentBehaviorFactory {
       currentStatePublisher: CurrentStatePublisher,
       commandResponseManager: CommandResponseManager,
       locationService: LocationService,
+      eventService: EventService,
       loggerFactory: LoggerFactory
   ): Behavior[Nothing] =
     Behaviors
@@ -58,7 +61,15 @@ abstract class ComponentBehaviorFactory {
             ctx,
             componentInfo,
             supervisor,
-            handlers(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, loggerFactory),
+            handlers(
+              ctx,
+              componentInfo,
+              commandResponseManager,
+              currentStatePublisher,
+              locationService,
+              eventService,
+              loggerFactory
+            ),
             commandResponseManager,
             locationService,
             loggerFactory

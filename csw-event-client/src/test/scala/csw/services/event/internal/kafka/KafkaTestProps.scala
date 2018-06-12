@@ -25,13 +25,13 @@ class KafkaTestProps(
   private val brokerProperties = Map("listeners" → brokers, "advertised.listeners" → brokers) ++ additionalBrokerProps
   val config                   = EmbeddedKafkaConfig(customBrokerProperties = brokerProperties)
 
-  val eventService: EventService   = KafkaEventServiceFactory.make(locationService)(typedActorSystem).await
-  val jEventService: IEventService = KafkaEventServiceFactory.jMake(locationService.asJava, typedActorSystem).toScala.await
+  val eventService: EventService   = KafkaEventServiceFactory.make(locationService)(typedActorSystem)
+  val jEventService: IEventService = KafkaEventServiceFactory.jMake(locationService.asJava, typedActorSystem)
 
-  val publisher: EventPublisher                                    = eventService.defaultPublisher
-  val subscriber: EventSubscriber                                  = eventService.defaultSubscriber
-  override def jPublisher[T <: EventPublisher]: IEventPublisher    = jEventService.defaultPublisher
-  override def jSubscriber[T <: EventSubscriber]: IEventSubscriber = jEventService.defaultSubscriber
+  val publisher: EventPublisher                                    = eventService.defaultPublisher.await
+  val subscriber: EventSubscriber                                  = eventService.defaultSubscriber.await
+  override def jPublisher[T <: EventPublisher]: IEventPublisher    = jEventService.defaultPublisher.toScala.await
+  override def jSubscriber[T <: EventSubscriber]: IEventSubscriber = jEventService.defaultSubscriber.toScala.await
 
   override def toString: String = "Kafka"
 

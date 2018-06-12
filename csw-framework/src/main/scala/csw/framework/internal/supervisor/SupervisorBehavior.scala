@@ -36,6 +36,7 @@ import csw.messages.scaladsl.SupervisorRestartMessage.{UnRegistrationComplete, U
 import csw.messages.scaladsl._
 import csw.services.command.internal.CommandResponseManagerFactory
 import csw.services.command.scaladsl.CommandResponseManager
+import csw.services.event.scaladsl.EventService
 import csw.services.location.models.AkkaRegistration
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
@@ -79,6 +80,7 @@ private[framework] final class SupervisorBehavior(
     commandResponseManagerFactory: CommandResponseManagerFactory,
     registrationFactory: RegistrationFactory,
     locationService: LocationService,
+    eventService: EventService,
     loggerFactory: LoggerFactory
 ) extends MutableBehavior[SupervisorMessage] {
 
@@ -135,7 +137,8 @@ private[framework] final class SupervisorBehavior(
    * @return the existing behavior
    */
   override def onSignal: PartialFunction[Signal, Behavior[SupervisorMessage]] = {
-    case Terminated(componentRef) ⇒
+    case ter @ Terminated(componentRef) ⇒
+      ter.failure.foreach(println)
       log.warn(s"Supervisor in lifecycle state :[$lifecycleState] received terminated signal from component :[$componentRef]")
       timerScheduler.cancel(InitializeTimerKey)
 
@@ -321,6 +324,7 @@ private[framework] final class SupervisorBehavior(
                 new CurrentStatePublisher(pubSubComponentActor),
                 commandResponseManager,
                 locationService,
+                eventService,
                 loggerFactory)
       )
       .onFailure[FailureRestart](SupervisorStrategy.restartWithLimit(3, Duration.Zero).withLoggingEnabled(true))

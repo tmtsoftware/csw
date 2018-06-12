@@ -13,6 +13,7 @@ import csw.messages.params.states.CurrentState
 import csw.messages.scaladsl.{CommandResponseManagerMessage, SupervisorMessage}
 import csw.services.command.internal.CommandResponseManagerFactory
 import csw.services.command.scaladsl.CommandResponseManager
+import csw.services.event.scaladsl.EventService
 import csw.services.location.javadsl.ILocationService
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
@@ -29,6 +30,7 @@ class FrameworkTestMocks(implicit untypedSystem: actor.ActorSystem, system: Acto
   val testActor: ActorRef[Any]                 = testkit.TestProbe("test-probe").testActor
   val akkaRegistration                         = AkkaRegistration(mock[AkkaConnection], Some("nfiraos.ncc.trombone"), testActor, testActor)
   val locationService: LocationService         = mock[LocationService]
+  val eventService: EventService               = mock[EventService]
   val registrationResult: RegistrationResult   = mock[RegistrationResult]
   val registrationFactory: RegistrationFactory = mock[RegistrationFactory]
 
@@ -37,6 +39,7 @@ class FrameworkTestMocks(implicit untypedSystem: actor.ActorSystem, system: Acto
   when(locationService.register(akkaRegistration)).thenReturn(Future.successful(registrationResult))
   when(locationService.unregister(any[AkkaConnection])).thenReturn(Future.successful(Done))
   when(locationService.asJava).thenReturn(mock[ILocationService])
+  when(eventService.executionContext).thenReturn(untypedSystem.dispatcher)
   ///////////////////////////////////////////////
 
   val commandResponseManagerActor: TestProbe[CommandResponseManagerMessage] = TestProbe[CommandResponseManagerMessage]

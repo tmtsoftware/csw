@@ -1,8 +1,11 @@
 package csw.services.event.scaladsl
 
-trait EventService {
-  val defaultPublisher: EventPublisher
-  val defaultSubscriber: EventSubscriber
+import scala.concurrent.{ExecutionContext, Future}
 
-  def makeNewPublisher(): EventPublisher
+trait EventService {
+  implicit val executionContext: ExecutionContext
+  val defaultPublisher: Future[EventPublisher]
+  val defaultSubscriber: Future[EventSubscriber]
+
+  def makeNewPublisher(): Future[EventPublisher]
 }

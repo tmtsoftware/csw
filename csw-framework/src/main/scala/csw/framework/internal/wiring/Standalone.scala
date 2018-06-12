@@ -29,6 +29,7 @@ object Standalone {
       None,
       componentInfo,
       locationService,
+      eventService,
       registrationFactory,
       commandResponseManagerFactory
     )

@@ -16,6 +16,7 @@ import csw.services.command.scaladsl.{CommandResponseManager, CommandService}
 import csw.services.config.api.models.ConfigData
 import csw.services.config.api.scaladsl.ConfigClientService
 import csw.services.config.client.scaladsl.ConfigClientFactory
+import csw.services.event.scaladsl.EventService
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
@@ -30,6 +31,7 @@ class AssemblyComponentHandlers(
     commandResponseManager: CommandResponseManager,
     currentStatePublisher: CurrentStatePublisher,
     locationService: LocationService,
+    eventService: EventService,
     loggerFactory: LoggerFactory
 ) extends ComponentHandlers(
       ctx,
@@ -37,6 +39,7 @@ class AssemblyComponentHandlers(
       commandResponseManager,
       currentStatePublisher,
       locationService,
+      eventService,
       loggerFactory: LoggerFactory
     )
 //#component-handlers-class

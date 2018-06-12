@@ -8,6 +8,7 @@ import csw.messages.framework.ComponentInfo
 import csw.messages.location.TrackingEvent
 import csw.messages.scaladsl.TopLevelActorMessage
 import csw.services.command.scaladsl.CommandResponseManager
+import csw.services.event.scaladsl.EventService
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
@@ -21,8 +22,17 @@ class GalilComponentHandlers(
     commandResponseManager: CommandResponseManager,
     currentStatePublisher: CurrentStatePublisher,
     locationService: LocationService,
+    eventService: EventService,
     loggerFactory: LoggerFactory
-) extends ComponentHandlers(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, loggerFactory) {
+) extends ComponentHandlers(
+      ctx,
+      componentInfo,
+      commandResponseManager,
+      currentStatePublisher,
+      locationService,
+      eventService,
+      loggerFactory
+    ) {
   val log: Logger = new LoggerFactory(componentInfo.name).getLogger
 
   override def initialize(): Future[Unit] = Future.successful(())

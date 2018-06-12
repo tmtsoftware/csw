@@ -2,10 +2,13 @@ package csw.framework.internal.wiring
 
 import akka.actor.ActorSystem
 import akka.actor.typed.ActorRef
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import csw.framework.deploy.ConfigUtils
 import csw.services.command.internal.CommandResponseManagerFactory
 import csw.services.config.api.scaladsl.ConfigClientService
 import csw.services.config.client.scaladsl.ConfigClientFactory
+import csw.services.event.internal.redis.RedisEventServiceFactory
+import csw.services.event.scaladsl.EventService
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory, RegistrationFactory}
 import csw.services.logging.commons.LogAdminActorFactory
@@ -18,6 +21,7 @@ class FrameworkWiring {
   lazy val clusterSettings: ClusterSettings               = ClusterSettings()
   lazy val actorSystem: ActorSystem                       = clusterSettings.system
   lazy val locationService: LocationService               = LocationServiceFactory.withSystem(actorSystem)
+  lazy val eventService: EventService                     = RedisEventServiceFactory.make(locationService)(actorSystem.toTyped)
   lazy val actorRuntime: ActorRuntime                     = new ActorRuntime(actorSystem)
   lazy val logAdminActorRef: ActorRef[LogControlMessages] = LogAdminActorFactory.make(actorSystem)
   lazy val registrationFactory                            = new RegistrationFactory(logAdminActorRef)

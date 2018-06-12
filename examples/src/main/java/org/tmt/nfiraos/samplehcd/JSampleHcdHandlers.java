@@ -14,6 +14,7 @@ import csw.messages.params.generics.Parameter;
 import csw.messages.params.models.Id;
 import csw.messages.scaladsl.TopLevelActorMessage;
 import csw.services.command.scaladsl.CommandResponseManager;
+import csw.services.event.javadsl.IEventService;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.logging.javadsl.ILogger;
 import csw.services.logging.javadsl.JLoggerFactory;
@@ -47,9 +48,10 @@ public class JSampleHcdHandlers extends JComponentHandlers {
             CommandResponseManager commandResponseManager,
             CurrentStatePublisher currentStatePublisher,
             ILocationService locationService,
+            IEventService eventService,
             JLoggerFactory loggerFactory
     ) {
-        super(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, loggerFactory);
+        super(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, eventService, loggerFactory);
         this.currentStatePublisher = currentStatePublisher;
         this.log = loggerFactory.getLogger(getClass());
         this.commandResponseManager = commandResponseManager;

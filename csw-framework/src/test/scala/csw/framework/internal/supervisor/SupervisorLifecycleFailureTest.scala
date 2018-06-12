@@ -29,6 +29,7 @@ import csw.messages.scaladsl.ComponentCommonMessage.{
 import csw.messages.scaladsl.SupervisorContainerCommonMessages.Restart
 import csw.messages.scaladsl.{ComponentMessage, ContainerIdleMessage, TopLevelActorMessage}
 import csw.services.command.scaladsl.CommandResponseManager
+import csw.services.event.scaladsl.EventService
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.internal.LoggingLevels.ERROR
 import csw.services.logging.internal.LoggingSystem
@@ -218,6 +219,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
       Some(mock[ActorRef[ContainerIdleMessage]]),
       hcdInfo,
       locationService,
+      eventService,
       registrationFactory,
       new SampleBehaviorFactory(componentHandlers),
       commandResponseManagerFactory,
@@ -254,12 +256,15 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
 }
 
 class SampleBehaviorFactory(componentHandlers: ComponentHandlers) extends ComponentBehaviorFactory {
-  override protected def handlers(ctx: ActorContext[TopLevelActorMessage],
-                                  componentInfo: ComponentInfo,
-                                  commandResponseManager: CommandResponseManager,
-                                  currentStatePublisher: CurrentStatePublisher,
-                                  locationService: LocationService,
-                                  loggerFactory: LoggerFactory): ComponentHandlers = componentHandlers
+  override protected def handlers(
+      ctx: ActorContext[TopLevelActorMessage],
+      componentInfo: ComponentInfo,
+      commandResponseManager: CommandResponseManager,
+      currentStatePublisher: CurrentStatePublisher,
+      locationService: LocationService,
+      eventService: EventService,
+      loggerFactory: LoggerFactory
+  ): ComponentHandlers = componentHandlers
 }
 
 case class TestFailureStop(msg: String)    extends FailureStop(msg)

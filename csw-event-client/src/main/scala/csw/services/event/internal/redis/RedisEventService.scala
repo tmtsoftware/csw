@@ -1,27 +1,30 @@
 package csw.services.event.internal.redis
 
 import akka.stream.Materializer
+import csw.services.event.internal.commons.serviceresolver.EventServiceResolver
 import csw.services.event.scaladsl.{EventPublisher, EventService, EventSubscriber}
 import io.lettuce.core.{RedisClient, RedisURI}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
-class RedisEventService(host: String, port: Int, masterId: String, redisClient: RedisClient)(
-    implicit ec: ExecutionContext,
+class RedisEventService(eventServiceResolver: EventServiceResolver, masterId: String, redisClient: RedisClient)(
+    implicit val executionContext: ExecutionContext,
     mat: Materializer
 ) extends EventService {
 
-  private val redisURI                      = RedisURI.Builder.sentinel(host, port, masterId).build()
-  lazy val defaultPublisher: EventPublisher = publisher()
+  private val redisURI: Future[RedisURI] =
+    eventServiceResolver.uri.map(uri ⇒ RedisURI.Builder.sentinel(uri.getHost, uri.getPort, masterId).build())
 
-  lazy val defaultSubscriber: EventSubscriber = subscriber()
+  lazy val defaultPublisher: Future[EventPublisher] = redisURI.map(publisher)
 
-  override def makeNewPublisher(): EventPublisher = publisher()
+  lazy val defaultSubscriber: Future[EventSubscriber] = redisURI.map(subscriber)
 
-  private[csw] def publisher(): EventPublisher =
+  override def makeNewPublisher(): Future[EventPublisher] = redisURI.map(publisher)
+
+  private[csw] def publisher(redisURI: RedisURI): EventPublisher =
     new RedisPublisher(redisURI, redisClient)
 
-  private[csw] def subscriber(): EventSubscriber =
+  private[csw] def subscriber(redisURI: RedisURI): EventSubscriber =
     new RedisSubscriber(redisURI, redisClient)
 
 }

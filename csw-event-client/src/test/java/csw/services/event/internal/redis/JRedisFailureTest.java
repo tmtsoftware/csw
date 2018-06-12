@@ -40,7 +40,7 @@ public class JRedisFailureTest {
 
     @Test
     public void failureInPublishingShouldFailFutureWithPublishFailedException() throws InterruptedException, ExecutionException, TimeoutException {
-        IEventPublisher publisher = redisTestProps.jEventService().makeNewPublisher();
+        IEventPublisher publisher = redisTestProps.jEventService().makeNewPublisher().get(10, TimeUnit.SECONDS);
         Event event = Utils.makeEvent(2);
         publisher.publish(event).get(10, TimeUnit.SECONDS);
 
@@ -54,7 +54,7 @@ public class JRedisFailureTest {
 
     @Test
     public void handleFailedPublishEventWithACallback() throws InterruptedException, ExecutionException, TimeoutException {
-        IEventPublisher publisher = redisTestProps.jEventService().makeNewPublisher();
+        IEventPublisher publisher = redisTestProps.jEventService().makeNewPublisher().get(10, TimeUnit.SECONDS);
         TestProbe<PublishFailure> testProbe = TestProbe.create(redisTestProps.typedActorSystem());
         publisher.publish(Utils.makeEvent(1)).get(10, TimeUnit.SECONDS);
 
@@ -74,7 +74,7 @@ public class JRedisFailureTest {
 
     @Test
     public void handleFailedPublishEventWithAnEventGeneratorAndACallback() throws InterruptedException, ExecutionException, TimeoutException {
-        IEventPublisher publisher = redisTestProps.jEventService().makeNewPublisher();
+        IEventPublisher publisher = redisTestProps.jEventService().makeNewPublisher().get(10, TimeUnit.SECONDS);
         TestProbe<PublishFailure> testProbe = TestProbe.create(redisTestProps.typedActorSystem());
         publisher.publish(Utils.makeEvent(1)).get(10, TimeUnit.SECONDS);
 

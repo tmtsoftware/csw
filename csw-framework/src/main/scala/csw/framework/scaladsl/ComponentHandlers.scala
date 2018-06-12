@@ -7,6 +7,7 @@ import csw.messages.location.{Connection, TrackingEvent}
 import csw.messages.scaladsl.TopLevelActorCommonMessage.TrackingEventReceived
 import csw.messages.scaladsl.TopLevelActorMessage
 import csw.services.command.scaladsl.CommandResponseManager
+import csw.services.event.scaladsl.EventService
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
 
@@ -26,6 +27,7 @@ abstract class ComponentHandlers(
     commandResponseManager: CommandResponseManager,
     currentStatePublisher: CurrentStatePublisher,
     locationService: LocationService,
+    eventService: EventService,
     loggerFactory: LoggerFactory
 ) {
 

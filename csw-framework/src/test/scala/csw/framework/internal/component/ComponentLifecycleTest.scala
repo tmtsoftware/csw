@@ -15,6 +15,7 @@ import csw.messages.scaladsl.RunningMessage.Lifecycle
 import csw.messages.scaladsl.TopLevelActorIdleMessage.Initialize
 import csw.messages.scaladsl.{CommandResponseManagerMessage, FromComponentLifecycleMessage, TopLevelActorMessage}
 import csw.services.command.scaladsl.CommandResponseManager
+import csw.services.event.scaladsl.EventService
 import csw.services.location.scaladsl.LocationService
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
@@ -33,6 +34,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
   ) {
 
     val locationService: LocationService               = mock[LocationService]
+    val eventService: EventService                     = mock[EventService]
     val commandResponseManager: CommandResponseManager = mock[CommandResponseManager]
     when(commandResponseManager.commandResponseManagerActor).thenReturn(commandStatusServiceProbe.ref)
 
@@ -41,12 +43,15 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     when(sampleHcdHandler.onShutdown()).thenReturn(Future.unit)
     val factory = new TestComponentBehaviorFactory(sampleHcdHandler)
 
-    private val behavior: Behavior[Nothing] = factory.make(ComponentInfos.hcdInfo,
-                                                           supervisorProbe.ref,
-                                                           mock[CurrentStatePublisher],
-                                                           commandResponseManager,
-                                                           locationService,
-                                                           frameworkTestMocks().loggerFactory)
+    private val behavior: Behavior[Nothing] = factory.make(
+      ComponentInfos.hcdInfo,
+      supervisorProbe.ref,
+      mock[CurrentStatePublisher],
+      commandResponseManager,
+      locationService,
+      eventService,
+      frameworkTestMocks().loggerFactory
+    )
 
     val componentBehaviorTestKit: BehaviorTestKit[TopLevelActorMessage] =
       BehaviorTestKit(behavior.asInstanceOf[Behavior[TopLevelActorMessage]])

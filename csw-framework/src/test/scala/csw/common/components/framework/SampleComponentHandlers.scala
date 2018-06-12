@@ -11,6 +11,7 @@ import csw.messages.location.{LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.messages.params.states.{CurrentState, StateName}
 import csw.messages.scaladsl.TopLevelActorMessage
 import csw.services.command.scaladsl.CommandResponseManager
+import csw.services.event.scaladsl.EventService
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
@@ -22,6 +23,7 @@ class SampleComponentHandlers(
     commandResponseManager: CommandResponseManager,
     currentStatePublisher: CurrentStatePublisher,
     locationService: LocationService,
+    eventService: EventService,
     loggerFactory: LoggerFactory
 ) extends ComponentHandlers(
       ctx,
@@ -29,6 +31,7 @@ class SampleComponentHandlers(
       commandResponseManager,
       currentStatePublisher,
       locationService,
+      eventService,
       loggerFactory: LoggerFactory
     ) {
 

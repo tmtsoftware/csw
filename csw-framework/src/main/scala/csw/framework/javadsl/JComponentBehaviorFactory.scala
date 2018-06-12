@@ -6,6 +6,9 @@ import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers, Curr
 import csw.messages.framework.ComponentInfo
 import csw.messages.scaladsl.TopLevelActorMessage
 import csw.services.command.scaladsl.CommandResponseManager
+import csw.services.event.internal.commons.EventServiceAdapter
+import csw.services.event.javadsl.IEventService
+import csw.services.event.scaladsl.EventService
 import csw.services.location.javadsl.ILocationService
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.javadsl.JLoggerFactory
@@ -22,6 +25,7 @@ abstract class JComponentBehaviorFactory extends ComponentBehaviorFactory() {
       commandResponseManager: CommandResponseManager,
       currentStatePublisher: CurrentStatePublisher,
       locationService: LocationService,
+      eventService: EventService,
       loggerFactory: LoggerFactory
   ): ComponentHandlers =
     jHandlers(
@@ -30,6 +34,7 @@ abstract class JComponentBehaviorFactory extends ComponentBehaviorFactory() {
       commandResponseManager,
       currentStatePublisher,
       locationService.asJava,
+      EventServiceAdapter.asJava(eventService),
       loggerFactory.asJava
     )
 
@@ -39,6 +44,7 @@ abstract class JComponentBehaviorFactory extends ComponentBehaviorFactory() {
       commandResponseManager: CommandResponseManager,
       currentStatePublisher: CurrentStatePublisher,
       locationService: ILocationService,
+      eventService: IEventService,
       loggerFactory: JLoggerFactory
   ): JComponentHandlers
 }

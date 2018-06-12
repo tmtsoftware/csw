@@ -23,6 +23,7 @@ import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.scaladsl.AskPattern.Askable
+import csw.services.event.scaladsl.EventService
 
 import scala.async.Async.{async, await}
 import scala.concurrent.duration.DurationLong
@@ -35,6 +36,7 @@ class HcdComponentHandlers(
     commandResponseManager: CommandResponseManager,
     currentStatePublisher: CurrentStatePublisher,
     locationService: LocationService,
+    eventService: EventService,
     loggerFactory: LoggerFactory
 ) extends ComponentHandlers(
       ctx,
@@ -42,6 +44,7 @@ class HcdComponentHandlers(
       commandResponseManager,
       currentStatePublisher,
       locationService,
+      eventService,
       loggerFactory: LoggerFactory
     )
 //#component-handlers-class

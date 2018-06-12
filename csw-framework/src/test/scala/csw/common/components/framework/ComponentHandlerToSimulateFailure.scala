@@ -5,6 +5,7 @@ import csw.framework.scaladsl.CurrentStatePublisher
 import csw.messages.framework.ComponentInfo
 import csw.messages.scaladsl.TopLevelActorMessage
 import csw.services.command.scaladsl.CommandResponseManager
+import csw.services.event.scaladsl.EventService
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
 
@@ -16,6 +17,7 @@ class ComponentHandlerToSimulateFailure(
     commandResponseManager: CommandResponseManager,
     currentStatePublisher: CurrentStatePublisher,
     locationService: LocationService,
+    eventService: EventService,
     loggerFactory: LoggerFactory
 ) extends SampleComponentHandlers(
       ctx,
@@ -23,6 +25,7 @@ class ComponentHandlerToSimulateFailure(
       commandResponseManager,
       currentStatePublisher,
       locationService,
+      eventService,
       loggerFactory: LoggerFactory
     ) {
 

@@ -23,6 +23,7 @@ import csw.services.command.scaladsl.CommandResponseManager;
 import csw.services.config.api.javadsl.IConfigClientService;
 import csw.services.config.api.models.ConfigData;
 import csw.services.config.client.javadsl.JConfigClientFactory;
+import csw.services.event.javadsl.IEventService;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.location.javadsl.JComponentType;
 import csw.services.logging.javadsl.ILogger;
@@ -58,10 +59,11 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
             CommandResponseManager commandResponseManager,
             CurrentStatePublisher currentStatePublisher,
             ILocationService locationService,
+            IEventService eventService,
             JLoggerFactory loggerFactory
 
     ) {
-        super(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, loggerFactory);
+        super(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, eventService, loggerFactory);
         this.ctx = ctx;
         this.componentInfo = componentInfo;
         this.commandResponseManager = commandResponseManager;
