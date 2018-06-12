@@ -98,6 +98,7 @@ public class JEventPublisherTest extends TestNGSuite {
         List<Event> queue = new ArrayList<>();
         IEventSubscription subscription = baseProperties.jSubscriber().subscribe(Collections.singleton(eventKey)).toMat(Sink.foreach(queue::add), Keep.left()).run(baseProperties.resumingMat());
         subscription.ready().get(10, TimeUnit.SECONDS);
+        Thread.sleep(500); // Needed for getting the latest event
 
         IEventPublisher publisher = baseProperties.jPublisher();
         counter = -1;
