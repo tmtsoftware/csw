@@ -32,6 +32,9 @@ class LocationRoutes(locationService: LocationService, actorRuntime: ActorRuntim
         entity(as[Connection]) { connection =>
           complete(locationService.unregister(connection))
         }
+      } ~
+      path("unregisterAll") {
+        complete(locationService.unregisterAll())
       }
     }
   }
