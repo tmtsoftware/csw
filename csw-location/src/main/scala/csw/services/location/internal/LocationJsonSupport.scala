@@ -6,6 +6,7 @@ import akka.actor.ActorSystem
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.adapter._
 import akka.serialization.{Serialization, SerializationExtension}
+import csw.messages.location.Connection
 import csw.messages.location.Connection.AkkaConnection
 import csw.services.location.models.AkkaRegistration
 import csw.services.logging.messages.LogControlMessages
@@ -25,6 +26,9 @@ trait LocationJsonSupport {
 
   implicit val uriDecoder: Decoder[URI] = Decoder.decodeString.map(path => new URI(path))
   implicit val uriEncoder: Encoder[URI] = Encoder.encodeString.contramap(uri => uri.toString)
+
+  implicit def connectionDecoder[T <: Connection]: Decoder[T] = Decoder.decodeString.map(x => Connection.from(x).asInstanceOf[T])
+  implicit def connectionEncoder[T <: Connection]: Encoder[T] = Encoder.encodeString.contramap(_.name)
 
   implicit def akkaRegistrationDecoder(implicit actorSystem: ActorSystem): Decoder[AkkaRegistration] = { cursor =>
     for {

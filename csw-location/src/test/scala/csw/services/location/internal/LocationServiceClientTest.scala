@@ -2,15 +2,15 @@ package csw.services.location.internal
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.location.Connection.TcpConnection
+import csw.messages.location.{ComponentId, ComponentType}
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.location.models.TcpRegistration
 import csw.services.logging.commons.LogAdminActorFactory
 import org.scalatest.FunSuite
 
-class LocationServiceClientTest extends FunSuite {
+class LocationServiceClientTest extends FunSuite with LocationJsonSupport {
   implicit val actorSystem: ActorSystem        = ActorSystemFactory.remote("demo")
   implicit val materializer: ActorMaterializer = ActorMaterializer()
   private val locationServiceClient            = new LocationServiceClient()
@@ -24,7 +24,6 @@ class LocationServiceClientTest extends FunSuite {
   test("demo") {
     println(locationServiceClient.list.await)
     val registrationResult = locationServiceClient.register(registration).await
-    Thread.sleep(2000)
     println(locationServiceClient.list.await)
     registrationResult.unregister().await
     println(locationServiceClient.list.await)
