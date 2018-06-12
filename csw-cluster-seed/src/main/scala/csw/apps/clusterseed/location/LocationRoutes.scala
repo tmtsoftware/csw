@@ -1,7 +1,10 @@
 package csw.apps.clusterseed.location
 
+import akka.NotUsed
+import akka.http.scaladsl.model.sse.ServerSentEvent
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
+import akka.stream.scaladsl.Source
 import csw.apps.clusterseed.admin.internal.ActorRuntime
 import csw.messages.location._
 import csw.services.location.internal.LocationJsonSupport
@@ -9,6 +12,8 @@ import csw.services.location.models.Registration
 import csw.services.location.scaladsl.LocationService
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
 import io.circe.generic.auto._
+import io.circe.syntax._
+import akka.http.scaladsl.marshalling.sse.EventStreamMarshalling._
 
 import scala.concurrent.duration.{Duration, FiniteDuration}
 
@@ -41,11 +46,6 @@ class LocationRoutes(locationService: LocationService, actorRuntime: ActorRuntim
           locationService.find(Connection.from(connectionName).asInstanceOf[TypedConnection[Location]])
         )
       } ~
-      path("find" / Segment) { connectionName =>
-        complete(
-          locationService.find(Connection.from(connectionName).asInstanceOf[TypedConnection[Location]])
-        )
-      } ~
       path("resolve" / Segment) { connectionName =>
         parameter("within".as[String]) { within =>
           val duration = Duration(within).asInstanceOf[FiniteDuration]
@@ -53,7 +53,18 @@ class LocationRoutes(locationService: LocationService, actorRuntime: ActorRuntim
             locationService.resolve(Connection.from(connectionName).asInstanceOf[TypedConnection[Location]], duration)
           )
         }
-
+      } ~
+      path("track" / Segment) { connectionName =>
+        val connection = Connection.from(connectionName)
+        val stream: Source[ServerSentEvent, NotUsed] = locationService
+          .track(connection)
+          .mapMaterializedValue(_ => NotUsed)
+          .map { trackingEvent =>
+            ServerSentEvent(trackingEvent.asJson.noSpaces)
+          }
+        complete {
+          stream
+        }
       }
     } ~
     post {
