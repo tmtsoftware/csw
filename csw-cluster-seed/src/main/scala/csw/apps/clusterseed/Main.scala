@@ -23,6 +23,7 @@ class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) {
         if (startLogging) wiring.actorRuntime.startLogging(name)
 
         wiring.locationService
+        wiring.locationHttpService.start()
         Await.result(wiring.adminHttpService.registeredLazyBinding, 10.seconds)
     }
 }

@@ -59,6 +59,10 @@ object Dependencies {
     Libs.`akka-management-cluster-http`,
     Chill.`chill-akka`,
     AkkaHttp.`akka-http`,
+    Circe.`circe-core`,
+    Circe.`circe-generic`,
+    Circe.`circe-parser`,
+    Libs.`akka-http-circe`,
     Libs.`scalatest`               % Test,
     Libs.`junit`                   % Test,
     Libs.`junit-interface`         % Test,
@@ -114,13 +118,9 @@ object Dependencies {
   )
 
   val ClusterSeed = Seq(
-    Circe.`circe-core`,
-    Circe.`circe-generic`,
-    Circe.`circe-parser`,
     AkkaHttp.`akka-http`,
     Libs.`play-json`,
     Libs.`akka-http-play-json`,
-    Libs.`akka-http-circe`,
     Libs.`scopt`,
     Libs.`scalatest` % Test
   )
