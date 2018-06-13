@@ -43,6 +43,7 @@ class BasePerfSuite(config: MultiNodeConfig)
 
   var throughputPlots: ThroughputPlots              = ThroughputPlots()
   var latencyPlots: LatencyPlots                    = LatencyPlots()
+  var initialLatencyPlots: InitialLatencyPlots      = InitialLatencyPlots()
   var jstatProcessLogger: Option[FileProcessLogger] = None
 
   val defaultTimeout: Duration   = 1.minute
@@ -85,12 +86,13 @@ class BasePerfSuite(config: MultiNodeConfig)
   }
 
   def waitForResultsFromAllSubscribers(subscribers: immutable.Seq[(Future[Done], PerfSubscriber)]): Unit = {
-    val histogramPerNode         = new Histogram(SECONDS.toNanos(10), 3)
-    var totalTimePerNode         = 0L
-    var eventsReceivedPerNode    = 0L
-    var totalDroppedPerNode      = 0L
-    var outOfOrderCountPerNode   = 0L
-    var aggregatedLatencyPerNode = 0L
+    val histogramPerNode               = new Histogram(SECONDS.toNanos(10), 3)
+    val initialLatencyHistogramPerNode = new Histogram(SECONDS.toNanos(10), 3)
+    var totalTimePerNode               = 0L
+    var eventsReceivedPerNode          = 0L
+    var totalDroppedPerNode            = 0L
+    var outOfOrderCountPerNode         = 0L
+    var aggregatedLatencyPerNode       = 0L
 
     subscribers.foreach {
       case (doneF, subscriber) ⇒
@@ -100,6 +102,7 @@ class BasePerfSuite(config: MultiNodeConfig)
           totalDroppedPerNode += subscriber.totalDropped()
           aggregatedLatencyPerNode += subscriber.avgLatency()
           histogramPerNode.add(subscriber.histogram)
+          initialLatencyHistogramPerNode.recordValue(subscriber.initialLatency)
           eventsReceivedPerNode += subscriber.eventsReceived
           totalTimePerNode = Math.max(totalTimePerNode, subscriber.totalTime)
         }
@@ -108,10 +111,14 @@ class BasePerfSuite(config: MultiNodeConfig)
     val byteBuffer: ByteBuffer = ByteBuffer.allocate(326942)
     histogramPerNode.encodeIntoByteBuffer(byteBuffer)
 
+    val initialLatencyByteBuffer: ByteBuffer = ByteBuffer.allocate(326942)
+    initialLatencyHistogramPerNode.encodeIntoByteBuffer(initialLatencyByteBuffer)
+
     Await.result(
       publisher.publish(
         EventUtils.perfResultEvent(
           byteBuffer.array(),
+          initialLatencyByteBuffer.array(),
           eventsReceivedPerNode / nanosToSeconds(totalTimePerNode),
           totalDroppedPerNode,
           outOfOrderCountPerNode,
@@ -134,6 +141,12 @@ class BasePerfSuite(config: MultiNodeConfig)
       throughput = throughputPlots.throughput.addAll(aggregatedResult.throughputPlots.throughput),
       dropped = throughputPlots.dropped.addAll(aggregatedResult.throughputPlots.dropped),
       outOfOrder = throughputPlots.outOfOrder.addAll(aggregatedResult.throughputPlots.outOfOrder)
+    )
+
+    initialLatencyPlots = initialLatencyPlots.copy(
+      plot50 = initialLatencyPlots.plot50.addAll(aggregatedResult.initialLatencyPlots.plot50),
+      plot90 = initialLatencyPlots.plot90.addAll(aggregatedResult.initialLatencyPlots.plot90),
+      plot99 = initialLatencyPlots.plot99.addAll(aggregatedResult.initialLatencyPlots.plot99)
     )
   }
 

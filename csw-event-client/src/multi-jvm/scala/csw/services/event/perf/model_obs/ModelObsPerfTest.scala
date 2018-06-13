@@ -55,6 +55,7 @@ class ModelObsPerfTest extends BasePerfSuite(ModelObsMultiNodeConfig) {
     enterBarrier("start-printing")
     runOn(roles.last) {
       throughputPlots.printTable()
+      initialLatencyPlots.printTable()
       latencyPlots.printTable()
     }
     enterBarrier("results-printed")

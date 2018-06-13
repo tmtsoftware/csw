@@ -36,30 +36,44 @@ class PerfSubscriber(
   val histogram: Histogram   = new Histogram(SECONDS.toNanos(10), 3)
   private val resultReporter = new ResultReporter(prefix.prefix, actorSystem)
 
-  var startTime         = 0L
-  var totalTime         = 0L
-  var aggregatedLatency = 0L
-  var eventsReceived    = 0L
-  var lastId            = 0
-  var outOfOrderCount   = 0
-  var lastCurrentId     = 0
+  var startTime           = 0L
+  var totalTime           = 0L
+  var aggregatedLatency   = 0L
+  var eventsReceived      = 0L
+  var timeBeforeSubscribe = 0L
+  var initialLatency      = 0L
+  var lastId              = 0
+  var outOfOrderCount     = 0
+  var lastCurrentId       = 0
 
   private val testEventName = EventName(s"$testEventS-$pubId")
   private val endEventName  = EventName(s"$endEventS-$pubId")
 
-  private val eventKeys = Set(EventKey(prefix, testEventName), EventKey(prefix, endEventName))
-
-  private val eventsToDrop = warmup + eventKeys.size //inclusive of latest events from subscription
+  private var eventKeys = Set.empty[EventKey]
 
   def subscription: Source[Event, EventSubscription] =
     if (isPatternSubscriber) {
       val pattern = if (redisEnabled) redisPattern else kafkaPattern
       subscriber.pSubscribe(prefix.subsystem, pattern)
-    } else subscriber.subscribe(eventKeys)
+    } else {
+      eventKeys = Set(EventKey(prefix, testEventName), EventKey(prefix, endEventName))
+      timeBeforeSubscribe = getNanos(Instant.now()).toLong
+      subscriber.subscribe(eventKeys)
+    }
 
   def startSubscription(): Future[Done] =
     subscription
-      .drop(eventsToDrop)
+      .prefixAndTail(eventKeys.size)
+      .flatMapConcat {
+        case (events, remainingSource) ⇒
+          events.foreach {
+            case SystemEvent(_, _, `testEventName`, _, _) ⇒
+              initialLatency = getNanos(Instant.now()).toLong - timeBeforeSubscribe
+            case _ ⇒ // Do nothing
+          }
+          remainingSource
+      }
+      .drop(warmup)
       .takeWhile {
         case SystemEvent(_, _, `endEventName`, _, _) ⇒ false
         case e @ _ ⇒

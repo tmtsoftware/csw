@@ -53,6 +53,7 @@ class EventServicePerfTest extends BasePerfSuite(EventServiceMultiNodeConfig) {
     enterBarrier("start-printing")
     runOn(subscriberNodes.head) {
       throughputPlots.printTable()
+      initialLatencyPlots.printTable()
       latencyPlots.printTable()
     }
     enterBarrier("results-printed")

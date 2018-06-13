@@ -50,3 +50,22 @@ final case class LatencyPlots(
     println("\n")
   }
 }
+
+final case class InitialLatencyPlots(
+    plot50: PlotResult = PlotResult(),
+    plot90: PlotResult = PlotResult(),
+    plot99: PlotResult = PlotResult(),
+) {
+  def printTable(): Unit = {
+    println("================================= First Event Latency in µs ================================================")
+    println("\t\t\t 50%tile \t\t 90%tile \t\t 99%tile \t")
+    println("============================================================================================================")
+
+    plot50.labels.zipWithIndex.foreach {
+      case (label, index) ⇒
+        println(s"$label: ${if (label.length < 6) "\t\t" else "\t"} ${plot50.results(index)} \t\t ${plot90
+          .results(index)} \t\t ${plot99.results(index)} \t")
+    }
+    println("\n")
+  }
+}
