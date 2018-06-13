@@ -1,20 +1,23 @@
 package csw.services.location.internal
 
-import akka.Done
-import akka.actor.{ActorSystem, CoordinatedShutdown}
+import akka.actor.{ActorSystem, CoordinatedShutdown, Scheduler}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.marshalling.Marshal
 import akka.http.scaladsl.model._
+import akka.http.scaladsl.model.sse.ServerSentEvent
 import akka.http.scaladsl.unmarshalling.Unmarshal
-import akka.stream.scaladsl.Source
+import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{KillSwitch, Materializer}
+import akka.{Done, NotUsed}
 import csw.messages.location._
+import csw.services.location.internal.StreamExt.RichSource
 import csw.services.location.javadsl.ILocationService
 import csw.services.location.models.{Registration, RegistrationResult}
 import csw.services.location.scaladsl.LocationService
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
 import io.circe.generic.auto._
-import io.circe.syntax._
+import io.circe.parser._
+import akka.http.scaladsl.unmarshalling.sse.EventStreamUnmarshalling._
 
 import scala.async.Async._
 import scala.concurrent.Future
@@ -26,6 +29,7 @@ class LocationServiceClient(implicit actorSystem: ActorSystem, mat: Materializer
     with LocationJsonSupport { outer =>
 
   import actorSystem.dispatcher
+  implicit val scheduler: Scheduler = actorSystem.scheduler
 
   override def register(registration: Registration): Future[RegistrationResult] = async {
     val uri            = Uri("http://localhost:7654/location/register")
@@ -103,38 +107,23 @@ class LocationServiceClient(implicit actorSystem: ActorSystem, mat: Materializer
     await(Unmarshal(responseEntity).to[List[AkkaLocation]])
   }
 
-  /**
-   * Tracks the connection and send events for modification or removal of its location
-   *
-   * @param connection the `connection` that is to be tracked
-   * @return A stream that emits events related to the connection. It can be cancelled using KillSwitch. This will stop giving
-   *         events for earlier tracked connection
-   */
-  override def track(connection: Connection): Source[TrackingEvent, KillSwitch] = ???
+  override def track(connection: Connection): Source[TrackingEvent, KillSwitch] = {
+    val uri     = Uri(s"http://localhost:7654/location/track/${connection.name}")
+    val request = HttpRequest(HttpMethods.GET, uri = uri)
+    val sseStreamFuture = async {
+      val responseEntity = await(Http().singleRequest(request)).entity
+      await(Unmarshal(responseEntity).to[Source[ServerSentEvent, NotUsed]])
+    }
+    val sseStream = Source.fromFuture(sseStreamFuture).flatMapConcat(identity)
+    sseStream.map(x => decode[TrackingEvent](x.data).right.get).cancellable
+  }
 
-  /**
-   * Subscribe to tracking events for a connection by providing a callback
-   * For each event the callback is invoked.
-   * Use this method if you do not want to handle materialization and happy with a side-effecting callback instead
-   *
-   * @param connection the `connection` that is to be tracked
-   * @param callback   the callback function of type `TrackingEvent` => Unit which gets executed on receiving any `TrackingEvent`
-   * @return a killswitch which can be shutdown to unsubscribe the consumer
-   */
-  override def subscribe(connection: Connection, callback: TrackingEvent => Unit): KillSwitch = ???
+  override def subscribe(connection: Connection, callback: TrackingEvent => Unit): KillSwitch = {
+    track(connection).to(Sink.foreach(callback)).run()
+  }
 
-  /**
-   * Shuts down the LocationService
-   *
-   * @see terminate method in [[csw.services.location.commons.CswCluster]]
-   * @note it is recommended not to perform any operation on LocationService after calling this method
-   * @param reason the reason explaining the shutdown
-   * @return a future which completes when the location service has shutdown successfully
-   */
-  override def shutdown(reason: CoordinatedShutdown.Reason): Future[Done] = ???
+  override def shutdown(reason: CoordinatedShutdown.Reason): Future[Done] =
+    Future.failed(new RuntimeException("can not shutdown via http-client"))
 
-  /**
-   * Returns the Java API for this instance of location service
-   */
-  override def asJava: ILocationService = ???
+  override def asJava: ILocationService = new JLocationServiceImpl(this)
 }
