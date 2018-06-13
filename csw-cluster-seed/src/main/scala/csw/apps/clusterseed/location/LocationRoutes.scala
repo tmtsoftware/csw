@@ -59,12 +59,8 @@ class LocationRoutes(locationService: LocationService, actorRuntime: ActorRuntim
         val stream: Source[ServerSentEvent, NotUsed] = locationService
           .track(connection)
           .mapMaterializedValue(_ => NotUsed)
-          .map { trackingEvent =>
-            ServerSentEvent(trackingEvent.asJson.noSpaces)
-          }
-        complete {
-          stream
-        }
+          .map(trackingEvent => ServerSentEvent(trackingEvent.asJson.noSpaces))
+        complete(stream)
       }
     } ~
     post {
