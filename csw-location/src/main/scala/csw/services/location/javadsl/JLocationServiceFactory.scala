@@ -44,6 +44,6 @@ object JLocationServiceFactory {
    */
   def withCluster(cswCluster: CswCluster): ILocationService = {
     val locationService = LocationServiceFactory.withCluster(cswCluster)
-    new JLocationServiceImpl(locationService, cswCluster)
+    new JLocationServiceImpl(locationService)(cswCluster.ec)
   }
 }
