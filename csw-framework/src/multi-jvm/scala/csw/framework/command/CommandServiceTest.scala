@@ -4,8 +4,8 @@ import akka.actor.Scheduler
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.{ActorMaterializer, Materializer}
-import akka.testkit.typed.TestKitSettings
-import akka.testkit.typed.scaladsl.TestProbe
+import akka.actor.testkit.typed.TestKitSettings
+import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.common.utils.LockCommandFactory

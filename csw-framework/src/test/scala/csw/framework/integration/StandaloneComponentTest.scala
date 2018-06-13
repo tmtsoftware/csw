@@ -6,8 +6,8 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
 import akka.stream.{ActorMaterializer, Materializer}
-import akka.testkit.typed.TestKitSettings
-import akka.testkit.typed.scaladsl.TestProbe
+import akka.actor.testkit.typed.TestKitSettings
+import akka.actor.testkit.typed.scaladsl.TestProbe
 import com.persist.JsonOps
 import com.persist.JsonOps.JsonObject
 import com.typesafe.config.ConfigFactory

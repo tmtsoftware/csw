@@ -1,6 +1,6 @@
 package csw.framework.internal.supervisor
 
-import akka.testkit.typed.scaladsl.TestProbe
+import akka.actor.testkit.typed.scaladsl.TestProbe
 import csw.framework.ComponentInfos._
 import csw.framework.FrameworkTestSuite
 import csw.framework.javadsl.commons.JComponentInfos.{jHcdInfo, jHcdInfoWithInitializeTimeout}

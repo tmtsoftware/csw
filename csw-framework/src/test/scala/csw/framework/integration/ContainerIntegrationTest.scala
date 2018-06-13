@@ -4,8 +4,8 @@ import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.scaladsl.{Keep, Sink}
 import akka.stream.{ActorMaterializer, Materializer}
-import akka.testkit.typed.TestKitSettings
-import akka.testkit.typed.scaladsl.TestProbe
+import akka.actor.testkit.typed.TestKitSettings
+import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.{actor, testkit}
 import com.typesafe.config.ConfigFactory
 import csw.common.FrameworkAssertions._

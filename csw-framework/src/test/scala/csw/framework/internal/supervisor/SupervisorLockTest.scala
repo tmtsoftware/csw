@@ -1,7 +1,7 @@
 package csw.framework.internal.supervisor
 
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.testkit.typed.scaladsl.TestProbe
+import akka.actor.testkit.typed.scaladsl.TestProbe
 import csw.common.components.framework.SampleComponentState.{choiceKey, initChoice, prefix}
 import csw.common.utils.LockCommandFactory
 import csw.framework.ComponentInfos.assemblyInfo

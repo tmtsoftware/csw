@@ -3,9 +3,9 @@ package csw.framework.internal.container
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.typed.{ActorRef, ActorSystem}
-import akka.testkit.typed.TestKitSettings
-import akka.testkit.typed.scaladsl.Effects.Watched
-import akka.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
+import akka.actor.testkit.typed.TestKitSettings
+import akka.actor.testkit.typed.scaladsl.Effects.Watched
+import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
 import akka.{actor, Done}
 import csw.framework.ComponentInfos._
 import csw.framework.FrameworkTestMocks

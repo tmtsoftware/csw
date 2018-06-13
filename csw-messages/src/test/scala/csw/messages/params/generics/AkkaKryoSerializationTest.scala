@@ -6,7 +6,7 @@ import java.time.Instant
 import akka.actor.{typed, ActorSystem}
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.serialization.SerializationExtension
-import akka.testkit.typed.scaladsl.TestProbe
+import akka.actor.testkit.typed.scaladsl.TestProbe
 import com.twitter.chill.akka.AkkaSerializer
 import csw.commons.tagobjects.FileSystemSensitive
 import csw.messages.commands.CommandResponse._

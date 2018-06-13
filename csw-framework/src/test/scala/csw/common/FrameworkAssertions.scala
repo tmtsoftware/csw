@@ -1,7 +1,7 @@
 package csw.common
 
 import akka.actor.typed.ActorRef
-import akka.testkit.typed.scaladsl.TestProbe
+import akka.actor.testkit.typed.scaladsl.TestProbe
 import com.persist.JsonOps.JsonObject
 import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState}
 import csw.messages.scaladsl.ComponentCommonMessage.GetSupervisorLifecycleState

@@ -3,7 +3,7 @@ package csw.framework.internal.supervisor
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.testkit.typed.scaladsl.TestProbe
+import akka.actor.testkit.typed.scaladsl.TestProbe
 import com.persist.JsonOps
 import com.persist.JsonOps.JsonObject
 import csw.common.FrameworkAssertions._

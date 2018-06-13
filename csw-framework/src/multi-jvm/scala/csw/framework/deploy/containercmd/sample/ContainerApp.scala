@@ -4,8 +4,8 @@ import akka.actor.ActorSystem
 import akka.actor.typed
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.testkit.typed.TestKitSettings
-import akka.testkit.typed.scaladsl.TestProbe
+import akka.actor.testkit.typed.TestKitSettings
+import akka.actor.testkit.typed.scaladsl.TestProbe
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.messages.framework.ContainerLifecycleState

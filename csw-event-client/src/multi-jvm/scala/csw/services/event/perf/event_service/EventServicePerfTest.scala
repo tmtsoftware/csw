@@ -4,7 +4,7 @@ import akka.Done
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.remote.testconductor.RoleName
 import akka.remote.testkit.MultiNodeConfig
-import akka.testkit.typed.scaladsl
+import akka.actor.testkit.typed.scaladsl
 import com.typesafe.config.ConfigFactory
 import csw.messages.params.models.Prefix
 import csw.services.event.perf.BasePerfSuite

@@ -4,7 +4,7 @@ import akka.actor.ActorSystem;
 import akka.actor.typed.internal.adapter.ActorSystemAdapter;
 import akka.stream.ActorMaterializer;
 import akka.stream.Materializer;
-import akka.testkit.typed.javadsl.TestProbe;
+import akka.actor.testkit.typed.javadsl.TestProbe;
 import akka.util.Timeout;
 import com.typesafe.config.ConfigFactory;
 import csw.common.components.framework.SampleComponentState;

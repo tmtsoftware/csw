@@ -2,7 +2,7 @@ package csw.services.event.perf.model_obs
 
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.remote.testkit.MultiNodeConfig
-import akka.testkit.typed.scaladsl
+import akka.actor.testkit.typed.scaladsl
 import com.typesafe.config.ConfigFactory
 import csw.services.event.perf.BasePerfSuite
 import csw.services.event.perf.commons.{EventsSetting, PerfPublisher, PerfSubscriber}

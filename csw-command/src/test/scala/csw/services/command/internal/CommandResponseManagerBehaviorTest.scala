@@ -4,8 +4,8 @@ import akka.actor
 import akka.actor.{typed, ActorSystem}
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
-import akka.testkit.typed.TestKitSettings
-import akka.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
+import akka.actor.testkit.typed.TestKitSettings
+import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
 import csw.messages.commands.{CommandCorrelation, CommandResponse, CommandResponseManagerState}
 import csw.messages.commands.CommandResponse.{Accepted, Completed, Error}
 import csw.messages.params.models.Id

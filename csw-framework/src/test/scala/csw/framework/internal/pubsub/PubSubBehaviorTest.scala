@@ -3,8 +3,8 @@ package csw.framework.internal.pubsub
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.typed.scaladsl.{Behaviors, MutableBehavior}
 import akka.actor.{typed, ActorSystem}
-import akka.testkit.typed.TestKitSettings
-import akka.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
+import akka.actor.testkit.typed.TestKitSettings
+import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
 import csw.framework.FrameworkTestMocks
 import csw.messages.framework
 import csw.messages.framework.PubSub.{Publish, Subscribe, Unsubscribe}

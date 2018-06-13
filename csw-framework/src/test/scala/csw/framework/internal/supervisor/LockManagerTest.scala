@@ -2,8 +2,8 @@ package csw.framework.internal.supervisor
 
 import akka.actor.{typed, ActorSystem}
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.testkit.typed.TestKitSettings
-import akka.testkit.typed.scaladsl.TestProbe
+import akka.actor.testkit.typed.TestKitSettings
+import akka.actor.testkit.typed.scaladsl.TestProbe
 import csw.messages.commands.CommandIssue.ComponentLockedIssue
 import csw.messages.commands.CommandResponse.NotAllowed
 import csw.messages.commands.{CommandName, CommandResponse, Setup}

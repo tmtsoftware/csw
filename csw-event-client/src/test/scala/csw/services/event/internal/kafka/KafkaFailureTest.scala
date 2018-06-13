@@ -1,7 +1,7 @@
 package csw.services.event.internal.kafka
 
 import akka.stream.scaladsl.Source
-import akka.testkit.typed.scaladsl.TestProbe
+import akka.actor.testkit.typed.scaladsl.TestProbe
 import csw.services.event.exceptions.PublishFailure
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.helpers.Utils

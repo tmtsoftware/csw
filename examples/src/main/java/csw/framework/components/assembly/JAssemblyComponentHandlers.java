@@ -3,7 +3,7 @@ package csw.framework.components.assembly;
 import akka.actor.typed.ActorRef;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Adapter;
-import akka.testkit.typed.javadsl.TestProbe;
+import akka.actor.testkit.typed.javadsl.TestProbe;
 import akka.util.Timeout;
 import csw.framework.exceptions.FailureRestart;
 import csw.framework.exceptions.FailureStop;

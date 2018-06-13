@@ -5,8 +5,8 @@ import java.util.Optional
 import akka.actor
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.typed.{ActorRef, ActorSystem}
-import akka.testkit.typed.TestKitSettings
-import akka.testkit.typed.scaladsl.TestProbe
+import akka.actor.testkit.typed.TestKitSettings
+import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.util.Timeout
 import csw.messages.commands.{Command, CommandName, Setup}
 import csw.messages.events.SystemEvent

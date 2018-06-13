@@ -2,7 +2,7 @@ package csw.services.event.internal.kafka;
 
 import akka.actor.typed.javadsl.Adapter;
 import akka.stream.javadsl.Source;
-import akka.testkit.typed.javadsl.TestProbe;
+import akka.actor.testkit.typed.javadsl.TestProbe;
 import csw.messages.events.Event;
 import csw.services.event.exceptions.PublishFailure;
 import csw.services.event.helpers.Utils;

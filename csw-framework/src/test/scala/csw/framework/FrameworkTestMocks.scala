@@ -1,9 +1,9 @@
 package csw.framework
 
+import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.adapter._
 import akka.actor.typed.{ActorRef, ActorSystem}
-import akka.testkit.typed.scaladsl.TestProbe
 import akka.{actor, testkit, Done}
 import csw.messages.commands.CommandResponse
 import csw.messages.framework.LifecycleStateChanged

@@ -4,8 +4,8 @@ import akka.actor.{ActorSystem, Props, Scheduler}
 import akka.actor.typed
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.adapter._
-import akka.testkit.typed.TestKitSettings
-import akka.testkit.typed.scaladsl.TestProbe
+import akka.actor.testkit.typed.TestKitSettings
+import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.util.Timeout
 import csw.messages.scaladsl.CommandMessage.Submit
 import csw.messages.commands.{CommandName, Setup}

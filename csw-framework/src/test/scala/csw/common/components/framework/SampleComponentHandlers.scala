@@ -34,8 +34,7 @@ class SampleComponentHandlers(
       eventService,
       loggerFactory: LoggerFactory
     ) {
-
-  val log: Logger                   = new LoggerFactory(componentInfo.name).getLogger(ctx)
+  val log: Logger                   = loggerFactory.getLogger(ctx)
   implicit val ec: ExecutionContext = ctx.executionContext
 
   import SampleComponentState._

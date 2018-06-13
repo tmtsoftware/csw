@@ -2,8 +2,8 @@ package csw.framework.internal.supervisor
 
 import akka.actor.typed.scaladsl.{Behaviors, TimerScheduler}
 import akka.actor.typed.{ActorRef, Terminated}
-import akka.testkit.typed.scaladsl.Effects.Spawned
-import akka.testkit.typed.scaladsl.{BehaviorTestKit, TestInbox, TestProbe}
+import akka.actor.testkit.typed.scaladsl.Effects.Spawned
+import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestInbox, TestProbe}
 import csw.common.components.framework.SampleComponentBehaviorFactory
 import csw.framework.ComponentInfos._
 import csw.framework.exceptions.{FailureStop, InitializationFailed}

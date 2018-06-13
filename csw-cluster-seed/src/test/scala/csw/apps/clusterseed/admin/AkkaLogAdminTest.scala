@@ -5,8 +5,8 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpMethods, HttpRequest, StatusCodes, Uri}
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.testkit.typed.TestKitSettings
-import akka.testkit.typed.scaladsl.TestProbe
+import akka.actor.testkit.typed.TestKitSettings
+import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.{ActorRef, ActorSystem}
 import com.typesafe.config.ConfigFactory
 import csw.apps.clusterseed.admin.http.HttpSupport

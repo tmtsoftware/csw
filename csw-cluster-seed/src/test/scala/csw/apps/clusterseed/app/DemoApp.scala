@@ -1,8 +1,8 @@
 package csw.apps.clusterseed.app
 
 import akka.actor.typed.scaladsl.adapter._
-import akka.testkit.typed.TestKitSettings
-import akka.testkit.typed.scaladsl.TestProbe
+import akka.actor.testkit.typed.TestKitSettings
+import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.{ActorRef, ActorSystem}
 import com.typesafe.config.ConfigFactory
 import csw.apps.clusterseed.admin.internal.AdminWiring

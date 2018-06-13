@@ -4,7 +4,7 @@ import akka.actor.Cancellable;
 import akka.stream.javadsl.Keep;
 import akka.stream.javadsl.Sink;
 import akka.stream.javadsl.Source;
-import akka.testkit.typed.javadsl.TestProbe;
+import akka.actor.testkit.typed.javadsl.TestProbe;
 import csw.messages.events.Event;
 import csw.messages.events.Event$;
 import csw.messages.events.EventKey;
