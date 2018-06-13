@@ -228,7 +228,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
     track(connection).to(Sink.foreach(callback)).run()
   }
 
-  override def asJava: ILocationService = new JLocationServiceImpl(this, cswCluster)
+  override def asJava: ILocationService = new JLocationServiceImpl(this)
 
   /**
    * Terminate the ActorSystem and gracefully leave the akka cluster
