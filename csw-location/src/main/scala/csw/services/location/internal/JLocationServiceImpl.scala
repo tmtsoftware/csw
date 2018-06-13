@@ -10,7 +10,6 @@ import akka.actor.CoordinatedShutdown.Reason
 import akka.stream.KillSwitch
 import akka.stream.javadsl.Source
 import csw.messages.location._
-import csw.services.location.commons.CswCluster
 import csw.services.location.javadsl.{ILocationService, IRegistrationResult}
 import csw.services.location.models._
 import csw.services.location.scaladsl.LocationService
@@ -18,11 +17,11 @@ import csw.services.location.scaladsl.LocationService
 import scala.collection.JavaConverters._
 import scala.compat.java8.FutureConverters._
 import scala.compat.java8.OptionConverters._
+import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.FiniteDuration
 
-private[location] class JLocationServiceImpl(locationService: LocationService, cswCluster: CswCluster) extends ILocationService {
-
-  import cswCluster._
+private[location] class JLocationServiceImpl(locationService: LocationService)(implicit ec: ExecutionContext)
+    extends ILocationService {
 
   override def register(registration: Registration): CompletableFuture[IRegistrationResult] =
     locationService.register(registration).map(registrationResult).toJava.toCompletableFuture
