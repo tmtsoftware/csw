@@ -1,21 +1,18 @@
 package csw.services.event.internal.redis
 
 import java.nio.ByteBuffer
-import java.nio.charset.Charset
 
 import csw.messages.events.Event
 import csw_protobuf.events.PbEvent
-import io.lettuce.core.codec.RedisCodec
+import io.lettuce.core.codec.{RedisCodec, Utf8StringCodec}
 
 object PatternBasedEventServiceCodec extends RedisCodec[String, Event] {
 
-  private val utf8Charset: Charset = Charset.forName("utf8")
+  private lazy val utf8StringCodec = new Utf8StringCodec()
 
-  override def encodeKey(eventKey: String): ByteBuffer =
-    utf8Charset.encode(eventKey)
+  override def encodeKey(eventKey: String): ByteBuffer = utf8StringCodec.encodeKey(eventKey)
 
-  override def decodeKey(byteBuf: ByteBuffer): String =
-    utf8Charset.decode(byteBuf).toString
+  override def decodeKey(byteBuf: ByteBuffer): String = utf8StringCodec.decodeKey(byteBuf)
 
   override def encodeValue(event: Event): ByteBuffer = {
     val pbEvent = Event.typeMapper.toBase(event)

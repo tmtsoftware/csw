@@ -375,6 +375,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     Thread.sleep(500) // Needed for redis set which is fire and forget operation
     val (subscription, seqF) = subscriber.subscribe(Set(eventKey)).take(2).toMat(Sink.seq)(Keep.both).run()
     subscription.ready.await
+    Thread.sleep(500) // Needed for getting the latest event
 
     publisher.publish(event3).await
 
