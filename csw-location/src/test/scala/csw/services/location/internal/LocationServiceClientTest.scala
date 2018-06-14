@@ -2,6 +2,7 @@ package csw.services.location.internal
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
+import akka.stream.scaladsl.Sink
 import csw.messages.location.Connection.TcpConnection
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.services.location.commons.ActorSystemFactory
@@ -27,8 +28,7 @@ class LocationServiceClientTest extends FunSuite with LocationJsonSupport {
     println(locationService.list.await)
     val registrationResult = locationService.register(registration).await
     println(locationService.list.await)
-//    registrationResult.unregister().await
-    locationService.unregisterAll().await
+    registrationResult.unregister().await
     println(locationService.list.await)
   }
 
@@ -36,7 +36,24 @@ class LocationServiceClientTest extends FunSuite with LocationJsonSupport {
     val registrationResult = locationService.register(registration).await
     println(locationService.list.await)
     println(locationService.find(tcpConnection).await)
-    registrationResult.unregister().await
+    locationService.unregisterAll().await
     println(locationService.list.await)
+  }
+
+  test("track") {
+    val switch = locationService.track(tcpConnection).to(Sink.foreach(println)).run()
+
+    val registrationResult = locationService.register(registration).await
+    Thread.sleep(1000)
+    registrationResult.unregister().await
+    Thread.sleep(1000)
+
+    switch.shutdown()
+    Thread.sleep(10000)
+
+    val registrationResult2 = locationService.register(registration).await
+    Thread.sleep(1000)
+    registrationResult2.unregister().await
+    Thread.sleep(1000)
   }
 }
