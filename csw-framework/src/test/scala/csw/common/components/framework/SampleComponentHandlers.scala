@@ -5,9 +5,11 @@ import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
 import csw.messages.commands.CommandIssue.OtherIssue
 import csw.messages.commands.CommandResponse.{Accepted, Completed, Invalid}
 import csw.messages.commands._
+import csw.messages.events.{Event, EventName, SystemEvent}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location.{LocationRemoved, LocationUpdated, TrackingEvent}
+import csw.messages.params.models.Prefix
 import csw.messages.params.states.{CurrentState, StateName}
 import csw.messages.scaladsl.TopLevelActorMessage
 import csw.services.command.scaladsl.CommandResponseManager
@@ -75,18 +77,34 @@ class SampleComponentHandlers(
   }
 
   // DEOPSCSW-372: Provide an API for PubSubActor that hides actor based interaction
-  private def processCommand(controlCommand: ControlCommand): Unit =
+  private def processCommand(controlCommand: ControlCommand): Unit = {
+
+    lazy val event = SystemEvent(Prefix("test"), EventName("system"))
+    def processEvent(prefix: Prefix): Event ⇒ Unit =
+      _ ⇒
+        currentStatePublisher.publish(
+          CurrentState(prefix, StateName("testStateName"), controlCommand.paramSet + choiceKey.set(eventReceivedChoice))
+      )
+
     controlCommand match {
+      case Setup(_, _, CommandName("publish.event.success"), _, _) ⇒
+        eventService.defaultPublisher.map(_.publish(event))
+
+      case Setup(_, somePrefix, CommandName("subscribe.event.success"), _, _) ⇒
+        eventService.defaultSubscriber.map(_.subscribeCallback(Set(event.eventKey), processEvent(somePrefix)))
+
       case Setup(_, somePrefix, _, _, _) ⇒
         currentStatePublisher.publish(
           CurrentState(somePrefix, StateName("testStateName"), controlCommand.paramSet + choiceKey.set(setupConfigChoice))
         )
+
       case Observe(_, somePrefix, _, _, _) ⇒
         currentStatePublisher.publish(
           CurrentState(somePrefix, StateName("testStateName"), controlCommand.paramSet + choiceKey.set(observeConfigChoice))
         )
       case _ ⇒
     }
+  }
 
   def validateCommand(command: ControlCommand): CommandResponse = {
     currentStatePublisher.publish(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(commandValidationChoice))))

@@ -24,6 +24,7 @@ object SampleComponentState {
   val httpLocationRemovedChoice = Choice("HttpLocationRemoved")
   val tcpLocationUpdatedChoice  = Choice("TcpLocationUpdated")
   val tcpLocationRemovedChoice  = Choice("TcpLocationRemoved")
+  val eventReceivedChoice       = Choice("EventReceived")
   val prefix                    = Prefix("wfos.prog.cloudcover")
   val successPrefix             = Prefix("wfos.prog.cloudcover.success")
   val failedPrefix              = Prefix("wfos.prog.cloudcover.failure")
@@ -46,7 +47,8 @@ object SampleComponentState {
       httpLocationUpdatedChoice,
       httpLocationRemovedChoice,
       tcpLocationUpdatedChoice,
-      tcpLocationRemovedChoice
+      tcpLocationRemovedChoice,
+      eventReceivedChoice
     )
   val choiceKey: GChoiceKey          = ChoiceKey.make("choiceKey", choices)
   val httpConnection: HttpConnection = HttpConnection(ComponentId("exampleHTTPService", ComponentType.Service))
