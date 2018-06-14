@@ -24,7 +24,7 @@ import scala.concurrent.duration.DurationLong
 import scala.concurrent.{Await, ExecutionContextExecutor}
 
 class EventServiceIntegrationTest extends FunSuite with Matchers with BeforeAndAfterAll {
-  val seedPort                      = 3552
+  val seedPort                      = 3557
   val sentinelPort                  = 26379
   val serverPort                    = 6379
   private val props: RedisTestProps = RedisTestProps.createRedisProperties(seedPort, sentinelPort, serverPort)

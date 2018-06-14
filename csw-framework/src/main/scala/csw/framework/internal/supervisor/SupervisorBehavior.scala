@@ -137,8 +137,7 @@ private[framework] final class SupervisorBehavior(
    * @return the existing behavior
    */
   override def onSignal: PartialFunction[Signal, Behavior[SupervisorMessage]] = {
-    case ter @ Terminated(componentRef) ⇒
-      ter.failure.foreach(println)
+    case Terminated(componentRef) ⇒
       log.warn(s"Supervisor in lifecycle state :[$lifecycleState] received terminated signal from component :[$componentRef]")
       timerScheduler.cancel(InitializeTimerKey)
 
