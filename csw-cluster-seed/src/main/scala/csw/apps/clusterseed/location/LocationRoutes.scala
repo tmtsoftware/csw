@@ -15,7 +15,7 @@ import io.circe.generic.auto._
 import io.circe.syntax._
 import akka.http.scaladsl.marshalling.sse.EventStreamMarshalling._
 
-import scala.concurrent.duration.{Duration, FiniteDuration}
+import scala.concurrent.duration.{Duration, DurationLong, FiniteDuration}
 
 class LocationRoutes(locationService: LocationService, actorRuntime: ActorRuntime)
     extends FailFastCirceSupport
@@ -64,6 +64,7 @@ class LocationRoutes(locationService: LocationService, actorRuntime: ActorRuntim
           }
           .mapMaterializedValue(_ => NotUsed)
           .map(trackingEvent => ServerSentEvent(trackingEvent.asJson.noSpaces))
+          .keepAlive(2.second, () => ServerSentEvent.heartbeat)
         complete(stream)
       }
     } ~
