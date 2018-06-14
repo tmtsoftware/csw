@@ -6,7 +6,7 @@ import akka.http.scaladsl.marshalling.Marshal
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.sse.ServerSentEvent
 import akka.http.scaladsl.unmarshalling.Unmarshal
-import akka.stream.scaladsl.{Sink, Source}
+import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.{KillSwitch, Materializer}
 import akka.{Done, NotUsed}
 import csw.messages.location._
