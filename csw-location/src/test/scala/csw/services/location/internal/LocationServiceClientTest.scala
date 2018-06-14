@@ -49,7 +49,7 @@ class LocationServiceClientTest extends FunSuite with LocationJsonSupport {
     Thread.sleep(1000)
 
     switch.shutdown()
-    Thread.sleep(10000)
+    Thread.sleep(5000)
 
     val registrationResult2 = locationService.register(registration).await
     Thread.sleep(1000)
