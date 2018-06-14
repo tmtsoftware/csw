@@ -29,11 +29,13 @@ class EventServiceIntegrationTest extends FunSuite with Matchers with BeforeAndA
   val serverPort                    = 6379
   private val props: RedisTestProps = RedisTestProps.createRedisProperties(seedPort, sentinelPort, serverPort)
 
-  implicit val typedSystem: ActorSystem[_]      = props.typedActorSystem
-  implicit val testKitSettings: TestKitSettings = TestKitSettings(typedSystem)
+  implicit val typedSystem: ActorSystem[_] = props.typedActorSystem
+  val systemToJoinCluster                  = ClusterSettings().joinLocal(seedPort).system
 
-  private val filterAssemblyConnection = AkkaConnection(ComponentId("Filter", Assembly))
-  private val disperserHcdConnection   = AkkaConnection(ComponentId("Disperser", HCD))
+  implicit val testKitSettings: TestKitSettings = TestKitSettings(typedSystem)
+  private val filterAssemblyConnection          = AkkaConnection(ComponentId("Filter", Assembly))
+
+  private val disperserHcdConnection = AkkaConnection(ComponentId("Disperser", HCD))
 
   override protected def beforeAll(): Unit = {
     props.start()
@@ -41,11 +43,11 @@ class EventServiceIntegrationTest extends FunSuite with Matchers with BeforeAndA
 
   override protected def afterAll(): Unit = {
     props.shutdown()
-    Await.result(typedSystem.terminate(), 5.seconds)
+    Await.result(systemToJoinCluster.terminate(), 5.seconds)
   }
 
   test("should be able to publish and subscribe to events") {
-    val wiring: FrameworkWiring               = FrameworkWiring.make(ClusterSettings().joinLocal(seedPort).system)
+    val wiring: FrameworkWiring               = FrameworkWiring.make(systemToJoinCluster)
     implicit val ec: ExecutionContextExecutor = typedSystem.executionContext
 
     val containerRef = Await.result(Container.spawn(ConfigFactory.load("container_tracking_connections.conf"), wiring), 5.seconds)
