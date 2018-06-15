@@ -1,10 +1,11 @@
 package csw.services.location.scaladsl
 
+import akka.actor.ActorSystem
 import csw.messages.location.Connection.TcpConnection
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.location.commons.TestFutureExtension.RichFuture
-import csw.services.location.commons.{ClusterSettings, CswCluster, RegistrationFactory}
+import csw.services.location.commons._
 import csw.services.location.internal.Networks
 import csw.services.location.models.TcpRegistration
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
@@ -12,6 +13,9 @@ import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 import scala.concurrent.duration.DurationInt
 
 class MultiActorSystemTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
+
+  implicit val actorSystem: ActorSystem = ActorSystemFactory.remote()
+  val RegistrationFactory               = new RegistrationFactory2
 
   val connection: TcpConnection        = TcpConnection(ComponentId("exampleTCPService", ComponentType.Service))
   val tcpRegistration: TcpRegistration = RegistrationFactory.tcp(connection, 1234)
