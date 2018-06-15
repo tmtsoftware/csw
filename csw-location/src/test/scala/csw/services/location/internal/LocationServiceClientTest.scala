@@ -56,4 +56,5 @@ class LocationServiceClientTest extends FunSuite with LocationJsonSupport {
     registrationResult2.unregister().await
     Thread.sleep(1000)
   }
+
 }

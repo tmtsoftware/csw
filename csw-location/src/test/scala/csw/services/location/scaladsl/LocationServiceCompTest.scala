@@ -11,9 +11,9 @@ import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location._
 import csw.services.location.commons.TestFutureExtension.RichFuture
-import csw.services.location.commons.{ActorSystemFactory, RegistrationFactory}
+import csw.services.location.commons.{ActorSystemFactory, RegistrationFactory2}
 import csw.services.location.exceptions.OtherLocationIsRegistered
-import csw.services.location.internal.Networks
+import csw.services.location.internal.{LocationServiceClient, Networks}
 import csw.services.location.models._
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.scalatest.concurrent.Eventually
@@ -27,19 +27,22 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
   InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
 
-  lazy val locationService: LocationService = LocationServiceFactory.make()
+//  lazy val locationService: LocationService = LocationServiceFactory.make()
 
-  implicit val actorSystem: ActorSystem = ActorSystemFactory.remote("test")
-  implicit val mat: Materializer        = ActorMaterializer()
+  implicit val actorSystem: ActorSystem        = ActorSystemFactory.remote("test")
+  implicit val mat: Materializer               = ActorMaterializer()
+  private val locationService: LocationService = new LocationServiceClient()
 
   implicit val patience: PatienceConfig =
     PatienceConfig(Span(5, org.scalatest.time.Seconds), Span(100, org.scalatest.time.Millis))
+
+  val RegistrationFactory = new RegistrationFactory2
 
   override protected def afterEach(): Unit =
     locationService.unregisterAll().await
 
   override protected def afterAll(): Unit = {
-    locationService.shutdown(TestFinishedReason).await
+//    locationService.shutdown(TestFinishedReason).await
     actorSystem.terminate().await
   }
 
@@ -269,7 +272,7 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
     httpProbe.expectNoMessage(200.millis)
   }
 
-  test("should not register a different Registration(connection + port/URI/actorRef) against already registered name") {
+  test("ddd should not register a different Registration(connection + port/URI/actorRef) against already registered name") {
     val connection = TcpConnection(ComponentId("redis4", ComponentType.Service))
 
     val duplicateTcpRegistration = RegistrationFactory.tcp(connection, 1234)
