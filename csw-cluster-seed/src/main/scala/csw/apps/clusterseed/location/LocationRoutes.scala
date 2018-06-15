@@ -23,64 +23,66 @@ class LocationRoutes(locationService: LocationService, actorRuntime: ActorRuntim
 
   import actorRuntime._
 
-  val routes: Route = pathPrefix("location") {
-    get {
-      path("list") {
-        parameters(("componentType".?, "connectionType".?, "hostname".?, "prefix".?)) {
-          case (None, None, None, None) =>
-            complete(locationService.list)
-          case (Some(componentName), None, None, None) =>
-            complete(locationService.list(ComponentType.withNameInsensitive(componentName)))
-          case (None, Some(connectionType), None, None) =>
-            complete(locationService.list(ConnectionType.withNameInsensitive(connectionType)))
-          case (None, None, Some(hostname), None) =>
-            complete(locationService.list(hostname))
-          case (None, None, None, Some(prefix)) =>
-            complete(locationService.listByPrefix(prefix))
-          case _ =>
-            complete("asdasd")
-        }
-      } ~
-      path("find" / Segment) { connectionName =>
-        complete(
-          locationService.find(Connection.from(connectionName).asInstanceOf[TypedConnection[Location]])
-        )
-      } ~
-      path("resolve" / Segment) { connectionName =>
-        parameter("within".as[String]) { within =>
-          val duration = Duration(within).asInstanceOf[FiniteDuration]
-          complete(
-            locationService.resolve(Connection.from(connectionName).asInstanceOf[TypedConnection[Location]], duration)
-          )
-        }
-      } ~
-      path("track" / Segment) { connectionName =>
-        val connection = Connection.from(connectionName)
-        val stream: Source[ServerSentEvent, NotUsed] = locationService
-          .track(connection)
-          .map { x =>
-            println(s"*****************$x")
-            x
+  val routes: Route = rejectEmptyResponse {
+    pathPrefix("location") {
+      get {
+        path("list") {
+          parameters(("componentType".?, "connectionType".?, "hostname".?, "prefix".?)) {
+            case (None, None, None, None) =>
+              complete(locationService.list)
+            case (Some(componentName), None, None, None) =>
+              complete(locationService.list(ComponentType.withNameInsensitive(componentName)))
+            case (None, Some(connectionType), None, None) =>
+              complete(locationService.list(ConnectionType.withNameInsensitive(connectionType)))
+            case (None, None, Some(hostname), None) =>
+              complete(locationService.list(hostname))
+            case (None, None, None, Some(prefix)) =>
+              complete(locationService.listByPrefix(prefix))
+            case _ =>
+              complete("asdasd")
           }
-          .mapMaterializedValue(_ => NotUsed)
-          .map(trackingEvent => ServerSentEvent(trackingEvent.asJson.noSpaces))
-          .keepAlive(2.second, () => ServerSentEvent.heartbeat)
-        complete(stream)
-      }
-    } ~
-    post {
-      path("register") {
-        entity(as[Registration]) { registration =>
-          complete(locationService.register(registration).map(_.location))
+        } ~
+        path("find" / Segment) { connectionName =>
+          complete(
+            locationService.find(Connection.from(connectionName).asInstanceOf[TypedConnection[Location]])
+          )
+        } ~
+        path("resolve" / Segment) { connectionName =>
+          parameter("within") { within =>
+            val duration = Duration(within).asInstanceOf[FiniteDuration]
+            complete {
+              locationService.resolve(Connection.from(connectionName).asInstanceOf[TypedConnection[Location]], duration)
+            }
+          }
+        } ~
+        path("track" / Segment) { connectionName =>
+          val connection = Connection.from(connectionName)
+          val stream: Source[ServerSentEvent, NotUsed] = locationService
+            .track(connection)
+            .map { x =>
+              println(s"*****************$x")
+              x
+            }
+            .mapMaterializedValue(_ => NotUsed)
+            .map(trackingEvent => ServerSentEvent(trackingEvent.asJson.noSpaces))
+            .keepAlive(2.second, () => ServerSentEvent.heartbeat)
+          complete(stream)
         }
       } ~
-      path("unregister") {
-        entity(as[Connection]) { connection =>
-          complete(locationService.unregister(connection))
+      post {
+        path("register") {
+          entity(as[Registration]) { registration =>
+            complete(locationService.register(registration).map(_.location))
+          }
+        } ~
+        path("unregister") {
+          entity(as[Connection]) { connection =>
+            complete(locationService.unregister(connection))
+          }
+        } ~
+        path("unregisterAll") {
+          complete(locationService.unregisterAll())
         }
-      } ~
-      path("unregisterAll") {
-        complete(locationService.unregisterAll())
       }
     }
   }

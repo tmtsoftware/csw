@@ -21,7 +21,7 @@ import csw.messages.location.Connection.TcpConnection;
 import csw.messages.commons.CoordinatedShutdownReasons;
 import csw.services.location.commons.ActorSystemFactory;
 import csw.services.location.commons.Constants;
-import csw.services.location.commons.RegistrationFactory;
+import csw.services.location.commons.RegistrationFactory2;
 import csw.services.location.internal.Networks;
 import csw.services.location.models.AkkaRegistration;
 import csw.services.location.models.HttpRegistration;
@@ -59,6 +59,9 @@ public class JLocationServiceImplTest {
     private ComponentId httpServiceComponentId = new ComponentId("exampleHTTPService", JComponentType.Service);
     private HttpConnection httpServiceConnection = new HttpConnection(httpServiceComponentId);
     private String Path = "/path/to/resource";
+
+    private RegistrationFactory2 RegistrationFactory  = new RegistrationFactory2(actorSystem);
+
 
     @After
     public void unregisterAllServices() throws ExecutionException, InterruptedException {
