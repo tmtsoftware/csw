@@ -149,5 +149,4 @@ class BasePerfSuite(config: MultiNodeConfig)
       plot99 = initialLatencyPlots.plot99.addAll(aggregatedResult.initialLatencyPlots.plot99)
     )
   }
-
 }

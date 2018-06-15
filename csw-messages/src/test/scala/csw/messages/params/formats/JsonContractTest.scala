@@ -19,6 +19,7 @@ import scala.io.Source
 // DEOPSCSW-282: Add a timestamp Key and Parameter
 // DEOPSCSW-184: Change configurations - attributes and values
 // DEOPSCSW-423: Introduce name for CurrentState and DemandState
+// DEOPSCSW-401: Remove implicit apply method from prefix
 class JsonContractTest extends FunSpec with Matchers {
 
   private val prefix: Prefix       = Prefix("wfos.blue.filter")
