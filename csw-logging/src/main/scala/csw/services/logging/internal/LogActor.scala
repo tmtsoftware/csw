@@ -203,7 +203,7 @@ private[logging] class LogActor(
 
   private def receiveLogAkkaMessage(logAkka: LogAkka): Unit =
     if (logAkka.level.pos >= akkaLogLevel.pos) {
-      val msg1 = if (logAkka.msg.toString.isEmpty) "UNKNOWN" else logAkka.msg
+      val msg1 = if (logAkka.msg == null) "UNKNOWN" else logAkka.msg
       var jsonObject = JsonObject(
         LoggingKeys.TIMESTAMP -> TMTDateTimeFormatter.format(logAkka.time),
         LoggingKeys.KIND      -> "akka",
