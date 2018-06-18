@@ -348,11 +348,12 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
 
     val (subscription, seqF) = subscriber.subscribe(Set(event1.eventKey)).take(2).toMat(Sink.seq)(Keep.both).run()
     subscription.ready.await
-    Thread.sleep(100)
+    Thread.sleep(200)
     publisher.publish(event1).await
 
     val (subscription2, seqF2) = subscriber.subscribe(Set(event2.eventKey)).take(2).toMat(Sink.seq)(Keep.both).run()
     subscription2.ready.await
+    Thread.sleep(200)
     publisher.publish(event2).await
 
     seqF.await.toSet shouldBe Set(Event.invalidEvent(event1.eventKey), event1)
