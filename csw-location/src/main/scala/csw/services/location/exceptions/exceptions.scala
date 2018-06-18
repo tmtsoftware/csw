@@ -6,9 +6,10 @@ import csw.messages.location.{Connection, Location}
 /**
  * An Exception representing failure in registration
  *
- * @param connection a connection for which registration failed
  */
-case class RegistrationFailed(connection: Connection) extends RuntimeException(s"unable to register $connection")
+case class RegistrationFailed(msg: String) extends RuntimeException(msg) {
+  def this(connection: Connection) = this(s"unable to register $connection")
+}
 
 /**
  * An Exception representing failure in un-registration
@@ -23,13 +24,11 @@ case class UnregistrationFailed(connection: Connection)
 /**
  * An Exception representing failure in registration as other location is already registered in place of the given location
  *
- * @param location the location which is supposed to be registered
- * @param otherLocation the location which already registered
  */
-case class OtherLocationIsRegistered(location: Location, otherLocation: Location)
-    extends RuntimeException(
-      s"there is other location=$otherLocation registered against name=${location.connection.name}."
-    )
+case class OtherLocationIsRegistered(msg: String) extends RuntimeException(msg) {
+  def this(location: Location, otherLocation: Location) =
+    this(s"there is other location=$otherLocation registered against name=${location.connection.name}.")
+}
 
 /**
  * An Exception representing failure in registering non remote actors

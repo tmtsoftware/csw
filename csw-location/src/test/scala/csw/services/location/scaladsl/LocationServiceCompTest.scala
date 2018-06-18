@@ -272,7 +272,7 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
     httpProbe.expectNoMessage(200.millis)
   }
 
-  test("ddd should not register a different Registration(connection + port/URI/actorRef) against already registered name") {
+  test("should not register a different Registration(connection + port/URI/actorRef) against already registered name") {
     val connection = TcpConnection(ComponentId("redis4", ComponentType.Service))
 
     val duplicateTcpRegistration = RegistrationFactory.tcp(connection, 1234)

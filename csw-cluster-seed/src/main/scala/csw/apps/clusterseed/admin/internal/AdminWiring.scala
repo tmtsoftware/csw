@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.apps.clusterseed.admin.LogAdmin
 import csw.apps.clusterseed.admin.http.{AdminHandlers, AdminHttpService, AdminRoutes}
-import csw.apps.clusterseed.location.{LocationHttpService, LocationRoutes}
+import csw.apps.clusterseed.location.{LocationExceptionHandler, LocationHttpService, LocationRoutes}
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 
@@ -20,7 +20,8 @@ private[clusterseed] class AdminWiring {
   lazy val adminHandlers                      = new AdminHandlers
   lazy val adminRoutes                        = new AdminRoutes(logAdmin, actorRuntime, adminHandlers)
   lazy val adminHttpService: AdminHttpService = new AdminHttpService(adminRoutes, actorRuntime, settings)
-  lazy val locationRoutes                     = new LocationRoutes(locationService, actorRuntime)
+  lazy val locationExceptionHandler           = new LocationExceptionHandler
+  lazy val locationRoutes                     = new LocationRoutes(locationService, locationExceptionHandler, actorRuntime)
   lazy val locationHttpService                = new LocationHttpService(locationRoutes, actorRuntime)
 }
 
