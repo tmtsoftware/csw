@@ -24,16 +24,16 @@ object Standalone {
       wiring: FrameworkWiring
   ): Future[ActorRef[ComponentMessage]] = {
     import wiring._
-    val componentInfo = ConfigParser.parseStandalone(config)
+    val componentInfo      = ConfigParser.parseStandalone(config)
+    val cswFrameworkSystem = new CswFrameworkSystem(actorSystem)
     val supervisorBehavior = SupervisorBehaviorFactory.make(
       None,
       componentInfo,
       locationService,
-      eventService,
+      eventServiceFactory,
       registrationFactory,
       commandResponseManagerFactory
     )
-    val cswFrameworkSystem = new CswFrameworkSystem(actorSystem)
     cswFrameworkSystem.spawnTyped(supervisorBehavior, componentInfo.name)
   }
 }

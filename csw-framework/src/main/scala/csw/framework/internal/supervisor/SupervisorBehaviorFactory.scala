@@ -6,7 +6,7 @@ import csw.framework.scaladsl.ComponentBehaviorFactory
 import csw.messages.framework.ComponentInfo
 import csw.messages.scaladsl.{ComponentMessage, ContainerIdleMessage, SupervisorMessage}
 import csw.services.command.internal.CommandResponseManagerFactory
-import csw.services.event.scaladsl.EventService
+import csw.services.event.internal.commons.EventServiceFactory
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.LoggerFactory
 
@@ -19,7 +19,7 @@ private[framework] object SupervisorBehaviorFactory {
       containerRef: Option[ActorRef[ContainerIdleMessage]],
       componentInfo: ComponentInfo,
       locationService: LocationService,
-      eventService: EventService,
+      eventServiceFactory: EventServiceFactory,
       registrationFactory: RegistrationFactory,
       commandResponseManagerFactory: CommandResponseManagerFactory
   ): Behavior[ComponentMessage] = {
@@ -33,7 +33,7 @@ private[framework] object SupervisorBehaviorFactory {
       containerRef,
       componentInfo,
       locationService,
-      eventService,
+      eventServiceFactory,
       registrationFactory,
       componentBehaviorFactory,
       commandResponseManagerFactory,
@@ -46,7 +46,7 @@ private[framework] object SupervisorBehaviorFactory {
       containerRef: Option[ActorRef[ContainerIdleMessage]],
       componentInfo: ComponentInfo,
       locationService: LocationService,
-      eventService: EventService,
+      eventServiceFactory: EventServiceFactory,
       registrationFactory: RegistrationFactory,
       componentBehaviorFactory: ComponentBehaviorFactory,
       commandResponseManagerFactory: CommandResponseManagerFactory,
@@ -67,7 +67,7 @@ private[framework] object SupervisorBehaviorFactory {
                   commandResponseManagerFactory,
                   registrationFactory,
                   locationService,
-                  eventService,
+                  eventServiceFactory,
                   loggerFactory
               )
           )

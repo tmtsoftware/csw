@@ -16,7 +16,7 @@ private[csw] object Container {
     import wiring._
     val containerInfo = ConfigParser.parseContainer(config)
     val containerBehavior: Behavior[ContainerActorMessage] =
-      ContainerBehaviorFactory.behavior(containerInfo, locationService, eventService, registrationFactory)
+      ContainerBehaviorFactory.behavior(containerInfo, locationService, eventServiceFactory, registrationFactory)
     val cswFrameworkSystem = new CswFrameworkSystem(actorSystem)
     cswFrameworkSystem.spawnTyped(containerBehavior, containerInfo.name)
   }

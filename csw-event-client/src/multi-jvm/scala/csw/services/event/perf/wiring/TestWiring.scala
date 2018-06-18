@@ -2,13 +2,13 @@ package csw.services.event.perf.wiring
 
 import akka.actor
 import akka.actor.typed.ActorSystem
-
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Materializer, Supervision}
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.internal.kafka.KafkaEventServiceFactory
 import csw.services.event.internal.redis.RedisEventServiceFactory
 import csw.services.event.scaladsl._
+import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar
 
 import scala.concurrent.ExecutionContext
@@ -23,8 +23,8 @@ class TestWiring(val actorSystem: actor.ActorSystem) extends MockitoSugar {
     ActorMaterializerSettings(actorSystem).withSupervisionStrategy(Supervision.getResumingDecider)
   implicit lazy val resumingMat: Materializer = ActorMaterializer(settings)(actorSystem)
 
-  private lazy val redisEventService = RedisEventServiceFactory.make(redisHost, redisPort)
-  private lazy val kafkaEventService = KafkaEventServiceFactory.make(kafkaHost, kafkaPort)
+  private lazy val redisEventService = new RedisEventServiceFactory(RedisClient.create()).make(redisHost, redisPort)
+  private lazy val kafkaEventService = new KafkaEventServiceFactory().make(kafkaHost, kafkaPort)
 
   def publisher: EventPublisher =
     if (redisEnabled) redisEventService.makeNewPublisher().await else kafkaEventService.makeNewPublisher().await

@@ -11,17 +11,17 @@ import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.messages.commands
 import csw.messages.commands.CommandName
 import csw.messages.framework.ContainerLifecycleState
+import csw.messages.location.ComponentId
 import csw.messages.location.ComponentType.{Assembly, HCD}
-import csw.messages.location.Connection.{AkkaConnection, TcpConnection}
-import csw.messages.location.{ComponentId, ComponentType}
+import csw.messages.location.Connection.AkkaConnection
 import csw.messages.params.states.{CurrentState, StateName}
 import csw.services.command.scaladsl.CommandService
 import csw.services.event.internal.redis.RedisTestProps
 import csw.services.location.commons.ClusterSettings
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
+import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
-import scala.concurrent.{Await, ExecutionContextExecutor}
 
 class EventServiceIntegrationTest extends FunSuite with Matchers with BeforeAndAfterAll {
   val seedPort                      = 3557
@@ -47,8 +47,7 @@ class EventServiceIntegrationTest extends FunSuite with Matchers with BeforeAndA
   }
 
   test("should be able to publish and subscribe to events") {
-    val wiring: FrameworkWiring               = FrameworkWiring.make(systemToJoinCluster)
-    implicit val ec: ExecutionContextExecutor = typedSystem.executionContext
+    val wiring: FrameworkWiring = FrameworkWiring.make(systemToJoinCluster)
 
     val containerRef = Await.result(Container.spawn(ConfigFactory.load("container_tracking_connections.conf"), wiring), 5.seconds)
 

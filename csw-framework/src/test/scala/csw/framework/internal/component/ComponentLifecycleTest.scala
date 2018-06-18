@@ -56,10 +56,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     val componentBehaviorTestKit: BehaviorTestKit[TopLevelActorMessage] =
       BehaviorTestKit(behavior.asInstanceOf[Behavior[TopLevelActorMessage]])
 
-//    val runningComponentBehavior: Behavior[TopLevelActorMessage] = {
     componentBehaviorTestKit.run(Initialize)
-//      componentBehaviorTestKit.returnedBehavior
-//    }
   }
 
   test("running component should handle RunOffline lifecycle message") {

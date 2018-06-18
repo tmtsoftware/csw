@@ -18,7 +18,7 @@ import csw.messages.scaladsl.FromSupervisorMessage.SupervisorLifecycleStateChang
 import csw.messages.scaladsl.RunningMessage.Lifecycle
 import csw.messages.scaladsl.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.messages.scaladsl.{ComponentMessage, ContainerActorMessage, ContainerCommonMessage, ContainerIdleMessage}
-import csw.services.event.scaladsl.EventService
+import csw.services.event.internal.commons.EventServiceFactory
 import csw.services.location.models._
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
@@ -42,7 +42,7 @@ private[framework] final class ContainerBehavior(
     supervisorInfoFactory: SupervisorInfoFactory,
     registrationFactory: RegistrationFactory,
     locationService: LocationService,
-    eventService: EventService,
+    eventServiceFactory: EventServiceFactory,
     loggerFactory: LoggerFactory
 ) extends MutableBehavior[ContainerActorMessage] {
 
@@ -156,7 +156,7 @@ private[framework] final class ContainerBehavior(
     log.info(s"Container is creating following components :[${componentInfos.map(_.name).mkString(", ")}]")
     Future
       .traverse(componentInfos) { ci ⇒
-        supervisorInfoFactory.make(ctx.self, ci, locationService, eventService, registrationFactory)
+        supervisorInfoFactory.make(ctx.self, ci, locationService, eventServiceFactory, registrationFactory)
       }
       .foreach(x ⇒ {
         ctx.self ! SupervisorsCreated(x.flatten)

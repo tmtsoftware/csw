@@ -66,7 +66,7 @@ private[csw] abstract class FrameworkTestSuite extends FunSuite with Matchers wi
       Some(containerRef),
       componentInfo,
       locationService,
-      eventService,
+      eventServiceFactory,
       registrationFactory,
       commandResponseManagerFactory
     )

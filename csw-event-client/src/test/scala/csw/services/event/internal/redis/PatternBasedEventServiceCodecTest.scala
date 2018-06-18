@@ -3,7 +3,7 @@ package csw.services.event.internal.redis
 import java.nio.ByteBuffer
 
 import akka.util.ByteString
-import csw.messages.events.{Event, EventKey, EventName, SystemEvent}
+import csw.messages.events.{Event, EventName, SystemEvent}
 import csw.messages.params.models.Prefix
 import org.scalatest.{FunSuite, Matchers}
 

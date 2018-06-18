@@ -4,7 +4,6 @@ import akka.actor.{ActorSystem, CoordinatedShutdown}
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.internal.commons.javawrappers.JEventService
-import csw.services.event.internal.commons.serviceresolver.EventServiceLocationResolver
 import csw.services.event.internal.wiring.BaseProperties
 import csw.services.event.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
 import csw.services.event.scaladsl._
@@ -34,8 +33,11 @@ class RedisTestProps(
     .quorumSize(1)
     .build()
   override val eventPattern: String = "*sys*"
-  val eventService: EventService    = new RedisEventService(new EventServiceLocationResolver(locationService), masterId, redisClient)
-  val jEventService: IEventService  = new JEventService(eventService)
+
+  private val eventServiceFactory = new RedisEventServiceFactory(redisClient)
+
+  val eventService: EventService   = eventServiceFactory.make(locationService)
+  val jEventService: IEventService = new JEventService(eventService)
 
   val publisher: EventPublisher   = eventService.defaultPublisher.await
   val subscriber: EventSubscriber = eventService.defaultSubscriber.await

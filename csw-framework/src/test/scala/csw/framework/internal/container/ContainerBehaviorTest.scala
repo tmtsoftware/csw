@@ -1,11 +1,11 @@
 package csw.framework.internal.container
 
-import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.Effects.Watched
 import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
+import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.{actor, Done}
 import csw.framework.ComponentInfos._
 import csw.framework.FrameworkTestMocks
@@ -19,7 +19,7 @@ import csw.messages.scaladsl.FromSupervisorMessage.SupervisorLifecycleStateChang
 import csw.messages.scaladsl.RunningMessage.Lifecycle
 import csw.messages.scaladsl.SupervisorContainerCommonMessages.Restart
 import csw.messages.scaladsl.{ComponentMessage, ContainerActorMessage, ContainerIdleMessage}
-import csw.services.event.scaladsl.EventService
+import csw.services.event.internal.commons.EventServiceFactory
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
@@ -45,7 +45,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     private val testActor: ActorRef[Any]                  = TestProbe("test-probe").ref
     val akkaRegistration                                  = AkkaRegistration(mock[AkkaConnection], Some("nfiraos.ncc.trombone"), testActor, testActor)
     val locationService: LocationService                  = mock[LocationService]
-    val eventService: EventService                        = mock[EventService]
+    val eventService: EventServiceFactory                 = mock[EventServiceFactory]
     val registrationResult: RegistrationResult            = mock[RegistrationResult]
     var supervisorInfos: Set[SupervisorInfo]              = Set.empty
     var componentProbes: Set[TestProbe[ComponentMessage]] = Set.empty
@@ -76,7 +76,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
           any[ActorRef[ContainerIdleMessage]],
           any[ComponentInfo],
           any[LocationService],
-          any[EventService],
+          any[EventServiceFactory],
           any[RegistrationFactory]
         )
     ).thenAnswer(answer)
@@ -219,6 +219,5 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     // verify that Container LifecycleState does not change on receiving GoOffline message
     containerBehaviorTestkit.run(GetContainerLifecycleState(containerLifecycleStateProbe.ref))
     containerLifecycleStateProbe.expectMessage(newLifecycleState)
-
   }
 }

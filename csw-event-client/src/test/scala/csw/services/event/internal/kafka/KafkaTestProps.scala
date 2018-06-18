@@ -25,8 +25,10 @@ class KafkaTestProps(
   private val brokerProperties = Map("listeners" → brokers, "advertised.listeners" → brokers) ++ additionalBrokerProps
   val config                   = EmbeddedKafkaConfig(customBrokerProperties = brokerProperties)
 
-  val eventService: EventService   = KafkaEventServiceFactory.make(locationService)(typedActorSystem)
-  val jEventService: IEventService = KafkaEventServiceFactory.jMake(locationService.asJava, typedActorSystem)
+  private val eventServiceFactory = new KafkaEventServiceFactory()
+
+  val eventService: EventService   = eventServiceFactory.make(locationService)
+  val jEventService: IEventService = eventServiceFactory.jMake(locationService.asJava, typedActorSystem)
 
   val publisher: EventPublisher                                    = eventService.defaultPublisher.await
   val subscriber: EventSubscriber                                  = eventService.defaultSubscriber.await
