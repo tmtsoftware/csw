@@ -326,6 +326,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
 
     val subscription = subscriber.pSubscribe(Subsystem.TEST, eventPattern, testProbe.ref ! _)
     subscription.ready.await
+    Thread.sleep(500)
 
     publisher.publish(event1).await
     testProbe.expectMessage(event1)
