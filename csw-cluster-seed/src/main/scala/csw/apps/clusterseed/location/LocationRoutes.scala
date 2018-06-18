@@ -17,13 +17,16 @@ import akka.http.scaladsl.marshalling.sse.EventStreamMarshalling._
 
 import scala.concurrent.duration.{Duration, DurationLong, FiniteDuration}
 
-class LocationRoutes(locationService: LocationService, actorRuntime: ActorRuntime)
-    extends FailFastCirceSupport
+class LocationRoutes(
+    locationService: LocationService,
+    locationExceptionHandler: LocationExceptionHandler,
+    actorRuntime: ActorRuntime
+) extends FailFastCirceSupport
     with LocationJsonSupport {
 
   import actorRuntime._
 
-  val routes: Route = rejectEmptyResponse {
+  val routes: Route = locationExceptionHandler.route {
     pathPrefix("location") {
       get {
         path("list") {
@@ -39,7 +42,9 @@ class LocationRoutes(locationService: LocationService, actorRuntime: ActorRuntim
             case (None, None, None, Some(prefix)) =>
               complete(locationService.listByPrefix(prefix))
             case _ =>
-              complete("asdasd")
+              throw new QueryFilterException(
+                "please provides exactly zero or one of the following filters: componentType, connectionType, hostname, prefix"
+              )
           }
         } ~
         path("find" / Segment) { connectionName =>
