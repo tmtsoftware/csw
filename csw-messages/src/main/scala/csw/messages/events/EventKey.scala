@@ -17,7 +17,7 @@ case class EventKey(source: Prefix, eventName: EventName) {
 object EventKey {
   private val SEPARATOR = "."
 
-  private[csw] def apply(eventKeyStr: String): EventKey = {
+  def apply(eventKeyStr: String): EventKey = {
     require(eventKeyStr != null)
     val strings = eventKeyStr.splitAt(eventKeyStr.lastIndexOf(SEPARATOR))
     new EventKey(Prefix(strings._1), EventName(strings._2.tail))
