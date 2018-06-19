@@ -2,6 +2,7 @@ package csw.services.event.internal.redis
 
 import akka.Done
 import akka.actor.{ActorSystem, CoordinatedShutdown}
+import com.typesafe.config.ConfigFactory
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.internal.commons.javawrappers.JEventService
@@ -27,7 +28,7 @@ class RedisTestProps(
     extends BaseProperties {
 
   private val redis: RedisServer = RedisServer.builder().port(serverPort).build()
-  private val masterId           = "eventServer"
+  private lazy val masterId      = ConfigFactory.load().getString("redis.masterId")
   private lazy val redisURI      = RedisURI.Builder.sentinel("localhost", sentinelPort, masterId).build()
   private lazy val asyncConnection: Future[RedisAsyncCommands[String, String]] =
     redisClient.connectAsync(new StringCodec(), redisURI).toScala.map(_.async())
@@ -39,6 +40,7 @@ class RedisTestProps(
     .masterPort(serverPort)
     .quorumSize(1)
     .build()
+
   override val eventPattern: String = "*sys*"
 
   private val eventServiceFactory = new RedisEventServiceFactory(redisClient)
