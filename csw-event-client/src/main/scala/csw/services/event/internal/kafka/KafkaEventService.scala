@@ -7,8 +7,6 @@ import akka.kafka.{ConsumerSettings, ProducerSettings}
 import akka.stream.Materializer
 import csw.services.event.internal.commons.serviceresolver.EventServiceResolver
 import csw.services.event.scaladsl.EventService
-import org.apache.kafka.clients.consumer.ConsumerConfig
-import org.apache.kafka.common.serialization.{ByteArrayDeserializer, ByteArraySerializer, StringDeserializer, StringSerializer}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -23,16 +21,13 @@ class KafkaEventService(eventServiceResolver: EventServiceResolver)(
 
   override def makeNewPublisher(): Future[KafkaPublisher] = publisher()
 
-  private lazy val producerSettings = eventServiceResolver.uri.map { uri ⇒
-    ProducerSettings(actorSystem, new StringSerializer, new ByteArraySerializer)
-      .withBootstrapServers(s"${uri.getHost}:${uri.getPort}")
+  private lazy val producerSettings: Future[ProducerSettings[String, Array[Byte]]] = eventServiceResolver.uri.map { uri ⇒
+    ProducerSettings(actorSystem, None, None).withBootstrapServers(s"${uri.getHost}:${uri.getPort}")
   }
 
-  private lazy val consumerSettings = eventServiceResolver.uri.map { uri ⇒
-    ConsumerSettings(actorSystem, new StringDeserializer, new ByteArrayDeserializer)
+  private lazy val consumerSettings: Future[ConsumerSettings[String, Array[Byte]]] = eventServiceResolver.uri.map { uri ⇒
+    ConsumerSettings(actorSystem, None, None)
       .withBootstrapServers(s"${uri.getHost}:${uri.getPort}")
-      .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest")
-      .withProperty(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false")
       .withGroupId(UUID.randomUUID().toString)
   }
 

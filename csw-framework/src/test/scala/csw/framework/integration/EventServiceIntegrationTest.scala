@@ -23,6 +23,7 @@ import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
 
+//DEOPSCSW-395: Provide EventService handle to component developers
 class EventServiceIntegrationTest extends FunSuite with Matchers with BeforeAndAfterAll {
   val seedPort                      = 3557
   val sentinelPort                  = 26379
