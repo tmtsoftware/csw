@@ -58,8 +58,8 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
 
   val events: immutable.Seq[Event] = for (i ← 1 to 1500) yield makeEvent(i)
 
-  def eventGenerator(beginAt: Int): Event = {
-    var counter = beginAt
+  var counter = 0
+  def eventGenerator(): Event = {
     counter += 1
     events(counter)
   }
@@ -70,7 +70,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   def should_be_able_to_subscribe_an_event(baseProperties: BaseProperties): Unit = {
     import baseProperties._
 
-    val event1             = makeDistinctEvent(1)
+    val event1             = makeDistinctEvent(Random.nextInt())
     val eventKey: EventKey = event1.eventKey
     val testProbe          = TestProbe[Event]()(typedActorSystem)
     val subscription       = subscriber.subscribe(Set(eventKey)).toMat(Sink.foreach(testProbe.ref ! _))(Keep.left).run()
@@ -97,10 +97,9 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
 
     val queue: mutable.Queue[Event]  = new mutable.Queue[Event]()
     val queue2: mutable.Queue[Event] = new mutable.Queue[Event]()
-    val event1                       = makeDistinctEvent(Random.nextInt())
-    val eventKey: EventKey           = event1.eventKey
-
-    val cancellable = publisher.publish(eventGenerator(0), 1.millis)
+    val eventKey: EventKey           = events.head.eventKey
+    counter = 0
+    val cancellable = publisher.publish(eventGenerator(), 1.millis)
     val subscription = subscriber
       .subscribe(Set(eventKey), 300.millis, SubscriptionModes.RateAdapterMode)
       .to(Sink.foreach[Event](queue.enqueue(_)))
@@ -121,7 +120,12 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     cancellable.cancel()
 
     queue.size shouldBe 3
+    // assert if received elements do not have duplicates
+    queue.toSet.size shouldBe 3
+
     queue2.size shouldBe 2
+    // assert if received elements do not have duplicates
+    queue2.toSet.size shouldBe 2
   }
 
   //DEOPSCSW-338: Provide callback for Event alerts
@@ -130,7 +134,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   def should_be_able_to_subscribe_with_async_callback(baseProperties: BaseProperties): Unit = {
     import baseProperties._
 
-    val event1    = makeDistinctEvent(204)
+    val event1    = makeEvent(1)
     val testProbe = TestProbe[Event]()(typedActorSystem)
 
     val callback: Event ⇒ Future[Event] = (event) ⇒ Future.successful(testProbe.ref ! event).map(_ ⇒ event)(ec)
@@ -155,15 +159,15 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
 
     val queue: mutable.Queue[Event]  = new mutable.Queue[Event]()
     val queue2: mutable.Queue[Event] = new mutable.Queue[Event]()
-    val event1                       = makeEvent(1)
+    val eventKey                     = events.head.eventKey
 
     val callback: Event ⇒ Future[Event]  = event ⇒ Future.successful(queue.enqueue(event)).map(_ ⇒ event)(ec)
     val callback2: Event ⇒ Future[Event] = event ⇒ Future.successful(queue2.enqueue(event)).map(_ ⇒ event)(ec)
+    counter = 0
+    val cancellable = publisher.publish(eventGenerator(), 1.millis)
 
-    val cancellable = publisher.publish(eventGenerator(0), 1.millis)
-
-    val subscription  = subscriber.subscribeAsync(Set(event1.eventKey), callback, 300.millis, SubscriptionModes.RateAdapterMode)
-    val subscription2 = subscriber.subscribeAsync(Set(event1.eventKey), callback2, 400.millis, SubscriptionModes.RateAdapterMode)
+    val subscription  = subscriber.subscribeAsync(Set(eventKey), callback, 300.millis, SubscriptionModes.RateAdapterMode)
+    val subscription2 = subscriber.subscribeAsync(Set(eventKey), callback2, 400.millis, SubscriptionModes.RateAdapterMode)
     Thread.sleep(1000) // Future in callback needs time to execute
     subscription.unsubscribe().await
     subscription2.unsubscribe().await
@@ -212,8 +216,8 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
 
     val callback: Event ⇒ Unit  = queue.enqueue(_)
     val callback2: Event ⇒ Unit = queue2.enqueue(_)
-
-    val cancellable = publisher.publish(eventGenerator(0), 1.millis)
+    counter = 0
+    val cancellable = publisher.publish(eventGenerator(), 1.millis)
     Thread.sleep(500) // Needed for redis set which is fire and forget operation
     val subscription = subscriber.subscribeCallback(Set(event1.eventKey), callback, 300.millis, SubscriptionModes.RateAdapterMode)
     val subscription2 =
@@ -232,7 +236,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   def should_be_able_to_subscribe_with_an_ActorRef(baseProperties: BaseProperties): Unit = {
     import baseProperties._
 
-    val event1 = makeDistinctEvent(205)
+    val event1 = makeDistinctEvent(Random.nextInt())
 
     val probe = TestProbe[Event]()(typedActorSystem)
 
@@ -271,14 +275,17 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   ): Unit = {
     import baseProperties._
     val inbox = TestInbox[Event]()
-
-    val cancellable = publisher.publish(eventGenerator(1), 200.millis)
+    counter = 0
+    val cancellable = publisher.publish(eventGenerator(), 200.millis)
     val subscription =
       subscriber.subscribeActorRef(events.map(_.eventKey).toSet, inbox.ref, 100.millis, SubscriptionModes.RateLimiterMode)
     Thread.sleep(900)
     subscription.unsubscribe().await
     cancellable.cancel()
-    inbox.receiveAll().size shouldBe 5
+    val eventsReceived = inbox.receiveAll()
+    eventsReceived.size shouldBe 5
+    // assert if received elements do not have duplicates
+    eventsReceived.toSet.size shouldBe 5
   }
 
   //DEOPSCSW-342: Subscription with consumption frequency
@@ -288,14 +295,17 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   ): Unit = {
     import baseProperties._
     val inbox = TestInbox[Event]()
-
-    val cancellable = publisher.publish(eventGenerator(1), 105.millis)
+    counter = 0
+    val cancellable = publisher.publish(eventGenerator(), 105.millis)
     val subscription =
       subscriber.subscribeActorRef(events.map(_.eventKey).toSet, inbox.ref, 200.millis, SubscriptionModes.RateLimiterMode)
     Thread.sleep(900)
     subscription.unsubscribe().await
     cancellable.cancel()
-    inbox.receiveAll().size shouldBe 5
+    val eventsReceived = inbox.receiveAll()
+    eventsReceived.size shouldBe 5
+    // assert if received elements do not have duplicates
+    eventsReceived.toSet.size shouldBe 5
   }
 
   //DEOPSCSW-342: Subscription with consumption frequency
@@ -305,14 +315,17 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   ): Unit = {
     import baseProperties._
     val inbox = TestInbox[Event]()
-
-    val cancellable = publisher.publish(eventGenerator(1), 200.millis)
+    counter = 0
+    val cancellable = publisher.publish(eventGenerator(), 200.millis)
     val subscription =
       subscriber.subscribeActorRef(events.map(_.eventKey).toSet, inbox.ref, 100.millis, SubscriptionModes.RateAdapterMode)
     Thread.sleep(1050)
     subscription.unsubscribe().await
     cancellable.cancel()
-    inbox.receiveAll().size shouldBe 10
+    val eventsReceived = inbox.receiveAll()
+    eventsReceived.size shouldBe 10
+    // assert that received elements will have duplicates
+    eventsReceived.toSet.size should not be 10
   }
 
   //DEOPSCSW-420: Implement Pattern based subscription
@@ -402,8 +415,8 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
       baseProperties: BaseProperties
   ): Unit = {
     import baseProperties._
-    val distinctEvent1 = makeDistinctEvent(201)
-    val distinctEvent2 = makeDistinctEvent(202)
+    val distinctEvent1 = makeDistinctEvent(Random.nextInt())
+    val distinctEvent2 = makeDistinctEvent(Random.nextInt())
 
     val eventKey1 = distinctEvent1.eventKey
     val eventKey2 = distinctEvent2.eventKey
@@ -421,7 +434,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   def should_be_able_to_get_an_event_without_subscribing_for_it(baseProperties: BaseProperties): Unit = {
     import baseProperties._
 
-    val event1   = makeDistinctEvent(301)
+    val event1   = makeDistinctEvent(Random.nextInt())
     val eventKey = event1.eventKey
 
     publisher.publish(event1).await
@@ -451,10 +464,10 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   def should_be_able_to_get_events_for_multiple_event_keys(baseProperties: BaseProperties): Unit = {
     import baseProperties._
 
-    val event1    = makeDistinctEvent(206)
+    val event1    = makeDistinctEvent(Random.nextInt())
     val eventKey1 = event1.eventKey
 
-    val event2    = makeDistinctEvent(207)
+    val event2    = makeDistinctEvent(Random.nextInt())
     val eventKey2 = event2.eventKey
 
     publisher.publish(event1).await

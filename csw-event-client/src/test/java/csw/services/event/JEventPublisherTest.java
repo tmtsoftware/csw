@@ -63,7 +63,7 @@ public class JEventPublisherTest extends TestNGSuite {
     //DEOPSCSW-345: Publish events irrespective of subscriber existence
     @Test(dataProvider = "event-service-provider")
     public void should_be_able_to_publish_and_subscribe_an_event(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
-        Event event1 = Utils.makeDistinctEvent(1);
+        Event event1 = Utils.makeDistinctEvent(new Random().nextInt());
         EventKey eventKey = event1.eventKey();
 
         TestProbe probe = TestProbe.create(baseProperties.typedActorSystem());
