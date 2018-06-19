@@ -17,6 +17,7 @@ import org.testng.annotations._
 
 import scala.collection.{immutable, mutable}
 import scala.concurrent.duration.DurationLong
+import scala.util.Random
 
 //DEOPSCSW-334: Publish an event
 //DEOPSCSW-335: Model for EventName that encapsulates the topic(or channel ) name
@@ -53,7 +54,7 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
   def should_be_able_to_publish_and_subscribe_an_event(baseProperties: BaseProperties): Unit = {
     import baseProperties._
 
-    val event1             = makeDistinctEvent(1)
+    val event1             = makeDistinctEvent(Random.nextInt())
     val eventKey: EventKey = event1.eventKey
     val testProbe          = TestProbe[Event]()(typedActorSystem)
 
