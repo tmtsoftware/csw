@@ -30,7 +30,7 @@ class EventServiceIntegrationTest extends FunSuite with Matchers with BeforeAndA
   private val props: RedisTestProps = RedisTestProps.createRedisProperties(seedPort, sentinelPort, serverPort)
 
   implicit val typedSystem: ActorSystem[_] = props.typedActorSystem
-  val systemToJoinCluster                  = ClusterSettings().joinLocal(seedPort).system
+  private val systemToJoinCluster          = ClusterSettings().joinLocal(seedPort).system
 
   implicit val testKitSettings: TestKitSettings = TestKitSettings(typedSystem)
   private val filterAssemblyConnection          = AkkaConnection(ComponentId("Filter", Assembly))
