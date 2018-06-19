@@ -3,8 +3,11 @@ package csw.services.event.internal.redis
 import java.nio.ByteBuffer
 
 import csw.messages.events.{Event, EventKey}
+import csw.messages.params.models.Subsystem
 import csw_protobuf.events.PbEvent
 import io.lettuce.core.codec.{RedisCodec, Utf8StringCodec}
+
+import scala.util.control.NonFatal
 
 object EventServiceCodec extends RedisCodec[EventKey, Event] {
 
@@ -19,10 +22,12 @@ object EventServiceCodec extends RedisCodec[EventKey, Event] {
     ByteBuffer.wrap(pbEvent.toByteArray)
   }
 
-  override def decodeValue(byteBuf: ByteBuffer): Event = {
-    val bytes = new Array[Byte](byteBuf.remaining)
-    byteBuf.get(bytes)
-    val pbEvent = PbEvent.parseFrom(bytes)
-    Event.fromPb(pbEvent)
-  }
+  override def decodeValue(byteBuf: ByteBuffer): Event =
+    try {
+      val bytes = new Array[Byte](byteBuf.remaining)
+      byteBuf.get(bytes)
+      Event.fromPb(PbEvent.parseFrom(bytes))
+    } catch {
+      case NonFatal(_) ⇒ Event.badEvent()
+    }
 }

@@ -2,7 +2,7 @@ package csw.services.event.internal.wiring
 
 import java.net.URI
 
-import akka.actor
+import akka.{actor, Done}
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Materializer, Supervision}
@@ -26,6 +26,7 @@ trait BaseProperties {
   def jEventService: IEventService
   def jPublisher[T <: EventPublisher]: IEventPublisher
   def jSubscriber[T <: EventSubscriber]: IEventSubscriber
+  def publishGarbage(channel: String, message: String): Future[Done]
   def start(): Unit
   def shutdown(): Unit
 
