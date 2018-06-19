@@ -9,7 +9,7 @@ import io.lettuce.core.RedisClient
 
 import scala.concurrent.ExecutionContext
 
-class RedisEventServiceFactory(redisClient: RedisClient) extends EventServiceFactory {
+class RedisEventServiceFactory(redisClient: RedisClient = RedisClient.create()) extends EventServiceFactory {
   val masterId = "eventServer"
   protected override def eventServiceImpl(eventServiceResolver: EventServiceResolver)(
       implicit actorSystem: ActorSystem,
