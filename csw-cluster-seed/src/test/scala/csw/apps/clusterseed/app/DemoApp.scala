@@ -44,8 +44,7 @@ object AppLogger extends LoggerFactory("app")
 
 object DemoApp extends App {
 
-  val seedSettings             = ClusterAwareSettings.onPort(3552)
-  val adminWiring: AdminWiring = AdminWiring.make(seedSettings, None)
+  val adminWiring: AdminWiring = AdminWiring.make(ClusterAwareSettings, None, Some(3552))
 
   val frameworkSystem = ClusterAwareSettings.joinLocal(3552).system
   val frameworkWiring = FrameworkWiring.make(frameworkSystem)

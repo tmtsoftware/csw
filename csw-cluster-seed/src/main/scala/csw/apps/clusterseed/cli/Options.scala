@@ -1,3 +1,3 @@
 package csw.apps.clusterseed.cli
 
-case class Options(clusterPort: Int = 0, adminPort: Option[Int] = None)
+case class Options(clusterPort: Option[Int] = None, adminPort: Option[Int] = None, testMode: Boolean = false)

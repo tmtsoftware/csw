@@ -97,7 +97,7 @@ lazy val `csw-location` = project
 lazy val `csw-cluster-seed` = project
   .dependsOn(
     `csw-messages`,
-    `csw-location`,
+    `csw-location`      % "compile->compile;test->test",
     `csw-commons`       % "compile->compile;test->test",
     `csw-framework`     % "test->test",
     `csw-config-server` % "test->test"

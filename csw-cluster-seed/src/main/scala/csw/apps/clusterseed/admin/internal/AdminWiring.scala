@@ -36,5 +36,14 @@ private[clusterseed] object AdminWiring {
       }
     }
 
+  def make(_clusterSettings: ClusterSettings, maybeAdminPort: Option[Int], maybeClusterPort: Option[Int]): AdminWiring =
+    new AdminWiring {
+      override lazy val clusterSettings: ClusterSettings = _clusterSettings.onPort(settings.clusterPort)
+
+      override lazy val settings: Settings = new Settings(config) {
+        override val adminPort: Int   = maybeAdminPort.getOrElse(super.adminPort)
+        override val clusterPort: Int = maybeClusterPort.getOrElse(super.clusterPort)
+      }
+    }
 }
 // $COVERAGE-ON$
