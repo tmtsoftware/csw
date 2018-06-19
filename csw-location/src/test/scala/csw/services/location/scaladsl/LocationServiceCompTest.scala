@@ -23,10 +23,9 @@ import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 
-class LocationServiceCompTestWithHttp    extends LocationServiceCompTestWithMode("http")
-class LocationServiceCompTestWithCluster extends LocationServiceCompTestWithMode("cluster")
+class LocationServiceCompTestWithCluster extends LocationServiceCompTest("cluster")
 
-class LocationServiceCompTestWithMode(mode: String)
+class LocationServiceCompTest(mode: String)
     extends FunSuite
     with Matchers
     with BeforeAndAfterAll

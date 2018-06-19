@@ -64,10 +64,6 @@ class LocationRoutes(
           val connection = Connection.from(connectionName)
           val stream: Source[ServerSentEvent, NotUsed] = locationService
             .track(connection)
-            .map { x =>
-              println(s"*****************$x")
-              x
-            }
             .mapMaterializedValue(_ => NotUsed)
             .map(trackingEvent => ServerSentEvent(trackingEvent.asJson.noSpaces))
             .keepAlive(2.second, () => ServerSentEvent.heartbeat)

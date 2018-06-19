@@ -25,7 +25,7 @@ import scala.concurrent.duration.DurationDouble
 
 class HttpLogAdminTest extends AdminLogTestSuite with HttpSupport {
 
-  private val adminWiring: AdminWiring = AdminWiring.make(ClusterAwareSettings.onPort(3653), Some(7888))
+  private val adminWiring: AdminWiring = AdminWiring.make(ClusterAwareSettings, Some(7888), Some(3653))
   import adminWiring.actorRuntime._
 
   implicit val typedSystem: ActorSystem[Nothing] = actorSystem.toTyped

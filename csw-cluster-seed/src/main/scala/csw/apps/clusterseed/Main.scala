@@ -16,25 +16,24 @@ class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) {
   // 2. http server which exposes http end point to change/get the log level of components dynamically
   def start(args: Array[String]): Unit =
     new ArgsParser(name).parse(args).map {
-      case Options(clusterPort, maybeAdminPort) =>
-        val updatedClusterSettings = clusterSettings.onPort(clusterPort)
-        val wiring                 = AdminWiring.make(updatedClusterSettings, maybeAdminPort)
+      case Options(maybeClusterPort, maybeAdminPort, testMode) =>
+        if (!testMode && ClusterAwareSettings.seedNodes.isEmpty) {
+          println(
+            "[ERROR] clusterSeeds setting is not specified either as env variable or system property. Please check online documentation for this set-up."
+          )
+        } else {
+          val wiring = AdminWiring.make(clusterSettings, maybeAdminPort, maybeClusterPort)
 
-        if (startLogging) wiring.actorRuntime.startLogging(name)
+          if (startLogging) wiring.actorRuntime.startLogging(name)
 
-        wiring.locationService
-        wiring.locationHttpService.start()
-        Await.result(wiring.adminHttpService.registeredLazyBinding, 10.seconds)
+          wiring.locationService
+          wiring.locationHttpService.start()
+          Await.result(wiring.adminHttpService.registeredLazyBinding, 10.seconds)
+        }
     }
 }
 
 object Main extends App {
-  if (ClusterAwareSettings.seedNodes.isEmpty) {
-    println(
-      "clusterSeeds setting is not specified either as env variable or system property. Please check online documentation for this set-up."
-    )
-  } else {
-    new Main(ClusterAwareSettings, startLogging = true).start(args)
-  }
+  new Main(ClusterAwareSettings, startLogging = true).start(args)
 }
 // $COVERAGE-ON$

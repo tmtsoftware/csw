@@ -40,7 +40,7 @@ import scala.concurrent.duration.DurationDouble
 @LoggingSystemSensitive
 class AkkaLogAdminTest extends AdminLogTestSuite with MockitoSugar with HttpSupport {
 
-  private val adminWiring: AdminWiring = AdminWiring.make(ClusterAwareSettings.onPort(3652), Some(7879))
+  private val adminWiring: AdminWiring = AdminWiring.make(ClusterAwareSettings, Some(7879), Some(3652))
   import adminWiring.actorRuntime._
 
   implicit val typedSystem: ActorSystem[Nothing] = actorSystem.toTyped
