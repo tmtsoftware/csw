@@ -13,7 +13,7 @@ object JsonSupport extends JsonSupport with DerivedJsonFormats with WrappedArray
 /**
  * Supports conversion of commands, state variables and events to/from JSON
  */
-private[messages] trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
+trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
 
   // JSON formats
   lazy val paramSetFormat: Format[Set[Parameter[_]]] = implicitly[Format[Set[Parameter[_]]]]
@@ -93,6 +93,11 @@ private[messages] trait JsonSupport { self: DerivedJsonFormats with WrappedArray
         }
       case _ => unexpectedJsValueError(json)
     }
+  }
+
+  implicit val sequenceCommandFormat: Format[SequenceCommand] = new Format[SequenceCommand] {
+    override def writes(o: SequenceCommand): JsValue             = writeSequenceCommand(o)
+    override def reads(json: JsValue): JsResult[SequenceCommand] = readSequenceCommand(json)
   }
 
   /**

@@ -10,5 +10,5 @@ import play.api.libs.json.{Json, OFormat}
 case class CommandName(name: String)
 
 object CommandName {
-  private[messages] implicit val format: OFormat[CommandName] = Json.format[CommandName]
+  implicit val format: OFormat[CommandName] = Json.format[CommandName]
 }

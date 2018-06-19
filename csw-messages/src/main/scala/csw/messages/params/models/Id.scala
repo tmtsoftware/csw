@@ -20,7 +20,7 @@ object Id {
    */
   def apply(): Id = new Id(UUID.randomUUID().toString)
 
-  private[messages] implicit val format: Format[Id] = new Format[Id] {
+  implicit val format: Format[Id] = new Format[Id] {
     override def writes(obj: Id): JsValue           = JsString(obj.id)
     override def reads(json: JsValue): JsResult[Id] = JsSuccess(Id(json.as[String]))
   }
