@@ -20,18 +20,29 @@ import org.scalatest.concurrent.Eventually
 import org.scalatest.time.Span
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
+import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 
-class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach with Eventually {
+class LocationServiceCompTestWithHttp    extends LocationServiceCompTestWithMode("http")
+class LocationServiceCompTestWithCluster extends LocationServiceCompTestWithMode("cluster")
+
+class LocationServiceCompTestWithMode(mode: String)
+    extends FunSuite
+    with Matchers
+    with BeforeAndAfterAll
+    with BeforeAndAfterEach
+    with Eventually {
 
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
   InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
 
-//  lazy val locationService: LocationService = LocationServiceFactory.make()
+  implicit val actorSystem: ActorSystem = ActorSystemFactory.remote("test")
+  implicit val mat: Materializer        = ActorMaterializer()
 
-  implicit val actorSystem: ActorSystem        = ActorSystemFactory.remote("test")
-  implicit val mat: Materializer               = ActorMaterializer()
-  private val locationService: LocationService = new LocationServiceClient()
+  private lazy val locationService: LocationService = mode match {
+    case "http"    => new LocationServiceClient()
+    case "cluster" => LocationServiceFactory.make()
+  }
 
   implicit val patience: PatienceConfig =
     PatienceConfig(Span(5, org.scalatest.time.Seconds), Span(100, org.scalatest.time.Millis))
@@ -42,7 +53,7 @@ class LocationServiceCompTest extends FunSuite with Matchers with BeforeAndAfter
     locationService.unregisterAll().await
 
   override protected def afterAll(): Unit = {
-//    locationService.shutdown(TestFinishedReason).await
+    Await.ready(locationService.shutdown(TestFinishedReason), 5.seconds)
     actorSystem.terminate().await
   }
 

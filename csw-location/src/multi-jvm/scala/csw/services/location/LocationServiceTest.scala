@@ -7,7 +7,7 @@ import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location._
-import csw.services.location.commons.RegistrationFactory
+import csw.services.location.commons.RegistrationFactory2
 import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.location.helpers.{LSNodeSpec, OneMemberAndSeed}
 import org.scalatest.BeforeAndAfterEach
@@ -25,6 +25,8 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
   import cswCluster.mat
 
   val assemblyActorSystem = ActorSystem("assembly-actor-system")
+
+  val RegistrationFactory = new RegistrationFactory2
 
   override protected def afterEach(): Unit =
     Await.result(locationService.unregisterAll(), 10.seconds)
