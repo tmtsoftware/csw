@@ -34,6 +34,7 @@ import csw.services.command.scaladsl.CurrentStateSubscription;
 import csw.services.location.commons.ClusterAwareSettings;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.location.javadsl.JLocationServiceFactory;
+import io.lettuce.core.RedisClient;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -83,7 +84,8 @@ public class JCommandIntegrationTest {
     }
 
     private static AkkaLocation getLocation() throws Exception {
-        FrameworkWiring wiring = FrameworkWiring.make(hcdActorSystem);
+        RedisClient redisClient = null;
+        FrameworkWiring wiring = FrameworkWiring.make(hcdActorSystem, redisClient);
         Await.result(Standalone.spawn(ConfigFactory.load("mcs_hcd_java.conf"), wiring), new FiniteDuration(5, TimeUnit.SECONDS));
 
         AkkaConnection akkaConnection = new AkkaConnection(new ComponentId("Test_Component_Running_Long_Command_Java", HCD));

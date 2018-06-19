@@ -25,6 +25,8 @@ import csw.messages.params.states.{DemandState, StateName}
 import csw.messages.scaladsl.CommandMessage.Submit
 import csw.services.command.scaladsl.CommandService
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
+import io.lettuce.core.RedisClient
+import org.scalatest.mockito.MockitoSugar
 
 import scala.async.Async._
 import scala.concurrent.duration.DurationDouble
@@ -73,7 +75,7 @@ class CommandServiceTestMultiJvm3 extends CommandServiceTest(0)
 // DEOPSCSW-228: Assist Components with command completion
 // DEOPSCSW-313: Support short running actions by providing immediate response
 // DEOPSCSW-321: AkkaLocation provides wrapper for ActorRef[ComponentMessage]
-class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSeed) {
+class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSeed) with MockitoSugar {
 
   import config._
   import csw.common.components.command.ComponentStateForCommand._
@@ -114,7 +116,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       val obsId            = Some(ObsId("Obs001"))
 
       // spawn single assembly running in Standalone mode in jvm-2
-      val wiring        = FrameworkWiring.make(system, locationService)
+      val wiring        = FrameworkWiring.make(system, locationService, mock[RedisClient])
       val sequencerConf = ConfigFactory.load("command/commanding_assembly.conf")
       Await.result(Standalone.spawn(sequencerConf, wiring), 5.seconds)
       enterBarrier("spawned")
@@ -317,7 +319,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
 
     runOn(member2) {
       // spawn container having assembly and hcd running in jvm-3
-      val wiring        = FrameworkWiring.make(system, locationService)
+      val wiring        = FrameworkWiring.make(system, locationService, mock[RedisClient])
       val containerConf = ConfigFactory.load("command/container.conf")
       Await.result(Container.spawn(containerConf, wiring), 5.seconds)
       enterBarrier("spawned")

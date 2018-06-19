@@ -25,12 +25,14 @@ import csw.services.location.commons.ClusterSettings
 import csw.services.location.models.{HttpRegistration, TcpRegistration}
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import csw.services.logging.commons.LogAdminActorFactory
+import io.lettuce.core.RedisClient
+import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{Await, TimeoutException}
 
-class TrackConnectionsIntegrationTest extends FunSuite with Matchers with BeforeAndAfterAll {
+class TrackConnectionsIntegrationTest extends FunSuite with Matchers with MockitoSugar with BeforeAndAfterAll {
 
   implicit val seedActorSystem: actor.ActorSystem = ClusterSettings().onPort(3554).system
 
@@ -53,7 +55,7 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Before
   // DEOPSCSW-221: Avoid sending commands to non-executing components
   test("should track connections when locationServiceUsage is RegisterAndTrackServices") {
     val containerActorSystem: actor.ActorSystem = ClusterSettings().joinLocal(3554).system
-    val wiring: FrameworkWiring                 = FrameworkWiring.make(containerActorSystem)
+    val wiring: FrameworkWiring                 = FrameworkWiring.make(containerActorSystem, mock[RedisClient])
     // start a container and verify it moves to running lifecycle state
     val containerRef =
       Await.result(Container.spawn(ConfigFactory.load("container_tracking_connections.conf"), wiring), 5.seconds)
@@ -101,7 +103,7 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Before
   //DEOPSCSW-219 Discover component connection using HTTP protocol
   test("component should be able to track http and tcp connections") {
     val actorSystem: actor.ActorSystem = ClusterSettings().joinLocal(3554).system
-    val wiring: FrameworkWiring        = FrameworkWiring.make(actorSystem)
+    val wiring: FrameworkWiring        = FrameworkWiring.make(actorSystem, mock[RedisClient])
     // start component in standalone mode
     Standalone.spawn(ConfigFactory.load("standalone.conf"), wiring)
 

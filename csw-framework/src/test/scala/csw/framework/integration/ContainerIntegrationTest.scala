@@ -26,6 +26,8 @@ import csw.messages.scaladsl.SupervisorContainerCommonMessages.{Restart, Shutdow
 import csw.services.command.scaladsl.CommandService
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
+import io.lettuce.core.RedisClient
+import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.concurrent.Await
@@ -35,7 +37,7 @@ import scala.concurrent.duration.DurationLong
 // DEOPSCSW-177: Hooks for lifecycle management
 // DEOPSCSW-182: Control Life Cycle of Components
 // DEOPSCSW-216: Locate and connect components to send AKKA commands
-class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfterAll {
+class ContainerIntegrationTest extends FunSuite with MockitoSugar with Matchers with BeforeAndAfterAll {
 
   implicit val seedActorSystem: actor.ActorSystem     = ClusterSettings().onPort(3555).system
   private val containerActorSystem: actor.ActorSystem = ClusterSettings().joinLocal(3555).system
@@ -55,7 +57,7 @@ class ContainerIntegrationTest extends FunSuite with Matchers with BeforeAndAfte
 
   test("should start multiple components withing a single container and able to accept lifecycle messages") {
 
-    val wiring = FrameworkWiring.make(containerActorSystem)
+    val wiring = FrameworkWiring.make(containerActorSystem, mock[RedisClient])
     // start a container and verify it moves to running lifecycle state
     val containerRef =
       Await.result(Container.spawn(ConfigFactory.load("container.conf"), wiring), 5.seconds)

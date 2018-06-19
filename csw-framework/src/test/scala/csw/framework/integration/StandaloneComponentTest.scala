@@ -1,13 +1,13 @@
 package csw.framework.integration
 
 import akka.actor
+import akka.actor.testkit.typed.TestKitSettings
+import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
 import akka.stream.{ActorMaterializer, Materializer}
-import akka.actor.testkit.typed.TestKitSettings
-import akka.actor.testkit.typed.scaladsl.TestProbe
 import com.persist.JsonOps
 import com.persist.JsonOps.JsonObject
 import com.typesafe.config.ConfigFactory
@@ -29,6 +29,8 @@ import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import csw.services.logging.internal.LoggingLevels.INFO
 import csw.services.logging.internal.LoggingSystem
+import io.lettuce.core.RedisClient
+import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.collection.mutable
@@ -39,7 +41,7 @@ import scala.concurrent.duration.DurationLong
 // DEOPSCSW-177: Hooks for lifecycle management
 // DEOPSCSW-216: Locate and connect components to send AKKA commands
 @LoggingSystemSensitive
-class StandaloneComponentTest extends FunSuite with Matchers with BeforeAndAfterAll {
+class StandaloneComponentTest extends FunSuite with Matchers with MockitoSugar with BeforeAndAfterAll {
 
   // ActorSystem for testing. This acts as a seed node
   implicit val seedActorSystem: actor.ActorSystem = ClusterSettings().onPort(3553).system
@@ -66,7 +68,7 @@ class StandaloneComponentTest extends FunSuite with Matchers with BeforeAndAfter
   test("should start a component in standalone mode and register with location service") {
 
     // start component in standalone mode
-    val wiring: FrameworkWiring = FrameworkWiring.make(hcdActorSystem)
+    val wiring: FrameworkWiring = FrameworkWiring.make(hcdActorSystem, mock[RedisClient])
     Standalone.spawn(ConfigFactory.load("standalone.conf"), wiring)
 
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]("supervisor-lifecycle-state-probe")

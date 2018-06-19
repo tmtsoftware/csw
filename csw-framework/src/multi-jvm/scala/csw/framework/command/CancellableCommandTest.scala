@@ -18,6 +18,8 @@ import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.params.generics.KeyType
 import csw.messages.params.models.ObsId
 import csw.services.location.helpers.{LSNodeSpec, OneMemberAndSeed}
+import io.lettuce.core.RedisClient
+import org.scalatest.mockito.MockitoSugar
 
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, ExecutionContext}
@@ -26,7 +28,7 @@ class CancellableCommandTestMultiJvm1 extends CancellableCommandTest(0)
 class CancellableCommandTestMultiJvm2 extends CancellableCommandTest(0)
 
 // DEOPSCSW-211 Notification of Interrupted Message
-class CancellableCommandTest(ignore: Int) extends LSNodeSpec(config = new OneMemberAndSeed) {
+class CancellableCommandTest(ignore: Int) extends LSNodeSpec(config = new OneMemberAndSeed) with MockitoSugar {
   import config._
 
   implicit val actorSystem: ActorSystem[_] = system.toTyped
@@ -38,7 +40,7 @@ class CancellableCommandTest(ignore: Int) extends LSNodeSpec(config = new OneMem
   test("a long running command should be cancellable") {
     runOn(seed) {
       // spawn container having assembly and hcd running in jvm-1
-      val wiring       = FrameworkWiring.make(system, locationService)
+      val wiring       = FrameworkWiring.make(system, locationService, mock[RedisClient])
       val assemblyConf = ConfigFactory.load("command/commanding_assembly.conf")
       Await.result(Standalone.spawn(assemblyConf, wiring), 5.seconds)
       enterBarrier("spawned")
