@@ -463,4 +463,20 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     val eventsF = subscriber.get(Set(eventKey1, eventKey2))
     eventsF.await shouldBe Set(Event.invalidEvent(eventKey2), event1)
   }
+
+  @Test(dataProvider = "event-service-provider")
+  def should_be_able_to_get_invalid_event_on_event_parse_failure(baseProperties: BaseProperties): Unit = {
+    import baseProperties._
+    val eventKey = makeEvent(0).eventKey
+
+    val (subscription, seqF) = subscriber.subscribe(Set(eventKey)).take(2).toMat(Sink.seq)(Keep.both).run()
+    subscription.ready().await
+    Thread.sleep(500)
+
+    publishGarbage(eventKey.key, "garbage").await
+    Thread.sleep(200)
+    subscription.unsubscribe()
+
+    seqF.await should contain inOrder (Event.invalidEvent(eventKey), Event.badEvent())
+  }
 }

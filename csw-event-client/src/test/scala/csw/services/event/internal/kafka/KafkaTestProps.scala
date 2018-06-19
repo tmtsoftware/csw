@@ -1,6 +1,8 @@
 package csw.services.event.internal.kafka
 
+import akka.Done
 import akka.actor.{ActorSystem, CoordinatedShutdown}
+import akka.kafka.ProducerSettings
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.internal.wiring.BaseProperties
@@ -10,9 +12,12 @@ import csw.services.event.scaladsl.{EventPublisher, EventService, EventSubscribe
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.LocationService
 import net.manub.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
+import org.apache.kafka.clients.producer.ProducerRecord
+import org.apache.kafka.common.serialization.{ByteArraySerializer, StringSerializer}
 
 import scala.collection.JavaConverters.mapAsScalaMapConverter
 import scala.compat.java8.FutureConverters.CompletionStageOps
+import scala.concurrent.Future
 
 class KafkaTestProps(
     kafkaPort: Int,
@@ -26,6 +31,11 @@ class KafkaTestProps(
   val config                   = EmbeddedKafkaConfig(customBrokerProperties = brokerProperties)
 
   private val eventServiceFactory = new KafkaEventServiceFactory()
+  private lazy val producerSettings: ProducerSettings[String, String] =
+    ProducerSettings(actorSystem, new StringSerializer, new StringSerializer)
+      .withBootstrapServers(s"${clusterSettings.hostname}:$kafkaPort")
+
+  private lazy val kafkaProducer = producerSettings.createKafkaProducer()
 
   val eventService: EventService   = eventServiceFactory.make(locationService)
   val jEventService: IEventService = eventServiceFactory.jMake(locationService.asJava, typedActorSystem)
@@ -38,6 +48,9 @@ class KafkaTestProps(
   override def toString: String = "Kafka"
 
   override val eventPattern: String = ".*sys.*"
+
+  override def publishGarbage(channel: String, message: String): Future[Done] =
+    Future { kafkaProducer.send(new ProducerRecord(channel, message)).get() }.map(_ ⇒ Done)
 
   override def start(): Unit = EmbeddedKafka.start()(config)
 

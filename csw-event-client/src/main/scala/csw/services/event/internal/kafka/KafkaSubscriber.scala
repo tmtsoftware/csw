@@ -17,6 +17,7 @@ import scala.async.Async.{async, await}
 import scala.collection.JavaConverters._
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(
     implicit ec: ExecutionContext,
@@ -104,7 +105,11 @@ class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(
   private def getEventStream(subscription: Subscription): Source[Event, scaladsl.Consumer.Control] =
     scaladsl.Consumer
       .plainSource(consumerSettings, subscription)
-      .map(record ⇒ Event.fromPb(PbEvent.parseFrom(record.value())))
+      .map(
+        record ⇒
+          try Event.fromPb(PbEvent.parseFrom(record.value()))
+          catch { case NonFatal(_) ⇒ Event.badEvent() }
+      )
 
   private def getLatestOffsets(eventKeys: Set[EventKey]): Map[TopicPartition, Long] = {
     val topicPartitions = eventKeys.map(e ⇒ new TopicPartition(e.key, 0)).toList

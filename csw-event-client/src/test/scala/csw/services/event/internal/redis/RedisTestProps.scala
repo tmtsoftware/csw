@@ -1,5 +1,6 @@
 package csw.services.event.internal.redis
 
+import akka.Done
 import akka.actor.{ActorSystem, CoordinatedShutdown}
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.event.helpers.TestFutureExt.RichFuture
@@ -8,10 +9,13 @@ import csw.services.event.internal.wiring.BaseProperties
 import csw.services.event.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
 import csw.services.event.scaladsl._
 import csw.services.location.scaladsl.LocationService
-import io.lettuce.core.{ClientOptions, RedisClient}
+import io.lettuce.core.api.async.RedisAsyncCommands
+import io.lettuce.core.codec.StringCodec
+import io.lettuce.core.{ClientOptions, RedisClient, RedisURI}
 import redis.embedded.{RedisSentinel, RedisServer}
 
 import scala.compat.java8.FutureConverters.CompletionStageOps
+import scala.concurrent.Future
 
 class RedisTestProps(
     name: String,
@@ -24,6 +28,9 @@ class RedisTestProps(
 
   private val redis: RedisServer = RedisServer.builder().port(serverPort).build()
   private val masterId           = "eventServer"
+  private lazy val redisURI      = RedisURI.Builder.sentinel("localhost", sentinelPort, masterId).build()
+  private lazy val asyncConnection: Future[RedisAsyncCommands[String, String]] =
+    redisClient.connectAsync(new StringCodec(), redisURI).toScala.map(_.async())
 
   private val redisSentinel: RedisSentinel = RedisSentinel
     .builder()
@@ -47,6 +54,9 @@ class RedisTestProps(
   override def jPublisher[T <: EventPublisher]: IEventPublisher = jEventService.defaultPublisher.toScala.await
 
   override def jSubscriber[T <: EventSubscriber]: IEventSubscriber = jEventService.defaultSubscriber.toScala.await
+
+  override def publishGarbage(channel: String, message: String): Future[Done] =
+    asyncConnection.flatMap(c ⇒ c.publish(channel, message).toScala.map(_ ⇒ Done))
 
   override def start(): Unit = {
     redisSentinel.start()

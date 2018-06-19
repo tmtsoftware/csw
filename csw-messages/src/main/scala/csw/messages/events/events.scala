@@ -3,11 +3,10 @@ package csw.messages.events
 import java.time.Instant
 
 import csw.messages.params.generics.{Parameter, ParameterSetType}
-import csw.messages.params.models.{Id, Prefix}
+import csw.messages.params.models.{Id, Prefix, Subsystem}
 import csw_protobuf.events.PbEvent
 import csw_protobuf.events.PbEvent.PbEventType
 import csw_protobuf.parameter.PbParameter
-
 import scalapb.TypeMapper
 
 /**
@@ -125,6 +124,8 @@ object Event {
   def invalidEvent(eventKey: EventKey): SystemEvent =
     SystemEvent(eventKey.source, eventKey.eventName)
       .copy(eventId = Id("-1"), eventTime = EventTime(Instant.ofEpochMilli(-1)))
+
+  def badEvent(): SystemEvent = Event.invalidEvent(EventKey(s"${Subsystem.BAD}.CouldNotParseEvent"))
 }
 
 /**
