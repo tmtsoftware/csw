@@ -8,7 +8,7 @@ import scalapb.TypeMapper
 
 object ObsId {
 
-  private[messages] implicit val format: Format[ObsId] = new Format[ObsId] {
+  implicit val format: Format[ObsId] = new Format[ObsId] {
     override def writes(obj: ObsId): JsValue           = JsString(obj.obsId)
     override def reads(json: JsValue): JsResult[ObsId] = JsSuccess(ObsId(json.as[String]))
   }
