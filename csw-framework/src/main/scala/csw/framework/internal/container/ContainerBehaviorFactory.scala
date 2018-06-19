@@ -6,7 +6,6 @@ import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.framework.models.ContainerInfo
 import csw.messages.scaladsl.ContainerActorMessage
 import csw.services.event.internal.commons.EventServiceFactory
-import csw.services.event.scaladsl.EventService
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.LoggerFactory
 

@@ -30,13 +30,15 @@ import csw.services.logging.internal.LoggingLevels.{ERROR, Level, WARN}
 import csw.services.logging.internal._
 import csw.services.logging.models.LogMetadata
 import csw.services.logging.scaladsl.LoggingSystemFactory
+import io.lettuce.core.RedisClient
+import org.scalatest.mockito.MockitoSugar
 
 import scala.collection.JavaConverters.mapAsScalaMapConverter
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
 
 @LoggingSystemSensitive
-class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
+class AkkaLogAdminTest extends AdminLogTestSuite with MockitoSugar with HttpSupport {
 
   private val adminWiring: AdminWiring = AdminWiring.make(ClusterAwareSettings.onPort(3652), Some(7879))
   import adminWiring.actorRuntime._
@@ -83,7 +85,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
   }
 
   def startContainerAndWaitForRunning(): ActorRef[ContainerMessage] = {
-    val frameworkWiring = FrameworkWiring.make(containerActorSystem)
+    val frameworkWiring = FrameworkWiring.make(containerActorSystem, mock[RedisClient])
     val config          = ConfigFactory.load("laser_container.conf")
     val containerRef    = Await.result(Container.spawn(config, frameworkWiring), 5.seconds)
 

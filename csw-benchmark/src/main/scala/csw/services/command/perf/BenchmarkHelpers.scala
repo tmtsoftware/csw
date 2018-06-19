@@ -1,9 +1,9 @@
 package csw.services.command.perf
 
-import akka.actor.{typed, ActorSystem}
+import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.actor.testkit.typed.scaladsl.TestProbe
+import akka.actor.{typed, ActorSystem}
 import com.typesafe.config.Config
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState}
