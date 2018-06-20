@@ -23,7 +23,7 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
     mat: Materializer
 ) extends EventSubscriber {
 
-  val eventSubscriberUtil = new EventSubscriberUtil()
+  private val eventSubscriberUtil = new EventSubscriberUtil()
 
   private lazy val asyncConnectionF: Future[RedisAsyncCommands[EventKey, Event]] =
     redisClient.connectAsync(EventServiceCodec, redisURI).toScala.map(_.async())
@@ -49,8 +49,8 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
           new EventSubscription {
             override def unsubscribe(): Future[Done] = async {
               val commands = await(connectionF)
-              commands.quit()
               await(commands.unsubscribe(eventKeys.toSeq: _*).toFuture.toScala)
+              await(commands.quit().toFuture.toScala)
               killSwitch.shutdown()
               await(terminationSignal)
             }
@@ -114,8 +114,8 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
           new EventSubscription {
             override def unsubscribe(): Future[Done] = async {
               val commands = await(connectionF)
-              commands.quit()
               await(commands.punsubscribe(pattern.toString).toFuture.toScala)
+              await(commands.quit().toFuture.toScala)
               killSwitch.shutdown()
               await(terminationSignal)
             }

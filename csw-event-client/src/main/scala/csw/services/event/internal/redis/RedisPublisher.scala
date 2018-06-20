@@ -20,8 +20,8 @@ import scala.util.control.NonFatal
 class RedisPublisher(redisURI: RedisURI, redisClient: RedisClient)(implicit ec: ExecutionContext, mat: Materializer)
     extends EventPublisher {
 
-  private val parallelism = 1
-  val eventPublisherUtil  = new EventPublisherUtil()
+  private val parallelism        = 1
+  private val eventPublisherUtil = new EventPublisherUtil()
 
   private lazy val asyncConnectionF: Future[RedisAsyncCommands[EventKey, Event]] =
     redisClient.connectAsync(EventServiceCodec, redisURI).toScala.map(_.async())

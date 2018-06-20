@@ -15,7 +15,7 @@ class RedisEventService(eventServiceResolver: EventServiceResolver, masterId: St
   private val redisURI: Future[RedisURI] =
     eventServiceResolver.uri.map(uri ⇒ RedisURI.Builder.sentinel(uri.getHost, uri.getPort, masterId).build())
 
-  lazy val defaultPublisher: Future[EventPublisher] = redisURI.map(publisher)
+  lazy val defaultPublisher: Future[EventPublisher] = makeNewPublisher()
 
   lazy val defaultSubscriber: Future[EventSubscriber] = redisURI.map(subscriber)
 
