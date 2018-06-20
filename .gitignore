@@ -37,3 +37,6 @@ bin/
 journal
 snapshots
 dump.rdb
+.bloop
+project/.bloop
+project/project/.bloop
