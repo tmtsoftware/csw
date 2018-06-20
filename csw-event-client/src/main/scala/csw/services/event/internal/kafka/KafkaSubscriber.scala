@@ -25,7 +25,7 @@ class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(
 ) extends EventSubscriber {
 
   private val consumer: Consumer[String, Array[Byte]] = consumerSettings.createKafkaConsumer()
-  val eventSubscriberUtil                             = new EventSubscriberUtil()
+  private val eventSubscriberUtil                     = new EventSubscriberUtil()
 
   override def subscribe(eventKeys: Set[EventKey]): Source[Event, EventSubscription] = {
     val partitionToOffsets = getLatestOffsets(eventKeys)

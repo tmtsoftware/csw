@@ -20,9 +20,9 @@ class KafkaPublisher(producerSettings: ProducerSettings[String, Array[Byte]])(
     mat: Materializer
 ) extends EventPublisher {
 
-  private val parallelism   = 1
-  private val kafkaProducer = producerSettings.createKafkaProducer()
-  val eventPublisherUtil    = new EventPublisherUtil()
+  private val parallelism        = 1
+  private val kafkaProducer      = producerSettings.createKafkaProducer()
+  private val eventPublisherUtil = new EventPublisherUtil()
 
   override def publish(event: Event): Future[Done] = {
     val promisedDone: Promise[Done] = Promise()
