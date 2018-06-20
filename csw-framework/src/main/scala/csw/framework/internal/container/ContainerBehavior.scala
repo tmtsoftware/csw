@@ -12,6 +12,8 @@ import csw.messages.commons.CoordinatedShutdownReasons.{AllActorsWithinContainer
 import csw.messages.framework._
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
+import csw.messages.params.models.Prefix
+import csw.messages.params.models.Subsystem.Container
 import csw.messages.scaladsl.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.messages.scaladsl.ContainerIdleMessage.SupervisorsCreated
 import csw.messages.scaladsl.FromSupervisorMessage.SupervisorLifecycleStateChanged
@@ -48,8 +50,9 @@ private[framework] final class ContainerBehavior(
 
   import ctx.executionContext
   private val log: Logger                        = loggerFactory.getLogger(ctx)
+  private val containerPrefix                    = s"${Container.entryName}.${containerInfo.name}"
   private val akkaConnection                     = AkkaConnection(ComponentId(containerInfo.name, ComponentType.Container))
-  private val akkaRegistration: AkkaRegistration = registrationFactory.akkaTyped(akkaConnection, ctx.self)
+  private val akkaRegistration: AkkaRegistration = registrationFactory.akkaTyped(akkaConnection, containerPrefix, ctx.self)
 
   // Set of successfully created supervisors for components
   var supervisors: Set[SupervisorInfo] = Set.empty

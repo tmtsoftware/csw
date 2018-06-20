@@ -36,7 +36,7 @@ class FrameworkTestMocks(implicit untypedSystem: actor.ActorSystem, system: Acto
   val registrationResult: RegistrationResult   = mock[RegistrationResult]
   val registrationFactory: RegistrationFactory = mock[RegistrationFactory]
 
-  when(registrationFactory.akkaTyped(any[AkkaConnection], any[ActorRef[_]]))
+  when(registrationFactory.akkaTyped(any[AkkaConnection], any[String], any[ActorRef[_]]))
     .thenReturn(akkaRegistration)
   when(locationService.register(akkaRegistration)).thenReturn(Future.successful(registrationResult))
   when(locationService.unregister(any[AkkaConnection])).thenReturn(Future.successful(Done))

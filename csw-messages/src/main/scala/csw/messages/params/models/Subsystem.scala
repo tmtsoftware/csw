@@ -56,6 +56,8 @@ object Subsystem extends Enum[Subsystem] with PlayJsonEnum[Subsystem] {
   case object TCS     extends Subsystem("Telescope Control System")
   case object TINC    extends Subsystem("Prime Focus Camera Controls")
   case object WFOS    extends Subsystem("Wide Field Optical Spectrometer")
+
+  case object Container extends Subsystem("Container Subsystem")
   // for testing
   case object TEST extends Subsystem("Testing System")
   case object BAD  extends Subsystem("Unknown/default Subsystem")

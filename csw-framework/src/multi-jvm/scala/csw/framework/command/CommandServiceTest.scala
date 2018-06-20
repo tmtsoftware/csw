@@ -94,8 +94,13 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       enterBarrier("spawned")
 
       // resolve assembly running in jvm-3 and send setup command expecting immediate command completion response
-      val assemblyLocF = locationService.resolve(AkkaConnection(ComponentId("Assembly", ComponentType.Assembly)), 5.seconds)
-      val assemblyRef  = Await.result(assemblyLocF, 10.seconds).map(_.componentRef).get
+      val assemblyLocF  = locationService.resolve(AkkaConnection(ComponentId("Assembly", ComponentType.Assembly)), 5.seconds)
+      val maybeLocation = Await.result(assemblyLocF, 10.seconds)
+
+      maybeLocation.isDefined shouldBe true
+      maybeLocation.get.maybePrefix shouldBe Some("tcs.mobie.blue.assembly")
+
+      val assemblyRef = maybeLocation.map(_.componentRef).get
 
       enterBarrier("short-long-commands")
       enterBarrier("assembly-locked")

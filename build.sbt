@@ -100,7 +100,7 @@ lazy val `csw-cluster-seed` = project
     `csw-location`,
     `csw-commons`       % "compile->compile;test->test",
     `csw-framework`     % "test->test",
-    `csw-config-server` % "test->test",
+    `csw-config-server` % "test->test"
   )
   .enablePlugins(DeployApp, MaybeCoverage)
   .settings(

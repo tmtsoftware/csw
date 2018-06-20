@@ -3,9 +3,9 @@ package csw.framework.deploy.containercmd
 import java.io.FileWriter
 import java.nio.file.{Files, Path, Paths}
 
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.TestProbe
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
@@ -19,6 +19,7 @@ import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.ObsId
+import csw.messages.params.models.Subsystem.Container
 import csw.messages.params.states.{CurrentState, StateName}
 import csw.messages.scaladsl.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState}
 import csw.messages.scaladsl.ContainerCommonMessage.GetComponents
@@ -97,6 +98,13 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
 
       enterBarrier("config-file-uploaded")
       enterBarrier("running")
+
+      val maybeContainerLoc =
+        locationService.resolve(AkkaConnection(ComponentId("LGSF_Container", ComponentType.Container)), 5.seconds).await
+
+      maybeContainerLoc.isDefined shouldBe true
+      maybeContainerLoc.get.maybePrefix shouldBe Some(s"${Container.entryName}.LGSF_Container")
+
       enterBarrier("offline")
       enterBarrier("before-shutdown")
       enterBarrier("eton-shutdown")
