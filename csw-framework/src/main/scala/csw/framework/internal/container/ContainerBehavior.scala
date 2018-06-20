@@ -12,7 +12,6 @@ import csw.messages.commons.CoordinatedShutdownReasons.{AllActorsWithinContainer
 import csw.messages.framework._
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
-import csw.messages.params.models.Prefix
 import csw.messages.params.models.Subsystem.Container
 import csw.messages.scaladsl.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.messages.scaladsl.ContainerIdleMessage.SupervisorsCreated

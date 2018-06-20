@@ -3,10 +3,11 @@ package csw.services.location.helpers
 import akka.remote.testkit.{MultiNodeSpec, MultiNodeSpecCallbacks}
 import akka.testkit.ImplicitSender
 import csw.services.location.commons.CswCluster
+import csw.services.location.internal.LocationServiceClient
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import org.scalatest.{BeforeAndAfterAll, FunSuiteLike, Matchers}
 
-abstract class LSNodeSpec[T <: NMembersAndSeed](val config: T)
+abstract class LSNodeSpec[T <: NMembersAndSeed](val config: T, mode: String = "cluster")
     extends MultiNodeSpec(config, config.makeSystem)
     with ImplicitSender
     with MultiNodeSpecCallbacks
@@ -14,8 +15,11 @@ abstract class LSNodeSpec[T <: NMembersAndSeed](val config: T)
     with Matchers
     with BeforeAndAfterAll {
 
-  protected val cswCluster: CswCluster           = CswCluster.withSystem(system)
-  protected val locationService: LocationService = LocationServiceFactory.withCluster(cswCluster)
+  protected val cswCluster: CswCluster = CswCluster.withSystem(system)
+  protected val locationService: LocationService = mode match {
+    case "http"    => new LocationServiceClient()(system, cswCluster.mat)
+    case "cluster" => LocationServiceFactory.withCluster(cswCluster)
+  }
 
   override def initialParticipants: Int = roles.size
 

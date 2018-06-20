@@ -11,11 +11,11 @@ import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 
 import scala.concurrent.duration.DurationInt
 
-class TrackLocationTestMultiJvmNode1 extends TrackLocationTest(0)
-class TrackLocationTestMultiJvmNode2 extends TrackLocationTest(0)
-class TrackLocationTestMultiJvmNode3 extends TrackLocationTest(0)
+class TrackLocationTestMultiJvmNode1 extends TrackLocationTest(0, "cluster")
+class TrackLocationTestMultiJvmNode2 extends TrackLocationTest(0, "cluster")
+class TrackLocationTestMultiJvmNode3 extends TrackLocationTest(0, "cluster")
 
-class TrackLocationTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSeed) {
+class TrackLocationTest(ignore: Int, mode: String) extends LSNodeSpec(config = new TwoMembersAndSeed, mode) {
 
   import config._
   import cswCluster.mat

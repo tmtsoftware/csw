@@ -6,10 +6,12 @@ import akka.http.scaladsl.marshalling.Marshal
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.sse.ServerSentEvent
 import akka.http.scaladsl.unmarshalling.Unmarshal
-import akka.stream.scaladsl.{Keep, Sink, Source}
+import akka.http.scaladsl.unmarshalling.sse.EventStreamUnmarshalling._
+import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{KillSwitch, Materializer}
 import akka.{Done, NotUsed}
 import csw.messages.location._
+import csw.services.location.exceptions.{OtherLocationIsRegistered, RegistrationFailed}
 import csw.services.location.internal.StreamExt.RichSource
 import csw.services.location.javadsl.ILocationService
 import csw.services.location.models.{Registration, RegistrationResult}
@@ -17,13 +19,10 @@ import csw.services.location.scaladsl.LocationService
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
 import io.circe.generic.auto._
 import io.circe.parser._
-import akka.http.scaladsl.unmarshalling.sse.EventStreamUnmarshalling._
-import csw.services.location.exceptions.{OtherLocationIsRegistered, RegistrationFailed}
 
 import scala.async.Async._
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
-import scala.util.control.NonFatal
 
 class LocationServiceClient(implicit actorSystem: ActorSystem, mat: Materializer)
     extends LocationService
@@ -33,8 +32,10 @@ class LocationServiceClient(implicit actorSystem: ActorSystem, mat: Materializer
   import actorSystem.dispatcher
   implicit val scheduler: Scheduler = actorSystem.scheduler
 
+  private val baseUri = "http://localhost:7654/location"
+
   override def register(registration: Registration): Future[RegistrationResult] = async {
-    val uri           = Uri("http://localhost:7654/location/register")
+    val uri           = Uri(baseUri + "/register")
     val requestEntity = await(Marshal(registration).to[RequestEntity])
     val request       = HttpRequest(HttpMethods.POST, uri = uri, entity = requestEntity)
     val response      = await(Http().singleRequest(request))
@@ -51,7 +52,7 @@ class LocationServiceClient(implicit actorSystem: ActorSystem, mat: Materializer
   }
 
   override def unregister(connection: Connection): Future[Done] = async {
-    val uri           = Uri("http://localhost:7654/location/unregister")
+    val uri           = Uri(baseUri + "/unregister")
     val requestEntity = await(Marshal(connection).to[RequestEntity])
     val request       = HttpRequest(HttpMethods.POST, uri = uri, entity = requestEntity)
     val response      = await(Http().singleRequest(request))
@@ -59,14 +60,14 @@ class LocationServiceClient(implicit actorSystem: ActorSystem, mat: Materializer
   }
 
   override def unregisterAll(): Future[Done] = async {
-    val uri      = Uri("http://localhost:7654/location/unregisterAll")
+    val uri      = Uri(baseUri + "/unregisterAll")
     val request  = HttpRequest(HttpMethods.POST, uri = uri)
     val response = await(Http().singleRequest(request))
     await(Unmarshal(response.entity).to[Done])
   }
 
   override def find[L <: Location](connection: TypedConnection[L]): Future[Option[L]] = async {
-    val uri      = Uri(s"http://localhost:7654/location/find/${connection.name}")
+    val uri      = Uri(s"$baseUri/find/${connection.name}")
     val request  = HttpRequest(HttpMethods.GET, uri = uri)
     val response = await(Http().singleRequest(request))
     await(Unmarshal(response.entity).to[Option[Location]]).map(_.asInstanceOf[L])
@@ -74,7 +75,7 @@ class LocationServiceClient(implicit actorSystem: ActorSystem, mat: Materializer
 
   override def resolve[L <: Location](connection: TypedConnection[L], within: FiniteDuration): Future[Option[L]] = async {
     val uri = Uri(
-      s"http://localhost:7654/location/resolve/${connection.name}?within=${within.length.toString + within.unit.toString.toLowerCase}"
+      s"$baseUri/resolve/${connection.name}?within=${within.length.toString + within.unit.toString.toLowerCase}"
     )
     val request  = HttpRequest(HttpMethods.GET, uri = uri)
     val response = await(Http().singleRequest(request))
@@ -85,42 +86,42 @@ class LocationServiceClient(implicit actorSystem: ActorSystem, mat: Materializer
   }
 
   override def list: Future[List[Location]] = async {
-    val uri      = Uri("http://localhost:7654/location/list")
+    val uri      = Uri(baseUri + "/list")
     val request  = HttpRequest(HttpMethods.GET, uri = uri)
     val response = await(Http().singleRequest(request))
     await(Unmarshal(response.entity).to[List[Location]])
   }
 
   override def list(componentType: ComponentType): Future[List[Location]] = async {
-    val uri      = Uri(s"http://localhost:7654/location/list?componentType=$componentType")
+    val uri      = Uri(s"$baseUri/list?componentType=$componentType")
     val request  = HttpRequest(HttpMethods.GET, uri = uri)
     val response = await(Http().singleRequest(request))
     await(Unmarshal(response.entity).to[List[Location]])
   }
 
   override def list(hostname: String): Future[List[Location]] = async {
-    val uri      = Uri(s"http://localhost:7654/location/list?hostname=$hostname")
+    val uri      = Uri(s"$baseUri/list?hostname=$hostname")
     val request  = HttpRequest(HttpMethods.GET, uri = uri)
     val response = await(Http().singleRequest(request))
     await(Unmarshal(response.entity).to[List[Location]])
   }
 
   override def list(connectionType: ConnectionType): Future[List[Location]] = async {
-    val uri      = Uri(s"http://localhost:7654/location/list?connectionType=${connectionType.entryName}")
+    val uri      = Uri(s"$baseUri/list?connectionType=${connectionType.entryName}")
     val request  = HttpRequest(HttpMethods.GET, uri = uri)
     val response = await(Http().singleRequest(request))
     await(Unmarshal(response.entity).to[List[Location]])
   }
 
   override def listByPrefix(prefix: String): Future[List[AkkaLocation]] = async {
-    val uri      = Uri(s"http://localhost:7654/location/list?prefix=$prefix")
+    val uri      = Uri(s"$baseUri/list?prefix=$prefix")
     val request  = HttpRequest(HttpMethods.GET, uri = uri)
     val response = await(Http().singleRequest(request))
     await(Unmarshal(response.entity).to[List[AkkaLocation]])
   }
 
   override def track(connection: Connection): Source[TrackingEvent, KillSwitch] = {
-    val uri     = Uri(s"http://localhost:7654/location/track/${connection.name}")
+    val uri     = Uri(s"$baseUri/track/${connection.name}")
     val request = HttpRequest(HttpMethods.GET, uri = uri)
     val sseStreamFuture = async {
       val response = await(Http().singleRequest(request))

@@ -38,7 +38,7 @@ class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMember
 
   test("ensure that a component registered by one node is resolved and listed on all the nodes") {
     val tcpPort         = 446
-    val tcpConnection   = TcpConnection(ComponentId("reddis", ComponentType.Service))
+    val tcpConnection   = TcpConnection(ComponentId("redis", ComponentType.Service))
     val tcpRegistration = RegistrationFactory.tcp(tcpConnection, tcpPort)
 
     val httpPort         = 81
