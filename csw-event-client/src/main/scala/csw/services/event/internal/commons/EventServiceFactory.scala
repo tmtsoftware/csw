@@ -50,7 +50,7 @@ abstract class EventServiceFactory {
   }
 
   private def mat()(implicit actorSystem: actor.ActorSystem): Materializer = {
-    val settings = ActorMaterializerSettings(actorSystem).withSupervisionStrategy(Supervision.getResumingDecider)
+    val settings = ActorMaterializerSettings(actorSystem).withSupervisionStrategy(EventStreamSupervisionStrategy.decider)
     ActorMaterializer(settings)
   }
 }

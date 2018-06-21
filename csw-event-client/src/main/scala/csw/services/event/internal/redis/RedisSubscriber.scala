@@ -1,11 +1,12 @@
 package csw.services.event.internal.redis
 
 import akka.actor.typed.ActorRef
-import akka.stream.{KillSwitches, Materializer}
 import akka.stream.scaladsl.{Keep, Source}
+import akka.stream.{KillSwitches, Materializer}
 import akka.{Done, NotUsed}
 import csw.messages.events._
 import csw.messages.params.models.Subsystem
+import csw.services.event.exceptions.EventServerNotAvailable
 import csw.services.event.internal.commons.EventSubscriberUtil
 import csw.services.event.scaladsl.{EventSubscriber, EventSubscription, SubscriptionMode}
 import io.lettuce.core.api.async.RedisAsyncCommands
@@ -17,6 +18,7 @@ import scala.async.Async._
 import scala.compat.java8.FutureConverters.CompletionStageOps
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
     implicit ec: ExecutionContext,
@@ -26,13 +28,13 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
   private val eventSubscriberUtil = new EventSubscriberUtil()
 
   private lazy val asyncConnectionF: Future[RedisAsyncCommands[EventKey, Event]] =
-    redisClient.connectAsync(EventServiceCodec, redisURI).toScala.map(_.async())
+    connection(redisClient.connectAsync(EventServiceCodec, redisURI).toScala).map(_.async())
 
   private def reactiveConnectionF(): Future[RedisPubSubReactiveCommands[EventKey, Event]] =
-    redisClient.connectPubSubAsync(EventServiceCodec, redisURI).toScala.map(_.reactive())
+    connection(redisClient.connectPubSubAsync(EventServiceCodec, redisURI).toScala).map(_.reactive())
 
   private def patternBasedReactiveConnection(): Future[RedisPubSubReactiveCommands[String, Event]] =
-    redisClient.connectPubSubAsync(PatternBasedEventServiceCodec, redisURI).toScala.map(_.reactive())
+    connection(redisClient.connectPubSubAsync(PatternBasedEventServiceCodec, redisURI).toScala).map(_.reactive())
 
   override def subscribe(eventKeys: Set[EventKey]): Source[Event, EventSubscription] = {
     val connectionF                                  = reactiveConnectionF()
@@ -155,4 +157,7 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
       .toFuture
       .toScala
       .map(_ ⇒ Source.fromPublisher(reactiveCommands.observePatterns(OverflowStrategy.LATEST)).map(_.getMessage))
+
+  private def connection[T](commands: ⇒ Future[T]): Future[T] =
+    Future.unit.flatMap(_ ⇒ commands).recover { case NonFatal(ex) ⇒ throw EventServerNotAvailable(ex) }
 }
