@@ -1,34 +1,13 @@
-package csw.services.tracklocation
+package csw.services.location_agent
 
 import csw.services.BuildInfo
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.logging.scaladsl.{Logger, LoggingSystemFactory}
-import csw.services.tracklocation.commons.LocationAgentLogger
-import csw.services.tracklocation.models.Command
-import csw.services.tracklocation.utils.ArgsParser
+import csw.services.location_agent.commons.LocationAgentLogger
+import csw.services.location_agent.models.Command
+import csw.services.location_agent.utils.ArgsParser
 
 import scala.sys.process.Process
-
-/**
- * Application object allowing program execution from command line, also facilitates an entry point for Component level testing.
- */
-class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) {
-  private val name        = "csw-location-agent"
-  private val log: Logger = LocationAgentLogger.getLogger
-
-  def start(args: Array[String]): Option[Process] =
-    new ArgsParser(name).parse(args).map { options =>
-      val actorSystem = clusterSettings.system
-
-      if (startLogging)
-        LoggingSystemFactory.start(name, BuildInfo.version, clusterSettings.hostname, actorSystem)
-
-      val command = Command.parse(options)
-      log.info(s"commandText: ${command.commandText}, command: ${command.toString}")
-      val trackLocation = new TrackLocation(options.names, command, actorSystem)
-      trackLocation.run()
-    }
-}
 
 // $COVERAGE-OFF$
 object Main extends App {
@@ -41,3 +20,25 @@ object Main extends App {
   }
 }
 // $COVERAGE-ON$
+
+/**
+ * Application object allowing program execution from command line, also facilitates an entry point for Component level testing.
+ */
+class Main(clusterSettings: ClusterSettings, startLogging: Boolean) {
+  private val name        = "csw-location-agent"
+  private val log: Logger = LocationAgentLogger.getLogger
+
+  def start(args: Array[String]): Option[Process] =
+    new ArgsParser(name).parse(args).map { options =>
+      val actorSystem = clusterSettings.system
+
+      if (startLogging)
+        LoggingSystemFactory.start(name, BuildInfo.version, clusterSettings.hostname, actorSystem)
+
+      val command = Command.parse(options)
+
+      log.info(s"commandText: ${command.commandText}, command: ${command.toString}")
+      val locationAgent = new LocationAgent(options.names, command, actorSystem)
+      locationAgent.run()
+    }
+}

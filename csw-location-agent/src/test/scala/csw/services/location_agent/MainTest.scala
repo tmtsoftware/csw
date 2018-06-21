@@ -1,4 +1,4 @@
-package csw.services.tracklocation
+package csw.services.location_agent
 
 import java.net.URI
 import java.nio.file.Paths
@@ -10,7 +10,7 @@ import csw.messages.location.Connection.TcpConnection
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.location.scaladsl.LocationServiceFactory
-import csw.services.tracklocation.common.TestFutureExtension.RichFuture
+import csw.services.location_agent.common.TestFutureExtension.RichFuture
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
@@ -51,8 +51,8 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterAll with Before
   }
 
   private def testWith(args: Array[String], name: String, port: Int) = {
-    val trackLocationApp = new Main(ClusterAwareSettings.joinLocal(3559))
-    val process          = trackLocationApp.start(args).get
+    val locationAgentApp = new Main(ClusterAwareSettings.joinLocal(3559))
+    val process          = locationAgentApp.start(args).get
 
     val connection       = TcpConnection(ComponentId(name, ComponentType.Service))
     val resolvedLocation = locationService.resolve(connection, 5.seconds).await.get

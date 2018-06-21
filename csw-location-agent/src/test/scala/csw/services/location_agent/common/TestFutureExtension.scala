@@ -1,4 +1,4 @@
-package csw.services.tracklocation.common
+package csw.services.location_agent.common
 
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{Await, Future}

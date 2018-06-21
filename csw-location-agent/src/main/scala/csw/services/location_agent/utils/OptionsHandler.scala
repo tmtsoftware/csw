@@ -1,7 +1,7 @@
-package csw.services.tracklocation.utils
+package csw.services.location_agent.utils
 
 import com.typesafe.config.Config
-import csw.services.tracklocation.models.Options
+import csw.services.location_agent.models.Options
 
 /**
  * Exposes utility methods to parse string, int, port options.

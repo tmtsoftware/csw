@@ -1,4 +1,4 @@
-package csw.services.tracklocation
+package csw.services.location_agent
 
 import akka.Done
 import akka.actor.CoordinatedShutdown.Reason
@@ -11,8 +11,8 @@ import csw.services.location.models._
 import csw.services.location.scaladsl.LocationServiceFactory
 import csw.services.logging.commons.LogAdminActorFactory
 import csw.services.logging.scaladsl.Logger
-import csw.services.tracklocation.commons.LocationAgentLogger
-import csw.services.tracklocation.models.Command
+import csw.services.location_agent.commons.LocationAgentLogger
+import csw.services.location_agent.models.Command
 
 import scala.collection.immutable.Seq
 import scala.concurrent.duration.DurationDouble
@@ -23,7 +23,7 @@ import scala.util.control.NonFatal
 /**
  * Starts a given external program ([[TcpConnection]]), registers it with the location service and unregisters it when the program exits.
  */
-class TrackLocation(names: List[String], command: Command, actorSystem: ActorSystem) {
+class LocationAgent(names: List[String], command: Command, actorSystem: ActorSystem) {
   private val log: Logger = LocationAgentLogger.getLogger
 
   private val cswCluster      = CswCluster.withSystem(actorSystem)
