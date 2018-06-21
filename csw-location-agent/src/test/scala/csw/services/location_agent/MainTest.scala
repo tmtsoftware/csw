@@ -51,7 +51,7 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterAll with Before
   }
 
   private def testWith(args: Array[String], name: String, port: Int) = {
-    val locationAgentApp = new Main(ClusterAwareSettings.joinLocal(3559))
+    val locationAgentApp = new Main(ClusterAwareSettings.joinLocal(3559), false)
     val process          = locationAgentApp.start(args).get
 
     val connection       = TcpConnection(ComponentId(name, ComponentType.Service))

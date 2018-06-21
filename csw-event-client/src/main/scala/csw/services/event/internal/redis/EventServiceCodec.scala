@@ -3,7 +3,6 @@ package csw.services.event.internal.redis
 import java.nio.ByteBuffer
 
 import csw.messages.events.{Event, EventKey}
-import csw.messages.params.models.Subsystem
 import csw_protobuf.events.PbEvent
 import io.lettuce.core.codec.{RedisCodec, Utf8StringCodec}
 
