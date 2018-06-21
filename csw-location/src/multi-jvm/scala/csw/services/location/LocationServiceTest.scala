@@ -1,10 +1,10 @@
 package csw.services.location
 
 import akka.actor.ActorSystem
-import akka.stream.scaladsl.Keep
-import akka.stream.testkit.scaladsl.TestSink
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.stream.scaladsl.Keep
+import akka.stream.testkit.scaladsl.TestSink
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location._
 import csw.services.location.commons.RegistrationFactory2
@@ -16,10 +16,12 @@ import scala.collection.immutable.Set
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class LocationServiceTestMultiJvmNode1 extends LocationServiceTest(0)
-class LocationServiceTestMultiJvmNode2 extends LocationServiceTest(0)
+class LocationServiceTestMultiJvmNode1 extends LocationServiceTest(0, "cluster")
+class LocationServiceTestMultiJvmNode2 extends LocationServiceTest(0, "cluster")
 
-class LocationServiceTest(ignore: Int) extends LSNodeSpec(config = new OneMemberAndSeed) with BeforeAndAfterEach {
+class LocationServiceTest(ignore: Int, mode: String)
+    extends LSNodeSpec(config = new OneMemberAndSeed, mode)
+    with BeforeAndAfterEach {
 
   import config._
   import cswCluster.mat

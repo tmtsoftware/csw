@@ -1,12 +1,14 @@
 package csw.services.location
 
-import akka.testkit.TestProbe
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.stream.ActorMaterializer
+import akka.testkit.TestProbe
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType, LocationRemoved, LocationUpdated}
 import csw.services.location.commons.CswCluster
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
+import csw.services.location.internal.LocationServiceClient
 import csw.services.location.models._
 import csw.services.location.scaladsl.LocationServiceFactory
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
@@ -14,11 +16,11 @@ import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class DetectComponentRestartTestMultiJvmNode1 extends DetectComponentRestartTest(0)
-class DetectComponentRestartTestMultiJvmNode2 extends DetectComponentRestartTest(0)
-class DetectComponentRestartTestMultiJvmNode3 extends DetectComponentRestartTest(0)
+class DetectComponentRestartTestMultiJvmNode1 extends DetectComponentRestartTest(0, "cluster")
+class DetectComponentRestartTestMultiJvmNode2 extends DetectComponentRestartTest(0, "cluster")
+class DetectComponentRestartTestMultiJvmNode3 extends DetectComponentRestartTest(0, "cluster")
 
-class DetectComponentRestartTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSeed) {
+class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(config = new TwoMembersAndSeed, mode) {
 
   import config._
 
@@ -47,7 +49,11 @@ class DetectComponentRestartTest(ignore: Int) extends LSNodeSpec(config = new Tw
 
       val newSystem = startNewSystem()
 
-      val freshLocationService = LocationServiceFactory.withCluster(CswCluster.withSystem(newSystem))
+      val freshLocationService = mode match {
+        case "http"    => new LocationServiceClient()(newSystem, ActorMaterializer()(newSystem))
+        case "cluster" => LocationServiceFactory.withCluster(CswCluster.withSystem(newSystem))
+      }
+
       Thread.sleep(2000)
 
       freshLocationService

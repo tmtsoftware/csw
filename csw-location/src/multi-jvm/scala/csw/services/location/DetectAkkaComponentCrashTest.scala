@@ -1,9 +1,9 @@
 package csw.services.location
 
-import akka.stream.scaladsl.Keep
-import akka.stream.testkit.scaladsl.TestSink
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.stream.scaladsl.Keep
+import akka.stream.testkit.scaladsl.TestSink
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
 import csw.messages.location._
 import csw.services.location.commons.{ActorSystemFactory, RegistrationFactory2}
@@ -14,9 +14,9 @@ import csw.services.logging.commons.LogAdminActorFactory
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class DetectAkkaComponentCrashTestMultiJvmNode1 extends DetectAkkaComponentCrashTest(0)
-class DetectAkkaComponentCrashTestMultiJvmNode2 extends DetectAkkaComponentCrashTest(0)
-class DetectAkkaComponentCrashTestMultiJvmNode3 extends DetectAkkaComponentCrashTest(0)
+class DetectAkkaComponentCrashTestMultiJvmNode1 extends DetectAkkaComponentCrashTest(0, "cluster")
+class DetectAkkaComponentCrashTestMultiJvmNode2 extends DetectAkkaComponentCrashTest(0, "cluster")
+class DetectAkkaComponentCrashTestMultiJvmNode3 extends DetectAkkaComponentCrashTest(0, "cluster")
 
 /**
  * This test is running as a part of jenkins master-slave setup forming three nodes cluster. (seed: running on jenkins master, member1: running on jenkins slave, member2: running on jenkins slave)
@@ -29,7 +29,7 @@ class DetectAkkaComponentCrashTestMultiJvmNode3 extends DetectAkkaComponentCrash
  * => probe.requestNext(5.seconds) shouldBe a[LocationRemoved]
  *
 **/
-class DetectAkkaComponentCrashTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSeed) {
+class DetectAkkaComponentCrashTest(ignore: Int, mode: String) extends LSNodeSpec(config = new TwoMembersAndSeed, mode) {
 
   import config._
   import cswCluster.mat
@@ -91,5 +91,6 @@ class DetectAkkaComponentCrashTest(ignore: Int) extends LSNodeSpec(config = new 
         }
       }
     }
+    enterBarrier("end")
   }
 }

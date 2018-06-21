@@ -5,10 +5,11 @@ import akka.actor.typed.ActorRef
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.models.{AkkaRegistration, HttpRegistration, TcpRegistration}
 import csw.services.logging.commons.LogAdminActorFactory
+import csw.services.logging.messages.LogControlMessages
 
-class RegistrationFactory2(implicit actorSystem: ActorSystem) {
+class TestRegistrationFactory(implicit actorSystem: ActorSystem) {
 
-  private lazy val logAdminActorRef = LogAdminActorFactory.make(actorSystem)
+  lazy val logAdminActorRef: ActorRef[LogControlMessages] = LogAdminActorFactory.make(actorSystem)
 
   def akka(connection: AkkaConnection, actorRef: ActorRef[_]): AkkaRegistration =
     AkkaRegistration(connection, Some("nfiraos.ncc.trombone"), actorRef, logAdminActorRef)

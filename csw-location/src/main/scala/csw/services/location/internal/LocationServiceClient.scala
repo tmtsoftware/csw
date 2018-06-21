@@ -44,6 +44,9 @@ class LocationServiceClient(implicit actorSystem: ActorSystem, mat: Materializer
       case x @ StatusCodes.InternalServerError => throw RegistrationFailed(x.reason)
       case StatusCodes.OK =>
         val location0 = await(Unmarshal(response.entity).to[Location])
+        CoordinatedShutdown(actorSystem).addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "unregister")(
+          () ⇒ unregister(location0.connection)
+        )
         new RegistrationResult {
           override def unregister(): Future[Done] = outer.unregister(location0.connection)
           override def location: Location         = location0

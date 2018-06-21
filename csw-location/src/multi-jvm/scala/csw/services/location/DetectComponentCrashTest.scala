@@ -11,13 +11,13 @@ import csw.services.logging.commons.LogAdminActorFactory
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class DetectComponentCrashTestMultiJvmNode1 extends DetectComponentCrashTest(0)
-class DetectComponentCrashTestMultiJvmNode2 extends DetectComponentCrashTest(0)
-class DetectComponentCrashTestMultiJvmNode3 extends DetectComponentCrashTest(0)
+class DetectComponentCrashTestMultiJvmNode1 extends DetectComponentCrashTest(0, "cluster")
+class DetectComponentCrashTestMultiJvmNode2 extends DetectComponentCrashTest(0, "cluster")
+class DetectComponentCrashTestMultiJvmNode3 extends DetectComponentCrashTest(0, "cluster")
 
 // DEOPSCSW-298: DeathWatch Http components
 // DEOPSCSW-300: DeathWatch tcp components
-class DetectComponentCrashTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSeed) {
+class DetectComponentCrashTest(ignore: Int, mode: String) extends LSNodeSpec(config = new TwoMembersAndSeed, mode) {
 
   import config._
   import cswCluster.mat
@@ -67,7 +67,7 @@ class DetectComponentCrashTest(ignore: Int) extends LSNodeSpec(config = new TwoM
       locationService.register(httpRegistration).await
       enterBarrier("Registration")
 
-      Await.ready(system.whenTerminated, 5.seconds)
+      Await.ready(system.whenTerminated, 15.seconds)
     }
 
     runOn(member2) {
@@ -80,7 +80,7 @@ class DetectComponentCrashTest(ignore: Int) extends LSNodeSpec(config = new TwoM
       enterBarrier("Registration")
 
       enterBarrier("after-crash")
-      Await.ready(system.whenTerminated, 5.seconds)
+      Await.ready(system.whenTerminated, 15.seconds)
     }
   }
 }
