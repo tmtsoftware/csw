@@ -21,7 +21,7 @@ import csw.messages.location.Connection.TcpConnection;
 import csw.messages.commons.CoordinatedShutdownReasons;
 import csw.services.location.commons.ActorSystemFactory;
 import csw.services.location.commons.Constants;
-import csw.services.location.commons.RegistrationFactory2;
+import csw.services.location.commons.TestRegistrationFactory;
 import csw.services.location.internal.Networks;
 import csw.services.location.models.AkkaRegistration;
 import csw.services.location.models.HttpRegistration;
@@ -60,7 +60,7 @@ public class JLocationServiceImplTest {
     private HttpConnection httpServiceConnection = new HttpConnection(httpServiceComponentId);
     private String Path = "/path/to/resource";
 
-    private RegistrationFactory2 RegistrationFactory  = new RegistrationFactory2(actorSystem);
+    private TestRegistrationFactory RegistrationFactory  = new TestRegistrationFactory(actorSystem);
 
 
     @After

@@ -6,7 +6,7 @@ import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
 import csw.messages.location._
-import csw.services.location.commons.{ActorSystemFactory, RegistrationFactory2}
+import csw.services.location.commons.{ActorSystemFactory, TestRegistrationFactory}
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.services.location.models.HttpRegistration
 import csw.services.logging.commons.LogAdminActorFactory
@@ -65,7 +65,7 @@ class DetectAkkaComponentCrashTest(ignore: Int, mode: String) extends LSNodeSpec
         .remote()
         .spawn(Behavior.empty, "trombone-hcd-1")
 
-      locationService.register(new RegistrationFactory2().akka(akkaConnection, actorRef)).await
+      locationService.register(new TestRegistrationFactory().akka(akkaConnection, actorRef)).await
       enterBarrier("Registration")
 
       Await.ready(system.whenTerminated, 5.seconds)

@@ -7,8 +7,8 @@ import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConn
 import csw.messages.location.{AkkaLocation, HttpLocation, TcpLocation}
 
 object LocationFactory {
-  def akka(connection: AkkaConnection, uri: URI, actorRef: ActorRef[_]) =
-    AkkaLocation(connection, Some("nfiraos.ncc.trombone"), uri, actorRef, null)
-  def http(connection: HttpConnection, uri: URI) = HttpLocation(connection, uri, null)
-  def tcp(connection: TcpConnection, uri: URI)   = TcpLocation(connection, uri, null)
+  def akka(connection: AkkaConnection, uri: URI, actorRef: ActorRef[_], logAdminRef: ActorRef[_] = null) =
+    AkkaLocation(connection, Some("nfiraos.ncc.trombone"), uri, actorRef, logAdminRef)
+  def http(connection: HttpConnection, uri: URI, logAdminRef: ActorRef[_] = null) = HttpLocation(connection, uri, logAdminRef)
+  def tcp(connection: TcpConnection, uri: URI, logAdminRef: ActorRef[_] = null)   = TcpLocation(connection, uri, logAdminRef)
 }

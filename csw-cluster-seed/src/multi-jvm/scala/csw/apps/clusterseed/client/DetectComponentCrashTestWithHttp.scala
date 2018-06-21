@@ -1,7 +1,6 @@
 package csw.apps.clusterseed.client
 
 import csw.services.location.DetectComponentCrashTest
-import csw.services.logging.scaladsl.LoggingSystemFactory
 
 class DetectComponentCrashTestWithHttpMultiJvmNode1 extends DetectComponentCrashTestWithHttp(0, "http")
 class DetectComponentCrashTestWithHttpMultiJvmNode2 extends DetectComponentCrashTestWithHttp(0, "http")

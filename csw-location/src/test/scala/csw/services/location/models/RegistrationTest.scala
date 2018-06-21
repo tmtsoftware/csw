@@ -9,7 +9,7 @@ import akka.serialization.Serialization
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location._
-import csw.services.location.commons.{ActorSystemFactory, LocationFactory, RegistrationFactory2}
+import csw.services.location.commons.{ActorSystemFactory, LocationFactory, TestRegistrationFactory}
 import csw.services.location.exceptions.LocalAkkaActorRegistrationNotAllowed
 import csw.services.location.internal.Networks
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
@@ -21,7 +21,8 @@ class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll wit
 
   implicit val actorSystem: ActorSystem = ActorSystemFactory.remote()
 
-  val RegistrationFactory = new RegistrationFactory2
+  val RegistrationFactory = new TestRegistrationFactory
+  import RegistrationFactory._
 
   test("should able to create the AkkaRegistration which should internally create AkkaLocation") {
     val hostname = new Networks().hostname()
@@ -33,7 +34,7 @@ class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll wit
 
     val akkaRegistration = RegistrationFactory.akka(akkaConnection, actorRef)
 
-    val expectedAkkaLocation = LocationFactory.akka(akkaConnection, akkaUri, actorRef)
+    val expectedAkkaLocation = LocationFactory.akka(akkaConnection, akkaUri, actorRef, logAdminActorRef)
 
     akkaRegistration.location(hostname) shouldBe expectedAkkaLocation
   }
@@ -46,7 +47,7 @@ class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll wit
     val httpConnection   = HttpConnection(ComponentId("trombone", ComponentType.HCD))
     val httpRegistration = RegistrationFactory.http(httpConnection, port, prefix)
 
-    val expectedhttpLocation = LocationFactory.http(httpConnection, new URI(s"http://$hostname:$port/$prefix"))
+    val expectedhttpLocation = LocationFactory.http(httpConnection, new URI(s"http://$hostname:$port/$prefix"), logAdminActorRef)
 
     httpRegistration.location(hostname) shouldBe expectedhttpLocation
   }
@@ -58,7 +59,7 @@ class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll wit
     val tcpConnection   = TcpConnection(ComponentId("lgsTrombone", ComponentType.HCD))
     val tcpRegistration = RegistrationFactory.tcp(tcpConnection, port)
 
-    val expectedTcpLocation = LocationFactory.tcp(tcpConnection, new URI(s"tcp://$hostname:$port"))
+    val expectedTcpLocation = LocationFactory.tcp(tcpConnection, new URI(s"tcp://$hostname:$port"), logAdminActorRef)
 
     tcpRegistration.location(hostname) shouldBe expectedTcpLocation
   }

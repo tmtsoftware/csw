@@ -11,7 +11,7 @@ import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location._
 import csw.services.location.commons.TestFutureExtension.RichFuture
-import csw.services.location.commons.{ActorSystemFactory, RegistrationFactory2}
+import csw.services.location.commons.{ActorSystemFactory, TestRegistrationFactory}
 import csw.services.location.exceptions.OtherLocationIsRegistered
 import csw.services.location.internal.{LocationServiceClient, Networks}
 import csw.services.location.models._
@@ -46,7 +46,7 @@ class LocationServiceCompTest(mode: String)
   implicit val patience: PatienceConfig =
     PatienceConfig(Span(5, org.scalatest.time.Seconds), Span(100, org.scalatest.time.Millis))
 
-  val RegistrationFactory = new RegistrationFactory2
+  val RegistrationFactory = new TestRegistrationFactory
 
   override protected def afterEach(): Unit =
     locationService.unregisterAll().await
