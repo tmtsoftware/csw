@@ -36,7 +36,6 @@ import csw.messages.scaladsl.SupervisorRestartMessage.{UnRegistrationComplete, U
 import csw.messages.scaladsl._
 import csw.services.command.internal.CommandResponseManagerFactory
 import csw.services.command.scaladsl.CommandResponseManager
-import csw.services.event.internal.commons.EventServiceFactory
 import csw.services.event.scaladsl.EventService
 import csw.services.location.models.AkkaRegistration
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
@@ -70,7 +69,6 @@ private[framework] object SupervisorBehavior {
  * @param registrationFactory the factory for creating a typed [[csw.services.location.models.AkkaRegistration]] from
  *                            [[csw.messages.location.Connection.AkkaConnection]]
  * @param locationService the single instance of Location service created for a running application
- * @param eventServiceFactory factory for creating event service instance
  * @param loggerFactory the factory for creating [[csw.services.logging.scaladsl.Logger]] instance
  */
 private[framework] final class SupervisorBehavior(

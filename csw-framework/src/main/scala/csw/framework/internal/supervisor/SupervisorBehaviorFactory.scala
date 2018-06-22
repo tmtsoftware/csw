@@ -6,7 +6,6 @@ import csw.framework.scaladsl.ComponentBehaviorFactory
 import csw.messages.framework.ComponentInfo
 import csw.messages.scaladsl.{ComponentMessage, ContainerIdleMessage, SupervisorMessage}
 import csw.services.command.internal.CommandResponseManagerFactory
-import csw.services.event.internal.commons.EventServiceFactory
 import csw.services.event.scaladsl.EventService
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.LoggerFactory

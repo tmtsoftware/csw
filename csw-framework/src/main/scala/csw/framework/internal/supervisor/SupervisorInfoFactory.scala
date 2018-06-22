@@ -1,13 +1,11 @@
 package csw.framework.internal.supervisor
 
-import akka.actor.ActorSystem
 import akka.actor.typed.ActorRef
 import csw.framework.internal.wiring.CswFrameworkSystem
 import csw.messages.framework.{Component, ComponentInfo, SupervisorInfo}
 import csw.messages.scaladsl.ContainerIdleMessage
 import csw.services.command.internal.CommandResponseManagerFactory
 import csw.services.event.internal.commons.EventServiceFactory
-import csw.services.event.internal.redis.RedisEventServiceFactory
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
