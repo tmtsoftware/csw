@@ -2,7 +2,7 @@ package csw.services.event.internal.commons
 import akka.actor
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Materializer, Supervision}
+import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Materializer}
 import csw.services.event.internal.commons.javawrappers.JEventService
 import csw.services.event.internal.commons.serviceresolver.{
   EventServiceHostPortResolver,
@@ -50,7 +50,7 @@ abstract class EventServiceFactory {
   }
 
   private def mat()(implicit actorSystem: actor.ActorSystem): Materializer = {
-    val settings = ActorMaterializerSettings(actorSystem).withSupervisionStrategy(Supervision.getResumingDecider)
+    val settings = ActorMaterializerSettings(actorSystem).withSupervisionStrategy(EventStreamSupervisionStrategy.decider)
     ActorMaterializer(settings)
   }
 }

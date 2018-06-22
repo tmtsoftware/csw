@@ -23,8 +23,9 @@ class RedisPublisher(redisURI: RedisURI, redisClient: RedisClient)(implicit ec: 
   private val parallelism        = 1
   private val eventPublisherUtil = new EventPublisherUtil()
 
-  private lazy val asyncConnectionF: Future[RedisAsyncCommands[EventKey, Event]] =
-    redisClient.connectAsync(EventServiceCodec, redisURI).toScala.map(_.async())
+  private lazy val asyncConnectionF: Future[RedisAsyncCommands[EventKey, Event]] = Future.unit
+    .flatMap(_ ⇒ redisClient.connectAsync(EventServiceCodec, redisURI).toScala)
+    .map(_.async())
 
   override def publish(event: Event): Future[Done] =
     async {
