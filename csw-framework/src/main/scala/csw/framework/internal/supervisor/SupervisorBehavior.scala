@@ -37,6 +37,7 @@ import csw.messages.scaladsl._
 import csw.services.command.internal.CommandResponseManagerFactory
 import csw.services.command.scaladsl.CommandResponseManager
 import csw.services.event.internal.commons.EventServiceFactory
+import csw.services.event.scaladsl.EventService
 import csw.services.location.models.AkkaRegistration
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
@@ -81,7 +82,7 @@ private[framework] final class SupervisorBehavior(
     commandResponseManagerFactory: CommandResponseManagerFactory,
     registrationFactory: RegistrationFactory,
     locationService: LocationService,
-    eventServiceFactory: EventServiceFactory,
+    eventService: EventService,
     loggerFactory: LoggerFactory
 ) extends MutableBehavior[SupervisorMessage] {
 
@@ -106,7 +107,6 @@ private[framework] final class SupervisorBehavior(
   private var lockManager: LockManager                            = new LockManager(None, loggerFactory)
   private[framework] var lifecycleState: SupervisorLifecycleState = SupervisorLifecycleState.Idle
   private[framework] var component: Option[ActorRef[Nothing]]     = None
-  private lazy val eventService                                   = eventServiceFactory.make(locationService)(ctx.system)
 
   spawnAndWatchComponent()
 

@@ -6,11 +6,9 @@ import csw.services.event.internal.commons.EventServiceFactory
 import csw.services.event.internal.commons.serviceresolver.EventServiceResolver
 import csw.services.event.scaladsl.EventService
 
-import scala.concurrent.ExecutionContext
-
 class KafkaEventServiceFactory() extends EventServiceFactory {
-  override protected def eventServiceImpl(
-      eventServiceResolver: EventServiceResolver
-  )(implicit actorSystem: ActorSystem, ec: ExecutionContext, mat: Materializer): EventService =
-    new KafkaEventService(eventServiceResolver)
+  override protected def eventServiceImpl(eventServiceResolver: EventServiceResolver)(
+      implicit actorSystem: ActorSystem,
+      mat: Materializer
+  ): EventService = new KafkaEventService(eventServiceResolver)
 }

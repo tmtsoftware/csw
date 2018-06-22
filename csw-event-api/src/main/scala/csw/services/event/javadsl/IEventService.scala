@@ -7,11 +7,14 @@ import csw.services.event.scaladsl.EventService
 import scala.concurrent.ExecutionContext
 
 trait IEventService {
-  val executionContext: ExecutionContext
-  val defaultPublisher: CompletableFuture[IEventPublisher]
-  val defaultSubscriber: CompletableFuture[IEventSubscriber]
+
+  implicit val executionContext: ExecutionContext
+
+  lazy val defaultPublisher: CompletableFuture[IEventPublisher]   = makeNewPublisher()
+  lazy val defaultSubscriber: CompletableFuture[IEventSubscriber] = makeNewSubscriber()
 
   def makeNewPublisher(): CompletableFuture[IEventPublisher]
+  def makeNewSubscriber(): CompletableFuture[IEventSubscriber]
 
   def asScala: EventService
 }

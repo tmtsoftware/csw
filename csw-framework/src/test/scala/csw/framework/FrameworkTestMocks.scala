@@ -41,7 +41,7 @@ class FrameworkTestMocks(implicit untypedSystem: actor.ActorSystem, system: Acto
   when(locationService.register(akkaRegistration)).thenReturn(Future.successful(registrationResult))
   when(locationService.unregister(any[AkkaConnection])).thenReturn(Future.successful(Done))
   when(locationService.asJava).thenReturn(mock[ILocationService])
-  when(eventServiceFactory.make(any[LocationService]())(any[ActorSystem[_]]())).thenReturn(eventService)
+  when(eventServiceFactory.make(any[LocationService]())(any[actor.ActorSystem]())).thenReturn(eventService)
   when(eventService.executionContext).thenReturn(untypedSystem.dispatcher)
   ///////////////////////////////////////////////
 

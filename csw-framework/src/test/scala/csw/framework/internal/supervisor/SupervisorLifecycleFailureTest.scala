@@ -219,7 +219,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
       Some(mock[ActorRef[ContainerIdleMessage]]),
       hcdInfo,
       locationService,
-      eventServiceFactory,
+      eventService,
       registrationFactory,
       new SampleBehaviorFactory(componentHandlers),
       commandResponseManagerFactory,

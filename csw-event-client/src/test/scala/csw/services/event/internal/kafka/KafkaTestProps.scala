@@ -38,7 +38,7 @@ class KafkaTestProps(
   private lazy val kafkaProducer = producerSettings.createKafkaProducer()
 
   val eventService: EventService   = eventServiceFactory.make(locationService)
-  val jEventService: IEventService = eventServiceFactory.jMake(locationService.asJava, typedActorSystem)
+  val jEventService: IEventService = eventServiceFactory.jMake(locationService.asJava, actorSystem)
 
   val publisher: EventPublisher                                    = eventService.defaultPublisher.await
   val subscriber: EventSubscriber                                  = eventService.defaultSubscriber.await

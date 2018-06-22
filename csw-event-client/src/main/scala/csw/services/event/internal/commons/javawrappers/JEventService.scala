@@ -8,16 +8,15 @@ import csw.services.event.scaladsl.EventService
 import scala.compat.java8.FutureConverters.FutureOps
 import scala.concurrent.ExecutionContext
 
-class JEventService(eventService: EventService)(implicit val executionContext: ExecutionContext) extends IEventService {
+class JEventService(eventService: EventService) extends IEventService {
 
-  override lazy val defaultPublisher: CompletableFuture[IEventPublisher] =
-    eventService.defaultPublisher.map[IEventPublisher](new JEventPublisher(_)).toJava.toCompletableFuture
-
-  override lazy val defaultSubscriber: CompletableFuture[IEventSubscriber] =
-    eventService.defaultSubscriber.map[IEventSubscriber](new JEventSubscriber(_)).toJava.toCompletableFuture
+  implicit val executionContext: ExecutionContext = eventService.executionContext
 
   override def makeNewPublisher(): CompletableFuture[IEventPublisher] =
     eventService.makeNewPublisher().map[IEventPublisher](new JEventPublisher(_)).toJava.toCompletableFuture
+
+  override def makeNewSubscriber(): CompletableFuture[IEventSubscriber] =
+    eventService.defaultSubscriber.map[IEventSubscriber](new JEventSubscriber(_)).toJava.toCompletableFuture
 
   override def asScala: EventService = eventService
 }

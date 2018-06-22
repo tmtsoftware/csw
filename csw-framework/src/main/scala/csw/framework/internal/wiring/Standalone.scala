@@ -26,11 +26,13 @@ object Standalone {
     import wiring._
     val componentInfo      = ConfigParser.parseStandalone(config)
     val cswFrameworkSystem = new CswFrameworkSystem(actorSystem)
+    val eventService       = eventServiceFactory.make(locationService)(actorSystem)
+
     val supervisorBehavior = SupervisorBehaviorFactory.make(
       None,
       componentInfo,
       locationService,
-      eventServiceFactory,
+      eventService,
       registrationFactory,
       commandResponseManagerFactory
     )

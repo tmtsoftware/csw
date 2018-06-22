@@ -1,11 +1,13 @@
 package csw.framework.internal.supervisor
 
+import akka.actor.ActorSystem
 import akka.actor.typed.ActorRef
 import csw.framework.internal.wiring.CswFrameworkSystem
 import csw.messages.framework.{Component, ComponentInfo, SupervisorInfo}
 import csw.messages.scaladsl.ContainerIdleMessage
 import csw.services.command.internal.CommandResponseManagerFactory
 import csw.services.event.internal.commons.EventServiceFactory
+import csw.services.event.internal.redis.RedisEventServiceFactory
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
@@ -31,6 +33,7 @@ private[framework] class SupervisorInfoFactory(containerName: String) {
     implicit val ec: ExecutionContextExecutor = system.dispatcher
     val richSystem                            = new CswFrameworkSystem(system)
     val commandResponseManagerFactory         = new CommandResponseManagerFactory
+    val eventService                          = eventServiceFactory.make(locationService)(system)
 
     async {
       val supervisorBehavior = {
@@ -38,7 +41,7 @@ private[framework] class SupervisorInfoFactory(containerName: String) {
           Some(containerRef),
           componentInfo,
           locationService,
-          eventServiceFactory,
+          eventService,
           registrationFactory,
           commandResponseManagerFactory
         )

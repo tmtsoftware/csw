@@ -9,5 +9,5 @@ private[csw] object EventServiceAdapter {
 
   def asJava(eventSubscriber: EventSubscriber): IEventSubscriber = new JEventSubscriber(eventSubscriber)
 
-  def asJava(eventService: EventService): IEventService = new JEventService(eventService)(eventService.executionContext)
+  def asJava(eventService: EventService): IEventService = new JEventService(eventService)
 }

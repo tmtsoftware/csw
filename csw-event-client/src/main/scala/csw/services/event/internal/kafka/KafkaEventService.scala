@@ -10,16 +10,10 @@ import csw.services.event.scaladsl.EventService
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class KafkaEventService(eventServiceResolver: EventServiceResolver)(
-    implicit actorSystem: ActorSystem,
-    val executionContext: ExecutionContext,
-    mat: Materializer
-) extends EventService {
+class KafkaEventService(eventServiceResolver: EventServiceResolver)(implicit actorSystem: ActorSystem, mat: Materializer)
+    extends EventService {
 
-  override val defaultPublisher: Future[KafkaPublisher]   = publisher()
-  override val defaultSubscriber: Future[KafkaSubscriber] = subscriber()
-
-  override def makeNewPublisher(): Future[KafkaPublisher] = publisher()
+  implicit val executionContext: ExecutionContext = actorSystem.dispatcher
 
   private lazy val producerSettings: Future[ProducerSettings[String, Array[Byte]]] = eventServiceResolver.uri.map { uri ⇒
     ProducerSettings(actorSystem, None, None).withBootstrapServers(s"${uri.getHost}:${uri.getPort}")
@@ -31,6 +25,6 @@ class KafkaEventService(eventServiceResolver: EventServiceResolver)(
       .withGroupId(UUID.randomUUID().toString)
   }
 
-  private[csw] def publisher(): Future[KafkaPublisher]   = producerSettings.map(new KafkaPublisher(_))
-  private[csw] def subscriber(): Future[KafkaSubscriber] = consumerSettings.map(new KafkaSubscriber(_))
+  override def makeNewPublisher(): Future[KafkaPublisher]   = producerSettings.map(new KafkaPublisher(_))
+  override def makeNewSubscriber(): Future[KafkaSubscriber] = consumerSettings.map(new KafkaSubscriber(_))
 }

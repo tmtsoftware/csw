@@ -7,6 +7,7 @@ import csw.messages.framework.ComponentInfo
 import csw.messages.scaladsl.{ComponentMessage, ContainerIdleMessage, SupervisorMessage}
 import csw.services.command.internal.CommandResponseManagerFactory
 import csw.services.event.internal.commons.EventServiceFactory
+import csw.services.event.scaladsl.EventService
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.LoggerFactory
 
@@ -19,7 +20,7 @@ private[framework] object SupervisorBehaviorFactory {
       containerRef: Option[ActorRef[ContainerIdleMessage]],
       componentInfo: ComponentInfo,
       locationService: LocationService,
-      eventServiceFactory: EventServiceFactory,
+      eventService: EventService,
       registrationFactory: RegistrationFactory,
       commandResponseManagerFactory: CommandResponseManagerFactory
   ): Behavior[ComponentMessage] = {
@@ -33,7 +34,7 @@ private[framework] object SupervisorBehaviorFactory {
       containerRef,
       componentInfo,
       locationService,
-      eventServiceFactory,
+      eventService,
       registrationFactory,
       componentBehaviorFactory,
       commandResponseManagerFactory,
@@ -46,7 +47,7 @@ private[framework] object SupervisorBehaviorFactory {
       containerRef: Option[ActorRef[ContainerIdleMessage]],
       componentInfo: ComponentInfo,
       locationService: LocationService,
-      eventServiceFactory: EventServiceFactory,
+      eventService: EventService,
       registrationFactory: RegistrationFactory,
       componentBehaviorFactory: ComponentBehaviorFactory,
       commandResponseManagerFactory: CommandResponseManagerFactory,
@@ -67,7 +68,7 @@ private[framework] object SupervisorBehaviorFactory {
                   commandResponseManagerFactory,
                   registrationFactory,
                   locationService,
-                  eventServiceFactory,
+                  eventService,
                   loggerFactory
               )
           )
