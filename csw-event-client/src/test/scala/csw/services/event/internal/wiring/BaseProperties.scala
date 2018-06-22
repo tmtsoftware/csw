@@ -2,14 +2,14 @@ package csw.services.event.internal.wiring
 
 import java.net.URI
 
-import akka.{actor, Done}
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Materializer, Supervision}
+import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Materializer}
+import akka.{actor, Done}
 import csw.services.event.helpers.RegistrationFactory
 import csw.services.event.helpers.TestFutureExt.RichFuture
-import csw.services.event.internal.commons.{EventServiceConnection, EventStreamSupervisionStrategy}
 import csw.services.event.internal.commons.serviceresolver.EventServiceLocationResolver
+import csw.services.event.internal.commons.{EventServiceConnection, EventStreamSupervisionStrategy}
 import csw.services.event.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
 import csw.services.event.scaladsl.{EventPublisher, EventService, EventSubscriber}
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}

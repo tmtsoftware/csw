@@ -5,7 +5,7 @@ import akka.actor.testkit.typed.scaladsl.{TestInbox, TestProbe}
 import csw.messages.events.{Event, EventKey, EventName, SystemEvent}
 import csw.messages.params.models.{Prefix, Subsystem}
 import csw.services.event.helpers.TestFutureExt.RichFuture
-import csw.services.event.helpers.Utils.{makeDistinctEvent, makeEvent, makeEventWithPrefix}
+import csw.services.event.helpers.Utils.{makeDistinctEvent, makeEvent, makeEventForKeyName, makeEventWithPrefix}
 import csw.services.event.internal.kafka.KafkaTestProps
 import csw.services.event.internal.redis.RedisTestProps
 import csw.services.event.internal.wiring.BaseProperties
@@ -56,12 +56,26 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     Array(redisTestProps)
   )
 
-  val events: immutable.Seq[Event] = for (i ← 1 to 1500) yield makeEvent(i)
+  val events: immutable.Seq[Event]                  = for (i ← 1 to 1500) yield makeEvent(i)
+  def events(name: EventName): immutable.Seq[Event] = for (i ← 1 to 1500) yield makeEventForKeyName(name, i)
 
-  var counter = 0
+  class EventGenerator(eventName: EventName) {
+    var counter                               = 0
+    var publishedEvents: mutable.Queue[Event] = mutable.Queue.empty
+    val eventsGroup: immutable.Seq[Event]     = events(eventName)
+
+    def generator: Event = {
+      counter += 1
+      val event = eventsGroup(counter)
+      publishedEvents.enqueue(event)
+      event
+    }
+  }
+
+  var eventId = 0
   def eventGenerator(): Event = {
-    counter += 1
-    events(counter)
+    eventId += 1
+    events(eventId)
   }
 
   //DEOPSCSW-346: Subscribe to event irrespective of Publisher's existence
@@ -95,37 +109,43 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   ): Unit = {
     import baseProperties._
 
-    val queue: mutable.Queue[Event]  = new mutable.Queue[Event]()
-    val queue2: mutable.Queue[Event] = new mutable.Queue[Event]()
-    val eventKey: EventKey           = events.head.eventKey
-    counter = 0
-    val cancellable = publisher.publish(eventGenerator(), 1.millis)
-    val subscription = subscriber
-      .subscribe(Set(eventKey), 300.millis, SubscriptionModes.RateAdapterMode)
-      .to(Sink.foreach[Event](queue.enqueue(_)))
-      .run()
+    val receivedEvents: mutable.Queue[Event]  = new mutable.Queue[Event]()
+    val receivedEvents2: mutable.Queue[Event] = new mutable.Queue[Event]()
+    val eventGenerator                        = new EventGenerator(EventName(s"system_${Random.nextInt()}"))
+    import eventGenerator._
+    val eventKey: EventKey = eventsGroup.head.eventKey
 
+    val cancellable = publisher.publish(eventGenerator.generator, 100.millis)
+    Thread.sleep(500)
+    val subscription = subscriber
+      .subscribe(Set(eventKey), 600.millis, SubscriptionModes.RateAdapterMode)
+      .to(Sink.foreach[Event](receivedEvents.enqueue(_)))
+      .run()
     subscription.ready().await
 
     val subscription2 = subscriber
-      .subscribe(Set(eventKey), 400.millis, SubscriptionModes.RateAdapterMode)
-      .to(Sink.foreach[Event](queue2.enqueue(_)))
+      .subscribe(Set(eventKey), 800.millis, SubscriptionModes.RateAdapterMode)
+      .to(Sink.foreach[Event](receivedEvents2.enqueue(_)))
       .run()
     subscription2.ready().await
 
-    Thread.sleep(1000)
+    Thread.sleep(2000)
 
     subscription.unsubscribe().await
     subscription2.unsubscribe().await
     cancellable.cancel()
 
-    queue.size shouldBe 3
+    receivedEvents.size shouldBe 3
+    publishedEvents.size should be > receivedEvents.size
+    publishedEvents should contain allElementsOf receivedEvents
     // assert if received elements do not have duplicates
-    queue.toSet.size shouldBe 3
+    receivedEvents.toSet.size shouldBe 3
 
-    queue2.size shouldBe 2
+    receivedEvents2.size shouldBe 2
+    publishedEvents.size should be > receivedEvents2.size
+    publishedEvents should contain allElementsOf receivedEvents
     // assert if received elements do not have duplicates
-    queue2.toSet.size shouldBe 2
+    receivedEvents2.toSet.size shouldBe 2
   }
 
   //DEOPSCSW-338: Provide callback for Event alerts
@@ -163,7 +183,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
 
     val callback: Event ⇒ Future[Event]  = event ⇒ Future.successful(queue.enqueue(event)).map(_ ⇒ event)(ec)
     val callback2: Event ⇒ Future[Event] = event ⇒ Future.successful(queue2.enqueue(event)).map(_ ⇒ event)(ec)
-    counter = 0
+    eventId = 0
     val cancellable = publisher.publish(eventGenerator(), 1.millis)
 
     val subscription  = subscriber.subscribeAsync(Set(eventKey), callback, 300.millis, SubscriptionModes.RateAdapterMode)
@@ -216,7 +236,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
 
     val callback: Event ⇒ Unit  = queue.enqueue(_)
     val callback2: Event ⇒ Unit = queue2.enqueue(_)
-    counter = 0
+    eventId = 0
     val cancellable = publisher.publish(eventGenerator(), 1.millis)
     Thread.sleep(500) // Needed for redis set which is fire and forget operation
     val subscription = subscriber.subscribeCallback(Set(event1.eventKey), callback, 300.millis, SubscriptionModes.RateAdapterMode)
@@ -275,17 +295,23 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   ): Unit = {
     import baseProperties._
     val inbox = TestInbox[Event]()
-    counter = 0
-    val cancellable = publisher.publish(eventGenerator(), 200.millis)
-    val subscription =
-      subscriber.subscribeActorRef(events.map(_.eventKey).toSet, inbox.ref, 100.millis, SubscriptionModes.RateLimiterMode)
+
+    val eventGenerator = new EventGenerator(EventName(s"system_${Random.nextInt()}"))
+    import eventGenerator._
+    val eventKey: EventKey = eventsGroup.head.eventKey
+
+    val cancellable = publisher.publish(eventGenerator.generator, 400.millis)
+    Thread.sleep(500)
+    val subscription = subscriber.subscribeActorRef(Set(eventKey), inbox.ref, 100.millis, SubscriptionModes.RateLimiterMode)
     Thread.sleep(900)
     subscription.unsubscribe().await
     cancellable.cancel()
-    val eventsReceived = inbox.receiveAll()
-    eventsReceived.size shouldBe 5
+
+    val receivedEvents = inbox.receiveAll()
+    receivedEvents.size shouldBe 3
+    publishedEvents should contain allElementsOf receivedEvents
     // assert if received elements do not have duplicates
-    eventsReceived.toSet.size shouldBe 5
+    receivedEvents.toSet.size shouldBe 3
   }
 
   //DEOPSCSW-342: Subscription with consumption frequency
@@ -295,17 +321,27 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   ): Unit = {
     import baseProperties._
     val inbox = TestInbox[Event]()
-    counter = 0
-    val cancellable = publisher.publish(eventGenerator(), 105.millis)
+
+    val eventGenerator = new EventGenerator(EventName(s"system_${Random.nextInt()}"))
+    import eventGenerator._
+    val eventKey: EventKey = eventsGroup.head.eventKey
+
+    val cancellable = publisher.publish(eventGenerator.generator, 105.millis)
+    Thread.sleep(500)
     val subscription =
-      subscriber.subscribeActorRef(events.map(_.eventKey).toSet, inbox.ref, 200.millis, SubscriptionModes.RateLimiterMode)
+      subscriber.subscribeActorRef(Set(eventKey), inbox.ref, 200.millis, SubscriptionModes.RateLimiterMode)
     Thread.sleep(900)
     subscription.unsubscribe().await
     cancellable.cancel()
-    val eventsReceived = inbox.receiveAll()
-    eventsReceived.size shouldBe 5
+
+    val receivedEvents = inbox.receiveAll()
+    receivedEvents.size shouldBe 5
+    publishedEvents should contain allElementsOf receivedEvents
     // assert if received elements do not have duplicates
-    eventsReceived.toSet.size shouldBe 5
+    receivedEvents.toSet.size shouldBe 5
+
+    // assert if received elements do not have duplicates
+    receivedEvents.toSet.size shouldBe 5
   }
 
   //DEOPSCSW-342: Subscription with consumption frequency
@@ -315,17 +351,24 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   ): Unit = {
     import baseProperties._
     val inbox = TestInbox[Event]()
-    counter = 0
-    val cancellable = publisher.publish(eventGenerator(), 200.millis)
+
+    val eventGenerator = new EventGenerator(EventName(s"system_${Random.nextInt()}"))
+    import eventGenerator._
+    val eventKey: EventKey = eventsGroup.head.eventKey
+
+    val cancellable = publisher.publish(eventGenerator.generator, 400.millis)
+    Thread.sleep(500)
     val subscription =
-      subscriber.subscribeActorRef(events.map(_.eventKey).toSet, inbox.ref, 100.millis, SubscriptionModes.RateAdapterMode)
+      subscriber.subscribeActorRef(Set(eventKey), inbox.ref, 100.millis, SubscriptionModes.RateAdapterMode)
     Thread.sleep(1050)
     subscription.unsubscribe().await
     cancellable.cancel()
-    val eventsReceived = inbox.receiveAll()
-    eventsReceived.size shouldBe 10
+
+    val receivedEvents = inbox.receiveAll()
+    receivedEvents.size shouldBe 10
+    publishedEvents should contain allElementsOf receivedEvents
     // assert that received elements will have duplicates
-    eventsReceived.toSet.size should not be 10
+    receivedEvents.toSet.size should not be 10
   }
 
   //DEOPSCSW-420: Implement Pattern based subscription

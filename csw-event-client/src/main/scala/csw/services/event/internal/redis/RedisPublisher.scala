@@ -5,7 +5,7 @@ import akka.actor.Cancellable
 import akka.stream.Materializer
 import akka.stream.scaladsl.Source
 import csw.messages.events.{Event, EventKey}
-import csw.services.event.exceptions.{EventServerNotAvailable, PublishFailure}
+import csw.services.event.exceptions.PublishFailure
 import csw.services.event.internal.commons.EventPublisherUtil
 import csw.services.event.scaladsl.EventPublisher
 import io.lettuce.core.api.async.RedisAsyncCommands

@@ -19,6 +19,8 @@ object Utils {
     paramSet = Set(timeNanosKey.set(System.nanoTime()))
   )
 
+  def makeEventForKeyName(name: EventName, id: Int): Event = event.copy(eventName = name, eventId = Id(id.toString))
+
   def makeEventWithPrefix(id: Int, prefix: Prefix): Event = event.copy(
     eventId = Id(id.toString),
     source = prefix,
