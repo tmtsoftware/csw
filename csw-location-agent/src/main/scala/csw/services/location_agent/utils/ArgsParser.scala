@@ -1,9 +1,9 @@
-package csw.services.tracklocation.utils
+package csw.services.location_agent.utils
 
 import java.io.File
 
 import csw.services.BuildInfo
-import csw.services.tracklocation.models.Options
+import csw.services.location_agent.models.Options
 import scopt.OptionParser
 
 /**

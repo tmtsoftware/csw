@@ -13,7 +13,7 @@ import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.LocationService
 import net.manub.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
 import org.apache.kafka.clients.producer.ProducerRecord
-import org.apache.kafka.common.serialization.{ByteArraySerializer, StringSerializer}
+import org.apache.kafka.common.serialization.StringSerializer
 
 import scala.collection.JavaConverters.mapAsScalaMapConverter
 import scala.compat.java8.FutureConverters.CompletionStageOps

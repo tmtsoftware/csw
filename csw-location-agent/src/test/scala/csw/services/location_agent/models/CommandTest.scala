@@ -1,4 +1,4 @@
-package csw.services.tracklocation.models
+package csw.services.location_agent.models
 
 import java.io.File
 import java.nio.file.Paths

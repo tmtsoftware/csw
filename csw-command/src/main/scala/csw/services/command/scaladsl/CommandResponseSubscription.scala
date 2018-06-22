@@ -37,7 +37,7 @@ class CommandResponseSubscription private[csw] (
       }
   }
 
-  private val (killSwitch, currentStateF) = source
+  private val (killSwitch, _) = source
     .map(callback)
     .viaMat(KillSwitches.single)(Keep.right)
     .toMat(Sink.ignore)(Keep.both)
