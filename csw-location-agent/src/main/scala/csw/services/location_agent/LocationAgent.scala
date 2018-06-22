@@ -34,10 +34,19 @@ class LocationAgent(names: List[String], command: Command, actorSystem: ActorSys
   // and starts a external program in child process using provided command
   def run(): Process =
     try {
+      log.info(s"Executing specified command: ${command.commandText}")
+      val process = command.commandText.run()
+      // shutdown location agent on termination of external program started using provided command
+      Future(process.exitValue()).onComplete(_ ⇒ shutdown(ProcessTerminatedReason))
+
+      // delay the registration of component after executing the command
       Thread.sleep(command.delay)
+
       //Register all connections
       val results = Await.result(Future.traverse(names)(registerName), 10.seconds)
       unregisterOnTermination(results)
+
+      process
     } catch {
       case NonFatal(ex) ⇒
         shutdown(FailureReason(ex))
@@ -54,7 +63,7 @@ class LocationAgent(names: List[String], command: Command, actorSystem: ActorSys
   }
 
   // Registers a shutdownHook to handle service un-registration during abnormal exit
-  private def unregisterOnTermination(results: Seq[RegistrationResult]): Process = {
+  private def unregisterOnTermination(results: Seq[RegistrationResult]): Unit = {
 
     // Add task to unregister the TcpRegistration from location service
     // This task will get invoked before shutting down actor system
@@ -62,13 +71,6 @@ class LocationAgent(names: List[String], command: Command, actorSystem: ActorSys
       CoordinatedShutdown.PhaseBeforeServiceUnbind,
       "unregistering"
     )(() => unregisterServices(results))
-
-    log.info(s"Executing specified command: ${command.commandText}")
-    val process = command.commandText.run()
-
-    // shutdown location agent on termination of external program started using provided command
-    Future(process.exitValue()).onComplete(_ ⇒ shutdown(ProcessTerminatedReason))
-    process
   }
 
   private def unregisterServices(results: Seq[RegistrationResult]): Future[Done] = {
