@@ -8,7 +8,7 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.testkit.typed.TestKitSettings
 import com.typesafe.config.ConfigFactory
 import csw.apps.clusterseed.admin.http.HttpSupport
-import csw.apps.clusterseed.admin.internal.AdminWiring
+import csw.apps.clusterseed.internal.AdminWiring
 import csw.apps.clusterseed.utils.AdminLogTestSuite
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.config.server.commons.{ConfigServiceConnection, TestFileUtils}

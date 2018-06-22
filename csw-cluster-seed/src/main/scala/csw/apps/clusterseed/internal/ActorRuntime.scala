@@ -1,4 +1,4 @@
-package csw.apps.clusterseed.admin.internal
+package csw.apps.clusterseed.internal
 
 import akka.Done
 import akka.actor.CoordinatedShutdown.Reason

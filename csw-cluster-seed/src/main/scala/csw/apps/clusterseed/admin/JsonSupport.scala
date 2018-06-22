@@ -1,4 +1,4 @@
-package csw.apps.clusterseed.admin.internal
+package csw.apps.clusterseed.admin
 
 import csw.apps.clusterseed.commons.ClusterSeedLogger
 import csw.services.logging.internal.LoggingLevels.Level

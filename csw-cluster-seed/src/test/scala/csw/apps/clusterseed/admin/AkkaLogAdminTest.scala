@@ -1,16 +1,16 @@
 package csw.apps.clusterseed.admin
 
 import akka.actor
+import akka.actor.testkit.typed.TestKitSettings
+import akka.actor.testkit.typed.scaladsl.TestProbe
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpMethods, HttpRequest, StatusCodes, Uri}
 import akka.http.scaladsl.unmarshalling.Unmarshal
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.actor.testkit.typed.TestKitSettings
-import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.{ActorRef, ActorSystem}
 import com.typesafe.config.ConfigFactory
 import csw.apps.clusterseed.admin.http.HttpSupport
-import csw.apps.clusterseed.admin.internal.AdminWiring
+import csw.apps.clusterseed.internal.AdminWiring
 import csw.apps.clusterseed.utils.AdminLogTestSuite
 import csw.common.FrameworkAssertions.assertThatContainerIsRunning
 import csw.commons.tags.LoggingSystemSensitive
@@ -153,8 +153,10 @@ class AkkaLogAdminTest extends AdminLogTestSuite with MockitoSugar with HttpSupp
     Thread.sleep(100)
 
     // default logging level for Laser component is info
-    val groupByComponentNamesLog = logBuffer.groupBy(json ⇒ json("@componentName").toString)
-    val laserComponentLogs       = groupByComponentNamesLog(laserComponent.info.name)
+    val groupByComponentNamesLog = logBuffer.groupBy { json ⇒
+      if (json.contains("@componentName")) json("@componentName").toString
+    }
+    val laserComponentLogs = groupByComponentNamesLog(laserComponent.info.name)
 
     laserComponentLogs.exists(log ⇒ log("@severity").toString.toLowerCase.equalsIgnoreCase("info")) shouldBe true
     laserComponentLogs.foreach { log ⇒

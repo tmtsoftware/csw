@@ -1,7 +1,7 @@
 package csw.apps.clusterseed.client
 
 import akka.http.scaladsl.Http
-import csw.apps.clusterseed.admin.internal.AdminWiring
+import csw.apps.clusterseed.internal.AdminWiring
 import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.location.scaladsl.LocationServiceCompTest
 

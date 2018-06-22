@@ -3,7 +3,7 @@ package csw.apps.clusterseed.admin
 import akka.actor.typed.scaladsl.AskPattern._
 import akka.util.Timeout
 import csw.apps.clusterseed.admin.exceptions.{InvalidComponentNameException, UnresolvedAkkaOrHttpLocationException}
-import csw.apps.clusterseed.admin.internal.ActorRuntime
+import csw.apps.clusterseed.internal.ActorRuntime
 import csw.apps.clusterseed.commons.ClusterSeedLogger
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
 import csw.messages.location.{Connection, Location}

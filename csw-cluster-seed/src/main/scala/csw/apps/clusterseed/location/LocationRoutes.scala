@@ -5,7 +5,7 @@ import akka.http.scaladsl.model.sse.ServerSentEvent
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.stream.scaladsl.Source
-import csw.apps.clusterseed.admin.internal.ActorRuntime
+import csw.apps.clusterseed.internal.ActorRuntime
 import csw.messages.location._
 import csw.services.location.internal.LocationJsonSupport
 import csw.services.location.models.Registration

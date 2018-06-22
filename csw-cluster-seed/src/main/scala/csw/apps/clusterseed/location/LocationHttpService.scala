@@ -1,11 +1,11 @@
 package csw.apps.clusterseed.location
 
 import akka.http.scaladsl.Http
-import csw.apps.clusterseed.admin.internal.ActorRuntime
+import csw.apps.clusterseed.internal.{ActorRuntime, Settings}
 
 import scala.concurrent.Future
 
-class LocationHttpService(locationRoutes: LocationRoutes, actorRuntime: ActorRuntime) {
+class LocationHttpService(locationRoutes: LocationRoutes, actorRuntime: ActorRuntime, settings: Settings) {
 
   import actorRuntime._
 
@@ -13,7 +13,7 @@ class LocationHttpService(locationRoutes: LocationRoutes, actorRuntime: ActorRun
     Http().bindAndHandle(
       handler = locationRoutes.routes,
       interface = "0.0.0.0",
-      port = 7654
+      port = settings.httpLocationPort
     )
   }
 }

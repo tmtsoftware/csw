@@ -1,7 +1,7 @@
 package csw.apps.clusterseed.admin.http
 
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.server.{Directives, ExceptionHandler}
+import akka.http.scaladsl.server.{Directive, Directives, ExceptionHandler}
 import csw.apps.clusterseed.admin.exceptions.UnresolvedAkkaOrHttpLocationException
 import csw.apps.clusterseed.commons.ClusterSeedLogger
 import csw.commons.http.{JsonRejectionHandler, JsonSupport}
@@ -24,10 +24,12 @@ case object ErrorMessage {
 /**
  * Maps server side exceptions to Http Status codes
  */
-class AdminHandlers extends Directives with JsonRejectionHandler {
+class AdminExceptionHandlers extends Directives with JsonRejectionHandler {
   private val log: Logger = ClusterSeedLogger.getLogger
 
-  val jsonExceptionHandler: ExceptionHandler = ExceptionHandler {
+  def route: Directive[Unit] = handleExceptions(jsonExceptionHandler) & handleRejections(jsonRejectionHandler)
+
+  private val jsonExceptionHandler: ExceptionHandler = ExceptionHandler {
     case ex: UnresolvedAkkaOrHttpLocationException ⇒
       log.error(ex.getMessage, ex = ex)
       complete(JsonSupport.asJsonResponse(StatusCodes.NotFound, ex.getMessage))

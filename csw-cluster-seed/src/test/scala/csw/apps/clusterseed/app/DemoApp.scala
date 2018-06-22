@@ -5,7 +5,7 @@ import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.{ActorRef, ActorSystem}
 import com.typesafe.config.ConfigFactory
-import csw.apps.clusterseed.admin.internal.AdminWiring
+import csw.apps.clusterseed.internal.AdminWiring
 import csw.common.FrameworkAssertions.assertThatContainerIsRunning
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.messages.commands.{CommandName, CommandResponse, Setup}

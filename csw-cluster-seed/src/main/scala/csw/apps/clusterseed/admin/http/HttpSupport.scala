@@ -3,7 +3,7 @@ package csw.apps.clusterseed.admin.http
 import akka.http.scaladsl.model.HttpRequest
 import akka.http.scaladsl.server.directives.{DebuggingDirectives, LoggingMagnet}
 import akka.http.scaladsl.server.{Directive0, Directive1, Directives, MalformedQueryParamRejection}
-import csw.apps.clusterseed.admin.internal.JsonSupport
+import csw.apps.clusterseed.admin.JsonSupport
 import csw.apps.clusterseed.commons.ClusterSeedLogger
 import csw.services.logging.internal.LoggingLevels
 import csw.services.logging.internal.LoggingLevels.Level

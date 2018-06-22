@@ -1,6 +1,6 @@
 package csw.apps.clusterseed
 
-import csw.apps.clusterseed.admin.internal.AdminWiring
+import csw.apps.clusterseed.internal.AdminWiring
 import csw.apps.clusterseed.cli.{ArgsParser, Options}
 import csw.services.location.commons.ClusterAwareSettings
 
