@@ -8,6 +8,7 @@ import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.adapter.TypedActorRefOps
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location._
+import csw.messages.params.models.Prefix
 import csw.services.location.commons.LocationServiceLogger
 import csw.services.location.exceptions.LocalAkkaActorRegistrationNotAllowed
 import csw.services.logging.messages.LogControlMessages
@@ -37,14 +38,14 @@ sealed abstract class Registration {
  * is thrown if the actorRef provided is not a remote actorRef
  *
  * @param connection the `Connection` to register with `LocationService`
- * @param prefix the optional prefix representing
+ * @param prefix prefix of the component
  * @param actorRef Provide a remote actor that is offering a connection. Local actors cannot be registered since they can't be
  *                 communicated from components across the network
  * @param logAdminActorRef the ActorRef responsible to handle log level change for a component dynamically
  */
 final case class AkkaRegistration(
     connection: AkkaConnection,
-    prefix: Option[String],
+    prefix: Prefix,
     actorRef: ActorRef[_],
     logAdminActorRef: ActorRef[LogControlMessages]
 ) extends Registration {

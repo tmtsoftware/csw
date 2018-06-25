@@ -8,6 +8,7 @@ import akka.actor.typed.scaladsl.adapter._
 import akka.serialization.{Serialization, SerializationExtension}
 import csw.messages.location.Connection
 import csw.messages.location.Connection.AkkaConnection
+import csw.messages.params.models.Prefix
 import csw.services.location.models.AkkaRegistration
 import csw.services.logging.messages.LogControlMessages
 import io.circe._
@@ -20,7 +21,7 @@ trait LocationJsonSupport {
   }
 
   implicit def actorRefEncoder[T]: Encoder[ActorRef[T]] = {
-    Encoder.encodeString.contramap(actoRef => Serialization.serializedActorPath(actoRef.toUntyped))
+    Encoder.encodeString.contramap(actorRef => Serialization.serializedActorPath(actorRef.toUntyped))
   }
 
   implicit val uriDecoder: Decoder[URI] = Decoder.decodeString.map(path => new URI(path))
@@ -29,10 +30,13 @@ trait LocationJsonSupport {
   implicit def connectionDecoder[T <: Connection]: Decoder[T] = Decoder.decodeString.map(x => Connection.from(x).asInstanceOf[T])
   implicit def connectionEncoder[T <: Connection]: Encoder[T] = Encoder.encodeString.contramap(_.name)
 
+  implicit def prefixDecoder: Decoder[Prefix] = Decoder.decodeString.map(x => Prefix(x))
+  implicit def prefixEncoder: Encoder[Prefix] = Encoder.encodeString.contramap(_.prefix)
+
   implicit def akkaRegistrationDecoder(implicit actorSystem: ActorSystem): Decoder[AkkaRegistration] = { cursor =>
     for {
       connection       <- cursor.downField("connection").as[AkkaConnection]
-      prefix           <- cursor.downField("prefix").as[Option[String]]
+      prefix           <- cursor.downField("prefix").as[Prefix]
       actorRef         <- cursor.downField("actorRef").as[ActorRef[Any]]
       logAdminActorRef <- cursor.downField("logAdminActorRef").as[ActorRef[LogControlMessages]]
     } yield {

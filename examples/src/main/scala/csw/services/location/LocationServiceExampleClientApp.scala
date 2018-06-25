@@ -10,6 +10,7 @@ import akka.stream.{ActorMaterializer, Materializer}
 import csw.messages.commons.CoordinatedShutdownReasons.ActorTerminatedReason
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
 import csw.messages.location._
+import csw.messages.params.models.Prefix
 import csw.messages.scaladsl.{ComponentMessage, ContainerMessage}
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.models._
@@ -109,7 +110,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
   val hcdConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
   val hcdRegistration: AkkaRegistration = registrationFactory.akkaTyped(
     hcdConnection,
-    "nfiraos.ncc.tromboneHcd",
+    Prefix("nfiraos.ncc.tromboneHcd"),
     context.actorOf(Props(new akka.actor.Actor {
       override def receive: Receive = {
         case "print" => log.info("hello world")
@@ -132,7 +133,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
 
   // Register Typed ActorRef[String] with Location Service
   val assemblyRegistration: AkkaRegistration =
-    registrationFactory.akkaTyped(assemblyConnection, "nfiraos.ncc.tromboneAssembly", typedActorRef)
+    registrationFactory.akkaTyped(assemblyConnection, Prefix("nfiraos.ncc.tromboneAssembly"), typedActorRef)
 
   val assemblyRegResult: RegistrationResult = Await.result(locationService.register(assemblyRegistration), 2.seconds)
   //#Components-Connections-Registrations

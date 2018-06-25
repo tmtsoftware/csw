@@ -10,6 +10,7 @@ import akka.testkit.TestProbe
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location._
+import csw.messages.params.models.Prefix
 import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.location.commons.{ActorSystemFactory, TestRegistrationFactory}
 import csw.services.location.exceptions.OtherLocationIsRegistered
@@ -418,11 +419,11 @@ class LocationServiceCompTest(mode: String)
     val actorRef2 = actorSystem.spawnAnonymous(Behavior.empty)
     val actorRef3 = actorSystem.spawnAnonymous(Behavior.empty)
 
-    locationService.register(RegistrationFactory.akka(akkaConnection1, "nfiraos.ncc.tromboneHcd1", actorRef)).await
+    locationService.register(RegistrationFactory.akka(akkaConnection1, Prefix("nfiraos.ncc.tromboneHcd1"), actorRef)).await
     locationService
-      .register(RegistrationFactory.akka(akkaConnection2, "nfiraos.ncc.tromboneAssembly2", actorRef2))
+      .register(RegistrationFactory.akka(akkaConnection2, Prefix("nfiraos.ncc.tromboneAssembly2"), actorRef2))
       .await
-    locationService.register(RegistrationFactory.akka(akkaConnection3, "nfiraos.ncc.tromboneHcd3", actorRef3)).await
+    locationService.register(RegistrationFactory.akka(akkaConnection3, Prefix("nfiraos.ncc.tromboneHcd3"), actorRef3)).await
 
     locationService.listByPrefix("nfiraos.ncc.trombone").await.map(_.connection).toSet shouldBe Set(akkaConnection1,
                                                                                                     akkaConnection2,

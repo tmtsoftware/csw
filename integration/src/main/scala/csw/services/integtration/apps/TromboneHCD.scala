@@ -6,6 +6,7 @@ import csw.messages.commands.{CommandName, Setup}
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
+import csw.messages.params.models.Prefix
 import csw.messages.scaladsl.CommandMessage.Submit
 import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.commons.ClusterAwareSettings
@@ -22,7 +23,7 @@ object TromboneHCD {
   val componentId                   = ComponentId("trombonehcd", ComponentType.HCD)
   val connection                    = AkkaConnection(componentId)
 
-  val registration                           = AkkaRegistration(connection, Some("nfiraos.ncc.trombone"), tromboneHcdActorRef, null)
+  val registration                           = AkkaRegistration(connection, Prefix("nfiraos.ncc.trombone"), tromboneHcdActorRef, null)
   private val locationService                = LocationServiceFactory.withSystem(hcdActorSystem)
   val registrationResult: RegistrationResult = locationService.register(registration).await
 

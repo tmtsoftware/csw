@@ -2,6 +2,7 @@ package csw.services.location.scaladsl
 
 import akka.actor.typed.ActorRef
 import csw.messages.location.Connection.AkkaConnection
+import csw.messages.params.models.Prefix
 import csw.services.location.models.AkkaRegistration
 import csw.services.logging.messages.LogControlMessages
 
@@ -27,8 +28,8 @@ class RegistrationFactory(logAdminActorRef: ActorRef[LogControlMessages]) {
    */
   def akkaTyped(
       akkaConnection: AkkaConnection,
-      prefix: String,
+      prefix: Prefix,
       actorRef: ActorRef[_]
-  ): AkkaRegistration = AkkaRegistration(akkaConnection, Some(prefix), actorRef, logAdminActorRef)
+  ): AkkaRegistration = AkkaRegistration(akkaConnection, prefix, actorRef, logAdminActorRef)
 
 }

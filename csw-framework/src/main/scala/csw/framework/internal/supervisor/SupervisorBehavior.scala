@@ -92,7 +92,7 @@ private[framework] final class SupervisorBehavior(
   private val componentName: String                        = componentInfo.name
   private val componentActorName: String                   = s"$componentName-$ComponentActorNameSuffix"
   private val akkaConnection: AkkaConnection               = AkkaConnection(ComponentId(componentName, componentInfo.componentType))
-  private val prefix: String                               = componentInfo.prefix.prefix
+  private val prefix: Prefix                               = componentInfo.prefix
   private val akkaRegistration: AkkaRegistration           = registrationFactory.akkaTyped(akkaConnection, prefix, ctx.self)
   private val isStandalone: Boolean                        = maybeContainerRef.isEmpty
   private[framework] val initializeTimeout: FiniteDuration = componentInfo.initializeTimeout

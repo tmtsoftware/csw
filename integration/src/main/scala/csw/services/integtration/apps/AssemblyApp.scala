@@ -7,6 +7,7 @@ import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.adapter._
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
+import csw.messages.params.models.Prefix
 import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.commons.{ActorSystemFactory, ClusterSettings, CswCluster}
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
@@ -23,7 +24,7 @@ object AssemblyApp {
   val connection                                           = AkkaConnection(componentId)
 
   val actorPath: ActorPath = ActorPath.fromString(Serialization.serializedActorPath(assemblyActorRef))
-  val registration         = AkkaRegistration(connection, Some("nfiraos.ncc.trombone"), assemblyActorRef, logAdminActorRef)
+  val registration         = AkkaRegistration(connection, Prefix("nfiraos.ncc.trombone"), assemblyActorRef, logAdminActorRef)
   val registrationResult: RegistrationResult =
     LocationServiceFactory.withCluster(cswCluster).register(registration).await
 

@@ -20,7 +20,7 @@ import csw.messages.framework.LockingResponses.LockAcquired
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{AkkaLocation, ComponentId, ComponentType}
 import csw.messages.params.generics.{KeyType, Parameter}
-import csw.messages.params.models.ObsId
+import csw.messages.params.models.{ObsId, Prefix}
 import csw.messages.params.states.{DemandState, StateName}
 import csw.messages.scaladsl.CommandMessage.Submit
 import csw.services.command.scaladsl.CommandService
@@ -98,7 +98,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       val maybeLocation = Await.result(assemblyLocF, 10.seconds)
 
       maybeLocation.isDefined shouldBe true
-      maybeLocation.get.maybePrefix shouldBe Some("tcs.mobie.blue.assembly")
+      maybeLocation.get.prefix shouldBe Prefix("tcs.mobie.blue.assembly")
 
       val assemblyRef = maybeLocation.map(_.componentRef).get
 

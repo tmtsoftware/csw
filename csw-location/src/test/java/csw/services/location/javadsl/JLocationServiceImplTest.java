@@ -19,6 +19,7 @@ import csw.messages.location.Connection.AkkaConnection;
 import csw.messages.location.Connection.HttpConnection;
 import csw.messages.location.Connection.TcpConnection;
 import csw.messages.commons.CoordinatedShutdownReasons;
+import csw.messages.params.models.Prefix;
 import csw.services.location.commons.ActorSystemFactory;
 import csw.services.location.commons.Constants;
 import csw.services.location.commons.TestRegistrationFactory;
@@ -288,9 +289,9 @@ public class JLocationServiceImplTest {
         AkkaConnection akkaHcdConnection3 = new AkkaConnection(new ComponentId("hcd3", JComponentType.HCD));
 
        // Register Akka connection
-        AkkaRegistration akkaRegistration1 = RegistrationFactory.akka(akkaHcdConnection1, "nfiraos.ncc.tromboneHcd1", actorRef);
-        AkkaRegistration akkaRegistration2 = RegistrationFactory.akka(akkaHcdConnection2, "nfiraos.ncc.tromboneAssembly2", actorRef);
-        AkkaRegistration akkaRegistration3 = RegistrationFactory.akka(akkaHcdConnection3, "nfiraos.ncc.tromboneHcd3", actorRef);
+        AkkaRegistration akkaRegistration1 = RegistrationFactory.akka(akkaHcdConnection1, new Prefix("nfiraos.ncc.tromboneHcd1"), actorRef);
+        AkkaRegistration akkaRegistration2 = RegistrationFactory.akka(akkaHcdConnection2, new Prefix("nfiraos.ncc.tromboneAssembly2"), actorRef);
+        AkkaRegistration akkaRegistration3 = RegistrationFactory.akka(akkaHcdConnection3, new Prefix("nfiraos.ncc.tromboneHcd3"), actorRef);
         locationService.register(akkaRegistration1).get();
         locationService.register(akkaRegistration2).get();
         locationService.register(akkaRegistration3).get();

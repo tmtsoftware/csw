@@ -8,7 +8,7 @@ import akka.{actor, testkit, Done}
 import csw.messages.commands.CommandResponse
 import csw.messages.framework.LifecycleStateChanged
 import csw.messages.location.Connection.AkkaConnection
-import csw.messages.params.models.Id
+import csw.messages.params.models.{Id, Prefix}
 import csw.messages.params.states.CurrentState
 import csw.messages.scaladsl.{CommandResponseManagerMessage, SupervisorMessage}
 import csw.services.command.internal.CommandResponseManagerFactory
@@ -29,14 +29,14 @@ class FrameworkTestMocks(implicit untypedSystem: actor.ActorSystem, system: Acto
 
   ///////////////////////////////////////////////
   val testActor: ActorRef[Any]                 = testkit.TestProbe("test-probe").testActor
-  val akkaRegistration                         = AkkaRegistration(mock[AkkaConnection], Some("nfiraos.ncc.trombone"), testActor, testActor)
+  val akkaRegistration                         = AkkaRegistration(mock[AkkaConnection], Prefix("nfiraos.ncc.trombone"), testActor, testActor)
   val locationService: LocationService         = mock[LocationService]
   val eventServiceFactory: EventServiceFactory = mock[EventServiceFactory]
   val eventService: EventService               = mock[EventService]
   val registrationResult: RegistrationResult   = mock[RegistrationResult]
   val registrationFactory: RegistrationFactory = mock[RegistrationFactory]
 
-  when(registrationFactory.akkaTyped(any[AkkaConnection], any[String], any[ActorRef[_]]))
+  when(registrationFactory.akkaTyped(any[AkkaConnection], any[Prefix], any[ActorRef[_]]))
     .thenReturn(akkaRegistration)
   when(locationService.register(akkaRegistration)).thenReturn(Future.successful(registrationResult))
   when(locationService.unregister(any[AkkaConnection])).thenReturn(Future.successful(Done))

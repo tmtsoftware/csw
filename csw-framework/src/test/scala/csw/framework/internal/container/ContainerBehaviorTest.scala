@@ -13,6 +13,7 @@ import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.messages.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.messages.framework.{ComponentInfo, ContainerLifecycleState, SupervisorLifecycleState, _}
 import csw.messages.location.Connection.AkkaConnection
+import csw.messages.params.models.Prefix
 import csw.messages.scaladsl.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.messages.scaladsl.ContainerIdleMessage.SupervisorsCreated
 import csw.messages.scaladsl.FromSupervisorMessage.SupervisorLifecycleStateChanged
@@ -43,7 +44,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
 
   class IdleContainer() {
     private val testActor: ActorRef[Any]                  = TestProbe("test-probe").ref
-    val akkaRegistration                                  = AkkaRegistration(mock[AkkaConnection], Some("nfiraos.ncc.trombone"), testActor, testActor)
+    val akkaRegistration                                  = AkkaRegistration(mock[AkkaConnection], Prefix("nfiraos.ncc.trombone"), testActor, testActor)
     val locationService: LocationService                  = mock[LocationService]
     val eventService: EventServiceFactory                 = mock[EventServiceFactory]
     val registrationResult: RegistrationResult            = mock[RegistrationResult]
@@ -51,7 +52,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     var componentProbes: Set[TestProbe[ComponentMessage]] = Set.empty
     val supervisorInfoFactory: SupervisorInfoFactory      = mock[SupervisorInfoFactory]
 
-    lazy val answer = new Answer[Future[Option[SupervisorInfo]]] {
+    private lazy val answer = new Answer[Future[Option[SupervisorInfo]]] {
 
       override def answer(invocation: InvocationOnMock): Future[Option[SupervisorInfo]] = {
         val componentInfo = invocation.getArgument[ComponentInfo](1)
@@ -82,7 +83,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     ).thenAnswer(answer)
 
     private val registrationFactory: RegistrationFactory = mock[RegistrationFactory]
-    when(registrationFactory.akkaTyped(any[AkkaConnection], any[String], any[ActorRef[_]]))
+    when(registrationFactory.akkaTyped(any[AkkaConnection], any[Prefix], any[ActorRef[_]]))
       .thenReturn(akkaRegistration)
 
     private val eventualRegistrationResult: Future[RegistrationResult] =

@@ -9,7 +9,7 @@ import csw.services.event.internal.kafka.KafkaTestProps
 import csw.services.event.internal.redis.RedisTestProps
 import csw.services.event.internal.wiring.BaseProperties
 import csw.services.event.scaladsl.SubscriptionModes
-import org.scalatest.{Matchers, ParallelTestExecution}
+import org.scalatest.Matchers
 import org.scalatest.concurrent.Eventually
 import org.scalatest.testng.TestNGSuite
 import org.testng.annotations._

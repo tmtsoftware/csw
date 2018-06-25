@@ -18,6 +18,7 @@ import csw.messages.commons.CoordinatedShutdownReasons;
 import csw.messages.location.*;
 import csw.messages.location.Connection.AkkaConnection;
 import csw.messages.location.Connection.HttpConnection;
+import csw.messages.params.models.Prefix;
 import csw.messages.scaladsl.ComponentMessage;
 import csw.messages.scaladsl.ContainerMessage;
 import csw.services.location.commons.ActorSystemFactory;
@@ -115,7 +116,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
 
         // Register UnTyped ActorRef with Location service. Use javadsl Adapter to convert UnTyped ActorRefs
         // to Typed ActorRef[Nothing]
-        AkkaRegistration hcdRegistration = registrationFactory.akkaTyped(hcdConnection, "nfiraos.ncc.tromboneHcd", Adapter.toTyped(actorRef));
+        AkkaRegistration hcdRegistration = registrationFactory.akkaTyped(hcdConnection, new Prefix("nfiraos.ncc.tromboneHcd"), Adapter.toTyped(actorRef));
         hcdRegResult = locationService.register(hcdRegistration).get();
 
         // ************************************************************************************************************
@@ -128,7 +129,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
         AkkaConnection assemblyConnection = new AkkaConnection(new ComponentId("assembly1", JComponentType.Assembly));
 
         // Register Typed ActorRef[String] with Location Service
-        AkkaRegistration assemblyRegistration = registrationFactory.akkaTyped(assemblyConnection, "nfiraos.ncc.tromboneAssembly", typedActorRef);
+        AkkaRegistration assemblyRegistration = registrationFactory.akkaTyped(assemblyConnection, new Prefix("nfiraos.ncc.tromboneAssembly"), typedActorRef);
         assemblyRegResult = locationService.register(assemblyRegistration).get();
         //#Components-Connections-Registrations
     }

@@ -189,7 +189,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
 
   override def listByPrefix(_prefix: String): Future[List[AkkaLocation]] = async {
     await(list).collect {
-      case akkaLocation @ AkkaLocation(_, prefix, _, _, _) if prefix.exists(_.startsWith(_prefix)) ⇒ akkaLocation
+      case akkaLocation @ AkkaLocation(_, prefix, _, _, _) if prefix.prefix.startsWith(_prefix) ⇒ akkaLocation
     }
   }
 

@@ -18,7 +18,7 @@ import csw.messages.framework.{Components, ContainerLifecycleState, SupervisorLi
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.params.generics.{KeyType, Parameter}
-import csw.messages.params.models.ObsId
+import csw.messages.params.models.{ObsId, Prefix}
 import csw.messages.params.models.Subsystem.Container
 import csw.messages.params.states.{CurrentState, StateName}
 import csw.messages.scaladsl.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState}
@@ -103,7 +103,9 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
         locationService.resolve(AkkaConnection(ComponentId("LGSF_Container", ComponentType.Container)), 5.seconds).await
 
       maybeContainerLoc.isDefined shouldBe true
-      maybeContainerLoc.get.maybePrefix shouldBe Some(s"${Container.entryName}.LGSF_Container")
+
+      //DEOPSCSW-430: Update AkkaLocation model to take Prefix model instead of Option[String]
+      maybeContainerLoc.get.prefix shouldBe Prefix(s"${Container.entryName}.LGSF_Container")
 
       enterBarrier("offline")
       enterBarrier("before-shutdown")

@@ -43,7 +43,7 @@ class LocationServiceIntegrationTest extends FunSuite with Matchers with BeforeA
     val componentId                                          = ComponentId("trombonehcd", ComponentType.HCD)
     val connection                                           = AkkaConnection(componentId)
 
-    val registration = AkkaRegistration(connection, Some("nfiraos.ncc.trombone"), tromboneHcdActorRef, logAdminActorRef)
+    val registration = AkkaRegistration(connection, Prefix("nfiraos.ncc.trombone"), tromboneHcdActorRef, logAdminActorRef)
     Thread.sleep(4000)
     intercept[OtherLocationIsRegistered] {
       locationService.register(registration).await

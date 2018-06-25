@@ -6,6 +6,7 @@ import akka.actor.typed.ActorRef
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.scaladsl.{ComponentMessage, ContainerMessage}
 import csw.messages.TMTSerializable
+import csw.messages.params.models.Prefix
 
 import scala.reflect.ClassTag
 
@@ -36,7 +37,7 @@ sealed abstract class Location extends TMTSerializable {
  * @note Do not directly access actorRef from constructor, use one of component() or containerRef() method
  *       to get the correctly typed actor reference.
  * @param connection represents a connection based on a componentId and the type of connection offered by the component
- * @param maybePrefix an optional prefix of the component. In case of container this option remains none.
+ * @param prefix prefix of the component
  * @param uri represents the URI of the component. URI is not significant for AkkaLocation as actorRef serves the purpose
  *            of exposed remote address of component.
  * @param actorRef gateway or router for a component that other components will resolve and talk to
@@ -44,7 +45,7 @@ sealed abstract class Location extends TMTSerializable {
  */
 final case class AkkaLocation(
     connection: AkkaConnection,
-    maybePrefix: Option[String],
+    prefix: Prefix,
     uri: URI,
     actorRef: ActorRef[Nothing],
     logAdminActorRef: ActorRef[Nothing]

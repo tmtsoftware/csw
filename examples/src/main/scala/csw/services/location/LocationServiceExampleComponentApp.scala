@@ -9,6 +9,7 @@ import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.adapter._
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
+import csw.messages.params.models.Prefix
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
@@ -60,7 +61,7 @@ class LocationServiceExampleComponent(locationService: LocationService) extends 
   // Register with the location service
   val registrationResult: Future[RegistrationResult] =
     locationService.register(
-      AkkaRegistration(LocationServiceExampleComponent.connection, Some("nfiraos.ncc.trombone"), self, logAdminActorRef)
+      AkkaRegistration(LocationServiceExampleComponent.connection, Prefix("nfiraos.ncc.trombone"), self, logAdminActorRef)
     )
   Await.result(registrationResult, 5.seconds)
 

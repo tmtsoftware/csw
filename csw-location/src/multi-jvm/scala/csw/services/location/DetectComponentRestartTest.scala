@@ -6,6 +6,7 @@ import akka.stream.ActorMaterializer
 import akka.testkit.TestProbe
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType, LocationRemoved, LocationUpdated}
+import csw.messages.params.models.Prefix
 import csw.services.location.commons.CswCluster
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.services.location.models._
@@ -35,7 +36,7 @@ class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(c
         .register(
           AkkaRegistration(
             akkaConnection,
-            Some("nfiraos.ncc.trombone"),
+            Prefix("nfiraos.ncc.trombone"),
             system.spawnAnonymous(Behavior.empty),
             system.spawnAnonymous(Behavior.empty)
           )
@@ -57,10 +58,12 @@ class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(c
 
       freshLocationService
         .register(
-          AkkaRegistration(akkaConnection,
-                           Some("nfiraos.ncc.trombone"),
-                           newSystem.spawnAnonymous(Behavior.empty),
-                           newSystem.spawnAnonymous(Behavior.empty))
+          AkkaRegistration(
+            akkaConnection,
+            Prefix("nfiraos.ncc.trombone"),
+            newSystem.spawnAnonymous(Behavior.empty),
+            newSystem.spawnAnonymous(Behavior.empty)
+          )
         )
         .await
       enterBarrier("member-re-registered")
