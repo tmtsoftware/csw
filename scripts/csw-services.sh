@@ -28,7 +28,7 @@
 # Setting default values
 seed_port=5552
 config_port=5000
-event_port=6379
+event_port=26379
 initSvnRepo=""
 
 # Always start cluster seed application
@@ -43,8 +43,8 @@ test -d ${logDir} || mkdir -p ${logDir}
 
 # We need at least this version of Redis
 minRedisVersion=3.2.5
-redisServer=/usr/local/bin/redis-server
-redisClient=`echo ${redisServer} | sed -e 's/-server/-cli/'`
+redisSentinel=/usr/local/bin/redis-sentinel
+redisClient=`echo ${redisSentinel} | sed -e 's/-sentinel/-cli/'`
 
 seedLogFile=${logDir}/seed.log
 seedPidFile=${logDir}/seed.pid
@@ -65,12 +65,12 @@ function get_version {
 
 function checkIfRedisIsInstalled {
     # Look in the default location first, since installing from the source puts it there, otherwise look in the path
-    if test ! -x ${redisServer} ; then redisServer=redis-server ; fi
-    if ! type ${redisServer} &> /dev/null; then
-      echo "[ERROR] Can't find $redisServer. Please install Redis version [$minRedisVersion] or greater."
+    if test ! -x ${redisSentinel} ; then redisSentinel=redis-sentinel ; fi
+    if ! type ${redisSentinel} &> /dev/null; then
+      echo "[ERROR] Can't find $redisSentinel. Please install Redis version [$minRedisVersion] or greater."
       return 1
     else
-        redis_version=`${redisServer} --version | awk '{sub(/-.*/,"",$3);print $3}' | sed -e 's/v=//'`
+        redis_version=`${redisSentinel} --version | awk '{sub(/-.*/,"",$3);print $3}' | sed -e 's/v=//'`
         if get_version ${minRedisVersion} ${redis_version}; then
              echo "[ERROR] Required Redis version is [$minRedisVersion], but only version [$redis_version] was found"
              return 1
@@ -122,7 +122,7 @@ function start_config {
 function start_event() {
     if checkIfRedisIsInstalled ; then
         echo "[EVENT] Starting Event Service on port: [$event_port] ..."
-        nohup ./csw-location-agent -DclusterSeeds=${seeds} --name "Event Service" --command "$redisServer --port ${event_port} --protected-mode no --notify-keyspace-events KEA" > ${eventLogFile} 2>&1 &
+        nohup ./csw-location-agent -DclusterSeeds=${seeds} --name "EventServer" --command "$redisSentinel ../conf/sentinel.conf --port ${event_port}" --port "${event_port}"> ${eventLogFile} 2>&1 &
         echo $! > ${eventPidFile}
         echo ${event_port} > ${eventPortFile}
     else
@@ -214,6 +214,7 @@ function parse_cmd_args {
                 enableAllServicesForRunning
             fi
 
+            start_services
             if [[ ${interfaceName} == "" ]] ; then
                 echo "[ERROR] interfaceName is not provided, please provide valid interface name via argument --interfaceName|-i or set interfaceName env variable."
                 exit 1
