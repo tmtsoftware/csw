@@ -3,7 +3,6 @@ package csw.services.location.helpers
 import akka.remote.testkit.{MultiNodeSpec, MultiNodeSpecCallbacks}
 import akka.testkit.ImplicitSender
 import csw.services.location.commons.CswCluster
-import csw.services.location.internal.LocationServiceClient
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import org.scalatest.{BeforeAndAfterAll, FunSuiteLike, Matchers}
 
@@ -17,7 +16,7 @@ abstract class LSNodeSpec[T <: NMembersAndSeed](val config: T, mode: String = "c
 
   protected val cswCluster: CswCluster = CswCluster.withSystem(system)
   protected val locationService: LocationService = mode match {
-    case "http"    => new LocationServiceClient()(system, cswCluster.mat)
+    case "http"    => LocationServiceFactory.makeLocalHttpClient(system, cswCluster.mat)
     case "cluster" => LocationServiceFactory.withCluster(cswCluster)
   }
 

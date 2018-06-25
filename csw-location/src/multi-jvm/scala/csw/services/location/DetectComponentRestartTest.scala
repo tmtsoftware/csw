@@ -8,7 +8,6 @@ import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType, LocationRemoved, LocationUpdated}
 import csw.services.location.commons.CswCluster
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
-import csw.services.location.internal.LocationServiceClient
 import csw.services.location.models._
 import csw.services.location.scaladsl.LocationServiceFactory
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
@@ -50,7 +49,7 @@ class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(c
       val newSystem = startNewSystem()
 
       val freshLocationService = mode match {
-        case "http"    => new LocationServiceClient()(newSystem, ActorMaterializer()(newSystem))
+        case "http"    => LocationServiceFactory.makeLocalHttpClient(newSystem, ActorMaterializer()(newSystem))
         case "cluster" => LocationServiceFactory.withCluster(CswCluster.withSystem(newSystem))
       }
 

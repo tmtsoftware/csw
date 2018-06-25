@@ -24,7 +24,7 @@ import scala.async.Async._
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 
-class LocationServiceClient(implicit actorSystem: ActorSystem, mat: Materializer)
+class LocationServiceClient(serverIp: String, serverPort: Int)(implicit actorSystem: ActorSystem, mat: Materializer)
     extends LocationService
     with FailFastCirceSupport
     with LocationJsonSupport { outer =>
@@ -32,7 +32,7 @@ class LocationServiceClient(implicit actorSystem: ActorSystem, mat: Materializer
   import actorSystem.dispatcher
   implicit val scheduler: Scheduler = actorSystem.scheduler
 
-  private val baseUri = "http://localhost:7654/location"
+  private val baseUri = s"http://$serverIp:$serverPort/location"
 
   override def register(registration: Registration): Future[RegistrationResult] = async {
     val uri           = Uri(baseUri + "/register")

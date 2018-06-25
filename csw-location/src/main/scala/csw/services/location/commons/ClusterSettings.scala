@@ -103,11 +103,11 @@ case class ClusterSettings(clusterName: String = Constants.ClusterName, values: 
   //Get the managementPort to start akka cluster management service.
   private[location] def managementPort: Option[Any] = allValues.get(ManagementPortKey)
 
-  //Prepare a list of seedNodes provided via clusterSeeds
-  def seedNodes: List[String] = {
-    val seeds = allValues.get(ClusterSeedsKey).toList.flatMap(_.toString.split(",")).map(_.trim)
-    seeds.map(seed ⇒ s"akka.tcp://$clusterName@$seed")
-  }
+  //Extract seeds [hostname1:port1,hostname2:port2] from clusterSeeds environment variable
+  private[location] def seeds = allValues.get(ClusterSeedsKey).toList.flatMap(_.toString.split(",")).map(_.trim)
+
+  //Prepare a list of seedNodes
+  def seedNodes: List[String] = seeds.map(seed ⇒ s"akka.tcp://$clusterName@$seed")
 
   //Prepare config for ActorSystem to join csw-cluster
   private[location] def config: Config = {
