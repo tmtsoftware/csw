@@ -1,11 +1,11 @@
-package csw.services.location_agent
+package csw.services.location.agent
 
 import csw.services.BuildInfo
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
+import csw.services.location.agent.commons.LocationAgentLogger
+import csw.services.location.agent.models.Command
+import csw.services.location.agent.utils.ArgsParser
 import csw.services.logging.scaladsl.{Logger, LoggingSystemFactory}
-import csw.services.location_agent.commons.LocationAgentLogger
-import csw.services.location_agent.models.Command
-import csw.services.location_agent.utils.ArgsParser
 
 import scala.sys.process.Process
 

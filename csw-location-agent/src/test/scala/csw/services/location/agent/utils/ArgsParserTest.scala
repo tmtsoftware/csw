@@ -1,8 +1,8 @@
-package csw.services.location_agent.utils
+package csw.services.location.agent.utils
 
 import java.io.ByteArrayOutputStream
 
-import csw.services.location_agent.models.Options
+import csw.services.location.agent.models.Options
 import org.scalatest.{BeforeAndAfterEach, FunSuite, Matchers}
 
 class ArgsParserTest extends FunSuite with Matchers with BeforeAndAfterEach {

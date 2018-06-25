@@ -1,18 +1,18 @@
-package csw.services.location_agent
+package csw.services.location.agent
 
 import akka.Done
 import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.{ActorSystem, CoordinatedShutdown}
+import csw.messages.commons.CoordinatedShutdownReasons.{FailureReason, ProcessTerminatedReason}
 import csw.messages.location.Connection.TcpConnection
 import csw.messages.location.{ComponentId, ComponentType}
-import csw.messages.commons.CoordinatedShutdownReasons.{FailureReason, ProcessTerminatedReason}
 import csw.services.location.commons.CswCluster
 import csw.services.location.models._
 import csw.services.location.scaladsl.LocationServiceFactory
+import csw.services.location.agent.commons.LocationAgentLogger
+import csw.services.location.agent.models.Command
 import csw.services.logging.commons.LogAdminActorFactory
 import csw.services.logging.scaladsl.Logger
-import csw.services.location_agent.commons.LocationAgentLogger
-import csw.services.location_agent.models.Command
 
 import scala.collection.immutable.Seq
 import scala.concurrent.duration.DurationDouble

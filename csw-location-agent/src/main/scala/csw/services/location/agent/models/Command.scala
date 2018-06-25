@@ -1,7 +1,7 @@
-package csw.services.location_agent.models
+package csw.services.location.agent.models
 
 import com.typesafe.config.Config
-import csw.services.location_agent.utils.{OptionsHandler, Utils}
+import csw.services.location.agent.utils.{OptionsHandler, Utils}
 
 /**
  * Prepares a command object, based on in input parameters.

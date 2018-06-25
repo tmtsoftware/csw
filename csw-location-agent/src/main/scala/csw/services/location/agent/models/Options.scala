@@ -1,4 +1,4 @@
-package csw.services.location_agent.models
+package csw.services.location.agent.models
 
 import java.io.File
 

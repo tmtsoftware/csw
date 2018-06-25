@@ -1,4 +1,4 @@
-package csw.services.location_agent
+package csw.services.location.agent
 
 import java.net.URI
 import java.nio.file.Paths
@@ -8,9 +8,9 @@ import com.typesafe.config.ConfigFactory
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.location.Connection.TcpConnection
 import csw.messages.location.{ComponentId, ComponentType}
+import csw.services.location.agent.common.TestFutureExtension.RichFuture
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.location.scaladsl.LocationServiceFactory
-import csw.services.location_agent.common.TestFutureExtension.RichFuture
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}

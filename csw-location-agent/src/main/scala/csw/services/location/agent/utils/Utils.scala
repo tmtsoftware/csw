@@ -1,4 +1,4 @@
-package csw.services.location_agent.utils
+package csw.services.location.agent.utils
 
 import java.io.File
 import java.net.ServerSocket
