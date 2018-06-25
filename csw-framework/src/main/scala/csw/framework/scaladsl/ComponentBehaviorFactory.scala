@@ -18,11 +18,14 @@ abstract class ComponentBehaviorFactory {
   /**
    * Implement this method for providing the component handlers to be used by component actor
    *
-   * @param ctx the Actor Context under which the actor instance of this behavior is created
+   * @param ctx the [[akka.actor.typed.scaladsl.ActorContext]] under which the actor instance of this behavior is created
    * @param componentInfo component related information as described in the configuration file
+   * @param commandResponseManager to manage state of a received Submit command
    * @param currentStatePublisher the pub sub actor to publish state represented by [[csw.messages.params.states.CurrentState]]
    *                              for this component
    * @param locationService the single instance of Location service created for a running application
+   * @param eventService the single instance of event service with default publishers and subcribers as well as the capability to create new ones
+   * @param loggerFactory factory to create suitable logger instance
    * @return componentHandlers to be used by this component
    */
   protected def handlers(
@@ -40,9 +43,12 @@ abstract class ComponentBehaviorFactory {
    *
    * @param componentInfo component related information as described in the configuration file
    * @param supervisor the actor reference of the supervisor actor which created this component
-   * @param currentStatePublisher the pub sub actor to publish state represented by [[csw.messages.params.states.CurrentState]]
-   *                              for this component
-   * @param locationService the single instance of Location service created for a running application
+   * @param commandResponseManager to manage state of a received Submit command
+   * @param currentStatePublisher  the pub sub actor to publish state represented by [[csw.messages.params.states.CurrentState]]
+   *                               for this component
+   * @param locationService        the single instance of Location service created for a running application
+   * @param eventService the single instance of event service with default publishers and subcribers as well as the capability to create new ones
+   * @param loggerFactory factory to create suitable logger instance
    * @return behavior for component Actor
    */
   private[framework] def make(

@@ -58,18 +58,19 @@ private[framework] object SupervisorBehavior {
 /**
  * The Behavior of a Supervisor of a component actor, represented as a mutable behavior
  *
- * @param ctx the ActorContext under which the actor instance of this behavior is created
+ * @param ctx the [[akka.actor.typed.scaladsl.ActorContext]] under which the actor instance of this behavior is created
  * @param timerScheduler provides support for scheduled `self` messages in an actor
  * @param maybeContainerRef the container ref of the container under which this supervisor is started if
- *                          its not running in standalone mode
+ *                          it's not running in standalone mode
  * @param componentInfo component related information as described in the configuration file
  * @param componentBehaviorFactory the factory for creating the component supervised by this Supervisor
  * @param commandResponseManagerFactory the factory for creating actor instance of [[csw.framework.internal.pubsub.PubSubBehavior]]
  *                                      for utilising pub-sub of any state of a component
- * @param registrationFactory the factory for creating a typed [[csw.services.location.models.AkkaRegistration]] from
- *                            [[csw.messages.location.Connection.AkkaConnection]]
- * @param locationService the single instance of Location service created for a running application
- * @param loggerFactory the factory for creating [[csw.services.logging.scaladsl.Logger]] instance
+ * @param registrationFactory           the factory for creating a typed [[csw.services.location.models.AkkaRegistration]] from
+ *                                      [[csw.messages.location.Connection.AkkaConnection]]
+ * @param locationService               the single instance of Location service created for a running application
+ * @param eventService the single instance of event service with default publishers and subcribers as well as the capability to create new ones
+ * @param loggerFactory                 the factory for creating [[csw.services.logging.scaladsl.Logger]] instance
  */
 private[framework] final class SupervisorBehavior(
     ctx: ActorContext[SupervisorMessage],

@@ -27,12 +27,14 @@ import scala.util.control.NonFatal
 /**
  * The Behavior of a component actor, represented as a mutable behavior
  *
- * @param ctx the ActorContext under which the actor instance of this behavior is created
+ * @param ctx the [[akka.actor.typed.scaladsl.ActorContext]] under which the actor instance of this behavior is created
  * @param componentInfo component related information as described in the configuration file
  * @param supervisor the actor reference of the supervisor actor which created this component
  * @param lifecycleHandlers the implementation of handlers which defines the domain actions to be performed by this
  *                          component
+ * @param commandResponseManager to manage state of a received Submit command
  * @param locationService the single instance of Location service created for a running application
+ * @param loggerFactory factory to create suitable logger instance
  */
 private[framework] final class ComponentBehavior(
     ctx: ActorContext[TopLevelActorMessage],

@@ -30,12 +30,14 @@ import scala.util.{Failure, Success}
 /**
  * The Behavior of a Container of one or more components, represented as a mutable behavior.
  *
- * @param ctx the ActorContext under which the actor instance of this behavior is created
+ * @param ctx the [[akka.actor.typed.scaladsl.ActorContext]] under which the actor instance of this behavior is created
  * @param containerInfo container related information as described in the configuration file
  * @param supervisorInfoFactory the factory for creating the Supervisors for components described in ContainerInfo
  * @param registrationFactory the factory for creating a typed [[csw.services.location.models.AkkaRegistration]] from
                               [[csw.messages.location.Connection.AkkaConnection]]
+ * @param eventServiceFactory the factory to create instance of event service to be used by components to use and/or create publishers and subscribers
  * @param locationService the single instance of Location service created for a running application
+ * @param loggerFactory factory to create suitable logger instance
  */
 private[framework] final class ContainerBehavior(
     ctx: ActorContext[ContainerActorMessage],
