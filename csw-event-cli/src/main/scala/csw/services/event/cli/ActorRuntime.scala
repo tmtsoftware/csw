@@ -15,9 +15,7 @@ class ActorRuntime(_actorSystem: ActorSystem) {
   private val coordinatedShutdown = CoordinatedShutdown(system)
 
   /**
-   * The shutdown method helps self node to gracefully quit the akka cluster. It is used by `csw-config-client-cli`
-   * to shutdown the the app gracefully. `csw-config-client-cli` becomes the part of akka cluster on booting up and
-   * resolves the config server, using location service, to provide cli features around admin api of config service.
+   * Gracefully shutdown [[_actorSystem]]
    *
    * @param reason the reason for shutdown
    * @return a future that completes when shutdown is successful

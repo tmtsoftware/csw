@@ -14,13 +14,13 @@ class ArgsParser(name: String) {
 
     cmd("inspect") action { (_, c) =>
       c.copy(op = "inspect")
-    } text "returns info on an event" children {
+    } text "returns event information excluding parameter values" children {
       opt[Seq[String]]('e', "events")
         .valueName("<event1>,<event2>...")
         .action { (x, c) =>
           c.copy(eventKeys = x.map(EventKey(_)))
         }
-        .text("list of events to inspect")
+        .text("comma separated list of events to inspect")
     }
 
     help("help")

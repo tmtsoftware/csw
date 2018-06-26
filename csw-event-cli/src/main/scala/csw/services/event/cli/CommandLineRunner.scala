@@ -18,7 +18,7 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
   def inspect(options: Options): Future[Unit] = async {
 
     val subscriber         = await(eventService.defaultSubscriber)
-    val events: Seq[Event] = await(Future.traverse(options.eventKeys)(key ⇒ subscriber.get(key)))
+    val events: Seq[Event] = await(Future.traverse(options.eventKeys)(subscriber.get))
 
     def inspect0(eventKey: String, parentKey: Option[String], params: Set[Parameter[_]]): Unit = {
       def keyName(param: Parameter[_]) =
@@ -29,7 +29,7 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
         param.keyType match {
           case StructKey ⇒
             printLine(s"$eventKey ${keyName(param)} = ${param.keyType}[${param.units}]")
-            inspect0(eventKey, Some(keyName(param)), param.values.flatMap(x ⇒ x.asInstanceOf[Struct].paramSet).toSet)
+            inspect0(eventKey, Some(keyName(param)), param.values.flatMap(_.asInstanceOf[Struct].paramSet).toSet)
           case _ ⇒
             printLine(s"$eventKey ${keyName(param)} = ${param.keyType}[${param.units}]")
         }

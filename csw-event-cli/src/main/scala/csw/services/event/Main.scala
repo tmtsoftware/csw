@@ -3,7 +3,7 @@ package csw.services.event
 import csw.messages.commons.CoordinatedShutdownReasons.ApplicationFinishedReason
 import csw.services.BuildInfo
 import csw.services.event.cli.{ArgsParser, Options, Wiring}
-import csw.services.location.commons.ClusterAwareSettings
+import csw.services.location.commons.{ActorSystemFactory, ClusterAwareSettings}
 import csw.services.logging.scaladsl.LoggingSystemFactory
 
 // $COVERAGE-OFF$
@@ -22,7 +22,7 @@ object Main extends App {
   }
 
   private def run(options: Options): Unit = {
-    val actorSystem = ClusterAwareSettings.system
+    val actorSystem = ActorSystemFactory.remote()
     LoggingSystemFactory.start(name, BuildInfo.version, ClusterAwareSettings.hostname, actorSystem)
 
     val wiring = new Wiring(actorSystem)
