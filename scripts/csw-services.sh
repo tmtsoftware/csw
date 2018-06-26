@@ -53,12 +53,13 @@ seedPidFile=${logDir}/seed.pid
 configLogFile=${logDir}/config.log
 configPidFile=${logDir}/config.pid
 
-eventLogFile=${logDir}/event.log
-eventPidFile=${logDir}/event.pid
-eventPortFile=${logDir}/event.port
+sentinelLogFile=${logDir}/event.log
+sentinelPidFile=${logDir}/event.pid
+sentinelPortFile=${logDir}/event.port
 
-eventMasterPidFile=${logDir}/event_master.pid
-eventMasterPortFile=${logDir}/event_master.port
+masterLogFile=${logDir}/event_master.log
+masterPidFile=${logDir}/event_master.pid
+masterPortFile=${logDir}/event_master.port
 
 sortVersion="sort -V"
 
@@ -126,12 +127,12 @@ function start_config {
 function start_event() {
     if checkIfRedisIsInstalled ; then
         echo "[EVENT] Starting Event Service on port: [$event_port] ..."
-        nohup redis-server ../conf/master.conf &
-        echo $! > ${eventMasterPidFile}
-        nohup ./csw-location-agent -DclusterSeeds=${seeds} --name "EventServer" --command "$redisSentinel ../conf/sentinel.conf --port ${event_port}" --port "${event_port}"> ${eventLogFile} 2>&1 &
-        echo $! > ${eventPidFile}
-        echo ${event_port} > ${eventPortFile}
-        echo ${event_master_port} > ${eventMasterPortFile}
+        nohup redis-server ../conf/master.conf> ${masterLogFile} 2>&1 &
+        echo $! > ${masterPidFile}
+        nohup ./csw-location-agent -DclusterSeeds=${seeds} --name "EventServer" --command "$redisSentinel ../conf/sentinel.conf --port ${event_port}" --port "${event_port}"> ${sentinelLogFile} 2>&1 &
+        echo $! > ${sentinelPidFile}
+        echo ${event_port} > ${sentinelPortFile}
+        echo ${event_master_port} > ${masterPortFile}
     else
         exit 1
     fi
@@ -249,24 +250,24 @@ function parse_cmd_args {
             ;;
         stop)
             # Stop Redis
-            if [ ! -f ${eventPidFile} ]
+            if [ ! -f ${sentinelPidFile} ]
             then
-                echo "[EVENT] Event $eventPidFile does not exist, process is not running."
+                echo "[EVENT] Event $sentinelPidFile does not exist, process is not running."
             else
-                local PID=$(cat ${eventPidFile})
-                local MasterPID=$(cat ${eventMasterPidFile})
-                local redisPort=$(cat ${eventPortFile})
-                local redisMasterPort=$(cat ${eventMasterPortFile})
+                local sentinelPID=$(cat ${sentinelPidFile})
+                local MasterPID=$(cat ${masterPidFile})
+                local sentinelPort=$(cat ${sentinelPortFile})
+                local masterPort=$(cat ${masterPortFile})
                 echo "[EVENT] Stopping Event Service..."
-                ${redisClient} -p ${redisPort} shutdown
-                ${redisClient} -p ${redisMasterPort} shutdown
-                while(( -x /proc/${PID} )) || ((-x /proc/${MasterPID}))
+                ${redisClient} -p ${sentinelPort} shutdown
+                ${redisClient} -p ${masterPort} shutdown
+                while(( -x /proc/${sentinelPID} )) || ((-x /proc/${MasterPID}))
                 do
                     echo "[EVENT] Waiting for Event Service to shutdown ..."
                     sleep 1
                 done
                 echo "[EVENT] Event Service stopped."
-                rm -f ${eventLogFile} ${eventPidFile} ${eventPortFile} ${eventMasterPortFile} ${eventMasterPidFile}
+                rm -f ${sentinelLogFile} ${sentinelPidFile} ${sentinelPortFile} ${masterPortFile} ${masterPidFile}
             fi
 
             # Stop Cluster Seed application
