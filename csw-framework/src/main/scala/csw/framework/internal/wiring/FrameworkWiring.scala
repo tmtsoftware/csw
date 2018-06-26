@@ -1,6 +1,7 @@
 package csw.framework.internal.wiring
 
-import akka.actor.ActorSystem
+import akka.Done
+import akka.actor.{ActorSystem, CoordinatedShutdown}
 import akka.actor.typed.ActorRef
 import csw.framework.deploy.ConfigUtils
 import csw.services.command.internal.CommandResponseManagerFactory
@@ -13,6 +14,8 @@ import csw.services.location.scaladsl.{LocationService, LocationServiceFactory, 
 import csw.services.logging.commons.LogAdminActorFactory
 import csw.services.logging.messages.LogControlMessages
 import io.lettuce.core.RedisClient
+
+import scala.concurrent.Future
 
 /**
  * Represents a class that lazily initializes necessary instances to run a component(s)
@@ -27,8 +30,19 @@ class FrameworkWiring {
   lazy val commandResponseManagerFactory                  = new CommandResponseManagerFactory
   lazy val configClientService: ConfigClientService       = ConfigClientFactory.clientApi(actorSystem, locationService)
   lazy val configUtils: ConfigUtils                       = new ConfigUtils(configClientService, actorRuntime)
-  lazy val redisClient: RedisClient                       = RedisClient.create()
   lazy val eventServiceFactory: EventServiceFactory       = new RedisEventServiceFactory(redisClient)
+
+  lazy val redisClient: RedisClient = {
+    val client = RedisClient.create()
+    shutdownRedisOnTermination(client)
+    client
+  }
+
+  private def shutdownRedisOnTermination(client: RedisClient): Unit =
+    actorRuntime.coordinatedShutdown.addTask(
+      CoordinatedShutdown.PhaseBeforeServiceUnbind,
+      "unregistering"
+    )(() => Future { client.shutdown(); Done })
 }
 
 /**

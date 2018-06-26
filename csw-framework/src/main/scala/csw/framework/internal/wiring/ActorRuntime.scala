@@ -20,7 +20,7 @@ private[framework] class ActorRuntime(_actorSystem: ActorSystem) {
   implicit val ec: ExecutionContextExecutor = actorSystem.dispatcher
   implicit val mat: Materializer            = ActorMaterializer()
 
-  private val coordinatedShutdown = CoordinatedShutdown(actorSystem)
+  private[framework] val coordinatedShutdown = CoordinatedShutdown(actorSystem)
 
   def startLogging(name: String): LoggingSystem =
     LoggingSystemFactory.start(name, BuildInfo.version, ClusterAwareSettings.hostname, actorSystem)
