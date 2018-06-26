@@ -12,13 +12,13 @@ object Dependencies {
     Libs.`scalapb-runtime`,
     Libs.`scalapb-json4s`,
     Akka.`akka-actor-typed`,
-    Akka.`akka-cluster-tools` % Test,
+    Akka.`akka-cluster-tools`       % Test,
     Akka.`akka-actor-testkit-typed` % Test,
-    Akka.`akka-actor`         % Test,
-    Chill.`chill-akka`        % Test,
-    Libs.`scalatest`          % Test,
-    Libs.`junit`              % Test,
-    Libs.`junit-interface`    % Test
+    Akka.`akka-actor`               % Test,
+    Chill.`chill-akka`              % Test,
+    Libs.`scalatest`                % Test,
+    Libs.`junit`                    % Test,
+    Libs.`junit-interface`          % Test
   )
 
   val Logging = Seq(
@@ -131,32 +131,32 @@ object Dependencies {
     Enumeratum.`enumeratum-play`,
     Akka.`akka-actor-typed`,
     Libs.`scopt`,
-    Akka.`akka-actor-testkit-typed`  % Test,
-    Akka.`akka-stream-testkit` % Test,
-    Libs.`scalatest`           % Test,
-    Libs.`junit`               % Test,
-    Libs.`junit-interface`     % Test,
-    Libs.`mockito-core`        % Test
+    Akka.`akka-actor-testkit-typed` % Test,
+    Akka.`akka-stream-testkit`      % Test,
+    Libs.`scalatest`                % Test,
+    Libs.`junit`                    % Test,
+    Libs.`junit-interface`          % Test,
+    Libs.`mockito-core`             % Test
   )
 
   val Command = Seq(
     Libs.`scala-async`,
     Akka.`akka-actor-typed`,
-    Akka.`akka-actor-testkit-typed`  % Test,
-    Akka.`akka-stream-testkit` % Test,
-    Libs.`scalatest`           % Test,
-    Chill.`chill-akka`         % Test,
-    Libs.`junit`               % Test,
-    Libs.`junit-interface`     % Test,
-    Libs.`mockito-core`        % Test
+    Akka.`akka-actor-testkit-typed` % Test,
+    Akka.`akka-stream-testkit`      % Test,
+    Libs.`scalatest`                % Test,
+    Chill.`chill-akka`              % Test,
+    Libs.`junit`                    % Test,
+    Libs.`junit-interface`          % Test,
+    Libs.`mockito-core`             % Test
   )
 
-  val EventImpl = Seq(
+  val EventClient = Seq(
     Libs.`scala-async`,
     Akka.`akka-stream`,
     Libs.`akka-stream-kafka`,
     Libs.`lettuce`,
-    Akka.`akka-actor-testkit-typed`       % Test,
+    Akka.`akka-actor-testkit-typed` % Test,
     Akka.`akka-stream-testkit`      % Test,
     Libs.`scalatest`                % Test,
     Libs.`junit`                    % Test,
@@ -167,6 +167,11 @@ object Dependencies {
     Akka.`akka-multi-node-testkit`  % Test,
     Libs.HdrHistogram               % Test,
     Libs.testng                     % Test
+  )
+
+  val EventCli = Seq(
+    Libs.`scopt`,
+    Libs.`scalatest` % Test
   )
 
   val Commons = Seq(
