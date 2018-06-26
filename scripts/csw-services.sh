@@ -29,6 +29,7 @@
 seed_port=5552
 config_port=5000
 event_port=26379
+event_master_port=6379
 initSvnRepo=""
 
 # Always start cluster seed application
@@ -55,6 +56,9 @@ configPidFile=${logDir}/config.pid
 eventLogFile=${logDir}/event.log
 eventPidFile=${logDir}/event.pid
 eventPortFile=${logDir}/event.port
+
+eventMasterPidFile=${logDir}/event_master.pid
+eventMasterPortFile=${logDir}/event_master.port
 
 sortVersion="sort -V"
 
@@ -122,9 +126,12 @@ function start_config {
 function start_event() {
     if checkIfRedisIsInstalled ; then
         echo "[EVENT] Starting Event Service on port: [$event_port] ..."
+        nohup redis-server ../conf/master.conf &
+        echo $! > ${eventMasterPidFile}
         nohup ./csw-location-agent -DclusterSeeds=${seeds} --name "EventServer" --command "$redisSentinel ../conf/sentinel.conf --port ${event_port}" --port "${event_port}"> ${eventLogFile} 2>&1 &
         echo $! > ${eventPidFile}
         echo ${event_port} > ${eventPortFile}
+        echo ${event_master_port} > ${eventMasterPortFile}
     else
         exit 1
     fi
@@ -247,16 +254,19 @@ function parse_cmd_args {
                 echo "[EVENT] Event $eventPidFile does not exist, process is not running."
             else
                 local PID=$(cat ${eventPidFile})
+                local MasterPID=$(cat ${eventMasterPidFile})
                 local redisPort=$(cat ${eventPortFile})
+                local redisMasterPort=$(cat ${eventMasterPortFile})
                 echo "[EVENT] Stopping Event Service..."
                 ${redisClient} -p ${redisPort} shutdown
-                while [ -x /proc/${PID} ]
+                ${redisClient} -p ${redisMasterPort} shutdown
+                while(( -x /proc/${PID} )) || ((-x /proc/${MasterPID}))
                 do
                     echo "[EVENT] Waiting for Event Service to shutdown ..."
                     sleep 1
                 done
                 echo "[EVENT] Event Service stopped."
-                rm -f ${eventLogFile} ${eventPidFile} ${eventPortFile}
+                rm -f ${eventLogFile} ${eventPidFile} ${eventPortFile} ${eventMasterPortFile} ${eventMasterPidFile}
             fi
 
             # Stop Cluster Seed application
