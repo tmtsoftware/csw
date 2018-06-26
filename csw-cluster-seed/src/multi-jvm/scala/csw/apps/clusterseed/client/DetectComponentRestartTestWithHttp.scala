@@ -6,6 +6,7 @@ class DetectComponentRestartTestWithHttpMultiJvmNode1 extends DetectComponentRes
 class DetectComponentRestartTestWithHttpMultiJvmNode2 extends DetectComponentRestartTestWithHttp(0, "http")
 class DetectComponentRestartTestWithHttpMultiJvmNode3 extends DetectComponentRestartTestWithHttp(0, "http")
 
+// DEOPSCSW-429: [SPIKE] Provide HTTP server and client for location service
 class DetectComponentRestartTestWithHttp(ignore: Int, mode: String)
     extends DetectComponentRestartTest(ignore, mode)
     with HTTPLocationService
