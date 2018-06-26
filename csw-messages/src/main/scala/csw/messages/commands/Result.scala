@@ -2,6 +2,7 @@ package csw.messages.commands
 
 import csw.messages.params.generics.{Parameter, ParameterSetKeyData, ParameterSetType}
 import csw.messages.params.models.Prefix
+import play.api.libs.json.{Json, OFormat}
 
 /**
  * A result containing parameters for command response
@@ -39,4 +40,6 @@ object Result {
    */
   def apply(prefix: Prefix, paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]): Result =
     new Result(prefix).madd(paramSet)
+
+  implicit val format: OFormat[Result] = Json.format[Result]
 }

@@ -1,5 +1,6 @@
 package csw.messages.commands
 
+import ai.x.play.json.Jsonx
 import akka.NotUsed
 import akka.stream.Materializer
 import akka.stream.scaladsl.Source
@@ -9,6 +10,7 @@ import csw.messages.params.models.Id
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
+import play.api.libs.json._
 
 /**
  * Parent type of a response of command Execution
@@ -95,6 +97,17 @@ object CommandResponse {
    */
   case class NotAllowed(runId: Id, issue: CommandIssue) extends CommandResponse(Negative)
 
+  implicit lazy val jsonFormatAccepted: Format[Accepted]                       = Jsonx.formatCaseClass[Accepted]
+  implicit lazy val jsonFormatInvalid: Format[Invalid]                         = Jsonx.formatCaseClass[Invalid]
+  implicit lazy val jsonFormatCompletedWithResult: Format[CompletedWithResult] = Jsonx.formatCaseClass[CompletedWithResult]
+  implicit lazy val jsonFormatCompleted: Format[Completed]                     = Jsonx.formatCaseClass[Completed]
+  implicit lazy val jsonFormatNoLongerValid: Format[NoLongerValid]             = Jsonx.formatCaseClass[NoLongerValid]
+  implicit lazy val jsonFormatError: Format[Error]                             = Jsonx.formatCaseClass[Error]
+  implicit lazy val jsonFormatCancelled: Format[Cancelled]                     = Jsonx.formatCaseClass[Cancelled]
+  implicit lazy val jsonFormatCommandNotAvailable: Format[CommandNotAvailable] = Jsonx.formatCaseClass[CommandNotAvailable]
+  implicit lazy val jsonFormatNotAllowed: Format[NotAllowed]                   = Jsonx.formatCaseClass[NotAllowed]
+  implicit lazy val jsonFormat: Format[CommandResponse]                        = Jsonx.formatSealed[CommandResponse]
+
   /**
    * Transform a given CommandResponse to a response with the provided Id
    *
@@ -162,4 +175,9 @@ object CommandResultType {
    * A Negative CommandResponse of Final type
    */
   case object Negative extends Final
+
+  import ai.x.play.json.implicits.formatSingleton
+  import ai.x.play.json.SingletonEncoder.simpleName
+  implicit lazy val jsonFormatFinal: Format[Final]                         = Jsonx.formatSealed[Final]
+  implicit lazy val jsonFormatCommandResultType: Format[CommandResultType] = Jsonx.formatSealed[CommandResultType]
 }
