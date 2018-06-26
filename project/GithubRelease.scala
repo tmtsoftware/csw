@@ -77,7 +77,9 @@ object GithubRelease extends AutoPlugin {
 
   def githubReleases(projects: Seq[ProjectReference]): Setting[Task[Seq[sbt.File]]] =
     ghreleaseAssets := Seq(
-      stageAndZipTask(projects).value
+      stageAndZipTask(projects).value,
+      coverageReportZipKey.value,
+      testReportZipKey.value
     )
 
 }
