@@ -23,5 +23,5 @@ trait IEventPublisher {
 
   def publish(eventGenerator: Supplier[Event], every: FiniteDuration, onError: Consumer[PublishFailure]): Cancellable
 
-  def shutdown(): CompletableFuture[Done]
+  private[event] def shutdown(): CompletableFuture[Done]
 }

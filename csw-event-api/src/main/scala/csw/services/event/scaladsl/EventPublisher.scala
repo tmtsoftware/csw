@@ -64,5 +64,5 @@ trait EventPublisher {
    * This method will be called while component is getting shutdown gracefully.
    * @return a future which completes when the event is published
    */
-  def shutdown(): Future[Done]
+  private[event] def shutdown(): Future[Done]
 }
