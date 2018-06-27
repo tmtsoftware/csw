@@ -8,7 +8,7 @@ import csw.services.event.scaladsl.EventSubscription
 
 import scala.compat.java8.FutureConverters.FutureOps
 
-object EventServiceExts {
+private[event] object EventServiceExts {
   implicit class RichEventSubscription(val eventSubscription: EventSubscription) {
     def asJava: IEventSubscription = {
       new IEventSubscription {
