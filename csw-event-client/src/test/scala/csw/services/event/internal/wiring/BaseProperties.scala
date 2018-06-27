@@ -39,7 +39,7 @@ trait BaseProperties {
 
   def resolveEventService(locationService: LocationService): Future[URI] = async {
     val eventServiceResolver = new EventServiceLocationResolver(locationService)
-    await(eventServiceResolver.uri)
+    await(eventServiceResolver.uri())
   }
 }
 
