@@ -15,7 +15,7 @@ import csw.services.logging.commons.LogAdminActorFactory
 import csw.services.logging.messages.LogControlMessages
 import io.lettuce.core.RedisClient
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
  * Represents a class that lazily initializes necessary instances to run a component(s)
@@ -38,11 +38,14 @@ class FrameworkWiring {
     client
   }
 
-  private def shutdownRedisOnTermination(client: RedisClient): Unit =
+  private def shutdownRedisOnTermination(client: RedisClient): Unit = {
+    implicit val ec: ExecutionContext = actorSystem.dispatcher
+
     actorRuntime.coordinatedShutdown.addTask(
       CoordinatedShutdown.PhaseBeforeServiceUnbind,
       "unregistering"
     )(() => Future { client.shutdown(); Done })
+  }
 }
 
 /**
