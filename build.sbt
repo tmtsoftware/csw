@@ -197,8 +197,9 @@ lazy val `csw-event-client` = project
 
 lazy val `csw-event-cli` = project
   .dependsOn(
-    `csw-event-client`,
-    `csw-messages`
+    `csw-messages`,
+    `csw-event-client` % "compile->compile,test->test",
+    `csw-cluster-seed` % "test->test"
   )
   .enablePlugins(DeployApp, MaybeCoverage)
   .settings(libraryDependencies ++= Dependencies.EventCli)

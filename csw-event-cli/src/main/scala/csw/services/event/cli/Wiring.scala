@@ -13,3 +13,11 @@ class Wiring(actorSystem: ActorSystem) {
   lazy val commandLineRunner                = new CommandLineRunner(eventService, actorRuntime, printLine)
   lazy val cliApp                           = new CliApp(commandLineRunner)
 }
+
+object Wiring {
+  private[event] def make(_actorSystem: ActorSystem, _locationService: LocationService, _printLine: Any ⇒ Unit): Wiring =
+    new Wiring(_actorSystem) {
+      override lazy val locationService: LocationService = _locationService
+      override lazy val printLine: Any ⇒ Unit            = _printLine
+    }
+}
