@@ -18,6 +18,7 @@ trait EventPublisher {
 
   /**
    * publish a single [[csw.messages.events.Event]]
+   *
    * @param event an event to be published
    * @return a future which completes when the event is published
    */
@@ -25,6 +26,7 @@ trait EventPublisher {
 
   /**
    * publish from a stream of [[csw.messages.events.Event]]
+   *
    * @param source a [[akka.stream.scaladsl.Source]] of events to be published
    * @tparam Mat represents the type of materialized value as defined in the source to be obtained on running the stream
    * @return the materialized value obtained on running the stream
@@ -43,6 +45,7 @@ trait EventPublisher {
   /**
    * publish [[csw.messages.events.Event]] from a `eventGenerator` function, which will be executed at `every` frequency. `Cancellable` can be used to cancel
    * the execution of `eventGenerator` function.
+   *
    * @param eventGenerator a function which can generate an event to be published at `every` frequency
    * @param every frequency with which the events are to be published
    * @return a handle to cancel the event generation through `eventGenerator`
@@ -52,6 +55,7 @@ trait EventPublisher {
   /**
    * publish [[csw.messages.events.Event]] from a `eventGenerator` function, which will be executed at `every` frequency. Also, provide `onError` callback
    * for each event for which publishing failed.
+   *
    * @note any exception thrown from `eventGenerator` or `onError` callback is expected
    * to be handled by component developers.
    * @param eventGenerator a function which can generate an event to be published at `every` frequency
@@ -64,6 +68,7 @@ trait EventPublisher {
   /**
    * shuts down the connection for this publisher. Using any api of publisher after shutdown should give exceptions.
    * This method should be called while the component is shutdown gracefully.
+   *
    * @return a future which completes when the event is published
    */
   private[event] def shutdown(): Future[Done]
