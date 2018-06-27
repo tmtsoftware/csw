@@ -12,9 +12,12 @@ class RedisEventService(eventServiceResolver: EventServiceResolver, masterId: St
     mat: Materializer
 ) extends EventService {
 
-  private def redisURI: Future[RedisURI] =
-    eventServiceResolver.uri.map(uri ⇒ RedisURI.Builder.sentinel(uri.getHost, uri.getPort, masterId).build())
+  override def makeNewPublisher(): Future[EventPublisher] = redisURI().map(new RedisPublisher(_, redisClient))
 
-  override def makeNewPublisher(): Future[EventPublisher]   = redisURI.map(new RedisPublisher(_, redisClient))
-  override def makeNewSubscriber(): Future[EventSubscriber] = redisURI.map(new RedisSubscriber(_, redisClient))
+  override def makeNewSubscriber(): Future[EventSubscriber] = redisURI().map(new RedisSubscriber(_, redisClient))
+
+  // resolve event service every time before creating a new publisher or subscriber
+  private def redisURI(): Future[RedisURI] =
+    eventServiceResolver.uri().map(uri ⇒ RedisURI.Builder.sentinel(uri.getHost, uri.getPort, masterId).build())
+
 }

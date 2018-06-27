@@ -40,10 +40,10 @@ class KafkaTestProps(
   val eventService: EventService   = eventServiceFactory.make(locationService)
   val jEventService: IEventService = eventServiceFactory.jMake(locationService.asJava, actorSystem)
 
-  val publisher: EventPublisher                                    = eventService.defaultPublisher.await
-  val subscriber: EventSubscriber                                  = eventService.defaultSubscriber.await
-  override def jPublisher[T <: EventPublisher]: IEventPublisher    = jEventService.defaultPublisher.toScala.await
-  override def jSubscriber[T <: EventSubscriber]: IEventSubscriber = jEventService.defaultSubscriber.toScala.await
+  override val publisher: EventPublisher     = eventService.defaultPublisher.await
+  override val subscriber: EventSubscriber   = eventService.defaultSubscriber.await
+  override val jPublisher: IEventPublisher   = jEventService.defaultPublisher.get()
+  override val jSubscriber: IEventSubscriber = jEventService.defaultSubscriber.get()
 
   override def toString: String = "Kafka"
 

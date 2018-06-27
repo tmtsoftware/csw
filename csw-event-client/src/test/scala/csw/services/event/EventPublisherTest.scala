@@ -20,8 +20,9 @@ import scala.concurrent.duration.DurationLong
 import scala.util.Random
 
 //DEOPSCSW-334: Publish an event
-//DEOPSCSW-335: Model for EventName that encapsulates the topic(or channel ) name
+//DEOPSCSW-335: Model for EventName that encapsulates the topic(or channel) name
 //DEOPSCSW-337: Subscribe to an event based on prefix
+//DEOPSCSW-395: Provide EventService handle to component developers
 class EventPublisherTest extends TestNGSuite with Matchers with Eventually with EmbeddedKafka {
 
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 10.millis)

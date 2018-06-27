@@ -20,12 +20,12 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait BaseProperties {
   val eventPattern: String
-  def publisher: EventPublisher
-  def subscriber: EventSubscriber
-  def eventService: EventService
-  def jEventService: IEventService
-  def jPublisher[T <: EventPublisher]: IEventPublisher
-  def jSubscriber[T <: EventSubscriber]: IEventSubscriber
+  val publisher: EventPublisher
+  val subscriber: EventSubscriber
+  val eventService: EventService
+  val jEventService: IEventService
+  val jPublisher: IEventPublisher
+  val jSubscriber: IEventSubscriber
   def publishGarbage(channel: String, message: String): Future[Done]
   def start(): Unit
   def shutdown(): Unit

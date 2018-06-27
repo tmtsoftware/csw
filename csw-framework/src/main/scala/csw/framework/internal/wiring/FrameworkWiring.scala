@@ -43,7 +43,7 @@ class FrameworkWiring {
 
     actorRuntime.coordinatedShutdown.addTask(
       CoordinatedShutdown.PhaseBeforeServiceUnbind,
-      "unregistering"
+      "shutting_down_redis_client"
     )(() => Future { client.shutdown(); Done })
   }
 }

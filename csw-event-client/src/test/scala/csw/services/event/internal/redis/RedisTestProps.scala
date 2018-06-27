@@ -47,15 +47,14 @@ class RedisTestProps(
 
   val eventService: EventService   = eventServiceFactory.make(locationService)
   val jEventService: IEventService = new JEventService(eventService)
-
-  val publisher: EventPublisher   = eventService.defaultPublisher.await
-  val subscriber: EventSubscriber = eventService.defaultSubscriber.await
+  val publisher: EventPublisher    = eventService.defaultPublisher.await
+  val subscriber: EventSubscriber  = eventService.defaultSubscriber.await
 
   override def toString: String = name
 
-  override def jPublisher[T <: EventPublisher]: IEventPublisher = jEventService.defaultPublisher.toScala.await
+  override val jPublisher: IEventPublisher = jEventService.defaultPublisher.get()
 
-  override def jSubscriber[T <: EventSubscriber]: IEventSubscriber = jEventService.defaultSubscriber.toScala.await
+  override val jSubscriber: IEventSubscriber = jEventService.defaultSubscriber.get()
 
   override def publishGarbage(channel: String, message: String): Future[Done] =
     asyncConnection.flatMap(c ⇒ c.publish(channel, message).toScala.map(_ ⇒ Done))

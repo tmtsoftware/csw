@@ -32,6 +32,7 @@ import java.util.function.Supplier;
 //DEOPSCSW-334: Publish an event
 //DEOPSCSW-335: Model for EventName that encapsulates the topic(or channel ) name
 //DEOPSCSW-337: Subscribe to an event based on prefix
+//DEOPSCSW-395: Provide EventService handle to component developers
 public class JEventSubscriberTest extends TestNGSuite {
 
     private RedisTestProps redisTestProps;
