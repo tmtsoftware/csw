@@ -33,6 +33,8 @@ trait ILocationService {
   /**
    * Unregisters the connection
    *
+   *  @note this method is idempotent, which means multiple call to unregister the same connection will be no-op once successfully
+   *       unregistered from location service
    * @param connection an already registered connection
    * @return a CompletableFuture which completes after un-registration happens successfully and fails otherwise with
    *         [[csw.services.location.exceptions.UnregistrationFailed]]
