@@ -326,6 +326,13 @@ Java
 
 This worker actor simply takes the time passed in the message, sleeps that amount, and then updates the `CommandResponseManager` that the command is complete.
 
+@@@ note { title=Note }
+
+If the component developer creates new set of messages for worker actor then it is mandatory that those messages extend `TMTSerializable`
+which will enable messages to serialize on wire.
+
+@@@ 
+
 
 ## Building and Running component in standalone mode
 
