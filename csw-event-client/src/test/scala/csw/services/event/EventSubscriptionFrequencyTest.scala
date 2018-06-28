@@ -99,17 +99,17 @@ class EventSubscriptionFrequencyTest extends TestNGSuite with Matchers with Even
     subscription2.unsubscribe().await
     cancellable.cancel()
 
-    receivedEvents.size shouldBe 3
+    receivedEvents.size shouldBe 4
     publishedEvents.size should be > receivedEvents.size
     publishedEvents should contain allElementsOf receivedEvents
     // assert if received elements do not have duplicates
-    receivedEvents.toSet.size shouldBe 3
+    receivedEvents.toSet.size shouldBe 4
 
-    receivedEvents2.size shouldBe 2
+    receivedEvents2.size shouldBe 3
     publishedEvents.size should be > receivedEvents2.size
     publishedEvents should contain allElementsOf receivedEvents
     // assert if received elements do not have duplicates
-    receivedEvents2.toSet.size shouldBe 2
+    receivedEvents2.toSet.size shouldBe 3
   }
 
   //DEOPSCSW-342: Subscription with consumption frequency
@@ -189,10 +189,10 @@ class EventSubscriptionFrequencyTest extends TestNGSuite with Matchers with Even
     cancellable.cancel()
 
     val receivedEvents = inbox.receiveAll()
-    receivedEvents.size shouldBe 10
+    receivedEvents.size shouldBe 11
     publishedEvents should contain allElementsOf receivedEvents
     // assert that received elements will have duplicates
-    receivedEvents.toSet.size should not be 10
+    receivedEvents.toSet.size should not be 11
   }
 
 }

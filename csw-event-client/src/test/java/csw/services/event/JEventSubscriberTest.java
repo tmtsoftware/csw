@@ -131,13 +131,13 @@ public class JEventSubscriberTest extends TestNGSuite {
         subscription2.unsubscribe().get(10, TimeUnit.SECONDS);
         cancellable.cancel();
 
-        Assert.assertEquals(queue.size(), 3);
+        Assert.assertEquals(queue.size(), 4);
         // assert if received elements do not have duplicates
-        Assert.assertEquals(queue.stream().distinct().count(), 3);
+        Assert.assertEquals(queue.stream().distinct().count(), 4);
 
-        Assert.assertEquals(queue2.size(), 2);
+        Assert.assertEquals(queue2.size(), 3);
         // assert if received elements do not have duplicates
-        Assert.assertEquals(queue2.stream().distinct().count(), 2);
+        Assert.assertEquals(queue2.stream().distinct().count(), 3);
     }
 
     //DEOPSCSW-338: Provide callback for Event alerts
@@ -189,8 +189,8 @@ public class JEventSubscriberTest extends TestNGSuite {
         subscription2.unsubscribe().get(10, TimeUnit.SECONDS);
 
         cancellable.cancel();
-        Assert.assertEquals(queue.size(), 3);
-        Assert.assertEquals(queue2.size(), 2);
+        Assert.assertEquals(queue.size(), 4);
+        Assert.assertEquals(queue2.size(), 3);
     }
 
     //DEOPSCSW-338: Provide callback for Event alerts
@@ -236,8 +236,8 @@ public class JEventSubscriberTest extends TestNGSuite {
         subscription2.unsubscribe().get(10, TimeUnit.SECONDS);
 
         cancellable.cancel();
-        Assert.assertEquals(queue.size(), 3);
-        Assert.assertEquals(queue2.size(), 2);
+        Assert.assertEquals(queue.size(), 4);
+        Assert.assertEquals(queue2.size(), 3);
     }
 
     //DEOPSCSW-339: Provide actor ref to alert about Event arrival
@@ -271,7 +271,7 @@ public class JEventSubscriberTest extends TestNGSuite {
         IEventSubscription subscription = baseProperties.jSubscriber().subscribeActorRef(Collections.singleton(event1.eventKey()), inbox.getRef(), Duration.ofMillis(300), SubscriptionModes.jRateAdapterMode());
         Thread.sleep(1000);
         subscription.unsubscribe().get(10, TimeUnit.SECONDS);
-        Assert.assertEquals(inbox.getAllReceived().size(), 3);
+        Assert.assertEquals(inbox.getAllReceived().size(), 4);
     }
 
     //DEOPSCSW-342: Subscription with consumption frequency
@@ -331,10 +331,10 @@ public class JEventSubscriberTest extends TestNGSuite {
         cancellable.cancel();
 
         List<Event> eventsReceived = inbox.getAllReceived();
-        Assert.assertEquals(eventsReceived.size(), 10);
+        Assert.assertEquals(eventsReceived.size(), 11);
 
         // assert if received elements do not have duplicates
-        Assert.assertNotEquals(eventsReceived.stream().distinct().count(), 10);
+        Assert.assertNotEquals(eventsReceived.stream().distinct().count(), 11);
 
     }
 

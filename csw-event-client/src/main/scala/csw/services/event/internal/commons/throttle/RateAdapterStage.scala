@@ -12,6 +12,7 @@ class RateAdapterStage[A](delay: FiniteDuration) extends GraphStage[FlowShape[A,
 
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = new TimerGraphStageLogic(shape) {
     private var isPulled             = false
+    private var firstTick            = true
     private var maybeElem: Option[A] = None
 
     override def preStart(): Unit = {
@@ -21,7 +22,9 @@ class RateAdapterStage[A](delay: FiniteDuration) extends GraphStage[FlowShape[A,
 
     setHandler(in, new InHandler {
       override def onPush(): Unit = {
-        maybeElem = Some(grab(in))
+        val ele = grab(in)
+        maybeElem = Some(ele)
+        if (firstTick) { push(out, ele); firstTick = false }
         pull(in) //drop
       }
     })
@@ -31,9 +34,11 @@ class RateAdapterStage[A](delay: FiniteDuration) extends GraphStage[FlowShape[A,
         isPulled = true
     })
 
-    override def onTimer(key: Any): Unit = if (isPulled) maybeElem.foreach { x =>
-      isPulled = false
-      push(out, x)
+    override def onTimer(key: Any): Unit = {
+      if (isPulled) maybeElem.foreach { x =>
+        isPulled = false
+        push(out, x)
+      }
     }
   }
 }

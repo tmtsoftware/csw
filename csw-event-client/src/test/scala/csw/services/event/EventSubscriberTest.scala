@@ -147,8 +147,8 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     subscription2.unsubscribe().await
 
     cancellable.cancel()
-    queue.size shouldBe 3
-    queue2.size shouldBe 2
+    queue.size shouldBe 4
+    queue2.size shouldBe 3
   }
 
   //DEOPSCSW-338: Provide callback for Event alerts
@@ -201,8 +201,8 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     subscription2.unsubscribe().await
 
     cancellable.cancel()
-    queue.size shouldBe 3
-    queue2.size shouldBe 2
+    queue.size shouldBe 4
+    queue2.size shouldBe 3
   }
 
   //DEOPSCSW-339: Provide actor ref to alert about Event arrival
@@ -233,13 +233,13 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     val event1 = makeEvent(205)
 
     publisher.publish(event1).await
-    Thread.sleep(500) // Needed for redis set which is fire and forget operation
+    Thread.sleep(1000) // Needed for redis set which is fire and forget operation
     val subscription =
       subscriber.subscribeActorRef(Set(event1.eventKey), inbox.ref, 300.millis, SubscriptionModes.RateAdapterMode)
     Thread.sleep(1000)
     subscription.unsubscribe().await
 
-    inbox.receiveAll().size shouldBe 3
+    inbox.receiveAll().size shouldBe 4
   }
 
   //DEOPSCSW-420: Implement Pattern based subscription

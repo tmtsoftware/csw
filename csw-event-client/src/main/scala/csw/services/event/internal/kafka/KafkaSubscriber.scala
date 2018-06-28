@@ -57,7 +57,7 @@ class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(
       every: FiniteDuration,
       mode: SubscriptionMode
   ): EventSubscription =
-    eventSubscriberUtil.subscribeAsync(subscribe(eventKeys).via(eventSubscriberUtil.subscriptionModeStage(every, mode)), callback)
+    eventSubscriberUtil.subscribeAsync(subscribe(eventKeys, every, mode), callback)
 
   override def subscribeCallback(eventKeys: Set[EventKey], callback: Event => Unit): EventSubscription =
     eventSubscriberUtil.subscribeCallback(subscribe(eventKeys), callback)
@@ -69,7 +69,7 @@ class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(
       mode: SubscriptionMode
   ): EventSubscription =
     eventSubscriberUtil
-      .subscribeCallback(subscribe(eventKeys).via(eventSubscriberUtil.subscriptionModeStage(every, mode)), callback)
+      .subscribeCallback(subscribe(eventKeys, every, mode), callback)
 
   override def subscribeActorRef(eventKeys: Set[EventKey], actorRef: ActorRef[Event]): EventSubscription =
     subscribeCallback(eventKeys, eventSubscriberUtil.actorCallback(actorRef))
