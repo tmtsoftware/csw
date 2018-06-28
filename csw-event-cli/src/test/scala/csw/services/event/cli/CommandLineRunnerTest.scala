@@ -7,7 +7,8 @@ import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
 import csw.apps.clusterseed.client.HTTPLocationService
 import csw.messages.commons.CoordinatedShutdownReasons
-import csw.messages.events.{EventName, ObserveEvent, SystemEvent}
+import csw.messages.events.{Event, EventName, ObserveEvent, SystemEvent}
+import csw.messages.params.formats.JsonSupport
 import csw.messages.params.generics.KeyType
 import csw.messages.params.models.{Prefix, Struct}
 import csw.services.event.helpers.TestFutureExt.RichFuture
@@ -16,12 +17,13 @@ import csw.services.event.scaladsl.EventPublisher
 import csw.services.location.models.TcpRegistration
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import csw.services.logging.commons.LogAdminActorFactory
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.{BeforeAndAfterEach, FunSuite, Matchers}
+import play.api.libs.json.Json
 import redis.embedded.{RedisSentinel, RedisServer}
 
 import scala.collection.mutable
 
-class CommandLineRunnerTest extends FunSuite with Matchers with HTTPLocationService {
+class CommandLineRunnerTest extends FunSuite with Matchers with HTTPLocationService with BeforeAndAfterEach {
 
   implicit val system: ActorSystem    = ActorSystem("test")
   implicit val mat: ActorMaterializer = ActorMaterializer()
@@ -36,11 +38,16 @@ class CommandLineRunnerTest extends FunSuite with Matchers with HTTPLocationServ
 
   private val (event1: SystemEvent, event2: ObserveEvent, expectedOut1: Set[String], expectedOut2: Set[String]) = seedEvents()
 
+  override protected def afterEach(): Unit = {
+    super.afterEach()
+    logBuffer.clear()
+  }
+
   override def afterAll(): Unit = {
-    super.afterAll()
     redisServer.stop()
     redisSentinel.stop()
     cliWiring.actorRuntime.shutdown(CoordinatedShutdownReasons.testFinishedReason).await
+    super.afterAll()
   }
 
   private def startAndRegisterRedis(sentinelPort: Int, serverPort: Int): (LocationService, RedisServer, RedisSentinel) = {
@@ -122,15 +129,26 @@ class CommandLineRunnerTest extends FunSuite with Matchers with HTTPLocationServ
 
     logBuffer.clear()
 
-    commandLineRunner.inspect(argsParser.parse(Seq("inspect", "-e", s"${event2.eventKey}")).get).await
+    commandLineRunner.inspect(argsParser.parse(Seq("inspect", "--events", s"${event2.eventKey}")).get).await
     logBuffer.filterNot(_.startsWith("==")).toSet shouldEqual expectedOut2
 
     logBuffer.clear()
 
     commandLineRunner.inspect(argsParser.parse(Seq("inspect", "-e", s"${event1.eventKey},${event2.eventKey}")).get).await
     logBuffer.filterNot(_.startsWith("==")).toSet shouldEqual (expectedOut1 ++ expectedOut2)
+  }
+
+  test("should able to get entire event/events in json format") {
+    import cliWiring._
+
+    commandLineRunner.get(argsParser.parse(Seq("get", "-e", s"${event1.eventKey}", "-o", "json")).get).await
+    JsonSupport.readEvent[SystemEvent](Json.parse(logBuffer.head)) shouldBe event1
 
     logBuffer.clear()
+
+    commandLineRunner.get(argsParser.parse(Seq("get", "-e", s"${event1.eventKey},${event2.eventKey}", "--out", "json")).get).await
+    val events = logBuffer.map(event ⇒ JsonSupport.readEvent[Event](Json.parse(event))).toSet
+    events shouldEqual Set(event1, event2)
   }
 
 }
