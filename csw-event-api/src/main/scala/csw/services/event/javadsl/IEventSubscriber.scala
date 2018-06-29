@@ -21,6 +21,9 @@ trait IEventSubscriber {
    * Subscribe to multiple Event Keys and get a single stream of events for all event keys. The latest events available for the given
    * Event Keys will be received first. If event is not published for one or more event keys, `invalid event` will be received for those Event Keys.
    *
+   * At the time of invocation, in case the underlying server is not available [[csw.services.event.exceptions.EventServerNotAvailable]] exception is thrown
+   * and the stream is stopped after logging appropriately. In all other cases of exception, the stream resumes to receive remaining elements.
+   *
    * @param eventKeys a set of [[csw.messages.events.EventKey]] to subscribe to
    * @return a [[akka.stream.javadsl.Source]] of [[csw.messages.events.Event]]. The materialized value of the source provides an
    *         [[csw.services.event.javadsl.IEventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
@@ -31,6 +34,9 @@ trait IEventSubscriber {
    * Subscribe to multiple eventKeys and receive events at `every` frequency based on one of the given `mode` (RateAdapter or RateLimiter). The latest events
    * available for the given Event Keys will be received first. If event is not published for one or more event keys, `invalid event` will be received for
    * those Event Keys.
+   *
+   * At the time of invocation, in case the underlying server is not available, [[csw.services.event.exceptions.EventServerNotAvailable]] exception is thrown
+   * and the stream is stopped after logging appropriately. In all other cases of exception, the stream resumes to receive remaining elements.
    *
    * @param eventKeys a set of [[csw.messages.events.EventKey]] to subscribe to
    * @param every the duration which determines the frequency with which events are received
@@ -46,6 +52,10 @@ trait IEventSubscriber {
    * type, so that blocking operation within callback can be placed in the completable future (separate thread than main thread). The latest events available
    * for the given Event Keys will be received first. If event is not published for one or more event keys, `invalid event` will be received for those Event Keys.
    *
+   * At the time of invocation, in case the underlying server is not available, [[csw.services.event.exceptions.EventServerNotAvailable]] exception is thrown
+   * and the subscription is stopped after logging appropriately. [[csw.services.event.scaladsl.EventSubscription#isReady]] method can be used to determine
+   * this state. In all other cases of exception, the subscription resumes to receive remaining elements.
+   *
    * @param eventKeys a set of [[csw.messages.events.EventKey]] to subscribe to
    * @param callback a function to execute asynchronously on each received event
    * @return an [[csw.services.event.javadsl.IEventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
@@ -55,6 +65,10 @@ trait IEventSubscriber {
   /**
    * [[csw.services.event.javadsl.IEventSubscriber#subscribeAsync]] overload for receiving event at a `every` frequency based on one of the give `mode`. The latest
    * events available for the given Event Keys will be received first. If event is not published for one or more event keys, `invalid event` will be received for those Event Keys.
+   *
+   * At the time of invocation, in case the underlying server is not available, [[csw.services.event.exceptions.EventServerNotAvailable]] exception is thrown
+   * and the subscription is stopped after logging appropriately. [[csw.services.event.scaladsl.EventSubscription#isReady]] method can be used to determine
+   * this state. In all other cases of exception, the subscription resumes to receive remaining elements.
    *
    * @param eventKeys a set of [[csw.messages.events.EventKey]] to subscribe to
    * @param callback a function to execute on each received event
@@ -75,6 +89,10 @@ trait IEventSubscriber {
    * component developers. The latest events available for the given Event Keys will be received first. If event is not published for one or more event keys,
    * `invalid event` will be received for those Event Keys.
    *
+   * At the time of invocation, in case the underlying server is not available, [[csw.services.event.exceptions.EventServerNotAvailable]] exception is thrown
+   * and the subscription is stopped after logging appropriately. [[csw.services.event.scaladsl.EventSubscription#isReady]] method can be used to determine this
+   * state. In all other cases of exception, the subscription resumes to receive remaining elements.
+   *
    * @param eventKeys a set of [[csw.messages.events.EventKey]] to subscribe to
    * @param callback a consumer which defines an operation to execute on each received event
    * @return an [[csw.services.event.javadsl.IEventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
@@ -85,6 +103,10 @@ trait IEventSubscriber {
    * [[csw.services.event.javadsl.IEventSubscriber#subscribeCallback]] overload for receiving event at a `every` frequency based on one of the give `mode`.
    * The latest events available for the given Event Keys will be received first. If event is not published for one or more event keys, `invalid event` will
    * be received for those Event Keys.
+   *
+   * At the time of invocation, in case the underlying server is not available, [[csw.services.event.exceptions.EventServerNotAvailable]] exception is thrown
+   * and the subscription is stopped after logging appropriately. [[csw.services.event.scaladsl.EventSubscription#isReady]] method can be used to determine this
+   * state. In all other cases of exception, the subscription resumes to receive remaining elements.
    *
    * @param eventKeys a set of [[csw.messages.events.EventKey]] to subscribe to
    * @param callback a consumer which defines an operation to execute on each received event
@@ -104,6 +126,10 @@ trait IEventSubscriber {
    * Subscribes an actor to events from multiple event keys. The latest events available for the given Event Keys will be received first.
    * If event is not published for one or more event keys, `invalid event` will be received for those Event Keys.
    *
+   * At the time of invocation, in case the underlying server is not available, [[csw.services.event.exceptions.EventServerNotAvailable]] exception is thrown
+   * and the subscription is stopped after logging appropriately. [[csw.services.event.scaladsl.EventSubscription#isReady]] method can be used to determine this
+   * state. In all other cases of exception, the subscription resumes to receive remaining elements.
+   *
    * @param eventKeys a set of [[csw.messages.events.EventKey]] to subscribe to
    * @param actorRef an actorRef of an actor which handles each received event
    * @return an [[csw.services.event.javadsl.IEventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
@@ -114,6 +140,10 @@ trait IEventSubscriber {
    * [[csw.services.event.javadsl.IEventSubscriber#subscribeActorRef]] overload for receiving event at a `every` frequency based on one of the give `mode`.
    * The latest events available for the given Event Keys will be received first. If event is not published for one or more event keys, `invalid event` will be
    * received for those Event Keys.
+   *
+   * At the time of invocation, in case the underlying server is not available, [[csw.services.event.exceptions.EventServerNotAvailable]] exception is thrown
+   * and the subscription is stopped after logging appropriately. [[csw.services.event.scaladsl.EventSubscription#isReady]] method can be used to determine this
+   * state. In all other cases of exception, the subscription resumes to receive remaining elements.
    *
    * @param eventKeys a set of [[csw.messages.events.EventKey]] to subscribe to
    * @param actorRef an actorRef of an actor to which each received event is redirected
@@ -132,6 +162,10 @@ trait IEventSubscriber {
   /**
    * Subscribe to events from Event Keys specified using a subsystem and a pattern to match the remaining Event Key
    *
+   * At the time of invocation, in case the underlying server is not available, [[csw.services.event.exceptions.EventServerNotAvailable]] exception is thrown
+   * and the subscription is stopped after logging appropriately. [[csw.services.event.scaladsl.EventSubscription#isReady]] method can be used to determine this
+   * state. In all other cases of exception, the subscription resumes to receive remaining elements.
+   *
    * @param subsystem a valid [[csw.messages.params.models.Subsystem]] which represents the source of the events
    * @param pattern   Subscribes the client to the given patterns. Supported glob-style patterns:
    *                  - h?llo subscribes to hello, hallo and hxllo
@@ -146,6 +180,10 @@ trait IEventSubscriber {
   /**
    * Subscribes a callback to events from Event Keys specified using a subsystem and a pattern to match the remaining Event Key
    *
+   * At the time of invocation, in case the underlying server is not available, [[csw.services.event.exceptions.EventServerNotAvailable]] exception is thrown
+   * and the subscription is stopped after logging appropriately. [[csw.services.event.scaladsl.EventSubscription#isReady]] method can be used to determine this
+   * state. In all other cases of exception, the subscription resumes to receive remaining elements.
+   *
    * @param subsystem a valid [[csw.messages.params.models.Subsystem]] which represents the source of the events
    * @param pattern   Subscribes the client to the given patterns. Supported glob-style patterns:
                       - h?llo subscribes to hello, hallo and hxllo
@@ -158,9 +196,11 @@ trait IEventSubscriber {
   def pSubscribe(subsystem: Subsystem, pattern: String, callback: Consumer[Event]): IEventSubscription
 
   /**
-   * Get latest events for multiple Event Keys. If an event is not published for any Event Key, then `invalid event` is returned for that Event Key.
-   * The latest events available for the given Event Keys will be received first. If event is not published for one or more event keys, `invalid event` will
-   * be received for those Event Keys.
+   * Get latest events for multiple Event Keys. The latest events available for the given Event Keys will be received first.
+   * If event is not published for one or more event keys, `invalid event` will be received for those Event Keys.
+   *
+   * In case the underlying server is not available, the future fails with [[csw.services.event.exceptions.EventServerNotAvailable]] exception.
+   * In all other cases of exception, the future fails with the respective exception
    *
    * @param eventKeys a set of [[csw.messages.events.EventKey]] to subscribe to
    * @return a completable future which completes with a set of latest [[csw.messages.events.Event]] for the provided Event Keys
@@ -169,6 +209,9 @@ trait IEventSubscriber {
 
   /**
    * Get latest event for the given Event Key. If an event is not published for any eventKey, then `invalid event` is returned for that Event Key.
+   *
+   * In case the underlying server is not available, the future fails with [[csw.services.event.exceptions.EventServerNotAvailable]] exception.
+   * In all other cases of exception, the future fails with the respective exception
    *
    * @param eventKey an [[csw.messages.events.EventKey]] to subscribe to
    * @return a completable future which completes with the latest [[csw.messages.events.Event]] for the provided Event Key
