@@ -1,7 +1,7 @@
 package csw.common.components.framework
 
 import akka.actor.typed.scaladsl.ActorContext
-import csw.framework.scaladsl.CurrentStatePublisher
+import csw.framework.CurrentStatePublisher
 import csw.messages.TopLevelActorMessage
 import csw.messages.framework.ComponentInfo
 import csw.services.command.scaladsl.CommandResponseManager

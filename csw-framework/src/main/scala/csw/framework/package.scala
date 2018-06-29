@@ -41,7 +41,7 @@ package csw
  * This is where framework code meets Component specific code.
  *
  * - [[csw.framework.internal.pubsub.PubSubBehavior]]
- * : This actor is created by framework which is wrapped into [[csw.framework.scaladsl.CurrentStatePublisher]] for easy interaction with this actor
+ * : This actor is created by framework which is wrapped into [[csw.framework.CurrentStatePublisher]] for easy interaction with this actor
  * and then passed to component handlers so that component can publish their [[csw.messages.params.states.CurrentState]].
  *
  * If one component (ex. Assembly) is interested in [[csw.messages.params.states.CurrentState]] published by other component (ex. HCD)

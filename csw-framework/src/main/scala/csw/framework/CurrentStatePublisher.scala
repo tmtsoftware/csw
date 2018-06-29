@@ -1,4 +1,4 @@
-package csw.framework.scaladsl
+package csw.framework
 
 import akka.actor.typed.ActorRef
 import csw.messages.framework.PubSub.{Publish, PublisherMessage}

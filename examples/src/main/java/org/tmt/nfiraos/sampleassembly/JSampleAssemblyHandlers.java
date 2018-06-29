@@ -5,7 +5,7 @@ import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.util.Timeout;
 import csw.framework.javadsl.JComponentHandlers;
-import csw.framework.scaladsl.CurrentStatePublisher;
+import csw.framework.CurrentStatePublisher;
 import csw.messages.commands.CommandName;
 import csw.messages.commands.CommandResponse;
 import csw.messages.commands.ControlCommand;

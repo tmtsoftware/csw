@@ -3,7 +3,7 @@ package csw.framework.components.hcd;
 import akka.actor.typed.javadsl.ActorContext;
 import csw.framework.javadsl.JComponentBehaviorFactory;
 import csw.framework.javadsl.JComponentHandlers;
-import csw.framework.scaladsl.CurrentStatePublisher;
+import csw.framework.CurrentStatePublisher;
 import csw.messages.framework.ComponentInfo;
 import csw.messages.TopLevelActorMessage;
 import csw.services.command.scaladsl.CommandResponseManager;

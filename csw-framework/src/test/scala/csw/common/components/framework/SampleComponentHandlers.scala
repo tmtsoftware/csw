@@ -1,7 +1,8 @@
 package csw.common.components.framework
 
 import akka.actor.typed.scaladsl.ActorContext
-import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
+import csw.framework.CurrentStatePublisher
+import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandIssue.OtherIssue
 import csw.messages.commands.CommandResponse.{Accepted, Completed, Invalid}

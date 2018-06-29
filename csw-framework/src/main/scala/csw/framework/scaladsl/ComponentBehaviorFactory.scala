@@ -2,6 +2,7 @@ package csw.framework.scaladsl
 
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.actor.typed.{ActorRef, Behavior}
+import csw.framework.CurrentStatePublisher
 import csw.framework.internal.component.ComponentBehavior
 import csw.messages.{FromComponentLifecycleMessage, TopLevelActorMessage}
 import csw.messages.framework.ComponentInfo

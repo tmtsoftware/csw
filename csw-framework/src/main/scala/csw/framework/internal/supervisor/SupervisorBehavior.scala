@@ -6,9 +6,10 @@ import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors, MutableBehavior, TimerScheduler}
 import akka.actor.typed.{ActorRef, Behavior, PostStop, Signal, SupervisorStrategy, Terminated}
+import csw.framework.CurrentStatePublisher
 import csw.framework.exceptions.{FailureRestart, InitializationFailed}
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
-import csw.framework.scaladsl.{ComponentBehaviorFactory, CurrentStatePublisher}
+import csw.framework.scaladsl.ComponentBehaviorFactory
 import csw.messages.commons.CoordinatedShutdownReasons.ShutdownMessageReceivedReason
 import csw.messages.framework.LocationServiceUsage.DoNotRegister
 import csw.messages.framework.LockingResponses.{LockExpired, LockExpiringShortly}

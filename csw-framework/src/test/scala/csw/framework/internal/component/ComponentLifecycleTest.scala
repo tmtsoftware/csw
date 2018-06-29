@@ -2,8 +2,8 @@ package csw.framework.internal.component
 
 import akka.actor.typed.{Behavior, PostStop}
 import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
-import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
-import csw.framework.{ComponentInfos, FrameworkTestSuite}
+import csw.framework.scaladsl.ComponentHandlers
+import csw.framework.{ComponentInfos, CurrentStatePublisher, FrameworkTestSuite}
 import csw.messages.commands.CommandResponse.{Accepted, Completed, Error}
 import csw.messages.commands.{CommandName, CommandResponse, Observe, Setup}
 import csw.messages.framework.ToComponentLifecycleMessages._

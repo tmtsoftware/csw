@@ -9,7 +9,7 @@ import csw.framework.components.assembly.WorkerActor;
 import csw.framework.components.assembly.WorkerActorMsg;
 import csw.framework.components.assembly.WorkerActorMsgs;
 import csw.framework.javadsl.JComponentHandlers;
-import csw.framework.scaladsl.CurrentStatePublisher;
+import csw.framework.CurrentStatePublisher;
 import csw.messages.commands.CommandResponse;
 import csw.messages.commands.ControlCommand;
 import csw.messages.commands.Observe;

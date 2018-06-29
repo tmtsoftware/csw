@@ -2,8 +2,8 @@ package csw.framework.internal.component
 
 import akka.actor.typed.Behavior
 import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
-import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
-import csw.framework.{ComponentInfos, FrameworkTestSuite}
+import csw.framework.scaladsl.ComponentHandlers
+import csw.framework.{ComponentInfos, CurrentStatePublisher, FrameworkTestSuite}
 import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages.TopLevelActorIdleMessage.Initialize
 import csw.messages.{CommandResponseManagerMessage, FromComponentLifecycleMessage, TopLevelActorMessage}

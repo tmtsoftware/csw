@@ -1,7 +1,8 @@
 package org.tmt.nfiraos.samplehcd
 
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
-import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
+import csw.framework.CurrentStatePublisher
+import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands._
 import csw.messages.framework.ComponentInfo
