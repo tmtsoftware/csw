@@ -56,7 +56,7 @@ trait EventSubscriber {
   def pSubscribe(subsystem: Subsystem, pattern: String): Source[Event, EventSubscription]
 
   // pattern subscribe for a given subsystem and pattern, and execute a callback for each event received
-  def pSubscribe(subsystem: Subsystem, pattern: String, callback: Event ⇒ Unit): EventSubscription
+  def pSubscribeCallback(subsystem: Subsystem, pattern: String, callback: Event ⇒ Unit): EventSubscription
 
   // get events for multiple keys, if an event is not published for any eventKey, then invalid event is returned for that eventKey.
   // For all subscribe apis above, if for any eventKey no event is published then an invalid event is returned forr that eventKey.

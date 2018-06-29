@@ -87,7 +87,7 @@ class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(
     getEventStream(subscription).mapMaterializedValue(eventSubscription)
   }
 
-  override def pSubscribe(subsystem: Subsystem, pattern: String, callback: Event ⇒ Unit): EventSubscription =
+  override def pSubscribeCallback(subsystem: Subsystem, pattern: String, callback: Event ⇒ Unit): EventSubscription =
     eventSubscriberUtil.pSubscribe(pSubscribe(subsystem, pattern), callback)
 
   override def get(eventKeys: Set[EventKey]): Future[Set[Event]] = {

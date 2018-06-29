@@ -86,6 +86,7 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
     )
 
   // DEOPSCSW-336: Pattern based subscription analysis and performance testing
+  // DEOPSCSW-420: Implement Pattern based subscription
   val idealMultiNodePatternModelObsScenario: ModelObservatoryTestSettings =
     ModelObservatoryTestSettings(
       JvmSetting(
@@ -279,6 +280,8 @@ class ModelObsScenarios(testConfigs: TestConfigs) {
       }
     )
 
+  // DEOPSCSW-336: Pattern based subscription analysis and performance testing
+  // DEOPSCSW-420: Implement Pattern based subscription
   val modelObsScenarioPatternWithTwoProcesses: ModelObservatoryTestSettings =
     ModelObservatoryTestSettings(
       JvmSetting(
