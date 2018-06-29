@@ -6,11 +6,11 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
+import csw.messages.CommandResponseManagerMessage
 import csw.messages.commands.{CommandCorrelation, CommandResponse, CommandResponseManagerState}
 import csw.messages.commands.CommandResponse.{Accepted, Completed, Error}
 import csw.messages.params.models.Id
-import csw.messages.scaladsl.CommandResponseManagerMessage
-import csw.messages.scaladsl.CommandResponseManagerMessage._
+import csw.messages.CommandResponseManagerMessage._
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when

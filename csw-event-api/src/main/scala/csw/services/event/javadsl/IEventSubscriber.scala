@@ -6,7 +6,6 @@ import java.util.concurrent.CompletableFuture
 import java.util.function.Consumer
 
 import akka.actor.typed.ActorRef
-import akka.stream.Materializer
 import akka.stream.javadsl.Source
 import csw.messages.events.{Event, EventKey}
 import csw.messages.params.models.Subsystem

@@ -11,7 +11,7 @@ import csw.messages.framework.LockingResponse
 import csw.messages.framework.LockingResponses._
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.{ObsId, Prefix}
-import csw.messages.scaladsl.CommandMessage.Submit
+import csw.messages.CommandMessage.Submit
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar

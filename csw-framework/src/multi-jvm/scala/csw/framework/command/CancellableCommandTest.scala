@@ -9,8 +9,8 @@ import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.common.components.command.ComponentStateForCommand.{acceptedCmd, cancelCmd, prefix}
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
-import csw.messages.scaladsl.CommandMessage.{Oneway, Submit}
-import csw.messages.scaladsl.CommandResponseManagerMessage.Subscribe
+import csw.messages.CommandMessage.{Oneway, Submit}
+import csw.messages.CommandResponseManagerMessage.Subscribe
 import csw.messages.commands.CommandResponse.{Accepted, Cancelled, Completed}
 import csw.messages.commands.{CommandResponse, Setup}
 import csw.messages.location.Connection.AkkaConnection

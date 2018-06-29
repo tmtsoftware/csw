@@ -3,7 +3,7 @@ package csw.common.utils
 import akka.actor.typed.ActorRef
 import csw.messages.framework.LockingResponse
 import csw.messages.params.models.Prefix
-import csw.messages.scaladsl.SupervisorLockMessage.Lock
+import csw.messages.SupervisorLockMessage.Lock
 
 import scala.concurrent.duration.DurationLong
 

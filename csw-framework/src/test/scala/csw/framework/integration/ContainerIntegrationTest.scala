@@ -19,10 +19,10 @@ import csw.messages.location.ComponentType.{Assembly, HCD}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType, LocationRemoved, TrackingEvent}
 import csw.messages.params.states.{CurrentState, StateName}
-import csw.messages.scaladsl.ComponentCommonMessage.{GetSupervisorLifecycleState, LifecycleStateSubscription}
-import csw.messages.scaladsl.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
-import csw.messages.scaladsl.RunningMessage.Lifecycle
-import csw.messages.scaladsl.SupervisorContainerCommonMessages.{Restart, Shutdown}
+import csw.messages.ComponentCommonMessage.{GetSupervisorLifecycleState, LifecycleStateSubscription}
+import csw.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
+import csw.messages.RunningMessage.Lifecycle
+import csw.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.services.command.scaladsl.CommandService
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}

@@ -4,10 +4,10 @@ import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.adapter._
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.{KillSwitches, Materializer, OverflowStrategy}
+import csw.messages.CommandResponseManagerMessage
 import csw.messages.commands.CommandResponse
 import csw.messages.params.models.Id
-import csw.messages.scaladsl.CommandResponseManagerMessage
-import csw.messages.scaladsl.CommandResponseManagerMessage.Subscribe
+import csw.messages.CommandResponseManagerMessage.Subscribe
 
 /**
  * The handle to the subscription created for the current state published by the specified publisher

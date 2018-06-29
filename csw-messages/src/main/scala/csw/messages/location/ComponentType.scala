@@ -1,7 +1,6 @@
 package csw.messages.location
 
-import csw.messages.scaladsl.{ComponentMessage, ContainerMessage}
-import csw.messages.TMTSerializable
+import csw.messages.{ComponentMessage, ContainerMessage, TMTSerializable}
 import enumeratum.EnumEntry.Lowercase
 import enumeratum.{Enum, EnumEntry, PlayJsonEnum}
 

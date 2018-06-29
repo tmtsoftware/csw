@@ -9,9 +9,10 @@ import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{AkkaLocation, ComponentId, ComponentType}
-import csw.messages.scaladsl.ComponentCommonMessage.GetSupervisorLifecycleState
-import csw.messages.scaladsl.ContainerCommonMessage.GetContainerLifecycleState
-import csw.messages.scaladsl.{ComponentMessage, ContainerMessage}
+import csw.messages.ComponentCommonMessage.GetSupervisorLifecycleState
+import csw.messages.{ComponentMessage, ContainerMessage}
+import csw.messages.ContainerCommonMessage.GetContainerLifecycleState
+import csw.messages.ContainerMessage
 import csw.services.command.scaladsl.CommandService
 import csw.services.location.commons.BlockingUtils
 import csw.services.location.scaladsl.LocationServiceFactory

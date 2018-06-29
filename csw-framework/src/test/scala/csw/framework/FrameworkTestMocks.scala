@@ -5,12 +5,13 @@ import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.adapter._
 import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.{actor, testkit, Done}
+import csw.messages.{CommandResponseManagerMessage, SupervisorMessage}
 import csw.messages.commands.CommandResponse
 import csw.messages.framework.LifecycleStateChanged
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.params.models.{Id, Prefix}
 import csw.messages.params.states.CurrentState
-import csw.messages.scaladsl.{CommandResponseManagerMessage, SupervisorMessage}
+import csw.messages.CommandResponseManagerMessage
 import csw.services.command.internal.CommandResponseManagerFactory
 import csw.services.command.scaladsl.CommandResponseManager
 import csw.services.event.internal.commons.EventServiceFactory

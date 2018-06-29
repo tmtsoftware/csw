@@ -22,9 +22,9 @@ import csw.messages.location.ComponentId
 import csw.messages.location.ComponentType.{Assembly, HCD}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.params.models.Prefix
-import csw.messages.scaladsl.CommandMessage.Oneway
-import csw.messages.scaladsl.ContainerCommonMessage.GetComponents
-import csw.messages.scaladsl.ContainerMessage
+import csw.messages.CommandMessage.Oneway
+import csw.messages.ContainerMessage
+import csw.messages.ContainerCommonMessage.GetComponents
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.logging.internal.LoggingLevels.{ERROR, Level, WARN}
 import csw.services.logging.internal._

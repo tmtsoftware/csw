@@ -8,18 +8,19 @@ import akka.actor.typed.scaladsl.{ActorContext, MutableBehavior}
 import akka.actor.typed.{ActorRef, Behavior, PostStop, Signal, Terminated}
 import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.framework.models._
+import csw.messages.{ComponentMessage, ContainerActorMessage, ContainerCommonMessage, ContainerIdleMessage}
 import csw.messages.commons.CoordinatedShutdownReasons.{AllActorsWithinContainerTerminatedReason, FailedToCreateSupervisorsReason}
 import csw.messages.framework._
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.params.models.Prefix
 import csw.messages.params.models.Subsystem.Container
-import csw.messages.scaladsl.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
-import csw.messages.scaladsl.ContainerIdleMessage.SupervisorsCreated
-import csw.messages.scaladsl.FromSupervisorMessage.SupervisorLifecycleStateChanged
-import csw.messages.scaladsl.RunningMessage.Lifecycle
-import csw.messages.scaladsl.SupervisorContainerCommonMessages.{Restart, Shutdown}
-import csw.messages.scaladsl.{ComponentMessage, ContainerActorMessage, ContainerCommonMessage, ContainerIdleMessage}
+import csw.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
+import csw.messages.ContainerIdleMessage.SupervisorsCreated
+import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
+import csw.messages.RunningMessage.Lifecycle
+import csw.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
+import csw.messages.{ComponentMessage, ContainerActorMessage, ContainerCommonMessage, ContainerIdleMessage}
 import csw.services.event.internal.commons.EventServiceFactory
 import csw.services.location.models._
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
@@ -69,7 +70,7 @@ private[framework] final class ContainerBehavior(
   createComponents(containerInfo.components)
 
   /**
-   * Defines processing for a [[csw.messages.scaladsl.ContainerActorMessage]] received by the actor instance.
+   * Defines processing for a [[ContainerActorMessage]] received by the actor instance.
    *
    * @param msg containerMessage received
    * @return the existing behavior

@@ -33,7 +33,7 @@ package csw
  *  - [[csw.messages.events.ObserveEvent]]
  *
  * Another important feature provided by *commands* package is [[csw.messages.commands.matchers.Matcher]]
- * One of the use case for using matcher is when Assembly sends [[csw.messages.scaladsl.CommandMessage.Oneway]] command to HCD
+ * One of the use case for using matcher is when Assembly sends [[csw.messages.CommandMessage.Oneway]] command to HCD
  * and in response to this command HCD keeps publishing its current state.
  * Then Assembly can use Matcher with the matching definition as provided by [[csw.messages.commands.matchers.StateMatcher]] to
  * match against the current states published by HCD.
@@ -60,7 +60,7 @@ package csw
  * Framework package contains following actor messages:
  *  - Messages of type [[csw.messages.framework.PubSub]] are supported by PubSubActor
  *  - Below Lifecycle messages can be sent to component when component is in [[csw.messages.framework.SupervisorLifecycleState.Running]] state,
- *  note that these messages should be wrapped inside [[csw.messages.scaladsl.RunningMessage.Lifecycle]] before sending it to Supervisor actor.
+ *  note that these messages should be wrapped inside [[csw.messages.RunningMessage.Lifecycle]] before sending it to Supervisor actor.
  *   - [[csw.messages.framework.ToComponentLifecycleMessages.GoOnline]]
  *   - [[csw.messages.framework.ToComponentLifecycleMessages.GoOffline]]
  *

@@ -12,11 +12,11 @@ import csw.messages.framework.LockingResponses._
 import csw.messages.framework.{LifecycleStateChanged, LockingResponse, PubSub, SupervisorLifecycleState}
 import csw.messages.params.models.{ObsId, Prefix}
 import csw.messages.params.states.{CurrentState, StateName}
-import csw.messages.scaladsl.CommandMessage.Submit
-import csw.messages.scaladsl.{CommandResponseManagerMessage ⇒ CRM}
+import csw.messages.CommandMessage.Submit
+import csw.messages.{CommandResponseManagerMessage ⇒ CRM}
 import CRM.{AddOrUpdateCommand, Query, Unsubscribe}
-import csw.messages.scaladsl.ComponentCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
-import csw.messages.scaladsl.SupervisorLockMessage.{Lock, Unlock}
+import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
+import csw.messages.SupervisorLockMessage.{Lock, Unlock}
 import org.scalatest.BeforeAndAfterEach
 
 import scala.concurrent.duration.DurationDouble

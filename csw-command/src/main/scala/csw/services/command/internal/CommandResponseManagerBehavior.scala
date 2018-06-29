@@ -2,12 +2,12 @@ package csw.services.command.internal
 
 import akka.actor.typed.scaladsl.{ActorContext, MutableBehavior}
 import akka.actor.typed.{ActorRef, Behavior}
+import csw.messages.CommandResponseManagerMessage
 import csw.messages.commands.CommandResponse.CommandNotAvailable
 import csw.messages.commands.CommandResultType.{Final, Intermediate}
 import csw.messages.commands.{CommandCorrelation, CommandResponse, CommandResponseManagerState, CommandResultType}
 import csw.messages.params.models.Id
-import csw.messages.scaladsl.CommandResponseManagerMessage
-import csw.messages.scaladsl.CommandResponseManagerMessage._
+import csw.messages.CommandResponseManagerMessage._
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
 /**

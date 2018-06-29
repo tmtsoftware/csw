@@ -20,14 +20,11 @@ import csw.messages.framework.{ComponentInfo, LifecycleStateChanged, PubSub, Sup
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.{CurrentState, StateName}
-import csw.messages.scaladsl.CommandMessage.Submit
-import csw.messages.scaladsl.ComponentCommonMessage.{
-  ComponentStateSubscription,
-  GetSupervisorLifecycleState,
-  LifecycleStateSubscription
-}
-import csw.messages.scaladsl.SupervisorContainerCommonMessages.Restart
-import csw.messages.scaladsl.{ComponentMessage, ContainerIdleMessage, TopLevelActorMessage}
+import csw.messages.CommandMessage.Submit
+import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
+import csw.messages.SupervisorContainerCommonMessages.Restart
+import csw.messages.{ComponentMessage, ContainerIdleMessage, TopLevelActorMessage}
+import csw.messages.{ComponentMessage, ContainerIdleMessage}
 import csw.services.command.scaladsl.CommandResponseManager
 import csw.services.event.scaladsl.EventService
 import csw.services.location.scaladsl.LocationService

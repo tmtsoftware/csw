@@ -22,7 +22,7 @@ import csw.messages.location.{AkkaLocation, ComponentId, ComponentType}
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.{ObsId, Prefix}
 import csw.messages.params.states.{DemandState, StateName}
-import csw.messages.scaladsl.CommandMessage.Submit
+import csw.messages.CommandMessage.Submit
 import csw.services.command.scaladsl.CommandService
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import io.lettuce.core.RedisClient

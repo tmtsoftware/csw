@@ -23,7 +23,7 @@ import csw.messages.location.ComponentType.HCD
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.messages.params.states.{CurrentState, StateName}
-import csw.messages.scaladsl.SupervisorContainerCommonMessages.Shutdown
+import csw.messages.SupervisorContainerCommonMessages.Shutdown
 import csw.services.command.scaladsl.CommandService
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}

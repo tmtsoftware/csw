@@ -9,6 +9,7 @@ import akka.serialization.SerializationExtension
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import com.twitter.chill.akka.AkkaSerializer
 import csw.commons.tagobjects.FileSystemSensitive
+import csw.messages.ComponentMessage
 import csw.messages.commands.CommandResponse._
 import csw.messages.commands.{CommandIssue, _}
 import csw.messages.events.{EventName, EventTime, ObserveEvent, SystemEvent}
@@ -22,15 +23,10 @@ import csw.messages.params.generics.KeyType.{ByteArrayKey, ChoiceKey, DoubleMatr
 import csw.messages.params.models.Units.{arcmin, coulomb, encoder, joule, lightyear, meter, pascal, NoUnits}
 import csw.messages.params.models._
 import csw.messages.params.states.{CurrentState, DemandState, StateName}
-import csw.messages.scaladsl.ComponentCommonMessage.{
-  ComponentStateSubscription,
-  GetSupervisorLifecycleState,
-  LifecycleStateSubscription
-}
-import csw.messages.scaladsl.ComponentMessage
-import csw.messages.scaladsl.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
-import csw.messages.scaladsl.RunningMessage.Lifecycle
-import csw.messages.scaladsl.SupervisorContainerCommonMessages.{Restart, Shutdown}
+import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
+import csw.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
+import csw.messages.RunningMessage.Lifecycle
+import csw.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.prop.Tables.Table
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}

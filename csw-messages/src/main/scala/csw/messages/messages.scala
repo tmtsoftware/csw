@@ -1,7 +1,6 @@
-package csw.messages.scaladsl
+package csw.messages
 
 import akka.actor.typed.ActorRef
-import csw.messages._
 import csw.messages.commands.{CommandCorrelation, CommandResponse, CommandResponseManagerState, ControlCommand}
 import csw.messages.framework.PubSub.SubscriberMessage
 import csw.messages.framework._

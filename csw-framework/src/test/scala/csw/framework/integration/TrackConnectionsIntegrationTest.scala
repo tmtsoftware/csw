@@ -11,7 +11,7 @@ import com.typesafe.config.ConfigFactory
 import csw.common.FrameworkAssertions._
 import csw.common.components.framework.SampleComponentState._
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
-import csw.messages.scaladsl.SupervisorContainerCommonMessages.Shutdown
+import csw.messages.SupervisorContainerCommonMessages.Shutdown
 import csw.messages.commands
 import csw.messages.commands.CommandName
 import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState}

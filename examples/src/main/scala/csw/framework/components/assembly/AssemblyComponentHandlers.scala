@@ -7,11 +7,11 @@ import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import csw.framework.exceptions.{FailureRestart, FailureStop}
 import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
+import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandResponse.Accepted
 import csw.messages.commands._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location._
-import csw.messages.scaladsl.TopLevelActorMessage
 import csw.services.command.scaladsl.{CommandResponseManager, CommandService}
 import csw.services.config.api.models.ConfigData
 import csw.services.config.api.scaladsl.ConfigClientService

@@ -3,13 +3,13 @@ package org.tmt.nfiraos.sampleassembly
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.util.Timeout
 import csw.framework.scaladsl.{ComponentHandlers, CurrentStatePublisher}
+import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandResponse.Accepted
 import csw.messages.commands.{CommandName, CommandResponse, ControlCommand, Setup}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.{AkkaLocation, LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.messages.params.generics.{Key, KeyType, Parameter}
 import csw.messages.params.models.{ObsId, Units}
-import csw.messages.scaladsl.TopLevelActorMessage
 import csw.services.command.scaladsl.{CommandResponseManager, CommandService}
 import csw.services.event.scaladsl.EventService
 import csw.services.location.scaladsl.LocationService

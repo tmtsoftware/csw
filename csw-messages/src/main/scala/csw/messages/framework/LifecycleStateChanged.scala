@@ -1,8 +1,7 @@
 package csw.messages.framework
 
 import akka.actor.typed.ActorRef
-import csw.messages.TMTSerializable
-import csw.messages.scaladsl.ComponentMessage
+import csw.messages.{ComponentMessage, TMTSerializable}
 
 /**
  * LifecycleStateChanged represents a notification of state change in a component

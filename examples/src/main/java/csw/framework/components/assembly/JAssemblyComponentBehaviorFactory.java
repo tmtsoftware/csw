@@ -4,7 +4,7 @@ import akka.actor.typed.javadsl.ActorContext;
 import csw.framework.javadsl.JComponentBehaviorFactory;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.scaladsl.CurrentStatePublisher;
-import csw.messages.scaladsl.TopLevelActorMessage;
+import csw.messages.TopLevelActorMessage;
 import csw.messages.framework.ComponentInfo;
 import csw.services.command.scaladsl.CommandResponseManager;
 import csw.services.event.javadsl.IEventService;

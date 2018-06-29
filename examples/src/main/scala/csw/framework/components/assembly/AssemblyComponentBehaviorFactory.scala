@@ -2,8 +2,8 @@ package csw.framework.components.assembly
 
 import akka.actor.typed.scaladsl.ActorContext
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers, CurrentStatePublisher}
+import csw.messages.TopLevelActorMessage
 import csw.messages.framework.ComponentInfo
-import csw.messages.scaladsl.TopLevelActorMessage
 import csw.services.command.scaladsl.CommandResponseManager
 import csw.services.event.scaladsl.EventService
 import csw.services.location.scaladsl.LocationService

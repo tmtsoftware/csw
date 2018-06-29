@@ -2,7 +2,8 @@ package csw.services.command.internal
 
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.actor.typed.{ActorRef, Behavior}
-import csw.messages.scaladsl.{CommandResponseManagerMessage, SupervisorMessage}
+import csw.messages.{CommandResponseManagerMessage, SupervisorMessage}
+import csw.messages.CommandResponseManagerMessage
 import csw.services.command.scaladsl.CommandResponseManager
 import csw.services.logging.scaladsl.LoggerFactory
 

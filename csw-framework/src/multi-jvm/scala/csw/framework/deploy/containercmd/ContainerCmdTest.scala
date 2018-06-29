@@ -21,11 +21,12 @@ import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.{ObsId, Prefix}
 import csw.messages.params.models.Subsystem.Container
 import csw.messages.params.states.{CurrentState, StateName}
-import csw.messages.scaladsl.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState}
-import csw.messages.scaladsl.ContainerCommonMessage.GetComponents
-import csw.messages.scaladsl.RunningMessage.Lifecycle
-import csw.messages.scaladsl.SupervisorContainerCommonMessages.Shutdown
-import csw.messages.scaladsl.{ComponentMessage, ContainerMessage}
+import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState}
+import csw.messages.{ComponentMessage, ContainerMessage}
+import csw.messages.ContainerCommonMessage.GetComponents
+import csw.messages.RunningMessage.Lifecycle
+import csw.messages.SupervisorContainerCommonMessages.Shutdown
+import csw.messages.ContainerMessage
 import csw.services.command.scaladsl.CommandService
 import csw.services.config.api.models.ConfigData
 import csw.services.config.client.scaladsl.ConfigClientFactory

@@ -15,16 +15,12 @@ import csw.messages.location.Connection.AkkaConnection
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.{CurrentState, DemandState, StateName}
-import csw.messages.scaladsl.CommandMessage.{Oneway, Submit}
-import csw.messages.scaladsl.ComponentCommonMessage.{
-  ComponentStateSubscription,
-  GetSupervisorLifecycleState,
-  LifecycleStateSubscription
-}
-import csw.messages.scaladsl.ContainerIdleMessage
-import csw.messages.scaladsl.FromSupervisorMessage.SupervisorLifecycleStateChanged
-import csw.messages.scaladsl.RunningMessage.Lifecycle
-import csw.messages.scaladsl.SupervisorContainerCommonMessages.Restart
+import csw.messages.CommandMessage.{Oneway, Submit}
+import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
+import csw.messages.ContainerIdleMessage
+import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
+import csw.messages.RunningMessage.Lifecycle
+import csw.messages.SupervisorContainerCommonMessages.Restart
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach

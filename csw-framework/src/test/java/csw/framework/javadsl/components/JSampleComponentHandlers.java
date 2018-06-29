@@ -18,7 +18,7 @@ import csw.messages.params.generics.JKeyTypes;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.states.CurrentState;
 import csw.messages.params.states.StateName;
-import csw.messages.scaladsl.TopLevelActorMessage;
+import csw.messages.TopLevelActorMessage;
 import csw.services.command.scaladsl.CommandResponseManager;
 import csw.services.event.javadsl.IEventService;
 import csw.services.location.javadsl.ILocationService;

@@ -4,9 +4,10 @@ import akka.actor.typed.ActorRef
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import com.persist.JsonOps.JsonObject
 import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState}
-import csw.messages.scaladsl.ComponentCommonMessage.GetSupervisorLifecycleState
-import csw.messages.scaladsl.ContainerCommonMessage.GetContainerLifecycleState
-import csw.messages.scaladsl.{ComponentMessage, ContainerMessage}
+import csw.messages.ComponentCommonMessage.GetSupervisorLifecycleState
+import csw.messages.{ComponentMessage, ContainerMessage}
+import csw.messages.ContainerCommonMessage.GetContainerLifecycleState
+import csw.messages.ContainerMessage
 import csw.services.location.commons.BlockingUtils
 import csw.services.logging.internal.LoggingLevels.Level
 import org.scalatest.Matchers

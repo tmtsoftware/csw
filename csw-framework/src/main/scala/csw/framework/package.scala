@@ -14,11 +14,11 @@ package csw
  * that intercepts common messages (ex. Shutdown, Restart) or lifecycle messages (ex. GoOffline or GoOnline)
  * sent from external entities to determine the state of the component.
  *
- * Components that are not in the [[csw.messages.framework.SupervisorLifecycleState.Running]] state, do not receive [[csw.messages.scaladsl.CommandMessage]].
+ * Components that are not in the [[csw.messages.framework.SupervisorLifecycleState.Running]] state, do not receive [[csw.messages.CommandMessage]].
  *
  * When Component is created using this framework, it guarantees that component (HCD/Assembly) is registered with
  * LocationService only when Component moves to [[csw.messages.framework.SupervisorLifecycleState.Running]] state.
- * That means, one component can resolve other component only when its in ``Running`` state and ready to accept [[csw.messages.scaladsl.CommandMessage]]
+ * That means, one component can resolve other component only when its in ``Running`` state and ready to accept [[messages.CommandMessage]]
  *
  * === Important Actors in Framework ===
  *
@@ -51,8 +51,8 @@ package csw
  *
  * - [[csw.framework.internal.container.ContainerBehavior]]
  * : When multiple components needs to be started in container, then this actor is created.
- * Job of this actor is just to logically group multiple components and support [[csw.messages.scaladsl.SupervisorContainerCommonMessages]].
- * It receives [[csw.messages.scaladsl.SupervisorContainerCommonMessages.Shutdown]] or [[csw.messages.scaladsl.SupervisorContainerCommonMessages.Restart]] message
+ * Job of this actor is just to logically group multiple components and support [[csw.messages.SupervisorContainerCommonMessages]].
+ * It receives [[csw.messages.SupervisorContainerCommonMessages.Shutdown]] or [[csw.messages.SupervisorContainerCommonMessages.Restart]] message
  * and forwards it to all the components residing in this container.
  *
  * == deploy package ==

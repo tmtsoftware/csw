@@ -9,10 +9,10 @@ import akka.actor.typed.scaladsl.AskPattern._
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
+import csw.messages.CommandResponseManagerMessage
 import csw.messages.commands.CommandResponse
 import csw.messages.params.models.Id
-import csw.messages.scaladsl.CommandResponseManagerMessage
-import csw.messages.scaladsl.CommandResponseManagerMessage.{AddOrUpdateCommand, AddSubCommand, Query, UpdateSubCommand}
+import csw.messages.CommandResponseManagerMessage.{AddOrUpdateCommand, AddSubCommand, Query, UpdateSubCommand}
 
 import scala.compat.java8.FunctionConverters.enrichAsScalaFromConsumer
 import scala.compat.java8.FutureConverters._

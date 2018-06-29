@@ -7,7 +7,7 @@ import akka.actor.typed.scaladsl.adapter._
 import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.util.Timeout
-import csw.messages.scaladsl.CommandMessage.Submit
+import csw.messages.CommandMessage.Submit
 import csw.messages.commands.{CommandName, Setup}
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
 import csw.messages.location.{AkkaLocation, ComponentId, ComponentType, HttpLocation}

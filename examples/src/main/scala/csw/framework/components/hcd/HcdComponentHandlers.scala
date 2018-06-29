@@ -14,7 +14,6 @@ import csw.messages.commands.CommandResponse.Accepted
 import csw.messages.commands.{CommandResponse, ControlCommand, Observe, Setup}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.{LocationRemoved, LocationUpdated, TrackingEvent}
-import csw.messages.scaladsl.TopLevelActorMessage
 import csw.services.command.scaladsl.CommandResponseManager
 import csw.services.config.api.models.ConfigData
 import csw.services.config.api.scaladsl.ConfigClientService
@@ -23,6 +22,7 @@ import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.scaladsl.AskPattern.Askable
+import csw.messages.TopLevelActorMessage
 import csw.services.event.scaladsl.EventService
 
 import scala.async.Async.{async, await}

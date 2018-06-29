@@ -8,7 +8,8 @@ import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
 import csw.common.components.framework.SampleComponentBehaviorFactory
 import csw.framework.ComponentInfos._
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
-import csw.messages.scaladsl.{ComponentMessage, ContainerIdleMessage, SupervisorMessage}
+import csw.messages.{ComponentMessage, ContainerIdleMessage, SupervisorMessage}
+import csw.messages.{ComponentMessage, ContainerIdleMessage}
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar

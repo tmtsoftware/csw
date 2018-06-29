@@ -3,8 +3,9 @@ package csw.framework.scaladsl
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.actor.typed.{ActorRef, Behavior}
 import csw.framework.internal.component.ComponentBehavior
+import csw.messages.{FromComponentLifecycleMessage, TopLevelActorMessage}
 import csw.messages.framework.ComponentInfo
-import csw.messages.scaladsl.{FromComponentLifecycleMessage, TopLevelActorMessage}
+import csw.messages.FromComponentLifecycleMessage
 import csw.services.command.scaladsl.CommandResponseManager
 import csw.services.event.scaladsl.EventService
 import csw.services.location.scaladsl.LocationService

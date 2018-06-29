@@ -7,7 +7,7 @@ import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.params.models.Prefix
-import csw.messages.scaladsl.CommandMessage.Submit
+import csw.messages.CommandMessage.Submit
 import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}

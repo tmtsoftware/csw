@@ -15,8 +15,9 @@ import csw.messages.commands.{CommandResponse, ControlCommand}
 import csw.messages.location.AkkaLocation
 import csw.messages.params.models.Id
 import csw.messages.params.states.CurrentState
-import csw.messages.scaladsl.CommandMessage.{Oneway, Submit}
-import csw.messages.scaladsl.{CommandResponseManagerMessage, ComponentMessage}
+import csw.messages.CommandMessage.{Oneway, Submit}
+import csw.messages.{CommandResponseManagerMessage, ComponentMessage}
+import csw.messages.CommandResponseManagerMessage
 
 import scala.concurrent.{ExecutionContext, Future}
 

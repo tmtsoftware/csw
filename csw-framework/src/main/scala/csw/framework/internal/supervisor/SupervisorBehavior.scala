@@ -19,21 +19,18 @@ import csw.messages.location.ComponentId
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.params.models.Prefix
 import csw.messages.params.states.CurrentState
-import csw.messages.scaladsl.CommandResponseManagerMessage.{Query, Subscribe, Unsubscribe}
-import csw.messages.scaladsl.ComponentCommonMessage.{
-  ComponentStateSubscription,
-  GetSupervisorLifecycleState,
-  LifecycleStateSubscription
-}
-import csw.messages.scaladsl.FromComponentLifecycleMessage.Running
-import csw.messages.scaladsl.FromSupervisorMessage.SupervisorLifecycleStateChanged
-import csw.messages.scaladsl.RunningMessage.Lifecycle
-import csw.messages.scaladsl.SupervisorContainerCommonMessages.{Restart, Shutdown}
-import csw.messages.scaladsl.SupervisorIdleMessage.InitializeTimeout
-import csw.messages.scaladsl.SupervisorInternalRunningMessage.{RegistrationFailed, RegistrationNotRequired, RegistrationSuccess}
-import csw.messages.scaladsl.SupervisorLockMessage.{Lock, Unlock}
-import csw.messages.scaladsl.SupervisorRestartMessage.{UnRegistrationComplete, UnRegistrationFailed}
-import csw.messages.scaladsl._
+import csw.messages.CommandResponseManagerMessage.{Query, Subscribe, Unsubscribe}
+import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
+import csw.messages.FromComponentLifecycleMessage.Running
+import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
+import csw.messages.RunningMessage.Lifecycle
+import csw.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
+import csw.messages.SupervisorIdleMessage.InitializeTimeout
+import csw.messages.SupervisorInternalRunningMessage.{RegistrationFailed, RegistrationNotRequired, RegistrationSuccess}
+import csw.messages.SupervisorLockMessage.{Lock, Unlock}
+import csw.messages._
+import csw.messages.SupervisorRestartMessage.{UnRegistrationComplete, UnRegistrationFailed}
+import csw.messages._
 import csw.services.command.internal.CommandResponseManagerFactory
 import csw.services.command.scaladsl.CommandResponseManager
 import csw.services.event.scaladsl.EventService
@@ -110,7 +107,7 @@ private[framework] final class SupervisorBehavior(
   spawnAndWatchComponent()
 
   /**
-   * Defines processing for a [[csw.messages.scaladsl.SupervisorMessage]] received by the actor instance
+   * Defines processing for a [[SupervisorMessage]] received by the actor instance
    *
    * @param msg supervisorMessage received
    * @return the existing behavior

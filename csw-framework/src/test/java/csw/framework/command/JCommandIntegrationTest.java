@@ -27,7 +27,7 @@ import csw.messages.params.generics.Parameter;
 import csw.messages.params.states.CurrentState;
 import csw.messages.params.states.DemandState;
 import csw.messages.params.states.StateName;
-import csw.messages.scaladsl.SupervisorLockMessage;
+import csw.messages.SupervisorLockMessage;
 import csw.services.command.javadsl.JCommandDistributor;
 import csw.services.command.javadsl.JCommandService;
 import csw.services.command.scaladsl.CurrentStateSubscription;
