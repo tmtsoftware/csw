@@ -65,7 +65,7 @@ class JEventSubscriber(eventSubscriber: EventSubscriber) extends IEventSubscribe
       .subscribeCallback(eventKeys.asScala.toSet, e ⇒ callback.accept(e), every.toScala, mode)
       .asJava
 
-  def subscribeActorRef(eventKeys: util.Set[EventKey], actorRef: ActorRef[Event], mat: Materializer): IEventSubscription =
+  def subscribeActorRef(eventKeys: util.Set[EventKey], actorRef: ActorRef[Event]): IEventSubscription =
     eventSubscriber.subscribeActorRef(eventKeys.asScala.toSet, actorRef).asJava
 
   def subscribeActorRef(

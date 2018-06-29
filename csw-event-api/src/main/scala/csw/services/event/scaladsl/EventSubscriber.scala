@@ -30,8 +30,8 @@ trait EventSubscriber {
    * @param every the duration which determines the frequency with which events are received
    * @param mode an appropriate [[csw.services.event.scaladsl.SubscriptionMode]] to control the behavior of rate of events w.r.t. the given frequency.
    *             Refer the API documentation for SubscriptionMode for more details
-   * @return a [[akka.stream.scaladsl.Source]] of [[csw.messages.events.Event]]. The materialized value of the source provides an [[csw.services.event.scaladsl.EventSubscription]]
-   *         which can be used to unsubscribe from all the Event Keys which were subscribed to
+   * @return a [[akka.stream.scaladsl.Source]] of [[csw.messages.events.Event]]. The materialized value of the source provides an
+   *         [[csw.services.event.scaladsl.EventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
    */
   def subscribe(eventKeys: Set[EventKey], every: FiniteDuration, mode: SubscriptionMode): Source[Event, EventSubscription]
 
@@ -93,7 +93,7 @@ trait EventSubscriber {
    * Subscribes an actor to events from multiple event keys
    *
    * @param eventKeys a set of [[csw.messages.events.EventKey]] to subscribe to
-   * @param actorRef an actorRef to an actor to which each received event is redirected
+   * @param actorRef an actorRef of an actor which handles each received event
    * @return an [[csw.services.event.scaladsl.EventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
    */
   def subscribeActorRef(eventKeys: Set[EventKey], actorRef: ActorRef[Event]): EventSubscription
@@ -102,7 +102,7 @@ trait EventSubscriber {
    * [[csw.services.event.scaladsl.EventSubscriber#subscribeActorRef]] overload for receiving event at a `every` frequency based on one of the give `mode`
    *
    * @param eventKeys a set of [[csw.messages.events.EventKey]] to subscribe to
-   * @param actorRef an actorRef to an actor to which each received event is redirected
+   * @param actorRef an actorRef of an actor to which each received event is redirected
    * @param every the duration which determines the frequency with which events are received
    * @param mode an appropriate [[csw.services.event.scaladsl.SubscriptionMode]] to control the behavior of rate of events w.r.t. the given frequency.
    *             Refer the API documentation for SubscriptionMode for more details
@@ -145,7 +145,6 @@ trait EventSubscriber {
 
   /**
    * Get latest events for multiple Event Keys. If an event is not published for any Event Key, then `invalid event` is returned for that Event Key.
-   * For all subscribe APIs above, if for any eventKey no event is published then an invalid event is returned for that Event Key.
    *
    * @param eventKeys a set of [[csw.messages.events.EventKey]] to subscribe to
    * @return a future which completes with a set of latest [[csw.messages.events.Event]] for the provided Event Keys

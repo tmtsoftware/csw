@@ -20,7 +20,7 @@ class JEventPublisher(eventPublisher: EventPublisher) extends IEventPublisher {
 
   override def publish[Mat](source: Source[Event, Mat]): Mat = eventPublisher.publish(source.asScala)
 
-  override def publish[Mat](source: Source[Event, Mat], onError: Consumer[PublishFailure]): Any =
+  override def publish[Mat](source: Source[Event, Mat], onError: Consumer[PublishFailure]): Mat =
     eventPublisher.publish(source.asScala, onError.asScala)
 
   override def publish(eventGenerator: Supplier[Event], every: FiniteDuration): Cancellable =

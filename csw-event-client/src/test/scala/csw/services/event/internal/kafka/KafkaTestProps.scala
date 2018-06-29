@@ -16,7 +16,6 @@ import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.StringSerializer
 
 import scala.collection.JavaConverters.mapAsScalaMapConverter
-import scala.compat.java8.FutureConverters.CompletionStageOps
 import scala.concurrent.Future
 
 class KafkaTestProps(

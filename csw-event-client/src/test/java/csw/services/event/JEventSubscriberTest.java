@@ -249,7 +249,7 @@ public class JEventSubscriberTest extends TestNGSuite {
 
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
         Thread.sleep(500); // Needed for redis set which is fire and forget operation
-        IEventSubscription subscription = baseProperties.jSubscriber().subscribeActorRef(Collections.singleton(event1.eventKey()), probe.ref(), baseProperties.resumingMat());
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribeActorRef(Collections.singleton(event1.eventKey()), probe.ref());
         probe.expectMessage(event1);
 
         subscription.unsubscribe().get(10, TimeUnit.SECONDS);
