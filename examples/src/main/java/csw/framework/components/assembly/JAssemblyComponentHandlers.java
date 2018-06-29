@@ -19,7 +19,7 @@ import csw.messages.params.states.CurrentState;
 import csw.messages.params.states.StateName;
 import csw.messages.TopLevelActorMessage;
 import csw.services.command.javadsl.JCommandService;
-import csw.services.command.scaladsl.CommandResponseManager;
+import csw.services.command.CommandResponseManager;
 import csw.services.config.api.javadsl.IConfigClientService;
 import csw.services.config.api.models.ConfigData;
 import csw.services.config.client.javadsl.JConfigClientFactory;

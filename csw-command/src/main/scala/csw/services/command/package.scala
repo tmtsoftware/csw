@@ -19,7 +19,7 @@ package csw.services
  *
  * Important classes in this project are:
  *
- * - [[csw.services.command.scaladsl.CommandResponseManager]]
+ * - [[csw.services.command.CommandResponseManager]]
  *
  * This class wraps CommandResponseManagerActor and provides helpers to interact with actor which is responsible for adding/updating/querying command result.
  * Component writers will get handle to CommandResponseManager in their handlers.

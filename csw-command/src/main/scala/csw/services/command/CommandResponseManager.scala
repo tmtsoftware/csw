@@ -1,18 +1,19 @@
-package csw.services.command.scaladsl
+package csw.services.command
 
 import java.util.concurrent.CompletableFuture
 import java.util.function.Consumer
 
 import akka.actor.Scheduler
-import akka.stream.{ActorMaterializer, Materializer}
 import akka.actor.typed.scaladsl.AskPattern._
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{ActorRef, ActorSystem}
+import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
 import csw.messages.CommandResponseManagerMessage
+import csw.messages.CommandResponseManagerMessage.{AddOrUpdateCommand, AddSubCommand, Query, UpdateSubCommand}
 import csw.messages.commands.CommandResponse
 import csw.messages.params.models.Id
-import csw.messages.CommandResponseManagerMessage.{AddOrUpdateCommand, AddSubCommand, Query, UpdateSubCommand}
+import csw.services.command.scaladsl.CommandResponseSubscription
 
 import scala.compat.java8.FunctionConverters.enrichAsScalaFromConsumer
 import scala.compat.java8.FutureConverters._

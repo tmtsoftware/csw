@@ -7,7 +7,7 @@ import csw.framework.internal.component.ComponentBehavior
 import csw.messages.{FromComponentLifecycleMessage, TopLevelActorMessage}
 import csw.messages.framework.ComponentInfo
 import csw.messages.FromComponentLifecycleMessage
-import csw.services.command.scaladsl.CommandResponseManager
+import csw.services.command.CommandResponseManager
 import csw.services.event.scaladsl.EventService
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory

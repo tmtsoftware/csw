@@ -8,7 +8,7 @@ import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages.TopLevelActorIdleMessage.Initialize
 import csw.messages.{CommandResponseManagerMessage, FromComponentLifecycleMessage, TopLevelActorMessage}
 import csw.messages.{CommandResponseManagerMessage, FromComponentLifecycleMessage}
-import csw.services.command.scaladsl.CommandResponseManager
+import csw.services.command.CommandResponseManager
 import csw.services.event.scaladsl.EventService
 import csw.services.location.scaladsl.LocationService
 import org.mockito.Mockito._

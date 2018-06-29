@@ -32,8 +32,8 @@ import csw.messages.SupervisorLockMessage.{Lock, Unlock}
 import csw.messages._
 import csw.messages.SupervisorRestartMessage.{UnRegistrationComplete, UnRegistrationFailed}
 import csw.messages._
+import csw.services.command.CommandResponseManager
 import csw.services.command.internal.CommandResponseManagerFactory
-import csw.services.command.scaladsl.CommandResponseManager
 import csw.services.event.scaladsl.EventService
 import csw.services.location.models.AkkaRegistration
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}

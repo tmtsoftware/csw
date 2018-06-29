@@ -17,7 +17,7 @@ import csw.messages.location._
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.Id
 import csw.messages.params.states.{CurrentState, StateName}
-import csw.services.command.scaladsl.CommandResponseManager
+import csw.services.command.CommandResponseManager
 import csw.services.event.scaladsl.EventService
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory

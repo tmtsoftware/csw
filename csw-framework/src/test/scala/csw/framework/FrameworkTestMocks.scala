@@ -12,8 +12,8 @@ import csw.messages.location.Connection.AkkaConnection
 import csw.messages.params.models.{Id, Prefix}
 import csw.messages.params.states.CurrentState
 import csw.messages.CommandResponseManagerMessage
+import csw.services.command.CommandResponseManager
 import csw.services.command.internal.CommandResponseManagerFactory
-import csw.services.command.scaladsl.CommandResponseManager
 import csw.services.event.internal.commons.EventServiceFactory
 import csw.services.event.scaladsl.EventService
 import csw.services.location.javadsl.ILocationService

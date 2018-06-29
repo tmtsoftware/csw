@@ -13,7 +13,8 @@ import csw.messages.commands.CommandResponse.Accepted
 import csw.messages.commands._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location._
-import csw.services.command.scaladsl.{CommandResponseManager, CommandService}
+import csw.services.command.CommandResponseManager
+import csw.services.command.scaladsl.CommandService
 import csw.services.config.api.models.ConfigData
 import csw.services.config.api.scaladsl.ConfigClientService
 import csw.services.config.client.scaladsl.ConfigClientFactory

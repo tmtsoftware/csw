@@ -6,7 +6,7 @@ import csw.framework.CurrentStatePublisher
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.messages.TopLevelActorMessage
 import csw.messages.framework.ComponentInfo
-import csw.services.command.scaladsl.CommandResponseManager
+import csw.services.command.CommandResponseManager
 import csw.services.event.internal.commons.EventServiceAdapter
 import csw.services.event.javadsl.IEventService
 import csw.services.event.scaladsl.EventService

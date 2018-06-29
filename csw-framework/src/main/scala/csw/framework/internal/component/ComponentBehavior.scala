@@ -16,7 +16,7 @@ import csw.messages.TopLevelActorCommonMessage.{TrackingEventReceived, Underlyin
 import csw.messages.TopLevelActorIdleMessage.Initialize
 import csw.messages._
 import csw.messages._
-import csw.services.command.scaladsl.CommandResponseManager
+import csw.services.command.CommandResponseManager
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 

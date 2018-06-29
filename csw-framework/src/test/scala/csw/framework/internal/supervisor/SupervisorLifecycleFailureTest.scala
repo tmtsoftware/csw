@@ -25,7 +25,7 @@ import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSuper
 import csw.messages.SupervisorContainerCommonMessages.Restart
 import csw.messages.{ComponentMessage, ContainerIdleMessage, TopLevelActorMessage}
 import csw.messages.{ComponentMessage, ContainerIdleMessage}
-import csw.services.command.scaladsl.CommandResponseManager
+import csw.services.command.CommandResponseManager
 import csw.services.event.scaladsl.EventService
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.internal.LoggingLevels.ERROR

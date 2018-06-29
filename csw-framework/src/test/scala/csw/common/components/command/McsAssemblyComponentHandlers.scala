@@ -13,7 +13,8 @@ import csw.messages.framework.ComponentInfo
 import csw.messages.location.{AkkaLocation, TrackingEvent}
 import csw.messages.params.models.Id
 import csw.messages.params.states.{CurrentState, StateName}
-import csw.services.command.scaladsl.{CommandResponseManager, CommandService}
+import csw.services.command.CommandResponseManager
+import csw.services.command.scaladsl.CommandService
 import csw.services.event.scaladsl.EventService
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
