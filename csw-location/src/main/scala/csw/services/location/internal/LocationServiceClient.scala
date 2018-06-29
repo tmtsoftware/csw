@@ -14,7 +14,7 @@ import csw.messages.location._
 import csw.services.location.exceptions.{OtherLocationIsRegistered, RegistrationFailed}
 import csw.services.location.internal.StreamExt.RichSource
 import csw.services.location.javadsl.ILocationService
-import csw.services.location.models.{Registration, RegistrationResult, UpickleFormats}
+import csw.services.location.models.{Registration, RegistrationResult}
 import csw.services.location.scaladsl.LocationService
 import de.heikoseeberger.akkahttpupickle.UpickleSupport
 
@@ -24,7 +24,8 @@ import scala.concurrent.duration.FiniteDuration
 
 import upickle.default._
 
-class LocationServiceClient(serverIp: String, serverPort: Int)(implicit val actorSystem: ActorSystem, mat: Materializer)
+private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(implicit val actorSystem: ActorSystem,
+                                                                            mat: Materializer)
     extends LocationService
     with UpickleSupport
     with UpickleFormats { outer =>

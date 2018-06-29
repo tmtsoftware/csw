@@ -8,9 +8,10 @@ import akka.http.scaladsl.server.Route
 import akka.stream.scaladsl.Source
 import csw.apps.clusterseed.internal.ActorRuntime
 import csw.messages.location._
-import csw.services.location.models.{Registration, UpickleFormats}
+import csw.services.location.models.Registration
 import csw.services.location.scaladsl.LocationService
 import akka.http.scaladsl.marshalling.sse.EventStreamMarshalling._
+import csw.services.location.internal.UpickleFormats
 import de.heikoseeberger.akkahttpupickle.UpickleSupport
 import upickle.default._
 
