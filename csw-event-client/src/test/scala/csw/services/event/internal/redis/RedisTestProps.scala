@@ -41,7 +41,7 @@ class RedisTestProps(
     .quorumSize(1)
     .build()
 
-  override val eventPattern: String = "*sys*"
+  override val eventPattern: String = "*"
 
   private val eventServiceFactory = new RedisEventServiceFactory(redisClient)
 

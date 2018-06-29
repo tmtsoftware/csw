@@ -338,21 +338,27 @@ public class JEventSubscriberTest extends TestNGSuite {
 
     }
 
-    //DEOPSCSW-420: Implement Pattern based subscription
+    // DEOPSCSW-420: Implement Pattern based subscription
+    // Pattern subscription doesn't work with embedded kafka hence not running it with the suite
     @Test(dataProvider = "redis-provider")
     public void should_be_able_to_subscribe_an_event_with_pattern(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
-        Event event1 = Utils.makeEventWithPrefix(1, new Prefix("test.prefix"));
-        Event event2 = Utils.makeEventWithPrefix(2, new Prefix("tcs.prefix"));
+        Event testEvent1 = Utils.makeEventWithPrefix(1, new Prefix("test.prefix"));
+        Event testEvent2 = Utils.makeEventWithPrefix(2, new Prefix("test.prefix"));
+        Event tcsEvent1 = Utils.makeEventWithPrefix(1, new Prefix("tcs.prefix"));
 
         TestProbe<Event> probe = TestProbe.create(baseProperties.typedActorSystem());
 
+        // pattern is * for redis
         IEventSubscription subscription = baseProperties.jSubscriber().pSubscribe(JSubsystem.TEST, baseProperties.eventPattern(), event -> probe.ref().tell(event));
         subscription.ready().get(10, TimeUnit.SECONDS);
 
-        baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
-        probe.expectMessage(event1);
+        baseProperties.jPublisher().publish(testEvent1).get(10, TimeUnit.SECONDS);
+        baseProperties.jPublisher().publish(testEvent2).get(10, TimeUnit.SECONDS);
 
-        baseProperties.jPublisher().publish(event2).get(10, TimeUnit.SECONDS);
+        probe.expectMessage(testEvent1);
+        probe.expectMessage(testEvent2);
+
+        baseProperties.jPublisher().publish(tcsEvent1).get(10, TimeUnit.SECONDS);
         probe.expectNoMessage(Duration.ofSeconds(2));
 
         subscription.unsubscribe().get(10, TimeUnit.SECONDS);

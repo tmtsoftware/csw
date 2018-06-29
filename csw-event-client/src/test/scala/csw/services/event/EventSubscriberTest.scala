@@ -242,24 +242,29 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     inbox.receiveAll().size shouldBe 4
   }
 
-  //DEOPSCSW-420: Implement Pattern based subscription
+  // DEOPSCSW-420: Implement Pattern based subscription
   // Pattern subscription doesn't work with embedded kafka hence not running it with the suite
   @Test(dataProvider = "redis-provider")
   def should_be_able_to_subscribe_an_event_with_pattern(redisProps: RedisTestProps): Unit = {
     import redisProps._
 
-    val event1    = makeEventWithPrefix(1, Prefix("test.prefix"))
-    val event2    = makeEventWithPrefix(1, Prefix("tcs.prefix"))
-    val testProbe = TestProbe[Event]()(typedActorSystem)
+    val testEvent1 = makeEventWithPrefix(1, Prefix("test.prefix"))
+    val testEvent2 = makeEventWithPrefix(2, Prefix("test.prefix"))
+    val tcsEvent1  = makeEventWithPrefix(1, Prefix("tcs.prefix"))
+    val testProbe  = TestProbe[Event]()(typedActorSystem)
 
+    // pattern is * for redis
     val subscription = subscriber.pSubscribeCallback(Subsystem.TEST, eventPattern, testProbe.ref ! _)
     subscription.ready.await
     Thread.sleep(500)
 
-    publisher.publish(event1).await
-    testProbe.expectMessage(event1)
+    publisher.publish(testEvent1).await
+    publisher.publish(testEvent2).await
 
-    publisher.publish(event2).await
+    testProbe.expectMessage(testEvent1)
+    testProbe.expectMessage(testEvent2)
+
+    publisher.publish(tcsEvent1).await
     testProbe.expectNoMessage(2.seconds)
 
     subscription.unsubscribe().await
