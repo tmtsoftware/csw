@@ -6,10 +6,10 @@ import csw.messages.params.models.Prefix
 import csw.services.location.models.{AkkaRegistration, HttpRegistration, TcpRegistration}
 
 object RegistrationFactory {
-  def akka(connection: AkkaConnection, actorRef: ActorRef[_]): AkkaRegistration =
+  def akka(connection: AkkaConnection, actorRef: ActorRef[Nothing]): AkkaRegistration =
     AkkaRegistration(connection, Prefix("nfiraos.ncc.trombone"), actorRef, null)
 
-  def akka(connection: AkkaConnection, prefix: Prefix, actorRef: ActorRef[_]): AkkaRegistration =
+  def akka(connection: AkkaConnection, prefix: Prefix, actorRef: ActorRef[Nothing]): AkkaRegistration =
     AkkaRegistration(connection, prefix, actorRef, null)
 
   def http(connection: HttpConnection, port: Int, path: String): HttpRegistration =

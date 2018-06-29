@@ -2,6 +2,7 @@ package csw.messages.location
 
 import csw.messages.TMTSerializable
 import play.api.libs.json.{Format, Json}
+import upickle.default.macroRW
 
 /**
  * Represents a component based on its name and type.
@@ -25,5 +26,7 @@ case class ComponentId private[messages] (name: String, componentType: Component
 }
 
 object ComponentId {
+  import upickle.default.{macroRW, ReadWriter => RW}
   private[messages] implicit val format: Format[ComponentId] = Json.format
+  implicit def componentIdRw: RW[ComponentId]                = macroRW
 }

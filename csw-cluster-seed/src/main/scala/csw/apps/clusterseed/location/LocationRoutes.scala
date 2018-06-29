@@ -1,19 +1,18 @@
 package csw.apps.clusterseed.location
 
 import akka.NotUsed
+import akka.actor.ActorSystem
 import akka.http.scaladsl.model.sse.ServerSentEvent
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.stream.scaladsl.Source
 import csw.apps.clusterseed.internal.ActorRuntime
 import csw.messages.location._
-import csw.services.location.internal.LocationJsonSupport
-import csw.services.location.models.Registration
+import csw.services.location.models.{Registration, UpickleFormats}
 import csw.services.location.scaladsl.LocationService
-import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
-import io.circe.generic.auto._
-import io.circe.syntax._
 import akka.http.scaladsl.marshalling.sse.EventStreamMarshalling._
+import de.heikoseeberger.akkahttpupickle.UpickleSupport
+import upickle.default._
 
 import scala.concurrent.duration.{Duration, DurationLong, FiniteDuration}
 
@@ -21,10 +20,12 @@ class LocationRoutes(
     locationService: LocationService,
     locationExceptionHandler: LocationExceptionHandler,
     actorRuntime: ActorRuntime
-) extends FailFastCirceSupport
-    with LocationJsonSupport {
+) extends UpickleSupport
+    with UpickleFormats {
 
   import actorRuntime._
+
+  override implicit def actorSystem: ActorSystem = actorRuntime.actorSystem
 
   val routes: Route = locationExceptionHandler.route {
     pathPrefix("location") {
@@ -65,7 +66,7 @@ class LocationRoutes(
           val stream: Source[ServerSentEvent, NotUsed] = locationService
             .track(connection)
             .mapMaterializedValue(_ => NotUsed)
-            .map(trackingEvent => ServerSentEvent(trackingEvent.asJson.noSpaces))
+            .map(trackingEvent => ServerSentEvent(write(trackingEvent)))
             .keepAlive(2.second, () => ServerSentEvent.heartbeat)
           complete(stream)
         }

@@ -14,20 +14,20 @@ import csw.messages.location._
 import csw.services.location.exceptions.{OtherLocationIsRegistered, RegistrationFailed}
 import csw.services.location.internal.StreamExt.RichSource
 import csw.services.location.javadsl.ILocationService
-import csw.services.location.models.{Registration, RegistrationResult}
+import csw.services.location.models.{Registration, RegistrationResult, UpickleFormats}
 import csw.services.location.scaladsl.LocationService
-import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
-import io.circe.generic.auto._
-import io.circe.parser._
+import de.heikoseeberger.akkahttpupickle.UpickleSupport
 
 import scala.async.Async._
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 
-class LocationServiceClient(serverIp: String, serverPort: Int)(implicit actorSystem: ActorSystem, mat: Materializer)
+import upickle.default._
+
+class LocationServiceClient(serverIp: String, serverPort: Int)(implicit val actorSystem: ActorSystem, mat: Materializer)
     extends LocationService
-    with FailFastCirceSupport
-    with LocationJsonSupport { outer =>
+    with UpickleSupport
+    with UpickleFormats { outer =>
 
   import actorSystem.dispatcher
   implicit val scheduler: Scheduler = actorSystem.scheduler
@@ -39,6 +39,7 @@ class LocationServiceClient(serverIp: String, serverPort: Int)(implicit actorSys
     val requestEntity = await(Marshal(registration).to[RequestEntity])
     val request       = HttpRequest(HttpMethods.POST, uri = uri, entity = requestEntity)
     val response      = await(Http().singleRequest(request))
+
     response.status match {
       case x @ StatusCodes.BadRequest          => throw OtherLocationIsRegistered(x.reason)
       case x @ StatusCodes.InternalServerError => throw RegistrationFailed(x.reason)
@@ -73,7 +74,10 @@ class LocationServiceClient(serverIp: String, serverPort: Int)(implicit actorSys
     val uri      = Uri(s"$baseUri/find/${connection.name}")
     val request  = HttpRequest(HttpMethods.GET, uri = uri)
     val response = await(Http().singleRequest(request))
-    await(Unmarshal(response.entity).to[Option[Location]]).map(_.asInstanceOf[L])
+    response.status match {
+      case StatusCodes.OK       => Some(await(Unmarshal(response.entity).to[Location]).asInstanceOf[L])
+      case StatusCodes.NotFound => None
+    }
   }
 
   override def resolve[L <: Location](connection: TypedConnection[L], within: FiniteDuration): Future[Option[L]] = async {
@@ -131,7 +135,7 @@ class LocationServiceClient(serverIp: String, serverPort: Int)(implicit actorSys
       await(Unmarshal(response.entity).to[Source[ServerSentEvent, NotUsed]])
     }
     val sseStream = Source.fromFuture(sseStreamFuture).flatMapConcat(identity)
-    sseStream.map(x => decode[TrackingEvent](x.data).right.get).cancellable
+    sseStream.map(x => read[TrackingEvent](x.data)).cancellable
   }
 
   override def subscribe(connection: Connection, callback: TrackingEvent => Unit): KillSwitch = {

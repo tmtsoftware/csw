@@ -24,7 +24,6 @@ object Libs {
   val `play-json`                    = "com.typesafe.play"      %% "play-json"                    % "2.6.9" //Apache 2.0
   val `play-json-extensions`         = "ai.x"                   %% "play-json-extensions"         % "0.14.0" //Simplified BSD License
   val `akka-http-play-json`          = "de.heikoseeberger"      %% "akka-http-play-json"          % "1.21.0" //Apache 2.0
-  val `akka-http-circe`              = "de.heikoseeberger"      %% "akka-http-circe"              % "1.21.0" //Apache 2.0
   val `scalapb-runtime`              = "com.thesamet.scalapb"   %% "scalapb-runtime"              % scalapbVersion % "protobuf"
   val `scalapb-json4s`               = "com.thesamet.scalapb"   %% "scalapb-json4s"               % "0.7.1"
   val `lettuce`                      = "io.lettuce"             % "lettuce-core"                  % "5.0.4.RELEASE"
@@ -34,6 +33,8 @@ object Libs {
   val `scalatest-embedded-redis`     = "com.github.sebruck"     %% "scalatest-embedded-redis"     % "0.3.0"
   val `HdrHistogram`                 = "org.hdrhistogram"       % "HdrHistogram"                  % "2.1.10"
   val `testng`                       = "org.testng"             % "testng"                        % "6.14.3"
+  val `upickle`                      = "com.lihaoyi"            %% "upickle"                      % "0.6.6"
+  val `akka-http-upickle`            = "de.heikoseeberger"      %% "akka-http-upickle"            % "1.21.0" //Apache 2.0
 }
 
 object Jackson {
@@ -44,9 +45,9 @@ object Jackson {
 }
 
 object Enumeratum {
-  val version           = "1.5.13"
+  val version           = "1.5.12"
   val `enumeratum`      = "com.beachape" %% "enumeratum" % version //MIT License
-  val `enumeratum-play` = "com.beachape" %% "enumeratum-play" % "1.5.14" //MIT License
+  val `enumeratum-play` = "com.beachape" %% "enumeratum-play" % version //MIT License
 }
 
 object Chill {
@@ -80,11 +81,4 @@ object Ammonite {
   val Version         = "1.1.2"
   val `ammonite`      = "com.lihaoyi" % "ammonite" % Version cross CrossVersion.full
   val `ammonite-sshd` = "com.lihaoyi" % "ammonite-sshd" % Version cross CrossVersion.full
-}
-
-object Circe {
-  val Version         = "0.9.3"
-  val `circe-core`    = "io.circe" %% "circe-core" % Version
-  val `circe-generic` = "io.circe" %% "circe-generic" % Version
-  val `circe-parser`  = "io.circe" %% "circe-parser" % Version
 }

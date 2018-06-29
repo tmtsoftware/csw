@@ -2,10 +2,10 @@ package csw.services.location.models
 
 import java.net.URI
 
-import akka.actor.{ActorPath, Address}
-import akka.serialization.Serialization
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.adapter.TypedActorRefOps
+import akka.actor.{ActorPath, Address}
+import akka.serialization.Serialization
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location._
 import csw.messages.params.models.Prefix
@@ -46,7 +46,7 @@ sealed abstract class Registration {
 final case class AkkaRegistration(
     connection: AkkaConnection,
     prefix: Prefix,
-    actorRef: ActorRef[_],
+    actorRef: ActorRef[Nothing],
     logAdminActorRef: ActorRef[LogControlMessages]
 ) extends Registration {
 
