@@ -9,3 +9,44 @@
 * [csw-config-client-cli](../apps/cswconfigclientcli.md): Application to perform administrative functions on the Configuration Service.
 * [csw-host-config](../apps/hostconfig.md): Framework for creating host configuration applications, used to start multiple containers on a machnine.
 @@@
+
+# Starting apps for development
+
+In order to run a component it is required to run `csw-cluster-seed`. Moreover, even to start event service or configuration service,
+`csw-cluster-seed` should be running.
+
+But for developers to start `csw-cluster-seed` first and then configuration service and then event service is a tedious job. So, for
+development purpose, it is recommended to use a shell script which will start `csw-cluster-seed` and/or configuration service and/or 
+event service.
+
+Assuming that developer has downloaded `csw-apps-<some-version>.zip` from [csw releases](https://github.com/tmtsoftware/csw-prod/releases)
+and unzipped it.
+
+There are three folders, as follows, in `csw-apps-<some-version>`
+* bin
+* lib
+* and conf.
+
+All the shell scripts provided by `csw-prod` reside in `bin` folder. The shell script referred in this segment is named as `csw-services.sh`.
+Go to the bin folder and hit `./csw-services.sh --help`. This will list all possible options applicable for the script.
+
+@@@ note { title=Note }
+
+This shell script will start `csw-cluster-seed` as the first step regardless of any options provided. 
+
+@@@
+
+The execution of the script is such that it starts `csw-cluster-seed`, then checks whether to start configuration service from provided
+`--config` option, if provided, then starts configuration service. Next, it checks whether to start event service from provided 
+`--event` option, if provided, it starts event service.
+
+With this, the component code is now ready to connect to configuration service and event service started via `csw-services.sh`.   
+
+
+  
+
+
+ 
+
+
+ 
