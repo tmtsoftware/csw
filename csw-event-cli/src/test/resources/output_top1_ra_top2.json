@@ -1,0 +1,32 @@
+{
+  "type": "ObserveEvent",
+  "paramSet": [
+    {
+      "keyName": "top1",
+      "keyType": "StructKey",
+      "values": [
+        {
+          "paramSet": [
+            {
+              "keyName": "ra",
+              "keyType": "StringKey",
+              "values": [
+                "12:13:14.1"
+              ],
+              "units": "NoUnits"
+            }
+          ]
+        }
+      ],
+      "units": "NoUnits"
+    },
+    {
+      "keyName": "top2",
+      "keyType": "StringKey",
+      "values": [
+        "12:13:14.1"
+      ],
+      "units": "NoUnits"
+    }
+  ]
+}

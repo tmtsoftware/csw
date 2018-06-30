@@ -24,4 +24,31 @@ object EventParser {
         }
       }
   }
+
+  def parseWithMultipleKeys(input: Js.Obj, path: List[String]): Js.Obj = {
+    transformInPlace0(input, path.map(_.split("/").toList))
+    input
+  }
+
+  private def transformInPlace0(json: Js.Obj, names: List[List[String]]): Unit = names match {
+    case Nil ⇒
+    case _ ⇒
+      val (keys, rest) = names.map {
+        case Nil          ⇒ ("", Nil)
+        case head :: tail ⇒ (head, tail)
+      }.unzip
+
+      keys match {
+        case Nil =>
+        case _ =>
+          json("paramSet") = json("paramSet").arr.filter(x ⇒ keys.contains(x("keyName").str))
+          json("paramSet").arr.foreach { innerSet =>
+            innerSet("values").arr.foreach {
+              case x: Js.Obj => transformInPlace0(x, rest)
+              case _         =>
+            }
+          }
+      }
+  }
+
 }
