@@ -1,5 +1,6 @@
 package csw.services.event.cli.temp
 
+import akka.japi.Option.Some
 import play.api.libs.json.JsValue
 import ujson.Js
 
@@ -25,12 +26,44 @@ object EventParser {
       }
   }
 
+  def inspect(json: Js.Obj, printLine: Any ⇒ Unit): Unit = {
+    def inspect0(js: Js, parentKey: Option[String]): Unit = {
+      js("paramSet").arr.foreach { innerSet ⇒
+        val keyName = innerSet("keyName").str
+        val keyType = innerSet("keyType").str
+        val unit    = innerSet("units").str
+
+        val fullKey =
+          if (parentKey.isDefined) s"${parentKey.get}/$keyName"
+          else keyName
+
+        printLine(s"$fullKey = $keyType[$unit]")
+
+        innerSet("values").arr.foreach {
+          case x: Js.Obj => inspect0(x, Some(fullKey))
+          case _         ⇒
+        }
+      }
+    }
+
+    inspect0(json, None)
+  }
+
   def parseWithMultipleKeys(input: Js.Obj, path: List[String]): Js.Obj = {
-    transformInPlace0(input, path.map(_.split("/").toList))
+    val paths = path.map(_.split("/").toList)
+    transformInPlace0(input, None, buildIncrementalPath(paths))
     input
   }
 
-  private def transformInPlace0(json: Js.Obj, names: List[List[String]]): Unit = names match {
+  private def buildIncrementalPath(paths: List[List[String]]) = paths.map { p1 ⇒
+    var last = ""
+    p1.map { p2 ⇒
+      last = if (last.nonEmpty) last + "/" + p2 else p2
+      last
+    }
+  }
+
+  private def transformInPlace0(json: Js.Obj, parentKey: Option[String], names: List[List[String]]): Unit = names match {
     case Nil ⇒
     case _ ⇒
       val (keys, rest) = names.map {
@@ -38,13 +71,20 @@ object EventParser {
         case head :: tail ⇒ (head, tail)
       }.unzip
 
-      keys match {
+      keys.filter(_.nonEmpty) match {
         case Nil =>
         case _ =>
-          json("paramSet") = json("paramSet").arr.filter(x ⇒ keys.contains(x("keyName").str))
+          def keyName(json: Js.Value): String = {
+            val keyName = json("keyName").str
+            if (parentKey.isDefined) s"${parentKey.get}/$keyName"
+            else keyName
+          }
+
+          json("paramSet") = json("paramSet").arr.filter(x ⇒ keys.contains(keyName(x)))
+
           json("paramSet").arr.foreach { innerSet =>
             innerSet("values").arr.foreach {
-              case x: Js.Obj => transformInPlace0(x, rest)
+              case x: Js.Obj => transformInPlace0(x, Some(keyName(innerSet)), rest)
               case _         =>
             }
           }
