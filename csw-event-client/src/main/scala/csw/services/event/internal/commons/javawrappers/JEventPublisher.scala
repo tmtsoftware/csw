@@ -15,6 +15,9 @@ import scala.compat.java8.FunctionConverters.{enrichAsScalaFromConsumer, enrichA
 import scala.compat.java8.FutureConverters.FutureOps
 import scala.concurrent.duration.FiniteDuration
 
+/**
+ * Java API for [[csw.services.event.scaladsl.EventPublisher]]
+ */
 class JEventPublisher(eventPublisher: EventPublisher) extends IEventPublisher {
   override def publish(event: Event): CompletableFuture[Done] = eventPublisher.publish(event).toJava.toCompletableFuture
 

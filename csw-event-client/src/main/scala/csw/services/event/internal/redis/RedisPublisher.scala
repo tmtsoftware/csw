@@ -17,12 +17,23 @@ import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
+/**
+ * An implementation of [[csw.services.event.scaladsl.EventPublisher]] API which uses Redis as the provider for publishing
+ * and subscribing events.
+ * @param redisURI Contains connection details for the Redis/Sentinel connections.
+ * @param redisClient A redis client available from lettuce
+ * @param ec the execution context to be used for performing asynchronous operations
+ * @param mat the materializer to be used for materializing underlying streams
+ */
 class RedisPublisher(redisURI: RedisURI, redisClient: RedisClient)(implicit ec: ExecutionContext, mat: Materializer)
     extends EventPublisher {
 
+  // inorder to preserve the order of publishing events, the parallelism level is maintained to 1
   private val parallelism        = 1
   private val eventPublisherUtil = new EventPublisherUtil()
 
+  // create underlying connection asynchronously and obtain an instance of `RedisAsyncCommands` to perform
+  // redis operations asynchronously
   private lazy val asyncConnectionF: Future[RedisAsyncCommands[EventKey, Event]] = Future.unit
     .flatMap(_ ⇒ redisClient.connectAsync(EventServiceCodec, redisURI).toScala)
     .map(_.async())
@@ -32,7 +43,7 @@ class RedisPublisher(redisURI: RedisURI, redisClient: RedisClient)(implicit ec: 
       val commands = await(asyncConnectionF)
       val publishF = commands.publish(event.eventKey, event).toScala
       await(publishF)
-      set(event, commands) // set will run in independent of publish
+      set(event, commands) // set will run independent of publish
       Done
     } recover {
       case NonFatal(ex) ⇒

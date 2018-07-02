@@ -12,6 +12,9 @@ import csw.services.event.scaladsl.{EventSubscription, SubscriptionMode}
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 
+/**
+ * Utility class to provided common functionalities to different implementations of EventSubscriber
+ */
 class EventSubscriberUtil(implicit mat: Materializer) {
 
   def subscriptionModeStage(

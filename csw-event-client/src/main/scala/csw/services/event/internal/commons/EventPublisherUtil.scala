@@ -11,10 +11,14 @@ import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
+/**
+ * Utility class to provided common functionalities to different implementations of EventPublisher
+ */
 class EventPublisherUtil(implicit ec: ExecutionContext, mat: Materializer) {
 
   private val logger = EventServiceLogger.getLogger
 
+  // create an akka stream source out of eventGenerator function
   def eventSource(eventGenerator: => Event, every: FiniteDuration): Source[Event, Cancellable] =
     Source.tick(0.millis, every, ()).map(_ => withErrorLogging(eventGenerator))
 
@@ -42,6 +46,7 @@ class EventPublisherUtil(implicit ec: ExecutionContext, mat: Materializer) {
     logger.error(failure.getMessage, ex = failure)
   }
 
+  // log error for any exception from provided eventGenerator
   private def withErrorLogging(eventGenerator: => Event): Event =
     try {
       eventGenerator

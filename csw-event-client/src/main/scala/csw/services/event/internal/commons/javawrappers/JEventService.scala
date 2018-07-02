@@ -8,6 +8,9 @@ import csw.services.event.scaladsl.EventService
 import scala.compat.java8.FutureConverters.FutureOps
 import scala.concurrent.ExecutionContext
 
+/**
+ * Java API for [[csw.services.event.scaladsl.EventService]]
+ */
 class JEventService(eventService: EventService) extends IEventService {
 
   implicit val executionContext: ExecutionContext = eventService.executionContext

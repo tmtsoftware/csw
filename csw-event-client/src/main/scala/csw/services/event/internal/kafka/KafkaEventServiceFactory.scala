@@ -6,6 +6,9 @@ import csw.services.event.internal.commons.EventServiceFactory
 import csw.services.event.internal.commons.serviceresolver.EventServiceResolver
 import csw.services.event.scaladsl.EventService
 
+/**
+ * Factory to create KafkaEventService.
+ */
 class KafkaEventServiceFactory() extends EventServiceFactory {
   override protected def eventServiceImpl(eventServiceResolver: EventServiceResolver)(
       implicit actorSystem: ActorSystem,

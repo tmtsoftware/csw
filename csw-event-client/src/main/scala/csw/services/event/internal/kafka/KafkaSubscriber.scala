@@ -19,6 +19,13 @@ import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
+/**
+ * An implementation of [[csw.services.event.scaladsl.EventSubscriber]] API which uses Apache Kafka as the provider for publishing
+ * and subscribing events.
+ * @param consumerSettings Settings for akka-streams-kafka API for Apache Kafka consumer
+ * @param ec the execution context to be used for performing asynchronous operations
+ * @param mat the materializer to be used for materializing underlying streams
+ */
 class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(
     implicit ec: ExecutionContext,
     mat: Materializer
@@ -29,6 +36,7 @@ class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(
 
   override def subscribe(eventKeys: Set[EventKey]): Source[Event, EventSubscription] = {
     val partitionToOffsets = getLatestOffsets(eventKeys)
+    // Subscribe to the 0th offset if nothing has been published yet or `current offset - 1` to receive the last published event
     val manualSubscription = Subscriptions.assignmentWithOffset(partitionToOffsets.mapValues(x ⇒ if (x == 0) 0L else x - 1))
     val eventStream        = getEventStream(manualSubscription)
 
@@ -111,6 +119,8 @@ class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(
           catch { case NonFatal(_) ⇒ Event.badEvent() }
       )
 
+  //Get the last offset for the given partitions. The last offset of a partition is the offset of the upcoming
+  // message, i.e. the offset of the last available message + 1.
   private def getLatestOffsets(eventKeys: Set[EventKey]): Map[TopicPartition, Long] = {
     val topicPartitions = eventKeys.map(e ⇒ new TopicPartition(e.key, 0)).toList
     consumer.endOffsets(topicPartitions.asJava).asScala.toMap.mapValues(_.toLong)

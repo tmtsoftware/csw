@@ -8,6 +8,9 @@ import io.lettuce.core.codec.{RedisCodec, Utf8StringCodec}
 
 import scala.util.control.NonFatal
 
+/**
+ * Encodes and decodes keys as EventKeys and values as ProtoBuf byte equivalent of Event
+ */
 object EventServiceCodec extends RedisCodec[EventKey, Event] {
 
   private lazy val utf8StringCodec = new Utf8StringCodec()

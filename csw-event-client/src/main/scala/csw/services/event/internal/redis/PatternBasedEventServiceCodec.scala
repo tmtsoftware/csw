@@ -6,6 +6,9 @@ import csw.messages.events.Event
 import csw_protobuf.events.PbEvent
 import io.lettuce.core.codec.{RedisCodec, Utf8StringCodec}
 
+/**
+ * Encodes and decodes keys as Strings and values as ProtoBuf byte equivalent of Event
+ */
 object PatternBasedEventServiceCodec extends RedisCodec[String, Event] {
 
   private lazy val utf8StringCodec = new Utf8StringCodec()

@@ -14,6 +14,9 @@ import csw.services.location.scaladsl.LocationService
 
 import scala.concurrent.ExecutionContext
 
+/**
+ * Base class for factory instances of EventService
+ */
 abstract class EventServiceFactory {
 
   protected def eventServiceImpl(eventServiceResolver: EventServiceResolver)(

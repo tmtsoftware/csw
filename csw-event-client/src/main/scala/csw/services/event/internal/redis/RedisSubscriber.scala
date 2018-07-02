@@ -20,6 +20,14 @@ import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
+/**
+ * An implementation of [[csw.services.event.scaladsl.EventSubscriber]] API which uses Redis as the provider for publishing
+ * and subscribing events.
+ * @param redisURI Contains connection details for the Redis/Sentinel connections.
+ * @param redisClient A redis client available from lettuce
+ * @param ec the execution context to be used for performing asynchronous operations
+ * @param mat the materializer to be used for materializing underlying streams
+ */
 class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
     implicit ec: ExecutionContext,
     mat: Materializer
@@ -27,12 +35,18 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
 
   private val eventSubscriberUtil = new EventSubscriberUtil()
 
+  // create underlying connection asynchronously and obtain an instance of RedisAsyncCommands to perform
+  // redis operations asynchronously. This instance of RedisAsyncCommands is used for performing `get`
+  // operations on Redis asynchronously
   private lazy val asyncConnectionF: Future[RedisAsyncCommands[EventKey, Event]] =
     connection(redisClient.connectAsync(EventServiceCodec, redisURI).toScala).map(_.async())
 
+  // create underlying connection asynchronously and obtain an instance of RedisPubSubReactiveCommands to perform
+  // redis pub sub operations using a `reactor` based reactive API provided by lettuce Redis driver.
   private def reactiveConnectionF(): Future[RedisPubSubReactiveCommands[EventKey, Event]] =
     connection(redisClient.connectPubSubAsync(EventServiceCodec, redisURI).toScala).map(_.reactive())
 
+  // create a RedisPubSubReactiveCommands instance similar to above for pattern based subscription
   private def patternBasedReactiveConnection(): Future[RedisPubSubReactiveCommands[String, Event]] =
     connection(redisClient.connectPubSubAsync(PatternBasedEventServiceCodec, redisURI).toScala).map(_.reactive())
 
@@ -42,6 +56,7 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
     val eventStreamF: Future[Source[Event, NotUsed]] = connectionF.flatMap(subscribe_internal(eventKeys, _))
     val eventStream: Source[Event, Future[NotUsed]]  = Source.fromFutureSource(eventStreamF)
 
+    // get stream of latest events using the `get` API and concat it with the event stream from `subscribe_internal`
     latestEventStream
       .concatMat(eventStream)(Keep.right)
       .viaMat(KillSwitches.single)(Keep.both)
@@ -138,6 +153,7 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
     if (event == null) Event.invalidEvent(eventKey) else event
   }
 
+  // get stream of events from redis `subscribe` command
   private def subscribe_internal(
       eventKeys: Set[EventKey],
       reactiveCommands: RedisPubSubReactiveCommands[EventKey, Event]

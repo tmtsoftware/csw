@@ -10,7 +10,7 @@ import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
- * Resolves the location of server hosting the Event service
+ * Provides the connection information of `Event Service` by resolving the location through `Location Service`
  */
 class EventServiceLocationResolver(locationService: LocationService)(implicit ec: ExecutionContext) extends EventServiceResolver {
 

@@ -10,6 +10,13 @@ import csw.services.event.scaladsl.EventService
 
 import scala.concurrent.{ExecutionContext, Future}
 
+/**
+ * Implementation of [[csw.services.event.scaladsl.EventService]] which provides handle to [[csw.services.event.scaladsl.EventPublisher]]
+ * and [[csw.services.event.scaladsl.EventSubscriber]] backed by Kafka
+ * @param eventServiceResolver to get the connection information of event service
+ * @param actorSystem actor system to be used by Producer and Consumer API of akka-stream-kafka
+ * @param mat the materializer to be used for materializing underlying streams
+ */
 class KafkaEventService(eventServiceResolver: EventServiceResolver)(implicit actorSystem: ActorSystem, mat: Materializer)
     extends EventService {
 

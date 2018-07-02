@@ -18,6 +18,9 @@ import scala.collection.JavaConverters.{asScalaSetConverter, setAsJavaSetConvert
 import scala.compat.java8.DurationConverters.DurationOps
 import scala.compat.java8.FutureConverters.{CompletionStageOps, FutureOps}
 
+/**
+ * Java API for [[csw.services.event.scaladsl.EventSubscriber]]
+ */
 class JEventSubscriber(eventSubscriber: EventSubscriber) extends IEventSubscriber {
 
   def subscribe(eventKeys: util.Set[EventKey]): Source[Event, IEventSubscription] =

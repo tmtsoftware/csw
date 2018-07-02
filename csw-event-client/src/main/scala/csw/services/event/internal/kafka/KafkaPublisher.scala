@@ -15,6 +15,13 @@ import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.util.control.NonFatal
 
+/**
+ * An implementation of [[csw.services.event.scaladsl.EventPublisher]] API which uses Apache Kafka as the provider for publishing
+ * and subscribing events.
+ * @param producerSettings Settings for akka-streams-kafka API for Apache Kafka producer
+ * @param ec the execution context to be used for performing asynchronous operations
+ * @param mat the materializer to be used for materializing underlying streams
+ */
 class KafkaPublisher(producerSettings: ProducerSettings[String, Array[Byte]])(
     implicit ec: ExecutionContext,
     mat: Materializer
@@ -54,6 +61,7 @@ class KafkaPublisher(producerSettings: ProducerSettings[String, Array[Byte]])(
   private def eventToProducerRecord(event: Event): ProducerRecord[String, Array[Byte]] =
     new ProducerRecord(event.eventKey.key, Event.typeMapper.toBase(event).toByteArray)
 
+  // callback to be complete the future operation for publishing when the record has been acknowledged by the server
   private def completePromise(event: Event, promisedDone: Promise[Done]): Callback = {
     case (_, null)          ⇒ promisedDone.success(Done)
     case (_, ex: Exception) ⇒ promisedDone.failure(PublishFailure(event, ex))
