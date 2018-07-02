@@ -46,7 +46,7 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
   }
 
   def get(options: Options): Future[Unit] = async {
-    val events = await(getEvents(options.eventKeys))
+    val events = await(getEvents(options.eventsMap.keys.toSeq))
 
     prettyPrintEventsJson(events)
   }
