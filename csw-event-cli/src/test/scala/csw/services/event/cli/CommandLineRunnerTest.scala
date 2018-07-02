@@ -7,10 +7,10 @@ import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
 import csw.apps.clusterseed.client.HTTPLocationService
 import csw.messages.commons.CoordinatedShutdownReasons
-import csw.messages.events.{Event, EventName, ObserveEvent, SystemEvent}
+import csw.messages.events._
 import csw.messages.params.formats.JsonSupport
 import csw.messages.params.generics.KeyType
-import csw.messages.params.models.{Prefix, Struct}
+import csw.messages.params.models.{Id, Prefix, Struct}
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.internal.commons.EventServiceConnection
 import csw.services.event.scaladsl.EventPublisher
@@ -20,8 +20,11 @@ import csw.services.logging.commons.LogAdminActorFactory
 import org.scalatest.{BeforeAndAfterEach, FunSuite, Matchers}
 import play.api.libs.json.Json
 import redis.embedded.{RedisSentinel, RedisServer}
+import ujson.Js
+import upickle.default.{read, write}
 
 import scala.collection.mutable
+import scala.io.Source
 
 class CommandLineRunnerTest extends FunSuite with Matchers with HTTPLocationService with BeforeAndAfterEach {
 
@@ -92,8 +95,10 @@ class CommandLineRunnerTest extends FunSuite with Matchers with HTTPLocationServ
     val s2  = Struct(Set(sp1))
     val sp2 = structKey2.set(s2, s1)
 
-    val e1 = SystemEvent(prefix1, eventName1).madd(sp1, ep)
-    val e2 = ObserveEvent(prefix2, eventName2).madd(sp2, tp)
+    val eId   = Id("3186979f-6cde-43a5-a42a-1ae37bfed669")
+    val eTime = EventTime(Instant.parse("2018-07-02T09:23:26.477Z"))
+    val e1    = SystemEvent(prefix1, eventName1).madd(sp1, ep).copy(eventId = eId, eventTime = eTime)
+    val e2    = ObserveEvent(prefix2, eventName2).madd(sp2, tp).copy(eventId = eId, eventTime = eTime)
 
     val publisher: EventPublisher = cliWiring.eventService.defaultPublisher.await
     publisher.publish(e1).await
@@ -149,6 +154,42 @@ class CommandLineRunnerTest extends FunSuite with Matchers with HTTPLocationServ
     commandLineRunner.get(argsParser.parse(Seq("get", "-e", s"${event1.eventKey},${event2.eventKey}", "--out", "json")).get).await
     val events = logBuffer.map(event ⇒ JsonSupport.readEvent[Event](Json.parse(event))).toSet
     events shouldEqual Set(event1, event2)
+  }
+
+  test("should be able to get specified top level paths in event in json format") {
+    import cliWiring._
+
+    val value: Js.Obj     = read[Js.Obj](Source.fromResource("get_path_top_level.json").mkString)
+    val expectedEventJson = write(value, 4)
+
+    commandLineRunner.get(argsParser.parse(Seq("get", "-e", s"${event1.eventKey}:epoch", "-o", "json")).get).await
+    logBuffer.head shouldBe expectedEventJson
+
+    logBuffer.clear()
+  }
+
+  test("should be able to get specified paths two levels deep in event in json format") {
+    import cliWiring._
+
+    val value: Js.Obj     = read[Js.Obj](Source.fromResource("get_path_2_levels_deep.json").mkString)
+    val expectedEventJson = write(value, 4)
+
+    commandLineRunner.get(argsParser.parse(Seq("get", "-e", s"${event1.eventKey}:struct-1/ra", "-o", "json")).get).await
+    logBuffer.head shouldBe expectedEventJson
+
+    logBuffer.clear()
+  }
+
+  test("should be able to get multiple specified paths two levels deep in event/events in json format") {
+    import cliWiring._
+
+    val value: Js.Obj     = read[Js.Obj](Source.fromResource("get_multiple_paths.json").mkString)
+    val expectedEventJson = write(value, 4)
+
+    commandLineRunner.get(argsParser.parse(Seq("get", "-e", s"${event1.eventKey}:struct-1/ra:epoch", "-o", "json")).get).await
+    logBuffer.head shouldBe expectedEventJson
+
+    logBuffer.clear()
   }
 
 }

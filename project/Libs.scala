@@ -34,6 +34,7 @@ object Libs {
   val `HdrHistogram`                 = "org.hdrhistogram"       % "HdrHistogram"                  % "2.1.10"
   val `testng`                       = "org.testng"             % "testng"                        % "6.14.3"
   val `upickle`                      = "com.lihaoyi"            %% "upickle"                      % "0.6.6"
+  val `ujson-play`                   = "com.lihaoyi"            %% "ujson-play"                   % "0.6.6"
   val `akka-http-upickle`            = "de.heikoseeberger"      %% "akka-http-upickle"            % "1.21.0" //Apache 2.0
 }
 

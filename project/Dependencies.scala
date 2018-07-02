@@ -170,6 +170,7 @@ object Dependencies {
 
   val EventCli = Seq(
     Libs.`upickle`,
+    Libs.`ujson-play`,
     Libs.`scopt`,
     Libs.`scalatest` % Test
   )
