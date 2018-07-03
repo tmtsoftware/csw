@@ -1,8 +1,14 @@
 {
-  "type": "ObserveEvent",
+  "type": "SystemEvent",
+  "eventId": "3186979f-6cde-43a5-a42a-1ae37bfed669",
+  "source": "wfos.prog.cloudcover",
+  "eventName": {
+    "name": "move"
+  },
+  "eventTime": "2018-07-02T09:23:26.477Z",
   "paramSet": [
     {
-      "keyName": "top1",
+      "keyName": "struct-1",
       "keyType": "StructKey",
       "values": [
         {
@@ -14,18 +20,7 @@
                 "12:13:14.1"
               ],
               "units": "NoUnits"
-            }
-          ]
-        }
-      ],
-      "units": "NoUnits"
-    },
-    {
-      "keyName": "top3",
-      "keyType": "StructKey",
-      "values": [
-        {
-          "paramSet": [
+            },
             {
               "keyName": "dec",
               "keyType": "StringKey",
