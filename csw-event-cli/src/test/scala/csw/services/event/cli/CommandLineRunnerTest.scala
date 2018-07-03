@@ -207,4 +207,17 @@ class CommandLineRunnerTest extends FunSuite with Matchers with HTTPLocationServ
     logBuffer.clear()
   }
 
+  test("should able to publish event when event json file provided") {
+    val path              = getClass.getResource("/observe_event.json").getPath
+    val expectedEventJson = Json.parse(Source.fromResource("observe_event.json").mkString)
+
+    import cliWiring._
+
+    val eventKey = "wfos.blue.filter.filter_wheel"
+    commandLineRunner.publish(argsParser.parse(Seq("publish", "-e", s"$eventKey", "--data", path)).get).await
+
+    commandLineRunner.get(argsParser.parse(Seq("get", "-e", eventKey, "-o", "json")).get).await
+    Json.parse(logBuffer.last) shouldBe expectedEventJson
+  }
+
 }

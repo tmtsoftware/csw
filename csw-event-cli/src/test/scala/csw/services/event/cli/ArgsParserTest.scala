@@ -1,9 +1,11 @@
 package csw.services.event.cli
 
-import java.io.ByteArrayOutputStream
+import java.io.{ByteArrayOutputStream, File}
 
 import csw.messages.events.EventKey
 import org.scalatest.{FunSuite, Matchers}
+
+import scala.concurrent.duration.DurationDouble
 
 class ArgsParserTest extends FunSuite with Matchers {
 
@@ -37,7 +39,7 @@ class ArgsParserTest extends FunSuite with Matchers {
 
   test("parse inspect command with only mandatory options") {
     val args = Array("inspect", "-e", "a.b.c,x.y.z")
-    silentParse(args) shouldBe Some(Options("inspect", eventKeys))
+    silentParse(args) shouldBe Some(Options("inspect", eventKeys = eventKeys))
   }
 
   test("parse get with only mandatory options") {
@@ -61,6 +63,37 @@ class ArgsParserTest extends FunSuite with Matchers {
         printTimestamp = true,
         printId = true,
         printUnits = true
+      )
+    )
+  }
+
+  test("parse publish when input data file does not exist") {
+    val args = Array("publish", "-e", "a.b.c", "--data", "./observe_event.json")
+    silentParse(args) shouldBe None
+  }
+
+  test("parse publish with mandatory fields when input data file exist") {
+    val observeEventJson = File.createTempFile("observe_event", "json")
+    val args             = Array("publish", "-e", "a.b.c", "--data", observeEventJson.getAbsolutePath)
+    observeEventJson.deleteOnExit()
+
+    silentParse(args) shouldBe Some(
+      Options("publish", eventKey = Some(EventKey("a.b.c")), eventData = observeEventJson)
+    )
+  }
+
+  test("parse publish with all fields when input data file exist") {
+    val observeEventJson = File.createTempFile("observe_event", "json")
+    val args             = Array("publish", "-e", "a.b.c", "--data", observeEventJson.getAbsolutePath, "-i", "20", "-d", "10")
+    observeEventJson.deleteOnExit()
+
+    silentParse(args) shouldBe Some(
+      Options(
+        "publish",
+        eventKey = Some(EventKey("a.b.c")),
+        eventData = observeEventJson,
+        interval = Some(20.millis),
+        duration = 10.seconds
       )
     )
   }

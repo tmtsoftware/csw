@@ -1,20 +1,25 @@
 package csw.services.event.cli
 
+import java.io.File
 import java.time.Instant
 
-import akka.japi.Option.Some
-import csw.messages.events.{Event, EventKey, EventTime}
+import akka.Done
+import akka.stream.scaladsl.{Keep, Sink, Source}
+import csw.messages.events._
 import csw.messages.params.formats.JsonSupport
 import csw.messages.params.generics.KeyType.StructKey
 import csw.messages.params.generics.Parameter
-import csw.messages.params.models.Struct
+import csw.messages.params.models.{Id, Struct}
 import csw.services.event.scaladsl.EventService
+import play.api.libs.json.Json
 import ujson.Js
 import ujson.play.PlayJson
 import upickle.default.write
 
 import scala.async.Async.{async, await}
 import scala.concurrent.Future
+import scala.concurrent.duration.{DurationLong, FiniteDuration}
+import scala.util.{Failure, Success}
 
 class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, printLine: Any ⇒ Unit) {
 
@@ -57,6 +62,15 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
       transformInPlace(eventJson, None, buildIncrementalPath(paths))
       printLine(write(eventJson, 4))
     })
+  }
+
+  def publish(options: Options): Future[Done] = async {
+    val event = readEventFromJson(options.eventData)
+
+    options.interval match {
+      case Some(interval) ⇒ await(publishEventsWithInterval(event, interval, options.duration))
+      case None           ⇒ await(publishEvent(event))
+    }
   }
 
   private def isInvalid(event: Event): Boolean = event.eventTime == EventTime(Instant.ofEpochMilli(-1))
@@ -108,4 +122,33 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
             }
         }
     }
+
+  private def readEventFromJson(data: File) = {
+    val eventJson = Json.parse(scala.io.Source.fromFile(data).mkString)
+    JsonSupport.readEvent[Event](eventJson)
+  }
+
+  private def eventGenerator(initialEvent: Event) = initialEvent match {
+    case e: SystemEvent  ⇒ e.copy(eventId = Id(), eventTime = EventTime())
+    case e: ObserveEvent ⇒ e.copy(eventId = Id(), eventTime = EventTime())
+  }
+
+  private def publishEvent(event: Event) = async {
+    val publisher     = await(eventService.defaultPublisher)
+    val publishResult = publisher.publish(event)
+    publishResult.onComplete {
+      case Success(_)  ⇒ printLine(s"Event [${event.eventKey}] published successfully")
+      case Failure(ex) ⇒ printLine(s"Failed to publish event [${event.eventKey}] with cause: [${ex.getCause.getMessage}]")
+    }
+    await(publishResult)
+  }
+
+  private def publishEventsWithInterval(initialEvent: Event, interval: FiniteDuration, duration: FiniteDuration) =
+    Source
+      .tick(0.millis, interval, ())
+      .map(_ ⇒ eventGenerator(initialEvent))
+      .takeWithin(duration)
+      .map(publishEvent)
+      .toMat(Sink.ignore)(Keep.right)
+      .run()
 }

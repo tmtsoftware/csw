@@ -6,9 +6,10 @@ import scala.concurrent.{Await, Future}
 class CliApp(commandLineRunner: CommandLineRunner) {
 
   def start(options: Options): Any = {
-    options.op match {
+    options.cmd match {
       case "inspect" ⇒ await(commandLineRunner.inspect(options))
       case "get"     ⇒ await(commandLineRunner.get(options))
+      case "publish" ⇒ await(commandLineRunner.publish(options))
       case x         ⇒ throw new RuntimeException(s"Unknown operation: $x")
     }
   }
