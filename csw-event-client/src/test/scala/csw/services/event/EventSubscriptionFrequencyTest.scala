@@ -150,11 +150,11 @@ class EventSubscriptionFrequencyTest extends TestNGSuite with Matchers with Even
     import eventGenerator._
     val eventKey: EventKey = eventsGroup.head.eventKey
 
-    val cancellable = publisher.publish(eventGenerator.generator, 105.millis)
+    val cancellable = publisher.publish(eventGenerator.generator, 100.millis)
     Thread.sleep(500)
     val subscription =
-      subscriber.subscribeActorRef(Set(eventKey), inbox.ref, 200.millis, SubscriptionModes.RateLimiterMode)
-    Thread.sleep(900)
+      subscriber.subscribeActorRef(Set(eventKey), inbox.ref, 400.millis, SubscriptionModes.RateLimiterMode)
+    Thread.sleep(1800)
     subscription.unsubscribe().await
     cancellable.cancel()
 
