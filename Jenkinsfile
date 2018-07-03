@@ -49,6 +49,7 @@ pipeline {
                 sh "sbt csw-config-client/multi-jvm:test"
                 sh "sbt csw-config-client-cli/multi-jvm:test"
                 sh "sbt csw-framework/multi-jvm:test"
+                sh "sbt csw-cluster-seed/multi-jvm:test"
             }
         }
     }

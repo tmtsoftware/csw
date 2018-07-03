@@ -13,6 +13,7 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-command`,
   `csw-event-api`,
   `csw-event-client`,
+  `csw-event-cli`,
   `csw-location`,
   `csw-location-agent`,
   `csw-benchmark`,
@@ -34,6 +35,7 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
   `sequencer-prototype`,
   `examples`,
   `csw-event-client`,
+  `csw-event-cli`,
   `csw-commons`
 )
 
@@ -198,8 +200,8 @@ lazy val `csw-event-client` = project
 lazy val `csw-event-cli` = project
   .dependsOn(
     `csw-messages`,
-    `csw-event-client` % "compile->compile,test->test",
-    `csw-cluster-seed` % "test->test"
+    `csw-event-client`,
+    `csw-cluster-seed` % "test->multi-jvm"
   )
   .enablePlugins(DeployApp, MaybeCoverage)
   .settings(libraryDependencies ++= Dependencies.EventCli)
