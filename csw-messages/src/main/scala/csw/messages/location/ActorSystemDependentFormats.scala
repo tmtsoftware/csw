@@ -9,7 +9,7 @@ import akka.serialization.{Serialization, SerializationExtension}
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import upickle.default.{macroRW, ReadWriter => RW}
 
-trait ActorSystemDependentFormats {
+private[csw] trait ActorSystemDependentFormats {
   implicit def actorSystem: ActorSystem
 
   implicit val akkaConnectionRw: RW[AkkaConnection] = macroRW

@@ -17,7 +17,7 @@ import upickle.default._
 
 import scala.concurrent.duration.{Duration, DurationLong, FiniteDuration}
 
-class LocationRoutes(
+private[csw] class LocationRoutes(
     locationService: LocationService,
     locationExceptionHandler: LocationExceptionHandler,
     actorRuntime: ActorRuntime

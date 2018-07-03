@@ -42,7 +42,7 @@ package csw
  *
  * These packages contain reusable classes, traits and models. We are keeping all the models which are getting transferred over the wire and
  * requires serialization and deserialization in `csw-messages` project. All the models are marked with [[csw.messages.TMTSerializable]].
- * [[csw.messages.TMTSerializable]] is a marker trait which extends [[Serializable]]. This is configured to use `kryo` serialization.
+ * [[csw.messages.TMTSerializable]] is a marker trait which extends [[scala.Serializable]]. This is configured to use `kryo` serialization.
  * Also these models are being shared between multiple projects. `csw-location`, `csw-framework` and `csw-logging` depends on `csw-messages` project
  * which uses these models.
  *
