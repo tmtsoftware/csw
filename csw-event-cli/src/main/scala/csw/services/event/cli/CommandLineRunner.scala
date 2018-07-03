@@ -59,7 +59,7 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
     events.foreach(e ⇒ {
       val eventJson = PlayJson.transform(JsonSupport.writeEvent(e), upickle.default.reader[Js.Obj])
       val paths     = options.eventsMap(e.eventKey).map(_.split("/").toList).toList
-      transformInPlace(eventJson, None, buildIncrementalPath(paths))
+      EventJsonTransformer.transformInPlace(eventJson, paths)
       printLine(write(eventJson, 4))
     })
   }
@@ -79,49 +79,6 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
     val subscriber = await(eventService.defaultSubscriber)
     await(Future.traverse(keys)(subscriber.get))
   }
-
-  private def buildIncrementalPath(paths: List[List[String]]) = paths.map { path ⇒
-    var last = ""
-    path.map { segment ⇒
-      last = if (last.nonEmpty) last + "/" + segment else segment
-      last
-    }
-  }
-
-  private def breakIncrementalPaths(allIncrementalPaths: List[List[String]]) = {
-    allIncrementalPaths.map {
-      case Nil                                            ⇒ ("", Nil)
-      case currentIncrementalPath :: nextIncrementalPaths ⇒ (currentIncrementalPath, nextIncrementalPaths)
-    }.unzip
-  }
-
-  private def transformInPlace(json: Js.Obj, parentPath: Option[String], allIncrementalPaths: List[List[String]]): Unit =
-    allIncrementalPaths match {
-      case Nil ⇒
-      case _ ⇒
-        val (allCurrentIncrementalPaths, allNextIncrementalPaths) = breakIncrementalPaths(allIncrementalPaths)
-
-        allCurrentIncrementalPaths.filter(_.nonEmpty) match {
-          case Nil =>
-          case _ =>
-            def currentPath(json: Js.Value): String = {
-              val keyName = json("keyName").str
-              if (parentPath.isDefined) s"${parentPath.get}/$keyName"
-              else keyName
-            }
-
-            json("paramSet") = json("paramSet").arr.filter(param ⇒ allCurrentIncrementalPaths.contains(currentPath(param)))
-
-            json("paramSet").arr.foreach { param =>
-              param("values") = param("values").arr.filter {
-                case value: Js.Obj =>
-                  transformInPlace(value, Some(currentPath(param)), allNextIncrementalPaths)
-                  value("paramSet").arr.nonEmpty //Remove empty paramSets
-                case _ => true
-              }
-            }
-        }
-    }
 
   private def readEventFromJson(data: File) = {
     val eventJson = Json.parse(scala.io.Source.fromFile(data).mkString)
