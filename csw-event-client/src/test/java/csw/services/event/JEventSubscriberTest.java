@@ -104,42 +104,6 @@ public class JEventSubscriberTest extends TestNGSuite {
         probe.expectNoMessage(Duration.ofMillis(200));
     }
 
-    //DEOPSCSW-346: Subscribe to event irrespective of Publisher's existence
-    //DEOPSCSW-342: Subscription with consumption frequency
-    @Test(dataProvider = "event-service-provider")
-    public void should_be_able_to_subscribe_an_event_with_duration_with_rate_adapter_for_fast_publisher(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
-        EventKey eventKey = events.get(0).eventKey();
-
-        java.util.Set<EventKey> set = new HashSet<>();
-        set.add(eventKey);
-
-        List<Event> queue = new ArrayList<>();
-        List<Event> queue2 = new ArrayList<>();
-
-        counter = 0;
-        Cancellable cancellable = baseProperties.jPublisher().publish(eventGenerator(), new FiniteDuration(1, TimeUnit.MILLISECONDS));
-
-        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(set, Duration.ZERO.plusMillis(300), SubscriptionModes.jRateAdapterMode()).toMat(Sink.foreach(queue::add), Keep.left()).run(baseProperties.resumingMat());
-        subscription.ready().get(10, TimeUnit.SECONDS);
-
-        IEventSubscription subscription2 = baseProperties.jSubscriber().subscribe(set, Duration.ZERO.plusMillis(400), SubscriptionModes.jRateAdapterMode()).toMat(Sink.foreach(queue2::add), Keep.left()).run(baseProperties.resumingMat());
-        subscription.ready().get(10, TimeUnit.SECONDS);
-
-        Thread.sleep(1000);
-
-        subscription.unsubscribe().get(10, TimeUnit.SECONDS);
-        subscription2.unsubscribe().get(10, TimeUnit.SECONDS);
-        cancellable.cancel();
-
-        Assert.assertEquals(queue.size(), 4);
-        // assert if received elements do not have duplicates
-        Assert.assertEquals(queue.stream().distinct().count(), 4);
-
-        Assert.assertEquals(queue2.size(), 3);
-        // assert if received elements do not have duplicates
-        Assert.assertEquals(queue2.stream().distinct().count(), 3);
-    }
-
     //DEOPSCSW-338: Provide callback for Event alerts
     //DEOPSCSW-343: Unsubscribe based on prefix and event name
     @Test(dataProvider = "event-service-provider")
@@ -272,70 +236,6 @@ public class JEventSubscriberTest extends TestNGSuite {
         Thread.sleep(1000);
         subscription.unsubscribe().get(10, TimeUnit.SECONDS);
         Assert.assertEquals(inbox.getAllReceived().size(), 4);
-    }
-
-    //DEOPSCSW-342: Subscription with consumption frequency
-    @Test(dataProvider = "event-service-provider")
-    public void should_be_able_to_subscribe_with_duration_with_rate_limiter_mode_for_slow_publisher(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
-        TestInbox<Event> inbox = TestInbox.create();
-
-        counter = 0;
-        Cancellable cancellable = baseProperties.jPublisher().publish(eventGenerator(), new FiniteDuration(200, TimeUnit.MILLISECONDS));
-        IEventSubscription subscription = baseProperties.jSubscriber().subscribeActorRef(Collections.singleton(events.get(0).eventKey()), inbox.getRef(), Duration.ofMillis(100), SubscriptionModes.jRateLimiterMode());
-        Thread.sleep(900);
-        subscription.unsubscribe().get(10, TimeUnit.SECONDS);
-        cancellable.cancel();
-        List<Event> eventsReceived = inbox.getAllReceived();
-        Assert.assertEquals(eventsReceived.size(), 5);
-
-        // assert if received elements do not have duplicates
-        Assert.assertEquals(eventsReceived.stream().distinct().count(), 5);
-
-    }
-
-    //DEOPSCSW-342: Subscription with consumption frequency
-    @Test(dataProvider = "event-service-provider")
-    public void should_be_able_to_subscribe_with_duration_with_rate_limiter_mode_for_fast_publisher(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
-
-        Event event1 = Utils.makeEvent(1);
-
-        TestInbox<Event> inbox = TestInbox.create();
-
-        counter = 0;
-        Cancellable cancellable = baseProperties.jPublisher().publish(eventGenerator(), new FiniteDuration(105, TimeUnit.MILLISECONDS));
-        IEventSubscription subscription = baseProperties.jSubscriber().subscribeActorRef(Collections.singleton(event1.eventKey()), inbox.getRef(), Duration.ofMillis(200), SubscriptionModes.jRateLimiterMode());
-        Thread.sleep(900);
-        subscription.unsubscribe().get(10, TimeUnit.SECONDS);
-        cancellable.cancel();
-
-        List<Event> eventsReceived = inbox.getAllReceived();
-        Assert.assertEquals(eventsReceived.size(), 5);
-
-        // assert if received elements do not have duplicates
-        Assert.assertEquals(eventsReceived.stream().distinct().count(), 5);
-
-    }
-
-    //DEOPSCSW-342: Subscription with consumption frequency
-    @Test(dataProvider = "event-service-provider")
-    public void should_be_able_to_subscribe_with_duration_with_rate_adapter_mode_for_slow_publisher(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
-        Event event1 = Utils.makeDistinctEvent(new Random().nextInt());
-
-        TestInbox<Event> inbox = TestInbox.create();
-
-        counter = 0;
-        Cancellable cancellable = baseProperties.jPublisher().publish(eventGenerator(), new FiniteDuration(200, TimeUnit.MILLISECONDS));
-        IEventSubscription subscription = baseProperties.jSubscriber().subscribeActorRef(Collections.singleton(event1.eventKey()), inbox.getRef(), Duration.ofMillis(100), SubscriptionModes.jRateAdapterMode());
-        Thread.sleep(1050);
-        subscription.unsubscribe().get(10, TimeUnit.SECONDS);
-        cancellable.cancel();
-
-        List<Event> eventsReceived = inbox.getAllReceived();
-        Assert.assertEquals(eventsReceived.size(), 11);
-
-        // assert if received elements do not have duplicates
-        Assert.assertNotEquals(eventsReceived.stream().distinct().count(), 11);
-
     }
 
     // DEOPSCSW-420: Implement Pattern based subscription

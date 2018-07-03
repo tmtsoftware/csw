@@ -49,7 +49,6 @@ class EventSubscriptionFrequencyTest extends TestNGSuite with Matchers with Even
     Array(redisTestProps)
   )
 
-  val events: immutable.Seq[Event]                  = for (i ← 1 to 1500) yield makeEvent(i)
   def events(name: EventName): immutable.Seq[Event] = for (i ← 1 to 1500) yield makeEventForKeyName(name, i)
 
   class EventGenerator(eventName: EventName) {
@@ -63,6 +62,33 @@ class EventSubscriptionFrequencyTest extends TestNGSuite with Matchers with Even
       publishedEvents.enqueue(event)
       event
     }
+  }
+
+  //DEOPSCSW-342: Subscription with consumption frequency
+  @Test(dataProvider = "event-service-provider")
+  def should_be_able_to_subscribe_with_duration_with_rate_adapter_mode_for_slow_publisher(
+      baseProperties: BaseProperties
+  ): Unit = {
+    import baseProperties._
+    val inbox = TestInbox[Event]()
+
+    val eventGenerator = new EventGenerator(EventName(s"system_${Random.nextInt()}"))
+    import eventGenerator._
+    val eventKey: EventKey = eventsGroup.head.eventKey
+
+    val cancellable = publisher.publish(eventGenerator.generator, 400.millis)
+    Thread.sleep(500)
+    val subscription =
+      subscriber.subscribeActorRef(Set(eventKey), inbox.ref, 100.millis, SubscriptionModes.RateAdapterMode)
+    Thread.sleep(1050)
+    subscription.unsubscribe().await
+    cancellable.cancel()
+
+    val receivedEvents = inbox.receiveAll()
+    receivedEvents.size shouldBe 11
+    publishedEvents should contain allElementsOf receivedEvents
+    // assert that received elements will have duplicates
+    receivedEvents.toSet.size should not be 11
   }
 
   //DEOPSCSW-346: Subscribe to event irrespective of Publisher's existence
@@ -163,36 +189,5 @@ class EventSubscriptionFrequencyTest extends TestNGSuite with Matchers with Even
     publishedEvents should contain allElementsOf receivedEvents
     // assert if received elements do not have duplicates
     receivedEvents.toSet.size shouldBe 5
-
-    // assert if received elements do not have duplicates
-    receivedEvents.toSet.size shouldBe 5
   }
-
-  //DEOPSCSW-342: Subscription with consumption frequency
-  @Test(dataProvider = "event-service-provider")
-  def should_be_able_to_subscribe_with_duration_with_rate_adapter_mode_for_slow_publisher(
-      baseProperties: BaseProperties
-  ): Unit = {
-    import baseProperties._
-    val inbox = TestInbox[Event]()
-
-    val eventGenerator = new EventGenerator(EventName(s"system_${Random.nextInt()}"))
-    import eventGenerator._
-    val eventKey: EventKey = eventsGroup.head.eventKey
-
-    val cancellable = publisher.publish(eventGenerator.generator, 400.millis)
-    Thread.sleep(500)
-    val subscription =
-      subscriber.subscribeActorRef(Set(eventKey), inbox.ref, 100.millis, SubscriptionModes.RateAdapterMode)
-    Thread.sleep(1050)
-    subscription.unsubscribe().await
-    cancellable.cancel()
-
-    val receivedEvents = inbox.receiveAll()
-    receivedEvents.size shouldBe 11
-    publishedEvents should contain allElementsOf receivedEvents
-    // assert that received elements will have duplicates
-    receivedEvents.toSet.size should not be 11
-  }
-
 }
