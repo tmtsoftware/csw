@@ -99,9 +99,11 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
             json("paramSet") = json("paramSet").arr.filter(param ⇒ allCurrentIncrementalPaths.contains(currentPath(param)))
 
             json("paramSet").arr.foreach { param =>
-              param("values").arr.foreach {
-                case x: Js.Obj => transformInPlace(x, Some(currentPath(param)), allNextIncrementalPaths)
-                case _         =>
+              param("values") = param("values").arr.filter {
+                case value: Js.Obj =>
+                  transformInPlace(value, Some(currentPath(param)), allNextIncrementalPaths)
+                  value("paramSet").arr.nonEmpty //Remove empty paramSets
+                case _ => true
               }
             }
         }

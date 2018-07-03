@@ -159,8 +159,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with HTTPLocationServ
   test("should be able to get specified top level paths in event in json format") {
     import cliWiring._
 
-    val value: Js.Obj     = read[Js.Obj](Source.fromResource("get_path_top_level.json").mkString)
-    val expectedEventJson = write(value, 4)
+    val expectedEventJson = write(read[Js.Obj](Source.fromResource("get_path_top_level.json").mkString), 4)
 
     commandLineRunner.get(argsParser.parse(Seq("get", "-e", s"${event1.eventKey}:epoch", "-o", "json")).get).await
     logBuffer.head shouldBe expectedEventJson
@@ -171,8 +170,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with HTTPLocationServ
   test("should be able to get specified paths two levels deep in event in json format") {
     import cliWiring._
 
-    val value: Js.Obj     = read[Js.Obj](Source.fromResource("get_path_2_levels_deep.json").mkString)
-    val expectedEventJson = write(value, 4)
+    val expectedEventJson = write(read[Js.Obj](Source.fromResource("get_path_2_levels_deep.json").mkString), 4)
 
     commandLineRunner.get(argsParser.parse(Seq("get", "-e", s"${event1.eventKey}:struct-1/ra", "-o", "json")).get).await
     logBuffer.head shouldBe expectedEventJson
@@ -180,14 +178,31 @@ class CommandLineRunnerTest extends FunSuite with Matchers with HTTPLocationServ
     logBuffer.clear()
   }
 
-  test("should be able to get multiple specified paths two levels deep in event/events in json format") {
+  test("should be able to get multiple specified paths two levels deep in event in json format") {
     import cliWiring._
 
-    val value: Js.Obj     = read[Js.Obj](Source.fromResource("get_multiple_paths.json").mkString)
-    val expectedEventJson = write(value, 4)
+    val expectedEventJson = write(read[Js.Obj](Source.fromResource("get_multiple_paths.json").mkString), 4)
 
     commandLineRunner.get(argsParser.parse(Seq("get", "-e", s"${event1.eventKey}:struct-1/ra:epoch", "-o", "json")).get).await
     logBuffer.head shouldBe expectedEventJson
+
+    logBuffer.clear()
+  }
+
+  test("should be able to get specified paths for multiple events in json format") {
+    import cliWiring._
+
+    val expectedEvent1Json = write(read[Js.Obj](Source.fromResource("get_multiple_events1.json").mkString), 4)
+    val expectedEvent2Json = write(read[Js.Obj](Source.fromResource("get_multiple_events2.json").mkString), 4)
+
+    commandLineRunner
+      .get(
+        argsParser
+          .parse(Seq("get", "-e", s"${event1.eventKey}:struct-1/ra,${event2.eventKey}:struct-2/struct-1/ra", "-o", "json"))
+          .get
+      )
+      .await
+    logBuffer should contain allOf (expectedEvent1Json, expectedEvent2Json)
 
     logBuffer.clear()
   }
