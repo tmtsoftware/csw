@@ -53,14 +53,24 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
     }
   }
 
-  def get(options: Options): Future[Unit] = async {
-    val events = await(getEvents(options.eventsMap.keys.toSeq))
+  private def printHeader(eventKey: EventKey, eventJson: Js.Obj, options: Options): Unit = {
+    val timestamp = if (options.printTimestamp) eventJson("eventTime").str else ""
+    val id        = if (options.printId) eventJson("eventId").str else ""
+    val header    = List(timestamp, id, eventKey.key).filter(_.nonEmpty).mkString(" ")
+    printLine(header)
+  }
 
+  def get(options: Options): Future[Unit] = async {
+    val transformer = new EventJsonTransformer(printLine, options)
+
+    val events = await(getEvents(options.eventsMap.keys.toSeq))
     events.foreach(e ⇒ {
       val eventJson = PlayJson.transform(JsonSupport.writeEvent(e), upickle.default.reader[Js.Obj])
       val paths     = options.eventsMap(e.eventKey).toList
-      EventJsonTransformer.transformInPlace(eventJson, paths)
-      printLine(write(eventJson, 4))
+      if (options.isOneline) printHeader(e.eventKey, eventJson, options)
+      transformer.transformInPlace(eventJson, paths)
+      if (options.isJson) printLine(write(eventJson, 4))
+
     })
   }
 

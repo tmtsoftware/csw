@@ -3,7 +3,7 @@ package csw.services.event.cli
 import akka.japi.Option.Some
 import ujson.Js
 
-object EventJsonTransformer {
+class EventJsonTransformer(printLine: Any ⇒ Unit, options: Options) {
 
   def transformInPlace(eventJson: Js.Obj, paths: List[String]): Unit =
     transformInPlace0(eventJson, None, paths)
@@ -31,7 +31,11 @@ object EventJsonTransformer {
                 transformInPlace0(value, Some(currentFullPath), paths)
                 value("paramSet").arr.nonEmpty //Remove empty paramSets
               case _ => true
-            }
+            } else if (options.isOneline) {
+            var values = s"$currentFullPath = ${param("values").arr.mkString("[", ",", "]")}"
+            if (options.printUnits) values += s" [${param("units").str}]"
+            printLine(values)
+          }
         }
     }
 }

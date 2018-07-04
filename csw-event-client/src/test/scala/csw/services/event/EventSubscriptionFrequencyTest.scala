@@ -4,7 +4,7 @@ import akka.actor.testkit.typed.scaladsl.TestInbox
 import akka.stream.scaladsl.Sink
 import csw.messages.events.{Event, EventKey, EventName}
 import csw.services.event.helpers.TestFutureExt.RichFuture
-import csw.services.event.helpers.Utils.{makeEvent, makeEventForKeyName}
+import csw.services.event.helpers.Utils.makeEventForKeyName
 import csw.services.event.internal.kafka.KafkaTestProps
 import csw.services.event.internal.redis.RedisTestProps
 import csw.services.event.internal.wiring.BaseProperties

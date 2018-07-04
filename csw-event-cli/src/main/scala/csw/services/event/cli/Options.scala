@@ -18,4 +18,7 @@ case class Options(
     printUnits: Boolean = false,
     interval: Option[FiniteDuration] = None,
     duration: FiniteDuration = Int.MaxValue.seconds
-)
+) {
+  def isOneline: Boolean = out == "oneline"
+  def isJson: Boolean    = out == "json"
+}
