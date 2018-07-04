@@ -11,7 +11,7 @@ import csw.messages.params.generics.KeyType.StructKey
 import csw.messages.params.generics.Parameter
 import csw.messages.params.models.{Id, Struct}
 import csw.services.event.scaladsl.EventService
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, JsValue, Json}
 import ujson.Js
 import ujson.play.PlayJson
 import upickle.default.write
@@ -92,8 +92,14 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
 
   private def readEventFromJson(data: File) = {
     val eventJson = Json.parse(scala.io.Source.fromFile(data).mkString)
-    JsonSupport.readEvent[Event](eventJson)
+    JsonSupport.readEvent[Event](updateEventMetadata(eventJson))
   }
+
+  private def updateEventMetadata(json: JsValue) =
+    json.as[JsObject] ++ Json.obj(
+      ("eventId", Id().id),
+      ("eventTime", EventTime().time)
+    )
 
   private def eventGenerator(initialEvent: Event) = initialEvent match {
     case e: SystemEvent  ⇒ e.copy(eventId = Id(), eventTime = EventTime())
