@@ -11,7 +11,7 @@ class EventJsonTransformerTest extends FunSuite with Matchers with BeforeAndAfte
 
   private var logBuffer = mutable.Buffer.empty[String]
 
-  override def beforeEach() {
+  override def beforeEach(): Unit = {
     logBuffer = mutable.Buffer.empty
   }
 

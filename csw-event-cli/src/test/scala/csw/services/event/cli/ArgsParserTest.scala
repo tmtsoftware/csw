@@ -74,17 +74,17 @@ class ArgsParserTest extends FunSuite with Matchers {
 
   test("parse publish with mandatory fields when input data file exist") {
     val observeEventJson = File.createTempFile("observe_event", "json")
-    val args             = Array("publish", "-e", "a.b.c", "--data", observeEventJson.getAbsolutePath)
+    val args             = Array("publish", "--data", observeEventJson.getAbsolutePath)
     observeEventJson.deleteOnExit()
 
     silentParse(args) shouldBe Some(
-      Options("publish", eventKey = Some(EventKey("a.b.c")), eventData = observeEventJson)
+      Options("publish", eventData = observeEventJson)
     )
   }
 
   test("parse publish with all fields when input data file exist") {
     val observeEventJson = File.createTempFile("observe_event", "json")
-    val args             = Array("publish", "-e", "a.b.c", "--data", observeEventJson.getAbsolutePath, "-i", "20", "-d", "10")
+    val args             = Array("publish", "-e", "a.b.c", "--data", observeEventJson.getAbsolutePath, "-i", "20", "--period", "10")
     observeEventJson.deleteOnExit()
 
     silentParse(args) shouldBe Some(
