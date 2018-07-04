@@ -93,7 +93,7 @@ class ArgsParserTest extends FunSuite with Matchers {
         eventKey = Some(EventKey("a.b.c")),
         eventData = observeEventJson,
         interval = Some(20.millis),
-        duration = 10.seconds
+        period = 10.seconds
       )
     )
   }

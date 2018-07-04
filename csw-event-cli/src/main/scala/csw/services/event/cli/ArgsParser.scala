@@ -63,10 +63,9 @@ class ArgsParser(name: String) {
       .text("publishes event provided from input file")
       .children(
         opt[String]('e', "event")
-          .required()
           .valueName("<event>")
           .action((x, c) => c.copy(eventKey = Some(EventKey(x))))
-          .text("required: event to publish"),
+          .text("event key to publish"),
         opt[File]("data")
           .required()
           .valueName("<file>")
@@ -84,11 +83,11 @@ class ArgsParser(name: String) {
             else failure(s"invalid interval :$interval, should be > 0 milliseconds")
           }
           .text("interval in [ms] to publish event, single event will be published if not provided"),
-        opt[Int]('d', "duration")
-          .action((x, c) => c.copy(duration = x.seconds))
-          .validate { duration ⇒
-            if (duration > 0) success
-            else failure(s"invalid duration :$duration, should be > 0 seconds")
+        opt[Int]('p', "period")
+          .action((x, c) => c.copy(period = x.seconds))
+          .validate { period ⇒
+            if (period > 0) success
+            else failure(s"invalid period :$period, should be > 0 seconds")
           }
           .text(
             "publish events for this duration [seconds] on provided interval. Default is Int.MaxValue seconds"
@@ -103,10 +102,10 @@ class ArgsParser(name: String) {
       if (c.cmd.isEmpty)
         failure("""
           |Please specify one of the following command with their corresponding options:
-          |  1> Inspect
-          |  2> Get
-          |  3> Subscribe
-          |  4> Publish
+          |  1> inspect
+          |  2> get
+          |  3> subscribe
+          |  4> publish
         """.stripMargin)
       else success
     }

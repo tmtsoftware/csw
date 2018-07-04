@@ -75,10 +75,10 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
   }
 
   def publish(options: Options): Future[Done] = async {
-    val event = readEventFromJson(options.eventData)
+    val event = readEventFromJson(options.eventData, options.eventKey)
 
     options.interval match {
-      case Some(interval) ⇒ await(publishEventsWithInterval(event, interval, options.duration))
+      case Some(interval) ⇒ await(publishEventsWithInterval(event, interval, options.period))
       case None           ⇒ await(publishEvent(event))
     }
   }
@@ -90,16 +90,27 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
     await(Future.traverse(keys)(subscriber.get))
   }
 
-  private def readEventFromJson(data: File) = {
+  private def readEventFromJson(data: File, maybeEventKey: Option[EventKey]) = {
     val eventJson = Json.parse(scala.io.Source.fromFile(data).mkString)
-    JsonSupport.readEvent[Event](updateEventMetadata(eventJson))
+    JsonSupport.readEvent[Event](updateEventMetadata(eventJson, maybeEventKey))
   }
 
-  private def updateEventMetadata(json: JsValue) =
-    json.as[JsObject] ++ Json.obj(
+  private def updateEventMetadata(json: JsValue, maybeEventKey: Option[EventKey]) = {
+
+    val updatedJson = json.as[JsObject] ++ Json.obj(
       ("eventId", Id().id),
       ("eventTime", EventTime().time)
     )
+
+    maybeEventKey match {
+      case Some(eventKey) =>
+        updatedJson ++ Json.obj(
+          ("source", eventKey.source.prefix),
+          ("eventName", Json.obj(("name", eventKey.eventName.name)))
+        )
+      case None => updatedJson
+    }
+  }
 
   private def eventGenerator(initialEvent: Event) = initialEvent match {
     case e: SystemEvent  ⇒ e.copy(eventId = Id(), eventTime = EventTime())
@@ -110,8 +121,9 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
     val publisher     = await(eventService.defaultPublisher)
     val publishResult = publisher.publish(event)
     publishResult.onComplete {
-      case Success(_)  ⇒ printLine(s"Event [${event.eventKey}] published successfully")
-      case Failure(ex) ⇒ printLine(s"Failed to publish event [${event.eventKey}] with cause: [${ex.getCause.getMessage}]")
+      case Success(_) ⇒ printLine(s"[SUCCESS] Event [${event.eventKey}] published successfully")
+      case Failure(ex) ⇒
+        printLine(s"[FAILURE] Failed to publish event [${event.eventKey}] with error: [${ex.getCause.getMessage}]")
     }
     await(publishResult)
   }

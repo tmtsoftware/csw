@@ -4,7 +4,7 @@ import java.io.File
 
 import csw.messages.events.EventKey
 
-import scala.concurrent.duration.{DurationInt, FiniteDuration}
+import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 
 case class Options(
     cmd: String = "",
@@ -17,7 +17,7 @@ case class Options(
     printId: Boolean = false,
     printUnits: Boolean = false,
     interval: Option[FiniteDuration] = None,
-    duration: FiniteDuration = Int.MaxValue.seconds
+    period: FiniteDuration = (Int.MaxValue / 1000).seconds
 ) {
   def isOneline: Boolean = out == "oneline"
   def isJson: Boolean    = out == "json"
