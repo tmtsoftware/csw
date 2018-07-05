@@ -1,5 +1,6 @@
 package csw.services.event.cli
 
+import akka.stream.scaladsl.Sink
 import csw.messages.events._
 import csw.messages.params.formats.JsonSupport
 import csw.services.event.helpers.TestFutureExt.RichFuture
@@ -8,6 +9,8 @@ import org.scalatest.time.SpanSugar.convertDoubleToGrainOfTime
 import org.scalatest.{FunSuite, Matchers}
 import play.api.libs.json.{JsObject, JsValue, Json}
 
+import scala.collection.mutable
+import scala.concurrent.Await
 import scala.io.Source
 
 class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Eventually {
@@ -75,6 +78,28 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
     }
   }
 
+  test("should able to publish event with interval") {
+    val queue             = new mutable.Queue[JsObject]()
+    val eventKey          = EventKey("wfos.blue.filter.wheel")
+    val path              = getClass.getResource("/observe_event.json").getPath
+    val eventJson         = Json.parse(Source.fromResource("observe_event.json").mkString)
+    val expectedEventJson = removeDynamicKeys(addEventIdAndName(eventJson, eventKey))
+
+    val subscriber = Await.result(eventService.defaultSubscriber, 5.seconds)
+    subscriber.subscribe(Set(eventKey)).to(Sink.foreach[Event](e ⇒ queue.enqueue(eventToSanitizedJson(e)))).run()
+
+    // publish same event every 300 millis for 2 seconds, which results into publishing 6 events
+    commandLineRunner
+      .publish(argsParser.parse(Seq("publish", "-e", s"${eventKey.key}", "--data", path, "-i", "300", "-p", "2")).get)
+      .await
+
+    // invalid event + 6 events published in previous step
+    eventually(queue.size shouldBe 7)
+    queue should contain allElementsOf Seq(eventToSanitizedJson(Event.invalidEvent(eventKey))) ++ (1 to 5).map(
+      _ ⇒ expectedEventJson
+    )
+  }
+
   // publish command generates new id and event time while publishing, hence assertions exclude these keys from json
   private def removeDynamicKeys(json: JsValue) = JsObject(json.as[JsObject].value -- Seq("eventId", "eventTime"))
 
@@ -84,4 +109,6 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
     ("source", eventKey.source.prefix),
     ("eventName", eventKey.eventName.name)
   )
+
+  private def eventToSanitizedJson(event: Event) = removeDynamicKeys(JsonSupport.writeEvent(event))
 }
