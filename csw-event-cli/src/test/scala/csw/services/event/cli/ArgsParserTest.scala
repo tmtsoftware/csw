@@ -27,19 +27,21 @@ class ArgsParserTest extends FunSuite with Matchers {
     silentParse(args) shouldBe None
   }
 
+  // DEOPSCSW-364: [Event Cli] Inspect command
   test("parse inspect command without any options") {
     val args = Array("inspect")
     silentParse(args) shouldBe None
   }
 
-  test("parse get command without any options") {
-    val args = Array("get")
-    silentParse(args) shouldBe None
-  }
-
+  // DEOPSCSW-364: [Event Cli] Inspect command
   test("parse inspect command with only mandatory options") {
     val args = Array("inspect", "-e", "a.b.c,x.y.z")
     silentParse(args) shouldBe Some(Options("inspect", eventKeys = eventKeys))
+  }
+
+  test("parse get command without any options") {
+    val args = Array("get")
+    silentParse(args) shouldBe None
   }
 
   test("parse get with only mandatory options") {
@@ -67,11 +69,13 @@ class ArgsParserTest extends FunSuite with Matchers {
     )
   }
 
+  // DEOPSCSW-432: [Event Cli] Publish command
   test("parse publish when input data file does not exist") {
     val args = Array("publish", "-e", "a.b.c", "--data", "./observe_event.json")
     silentParse(args) shouldBe None
   }
 
+  // DEOPSCSW-432: [Event Cli] Publish command
   test("parse publish with mandatory fields when input data file exist") {
     val observeEventJson = File.createTempFile("observe_event", "json")
     val args             = Array("publish", "--data", observeEventJson.getAbsolutePath)
@@ -82,6 +86,7 @@ class ArgsParserTest extends FunSuite with Matchers {
     )
   }
 
+  // DEOPSCSW-432: [Event Cli] Publish command
   test("parse publish with all fields when input data file exist") {
     val observeEventJson = File.createTempFile("observe_event", "json")
     val args             = Array("publish", "-e", "a.b.c", "--data", observeEventJson.getAbsolutePath, "-i", "20", "--period", "10")
@@ -97,5 +102,4 @@ class ArgsParserTest extends FunSuite with Matchers {
       )
     )
   }
-
 }

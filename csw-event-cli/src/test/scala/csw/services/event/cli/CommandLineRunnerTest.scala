@@ -17,6 +17,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
 
   import cliWiring._
 
+  // DEOPSCSW-364: [Event Cli] Inspect command
   test("should able to inspect event/events containing multiple parameters including recursive structs") {
 
     commandLineRunner.inspect(argsParser.parse(Seq("inspect", "-e", s"${event1.eventKey}")).get).await
@@ -45,6 +46,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
     events shouldEqual Set(event1, event2)
   }
 
+  // DEOPSCSW-432: [Event Cli] Publish command
   test("should able to publish event without event key provided") {
     val path              = getClass.getResource("/observe_event.json").getPath
     val expectedEventJson = Json.parse(Source.fromResource("observe_event.json").mkString)
@@ -61,6 +63,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
     }
   }
 
+  // DEOPSCSW-432: [Event Cli] Publish command
   test("should able to publish event when event key and event json file provided") {
     val path      = getClass.getResource("/observe_event.json").getPath
     val eventJson = Json.parse(Source.fromResource("observe_event.json").mkString)
@@ -78,6 +81,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
     }
   }
 
+  // DEOPSCSW-432: [Event Cli] Publish command
   test("should able to publish event with interval") {
     val queue             = new mutable.Queue[JsObject]()
     val eventKey          = EventKey("wfos.blue.filter.wheel")
@@ -87,14 +91,15 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
 
     val subscriber = Await.result(eventService.defaultSubscriber, 5.seconds)
     subscriber.subscribe(Set(eventKey)).to(Sink.foreach[Event](e ⇒ queue.enqueue(eventToSanitizedJson(e)))).run()
+    Thread.sleep(500)
 
-    // publish same event every 300 millis for 2 seconds, which results into publishing 6 events
+    // publish same event every 300 millis for 2 seconds and starts with 0th sec, which results into publishing 7 events
     commandLineRunner
       .publish(argsParser.parse(Seq("publish", "-e", s"${eventKey.key}", "--data", path, "-i", "300", "-p", "2")).get)
       .await
 
-    // invalid event + 6 events published in previous step
-    eventually(queue.size shouldBe 7)
+    // invalid event + 7 events published in previous step
+    eventually(queue.size shouldBe 8)
     queue should contain allElementsOf Seq(eventToSanitizedJson(Event.invalidEvent(eventKey))) ++ (1 to 5).map(
       _ ⇒ expectedEventJson
     )
