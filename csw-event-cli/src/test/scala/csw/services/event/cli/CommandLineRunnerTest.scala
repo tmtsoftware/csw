@@ -84,7 +84,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
   // DEOPSCSW-432: [Event Cli] Publish command
   test("should able to publish event with interval") {
     val queue             = new mutable.Queue[JsObject]()
-    val eventKey          = EventKey("wfos.blue.filter.wheel")
+    val eventKey          = EventKey("tcs.mobie.blue.filter")
     val path              = getClass.getResource("/observe_event.json").getPath
     val eventJson         = Json.parse(Source.fromResource("observe_event.json").mkString)
     val expectedEventJson = removeDynamicKeys(addEventIdAndName(eventJson, eventKey))
