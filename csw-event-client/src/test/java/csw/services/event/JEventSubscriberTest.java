@@ -241,7 +241,7 @@ public class JEventSubscriberTest extends TestNGSuite {
     // DEOPSCSW-420: Implement Pattern based subscription
     // Pattern subscription doesn't work with embedded kafka hence not running it with the suite
     @Test(dataProvider = "redis-provider")
-    public void should_be_able_to_subscribe_an_event_with_pattern(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
+    public void should_be_able_to_subscribe_an_event_with_pattern_from_different_subsystem(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
         Event testEvent1 = Utils.makeEventWithPrefix(1, new Prefix("test.prefix"));
         Event testEvent2 = Utils.makeEventWithPrefix(2, new Prefix("test.prefix"));
         Event tcsEvent1 = Utils.makeEventWithPrefix(1, new Prefix("tcs.prefix"));
@@ -262,6 +262,55 @@ public class JEventSubscriberTest extends TestNGSuite {
         probe.expectNoMessage(Duration.ofSeconds(2));
 
         subscription.unsubscribe().get(10, TimeUnit.SECONDS);
+    }
+
+    // DEOPSCSW-420: Implement Pattern based subscription
+    // Pattern subscription doesn't work with embedded kafka hence not running it with the suite
+    @Test(dataProvider = "redis-provider")
+    public void should_be_able_to_subscribe_an_event_with_pattern_from_same_subsystem(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
+        Event testEvent1 = Utils.makeEventForKeyName(new EventName("movement.linear"),1);
+        Event testEvent2 = Utils.makeEventForKeyName(new EventName("movement.angular"),2);
+        Event testEvent3 = Utils.makeEventForKeyName(new EventName("temperature"),3);
+        Event testEvent4 = Utils.makeEventForKeyName(new EventName("move"),3);
+        Event testEvent5 = Utils.makeEventForKeyName(new EventName("cove"),3);
+
+        TestInbox<Event> inbox = TestInbox.create();
+        TestInbox<Event> inbox2 = TestInbox.create();
+        TestInbox<Event> inbox3 = TestInbox.create();
+
+        String eventPattern  = "*.movement.*";
+        String eventPattern2 = "*.move*";
+        String eventPattern3 = "*.?ove*";
+
+        // pattern is * for redis
+        IEventSubscription subscription = baseProperties.jSubscriber().pSubscribe(JSubsystem.TEST, baseProperties.eventPattern(), event -> inbox.getRef().tell(event));
+        IEventSubscription subscription2 = baseProperties.jSubscriber().pSubscribe(JSubsystem.TEST, baseProperties.eventPattern(), event -> inbox2.getRef().tell(event));
+        IEventSubscription subscription3 = baseProperties.jSubscriber().pSubscribe(JSubsystem.TEST, baseProperties.eventPattern(), event -> inbox3.getRef().tell(event));
+        subscription.ready().get(10, TimeUnit.SECONDS);
+        subscription2.ready().get(10, TimeUnit.SECONDS);
+        subscription3.ready().get(10, TimeUnit.SECONDS);
+
+        Thread.sleep(500);
+
+        baseProperties.jPublisher().publish(testEvent1).get(10, TimeUnit.SECONDS);
+        baseProperties.jPublisher().publish(testEvent2).get(10, TimeUnit.SECONDS);
+        baseProperties.jPublisher().publish(testEvent3).get(10, TimeUnit.SECONDS);
+        baseProperties.jPublisher().publish(testEvent4).get(10, TimeUnit.SECONDS);
+        baseProperties.jPublisher().publish(testEvent5).get(10, TimeUnit.SECONDS);
+
+        Thread.sleep(1000);
+
+        List<Event> receivedEvents = inbox.getAllReceived();
+        List<Event> receivedEvents2 = inbox2.getAllReceived();
+        List<Event> receivedEvents3 = inbox3.getAllReceived();
+
+        Assert.assertTrue(receivedEvents.containsAll(Arrays.asList(testEvent1, testEvent2)));
+        Assert.assertTrue(receivedEvents.containsAll(Arrays.asList(testEvent1, testEvent2, testEvent4)));
+        Assert.assertTrue(receivedEvents.containsAll(Arrays.asList(testEvent1, testEvent2, testEvent4, testEvent5)));
+
+        subscription.unsubscribe().get(10, TimeUnit.SECONDS);
+        subscription2.unsubscribe().get(10, TimeUnit.SECONDS);
+        subscription3.unsubscribe().get(10, TimeUnit.SECONDS);
     }
 
     @Test(dataProvider = "event-service-provider")

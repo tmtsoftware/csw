@@ -245,7 +245,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
   // DEOPSCSW-420: Implement Pattern based subscription
   // Pattern subscription doesn't work with embedded kafka hence not running it with the suite
   @Test(dataProvider = "redis-provider")
-  def should_be_able_to_subscribe_an_event_with_pattern(redisProps: RedisTestProps): Unit = {
+  def should_be_able_to_subscribe_an_event_with_pattern_from_different_subsystem(redisProps: RedisTestProps): Unit = {
     import redisProps._
 
     val testEvent1 = makeEventWithPrefix(1, Prefix("test.prefix"))
@@ -268,6 +268,57 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     testProbe.expectNoMessage(2.seconds)
 
     subscription.unsubscribe().await
+  }
+
+  // DEOPSCSW-420: Implement Pattern based subscription
+  // Pattern subscription doesn't work with embedded kafka hence not running it with the suite
+  @Test(dataProvider = "redis-provider")
+  def should_be_able_to_subscribe_an_event_with_pattern_from_same_subsystem(redisProps: RedisTestProps): Unit = {
+    import redisProps._
+
+    val testEvent1 = makeEventForKeyName(EventName("movement.linear"), 1)
+    val testEvent2 = makeEventForKeyName(EventName("movement.angular"), 2)
+    val testEvent3 = makeEventForKeyName(EventName("temperature"), 3)
+    val testEvent4 = makeEventForKeyName(EventName("move"), 4)
+    val testEvent5 = makeEventForKeyName(EventName("cove"), 5)
+
+    val inbox  = TestInbox[Event]()
+    val inbox2 = TestInbox[Event]()
+    val inbox3 = TestInbox[Event]()
+
+    val eventPattern  = "*.movement.*"
+    val eventPattern2 = "*.move*"
+    val eventPattern3 = "*.?ove*"
+
+    val subscription  = subscriber.pSubscribeCallback(Subsystem.TEST, eventPattern, inbox.ref ! _)
+    val subscription2 = subscriber.pSubscribeCallback(Subsystem.TEST, eventPattern2, inbox2.ref ! _)
+    val subscription3 = subscriber.pSubscribeCallback(Subsystem.TEST, eventPattern3, inbox3.ref ! _)
+
+    subscription.ready().await
+    subscription2.ready().await
+    subscription3.ready().await
+
+    Thread.sleep(500)
+
+    publisher.publish(testEvent1).await
+    publisher.publish(testEvent2).await
+    publisher.publish(testEvent3).await
+    publisher.publish(testEvent4).await
+    publisher.publish(testEvent5).await
+
+    Thread.sleep(1000)
+
+    val receivedEvents  = inbox.receiveAll()
+    val receivedEvents2 = inbox2.receiveAll()
+    val receivedEvents3 = inbox3.receiveAll()
+
+    receivedEvents should contain only (testEvent1, testEvent2)
+    receivedEvents2 should contain only (testEvent1, testEvent2, testEvent4)
+    receivedEvents3 should contain only (testEvent1, testEvent2, testEvent4, testEvent5)
+
+    subscription.unsubscribe().await
+    subscription2.unsubscribe().await
+    subscription3.unsubscribe().await
   }
 
   @Test(dataProvider = "event-service-provider")

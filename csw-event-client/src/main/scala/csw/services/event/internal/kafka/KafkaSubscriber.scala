@@ -9,6 +9,7 @@ import csw.messages.events._
 import csw.messages.params.models.Subsystem
 import csw.services.event.internal.commons.EventSubscriberUtil
 import csw.services.event.scaladsl.{EventSubscriber, EventSubscription, SubscriptionMode}
+import csw.services.event.utils.Utils
 import csw_protobuf.events.PbEvent
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.common.TopicPartition
@@ -90,7 +91,7 @@ class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(
   ): EventSubscription = subscribeCallback(eventKeys, eventSubscriberUtil.actorCallback(actorRef), every, mode)
 
   override def pSubscribe(subsystem: Subsystem, pattern: String): Source[Event, EventSubscription] = {
-    val keyPattern   = s"${subsystem.entryName}.*$pattern"
+    val keyPattern   = s"${subsystem.entryName}.*${Utils.globToRegex(pattern)}"
     val subscription = Subscriptions.topicPattern(keyPattern)
     getEventStream(subscription).mapMaterializedValue(eventSubscription)
   }
