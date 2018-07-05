@@ -83,8 +83,7 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
   }
 
   def get(options: Options): Future[Unit] = async {
-    val transformer = new EventJsonTransformer(printLine, options)
-    val events      = await(getEvents(options.eventsMap.keys.toSeq))
+    val events = await(getEvents(options.eventsMap.keys.toSeq))
 
     events.foreach { event ⇒
       val paths = options.eventsMap(event.eventKey).toList
@@ -99,7 +98,7 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
 
         case _ if options.isJson ⇒
           val eventJson = PlayJson.transform(JsonSupport.writeEvent(event), upickle.default.reader[Js.Obj])
-          transformer.transformInPlace(eventJson, paths)
+          EventJsonTransformer.transformInPlace(eventJson, paths)
           printLine(write(eventJson, 4))
       }
     }
