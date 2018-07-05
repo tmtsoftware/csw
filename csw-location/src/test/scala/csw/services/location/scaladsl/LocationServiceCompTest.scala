@@ -53,7 +53,7 @@ class LocationServiceCompTest(mode: String)
     locationService.unregisterAll().await
 
   override protected def afterAll(): Unit = {
-    Await.ready(locationService.shutdown(TestFinishedReason), 5.seconds)
+    if (mode.equals("cluster")) Await.result(locationService.shutdown(TestFinishedReason), 5.seconds)
     actorSystem.terminate().await
   }
 

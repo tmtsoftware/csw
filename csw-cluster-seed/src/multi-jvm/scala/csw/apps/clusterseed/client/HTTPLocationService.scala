@@ -1,6 +1,7 @@
 package csw.apps.clusterseed.client
 
 import csw.apps.clusterseed.internal.AdminWiring
+import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import org.scalatest.{BeforeAndAfterAll, FunSuiteLike}
 
@@ -17,7 +18,7 @@ trait HTTPLocationService extends FunSuiteLike with BeforeAndAfterAll {
   }
 
   override def afterAll(): Unit = {
-    wiring.map(_.actorSystem.terminate().await)
+    wiring.map(_.actorRuntime.shutdown(TestFinishedReason).await)
     super.afterAll()
   }
 }
