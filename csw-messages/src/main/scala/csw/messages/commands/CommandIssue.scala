@@ -1,8 +1,5 @@
 package csw.messages.commands
 
-import ai.x.play.json.Jsonx
-import play.api.libs.json.Format
-
 /**
  * Describes a command issue with appropriate reason for validation failure
  */
@@ -140,33 +137,4 @@ object CommandIssue {
    */
   final case class OtherIssue(reason: String) extends CommandIssue
 
-  implicit lazy val jsonFormatMissingKeyIssue: Format[MissingKeyIssue]   = Jsonx.formatCaseClass[MissingKeyIssue]
-  implicit lazy val jsonFormatWrongPrefixIssue: Format[WrongPrefixIssue] = Jsonx.formatCaseClass[WrongPrefixIssue]
-  implicit lazy val jsonFormatWrongUnitsIssue: Format[WrongUnitsIssue]   = Jsonx.formatCaseClass[WrongUnitsIssue]
-  implicit lazy val jsonFormatWrongNumberOfParametersIssue: Format[WrongNumberOfParametersIssue] =
-    Jsonx.formatCaseClass[WrongNumberOfParametersIssue]
-  implicit lazy val jsonFormatWrongParameterTypeIssue: Format[WrongParameterTypeIssue] =
-    Jsonx.formatCaseClass[WrongParameterTypeIssue]
-  implicit lazy val jsonFormatAssemblyBusyIssue: Format[AssemblyBusyIssue] = Jsonx.formatCaseClass[AssemblyBusyIssue]
-  implicit lazy val jsonFormatUnresolvedLocationsIssue: Format[UnresolvedLocationsIssue] =
-    Jsonx.formatCaseClass[UnresolvedLocationsIssue]
-  implicit lazy val jsonFormatParameterValueOutOfRangeIssue: Format[ParameterValueOutOfRangeIssue] =
-    Jsonx.formatCaseClass[ParameterValueOutOfRangeIssue]
-  implicit lazy val jsonFormatWrongInternalStateIssue: Format[WrongInternalStateIssue] =
-    Jsonx.formatCaseClass[WrongInternalStateIssue]
-  implicit lazy val jsonFormatUnsupportedCommandInStateIssue: Format[UnsupportedCommandInStateIssue] =
-    Jsonx.formatCaseClass[UnsupportedCommandInStateIssue]
-  implicit lazy val jsonFormatUnsupportedCommandIssue: Format[UnsupportedCommandIssue] =
-    Jsonx.formatCaseClass[UnsupportedCommandIssue]
-  implicit lazy val jsonFormatRequiredServiceUnavailableIssue: Format[RequiredServiceUnavailableIssue] =
-    Jsonx.formatCaseClass[RequiredServiceUnavailableIssue]
-  implicit lazy val jsonFormatRequiredHCDUnavailableIssue: Format[RequiredHCDUnavailableIssue] =
-    Jsonx.formatCaseClass[RequiredHCDUnavailableIssue]
-  implicit lazy val jsonFormatRequiredAssemblyUnavailableIssue: Format[RequiredAssemblyUnavailableIssue] =
-    Jsonx.formatCaseClass[RequiredAssemblyUnavailableIssue]
-  implicit lazy val jsonFormatRequiredSequencerUnavailableIssue: Format[RequiredSequencerUnavailableIssue] =
-    Jsonx.formatCaseClass[RequiredSequencerUnavailableIssue]
-  implicit lazy val jsonFormatComponentLockedIssue: Format[ComponentLockedIssue] = Jsonx.formatCaseClass[ComponentLockedIssue]
-  implicit lazy val jsonFormatOtherIssue: Format[OtherIssue]                     = Jsonx.formatCaseClass[OtherIssue]
-  implicit lazy val jsonFormat: Format[CommandIssue]                             = Jsonx.formatSealed[CommandIssue]
 }
