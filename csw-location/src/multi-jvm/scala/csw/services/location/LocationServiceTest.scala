@@ -1,14 +1,13 @@
 package csw.services.location
 
-import akka.actor.ActorSystem
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location._
-import csw.services.location.commons.TestRegistrationFactory
 import csw.services.location.commons.TestFutureExtension.RichFuture
+import csw.services.location.commons.TestRegistrationFactory
 import csw.services.location.helpers.{LSNodeSpec, OneMemberAndSeed}
 import org.scalatest.BeforeAndAfterEach
 
@@ -26,17 +25,10 @@ class LocationServiceTest(ignore: Int, mode: String)
   import config._
   import cswCluster.mat
 
-  val assemblyActorSystem = ActorSystem("assembly-actor-system")
-
   val RegistrationFactory = new TestRegistrationFactory
 
   override protected def afterEach(): Unit =
     Await.result(locationService.unregisterAll(), 10.seconds)
-
-  override def afterAll(): Unit = {
-    super.afterAll()
-    assemblyActorSystem.terminate()
-  }
 
   test("ensure that a component registered by one node is resolved and listed on all the nodes") {
     val tcpPort         = 446
