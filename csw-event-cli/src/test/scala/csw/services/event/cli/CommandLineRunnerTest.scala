@@ -21,17 +21,17 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
   test("should able to inspect event/events containing multiple parameters including recursive structs") {
 
     commandLineRunner.inspect(argsParser.parse(Seq("inspect", "-e", s"${event1.eventKey}")).get).await
-    logBuffer.filterNot(_.startsWith("==")).toSet shouldEqual expectedOut1
+    logBuffer.filterNot(_.startsWith("==")).toList shouldEqual expectedOut1
 
     logBuffer.clear()
 
     commandLineRunner.inspect(argsParser.parse(Seq("inspect", "--events", s"${event2.eventKey}")).get).await
-    logBuffer.filterNot(_.startsWith("==")).toSet shouldEqual expectedOut2
+    logBuffer.filterNot(_.startsWith("==")).toList shouldEqual expectedOut2
 
     logBuffer.clear()
 
     commandLineRunner.inspect(argsParser.parse(Seq("inspect", "-e", s"${event1.eventKey},${event2.eventKey}")).get).await
-    logBuffer.filterNot(_.startsWith("==")).toSet shouldEqual (expectedOut1 ++ expectedOut2)
+    logBuffer.filterNot(_.startsWith("==")).toList shouldEqual (expectedOut1 ++ expectedOut2)
   }
 
   test("should able to get entire event/events in json format") {

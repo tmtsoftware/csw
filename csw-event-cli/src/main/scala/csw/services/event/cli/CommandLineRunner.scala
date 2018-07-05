@@ -25,53 +25,92 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
 
   import actorRuntime._
 
+  private val footer = "========================================================================="
+
   def inspect(options: Options): Future[Unit] = async {
 
     val events = await(getEvents(options.eventKeys))
     events.foreach { event ⇒
-      val eventKey = s"${event.eventKey.source.prefix}.${event.eventKey.eventName}"
-      val params   = event.paramSet
-      if (isInvalid(event)) printLine(s"$eventKey [ERROR] No events published for this key.")
-      else traverse(eventKey, None, params).foreach(printLine)
-      printLine("=========================================================================")
+      printHeader(event, options)
+      if (isInvalid(event)) printForInvalidKey(event.eventKey)
+      else traverse(options, None, event.paramSet).sorted.foreach(printLine)
+      printLine(footer)
     }
   }
+
+  private def printForInvalidKey(eventKey: EventKey): Unit =
+    printLine(s"$eventKey [ERROR] No events published for this key.")
 
   private def makeCurrentPath(param: Parameter[_], parentKey: Option[String]) =
     if (parentKey.isDefined) s"${parentKey.get}/${param.keyName}"
     else param.keyName
 
-  private def traverse(eventKey: String, parentKey: Option[String], params: Set[Parameter[_]]): List[String] =
+  private def traverse(
+      options: Options,
+      parentKey: Option[String],
+      params: Set[Parameter[_]],
+      paths: List[String] = Nil
+  ): List[String] =
     params.flatMap { param ⇒
       val currentPath = makeCurrentPath(param, parentKey)
-      val pathInfo    = s"$eventKey $currentPath = ${param.keyType}[${param.units}]"
+
+      val maybePathInfo = {
+        if (paths.isEmpty || paths.contains(currentPath)) {
+          //|| paths.exists(path => path.startsWith(s"$currentPath/")))) {
+          Some(formatOneline(options, param, currentPath))
+        } else None
+      }
 
       val innerPathInfos = param.keyType match {
-        case StructKey ⇒ traverse(eventKey, Some(currentPath), param.values.flatMap(_.asInstanceOf[Struct].paramSet).toSet)
+        case StructKey ⇒ traverse(options, Some(currentPath), param.values.flatMap(_.asInstanceOf[Struct].paramSet).toSet, paths)
         case _         ⇒ Nil
       }
-      pathInfo :: innerPathInfos
+
+      maybePathInfo match {
+        case Some(pathInfo) ⇒ pathInfo :: innerPathInfos
+        case None           ⇒ innerPathInfos
+      }
+
     }.toList
+
+  private def formatOneline(options: Options, param: Parameter[_], currentPath: String) = {
+    if (options.cmd == "get") {
+      var values = s"$currentPath = ${param.values.mkString("[", ",", "]")}"
+      if (options.printUnits) values += s" [${param.units}]"
+      values
+    } else s"$currentPath = ${param.keyType}[${param.units}]"
+
+  }
 
   def get(options: Options): Future[Unit] = async {
     val transformer = new EventJsonTransformer(printLine, options)
+    val events      = await(getEvents(options.eventsMap.keys.toSeq))
 
-    val events = await(getEvents(options.eventsMap.keys.toSeq))
-    events.foreach(e ⇒ {
-      val eventJson = PlayJson.transform(JsonSupport.writeEvent(e), upickle.default.reader[Js.Obj])
-      val paths     = options.eventsMap(e.eventKey).toList
-      if (options.isOneline) printHeader(e.eventKey, eventJson, options)
-      transformer.transformInPlace(eventJson, paths)
-      if (options.isJson) printLine(write(eventJson, 4))
+    events.foreach { event ⇒
+      val paths = options.eventsMap(event.eventKey).toList
+      event match {
+        case _ if isInvalid(event) ⇒ printForInvalidKey(event.eventKey)
 
-    })
+        case _ if options.isOneline ⇒
+          printHeader(event, options)
+          traverse(options, None, event.paramSet, paths).sorted.foreach(printLine)
+          printLine(footer)
+          printLine("")
+
+        case _ if options.isJson ⇒
+          val eventJson = PlayJson.transform(JsonSupport.writeEvent(event), upickle.default.reader[Js.Obj])
+          transformer.transformInPlace(eventJson, paths)
+          printLine(write(eventJson, 4))
+      }
+    }
   }
 
-  private def printHeader(eventKey: EventKey, eventJson: Js.Obj, options: Options): Unit = {
-    val timestamp = if (options.printTimestamp) eventJson("eventTime").str else ""
-    val id        = if (options.printId) eventJson("eventId").str else ""
-    val header    = List(timestamp, id, eventKey.key).filter(_.nonEmpty).mkString(" ")
+  private def printHeader(event: Event, options: Options): Unit = {
+    val timestamp = if (options.printTimestamp) event.eventTime.time.toString else ""
+    val id        = if (options.printId) event.eventId.id else ""
+    val header    = List(timestamp, id, event.eventKey.key).filter(_.nonEmpty).mkString(" ")
     printLine(header)
+    printLine("")
   }
 
   def publish(options: Options): Future[Done] = async {

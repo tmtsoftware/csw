@@ -8,19 +8,28 @@ class GetOnelineTest extends FunSuite with Matchers with SeedData {
 
   test("should able to get entire event/events in oneline format") {
 
-    val options = Options(eventsMap = Map(event1.eventKey -> Set("epoch"), event2.eventKey -> Set("struct-2/struct-1/ra")))
+    val options =
+      Options(cmd = "get", eventsMap = Map(event1.eventKey -> Set("epoch"), event2.eventKey -> Set("struct-2/struct-1/ra")))
 
     commandLineRunner.get(options).await
 
     val expectedLogs =
-      List("wfos.prog.cloudcover.move", "epoch = [1950]", "wfos.prog.filter.stop", "struct-2/struct-1/ra = [\"12:13:14.1\"]")
+      List("wfos.prog.cloudcover.move",
+           "",
+           "epoch = [1950.0]",
+           "",
+           "wfos.prog.filter.stop",
+           "",
+           "struct-2/struct-1/ra = [12:13:14.1]",
+           "")
 
-    logBuffer shouldEqual expectedLogs
+    logBuffer.filterNot(_.startsWith("==")).toList shouldEqual expectedLogs
   }
 
   test("should be able to log timestamp in oneline format") {
 
     val options = Options(
+      cmd = "get",
       eventsMap = Map(event1.eventKey -> Set("epoch"), event2.eventKey -> Set("struct-2/struct-1/ra")),
       printTimestamp = true
     )
@@ -29,16 +38,22 @@ class GetOnelineTest extends FunSuite with Matchers with SeedData {
 
     val expectedLogs = List(
       s"${event1.eventTime.time} ${event1.eventKey.key}",
-      "epoch = [1950]",
+      "",
+      "epoch = [1950.0]",
+      "",
       s"${event2.eventTime.time} ${event2.eventKey.key}",
-      "struct-2/struct-1/ra = [\"12:13:14.1\"]"
+      "",
+      "struct-2/struct-1/ra = [12:13:14.1]",
+      ""
     )
 
-    logBuffer shouldEqual expectedLogs
+    logBuffer.filterNot(_.startsWith("==")).toList shouldEqual expectedLogs
   }
+
   test("should be able to log id per event in oneline format") {
     val options =
       Options(
+        cmd = "get",
         eventsMap = Map(event1.eventKey -> Set("epoch"), event2.eventKey -> Set("struct-2/struct-1/ra")),
         printId = true
       )
@@ -46,11 +61,15 @@ class GetOnelineTest extends FunSuite with Matchers with SeedData {
 
     val expectedLogs = List(
       s"${event1.eventId.id} ${event1.eventKey.key}",
-      "epoch = [1950]",
+      "",
+      "epoch = [1950.0]",
+      "",
       s"${event2.eventId.id} ${event2.eventKey.key}",
-      "struct-2/struct-1/ra = [\"12:13:14.1\"]"
+      "",
+      "struct-2/struct-1/ra = [12:13:14.1]",
+      ""
     )
 
-    logBuffer shouldEqual expectedLogs
+    logBuffer.filterNot(_.startsWith("==")).toList shouldEqual expectedLogs
   }
 }
