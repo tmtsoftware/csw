@@ -106,7 +106,7 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
       case Some(eventKey) =>
         updatedJson ++ Json.obj(
           ("source", eventKey.source.prefix),
-          ("eventName", Json.obj(("name", eventKey.eventName.name)))
+          ("eventName", eventKey.eventName.name)
         )
       case None => updatedJson
     }

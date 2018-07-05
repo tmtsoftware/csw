@@ -82,6 +82,6 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
   // else adds new entry
   private def addEventIdAndName(json: JsValue, eventKey: EventKey) = json.as[JsObject] ++ Json.obj(
     ("source", eventKey.source.prefix),
-    ("eventName", Json.obj(("name", eventKey.eventName.name)))
+    ("eventName", eventKey.eventName.name)
   )
 }

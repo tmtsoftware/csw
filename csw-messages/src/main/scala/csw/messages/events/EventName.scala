@@ -1,6 +1,6 @@
 package csw.messages.events
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json._
 
 /**
  * A wrapper class representing the name of an Event
@@ -10,5 +10,8 @@ case class EventName(name: String) {
 }
 
 object EventName {
-  private[messages] implicit val format: OFormat[EventName] = Json.format[EventName]
+  implicit val format: Format[EventName] = new Format[EventName] {
+    override def writes(obj: EventName): JsValue           = JsString(obj.name)
+    override def reads(json: JsValue): JsResult[EventName] = JsSuccess(EventName(json.as[String]))
+  }
 }
