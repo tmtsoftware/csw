@@ -54,22 +54,14 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
     params.flatMap { param ⇒
       val currentPath = makeCurrentPath(param, parentKey)
 
-      val maybePathInfo = {
-        if (paths.isEmpty || paths.contains(currentPath)) {
-          //|| paths.exists(path => path.startsWith(s"$currentPath/")))) {
-          Some(formatOneline(options, param, currentPath))
-        } else None
-      }
-
       val innerPathInfos = param.keyType match {
         case StructKey ⇒ traverse(options, Some(currentPath), param.values.flatMap(_.asInstanceOf[Struct].paramSet).toSet, paths)
         case _         ⇒ Nil
       }
 
-      maybePathInfo match {
-        case Some(pathInfo) ⇒ pathInfo :: innerPathInfos
-        case None           ⇒ innerPathInfos
-      }
+      if (paths.isEmpty || paths.contains(currentPath))
+        formatOneline(options, param, currentPath) :: innerPathInfos
+      else innerPathInfos
 
     }.toList
 
@@ -82,25 +74,31 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
 
   }
 
+  private def processGetOneline(event: Event, options: Options): Unit = {
+
+    if (isInvalid(event)) printForInvalidKey(event.eventKey)
+
+    val paths = options.eventsMap(event.eventKey).toList
+    printHeader(event, options)
+    traverse(options, None, event.paramSet, paths).sorted.foreach(printLine)
+    printLine(footer)
+    printLine("")
+  }
+
+  private def processGetJson(event: Event, options: Options): Unit = {
+    if (isInvalid(event)) printForInvalidKey(event.eventKey)
+
+    val paths     = options.eventsMap(event.eventKey).toList
+    val eventJson = PlayJson.transform(JsonSupport.writeEvent(event), upickle.default.reader[Js.Obj])
+    EventJsonTransformer.transformInPlace(eventJson, paths)
+    printLine(write(eventJson, 4))
+  }
+
   def get(options: Options): Future[Unit] = async {
     val events = await(getEvents(options.eventsMap.keys.toSeq))
-
     events.foreach { event ⇒
-      val paths = options.eventsMap(event.eventKey).toList
-      event match {
-        case _ if isInvalid(event) ⇒ printForInvalidKey(event.eventKey)
-
-        case _ if options.isOneline ⇒
-          printHeader(event, options)
-          traverse(options, None, event.paramSet, paths).sorted.foreach(printLine)
-          printLine(footer)
-          printLine("")
-
-        case _ if options.isJson ⇒
-          val eventJson = PlayJson.transform(JsonSupport.writeEvent(event), upickle.default.reader[Js.Obj])
-          EventJsonTransformer.transformInPlace(eventJson, paths)
-          printLine(write(eventJson, 4))
-      }
+      if (options.isOneline) processGetOneline(event, options)
+      if (options.isJson) processGetJson(event, options)
     }
   }
 
