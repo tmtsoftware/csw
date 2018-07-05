@@ -27,38 +27,31 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
 
   def inspect(options: Options): Future[Unit] = async {
 
-    def inspect0(eventKey: String, parentKey: Option[String], params: Set[Parameter[_]]): Unit = {
-      def keyName(param: Parameter[_]) =
-        if (parentKey.isDefined) s"${parentKey.get}/${param.keyName}"
-        else param.keyName
-
-      params.foreach { param ⇒
-        param.keyType match {
-          case StructKey ⇒
-            printLine(s"$eventKey ${keyName(param)} = ${param.keyType}[${param.units}]")
-            inspect0(eventKey, Some(keyName(param)), param.values.flatMap(_.asInstanceOf[Struct].paramSet).toSet)
-          case _ ⇒
-            printLine(s"$eventKey ${keyName(param)} = ${param.keyType}[${param.units}]")
-        }
-      }
-    }
-
     val events = await(getEvents(options.eventKeys))
     events.foreach { event ⇒
       val eventKey = s"${event.eventKey.source.prefix}.${event.eventKey.eventName}"
       val params   = event.paramSet
       if (isInvalid(event)) printLine(s"$eventKey [ERROR] No events published for this key.")
-      else inspect0(eventKey, None, params)
+      else traverse(eventKey, None, params).foreach(printLine)
       printLine("=========================================================================")
     }
   }
 
-  private def printHeader(eventKey: EventKey, eventJson: Js.Obj, options: Options): Unit = {
-    val timestamp = if (options.printTimestamp) eventJson("eventTime").str else ""
-    val id        = if (options.printId) eventJson("eventId").str else ""
-    val header    = List(timestamp, id, eventKey.key).filter(_.nonEmpty).mkString(" ")
-    printLine(header)
-  }
+  private def makeCurrentPath(param: Parameter[_], parentKey: Option[String]) =
+    if (parentKey.isDefined) s"${parentKey.get}/${param.keyName}"
+    else param.keyName
+
+  private def traverse(eventKey: String, parentKey: Option[String], params: Set[Parameter[_]]): List[String] =
+    params.flatMap { param ⇒
+      val currentPath = makeCurrentPath(param, parentKey)
+      val pathInfo    = s"$eventKey $currentPath = ${param.keyType}[${param.units}]"
+
+      val innerPathInfos = param.keyType match {
+        case StructKey ⇒ traverse(eventKey, Some(currentPath), param.values.flatMap(_.asInstanceOf[Struct].paramSet).toSet)
+        case _         ⇒ Nil
+      }
+      pathInfo :: innerPathInfos
+    }.toList
 
   def get(options: Options): Future[Unit] = async {
     val transformer = new EventJsonTransformer(printLine, options)
@@ -72,6 +65,13 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
       if (options.isJson) printLine(write(eventJson, 4))
 
     })
+  }
+
+  private def printHeader(eventKey: EventKey, eventJson: Js.Obj, options: Options): Unit = {
+    val timestamp = if (options.printTimestamp) eventJson("eventTime").str else ""
+    val id        = if (options.printId) eventJson("eventId").str else ""
+    val header    = List(timestamp, id, eventKey.key).filter(_.nonEmpty).mkString(" ")
+    printLine(header)
   }
 
   def publish(options: Options): Future[Done] = async {
