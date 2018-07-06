@@ -35,21 +35,23 @@ trait EventPublisher {
    * stopped after logging appropriately. In all other cases of exception, the stream receives a [[csw.services.event.exceptions.PublishFailure]] exception
    * which wraps the underlying exception. The stream resumes to publish remaining elements in case of this exception.
    *
-   * @param source a [[akka.stream.scaladsl.Source]] of events to be published
+   * @param source a [[akka.stream.scaladsl.Source]] of events to be published. Any resource cleanup or exception handling of the provided source is to be managed by the source
+   *               provider
    * @tparam Mat represents the type of materialized value as defined in the source to be obtained on running the stream
    * @return the materialized value obtained on running the stream
    */
   def publish[Mat](source: Source[Event, Mat]): Mat
 
   /**
-   * Publish from a stream of [[csw.messages.events.Event]], and execute `onError` callback for each event for which publishing failed
+   * Publish from a stream of [[csw.messages.events.Event]], and execute `onError` callback for each event for which publishing failed.
    *
    * At the time of invocation, in case the underlying server is not available, [[csw.services.event.exceptions.EventServerNotAvailable]] exception is thrown and the stream is
    * stopped after logging appropriately. In all other cases of exception, the stream receives a [[csw.services.event.exceptions.PublishFailure]] exception
    * which wraps the underlying exception and also provides the handle to the event which was failed to be published.
    * The provided callback is executed on the failed element and the stream resumes to publish remaining elements.
    *
-   * @param source a [[akka.stream.scaladsl.Source]] of events to be published
+   * @param source  a [[akka.stream.scaladsl.Source]] of events to be published. Any resource cleanup or exception handling of the provided source is to be managed by the source
+   *               provider
    * @param onError a callback to execute for each event for which publishing failed
    * @tparam Mat represents the type of materialized value as defined in the source to be obtained on running the stream
    * @return the materialized value obtained on running the stream

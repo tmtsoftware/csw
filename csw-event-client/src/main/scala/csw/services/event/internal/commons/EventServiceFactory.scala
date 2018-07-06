@@ -43,8 +43,12 @@ abstract class EventServiceFactory {
     new JEventService(eventService)
   }
 
+  /**
+   * Using resuming decider for Event streams to stop the stream in case underlying server is not available and resume
+   * in all other cases of exceptions
+   */
   private def mat()(implicit actorSystem: ActorSystem): Materializer = {
-    val settings = ActorMaterializerSettings(actorSystem).withSupervisionStrategy(Supervision.getResumingDecider)
+    val settings = ActorMaterializerSettings(actorSystem).withSupervisionStrategy(EventStreamSupervisionStrategy.decider)
     ActorMaterializer(settings)
   }
 }
