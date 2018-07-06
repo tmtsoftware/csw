@@ -6,7 +6,9 @@ import akka.stream.scaladsl.Source
 import csw.messages.TMTSerializable
 import csw.messages.commands.CommandResultType.{Intermediate, Negative, Positive}
 import csw.messages.params.models.Id
+import enumeratum._
 
+import scala.collection.immutable
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -140,8 +142,10 @@ object CommandResponse {
  * The nature of CommandResponse as an intermediate response of command execution or a final response which could be
  * positive or negative
  */
-sealed trait CommandResultType
-object CommandResultType {
+sealed trait CommandResultType extends EnumEntry
+object CommandResultType extends Enum[CommandResultType] {
+
+  override def values: immutable.IndexedSeq[CommandResultType] = findValues
 
   /**
    * A CommandResponse of intermediate type
