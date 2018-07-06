@@ -88,10 +88,10 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
   private def processGetJson(event: Event, options: Options): Unit = {
     if (isInvalid(event)) printForInvalidKey(event.eventKey)
 
-    val paths     = options.eventsMap(event.eventKey).toList
-    val eventJson = PlayJson.transform(JsonSupport.writeEvent(event), upickle.default.reader[Js.Obj])
-    EventJsonTransformer.transformInPlace(eventJson, paths)
-    printLine(write(eventJson, 4))
+    val paths                = options.eventsMap(event.eventKey).toList
+    val eventJson            = PlayJson.transform(JsonSupport.writeEvent(event), upickle.default.reader[Js.Obj])
+    val transformedEventJson = EventJsonTransformer.transform(eventJson, paths)
+    printLine(write(transformedEventJson, 4))
   }
 
   def get(options: Options): Future[Unit] = async {

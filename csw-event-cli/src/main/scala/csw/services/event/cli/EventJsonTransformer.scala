@@ -5,8 +5,11 @@ import ujson.Js
 
 object EventJsonTransformer {
 
-  def transformInPlace(eventJson: Js.Obj, paths: List[String]): Unit =
-    transformInPlace0(eventJson, None, paths)
+  def transform(eventJson: Js.Obj, paths: List[String]): Js.Obj = {
+    val eventJsonCopy = Js.Obj(ujson.copy(eventJson).obj)
+    transformInPlace0(eventJsonCopy, None, paths)
+    eventJsonCopy
+  }
 
   private def transformInPlace0(json: Js.Obj, parentPath: Option[String], paths: List[String]): Unit =
     paths match {
