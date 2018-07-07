@@ -41,8 +41,7 @@ class RedisPublisher(redisURI: RedisURI, redisClient: RedisClient)(implicit ec: 
   override def publish(event: Event): Future[Done] =
     async {
       val commands = await(asyncConnectionF)
-      val publishF = commands.publish(event.eventKey, event).toScala
-      await(publishF)
+      await(commands.publish(event.eventKey, event).toScala)
       set(event, commands) // set will run independent of publish
       Done
     } recover {
