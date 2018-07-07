@@ -222,7 +222,6 @@ function parse_cmd_args {
                 enableAllServicesForRunning
             fi
 
-            start_services
             if [[ ${interfaceName} == "" ]] ; then
                 echo "[ERROR] interfaceName is not provided, please provide valid interface name via argument --interfaceName|-i or set interfaceName env variable."
                 exit 1
