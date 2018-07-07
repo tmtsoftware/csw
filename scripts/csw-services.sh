@@ -113,27 +113,48 @@ function random_unused_port {
 }
 
 function start_seed {
-    echo "[SEED] Starting cluster seed on port: [$seed_port] ..."
-    nohup ./csw-cluster-seed --clusterPort ${seed_port} -DclusterSeeds=${seeds} &> ${seedLogFile} &
-    echo $! > ${seedPidFile}
+    local seed_script="csw-cluster-seed"
+
+    if [ -x "$seed_script" ]; then
+        echo "[SEED] Starting cluster seed on port: [$seed_port] ..."
+        nohup ./csw-cluster-seed --clusterPort ${seed_port} -DclusterSeeds=${seeds} &> ${seedLogFile} &
+        echo $! > ${seedPidFile}
+    else
+        echo "[ERROR] $seed_script script does not exist, please make sure that $seed_script resides in same directory as $script_name"
+        exit 1
+    fi
 }
 
 function start_config {
-    echo "[CONFIG] Starting config service on port: [$config_port] ..."
-    nohup ./csw-config-server --port ${config_port} ${initSvnRepo} -DclusterSeeds=${seeds} &> ${configLogFile} &
-    echo $! > ${configPidFile}
+    local config_script="csw-config-server"
+
+    if [ -x "$config_script" ]; then
+        echo "[CONFIG] Starting config service on port: [$config_port] ..."
+        nohup ./csw-config-server --port ${config_port} ${initSvnRepo} -DclusterSeeds=${seeds} &> ${configLogFile} &
+        echo $! > ${configPidFile}
+    else
+        echo "[ERROR] $config_script script does not exist, please make sure that $config_script resides in same directory as $script_name"
+        exit 1
+    fi
 }
 
 function start_event() {
-    if checkIfRedisIsInstalled ; then
-        echo "[EVENT] Starting Event Service on port: [$event_port] ..."
-        nohup redis-server ../conf/master.conf> ${masterLogFile} 2>&1 &
-        echo $! > ${masterPidFile}
-        nohup ./csw-location-agent -DclusterSeeds=${seeds} --name "EventServer" --command "$redisSentinel ../conf/sentinel.conf --port ${event_port}" --port "${event_port}"> ${sentinelLogFile} 2>&1 &
-        echo $! > ${sentinelPidFile}
-        echo ${event_port} > ${sentinelPortFile}
-        echo ${event_master_port} > ${masterPortFile}
+    local location_agent_script="csw-cluster-seed"
+
+    if [ -x "$location_agent_script" ]; then
+        if checkIfRedisIsInstalled ; then
+            echo "[EVENT] Starting Event Service on port: [$event_port] ..."
+            nohup redis-server ../conf/master.conf> ${masterLogFile} 2>&1 &
+            echo $! > ${masterPidFile}
+            nohup ./csw-location-agent -DclusterSeeds=${seeds} --name "EventServer" --command "$redisSentinel ../conf/sentinel.conf --port ${event_port}" --port "${event_port}"> ${sentinelLogFile} 2>&1 &
+            echo $! > ${sentinelPidFile}
+            echo ${event_port} > ${sentinelPortFile}
+            echo ${event_master_port} > ${masterPortFile}
+        else
+            exit 1
+        fi
     else
+        echo "[ERROR] $location_agent_script script does not exist, please make sure that $location_agent_script resides in same directory as $script_name"
         exit 1
     fi
 }
