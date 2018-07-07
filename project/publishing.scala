@@ -1,5 +1,8 @@
+import java.io.File
+
 import sbt.Keys._
 import sbt._
+import sbt.io.Path
 
 object NoPublish extends AutoPlugin {
   override def requires: Plugins = plugins.JvmPlugin
@@ -49,8 +52,21 @@ object DeployApp extends AutoPlugin {
   override def projectSettings: Seq[Setting[_]] =
     SettingsHelper.makeDeploymentSettings(Universal, packageBin in Universal, "zip") ++
     SettingsHelper.makeDeploymentSettings(UniversalDocs, packageBin in UniversalDocs, "zip") ++ Seq(
-      target in Universal := baseDirectory.value.getParentFile / "target" / "universal"
+      target in Universal := baseDirectory.value.getParentFile / "target" / "universal",
+      mappings in Universal := (mappings in Universal).value ++ scriptsAndConfsMapping.value
     )
+
+  private def scriptsAndConfsMapping = Def.task {
+    val scriptsDir             = baseDirectory.value.getParentFile / "scripts"
+    val serviceScript          = scriptsDir / "csw-services.sh"
+    val eventServiceDir        = scriptsDir / "event_service"
+    val eventServiceProdScript = eventServiceDir / "event_service_sentinel_prod.sh"
+    val eventServiceConfs      = Path.allSubpaths(new File(eventServiceDir, "conf"))
+
+    eventServiceConfs.map { case (source, dest) ⇒ (source, s"conf/$dest") }.toSeq :+
+    ((serviceScript, s"bin/${serviceScript.getName}")) :+
+    ((eventServiceProdScript, s"bin/${eventServiceProdScript.getName}"))
+  }
 }
 
 object CswBuildInfo extends AutoPlugin {
