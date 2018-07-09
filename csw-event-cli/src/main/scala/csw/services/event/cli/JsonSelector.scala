@@ -11,16 +11,17 @@ case class JsonSelector(paths: List[List[String]]) {
     def select: ParamSetJson = paths match {
       case Nil ⇒ this
       case _ ⇒
-        val selectedSet = paramSet.filter(_.hasValidPath).map(_.select)
+        val selectedSet = paramSet.filter(_.matchesPartialPath).map(_.select)
         copy(json ++ Json.obj("paramSet" -> selectedSet.map(_.json)))
     }
   }
 
   private case class ParamJson(json: JsObject, parents: List[String]) {
-    def hasValidPath: Boolean = paths.exists(_.startsWith(path))
+    def matchesPartialPath: Boolean      = paths.exists(_.startsWith(path))
+    private def matchesFullPath: Boolean = paths.contains(path)
 
     def select: ParamJson = {
-      val selectedSets     = if (!paths.contains(path)) paramSets.map(_.select) else paramSets
+      val selectedSets     = if (matchesFullPath) paramSets else paramSets.map(_.select)
       val selectedSetsJson = selectedSets.filter(_.paramSet.nonEmpty).map(_.json)
       copy(json ++ Json.obj("values" -> (selectedSetsJson ++ simpleValues)))
     }
