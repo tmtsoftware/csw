@@ -26,6 +26,27 @@ class GetOnelineTest extends FunSuite with Matchers with SeedData {
     logBuffer.filterNot(_.startsWith("==")).toList shouldEqual expectedLogs
   }
 
+  test("should able to get partial struct paths from event in oneline format") {
+
+    val options =
+      Options(cmd = "get", eventsMap = Map(event2.eventKey -> Set("struct-2")))
+
+    commandLineRunner.get(options).await
+
+    val expectedLogs =
+      List(
+        "wfos.prog.filter.stop",
+        "",
+        "struct-2/dec = [32:33:34.4]",
+        "struct-2/ra = [12:13:14.1]",
+        "struct-2/struct-1/dec = [32:33:34.4]",
+        "struct-2/struct-1/ra = [12:13:14.1]",
+        ""
+      )
+
+    logBuffer.filterNot(_.startsWith("==")).toList shouldEqual expectedLogs
+  }
+
   test("should be able to log timestamp in oneline format") {
 
     val options = Options(

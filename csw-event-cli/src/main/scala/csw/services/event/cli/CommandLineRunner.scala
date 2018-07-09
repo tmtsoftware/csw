@@ -51,19 +51,16 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
       params: Set[Parameter[_]],
       paths: List[String] = Nil
   ): List[String] =
-    params.flatMap { param ⇒
+    params.toList.flatMap { param ⇒
       val currentPath = makeCurrentPath(param, parentKey)
 
-      val innerPathInfos = param.keyType match {
+      param.keyType match {
         case StructKey ⇒ traverse(options, Some(currentPath), param.values.flatMap(_.asInstanceOf[Struct].paramSet).toSet, paths)
-        case _         ⇒ Nil
+        case _ if paths.isEmpty || paths.contains(currentPath) || paths.exists(p ⇒ currentPath.startsWith(p)) ⇒
+          List(formatOneline(options, param, currentPath))
+        case _ ⇒ Nil
       }
-
-      if (paths.isEmpty || paths.contains(currentPath))
-        formatOneline(options, param, currentPath) :: innerPathInfos
-      else innerPathInfos
-
-    }.toList
+    }
 
   private def formatOneline(options: Options, param: Parameter[_], currentPath: String) = {
     if (options.cmd == "get") {

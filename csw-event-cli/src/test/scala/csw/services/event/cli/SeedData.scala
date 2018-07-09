@@ -104,7 +104,6 @@ trait SeedData extends HTTPLocationService with BeforeAndAfterEach {
         s"${e1.eventKey.key}",
         "",
         s"${ep.keyName} = ${ep.keyType}[${ep.units}]",
-        s"${sp1.keyName} = ${sp1.keyType}[${sp1.units}]",
         s"${sp1.keyName}/${dp.keyName} = ${dp.keyType}[${dp.units}]",
         s"${sp1.keyName}/${rp.keyName} = ${rp.keyType}[${rp.units}]"
       )
@@ -113,10 +112,8 @@ trait SeedData extends HTTPLocationService with BeforeAndAfterEach {
       List(
         s"${e2.eventKey.key}",
         "",
-        s"${sp2.keyName} = ${sp2.keyType}[${sp2.units}]",
         s"${sp2.keyName}/${dp.keyName} = ${dp.keyType}[${dp.units}]",
         s"${sp2.keyName}/${rp.keyName} = ${rp.keyType}[${rp.units}]",
-        s"${sp2.keyName}/${sp1.keyName} = ${sp1.keyType}[${sp1.units}]",
         s"${sp2.keyName}/${sp1.keyName}/${dp.keyName} = ${dp.keyType}[${dp.units}]",
         s"${sp2.keyName}/${sp1.keyName}/${rp.keyName} = ${rp.keyType}[${rp.units}]",
         s"${tp.keyName} = ${tp.keyType}[${tp.units}]"
