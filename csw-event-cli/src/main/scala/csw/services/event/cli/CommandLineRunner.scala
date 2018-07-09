@@ -34,7 +34,7 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
 
     val (es, f) = subscribeResult
       .toMat(Sink.foreach { event =>
-        val eventJson = PlayJson.transform(JsonSupport.writeEvent(event), upickle.default.reader[Js.Obj])
+        val eventJson = JsonSupport.writeEvent(event).as[JsObject]
         printLine(eventJson)
       })(Keep.both)
       .run()
