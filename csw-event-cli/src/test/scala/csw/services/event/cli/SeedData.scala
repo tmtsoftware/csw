@@ -16,12 +16,12 @@ import csw.services.event.scaladsl.EventPublisher
 import csw.services.location.models.TcpRegistration
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import csw.services.logging.commons.LogAdminActorFactory
-import org.scalatest.BeforeAndAfterEach
+import org.scalatest.{BeforeAndAfterEach, Matchers}
 import redis.embedded.{RedisSentinel, RedisServer}
 
 import scala.collection.mutable
 
-trait SeedData extends HTTPLocationService with BeforeAndAfterEach {
+trait SeedData extends HTTPLocationService with Matchers with BeforeAndAfterEach {
 
   implicit val system: ActorSystem    = ActorSystem("test")
   implicit val mat: ActorMaterializer = ActorMaterializer()
@@ -32,9 +32,13 @@ trait SeedData extends HTTPLocationService with BeforeAndAfterEach {
   val (localHttpClient: LocationService, redisServer: RedisServer, redisSentinel: RedisSentinel) =
     startAndRegisterRedis(sentinelPort = 26379, serverPort = 6379)
 
-  val cliWiring: Wiring = Wiring.make(system, localHttpClient, msg ⇒ logBuffer += msg.toString)
+  private def printLine(msg: Any): Unit = {
+    logBuffer += msg.toString
+  }
 
-  val (event1: SystemEvent, event2: ObserveEvent, expectedOut1: List[String], expectedOut2: List[String]) = seedEvents()
+  val cliWiring: Wiring = Wiring.make(system, localHttpClient, printLine)
+
+  val (event1: SystemEvent, event2: ObserveEvent) = seedEvents()
 
   override protected def afterEach(): Unit = {
     super.afterEach()
@@ -68,7 +72,7 @@ trait SeedData extends HTTPLocationService with BeforeAndAfterEach {
     (localHttpClient, redisServer, redisSentinel)
   }
 
-  def seedEvents(): (SystemEvent, ObserveEvent, List[String], List[String]) = {
+  def seedEvents(): (SystemEvent, ObserveEvent) = {
     val prefix1: Prefix       = Prefix("wfos.prog.cloudcover")
     val prefix2: Prefix       = Prefix("wfos.prog.filter")
     val eventName1: EventName = EventName("move")
@@ -99,26 +103,6 @@ trait SeedData extends HTTPLocationService with BeforeAndAfterEach {
     publisher.publish(e1).await
     publisher.publish(e2).await
 
-    val expOut1 =
-      List(
-        s"${e1.eventKey.key}",
-        "",
-        s"${ep.keyName} = ${ep.keyType}[${ep.units}]",
-        s"${sp1.keyName}/${dp.keyName} = ${dp.keyType}[${dp.units}]",
-        s"${sp1.keyName}/${rp.keyName} = ${rp.keyType}[${rp.units}]"
-      )
-
-    val expOut2 =
-      List(
-        s"${e2.eventKey.key}",
-        "",
-        s"${sp2.keyName}/${dp.keyName} = ${dp.keyType}[${dp.units}]",
-        s"${sp2.keyName}/${rp.keyName} = ${rp.keyType}[${rp.units}]",
-        s"${sp2.keyName}/${sp1.keyName}/${dp.keyName} = ${dp.keyType}[${dp.units}]",
-        s"${sp2.keyName}/${sp1.keyName}/${rp.keyName} = ${rp.keyType}[${rp.units}]",
-        s"${tp.keyName} = ${tp.keyType}[${tp.units}]"
-      )
-
-    (e1, e2, expOut1, expOut2)
+    (e1, e2)
   }
 }

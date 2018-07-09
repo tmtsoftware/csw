@@ -1,0 +1,7 @@
+=========================================================================
+wfos.prog.cloudcover.move
+
+epoch = DoubleKey[NoUnits]
+struct-1/dec = StringKey[NoUnits]
+struct-1/ra = StringKey[NoUnits]
+=========================================================================

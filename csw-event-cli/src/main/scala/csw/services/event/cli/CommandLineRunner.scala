@@ -14,7 +14,6 @@ import csw.services.event.scaladsl.EventService
 import play.api.libs.json.{JsObject, JsValue, Json}
 import ujson.Js
 import ujson.play.PlayJson
-import upickle.default.write
 
 import scala.async.Async.{async, await}
 import scala.concurrent.Future
@@ -25,21 +24,21 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
 
   import actorRuntime._
 
-  private val footer = "========================================================================="
-
   def inspect(options: Options): Future[Unit] = async {
+    val events    = await(getEvents(options.eventKeys))
+    val formatter = OnelineFormatter(options)
 
-    val events = await(getEvents(options.eventKeys))
+    printLine(formatter.eventSeparator)
     events.foreach { event ⇒
-      printHeader(event, options)
-      if (isInvalid(event)) printForInvalidKey(event.eventKey)
-      else traverse(options, None, event.paramSet).sorted.foreach(printLine)
-      printLine(footer)
+      printLine(formatter.header(event))
+      if (isInvalid(event)) printLine(formatter.invalidKey(event.eventKey))
+      else {
+        val onelines = traverse(options, None, event.paramSet)
+        printLine(formatter.format(event, onelines))
+      }
+      printLine(formatter.eventSeparator)
     }
   }
-
-  private def printForInvalidKey(eventKey: EventKey): Unit =
-    printLine(s"$eventKey [ERROR] No events published for this key.")
 
   private def makeCurrentPath(param: Parameter[_], parentKey: Option[String]) =
     if (parentKey.isDefined) s"${parentKey.get}/${param.keyName}"
@@ -50,61 +49,50 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
       parentKey: Option[String],
       params: Set[Parameter[_]],
       paths: List[String] = Nil
-  ): List[String] =
+  ): List[Oneline] =
     params.toList.flatMap { param ⇒
       val currentPath = makeCurrentPath(param, parentKey)
 
       param.keyType match {
         case StructKey ⇒ traverse(options, Some(currentPath), param.values.flatMap(_.asInstanceOf[Struct].paramSet).toSet, paths)
-        case _ if paths.isEmpty || paths.contains(currentPath) || paths.exists(p ⇒ currentPath.startsWith(p)) ⇒
-          List(formatOneline(options, param, currentPath))
+        case _ if paths.isEmpty || paths.contains(currentPath) || paths.exists(p ⇒ currentPath.contains(p)) ⇒
+          List(Oneline(currentPath, param))
         case _ ⇒ Nil
       }
     }
 
-  private def formatOneline(options: Options, param: Parameter[_], currentPath: String) = {
-    if (options.cmd == "get") {
-      var values = s"$currentPath = ${param.values.mkString("[", ",", "]")}"
-      if (options.printUnits) values += s" [${param.units}]"
-      values
-    } else s"$currentPath = ${param.keyType}[${param.units}]"
+  private def processGetOneline(event: Event, paths: List[String], options: Options): Unit = {
+    val formatter = OnelineFormatter(options)
 
+    printLine(formatter.header(event))
+
+    if (isInvalid(event)) printLine(formatter.invalidKey(event.eventKey))
+    val onelines = traverse(options, None, event.paramSet, paths)
+    printLine(formatter.format(event, onelines))
+
+    printLine(formatter.eventSeparator)
   }
 
-  private def processGetOneline(event: Event, options: Options): Unit = {
-
-    if (isInvalid(event)) printForInvalidKey(event.eventKey)
-
-    val paths = options.eventsMap(event.eventKey).toList
-    printHeader(event, options)
-    traverse(options, None, event.paramSet, paths).sorted.foreach(printLine)
-    printLine(footer)
-    printLine("")
-  }
-
-  private def processGetJson(event: Event, options: Options): Unit = {
-    if (isInvalid(event)) printForInvalidKey(event.eventKey)
+  private def processGetJson(event: Event, paths: List[String], options: Options): Unit = {
+    val formatter = JsonFormatter(options)
+    if (isInvalid(event)) printLine(formatter.invalidKey(event.eventKey))
 
     val paths                = options.eventsMap(event.eventKey).toList
     val eventJson            = PlayJson.transform(JsonSupport.writeEvent(event), upickle.default.reader[Js.Obj])
     val transformedEventJson = EventJsonTransformer.transform(eventJson, paths)
-    printLine(write(transformedEventJson, 4))
+    printLine(formatter.format(transformedEventJson))
   }
 
   def get(options: Options): Future[Unit] = async {
     val events = await(getEvents(options.eventsMap.keys.toSeq))
-    events.foreach { event ⇒
-      if (options.isOneline) processGetOneline(event, options)
-      if (options.isJson) processGetJson(event, options)
-    }
-  }
 
-  private def printHeader(event: Event, options: Options): Unit = {
-    val timestamp = if (options.printTimestamp) event.eventTime.time.toString else ""
-    val id        = if (options.printId) event.eventId.id else ""
-    val header    = List(timestamp, id, event.eventKey.key).filter(_.nonEmpty).mkString(" ")
-    printLine(header)
-    printLine("")
+    if (options.isOneline) printLine(OnelineFormatter(options).eventSeparator)
+
+    events.foreach { event ⇒
+      val paths = options.eventsMap(event.eventKey).toList
+      if (options.isOneline) processGetOneline(event, paths, options)
+      if (options.isJson) processGetJson(event, paths, options)
+    }
   }
 
   def publish(options: Options): Future[Done] = async {

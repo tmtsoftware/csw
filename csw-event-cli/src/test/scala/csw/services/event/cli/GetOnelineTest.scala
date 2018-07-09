@@ -1,5 +1,6 @@
 package csw.services.event.cli
 
+import csw.services.event.cli.BufferExtensions.RichBuffer
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import org.scalatest.{FunSuite, Matchers}
 
@@ -10,20 +11,9 @@ class GetOnelineTest extends FunSuite with Matchers with SeedData {
 
     val options =
       Options(cmd = "get", eventsMap = Map(event1.eventKey -> Set("epoch"), event2.eventKey -> Set("struct-2/struct-1/ra")))
-
     commandLineRunner.get(options).await
 
-    val expectedLogs =
-      List("wfos.prog.cloudcover.move",
-           "",
-           "epoch = [1950.0]",
-           "",
-           "wfos.prog.filter.stop",
-           "",
-           "struct-2/struct-1/ra = [12:13:14.1]",
-           "")
-
-    logBuffer.filterNot(_.startsWith("==")).toList shouldEqual expectedLogs
+    logBuffer shouldEqualContentsOf "get/oneline/expected/entire_event.txt"
   }
 
   test("should able to get partial struct paths from event in oneline format") {
@@ -33,18 +23,7 @@ class GetOnelineTest extends FunSuite with Matchers with SeedData {
 
     commandLineRunner.get(options).await
 
-    val expectedLogs =
-      List(
-        "wfos.prog.filter.stop",
-        "",
-        "struct-2/dec = [32:33:34.4]",
-        "struct-2/ra = [12:13:14.1]",
-        "struct-2/struct-1/dec = [32:33:34.4]",
-        "struct-2/struct-1/ra = [12:13:14.1]",
-        ""
-      )
-
-    logBuffer.filterNot(_.startsWith("==")).toList shouldEqual expectedLogs
+    logBuffer shouldEqualContentsOf "get/oneline/expected/partial_struct_path.txt"
   }
 
   test("should be able to log timestamp in oneline format") {
@@ -57,18 +36,7 @@ class GetOnelineTest extends FunSuite with Matchers with SeedData {
 
     commandLineRunner.get(options).await
 
-    val expectedLogs = List(
-      s"${event1.eventTime.time} ${event1.eventKey.key}",
-      "",
-      "epoch = [1950.0]",
-      "",
-      s"${event2.eventTime.time} ${event2.eventKey.key}",
-      "",
-      "struct-2/struct-1/ra = [12:13:14.1]",
-      ""
-    )
-
-    logBuffer.filterNot(_.startsWith("==")).toList shouldEqual expectedLogs
+    logBuffer shouldEqualContentsOf "get/oneline/expected/with_timestamp.txt"
   }
 
   test("should be able to log id per event in oneline format") {
@@ -80,17 +48,6 @@ class GetOnelineTest extends FunSuite with Matchers with SeedData {
       )
     commandLineRunner.get(options).await
 
-    val expectedLogs = List(
-      s"${event1.eventId.id} ${event1.eventKey.key}",
-      "",
-      "epoch = [1950.0]",
-      "",
-      s"${event2.eventId.id} ${event2.eventKey.key}",
-      "",
-      "struct-2/struct-1/ra = [12:13:14.1]",
-      ""
-    )
-
-    logBuffer.filterNot(_.startsWith("==")).toList shouldEqual expectedLogs
+    logBuffer shouldEqualContentsOf "get/oneline/expected/with_id.txt"
   }
 }

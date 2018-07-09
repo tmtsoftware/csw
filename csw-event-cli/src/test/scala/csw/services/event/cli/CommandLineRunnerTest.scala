@@ -11,6 +11,7 @@ import play.api.libs.json.{JsObject, JsValue, Json}
 
 import scala.collection.mutable
 import scala.concurrent.Await
+import csw.services.event.cli.BufferExtensions.RichBuffer
 import scala.io.Source
 
 class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Eventually {
@@ -21,17 +22,17 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
   test("should able to inspect event/events containing multiple parameters including recursive structs") {
 
     commandLineRunner.inspect(argsParser.parse(Seq("inspect", "-e", s"${event1.eventKey}")).get).await
-    logBuffer.filterNot(_.startsWith("==")).toList shouldEqual expectedOut1
+    logBuffer shouldEqualContentsOf "inspect/expected/event1.txt"
 
     logBuffer.clear()
 
     commandLineRunner.inspect(argsParser.parse(Seq("inspect", "--events", s"${event2.eventKey}")).get).await
-    logBuffer.filterNot(_.startsWith("==")).toList shouldEqual expectedOut2
+    logBuffer shouldEqualContentsOf "inspect/expected/event2.txt"
 
     logBuffer.clear()
 
     commandLineRunner.inspect(argsParser.parse(Seq("inspect", "-e", s"${event1.eventKey},${event2.eventKey}")).get).await
-    logBuffer.filterNot(_.startsWith("==")).toList shouldEqual (expectedOut1 ++ expectedOut2)
+    logBuffer shouldEqualContentsOf "inspect/expected/event1And2.txt"
   }
 
   test("should able to get entire event/events in json format") {
