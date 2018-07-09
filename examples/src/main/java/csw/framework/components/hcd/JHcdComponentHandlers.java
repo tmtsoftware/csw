@@ -1,5 +1,6 @@
 package csw.framework.components.hcd;
 
+import akka.actor.Cancellable;
 import akka.actor.typed.ActorRef;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.AskPattern;
@@ -14,6 +15,9 @@ import csw.messages.commands.CommandResponse;
 import csw.messages.commands.ControlCommand;
 import csw.messages.commands.Observe;
 import csw.messages.commands.Setup;
+import csw.messages.events.Event;
+import csw.messages.events.EventName;
+import csw.messages.events.SystemEvent;
 import csw.messages.framework.ComponentInfo;
 import csw.messages.location.LocationRemoved;
 import csw.messages.location.LocationUpdated;
@@ -22,10 +26,13 @@ import csw.messages.TopLevelActorMessage;
 import csw.services.command.CommandResponseManager;
 import csw.services.config.api.javadsl.IConfigClientService;
 import csw.services.config.api.models.ConfigData;
+import csw.services.event.exceptions.PublishFailure;
+import csw.services.event.internal.commons.EventServiceConnection;
 import csw.services.event.javadsl.IEventService;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.logging.javadsl.ILogger;
 import csw.services.logging.javadsl.JLoggerFactory;
+import scala.concurrent.duration.FiniteDuration;
 
 import java.nio.file.Paths;
 import java.util.concurrent.CompletableFuture;
@@ -40,6 +47,7 @@ public class JHcdComponentHandlers extends JComponentHandlers {
     private final CommandResponseManager commandResponseManager;
     private final CurrentStatePublisher currentStatePublisher;
     private final ILocationService locationService;
+    private final IEventService eventService;
     private ILogger log;
     private IConfigClientService configClient;
     private ConfigData hcdConfig;
@@ -63,6 +71,7 @@ public class JHcdComponentHandlers extends JComponentHandlers {
         this.commandResponseManager = commandResponseManager;
         this.currentStatePublisher = currentStatePublisher;
         this.locationService = locationService;
+        this.eventService = eventService;
         log = loggerFactory.getLogger(this.getClass());
     }
     //#jcomponent-handlers-class
@@ -87,6 +96,7 @@ public class JHcdComponentHandlers extends JComponentHandlers {
 
         return CompletableFuture.allOf(currentFuture, statsFuture);
     }
+
     //#jInitialize-handler
     //#validateCommand-handler
     @Override
@@ -149,13 +159,32 @@ public class JHcdComponentHandlers extends JComponentHandlers {
     //#onLocationTrackingEvent-handler
     @Override
     public void onLocationTrackingEvent(TrackingEvent trackingEvent) {
-        if (trackingEvent instanceof LocationUpdated) {
+        // start publishing events when event service is up
+        if (trackingEvent instanceof LocationUpdated && trackingEvent.connection().name().equals(EventServiceConnection.value().name())) {
+            CompletableFuture<Cancellable> cancellableF = startPublishingEvents();
+            // stop publishing by calling cancellableF.thenApply(Cancellable::cancel)
+        } else if (trackingEvent instanceof LocationUpdated) {
             // do something for the tracked location when it is updated
         } else if (trackingEvent instanceof LocationRemoved) {
             // do something for the tracked location when it is no longer available
         }
     }
     //#onLocationTrackingEvent-handler
+
+    private CompletableFuture<Cancellable> startPublishingEvents() {
+        Event systemEvent = new SystemEvent(componentInfo.prefix(), new EventName("filter_wheel"));
+        return eventService.defaultPublisher().thenApply(publisher -> publisher.publish(() -> eventGenerator(systemEvent), new FiniteDuration(100, TimeUnit.MILLISECONDS), this::onError));
+    }
+
+    // this holds the logic for event generation, could be based on some computation or current state of HCD
+    private Event eventGenerator(Event initialEvent) {
+        // add logic here to create a new event and return the same
+        return initialEvent;
+    }
+
+    private void onError(PublishFailure publishFailure) {
+        log.error("Failed to publish event: [" + publishFailure.event() + "]", publishFailure.cause());
+    }
 
     private void processSetup(Setup sc) {
         switch (sc.commandName().name()) {
