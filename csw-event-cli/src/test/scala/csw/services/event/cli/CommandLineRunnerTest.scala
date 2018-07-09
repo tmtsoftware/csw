@@ -51,6 +51,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
     logBuffer shouldEqualContentsOf "inspect/expected/event1And2.txt"
   }
 
+  // DEOPSCSW-431: [Event Cli] Get command
   test("should able to get entire event/events in json format") {
 
     commandLineRunner.get(argsParser.parse(Seq("get", "-e", s"${event1.eventKey}", "-o", "json")).get).await

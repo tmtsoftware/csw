@@ -4,6 +4,7 @@ import csw.services.event.cli.BufferExtensions.RichBuffer
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import org.scalatest.{FunSuite, Matchers}
 
+// DEOPSCSW-431: [Event Cli] Get command
 class GetOnelineTest extends FunSuite with Matchers with SeedData {
   import cliWiring._
 

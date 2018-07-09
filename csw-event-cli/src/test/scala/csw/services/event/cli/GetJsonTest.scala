@@ -6,6 +6,7 @@ import csw.services.event.helpers.TestFutureExt.RichFuture
 import org.scalatest.{FunSuite, Matchers}
 import play.api.libs.json.Json
 
+// DEOPSCSW-431: [Event Cli] Get command
 class GetJsonTest extends FunSuite with Matchers with SeedData {
 
   import cliWiring._
