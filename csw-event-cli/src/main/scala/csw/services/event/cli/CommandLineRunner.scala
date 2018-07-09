@@ -4,6 +4,7 @@ import java.io.File
 import java.time.Instant
 
 import akka.Done
+import akka.stream.Materializer
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import csw.messages.events._
 import csw.messages.params.formats.JsonSupport
@@ -11,14 +12,33 @@ import csw.messages.params.generics.KeyType.StructKey
 import csw.messages.params.generics.Parameter
 import csw.messages.params.models.{Id, Struct}
 import csw.services.event.scaladsl.EventService
+import csw.services.event.scaladsl.SubscriptionModes.RateAdapterMode
 import play.api.libs.json.{JsObject, JsValue, Json}
 
 import scala.async.Async.{async, await}
-import scala.concurrent.Future
 import scala.concurrent.duration.{DurationLong, FiniteDuration}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, printLine: Any ⇒ Unit) {
+
+  def subscribe(options: Options)(implicit ec: ExecutionContext, mat: Materializer): Future[Done] = async {
+    val keys       = options.eventsMap.keys.toSet
+    val subscriber = await(eventService.defaultSubscriber)
+    val subscribeResult = options.interval match {
+      case Some(value) => subscriber.subscribe(keys, value, RateAdapterMode)
+      case None        => subscriber.subscribe(keys)
+    }
+
+    val (es, f) = subscribeResult
+      .toMat(Sink.foreach { event =>
+        val eventJson = PlayJson.transform(JsonSupport.writeEvent(event), upickle.default.reader[Js.Obj])
+        printLine(eventJson)
+      })(Keep.both)
+      .run()
+
+    await(f)
+  }
 
   import actorRuntime._
 

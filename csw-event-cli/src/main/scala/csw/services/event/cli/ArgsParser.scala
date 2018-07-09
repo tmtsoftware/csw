@@ -58,6 +58,44 @@ class ArgsParser(name: String) {
           .text("display units")
       )
 
+    cmd("subscribe")
+      .action((_, c) => c.copy(cmd = "subscribe"))
+      .text("returns event")
+      .children(
+        opt[Seq[String]]('e', "events")
+          .required()
+          .valueName("<event1:key1>,<event2:key2:key3>...")
+          .action { (x, c) =>
+            val map = x.map { eventArg ⇒
+              val events = eventArg.split(":").toSet
+              EventKey(events.head) → events.tail
+            }.toMap
+
+            c.copy(eventsMap = map)
+          }
+          .text("comma separated list of <events:key-paths>"),
+        opt[Int]('i', "interval")
+          .action((x, c) => c.copy(interval = Some(x.millis)))
+          .validate { interval ⇒
+            if (interval > 0) success
+            else failure(s"invalid interval :$interval, should be > 0 milliseconds")
+          }
+          .text("interval in [ms] to publish event, single event will be published if not provided"),
+        opt[String]('o', "out")
+          .valueName("oneline|json")
+          .action((x, c) => c.copy(out = x))
+          .text("output format, default is oneline"),
+        opt[Unit]('t', "timestamp")
+          .action((_, c) => c.copy(printTimestamp = true))
+          .text("display timestamp"),
+        opt[Unit]('i', "id")
+          .action((_, c) => c.copy(printId = true))
+          .text("display event id"),
+        opt[Unit]('u', "units")
+          .action((_, c) => c.copy(printUnits = true))
+          .text("display units")
+      )
+
     cmd("publish")
       .action((_, c) => c.copy(cmd = "publish"))
       .text("publishes event provided from input file")

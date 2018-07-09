@@ -4,17 +4,33 @@ import akka.stream.scaladsl.Sink
 import csw.messages.events._
 import csw.messages.params.formats.JsonSupport
 import csw.services.event.helpers.TestFutureExt.RichFuture
+import csw.services.event.helpers.Utils.makeEventForKeyName
 import org.scalatest.concurrent.Eventually
 import org.scalatest.time.SpanSugar.convertDoubleToGrainOfTime
 import org.scalatest.{FunSuite, Matchers}
 import play.api.libs.json.{JsObject, JsValue, Json}
 
-import scala.collection.mutable
+import scala.collection.{immutable, mutable}
 import scala.concurrent.Await
 import csw.services.event.cli.BufferExtensions.RichBuffer
 import scala.io.Source
 
 class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Eventually {
+
+  def events(name: EventName): immutable.Seq[Event] = for (i ← 1 to 1500) yield makeEventForKeyName(name, i)
+
+  class EventGenerator(eventName: EventName) {
+    var counter                               = 0
+    var publishedEvents: mutable.Queue[Event] = mutable.Queue.empty
+    val eventsGroup: immutable.Seq[Event]     = events(eventName)
+
+    def generate: Event = {
+      val event = eventsGroup(counter)
+      counter += 1
+      publishedEvents.enqueue(event)
+      event
+    }
+  }
 
   import cliWiring._
 
@@ -38,12 +54,12 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
   test("should able to get entire event/events in json format") {
 
     commandLineRunner.get(argsParser.parse(Seq("get", "-e", s"${event1.eventKey}", "-o", "json")).get).await
-    JsonSupport.readEvent[SystemEvent](Json.parse(logBuffer.head)) shouldBe event1
+    stringToEvent(logBuffer.head) shouldBe event1
 
     logBuffer.clear()
 
     commandLineRunner.get(argsParser.parse(Seq("get", "-e", s"${event1.eventKey},${event2.eventKey}", "--out", "json")).get).await
-    val events = logBuffer.map(event ⇒ JsonSupport.readEvent[Event](Json.parse(event))).toSet
+    val events = logBuffer.map(stringToEvent).toSet
     events shouldEqual Set(event1, event2)
   }
 
@@ -117,4 +133,28 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
   )
 
   private def eventToSanitizedJson(event: Event) = removeDynamicKeys(JsonSupport.writeEvent(event))
+  private def stringToEvent(eventString: String) = JsonSupport.readEvent[Event](Json.parse(eventString))
+
+  test("should able to subscribe to event key") {
+    import cliWiring._
+    implicit val ec    = actorRuntime.ec
+    val eventGenerator = new EventGenerator(EventName(s"system_1"))
+    import eventGenerator._
+    val eventKey: EventKey = eventsGroup.head.eventKey
+    val publisher          = eventService.defaultPublisher.await
+
+    publisher.publish(eventGenerator.generate, 400.millis)
+
+    //to publish first event
+    Thread.sleep(200)
+
+    commandLineRunner.subscribe(argsParser.parse(Seq("subscribe", "--events", eventKey.key)).get)
+    //wait for next 2 events
+    Thread.sleep(900)
+    val expectedEventGenerator = new EventGenerator(EventName(s"system_1"))
+    val expectedEvents         = (1 to 3).map(_ => expectedEventGenerator.generate).toList
+
+    logBuffer.size shouldBe expectedEvents.size
+    logBuffer.map(stringToEvent).toList shouldBe expectedEvents
+  }
 }

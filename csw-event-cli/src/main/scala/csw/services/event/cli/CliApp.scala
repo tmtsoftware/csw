@@ -1,16 +1,19 @@
 package csw.services.event.cli
 
+import akka.stream.Materializer
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 
-class CliApp(commandLineRunner: CommandLineRunner) {
+class CliApp(commandLineRunner: CommandLineRunner)(implicit val ec: ExecutionContext, mat: Materializer) {
 
   def start(options: Options): Any = {
     options.cmd match {
-      case "inspect" ⇒ await(commandLineRunner.inspect(options))
-      case "get"     ⇒ await(commandLineRunner.get(options))
-      case "publish" ⇒ await(commandLineRunner.publish(options))
-      case x         ⇒ throw new RuntimeException(s"Unknown operation: $x")
+      case "inspect"   ⇒ await(commandLineRunner.inspect(options))
+      case "get"       ⇒ await(commandLineRunner.get(options))
+      case "publish"   ⇒ await(commandLineRunner.publish(options))
+      case "subscribe" ⇒ await(commandLineRunner.subscribe(options))
+      case x           ⇒ throw new RuntimeException(s"Unknown operation: $x")
+
     }
   }
 
