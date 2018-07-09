@@ -175,6 +175,10 @@ object Dependencies {
     Libs.`scalatest-embedded-redis` % Test
   )
 
+  val AlarmApi = Seq(
+    Libs.`play-json`
+  )
+
   val Commons = Seq(
     Akka.`akka-stream`,
     AkkaHttp.`akka-http`,

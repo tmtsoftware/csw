@@ -206,6 +206,9 @@ lazy val `csw-event-cli` = project
   .enablePlugins(DeployApp, MaybeCoverage)
   .settings(libraryDependencies ++= Dependencies.EventCli)
 
+lazy val `csw-alarm-api` = project
+  .enablePlugins(GenJavadocPlugin)
+  .settings(libraryDependencies ++= Dependencies.AlarmApi)
 
 lazy val `csw-commons` = project
   .enablePlugins(PublishBintray, GenJavadocPlugin)
