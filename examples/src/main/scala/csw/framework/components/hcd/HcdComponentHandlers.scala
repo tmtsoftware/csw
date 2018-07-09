@@ -2,29 +2,33 @@ package csw.framework.components.hcd
 
 import java.nio.file.Paths
 
-import akka.actor.Scheduler
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.ActorContext
+import akka.actor.typed.scaladsl.AskPattern.Askable
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.actor.{Cancellable, Scheduler}
 import akka.util.Timeout
+import csw.framework.CurrentStatePublisher
 import csw.framework.components.ConfigNotAvailableException
 import csw.framework.components.assembly.WorkerActorMsgs.{GetStatistics, InitialState}
 import csw.framework.components.assembly.{WorkerActor, WorkerActorMsg}
 import csw.framework.scaladsl.ComponentHandlers
+import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandResponse.Accepted
 import csw.messages.commands.{CommandResponse, ControlCommand, Observe, Setup}
+import csw.messages.events._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.{LocationRemoved, LocationUpdated, TrackingEvent}
+import csw.messages.params.models.Id
+import csw.services.command.CommandResponseManager
 import csw.services.config.api.models.ConfigData
 import csw.services.config.api.scaladsl.ConfigClientService
 import csw.services.config.client.scaladsl.ConfigClientFactory
+import csw.services.event.exceptions.PublishFailure
+import csw.services.event.internal.commons.EventServiceConnection
+import csw.services.event.scaladsl.EventService
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.typed.scaladsl.AskPattern.Askable
-import csw.framework.CurrentStatePublisher
-import csw.messages.TopLevelActorMessage
-import csw.services.command.CommandResponseManager
-import csw.services.event.scaladsl.EventService
 
 import scala.async.Async.{async, await}
 import scala.concurrent.duration.DurationLong
@@ -117,10 +121,27 @@ class HcdComponentHandlers(
 
   //#onLocationTrackingEvent-handler
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = trackingEvent match {
-    case LocationUpdated(location)   ⇒ // do something for the tracked location when it is updated
-    case LocationRemoved(connection) ⇒ // do something for the tracked location when it is no longer available
+    case LocationUpdated(location) if location.connection == EventServiceConnection.value ⇒ startPublishingEvents()
+    case LocationUpdated(location)                                                        ⇒ // do something for the tracked location when it is updated
+    case LocationRemoved(connection)                                                      ⇒ // do something for the tracked location when it is no longer available
   }
   //#onLocationTrackingEvent-handler
+
+  private def startPublishingEvents(): Future[Cancellable] = async {
+    val publisher    = await(eventService.defaultPublisher)
+    val initialEvent = SystemEvent(componentInfo.prefix, EventName("filter_wheel"))
+
+    publisher.publish(eventGenerator(initialEvent), 100.millis, onError)
+  }
+
+  // this holds the logic for event generation, could be based on some computation or current state of HCD
+  private def eventGenerator(initialEvent: Event): Event = initialEvent match {
+    case e: SystemEvent  ⇒ e.copy(eventId = Id(), eventTime = EventTime())
+    case e: ObserveEvent ⇒ e.copy(eventId = Id(), eventTime = EventTime())
+  }
+
+  private def onError(publishFailure: PublishFailure): Unit =
+    log.error(s"Publish failed for event: [${publishFailure.event}]", ex = publishFailure.cause)
 
   private def processSetup(sc: Setup): Unit = {
     sc.commandName.toString match {

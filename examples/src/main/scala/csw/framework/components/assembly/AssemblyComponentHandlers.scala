@@ -2,15 +2,16 @@ package csw.framework.components.assembly
 
 import java.nio.file.Paths
 
-import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.actor.typed.{ActorRef, ActorSystem}
 import csw.framework.CurrentStatePublisher
 import csw.framework.exceptions.{FailureRestart, FailureStop}
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandResponse.Accepted
 import csw.messages.commands._
+import csw.messages.events._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location._
 import csw.services.command.CommandResponseManager
@@ -54,6 +55,7 @@ class AssemblyComponentHandlers(
   private var runningHcds: Map[Connection, Option[CommandService]]        = Map.empty
   private var diagnosticsPublisher: ActorRef[DiagnosticPublisherMessages] = _
   private var commandHandler: ActorRef[CommandHandlerMsgs]                = _
+  private val eventHandler: ActorRef[Event]                               = ctx.spawnAnonymous(EventHandler.make())
 
   //#initialize-handler
   override def initialize(): Future[Unit] = async {
@@ -73,6 +75,9 @@ class AssemblyComponentHandlers(
     // 4. If an Hcd is found as a connection, resolve its location from location service and create other
     // required worker actors required by this assembly
 
+    // 5. retrieve default subscriber from event service
+    val subscriber = await(eventService.defaultSubscriber)
+
     maybeConnection match {
       case Some(_) ⇒
         resolveHcd().map {
@@ -80,6 +85,8 @@ class AssemblyComponentHandlers(
             runningHcds = runningHcds.updated(maybeConnection.get, Some(new CommandService(hcd)(ctx.system)))
             diagnosticsPublisher = ctx.spawnAnonymous(DiagnosticsPublisher.make(runningHcds(maybeConnection.get).get, worker))
             commandHandler = ctx.spawnAnonymous(CommandHandler.make(calculationConfig, runningHcds(maybeConnection.get)))
+            // subscribe to HCD's filter_wheel event stream
+            subscriber.subscribeActorRef(Set(EventKey(hcd.prefix, EventName("filter_wheel"))), eventHandler)
           case None ⇒ // do something
         }
       case None ⇒ Future.successful(Unit)
