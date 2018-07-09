@@ -72,8 +72,8 @@ trait SeedData extends HTTPLocationService with Matchers with BeforeAndAfterEach
   }
 
   def seedEvents(): (SystemEvent, ObserveEvent) = {
-    val event1Str = Source.fromResource("seedData/event1.json").getLines().mkString("")
-    val event2Str = Source.fromResource("seedData/event2.json").getLines().mkString("")
+    val event1Str = Source.fromResource("seedData/event1.json").mkString
+    val event2Str = Source.fromResource("seedData/event2.json").mkString
 
     val e1 = JsonSupport.readEvent[SystemEvent](Json.parse(event1Str))
     val e2 = JsonSupport.readEvent[ObserveEvent](Json.parse(event2Str))

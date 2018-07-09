@@ -2,8 +2,7 @@ package csw.services.event.cli
 
 import csw.messages.events.{Event, EventKey}
 import csw.messages.params.generics.Parameter
-import ujson.Js
-import upickle.default.write
+import play.api.libs.json.{JsObject, Json}
 
 abstract class CLIFormatter(options: Options) {
 
@@ -21,7 +20,7 @@ abstract class CLIFormatter(options: Options) {
 }
 
 case class JsonFormatter(options: Options) extends CLIFormatter(options) {
-  def format(eventJson: Js.Obj): String = write(eventJson, 4)
+  def format(eventJson: JsObject): String = Json.prettyPrint(eventJson)
 }
 
 case class OnelineFormatter(options: Options) extends CLIFormatter(options) {

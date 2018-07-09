@@ -12,8 +12,6 @@ import csw.messages.params.generics.Parameter
 import csw.messages.params.models.{Id, Struct}
 import csw.services.event.scaladsl.EventService
 import play.api.libs.json.{JsObject, JsValue, Json}
-import ujson.Js
-import ujson.play.PlayJson
 
 import scala.async.Async.{async, await}
 import scala.concurrent.Future
@@ -78,7 +76,7 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
     if (isInvalid(event)) printLine(formatter.invalidKey(event.eventKey))
 
     val paths                = options.eventsMap(event.eventKey).toList
-    val eventJson            = PlayJson.transform(JsonSupport.writeEvent(event), upickle.default.reader[Js.Obj])
+    val eventJson            = JsonSupport.writeEvent(event).as[JsObject]
     val transformedEventJson = EventJsonTransformer.transform(eventJson, paths)
     printLine(formatter.format(transformedEventJson))
   }
