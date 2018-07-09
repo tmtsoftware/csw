@@ -14,6 +14,8 @@ import csw.messages.params.models.{Id, Struct}
 import csw.services.event.scaladsl.EventService
 import csw.services.event.scaladsl.SubscriptionModes.RateAdapterMode
 import play.api.libs.json.{JsObject, JsValue, Json}
+import ujson.Js
+import ujson.play.PlayJson
 
 import scala.async.Async.{async, await}
 import scala.concurrent.duration.{DurationLong, FiniteDuration}
