@@ -71,7 +71,7 @@ class ArgsParserTest extends FunSuite with Matchers {
 
   // DEOPSCSW-432: [Event Cli] Publish command
   test("parse publish when input data file does not exist") {
-    val args = Array("publish", "-e", "a.b.c", "--data", "./observe_event.json")
+    val args = Array("publish", "-e", "a.b.c", "--data", "publish/observe_event.json")
     silentParse(args) shouldBe None
   }
 

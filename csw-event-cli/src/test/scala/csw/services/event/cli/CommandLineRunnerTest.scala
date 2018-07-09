@@ -49,8 +49,8 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
 
   // DEOPSCSW-432: [Event Cli] Publish command
   test("should able to publish event without event key provided") {
-    val path              = getClass.getResource("/observe_event.json").getPath
-    val expectedEventJson = Json.parse(Source.fromResource("observe_event.json").mkString)
+    val path              = getClass.getResource("/publish/observe_event.json").getPath
+    val expectedEventJson = Json.parse(Source.fromResource("publish/observe_event.json").mkString)
 
     // observe_event.json file contains this event key
     val eventKey = "wfos.blue.filter.filter_wheel"
@@ -66,8 +66,8 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
 
   // DEOPSCSW-432: [Event Cli] Publish command
   test("should able to publish event when event key and event json file provided") {
-    val path      = getClass.getResource("/observe_event.json").getPath
-    val eventJson = Json.parse(Source.fromResource("observe_event.json").mkString)
+    val path      = getClass.getResource("/publish/observe_event.json").getPath
+    val eventJson = Json.parse(Source.fromResource("publish/observe_event.json").mkString)
 
     val eventKey = EventKey("wfos.blue.filter.wheel")
     commandLineRunner.publish(argsParser.parse(Seq("publish", "-e", s"${eventKey.key}", "--data", path)).get).await
@@ -86,8 +86,8 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
   test("should able to publish event with interval") {
     val queue             = new mutable.Queue[JsObject]()
     val eventKey          = EventKey("tcs.mobie.blue.filter")
-    val path              = getClass.getResource("/observe_event.json").getPath
-    val eventJson         = Json.parse(Source.fromResource("observe_event.json").mkString)
+    val path              = getClass.getResource("/publish/observe_event.json").getPath
+    val eventJson         = Json.parse(Source.fromResource("publish/observe_event.json").mkString)
     val expectedEventJson = removeDynamicKeys(addEventIdAndName(eventJson, eventKey))
 
     val subscriber = Await.result(eventService.defaultSubscriber, 5.seconds)
