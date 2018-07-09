@@ -1,0 +1,75 @@
+{
+  "type": "ObserveEvent",
+  "eventId": "3186979f-6cde-43a5-a42a-1ae37bfed669",
+  "source": "wfos.prog.filter",
+  "eventName": "stop",
+  "eventTime": "2018-07-02T09:23:26.477Z",
+  "paramSet": [
+    {
+      "keyName": "struct-2",
+      "keyType": "StructKey",
+      "values": [
+        {
+          "paramSet": [
+            {
+              "keyName": "struct-1",
+              "keyType": "StructKey",
+              "values": [
+                {
+                  "paramSet": [
+                    {
+                      "keyName": "ra",
+                      "keyType": "StringKey",
+                      "values": [
+                        "12:13:14.1"
+                      ],
+                      "units": "NoUnits"
+                    },
+                    {
+                      "keyName": "dec",
+                      "keyType": "StringKey",
+                      "values": [
+                        "32:33:34.4"
+                      ],
+                      "units": "NoUnits"
+                    }
+                  ]
+                }
+              ],
+              "units": "NoUnits"
+            }
+          ]
+        },
+        {
+          "paramSet": [
+            {
+              "keyName": "ra",
+              "keyType": "StringKey",
+              "values": [
+                "12:13:14.1"
+              ],
+              "units": "NoUnits"
+            },
+            {
+              "keyName": "dec",
+              "keyType": "StringKey",
+              "values": [
+                "32:33:34.4"
+              ],
+              "units": "NoUnits"
+            }
+          ]
+        }
+      ],
+      "units": "NoUnits"
+    },
+    {
+      "keyName": "timestamp",
+      "keyType": "TimestampKey",
+      "values": [
+        "2018-07-09T09:02:18.682Z"
+      ],
+      "units": "second"
+    }
+  ]
+}

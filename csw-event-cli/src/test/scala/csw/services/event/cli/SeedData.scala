@@ -1,15 +1,12 @@
 package csw.services.event.cli
 
-import java.time.Instant
-
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
 import csw.apps.clusterseed.client.HTTPLocationService
 import csw.messages.commons.CoordinatedShutdownReasons
-import csw.messages.events.{EventName, EventTime, ObserveEvent, SystemEvent}
-import csw.messages.params.generics.KeyType
-import csw.messages.params.models.{Id, Prefix, Struct}
+import csw.messages.events._
+import csw.messages.params.formats.JsonSupport
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.internal.commons.EventServiceConnection
 import csw.services.event.scaladsl.EventPublisher
@@ -17,9 +14,11 @@ import csw.services.location.models.TcpRegistration
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import csw.services.logging.commons.LogAdminActorFactory
 import org.scalatest.{BeforeAndAfterEach, Matchers}
+import play.api.libs.json.Json
 import redis.embedded.{RedisSentinel, RedisServer}
 
 import scala.collection.mutable
+import scala.io.Source
 
 trait SeedData extends HTTPLocationService with Matchers with BeforeAndAfterEach {
 
@@ -73,31 +72,11 @@ trait SeedData extends HTTPLocationService with Matchers with BeforeAndAfterEach
   }
 
   def seedEvents(): (SystemEvent, ObserveEvent) = {
-    val prefix1: Prefix       = Prefix("wfos.prog.cloudcover")
-    val prefix2: Prefix       = Prefix("wfos.prog.filter")
-    val eventName1: EventName = EventName("move")
-    val eventName2: EventName = EventName("stop")
+    val event1Str = Source.fromResource("seedData/event1.json").getLines().mkString("")
+    val event2Str = Source.fromResource("seedData/event2.json").getLines().mkString("")
 
-    val ra           = KeyType.StringKey.make("ra")
-    val dec          = KeyType.StringKey.make("dec")
-    val epoch        = KeyType.DoubleKey.make("epoch")
-    val timestampKey = KeyType.TimestampKey.make("timestamp")
-    val structKey1   = KeyType.StructKey.make("struct-1")
-    val structKey2   = KeyType.StructKey.make("struct-2")
-
-    val rp  = ra.set("12:13:14.1")
-    val dp  = dec.set("32:33:34.4")
-    val ep  = epoch.set(1950.0)
-    val tp  = timestampKey.set(Instant.now())
-    val s1  = Struct(Set(rp, dp))
-    val sp1 = structKey1.set(s1)
-    val s2  = Struct(Set(sp1))
-    val sp2 = structKey2.set(s2, s1)
-
-    val eId   = Id("3186979f-6cde-43a5-a42a-1ae37bfed669")
-    val eTime = EventTime(Instant.parse("2018-07-02T09:23:26.477Z"))
-    val e1    = SystemEvent(prefix1, eventName1).madd(sp1, ep).copy(eventId = eId, eventTime = eTime)
-    val e2    = ObserveEvent(prefix2, eventName2).madd(sp2, tp).copy(eventId = eId, eventTime = eTime)
+    val e1 = JsonSupport.readEvent[SystemEvent](Json.parse(event1Str))
+    val e2 = JsonSupport.readEvent[ObserveEvent](Json.parse(event2Str))
 
     val publisher: EventPublisher = cliWiring.eventService.defaultPublisher.await
     publisher.publish(e1).await
