@@ -1,7 +1,9 @@
 package csw.services.alarm.api.models
 
 import csw.messages.params.models.Prefix
+import csw.services.alarm.api.internal.UPickleFormatAdapter
 import play.api.libs.json.{Json, OFormat}
+import upickle.default.{ReadWriter => RW, _}
 
 /**
  * A wrapper class representing the key for an alarm e.g. nfiraos.cc.trombone.tromboneAxisLowLimitAlarm. It represents each
@@ -32,4 +34,5 @@ object AlarmKey {
   }
 
   implicit val format: OFormat[AlarmKey] = Json.format[AlarmKey]
+  implicit val alarmKeyRw: RW[AlarmKey]  = UPickleFormatAdapter.playJsonToUPickle
 }
