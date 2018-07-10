@@ -66,23 +66,6 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
   }
 
   // DEOPSCSW-432: [Event Cli] Publish command
-  test("should able to publish event without event key provided") {
-    val path              = getClass.getResource("/publish/observe_event.json").getPath
-    val expectedEventJson = Json.parse(Source.fromResource("publish/observe_event.json").mkString)
-
-    // observe_event.json file contains this event key
-    val eventKey = "wfos.blue.filter.filter_wheel"
-
-    commandLineRunner.publish(argsParser.parse(Seq("publish", "--data", path)).get).await
-
-    eventually(timeout = timeout(5.seconds), interval = interval(100.millis)) {
-      commandLineRunner.get(argsParser.parse(Seq("get", "-e", eventKey, "-o", "json")).get).await
-
-      removeDynamicKeys(Json.parse(logBuffer.last)) shouldBe removeDynamicKeys(expectedEventJson)
-    }
-  }
-
-  // DEOPSCSW-432: [Event Cli] Publish command
   test("should able to publish event when event key and event json file provided") {
     val path      = getClass.getResource("/publish/observe_event.json").getPath
     val eventJson = Json.parse(Source.fromResource("publish/observe_event.json").mkString)

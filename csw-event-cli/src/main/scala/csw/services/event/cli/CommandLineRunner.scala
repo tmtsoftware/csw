@@ -88,7 +88,10 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
   }
 
   def publish(options: Options): Future[Done] = async {
-    val event = readEventFromJson(options.eventData, options.eventKey)
+    val event = options.eventData match {
+      case Some(file) ⇒ readEventFromJson(file, options.eventKey)
+      case None       ⇒ updateEventParams(await(getEvent(options.eventKey)), options.params)
+    }
 
     options.maybeInterval match {
       case Some(interval) ⇒ await(publishEventsWithInterval(event, interval, options.period))
@@ -123,36 +126,37 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
 
   private def isInvalid(event: Event): Boolean = event.eventTime == EventTime(Instant.ofEpochMilli(-1))
 
-  private def getEvents(keys: Seq[EventKey]): Future[Seq[Event]] = async {
+  private def getEvents(keys: Seq[EventKey]) = async {
     val subscriber = await(eventService.defaultSubscriber)
     await(Future.traverse(keys)(subscriber.get))
   }
 
-  private def readEventFromJson(data: File, maybeEventKey: Option[EventKey]) = {
-    val eventJson = Json.parse(scala.io.Source.fromFile(data).mkString)
-    JsonSupport.readEvent[Event](updateEventMetadata(eventJson, maybeEventKey))
+  private def getEvent(key: EventKey) = async {
+    val subscriber = await(eventService.defaultSubscriber)
+    await(subscriber.get(key))
   }
 
-  private def updateEventMetadata(json: JsValue, maybeEventKey: Option[EventKey]) = {
+  private def readEventFromJson(data: File, eventKey: EventKey) = {
+    val eventJson = Json.parse(scala.io.Source.fromFile(data).mkString)
+    JsonSupport.readEvent[Event](updateEventMetadata(eventJson, eventKey))
+  }
 
-    val updatedJson = json.as[JsObject] ++ Json.obj(
+  private def updateEventMetadata(json: JsValue, eventKey: EventKey) =
+    json.as[JsObject] ++ Json.obj(
       ("eventId", Id().id),
-      ("eventTime", EventTime().time)
+      ("eventTime", EventTime().time),
+      ("source", eventKey.source.prefix),
+      ("eventName", eventKey.eventName.name)
     )
 
-    maybeEventKey match {
-      case Some(eventKey) =>
-        updatedJson ++ Json.obj(
-          ("source", eventKey.source.prefix),
-          ("eventName", eventKey.eventName.name)
-        )
-      case None => updatedJson
-    }
+  private def updateEventParams(event: Event, paramSet: Set[Parameter[_]]) = event match {
+    case event: SystemEvent  ⇒ event.madd(paramSet)
+    case event: ObserveEvent ⇒ event.madd(paramSet)
   }
 
   private def eventGenerator(initialEvent: Event) = initialEvent match {
-    case e: SystemEvent  ⇒ e.copy(eventId = Id(), eventTime = EventTime())
-    case e: ObserveEvent ⇒ e.copy(eventId = Id(), eventTime = EventTime())
+    case event: SystemEvent  ⇒ event.copy(eventId = Id(), eventTime = EventTime())
+    case event: ObserveEvent ⇒ event.copy(eventId = Id(), eventTime = EventTime())
   }
 
   private def publishEvent(event: Event) = async {

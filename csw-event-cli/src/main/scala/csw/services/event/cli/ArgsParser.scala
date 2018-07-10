@@ -101,19 +101,23 @@ class ArgsParser(name: String) {
       .text("publishes event provided from input file")
       .children(
         opt[String]('e', "event")
-          .valueName("<event>")
-          .action((x, c) => c.copy(eventKey = Some(EventKey(x))))
-          .text("event key to publish"),
-        opt[File]("data")
           .required()
+          .valueName("<event>")
+          .action((x, c) => c.copy(eventKey = EventKey(x)))
+          .text("required: event key to publish"),
+        opt[File]("data")
           .valueName("<file>")
-          .action((x, c) => c.copy(eventData = x))
+          .action((x, c) => c.copy(eventData = Some(x)))
           .validate(
             file ⇒
               if (file.exists()) success
               else failure(s"file [${file.getAbsolutePath}] does not exist")
           )
-          .text("required: file path which contains event json"),
+          .text("file path which contains event json"),
+        opt[String]("params")
+          .valueName("<k1:i:meter=10,20> <k2:s:volt=10v>")
+          .action((x, c) => c.copy(params = ParameterArgParser.parse(x)))
+          .text("space separated list of params in the form of <keyName:keyType:unit=values ...> (unit is optional)"),
         opt[Int]('i', "interval")
           .action((x, c) => c.copy(maybeInterval = Some(x.millis)))
           .validate { interval ⇒
@@ -127,9 +131,7 @@ class ArgsParser(name: String) {
             if (period > 0) success
             else failure(s"invalid period :$period, should be > 0 seconds")
           }
-          .text(
-            "publish events for this duration [seconds] on provided interval. Default is Int.MaxValue seconds"
-          )
+          .text("publish events for this period [seconds] on provided interval. Default is Int.MaxValue seconds")
       )
 
     help("help")

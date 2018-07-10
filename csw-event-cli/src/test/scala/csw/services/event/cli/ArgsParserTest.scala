@@ -3,6 +3,8 @@ package csw.services.event.cli
 import java.io.{ByteArrayOutputStream, File}
 
 import csw.messages.events.EventKey
+import csw.messages.params.generics.KeyType.{IntKey, StringKey}
+import csw.messages.params.models.Units.volt
 import org.scalatest.{FunSuite, Matchers}
 
 import scala.concurrent.duration.DurationDouble
@@ -78,12 +80,10 @@ class ArgsParserTest extends FunSuite with Matchers {
   // DEOPSCSW-432: [Event Cli] Publish command
   test("parse publish with mandatory fields when input data file exist") {
     val observeEventJson = File.createTempFile("observe_event", "json")
-    val args             = Array("publish", "--data", observeEventJson.getAbsolutePath)
+    val args             = Array("publish", "-e", "a.b.c", "--data", observeEventJson.getAbsolutePath)
     observeEventJson.deleteOnExit()
 
-    silentParse(args) shouldBe Some(
-      Options("publish", eventData = observeEventJson)
-    )
+    silentParse(args) shouldBe Some(Options("publish", eventKey = EventKey("a.b.c"), eventData = Some(observeEventJson)))
   }
 
   // DEOPSCSW-432: [Event Cli] Publish command
@@ -95,11 +95,19 @@ class ArgsParserTest extends FunSuite with Matchers {
     silentParse(args) shouldBe Some(
       Options(
         "publish",
-        eventKey = Some(EventKey("a.b.c")),
-        eventData = observeEventJson,
+        eventKey = EventKey("a.b.c"),
+        eventData = Some(observeEventJson),
         maybeInterval = Some(20.millis),
         period = 10.seconds
       )
     )
+  }
+
+  test("parse publish with only params provided") {
+    val args     = Array("publish", "-e", "a.b.c", "--params", "k1:i=1,2,3 k2:s:volt=5v")
+    val intParam = IntKey.make("k1").set(1, 2, 3)
+    val strParam = StringKey.make("k2").set("5v").withUnits(volt)
+
+    silentParse(args) shouldBe Some(Options("publish", eventKey = EventKey("a.b.c"), params = Set(intParam, strParam)))
   }
 }
