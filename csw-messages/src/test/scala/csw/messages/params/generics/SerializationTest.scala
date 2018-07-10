@@ -2,7 +2,7 @@ package csw.messages.params.generics
 
 import java.time.Instant
 
-import csw.messages.commands.{CommandName, Observe, Setup, Wait}
+import csw.messages.commands._
 import csw.messages.events.{Event, EventName, SystemEvent}
 import csw.messages.params.models.{ObsId, Prefix}
 import csw.messages.params.states.{CurrentState, CurrentStates, StateName}
@@ -37,6 +37,14 @@ class SerializationTest extends FunSuite {
   ) //.second
 
   val cs1: CurrentState = CurrentState(Prefix("tcs.pos"), StateName("testStateName")).madd(
+    ra.set("12:32:11"),
+    dec.set("30:22:22"),
+    epoch.set(1950.0),
+    test.set(1),
+    timestamp.set(Instant.now)
+  ) //.second
+
+  val cs2: CurrentState = CurrentState(Prefix("tcs.pos"), StateName("testStateName2")).madd(
     ra.set("12:32:11"),
     dec.set("30:22:22"),
     epoch.set(1950.0),
@@ -96,6 +104,24 @@ class SerializationTest extends FunSuite {
 
     val sout1 = read[CurrentStates](bytes1)
     assert(sout1 == sca1)
+  }
+
+  test("SubscriptionKey kryo serialization") {
+    import csw.messages.params.generics.ParamSetSerializer._
+
+    val sk1: SubscriptionKey[CurrentState] = SubscriptionKey.all[CurrentState]
+    val bytes1: Array[Byte]                = write(sk1)
+
+    val skout1: SubscriptionKey[CurrentState] = read[SubscriptionKey[CurrentState]](bytes1)
+    assert(skout1.predicate(cs1))
+
+    val sk2: SubscriptionKey[CurrentState] = new SubscriptionKey[CurrentState](_.stateName == StateName("testStateName2"))
+    val bytes2: Array[Byte]                = write(sk2)
+
+    val skout2: SubscriptionKey[CurrentState] = read[SubscriptionKey[CurrentState]](bytes2)
+    assert(!skout2.predicate(cs1))
+    assert(skout2.predicate(cs2))
+
   }
 
 }
