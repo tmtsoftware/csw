@@ -13,12 +13,24 @@ class GetJsonTest extends FunSuite with Matchers with SeedData {
 
   test("should able to get entire event/events in json format") {
 
-    commandLineRunner.get(argsParser.parse(Seq("get", "-e", s"${event1.eventKey}", "-o", "json")).get).await
+    val options1 = Options(
+      cmd = "get",
+      out = "json",
+      eventKeys = Seq(event1.eventKey)
+    )
+
+    val options2 = Options(
+      cmd = "get",
+      out = "json",
+      eventKeys = Seq(event1.eventKey, event2.eventKey)
+    )
+
+    commandLineRunner.get(options1).await
     JsonSupport.readEvent[SystemEvent](Json.parse(logBuffer.head)) shouldBe event1
 
     logBuffer.clear()
 
-    commandLineRunner.get(argsParser.parse(Seq("get", "-e", s"${event1.eventKey},${event2.eventKey}", "--out", "json")).get).await
+    commandLineRunner.get(options2).await
     val events = logBuffer.map(event ⇒ JsonSupport.readEvent[Event](Json.parse(event))).toSet
     events shouldEqual Set(event1, event2)
   }
