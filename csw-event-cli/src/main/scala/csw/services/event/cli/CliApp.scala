@@ -11,7 +11,7 @@ class CliApp(commandLineRunner: CommandLineRunner)(implicit val ec: ExecutionCon
       case "inspect"   ⇒ await(commandLineRunner.inspect(options))
       case "get"       ⇒ await(commandLineRunner.get(options))
       case "publish"   ⇒ await(commandLineRunner.publish(options))
-      case "subscribe" ⇒ await(commandLineRunner.subscribe(options))
+      case "subscribe" ⇒ await { val (_, doneF) = commandLineRunner.subscribe(options); doneF }
       case x           ⇒ throw new RuntimeException(s"Unknown operation: $x")
 
     }

@@ -11,7 +11,7 @@ import csw.messages.params.formats.JsonSupport
 import csw.messages.params.generics.KeyType.StructKey
 import csw.messages.params.generics.Parameter
 import csw.messages.params.models.{Id, Struct}
-import csw.services.event.scaladsl.EventService
+import csw.services.event.scaladsl.{EventService, EventSubscription}
 import csw.services.event.scaladsl.SubscriptionModes.RateAdapterMode
 import play.api.libs.json.{JsObject, JsValue, Json}
 
@@ -22,39 +22,15 @@ import scala.util.{Failure, Success}
 
 class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, printLine: Any ⇒ Unit) {
 
-  def subscribe(options: Options)(implicit ec: ExecutionContext, mat: Materializer): Future[Done] = async {
-    val keys       = options.eventsMap.keys.toSet
-    val subscriber = await(eventService.defaultSubscriber)
-    val subscribeResult = options.interval match {
-      case Some(value) => subscriber.subscribe(keys, value, RateAdapterMode)
-      case None        => subscriber.subscribe(keys)
-    }
-
-    val (es, f) = subscribeResult
-      .toMat(Sink.foreach { event =>
-        val eventJson = JsonSupport.writeEvent(event).as[JsObject]
-        printLine(eventJson)
-      })(Keep.both)
-      .run()
-
-    await(f)
-  }
-
   import actorRuntime._
 
   def inspect(options: Options): Future[Unit] = async {
     val events    = await(getEvents(options.eventKeys))
     val formatter = OnelineFormatter(options)
-
     printLine(formatter.eventSeparator)
+
     events.foreach { event ⇒
-      printLine(formatter.header(event))
-      if (isInvalid(event)) printLine(formatter.invalidKey(event.eventKey))
-      else {
-        val onelines = traverse(options, None, event.paramSet)
-        printLine(formatter.format(event, onelines))
-      }
-      printLine(formatter.eventSeparator)
+      processOneline(event, options)
     }
   }
 
@@ -79,7 +55,7 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
       }
     }
 
-  private def processGetOneline(event: Event, paths: List[String], options: Options): Unit = {
+  private def processOneline(event: Event, options: Options, paths: List[String] = Nil): Unit = {
     val formatter = OnelineFormatter(options)
 
     printLine(formatter.header(event))
@@ -107,19 +83,42 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
     if (options.isOneline) printLine(OnelineFormatter(options).eventSeparator)
 
     events.foreach { event ⇒
-      val paths = options.eventsMap(event.eventKey).toList
-      if (options.isOneline) processGetOneline(event, paths, options)
-      if (options.isJson) processGetJson(event, paths, options)
+      processEvent(options, event)
     }
   }
 
   def publish(options: Options): Future[Done] = async {
     val event = readEventFromJson(options.eventData, options.eventKey)
 
-    options.interval match {
+    options.maybeInterval match {
       case Some(interval) ⇒ await(publishEventsWithInterval(event, interval, options.period))
       case None           ⇒ await(publishEvent(event))
     }
+  }
+
+  def subscribe(options: Options)(implicit ec: ExecutionContext, mat: Materializer): (Future[EventSubscription], Future[Done]) = {
+    val keys        = options.eventsMap.keys.toSet
+    val subscriberF = eventService.defaultSubscriber
+
+    val eventStream = options.maybeInterval match {
+      case Some(interval) => subscriberF.map(_.subscribe(keys, interval, RateAdapterMode))
+      case None           => subscriberF.map(_.subscribe(keys))
+    }
+
+    if (options.isOneline) printLine(OnelineFormatter(options).eventSeparator)
+
+    Source
+      .fromFutureSource(eventStream)
+      .toMat(Sink.foreach { event =>
+        processEvent(options, event)
+      })(Keep.both)
+      .run()
+  }
+
+  private def processEvent(options: Options, event: Event): Unit = {
+    val paths = options.eventsMap(event.eventKey).toList
+    if (options.isOneline) processOneline(event, options, paths)
+    if (options.isJson) processGetJson(event, paths, options)
   }
 
   private def isInvalid(event: Event): Boolean = event.eventTime == EventTime(Instant.ofEpochMilli(-1))

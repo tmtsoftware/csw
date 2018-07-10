@@ -16,7 +16,7 @@ case class Options(
     printTimestamp: Boolean = false,
     printId: Boolean = false,
     printUnits: Boolean = false,
-    interval: Option[FiniteDuration] = None,
+    maybeInterval: Option[FiniteDuration] = None,
     period: FiniteDuration = (Int.MaxValue / 1000).seconds
 ) {
   def isOneline: Boolean = out == "oneline"

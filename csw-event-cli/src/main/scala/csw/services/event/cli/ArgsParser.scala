@@ -75,7 +75,7 @@ class ArgsParser(name: String) {
           }
           .text("comma separated list of <events:key-paths>"),
         opt[Int]('i', "interval")
-          .action((x, c) => c.copy(interval = Some(x.millis)))
+          .action((x, c) => c.copy(maybeInterval = Some(x.millis)))
           .validate { interval ⇒
             if (interval > 0) success
             else failure(s"invalid interval :$interval, should be > 0 milliseconds")
@@ -115,7 +115,7 @@ class ArgsParser(name: String) {
           )
           .text("required: file path which contains event json"),
         opt[Int]('i', "interval")
-          .action((x, c) => c.copy(interval = Some(x.millis)))
+          .action((x, c) => c.copy(maybeInterval = Some(x.millis)))
           .validate { interval ⇒
             if (interval > 0) success
             else failure(s"invalid interval :$interval, should be > 0 milliseconds")

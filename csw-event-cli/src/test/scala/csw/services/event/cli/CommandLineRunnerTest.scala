@@ -1,23 +1,24 @@
 package csw.services.event.cli
 
+import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
 import csw.messages.events._
 import csw.messages.params.formats.JsonSupport
+import csw.messages.params.models.Id
+import csw.services.event.cli.BufferExtensions.RichBuffer
 import csw.services.event.helpers.TestFutureExt.RichFuture
-import csw.services.event.helpers.Utils.makeEventForKeyName
 import org.scalatest.concurrent.Eventually
 import org.scalatest.time.SpanSugar.convertDoubleToGrainOfTime
 import org.scalatest.{FunSuite, Matchers}
 import play.api.libs.json.{JsObject, JsValue, Json}
 
 import scala.collection.{immutable, mutable}
-import scala.concurrent.Await
-import csw.services.event.cli.BufferExtensions.RichBuffer
+import scala.concurrent.{Await, ExecutionContext}
 import scala.io.Source
 
 class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Eventually {
 
-  def events(name: EventName): immutable.Seq[Event] = for (i ← 1 to 1500) yield makeEventForKeyName(name, i)
+  def events(name: EventName): immutable.Seq[Event] = for (i ← 1 to 10) yield event1.copy(eventId = Id(i.toString))
 
   class EventGenerator(eventName: EventName) {
     var counter                               = 0
@@ -136,26 +137,28 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
   private def eventToSanitizedJson(event: Event) = removeDynamicKeys(JsonSupport.writeEvent(event))
   private def stringToEvent(eventString: String) = JsonSupport.readEvent[Event](Json.parse(eventString))
 
-  test("should able to subscribe to event key") {
+  test("should be able to subscribe to event key") {
     import cliWiring._
-    implicit val ec    = actorRuntime.ec
+
+    implicit val mat: Materializer    = actorRuntime.mat
+    implicit val ec: ExecutionContext = actorRuntime.ec
+
     val eventGenerator = new EventGenerator(EventName(s"system_1"))
     import eventGenerator._
+
     val eventKey: EventKey = eventsGroup.head.eventKey
     val publisher          = eventService.defaultPublisher.await
 
-    publisher.publish(eventGenerator.generate, 400.millis)
+    val cancellable = publisher.publish(eventGenerator.generate, 400.millis)
 
-    //to publish first event
-    Thread.sleep(200)
+    val (subscriptionF, doneF) =
+      commandLineRunner.subscribe(argsParser.parse(Seq("subscribe", "--out", "json", "--events", eventKey.key)).get)
 
-    commandLineRunner.subscribe(argsParser.parse(Seq("subscribe", "--events", eventKey.key)).get)
-    //wait for next 2 events
-    Thread.sleep(900)
-    val expectedEventGenerator = new EventGenerator(EventName(s"system_1"))
-    val expectedEvents         = (1 to 3).map(_ => expectedEventGenerator.generate).toList
+    Thread.sleep(1000)
 
-    logBuffer.size shouldBe expectedEvents.size
-    logBuffer.map(stringToEvent).toList shouldBe expectedEvents
+    cancellable.cancel()
+    subscriptionF.map(_.unsubscribe())
+
+    logBuffer shouldEqualContentsOf "subscribe/expected/outJson.txt"
   }
 }
