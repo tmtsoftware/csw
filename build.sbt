@@ -207,6 +207,7 @@ lazy val `csw-event-cli` = project
   .settings(libraryDependencies ++= Dependencies.EventCli)
 
 lazy val `csw-alarm-api` = project
+  .dependsOn(`csw-messages`)
   .enablePlugins(GenJavadocPlugin)
   .settings(libraryDependencies ++= Dependencies.AlarmApi)
 
