@@ -24,12 +24,25 @@ class ArgsParser(name: String) {
     cmd("subscribe")
       .action((_, c) => c.copy(cmd = "subscribe"))
       .text("returns event")
-      .children(eventkeysWithPath, interval, out, timestamp, id, units)
+      .children(
+        eventkeysWithPath,
+        interval.text("interval in [ms]: receive an event exactly at each tick"),
+        out,
+        timestamp,
+        id,
+        units
+      )
 
     cmd("publish")
       .action((_, c) => c.copy(cmd = "publish"))
       .text("publishes event provided from input file")
-      .children(eventkey, data, params, interval, period)
+      .children(
+        eventkey,
+        data,
+        params,
+        interval.text("interval in [ms] to publish event, single event will be published if not provided"),
+        period
+      )
 
     help("help")
 
