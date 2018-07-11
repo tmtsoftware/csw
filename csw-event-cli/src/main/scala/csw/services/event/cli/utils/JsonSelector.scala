@@ -1,4 +1,4 @@
-package csw.services.event.cli
+package csw.services.event.cli.utils
 
 import play.api.libs.json.{JsObject, JsValue, Json}
 

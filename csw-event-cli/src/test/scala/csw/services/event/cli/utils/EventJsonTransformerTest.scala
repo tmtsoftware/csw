@@ -1,4 +1,4 @@
-package csw.services.event.cli
+package csw.services.event.cli.utils
 
 import org.scalatest.{BeforeAndAfterEach, FunSuite, Matchers}
 import play.api.libs.json.{JsObject, Json}

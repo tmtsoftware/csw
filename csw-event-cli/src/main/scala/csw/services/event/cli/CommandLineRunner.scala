@@ -11,8 +11,11 @@ import csw.messages.params.formats.JsonSupport
 import csw.messages.params.generics.KeyType.StructKey
 import csw.messages.params.generics.Parameter
 import csw.messages.params.models.{Id, Struct}
-import csw.services.event.scaladsl.{EventService, EventSubscription}
+import csw.services.event.cli.args.Options
+import csw.services.event.cli.utils.{EventJsonTransformer, JsonFormatter, Oneline, OnelineFormatter}
+import csw.services.event.cli.wiring.ActorRuntime
 import csw.services.event.scaladsl.SubscriptionModes.RateAdapterMode
+import csw.services.event.scaladsl.{EventService, EventSubscription}
 import play.api.libs.json.{JsObject, JsValue, Json}
 
 import scala.async.Async.{async, await}
@@ -88,14 +91,12 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
   }
 
   def publish(options: Options): Future[Done] = async {
-    val event = options.eventData match {
-      case Some(file) ⇒ readEventFromJson(file, options.eventKey)
-      case None       ⇒ updateEventParams(await(getEvent(options.eventKey)), options.params)
-    }
+    val event        = await(getEvent(options.eventKey, options.eventData))
+    val updatedEvent = updateEventParams(event, options.params)
 
     options.maybeInterval match {
-      case Some(interval) ⇒ await(publishEventsWithInterval(event, interval, options.period))
-      case None           ⇒ await(publishEvent(event))
+      case Some(interval) ⇒ await(publishEventsWithInterval(updatedEvent, interval, options.period))
+      case None           ⇒ await(publishEvent(updatedEvent))
     }
   }
 
@@ -131,9 +132,12 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
     await(Future.traverse(keys)(subscriber.get))
   }
 
-  private def getEvent(key: EventKey) = async {
+  private def getEvent(key: EventKey, eventData: Option[File]) = async {
     val subscriber = await(eventService.defaultSubscriber)
-    await(subscriber.get(key))
+    eventData match {
+      case Some(file) ⇒ readEventFromJson(file, key)
+      case None       ⇒ await(subscriber.get(key))
+    }
   }
 
   private def readEventFromJson(data: File, eventKey: EventKey) = {

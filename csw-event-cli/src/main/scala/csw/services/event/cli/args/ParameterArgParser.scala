@@ -1,4 +1,4 @@
-package csw.services.event.cli
+package csw.services.event.cli.args
 
 import csw.messages.params.generics.KeyType.{BooleanKey, DoubleKey, FloatKey, IntKey, LongKey, StringKey}
 import csw.messages.params.generics.Parameter

@@ -1,6 +1,8 @@
 package csw.services.event.cli
 
 import akka.stream.Materializer
+import csw.services.event.cli.args.Options
+
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 

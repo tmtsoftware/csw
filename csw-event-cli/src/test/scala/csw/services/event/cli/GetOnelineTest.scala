@@ -1,6 +1,7 @@
 package csw.services.event.cli
 
 import csw.services.event.cli.BufferExtensions.RichBuffer
+import csw.services.event.cli.args.Options
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import org.scalatest.{FunSuite, Matchers}
 

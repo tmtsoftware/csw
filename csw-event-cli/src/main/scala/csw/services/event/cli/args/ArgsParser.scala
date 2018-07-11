@@ -1,4 +1,4 @@
-package csw.services.event.cli
+package csw.services.event.cli.args
 
 import csw.services.BuildInfo
 import scopt.OptionParser
@@ -8,7 +8,7 @@ import scopt.OptionParser
  */
 class ArgsParser(name: String) {
 
-  val parser: OptionParser[Options] = new scopt.OptionParser[Options](name) with CommandParams {
+  val parser: OptionParser[Options] = new scopt.OptionParser[Options](name) with Arguments {
     head(name, BuildInfo.version)
 
     cmd("inspect")
@@ -51,12 +51,12 @@ class ArgsParser(name: String) {
     checkConfig { c =>
       if (c.cmd.isEmpty)
         failure("""
-          |Please specify one of the following command with their corresponding options:
-          |  1> inspect
-          |  2> get
-          |  3> subscribe
-          |  4> publish
-        """.stripMargin)
+                  |Please specify one of the following command with their corresponding options:
+                  |  1> inspect
+                  |  2> get
+                  |  3> subscribe
+                  |  4> publish
+                """.stripMargin)
       else success
     }
   }

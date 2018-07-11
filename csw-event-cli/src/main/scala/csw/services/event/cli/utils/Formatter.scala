@@ -1,10 +1,11 @@
-package csw.services.event.cli
+package csw.services.event.cli.utils
 
 import csw.messages.events.{Event, EventKey}
 import csw.messages.params.generics.Parameter
+import csw.services.event.cli.args.Options
 import play.api.libs.json.{JsObject, Json}
 
-abstract class CLIFormatter(options: Options) {
+abstract class Formatter(options: Options) {
 
   val eventSeparator = "========================================================================="
 
@@ -19,11 +20,11 @@ abstract class CLIFormatter(options: Options) {
 
 }
 
-case class JsonFormatter(options: Options) extends CLIFormatter(options) {
+case class JsonFormatter(options: Options) extends Formatter(options) {
   def format(eventJson: JsObject): String = Json.prettyPrint(eventJson)
 }
 
-case class OnelineFormatter(options: Options) extends CLIFormatter(options) {
+case class OnelineFormatter(options: Options) extends Formatter(options) {
   def format(event: Event, onelines: List[Oneline]): String =
     EventOutput(event, options, onelines)
       .onelines()

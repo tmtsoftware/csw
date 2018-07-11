@@ -134,6 +134,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
     )
   }
 
+  // DEOPSCSW-436: [Event Cli] Specialized Publish command (take params from command line)
   test("should able to publish event when params are provided") {
     val filePath = "publish/observe_event.json"
     val path     = getClass.getResource("/" + filePath).getPath

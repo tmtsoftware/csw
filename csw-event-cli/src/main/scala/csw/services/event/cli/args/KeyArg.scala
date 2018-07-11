@@ -1,4 +1,4 @@
-package csw.services.event.cli
+package csw.services.event.cli.args
 
 import csw.messages.params.models.Units
 import csw.messages.params.models.Units.NoUnits

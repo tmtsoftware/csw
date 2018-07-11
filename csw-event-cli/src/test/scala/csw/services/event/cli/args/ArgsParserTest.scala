@@ -1,4 +1,4 @@
-package csw.services.event.cli
+package csw.services.event.cli.args
 
 import java.io.{ByteArrayOutputStream, File}
 

@@ -1,8 +1,8 @@
-package csw.services.event.cli
+package csw.services.event.cli.wiring
 
 import akka.Done
-import akka.actor.{ActorSystem, CoordinatedShutdown}
 import akka.actor.CoordinatedShutdown.Reason
+import akka.actor.{ActorSystem, CoordinatedShutdown}
 import akka.stream.{ActorMaterializer, Materializer}
 
 import scala.concurrent.{ExecutionContextExecutor, Future}

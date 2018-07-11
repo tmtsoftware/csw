@@ -7,9 +7,12 @@ import csw.apps.clusterseed.client.HTTPLocationService
 import csw.messages.commons.CoordinatedShutdownReasons
 import csw.messages.events._
 import csw.messages.params.formats.JsonSupport
+import csw.services.event.cli.args.ArgsParser
+import csw.services.event.cli.wiring.Wiring
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.internal.commons.EventServiceConnection
 import csw.services.event.scaladsl.EventPublisher
+import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.models.TcpRegistration
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import csw.services.logging.commons.LogAdminActorFactory
@@ -22,7 +25,7 @@ import scala.io.Source
 
 trait SeedData extends HTTPLocationService with Matchers with BeforeAndAfterEach {
 
-  implicit val system: ActorSystem    = ActorSystem("test")
+  implicit val system: ActorSystem    = ActorSystemFactory.remote()
   implicit val mat: ActorMaterializer = ActorMaterializer()
 
   val argsParser                        = new ArgsParser("csw-event-cli")

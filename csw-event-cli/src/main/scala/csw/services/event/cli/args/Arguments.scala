@@ -1,28 +1,29 @@
-package csw.services.event.cli
+package csw.services.event.cli.args
 
 import java.io.File
 
 import csw.messages.events.EventKey
-import scopt.OptionParser
+import scopt.{OptionDef, OptionParser}
 
 import scala.concurrent.duration.DurationDouble
 
-trait CommandParams { self: OptionParser[Options] =>
+trait Arguments { self: OptionParser[Options] =>
 
-  def eventkey =
+  def eventkey: OptionDef[String, Options] =
     opt[String]('e', "event")
+      .required()
       .valueName("<event>")
       .action((x, c) => c.copy(eventKey = EventKey(x)))
-      .text("event key to publish")
+      .text("required: event key to publish")
 
-  def eventkeys =
+  def eventkeys: OptionDef[Seq[String], Options] =
     opt[Seq[String]]('e', "events")
       .required()
       .valueName("<event1>,<event2>...")
       .action((x, c) => c.copy(eventKeys = x.map(EventKey(_))))
-      .text("comma separated list of events to inspect")
+      .text("required: comma separated list of events to inspect")
 
-  def eventkeysWithPath =
+  def eventkeysWithPath: OptionDef[Seq[String], Options] =
     opt[Seq[String]]('e', "events")
       .required()
       .valueName("<event1:key1>,<event2:key2:key3>...")
@@ -34,30 +35,9 @@ trait CommandParams { self: OptionParser[Options] =>
 
         c.copy(eventsMap = map)
       }
-      .text("comma separated list of <events:key-paths>")
+      .text("required: comma separated list of <events:key-paths>")
 
-  def interval =
-    opt[Int]('i', "interval")
-      .valueName("")
-      .action((x, c) => c.copy(maybeInterval = Some(x.millis)))
-      .validate { interval ⇒
-        if (interval > 0) success
-        else failure(s"invalid interval :$interval, should be > 0 milliseconds")
-      }
-      .text("interval in [ms] to publish event, single event will be published if not provided")
-
-  def period =
-    opt[Int]('p', "period")
-      .action((x, c) => c.copy(period = x.seconds))
-      .validate { period ⇒
-        if (period > 0) success
-        else failure(s"invalid period :$period, should be > 0 seconds")
-      }
-      .text(
-        "publish events for this duration [seconds] on provided interval. Default is Int.MaxValue seconds"
-      )
-
-  def data =
+  def data: OptionDef[File, Options] =
     opt[File]("data")
       .valueName("<file>")
       .action((x, c) => c.copy(eventData = Some(x)))
@@ -66,9 +46,9 @@ trait CommandParams { self: OptionParser[Options] =>
           if (file.exists()) success
           else failure(s"file [${file.getAbsolutePath}] does not exist")
       )
-      .text("required: file path which contains event json")
+      .text("file path which contains event json")
 
-  def params =
+  def params: OptionDef[String, Options] =
     opt[String]("params")
       .valueName("<k1:i:meter=10,20> <k2:s:volt=10v>")
       .action((x, c) => c.copy(params = ParameterArgParser.parse(x)))
@@ -78,23 +58,42 @@ trait CommandParams { self: OptionParser[Options] =>
            |""".stripMargin
       )
 
-  def out =
+  def interval: OptionDef[Int, Options] =
+    opt[Int]('i', "interval")
+      .action((x, c) => c.copy(maybeInterval = Some(x.millis)))
+      .validate { interval ⇒
+        if (interval > 0) success
+        else failure(s"invalid interval :$interval, should be > 0 milliseconds")
+      }
+
+  def period: OptionDef[Int, Options] =
+    opt[Int]('p', "period")
+      .action((x, c) => c.copy(period = x.seconds))
+      .validate { period ⇒
+        if (period > 0) success
+        else failure(s"invalid period :$period, should be > 0 seconds")
+      }
+      .text(
+        s"publish events for this duration [seconds] on provided interval. Default is ${Int.MaxValue / 1000} seconds"
+      )
+
+  def out: OptionDef[String, Options] =
     opt[String]('o', "out")
       .valueName("oneline|json")
       .action((x, c) => c.copy(out = x))
       .text("output format, default is oneline")
 
-  def timestamp =
+  def timestamp: OptionDef[Unit, Options] =
     opt[Unit]('t', "timestamp")
       .action((_, c) => c.copy(printTimestamp = true))
       .text("display timestamp")
 
-  def id =
+  def id: OptionDef[Unit, Options] =
     opt[Unit]('i', "id")
       .action((_, c) => c.copy(printId = true))
       .text("display event id")
 
-  def units =
+  def units: OptionDef[Unit, Options] =
     opt[Unit]('u', "units")
       .action((_, c) => c.copy(printUnits = true))
       .text("display units")

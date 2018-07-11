@@ -2,7 +2,8 @@ package csw.services.event
 
 import csw.messages.commons.CoordinatedShutdownReasons.ApplicationFinishedReason
 import csw.services.BuildInfo
-import csw.services.event.cli.{ArgsParser, Options, Wiring}
+import csw.services.event.cli.args.{ArgsParser, Options}
+import csw.services.event.cli.wiring.Wiring
 import csw.services.location.commons.{ActorSystemFactory, ClusterAwareSettings}
 import csw.services.logging.scaladsl.LoggingSystemFactory
 
