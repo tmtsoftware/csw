@@ -117,7 +117,11 @@ class ArgsParser(name: String) {
         opt[String]("params")
           .valueName("<k1:i:meter=10,20> <k2:s:volt=10v>")
           .action((x, c) => c.copy(params = ParameterArgParser.parse(x)))
-          .text("space separated list of params in the form of <keyName:keyType:unit=values ...> (unit is optional)"),
+          .text(
+            """|space separated list of params in the form of "keyName:keyType:unit=values ...".
+               |Imp: Multiple params should be provided in double quotes and unit is optional
+               |""".stripMargin
+          ),
         opt[Int]('i', "interval")
           .action((x, c) => c.copy(maybeInterval = Some(x.millis)))
           .validate { interval ⇒

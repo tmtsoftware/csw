@@ -30,7 +30,16 @@ object ParameterArgParser {
       case 'd' ⇒ DoubleKey.make(keyName).set(values.map(_.toDouble), units)
       case 'l' ⇒ LongKey.make(keyName).set(values.map(_.toLong), units)
       case 'b' ⇒ BooleanKey.make(keyName).set(values.map(_.toBoolean), units)
-      case _   ⇒ throw new RuntimeException(s"Unsupported key type [${keyArg.keyType}] provided")
+      case _   ⇒ throw new RuntimeException(s"""
+           |Unsupported key type [${keyArg.keyType}] provided.
+           |Supported key types are:
+           |i = IntKey
+           |s = StringKey
+           |f = FloatKey
+           |d = DoubleKey
+           |l = LongKey
+           |b = BooleanKey
+           |""".stripMargin)
     }
   }
 

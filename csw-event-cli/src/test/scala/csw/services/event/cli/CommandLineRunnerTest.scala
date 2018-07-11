@@ -65,6 +65,31 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
     events shouldEqual Set(event1, event2)
   }
 
+  test("should be able to subscribe to event key") {
+    import cliWiring._
+
+    implicit val mat: Materializer    = actorRuntime.mat
+    implicit val ec: ExecutionContext = actorRuntime.ec
+
+    val eventGenerator = new EventGenerator(EventName(s"system_1"))
+    import eventGenerator._
+
+    val eventKey: EventKey = eventsGroup.head.eventKey
+    val publisher          = eventService.defaultPublisher.await
+
+    val cancellable = publisher.publish(eventGenerator.generate, 400.millis)
+
+    val (subscriptionF, doneF) =
+      commandLineRunner.subscribe(argsParser.parse(Seq("subscribe", "--out", "json", "--events", eventKey.key)).get)
+
+    Thread.sleep(1000)
+
+    cancellable.cancel()
+    subscriptionF.map(_.unsubscribe())
+
+    logBuffer shouldEqualContentsOf "subscribe/expected/outJson.txt"
+  }
+
   // DEOPSCSW-432: [Event Cli] Publish command
   test("should able to publish event when event key and event json file provided") {
     val path      = getClass.getResource("/publish/observe_event.json").getPath
@@ -119,29 +144,4 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
 
   private def eventToSanitizedJson(event: Event) = removeDynamicKeys(JsonSupport.writeEvent(event))
   private def stringToEvent(eventString: String) = JsonSupport.readEvent[Event](Json.parse(eventString))
-
-  test("should be able to subscribe to event key") {
-    import cliWiring._
-
-    implicit val mat: Materializer    = actorRuntime.mat
-    implicit val ec: ExecutionContext = actorRuntime.ec
-
-    val eventGenerator = new EventGenerator(EventName(s"system_1"))
-    import eventGenerator._
-
-    val eventKey: EventKey = eventsGroup.head.eventKey
-    val publisher          = eventService.defaultPublisher.await
-
-    val cancellable = publisher.publish(eventGenerator.generate, 400.millis)
-
-    val (subscriptionF, doneF) =
-      commandLineRunner.subscribe(argsParser.parse(Seq("subscribe", "--out", "json", "--events", eventKey.key)).get)
-
-    Thread.sleep(1000)
-
-    cancellable.cancel()
-    subscriptionF.map(_.unsubscribe())
-
-    logBuffer shouldEqualContentsOf "subscribe/expected/outJson.txt"
-  }
 }
