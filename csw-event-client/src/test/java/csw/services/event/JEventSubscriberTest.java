@@ -281,11 +281,11 @@ public class JEventSubscriberTest extends TestNGSuite {
         TestInbox<Event> inbox4 = TestInbox.create();
         TestInbox<Event> inbox5 = TestInbox.create();
 
-        String eventPattern  = "*.movement.*";
-        String eventPattern2 = "*.move*";
-        String eventPattern3 = "*.?ove*";
-        String eventPattern4 = "test_prefix.*";
-        String eventPattern5 = "*";
+        String eventPattern  = "*.movement.*";      //subscribe to events with any prefix but event name containing 'movement'
+        String eventPattern2 = "*.move*";           //subscribe to events with any prefix but event name containing 'move'
+        String eventPattern3 = "*.?ove*";           //subscribe to events with any prefix but event name matching any first  character followed by `ove`
+        String eventPattern4 = "test_prefix.*";     //subscribe to all events with prefix `test_prefix` irresepective of event names
+        String eventPattern5 = "*";                 //subscribe to all events with prefix `test_prefix` irresepective of event names
 
         // pattern is * for redis
         IEventSubscription subscription = baseProperties.jSubscriber().pSubscribe(JSubsystem.TEST, eventPattern, event -> inbox.getRef().tell(event));

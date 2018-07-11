@@ -2,8 +2,9 @@ package csw.framework.internal.pubsub
 
 import akka.actor.typed.scaladsl.{ActorContext, MutableBehavior}
 import akka.actor.typed.{ActorRef, Behavior, Signal, Terminated}
+import csw.messages.commands.SubscriptionKey
 import csw.messages.framework.PubSub
-import csw.messages.framework.PubSub.{Publish, Subscribe, Unsubscribe}
+import csw.messages.framework.PubSub.{Publish, Subscribe, SubscribeOnly, Unsubscribe}
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
 /**
@@ -18,13 +19,14 @@ private[framework] class PubSubBehavior[T](ctx: ActorContext[PubSub[T]], loggerF
   private val log: Logger = loggerFactory.getLogger(ctx)
 
   // list of subscribers who subscribe to the component using this pub-sub actor for the data of type [[T]]
-  var subscribers: Set[ActorRef[T]] = Set.empty
+  var subscribers: Map[ActorRef[T], SubscriptionKey[T]] = Map.empty
 
   override def onMessage(msg: PubSub[T]): Behavior[PubSub[T]] = {
     msg match {
-      case Subscribe(ref)   => subscribe(ref)
-      case Unsubscribe(ref) => unsubscribe(ref)
-      case Publish(data)    => notifySubscribers(data)
+      case SubscribeOnly(ref, key) => subscribe(ref, key)
+      case Subscribe(ref)          => subscribe(ref, SubscriptionKey.all)
+      case Unsubscribe(ref)        => unsubscribe(ref)
+      case Publish(data)           => notifySubscribers(data)
     }
     this
   }
@@ -33,9 +35,9 @@ private[framework] class PubSubBehavior[T](ctx: ActorContext[PubSub[T]], loggerF
     case Terminated(ref) ⇒ unsubscribe(ref.upcast); this
   }
 
-  private def subscribe(actorRef: ActorRef[T]): Unit = {
+  private def subscribe(actorRef: ActorRef[T], key: SubscriptionKey[T]): Unit = {
     if (!subscribers.contains(actorRef)) {
-      subscribers += actorRef
+      subscribers += ((actorRef, key))
       ctx.watch(actorRef)
     }
   }
@@ -46,6 +48,6 @@ private[framework] class PubSubBehavior[T](ctx: ActorContext[PubSub[T]], loggerF
 
   protected def notifySubscribers(data: T): Unit = {
     log.debug(s"Notifying subscribers :[${subscribers.mkString(",")}] with data :[$data]")
-    subscribers.foreach(_ ! data)
+    subscribers.filter(subscriber ⇒ subscriber._2.predicate(data)).foreach(_._1 ! data)
   }
 }
