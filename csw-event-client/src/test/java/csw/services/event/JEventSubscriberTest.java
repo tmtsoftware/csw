@@ -273,22 +273,32 @@ public class JEventSubscriberTest extends TestNGSuite {
         Event testEvent3 = Utils.makeEventForKeyName(new EventName("temperature"),3);
         Event testEvent4 = Utils.makeEventForKeyName(new EventName("move"),3);
         Event testEvent5 = Utils.makeEventForKeyName(new EventName("cove"),3);
+        Event testEvent6 = Utils.makeEventForPrefixAndKeyName(new Prefix("test.test_prefix"), new EventName("move"), 6);
 
         TestInbox<Event> inbox = TestInbox.create();
         TestInbox<Event> inbox2 = TestInbox.create();
         TestInbox<Event> inbox3 = TestInbox.create();
+        TestInbox<Event> inbox4 = TestInbox.create();
+        TestInbox<Event> inbox5 = TestInbox.create();
 
         String eventPattern  = "*.movement.*";
         String eventPattern2 = "*.move*";
         String eventPattern3 = "*.?ove*";
+        String eventPattern4 = "test_prefix.*";
+        String eventPattern5 = "*";
 
         // pattern is * for redis
-        IEventSubscription subscription = baseProperties.jSubscriber().pSubscribe(JSubsystem.TEST, baseProperties.eventPattern(), event -> inbox.getRef().tell(event));
-        IEventSubscription subscription2 = baseProperties.jSubscriber().pSubscribe(JSubsystem.TEST, baseProperties.eventPattern(), event -> inbox2.getRef().tell(event));
-        IEventSubscription subscription3 = baseProperties.jSubscriber().pSubscribe(JSubsystem.TEST, baseProperties.eventPattern(), event -> inbox3.getRef().tell(event));
+        IEventSubscription subscription = baseProperties.jSubscriber().pSubscribe(JSubsystem.TEST, eventPattern, event -> inbox.getRef().tell(event));
+        IEventSubscription subscription2 = baseProperties.jSubscriber().pSubscribe(JSubsystem.TEST, eventPattern2, event -> inbox2.getRef().tell(event));
+        IEventSubscription subscription3 = baseProperties.jSubscriber().pSubscribe(JSubsystem.TEST, eventPattern3, event -> inbox3.getRef().tell(event));
+        IEventSubscription subscription4 = baseProperties.jSubscriber().pSubscribe(JSubsystem.TEST, eventPattern4, event -> inbox4.getRef().tell(event));
+        IEventSubscription subscription5 = baseProperties.jSubscriber().pSubscribe(JSubsystem.TEST, eventPattern5, event -> inbox5.getRef().tell(event));
+
         subscription.ready().get(10, TimeUnit.SECONDS);
         subscription2.ready().get(10, TimeUnit.SECONDS);
         subscription3.ready().get(10, TimeUnit.SECONDS);
+        subscription4.ready().get(10, TimeUnit.SECONDS);
+        subscription5.ready().get(10, TimeUnit.SECONDS);
 
         Thread.sleep(500);
 
@@ -297,20 +307,27 @@ public class JEventSubscriberTest extends TestNGSuite {
         baseProperties.jPublisher().publish(testEvent3).get(10, TimeUnit.SECONDS);
         baseProperties.jPublisher().publish(testEvent4).get(10, TimeUnit.SECONDS);
         baseProperties.jPublisher().publish(testEvent5).get(10, TimeUnit.SECONDS);
+        baseProperties.jPublisher().publish(testEvent6).get(10, TimeUnit.SECONDS);
 
         Thread.sleep(1000);
 
         List<Event> receivedEvents = inbox.getAllReceived();
         List<Event> receivedEvents2 = inbox2.getAllReceived();
         List<Event> receivedEvents3 = inbox3.getAllReceived();
+        List<Event> receivedEvents4 = inbox4.getAllReceived();
+        List<Event> receivedEvents5 = inbox5.getAllReceived();
 
         Assert.assertTrue(receivedEvents.containsAll(Arrays.asList(testEvent1, testEvent2)));
-        Assert.assertTrue(receivedEvents.containsAll(Arrays.asList(testEvent1, testEvent2, testEvent4)));
-        Assert.assertTrue(receivedEvents.containsAll(Arrays.asList(testEvent1, testEvent2, testEvent4, testEvent5)));
+        Assert.assertTrue(receivedEvents2.containsAll(Arrays.asList(testEvent1, testEvent2, testEvent4, testEvent6)));
+        Assert.assertTrue(receivedEvents3.containsAll(Arrays.asList(testEvent4, testEvent5, testEvent6)));
+        Assert.assertTrue(receivedEvents4.contains(testEvent6));
+        Assert.assertTrue(receivedEvents5.containsAll(Arrays.asList(testEvent1, testEvent2, testEvent3, testEvent4, testEvent5, testEvent6)));
 
         subscription.unsubscribe().get(10, TimeUnit.SECONDS);
         subscription2.unsubscribe().get(10, TimeUnit.SECONDS);
         subscription3.unsubscribe().get(10, TimeUnit.SECONDS);
+        subscription4.unsubscribe().get(10, TimeUnit.SECONDS);
+        subscription5.unsubscribe().get(10, TimeUnit.SECONDS);
     }
 
     @Test(dataProvider = "event-service-provider")

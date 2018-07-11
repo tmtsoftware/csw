@@ -5,7 +5,7 @@ import akka.actor.testkit.typed.scaladsl.{TestInbox, TestProbe}
 import csw.messages.events.{Event, EventKey, EventName, SystemEvent}
 import csw.messages.params.models.{Prefix, Subsystem}
 import csw.services.event.helpers.TestFutureExt.RichFuture
-import csw.services.event.helpers.Utils.{makeDistinctEvent, makeEvent, makeEventForKeyName, makeEventWithPrefix}
+import csw.services.event.helpers.Utils._
 import csw.services.event.internal.kafka.KafkaTestProps
 import csw.services.event.internal.redis.RedisTestProps
 import csw.services.event.internal.wiring.BaseProperties
@@ -281,22 +281,31 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     val testEvent3 = makeEventForKeyName(EventName("temperature"), 3)
     val testEvent4 = makeEventForKeyName(EventName("move"), 4)
     val testEvent5 = makeEventForKeyName(EventName("cove"), 5)
+    val testEvent6 = makeEventForPrefixAndKeyName(Prefix("test.test_prefix"), EventName("move"), 6)
 
     val inbox  = TestInbox[Event]()
     val inbox2 = TestInbox[Event]()
     val inbox3 = TestInbox[Event]()
+    val inbox4 = TestInbox[Event]()
+    val inbox5 = TestInbox[Event]()
 
-    val eventPattern  = "*.movement.*"
-    val eventPattern2 = "*.move*"
-    val eventPattern3 = "*.?ove*"
+    val eventPattern  = "*.movement.*"  //subscribe to events with any prefix but event name containing 'movement'
+    val eventPattern2 = "*.move*"       //subscribe to events with any prefix but event name containing 'move'
+    val eventPattern3 = "*.?ove"        //subscribe to events with any prefix but event name matching any first  character followed by `ove`
+    val eventPattern4 = "test_prefix.*" //subscribe to all events with prefix `test_prefix` irresepective of event names
+    val eventPattern5 = "*"             //subscribe to all events with prefix `test_prefix` irresepective of event names
 
     val subscription  = subscriber.pSubscribeCallback(Subsystem.TEST, eventPattern, inbox.ref ! _)
     val subscription2 = subscriber.pSubscribeCallback(Subsystem.TEST, eventPattern2, inbox2.ref ! _)
     val subscription3 = subscriber.pSubscribeCallback(Subsystem.TEST, eventPattern3, inbox3.ref ! _)
+    val subscription4 = subscriber.pSubscribeCallback(Subsystem.TEST, eventPattern4, inbox4.ref ! _)
+    val subscription5 = subscriber.pSubscribeCallback(Subsystem.TEST, eventPattern5, inbox5.ref ! _)
 
     subscription.ready().await
     subscription2.ready().await
     subscription3.ready().await
+    subscription4.ready().await
+    subscription5.ready().await
 
     Thread.sleep(500)
 
@@ -305,20 +314,27 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     publisher.publish(testEvent3).await
     publisher.publish(testEvent4).await
     publisher.publish(testEvent5).await
+    publisher.publish(testEvent6).await
 
     Thread.sleep(1000)
 
     val receivedEvents  = inbox.receiveAll()
     val receivedEvents2 = inbox2.receiveAll()
     val receivedEvents3 = inbox3.receiveAll()
+    val receivedEvents4 = inbox4.receiveAll()
+    val receivedEvents5 = inbox5.receiveAll()
 
     receivedEvents should contain only (testEvent1, testEvent2)
-    receivedEvents2 should contain only (testEvent1, testEvent2, testEvent4)
-    receivedEvents3 should contain only (testEvent1, testEvent2, testEvent4, testEvent5)
+    receivedEvents2 should contain only (testEvent1, testEvent2, testEvent4, testEvent6)
+    receivedEvents3 should contain only (testEvent4, testEvent5, testEvent6)
+    receivedEvents4 should contain only testEvent6
+    receivedEvents5 should contain allOf (testEvent1, testEvent2, testEvent3, testEvent4, testEvent5, testEvent6)
 
     subscription.unsubscribe().await
     subscription2.unsubscribe().await
     subscription3.unsubscribe().await
+    subscription4.unsubscribe().await
+    subscription5.unsubscribe().await
   }
 
   @Test(dataProvider = "event-service-provider")

@@ -21,6 +21,9 @@ object Utils {
 
   def makeEventForKeyName(name: EventName, id: Int): Event = event.copy(eventName = name, eventId = Id(id.toString))
 
+  def makeEventForPrefixAndKeyName(prefix: Prefix, name: EventName, id: Int): Event =
+    SystemEvent(prefix, name).copy(eventId = Id(id.toString))
+
   def makeEventWithPrefix(id: Int, prefix: Prefix): Event = event.copy(
     eventId = Id(id.toString),
     source = prefix,
