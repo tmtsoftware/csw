@@ -211,6 +211,11 @@ lazy val `csw-alarm-api` = project
   .enablePlugins(GenJavadocPlugin)
   .settings(libraryDependencies ++= Dependencies.AlarmApi)
 
+lazy val `csw-alarm-client` = project
+  .dependsOn(`csw-alarm-api`)
+  .enablePlugins(GenJavadocPlugin)
+  .settings(libraryDependencies ++= Dependencies.AlarmClient)
+
 lazy val `csw-commons` = project
   .enablePlugins(PublishBintray, GenJavadocPlugin)
   .settings(

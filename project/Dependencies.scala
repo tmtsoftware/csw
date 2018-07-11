@@ -179,6 +179,10 @@ object Dependencies {
     Libs.`play-json`
   )
 
+  val AlarmClient = Seq(
+    Libs.`lettuce`
+  )
+
   val Commons = Seq(
     Akka.`akka-stream`,
     AkkaHttp.`akka-http`,
