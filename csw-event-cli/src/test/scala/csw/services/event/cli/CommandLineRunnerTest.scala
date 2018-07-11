@@ -4,13 +4,15 @@ import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
 import csw.messages.events._
 import csw.messages.params.formats.JsonSupport
+import csw.messages.params.generics.KeyType.{IntKey, StringKey}
 import csw.messages.params.models.Id
+import csw.messages.params.models.Units.meter
 import csw.services.event.cli.BufferExtensions.RichBuffer
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import org.scalatest.concurrent.Eventually
 import org.scalatest.time.SpanSugar.convertDoubleToGrainOfTime
 import org.scalatest.{FunSuite, Matchers}
-import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.json._
 
 import scala.collection.{immutable, mutable}
 import scala.concurrent.{Await, ExecutionContext}
@@ -132,6 +134,49 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
     )
   }
 
+  test("should able to publish event when params are provided") {
+    val filePath = "publish/observe_event.json"
+    val path     = getClass.getResource("/" + filePath).getPath
+    val eventKey = EventKey("wfos.test.move")
+
+    val cmdLineParams = "testKey:s=test testKey2:i:meter=1,2,3"
+    val strParam      = StringKey.make("testKey").set("test")
+    val intParam      = IntKey.make("testKey2").set(1, 2, 3).withUnits(meter)
+
+    val expectedEvent     = fileToEvent[ObserveEvent](filePath).madd(strParam, intParam)
+    val expectedEventJson = JsonSupport.writeEvent[ObserveEvent](expectedEvent)
+
+    // first publish event with default data from json file
+    commandLineRunner.publish(argsParser.parse(Seq("publish", "-e", s"${eventKey.key}", "--data", path)).get).await
+
+    // publish with params and verify new event contains existing params as well as newly provided cmd line params
+    commandLineRunner.publish(argsParser.parse(Seq("publish", "-e", s"${eventKey.key}", "--params", cmdLineParams)).get).await
+
+    eventually(timeout = timeout(5.seconds), interval = interval(100.millis)) {
+      commandLineRunner.get(argsParser.parse(Seq("get", "-e", eventKey.key, "-o", "json")).get).await
+      removeDynamicKeys(strToJsObject(logBuffer.last)) shouldBe removeDynamicKeys(addEventIdAndName(expectedEventJson, eventKey))
+    }
+
+    // verify existing params get updated if provided cmd line params already present
+    val updateCmdLineParams = "testKey:s=test1,test2 testKey2:i:meter=4"
+    val updatedStrParam     = StringKey.make("testKey").set("test1", "test2")
+    val updatedIntParam     = IntKey.make("testKey2").set(4).withUnits(meter)
+
+    val updatedExpectedEvent     = fileToEvent[ObserveEvent](filePath).madd(updatedStrParam, updatedIntParam)
+    val updatedExpectedEventJson = JsonSupport.writeEvent[ObserveEvent](updatedExpectedEvent)
+
+    commandLineRunner
+      .publish(argsParser.parse(Seq("publish", "-e", s"${eventKey.key}", "--params", updateCmdLineParams)).get)
+      .await
+
+    eventually(timeout = timeout(5.seconds), interval = interval(100.millis)) {
+      commandLineRunner.get(argsParser.parse(Seq("get", "-e", eventKey.key, "-o", "json")).get).await
+      removeDynamicKeys(strToJsObject(logBuffer.last)) shouldBe removeDynamicKeys(
+        addEventIdAndName(updatedExpectedEventJson, eventKey)
+      )
+    }
+  }
+
   // publish command generates new id and event time while publishing, hence assertions exclude these keys from json
   private def removeDynamicKeys(json: JsValue) = JsObject(json.as[JsObject].value -- Seq("eventId", "eventTime"))
 
@@ -142,6 +187,10 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
     ("eventName", eventKey.eventName.name)
   )
 
-  private def eventToSanitizedJson(event: Event) = removeDynamicKeys(JsonSupport.writeEvent(event))
-  private def stringToEvent(eventString: String) = JsonSupport.readEvent[Event](Json.parse(eventString))
+  private def eventToSanitizedJson(event: Event)        = removeDynamicKeys(JsonSupport.writeEvent(event))
+  private def stringToEvent(eventString: String)        = JsonSupport.readEvent[Event](Json.parse(eventString))
+  private def fileToEvent[T <: Event](filePath: String) = JsonSupport.readEvent[T](fileToEventJson(filePath))
+  private def fileToEventJson(filePath: String)         = Json.parse(Source.fromResource(filePath).mkString)
+  private def strToJsObject(js: String)                 = Json.parse(js).as[JsObject]
+
 }
