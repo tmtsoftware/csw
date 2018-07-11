@@ -3,7 +3,7 @@ package csw.services.alarm.api.models
 import csw.messages.params.models.Prefix
 import csw.services.alarm.api.internal.UPickleFormatAdapter
 import play.api.libs.json.{Json, OFormat}
-import upickle.default.{ReadWriter => RW, _}
+import upickle.default.{ReadWriter ⇒ RW}
 
 /**
  * A wrapper class representing the key for an alarm e.g. nfiraos.cc.trombone.tromboneAxisLowLimitAlarm. It represents each

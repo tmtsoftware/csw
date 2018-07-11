@@ -2,7 +2,7 @@ package csw.services.alarm.api.models
 
 import csw.services.alarm.api.internal.UPickleFormatAdapter
 import play.api.libs.json._
-import upickle.default.{ReadWriter ⇒ RW, _}
+import upickle.default.{ReadWriter ⇒ RW}
 
 /**
  * A wrapper class representing the name of an Alarm e.g. tromboneAxisLowLimitAlarm, tromboneAxisHighLimitAlarm
