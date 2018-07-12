@@ -124,6 +124,8 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
     // first publish event with default data from json file
     commandLineRunner.publish(argsParser.parse(Seq("publish", "-e", eventKey.key, "--data", path)).get).await
 
+    Thread.sleep(500)
+
     // publish with params and verify new event contains existing params as well as newly provided cmd line params
     commandLineRunner.publish(argsParser.parse(Seq("publish", "-e", eventKey.key, "--params", cmdLineParams)).get).await
 
