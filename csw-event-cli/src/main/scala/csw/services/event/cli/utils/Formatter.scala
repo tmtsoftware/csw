@@ -5,7 +5,8 @@ import csw.messages.params.generics.Parameter
 import csw.services.event.cli.args.Options
 
 object Formatter {
-  val eventSeparator = "========================================================================="
+  val eventSeparator =
+    "==============================================================================================================="
 
   def invalidKey(eventKey: EventKey): String = s"$eventKey [ERROR] No events published for this key."
 }
@@ -24,9 +25,11 @@ case class OnelineFormatter(options: Options) {
   }
 
   def header(event: Event): String = {
-    val timestamp = if (options.printTimestamp) event.eventTime.time.toString else ""
-    val id        = if (options.printId) event.eventId.id else ""
-    val header    = List(timestamp, id, event.eventKey.key).filter(_.nonEmpty).mkString(" ")
+    val timestamp = if (options.printTimestamp) s"Timestamp: ${event.eventTime.time.toString}" else ""
+    val id        = if (options.printId) s"Id: ${event.eventId.id}" else ""
+    val key       = s"EventKey: ${event.eventKey.key}"
+
+    val header = List(key, timestamp, id).filter(_.nonEmpty).mkString(" | ")
     header + "\n"
   }
 }
