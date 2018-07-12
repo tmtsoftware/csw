@@ -85,8 +85,10 @@ class AssemblyComponentHandlers(
             runningHcds = runningHcds.updated(maybeConnection.get, Some(new CommandService(hcd)(ctx.system)))
             diagnosticsPublisher = ctx.spawnAnonymous(DiagnosticsPublisher.make(runningHcds(maybeConnection.get).get, worker))
             commandHandler = ctx.spawnAnonymous(CommandHandler.make(calculationConfig, runningHcds(maybeConnection.get)))
+            //#event-subscriber
             // subscribe to HCD's filter_wheel event stream
             subscriber.subscribeActorRef(Set(EventKey(hcd.prefix, EventName("filter_wheel"))), eventHandler)
+          //#event-subscriber
           case None ⇒ // do something
         }
       case None ⇒ Future.successful(Unit)

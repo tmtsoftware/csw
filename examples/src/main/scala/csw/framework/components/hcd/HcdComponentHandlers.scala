@@ -127,6 +127,7 @@ class HcdComponentHandlers(
   }
   //#onLocationTrackingEvent-handler
 
+  //#event-publisher
   private def startPublishingEvents(): Future[Cancellable] = async {
     val publisher    = await(eventService.defaultPublisher)
     val initialEvent = SystemEvent(componentInfo.prefix, EventName("filter_wheel"))
@@ -142,6 +143,7 @@ class HcdComponentHandlers(
 
   private def onError(publishFailure: PublishFailure): Unit =
     log.error(s"Publish failed for event: [${publishFailure.event}]", ex = publishFailure.cause)
+  //#event-publisher
 
   private def processSetup(sc: Setup): Unit = {
     sc.commandName.toString match {

@@ -171,6 +171,7 @@ public class JHcdComponentHandlers extends JComponentHandlers {
     }
     //#onLocationTrackingEvent-handler
 
+    //#event-publisher
     private CompletableFuture<Cancellable> startPublishingEvents() {
         Event systemEvent = new SystemEvent(componentInfo.prefix(), new EventName("filter_wheel"));
         return eventService.defaultPublisher().thenApply(publisher -> publisher.publish(() -> eventGenerator(systemEvent), new FiniteDuration(100, TimeUnit.MILLISECONDS), this::onError));
@@ -185,6 +186,7 @@ public class JHcdComponentHandlers extends JComponentHandlers {
     private void onError(PublishFailure publishFailure) {
         log.error("Failed to publish event: [" + publishFailure.event() + "]", publishFailure.cause());
     }
+    //#event-publisher
 
     private void processSetup(Setup sc) {
         switch (sc.commandName().name()) {

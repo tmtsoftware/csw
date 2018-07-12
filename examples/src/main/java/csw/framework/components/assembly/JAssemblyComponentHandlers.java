@@ -1,14 +1,15 @@
 package csw.framework.components.assembly;
 
+import akka.actor.testkit.typed.javadsl.TestProbe;
 import akka.actor.typed.ActorRef;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Adapter;
-import akka.actor.testkit.typed.javadsl.TestProbe;
 import akka.util.Timeout;
+import csw.framework.CurrentStatePublisher;
 import csw.framework.exceptions.FailureRestart;
 import csw.framework.exceptions.FailureStop;
 import csw.framework.javadsl.JComponentHandlers;
-import csw.framework.CurrentStatePublisher;
+import csw.messages.TopLevelActorMessage;
 import csw.messages.commands.*;
 import csw.messages.events.Event;
 import csw.messages.events.EventKey;
@@ -20,16 +21,14 @@ import csw.messages.params.generics.Key;
 import csw.messages.params.models.Prefix;
 import csw.messages.params.states.CurrentState;
 import csw.messages.params.states.StateName;
-import csw.messages.TopLevelActorMessage;
-import csw.services.command.javadsl.JCommandService;
 import csw.services.command.CommandResponseManager;
+import csw.services.command.javadsl.JCommandService;
 import csw.services.config.api.javadsl.IConfigClientService;
 import csw.services.config.api.models.ConfigData;
 import csw.services.config.client.javadsl.JConfigClientFactory;
 import csw.services.event.javadsl.IEventService;
 import csw.services.event.javadsl.IEventSubscriber;
 import csw.services.event.javadsl.IEventSubscription;
-import csw.services.event.scaladsl.SubscriptionModes;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.location.javadsl.JComponentType;
 import csw.services.logging.javadsl.ILogger;
@@ -37,7 +36,6 @@ import csw.services.logging.javadsl.JLoggerFactory;
 import scala.concurrent.duration.FiniteDuration;
 
 import java.nio.file.Paths;
-import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -116,10 +114,12 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
                         throw new HcdNotFoundException();
                     else {
                         runningHcds.put(connection, Optional.of(new JCommandService(hcdLocation.get(), ctx.getSystem())));
+                        //#event-subscriber
                         CompletableFuture<IEventSubscription> subscription = subscriberF.thenApply(subscriber -> {
                             EventKey filterWheelEventKey = new EventKey(hcdLocation.get().prefix(), new EventName("filter_wheel"));
-                            return subscriber.subscribeActorRef(Collections.singleton(filterWheelEventKey), eventHandler, Duration.ofMillis(100), SubscriptionModes.jRateAdapterMode());
+                            return subscriber.subscribeActorRef(Collections.singleton(filterWheelEventKey), eventHandler);
                         });
+                        //#event-subscriber
                     }
                     diagnosticPublisher = ctx.spawnAnonymous(JDiagnosticsPublisherFactory.make(new JCommandService(hcdLocation.get(), ctx.getSystem()), workerActor));
                 })).get();
