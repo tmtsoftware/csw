@@ -59,7 +59,7 @@ class ArgsParserTest extends FunSuite with Matchers {
   }
 
   test("parse get with all options") {
-    val args = Array("get", "-e", "a.b.c,x.y.z:k2:k3", "-o", "oneline", "-t", "-i", "-u")
+    val args = Array("get", "-e", "a.b.c,x.y.z:k2:k3", "-o", "oneline", "-t", "--id", "-u")
     silentParse(args) shouldBe Some(
       Options(
         "get",

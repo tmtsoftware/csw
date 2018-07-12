@@ -41,13 +41,13 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
   test("should able to inspect events containing multiple parameters including recursive structs") {
 
     commandLineRunner.inspect(argsParser.parse(Seq("inspect", "-e", s"${event1.eventKey},${event2.eventKey}")).get).await
-    logBuffer shouldEqualContentsOf "oneline/multiple_events_inspect.txt"
+    logBuffer shouldEqualContentsOf "oneline/inspect_multiple_events.txt"
   }
 
   // DEOPSCSW-431: [Event Cli] Get command
   test("should able to get events in json format") {
 
-    commandLineRunner.get(argsParser.parse(Seq("get", "-e", s"${event1.eventKey}", "-o", "json")).get).await
+    commandLineRunner.get(argsParser.parse(Seq("get", "-e", event1.eventKey.key, "-o", "json")).get).await
     stringToEvent(logBuffer.head) shouldBe event1
 
     logBuffer.clear()
@@ -60,8 +60,10 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
   // DEOPSCSW-431: [Event Cli] Get command
   test("should able to get events in oneline format") {
 
-    commandLineRunner.get(argsParser.parse(Seq("get", "-e", s"${event1.eventKey}")).get).await
-    logBuffer shouldEqualContentsOf "oneline/entire_event_get.txt"
+    commandLineRunner
+      .get(argsParser.parse(Seq("get", "--id", "-u", "-t", "-e", s"${event1.eventKey},${event2.eventKey}")).get)
+      .await
+    logBuffer shouldEqualContentsOf "oneline/get_multiple_events.txt"
   }
 
   // DEOPSCSW-432: [Event Cli] Publish command
@@ -209,6 +211,6 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
 
     subscriptionF.map(_.unsubscribe())
 
-    logBuffer shouldEqualContentsOf "oneline/entire_event_get.txt"
+    logBuffer shouldEqualContentsOf "oneline/get_entire_event.txt"
   }
 }

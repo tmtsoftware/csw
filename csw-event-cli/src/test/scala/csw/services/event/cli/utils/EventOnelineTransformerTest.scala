@@ -21,7 +21,7 @@ class EventOnelineTransformerTest extends FunSuite with Matchers {
     val options       = Options(cmd = "inspect", eventsMap = Map(event1.eventKey → Set.empty))
     val onelineOutput = new EventOnelineTransformer(options).transform(List(event1))
 
-    onelineOutput shouldEqualContentsOf "oneline/entire_event_inspect.txt"
+    onelineOutput shouldEqualContentsOf "oneline/inspect_entire_event.txt"
   }
 
   test("should be able to get entire event in oneline format") {
@@ -29,7 +29,7 @@ class EventOnelineTransformerTest extends FunSuite with Matchers {
     val options       = Options(cmd = "get", eventsMap = Map(event1.eventKey → Set.empty))
     val onelineOutput = new EventOnelineTransformer(options).transform(List(event1))
 
-    onelineOutput shouldEqualContentsOf "oneline/entire_event_get.txt"
+    onelineOutput shouldEqualContentsOf "oneline/get_entire_event.txt"
   }
 
   test("should be able to get specified paths for event in oneline format") {
@@ -46,7 +46,7 @@ class EventOnelineTransformerTest extends FunSuite with Matchers {
       Options(cmd = "get", eventsMap = Map(event1.eventKey -> Set("epoch"), event2.eventKey -> Set("struct-2/struct-1/ra")))
 
     val onelineOutput = new EventOnelineTransformer(options).transform(List(event1, event2))
-    onelineOutput shouldEqualContentsOf "oneline/multiple_events_get.txt"
+    onelineOutput shouldEqualContentsOf "oneline/get_multiple_paths.txt"
   }
 
   test("should be able to get partial struct paths from event in oneline format") {
@@ -54,7 +54,7 @@ class EventOnelineTransformerTest extends FunSuite with Matchers {
     val options       = Options(cmd = "get", eventsMap = Map(event2.eventKey -> Set("struct-2")))
     val onelineOutput = new EventOnelineTransformer(options).transform(List(event2))
 
-    onelineOutput shouldEqualContentsOf "oneline/partial_struct_path.txt"
+    onelineOutput shouldEqualContentsOf "oneline/get_partial_struct_path.txt"
   }
 
   test("should be able to log timestamp in oneline format") {
@@ -62,7 +62,7 @@ class EventOnelineTransformerTest extends FunSuite with Matchers {
     val options       = Options(cmd = "get", eventsMap = Map(event1.eventKey -> Set("epoch")), printTimestamp = true)
     val onelineOutput = new EventOnelineTransformer(options).transform(List(event1))
 
-    onelineOutput shouldEqualContentsOf "oneline/with_timestamp.txt"
+    onelineOutput shouldEqualContentsOf "oneline/get_with_timestamp.txt"
   }
 
   test("should be able to log id per event in oneline format") {
@@ -71,7 +71,7 @@ class EventOnelineTransformerTest extends FunSuite with Matchers {
 
     val onelineOutput = new EventOnelineTransformer(options).transform(List(event1))
 
-    onelineOutput shouldEqualContentsOf "oneline/with_id.txt"
+    onelineOutput shouldEqualContentsOf "oneline/get_with_id.txt"
   }
 
   test("should be able to log units per event in oneline format") {
@@ -79,6 +79,6 @@ class EventOnelineTransformerTest extends FunSuite with Matchers {
     val options       = Options(cmd = "get", eventsMap = Map(event1.eventKey -> Set("epoch")), printUnits = true)
     val onelineOutput = new EventOnelineTransformer(options).transform(List(event1))
 
-    onelineOutput shouldEqualContentsOf "oneline/with_units.txt"
+    onelineOutput shouldEqualContentsOf "oneline/get_with_units.txt"
   }
 }

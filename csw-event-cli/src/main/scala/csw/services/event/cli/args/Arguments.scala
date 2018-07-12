@@ -89,7 +89,7 @@ trait Arguments { self: OptionParser[Options] =>
       .text("display timestamp")
 
   def id: OptionDef[Unit, Options] =
-    opt[Unit]('i', "id")
+    opt[Unit]("id")
       .action((_, c) => c.copy(printId = true))
       .text("display event id")
 
