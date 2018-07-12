@@ -104,7 +104,7 @@ class ArgsParserTest extends FunSuite with Matchers {
   }
 
   test("parse publish with only params provided") {
-    val args     = Array("publish", "-e", "a.b.c", "--params", "k1:i=1,2,3 k2:s:volt=5v")
+    val args     = Array("publish", "-e", "a.b.c", "--params", "k1:i=[1,2,3]|k2:s:volt=[5v]")
     val intParam = IntKey.make("k1").set(1, 2, 3)
     val strParam = StringKey.make("k2").set("5v").withUnits(volt)
 

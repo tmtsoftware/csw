@@ -8,11 +8,15 @@ import org.scalatest.{FunSuite, Matchers}
 class ParameterArgParserTest extends FunSuite with Matchers {
 
   test("should able to parse valid single param string when key name, type, units & values provided") {
-    ParameterArgParser.parse("k1:i:meter=1,2,3") shouldBe Set(IntKey.make("k1").set(1, 2, 3).withUnits(meter))
+    ParameterArgParser.parse("k1:i:meter=[1,2,3]") shouldBe Set(IntKey.make("k1").set(1, 2, 3).withUnits(meter))
+  }
+  test("should able to parse valid string params") {
+    ParameterArgParser.parse("k1:s=['a, b','cd']|k2:s=['x,y','z']") shouldBe
+    Set(StringKey.make("k1").set("a, b", "cd"), StringKey.make("k2").set("x,y", "z"))
   }
 
   test("should able to parse all valid space separated multi param string") {
-    val allParamsStr = "k1:i=1 k2:s:volt=5v k3:f=2.0 k4:d:centimeter=5.0 k5:l=10,20 k6:b=true"
+    val allParamsStr = "k1:i=[1]|k2:s:volt=[5v]|k3:f=[2.0]|k4:d:centimeter=[5.0]|k5:l=[10,20]|k6:b=[true]"
     val p1           = IntKey.make("k1").set(1)
     val p2           = StringKey.make("k2").set("5v").withUnits(volt)
     val p3           = FloatKey.make("k3").set(2.0f)
@@ -24,7 +28,7 @@ class ParameterArgParserTest extends FunSuite with Matchers {
   }
 
   test("should throw exception when values are not provided for some of the param") {
-    intercept[RuntimeException](ParameterArgParser.parse("k:i=1 k2:s"))
+    intercept[RuntimeException](ParameterArgParser.parse("k:i=1|k2:s"))
   }
 
   test("should throw exception when unsupported key type provided") {

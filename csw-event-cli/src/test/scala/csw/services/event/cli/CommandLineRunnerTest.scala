@@ -114,7 +114,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
     val path     = getClass.getResource("/" + filePath).getPath
     val eventKey = EventKey("wfos.test.move")
 
-    val cmdLineParams = "testKey:s=test testKey2:i:meter=1,2,3"
+    val cmdLineParams = "testKey:s=[test]|testKey2:i:meter=[1,2,3]"
     val strParam      = StringKey.make("testKey").set("test")
     val intParam      = IntKey.make("testKey2").set(1, 2, 3).withUnits(meter)
 
@@ -135,7 +135,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
     }
 
     // verify existing params get updated if provided cmd line params already present
-    val updateCmdLineParams = "testKey:s=test1,test2 testKey2:i:meter=4"
+    val updateCmdLineParams = "testKey:s=['test1','test2']|testKey2:i:meter=[4]"
     val updatedStrParam     = StringKey.make("testKey").set("test1", "test2")
     val updatedIntParam     = IntKey.make("testKey2").set(4).withUnits(meter)
 

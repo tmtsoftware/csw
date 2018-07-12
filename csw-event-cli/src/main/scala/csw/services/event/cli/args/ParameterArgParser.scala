@@ -8,18 +8,29 @@ object ParameterArgParser {
   def parse(cmdLineParamsArg: String): Set[Parameter[_]] =
     strParams(cmdLineParamsArg)
       .map(keyValue)
-      .map { case (key, values) ⇒ createParam(KeyArg(key), values) }
+      .map((createParam _).tupled)
       .toSet
 
-  private def strParams(paramsStr: String) = paramsStr.split(" ")
+  private def strParams(paramsStr: String) = paramsStr.split('|')
 
   private def keyValue(paramStr: String) = paramStr.split("=").toList match {
-    case List(key, value) ⇒ key → value.split(",")
+    case List(key, values) ⇒
+      val keyArg = KeyArg(key)
+      val sep    = if (keyArg.keyType == 's') '\'' else ','
+      keyArg → parseValues(values, sep)
     case _ ⇒
       throw new RuntimeException(
         s"Values are not provided in parameter arg [$paramStr], please specify param argument like keyName:keyType:unit=v1,v2"
       )
   }
+
+  private def invalidValue(value: String) = value.equals(",") || value.isEmpty
+  private def parseValues(values: String, separator: Char) =
+    values.split(separator).map(trim("\\[", "\\]")).filterNot(invalidValue)
+
+  private def ltrim(prefix: String): String ⇒ String                = _.replaceAll(s"^$prefix+", "")
+  private def rtrim(suffix: String): String ⇒ String                = _.replaceAll(s"$suffix+$$", "")
+  private def trim(prefix: String, suffix: String): String ⇒ String = ltrim(prefix) andThen rtrim(suffix)
 
   private def createParam(keyArg: KeyArg, values: Array[String]): Parameter[_] = {
     import keyArg._
