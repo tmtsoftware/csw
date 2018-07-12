@@ -28,7 +28,7 @@ trait EventSubscriber {
   def subscribe(eventKeys: Set[EventKey]): Source[Event, EventSubscription]
 
   /**
-   * Subscribe to multiple eventKeys and receive events at `every` frequency based on one of the given `mode` (RateAdapter or RateLimiter). The latest events available for the given
+   * Subscribe to multiple eventKeys and receive events at `every` frequency according to the specified `mode` (RateAdapter or RateLimiter). The latest events available for the given
    * Event Keys will be received first. If event is not published for one or more event keys, `invalid event` will be received for those Event Keys.
    *
    * At the time of invocation, in case the underlying server is not available, [[csw.services.event.exceptions.EventServerNotAvailable]] exception is thrown
@@ -59,7 +59,7 @@ trait EventSubscriber {
   def subscribeAsync(eventKeys: Set[EventKey], callback: Event => Future[_]): EventSubscription
 
   /**
-   * Overload for above `subscribeAsync` for receiving event at a `every` frequency based on one of the give `mode`. The latest events available for the given
+   * Overload for above `subscribeAsync` for receiving event at a `every` frequency according to the specified `mode`. The latest events available for the given
    * Event Keys will be received first. If event is not published for one or more event keys, `invalid event` will be received for those Event Keys.
    *
    * At the time of invocation, in case the underlying server is not available, [[csw.services.event.exceptions.EventServerNotAvailable]] exception is thrown
@@ -96,7 +96,7 @@ trait EventSubscriber {
   def subscribeCallback(eventKeys: Set[EventKey], callback: Event => Unit): EventSubscription
 
   /**
-   * Overload for above `subscribeCallback` for receiving event at a `every` frequency based on one of the give `mode`. The latest events available for the given
+   * Overload for above `subscribeCallback` for receiving event at a `every` frequency according to the specified `mode`. The latest events available for the given
    * Event Keys will be received first. If event is not published for one or more event keys, `invalid event` will be received for those Event Keys.
    *
    * At the time of invocation, in case the underlying server is not available, [[csw.services.event.exceptions.EventServerNotAvailable]] exception is thrown
@@ -132,7 +132,7 @@ trait EventSubscriber {
   def subscribeActorRef(eventKeys: Set[EventKey], actorRef: ActorRef[Event]): EventSubscription
 
   /**
-   * Overload for above `subscribeActorRef` for receiving event at a `every` frequency based on one of the give `mode`. The latest events available for the given
+   * Overload for above `subscribeActorRef` for receiving event at a `every` frequency according to the specified `mode`. The latest events available for the given
    * Event Keys will be received first. If event is not published for one or more event keys, `invalid event` will be received for those Event Keys.
    *
    * At the time of invocation, in case the underlying server is not available, [[csw.services.event.exceptions.EventServerNotAvailable]] exception is thrown

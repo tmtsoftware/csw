@@ -31,7 +31,7 @@ trait IEventSubscriber {
   def subscribe(eventKeys: util.Set[EventKey]): Source[Event, IEventSubscription]
 
   /**
-   * Subscribe to multiple eventKeys and receive events at `every` frequency based on one of the given `mode` (RateAdapter or RateLimiter). The latest events
+   * Subscribe to multiple eventKeys and receive events at `every` frequency according to the specified given `mode` (RateAdapter or RateLimiter). The latest events
    * available for the given Event Keys will be received first. If event is not published for one or more event keys, `invalid event` will be received for
    * those Event Keys.
    *
@@ -63,7 +63,7 @@ trait IEventSubscriber {
   def subscribeAsync(eventKeys: util.Set[EventKey], callback: Event ⇒ CompletableFuture[_]): IEventSubscription
 
   /**
-   * Overload for above `subscribeAsync` for receiving event at a `every` frequency based on one of the give `mode`. The latest
+   * Overload for above `subscribeAsync` for receiving event at a `every` frequency according to the specified `mode`. The latest
    * events available for the given Event Keys will be received first. If event is not published for one or more event keys, `invalid event` will be received for those Event Keys.
    *
    * At the time of invocation, in case the underlying server is not available, [[csw.services.event.exceptions.EventServerNotAvailable]] exception is thrown
@@ -100,7 +100,7 @@ trait IEventSubscriber {
   def subscribeCallback(eventKeys: util.Set[EventKey], callback: Consumer[Event]): IEventSubscription
 
   /**
-   * Overload for above `subscribeCallback` for receiving event at a `every` frequency based on one of the give `mode`.
+   * Overload for above `subscribeCallback` for receiving event at a `every` frequency according to the specified `mode`.
    * The latest events available for the given Event Keys will be received first. If event is not published for one or more event keys, `invalid event` will
    * be received for those Event Keys.
    *
@@ -137,7 +137,7 @@ trait IEventSubscriber {
   def subscribeActorRef(eventKeys: util.Set[EventKey], actorRef: ActorRef[Event]): IEventSubscription
 
   /**
-   * Overload for above `subscribeActorRef` for receiving event at a `every` frequency based on one of the give `mode`.
+   * Overload for above `subscribeActorRef` for receiving event at a `every` frequency according to the specified give `mode`.
    * The latest events available for the given Event Keys will be received first. If event is not published for one or more event keys, `invalid event` will be
    * received for those Event Keys.
    *
