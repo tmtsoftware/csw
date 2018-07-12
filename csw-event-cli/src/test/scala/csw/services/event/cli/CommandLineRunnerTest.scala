@@ -7,7 +7,7 @@ import csw.messages.params.formats.JsonSupport
 import csw.messages.params.generics.KeyType.{IntKey, StringKey}
 import csw.messages.params.models.Id
 import csw.messages.params.models.Units.meter
-import csw.services.event.cli.BufferExtensions.RichBuffer
+import csw.services.event.cli.IterableExtensions.RichStringIterable
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import org.scalatest.concurrent.Eventually
 import org.scalatest.time.SpanSugar.convertDoubleToGrainOfTime
@@ -38,24 +38,14 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
   import cliWiring._
 
   // DEOPSCSW-364: [Event Cli] Inspect command
-  test("should able to inspect event/events containing multiple parameters including recursive structs") {
-
-    commandLineRunner.inspect(argsParser.parse(Seq("inspect", "-e", s"${event1.eventKey}")).get).await
-    logBuffer shouldEqualContentsOf "inspect/expected/event1.txt"
-
-    logBuffer.clear()
-
-    commandLineRunner.inspect(argsParser.parse(Seq("inspect", "--events", s"${event2.eventKey}")).get).await
-    logBuffer shouldEqualContentsOf "inspect/expected/event2.txt"
-
-    logBuffer.clear()
+  test("should able to inspect events containing multiple parameters including recursive structs") {
 
     commandLineRunner.inspect(argsParser.parse(Seq("inspect", "-e", s"${event1.eventKey},${event2.eventKey}")).get).await
-    logBuffer shouldEqualContentsOf "inspect/expected/event1And2.txt"
+    logBuffer shouldEqualContentsOf "oneline/multiple_events_inspect.txt"
   }
 
   // DEOPSCSW-431: [Event Cli] Get command
-  test("should able to get entire event/events in json format") {
+  test("should able to get events in json format") {
 
     commandLineRunner.get(argsParser.parse(Seq("get", "-e", s"${event1.eventKey}", "-o", "json")).get).await
     stringToEvent(logBuffer.head) shouldBe event1
@@ -67,29 +57,10 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
     events shouldEqual Set(event1, event2)
   }
 
-  test("should be able to subscribe to event key") {
-    import cliWiring._
+  test("should able to get events in oneline format") {
 
-    implicit val mat: Materializer    = actorRuntime.mat
-    implicit val ec: ExecutionContext = actorRuntime.ec
-
-    val eventGenerator = new EventGenerator(EventName(s"system_1"))
-    import eventGenerator._
-
-    val eventKey: EventKey = eventsGroup.head.eventKey
-    val publisher          = eventService.defaultPublisher.await
-
-    val cancellable = publisher.publish(eventGenerator.generate, 400.millis)
-
-    val (subscriptionF, doneF) =
-      commandLineRunner.subscribe(argsParser.parse(Seq("subscribe", "--out", "json", "--events", eventKey.key)).get)
-
-    Thread.sleep(1000)
-
-    cancellable.cancel()
-    subscriptionF.map(_.unsubscribe())
-
-    logBuffer shouldEqualContentsOf "subscribe/expected/outJson.txt"
+    commandLineRunner.get(argsParser.parse(Seq("get", "-e", s"${event1.eventKey}")).get).await
+    logBuffer shouldEqualContentsOf "oneline/entire_event_get.txt"
   }
 
   // DEOPSCSW-432: [Event Cli] Publish command
@@ -98,7 +69,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
     val eventJson = Json.parse(Source.fromResource("publish/observe_event.json").mkString)
 
     val eventKey = EventKey("wfos.blue.filter.wheel")
-    commandLineRunner.publish(argsParser.parse(Seq("publish", "-e", s"${eventKey.key}", "--data", path)).get).await
+    commandLineRunner.publish(argsParser.parse(Seq("publish", "-e", eventKey.key, "--data", path)).get).await
 
     eventually(timeout = timeout(5.seconds), interval = interval(100.millis)) {
       commandLineRunner.get(argsParser.parse(Seq("get", "-e", eventKey.key, "-o", "json")).get).await
@@ -124,7 +95,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
 
     // publish same event every 300 millis for 2 seconds and starts with 0th sec, which results into publishing 7 events
     commandLineRunner
-      .publish(argsParser.parse(Seq("publish", "-e", s"${eventKey.key}", "--data", path, "-i", "300", "-p", "2")).get)
+      .publish(argsParser.parse(Seq("publish", "-e", eventKey.key, "--data", path, "-i", "300", "-p", "2")).get)
       .await
 
     // invalid event + 7 events published in previous step
@@ -148,10 +119,10 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
     val expectedEventJson = JsonSupport.writeEvent[ObserveEvent](expectedEvent)
 
     // first publish event with default data from json file
-    commandLineRunner.publish(argsParser.parse(Seq("publish", "-e", s"${eventKey.key}", "--data", path)).get).await
+    commandLineRunner.publish(argsParser.parse(Seq("publish", "-e", eventKey.key, "--data", path)).get).await
 
     // publish with params and verify new event contains existing params as well as newly provided cmd line params
-    commandLineRunner.publish(argsParser.parse(Seq("publish", "-e", s"${eventKey.key}", "--params", cmdLineParams)).get).await
+    commandLineRunner.publish(argsParser.parse(Seq("publish", "-e", eventKey.key, "--params", cmdLineParams)).get).await
 
     eventually(timeout = timeout(5.seconds), interval = interval(100.millis)) {
       commandLineRunner.get(argsParser.parse(Seq("get", "-e", eventKey.key, "-o", "json")).get).await
@@ -167,7 +138,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
     val updatedExpectedEventJson = JsonSupport.writeEvent[ObserveEvent](updatedExpectedEvent)
 
     commandLineRunner
-      .publish(argsParser.parse(Seq("publish", "-e", s"${eventKey.key}", "--params", updateCmdLineParams)).get)
+      .publish(argsParser.parse(Seq("publish", "-e", eventKey.key, "--params", updateCmdLineParams)).get)
       .await
 
     eventually(timeout = timeout(5.seconds), interval = interval(100.millis)) {
@@ -194,4 +165,47 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
   private def fileToEventJson(filePath: String)         = Json.parse(Source.fromResource(filePath).mkString)
   private def strToJsObject(js: String)                 = Json.parse(js).as[JsObject]
 
+  test("should be able to subscribe and get json output to event key") {
+
+    implicit val mat: Materializer    = actorRuntime.mat
+    implicit val ec: ExecutionContext = actorRuntime.ec
+
+    val eventGenerator = new EventGenerator(EventName(s"system_1"))
+    import eventGenerator._
+    val publisher   = eventService.defaultPublisher.await
+    val cancellable = publisher.publish(eventGenerator.generate, 400.millis)
+
+    val eventKey: EventKey = eventsGroup.head.eventKey
+    val (subscriptionF, _) =
+      commandLineRunner.subscribe(argsParser.parse(Seq("subscribe", "-o", "json", "--events", eventKey.key)).get)
+
+    Thread.sleep(1000)
+
+    cancellable.cancel()
+    subscriptionF.map(_.unsubscribe())
+
+    logBuffer shouldEqualContentsOf "json/entire_events.txt"
+  }
+
+  test("should be able to subscribe to event key and get oneline output") {
+    import cliWiring._
+
+    implicit val mat: Materializer    = actorRuntime.mat
+    implicit val ec: ExecutionContext = actorRuntime.ec
+
+    val eventGenerator = new EventGenerator(EventName(s"system_1"))
+    import eventGenerator._
+
+    val eventKey: EventKey = eventsGroup.head.eventKey
+    eventService.defaultPublisher.await.publish(event1).await
+
+    val (subscriptionF, _) =
+      commandLineRunner.subscribe(argsParser.parse(Seq("subscribe", "--events", eventKey.key)).get)
+
+    Thread.sleep(1000)
+
+    subscriptionF.map(_.unsubscribe())
+
+    logBuffer shouldEqualContentsOf "oneline/entire_event_get.txt"
+  }
 }

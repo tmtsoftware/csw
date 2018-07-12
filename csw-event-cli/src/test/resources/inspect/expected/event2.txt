@@ -1,9 +1,0 @@
-=========================================================================
-wfos.prog.filter.stop
-
-struct-2/dec = StringKey[NoUnits]
-struct-2/ra = StringKey[NoUnits]
-struct-2/struct-1/dec = StringKey[NoUnits]
-struct-2/struct-1/ra = StringKey[NoUnits]
-timestamp = TimestampKey[second]
-=========================================================================

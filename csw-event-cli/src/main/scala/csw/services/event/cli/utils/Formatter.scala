@@ -3,11 +3,25 @@ package csw.services.event.cli.utils
 import csw.messages.events.{Event, EventKey}
 import csw.messages.params.generics.Parameter
 import csw.services.event.cli.args.Options
-import play.api.libs.json.{JsObject, Json}
 
-abstract class Formatter(options: Options) {
-
+object Formatter {
   val eventSeparator = "========================================================================="
+
+  def invalidKey(eventKey: EventKey): String = s"$eventKey [ERROR] No events published for this key."
+}
+
+case class OnelineFormatter(options: Options) {
+
+  def format(event: Event, lines: List[Oneline]): String = {
+    lines
+      .map { line =>
+        if (options.printValues && options.printUnits) line.withValuesAndUnits()
+        else if (options.printValues) line.withValues()
+        else line.withKeyTypeAndUnits()
+      }
+      .sorted
+      .mkString("\n")
+  }
 
   def header(event: Event): String = {
     val timestamp = if (options.printTimestamp) event.eventTime.time.toString else ""
@@ -15,32 +29,6 @@ abstract class Formatter(options: Options) {
     val header    = List(timestamp, id, event.eventKey.key).filter(_.nonEmpty).mkString(" ")
     header + "\n"
   }
-
-  def invalidKey(eventKey: EventKey): String = s"$eventKey [ERROR] No events published for this key."
-
-}
-
-case class JsonFormatter(options: Options) extends Formatter(options) {
-  def format(eventJson: JsObject): String = Json.prettyPrint(eventJson)
-}
-
-case class OnelineFormatter(options: Options) extends Formatter(options) {
-  def format(event: Event, onelines: List[Oneline]): String =
-    EventOutput(event, options, onelines)
-      .onelines()
-      .sorted
-      .mkString("\n")
-}
-
-case class EventOutput(event: Event, options: Options, lines: List[Oneline]) {
-  def onelines(): List[String] =
-    lines
-      .map(
-        line ⇒
-          if (options.cmd == "get")
-            if (options.printUnits) line.withValuesAndUnits() else line.withValues()
-          else line.withKeyTypeAndUnits()
-      )
 }
 
 case class Oneline(path: String, param: Parameter[_]) {

@@ -68,6 +68,8 @@ sealed trait Event { self: ParameterSetType[_] ⇒
    */
   override def toString: String =
     s"$typeName(eventId=$eventId, source=$source, eventName=$eventName, eventTime=$eventTime, paramSet=$paramSet)"
+
+  def isInvalid: Boolean = eventTime == EventTime(Instant.ofEpochMilli(-1))
 }
 
 object Event {
@@ -172,7 +174,6 @@ case class SystemEvent private (
    */
   def toPb: PbEvent = Event.typeMapper[SystemEvent].toBase(this)
 
-  def isInvalid: Boolean = eventTime == EventTime(Instant.ofEpochMilli(-1))
 }
 
 object SystemEvent {
