@@ -6,7 +6,7 @@ import enumeratum.{Enum, EnumEntry, PlayJsonEnum}
 
 import scala.collection.immutable.IndexedSeq
 
-sealed abstract class AlarmSeverity private[alarm] (level: Int) extends EnumEntry with Lowercase with TMTSerializable {
+sealed abstract class AlarmSeverity private[alarm] (val level: Int) extends EnumEntry with Lowercase with TMTSerializable {
 
   /**
    * The name of SeverityLevels e.g. for Major severity level, the name will be represented as `major`

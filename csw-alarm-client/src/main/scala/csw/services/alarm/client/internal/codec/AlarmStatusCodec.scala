@@ -19,5 +19,5 @@ object AlarmStatusCodec extends RedisCodec[AlarmKey, AlarmStatus] {
 
   override def encodeValue(alarmStatus: AlarmStatus): ByteBuffer = utf8StringCodec.encodeValue(write(alarmStatus))
 
-  override def decodeValue(byteBuf: ByteBuffer): AlarmStatus = read[AlarmStatus](utf8StringCodec.decodeKey(byteBuf))
+  override def decodeValue(byteBuf: ByteBuffer): AlarmStatus = read[AlarmStatus](utf8StringCodec.decodeValue(byteBuf))
 }

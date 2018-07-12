@@ -6,6 +6,8 @@ import csw.services.alarm.api.models.{AlarmKey, AlarmSeverity}
 import io.lettuce.core.codec.{RedisCodec, Utf8StringCodec}
 import upickle.default._
 
+import scala.util.control.NonFatal
+
 /**
  * Encodes and decodes keys as AlarmKey and values as Json byte equivalent of AlarmSeverity
  */
@@ -19,5 +21,10 @@ object AlarmSeverityCodec extends RedisCodec[AlarmKey, AlarmSeverity] {
 
   override def encodeValue(alarmSeverity: AlarmSeverity): ByteBuffer = utf8StringCodec.encodeValue(write(alarmSeverity))
 
-  override def decodeValue(byteBuf: ByteBuffer): AlarmSeverity = read[AlarmSeverity](utf8StringCodec.decodeKey(byteBuf))
+  override def decodeValue(byteBuf: ByteBuffer): AlarmSeverity =
+    try {
+      read[AlarmSeverity](utf8StringCodec.decodeValue(byteBuf))
+    } catch {
+      case NonFatal(_) ⇒ AlarmSeverity.Disconnected // if severity expires than cast the null returned value to Disconnected
+    }
 }

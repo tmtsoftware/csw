@@ -35,7 +35,7 @@ class AlarmServiceImpl(redisURI: RedisURI, redisClient: RedisClient)(implicit ac
   private val maxMissedRefreshCounts = actorSystem.settings.config.getInt("alarm.max-missed-refresh-counts") //default value is 3 times
   private val ttlInSeconds           = refreshInSeconds * maxMissedRefreshCounts
 
-  override def setSeverity(key: AlarmKey, severity: AlarmSeverity, autoRefresh: Boolean): Future[Unit] = async {
+  override def setSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Unit] = async {
     // get alarm metadata
     val metadataCommands = await(asyncMetadataCommandsF)
     val alarm            = await(metadataCommands.get(key).toScala)
@@ -69,5 +69,8 @@ class AlarmServiceImpl(redisURI: RedisURI, redisClient: RedisClient)(implicit ac
     await(statusCommands.set(key, status).toScala)
   }
 
-  override def getSeverity(key: AlarmKey): Future[AlarmSeverity] = ???
+  override def getSeverity(key: AlarmKey): Future[AlarmSeverity] = async {
+    val severityCommands = await(asyncSeverityCommandsF)
+    await(severityCommands.get(key).toScala)
+  }
 }

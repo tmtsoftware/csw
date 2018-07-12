@@ -19,5 +19,5 @@ object AlarmMetadataCodec extends RedisCodec[AlarmKey, AlarmMetadata] {
 
   override def encodeValue(alarmMetadata: AlarmMetadata): ByteBuffer = utf8StringCodec.encodeValue(write(alarmMetadata))
 
-  override def decodeValue(byteBuf: ByteBuffer): AlarmMetadata = read[AlarmMetadata](utf8StringCodec.decodeKey(byteBuf))
+  override def decodeValue(byteBuf: ByteBuffer): AlarmMetadata = read[AlarmMetadata](utf8StringCodec.decodeValue(byteBuf))
 }
