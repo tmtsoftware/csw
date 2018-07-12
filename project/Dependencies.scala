@@ -180,7 +180,8 @@ object Dependencies {
   )
 
   val AlarmClient = Seq(
-    Libs.`lettuce`
+    Libs.`lettuce`,
+    Libs.`scala-async`
   )
 
   val Commons = Seq(

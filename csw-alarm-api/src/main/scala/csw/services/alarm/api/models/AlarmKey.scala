@@ -2,6 +2,7 @@ package csw.services.alarm.api.models
 
 import csw.messages.params.models.Prefix
 import csw.services.alarm.api.internal.UPickleFormatAdapter
+import csw.services.alarm.api.models.AlarmKey.{METADATA_KEY_SUFFIX, SEVERITY_KEY_SUFFIX, STATUS_KEY_SUFFIX}
 import play.api.libs.json.{Json, OFormat}
 import upickle.default.{ReadWriter ⇒ RW}
 
@@ -13,12 +14,20 @@ import upickle.default.{ReadWriter ⇒ RW}
  * @param alarmName represents the name of the alarm e.g tromboneAxisLowLimitAlarm
  */
 case class AlarmKey(source: Prefix, alarmName: AlarmName) {
-  val key                       = s"${source.prefix}.$alarmName"
+  val key = s"${source.prefix}.$alarmName"
+
+  private[alarm] val metadataKey: String = key + METADATA_KEY_SUFFIX
+  private[alarm] val statusKey: String   = key + STATUS_KEY_SUFFIX
+  private[alarm] val severityKey: String = key + SEVERITY_KEY_SUFFIX
+
   override def toString: String = key
 }
 
 object AlarmKey {
-  private val SEPARATOR = "."
+  private val SEPARATOR           = "."
+  private val METADATA_KEY_SUFFIX = ".metadata"
+  private val STATUS_KEY_SUFFIX   = ".status"
+  private val SEVERITY_KEY_SUFFIX = ".severity"
 
   /**
    * Create AlarmKey from the given string representation of the same
@@ -32,6 +41,10 @@ object AlarmKey {
     val strings = alarmKeyStr.splitAt(alarmKeyStr.lastIndexOf(SEPARATOR))
     new AlarmKey(Prefix(strings._1), AlarmName(strings._2.tail))
   }
+
+  private[alarm] def fromMetadataKey(metadataKeyStr: String): AlarmKey = apply(metadataKeyStr.replace(METADATA_KEY_SUFFIX, ""))
+  private[alarm] def fromStatusKey(statusKeyStr: String): AlarmKey     = apply(statusKeyStr.replace(STATUS_KEY_SUFFIX, ""))
+  private[alarm] def fromSeverityKey(severityKeyStr: String): AlarmKey = apply(severityKeyStr.replace(SEVERITY_KEY_SUFFIX, ""))
 
   implicit val format: OFormat[AlarmKey] = Json.format[AlarmKey]
   implicit val alarmKeyRw: RW[AlarmKey]  = UPickleFormatAdapter.playJsonToUPickle
