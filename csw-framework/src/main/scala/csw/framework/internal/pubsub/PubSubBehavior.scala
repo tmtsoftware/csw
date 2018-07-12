@@ -2,9 +2,9 @@ package csw.framework.internal.pubsub
 
 import akka.actor.typed.scaladsl.{ActorContext, MutableBehavior}
 import akka.actor.typed.{ActorRef, Behavior, Signal, Terminated}
-import csw.messages.commands.SubscriptionKey
+import csw.messages.commands.Nameable
 import csw.messages.framework.PubSub
-import csw.messages.framework.PubSub.{Publish, Subscribe, SubscribeOnly, Unsubscribe}
+import csw.messages.framework.PubSub._
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
 /**
@@ -14,19 +14,20 @@ import csw.services.logging.scaladsl.{Logger, LoggerFactory}
  * @param loggerFactory the LoggerFactory used for logging with component name
  * @tparam T the type of the data which will be published or subscribed to using this actor
  */
-private[framework] class PubSubBehavior[T](ctx: ActorContext[PubSub[T]], loggerFactory: LoggerFactory)
+private[framework] class PubSubBehavior[T: Nameable](ctx: ActorContext[PubSub[T]], loggerFactory: LoggerFactory)
     extends MutableBehavior[PubSub[T]] {
   private val log: Logger = loggerFactory.getLogger(ctx)
 
+  val nameableData: Nameable[T] = implicitly[Nameable[T]]
   // list of subscribers who subscribe to the component using this pub-sub actor for the data of type [[T]]
-  var subscribers: Map[ActorRef[T], SubscriptionKey[T]] = Map.empty
+  var subscribers: Map[ActorRef[T], Option[Set[String]]] = Map.empty
 
   override def onMessage(msg: PubSub[T]): Behavior[PubSub[T]] = {
     msg match {
-      case SubscribeOnly(ref, key) => subscribe(ref, key)
-      case Subscribe(ref)          => subscribe(ref, SubscriptionKey.all)
-      case Unsubscribe(ref)        => unsubscribe(ref)
-      case Publish(data)           => notifySubscribers(data)
+      case SubscribeOnly(ref, names) => subscribe(ref, Some(names))
+      case Subscribe(ref)            => subscribe(ref, None)
+      case Unsubscribe(ref)          => unsubscribe(ref)
+      case Publish(data)             => notifySubscribers(data)
     }
     this
   }
@@ -35,9 +36,9 @@ private[framework] class PubSubBehavior[T](ctx: ActorContext[PubSub[T]], loggerF
     case Terminated(ref) ⇒ unsubscribe(ref.upcast); this
   }
 
-  private def subscribe(actorRef: ActorRef[T], key: SubscriptionKey[T]): Unit = {
+  private def subscribe(actorRef: ActorRef[T], mayBeNames: Option[Set[String]]): Unit = {
     if (!subscribers.contains(actorRef)) {
-      subscribers += ((actorRef, key))
+      subscribers += ((actorRef, mayBeNames))
       ctx.watch(actorRef)
     }
   }
@@ -48,6 +49,12 @@ private[framework] class PubSubBehavior[T](ctx: ActorContext[PubSub[T]], loggerF
 
   protected def notifySubscribers(data: T): Unit = {
     log.debug(s"Notifying subscribers :[${subscribers.mkString(",")}] with data :[$data]")
-    subscribers.filter(subscriber ⇒ subscriber._2.predicate(data)).foreach(_._1 ! data)
+    subscribers.foreach(
+      subscriber ⇒
+        subscriber._2 match {
+          case None        ⇒ subscriber._1 ! data
+          case Some(names) ⇒ if (names.contains(nameableData.name(data))) subscriber._1 ! data
+      }
+    )
   }
 }

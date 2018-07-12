@@ -154,7 +154,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
         CurrentState commandState;
 
         if (controlCommand instanceof Setup)
-            commandState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.setupConfigChoice())).add(controlCommand.paramSet().head());
+            commandState = new CurrentState(SampleComponentState.prefix().prefix(), new StateName("testStateSetup")).add(SampleComponentState.choiceKey().set(SampleComponentState.setupConfigChoice())).add(controlCommand.paramSet().head());
         else
             commandState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.observeConfigChoice())).add(controlCommand.paramSet().head());
 

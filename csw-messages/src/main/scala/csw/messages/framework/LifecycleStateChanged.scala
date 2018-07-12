@@ -1,6 +1,7 @@
 package csw.messages.framework
 
 import akka.actor.typed.ActorRef
+import csw.messages.commands.Nameable
 import csw.messages.{ComponentMessage, TMTSerializable}
 
 /**
@@ -11,3 +12,9 @@ import csw.messages.{ComponentMessage, TMTSerializable}
  */
 case class LifecycleStateChanged private[messages] (publisher: ActorRef[ComponentMessage], state: SupervisorLifecycleState)
     extends TMTSerializable
+
+object LifecycleStateChanged {
+  implicit object NameableLifecycleStateChanged extends Nameable[LifecycleStateChanged] {
+    override def name(state: LifecycleStateChanged): String = state.state.toString
+  }
+}

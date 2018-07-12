@@ -1,6 +1,6 @@
 package csw.messages.params.states
 
-import csw.messages.commands.Setup
+import csw.messages.commands.{Nameable, Setup}
 import csw.messages.params.generics.{Parameter, ParameterSetKeyData, ParameterSetType}
 import csw.messages.params.models.Prefix
 import csw.messages.params.states.StateVariable.StateVariable
@@ -165,4 +165,8 @@ object CurrentState {
       stateName: StateName,
       paramSet: Set[Parameter[_]] = Set.empty[Parameter[_]]
   ): CurrentState = new CurrentState(prefix, stateName).madd(paramSet)
+
+  implicit object NameableCurrentState extends Nameable[CurrentState] {
+    override def name(state: CurrentState): String = state.stateName.name
+  }
 }

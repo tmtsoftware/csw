@@ -2,12 +2,13 @@ package csw.services.command.scaladsl
 
 import akka.NotUsed
 import akka.actor.Scheduler
-import akka.stream.scaladsl.Source
-import akka.stream.{ActorMaterializer, Materializer}
 import akka.actor.typed.scaladsl.AskPattern._
 import akka.actor.typed.scaladsl.adapter._
 import akka.actor.typed.{ActorRef, ActorSystem}
+import akka.stream.scaladsl.Source
+import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
+import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.commands.CommandResponse.{Accepted, Completed, Error}
 import csw.messages.commands.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
 import csw.messages.commands.matchers.{Matcher, StateMatcher}
@@ -15,9 +16,7 @@ import csw.messages.commands.{CommandResponse, ControlCommand}
 import csw.messages.location.AkkaLocation
 import csw.messages.params.models.Id
 import csw.messages.params.states.CurrentState
-import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.{CommandResponseManagerMessage, ComponentMessage}
-import csw.messages.CommandResponseManagerMessage
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -169,6 +168,19 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
    * @return a CurrentStateSubscription to stop the subscription
    */
   def subscribeCurrentState(callback: CurrentState ⇒ Unit): CurrentStateSubscription =
-    new CurrentStateSubscription(component, callback)
+    new CurrentStateSubscription(component, None, callback)
+
+  /**
+   * Subscribe to the current state of a component corresponding to the [[csw.messages.location.AkkaLocation]] of the component
+   *
+   * @param names subscribe to only those states which have any of the the provided value for name
+   * @param callback the action to be applied on the CurrentState element received as a result of subscription
+   * @return a CurrentStateSubscription to stop the subscription
+   */
+  def subscribeOnlyCurrentState(
+      names: Set[String],
+      callback: CurrentState ⇒ Unit
+  ): CurrentStateSubscription =
+    new CurrentStateSubscription(component, Some(names), callback)
 
 }

@@ -1,17 +1,15 @@
 package csw.framework.internal.pubsub
 
+import akka.actor.testkit.typed.TestKitSettings
+import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestInbox, TestProbe}
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.typed.scaladsl.{Behaviors, MutableBehavior}
 import akka.actor.{typed, ActorSystem}
-import akka.actor.testkit.typed.TestKitSettings
-import akka.actor.testkit.typed.scaladsl.TestInbox
-import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
 import csw.framework.FrameworkTestMocks
-import csw.messages.commands.SubscriptionKey
-import csw.messages.{framework, ComponentMessage}
 import csw.messages.framework.PubSub.{Publish, Subscribe, SubscribeOnly, Unsubscribe}
 import csw.messages.framework.{LifecycleStateChanged, PubSub, SupervisorLifecycleState}
 import csw.messages.params.states.{CurrentState, StateName}
+import csw.messages.{framework, ComponentMessage}
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.logging.scaladsl.Logger
 import org.scalatest.mockito.MockitoSugar
@@ -64,12 +62,15 @@ class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
   // DEOPSCSW-434 : Allow subscription of CurrentState using StateName
   test("message should be published to the subscribers depending on subscription key") {
     val pubSubBehavior: BehaviorTestKit[PubSub[CurrentState]] = createCurrentStateStatePubSubBehavior()
-    val supervisorProbe                                       = TestProbe[ComponentMessage]
 
-    val subscriptionKey = new SubscriptionKey[CurrentState](state ⇒ state.stateName == StateName("testStateName2"))
+//    val subscriptionKey = new SubscriptionKey[CurrentState](state ⇒ state.stateName == StateName("testStateName2"))
+//    val subscriptionKey1 = new SubscriptionKey[CurrentState](state => {
+//      val choiceParameter = SampleComponentState.choiceKey.set(SampleComponentState.submitCommandChoice)
+//      state.paramSet.contains(choiceParameter)
+//    })
 
     pubSubBehavior.run(Subscribe(currentStateProbe1.ref))
-    pubSubBehavior.run(SubscribeOnly(currentStateProbe2.ref, subscriptionKey))
+    pubSubBehavior.run(SubscribeOnly(currentStateProbe2.ref, Set("testStateName2")))
 
     pubSubBehavior.run(Publish(currentState1))
     pubSubBehavior.run(Publish(currentState2))

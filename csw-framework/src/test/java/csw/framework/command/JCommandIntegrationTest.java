@@ -1,15 +1,17 @@
 package csw.framework.command;
 
 import akka.actor.ActorSystem;
+import akka.actor.testkit.typed.javadsl.TestInbox;
+import akka.actor.testkit.typed.javadsl.TestProbe;
 import akka.actor.typed.internal.adapter.ActorSystemAdapter;
 import akka.stream.ActorMaterializer;
 import akka.stream.Materializer;
-import akka.actor.testkit.typed.javadsl.TestProbe;
 import akka.util.Timeout;
 import com.typesafe.config.ConfigFactory;
 import csw.common.components.framework.SampleComponentState;
 import csw.framework.internal.wiring.FrameworkWiring;
 import csw.framework.internal.wiring.Standalone;
+import csw.messages.SupervisorLockMessage;
 import csw.messages.commands.CommandIssue;
 import csw.messages.commands.CommandResponse;
 import csw.messages.commands.CommandResponse.Completed;
@@ -27,13 +29,13 @@ import csw.messages.params.generics.Parameter;
 import csw.messages.params.states.CurrentState;
 import csw.messages.params.states.DemandState;
 import csw.messages.params.states.StateName;
-import csw.messages.SupervisorLockMessage;
 import csw.services.command.javadsl.JCommandDistributor;
 import csw.services.command.javadsl.JCommandService;
 import csw.services.command.scaladsl.CurrentStateSubscription;
 import csw.services.location.commons.ClusterAwareSettings;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.location.javadsl.JLocationServiceFactory;
+import csw.services.logging.javadsl.JLoggingSystemFactory;
 import io.lettuce.core.RedisClient;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -75,6 +77,7 @@ public class JCommandIntegrationTest {
     public static void setup() throws Exception {
         hcdLocation = getLocation();
         hcdCmdService = new JCommandService(hcdLocation, akka.actor.typed.ActorSystem.wrap(hcdActorSystem));
+        JLoggingSystemFactory.start("","", "", hcdActorSystem);
     }
 
     @AfterClass
@@ -405,7 +408,7 @@ public class JCommandIntegrationTest {
         CurrentState currentState = new CurrentState(SampleComponentState.prefix().prefix(), new StateName("testStateName"));
         CurrentState expectedValidationCurrentState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.commandValidationChoice()));
         CurrentState expectedSubmitCurrentState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.submitCommandChoice()));
-        CurrentState expectedSetupCurrentState = currentState.madd(SampleComponentState.choiceKey().set(SampleComponentState.setupConfigChoice()), intParameter1);
+        CurrentState expectedSetupCurrentState = new CurrentState(SampleComponentState.prefix().prefix(), new StateName("testStateSetup")).madd(SampleComponentState.choiceKey().set(SampleComponentState.setupConfigChoice()), intParameter1);
 
         probe.expectMessage(expectedValidationCurrentState);
         probe.expectMessage(expectedSubmitCurrentState);
@@ -416,5 +419,40 @@ public class JCommandIntegrationTest {
 
         hcdCmdService.submit(setup, timeout);
         probe.expectNoMessage(java.time.Duration.ofMillis(20));
+    }
+
+    @Test
+    public void testSubscribeOnlyCurrentState() throws InterruptedException {
+        Key<Integer> intKey1 = JKeyTypes.IntKey().make("encoder");
+        Parameter<Integer> intParameter1 = intKey1.set(22, 23);
+        Setup setup = new Setup(prefix(), acceptedCmd(), Optional.empty()).add(intParameter1);
+
+        TestInbox<CurrentState> inbox = TestInbox.create();
+        Thread.sleep(1000);
+
+        // DEOPSCSW-434: Provide an API for PubSubActor that hides actor based interaction
+        //#subscribeOnlyCurrentState
+        // subscribe to the current state of an assembly component and use a callback which forwards each received
+        // element to a test probe actor
+        CurrentStateSubscription subscription = hcdCmdService.subscribeOnlyCurrentState(Collections.singleton("testStateSetup"), currentState -> inbox.getRef().tell(currentState));
+        //#subscribeOnlyCurrentState
+
+        hcdCmdService.submit(setup, timeout);
+
+        CurrentState currentState = new CurrentState(SampleComponentState.prefix().prefix(), new StateName("testStateName"));
+        CurrentState expectedValidationCurrentState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.commandValidationChoice()));
+        CurrentState expectedSubmitCurrentState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.submitCommandChoice()));
+        CurrentState expectedSetupCurrentState = new CurrentState(SampleComponentState.prefix().prefix(), new StateName("testStateSetup")).madd(SampleComponentState.choiceKey().set(SampleComponentState.setupConfigChoice()), intParameter1);
+
+        Thread.sleep(1000);
+        List<CurrentState> receivedStates = inbox.getAllReceived();
+        System.out.println(receivedStates.size());
+        receivedStates.forEach(System.out::println);
+
+        Assert.assertFalse(receivedStates.contains(expectedValidationCurrentState));
+        Assert.assertFalse(receivedStates.contains(expectedSubmitCurrentState));
+        Assert.assertTrue(receivedStates.contains(expectedSetupCurrentState));
+
+        subscription.unsubscribe();
     }
 }

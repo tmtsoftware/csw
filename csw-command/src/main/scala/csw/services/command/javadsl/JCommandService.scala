@@ -5,10 +5,10 @@ import java.util.function.Consumer
 
 import akka.NotUsed
 import akka.actor.Scheduler
-import akka.stream.javadsl.Source
-import akka.stream.{ActorMaterializer, Materializer}
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.stream.javadsl.Source
+import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
 import csw.messages.commands.matchers.StateMatcher
 import csw.messages.commands.{CommandResponse, ControlCommand}
@@ -152,5 +152,18 @@ class JCommandService(akkaLocation: AkkaLocation, actorSystem: ActorSystem[_]) {
    */
   def subscribeCurrentState(callback: Consumer[CurrentState]): CurrentStateSubscription =
     sCommandService.subscribeCurrentState(callback.asScala)
+
+  /**
+   * Subscribe to the current state of a component corresponding to the [[csw.messages.location.AkkaLocation]] of the component
+   *
+   * @param names subscribe to only those states which have any of the the provided value for name
+   * @param callback the action to be applied on the CurrentState element received as a result of subscription
+   * @return a CurrentStateSubscription to stop the subscription
+   */
+  def subscribeOnlyCurrentState(
+      names: java.util.Set[String],
+      callback: Consumer[CurrentState]
+  ): CurrentStateSubscription =
+    sCommandService.subscribeOnlyCurrentState(names.asScala.toSet, callback.asScala)
 
 }
