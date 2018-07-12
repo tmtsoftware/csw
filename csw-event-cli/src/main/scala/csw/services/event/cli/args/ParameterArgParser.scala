@@ -1,36 +1,36 @@
 package csw.services.event.cli.args
 
+import com.github.tototoshi.csv.CSVParser
 import csw.messages.params.generics.KeyType.{BooleanKey, DoubleKey, FloatKey, IntKey, LongKey, StringKey}
 import csw.messages.params.generics.Parameter
+import csw.services.event.cli.args.Separators._
 
 object ParameterArgParser {
 
   def parse(cmdLineParamsArg: String): Set[Parameter[_]] =
-    strParams(cmdLineParamsArg)
+    extractParams(cmdLineParamsArg)
       .map(keyValue)
       .map((createParam _).tupled)
       .toSet
 
-  private def strParams(paramsStr: String) = paramsStr.split('|')
+  private def extractParams(paramsStr: String) = paramsStr.split(PARAMS_SEP)
 
-  private def keyValue(paramStr: String) = paramStr.split("=").toList match {
-    case List(key, values) ⇒
-      val keyArg = KeyArg(key)
-      val sep    = if (keyArg.keyType == 's') '\'' else ','
-      keyArg → parseValues(values, sep)
+  private def keyValue(paramStr: String) = paramStr.split(KEY_VALUE_SEP).toList match {
+    case List(key, values) ⇒ KeyArg(key) → parseValues(values)
     case _ ⇒
       throw new RuntimeException(
         s"Values are not provided in parameter arg [$paramStr], please specify param argument like keyName:keyType:unit=v1,v2"
       )
   }
 
-  private def invalidValue(value: String) = value.equals(",") || value.isEmpty
-  private def parseValues(values: String, separator: Char) =
-    values.split(separator).map(trim("\\[", "\\]")).filterNot(invalidValue)
+  private def parseValues(values: String) = {
+    val trimmedValues = trim(values, VALUES_OPENING, VALUES_CLOSING)
 
-  private def ltrim(prefix: String): String ⇒ String                = _.replaceAll(s"^$prefix+", "")
-  private def rtrim(suffix: String): String ⇒ String                = _.replaceAll(s"$suffix+$$", "")
-  private def trim(prefix: String, suffix: String): String ⇒ String = ltrim(prefix) andThen rtrim(suffix)
+    CSVParser.parse(trimmedValues, DEFAULT_ESC_CHAR, VALUES_DELIMITER, VALUES_QUOTE_CHAR) match {
+      case Some(result) ⇒ result.toArray
+      case None         ⇒ throw new RuntimeException(s"Failed to parse values: $values")
+    }
+  }
 
   private def createParam(keyArg: KeyArg, values: Array[String]): Parameter[_] = {
     import keyArg._
@@ -54,4 +54,7 @@ object ParameterArgParser {
     }
   }
 
+  private def ltrim(prefix: String): String ⇒ String                      = _.replaceAll(s"^$prefix+", "")
+  private def rtrim(suffix: String): String ⇒ String                      = _.replaceAll(s"$suffix+$$", "")
+  private def trim(input: String, prefix: String, suffix: String): String = (ltrim(prefix) andThen rtrim(suffix))(input)
 }

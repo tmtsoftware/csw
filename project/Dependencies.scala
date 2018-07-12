@@ -171,6 +171,7 @@ object Dependencies {
   val EventCli = Seq(
     Libs.`upickle`,
     Libs.`scopt`,
+    Libs.`scala-csv`,
     Libs.`scalatest`                % Test,
     Libs.`scalatest-embedded-redis` % Test
   )

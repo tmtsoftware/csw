@@ -8,11 +8,18 @@ import org.scalatest.{FunSuite, Matchers}
 class ParameterArgParserTest extends FunSuite with Matchers {
 
   test("should able to parse valid single param string when key name, type, units & values provided") {
-    ParameterArgParser.parse("k1:i:meter=[1,2,3]") shouldBe Set(IntKey.make("k1").set(1, 2, 3).withUnits(meter))
+    ParameterArgParser.parse("k1:i:meter=[1,2,3]|k2:d=10.11,20.22") shouldBe
+    Set(IntKey.make("k1").set(1, 2, 3).withUnits(meter), DoubleKey.make("k2").set(10.11, 20.22))
   }
+
   test("should able to parse valid string params") {
     ParameterArgParser.parse("k1:s=['a, b','cd']|k2:s=['x,y','z']") shouldBe
     Set(StringKey.make("k1").set("a, b", "cd"), StringKey.make("k2").set("x,y", "z"))
+  }
+
+  test("should able to parse valid string params with single quote and comma") {
+    ParameterArgParser.parse("k1:s=['Kevin O\\'Brien','Chicago, USA']|k2:s=['2016-08-05T16:23:19.002']") shouldBe
+    Set(StringKey.make("k1").set("Kevin O'Brien", "Chicago, USA"), StringKey.make("k2").set("2016-08-05T16:23:19.002"))
   }
 
   test("should able to parse all valid space separated multi param string") {
