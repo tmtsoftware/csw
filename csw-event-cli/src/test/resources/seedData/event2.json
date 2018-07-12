@@ -70,6 +70,15 @@
         "2018-07-09T09:02:18.682Z"
       ],
       "units": "second"
+    },
+    {
+      "keyName": "temperature",
+      "keyType": "StringKey",
+      "values": [
+        "1k",
+        "2k"
+      ],
+      "units": "kelvin"
     }
   ]
 }

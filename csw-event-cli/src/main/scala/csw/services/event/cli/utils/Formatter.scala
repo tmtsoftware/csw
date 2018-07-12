@@ -1,6 +1,7 @@
 package csw.services.event.cli.utils
 
 import csw.messages.events.{Event, EventKey}
+import csw.messages.params.generics.KeyType.StringKey
 import csw.messages.params.generics.Parameter
 import csw.services.event.cli.args.Options
 
@@ -37,7 +38,14 @@ case class OnelineFormatter(options: Options) {
 case class Oneline(path: String, param: Parameter[_]) {
   private val onelineSeparator = " = "
 
-  private def values  = param.values.mkString("[", ",", "]")
+  private def values = {
+    val paramValues =
+      if (param.keyType == StringKey)
+        param.values.map(v ⇒ s""""$v"""") // wrap string values in double quotes
+      else param.values
+    paramValues.mkString("[", ", ", "]")
+  }
+
   private def unitStr = List(param.units).mkString("[", "", "]")
 
   def withValues(): String = List(path, values).mkString(onelineSeparator)
