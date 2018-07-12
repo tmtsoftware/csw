@@ -57,6 +57,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
     events shouldEqual Set(event1, event2)
   }
 
+  // DEOPSCSW-431: [Event Cli] Get command
   test("should able to get events in oneline format") {
 
     commandLineRunner.get(argsParser.parse(Seq("get", "-e", s"${event1.eventKey}")).get).await
@@ -165,6 +166,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
   private def fileToEventJson(filePath: String)         = Json.parse(Source.fromResource(filePath).mkString)
   private def strToJsObject(js: String)                 = Json.parse(js).as[JsObject]
 
+  // DEOPSCSW-433: [Event Cli] Subscribe command
   test("should be able to subscribe and get json output to event key") {
 
     implicit val mat: Materializer    = actorRuntime.mat
@@ -187,6 +189,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
     logBuffer shouldEqualContentsOf "json/entire_events.txt"
   }
 
+  // DEOPSCSW-433: [Event Cli] Subscribe command
   test("should be able to subscribe to event key and get oneline output") {
     import cliWiring._
 

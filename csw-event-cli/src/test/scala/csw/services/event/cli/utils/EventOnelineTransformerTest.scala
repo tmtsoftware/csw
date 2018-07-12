@@ -9,7 +9,6 @@ import play.api.libs.json.Json
 
 import scala.io.Source
 
-// DEOPSCSW-431: [Event Cli] Get command
 class EventOnelineTransformerTest extends FunSuite with Matchers {
 
   private val event1Str = Source.fromResource("seedData/event1.json").mkString
