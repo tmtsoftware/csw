@@ -62,4 +62,13 @@ class EventJsonTransformerTest extends FunSuite with Matchers with BeforeAndAfte
     transformedEventJson1 shouldBe expectedEvent1Json
     transformedEventJson2 shouldBe expectedEvent2Json
   }
+
+  test("should be able to get full struct if both partial struct path and full path are given") {
+
+    val event1Json         = Json.parse(Source.fromResource("seedData/event1.json").mkString).as[JsObject]
+    val expectedEvent1Json = Json.parse(Source.fromResource("json/top_level_partial_struct_key.json").mkString).as[JsObject]
+
+    val transformedEventJson1 = EventJsonTransformer.transform(event1Json, List("struct-1/ra", "struct-1"))
+    transformedEventJson1 shouldBe expectedEvent1Json
+  }
 }
