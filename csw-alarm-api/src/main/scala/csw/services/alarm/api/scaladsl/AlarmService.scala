@@ -5,5 +5,5 @@ import csw.services.alarm.api.models.{AlarmKey, AlarmSeverity}
 import scala.concurrent.Future
 
 trait AlarmService {
-  def setSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Unit]
+  def setSeverity(key: AlarmKey, severity: AlarmSeverity, autoRefresh: Boolean): Future[Unit]
 }

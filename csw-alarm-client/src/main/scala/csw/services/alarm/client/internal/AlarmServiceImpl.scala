@@ -6,6 +6,7 @@ import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, UnAckn
 import csw.services.alarm.api.models.LatchStatus.Latched
 import csw.services.alarm.api.models.{AlarmKey, AlarmMetadata, AlarmSeverity, AlarmStatus}
 import csw.services.alarm.api.scaladsl.AlarmAdminService
+import csw.services.alarm.client.internal.codec.{AlarmMetadataCodec, AlarmSeverityCodec, AlarmStatusCodec}
 import io.lettuce.core.api.async.RedisAsyncCommands
 import io.lettuce.core.{RedisClient, RedisURI}
 
@@ -34,7 +35,7 @@ class AlarmServiceImpl(redisURI: RedisURI, redisClient: RedisClient)(implicit ac
   private val maxMissedRefreshCounts = actorSystem.settings.config.getInt("alarm.max-missed-refresh-counts") //default value is 3 times
   private val ttlInSeconds           = refreshInSeconds * maxMissedRefreshCounts
 
-  override def setSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Unit] = async {
+  override def setSeverity(key: AlarmKey, severity: AlarmSeverity, autoRefresh: Boolean): Future[Unit] = async {
     // get alarm metadata
     val metadataCommands = await(asyncMetadataCommandsF)
     val alarm            = await(metadataCommands.get(key).toScala)

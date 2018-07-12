@@ -1,4 +1,4 @@
-package csw.services.alarm.client.internal
+package csw.services.alarm.client.internal.codec
 
 import java.nio.ByteBuffer
 
