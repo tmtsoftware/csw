@@ -9,7 +9,7 @@ case class AlarmMetadata(
     description: String,
     location: String,
     alarmType: AlarmType,
-    supportedSeverityLevels: List[AlarmSeverity],
+    supportedSeverities: List[AlarmSeverity],
     probableCause: String,
     operatorResponse: String,
     autoAcknowledgable: Boolean,

@@ -14,13 +14,13 @@ import upickle.default.{ReadWriter ⇒ RW}
  * @param alarmName represents the name of the alarm e.g tromboneAxisLowLimitAlarm
  */
 case class AlarmKey(source: Prefix, alarmName: AlarmName) {
-  val key = s"${source.prefix}.$alarmName"
+  val name = s"${source.prefix}.$alarmName"
 
-  private[alarm] val metadataKey: String = key + METADATA_KEY_SUFFIX
-  private[alarm] val statusKey: String   = key + STATUS_KEY_SUFFIX
-  private[alarm] val severityKey: String = key + SEVERITY_KEY_SUFFIX
+  private[alarm] val metadataKey: String = name + METADATA_KEY_SUFFIX
+  private[alarm] val statusKey: String   = name + STATUS_KEY_SUFFIX
+  private[alarm] val severityKey: String = name + SEVERITY_KEY_SUFFIX
 
-  override def toString: String = key
+  override def toString: String = name
 }
 
 object AlarmKey {
