@@ -12,7 +12,7 @@ case class AlarmMetadata(
     supportedSeverities: List[AlarmSeverity],
     probableCause: String,
     operatorResponse: String,
-    autoAcknowledgable: Boolean,
+    isAutoAcknowledgable: Boolean,
     isLatchable: Boolean
 )
 

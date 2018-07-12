@@ -1,6 +1,6 @@
 package csw.services.event.internal.commons
 import akka.actor.ActorSystem
-import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Materializer, Supervision}
+import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Materializer}
 import csw.services.event.internal.commons.javawrappers.JEventService
 import csw.services.event.internal.commons.serviceresolver.{
   EventServiceHostPortResolver,

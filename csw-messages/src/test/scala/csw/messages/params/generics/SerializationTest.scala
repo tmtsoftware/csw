@@ -1,9 +1,7 @@
 package csw.messages.params.generics
 
-import java.io.Serializable
 import java.time.Instant
 
-import csw.messages.TMTSerializable
 import csw.messages.commands._
 import csw.messages.events.{Event, EventName, SystemEvent}
 import csw.messages.params.generics.KeyType.ChoiceKey
