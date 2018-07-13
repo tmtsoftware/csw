@@ -7,11 +7,18 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
-import csw.command.messages.CommandMessage.{Oneway, Submit}
-import csw.command.messages.CommandResponseManagerMessage.Subscribe
-import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.common.components.command.ComponentStateForCommand.{acceptedCmd, cancelCmd, prefix}
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
+import csw.messages.CommandMessage.{Oneway, Submit}
+import csw.messages.CommandResponseManagerMessage.Subscribe
+import csw.messages.commands.CommandResponse.{Cancelled, Completed}
+import csw.messages.commands.ValidationResponse.Accepted
+import csw.messages.commands.{CommandResponse, Setup}
+import csw.messages.location.Connection.AkkaConnection
+import csw.messages.location.{ComponentId, ComponentType}
+import csw.messages.params.generics.KeyType
+import csw.messages.params.models.ObsId
+import csw.services.location.helpers.{LSNodeSpec, OneMemberAndSeed}
 import csw.params.commands.CommandResponse.{Accepted, Cancelled, Completed}
 import csw.params.commands.{CommandResponse, Setup}
 import csw.params.core.generics.KeyType

@@ -89,8 +89,8 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
   override def validateCommand(controlCommand: ControlCommand): CommandResponse = {
     log.info(s"Validating command: ${controlCommand.commandName.name}")
     controlCommand.commandName.name match {
-      case "sleep" => CommandResponse.Accepted(controlCommand.runId)
-      case x       => CommandResponse.Invalid(controlCommand.runId, CommandIssue.UnsupportedCommandIssue(s"Command $x. not supported."))
+      case "sleep" => ValidationResponse.Accepted(controlCommand.runId)
+      case x       => ValidationResponse.Invalid(controlCommand.runId, CommandIssue.UnsupportedCommandIssue(s"Command $x. not supported."))
     }
   }
   //#validate

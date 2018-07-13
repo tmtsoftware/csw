@@ -108,15 +108,15 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
             // validation for setup goes here
             //#addOrUpdateCommand
             // after validation of the controlCommand, update its status of successful validation as Accepted
-            CommandResponse.Accepted accepted = new CommandResponse.Accepted(controlCommand.runId());
+            ValidationResponse.Accepted accepted = new ValidationResponse.Accepted(controlCommand.runId());
             commandResponseManager.addOrUpdateCommand(controlCommand.runId(), accepted);
             //#addOrUpdateCommand
-            return new CommandResponse.Accepted(controlCommand.runId());
+            return new ValidationResponse.Accepted(controlCommand.runId());
         } else if (controlCommand instanceof Observe) {
             // validation for observe goes here
-            return new CommandResponse.Accepted(controlCommand.runId());
+            return new ValidationResponse.Accepted(controlCommand.runId());
         } else {
-            return new CommandResponse.Invalid(controlCommand.runId(), new CommandIssue.AssemblyBusyIssue("Command not supported"));
+            return new ValidationResponse.Invalid(controlCommand.runId(), new CommandIssue.AssemblyBusyIssue("Command not supported"));
         }
     }
     //#validateCommand-handler

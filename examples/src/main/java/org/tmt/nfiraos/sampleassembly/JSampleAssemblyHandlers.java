@@ -5,6 +5,7 @@ import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.util.Timeout;
 import csw.framework.CurrentStatePublisher;
+import csw.messages.commands.*;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.models.JCswContext;
 import csw.command.messages.TopLevelActorMessage;
@@ -110,7 +111,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
         // Submit command, and handle validation response. Final response is returned as a Future
         CompletableFuture<CommandResponse> submitCommandResponseF = hcd.submit(setupCommand, submitTimeout)
                 .thenCompose(commandResponse -> {
-                    if (commandResponse instanceof CommandResponse.Accepted) {
+                    if (commandResponse instanceof ValidationResponse.Accepted) {
                         return hcd.subscribe(commandResponse.runId(), commandResponseTimeout);
                     } else {
                         log.error("Sleep command invalid");

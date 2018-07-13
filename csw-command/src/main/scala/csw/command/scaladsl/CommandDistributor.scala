@@ -8,6 +8,9 @@ import csw.command.models.CommandResponseAggregator
 import csw.params.commands.CommandResponse.Completed
 import csw.params.commands.{CommandIssue, CommandResponse, ControlCommand}
 import csw.params.core.models.Id
+import csw.messages.commands.CommandResponse.Completed
+import csw.messages.commands._
+import csw.messages.params.models.Id
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -31,15 +34,15 @@ case class CommandDistributor(componentToCommands: Map[CommandService, Set[Contr
       implicit timeout: Timeout,
       ec: ExecutionContext,
       mat: Materializer
-  ): Future[CommandResponse] = {
+  ): Future[ValidationResponse] = {
 
     val commandResponsesF: Source[CommandResponse, NotUsed] = Source(componentToCommands).flatMapMerge(
       breadth,
       { case (component, commands) ⇒ component.submitAll(commands) }
     )
-    CommandResponseAggregator.aggregateResponse(commandResponsesF).map {
-      case _: Completed  ⇒ CommandResponse.Accepted(Id())
-      case otherResponse ⇒ CommandResponse.Invalid(Id(), CommandIssue.OtherIssue("One or more commands were Invalid"))
+    CommandResponse.aggregateResponse(commandResponsesF).map {
+      case _: Completed  ⇒ ValidationResponse.Accepted(Id())
+      case otherResponse ⇒ ValidationResponse.Invalid(Id(), CommandIssue.OtherIssue("One or more commands were Invalid"))
     }
   }
 
@@ -56,7 +59,7 @@ case class CommandDistributor(componentToCommands: Map[CommandService, Set[Contr
       mat: Materializer
   ): Future[CommandResponse] = {
 
-    val commandResponsesF: Source[CommandResponse, NotUsed] = Source(componentToCommands).flatMapMerge(
+    val commandResponsesF: Source[CommandResponseBase, NotUsed] = Source(componentToCommands).flatMapMerge(
       breadth,
       { case (component, commands) ⇒ component.submitAllAndSubscribe(commands) }
     )

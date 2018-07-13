@@ -12,6 +12,12 @@ import csw.framework.components.assembly.WorkerActorMsgs.{GetStatistics, Initial
 import csw.framework.components.assembly.{WorkerActor, WorkerActorMsg}
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
+import csw.messages.TopLevelActorMessage
+import csw.messages.commands.ValidationResponse.Accepted
+import csw.messages.commands.{CommandResponse, ControlCommand, Observe, Setup}
+import csw.messages.location.{LocationRemoved, LocationUpdated, TrackingEvent}
+import csw.services.config.api.models.ConfigData
+import csw.services.logging.scaladsl.Logger
 import csw.command.messages.TopLevelActorMessage
 import csw.params.commands.CommandResponse.Accepted
 import csw.params.commands.{CommandResponse, ControlCommand, Observe, Setup}

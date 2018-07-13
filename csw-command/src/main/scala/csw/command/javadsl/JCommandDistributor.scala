@@ -7,6 +7,8 @@ import akka.stream.Materializer
 import akka.util.Timeout
 import csw.params.commands.{CommandResponse, ControlCommand}
 import csw.command.scaladsl.CommandDistributor
+import csw.messages.commands.{CommandResponse, ControlCommand, ValidationResponse}
+import csw.services.command.scaladsl.CommandDistributor
 
 import scala.collection.JavaConverters.{collectionAsScalaIterableConverter, mapAsScalaMapConverter}
 import scala.compat.java8.FutureConverters.FutureOps
@@ -29,7 +31,7 @@ case class JCommandDistributor(componentToCommands: util.Map[JCommandService, ut
       timeout: Timeout,
       ec: ExecutionContext,
       mat: Materializer
-  ): CompletableFuture[CommandResponse] = {
+  ): CompletableFuture[ValidationResponse] = {
 
     val sComponentToCommands = componentToCommands.asScala.toMap.map {
       case (jCommandService, commands) ⇒ jCommandService.sCommandService -> commands.asScala.toSet

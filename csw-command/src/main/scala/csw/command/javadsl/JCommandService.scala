@@ -61,6 +61,8 @@ class JCommandService(akkaLocation: AkkaLocation, actorSystem: ActorSystem[_]) {
    *
    * @param controlCommands the set of [[csw.params.commands.ControlCommand]] payloads
    * @return [[csw.params.commands.CommandResponse.Accepted]] or [[csw.params.commands.CommandResponse.Error]] CommandResponse as a CompletableFuture.
+   * @param controlCommands the set of [[csw.messages.commands.ControlCommand]] payloads
+   * @return [[csw.messages.commands.ValidationResponse.Accepted]] or [[csw.messages.commands.CommandResponse.Error]] CommandResponse as a CompletableFuture.
    */
   def submitAllAndGetResponse(
       controlCommands: java.util.Set[ControlCommand],

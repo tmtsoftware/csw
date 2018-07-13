@@ -49,7 +49,7 @@ abstract class ComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx
    * @param controlCommand represents a command received e.g. Setup, Observe or wait
    * @return a CommandResponse after validation
    */
-  def validateCommand(controlCommand: ControlCommand): CommandResponse
+  def validateCommand(controlCommand: ControlCommand): ValidationResponse
 
   /**
    * On receiving a command as Submit, the onSubmit handler is invoked for a component only if the validateCommand handler

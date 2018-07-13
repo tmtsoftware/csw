@@ -1,5 +1,6 @@
 package csw.framework.components.hcd;
 
+import akka.actor.Cancellable;
 import akka.actor.typed.ActorRef;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.AskPattern;
@@ -90,10 +91,10 @@ public class JHcdComponentHandlers extends JComponentHandlers {
     public CommandResponse validateCommand(ControlCommand controlCommand) {
         if (controlCommand instanceof Setup) {
             // validation for setup goes here
-            return new CommandResponse.Accepted(controlCommand.runId());
+            return new ValidationResponse.Accepted(controlCommand.runId());
         } else if (controlCommand instanceof Observe) {
             // validation for observe goes here
-            return new CommandResponse.Accepted(controlCommand.runId());
+            return new ValidationResponse.Accepted(controlCommand.runId());
         } else {
             return new CommandResponse.CommandNotAvailable(controlCommand.runId());
         }

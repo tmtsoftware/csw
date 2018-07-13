@@ -139,9 +139,9 @@ public class JSampleHcdHandlers extends JComponentHandlers {
         String commandName = controlCommand.commandName().name();
         log.info(() -> "Validating command: " + commandName);
         if (commandName.equals("sleep")) {
-            return new CommandResponse.Accepted(controlCommand.runId());
+            return new ValidationResponse.Accepted(controlCommand.runId());
         }
-        return new CommandResponse.Invalid(controlCommand.runId(), new CommandIssue.UnsupportedCommandIssue("Command " + commandName + ". not supported."));
+        return new ValidationResponse.Invalid(controlCommand.runId(), new CommandIssue.UnsupportedCommandIssue("Command " + commandName + ". not supported."));
     }
     //#validate
 

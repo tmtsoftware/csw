@@ -10,10 +10,11 @@ import scala.collection.immutable
 /**
  * Parent type of a response of command Execution
  *
- * @param resultType the nature of command response as [[csw.params.commands.CommandResultType]]
+ *   @param resultType the nature of command response as [[csw.messages.commands.CommandResultType]]
  */
-sealed abstract class CommandResponse(val resultType: CommandResultType) extends TMTSerializable {
+sealed abstract class CommandResponseBase() extends TMTSerializable {
 
+  def resultType: CommandResultType
   /**
    * A helper method to get the runId for this command response
    *
@@ -22,7 +23,8 @@ sealed abstract class CommandResponse(val resultType: CommandResultType) extends
   def runId: Id
 }
 
-object CommandResponse {
+sealed abstract class ValidationResponse(val resultType: CommandResultType) extends CommandResponseBase
+object ValidationResponse {
 
   /**
    * Represents an intermediate response stating acceptance of a command received
@@ -100,8 +102,8 @@ object CommandResponse {
    * @return a CommandResponse that has runId as provided id
    */
   def withRunId(id: Id, commandResponse: CommandResponse): CommandResponse = commandResponse match {
-    case accepted: Accepted                       ⇒ accepted.copy(runId = id)
-    case invalid: Invalid                         ⇒ invalid.copy(runId = id)
+    //case accepted: Accepted                       ⇒ accepted.copy(runId = id)
+    //case invalid: Invalid                         ⇒ invalid.copy(runId = id)
     case completedWithResult: CompletedWithResult ⇒ completedWithResult.copy(runId = id)
     case completed: Completed                     ⇒ completed.copy(runId = id)
     case noLongerValid: NoLongerValid             ⇒ noLongerValid.copy(runId = id)
@@ -111,6 +113,26 @@ object CommandResponse {
     case notAllowed: NotAllowed                   ⇒ notAllowed.copy(runId = id)
   }
 
+  /**
+   * Creates an aggregated response from a collection of CommandResponses received from other components. If one of the
+   * CommandResponses fail, the aggregated response fails and further processing of any more CommandResponse is terminated.
+   *
+   * @param commandResponses a stream of CommandResponses
+   * @return a future of aggregated response
+   */
+  def aggregateResponse(
+      commandResponses: Source[CommandResponseBase, NotUsed]
+  )(implicit ec: ExecutionContext, mat: Materializer): Future[CommandResponseBase] = {
+    commandResponses
+      .runForeach { x ⇒
+        if (x.resultType == CommandResultType.Negative)
+          throw new RuntimeException(s"Command with runId [${x.runId}] failed with response [$x]")
+      }
+      .transform {
+        case Success(_)  ⇒ Success(CommandResponse.Completed(Id()))
+        case Failure(ex) ⇒ Success(CommandResponse.Error(Id(), s"${ex.getMessage}"))
+      }
+  }
 }
 
 /**

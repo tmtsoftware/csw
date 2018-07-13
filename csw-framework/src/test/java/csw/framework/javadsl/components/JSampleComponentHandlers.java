@@ -27,6 +27,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import static csw.common.components.command.ComponentStateForCommand.*;
+import static csw.messages.commands.CommandResponse.Completed;
+import static csw.messages.commands.CommandResponse.CompletedWithResult;
 import static csw.params.commands.CommandResponse.*;
 
 public class JSampleComponentHandlers extends JComponentHandlers {
@@ -94,13 +96,13 @@ public class JSampleComponentHandlers extends JComponentHandlers {
             Result result = new Result(controlCommand.source().prefix()).add(param);
             return new CompletedWithResult(controlCommand.runId(), result);
         } else if (controlCommand.commandName().equals(failureAfterValidationCmd())) {
-            Accepted accepted = new Accepted(controlCommand.runId());
+            ValidationResponse.Accepted accepted = new ValidationResponse.Accepted(controlCommand.runId());
             commandResponseManager.addOrUpdateCommand(controlCommand.runId(), accepted);
             return accepted;
         } else if (controlCommand.commandName().name().contains("failure")) {
-            return new Invalid(controlCommand.runId(), new CommandIssue.OtherIssue("Testing: Received failure, will return Invalid."));
+            return new ValidationResponse.Invalid(controlCommand.runId(), new CommandIssue.OtherIssue("Testing: Received failure, will return Invalid."));
         } else {
-            return new Accepted(controlCommand.runId());
+            return new ValidationResponse.Accepted(controlCommand.runId());
         }
     }
 
@@ -130,7 +132,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
             // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
             CompletableFuture<CommandResponse> status = commandResponseManager.jQuery(controlCommand.runId(), Timeout.apply(100, TimeUnit.MILLISECONDS));
             status.thenAccept(response -> {
-                if (response instanceof Accepted)
+                if(response instanceof ValidationResponse.Accepted)
                     commandResponseManager.addOrUpdateCommand(controlCommand.runId(), new CommandResponse.Error(controlCommand.runId(), "Unknown Error occurred"));
             });
         } else {

@@ -8,6 +8,15 @@ import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.Source
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
+import csw.messages.CommandMessage.{Oneway, Submit}
+import csw.messages.commands.CommandResponse.{Completed, Error}
+import csw.messages.commands.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
+import csw.messages.commands.matchers.{Matcher, StateMatcher}
+import csw.messages.commands.{CommandResponse, CommandResponseBase, ControlCommand, ValidationResponse}
+import csw.messages.location.AkkaLocation
+import csw.messages.params.models.Id
+import csw.messages.params.states.{CurrentState, StateName}
+import csw.messages.{CommandResponseManagerMessage, ComponentMessage}
 import csw.command.messages.CommandMessage.{Oneway, Submit}
 import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.models.CommandResponseAggregator
@@ -63,13 +72,13 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
    * a CommandResponse as [[csw.params.commands.CommandResponse.Completed]] will be returned. If any one of the command fails, an [[csw.params.commands.CommandResponse.Error]]
    * will be returned.
    *
-   * @param controlCommands the set of [[csw.params.commands.ControlCommand]] payloads
-   * @return [[csw.params.commands.CommandResponse.Accepted]] or [[csw.params.commands.CommandResponse.Error]] CommandResponse as a Future
+   * @param controlCommands the set of [[csw.messages.commands.ControlCommand]] payloads
+   * @return [[csw.messages.commands.CommandResponse.Accepted]] or [[csw.messages.commands.CommandResponse.Error]] CommandResponse as a Future
    */
-  def submitAllAndGetResponse(controlCommands: Set[ControlCommand])(implicit timeout: Timeout): Future[CommandResponse] = {
+  def submitAllAndGetResponse(controlCommands: Set[ControlCommand])(implicit timeout: Timeout): Future[CommandResponseBase] = {
     val value = Source(controlCommands).mapAsyncUnordered(parallelism)(submit)
-    CommandResponseAggregator.aggregateResponse(value).map {
-      case _: Completed  ⇒ CommandResponse.Accepted(Id())
+    CommandResponse.aggregateResponse(value).map {
+      case _: Completed  ⇒ ValidationResponse.Accepted(Id())
       case otherResponse ⇒ otherResponse
     }
   }
@@ -110,7 +119,7 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
    */
   def submitAndSubscribe(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[CommandResponse] =
     submit(controlCommand).flatMap {
-      case _: Accepted ⇒ subscribe(controlCommand.runId)
+      case _: ValidationResponse.Accepted ⇒ subscribe(controlCommand.runId)
       case x           ⇒ Future.successful(x)
     }
 
@@ -129,7 +138,7 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
     val matcher          = new Matcher(component, stateMatcher)
     val matcherResponseF = matcher.start
     oneway(controlCommand).flatMap {
-      case _: Accepted ⇒
+      case _: ValidationResponse.Accepted ⇒
         matcherResponseF.map {
           case MatchCompleted  ⇒ Completed(controlCommand.runId)
           case MatchFailed(ex) ⇒ Error(controlCommand.runId, ex.getMessage)

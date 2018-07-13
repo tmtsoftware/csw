@@ -37,6 +37,28 @@ import csw.location.commons.ClusterAwareSettings;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.javadsl.JLocationServiceFactory;
 import csw.logging.javadsl.JLoggingSystemFactory;
+import csw.messages.SupervisorLockMessage;
+import csw.messages.commands.*;
+import csw.messages.commands.CommandResponse.Completed;
+import csw.messages.commands.matchers.*;
+import csw.messages.commons.CoordinatedShutdownReasons;
+import csw.messages.framework.LockingResponse;
+import csw.messages.framework.LockingResponses;
+import csw.messages.location.AkkaLocation;
+import csw.messages.location.ComponentId;
+import csw.messages.params.generics.JKeyType;
+import csw.messages.params.generics.Key;
+import csw.messages.params.generics.Parameter;
+import csw.messages.params.states.CurrentState;
+import csw.messages.params.states.DemandState;
+import csw.messages.params.states.StateName;
+import csw.services.command.javadsl.JCommandDistributor;
+import csw.services.command.javadsl.JCommandService;
+import csw.services.command.scaladsl.CurrentStateSubscription;
+import csw.services.location.commons.ClusterAwareSettings;
+import csw.services.location.javadsl.ILocationService;
+import csw.services.location.javadsl.JLocationServiceFactory;
+import csw.services.logging.javadsl.JLoggingSystemFactory;
 import io.lettuce.core.RedisClient;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -133,7 +155,7 @@ public class JCommandIntegrationTest {
 
         CompletableFuture<CommandResponse> imdInvalidCmdResponseCompletableFuture = hcdCmdService.submit(imdInvalidCommand, timeout);
         CommandResponse actualImdInvalidCmdResponse = imdInvalidCmdResponseCompletableFuture.get();
-        Assert.assertTrue(actualImdInvalidCmdResponse instanceof CommandResponse.Invalid);
+        Assert.assertTrue(actualImdInvalidCmdResponse instanceof ValidationResponse.Invalid);
 
         // long running command which does not use matcher
         Key<Integer> encoder = JKeyType.IntKey().make("encoder");
@@ -153,7 +175,7 @@ public class JCommandIntegrationTest {
                 hcdCmdService
                         .submit(controlCommand, timeout)
                         .thenCompose(commandResponse -> {
-                            if (commandResponse instanceof CommandResponse.Accepted)
+                            if (commandResponse instanceof ValidationResponse.Accepted)
                                 return hcdCmdService.subscribe(commandResponse.runId(), timeout);
                             else
                                 return CompletableFuture.completedFuture(new CommandResponse.Error(commandResponse.runId(), "test error"));
@@ -184,7 +206,7 @@ public class JCommandIntegrationTest {
         CompletableFuture<CommandResponse> commandResponseToBeMatched = hcdCmdService
                 .oneway(setup, timeout)
                 .thenCompose(initialCommandResponse -> {
-                    if (initialCommandResponse instanceof CommandResponse.Accepted) {
+                    if (initialCommandResponse instanceof ValidationResponse.Accepted) {
                         return matcherResponseFuture.thenApply(matcherResponse -> {
                             // create appropriate response if demand state was matched from among the published state or otherwise
                             if (matcherResponse.getClass().isAssignableFrom(MatcherResponses.jMatchCompleted().getClass()))
@@ -206,9 +228,9 @@ public class JCommandIntegrationTest {
         CompletableFuture onewayCommandResponseF = hcdCmdService
                 .oneway(setup, timeout)
                 .thenAccept(initialCommandResponse -> {
-                    if (initialCommandResponse instanceof CommandResponse.Accepted) {
+                    if (initialCommandResponse instanceof ValidationResponse.Accepted) {
                         //do something
-                    } else if (initialCommandResponse instanceof CommandResponse.Invalid) {
+                    } else if (initialCommandResponse instanceof ValidationResponse.Invalid) {
                         //do something
                     } else {
                         //do something
@@ -221,9 +243,9 @@ public class JCommandIntegrationTest {
         CompletableFuture submitCommandResponseF = hcdCmdService
                 .oneway(setup, timeout)
                 .thenAccept(initialCommandResponse -> {
-                    if (initialCommandResponse instanceof CommandResponse.Accepted) {
+                    if (initialCommandResponse instanceof ValidationResponse.Accepted) {
                         //do something
-                    } else if (initialCommandResponse instanceof CommandResponse.Invalid) {
+                    } else if (initialCommandResponse instanceof ValidationResponse.Invalid) {
                         //do something
                     } else {
                         //do something
@@ -303,7 +325,7 @@ public class JCommandIntegrationTest {
                         aggregatedValidationResponse(timeout, ec, mat);
         //#aggregated-validation
 
-        Assert.assertTrue(cmdValidationResponseF.get() instanceof CommandResponse.Accepted);
+        Assert.assertTrue(cmdValidationResponseF.get() instanceof ValidationResponse.Accepted);
 
         //#aggregated-completion
         CompletableFuture<CommandResponse> cmdCompletionResponseF =
@@ -333,7 +355,7 @@ public class JCommandIntegrationTest {
         // using separate submit and subscribe API
         Setup failureResCommand2 = new Setup(prefix(), failureAfterValidationCmd(), Optional.empty()).add(intParameter1);
         CompletableFuture<CommandResponse> validationResponse = hcdCmdService.submit(failureResCommand2, timeout);
-        Assert.assertTrue(validationResponse.get() instanceof CommandResponse.Accepted);
+        Assert.assertTrue(validationResponse.get() instanceof ValidationResponse.Accepted);
 
         CompletableFuture<CommandResponse> finalResponse = hcdCmdService.subscribe(failureResCommand1.runId(), timeout);
         Assert.assertTrue(finalResponse.get() instanceof CommandResponse.Error);
@@ -360,7 +382,7 @@ public class JCommandIntegrationTest {
                 );
         //#submitAllAndGetResponse
 
-        Assert.assertTrue(commandResponse.get() instanceof CommandResponse.Accepted);
+        Assert.assertTrue(commandResponse.get() instanceof ValidationResponse.Accepted);
     }
 
     @Test
