@@ -36,6 +36,7 @@ class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
   private val currentStateProbe2 = TestInbox[CurrentState]()
   val currentState1              = new CurrentState(prefix, new StateName("testStateName1"))
   val currentState2              = new CurrentState(prefix, new StateName("testStateName2"))
+  val currentState3              = new CurrentState(prefix, new StateName("testStateName3"))
 
   def createLifecycleStatePubSubBehavior(): BehaviorTestKit[PubSub[LifecycleStateChanged]] =
     BehaviorTestKit(Behaviors.setup[PubSub[LifecycleStateChanged]](ctx ⇒ new PubSubBehavior(ctx, mocks.loggerFactory)))
@@ -60,26 +61,21 @@ class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
   }
 
   // DEOPSCSW-434 : Allow subscription of CurrentState using StateName
-  test("message should be published to the subscribers depending on subscription key") {
+  test("message should be published to the subscribers depending on names") {
     val pubSubBehavior: BehaviorTestKit[PubSub[CurrentState]] = createCurrentStateStatePubSubBehavior()
 
-//    val subscriptionKey = new SubscriptionKey[CurrentState](state ⇒ state.stateName == StateName("testStateName2"))
-//    val subscriptionKey1 = new SubscriptionKey[CurrentState](state => {
-//      val choiceParameter = SampleComponentState.choiceKey.set(SampleComponentState.submitCommandChoice)
-//      state.paramSet.contains(choiceParameter)
-//    })
-
     pubSubBehavior.run(Subscribe(currentStateProbe1.ref))
-    pubSubBehavior.run(SubscribeOnly(currentStateProbe2.ref, Set("testStateName2")))
+    pubSubBehavior.run(SubscribeOnly(currentStateProbe2.ref, Set("testStateName2", "testStateName3")))
 
     pubSubBehavior.run(Publish(currentState1))
     pubSubBehavior.run(Publish(currentState2))
+    pubSubBehavior.run(Publish(currentState3))
 
     val currentStates  = currentStateProbe1.receiveAll()
     val currentStates2 = currentStateProbe2.receiveAll()
 
-    currentStates should contain allOf (currentState1, currentState2)
-    currentStates2 should contain only currentState2
+    currentStates should contain allOf (currentState1, currentState2, currentState3)
+    currentStates2 should contain allOf (currentState2, currentState3)
   }
 
   test("should not receive messages on un-subscription") {
