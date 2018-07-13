@@ -83,4 +83,11 @@ class AlarmServiceImpl(redisURI: RedisURI, redisClient: RedisClient)(implicit ac
     val statusApi = await(asyncStatusApiF)
     await(statusApi.get(key).toScala)
   }
+
+  override def acknowledge(key: AlarmKey): Future[Unit] = async {
+    val statusApi = await(asyncStatusApiF)
+    val status    = await(statusApi.get(key).toScala)
+    if (status.acknowledgementStatus == UnAcknowledged) // save the set call if status is already Acknowledged
+      await(statusApi.set(key, status.copy(acknowledgementStatus = Acknowledged)).toScala)
+  }
 }
