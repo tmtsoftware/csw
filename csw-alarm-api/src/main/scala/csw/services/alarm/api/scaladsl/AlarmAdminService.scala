@@ -9,4 +9,5 @@ trait AlarmAdminService extends AlarmService {
   def getMetadata(key: AlarmKey): Future[AlarmMetadata]
   def getStatus(key: AlarmKey): Future[AlarmStatus]
   def acknowledge(key: AlarmKey): Future[Unit]
+  def reset(key: AlarmKey): Future[Unit]
 }

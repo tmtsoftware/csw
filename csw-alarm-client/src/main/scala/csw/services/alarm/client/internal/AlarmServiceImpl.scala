@@ -1,9 +1,9 @@
 package csw.services.alarm.client.internal
 
 import akka.actor.ActorSystem
-import csw.services.alarm.api.exceptions.InvalidSeverityException
+import csw.services.alarm.api.exceptions.{InvalidSeverityException, ResetOperationFailedException}
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, UnAcknowledged}
-import csw.services.alarm.api.models.LatchStatus.Latched
+import csw.services.alarm.api.models.LatchStatus.{Latched, UnLatched}
 import csw.services.alarm.api.models.{AlarmKey, AlarmMetadata, AlarmSeverity, AlarmStatus}
 import csw.services.alarm.api.scaladsl.AlarmAdminService
 import csw.services.alarm.client.internal.codec.{AlarmMetadataCodec, AlarmSeverityCodec, AlarmStatusCodec}
@@ -89,5 +89,25 @@ class AlarmServiceImpl(redisURI: RedisURI, redisClient: RedisClient)(implicit ac
     val status    = await(statusApi.get(key).toScala)
     if (status.acknowledgementStatus == UnAcknowledged) // save the set call if status is already Acknowledged
       await(statusApi.set(key, status.copy(acknowledgementStatus = Acknowledged)).toScala)
+  }
+
+  override def reset(key: AlarmKey): Future[Unit] = async {
+
+    val severityApi     = await(asyncSeverityApiF)
+    val currentSeverity = await(severityApi.get(key).toScala)
+
+    if (currentSeverity != AlarmSeverity.Okay) throw ResetOperationFailedException(key, currentSeverity)
+
+    val statusApi = await(asyncStatusApiF)
+    val status    = await(statusApi.get(key).toScala)
+
+    // acknowledge
+    if (status.acknowledgementStatus == UnAcknowledged) // save the set call if status is already Acknowledged
+      await(statusApi.set(key, status.copy(acknowledgementStatus = Acknowledged)).toScala)
+
+    // unlatch
+    if (status.latchStatus == Latched) {
+      await(statusApi.set(key, status.copy(latchStatus = UnLatched)).toScala)
+    }
   }
 }
