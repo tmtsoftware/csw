@@ -19,15 +19,15 @@ class AlarmServiceImpl(redisURI: RedisURI, redisClient: RedisClient)(implicit ac
 
   import actorSystem.dispatcher
 
-  private lazy val asyncMetadataCommandsF: Future[RedisAsyncCommands[AlarmKey, AlarmMetadata]] = Future.unit
+  private lazy val asyncMetadataApiF: Future[RedisAsyncCommands[AlarmKey, AlarmMetadata]] = Future.unit
     .flatMap(_ ⇒ redisClient.connectAsync(AlarmMetadataCodec, redisURI).toScala)
     .map(_.async())
 
-  private lazy val asyncSeverityCommandsF: Future[RedisAsyncCommands[AlarmKey, AlarmSeverity]] = Future.unit
+  private lazy val asyncSeverityApiF: Future[RedisAsyncCommands[AlarmKey, AlarmSeverity]] = Future.unit
     .flatMap(_ ⇒ redisClient.connectAsync(AlarmSeverityCodec, redisURI).toScala)
     .map(_.async())
 
-  private lazy val asyncStatusCommandsF: Future[RedisAsyncCommands[AlarmKey, AlarmStatus]] = Future.unit
+  private lazy val asyncStatusApiF: Future[RedisAsyncCommands[AlarmKey, AlarmStatus]] = Future.unit
     .flatMap(_ ⇒ redisClient.connectAsync(AlarmStatusCodec, redisURI).toScala)
     .map(_.async())
 
@@ -37,23 +37,23 @@ class AlarmServiceImpl(redisURI: RedisURI, redisClient: RedisClient)(implicit ac
 
   override def setSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Unit] = async {
     // get alarm metadata
-    val metadataCommands = await(asyncMetadataCommandsF)
-    val alarm            = await(metadataCommands.get(key).toScala)
+    val metadataApi = await(asyncMetadataApiF)
+    val alarm       = await(metadataApi.get(key).toScala)
 
     // validate if the provided severity is supported by this alarm
     if (!alarm.supportedSeverities.contains(severity))
       throw InvalidSeverityException(key, alarm.supportedSeverities, severity)
 
     // get the current severity of the alarm
-    val severityCommands = await(asyncSeverityCommandsF)
-    val currentSeverity  = await(severityCommands.get(key).toScala)
+    val severityApi     = await(asyncSeverityApiF)
+    val currentSeverity = await(severityApi.get(key).toScala)
 
     // set the severity of the alarm so that it does not transition to `Disconnected` state
-    await(severityCommands.setex(key, ttlInSeconds, severity).toScala)
+    await(severityApi.setex(key, ttlInSeconds, severity).toScala)
 
     // get alarm status
-    val statusCommands = await(asyncStatusCommandsF)
-    var status         = await(statusCommands.get(key).toScala)
+    val statusApi = await(asyncStatusApiF)
+    var status    = await(statusApi.get(key).toScala)
 
     // derive latch status
     if (alarm.isLatchable && severity.isHighRisk && severity.isHigherThan(status.latchedSeverity))
@@ -66,11 +66,21 @@ class AlarmServiceImpl(redisURI: RedisURI, redisClient: RedisClient)(implicit ac
     }
 
     // update alarm status
-    await(statusCommands.set(key, status).toScala)
+    await(statusApi.set(key, status).toScala)
   }
 
   override def getSeverity(key: AlarmKey): Future[AlarmSeverity] = async {
-    val severityCommands = await(asyncSeverityCommandsF)
-    await(severityCommands.get(key).toScala)
+    val severityApi = await(asyncSeverityApiF)
+    await(severityApi.get(key).toScala)
+  }
+
+  override def getMetadata(key: AlarmKey): Future[AlarmMetadata] = async {
+    val metadataApi = await(asyncMetadataApiF)
+    await(metadataApi.get(key).toScala)
+  }
+
+  override def getStatus(key: AlarmKey): Future[AlarmStatus] = async {
+    val statusApi = await(asyncStatusApiF)
+    await(statusApi.get(key).toScala)
   }
 }

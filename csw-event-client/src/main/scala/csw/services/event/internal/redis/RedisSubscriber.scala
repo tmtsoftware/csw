@@ -131,7 +131,7 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
           new EventSubscription {
             override def unsubscribe(): Future[Done] = async {
               val commands = await(connectionF)
-              await(commands.punsubscribe(pattern.toString).toFuture.toScala)
+              await(commands.punsubscribe(keyPattern.toString).toFuture.toScala)
               await(commands.quit().toFuture.toScala)
               killSwitch.shutdown()
               await(terminationSignal)
