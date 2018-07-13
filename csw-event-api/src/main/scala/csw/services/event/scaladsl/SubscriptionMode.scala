@@ -11,6 +11,7 @@ package csw.services.event.scaladsl
  * - [[SubscriptionModes.RateAdapterMode]]
  * - [[SubscriptionModes.RateLimiterMode]]
  *
+ * {{{
  * ---------------------------------------------------------------------------------------------------------------------
  *                    |                 Rate Adapter                  |                 Rate Limiter
  * ---------------------------------------------------------------------------------------------------------------------
@@ -46,9 +47,14 @@ package csw.services.event.scaladsl
  *                    |                                               | Duration observed between events received might
  *                    |                                               | not match with the specified subscription rate.
  *                    |                                               |
+ * }}}
  */
 sealed trait SubscriptionMode
 
+/**
+ * Variations of [[csw.services.event.scaladsl.SubscriptionMode]] available for use. Refer to documentation for
+ * [[csw.services.event.scaladsl.SubscriptionMode]] for more details.
+ */
 object SubscriptionModes {
   case object RateAdapterMode extends SubscriptionMode
   case object RateLimiterMode extends SubscriptionMode
