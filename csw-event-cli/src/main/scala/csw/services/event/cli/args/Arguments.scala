@@ -50,12 +50,23 @@ trait Arguments { self: OptionParser[Options] =>
 
   def params: OptionDef[String, Options] =
     opt[String]("params")
-      .valueName("<k1:i:meter=10,20> <k2:s:volt=10v>")
+      .valueName("\"<k1:i:meter=[10,20]>|<k2:s:volt=10v>|...\"")
       .action((x, c) => c.copy(params = ParameterArgParser.parse(x)))
       .text(
-        """|space separated list of params in the form of "keyName:keyType:unit=values ...".
-           |Imp: Multiple params should be provided in double quotes and unit is optional
-           |""".stripMargin
+        """pipe '|' separated list of params enclosed in double quotes in the form of "keyName:keyType:unit=values| ..."
+           unit is optional here.
+           Supported key types are:
+           i = IntKey
+           s = StringKey
+           f = FloatKey
+           d = DoubleKey
+           l = LongKey
+           b = BooleanKey
+
+           You can optionally choose to enclose param values in `[`, `]` brackets.
+           Values of string key should be provided in single quotes and use '\' to escape string.
+           Ex. "addressKey:s=['Kevin O\'Brien','Chicago, USA']|timestampKey:s=['2016-08-05T16:23:19.002']"
+           """
       )
 
   def interval: OptionDef[Int, Options] =
