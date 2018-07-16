@@ -12,7 +12,8 @@ import csw.location.api.models.TrackingEvent
 import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandResponse.{Completed, Error}
-import csw.messages.commands.{CommandResponse, ControlCommand}
+import csw.messages.commands.{CommandResponse, ControlCommand, ValidationResponse}
+import csw.messages.framework.ComponentInfo
 import csw.messages.location.TrackingEvent
 
 import scala.concurrent.Future
@@ -26,13 +27,14 @@ class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = ???
 
-  override def validateCommand(controlCommand: ControlCommand): CommandResponse = {
+  override def validateCommand(controlCommand: ControlCommand): ValidationResponse = {
     controlCommand.commandName match {
       case `longRunning`               ⇒ Accepted(controlCommand.runId)
       case `mediumRunning`             ⇒ Accepted(controlCommand.runId)
       case `shortRunning`              ⇒ Accepted(controlCommand.runId)
       case `failureAfterValidationCmd` ⇒ Accepted(controlCommand.runId)
-      case _                           ⇒ CommandResponse.Error(controlCommand.runId, "")
+      case _                           ⇒
+        ValidationResponse.Invalid(controlCommand.runId, UnsupportedCommandIssue(controlCommand.commandName.name))
     }
   }
 

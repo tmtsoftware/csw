@@ -14,9 +14,11 @@ import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
 import csw.command.scaladsl.CommandService
 import csw.messages.TopLevelActorMessage
+import csw.messages.commands.CommandIssue.UnsupportedCommandIssue
 import csw.messages.commands.CommandResponse.Completed
 import csw.messages.commands.ValidationResponse.{Accepted, Invalid}
 import csw.messages.commands.{CommandIssue, CommandResponse, ControlCommand, Setup}
+import csw.messages.framework.ComponentInfo
 import csw.messages.location.{AkkaLocation, TrackingEvent}
 import csw.messages.params.models.Id
 import csw.messages.params.states.{CurrentState, StateName}
@@ -50,7 +52,7 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = Unit
 
-  override def validateCommand(controlCommand: ControlCommand): CommandResponse = {
+  override def validateCommand(controlCommand: ControlCommand): ValidationResponse = {
     controlCommand.commandName match {
       case `longRunning` ⇒
         //#addOrUpdateCommand
@@ -61,7 +63,7 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
       case `moveCmd`    ⇒ Accepted(controlCommand.runId)
       case `initCmd`    ⇒ Accepted(controlCommand.runId)
       case `invalidCmd` ⇒ Invalid(controlCommand.runId, CommandIssue.OtherIssue("Invalid"))
-      case _            ⇒ CommandResponse.Error(controlCommand.runId, "")
+      case _            ⇒ ValidationResponse.Invalid(controlCommand.runId, UnsupportedCommandIssue(controlCommand.commandName.name))
     }
   }
 

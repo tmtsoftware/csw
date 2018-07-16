@@ -85,7 +85,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     }
 
     @Override
-    public CommandResponse validateCommand(ControlCommand controlCommand) {
+    public ValidationResponse validateCommand(ControlCommand controlCommand) {
         CurrentState submitState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.commandValidationChoice()));
         currentStatePublisher.publish(submitState);
 
@@ -130,7 +130,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
 
         if (controlCommand.commandName().equals(failureAfterValidationCmd())) {
             // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
-            CompletableFuture<CommandResponse> status = commandResponseManager.jQuery(controlCommand.runId(), Timeout.apply(100, TimeUnit.MILLISECONDS));
+            CompletableFuture<CommandResponseBase> status = commandResponseManager.jQuery(controlCommand.runId(), Timeout.apply(100, TimeUnit.MILLISECONDS));
             status.thenAccept(response -> {
                 if(response instanceof ValidationResponse.Accepted)
                     commandResponseManager.addOrUpdateCommand(controlCommand.runId(), new CommandResponse.Error(controlCommand.runId(), "Unknown Error occurred"));

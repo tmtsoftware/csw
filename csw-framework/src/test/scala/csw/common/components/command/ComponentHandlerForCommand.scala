@@ -44,8 +44,9 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = ???
 
-  override def validateCommand(controlCommand: ControlCommand): CommandResponse = controlCommand.commandName match {
+  override def validateCommand(controlCommand: ControlCommand): ValidationResponse = controlCommand.commandName match {
     case `acceptedCmd`       ⇒ Accepted(controlCommand.runId)
+      /*
     case `withoutMatcherCmd` ⇒ Accepted(controlCommand.runId)
     case `matcherCmd`        ⇒ Accepted(controlCommand.runId)
     case `matcherFailedCmd`  ⇒ Accepted(controlCommand.runId)
@@ -54,6 +55,7 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
     case `immediateCmd`      ⇒ Completed(controlCommand.runId)
     case `immediateResCmd` ⇒
       CompletedWithResult(controlCommand.runId, Result(controlCommand.source, Set(KeyType.IntKey.make("encoder").set(20))))
+      */
     case `invalidCmd` ⇒ Invalid(controlCommand.runId, OtherIssue(s"Unsupported prefix: ${controlCommand.commandName}"))
     case _            ⇒ Invalid(controlCommand.runId, WrongPrefixIssue(s"Wrong prefix: ${controlCommand.commandName}"))
   }
@@ -99,7 +101,7 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
     implicit val timeout: Timeout = 5.seconds
 
     // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
-    val eventualResponse: Future[CommandResponse] = commandResponseManager.query(runId)
+    val eventualResponse: Future[CommandResponseBase] = commandResponseManager.query(runId)
     eventualResponse.onComplete { x ⇒
       commandResponseManager.addOrUpdateCommand(runId, Cancelled(runId))
     }

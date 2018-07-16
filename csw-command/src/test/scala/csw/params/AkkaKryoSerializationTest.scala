@@ -258,7 +258,7 @@ class AkkaKryoSerializationTest extends FunSpec with Matchers with BeforeAndAfte
       val testData = Table(
         "CommandExecutionResponse models",
         CompletedWithResult(Id(), Result(prefix)),
-        NoLongerValid(Id(), CommandIssue.OtherIssue("test issue")),
+        //NoLongerValid(Id(), CommandIssue.OtherIssue("test issue")),
         Completed(Id()),
         Error(Id(), "test"),
         Cancelled(Id())

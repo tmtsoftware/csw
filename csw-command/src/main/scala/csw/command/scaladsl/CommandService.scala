@@ -54,7 +54,7 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
    * @param controlCommand the [[csw.params.commands.ControlCommand]] payload
    * @return a CommandResponse as a Future value
    */
-  def submit(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[CommandResponse] =
+  def submit(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[CommandResponseBase] =
     component ? (Submit(controlCommand, _))
 
   /**
@@ -64,7 +64,7 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
    * @param controlCommands the set of [[csw.params.commands.ControlCommand]] payloads
    * @return a Source of CommandResponse as a stream of CommandResponses for all commands
    */
-  def submitAll(controlCommands: Set[ControlCommand])(implicit timeout: Timeout): Source[CommandResponse, NotUsed] =
+  def submitAll(controlCommands: Set[ControlCommand])(implicit timeout: Timeout): Source[CommandResponseBase, NotUsed] =
     Source(controlCommands).mapAsyncUnordered(parallelism)(submit)
 
   /**
@@ -90,7 +90,7 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
    * @param controlCommand the [[csw.params.commands.ControlCommand]] payload
    * @return a CommandResponse as a Future value
    */
-  def oneway(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[CommandResponse] =
+  def oneway(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[ValidationResponse] =
     component ? (Oneway(controlCommand, _))
 
   /**
@@ -99,7 +99,7 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
    * @param commandRunId the runId of the command for which response is required
    * @return a CommandResponse as a Future value
    */
-  def subscribe(commandRunId: Id)(implicit timeout: Timeout): Future[CommandResponse] =
+  def subscribe(commandRunId: Id)(implicit timeout: Timeout): Future[CommandResponseBase] =
     component ? (CommandResponseManagerMessage.Subscribe(commandRunId, _))
 
   /**
@@ -108,7 +108,7 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
    * @param commandRunId the runId of the command for which response is required
    * @return a CommandResponse as a Future value
    */
-  def query(commandRunId: Id)(implicit timeout: Timeout): Future[CommandResponse] =
+  def query(commandRunId: Id)(implicit timeout: Timeout): Future[CommandResponseBase] =
     component ? (CommandResponseManagerMessage.Query(commandRunId, _))
 
   /**
@@ -117,7 +117,7 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
    * @param controlCommand the [[csw.params.commands.ControlCommand]] payload
    * @return a CommandResponse as a Future value
    */
-  def submitAndSubscribe(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[CommandResponse] =
+  def submitAndSubscribe(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[CommandResponseBase] =
     submit(controlCommand).flatMap {
       case _: ValidationResponse.Accepted ⇒ subscribe(controlCommand.runId)
       case x           ⇒ Future.successful(x)
@@ -134,7 +134,7 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
   def onewayAndMatch(
       controlCommand: ControlCommand,
       stateMatcher: StateMatcher
-  )(implicit timeout: Timeout): Future[CommandResponse] = {
+  )(implicit timeout: Timeout): Future[CommandResponseBase] = {
     val matcher          = new Matcher(component, stateMatcher)
     val matcherResponseF = matcher.start
     oneway(controlCommand).flatMap {
@@ -156,7 +156,7 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
    * @param controlCommands the [[csw.params.commands.ControlCommand]] payload
    * @return a Source of CommandResponse as a stream of CommandResponses for all commands
    */
-  def submitAllAndSubscribe(controlCommands: Set[ControlCommand])(implicit timeout: Timeout): Source[CommandResponse, NotUsed] =
+  def submitAllAndSubscribe(controlCommands: Set[ControlCommand])(implicit timeout: Timeout): Source[CommandResponseBase, NotUsed] =
     Source(controlCommands).mapAsyncUnordered(parallelism)(submitAndSubscribe)
 
   /**
@@ -167,7 +167,7 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
    * @param controlCommands the [[csw.params.commands.ControlCommand]] payload
    * @return a CommandResponse as a Future value
    */
-  def submitAllAndGetFinalResponse(controlCommands: Set[ControlCommand])(implicit timeout: Timeout): Future[CommandResponse] = {
+  def submitAllAndGetFinalResponse(controlCommands: Set[ControlCommand])(implicit timeout: Timeout): Future[CommandResponseBase] = {
     val value = Source(controlCommands).mapAsyncUnordered(parallelism)(submitAndSubscribe)
     CommandResponseAggregator.aggregateResponse(value)
   }

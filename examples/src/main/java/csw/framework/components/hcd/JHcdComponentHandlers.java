@@ -88,7 +88,7 @@ public class JHcdComponentHandlers extends JComponentHandlers {
     //#jInitialize-handler
     //#validateCommand-handler
     @Override
-    public CommandResponse validateCommand(ControlCommand controlCommand) {
+    public ValidationResponse validateCommand(ControlCommand controlCommand) {
         if (controlCommand instanceof Setup) {
             // validation for setup goes here
             return new ValidationResponse.Accepted(controlCommand.runId());
@@ -96,7 +96,7 @@ public class JHcdComponentHandlers extends JComponentHandlers {
             // validation for observe goes here
             return new ValidationResponse.Accepted(controlCommand.runId());
         } else {
-            return new CommandResponse.CommandNotAvailable(controlCommand.runId());
+            return new ValidationResponse.Invalid(controlCommand.runId(), new CommandIssue.UnsupportedCommandIssue(controlCommand.commandName().name()));
         }
     }
     //#validateCommand-handler

@@ -102,7 +102,7 @@ class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
     }
   }
 
-  override def validateCommand(command: ControlCommand): CommandResponse = {
+  def validateCommand(command: ControlCommand): ValidationResponse = {
     currentStatePublisher.publish(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(commandValidationChoice))))
     if (command.commandName.name.contains("success")) Accepted(command.runId)
     else Invalid(command.runId, OtherIssue("Testing: Received failure, will return Invalid."))

@@ -109,7 +109,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
         Timeout commandResponseTimeout = new Timeout(10, TimeUnit.SECONDS);
 
         // Submit command, and handle validation response. Final response is returned as a Future
-        CompletableFuture<CommandResponse> submitCommandResponseF = hcd.submit(setupCommand, submitTimeout)
+        CompletableFuture<CommandResponseBase> submitCommandResponseF = hcd.submit(setupCommand, submitTimeout)
                 .thenCompose(commandResponse -> {
                     if (commandResponse instanceof ValidationResponse.Accepted) {
                         return hcd.subscribe(commandResponse.runId(), commandResponseTimeout);
@@ -196,7 +196,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
     //#subscribe
 
     @Override
-    public CommandResponse validateCommand(ControlCommand controlCommand) {
+    public ValidationResponse validateCommand(ControlCommand controlCommand) {
         return null;
     }
 

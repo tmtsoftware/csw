@@ -13,6 +13,11 @@ import csw.command.messages.CommandResponseManagerMessage.{AddOrUpdateCommand, A
 import csw.command.scaladsl.CommandResponseSubscription
 import csw.params.commands.CommandResponse
 import csw.params.core.models.Id
+import csw.messages.CommandResponseManagerMessage
+import csw.messages.CommandResponseManagerMessage.{AddOrUpdateCommand, AddSubCommand, Query, UpdateSubCommand}
+import csw.messages.commands.{CommandResponse, CommandResponseBase}
+import csw.messages.params.models.Id
+import csw.services.command.scaladsl.CommandResponseSubscription
 
 import scala.compat.java8.FunctionConverters.enrichAsScalaFromConsumer
 import scala.compat.java8.FutureConverters._
@@ -55,7 +60,7 @@ class CommandResponseManager private[command] (val commandResponseManagerActor: 
    * @param subCommandId command identifier of sub command
    * @param cmdStatus status of command as [[csw.params.commands.CommandResponse]]
    */
-  def updateSubCommand(subCommandId: Id, cmdStatus: CommandResponse): Unit =
+  def updateSubCommand(subCommandId: Id, cmdStatus: CommandResponseBase): Unit =
     commandResponseManagerActor ! UpdateSubCommand(subCommandId, cmdStatus)
 
   /**
@@ -65,7 +70,7 @@ class CommandResponseManager private[command] (val commandResponseManagerActor: 
    * @param timeout timeout duration until which this operation is expected to wait for providing a value
    * @return a future of CommandResponse
    */
-  def query(runId: Id)(implicit timeout: Timeout): Future[CommandResponse] =
+  def query(runId: Id)(implicit timeout: Timeout): Future[CommandResponseBase] =
     commandResponseManagerActor ? (Query(runId, _))
 
   /**
@@ -75,7 +80,7 @@ class CommandResponseManager private[command] (val commandResponseManagerActor: 
    * @param timeout timeout duration until which this operation is expected to wait for providing a value
    * @return a future of CommandResponse
    */
-  def jQuery(runId: Id, timeout: Timeout): CompletableFuture[CommandResponse] =
+  def jQuery(runId: Id, timeout: Timeout): CompletableFuture[CommandResponseBase] =
     query(runId)(timeout).toJava.toCompletableFuture
 
   /**

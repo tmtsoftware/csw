@@ -24,6 +24,27 @@ import csw.command.models.framework.ToComponentLifecycleMessages._
 import csw.command.models.framework.{ComponentInfo, LifecycleStateChanged, PubSub, SupervisorLifecycleState}
 import csw.params.core.models.Id
 import csw.command.messages.{CommandResponseManagerMessage, ContainerIdleMessage, SupervisorMessage, TopLevelActorMessage}
+import csw.messages.commands.{CommandResponse, CommandResponseBase}
+import csw.messages.framework.LocationServiceUsage.DoNotRegister
+import csw.messages.framework.PubSub.{Publish, Subscribe, Unsubscribe}
+import csw.messages.framework.ToComponentLifecycleMessages._
+import csw.messages.framework.{ComponentInfo, LifecycleStateChanged, PubSub, SupervisorLifecycleState}
+import csw.messages.params.models.Id
+import csw.messages.params.states.CurrentState
+import csw.messages.CommandResponseManagerMessage.Query
+import csw.messages.ComponentCommonMessage.{GetSupervisorLifecycleState, LifecycleStateSubscription}
+import csw.messages.FromComponentLifecycleMessage.Running
+import csw.messages.RunningMessage.Lifecycle
+import csw.messages.SupervisorContainerCommonMessages.Restart
+import csw.messages.SupervisorIdleMessage.InitializeTimeout
+import csw.messages.SupervisorInternalRunningMessage.{RegistrationNotRequired, RegistrationSuccess}
+import csw.messages.commands.CommandResponse
+import csw.messages.framework.LocationServiceUsage.DoNotRegister
+import csw.messages.framework.PubSub.{Publish, Subscribe, Unsubscribe}
+import csw.messages.framework.ToComponentLifecycleMessages._
+import csw.messages.framework.{ComponentInfo, LifecycleStateChanged, PubSub, SupervisorLifecycleState}
+import csw.messages.params.models.Id
+import csw.messages.{CommandResponseManagerMessage, ContainerIdleMessage, SupervisorMessage, TopLevelActorMessage}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 
@@ -260,7 +281,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     import testData._
 
     val childRef: ActorRef[TopLevelActorMessage] = supervisorBehaviorKit.childInbox(componentActorName).ref
-    val subscriberProbe                          = TestProbe[CommandResponse]
+    val subscriberProbe                          = TestProbe[CommandResponseBase]
     val testCmdId                                = Id()
 
     supervisorBehaviorKit.run(Running(childRef))

@@ -13,7 +13,7 @@ import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.CommandResponseManagerMessage.Subscribe
 import csw.messages.commands.CommandResponse.{Cancelled, Completed}
 import csw.messages.commands.ValidationResponse.Accepted
-import csw.messages.commands.{CommandResponse, Setup}
+import csw.messages.commands.{CommandResponseBase, Setup}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.params.generics.KeyType
@@ -55,7 +55,7 @@ class CancellableCommandTest(ignore: Int) extends LSNodeSpec(config = new OneMem
     }
 
     runOn(member) {
-      val cmdResponseProbe = TestProbe[CommandResponse]
+      val cmdResponseProbe = TestProbe[CommandResponseBase]
       val obsId            = Some(ObsId("Obs001"))
       val cancelCmdId      = KeyType.StringKey.make("cancelCmdId")
 

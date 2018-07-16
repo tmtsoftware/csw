@@ -67,7 +67,7 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
     val setupCommand                    = Setup(componentInfo.prefix, CommandName("sleep"), Some(ObsId("2018A-001"))).add(sleepTimeParam)
 
     // Submit command, and handle validation response. Final response is returned as a Future
-    val submitCommandResponseF: Future[CommandResponse] = hcd.submit(setupCommand).flatMap {
+    val submitCommandResponseF: Future[CommandResponseBase] = hcd.submit(setupCommand).flatMap {
       case _: Accepted =>
         // If valid, subscribe to the HCD's CommandResponseManager
         // This explicit timeout indicates how long to wait for completion

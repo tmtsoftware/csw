@@ -36,7 +36,7 @@ case class CommandDistributor(componentToCommands: Map[CommandService, Set[Contr
       mat: Materializer
   ): Future[ValidationResponse] = {
 
-    val commandResponsesF: Source[CommandResponse, NotUsed] = Source(componentToCommands).flatMapMerge(
+    val commandResponsesF: Source[CommandResponseBase, NotUsed] = Source(componentToCommands).flatMapMerge(
       breadth,
       { case (component, commands) ⇒ component.submitAll(commands) }
     )
@@ -57,7 +57,7 @@ case class CommandDistributor(componentToCommands: Map[CommandService, Set[Contr
       implicit timeout: Timeout,
       ec: ExecutionContext,
       mat: Materializer
-  ): Future[CommandResponse] = {
+  ): Future[CommandResponseBase] = {
 
     val commandResponsesF: Source[CommandResponseBase, NotUsed] = Source(componentToCommands).flatMapMerge(
       breadth,

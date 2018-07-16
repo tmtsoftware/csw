@@ -20,7 +20,7 @@ import csw.command.scaladsl.{CommandDistributor, CommandService}
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.messages.commands.CommandResponse.Completed
 import csw.messages.commands.ValidationResponse.{Accepted, Invalid}
-import csw.messages.commands.{CommandResponse, Setup}
+import csw.messages.commands.{CommandResponse, CommandResponseBase, Setup}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{AkkaLocation, ComponentId, ComponentType}
 import csw.messages.params.models.ObsId
@@ -112,7 +112,7 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
 
       //do some work before querying for the result of above command as needed
 
-      val eventualResponse: Future[CommandResponse] = assemblyCommandService.query(setupForQuery.runId)
+      val eventualResponse: Future[CommandResponseBase] = assemblyCommandService.query(setupForQuery.runId)
       //#query-response
       eventualResponse.map(_ shouldBe Accepted(setupForQuery.runId))
       enterBarrier("long-commands")

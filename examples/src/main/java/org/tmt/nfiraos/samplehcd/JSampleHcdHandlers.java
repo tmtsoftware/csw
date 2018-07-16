@@ -135,7 +135,7 @@ public class JSampleHcdHandlers extends JComponentHandlers {
 
     //#validate
     @Override
-    public CommandResponse validateCommand(ControlCommand controlCommand) {
+    public ValidationResponse validateCommand(ControlCommand controlCommand) {
         String commandName = controlCommand.commandName().name();
         log.info(() -> "Validating command: " + commandName);
         if (commandName.equals("sleep")) {

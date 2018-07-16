@@ -11,6 +11,12 @@ import csw.params.core.models.Prefix
 import csw.command.perf.BenchmarkHelpers.spawnStandaloneComponent
 import csw.command.scaladsl.CommandService
 import csw.location.commons.ClusterAwareSettings
+import csw.messages.commands
+import csw.messages.commands.{CommandName, CommandResponseBase}
+import csw.messages.params.models.Prefix
+import csw.services.command.perf.BenchmarkHelpers.spawnStandaloneComponent
+import csw.services.command.scaladsl.CommandService
+import csw.services.location.commons.ClusterAwareSettings
 import org.openjdk.jmh.annotations._
 
 import scala.concurrent.Await
@@ -59,14 +65,14 @@ class CommandServiceBenchmark {
   @Benchmark
   @BenchmarkMode(Array(Mode.Throughput))
   @OutputTimeUnit(TimeUnit.SECONDS)
-  def commandThroughput(): CommandResponse = {
+  def commandThroughput(): CommandResponseBase = {
     Await.result(componentRef.submit(setupCommand), 5.seconds)
   }
 
   @Benchmark
   @BenchmarkMode(Array(Mode.AverageTime))
   @OutputTimeUnit(TimeUnit.MILLISECONDS)
-  def commandLatency(): CommandResponse = {
+  def commandLatency(): CommandResponseBase = {
     Await.result(componentRef.submit(setupCommand), 5.seconds)
   }
 }

@@ -14,6 +14,25 @@ import csw.command.models.framework.ToComponentLifecycleMessage
 import csw.command.models.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
+import csw.messages.framework.LocationServiceUsage.RegisterAndTrackServices
+import csw.messages.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
+import csw.messages.framework.{ComponentInfo, ToComponentLifecycleMessage}
+import csw.messages.CommandMessage.{Oneway, Submit}
+import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
+import csw.messages.FromComponentLifecycleMessage.Running
+import csw.messages.RunningMessage.Lifecycle
+import csw.messages.TopLevelActorCommonMessage.{TrackingEventReceived, UnderlyingHookFailed}
+import csw.messages.TopLevelActorIdleMessage.Initialize
+import csw.messages._
+import csw.services.command.CommandResponseManager
+import csw.services.location.scaladsl.LocationService
+import csw.services.logging.scaladsl.{Logger, LoggerFactory}
+import csw.messages.commands.CommandResponse
+import csw.messages.commands.CommandResponse.Accepted
+import csw.messages.framework.LocationServiceUsage.RegisterAndTrackServices
+import csw.messages.framework.ToComponentLifecycleMessage
+import csw.messages.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
+import csw.services.logging.scaladsl.Logger
 import csw.params.commands.CommandResponse
 import csw.params.commands.CommandResponse.Accepted
 import csw.logging.scaladsl.Logger
@@ -175,13 +194,15 @@ private[framework] final class ComponentBehavior(
       case _: Oneway ⇒ //Oneway command should not be added to CommandResponseManager
     }
 
-    commandMessage.replyTo ! validationResponse
-    forwardCommand(commandMessage, validationResponse)
+    //commandMessage.replyTo ! validationResponse
+    forwardCommand(commandMessage /*, validationResponse */)
   }
 
-  private def forwardCommand(commandMessage: CommandMessage, validationResponse: CommandResponse): Unit =
+  private def forwardCommand(commandMessage: CommandMessage /*, validationResponse: CommandResponse*/): Unit =
+  /*
     validationResponse match {
       case Accepted(_) ⇒
+      */
         commandMessage match {
           case _: Submit ⇒
             log.info(s"Invoking lifecycle handler's onSubmit hook with msg :[$commandMessage]")
@@ -190,6 +211,9 @@ private[framework] final class ComponentBehavior(
             log.info(s"Invoking lifecycle handler's onOneway hook with msg :[$commandMessage]")
             lifecycleHandlers.onOneway(commandMessage.command)
         }
+  /*
       case _ ⇒ log.debug(s"Command not forwarded to TLA post validation. ValidationResponse was [$validationResponse]")
+
     }
+    */
 }

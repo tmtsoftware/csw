@@ -114,8 +114,8 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
       {
         val mocks = frameworkTestMocks()
         import mocks._
-        val supervisorRef                                              = createSupervisorAndStartTLA(info, mocks)
-        val commandValidationResponseProbe: TestProbe[CommandResponse] = TestProbe[CommandResponse]
+        val supervisorRef                  = createSupervisorAndStartTLA(info, mocks)
+        val commandValidationResponseProbe = TestProbe[CommandResponseBase]
 
         supervisorRef ! ComponentStateSubscription(Subscribe(compStateProbe.ref))
         supervisorRef ! LifecycleStateSubscription(Subscribe(lifecycleStateProbe.ref))
@@ -190,7 +190,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         val mocks = frameworkTestMocks()
         import mocks._
         val supervisorRef                                              = createSupervisorAndStartTLA(info, mocks)
-        val commandValidationResponseProbe: TestProbe[CommandResponse] = TestProbe[CommandResponse]
+        val commandValidationResponseProbe: TestProbe[ValidationResponse] = TestProbe[ValidationResponse]
 
         supervisorRef ! ComponentStateSubscription(Subscribe(compStateProbe.ref))
         supervisorRef ! LifecycleStateSubscription(Subscribe(lifecycleStateProbe.ref))
@@ -261,7 +261,8 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
     forAll(testData) { (info: ComponentInfo) ⇒
       {
         val mocks                                                      = frameworkTestMocks()
-        val commandValidationResponseProbe: TestProbe[CommandResponse] = TestProbe[CommandResponse]
+        val commandResponseProbe: TestProbe[CommandResponse]              = TestProbe[CommandResponse]
+        val commandValidationResponseProbe: TestProbe[ValidationResponse] = TestProbe[ValidationResponse]
         import mocks._
         val supervisorRef = createSupervisorAndStartTLA(hcdInfo, mocks)
 
@@ -276,7 +277,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         // setup to receive Success in validation result
         val setup: Setup = Setup(prefix, CommandName("move.failure"), Some(obsId), Set(param))
 
-        supervisorRef ! Submit(setup, commandValidationResponseProbe.ref)
+        supervisorRef ! Submit(setup, commandResponseProbe.ref)
         commandValidationResponseProbe.expectMessageType[Invalid]
 
         supervisorRef ! Oneway(setup, commandValidationResponseProbe.ref)

@@ -13,6 +13,13 @@ import csw.params.commands.CommandResponse
 import csw.params.commands.CommandResponse.{Accepted, Completed, Error}
 import csw.params.core.models.Id
 import csw.logging.scaladsl.{Logger, LoggerFactory}
+import csw.messages.CommandResponseManagerMessage
+import csw.messages.commands.{CommandCorrelation, CommandResponseBase, CommandResponseManagerState}
+import csw.messages.commands.CommandResponse.{Completed, Error}
+import csw.messages.params.models.Id
+import csw.messages.CommandResponseManagerMessage._
+import csw.messages.commands.ValidationResponse.Accepted
+import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
@@ -32,7 +39,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
 
   test("should be able to add command entry in Command Response Manager") {
     val behaviorTestKit         = createBehaviorTestKit()
-    val commandResponseProbe    = TestProbe[CommandResponse]
+    val commandResponseProbe    = TestProbe[CommandResponseBase]
     val commandCorrelationProbe = TestProbe[CommandCorrelation]
     val runId                   = Id()
     behaviorTestKit.run(AddOrUpdateCommand(runId, Accepted(runId)))
@@ -59,7 +66,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
 
   test("should be able to add subscriber and publish current state to newly added subscriber") {
     val behaviorTestKit                  = createBehaviorTestKit()
-    val commandResponseProbe             = TestProbe[CommandResponse]
+    val commandResponseProbe             = TestProbe[CommandResponseBase]
     val commandResponseManagerStateProbe = TestProbe[CommandResponseManagerState]
 
     val runId = Id()
@@ -80,7 +87,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
 
   test("should be able to remove subscriber") {
     val behaviorTestKit                  = createBehaviorTestKit()
-    val commandResponseProbe             = TestProbe[CommandResponse]
+    val commandResponseProbe             = TestProbe[CommandResponseBase]
     val commandResponseManagerStateProbe = TestProbe[CommandResponseManagerState]
 
     val runId = Id()
@@ -102,7 +109,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
 
   test("should be able to get current status of command on Query message") {
     val behaviorTestKit      = createBehaviorTestKit()
-    val commandResponseProbe = TestProbe[CommandResponse]
+    val commandResponseProbe = TestProbe[CommandResponseBase]
 
     val runId = Id()
 
@@ -114,8 +121,8 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
 
   test("should be able to update and publish command status to all subscribers") {
     val behaviorTestKit                  = createBehaviorTestKit()
-    val commandResponseProbe1            = TestProbe[CommandResponse]
-    val commandResponseProbe2            = TestProbe[CommandResponse]
+    val commandResponseProbe1            = TestProbe[CommandResponseBase]
+    val commandResponseProbe2            = TestProbe[CommandResponseBase]
     val commandResponseManagerStateProbe = TestProbe[CommandResponseManagerState]
 
     val runId = Id()
@@ -136,7 +143,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
 
   test("should be able to infer command status when status of sub command is updated") {
     val behaviorTestKit      = createBehaviorTestKit()
-    val commandResponseProbe = TestProbe[CommandResponse]
+    val commandResponseProbe = TestProbe[CommandResponseBase]
 
     val runId        = Id()
     val subCommandId = Id()
@@ -155,7 +162,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
   // DEOPSCSW-208: Report failure on Configuration Completion command
   test("should be able to update command status with the status of subcommand if one of the subcommand fails") {
     val behaviorTestKit      = createBehaviorTestKit()
-    val commandResponseProbe = TestProbe[CommandResponse]
+    val commandResponseProbe = TestProbe[CommandResponseBase]
     val runId                = Id()
     val subCommandId1        = Id()
     val subCommandId2        = Id()
@@ -177,7 +184,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
   // DEOPSCSW-207: Report on Configuration Command Completion
   test("should be able to update successful command status when all the subcommand completes with success") {
     val behaviorTestKit      = createBehaviorTestKit()
-    val commandResponseProbe = TestProbe[CommandResponse]
+    val commandResponseProbe = TestProbe[CommandResponseBase]
     val runId                = Id()
     val subCommandId1        = Id()
     val subCommandId2        = Id()

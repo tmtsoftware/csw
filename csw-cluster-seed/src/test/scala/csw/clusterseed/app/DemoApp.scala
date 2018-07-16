@@ -16,6 +16,14 @@ import csw.command.messages.ContainerMessage
 import csw.command.messages.ContainerCommonMessage.GetComponents
 import csw.location.commons.ClusterAwareSettings
 import csw.logging.scaladsl.{LoggerFactory, LoggingSystemFactory}
+import csw.messages.commands.{CommandName, CommandResponse, Setup, ValidationResponse}
+import csw.messages.framework.{Component, Components, ContainerLifecycleState}
+import csw.messages.params.models.Prefix
+import csw.messages.CommandMessage.Oneway
+import csw.messages.ContainerMessage
+import csw.messages.ContainerCommonMessage.GetComponents
+import csw.services.location.commons.ClusterAwareSettings
+import csw.services.logging.scaladsl.{LoggerFactory, LoggingSystemFactory}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
@@ -52,7 +60,7 @@ object DemoApp extends App {
   implicit val typedSystem: ActorSystem[Nothing] = frameworkWiring.actorSystem.toTyped
   implicit val testKitSettings: TestKitSettings  = TestKitSettings(typedSystem)
 
-  private val cmdResponseProbe = TestProbe[CommandResponse]
+  private val cmdResponseProbe = TestProbe[ValidationResponse]
   private val startLoggingCmd  = CommandName("StartLogging")
   private val prefix           = Prefix("iris.command")
 

@@ -15,7 +15,7 @@ import csw.params.core.states.{CurrentState, StateName}
 import csw.command.messages.CommandMessage.Submit
 import csw.command.messages.{CommandResponseManagerMessage ⇒ CRM}
 import csw.messages.commands.CommandResponse.NotAllowed
-import csw.messages.commands.{CommandName, CommandResponse, Setup}
+import csw.messages.commands.{CommandName, CommandResponse, CommandResponseBase, Setup}
 import csw.messages.framework.LockingResponses._
 import csw.messages.framework.{LifecycleStateChanged, LockingResponse, PubSub, SupervisorLifecycleState}
 import csw.messages.params.models.{ObsId, Prefix}
@@ -90,7 +90,7 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
   // DEOPSCSW-301: Support UnLocking
   test("should forward command messages from client that locked the component and reject for other clients ") {
     val lockingStateProbe    = TestProbe[LockingResponse]
-    val commandResponseProbe = TestProbe[CommandResponse]
+    val commandResponseProbe = TestProbe[CommandResponseBase]
 
     val source1Prefix = Prefix("wfos.prog.cloudcover.source1")
     val commandName1  = CommandName("move.Client1.success")
@@ -143,7 +143,7 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
   // DEOPSCSW-301: Support UnLocking
   test("should forward messages that are of type SupervisorLockMessage to TLA") {
     val lockingStateProbe    = TestProbe[LockingResponse]
-    val commandResponseProbe = TestProbe[CommandResponse]()(untypedSystem.toTyped)
+    val commandResponseProbe = TestProbe[CommandResponseBase]()(untypedSystem.toTyped)
 
     val sourcePrefix = Prefix("wfos.prog.cloudcover.source")
     val commandName  = CommandName("move.Client1.success")
@@ -191,7 +191,7 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
   // DEOPSCSW-223 Expiry of component Locking mode
   test("should expire lock after timeout") {
     val lockingStateProbe    = TestProbe[LockingResponse]
-    val commandResponseProbe = TestProbe[CommandResponse]
+    val commandResponseProbe = TestProbe[CommandResponseBase]
 
     val source1Prefix = Prefix("wfos.prog.cloudcover.Client1.success")
     val source2Prefix = Prefix("wfos.prog.cloudcover.source2.success")

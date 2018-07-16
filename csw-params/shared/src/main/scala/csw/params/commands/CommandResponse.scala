@@ -62,7 +62,7 @@ object ValidationResponse {
    * @param runId of command for which this response is created
    * @param issue describing the cause of invalidation
    */
-  case class NoLongerValid(runId: Id, issue: CommandIssue) extends CommandResponse(Negative)
+  //case class NoLongerValid(runId: Id, issue: CommandIssue) extends CommandResponse(Negative)
 
   /**
    * Represents a negative response that describes an error in executing the command
@@ -101,12 +101,12 @@ object ValidationResponse {
    * @param commandResponse the CommandResponse to be transformed
    * @return a CommandResponse that has runId as provided id
    */
-  def withRunId(id: Id, commandResponse: CommandResponse): CommandResponse = commandResponse match {
+  def withRunId(id: Id, commandResponse: CommandResponseBase): CommandResponseBase = commandResponse match {
     //case accepted: Accepted                       ⇒ accepted.copy(runId = id)
     //case invalid: Invalid                         ⇒ invalid.copy(runId = id)
     case completedWithResult: CompletedWithResult ⇒ completedWithResult.copy(runId = id)
     case completed: Completed                     ⇒ completed.copy(runId = id)
-    case noLongerValid: NoLongerValid             ⇒ noLongerValid.copy(runId = id)
+    //case noLongerValid: NoLongerValid             ⇒ noLongerValid.copy(runId = id)
     case error: Error                             ⇒ error.copy(runId = id)
     case cancelled: Cancelled                     ⇒ cancelled.copy(runId = id)
     case commandNotAvailable: CommandNotAvailable ⇒ commandNotAvailable.copy(runId = id)

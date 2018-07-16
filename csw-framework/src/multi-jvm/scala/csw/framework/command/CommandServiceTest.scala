@@ -138,7 +138,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       shortCommandResponse shouldBe a[Invalid]
 
       //#immediate-response
-      val eventualResponse: Future[CommandResponse] = async {
+      val eventualResponse: Future[CommandResponseBase] = async {
         await(assemblyComponent.submit(Setup(prefix, immediateCmd, obsId))) match {
           case response: Completed ⇒
             //do something with completed result
@@ -183,7 +183,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       val matcherResponseF: Future[MatcherResponse] = matcher.start
 
       // submit command and if the command is successfully validated, check for matching of demand state against current state
-      val eventualCommandResponse: Future[CommandResponse] = async {
+      val eventualCommandResponse: Future[CommandResponseBase] = async {
         val initialResponse = await(assemblyComponent.oneway(setupWithMatcher))
         initialResponse match {
           case _: Accepted ⇒
@@ -200,12 +200,13 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
         }
       }
 
+      // TODO -- CHECK ALL THESE USES OF COMMANDRESPONSEBASE
       val commandResponse = Await.result(eventualCommandResponse, timeout.duration)
       //#matcher
       commandResponse shouldBe Completed(setupWithMatcher.runId)
 
       //#onewayAndMatch
-      val eventualResponse1: Future[CommandResponse] = assemblyComponent.onewayAndMatch(setupWithMatcher, demandMatcher)
+      val eventualResponse1: Future[CommandResponseBase] = assemblyComponent.onewayAndMatch(setupWithMatcher, demandMatcher)
       //#onewayAndMatch
       Await.result(eventualResponse1, timeout.duration) shouldBe Completed(setupWithMatcher.runId)
 
@@ -215,7 +216,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
 
       val failedMatcherResponseF: Future[MatcherResponse] = failedMatcher.start
 
-      val eventualCommandResponse2: Future[CommandResponse] = async {
+      val eventualCommandResponse2: Future[CommandResponseBase] = async {
         val initialResponse = await(assemblyComponent.oneway(setupWithFailedMatcher))
         initialResponse match {
           case _: Accepted ⇒
@@ -250,7 +251,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       val matcherResponseF1: Future[MatcherResponse] = matcherForTimeout.start
 
       val timeoutExMsg = "The stream has not been completed in 500 milliseconds."
-      val eventualCommandResponse1: Future[CommandResponse] = async {
+      val eventualCommandResponse1: Future[CommandResponseBase] = async {
         val initialResponse = await(assemblyComponent.oneway(setupWithTimeoutMatcher))
         initialResponse match {
           case _: Accepted ⇒
@@ -266,7 +267,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
           case x ⇒ x
         }
       }
-      val commandResponseOnTimeout: CommandResponse = Await.result(eventualCommandResponse1, timeout.duration)
+      val commandResponseOnTimeout: CommandResponseBase = Await.result(eventualCommandResponse1, timeout.duration)
       commandResponseOnTimeout shouldBe a[Error]
       commandResponseOnTimeout.asInstanceOf[Error].message shouldBe timeoutExMsg
 
@@ -274,7 +275,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       // `setupWithTimeoutMatcher` is a sample setup payload intended to be used when command response is not determined
       // using matcher
       val onewayCommandResponseF: Future[Unit] = async {
-        val initialResponse: CommandResponse = await(assemblyComponent.oneway(setupWithTimeoutMatcher))
+        val initialResponse: CommandResponseBase = await(assemblyComponent.oneway(setupWithTimeoutMatcher))
         initialResponse match {
           case accepted: Accepted ⇒
           // do Something
@@ -290,7 +291,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       // `setupWithTimeoutMatcher` is a sample setup payload intended to be used when command response is not determined
       // using matcher
       val submitCommandResponseF: Future[Unit] = async {
-        val initialResponse: CommandResponse = await(assemblyComponent.submit(setupWithTimeoutMatcher))
+        val initialResponse: CommandResponseBase = await(assemblyComponent.submit(setupWithTimeoutMatcher))
         initialResponse match {
           case accepted: Accepted ⇒
           // do Something

@@ -10,7 +10,8 @@ import csw.location.api.models.TrackingEvent
 import csw.logging.scaladsl.Logger
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.ValidationResponse.Accepted
-import csw.messages.commands.{CommandResponse, ControlCommand}
+import csw.messages.commands.{CommandResponse, ControlCommand, ValidationResponse}
+import csw.messages.framework.ComponentInfo
 import csw.messages.location.TrackingEvent
 import csw.services.logging.scaladsl.Logger
 
@@ -35,7 +36,7 @@ class GalilComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
     log.fatal("Level is fatal")
   }
 
-  override def validateCommand(controlCommand: ControlCommand): CommandResponse = Accepted(controlCommand.runId)
+  override def validateCommand(controlCommand: ControlCommand): ValidationResponse = Accepted(controlCommand.runId)
 
   override def onSubmit(controlCommand: ControlCommand): Unit = ()
 

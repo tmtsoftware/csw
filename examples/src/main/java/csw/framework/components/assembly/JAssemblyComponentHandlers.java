@@ -103,7 +103,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
 
     //#validateCommand-handler
     @Override
-    public CommandResponse validateCommand(ControlCommand controlCommand) {
+    public ValidationResponse validateCommand(ControlCommand controlCommand) {
         if (controlCommand instanceof Setup) {
             // validation for setup goes here
             //#addOrUpdateCommand

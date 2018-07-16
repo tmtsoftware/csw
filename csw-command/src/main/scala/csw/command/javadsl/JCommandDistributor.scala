@@ -5,6 +5,7 @@ import java.util.concurrent.CompletableFuture
 
 import akka.stream.Materializer
 import akka.util.Timeout
+import csw.messages.commands.{CommandResponseBase, ControlCommand, ValidationResponse}
 import csw.params.commands.{CommandResponse, ControlCommand}
 import csw.command.scaladsl.CommandDistributor
 import csw.messages.commands.{CommandResponse, ControlCommand, ValidationResponse}
@@ -53,7 +54,7 @@ case class JCommandDistributor(componentToCommands: util.Map[JCommandService, ut
       timeout: Timeout,
       ec: ExecutionContext,
       mat: Materializer
-  ): CompletableFuture[CommandResponse] = {
+  ): CompletableFuture[CommandResponseBase] = {
 
     val sComponentToCommands = componentToCommands.asScala.toMap.map {
       case (jCommandService, commands) ⇒ jCommandService.sCommandService -> commands.asScala.toSet

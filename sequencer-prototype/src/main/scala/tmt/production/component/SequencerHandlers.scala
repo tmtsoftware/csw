@@ -91,7 +91,7 @@ class SequencerHandlers(
   override def onGoOffline(): Unit                                         = {}
   override def onGoOnline(): Unit                                          = {}
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = {}
-  override def validateCommand(controlCommand: ControlCommand): CommandResponse = {
+  override def validateCommand(controlCommand: ControlCommand): ValidationResponse = {
     ValidationResponse.Accepted(controlCommand.runId)
   }
 }
