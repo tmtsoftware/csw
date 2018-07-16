@@ -154,22 +154,6 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
     }
   }
 
-  // publish command generates new id and event time while publishing, hence assertions exclude these keys from json
-  private def removeDynamicKeys(json: JsValue) = JsObject(json.as[JsObject].value -- Seq("eventId", "eventTime"))
-
-  // publish command with -e argument updates existing prefix and event name from provided json if already present
-  // else adds new entry
-  private def addEventIdAndName(json: JsValue, eventKey: EventKey) = json.as[JsObject] ++ Json.obj(
-    ("source", eventKey.source.prefix),
-    ("eventName", eventKey.eventName.name)
-  )
-
-  private def eventToSanitizedJson(event: Event)        = removeDynamicKeys(JsonSupport.writeEvent(event))
-  private def stringToEvent(eventString: String)        = JsonSupport.readEvent[Event](Json.parse(eventString))
-  private def fileToEvent[T <: Event](filePath: String) = JsonSupport.readEvent[T](fileToEventJson(filePath))
-  private def fileToEventJson(filePath: String)         = Json.parse(Source.fromResource(filePath).mkString)
-  private def strToJsObject(js: String)                 = Json.parse(js).as[JsObject]
-
   // DEOPSCSW-433: [Event Cli] Subscribe command
   test("should be able to subscribe and get json output to event key") {
 
@@ -204,15 +188,32 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
     import eventGenerator._
 
     val eventKey: EventKey = eventsGroup.head.eventKey
-    eventService.defaultPublisher.await.publish(event1).await
+    val publisher          = eventService.defaultPublisher.await
+    val cancellable        = publisher.publish(eventGenerator.generate, 400.millis)
 
     val (subscriptionF, _) =
-      commandLineRunner.subscribe(argsParser.parse(Seq("subscribe", "--events", eventKey.key)).get)
+      commandLineRunner.subscribe(argsParser.parse(Seq("subscribe", "--events", eventKey.key, "--id")).get)
 
     Thread.sleep(1000)
-
+    cancellable.cancel()
     subscriptionF.map(_.unsubscribe())
 
-    logBuffer shouldEqualContentsOf "oneline/get_entire_event.txt"
+    logBuffer shouldEqualContentsOf "oneline/entire_events.txt"
   }
+
+  // publish command generates new id and event time while publishing, hence assertions exclude these keys from json
+  private def removeDynamicKeys(json: JsValue) = JsObject(json.as[JsObject].value -- Seq("eventId", "eventTime"))
+
+  // publish command with -e argument updates existing prefix and event name from provided json if already present
+  // else adds new entry
+  private def addEventIdAndName(json: JsValue, eventKey: EventKey) = json.as[JsObject] ++ Json.obj(
+    ("source", eventKey.source.prefix),
+    ("eventName", eventKey.eventName.name)
+  )
+
+  private def eventToSanitizedJson(event: Event)        = removeDynamicKeys(JsonSupport.writeEvent(event))
+  private def stringToEvent(eventString: String)        = JsonSupport.readEvent[Event](Json.parse(eventString))
+  private def fileToEvent[T <: Event](filePath: String) = JsonSupport.readEvent[T](fileToEventJson(filePath))
+  private def fileToEventJson(filePath: String)         = Json.parse(Source.fromResource(filePath).mkString)
+  private def strToJsObject(js: String)                 = Json.parse(js).as[JsObject]
 }
