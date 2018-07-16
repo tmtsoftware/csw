@@ -7,10 +7,11 @@
 * [csw-location-agent](../apps/cswlocationagent.md): Application used to start non-CSW services so that register with Location Service.
 * [csw-config-server](../apps/cswonfigserverapp.md): Start a Configuration Service SVN repository.
 * [csw-config-client-cli](../apps/cswconfigclientcli.md): Application to perform administrative functions on the Configuration Service.
-* [csw-host-config](../apps/hostconfig.md): Framework for creating host configuration applications, used to start multiple containers on a machnine.
+* [csw-event-cli](../apps/csweventcli.md): Application to publish an event or subscribe to an event.
+* [csw-host-config](../apps/hostconfig.md): Framework for creating host configuration applications, used to start multiple containers on a machine.
 @@@
 
-# Starting apps for development
+## Starting apps for development
 
 In order to run a component it is required to run `csw-cluster-seed`. Moreover, even to start event service or configuration service,
 `csw-cluster-seed` should be running.
