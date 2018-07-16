@@ -1,11 +1,15 @@
 package csw.services.alarm.client.internal
 
 import akka.actor.ActorSystem
+import akka.actor.typed.ActorRef
 import csw.services.alarm.api.exceptions.{InvalidSeverityException, ResetOperationFailedException}
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, UnAcknowledged}
+import csw.services.alarm.api.models.AlarmSeverity.Okay
 import csw.services.alarm.api.models.LatchStatus.{Latched, UnLatched}
-import csw.services.alarm.api.models.{AlarmKey, AlarmMetadata, AlarmSeverity, AlarmStatus}
+import csw.services.alarm.api.models.ShelveStatus.{Shelved, UnShelved}
+import csw.services.alarm.api.models._
 import csw.services.alarm.api.scaladsl.AlarmAdminService
+import csw.services.alarm.client.internal.AlarmTimeoutMessage.{CancelShelveTimeout, ScheduleShelveTimeout}
 import csw.services.alarm.client.internal.codec.{AlarmMetadataCodec, AlarmSeverityCodec, AlarmStatusCodec}
 import io.lettuce.core.api.async.RedisAsyncCommands
 import io.lettuce.core.{RedisClient, RedisURI}
@@ -14,7 +18,11 @@ import scala.async.Async._
 import scala.compat.java8.FutureConverters.CompletionStageOps
 import scala.concurrent.Future
 
-class AlarmServiceImpl(redisURI: RedisURI, redisClient: RedisClient)(implicit actorSystem: ActorSystem)
+class AlarmServiceImpl(
+    redisURI: RedisURI,
+    redisClient: RedisClient,
+    shelveTimeoutRef: ActorRef[AlarmTimeoutMessage]
+)(implicit actorSystem: ActorSystem)
     extends AlarmAdminService {
 
   import actorSystem.dispatcher
@@ -96,7 +104,7 @@ class AlarmServiceImpl(redisURI: RedisURI, redisClient: RedisClient)(implicit ac
     val severityApi     = await(asyncSeverityApiF)
     val currentSeverity = await(severityApi.get(key).toScala)
 
-    if (currentSeverity != AlarmSeverity.Okay) throw ResetOperationFailedException(key, currentSeverity)
+    if (currentSeverity != Okay) throw ResetOperationFailedException(key, currentSeverity)
 
     val statusApi = await(asyncStatusApiF)
     val status    = await(statusApi.get(key).toScala)
@@ -110,4 +118,35 @@ class AlarmServiceImpl(redisURI: RedisURI, redisClient: RedisClient)(implicit ac
       await(statusApi.set(key, status.copy(latchStatus = UnLatched)).toScala)
     }
   }
+
+  override def shelve(key: AlarmKey): Future[Unit] = async {
+    val severityApi     = await(asyncSeverityApiF)
+    val currentSeverity = await(severityApi.get(key).toScala)
+
+    if (currentSeverity.isHighRisk) {
+      val statusApi = await(asyncStatusApiF)
+      val status    = await(statusApi.get(key).toScala)
+      if (status.shelveStatus != Shelved) {
+        await(statusApi.set(key, status.copy(shelveStatus = Shelved)).toScala)
+        shelveTimeoutRef ! ScheduleShelveTimeout(key)
+      }
+    }
+  }
+
+  override def unShelve(key: AlarmKey): Future[Unit] = async {
+    val severityApi     = await(asyncSeverityApiF)
+    val currentSeverity = await(severityApi.get(key).toScala)
+
+    //TODO: decide whether to unshelve an alarm when it goes to okay
+    val statusApi = await(asyncStatusApiF)
+    val status    = await(statusApi.get(key).toScala)
+    if (status.shelveStatus != UnShelved) {
+      await(statusApi.set(key, status.copy(shelveStatus = UnShelved)).toScala)
+      shelveTimeoutRef ! CancelShelveTimeout(key)
+    }
+  }
+
+  override def activate(key: AlarmKey): Future[Unit] = ???
+
+  override def deActivate(key: AlarmKey): Future[Unit] = ???
 }

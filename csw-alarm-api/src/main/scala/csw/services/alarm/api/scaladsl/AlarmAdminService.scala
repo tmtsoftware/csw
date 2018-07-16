@@ -10,4 +10,10 @@ trait AlarmAdminService extends AlarmService {
   def getStatus(key: AlarmKey): Future[AlarmStatus]
   def acknowledge(key: AlarmKey): Future[Unit]
   def reset(key: AlarmKey): Future[Unit]
+  def shelve(key: AlarmKey): Future[Unit]
+  def unShelve(key: AlarmKey): Future[Unit]
+  // api only for test purpose
+  def activate(key: AlarmKey): Future[Unit]
+  // api only for test purpose
+  def deActivate(key: AlarmKey): Future[Unit]
 }

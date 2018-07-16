@@ -10,6 +10,17 @@ import csw.framework.CurrentStatePublisher
 import csw.framework.exceptions.{FailureRestart, InitializationFailed}
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.scaladsl.ComponentBehaviorFactory
+import csw.messages.CommandResponseManagerMessage.{Query, Subscribe, Unsubscribe}
+import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
+import csw.messages.FromComponentLifecycleMessage.Running
+import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
+import csw.messages.RunningMessage.Lifecycle
+import csw.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
+import csw.messages.SupervisorIdleMessage.InitializeTimeout
+import csw.messages.SupervisorInternalRunningMessage.{RegistrationFailed, RegistrationNotRequired, RegistrationSuccess}
+import csw.messages.SupervisorLockMessage.{Lock, Unlock}
+import csw.messages.SupervisorRestartMessage.{UnRegistrationComplete, UnRegistrationFailed}
+import csw.messages._
 import csw.messages.commons.CoordinatedShutdownReasons.ShutdownMessageReceivedReason
 import csw.messages.framework.LocationServiceUsage.DoNotRegister
 import csw.messages.framework.LockingResponses.{LockExpired, LockExpiringShortly}
@@ -20,18 +31,6 @@ import csw.messages.location.ComponentId
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.params.models.Prefix
 import csw.messages.params.states.CurrentState
-import csw.messages.CommandResponseManagerMessage.{Query, Subscribe, Unsubscribe}
-import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
-import csw.messages.FromComponentLifecycleMessage.Running
-import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
-import csw.messages.RunningMessage.Lifecycle
-import csw.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
-import csw.messages.SupervisorIdleMessage.InitializeTimeout
-import csw.messages.SupervisorInternalRunningMessage.{RegistrationFailed, RegistrationNotRequired, RegistrationSuccess}
-import csw.messages.SupervisorLockMessage.{Lock, Unlock}
-import csw.messages._
-import csw.messages.SupervisorRestartMessage.{UnRegistrationComplete, UnRegistrationFailed}
-import csw.messages._
 import csw.services.command.CommandResponseManager
 import csw.services.command.internal.CommandResponseManagerFactory
 import csw.services.event.scaladsl.EventService
