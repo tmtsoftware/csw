@@ -35,6 +35,7 @@ import csw.services.logging.javadsl.JLoggerFactory;
 import scala.concurrent.duration.FiniteDuration;
 
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
@@ -174,7 +175,7 @@ public class JHcdComponentHandlers extends JComponentHandlers {
     //#event-publisher
     private CompletableFuture<Cancellable> startPublishingEvents() {
         Event systemEvent = new SystemEvent(componentInfo.prefix(), new EventName("filter_wheel"));
-        return eventService.defaultPublisher().thenApply(publisher -> publisher.publish(() -> eventGenerator(systemEvent), new FiniteDuration(100, TimeUnit.MILLISECONDS), this::onError));
+        return eventService.defaultPublisher().thenApply(publisher -> publisher.publish(() -> eventGenerator(systemEvent), Duration.ofMillis(100), this::onError));
     }
 
     // this holds the logic for event generation, could be based on some computation or current state of HCD

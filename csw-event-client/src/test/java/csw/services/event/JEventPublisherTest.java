@@ -1,10 +1,10 @@
 package csw.services.event;
 
 import akka.actor.Cancellable;
+import akka.actor.testkit.typed.javadsl.TestProbe;
 import akka.stream.javadsl.Keep;
 import akka.stream.javadsl.Sink;
 import akka.stream.javadsl.Source;
-import akka.actor.testkit.typed.javadsl.TestProbe;
 import csw.messages.events.Event;
 import csw.messages.events.Event$;
 import csw.messages.events.EventKey;
@@ -21,7 +21,6 @@ import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-import scala.concurrent.duration.FiniteDuration;
 
 import java.time.Duration;
 import java.util.*;
@@ -33,6 +32,7 @@ import java.util.stream.Collectors;
 //DEOPSCSW-334: Publish an event
 //DEOPSCSW-335: Model for EventName that encapsulates the topic(or channel ) name
 //DEOPSCSW-337: Subscribe to an event based on prefix
+//DEOPSCSW-349: Event Service API creation
 //DEOPSCSW-395: Provide EventService handle to component developers
 public class JEventPublisherTest extends TestNGSuite {
 
@@ -106,7 +106,7 @@ public class JEventPublisherTest extends TestNGSuite {
         cancellable = publisher.publish(() -> {
             counter += 1;
             return events.get(counter);
-        }, new FiniteDuration(10, TimeUnit.MILLISECONDS));
+        }, Duration.ofMillis(10));
 
         Thread.sleep(1000);
         cancellable.cancel();

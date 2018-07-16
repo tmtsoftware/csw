@@ -1,8 +1,8 @@
 package csw.services.event.internal.kafka;
 
+import akka.actor.testkit.typed.javadsl.TestProbe;
 import akka.actor.typed.javadsl.Adapter;
 import akka.stream.javadsl.Source;
-import akka.actor.testkit.typed.javadsl.TestProbe;
 import csw.messages.events.Event;
 import csw.services.event.exceptions.PublishFailure;
 import csw.services.event.helpers.Utils;
@@ -11,8 +11,8 @@ import net.manub.embeddedkafka.EmbeddedKafka$;
 import org.apache.kafka.common.errors.RecordTooLargeException;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
-import scala.concurrent.duration.FiniteDuration;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -68,7 +68,7 @@ public class JKafkaFailureTest {
         TestProbe<PublishFailure> testProbe = TestProbe.create(Adapter.toTyped(kafkaTestProps.actorSystem()));
         Event event = Utils.makeEvent(1);
 
-        publisher.publish(() -> event, new FiniteDuration(20, TimeUnit.MILLISECONDS), failure -> testProbe.ref().tell(failure));
+        publisher.publish(() -> event, Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
 
         PublishFailure failure = testProbe.expectMessageClass(PublishFailure.class);
         Assert.assertEquals(failure.event(), event);

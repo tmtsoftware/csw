@@ -1,5 +1,6 @@
 package csw.services.event.javadsl
 
+import java.time.Duration
 import java.util.concurrent.CompletableFuture
 import java.util.function.{Consumer, Supplier}
 
@@ -8,8 +9,6 @@ import akka.actor.Cancellable
 import akka.stream.javadsl.Source
 import csw.messages.events.Event
 import csw.services.event.exceptions.PublishFailure
-
-import scala.concurrent.duration.FiniteDuration
 
 /**
  * An EventPublisher interface to publish events. The published events are published on a key determined by [[csw.messages.events.EventKey]]
@@ -71,7 +70,7 @@ trait IEventPublisher {
    * @param every frequency with which the events are to be published
    * @return a handle to cancel the event generation through `eventGenerator`
    */
-  def publish(eventGenerator: Supplier[Event], every: FiniteDuration): Cancellable
+  def publish(eventGenerator: Supplier[Event], every: Duration): Cancellable
 
   /**
    * Publish [[csw.messages.events.Event]] from an `eventGenerator` supplier, which will be executed at `every` frequency. Also, provide `onError` consumer to
@@ -89,7 +88,7 @@ trait IEventPublisher {
    * @param onError a consumer which defines an operation for each event for which publishing failed
    * @return a handle to cancel the event generation through `eventGenerator`
    */
-  def publish(eventGenerator: Supplier[Event], every: FiniteDuration, onError: Consumer[PublishFailure]): Cancellable
+  def publish(eventGenerator: Supplier[Event], every: Duration, onError: Consumer[PublishFailure]): Cancellable
 
   /**
    * Shuts down the connection for this publisher. Using any api of publisher after shutdown should give exceptions.
