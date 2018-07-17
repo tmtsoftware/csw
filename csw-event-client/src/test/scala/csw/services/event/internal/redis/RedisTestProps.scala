@@ -33,7 +33,7 @@ class RedisTestProps(
   private lazy val asyncConnection: Future[RedisAsyncCommands[String, String]] =
     redisClient.connectAsync(new StringCodec(), redisURI).toScala.map(_.async())
 
-  private val redisSentinel: RedisSentinel = RedisSentinel
+  private lazy val redisSentinel: RedisSentinel = RedisSentinel
     .builder()
     .port(sentinelPort)
     .masterName(masterId)
@@ -45,16 +45,16 @@ class RedisTestProps(
 
   private val eventServiceFactory = new RedisEventServiceFactory(redisClient)
 
-  val eventService: EventService   = eventServiceFactory.make(locationService)
-  val jEventService: IEventService = new JEventService(eventService)
-  val publisher: EventPublisher    = eventService.defaultPublisher.await
-  val subscriber: EventSubscriber  = eventService.defaultSubscriber.await
+  val eventService: EventService       = eventServiceFactory.make(locationService)
+  val jEventService: IEventService     = new JEventService(eventService)
+  lazy val publisher: EventPublisher   = eventService.defaultPublisher.await
+  lazy val subscriber: EventSubscriber = eventService.defaultSubscriber.await
 
   override def toString: String = name
 
-  override val jPublisher: IEventPublisher = jEventService.defaultPublisher.get()
+  override lazy val jPublisher: IEventPublisher = jEventService.defaultPublisher.get()
 
-  override val jSubscriber: IEventSubscriber = jEventService.defaultSubscriber.get()
+  override lazy val jSubscriber: IEventSubscriber = jEventService.defaultSubscriber.get()
 
   override def publishGarbage(channel: String, message: String): Future[Done] =
     asyncConnection.flatMap(c ⇒ c.publish(channel, message).toScala.map(_ ⇒ Done))
