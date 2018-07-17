@@ -18,6 +18,7 @@ import scala.concurrent.duration.DurationInt
 import scala.util.Random
 
 //DEOPSCSW-398: Propagate failure for publish api (eventGenerator)
+//DEOPSCSW-399: Propagate failure for publish api when redis/kafka server is down
 class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with BeforeAndAfterAll {
 
   private val redisClientOptions = ClientOptions
@@ -104,7 +105,6 @@ class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
 
     redis.start()
     failure.getCause shouldBe a[ConnectException]
-
   }
 
 }
