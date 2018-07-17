@@ -60,10 +60,12 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
     case _            ⇒ Invalid(controlCommand.runId, WrongPrefixIssue(s"Wrong prefix: ${controlCommand.commandName}"))
   }
 
-  override def onSubmit(controlCommand: ControlCommand): Unit = controlCommand.commandName match {
+  override def onSubmit(controlCommand: ControlCommand): CommandResponse = controlCommand.commandName match {
     case `cancelCmd`         ⇒ processAcceptedSubmitCmd(controlCommand)
     case `withoutMatcherCmd` ⇒ processCommandWithoutMatcher(controlCommand)
-    case `acceptedCmd`       ⇒ //mimic long running process by not updating CSRM
+    case `acceptedCmd`       ⇒
+        //mimic long running process by not updating CSRM
+      Started(controlCommand.runId)
     case _                   ⇒ CommandNotAvailable(controlCommand.runId)
   }
 
@@ -75,26 +77,29 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
     case _                  ⇒ CommandNotAvailable(controlCommand.runId)
   }
 
-  private def processAcceptedSubmitCmd(controlCommand: ControlCommand): Unit = {
-    controlCommand.paramType.get(cancelCmdId).foreach { param ⇒
-      processCancelCommand(controlCommand.runId, Id(param.head))
+  private def processAcceptedSubmitCmd(controlCommand: ControlCommand): CommandResponse = {
+    controlCommand.paramType.get(cancelCmdId) match {
+      case None => Error(controlCommand.runId, "Cancel command not present")
+      case Some(param) =>  processCancelCommand(controlCommand.runId, Id(param.head))
     }
   }
 
   private def processAcceptedOnewayCmd(controlCommand: ControlCommand): Unit =
     controlCommand.paramType.get(cancelCmdId).foreach(param ⇒ processOriginalCommand(Id(param.head)))
 
-  private def processCommandWithoutMatcher(controlCommand: ControlCommand): Unit = {
+  private def processCommandWithoutMatcher(controlCommand: ControlCommand): CommandResponse = {
     val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(20)
     val result                = Result(controlCommand.source, Set(param))
 
     // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
     commandResponseManager.addOrUpdateCommand(controlCommand.runId, CompletedWithResult(controlCommand.runId, result))
+    CompletedWithResult(controlCommand.runId, result)
   }
 
-  private def processCancelCommand(runId: Id, cancelId: Id): Unit = {
+  private def processCancelCommand(runId: Id, cancelId: Id): CommandResponse = {
     processOriginalCommand(cancelId)
     commandResponseManager.addOrUpdateCommand(runId, Completed(runId))
+    Completed(runId)
   }
 
   private def processOriginalCommand(runId: Id): Unit = {

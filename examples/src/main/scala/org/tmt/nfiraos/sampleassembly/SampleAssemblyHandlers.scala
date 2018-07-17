@@ -141,7 +141,7 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
 
   override def validateCommand(controlCommand: ControlCommand): CommandResponse = ???
 
-  override def onSubmit(controlCommand: ControlCommand): Unit = ???
+  override def onSubmit(controlCommand: ControlCommand): CommandResponse = ???
 
   override def onOneway(controlCommand: ControlCommand): Unit = ???
 

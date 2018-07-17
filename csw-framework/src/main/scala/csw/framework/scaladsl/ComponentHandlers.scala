@@ -58,7 +58,7 @@ abstract class ComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx
    *
    * @param controlCommand represents a command received e.g. Setup, Observe or wait
    */
-  def onSubmit(controlCommand: ControlCommand): Unit
+  def onSubmit(controlCommand: ControlCommand): CommandResponse
 
   /**
    * On receiving a command as Oneway, the onOneway handler is invoked for a component only if the validateCommand handler

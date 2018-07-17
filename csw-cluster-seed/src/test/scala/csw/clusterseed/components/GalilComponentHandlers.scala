@@ -9,6 +9,7 @@ import csw.params.commands.{CommandResponse, ControlCommand}
 import csw.location.api.models.TrackingEvent
 import csw.logging.scaladsl.Logger
 import csw.messages.TopLevelActorMessage
+import csw.messages.commands.CommandResponse.Completed
 import csw.messages.commands.ValidationResponse.Accepted
 import csw.messages.commands.{CommandResponse, ControlCommand, ValidationResponse}
 import csw.messages.framework.ComponentInfo
@@ -38,7 +39,9 @@ class GalilComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
 
   override def validateCommand(controlCommand: ControlCommand): ValidationResponse = Accepted(controlCommand.runId)
 
-  override def onSubmit(controlCommand: ControlCommand): Unit = ()
+  override def onSubmit(controlCommand: ControlCommand): CommandResponse = {
+    Completed(controlCommand.runId)
+  }
 
   override def onOneway(controlCommand: ControlCommand): Unit =
     if (controlCommand.commandName.name == "StartLogging") startLogging()

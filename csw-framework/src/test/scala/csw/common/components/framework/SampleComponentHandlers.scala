@@ -58,11 +58,12 @@ class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
   override def onGoOnline(): Unit =
     currentStatePublisher.publish(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(onlineChoice))))
 
-  override def onSubmit(controlCommand: ControlCommand): Unit = {
+  override def onSubmit(controlCommand: ControlCommand): CommandResponse = {
     // Adding passed in parameter to see if data is transferred properly
     commandResponseManager.addOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId))
     currentStatePublisher.publish(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(submitCommandChoice))))
     processCommand(controlCommand)
+    Completed(controlCommand.runId)
   }
 
   override def onOneway(controlCommand: ControlCommand): Unit = {

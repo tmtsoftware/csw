@@ -28,7 +28,7 @@ class ActionLessHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCon
 
   override def validateCommand(controlCommand: ControlCommand): ValidationResponse = Accepted(Id())
 
-  override def onSubmit(controlCommand: ControlCommand): Unit = ???
+  override def onSubmit(controlCommand: ControlCommand): CommandResponse = ???
 
   override def onOneway(controlCommand: ControlCommand): Unit = ???
 

@@ -10,6 +10,13 @@ import csw.params.events.{EventName, SystemEvent}
 import csw.location.api.models.TrackingEvent
 import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.Id
+import csw.messages.TopLevelActorMessage
+import csw.messages.commands.CommandResponse.{Error, Started}
+import csw.messages.commands._
+import csw.messages.events.{EventName, SystemEvent}
+import csw.messages.location.TrackingEvent
+import csw.messages.params.generics.{Key, KeyType, Parameter}
+import csw.messages.params.models.Id
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContextExecutor, Future}
@@ -96,16 +103,17 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
   //#validate
 
   //#onSetup
-  override def onSubmit(controlCommand: ControlCommand): Unit = {
+  override def onSubmit(controlCommand: ControlCommand): CommandResponse = {
     log.info(s"Handling command: ${controlCommand.commandName}")
 
     controlCommand match {
       case setupCommand: Setup     => onSetup(setupCommand)
       case observeCommand: Observe => // implement (or not)
+        Error(controlCommand.runId, "Observe not supported")
     }
   }
 
-  def onSetup(setup: Setup): Unit = {
+  def onSetup(setup: Setup): CommandResponse = {
     val sleepTimeKey: Key[Long] = KeyType.LongKey.make("SleepTime")
 
     // get param from the Parameter Set in the Setup
@@ -117,6 +125,8 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
     log.info(s"command payload: ${sleepTimeParam.keyName} = $sleepTimeInMillis")
 
     workerActor ! Sleep(setup.runId, sleepTimeInMillis)
+
+    Started(setup.runId)
   }
   //#onSetup
 

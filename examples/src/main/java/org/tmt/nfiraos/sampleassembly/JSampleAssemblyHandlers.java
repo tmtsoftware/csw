@@ -201,7 +201,8 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
     }
 
     @Override
-    public void onSubmit(ControlCommand controlCommand) {
+    public CommandResponse onSubmit(ControlCommand controlCommand) {
+        return new CommandResponse.Completed(controlCommand.runId());
     }
 
     @Override

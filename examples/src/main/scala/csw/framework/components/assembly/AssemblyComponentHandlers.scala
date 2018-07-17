@@ -14,6 +14,14 @@ import csw.location.api.models._
 import csw.command.scaladsl.CommandService
 import csw.config.api.models.ConfigData
 import csw.logging.scaladsl.Logger
+import csw.messages.TopLevelActorMessage
+import csw.messages.commands.CommandResponse.Completed
+import csw.messages.commands.ValidationResponse.Accepted
+import csw.messages.commands._
+import csw.messages.location._
+import csw.services.command.scaladsl.CommandService
+import csw.services.config.api.models.ConfigData
+import csw.services.logging.scaladsl.Logger
 
 import scala.async.Async._
 import scala.concurrent.duration.DurationDouble
@@ -74,7 +82,7 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
   //#validateCommand-handler
 
   //#onSubmit-handler
-  override def onSubmit(controlCommand: ControlCommand): Unit = controlCommand match {
+  override def onSubmit(controlCommand: ControlCommand): CommandResponse = controlCommand match {
     case setup: Setup     ⇒ submitSetup(setup) // includes logic to handle Submit with Setup config command
     case observe: Observe ⇒ submitObserve(observe) // includes logic to handle Submit with Observe config command
   }
@@ -130,9 +138,15 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
   /**
    * in case of submit command, component writer is required to update commandResponseManager with the result
    */
-  private def submitSetup(setup: Setup): Unit = processSetup(setup)
+  private def submitSetup(setup: Setup): CommandResponse = {
+    processSetup(setup)
+    Completed(setup.runId)
+  }
 
-  private def submitObserve(observe: Observe): Unit = processObserve(observe)
+  private def submitObserve(observe: Observe): CommandResponse = {
+    processObserve(observe)
+    Completed(observe.runId)
+  }
 
   private def onewaySetup(setup: Setup): Unit = processSetup(setup)
 

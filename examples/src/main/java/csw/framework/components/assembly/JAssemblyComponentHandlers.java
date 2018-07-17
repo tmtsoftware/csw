@@ -123,11 +123,12 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
 
     //#onSubmit-handler
     @Override
-    public void onSubmit(ControlCommand controlCommand) {
+    public CommandResponse onSubmit(ControlCommand controlCommand) {
         if (controlCommand instanceof Setup)
-            submitSetup((Setup) controlCommand); // includes logic to handle Submit with Setup config command
+            return submitSetup((Setup) controlCommand); // includes logic to handle Submit with Setup config command
         else if (controlCommand instanceof Observe)
-            submitObserve((Observe) controlCommand); // includes logic to handle Submit with Observe config command
+            return submitObserve((Observe) controlCommand); // includes logic to handle Submit with Observe config command
+        else return new CommandResponse.Error(controlCommand.runId(), "Submitted command not supported: " + controlCommand.commandName().name());
     }
     //#onSubmit-handler
 
@@ -243,12 +244,14 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     /**
      * in case of submit command, component writer is required to update commandResponseManager with the result
      */
-    private void submitSetup(Setup setup) {
+    private CommandResponse submitSetup(Setup setup) {
         processSetup(setup);
+        return new CommandResponse.Started(setup.runId());
     }
 
-    private void submitObserve(Observe observe) {
+    private CommandResponse submitObserve(Observe observe) {
         processObserve(observe);
+        return new CommandResponse.Completed(observe.runId());
     }
 
     private void onewaySetup(Setup setup) {

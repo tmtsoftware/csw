@@ -15,6 +15,7 @@ import csw.framework.components.assembly.{WorkerActor, WorkerActorMsg}
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.TopLevelActorMessage
+import csw.messages.commands.CommandResponse.Completed
 import csw.messages.commands.ValidationResponse.Accepted
 import csw.messages.commands.{CommandResponse, ControlCommand, Observe, Setup}
 import csw.messages.location.{LocationRemoved, LocationUpdated, TrackingEvent}
@@ -71,7 +72,7 @@ class HcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswC
   //#validateCommand-handler
 
   //#onSubmit-handler
-  override def onSubmit(controlCommand: ControlCommand): Unit = controlCommand match {
+  override def onSubmit(controlCommand: ControlCommand): CommandResponse = controlCommand match {
     case setup: Setup     ⇒ submitSetup(setup) // includes logic to handle Submit with Setup config command
     case observe: Observe ⇒ submitObserve(observe) // includes logic to handle Submit with Observe config command
   }
@@ -130,9 +131,15 @@ class HcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswC
   /**
    * in case of submit command, component writer is required to update commandResponseManager with the result
    */
-  private def submitSetup(setup: Setup): Unit = processSetup(setup)
+  private def submitSetup(setup: Setup): CommandResponse = {
+    processSetup(setup)
+    Completed(setup.runId)
+  }
 
-  private def submitObserve(observe: Observe): Unit = processObserve(observe)
+  private def submitObserve(observe: Observe): CommandResponse = {
+    processObserve(observe)
+    Completed(observe.runId)
+  }
 
   private def onewaySetup(setup: Setup): Unit = processSetup(setup)
 

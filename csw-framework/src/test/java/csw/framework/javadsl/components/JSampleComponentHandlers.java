@@ -69,11 +69,13 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     }
 
     @Override
-    public void onSubmit(ControlCommand controlCommand) {
+    /// TODO - probbably need to make this work when running tests
+    public CommandResponse onSubmit(ControlCommand controlCommand) {
         // Adding item from CommandMessage paramset to ensure things are working
         CurrentState submitState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.submitCommandChoice()));
         currentStatePublisher.publish(submitState);
         processCommand(controlCommand);
+        return new Completed(controlCommand.runId());
     }
 
     @Override

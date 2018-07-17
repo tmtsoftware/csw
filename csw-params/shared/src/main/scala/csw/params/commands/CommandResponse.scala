@@ -42,6 +42,13 @@ object ValidationResponse {
   case class Invalid(runId: Id, issue: CommandIssue) extends CommandResponse(Negative)
 
   /**
+    * Represents an intermediate response stating a submitted command is long-running and has started actions
+    *
+    * @param runId the runId of command for which this response is created
+    */
+  case class Started(runId: Id) extends CommandResponse(Intermediate)
+
+  /**
    * Represents a positive response stating completion of command
    *
    * @param runId of command for which this response is created
@@ -84,6 +91,7 @@ object ValidationResponse {
    *
    * @param runId of command for which this response is created
    */
+  /// TODO - temporarily remains in order to deal with CommandResponseManager later
   case class CommandNotAvailable(runId: Id) extends CommandResponse(Negative)
 
   /**
@@ -109,7 +117,7 @@ object ValidationResponse {
     //case noLongerValid: NoLongerValid             ⇒ noLongerValid.copy(runId = id)
     case error: Error                             ⇒ error.copy(runId = id)
     case cancelled: Cancelled                     ⇒ cancelled.copy(runId = id)
-    case commandNotAvailable: CommandNotAvailable ⇒ commandNotAvailable.copy(runId = id)
+    //case commandNotAvailable: CommandNotAvailable ⇒ commandNotAvailable.copy(runId = id)
     case notAllowed: NotAllowed                   ⇒ notAllowed.copy(runId = id)
   }
 

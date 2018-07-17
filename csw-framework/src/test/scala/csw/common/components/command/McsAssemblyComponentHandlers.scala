@@ -15,7 +15,7 @@ import csw.params.core.states.{CurrentState, StateName}
 import csw.command.scaladsl.CommandService
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandIssue.UnsupportedCommandIssue
-import csw.messages.commands.CommandResponse.Completed
+import csw.messages.commands.CommandResponse.{Completed, Error, Started}
 import csw.messages.commands.ValidationResponse.{Accepted, Invalid}
 import csw.messages.commands.{CommandIssue, CommandResponse, ControlCommand, Setup}
 import csw.messages.framework.ComponentInfo
@@ -67,7 +67,7 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
     }
   }
 
-  override def onSubmit(controlCommand: ControlCommand): Unit = {
+  override def onSubmit(controlCommand: ControlCommand): CommandResponse = {
     controlCommand.commandName match {
       case `longRunning` ⇒
         runId = controlCommand.runId
@@ -114,11 +114,16 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
           .map(
             _ ⇒ () // may choose to publish current state to subscribers or do other operations
           )
+
+        Started(controlCommand.runId)
       //#query-command-response-manager
 
       case `initCmd` ⇒ commandResponseManager.addOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId))
+        Completed(controlCommand.runId)
       case `moveCmd` ⇒ commandResponseManager.addOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId))
+        Completed(controlCommand.runId)
       case _         ⇒ //do nothing
+        Error(controlCommand.runId, "Unknown command in onSubmit")
     }
   }
 
@@ -126,9 +131,9 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
     hcdComponent
       .submit(controlCommand)
       .map {
-        case response: Accepted ⇒
+        case response: Started ⇒
           // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
-          commandResponseManager.updateSubCommand(response.runId, Accepted(response.runId))
+          commandResponseManager.updateSubCommand(response.runId, Started(response.runId))
           //#updateSubCommand
           // An original command is split into sub-commands and sent to a component. The result of the command is
           // obtained by subscribing to the component with the sub command id.

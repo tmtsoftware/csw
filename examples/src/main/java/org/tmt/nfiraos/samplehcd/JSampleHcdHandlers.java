@@ -148,14 +148,16 @@ public class JSampleHcdHandlers extends JComponentHandlers {
 
     //#onSetup
     @Override
-    public void onSubmit(ControlCommand controlCommand) {
+    public CommandResponse onSubmit(ControlCommand controlCommand) {
         log.info(() -> "Handling command: " + controlCommand.commandName());
 
         if (controlCommand instanceof Setup) {
             onSetup((Setup) controlCommand);
+            return new CommandResponse.Started(controlCommand.runId());
         } else if (controlCommand instanceof Observe) {
             // implement (or not)
         }
+        return new CommandResponse.Error(controlCommand.runId(), "Observe command not supported");
     }
 
     private void onSetup(Setup setup) {
