@@ -1,7 +1,6 @@
 package csw.services.alarm.client.internal
 
 import akka.actor.ActorSystem
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import csw.services.alarm.api.exceptions.{InvalidSeverityException, ResetOperationFailedException}
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, UnAcknowledged}
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
@@ -139,7 +138,7 @@ class AlarmServiceImpl(
 
   // this will most likely be called when operator manually un-shelves an already shelved alarm
   override def unShelve(key: AlarmKey): Future[Unit] = async {
-    unShelve(key, cancelShelveTimeout = true)
+    await(unShelve(key, cancelShelveTimeout = true))
   }
 
   private def unShelve(key: AlarmKey, cancelShelveTimeout: Boolean): Future[Unit] = async {
