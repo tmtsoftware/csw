@@ -1,16 +1,21 @@
 package csw.services.event.internal.redis
 
-import akka.stream.scaladsl.Source
+import java.net.ConnectException
+
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import csw.services.event.exceptions.PublishFailure
+import akka.stream.scaladsl.{Keep, Sink, Source}
+import csw.messages.events.EventKey
+import csw.services.event.exceptions.{EventServerNotAvailable, PublishFailure}
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.helpers.Utils
+import csw.services.event.helpers.Utils.makeDistinctEvent
 import io.lettuce.core.ClientOptions.DisconnectedBehavior
 import io.lettuce.core.{ClientOptions, RedisException}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.concurrent.duration.DurationInt
+import scala.util.Random
 
 //DEOPSCSW-398: Propagate failure for publish api (eventGenerator)
 class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with BeforeAndAfterAll {
@@ -84,4 +89,22 @@ class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
     failure.event shouldBe event
     failure.getCause shouldBe a[RedisException]
   }
+
+  test("should throw EventServerNotAvailable exception on subscription failure") {
+    import redisTestProps._
+    val event1             = makeDistinctEvent(Random.nextInt())
+    val eventKey: EventKey = event1.eventKey
+
+    redis.stop()
+
+    val failure = intercept[EventServerNotAvailable] {
+      val subscription = subscriber.subscribe(Set(eventKey)).toMat(Sink.foreach(println))(Keep.left).run()
+      subscription.ready().await
+    }
+
+    redis.start()
+    failure.getCause shouldBe a[ConnectException]
+
+  }
+
 }

@@ -27,9 +27,9 @@ class RedisTestProps(
 )(implicit val actorSystem: ActorSystem)
     extends BaseProperties {
 
-  private val redis: RedisServer = RedisServer.builder().port(serverPort).build()
-  private lazy val masterId      = ConfigFactory.load().getString("redis.masterId")
-  private lazy val redisURI      = RedisURI.Builder.sentinel("localhost", sentinelPort, masterId).build()
+  val redis: RedisServer    = RedisServer.builder().port(serverPort).build()
+  private lazy val masterId = ConfigFactory.load().getString("redis.masterId")
+  private lazy val redisURI = RedisURI.Builder.sentinel("localhost", sentinelPort, masterId).build()
   private lazy val asyncConnection: Future[RedisAsyncCommands[String, String]] =
     redisClient.connectAsync(new StringCodec(), redisURI).toScala.map(_.async())
 

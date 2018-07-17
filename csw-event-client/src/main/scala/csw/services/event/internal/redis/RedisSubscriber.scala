@@ -58,11 +58,11 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
 
     // get stream of latest events using the `get` API and concat it with the event stream from `subscribe_internal`
     latestEventStream
-      .concatMat(eventStream)(Keep.right)
+      .watchTermination()(Keep.right)
+      .concatMat(eventStream)(Keep.both)
       .viaMat(KillSwitches.single)(Keep.both)
-      .watchTermination()(Keep.both)
       .mapMaterializedValue {
-        case ((subscriptionF, killSwitch), terminationSignal) ⇒
+        case ((terminationSignal, subscriptionF), killSwitch) ⇒
           new EventSubscription {
             override def unsubscribe(): Future[Done] = async {
               val commands = await(connectionF)
@@ -72,7 +72,9 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
               await(terminationSignal)
             }
 
-            override def ready(): Future[Done] = subscriptionF.map(_ ⇒ Done)
+            override def ready(): Future[Done] = subscriptionF.map(_ ⇒ Done).recoverWith {
+              case _ if terminationSignal.isCompleted ⇒ terminationSignal
+            }
           }
       }
   }
@@ -124,10 +126,11 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
       Source.fromFutureSource(patternBasedReactiveConnection().flatMap(c ⇒ pSubscribe_internal(keyPattern, c)))
 
     eventStream
+      .watchTermination()(Keep.right)
+      .concatMat(eventStream)(Keep.both)
       .viaMat(KillSwitches.single)(Keep.both)
-      .watchTermination()(Keep.both)
       .mapMaterializedValue {
-        case ((subscriptionF, killSwitch), terminationSignal) ⇒
+        case ((terminationSignal, subscriptionF), killSwitch) ⇒
           new EventSubscription {
             override def unsubscribe(): Future[Done] = async {
               val commands = await(connectionF)
@@ -137,7 +140,9 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
               await(terminationSignal)
             }
 
-            override def ready(): Future[Done] = subscriptionF.map(_ ⇒ Done)
+            override def ready(): Future[Done] = subscriptionF.map(_ ⇒ Done).recoverWith {
+              case _ if terminationSignal.isCompleted ⇒ terminationSignal
+            }
           }
       }
   }
@@ -175,5 +180,5 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
       .map(_ ⇒ Source.fromPublisher(reactiveCommands.observePatterns(OverflowStrategy.LATEST)).map(_.getMessage))
 
   private def connection[T](commands: ⇒ Future[T]): Future[T] =
-    Future.unit.flatMap(_ ⇒ commands).recover { case NonFatal(ex) ⇒ throw EventServerNotAvailable(ex) }
+    Future.unit.flatMap(_ ⇒ commands).recover { case NonFatal(ex) ⇒ throw EventServerNotAvailable(ex.getCause) }
 }
