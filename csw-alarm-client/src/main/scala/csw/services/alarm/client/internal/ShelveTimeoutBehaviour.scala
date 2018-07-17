@@ -23,14 +23,17 @@ class ShelveTimeoutBehaviour(
 
   override def onMessage(msg: AlarmTimeoutMessage): Behavior[AlarmTimeoutMessage] = {
     msg match {
-      case ScheduleShelveTimeout(key) ⇒
-        val currentTime   = ZonedDateTime.now(ZoneOffset.UTC)
-        val shelveTimeout = timeUntilNextHourOfDay(currentTime)
-        timerScheduler.startSingleTimer(key.name, ShelveHasTimedOut(key), shelveTimeout)
-      case CancelShelveTimeout(key) ⇒ timerScheduler.cancel(key.name)
-      case ShelveHasTimedOut(key)   ⇒ // ???
+      case ScheduleShelveTimeout(key) ⇒ scheduleShelveTimeout(key)
+      case CancelShelveTimeout(key)   ⇒ timerScheduler.cancel(key.name)
+      case ShelveHasTimedOut(key)     ⇒ unShelve(key)
     }
     this
+  }
+
+  private def scheduleShelveTimeout(key: AlarmKey): Unit = {
+    val currentTime   = ZonedDateTime.now(ZoneOffset.UTC)
+    val shelveTimeout = timeUntilNextHourOfDay(currentTime)
+    timerScheduler.startSingleTimer(key.name, ShelveHasTimedOut(key), shelveTimeout)
   }
 
   private def timeUntilNextHourOfDay(currentTime: ZonedDateTime): FiniteDuration = {

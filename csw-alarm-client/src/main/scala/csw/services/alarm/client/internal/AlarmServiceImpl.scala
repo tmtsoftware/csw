@@ -1,7 +1,7 @@
 package csw.services.alarm.client.internal
 
 import akka.actor.ActorSystem
-import akka.actor.typed.ActorRef
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import csw.services.alarm.api.exceptions.{InvalidSeverityException, ResetOperationFailedException}
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, UnAcknowledged}
 import csw.services.alarm.api.models.AlarmSeverity.Okay
@@ -21,7 +21,7 @@ import scala.concurrent.Future
 class AlarmServiceImpl(
     redisURI: RedisURI,
     redisClient: RedisClient,
-    shelveTimeoutRef: ActorRef[AlarmTimeoutMessage]
+    shelveTimeoutActorFactory: ShelveTimeoutActorFactory
 )(implicit actorSystem: ActorSystem)
     extends AlarmAdminService {
 
@@ -42,6 +42,8 @@ class AlarmServiceImpl(
   private val refreshInSeconds       = actorSystem.settings.config.getInt("alarm.refresh-in-seconds") // default value is 5 seconds
   private val maxMissedRefreshCounts = actorSystem.settings.config.getInt("alarm.max-missed-refresh-counts") //default value is 3 times
   private val ttlInSeconds           = refreshInSeconds * maxMissedRefreshCounts
+
+  private lazy val shelveTimeoutRef = shelveTimeoutActorFactory.make(unShelve(_, cancelShelveTimeout = false))
 
   override def setSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Unit] = async {
     // get alarm metadata
@@ -109,11 +111,11 @@ class AlarmServiceImpl(
     val statusApi = await(asyncStatusApiF)
     val status    = await(statusApi.get(key).toScala)
 
-    // acknowledge
+    // reset is only called when severity is `Okay` so update acknowledgeStatus to `Acknowledged`
     if (status.acknowledgementStatus == UnAcknowledged) // save the set call if status is already Acknowledged
       await(statusApi.set(key, status.copy(acknowledgementStatus = Acknowledged)).toScala)
 
-    // unlatch
+    // reset is only called when severity is `Okay` so update LatchStatus to `UnLatched`
     if (status.latchStatus == Latched) {
       await(statusApi.set(key, status.copy(latchStatus = UnLatched)).toScala)
     }
@@ -123,29 +125,35 @@ class AlarmServiceImpl(
     val severityApi     = await(asyncSeverityApiF)
     val currentSeverity = await(severityApi.get(key).toScala)
 
+    // TODO: confirm
     if (currentSeverity.isHighRisk) {
       val statusApi = await(asyncStatusApiF)
       val status    = await(statusApi.get(key).toScala)
       if (status.shelveStatus != Shelved) {
         await(statusApi.set(key, status.copy(shelveStatus = Shelved)).toScala)
-        shelveTimeoutRef ! ScheduleShelveTimeout(key)
+        shelveTimeoutRef ! ScheduleShelveTimeout(key) // start shelve timeout for this alarm (default 8 AM local time)
       }
     }
   }
 
+  // this will most likely be called when operator manually un-shelves an already shelved alarm
   override def unShelve(key: AlarmKey): Future[Unit] = async {
-    val severityApi     = await(asyncSeverityApiF)
-    val currentSeverity = await(severityApi.get(key).toScala)
+    unShelve(key, cancelShelveTimeout = true)
+  }
 
+  private def unShelve(key: AlarmKey, cancelShelveTimeout: Boolean): Future[Unit] = async {
     //TODO: decide whether to unshelve an alarm when it goes to okay
     val statusApi = await(asyncStatusApiF)
     val status    = await(statusApi.get(key).toScala)
     if (status.shelveStatus != UnShelved) {
       await(statusApi.set(key, status.copy(shelveStatus = UnShelved)).toScala)
-      shelveTimeoutRef ! CancelShelveTimeout(key)
+      // if in case of manual un-shelve operation, cancel the scheduled timer for this alarm
+      // this method is also called when scheduled timer for shelving of an alarm goes off (i.e. default 8 AM local time) with
+      // cancelShelveTimeout as false
+      // so, at this time `CancelShelveTimeout` should not be sent to `shelveTimeoutRef` as it is already cancelled
+      if (cancelShelveTimeout) shelveTimeoutRef ! CancelShelveTimeout(key)
     }
   }
-
   override def activate(key: AlarmKey): Future[Unit] = ???
 
   override def deActivate(key: AlarmKey): Future[Unit] = ???
