@@ -4,6 +4,7 @@ import akka.actor.ActorSystem
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import csw.services.alarm.api.exceptions.{InvalidSeverityException, ResetOperationFailedException}
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, UnAcknowledged}
+import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
 import csw.services.alarm.api.models.AlarmSeverity.Okay
 import csw.services.alarm.api.models.LatchStatus.{Latched, UnLatched}
 import csw.services.alarm.api.models.ShelveStatus.{Shelved, UnShelved}
@@ -154,7 +155,18 @@ class AlarmServiceImpl(
       if (cancelShelveTimeout) shelveTimeoutRef ! CancelShelveTimeout(key)
     }
   }
-  override def activate(key: AlarmKey): Future[Unit] = ???
 
-  override def deActivate(key: AlarmKey): Future[Unit] = ???
+  override def activate(key: AlarmKey): Future[Unit] = async {
+    val statusApi = await(asyncStatusApiF)
+    val status    = await(statusApi.get(key).toScala)
+
+    if (status.activationStatus != Active) await(statusApi.set(key, status.copy(activationStatus = Active)).toScala)
+  }
+
+  override def deActivate(key: AlarmKey): Future[Unit] = async {
+    val statusApi = await(asyncStatusApiF)
+    val status    = await(statusApi.get(key).toScala)
+
+    if (status.activationStatus != Inactive) await(statusApi.set(key, status.copy(activationStatus = Inactive)).toScala)
+  }
 }
