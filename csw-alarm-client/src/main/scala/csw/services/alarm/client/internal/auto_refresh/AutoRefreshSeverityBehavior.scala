@@ -3,6 +3,7 @@ package csw.services.alarm.client.internal.auto_refresh
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.{ActorContext, MutableBehavior, TimerScheduler}
 import csw.services.alarm.api.models.{AlarmKey, AlarmSeverity}
+import csw.services.alarm.client.internal.auto_refresh.AutoRefreshSeverityMessage.{SetSeverity, SetSeverityAndAutoRefresh}
 
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt

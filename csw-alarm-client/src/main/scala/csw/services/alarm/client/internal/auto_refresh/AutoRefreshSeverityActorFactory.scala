@@ -13,10 +13,12 @@ class AutoRefreshSeverityActorFactory {
       setSeverity: (AlarmKey, AlarmSeverity) ⇒ Future[Unit]
   )(implicit actorSystem: ActorSystem): ActorRef[AutoRefreshSeverityMessage] =
     actorSystem.spawnAnonymous {
-      Behaviors.withTimers { timerScheduler ⇒
-        Behaviors.setup[AutoRefreshSeverityMessage] { ctx ⇒
-          new AutoRefreshSeverityBehavior(ctx, timerScheduler, setSeverity)
+      Behaviors
+        .withTimers[AutoRefreshSeverityMessage] { timerScheduler ⇒
+          Behaviors
+            .setup[AutoRefreshSeverityMessage] { ctx ⇒
+              new AutoRefreshSeverityBehavior(ctx, timerScheduler, setSeverity)
+            }
         }
-      }
     }
 }
