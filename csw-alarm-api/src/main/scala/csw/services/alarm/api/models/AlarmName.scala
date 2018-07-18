@@ -18,5 +18,5 @@ object AlarmName {
     override def reads(json: JsValue): JsResult[AlarmName] = JsSuccess(AlarmName(json.as[String]))
   }
 
-  implicit val alarmKeyRw: RW[AlarmKey] = UPickleFormatAdapter.playJsonToUPickle
+  implicit val alarmKeyRw: RW[AlarmName] = UPickleFormatAdapter.playJsonToUPickle
 }
