@@ -4,7 +4,8 @@ package csw.services
  * == Event Service ==
  *
  * This module implements an Event Service responsible for publishing an [[csw.messages.events.Event]] or subscribing to an [[csw.messages.events.Event]].
- * An event can be published and subscribers can receive the events.
+ * An event is published on a [[csw.messages.events.EventKey]]. The event key is composed of a [[csw.messages.params.models.Prefix]] depicting the source and an [[csw.messages.events.EventName]].
+ * The subscriber can subscribe to the [[csw.messages.events.EventKey]] to receive all events published on the Key.
  *
  * === Example: Event Service ===
  *
@@ -15,11 +16,13 @@ package csw.services
  *
  * }}}
  *
- * Using above code, you can create instance of [[csw.services.event.api.scaladsl.EventService]]. EventService is nothing but the factory to create publishers and subscribers.
+ * Using above code, you can create instance of [[csw.services.event.api.scaladsl.EventService]]. EventService is the factory to create publishers and subscribers.
  *
  * You can choose to use defaultPublisher in case you want to share same connection for publishing different events.
  *
  * === Example: Event Publisher ===
+ *
+ * Event Publisher provides asynchronous APIs to publish one or more Events
  *
  * {{{
  *
@@ -33,6 +36,10 @@ package csw.services
  * }}}
  *
  * === Example: Event Subscriber (subscribe and get API) ===
+ *
+ * Event Subscriber provides asynchronous APIs to subscribe to one or more Event Keys.
+ * It also provides APIs to subscribe using a pattern.
+ * In addition, there are APIs to `get` latest events for one ore more Event Keys without making a subscription
  *
  * The EventSubscriber provides various API's to subscribe to [[csw.messages.events.EventKey]].
  * One of such a subscribe method takes an ActorRef of an arbitrary actor or a callback function to be called
@@ -58,6 +65,14 @@ package csw.services
  *     }
  *
  * }}}
+ *
+ * `csw-prod` provides two implementations for Event Service which can be accessed through `csw-event-client` :
+ * 1. [[csw.services.event.internal.redis.RedisEventService]] - Redis as event store and publisher/subscriber functionality
+ * 2. [[csw.services.event.internal.kafka.KafkaEventService]] - Kafka as event store and publisher/subscriber functionality
+ *
+ *
+ * Complete guide of usage of different API's provided by EventService is available at:
+ * https://tmtsoftware.github.io/csw-prod/services/event.html
  *
  */
 package object event {}
