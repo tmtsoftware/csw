@@ -168,3 +168,35 @@ While testing or development, in order to use this cli application, below prereq
 *  @ref:[csw-location-agent](./../apps/cswlocationagent.md) application is running, which has started event server and registered it to location service.
 
 Please refer @ref:[Starting apps for development](./../commons/apps.md#starting-apps-for-development) section for more details on how to start these applications using `csw-services.sh` script.
+
+## Monitor statistic
+
+`Event Service` uses [redis](https://redis.io/) as a event store. Using `redis-cli`, you can monitor continuous stats about Event service.
+
+```
+$ redis-cli --stat
+------- data ------ --------------------- load -------------------- - child -
+keys       mem      clients blocked requests            connections
+305        20.70M   605     0       1771418 (+0)        615
+305        20.71M   605     0       1825363 (+53945)    615
+305        20.70M   605     0       1877638 (+52275)    615
+305        20.71M   605     0       1910198 (+32560)    615
+305        20.71M   605     0       1960837 (+50639)    615
+305        20.74M   605     0       2001565 (+40728)    615
+```
+
+In above example, new line is printed every second with useful information and the difference between the old data point. 
+
+* `keys`: Represents Event Keys
+* `clients`: Represents total number of clients currently connected to redis server
+* `requests`: Represents total number of redis commands processed along with delta between every interval, in this case 1 second
+* `connections`: Represents total number of connections opened by redis server
+
+The -i <interval> option in this case works as a modifier in order to change the frequency at which new lines are emitted. The default is one second.
+
+You can explicitly pass hostname and port of redis server while running `redis-cli`
+```
+$ redis-cli -h redis.tmt.org -p 6379
+```
+
+Detailed list of operations you can perform with `redis-cli` can be found [here](https://redis.io/topics/rediscli) 
