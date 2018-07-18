@@ -9,7 +9,7 @@ object Formatter {
   val eventSeparator =
     "==============================================================================================================="
 
-  def invalidKey(eventKey: EventKey): String = s"$eventKey [ERROR] No events published for this key."
+  def invalidKey(eventKey: EventKey): String = s"[ERROR] No events published for this key."
 }
 
 case class OnelineFormatter(options: Options) {

@@ -20,7 +20,8 @@ import scala.io.Source
 
 class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Eventually {
 
-  def events(name: EventName): immutable.Seq[Event] = for (i ← 1 to 10) yield event1.copy(eventId = Id(i.toString))
+  def events(name: EventName): immutable.Seq[Event] =
+    for (i ← 1 to 10) yield event1.copy(eventName = name, eventId = Id(i.toString))
 
   class EventGenerator(eventName: EventName) {
     var counter                               = 0
@@ -160,7 +161,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
     implicit val mat: Materializer    = actorRuntime.mat
     implicit val ec: ExecutionContext = actorRuntime.ec
 
-    val eventGenerator = new EventGenerator(EventName(s"system_1"))
+    val eventGenerator = new EventGenerator(EventName("system_1"))
     import eventGenerator._
     val publisher   = eventService.defaultPublisher.await
     val cancellable = publisher.publish(eventGenerator.generate, 400.millis)
@@ -184,15 +185,17 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
     implicit val mat: Materializer    = actorRuntime.mat
     implicit val ec: ExecutionContext = actorRuntime.ec
 
-    val eventGenerator = new EventGenerator(EventName(s"system_1"))
+    val eventGenerator = new EventGenerator(EventName("system_2"))
     import eventGenerator._
 
     val eventKey: EventKey = eventsGroup.head.eventKey
     val publisher          = eventService.defaultPublisher.await
-    val cancellable        = publisher.publish(eventGenerator.generate, 400.millis)
 
     val (subscriptionF, _) =
       commandLineRunner.subscribe(argsParser.parse(Seq("subscribe", "--events", eventKey.key, "--id")).get)
+
+    Thread.sleep(500)
+    val cancellable = publisher.publish(eventGenerator.generate, 400.millis)
 
     Thread.sleep(1000)
     cancellable.cancel()
