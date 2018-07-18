@@ -1,7 +1,7 @@
 package csw.framework.internal.container
 
+import akka.actor.testkit.typed.Effect.Watched
 import akka.actor.testkit.typed.TestKitSettings
-import akka.actor.testkit.typed.scaladsl.Effects.Watched
 import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
@@ -10,17 +10,16 @@ import akka.{actor, Done}
 import csw.framework.ComponentInfos._
 import csw.framework.FrameworkTestMocks
 import csw.framework.internal.supervisor.SupervisorInfoFactory
-import csw.messages.{ComponentMessage, ContainerActorMessage, ContainerIdleMessage}
-import csw.messages.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
-import csw.messages.framework.{ComponentInfo, ContainerLifecycleState, SupervisorLifecycleState, _}
-import csw.messages.location.Connection.AkkaConnection
-import csw.messages.params.models.Prefix
 import csw.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.messages.ContainerIdleMessage.SupervisorsCreated
 import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.messages.RunningMessage.Lifecycle
 import csw.messages.SupervisorContainerCommonMessages.Restart
-import csw.messages.{ContainerActorMessage, ContainerIdleMessage}
+import csw.messages.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
+import csw.messages.framework.{ComponentInfo, ContainerLifecycleState, SupervisorLifecycleState, _}
+import csw.messages.location.Connection.AkkaConnection
+import csw.messages.params.models.Prefix
+import csw.messages.{ComponentMessage, ContainerActorMessage, ContainerIdleMessage}
 import csw.services.event.internal.commons.EventServiceFactory
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}

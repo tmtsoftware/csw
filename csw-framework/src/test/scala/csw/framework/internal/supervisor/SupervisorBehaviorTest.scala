@@ -1,15 +1,14 @@
 package csw.framework.internal.supervisor
 
+import akka.actor.testkit.typed.Effect
+import akka.actor.testkit.typed.Effect.{Spawned, Watched}
+import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.{Behaviors, TimerScheduler}
-import akka.actor.testkit.typed.Effect
-import akka.actor.testkit.typed.scaladsl.Effects.{Spawned, Watched}
-import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
 import csw.common.components.framework.SampleComponentBehaviorFactory
 import csw.framework.ComponentInfos._
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.messages.{ComponentMessage, ContainerIdleMessage, SupervisorMessage}
-import csw.messages.{ComponentMessage, ContainerIdleMessage}
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar

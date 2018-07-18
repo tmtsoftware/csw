@@ -1,21 +1,14 @@
 package csw.framework.internal.supervisor
 
+import akka.actor.testkit.typed.Effect.Spawned
+import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestInbox, TestProbe}
 import akka.actor.typed.scaladsl.{Behaviors, TimerScheduler}
 import akka.actor.typed.{ActorRef, Terminated}
-import akka.actor.testkit.typed.scaladsl.Effects.Spawned
-import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestInbox, TestProbe}
 import csw.common.components.framework.SampleComponentBehaviorFactory
 import csw.framework.ComponentInfos._
 import csw.framework.exceptions.{FailureStop, InitializationFailed}
 import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
-import csw.messages.commands.CommandResponse
-import csw.messages.framework.LocationServiceUsage.DoNotRegister
-import csw.messages.framework.PubSub.{Publish, Subscribe, Unsubscribe}
-import csw.messages.framework.ToComponentLifecycleMessages._
-import csw.messages.framework.{ComponentInfo, LifecycleStateChanged, PubSub, SupervisorLifecycleState}
-import csw.messages.params.models.Id
-import csw.messages.params.states.CurrentState
 import csw.messages.CommandResponseManagerMessage.Query
 import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
 import csw.messages.FromComponentLifecycleMessage.Running
@@ -23,8 +16,14 @@ import csw.messages.RunningMessage.Lifecycle
 import csw.messages.SupervisorContainerCommonMessages.Restart
 import csw.messages.SupervisorIdleMessage.InitializeTimeout
 import csw.messages.SupervisorInternalRunningMessage.{RegistrationNotRequired, RegistrationSuccess}
+import csw.messages.commands.CommandResponse
+import csw.messages.framework.LocationServiceUsage.DoNotRegister
+import csw.messages.framework.PubSub.{Publish, Subscribe, Unsubscribe}
+import csw.messages.framework.ToComponentLifecycleMessages._
+import csw.messages.framework.{ComponentInfo, LifecycleStateChanged, PubSub, SupervisorLifecycleState}
+import csw.messages.params.models.Id
+import csw.messages.params.states.CurrentState
 import csw.messages.{CommandResponseManagerMessage, ContainerIdleMessage, SupervisorMessage, TopLevelActorMessage}
-import csw.messages.{CommandResponseManagerMessage, ContainerIdleMessage, SupervisorMessage}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 
