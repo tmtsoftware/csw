@@ -7,8 +7,8 @@ import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.internal.commons.javawrappers.JEventService
 import csw.services.event.internal.wiring.BaseProperties
-import csw.services.event.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
-import csw.services.event.scaladsl._
+import csw.services.event.api.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
+import csw.services.event.api.scaladsl._
 import csw.services.location.scaladsl.LocationService
 import io.lettuce.core.api.async.RedisAsyncCommands
 import io.lettuce.core.codec.StringCodec

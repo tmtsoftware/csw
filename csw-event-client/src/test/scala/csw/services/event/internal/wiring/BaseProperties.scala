@@ -6,12 +6,12 @@ import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Materializer}
 import akka.{actor, Done}
+import csw.services.event.api.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
+import csw.services.event.api.scaladsl.{EventPublisher, EventService, EventSubscriber}
 import csw.services.event.helpers.RegistrationFactory
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.internal.commons.serviceresolver.EventServiceLocationResolver
 import csw.services.event.internal.commons.{EventServiceConnection, EventStreamSupervisionStrategy}
-import csw.services.event.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
-import csw.services.event.scaladsl.{EventPublisher, EventService, EventSubscriber}
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 

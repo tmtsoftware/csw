@@ -33,7 +33,7 @@ import csw.messages.params.models.Prefix
 import csw.messages.params.states.CurrentState
 import csw.services.command.CommandResponseManager
 import csw.services.command.internal.CommandResponseManagerFactory
-import csw.services.event.scaladsl.EventService
+import csw.services.event.api.scaladsl.EventService
 import csw.services.location.models.AkkaRegistration
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}

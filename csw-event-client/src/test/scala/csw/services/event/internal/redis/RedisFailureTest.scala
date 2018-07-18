@@ -5,7 +5,7 @@ import java.net.ConnectException
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import csw.messages.events.EventKey
-import csw.services.event.exceptions.{EventServerNotAvailable, PublishFailure}
+import csw.services.event.api.exceptions.{EventServerNotAvailable, PublishFailure}
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.helpers.Utils
 import csw.services.event.helpers.Utils.makeDistinctEvent

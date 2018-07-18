@@ -7,12 +7,12 @@ import java.util.concurrent.{ExecutorService, Executors}
 import akka.Done
 import akka.remote.testkit.{MultiNodeConfig, MultiNodeSpec, MultiNodeSpecCallbacks}
 import akka.testkit.ImplicitSender
+import csw.services.event.api.scaladsl.{EventPublisher, EventSubscriber}
 import csw.services.event.perf.commons.PerfSubscriber
 import csw.services.event.perf.reporter._
 import csw.services.event.perf.utils.EventUtils.nanosToSeconds
 import csw.services.event.perf.utils.{EventUtils, SystemMonitoringSupport}
 import csw.services.event.perf.wiring.{TestConfigs, TestWiring}
-import csw.services.event.scaladsl.{EventPublisher, EventSubscriber}
 import org.HdrHistogram.Histogram
 import org.scalatest.{BeforeAndAfterAll, FunSuiteLike, Matchers}
 

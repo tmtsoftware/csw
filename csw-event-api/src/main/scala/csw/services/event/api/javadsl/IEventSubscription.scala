@@ -1,4 +1,4 @@
-package csw.services.event.javadsl
+package csw.services.event.api.javadsl
 
 import java.util.concurrent.CompletableFuture
 

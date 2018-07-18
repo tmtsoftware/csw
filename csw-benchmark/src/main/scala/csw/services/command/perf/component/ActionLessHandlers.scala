@@ -10,7 +10,7 @@ import csw.messages.framework.ComponentInfo
 import csw.messages.location.TrackingEvent
 import csw.messages.params.models.Id
 import csw.services.command.CommandResponseManager
-import csw.services.event.scaladsl.EventService
+import csw.services.event.api.scaladsl.EventService
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 

@@ -8,16 +8,16 @@ import akka.Done
 import akka.actor.Cancellable
 import akka.stream.javadsl.Source
 import csw.messages.events.Event
-import csw.services.event.exceptions.PublishFailure
-import csw.services.event.javadsl.IEventPublisher
-import csw.services.event.scaladsl.EventPublisher
+import csw.services.event.api.exceptions.PublishFailure
+import csw.services.event.api.javadsl.IEventPublisher
+import csw.services.event.api.scaladsl.EventPublisher
 
 import scala.compat.java8.DurationConverters.DurationOps
 import scala.compat.java8.FunctionConverters.{enrichAsScalaFromConsumer, enrichAsScalaFromSupplier}
 import scala.compat.java8.FutureConverters.FutureOps
 
 /**
- * Java API for [[csw.services.event.scaladsl.EventPublisher]]
+ * Java API for [[csw.services.event.api.scaladsl.EventPublisher]]
  */
 class JEventPublisher(eventPublisher: EventPublisher) extends IEventPublisher {
   override def publish(event: Event): CompletableFuture[Done] = eventPublisher.publish(event).toJava.toCompletableFuture

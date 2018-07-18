@@ -16,7 +16,7 @@ import csw.messages.framework.ComponentInfo
 import csw.messages.location.TrackingEvent
 import csw.services.command.CommandResponseManager
 import csw.services.config.api.models.ConfigData
-import csw.services.event.scaladsl.EventService
+import csw.services.event.api.scaladsl.EventService
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
 import tmt.production.dsl.Dsl

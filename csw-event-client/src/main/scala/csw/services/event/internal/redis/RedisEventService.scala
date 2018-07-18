@@ -1,15 +1,15 @@
 package csw.services.event.internal.redis
 
 import akka.stream.Materializer
+import csw.services.event.api.scaladsl.{EventPublisher, EventService, EventSubscriber}
 import csw.services.event.internal.commons.serviceresolver.EventServiceResolver
-import csw.services.event.scaladsl.{EventPublisher, EventService, EventSubscriber}
 import io.lettuce.core.{RedisClient, RedisURI}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
- * Implementation of [[csw.services.event.scaladsl.EventService]] which provides handle to [[csw.services.event.scaladsl.EventPublisher]]
- * and [[csw.services.event.scaladsl.EventSubscriber]] backed by Redis
+ * Implementation of [[csw.services.event.api.scaladsl.EventService]] which provides handle to [[csw.services.event.api.scaladsl.EventPublisher]]
+ * and [[csw.services.event.api.scaladsl.EventSubscriber]] backed by Redis
  * @param eventServiceResolver to get the connection information of event service
  * @param masterId the Id used by Redis Sentinel to identify the master
  * @param redisClient the client instance of [[io.lettuce.core.RedisClient]]

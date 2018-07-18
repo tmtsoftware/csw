@@ -7,8 +7,8 @@ import akka.stream.Materializer
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import csw.messages.events._
 import csw.messages.params.models.Subsystem
+import csw.services.event.api.scaladsl.{EventSubscriber, EventSubscription, SubscriptionMode}
 import csw.services.event.internal.commons.EventSubscriberUtil
-import csw.services.event.scaladsl.{EventSubscriber, EventSubscription, SubscriptionMode}
 import csw.services.event.utils.Utils
 import csw_protobuf.events.PbEvent
 import org.apache.kafka.clients.consumer.Consumer
@@ -21,7 +21,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
 /**
- * An implementation of [[csw.services.event.scaladsl.EventSubscriber]] API which uses Apache Kafka as the provider for publishing
+ * An implementation of [[csw.services.event.api.scaladsl.EventSubscriber]] API which uses Apache Kafka as the provider for publishing
  * and subscribing events.
  * @param consumerSettings Settings for akka-streams-kafka API for Apache Kafka consumer
  * @param ec the execution context to be used for performing asynchronous operations

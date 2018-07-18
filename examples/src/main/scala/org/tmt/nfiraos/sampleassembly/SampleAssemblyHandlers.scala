@@ -13,7 +13,7 @@ import csw.messages.params.generics.{Key, KeyType, Parameter}
 import csw.messages.params.models.{ObsId, Units}
 import csw.services.command.CommandResponseManager
 import csw.services.command.scaladsl.CommandService
-import csw.services.event.scaladsl.EventService
+import csw.services.event.api.scaladsl.EventService
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
 

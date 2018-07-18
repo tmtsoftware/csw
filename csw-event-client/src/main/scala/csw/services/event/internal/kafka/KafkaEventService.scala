@@ -5,14 +5,14 @@ import java.util.UUID
 import akka.actor.ActorSystem
 import akka.kafka.{ConsumerSettings, ProducerSettings}
 import akka.stream.Materializer
+import csw.services.event.api.scaladsl.EventService
 import csw.services.event.internal.commons.serviceresolver.EventServiceResolver
-import csw.services.event.scaladsl.EventService
 
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
- * Implementation of [[csw.services.event.scaladsl.EventService]] which provides handle to [[csw.services.event.scaladsl.EventPublisher]]
- * and [[csw.services.event.scaladsl.EventSubscriber]] backed by Kafka
+ * Implementation of [[csw.services.event.api.scaladsl.EventService]] which provides handle to [[csw.services.event.api.scaladsl.EventPublisher]]
+ * and [[csw.services.event.api.scaladsl.EventSubscriber]] backed by Kafka
  * @param eventServiceResolver to get the connection information of event service
  * @param actorSystem actor system to be used by Producer and Consumer API of akka-stream-kafka
  * @param mat the materializer to be used for materializing underlying streams

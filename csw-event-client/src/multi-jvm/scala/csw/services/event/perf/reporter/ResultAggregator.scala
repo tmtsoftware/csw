@@ -9,7 +9,7 @@ import akka.util.ByteString
 import csw.messages.events.{Event, SystemEvent}
 import csw.services.event.perf.utils.EventUtils
 import csw.services.event.perf.utils.EventUtils._
-import csw.services.event.scaladsl.{EventSubscriber, EventSubscription}
+import csw.services.event.api.scaladsl.{EventSubscriber, EventSubscription}
 import org.HdrHistogram.Histogram
 
 class ResultAggregator(

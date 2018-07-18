@@ -2,14 +2,14 @@ package csw.services.event.internal.commons.javawrappers
 
 import java.util.concurrent.CompletableFuture
 
-import csw.services.event.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
-import csw.services.event.scaladsl.EventService
+import csw.services.event.api.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
+import csw.services.event.api.scaladsl.EventService
 
 import scala.compat.java8.FutureConverters.FutureOps
 import scala.concurrent.ExecutionContext
 
 /**
- * Java API for [[csw.services.event.scaladsl.EventService]]
+ * Java API for [[csw.services.event.api.scaladsl.EventService]]
  */
 class JEventService(eventService: EventService) extends IEventService {
 

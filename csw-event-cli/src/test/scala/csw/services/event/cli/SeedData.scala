@@ -11,7 +11,7 @@ import csw.services.event.cli.args.ArgsParser
 import csw.services.event.cli.wiring.Wiring
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.internal.commons.EventServiceConnection
-import csw.services.event.scaladsl.EventPublisher
+import csw.services.event.api.scaladsl.EventPublisher
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.models.TcpRegistration
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}

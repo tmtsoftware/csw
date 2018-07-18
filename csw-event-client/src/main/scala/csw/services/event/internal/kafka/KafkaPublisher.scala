@@ -6,9 +6,9 @@ import akka.kafka.ProducerSettings
 import akka.stream.Materializer
 import akka.stream.scaladsl.Source
 import csw.messages.events.Event
-import csw.services.event.exceptions.PublishFailure
+import csw.services.event.api.exceptions.PublishFailure
+import csw.services.event.api.scaladsl.EventPublisher
 import csw.services.event.internal.commons.EventPublisherUtil
-import csw.services.event.scaladsl.EventPublisher
 import org.apache.kafka.clients.producer.{Callback, ProducerRecord}
 
 import scala.concurrent.duration.FiniteDuration
@@ -16,7 +16,7 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.util.control.NonFatal
 
 /**
- * An implementation of [[csw.services.event.scaladsl.EventPublisher]] API which uses Apache Kafka as the provider for publishing
+ * An implementation of [[csw.services.event.api.scaladsl.EventPublisher]] API which uses Apache Kafka as the provider for publishing
  * and subscribing events.
  * @param producerSettings Settings for akka-streams-kafka API for Apache Kafka producer
  * @param ec the execution context to be used for performing asynchronous operations

@@ -1,14 +1,14 @@
 package csw.services.event.internal.commons
 import akka.actor.ActorSystem
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Materializer}
+import csw.services.event.api.javadsl.IEventService
+import csw.services.event.api.scaladsl.EventService
 import csw.services.event.internal.commons.javawrappers.JEventService
 import csw.services.event.internal.commons.serviceresolver.{
   EventServiceHostPortResolver,
   EventServiceLocationResolver,
   EventServiceResolver
 }
-import csw.services.event.javadsl.IEventService
-import csw.services.event.scaladsl.EventService
 import csw.services.location.javadsl.ILocationService
 import csw.services.location.scaladsl.LocationService
 

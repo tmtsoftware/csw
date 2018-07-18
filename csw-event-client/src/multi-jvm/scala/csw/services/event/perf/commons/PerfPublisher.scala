@@ -7,7 +7,7 @@ import csw.messages.events.{Event, EventName, SystemEvent}
 import csw.messages.params.models.Prefix
 import csw.services.event.perf.utils.EventUtils._
 import csw.services.event.perf.wiring.{TestConfigs, TestWiring}
-import csw.services.event.scaladsl.EventPublisher
+import csw.services.event.api.scaladsl.EventPublisher
 
 import scala.async.Async.{async, await}
 import scala.concurrent.Future

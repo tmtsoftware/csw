@@ -6,9 +6,9 @@ import akka.stream.{KillSwitches, Materializer}
 import akka.{Done, NotUsed}
 import csw.messages.events._
 import csw.messages.params.models.Subsystem
-import csw.services.event.exceptions.EventServerNotAvailable
+import csw.services.event.api.exceptions.EventServerNotAvailable
+import csw.services.event.api.scaladsl.{EventSubscriber, EventSubscription, SubscriptionMode}
 import csw.services.event.internal.commons.EventSubscriberUtil
-import csw.services.event.scaladsl.{EventSubscriber, EventSubscription, SubscriptionMode}
 import io.lettuce.core.api.async.RedisAsyncCommands
 import io.lettuce.core.pubsub.api.reactive.RedisPubSubReactiveCommands
 import io.lettuce.core.{RedisClient, RedisURI}
@@ -21,7 +21,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
 /**
- * An implementation of [[csw.services.event.scaladsl.EventSubscriber]] API which uses Redis as the provider for publishing
+ * An implementation of [[csw.services.event.api.scaladsl.EventSubscriber]] API which uses Redis as the provider for publishing
  * and subscribing events.
  * @param redisURI Contains connection details for the Redis/Sentinel connections.
  * @param redisClient A redis client available from lettuce

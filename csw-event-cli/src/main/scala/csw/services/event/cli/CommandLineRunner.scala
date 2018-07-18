@@ -12,8 +12,8 @@ import csw.messages.params.models.Id
 import csw.services.event.cli.args.Options
 import csw.services.event.cli.utils.{EventJsonTransformer, EventOnelineTransformer, Formatter}
 import csw.services.event.cli.wiring.ActorRuntime
-import csw.services.event.scaladsl.SubscriptionModes.RateAdapterMode
-import csw.services.event.scaladsl.{EventService, EventSubscription}
+import csw.services.event.api.scaladsl.SubscriptionModes.RateAdapterMode
+import csw.services.event.api.scaladsl.{EventService, EventSubscription}
 import play.api.libs.json.{JsObject, JsValue, Json}
 
 import scala.async.Async.{async, await}

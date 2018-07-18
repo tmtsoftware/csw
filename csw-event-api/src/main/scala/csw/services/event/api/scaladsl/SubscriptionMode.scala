@@ -1,4 +1,4 @@
-package csw.services.event.scaladsl
+package csw.services.event.api.scaladsl
 
 /**
  * The subscription mode is used to control the rate of events received by the subscriber.
@@ -52,8 +52,8 @@ package csw.services.event.scaladsl
 sealed trait SubscriptionMode
 
 /**
- * Variations of [[csw.services.event.scaladsl.SubscriptionMode]] available for use. Refer to documentation for
- * [[csw.services.event.scaladsl.SubscriptionMode]] for more details.
+ * Variations of [[csw.services.event.api.scaladsl.SubscriptionMode]] available for use. Refer to documentation for
+ * [[csw.services.event.api.scaladsl.SubscriptionMode]] for more details.
  */
 object SubscriptionModes {
   case object RateAdapterMode extends SubscriptionMode

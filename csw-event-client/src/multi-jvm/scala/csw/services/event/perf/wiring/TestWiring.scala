@@ -2,10 +2,10 @@ package csw.services.event.perf.wiring
 
 import akka.actor
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Materializer, Supervision}
+import csw.services.event.api.scaladsl.{EventPublisher, EventSubscriber}
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.internal.kafka.KafkaEventServiceFactory
 import csw.services.event.internal.redis.RedisEventServiceFactory
-import csw.services.event.scaladsl._
 import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar
 

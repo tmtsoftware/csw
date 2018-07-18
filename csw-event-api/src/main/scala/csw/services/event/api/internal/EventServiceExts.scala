@@ -1,10 +1,10 @@
-package csw.services.event.internal
+package csw.services.event.api.internal
 
 import java.util.concurrent.CompletableFuture
 
 import akka.Done
-import csw.services.event.javadsl.IEventSubscription
-import csw.services.event.scaladsl.EventSubscription
+import csw.services.event.api.javadsl.IEventSubscription
+import csw.services.event.api.scaladsl.EventSubscription
 
 import scala.compat.java8.FutureConverters.FutureOps
 

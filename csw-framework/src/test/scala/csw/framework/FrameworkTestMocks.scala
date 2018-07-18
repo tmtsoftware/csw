@@ -15,7 +15,7 @@ import csw.messages.CommandResponseManagerMessage
 import csw.services.command.CommandResponseManager
 import csw.services.command.internal.CommandResponseManagerFactory
 import csw.services.event.internal.commons.EventServiceFactory
-import csw.services.event.scaladsl.EventService
+import csw.services.event.api.scaladsl.EventService
 import csw.services.location.javadsl.ILocationService
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}

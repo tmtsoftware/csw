@@ -8,8 +8,8 @@ import csw.messages.TopLevelActorMessage
 import csw.messages.framework.ComponentInfo
 import csw.services.command.CommandResponseManager
 import csw.services.event.internal.commons.EventServiceAdapter
-import csw.services.event.javadsl.IEventService
-import csw.services.event.scaladsl.EventService
+import csw.services.event.api.javadsl.IEventService
+import csw.services.event.api.scaladsl.EventService
 import csw.services.location.javadsl.ILocationService
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.javadsl.JLoggerFactory

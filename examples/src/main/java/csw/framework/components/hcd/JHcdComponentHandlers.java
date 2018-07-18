@@ -26,13 +26,12 @@ import csw.messages.TopLevelActorMessage;
 import csw.services.command.CommandResponseManager;
 import csw.services.config.api.javadsl.IConfigClientService;
 import csw.services.config.api.models.ConfigData;
-import csw.services.event.exceptions.PublishFailure;
+import csw.services.event.api.exceptions.PublishFailure;
 import csw.services.event.internal.commons.EventServiceConnection;
-import csw.services.event.javadsl.IEventService;
+import csw.services.event.api.javadsl.IEventService;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.logging.javadsl.ILogger;
 import csw.services.logging.javadsl.JLoggerFactory;
-import scala.concurrent.duration.FiniteDuration;
 
 import java.nio.file.Paths;
 import java.time.Duration;

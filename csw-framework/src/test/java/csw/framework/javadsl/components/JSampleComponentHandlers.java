@@ -20,7 +20,7 @@ import csw.messages.params.states.CurrentState;
 import csw.messages.params.states.StateName;
 import csw.messages.TopLevelActorMessage;
 import csw.services.command.CommandResponseManager;
-import csw.services.event.javadsl.IEventService;
+import csw.services.event.api.javadsl.IEventService;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.logging.javadsl.ILogger;
 import csw.services.logging.javadsl.JLoggerFactory;

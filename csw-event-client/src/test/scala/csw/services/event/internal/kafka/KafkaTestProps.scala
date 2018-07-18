@@ -4,11 +4,11 @@ import akka.Done
 import akka.actor.{ActorSystem, CoordinatedShutdown}
 import akka.kafka.ProducerSettings
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
+import csw.services.event.api.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
+import csw.services.event.api.scaladsl.{EventPublisher, EventService, EventSubscriber}
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.internal.wiring.BaseProperties
 import csw.services.event.internal.wiring.BaseProperties.createInfra
-import csw.services.event.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
-import csw.services.event.scaladsl.{EventPublisher, EventService, EventSubscriber}
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.LocationService
 import net.manub.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}

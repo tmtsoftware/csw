@@ -10,7 +10,7 @@ import csw.messages.params.models.Prefix
 import csw.services.event.perf.reporter.{ResultReporter, TestRateReporter}
 import csw.services.event.perf.utils.EventUtils._
 import csw.services.event.perf.wiring.{TestConfigs, TestWiring}
-import csw.services.event.scaladsl.{EventSubscriber, EventSubscription}
+import csw.services.event.api.scaladsl.{EventSubscriber, EventSubscription}
 import org.HdrHistogram.Histogram
 
 import scala.concurrent.Future

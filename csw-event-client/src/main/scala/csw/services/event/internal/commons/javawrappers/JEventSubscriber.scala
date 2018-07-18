@@ -10,16 +10,16 @@ import akka.actor.typed.ActorRef
 import akka.stream.javadsl.Source
 import csw.messages.events.{Event, EventKey}
 import csw.messages.params.models.Subsystem
-import csw.services.event.internal.EventServiceExts.RichEventSubscription
-import csw.services.event.javadsl.{IEventSubscriber, IEventSubscription}
-import csw.services.event.scaladsl.{EventSubscriber, EventSubscription, SubscriptionMode}
+import csw.services.event.api.internal.EventServiceExts.RichEventSubscription
+import csw.services.event.api.javadsl.{IEventSubscriber, IEventSubscription}
+import csw.services.event.api.scaladsl.{EventSubscriber, EventSubscription, SubscriptionMode}
 
 import scala.collection.JavaConverters.{asScalaSetConverter, setAsJavaSetConverter}
 import scala.compat.java8.DurationConverters.DurationOps
 import scala.compat.java8.FutureConverters.{CompletionStageOps, FutureOps}
 
 /**
- * Java API for [[csw.services.event.scaladsl.EventSubscriber]]
+ * Java API for [[csw.services.event.api.scaladsl.EventSubscriber]]
  */
 class JEventSubscriber(eventSubscriber: EventSubscriber) extends IEventSubscriber {
 

@@ -24,9 +24,9 @@ import csw.services.command.CommandResponseManager
 import csw.services.config.api.models.ConfigData
 import csw.services.config.api.scaladsl.ConfigClientService
 import csw.services.config.client.scaladsl.ConfigClientFactory
-import csw.services.event.exceptions.PublishFailure
+import csw.services.event.api.exceptions.PublishFailure
 import csw.services.event.internal.commons.EventServiceConnection
-import csw.services.event.scaladsl.EventService
+import csw.services.event.api.scaladsl.EventService
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 

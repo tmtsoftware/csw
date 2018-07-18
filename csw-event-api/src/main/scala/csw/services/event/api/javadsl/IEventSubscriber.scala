@@ -1,4 +1,4 @@
-package csw.services.event.javadsl
+package csw.services.event.api.javadsl
 
 import java.time.Duration
 import java.util
@@ -9,7 +9,7 @@ import akka.actor.typed.ActorRef
 import akka.stream.javadsl.Source
 import csw.messages.events.{Event, EventKey}
 import csw.messages.params.models.Subsystem
-import csw.services.event.scaladsl.SubscriptionMode
+import csw.services.event.api.scaladsl.SubscriptionMode
 
 /**
  * An EventSubscriber interface to subscribe events. The events can be subscribed on [[csw.messages.events.EventKey]]. All events
@@ -21,12 +21,12 @@ trait IEventSubscriber {
    * Subscribe to multiple Event Keys and get a single stream of events for all event keys. The latest events available for the given
    * Event Keys will be received first. If event is not published for one or more event keys, `invalid event` will be received for those Event Keys.
    *
-   * At the time of invocation, in case the underlying server is not available [[csw.services.event.exceptions.EventServerNotAvailable]] exception is thrown
+   * At the time of invocation, in case the underlying server is not available [[csw.services.event.api.exceptions.EventServerNotAvailable]] exception is thrown
    * and the stream is stopped after logging appropriately. In all other cases of exception, the stream resumes to receive remaining elements.
    *
    * @param eventKeys a set of [[csw.messages.events.EventKey]] to subscribe to
    * @return a [[akka.stream.javadsl.Source]] of [[csw.messages.events.Event]]. The materialized value of the source provides an
-   *         [[csw.services.event.javadsl.IEventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
+   *         [[csw.services.event.api.javadsl.IEventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
    */
   def subscribe(eventKeys: util.Set[EventKey]): Source[Event, IEventSubscription]
 
@@ -35,15 +35,15 @@ trait IEventSubscriber {
    * available for the given Event Keys will be received first. If event is not published for one or more event keys, `invalid event` will be received for
    * those Event Keys.
    *
-   * At the time of invocation, in case the underlying server is not available, [[csw.services.event.exceptions.EventServerNotAvailable]] exception is thrown
+   * At the time of invocation, in case the underlying server is not available, [[csw.services.event.api.exceptions.EventServerNotAvailable]] exception is thrown
    * and the stream is stopped after logging appropriately. In all other cases of exception, the stream resumes to receive remaining elements.
    *
    * @param eventKeys a set of [[csw.messages.events.EventKey]] to subscribe to
    * @param every the duration which determines the frequency with which events are received
-   * @param mode an appropriate [[csw.services.event.scaladsl.SubscriptionMode]] to control the behavior of rate of events w.r.t. the given frequency.
+   * @param mode an appropriate [[csw.services.event.api.scaladsl.SubscriptionMode]] to control the behavior of rate of events w.r.t. the given frequency.
    *             Refer the API documentation for SubscriptionMode for more details
    * @return a [[akka.stream.javadsl.Source]] of [[csw.messages.events.Event]]. The materialized value of the source provides an
-   *         [[csw.services.event.javadsl.IEventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
+   *         [[csw.services.event.api.javadsl.IEventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
    */
   def subscribe(eventKeys: util.Set[EventKey], every: Duration, mode: SubscriptionMode): Source[Event, IEventSubscription]
 
@@ -52,13 +52,13 @@ trait IEventSubscriber {
    * type, so that blocking operation within callback can be placed in the completable future (separate thread than main thread). The latest events available
    * for the given Event Keys will be received first. If event is not published for one or more event keys, `invalid event` will be received for those Event Keys.
    *
-   * At the time of invocation, in case the underlying server is not available, [[csw.services.event.exceptions.EventServerNotAvailable]] exception is thrown
-   * and the subscription is stopped after logging appropriately. [[csw.services.event.scaladsl.EventSubscription!.ready]] method can be used to determine
+   * At the time of invocation, in case the underlying server is not available, [[csw.services.event.api.exceptions.EventServerNotAvailable]] exception is thrown
+   * and the subscription is stopped after logging appropriately. [[csw.services.event.api.scaladsl.EventSubscription!.ready]] method can be used to determine
    * this state. In all other cases of exception, the subscription resumes to receive remaining elements.
    *
    * @param eventKeys a set of [[csw.messages.events.EventKey]] to subscribe to
    * @param callback a function to execute asynchronously on each received event
-   * @return an [[csw.services.event.javadsl.IEventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
+   * @return an [[csw.services.event.api.javadsl.IEventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
    */
   def subscribeAsync(eventKeys: util.Set[EventKey], callback: Event ⇒ CompletableFuture[_]): IEventSubscription
 
@@ -66,16 +66,16 @@ trait IEventSubscriber {
    * Overload for above `subscribeAsync` for receiving event at a `every` frequency according to the specified `mode`. The latest
    * events available for the given Event Keys will be received first. If event is not published for one or more event keys, `invalid event` will be received for those Event Keys.
    *
-   * At the time of invocation, in case the underlying server is not available, [[csw.services.event.exceptions.EventServerNotAvailable]] exception is thrown
-   * and the subscription is stopped after logging appropriately. [[csw.services.event.scaladsl.EventSubscription!.ready]] method can be used to determine
+   * At the time of invocation, in case the underlying server is not available, [[csw.services.event.api.exceptions.EventServerNotAvailable]] exception is thrown
+   * and the subscription is stopped after logging appropriately. [[csw.services.event.api.scaladsl.EventSubscription!.ready]] method can be used to determine
    * this state. In all other cases of exception, the subscription resumes to receive remaining elements.
    *
    * @param eventKeys a set of [[csw.messages.events.EventKey]] to subscribe to
    * @param callback a function to execute on each received event
    * @param every the duration which determines the frequency with which events are received
-   * @param mode an appropriate [[csw.services.event.scaladsl.SubscriptionMode]] to control the behavior of rate of events w.r.t. the given frequency.
+   * @param mode an appropriate [[csw.services.event.api.scaladsl.SubscriptionMode]] to control the behavior of rate of events w.r.t. the given frequency.
    *             Refer the API documentation for SubscriptionMode for more details
-   * @return an [[csw.services.event.javadsl.IEventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
+   * @return an [[csw.services.event.api.javadsl.IEventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
    */
   def subscribeAsync(
       eventKeys: util.Set[EventKey],
@@ -89,13 +89,13 @@ trait IEventSubscriber {
    * component developers. The latest events available for the given Event Keys will be received first. If event is not published for one or more event keys,
    * `invalid event` will be received for those Event Keys.
    *
-   * At the time of invocation, in case the underlying server is not available, [[csw.services.event.exceptions.EventServerNotAvailable]] exception is thrown
-   * and the subscription is stopped after logging appropriately. [[csw.services.event.scaladsl.EventSubscription!.ready]] method can be used to determine this
+   * At the time of invocation, in case the underlying server is not available, [[csw.services.event.api.exceptions.EventServerNotAvailable]] exception is thrown
+   * and the subscription is stopped after logging appropriately. [[csw.services.event.api.scaladsl.EventSubscription!.ready]] method can be used to determine this
    * state. In all other cases of exception, the subscription resumes to receive remaining elements.
    *
    * @param eventKeys a set of [[csw.messages.events.EventKey]] to subscribe to
    * @param callback a consumer which defines an operation to execute on each received event
-   * @return an [[csw.services.event.javadsl.IEventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
+   * @return an [[csw.services.event.api.javadsl.IEventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
    */
   def subscribeCallback(eventKeys: util.Set[EventKey], callback: Consumer[Event]): IEventSubscription
 
@@ -104,16 +104,16 @@ trait IEventSubscriber {
    * The latest events available for the given Event Keys will be received first. If event is not published for one or more event keys, `invalid event` will
    * be received for those Event Keys.
    *
-   * At the time of invocation, in case the underlying server is not available, [[csw.services.event.exceptions.EventServerNotAvailable]] exception is thrown
-   * and the subscription is stopped after logging appropriately. [[csw.services.event.scaladsl.EventSubscription!.ready]] method can be used to determine this
+   * At the time of invocation, in case the underlying server is not available, [[csw.services.event.api.exceptions.EventServerNotAvailable]] exception is thrown
+   * and the subscription is stopped after logging appropriately. [[csw.services.event.api.scaladsl.EventSubscription!.ready]] method can be used to determine this
    * state. In all other cases of exception, the subscription resumes to receive remaining elements.
    *
    * @param eventKeys a set of [[csw.messages.events.EventKey]] to subscribe to
    * @param callback a consumer which defines an operation to execute on each received event
    * @param every the duration which determines the frequency with which events are received
-   * @param mode an appropriate [[csw.services.event.scaladsl.SubscriptionMode]] to control the behavior of rate of events w.r.t. the given frequency.
+   * @param mode an appropriate [[csw.services.event.api.scaladsl.SubscriptionMode]] to control the behavior of rate of events w.r.t. the given frequency.
    *             Refer the API documentation for SubscriptionMode for more details
-   * @return an [[csw.services.event.javadsl.IEventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
+   * @return an [[csw.services.event.api.javadsl.IEventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
    */
   def subscribeCallback(
       eventKeys: util.Set[EventKey],
@@ -126,13 +126,13 @@ trait IEventSubscriber {
    * Subscribes an actor to events from multiple event keys. The latest events available for the given Event Keys will be received first.
    * If event is not published for one or more event keys, `invalid event` will be received for those Event Keys.
    *
-   * At the time of invocation, in case the underlying server is not available, [[csw.services.event.exceptions.EventServerNotAvailable]] exception is thrown
-   * and the subscription is stopped after logging appropriately. [[csw.services.event.scaladsl.EventSubscription!.ready]] method can be used to determine this
+   * At the time of invocation, in case the underlying server is not available, [[csw.services.event.api.exceptions.EventServerNotAvailable]] exception is thrown
+   * and the subscription is stopped after logging appropriately. [[csw.services.event.api.scaladsl.EventSubscription!.ready]] method can be used to determine this
    * state. In all other cases of exception, the subscription resumes to receive remaining elements.
    *
    * @param eventKeys a set of [[csw.messages.events.EventKey]] to subscribe to
    * @param actorRef an actorRef of an actor which handles each received event
-   * @return an [[csw.services.event.javadsl.IEventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
+   * @return an [[csw.services.event.api.javadsl.IEventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
    */
   def subscribeActorRef(eventKeys: util.Set[EventKey], actorRef: ActorRef[Event]): IEventSubscription
 
@@ -141,16 +141,16 @@ trait IEventSubscriber {
    * The latest events available for the given Event Keys will be received first. If event is not published for one or more event keys, `invalid event` will be
    * received for those Event Keys.
    *
-   * At the time of invocation, in case the underlying server is not available, [[csw.services.event.exceptions.EventServerNotAvailable]] exception is thrown
-   * and the subscription is stopped after logging appropriately. [[csw.services.event.scaladsl.EventSubscription!.ready]] method can be used to determine this
+   * At the time of invocation, in case the underlying server is not available, [[csw.services.event.api.exceptions.EventServerNotAvailable]] exception is thrown
+   * and the subscription is stopped after logging appropriately. [[csw.services.event.api.scaladsl.EventSubscription!.ready]] method can be used to determine this
    * state. In all other cases of exception, the subscription resumes to receive remaining elements.
    *
    * @param eventKeys a set of [[csw.messages.events.EventKey]] to subscribe to
    * @param actorRef an actorRef of an actor to which each received event is redirected
    * @param every the duration which determines the frequency with which events are received
-   * @param mode an appropriate [[csw.services.event.scaladsl.SubscriptionMode]] to control the behavior of rate of events w.r.t. the given frequency.
+   * @param mode an appropriate [[csw.services.event.api.scaladsl.SubscriptionMode]] to control the behavior of rate of events w.r.t. the given frequency.
    *             Refer the API documentation for SubscriptionMode for more details
-   * @return an [[csw.services.event.javadsl.IEventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
+   * @return an [[csw.services.event.api.javadsl.IEventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
    */
   def subscribeActorRef(
       eventKeys: util.Set[EventKey],
@@ -162,8 +162,8 @@ trait IEventSubscriber {
   /**
    * Subscribe to events from Event Keys specified using a subsystem and a pattern to match the remaining Event Key
    *
-   * At the time of invocation, in case the underlying server is not available, [[csw.services.event.exceptions.EventServerNotAvailable]] exception is thrown
-   * and the subscription is stopped after logging appropriately. [[csw.services.event.scaladsl.EventSubscription!.ready]] method can be used to determine this
+   * At the time of invocation, in case the underlying server is not available, [[csw.services.event.api.exceptions.EventServerNotAvailable]] exception is thrown
+   * and the subscription is stopped after logging appropriately. [[csw.services.event.api.scaladsl.EventSubscription!.ready]] method can be used to determine this
    * state. In all other cases of exception, the subscription resumes to receive remaining elements.
    *
    * @param subsystem a valid [[csw.messages.params.models.Subsystem]] which represents the source of the events
@@ -172,7 +172,7 @@ trait IEventSubscriber {
    *                  - h*llo subscribes to hllo and heeeello
    *                  - h[ae]llo subscribes to hello and hallo, but not hillo
    *                  Use \ to escape special characters if you want to match them verbatim.
-   * @return a [[akka.stream.javadsl.Source]] of [[csw.messages.events.Event]]. The materialized value of the source provides an [[csw.services.event.javadsl.IEventSubscription]]
+   * @return a [[akka.stream.javadsl.Source]] of [[csw.messages.events.Event]]. The materialized value of the source provides an [[csw.services.event.api.javadsl.IEventSubscription]]
    *         which can be used to unsubscribe from all the Event Keys which were subscribed to
    */
   def pSubscribe(subsystem: Subsystem, pattern: String): Source[Event, IEventSubscription]
@@ -180,18 +180,18 @@ trait IEventSubscriber {
   /**
    * Subscribes a callback to events from Event Keys specified using a subsystem and a pattern to match the remaining Event Key
    *
-   * At the time of invocation, in case the underlying server is not available, [[csw.services.event.exceptions.EventServerNotAvailable]] exception is thrown
-   * and the subscription is stopped after logging appropriately. [[csw.services.event.scaladsl.EventSubscription!.ready]] method can be used to determine this
+   * At the time of invocation, in case the underlying server is not available, [[csw.services.event.api.exceptions.EventServerNotAvailable]] exception is thrown
+   * and the subscription is stopped after logging appropriately. [[csw.services.event.api.scaladsl.EventSubscription!.ready]] method can be used to determine this
    * state. In all other cases of exception, the subscription resumes to receive remaining elements.
    *
    * @param subsystem a valid [[csw.messages.params.models.Subsystem]] which represents the source of the events
    * @param pattern   Subscribes the client to the given patterns. Supported glob-style patterns:
-                      - h?llo subscribes to hello, hallo and hxllo
-                      - h*llo subscribes to hllo and heeeello
-                      - h[ae]llo subscribes to hello and hallo, but not hillo
-                      Use \ to escape special characters if you want to match them verbatim.
+   *- h?llo subscribes to hello, hallo and hxllo
+   *- h*llo subscribes to hllo and heeeello
+   *- h[ae]llo subscribes to hello and hallo, but not hillo
+   *Use \ to escape special characters if you want to match them verbatim.
    * @param callback a consumer which defines an operation to execute on each received event
-   * @return an [[csw.services.event.javadsl.IEventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
+   * @return an [[csw.services.event.api.javadsl.IEventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
    */
   def pSubscribe(subsystem: Subsystem, pattern: String, callback: Consumer[Event]): IEventSubscription
 
@@ -199,7 +199,7 @@ trait IEventSubscriber {
    * Get latest events for multiple Event Keys. The latest events available for the given Event Keys will be received first.
    * If event is not published for one or more event keys, `invalid event` will be received for those Event Keys.
    *
-   * In case the underlying server is not available, the future fails with [[csw.services.event.exceptions.EventServerNotAvailable]] exception.
+   * In case the underlying server is not available, the future fails with [[csw.services.event.api.exceptions.EventServerNotAvailable]] exception.
    * In all other cases of exception, the future fails with the respective exception
    *
    * @param eventKeys a set of [[csw.messages.events.EventKey]] to subscribe to
@@ -210,7 +210,7 @@ trait IEventSubscriber {
   /**
    * Get latest event for the given Event Key. If an event is not published for any eventKey, then `invalid event` is returned for that Event Key.
    *
-   * In case the underlying server is not available, the future fails with [[csw.services.event.exceptions.EventServerNotAvailable]] exception.
+   * In case the underlying server is not available, the future fails with [[csw.services.event.api.exceptions.EventServerNotAvailable]] exception.
    * In all other cases of exception, the future fails with the respective exception
    *
    * @param eventKey an [[csw.messages.events.EventKey]] to subscribe to

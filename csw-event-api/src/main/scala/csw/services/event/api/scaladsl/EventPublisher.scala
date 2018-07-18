@@ -1,10 +1,10 @@
-package csw.services.event.scaladsl
+package csw.services.event.api.scaladsl
 
 import akka.Done
 import akka.actor.Cancellable
 import akka.stream.scaladsl.Source
 import csw.messages.events.Event
-import csw.services.event.exceptions.PublishFailure
+import csw.services.event.api.exceptions.PublishFailure
 
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
@@ -19,8 +19,8 @@ trait EventPublisher {
   /**
    * Publish a single [[csw.messages.events.Event]]
    *
-   * At the time of invocation, in case the underlying server is not available, [[csw.services.event.exceptions.EventServerNotAvailable]] exception is thrown,
-   * in all other cases [[csw.services.event.exceptions.PublishFailure]] exception is thrown which wraps the underlying exception and
+   * At the time of invocation, in case the underlying server is not available, [[csw.services.event.api.exceptions.EventServerNotAvailable]] exception is thrown,
+   * in all other cases [[csw.services.event.api.exceptions.PublishFailure]] exception is thrown which wraps the underlying exception and
    * also provides the handle to the event which was failed to be published
    *
    * @param event an event to be published
@@ -31,8 +31,8 @@ trait EventPublisher {
   /**
    * Publish from a stream of [[csw.messages.events.Event]]
    *
-   * At the time of invocation, in case the underlying server is not available, [[csw.services.event.exceptions.EventServerNotAvailable]] exception is thrown and the stream is
-   * stopped after logging appropriately. In all other cases of exception, the stream receives a [[csw.services.event.exceptions.PublishFailure]] exception
+   * At the time of invocation, in case the underlying server is not available, [[csw.services.event.api.exceptions.EventServerNotAvailable]] exception is thrown and the stream is
+   * stopped after logging appropriately. In all other cases of exception, the stream receives a [[csw.services.event.api.exceptions.PublishFailure]] exception
    * which wraps the underlying exception. The stream resumes to publish remaining elements in case of this exception.
    *
    * @param source a [[akka.stream.scaladsl.Source]] of events to be published. Any resource cleanup or exception handling of the provided source is to be managed by the source
@@ -45,8 +45,8 @@ trait EventPublisher {
   /**
    * Publish from a stream of [[csw.messages.events.Event]], and execute `onError` callback for each event for which publishing failed.
    *
-   * At the time of invocation, in case the underlying server is not available, [[csw.services.event.exceptions.EventServerNotAvailable]] exception is thrown and the stream is
-   * stopped after logging appropriately. In all other cases of exception, the stream receives a [[csw.services.event.exceptions.PublishFailure]] exception
+   * At the time of invocation, in case the underlying server is not available, [[csw.services.event.api.exceptions.EventServerNotAvailable]] exception is thrown and the stream is
+   * stopped after logging appropriately. In all other cases of exception, the stream receives a [[csw.services.event.api.exceptions.PublishFailure]] exception
    * which wraps the underlying exception and also provides the handle to the event which was failed to be published.
    * The provided callback is executed on the failed element and the stream resumes to publish remaining elements.
    *
@@ -62,8 +62,8 @@ trait EventPublisher {
    * Publish [[csw.messages.events.Event]] from an `eventGenerator` function, which will be executed at `every` frequency. `Cancellable` can be used to cancel
    * the execution of `eventGenerator` function.
    *
-   * At the time of invocation, in case the underlying server is not available, [[csw.services.event.exceptions.EventServerNotAvailable]] exception is thrown and the stream is
-   * stopped after logging appropriately. In all other cases of exception, the stream receives a [[csw.services.event.exceptions.PublishFailure]] exception
+   * At the time of invocation, in case the underlying server is not available, [[csw.services.event.api.exceptions.EventServerNotAvailable]] exception is thrown and the stream is
+   * stopped after logging appropriately. In all other cases of exception, the stream receives a [[csw.services.event.api.exceptions.PublishFailure]] exception
    * which wraps the underlying exception. The generator resumes to publish remaining elements in case of this exception.
    *
    * @param eventGenerator a function which can generate an event to be published at `every` frequency
@@ -76,8 +76,8 @@ trait EventPublisher {
    * Publish [[csw.messages.events.Event]] from an `eventGenerator` function, which will be executed at `every` frequency. Also, provide `onError` callback
    * for each event for which publishing failed.
    *
-   * At the time of invocation, in case the underlying server is not available, [[csw.services.event.exceptions.EventServerNotAvailable]] exception is thrown and the stream is
-   * stopped after logging appropriately. In all other cases of exception, the stream receives a [[csw.services.event.exceptions.PublishFailure]] exception
+   * At the time of invocation, in case the underlying server is not available, [[csw.services.event.api.exceptions.EventServerNotAvailable]] exception is thrown and the stream is
+   * stopped after logging appropriately. In all other cases of exception, the stream receives a [[csw.services.event.api.exceptions.PublishFailure]] exception
    * which wraps the underlying exception and also provides the handle to the event which was failed to be published.
    * The provided callback is executed on the failed element and the generator resumes to publish remaining elements.
    *

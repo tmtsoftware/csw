@@ -3,7 +3,7 @@ package csw.services.event.cli.wiring
 import akka.actor.ActorSystem
 import csw.services.event.cli.{CliApp, CommandLineRunner}
 import csw.services.event.internal.redis.RedisEventServiceFactory
-import csw.services.event.scaladsl.EventService
+import csw.services.event.api.scaladsl.EventService
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 
 class Wiring(actorSystem: ActorSystem) {

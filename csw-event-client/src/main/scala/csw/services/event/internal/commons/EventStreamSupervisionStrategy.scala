@@ -1,7 +1,7 @@
 package csw.services.event.internal.commons
 
 import akka.stream.Supervision
-import csw.services.event.exceptions.EventServerNotAvailable
+import csw.services.event.api.exceptions.EventServerNotAvailable
 
 /**
  * Use this decider for Event streams to stop the stream in case underlying server is not available and resume

@@ -20,7 +20,7 @@ import csw.messages.params.models.ObsId;
 import csw.messages.TopLevelActorMessage;
 import csw.services.command.javadsl.JCommandService;
 import csw.services.command.CommandResponseManager;
-import csw.services.event.javadsl.IEventService;
+import csw.services.event.api.javadsl.IEventService;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.logging.javadsl.ILogger;
 import csw.services.logging.javadsl.JLoggerFactory;

@@ -15,7 +15,7 @@ package csw.services
  *
  * }}}
  *
- * Using above code, you can create instance of [[csw.services.event.scaladsl.EventService]]. EventService is nothing but the factory to create publishers and subscribers.
+ * Using above code, you can create instance of [[csw.services.event.api.scaladsl.EventService]]. EventService is nothing but the factory to create publishers and subscribers.
  *
  * You can choose to use defaultPublisher in case you want to share same connection for publishing different events.
  *

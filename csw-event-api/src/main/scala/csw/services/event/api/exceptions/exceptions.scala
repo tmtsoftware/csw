@@ -1,4 +1,4 @@
-package csw.services.event.exceptions
+package csw.services.event.api.exceptions
 
 import csw.messages.events.Event
 

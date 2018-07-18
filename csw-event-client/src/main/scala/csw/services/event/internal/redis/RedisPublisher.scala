@@ -5,9 +5,9 @@ import akka.actor.Cancellable
 import akka.stream.Materializer
 import akka.stream.scaladsl.Source
 import csw.messages.events.{Event, EventKey}
-import csw.services.event.exceptions.PublishFailure
+import csw.services.event.api.exceptions.PublishFailure
+import csw.services.event.api.scaladsl.EventPublisher
 import csw.services.event.internal.commons.EventPublisherUtil
-import csw.services.event.scaladsl.EventPublisher
 import io.lettuce.core.api.async.RedisAsyncCommands
 import io.lettuce.core.{RedisClient, RedisURI}
 
@@ -18,7 +18,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
 /**
- * An implementation of [[csw.services.event.scaladsl.EventPublisher]] API which uses Redis as the provider for publishing
+ * An implementation of [[csw.services.event.api.scaladsl.EventPublisher]] API which uses Redis as the provider for publishing
  * and subscribing events.
  * @param redisURI Contains connection details for the Redis/Sentinel connections.
  * @param redisClient A redis client available from lettuce

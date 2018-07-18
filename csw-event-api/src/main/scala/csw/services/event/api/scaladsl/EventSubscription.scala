@@ -1,4 +1,4 @@
-package csw.services.event.scaladsl
+package csw.services.event.api.scaladsl
 
 import akka.Done
 

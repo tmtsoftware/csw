@@ -9,7 +9,7 @@ import csw.messages.TopLevelActorIdleMessage.Initialize
 import csw.messages.{CommandResponseManagerMessage, FromComponentLifecycleMessage, TopLevelActorMessage}
 import csw.messages.{CommandResponseManagerMessage, FromComponentLifecycleMessage}
 import csw.services.command.CommandResponseManager
-import csw.services.event.scaladsl.EventService
+import csw.services.event.api.scaladsl.EventService
 import csw.services.location.scaladsl.LocationService
 import org.mockito.Mockito._
 import org.scalatest.Matchers
