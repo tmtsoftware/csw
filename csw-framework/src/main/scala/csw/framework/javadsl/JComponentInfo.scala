@@ -1,5 +1,6 @@
 package csw.framework.javadsl
 
+import java.time.Duration
 import java.util
 
 import csw.messages.framework.{ComponentInfo, LocationServiceUsage}
@@ -7,7 +8,7 @@ import csw.messages.location.{ComponentType, Connection}
 import csw.messages.params.models.Prefix
 
 import scala.collection.JavaConverters.iterableAsScalaIterableConverter
-import scala.concurrent.duration.FiniteDuration
+import scala.compat.java8.DurationConverters.DurationOps
 
 /**
  * Helper instance for Java to create [[csw.messages.framework.ComponentInfo]]
@@ -33,7 +34,7 @@ object JComponentInfo {
       className: String,
       locationServiceUsage: LocationServiceUsage,
       connections: util.Set[Connection],
-      initializeTimeout: FiniteDuration
+      initializeTimeout: Duration
   ): ComponentInfo = ComponentInfo(
     name,
     componentType,
@@ -41,6 +42,6 @@ object JComponentInfo {
     className,
     locationServiceUsage,
     connections.asScala.toSet,
-    initializeTimeout
+    initializeTimeout.toScala
   )
 }

@@ -36,6 +36,7 @@ import csw.services.logging.javadsl.JLoggerFactory;
 import scala.concurrent.duration.FiniteDuration;
 
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -306,7 +307,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
         // If an Hcd is found as a connection, resolve its location from location service and create other
         // required worker actors required by this assembly
         if (mayBeConnection.isPresent()) {
-            CompletableFuture<Optional<AkkaLocation>> resolve = locationService.resolve(mayBeConnection.get().<AkkaLocation>of(), FiniteDuration.apply(5, TimeUnit.SECONDS));
+            CompletableFuture<Optional<AkkaLocation>> resolve = locationService.resolve(mayBeConnection.get().<AkkaLocation>of(), Duration.ofSeconds(5));
             return resolve.thenCompose((Optional<AkkaLocation> resolvedHcd) -> {
                 if (resolvedHcd.isPresent())
                     return CompletableFuture.completedFuture(resolvedHcd);
@@ -344,7 +345,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
                 .findFirst().get().<AkkaLocation>of();
 
         // #resolve-hcd-and-create-commandservice
-        CompletableFuture<Optional<AkkaLocation>> resolvedHcdLocation = locationService.resolve(hcdConnection, FiniteDuration.apply(5, TimeUnit.SECONDS));
+        CompletableFuture<Optional<AkkaLocation>> resolvedHcdLocation = locationService.resolve(hcdConnection, Duration.ofSeconds(5));
 
         CompletableFuture<JCommandService> eventualCommandService = resolvedHcdLocation.thenApply((Optional<AkkaLocation> hcdLocation) -> {
             if (hcdLocation.isPresent())

@@ -1,5 +1,6 @@
 package csw.services.location.internal
 
+import java.time.Duration
 import java.util
 import java.util.Optional
 import java.util.concurrent.CompletableFuture
@@ -15,10 +16,10 @@ import csw.services.location.models._
 import csw.services.location.scaladsl.LocationService
 
 import scala.collection.JavaConverters._
+import scala.compat.java8.DurationConverters.DurationOps
 import scala.compat.java8.FutureConverters._
 import scala.compat.java8.OptionConverters._
 import scala.concurrent.ExecutionContext
-import scala.concurrent.duration.FiniteDuration
 
 private[location] class JLocationServiceImpl(locationService: LocationService)(implicit ec: ExecutionContext)
     extends ILocationService {
@@ -35,8 +36,8 @@ private[location] class JLocationServiceImpl(locationService: LocationService)(i
   override def find[L <: Location](connection: TypedConnection[L]): CompletableFuture[Optional[L]] =
     locationService.find(connection).map(_.asJava).toJava.toCompletableFuture
 
-  override def resolve[L <: Location](connection: TypedConnection[L], within: FiniteDuration): CompletableFuture[Optional[L]] =
-    locationService.resolve(connection, within).map(_.asJava).toJava.toCompletableFuture
+  override def resolve[L <: Location](connection: TypedConnection[L], within: Duration): CompletableFuture[Optional[L]] =
+    locationService.resolve(connection, within.toScala).map(_.asJava).toJava.toCompletableFuture
 
   override def list: CompletableFuture[util.List[Location]] =
     locationService.list.map(_.asJava).toJava.toCompletableFuture

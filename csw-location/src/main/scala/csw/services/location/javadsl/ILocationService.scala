@@ -1,6 +1,6 @@
 package csw.services.location.javadsl
 
-import acyclic.skipped
+import java.time.Duration
 import java.util.Optional
 import java.util.concurrent.CompletableFuture
 import java.util.function.Consumer
@@ -13,8 +13,6 @@ import akka.stream.javadsl.Source
 import csw.messages.location._
 import csw.services.location.models._
 import csw.services.location.scaladsl.LocationService
-
-import scala.concurrent.duration.FiniteDuration
 
 /**
  * A LocationService interface to manage connections and their registrations. All operations are non-blocking.
@@ -68,7 +66,7 @@ trait ILocationService {
    * @return a CompletableFuture which completes with the resolved location if found or None otherwise. It can fail with
    *         [[csw.services.location.exceptions.RegistrationListingFailed]].
    */
-  def resolve[L <: Location](connection: TypedConnection[L], within: FiniteDuration): CompletableFuture[Optional[L]]
+  def resolve[L <: Location](connection: TypedConnection[L], within: Duration): CompletableFuture[Optional[L]]
 
   /**
    * Lists all locations registered

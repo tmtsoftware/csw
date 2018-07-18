@@ -2,7 +2,6 @@ package csw.framework.deploy.hostconfig
 
 import akka.actor.ActorSystem
 import akka.actor.CoordinatedShutdown.Reason
-import csw.framework.deploy.containercmd.cli.Options
 import csw.framework.deploy.hostconfig.cli.{ArgsParser, Options}
 import csw.framework.exceptions.{ClusterSeedsNotFound, UnableToParseOptions}
 import csw.framework.internal.configparser.ConfigParser

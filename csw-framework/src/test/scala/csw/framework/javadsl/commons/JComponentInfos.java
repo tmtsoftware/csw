@@ -5,10 +5,10 @@ import csw.messages.framework.ComponentInfo;
 import csw.messages.framework.LocationServiceUsage;
 import csw.messages.params.models.Prefix;
 import csw.services.location.javadsl.JComponentType;
-import scala.concurrent.duration.FiniteDuration;
 
+import java.time.Duration;
 import java.util.Collections;
-import java.util.concurrent.TimeUnit;
+
 
 public class JComponentInfos {
 
@@ -19,7 +19,7 @@ public class JComponentInfos {
             "csw.framework.javadsl.components.JSampleComponentBehaviorFactory",
             LocationServiceUsage.JRegisterOnly(),
             Collections.emptySet(),
-            new FiniteDuration(10, TimeUnit.SECONDS)
+            Duration.ofSeconds(10)
     );
 
     public static ComponentInfo jHcdInfoWithInitializeTimeout = JComponentInfo.from(
@@ -29,6 +29,6 @@ public class JComponentInfos {
             "csw.framework.javadsl.components.JSampleComponentBehaviorFactory",
             LocationServiceUsage.JRegisterOnly(),
             Collections.emptySet(),
-            new FiniteDuration(50, TimeUnit.MILLISECONDS)
+            Duration.ofMillis(10)
     );
 }

@@ -33,17 +33,15 @@ import csw.services.logging.javadsl.ILogger;
 import csw.services.logging.javadsl.JKeys;
 import csw.services.logging.javadsl.JLoggerFactory;
 import csw.services.logging.javadsl.JLoggingSystemFactory;
-import scala.concurrent.duration.Duration;
-import scala.concurrent.duration.FiniteDuration;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 /**
  * An example location service client application.
@@ -170,7 +168,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
         //#resolve
         // resolve connection to LocationServiceExampleComponent
         // [start LocationServiceExampleComponent after this command but before timeout]
-        FiniteDuration waitForResolveLimit = new FiniteDuration(30, TimeUnit.SECONDS);
+        Duration waitForResolveLimit = Duration.ofSeconds(30);
 
         //#log-info-map-supplier
         log.info(() -> "Attempting to resolve " + exampleConnection + " with a wait of " + waitForResolveLimit + "...", () -> {
@@ -252,7 +250,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
         //in this case track a connection for 5 seconds, after that schedule switching off the stream
         Pair pair = locationService.track(exampleConnection).toMat(Sink.ignore(), Keep.both()).run(mat);
         context().system().scheduler().scheduleOnce(
-                Duration.create(5, TimeUnit.SECONDS),
+                Duration.ofSeconds(5),
                 () -> ((KillSwitch) pair.first()).shutdown(),
                 context().system().dispatcher());
 
