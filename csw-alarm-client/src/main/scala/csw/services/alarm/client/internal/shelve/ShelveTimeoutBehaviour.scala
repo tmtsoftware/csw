@@ -1,4 +1,4 @@
-package csw.services.alarm.client.internal
+package csw.services.alarm.client.internal.shelve
 
 import java.time.temporal.ChronoField.HOUR_OF_DAY
 import java.time.temporal.ChronoUnit
@@ -7,21 +7,25 @@ import java.time.{Duration, ZoneOffset, ZonedDateTime}
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.{ActorContext, MutableBehavior, TimerScheduler}
 import csw.services.alarm.api.models.AlarmKey
-import csw.services.alarm.client.internal.AlarmTimeoutMessage.{CancelShelveTimeout, ScheduleShelveTimeout, ShelveHasTimedOut}
+import csw.services.alarm.client.internal.shelve.ShelveTimeoutMessage.{
+  CancelShelveTimeout,
+  ScheduleShelveTimeout,
+  ShelveHasTimedOut
+}
 
 import scala.compat.java8.DurationConverters.DurationOps
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 
 class ShelveTimeoutBehaviour(
-    ctx: ActorContext[AlarmTimeoutMessage],
-    timerScheduler: TimerScheduler[AlarmTimeoutMessage],
+    ctx: ActorContext[ShelveTimeoutMessage],
+    timerScheduler: TimerScheduler[ShelveTimeoutMessage],
     unShelve: AlarmKey ⇒ Future[Unit]
-) extends MutableBehavior[AlarmTimeoutMessage] {
+) extends MutableBehavior[ShelveTimeoutMessage] {
 
   private val shelveTimeoutInHourOfDay: Int = ctx.system.settings.config.getInt("shelve-timeout-hour-of-day")
 
-  override def onMessage(msg: AlarmTimeoutMessage): Behavior[AlarmTimeoutMessage] = {
+  override def onMessage(msg: ShelveTimeoutMessage): Behavior[ShelveTimeoutMessage] = {
     msg match {
       case ScheduleShelveTimeout(key) ⇒ scheduleShelveTimeout(key)
       case CancelShelveTimeout(key)   ⇒ timerScheduler.cancel(key.name)

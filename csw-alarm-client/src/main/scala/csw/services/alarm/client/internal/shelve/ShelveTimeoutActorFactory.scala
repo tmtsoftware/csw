@@ -1,4 +1,4 @@
-package csw.services.alarm.client.internal
+package csw.services.alarm.client.internal.shelve
 
 import akka.actor.ActorSystem
 import akka.actor.typed.ActorRef
@@ -9,12 +9,12 @@ import csw.services.alarm.api.models.AlarmKey
 import scala.concurrent.Future
 
 class ShelveTimeoutActorFactory {
-  def make(unshelve: AlarmKey ⇒ Future[Unit])(implicit actorSystem: ActorSystem): ActorRef[AlarmTimeoutMessage] =
+  def make(unshelve: AlarmKey ⇒ Future[Unit])(implicit actorSystem: ActorSystem): ActorRef[ShelveTimeoutMessage] =
     actorSystem.spawnAnonymous {
       Behaviors
-        .withTimers[AlarmTimeoutMessage] { timerScheduler ⇒
+        .withTimers[ShelveTimeoutMessage] { timerScheduler ⇒
           Behaviors
-            .setup[AlarmTimeoutMessage] { ctx ⇒
+            .setup[ShelveTimeoutMessage] { ctx ⇒
               new ShelveTimeoutBehaviour(ctx, timerScheduler, unshelve)
             }
         }

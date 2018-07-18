@@ -10,7 +10,10 @@ import csw.services.alarm.api.models.ShelveStatus.{Shelved, UnShelved}
 import csw.services.alarm.api.models._
 import csw.services.alarm.api.scaladsl.AlarmAdminService
 import csw.services.alarm.client.internal.AlarmTimeoutMessage.{CancelShelveTimeout, ScheduleShelveTimeout}
+import csw.services.alarm.client.internal.AutoRefreshSeverityMessage.SetSeverityAndAutoRefresh
+import csw.services.alarm.client.internal.auto_refresh.AutoRefreshSeverityActorFactory
 import csw.services.alarm.client.internal.codec.{AlarmMetadataCodec, AlarmSeverityCodec, AlarmStatusCodec}
+import csw.services.alarm.client.internal.shelve.ShelveTimeoutActorFactory
 import io.lettuce.core.api.async.RedisAsyncCommands
 import io.lettuce.core.{RedisClient, RedisURI}
 
@@ -21,7 +24,8 @@ import scala.concurrent.Future
 class AlarmServiceImpl(
     redisURI: RedisURI,
     redisClient: RedisClient,
-    shelveTimeoutActorFactory: ShelveTimeoutActorFactory
+    shelveTimeoutActorFactory: ShelveTimeoutActorFactory,
+    autoRefreshSeverityActorFactory: AutoRefreshSeverityActorFactory
 )(implicit actorSystem: ActorSystem)
     extends AlarmAdminService {
 
@@ -43,9 +47,15 @@ class AlarmServiceImpl(
   private val maxMissedRefreshCounts = actorSystem.settings.config.getInt("alarm.max-missed-refresh-counts") //default value is 3 times
   private val ttlInSeconds           = refreshInSeconds * maxMissedRefreshCounts
 
-  private lazy val shelveTimeoutRef = shelveTimeoutActorFactory.make(unShelve(_, cancelShelveTimeout = false))
+  private lazy val shelveTimeoutRef       = shelveTimeoutActorFactory.make(unShelve(_, cancelShelveTimeout = false))
+  private lazy val autoRefreshSeverityRef = autoRefreshSeverityActorFactory.make(setSeverity)
 
-  override def setSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Unit] = async {
+  override def setSeverity(key: AlarmKey, severity: AlarmSeverity, autoRefresh: Boolean): Future[Unit] = async {
+    if (autoRefresh) autoRefreshSeverityRef ! SetSeverityAndAutoRefresh(key, severity)
+    else await(setSeverity(key, severity))
+  }
+
+  private def setSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Unit] = async {
     // get alarm metadata
     val metadataApi = await(asyncMetadataApiF)
     val alarm       = await(metadataApi.get(key).toScala)
