@@ -41,6 +41,11 @@ object ValidationResponse {
    */
   case class Invalid(runId: Id, issue: CommandIssue) extends CommandResponse(Negative)
 
+  case class Invalid(runId: Id, issue: CommandIssue) extends CommandResponse(Negative) //{
+   // def this(inv: ValidationResponse.Invalid) =  this(inv.runId, inv.issue)
+  //}
+
+
   /**
     * Represents an intermediate response stating a submitted command is long-running and has started actions
     *

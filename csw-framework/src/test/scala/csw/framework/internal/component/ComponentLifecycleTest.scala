@@ -21,6 +21,8 @@ import csw.command.CommandResponseManager
 import csw.event.api.scaladsl.EventService
 import csw.messages.commands.CommandResponse.{Completed, Error}
 import csw.messages.commands.{CommandName, CommandResponse, Observe, Setup}
+import csw.messages.commands.CommandResponse.Completed
+import csw.messages.commands._
 import csw.messages.framework.ToComponentLifecycleMessages._
 import csw.messages.params.generics.KeyType
 import csw.messages.params.models.{ObsId, Prefix}
@@ -147,17 +149,14 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
       .add(KeyType.IntKey.make("encoder").set(22))
 
     when(sampleHcdHandler.validateCommand(ArgumentMatchers.any[Setup]())).thenReturn(Accepted(sc1.runId))
-
-    doNothing()
-      .when(sampleHcdHandler)
-      .onSubmit(ArgumentMatchers.any[Setup]())
+    when(sampleHcdHandler.onSubmit(ArgumentMatchers.any[Setup]())).thenReturn(Completed(sc1.runId))
 
     componentBehaviorTestKit.run(Submit(sc1, commandResponseProbe.ref))
 
     verify(sampleHcdHandler).validateCommand(sc1)
     verify(sampleHcdHandler).onSubmit(sc1)
-    commandResponseProbe.expectMessage(Accepted(sc1.runId))
-    commandStatusServiceProbe.expectMessage(AddOrUpdateCommand(sc1.runId, Accepted(sc1.runId)))
+    commandResponseProbe.expectMessage(Completed(sc1.runId))
+    commandStatusServiceProbe.expectMessage(AddOrUpdateCommand(sc1.runId, Completed(sc1.runId)))
   }
 
   test("running component should handle Oneway command") {
@@ -170,7 +169,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     val obsId: ObsId = ObsId("Obs001")
     val sc1 = Observe(Prefix("wfos.prog.cloudcover"), CommandName("wfos.prog.cloudcover"), Some(obsId))
       .add(KeyType.IntKey.make("encoder").set(22))
-
+    // A one way returns validation but is not entered into command response manager
     when(sampleHcdHandler.validateCommand(ArgumentMatchers.any[Setup]())).thenReturn(Accepted(sc1.runId))
     doNothing().when(sampleHcdHandler).onOneway(ArgumentMatchers.any[Setup]())
 
@@ -193,17 +192,14 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     val obsId: ObsId = ObsId("Obs001")
     val sc1 = Setup(Prefix("wfos.prog.cloudcover"), CommandName("wfos.prog.cloudcover"), Some(obsId))
       .add(KeyType.IntKey.make("encoder").set(22))
-
-    when(sampleHcdHandler.validateCommand(ArgumentMatchers.any[Setup]())).thenReturn(Completed(sc1.runId))
-
-    doNothing()
-      .when(sampleHcdHandler)
-      .onSubmit(ArgumentMatchers.any[Setup]())
+    // validate returns Accepted and onSubmit returns Completed
+    when(sampleHcdHandler.validateCommand(ArgumentMatchers.any[Setup]())).thenReturn(Accepted(sc1.runId))
+    when(sampleHcdHandler.onSubmit(ArgumentMatchers.any[Setup]())).thenReturn(Completed(sc1.runId))
 
     componentBehaviorTestKit.run(Submit(sc1, commandResponseProbe.ref))
 
     verify(sampleHcdHandler).validateCommand(sc1)
-    verify(sampleHcdHandler, never()).onSubmit(sc1)
+    verify(sampleHcdHandler).onSubmit(sc1)
     commandResponseProbe.expectMessage(Completed(sc1.runId))
     commandStatusServiceProbe.expectMessage(AddOrUpdateCommand(sc1.runId, Completed(sc1.runId)))
   }

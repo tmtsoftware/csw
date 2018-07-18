@@ -46,17 +46,18 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
 
   override def validateCommand(controlCommand: ControlCommand): ValidationResponse = controlCommand.commandName match {
     case `acceptedCmd`       ⇒ Accepted(controlCommand.runId)
-      /*
     case `withoutMatcherCmd` ⇒ Accepted(controlCommand.runId)
     case `matcherCmd`        ⇒ Accepted(controlCommand.runId)
     case `matcherFailedCmd`  ⇒ Accepted(controlCommand.runId)
     case `matcherTimeoutCmd` ⇒ Accepted(controlCommand.runId)
     case `cancelCmd`         ⇒ Accepted(controlCommand.runId)
+      /*
     case `immediateCmd`      ⇒ Completed(controlCommand.runId)
     case `immediateResCmd` ⇒
       CompletedWithResult(controlCommand.runId, Result(controlCommand.source, Set(KeyType.IntKey.make("encoder").set(20))))
       */
-    case `invalidCmd` ⇒ Invalid(controlCommand.runId, OtherIssue(s"Unsupported prefix: ${controlCommand.commandName}"))
+    case `invalidCmd` ⇒
+      Invalid(controlCommand.runId, OtherIssue(s"Unsupported prefix: ${controlCommand.commandName}"))
     case _            ⇒ Invalid(controlCommand.runId, WrongPrefixIssue(s"Wrong prefix: ${controlCommand.commandName}"))
   }
 

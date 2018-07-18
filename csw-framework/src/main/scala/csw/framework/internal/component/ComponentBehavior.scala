@@ -24,8 +24,9 @@ import csw.messages.RunningMessage.Lifecycle
 import csw.messages.TopLevelActorCommonMessage.{TrackingEventReceived, UnderlyingHookFailed}
 import csw.messages.TopLevelActorIdleMessage.Initialize
 import csw.messages._
-import csw.messages.commands.ValidationResponse
-import csw.messages.commands.ValidationResponse.{Accepted, Invalid}
+import csw.messages.commands.{CommandResponse, ValidationResponse}
+import csw.messages.commands.CommandResponse.Invalid
+import csw.messages.commands.ValidationResponse.Accepted
 import csw.services.command.CommandResponseManager
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
@@ -192,19 +193,25 @@ private[framework] final class ComponentBehavior(
     commandMessage match {
       case ow: Oneway ⇒ //Oneway command should not be added to CommandResponseManager
         val validationResponse = lifecycleHandlers.validateCommand(commandMessage.command)
-        if (validationResponse == Accepted) {
+        if (validationResponse == Accepted(commandMessage.command.runId)) {
           log.info(s"Invoking lifecycle handler's onOneway hook with msg :[$commandMessage]")
           lifecycleHandlers.onOneway(commandMessage.command)
         }
         ow.replyTo ! validationResponse
-      case _: Submit ⇒
-        val validationResponse = lifecycleHandlers.validateCommand(commandMessage.command)
-        commandResponseManager.commandResponseManagerActor ! AddOrUpdateCommand(commandMessage.command.runId, validationResponse)
+      case su: Submit ⇒
+        lifecycleHandlers.validateCommand(commandMessage.command) match {
+          case _:Accepted =>
+            // commandResponseManager.commandResponseManagerActor ! AddOrUpdateCommand(commandMessage.command.runId, validationResponse)
+            val response = lifecycleHandlers.onSubmit(commandMessage.command)
+            commandResponseManager.commandResponseManagerActor ! AddOrUpdateCommand(commandMessage.command.runId, response)
+            su.replyTo ! response
+          case in: ValidationResponse.Invalid =>
+            su.replyTo ! CommandResponse.Invalid(in.runId, in.issue)
+        }
     }
-    val validationResponse = lifecycleHandlers.validateCommand(commandMessage.command)
+  }
 
-
-
+    /*
     commandMessage match {
       case _: Submit ⇒
         commandResponseManager.commandResponseManagerActor ! AddOrUpdateCommand(commandMessage.command.runId, validationResponse)
@@ -216,10 +223,10 @@ private[framework] final class ComponentBehavior(
   }
 
   private def forwardCommand(commandMessage: CommandMessage /*, validationResponse: CommandResponse*/): Unit =
-  /*
+  */
+    /*
     validationResponse match {
       case Accepted(_) ⇒
-      */
         commandMessage match {
           case _: Submit ⇒
             log.info(s"Invoking lifecycle handler's onSubmit hook with msg :[$commandMessage]")
@@ -228,9 +235,9 @@ private[framework] final class ComponentBehavior(
             log.info(s"Invoking lifecycle handler's onOneway hook with msg :[$commandMessage]")
             lifecycleHandlers.onOneway(commandMessage.command)
         }
-  /*
       case _ ⇒ log.debug(s"Command not forwarded to TLA post validation. ValidationResponse was [$validationResponse]")
 
     }
     */
+
 }

@@ -42,6 +42,7 @@ import csw.messages.ContainerIdleMessage
 import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.messages.RunningMessage.Lifecycle
 import csw.messages.SupervisorContainerCommonMessages.Restart
+import csw.messages.commands.CommandResponse.Completed
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
@@ -134,7 +135,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
           DemandState(prefix, StateName("testStateName"), Set(choiceKey.set(commandValidationChoice)))
         DemandMatcher(submitSetupValidationDemandState, timeout = 5.seconds)
           .check(submitSetupValidationCurrentState) shouldBe true
-        commandValidationResponseProbe.expectMessage(Accepted(setup.runId))
+        commandValidationResponseProbe.expectMessage(Completed(setup.runId))
 
         // verify that onSubmit handler is invoked
         val submitSetupCommandCurrentState = compStateProbe.expectMessageType[CurrentState]
@@ -160,7 +161,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
           DemandState(prefix, StateName("testStateName"), Set(choiceKey.set(commandValidationChoice)))
         DemandMatcher(submitValidationDemandState, timeout = 5.seconds)
           .check(submitValidationCurrentState) shouldBe true
-        commandValidationResponseProbe.expectMessage(Accepted(observe.runId))
+        commandValidationResponseProbe.expectMessage(Completed(observe.runId))
 
         // verify that onSubmit handler is invoked
         val submitCommandCurrentState = compStateProbe.expectMessageType[CurrentState]
@@ -278,7 +279,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         val setup: Setup = Setup(prefix, CommandName("move.failure"), Some(obsId), Set(param))
 
         supervisorRef ! Submit(setup, commandResponseProbe.ref)
-        commandValidationResponseProbe.expectMessageType[Invalid]
+        commandResponseProbe.expectMessageType[CommandResponse.Invalid]
 
         supervisorRef ! Oneway(setup, commandValidationResponseProbe.ref)
         commandValidationResponseProbe.expectMessageType[Invalid]
