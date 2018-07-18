@@ -58,12 +58,15 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
 
     // get stream of latest events using the `get` API and concat it with the event stream from `subscribe_internal`
     latestEventStream
-      .watchTermination()(Keep.right)
-      .concatMat(eventStream)(Keep.both)
+      .concatMat(eventStream)(Keep.right)
+      .watchTermination()(Keep.both)
       .viaMat(KillSwitches.single)(Keep.both)
       .mapMaterializedValue {
-        case ((terminationSignal, subscriptionF), killSwitch) ⇒
+        case ((subscriptionF, terminationSignal), killSwitch) ⇒
           new EventSubscription {
+
+            terminationSignal.onComplete(_ => unsubscribe())
+
             override def unsubscribe(): Future[Done] = async {
               val commands = await(connectionF)
               await(commands.unsubscribe(eventKeys.toSeq: _*).toFuture.toScala)
@@ -126,12 +129,15 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
       Source.fromFutureSource(patternBasedReactiveConnection().flatMap(c ⇒ pSubscribe_internal(keyPattern, c)))
 
     eventStream
-      .watchTermination()(Keep.right)
-      .concatMat(eventStream)(Keep.both)
+      .concatMat(eventStream)(Keep.right)
+      .watchTermination()(Keep.both)
       .viaMat(KillSwitches.single)(Keep.both)
       .mapMaterializedValue {
-        case ((terminationSignal, subscriptionF), killSwitch) ⇒
+        case ((subscriptionF, terminationSignal), killSwitch) ⇒
           new EventSubscription {
+
+            terminationSignal.onComplete(_ => unsubscribe())
+
             override def unsubscribe(): Future[Done] = async {
               val commands = await(connectionF)
               await(commands.punsubscribe(keyPattern.toString).toFuture.toScala)
