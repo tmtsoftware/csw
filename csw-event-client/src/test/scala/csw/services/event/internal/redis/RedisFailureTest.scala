@@ -38,7 +38,7 @@ class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
     val publisher = eventService.makeNewPublisher().await
     publisher.publish(Utils.makeEvent(1)).await
 
-    publisher.shutdown().await
+    redis.stop()
 
     Thread.sleep(1000) // wait till the publisher is shutdown successfully
 
@@ -46,6 +46,9 @@ class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
     val failure = intercept[PublishFailure] {
       publisher.publish(failedEvent).await
     }
+
+    redis.start()
+
     failure.event shouldBe failedEvent
     failure.getCause shouldBe a[RedisException]
   }
