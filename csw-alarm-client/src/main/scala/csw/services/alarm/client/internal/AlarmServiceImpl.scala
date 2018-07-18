@@ -107,12 +107,12 @@ class AlarmServiceImpl(
   override def acknowledge(key: AlarmKey): Future[Unit] = async {
     val statusApi = await(asyncStatusApiF)
     val status    = await(statusApi.get(key).toScala)
+
     if (status.acknowledgementStatus == UnAcknowledged) // save the set call if status is already Acknowledged
       await(statusApi.set(key, status.copy(acknowledgementStatus = Acknowledged)).toScala)
   }
 
   override def reset(key: AlarmKey): Future[Unit] = async {
-
     val severityApi     = await(asyncSeverityApiF)
     val currentSeverity = await(severityApi.get(key).toScala)
 
@@ -132,17 +132,12 @@ class AlarmServiceImpl(
   }
 
   override def shelve(key: AlarmKey): Future[Unit] = async {
-    val severityApi     = await(asyncSeverityApiF)
-    val currentSeverity = await(severityApi.get(key).toScala)
+    val statusApi = await(asyncStatusApiF)
+    val status    = await(statusApi.get(key).toScala)
 
-    // TODO: confirm
-    if (currentSeverity.isHighRisk) {
-      val statusApi = await(asyncStatusApiF)
-      val status    = await(statusApi.get(key).toScala)
-      if (status.shelveStatus != Shelved) {
-        await(statusApi.set(key, status.copy(shelveStatus = Shelved)).toScala)
-        shelveTimeoutRef ! ScheduleShelveTimeout(key) // start shelve timeout for this alarm (default 8 AM local time)
-      }
+    if (status.shelveStatus != Shelved) {
+      await(statusApi.set(key, status.copy(shelveStatus = Shelved)).toScala)
+      shelveTimeoutRef ! ScheduleShelveTimeout(key) // start shelve timeout for this alarm (default 8 AM local time)
     }
   }
 
@@ -155,6 +150,7 @@ class AlarmServiceImpl(
     //TODO: decide whether to unshelve an alarm when it goes to okay
     val statusApi = await(asyncStatusApiF)
     val status    = await(statusApi.get(key).toScala)
+
     if (status.shelveStatus != UnShelved) {
       await(statusApi.set(key, status.copy(shelveStatus = UnShelved)).toScala)
       // if in case of manual un-shelve operation, cancel the scheduled timer for this alarm
