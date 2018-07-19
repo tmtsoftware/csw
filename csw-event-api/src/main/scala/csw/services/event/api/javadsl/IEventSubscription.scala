@@ -5,7 +5,7 @@ import java.util.concurrent.CompletableFuture
 import akka.Done
 
 /**
- * An interface to represent a subscription. On subscribing to one or more Event Keys using the [[csw.services.event.javadsl.IEventSubscriber]],
+ * An interface to represent a subscription. On subscribing to one or more Event Keys using the [[csw.services.event.api.javadsl.IEventSubscriber]],
  * the subscriber gets a handle to that particular subscription so as to perform some subscription specific tasks.
  */
 trait IEventSubscription {

@@ -11,7 +11,7 @@ import scala.concurrent.duration.FiniteDuration
 
 /**
  * An EventPublisher interface to publish events. The published events are published on a key determined by [[csw.messages.events.EventKey]]
- * in the [[csw.messages.events.Event]] model. This key can be used by the subscribers using [[csw.services.event.scaladsl.EventSubscriber]]
+ * in the [[csw.messages.events.Event]] model. This key can be used by the subscribers using [[csw.services.event.api.scaladsl.EventSubscriber]]
  * interface to subscribe to the events.
  */
 trait EventPublisher {

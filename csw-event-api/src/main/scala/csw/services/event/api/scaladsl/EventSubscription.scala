@@ -5,7 +5,7 @@ import akka.Done
 import scala.concurrent.Future
 
 /**
- * An interface to represent a subscription. On subscribing to one or more Event Keys using the [[csw.services.event.scaladsl.EventSubscriber]],
+ * An interface to represent a subscription. On subscribing to one or more Event Keys using the [[csw.services.event.api.scaladsl.EventSubscriber]],
  * the subscriber gets a handle to that particular subscription so as to perform some subscription specific tasks.
  */
 trait EventSubscription {
