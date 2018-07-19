@@ -1,6 +1,6 @@
 # csw-event-cli
 
-A command line application that facilitates interaction with Event Service. It accepts various commands to publish and subscribe to events.
+A command line application that facilitates interaction with @ref:[Event Service](./../services/event.md). It accepts various commands to publish and subscribe to events.
 
 ## Supported Commands
 
@@ -11,7 +11,7 @@ A command line application that facilitates interaction with Event Service. It a
 
 ### inspect
 
-Takes an comma separated list of events and displays event's parameter information which includes key name, key type and unit along with metadata (event key, timestamp & id).
+Takes a comma separated list of events and displays event's parameter information which includes key name, key type and unit along with metadata (event key, timestamp & id).
 
  * `-e`, `--events` : comma separated list of events to inspect
  
@@ -27,7 +27,7 @@ csw-event-cli inspect -e wfos.prog.cloudcover,wfos.prog.filter
  
 ### get
 
-Takes an comma separated list of events with nested key paths and displays event information including values either in oneline or json format.
+Takes a comma separated list of events with nested key paths and displays event information including values either in oneline or json format.
 
  * `-e`, `--events`     comma separated list of events in the form of `<event1:key1>,<event2:key2:key3>`, use `:` to separate multiple keys for same event. Ex. `-e a.b.c:struct1/ra,x.y.z:struct2/dec:epoch`
  * `-o`, `--out`        output format, default is oneline
@@ -68,7 +68,7 @@ Displays event `wfos.prog.cloudcover` with only `epcoh` key in json format.
  
 ### publish
 
-Publishes event to event server from provided input data file or cli params.
+Publishes an event to event server from provided input data file or cli params.
 
  * `-e`, `--event`      event key to publish
  * `--data`             absolute file path which contains event in json format
@@ -111,7 +111,7 @@ If no event is published in past for provided key, then new event gets created w
 
 ### subscribe
 
-Takes an comma separated list of events with nested key paths and displays continuous stream of event information as soon as it receives event. 
+Takes a comma separated list of events with nested key paths and displays continuous stream of event information as soon as it receives event. 
 
  * `-e`, `--events`     comma separated list of events in the form of `<event1:key1>,<event2:key2:key3>`, use `:` to separate multiple keys for same event. Ex. `-e a.b.c:struct1/ra,x.y.z:struct2/dec:epoch`
  * `-i`, `--interval`   interval in `<ms>`, receive an event exactly at each interval
@@ -169,7 +169,7 @@ While testing or development, in order to use this cli application, below prereq
 
 Please refer @ref:[Starting apps for development](./../commons/apps.md#starting-apps-for-development) section for more details on how to start these applications using `csw-services.sh` script.
 
-## Monitor statistic
+## Monitor statistics
 
 `Event Service` uses [redis](https://redis.io/) as a event store. Using `redis-cli`, you can monitor continuous stats about Event service.
 
@@ -187,12 +187,12 @@ keys       mem      clients blocked requests            connections
 
 In above example, new line is printed every second with useful information and the difference between the old data point. 
 
-* `keys`: Represents Event Keys
+* `keys`: Represents all the keys present in the redis database which in case of event service are EventKeys
 * `clients`: Represents total number of clients currently connected to redis server
 * `requests`: Represents total number of redis commands processed along with delta between every interval, in this case 1 second
-* `connections`: Represents total number of connections opened by redis server
+* `connections`: Represents total number of socket connections opened to redis server
 
-The -i <interval> option in this case works as a modifier in order to change the frequency at which new lines are emitted. The default is one second.
+The `-i <interval>` option in this case works as a modifier in order to change the frequency at which new lines are emitted. The default is one second.
 
 You can explicitly pass hostname and port of redis server while running `redis-cli`
 ```

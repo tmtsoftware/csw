@@ -4,10 +4,12 @@ package csw.services.event.api.scaladsl
  * The subscription mode is used to control the rate of events received by the subscriber.
  *
  * Terminology:
+ *
  * `Tick:` Refers to the exact clock tick
  * `Interval:` Refers to the duration between two ticks
  *
  * Parameter mode can have two values -
+ *
  * - [[SubscriptionModes.RateAdapterMode]]
  * - [[SubscriptionModes.RateLimiterMode]]
  *
@@ -17,7 +19,7 @@ package csw.services.event.api.scaladsl
  * ---------------------------------------------------------------------------------------------------------------------
  *                    |                                               |
  * 1. Description     | Ensures that the subscriber will receive an   | Ensures that events will be delivered as soon
- *                    | event exactly at each tick.                   | as they are generated along with the guarantee
+ *                    | event exactly at each tick.                   | as they are published along with the guarantee
  *                    |                                               | that no more than one event is delivered within
  *                    |                                               | a given interval.
  *                    |                                               |
@@ -41,7 +43,7 @@ package csw.services.event.api.scaladsl
  *                    |                                               |
  * 5. Trade offs      | Latency of events received in this mode will  | The events received will not be in
  *                    | be more than that in                          | synchronization with the subscription frequency.
- *                    | [[SubscriptionModes.RateLimiterMode]].         |
+ *                    | [[SubscriptionModes.RateLimiterMode]].        |
  *                    |                                               | Some intervals might not receive an event.
  *                    |                                               |
  *                    |                                               | Duration observed between events received might

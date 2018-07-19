@@ -173,14 +173,14 @@ public class JHcdComponentHandlers extends JComponentHandlers {
 
     //#event-publisher
     private CompletableFuture<Cancellable> startPublishingEvents() {
-        Event systemEvent = new SystemEvent(componentInfo.prefix(), new EventName("filter_wheel"));
-        return eventService.defaultPublisher().thenApply(publisher -> publisher.publish(() -> eventGenerator(systemEvent), Duration.ofMillis(100), this::onError));
+        Event baseEvent = new SystemEvent(componentInfo.prefix(), new EventName("filter_wheel"));
+        return eventService.defaultPublisher().thenApply(publisher -> publisher.publish(() -> eventGenerator(baseEvent), Duration.ofMillis(100), this::onError));
     }
 
     // this holds the logic for event generation, could be based on some computation or current state of HCD
-    private Event eventGenerator(Event initialEvent) {
+    private Event eventGenerator(Event baseEvent) {
         // add logic here to create a new event and return the same
-        return initialEvent;
+        return baseEvent;
     }
 
     private void onError(PublishFailure publishFailure) {
