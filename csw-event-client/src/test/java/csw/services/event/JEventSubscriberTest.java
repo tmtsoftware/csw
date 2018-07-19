@@ -249,7 +249,7 @@ public class JEventSubscriberTest extends TestNGSuite {
         TestProbe<Event> probe = TestProbe.create(baseProperties.typedActorSystem());
 
         // pattern is * for redis
-        IEventSubscription subscription = baseProperties.jSubscriber().pSubscribe(JSubsystem.TEST, baseProperties.eventPattern(), event -> probe.ref().tell(event));
+        IEventSubscription subscription = baseProperties.jSubscriber().pSubscribeCallback(JSubsystem.TEST, baseProperties.eventPattern(), event -> probe.ref().tell(event));
         subscription.ready().get(10, TimeUnit.SECONDS);
 
         baseProperties.jPublisher().publish(testEvent1).get(10, TimeUnit.SECONDS);
@@ -288,11 +288,11 @@ public class JEventSubscriberTest extends TestNGSuite {
         String eventPattern5 = "*";                 //subscribe to all events with prefix `test_prefix` irresepective of event names
 
         // pattern is * for redis
-        IEventSubscription subscription = baseProperties.jSubscriber().pSubscribe(JSubsystem.TEST, eventPattern, event -> inbox.getRef().tell(event));
-        IEventSubscription subscription2 = baseProperties.jSubscriber().pSubscribe(JSubsystem.TEST, eventPattern2, event -> inbox2.getRef().tell(event));
-        IEventSubscription subscription3 = baseProperties.jSubscriber().pSubscribe(JSubsystem.TEST, eventPattern3, event -> inbox3.getRef().tell(event));
-        IEventSubscription subscription4 = baseProperties.jSubscriber().pSubscribe(JSubsystem.TEST, eventPattern4, event -> inbox4.getRef().tell(event));
-        IEventSubscription subscription5 = baseProperties.jSubscriber().pSubscribe(JSubsystem.TEST, eventPattern5, event -> inbox5.getRef().tell(event));
+        IEventSubscription subscription = baseProperties.jSubscriber().pSubscribeCallback(JSubsystem.TEST, eventPattern, event -> inbox.getRef().tell(event));
+        IEventSubscription subscription2 = baseProperties.jSubscriber().pSubscribeCallback(JSubsystem.TEST, eventPattern2, event -> inbox2.getRef().tell(event));
+        IEventSubscription subscription3 = baseProperties.jSubscriber().pSubscribeCallback(JSubsystem.TEST, eventPattern3, event -> inbox3.getRef().tell(event));
+        IEventSubscription subscription4 = baseProperties.jSubscriber().pSubscribeCallback(JSubsystem.TEST, eventPattern4, event -> inbox4.getRef().tell(event));
+        IEventSubscription subscription5 = baseProperties.jSubscriber().pSubscribeCallback(JSubsystem.TEST, eventPattern5, event -> inbox5.getRef().tell(event));
 
         subscription.ready().get(10, TimeUnit.SECONDS);
         subscription2.ready().get(10, TimeUnit.SECONDS);

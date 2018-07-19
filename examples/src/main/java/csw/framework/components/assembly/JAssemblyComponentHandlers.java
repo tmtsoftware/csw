@@ -19,6 +19,7 @@ import csw.messages.location.*;
 import csw.messages.params.generics.JKeyTypes;
 import csw.messages.params.generics.Key;
 import csw.messages.params.models.Prefix;
+import csw.messages.params.models.Subsystem;
 import csw.messages.params.states.CurrentState;
 import csw.messages.params.states.StateName;
 import csw.services.command.CommandResponseManager;
@@ -61,6 +62,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     private ActorRef<DiagnosticPublisherMessages> diagnosticPublisher;
     private ActorRef<CommandResponse> commandResponseAdapter;
     private ActorRef<Event> eventHandler;
+    private CompletableFuture<IEventSubscriber> subscriberF;
 
     public JAssemblyComponentHandlers(
             akka.actor.typed.javadsl.ActorContext<TopLevelActorMessage> ctx,
@@ -85,6 +87,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
         runningHcds = new HashMap<>();
         commandResponseAdapter = TestProbe.<CommandResponse>create(ctx.getSystem()).ref();
         eventHandler = ctx.spawnAnonymous(JEventHandlerFactory.make());
+        subscriberF = eventService.defaultSubscriber();
     }
     //#jcomponent-handlers-class
 
@@ -103,9 +106,6 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
         Optional<Connection> mayBeConnection = componentInfo.getConnections().stream()
                 .filter(connection -> connection.componentId().componentType() == JComponentType.HCD)
                 .findFirst();
-
-        // retrieve default subscriber from event service
-        CompletableFuture<IEventSubscriber> subscriberF = eventService.defaultSubscriber();
 
         // If an Hcd is found as a connection, resolve its location from location service and create other
         // required worker actors required by this assembly, also subscribe to HCD's filter wheel event stream
@@ -357,4 +357,15 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
         eventualCommandService.thenAccept((jcommandService) -> hcd = jcommandService);
         // #resolve-hcd-and-create-commandservice
     }
+
+    // #event-psubscribe
+    private void subscribeToSubsystemEvents(Subsystem subsystem)  {
+        subscriberF.thenApply(subscriber -> subscriber.pSubscribeCallback(subsystem, "*", this::callback));
+    }
+    // #event-psubscribe
+
+    private void callback(Event event){
+        //do something
+    }
+
 }

@@ -54,7 +54,7 @@ Scala
 Java
 :   @@snip [JHcdComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/hcd/JHcdComponentHandlers.java) { #event-publisher }
 
-You can find complete list of API's supported by `EventPublisher` and `IEventPublisher` with detailed description of each API here: 
+You can find complete list of APIs supported by `EventPublisher` and `IEventPublisher` with detailed description of each API here: 
 
 * @scaladoc[EventPublisher](csw/services/event/scaladsl/EventPublisher)
 * @javadoc[IEventPublisher](csw/services/event/javadsl/IEventPublisher)
@@ -72,7 +72,7 @@ Java
 In above example, `eventHandler` is the actorRef which accepts events. If you need to mutate state on receiving each event, 
 then it is recommended to use this API. To use this API, you have to create an actor which takes event and then you can safely keep mutable state inside this actor.
 
-The subscription api shown above receives events as soon as they are published. However, other apis also support `interval` and `Subscription Mode` which help in controlling the rate of events received. This can cater multiple use cases for instance slow subscribers can receive events at their own speed rather than being overloaded with events to catch up with the publisher's speed.
+The subscription API shown above receives events as soon as they are published. However, other APIs also support `interval` and `Subscription Mode` which help in controlling the rate of events received. This can cater multiple use cases for instance slow subscribers can receive events at their own speed rather than being overloaded with events to catch up with the publisher's speed.
 
 
 There are two types of Subscription modes:
@@ -81,6 +81,29 @@ There are two types of Subscription modes:
 * `RateLimiterMode` which ensures that events are received as they are published along with the guarantee that no more than one event is delivered within a given interval.
 
 Read more about Subscription Mode @scaladoc[here](csw/services/event/scaladsl/SubscriptionMode)
+
+### Pattern Subscription
+
+Below example demonstrates the usage of pattern subscribe API with callback. Events with keys that match the specified pattern and belong to the given subsystem are received by the subscriber. The callback function provided is called on each event received.
+
+Scala
+:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/AssemblyComponentHandlers.scala) { #event-psubscribe }
+
+Java
+:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JAssemblyComponentHandlers.java) { #event-psubscribe }
+
+
+@@@ warning
+DO NOT include subsystem in the provided pattern. Final pattern generated will be provided pattern prepended with subsystem.
+For Ex. `pSubscribe(Subsytem.WFOS, *)` will subscribe to event keys matching pattern : `wfos.*`
+@@@ 
+
+### Event Subscription
+On subscription to event keys, you get a handle to `EventSubscription` which provides following APIs:
+
+* `unsubscribe`: On un-subscribing, the event stream is destroyed and the connection created to event server while subscription is released. 
+
+* `ready`: check if event subscription is successful or not.
 
 You can find complete list of API's supported by `EventSubscriber` and `IEventSubscriber` with detailed description of each API here: 
 

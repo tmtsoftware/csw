@@ -14,6 +14,7 @@ import csw.messages.commands._
 import csw.messages.events._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location._
+import csw.messages.params.models.Subsystem
 import csw.services.command.CommandResponseManager
 import csw.services.command.scaladsl.CommandService
 import csw.services.config.api.models.ConfigData
@@ -223,5 +224,16 @@ class AssemblyComponentHandlers(
       hcd = commandService
     }
     // #resolve-hcd-and-create-commandservice
+  }
+
+  // #event-psubscribe
+  private def subscribeToSubsystemEvents(subsystem: Subsystem) = async {
+    val subscriber = await(eventService.defaultSubscriber)
+    subscriber.pSubscribeCallback(subsystem, "*", callback)
+  }
+  // #event-psubscribe
+
+  private def callback(event: Event): Unit = {
+    //do something
   }
 }

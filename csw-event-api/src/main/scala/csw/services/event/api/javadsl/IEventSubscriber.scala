@@ -193,7 +193,7 @@ trait IEventSubscriber {
    * @param callback a consumer which defines an operation to execute on each received event
    * @return an [[csw.services.event.api.javadsl.IEventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
    */
-  def pSubscribe(subsystem: Subsystem, pattern: String, callback: Consumer[Event]): IEventSubscription
+  def pSubscribeCallback(subsystem: Subsystem, pattern: String, callback: Consumer[Event]): IEventSubscription
 
   /**
    * Get latest events for multiple Event Keys. The latest events available for the given Event Keys will be received first.
