@@ -18,6 +18,7 @@ import io.lettuce.core.api.async.RedisAsyncCommands
 import io.lettuce.core.{RedisClient, RedisURI}
 
 import scala.async.Async._
+import scala.collection.JavaConverters.iterableAsScalaIterableConverter
 import scala.compat.java8.FutureConverters.CompletionStageOps
 import scala.concurrent.Future
 
@@ -99,6 +100,26 @@ class AlarmServiceImpl(
   override def getMetadata(key: AlarmKey): Future[AlarmMetadata] = async {
     val metadataApi = await(asyncMetadataApiF)
     await(metadataApi.get(key).toScala)
+  }
+
+  override def getMetadata(
+      subSystem: Option[String],
+      componentName: Option[String],
+      alarmName: Option[String]
+  ): Future[List[AlarmMetadata]] = async {
+
+    val SEPARATOR = "."
+    val WILD_CARD = "*"
+
+    val pattern =
+    subSystem.getOrElse(WILD_CARD) + SEPARATOR +
+    componentName.getOrElse(WILD_CARD) + SEPARATOR +
+    alarmName.getOrElse(WILD_CARD)
+
+    val metadataApi = await(asyncMetadataApiF)
+    val alarmKeys   = await(metadataApi.keys(AlarmKey(pattern)).toScala).asScala.toList // e.g when None is provided for all parameters - AlarmKey("metadata.*.*.*")
+
+    await(metadataApi.mget(alarmKeys: _*).toScala).asScala.toList.map(_.getValue)
   }
 
   override def getStatus(key: AlarmKey): Future[AlarmStatus] = async {
