@@ -1,10 +1,8 @@
 package csw.services.alarm.api.models
 
 import csw.messages.params.models.Prefix
-import csw.services.alarm.api.internal.UPickleFormatAdapter
-import csw.services.alarm.api.models.AlarmKey.{METADATA_KEY_PREFIX, SEVERITY_KEY_PREFIX, STATUS_KEY_PREFIX}
-import play.api.libs.json.{Json, OFormat}
-import upickle.default.{ReadWriter ⇒ RW}
+
+import scala.language.implicitConversions
 
 /**
  * A wrapper class representing the key for an alarm e.g. nfiraos.cc.trombone.tromboneAxisLowLimitAlarm. It represents each
@@ -14,21 +12,12 @@ import upickle.default.{ReadWriter ⇒ RW}
  * @param alarmName represents the name of the alarm e.g tromboneAxisLowLimitAlarm
  */
 case class AlarmKey(source: Prefix, alarmName: AlarmName) {
-  val name = s"${source.prefix}.$alarmName"
-
-  //TODO: Consider having 3 types for these, so that codecs could be reduced to a single generics-based impl.
-  private[alarm] val metadataKey: String = METADATA_KEY_PREFIX + name
-  private[alarm] val statusKey: String   = STATUS_KEY_PREFIX + name
-  private[alarm] val severityKey: String = SEVERITY_KEY_PREFIX + name
-
+  val name                      = s"${source.prefix}.$alarmName"
   override def toString: String = name
 }
 
 object AlarmKey {
-  private val SEPARATOR           = "."
-  private val METADATA_KEY_PREFIX = "metadata."
-  private val STATUS_KEY_PREFIX   = "status."
-  private val SEVERITY_KEY_PREFIX = "severity."
+  private val SEPARATOR = "."
 
   /**
    * Create AlarmKey from the given string representation of the same
@@ -42,11 +31,19 @@ object AlarmKey {
     val strings = alarmKeyStr.splitAt(alarmKeyStr.lastIndexOf(SEPARATOR))
     new AlarmKey(Prefix(strings._1), AlarmName(strings._2.tail))
   }
+}
 
-  private[alarm] def fromMetadataKey(metadataKeyStr: String): AlarmKey = apply(metadataKeyStr.replace(METADATA_KEY_PREFIX, ""))
-  private[alarm] def fromStatusKey(statusKeyStr: String): AlarmKey     = apply(statusKeyStr.replace(STATUS_KEY_PREFIX, ""))
-  private[alarm] def fromSeverityKey(severityKeyStr: String): AlarmKey = apply(severityKeyStr.replace(SEVERITY_KEY_PREFIX, ""))
+case class MetadataKey(key: String)
+object MetadataKey {
+  implicit def fromAlarmKey(alarmKey: AlarmKey): MetadataKey = MetadataKey("metadata." + alarmKey.name)
+}
 
-  implicit val format: OFormat[AlarmKey] = Json.format[AlarmKey]
-  implicit val alarmKeyRw: RW[AlarmKey]  = UPickleFormatAdapter.playJsonToUPickle
+case class StatusKey(key: String)
+object StatusKey {
+  implicit def fromAlarmKey(alarmKey: AlarmKey): StatusKey = StatusKey("status." + alarmKey.name)
+}
+
+case class SeverityKey(key: String)
+object SeverityKey {
+  implicit def fromAlarmKey(alarmKey: AlarmKey): SeverityKey = SeverityKey("severity." + alarmKey.name)
 }

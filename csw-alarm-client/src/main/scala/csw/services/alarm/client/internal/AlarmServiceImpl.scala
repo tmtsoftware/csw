@@ -11,7 +11,7 @@ import csw.services.alarm.api.models._
 import csw.services.alarm.api.scaladsl.AlarmAdminService
 import csw.services.alarm.client.internal.auto_refresh.AutoRefreshSeverityActorFactory
 import csw.services.alarm.client.internal.auto_refresh.AutoRefreshSeverityMessage.SetSeverityAndAutoRefresh
-import csw.services.alarm.client.internal.codec.{AlarmMetadataCodec, AlarmSeverityCodec, AlarmStatusCodec}
+import csw.services.alarm.client.internal.codec.AlarmCodec
 import csw.services.alarm.client.internal.shelve.ShelveTimeoutActorFactory
 import csw.services.alarm.client.internal.shelve.ShelveTimeoutMessage.{CancelShelveTimeout, ScheduleShelveTimeout}
 import io.lettuce.core.api.async.RedisAsyncCommands
@@ -34,16 +34,16 @@ class AlarmServiceImpl(
 
   //TODO: delete Future.unit, useless here
   //TODO: inject these 3 as dependencies without Future wrapper, will simplify code
-  private lazy val asyncMetadataApiF: Future[RedisAsyncCommands[AlarmKey, AlarmMetadata]] = Future.unit
-    .flatMap(_ ⇒ redisClient.connectAsync(AlarmMetadataCodec, redisURI).toScala)
+  private lazy val asyncMetadataApiF: Future[RedisAsyncCommands[MetadataKey, AlarmMetadata]] = Future.unit
+    .flatMap(_ ⇒ redisClient.connectAsync(AlarmCodec.MetadataCodec, redisURI).toScala)
     .map(_.async())
 
-  private lazy val asyncSeverityApiF: Future[RedisAsyncCommands[AlarmKey, AlarmSeverity]] = Future.unit
-    .flatMap(_ ⇒ redisClient.connectAsync(AlarmSeverityCodec, redisURI).toScala)
+  private lazy val asyncSeverityApiF: Future[RedisAsyncCommands[SeverityKey, AlarmSeverity]] = Future.unit
+    .flatMap(_ ⇒ redisClient.connectAsync(AlarmCodec.SeverityCodec, redisURI).toScala)
     .map(_.async())
 
-  private lazy val asyncStatusApiF: Future[RedisAsyncCommands[AlarmKey, AlarmStatus]] = Future.unit
-    .flatMap(_ ⇒ redisClient.connectAsync(AlarmStatusCodec, redisURI).toScala)
+  private lazy val asyncStatusApiF: Future[RedisAsyncCommands[StatusKey, AlarmStatus]] = Future.unit
+    .flatMap(_ ⇒ redisClient.connectAsync(AlarmCodec.StatusCodec, redisURI).toScala)
     .map(_.async())
 
   private val refreshInSeconds       = actorSystem.settings.config.getInt("alarm.refresh-in-seconds") // default value is 5 seconds

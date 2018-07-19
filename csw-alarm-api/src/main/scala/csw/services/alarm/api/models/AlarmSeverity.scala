@@ -2,7 +2,7 @@ package csw.services.alarm.api.models
 
 import csw.messages.TMTSerializable
 import enumeratum.EnumEntry.Lowercase
-import enumeratum.{Enum, EnumEntry, PlayJsonEnum}
+import enumeratum.{Enum, EnumEntry}
 
 import scala.collection.immutable.IndexedSeq
 
@@ -19,7 +19,7 @@ sealed abstract class AlarmSeverity private[alarm] (val level: Int) extends Enum
   def isHighRisk: Boolean = this.level > 0
 }
 
-object AlarmSeverity extends Enum[AlarmSeverity] with PlayJsonEnum[AlarmSeverity] {
+object AlarmSeverity extends Enum[AlarmSeverity] {
 
   /**
    * Returns a sequence of all alarm severity
@@ -32,15 +32,4 @@ object AlarmSeverity extends Enum[AlarmSeverity] with PlayJsonEnum[AlarmSeverity
   case object Warning       extends AlarmSeverity(1)
   case object Major         extends AlarmSeverity(2)
   case object Critical      extends AlarmSeverity(3)
-
-  import upickle.default.{macroRW, ReadWriter ⇒ RW}
-
-  implicit def alarmSeverityRw: RW[AlarmSeverity] = RW.merge(
-    macroRW[AlarmSeverity.Disconnected.type],
-    macroRW[AlarmSeverity.Indeterminate.type],
-    macroRW[AlarmSeverity.Okay.type],
-    macroRW[AlarmSeverity.Warning.type],
-    macroRW[AlarmSeverity.Major.type],
-    macroRW[AlarmSeverity.Critical.type]
-  )
 }
