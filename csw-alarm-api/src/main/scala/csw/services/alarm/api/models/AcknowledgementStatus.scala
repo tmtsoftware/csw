@@ -15,6 +15,9 @@ sealed abstract class AcknowledgementStatus extends EnumEntry with Lowercase wit
   def name: String = entryName
 }
 
+//TODO: remove play-json
+//TODO: use enum helper for upickle
+//TODO: use a single file for all pickles
 object AcknowledgementStatus extends Enum[AcknowledgementStatus] with PlayJsonEnum[AcknowledgementStatus] {
 
   /**

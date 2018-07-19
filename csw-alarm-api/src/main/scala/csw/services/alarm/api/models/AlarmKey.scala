@@ -16,6 +16,7 @@ import upickle.default.{ReadWriter ⇒ RW}
 case class AlarmKey(source: Prefix, alarmName: AlarmName) {
   val name = s"${source.prefix}.$alarmName"
 
+  //TODO: Consider having 3 types for these, so that codecs could be reduced to a single generics-based impl.
   private[alarm] val metadataKey: String = name + METADATA_KEY_SUFFIX
   private[alarm] val statusKey: String   = name + STATUS_KEY_SUFFIX
   private[alarm] val severityKey: String = name + SEVERITY_KEY_SUFFIX

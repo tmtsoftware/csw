@@ -15,6 +15,8 @@ sealed abstract class ActivationStatus extends EnumEntry with Lowercase with TMT
   def name: String = entryName
 }
 
+//TODO: remove play-json
+//TODO: use enum helper for upickle
 object ActivationStatus extends Enum[ActivationStatus] with PlayJsonEnum[ActivationStatus] {
 
   /**

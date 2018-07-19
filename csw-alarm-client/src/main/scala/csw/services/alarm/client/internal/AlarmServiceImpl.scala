@@ -31,6 +31,8 @@ class AlarmServiceImpl(
 
   import actorSystem.dispatcher
 
+  //TODO: delete Future.unit, useless here
+  //TODO: inject these 3 as dependencies without Future wrapper, will simplify code
   private lazy val asyncMetadataApiF: Future[RedisAsyncCommands[AlarmKey, AlarmMetadata]] = Future.unit
     .flatMap(_ ⇒ redisClient.connectAsync(AlarmMetadataCodec, redisURI).toScala)
     .map(_.async())

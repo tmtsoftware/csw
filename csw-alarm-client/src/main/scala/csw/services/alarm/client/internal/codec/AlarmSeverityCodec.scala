@@ -23,6 +23,8 @@ object AlarmSeverityCodec extends RedisCodec[AlarmKey, AlarmSeverity] {
 
   override def decodeValue(byteBuf: ByteBuffer): AlarmSeverity =
     try {
+      //TODO: use explicit null check rather than exception?
+      //TODO: should we do this check for all codecs including events?
       read[AlarmSeverity](utf8StringCodec.decodeValue(byteBuf))
     } catch {
       case NonFatal(_) ⇒ AlarmSeverity.Disconnected // if severity expires than cast the null returned value to Disconnected

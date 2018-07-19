@@ -2,6 +2,7 @@ package csw.services.alarm.api.exceptions
 
 import csw.services.alarm.api.models.{AlarmKey, AlarmSeverity}
 
+//TODO: Use tripe quotes in string
 case class InvalidSeverityException(key: AlarmKey, supportedSeverities: List[AlarmSeverity], invalidSeverity: AlarmSeverity)
     extends RuntimeException(
       s"Attempt to set invalid severity [${invalidSeverity.name}] for alarm [${key.name}]. " +
