@@ -4,9 +4,9 @@ The Event Service implements the [publish/subscribe messaging paradigm](https://
 The advantage of this type of message system is that publishers and subscribers are decoupled. This decoupling of publishers and subscribers can allow for greater scalability and a more dynamic network topology.
 Publishers can publish regardless of whether there are subscribers, and subscribers can subscribe even if there are no publishers. The relationship between publishers and subscribers can be one-to-one, one-to-many, many to one, or even many-to-many. 
 
-Event Service is optimized for the high performance requirements of event streams which support multiple streams with varying rates, for ex. 100 Hz, 50 Hz etc. In the TMT control system Event Streams are created as an output of a calculation by one component for the input to a calculation in one or more other components. Event streams often consist of events that are published at a specific rate. These events are transient, historical events are not stored/persisted. 
+Event Service is optimized for the high performance requirements of event streams which support multiple streams with varying rates, for ex. 100 Hz, 50 Hz etc. In the TMT control system event streams are created as an output of a calculation by one component for the input to a calculation in one or more other components. Event streams often consist of events that are published at a specific rate. These events are transient, historical events are not stored/persisted. 
 
-The Event Service provides an API that allows events to be created and published as well as allows clients to subscribe and unsubscribe to specific types of events.
+The Event Service provides an API that allows @ref:[Event](./../messages/events.md)s to be created and published as well as allows clients to subscribe and unsubscribe to specific types of events.
 
 ## Dependencies
 
@@ -56,8 +56,8 @@ Java
 
 You can find complete list of APIs supported by `EventPublisher` and `IEventPublisher` with detailed description of each API here: 
 
-* @scaladoc[EventPublisher](csw/services/event/scaladsl/EventPublisher)
-* @javadoc[IEventPublisher](csw/services/event/javadsl/IEventPublisher)
+* @scaladoc[EventPublisher](csw/services/event/api/scaladsl/EventPublisher)
+* @javadoc[IEventPublisher](csw/services/event/api/javadsl/IEventPublisher)
 
 ## Usage of EventSubscriber
 
@@ -80,7 +80,7 @@ There are two types of Subscription modes:
 * `RateAdapterMode` which ensures that an event is received exactly at each tick of the specified interval.
 * `RateLimiterMode` which ensures that events are received as they are published along with the guarantee that no more than one event is delivered within a given interval.
 
-Read more about Subscription Mode @scaladoc[here](csw/services/event/scaladsl/SubscriptionMode)
+Read more about Subscription Mode @scaladoc[here](csw/services/event/api/scaladsl/SubscriptionMode)
 
 ### Pattern Subscription
 
@@ -107,5 +107,5 @@ On subscription to event keys, you get a handle to `EventSubscription` which pro
 
 You can find complete list of API's supported by `EventSubscriber` and `IEventSubscriber` with detailed description of each API here: 
 
-* @scaladoc[EventSubscriber](csw/services/event/scaladsl/EventSubscriber)
-* @javadoc[IEventSubscriber](csw/services/event/javadsl/IEventSubscriber)
+* @scaladoc[EventSubscriber](csw/services/event/api/scaladsl/EventSubscriber)
+* @javadoc[IEventSubscriber](csw/services/event/api/javadsl/IEventSubscriber)
