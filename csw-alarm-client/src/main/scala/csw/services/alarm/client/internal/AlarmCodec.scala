@@ -16,8 +16,8 @@ class AlarmCodec[K: ReadWriter, V: ReadWriter] extends RedisCodec[K, V] {
   override def encodeKey(key: K): ByteBuffer     = utf8StringCodec.encodeKey(writeJs(key).str)
   override def decodeKey(byteBuf: ByteBuffer): K = read[K](Js.Str(utf8StringCodec.decodeKey(byteBuf)))
 
-  override def encodeValue(alarmMetadata: V): ByteBuffer = utf8StringCodec.encodeValue(write(alarmMetadata))
-  override def decodeValue(byteBuf: ByteBuffer): V       = read[V](utf8StringCodec.decodeValue(byteBuf))
+  override def encodeValue(value: V): ByteBuffer   = utf8StringCodec.encodeValue(write(value))
+  override def decodeValue(byteBuf: ByteBuffer): V = read[V](utf8StringCodec.decodeValue(byteBuf))
 }
 
 object AlarmCodec extends AlarmRW {
