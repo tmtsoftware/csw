@@ -1,8 +1,11 @@
 package csw.params.commands
 
-import csw.params.TMTSerializable
-import csw.params.commands.CommandResultType.{Intermediate, Negative, Positive}
-import csw.params.core.models.Id
+import akka.NotUsed
+import akka.stream.Materializer
+import akka.stream.scaladsl.Source
+import csw.messages.TMTSerializable
+import csw.messages.commands.CommandResultType.{Intermediate, Negative, Positive}
+import csw.messages.params.models.Id
 import enumeratum._
 
 import scala.collection.immutable
@@ -27,19 +30,25 @@ sealed abstract class ValidationResponse(val resultType: CommandResultType) exte
 object ValidationResponse {
 
   /**
-   * Represents an intermediate response stating acceptance of a command received
-   *
-   * @param runId the runId of command for which this response is created
-   */
-  case class Accepted(runId: Id) extends CommandResponse(Intermediate)
+    * Represents an intermediate response stating acceptance of a command received
+    *
+    * @param runId the runId of command for which this response is created
+    */
+  case class Accepted(runId: Id) extends ValidationResponse(Intermediate)
 
   /**
-   * Represents a negative response invalidating a command received
-   *
-   * @param runId of command for which this response is created
-   * @param issue describing the cause of invalidation
-   */
-  case class Invalid(runId: Id, issue: CommandIssue) extends CommandResponse(Negative)
+    * Represents a negative response invalidating a command received
+    *
+    * @param runId of command for which this response is created
+    * @param issue describing the cause of invalidation
+    */
+  case class Invalid(runId: Id, issue: CommandIssue) extends ValidationResponse(Negative)
+
+}
+
+
+sealed abstract class CommandResponse(val resultType: CommandResultType) extends CommandResponseBase
+object CommandResponse {
 
   case class Invalid(runId: Id, issue: CommandIssue) extends CommandResponse(Negative) //{
    // def this(inv: ValidationResponse.Invalid) =  this(inv.runId, inv.issue)
@@ -178,3 +187,65 @@ object CommandResultType extends Enum[CommandResultType] {
   case object Negative extends Final
 
 }
+
+object Responses {
+  sealed abstract class LockResponse()
+  object LockResponse
+  {
+    case class Locked(runId: Id) extends LockResponse
+  }
+
+  sealed abstract class OnewayResponse() extends LockResponse with TMTSerializable
+  object OnewayResponse {
+    import LockResponse._
+    case class Invalid(runId: Id, issue: CommandIssue) extends OnewayResponse
+    case class Accepted(runId: Id) extends OnewayResponse
+    case class NotAllowed(runId: Id, issue: CommandIssue) extends OnewayResponse
+  }
+
+  sealed abstract class ValidationResponse() extends TMTSerializable
+  object ValidationResponse {
+    case class Invalid(runId: Id, issue: CommandIssue) extends ValidationResponse
+    case class Accepted(runId: Id) extends ValidationResponse
+  }
+
+  sealed abstract class SubmitResponse() extends TMTSerializable
+  object SubmitResponse {
+    case class Invalid(runId: Id, issue: CommandIssue) extends SubmitResponse
+
+    case class Started(runId: Id) extends SubmitResponse
+
+    case class CompletedWithResult(runId: Id, result: Result) extends SubmitResponse
+
+    case class Completed(runId: Id) extends SubmitResponse
+    case class Error(runId: Id, message: String) extends SubmitResponse
+
+    case class Cancelled(runId: Id) extends SubmitResponse
+  }
+
+  def oneway():OnewayResponse = {
+    import OnewayResponse._
+    val x = Locked(Id())
+    x
+  }
+}
+
+object Test2 {
+  sealed abstract class BasicResponse() extends TMTSerializable
+
+
+  trait FResult[A <: BasicResponse] {
+    def runId:Id
+  }
+
+  case class Started(runId: Id) extends BasicResponse
+
+  object Ended extends FResult[Started] {
+
+  }
+
+
+
+}
+
+
