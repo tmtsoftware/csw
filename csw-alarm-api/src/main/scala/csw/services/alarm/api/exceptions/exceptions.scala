@@ -12,3 +12,5 @@ case class ResetOperationFailedException(key: AlarmKey, currentSeverity: AlarmSe
     extends RuntimeException(
       s"Attempt to reset alarm [${key.name}] has failed because current severity is set to [${currentSeverity.name}]."
     )
+
+case object NoAlarmsFoundException extends RuntimeException("No alarms found")

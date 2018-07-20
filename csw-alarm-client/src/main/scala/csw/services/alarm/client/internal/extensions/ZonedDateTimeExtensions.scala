@@ -1,4 +1,4 @@
-package csw.services.alarm.client.internal
+package csw.services.alarm.client.internal.extensions
 
 import java.time.temporal.ChronoUnit
 import java.time.{ZoneOffset, ZonedDateTime}
@@ -6,7 +6,7 @@ import java.time.{ZoneOffset, ZonedDateTime}
 import scala.compat.java8.DurationConverters.DurationOps
 import scala.concurrent.duration.FiniteDuration
 
-object Extensions {
+object ZonedDateTimeExtensions {
 
   implicit class RichZonedDateTime(value: ZonedDateTime) {
     def -(targetDate: ZonedDateTime): FiniteDuration = {

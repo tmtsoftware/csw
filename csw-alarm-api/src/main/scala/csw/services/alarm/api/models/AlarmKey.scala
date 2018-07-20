@@ -13,3 +13,10 @@ case class AlarmKey(subsystem: String, component: String, name: String) {
   private val key               = s"$subsystem$SEPARATOR$component$SEPARATOR$name"
   override def toString: String = key
 }
+
+object AlarmKey {
+  private[alarm] def withPattern(subsystem: Option[String], component: Option[String], alarmName: Option[String]): AlarmKey = {
+    val WILD_CARD = "*"
+    AlarmKey(subsystem.getOrElse(WILD_CARD), component.getOrElse(WILD_CARD), alarmName.getOrElse(WILD_CARD))
+  }
+}
