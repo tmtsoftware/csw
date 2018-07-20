@@ -13,6 +13,11 @@ package csw.services.event.api.scaladsl
  * - [[SubscriptionModes.RateAdapterMode]]
  * - [[SubscriptionModes.RateLimiterMode]]
  *
+ * These two modes can be accessed  in Java as:
+ *
+ * - [[SubscriptionModes.jRateAdapterMode]]
+ * - [[SubscriptionModes.jRateLimiterMode]]
+ *
  * {{{
  * ---------------------------------------------------------------------------------------------------------------------
  *                    |                 Rate Adapter                  |                 Rate Limiter
@@ -58,9 +63,28 @@ sealed trait SubscriptionMode
  * Refer to documentation for [[csw.services.event.api.scaladsl.SubscriptionMode]] for more details.
  */
 object SubscriptionModes {
+
+  /**
+   * Subscription mode to adjust the rate in which subscribed events arrive.
+   * See [[csw.services.event.api.scaladsl.SubscriptionMode]] for more details.
+   */
   case object RateAdapterMode extends SubscriptionMode
+
+  /**
+   * Subscription mode to limit the rate in which subscribed events arrive.
+   * See [[csw.services.event.api.scaladsl.SubscriptionMode]] for more details.
+   */
   case object RateLimiterMode extends SubscriptionMode
 
+  /**
+   * Subscription mode for Java to adjust the rate in which subscribed events arrive.
+   * See [[csw.services.event.api.scaladsl.SubscriptionMode]] for more details.
+   */
   val jRateAdapterMode: SubscriptionMode = RateAdapterMode
+
+  /**
+   * Subscription mode for Java to limit the rate in which subscribed events arrive.
+   * See [[csw.services.event.api.scaladsl.SubscriptionMode]] for more details.
+   */
   val jRateLimiterMode: SubscriptionMode = RateLimiterMode
 }
