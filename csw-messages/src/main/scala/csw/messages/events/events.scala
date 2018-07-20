@@ -10,7 +10,7 @@ import csw_protobuf.parameter.PbParameter
 import scalapb.TypeMapper
 
 /**
- * Common trait representing events in TMT like SystemEvent and ObserveEvent
+ * Common trait representing events in TMT like [[csw.messages.events.SystemEvent]] and [[csw.messages.events.ObserveEvent]]
  */
 sealed trait Event { self: ParameterSetType[_] ⇒
 
