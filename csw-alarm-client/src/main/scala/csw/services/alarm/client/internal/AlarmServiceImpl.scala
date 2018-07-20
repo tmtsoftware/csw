@@ -74,19 +74,19 @@ class AlarmServiceImpl(
   override def getMetadata(key: AlarmKey): Future[AlarmMetadata] = metadataApi.get(key).toScala
 
   override def getMetadata(
-      subSystem: Option[String],
+      subsystem: Option[String],
       componentName: Option[String],
       alarmName: Option[String]
   ): Future[List[AlarmMetadata]] = async {
-    val SEPARATOR = "."
     val WILD_CARD = "*"
 
-    val pattern =
-    subSystem.getOrElse(WILD_CARD) + SEPARATOR +
-    componentName.getOrElse(WILD_CARD) + SEPARATOR +
-    alarmName.getOrElse(WILD_CARD)
+    val patternBasedAlarmKey = AlarmKey(
+      subsystem.getOrElse(WILD_CARD),
+      componentName.getOrElse(WILD_CARD),
+      alarmName.getOrElse(WILD_CARD)
+    )
 
-    val alarmKeys = await(metadataApi.keys(AlarmKey(pattern)).toScala).asScala.toList // e.g when None is provided for all parameters - AlarmKey("metadata.*.*.*")
+    val alarmKeys = await(metadataApi.keys(patternBasedAlarmKey).toScala).asScala.toList // e.g when None is provided for all parameters - AlarmKey("metadata.*.*.*")
     await(metadataApi.mget(alarmKeys: _*).toScala).asScala.toList.map(_.getValue)
   }
 

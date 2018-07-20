@@ -1,6 +1,5 @@
 package csw.services.alarm.api.models
 
-import csw.messages.TMTSerializable
 import enumeratum.EnumEntry.Lowercase
 import enumeratum.{Enum, EnumEntry}
 
@@ -10,7 +9,7 @@ import scala.collection.immutable.IndexedSeq
  * Represents a type of the Alarm. It should be serializable since it has to be transmittable over the network.
  * The type will always be represented in lower case.
  */
-sealed abstract class AlarmType extends EnumEntry with Lowercase with TMTSerializable {
+sealed abstract class AlarmType extends EnumEntry with Lowercase {
 
   /**
    * The name of AlarmType e.g. for Absolute type of alarms, the name will be represented as `absolute`

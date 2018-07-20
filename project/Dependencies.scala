@@ -184,6 +184,7 @@ object Dependencies {
   val AlarmClient = Seq(
     Libs.`lettuce`,
     Libs.`scala-async`,
+    Libs.`scala-java8-compat`,
     Akka.`akka-actor-typed`
   )
 

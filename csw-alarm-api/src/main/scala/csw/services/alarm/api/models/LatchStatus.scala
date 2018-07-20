@@ -1,12 +1,11 @@
 package csw.services.alarm.api.models
 
-import csw.messages.TMTSerializable
 import enumeratum.EnumEntry.Lowercase
 import enumeratum.{Enum, EnumEntry}
 
 import scala.collection.immutable.IndexedSeq
 
-sealed abstract class LatchStatus extends EnumEntry with Lowercase with TMTSerializable {
+sealed abstract class LatchStatus extends EnumEntry with Lowercase {
 
   /**
    * The name of LatchStatus e.g. for Latched status, the name will be represented as `latched`
