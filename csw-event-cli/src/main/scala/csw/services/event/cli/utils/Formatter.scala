@@ -17,7 +17,8 @@ case class OnelineFormatter(options: Options) {
   def format(event: Event, lines: List[Oneline]): String = {
     lines
       .map { line =>
-        if (options.printValues && options.printUnits) line.withValuesAndUnits()
+        if (options.terse) line.terse()
+        else if (options.printValues && options.printUnits) line.withValuesAndUnits()
         else if (options.printValues) line.withValues()
         else line.withKeyTypeAndUnits()
       }
@@ -44,7 +45,8 @@ case class Oneline(path: String, param: Parameter[_]) {
       case _         ⇒ param.values
     }
 
-    paramValues.mkString("[", ", ", "]")
+    //paramValues.mkString("[", ", ", "]")
+    paramValues.mkString(", ")
   }
 
   private def unitStr = List(param.units).mkString("[", "", "]")
@@ -57,4 +59,6 @@ case class Oneline(path: String, param: Parameter[_]) {
     val str = s"${param.keyType}$unitStr"
     List(path, str).mkString(onelineSeparator)
   }
+
+  def terse(): String = values
 }

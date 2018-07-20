@@ -8,8 +8,17 @@ import csw.services.event.cli.args.Options
 
 class EventOnelineTransformer(options: Options) {
 
-  def transform(events: Seq[Event]): List[String] =
-    Formatter.eventSeparator :: events.flatMap(e ⇒ transform(e)).toList
+  def transform(events: Seq[Event]): List[String] = {
+    if (options.terse) events.flatMap(e => transformTerse(e)).toList
+    else Formatter.eventSeparator :: events.flatMap(e ⇒ transform(e)).toList
+  }
+  def transformTerse(event: Event): List[String] = {
+    val onelineFormatter = OnelineFormatter(options)
+    val onelines =
+      if (event.isInvalid) Formatter.invalidKey(event.eventKey)
+      else onelineFormatter.format(event, traverse(event.paramSet, options.paths(event.eventKey)))
+    List(onelines)
+  }
 
   def transform(event: Event): List[String] = {
     val onelineFormatter = OnelineFormatter(options)

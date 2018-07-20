@@ -19,7 +19,7 @@ class ArgsParser(name: String) {
     cmd("get")
       .action((_, c) => c.copy(cmd = "get"))
       .text("returns event")
-      .children(eventkeysWithPath, out, timestamp, id, units)
+      .children(eventkeysWithPath, out, timestamp, id, units, terse)
 
     cmd("publish")
       .action((_, c) => c.copy(cmd = "publish"))

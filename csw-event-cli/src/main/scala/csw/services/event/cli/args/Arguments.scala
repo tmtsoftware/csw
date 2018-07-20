@@ -108,4 +108,9 @@ trait Arguments { self: OptionParser[Options] =>
     opt[Unit]('u', "units")
       .action((_, c) => c.copy(printUnits = true))
       .text("display units")
+
+  def terse: OptionDef[Unit, Options] =
+    opt[Unit]("terse")
+      .action((_, c) => c.copy(terse = true))
+      .text("terse mode (display value only)")
 }
