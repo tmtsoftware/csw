@@ -9,5 +9,5 @@ sealed trait AutoRefreshSeverityMessage {
 
 object AutoRefreshSeverityMessage {
   case class SetSeverityAndAutoRefresh(key: AlarmKey, severity: AlarmSeverity) extends AutoRefreshSeverityMessage
-  case class SetSeverity(key: AlarmKey, severity: AlarmSeverity)               extends AutoRefreshSeverityMessage
+  case class RefreshSeverity(key: AlarmKey, severity: AlarmSeverity)           extends AutoRefreshSeverityMessage
 }

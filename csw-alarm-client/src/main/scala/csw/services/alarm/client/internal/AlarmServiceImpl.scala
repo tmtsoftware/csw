@@ -37,7 +37,7 @@ class AlarmServiceImpl(
   private val maxMissedRefreshCounts = actorSystem.settings.config.getInt("alarm.max-missed-refresh-counts") //default value is 3 times
   private val ttlInSeconds           = refreshInSeconds * maxMissedRefreshCounts
 
-  private lazy val shelveTimeoutRef = shelveTimeoutActorFactory.make(unShelve(_, cancelShelveTimeout = false))
+  private lazy val shelveTimeoutRef = shelveTimeoutActorFactory.make(key ⇒ unShelve(key, cancelShelveTimeout = false))
 
   override def setSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Unit] = async {
     // get alarm metadata

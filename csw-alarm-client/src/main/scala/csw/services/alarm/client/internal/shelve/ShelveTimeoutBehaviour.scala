@@ -12,12 +12,10 @@ import csw.services.alarm.client.internal.shelve.ShelveTimeoutMessage.{
   ShelveHasTimedOut
 }
 
-import scala.concurrent.Future
-
 class ShelveTimeoutBehaviour(
     ctx: ActorContext[ShelveTimeoutMessage],
     timerScheduler: TimerScheduler[ShelveTimeoutMessage],
-    unShelve: AlarmKey ⇒ Future[Unit]
+    alarm: UnShelvable
 ) extends MutableBehavior[ShelveTimeoutMessage] {
 
   private val shelveTimeoutHour: Int = ctx.system.settings.config.getInt("alarm.shelve-timeout-hour-of-day")
@@ -26,7 +24,7 @@ class ShelveTimeoutBehaviour(
     msg match {
       case ScheduleShelveTimeout(key) ⇒ scheduleShelveTimeout(key)
       case CancelShelveTimeout(key)   ⇒ timerScheduler.cancel(key.name)
-      case ShelveHasTimedOut(key)     ⇒ unShelve(key)
+      case ShelveHasTimedOut(key)     ⇒ alarm.unShelve(key)
     }
     this
   }

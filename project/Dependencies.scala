@@ -185,7 +185,8 @@ object Dependencies {
     Libs.`lettuce`,
     Libs.`scala-async`,
     Libs.`scala-java8-compat`,
-    Akka.`akka-actor-typed`
+    Akka.`akka-actor-typed`,
+    Akka.`akka-stream`
   )
 
   val Commons = Seq(
