@@ -2,7 +2,7 @@ package csw.services.alarm.api.models
 
 import csw.messages.TMTSerializable
 import enumeratum.EnumEntry.Lowercase
-import enumeratum.{Enum, EnumEntry, PlayJsonEnum}
+import enumeratum.{Enum, EnumEntry}
 
 import scala.collection.immutable.IndexedSeq
 
@@ -18,7 +18,7 @@ sealed abstract class AlarmType extends EnumEntry with Lowercase with TMTSeriali
   def name: String = entryName
 }
 
-object AlarmType extends Enum[AlarmType] with PlayJsonEnum[AlarmType] {
+object AlarmType extends Enum[AlarmType] {
 
   /**
    * Returns a sequence of all alarm types
@@ -36,20 +36,4 @@ object AlarmType extends Enum[AlarmType] with PlayJsonEnum[AlarmType] {
   case object Safety       extends AlarmType
   case object Statistical  extends AlarmType
   case object System       extends AlarmType
-
-  import upickle.default.{macroRW, ReadWriter ⇒ RW}
-
-  implicit def alarmTypeRw: RW[AlarmType] = RW.merge(
-    macroRW[AlarmType.Absolute.type],
-    macroRW[AlarmType.BitPattern.type],
-    macroRW[AlarmType.Calculated.type],
-    macroRW[AlarmType.Deviation.type],
-    macroRW[AlarmType.Discrepancy.type],
-    macroRW[AlarmType.Instrument.type],
-    macroRW[AlarmType.RateChange.type],
-    macroRW[AlarmType.RecipeDriven.type],
-    macroRW[AlarmType.Safety.type],
-    macroRW[AlarmType.Statistical.type],
-    macroRW[AlarmType.System.type]
-  )
 }

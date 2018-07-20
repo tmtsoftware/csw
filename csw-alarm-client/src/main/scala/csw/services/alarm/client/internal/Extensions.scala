@@ -19,8 +19,8 @@ object Extensions {
 
     val TWENTY_HOUR_FORMAT_MAX_LIMIT = 23
     val TWENTY_HOUR_FORMAT_MIN_LIMIT = 0
-    val TWELEVE_FORMAT_MAX_LIMIT     = 12
-    val TWELEVE_FORMAT_MIN_LIMIT     = 1
+    val TWELVE_FORMAT_MAX_LIMIT      = 12
+    val TWELVE_FORMAT_MIN_LIMIT      = 1
 
     /**
      * Converts an integer to ZonedDateTime with UTC offset
@@ -31,11 +31,11 @@ object Extensions {
     }
 
     def am: ZonedDateTime = {
-      hourOfDay(TWELEVE_FORMAT_MIN_LIMIT, TWELEVE_FORMAT_MAX_LIMIT)
+      hourOfDay(TWELVE_FORMAT_MIN_LIMIT, TWELVE_FORMAT_MAX_LIMIT)
     }
 
     def pm: ZonedDateTime = {
-      hourOfDay(TWELEVE_FORMAT_MIN_LIMIT, TWELEVE_FORMAT_MAX_LIMIT).plusHours(12)
+      hourOfDay(TWELVE_FORMAT_MIN_LIMIT, TWELVE_FORMAT_MAX_LIMIT).plusHours(12)
     }
 
     private def hourOfDay(minHour: Int, maxHour: Int) = {

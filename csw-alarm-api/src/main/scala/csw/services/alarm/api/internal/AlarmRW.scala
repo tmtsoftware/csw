@@ -14,4 +14,10 @@ trait AlarmRW {
   implicit val alarmMetadataRW: RW[AlarmMetadata] = macroRW
   implicit val alarmStatusRW: RW[AlarmStatus]     = macroRW
   implicit val alarmSeverityRW: RW[AlarmSeverity] = EnumUpickleSupport.enumFormat
+
+  implicit val acknowledgementStatusRW: RW[AcknowledgementStatus] = EnumUpickleSupport.enumFormat
+  implicit val activationStatusRW: RW[ActivationStatus]           = EnumUpickleSupport.enumFormat
+  implicit val alarmTypeRW: RW[AlarmType]                         = EnumUpickleSupport.enumFormat
+  implicit val latchStatusRW: RW[LatchStatus]                     = EnumUpickleSupport.enumFormat
+  implicit val shelveStatusRW: RW[ShelveStatus]                   = EnumUpickleSupport.enumFormat
 }

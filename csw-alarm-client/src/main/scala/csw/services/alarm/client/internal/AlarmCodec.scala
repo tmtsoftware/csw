@@ -1,8 +1,8 @@
-package csw.services.alarm.client.internal.codec
+package csw.services.alarm.client.internal
 
 import java.nio.ByteBuffer
 
-import csw.services.alarm.api.internal.AlarmRW
+import csw.services.alarm.api.internal.{AlarmRW, MetadataKey, SeverityKey, StatusKey}
 import csw.services.alarm.api.models._
 import io.lettuce.core.codec.{RedisCodec, Utf8StringCodec}
 import ujson.Js

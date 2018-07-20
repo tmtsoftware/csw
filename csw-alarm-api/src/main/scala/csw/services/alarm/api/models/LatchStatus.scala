@@ -2,8 +2,7 @@ package csw.services.alarm.api.models
 
 import csw.messages.TMTSerializable
 import enumeratum.EnumEntry.Lowercase
-import enumeratum.{Enum, EnumEntry, PlayJsonEnum}
-import upickle.default.{macroRW, ReadWriter ⇒ RW}
+import enumeratum.{Enum, EnumEntry}
 
 import scala.collection.immutable.IndexedSeq
 
@@ -15,7 +14,7 @@ sealed abstract class LatchStatus extends EnumEntry with Lowercase with TMTSeria
   def name: String = entryName
 }
 
-object LatchStatus extends Enum[LatchStatus] with PlayJsonEnum[LatchStatus] {
+object LatchStatus extends Enum[LatchStatus] {
 
   /**
    * Returns a sequence of all alarm types
@@ -24,9 +23,4 @@ object LatchStatus extends Enum[LatchStatus] with PlayJsonEnum[LatchStatus] {
 
   case object UnLatched extends LatchStatus
   case object Latched   extends LatchStatus
-
-  implicit def latchStatusRw: RW[LatchStatus] = RW.merge(
-    macroRW[LatchStatus.UnLatched.type],
-    macroRW[LatchStatus.Latched.type]
-  )
 }

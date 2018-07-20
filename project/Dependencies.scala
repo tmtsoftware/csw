@@ -177,12 +177,14 @@ object Dependencies {
   )
 
   val AlarmApi = Seq(
-    Libs.`play-json`
+    Enumeratum.`enumeratum`,
+    Libs.`upickle`
   )
 
   val AlarmClient = Seq(
     Libs.`lettuce`,
-    Libs.`scala-async`
+    Libs.`scala-async`,
+    Akka.`akka-actor-typed`
   )
 
   val Commons = Seq(
