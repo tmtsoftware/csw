@@ -19,8 +19,7 @@ import csw.messages.commands.{CommandResponse, ControlCommand, Observe, Setup}
 import csw.messages.events._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.{LocationRemoved, LocationUpdated, TrackingEvent}
-import csw.messages.params.generics.{Key, KeyType}
-import csw.messages.params.models.{Id, Units}
+import csw.messages.params.models.Id
 import csw.services.command.CommandResponseManager
 import csw.services.config.api.models.ConfigData
 import csw.services.config.api.scaladsl.ConfigClientService

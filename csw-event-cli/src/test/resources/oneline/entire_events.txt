@@ -1,7 +1,7 @@
 ===============================================================================================================
 EventKey: wfos.prog.cloudcover.system_2 | Id: -1
 
-[ERROR] No events published for this key.
+[ERROR] No events published for key: [wfos.prog.cloudcover.system_2]
 ===============================================================================================================
 EventKey: wfos.prog.cloudcover.system_2 | Id: 1
 

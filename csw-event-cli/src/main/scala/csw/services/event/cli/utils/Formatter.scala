@@ -9,7 +9,7 @@ object Formatter {
   val eventSeparator =
     "==============================================================================================================="
 
-  def invalidKey(eventKey: EventKey): String = s"[ERROR] No events published for this key."
+  def invalidKey(eventKey: EventKey): String = s"[ERROR] No events published for key: [$eventKey]"
 }
 
 case class OnelineFormatter(options: Options) {
@@ -39,10 +39,11 @@ case class Oneline(path: String, param: Parameter[_]) {
   private val onelineSeparator = " = "
 
   private def values = {
-    val paramValues =
-      if (param.keyType == StringKey)
-        param.values.map(v ⇒ s""""$v"""") // wrap string values in double quotes
-      else param.values
+    val paramValues = param.keyType match {
+      case StringKey ⇒ param.values.map(v ⇒ s""""$v"""") // wrap string values in double quotes
+      case _         ⇒ param.values
+    }
+
     paramValues.mkString("[", ", ", "]")
   }
 

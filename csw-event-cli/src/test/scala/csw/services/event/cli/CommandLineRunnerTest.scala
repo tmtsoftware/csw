@@ -59,6 +59,12 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
   }
 
   // DEOPSCSW-431: [Event Cli] Get command
+  test("should able to get appropriate error message when there is no event published for provided key") {
+    commandLineRunner.get(argsParser.parse(Seq("get", "-e", "x.y.invalid_key", "--out", "json")).get).await
+    logBuffer.head shouldEqual "[ERROR] No events published for key: [x.y.invalid_key]"
+  }
+
+  // DEOPSCSW-431: [Event Cli] Get command
   test("should able to get events in oneline format") {
 
     commandLineRunner
