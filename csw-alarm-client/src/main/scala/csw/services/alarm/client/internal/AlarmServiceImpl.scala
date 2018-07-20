@@ -57,12 +57,13 @@ class AlarmServiceImpl(
     var status        = await(statusApi.get(key))
     var statusChanged = false
 
-    // derive latch status
+    // derive latch status for latchable alarms
     if (alarm.isLatchable && severity.isHighRisk && severity.isHigherThan(status.latchedSeverity)) {
       status = status.copy(latchStatus = Latched, latchedSeverity = severity)
       statusChanged = true
     }
 
+    // derive latch status for un-latchable alarms
     if (!alarm.isLatchable && severity != currentSeverity) {
       status = status.copy(latchedSeverity = severity)
       statusChanged = true
@@ -140,12 +141,12 @@ class AlarmServiceImpl(
 
   override def activate(key: AlarmKey): Future[Unit] = async {
     val status = await(statusApi.get(key))
-    if (status.activationStatus != Active) await(statusApi.set(key, status.copy(activationStatus = Active)))
+    if (!status.isActive) await(statusApi.set(key, status.copy(activationStatus = Active)))
   }
 
   override def deActivate(key: AlarmKey): Future[Unit] = async {
     val status = await(statusApi.get(key))
-    if (status.activationStatus != Inactive) await(statusApi.set(key, status.copy(activationStatus = Inactive)))
+    if (status.isActive) await(statusApi.set(key, status.copy(activationStatus = Inactive)))
   }
 
   override def getAggregateSeverity(
@@ -164,8 +165,8 @@ class AlarmServiceImpl(
       .reduceRight((previous, current) ⇒ if (previous.isHigherThan(current)) previous else current)
   }
 
-  private def getKeys[K](patternBasedAlarmKey: K, redisScalaApi: RedisAsyncScalaApi[K, _]): Future[List[K]] = async {
-    val keys = await(redisScalaApi.keys(patternBasedAlarmKey))
+  private def getKeys[K](patternBasedAlarmKey: K, redisAsyncScalaApi: RedisAsyncScalaApi[K, _]): Future[List[K]] = async {
+    val keys = await(redisAsyncScalaApi.keys(patternBasedAlarmKey))
     if (keys.isEmpty) throw NoAlarmsFoundException
     keys
   }
