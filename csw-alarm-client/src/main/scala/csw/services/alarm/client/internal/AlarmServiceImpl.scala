@@ -20,14 +20,18 @@ import scala.concurrent.Future
 class AlarmServiceImpl(
     redisURI: RedisURI,
     redisClient: RedisClient,
-    metadataApi: RedisAsyncScalaApi[MetadataKey, AlarmMetadata],
-    severityApi: RedisAsyncScalaApi[SeverityKey, AlarmSeverity],
-    statusApi: RedisAsyncScalaApi[StatusKey, AlarmStatus],
+    metadataApiFactory: ⇒ RedisAsyncScalaApi[MetadataKey, AlarmMetadata],
+    severityApiFactory: ⇒ RedisAsyncScalaApi[SeverityKey, AlarmSeverity],
+    statusApiFactory: ⇒ RedisAsyncScalaApi[StatusKey, AlarmStatus],
     shelveTimeoutActorFactory: ShelveTimeoutActorFactory
 )(implicit actorSystem: ActorSystem)
     extends AlarmAdminService {
 
   import actorSystem.dispatcher
+
+  private lazy val metadataApi = metadataApiFactory
+  private lazy val severityApi = severityApiFactory
+  private lazy val statusApi   = statusApiFactory
 
   private val refreshInSeconds       = actorSystem.settings.config.getInt("alarm.refresh-in-seconds") // default value is 3 seconds
   private val maxMissedRefreshCounts = actorSystem.settings.config.getInt("alarm.max-missed-refresh-counts") //default value is 3 times
@@ -50,20 +54,29 @@ class AlarmServiceImpl(
     await(severityApi.setex(key, ttlInSeconds, severity))
 
     // get alarm status
-    var status = await(statusApi.get(key))
+    var status        = await(statusApi.get(key))
+    var statusChanged = false
 
     // derive latch status
-    if (alarm.isLatchable && severity.isHighRisk && severity.isHigherThan(status.latchedSeverity))
+    if (alarm.isLatchable && severity.isHighRisk && severity.isHigherThan(status.latchedSeverity)) {
       status = status.copy(latchStatus = Latched, latchedSeverity = severity)
+      statusChanged = true
+    }
+
+    if (!alarm.isLatchable && severity != currentSeverity) {
+      status = status.copy(latchedSeverity = severity)
+      statusChanged = true
+    }
 
     // derive acknowledgement status
     if (severity.isHighRisk && severity != currentSeverity) {
       if (alarm.isAutoAcknowledgable) status = status.copy(acknowledgementStatus = Acknowledged)
       else status = status.copy(acknowledgementStatus = UnAcknowledged)
+      statusChanged = true
     }
 
-    // update alarm status
-    await(statusApi.set(key, status))
+    // update alarm status only when severity changes
+    if (statusChanged) await(statusApi.set(key, status))
   }
 
   override def getSeverity(key: AlarmKey): Future[AlarmSeverity] = severityApi.get(key)
