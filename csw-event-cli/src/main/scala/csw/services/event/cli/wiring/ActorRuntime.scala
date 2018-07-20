@@ -12,7 +12,7 @@ class ActorRuntime(_actorSystem: ActorSystem) {
   implicit val ec: ExecutionContextExecutor = system.dispatcher
   implicit val mat: Materializer            = ActorMaterializer()
 
-  private val coordinatedShutdown = CoordinatedShutdown(system)
+  val coordinatedShutdown = CoordinatedShutdown(system)
 
   /**
    * Gracefully shutdown [[_actorSystem]]

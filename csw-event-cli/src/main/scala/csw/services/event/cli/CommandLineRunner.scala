@@ -3,7 +3,8 @@ package csw.services.event.cli
 import java.io.File
 
 import akka.Done
-import akka.stream.Materializer
+import akka.actor.CoordinatedShutdown
+import akka.stream.{KillSwitches, Materializer}
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import csw.messages.events._
 import csw.messages.params.formats.JsonSupport
@@ -57,12 +58,19 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
 
     if (options.isOneline) printLine(Formatter.eventSeparator)
 
-    Source
+    val (subscriptionF, doneF) = Source
       .fromFutureSource(eventStream)
       .toMat(Sink.foreach { event =>
         processEvent(options, event)
       })(Keep.both)
       .run()
+
+    coordinatedShutdown.addTask(
+      CoordinatedShutdown.PhaseBeforeServiceUnbind,
+      "unsubscribe-stream"
+    )(() ⇒ subscriptionF.flatMap(_.unsubscribe()))
+
+    (subscriptionF, doneF)
   }
 
   private def processEvent(options: Options, event: Event): Unit =
@@ -126,12 +134,22 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
     await(publishResult)
   }
 
-  private def publishEventsWithInterval(initialEvent: Event, interval: FiniteDuration, duration: FiniteDuration) =
-    Source
+  private def publishEventsWithInterval(initialEvent: Event, interval: FiniteDuration, duration: FiniteDuration) = {
+    val (killSwitch, doneF) = Source
       .tick(0.millis, interval, ())
+      .viaMat(KillSwitches.single)(Keep.right)
       .map(_ ⇒ eventGenerator(initialEvent))
       .takeWithin(duration)
       .map(publishEvent)
-      .toMat(Sink.ignore)(Keep.right)
+      .toMat(Sink.ignore)(Keep.both)
       .run()
+
+    coordinatedShutdown.addTask(
+      CoordinatedShutdown.PhaseBeforeServiceUnbind,
+      "shutdown-publish-stream"
+    )(() ⇒ Future { killSwitch.shutdown(); Done })
+
+    doneF
+  }
+
 }

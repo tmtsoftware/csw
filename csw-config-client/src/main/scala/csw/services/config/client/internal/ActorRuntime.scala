@@ -15,7 +15,7 @@ private[csw] class ActorRuntime(_actorSystem: ActorSystem = ActorSystem()) {
   implicit val ec: ExecutionContextExecutor = actorSystem.dispatcher
   implicit val mat: Materializer            = ActorMaterializer()
 
-  private val coordinatedShutdown = CoordinatedShutdown(actorSystem)
+  val coordinatedShutdown = CoordinatedShutdown(actorSystem)
 
   /**
    * The shutdown method helps self node to gracefully quit the akka cluster. It is used by `csw-config-client-cli`
