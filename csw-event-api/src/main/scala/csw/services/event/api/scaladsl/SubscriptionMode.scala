@@ -54,8 +54,8 @@ package csw.services.event.api.scaladsl
 sealed trait SubscriptionMode
 
 /**
- * Variations of [[csw.services.event.api.scaladsl.SubscriptionMode]] available for use. Refer to documentation for
- * [[csw.services.event.api.scaladsl.SubscriptionMode]] for more details.
+ * List of supported Subscription Modes needed while subscribing to set of [[csw.messages.events.EventKey]].
+ * Refer to documentation for [[csw.services.event.api.scaladsl.SubscriptionMode]] for more details.
  */
 object SubscriptionModes {
   case object RateAdapterMode extends SubscriptionMode
