@@ -36,25 +36,19 @@ private[framework] class PubSubBehavior[T: Nameable](ctx: ActorContext[PubSub[T]
     case Terminated(ref) ⇒ unsubscribe(ref.upcast); this
   }
 
-  private def subscribe(actorRef: ActorRef[T], mayBeNames: Option[Set[String]]): Unit = {
+  private def subscribe(actorRef: ActorRef[T], mayBeNames: Option[Set[String]]): Unit =
     if (!subscribers.contains(actorRef)) {
       subscribers += ((actorRef, mayBeNames))
       ctx.watch(actorRef)
     }
-  }
 
-  private def unsubscribe(actorRef: ActorRef[T]): Unit = {
-    subscribers -= actorRef
-  }
+  private def unsubscribe(actorRef: ActorRef[T]): Unit = subscribers -= actorRef
 
   protected def notifySubscribers(data: T): Unit = {
     log.debug(s"Notifying subscribers :[${subscribers.mkString(",")}] with data :[$data]")
-    subscribers.foreach(
-      subscriber ⇒
-        subscriber._2 match {
-          case None        ⇒ subscriber._1 ! data
-          case Some(names) ⇒ if (names.contains(nameableData.name(data))) subscriber._1 ! data
-      }
-    )
+    subscribers.foreach {
+      case (actorRef, None)        ⇒ actorRef ! data
+      case (actorRef, Some(names)) ⇒ if (names.contains(nameableData.name(data))) actorRef ! data
+    }
   }
 }

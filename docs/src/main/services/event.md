@@ -99,7 +99,7 @@ For Ex. `pSubscribe(Subsytem.WFOS, *)` will subscribe to event keys matching pat
 @@@ 
 
 ### Event Subscription
-On subscription to event keys, you get a handle to `EventSubscription` which provides following APIs:
+On subscription to event keys, you get a handle to @scaladoc[EventSubscription](csw/services/event/api/scaladsl/EventSubscription) which provides following APIs:
 
 * `unsubscribe`: On un-subscribing, the event stream is destroyed and the connection created to event server while subscription is released. 
 
