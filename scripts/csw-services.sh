@@ -44,7 +44,7 @@ test -d ${logDir} || mkdir -p ${logDir}
 
 # We need at least this version of Redis
 minRedisVersion=3.2.5
-redisSentinel=/usr/local/bin/redis-sentinel
+redisSentinel=redis-sentinel
 redisClient=`echo ${redisSentinel} | sed -e 's/-sentinel/-cli/'`
 
 seedLogFile=${logDir}/seed.log
@@ -70,7 +70,7 @@ function get_version {
 
 function checkIfRedisIsInstalled {
     # Look in the default location first, since installing from the source puts it there, otherwise look in the path
-    if test ! -x ${redisSentinel} ; then redisSentinel=redis-sentinel ; fi
+    #if test ! -x ${redisSentinel} ; then redisSentinel=redis-sentinel ; fi
     if ! type ${redisSentinel} &> /dev/null; then
       echo "[ERROR] Can't find $redisSentinel. Please install Redis version [$minRedisVersion] or greater."
       return 1
@@ -281,7 +281,7 @@ function parse_cmd_args {
                 echo "[EVENT] Stopping Event Service..."
                 ${redisClient} -p ${sentinelPort} shutdown
                 ${redisClient} -p ${masterPort} shutdown
-                while(( -x /proc/${sentinelPID} )) || ((-x /proc/${MasterPID}))
+                while(test -x /proc/${sentinelPID} ) || (test -x /proc/${MasterPID})
                 do
                     echo "[EVENT] Waiting for Event Service to shutdown ..."
                     sleep 1
