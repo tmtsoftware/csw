@@ -7,9 +7,10 @@ import upickle.default.{ReadWriter => RW, _}
 trait AlarmRW {
   implicit val alarmKeyRW: RW[AlarmKey] = macroRW
 
-  implicit val metadataKeyRW: RW[MetadataKey] = readwriter[String].bimap(_.key, MetadataKey.apply)
-  implicit val statusKeyRW: RW[StatusKey]     = readwriter[String].bimap(_.key, StatusKey.apply)
-  implicit val severityKeyRW: RW[SeverityKey] = readwriter[String].bimap(_.key, SeverityKey.apply)
+  implicit val metadataKeyRW: RW[MetadataKey]   = readwriter[String].bimap(_.key, MetadataKey.apply)
+  implicit val statusKeyRW: RW[StatusKey]       = readwriter[String].bimap(_.key, StatusKey.apply)
+  implicit val severityKeyRW: RW[SeverityKey]   = readwriter[String].bimap(_.key, SeverityKey.apply)
+  implicit val aggregateKeyRW: RW[AggregateKey] = readwriter[String].bimap(_.key, AggregateKey.apply)
 
   implicit val alarmMetadataRW: RW[AlarmMetadata]                 = macroRW
   implicit val alarmStatusRW: RW[AlarmStatus]                     = macroRW

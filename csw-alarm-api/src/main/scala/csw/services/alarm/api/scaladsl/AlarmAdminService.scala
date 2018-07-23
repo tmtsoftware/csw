@@ -1,5 +1,6 @@
 package csw.services.alarm.api.scaladsl
 
+import akka.actor.typed.ActorRef
 import csw.services.alarm.api.models._
 
 import scala.concurrent.Future
@@ -19,9 +20,21 @@ trait AlarmAdminService extends AlarmService {
   def unShelve(key: AlarmKey): Future[Unit]
   def activate(key: AlarmKey): Future[Unit]   // api only for test purpose
   def deActivate(key: AlarmKey): Future[Unit] // api only for test purpose
-  def getAggregateSeverity(
+  def getSeverityAggregate(
       subsystem: Option[String] = None,
       componentName: Option[String] = None,
       alarmName: Option[String] = None
   ): Future[AlarmSeverity]
+  def subscribeSeverityAggregateCallback(
+      subsystem: Option[String] = None,
+      componentName: Option[String] = None,
+      alarmName: Option[String] = None,
+      callback: AlarmSeverity ⇒ Unit
+  ): Future[Unit]
+  def subscribeSeverityAggregateActorRef(
+      subsystem: Option[String] = None,
+      componentName: Option[String] = None,
+      alarmName: Option[String] = None,
+      actorRef: ActorRef[AlarmSeverity]
+  ): Future[Unit] = subscribeSeverityAggregateCallback(subsystem, componentName, alarmName, actorRef ! _)
 }

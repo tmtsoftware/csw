@@ -9,9 +9,8 @@ package csw.services.alarm.api.models
  * @param name represents the name of the alarm unique to the component e.g tromboneAxisLowLimitAlarm
  */
 case class AlarmKey(subsystem: String, component: String, name: String) {
-  private val SEPARATOR         = "."
-  private val key               = s"$subsystem$SEPARATOR$component$SEPARATOR$name"
-  override def toString: String = key
+  private val SEPARATOR = "."
+  val key               = s"$subsystem$SEPARATOR$component$SEPARATOR$name"
 }
 
 object AlarmKey {

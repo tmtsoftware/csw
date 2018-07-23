@@ -7,5 +7,5 @@ import scala.language.implicitConversions
 case class SeverityKey(key: String)
 
 object SeverityKey {
-  implicit def fromAlarmKey(alarmKey: AlarmKey): SeverityKey = SeverityKey("severity." + alarmKey.name)
+  implicit def fromAlarmKey(alarmKey: AlarmKey): SeverityKey = SeverityKey("severity." + alarmKey.key)
 }

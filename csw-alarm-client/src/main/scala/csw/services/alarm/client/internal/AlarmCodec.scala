@@ -2,7 +2,7 @@ package csw.services.alarm.client.internal
 
 import java.nio.ByteBuffer
 
-import csw.services.alarm.api.internal.{AlarmRW, MetadataKey, SeverityKey, StatusKey}
+import csw.services.alarm.api.internal._
 import csw.services.alarm.api.models._
 import io.lettuce.core.codec.{RedisCodec, Utf8StringCodec}
 import ujson.Js
@@ -21,8 +21,9 @@ class AlarmCodec[K: ReadWriter, V: ReadWriter] extends RedisCodec[K, V] {
 }
 
 object AlarmCodec extends AlarmRW {
-  object MetadataCodec extends AlarmCodec[MetadataKey, AlarmMetadata]
-  object StatusCodec   extends AlarmCodec[StatusKey, AlarmStatus]
+  object MetadataCodec  extends AlarmCodec[MetadataKey, AlarmMetadata]
+  object StatusCodec    extends AlarmCodec[StatusKey, AlarmStatus]
+  object AggregateCodec extends AlarmCodec[AggregateKey, AlarmStatus]
   object SeverityCodec extends AlarmCodec[SeverityKey, AlarmSeverity] {
     override def decodeValue(byteBuf: ByteBuffer): AlarmSeverity = {
       //TODO: get rid of try-catch? what about events?

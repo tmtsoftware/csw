@@ -7,5 +7,5 @@ import scala.language.implicitConversions
 case class StatusKey(key: String)
 
 object StatusKey {
-  implicit def fromAlarmKey(alarmKey: AlarmKey): StatusKey = StatusKey("status." + alarmKey.name)
+  implicit def fromAlarmKey(alarmKey: AlarmKey): StatusKey = StatusKey("status." + alarmKey.key)
 }

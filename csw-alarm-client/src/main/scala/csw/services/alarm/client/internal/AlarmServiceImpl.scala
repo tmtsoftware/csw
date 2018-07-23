@@ -1,8 +1,11 @@
 package csw.services.alarm.client.internal
 
 import akka.actor.ActorSystem
+import akka.actor.typed.ActorRef
+import akka.stream.scaladsl.Source
+import akka.stream.{ActorMaterializer, Materializer}
 import csw.services.alarm.api.exceptions.{InvalidSeverityException, NoAlarmsFoundException, ResetOperationFailedException}
-import csw.services.alarm.api.internal.{MetadataKey, SeverityKey, StatusKey}
+import csw.services.alarm.api.internal.{AggregateKey, MetadataKey, SeverityKey, StatusKey}
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, UnAcknowledged}
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
 import csw.services.alarm.api.models.AlarmSeverity.Okay
@@ -12,32 +15,34 @@ import csw.services.alarm.api.models._
 import csw.services.alarm.api.scaladsl.AlarmAdminService
 import csw.services.alarm.client.internal.shelve.ShelveTimeoutActorFactory
 import csw.services.alarm.client.internal.shelve.ShelveTimeoutMessage.{CancelShelveTimeout, ScheduleShelveTimeout}
-import io.lettuce.core.{KeyValue, RedisClient, RedisURI}
+import io.lettuce.core.KeyValue
+import reactor.core.publisher.FluxSink.OverflowStrategy
 
 import scala.async.Async._
 import scala.concurrent.Future
 
 class AlarmServiceImpl(
-    redisURI: RedisURI,
-    redisClient: RedisClient,
-    metadataApiFactory: ⇒ RedisAsyncScalaApi[MetadataKey, AlarmMetadata],
-    severityApiFactory: ⇒ RedisAsyncScalaApi[SeverityKey, AlarmSeverity],
-    statusApiFactory: ⇒ RedisAsyncScalaApi[StatusKey, AlarmStatus],
+    metadataApiFactory: ⇒ RedisScalaApi[MetadataKey, AlarmMetadata],
+    severityApiFactory: ⇒ RedisScalaApi[SeverityKey, AlarmSeverity],
+    statusApiFactory: ⇒ RedisScalaApi[StatusKey, AlarmStatus],
+    aggregateApiFactory: ⇒ RedisScalaApi[AggregateKey, AlarmStatus],
     shelveTimeoutActorFactory: ShelveTimeoutActorFactory
 )(implicit actorSystem: ActorSystem)
     extends AlarmAdminService {
 
   import actorSystem.dispatcher
 
-  private lazy val metadataApi = metadataApiFactory
-  private lazy val severityApi = severityApiFactory
-  private lazy val statusApi   = statusApiFactory
+  private lazy val metadataApi      = metadataApiFactory
+  private lazy val severityApi      = severityApiFactory
+  private lazy val statusApi        = statusApiFactory
+  private lazy val aggregateApi     = aggregateApiFactory
+  private lazy val shelveTimeoutRef = shelveTimeoutActorFactory.make(key ⇒ unShelve(key, cancelShelveTimeout = false))
 
   private val refreshInSeconds       = actorSystem.settings.config.getInt("alarm.refresh-in-seconds") // default value is 3 seconds
   private val maxMissedRefreshCounts = actorSystem.settings.config.getInt("alarm.max-missed-refresh-counts") //default value is 3 times
   private val ttlInSeconds           = refreshInSeconds * maxMissedRefreshCounts
 
-  private lazy val shelveTimeoutRef = shelveTimeoutActorFactory.make(key ⇒ unShelve(key, cancelShelveTimeout = false))
+  implicit val mat: Materializer = ActorMaterializer()
 
   override def setSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Unit] = async {
     // get alarm metadata
@@ -149,7 +154,7 @@ class AlarmServiceImpl(
     if (status.isActive) await(statusApi.set(key, status.copy(activationStatus = Inactive)))
   }
 
-  override def getAggregateSeverity(
+  override def getSeverityAggregate(
       subsystem: Option[String],
       component: Option[String],
       alarmName: Option[String]
@@ -165,7 +170,27 @@ class AlarmServiceImpl(
       .reduceRight((previous, current) ⇒ if (previous.isHigherThan(current)) previous else current)
   }
 
-  private def getKeys[K](patternBasedAlarmKey: K, redisAsyncScalaApi: RedisAsyncScalaApi[K, _]): Future[List[K]] = async {
+  override def subscribeSeverityAggregateCallback(
+      subsystem: Option[String],
+      componentName: Option[String],
+      alarmName: Option[String],
+      callback: AlarmSeverity ⇒ Unit
+  ): Future[Unit] = {
+    val patternBasedAlarmKey = AlarmKey.withPattern(subsystem, componentName, alarmName)
+
+    aggregateApi.psubscribe(List(patternBasedAlarmKey)).map { _ ⇒
+      Source
+        .fromPublisher(aggregateApi.observePatterns(OverflowStrategy.LATEST))
+        .map(_.getMessage.latchedSeverity)
+        .scan[AlarmSeverity](AlarmSeverity.Disconnected) { (maxSeverity, currentSeverity) ⇒
+          if (currentSeverity.isHigherThan(maxSeverity)) currentSeverity else maxSeverity
+        }
+        .runForeach(callback)
+      Unit
+    }
+  }
+
+  private def getKeys[K](patternBasedAlarmKey: K, redisAsyncScalaApi: RedisScalaApi[K, _]): Future[List[K]] = async {
     val keys = await(redisAsyncScalaApi.keys(patternBasedAlarmKey))
     if (keys.isEmpty) throw NoAlarmsFoundException
     keys

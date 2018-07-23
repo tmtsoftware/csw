@@ -7,5 +7,5 @@ import scala.language.implicitConversions
 case class MetadataKey(key: String)
 
 object MetadataKey {
-  implicit def fromAlarmKey(alarmKey: AlarmKey): MetadataKey = MetadataKey("metadata." + alarmKey.name)
+  implicit def fromAlarmKey(alarmKey: AlarmKey): MetadataKey = MetadataKey("metadata." + alarmKey.key)
 }
