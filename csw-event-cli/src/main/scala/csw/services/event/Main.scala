@@ -1,5 +1,6 @@
 package csw.services.event
 
+import akka.http.scaladsl.Http
 import csw.messages.commons.CoordinatedShutdownReasons.ApplicationFinishedReason
 import csw.services.BuildInfo
 import csw.services.event.cli.args.{ArgsParser, Options}
@@ -27,11 +28,11 @@ object Main extends App {
     LoggingSystemFactory.start(name, BuildInfo.version, ClusterAwareSettings.hostname, actorSystem)
 
     val wiring = new Wiring(actorSystem)
-    try {
-      wiring.cliApp.start(options)
-    } finally {
-      wiring.actorRuntime.shutdown(ApplicationFinishedReason)
-    }
+    import wiring._
+    import actorRuntime._
+
+    try cliApp.start(options)
+    finally Http().shutdownAllConnectionPools().onComplete(_ ⇒ actorRuntime.shutdown(ApplicationFinishedReason))
   }
 }
 // $COVERAGE-ON$

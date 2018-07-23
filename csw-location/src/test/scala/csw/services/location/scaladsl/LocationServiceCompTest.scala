@@ -3,6 +3,7 @@ package csw.services.location.scaladsl
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.{ActorSystem, PoisonPill}
+import akka.http.scaladsl.Http
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
 import akka.stream.{ActorMaterializer, Materializer}
@@ -49,11 +50,12 @@ class LocationServiceCompTest(mode: String)
 
   val RegistrationFactory = new TestRegistrationFactory
 
-  override protected def afterEach(): Unit =
-    locationService.unregisterAll().await
+  override protected def afterEach(): Unit = locationService.unregisterAll().await
 
   override protected def afterAll(): Unit = {
     if (mode.equals("cluster")) Await.result(locationService.shutdown(TestFinishedReason), 5.seconds)
+    else Http().shutdownAllConnectionPools().await
+
     actorSystem.terminate().await
   }
 
