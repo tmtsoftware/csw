@@ -79,7 +79,6 @@ public class JEventSubscriberTest extends TestNGSuite {
 
 
     //DEOPSCSW-346: Subscribe to event irrespective of Publisher's existence
-    //DEOPSCSW-343: Unsubscribe based on prefix and event name
     @Test(dataProvider = "event-service-provider")
     public void should_be_able_to_subscribe_an_event(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
         Event event1 = Utils.makeDistinctEvent(new Random().nextInt());
@@ -97,8 +96,6 @@ public class JEventSubscriberTest extends TestNGSuite {
 
         probe.expectMessage(Event$.MODULE$.invalidEvent(eventKey));
         probe.expectMessage(event1);
-
-        subscription.unsubscribe().get(10, TimeUnit.SECONDS);
 
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
         probe.expectNoMessage(Duration.ofMillis(200));
