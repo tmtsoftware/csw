@@ -25,6 +25,9 @@
 #    csw-services.sh stop     :to stop event service and unregister the services from the location service
 #
 
+# Run from the directory containing the script
+cd `dirname $0`
+
 # Setting default values
 seed_port=5552
 config_port=5000
