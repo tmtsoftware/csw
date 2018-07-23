@@ -13,7 +13,7 @@ class LocationServiceCompTestWithHttp extends LocationServiceCompTest("http") {
   val binding: Http.ServerBinding = wiring.locationHttpService.start().await
 
   override protected def afterAll(): Unit = {
-    wiring.actorSystem.terminate().await
     super.afterAll()
+    wiring.actorSystem.terminate().await
   }
 }
