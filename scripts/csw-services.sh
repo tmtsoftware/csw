@@ -26,7 +26,7 @@
 #
 
 # Run from the directory containing the script
-cd `dirname $0`
+cd "$( dirname "${BASH_SOURCE[0]}" )"
 
 # Setting default values
 seed_port=5552
