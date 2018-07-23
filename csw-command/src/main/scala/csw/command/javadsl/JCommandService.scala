@@ -47,7 +47,7 @@ class JCommandService(akkaLocation: AkkaLocation, actorSystem: ActorSystem[_]) {
    * @param controlCommand the [[csw.params.commands.ControlCommand]] payload
    * @return a CommandResponse as a CompletableFuture
    */
-  def submit(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[CommandResponseBase] =
+  def submit(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[SubmitResponse] =
     sCommandService.submit(controlCommand)(timeout).toJava.toCompletableFuture
 
   /**
@@ -73,7 +73,7 @@ class JCommandService(akkaLocation: AkkaLocation, actorSystem: ActorSystem[_]) {
   def submitAllAndGetResponse(
       controlCommands: java.util.Set[ControlCommand],
       timeout: Timeout
-  ): CompletableFuture[CommandResponseBase] =
+  ): CompletableFuture[SubmitResponse] =
     sCommandService.submitAllAndGetResponse(controlCommands.asScala.toSet)(timeout).toJava.toCompletableFuture
 
   /**
@@ -83,7 +83,7 @@ class JCommandService(akkaLocation: AkkaLocation, actorSystem: ActorSystem[_]) {
    * @param controlCommand the [[csw.params.commands.ControlCommand]] payload
    * @return a CommandResponse as a CompletableFuture
    */
-  def oneway(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[ValidationResponse] =
+  def oneway(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[OnewayResponse] =
     sCommandService.oneway(controlCommand)(timeout).toJava.toCompletableFuture
 
   /**
@@ -92,7 +92,7 @@ class JCommandService(akkaLocation: AkkaLocation, actorSystem: ActorSystem[_]) {
    * @param commandRunId the runId of the command for which response is required
    * @return a CommandResponse as a CompletableFuture
    */
-  def subscribe(commandRunId: Id, timeout: Timeout): CompletableFuture[CommandResponseBase] =
+  def subscribe(commandRunId: Id, timeout: Timeout): CompletableFuture[SubmitResponse] =
     sCommandService.subscribe(commandRunId)(timeout).toJava.toCompletableFuture
 
   /**
@@ -101,7 +101,7 @@ class JCommandService(akkaLocation: AkkaLocation, actorSystem: ActorSystem[_]) {
    * @param commandRunId the runId of the command for which response is required
    * @return a CommandResponse as a CompletableFuture
    */
-  def query(commandRunId: Id, timeout: Timeout): CompletableFuture[CommandResponseBase] =
+  def query(commandRunId: Id, timeout: Timeout): CompletableFuture[SubmitResponse] =
     sCommandService.query(commandRunId)(timeout).toJava.toCompletableFuture
 
   /**
@@ -110,7 +110,7 @@ class JCommandService(akkaLocation: AkkaLocation, actorSystem: ActorSystem[_]) {
    * @param controlCommand the [[csw.params.commands.ControlCommand]] payload.
    * @return a CommandResponse as a CompletableFuture
    */
-  def submitAndSubscribe(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[CommandResponseBase] =
+  def submitAndSubscribe(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[SubmitResponse] =
     sCommandService.submitAndSubscribe(controlCommand)(timeout).toJava.toCompletableFuture
 
   /**
@@ -121,13 +121,14 @@ class JCommandService(akkaLocation: AkkaLocation, actorSystem: ActorSystem[_]) {
    * @param stateMatcher   the StateMatcher implementation for matching received state against a demand state.
    * @return a CommandResponse as a CompletableFuture
    */
+  /**  TODO
   def onewayAndMatch(
       controlCommand: ControlCommand,
       stateMatcher: StateMatcher,
       timeout: Timeout
   ): CompletableFuture[CommandResponseBase] =
     sCommandService.onewayAndMatch(controlCommand, stateMatcher)(timeout).toJava.toCompletableFuture
-
+   */
   /**
    * Submit multiple commands and get final CommandResponse for all as a stream of CommandResponse. For long running commands, it will subscribe for the
    * result of those which were successfully validated as `Accepted` and get the final CommandResponse.
@@ -135,7 +136,7 @@ class JCommandService(akkaLocation: AkkaLocation, actorSystem: ActorSystem[_]) {
    * @param controlCommands the [[csw.params.commands.ControlCommand]] payload.
    * @return a Source of CommandResponse as a stream of CommandResponses for all commands
    */
-  def submitAllAndSubscribe(controlCommands: java.util.Set[ControlCommand], timeout: Timeout): Source[CommandResponseBase, NotUsed] =
+  def submitAllAndSubscribe(controlCommands: java.util.Set[ControlCommand], timeout: Timeout): Source[SubmitResponse, NotUsed] =
     sCommandService.submitAllAndSubscribe(controlCommands.asScala.toSet)(timeout).asJava
 
   /**
@@ -149,7 +150,7 @@ class JCommandService(akkaLocation: AkkaLocation, actorSystem: ActorSystem[_]) {
   def submitAllAndGetFinalResponse(
       controlCommands: java.util.Set[ControlCommand],
       timeout: Timeout
-  ): CompletableFuture[CommandResponseBase] =
+  ): CompletableFuture[SubmitResponse] =
     sCommandService.submitAllAndGetFinalResponse(controlCommands.asScala.toSet)(timeout).toJava.toCompletableFuture
 
   /**

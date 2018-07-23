@@ -18,8 +18,7 @@ import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandIssue.{OtherIssue, WrongPrefixIssue}
-import csw.messages.commands.CommandResponse._
-import csw.messages.commands.ValidationResponse.{Accepted, Invalid}
+import csw.messages.commands.Responses._
 import csw.messages.commands._
 import csw.messages.location._
 import csw.messages.params.generics.{KeyType, Parameter}
@@ -51,23 +50,23 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
     case `matcherFailedCmd`  ⇒ Accepted(controlCommand.runId)
     case `matcherTimeoutCmd` ⇒ Accepted(controlCommand.runId)
     case `cancelCmd`         ⇒ Accepted(controlCommand.runId)
-      /*
+    /*
     case `immediateCmd`      ⇒ Completed(controlCommand.runId)
     case `immediateResCmd` ⇒
       CompletedWithResult(controlCommand.runId, Result(controlCommand.source, Set(KeyType.IntKey.make("encoder").set(20))))
-      */
+     */
     case `invalidCmd` ⇒
       Invalid(controlCommand.runId, OtherIssue(s"Unsupported prefix: ${controlCommand.commandName}"))
-    case _            ⇒ Invalid(controlCommand.runId, WrongPrefixIssue(s"Wrong prefix: ${controlCommand.commandName}"))
+    case _ ⇒ Invalid(controlCommand.runId, WrongPrefixIssue(s"Wrong prefix: ${controlCommand.commandName}"))
   }
 
-  override def onSubmit(controlCommand: ControlCommand): CommandResponse = controlCommand.commandName match {
+  override def onSubmit(controlCommand: ControlCommand): SubmitResponse = controlCommand.commandName match {
     case `cancelCmd`         ⇒ processAcceptedSubmitCmd(controlCommand)
     case `withoutMatcherCmd` ⇒ processCommandWithoutMatcher(controlCommand)
     case `acceptedCmd`       ⇒
-        //mimic long running process by not updating CSRM
+      //mimic long running process by not updating CSRM
       Started(controlCommand.runId)
-    case _                   ⇒ CommandNotAvailable(controlCommand.runId)
+    case _ ⇒ CommandNotAvailable(controlCommand.runId)
   }
 
   override def onOneway(controlCommand: ControlCommand): Unit = controlCommand.commandName match {
@@ -78,17 +77,17 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
     case _                  ⇒ CommandNotAvailable(controlCommand.runId)
   }
 
-  private def processAcceptedSubmitCmd(controlCommand: ControlCommand): CommandResponse = {
+  private def processAcceptedSubmitCmd(controlCommand: ControlCommand): SubmitResponse = {
     controlCommand.paramType.get(cancelCmdId) match {
-      case None => Error(controlCommand.runId, "Cancel command not present")
-      case Some(param) =>  processCancelCommand(controlCommand.runId, Id(param.head))
+      case None        => Error(controlCommand.runId, "Cancel command not present")
+      case Some(param) => processCancelCommand(controlCommand.runId, Id(param.head))
     }
   }
 
   private def processAcceptedOnewayCmd(controlCommand: ControlCommand): Unit =
     controlCommand.paramType.get(cancelCmdId).foreach(param ⇒ processOriginalCommand(Id(param.head)))
 
-  private def processCommandWithoutMatcher(controlCommand: ControlCommand): CommandResponse = {
+  private def processCommandWithoutMatcher(controlCommand: ControlCommand): SubmitResponse = {
     val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(20)
     val result                = Result(controlCommand.source, Set(param))
 
@@ -97,7 +96,7 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
     CompletedWithResult(controlCommand.runId, result)
   }
 
-  private def processCancelCommand(runId: Id, cancelId: Id): CommandResponse = {
+  private def processCancelCommand(runId: Id, cancelId: Id): SubmitResponse = {
     processOriginalCommand(cancelId)
     commandResponseManager.addOrUpdateCommand(runId, Completed(runId))
     Completed(runId)
@@ -107,7 +106,7 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
     implicit val timeout: Timeout = 5.seconds
 
     // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
-    val eventualResponse: Future[CommandResponseBase] = commandResponseManager.query(runId)
+    val eventualResponse: Future[SubmitResponse] = commandResponseManager.query(runId)
     eventualResponse.onComplete { x ⇒
       commandResponseManager.addOrUpdateCommand(runId, Cancelled(runId))
     }

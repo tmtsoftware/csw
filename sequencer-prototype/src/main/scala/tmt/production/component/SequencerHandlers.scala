@@ -12,8 +12,8 @@ import csw.framework.CurrentStatePublisher
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.TopLevelActorMessage
-import csw.messages.commands.CommandResponse.Completed
-import csw.messages.commands.{CommandResponse, ControlCommand, ValidationResponse}
+import csw.messages.commands.ControlCommand
+import csw.messages.commands.Responses.{Accepted, Completed, SubmitResponse, ValidationResponse}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.TrackingEvent
 import csw.services.command.CommandResponseManager
@@ -87,7 +87,7 @@ class SequencerHandlers(
     //kill the ammonite instance
   } //TODO: clean up engine and other relevant instances and ammonite instance
 
-  override def onSubmit(controlCommand: ControlCommand): CommandResponse   = {
+  override def onSubmit(controlCommand: ControlCommand): SubmitResponse = {
     Completed(controlCommand.runId)
   }
   override def onOneway(controlCommand: ControlCommand): Unit              = {}
@@ -95,6 +95,6 @@ class SequencerHandlers(
   override def onGoOnline(): Unit                                          = {}
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = {}
   override def validateCommand(controlCommand: ControlCommand): ValidationResponse = {
-    ValidationResponse.Accepted(controlCommand.runId)
+    Accepted(controlCommand.runId)
   }
 }

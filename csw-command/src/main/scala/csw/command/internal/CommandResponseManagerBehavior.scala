@@ -11,11 +11,10 @@ import csw.params.commands.{CommandResponse, CommandResultType}
 import csw.params.core.models.Id
 import csw.logging.scaladsl.{Logger, LoggerFactory}
 import csw.messages.CommandResponseManagerMessage
-import csw.messages.commands.CommandResponse.CommandNotAvailable
-import csw.messages.commands.CommandResultType.{Final, Intermediate}
 import csw.messages.commands._
 import csw.messages.params.models.Id
 import csw.messages.CommandResponseManagerMessage._
+import csw.messages.commands.Responses._
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
 /**
@@ -71,13 +70,13 @@ private[command] class CommandResponseManagerBehavior(
     this
   }
 
-  private def addOrUpdateCommand(runId: Id, commandResponse: CommandResponseBase): Unit =
+  private def addOrUpdateCommand(runId: Id, commandResponse: SubmitResponse): Unit =
     commandResponseManagerState.get(runId) match {
       case _: CommandNotAvailable ⇒ commandResponseManagerState = commandResponseManagerState.add(runId, commandResponse)
       case _                      ⇒ updateCommand(runId, commandResponse)
     }
 
-  private def updateCommand(runId: Id, commandResponse: CommandResponseBase): Unit = {
+  private def updateCommand(runId: Id, commandResponse: SubmitResponse): Unit = {
     val currentResponse = commandResponseManagerState.get(runId)
     if (currentResponse.resultType == CommandResultType.Intermediate && currentResponse != commandResponse) {
       commandResponseManagerState = commandResponseManagerState.updateCommandStatus(commandResponse)
@@ -85,19 +84,19 @@ private[command] class CommandResponseManagerBehavior(
     }
   }
 
-  private def updateSubCommand(subCommandRunId: Id, commandResponse: CommandResponseBase): Unit = {
+  private def updateSubCommand(subCommandRunId: Id, commandResponse: SubmitResponse): Unit = {
     // If the sub command has a parent command, fetch the current status of parent command from command status service
     commandCoRelation
       .getParent(commandResponse.runId)
       .foreach(parentId ⇒ updateParent(parentId, commandResponse))
   }
 
-  private def updateParent(parentRunId: Id, childCommandResponse: CommandResponseBase): Unit =
+  private def updateParent(parentRunId: Id, childCommandResponse: SubmitResponse): Unit =
     (commandResponseManagerState.get(parentRunId).resultType, childCommandResponse.resultType) match {
       // If the child command receives a negative result, the result of the parent command need not wait for the
       // result from other sub commands
       case (CommandResultType.Intermediate, CommandResultType.Negative) ⇒
-        updateCommand(parentRunId, CommandResponse.withRunId(parentRunId, childCommandResponse))
+        updateCommand(parentRunId, Responses.withRunId(parentRunId, childCommandResponse))
       // If the child command receives a positive result, the result of the parent command needs to be evaluated based
       // on the result from other sub commands
       case (CommandResultType.Intermediate, CommandResultType.Positive) ⇒
@@ -105,26 +104,26 @@ private[command] class CommandResponseManagerBehavior(
       case _ ⇒ log.debug("Parent Command is already updated with a Final response. Ignoring this update.")
     }
 
-  private def updateParentForChild(parentRunId: Id, childCommandResponse: CommandResponseBase): Unit =
+  private def updateParentForChild(parentRunId: Id, childCommandResponse: SubmitResponse): Unit =
     childCommandResponse.resultType match {
-      case _: Final ⇒
+      case _: CommandResultType.Final ⇒
         commandCoRelation = commandCoRelation.remove(parentRunId, childCommandResponse.runId)
         if (!commandCoRelation.hasChildren(parentRunId))
-          updateCommand(parentRunId, CommandResponse.withRunId(parentRunId, childCommandResponse))
+          updateCommand(parentRunId, Responses.withRunId(parentRunId, childCommandResponse))
       case _ ⇒ log.debug("Validation response will not affect status of Parent command.")
     }
 
-  private def publishToSubscribers(commandResponse: CommandResponseBase, subscribers: Set[ActorRef[CommandResponseBase]]): Unit = {
+  private def publishToSubscribers(commandResponse: SubmitResponse, subscribers: Set[ActorRef[SubmitResponse]]): Unit = {
     commandResponse.resultType match {
-      case _: Final ⇒
+      case _: CommandResultType.Final ⇒
         subscribers.foreach(_ ! commandResponse)
-      case Intermediate ⇒
+      case CommandResultType.Intermediate ⇒
         // Do not send updates for validation response as it is send by the framework
         log.debug("Validation response will not affect status of Parent command.")
     }
   }
 
-  private def subscribe(runId: Id, replyTo: ActorRef[CommandResponseBase]): Unit = {
+  private def subscribe(runId: Id, replyTo: ActorRef[SubmitResponse]): Unit = {
     ctx.watchWith(replyTo, SubscriberTerminated(replyTo))
     commandResponseManagerState = commandResponseManagerState.subscribe(runId, replyTo)
     publishToSubscribers(commandResponseManagerState.get(runId), Set(replyTo))

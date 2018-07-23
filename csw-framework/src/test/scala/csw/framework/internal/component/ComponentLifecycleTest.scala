@@ -140,7 +140,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
   test("running component should handle Submit command") {
     val supervisorProbe           = TestProbe[FromComponentLifecycleMessage]
     val commandStatusServiceProbe = TestProbe[CommandResponseManagerMessage]
-    val commandResponseProbe      = TestProbe[CommandResponseBase]
+    val submitResponseProbe       = TestProbe[SubmitResponse]
     val runningComponent          = new RunningComponent(supervisorProbe, commandStatusServiceProbe)
     import runningComponent._
 
@@ -151,18 +151,18 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     when(sampleHcdHandler.validateCommand(ArgumentMatchers.any[Setup]())).thenReturn(Accepted(sc1.runId))
     when(sampleHcdHandler.onSubmit(ArgumentMatchers.any[Setup]())).thenReturn(Completed(sc1.runId))
 
-    componentBehaviorTestKit.run(Submit(sc1, commandResponseProbe.ref))
+    componentBehaviorTestKit.run(Submit(sc1, submitResponseProbe.ref))
 
     verify(sampleHcdHandler).validateCommand(sc1)
     verify(sampleHcdHandler).onSubmit(sc1)
-    commandResponseProbe.expectMessage(Completed(sc1.runId))
+    submitResponseProbe.expectMessage(Completed(sc1.runId))
     commandStatusServiceProbe.expectMessage(AddOrUpdateCommand(sc1.runId, Completed(sc1.runId)))
   }
 
   test("running component should handle Oneway command") {
     val supervisorProbe           = TestProbe[FromComponentLifecycleMessage]
     val commandStatusServiceProbe = TestProbe[CommandResponseManagerMessage]
-    val commandResponseProbe      = TestProbe[CommandResponseBase]
+    val onewayResponseProbe       = TestProbe[OnewayResponse]
     val runningComponent          = new RunningComponent(supervisorProbe, commandStatusServiceProbe)
     import runningComponent._
 
@@ -173,11 +173,11 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     when(sampleHcdHandler.validateCommand(ArgumentMatchers.any[Setup]())).thenReturn(Accepted(sc1.runId))
     doNothing().when(sampleHcdHandler).onOneway(ArgumentMatchers.any[Setup]())
 
-    componentBehaviorTestKit.run(Oneway(sc1, commandResponseProbe.ref))
+    componentBehaviorTestKit.run(Oneway(sc1, onewayResponseProbe.ref))
 
     verify(sampleHcdHandler).validateCommand(sc1)
     verify(sampleHcdHandler).onOneway(sc1)
-    commandResponseProbe.expectMessage(Accepted(sc1.runId))
+    onewayResponseProbe.expectMessage(Accepted(sc1.runId))
     commandStatusServiceProbe.expectNoMessage(3.seconds)
   }
 
@@ -185,7 +185,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
   test("running component can send an immediate response to a submit command and avoid invoking further processing") {
     val supervisorProbe           = TestProbe[FromComponentLifecycleMessage]
     val commandStatusServiceProbe = TestProbe[CommandResponseManagerMessage]
-    val commandResponseProbe      = TestProbe[CommandResponse]
+    val submitResponseProbe       = TestProbe[SubmitResponse]
     val runningComponent          = new RunningComponent(supervisorProbe, commandStatusServiceProbe)
     import runningComponent._
 
@@ -196,19 +196,19 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     when(sampleHcdHandler.validateCommand(ArgumentMatchers.any[Setup]())).thenReturn(Accepted(sc1.runId))
     when(sampleHcdHandler.onSubmit(ArgumentMatchers.any[Setup]())).thenReturn(Completed(sc1.runId))
 
-    componentBehaviorTestKit.run(Submit(sc1, commandResponseProbe.ref))
+    componentBehaviorTestKit.run(Submit(sc1, submitResponseProbe.ref))
 
     verify(sampleHcdHandler).validateCommand(sc1)
     verify(sampleHcdHandler).onSubmit(sc1)
-    commandResponseProbe.expectMessage(Completed(sc1.runId))
+    submitResponseProbe.expectMessage(Completed(sc1.runId))
     commandStatusServiceProbe.expectMessage(AddOrUpdateCommand(sc1.runId, Completed(sc1.runId)))
   }
 
-  //DEOPSCSW-313: Support short running actions by providing immediate response
-  test("running component can send an immediate response to a oneway command and avoid invoking further processing") {
+  // Demonstrate oneway failure
+  test("running component can send a oneway command that is rejected") {
     val supervisorProbe           = TestProbe[FromComponentLifecycleMessage]
     val commandStatusServiceProbe = TestProbe[CommandResponseManagerMessage]
-    val commandResponseProbe      = TestProbe[ValidationResponse]
+    val onewayResponseProbe       = TestProbe[OnewayResponse]
     val runningComponent          = new RunningComponent(supervisorProbe, commandStatusServiceProbe)
     import runningComponent._
 
@@ -217,15 +217,17 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
       .add(KeyType.IntKey.make("encoder").set(22))
 
     val invalid = Invalid(sc1.runId, OtherIssue("error from the test command"))
-    // TODO - Need to fix this to do validate and then submit or call submit instead
     when(sampleHcdHandler.validateCommand(ArgumentMatchers.any[Setup]())).thenReturn(invalid)
     doNothing().when(sampleHcdHandler).onOneway(ArgumentMatchers.any[Setup]())
 
-    componentBehaviorTestKit.run(Oneway(sc1, commandResponseProbe.ref))
+    componentBehaviorTestKit.run(Oneway(sc1, onewayResponseProbe.ref))
 
+    // onValidate called
     verify(sampleHcdHandler).validateCommand(sc1)
+    // onOneway called
     verify(sampleHcdHandler, never()).onOneway(sc1)
-    commandResponseProbe.expectMessage(invalid)
+    onewayResponseProbe.expectMessage(invalid)
+    // No contact on command response manager
     commandStatusServiceProbe.expectNoMessage(3.seconds)
   }
 

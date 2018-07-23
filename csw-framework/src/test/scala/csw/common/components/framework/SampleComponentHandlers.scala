@@ -15,9 +15,8 @@ import csw.params.core.states.{CurrentState, StateName}
 import csw.logging.scaladsl.Logger
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandIssue.OtherIssue
-import csw.messages.commands.CommandResponse.Completed
-import csw.messages.commands.ValidationResponse.{Accepted, Invalid}
-import csw.messages.commands._
+import csw.messages.commands.{CommandName, ControlCommand, Observe, Setup}
+import csw.messages.commands.Responses._
 import csw.messages.events.{Event, EventName, SystemEvent}
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location.{LocationRemoved, LocationUpdated, TrackingEvent}
@@ -58,9 +57,11 @@ class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
   override def onGoOnline(): Unit =
     currentStatePublisher.publish(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(onlineChoice))))
 
-  override def onSubmit(controlCommand: ControlCommand): CommandResponse = {
+  override def onSubmit(controlCommand: ControlCommand): SubmitResponse = {
     // Adding passed in parameter to see if data is transferred properly
-    commandResponseManager.addOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId))
+    // TODO -- POSSIBLY NOT NEEDED if DONE in COMponent
+    println("In SampleComponentHandlers, removed commandResponseManager call")
+    //commandResponseManager.addOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId))
     currentStatePublisher.publish(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(submitCommandChoice))))
     processCommand(controlCommand)
     Completed(controlCommand.runId)

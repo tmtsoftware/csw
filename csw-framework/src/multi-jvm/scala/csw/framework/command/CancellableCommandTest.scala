@@ -11,9 +11,8 @@ import csw.common.components.command.ComponentStateForCommand.{acceptedCmd, canc
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.CommandResponseManagerMessage.Subscribe
-import csw.messages.commands.CommandResponse.{Cancelled, Completed}
-import csw.messages.commands.ValidationResponse.Accepted
-import csw.messages.commands.{CommandResponseBase, Setup}
+import csw.messages.commands.Responses._
+import csw.messages.commands.Setup
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.params.generics.KeyType
@@ -55,7 +54,8 @@ class CancellableCommandTest(ignore: Int) extends LSNodeSpec(config = new OneMem
     }
 
     runOn(member) {
-      val cmdResponseProbe = TestProbe[CommandResponseBase]
+      val submitResponseProbe = TestProbe[SubmitResponse]
+      val onewayResponseProbe = TestProbe[OnewayResponse]
       val obsId            = Some(ObsId("Obs001"))
       val cancelCmdId      = KeyType.StringKey.make("cancelCmdId")
 
@@ -68,51 +68,51 @@ class CancellableCommandTest(ignore: Int) extends LSNodeSpec(config = new OneMem
 
       // original command is submit and Cancel command is also submit
       val originalSetup = Setup(prefix, acceptedCmd, obsId)
-      assemblyRef ! Submit(originalSetup, cmdResponseProbe.ref)
-      cmdResponseProbe.expectMessage(Accepted(originalSetup.runId))
+      assemblyRef ! Submit(originalSetup, submitResponseProbe.ref)
+      submitResponseProbe.expectMessage(Started(originalSetup.runId))
 
       val cancelSetup = Setup(prefix, cancelCmd, obsId, Set(cancelCmdId.set(originalSetup.runId.id)))
-      assemblyRef ! Submit(cancelSetup, cmdResponseProbe.ref)
-      cmdResponseProbe.expectMessage(Accepted(cancelSetup.runId))
+      assemblyRef ! Submit(cancelSetup, submitResponseProbe.ref)
+      submitResponseProbe.expectMessage(Started(cancelSetup.runId))
 
-      assemblyRef ! Subscribe(cancelSetup.runId, cmdResponseProbe.ref)
-      cmdResponseProbe.expectMessage(Completed(cancelSetup.runId))
+      assemblyRef ! Subscribe(cancelSetup.runId, submitResponseProbe.ref)
+      submitResponseProbe.expectMessage(Completed(cancelSetup.runId))
 
-      assemblyRef ! Subscribe(originalSetup.runId, cmdResponseProbe.ref)
-      cmdResponseProbe.expectMessage(Cancelled(originalSetup.runId))
+      assemblyRef ! Subscribe(originalSetup.runId, submitResponseProbe.ref)
+      submitResponseProbe.expectMessage(Cancelled(originalSetup.runId))
 
       // original command is submit but Cancel command is oneway
       val originalSetup2 = Setup(prefix, acceptedCmd, obsId)
-      assemblyRef ! Submit(originalSetup2, cmdResponseProbe.ref)
-      cmdResponseProbe.expectMessage(Accepted(originalSetup2.runId))
+      assemblyRef ! Submit(originalSetup2, submitResponseProbe.ref)
+      submitResponseProbe.expectMessage(Started(originalSetup2.runId))
 
       val cancelSetup2 = Setup(prefix, cancelCmd, obsId, Set(cancelCmdId.set(originalSetup2.runId.id)))
-      assemblyRef ! Oneway(cancelSetup2, cmdResponseProbe.ref)
-      cmdResponseProbe.expectMessage(Accepted(cancelSetup2.runId))
+      assemblyRef ! Oneway(cancelSetup2, onewayResponseProbe.ref)
+      onewayResponseProbe.expectMessage(Accepted(cancelSetup2.runId))
 
-      assemblyRef ! Subscribe(originalSetup2.runId, cmdResponseProbe.ref)
-      cmdResponseProbe.expectMessage(Cancelled(originalSetup2.runId))
+      assemblyRef ! Subscribe(originalSetup2.runId, submitResponseProbe.ref)
+      submitResponseProbe.expectMessage(Cancelled(originalSetup2.runId))
 
       // original command is oneway but Cancel command is submit
       val originalSetup3 = Setup(prefix, acceptedCmd, obsId)
-      assemblyRef ! Oneway(originalSetup3, cmdResponseProbe.ref)
-      cmdResponseProbe.expectMessage(Accepted(originalSetup3.runId))
+      assemblyRef ! Oneway(originalSetup3, onewayResponseProbe.ref)
+      onewayResponseProbe.expectMessage(Accepted(originalSetup3.runId))
 
       val cancelSetup3 = Setup(prefix, cancelCmd, obsId, Set(cancelCmdId.set(originalSetup3.runId.id)))
-      assemblyRef ! Submit(cancelSetup3, cmdResponseProbe.ref)
-      cmdResponseProbe.expectMessage(Accepted(cancelSetup3.runId))
+      assemblyRef ! Submit(cancelSetup3, submitResponseProbe.ref)
+      submitResponseProbe.expectMessage(Started(cancelSetup3.runId))
 
-      assemblyRef ! Subscribe(cancelSetup3.runId, cmdResponseProbe.ref)
-      cmdResponseProbe.expectMessage(Completed(cancelSetup3.runId))
+      assemblyRef ! Subscribe(cancelSetup3.runId, submitResponseProbe.ref)
+      submitResponseProbe.expectMessage(Completed(cancelSetup3.runId))
 
       // original command is oneway and Cancel command is also oneway
       val originalSetup4 = Setup(prefix, acceptedCmd, obsId)
-      assemblyRef ! Oneway(originalSetup4, cmdResponseProbe.ref)
-      cmdResponseProbe.expectMessage(Accepted(originalSetup4.runId))
+      assemblyRef ! Oneway(originalSetup4, onewayResponseProbe.ref)
+      onewayResponseProbe.expectMessage(Accepted(originalSetup4.runId))
 
       val cancelSetup4 = Setup(prefix, cancelCmd, obsId, Set(cancelCmdId.set(originalSetup4.runId.id)))
-      assemblyRef ! Oneway(cancelSetup4, cmdResponseProbe.ref)
-      cmdResponseProbe.expectMessage(Accepted(cancelSetup4.runId))
+      assemblyRef ! Oneway(cancelSetup4, onewayResponseProbe.ref)
+      onewayResponseProbe.expectMessage(Accepted(cancelSetup4.runId))
     }
     enterBarrier("end")
   }

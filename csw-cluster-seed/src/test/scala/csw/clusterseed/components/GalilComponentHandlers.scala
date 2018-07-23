@@ -9,9 +9,8 @@ import csw.params.commands.{CommandResponse, ControlCommand}
 import csw.location.api.models.TrackingEvent
 import csw.logging.scaladsl.Logger
 import csw.messages.TopLevelActorMessage
-import csw.messages.commands.CommandResponse.Completed
-import csw.messages.commands.ValidationResponse.Accepted
-import csw.messages.commands.{CommandResponse, ControlCommand, ValidationResponse}
+import csw.messages.commands.ControlCommand
+import csw.messages.commands.Responses.{Accepted, Completed, SubmitResponse, ValidationResponse}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.TrackingEvent
 import csw.services.logging.scaladsl.Logger
@@ -39,7 +38,7 @@ class GalilComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
 
   override def validateCommand(controlCommand: ControlCommand): ValidationResponse = Accepted(controlCommand.runId)
 
-  override def onSubmit(controlCommand: ControlCommand): CommandResponse = {
+  override def onSubmit(controlCommand: ControlCommand): SubmitResponse = {
     Completed(controlCommand.runId)
   }
 

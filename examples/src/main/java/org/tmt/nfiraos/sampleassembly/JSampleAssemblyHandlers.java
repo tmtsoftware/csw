@@ -109,23 +109,23 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
         Timeout commandResponseTimeout = new Timeout(10, TimeUnit.SECONDS);
 
         // Submit command, and handle validation response. Final response is returned as a Future
-        CompletableFuture<CommandResponseBase> submitCommandResponseF = hcd.submit(setupCommand, submitTimeout)
+        CompletableFuture<Responses.SubmitResponse> submitCommandResponseF = hcd.submit(setupCommand, submitTimeout)
                 .thenCompose(commandResponse -> {
-                    if (commandResponse instanceof ValidationResponse.Accepted) {
+                    if (commandResponse instanceof Responses.Started) {
                         return hcd.subscribe(commandResponse.runId(), commandResponseTimeout);
                     } else {
                         log.error("Sleep command invalid");
-                        return CompletableFuture.completedFuture(new CommandResponse.Error(commandResponse.runId(), "test error"));
+                        return CompletableFuture.completedFuture(new Responses.Error(commandResponse.runId(), "test error"));
                     }
                 });
 
 
         // Wait for final response, and log result
         submitCommandResponseF.toCompletableFuture().thenAccept(commandResponse -> {
-            if (commandResponse instanceof CommandResponse.Completed) {
+            if (commandResponse instanceof Responses.Completed) {
                 log.info("Command completed successfully");
-            } else if (commandResponse instanceof CommandResponse.Error) {
-                CommandResponse.Error x = (CommandResponse.Error) commandResponse;
+            } else if (commandResponse instanceof Responses.Error) {
+                Responses.Error x = (Responses.Error) commandResponse;
                 log.error(() -> "Command Completed with error: " + x.message());
             } else {
                 log.error("Command failed");
@@ -196,13 +196,13 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
     //#subscribe
 
     @Override
-    public ValidationResponse validateCommand(ControlCommand controlCommand) {
+    public Responses.ValidationResponse validateCommand(ControlCommand controlCommand) {
         return null;
     }
 
     @Override
-    public CommandResponse onSubmit(ControlCommand controlCommand) {
-        return new CommandResponse.Completed(controlCommand.runId());
+    public Responses.SubmitResponse onSubmit(ControlCommand controlCommand) {
+        return new Responses.Completed(controlCommand.runId());
     }
 
     @Override

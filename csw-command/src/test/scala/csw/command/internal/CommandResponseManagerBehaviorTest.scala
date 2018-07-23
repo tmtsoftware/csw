@@ -14,8 +14,7 @@ import csw.params.commands.CommandResponse.{Accepted, Completed, Error}
 import csw.params.core.models.Id
 import csw.logging.scaladsl.{Logger, LoggerFactory}
 import csw.messages.CommandResponseManagerMessage
-import csw.messages.commands.{CommandCorrelation, CommandResponseBase, CommandResponseManagerState}
-import csw.messages.commands.CommandResponse.{Completed, Error}
+import csw.messages.commands.{CommandCorrelation, CommandResponseManagerState}
 import csw.messages.params.models.Id
 import csw.messages.CommandResponseManagerMessage._
 import csw.messages.commands.ValidationResponse.Accepted
@@ -39,13 +38,13 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
 
   test("should be able to add command entry in Command Response Manager") {
     val behaviorTestKit         = createBehaviorTestKit()
-    val commandResponseProbe    = TestProbe[CommandResponseBase]
+    val commandResponseProbe    = TestProbe[SubmitResponse]
     val commandCorrelationProbe = TestProbe[CommandCorrelation]
     val runId                   = Id()
-    behaviorTestKit.run(AddOrUpdateCommand(runId, Accepted(runId)))
+    behaviorTestKit.run(AddOrUpdateCommand(runId, Started(runId)))
 
     behaviorTestKit.run(Query(runId, commandResponseProbe.ref))
-    commandResponseProbe.expectMessage(Accepted(runId))
+    commandResponseProbe.expectMessage(Started(runId))
 
     behaviorTestKit.run(GetCommandCorrelation(commandCorrelationProbe.ref))
     commandCorrelationProbe.expectMessage(CommandCorrelation(Map.empty[Id, Set[Id]], Map.empty[Id, Id]))
@@ -57,7 +56,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
     val parentId                = Id()
     val childId                 = Id()
 
-    behaviorTestKit.run(AddOrUpdateCommand(parentId, Accepted(parentId)))
+    behaviorTestKit.run(AddOrUpdateCommand(parentId, Started(parentId)))
     behaviorTestKit.run(AddSubCommand(parentId, childId))
 
     behaviorTestKit.run(GetCommandCorrelation(commandCorrelationProbe.ref))
@@ -66,7 +65,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
 
   test("should be able to add subscriber and publish current state to newly added subscriber") {
     val behaviorTestKit                  = createBehaviorTestKit()
-    val commandResponseProbe             = TestProbe[CommandResponseBase]
+    val commandResponseProbe             = TestProbe[SubmitResponse]
     val commandResponseManagerStateProbe = TestProbe[CommandResponseManagerState]
 
     val runId = Id()
@@ -87,12 +86,12 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
 
   test("should be able to remove subscriber") {
     val behaviorTestKit                  = createBehaviorTestKit()
-    val commandResponseProbe             = TestProbe[CommandResponseBase]
+    val commandResponseProbe             = TestProbe[SubmitResponse]
     val commandResponseManagerStateProbe = TestProbe[CommandResponseManagerState]
 
     val runId = Id()
 
-    behaviorTestKit.run(AddOrUpdateCommand(runId, Accepted(runId)))
+    behaviorTestKit.run(AddOrUpdateCommand(runId, Started(runId)))
 
     behaviorTestKit.run(Subscribe(runId, commandResponseProbe.ref))
 
@@ -109,25 +108,25 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
 
   test("should be able to get current status of command on Query message") {
     val behaviorTestKit      = createBehaviorTestKit()
-    val commandResponseProbe = TestProbe[CommandResponseBase]
+    val commandResponseProbe = TestProbe[SubmitResponse]
 
     val runId = Id()
 
-    behaviorTestKit.run(AddOrUpdateCommand(runId, Accepted(runId)))
+    behaviorTestKit.run(AddOrUpdateCommand(runId, Started(runId)))
 
     behaviorTestKit.run(Query(runId, commandResponseProbe.ref))
-    commandResponseProbe.expectMessage(Accepted(runId))
+    commandResponseProbe.expectMessage(Started(runId))
   }
 
   test("should be able to update and publish command status to all subscribers") {
     val behaviorTestKit                  = createBehaviorTestKit()
-    val commandResponseProbe1            = TestProbe[CommandResponseBase]
-    val commandResponseProbe2            = TestProbe[CommandResponseBase]
+    val commandResponseProbe1            = TestProbe[SubmitResponse]
+    val commandResponseProbe2            = TestProbe[SubmitResponse]
     val commandResponseManagerStateProbe = TestProbe[CommandResponseManagerState]
 
     val runId = Id()
 
-    behaviorTestKit.run(AddOrUpdateCommand(runId, Accepted(runId)))
+    behaviorTestKit.run(AddOrUpdateCommand(runId, Started(runId)))
     behaviorTestKit.run(Subscribe(runId, commandResponseProbe1.ref))
     behaviorTestKit.run(Subscribe(runId, commandResponseProbe2.ref))
 
@@ -143,12 +142,12 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
 
   test("should be able to infer command status when status of sub command is updated") {
     val behaviorTestKit      = createBehaviorTestKit()
-    val commandResponseProbe = TestProbe[CommandResponseBase]
+    val commandResponseProbe = TestProbe[SubmitResponse]
 
     val runId        = Id()
     val subCommandId = Id()
 
-    behaviorTestKit.run(AddOrUpdateCommand(runId, Accepted(runId)))
+    behaviorTestKit.run(AddOrUpdateCommand(runId, Started(runId)))
     behaviorTestKit.run(Subscribe(runId, commandResponseProbe.ref))
 
     behaviorTestKit.run(AddSubCommand(runId, subCommandId))
@@ -162,12 +161,12 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
   // DEOPSCSW-208: Report failure on Configuration Completion command
   test("should be able to update command status with the status of subcommand if one of the subcommand fails") {
     val behaviorTestKit      = createBehaviorTestKit()
-    val commandResponseProbe = TestProbe[CommandResponseBase]
+    val commandResponseProbe = TestProbe[SubmitResponse]
     val runId                = Id()
     val subCommandId1        = Id()
     val subCommandId2        = Id()
 
-    behaviorTestKit.run(AddOrUpdateCommand(runId, Accepted(runId)))
+    behaviorTestKit.run(AddOrUpdateCommand(runId, Started(runId)))
     behaviorTestKit.run(Subscribe(runId, commandResponseProbe.ref))
 
     behaviorTestKit.run(AddSubCommand(runId, subCommandId1))
@@ -184,12 +183,12 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
   // DEOPSCSW-207: Report on Configuration Command Completion
   test("should be able to update successful command status when all the subcommand completes with success") {
     val behaviorTestKit      = createBehaviorTestKit()
-    val commandResponseProbe = TestProbe[CommandResponseBase]
+    val commandResponseProbe = TestProbe[SubmitResponse]
     val runId                = Id()
     val subCommandId1        = Id()
     val subCommandId2        = Id()
 
-    behaviorTestKit.run(AddOrUpdateCommand(runId, Accepted(runId)))
+    behaviorTestKit.run(AddOrUpdateCommand(runId, Started(runId)))
     behaviorTestKit.run(Subscribe(runId, commandResponseProbe.ref))
 
     behaviorTestKit.run(AddSubCommand(runId, subCommandId1))
@@ -200,14 +199,14 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
 
     // Status update of sub command 1 does not make the parent command complete
     behaviorTestKit.run(Query(runId, commandResponseProbe.ref))
-    commandResponseProbe.expectMessage(Accepted(runId))
+    commandResponseProbe.expectMessage(Started(runId))
 
     // Update status of sub command 2 with some intermediate status
-    behaviorTestKit.run(UpdateSubCommand(subCommandId2, Accepted(subCommandId2)))
+    behaviorTestKit.run(UpdateSubCommand(subCommandId2, Started(subCommandId2)))
 
     // Status update of sub command 2  with intermediate does not make the parent command complete
     behaviorTestKit.run(Query(runId, commandResponseProbe.ref))
-    commandResponseProbe.expectMessage(Accepted(runId))
+    commandResponseProbe.expectMessage(Started(runId))
 
     // Update status of sub command 2 as completed
     behaviorTestKit.run(UpdateSubCommand(subCommandId2, Completed(subCommandId2)))

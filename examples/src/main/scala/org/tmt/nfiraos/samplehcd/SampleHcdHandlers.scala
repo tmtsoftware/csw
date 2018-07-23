@@ -11,7 +11,7 @@ import csw.location.api.models.TrackingEvent
 import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.Id
 import csw.messages.TopLevelActorMessage
-import csw.messages.commands.CommandResponse.{Error, Started}
+import csw.messages.commands.Responses._
 import csw.messages.commands._
 import csw.messages.events.{EventName, SystemEvent}
 import csw.messages.location.TrackingEvent
@@ -46,7 +46,7 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
             log.trace(s"WorkerActor received sleep command with time of ${sleep.timeInMillis} ms")
             // simulate long running command
             Thread.sleep(sleep.timeInMillis)
-            commandResponseManager.addOrUpdateCommand(sleep.runId, CommandResponse.Completed(sleep.runId))
+            commandResponseManager.addOrUpdateCommand(sleep.runId, Responses.Completed(sleep.runId))
           case _ => log.error("Unsupported message type")
         }
         Behaviors.same
@@ -96,24 +96,24 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
   override def validateCommand(controlCommand: ControlCommand): ValidationResponse = {
     log.info(s"Validating command: ${controlCommand.commandName.name}")
     controlCommand.commandName.name match {
-      case "sleep" => ValidationResponse.Accepted(controlCommand.runId)
-      case x       => ValidationResponse.Invalid(controlCommand.runId, CommandIssue.UnsupportedCommandIssue(s"Command $x. not supported."))
+      case "sleep" => Accepted(controlCommand.runId)
+      case x       => Invalid(controlCommand.runId, CommandIssue.UnsupportedCommandIssue(s"Command $x. not supported."))
     }
   }
   //#validate
 
   //#onSetup
-  override def onSubmit(controlCommand: ControlCommand): CommandResponse = {
+  override def onSubmit(controlCommand: ControlCommand): SubmitResponse = {
     log.info(s"Handling command: ${controlCommand.commandName}")
 
     controlCommand match {
-      case setupCommand: Setup     => onSetup(setupCommand)
+      case setupCommand: Setup => onSetup(setupCommand)
       case observeCommand: Observe => // implement (or not)
         Error(controlCommand.runId, "Observe not supported")
     }
   }
 
-  def onSetup(setup: Setup): CommandResponse = {
+  def onSetup(setup: Setup): SubmitResponse = {
     val sleepTimeKey: Key[Long] = KeyType.LongKey.make("SleepTime")
 
     // get param from the Parameter Set in the Setup

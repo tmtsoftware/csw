@@ -24,9 +24,7 @@ import csw.messages.RunningMessage.Lifecycle
 import csw.messages.TopLevelActorCommonMessage.{TrackingEventReceived, UnderlyingHookFailed}
 import csw.messages.TopLevelActorIdleMessage.Initialize
 import csw.messages._
-import csw.messages.commands.{CommandResponse, ValidationResponse}
-import csw.messages.commands.CommandResponse.Invalid
-import csw.messages.commands.ValidationResponse.Accepted
+import csw.messages.commands.Responses.{Accepted, Invalid, OnewayResponse, SubmitResponse}
 import csw.services.command.CommandResponseManager
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
@@ -187,6 +185,7 @@ private[framework] final class ComponentBehavior(
    * @param commandMessage message encapsulating a [[csw.params.commands.Command]]
    */
   private def onRunningCompCommandMessage(commandMessage: CommandMessage): Unit = {
+    println(s"Got to onRunnginCompMess: $commandMessage")
 
     log.info(s"Invoking lifecycle handler's validateSubmit hook with msg :[$commandMessage]")
 
@@ -197,21 +196,25 @@ private[framework] final class ComponentBehavior(
           log.info(s"Invoking lifecycle handler's onOneway hook with msg :[$commandMessage]")
           lifecycleHandlers.onOneway(commandMessage.command)
         }
-        ow.replyTo ! validationResponse
+        ow.replyTo ! validationResponse.asInstanceOf[OnewayResponse]
       case su: Submit ⇒
-        lifecycleHandlers.validateCommand(commandMessage.command) match {
-          case _:Accepted =>
+        val validationResponse = lifecycleHandlers.validateCommand(commandMessage.command)
+        println("Submit validation response: " + validationResponse)
+        validationResponse match {
+          case _: Accepted =>
             // commandResponseManager.commandResponseManagerActor ! AddOrUpdateCommand(commandMessage.command.runId, validationResponse)
-            val response = lifecycleHandlers.onSubmit(commandMessage.command)
+            println(s"onsubmitAccepted: ")
+            val response: SubmitResponse = lifecycleHandlers.onSubmit(commandMessage.command)
+            println(s"onsubmitAccepted response: $response")
             commandResponseManager.commandResponseManagerActor ! AddOrUpdateCommand(commandMessage.command.runId, response)
             su.replyTo ! response
-          case in: ValidationResponse.Invalid =>
-            su.replyTo ! CommandResponse.Invalid(in.runId, in.issue)
+          case in: Invalid =>
+            su.replyTo ! in
         }
     }
   }
 
-    /*
+  /*
     commandMessage match {
       case _: Submit ⇒
         commandResponseManager.commandResponseManagerActor ! AddOrUpdateCommand(commandMessage.command.runId, validationResponse)
@@ -223,8 +226,8 @@ private[framework] final class ComponentBehavior(
   }
 
   private def forwardCommand(commandMessage: CommandMessage /*, validationResponse: CommandResponse*/): Unit =
-  */
-    /*
+   */
+  /*
     validationResponse match {
       case Accepted(_) ⇒
         commandMessage match {
@@ -238,6 +241,6 @@ private[framework] final class ComponentBehavior(
       case _ ⇒ log.debug(s"Command not forwarded to TLA post validation. ValidationResponse was [$validationResponse]")
 
     }
-    */
+ */
 
 }

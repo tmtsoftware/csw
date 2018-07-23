@@ -89,8 +89,8 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
   // DEOPSCSW-222: Locking a component for a specific duration
   // DEOPSCSW-301: Support UnLocking
   test("should forward command messages from client that locked the component and reject for other clients ") {
-    val lockingStateProbe    = TestProbe[LockingResponse]
-    val commandResponseProbe = TestProbe[CommandResponseBase]
+    val lockingStateProbe   = TestProbe[LockingResponse]
+    val submitResponseProbe = TestProbe[SubmitResponse]
 
     val source1Prefix = Prefix("wfos.prog.cloudcover.source1")
     val commandName1  = CommandName("move.Client1.success")
@@ -115,35 +115,35 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     lockingStateProbe.expectMessage(LockAcquired)
 
     // Client 1 sends submit command with tokenId in parameter set
-    supervisorRef ! Submit(Setup(source1Prefix, commandName1, Some(obsId)), commandResponseProbe.ref)
-    commandResponseProbe.expectMessageType[Accepted]
+    supervisorRef ! Submit(Setup(source1Prefix, commandName1, Some(obsId)), submitResponseProbe.ref)
+    submitResponseProbe.expectMessageType[Completed]
 
     // Client 2 tries to send submit command while Client 1 has the lock
-    supervisorRef ! Submit(Setup(source2Prefix, commandName2, Some(obsId)), commandResponseProbe.ref)
-    commandResponseProbe.expectMessageType[NotAllowed]
+    supervisorRef ! Submit(Setup(source2Prefix, commandName2, Some(obsId)), submitResponseProbe.ref)
+    submitResponseProbe.expectMessageType[Locked]
 
     // Client 1 unlocks the assembly
     supervisorRef ! Unlock(source1Prefix, lockingStateProbe.ref)
     lockingStateProbe.expectMessage(LockReleased)
 
     // Client 2 tries to send submit command again after lock is released
-    supervisorRef ! Submit(Setup(source2Prefix, commandName2, Some(obsId)), commandResponseProbe.ref)
-    commandResponseProbe.expectMessageType[Accepted]
+    supervisorRef ! Submit(Setup(source2Prefix, commandName2, Some(obsId)), submitResponseProbe.ref)
+    submitResponseProbe.expectMessageType[Completed]
 
     // Client 2 will lock an assembly
     supervisorRef ! LockCommandFactory.make(Prefix("wfos.prog.cloudcover.Client2"), lockingStateProbe.ref)
     lockingStateProbe.expectMessage(LockAcquired)
 
     // Client 1 tries to send submit command while Client 2 has the lock
-    supervisorRef ! Submit(Setup(source1Prefix, commandName1, Some(obsId)), commandResponseProbe.ref)
-    commandResponseProbe.expectMessageType[NotAllowed]
+    supervisorRef ! Submit(Setup(source1Prefix, commandName1, Some(obsId)), submitResponseProbe.ref)
+    submitResponseProbe.expectMessageType[Locked]
   }
 
   // DEOPSCSW-222: Locking a component for a specific duration
   // DEOPSCSW-301: Support UnLocking
   test("should forward messages that are of type SupervisorLockMessage to TLA") {
-    val lockingStateProbe    = TestProbe[LockingResponse]
-    val commandResponseProbe = TestProbe[CommandResponseBase]()(untypedSystem.toTyped)
+    val lockingStateProbe   = TestProbe[LockingResponse]
+    val submitResponseProbe = TestProbe[SubmitResponse]()(untypedSystem.toTyped)
 
     val sourcePrefix = Prefix("wfos.prog.cloudcover.source")
     val commandName  = CommandName("move.Client1.success")
@@ -167,31 +167,32 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
     // Client 1 sends submit command with tokenId in parameter set
     val setup = Setup(sourcePrefix, commandName, Some(obsId))
-    supervisorRef ! Submit(setup, commandResponseProbe.ref)
-    commandResponseProbe.expectMessageType[Accepted]
-    commandResponseManagerActor.expectMessage(AddOrUpdateCommand(setup.runId, Accepted(setup.runId)))
+    supervisorRef ! Submit(setup, submitResponseProbe.ref)
+    submitResponseProbe.expectMessageType[Completed]
+    // TODO -- CHeck on why these are here?
+    commandResponseManagerActor.expectMessage(AddOrUpdateCommand(setup.runId, Completed(setup.runId)))
 
     // Ensure Query can be sent to component even in locked state
-    supervisorRef ! Query(setup.runId, commandResponseProbe.ref)
-    commandResponseManagerActor.expectMessage(Query(setup.runId, commandResponseProbe.ref))
+    supervisorRef ! Query(setup.runId, submitResponseProbe.ref)
+    commandResponseManagerActor.expectMessage(Query(setup.runId, submitResponseProbe.ref))
 
     // Ensure Subscribe can be sent to component even in locked state
-    supervisorRef ! CRM.Subscribe(setup.runId, commandResponseProbe.ref)
-    commandResponseManagerActor.expectMessage(CRM.Subscribe(setup.runId, commandResponseProbe.ref))
+    supervisorRef ! CRM.Subscribe(setup.runId, submitResponseProbe.ref)
+    commandResponseManagerActor.expectMessage(CRM.Subscribe(setup.runId, submitResponseProbe.ref))
 
     // Ensure Unsubscribe can be sent to component even in locked state
-    supervisorRef ! Unsubscribe(setup.runId, commandResponseProbe.ref)
+    supervisorRef ! Unsubscribe(setup.runId, submitResponseProbe.ref)
     // to prove un-subscribe is handled, sending a same setup command with the same runId again
-    // now that we have un-subscribed, commandResponseProbe is not expecting command completion result (validation ll be received)
-    supervisorRef ! Submit(setup, commandResponseProbe.ref)
-    commandResponseProbe.expectMessageType[Accepted]
-    commandResponseProbe.expectNoMessage(200.millis)
+    // now that we have un-subscribed, submitResponseProbe  is not expecting command completion result (validation ll be received)
+    supervisorRef ! Submit(setup, submitResponseProbe.ref)
+    submitResponseProbe.expectMessageType[Completed]
+    submitResponseProbe.expectNoMessage(200.millis)
   }
 
   // DEOPSCSW-223 Expiry of component Locking mode
   test("should expire lock after timeout") {
-    val lockingStateProbe    = TestProbe[LockingResponse]
-    val commandResponseProbe = TestProbe[CommandResponseBase]
+    val lockingStateProbe   = TestProbe[LockingResponse]
+    val submitResponseProbe = TestProbe[SubmitResponse]
 
     val source1Prefix = Prefix("wfos.prog.cloudcover.Client1.success")
     val source2Prefix = Prefix("wfos.prog.cloudcover.source2.success")
@@ -210,14 +211,14 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     compStateProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))
     lifecycleStateProbe.expectMessage(LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
 
-    // Client 1 will lock an assembly
-    supervisorRef ! Lock(source1Prefix, lockingStateProbe.ref, 100.millis)
+    // Client 1 will lock an assembly - Note this delay must be long enough to allow client 2 to reject
+    supervisorRef ! Lock(source1Prefix, lockingStateProbe.ref, 200.millis)
     lockingStateProbe.expectMessage(LockAcquired)
     lockingStateProbe.expectMessage(LockExpiringShortly)
 
     // Client 2 tries to send submit command while Client 1 has the lock
-    supervisorRef ! Submit(Setup(source2Prefix, commandName, Some(obsId)), commandResponseProbe.ref)
-    commandResponseProbe.expectMessageType[NotAllowed]
+    supervisorRef ! Submit(Setup(source2Prefix, commandName, Some(obsId)), submitResponseProbe.ref)
+    submitResponseProbe.expectMessageType[Locked]
 
     // Reacquire lock before it gets expired
     supervisorRef ! Lock(source1Prefix, lockingStateProbe.ref, 100.millis)
@@ -229,8 +230,8 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     lockingStateProbe.expectMessage(LockExpired)
 
     // Client 2 tries to send submit command again after lock is released
-    supervisorRef ! Submit(Setup(source2Prefix, commandName, Some(obsId)), commandResponseProbe.ref)
-    commandResponseProbe.expectMessageType[Accepted]
+    supervisorRef ! Submit(Setup(source2Prefix, commandName, Some(obsId)), submitResponseProbe.ref)
+    submitResponseProbe.expectMessageType[Completed]
   }
 
   // DEOPSCSW-223 Expiry of component Locking mode

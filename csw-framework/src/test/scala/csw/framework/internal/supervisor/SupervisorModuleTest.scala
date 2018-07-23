@@ -115,8 +115,8 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
       {
         val mocks = frameworkTestMocks()
         import mocks._
-        val supervisorRef                  = createSupervisorAndStartTLA(info, mocks)
-        val commandValidationResponseProbe = TestProbe[CommandResponseBase]
+        val supervisorRef       = createSupervisorAndStartTLA(info, mocks)
+        val submitResponseProbe = TestProbe[SubmitResponse]
 
         supervisorRef ! ComponentStateSubscription(Subscribe(compStateProbe.ref))
         supervisorRef ! LifecycleStateSubscription(Subscribe(lifecycleStateProbe.ref))
@@ -127,7 +127,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(22)
         val setup: Setup          = Setup(prefix, CommandName("move.success"), Some(obsId), Set(param))
 
-        supervisorRef ! Submit(setup, commandValidationResponseProbe.ref)
+        supervisorRef ! Submit(setup, submitResponseProbe.ref)
 
         // verify that validateSubmit handler is invoked
         val submitSetupValidationCurrentState = compStateProbe.expectMessageType[CurrentState]
@@ -135,7 +135,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
           DemandState(prefix, StateName("testStateName"), Set(choiceKey.set(commandValidationChoice)))
         DemandMatcher(submitSetupValidationDemandState, timeout = 5.seconds)
           .check(submitSetupValidationCurrentState) shouldBe true
-        commandValidationResponseProbe.expectMessage(Completed(setup.runId))
+        submitResponseProbe.expectMessage(Completed(setup.runId))
 
         // verify that onSubmit handler is invoked
         val submitSetupCommandCurrentState = compStateProbe.expectMessageType[CurrentState]
@@ -153,7 +153,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
         val observe: Observe = Observe(prefix, CommandName("move.success"), Some(obsId), Set(param))
 
-        supervisorRef ! Submit(observe, commandValidationResponseProbe.ref)
+        supervisorRef ! Submit(observe, submitResponseProbe.ref)
 
         // verify that validateSubmit handler is invoked
         val submitValidationCurrentState = compStateProbe.expectMessageType[CurrentState]
@@ -161,7 +161,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
           DemandState(prefix, StateName("testStateName"), Set(choiceKey.set(commandValidationChoice)))
         DemandMatcher(submitValidationDemandState, timeout = 5.seconds)
           .check(submitValidationCurrentState) shouldBe true
-        commandValidationResponseProbe.expectMessage(Completed(observe.runId))
+        submitResponseProbe.expectMessage(Completed(observe.runId))
 
         // verify that onSubmit handler is invoked
         val submitCommandCurrentState = compStateProbe.expectMessageType[CurrentState]
@@ -190,8 +190,8 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
       {
         val mocks = frameworkTestMocks()
         import mocks._
-        val supervisorRef                                              = createSupervisorAndStartTLA(info, mocks)
-        val commandValidationResponseProbe: TestProbe[ValidationResponse] = TestProbe[ValidationResponse]
+        val supervisorRef                                 = createSupervisorAndStartTLA(info, mocks)
+        val onewayResposeProbe: TestProbe[OnewayResponse] = TestProbe[OnewayResponse]
 
         supervisorRef ! ComponentStateSubscription(Subscribe(compStateProbe.ref))
         supervisorRef ! LifecycleStateSubscription(Subscribe(lifecycleStateProbe.ref))
@@ -203,7 +203,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(22)
         val setup: Setup          = Setup(prefix, CommandName("move.success"), Some(obsId), Set(param))
 
-        supervisorRef ! Oneway(setup, commandValidationResponseProbe.ref)
+        supervisorRef ! Oneway(setup, onewayResposeProbe.ref)
 
         // verify that validateOneway handler is invoked
         val onewaySetupValidationCurrentState = compStateProbe.expectMessageType[CurrentState]
@@ -211,7 +211,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
           DemandState(prefix, StateName("testStateName"), Set(choiceKey.set(commandValidationChoice)))
         DemandMatcher(onewaySetupValidationDemandState, timeout = 5.seconds)
           .check(onewaySetupValidationCurrentState) shouldBe true
-        commandValidationResponseProbe.expectMessage(Accepted(setup.runId))
+        onewayResposeProbe.expectMessage(Accepted(setup.runId))
 
         // verify that onSetup handler is invoked and that data is transferred
         val onewaySetupCommandCurrentState = compStateProbe.expectMessageType[CurrentState]
@@ -229,7 +229,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
         val observe: Observe = Observe(prefix, CommandName("move.success"), Some(obsId), Set(param))
 
-        supervisorRef ! Oneway(observe, commandValidationResponseProbe.ref)
+        supervisorRef ! Oneway(observe, onewayResposeProbe.ref)
 
         // verify that validateOneway handler is invoked
         val oneWayObserveValidationCurrentState = compStateProbe.expectMessageType[CurrentState]
@@ -237,7 +237,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
           DemandState(prefix, StateName("testStateName"), Set(choiceKey.set(commandValidationChoice)))
         DemandMatcher(oneWayObserveValidationDemandState, timeout = 5.seconds)
           .check(oneWayObserveValidationCurrentState) shouldBe true
-        commandValidationResponseProbe.expectMessage(Accepted(observe.runId))
+        onewayResposeProbe.expectMessage(Accepted(observe.runId))
 
         // verify that onObserve handler is invoked and parameter is successfully transferred
         val oneWayObserveCommandCurrentState = compStateProbe.expectMessageType[CurrentState]
@@ -261,9 +261,9 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
   test("component handler should be able to validate a Setup or Observe command as failure during validation") {
     forAll(testData) { (info: ComponentInfo) ⇒
       {
-        val mocks                                                      = frameworkTestMocks()
-        val commandResponseProbe: TestProbe[CommandResponse]              = TestProbe[CommandResponse]
-        val commandValidationResponseProbe: TestProbe[ValidationResponse] = TestProbe[ValidationResponse]
+        val mocks                                          = frameworkTestMocks()
+        val submitResponseProbe: TestProbe[SubmitResponse] = TestProbe[SubmitResponse]
+        val onewayResponseProbe: TestProbe[OnewayResponse] = TestProbe[OnewayResponse]
         import mocks._
         val supervisorRef = createSupervisorAndStartTLA(hcdInfo, mocks)
 
@@ -278,11 +278,11 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
         // setup to receive Success in validation result
         val setup: Setup = Setup(prefix, CommandName("move.failure"), Some(obsId), Set(param))
 
-        supervisorRef ! Submit(setup, commandResponseProbe.ref)
-        commandResponseProbe.expectMessageType[CommandResponse.Invalid]
+        supervisorRef ! Submit(setup, submitResponseProbe.ref)
+        submitResponseProbe.expectMessageType[Invalid]
 
-        supervisorRef ! Oneway(setup, commandValidationResponseProbe.ref)
-        commandValidationResponseProbe.expectMessageType[Invalid]
+        supervisorRef ! Oneway(setup, onewayResponseProbe.ref)
+        onewayResponseProbe.expectMessageType[Invalid]
       }
     }
   }

@@ -15,17 +15,18 @@ import csw.params.core.states.{CurrentState, StateName}
 import csw.command.scaladsl.CommandService
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandIssue.UnsupportedCommandIssue
-import csw.messages.commands.CommandResponse.{Completed, Error, Started}
-import csw.messages.commands.ValidationResponse.{Accepted, Invalid}
-import csw.messages.commands.{CommandIssue, CommandResponse, ControlCommand, Setup}
+import csw.messages.commands.Responses._
+import csw.messages.commands._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.{AkkaLocation, TrackingEvent}
 import csw.messages.params.models.Id
 import csw.messages.params.states.{CurrentState, StateName}
+import csw.services.alarm.api.scaladsl.AlarmService
+import csw.services.command.CommandResponseManager
 import csw.services.command.scaladsl.CommandService
 
 import scala.concurrent.duration.DurationDouble
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext)
     extends ComponentHandlers(ctx, cswCtx) {
@@ -41,6 +42,8 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
 
   import cswCtx._
   override def initialize(): Future[Unit] =
+  override def initialize(): Future[Unit] = {
+    println("Yes MCS Initialize")
     componentInfo.connections.headOption match {
       case Some(hcd) ⇒
         cswCtx.locationService.resolve(hcd.of[AkkaLocation], 5.seconds).map {
@@ -49,27 +52,34 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
         }
       case None ⇒ Future.successful(Unit)
     }
+  }
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = Unit
 
   override def validateCommand(controlCommand: ControlCommand): ValidationResponse = {
+    println(s"Validate: $controlCommand")
     controlCommand.commandName match {
       case `longRunning` ⇒
+        println("Got longRunning on assembly validate")
         //#addOrUpdateCommand
         // after validation of the controlCommand, update its status of successful validation as Accepted
-        commandResponseManager.addOrUpdateCommand(controlCommand.runId, Accepted(controlCommand.runId))
+        // TODO -- Don't think we should do this
+        // commandResponseManager.addOrUpdateCommand(controlCommand.runId, Started(controlCommand.runId))
         //#addOrUpdateCommand
         Accepted(controlCommand.runId)
       case `moveCmd`    ⇒ Accepted(controlCommand.runId)
       case `initCmd`    ⇒ Accepted(controlCommand.runId)
       case `invalidCmd` ⇒ Invalid(controlCommand.runId, CommandIssue.OtherIssue("Invalid"))
-      case _            ⇒ ValidationResponse.Invalid(controlCommand.runId, UnsupportedCommandIssue(controlCommand.commandName.name))
+      case _            ⇒ Invalid(controlCommand.runId, UnsupportedCommandIssue(controlCommand.commandName.name))
     }
   }
 
-  override def onSubmit(controlCommand: ControlCommand): CommandResponse = {
+  override def onSubmit(controlCommand: ControlCommand): SubmitResponse = {
+    println("Got to onSubmit")
+
     controlCommand.commandName match {
       case `longRunning` ⇒
+        println("Got long running in assembly submit")
         runId = controlCommand.runId
 
         //#addSubCommand
@@ -107,23 +117,31 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
         )
         //#subscribe-to-command-response-manager
 
-        //#query-command-response-manager
-        // query CommandResponseManager to get the current status of Command, for example: Accepted/Completed/Invalid etc.
-        commandResponseManager
-          .query(controlCommand.runId)
+        Started(controlCommand.runId)
+
+      //#query-command-response-manager
+      // query CommandResponseManager to get the current status of Command, for example: Accepted/Completed/Invalid etc.
+      /* TODO -- CHECK THIS AGAIN */
+      // Await.result(commandResponseManager.query(controlCommand.runId), 20.millis)
+      /*
           .map(
             _ ⇒ () // may choose to publish current state to subscribers or do other operations
           )
-
-        Started(controlCommand.runId)
+        Completed(controlCommand.runId)
+       */
       //#query-command-response-manager
 
-      case `initCmd` ⇒ commandResponseManager.addOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId))
+      case `initCmd` ⇒
+        commandResponseManager.addOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId))
         Completed(controlCommand.runId)
-      case `moveCmd` ⇒ commandResponseManager.addOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId))
+
+      case `moveCmd` ⇒
+        commandResponseManager.addOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId))
         Completed(controlCommand.runId)
-      case _         ⇒ //do nothing
-        Error(controlCommand.runId, "Unknown command in onSubmit")
+
+      case _ ⇒ //do nothing
+        Completed(controlCommand.runId)
+
     }
   }
 
@@ -144,14 +162,17 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
                   currentStatePublisher
                     .publish(CurrentState(shortSetup.source, StateName("testStateName"), Set(choiceKey.set(shortCmdCompleted))))
                   // As the commands get completed, the results are updated in the commandResponseManager
+                  println("Short complete")
                   commandResponseManager.updateSubCommand(id, Completed(id))
                 case id if id == mediumSetup.runId ⇒
                   currentStatePublisher
                     .publish(CurrentState(mediumSetup.source, StateName("testStateName"), Set(choiceKey.set(mediumCmdCompleted))))
+                  println("Medium complete")
                   commandResponseManager.updateSubCommand(id, Completed(id))
                 case id if id == longSetup.runId ⇒
                   currentStatePublisher
                     .publish(CurrentState(longSetup.source, StateName("testStateName"), Set(choiceKey.set(longCmdCompleted))))
+                  println("Long complete")
                   commandResponseManager.updateSubCommand(id, Completed(id))
               }
             //#updateSubCommand

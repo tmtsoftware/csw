@@ -88,28 +88,28 @@ public class JHcdComponentHandlers extends JComponentHandlers {
     //#jInitialize-handler
     //#validateCommand-handler
     @Override
-    public ValidationResponse validateCommand(ControlCommand controlCommand) {
+    public Responses.ValidationResponse validateCommand(ControlCommand controlCommand) {
         if (controlCommand instanceof Setup) {
             // validation for setup goes here
-            return new ValidationResponse.Accepted(controlCommand.runId());
+            return new Responses.Accepted(controlCommand.runId());
         } else if (controlCommand instanceof Observe) {
             // validation for observe goes here
-            return new ValidationResponse.Accepted(controlCommand.runId());
+            return new Responses.Accepted(controlCommand.runId());
         } else {
-            return new ValidationResponse.Invalid(controlCommand.runId(), new CommandIssue.UnsupportedCommandIssue(controlCommand.commandName().name()));
+            return new Responses.Invalid(controlCommand.runId(), new CommandIssue.UnsupportedCommandIssue(controlCommand.commandName().name()));
         }
     }
     //#validateCommand-handler
 
     //#onSubmit-handler
     @Override
-    public CommandResponse onSubmit(ControlCommand controlCommand) {
+    public Responses.SubmitResponse onSubmit(ControlCommand controlCommand) {
         if (controlCommand instanceof Setup)
             return submitSetup((Setup) controlCommand); // includes logic to handle Submit with Setup config command
         else if (controlCommand instanceof Observe)
             return submitObserve((Observe) controlCommand); // includes logic to handle Submit with Observe config command"
         else
-            return new CommandResponse.Error(controlCommand.runId(), "Unknown command: " + controlCommand.commandName().name());
+            return new Responses.Error(controlCommand.runId(), "Unknown command: " + controlCommand.commandName().name());
     }
     //#onSubmit-handler
 
@@ -166,28 +166,30 @@ public class JHcdComponentHandlers extends JComponentHandlers {
             default:
                 log.error("Invalid command [" + sc + "] received.");
         }
+        return new Responses.Completed(sc.runId());
     }
 
-    private void processObserve(Observe oc) {
+    private Responses.SubmitResponse processObserve(Observe oc) {
         switch (oc.commandName().name()) {
             case "point":
             case "acquire":
             default:
                 log.error("Invalid command [" + oc + "] received.");
         }
+        return new Responses.Completed(oc.runId());
     }
 
     /**
      * in case of submit command, component writer is required to update commandResponseManager with the result
      */
-    private CommandResponse submitSetup(Setup setup) {
+    private Responses.SubmitResponse submitSetup(Setup setup) {
         processSetup(setup);
-        return new CommandResponse.Completed(setup.runId());
+        return new Responses.Completed(setup.runId());
     }
 
-    private CommandResponse submitObserve(Observe observe) {
+    private Responses.SubmitResponse submitObserve(Observe observe) {
         processObserve(observe);
-        return new CommandResponse.Completed(observe.runId());
+        return new Responses.Completed(observe.runId());
     }
 
     private void onewaySetup(Setup setup) {

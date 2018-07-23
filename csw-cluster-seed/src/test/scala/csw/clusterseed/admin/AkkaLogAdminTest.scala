@@ -69,7 +69,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with MockitoSugar with HttpSupp
 
   private var laserComponent: Component = _
   private var galilComponent: Component = _
-  private val probe                     = TestProbe[CommandResponse]
+  private val probe                     = TestProbe[OnewayResponse]
   private val startLoggingCmd           = CommandName("StartLogging")
   private val prefix                    = Prefix("iris.command")
 

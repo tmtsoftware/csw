@@ -116,7 +116,7 @@ class LockManagerTest extends FunSuite with MockitoSugar with Matchers {
   }
 
   test("should allow commands when component is not locked") {
-    val commandResponseProbe = TestProbe[CommandResponse]
+    val commandResponseProbe = TestProbe[SubmitResponse]
 
     val lockManager = new LockManager(None, mockedLoggerFactory)
     lockManager.isUnLocked shouldBe true
@@ -125,7 +125,7 @@ class LockManagerTest extends FunSuite with MockitoSugar with Matchers {
   }
 
   test("should allow commands when component is locked with same prefix") {
-    val commandResponseProbe = TestProbe[CommandResponse]
+    val commandResponseProbe = TestProbe[SubmitResponse]
 
     val lockManager = new LockManager(Some(prefix), mockedLoggerFactory)
     lockManager.isLocked shouldBe true
@@ -134,13 +134,12 @@ class LockManagerTest extends FunSuite with MockitoSugar with Matchers {
   }
 
   test("should not allow commands when component is locked with different prefix") {
-    val commandResponseProbe = TestProbe[CommandResponse]
+    val commandResponseProbe = TestProbe[SubmitResponse]
 
     val lockManager = new LockManager(Some(prefix), mockedLoggerFactory)
     lockManager.isLocked shouldBe true
 
     lockManager.allowCommand(Submit(invalidSetup, commandResponseProbe.ref)) shouldBe false
-    val commandResponse = commandResponseProbe.expectMessageType[NotAllowed]
-    commandResponse.issue shouldBe a[ComponentLockedIssue]
+
   }
 }

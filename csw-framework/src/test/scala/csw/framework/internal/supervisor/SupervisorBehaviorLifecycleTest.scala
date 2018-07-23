@@ -48,6 +48,7 @@ import csw.messages.{CommandResponseManagerMessage, ContainerIdleMessage, Superv
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 
+// TODO -- DID I REMOVE SOMETHING FORM THIS?  Why are there so many unused imports?
 // DEOPSCSW-163: Provide admin facilities in the framework through Supervisor role
 // DEOPSCSW-177: Hooks for lifecycle management
 class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndAfterEach {
@@ -281,18 +282,22 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     import testData._
 
     val childRef: ActorRef[TopLevelActorMessage] = supervisorBehaviorKit.childInbox(componentActorName).ref
-    val subscriberProbe                          = TestProbe[CommandResponseBase]
+    val submitResponseProbe                      = TestProbe[SubmitResponse]
     val testCmdId                                = Id()
 
     supervisorBehaviorKit.run(Running(childRef))
 
-    supervisorBehaviorKit.run(Query(testCmdId, subscriberProbe.ref))
-    testMocks.commandResponseManagerActor.expectMessage(Query(testCmdId, subscriberProbe.ref))
+    supervisorBehaviorKit.run(Query(testCmdId, submitResponseProbe.ref))
+    testMocks.commandResponseManagerActor.expectMessage(Query(testCmdId, submitResponseProbe.ref))
 
-    supervisorBehaviorKit.run(CommandResponseManagerMessage.Subscribe(testCmdId, subscriberProbe.ref))
-    testMocks.commandResponseManagerActor.expectMessage(CommandResponseManagerMessage.Subscribe(testCmdId, subscriberProbe.ref))
+    supervisorBehaviorKit.run(CommandResponseManagerMessage.Subscribe(testCmdId, submitResponseProbe.ref))
+    testMocks.commandResponseManagerActor.expectMessage(
+      CommandResponseManagerMessage.Subscribe(testCmdId, submitResponseProbe.ref)
+    )
 
-    supervisorBehaviorKit.run(CommandResponseManagerMessage.Unsubscribe(testCmdId, subscriberProbe.ref))
-    testMocks.commandResponseManagerActor.expectMessage(CommandResponseManagerMessage.Unsubscribe(testCmdId, subscriberProbe.ref))
+    supervisorBehaviorKit.run(CommandResponseManagerMessage.Unsubscribe(testCmdId, submitResponseProbe.ref))
+    testMocks.commandResponseManagerActor.expectMessage(
+      CommandResponseManagerMessage.Unsubscribe(testCmdId, submitResponseProbe.ref)
+    )
   }
 }

@@ -15,8 +15,7 @@ import csw.command.scaladsl.CommandService
 import csw.config.api.models.ConfigData
 import csw.logging.scaladsl.Logger
 import csw.messages.TopLevelActorMessage
-import csw.messages.commands.CommandResponse.Completed
-import csw.messages.commands.ValidationResponse.Accepted
+import csw.messages.commands.Responses.{Accepted, Completed, SubmitResponse, ValidationResponse}
 import csw.messages.commands._
 import csw.messages.location._
 import csw.services.command.scaladsl.CommandService
@@ -82,7 +81,7 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
   //#validateCommand-handler
 
   //#onSubmit-handler
-  override def onSubmit(controlCommand: ControlCommand): CommandResponse = controlCommand match {
+  override def onSubmit(controlCommand: ControlCommand): SubmitResponse = controlCommand match {
     case setup: Setup     ⇒ submitSetup(setup) // includes logic to handle Submit with Setup config command
     case observe: Observe ⇒ submitObserve(observe) // includes logic to handle Submit with Observe config command
   }
@@ -138,12 +137,12 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
   /**
    * in case of submit command, component writer is required to update commandResponseManager with the result
    */
-  private def submitSetup(setup: Setup): CommandResponse = {
+  private def submitSetup(setup: Setup): SubmitResponse = {
     processSetup(setup)
     Completed(setup.runId)
   }
 
-  private def submitObserve(observe: Observe): CommandResponse = {
+  private def submitObserve(observe: Observe): SubmitResponse = {
     processObserve(observe)
     Completed(observe.runId)
   }

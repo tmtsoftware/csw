@@ -19,7 +19,7 @@ import csw.params.core.models.Id
 class CommandResponseSubscription private[csw] (
     runId: Id,
     commandResponseManagerActor: ActorRef[CommandResponseManagerMessage],
-    callback: CommandResponse ⇒ Unit
+    callback: SubmitResponse ⇒ Unit
 )(implicit val mat: Materializer) {
 
   /**
@@ -28,10 +28,10 @@ class CommandResponseSubscription private[csw] (
    * Any change in status of the command will push the new status to source actorRef and this will flow though the stream
    * to sink. The callback provided by component developers is executed for the status flowing through the stream.
    */
-  private def source: Source[CommandResponse, Unit] = {
+  private def source: Source[SubmitResponse, Unit] = {
     val bufferSize = 256
     Source
-      .actorRef[CommandResponse](bufferSize, OverflowStrategy.dropHead)
+      .actorRef[SubmitResponse](bufferSize, OverflowStrategy.dropHead)
       .mapMaterializedValue { ref ⇒
         commandResponseManagerActor ! Subscribe(runId, ref)
       }

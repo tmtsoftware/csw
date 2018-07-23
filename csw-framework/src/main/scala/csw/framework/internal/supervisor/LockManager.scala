@@ -26,6 +26,7 @@ private[framework] class LockManager(val lockPrefix: Option[Prefix], loggerFacto
 
   def releaseLockOnTimeout(): LockManager = new LockManager(None, loggerFactory)
 
+  // Checks to see if component is locked, and if so, does the incoming prefix match the locked prefix
   def allowCommand(msg: CommandMessage): Boolean = lockPrefix match {
     case None ⇒ true
     case Some(currentPrefix) ⇒
@@ -35,9 +36,6 @@ private[framework] class LockManager(val lockPrefix: Option[Prefix], loggerFacto
           true
         case _ ⇒
           log.error(s"Cannot process the command [${msg.command.toString}] as the lock is acquired by component: $currentPrefix")
-          //// TODO -- FIX THIS currently base message has no reply -- look into LOCK replyTo?
-          //msg.replyTo ! NotAllowed(msg.command.runId,
-//                                   ComponentLockedIssue(s"This component is locked by component $currentPrefix"))
           false
       }
   }

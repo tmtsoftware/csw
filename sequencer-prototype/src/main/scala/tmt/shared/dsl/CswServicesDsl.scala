@@ -3,6 +3,7 @@ package tmt.shared.dsl
 import akka.stream.KillSwitch
 import akka.actor.typed.ActorSystem
 import akka.util.Timeout
+import csw.messages.commands.Responses.{Invalid, SubmitResponse}
 import csw.messages.commands._
 import csw.messages.location._
 import csw.services.command.scaladsl.CommandService
@@ -19,16 +20,16 @@ class CswServicesDsl(locationService: LocationService)(implicit system: ActorSys
 
   def track(connectionName: String): KillSwitch = locationService.subscribe(Connection.from(connectionName), trackingCallback)
 
-  def submit(componentName: String, controlCommand: ControlCommand, timeOut: Timeout): CommandResponseBase = //TODO: create dsl for Timeout and accept as parameter
+  def submit(componentName: String, controlCommand: ControlCommand, timeOut: Timeout): SubmitResponse = //TODO: create dsl for Timeout and accept as parameter
     components
       .get(componentName)
-      .fold[CommandResponseBase] {
+      .fold[SubmitResponse] {
         //TODO: decide the type of CommandIssue
-        ValidationResponse.Invalid(controlCommand.runId, CommandIssue.OtherIssue(s"Unavailable component $componentName"))
+        Invalid(controlCommand.runId, CommandIssue.OtherIssue(s"Unavailable component $componentName"))
       } { location =>
         new CommandService(location)
           .submit(controlCommand)(timeOut)
-          .recover { case NonFatal(ex) => ValidationResponse.Invalid(controlCommand.runId, CommandIssue.OtherIssue(ex.getMessage)) }
+          .recover { case NonFatal(ex) => Invalid(controlCommand.runId, CommandIssue.OtherIssue(ex.getMessage)) }
           .await(timeOut.duration)
       }
 

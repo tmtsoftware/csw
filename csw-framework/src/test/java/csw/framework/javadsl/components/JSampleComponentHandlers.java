@@ -70,12 +70,12 @@ public class JSampleComponentHandlers extends JComponentHandlers {
 
     @Override
     /// TODO - probbably need to make this work when running tests
-    public CommandResponse onSubmit(ControlCommand controlCommand) {
+    public Responses.SubmitResponse onSubmit(ControlCommand controlCommand) {
         // Adding item from CommandMessage paramset to ensure things are working
         CurrentState submitState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.submitCommandChoice()));
         currentStatePublisher.publish(submitState);
         processCommand(controlCommand);
-        return new Completed(controlCommand.runId());
+        return new Responses.Completed(controlCommand.runId());
     }
 
     @Override
@@ -87,24 +87,26 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     }
 
     @Override
-    public ValidationResponse validateCommand(ControlCommand controlCommand) {
+    public Responses.ValidationResponse validateCommand(ControlCommand controlCommand) {
         CurrentState submitState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.commandValidationChoice()));
         currentStatePublisher.publish(submitState);
-
+// TODO -- need to fix this by moving some to process command with submit
+        /*
         if (controlCommand.commandName().equals(immediateCmd())) {
             return new Completed(controlCommand.runId());
         } else if (controlCommand.commandName().equals(immediateResCmd())) {
-            Parameter<Integer> param = JKeyType.IntKey().make("encoder").set(22);
+            Parameter<Integer> param = JKeyTypes.IntKey().make("encoder").set(22);
             Result result = new Result(controlCommand.source().prefix()).add(param);
             return new CompletedWithResult(controlCommand.runId(), result);
         } else if (controlCommand.commandName().equals(failureAfterValidationCmd())) {
             ValidationResponse.Accepted accepted = new ValidationResponse.Accepted(controlCommand.runId());
             commandResponseManager.addOrUpdateCommand(controlCommand.runId(), accepted);
             return accepted;
-        } else if (controlCommand.commandName().name().contains("failure")) {
-            return new ValidationResponse.Invalid(controlCommand.runId(), new CommandIssue.OtherIssue("Testing: Received failure, will return Invalid."));
+
+        } else */ if (controlCommand.commandName().name().contains("failure")) {
+            return new Responses.Invalid(controlCommand.runId(), new CommandIssue.OtherIssue("Testing: Received failure, will return Invalid."));
         } else {
-            return new ValidationResponse.Accepted(controlCommand.runId());
+            return new Responses.Accepted(controlCommand.runId());
         }
     }
 
@@ -121,7 +123,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     private void processCommandWithMatcher(ControlCommand controlCommand) {
         Source.range(1, 10)
                 .map(i -> {
-                    currentStatePublisher.publish(new CurrentState(controlCommand.source().prefix(), new StateName("testStateName")).add(JKeyType.IntKey().make("encoder").set(i * 10)));
+                    currentStatePublisher.publish(new CurrentState(controlCommand.source().prefix(), new StateName("testStateName")).add(JKeyTypes.IntKey().make("encoder").set(i * 10)));
                     return i;
                 })
                 .throttle(1, Duration.ofMillis(100), 1, ThrottleMode.shaping())
@@ -132,13 +134,13 @@ public class JSampleComponentHandlers extends JComponentHandlers {
 
         if (controlCommand.commandName().equals(failureAfterValidationCmd())) {
             // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
-            CompletableFuture<CommandResponseBase> status = commandResponseManager.jQuery(controlCommand.runId(), Timeout.apply(100, TimeUnit.MILLISECONDS));
+            CompletableFuture<Responses.SubmitResponse> status = commandResponseManager.jQuery(controlCommand.runId(), Timeout.apply(100, TimeUnit.MILLISECONDS));
             status.thenAccept(response -> {
-                if(response instanceof ValidationResponse.Accepted)
-                    commandResponseManager.addOrUpdateCommand(controlCommand.runId(), new CommandResponse.Error(controlCommand.runId(), "Unknown Error occurred"));
+                if(response instanceof Responses.Invalid)
+                    commandResponseManager.addOrUpdateCommand(controlCommand.runId(), new Responses.Error(controlCommand.runId(), "Unknown Error occurred"));
             });
         } else {
-            commandResponseManager.addOrUpdateCommand(controlCommand.runId(), new Completed(controlCommand.runId()));
+             commandResponseManager.addOrUpdateCommand(controlCommand.runId(), new Responses.Completed(controlCommand.runId()));
         }
 
     }

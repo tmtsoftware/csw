@@ -19,7 +19,7 @@ private[csw] case class CommandResponseManagerState(cmdToCmdStatus: Map[Id, Comm
    * @param initialState an initial state
    * @return a new CommandResponseManagerState instance with updated cmdToCmdStatus
    */
-  def add(runId: Id, initialState: CommandResponseBase): CommandResponseManagerState =
+  def add(runId: Id, initialState: SubmitResponse): CommandResponseManagerState =
     CommandResponseManagerState(cmdToCmdStatus.updated(runId, CommandState.init(runId, initialState)))
 
   /**
@@ -28,7 +28,7 @@ private[csw] case class CommandResponseManagerState(cmdToCmdStatus: Map[Id, Comm
    * @param runId command identifier
    * @return current command response
    */
-  def get(runId: Id): CommandResponseBase = cmdToCmdStatus.get(runId) match {
+  def get(runId: Id): SubmitResponse = cmdToCmdStatus.get(runId) match {
     case Some(cmdState) => cmdState.commandStatus.currentCmdStatus
     case None           => CommandNotAvailable(runId)
   }
@@ -39,7 +39,7 @@ private[csw] case class CommandResponseManagerState(cmdToCmdStatus: Map[Id, Comm
    * @param commandResponse the command response to be updated for this command
    * @return a new CommandResponseManagerState instance with updated cmdToCmdStatus
    */
-  def updateCommandStatus(commandResponse: CommandResponseBase): CommandResponseManagerState =
+  def updateCommandStatus(commandResponse: SubmitResponse): CommandResponseManagerState =
     update(commandResponse.runId, _.withCommandStatus(commandResponse))
 
   /**
@@ -48,7 +48,7 @@ private[csw] case class CommandResponseManagerState(cmdToCmdStatus: Map[Id, Comm
    * @param actorRef the subscriber as an actor to which the updated state will be sent
    * @return a new CommandResponseManagerState instance with updated cmdToCmdStatus
    */
-  def subscribe(runId: Id, actorRef: ActorRef[CommandResponseBase]): CommandResponseManagerState =
+  def subscribe(runId: Id, actorRef: ActorRef[SubmitResponse]): CommandResponseManagerState =
     update(runId, _.addSubscriber(actorRef))
 
   /**
@@ -58,10 +58,10 @@ private[csw] case class CommandResponseManagerState(cmdToCmdStatus: Map[Id, Comm
    * @param actorRef the subscriber as an actor to which the updated state was being sent
    * @return a new CommandResponseManagerState instance with updated cmdToCmdStatus
    */
-  def unSubscribe(runId: Id, actorRef: ActorRef[CommandResponseBase]): CommandResponseManagerState =
+  def unSubscribe(runId: Id, actorRef: ActorRef[SubmitResponse]): CommandResponseManagerState =
     update(runId, _.removeSubscriber(actorRef))
 
-  def removeSubscriber(actorRef: ActorRef[CommandResponseBase]): CommandResponseManagerState = {
+  def removeSubscriber(actorRef: ActorRef[SubmitResponse]): CommandResponseManagerState = {
     def remove(ids: List[Id], commandResponseManagerState: CommandResponseManagerState): CommandResponseManagerState = {
       ids match {
         case Nil                ⇒ commandResponseManagerState

@@ -15,9 +15,10 @@ import csw.framework.components.assembly.{WorkerActor, WorkerActorMsg}
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.TopLevelActorMessage
-import csw.messages.commands.CommandResponse.Completed
-import csw.messages.commands.ValidationResponse.Accepted
-import csw.messages.commands.{CommandResponse, ControlCommand, Observe, Setup}
+import csw.messages.commands.Responses.{Accepted, Completed, SubmitResponse, ValidationResponse}
+import csw.messages.commands._
+import csw.messages.events._
+import csw.messages.framework.ComponentInfo
 import csw.messages.location.{LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.services.config.api.models.ConfigData
 import csw.services.logging.scaladsl.Logger
@@ -72,7 +73,7 @@ class HcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswC
   //#validateCommand-handler
 
   //#onSubmit-handler
-  override def onSubmit(controlCommand: ControlCommand): CommandResponse = controlCommand match {
+  override def onSubmit(controlCommand: ControlCommand): SubmitResponse = controlCommand match {
     case setup: Setup     ⇒ submitSetup(setup) // includes logic to handle Submit with Setup config command
     case observe: Observe ⇒ submitObserve(observe) // includes logic to handle Submit with Observe config command
   }
@@ -131,12 +132,12 @@ class HcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswC
   /**
    * in case of submit command, component writer is required to update commandResponseManager with the result
    */
-  private def submitSetup(setup: Setup): CommandResponse = {
+  private def submitSetup(setup: Setup): SubmitResponse = {
     processSetup(setup)
     Completed(setup.runId)
   }
 
-  private def submitObserve(observe: Observe): CommandResponse = {
+  private def submitObserve(observe: Observe): SubmitResponse = {
     processObserve(observe)
     Completed(observe.runId)
   }

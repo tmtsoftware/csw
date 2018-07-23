@@ -60,7 +60,7 @@ object DemoApp extends App {
   implicit val typedSystem: ActorSystem[Nothing] = frameworkWiring.actorSystem.toTyped
   implicit val testKitSettings: TestKitSettings  = TestKitSettings(typedSystem)
 
-  private val cmdResponseProbe = TestProbe[ValidationResponse]
+  private val cmdResponseProbe = TestProbe[OnewayResponse]
   private val startLoggingCmd  = CommandName("StartLogging")
   private val prefix           = Prefix("iris.command")
 

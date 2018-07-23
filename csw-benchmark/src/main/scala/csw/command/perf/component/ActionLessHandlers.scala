@@ -10,7 +10,7 @@ import csw.location.api.models.TrackingEvent
 import csw.params.core.models.Id
 import csw.logging.scaladsl.Logger
 import csw.messages.TopLevelActorMessage
-import csw.messages.commands.ValidationResponse.Accepted
+import csw.messages.commands.Responses.{Accepted, SubmitResponse, ValidationResponse}
 import csw.messages.commands._
 import csw.messages.location.TrackingEvent
 import csw.messages.params.models.Id
@@ -28,7 +28,7 @@ class ActionLessHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCon
 
   override def validateCommand(controlCommand: ControlCommand): ValidationResponse = Accepted(Id())
 
-  override def onSubmit(controlCommand: ControlCommand): CommandResponse = ???
+  override def onSubmit(controlCommand: ControlCommand): SubmitResponse = ???
 
   override def onOneway(controlCommand: ControlCommand): Unit = ???
 

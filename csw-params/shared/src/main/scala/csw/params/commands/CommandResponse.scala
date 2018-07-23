@@ -11,128 +11,124 @@ import enumeratum._
 import scala.collection.immutable
 
 /**
- * Parent type of a response of command Execution
- *
- *   @param resultType the nature of command response as [[csw.messages.commands.CommandResultType]]
+ * The nature of CommandResponse as an intermediate response of command execution or a final response which could be
+ * positive or negative
  */
-sealed abstract class CommandResponseBase() extends TMTSerializable {
+/*
+sealed trait CommandResultType extends EnumEntry
+object CommandResultType extends Enum[CommandResultType] {
 
-  def resultType: CommandResultType
-  /**
-   * A helper method to get the runId for this command response
-   *
-   * @return the runId of command for which this response is created
-   */
-  def runId: Id
-}
-
-sealed abstract class ValidationResponse(val resultType: CommandResultType) extends CommandResponseBase
-object ValidationResponse {
+  override def values: immutable.IndexedSeq[CommandResultType] = findValues
 
   /**
-    * Represents an intermediate response stating acceptance of a command received
-    *
-    * @param runId the runId of command for which this response is created
-    */
-  case class Accepted(runId: Id) extends ValidationResponse(Intermediate)
+ * A CommandResponse of intermediate type
+ */
+  case object Intermediate extends CommandResultType
 
   /**
-    * Represents a negative response invalidating a command received
-    *
-    * @param runId of command for which this response is created
-    * @param issue describing the cause of invalidation
-    */
-  case class Invalid(runId: Id, issue: CommandIssue) extends ValidationResponse(Negative)
+ * A CommandResponse of final type. It could be Positive or Negative
+ */
+  sealed trait Final extends CommandResultType
+
+  /**
+ * A Positive CommandResponse of Final type
+ */
+  case object Positive extends Final
+
+  /**
+ * A Negative CommandResponse of Final type
+ */
+  case object Negative extends Final
 
 }
+ */
 
+sealed trait CommandResultType
+object CommandResultType {
 
-sealed abstract class CommandResponse(val resultType: CommandResultType) extends CommandResponseBase
-object CommandResponse {
+  case object Intermediate extends CommandResultType
 
-  case class Invalid(runId: Id, issue: CommandIssue) extends CommandResponse(Negative) //{
-   // def this(inv: ValidationResponse.Invalid) =  this(inv.runId, inv.issue)
-  //}
+  sealed trait Final extends CommandResultType
 
+  case object Negative extends Final
 
-  /**
-    * Represents an intermediate response stating a submitted command is long-running and has started actions
-    *
-    * @param runId the runId of command for which this response is created
-    */
-  case class Started(runId: Id) extends CommandResponse(Intermediate)
+  case object Positive extends Final
 
-  /**
-   * Represents a positive response stating completion of command
-   *
-   * @param runId of command for which this response is created
-   * @param result describing the result of completion
-   */
-  case class CompletedWithResult(runId: Id, result: Result) extends CommandResponse(Positive)
+}
 
-  /**
-   * Represents a positive response stating completion of command
-   *
-   * @param runId of command for which this response is created
-   */
-  case class Completed(runId: Id) extends CommandResponse(Positive)
+object Responses {
 
-  /**
-   * Represents a negative response that states that a command is no longer valid
-   *
-   * @param runId of command for which this response is created
-   * @param issue describing the cause of invalidation
-   */
-  //case class NoLongerValid(runId: Id, issue: CommandIssue) extends CommandResponse(Negative)
+  import CommandResultType._
 
-  /**
-   * Represents a negative response that describes an error in executing the command
-   *
-   * @param runId of command for which this response is created
-   * @param message describing the reason or cause or action item of the error encountered while executing the command
-   */
-  case class Error(runId: Id, message: String) extends CommandResponse(Negative)
+  sealed trait Response extends TMTSerializable {
+    def resultType: CommandResultType
 
-  /**
-   * Represents a negative response that describes the cancellation of command
-   *
-   * @param runId of command for which this response is created
-   */
-  case class Cancelled(runId: Id) extends CommandResponse(Negative)
+    /**
+     * A helper method to get the runId for this command response
+     *
+     * @return the runId of command for which this response is created
+     */
+    def runId: Id
+  }
 
-  /**
-   * Represents a negative response stating that a command is not available
-   *
-   * @param runId of command for which this response is created
-   */
-  /// TODO - temporarily remains in order to deal with CommandResponseManager later
-  case class CommandNotAvailable(runId: Id) extends CommandResponse(Negative)
+  sealed trait CanBeLockedResponse extends Response
 
-  /**
-   * Represents a negative response stating that a command is not allowed
-   *
-   * @param runId of command for which this response is created
-   * @param issue describing the cause of invalidation
-   */
-  case class NotAllowed(runId: Id, issue: CommandIssue) extends CommandResponse(Negative)
+  sealed trait ValidationResponse extends Response
+
+  sealed trait OnewayResponse extends Response with CanBeLockedResponse
+
+  sealed trait SubmitResponse extends Response with CanBeLockedResponse
+
+  case class Invalid(runId: Id, issue: CommandIssue) extends ValidationResponse with OnewayResponse with SubmitResponse {
+    val resultType: CommandResultType = Negative
+  }
+  case class Accepted(runId: Id) extends ValidationResponse with OnewayResponse {
+    val resultType: CommandResultType = Positive
+  }
+
+  case class Locked(runId: Id) extends OnewayResponse with SubmitResponse {
+    val resultType: CommandResultType = Negative
+  }
+
+  case class Started(runId: Id) extends SubmitResponse {
+    val resultType: CommandResultType = Intermediate
+  }
+
+  case class CompletedWithResult(runId: Id, result: Result) extends SubmitResponse {
+    val resultType: CommandResultType = Positive
+  }
+
+  case class Completed(runId: Id) extends SubmitResponse {
+    val resultType: CommandResultType = Positive
+  }
+  case class Error(runId: Id, message: String) extends SubmitResponse {
+    val resultType: CommandResultType = Negative
+  }
+
+  case class Cancelled(runId: Id) extends SubmitResponse {
+    val resultType: CommandResultType = Negative
+  }
+
+  case class CommandNotAvailable(runId: Id) extends SubmitResponse {
+    val resultType: CommandResultType = Negative
+  }
 
   /**
    * Transform a given CommandResponse to a response with the provided Id
    *
    * @param id the RunId for the new CommandResponse
-   * @param commandResponse the CommandResponse to be transformed
+   * @param response the CommandResponse to be transformed
    * @return a CommandResponse that has runId as provided id
    */
-  def withRunId(id: Id, commandResponse: CommandResponseBase): CommandResponseBase = commandResponse match {
-    //case accepted: Accepted                       ⇒ accepted.copy(runId = id)
-    //case invalid: Invalid                         ⇒ invalid.copy(runId = id)
+  def withRunId(id: Id, response: SubmitResponse): SubmitResponse = response match {
+    case started: Started                         ⇒ started.copy(runId = id)
+    case invalid: Invalid                         ⇒ invalid.copy(runId = id)
     case completedWithResult: CompletedWithResult ⇒ completedWithResult.copy(runId = id)
     case completed: Completed                     ⇒ completed.copy(runId = id)
-    //case noLongerValid: NoLongerValid             ⇒ noLongerValid.copy(runId = id)
+    case locked: Locked                           ⇒ locked.copy(runId = id)
     case error: Error                             ⇒ error.copy(runId = id)
     case cancelled: Cancelled                     ⇒ cancelled.copy(runId = id)
-    //case commandNotAvailable: CommandNotAvailable ⇒ commandNotAvailable.copy(runId = id)
-    case notAllowed: NotAllowed                   ⇒ notAllowed.copy(runId = id)
+    case commandNotAvailable: CommandNotAvailable ⇒ commandNotAvailable.copy(runId = id)
   }
 
   /**
@@ -142,110 +138,38 @@ object CommandResponse {
    * @param commandResponses a stream of CommandResponses
    * @return a future of aggregated response
    */
-  def aggregateResponse(
-      commandResponses: Source[CommandResponseBase, NotUsed]
-  )(implicit ec: ExecutionContext, mat: Materializer): Future[CommandResponseBase] = {
+  def aggregateResponse(commandResponses: Source[SubmitResponse, NotUsed])(implicit ec: ExecutionContext,
+                                                                           mat: Materializer): Future[SubmitResponse] = {
     commandResponses
       .runForeach { x ⇒
-        if (x.resultType == CommandResultType.Negative)
+        if (x.resultType == Negative)
           throw new RuntimeException(s"Command with runId [${x.runId}] failed with response [$x]")
       }
       .transform {
-        case Success(_)  ⇒ Success(CommandResponse.Completed(Id()))
-        case Failure(ex) ⇒ Success(CommandResponse.Error(Id(), s"${ex.getMessage}"))
+        case Success(_)  ⇒ Success(Responses.Completed(Id()))
+        case Failure(ex) ⇒ Success(Responses.Error(Id(), s"${ex.getMessage}"))
       }
   }
-}
-
-/**
- * The nature of CommandResponse as an intermediate response of command execution or a final response which could be
- * positive or negative
- */
-sealed trait CommandResultType extends EnumEntry
-object CommandResultType extends Enum[CommandResultType] {
-
-  override def values: immutable.IndexedSeq[CommandResultType] = findValues
-
-  /**
-   * A CommandResponse of intermediate type
-   */
-  case object Intermediate extends CommandResultType
-
-  /**
-   * A CommandResponse of final type. It could be Positive or Negative
-   */
-  sealed trait Final extends CommandResultType
-
-  /**
-   * A Positive CommandResponse of Final type
-   */
-  case object Positive extends Final
-
-  /**
-   * A Negative CommandResponse of Final type
-   */
-  case object Negative extends Final
-
-}
-
-object Responses {
-  sealed abstract class LockResponse()
-  object LockResponse
-  {
-    case class Locked(runId: Id) extends LockResponse
-  }
-
-  sealed abstract class OnewayResponse() extends LockResponse with TMTSerializable
-  object OnewayResponse {
-    import LockResponse._
-    case class Invalid(runId: Id, issue: CommandIssue) extends OnewayResponse
-    case class Accepted(runId: Id) extends OnewayResponse
-    case class NotAllowed(runId: Id, issue: CommandIssue) extends OnewayResponse
-  }
-
-  sealed abstract class ValidationResponse() extends TMTSerializable
-  object ValidationResponse {
-    case class Invalid(runId: Id, issue: CommandIssue) extends ValidationResponse
-    case class Accepted(runId: Id) extends ValidationResponse
-  }
-
-  sealed abstract class SubmitResponse() extends TMTSerializable
-  object SubmitResponse {
-    case class Invalid(runId: Id, issue: CommandIssue) extends SubmitResponse
-
-    case class Started(runId: Id) extends SubmitResponse
-
-    case class CompletedWithResult(runId: Id, result: Result) extends SubmitResponse
-
-    case class Completed(runId: Id) extends SubmitResponse
-    case class Error(runId: Id, message: String) extends SubmitResponse
-
-    case class Cancelled(runId: Id) extends SubmitResponse
+  /*
+  def validate():ValidationResponse = {
+    Accepted(Id())
+    Invalid(Id(), WrongInternalStateIssue(""))
+    //Started(Id())
   }
 
   def oneway():OnewayResponse = {
-    import OnewayResponse._
-    val x = Locked(Id())
-    x
+    Invalid(Id(), WrongInternalStateIssue(""))
+    Accepted(Id())
   }
+
+  def submit():SubmitResponse = {
+    Invalid(Id(), WrongInternalStateIssue(""))
+    Completed(Id())
+    Started(Id())
+    Locked(Id())
+    Error(Id(), "Bogus")
+    Cancelled(Id())
+    CompletedWithResult(Id(), Result(Prefix("wfos")))
+  }
+ */
 }
-
-object Test2 {
-  sealed abstract class BasicResponse() extends TMTSerializable
-
-
-  trait FResult[A <: BasicResponse] {
-    def runId:Id
-  }
-
-  case class Started(runId: Id) extends BasicResponse
-
-  object Ended extends FResult[Started] {
-
-  }
-
-
-
-}
-
-

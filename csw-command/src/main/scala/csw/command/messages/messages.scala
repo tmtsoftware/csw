@@ -45,10 +45,10 @@ sealed trait CommandMessage extends RunningMessage with SupervisorLockMessage {
    */
   def command: ControlCommand
 
-  /**
+  /*
    * Represents the actor that will receive the command response
    */
-  //def replyTo: ActorRef[T <: CommandResponseBase]
+  // def replyTo: ActorRef[Responses.CanBeLockedResponse]
 }
 
 object CommandMessage {
@@ -59,7 +59,7 @@ object CommandMessage {
    * @param command represents a command sent to other component
    * @param replyTo represents the actor that will receive the command response
    */
-  case class Submit(command: ControlCommand, replyTo: ActorRef[CommandResponse]) extends CommandMessage
+  case class Submit(command: ControlCommand, replyTo: ActorRef[SubmitResponse]) extends CommandMessage
 
   /**
    * Represents a oneway kind of message that carries command to other component
@@ -67,8 +67,7 @@ object CommandMessage {
    * @param command represents a command sent to other component
    * @param replyTo represents the actor that will receive the command response
    */
-  // TODO -- Need to change this to ValidationResponse maybe requiring separateing from CommandMessage
-  case class Oneway(command: ControlCommand, replyTo: ActorRef[ValidationResponse]) extends CommandMessage
+  case class Oneway(command: ControlCommand, replyTo: ActorRef[OnewayResponse]) extends CommandMessage
 }
 
 private[csw] case class LockTimedout(replyTo: ActorRef[LockingResponse])       extends SupervisorMessage
@@ -257,14 +256,14 @@ private[csw] object FromSupervisorMessage {
 
 private[csw] sealed trait CommandResponseManagerMessage
 object CommandResponseManagerMessage {
-  private[csw] case class AddOrUpdateCommand(runId: Id, commandResponse: CommandResponseBase) extends CommandResponseManagerMessage
-  private[csw] case class AddSubCommand(runId: Id, subCommandId: Id)                      extends CommandResponseManagerMessage
-  private[csw] case class UpdateSubCommand(subCommandId: Id, commandResponse: CommandResponseBase)
+  private[csw] case class AddOrUpdateCommand(runId: Id, commandResponse: SubmitResponse) extends CommandResponseManagerMessage
+  private[csw] case class AddSubCommand(runId: Id, subCommandId: Id)                     extends CommandResponseManagerMessage
+  private[csw] case class UpdateSubCommand(subCommandId: Id, commandResponse: SubmitResponse)
       extends CommandResponseManagerMessage
   private[csw] case class GetCommandCorrelation(replyTo: ActorRef[CommandCorrelation]) extends CommandResponseManagerMessage
   private[csw] case class GetCommandResponseManagerState(replyTo: ActorRef[CommandResponseManagerState])
       extends CommandResponseManagerMessage
-  private[csw] case class SubscriberTerminated(terminated: ActorRef[CommandResponseBase]) extends CommandResponseManagerMessage
+  private[csw] case class SubscriberTerminated(terminated: ActorRef[SubmitResponse]) extends CommandResponseManagerMessage
 
   /**
    * Represents a message to query the command status of a command running on some component
@@ -272,7 +271,7 @@ object CommandResponseManagerMessage {
    * @param runId represents an unique identifier of command
    * @param replyTo represents the actor that will receive the command status
    */
-  case class Query(runId: Id, replyTo: ActorRef[CommandResponseBase]) extends CommandResponseManagerMessage with SupervisorLockMessage
+  case class Query(runId: Id, replyTo: ActorRef[SubmitResponse]) extends CommandResponseManagerMessage with SupervisorLockMessage
 
   /**
    * Represents a message to subscribe to change in command status of a command running on some component
@@ -280,7 +279,7 @@ object CommandResponseManagerMessage {
    * @param runId represents an unique identifier of command
    * @param replyTo represents the actor that will receive the notification of change in command status
    */
-  case class Subscribe(runId: Id, replyTo: ActorRef[CommandResponseBase])
+  case class Subscribe(runId: Id, replyTo: ActorRef[SubmitResponse])
       extends CommandResponseManagerMessage
       with SupervisorLockMessage
 
@@ -290,7 +289,7 @@ object CommandResponseManagerMessage {
    * @param runId represents an unique identifier of command
    * @param replyTo represents the actor that will be stop receiving notification of change in command status
    */
-  case class Unsubscribe(runId: Id, replyTo: ActorRef[CommandResponseBase])
+  case class Unsubscribe(runId: Id, replyTo: ActorRef[SubmitResponse])
       extends CommandResponseManagerMessage
       with SupervisorLockMessage
 }

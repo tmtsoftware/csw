@@ -29,9 +29,11 @@ class CommandResponseTest extends FunSuite with Matchers with ScalaFutures with 
     val commandResponseFailure  = Future { Error(Id(), "test Error") }
     val commandResponseSuccess2 = Future { Completed(Id()) }
 
-    val source: Source[CommandResponse, NotUsed] =
+    val source: Source[SubmitResponse, NotUsed] =
       Source(List(commandResponseSuccess1, commandResponseSuccess2, commandResponseFailure)).flatMapMerge(10, Source.fromFuture)
 
+    whenReady(Responses.aggregateResponse(source)) { result ⇒
+      result shouldBe a[Responses.Error]
     whenReady(CommandResponseAggregator.aggregateResponse(source)) { result ⇒
       result shouldBe a[commands.CommandResponse.Error]
     }
@@ -44,10 +46,12 @@ class CommandResponseTest extends FunSuite with Matchers with ScalaFutures with 
     val commandResponseSuccess2 = Future { Completed(Id()) }
     val commandResponseSuccess3 = Future { Completed(Id()) }
 
-    val source: Source[CommandResponse, NotUsed] =
+    val source: Source[SubmitResponse, NotUsed] =
       Source(List(commandResponseSuccess1, commandResponseSuccess2, commandResponseSuccess3))
         .flatMapMerge(10, Source.fromFuture)
 
+    whenReady(Responses.aggregateResponse(source)) { result ⇒
+      result shouldBe a[Responses.Completed]
     whenReady(CommandResponseAggregator.aggregateResponse(source)) { result ⇒
       result shouldBe a[commands.CommandResponse.Completed]
     }

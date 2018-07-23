@@ -34,15 +34,15 @@ case class CommandDistributor(componentToCommands: Map[CommandService, Set[Contr
       implicit timeout: Timeout,
       ec: ExecutionContext,
       mat: Materializer
-  ): Future[ValidationResponse] = {
+  ): Future[Responses.SubmitResponse] = {
 
-    val commandResponsesF: Source[CommandResponseBase, NotUsed] = Source(componentToCommands).flatMapMerge(
+    val commandResponsesF: Source[SubmitResponse, NotUsed] = Source(componentToCommands).flatMapMerge(
       breadth,
       { case (component, commands) ⇒ component.submitAll(commands) }
     )
-    CommandResponse.aggregateResponse(commandResponsesF).map {
-      case _: Completed  ⇒ ValidationResponse.Accepted(Id())
-      case otherResponse ⇒ ValidationResponse.Invalid(Id(), CommandIssue.OtherIssue("One or more commands were Invalid"))
+    Responses.aggregateResponse(commandResponsesF).map {
+      case _: Started    ⇒ Responses.Started(Id())
+      case otherResponse ⇒ Responses.Invalid(Id(), CommandIssue.OtherIssue("One or more commands were Invalid"))
     }
   }
 
@@ -57,9 +57,9 @@ case class CommandDistributor(componentToCommands: Map[CommandService, Set[Contr
       implicit timeout: Timeout,
       ec: ExecutionContext,
       mat: Materializer
-  ): Future[CommandResponseBase] = {
+  ): Future[SubmitResponse] = {
 
-    val commandResponsesF: Source[CommandResponseBase, NotUsed] = Source(componentToCommands).flatMapMerge(
+    val commandResponsesF: Source[SubmitResponse, NotUsed] = Source(componentToCommands).flatMapMerge(
       breadth,
       { case (component, commands) ⇒ component.submitAllAndSubscribe(commands) }
     )

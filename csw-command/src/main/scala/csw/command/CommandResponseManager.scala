@@ -15,7 +15,7 @@ import csw.params.commands.CommandResponse
 import csw.params.core.models.Id
 import csw.messages.CommandResponseManagerMessage
 import csw.messages.CommandResponseManagerMessage.{AddOrUpdateCommand, AddSubCommand, Query, UpdateSubCommand}
-import csw.messages.commands.{CommandResponse, CommandResponseBase}
+import csw.messages.commands.Responses.SubmitResponse
 import csw.messages.params.models.Id
 import csw.services.command.scaladsl.CommandResponseSubscription
 
@@ -42,7 +42,7 @@ class CommandResponseManager private[command] (val commandResponseManagerActor: 
    * @param runId command identifier
    * @param cmdStatus status of command as [[csw.params.commands.CommandResponse]]
    */
-  def addOrUpdateCommand(runId: Id, cmdStatus: CommandResponse): Unit =
+  def addOrUpdateCommand(runId: Id, cmdStatus: SubmitResponse): Unit =
     commandResponseManagerActor ! AddOrUpdateCommand(runId, cmdStatus)
 
   /**
@@ -60,7 +60,7 @@ class CommandResponseManager private[command] (val commandResponseManagerActor: 
    * @param subCommandId command identifier of sub command
    * @param cmdStatus status of command as [[csw.params.commands.CommandResponse]]
    */
-  def updateSubCommand(subCommandId: Id, cmdStatus: CommandResponseBase): Unit =
+  def updateSubCommand(subCommandId: Id, cmdStatus: SubmitResponse): Unit =
     commandResponseManagerActor ! UpdateSubCommand(subCommandId, cmdStatus)
 
   /**
@@ -70,7 +70,7 @@ class CommandResponseManager private[command] (val commandResponseManagerActor: 
    * @param timeout timeout duration until which this operation is expected to wait for providing a value
    * @return a future of CommandResponse
    */
-  def query(runId: Id)(implicit timeout: Timeout): Future[CommandResponseBase] =
+  def query(runId: Id)(implicit timeout: Timeout): Future[SubmitResponse] =
     commandResponseManagerActor ? (Query(runId, _))
 
   /**
@@ -80,7 +80,7 @@ class CommandResponseManager private[command] (val commandResponseManagerActor: 
    * @param timeout timeout duration until which this operation is expected to wait for providing a value
    * @return a future of CommandResponse
    */
-  def jQuery(runId: Id, timeout: Timeout): CompletableFuture[CommandResponseBase] =
+  def jQuery(runId: Id, timeout: Timeout): CompletableFuture[SubmitResponse] =
     query(runId)(timeout).toJava.toCompletableFuture
 
   /**
@@ -88,9 +88,9 @@ class CommandResponseManager private[command] (val commandResponseManagerActor: 
    *
    * @param runId command identifier of command
    * @param callback callback  to take action on the command response received
-   * @return a [[csw.command.scaladsl.CommandResponseSubscription]] to unsubscribe the subscription later
+   * @return a [[csw.services.command.scaladsl.CommandResponseSubscription]] to unsubscribe the subscription later
    */
-  def subscribe(runId: Id, callback: CommandResponse ⇒ Unit): CommandResponseSubscription =
+  def subscribe(runId: Id, callback: SubmitResponse ⇒ Unit): CommandResponseSubscription =
     new CommandResponseSubscription(runId, commandResponseManagerActor, callback)
 
   /**
@@ -99,7 +99,7 @@ class CommandResponseManager private[command] (val commandResponseManagerActor: 
    * @param consumer consumer function to take action on the command response received
    * @return a CommandResponseSubscription that can be used to unsubscribe
    */
-  def jSubscribe(runId: Id, consumer: Consumer[CommandResponse]): CommandResponseSubscription =
+  def jSubscribe(runId: Id, consumer: Consumer[SubmitResponse]): CommandResponseSubscription =
     new CommandResponseSubscription(runId, commandResponseManagerActor, consumer.asScala)
 
 }

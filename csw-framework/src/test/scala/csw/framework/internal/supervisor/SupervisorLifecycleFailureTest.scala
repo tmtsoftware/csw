@@ -191,7 +191,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     lifecycleStateProbe.expectMessage(5.seconds, LifecycleStateChanged(supervisorRef, SupervisorLifecycleState.Running))
 
     // Supervisor sends component a submit command which will fail with FailureRestart exception on calling onSubmit Handler
-    supervisorRef ! Submit(setup, TestProbe[CommandResponse].ref)
+    supervisorRef ! Submit(setup, TestProbe[SubmitResponse].ref)
 
     // Component initializes again by the akka framework without termination
     compStateProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(initChoice))))

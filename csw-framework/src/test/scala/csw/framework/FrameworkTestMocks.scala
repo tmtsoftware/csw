@@ -56,7 +56,7 @@ class FrameworkTestMocks(implicit untypedSystem: actor.ActorSystem, system: Acto
   val commandResponseManager: CommandResponseManager                        = mock[CommandResponseManager]
 
   when(commandResponseManager.commandResponseManagerActor).thenReturn(commandResponseManagerActor.ref)
-  doNothing().when(commandResponseManager).addOrUpdateCommand(any[Id], any[CommandResponse])
+  doNothing().when(commandResponseManager).addOrUpdateCommand(any[Id], any[SubmitResponse])
 
   val lifecycleStateProbe: TestProbe[LifecycleStateChanged] = TestProbe[LifecycleStateChanged]
   val compStateProbe: TestProbe[CurrentState]               = TestProbe[CurrentState]

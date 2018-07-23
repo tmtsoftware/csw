@@ -28,33 +28,41 @@ class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = ???
 
   override def validateCommand(controlCommand: ControlCommand): ValidationResponse = {
+    println("HCD Validate")
     controlCommand.commandName match {
       case `longRunning`               ⇒ Accepted(controlCommand.runId)
       case `mediumRunning`             ⇒ Accepted(controlCommand.runId)
       case `shortRunning`              ⇒ Accepted(controlCommand.runId)
       case `failureAfterValidationCmd` ⇒ Accepted(controlCommand.runId)
-      case _                           ⇒
-        ValidationResponse.Invalid(controlCommand.runId, UnsupportedCommandIssue(controlCommand.commandName.name))
+      case _ ⇒
+        Invalid(controlCommand.runId, UnsupportedCommandIssue(controlCommand.commandName.name))
     }
   }
 
-  override def onSubmit(controlCommand: ControlCommand): CommandResponse = {
+  override def onSubmit(controlCommand: ControlCommand): SubmitResponse = {
+    println("HCD ON submit: " + controlCommand)
     controlCommand.commandName match {
       case `longRunning` ⇒
+        println("Got long")
         ctx.schedule(5.seconds,
                      commandResponseManager.commandResponseManagerActor,
-                     AddOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId)))
-                     Completed(controlCommand.runId)
+                     AddOrUpdateCommand(controlCommand.runId, Error(controlCommand.runId, "What")))
+        //Error(controlCommand.runId, "WTF1")
+        Started(controlCommand.runId)
       case `mediumRunning` ⇒
+        println("God medium")
         ctx.schedule(3.seconds,
                      commandResponseManager.commandResponseManagerActor,
-                     AddOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId)))
-                     Completed(controlCommand.runId)
+                     AddOrUpdateCommand(controlCommand.runId, Error(controlCommand.runId, "two")))
+        Started(controlCommand.runId)
+      //Error(controlCommand.runId, "WTF2")
       case `shortRunning` ⇒
+        println("Got short")
         ctx.schedule(1.seconds,
                      commandResponseManager.commandResponseManagerActor,
-                     AddOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId)))
-                     Completed(controlCommand.runId)
+                     AddOrUpdateCommand(controlCommand.runId, Error(controlCommand.runId, "three")))
+        Started(controlCommand.runId)
+//        Error(controlCommand.runId, "WTF3")
       case `failureAfterValidationCmd` ⇒
         commandResponseManager.addOrUpdateCommand(controlCommand.runId, Error(controlCommand.runId, "Failed command"))
         Error(controlCommand.runId, "Failed command")
