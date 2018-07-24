@@ -56,7 +56,7 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
       case None           => subscriberF.map(_.subscribe(keys))
     }
 
-    if (options.isOneline) printLine(Formatter.eventSeparator)
+    if (options.isOneline && !options.terse) printLine(Formatter.eventSeparator)
 
     val (subscriptionF, doneF) = Source
       .fromFutureSource(eventStream)
@@ -74,7 +74,8 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
   }
 
   private def processEvent(options: Options, event: Event): Unit =
-    if (options.isOneline) new EventOnelineTransformer(options).transform(event).foreach(printLine)
+    if (options.terse) new EventOnelineTransformer(options).transformTerse(event).foreach(printLine)
+    else if (options.isOneline) new EventOnelineTransformer(options).transform(event).foreach(printLine)
     else processGetJson(event, options)
 
   private def processGetJson(event: Event, options: Options): Unit = {

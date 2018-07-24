@@ -41,7 +41,8 @@ class ArgsParser(name: String) {
         out,
         timestamp,
         id,
-        units
+        units,
+        terse
       )
 
     help("help")

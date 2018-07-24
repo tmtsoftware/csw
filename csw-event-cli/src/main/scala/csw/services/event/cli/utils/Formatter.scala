@@ -15,15 +15,22 @@ object Formatter {
 case class OnelineFormatter(options: Options) {
 
   def format(event: Event, lines: List[Oneline]): String = {
-    lines
-      .map { line =>
-        if (options.terse) line.terse()
-        else if (options.printValues && options.printUnits) line.withValuesAndUnits()
-        else if (options.printValues) line.withValues()
-        else line.withKeyTypeAndUnits()
-      }
-      .sorted
-      .mkString("\n")
+    if (options.terse) {
+      lines
+        .map { line =>
+          line.terse()
+        }
+        .mkString("\n")
+    } else {
+      lines
+        .map { line =>
+          if (options.printValues && options.printUnits) line.withValuesAndUnits()
+          else if (options.printValues) line.withValues()
+          else line.withKeyTypeAndUnits()
+        }
+        .sorted
+        .mkString("\n")
+    }
   }
 
   def header(event: Event): String = {
