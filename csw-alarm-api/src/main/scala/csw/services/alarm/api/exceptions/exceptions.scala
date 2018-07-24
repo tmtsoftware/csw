@@ -14,3 +14,5 @@ case class ResetOperationFailedException(key: AlarmKey, currentSeverity: AlarmSe
     )
 
 case object NoAlarmsFoundException extends RuntimeException("No alarms found")
+
+case class ConfigParseException(reasons: List[String]) extends RuntimeException(reasons.mkString("[", "\n", "]"))

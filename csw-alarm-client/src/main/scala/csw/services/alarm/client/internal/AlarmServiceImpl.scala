@@ -75,7 +75,7 @@ class AlarmServiceImpl(
 
     // derive acknowledgement status
     if (severity.isHighRisk && severity != currentSeverity) {
-      if (alarm.isAutoAcknowledgable) status = status.copy(acknowledgementStatus = Acknowledged)
+      if (alarm.isAutoAcknowledgeable) status = status.copy(acknowledgementStatus = Acknowledged)
       else status = status.copy(acknowledgementStatus = UnAcknowledged)
       statusChanged = true
     }

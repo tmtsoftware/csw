@@ -9,6 +9,6 @@ object EnumUpickleSupport {
       .readwriter[String]
       .bimap[T](
         _.entryName,
-        implicitly[Enum[T]].withName
+        implicitly[Enum[T]].withNameInsensitive
       )
 }

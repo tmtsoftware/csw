@@ -185,9 +185,11 @@ object Dependencies {
   val AlarmClient = Seq(
     Libs.`lettuce`,
     Libs.`scala-async`,
+    Libs.`json-schema-validator`,
     Libs.`scala-java8-compat`,
     Akka.`akka-actor-typed`,
-    Akka.`akka-stream`
+    Akka.`akka-stream`,
+    Libs.`scalatest` % Test
   )
 
   val Commons = Seq(
