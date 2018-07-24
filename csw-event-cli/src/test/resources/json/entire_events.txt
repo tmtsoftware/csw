@@ -1,3 +1,4 @@
+[ERROR] No events published for key: [wfos.prog.cloudcover.system_1]
 {
   "type" : "SystemEvent",
   "eventId" : "1",

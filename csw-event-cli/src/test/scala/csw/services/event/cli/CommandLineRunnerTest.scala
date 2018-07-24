@@ -169,12 +169,14 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
 
     val eventGenerator = new EventGenerator(EventName("system_1"))
     import eventGenerator._
-    val publisher   = eventService.defaultPublisher.await
-    val cancellable = publisher.publish(eventGenerator.generate, 400.millis)
-
     val eventKey: EventKey = eventsGroup.head.eventKey
+
     val (subscriptionF, _) =
       commandLineRunner.subscribe(argsParser.parse(Seq("subscribe", "-o", "json", "--events", eventKey.key)).get)
+    Thread.sleep(500)
+
+    val publisher   = eventService.defaultPublisher.await
+    val cancellable = publisher.publish(eventGenerator.generate, 400.millis)
 
     Thread.sleep(1000)
 

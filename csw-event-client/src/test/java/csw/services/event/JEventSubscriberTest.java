@@ -337,22 +337,23 @@ public class JEventSubscriberTest extends TestNGSuite {
 
         Pair<IEventSubscription, CompletionStage<List<Event>>> pair = baseProperties.jSubscriber().subscribe(Collections.singleton(event1.eventKey())).take(2).toMat(Sink.seq(), Keep.both()).run(baseProperties.resumingMat());
         pair.first().ready().get(10, TimeUnit.SECONDS);
-        Thread.sleep(100);
-        baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
 
         Pair<IEventSubscription, CompletionStage<List<Event>>> pair2 = baseProperties.jSubscriber().subscribe(Collections.singleton(event2.eventKey())).take(2).toMat(Sink.seq(), Keep.both()).run(baseProperties.resumingMat());
         pair2.first().ready().get(10, TimeUnit.SECONDS);
+        Thread.sleep(500);
+
+        baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
         baseProperties.jPublisher().publish(event2).get(10, TimeUnit.SECONDS);
 
         Set<Event> expectedEvents = new HashSet<>();
         expectedEvents.add(Event$.MODULE$.invalidEvent(event1.eventKey()));
         expectedEvents.add(event1);
 
-        Assert.assertEquals(expectedEvents, new HashSet<>(pair.second().toCompletableFuture().get(10, TimeUnit.SECONDS)));
-
         Set<Event> expectedEvents2 = new HashSet<>();
         expectedEvents2.add(Event$.MODULE$.invalidEvent(event2.eventKey()));
         expectedEvents2.add(event2);
+
+        Assert.assertEquals(expectedEvents, new HashSet<>(pair.second().toCompletableFuture().get(10, TimeUnit.SECONDS)));
 
         Assert.assertEquals(expectedEvents2, new HashSet<>(pair2.second().toCompletableFuture().get(10, TimeUnit.SECONDS)));
     }
