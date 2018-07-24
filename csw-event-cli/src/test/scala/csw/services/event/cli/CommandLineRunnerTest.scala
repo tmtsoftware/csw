@@ -73,6 +73,16 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
     logBuffer shouldEqualContentsOf "oneline/get_multiple_events.txt"
   }
 
+  // DEOPSCSW-431: [Event Cli] Get command
+  test("should able to get events in oneline terse format") {
+
+    // note: terse does not sort parameters
+    commandLineRunner
+      .get(argsParser.parse(Seq("get", "--terse", "-e", s"${event1.eventKey},${event2.eventKey}")).get)
+      .await
+    logBuffer shouldEqualContentsOf "oneline/get_multiple_events_terse.txt"
+  }
+
   // DEOPSCSW-432: [Event Cli] Publish command
   test("should able to publish event when event key and event json file provided") {
     val path      = getClass.getResource("/publish/observe_event.json").getPath
@@ -210,6 +220,32 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
     subscriptionF.map(_.unsubscribe())
 
     logBuffer shouldEqualContentsOf "oneline/entire_events.txt"
+  }
+
+  // DEOPSCSW-433: [Event Cli] Subscribe command
+  test("should be able to subscribe to event key using terse mode and get oneline output") {
+    import cliWiring._
+
+    implicit val mat: Materializer    = actorRuntime.mat
+    implicit val ec: ExecutionContext = actorRuntime.ec
+
+    val eventGenerator = new EventGenerator(EventName("system_3"))
+    import eventGenerator._
+
+    val eventKey: EventKey = eventsGroup.head.eventKey
+    val publisher          = eventService.defaultPublisher.await
+
+    val (subscriptionF, _) =
+      commandLineRunner.subscribe(argsParser.parse(Seq("subscribe", "--events", eventKey.key, "--terse")).get)
+
+    Thread.sleep(500)
+    val cancellable = publisher.publish(eventGenerator.generate, 400.millis)
+
+    Thread.sleep(1000)
+    cancellable.cancel()
+    subscriptionF.map(_.unsubscribe())
+
+    logBuffer shouldEqualContentsOf "oneline/entire_events_terse.txt"
   }
 
   // publish command generates new id and event time while publishing, hence assertions exclude these keys from json
