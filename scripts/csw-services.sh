@@ -46,7 +46,7 @@ logDir=/tmp/csw-prod/logs
 test -d ${logDir} || mkdir -p ${logDir}
 
 # We need at least this version of Redis
-minRedisVersion=3.2.5
+minRedisVersion=4.0
 redisSentinel=redis-sentinel
 redisClient=`echo ${redisSentinel} | sed -e 's/-sentinel/-cli/'`
 
