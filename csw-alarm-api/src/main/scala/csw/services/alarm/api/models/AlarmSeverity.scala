@@ -12,7 +12,9 @@ sealed abstract class AlarmSeverity private[alarm] (val level: Int) extends Enum
    */
   def name: String = entryName
 
-  def isHigherThan(otherSeverity: AlarmSeverity): Boolean = this.level > otherSeverity.level
+  def >(otherSeverity: AlarmSeverity): Boolean = this.level > otherSeverity.level
+
+  def max(otherSeverity: AlarmSeverity): AlarmSeverity = if (otherSeverity > this) otherSeverity else this
 
   // Disconnected, Indeterminate and Okay are not considered as an alarm condition
   def isHighRisk: Boolean = this.level > 0

@@ -63,7 +63,7 @@ class AlarmServiceImpl(
     var statusChanged = false
 
     // derive latch status for latchable alarms
-    if (alarm.isLatchable && severity.isHighRisk && severity.isHigherThan(status.latchedSeverity)) {
+    if (alarm.isLatchable && severity.isHighRisk && severity > status.latchedSeverity) {
       status = status.copy(latchStatus = Latched, latchedSeverity = severity)
       statusChanged = true
     }
@@ -167,7 +167,7 @@ class AlarmServiceImpl(
       .collect {
         case status: KeyValue[StatusKey, AlarmStatus] if status.getValue.isActive ⇒ status.getValue.latchedSeverity
       }
-      .reduceRight((previous, current) ⇒ if (previous.isHigherThan(current)) previous else current)
+      .reduceRight((previous, current) ⇒ previous max current)
   }
 
   override def subscribeSeverityAggregateCallback(
@@ -182,9 +182,7 @@ class AlarmServiceImpl(
       Source
         .fromPublisher(aggregateApi.observePatterns(OverflowStrategy.LATEST))
         .map(_.getMessage.latchedSeverity)
-        .scan[AlarmSeverity](AlarmSeverity.Disconnected) { (maxSeverity, currentSeverity) ⇒
-          if (currentSeverity.isHigherThan(maxSeverity)) currentSeverity else maxSeverity
-        }
+        .scan[AlarmSeverity](AlarmSeverity.Disconnected)((maxSeverity, currentSeverity) ⇒ currentSeverity max maxSeverity)
         .runForeach(callback)
       Unit
     }
