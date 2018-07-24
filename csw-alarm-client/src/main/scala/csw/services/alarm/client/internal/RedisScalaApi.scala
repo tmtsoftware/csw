@@ -1,9 +1,10 @@
 package csw.services.alarm.client.internal
 
+import akka.NotUsed
+import akka.stream.scaladsl.Source
 import io.lettuce.core.KeyValue
 import io.lettuce.core.api.async.RedisAsyncCommands
 import io.lettuce.core.pubsub.api.reactive.{PatternMessage, RedisPubSubReactiveCommands}
-import reactor.core.publisher.Flux
 import reactor.core.publisher.FluxSink.OverflowStrategy
 
 import scala.collection.JavaConverters.iterableAsScalaIterableConverter
@@ -20,6 +21,6 @@ class RedisScalaApi[K, V](
   def mget(keys: List[K]): Future[List[KeyValue[K, V]]]      = redisAsyncCommands.mget(keys: _*).toScala.map(_.asScala.toList)
   def keys(key: K): Future[List[K]]                          = redisAsyncCommands.keys(key).toScala.map(_.asScala.toList)
   def psubscribe(keys: List[K]): Future[Unit]                = redisReactiveCommands.psubscribe(keys: _*).toFuture.toScala.map(_ ⇒ Unit)
-  def observePatterns(overflowStrategy: OverflowStrategy): Flux[PatternMessage[K, V]] =
-    redisReactiveCommands.observePatterns(overflowStrategy)
+  def observePatterns(overflowStrategy: OverflowStrategy): Source[PatternMessage[K, V], NotUsed] =
+    Source.fromPublisher(redisReactiveCommands.observePatterns(overflowStrategy))
 }

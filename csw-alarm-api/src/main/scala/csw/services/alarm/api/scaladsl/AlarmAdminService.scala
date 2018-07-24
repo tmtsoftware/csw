@@ -36,5 +36,5 @@ trait AlarmAdminService extends AlarmService {
       componentName: Option[String] = None,
       alarmName: Option[String] = None,
       actorRef: ActorRef[AlarmSeverity]
-  ): Future[Unit] = subscribeSeverityAggregateCallback(subsystem, componentName, alarmName, actorRef ! _)
+  ): Future[Unit]
 }

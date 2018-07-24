@@ -2,7 +2,6 @@ package csw.services.alarm.client.internal
 
 import akka.actor.ActorSystem
 import akka.actor.typed.ActorRef
-import akka.stream.scaladsl.Source
 import akka.stream.{ActorMaterializer, Materializer}
 import csw.services.alarm.api.exceptions.{InvalidSeverityException, NoAlarmsFoundException, ResetOperationFailedException}
 import csw.services.alarm.api.internal.{AggregateKey, MetadataKey, SeverityKey, StatusKey}
@@ -179,14 +178,21 @@ class AlarmServiceImpl(
     val patternBasedAlarmKey = AlarmKey.withPattern(subsystem, componentName, alarmName)
 
     aggregateApi.psubscribe(List(patternBasedAlarmKey)).map { _ ⇒
-      Source
-        .fromPublisher(aggregateApi.observePatterns(OverflowStrategy.LATEST))
+      aggregateApi
+        .observePatterns(OverflowStrategy.LATEST)
         .map(_.getMessage.latchedSeverity)
         .scan[AlarmSeverity](AlarmSeverity.Disconnected)((maxSeverity, currentSeverity) ⇒ currentSeverity max maxSeverity)
         .runForeach(callback)
       Unit
     }
   }
+
+  override def subscribeSeverityAggregateActorRef(
+      subsystem: Option[String],
+      componentName: Option[String],
+      alarmName: Option[String],
+      actorRef: ActorRef[AlarmSeverity]
+  ): Future[Unit] = subscribeSeverityAggregateCallback(subsystem, componentName, alarmName, actorRef ! _)
 
   private def getKeys[K](patternBasedAlarmKey: K, redisAsyncScalaApi: RedisScalaApi[K, _]): Future[List[K]] = async {
     val keys = await(redisAsyncScalaApi.keys(patternBasedAlarmKey))
