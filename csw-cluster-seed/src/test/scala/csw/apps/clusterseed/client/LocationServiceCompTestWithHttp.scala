@@ -14,6 +14,7 @@ class LocationServiceCompTestWithHttp extends LocationServiceCompTest("http") {
 
   override protected def afterAll(): Unit = {
     super.afterAll()
+    Http(wiring.actorSystem).shutdownAllConnectionPools().await
     wiring.actorSystem.terminate().await
   }
 }
