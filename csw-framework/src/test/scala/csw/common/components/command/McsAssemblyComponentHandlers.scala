@@ -84,7 +84,7 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
 
         //#addSubCommand
         shortSetup = Setup(prefix, shortRunning, controlCommand.maybeObsId)
-        commandResponseManager.addSubCommand(runId, shortSetup.runId)
+        //commandResponseManager.addSubCommand(runId, shortSetup.runId)
         //#addSubCommand
 
         mediumSetup = Setup(prefix, mediumRunning, controlCommand.maybeObsId)
@@ -92,20 +92,22 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
         commandResponseManager.addSubCommand(runId, mediumSetup.runId)
 
         longSetup = Setup(prefix, longRunning, controlCommand.maybeObsId)
-        commandResponseManager.addSubCommand(runId, longSetup.runId)
+        //commandResponseManager.addSubCommand(runId, longSetup.runId)
 
         // this is to simulate that assembly is splitting command into three sub commands and forwarding same to hcd
         // longSetup takes 5 seconds to finish
         // shortSetup takes 1 second to finish
         // mediumSetup takes 3 seconds to finish
-        processCommand(longSetup)
-        processCommand(shortSetup)
+        //processCommand(longSetup)
+        // processCommand(shortSetup)
+        //
         processCommand(mediumSetup)
 
         // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
         //#subscribe-to-command-response-manager
         // subscribe to the status of original command received and publish the state when its status changes to
         // Completed
+        /*
         commandResponseManager.subscribe(
           controlCommand.runId, {
             case Completed(_) ⇒
@@ -115,6 +117,7 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
             case _ ⇒
           }
         )
+         */
         //#subscribe-to-command-response-manager
 
         Started(controlCommand.runId)
@@ -146,6 +149,7 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
   }
 
   private def processCommand(controlCommand: ControlCommand) = {
+    println(s"MCSASSembly: processCommand: $controlCommand")
     hcdComponent
       .submit(controlCommand)
       .map {
@@ -165,6 +169,7 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
                   println("Short complete")
                   commandResponseManager.updateSubCommand(id, Completed(id))
                 case id if id == mediumSetup.runId ⇒
+                  println("Got something back for medium")
                   currentStatePublisher
                     .publish(CurrentState(mediumSetup.source, StateName("testStateName"), Set(choiceKey.set(mediumCmdCompleted))))
                   println("Medium complete")
@@ -176,7 +181,8 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
                   commandResponseManager.updateSubCommand(id, Completed(id))
               }
             //#updateSubCommand
-            case _ ⇒ // Do nothing
+            case a ⇒ // Do nothing
+              println(s"Got some other message in processCommand: $a")
           }
         case _ ⇒ // Do nothing
       }

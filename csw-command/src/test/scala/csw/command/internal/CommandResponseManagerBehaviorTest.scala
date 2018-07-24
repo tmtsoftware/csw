@@ -32,7 +32,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
   implicit val typedSystem: typed.ActorSystem[_] = actorSystem.toTyped
   implicit val testKitSettings: TestKitSettings  = TestKitSettings(typedSystem)
 
-  def createBehaviorTestKit() = BehaviorTestKit(
+  def createBehaviorTestKit(): BehaviorTestKit[CommandResponseManagerMessage] = BehaviorTestKit(
     Behaviors.setup[CommandResponseManagerMessage](ctx ⇒ new CommandResponseManagerBehavior(ctx, getMockedLogger))
   )
 
@@ -204,7 +204,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
     // Update status of sub command 2 with some intermediate status
     behaviorTestKit.run(UpdateSubCommand(subCommandId2, Started(subCommandId2)))
 
-    // Status update of sub command 2  with intermediate does not make the parent command complete
+    // Status update of sub command 2 with intermediate does not make the parent command complete
     behaviorTestKit.run(Query(runId, commandResponseProbe.ref))
     commandResponseProbe.expectMessage(Started(runId))
 

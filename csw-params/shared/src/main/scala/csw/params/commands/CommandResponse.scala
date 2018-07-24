@@ -71,23 +71,14 @@ object Responses {
     def runId: Id
   }
 
-  sealed trait CanBeLockedResponse extends Response
-
   sealed trait ValidationResponse extends Response
 
-  sealed trait OnewayResponse extends Response with CanBeLockedResponse
+  sealed trait OnewayResponse extends Response
 
-  sealed trait SubmitResponse extends Response with CanBeLockedResponse
+  sealed trait SubmitResponse extends Response
 
-  case class Invalid(runId: Id, issue: CommandIssue) extends ValidationResponse with OnewayResponse with SubmitResponse {
-    val resultType: CommandResultType = Negative
-  }
   case class Accepted(runId: Id) extends ValidationResponse with OnewayResponse {
     val resultType: CommandResultType = Positive
-  }
-
-  case class Locked(runId: Id) extends OnewayResponse with SubmitResponse {
-    val resultType: CommandResultType = Negative
   }
 
   case class Started(runId: Id) extends SubmitResponse {
@@ -101,11 +92,20 @@ object Responses {
   case class Completed(runId: Id) extends SubmitResponse {
     val resultType: CommandResultType = Positive
   }
+
+  case class Invalid(runId: Id, issue: CommandIssue) extends ValidationResponse with OnewayResponse with SubmitResponse {
+    val resultType: CommandResultType = Negative
+  }
+
   case class Error(runId: Id, message: String) extends SubmitResponse {
     val resultType: CommandResultType = Negative
   }
 
   case class Cancelled(runId: Id) extends SubmitResponse {
+    val resultType: CommandResultType = Negative
+  }
+
+  case class Locked(runId: Id) extends OnewayResponse with SubmitResponse {
     val resultType: CommandResultType = Negative
   }
 

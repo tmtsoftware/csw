@@ -50,7 +50,7 @@ class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
         //Error(controlCommand.runId, "WTF1")
         Started(controlCommand.runId)
       case `mediumRunning` ⇒
-        println("God medium")
+        println("Got medium")
         ctx.schedule(3.seconds,
                      commandResponseManager.commandResponseManagerActor,
                      AddOrUpdateCommand(controlCommand.runId, Error(controlCommand.runId, "two")))

@@ -201,7 +201,7 @@ private[framework] final class SupervisorBehavior(
     case Lock(source, replyTo, leaseDuration) ⇒ lockComponent(source, replyTo, leaseDuration)
     case Unlock(source, replyTo)              ⇒ unlockComponent(source, replyTo)
     case command: CommandMessage ⇒
-      println("COt a command: " + command)
+      println("Supervisor got a command: " + command)
       if (lockManager.allowCommand(command) == false) {
         // Both types of command message have their own responses, so while it is not elegant, it is necessary
         // to check for the type of message upon failure, and send to the currect replyTo

@@ -24,7 +24,7 @@ import csw.services.logging.scaladsl.{Logger, LoggerFactory}
  *
  * This class defines the behavior of CommandResponseManagerActor and is responsible for adding/updating/querying command result.
  * When component receives command of type Submit, then framework (ComponentBehavior - TLA) will add a entry of this command
- * with its validation status into CommandResponseManager.
+ * with the [[csw.messages.commands.Responses.SubmitResponse]] returned into the CommandResponseManager.
  *
  * In case of short running or immediate command,
  * validation response will be of type final result which can either be of type
@@ -32,6 +32,8 @@ import csw.services.logging.scaladsl.{Logger, LoggerFactory}
  *
  * In case of long running command, validation response will be of type [[csw.params.commands.CommandResultType.Intermediate]]
  * then it is the responsibility of component writer to update its final command status later on
+ * with [[csw.messages.commands.Responses.SubmitResponse]] which will either be
+ * [[csw.messages.commands.CommandResultType.Positive]] or [[csw.messages.commands.CommandResultType.Negative]]
  * with [[csw.params.commands.CommandResponse]] which should be of type
  * [[csw.params.commands.CommandResultType.Positive]] or [[csw.params.commands.CommandResultType.Negative]]
  *
@@ -70,16 +72,21 @@ private[command] class CommandResponseManagerBehavior(
     this
   }
 
-  private def addOrUpdateCommand(runId: Id, commandResponse: SubmitResponse): Unit =
+  private def addOrUpdateCommand(runId: Id, commandResponse: SubmitResponse): Unit = {
+    println(s"Add or Update: $runId --- $commandResponse")
     commandResponseManagerState.get(runId) match {
       case _: CommandNotAvailable ⇒ commandResponseManagerState = commandResponseManagerState.add(runId, commandResponse)
       case _                      ⇒ updateCommand(runId, commandResponse)
     }
+  }
 
   private def updateCommand(runId: Id, commandResponse: SubmitResponse): Unit = {
     val currentResponse = commandResponseManagerState.get(runId)
+    println(s"In Update: $commandResponse")
     if (currentResponse.resultType == CommandResultType.Intermediate && currentResponse != commandResponse) {
       commandResponseManagerState = commandResponseManagerState.updateCommandStatus(commandResponse)
+      val x = commandResponseManagerState.cmdToCmdStatus(commandResponse.runId).subscribers
+      println(s"Doing update to: $x with $commandResponse")
       publishToSubscribers(commandResponse, commandResponseManagerState.cmdToCmdStatus(commandResponse.runId).subscribers)
     }
   }

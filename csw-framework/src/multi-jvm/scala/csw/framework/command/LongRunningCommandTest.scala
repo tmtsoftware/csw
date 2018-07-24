@@ -65,7 +65,7 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
           5.seconds
         )
       val assemblyLocation: AkkaLocation = Await.result(assemblyLocF, 10.seconds).get
-      val assemblyCommandService         = new CommandService(assemblyLocation)
+      val assemblyCommandService = new CommandService(assemblyLocation)
 
       println(s"Assembly: $assemblyLocation")
       val setup = Setup(prefix, longRunning, Some(obsId))
@@ -89,7 +89,7 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
         case _: Started ⇒
           println("Got started")
           assemblyCommandService.subscribe(setup.runId)
-        case _           ⇒ Future(Error(setup.runId, ""))
+        case _ ⇒ Future(Error(setup.runId, ""))
       }
       //#subscribe-for-result
 
@@ -98,7 +98,7 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
       println("Got Fin: " + fin)
 
       //Await.result(eventualCommandResponse, 20.seconds) shouldBe Completed(setup.runId)
-/*
+      /*
       //#submitAndSubscribe
       val setupForSubscribe = Setup(prefix, longRunning, Some(obsId))
       val response          = assemblyCommandService.submitAndSubscribe(setupForSubscribe)
@@ -106,7 +106,7 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
 
       Await.result(response, 20.seconds) shouldBe Completed(setupForSubscribe.runId)
       */
-/*
+      /*
       // verify that commands gets completed in following sequence
       // ShortSetup => MediumSetup => LongSetup
       probe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(shortCmdCompleted))))
@@ -126,6 +126,7 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
       */
       enterBarrier("long-commands")
 
+/*
       val hcdLocF =
         locationService.resolve(
           AkkaConnection(ComponentId("Test_Component_Running_Long_Command", ComponentType.HCD)),
@@ -169,6 +170,7 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
       whenReady(aggregatedInvalidValidationResponse, PatienceConfiguration.Timeout(20.seconds)) { result ⇒
         result shouldBe a[Invalid]
       }
+      */
 /*
       enterBarrier("multiple-components-submit-multiple-commands")
 

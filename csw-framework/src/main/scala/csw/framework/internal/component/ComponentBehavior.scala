@@ -205,7 +205,7 @@ private[framework] final class ComponentBehavior(
             // commandResponseManager.commandResponseManagerActor ! AddOrUpdateCommand(commandMessage.command.runId, validationResponse)
             println(s"onsubmitAccepted: ")
             val response: SubmitResponse = lifecycleHandlers.onSubmit(commandMessage.command)
-            println(s"onsubmitAccepted response: $response")
+            println(s"onSubmitHandler response: $response")
             commandResponseManager.commandResponseManagerActor ! AddOrUpdateCommand(commandMessage.command.runId, response)
             su.replyTo ! response
           case in: Invalid =>
