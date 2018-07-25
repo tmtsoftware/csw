@@ -1,6 +1,6 @@
 package csw.services.alarm.client.internal.configparser
 
-import java.io.{ByteArrayInputStream, File, IOException, InputStream}
+import java.io.{ByteArrayInputStream, IOException, InputStream}
 import java.net.URI
 
 import com.fasterxml.jackson.databind.JsonNode
@@ -27,7 +27,8 @@ object ConfigValidator {
    * @param config the config to convert
    * @return the config contents in JSON format
    */
-  private def toJson(config: Config): String = config.root.render(ConfigRenderOptions.concise())
+  private def conciseJsonFrom(config: Config) = config.root.render(ConfigRenderOptions.concise())
+  private def jsonNodeFrom(config: Config)    = JsonLoader.fromString(conciseJsonFrom(config))
 
   // Adds a custom URI scheme, so that config:/... loads the config file as a resource
   // and converts it to JSON. In this way you can use "$ref": "config:/myfile.conf"
@@ -36,7 +37,7 @@ object ConfigValidator {
     override def fetch(uri: URI): InputStream = {
       val config = ConfigFactory.parseResources(uri.getPath.substring(1))
       if (config == null) throw new IOException(s"Resource not found: ${uri.getPath}")
-      new ByteArrayInputStream(toJson(config).getBytes)
+      new ByteArrayInputStream(conciseJsonFrom(config).getBytes)
     }
   }
 
@@ -48,19 +49,20 @@ object ConfigValidator {
    * @return a list of problems, if any were found
    */
   def validate(inputConfig: Config, schemaConfig: Config): ValidationResult = {
-    val jsonSchema = JsonLoader.fromString(toJson(schemaConfig))
-    val schema     = jsonSchemaFactory.getJsonSchema(jsonSchema)
-    val jsonInput  = JsonLoader.fromString(toJson(inputConfig))
-    validate(schema, jsonInput, inputConfig.origin().filename())
+    val jsonSchema = jsonSchemaFactory.getJsonSchema(jsonNodeFrom(schemaConfig))
+    val jsonInput  = jsonNodeFrom(inputConfig)
+    val fileName   = inputConfig.origin().filename()
+
+    validate(jsonSchema, jsonInput, fileName)
   }
 
   // Runs the validation and handles any internal exceptions
   // 'source' is the name of the input file for use in error messages.
-  private def validate(schema: JsonSchema, jsonInput: JsonNode, source: String): ValidationResult = {
+  private def validate(jsonSchema: JsonSchema, jsonInput: JsonNode, source: String): ValidationResult = {
     try {
-      val report = schema.validate(jsonInput, true)
-      if (report.isSuccess) Success
-      else Failure(report.asScala.map(formatMsg(_, source)).toList)
+      val processingReport = jsonSchema.validate(jsonInput, true)
+      if (processingReport.isSuccess) Success
+      else Failure(processingReport.asScala.map(formatMsg(_, source)).toList)
     } catch {
       case e: Exception =>
         e.printStackTrace()
@@ -71,27 +73,36 @@ object ConfigValidator {
   // Formats the error message for display to user.
   // 'source' is the name of the original input file.
   private def formatMsg(msg: ProcessingMessage, source: String): String = {
-    val file = new File(source).getPath
-
     // try to get a nicely formatted error message that includes the necessary info
-    val json          = msg.asJson()
-    val pointer       = json.get("instance").get("pointer").asText()
-    val loc           = if (pointer.isEmpty) s"$file" else s"$file, at path: $pointer"
-    val schemaUri     = json.get("schema").get("loadingURI").asText()
-    val schemaPointer = json.get("schema").get("pointer").asText()
-    val schemaStr     = if (schemaUri == "#") "" else s" (schema: $schemaUri:$schemaPointer)"
+    val json             = msg.asJson()
+    val loc              = extractErrorLocation(json, source)
+    val schemaStr        = extractJsonSchemaStr(json)
+    val messages: String = extractAdditionalMessages(json)
 
-    // try to get additional messages from the reports section
-    val reports = json.get("reports")
-    val messages =
-      if (reports == null) ""
-      else {
-        val msgElems = (for (r <- reports.asScala) yield r.elements().asScala.toList).flatten
-        val msgTexts = for (e <- msgElems) yield e.get("message").asText()
-        "\n" + msgTexts.mkString("\n")
-      }
-
-    s"$loc: ${msg.getLogLevel.toString}: ${msg.getMessage}$schemaStr$messages"
+    s"$loc: ${msg.getLogLevel}: ${msg.getMessage}$schemaStr$messages"
   }
+
+  private def extractErrorLocation(json: JsonNode, source: String) = {
+    val pointer = json.get("instance").get("pointer").asText()
+    if (pointer.isEmpty) s"$source" else s"$source, at path: $pointer"
+  }
+
+  private def extractJsonSchemaStr(json: JsonNode) = {
+    val schemaUri = json.get("schema").get("loadingURI").asText()
+
+    val schemaPointer = json.get("schema").get("pointer").asText()
+    if (schemaUri == "#") "" else s" (schema: $schemaUri:$schemaPointer)"
+  }
+
+  // try to get additional messages from the reports section
+  private def extractAdditionalMessages(json: JsonNode) =
+    Option(json.get("reports"))
+      .map { reports ⇒
+        reports.asScala
+          .flatMap(_.elements().asScala)
+          .map(_.get("message").asText())
+          .mkString("\n", "\n", "\n")
+      }
+      .getOrElse("")
 
 }
