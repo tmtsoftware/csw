@@ -17,8 +17,8 @@ object ConfigParser extends AlarmRW {
   def parseAlarmMetadata(config: Config): AlarmMetadata   = parse[AlarmMetadata](config, ALARM_SCHEMA)
   def parseAlarmsMetadata(config: Config): AlarmsMetadata = parse[AlarmsMetadata](config, ALARMS_SCHEMA)
 
-  def parse[T: RW](config: Config, schemaConfig: Config): T =
-    AscfValidator.validate(config, schemaConfig) match {
+  private def parse[T: RW](config: Config, schemaConfig: Config): T =
+    ConfigValidator.validate(config, schemaConfig) match {
       case Success          ⇒ readJs[T](configToJsValue(config))
       case Failure(reasons) ⇒ throw ConfigParseException(reasons)
     }

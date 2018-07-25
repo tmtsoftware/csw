@@ -15,10 +15,9 @@ import csw.services.alarm.client.internal.configparser.ValidationResult.{Failure
 import scala.collection.JavaConverters.{asScalaIteratorConverter, iterableAsScalaIterableConverter}
 
 /**
- * Uses json-schema to validate the Alarm Service Config File (ASCF), which is used to
- * import alarm data into the database.
+ * Uses json-schema to validate the Config File
  */
-object AscfValidator {
+object ConfigValidator {
   private val loadingCfg        = LoadingConfiguration.newBuilder.addScheme("config", ConfigDownloader).freeze
   private val jsonSchemaFactory = JsonSchemaFactory.newBuilder.setLoadingConfiguration(loadingCfg).freeze
 
@@ -60,7 +59,6 @@ object AscfValidator {
   private def validate(schema: JsonSchema, jsonInput: JsonNode, source: String): ValidationResult = {
     try {
       val report = schema.validate(jsonInput, true)
-
       if (report.isSuccess) Success
       else Failure(report.asScala.map(formatMsg(_, source)).toList)
     } catch {

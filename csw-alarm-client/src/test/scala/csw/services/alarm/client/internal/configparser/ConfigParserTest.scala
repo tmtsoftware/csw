@@ -11,7 +11,7 @@ class ConfigParserTest extends FunSuite with Matchers {
 
     ConfigParser.parseAlarmMetadata(config) shouldEqual AlarmMetadata(
       subsystem = "nfiraos",
-      component = "nfiraos.cc.trombone",
+      component = "cc.trombone",
       name = "tromboneAxisHighLimitAlarm",
       description = "Warns when trombone axis has reached the low limit",
       location = "south side",

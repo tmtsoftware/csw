@@ -179,7 +179,8 @@ object Dependencies {
   val AlarmApi = Seq(
     Enumeratum.`enumeratum`,
     Libs.`upickle`,
-    Akka.`akka-actor-typed`
+    Akka.`akka-actor-typed`,
+    Libs.`scalatest` % Test
   )
 
   val AlarmClient = Seq(
