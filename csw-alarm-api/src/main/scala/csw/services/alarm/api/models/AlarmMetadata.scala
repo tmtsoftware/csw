@@ -1,7 +1,9 @@
 package csw.services.alarm.api.models
 
 case class AlarmMetadata(
-    alarmKey: AlarmKey,
+    subsystem: String,
+    component: String,
+    name: String,
     description: String,
     location: String,
     alarmType: AlarmType,
@@ -10,4 +12,6 @@ case class AlarmMetadata(
     operatorResponse: String,
     isAutoAcknowledgeable: Boolean,
     isLatchable: Boolean
-)
+) {
+  def alarmKey: AlarmKey = AlarmKey(subsystem, component, name)
+}

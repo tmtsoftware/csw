@@ -1,8 +1,8 @@
 package csw.services.alarm.client.internal.configparser
 import com.typesafe.config.ConfigFactory
-import csw.services.alarm.api.models.{AlarmKey, AlarmMetadata, AlarmSeverity, AlarmType}
+import csw.services.alarm.api.models.AlarmSeverity._
+import csw.services.alarm.api.models.{AlarmMetadata, AlarmType}
 import org.scalatest.{FunSuite, Matchers}
-import AlarmSeverity._
 
 class ConfigParserTest extends FunSuite with Matchers {
 
@@ -10,7 +10,9 @@ class ConfigParserTest extends FunSuite with Matchers {
     val config = ConfigFactory.parseResources("test-alarm.conf")
 
     ConfigParser.parseAlarmMetadata(config) shouldEqual AlarmMetadata(
-      AlarmKey("nfiraos", "nfiraos.cc.trombone", "tromboneAxisHighLimitAlarm"),
+      subsystem = "nfiraos",
+      component = "nfiraos.cc.trombone",
+      name = "tromboneAxisHighLimitAlarm",
       description = "Warns when trombone axis has reached the low limit",
       location = "south side",
       AlarmType.Absolute,
