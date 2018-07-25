@@ -3,10 +3,10 @@ package csw.services.alarm.client.internal.configparser
 import com.typesafe.config.{Config, ConfigRenderOptions}
 import csw.services.alarm.api.exceptions.ConfigParseException
 import csw.services.alarm.api.internal.AlarmRW
-import csw.services.alarm.api.models.AlarmMetadata
+import csw.services.alarm.api.models.{AlarmMetadata, AlarmsMetadata}
 import csw.services.alarm.client.internal.configparser.ValidationResult.{Failure, Success}
 import ujson.Js.Value
-import upickle.default._
+import upickle.default.{ReadWriter ⇒ RW, _}
 
 /**
  * Parses the information represented in configuration files into respective models
@@ -14,15 +14,12 @@ import upickle.default._
 object ConfigParser extends AlarmRW {
   import SchemaRegistry._
 
-  def parseAlarmMetadata(config: Config): AlarmMetadata =
-    AscfValidator.validate(config, ALARM_SCHEMA) match {
-      case Success          ⇒ readJs[AlarmMetadata](configToJsValue(config))
-      case Failure(reasons) ⇒ throw ConfigParseException(reasons)
-    }
+  def parseAlarmMetadata(config: Config): AlarmMetadata   = parse[AlarmMetadata](config, ALARM_SCHEMA)
+  def parseAlarmsMetadata(config: Config): AlarmsMetadata = parse[AlarmsMetadata](config, ALARMS_SCHEMA)
 
-  def parseAlarmsMetadata(config: Config): List[AlarmMetadata] =
-    AscfValidator.validate(config, ALARMS_SCHEMA) match {
-      case Success          ⇒ readJs[List[AlarmMetadata]](configToJsValue(config)("alarms"))
+  def parse[T: RW](config: Config, schemaConfig: Config): T =
+    AscfValidator.validate(config, schemaConfig) match {
+      case Success          ⇒ readJs[T](configToJsValue(config))
       case Failure(reasons) ⇒ throw ConfigParseException(reasons)
     }
 

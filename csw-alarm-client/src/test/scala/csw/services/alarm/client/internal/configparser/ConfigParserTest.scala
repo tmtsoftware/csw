@@ -27,8 +27,8 @@ class ConfigParserTest extends FunSuite with Matchers {
   test("should able to parse valid alarm metadata's config file") {
     val config = ConfigFactory.parseResources("test-alarms.conf")
 
-    val alarmMetadatas = ConfigParser.parseAlarmsMetadata(config)
-    alarmMetadatas.length shouldBe 3
+    val alarmsMetadata = ConfigParser.parseAlarmsMetadata(config)
+    alarmsMetadata.alarms.length shouldBe 3
   }
 
 }
