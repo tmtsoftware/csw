@@ -7,7 +7,7 @@ class AlarmMetadataTest extends FunSuite with Matchers {
 
   val alarmMetadata = AlarmMetadata(
     subsystem = "nfiraos",
-    component = "cc.trombone",
+    component = "trombone",
     name = "tromboneAxisHighLimitAlarm",
     description = "Warns when trombone axis has reached the low limit",
     location = "south side",
@@ -20,7 +20,7 @@ class AlarmMetadataTest extends FunSuite with Matchers {
   )
 
   test("should get alarm key from AlarmMetadata") {
-    alarmMetadata.alarmKey shouldBe AlarmKey("nfiraos", "cc.trombone", "tromboneAxisHighLimitAlarm")
+    alarmMetadata.alarmKey shouldBe AlarmKey("nfiraos", "trombone", "tromboneAxisHighLimitAlarm")
   }
 
 }

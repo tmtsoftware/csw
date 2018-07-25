@@ -156,7 +156,6 @@ class AlarmServiceImpl(
     if (statusKeys.isEmpty) throw NoAlarmsFoundException()
 
     val statusList = await(statusApi.mget(statusKeys))
-
     statusList
       .collect {
         case status: KeyValue[StatusKey, AlarmStatus] if status.getValue.isActive ⇒ status.getValue.latchedSeverity
@@ -187,38 +186,40 @@ class AlarmServiceImpl(
   // pattern: e.g  __keyspace@0__:status.nfiraos.*.*,
   // channel: e.g. __keyspace@0__:status.nfiraos.trombone.tromboneAxisLowLimitAlarm,
   // message: event type as value: e.g. set, expire, expired
-
   def subscribeAggregatedSeverity(key: AlarmKey): Source[AlarmSeverity, Future[AlarmSubscription]] = {
     val aggregateApi                      = aggregateApiFactory // create new connection for every client
     val aggregateKeys: List[AggregateKey] = List(key)
+    val psubscribeF                       = aggregateApi.psubscribe(aggregateKeys)
 
-    val sourceF = aggregateApi.psubscribe(aggregateKeys).map { _ ⇒
-      val patternSource = aggregateApi.observePatterns(OverflowStrategy.LATEST)
-      patternSource
-        .filter(_.getMessage == "set")
-        .mapAsync(1)(getLatchedSeverity)
-        .scan(Set.empty[AlarmSeverity])(_ + _)
-        .map(_.maxBy(_.level))
-        .distinctUntilChanged
-        .cancellable
-        .watchTermination()(Keep.both)
-        .mapMaterializedValue {
-          case (killSwitch, terminationSignal) ⇒
-            createAlarmSubscription(aggregateApi, aggregateKeys, killSwitch, terminationSignal)
+    val severitySourceF =
+      psubscribeF
+        .map { _ ⇒
+          val patternSource = aggregateApi.observePatterns(OverflowStrategy.LATEST)
+          patternSource
+            .filter(_.getMessage == "set")
+            .mapAsync(1)(getLatchedSeverity)
+            .scan(Set.empty[AlarmSeverity])(_ + _)
+            .map(_.maxBy(_.level))
+            .distinctUntilChanged
+            .cancellable
+            .watchTermination()(Keep.both)
+            .mapMaterializedValue {
+              case (killSwitch, terminationSignal) ⇒
+                createAlarmSubscription(aggregateApi, aggregateKeys, killSwitch, terminationSignal)
+            }
         }
-    }
 
-    Source.fromFutureSource(sourceF)
+    Source.fromFutureSource(severitySourceF)
   }
 
-  def createAlarmSubscription(
+  private def createAlarmSubscription(
       aggregateApi: RedisScalaApi[AggregateKey, String],
       aggregateKeys: List[AggregateKey],
       killSwitch: KillSwitch,
       terminationSignal: Future[Done]
   ): AlarmSubscription = new AlarmSubscription {
-    // call unsubscribe when stream completes successfully or with failure
-    terminationSignal.onComplete(_ => unsubscribe())
+
+    terminationSignal.onComplete(_ => unsubscribe()) // call unsubscribe when stream completes successfully or with failure
 
     override def unsubscribe(): Future[Unit] = async {
       await(aggregateApi.punsubscribe(aggregateKeys))
