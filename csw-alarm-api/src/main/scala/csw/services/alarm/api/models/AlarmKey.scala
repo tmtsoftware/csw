@@ -14,7 +14,11 @@ case class AlarmKey(subsystem: String, component: String, name: String) {
 }
 
 object AlarmKey {
-  private[alarm] def withPattern(subsystem: Option[String], component: Option[String], alarmName: Option[String]): AlarmKey = {
+  def withPattern(
+      subsystem: Option[String] = None,
+      component: Option[String] = None,
+      alarmName: Option[String] = None
+  ): AlarmKey = {
     val WILD_CARD = "*"
     AlarmKey(subsystem.getOrElse(WILD_CARD), component.getOrElse(WILD_CARD), alarmName.getOrElse(WILD_CARD))
   }

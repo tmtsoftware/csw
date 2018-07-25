@@ -3,8 +3,8 @@ package csw.services.alarm.client.internal
 import akka.Done
 import akka.actor.ActorSystem
 import akka.actor.typed.ActorRef
-import akka.stream.scaladsl.{Keep, Source}
-import akka.stream.{ActorMaterializer, KillSwitch, KillSwitches, Materializer}
+import akka.stream.scaladsl.{Keep, Sink, Source}
+import akka.stream.{ActorMaterializer, KillSwitch, Materializer}
 import csw.services.alarm.api.exceptions.{InvalidSeverityException, NoAlarmsFoundException, ResetOperationFailedException}
 import csw.services.alarm.api.internal.{AggregateKey, MetadataKey, SeverityKey, StatusKey}
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, UnAcknowledged}
@@ -89,22 +89,13 @@ class AlarmServiceImpl(
 
   override def getSeverity(key: AlarmKey): Future[AlarmSeverity] = severityApi.get(key)
 
-  override def getMetadata(key: AlarmKey): Future[AlarmMetadata] = metadataApi.get(key)
+  override def getStatus(key: AlarmKey): Future[AlarmStatus] = statusApi.get(key)
 
-  override def getMetadata(
-      subsystem: Option[String],
-      component: Option[String],
-      alarmName: Option[String]
-  ): Future[List[AlarmMetadata]] = async {
-    val patternBasedAlarmKey = AlarmKey.withPattern(subsystem, component, alarmName)
-    val metadataKeys         = await(metadataApi.keys(patternBasedAlarmKey))
-
+  override def getMetadata(key: AlarmKey): Future[List[AlarmMetadata]] = async {
+    val metadataKeys = await(metadataApi.keys(key))
     if (metadataKeys.isEmpty) throw NoAlarmsFoundException()
-
     await(metadataApi.mget(metadataKeys)).map(_.getValue)
   }
-
-  override def getStatus(key: AlarmKey): Future[AlarmStatus] = statusApi.get(key)
 
   override def acknowledge(key: AlarmKey): Future[Unit] = async {
     val status = await(statusApi.get(key))
@@ -159,13 +150,8 @@ class AlarmServiceImpl(
     if (status.isActive) await(statusApi.set(key, status.copy(activationStatus = Inactive)))
   }
 
-  override def getSeverityAggregate(
-      subsystem: Option[String],
-      component: Option[String],
-      alarmName: Option[String]
-  ): Future[AlarmSeverity] = async {
-    val patternBasedAlarmKey = AlarmKey.withPattern(subsystem, component, alarmName)
-    val statusKeys           = await(statusApi.keys(patternBasedAlarmKey))
+  override def getAggregatedSeverity(key: AlarmKey): Future[AlarmSeverity] = async {
+    val statusKeys = await(statusApi.keys(key))
 
     if (statusKeys.isEmpty) throw NoAlarmsFoundException()
 
@@ -178,28 +164,33 @@ class AlarmServiceImpl(
       .reduceRight((previous, current) ⇒ previous max current)
   }
 
-  override def subscribeSeverityAggregateCallback(
-      subsystem: Option[String],
-      componentName: Option[String],
-      alarmName: Option[String],
-      callback: AlarmSeverity ⇒ Unit
-  ): Future[Unit] =
-    subscribeSeverityAggregate(subsystem, componentName, alarmName)
-      .runForeach(callback)
-      .map(_ ⇒ ())
+  override def getAggregatedHealth(key: AlarmKey): Future[AlarmHealth] = getAggregatedSeverity(key).map(AlarmHealth.fromSeverity)
+
+  override def subscribeAggregatedSeverityCallback(key: AlarmKey, callback: AlarmSeverity ⇒ Unit): Future[AlarmSubscription] =
+    subscribeAggregatedSeverity(key)
+      .to(Sink.foreach(callback))
+      .run()
+
+  override def subscribeAggregatedHealthCallback(key: AlarmKey, callback: AlarmHealth ⇒ Unit): Future[AlarmSubscription] =
+    subscribeAggregatedSeverity(key)
+      .map(AlarmHealth.fromSeverity)
+      .to(Sink.foreach(callback))
+      .run()
+
+  override def subscribeAggregatedSeverityActorRef(key: AlarmKey, actorRef: ActorRef[AlarmSeverity]): Future[AlarmSubscription] =
+    subscribeAggregatedSeverityCallback(key, actorRef ! _)
+
+  override def subscribeAggregatedHealthActorRef(key: AlarmKey, actorRef: ActorRef[AlarmHealth]): Future[AlarmSubscription] =
+    subscribeAggregatedHealthCallback(key, actorRef ! _)
 
   // PatternMessage gives three values:
   // pattern: e.g  __keyspace@0__:status.nfiraos.*.*,
   // channel: e.g. __keyspace@0__:status.nfiraos.trombone.tromboneAxisLowLimitAlarm,
   // message: event type as value: e.g. set, expire, expired
-  def subscribeSeverityAggregate(
-      subsystem: Option[String],
-      componentName: Option[String],
-      alarmName: Option[String],
-  ): Source[AlarmSeverity, Future[AlarmSubscription]] = {
-    val patternBasedAlarmKey              = AlarmKey.withPattern(subsystem, componentName, alarmName)
+
+  def subscribeAggregatedSeverity(key: AlarmKey): Source[AlarmSeverity, Future[AlarmSubscription]] = {
     val aggregateApi                      = aggregateApiFactory // create new connection for every client
-    val aggregateKeys: List[AggregateKey] = List(patternBasedAlarmKey)
+    val aggregateKeys: List[AggregateKey] = List(key)
 
     val sourceF = aggregateApi.psubscribe(aggregateKeys).map { _ ⇒
       val patternSource = aggregateApi.observePatterns(OverflowStrategy.LATEST)
@@ -241,11 +232,4 @@ class AlarmServiceImpl(
     val statusKey = patternMessage.getChannel.toStatusKey
     statusApi.get(statusKey).map(_.latchedSeverity)
   }
-
-  override def subscribeSeverityAggregateActorRef(
-      subsystem: Option[String],
-      componentName: Option[String],
-      alarmName: Option[String],
-      actorRef: ActorRef[AlarmSeverity]
-  ): Future[Unit] = subscribeSeverityAggregateCallback(subsystem, componentName, alarmName, actorRef ! _)
 }

@@ -18,4 +18,5 @@ trait AlarmRW {
   implicit val alarmTypeRW: RW[AlarmType]                         = EnumUpickleSupport.enumFormat
   implicit val latchStatusRW: RW[LatchStatus]                     = EnumUpickleSupport.enumFormat
   implicit val shelveStatusRW: RW[ShelveStatus]                   = EnumUpickleSupport.enumFormat
+  implicit val alarmHealthRW: RW[AlarmHealth]                     = EnumUpickleSupport.enumFormat
 }

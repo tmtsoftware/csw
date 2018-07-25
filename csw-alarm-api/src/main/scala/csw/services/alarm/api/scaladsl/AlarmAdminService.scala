@@ -7,34 +7,21 @@ import scala.concurrent.Future
 
 trait AlarmAdminService extends AlarmService {
   def getSeverity(key: AlarmKey): Future[AlarmSeverity]
-  def getMetadata(key: AlarmKey): Future[AlarmMetadata]
-  def getMetadata(
-      subsystem: Option[String] = None,
-      componentName: Option[String] = None,
-      alarmName: Option[String] = None
-  ): Future[List[AlarmMetadata]]
   def getStatus(key: AlarmKey): Future[AlarmStatus]
+  def getMetadata(key: AlarmKey): Future[List[AlarmMetadata]]
   def acknowledge(key: AlarmKey): Future[Unit]
   def reset(key: AlarmKey): Future[Unit]
   def shelve(key: AlarmKey): Future[Unit]
   def unShelve(key: AlarmKey): Future[Unit]
   def activate(key: AlarmKey): Future[Unit]   // api only for test purpose
   def deActivate(key: AlarmKey): Future[Unit] // api only for test purpose
-  def getSeverityAggregate(
-      subsystem: Option[String] = None,
-      componentName: Option[String] = None,
-      alarmName: Option[String] = None
-  ): Future[AlarmSeverity]
-  def subscribeSeverityAggregateCallback(
-      subsystem: Option[String] = None,
-      componentName: Option[String] = None,
-      alarmName: Option[String] = None,
-      callback: AlarmSeverity ⇒ Unit
-  ): Future[Unit]
-  def subscribeSeverityAggregateActorRef(
-      subsystem: Option[String] = None,
-      componentName: Option[String] = None,
-      alarmName: Option[String] = None,
-      actorRef: ActorRef[AlarmSeverity]
-  ): Future[Unit]
+
+  def getAggregatedSeverity(key: AlarmKey): Future[AlarmSeverity]
+  def getAggregatedHealth(key: AlarmKey): Future[AlarmHealth]
+
+  def subscribeAggregatedSeverityCallback(key: AlarmKey, callback: AlarmSeverity ⇒ Unit): Future[AlarmSubscription]
+  def subscribeAggregatedHealthCallback(key: AlarmKey, callback: AlarmHealth ⇒ Unit): Future[AlarmSubscription]
+
+  def subscribeAggregatedSeverityActorRef(key: AlarmKey, actorRef: ActorRef[AlarmSeverity]): Future[AlarmSubscription]
+  def subscribeAggregatedHealthActorRef(key: AlarmKey, actorRef: ActorRef[AlarmHealth]): Future[AlarmSubscription]
 }
