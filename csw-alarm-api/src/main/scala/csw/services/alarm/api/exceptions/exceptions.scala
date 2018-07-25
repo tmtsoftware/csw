@@ -13,6 +13,6 @@ case class ResetOperationFailedException(key: AlarmKey, currentSeverity: AlarmSe
       s"Attempt to reset alarm [${key.name}] has failed because current severity is set to [${currentSeverity.name}]."
     )
 
-case object NoAlarmsFoundException extends RuntimeException("No alarms found")
+case class NoAlarmsFoundException() extends RuntimeException("No alarms found")
 
 case class ConfigParseException(reasons: List[String]) extends RuntimeException(reasons.mkString("[", "\n", "]"))

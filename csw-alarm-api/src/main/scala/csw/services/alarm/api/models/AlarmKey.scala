@@ -18,9 +18,4 @@ object AlarmKey {
     val WILD_CARD = "*"
     AlarmKey(subsystem.getOrElse(WILD_CARD), component.getOrElse(WILD_CARD), alarmName.getOrElse(WILD_CARD))
   }
-
-  private[alarm] def apply(alarmKeyStr: String): AlarmKey = {
-    val subsystem :: component :: name :: _ = alarmKeyStr.split(".").toList
-    AlarmKey(subsystem, component, name)
-  }
 }

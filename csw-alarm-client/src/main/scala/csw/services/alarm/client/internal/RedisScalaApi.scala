@@ -20,7 +20,9 @@ class RedisScalaApi[K, V](
   def get(key: K): Future[V]                                 = redisAsyncCommands.get(key).toScala
   def mget(keys: List[K]): Future[List[KeyValue[K, V]]]      = redisAsyncCommands.mget(keys: _*).toScala.map(_.asScala.toList)
   def keys(key: K): Future[List[K]]                          = redisAsyncCommands.keys(key).toScala.map(_.asScala.toList)
-  def psubscribe(keys: List[K]): Future[Unit]                = redisReactiveCommands.psubscribe(keys: _*).toFuture.toScala.map(_ ⇒ Unit)
+  def psubscribe(keys: List[K]): Future[Unit]                = redisReactiveCommands.psubscribe(keys: _*).toFuture.toScala.map(_ ⇒ ())
+  def punsubscribe(keys: List[K]): Future[Unit]              = redisReactiveCommands.punsubscribe(keys: _*).toFuture.toScala.map(_ ⇒ ())
+  def quit: Future[String]                                   = redisReactiveCommands.quit().toFuture.toScala
   def observePatterns(overflowStrategy: OverflowStrategy): Source[PatternMessage[K, V], NotUsed] =
     Source.fromPublisher(redisReactiveCommands.observePatterns(overflowStrategy))
 }
