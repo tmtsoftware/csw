@@ -11,7 +11,7 @@ class AlarmMetadataTest extends FunSuite with Matchers {
     description = "Warns when trombone axis has reached the low limit",
     location = "south side",
     AlarmType.Absolute,
-    List(Indeterminate, Okay, Warning, Major, Critical),
+    Set(Warning, Major, Critical),
     probableCause = "the trombone software has failed or the stage was driven into the low limit",
     operatorResponse = "go to the NFIRAOS engineering user interface and select the datum axis command",
     isAutoAcknowledgeable = true,

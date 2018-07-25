@@ -48,8 +48,8 @@ class AlarmServiceImpl(
     val alarm = await(metadataApi.get(key))
 
     // validate if the provided severity is supported by this alarm
-    if (!alarm.supportedSeverities.contains(severity))
-      throw InvalidSeverityException(key, alarm.supportedSeverities, severity)
+    if (!alarm.allSupportedSeverities.contains(severity))
+      throw InvalidSeverityException(key, alarm.allSupportedSeverities, severity)
 
     // get the current severity of the alarm
     val currentSeverity = await(severityApi.get(key))

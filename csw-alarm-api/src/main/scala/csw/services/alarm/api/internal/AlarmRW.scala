@@ -1,8 +1,7 @@
 package csw.services.alarm.api.internal
 
 import csw.services.alarm.api.models._
-import upickle.default.readwriter
-import upickle.default.{ReadWriter => RW, _}
+import upickle.default.{readwriter, ReadWriter ⇒ RW, _}
 
 trait AlarmRW {
   implicit val alarmKeyRW: RW[AlarmKey] = macroRW
@@ -12,7 +11,6 @@ trait AlarmRW {
   implicit val severityKeyRW: RW[SeverityKey]   = readwriter[String].bimap(_.key, SeverityKey.apply)
   implicit val aggregateKeyRW: RW[AggregateKey] = readwriter[String].bimap(_.key, AggregateKey.apply)
 
-  implicit val alarmMetadataRW: RW[AlarmMetadata]                 = macroRW
   implicit val alarmsMetadataRW: RW[AlarmsMetadata]               = macroRW
   implicit val alarmStatusRW: RW[AlarmStatus]                     = macroRW
   implicit val alarmSeverityRW: RW[AlarmSeverity]                 = EnumUpickleSupport.enumFormat
