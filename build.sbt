@@ -32,20 +32,20 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
   `csw-location-agent`,
   `csw-config-server`,
   `csw-config-client-cli`,
-  `csw-benchmark`,
-  `integration`,
-  `sequencer-prototype`,
-  `examples`,
-  `csw-event-client`,
   `csw-event-cli`,
-  `csw-commons`
+  `csw-commons`,
+  `csw-benchmark`,
+  `examples`,
+  `integration`,
+  `sequencer-prototype`
 )
 
 lazy val githubReleases: Seq[ProjectReference] = Seq(
   `csw-cluster-seed`,
   `csw-location-agent`,
   `csw-config-server`,
-  `csw-config-client-cli`
+  `csw-config-client-cli`,
+  `csw-event-cli`
 )
 
 //Root project
