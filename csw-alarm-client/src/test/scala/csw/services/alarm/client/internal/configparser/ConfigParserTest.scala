@@ -34,8 +34,8 @@ class ConfigParserTest extends FunSuite with Matchers {
   test("should able to parse valid alarm metadata's config file") {
     val config = ConfigFactory.parseResources("test-alarms/valid-alarms.conf")
 
-    val alarmsMetadata = ConfigParser.parseAlarmsMetadata(config)
-    alarmsMetadata.alarms.length shouldBe 3
+    val alarmsMetadata = ConfigParser.parseAlarmMetadataSet(config)
+    alarmsMetadata.alarms.size shouldBe 3
   }
 
   test("should throw Exception while parsing invalid alarm metadata config file") {
@@ -56,7 +56,7 @@ class ConfigParserTest extends FunSuite with Matchers {
     val config = ConfigFactory.parseResources("test-alarms/invalid-alarms.conf")
 
     val parseException = intercept[ConfigParseException] {
-      ConfigParser.parseAlarmsMetadata(config)
+      ConfigParser.parseAlarmMetadataSet(config)
     }
     // invalid-alarms.conf contains 2 errors:
     // 1. subsystem missing from second alarm
