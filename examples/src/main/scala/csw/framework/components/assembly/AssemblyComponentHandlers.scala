@@ -11,10 +11,8 @@ import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandResponse.Accepted
 import csw.messages.commands._
-import csw.messages.events._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location._
-import csw.messages.params.models.Subsystem
 import csw.services.command.CommandResponseManager
 import csw.services.command.scaladsl.CommandService
 import csw.services.config.api.models.ConfigData

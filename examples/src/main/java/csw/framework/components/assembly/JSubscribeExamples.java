@@ -92,16 +92,15 @@ public class JSubscribeExamples {
         //#with-subscription-mode
     }
 
-    // #psubscribe
+
     private void subscribeToSubsystemEvents(Subsystem subsystem)  {
+        // #psubscribe
+
         CompletableFuture<IEventSubscriber> subscriberF = eventService.defaultSubscriber();
 
-        subscriberF.thenApply(subscriber -> subscriber.pSubscribeCallback(subsystem, "*", this::callback));
-    }
-    // #psubscribe
+        subscriberF.thenApply(subscriber -> subscriber.pSubscribeCallback(subsystem, "*", event -> { /* do something*/ }));
 
-    private void callback(Event event){
-        //do something
+        // #psubscribe
     }
 
 }
