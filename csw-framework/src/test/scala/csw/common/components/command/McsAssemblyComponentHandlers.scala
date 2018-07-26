@@ -81,10 +81,10 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
       case `longRunning` ⇒
         println("Got long running in assembly submit")
         runId = controlCommand.runId
-
+        println(">>>>>>>>>>>>>> WTF<<<<<<<<<<<<<<<<<<<<<<  WTF <<<<<<<<<<<<")
         //#addSubCommand
         shortSetup = Setup(prefix, shortRunning, controlCommand.maybeObsId)
-        //commandResponseManager.addSubCommand(runId, shortSetup.runId)
+        commandResponseManager.addSubCommand(runId, shortSetup.runId)
         //#addSubCommand
 
         mediumSetup = Setup(prefix, mediumRunning, controlCommand.maybeObsId)
@@ -92,47 +92,44 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
         commandResponseManager.addSubCommand(runId, mediumSetup.runId)
 
         longSetup = Setup(prefix, longRunning, controlCommand.maybeObsId)
-        //commandResponseManager.addSubCommand(runId, longSetup.runId)
+        commandResponseManager.addSubCommand(runId, longSetup.runId)
 
         // this is to simulate that assembly is splitting command into three sub commands and forwarding same to hcd
         // longSetup takes 5 seconds to finish
         // shortSetup takes 1 second to finish
         // mediumSetup takes 3 seconds to finish
-        //processCommand(longSetup)
-        // processCommand(shortSetup)
-        //
+        processCommand(longSetup)
+        processCommand(shortSetup)
         processCommand(mediumSetup)
 
         // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
         //#subscribe-to-command-response-manager
         // subscribe to the status of original command received and publish the state when its status changes to
         // Completed
-        /*
         commandResponseManager.subscribe(
           controlCommand.runId, {
             case Completed(_) ⇒
+              println(">>>>>>>>>>>>>>>>>>>>>>>>>>Publishing that long completed")
               currentStatePublisher.publish(
                 CurrentState(controlCommand.source, StateName("testStateName"), Set(choiceKey.set(longRunningCmdCompleted)))
               )
-            case _ ⇒
+            case a ⇒
+              println(s"Got some other response from processing: $a")
           }
         )
-         */
         //#subscribe-to-command-response-manager
 
-        Started(controlCommand.runId)
-
-      //#query-command-response-manager
-      // query CommandResponseManager to get the current status of Command, for example: Accepted/Completed/Invalid etc.
-      /* TODO -- CHECK THIS AGAIN */
-      // Await.result(commandResponseManager.query(controlCommand.runId), 20.millis)
-      /*
+        //#query-command-response-manager
+        // query CommandResponseManager to get the current status of Command, for example: Accepted/Completed/Invalid etc.
+        commandResponseManager
+          .query(controlCommand.runId)
           .map(
             _ ⇒ () // may choose to publish current state to subscribers or do other operations
           )
-        Completed(controlCommand.runId)
-       */
-      //#query-command-response-manager
+
+        //#query-command-response-manager
+
+        Started(controlCommand.runId)
 
       case `initCmd` ⇒
         commandResponseManager.addOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId))
@@ -155,7 +152,8 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
       .map {
         case response: Started ⇒
           // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
-          commandResponseManager.updateSubCommand(response.runId, Started(response.runId))
+          // TODO -- Shouldn't be doing this - updating for subscommand
+          //commandResponseManager.updateSubCommand(response.runId, Started(response.runId))
           //#updateSubCommand
           // An original command is split into sub-commands and sent to a component. The result of the command is
           // obtained by subscribing to the component with the sub command id.
@@ -166,18 +164,18 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
                   currentStatePublisher
                     .publish(CurrentState(shortSetup.source, StateName("testStateName"), Set(choiceKey.set(shortCmdCompleted))))
                   // As the commands get completed, the results are updated in the commandResponseManager
-                  println("Short complete")
+                  println("Short complete, published short current state")
                   commandResponseManager.updateSubCommand(id, Completed(id))
                 case id if id == mediumSetup.runId ⇒
                   println("Got something back for medium")
                   currentStatePublisher
                     .publish(CurrentState(mediumSetup.source, StateName("testStateName"), Set(choiceKey.set(mediumCmdCompleted))))
-                  println("Medium complete")
+                  println("Medium complete, published medium current state")
                   commandResponseManager.updateSubCommand(id, Completed(id))
                 case id if id == longSetup.runId ⇒
                   currentStatePublisher
                     .publish(CurrentState(longSetup.source, StateName("testStateName"), Set(choiceKey.set(longCmdCompleted))))
-                  println("Long complete")
+                  println("Long complete, published long current state")
                   commandResponseManager.updateSubCommand(id, Completed(id))
               }
             //#updateSubCommand

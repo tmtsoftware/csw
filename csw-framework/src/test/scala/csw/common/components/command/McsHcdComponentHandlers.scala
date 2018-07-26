@@ -46,23 +46,20 @@ class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
         println("Got long")
         ctx.schedule(5.seconds,
                      commandResponseManager.commandResponseManagerActor,
-                     AddOrUpdateCommand(controlCommand.runId, Error(controlCommand.runId, "What")))
-        //Error(controlCommand.runId, "WTF1")
+                     AddOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId)))
         Started(controlCommand.runId)
       case `mediumRunning` ⇒
         println("Got medium")
         ctx.schedule(3.seconds,
                      commandResponseManager.commandResponseManagerActor,
-                     AddOrUpdateCommand(controlCommand.runId, Error(controlCommand.runId, "two")))
+                     AddOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId)))
         Started(controlCommand.runId)
-      //Error(controlCommand.runId, "WTF2")
       case `shortRunning` ⇒
         println("Got short")
         ctx.schedule(1.seconds,
                      commandResponseManager.commandResponseManagerActor,
-                     AddOrUpdateCommand(controlCommand.runId, Error(controlCommand.runId, "three")))
+                     AddOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId)))
         Started(controlCommand.runId)
-//        Error(controlCommand.runId, "WTF3")
       case `failureAfterValidationCmd` ⇒
         commandResponseManager.addOrUpdateCommand(controlCommand.runId, Error(controlCommand.runId, "Failed command"))
         Error(controlCommand.runId, "Failed command")

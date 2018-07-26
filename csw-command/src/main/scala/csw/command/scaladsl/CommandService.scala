@@ -78,7 +78,7 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
   def submitAllAndGetResponse(controlCommands: Set[ControlCommand])(implicit timeout: Timeout): Future[SubmitResponse] = {
     val value = Source(controlCommands).mapAsyncUnordered(parallelism)(submit)
     Responses.aggregateResponse(value).map {
-      case _: Completed  ⇒ Started(Id())
+      case _: Completed  ⇒ Completed(Id())
       case otherResponse ⇒ otherResponse
     }
   }

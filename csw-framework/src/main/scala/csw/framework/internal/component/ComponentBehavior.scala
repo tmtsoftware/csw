@@ -24,7 +24,7 @@ import csw.messages.RunningMessage.Lifecycle
 import csw.messages.TopLevelActorCommonMessage.{TrackingEventReceived, UnderlyingHookFailed}
 import csw.messages.TopLevelActorIdleMessage.Initialize
 import csw.messages._
-import csw.messages.commands.Responses.{Accepted, Invalid, OnewayResponse, SubmitResponse}
+import csw.messages.commands.Responses._
 import csw.services.command.CommandResponseManager
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
@@ -202,10 +202,16 @@ private[framework] final class ComponentBehavior(
         println("Submit validation response: " + validationResponse)
         validationResponse match {
           case _: Accepted =>
-            // commandResponseManager.commandResponseManagerActor ! AddOrUpdateCommand(commandMessage.command.runId, validationResponse)
+            // Here the submit is marked as started, to indicate that the command has started processing
+            // This is needed because someone might do something in the doSubmit like subscribe -- this may be
+            // a feature of certain tests, but it does seem possible that something should be in the CRM once validated
+            // Prefer not to add a response that would only be relevant to the internals
+            commandResponseManager.commandResponseManagerActor ! AddOrUpdateCommand(commandMessage.command.runId,
+                                                                                    Started(commandMessage.command.runId))
             println(s"onsubmitAccepted: ")
             val response: SubmitResponse = lifecycleHandlers.onSubmit(commandMessage.command)
             println(s"onSubmitHandler response: $response")
+            // The response is used to update the CRM, it may still be Started it if is a long running command
             commandResponseManager.commandResponseManagerActor ! AddOrUpdateCommand(commandMessage.command.runId, response)
             su.replyTo ! response
           case in: Invalid =>

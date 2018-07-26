@@ -83,7 +83,6 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
       // 1. longSetup which takes 5 seconds to finish
       // 2. shortSetup which takes 1 second to finish
       // 3. mediumSetup which takes 3 seconds to finish
-
       //#subscribe-for-result
       val eventualCommandResponse = assemblyCommandService.submit(setup).flatMap {
         case _: Started ⇒
@@ -93,20 +92,16 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
       }
       //#subscribe-for-result
 
-      val fin = Await.result(eventualCommandResponse, 20.seconds)
+      Await.result(eventualCommandResponse, 20.seconds) shouldBe Completed(setup.runId)
 
-      println("Got Fin: " + fin)
-
-      //Await.result(eventualCommandResponse, 20.seconds) shouldBe Completed(setup.runId)
-      /*
       //#submitAndSubscribe
       val setupForSubscribe = Setup(prefix, longRunning, Some(obsId))
       val response          = assemblyCommandService.submitAndSubscribe(setupForSubscribe)
       //#submitAndSubscribe
 
       Await.result(response, 20.seconds) shouldBe Completed(setupForSubscribe.runId)
-      */
-      /*
+
+
       // verify that commands gets completed in following sequence
       // ShortSetup => MediumSetup => LongSetup
       probe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(shortCmdCompleted))))
@@ -123,10 +118,10 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
       val eventualResponse: Future[SubmitResponse] = assemblyCommandService.query(setupForQuery.runId)
       //#query-response
       eventualResponse.map(_ shouldBe Started(setupForQuery.runId))
-      */
+
       enterBarrier("long-commands")
 
-/*
+
       val hcdLocF =
         locationService.resolve(
           AkkaConnection(ComponentId("Test_Component_Running_Long_Command", ComponentType.HCD)),
@@ -144,11 +139,12 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
 
       //#submitAllAndGetResponse
 
+      println("------- OKAY NOW STARTING THE COMMAND submit GET ALL")
       val responseOfMultipleCommands = hcdComponent.submitAllAndGetResponse(Set(setupHcd1, setupHcd2))
 
       //#submitAllAndGetResponse
       whenReady(responseOfMultipleCommands, PatienceConfiguration.Timeout(20.seconds)) { result ⇒
-        result shouldBe a[Started]
+        result shouldBe a[Completed]
       }
 
       //#aggregated-validation
@@ -158,7 +154,7 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
       //#aggregated-validation
 
       whenReady(aggregatedValidationResponse, PatienceConfiguration.Timeout(20.seconds)) { result ⇒
-        result shouldBe a[Accepted]
+        result shouldBe a[Invalid]
       }
 
       // Test failed validation in one more more commands
@@ -170,8 +166,7 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
       whenReady(aggregatedInvalidValidationResponse, PatienceConfiguration.Timeout(20.seconds)) { result ⇒
         result shouldBe a[Invalid]
       }
-      */
-/*
+
       enterBarrier("multiple-components-submit-multiple-commands")
 
       //#submitAllAndGetFinalResponse
@@ -200,9 +195,8 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
       whenReady(aggregatedErrorResponse, PatienceConfiguration.Timeout(20.seconds)) { result ⇒
         result shouldBe a[Error]
       }
-
+println("DID EVERYTHING!")
       enterBarrier("multiple-components-submit-subscribe-multiple-commands")
-      */
     }
 
     runOn(member1) {
@@ -213,8 +207,8 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
       enterBarrier("spawned")
       println("Member 1 spawned")
       enterBarrier("long-commands")
-      //enterBarrier("multiple-components-submit-multiple-commands")
-      //enterBarrier("multiple-components-submit-subscribe-multiple-commands")
+      enterBarrier("multiple-components-submit-multiple-commands")
+      enterBarrier("multiple-components-submit-subscribe-multiple-commands")
     }
 
     runOn(member2) {
@@ -225,8 +219,8 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
       enterBarrier("spawned")
       println("Member 2 spawned")
       enterBarrier("long-commands")
-      //enterBarrier("multiple-components-submit-multiple-commands")
-      //enterBarrier("multiple-components-submit-subscribe-multiple-commands")
+      enterBarrier("multiple-components-submit-multiple-commands")
+      enterBarrier("multiple-components-submit-subscribe-multiple-commands")
     }
     enterBarrier("end")
   }
