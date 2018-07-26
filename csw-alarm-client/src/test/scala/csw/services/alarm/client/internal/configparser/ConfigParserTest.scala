@@ -1,6 +1,7 @@
 package csw.services.alarm.client.internal.configparser
 import com.typesafe.config.ConfigFactory
 import csw.services.alarm.api.exceptions.ConfigParseException
+import csw.services.alarm.api.models.ActivationStatus.Active
 import csw.services.alarm.api.models.AlarmSeverity._
 import csw.services.alarm.api.models.{AlarmMetadata, AlarmType}
 import org.scalatest.{FunSuite, Matchers}
@@ -22,7 +23,8 @@ class ConfigParserTest extends FunSuite with Matchers {
       probableCause = "the trombone software has failed or the stage was driven into the low limit",
       operatorResponse = "go to the NFIRAOS engineering user interface and select the datum axis command",
       isAutoAcknowledgeable = true,
-      isLatchable = true
+      isLatchable = true,
+      activationStatus = Active
     )
 
     val actualAlarmMetadata = ConfigParser.parseAlarmMetadata(config)

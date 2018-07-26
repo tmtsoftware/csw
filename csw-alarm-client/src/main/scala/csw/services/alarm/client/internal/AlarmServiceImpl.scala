@@ -141,24 +141,25 @@ class AlarmServiceImpl(
   }
 
   override def activate(key: AlarmKey): Future[Unit] = async {
-    val status = await(statusApi.get(key))
-    if (!status.isActive) await(statusApi.set(key, status.copy(activationStatus = Active)))
+    val metadata = await(metadataApi.get(key))
+    if (!metadata.isActive) await(metadataApi.set(key, metadata.copy(activationStatus = Active)))
   }
 
   override def deActivate(key: AlarmKey): Future[Unit] = async {
-    val status = await(statusApi.get(key))
-    if (status.isActive) await(statusApi.set(key, status.copy(activationStatus = Inactive)))
+    val metadata = await(metadataApi.get(key))
+    if (metadata.isActive) await(metadataApi.set(key, metadata.copy(activationStatus = Inactive)))
   }
 
   override def getAggregatedSeverity(key: AlarmKey): Future[AlarmSeverity] = async {
     val statusKeys = await(statusApi.keys(key))
+    val metadata   = await(metadataApi.get(key))
 
     if (statusKeys.isEmpty) throw NoAlarmsFoundException()
 
     val statusList = await(statusApi.mget(statusKeys))
     statusList
       .collect {
-        case status: KeyValue[StatusKey, AlarmStatus] if status.getValue.isActive ⇒ status.getValue.latchedSeverity
+        case status: KeyValue[StatusKey, AlarmStatus] if metadata.isActive ⇒ status.getValue.latchedSeverity
       }
       .reduceRight((previous, current) ⇒ previous max current)
   }

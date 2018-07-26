@@ -1,5 +1,6 @@
 package csw.services.alarm.api.models
 import csw.services.alarm.api.internal.AlarmRW
+import csw.services.alarm.api.models.ActivationStatus.Active
 import upickle.default.{macroRW, ReadWriter ⇒ RW}
 
 /**
@@ -30,9 +31,11 @@ case class AlarmMetadata(
     probableCause: String,
     operatorResponse: String,
     isAutoAcknowledgeable: Boolean,
-    isLatchable: Boolean
+    isLatchable: Boolean,
+    activationStatus: ActivationStatus
 ) {
   def alarmKey: AlarmKey                         = AlarmKey(subsystem, component, name)
+  def isActive: Boolean                          = activationStatus == Active
   def allSupportedSeverities: Set[AlarmSeverity] = supportedSeverities ++ Set(AlarmSeverity.Indeterminate, AlarmSeverity.Okay)
 }
 

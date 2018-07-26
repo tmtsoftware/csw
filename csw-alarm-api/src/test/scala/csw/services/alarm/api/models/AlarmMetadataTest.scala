@@ -1,4 +1,5 @@
 package csw.services.alarm.api.models
+import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
 import csw.services.alarm.api.models.AlarmSeverity._
 import org.scalatest.{FunSuite, Matchers}
 
@@ -16,11 +17,19 @@ class AlarmMetadataTest extends FunSuite with Matchers {
     probableCause = "the trombone software has failed or the stage was driven into the low limit",
     operatorResponse = "go to the NFIRAOS engineering user interface and select the datum axis command",
     isAutoAcknowledgeable = true,
-    isLatchable = true
+    isLatchable = true,
+    activationStatus = Active
   )
 
   test("should get alarm key from AlarmMetadata") {
     alarmMetadata.alarmKey shouldBe AlarmKey("nfiraos", "trombone", "tromboneAxisHighLimitAlarm")
+  }
+
+  test("should tell if the alarm is active or not") {
+    alarmMetadata.isActive shouldBe true
+
+    // for Inactive activation status
+    alarmMetadata.copy(activationStatus = Inactive).isActive shouldBe false
   }
 
 }
