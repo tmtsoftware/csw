@@ -61,19 +61,61 @@ You can find complete list of APIs supported by `EventPublisher` and `IEventPubl
 
 ## Usage of EventSubscriber
 
-Below example demonstrates the usage of subscribe API with actorRef.
+Below examples demonstrate the usage of multiple variations of subscribe API.
+
+### With Callback
+
+The example shown below takes a set of event keys to subscribe to and a callback function which will be called on each event received by the event stream. This is the simplest and most commonly used API. 
 
 Scala
-:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/AssemblyComponentHandlers.scala) { #event-subscriber }
+:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/SubscribeExamples.scala) { #with-callback }
 
 Java
-:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JAssemblyComponentHandlers.java) { #event-subscriber }
+:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JSubscribeExamples.java) { #with-callback }
 
-In above example, `eventHandler` is the actorRef which accepts events. If you need to mutate state on receiving each event, 
-then it is recommended to use this API. To use this API, you have to create an actor which takes event and then you can safely keep mutable state inside this actor.
+### With Asynchronous Callback
 
-The subscription API shown above receives events as soon as they are published. However, other APIs also support `interval` and `Subscription Mode` which help in controlling the rate of events received. This can cater multiple use cases for instance slow subscribers can receive events at their own speed rather than being overloaded with events to catch up with the publisher's speed.
+The above example will run into concurrency issues, if the callback has a asynchronous behavior. To avoid that use the following API which will give the guarantee of ordered execution of these asynchronous callbacks.
 
+Scala
+:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/SubscribeExamples.scala) { #with-async-callback }
+
+Java
+:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JSubscribeExamples.java) { #with-async-callback }
+
+### With ActorRef
+
+If there is a need to mutate state on receiving each event, then it is recommended to use this API. To use this API, you have to create an actor which takes event and then you can safely keep mutable state inside this actor. In the example shown below, `eventHandler` is the actorRef which accepts events. 
+
+Scala
+:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/SubscribeExamples.scala) { #with-actor-ref }
+
+Java
+:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JSubscribeExamples.java) { #with-actor-ref }
+
+
+### Receive Event Stream
+
+This API takes a set of Event keys to subscribe to and returns a Source of events. This API gives more control to the user to customize behavior of the event stream.
+
+Scala
+:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/SubscribeExamples.scala) { #with-source }
+
+Java
+:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JSubscribeExamples.java) { #with-source }
+
+### Controlling Subscription Rate
+
+In all the examples shown above, events are received by the subscriber as soon as they are published. There will be scenarios where you would like to control the rate of events received. For instance, slow subscribers can receive events at their own specified speed rather than being overloaded with events to catch up with the publisher's speed. 
+
+All the APIs in EventSubscriber can be provided with `interval` and `SubscriptionMode` to control the subscription rate. Following example demonstrates this with the subscribeCallback API. 
+
+Scala
+:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/SubscribeExamples.scala) { #with-subscription-mode }
+
+Java
+:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JSubscribeExamples.java) { #with-subscription-mode }
+ 
 
 There are two types of Subscription modes:
 
@@ -87,10 +129,10 @@ Read more about Subscription Mode @scaladoc[here](csw/services/event/api/scalads
 Below example demonstrates the usage of pattern subscribe API with callback. Events with keys that match the specified pattern and belong to the given subsystem are received by the subscriber. The callback function provided is called on each event received.
 
 Scala
-:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/AssemblyComponentHandlers.scala) { #event-psubscribe }
+:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/SubscribeExamples.scala) { #psubscribe }
 
 Java
-:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JAssemblyComponentHandlers.java) { #event-psubscribe }
+:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JSubscribeExamples.java) { #psubscribe }
 
 
 @@@ warning

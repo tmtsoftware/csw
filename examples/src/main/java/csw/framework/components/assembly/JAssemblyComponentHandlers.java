@@ -11,15 +11,11 @@ import csw.framework.exceptions.FailureStop;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.messages.TopLevelActorMessage;
 import csw.messages.commands.*;
-import csw.messages.events.Event;
-import csw.messages.events.EventKey;
-import csw.messages.events.EventName;
 import csw.messages.framework.ComponentInfo;
 import csw.messages.location.*;
 import csw.messages.params.generics.JKeyTypes;
 import csw.messages.params.generics.Key;
 import csw.messages.params.models.Prefix;
-import csw.messages.params.models.Subsystem;
 import csw.messages.params.states.CurrentState;
 import csw.messages.params.states.StateName;
 import csw.services.command.CommandResponseManager;
@@ -28,8 +24,6 @@ import csw.services.config.api.javadsl.IConfigClientService;
 import csw.services.config.api.models.ConfigData;
 import csw.services.config.client.javadsl.JConfigClientFactory;
 import csw.services.event.api.javadsl.IEventService;
-import csw.services.event.api.javadsl.IEventSubscriber;
-import csw.services.event.api.javadsl.IEventSubscription;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.location.javadsl.JComponentType;
 import csw.services.logging.javadsl.ILogger;
@@ -38,7 +32,6 @@ import scala.concurrent.duration.FiniteDuration;
 
 import java.nio.file.Paths;
 import java.time.Duration;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -61,8 +54,6 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     private Map<Connection, Optional<JCommandService>> runningHcds;
     private ActorRef<DiagnosticPublisherMessages> diagnosticPublisher;
     private ActorRef<CommandResponse> commandResponseAdapter;
-    private ActorRef<Event> eventHandler;
-    private CompletableFuture<IEventSubscriber> subscriberF;
 
     public JAssemblyComponentHandlers(
             akka.actor.typed.javadsl.ActorContext<TopLevelActorMessage> ctx,
@@ -72,7 +63,6 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
             ILocationService locationService,
             IEventService eventService,
             JLoggerFactory loggerFactory
-
     ) {
         super(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, eventService, loggerFactory);
         this.ctx = ctx;
@@ -86,8 +76,6 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
 
         runningHcds = new HashMap<>();
         commandResponseAdapter = TestProbe.<CommandResponse>create(ctx.getSystem()).ref();
-        eventHandler = ctx.spawnAnonymous(JEventHandlerFactory.make());
-        subscriberF = eventService.defaultSubscriber();
     }
     //#jcomponent-handlers-class
 
@@ -108,19 +96,12 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
                 .findFirst();
 
         // If an Hcd is found as a connection, resolve its location from location service and create other
-        // required worker actors required by this assembly, also subscribe to HCD's filter wheel event stream
         return mayBeConnection.map(connection ->
                 worker.thenAcceptBoth(resolveHcd(), (workerActor, hcdLocation) -> {
                     if (!hcdLocation.isPresent())
                         throw new HcdNotFoundException();
                     else {
                         runningHcds.put(connection, Optional.of(new JCommandService(hcdLocation.get(), ctx.getSystem())));
-                        //#event-subscriber
-                        CompletableFuture<IEventSubscription> subscription = subscriberF.thenApply(subscriber -> {
-                            EventKey filterWheelEventKey = new EventKey(hcdLocation.get().prefix(), new EventName("filter_wheel"));
-                            return subscriber.subscribeActorRef(Collections.singleton(filterWheelEventKey), eventHandler);
-                        });
-                        //#event-subscriber
                     }
                     diagnosticPublisher = ctx.spawnAnonymous(JDiagnosticsPublisherFactory.make(new JCommandService(hcdLocation.get(), ctx.getSystem()), workerActor));
                 })).get();
@@ -357,15 +338,4 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
         eventualCommandService.thenAccept((jcommandService) -> hcd = jcommandService);
         // #resolve-hcd-and-create-commandservice
     }
-
-    // #event-psubscribe
-    private void subscribeToSubsystemEvents(Subsystem subsystem)  {
-        subscriberF.thenApply(subscriber -> subscriber.pSubscribeCallback(subsystem, "*", this::callback));
-    }
-    // #event-psubscribe
-
-    private void callback(Event event){
-        //do something
-    }
-
 }

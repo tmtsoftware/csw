@@ -56,7 +56,6 @@ class AssemblyComponentHandlers(
   private var runningHcds: Map[Connection, Option[CommandService]]        = Map.empty
   private var diagnosticsPublisher: ActorRef[DiagnosticPublisherMessages] = _
   private var commandHandler: ActorRef[CommandHandlerMsgs]                = _
-  private val eventHandler: ActorRef[Event]                               = ctx.spawnAnonymous(EventHandler.make())
 
   //#initialize-handler
   override def initialize(): Future[Unit] = async {
@@ -76,9 +75,6 @@ class AssemblyComponentHandlers(
     // 4. If an Hcd is found as a connection, resolve its location from location service and create other
     // required worker actors required by this assembly
 
-    // 5. retrieve default subscriber from event service
-    val subscriber = await(eventService.defaultSubscriber)
-
     maybeConnection match {
       case Some(_) ⇒
         resolveHcd().map {
@@ -86,10 +82,6 @@ class AssemblyComponentHandlers(
             runningHcds = runningHcds.updated(maybeConnection.get, Some(new CommandService(hcd)(ctx.system)))
             diagnosticsPublisher = ctx.spawnAnonymous(DiagnosticsPublisher.make(runningHcds(maybeConnection.get).get, worker))
             commandHandler = ctx.spawnAnonymous(CommandHandler.make(calculationConfig, runningHcds(maybeConnection.get)))
-            //#event-subscriber
-            // subscribe to HCD's filter_wheel event stream
-            subscriber.subscribeActorRef(Set(EventKey(hcd.prefix, EventName("filter_wheel"))), eventHandler)
-          //#event-subscriber
           case None ⇒ // do something
         }
       case None ⇒ Future.successful(Unit)
@@ -224,16 +216,5 @@ class AssemblyComponentHandlers(
       hcd = commandService
     }
     // #resolve-hcd-and-create-commandservice
-  }
-
-  // #event-psubscribe
-  private def subscribeToSubsystemEvents(subsystem: Subsystem) = async {
-    val subscriber = await(eventService.defaultSubscriber)
-    subscriber.pSubscribeCallback(subsystem, "*", callback)
-  }
-  // #event-psubscribe
-
-  private def callback(event: Event): Unit = {
-    //do something
   }
 }
