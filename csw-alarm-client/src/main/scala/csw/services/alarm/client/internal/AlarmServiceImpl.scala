@@ -198,8 +198,10 @@ class AlarmServiceImpl(
           patternSource
             .filter(_.getMessage == "set")
             .mapAsync(1)(getLatchedSeverity)
-            .scan(Set.empty[AlarmSeverity])(_ + _)
-            .map(_.maxBy(_.level))
+            .scan(Map.empty[StatusKey, AlarmSeverity]) {
+              case (keyToSeverity, (statusKey, severity)) ⇒ keyToSeverity + (statusKey → severity)
+            }
+            .map(_.values.maxBy(_.level))
             .distinctUntilChanged
             .cancellable
             .watchTermination()(Keep.both)
@@ -229,8 +231,8 @@ class AlarmServiceImpl(
     }
   }
 
-  private def getLatchedSeverity(patternMessage: PatternMessage[AggregateKey, String]): Future[AlarmSeverity] = {
+  private def getLatchedSeverity(patternMessage: PatternMessage[AggregateKey, String]): Future[(StatusKey, AlarmSeverity)] = {
     val statusKey = patternMessage.getChannel.toStatusKey
-    statusApi.get(statusKey).map(_.latchedSeverity)
+    statusApi.get(statusKey).map(status ⇒ (statusKey, status.latchedSeverity))
   }
 }
