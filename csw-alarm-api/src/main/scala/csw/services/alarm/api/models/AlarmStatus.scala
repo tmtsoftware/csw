@@ -4,6 +4,5 @@ case class AlarmStatus(
     acknowledgementStatus: AcknowledgementStatus,
     latchStatus: LatchStatus,
     latchedSeverity: AlarmSeverity,
-    shelveStatus: ShelveStatus,
-    activationStatus: ActivationStatus
+    shelveStatus: ShelveStatus
 )
