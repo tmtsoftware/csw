@@ -1,6 +1,7 @@
 package csw.services.alarm.client.internal.auto_refresh
 
-import csw.services.alarm.api.models.{AlarmKey, AlarmSeverity}
+import csw.services.alarm.api.models.AlarmSeverity
+import csw.services.alarm.api.models.Key.AlarmKey
 
 sealed trait AutoRefreshSeverityMessage {
   def key: AlarmKey

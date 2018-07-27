@@ -10,6 +10,7 @@ import csw.services.alarm.api.internal.{AggregateKey, MetadataKey, SeverityKey, 
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, UnAcknowledged}
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
 import csw.services.alarm.api.models.AlarmSeverity.Okay
+import csw.services.alarm.api.models.Key.AlarmKey
 import csw.services.alarm.api.models.LatchStatus.{Latched, UnLatched}
 import csw.services.alarm.api.models.ShelveStatus.{Shelved, UnShelved}
 import csw.services.alarm.api.models._
@@ -88,7 +89,9 @@ class AlarmServiceImpl(
 
   override def getStatus(key: AlarmKey): Future[AlarmStatus] = statusApi.get(key)
 
-  override def getMetadata(key: AlarmKey): Future[List[AlarmMetadata]] = async {
+  override def getMetadata(key: AlarmKey): Future[AlarmMetadata] = metadataApi.get(key)
+
+  override def getMetadata(key: Key): Future[List[AlarmMetadata]] = async {
     val metadataKeys = await(metadataApi.keys(key))
     if (metadataKeys.isEmpty) throw NoAlarmsFoundException()
     await(metadataApi.mget(metadataKeys)).map(_.getValue)
@@ -147,7 +150,7 @@ class AlarmServiceImpl(
     if (metadata.isActive) await(metadataApi.set(key, metadata.copy(activationStatus = Inactive)))
   }
 
-  override def getAggregatedSeverity(key: AlarmKey): Future[AlarmSeverity] = async {
+  override def getAggregatedSeverity(key: Key): Future[AlarmSeverity] = async {
     val statusKeys = await(statusApi.keys(key))
     val metadata   = await(metadataApi.get(key))
 
@@ -161,30 +164,30 @@ class AlarmServiceImpl(
       .reduceRight((previous, current) ⇒ previous max current)
   }
 
-  override def getAggregatedHealth(key: AlarmKey): Future[AlarmHealth] = getAggregatedSeverity(key).map(AlarmHealth.fromSeverity)
+  override def getAggregatedHealth(key: Key): Future[AlarmHealth] = getAggregatedSeverity(key).map(AlarmHealth.fromSeverity)
 
-  override def subscribeAggregatedSeverityCallback(key: AlarmKey, callback: AlarmSeverity ⇒ Unit): AlarmSubscription =
+  override def subscribeAggregatedSeverityCallback(key: Key, callback: AlarmSeverity ⇒ Unit): AlarmSubscription =
     subscribeAggregatedSeverity(key)
       .to(Sink.foreach(callback))
       .run()
 
-  override def subscribeAggregatedHealthCallback(key: AlarmKey, callback: AlarmHealth ⇒ Unit): AlarmSubscription =
+  override def subscribeAggregatedHealthCallback(key: Key, callback: AlarmHealth ⇒ Unit): AlarmSubscription =
     subscribeAggregatedSeverity(key)
       .map(AlarmHealth.fromSeverity)
       .to(Sink.foreach(callback))
       .run()
 
-  override def subscribeAggregatedSeverityActorRef(key: AlarmKey, actorRef: ActorRef[AlarmSeverity]): AlarmSubscription =
+  override def subscribeAggregatedSeverityActorRef(key: Key, actorRef: ActorRef[AlarmSeverity]): AlarmSubscription =
     subscribeAggregatedSeverityCallback(key, actorRef ! _)
 
-  override def subscribeAggregatedHealthActorRef(key: AlarmKey, actorRef: ActorRef[AlarmHealth]): AlarmSubscription =
+  override def subscribeAggregatedHealthActorRef(key: Key, actorRef: ActorRef[AlarmHealth]): AlarmSubscription =
     subscribeAggregatedHealthCallback(key, actorRef ! _)
 
   // PatternMessage gives three values:
   // pattern: e.g  __keyspace@0__:status.nfiraos.*.*,
   // channel: e.g. __keyspace@0__:status.nfiraos.trombone.tromboneAxisLowLimitAlarm,
   // message: event type as value: e.g. set, expire, expired
-  def subscribeAggregatedSeverity(key: AlarmKey): Source[AlarmSeverity, AlarmSubscription] = {
+  def subscribeAggregatedSeverity(key: Key): Source[AlarmSeverity, AlarmSubscription] = {
     val aggregateApi                      = aggregateApiFactory() // create new connection for every client
     val aggregateKeys: List[AggregateKey] = List(key)
     val psubscribeF                       = aggregateApi.psubscribe(aggregateKeys)

@@ -4,7 +4,7 @@ import java.time.{ZoneOffset, ZonedDateTime}
 
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.{ActorContext, MutableBehavior, TimerScheduler}
-import csw.services.alarm.api.models.AlarmKey
+import csw.services.alarm.api.models.Key.AlarmKey
 import csw.services.alarm.client.internal.extensions.ZonedDateTimeExtensions.{RichInt, RichZonedDateTime}
 import csw.services.alarm.client.internal.shelve.ShelveTimeoutMessage.{
   CancelShelveTimeout,

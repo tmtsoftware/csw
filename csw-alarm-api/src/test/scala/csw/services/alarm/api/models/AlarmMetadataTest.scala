@@ -1,6 +1,7 @@
 package csw.services.alarm.api.models
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
 import csw.services.alarm.api.models.AlarmSeverity._
+import csw.services.alarm.api.models.Key.AlarmKey
 import org.scalatest.{FunSuite, Matchers}
 
 // DEOPSCSW-452: Represent alarm in a model as defined in Configuration file

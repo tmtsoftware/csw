@@ -1,11 +1,11 @@
 package csw.services.alarm.api.internal
 
-import csw.services.alarm.api.models.AlarmKey
+import csw.services.alarm.api.models.Key
 
 import scala.language.implicitConversions
 
 case class StatusKey(key: String)
 
 object StatusKey {
-  implicit def fromAlarmKey(alarmKey: AlarmKey): StatusKey = StatusKey("status." + alarmKey.key)
+  implicit def fromAlarmKey(alarmKey: Key): StatusKey = StatusKey("status." + alarmKey.value)
 }
