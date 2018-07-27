@@ -11,7 +11,6 @@ import play.api.libs.json._
 case class CommandName(name: String)
 
 object CommandName {
-//  implicit val format: OFormat[CommandName] = Json.format[CommandName]
 
   implicit val format: Format[CommandName] = new Format[CommandName] {
     override def writes(obj: CommandName): JsValue           = JsString(obj.name)
