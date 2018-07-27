@@ -1,4 +1,4 @@
-package csw.services.alarm.client.internal.configparser
+package csw.services.alarm.api.models
 
 sealed trait ValidationResult
 

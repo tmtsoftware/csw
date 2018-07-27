@@ -1,20 +1,24 @@
 package csw.services.alarm.client.internal
 
+import java.io.File
+
 import akka.Done
 import akka.actor.ActorSystem
 import akka.actor.typed.ActorRef
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.{ActorMaterializer, KillSwitch, Materializer}
+import com.typesafe.config.{ConfigFactory, ConfigResolveOptions}
 import csw.services.alarm.api.exceptions.{InvalidSeverityException, NoAlarmsFoundException, ResetOperationFailedException}
 import csw.services.alarm.api.internal.{AggregateKey, MetadataKey, SeverityKey, StatusKey}
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, UnAcknowledged}
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
 import csw.services.alarm.api.models.AlarmSeverity.Okay
-import csw.services.alarm.api.models.Key.AlarmKey
+import csw.services.alarm.api.models.Key.{AlarmKey, GlobalKey}
 import csw.services.alarm.api.models.LatchStatus.{Latched, UnLatched}
 import csw.services.alarm.api.models.ShelveStatus.{Shelved, UnShelved}
 import csw.services.alarm.api.models._
 import csw.services.alarm.api.scaladsl.{AlarmAdminService, AlarmSubscription}
+import csw.services.alarm.client.internal.configparser.ConfigParser
 import csw.services.alarm.client.internal.extensions.SourceExtensions.RichSource
 import csw.services.alarm.client.internal.shelve.ShelveTimeoutActorFactory
 import csw.services.alarm.client.internal.shelve.ShelveTimeoutMessage.{CancelShelveTimeout, ScheduleShelveTimeout}
@@ -43,6 +47,15 @@ class AlarmServiceImpl(
   private val ttlInSeconds           = refreshInSeconds * maxMissedRefreshCounts
 
   implicit val mat: Materializer = ActorMaterializer()
+
+  override def initAlarms(inputFile: File, reset: Boolean): Future[Unit] = async {
+    val inputConfig      = ConfigFactory.parseFile(inputFile).resolve(ConfigResolveOptions.noSystem())
+    val alarmMetadataSet = ConfigParser.parseAlarmMetadataSet(inputConfig)
+
+    if (reset) await(resetAlarmStore())
+
+    await(setAlarmStore(alarmMetadataSet))
+  }
 
   override def setSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Unit] = async {
     // get alarm metadata
@@ -239,4 +252,23 @@ class AlarmServiceImpl(
     val statusKey = patternMessage.getChannel.toStatusKey
     statusApi.get(statusKey).map(status ⇒ (statusKey, status.latchedSeverity))
   }
+
+  private def setAlarmStore(alarmMetadataSet: AlarmMetadataSet) =
+    Future
+      .traverse(alarmMetadataSet.alarms) { alarmMetadata ⇒
+        val alarmKey = alarmMetadata.alarmKey
+        metadataApi.set(alarmKey, alarmMetadata)
+        statusApi.set(alarmKey, AlarmStatus())
+        severityApi.set(alarmKey, AlarmSeverity.Disconnected)
+      }
+
+  private def resetAlarmStore() =
+    Future
+      .sequence(
+        List(
+          metadataApi.pdel(GlobalKey),
+          statusApi.pdel(GlobalKey),
+          severityApi.pdel(GlobalKey)
+        )
+      )
 }

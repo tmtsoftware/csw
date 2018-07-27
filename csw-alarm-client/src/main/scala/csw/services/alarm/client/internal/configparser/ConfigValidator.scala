@@ -10,7 +10,8 @@ import com.github.fge.jsonschema.core.load.download.URIDownloader
 import com.github.fge.jsonschema.core.report.ProcessingMessage
 import com.github.fge.jsonschema.main.{JsonSchema, JsonSchemaFactory}
 import com.typesafe.config.{Config, ConfigFactory, ConfigRenderOptions}
-import csw.services.alarm.client.internal.configparser.ValidationResult.{Failure, Success}
+import csw.services.alarm.api.models.ValidationResult
+import csw.services.alarm.api.models.ValidationResult.{Failure, Success}
 
 import scala.collection.JavaConverters.{asScalaIteratorConverter, iterableAsScalaIterableConverter}
 
@@ -46,7 +47,7 @@ object ConfigValidator {
    *
    * @param inputConfig   the config to be validated against the schema
    * @param schemaConfig  a config using the JSON schema syntax (but may be simplified to HOCON format)
-   * @return a list of problems, if any were found
+   * @return validation status either Success or Failure with reasons
    */
   def validate(inputConfig: Config, schemaConfig: Config): ValidationResult = {
     val jsonSchema = jsonSchemaFactory.getJsonSchema(jsonNodeFrom(schemaConfig))
