@@ -159,34 +159,13 @@ public class JHcdComponentHandlers extends JComponentHandlers {
     //#onLocationTrackingEvent-handler
     @Override
     public void onLocationTrackingEvent(TrackingEvent trackingEvent) {
-        // start publishing events when event service is up
-        if (trackingEvent instanceof LocationUpdated && trackingEvent.connection().name().equals(EventServiceConnection.value().name())) {
-            CompletableFuture<Cancellable> cancellableF = startPublishingEvents();
-            // stop publishing by calling cancellableF.thenApply(Cancellable::cancel)
-        } else if (trackingEvent instanceof LocationUpdated) {
+        if (trackingEvent instanceof LocationUpdated) {
             // do something for the tracked location when it is updated
         } else if (trackingEvent instanceof LocationRemoved) {
             // do something for the tracked location when it is no longer available
         }
     }
     //#onLocationTrackingEvent-handler
-
-    //#event-publisher
-    private CompletableFuture<Cancellable> startPublishingEvents() {
-        Event baseEvent = new SystemEvent(componentInfo.prefix(), new EventName("filter_wheel"));
-        return eventService.defaultPublisher().thenApply(publisher -> publisher.publish(() -> eventGenerator(baseEvent), Duration.ofMillis(100), this::onError));
-    }
-
-    // this holds the logic for event generation, could be based on some computation or current state of HCD
-    private Event eventGenerator(Event baseEvent) {
-        // add logic here to create a new event and return the same
-        return baseEvent;
-    }
-
-    private void onError(PublishFailure publishFailure) {
-        log.error("Failed to publish event: [" + publishFailure.event() + "]", publishFailure.cause());
-    }
-    //#event-publisher
 
     private void processSetup(Setup sc) {
         switch (sc.commandName().name()) {

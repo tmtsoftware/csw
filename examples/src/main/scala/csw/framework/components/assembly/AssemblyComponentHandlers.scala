@@ -49,11 +49,11 @@ class AssemblyComponentHandlers(
 
   implicit val ec: ExecutionContextExecutor = ctx.executionContext
 
-  private val log: Logger                                                 = new LoggerFactory(componentInfo.name).getLogger(ctx)
-  private val configClient: ConfigClientService                           = ConfigClientFactory.clientApi(ctx.system.toUntyped, locationService)
-  private var runningHcds: Map[Connection, Option[CommandService]]        = Map.empty
-  private var diagnosticsPublisher: ActorRef[DiagnosticPublisherMessages] = _
-  private var commandHandler: ActorRef[CommandHandlerMsgs]                = _
+  private val log: Logger                                          = new LoggerFactory(componentInfo.name).getLogger(ctx)
+  private val configClient: ConfigClientService                    = ConfigClientFactory.clientApi(ctx.system.toUntyped, locationService)
+  private var runningHcds: Map[Connection, Option[CommandService]] = Map.empty
+  var diagnosticsPublisher: ActorRef[DiagnosticPublisherMessages]  = _
+  var commandHandler: ActorRef[CommandHandlerMsgs]                 = _
 
   //#initialize-handler
   override def initialize(): Future[Unit] = async {
@@ -198,7 +198,7 @@ class AssemblyComponentHandlers(
   }
   // #failureStop-Exception
 
-  private def resolveHcdAndCreateCommandService(): Unit = {
+  def resolveHcdAndCreateCommandService(): Unit = {
     var hcd: CommandService = null
     val hcdConnection       = componentInfo.connections.find(connection ⇒ connection.componentId.componentType == ComponentType.HCD).get
 

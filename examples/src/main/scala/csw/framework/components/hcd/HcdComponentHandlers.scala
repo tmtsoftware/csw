@@ -121,29 +121,10 @@ class HcdComponentHandlers(
 
   //#onLocationTrackingEvent-handler
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = trackingEvent match {
-    case LocationUpdated(location) if location.connection == EventServiceConnection.value ⇒ startPublishingEvents()
-    case LocationUpdated(location)                                                        ⇒ // do something for the tracked location when it is updated
-    case LocationRemoved(connection)                                                      ⇒ // do something for the tracked location when it is no longer available
+    case LocationUpdated(location)   ⇒ // do something for the tracked location when it is updated
+    case LocationRemoved(connection) ⇒ // do something for the tracked location when it is no longer available
   }
   //#onLocationTrackingEvent-handler
-
-  //#event-publisher
-  private def startPublishingEvents(): Future[Cancellable] = async {
-    val publisher = await(eventService.defaultPublisher)
-    val baseEvent = SystemEvent(componentInfo.prefix, EventName("filter_wheel"))
-
-    publisher.publish(eventGenerator(baseEvent), 100.millis, onError)
-  }
-
-  // this holds the logic for event generation, could be based on some computation or current state of HCD
-  private def eventGenerator(baseEvent: Event): Event = baseEvent match {
-    case e: SystemEvent  ⇒ e.copy(eventId = Id(), eventTime = EventTime())
-    case e: ObserveEvent ⇒ e.copy(eventId = Id(), eventTime = EventTime())
-  }
-
-  private def onError(publishFailure: PublishFailure): Unit =
-    log.error(s"Publish failed for event: [${publishFailure.event}]", ex = publishFailure.cause)
-  //#event-publisher
 
   private def processSetup(sc: Setup): Unit = {
     sc.commandName.toString match {

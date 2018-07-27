@@ -16,12 +16,12 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
-public class JSubscribeExamples {
+public class JEventSubscribeExamples {
 
     private JEventService eventService;
     private Materializer mat;
 
-    public JSubscribeExamples(JEventService eventService, Materializer mat){
+    public JEventSubscribeExamples(JEventService eventService, Materializer mat){
         this.eventService = eventService;
         this.mat = mat;
     }

@@ -13,7 +13,9 @@ import scala.async.Async._
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{ExecutionContext, Future}
 
-class SubscribeExamples(eventService: EventService)(implicit ec: ExecutionContext, mat: Materializer) {
+class EventSubscribeExamples(
+    eventService: EventService
+)(implicit ec: ExecutionContext, mat: Materializer) {
 
   def callback(hcd: AkkaLocation): Future[Unit] =
     //#with-callback

@@ -43,16 +43,40 @@ That means, with `defaultSubscriber`, you are sharing same connection for gettin
 
 ## Usage of EventPublisher
 
-Below example demonstrates the usage of publish API with event generator to publish events generated at specified interval and call onError callback to log events that were failed to be published.
+Below examples demonstrate the usage of multiple variations of publish API.
 
-* eventGenerator: Function responsible for generating events. You can add domain specific logic of generating new events based on certain conditions.
-* onError: Function which gets invoked on events which were failed to be published.
+### For Single Event
+
+This is the simplest API to publish a single event. It returns a Future which will complete successfully if the event is published or fail with a @scaladoc[PublishFailure](csw/services/event/api/exceptions/PublishFailure) exception.
 
 Scala
-:   @@snip [HcdComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/hcd/HcdComponentHandlers.scala) { #event-publisher }
+:   @@snip [HcdComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/hcd/EventPublishExamples.scala) { #single-event }
 
 Java
-:   @@snip [JHcdComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/hcd/JHcdComponentHandlers.java) { #event-publisher }
+:   @@snip [JHcdComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/hcd/JEventPublishExamples.java) { #single-event }
+
+### With Generator
+
+Below example demonstrates the usage of publish API with event generator which will publish one event at each `interval`. `eventGenerator` is a function responsible for generating events. It can hold domain specific logic of generating new events based on certain conditions.
+
+Scala
+:   @@snip [HcdComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/hcd/EventPublishExamples.scala) { #event-generator }
+
+Java
+:   @@snip [JHcdComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/hcd/JEventPublishExamples.java) { #event-generator }
+
+### With Event Stream
+
+In order to publish a continuous stream of events, this API can be used. If an infinite stream is provided, shutdown of the stream needs to be taken care by the users.
+
+Scala
+:   @@snip [HcdComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/hcd/EventPublishExamples.scala) { #with-source }
+
+Java
+:   @@snip [JHcdComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/hcd/JEventPublishExamples.java) { #with-source }
+
+This API also demonstrates the usage of onError callback which can be used to get the handle of events that were failed to be published. The `eventGenerator` API showed just above this example above also supports the `onError` callback.
+
 
 You can find complete list of APIs supported by `EventPublisher` and `IEventPublisher` with detailed description of each API here: 
 
@@ -68,30 +92,30 @@ Below examples demonstrate the usage of multiple variations of subscribe API.
 The example shown below takes a set of event keys to subscribe to and a callback function which will be called on each event received by the event stream. This is the simplest and most commonly used API. 
 
 Scala
-:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/SubscribeExamples.scala) { #with-callback }
+:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/EventSubscribeExamples.scala) { #with-callback }
 
 Java
-:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JSubscribeExamples.java) { #with-callback }
+:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JEventSubscribeExamples.java) { #with-callback }
 
 ### With Asynchronous Callback
 
 The above example will run into concurrency issues, if the callback has a asynchronous behavior. To avoid that use the following API which will give the guarantee of ordered execution of these asynchronous callbacks.
 
 Scala
-:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/SubscribeExamples.scala) { #with-async-callback }
+:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/EventSubscribeExamples.scala) { #with-async-callback }
 
 Java
-:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JSubscribeExamples.java) { #with-async-callback }
+:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JEventSubscribeExamples.java) { #with-async-callback }
 
 ### With ActorRef
 
 If there is a need to mutate state on receiving each event, then it is recommended to use this API. To use this API, you have to create an actor which takes event and then you can safely keep mutable state inside this actor. In the example shown below, `eventHandler` is the actorRef which accepts events. 
 
 Scala
-:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/SubscribeExamples.scala) { #with-actor-ref }
+:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/EventSubscribeExamples.scala) { #with-actor-ref }
 
 Java
-:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JSubscribeExamples.java) { #with-actor-ref }
+:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JEventSubscribeExamples.java) { #with-actor-ref }
 
 
 ### Receive Event Stream
@@ -99,10 +123,10 @@ Java
 This API takes a set of Event keys to subscribe to and returns a Source of events. This API gives more control to the user to customize behavior of the event stream.
 
 Scala
-:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/SubscribeExamples.scala) { #with-source }
+:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/EventSubscribeExamples.scala) { #with-source }
 
 Java
-:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JSubscribeExamples.java) { #with-source }
+:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JEventSubscribeExamples.java) { #with-source }
 
 ### Controlling Subscription Rate
 
@@ -111,10 +135,10 @@ In all the examples shown above, events are received by the subscriber as soon a
 All the APIs in EventSubscriber can be provided with `interval` and `SubscriptionMode` to control the subscription rate. Following example demonstrates this with the subscribeCallback API. 
 
 Scala
-:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/SubscribeExamples.scala) { #with-subscription-mode }
+:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/EventSubscribeExamples.scala) { #with-subscription-mode }
 
 Java
-:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JSubscribeExamples.java) { #with-subscription-mode }
+:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JEventSubscribeExamples.java) { #with-subscription-mode }
  
 
 There are two types of Subscription modes:
@@ -129,10 +153,10 @@ Read more about Subscription Mode @scaladoc[here](csw/services/event/api/scalads
 Below example demonstrates the usage of pattern subscribe API with callback. Events with keys that match the specified pattern and belong to the given subsystem are received by the subscriber. The callback function provided is called on each event received.
 
 Scala
-:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/SubscribeExamples.scala) { #psubscribe }
+:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/EventSubscribeExamples.scala) { #psubscribe }
 
 Java
-:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JSubscribeExamples.java) { #psubscribe }
+:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JEventSubscribeExamples.java) { #psubscribe }
 
 
 @@@ warning
