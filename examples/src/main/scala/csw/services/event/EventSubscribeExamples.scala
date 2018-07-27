@@ -1,8 +1,9 @@
-package csw.framework.components.assembly
+package csw.services.event
 
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.ActorContext
 import akka.stream.Materializer
+import csw.framework.components.assembly.EventHandler
 import csw.messages.TopLevelActorMessage
 import csw.messages.events.{Event, EventKey, EventName}
 import csw.messages.location.AkkaLocation

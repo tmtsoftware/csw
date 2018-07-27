@@ -1,0 +1,53 @@
+package csw.services.event;
+
+import akka.actor.ActorSystem;
+import csw.services.event.api.javadsl.IEventService;
+import csw.services.event.models.EventStores;
+import csw.services.location.javadsl.ILocationService;
+import io.lettuce.core.RedisClient;
+
+public class JEventServiceCreationExamples {
+
+    private ActorSystem actorSystem;
+    private ILocationService locationService;
+    private RedisClient redisClient;
+
+    public JEventServiceCreationExamples(ActorSystem actorSystem, ILocationService locationService) {
+        this.actorSystem = actorSystem;
+        this.locationService = locationService;
+        redisClient = RedisClient.create();
+    }
+
+    private void createDefaultEventService() {
+        //#default-event-service
+        // create event service using host and port of event server.
+        IEventService eventService1 = new EventServiceFactory().jMake(locationService, actorSystem);
+
+        // create event service using host and port of event server.
+        IEventService eventService2 = new EventServiceFactory().jMake("localhost", 26379, actorSystem);
+        //#default-event-service
+    }
+
+    private void createRedisEventService() {
+
+        //#redis-event-service
+        EventStores.RedisStore redisStore = new EventStores.RedisStore(redisClient);
+        // create event service using location service
+        IEventService eventService1 = new EventServiceFactory(redisStore).jMake(locationService, actorSystem);
+
+        // create event service using host and port of event server.
+        IEventService eventService2 = new EventServiceFactory(redisStore).jMake("localhost", 26379, actorSystem);
+        //#redis-event-service
+    }
+
+    private void createKafkaEventService() {
+
+        //#kafka-event-service
+        // create event service using location service
+        IEventService eventService1 = new EventServiceFactory(EventStores.jKafkaStore()).jMake(locationService, actorSystem);
+
+        // create event service using host and port of event server.
+        IEventService eventService2 = new EventServiceFactory(EventStores.jKafkaStore()).jMake("localhost", 26379, actorSystem);
+        //#kafka-event-service
+    }
+}

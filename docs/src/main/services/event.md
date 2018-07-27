@@ -50,30 +50,30 @@ Below examples demonstrate the usage of multiple variations of publish API.
 This is the simplest API to publish a single event. It returns a Future which will complete successfully if the event is published or fail with a @scaladoc[PublishFailure](csw/services/event/api/exceptions/PublishFailure) exception.
 
 Scala
-:   @@snip [HcdComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/hcd/EventPublishExamples.scala) { #single-event }
+:   @@snip [EventPublishExamples.scala](../../../../examples/src/main/scala/csw/services/event/EventPublishExamples.scala) { #single-event }
 
 Java
-:   @@snip [JHcdComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/hcd/JEventPublishExamples.java) { #single-event }
+:   @@snip [JEventPublishExamples.java](../../../../examples/src/main/java/csw/services/event/JEventPublishExamples.java) { #single-event }
 
 ### With Generator
 
 Below example demonstrates the usage of publish API with event generator which will publish one event at each `interval`. `eventGenerator` is a function responsible for generating events. It can hold domain specific logic of generating new events based on certain conditions.
 
 Scala
-:   @@snip [HcdComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/hcd/EventPublishExamples.scala) { #event-generator }
+:   @@snip [EventPublishExamples.scala](../../../../examples/src/main/scala/csw/services/event/EventPublishExamples.scala) { #event-generator }
 
 Java
-:   @@snip [JHcdComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/hcd/JEventPublishExamples.java) { #event-generator }
+:   @@snip [JEventPublishExamples.java](../../../../examples/src/main/java/csw/services/event/JEventPublishExamples.java) { #event-generator }
 
 ### With Event Stream
 
 In order to publish a continuous stream of events, this API can be used. If an infinite stream is provided, shutdown of the stream needs to be taken care by the users.
 
 Scala
-:   @@snip [HcdComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/hcd/EventPublishExamples.scala) { #with-source }
+:   @@snip [EventPublishExamples.scala](../../../../examples/src/main/scala/csw/services/event/EventPublishExamples.scala) { #with-source }
 
 Java
-:   @@snip [JHcdComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/hcd/JEventPublishExamples.java) { #with-source }
+:   @@snip [JEventPublishExamples.java](../../../../examples/src/main/java/csw/services/event/JEventPublishExamples.java) { #with-source }
 
 This API also demonstrates the usage of onError callback which can be used to get the handle of events that were failed to be published. The `eventGenerator` API showed just above this example above also supports the `onError` callback.
 
@@ -92,30 +92,30 @@ Below examples demonstrate the usage of multiple variations of subscribe API.
 The example shown below takes a set of event keys to subscribe to and a callback function which will be called on each event received by the event stream. This is the simplest and most commonly used API. 
 
 Scala
-:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/EventSubscribeExamples.scala) { #with-callback }
+:   @@snip [EventSubscribeExamples.scala](../../../../examples/src/main/scala/csw/services/event/EventSubscribeExamples.scala) { #with-callback }
 
 Java
-:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JEventSubscribeExamples.java) { #with-callback }
+:   @@snip [JEventSubscribeExamples.java](../../../../examples/src/main/java/csw/services/event/JEventSubscribeExamples.java) { #with-callback }
 
 ### With Asynchronous Callback
 
 The above example will run into concurrency issues, if the callback has a asynchronous behavior. To avoid that use the following API which will give the guarantee of ordered execution of these asynchronous callbacks.
 
 Scala
-:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/EventSubscribeExamples.scala) { #with-async-callback }
+:   @@snip [EventSubscribeExamples.scala](../../../../examples/src/main/scala/csw/services/event/EventSubscribeExamples.scala) { #with-async-callback }
 
 Java
-:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JEventSubscribeExamples.java) { #with-async-callback }
+:   @@snip [JEventSubscribeExamples.java](../../../../examples/src/main/java/csw/services/event/JEventSubscribeExamples.java) { #with-async-callback }
 
 ### With ActorRef
 
 If there is a need to mutate state on receiving each event, then it is recommended to use this API. To use this API, you have to create an actor which takes event and then you can safely keep mutable state inside this actor. In the example shown below, `eventHandler` is the actorRef which accepts events. 
 
 Scala
-:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/EventSubscribeExamples.scala) { #with-actor-ref }
+:   @@snip [EventSubscribeExamples.scala](../../../../examples/src/main/scala/csw/services/event/EventSubscribeExamples.scala) { #with-actor-ref }
 
 Java
-:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JEventSubscribeExamples.java) { #with-actor-ref }
+:   @@snip [JEventSubscribeExamples.java](../../../../examples/src/main/java/csw/services/event/JEventSubscribeExamples.java) { #with-actor-ref }
 
 
 ### Receive Event Stream
@@ -123,10 +123,10 @@ Java
 This API takes a set of Event keys to subscribe to and returns a Source of events. This API gives more control to the user to customize behavior of the event stream.
 
 Scala
-:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/EventSubscribeExamples.scala) { #with-source }
+:   @@snip [EventSubscribeExamples.scala](../../../../examples/src/main/scala/csw/services/event/EventSubscribeExamples.scala) { #with-source }
 
 Java
-:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JEventSubscribeExamples.java) { #with-source }
+:   @@snip [JEventSubscribeExamples.java](../../../../examples/src/main/java/csw/services/event/JEventSubscribeExamples.java) { #with-source }
 
 ### Controlling Subscription Rate
 
@@ -135,10 +135,10 @@ In all the examples shown above, events are received by the subscriber as soon a
 All the APIs in EventSubscriber can be provided with `interval` and `SubscriptionMode` to control the subscription rate. Following example demonstrates this with the subscribeCallback API. 
 
 Scala
-:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/EventSubscribeExamples.scala) { #with-subscription-mode }
+:   @@snip [EventSubscribeExamples.scala](../../../../examples/src/main/scala/csw/services/event/EventSubscribeExamples.scala) { #with-subscription-mode }
 
 Java
-:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JEventSubscribeExamples.java) { #with-subscription-mode }
+:   @@snip [JEventSubscribeExamples.java](../../../../examples/src/main/java/csw/services/event/JEventSubscribeExamples.java) { #with-subscription-mode }
  
 
 There are two types of Subscription modes:
@@ -153,10 +153,10 @@ Read more about Subscription Mode @scaladoc[here](csw/services/event/api/scalads
 Below example demonstrates the usage of pattern subscribe API with callback. Events with keys that match the specified pattern and belong to the given subsystem are received by the subscriber. The callback function provided is called on each event received.
 
 Scala
-:   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/EventSubscribeExamples.scala) { #psubscribe }
+:   @@snip [EventSubscribeExamples.scala](../../../../examples/src/main/scala/csw/services/event/EventSubscribeExamples.scala) { #psubscribe }
 
 Java
-:   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JEventSubscribeExamples.java) { #psubscribe }
+:   @@snip [JEventSubscribeExamples.java](../../../../examples/src/main/java/csw/services/event/JEventSubscribeExamples.java) { #psubscribe }
 
 
 @@@ warning
@@ -175,3 +175,47 @@ You can find complete list of API's supported by `EventSubscriber` and `IEventSu
 
 * @scaladoc[EventSubscriber](csw/services/event/api/scaladsl/EventSubscriber)
 * @javadoc[IEventSubscriber](csw/services/event/api/javadsl/IEventSubscriber)
+
+## Create Event Service
+If you are not using csw-framework, you can create @scaladoc[EventService](csw/services/event/api/scaladsl/EventService) using @scaladoc[EventServiceFactory](csw/services/event/EventServiceFactory).    
+
+Event service supports following two event stores:
+
+* @scaladoc[RedisStore](csw/services/event/models/EventStores/EventStores$$RedisStore) : This is the default and recommended store. 
+* @scaladoc[KafkaStore](csw/services/event/models/EventStores/EventStores$$KafkaStore$) : Not recommended. You should not use this unless you have strong reasons to do so.
+
+### Default Event Service
+Default event service is backed up by RedisStore.
+
+Scala
+:   @@snip [EventServiceCreationExamples.scala](../../../../examples/src/main/scala/csw/services/event/EventServiceCreationExamples.scala) { #default-event-service }
+
+Java
+:   @@snip [JEventServiceCreationExamples.java](../../../../examples/src/main/java/csw/services/event/JEventServiceCreationExamples.java) { #default-event-service }
+
+
+### Event Service with Redis Store
+You can optionally supply a RedisClient to the EventStore from outside which allows you to customize the behaviour of RedisClient used by Event Service which in most of the cases will be required in test scope only. 
+
+RedisClient is an expensive resource. Reuse this instance as much as possible.
+
+Note that it is the responsibility of consumer of this API to shutdown Redis Client when it is no longer in use.
+
+Scala
+:   @@snip [EventServiceCreationExamples.scala](../../../../examples/src/main/scala/csw/services/event/EventServiceCreationExamples.scala) { #redis-event-service }
+
+Java
+:   @@snip [JEventServiceCreationExamples.java](../../../../examples/src/main/java/csw/services/event/JEventServiceCreationExamples.java) { #redis-event-service }
+
+### Event Service with Kafka Store
+Event Service supports Kafka store but it does not meet TMT's performance requirements and hence not recommended for production use. 
+
+Scala
+:   @@snip [EventServiceCreationExamples.scala](../../../../examples/src/main/scala/csw/services/event/EventServiceCreationExamples.scala) { #kafka-event-service }
+
+Java
+:   @@snip [JEventServiceCreationExamples.java](../../../../examples/src/main/java/csw/services/event/JEventServiceCreationExamples.java) { #kafka-event-service }
+
+@@@ warning
+Do not use Kafka Store for production purpose. 
+@@@

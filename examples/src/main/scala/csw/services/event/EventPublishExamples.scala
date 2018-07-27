@@ -1,4 +1,4 @@
-package csw.framework.components.hcd
+package csw.services.event
 
 import akka.Done
 import akka.stream.scaladsl.{Keep, Source}

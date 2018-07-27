@@ -1,4 +1,4 @@
-package csw.framework.components.assembly;
+package csw.services.event;
 
 import akka.actor.typed.ActorRef;
 import akka.stream.Materializer;

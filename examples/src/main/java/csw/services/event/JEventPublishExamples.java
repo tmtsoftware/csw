@@ -1,4 +1,4 @@
-package csw.framework.components.hcd;
+package csw.services.event;
 
 import akka.Done;
 import akka.actor.Cancellable;
@@ -10,9 +10,7 @@ import csw.messages.events.EventName;
 import csw.messages.events.SystemEvent;
 import csw.messages.framework.ComponentInfo;
 import csw.messages.params.models.Prefix;
-import csw.services.event.api.exceptions.PublishFailure;
 import csw.services.event.internal.commons.javawrappers.JEventService;
-import csw.services.logging.scaladsl.Logger;
 
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
