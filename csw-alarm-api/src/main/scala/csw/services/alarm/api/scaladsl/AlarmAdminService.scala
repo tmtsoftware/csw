@@ -19,9 +19,9 @@ trait AlarmAdminService extends AlarmService {
   def getAggregatedSeverity(key: AlarmKey): Future[AlarmSeverity]
   def getAggregatedHealth(key: AlarmKey): Future[AlarmHealth]
 
-  def subscribeAggregatedSeverityCallback(key: AlarmKey, callback: AlarmSeverity ⇒ Unit): Future[AlarmSubscription]
-  def subscribeAggregatedHealthCallback(key: AlarmKey, callback: AlarmHealth ⇒ Unit): Future[AlarmSubscription]
+  def subscribeAggregatedSeverityCallback(key: AlarmKey, callback: AlarmSeverity ⇒ Unit): AlarmSubscription
+  def subscribeAggregatedHealthCallback(key: AlarmKey, callback: AlarmHealth ⇒ Unit): AlarmSubscription
 
-  def subscribeAggregatedSeverityActorRef(key: AlarmKey, actorRef: ActorRef[AlarmSeverity]): Future[AlarmSubscription]
-  def subscribeAggregatedHealthActorRef(key: AlarmKey, actorRef: ActorRef[AlarmHealth]): Future[AlarmSubscription]
+  def subscribeAggregatedSeverityActorRef(key: AlarmKey, actorRef: ActorRef[AlarmSeverity]): AlarmSubscription
+  def subscribeAggregatedHealthActorRef(key: AlarmKey, actorRef: ActorRef[AlarmHealth]): AlarmSubscription
 }

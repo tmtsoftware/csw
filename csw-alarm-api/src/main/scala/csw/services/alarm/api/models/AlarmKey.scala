@@ -14,7 +14,7 @@ case class AlarmKey(subsystem: String, component: String, name: String) {
 }
 
 object AlarmKey {
-  def withPattern(
+  private[alarm] def withPattern(
       subsystem: Option[String] = None,
       component: Option[String] = None,
       alarmName: Option[String] = None

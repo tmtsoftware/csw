@@ -25,19 +25,16 @@ import scala.async.Async._
 import scala.concurrent.Future
 
 class AlarmServiceImpl(
-    metadataApiFactory: ⇒ RedisScalaApi[MetadataKey, AlarmMetadata],
-    severityApiFactory: ⇒ RedisScalaApi[SeverityKey, AlarmSeverity],
-    statusApiFactory: ⇒ RedisScalaApi[StatusKey, AlarmStatus],
-    aggregateApiFactory: ⇒ RedisScalaApi[AggregateKey, String],
+    metadataApi: RedisAsyncScalaApi[MetadataKey, AlarmMetadata],
+    severityApi: RedisAsyncScalaApi[SeverityKey, AlarmSeverity],
+    statusApi: RedisAsyncScalaApi[StatusKey, AlarmStatus],
+    aggregateApiFactory: () ⇒ RedisReactiveScalaApi[AggregateKey, String],
     shelveTimeoutActorFactory: ShelveTimeoutActorFactory
 )(implicit actorSystem: ActorSystem)
     extends AlarmAdminService {
 
   import actorSystem.dispatcher
 
-  private lazy val metadataApi      = metadataApiFactory
-  private lazy val severityApi      = severityApiFactory
-  private lazy val statusApi        = statusApiFactory
   private lazy val shelveTimeoutRef = shelveTimeoutActorFactory.make(key ⇒ unShelve(key, cancelShelveTimeout = false))
 
   private val refreshInSeconds       = actorSystem.settings.config.getInt("alarm.refresh-in-seconds") // default value is 3 seconds
@@ -166,57 +163,56 @@ class AlarmServiceImpl(
 
   override def getAggregatedHealth(key: AlarmKey): Future[AlarmHealth] = getAggregatedSeverity(key).map(AlarmHealth.fromSeverity)
 
-  override def subscribeAggregatedSeverityCallback(key: AlarmKey, callback: AlarmSeverity ⇒ Unit): Future[AlarmSubscription] =
+  override def subscribeAggregatedSeverityCallback(key: AlarmKey, callback: AlarmSeverity ⇒ Unit): AlarmSubscription =
     subscribeAggregatedSeverity(key)
       .to(Sink.foreach(callback))
       .run()
 
-  override def subscribeAggregatedHealthCallback(key: AlarmKey, callback: AlarmHealth ⇒ Unit): Future[AlarmSubscription] =
+  override def subscribeAggregatedHealthCallback(key: AlarmKey, callback: AlarmHealth ⇒ Unit): AlarmSubscription =
     subscribeAggregatedSeverity(key)
       .map(AlarmHealth.fromSeverity)
       .to(Sink.foreach(callback))
       .run()
 
-  override def subscribeAggregatedSeverityActorRef(key: AlarmKey, actorRef: ActorRef[AlarmSeverity]): Future[AlarmSubscription] =
+  override def subscribeAggregatedSeverityActorRef(key: AlarmKey, actorRef: ActorRef[AlarmSeverity]): AlarmSubscription =
     subscribeAggregatedSeverityCallback(key, actorRef ! _)
 
-  override def subscribeAggregatedHealthActorRef(key: AlarmKey, actorRef: ActorRef[AlarmHealth]): Future[AlarmSubscription] =
+  override def subscribeAggregatedHealthActorRef(key: AlarmKey, actorRef: ActorRef[AlarmHealth]): AlarmSubscription =
     subscribeAggregatedHealthCallback(key, actorRef ! _)
 
   // PatternMessage gives three values:
   // pattern: e.g  __keyspace@0__:status.nfiraos.*.*,
   // channel: e.g. __keyspace@0__:status.nfiraos.trombone.tromboneAxisLowLimitAlarm,
   // message: event type as value: e.g. set, expire, expired
-  def subscribeAggregatedSeverity(key: AlarmKey): Source[AlarmSeverity, Future[AlarmSubscription]] = {
-    val aggregateApi                      = aggregateApiFactory // create new connection for every client
+  def subscribeAggregatedSeverity(key: AlarmKey): Source[AlarmSeverity, AlarmSubscription] = {
+    val aggregateApi                      = aggregateApiFactory() // create new connection for every client
     val aggregateKeys: List[AggregateKey] = List(key)
     val psubscribeF                       = aggregateApi.psubscribe(aggregateKeys)
 
-    val severitySourceF =
-      psubscribeF
-        .map { _ ⇒
-          val patternSource = aggregateApi.observePatterns(OverflowStrategy.LATEST)
-          patternSource
-            .filter(_.getMessage == "set")
-            .mapAsync(1)(getLatchedSeverity)
-            .scan(Map.empty[StatusKey, AlarmSeverity]) {
-              case (keyToSeverity, (statusKey, severity)) ⇒ keyToSeverity + (statusKey → severity)
-            }
-            .map(_.values.maxBy(_.level))
-            .distinctUntilChanged
-            .cancellable
-            .watchTermination()(Keep.both)
-            .mapMaterializedValue {
-              case (killSwitch, terminationSignal) ⇒
-                createAlarmSubscription(aggregateApi, aggregateKeys, killSwitch, terminationSignal)
-            }
-        }
-
-    Source.fromFutureSource(severitySourceF)
+    Source
+      .fromFuture(psubscribeF)
+      .flatMapConcat { _ =>
+        val patternSource = aggregateApi.observePatterns(OverflowStrategy.LATEST)
+        patternSource
+          .filter(_.getMessage == "set")
+          .mapAsync(1)(getLatchedSeverity)
+          .scan(Map.empty[StatusKey, AlarmSeverity]) {
+            case (keyToSeverity, (statusKey, severity)) ⇒ keyToSeverity + (statusKey → severity)
+          }
+          .map(_.values.maxBy(_.level))
+          .distinctUntilChanged
+      }
+      .cancellable
+      .watchTermination()(Keep.both)
+      .mapMaterializedValue {
+        case (killSwitch, terminationSignal) ⇒
+          createAlarmSubscription(psubscribeF, aggregateApi, aggregateKeys, killSwitch, terminationSignal)
+      }
   }
 
   private def createAlarmSubscription(
-      aggregateApi: RedisScalaApi[AggregateKey, String],
+      psubscribeF: Future[Unit],
+      aggregateApi: RedisReactiveScalaApi[AggregateKey, String],
       aggregateKeys: List[AggregateKey],
       killSwitch: KillSwitch,
       terminationSignal: Future[Done]
@@ -229,6 +225,10 @@ class AlarmServiceImpl(
       await(aggregateApi.quit)
       killSwitch.shutdown()
       await(terminationSignal) // await on terminationSignal when unsubscribe is called by user
+    }
+
+    override def ready(): Future[Unit] = psubscribeF.map(_ ⇒ ()).recoverWith {
+      case _ if terminationSignal.isCompleted ⇒ terminationSignal.map(_ ⇒ ())
     }
   }
 
