@@ -8,7 +8,7 @@ import csw.services.command.internal.CommandResponseManagerFactory
 import csw.services.config.api.scaladsl.ConfigClientService
 import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.event.EventServiceFactory
-import csw.services.event.models.EventStore.RedisStore
+import csw.services.event.models.EventStores.RedisStore
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory, RegistrationFactory}
 import csw.services.logging.commons.LogAdminActorFactory

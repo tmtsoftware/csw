@@ -14,6 +14,7 @@ import csw.services.event.internal.redis.RedisTestProps;
 import csw.services.event.internal.wiring.BaseProperties;
 import csw.services.event.api.javadsl.IEventPublisher;
 import csw.services.event.api.javadsl.IEventSubscription;
+import csw.services.event.models.EventStores;
 import io.lettuce.core.ClientOptions;
 import org.scalatest.testng.TestNGSuite;
 import org.testng.Assert;

@@ -14,7 +14,7 @@ import csw.services.event.internal.commons.serviceresolver.{
 import csw.services.event.internal.kafka.KafkaEventService
 import csw.services.event.internal.redis.RedisEventService
 import csw.services.event.models.EventStore
-import csw.services.event.models.EventStore.{KafkaStore, RedisStore}
+import csw.services.event.models.EventStores.{KafkaStore, RedisStore}
 import csw.services.location.javadsl.ILocationService
 import csw.services.location.scaladsl.LocationService
 
@@ -25,19 +25,50 @@ import scala.concurrent.ExecutionContext
  */
 class EventServiceFactory(store: EventStore = RedisStore()) {
 
+  /**
+   * A java helper to construct EventServiceFactory
+   */
+  def this() = this(RedisStore())
+
+  /**
+   * API to create [[EventService]] using [[LocationService]] to resolve Event Server.
+   * @param locationService instance of location service
+   * @param system an actor system required for underlying event streams
+   * @return [[EventService]] which provides handles to [[csw.services.event.api.scaladsl.EventPublisher]] and [[csw.services.event.api.scaladsl.EventSubscriber]]
+   */
   def make(locationService: LocationService)(implicit system: ActorSystem): EventService =
     eventService(new EventServiceLocationResolver(locationService)(system.dispatcher))
 
+  /**
+   * API to create [[EventService]] using host and port of Event Server.
+   * @param host hostname of event server
+   * @param port port on which event server is running
+   * @param system an actor system required for underlying event streams
+   * @return [[EventService]] which provides handles to [[csw.services.event.api.scaladsl.EventPublisher]] and [[csw.services.event.api.scaladsl.EventSubscriber]]
+   */
   def make(host: String, port: Int)(implicit system: ActorSystem): EventService =
     eventService(new EventServiceHostPortResolver(host, port))
 
+  /**
+   * Java API to create [[IEventService]] using [[ILocationService]] to resolve Event Server.
+   * @param locationService instance of location service
+   * @param actorSystem an actor system required for underlying event streams
+   * @return [[IEventService]] which provides handles to [[csw.services.event.api.javadsl.IEventPublisher]] and [[csw.services.event.api.javadsl.IEventSubscriber]]
+   */
   def jMake(locationService: ILocationService, actorSystem: ActorSystem): IEventService = {
     val eventService = make(locationService.asScala)(actorSystem)
     new JEventService(eventService)
   }
 
-  def jMake(host: String, port: Int, actorSystem: ActorSystem): IEventService = {
-    val eventService = make(host, port)(actorSystem)
+  /**
+   * Java API to create [[IEventService]] using host and port of Event Server.
+   * @param host hostname of event server
+   * @param port port on which event server is running
+   * @param system an actor system required for underlying event streams
+   * @return [[IEventService]] which provides handles to [[csw.services.event.api.javadsl.IEventPublisher]] and [[csw.services.event.api.javadsl.IEventSubscriber]]
+   */
+  def jMake(host: String, port: Int, system: ActorSystem): IEventService = {
+    val eventService = make(host, port)(system)
     new JEventService(eventService)
   }
 

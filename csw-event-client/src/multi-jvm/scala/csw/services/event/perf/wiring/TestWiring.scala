@@ -5,7 +5,7 @@ import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Materializer, 
 import csw.services.event.EventServiceFactory
 import csw.services.event.api.scaladsl.{EventPublisher, EventSubscriber}
 import csw.services.event.helpers.TestFutureExt.RichFuture
-import csw.services.event.models.EventStore.{KafkaStore, RedisStore}
+import csw.services.event.models.EventStores.{KafkaStore, RedisStore}
 import org.scalatest.mockito.MockitoSugar
 
 import scala.concurrent.ExecutionContext

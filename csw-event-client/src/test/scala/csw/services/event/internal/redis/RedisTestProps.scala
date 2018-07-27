@@ -10,7 +10,7 @@ import csw.services.event.api.scaladsl._
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.internal.commons.javawrappers.JEventService
 import csw.services.event.internal.wiring.BaseProperties
-import csw.services.event.models.EventStore.RedisStore
+import csw.services.event.models.EventStores.RedisStore
 import csw.services.location.scaladsl.LocationService
 import io.lettuce.core.api.async.RedisAsyncCommands
 import io.lettuce.core.codec.StringCodec

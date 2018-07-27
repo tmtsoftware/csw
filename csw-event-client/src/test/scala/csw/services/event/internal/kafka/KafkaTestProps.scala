@@ -10,7 +10,7 @@ import csw.services.event.api.scaladsl.{EventPublisher, EventService, EventSubsc
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.internal.wiring.BaseProperties
 import csw.services.event.internal.wiring.BaseProperties.createInfra
-import csw.services.event.models.EventStore.KafkaStore
+import csw.services.event.models.EventStores.KafkaStore
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.LocationService
 import net.manub.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
