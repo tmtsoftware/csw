@@ -5,7 +5,7 @@ import akka.actor.typed.scaladsl.Behaviors
 import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.framework.models.ContainerInfo
 import csw.messages.ContainerActorMessage
-import csw.services.event.internal.commons.EventServiceFactory
+import csw.services.event.EventServiceFactory
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
 import csw.services.logging.scaladsl.LoggerFactory
 

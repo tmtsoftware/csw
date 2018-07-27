@@ -2,11 +2,11 @@ package csw.framework.components.hcd
 
 import java.nio.file.Paths
 
+import akka.actor.Scheduler
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.AskPattern.Askable
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.{Cancellable, Scheduler}
 import akka.util.Timeout
 import csw.framework.CurrentStatePublisher
 import csw.framework.components.ConfigNotAvailableException
@@ -16,17 +16,13 @@ import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandResponse.Accepted
 import csw.messages.commands.{CommandResponse, ControlCommand, Observe, Setup}
-import csw.messages.events._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.{LocationRemoved, LocationUpdated, TrackingEvent}
-import csw.messages.params.models.Id
 import csw.services.command.CommandResponseManager
 import csw.services.config.api.models.ConfigData
 import csw.services.config.api.scaladsl.ConfigClientService
 import csw.services.config.client.scaladsl.ConfigClientFactory
-import csw.services.event.api.exceptions.PublishFailure
 import csw.services.event.api.scaladsl.EventService
-import csw.services.event.internal.commons.EventServiceConnection
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 

@@ -4,11 +4,13 @@ import akka.Done
 import akka.actor.{ActorSystem, CoordinatedShutdown}
 import com.typesafe.config.ConfigFactory
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
+import csw.services.event.EventServiceFactory
+import csw.services.event.api.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
+import csw.services.event.api.scaladsl._
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.internal.commons.javawrappers.JEventService
 import csw.services.event.internal.wiring.BaseProperties
-import csw.services.event.api.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
-import csw.services.event.api.scaladsl._
+import csw.services.event.models.EventStore.RedisStore
 import csw.services.location.scaladsl.LocationService
 import io.lettuce.core.api.async.RedisAsyncCommands
 import io.lettuce.core.codec.StringCodec
@@ -43,7 +45,7 @@ class RedisTestProps(
 
   override val eventPattern: String = "*"
 
-  private val eventServiceFactory = new RedisEventServiceFactory(redisClient)
+  private val eventServiceFactory = new EventServiceFactory(RedisStore(redisClient))
 
   val eventService: EventService       = eventServiceFactory.make(locationService)
   val jEventService: IEventService     = new JEventService(eventService)

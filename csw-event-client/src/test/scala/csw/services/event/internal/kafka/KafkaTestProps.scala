@@ -4,11 +4,13 @@ import akka.Done
 import akka.actor.{ActorSystem, CoordinatedShutdown}
 import akka.kafka.ProducerSettings
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
+import csw.services.event.EventServiceFactory
 import csw.services.event.api.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
 import csw.services.event.api.scaladsl.{EventPublisher, EventService, EventSubscriber}
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.internal.wiring.BaseProperties
 import csw.services.event.internal.wiring.BaseProperties.createInfra
+import csw.services.event.models.EventStore.KafkaStore
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.LocationService
 import net.manub.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
@@ -29,7 +31,7 @@ class KafkaTestProps(
   private val brokerProperties = Map("listeners" → brokers, "advertised.listeners" → brokers) ++ additionalBrokerProps
   val config                   = EmbeddedKafkaConfig(customBrokerProperties = brokerProperties)
 
-  private val eventServiceFactory = new KafkaEventServiceFactory()
+  private val eventServiceFactory = new EventServiceFactory(KafkaStore)
   private lazy val producerSettings: ProducerSettings[String, String] =
     ProducerSettings(actorSystem, new StringSerializer, new StringSerializer)
       .withBootstrapServers(s"${clusterSettings.hostname}:$kafkaPort")

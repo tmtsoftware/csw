@@ -11,7 +11,7 @@ package csw.services
  *
  * {{{
  *
- *      val eventServiceFactory          = new RedisEventServiceFactory()
+ *      val eventServiceFactory          = new EventServiceFactory()
  *      val eventService: EventService   = eventServiceFactory.make(locationService)
  *
  * }}}

@@ -20,7 +20,7 @@ import csw.messages.framework.{ComponentInfo, ContainerLifecycleState, Superviso
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.params.models.Prefix
 import csw.messages.{ComponentMessage, ContainerActorMessage, ContainerIdleMessage}
-import csw.services.event.internal.commons.EventServiceFactory
+import csw.services.event.EventServiceFactory
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}

@@ -1,14 +1,14 @@
 package csw.framework.internal.wiring
 
 import akka.Done
-import akka.actor.{ActorSystem, CoordinatedShutdown}
 import akka.actor.typed.ActorRef
+import akka.actor.{ActorSystem, CoordinatedShutdown}
 import csw.framework.deploy.ConfigUtils
 import csw.services.command.internal.CommandResponseManagerFactory
 import csw.services.config.api.scaladsl.ConfigClientService
 import csw.services.config.client.scaladsl.ConfigClientFactory
-import csw.services.event.internal.commons.EventServiceFactory
-import csw.services.event.internal.redis.RedisEventServiceFactory
+import csw.services.event.EventServiceFactory
+import csw.services.event.models.EventStore.RedisStore
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory, RegistrationFactory}
 import csw.services.logging.commons.LogAdminActorFactory
@@ -30,7 +30,7 @@ class FrameworkWiring {
   lazy val commandResponseManagerFactory                  = new CommandResponseManagerFactory
   lazy val configClientService: ConfigClientService       = ConfigClientFactory.clientApi(actorSystem, locationService)
   lazy val configUtils: ConfigUtils                       = new ConfigUtils(configClientService, actorRuntime)
-  lazy val eventServiceFactory: EventServiceFactory       = new RedisEventServiceFactory(redisClient)
+  lazy val eventServiceFactory: EventServiceFactory       = new EventServiceFactory(RedisStore(redisClient))
 
   lazy val redisClient: RedisClient = {
     val client = RedisClient.create()

@@ -1,16 +1,16 @@
 package csw.services.event.cli.wiring
 
 import akka.actor.ActorSystem
-import csw.services.event.cli.{CliApp, CommandLineRunner}
-import csw.services.event.internal.redis.RedisEventServiceFactory
+import csw.services.event.EventServiceFactory
 import csw.services.event.api.scaladsl.EventService
+import csw.services.event.cli.{CliApp, CommandLineRunner}
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 
 class Wiring(actorSystem: ActorSystem) {
   lazy val actorRuntime = new ActorRuntime(actorSystem)
   import actorRuntime._
   lazy val locationService: LocationService = LocationServiceFactory.makeRemoteHttpClient
-  lazy val eventService: EventService       = new RedisEventServiceFactory().make(locationService)
+  lazy val eventService: EventService       = new EventServiceFactory().make(locationService)
   lazy val printLine: Any ⇒ Unit            = println
   lazy val commandLineRunner                = new CommandLineRunner(eventService, actorRuntime, printLine)
   lazy val cliApp                           = new CliApp(commandLineRunner)
