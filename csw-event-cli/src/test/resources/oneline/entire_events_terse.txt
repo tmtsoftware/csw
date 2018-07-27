@@ -1,10 +1,10 @@
-[ERROR] No events published for key: [wfos.prog.cloudcover.system_2]
-struct-1/ra = "12:13:14.1"
-struct-1/dec = "32:33:34.4"
-epoch = 1950.0
-struct-1/ra = "12:13:14.1"
-struct-1/dec = "32:33:34.4"
-epoch = 1950.0
-struct-1/ra = "12:13:14.1"
-struct-1/dec = "32:33:34.4"
-epoch = 1950.0
+[ERROR] No events published for key: [wfos.prog.cloudcover.system_3]
+"12:13:14.1"
+"32:33:34.4"
+1950.0
+"12:13:14.1"
+"32:33:34.4"
+1950.0
+"12:13:14.1"
+"32:33:34.4"
+1950.0
