@@ -6,7 +6,7 @@ import csw.messages.framework.PubSub.SubscriberMessage
 import csw.messages.framework._
 import csw.messages.location.TrackingEvent
 import csw.messages.params.models.{Id, Prefix}
-import csw.messages.params.states.CurrentState
+import csw.messages.params.states.{CurrentState, StateName}
 
 import scala.concurrent.duration.FiniteDuration
 
@@ -173,7 +173,7 @@ object ComponentCommonMessage {
    *
    * @param subscriberMessage tells the component to subscribe to or unsubscribe from LifecycleStateChanged notifications
    */
-  case class LifecycleStateSubscription(subscriberMessage: SubscriberMessage[LifecycleStateChanged])
+  case class LifecycleStateSubscription(subscriberMessage: SubscriberMessage[LifecycleStateChanged, LifecycleStateChanged])
       extends ComponentCommonMessage
 
   /**
@@ -181,7 +181,7 @@ object ComponentCommonMessage {
    *
    * @param subscriberMessage tells the component to subscribe to or unsubscribe from CurrentState notifications
    */
-  case class ComponentStateSubscription(subscriberMessage: SubscriberMessage[CurrentState]) extends ComponentCommonMessage
+  case class ComponentStateSubscription(subscriberMessage: SubscriberMessage[CurrentState, StateName]) extends ComponentCommonMessage
 
   /**
    * Represents a message to get current lifecycle state of a component

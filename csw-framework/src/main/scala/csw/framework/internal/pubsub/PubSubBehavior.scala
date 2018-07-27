@@ -14,15 +14,14 @@ import csw.services.logging.scaladsl.{Logger, LoggerFactory}
  * @param loggerFactory the LoggerFactory used for logging with component name
  * @tparam T the type of the data which will be published or subscribed to using this actor
  */
-private[framework] class PubSubBehavior[T: Nameable](ctx: ActorContext[PubSub[T]], loggerFactory: LoggerFactory)
-    extends MutableBehavior[PubSub[T]] {
+private[framework] class PubSubBehavior[T: Nameable, U: Nameable](ctx: ActorContext[PubSub[T, U]], loggerFactory: LoggerFactory)
+    extends MutableBehavior[PubSub[T, U]] {
   private val log: Logger = loggerFactory.getLogger(ctx)
 
-  val nameableData: Nameable[T] = implicitly[Nameable[T]]
   // list of subscribers who subscribe to the component using this pub-sub actor for the data of type [[T]]
-  var subscribers: Map[ActorRef[T], Option[Set[String]]] = Map.empty
+  var subscribers: Map[ActorRef[T], Option[Set[U]]] = Map.empty
 
-  override def onMessage(msg: PubSub[T]): Behavior[PubSub[T]] = {
+  override def onMessage(msg: PubSub[T, U]): Behavior[PubSub[T, U]] = {
     msg match {
       case SubscribeOnly(ref, names) => subscribe(ref, Some(names))
       case Subscribe(ref)            => subscribe(ref, None)
@@ -32,11 +31,11 @@ private[framework] class PubSubBehavior[T: Nameable](ctx: ActorContext[PubSub[T]
     this
   }
 
-  override def onSignal: PartialFunction[Signal, Behavior[PubSub[T]]] = {
+  override def onSignal: PartialFunction[Signal, Behavior[PubSub[T, U]]] = {
     case Terminated(ref) ⇒ unsubscribe(ref.upcast); this
   }
 
-  private def subscribe(actorRef: ActorRef[T], mayBeNames: Option[Set[String]]): Unit =
+  private def subscribe(actorRef: ActorRef[T], mayBeNames: Option[Set[U]]): Unit =
     if (!subscribers.contains(actorRef)) {
       subscribers += ((actorRef, mayBeNames))
       ctx.watch(actorRef)
@@ -45,10 +44,13 @@ private[framework] class PubSubBehavior[T: Nameable](ctx: ActorContext[PubSub[T]
   private def unsubscribe(actorRef: ActorRef[T]): Unit = subscribers -= actorRef
 
   protected def notifySubscribers(data: T): Unit = {
+    import Nameable._
     log.debug(s"Notifying subscribers :[${subscribers.mkString(",")}] with data :[$data]")
     subscribers.foreach {
       case (actorRef, None)        ⇒ actorRef ! data
-      case (actorRef, Some(names)) ⇒ if (names.contains(nameableData.name(data))) actorRef ! data
+      case (actorRef, Some(names)) ⇒
+        val subscribeKeys:Set[String] = names map { _.name }
+        if (subscribeKeys.contains(data.name)) actorRef ! data
     }
   }
 }

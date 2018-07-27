@@ -14,7 +14,7 @@ import csw.messages.commands.matchers.StateMatcher
 import csw.messages.commands.{CommandResponse, ControlCommand}
 import csw.messages.location.AkkaLocation
 import csw.messages.params.models.Id
-import csw.messages.params.states.CurrentState
+import csw.messages.params.states.{CurrentState, StateName}
 import csw.services.command.scaladsl.{CommandService, CurrentStateSubscription}
 
 import scala.collection.JavaConverters.iterableAsScalaIterableConverter
@@ -161,7 +161,7 @@ class JCommandService(akkaLocation: AkkaLocation, actorSystem: ActorSystem[_]) {
    * @return a CurrentStateSubscription to stop the subscription
    */
   def subscribeOnlyCurrentState(
-      names: java.util.Set[String],
+      names: java.util.Set[StateName],
       callback: Consumer[CurrentState]
   ): CurrentStateSubscription =
     sCommandService.subscribeOnlyCurrentState(names.asScala.toSet, callback.asScala)

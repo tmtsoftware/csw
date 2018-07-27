@@ -6,7 +6,7 @@ import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.{KillSwitches, Materializer, OverflowStrategy}
 import csw.messages.ComponentCommonMessage.ComponentStateSubscription
 import csw.messages.framework.PubSub.{Subscribe, SubscribeOnly}
-import csw.messages.params.states.CurrentState
+import csw.messages.params.states.{CurrentState, StateName}
 
 /**
  * The handle to the subscription created for the current state published by the specified publisher
@@ -17,7 +17,7 @@ import csw.messages.params.states.CurrentState
  */
 class CurrentStateSubscription private[command] (
     publisher: ActorRef[ComponentStateSubscription],
-    names: Option[Set[String]],
+    names: Option[Set[StateName]],
     callback: CurrentState ⇒ Unit
 )(implicit val mat: Materializer) {
 

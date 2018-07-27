@@ -30,7 +30,7 @@ import csw.messages.framework._
 import csw.messages.location.ComponentId
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.params.models.Prefix
-import csw.messages.params.states.CurrentState
+import csw.messages.params.states.{CurrentState, StateName}
 import csw.services.command.CommandResponseManager
 import csw.services.command.internal.CommandResponseManagerFactory
 import csw.services.event.api.scaladsl.EventService
@@ -96,8 +96,8 @@ private[framework] final class SupervisorBehavior(
 
   private val commandResponseManager: CommandResponseManager                      = makeCommandResponseManager()
   private val pubSubBehaviorFactory: PubSubBehaviorFactory                        = new PubSubBehaviorFactory
-  private[framework] val pubSubComponentActor: ActorRef[PubSub[CurrentState]]     = makePubSubComponent()
-  private[framework] val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]] = makePubSubLifecycle()
+  private[framework] val pubSubComponentActor: ActorRef[PubSub[CurrentState, StateName]]     = makePubSubComponent()
+  private[framework] val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged, LifecycleStateChanged]] = makePubSubLifecycle()
 
   private var runningComponent: Option[ActorRef[RunningMessage]]  = None
   private var lockManager: LockManager                            = new LockManager(None, loggerFactory)
@@ -332,12 +332,12 @@ private[framework] final class SupervisorBehavior(
 
   private def coordinatedShutdown(reason: Reason): Future[Done] = CoordinatedShutdown(ctx.system.toUntyped).run(reason)
 
-  private def makePubSubComponent(): ActorRef[PubSub[CurrentState]] =
-    ctx.spawn(pubSubBehaviorFactory.make[CurrentState](PubSubComponentActor, loggerFactory),
+  private def makePubSubComponent(): ActorRef[PubSub[CurrentState, StateName]] =
+    ctx.spawn(pubSubBehaviorFactory.make[CurrentState, StateName](PubSubComponentActor, loggerFactory),
               SupervisorBehavior.PubSubComponentActor)
 
-  private def makePubSubLifecycle(): ActorRef[PubSub[LifecycleStateChanged]] =
-    ctx.spawn(pubSubBehaviorFactory.make[LifecycleStateChanged](PubSubComponentActor, loggerFactory),
+  private def makePubSubLifecycle(): ActorRef[PubSub[LifecycleStateChanged, LifecycleStateChanged]] =
+    ctx.spawn(pubSubBehaviorFactory.make[LifecycleStateChanged, LifecycleStateChanged](PubSubComponentActor, loggerFactory),
               SupervisorBehavior.PubSubLifecycleActor)
 
   private def makeCommandResponseManager() = {

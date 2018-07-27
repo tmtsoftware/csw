@@ -15,7 +15,7 @@ import csw.messages.commands.matchers.{Matcher, StateMatcher}
 import csw.messages.commands.{CommandResponse, ControlCommand}
 import csw.messages.location.AkkaLocation
 import csw.messages.params.models.Id
-import csw.messages.params.states.CurrentState
+import csw.messages.params.states.{CurrentState, StateName}
 import csw.messages.{CommandResponseManagerMessage, ComponentMessage}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -178,7 +178,7 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
    * @return a CurrentStateSubscription to stop the subscription
    */
   def subscribeOnlyCurrentState(
-      names: Set[String],
+      names: Set[StateName],
       callback: CurrentState ⇒ Unit
   ): CurrentStateSubscription =
     new CurrentStateSubscription(component, Some(names), callback)

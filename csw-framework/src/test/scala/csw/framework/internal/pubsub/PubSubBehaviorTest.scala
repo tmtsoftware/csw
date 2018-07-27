@@ -35,20 +35,23 @@ class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
   private val lifecycleProbe2    = TestProbe[LifecycleStateChanged]
   private val currentStateProbe1 = TestInbox[CurrentState]()
   private val currentStateProbe2 = TestInbox[CurrentState]()
-  val currentState1              = CurrentState(prefix, StateName("testStateName1"))
-  val currentState2              = CurrentState(prefix, StateName("testStateName2"))
-  val currentState3              = CurrentState(prefix, StateName("testStateName3"))
+  private val stateName1         = StateName("testStateName1")
+  private val stateName2         = StateName("testStateName2")
+  private val stateName3         = StateName("testStateName3")
+  val currentState1              = CurrentState(prefix, stateName1)
+  val currentState2              = CurrentState(prefix, stateName2)
+  val currentState3              = CurrentState(prefix, stateName3)
 
-  def createLifecycleStatePubSubBehavior(): BehaviorTestKit[PubSub[LifecycleStateChanged]] =
-    BehaviorTestKit(Behaviors.setup[PubSub[LifecycleStateChanged]](ctx ⇒ new PubSubBehavior(ctx, mocks.loggerFactory)))
+  def createLifecycleStatePubSubBehavior(): BehaviorTestKit[PubSub[LifecycleStateChanged, LifecycleStateChanged]] =
+    BehaviorTestKit(Behaviors.setup[PubSub[LifecycleStateChanged, LifecycleStateChanged]](ctx ⇒ new PubSubBehavior(ctx, mocks.loggerFactory)))
 
-  def createCurrentStatePubSubBehavior(): BehaviorTestKit[PubSub[CurrentState]] =
-    BehaviorTestKit(Behaviors.setup[PubSub[CurrentState]](ctx ⇒ new PubSubBehavior(ctx, mocks.loggerFactory)))
+  def createCurrentStatePubSubBehavior(): BehaviorTestKit[PubSub[CurrentState, StateName]] =
+    BehaviorTestKit(Behaviors.setup[PubSub[CurrentState, StateName]](ctx ⇒ new PubSubBehavior(ctx, mocks.loggerFactory)))
 
   override protected def afterAll(): Unit = Await.result(untypedSystem.terminate(), 5.seconds)
 
   test("message should be published to all the subscribers") {
-    val pubSubBehavior: BehaviorTestKit[PubSub[LifecycleStateChanged]] = createLifecycleStatePubSubBehavior()
+    val pubSubBehavior: BehaviorTestKit[PubSub[LifecycleStateChanged, LifecycleStateChanged]] = createLifecycleStatePubSubBehavior()
     val supervisorProbe                                                = TestProbe[ComponentMessage]
 
     pubSubBehavior.run(Subscribe(lifecycleProbe1.ref))
@@ -63,10 +66,10 @@ class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
   // DEOPSCSW-434 : Allow subscription of CurrentState using StateName
   test("message should be published to the subscribers depending on names") {
-    val pubSubBehavior: BehaviorTestKit[PubSub[CurrentState]] = createCurrentStatePubSubBehavior()
+    val pubSubBehavior: BehaviorTestKit[PubSub[CurrentState, StateName]] = createCurrentStatePubSubBehavior()
 
     pubSubBehavior.run(Subscribe(currentStateProbe1.ref))
-    pubSubBehavior.run(SubscribeOnly(currentStateProbe2.ref, Set("testStateName2", "testStateName3")))
+    pubSubBehavior.run(SubscribeOnly(currentStateProbe2.ref, Set(stateName2, stateName3)))
 
     pubSubBehavior.run(Publish(currentState1))
     pubSubBehavior.run(Publish(currentState2))
@@ -80,7 +83,7 @@ class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
   }
 
   test("should not receive messages on un-subscription") {
-    val pubSubBehavior: BehaviorTestKit[PubSub[LifecycleStateChanged]] = createLifecycleStatePubSubBehavior()
+    val pubSubBehavior: BehaviorTestKit[PubSub[LifecycleStateChanged, LifecycleStateChanged]] = createLifecycleStatePubSubBehavior()
     val supervisorProbe                                                = TestProbe[ComponentMessage]
 
     pubSubBehavior.run(Subscribe(lifecycleProbe1.ref))
