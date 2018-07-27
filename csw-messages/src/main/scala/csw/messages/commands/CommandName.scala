@@ -1,6 +1,7 @@
 package csw.messages.commands
 
-import play.api.libs.json.{Json, OFormat}
+import csw.messages.params.models.ObsId
+import play.api.libs.json._
 
 /**
  * Model representing the name as an identifier of a command
@@ -10,5 +11,10 @@ import play.api.libs.json.{Json, OFormat}
 case class CommandName(name: String)
 
 object CommandName {
-  implicit val format: OFormat[CommandName] = Json.format[CommandName]
+//  implicit val format: OFormat[CommandName] = Json.format[CommandName]
+
+  implicit val format: Format[CommandName] = new Format[CommandName] {
+    override def writes(obj: CommandName): JsValue           = JsString(obj.name)
+    override def reads(json: JsValue): JsResult[CommandName] = JsSuccess(CommandName(json.as[String]))
+  }
 }

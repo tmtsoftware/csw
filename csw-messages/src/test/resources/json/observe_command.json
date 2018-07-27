@@ -2,9 +2,7 @@
   "type": "Observe",
   "runId": "test-runId",
   "source": "wfos.blue.filter",
-  "commandName": {
-    "name": "move"
-  },
+  "commandName": "move",
   "obsId": "Obs001",
   "paramSet": [
     {
