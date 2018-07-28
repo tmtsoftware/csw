@@ -1,4 +1,4 @@
-package csw.services.alarm.client.internal
+package csw.services.alarm.client.internal.redis.scala_wrapper
 
 import akka.NotUsed
 import akka.stream.scaladsl.Source

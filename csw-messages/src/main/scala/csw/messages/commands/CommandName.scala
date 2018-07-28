@@ -1,6 +1,5 @@
 package csw.messages.commands
 
-import csw.messages.params.models.ObsId
 import play.api.libs.json._
 
 /**

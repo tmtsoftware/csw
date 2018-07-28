@@ -20,6 +20,7 @@ import csw.services.alarm.api.models._
 import csw.services.alarm.api.scaladsl.{AlarmAdminService, AlarmSubscription}
 import csw.services.alarm.client.internal.configparser.ConfigParser
 import csw.services.alarm.client.internal.extensions.SourceExtensions.RichSource
+import csw.services.alarm.client.internal.redis.scala_wrapper.{RedisAsyncScalaApi, RedisReactiveScalaApi}
 import csw.services.alarm.client.internal.shelve.ShelveTimeoutActorFactory
 import csw.services.alarm.client.internal.shelve.ShelveTimeoutMessage.{CancelShelveTimeout, ScheduleShelveTimeout}
 import io.lettuce.core.KeyValue

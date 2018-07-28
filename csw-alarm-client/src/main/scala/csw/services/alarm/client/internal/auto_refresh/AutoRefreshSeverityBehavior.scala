@@ -18,7 +18,6 @@ class AutoRefreshSeverityBehavior(
     msg match {
       case SetSeverityAndAutoRefresh(key, severity) ⇒
         alarm.refreshSeverity(key, severity) // fire and forget the refreshing of severity and straight away start the timer
-        //TODO: Why is there no initialDelay param in new API?
         timerScheduler.startPeriodicTimer(key.name, RefreshSeverity(key, severity), refreshInSeconds.seconds)
       case RefreshSeverity(key, severity) ⇒ alarm.refreshSeverity(key, severity) //fire and forget the refreshing of severity
     }

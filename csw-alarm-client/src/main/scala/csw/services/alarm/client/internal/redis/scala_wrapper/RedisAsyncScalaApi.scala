@@ -1,4 +1,4 @@
-package csw.services.alarm.client.internal
+package csw.services.alarm.client.internal.redis.scala_wrapper
 
 import io.lettuce.core.KeyValue
 import io.lettuce.core.api.async.RedisAsyncCommands
