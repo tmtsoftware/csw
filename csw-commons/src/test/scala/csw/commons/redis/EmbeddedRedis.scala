@@ -45,6 +45,7 @@ trait EmbeddedRedis {
   def startRedis(port: Int = getFreePort): RedisServer = {
     val redisServer = new RedisServer(port)
     redisServer.start()
+    addJvmShutdownHook(stopRedis(redisServer))
     redisServer
   }
 
@@ -66,6 +67,7 @@ trait EmbeddedRedis {
     redisServer.start()
     redisSentinel.start()
 
+    addJvmShutdownHook(stopSentinel(redisSentinel, redisServer))
     (redisSentinel, redisServer)
   }
 
@@ -75,4 +77,7 @@ trait EmbeddedRedis {
     redisServer.stop()
     redisSentinel.stop()
   }
+
+  private def addJvmShutdownHook[T](hook: ⇒ T): Unit =
+    Runtime.getRuntime.addShutdownHook(new Thread { override def run(): Unit = hook })
 }
