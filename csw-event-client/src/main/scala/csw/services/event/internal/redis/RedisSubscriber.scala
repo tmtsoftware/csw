@@ -129,7 +129,6 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
       Source.fromFutureSource(patternBasedReactiveConnection().flatMap(c ⇒ pSubscribe_internal(keyPattern, c)))
 
     eventStream
-      .concatMat(eventStream)(Keep.right)
       .watchTermination()(Keep.both)
       .viaMat(KillSwitches.single)(Keep.both)
       .mapMaterializedValue {
