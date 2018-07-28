@@ -2,6 +2,7 @@ package csw.messages.framework
 
 import akka.actor.typed.ActorRef
 import csw.messages.TMTSerializable
+import csw.messages.params.states.StateName
 
 /**
  * Represents the protocol or messages about publishing data and subscribing it
@@ -24,8 +25,8 @@ object PubSub {
    * @param ref the reference of subscriber used to notify to when some data is published
    * @tparam T represents the type of data that is subscribed
    */
-  case class Subscribe[T](ref: ActorRef[T])                         extends SubscriberMessage[T]
-  case class SubscribeOnly[T](ref: ActorRef[T], names: Set[String]) extends SubscriberMessage[T]
+  case class Subscribe[T](ref: ActorRef[T])                            extends SubscriberMessage[T]
+  case class SubscribeOnly[T](ref: ActorRef[T], names: Set[StateName]) extends SubscriberMessage[T]
 
   /**
    * Represents a unsubscribe action

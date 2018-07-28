@@ -167,6 +167,6 @@ object CurrentState {
   ): CurrentState = new CurrentState(prefix, stateName).madd(paramSet)
 
   implicit object NameableCurrentState extends Nameable[CurrentState] {
-    override def name(state: CurrentState): String = state.stateName.name
+    override def name(state: CurrentState): StateName = StateName(state.stateName.name)
   }
 }

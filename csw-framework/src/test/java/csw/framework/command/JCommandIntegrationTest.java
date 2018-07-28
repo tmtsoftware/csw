@@ -434,7 +434,7 @@ public class JCommandIntegrationTest {
         //#subscribeOnlyCurrentState
         // subscribe to the current state of an assembly component and use a callback which forwards each received
         // element to a test probe actor
-        CurrentStateSubscription subscription = hcdCmdService.subscribeOnlyCurrentState(Collections.singleton("testStateSetup"), currentState -> inbox.getRef().tell(currentState));
+        CurrentStateSubscription subscription = hcdCmdService.subscribeOnlyCurrentState(Collections.singleton(StateName.apply("testStateSetup")), currentState -> inbox.getRef().tell(currentState));
         //#subscribeOnlyCurrentState
 
         hcdCmdService.submit(setup, timeout);

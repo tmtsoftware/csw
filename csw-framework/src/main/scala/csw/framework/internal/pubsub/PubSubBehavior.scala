@@ -5,6 +5,7 @@ import akka.actor.typed.{ActorRef, Behavior, Signal, Terminated}
 import csw.messages.commands.Nameable
 import csw.messages.framework.PubSub
 import csw.messages.framework.PubSub._
+import csw.messages.params.states.StateName
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
 /**
@@ -20,7 +21,7 @@ private[framework] class PubSubBehavior[T: Nameable](ctx: ActorContext[PubSub[T]
 
   val nameableData: Nameable[T] = implicitly[Nameable[T]]
   // list of subscribers who subscribe to the component using this pub-sub actor for the data of type [[T]]
-  var subscribers: Map[ActorRef[T], Option[Set[String]]] = Map.empty
+  var subscribers: Map[ActorRef[T], Option[Set[StateName]]] = Map.empty
 
   override def onMessage(msg: PubSub[T]): Behavior[PubSub[T]] = {
     msg match {
@@ -36,7 +37,7 @@ private[framework] class PubSubBehavior[T: Nameable](ctx: ActorContext[PubSub[T]
     case Terminated(ref) ⇒ unsubscribe(ref.upcast); this
   }
 
-  private def subscribe(actorRef: ActorRef[T], mayBeNames: Option[Set[String]]): Unit =
+  private def subscribe(actorRef: ActorRef[T], mayBeNames: Option[Set[StateName]]): Unit =
     if (!subscribers.contains(actorRef)) {
       subscribers += ((actorRef, mayBeNames))
       ctx.watch(actorRef)
