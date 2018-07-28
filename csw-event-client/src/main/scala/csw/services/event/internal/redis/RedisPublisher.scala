@@ -34,14 +34,14 @@ class RedisPublisher(redisURI: RedisURI, redisClient: RedisClient)(implicit ec: 
 
   // create underlying connection asynchronously and obtain an instance of `RedisAsyncCommands` to perform
   // redis operations asynchronously
-  private lazy val asyncConnectionF: Future[RedisAsyncCommands[EventKey, Event]] = Future.unit
+  private lazy val asyncConnectionF: Future[RedisAsyncCommands[String, Event]] = Future.unit
     .flatMap(_ ⇒ redisClient.connectAsync(EventServiceCodec, redisURI).toScala)
     .map(_.async())
 
   override def publish(event: Event): Future[Done] =
     async {
       val commands = await(asyncConnectionF)
-      await(commands.publish(event.eventKey, event).toScala)
+      await(commands.publish(event.eventKey.key, event).toScala)
       set(event, commands) // set will run independent of publish
       Done
     } recover {
@@ -65,6 +65,6 @@ class RedisPublisher(redisURI: RedisURI, redisClient: RedisClient)(implicit ec: 
 
   override def shutdown(): Future[Done] = asyncConnectionF.flatMap(_.quit().toScala).map(_ ⇒ Done)
 
-  private def set(event: Event, commands: RedisAsyncCommands[EventKey, Event]): Future[Done] =
-    commands.set(event.eventKey, event).toScala.recover { case NonFatal(_) ⇒ Done }.mapTo[Done]
+  private def set(event: Event, commands: RedisAsyncCommands[String, Event]): Future[Done] =
+    commands.set(event.eventKey.key, event).toScala.recover { case NonFatal(_) ⇒ Done }.mapTo[Done]
 }

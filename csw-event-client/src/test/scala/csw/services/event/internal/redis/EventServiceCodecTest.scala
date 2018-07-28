@@ -3,7 +3,7 @@ package csw.services.event.internal.redis
 import java.nio.ByteBuffer
 
 import akka.util.ByteString
-import csw.messages.events.{Event, EventKey, EventName, SystemEvent}
+import csw.messages.events.{Event, EventName, SystemEvent}
 import csw.messages.params.models.Prefix
 import org.scalatest.{FunSuite, Matchers}
 
@@ -15,13 +15,13 @@ class EventServiceCodecTest extends FunSuite with Matchers {
 
   test("event key received can be decoded into equivalent string") {
     val byteBuf = ByteString("testKey").asByteBuffer
-    EventServiceCodec.decodeKey(byteBuf) shouldBe EventKey("testKey")
+    EventServiceCodec.decodeKey(byteBuf) shouldBe "testKey"
   }
 
   // DEOPSCSW-334 : Publish an event
   test("event key is encoded as bytes from string") {
     val byteBuf = ByteString("testPrefix.testName").asByteBuffer
-    EventServiceCodec.encodeKey(EventKey("testPrefix.testName")) shouldBe byteBuf
+    EventServiceCodec.encodeKey("testPrefix.testName") shouldBe byteBuf
   }
 
   // DEOPSCSW-334 : Publish an event
