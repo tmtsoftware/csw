@@ -7,19 +7,19 @@ import csw.messages.events.{Event, EventName, SystemEvent}
 import csw.messages.params.models.Prefix
 import org.scalatest.{FunSuite, Matchers}
 
-class EventServiceCodecTest extends FunSuite with Matchers {
+class PatternBasedEventServiceCodecTest extends FunSuite with Matchers {
   private val prefix    = Prefix("test.prefix")
   private val eventName = EventName("system")
   private val event     = SystemEvent(prefix, eventName)
   private val pbEvent   = Event.typeMapper.toBase(event)
 
-  test("event key received can be decoded into equivalent string") {
+  test("event key string received can be decoded into equivalent string") {
     val byteBuf = ByteString("testKey").asByteBuffer
     PatternBasedEventServiceCodec.decodeKey(byteBuf) shouldBe "testKey"
   }
 
   // DEOPSCSW-334 : Publish an event
-  test("event key is encoded as bytes from string") {
+  test("event key string is encoded as bytes") {
     val byteBuf = ByteString("testPrefix.testName").asByteBuffer
     PatternBasedEventServiceCodec.encodeKey("testPrefix.testName") shouldBe byteBuf
   }

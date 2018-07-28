@@ -35,7 +35,7 @@ class RedisPublisher(redisURI: RedisURI, redisClient: RedisClient)(implicit ec: 
   // create underlying connection asynchronously and obtain an instance of `RedisAsyncCommands` to perform
   // redis operations asynchronously
   private lazy val asyncConnectionF: Future[RedisAsyncCommands[String, Event]] = Future.unit
-    .flatMap(_ ⇒ redisClient.connectAsync(EventServiceCodec, redisURI).toScala)
+    .flatMap(_ ⇒ redisClient.connectAsync(PatternBasedEventServiceCodec, redisURI).toScala)
     .map(_.async())
 
   override def publish(event: Event): Future[Done] =
