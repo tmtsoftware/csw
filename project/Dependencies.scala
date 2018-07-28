@@ -161,7 +161,7 @@ object Dependencies {
     Libs.`junit`                    % Test,
     Libs.`junit-interface`          % Test,
     Libs.`mockito-core`             % Test,
-    Libs.`scalatest-embedded-redis` % Test,
+    Libs.`embedded-redis`           % Test,
     Libs.`scalatest-embedded-kafka` % Test,
     Akka.`akka-multi-node-testkit`  % Test,
     Libs.HdrHistogram               % Test,
@@ -172,8 +172,8 @@ object Dependencies {
     Libs.`upickle`,
     Libs.`scopt`,
     Libs.`scala-csv`,
-    Libs.`scalatest`                % Test,
-    Libs.`scalatest-embedded-redis` % Test
+    Libs.`scalatest`      % Test,
+    Libs.`embedded-redis` % Test
   )
 
   val AlarmApi = Seq(
@@ -197,7 +197,8 @@ object Dependencies {
     Akka.`akka-stream`,
     AkkaHttp.`akka-http`,
     Libs.`play-json`,
-    Libs.`scalatest` % Test
+    Libs.`scalatest`      % Test,
+    Libs.`embedded-redis` % Test
   )
 
   val Deploy = Seq(

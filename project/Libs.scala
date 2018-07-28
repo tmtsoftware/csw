@@ -29,8 +29,8 @@ object Libs {
   val `lettuce`                      = "io.lettuce"             % "lettuce-core"                  % "5.0.4.RELEASE"
   val `akka-stream-kafka`            = "com.typesafe.akka"      %% "akka-stream-kafka"            % "0.21"
   val `scalatest-embedded-kafka`     = "net.manub"              %% "scalatest-embedded-kafka"     % "1.1.0"
+  val `embedded-redis`               = "com.github.kstyrc"      % "embedded-redis"                % "0.6"
   val `scala-compiler`               = "org.scala-lang"         % "scala-compiler"                % ScalaVersion
-  val `scalatest-embedded-redis`     = "com.github.sebruck"     %% "scalatest-embedded-redis"     % "0.3.0"
   val `HdrHistogram`                 = "org.hdrhistogram"       % "HdrHistogram"                  % "2.1.10"
   val `testng`                       = "org.testng"             % "testng"                        % "6.14.3"
   val `upickle`                      = "com.lihaoyi"            %% "upickle"                      % "0.6.6"

@@ -203,7 +203,8 @@ lazy val `csw-event-cli` = project
   .dependsOn(
     `csw-messages`,
     `csw-event-client`,
-    `csw-cluster-seed` % "test->multi-jvm"
+    `csw-cluster-seed` % "test->multi-jvm",
+    `csw-commons` % "test->test"
   )
   .enablePlugins(DeployApp, MaybeCoverage)
   .settings(libraryDependencies ++= Dependencies.EventCli)
@@ -213,7 +214,10 @@ lazy val `csw-alarm-api` = project
   .settings(libraryDependencies ++= Dependencies.AlarmApi)
 
 lazy val `csw-alarm-client` = project
-  .dependsOn(`csw-alarm-api`)
+  .dependsOn(
+    `csw-alarm-api`,
+    `csw-commons` % "test->test"
+  )
   .enablePlugins(GenJavadocPlugin)
   .settings(libraryDependencies ++= Dependencies.AlarmClient)
 
