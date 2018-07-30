@@ -54,7 +54,9 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
     val eventStream: Source[Event, Future[NotUsed]]      = Source.fromFutureSource(subscribe_internal(eventKeys, connectionF))
     val finalEventStream: Source[Event, Future[NotUsed]] = latestEventStream.concatMat(eventStream)(Keep.right)
 
-    subscription(eventKeys.toSeq, finalEventStream, connectionF)
+    val unsubscribe = () ⇒ connectionF.flatMap(commands ⇒ commands.unsubscribe(eventKeys.toSeq: _*).toFuture.toScala)
+
+    subscription(finalEventStream, connectionF, unsubscribe)
   }
 
   override def subscribe(
@@ -71,9 +73,7 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
       callback: Event => Future[_],
       every: FiniteDuration,
       mode: SubscriptionMode
-  ): EventSubscription =
-    eventSubscriberUtil
-      .subscribeAsync(subscribe(eventKeys, every, mode), callback)
+  ): EventSubscription = eventSubscriberUtil.subscribeAsync(subscribe(eventKeys, every, mode), callback)
 
   override def subscribeCallback(eventKeys: Set[EventKey], callback: Event => Unit): EventSubscription =
     eventSubscriberUtil.subscribeCallback(subscribe(eventKeys), callback)
@@ -83,9 +83,7 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
       callback: Event => Unit,
       every: FiniteDuration,
       mode: SubscriptionMode
-  ): EventSubscription =
-    eventSubscriberUtil
-      .subscribeCallback(subscribe(eventKeys, every, mode), callback)
+  ): EventSubscription = eventSubscriberUtil.subscribeCallback(subscribe(eventKeys, every, mode), callback)
 
   override def subscribeActorRef(eventKeys: Set[EventKey], actorRef: ActorRef[Event]): EventSubscription =
     subscribeCallback(eventKeys, eventSubscriberUtil.actorCallback(actorRef))
@@ -103,7 +101,9 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
     val eventStream: Source[Event, Future[NotUsed]] =
       Source.fromFutureSource(pSubscribe_internal(keyPattern, connectionF))
 
-    subscription(Seq(keyPattern), eventStream, connectionF, pSubscribe = true)
+    val unsubscribe = () ⇒ connectionF.flatMap(commands ⇒ commands.punsubscribe(keyPattern).toFuture.toScala)
+
+    subscription(eventStream, connectionF, unsubscribe)
   }
 
   override def pSubscribeCallback(subsystem: Subsystem, pattern: String, callback: Event ⇒ Unit): EventSubscription =
@@ -147,10 +147,9 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
   }
 
   private def subscription[T](
-      keys: Seq[T],
       eventStream: Source[Event, Future[NotUsed]],
       connectionF: Future[RedisPubSubReactiveCommands[T, Event]],
-      pSubscribe: Boolean = false
+      unsubscribeBehavior: () ⇒ Future[Void]
   ): Source[Event, EventSubscription] =
     eventStream
       .watchTermination()(Keep.both)
@@ -162,9 +161,7 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
 
             override def unsubscribe(): Future[Done] = async {
               val commands = await(connectionF)
-
-              val unSubscribeResult = if (pSubscribe) commands.punsubscribe(keys: _*) else commands.unsubscribe(keys: _*)
-              await(unSubscribeResult.toFuture.toScala)
+              await(unsubscribeBehavior())
               await(commands.quit().toFuture.toScala)
               killSwitch.shutdown()
               await(terminationSignal)
