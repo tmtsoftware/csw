@@ -6,12 +6,12 @@ import scala.async.Async.{async, await}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class RedisWatchSubscription[TPatternKey] private[Alarm] (
-    keys: List[TPatternKey],
-    pSubscribeF: Future[Unit],
+class RedisSubscription[TKey] private[Alarm] (
+    keys: List[TKey],
+    subscriptionF: Future[Unit],
     killSwitch: KillSwitch,
     terminationSignal: Future[Done],
-    redisReactiveScalaApi: RedisReactiveScalaApi[TPatternKey, _]
+    redisReactiveScalaApi: RedisReactiveScalaApi[TKey, _]
 )(implicit executionContext: ExecutionContext) {
 
   /**
@@ -19,7 +19,8 @@ class RedisWatchSubscription[TPatternKey] private[Alarm] (
    * @return a future which completes when the unsubscribe is completed
    */
   def unsubscribe(): Future[Unit] = async {
-    await(redisReactiveScalaApi.punsubscribe(keys))
+    await(redisReactiveScalaApi.unsubscribe(keys))  // unsubscribe is no-op
+    await(redisReactiveScalaApi.punsubscribe(keys)) // punsubscribe is no-op
     await(redisReactiveScalaApi.quit)
     killSwitch.shutdown()
     await(terminationSignal) // await on terminationSignal when unsubscribe is called by user
@@ -29,7 +30,7 @@ class RedisWatchSubscription[TPatternKey] private[Alarm] (
    * To check if the underlying subscription is ready to emit elements
    * @return a future which completes when the underlying subscription is ready to emit elements
    */
-  def ready(): Future[Unit] = async {
-    case _ if terminationSignal.isCompleted ⇒ terminationSignal.map(_ ⇒ ())
+  def ready(): Future[Unit] = subscriptionF.map(_ ⇒ ()).recoverWith {
+    case _ if terminationSignal.isCompleted ⇒ terminationSignal.map(_ => ())
   }
 }

@@ -204,7 +204,7 @@ class AlarmServiceImpl(
     val keys: List[String] = List(StatusKey.fromAlarmKey(key).value)
 
     redisStreamApi
-      .watchFieldAggregation[AlarmSeverity](keys, OverflowStrategy.LATEST, _.latchedSeverity, _.maxBy(_.level))
+      .watchKeyspaceFieldAggregation[AlarmSeverity](keys, OverflowStrategy.LATEST, _.latchedSeverity, _.maxBy(_.level))
       .mapMaterializedValue { mat =>
         new AlarmSubscription {
           override def unsubscribe(): Future[Unit] = mat.unsubscribe()

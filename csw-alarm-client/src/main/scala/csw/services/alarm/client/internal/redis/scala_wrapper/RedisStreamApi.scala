@@ -1,7 +1,6 @@
 package csw.services.alarm.client.internal.redis.scala_wrapper
 
 import akka.NotUsed
-import akka.stream.KillSwitch
 import akka.stream.scaladsl.{Keep, Source}
 import csw.services.alarm.client.internal.extensions.SourceExtensions.RichSource
 import reactor.core.publisher.FluxSink.OverflowStrategy
@@ -9,22 +8,74 @@ import reactor.core.publisher.FluxSink.OverflowStrategy
 import scala.concurrent.{ExecutionContext, Future}
 
 class RedisStreamApi[TKey, TValue](
-    redisReactiveScalaApi: RedisReactiveScalaApi[String, String],
+    keyspaceApiFactory: () => RedisReactiveScalaApi[String, String],
+    subscribeApiFactory: () => RedisReactiveScalaApi[TKey, TValue],
+    psubscribeApiFactory: () => RedisReactiveScalaApi[String, TValue],
     redisAsyncScalaApi: RedisAsyncScalaApi[TKey, TValue],
 )(implicit redisKeySpaceCodec: RedisKeySpaceCodec[TKey, TValue], ec: ExecutionContext) {
 
-  def watchValue(
+  def subscribe(
+      keys: List[TKey],
+      overflowStrategy: OverflowStrategy
+  ): Source[RedisResult[TKey, TValue], RedisSubscription[TKey]] = {
+    val value            = subscribeApiFactory()
+    val connectionFuture = value.subscribe(keys)
+    val subscribeSource  = Source.fromFuture(connectionFuture)
+
+    val redisKeyValueSource: Source[RedisResult[TKey, TValue], NotUsed] = {
+      val channelSource = value.observeChannels(overflowStrategy)
+      channelSource.map(x => RedisResult(x.getChannel, x.getMessage))
+    }
+
+    val finalStream = subscribeSource
+      .flatMapConcat(_ => redisKeyValueSource)
+      .cancellable
+      .watchTermination()(Keep.both)
+      .mapMaterializedValue {
+        case (killSwitch, terminationSignal) ⇒
+          new RedisSubscription(keys, connectionFuture, killSwitch, terminationSignal, value)
+      }
+    finalStream
+  }
+
+  def pSubscribe(
       keys: List[String],
       overflowStrategy: OverflowStrategy
-  ): Source[RedisWatchResult[TKey, TValue], RedisWatchSubscription[String]] = {
+  ): Source[RedisResult[TKey, TValue], RedisSubscription[String]] = {
+    val value            = psubscribeApiFactory()
+    val connectionFuture = value.psubscribe(keys)
+    val psubscribeSource = Source.fromFuture(connectionFuture)
+
+    val redisKeyValueSource: Source[RedisResult[TKey, TValue], NotUsed] = {
+      val channelSource = value.observePatterns(overflowStrategy)
+      channelSource.map(x => RedisResult(redisKeySpaceCodec.fromKeyString(x.getChannel), x.getMessage))
+    }
+
+    val finalStream = psubscribeSource
+      .flatMapConcat(_ => redisKeyValueSource)
+      .cancellable
+      .watchTermination()(Keep.both)
+      .mapMaterializedValue {
+        case (killSwitch, terminationSignal) ⇒
+          new RedisSubscription(keys, connectionFuture, killSwitch, terminationSignal, value)
+      }
+    finalStream
+  }
+
+  def watchKeyspaceValue(
+      keys: List[String],
+      overflowStrategy: OverflowStrategy
+  ): Source[RedisResult[TKey, TValue], RedisSubscription[String]] = {
+
+    val redisReactiveScalaApi = keyspaceApiFactory()
 
     val patternBasedKeys = keys.map("__keyspace@0__:" + _)
 
     val pSubscribeF: Future[Unit] = redisReactiveScalaApi.psubscribe(patternBasedKeys)
 
-    val pSubsribeSource = Source.fromFuture(pSubscribeF)
+    val pSubscribeSource = Source.fromFuture(pSubscribeF)
 
-    val redisKeyValueSouce: Source[RedisWatchResult[TKey, TValue], NotUsed] = {
+    val redisKeyValueSource: Source[RedisResult[TKey, TValue], NotUsed] = {
       val patternSource = redisReactiveScalaApi.observePatterns(overflowStrategy)
       patternSource
         .filter(pm => pm.getMessage == "set")
@@ -34,68 +85,61 @@ class RedisStreamApi[TKey, TValue](
           value.map(v => (key, v))
         })
         .map({
-          case (k, v) => RedisWatchResult(k, v)
+          case (k, v) => RedisResult(k, v)
         })
         .distinctUntilChanged
     }
 
-    val finalStream = pSubsribeSource.flatMapConcat { _ =>
-      redisKeyValueSouce
-    }.cancellable
-
-    mapMatToSubscription(finalStream, keys, pSubscribeF)
+    pSubscribeSource
+      .flatMapConcat(_ => redisKeyValueSource)
+      .cancellable
+      .watchTermination()(Keep.both)
+      .mapMaterializedValue {
+        case (killSwitch, terminationSignal) ⇒
+          new RedisSubscription(keys, pSubscribeF, killSwitch, terminationSignal, redisReactiveScalaApi)
+      }
   }
 
-  def watchValueAggregation(
+  def watchKeyspaceValueAggregation(
       keys: List[String],
       overflowStrategy: OverflowStrategy,
       reducer: Iterable[TValue] => TValue
-  ): Source[TValue, RedisWatchSubscription[String]] = {
-    watchValue(keys, overflowStrategy)
+  ): Source[TValue, RedisSubscription[String]] = {
+    watchKeyspaceValue(keys, overflowStrategy)
       .scan(Map.empty[TKey, TValue]) {
-        case (data, RedisWatchResult(key, value)) ⇒ data + (key → value)
+        case (data, RedisResult(key, value)) ⇒ data + (key → value)
       }
       .map(data => reducer(data.values))
       .distinctUntilChanged
   }
 
-  def watchField[TField](
+  def watchKeyspaceField[TField](
       keys: List[String],
       overflowStrategy: OverflowStrategy,
       fieldMapper: TValue => TField
-  ): Source[RedisWatchResult[TKey, TField], RedisWatchSubscription[String]] = {
-    watchValue(keys, overflowStrategy)
-      .map(x => RedisWatchResult(x.key, fieldMapper(x.value)))
+  ): Source[RedisResult[TKey, TField], RedisSubscription[String]] = {
+    watchKeyspaceValue(keys, overflowStrategy)
+      .map(x => RedisResult(x.key, fieldMapper(x.value)))
       .distinctUntilChanged
   }
 
-  def watchFieldAggregation[TField](
+  def watchKeyspaceFieldAggregation[TField](
       keys: List[String],
       overflowStrategy: OverflowStrategy,
       fieldMapper: TValue => TField,
       reducer: Iterable[TField] => TField
-  ): Source[TField, RedisWatchSubscription[String]] = {
-    watchField(keys, overflowStrategy, fieldMapper)
+  ): Source[TField, RedisSubscription[String]] = {
+    watchKeyspaceField(keys, overflowStrategy, fieldMapper)
       .scan(Map.empty[TKey, TField]) {
-        case (data, RedisWatchResult(key, value)) ⇒ data + (key → value)
+        case (data, RedisResult(key, value)) ⇒ data + (key → value)
       }
       .map(data => reducer(data.values))
       .distinctUntilChanged
-  }
-
-  private def mapMatToSubscription[TSource](source: Source[TSource, KillSwitch],
-                                            keys: List[String],
-                                            pSubscribeF: Future[Unit]) = {
-    source
-      .watchTermination()(Keep.both)
-      .mapMaterializedValue {
-        case (killSwitch, terminationSignal) ⇒
-          new RedisWatchSubscription(keys, pSubscribeF, killSwitch, terminationSignal, redisReactiveScalaApi)
-      }
   }
 }
 //distinct events - DONE
 //subscriptionResult with unsubscribe and quit - DONE
 //watch termination - DONE
-//todo: remove aggregate key
+//remove aggregate key - DONE
 //todo: support for delete and expired, etc
+//todo: RedisWatchSubscription try to remove type parameter
