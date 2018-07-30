@@ -26,7 +26,7 @@ import csw.services.command.CommandResponseManager
 import csw.services.command.scaladsl.CommandService
 
 import scala.concurrent.duration.DurationDouble
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 
 class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext)
     extends ComponentHandlers(ctx, cswCtx) {
@@ -43,7 +43,6 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
   import cswCtx._
   override def initialize(): Future[Unit] =
   override def initialize(): Future[Unit] = {
-    println("Yes MCS Initialize")
     componentInfo.connections.headOption match {
       case Some(hcd) ⇒
         cswCtx.locationService.resolve(hcd.of[AkkaLocation], 5.seconds).map {
@@ -57,10 +56,8 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = Unit
 
   override def validateCommand(controlCommand: ControlCommand): ValidationResponse = {
-    println(s"Validate: $controlCommand")
     controlCommand.commandName match {
       case `longRunning` ⇒
-        println("Got longRunning on assembly validate")
         //#addOrUpdateCommand
         // after validation of the controlCommand, update its status of successful validation as Accepted
         // TODO -- Don't think we should do this
@@ -75,13 +72,10 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
   }
 
   override def onSubmit(controlCommand: ControlCommand): SubmitResponse = {
-    println("Got to onSubmit")
-
     controlCommand.commandName match {
       case `longRunning` ⇒
-        println("Got long running in assembly submit")
         runId = controlCommand.runId
-        println(">>>>>>>>>>>>>> WTF<<<<<<<<<<<<<<<<<<<<<<  WTF <<<<<<<<<<<<")
+
         //#addSubCommand
         shortSetup = Setup(prefix, shortRunning, controlCommand.maybeObsId)
         commandResponseManager.addSubCommand(runId, shortSetup.runId)
@@ -109,12 +103,10 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
         commandResponseManager.subscribe(
           controlCommand.runId, {
             case Completed(_) ⇒
-              println(">>>>>>>>>>>>>>>>>>>>>>>>>>Publishing that long completed")
               currentStatePublisher.publish(
                 CurrentState(controlCommand.source, StateName("testStateName"), Set(choiceKey.set(longRunningCmdCompleted)))
               )
-            case a ⇒
-              println(s"Got some other response from processing: $a")
+            case _ ⇒
           }
         )
         //#subscribe-to-command-response-manager
@@ -126,10 +118,9 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
           .map(
             _ ⇒ () // may choose to publish current state to subscribers or do other operations
           )
-
-        //#query-command-response-manager
-
+        // Return response
         Started(controlCommand.runId)
+      //#query-command-response-manager
 
       case `initCmd` ⇒
         commandResponseManager.addOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId))
@@ -146,7 +137,6 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
   }
 
   private def processCommand(controlCommand: ControlCommand) = {
-    println(s"MCSASSembly: processCommand: $controlCommand")
     hcdComponent
       .submit(controlCommand)
       .map {
@@ -164,23 +154,18 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
                   currentStatePublisher
                     .publish(CurrentState(shortSetup.source, StateName("testStateName"), Set(choiceKey.set(shortCmdCompleted))))
                   // As the commands get completed, the results are updated in the commandResponseManager
-                  println("Short complete, published short current state")
                   commandResponseManager.updateSubCommand(id, Completed(id))
                 case id if id == mediumSetup.runId ⇒
-                  println("Got something back for medium")
                   currentStatePublisher
                     .publish(CurrentState(mediumSetup.source, StateName("testStateName"), Set(choiceKey.set(mediumCmdCompleted))))
-                  println("Medium complete, published medium current state")
                   commandResponseManager.updateSubCommand(id, Completed(id))
                 case id if id == longSetup.runId ⇒
                   currentStatePublisher
                     .publish(CurrentState(longSetup.source, StateName("testStateName"), Set(choiceKey.set(longCmdCompleted))))
-                  println("Long complete, published long current state")
                   commandResponseManager.updateSubCommand(id, Completed(id))
               }
             //#updateSubCommand
-            case a ⇒ // Do nothing
-              println(s"Got some other message in processCommand: $a")
+            case _ ⇒ // Do nothing
           }
         case _ ⇒ // Do nothing
       }

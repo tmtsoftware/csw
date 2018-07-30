@@ -33,7 +33,6 @@ class CommandResponseSubscription private[csw] (
     Source
       .actorRef[SubmitResponse](bufferSize, OverflowStrategy.dropHead)
       .mapMaterializedValue { ref ⇒
-        println("<<<<<< DOING THE SUBSCRIBE <<<<<<<<")
         commandResponseManagerActor ! Subscribe(runId, ref)
       }
   }

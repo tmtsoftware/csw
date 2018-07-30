@@ -67,7 +67,6 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
       val assemblyLocation: AkkaLocation = Await.result(assemblyLocF, 10.seconds).get
       val assemblyCommandService = new CommandService(assemblyLocation)
 
-      println(s"Assembly: $assemblyLocation")
       val setup = Setup(prefix, longRunning, Some(obsId))
       val probe = TestProbe[CurrentState]
 
@@ -86,7 +85,6 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
       //#subscribe-for-result
       val eventualCommandResponse = assemblyCommandService.submit(setup).flatMap {
         case _: Started ⇒
-          println("Got started")
           assemblyCommandService.subscribe(setup.runId)
         case _ ⇒ Future(Error(setup.runId, ""))
       }
@@ -121,7 +119,6 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
 
       enterBarrier("long-commands")
 
-
       val hcdLocF =
         locationService.resolve(
           AkkaConnection(ComponentId("Test_Component_Running_Long_Command", ComponentType.HCD)),
@@ -139,7 +136,6 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
 
       //#submitAllAndGetResponse
 
-      println("------- OKAY NOW STARTING THE COMMAND submit GET ALL")
       val responseOfMultipleCommands = hcdComponent.submitAllAndGetResponse(Set(setupHcd1, setupHcd2))
 
       //#submitAllAndGetResponse
@@ -195,7 +191,7 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
       whenReady(aggregatedErrorResponse, PatienceConfiguration.Timeout(20.seconds)) { result ⇒
         result shouldBe a[Error]
       }
-println("DID EVERYTHING!")
+
       enterBarrier("multiple-components-submit-subscribe-multiple-commands")
     }
 
@@ -205,7 +201,6 @@ println("DID EVERYTHING!")
       val assemblyConf = ConfigFactory.load("command/mcs_assembly.conf")
       Await.result(Standalone.spawn(assemblyConf, wiring), 5.seconds)
       enterBarrier("spawned")
-      println("Member 1 spawned")
       enterBarrier("long-commands")
       enterBarrier("multiple-components-submit-multiple-commands")
       enterBarrier("multiple-components-submit-subscribe-multiple-commands")
@@ -217,7 +212,6 @@ println("DID EVERYTHING!")
       val hcdConf = ConfigFactory.load("command/mcs_hcd.conf")
       Await.result(Standalone.spawn(hcdConf, wiring), 5.seconds)
       enterBarrier("spawned")
-      println("Member 2 spawned")
       enterBarrier("long-commands")
       enterBarrier("multiple-components-submit-multiple-commands")
       enterBarrier("multiple-components-submit-subscribe-multiple-commands")

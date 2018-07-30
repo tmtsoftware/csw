@@ -68,6 +68,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
 
         runningHcds = new HashMap<>();
         commandResponseAdapter = TestProbe.<CommandResponse>create(ctx.getSystem()).ref();
+        commandResponseAdapter = TestProbe.<Responses.SubmitResponse>create(ctx.getSystem()).ref();
     }
     //#jcomponent-handlers-class
 
@@ -125,12 +126,12 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
 
     //#onSubmit-handler
     @Override
-    public CommandResponse onSubmit(ControlCommand controlCommand) {
+    public Responses.SubmitResponse onSubmit(ControlCommand controlCommand) {
         if (controlCommand instanceof Setup)
             return submitSetup((Setup) controlCommand); // includes logic to handle Submit with Setup config command
         else if (controlCommand instanceof Observe)
             return submitObserve((Observe) controlCommand); // includes logic to handle Submit with Observe config command
-        else return new CommandResponse.Error(controlCommand.runId(), "Submitted command not supported: " + controlCommand.commandName().name());
+        else return new Responses.Error(controlCommand.runId(), "Submitted command not supported: " + controlCommand.commandName().name());
     }
     //#onSubmit-handler
 
@@ -177,7 +178,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     }
     //#onLocationTrackingEvent-handler
 
-    private void processSetup(Setup sc) {
+    private Responses.SubmitResponse processSetup(Setup sc) {
         switch (sc.commandName().name()) {
             case "forwardToWorker":
                 //#addSubCommand
@@ -194,7 +195,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
                 // subscribe to the status of original command received and publish the state when its status changes to
                 // Completed
                 commandResponseManager.jSubscribe(subCommand.runId(), commandResponse -> {
-                    if (commandResponse.resultType() instanceof CommandResponse.Completed) {
+                    if (commandResponse.resultType() instanceof Responses.Completed) {
                         Key<String> stringKey = JKeyTypes.StringKey().make("sub-command-status");
                         CurrentState currentState = new CurrentState(sc.source().prefix(), new StateName("testStateName"));
                         currentStatePublisher.publish(currentState.madd(stringKey.set("complete")));

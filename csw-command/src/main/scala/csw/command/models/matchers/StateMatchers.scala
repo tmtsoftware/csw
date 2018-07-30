@@ -86,7 +86,7 @@ case class DemandMatcher(demand: DemandState, withUnits: Boolean = false, timeou
  * @param timeout A timeout for which the matching should be executed. Once the timeout occurs, complete the match with
  *                MatchFailed response and appropriate failure exception.
  */
-case class PresenceMatcher(prefix: String, stateName: String, timeout: Timeout) extends StateMatcher {
+case class PresenceMatcher(prefix: Prefix, stateName: StateName, timeout: Timeout) extends StateMatcher {
 
   /**
    * A predicate to match the current state
@@ -94,5 +94,5 @@ case class PresenceMatcher(prefix: String, stateName: String, timeout: Timeout) 
    * @param current current state to be matched as represented by [[csw.params.core.states.CurrentState]]
    * @return true if match is successful, false otherwise
    */
-  def check(current: CurrentState): Boolean = prefix == current.prefixStr && stateName == current.stateName.name
+  def check(current: CurrentState): Boolean = prefix == current.prefix && stateName == current.stateName
 }

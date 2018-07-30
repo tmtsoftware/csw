@@ -157,7 +157,7 @@ public class JHcdComponentHandlers extends JComponentHandlers {
     }
     //#onLocationTrackingEvent-handler
 
-    private void processSetup(Setup sc) {
+    private Responses.SubmitResponse processSetup(Setup sc) {
         switch (sc.commandName().name()) {
             case "axisMove":
             case "axisDatum":
@@ -183,13 +183,11 @@ public class JHcdComponentHandlers extends JComponentHandlers {
      * in case of submit command, component writer is required to update commandResponseManager with the result
      */
     private Responses.SubmitResponse submitSetup(Setup setup) {
-        processSetup(setup);
-        return new Responses.Completed(setup.runId());
+        return processSetup(setup);
     }
 
     private Responses.SubmitResponse submitObserve(Observe observe) {
-        processObserve(observe);
-        return new Responses.Completed(observe.runId());
+        return processObserve(observe);
     }
 
     private void onewaySetup(Setup setup) {

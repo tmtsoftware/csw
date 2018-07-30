@@ -73,7 +73,6 @@ private[command] class CommandResponseManagerBehavior(
   }
 
   private def addOrUpdateCommand(runId: Id, commandResponse: SubmitResponse): Unit = {
-    println(s"Add or Update: $runId --- $commandResponse")
     commandResponseManagerState.get(runId) match {
       case _: CommandNotAvailable ⇒ commandResponseManagerState = commandResponseManagerState.add(runId, commandResponse)
       case _                      ⇒ updateCommand(runId, commandResponse)
@@ -82,11 +81,8 @@ private[command] class CommandResponseManagerBehavior(
 
   private def updateCommand(runId: Id, commandResponse: SubmitResponse): Unit = {
     val currentResponse = commandResponseManagerState.get(runId)
-    println(s"In Update: $commandResponse")
     if (currentResponse.resultType == CommandResultType.Intermediate && currentResponse != commandResponse) {
       commandResponseManagerState = commandResponseManagerState.updateCommandStatus(commandResponse)
-      val x = commandResponseManagerState.cmdToCmdStatus(commandResponse.runId).subscribers
-      println(s"Doing update to: $x with $commandResponse")
       publishToSubscribers(commandResponse, commandResponseManagerState.cmdToCmdStatus(commandResponse.runId).subscribers)
     }
   }

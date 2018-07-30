@@ -28,7 +28,6 @@ class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = ???
 
   override def validateCommand(controlCommand: ControlCommand): ValidationResponse = {
-    println("HCD Validate")
     controlCommand.commandName match {
       case `longRunning`               ⇒ Accepted(controlCommand.runId)
       case `mediumRunning`             ⇒ Accepted(controlCommand.runId)
@@ -40,22 +39,18 @@ class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
   }
 
   override def onSubmit(controlCommand: ControlCommand): SubmitResponse = {
-    println("HCD ON submit: " + controlCommand)
     controlCommand.commandName match {
       case `longRunning` ⇒
-        println("Got long")
         ctx.schedule(5.seconds,
                      commandResponseManager.commandResponseManagerActor,
                      AddOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId)))
         Started(controlCommand.runId)
       case `mediumRunning` ⇒
-        println("Got medium")
         ctx.schedule(3.seconds,
                      commandResponseManager.commandResponseManagerActor,
                      AddOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId)))
         Started(controlCommand.runId)
       case `shortRunning` ⇒
-        println("Got short")
         ctx.schedule(1.seconds,
                      commandResponseManager.commandResponseManagerActor,
                      AddOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId)))

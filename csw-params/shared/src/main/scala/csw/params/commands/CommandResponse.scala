@@ -14,35 +14,6 @@ import scala.collection.immutable
  * The nature of CommandResponse as an intermediate response of command execution or a final response which could be
  * positive or negative
  */
-/*
-sealed trait CommandResultType extends EnumEntry
-object CommandResultType extends Enum[CommandResultType] {
-
-  override def values: immutable.IndexedSeq[CommandResultType] = findValues
-
-  /**
- * A CommandResponse of intermediate type
- */
-  case object Intermediate extends CommandResultType
-
-  /**
- * A CommandResponse of final type. It could be Positive or Negative
- */
-  sealed trait Final extends CommandResultType
-
-  /**
- * A Positive CommandResponse of Final type
- */
-  case object Positive extends Final
-
-  /**
- * A Negative CommandResponse of Final type
- */
-  case object Negative extends Final
-
-}
- */
-
 sealed trait CommandResultType
 object CommandResultType {
 
@@ -77,6 +48,8 @@ object Responses {
 
   sealed trait SubmitResponse extends Response
 
+  sealed trait MatchingResponse extends Response
+
   case class Accepted(runId: Id) extends ValidationResponse with OnewayResponse {
     val resultType: CommandResultType = Positive
   }
@@ -89,15 +62,19 @@ object Responses {
     val resultType: CommandResultType = Positive
   }
 
-  case class Completed(runId: Id) extends SubmitResponse {
+  case class Completed(runId: Id) extends SubmitResponse with MatchingResponse {
     val resultType: CommandResultType = Positive
   }
 
-  case class Invalid(runId: Id, issue: CommandIssue) extends ValidationResponse with OnewayResponse with SubmitResponse {
+  case class Invalid(runId: Id, issue: CommandIssue)
+      extends ValidationResponse
+      with OnewayResponse
+      with SubmitResponse
+      with MatchingResponse {
     val resultType: CommandResultType = Negative
   }
 
-  case class Error(runId: Id, message: String) extends SubmitResponse {
+  case class Error(runId: Id, message: String) extends SubmitResponse with MatchingResponse {
     val resultType: CommandResultType = Negative
   }
 
@@ -105,7 +82,7 @@ object Responses {
     val resultType: CommandResultType = Negative
   }
 
-  case class Locked(runId: Id) extends OnewayResponse with SubmitResponse {
+  case class Locked(runId: Id) extends OnewayResponse with SubmitResponse with MatchingResponse {
     val resultType: CommandResultType = Negative
   }
 
@@ -150,7 +127,14 @@ object Responses {
         case Failure(ex) ⇒ Success(Responses.Error(Id(), s"${ex.getMessage}"))
       }
   }
+
   /*
+  def matching():MatchingResponse = {
+    Completed(Id())
+    Invalid(Id(), WrongInternalStateIssue(""))
+    Error(Id(), "bogus")
+  }
+
   def validate():ValidationResponse = {
     Accepted(Id())
     Invalid(Id(), WrongInternalStateIssue(""))

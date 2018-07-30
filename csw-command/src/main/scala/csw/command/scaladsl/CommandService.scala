@@ -117,7 +117,7 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
    * @param controlCommand the [[csw.params.commands.ControlCommand]] payload
    * @return a CommandResponse as a Future value
    */
-  def submitAndSubscribe(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[Responses.SubmitResponse] =
+  def submitAndSubscribe(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[SubmitResponse] =
     submit(controlCommand).flatMap {
       case _: Started ⇒ subscribe(controlCommand.runId)
       case x          ⇒ Future.successful(x)
@@ -129,13 +129,12 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
    *
    * @param controlCommand the [[csw.params.commands.ControlCommand]] payload
    * @param stateMatcher the StateMatcher implementation for matching received state against a demand state
-   * @return a CommandResponse as a Future value
+   * @return a MatchingResponse as a Future value
    */
-  /* TODO ===
   def onewayAndMatch(
       controlCommand: ControlCommand,
       stateMatcher: StateMatcher
-  )(implicit timeout: Timeout): Future[OnewayResponse] = {
+  )(implicit timeout: Timeout): Future[MatchingResponse] = {
     val matcher          = new Matcher(component, stateMatcher)
     val matcherResponseF = matcher.start
     oneway(controlCommand).flatMap {
@@ -144,12 +143,14 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
           case MatchCompleted  ⇒ Completed(controlCommand.runId)
           case MatchFailed(ex) ⇒ Error(controlCommand.runId, ex.getMessage)
         }
-      case x ⇒
+      case _: Locked =>
         matcher.stop()
-        Future.successful(x)
+        Future.successful(Locked(controlCommand.runId))
+      case in: Invalid =>
+        matcher.stop()
+        Future.successful(in)
     }
   }
-   */
 
   /**
    * Submit multiple commands and get final CommandResponse for all as a stream of CommandResponse. For long running commands, it will subscribe for the

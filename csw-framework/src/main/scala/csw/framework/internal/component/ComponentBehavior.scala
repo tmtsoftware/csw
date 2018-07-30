@@ -185,7 +185,6 @@ private[framework] final class ComponentBehavior(
    * @param commandMessage message encapsulating a [[csw.params.commands.Command]]
    */
   private def onRunningCompCommandMessage(commandMessage: CommandMessage): Unit = {
-    println(s"Got to onRunnginCompMess: $commandMessage")
 
     log.info(s"Invoking lifecycle handler's validateSubmit hook with msg :[$commandMessage]")
 
@@ -199,23 +198,21 @@ private[framework] final class ComponentBehavior(
         ow.replyTo ! validationResponse.asInstanceOf[OnewayResponse]
       case su: Submit ⇒
         val validationResponse = lifecycleHandlers.validateCommand(commandMessage.command)
-        println("Submit validation response: " + validationResponse)
         validationResponse match {
           case _: Accepted =>
             // Here the submit is marked as started, to indicate that the command has started processing
             // This is needed because someone might do something in the doSubmit like subscribe -- this may be
             // a feature of certain tests, but it does seem possible that something should be in the CRM once validated
-            // Prefer not to add a response that would only be relevant to the internals
+            // Prefer not to add a new unique response that would only be relevant to the internals
             commandResponseManager.commandResponseManagerActor ! AddOrUpdateCommand(commandMessage.command.runId,
                                                                                     Started(commandMessage.command.runId))
-            println(s"onsubmitAccepted: ")
-            val response: SubmitResponse = lifecycleHandlers.onSubmit(commandMessage.command)
-            println(s"onSubmitHandler response: $response")
+            val submitResponse: SubmitResponse = lifecycleHandlers.onSubmit(commandMessage.command)
+
             // The response is used to update the CRM, it may still be Started it if is a long running command
-            commandResponseManager.commandResponseManagerActor ! AddOrUpdateCommand(commandMessage.command.runId, response)
-            su.replyTo ! response
-          case in: Invalid =>
-            su.replyTo ! in
+            commandResponseManager.commandResponseManagerActor ! AddOrUpdateCommand(commandMessage.command.runId, submitResponse)
+            su.replyTo ! submitResponse
+          case inv: Invalid =>
+            su.replyTo ! inv
         }
     }
   }

@@ -27,6 +27,7 @@ import csw.messages.params.states.{CurrentState, StateName}
 
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext)
     extends ComponentHandlers(ctx, cswCtx) {
@@ -50,22 +51,22 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
     case `matcherFailedCmd`  ⇒ Accepted(controlCommand.runId)
     case `matcherTimeoutCmd` ⇒ Accepted(controlCommand.runId)
     case `cancelCmd`         ⇒ Accepted(controlCommand.runId)
-    /*
-    case `immediateCmd`      ⇒ Completed(controlCommand.runId)
-    case `immediateResCmd` ⇒
-      CompletedWithResult(controlCommand.runId, Result(controlCommand.source, Set(KeyType.IntKey.make("encoder").set(20))))
-     */
+    case `immediateCmd`      ⇒ Accepted(controlCommand.runId)
+    case `immediateResCmd`   ⇒ Accepted(controlCommand.runId)
     case `invalidCmd` ⇒
       Invalid(controlCommand.runId, OtherIssue(s"Unsupported prefix: ${controlCommand.commandName}"))
     case _ ⇒ Invalid(controlCommand.runId, WrongPrefixIssue(s"Wrong prefix: ${controlCommand.commandName}"))
   }
 
   override def onSubmit(controlCommand: ControlCommand): SubmitResponse = controlCommand.commandName match {
-    case `cancelCmd`         ⇒ processAcceptedSubmitCmd(controlCommand)
-    case `withoutMatcherCmd` ⇒ processCommandWithoutMatcher(controlCommand)
-    case `acceptedCmd`       ⇒
-      //mimic long running process by not updating CSRM
+    case `cancelCmd` ⇒ processAcceptedSubmitCmd(controlCommand)
+    case `withoutMatcherCmd` ⇒
+      processCommandWithoutMatcher(controlCommand)
       Started(controlCommand.runId)
+    case `acceptedCmd`  ⇒ Started(controlCommand.runId)
+    case `immediateCmd` ⇒ Completed(controlCommand.runId)
+    case `immediateResCmd` ⇒
+      CompletedWithResult(controlCommand.runId, Result(controlCommand.source, Set(KeyType.IntKey.make("encoder").set(20))))
     case _ ⇒ CommandNotAvailable(controlCommand.runId)
   }
 
@@ -87,28 +88,33 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
   private def processAcceptedOnewayCmd(controlCommand: ControlCommand): Unit =
     controlCommand.paramType.get(cancelCmdId).foreach(param ⇒ processOriginalCommand(Id(param.head)))
 
-  private def processCommandWithoutMatcher(controlCommand: ControlCommand): SubmitResponse = {
+  // This simulates a long command that has been started and finishes with a result
+  private def processCommandWithoutMatcher(controlCommand: ControlCommand): Unit = {
     val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(20)
     val result                = Result(controlCommand.source, Set(param))
 
     // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
+    // This simulates a long running command that eventually updates with a result
     commandResponseManager.addOrUpdateCommand(controlCommand.runId, CompletedWithResult(controlCommand.runId, result))
-    CompletedWithResult(controlCommand.runId, result)
   }
 
   private def processCancelCommand(runId: Id, cancelId: Id): SubmitResponse = {
     processOriginalCommand(cancelId)
-    commandResponseManager.addOrUpdateCommand(runId, Completed(runId))
     Completed(runId)
   }
 
+  // This simulates the handling of cancelling a long command
   private def processOriginalCommand(runId: Id): Unit = {
     implicit val timeout: Timeout = 5.seconds
 
     // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
     val eventualResponse: Future[SubmitResponse] = commandResponseManager.query(runId)
-    eventualResponse.onComplete { x ⇒
-      commandResponseManager.addOrUpdateCommand(runId, Cancelled(runId))
+
+    eventualResponse.onComplete {
+      case Success(x) => {
+        commandResponseManager.addOrUpdateCommand(runId, Cancelled(runId))
+      }
+      case Failure(x) => println("Eventual response error occured: " + x.getMessage)
     }
   }
 

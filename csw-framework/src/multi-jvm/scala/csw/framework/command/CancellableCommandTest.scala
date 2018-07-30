@@ -32,22 +32,24 @@ import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, ExecutionContext}
 
 class CancellableCommandTestMultiJvm1 extends CancellableCommandTest(0)
+
 class CancellableCommandTestMultiJvm2 extends CancellableCommandTest(0)
 
 // DEOPSCSW-211 Notification of Interrupted Message
 class CancellableCommandTest(ignore: Int) extends LSNodeSpec(config = new OneMemberAndSeed) with MockitoSugar {
+
   import config._
 
   implicit val actorSystem: ActorSystem[_] = system.toTyped
-  implicit val mat: Materializer           = ActorMaterializer()
-  implicit val ec: ExecutionContext        = actorSystem.executionContext
-  implicit val timeout: Timeout            = 5.seconds
-  implicit val scheduler: Scheduler        = actorSystem.scheduler
+  implicit val mat: Materializer = ActorMaterializer()
+  implicit val ec: ExecutionContext = actorSystem.executionContext
+  implicit val timeout: Timeout = 5.seconds
+  implicit val scheduler: Scheduler = actorSystem.scheduler
 
   test("a long running command should be cancellable") {
     runOn(seed) {
       // spawn container having assembly and hcd running in jvm-1
-      val wiring       = FrameworkWiring.make(system, locationService, mock[RedisClient])
+      val wiring = FrameworkWiring.make(system, locationService, mock[RedisClient])
       val assemblyConf = ConfigFactory.load("command/commanding_assembly.conf")
       Await.result(Standalone.spawn(assemblyConf, wiring), 5.seconds)
       enterBarrier("spawned")
@@ -56,8 +58,8 @@ class CancellableCommandTest(ignore: Int) extends LSNodeSpec(config = new OneMem
     runOn(member) {
       val submitResponseProbe = TestProbe[SubmitResponse]
       val onewayResponseProbe = TestProbe[OnewayResponse]
-      val obsId            = Some(ObsId("Obs001"))
-      val cancelCmdId      = KeyType.StringKey.make("cancelCmdId")
+      val obsId = Some(ObsId("Obs001"))
+      val cancelCmdId = KeyType.StringKey.make("cancelCmdId")
 
       enterBarrier("spawned")
 
@@ -67,13 +69,15 @@ class CancellableCommandTest(ignore: Int) extends LSNodeSpec(config = new OneMem
       val assemblyRef = Await.result(assemblyLocF, 10.seconds).map(_.componentRef).get
 
       // original command is submit and Cancel command is also submit
+      // This returns Started, so it is a long-running and we are free to cancel it
       val originalSetup = Setup(prefix, acceptedCmd, obsId)
       assemblyRef ! Submit(originalSetup, submitResponseProbe.ref)
       submitResponseProbe.expectMessage(Started(originalSetup.runId))
 
+      // This is the cancel command that is processed
       val cancelSetup = Setup(prefix, cancelCmd, obsId, Set(cancelCmdId.set(originalSetup.runId.id)))
       assemblyRef ! Submit(cancelSetup, submitResponseProbe.ref)
-      submitResponseProbe.expectMessage(Started(cancelSetup.runId))
+      submitResponseProbe.expectMessage(Completed(cancelSetup.runId))
 
       assemblyRef ! Subscribe(cancelSetup.runId, submitResponseProbe.ref)
       submitResponseProbe.expectMessage(Completed(cancelSetup.runId))
@@ -100,10 +104,12 @@ class CancellableCommandTest(ignore: Int) extends LSNodeSpec(config = new OneMem
 
       val cancelSetup3 = Setup(prefix, cancelCmd, obsId, Set(cancelCmdId.set(originalSetup3.runId.id)))
       assemblyRef ! Submit(cancelSetup3, submitResponseProbe.ref)
-      submitResponseProbe.expectMessage(Started(cancelSetup3.runId))
-
-      assemblyRef ! Subscribe(cancelSetup3.runId, submitResponseProbe.ref)
       submitResponseProbe.expectMessage(Completed(cancelSetup3.runId))
+
+      // Note that this works, even though initial Oneway was not in CRM, if code puts Cancelled for the runId into CRM
+      // the subscribe will work
+      assemblyRef ! Subscribe(originalSetup3.runId, submitResponseProbe.ref)
+      submitResponseProbe.expectMessage(Cancelled(originalSetup3.runId))
 
       // original command is oneway and Cancel command is also oneway
       val originalSetup4 = Setup(prefix, acceptedCmd, obsId)

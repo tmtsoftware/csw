@@ -13,14 +13,14 @@ trait StateMatcher {
    *
    * @return the prefix of destination component
    */
-  def prefix: String
+  def prefix: Prefix
 
   /**
    * The name of the state to match for
    *
    * @return the name of the state
    */
-  def stateName: String
+  def stateName: StateName
 
   /**
    * A predicate to match the current state
