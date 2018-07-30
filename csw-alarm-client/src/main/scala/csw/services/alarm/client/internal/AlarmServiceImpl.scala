@@ -2,14 +2,13 @@ package csw.services.alarm.client.internal
 
 import java.io.File
 
-import akka.Done
 import akka.actor.ActorSystem
 import akka.actor.typed.ActorRef
-import akka.stream.scaladsl.{Keep, Sink, Source}
-import akka.stream.{ActorMaterializer, KillSwitch, Materializer}
+import akka.stream.scaladsl.{Sink, Source}
+import akka.stream.{ActorMaterializer, Materializer}
 import com.typesafe.config.{ConfigFactory, ConfigResolveOptions}
 import csw.services.alarm.api.exceptions.{InvalidSeverityException, NoAlarmsFoundException, ResetOperationFailedException}
-import csw.services.alarm.api.internal.{AggregateKey, MetadataKey, SeverityKey, StatusKey}
+import csw.services.alarm.api.internal.{MetadataKey, SeverityKey, StatusKey}
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, UnAcknowledged}
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
 import csw.services.alarm.api.models.AlarmSeverity.Okay
@@ -19,12 +18,10 @@ import csw.services.alarm.api.models.ShelveStatus.{Shelved, UnShelved}
 import csw.services.alarm.api.models._
 import csw.services.alarm.api.scaladsl.{AlarmAdminService, AlarmSubscription}
 import csw.services.alarm.client.internal.configparser.ConfigParser
-import csw.services.alarm.client.internal.extensions.SourceExtensions.RichSource
-import csw.services.alarm.client.internal.redis.scala_wrapper.{RedisAsyncScalaApi, RedisReactiveScalaApi}
+import csw.services.alarm.client.internal.redis.scala_wrapper.{RedisAsyncScalaApi, RedisStreamApi}
 import csw.services.alarm.client.internal.shelve.ShelveTimeoutActorFactory
 import csw.services.alarm.client.internal.shelve.ShelveTimeoutMessage.{CancelShelveTimeout, ScheduleShelveTimeout}
 import io.lettuce.core.KeyValue
-import io.lettuce.core.pubsub.api.reactive.PatternMessage
 import reactor.core.publisher.FluxSink.OverflowStrategy
 
 import scala.async.Async._
@@ -35,7 +32,7 @@ class AlarmServiceImpl(
     metadataApi: RedisAsyncScalaApi[MetadataKey, AlarmMetadata],
     severityApi: RedisAsyncScalaApi[SeverityKey, AlarmSeverity],
     statusApi: RedisAsyncScalaApi[StatusKey, AlarmStatus],
-    aggregateApi: ⇒ RedisReactiveScalaApi[AggregateKey, String],
+    statusStreamApiFactory: () ⇒ RedisStreamApi[StatusKey, AlarmStatus],
     shelveTimeoutActorFactory: ShelveTimeoutActorFactory
 )(implicit actorSystem: ActorSystem)
     extends AlarmAdminService {
@@ -203,56 +200,17 @@ class AlarmServiceImpl(
   // channel: e.g. __keyspace@0__:status.nfiraos.trombone.tromboneAxisLowLimitAlarm,
   // message: event type as value: e.g. set, expire, expired
   def subscribeAggregatedSeverity(key: Key): Source[AlarmSeverity, AlarmSubscription] = {
-    // create new connection for every client
-    val aggregateKeys: List[AggregateKey] = List(key)
-    val psubscribeF                       = aggregateApi.psubscribe(aggregateKeys)
+    val redisStreamApi     = statusStreamApiFactory() // create new connection for every client
+    val keys: List[String] = List(StatusKey.fromAlarmKey(key).value)
 
-    Source
-      .fromFuture(psubscribeF)
-      .flatMapConcat { _ =>
-        val patternSource = aggregateApi.observePatterns(OverflowStrategy.LATEST)
-        patternSource
-          .filter(_.getMessage == "set")
-          .mapAsync(1)(getLatchedSeverity)
-          .scan(Map.empty[StatusKey, AlarmSeverity]) {
-            case (keyToSeverity, (statusKey, severity)) ⇒ keyToSeverity + (statusKey → severity)
-          }
-          .map(_.values.maxBy(_.level))
-          .distinctUntilChanged
+    redisStreamApi
+      .watchFieldAggregation[AlarmSeverity](keys, OverflowStrategy.LATEST, _.latchedSeverity, _.maxBy(_.level))
+      .mapMaterializedValue { mat =>
+        new AlarmSubscription {
+          override def unsubscribe(): Future[Unit] = mat.unsubscribe()
+          override def ready(): Future[Unit]       = mat.ready()
+        }
       }
-      .cancellable
-      .watchTermination()(Keep.both)
-      .mapMaterializedValue {
-        case (killSwitch, terminationSignal) ⇒
-          createAlarmSubscription(psubscribeF, aggregateApi, aggregateKeys, killSwitch, terminationSignal)
-      }
-  }
-
-  private def createAlarmSubscription(
-      psubscribeF: Future[Unit],
-      aggregateApi: RedisReactiveScalaApi[AggregateKey, String],
-      aggregateKeys: List[AggregateKey],
-      killSwitch: KillSwitch,
-      terminationSignal: Future[Done]
-  ): AlarmSubscription = new AlarmSubscription {
-
-    terminationSignal.onComplete(_ => unsubscribe()) // call unsubscribe when stream completes successfully or with failure
-
-    override def unsubscribe(): Future[Unit] = async {
-      await(aggregateApi.punsubscribe(aggregateKeys))
-      await(aggregateApi.quit)
-      killSwitch.shutdown()
-      await(terminationSignal) // await on terminationSignal when unsubscribe is called by user
-    }
-
-    override def ready(): Future[Unit] = psubscribeF.map(_ ⇒ ()).recoverWith {
-      case _ if terminationSignal.isCompleted ⇒ terminationSignal.map(_ ⇒ ())
-    }
-  }
-
-  private def getLatchedSeverity(patternMessage: PatternMessage[AggregateKey, String]): Future[(StatusKey, AlarmSeverity)] = {
-    val statusKey = patternMessage.getChannel.toStatusKey
-    statusApi.get(statusKey).map(status ⇒ (statusKey, status.latchedSeverity))
   }
 
   private def setAlarmStore(alarmMetadataSet: AlarmMetadataSet) =

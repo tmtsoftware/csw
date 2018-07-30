@@ -4,7 +4,7 @@ import csw.services.alarm.api.models.Key
 
 import scala.language.implicitConversions
 
-case class SeverityKey(key: String)
+case class SeverityKey(value: String)
 
 object SeverityKey {
   implicit def fromAlarmKey(alarmKey: Key): SeverityKey = SeverityKey("severity." + alarmKey.value)
