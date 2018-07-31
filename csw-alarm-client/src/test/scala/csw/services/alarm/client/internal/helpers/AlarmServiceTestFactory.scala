@@ -1,9 +1,10 @@
-package csw.services.alarm.client.internal
+package csw.services.alarm.client.internal.helpers
 
 import akka.actor.ActorSystem
 import csw.services.alarm.api.internal.{MetadataKey, SeverityKey, StatusKey}
 import csw.services.alarm.api.models.{AlarmMetadata, AlarmSeverity, AlarmStatus}
 import csw.services.alarm.client.internal.AlarmCodec.{MetadataCodec, SeverityCodec, StatusCodec}
+import csw.services.alarm.client.internal.AlarmServiceImpl
 import csw.services.alarm.client.internal.redis.scala_wrapper.{RedisAsyncScalaApi, RedisKeySpaceApi, RedisReactiveScalaApi}
 import csw.services.alarm.client.internal.shelve.ShelveTimeoutActorFactory
 import io.lettuce.core.api.async.RedisAsyncCommands
