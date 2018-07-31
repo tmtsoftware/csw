@@ -7,7 +7,12 @@ import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 import scala.concurrent.ExecutionContext
 
-class AlarmServiceTestSetup extends FunSuite with Matchers with EmbeddedRedis with BeforeAndAfterAll with BeforeAndAfterEach {
+abstract class AlarmServiceTestSetup
+    extends FunSuite
+    with Matchers
+    with EmbeddedRedis
+    with BeforeAndAfterAll
+    with BeforeAndAfterEach {
   private val alarmServer        = "AlarmServer"
   private val (sentinel, server) = startSentinel(26379, 6379, masterId = alarmServer)
 
