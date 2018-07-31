@@ -5,7 +5,8 @@ import csw.services.event.api.scaladsl.EventService
 import csw.services.event.models.EventStores.{KafkaStore, RedisStore}
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.scaladsl.LocationServiceFactory
-import io.lettuce.core.RedisClient
+import io.lettuce.core.ClientOptions.DisconnectedBehavior
+import io.lettuce.core.{ClientOptions, RedisClient}
 
 class EventServiceCreationExamples {
 
@@ -26,6 +27,11 @@ class EventServiceCreationExamples {
   def redisEventService(): Unit = {
     //#redis-event-service
     // create event service using location service
+
+    val clientOptions = ClientOptions.builder().disconnectedBehavior(DisconnectedBehavior.REJECT_COMMANDS).build
+    val redisClient   = RedisClient.create()
+    redisClient.setOptions(clientOptions)
+
     val eventService1: EventService = new EventServiceFactory(RedisStore(redisClient)).make(locationService)
 
     // create event service using host and port of event server.

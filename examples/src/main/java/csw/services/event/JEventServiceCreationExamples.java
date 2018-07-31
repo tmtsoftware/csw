@@ -4,18 +4,17 @@ import akka.actor.ActorSystem;
 import csw.services.event.api.javadsl.IEventService;
 import csw.services.event.models.EventStores;
 import csw.services.location.javadsl.ILocationService;
+import io.lettuce.core.ClientOptions;
 import io.lettuce.core.RedisClient;
 
 public class JEventServiceCreationExamples {
 
     private ActorSystem actorSystem;
     private ILocationService locationService;
-    private RedisClient redisClient;
 
     public JEventServiceCreationExamples(ActorSystem actorSystem, ILocationService locationService) {
         this.actorSystem = actorSystem;
         this.locationService = locationService;
-        redisClient = RedisClient.create();
     }
 
     private void createDefaultEventService() {
@@ -31,6 +30,10 @@ public class JEventServiceCreationExamples {
     private void createRedisEventService() {
 
         //#redis-event-service
+        ClientOptions clientOptions = ClientOptions.builder().disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS).build();
+        RedisClient redisClient   = RedisClient.create();
+        redisClient.setOptions(clientOptions);
+
         EventStores.RedisStore redisStore = new EventStores.RedisStore(redisClient);
         // create event service using location service
         IEventService eventService1 = new EventServiceFactory(redisStore).jMake(locationService, actorSystem);

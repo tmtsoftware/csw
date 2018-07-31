@@ -177,15 +177,7 @@ You can find complete list of API's supported by `EventSubscriber` and `IEventSu
 * @javadoc[IEventSubscriber](csw/services/event/api/javadsl/IEventSubscriber)
 
 ## Create Event Service
-If you are not using csw-framework, you can create @scaladoc[EventService](csw/services/event/api/scaladsl/EventService) using @scaladoc[EventServiceFactory](csw/services/event/EventServiceFactory).    
-
-Event service supports following two event stores:
-
-* @scaladoc[RedisStore](csw/services/event/models/EventStores/EventStores$$RedisStore) : This is the default and recommended store. 
-* @scaladoc[KafkaStore](csw/services/event/models/EventStores/EventStores$$KafkaStore$) : Not recommended. You should not use this unless you have strong reasons to do so.
-
-### Default Event Service
-Default event service is backed up by RedisStore.
+If you are not using csw-framework, you can create @scaladoc[EventService](csw/services/event/api/scaladsl/EventService) using @scaladoc[EventServiceFactory](csw/services/event/EventServiceFactory).
 
 Scala
 :   @@snip [EventServiceCreationExamples.scala](../../../../examples/src/main/scala/csw/services/event/EventServiceCreationExamples.scala) { #default-event-service }
@@ -193,8 +185,7 @@ Scala
 Java
 :   @@snip [JEventServiceCreationExamples.java](../../../../examples/src/main/java/csw/services/event/JEventServiceCreationExamples.java) { #default-event-service }
 
-
-### Event Service with Redis Store
+Event service is backed up by Redis. Above example demonstrates creation of event service with default redis client options. 
 You can optionally supply a RedisClient to the EventStore from outside which allows you to customize the behaviour of RedisClient used by Event Service which in most of the cases will be required in test scope only. 
 
 RedisClient is an expensive resource. Reuse this instance as much as possible.
@@ -206,16 +197,3 @@ Scala
 
 Java
 :   @@snip [JEventServiceCreationExamples.java](../../../../examples/src/main/java/csw/services/event/JEventServiceCreationExamples.java) { #redis-event-service }
-
-### Event Service with Kafka Store
-Event Service supports Kafka store but it does not meet TMT's performance requirements and hence not recommended for production use. 
-
-Scala
-:   @@snip [EventServiceCreationExamples.scala](../../../../examples/src/main/scala/csw/services/event/EventServiceCreationExamples.scala) { #kafka-event-service }
-
-Java
-:   @@snip [JEventServiceCreationExamples.java](../../../../examples/src/main/java/csw/services/event/JEventServiceCreationExamples.java) { #kafka-event-service }
-
-@@@ warning
-Do not use Kafka Store for production purpose. 
-@@@
