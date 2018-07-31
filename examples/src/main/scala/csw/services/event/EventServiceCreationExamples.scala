@@ -26,12 +26,12 @@ class EventServiceCreationExamples {
 
   def redisEventService(): Unit = {
     //#redis-event-service
-    // create event service using location service
 
     val clientOptions = ClientOptions.builder().disconnectedBehavior(DisconnectedBehavior.REJECT_COMMANDS).build
     val redisClient   = RedisClient.create()
     redisClient.setOptions(clientOptions)
 
+    // create event service using location service
     val eventService1: EventService = new EventServiceFactory(RedisStore(redisClient)).make(locationService)
 
     // create event service using host and port of event server.
