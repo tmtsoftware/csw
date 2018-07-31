@@ -4,7 +4,7 @@ import java.io.File
 import akka.actor.ActorSystem
 import csw.commons.redis.EmbeddedRedis
 import csw.services.alarm.api.exceptions.{InvalidSeverityException, KeyNotFoundException}
-import csw.services.alarm.api.models.AcknowledgementStatus.Acknowledged
+import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, UnAcknowledged}
 import csw.services.alarm.api.models.ActivationStatus.Active
 import csw.services.alarm.api.models.AlarmHealth.Bad
 import csw.services.alarm.api.models.AlarmSeverity._
@@ -136,22 +136,30 @@ class AlarmServiceImplTest extends FunSuite with Matchers with EmbeddedRedis wit
   test("should latch alarm only when it is high risk and higher than latched severity in case of latchable alarms") {
     val tromboneAxisHighLimitAlarm = AlarmKey("nfiraos", "trombone", "tromboneAxisHighLimitAlarm")
     val status                     = setSeverity(tromboneAxisHighLimitAlarm, Major)
-    status shouldEqual AlarmStatus(latchStatus = Latched, latchedSeverity = Major)
+    status shouldEqual AlarmStatus(acknowledgementStatus = Acknowledged, latchStatus = Latched, latchedSeverity = Major)
 
     val status1 = setSeverity(tromboneAxisHighLimitAlarm, Warning)
-    status1 shouldEqual AlarmStatus(latchStatus = Latched, latchedSeverity = Major)
+    status1 shouldEqual AlarmStatus(acknowledgementStatus = Acknowledged, latchStatus = Latched, latchedSeverity = Major)
 
     val status2 = setSeverity(tromboneAxisHighLimitAlarm, Okay)
-    status2 shouldEqual AlarmStatus(latchStatus = Latched, latchedSeverity = Major)
+    status2 shouldEqual AlarmStatus(acknowledgementStatus = Acknowledged, latchStatus = Latched, latchedSeverity = Major)
   }
 
   test("should not latch alarm if it is not latchable") {
     val cpuExceededAlarm = AlarmKey("TCS", "tcsPk", "cpuExceededAlarm")
     val status           = setSeverity(cpuExceededAlarm, Critical)
-    status shouldEqual AlarmStatus(latchStatus = UnLatched, latchedSeverity = Critical)
+    status shouldEqual AlarmStatus(acknowledgementStatus = Acknowledged, latchStatus = UnLatched, latchedSeverity = Critical)
 
     val status1 = setSeverity(cpuExceededAlarm, Indeterminate)
-    status1 shouldEqual AlarmStatus(latchStatus = UnLatched, latchedSeverity = Indeterminate)
+    status1 shouldEqual AlarmStatus(acknowledgementStatus = Acknowledged,
+                                    latchStatus = UnLatched,
+                                    latchedSeverity = Indeterminate)
+  }
+
+  test("should auto-acknowledge alarm only when it is auto-acknowledgable while setting severity") {
+    val tromboneAxisLowLimitAlarm = AlarmKey("nfiraos", "trombone", "tromboneAxisLowLimitAlarm")
+    val status1                   = setSeverity(tromboneAxisLowLimitAlarm, Major)
+    status1 shouldEqual AlarmStatus(acknowledgementStatus = UnAcknowledged, latchStatus = Latched, latchedSeverity = Major)
   }
 
   private def setSeverity(alarmKey: AlarmKey, alarmSeverity: AlarmSeverity): AlarmStatus = {

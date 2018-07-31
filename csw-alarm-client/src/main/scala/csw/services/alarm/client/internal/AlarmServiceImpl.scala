@@ -86,7 +86,7 @@ class AlarmServiceImpl(
     }
 
     // derive latch status for un-latchable alarms
-    if (((alarm.isLatchable && !severity.isHighRisk && status.latchStatus != Latched) || (!alarm.isLatchable)) && severity != currentSeverity) {
+    if (((alarm.isLatchable && status.latchStatus != Latched && !severity.isHighRisk) || (!alarm.isLatchable)) && severity != currentSeverity) {
       status = status.copy(latchedSeverity = severity)
       statusChanged = true
     }
@@ -139,8 +139,8 @@ class AlarmServiceImpl(
       if (currentSeverity != Okay) throw ResetOperationNotAllowed(key, currentSeverity)
 
       val status = await(statusApi.get(key)).getOrElse(AlarmStatus())
-      if (status.acknowledgementStatus == UnAcknowledged || status.latchStatus == Latched || status.latchedSeverity != Okay) {
-        val resetStatus = status.copy(acknowledgementStatus = Acknowledged, latchStatus = UnLatched, latchedSeverity = Okay)
+      if (status.acknowledgementStatus == Acknowledged || status.latchStatus == Latched || status.latchedSeverity != Okay) {
+        val resetStatus = status.copy(acknowledgementStatus = UnAcknowledged, latchStatus = UnLatched, latchedSeverity = Okay)
         await(statusApi.set(key, resetStatus))
       }
     } else throw KeyNotFoundException(key)
