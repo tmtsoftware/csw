@@ -32,7 +32,6 @@ import reactor.core.publisher.FluxSink.OverflowStrategy
 import scala.async.Async._
 import scala.concurrent.Future
 
-//why all apis are not call-by-name
 class AlarmServiceImpl(
     metadataApi: RedisAsyncScalaApi[MetadataKey, AlarmMetadata],
     severityApi: RedisAsyncScalaApi[SeverityKey, AlarmSeverity],
@@ -76,30 +75,28 @@ class AlarmServiceImpl(
     await(severityApi.setex(key, ttlInSeconds, severity))
 
     // get alarm status
-    var status        = await(statusApi.get(key)).getOrElse(AlarmStatus())
-    var statusChanged = false
+    val status    = await(statusApi.get(key)).getOrElse(AlarmStatus())
+    var newStatus = status
 
-    // derive latch status for latchable alarms
-    if (alarm.isLatchable && severity.isHighRisk && severity > status.latchedSeverity) {
-      status = status.copy(latchStatus = Latched, latchedSeverity = severity)
-      statusChanged = true
-    }
+    def shouldUpdateLatchStatus: Boolean                     = alarm.isLatchable && severity.isHighRisk
+    def shouldUpdateLatchedSeverityWhenLatchable: Boolean    = shouldUpdateWhenLactched || shouldUpdateWhenUnLactched
+    def shouldUpdateWhenLactched: Boolean                    = alarm.isLatchable && severity.isHighRisk && severity > status.latchedSeverity
+    def shouldUpdateWhenUnLactched: Boolean                  = alarm.isLatchable && status.latchStatus == UnLatched && !severity.isHighRisk
+    def shouldUpdateLatchedSeverityWhenNotLatchable: Boolean = !alarm.isLatchable
 
-    // derive latch status for un-latchable alarms
-    if (((alarm.isLatchable && status.latchStatus != Latched && !severity.isHighRisk) || (!alarm.isLatchable)) && severity != currentSeverity) {
-      status = status.copy(latchedSeverity = severity)
-      statusChanged = true
-    }
+    if (shouldUpdateLatchStatus) newStatus = newStatus.copy(latchStatus = Latched)
+
+    if (shouldUpdateLatchedSeverityWhenLatchable || shouldUpdateLatchedSeverityWhenNotLatchable)
+      newStatus = newStatus.copy(latchedSeverity = severity)
 
     // derive acknowledgement status
     if (severity.isHighRisk && severity != currentSeverity) {
-      if (alarm.isAutoAcknowledgeable) status = status.copy(acknowledgementStatus = Acknowledged)
-      else status = status.copy(acknowledgementStatus = UnAcknowledged)
-      statusChanged = true
+      if (alarm.isAutoAcknowledgeable) newStatus = newStatus.copy(acknowledgementStatus = Acknowledged)
+      else newStatus = newStatus.copy(acknowledgementStatus = UnAcknowledged)
     }
 
     // update alarm status only when severity changes
-    if (statusChanged) await(statusApi.set(key, status))
+    if (newStatus != status) await(statusApi.set(key, newStatus))
   }
 
   override def getSeverity(key: AlarmKey): Future[AlarmSeverity] = async {
