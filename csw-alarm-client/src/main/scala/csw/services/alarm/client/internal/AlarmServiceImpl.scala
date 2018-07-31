@@ -86,7 +86,7 @@ class AlarmServiceImpl(
     }
 
     // derive latch status for un-latchable alarms
-    if (!alarm.isLatchable && severity != currentSeverity) {
+    if (((alarm.isLatchable && !severity.isHighRisk && status.latchStatus != Latched) || (!alarm.isLatchable)) && severity != currentSeverity) {
       status = status.copy(latchedSeverity = severity)
       statusChanged = true
     }

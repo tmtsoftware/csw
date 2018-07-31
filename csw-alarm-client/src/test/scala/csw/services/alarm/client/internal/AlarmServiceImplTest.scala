@@ -10,7 +10,7 @@ import csw.services.alarm.api.models.ActivationStatus.Active
 import csw.services.alarm.api.models.AlarmHealth.Bad
 import csw.services.alarm.api.models.AlarmSeverity._
 import csw.services.alarm.api.models.Key.AlarmKey
-import csw.services.alarm.api.models.LatchStatus.Latched
+import csw.services.alarm.api.models.LatchStatus.{Latched, UnLatched}
 import csw.services.alarm.api.models.ShelveStatus.UnShelved
 import csw.services.alarm.api.models.{AlarmMetadata, AlarmSeverity, AlarmStatus, AlarmType}
 import csw.services.alarm.client.internal.AlarmCodec.{MetadataCodec, SeverityCodec, StatusCodec}
@@ -20,13 +20,13 @@ import io.lettuce.core.api.async.RedisAsyncCommands
 import io.lettuce.core.codec.Utf8StringCodec
 import io.lettuce.core.pubsub.api.reactive.RedisPubSubReactiveCommands
 import io.lettuce.core.{RedisClient, RedisURI}
-import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
+import org.scalatest._
 
 import scala.compat.java8.FutureConverters.CompletionStageOps
-import scala.concurrent.duration.DurationInt
-import scala.concurrent.{Await, ExecutionContext}
+import scala.concurrent.duration.{DurationInt, FiniteDuration}
+import scala.concurrent.{Await, Awaitable, ExecutionContext}
 
-class AlarmServiceImplTest extends FunSuite with Matchers with EmbeddedRedis with BeforeAndAfterAll {
+class AlarmServiceImplTest extends FunSuite with Matchers with EmbeddedRedis with BeforeAndAfterAll with BeforeAndAfterEach {
   private val alarmServer        = "AlarmServer"
   private val (sentinel, server) = startSentinel(26379, 6379, masterId = alarmServer)
 
@@ -38,18 +38,19 @@ class AlarmServiceImplTest extends FunSuite with Matchers with EmbeddedRedis wit
   implicit val system: ActorSystem  = ActorSystem()
   implicit val ec: ExecutionContext = system.dispatcher
 
-  private val alarmServiceFactory    = new AlarmServiceFactory(redisURI, redisClient)
+  private val alarmServiceFactory    = new AlarmServiceTestFactory(redisURI, redisClient)
   val alarmService: AlarmServiceImpl = alarmServiceFactory.make()
 
-  test("init alarms") {
-
+  override protected def beforeEach(): Unit = {
     val path = getClass.getResource("/test-alarms/valid-alarms.conf").getPath
+    val file = new File(path)
+    await(alarmService.initAlarms(file))
+  }
 
+  test("init alarms") {
     val alarmKey = AlarmKey("nfiraos", "trombone", "tromboneAxisHighLimitAlarm")
-    val file     = new File(path)
-    Await.result(alarmService.initAlarms(file), 5.seconds)
 
-    Await.result(alarmService.getMetadata(alarmKey), 5.seconds) shouldBe AlarmMetadata(
+    await(alarmService.getMetadata(alarmKey)) shouldBe AlarmMetadata(
       subsystem = "nfiraos",
       component = "trombone",
       name = "tromboneAxisHighLimitAlarm",
@@ -64,32 +65,31 @@ class AlarmServiceImplTest extends FunSuite with Matchers with EmbeddedRedis wit
       activationStatus = Active
     )
 
-    Await.result(alarmService.getStatus(alarmKey), 5.seconds) shouldBe AlarmStatus()
+    await(alarmService.getStatus(alarmKey)) shouldBe AlarmStatus()
 
-    Await.result(alarmService.getSeverity(alarmKey), 5.seconds) shouldBe Disconnected
+    await(alarmService.getSeverity(alarmKey)) shouldBe Disconnected
 
-    Await.result(alarmService.getAggregatedHealth(alarmKey), 5.seconds) shouldBe Bad
+    await(alarmService.getAggregatedHealth(alarmKey)) shouldBe Bad
 
   }
 
   test("test set severity") {
-    val path = getClass.getResource("/test-alarms/valid-alarms.conf").getPath
-    val file = new File(path)
-    Await.result(alarmService.initAlarms(file, reset = true), 5.seconds)
-
     val tromboneAxisHighLimitAlarm = AlarmKey("nfiraos", "trombone", "tromboneAxisHighLimitAlarm")
-    Await.result(alarmService.setSeverity(tromboneAxisHighLimitAlarm, AlarmSeverity.Major), 5.seconds)
+    //set severity to Major
+    val status = setSeverity(tromboneAxisHighLimitAlarm, Major)
+    status shouldEqual AlarmStatus(Acknowledged, Latched, Major, UnShelved)
 
-    val statusOpt = Await.result(alarmServiceFactory.statusAsyncApi.get(tromboneAxisHighLimitAlarm), 5.seconds)
+    //get severity and assert
+    val alarmSeverity = await(alarmServiceFactory.severityApi.get(tromboneAxisHighLimitAlarm)).get
+    alarmSeverity shouldEqual Major
 
-    statusOpt shouldEqual Some(AlarmStatus(Acknowledged, Latched, Major, UnShelved))
+    //wait for 1 second and assert expiry of severity
+    Thread.sleep(1000)
+    val severityAfter1Second = await(alarmService.getSeverity(tromboneAxisHighLimitAlarm))
+    severityAfter1Second shouldEqual Disconnected
   }
 
   test("should throw InvalidSeverityException when unsupported severity is provided") {
-    val path = getClass.getResource("/test-alarms/valid-alarms.conf").getPath
-    val file = new File(path)
-    Await.result(alarmService.initAlarms(file, reset = true), 5.seconds)
-
     val tromboneAxisHighLimitAlarm = AlarmKey("nfiraos", "trombone", "tromboneAxisHighLimitAlarm")
 
     intercept[InvalidSeverityException] {
@@ -129,10 +129,51 @@ class AlarmServiceImplTest extends FunSuite with Matchers with EmbeddedRedis wit
       activationStatus = Active
     )
   }
+
+  test("should not latch the alarm when it's latchable but not high risk") {
+    val tromboneAxisHighLimitAlarm = AlarmKey("nfiraos", "trombone", "tromboneAxisHighLimitAlarm")
+
+    //set severity to Okay
+    val status = setSeverity(tromboneAxisHighLimitAlarm, Okay)
+    status shouldEqual AlarmStatus(latchStatus = UnLatched, latchedSeverity = Okay)
+
+    //set severity to indeterminant
+    val status1 = setSeverity(tromboneAxisHighLimitAlarm, Indeterminate)
+    status1 shouldEqual AlarmStatus(latchStatus = UnLatched, latchedSeverity = Indeterminate)
+  }
+
+  test("should latch alarm only when it is high risk and higher than latched severity in case of latchable alarms") {
+    val tromboneAxisHighLimitAlarm = AlarmKey("nfiraos", "trombone", "tromboneAxisHighLimitAlarm")
+    val status                     = setSeverity(tromboneAxisHighLimitAlarm, Major)
+    status shouldEqual AlarmStatus(latchStatus = Latched, latchedSeverity = Major)
+
+    val status1 = setSeverity(tromboneAxisHighLimitAlarm, Warning)
+    status1 shouldEqual AlarmStatus(latchStatus = Latched, latchedSeverity = Major)
+
+    val status2 = setSeverity(tromboneAxisHighLimitAlarm, Okay)
+    status2 shouldEqual AlarmStatus(latchStatus = Latched, latchedSeverity = Major)
+  }
+
+  test("should not latch alarm if it is not latchable") {
+    val cpuExceededAlarm = AlarmKey("TCS", "tcsPk", "cpuExceededAlarm")
+    val status           = setSeverity(cpuExceededAlarm, Critical)
+    status shouldEqual AlarmStatus(latchStatus = UnLatched, latchedSeverity = Critical)
+
+    val status1 = setSeverity(cpuExceededAlarm, Indeterminate)
+    status1 shouldEqual AlarmStatus(latchStatus = UnLatched, latchedSeverity = Indeterminate)
+  }
+
+  private def setSeverity(alarmKey: AlarmKey, alarmSeverity: AlarmSeverity): AlarmStatus = {
+    await(alarmService.setSeverity(alarmKey, alarmSeverity))
+    await(alarmServiceFactory.statusApi.get(alarmKey)).get
+  }
+
+  private def await[T](awaitable: Awaitable[T], atMost: FiniteDuration = 5.seconds): T = {
+    Await.result(awaitable, atMost)
+  }
 }
 
-// Fixme: provide factory in main scope
-class AlarmServiceFactory(redisURI: RedisURI, redisClient: RedisClient)(implicit system: ActorSystem, ec: ExecutionContext)
+class AlarmServiceTestFactory(redisURI: RedisURI, redisClient: RedisClient)(implicit system: ActorSystem, ec: ExecutionContext)
     extends AlarmRW {
 
   private val metadataAsyncCommands: RedisAsyncCommands[MetadataKey, AlarmMetadata] =
@@ -144,18 +185,18 @@ class AlarmServiceFactory(redisURI: RedisURI, redisClient: RedisClient)(implicit
   private val reactiveCommands: RedisPubSubReactiveCommands[String, String] =
     Await.result(redisClient.connectPubSubAsync(new Utf8StringCodec(), redisURI).toScala.map(_.reactive()), 5.seconds)
 
-  val statusAsyncApi = new RedisAsyncScalaApi(statusAsyncCommands)
-  val metatdataApi   = new RedisAsyncScalaApi(metadataAsyncCommands)
-  val severityApi    = new RedisAsyncScalaApi(severityAsyncCommands)
+  val statusApi    = new RedisAsyncScalaApi(statusAsyncCommands)
+  val metatdataApi = new RedisAsyncScalaApi(metadataAsyncCommands)
+  val severityApi  = new RedisAsyncScalaApi(severityAsyncCommands)
 
   def make(): AlarmServiceImpl = new AlarmServiceImpl(
     metatdataApi,
     severityApi,
-    statusAsyncApi,
+    statusApi,
     () ⇒
       new RedisKeySpaceApi[StatusKey, AlarmStatus](
         () => new RedisReactiveScalaApi[String, String](reactiveCommands),
-        statusAsyncApi
+        statusApi
     ),
     new ShelveTimeoutActorFactory()
   )

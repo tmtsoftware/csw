@@ -9,8 +9,6 @@ import io.lettuce.core.codec.Utf8StringCodec
 import ujson.Js
 import upickle.default._
 
-import scala.util.control.NonFatal
-
 class AlarmCodec[K: ReadWriter, V: ReadWriter] extends RedisKeySpaceCodec[K, V] {
   private lazy val utf8StringCodec = new Utf8StringCodec()
 
@@ -27,14 +25,5 @@ class AlarmCodec[K: ReadWriter, V: ReadWriter] extends RedisKeySpaceCodec[K, V] 
 object AlarmCodec extends AlarmRW {
   implicit object MetadataCodec extends AlarmCodec[MetadataKey, AlarmMetadata]
   implicit object StatusCodec   extends AlarmCodec[StatusKey, AlarmStatus]
-  implicit object SeverityCodec extends AlarmCodec[SeverityKey, AlarmSeverity] {
-    override def decodeValue(byteBuf: ByteBuffer): AlarmSeverity = {
-      //TODO: get rid of try-catch? what about events?
-      try {
-        super.decodeValue(byteBuf)
-      } catch {
-        case NonFatal(_) ⇒ AlarmSeverity.Disconnected // if severity expires than cast the null returned value to Disconnected
-      }
-    }
-  }
+  implicit object SeverityCodec extends AlarmCodec[SeverityKey, AlarmSeverity]
 }
