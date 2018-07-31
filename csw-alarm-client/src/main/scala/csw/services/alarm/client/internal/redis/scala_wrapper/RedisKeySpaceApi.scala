@@ -9,7 +9,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class RedisKeySpaceApi[TKey, TValue](
     keyspaceApiFactory: () => RedisReactiveScalaApi[String, String],
-    redisAsyncScalaApi: RedisAsyncScalaApi[TKey, TValue],
+    redisAsyncScalaApi: RedisAsyncScalaApi[TKey, TValue]
 )(implicit redisKeySpaceCodec: RedisKeySpaceCodec[TKey, TValue], ec: ExecutionContext) {
 
   def watchKeyspaceValue(
