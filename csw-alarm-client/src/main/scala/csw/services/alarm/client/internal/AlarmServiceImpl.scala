@@ -18,7 +18,7 @@ import csw.services.alarm.api.models.ShelveStatus.{Shelved, UnShelved}
 import csw.services.alarm.api.models._
 import csw.services.alarm.api.scaladsl.{AlarmAdminService, AlarmSubscription}
 import csw.services.alarm.client.internal.configparser.ConfigParser
-import csw.services.alarm.client.internal.redis.scala_wrapper.{RedisAsyncScalaApi, RedisStreamApi}
+import csw.services.alarm.client.internal.redis.scala_wrapper.{RedisAsyncScalaApi, RedisKeySpaceApi}
 import csw.services.alarm.client.internal.shelve.ShelveTimeoutActorFactory
 import csw.services.alarm.client.internal.shelve.ShelveTimeoutMessage.{CancelShelveTimeout, ScheduleShelveTimeout}
 import io.lettuce.core.KeyValue
@@ -32,7 +32,7 @@ class AlarmServiceImpl(
     metadataApi: RedisAsyncScalaApi[MetadataKey, AlarmMetadata],
     severityApi: RedisAsyncScalaApi[SeverityKey, AlarmSeverity],
     statusApi: RedisAsyncScalaApi[StatusKey, AlarmStatus],
-    statusStreamApiFactory: () ⇒ RedisStreamApi[StatusKey, AlarmStatus],
+    statusStreamApiFactory: () ⇒ RedisKeySpaceApi[StatusKey, AlarmStatus],
     shelveTimeoutActorFactory: ShelveTimeoutActorFactory
 )(implicit actorSystem: ActorSystem)
     extends AlarmAdminService {

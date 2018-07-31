@@ -10,9 +10,10 @@ import csw.services.alarm.api.models.AlarmSeverity._
 import csw.services.alarm.api.models.Key.AlarmKey
 import csw.services.alarm.api.models.{AlarmMetadata, AlarmSeverity, AlarmStatus, AlarmType}
 import csw.services.alarm.client.internal.AlarmCodec.{MetadataCodec, SeverityCodec, StatusCodec}
-import csw.services.alarm.client.internal.redis.scala_wrapper.{RedisAsyncScalaApi, RedisReactiveScalaApi}
+import csw.services.alarm.client.internal.redis.scala_wrapper.{RedisAsyncScalaApi, RedisKeySpaceApi, RedisReactiveScalaApi}
 import csw.services.alarm.client.internal.shelve.ShelveTimeoutActorFactory
 import io.lettuce.core.api.async.RedisAsyncCommands
+import io.lettuce.core.codec.Utf8StringCodec
 import io.lettuce.core.pubsub.api.reactive.RedisPubSubReactiveCommands
 import io.lettuce.core.{RedisClient, RedisURI}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
@@ -73,27 +74,29 @@ class AlarmServiceImplTest extends FunSuite with Matchers with EmbeddedRedis wit
 class AlarmServiceFactory(redisURI: RedisURI, redisClient: RedisClient)(implicit system: ActorSystem, ec: ExecutionContext)
     extends AlarmRW {
 
-  // Fixme
-  object AggregateCodec0 extends AlarmCodec[AggregateKey, String]
-
   val metadataAsyncCommandsF: Future[RedisAsyncCommands[MetadataKey, AlarmMetadata]] =
     redisClient.connectAsync(MetadataCodec, redisURI).toScala.map(_.async())
   val statusAsyncCommandsF: Future[RedisAsyncCommands[StatusKey, AlarmStatus]] =
     redisClient.connectAsync(StatusCodec, redisURI).toScala.map(_.async())
   val severityAsyncCommandsF: Future[RedisAsyncCommands[SeverityKey, AlarmSeverity]] =
     redisClient.connectAsync(SeverityCodec, redisURI).toScala.map(_.async())
-  val aggregateReactiveCommandsF: Future[RedisPubSubReactiveCommands[AggregateKey, String]] =
-    redisClient.connectPubSubAsync(AggregateCodec0, redisURI).toScala.map(_.reactive())
+  val reactiveCommandsF: Future[RedisPubSubReactiveCommands[String, String]] =
+    redisClient.connectPubSubAsync(new Utf8StringCodec(), redisURI).toScala.map(_.reactive())
 
   def make(): Future[AlarmServiceImpl] = async {
 
-    val value = await(aggregateReactiveCommandsF)
+    val reactiveCommands = await(reactiveCommandsF)
 
+    val statusAsyncApi = new RedisAsyncScalaApi(await(statusAsyncCommandsF))
     new AlarmServiceImpl(
       new RedisAsyncScalaApi(await(metadataAsyncCommandsF)),
       new RedisAsyncScalaApi(await(severityAsyncCommandsF)),
-      new RedisAsyncScalaApi(await(statusAsyncCommandsF)),
-      new RedisReactiveScalaApi(value),
+      statusAsyncApi,
+      () ⇒
+        new RedisKeySpaceApi[StatusKey, AlarmStatus](
+          () => new RedisReactiveScalaApi[String, String](reactiveCommands),
+          statusAsyncApi
+      ),
       new ShelveTimeoutActorFactory()
     )
 

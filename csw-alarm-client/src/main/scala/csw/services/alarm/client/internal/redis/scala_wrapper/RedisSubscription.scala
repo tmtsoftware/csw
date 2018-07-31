@@ -6,7 +6,7 @@ import scala.async.Async.{async, await}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class RedisSubscription[TKey] private[Alarm] (
+class RedisSubscription[TKey](
     keys: List[TKey],
     subscriptionF: Future[Unit],
     killSwitch: KillSwitch,
