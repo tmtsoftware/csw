@@ -17,6 +17,7 @@ addSbtPlugin("com.orrsella"                      % "sbt-stats"                  
 addSbtPlugin("io.github.jonas"                   % "sbt-paradox-material-theme" % "0.4.0")
 addSbtPlugin("de.johoop"                         % "sbt-testng-plugin"          % "3.1.1")
 addSbtPlugin("io.spray"                          % "sbt-revolver"               % "0.9.1")
+addSbtPlugin("com.typesafe.sbt"                  % "sbt-git"                    % "1.0.0")
 
 resolvers += "Jenkins repo" at "http://repo.jenkins-ci.org/public/"
 addSbtPlugin("ohnosequences" % "sbt-github-release" % "0.7.0")
