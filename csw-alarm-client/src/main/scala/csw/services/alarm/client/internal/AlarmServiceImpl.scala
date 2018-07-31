@@ -7,11 +7,16 @@ import akka.actor.typed.ActorRef
 import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{ActorMaterializer, Materializer}
 import com.typesafe.config.{ConfigFactory, ConfigResolveOptions}
-import csw.services.alarm.api.exceptions.{InvalidSeverityException, NoAlarmsFoundException, ResetOperationFailedException}
+import csw.services.alarm.api.exceptions.{
+  InvalidSeverityException,
+  KeyNotFoundException,
+  NoAlarmsFoundException,
+  ResetOperationNotAllowed
+}
 import csw.services.alarm.api.internal.{MetadataKey, SeverityKey, StatusKey}
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, UnAcknowledged}
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
-import csw.services.alarm.api.models.AlarmSeverity.Okay
+import csw.services.alarm.api.models.AlarmSeverity.{Disconnected, Okay}
 import csw.services.alarm.api.models.Key.{AlarmKey, GlobalKey}
 import csw.services.alarm.api.models.LatchStatus.{Latched, UnLatched}
 import csw.services.alarm.api.models.ShelveStatus.{Shelved, UnShelved}
@@ -58,20 +63,20 @@ class AlarmServiceImpl(
 
   override def setSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Unit] = async {
     // get alarm metadata
-    val alarm = await(metadataApi.get(key))
+    val alarm = await(metadataApi.get(key)).getOrElse(throw KeyNotFoundException(key))
 
     // validate if the provided severity is supported by this alarm
     if (!alarm.allSupportedSeverities.contains(severity))
       throw InvalidSeverityException(key, alarm.allSupportedSeverities, severity)
 
     // get the current severity of the alarm
-    val currentSeverity = await(severityApi.get(key))
+    val currentSeverity = await(severityApi.get(key)).getOrElse(Disconnected)
 
     // set the severity of the alarm so that it does not transition to `Disconnected` state
     await(severityApi.setex(key, ttlInSeconds, severity))
 
     // get alarm status
-    var status        = await(statusApi.get(key))
+    var status        = await(statusApi.get(key)).getOrElse(AlarmStatus())
     var statusChanged = false
 
     // derive latch status for latchable alarms
@@ -97,11 +102,11 @@ class AlarmServiceImpl(
     if (statusChanged) await(statusApi.set(key, status))
   }
 
-  override def getSeverity(key: AlarmKey): Future[AlarmSeverity] = severityApi.get(key)
+  override def getSeverity(key: AlarmKey): Future[Option[AlarmSeverity]] = severityApi.get(key)
 
-  override def getStatus(key: AlarmKey): Future[AlarmStatus] = statusApi.get(key)
+  override def getStatus(key: AlarmKey): Future[Option[AlarmStatus]] = statusApi.get(key)
 
-  override def getMetadata(key: AlarmKey): Future[AlarmMetadata] = metadataApi.get(key)
+  override def getMetadata(key: AlarmKey): Future[Option[AlarmMetadata]] = metadataApi.get(key)
 
   override def getMetadata(key: Key): Future[List[AlarmMetadata]] = async {
     val metadataKeys = await(metadataApi.keys(key))
@@ -110,26 +115,31 @@ class AlarmServiceImpl(
   }
 
   override def acknowledge(key: AlarmKey): Future[Unit] = async {
-    val status = await(statusApi.get(key))
-    if (status.acknowledgementStatus == UnAcknowledged) // save the set call if status is already Acknowledged
-      await(statusApi.set(key, status.copy(acknowledgementStatus = Acknowledged)))
+    if (await(metadataApi.exists(key))) {
+      val status = await(statusApi.get(key)).getOrElse(AlarmStatus())
+
+      if (status.acknowledgementStatus == UnAcknowledged) // save the set call if status is already Acknowledged
+        await(statusApi.set(key, status.copy(acknowledgementStatus = Acknowledged)))
+    } else throw KeyNotFoundException(key)
   }
 
   // reset is only called when severity is `Okay`
   override def reset(key: AlarmKey): Future[Unit] = async {
-    val currentSeverity = await(severityApi.get(key))
+    if (await(metadataApi.exists(key))) {
+      val currentSeverity = await(severityApi.get(key)).getOrElse(Disconnected)
 
-    if (currentSeverity != Okay) throw ResetOperationFailedException(key, currentSeverity)
+      if (currentSeverity != Okay) throw ResetOperationNotAllowed(key, currentSeverity)
 
-    val status = await(statusApi.get(key))
-    if (status.acknowledgementStatus == UnAcknowledged || status.latchStatus == Latched || status.latchedSeverity != Okay) {
-      val resetStatus = status.copy(acknowledgementStatus = Acknowledged, latchStatus = UnLatched, latchedSeverity = Okay)
-      await(statusApi.set(key, resetStatus))
-    }
+      val status = await(statusApi.get(key)).getOrElse(AlarmStatus())
+      if (status.acknowledgementStatus == UnAcknowledged || status.latchStatus == Latched || status.latchedSeverity != Okay) {
+        val resetStatus = status.copy(acknowledgementStatus = Acknowledged, latchStatus = UnLatched, latchedSeverity = Okay)
+        await(statusApi.set(key, resetStatus))
+      }
+    } else throw KeyNotFoundException(key)
   }
 
   override def shelve(key: AlarmKey): Future[Unit] = async {
-    val status = await(statusApi.get(key))
+    val status = await(statusApi.get(key)).getOrElse(AlarmStatus())
     if (status.shelveStatus != Shelved) {
       await(statusApi.set(key, status.copy(shelveStatus = Shelved)))
       shelveTimeoutRef ! ScheduleShelveTimeout(key) // start shelve timeout for this alarm (default 8 AM local time)
@@ -140,8 +150,8 @@ class AlarmServiceImpl(
   override def unShelve(key: AlarmKey): Future[Unit] = unShelve(key, cancelShelveTimeout = true)
 
   private def unShelve(key: AlarmKey, cancelShelveTimeout: Boolean): Future[Unit] = async {
-    //TODO: decide whether to unshelve an alarm when it goes to okay
-    val status = await(statusApi.get(key))
+    //TODO: decide whether to  unshelve an alarm when it goes to okay
+    val status = await(statusApi.get(key)).getOrElse(AlarmStatus())
     if (status.shelveStatus != UnShelved) {
       await(statusApi.set(key, status.copy(shelveStatus = UnShelved)))
       // if in case of manual un-shelve operation, cancel the scheduled timer for this alarm
@@ -153,20 +163,20 @@ class AlarmServiceImpl(
   }
 
   override def activate(key: AlarmKey): Future[Unit] = async {
-    val metadata = await(metadataApi.get(key))
+    val metadata = await(metadataApi.get(key)).getOrElse(throw KeyNotFoundException(key))
     if (!metadata.isActive) await(metadataApi.set(key, metadata.copy(activationStatus = Active)))
   }
 
   override def deActivate(key: AlarmKey): Future[Unit] = async {
-    val metadata = await(metadataApi.get(key))
+    val metadata = await(metadataApi.get(key)).getOrElse(throw KeyNotFoundException(key))
     if (metadata.isActive) await(metadataApi.set(key, metadata.copy(activationStatus = Inactive)))
   }
 
   override def getAggregatedSeverity(key: Key): Future[AlarmSeverity] = async {
     val statusKeys = await(statusApi.keys(key))
-    val metadata   = await(metadataApi.get(key))
-
     if (statusKeys.isEmpty) throw NoAlarmsFoundException()
+
+    val metadata = await(metadataApi.get(key)).getOrElse(throw KeyNotFoundException(key))
 
     val statusList = await(statusApi.mget(statusKeys))
     statusList
@@ -213,14 +223,19 @@ class AlarmServiceImpl(
       }
   }
 
-  private def setAlarmStore(alarmMetadataSet: AlarmMetadataSet) =
-    Future
-      .traverse(alarmMetadataSet.alarms) { alarmMetadata ⇒
-        val alarmKey = alarmMetadata.alarmKey
-        metadataApi.set(alarmKey, alarmMetadata)
-        statusApi.set(alarmKey, AlarmStatus())
-        severityApi.set(alarmKey, AlarmSeverity.Disconnected)
-      }
+  private def setAlarmStore(alarmMetadataSet: AlarmMetadataSet) = {
+    val alarms = alarmMetadataSet.alarms
+
+    val metadataMap = alarms.map(metadata ⇒ MetadataKey.fromAlarmKey(metadata.alarmKey) → metadata).toMap
+    val statusMap   = alarms.map(metadata ⇒ StatusKey.fromAlarmKey(metadata.alarmKey)   → AlarmStatus()).toMap
+
+    Future.sequence(
+      List(
+        metadataApi.mset(metadataMap),
+        statusApi.mset(statusMap)
+      )
+    )
+  }
 
   private def resetAlarmStore() =
     Future

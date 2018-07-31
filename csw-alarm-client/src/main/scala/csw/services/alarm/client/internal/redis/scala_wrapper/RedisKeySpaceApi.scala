@@ -29,14 +29,13 @@ class RedisKeySpaceApi[TKey, TValue](
       val patternSource = redisReactiveScalaApi.observePatterns(overflowStrategy)
       patternSource
         .filter(pm => pm.getMessage == "set")
-        .mapAsync(1)(pm => {
-          val key   = redisKeySpaceCodec.fromKeyString(pm.getChannel)
-          val value = redisAsyncScalaApi.get(key)
-          value.map(v => (key, v))
-        })
-        .map({
-          case (k, v) => RedisResult(k, v)
-        })
+        .mapAsync(1) { pm =>
+          val key = redisKeySpaceCodec.fromKeyString(pm.getChannel)
+          redisAsyncScalaApi.get(key).map(valueOpt ⇒ valueOpt.map(value ⇒ (key, value)))
+        }
+        .collect {
+          case Some((k, v)) ⇒ RedisResult(k, v)
+        }
         .distinctUntilChanged
     }
 
