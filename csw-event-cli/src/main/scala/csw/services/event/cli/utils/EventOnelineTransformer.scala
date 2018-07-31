@@ -9,26 +9,18 @@ import csw.services.event.cli.args.Options
 class EventOnelineTransformer(options: Options) {
 
   def transform(events: Seq[Event]): List[String] = {
-    if (options.terse) events.flatMap(e => transformTerse(e)).toList
-    else Formatter.eventSeparator :: events.flatMap(e ⇒ transform(e)).toList
-  }
-  def transformTerse(event: Event): List[String] = {
-    val onelineFormatter = OnelineFormatter(options)
-    val onelines =
-      if (event.isInvalid) Formatter.invalidKey(event.eventKey)
-      else onelineFormatter.format(event, traverse(event.paramSet, options.paths(event.eventKey)))
-    List(onelines)
+    val onelines = events.flatMap(e ⇒ transform(e)).toList
+    if (options.isTerseOut) onelines else Formatter.eventSeparator :: onelines
   }
 
   def transform(event: Event): List[String] = {
     val onelineFormatter = OnelineFormatter(options)
-    val eventHeader      = onelineFormatter.header(event)
-
     val onelines =
       if (event.isInvalid) Formatter.invalidKey(event.eventKey)
-      else onelineFormatter.format(event, traverse(event.paramSet, options.paths(event.eventKey)))
+      else onelineFormatter.format(traverse(event.paramSet, options.paths(event.eventKey)))
 
-    List(eventHeader, onelines, Formatter.eventSeparator)
+    if (options.isOnelineOut) List(onelineFormatter.header(event), onelines, Formatter.eventSeparator)
+    else List(onelines)
   }
 
   private def makeCurrentPath(param: Parameter[_], parentKey: Option[String]) =

@@ -14,24 +14,21 @@ object Formatter {
 
 case class OnelineFormatter(options: Options) {
 
-  def format(event: Event, lines: List[Oneline]): String = {
-    if (options.terse) {
-      lines
-        .map { line =>
-          line.terse()
-        }
-        .mkString("\n")
-    } else {
-      lines
-        .map { line =>
-          if (options.printValues && options.printUnits) line.withValuesAndUnits()
-          else if (options.printValues) line.withValues()
-          else line.withKeyTypeAndUnits()
-        }
-        .sorted
-        .mkString("\n")
-    }
-  }
+  def format(lines: List[Oneline]): String =
+    if (options.isOnelineOut) formatOnelineOutput(lines)
+    else formatTerseOutput(lines)
+
+  private def formatOnelineOutput(lines: List[Oneline]) =
+    lines
+      .map { line ⇒
+        if (options.printValues && options.printUnits) line.withValuesAndUnits()
+        else if (options.printValues) line.withValues()
+        else line.withKeyTypeAndUnits()
+      }
+      .sorted
+      .mkString("\n")
+
+  private def formatTerseOutput(lines: List[Oneline]) = lines.map(_.terse).mkString("\n")
 
   def header(event: Event): String = {
     val timestamp = if (options.printTimestamp) s"Timestamp: ${event.eventTime.time.toString}" else ""
@@ -52,7 +49,6 @@ case class Oneline(path: String, param: Parameter[_]) {
       case _         ⇒ param.values
     }
 
-    //paramValues.mkString("[", ", ", "]")
     paramValues.mkString(", ")
   }
 
@@ -67,5 +63,5 @@ case class Oneline(path: String, param: Parameter[_]) {
     List(path, str).mkString(onelineSeparator)
   }
 
-  def terse(): String = values
+  def terse: String = values
 }

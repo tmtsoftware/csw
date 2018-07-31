@@ -33,8 +33,9 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
 
   def get(options: Options): Future[Unit] = async {
     val events = await(getEvents(options.eventsMap.keys.toSeq))
-    if (options.isOneline) new EventOnelineTransformer(options).transform(events).foreach(printLine)
-    else events.foreach(event ⇒ processGetJson(event, options))
+    if (options.isJsonOut)
+      events.foreach(event ⇒ processGetJson(event, options))
+    else new EventOnelineTransformer(options).transform(events).foreach(printLine)
   }
 
   def publish(options: Options): Future[Done] = async {
@@ -56,13 +57,11 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
       case None           => subscriberF.map(_.subscribe(keys))
     }
 
-    if (options.isOneline && !options.terse) printLine(Formatter.eventSeparator)
+    if (options.isOnelineOut) printLine(Formatter.eventSeparator)
 
     val (subscriptionF, doneF) = Source
       .fromFutureSource(eventStream)
-      .toMat(Sink.foreach { event =>
-        processEvent(options, event)
-      })(Keep.both)
+      .toMat(Sink.foreach(processEvent(options, _)))(Keep.both)
       .run()
 
     coordinatedShutdown.addTask(
@@ -74,9 +73,8 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
   }
 
   private def processEvent(options: Options, event: Event): Unit =
-    if (options.terse) new EventOnelineTransformer(options).transformTerse(event).foreach(printLine)
-    else if (options.isOneline) new EventOnelineTransformer(options).transform(event).foreach(printLine)
-    else processGetJson(event, options)
+    if (options.isJsonOut) processGetJson(event, options)
+    else new EventOnelineTransformer(options).transform(event).foreach(printLine)
 
   private def processGetJson(event: Event, options: Options): Unit = {
     if (event.isInvalid) printLine(Formatter.invalidKey(event.eventKey))

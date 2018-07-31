@@ -12,7 +12,6 @@ class EventServiceCreationExamples {
 
   implicit val actorSystem: ActorSystem = ActorSystemFactory.remote()
   private val locationService           = LocationServiceFactory.withSystem(actorSystem)
-  private val redisClient               = RedisClient.create()
 
   def defaultEventService(): Unit = {
     //#default-event-service

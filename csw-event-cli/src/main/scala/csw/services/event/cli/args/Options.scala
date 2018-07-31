@@ -20,9 +20,10 @@ case class Options(
     printUnits: Boolean = false,
     maybeInterval: Option[FiniteDuration] = None,
     period: FiniteDuration = (Int.MaxValue / 1000).seconds,
-    terse: Boolean = false
 ) {
-  def isOneline: Boolean                 = out == "oneline"
+  def isJsonOut: Boolean                 = out == "json"
+  def isOnelineOut: Boolean              = out == "oneline"
+  def isTerseOut: Boolean                = out == "terse"
   def printValues: Boolean               = cmd != "inspect"
   def paths(key: EventKey): List[String] = eventsMap.getOrElse(key, Nil).toList
 }

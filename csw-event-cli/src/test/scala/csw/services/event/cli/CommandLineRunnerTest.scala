@@ -78,9 +78,9 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
 
     // note: terse does not sort parameters
     commandLineRunner
-      .get(argsParser.parse(Seq("get", "--terse", "-e", s"${event1.eventKey},${event2.eventKey}")).get)
+      .get(argsParser.parse(Seq("get", "-e", s"${event1.eventKey},${event2.eventKey}", "--out", "terse")).get)
       .await
-    logBuffer shouldEqualContentsOf "oneline/get_multiple_events_terse.txt"
+    logBuffer shouldEqualContentsOf "terse/get_multiple_events.txt"
   }
 
   // DEOPSCSW-432: [Event Cli] Publish command
@@ -236,7 +236,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
     val publisher          = eventService.defaultPublisher.await
 
     val (subscriptionF, _) =
-      commandLineRunner.subscribe(argsParser.parse(Seq("subscribe", "--events", eventKey.key, "--terse")).get)
+      commandLineRunner.subscribe(argsParser.parse(Seq("subscribe", "--events", eventKey.key, "--out", "terse")).get)
 
     Thread.sleep(500)
     val cancellable = publisher.publish(eventGenerator.generate, 400.millis)
@@ -245,7 +245,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
     cancellable.cancel()
     subscriptionF.map(_.unsubscribe())
 
-    logBuffer shouldEqualContentsOf "oneline/entire_events_terse.txt"
+    logBuffer shouldEqualContentsOf "terse/entire_events.txt"
   }
 
   // publish command generates new id and event time while publishing, hence assertions exclude these keys from json

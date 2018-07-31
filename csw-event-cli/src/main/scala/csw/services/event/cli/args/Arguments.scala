@@ -90,7 +90,7 @@ trait Arguments { self: OptionParser[Options] =>
 
   def out: OptionDef[String, Options] =
     opt[String]('o', "out")
-      .valueName("oneline|json")
+      .valueName("terse|oneline|json")
       .action((x, c) => c.copy(out = x))
       .text("output format, default is oneline")
 
@@ -108,9 +108,4 @@ trait Arguments { self: OptionParser[Options] =>
     opt[Unit]('u', "units")
       .action((_, c) => c.copy(printUnits = true))
       .text("display units")
-
-  def terse: OptionDef[Unit, Options] =
-    opt[Unit]("terse")
-      .action((_, c) => c.copy(terse = true))
-      .text("terse mode (display value only)")
 }
