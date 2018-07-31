@@ -141,8 +141,7 @@ class AlarmServiceImpl(
   override def reset(key: AlarmKey): Future[Unit] = async {
     log.debug(s"Reset alarm [${key.value}]")
     if (await(metadataApi.exists(key))) {
-      val currentSeverity = await(severityApi.get(key)).getOrElse(Disconnected)
-
+      val currentSeverity = await(getSeverity(key))
       if (currentSeverity != Okay) throw afterLogging(ResetOperationNotAllowed(key, currentSeverity))
 
       val status = await(statusApi.get(key)).getOrElse(AlarmStatus())
