@@ -96,6 +96,37 @@ class AlarmServiceImplTest extends FunSuite with Matchers with EmbeddedRedis wit
       Await.result(alarmService.setSeverity(tromboneAxisHighLimitAlarm, AlarmSeverity.Critical), 5.seconds)
     }
   }
+
+  test("should reset the previous Alarm data in redis and set newly provided") {
+
+    val threeAlarmConfigPath = getClass.getResource("/test-alarms/valid-alarms.conf").getPath
+    val twoAlarmConfigPath   = getClass.getResource("/test-alarms/two-valid-alarms.conf").getPath
+
+    val nfiraosAlarmKey = AlarmKey("nfiraos", "cc.trombone", "tromboneAxisHighLimitAlarm")
+    val tcpAlarmKey     = AlarmKey("tcp", "tcsPk", "cpuExceededAlarm")
+    val firstFile       = new File(threeAlarmConfigPath)
+    val secondFile      = new File(twoAlarmConfigPath)
+    Await.result(alarmService.initAlarms(firstFile), 5.seconds)
+
+    Await.result(alarmService.initAlarms(secondFile, true), 5.seconds)
+
+    Await.result(alarmService.getMetadata(tcpAlarmKey), 3.seconds) shouldBe null
+
+    Await.result(alarmService.getMetadata(nfiraosAlarmKey), 5.seconds) shouldBe AlarmMetadata(
+      subsystem = "nfiraos",
+      component = "cc.trombone",
+      name = "tromboneAxisHighLimitAlarm",
+      description = "Warns when trombone axis has reached the high limit",
+      location = "south side",
+      AlarmType.Absolute,
+      Set(Indeterminate, Okay, Warning, Major, Critical),
+      probableCause = "the trombone software has failed or the stage was driven into the high limit",
+      operatorResponse = "go to the NFIRAOS engineering user interface and select the datum axis command",
+      isAutoAcknowledgeable = true,
+      isLatchable = true,
+      activationStatus = Active
+    )
+  }
 }
 
 // Fixme: provide factory in main scope
