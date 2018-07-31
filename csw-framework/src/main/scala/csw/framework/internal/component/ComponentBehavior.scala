@@ -24,7 +24,7 @@ import csw.messages.RunningMessage.Lifecycle
 import csw.messages.TopLevelActorCommonMessage.{TrackingEventReceived, UnderlyingHookFailed}
 import csw.messages.TopLevelActorIdleMessage.Initialize
 import csw.messages._
-import csw.messages.commands.Responses._
+import csw.messages.commands.CommandResponse._
 import csw.services.command.CommandResponseManager
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
@@ -202,7 +202,7 @@ private[framework] final class ComponentBehavior(
           case _: Accepted =>
             // Here the submit is marked as started, to indicate that the command has started processing
             // This is needed because someone might do something in the doSubmit like subscribe -- this may be
-            // a feature of certain tests, but it does seem possible that something should be in the CRM once validated
+            // a feature of certain tests, but it does seem possible that something should be in the CRM once underway
             // Prefer not to add a new unique response that would only be relevant to the internals
             commandResponseManager.commandResponseManagerActor ! AddOrUpdateCommand(commandMessage.command.runId,
                                                                                     Started(commandMessage.command.runId))

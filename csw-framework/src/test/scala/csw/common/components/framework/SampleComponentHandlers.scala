@@ -16,7 +16,7 @@ import csw.logging.scaladsl.Logger
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandIssue.OtherIssue
 import csw.messages.commands.{CommandName, ControlCommand, Observe, Setup}
-import csw.messages.commands.Responses._
+import csw.messages.commands.CommandResponse._
 import csw.messages.events.{Event, EventName, SystemEvent}
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location.{LocationRemoved, LocationUpdated, TrackingEvent}

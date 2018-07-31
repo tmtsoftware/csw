@@ -15,7 +15,7 @@ import csw.command.scaladsl.CommandService
 import csw.config.api.models.ConfigData
 import csw.logging.scaladsl.Logger
 import csw.messages.TopLevelActorMessage
-import csw.messages.commands.Responses.{Accepted, Completed, SubmitResponse, ValidationResponse}
+import csw.messages.commands.CommandResponse.{Accepted, Completed, SubmitResponse, ValidationResponse}
 import csw.messages.commands._
 import csw.messages.location._
 import csw.services.command.scaladsl.CommandService

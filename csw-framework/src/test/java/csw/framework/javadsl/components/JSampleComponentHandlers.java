@@ -70,12 +70,12 @@ public class JSampleComponentHandlers extends JComponentHandlers {
 
     @Override
     /// TODO - probbably need to make this work when running tests
-    public Responses.SubmitResponse onSubmit(ControlCommand controlCommand) {
+    public CommandResponse.SubmitResponse onSubmit(ControlCommand controlCommand) {
         // Adding item from CommandMessage paramset to ensure things are working
         CurrentState submitState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.submitCommandChoice()));
         currentStatePublisher.publish(submitState);
         processCommand(controlCommand);
-        return new Responses.Completed(controlCommand.runId());
+        return new CommandResponse.Completed(controlCommand.runId());
     }
 
     @Override
@@ -87,7 +87,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     }
 
     @Override
-    public Responses.ValidationResponse validateCommand(ControlCommand controlCommand) {
+    public CommandResponse.ValidationResponse validateCommand(ControlCommand controlCommand) {
         CurrentState submitState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.commandValidationChoice()));
         currentStatePublisher.publish(submitState);
 // TODO -- need to fix this by moving some to process command with submit
@@ -104,9 +104,9 @@ public class JSampleComponentHandlers extends JComponentHandlers {
             return accepted;
 
         } else */ if (controlCommand.commandName().name().contains("failure")) {
-            return new Responses.Invalid(controlCommand.runId(), new CommandIssue.OtherIssue("Testing: Received failure, will return Invalid."));
+            return new CommandResponse.Invalid(controlCommand.runId(), new CommandIssue.OtherIssue("Testing: Received failure, will return Invalid."));
         } else {
-            return new Responses.Accepted(controlCommand.runId());
+            return new CommandResponse.Accepted(controlCommand.runId());
         }
     }
 
@@ -134,13 +134,13 @@ public class JSampleComponentHandlers extends JComponentHandlers {
 
         if (controlCommand.commandName().equals(failureAfterValidationCmd())) {
             // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
-            CompletableFuture<Responses.SubmitResponse> status = commandResponseManager.jQuery(controlCommand.runId(), Timeout.apply(100, TimeUnit.MILLISECONDS));
+            CompletableFuture<CommandResponse.SubmitResponse> status = commandResponseManager.jQuery(controlCommand.runId(), Timeout.apply(100, TimeUnit.MILLISECONDS));
             status.thenAccept(response -> {
-                if(response instanceof Responses.Invalid)
-                    commandResponseManager.addOrUpdateCommand(controlCommand.runId(), new Responses.Error(controlCommand.runId(), "Unknown Error occurred"));
+                if(response instanceof CommandResponse.Invalid)
+                    commandResponseManager.addOrUpdateCommand(controlCommand.runId(), new CommandResponse.Error(controlCommand.runId(), "Unknown Error occurred"));
             });
         } else {
-             commandResponseManager.addOrUpdateCommand(controlCommand.runId(), new Responses.Completed(controlCommand.runId()));
+             commandResponseManager.addOrUpdateCommand(controlCommand.runId(), new CommandResponse.Completed(controlCommand.runId()));
         }
 
     }

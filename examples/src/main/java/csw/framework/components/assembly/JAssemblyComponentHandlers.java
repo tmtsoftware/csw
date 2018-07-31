@@ -67,6 +67,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
         configClient = JConfigClientFactory.clientApi(Adapter.toUntyped(ctx.getSystem()), locationService);
 
         runningHcds = new HashMap<>();
+        commandResponseAdapter = TestProbe.<CommandResponse.SubmitResponse>create(ctx.getSystem()).ref();
         commandResponseAdapter = TestProbe.<CommandResponse>create(ctx.getSystem()).ref();
         commandResponseAdapter = TestProbe.<Responses.SubmitResponse>create(ctx.getSystem()).ref();
     }
@@ -105,33 +106,33 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
 
     //#validateCommand-handler
     @Override
-    public Responses.ValidationResponse validateCommand(ControlCommand controlCommand) {
+    public CommandResponse.ValidationResponse validateCommand(ControlCommand controlCommand) {
         if (controlCommand instanceof Setup) {
             // validation for setup goes here
             //#addOrUpdateCommand
             // after validation of the controlCommand, update its status of successful validation as Accepted
-            Responses.Accepted accepted = new Responses.Accepted(controlCommand.runId());
+            CommandResponse.Accepted accepted = new CommandResponse.Accepted(controlCommand.runId());
             // TODO - REALLY?
             //commandResponseManager.addOrUpdateCommand(controlCommand.runId(), accepted);
             //#addOrUpdateCommand
-            return new Responses.Accepted(controlCommand.runId());
+            return new CommandResponse.Accepted(controlCommand.runId());
         } else if (controlCommand instanceof Observe) {
             // validation for observe goes here
-            return new Responses.Accepted(controlCommand.runId());
+            return new CommandResponse.Accepted(controlCommand.runId());
         } else {
-            return new Responses.Invalid(controlCommand.runId(), new CommandIssue.AssemblyBusyIssue("Command not supported"));
+            return new CommandResponse.Invalid(controlCommand.runId(), new CommandIssue.AssemblyBusyIssue("Command not supported"));
         }
     }
     //#validateCommand-handler
 
     //#onSubmit-handler
     @Override
-    public Responses.SubmitResponse onSubmit(ControlCommand controlCommand) {
+    public CommandResponse.SubmitResponse onSubmit(ControlCommand controlCommand) {
         if (controlCommand instanceof Setup)
             return submitSetup((Setup) controlCommand); // includes logic to handle Submit with Setup config command
         else if (controlCommand instanceof Observe)
             return submitObserve((Observe) controlCommand); // includes logic to handle Submit with Observe config command
-        else return new Responses.Error(controlCommand.runId(), "Submitted command not supported: " + controlCommand.commandName().name());
+        else return new CommandResponse.Error(controlCommand.runId(), "Submitted command not supported: " + controlCommand.commandName().name());
     }
     //#onSubmit-handler
 
@@ -178,7 +179,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     }
     //#onLocationTrackingEvent-handler
 
-    private Responses.SubmitResponse processSetup(Setup sc) {
+    private CommandResponse.SubmitResponse processSetup(Setup sc) {
         switch (sc.commandName().name()) {
             case "forwardToWorker":
                 //#addSubCommand
@@ -195,7 +196,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
                 // subscribe to the status of original command received and publish the state when its status changes to
                 // Completed
                 commandResponseManager.jSubscribe(subCommand.runId(), commandResponse -> {
-                    if (commandResponse.resultType() instanceof Responses.Completed) {
+                    if (commandResponse.resultType() instanceof CommandResponse.Completed) {
                         Key<String> stringKey = JKeyTypes.StringKey().make("sub-command-status");
                         CurrentState currentState = new CurrentState(sc.source().prefix(), new StateName("testStateName"));
                         currentStatePublisher.publish(currentState.madd(stringKey.set("complete")));
@@ -211,7 +212,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
                 JCommandService componentCommandService = runningHcds.get(componentInfo.getConnections().get(0)).get();
                 componentCommandService.subscribe(subCommand2.runId(), Timeout.durationToTimeout(FiniteDuration.apply(5, TimeUnit.SECONDS)))
                         .thenAccept(commandResponse -> {
-                            if (commandResponse.resultType() instanceof Responses.Completed) {
+                            if (commandResponse.resultType() instanceof CommandResponse.Completed) {
                                 // As the commands get completed, the results are updated in the commandResponseManager
                                 commandResponseManager.updateSubCommand(subCommand2.runId(), commandResponse);
                             } else {
@@ -229,35 +230,35 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
                         });
 
                 //#query-command-response-manager
-                return new Responses.Completed(sc.runId());
+                return new CommandResponse.Completed(sc.runId());
 
             default:
                 log.error("Invalid command [" + sc + "] received.");
-                return new Responses.Invalid(sc.runId(), new CommandIssue.UnsupportedCommandIssue(sc.commandName().toString()));
+                return new CommandResponse.Invalid(sc.runId(), new CommandIssue.UnsupportedCommandIssue(sc.commandName().toString()));
         }
     }
 
-    private Responses.SubmitResponse processObserve(Observe oc) {
+    private CommandResponse.SubmitResponse processObserve(Observe oc) {
         switch (oc.commandName().name()) {
             case "point":
             case "acquire":
             default:
                 log.error("Invalid command [" + oc + "] received.");
         }
-        return new Responses.Completed(oc.runId());
+        return new CommandResponse.Completed(oc.runId());
     }
 
     /**
      * in case of submit command, component writer is required to update commandResponseManager with the result
      */
-    private Responses.SubmitResponse submitSetup(Setup setup) {
+    private CommandResponse.SubmitResponse submitSetup(Setup setup) {
         processSetup(setup);
-        return new Responses.Started(setup.runId());
+        return new CommandResponse.Started(setup.runId());
     }
 
-    private Responses.SubmitResponse submitObserve(Observe observe) {
+    private CommandResponse.SubmitResponse submitObserve(Observe observe) {
         processObserve(observe);
-        return new Responses.Completed(observe.runId());
+        return new CommandResponse.Completed(observe.runId());
     }
 
     private void onewaySetup(Setup setup) {

@@ -29,6 +29,7 @@ import csw.location.api.javadsl.ILocationService;
 import csw.logging.javadsl.ILogger;
 
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
@@ -88,28 +89,28 @@ public class JHcdComponentHandlers extends JComponentHandlers {
     //#jInitialize-handler
     //#validateCommand-handler
     @Override
-    public Responses.ValidationResponse validateCommand(ControlCommand controlCommand) {
+    public CommandResponse.ValidationResponse validateCommand(ControlCommand controlCommand) {
         if (controlCommand instanceof Setup) {
             // validation for setup goes here
-            return new Responses.Accepted(controlCommand.runId());
+            return new CommandResponse.Accepted(controlCommand.runId());
         } else if (controlCommand instanceof Observe) {
             // validation for observe goes here
-            return new Responses.Accepted(controlCommand.runId());
+            return new CommandResponse.Accepted(controlCommand.runId());
         } else {
-            return new Responses.Invalid(controlCommand.runId(), new CommandIssue.UnsupportedCommandIssue(controlCommand.commandName().name()));
+            return new CommandResponse.Invalid(controlCommand.runId(), new CommandIssue.UnsupportedCommandIssue(controlCommand.commandName().name()));
         }
     }
     //#validateCommand-handler
 
     //#onSubmit-handler
     @Override
-    public Responses.SubmitResponse onSubmit(ControlCommand controlCommand) {
+    public CommandResponse.SubmitResponse onSubmit(ControlCommand controlCommand) {
         if (controlCommand instanceof Setup)
             return submitSetup((Setup) controlCommand); // includes logic to handle Submit with Setup config command
         else if (controlCommand instanceof Observe)
             return submitObserve((Observe) controlCommand); // includes logic to handle Submit with Observe config command"
         else
-            return new Responses.Error(controlCommand.runId(), "Unknown command: " + controlCommand.commandName().name());
+            return new CommandResponse.Error(controlCommand.runId(), "Unknown command: " + controlCommand.commandName().name());
     }
     //#onSubmit-handler
 
@@ -157,7 +158,7 @@ public class JHcdComponentHandlers extends JComponentHandlers {
     }
     //#onLocationTrackingEvent-handler
 
-    private Responses.SubmitResponse processSetup(Setup sc) {
+    private CommandResponse.SubmitResponse processSetup(Setup sc) {
         switch (sc.commandName().name()) {
             case "axisMove":
             case "axisDatum":
@@ -166,27 +167,27 @@ public class JHcdComponentHandlers extends JComponentHandlers {
             default:
                 log.error("Invalid command [" + sc + "] received.");
         }
-        return new Responses.Completed(sc.runId());
+        return new CommandResponse.Completed(sc.runId());
     }
 
-    private Responses.SubmitResponse processObserve(Observe oc) {
+    private CommandResponse.SubmitResponse processObserve(Observe oc) {
         switch (oc.commandName().name()) {
             case "point":
             case "acquire":
             default:
                 log.error("Invalid command [" + oc + "] received.");
         }
-        return new Responses.Completed(oc.runId());
+        return new CommandResponse.Completed(oc.runId());
     }
 
     /**
      * in case of submit command, component writer is required to update commandResponseManager with the result
      */
-    private Responses.SubmitResponse submitSetup(Setup setup) {
+    private CommandResponse.SubmitResponse submitSetup(Setup setup) {
         return processSetup(setup);
     }
 
-    private Responses.SubmitResponse submitObserve(Observe observe) {
+    private CommandResponse.SubmitResponse submitObserve(Observe observe) {
         return processObserve(observe);
     }
 

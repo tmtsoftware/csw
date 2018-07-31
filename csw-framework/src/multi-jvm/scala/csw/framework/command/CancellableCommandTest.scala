@@ -11,7 +11,7 @@ import csw.common.components.command.ComponentStateForCommand.{acceptedCmd, canc
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.CommandResponseManagerMessage.Subscribe
-import csw.messages.commands.Responses._
+import csw.messages.commands.CommandResponse._
 import csw.messages.commands.Setup
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}

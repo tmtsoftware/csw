@@ -26,7 +26,7 @@ import csw.messages.ContainerCommonMessage.GetComponents
 import csw.messages.RunningMessage.Lifecycle
 import csw.messages.SupervisorContainerCommonMessages.Shutdown
 import csw.messages.ContainerMessage
-import csw.messages.commands.Responses.Invalid
+import csw.messages.commands.CommandResponse.Invalid
 import csw.services.command.scaladsl.CommandService
 import csw.services.config.api.models.ConfigData
 import csw.services.config.client.scaladsl.ConfigClientFactory

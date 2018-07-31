@@ -14,7 +14,7 @@ import csw.params.core.models.{ObsId, Prefix, Units}
 import csw.command.scaladsl.CommandService
 import csw.event.api.scaladsl.EventSubscription
 import csw.messages.TopLevelActorMessage
-import csw.messages.commands.Responses.{Started, SubmitResponse, ValidationResponse}
+import csw.messages.commands.CommandResponse.{Started, SubmitResponse, ValidationResponse}
 import csw.messages.commands._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.{AkkaLocation, LocationRemoved, LocationUpdated, TrackingEvent}
@@ -79,8 +79,8 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
 
     // Wait for final response, and log result
     submitCommandResponseF.foreach {
-      case _: Responses.Completed => log.info("Command completed successfully")
-      case x: Responses.Error     => log.error(s"Command Completed with error: ${x.message}")
+      case _: CommandResponse.Completed => log.info("Command completed successfully")
+      case x: CommandResponse.Error     => log.error(s"Command Completed with error: ${x.message}")
       case _                      => log.error("Command failed")
     }
   }

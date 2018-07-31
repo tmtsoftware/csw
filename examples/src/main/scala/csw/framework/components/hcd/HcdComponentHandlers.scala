@@ -15,7 +15,7 @@ import csw.framework.components.assembly.{WorkerActor, WorkerActorMsg}
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.TopLevelActorMessage
-import csw.messages.commands.Responses.{Accepted, Completed, SubmitResponse, ValidationResponse}
+import csw.messages.commands.CommandResponse.{Accepted, Completed, SubmitResponse, ValidationResponse}
 import csw.messages.commands._
 import csw.messages.events._
 import csw.messages.framework.ComponentInfo

@@ -4,6 +4,7 @@ import akka.NotUsed
 import akka.stream.Materializer
 import akka.stream.scaladsl.Source
 import akka.util.Timeout
+import csw.messages.commands.CommandResponse.{Started, SubmitResponse}
 import csw.command.models.CommandResponseAggregator
 import csw.params.commands.CommandResponse.Completed
 import csw.params.commands.{CommandIssue, CommandResponse, ControlCommand}
@@ -34,15 +35,15 @@ case class CommandDistributor(componentToCommands: Map[CommandService, Set[Contr
       implicit timeout: Timeout,
       ec: ExecutionContext,
       mat: Materializer
-  ): Future[Responses.SubmitResponse] = {
+  ): Future[CommandResponse.SubmitResponse] = {
 
     val commandResponsesF: Source[SubmitResponse, NotUsed] = Source(componentToCommands).flatMapMerge(
       breadth,
       { case (component, commands) ⇒ component.submitAll(commands) }
     )
-    Responses.aggregateResponse(commandResponsesF).map {
-      case _: Started    ⇒ Responses.Started(Id())
-      case otherResponse ⇒ Responses.Invalid(Id(), CommandIssue.OtherIssue("One or more commands were Invalid"))
+    CommandResponse.aggregateResponse(commandResponsesF).map {
+      case _: Started    ⇒ CommandResponse.Started(Id())
+      case otherResponse ⇒ CommandResponse.Invalid(Id(), CommandIssue.OtherIssue("One or more commands were Invalid"))
     }
   }
 

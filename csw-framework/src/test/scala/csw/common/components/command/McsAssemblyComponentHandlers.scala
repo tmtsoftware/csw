@@ -15,7 +15,7 @@ import csw.params.core.states.{CurrentState, StateName}
 import csw.command.scaladsl.CommandService
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandIssue.UnsupportedCommandIssue
-import csw.messages.commands.Responses._
+import csw.messages.commands.CommandResponse._
 import csw.messages.commands._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.{AkkaLocation, TrackingEvent}

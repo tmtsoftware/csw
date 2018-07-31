@@ -18,7 +18,7 @@ import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandIssue.{OtherIssue, WrongPrefixIssue}
-import csw.messages.commands.Responses._
+import csw.messages.commands.CommandResponse._
 import csw.messages.commands._
 import csw.messages.location._
 import csw.messages.params.generics.{KeyType, Parameter}

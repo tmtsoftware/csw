@@ -27,7 +27,7 @@ object CommandResultType {
 
 }
 
-object Responses {
+object CommandResponse {
 
   import CommandResultType._
 
@@ -123,8 +123,8 @@ object Responses {
           throw new RuntimeException(s"Command with runId [${x.runId}] failed with response [$x]")
       }
       .transform {
-        case Success(_)  ⇒ Success(Responses.Completed(Id()))
-        case Failure(ex) ⇒ Success(Responses.Error(Id(), s"${ex.getMessage}"))
+        case Success(_)  ⇒ Success(CommandResponse.Completed(Id()))
+        case Failure(ex) ⇒ Success(CommandResponse.Error(Id(), s"${ex.getMessage}"))
       }
   }
 

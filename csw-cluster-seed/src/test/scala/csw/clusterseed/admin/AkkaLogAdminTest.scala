@@ -40,6 +40,8 @@ import csw.messages.params.models.Prefix
 import csw.messages.CommandMessage.Oneway
 import csw.messages.ContainerMessage
 import csw.messages.ContainerCommonMessage.GetComponents
+import csw.messages.commands.{CommandName, Setup}
+import csw.messages.commands.Responses.OnewayResponse
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.logging.internal.LoggingLevels.{ERROR, Level, WARN}
 import csw.services.logging.internal._
@@ -95,7 +97,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with MockitoSugar with HttpSupp
   override protected def afterEach(): Unit = logBuffer.clear()
 
   override protected def afterAll(): Unit = {
-    Await.result(adminWiring.actorRuntime.shutdown(UnknownReason), 10.seconds)
+    Await.result(adminWiring.actorRuntime.shutdown(TestFinishedReason), 10.seconds)
     Await.result(containerActorSystem.terminate(), 5.seconds)
   }
 

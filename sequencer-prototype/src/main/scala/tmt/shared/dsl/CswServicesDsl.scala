@@ -3,7 +3,7 @@ package tmt.shared.dsl
 import akka.stream.KillSwitch
 import akka.actor.typed.ActorSystem
 import akka.util.Timeout
-import csw.messages.commands.Responses.{Invalid, SubmitResponse}
+import csw.messages.commands.CommandResponse.{Invalid, SubmitResponse}
 import csw.messages.commands._
 import csw.messages.location._
 import csw.services.command.scaladsl.CommandService

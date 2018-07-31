@@ -8,6 +8,8 @@ import csw.command.models.CommandResponseAggregator
 import csw.params.commands.CommandResponse
 import csw.params.commands.CommandResponse.{Completed, Error}
 import csw.params.core.models.Id
+import csw.messages.commands.CommandResponse.{Completed, Error, SubmitResponse}
+import csw.messages.params.models.Id
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 

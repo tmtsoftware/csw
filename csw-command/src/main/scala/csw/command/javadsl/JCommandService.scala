@@ -18,6 +18,8 @@ import csw.params.core.states.{CurrentState, StateName}
 import csw.command.scaladsl.{CommandService, CurrentStateSubscription}
 import csw.messages.commands.matchers.StateMatcher
 import csw.messages.commands.{CommandResponseBase, ControlCommand, ValidationResponse}
+import csw.messages.commands.CommandResponse.{OnewayResponse, SubmitResponse}
+import csw.messages.commands.ControlCommand
 import csw.messages.location.AkkaLocation
 import csw.messages.params.models.Id
 import csw.messages.params.states.{CurrentState, StateName}
@@ -65,8 +67,6 @@ class JCommandService(akkaLocation: AkkaLocation, actorSystem: ActorSystem[_]) {
    * a CommandResponse as [[csw.params.commands.CommandResponse.Completed]] will be returned. If any one of the command fails, an [[csw.params.commands.CommandResponse.Error]]
    * will be returned.
    *
-   * @param controlCommands the set of [[csw.params.commands.ControlCommand]] payloads
-   * @return [[csw.params.commands.CommandResponse.Accepted]] or [[csw.params.commands.CommandResponse.Error]] CommandResponse as a CompletableFuture.
    * @param controlCommands the set of [[csw.messages.commands.ControlCommand]] payloads
    * @return [[csw.messages.commands.ValidationResponse.Accepted]] or [[csw.messages.commands.CommandResponse.Error]] CommandResponse as a CompletableFuture.
    */

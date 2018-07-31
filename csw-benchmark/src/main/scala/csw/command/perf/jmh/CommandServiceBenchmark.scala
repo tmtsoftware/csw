@@ -12,7 +12,7 @@ import csw.command.perf.BenchmarkHelpers.spawnStandaloneComponent
 import csw.command.scaladsl.CommandService
 import csw.location.commons.ClusterAwareSettings
 import csw.messages.commands
-import csw.messages.commands.Responses.SubmitResponse
+import csw.messages.commands.CommandResponse.SubmitResponse
 import csw.messages.commands.CommandName
 import csw.messages.params.models.Prefix
 import csw.services.command.perf.BenchmarkHelpers.spawnStandaloneComponent

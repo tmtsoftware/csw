@@ -11,7 +11,7 @@ import csw.location.api.models.TrackingEvent
 import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.Id
 import csw.messages.TopLevelActorMessage
-import csw.messages.commands.Responses._
+import csw.messages.commands.CommandResponse._
 import csw.messages.commands._
 import csw.messages.events.{EventName, SystemEvent}
 import csw.messages.location.TrackingEvent
@@ -46,7 +46,7 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
             log.trace(s"WorkerActor received sleep command with time of ${sleep.timeInMillis} ms")
             // simulate long running command
             Thread.sleep(sleep.timeInMillis)
-            commandResponseManager.addOrUpdateCommand(sleep.runId, Responses.Completed(sleep.runId))
+            commandResponseManager.addOrUpdateCommand(sleep.runId, CommandResponse.Completed(sleep.runId))
           case _ => log.error("Unsupported message type")
         }
         Behaviors.same

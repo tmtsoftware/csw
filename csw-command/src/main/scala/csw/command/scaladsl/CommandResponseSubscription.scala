@@ -8,6 +8,10 @@ import csw.command.messages.CommandResponseManagerMessage
 import csw.command.messages.CommandResponseManagerMessage.Subscribe
 import csw.params.commands.CommandResponse
 import csw.params.core.models.Id
+import csw.messages.CommandResponseManagerMessage
+import csw.messages.params.models.Id
+import csw.messages.CommandResponseManagerMessage.Subscribe
+import csw.messages.commands.CommandResponse.SubmitResponse
 
 /**
  * The handle to the subscription created for the current state published by the specified publisher

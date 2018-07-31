@@ -81,7 +81,7 @@ public class JSampleHcdHandlers extends JComponentHandlers {
                         log.trace(() -> "WorkerActor received sleep command with time of " + sleep.timeInMillis + " ms");
                         // simulate long running command
                         Thread.sleep(sleep.timeInMillis);
-                        commandResponseManager.addOrUpdateCommand(sleep.runId, new Responses.Completed(sleep.runId));
+                        commandResponseManager.addOrUpdateCommand(sleep.runId, new CommandResponse.Completed(sleep.runId));
                     } else {
                         log.error("Unsupported message type");
                     }
@@ -135,29 +135,29 @@ public class JSampleHcdHandlers extends JComponentHandlers {
 
     //#validate
     @Override
-    public Responses.ValidationResponse validateCommand(ControlCommand controlCommand) {
+    public CommandResponse.ValidationResponse validateCommand(ControlCommand controlCommand) {
         String commandName = controlCommand.commandName().name();
         log.info(() -> "Validating command: " + commandName);
         if (commandName.equals("sleep")) {
-            return new Responses.Accepted(controlCommand.runId());
+            return new CommandResponse.Accepted(controlCommand.runId());
         }
-        return new Responses.Invalid(controlCommand.runId(), new CommandIssue.UnsupportedCommandIssue("Command " + commandName + ". not supported."));
+        return new CommandResponse.Invalid(controlCommand.runId(), new CommandIssue.UnsupportedCommandIssue("Command " + commandName + ". not supported."));
     }
     //#validate
 
 
     //#onSetup
     @Override
-    public Responses.SubmitResponse onSubmit(ControlCommand controlCommand) {
+    public CommandResponse.SubmitResponse onSubmit(ControlCommand controlCommand) {
         log.info(() -> "Handling command: " + controlCommand.commandName());
 
         if (controlCommand instanceof Setup) {
             onSetup((Setup) controlCommand);
-            return new Responses.Started(controlCommand.runId());
+            return new CommandResponse.Started(controlCommand.runId());
         } else if (controlCommand instanceof Observe) {
             // implement (or not)
         }
-        return new Responses.Error(controlCommand.runId(), "Observe command not supported");
+        return new CommandResponse.Error(controlCommand.runId(), "Observe command not supported");
     }
 
     private void onSetup(Setup setup) {

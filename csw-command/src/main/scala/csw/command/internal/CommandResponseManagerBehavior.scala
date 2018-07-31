@@ -24,21 +24,22 @@ import csw.services.logging.scaladsl.{Logger, LoggerFactory}
  *
  * This class defines the behavior of CommandResponseManagerActor and is responsible for adding/updating/querying command result.
  * When component receives command of type Submit, then framework (ComponentBehavior - TLA) will add a entry of this command
- * with the [[csw.messages.commands.Responses.SubmitResponse]] returned into the CommandResponseManager.
+ * with the [[csw.messages.commands.CommandResponse.SubmitResponse]] returned into the CommandResponseManager.
  *
  * In case of short running or immediate command,
- * validation response will be of type final result which can either be of type
- * [[csw.params.commands.CommandResultType.Positive]] or [[csw.params.commands.CommandResultType.Negative]]
- *
- * In case of long running command, validation response will be of type [[csw.params.commands.CommandResultType.Intermediate]]
- * then it is the responsibility of component writer to update its final command status later on
- * with [[csw.messages.commands.Responses.SubmitResponse]] which will either be
+ * submit response will be of type final result which can either be of type
  * [[csw.messages.commands.CommandResultType.Positive]] or [[csw.messages.commands.CommandResultType.Negative]]
- * with [[csw.params.commands.CommandResponse]] which should be of type
- * [[csw.params.commands.CommandResultType.Positive]] or [[csw.params.commands.CommandResultType.Negative]]
+ *
+ * In case of long running command, validation response will be of type [[csw.messages.commands.CommandResultType.Intermediate]]
+ * then it is the responsibility of component writer to update its final command status later on
+ * with [[csw.messages.commands.CommandResponse.SubmitResponse]] which will either be
+ * [[csw.messages.commands.CommandResultType.Positive]] or [[csw.messages.commands.CommandResultType.Negative]]
  *
  * CommandResponseManager also provides subscribe API.
  * One of the use case for this is when Assembly splits top level command into two sub commands and forwards them to two different HCD's.
+ * In this case, Assembly can register its interest in the final [[csw.messages.commands.CommandResponse.SubmitResponse]]
+ * from two HCD's when these sub commands completes, using subscribe API. And once Assembly receives final submit response
+ * from both the HCD's then it can update Top level command with final [[csw.messages.commands.CommandResponse.SubmitResponse]]
  * In this case, Assembly can register its interest in the final [[csw.params.commands.CommandResponse]]
  * from two HCD's when these sub commands completes, using subscribe API. And once Assembly receives final command response
  * from both the HCD's then it can update Top level command with final [[csw.params.commands.CommandResponse]]
@@ -99,7 +100,7 @@ private[command] class CommandResponseManagerBehavior(
       // If the child command receives a negative result, the result of the parent command need not wait for the
       // result from other sub commands
       case (CommandResultType.Intermediate, CommandResultType.Negative) ⇒
-        updateCommand(parentRunId, Responses.withRunId(parentRunId, childCommandResponse))
+        updateCommand(parentRunId, CommandResponse.withRunId(parentRunId, childCommandResponse))
       // If the child command receives a positive result, the result of the parent command needs to be evaluated based
       // on the result from other sub commands
       case (CommandResultType.Intermediate, CommandResultType.Positive) ⇒
@@ -112,7 +113,7 @@ private[command] class CommandResponseManagerBehavior(
       case _: CommandResultType.Final ⇒
         commandCoRelation = commandCoRelation.remove(parentRunId, childCommandResponse.runId)
         if (!commandCoRelation.hasChildren(parentRunId))
-          updateCommand(parentRunId, Responses.withRunId(parentRunId, childCommandResponse))
+          updateCommand(parentRunId, CommandResponse.withRunId(parentRunId, childCommandResponse))
       case _ ⇒ log.debug("Validation response will not affect status of Parent command.")
     }
 
@@ -121,7 +122,7 @@ private[command] class CommandResponseManagerBehavior(
       case _: CommandResultType.Final ⇒
         subscribers.foreach(_ ! commandResponse)
       case CommandResultType.Intermediate ⇒
-        // Do not send updates for validation response as it is send by the framework
+        // Do not send updates for validation response as it is sent by the framework
         log.debug("Validation response will not affect status of Parent command.")
     }
   }
