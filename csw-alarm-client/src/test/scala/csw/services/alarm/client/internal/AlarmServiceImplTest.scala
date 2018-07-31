@@ -4,10 +4,13 @@ import java.io.File
 import akka.actor.ActorSystem
 import csw.commons.redis.EmbeddedRedis
 import csw.services.alarm.api.internal._
+import csw.services.alarm.api.models.AcknowledgementStatus.Acknowledged
 import csw.services.alarm.api.models.ActivationStatus.Active
 import csw.services.alarm.api.models.AlarmHealth.Bad
 import csw.services.alarm.api.models.AlarmSeverity._
 import csw.services.alarm.api.models.Key.AlarmKey
+import csw.services.alarm.api.models.LatchStatus.Latched
+import csw.services.alarm.api.models.ShelveStatus.UnShelved
 import csw.services.alarm.api.models.{AlarmMetadata, AlarmSeverity, AlarmStatus, AlarmType}
 import csw.services.alarm.client.internal.AlarmCodec.{MetadataCodec, SeverityCodec, StatusCodec}
 import csw.services.alarm.client.internal.redis.scala_wrapper.{RedisAsyncScalaApi, RedisKeySpaceApi, RedisReactiveScalaApi}
@@ -18,10 +21,9 @@ import io.lettuce.core.pubsub.api.reactive.RedisPubSubReactiveCommands
 import io.lettuce.core.{RedisClient, RedisURI}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
-import scala.async.Async.{async, await}
 import scala.compat.java8.FutureConverters.CompletionStageOps
 import scala.concurrent.duration.DurationInt
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext}
 
 class AlarmServiceImplTest extends FunSuite with Matchers with EmbeddedRedis with BeforeAndAfterAll {
   private val alarmServer        = "AlarmServer"
@@ -35,19 +37,20 @@ class AlarmServiceImplTest extends FunSuite with Matchers with EmbeddedRedis wit
   implicit val system: ActorSystem  = ActorSystem()
   implicit val ec: ExecutionContext = system.dispatcher
 
-  val alarmService: AlarmServiceImpl = Await.result(new AlarmServiceFactory(redisURI, redisClient).make(), 5.seconds)
+  private val alarmServiceFactory    = new AlarmServiceFactory(redisURI, redisClient)
+  val alarmService: AlarmServiceImpl = alarmServiceFactory.make()
 
   test("init alarms") {
 
     val path = getClass.getResource("/test-alarms/valid-alarms.conf").getPath
 
-    val alarmKey = AlarmKey("nfiraos", "cc.trombone", "tromboneAxisHighLimitAlarm")
+    val alarmKey = AlarmKey("nfiraos", "trombone", "tromboneAxisHighLimitAlarm")
     val file     = new File(path)
     Await.result(alarmService.initAlarms(file), 5.seconds)
 
     Await.result(alarmService.getMetadata(alarmKey), 5.seconds) shouldBe AlarmMetadata(
       subsystem = "nfiraos",
-      component = "cc.trombone",
+      component = "trombone",
       name = "tromboneAxisHighLimitAlarm",
       description = "Warns when trombone axis has reached the high limit",
       location = "south side",
@@ -68,38 +71,46 @@ class AlarmServiceImplTest extends FunSuite with Matchers with EmbeddedRedis wit
 
   }
 
+  test("test set severity") {
+    val path = getClass.getResource("/test-alarms/valid-alarms.conf").getPath
+    val file = new File(path)
+    Await.result(alarmService.initAlarms(file, reset = true), 5.seconds)
+
+    val tromboneAxisHighLimitAlarm = AlarmKey("nfiraos", "trombone", "tromboneAxisHighLimitAlarm")
+    Await.result(alarmService.setSeverity(tromboneAxisHighLimitAlarm, AlarmSeverity.Critical), 5.seconds)
+
+    val status = Await.result(alarmServiceFactory.statusAsyncApi.get(tromboneAxisHighLimitAlarm), 5.seconds)
+
+    status shouldEqual AlarmStatus(Acknowledged, Latched, Critical, UnShelved)
+  }
 }
 
 // Fixme: provide factory in main scope
 class AlarmServiceFactory(redisURI: RedisURI, redisClient: RedisClient)(implicit system: ActorSystem, ec: ExecutionContext)
     extends AlarmRW {
 
-  val metadataAsyncCommandsF: Future[RedisAsyncCommands[MetadataKey, AlarmMetadata]] =
-    redisClient.connectAsync(MetadataCodec, redisURI).toScala.map(_.async())
-  val statusAsyncCommandsF: Future[RedisAsyncCommands[StatusKey, AlarmStatus]] =
-    redisClient.connectAsync(StatusCodec, redisURI).toScala.map(_.async())
-  val severityAsyncCommandsF: Future[RedisAsyncCommands[SeverityKey, AlarmSeverity]] =
-    redisClient.connectAsync(SeverityCodec, redisURI).toScala.map(_.async())
-  val reactiveCommandsF: Future[RedisPubSubReactiveCommands[String, String]] =
-    redisClient.connectPubSubAsync(new Utf8StringCodec(), redisURI).toScala.map(_.reactive())
+  private val metadataAsyncCommands: RedisAsyncCommands[MetadataKey, AlarmMetadata] =
+    Await.result(redisClient.connectAsync(MetadataCodec, redisURI).toScala.map(_.async()), 5.seconds)
+  private val statusAsyncCommands: RedisAsyncCommands[StatusKey, AlarmStatus] =
+    Await.result(redisClient.connectAsync(StatusCodec, redisURI).toScala.map(_.async()), 5.seconds)
+  private val severityAsyncCommands: RedisAsyncCommands[SeverityKey, AlarmSeverity] =
+    Await.result(redisClient.connectAsync(SeverityCodec, redisURI).toScala.map(_.async()), 5.seconds)
+  private val reactiveCommands: RedisPubSubReactiveCommands[String, String] =
+    Await.result(redisClient.connectPubSubAsync(new Utf8StringCodec(), redisURI).toScala.map(_.reactive()), 5.seconds)
 
-  def make(): Future[AlarmServiceImpl] = async {
+  val statusAsyncApi = new RedisAsyncScalaApi(statusAsyncCommands)
+  val metatdataApi   = new RedisAsyncScalaApi(metadataAsyncCommands)
+  val severityApi    = new RedisAsyncScalaApi(severityAsyncCommands)
 
-    val reactiveCommands = await(reactiveCommandsF)
-
-    val statusAsyncApi = new RedisAsyncScalaApi(await(statusAsyncCommandsF))
-    new AlarmServiceImpl(
-      new RedisAsyncScalaApi(await(metadataAsyncCommandsF)),
-      new RedisAsyncScalaApi(await(severityAsyncCommandsF)),
-      statusAsyncApi,
-      () ⇒
-        new RedisKeySpaceApi[StatusKey, AlarmStatus](
-          () => new RedisReactiveScalaApi[String, String](reactiveCommands),
-          statusAsyncApi
-      ),
-      new ShelveTimeoutActorFactory()
-    )
-
-  }
-
+  def make(): AlarmServiceImpl = new AlarmServiceImpl(
+    metatdataApi,
+    severityApi,
+    statusAsyncApi,
+    () ⇒
+      new RedisKeySpaceApi[StatusKey, AlarmStatus](
+        () => new RedisReactiveScalaApi[String, String](reactiveCommands),
+        statusAsyncApi
+    ),
+    new ShelveTimeoutActorFactory()
+  )
 }
