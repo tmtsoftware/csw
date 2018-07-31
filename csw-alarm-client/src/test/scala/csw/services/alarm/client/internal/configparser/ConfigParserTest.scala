@@ -30,7 +30,6 @@ class ConfigParserTest extends FunSuite with Matchers {
     val actualAlarmMetadata = ConfigParser.parseAlarmMetadata(config)
 
     actualAlarmMetadata shouldEqual expectedAlarmMetadata
-    actualAlarmMetadata.allSupportedSeverities shouldEqual Set(Indeterminate, Okay, Warning, Major, Critical)
   }
 
   test("should able to parse valid alarm metadata's config file") {
@@ -50,7 +49,7 @@ class ConfigParserTest extends FunSuite with Matchers {
     // 1. isLatchable missing
     // 2. invalid AlarmType
     // 3. invalid supportedSeverities
-    // 3. invalid type for isAutoAcknowledgeable, expected boolean
+    // 4. invalid type for isAutoAcknowledgeable, expected boolean
     parseException.reasons.length shouldBe 4
   }
 

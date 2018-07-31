@@ -30,11 +30,12 @@ import reactor.core.publisher.FluxSink.OverflowStrategy
 import scala.async.Async._
 import scala.concurrent.Future
 
+//why all apis are not call-by-name
 class AlarmServiceImpl(
     metadataApi: RedisAsyncScalaApi[MetadataKey, AlarmMetadata],
     severityApi: RedisAsyncScalaApi[SeverityKey, AlarmSeverity],
     statusApi: RedisAsyncScalaApi[StatusKey, AlarmStatus],
-    aggregateApiFactory: () ⇒ RedisReactiveScalaApi[AggregateKey, String],
+    aggregateApi: ⇒ RedisReactiveScalaApi[AggregateKey, String],
     shelveTimeoutActorFactory: ShelveTimeoutActorFactory
 )(implicit actorSystem: ActorSystem)
     extends AlarmAdminService {
@@ -202,7 +203,7 @@ class AlarmServiceImpl(
   // channel: e.g. __keyspace@0__:status.nfiraos.trombone.tromboneAxisLowLimitAlarm,
   // message: event type as value: e.g. set, expire, expired
   def subscribeAggregatedSeverity(key: Key): Source[AlarmSeverity, AlarmSubscription] = {
-    val aggregateApi                      = aggregateApiFactory() // create new connection for every client
+    // create new connection for every client
     val aggregateKeys: List[AggregateKey] = List(key)
     val psubscribeF                       = aggregateApi.psubscribe(aggregateKeys)
 

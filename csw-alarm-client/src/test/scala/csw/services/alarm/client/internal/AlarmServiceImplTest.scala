@@ -20,7 +20,7 @@ import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import scala.async.Async.{async, await}
 import scala.compat.java8.FutureConverters.CompletionStageOps
 import scala.concurrent.duration.DurationInt
-import scala.concurrent.{Await, ExecutionContext, ExecutionContextExecutor, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 class AlarmServiceImplTest extends FunSuite with Matchers with EmbeddedRedis with BeforeAndAfterAll {
   private val alarmServer        = "AlarmServer"
@@ -31,8 +31,8 @@ class AlarmServiceImplTest extends FunSuite with Matchers with EmbeddedRedis wit
 
   override protected def afterAll(): Unit = stopSentinel(sentinel, server)
 
-  implicit val system: ActorSystem          = ActorSystem()
-  implicit val ec: ExecutionContextExecutor = system.dispatcher
+  implicit val system: ActorSystem  = ActorSystem()
+  implicit val ec: ExecutionContext = system.dispatcher
 
   val alarmService: AlarmServiceImpl = Await.result(new AlarmServiceFactory(redisURI, redisClient).make(), 5.seconds)
 
@@ -93,7 +93,7 @@ class AlarmServiceFactory(redisURI: RedisURI, redisClient: RedisClient)(implicit
       new RedisAsyncScalaApi(await(metadataAsyncCommandsF)),
       new RedisAsyncScalaApi(await(severityAsyncCommandsF)),
       new RedisAsyncScalaApi(await(statusAsyncCommandsF)),
-      () ⇒ new RedisReactiveScalaApi(value),
+      new RedisReactiveScalaApi(value),
       new ShelveTimeoutActorFactory()
     )
 

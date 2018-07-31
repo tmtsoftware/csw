@@ -26,6 +26,10 @@ class AlarmMetadataTest extends FunSuite with Matchers {
     alarmMetadata.alarmKey shouldBe AlarmKey("nfiraos", "trombone", "tromboneAxisHighLimitAlarm")
   }
 
+  test("should always support Indeterminate and Okay severities ") {
+    alarmMetadata.allSupportedSeverities shouldEqual Set(Indeterminate, Okay, Warning, Major, Critical)
+  }
+
   test("should tell if the alarm is active or not") {
     alarmMetadata.isActive shouldBe true
 
