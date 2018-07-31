@@ -3,7 +3,7 @@ import java.io.File
 
 import akka.actor.ActorSystem
 import csw.commons.redis.EmbeddedRedis
-import csw.services.alarm.api.exceptions.InvalidSeverityException
+import csw.services.alarm.api.exceptions.{InvalidSeverityException, KeyNotFoundException}
 import csw.services.alarm.api.internal._
 import csw.services.alarm.api.models.AcknowledgementStatus.Acknowledged
 import csw.services.alarm.api.models.ActivationStatus.Active
@@ -80,9 +80,9 @@ class AlarmServiceImplTest extends FunSuite with Matchers with EmbeddedRedis wit
     val tromboneAxisHighLimitAlarm = AlarmKey("nfiraos", "trombone", "tromboneAxisHighLimitAlarm")
     Await.result(alarmService.setSeverity(tromboneAxisHighLimitAlarm, AlarmSeverity.Major), 5.seconds)
 
-    val status = Await.result(alarmServiceFactory.statusAsyncApi.get(tromboneAxisHighLimitAlarm), 5.seconds)
+    val statusOpt = Await.result(alarmServiceFactory.statusAsyncApi.get(tromboneAxisHighLimitAlarm), 5.seconds)
 
-    status shouldEqual AlarmStatus(Acknowledged, Latched, Major, UnShelved)
+    statusOpt shouldEqual Some(AlarmStatus(Acknowledged, Latched, Major, UnShelved))
   }
 
   test("should throw InvalidSeverityException when unsupported severity is provided") {
@@ -108,9 +108,11 @@ class AlarmServiceImplTest extends FunSuite with Matchers with EmbeddedRedis wit
     val secondFile      = new File(twoAlarmConfigPath)
     Await.result(alarmService.initAlarms(firstFile), 5.seconds)
 
-    Await.result(alarmService.initAlarms(secondFile, true), 5.seconds)
+    Await.result(alarmService.initAlarms(secondFile, reset = true), 5.seconds)
 
-    Await.result(alarmService.getMetadata(tcpAlarmKey), 3.seconds) shouldBe null
+    intercept[KeyNotFoundException] {
+      Await.result(alarmService.getMetadata(tcpAlarmKey), 3.seconds)
+    }
 
     Await.result(alarmService.getMetadata(nfiraosAlarmKey), 5.seconds) shouldBe AlarmMetadata(
       subsystem = "nfiraos",

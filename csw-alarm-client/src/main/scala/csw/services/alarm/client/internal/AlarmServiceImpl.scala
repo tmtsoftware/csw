@@ -102,11 +102,19 @@ class AlarmServiceImpl(
     if (statusChanged) await(statusApi.set(key, status))
   }
 
-  override def getSeverity(key: AlarmKey): Future[Option[AlarmSeverity]] = severityApi.get(key)
+  override def getSeverity(key: AlarmKey): Future[AlarmSeverity] = async {
+    if (await(metadataApi.exists(key)))
+      await(severityApi.get(key)).getOrElse(Disconnected)
+    else throw KeyNotFoundException(key)
+  }
 
-  override def getStatus(key: AlarmKey): Future[Option[AlarmStatus]] = statusApi.get(key)
+  override def getStatus(key: AlarmKey): Future[AlarmStatus] = async {
+    await(statusApi.get(key)).getOrElse(throw KeyNotFoundException(key))
+  }
 
-  override def getMetadata(key: AlarmKey): Future[Option[AlarmMetadata]] = metadataApi.get(key)
+  override def getMetadata(key: AlarmKey): Future[AlarmMetadata] = async {
+    await(metadataApi.get(key)).getOrElse(throw KeyNotFoundException(key))
+  }
 
   override def getMetadata(key: Key): Future[List[AlarmMetadata]] = async {
     val metadataKeys = await(metadataApi.keys(key))
