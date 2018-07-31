@@ -1,8 +1,8 @@
-package csw.services.alarm.client.internal.redis.scala_wrapper
+package romaine
 
-import csw.services.alarm.api.exceptions.RedisOperationFailed
 import io.lettuce.core.KeyValue
 import io.lettuce.core.api.async.RedisAsyncCommands
+import romaine.exceptions.RedisOperationFailed
 
 import scala.collection.JavaConverters.{iterableAsScalaIterableConverter, mapAsJavaMapConverter}
 import scala.compat.java8.FutureConverters.CompletionStageOps

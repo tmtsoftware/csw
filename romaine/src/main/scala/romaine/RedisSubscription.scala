@@ -1,9 +1,9 @@
-package csw.services.alarm.client.internal.redis.scala_wrapper
+package romaine
 
 import akka.Done
 import akka.stream.KillSwitch
-import scala.async.Async.{async, await}
 
+import scala.async.Async.{async, await}
 import scala.concurrent.{ExecutionContext, Future}
 
 class RedisSubscription[TKey](

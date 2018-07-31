@@ -1,9 +1,9 @@
-package csw.services.alarm.client.internal.redis.scala_wrapper
+package romaine
 
 import akka.NotUsed
 import akka.stream.scaladsl.{Keep, Source}
-import csw.services.alarm.client.internal.extensions.SourceExtensions.RichSource
 import reactor.core.publisher.FluxSink.OverflowStrategy
+import romaine.extensions.SourceExtensions.RichSource
 
 import scala.concurrent.ExecutionContext
 

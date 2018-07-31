@@ -5,7 +5,7 @@ import csw.services.alarm.api.internal.{MetadataKey, SeverityKey, StatusKey}
 import csw.services.alarm.api.models.{AlarmMetadata, AlarmSeverity, AlarmStatus}
 import csw.services.alarm.client.internal.AlarmCodec.{MetadataCodec, SeverityCodec, StatusCodec}
 import csw.services.alarm.client.internal.AlarmServiceImpl
-import csw.services.alarm.client.internal.redis.scala_wrapper.{RedisAsyncScalaApi, RedisKeySpaceApi, RedisReactiveScalaApi}
+import romaine.{RedisAsyncScalaApi, RedisKeySpaceApi, RedisReactiveScalaApi}
 import csw.services.alarm.client.internal.shelve.ShelveTimeoutActorFactory
 import io.lettuce.core.api.async.RedisAsyncCommands
 import io.lettuce.core.codec.Utf8StringCodec

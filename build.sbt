@@ -23,7 +23,8 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-commons`,
   `integration`,
   `examples`,
-  `sequencer-prototype`
+  `sequencer-prototype`,
+  `romaine`
 )
 
 lazy val unidocExclusions: Seq[ProjectReference] = Seq(
@@ -217,6 +218,7 @@ lazy val `csw-alarm-client` = project
   .dependsOn(
     `csw-alarm-api`,
     `csw-logging`,
+    `romaine`,
     `csw-commons` % "test->test"
   )
   .enablePlugins(GenJavadocPlugin)
@@ -240,6 +242,13 @@ lazy val `csw-benchmark` = project
   .settings(
     libraryDependencies ++= Dependencies.Benchmark
   )
+
+lazy val `romaine` = project
+  .enablePlugins(GenJavadocPlugin)
+  .settings(
+    libraryDependencies ++= Dependencies.Romaine
+  )
+
 
 //Integration test project
 lazy val integration = project

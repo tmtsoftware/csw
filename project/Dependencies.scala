@@ -193,6 +193,14 @@ object Dependencies {
     Libs.`scalatest` % Test
   )
 
+  val Romaine = Seq(
+    Libs.`lettuce`,
+    Libs.`scala-async`,
+    Libs.`scala-java8-compat`,
+    Akka.`akka-stream`,
+    Libs.`scalatest` % Test
+  )
+
   val Commons = Seq(
     Akka.`akka-stream`,
     AkkaHttp.`akka-http`,

@@ -1,4 +1,4 @@
-package csw.services.alarm.client.internal.redis.scala_wrapper
+package romaine
 
 import io.lettuce.core.codec.RedisCodec
 

@@ -4,8 +4,8 @@ import java.nio.ByteBuffer
 
 import csw.services.alarm.api.internal._
 import csw.services.alarm.api.models._
-import csw.services.alarm.client.internal.redis.scala_wrapper.RedisKeySpaceCodec
 import io.lettuce.core.codec.Utf8StringCodec
+import romaine.RedisKeySpaceCodec
 import ujson.Js
 import upickle.default._
 

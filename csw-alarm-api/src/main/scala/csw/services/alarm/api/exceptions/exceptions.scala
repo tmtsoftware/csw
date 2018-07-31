@@ -18,6 +18,4 @@ case class NoAlarmsFoundException() extends RuntimeException("No alarms found")
 
 case class ConfigParseException(reasons: List[String]) extends RuntimeException(reasons.mkString("[", "\n", "]"))
 
-case class RedisOperationFailed(msg: String, ex: Throwable = None.orNull) extends RuntimeException(msg, ex)
-
 case class KeyNotFoundException(key: Key) extends RuntimeException(s"Key: [${key.value}] not found in Alarm Store.")

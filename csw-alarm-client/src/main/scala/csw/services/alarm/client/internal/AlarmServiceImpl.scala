@@ -23,11 +23,11 @@ import csw.services.alarm.api.models.ShelveStatus.{Shelved, UnShelved}
 import csw.services.alarm.api.models._
 import csw.services.alarm.api.scaladsl.{AlarmAdminService, AlarmSubscription}
 import csw.services.alarm.client.internal.configparser.ConfigParser
-import csw.services.alarm.client.internal.redis.scala_wrapper.{RedisAsyncScalaApi, RedisKeySpaceApi}
 import csw.services.alarm.client.internal.shelve.ShelveTimeoutActorFactory
 import csw.services.alarm.client.internal.shelve.ShelveTimeoutMessage.{CancelShelveTimeout, ScheduleShelveTimeout}
 import io.lettuce.core.KeyValue
 import reactor.core.publisher.FluxSink.OverflowStrategy
+import romaine.{RedisAsyncScalaApi, RedisKeySpaceApi}
 
 import scala.async.Async._
 import scala.concurrent.Future
