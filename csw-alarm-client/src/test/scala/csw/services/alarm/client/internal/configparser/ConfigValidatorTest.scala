@@ -4,7 +4,7 @@ import csw.services.alarm.api.models.ValidationResult
 import csw.services.alarm.client.internal.configparser.SchemaRegistry._
 import org.scalatest.{FunSuite, Matchers}
 
-//DEOPSCSW-451: Create set of alarms based on Configuration file
+// DEOPSCSW-451: Create set of alarms based on Configuration file
 class ConfigValidatorTest extends FunSuite with Matchers {
 
   test("validation result should be successful for valid alarm metadata") {
