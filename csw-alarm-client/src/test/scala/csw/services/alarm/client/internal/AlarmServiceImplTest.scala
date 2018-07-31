@@ -3,6 +3,7 @@ import java.io.File
 
 import akka.actor.ActorSystem
 import csw.commons.redis.EmbeddedRedis
+import csw.services.alarm.api.exceptions.InvalidSeverityException
 import csw.services.alarm.api.internal._
 import csw.services.alarm.api.models.AcknowledgementStatus.Acknowledged
 import csw.services.alarm.api.models.ActivationStatus.Active
@@ -55,7 +56,7 @@ class AlarmServiceImplTest extends FunSuite with Matchers with EmbeddedRedis wit
       description = "Warns when trombone axis has reached the high limit",
       location = "south side",
       AlarmType.Absolute,
-      Set(Indeterminate, Okay, Warning, Major, Critical),
+      Set(Indeterminate, Okay, Warning, Major),
       probableCause = "the trombone software has failed or the stage was driven into the high limit",
       operatorResponse = "go to the NFIRAOS engineering user interface and select the datum axis command",
       isAutoAcknowledgeable = true,
@@ -77,11 +78,23 @@ class AlarmServiceImplTest extends FunSuite with Matchers with EmbeddedRedis wit
     Await.result(alarmService.initAlarms(file, reset = true), 5.seconds)
 
     val tromboneAxisHighLimitAlarm = AlarmKey("nfiraos", "trombone", "tromboneAxisHighLimitAlarm")
-    Await.result(alarmService.setSeverity(tromboneAxisHighLimitAlarm, AlarmSeverity.Critical), 5.seconds)
+    Await.result(alarmService.setSeverity(tromboneAxisHighLimitAlarm, AlarmSeverity.Major), 5.seconds)
 
     val status = Await.result(alarmServiceFactory.statusAsyncApi.get(tromboneAxisHighLimitAlarm), 5.seconds)
 
-    status shouldEqual AlarmStatus(Acknowledged, Latched, Critical, UnShelved)
+    status shouldEqual AlarmStatus(Acknowledged, Latched, Major, UnShelved)
+  }
+
+  test("should throw InvalidSeverityException when unsupported severity is provided") {
+    val path = getClass.getResource("/test-alarms/valid-alarms.conf").getPath
+    val file = new File(path)
+    Await.result(alarmService.initAlarms(file, reset = true), 5.seconds)
+
+    val tromboneAxisHighLimitAlarm = AlarmKey("nfiraos", "trombone", "tromboneAxisHighLimitAlarm")
+
+    intercept[InvalidSeverityException] {
+      Await.result(alarmService.setSeverity(tromboneAxisHighLimitAlarm, AlarmSeverity.Critical), 5.seconds)
+    }
   }
 }
 
