@@ -88,9 +88,9 @@ class AlarmServiceImpl(
     var newStatus = status
 
     def shouldUpdateLatchStatus: Boolean                     = alarm.isLatchable && severity.isHighRisk
-    def shouldUpdateLatchedSeverityWhenLatchable: Boolean    = shouldUpdateWhenLactched || shouldUpdateWhenUnLactched
-    def shouldUpdateWhenLactched: Boolean                    = alarm.isLatchable && severity.isHighRisk && severity > status.latchedSeverity
-    def shouldUpdateWhenUnLactched: Boolean                  = alarm.isLatchable && status.latchStatus == UnLatched && !severity.isHighRisk
+    def shouldUpdateLatchedSeverityWhenLatchable: Boolean    = shouldUpdateWhenLatched || shouldUpdateWhenUnLatched
+    def shouldUpdateWhenLatched: Boolean                     = alarm.isLatchable && severity.isHighRisk && severity > status.latchedSeverity
+    def shouldUpdateWhenUnLatched: Boolean                   = alarm.isLatchable && status.latchStatus == UnLatched && !severity.isHighRisk
     def shouldUpdateLatchedSeverityWhenNotLatchable: Boolean = !alarm.isLatchable
 
     if (shouldUpdateLatchStatus) newStatus = newStatus.copy(latchStatus = Latched)
@@ -240,7 +240,7 @@ class AlarmServiceImpl(
   }
 
   override def subscribeAggregatedHealthActorRef(key: Key, actorRef: ActorRef[AlarmHealth]): AlarmSubscription = {
-    log.debug(s"Subscribe aggregated helath for alarm [${key.value}] with an actor")
+    log.debug(s"Subscribe aggregated health for alarm [${key.value}] with an actor")
     subscribeAggregatedHealthCallback(key, actorRef ! _)
   }
 
