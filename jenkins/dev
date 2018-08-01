@@ -4,7 +4,6 @@ pipeline {
     }
 
     options {
-        // using the Timestamper plugin we can add timestamps to the console log
         timestamps()
     }
 
@@ -22,8 +21,8 @@ pipeline {
             }
         }
 
+        // Component tests cover the scenario of multiple components in single container
         stage('Unit and Component Tests') {
-            // Component tests cover the scenario of multiple components in single container
             steps {
                 sh "sbt -DenableCoverage=true test:test"
             }
@@ -44,8 +43,8 @@ pipeline {
             }
         }
 
+        // These tests cover the scenario of multiple components in multiple containers on same machine.
         stage('Multi-Jvm Test') {
-            // These tests cover the scenario of multiple components in multiple containers on same machine.
             steps {
                 sh "sbt csw-location/multi-jvm:test"
                 sh "sbt csw-config-client/multi-jvm:test"
