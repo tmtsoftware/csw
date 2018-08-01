@@ -9,6 +9,17 @@ The product is in a new repository: [csw-prod](https://github.com/tmtsoftware/cs
 
 All notable changes to this project will be documented in this file.
 
+## [CSW v0.5.0-RC1] - 2018-08-01
+
+This is the release candidate 1 of the second release of the TMT Common Software for project stakeholders. 
+This release includes event service.
+See [here](https://tmtsoftware.github.io/csw-prod/0.5.0-RC1/) for a detailed description of this version of the CSW software.
+
+### Planned for the Next Release (Coming Soon...)
+
+- Alarm Service
+
+
 ## [CSW v0.4.0] - 2018-04-11
 
 This is the first early release of the TMT Common Software for project stakeholders. 

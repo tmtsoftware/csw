@@ -1,0 +1,18 @@
+## CSW - TMT Common Software v0.5.0-RC1
+
+This is release v0.5.0-RC1 of the TMT Common Software.
+
+See [CHANGELOG.md](../CHANGELOG.md) for details of all releases.
+
+### Changed from FDR
+- Event Service Subscriber: In addition to subscribe APIs with callback and actorRef, additional subscribe APIs to control the rate of events are provided. 
+- Event Service Publisher: Additional publish APIs are provided like eventGenerator in combination with frequency and callback on error.
+- Updated to use latest Scala and Java versions and dependencies.
+
+### Planned for the Next Release
+- Alarm Service
+
+### Documentation
+- Reference paradox documentation: https://tmtsoftware.github.io/csw-prod/0.5.0-RC1/
+- Scaladoc: https://tmtsoftware.github.io/csw-prod/0.5.0-RC1/api/scala/index.html
+- Javadoc: https://tmtsoftware.github.io/csw-prod/0.5.0-RC1/api/java/index.html
