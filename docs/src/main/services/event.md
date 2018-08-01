@@ -4,7 +4,7 @@ The Event Service implements the [publish/subscribe messaging paradigm](https://
 The advantage of this type of message system is that publishers and subscribers are decoupled. This decoupling of publishers and subscribers can allow for greater scalability and a more dynamic network topology.
 Publishers can publish regardless of whether there are subscribers, and subscribers can subscribe even if there are no publishers. The relationship between publishers and subscribers can be one-to-one, one-to-many, many to one, or even many-to-many. 
 
-Event Service is optimized for the high performance requirements of event streams which support multiple streams with varying rates, for ex. 100 Hz, 50 Hz etc. In the TMT control system event streams are created as an output of a calculation by one component for the input to a calculation in one or more other components. Event streams often consist of events that are published at a specific rate. These events are transient, historical events are not stored/persisted. 
+Event Service is optimized for the high performance requirements of event streams which support multiple streams with varying rates, for ex. 100 Hz, 50 Hz etc. In the TMT control system, event streams are created as an output of a calculation by one component for the input to a calculation in one or more other components. Event streams often consist of events that are published at a specific rate. These events are transient. Historical events are not stored/persisted. 
 
 The Event Service provides an API that allows @ref:[Event](./../messages/events.md)s to be created and published as well as allows clients to subscribe and unsubscribe to specific types of events.
 
@@ -30,13 +30,13 @@ Using `EventService` you can start publishing or subscribing to events.
 
 * Access to `defaultPublisher`: 
 Using `defaultPublisher`, you can publish event or stream of events to event server. 
-In most of the cases, you should use `defaultPublisher`, because you can then pass the instance of `EventService` in worker actors or different places in your code and call `eventService.defaultPublisher` to access publisher. This way you reuse same instance of `EventPublisher` which means all events published via `defaultPublisher` go through same tcp connection. 
+In most of the cases, you should use `defaultPublisher`, because you can then pass the instance of `EventService` in worker actors or different places in your code and call `eventService.defaultPublisher` to access publisher. This way you reuse same instance of `EventPublisher` which means all events published via `defaultPublisher` go through same TCP connection. 
 
 * Access to `defaultSubscriber`:
 Using `defaultSubscriber`, you can subscribe to specific event keys. 
 You can share `defaultSubscriber` same way like `defaultPublisher` by passing instance of `EventService` to different parts of your code.
-Unlike `defaultPublisher`, each subscription `defaultSubscriber.subscribe` call creates a new tcp connection. This behavior is similar either you use `defaultSubscriber` or `makeNewSubscriber` call on `EventService`.
-But whenever you create a new `EventSubscriber`, it creates one more tcp connection which is used to get latest event from event server (Note that this is a different connection than the one which gets created on subscription).
+Unlike `defaultPublisher`, each subscription `defaultSubscriber.subscribe` call creates a new TCP connection. This behavior is similar either you use `defaultSubscriber` or `makeNewSubscriber` call on `EventService`.
+But whenever you create a new `EventSubscriber`, it creates one more TCP connection which is used to get latest event from event server (Note that this is a different connection than the one which gets created on subscription).
 That means, with `defaultSubscriber`, you are sharing same connection for getting latest events and creating a new connection for each subscribe call.
 
 * Create new `Publisher` or `Subscriber`: Whenever a new publisher or subscriber is created, location of event service is resolved. So, in case your event server goes down, and you wish to re-resolve the event server location, you would make a call to `makeNewPublisher` or `makeNewSubscriber` instead of using the `defaultPublisher` and `defaultSubscriber`. Apart from the above mentioned scenario, one can choose to create a new publisher in case of high frequency event streams to dedicate a separate connection to demanding streams without affecting the performance of all other low frequency (for ex. 1Hz, 20Hz etc.) event streams.
@@ -99,7 +99,7 @@ Java
 
 ### With Asynchronous Callback
 
-The above example will run into concurrency issues, if the callback has a asynchronous behavior. To avoid that use the following API which will give the guarantee of ordered execution of these asynchronous callbacks.
+The above example will run into concurrency issues, if the callback has an asynchronous behavior. To avoid that use the following API which will give the guarantee of ordered execution of these asynchronous callbacks.
 
 Scala
 :   @@snip [EventSubscribeExamples.scala](../../../../examples/src/main/scala/csw/services/event/EventSubscribeExamples.scala) { #with-async-callback }
@@ -185,7 +185,7 @@ Scala
 Java
 :   @@snip [JEventServiceCreationExamples.java](../../../../examples/src/main/java/csw/services/event/JEventServiceCreationExamples.java) { #default-event-service }
 
-Event service is backed up by Redis. Above example demonstrates creation of event service with default redis client options. 
+Event service is backed up by Redis. Above example demonstrates creation of event service with default Redis client options. 
 You can optionally supply a RedisClient to the EventStore from outside which allows you to customize the behaviour of RedisClient used by Event Service which in most of the cases will be required in test scope only. 
 
 RedisClient is an expensive resource. Reuse this instance as much as possible.
