@@ -12,7 +12,7 @@ object Libs {
   val `acyclic`                      = "com.lihaoyi"            %% "acyclic"                      % "0.1.7" % Provided //MIT License
   val `junit`                        = "junit"                  % "junit"                         % "4.12" //Eclipse Public License 1.0
   val `junit-interface`              = "com.novocode"           % "junit-interface"               % "0.11" //BSD 2-clause "Simplified" License
-  val `mockito-core`                 = "org.mockito"            % "mockito-core"                  % "2.18.3" //MIT License
+  val `mockito-core`                 = "org.mockito"            % "mockito-core"                  % "2.21.0" //MIT License
   val `logback-classic`              = "ch.qos.logback"         % "logback-classic"               % "1.2.3" //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
   val `akka-management-cluster-http` = "com.lightbend.akka"     %% "akka-management-cluster-http" % "0.6" //N/A at the moment
   val `svnkit`                       = "org.tmatesoft.svnkit"   % "svnkit"                        % "1.9.0" //TMate Open Source License
@@ -26,8 +26,8 @@ object Libs {
   val `akka-http-play-json`          = "de.heikoseeberger"      %% "akka-http-play-json"          % "1.21.0" //Apache 2.0
   val `scalapb-runtime`              = "com.thesamet.scalapb"   %% "scalapb-runtime"              % scalapbVersion % "protobuf"
   val `scalapb-json4s`               = "com.thesamet.scalapb"   %% "scalapb-json4s"               % "0.7.1"
-  val `lettuce`                      = "io.lettuce"             % "lettuce-core"                  % "5.0.4.RELEASE"
-  val `akka-stream-kafka`            = "com.typesafe.akka"      %% "akka-stream-kafka"            % "0.21"
+  val `lettuce`                      = "io.lettuce"             % "lettuce-core"                  % "5.0.5.RELEASE"
+  val `akka-stream-kafka`            = "com.typesafe.akka"      %% "akka-stream-kafka"            % "0.22"
   val `scalatest-embedded-kafka`     = "net.manub"              %% "scalatest-embedded-kafka"     % "1.1.0"
   val `embedded-redis`               = "com.github.kstyrc"      % "embedded-redis"                % "0.6"
   val `scala-compiler`               = "org.scala-lang"         % "scala-compiler"                % ScalaVersion
