@@ -190,8 +190,10 @@ object Dependencies {
     Libs.`scala-java8-compat`,
     Akka.`akka-actor-typed`,
     Akka.`akka-stream`,
-    Libs.`scalatest`   % Test,
-    Chill.`chill-akka` % Test
+    Libs.`junit`           % Test,
+    Libs.`junit-interface` % Test,
+    Libs.`scalatest`       % Test,
+    Chill.`chill-akka`     % Test
   )
 
   val Romaine = Seq(

@@ -1,7 +1,9 @@
 package csw.services.alarm.client.internal.helpers
 import akka.actor.ActorSystem
 import csw.commons.redis.EmbeddedRedis
-import csw.services.alarm.client.internal.AlarmServiceImpl
+import csw.services.alarm.api.javadsl.IAlarmService
+import csw.services.alarm.api.scaladsl.AlarmAdminService
+import csw.services.alarm.client.internal.JAlarmServiceImpl
 import io.lettuce.core.{RedisClient, RedisURI}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
@@ -22,8 +24,9 @@ abstract class AlarmServiceTestSetup
   implicit val system: ActorSystem  = ActorSystem()
   implicit val ec: ExecutionContext = system.dispatcher
 
-  val alarmServiceFactory            = new AlarmServiceTestFactory(redisURI, redisClient)
-  val alarmService: AlarmServiceImpl = alarmServiceFactory.make()
+  val alarmServiceFactory             = new AlarmServiceTestFactory(redisURI, redisClient)
+  val alarmService: AlarmAdminService = alarmServiceFactory.make()
+  val jalarmService: IAlarmService    = new JAlarmServiceImpl(alarmService)
 
   override protected def afterAll(): Unit = stopSentinel(sentinel, server)
 }
