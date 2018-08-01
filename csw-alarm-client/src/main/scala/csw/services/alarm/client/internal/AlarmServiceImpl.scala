@@ -57,19 +57,20 @@ class AlarmServiceImpl(
     await(setAlarmStore(alarmMetadataSet))
   }
 
+  private def logAndThrow(runtimeException: RuntimeException): Nothing = {
+    log.error(runtimeException.getMessage, ex = runtimeException)
+    throw runtimeException
+  }
+
   override def setSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Unit] = async {
     log.debug(s"Setting severity [${severity.name}] for alarm [${key.value}] with expire timeout [$ttlInSeconds] seconds")
 
     // get alarm metadata
-    val exception = KeyNotFoundException(key)
-    log.error(exception.getMessage, ex = exception)
-    val alarm = await(metadataApi.get(key)).getOrElse(throw exception)
+    val alarm = await(metadataApi.get(key)).getOrElse(logAndThrow(KeyNotFoundException(key)))
 
     // validate if the provided severity is supported by this alarm
     if (!alarm.allSupportedSeverities.contains(severity)) {
-      val exception = InvalidSeverityException(key, alarm.allSupportedSeverities, severity)
-      log.error(exception.getMessage, ex = exception)
-      throw exception
+      logAndThrow(InvalidSeverityException(key, alarm.allSupportedSeverities, severity))
     }
 
     // get the current severity of the alarm
@@ -107,27 +108,23 @@ class AlarmServiceImpl(
     log.debug(s"Getting severity for alarm [${key.value}]")
     if (await(metadataApi.exists(key)))
       await(severityApi.get(key)).getOrElse(Disconnected)
-    else {
-      val exception = KeyNotFoundException(key)
-      log.error(exception.getMessage, ex = exception)
-      throw exception
-    }
+    else logAndThrow(KeyNotFoundException(key))
   }
 
   override def getStatus(key: AlarmKey): Future[AlarmStatus] = async {
     log.debug(s"Getting status for alarm [${key.value}]")
-    await(statusApi.get(key)).getOrElse(throw KeyNotFoundException(key))
+    await(statusApi.get(key)).getOrElse(logAndThrow(KeyNotFoundException(key)))
   }
 
   override def getMetadata(key: AlarmKey): Future[AlarmMetadata] = async {
     log.debug(s"Getting metadata for alarm [${key.value}]")
-    await(metadataApi.get(key)).getOrElse(throw KeyNotFoundException(key))
+    await(metadataApi.get(key)).getOrElse(logAndThrow(KeyNotFoundException(key)))
   }
 
   override def getMetadata(key: Key): Future[List[AlarmMetadata]] = async {
     log.debug(s"Getting metadata for alarms matching [${key.value}]")
     val metadataKeys = await(metadataApi.keys(key))
-    if (metadataKeys.isEmpty) throw KeyNotFoundException(key);
+    if (metadataKeys.isEmpty) logAndThrow(KeyNotFoundException(key))
     await(metadataApi.mget(metadataKeys)).map(_.getValue)
   }
 
@@ -138,7 +135,7 @@ class AlarmServiceImpl(
 
       if (status.acknowledgementStatus == UnAcknowledged) // save the set call if status is already Acknowledged
         await(statusApi.set(key, status.copy(acknowledgementStatus = Acknowledged)))
-    } else throw KeyNotFoundException(key)
+    } else logAndThrow(KeyNotFoundException(key))
   }
 
   // reset is only called when severity is `Okay`
@@ -146,14 +143,14 @@ class AlarmServiceImpl(
     log.debug(s"Reset alarm [${key.value}]")
     if (await(metadataApi.exists(key))) {
       val currentSeverity = await(getSeverity(key))
-      if (currentSeverity != Okay) throw ResetOperationNotAllowed(key, currentSeverity)
+      if (currentSeverity != Okay) logAndThrow(ResetOperationNotAllowed(key, currentSeverity))
 
       val status = await(statusApi.get(key)).getOrElse(AlarmStatus())
       if (status.acknowledgementStatus == Acknowledged || status.latchStatus == Latched || status.latchedSeverity != Okay) {
         val resetStatus = status.copy(acknowledgementStatus = UnAcknowledged, latchStatus = UnLatched, latchedSeverity = Okay)
         await(statusApi.set(key, resetStatus))
       }
-    } else throw KeyNotFoundException(key)
+    } else logAndThrow(KeyNotFoundException(key))
   }
 
   override def shelve(key: AlarmKey): Future[Unit] = async {
@@ -184,22 +181,22 @@ class AlarmServiceImpl(
 
   override def activate(key: AlarmKey): Future[Unit] = async {
     log.debug(s"Activate alarm [${key.value}]")
-    val metadata = await(metadataApi.get(key)).getOrElse(throw KeyNotFoundException(key))
+    val metadata = await(metadataApi.get(key)).getOrElse(logAndThrow(KeyNotFoundException(key)))
     if (!metadata.isActive) await(metadataApi.set(key, metadata.copy(activationStatus = Active)))
   }
 
   override def deActivate(key: AlarmKey): Future[Unit] = async {
     log.debug(s"Deactivate alarm [${key.value}]")
-    val metadata = await(metadataApi.get(key)).getOrElse(throw KeyNotFoundException(key))
+    val metadata = await(metadataApi.get(key)).getOrElse(logAndThrow(KeyNotFoundException(key)))
     if (metadata.isActive) await(metadataApi.set(key, metadata.copy(activationStatus = Inactive)))
   }
 
   override def getAggregatedSeverity(key: Key): Future[AlarmSeverity] = async {
     log.debug(s"Get aggregated severity for alarm [${key.value}]")
     val statusKeys = await(statusApi.keys(key))
-    if (statusKeys.isEmpty) throw KeyNotFoundException(key)
+    if (statusKeys.isEmpty) logAndThrow(KeyNotFoundException(key))
 
-    val metadata = await(metadataApi.get(key)).getOrElse(throw KeyNotFoundException(key))
+    val metadata = await(metadataApi.get(key)).getOrElse(logAndThrow(KeyNotFoundException(key)))
 
     val statusList = await(statusApi.mget(statusKeys))
     statusList
@@ -243,7 +240,7 @@ class AlarmServiceImpl(
   // pattern: e.g  __keyspace@0__:status.nfiraos.*.*,
   // channel: e.g. __keyspace@0__:status.nfiraos.trombone.tromboneAxisLowLimitAlarm,
   // message: event type as value: e.g. set, expire, expired
-  def subscribeAggregatedSeverity(key: Key): Source[AlarmSeverity, AlarmSubscription] = {
+  private def subscribeAggregatedSeverity(key: Key): Source[AlarmSeverity, AlarmSubscription] = {
     val redisStreamApi     = statusStreamApiFactory() // create new connection for every client
     val keys: List[String] = List(StatusKey.fromAlarmKey(key).value)
 
