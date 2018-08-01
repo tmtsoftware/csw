@@ -34,6 +34,8 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
   `csw-config-server`,
   `csw-config-client-cli`,
   `csw-event-cli`,
+  `csw-alarm-api`,
+  `csw-alarm-client`,
   `csw-commons`,
   `csw-benchmark`,
   `examples`,
@@ -211,7 +213,6 @@ lazy val `csw-event-cli` = project
   .settings(libraryDependencies ++= Dependencies.EventCli)
 
 lazy val `csw-alarm-api` = project
-  .enablePlugins(GenJavadocPlugin)
   .settings(libraryDependencies ++= Dependencies.AlarmApi)
 
 lazy val `csw-alarm-client` = project
@@ -221,7 +222,6 @@ lazy val `csw-alarm-client` = project
     `romaine`,
     `csw-commons` % "test->test"
   )
-  .enablePlugins(GenJavadocPlugin)
   .settings(libraryDependencies ++= Dependencies.AlarmClient)
 
 lazy val `csw-commons` = project
@@ -244,7 +244,6 @@ lazy val `csw-benchmark` = project
   )
 
 lazy val `romaine` = project
-  .enablePlugins(GenJavadocPlugin)
   .settings(
     libraryDependencies ++= Dependencies.Romaine
   )
