@@ -22,7 +22,8 @@ pipeline {
             }
         }
 
-        stage('Unit and Component Tests') { // Component tests cover the scenario of multiple components in single container
+        stage('Unit and Component Tests') {
+            // Component tests cover the scenario of multiple components in single container
             steps {
                 sh "sbt -DenableCoverage=true test:test"
             }
@@ -43,7 +44,8 @@ pipeline {
             }
         }
 
-        stage('Multi-Jvm Test') { // These tests cover the scenario of multiple components in multiple containers on same machine.
+        stage('Multi-Jvm Test') {
+            // These tests cover the scenario of multiple components in multiple containers on same machine.
             steps {
                 sh "sbt csw-location/multi-jvm:test"
                 sh "sbt csw-config-client/multi-jvm:test"
@@ -82,10 +84,10 @@ def sendNotification(String buildStatus = 'STARTED') {
         color = 'RED'
         colorCode = '#FF0000'
         emailext(
-                    subject: subject,
-                    body: details,
-                    to: "tmt-csw@thoughtworks.com"
-            )
+                subject: subject,
+                body: details,
+                to: "tmt-csw@thoughtworks.com"
+        )
     }
 
     slackSend(channel: "#csw-build", color: colorCode, message: summary)
