@@ -38,6 +38,7 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
   `csw-alarm-client`,
   `csw-commons`,
   `csw-benchmark`,
+  `romaine`,
   `examples`,
   `integration`,
   `sequencer-prototype`
