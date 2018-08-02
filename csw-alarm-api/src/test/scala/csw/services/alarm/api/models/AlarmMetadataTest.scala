@@ -42,4 +42,9 @@ class AlarmMetadataTest extends FunSuite with Matchers {
   test("should get probable cause from AlarmMetadata") {
     alarmMetadata.probableCause shouldBe "the trombone software has failed or the stage was driven into the low limit"
   }
+
+  // DEOPSCSW-454: Instructions for corrective actions to handle the alarm
+  test("should get operator response from AlarmMetadata") {
+    alarmMetadata.operatorResponse shouldBe "go to the NFIRAOS engineering user interface and select the datum axis command"
+  }
 }
