@@ -8,7 +8,7 @@ import csw.messages.events._
 import csw.messages.params.models.Subsystem
 import csw.services.event.api.exceptions.EventServerNotAvailable
 import csw.services.event.api.scaladsl.{EventSubscriber, EventSubscription, SubscriptionMode}
-import csw.services.event.internal.commons.EventSubscriberUtil
+import csw.services.event.internal.commons.{EventServiceLogger, EventSubscriberUtil}
 import io.lettuce.core.api.async.RedisAsyncCommands
 import io.lettuce.core.codec.RedisCodec
 import io.lettuce.core.pubsub.api.reactive.RedisPubSubReactiveCommands
@@ -34,6 +34,7 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
     mat: Materializer
 ) extends EventSubscriber {
 
+  private val log                 = EventServiceLogger.getLogger
   private val eventSubscriberUtil = new EventSubscriberUtil()
 
   // create underlying connection asynchronously and obtain an instance of RedisAsyncCommands to perform
@@ -48,13 +49,18 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
     connection(redisClient.connectPubSubAsync(codec, redisURI).toScala).map(_.reactive())
 
   override def subscribe(eventKeys: Set[EventKey]): Source[Event, EventSubscription] = {
+    log.debug(s"Subscribing to event keys: $eventKeys")
     val connectionF = reactiveConnectionF(EventServiceCodec)
 
     val latestEventStream: Source[Event, NotUsed]        = Source.fromFuture(get(eventKeys)).mapConcat(identity)
     val eventStream: Source[Event, Future[NotUsed]]      = Source.fromFutureSource(subscribe_internal(eventKeys, connectionF))
     val finalEventStream: Source[Event, Future[NotUsed]] = latestEventStream.concatMat(eventStream)(Keep.right)
 
-    val unsubscribe = () ⇒ connectionF.flatMap(commands ⇒ commands.unsubscribe(eventKeys.toSeq: _*).toFuture.toScala)
+    val unsubscribe = () ⇒
+      connectionF.flatMap { commands ⇒
+        log.debug(s"Unsubscribing to event keys: $eventKeys")
+        commands.unsubscribe(eventKeys.toSeq: _*).toFuture.toScala
+    }
 
     subscription(finalEventStream, connectionF, unsubscribe)
   }
@@ -96,12 +102,19 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
   ): EventSubscription = subscribeCallback(eventKeys, eventSubscriberUtil.actorCallback(actorRef), every, mode)
 
   override def pSubscribe(subsystem: Subsystem, pattern: String): Source[Event, EventSubscription] = {
+    val keyPattern = s"${subsystem.entryName}.$pattern"
+    log.info(s"Subscribing to event key pattern: $keyPattern")
+
     val connectionF = reactiveConnectionF(PatternBasedEventServiceCodec)
-    val keyPattern  = s"${subsystem.entryName}.$pattern"
     val eventStream: Source[Event, Future[NotUsed]] =
       Source.fromFutureSource(pSubscribe_internal(keyPattern, connectionF))
 
-    val unsubscribe = () ⇒ connectionF.flatMap(commands ⇒ commands.punsubscribe(keyPattern).toFuture.toScala)
+    val unsubscribe = () ⇒
+      connectionF.flatMap {
+        log.info(s"Unsubscribing to event key pattern: $keyPattern")
+        commands ⇒
+          commands.punsubscribe(keyPattern).toFuture.toScala
+    }
 
     subscription(eventStream, connectionF, unsubscribe)
   }
@@ -112,6 +125,7 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
   override def get(eventKeys: Set[EventKey]): Future[Set[Event]] = Future.sequence(eventKeys.map(get))
 
   override def get(eventKey: EventKey): Future[Event] = async {
+    log.info(s"Fetching event key: $eventKey")
     val commands = await(asyncConnectionF)
     val event    = await(commands.get(eventKey).toScala)
     if (event == null) Event.invalidEvent(eventKey) else event
