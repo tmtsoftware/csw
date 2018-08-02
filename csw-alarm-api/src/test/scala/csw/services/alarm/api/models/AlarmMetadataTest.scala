@@ -47,4 +47,9 @@ class AlarmMetadataTest extends FunSuite with Matchers {
   test("should get operator response from AlarmMetadata") {
     alarmMetadata.operatorResponse shouldBe "go to the NFIRAOS engineering user interface and select the datum axis command"
   }
+
+  // DEOPSCSW-455: Identify Alarm auto acknowledgement
+  test("should be able to determine if alarm can be auto-acknowledged") {
+    alarmMetadata.isAutoAcknowledgeable shouldBe true
+  }
 }
