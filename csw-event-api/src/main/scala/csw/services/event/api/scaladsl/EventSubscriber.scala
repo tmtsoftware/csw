@@ -19,7 +19,10 @@ trait EventSubscriber {
    * Event Keys will be received first. If event is not published for one or more event keys, `invalid event` will be received for those Event Keys.
    *
    * At the time of invocation, in case the underlying server is not available [[csw.services.event.api.exceptions.EventServerNotAvailable]] exception is thrown
-   * and the stream is stopped after logging appropriately. In all other cases of exception, the stream resumes to receive remaining elements.
+   * and the stream is stopped after logging appropriately. In all other cases of exception, as per the default behavior, the stream will stop.
+   * To avoid that, user should provide a resuming materializer while running the stream.
+   *
+    @note All the other APIs of [[EventSubscriber]] that do not return a [[akka.stream.scaladsl.Source]], internally use the resuming materializer which will ignore the failed event and resume receiving further events.
    *
    * @param eventKeys a set of [[csw.messages.events.EventKey]] to subscribe to
    * @return a [[akka.stream.scaladsl.Source]] of [[csw.messages.events.Event]]. The materialized value of the source provides an [[csw.services.event.api.scaladsl.EventSubscription]]
@@ -32,7 +35,10 @@ trait EventSubscriber {
    * Event Keys will be received first. If event is not published for one or more event keys, `invalid event` will be received for those Event Keys.
    *
    * At the time of invocation, in case the underlying server is not available, [[csw.services.event.api.exceptions.EventServerNotAvailable]] exception is thrown
-   * and the stream is stopped after logging appropriately. In all other cases of exception, the stream resumes to receive remaining elements.
+   * and the stream is stopped after logging appropriately. In all other cases of exception, as per the default behavior, the stream will stop.
+   * To avoid that, user should provide a resuming materializer while running the stream.
+   *
+   * @note All the other APIs of [[EventSubscriber]] that do not return a [[akka.stream.scaladsl.Source]], internally use the resuming materializer which will ignore the failed event and resume receiving further events.
    *
    * @param eventKeys a set of [[csw.messages.events.EventKey]] to subscribe to
    * @param every the duration which determines the frequency with which events are received
