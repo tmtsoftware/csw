@@ -58,6 +58,7 @@ class AlarmServiceImplTest extends AlarmServiceTestSetup(26381, 6381) {
   test("should latch alarm only when it is high risk and higher than latched severity in case of latchable alarms") {
     val tromboneAxisHighLimitAlarm = AlarmKey("nfiraos", "trombone", "tromboneAxisHighLimitAlarm")
     val status                     = setSeverity(tromboneAxisHighLimitAlarm, Major)
+
     status shouldEqual AlarmStatus(acknowledgementStatus = Acknowledged, latchStatus = Latched, latchedSeverity = Major)
 
     val status1 = setSeverity(tromboneAxisHighLimitAlarm, Warning)
@@ -80,8 +81,8 @@ class AlarmServiceImplTest extends AlarmServiceTestSetup(26381, 6381) {
 
   test("should auto-acknowledge alarm only when it is auto-acknowledgable while setting severity") {
     val tromboneAxisLowLimitAlarm = AlarmKey("nfiraos", "trombone", "tromboneAxisLowLimitAlarm")
-    val status1                   = setSeverity(tromboneAxisLowLimitAlarm, Major)
-    status1 shouldEqual AlarmStatus(acknowledgementStatus = UnAcknowledged, latchStatus = Latched, latchedSeverity = Major)
+    val status                    = setSeverity(tromboneAxisLowLimitAlarm, Major)
+    status shouldEqual AlarmStatus(acknowledgementStatus = UnAcknowledged, latchStatus = Latched, latchedSeverity = Major)
   }
 
 //  test("should throw exception while getting severity if key does not exist") {

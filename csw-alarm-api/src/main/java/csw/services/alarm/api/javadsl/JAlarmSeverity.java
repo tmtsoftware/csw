@@ -1,4 +1,4 @@
-package csw.services.alarm.api;
+package csw.services.alarm.api.javadsl;
 
 import csw.services.alarm.api.models.AlarmSeverity;
 
