@@ -1,22 +1,17 @@
 package csw.services.alarm.client.internal
 import java.io.File
 
-import csw.services.alarm.api.exceptions.{
-  InvalidSeverityException,
-  KeyNotFoundException,
-  NoAlarmsFoundException,
-  ResetOperationNotAllowed
-}
+import csw.services.alarm.api.exceptions.InvalidSeverityException
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, UnAcknowledged}
 import csw.services.alarm.api.models.AlarmSeverity._
-import csw.services.alarm.api.models.Key.{AlarmKey, ComponentKey, GlobalKey, SubsystemKey}
+import csw.services.alarm.api.models.Key.AlarmKey
 import csw.services.alarm.api.models.LatchStatus.{Latched, UnLatched}
 import csw.services.alarm.api.models.ShelveStatus.UnShelved
 import csw.services.alarm.api.models.{AlarmSeverity, AlarmStatus}
 import csw.services.alarm.client.internal.helpers.AlarmServiceTestSetup
 import csw.services.alarm.client.internal.helpers.TestFutureExt.RichFuture
 
-class AlarmServiceImplTest extends AlarmServiceTestSetup {
+class AlarmServiceImplTest extends AlarmServiceTestSetup(26381, 6381) {
 
   override protected def beforeEach(): Unit = {
     val path = getClass.getResource("/test-alarms/valid-alarms.conf").getPath

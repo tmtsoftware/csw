@@ -13,7 +13,7 @@ import csw.services.alarm.client.internal.helpers.AlarmServiceTestSetup
 import csw.services.alarm.client.internal.helpers.TestFutureExt.RichFuture
 
 // DEOPSCSW-486: Provide API to load alarm metadata in Alarm store from file
-class InitAlarmStoreTest extends AlarmServiceTestSetup {
+class InitAlarmStoreTest extends AlarmServiceTestSetup(2639, 6379) {
 
   val nfiraosAlarmKey = AlarmKey("nfiraos", "trombone", "tromboneAxisHighLimitAlarm")
   private val tromboneAxisHighLimitAlarm = AlarmMetadata(

@@ -9,16 +9,16 @@ import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 import scala.concurrent.ExecutionContext
 
-abstract class AlarmServiceTestSetup
+class AlarmServiceTestSetup(sentinelPort: Int, serverPort: Int)
     extends FunSuite
     with Matchers
     with EmbeddedRedis
     with BeforeAndAfterAll
     with BeforeAndAfterEach {
   private val alarmServer        = "AlarmServer"
-  private val (sentinel, server) = startSentinel(26379, 6379, masterId = alarmServer)
+  private val (sentinel, server) = startSentinel(sentinelPort, serverPort, masterId = alarmServer)
 
-  private val redisURI                 = RedisURI.Builder.sentinel("localhost", 26379, alarmServer).build()
+  private val redisURI                 = RedisURI.Builder.sentinel("localhost", sentinelPort, alarmServer).build()
   private val redisClient: RedisClient = RedisClient.create(redisURI)
 
   implicit val system: ActorSystem  = ActorSystem()
