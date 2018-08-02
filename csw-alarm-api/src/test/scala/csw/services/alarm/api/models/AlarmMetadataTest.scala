@@ -52,4 +52,9 @@ class AlarmMetadataTest extends FunSuite with Matchers {
   test("should be able to determine if alarm can be auto-acknowledged") {
     alarmMetadata.isAutoAcknowledgeable shouldBe true
   }
+
+  // DEOPSCSW-456: Examine alarm latching state of each alarm
+  test("should be able to determine if alarm can be latched") {
+    alarmMetadata.isLatchable shouldBe true
+  }
 }
