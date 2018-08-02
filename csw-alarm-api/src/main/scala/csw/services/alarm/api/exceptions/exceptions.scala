@@ -1,6 +1,7 @@
 package csw.services.alarm.api.exceptions
 
 import csw.services.alarm.api.models.AlarmSeverity.Okay
+import csw.services.alarm.api.models.Key.AlarmKey
 import csw.services.alarm.api.models.{AlarmSeverity, Key}
 
 case class InvalidSeverityException(key: Key, supportedSeverities: Set[AlarmSeverity], invalidSeverity: AlarmSeverity)
@@ -14,8 +15,13 @@ case class ResetOperationNotAllowed(key: Key, currentSeverity: AlarmSeverity)
       s"Failed to reset alarm for key:[${key.value}], alarms can only be reset when severity:[${Okay.name}], but current severity is:[${currentSeverity.name}]."
     )
 
-case class NoAlarmsFoundException() extends RuntimeException("No alarms found")
-
 case class ConfigParseException(reasons: List[String]) extends RuntimeException(reasons.mkString("[", "\n", "]"))
 
-case class KeyNotFoundException(key: Key) extends RuntimeException(s"Key: [${key.value}] not found in Alarm Store.")
+case class KeyNotFoundException private (message: String) extends RuntimeException(message)
+
+object KeyNotFoundException {
+
+  def apply(key: AlarmKey): KeyNotFoundException = new KeyNotFoundException(s"Key: [${key.value}] not found in Alarm Store.")
+  def apply(key: Key): KeyNotFoundException =
+    new KeyNotFoundException(s"Key: [${key.value}] does not match any key in Alarm store.")
+}

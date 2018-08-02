@@ -49,6 +49,7 @@ public class JAlarmServiceImplTest {
         return Await.result(alarmServiceTestSetup.alarmService().getStatus(alarmKey), new FiniteDuration(2, TimeUnit.SECONDS));
     }
 
+    //  DEOPSCSW-459: Update severity to Disconnected if not updated within predefined time
     @Test
     public void shouldSetSeverityInAlarmStoreForGivenKey() throws Exception {
         AlarmKey tromboneAxisHighLimitAlarm = new AlarmKey("nfiraos", "trombone", "tromboneAxisHighLimitAlarm");

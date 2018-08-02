@@ -7,12 +7,7 @@ import akka.actor.typed.ActorRef
 import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{ActorMaterializer, Materializer}
 import com.typesafe.config.{ConfigFactory, ConfigResolveOptions}
-import csw.services.alarm.api.exceptions.{
-  InvalidSeverityException,
-  KeyNotFoundException,
-  NoAlarmsFoundException,
-  ResetOperationNotAllowed
-}
+import csw.services.alarm.api.exceptions.{InvalidSeverityException, KeyNotFoundException, ResetOperationNotAllowed}
 import csw.services.alarm.api.internal.{MetadataKey, SeverityKey, StatusKey}
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, UnAcknowledged}
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
@@ -132,7 +127,7 @@ class AlarmServiceImpl(
   override def getMetadata(key: Key): Future[List[AlarmMetadata]] = async {
     log.debug(s"Getting metadata for alarms matching [${key.value}]")
     val metadataKeys = await(metadataApi.keys(key))
-    if (metadataKeys.isEmpty) throw NoAlarmsFoundException()
+    if (metadataKeys.isEmpty) throw KeyNotFoundException(key);
     await(metadataApi.mget(metadataKeys)).map(_.getValue)
   }
 
@@ -202,7 +197,7 @@ class AlarmServiceImpl(
   override def getAggregatedSeverity(key: Key): Future[AlarmSeverity] = async {
     log.debug(s"Get aggregated severity for alarm [${key.value}]")
     val statusKeys = await(statusApi.keys(key))
-    if (statusKeys.isEmpty) throw NoAlarmsFoundException()
+    if (statusKeys.isEmpty) throw KeyNotFoundException(key)
 
     val metadata = await(metadataApi.get(key)).getOrElse(throw KeyNotFoundException(key))
 
