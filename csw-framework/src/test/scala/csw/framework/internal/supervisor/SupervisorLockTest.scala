@@ -169,7 +169,8 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     val setup = Setup(sourcePrefix, commandName, Some(obsId))
     supervisorRef ! Submit(setup, submitResponseProbe.ref)
     submitResponseProbe.expectMessageType[Completed]
-    // TODO -- CHeck on why these are here?
+    // Note there is a Started from ComponentBehavior as well as Completed
+    commandResponseManagerActor.expectMessage(AddOrUpdateCommand(setup.runId, Started(setup.runId)))
     commandResponseManagerActor.expectMessage(AddOrUpdateCommand(setup.runId, Completed(setup.runId)))
 
     // Ensure Query can be sent to component even in locked state

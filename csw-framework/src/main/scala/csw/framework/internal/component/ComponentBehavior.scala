@@ -80,7 +80,8 @@ private[framework] final class ComponentBehavior(
       case (_, msg: TopLevelActorCommonMessage)                          ⇒ onCommon(msg)
       case (ComponentLifecycleState.Idle, msg: TopLevelActorIdleMessage) ⇒ onIdle(msg)
       case (ComponentLifecycleState.Running, msg: RunningMessage)        ⇒ onRun(msg)
-      case _                                                             ⇒ log.error(s"Unexpected message :[$msg] received by component in lifecycle state :[$lifecycleState]")
+      case _ ⇒
+        log.error(s"Unexpected message :[$msg] received by component in lifecycle state :[$lifecycleState]")
     }
     this
   }
@@ -200,9 +201,9 @@ private[framework] final class ComponentBehavior(
         val validationResponse = lifecycleHandlers.validateCommand(commandMessage.command)
         validationResponse match {
           case _: Accepted =>
-            // Here the submit is marked as started, to indicate that the command has started processing
-            // This is needed because someone might do something in the doSubmit like subscribe -- this may be
-            // a feature of certain tests, but it does seem possible that something should be in the CRM once underway
+            // Here the submit is marked as started, to indicate that the command has transitioned from validation
+            // and has started processing. This is needed also for the case where someone in onSubmit subscribes
+            // to their own runId, which is done in at least one of the tests
             // Prefer not to add a new unique response that would only be relevant to the internals
             commandResponseManager.commandResponseManagerActor ! AddOrUpdateCommand(commandMessage.command.runId,
                                                                                     Started(commandMessage.command.runId))
@@ -216,34 +217,5 @@ private[framework] final class ComponentBehavior(
         }
     }
   }
-
-  /*
-    commandMessage match {
-      case _: Submit ⇒
-        commandResponseManager.commandResponseManagerActor ! AddOrUpdateCommand(commandMessage.command.runId, validationResponse)
-      case _: Oneway ⇒ //Oneway command should not be added to CommandResponseManager
-    }
-
-    //commandMessage.replyTo ! validationResponse
-    forwardCommand(commandMessage /*, validationResponse */)
-  }
-
-  private def forwardCommand(commandMessage: CommandMessage /*, validationResponse: CommandResponse*/): Unit =
-   */
-  /*
-    validationResponse match {
-      case Accepted(_) ⇒
-        commandMessage match {
-          case _: Submit ⇒
-            log.info(s"Invoking lifecycle handler's onSubmit hook with msg :[$commandMessage]")
-            lifecycleHandlers.onSubmit(commandMessage.command)
-          case _: Oneway ⇒
-            log.info(s"Invoking lifecycle handler's onOneway hook with msg :[$commandMessage]")
-            lifecycleHandlers.onOneway(commandMessage.command)
-        }
-      case _ ⇒ log.debug(s"Command not forwarded to TLA post validation. ValidationResponse was [$validationResponse]")
-
-    }
- */
 
 }

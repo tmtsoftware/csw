@@ -156,6 +156,8 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     verify(sampleHcdHandler).validateCommand(sc1)
     verify(sampleHcdHandler).onSubmit(sc1)
     submitResponseProbe.expectMessage(Completed(sc1.runId))
+    // First receives a Started and then Completed
+    commandStatusServiceProbe.expectMessage(AddOrUpdateCommand(sc1.runId, Started(sc1.runId)))
     commandStatusServiceProbe.expectMessage(AddOrUpdateCommand(sc1.runId, Completed(sc1.runId)))
   }
 
@@ -201,6 +203,8 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     verify(sampleHcdHandler).validateCommand(sc1)
     verify(sampleHcdHandler).onSubmit(sc1)
     submitResponseProbe.expectMessage(Completed(sc1.runId))
+    // Started is received from ComponentBehavior onSubmit
+    commandStatusServiceProbe.expectMessage(AddOrUpdateCommand(sc1.runId, Started(sc1.runId)))
     commandStatusServiceProbe.expectMessage(AddOrUpdateCommand(sc1.runId, Completed(sc1.runId)))
   }
 

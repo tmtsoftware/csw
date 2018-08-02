@@ -196,7 +196,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
                 // subscribe to the status of original command received and publish the state when its status changes to
                 // Completed
                 commandResponseManager.jSubscribe(subCommand.runId(), commandResponse -> {
-                    if (commandResponse.resultType() instanceof CommandResponse.Completed) {
+                    if (commandResponse instanceof CommandResponse.Completed) {
                         Key<String> stringKey = JKeyTypes.StringKey().make("sub-command-status");
                         CurrentState currentState = new CurrentState(sc.source().prefix(), new StateName("testStateName"));
                         currentStatePublisher.publish(currentState.madd(stringKey.set("complete")));
@@ -212,7 +212,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
                 JCommandService componentCommandService = runningHcds.get(componentInfo.getConnections().get(0)).get();
                 componentCommandService.subscribe(subCommand2.runId(), Timeout.durationToTimeout(FiniteDuration.apply(5, TimeUnit.SECONDS)))
                         .thenAccept(commandResponse -> {
-                            if (commandResponse.resultType() instanceof CommandResponse.Completed) {
+                            if (commandResponse instanceof CommandResponse.Completed) {
                                 // As the commands get completed, the results are updated in the commandResponseManager
                                 commandResponseManager.updateSubCommand(subCommand2.runId(), commandResponse);
                             } else {

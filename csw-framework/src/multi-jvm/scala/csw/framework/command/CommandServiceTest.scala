@@ -184,7 +184,6 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       val matcherResponseF: Future[MatcherResponse] = matcher.start
 
       // submit command and if the command is successfully validated, check for matching of demand state against current state
-
       val eventualCommandResponse: Future[MatchingResponse] = async {
         val initialResponse = await(assemblyComponent.oneway(setupWithMatcher))
         initialResponse match {
@@ -206,7 +205,6 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
         }
       }
 
-      // TODO -- This is currently kind of silly since it's returned above
       val commandResponse = Await.result(eventualCommandResponse, timeout.duration)
       //#matcher
       commandResponse shouldBe Completed(setupWithMatcher.runId)
@@ -272,14 +270,6 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
           case other@(Invalid(_, _) | Locked(_)) =>
             matcher.stop()
             other.asInstanceOf[MatchingResponse]
-          /*
-        case invalid: Invalid ⇒
-          matcher.stop()
-          invalid
-        case locked: Locked =>
-          matcher.stop()
-          locked
-          */
         }
       }
 
@@ -341,7 +331,6 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       submitResponseProbe.expectMessageType[CompletedWithResult](5.seconds)
 
       enterBarrier("command-when-locked")
-      */
     }
 
     runOn(member2) {

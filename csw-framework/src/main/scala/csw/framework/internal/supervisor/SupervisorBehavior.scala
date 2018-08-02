@@ -201,15 +201,15 @@ private[framework] final class SupervisorBehavior(
     case Lock(source, replyTo, leaseDuration) ⇒ lockComponent(source, replyTo, leaseDuration)
     case Unlock(source, replyTo)              ⇒ unlockComponent(source, replyTo)
     case command: CommandMessage ⇒
-      if (lockManager.allowCommand(command) == false) {
+      if (lockManager.allowCommand(command)) {
+        runningComponent.get ! command
+      } else {
         // Both types of command message have their own responses, so while it is not elegant, it is necessary
         // to check for the type of message upon failure, and send to the currect replyTo
         command match {
           case s: Submit => s.replyTo ! Locked(s.command.runId)
           case o: Oneway => o.replyTo ! Locked(o.command.runId)
         }
-      } else {
-        runningComponent.get ! command
       }
     case runningMessage: RunningMessage ⇒ handleRunningMessage(runningMessage)
     case msg @ Running(_)               ⇒ log.info(s"Ignoring [$msg] message received from TLA as Supervisor already in Running state")

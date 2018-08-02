@@ -4,7 +4,7 @@ import akka.NotUsed
 import akka.stream.Materializer
 import akka.stream.scaladsl.Source
 import csw.messages.TMTSerializable
-import csw.messages.commands.CommandResultType.{Intermediate, Negative, Positive}
+import csw.messages.commands.CommandResponse.CommandResultType.{Intermediate, Negative, Positive}
 import csw.messages.params.models.Id
 import enumeratum._
 
@@ -14,25 +14,9 @@ import scala.collection.immutable
  * The nature of CommandResponse as an intermediate response of command execution or a final response which could be
  * positive or negative
  */
-sealed trait CommandResultType
-object CommandResultType {
-
-  case object Intermediate extends CommandResultType
-
-  sealed trait Final extends CommandResultType
-
-  case object Negative extends Final
-
-  case object Positive extends Final
-
-}
-
 object CommandResponse {
 
-  import CommandResultType._
-
   sealed trait Response extends TMTSerializable {
-    def resultType: CommandResultType
 
     /**
      * A helper method to get the runId for this command response
@@ -50,45 +34,27 @@ object CommandResponse {
 
   sealed trait MatchingResponse extends Response
 
-  case class Accepted(runId: Id) extends ValidationResponse with OnewayResponse {
-    val resultType: CommandResultType = Positive
-  }
+  case class Accepted(runId: Id) extends ValidationResponse with OnewayResponse
 
-  case class Started(runId: Id) extends SubmitResponse {
-    val resultType: CommandResultType = Intermediate
-  }
+  case class Started(runId: Id) extends SubmitResponse
 
-  case class CompletedWithResult(runId: Id, result: Result) extends SubmitResponse {
-    val resultType: CommandResultType = Positive
-  }
+  case class CompletedWithResult(runId: Id, result: Result) extends SubmitResponse
 
-  case class Completed(runId: Id) extends SubmitResponse with MatchingResponse {
-    val resultType: CommandResultType = Positive
-  }
+  case class Completed(runId: Id) extends SubmitResponse with MatchingResponse
 
   case class Invalid(runId: Id, issue: CommandIssue)
       extends ValidationResponse
       with OnewayResponse
       with SubmitResponse
-      with MatchingResponse {
-    val resultType: CommandResultType = Negative
-  }
+      with MatchingResponse
 
-  case class Error(runId: Id, message: String) extends SubmitResponse with MatchingResponse {
-    val resultType: CommandResultType = Negative
-  }
+  case class Error(runId: Id, message: String) extends SubmitResponse with MatchingResponse
 
-  case class Cancelled(runId: Id) extends SubmitResponse {
-    val resultType: CommandResultType = Negative
-  }
+  case class Cancelled(runId: Id) extends SubmitResponse
 
-  case class Locked(runId: Id) extends OnewayResponse with SubmitResponse with MatchingResponse {
-    val resultType: CommandResultType = Negative
-  }
+  case class Locked(runId: Id) extends OnewayResponse with SubmitResponse with MatchingResponse
 
-  case class CommandNotAvailable(runId: Id) extends SubmitResponse {
-    val resultType: CommandResultType = Negative
-  }
+  case class CommandNotAvailable(runId: Id) extends SubmitResponse
 
   /**
    * Transform a given CommandResponse to a response with the provided Id
@@ -108,6 +74,25 @@ object CommandResponse {
     case commandNotAvailable: CommandNotAvailable ⇒ commandNotAvailable.copy(runId = id)
   }
 
+  sealed trait CommandResultType
+  object CommandResultType {
+
+    case object Intermediate extends CommandResultType
+
+    sealed trait Final extends CommandResultType
+
+    case object Negative extends Final
+
+    case object Positive extends Final
+
+  }
+
+  def isCommandResultType(sr: SubmitResponse): CommandResultType = sr match {
+    case Completed(_) | CompletedWithResult(_, _) => Positive
+    case Started(_)                               => Intermediate
+    case _                                        => Negative
+  }
+
   /**
    * Creates an aggregated response from a collection of CommandResponses received from other components. If one of the
    * CommandResponses fail, the aggregated response fails and further processing of any more CommandResponse is terminated.
@@ -119,41 +104,13 @@ object CommandResponse {
                                                                            mat: Materializer): Future[SubmitResponse] = {
     commandResponses
       .runForeach { x ⇒
-        if (x.resultType == Negative)
+        if (isCommandResultType((x)) == Negative)
           throw new RuntimeException(s"Command with runId [${x.runId}] failed with response [$x]")
       }
       .transform {
-        case Success(_)  ⇒ Success(CommandResponse.Completed(Id()))
-        case Failure(ex) ⇒ Success(CommandResponse.Error(Id(), s"${ex.getMessage}"))
+        case Success(_)  ⇒ Success(Completed(Id()))
+        case Failure(ex) ⇒ Success(Error(Id(), s"${ex.getMessage}"))
       }
   }
 
-  /*
-  def matching():MatchingResponse = {
-    Completed(Id())
-    Invalid(Id(), WrongInternalStateIssue(""))
-    Error(Id(), "bogus")
-  }
-
-  def validate():ValidationResponse = {
-    Accepted(Id())
-    Invalid(Id(), WrongInternalStateIssue(""))
-    //Started(Id())
-  }
-
-  def oneway():OnewayResponse = {
-    Invalid(Id(), WrongInternalStateIssue(""))
-    Accepted(Id())
-  }
-
-  def submit():SubmitResponse = {
-    Invalid(Id(), WrongInternalStateIssue(""))
-    Completed(Id())
-    Started(Id())
-    Locked(Id())
-    Error(Id(), "Bogus")
-    Cancelled(Id())
-    CompletedWithResult(Id(), Result(Prefix("wfos")))
-  }
- */
 }

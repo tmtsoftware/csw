@@ -84,6 +84,21 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
     commandResponseProbe.expectMessage(Completed(runId))
   }
 
+  test("should get one update for long running command that returns Started") {
+    val behaviorTestKit                  = createBehaviorTestKit()
+    val commandResponseProbe             = TestProbe[SubmitResponse]
+    val commandResponseManagerStateProbe = TestProbe[CommandResponseManagerState]
+
+    val runId = Id()
+
+    behaviorTestKit.run(AddOrUpdateCommand(runId, Started(runId)))
+
+    behaviorTestKit.run(Subscribe(runId, commandResponseProbe.ref))
+
+    commandResponseProbe.expectMessage(Started(runId))
+  }
+
+
   test("should be able to remove subscriber") {
     val behaviorTestKit                  = createBehaviorTestKit()
     val commandResponseProbe             = TestProbe[SubmitResponse]

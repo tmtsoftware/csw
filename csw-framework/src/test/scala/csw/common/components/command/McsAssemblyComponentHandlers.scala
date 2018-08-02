@@ -60,7 +60,7 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
       case `longRunning` ⇒
         //#addOrUpdateCommand
         // after validation of the controlCommand, update its status of successful validation as Accepted
-        // TODO -- Don't think we should do this
+        // TODO -- This isn't needed, but it must be part of docs
         // commandResponseManager.addOrUpdateCommand(controlCommand.runId, Started(controlCommand.runId))
         //#addOrUpdateCommand
         Accepted(controlCommand.runId)
@@ -142,8 +142,6 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
       .map {
         case response: Started ⇒
           // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
-          // TODO -- Shouldn't be doing this - updating for subscommand
-          //commandResponseManager.updateSubCommand(response.runId, Started(response.runId))
           //#updateSubCommand
           // An original command is split into sub-commands and sent to a component. The result of the command is
           // obtained by subscribing to the component with the sub command id.

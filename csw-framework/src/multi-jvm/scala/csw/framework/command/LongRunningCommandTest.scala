@@ -99,7 +99,6 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
 
       Await.result(response, 20.seconds) shouldBe Completed(setupForSubscribe.runId)
 
-
       // verify that commands gets completed in following sequence
       // ShortSetup => MediumSetup => LongSetup
       probe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(shortCmdCompleted))))
@@ -112,7 +111,6 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
       assemblyCommandService.submit(setupForQuery)
 
       //do some work before querying for the result of above command as needed
-
       val eventualResponse: Future[SubmitResponse] = assemblyCommandService.query(setupForQuery.runId)
       //#query-response
       eventualResponse.map(_ shouldBe Started(setupForQuery.runId))

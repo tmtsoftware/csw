@@ -59,9 +59,6 @@ class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
 
   override def onSubmit(controlCommand: ControlCommand): SubmitResponse = {
     // Adding passed in parameter to see if data is transferred properly
-    // TODO -- POSSIBLY NOT NEEDED if DONE in COMponent
-    println("In SampleComponentHandlers, removed commandResponseManager call")
-    //commandResponseManager.addOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId))
     currentStatePublisher.publish(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(submitCommandChoice))))
     processCommand(controlCommand)
     Completed(controlCommand.runId)
