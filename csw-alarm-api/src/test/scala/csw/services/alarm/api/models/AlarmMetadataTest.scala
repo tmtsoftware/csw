@@ -22,6 +22,7 @@ class AlarmMetadataTest extends FunSuite with Matchers {
     activationStatus = Active
   )
 
+  // DEOPSCSW-435: Identify Alarm by Subsystem, component and AlarmName
   test("should get alarm key from AlarmMetadata") {
     alarmMetadata.alarmKey shouldBe AlarmKey("nfiraos", "trombone", "tromboneAxisHighLimitAlarm")
   }
