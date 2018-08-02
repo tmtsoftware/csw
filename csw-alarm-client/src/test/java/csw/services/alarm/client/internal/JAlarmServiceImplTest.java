@@ -26,7 +26,7 @@ import static org.junit.Assert.assertEquals;
 public class JAlarmServiceImplTest {
 
     private static AlarmServiceTestSetup alarmServiceTestSetup = new AlarmServiceTestSetup(26380, 6380);
-    private static IAlarmService jAlarmService = alarmServiceTestSetup.jalarmService();
+    private static IAlarmService jAlarmService = alarmServiceTestSetup.jAlarmService();
     private static AlarmAdminService alarmService = alarmServiceTestSetup.alarmService();
 
     @Rule

@@ -76,7 +76,7 @@ class AlarmServiceImplTest extends AlarmServiceTestSetup(26381, 6381) {
     status shouldEqual AlarmStatus(Acknowledged, Latched, Major, UnShelved)
 
     //get severity and assert
-    val alarmSeverity = alarmServiceFactory.severityApi.get(tromboneAxisHighLimitAlarm).await.get
+    val alarmSeverity = testSeverityApi.get(tromboneAxisHighLimitAlarm).await.get
     alarmSeverity shouldEqual Major
 
     //wait for 1 second and assert expiry of severity
@@ -228,6 +228,6 @@ class AlarmServiceImplTest extends AlarmServiceTestSetup(26381, 6381) {
 //  }
   private def setSeverity(alarmKey: AlarmKey, alarmSeverity: AlarmSeverity): AlarmStatus = {
     alarmService.setSeverity(alarmKey, alarmSeverity).await
-    alarmServiceFactory.statusApi.get(alarmKey).await.get
+    testStatusApi.get(alarmKey).await.get
   }
 }

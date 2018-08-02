@@ -219,6 +219,7 @@ lazy val `csw-alarm-api` = project
 lazy val `csw-alarm-client` = project
   .dependsOn(
     `csw-alarm-api`,
+    `csw-location`,
     `csw-logging`,
     `romaine`,
     `csw-commons` % "test->test"

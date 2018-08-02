@@ -1,11 +1,17 @@
 package csw.services.alarm.client.internal.helpers
 import akka.actor.ActorSystem
 import csw.commons.redis.EmbeddedRedis
+import csw.services.alarm.api.internal.{MetadataKey, SeverityKey, StatusKey}
 import csw.services.alarm.api.javadsl.IAlarmService
+import csw.services.alarm.api.models.{AlarmMetadata, AlarmSeverity, AlarmStatus}
 import csw.services.alarm.api.scaladsl.AlarmAdminService
-import csw.services.alarm.client.internal.JAlarmServiceImpl
+import csw.services.alarm.client.AlarmServiceFactory
+import csw.services.alarm.client.internal.AlarmCodec.{MetadataCodec, SeverityCodec, StatusCodec}
+import csw.services.alarm.client.internal.commons.ConnectionsFactory
+import csw.services.alarm.client.internal.helpers.TestFutureExt.RichFuture
 import io.lettuce.core.{RedisClient, RedisURI}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
+import romaine.RedisAsyncScalaApi
 
 import scala.concurrent.ExecutionContext
 
@@ -15,18 +21,28 @@ class AlarmServiceTestSetup(sentinelPort: Int, serverPort: Int)
     with EmbeddedRedis
     with BeforeAndAfterAll
     with BeforeAndAfterEach {
-  private val alarmServer        = "AlarmServer"
+  private val hostname           = "localhost"
+  private val alarmServer        = "alarmServer"
   private val (sentinel, server) = startSentinel(sentinelPort, serverPort, masterId = alarmServer)
 
-  private val redisURI                 = RedisURI.Builder.sentinel("localhost", sentinelPort, alarmServer).build()
-  private val redisClient: RedisClient = RedisClient.create(redisURI)
+  private val redisURI                 = RedisURI.Builder.sentinel(hostname, sentinelPort, alarmServer).build()
+  private val redisClient: RedisClient = RedisClient.create()
 
   implicit val system: ActorSystem  = ActorSystem()
   implicit val ec: ExecutionContext = system.dispatcher
 
-  val alarmServiceFactory             = new AlarmServiceTestFactory(redisURI, redisClient)
-  val alarmService: AlarmAdminService = alarmServiceFactory.make()
-  val jalarmService: IAlarmService    = new JAlarmServiceImpl(alarmService)
+  val alarmServiceFactory             = new AlarmServiceFactory(redisClient)
+  val alarmService: AlarmAdminService = alarmServiceFactory.adminApi(hostname, sentinelPort).await
+  val jAlarmService: IAlarmService    = alarmServiceFactory.jClientApi(hostname, sentinelPort, system).await
 
-  override protected def afterAll(): Unit = stopSentinel(sentinel, server)
+  val connsFactory: ConnectionsFactory                                = new ConnectionsFactory(redisClient, redisURI)
+  val testMetadataApi: RedisAsyncScalaApi[MetadataKey, AlarmMetadata] = connsFactory.wrappedAsyncConnection(MetadataCodec).await
+  val testSeverityApi: RedisAsyncScalaApi[SeverityKey, AlarmSeverity] = connsFactory.wrappedAsyncConnection(SeverityCodec).await
+  val testStatusApi: RedisAsyncScalaApi[StatusKey, AlarmStatus]       = connsFactory.wrappedAsyncConnection(StatusCodec).await
+
+  override protected def afterAll(): Unit = {
+    redisClient.shutdown()
+    stopSentinel(sentinel, server)
+    system.terminate().await
+  }
 }

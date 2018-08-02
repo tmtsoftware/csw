@@ -60,7 +60,7 @@ class InitAlarmStoreTest extends AlarmServiceTestSetup(2639, 6379) {
     alarmService.getMetadata(nfiraosAlarmKey).await shouldBe tromboneAxisHighLimitAlarm
     alarmService.getStatus(nfiraosAlarmKey).await shouldBe AlarmStatus()
     // Severity does not get loaded in alarm store on init, but it gets interpreted as Disconnected by getSeverity API
-    alarmServiceFactory.severityApi.get(nfiraosAlarmKey).await shouldBe None
+    testSeverityApi.get(nfiraosAlarmKey).await shouldBe None
     alarmService.getSeverity(nfiraosAlarmKey).await shouldBe Disconnected
     alarmService.getAggregatedHealth(nfiraosAlarmKey).await shouldBe Bad
   }
@@ -88,13 +88,13 @@ class InitAlarmStoreTest extends AlarmServiceTestSetup(2639, 6379) {
     alarmService.getMetadata(GlobalKey).await.size shouldBe 2
 
     // bypassing AlarmService, set some value for MetadataKey using RedisAsyncScalaApi in order to simulate keys other than alarm service
-    alarmServiceFactory.metatdataApi.set(MetadataKey("sentinel.a.b.c"), cpuExceededAlarm).await
-    alarmServiceFactory.metatdataApi.get(MetadataKey("sentinel.a.b.c")).await shouldBe Some(cpuExceededAlarm)
+    testMetadataApi.set(MetadataKey("sentinel.a.b.c"), cpuExceededAlarm).await
+    testMetadataApi.get(MetadataKey("sentinel.a.b.c")).await shouldBe Some(cpuExceededAlarm)
 
     alarmService.initAlarms(twoAlarmConfFile, reset = true).await
     // alarm service related keys will still be 2 but there should be one additional key [sentinel.a.b.c] other than alarm service
     alarmService.getMetadata(GlobalKey).await.size shouldBe 2
-    alarmServiceFactory.metatdataApi.get(MetadataKey("sentinel.a.b.c")).await shouldBe Some(cpuExceededAlarm)
+    testMetadataApi.get(MetadataKey("sentinel.a.b.c")).await shouldBe Some(cpuExceededAlarm)
   }
 
   test("initAlarm with reset=false should preserve existing alarm keys") {
