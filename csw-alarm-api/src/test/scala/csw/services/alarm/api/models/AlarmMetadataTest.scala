@@ -38,6 +38,14 @@ class AlarmMetadataTest extends FunSuite with Matchers {
     alarmMetadata.copy(activationStatus = Inactive).isActive shouldBe false
   }
 
+  test("should be able to get description of the alarm") {
+    alarmMetadata.description shouldBe "Warns when trombone axis has reached the low limit"
+  }
+
+  test("should be able to get alarm type") {
+    AlarmType.values should contain allElementsOf Set(alarmMetadata.alarmType)
+  }
+
   // DEOPSCSW-453: Identify Probable cause of alarm
   test("should get probable cause from AlarmMetadata") {
     alarmMetadata.probableCause shouldBe "the trombone software has failed or the stage was driven into the low limit"
