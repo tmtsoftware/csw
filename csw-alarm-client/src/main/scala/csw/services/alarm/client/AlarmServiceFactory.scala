@@ -3,18 +3,15 @@ package csw.services.alarm.client
 import java.net.URI
 
 import akka.actor.ActorSystem
-import csw.services.alarm.api.internal.StatusKey
 import csw.services.alarm.api.javadsl.IAlarmService
-import csw.services.alarm.api.models.AlarmStatus
 import csw.services.alarm.api.scaladsl.{AlarmAdminService, AlarmService}
 import csw.services.alarm.client.internal.AlarmCodec.{MetadataCodec, SeverityCodec, StatusCodec}
-import csw.services.alarm.client.internal.{AlarmServiceImpl, JAlarmServiceImpl}
-import csw.services.alarm.client.internal.commons.{AlarmServiceLocationResolver, ConnectionsFactory}
+import csw.services.alarm.client.internal.commons.AlarmServiceLocationResolver
+import csw.services.alarm.client.internal.redis.{RedisConnectionsFactory, RedisKeySpaceApiFactory}
 import csw.services.alarm.client.internal.shelve.ShelveTimeoutActorFactory
+import csw.services.alarm.client.internal.{AlarmServiceImpl, JAlarmServiceImpl}
 import csw.services.location.scaladsl.LocationService
-import io.lettuce.core.codec.Utf8StringCodec
 import io.lettuce.core.{RedisClient, RedisURI}
-import romaine.RedisKeySpaceApi
 
 import scala.async.Async.{async, await}
 import scala.concurrent.{ExecutionContext, Future}
@@ -61,30 +58,22 @@ class AlarmServiceFactory(redisClient: RedisClient = RedisClient.create()) {
 
   /************ INTERNAL ************/
   private def alarmService(alarmURI: URI)(implicit actorSystem: ActorSystem, ec: ExecutionContext) = async {
-    val masterId           = actorSystem.settings.config.getString("redis.masterId")
-    val connectionsFactory = new ConnectionsFactory(redisClient, redisURI(alarmURI, masterId))
+    val masterId                = actorSystem.settings.config.getString("redis.masterId")
+    val redisConnectionsFactory = new RedisConnectionsFactory(redisClient, redisURI(alarmURI, masterId))
+    val redisKeySpaceApiFactory = new RedisKeySpaceApiFactory(redisConnectionsFactory)
 
-    val metadataApi = await(connectionsFactory.wrappedAsyncConnection(MetadataCodec))
-    val severityApi = await(connectionsFactory.wrappedAsyncConnection(SeverityCodec))
-    val statusApi   = await(connectionsFactory.wrappedAsyncConnection(StatusCodec))
-
-    // TODO: simplify
-    val statusStreamApiFactory = await(
-      connectionsFactory
-        .wrappedReactiveConnection(new Utf8StringCodec())
-        .map { conn ⇒ () ⇒
-          new RedisKeySpaceApi[StatusKey, AlarmStatus](() ⇒ conn, statusApi)
-        }
-    )
+    val metadataApi = await(redisConnectionsFactory.wrappedAsyncConnection(MetadataCodec))
+    val severityApi = await(redisConnectionsFactory.wrappedAsyncConnection(SeverityCodec))
+    val statusApi   = await(redisConnectionsFactory.wrappedAsyncConnection(StatusCodec))
 
     new AlarmServiceImpl(
       metadataApi,
       severityApi,
       statusApi,
-      statusStreamApiFactory,
+      redisKeySpaceApiFactory,
       new ShelveTimeoutActorFactory()
     )
   }
 
-  private[alarm] def redisURI(uri: URI, masterId: String) = RedisURI.Builder.sentinel(uri.getHost, uri.getPort, masterId).build()
+  private def redisURI(uri: URI, masterId: String) = RedisURI.Builder.sentinel(uri.getHost, uri.getPort, masterId).build()
 }

@@ -26,4 +26,5 @@ object AlarmCodec extends AlarmRW {
   implicit object MetadataCodec extends AlarmCodec[MetadataKey, AlarmMetadata]
   implicit object StatusCodec   extends AlarmCodec[StatusKey, AlarmStatus]
   implicit object SeverityCodec extends AlarmCodec[SeverityKey, AlarmSeverity]
+  implicit object StringCodec   extends AlarmCodec[String, String]
 }

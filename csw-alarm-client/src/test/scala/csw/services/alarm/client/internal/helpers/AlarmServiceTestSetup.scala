@@ -7,8 +7,8 @@ import csw.services.alarm.api.models.{AlarmMetadata, AlarmSeverity, AlarmStatus}
 import csw.services.alarm.api.scaladsl.AlarmAdminService
 import csw.services.alarm.client.AlarmServiceFactory
 import csw.services.alarm.client.internal.AlarmCodec.{MetadataCodec, SeverityCodec, StatusCodec}
-import csw.services.alarm.client.internal.commons.ConnectionsFactory
 import csw.services.alarm.client.internal.helpers.TestFutureExt.RichFuture
+import csw.services.alarm.client.internal.redis.RedisConnectionsFactory
 import io.lettuce.core.{RedisClient, RedisURI}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 import romaine.RedisAsyncScalaApi
@@ -35,7 +35,7 @@ class AlarmServiceTestSetup(sentinelPort: Int, serverPort: Int)
   val alarmService: AlarmAdminService = alarmServiceFactory.adminApi(hostname, sentinelPort).await
   val jAlarmService: IAlarmService    = alarmServiceFactory.jClientApi(hostname, sentinelPort, system).await
 
-  val connsFactory: ConnectionsFactory                                = new ConnectionsFactory(redisClient, redisURI)
+  val connsFactory: RedisConnectionsFactory                           = new RedisConnectionsFactory(redisClient, redisURI)
   val testMetadataApi: RedisAsyncScalaApi[MetadataKey, AlarmMetadata] = connsFactory.wrappedAsyncConnection(MetadataCodec).await
   val testSeverityApi: RedisAsyncScalaApi[SeverityKey, AlarmSeverity] = connsFactory.wrappedAsyncConnection(SeverityCodec).await
   val testStatusApi: RedisAsyncScalaApi[StatusKey, AlarmStatus]       = connsFactory.wrappedAsyncConnection(StatusCodec).await

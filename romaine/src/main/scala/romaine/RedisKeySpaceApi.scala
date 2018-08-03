@@ -8,7 +8,7 @@ import romaine.extensions.SourceExtensions.RichSource
 import scala.concurrent.{ExecutionContext, Future}
 
 class RedisKeySpaceApi[TKey, TValue](
-    keyspaceApiFactory: () => RedisReactiveScalaApi[String, String],
+    redisReactiveScalaApi: RedisReactiveScalaApi[String, String],
     redisAsyncScalaApi: RedisAsyncScalaApi[TKey, TValue]
 )(implicit redisKeySpaceCodec: RedisKeySpaceCodec[TKey, TValue], ec: ExecutionContext) {
 
@@ -16,8 +16,6 @@ class RedisKeySpaceApi[TKey, TValue](
       keys: List[String],
       overflowStrategy: OverflowStrategy
   ): Source[RedisResult[TKey, TValue], RedisSubscription[String]] = {
-
-    val redisReactiveScalaApi = keyspaceApiFactory()
 
     val patternBasedKeys = keys.map("__keyspace@0__:" + _)
 

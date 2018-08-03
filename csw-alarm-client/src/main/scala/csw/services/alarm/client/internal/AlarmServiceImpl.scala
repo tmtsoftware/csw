@@ -18,11 +18,12 @@ import csw.services.alarm.api.models.ShelveStatus.{Shelved, UnShelved}
 import csw.services.alarm.api.models._
 import csw.services.alarm.api.scaladsl.{AlarmAdminService, AlarmSubscription}
 import csw.services.alarm.client.internal.configparser.ConfigParser
+import csw.services.alarm.client.internal.redis.RedisKeySpaceApiFactory
 import csw.services.alarm.client.internal.shelve.ShelveTimeoutActorFactory
 import csw.services.alarm.client.internal.shelve.ShelveTimeoutMessage.{CancelShelveTimeout, ScheduleShelveTimeout}
 import io.lettuce.core.KeyValue
 import reactor.core.publisher.FluxSink.OverflowStrategy
-import romaine.{RedisAsyncScalaApi, RedisKeySpaceApi}
+import romaine.RedisAsyncScalaApi
 
 import scala.async.Async._
 import scala.collection.immutable
@@ -32,7 +33,7 @@ class AlarmServiceImpl(
     metadataApi: RedisAsyncScalaApi[MetadataKey, AlarmMetadata],
     severityApi: RedisAsyncScalaApi[SeverityKey, AlarmSeverity],
     statusApi: RedisAsyncScalaApi[StatusKey, AlarmStatus],
-    statusStreamApiFactory: () ⇒ RedisKeySpaceApi[StatusKey, AlarmStatus],
+    redisKeySpaceApiFactory: RedisKeySpaceApiFactory,
     shelveTimeoutActorFactory: ShelveTimeoutActorFactory
 )(implicit actorSystem: ActorSystem)
     extends AlarmAdminService {
@@ -252,15 +253,19 @@ class AlarmServiceImpl(
   // channel: e.g. __keyspace@0__:status.nfiraos.trombone.tromboneAxisLowLimitAlarm,
   // message: event type as value: e.g. set, expire, expired
   private def subscribeAggregatedSeverity(key: Key): Source[AlarmSeverity, AlarmSubscription] = {
-    val redisStreamApi     = statusStreamApiFactory() // create new connection for every client
+    val redisStreamApi     = redisKeySpaceApiFactory.make(statusApi)(AlarmCodec.StatusCodec) // create new connection for every client
     val keys: List[String] = List(StatusKey.fromAlarmKey(key).value)
 
-    redisStreamApi
-      .watchKeyspaceFieldAggregation[AlarmSeverity](keys, OverflowStrategy.LATEST, _.latchedSeverity, _.maxBy(_.level))
+    Source
+      .fromFutureSource(
+        redisStreamApi.map(
+          _.watchKeyspaceFieldAggregation[AlarmSeverity](keys, OverflowStrategy.LATEST, _.latchedSeverity, _.maxBy(_.level))
+        )
+      )
       .mapMaterializedValue { mat =>
         new AlarmSubscription {
-          override def unsubscribe(): Future[Unit] = mat.unsubscribe()
-          override def ready(): Future[Unit]       = mat.ready()
+          override def unsubscribe(): Future[Unit] = mat.flatMap(_.unsubscribe())
+          override def ready(): Future[Unit]       = mat.flatMap(_.ready())
         }
       }
   }
