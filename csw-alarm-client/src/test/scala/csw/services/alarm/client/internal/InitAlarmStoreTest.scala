@@ -61,7 +61,7 @@ class InitAlarmStoreTest extends AlarmServiceTestSetup(2639, 6379) {
     alarmService.getStatus(nfiraosAlarmKey).await shouldBe AlarmStatus()
     // Severity does not get loaded in alarm store on init, but it gets interpreted as Disconnected by getSeverity API
     testSeverityApi.get(nfiraosAlarmKey).await shouldBe None
-    alarmService.getSeverity(nfiraosAlarmKey).await shouldBe Disconnected
+    alarmService.getCurrentSeverity(nfiraosAlarmKey).await shouldBe Disconnected
     alarmService.getAggregatedHealth(nfiraosAlarmKey).await shouldBe Bad
   }
 

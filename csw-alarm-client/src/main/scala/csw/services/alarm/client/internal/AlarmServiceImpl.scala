@@ -25,6 +25,7 @@ import reactor.core.publisher.FluxSink.OverflowStrategy
 import romaine.{RedisAsyncScalaApi, RedisKeySpaceApi}
 
 import scala.async.Async._
+import scala.collection.immutable
 import scala.concurrent.Future
 
 class AlarmServiceImpl(
@@ -55,11 +56,6 @@ class AlarmServiceImpl(
     if (reset) await(resetAlarmStore())
 
     await(setAlarmStore(alarmMetadataSet))
-  }
-
-  private def logAndThrow(runtimeException: RuntimeException): Nothing = {
-    log.error(runtimeException.getMessage, ex = runtimeException)
-    throw runtimeException
   }
 
   override def setSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Unit] = async {
@@ -104,7 +100,7 @@ class AlarmServiceImpl(
     if (newStatus != status) await(statusApi.set(key, newStatus))
   }
 
-  override def getSeverity(key: AlarmKey): Future[AlarmSeverity] = async {
+  override def getCurrentSeverity(key: AlarmKey): Future[AlarmSeverity] = async {
     log.debug(s"Getting severity for alarm [${key.value}]")
     if (await(metadataApi.exists(key)))
       await(severityApi.get(key)).getOrElse(Disconnected)
@@ -142,7 +138,7 @@ class AlarmServiceImpl(
   override def reset(key: AlarmKey): Future[Unit] = async {
     log.debug(s"Reset alarm [${key.value}]")
     if (await(metadataApi.exists(key))) {
-      val currentSeverity = await(getSeverity(key))
+      val currentSeverity = await(getCurrentSeverity(key))
       if (currentSeverity != Okay) logAndThrow(ResetOperationNotAllowed(key, currentSeverity))
 
       val status = await(statusApi.get(key)).getOrElse(AlarmStatus())
@@ -196,14 +192,20 @@ class AlarmServiceImpl(
     val statusKeys = await(statusApi.keys(key))
     if (statusKeys.isEmpty) logAndThrow(KeyNotFoundException(key))
 
-    val metadata = await(metadataApi.get(key)).getOrElse(logAndThrow(KeyNotFoundException(key)))
+    val metadataKeys = await(metadataApi.keys(key))
+    if (metadataKeys.isEmpty) logAndThrow(KeyNotFoundException(key))
 
-    val statusList = await(statusApi.mget(statusKeys))
-    statusList
+    val statusList: immutable.Seq[KeyValue[StatusKey, AlarmStatus]]       = await(statusApi.mget(statusKeys))
+    val metadataList: immutable.Seq[KeyValue[MetadataKey, AlarmMetadata]] = await(metadataApi.mget(metadataKeys))
+
+    //todo: what if redis does not give status keys and metadata keys in the same order? the following .zip would fail then. Fixthis
+    val data: Seq[(KeyValue[StatusKey, AlarmStatus], KeyValue[MetadataKey, AlarmMetadata])] = statusList.zip(metadataList)
+
+    data
       .collect {
-        case status: KeyValue[StatusKey, AlarmStatus] if metadata.isActive ⇒ status.getValue.latchedSeverity
+        case (statusKV, metadataKV) if metadataKV.getValue.isActive => statusKV.getValue.latchedSeverity
       }
-      .reduceRight((previous, current) ⇒ previous max current)
+      .reduceRight((previous, current: AlarmSeverity) ⇒ previous max current)
   }
 
   override def getAggregatedHealth(key: Key): Future[AlarmHealth] = {
@@ -252,6 +254,11 @@ class AlarmServiceImpl(
           override def ready(): Future[Unit]       = mat.ready()
         }
       }
+  }
+
+  private def logAndThrow(runtimeException: RuntimeException): Nothing = {
+    log.error(runtimeException.getMessage, ex = runtimeException)
+    throw runtimeException
   }
 
   private def setAlarmStore(alarmMetadataSet: AlarmMetadataSet) = {

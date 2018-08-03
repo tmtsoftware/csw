@@ -12,7 +12,7 @@ trait AlarmAdminService extends AlarmService {
 
   def initAlarms(inputFile: File, reset: Boolean = false): Future[Unit]
 
-  def getSeverity(key: AlarmKey): Future[AlarmSeverity]
+  def getCurrentSeverity(key: AlarmKey): Future[AlarmSeverity]
   def getStatus(key: AlarmKey): Future[AlarmStatus]
   def getMetadata(key: AlarmKey): Future[AlarmMetadata]
   def getMetadata(key: Key): Future[List[AlarmMetadata]]

@@ -9,7 +9,7 @@ import csw.services.alarm.api.models.AlarmType.Absolute
 import csw.services.alarm.api.models.Key.{AlarmKey, ComponentKey, GlobalKey, SubsystemKey}
 import csw.services.alarm.api.models.LatchStatus.{Latched, UnLatched}
 import csw.services.alarm.api.models.ShelveStatus.UnShelved
-import csw.services.alarm.api.models.{AlarmMetadata, AlarmSeverity, AlarmStatus, AlarmType}
+import csw.services.alarm.api.models._
 import csw.services.alarm.client.internal.helpers.AlarmServiceTestSetup
 import csw.services.alarm.client.internal.helpers.TestFutureExt.RichFuture
 
@@ -81,7 +81,7 @@ class AlarmServiceImplTest extends AlarmServiceTestSetup(26381, 6381) {
 
     //wait for 1 second and assert expiry of severity
     Thread.sleep(1000)
-    val severityAfter1Second = alarmService.getSeverity(tromboneAxisHighLimitAlarm).await
+    val severityAfter1Second = alarmService.getCurrentSeverity(tromboneAxisHighLimitAlarm).await
     severityAfter1Second shouldEqual Disconnected
   }
 
@@ -190,13 +190,31 @@ class AlarmServiceImplTest extends AlarmServiceTestSetup(26381, 6381) {
     }
   }
 
-//  test("should throw exception while getting severity if key does not exist") {
-//    val invalidAlarm = AlarmKey("invalid", "invalid", "invalid")
-//    intercept[KeyNotFoundException] {
-//      alarmService.getSeverity(invalidAlarm)
-//    }
-//  }
-//
+  test("should get current severity") {
+    val nfiraosAlarmKey = AlarmKey("nfiraos", "trombone", "tromboneAxisHighLimitAlarm")
+    alarmService.setSeverity(nfiraosAlarmKey, Warning).await
+
+    alarmService.getCurrentSeverity(nfiraosAlarmKey).await shouldBe Warning
+  }
+
+  test("should throw exception while getting current severity if key does not exist") {
+    val invalidAlarm = AlarmKey("invalid", "invalid", "invalid")
+    intercept[KeyNotFoundException] {
+      alarmService.getCurrentSeverity(invalidAlarm).await
+    }
+  }
+
+  test("should get aggregated latched severity for component") {
+    val highLimitAlarmKey = AlarmKey("nfiraos", "trombone", "tromboneAxisHighLimitAlarm")
+    alarmService.setSeverity(highLimitAlarmKey, Warning).await
+
+    val lowLimitAlarmKey = AlarmKey("nfiraos", "trombone", "tromboneAxisLowLimitAlarm")
+    alarmService.setSeverity(lowLimitAlarmKey, Critical).await
+
+    val tromboneKey = ComponentKey("nfiraos", "trombone")
+    alarmService.getAggregatedSeverity(tromboneKey).await shouldBe Critical
+  }
+
 //  test("should throw exception while getting status if key does not exist") {
 //    val invalidAlarm = AlarmKey("invalid", "invalid", "invalid")
 //    intercept[KeyNotFoundException] {
