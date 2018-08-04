@@ -21,6 +21,7 @@ import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.messages.RunningMessage.Lifecycle
 import csw.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.messages.{ComponentMessage, ContainerActorMessage, ContainerCommonMessage, ContainerIdleMessage}
+import csw.services.alarm.client.AlarmServiceFactory
 import csw.services.event.EventServiceFactory
 import csw.services.location.models._
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
@@ -48,6 +49,7 @@ private[framework] final class ContainerBehavior(
     registrationFactory: RegistrationFactory,
     locationService: LocationService,
     eventServiceFactory: EventServiceFactory,
+    alarmServiceFactory: AlarmServiceFactory,
     loggerFactory: LoggerFactory
 ) extends MutableBehavior[ContainerActorMessage] {
 
@@ -162,7 +164,7 @@ private[framework] final class ContainerBehavior(
     log.info(s"Container is creating following components :[${componentInfos.map(_.name).mkString(", ")}]")
     Future
       .traverse(componentInfos) { ci ⇒
-        supervisorInfoFactory.make(ctx.self, ci, locationService, eventServiceFactory, registrationFactory)
+        supervisorInfoFactory.make(ctx.self, ci, locationService, eventServiceFactory, alarmServiceFactory, registrationFactory)
       }
       .foreach(x ⇒ {
         ctx.self ! SupervisorsCreated(x.flatten)

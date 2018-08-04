@@ -12,6 +12,7 @@ import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.messages.{ComponentMessage, ContainerIdleMessage, TopLevelActorMessage}
 import csw.messages.framework.ComponentInfo
 import csw.messages.{ComponentMessage, ContainerIdleMessage}
+import csw.services.alarm.api.scaladsl.AlarmService
 import csw.services.command.CommandResponseManager
 import csw.services.event.api.scaladsl.EventService
 import csw.services.location.commons.ActorSystemFactory
@@ -43,6 +44,7 @@ private[csw] abstract class FrameworkTestSuite extends FunSuite with Matchers wi
      currentStatePublisher: CurrentStatePublisher,
      locationService: LocationService,
      eventService: EventService,
+     alarmService: AlarmService,
      loggerFactory: LoggerFactory) => componentHandlers
 
   def getSampleAssemblyWiring(
@@ -54,6 +56,7 @@ private[csw] abstract class FrameworkTestSuite extends FunSuite with Matchers wi
      currentStatePublisher: CurrentStatePublisher,
      locationService: LocationService,
      eventService: EventService,
+     alarmService: AlarmService,
      loggerFactory: LoggerFactory) => assemblyHandlers
 
   def createSupervisorAndStartTLA(
@@ -68,6 +71,7 @@ private[csw] abstract class FrameworkTestSuite extends FunSuite with Matchers wi
       componentInfo,
       locationService,
       eventService,
+      alarmService,
       registrationFactory,
       commandResponseManagerFactory
     )

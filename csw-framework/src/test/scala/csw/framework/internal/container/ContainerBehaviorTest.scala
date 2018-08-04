@@ -20,6 +20,7 @@ import csw.messages.framework.{ComponentInfo, ContainerLifecycleState, Superviso
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.params.models.Prefix
 import csw.messages.{ComponentMessage, ContainerActorMessage, ContainerIdleMessage}
+import csw.services.alarm.client.AlarmServiceFactory
 import csw.services.event.EventServiceFactory
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}
@@ -47,6 +48,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
     val akkaRegistration                                  = AkkaRegistration(mock[AkkaConnection], Prefix("nfiraos.ncc.trombone"), testActor, testActor)
     val locationService: LocationService                  = mock[LocationService]
     val eventService: EventServiceFactory                 = mock[EventServiceFactory]
+    val alarmService: AlarmServiceFactory                 = mock[AlarmServiceFactory]
     val registrationResult: RegistrationResult            = mock[RegistrationResult]
     var supervisorInfos: Set[SupervisorInfo]              = Set.empty
     var componentProbes: Set[TestProbe[ComponentMessage]] = Set.empty
@@ -78,6 +80,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
           any[ComponentInfo],
           any[LocationService],
           any[EventServiceFactory],
+          any[AlarmServiceFactory],
           any[RegistrationFactory]
         )
     ).thenAnswer(answer)
@@ -103,6 +106,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
             registrationFactory,
             locationService,
             eventService,
+            alarmService,
             mocks.loggerFactory
         )
       )

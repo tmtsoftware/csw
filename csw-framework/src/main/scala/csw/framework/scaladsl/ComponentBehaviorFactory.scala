@@ -4,8 +4,9 @@ import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.actor.typed.{ActorRef, Behavior}
 import csw.framework.CurrentStatePublisher
 import csw.framework.internal.component.ComponentBehavior
-import csw.messages.{FromComponentLifecycleMessage, TopLevelActorMessage}
 import csw.messages.framework.ComponentInfo
+import csw.messages.{FromComponentLifecycleMessage, TopLevelActorMessage}
+import csw.services.alarm.api.scaladsl.AlarmService
 import csw.services.command.CommandResponseManager
 import csw.services.event.api.scaladsl.EventService
 import csw.services.location.scaladsl.LocationService
@@ -36,6 +37,7 @@ abstract class ComponentBehaviorFactory {
       currentStatePublisher: CurrentStatePublisher,
       locationService: LocationService,
       eventService: EventService,
+      alarmService: AlarmService,
       loggerFactory: LoggerFactory
   ): ComponentHandlers
 
@@ -59,6 +61,7 @@ abstract class ComponentBehaviorFactory {
       commandResponseManager: CommandResponseManager,
       locationService: LocationService,
       eventService: EventService,
+      alarmService: AlarmService,
       loggerFactory: LoggerFactory
   ): Behavior[Nothing] =
     Behaviors
@@ -75,6 +78,7 @@ abstract class ComponentBehaviorFactory {
               currentStatePublisher,
               locationService,
               eventService,
+              alarmService,
               loggerFactory
             ),
             commandResponseManager,

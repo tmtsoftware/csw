@@ -12,6 +12,7 @@ import csw.messages.location.Connection.AkkaConnection
 import csw.messages.params.models.{Id, Prefix}
 import csw.messages.params.states.CurrentState
 import csw.messages.CommandResponseManagerMessage
+import csw.services.alarm.api.scaladsl.AlarmService
 import csw.services.command.CommandResponseManager
 import csw.services.command.internal.CommandResponseManagerFactory
 import csw.services.event.EventServiceFactory
@@ -34,6 +35,7 @@ class FrameworkTestMocks(implicit untypedSystem: actor.ActorSystem, system: Acto
   val locationService: LocationService         = mock[LocationService]
   val eventServiceFactory: EventServiceFactory = mock[EventServiceFactory]
   val eventService: EventService               = mock[EventService]
+  val alarmService: AlarmService               = mock[AlarmService]
   val registrationResult: RegistrationResult   = mock[RegistrationResult]
   val registrationFactory: RegistrationFactory = mock[RegistrationFactory]
 

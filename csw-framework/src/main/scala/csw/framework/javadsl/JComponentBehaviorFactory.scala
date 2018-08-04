@@ -6,10 +6,13 @@ import csw.framework.CurrentStatePublisher
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.messages.TopLevelActorMessage
 import csw.messages.framework.ComponentInfo
+import csw.services.alarm.api.javadsl.IAlarmService
+import csw.services.alarm.api.scaladsl.AlarmService
+import csw.services.alarm.client.internal.JAlarmServiceImpl
 import csw.services.command.CommandResponseManager
-import csw.services.event.internal.commons.EventServiceAdapter
 import csw.services.event.api.javadsl.IEventService
 import csw.services.event.api.scaladsl.EventService
+import csw.services.event.internal.commons.EventServiceAdapter
 import csw.services.location.javadsl.ILocationService
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.javadsl.JLoggerFactory
@@ -27,6 +30,7 @@ abstract class JComponentBehaviorFactory extends ComponentBehaviorFactory() {
       currentStatePublisher: CurrentStatePublisher,
       locationService: LocationService,
       eventService: EventService,
+      alarmService: AlarmService,
       loggerFactory: LoggerFactory
   ): ComponentHandlers =
     jHandlers(
@@ -36,6 +40,7 @@ abstract class JComponentBehaviorFactory extends ComponentBehaviorFactory() {
       currentStatePublisher,
       locationService.asJava,
       EventServiceAdapter.asJava(eventService),
+      new JAlarmServiceImpl(alarmService),
       loggerFactory.asJava
     )
 
@@ -46,6 +51,7 @@ abstract class JComponentBehaviorFactory extends ComponentBehaviorFactory() {
       currentStatePublisher: CurrentStatePublisher,
       locationService: ILocationService,
       eventService: IEventService,
+      alarmService: IAlarmService,
       loggerFactory: JLoggerFactory
   ): JComponentHandlers
 }

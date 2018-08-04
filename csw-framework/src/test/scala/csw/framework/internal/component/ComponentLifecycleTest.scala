@@ -1,20 +1,20 @@
 package csw.framework.internal.component
 
-import akka.actor.typed.{Behavior, PostStop}
 import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
+import akka.actor.typed.{Behavior, PostStop}
 import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{ComponentInfos, CurrentStatePublisher, FrameworkTestSuite}
+import csw.messages.CommandMessage.{Oneway, Submit}
+import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
+import csw.messages.RunningMessage.Lifecycle
+import csw.messages.TopLevelActorIdleMessage.Initialize
 import csw.messages.commands.CommandResponse.{Accepted, Completed, Error}
 import csw.messages.commands.{CommandName, CommandResponse, Observe, Setup}
 import csw.messages.framework.ToComponentLifecycleMessages._
 import csw.messages.params.generics.KeyType
 import csw.messages.params.models.{ObsId, Prefix}
-import csw.messages.CommandMessage.{Oneway, Submit}
-import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
-import csw.messages.RunningMessage.Lifecycle
-import csw.messages.TopLevelActorIdleMessage.Initialize
 import csw.messages.{CommandResponseManagerMessage, FromComponentLifecycleMessage, TopLevelActorMessage}
-import csw.messages.{CommandResponseManagerMessage, FromComponentLifecycleMessage}
+import csw.services.alarm.api.scaladsl.AlarmService
 import csw.services.command.CommandResponseManager
 import csw.services.event.api.scaladsl.EventService
 import csw.services.location.scaladsl.LocationService
@@ -36,6 +36,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
 
     val locationService: LocationService               = mock[LocationService]
     val eventService: EventService                     = mock[EventService]
+    val alarmService: AlarmService                     = mock[AlarmService]
     val commandResponseManager: CommandResponseManager = mock[CommandResponseManager]
     when(commandResponseManager.commandResponseManagerActor).thenReturn(commandStatusServiceProbe.ref)
 
@@ -51,6 +52,7 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
       commandResponseManager,
       locationService,
       eventService,
+      alarmService,
       frameworkTestMocks().loggerFactory
     )
 

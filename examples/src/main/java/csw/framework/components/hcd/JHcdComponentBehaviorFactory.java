@@ -6,6 +6,7 @@ import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.CurrentStatePublisher;
 import csw.messages.framework.ComponentInfo;
 import csw.messages.TopLevelActorMessage;
+import csw.services.alarm.api.javadsl.IAlarmService;
 import csw.services.command.CommandResponseManager;
 import csw.services.event.api.javadsl.IEventService;
 import csw.services.location.javadsl.ILocationService;
@@ -22,6 +23,7 @@ public class JHcdComponentBehaviorFactory extends JComponentBehaviorFactory {
             CurrentStatePublisher currentStatePublisher,
             ILocationService locationService,
             IEventService eventService,
+            IAlarmService alarmService,
             JLoggerFactory loggerFactory
     ) {
         return new JHcdComponentHandlers(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, eventService, loggerFactory);

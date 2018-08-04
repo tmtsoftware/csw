@@ -1,9 +1,9 @@
 package csw.framework.internal.supervisor
 
+import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.actor.testkit.typed.scaladsl.TestProbe
 import com.persist.JsonOps
 import com.persist.JsonOps.JsonObject
 import csw.common.FrameworkAssertions._
@@ -15,16 +15,16 @@ import csw.framework.exceptions.{FailureRestart, FailureStop}
 import csw.framework.internal.component.ComponentBehavior
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.framework.{CurrentStatePublisher, FrameworkTestMocks, FrameworkTestSuite}
+import csw.messages.CommandMessage.Submit
+import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
+import csw.messages.SupervisorContainerCommonMessages.Restart
 import csw.messages.commands.{CommandName, CommandResponse, ControlCommand, Setup}
 import csw.messages.framework.{ComponentInfo, LifecycleStateChanged, PubSub, SupervisorLifecycleState}
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.{CurrentState, StateName}
-import csw.messages.CommandMessage.Submit
-import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
-import csw.messages.SupervisorContainerCommonMessages.Restart
 import csw.messages.{ComponentMessage, ContainerIdleMessage, TopLevelActorMessage}
-import csw.messages.{ComponentMessage, ContainerIdleMessage}
+import csw.services.alarm.api.scaladsl.AlarmService
 import csw.services.command.CommandResponseManager
 import csw.services.event.api.scaladsl.EventService
 import csw.services.location.scaladsl.LocationService
@@ -217,6 +217,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
       hcdInfo,
       locationService,
       eventService,
+      alarmService,
       registrationFactory,
       new SampleBehaviorFactory(componentHandlers),
       commandResponseManagerFactory,
@@ -260,6 +261,7 @@ class SampleBehaviorFactory(componentHandlers: ComponentHandlers) extends Compon
       currentStatePublisher: CurrentStatePublisher,
       locationService: LocationService,
       eventService: EventService,
+      alarmService: AlarmService,
       loggerFactory: LoggerFactory
   ): ComponentHandlers = componentHandlers
 }

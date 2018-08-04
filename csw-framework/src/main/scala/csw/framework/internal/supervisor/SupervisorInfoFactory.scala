@@ -1,9 +1,11 @@
 package csw.framework.internal.supervisor
 
+import akka.actor.ActorSystem
 import akka.actor.typed.ActorRef
 import csw.framework.internal.wiring.CswFrameworkSystem
 import csw.messages.ContainerIdleMessage
 import csw.messages.framework.{Component, ComponentInfo, SupervisorInfo}
+import csw.services.alarm.client.AlarmServiceFactory
 import csw.services.command.internal.CommandResponseManagerFactory
 import csw.services.event.EventServiceFactory
 import csw.services.location.commons.ActorSystemFactory
@@ -25,25 +27,28 @@ private[framework] class SupervisorInfoFactory(containerName: String) {
       componentInfo: ComponentInfo,
       locationService: LocationService,
       eventServiceFactory: EventServiceFactory,
+      alarmServiceFactory: AlarmServiceFactory,
       registrationFactory: RegistrationFactory
   ): Future[Option[SupervisorInfo]] = {
-    val system                                = ActorSystemFactory.remote(s"${componentInfo.name}-system")
+    implicit val system: ActorSystem          = ActorSystemFactory.remote(s"${componentInfo.name}-system")
     implicit val ec: ExecutionContextExecutor = system.dispatcher
     val richSystem                            = new CswFrameworkSystem(system)
-    val commandResponseManagerFactory         = new CommandResponseManagerFactory
-    val eventService                          = eventServiceFactory.make(locationService)(system)
 
     async {
-      val supervisorBehavior = {
-        SupervisorBehaviorFactory.make(
-          Some(containerRef),
-          componentInfo,
-          locationService,
-          eventService,
-          registrationFactory,
-          commandResponseManagerFactory
-        )
-      }
+      val commandResponseManagerFactory = new CommandResponseManagerFactory
+      val eventService                  = eventServiceFactory.make(locationService)
+      val alarmService                  = await(alarmServiceFactory.clientApi(locationService))
+
+      val supervisorBehavior = SupervisorBehaviorFactory.make(
+        Some(containerRef),
+        componentInfo,
+        locationService,
+        eventService,
+        alarmService,
+        registrationFactory,
+        commandResponseManagerFactory
+      )
+
       val actorRefF = richSystem.spawnTyped(supervisorBehavior, componentInfo.name)
       Some(SupervisorInfo(system, Component(await(actorRefF), componentInfo)))
     } recoverWith {

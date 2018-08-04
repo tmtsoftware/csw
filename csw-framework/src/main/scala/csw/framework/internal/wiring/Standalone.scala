@@ -5,6 +5,7 @@ import csw.framework.internal.configparser.ConfigParser
 import csw.framework.internal.supervisor.SupervisorBehaviorFactory
 import csw.messages.ComponentMessage
 
+import scala.async.Async.{async, await}
 import scala.concurrent.Future
 
 /**
@@ -24,18 +25,25 @@ object Standalone {
       wiring: FrameworkWiring
   ): Future[ActorRef[ComponentMessage]] = {
     import wiring._
-    val componentInfo      = ConfigParser.parseStandalone(config)
-    val cswFrameworkSystem = new CswFrameworkSystem(actorSystem)
-    val eventService       = eventServiceFactory.make(locationService)(actorSystem)
+    import actorRuntime._
 
-    val supervisorBehavior = SupervisorBehaviorFactory.make(
-      None,
-      componentInfo,
-      locationService,
-      eventService,
-      registrationFactory,
-      commandResponseManagerFactory
-    )
-    cswFrameworkSystem.spawnTyped(supervisorBehavior, componentInfo.name)
+    val componentInfo      = ConfigParser.parseStandalone(config)
+    val cswFrameworkSystem = new CswFrameworkSystem(system)
+
+    async {
+      val eventService = eventServiceFactory.make(locationService)
+      val alarmService = await(alarmServiceFactory.clientApi(locationService))
+
+      val supervisorBehavior = SupervisorBehaviorFactory.make(
+        None,
+        componentInfo,
+        locationService,
+        eventService,
+        alarmService,
+        registrationFactory,
+        commandResponseManagerFactory
+      )
+      await(cswFrameworkSystem.spawnTyped(supervisorBehavior, componentInfo.name))
+    }
   }
 }

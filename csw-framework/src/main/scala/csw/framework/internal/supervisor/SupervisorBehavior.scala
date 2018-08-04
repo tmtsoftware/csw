@@ -31,6 +31,7 @@ import csw.messages.location.ComponentId
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.params.models.Prefix
 import csw.messages.params.states.CurrentState
+import csw.services.alarm.api.scaladsl.AlarmService
 import csw.services.command.CommandResponseManager
 import csw.services.command.internal.CommandResponseManagerFactory
 import csw.services.event.api.scaladsl.EventService
@@ -79,6 +80,7 @@ private[framework] final class SupervisorBehavior(
     registrationFactory: RegistrationFactory,
     locationService: LocationService,
     eventService: EventService,
+    alarmService: AlarmService,
     loggerFactory: LoggerFactory
 ) extends MutableBehavior[SupervisorMessage] {
 
@@ -317,13 +319,16 @@ private[framework] final class SupervisorBehavior(
     val behavior = Behaviors
       .supervise[Nothing](
         componentBehaviorFactory
-          .make(componentInfo,
-                ctx.self,
-                new CurrentStatePublisher(pubSubComponentActor),
-                commandResponseManager,
-                locationService,
-                eventService,
-                loggerFactory)
+          .make(
+            componentInfo,
+            ctx.self,
+            new CurrentStatePublisher(pubSubComponentActor),
+            commandResponseManager,
+            locationService,
+            eventService,
+            alarmService,
+            loggerFactory
+          )
       )
       .onFailure[FailureRestart](SupervisorStrategy.restartWithLimit(3, Duration.Zero).withLoggingEnabled(true))
 

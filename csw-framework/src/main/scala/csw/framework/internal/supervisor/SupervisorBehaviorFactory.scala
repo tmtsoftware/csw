@@ -5,6 +5,7 @@ import akka.actor.typed.{ActorRef, Behavior}
 import csw.framework.scaladsl.ComponentBehaviorFactory
 import csw.messages.framework.ComponentInfo
 import csw.messages.{ComponentMessage, ContainerIdleMessage, SupervisorMessage}
+import csw.services.alarm.api.scaladsl.AlarmService
 import csw.services.command.internal.CommandResponseManagerFactory
 import csw.services.event.api.scaladsl.EventService
 import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
@@ -20,6 +21,7 @@ private[framework] object SupervisorBehaviorFactory {
       componentInfo: ComponentInfo,
       locationService: LocationService,
       eventService: EventService,
+      alarmService: AlarmService,
       registrationFactory: RegistrationFactory,
       commandResponseManagerFactory: CommandResponseManagerFactory
   ): Behavior[ComponentMessage] = {
@@ -34,6 +36,7 @@ private[framework] object SupervisorBehaviorFactory {
       componentInfo,
       locationService,
       eventService,
+      alarmService,
       registrationFactory,
       componentBehaviorFactory,
       commandResponseManagerFactory,
@@ -47,6 +50,7 @@ private[framework] object SupervisorBehaviorFactory {
       componentInfo: ComponentInfo,
       locationService: LocationService,
       eventService: EventService,
+      alarmService: AlarmService,
       registrationFactory: RegistrationFactory,
       componentBehaviorFactory: ComponentBehaviorFactory,
       commandResponseManagerFactory: CommandResponseManagerFactory,
@@ -68,6 +72,7 @@ private[framework] object SupervisorBehaviorFactory {
                   registrationFactory,
                   locationService,
                   eventService,
+                  alarmService,
                   loggerFactory
               )
           )
