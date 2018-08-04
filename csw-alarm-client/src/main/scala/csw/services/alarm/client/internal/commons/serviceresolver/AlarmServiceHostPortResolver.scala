@@ -1,11 +1,12 @@
-package csw.services.event.internal.commons.serviceresolver
+package csw.services.alarm.client.internal.commons.serviceresolver
+
 import java.net.URI
 
 import scala.concurrent.Future
 
 /**
- * Provides the connection information of `Event Service` by using the provided host and port.
+ * Provides the connection information of `Alarm Service` by using the provided host and port.
  */
-class EventServiceHostPortResolver(host: String, port: Int) extends EventServiceResolver {
+class AlarmServiceHostPortResolver(host: String, port: Int) extends AlarmServiceResolver {
   override def uri(): Future[URI] = Future.successful(new URI(s"tcp://$host:$port"))
 }

@@ -8,7 +8,7 @@ import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{ActorMaterializer, Materializer}
 import com.typesafe.config.{ConfigFactory, ConfigResolveOptions}
 import csw.services.alarm.api.exceptions.{InvalidSeverityException, KeyNotFoundException, ResetOperationNotAllowed}
-import csw.services.alarm.api.internal.{MetadataKey, SeverityKey, StatusKey}
+import csw.services.alarm.api.internal.{MetadataKey, StatusKey}
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, UnAcknowledged}
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
 import csw.services.alarm.api.models.AlarmSeverity.{Disconnected, Okay}
@@ -17,37 +17,37 @@ import csw.services.alarm.api.models.LatchStatus.{Latched, UnLatched}
 import csw.services.alarm.api.models.ShelveStatus.{Shelved, UnShelved}
 import csw.services.alarm.api.models._
 import csw.services.alarm.api.scaladsl.{AlarmAdminService, AlarmSubscription}
+import csw.services.alarm.client.internal.AlarmCodec.{MetadataCodec, SeverityCodec, StatusCodec}
+import csw.services.alarm.client.internal.commons.Settings
 import csw.services.alarm.client.internal.configparser.ConfigParser
-import csw.services.alarm.client.internal.redis.RedisKeySpaceApiFactory
+import csw.services.alarm.client.internal.redis.RedisConnectionsFactory
 import csw.services.alarm.client.internal.shelve.ShelveTimeoutActorFactory
 import csw.services.alarm.client.internal.shelve.ShelveTimeoutMessage.{CancelShelveTimeout, ScheduleShelveTimeout}
 import io.lettuce.core.KeyValue
 import reactor.core.publisher.FluxSink.OverflowStrategy
-import romaine.RedisAsyncScalaApi
 
 import scala.async.Async._
 import scala.collection.immutable
 import scala.concurrent.Future
 
 class AlarmServiceImpl(
-    metadataApi: RedisAsyncScalaApi[MetadataKey, AlarmMetadata],
-    severityApi: RedisAsyncScalaApi[SeverityKey, AlarmSeverity],
-    statusApi: RedisAsyncScalaApi[StatusKey, AlarmStatus],
-    redisKeySpaceApiFactory: RedisKeySpaceApiFactory,
-    shelveTimeoutActorFactory: ShelveTimeoutActorFactory
+    redisConnectionsFactory: RedisConnectionsFactory,
+    shelveTimeoutActorFactory: ShelveTimeoutActorFactory,
+    settings: Settings
 )(implicit actorSystem: ActorSystem)
     extends AlarmAdminService {
 
-  import actorSystem.dispatcher
+  import redisConnectionsFactory._
+  import settings._
+  implicit val mat: Materializer = ActorMaterializer()
+
+  private val log = AlarmServiceLogger.getLogger
+
+  private lazy val metadataApiF = wrappedAsyncConnection(MetadataCodec)
+  private lazy val severityApiF = wrappedAsyncConnection(SeverityCodec)
+  private lazy val statusApiF   = wrappedAsyncConnection(StatusCodec)
 
   private lazy val shelveTimeoutRef = shelveTimeoutActorFactory.make(key ⇒ unShelve(key, cancelShelveTimeout = false))
-
-  private val refreshInSeconds       = actorSystem.settings.config.getInt("alarm.refresh-in-seconds") // default value is 3 seconds
-  private val maxMissedRefreshCounts = actorSystem.settings.config.getInt("alarm.max-missed-refresh-counts") //default value is 3 times
-  private val ttlInSeconds           = refreshInSeconds * maxMissedRefreshCounts
-  private val log                    = AlarmServiceLogger.getLogger
-
-  implicit val mat: Materializer = ActorMaterializer()
 
   override def initAlarms(inputFile: File, reset: Boolean): Future[Unit] = async {
     log.debug(s"Initializing alarm store from file [${inputFile.getAbsolutePath}] with reset [$reset]")
@@ -61,6 +61,9 @@ class AlarmServiceImpl(
 
   override def setSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Unit] = async {
     log.debug(s"Setting severity [${severity.name}] for alarm [${key.value}] with expire timeout [$ttlInSeconds] seconds")
+    val metadataApi = await(metadataApiF)
+    val severityApi = await(severityApiF)
+    val statusApi   = await(statusApiF)
 
     // get alarm metadata
     val alarm = await(metadataApi.get(key)).getOrElse(logAndThrow(KeyNotFoundException(key)))
@@ -107,23 +110,32 @@ class AlarmServiceImpl(
 
   override def getCurrentSeverity(key: AlarmKey): Future[AlarmSeverity] = async {
     log.debug(s"Getting severity for alarm [${key.value}]")
+    val metadataApi = await(metadataApiF)
+    val severityApi = await(severityApiF)
+
     if (await(metadataApi.exists(key)))
       await(severityApi.get(key)).getOrElse(Disconnected)
     else logAndThrow(KeyNotFoundException(key))
   }
 
   override def getStatus(key: AlarmKey): Future[AlarmStatus] = async {
+    val statusApi = await(statusApiF)
+
     log.debug(s"Getting status for alarm [${key.value}]")
     await(statusApi.get(key)).getOrElse(logAndThrow(KeyNotFoundException(key)))
   }
 
   override def getMetadata(key: AlarmKey): Future[AlarmMetadata] = async {
     log.debug(s"Getting metadata for alarm [${key.value}]")
+    val metadataApi = await(metadataApiF)
+
     await(metadataApi.get(key)).getOrElse(logAndThrow(KeyNotFoundException(key)))
   }
 
   override def getMetadata(key: Key): Future[List[AlarmMetadata]] = async {
     log.debug(s"Getting metadata for alarms matching [${key.value}]")
+    val metadataApi = await(metadataApiF)
+
     val metadataKeys = await(metadataApi.keys(key))
     if (metadataKeys.isEmpty) logAndThrow(KeyNotFoundException(key))
     await(metadataApi.mget(metadataKeys)).map(_.getValue)
@@ -131,6 +143,9 @@ class AlarmServiceImpl(
 
   override def acknowledge(key: AlarmKey): Future[Unit] = async {
     log.debug(s"Acknowledge alarm [${key.value}]")
+    val metadataApi = await(metadataApiF)
+    val statusApi   = await(statusApiF)
+
     if (await(metadataApi.exists(key))) {
       val status = await(statusApi.get(key)).getOrElse(AlarmStatus())
 
@@ -142,6 +157,9 @@ class AlarmServiceImpl(
   // reset is only called when severity is `Okay`
   override def reset(key: AlarmKey): Future[Unit] = async {
     log.debug(s"Reset alarm [${key.value}]")
+    val metadataApi = await(metadataApiF)
+    val statusApi   = await(statusApiF)
+
     if (await(metadataApi.exists(key))) {
       val currentSeverity = await(getCurrentSeverity(key))
       if (currentSeverity != Okay) logAndThrow(ResetOperationNotAllowed(key, currentSeverity))
@@ -161,6 +179,8 @@ class AlarmServiceImpl(
 
   override def shelve(key: AlarmKey): Future[Unit] = async {
     log.debug(s"Shelve alarm [${key.value}]")
+    val statusApi = await(statusApiF)
+
     val status = await(statusApi.get(key)).getOrElse(AlarmStatus())
     if (status.shelveStatus != Shelved) {
       await(statusApi.set(key, status.copy(shelveStatus = Shelved)))
@@ -173,6 +193,8 @@ class AlarmServiceImpl(
 
   private def unShelve(key: AlarmKey, cancelShelveTimeout: Boolean): Future[Unit] = async {
     log.debug(s"Un-shelve alarm [${key.value}]")
+    val statusApi = await(statusApiF)
+
     //TODO: decide whether to  unshelve an alarm when it goes to okay
     val status = await(statusApi.get(key)).getOrElse(AlarmStatus())
     if (status.shelveStatus != UnShelved) {
@@ -187,18 +209,25 @@ class AlarmServiceImpl(
 
   override def activate(key: AlarmKey): Future[Unit] = async {
     log.debug(s"Activate alarm [${key.value}]")
+    val metadataApi = await(metadataApiF)
+
     val metadata = await(metadataApi.get(key)).getOrElse(logAndThrow(KeyNotFoundException(key)))
     if (!metadata.isActive) await(metadataApi.set(key, metadata.copy(activationStatus = Active)))
   }
 
   override def deActivate(key: AlarmKey): Future[Unit] = async {
     log.debug(s"Deactivate alarm [${key.value}]")
+    val metadataApi = await(metadataApiF)
+
     val metadata = await(metadataApi.get(key)).getOrElse(logAndThrow(KeyNotFoundException(key)))
     if (metadata.isActive) await(metadataApi.set(key, metadata.copy(activationStatus = Inactive)))
   }
 
   override def getAggregatedSeverity(key: Key): Future[AlarmSeverity] = async {
     log.debug(s"Get aggregated severity for alarm [${key.value}]")
+    val metadataApi = await(metadataApiF)
+    val statusApi   = await(statusApiF)
+
     val statusKeys = await(statusApi.keys(key))
     if (statusKeys.isEmpty) logAndThrow(KeyNotFoundException(key))
 
@@ -253,7 +282,7 @@ class AlarmServiceImpl(
   // channel: e.g. __keyspace@0__:status.nfiraos.trombone.tromboneAxisLowLimitAlarm,
   // message: event type as value: e.g. set, expire, expired
   private def subscribeAggregatedSeverity(key: Key): Source[AlarmSeverity, AlarmSubscription] = {
-    val redisStreamApi     = redisKeySpaceApiFactory.make(statusApi)(AlarmCodec.StatusCodec) // create new connection for every client
+    val redisStreamApi     = statusApiF.flatMap(statusApi ⇒ redisKeySpaceApi(statusApi)(AlarmCodec.StatusCodec)) // create new connection for every client
     val keys: List[String] = List(StatusKey.fromAlarmKey(key).value)
 
     Source
@@ -276,16 +305,15 @@ class AlarmServiceImpl(
   }
 
   private def setAlarmStore(alarmMetadataSet: AlarmMetadataSet) = {
-    val alarms = alarmMetadataSet.alarms
-
+    val alarms      = alarmMetadataSet.alarms
     val metadataMap = alarms.map(metadata ⇒ MetadataKey.fromAlarmKey(metadata.alarmKey) → metadata).toMap
-    val statusMap   = alarms.map(metadata ⇒ StatusKey.fromAlarmKey(metadata.alarmKey)   → AlarmStatus()).toMap
+    val statusMap   = alarms.map(metadata ⇒ StatusKey.fromAlarmKey(metadata.alarmKey) → AlarmStatus()).toMap
 
     log.info(s"Feeding alarm metadata in alarm store for following alarms: [${alarms.map(_.alarmKey.value).mkString("\n")}]")
     Future.sequence(
       List(
-        metadataApi.mset(metadataMap),
-        statusApi.mset(statusMap)
+        metadataApiF.flatMap(_.mset(metadataMap)),
+        statusApiF.flatMap(_.mset(statusMap))
       )
     )
   }
@@ -295,9 +323,9 @@ class AlarmServiceImpl(
     Future
       .sequence(
         List(
-          metadataApi.pdel(GlobalKey),
-          statusApi.pdel(GlobalKey),
-          severityApi.pdel(GlobalKey)
+          metadataApiF.flatMap(_.pdel(GlobalKey)),
+          statusApiF.flatMap(_.pdel(GlobalKey)),
+          severityApiF.flatMap(_.pdel(GlobalKey))
         )
       )
   }

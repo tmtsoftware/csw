@@ -1,19 +1,22 @@
 package csw.services.alarm.client
 
-import java.net.URI
-
 import akka.actor.ActorSystem
+import com.typesafe.config.ConfigFactory
 import csw.services.alarm.api.javadsl.IAlarmService
 import csw.services.alarm.api.scaladsl.{AlarmAdminService, AlarmService}
-import csw.services.alarm.client.internal.AlarmCodec.{MetadataCodec, SeverityCodec, StatusCodec}
-import csw.services.alarm.client.internal.commons.AlarmServiceLocationResolver
-import csw.services.alarm.client.internal.redis.{RedisConnectionsFactory, RedisKeySpaceApiFactory}
+import csw.services.alarm.client.internal.commons.Settings
+import csw.services.alarm.client.internal.commons.serviceresolver.{
+  AlarmServiceHostPortResolver,
+  AlarmServiceLocationResolver,
+  AlarmServiceResolver
+}
+import csw.services.alarm.client.internal.redis.RedisConnectionsFactory
 import csw.services.alarm.client.internal.shelve.ShelveTimeoutActorFactory
 import csw.services.alarm.client.internal.{AlarmServiceImpl, JAlarmServiceImpl}
 import csw.services.location.scaladsl.LocationService
-import io.lettuce.core.{RedisClient, RedisURI}
+import io.lettuce.core.RedisClient
 
-import scala.async.Async.{async, await}
+import scala.async.Async.async
 import scala.concurrent.{ExecutionContext, Future}
 
 class AlarmServiceFactory(redisClient: RedisClient = RedisClient.create()) {
@@ -22,12 +25,12 @@ class AlarmServiceFactory(redisClient: RedisClient = RedisClient.create()) {
 
   def adminApi(locationService: LocationService)(implicit system: ActorSystem): Future[AlarmAdminService] = {
     implicit val ec: ExecutionContext = system.dispatcher
-    AlarmServiceLocationResolver.resolveWith(locationService).flatMap(alarmService)
+    alarmService(new AlarmServiceLocationResolver(locationService))
   }
 
   def adminApi(host: String, port: Int)(implicit system: ActorSystem): Future[AlarmAdminService] = {
     implicit val ec: ExecutionContext = system.dispatcher
-    AlarmServiceLocationResolver.resolveWith(host, port).flatMap(alarmService)
+    alarmService(new AlarmServiceHostPortResolver(host, port))
   }
 
   def clientApi(locationService: LocationService)(implicit system: ActorSystem): Future[AlarmService] = adminApi(locationService)
@@ -45,23 +48,15 @@ class AlarmServiceFactory(redisClient: RedisClient = RedisClient.create()) {
   }
 
   /************ INTERNAL ************/
-  private def alarmService(alarmURI: URI)(implicit system: ActorSystem, ec: ExecutionContext) = async {
-    val masterId                = system.settings.config.getString("redis.masterId")
-    val redisConnectionsFactory = new RedisConnectionsFactory(redisClient, redisURI(alarmURI, masterId))
-    val redisKeySpaceApiFactory = new RedisKeySpaceApiFactory(redisConnectionsFactory)
+  private def alarmService(alarmServiceResolver: AlarmServiceResolver)(implicit system: ActorSystem, ec: ExecutionContext) =
+    async {
+      val settings                = new Settings(ConfigFactory.load())
+      val redisConnectionsFactory = new RedisConnectionsFactory(redisClient, alarmServiceResolver, settings.masterId)
 
-    val metadataApi = await(redisConnectionsFactory.wrappedAsyncConnection(MetadataCodec))
-    val severityApi = await(redisConnectionsFactory.wrappedAsyncConnection(SeverityCodec))
-    val statusApi   = await(redisConnectionsFactory.wrappedAsyncConnection(StatusCodec))
-
-    new AlarmServiceImpl(
-      metadataApi,
-      severityApi,
-      statusApi,
-      redisKeySpaceApiFactory,
-      new ShelveTimeoutActorFactory()
-    )
-  }
-
-  private def redisURI(uri: URI, masterId: String) = RedisURI.Builder.sentinel(uri.getHost, uri.getPort, masterId).build()
+      new AlarmServiceImpl(
+        redisConnectionsFactory,
+        new ShelveTimeoutActorFactory(),
+        settings
+      )
+    }
 }
