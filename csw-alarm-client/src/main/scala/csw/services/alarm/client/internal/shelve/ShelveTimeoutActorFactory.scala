@@ -7,13 +7,5 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 
 class ShelveTimeoutActorFactory {
   def make(alarm: UnShelvable)(implicit actorSystem: ActorSystem): ActorRef[ShelveTimeoutMessage] =
-    actorSystem.spawnAnonymous {
-      Behaviors
-        .withTimers[ShelveTimeoutMessage] { timerScheduler ⇒
-          Behaviors
-            .setup[ShelveTimeoutMessage] { ctx ⇒
-              new ShelveTimeoutBehaviour(ctx, timerScheduler, alarm)
-            }
-        }
-    }
+    actorSystem.spawnAnonymous(Behaviors.withTimers[ShelveTimeoutMessage](ShelveTimeoutActor.behavior(_, alarm)))
 }
