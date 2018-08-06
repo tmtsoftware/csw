@@ -83,7 +83,7 @@ class AlarmServiceImpl(
     def shouldUpdateLatchedSeverityWhenLatchable: Boolean    = shouldUpdateWhenLatched || shouldUpdateWhenUnLatched
     def shouldUpdateWhenLatched: Boolean                     = alarm.isLatchable && severity.isHighRisk && severity > status.latchedSeverity
     def shouldUpdateWhenUnLatched: Boolean                   = alarm.isLatchable && status.latchStatus == UnLatched && !severity.isHighRisk
-    def shouldUpdateLatchedSeverityWhenNotLatchable: Boolean = !alarm.isLatchable
+    def shouldUpdateLatchedSeverityWhenNotLatchable: Boolean = !alarm.isLatchable && severity != currentSeverity
 
     if (shouldUpdateLatchStatus) newStatus = newStatus.copy(latchStatus = Latched)
 
@@ -147,7 +147,7 @@ class AlarmServiceImpl(
           acknowledgementStatus = UnAcknowledged,
           latchStatus = UnLatched,
           latchedSeverity = Okay,
-          alarmTime = Some(AlarmTime())
+          alarmTime = alarmTime(status)
         )
         await(statusApi.set(key, resetStatus))
       }
@@ -261,7 +261,7 @@ class AlarmServiceImpl(
       }
   }
 
-  private def logAndThrow(runtimeException: RuntimeException): Nothing = {
+  private def logAndThrow(runtimeException: RuntimeException) = {
     log.error(runtimeException.getMessage, ex = runtimeException)
     throw runtimeException
   }
@@ -289,4 +289,8 @@ class AlarmServiceImpl(
           severityApi.pdel(GlobalKey)
         )
       )
+
+  private def alarmTime(status: AlarmStatus) = {
+    if (status.latchedSeverity != Okay) Some(AlarmTime()) else status.alarmTime
+  }
 }
