@@ -28,7 +28,7 @@ private[csw] case class CommandResponseManagerState(cmdToCmdStatus: Map[Id, Comm
    * @param runId command identifier
    * @return current command response
    */
-  def get(runId: Id): SubmitResponse = cmdToCmdStatus.get(runId) match {
+  def get(runId: Id): QueryResponse = cmdToCmdStatus.get(runId) match {
     case Some(cmdState) => cmdState.commandStatus.currentCmdStatus
     case None           => CommandNotAvailable(runId)
   }

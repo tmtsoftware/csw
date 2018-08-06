@@ -26,16 +26,22 @@ object CommandResponse {
     def runId: Id
   }
 
+  sealed trait QueryResponse extends Response
+
   sealed trait ValidationResponse extends Response
 
   sealed trait OnewayResponse extends Response
 
-  sealed trait SubmitResponse extends Response
+  sealed trait SubmitResponse extends QueryResponse
 
   sealed trait MatchingResponse extends Response
 
   case class Accepted(runId: Id) extends ValidationResponse with OnewayResponse
 
+  /**
+    * SubmiResponse can be Invalid, Started, Completed, CompletedWithResult, Error, Cancelled, Locked
+    * @param runId
+    */
   case class Started(runId: Id) extends SubmitResponse
 
   case class CompletedWithResult(runId: Id, result: Result) extends SubmitResponse
@@ -54,7 +60,7 @@ object CommandResponse {
 
   case class Locked(runId: Id) extends OnewayResponse with SubmitResponse with MatchingResponse
 
-  case class CommandNotAvailable(runId: Id) extends SubmitResponse
+  case class CommandNotAvailable(runId: Id) extends QueryResponse
 
   /**
    * Transform a given CommandResponse to a response with the provided Id
@@ -71,7 +77,6 @@ object CommandResponse {
     case locked: Locked                           ⇒ locked.copy(runId = id)
     case error: Error                             ⇒ error.copy(runId = id)
     case cancelled: Cancelled                     ⇒ cancelled.copy(runId = id)
-    case commandNotAvailable: CommandNotAvailable ⇒ commandNotAvailable.copy(runId = id)
   }
 
   sealed trait CommandResultType
@@ -87,9 +92,24 @@ object CommandResponse {
 
   }
 
-  def isCommandResultType(sr: SubmitResponse): CommandResultType = sr match {
-    case Completed(_) | CompletedWithResult(_, _) => Positive
+  object test {
+
+    def x():QueryResponse = {
+      Started(Id())
+      Completed(Id())
+      CommandNotAvailable(Id())
+    }
+
+  }
+
+  /**
+    * Helper function to convert a SubmitResponse to the internally used CommandResultType
+    * @param sr a SubmitResponse
+    * @return one of the three possible values: Intermediate, Positive, Negative
+    */
+  def isCommandResultType(sr: QueryResponse): CommandResultType = sr match {
     case Started(_)                               => Intermediate
+    case Completed(_) | CompletedWithResult(_, _) => Positive
     case _                                        => Negative
   }
 
@@ -104,7 +124,7 @@ object CommandResponse {
                                                                            mat: Materializer): Future[SubmitResponse] = {
     commandResponses
       .runForeach { x ⇒
-        if (isCommandResultType((x)) == Negative)
+        if (isCommandResultType(x) == Negative)
           throw new RuntimeException(s"Command with runId [${x.runId}] failed with response [$x]")
       }
       .transform {

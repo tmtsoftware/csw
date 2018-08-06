@@ -169,7 +169,7 @@ public class JCommandIntegrationTest {
 
         // do some work before querying for the result of above command as needed
 
-        CompletableFuture<CommandResponse.SubmitResponse> queryResponse = hcdCmdService.query(controlCommand.runId(), timeout);
+        CompletableFuture<CommandResponse.QueryResponse> queryResponse = hcdCmdService.query(controlCommand.runId(), timeout);
         //#query-response
 
         //#subscribe-for-result
@@ -321,7 +321,7 @@ public class JCommandIntegrationTest {
                 put(hcdCmdService, new HashSet<ControlCommand>(Arrays.asList(setupHcd1, setupHcd2)));
             }
         };
-
+/*
         //#aggregated-validation
         CompletableFuture<CommandResponse.SubmitResponse> cmdValidationResponseF =
                 new JCommandDistributor(componentsToCommands).
@@ -337,6 +337,7 @@ public class JCommandIntegrationTest {
         //#aggregated-completion
 
         Assert.assertTrue(cmdCompletionResponseF.get() instanceof CommandResponse.Completed);
+        */
     }
 
     // DEOPSCSW-208: Report failure on Configuration Completion command

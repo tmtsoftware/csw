@@ -59,8 +59,10 @@ class JCommandService(akkaLocation: AkkaLocation, actorSystem: ActorSystem[_]) {
    * @param controlCommands the set of [[csw.params.commands.ControlCommand]] payloads
    * @return a Source of CommandResponse as a stream of CommandResponses for all commands
    */
-  def submitAll(controlCommands: java.util.Set[ControlCommand], timeout: Timeout): Source[CommandResponseBase, NotUsed] =
+  /*
+  def submitAll(controlCommands: java.util.Set[ControlCommand], timeout: Timeout): Source[SubmitResponse, NotUsed] =
     sCommandService.submitAll(controlCommands.asScala.toSet)(timeout).asJava
+*/
 
   /**
    * Submit multiple commands and get one CommandResponse as a Future of [[csw.params.commands.CommandResponse]] for all commands. If all the commands were successful,
@@ -101,7 +103,7 @@ class JCommandService(akkaLocation: AkkaLocation, actorSystem: ActorSystem[_]) {
    * @param commandRunId the runId of the command for which response is required
    * @return a CommandResponse as a CompletableFuture
    */
-  def query(commandRunId: Id, timeout: Timeout): CompletableFuture[SubmitResponse] =
+  def query(commandRunId: Id, timeout: Timeout): CompletableFuture[QueryResponse] =
     sCommandService.query(commandRunId)(timeout).toJava.toCompletableFuture
 
   /**

@@ -67,7 +67,9 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
     case `immediateCmd` ⇒ Completed(controlCommand.runId)
     case `immediateResCmd` ⇒
       CompletedWithResult(controlCommand.runId, Result(controlCommand.source, Set(KeyType.IntKey.make("encoder").set(20))))
-    case _ ⇒ CommandNotAvailable(controlCommand.runId)
+    case c ⇒
+      println(s"Some other command received: $c")
+      Error(controlCommand.runId, s"Some other command received: $c")
   }
 
   override def onOneway(controlCommand: ControlCommand): Unit = controlCommand.commandName match {
@@ -108,7 +110,7 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
     implicit val timeout: Timeout = 5.seconds
 
     // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
-    val eventualResponse: Future[SubmitResponse] = commandResponseManager.query(runId)
+    val eventualResponse: Future[QueryResponse] = commandResponseManager.query(runId)
 
     eventualResponse.onComplete {
       case Success(x) => {

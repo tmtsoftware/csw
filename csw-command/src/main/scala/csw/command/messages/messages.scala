@@ -2,6 +2,7 @@ package csw.command.messages
 
 import acyclic.skipped
 import akka.actor.typed.ActorRef
+import csw.messages.commands.CommandResponse.{OnewayResponse, QueryResponse, SubmitResponse}
 import csw.command.models.{CommandCorrelation, CommandResponseManagerState}
 import csw.command.models.framework.PubSub.SubscriberMessage
 import csw.command.models.framework._
@@ -271,7 +272,7 @@ object CommandResponseManagerMessage {
    * @param runId represents an unique identifier of command
    * @param replyTo represents the actor that will receive the command status
    */
-  case class Query(runId: Id, replyTo: ActorRef[SubmitResponse]) extends CommandResponseManagerMessage with SupervisorLockMessage
+  case class Query(runId: Id, replyTo: ActorRef[QueryResponse]) extends CommandResponseManagerMessage with SupervisorLockMessage
 
   /**
    * Represents a message to subscribe to change in command status of a command running on some component

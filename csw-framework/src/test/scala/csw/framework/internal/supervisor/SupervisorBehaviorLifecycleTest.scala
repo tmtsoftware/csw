@@ -38,6 +38,7 @@ import csw.messages.RunningMessage.Lifecycle
 import csw.messages.SupervisorContainerCommonMessages.Restart
 import csw.messages.SupervisorIdleMessage.InitializeTimeout
 import csw.messages.SupervisorInternalRunningMessage.{RegistrationNotRequired, RegistrationSuccess}
+import csw.messages.commands.CommandResponse.{QueryResponse, SubmitResponse}
 import csw.messages.commands.CommandResponse
 import csw.messages.framework.LocationServiceUsage.DoNotRegister
 import csw.messages.framework.PubSub.{Publish, Subscribe, Unsubscribe}
@@ -282,22 +283,22 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     import testData._
 
     val childRef: ActorRef[TopLevelActorMessage] = supervisorBehaviorKit.childInbox(componentActorName).ref
-    val submitResponseProbe                      = TestProbe[SubmitResponse]
+    val queryResponseProbe                      = TestProbe[QueryResponse]
     val testCmdId                                = Id()
 
     supervisorBehaviorKit.run(Running(childRef))
 
-    supervisorBehaviorKit.run(Query(testCmdId, submitResponseProbe.ref))
-    testMocks.commandResponseManagerActor.expectMessage(Query(testCmdId, submitResponseProbe.ref))
+    supervisorBehaviorKit.run(Query(testCmdId, queryResponseProbe.ref))
+    testMocks.commandResponseManagerActor.expectMessage(Query(testCmdId, queryResponseProbe.ref))
 
-    supervisorBehaviorKit.run(CommandResponseManagerMessage.Subscribe(testCmdId, submitResponseProbe.ref))
+    supervisorBehaviorKit.run(CommandResponseManagerMessage.Subscribe(testCmdId, queryResponseProbe.ref))
     testMocks.commandResponseManagerActor.expectMessage(
-      CommandResponseManagerMessage.Subscribe(testCmdId, submitResponseProbe.ref)
+      CommandResponseManagerMessage.Subscribe(testCmdId, queryResponseProbe.ref)
     )
 
-    supervisorBehaviorKit.run(CommandResponseManagerMessage.Unsubscribe(testCmdId, submitResponseProbe.ref))
+    supervisorBehaviorKit.run(CommandResponseManagerMessage.Unsubscribe(testCmdId, queryResponseProbe.ref))
     testMocks.commandResponseManagerActor.expectMessage(
-      CommandResponseManagerMessage.Unsubscribe(testCmdId, submitResponseProbe.ref)
+      CommandResponseManagerMessage.Unsubscribe(testCmdId, queryResponseProbe.ref)
     )
   }
 }

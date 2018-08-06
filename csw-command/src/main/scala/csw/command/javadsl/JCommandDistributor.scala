@@ -28,6 +28,7 @@ case class JCommandDistributor(componentToCommands: util.Map[JCommandService, ut
    *
    * @return an aggregated response as CompletableFuture of CommandResponse
    */
+  /*
   def aggregatedValidationResponse(
       timeout: Timeout,
       ec: ExecutionContext,
@@ -65,4 +66,5 @@ case class JCommandDistributor(componentToCommands: util.Map[JCommandService, ut
       .toJava
       .toCompletableFuture
   }
+  */
 }

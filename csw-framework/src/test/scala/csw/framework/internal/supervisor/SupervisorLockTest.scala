@@ -143,7 +143,7 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
   // DEOPSCSW-301: Support UnLocking
   test("should forward messages that are of type SupervisorLockMessage to TLA") {
     val lockingStateProbe   = TestProbe[LockingResponse]
-    val submitResponseProbe = TestProbe[SubmitResponse]()(untypedSystem.toTyped)
+    val queryResponseProbe = TestProbe[QueryResponse]()(untypedSystem.toTyped)
 
     val sourcePrefix = Prefix("wfos.prog.cloudcover.source")
     val commandName  = CommandName("move.Client1.success")
@@ -167,27 +167,27 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
 
     // Client 1 sends submit command with tokenId in parameter set
     val setup = Setup(sourcePrefix, commandName, Some(obsId))
-    supervisorRef ! Submit(setup, submitResponseProbe.ref)
-    submitResponseProbe.expectMessageType[Completed]
+    supervisorRef ! Submit(setup, queryResponseProbe.ref)
+    queryResponseProbe.expectMessageType[Completed]
     // Note there is a Started from ComponentBehavior as well as Completed
     commandResponseManagerActor.expectMessage(AddOrUpdateCommand(setup.runId, Started(setup.runId)))
     commandResponseManagerActor.expectMessage(AddOrUpdateCommand(setup.runId, Completed(setup.runId)))
 
     // Ensure Query can be sent to component even in locked state
-    supervisorRef ! Query(setup.runId, submitResponseProbe.ref)
-    commandResponseManagerActor.expectMessage(Query(setup.runId, submitResponseProbe.ref))
+    supervisorRef ! Query(setup.runId, queryResponseProbe.ref)
+    commandResponseManagerActor.expectMessage(Query(setup.runId, queryResponseProbe.ref))
 
     // Ensure Subscribe can be sent to component even in locked state
-    supervisorRef ! CRM.Subscribe(setup.runId, submitResponseProbe.ref)
-    commandResponseManagerActor.expectMessage(CRM.Subscribe(setup.runId, submitResponseProbe.ref))
+    supervisorRef ! CRM.Subscribe(setup.runId, queryResponseProbe.ref)
+    commandResponseManagerActor.expectMessage(CRM.Subscribe(setup.runId, queryResponseProbe.ref))
 
     // Ensure Unsubscribe can be sent to component even in locked state
-    supervisorRef ! Unsubscribe(setup.runId, submitResponseProbe.ref)
+    supervisorRef ! Unsubscribe(setup.runId, queryResponseProbe.ref)
     // to prove un-subscribe is handled, sending a same setup command with the same runId again
     // now that we have un-subscribed, submitResponseProbe  is not expecting command completion result (validation ll be received)
-    supervisorRef ! Submit(setup, submitResponseProbe.ref)
-    submitResponseProbe.expectMessageType[Completed]
-    submitResponseProbe.expectNoMessage(200.millis)
+    supervisorRef ! Submit(setup, queryResponseProbe.ref)
+    queryResponseProbe.expectMessageType[Completed]
+    queryResponseProbe.expectNoMessage(200.millis)
   }
 
   // DEOPSCSW-223 Expiry of component Locking mode

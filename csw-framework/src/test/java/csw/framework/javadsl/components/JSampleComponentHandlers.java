@@ -134,7 +134,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
 
         if (controlCommand.commandName().equals(failureAfterValidationCmd())) {
             // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
-            CompletableFuture<CommandResponse.SubmitResponse> status = commandResponseManager.jQuery(controlCommand.runId(), Timeout.apply(100, TimeUnit.MILLISECONDS));
+            CompletableFuture<CommandResponse.QueryResponse> status = commandResponseManager.jQuery(controlCommand.runId(), Timeout.apply(100, TimeUnit.MILLISECONDS));
             status.thenAccept(response -> {
                 if(response instanceof CommandResponse.Invalid)
                     commandResponseManager.addOrUpdateCommand(controlCommand.runId(), new CommandResponse.Error(controlCommand.runId(), "Unknown Error occurred"));

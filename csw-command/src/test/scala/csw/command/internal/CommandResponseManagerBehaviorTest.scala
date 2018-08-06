@@ -38,7 +38,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
 
   test("should be able to add command entry in Command Response Manager") {
     val behaviorTestKit         = createBehaviorTestKit()
-    val commandResponseProbe    = TestProbe[SubmitResponse]
+    val commandResponseProbe    = TestProbe[QueryResponse]
     val commandCorrelationProbe = TestProbe[CommandCorrelation]
     val runId                   = Id()
     behaviorTestKit.run(AddOrUpdateCommand(runId, Started(runId)))
@@ -87,14 +87,19 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
   test("should get one update for long running command that returns Started") {
     val behaviorTestKit                  = createBehaviorTestKit()
     val commandResponseProbe             = TestProbe[SubmitResponse]
-    val commandResponseManagerStateProbe = TestProbe[CommandResponseManagerState]
 
     val runId = Id()
 
+    // This simulates ComponentBehavior adding the command with Started - does not cause update to subscriber
+    // Subscriber cannot subscribe before this happens, will not find command
     behaviorTestKit.run(AddOrUpdateCommand(runId, Started(runId)))
-
+    // Simulate doSubmit returning Started for a long-running command
+    behaviorTestKit.run(AddOrUpdateCommand(runId, Started(runId)))
+    // Subscribe succeeds no after initial Started
     behaviorTestKit.run(Subscribe(runId, commandResponseProbe.ref))
-
+    // Simulate doSubmit returning Started for a long-running command
+    //behaviorTestKit.run(AddOrUpdateCommand(runId, Started(runId)))
+    // Started is received to subscriber now
     commandResponseProbe.expectMessage(Started(runId))
   }
 
@@ -123,7 +128,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
 
   test("should be able to get current status of command on Query message") {
     val behaviorTestKit      = createBehaviorTestKit()
-    val commandResponseProbe = TestProbe[SubmitResponse]
+    val commandResponseProbe = TestProbe[QueryResponse]
 
     val runId = Id()
 
@@ -198,7 +203,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
   // DEOPSCSW-207: Report on Configuration Command Completion
   test("should be able to update successful command status when all the subcommand completes with success") {
     val behaviorTestKit      = createBehaviorTestKit()
-    val commandResponseProbe = TestProbe[SubmitResponse]
+    val commandResponseProbe = TestProbe[QueryResponse]
     val runId                = Id()
     val subCommandId1        = Id()
     val subCommandId2        = Id()

@@ -73,19 +73,28 @@ private[command] class CommandResponseManagerBehavior(
     this
   }
 
-  private def addOrUpdateCommand(runId: Id, commandResponse: SubmitResponse): Unit = {
+  // This is where the command is initially added. Note that every Submit is added as "Started"/Intermediate
+  private def addOrUpdateCommand(runId: Id, commandResponse: SubmitResponse): Unit =
     commandResponseManagerState.get(runId) match {
-      case _: CommandNotAvailable ⇒ println("Added"); commandResponseManagerState = commandResponseManagerState.add(runId, commandResponse)
+      case _: CommandNotAvailable ⇒ commandResponseManagerState = commandResponseManagerState.add(runId, commandResponse)
       case _                      ⇒ updateCommand(runId, commandResponse)
     }
-  }
 
-  private def updateCommand(runId: Id, commandResponse: SubmitResponse): Unit = {
-    val currentResponse = commandResponseManagerState.get(runId)
-    if (isCommandResultType(currentResponse) == CommandResultType.Intermediate && currentResponse != commandResponse) {
-      commandResponseManagerState = commandResponseManagerState.updateCommandStatus(commandResponse)
-      publishToSubscribers(commandResponse, commandResponseManagerState.cmdToCmdStatus(commandResponse.runId).subscribers)
+
+  private def updateCommand(runId: Id, updateResponse: SubmitResponse): Unit = {
+    val currentResponse:Response = commandResponseManagerState.get(runId)
+    currentResponse match {
+      case Started(_) =>
+        commandResponseManagerState = commandResponseManagerState.updateCommandStatus(updateResponse)
+//        publishToSubscribers(updateResponse, commandResponseManagerState.cmdToCmdStatus(updateResponse.runId).subscribers)
+        doPublish(updateResponse, commandResponseManagerState.cmdToCmdStatus(updateResponse.runId).subscribers)
     }
+    /*
+    if (/*isCommandResultType(currentResponse) == CommandResultType.Intermediate && */ currentResponse != updateResponse) {
+      commandResponseManagerState = commandResponseManagerState.updateCommandStatus(updateResponse)
+      publishToSubscribers(updateResponse, commandResponseManagerState.cmdToCmdStatus(updateResponse.runId).subscribers)
+    } else { println(s"Don't do the update for current: $currentResponse and update: $updateResponse")}
+    */
   }
 
   private def updateSubCommand(subCommandRunId: Id, commandResponse: SubmitResponse): Unit = {
@@ -117,19 +126,28 @@ private[command] class CommandResponseManagerBehavior(
       case _ ⇒ log.debug("Validation response will not affect status of Parent command.")
     }
 
-  private def publishToSubscribers(commandResponse: SubmitResponse, subscribers: Set[ActorRef[SubmitResponse]]): Unit =
+  private def publishToSubscribers(commandResponse: SubmitResponse, subscribers: Set[ActorRef[SubmitResponse]]): Unit = //subscribers.foreach(_ ! commandResponse)
     isCommandResultType(commandResponse) match {
-      case _: CommandResultType.Final ⇒
-        subscribers.foreach(_ ! commandResponse)
+      case _: CommandResultType.Final ⇒ doPublish(commandResponse, subscribers)
+
+      case _ =>  println("Don nothing")
+        /*
       case CommandResultType.Intermediate ⇒
         // Do not send updates for validation response as it is sent by the framework
         println("Don't publish started")
         log.debug("Validation response will not affect status of Parent command.")
+        */
     }
+
+  private def doPublish(commandResponse: SubmitResponse, subscribers: Set[ActorRef[SubmitResponse]]):Unit =
+    subscribers.foreach(_ ! commandResponse)
 
   private def subscribe(runId: Id, replyTo: ActorRef[SubmitResponse]): Unit = {
     ctx.watchWith(replyTo, SubscriberTerminated(replyTo))
     commandResponseManagerState = commandResponseManagerState.subscribe(runId, replyTo)
-    publishToSubscribers(commandResponseManagerState.get(runId), Set(replyTo))
+    commandResponseManagerState.get(runId) match {
+      case sr:SubmitResponse => publishToSubscribers(sr, Set(replyTo))
+      case _ => log.debug("Failed to find runId for subscribe.")
+    }
   }
 }

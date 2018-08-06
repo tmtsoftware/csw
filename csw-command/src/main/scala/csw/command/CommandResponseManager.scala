@@ -15,7 +15,7 @@ import csw.params.commands.CommandResponse
 import csw.params.core.models.Id
 import csw.messages.CommandResponseManagerMessage
 import csw.messages.CommandResponseManagerMessage.{AddOrUpdateCommand, AddSubCommand, Query, UpdateSubCommand}
-import csw.messages.commands.CommandResponse.SubmitResponse
+import csw.messages.commands.CommandResponse.{QueryResponse, SubmitResponse}
 import csw.messages.params.models.Id
 import csw.services.command.scaladsl.CommandResponseSubscription
 
@@ -70,7 +70,7 @@ class CommandResponseManager private[command] (val commandResponseManagerActor: 
    * @param timeout timeout duration until which this operation is expected to wait for providing a value
    * @return a future of CommandResponse
    */
-  def query(runId: Id)(implicit timeout: Timeout): Future[SubmitResponse] =
+  def query(runId: Id)(implicit timeout: Timeout): Future[QueryResponse] =
     commandResponseManagerActor ? (Query(runId, _))
 
   /**
@@ -80,7 +80,7 @@ class CommandResponseManager private[command] (val commandResponseManagerActor: 
    * @param timeout timeout duration until which this operation is expected to wait for providing a value
    * @return a future of CommandResponse
    */
-  def jQuery(runId: Id, timeout: Timeout): CompletableFuture[SubmitResponse] =
+  def jQuery(runId: Id, timeout: Timeout): CompletableFuture[QueryResponse] =
     query(runId)(timeout).toJava.toCompletableFuture
 
   /**

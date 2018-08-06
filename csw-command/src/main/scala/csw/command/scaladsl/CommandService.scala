@@ -64,8 +64,10 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
    * @param controlCommands the set of [[csw.params.commands.ControlCommand]] payloads
    * @return a Source of CommandResponse as a stream of CommandResponses for all commands
    */
+  /*
   def submitAll(controlCommands: Set[ControlCommand])(implicit timeout: Timeout): Source[SubmitResponse, NotUsed] =
     Source(controlCommands).mapAsyncUnordered(parallelism)(submit)
+*/
 
   /**
    * Submit multiple commands and get one CommandResponse as a Future of [[csw.params.commands.CommandResponse]] for all commands. If all the commands were successful,
@@ -108,11 +110,12 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
    * @param commandRunId the runId of the command for which response is required
    * @return a CommandResponse as a Future value
    */
-  def query(commandRunId: Id)(implicit timeout: Timeout): Future[SubmitResponse] =
+  def query(commandRunId: Id)(implicit timeout: Timeout): Future[QueryResponse] =
     component ? (CommandResponseManagerMessage.Query(commandRunId, _))
 
   /**
    * Submit a command and Subscribe for the result if it was successfully validated as `Accepted` to get a final [[csw.params.commands.CommandResponse]] as a Future
+   * Submit a command and Subscribe for the result if it was successfully validated as `Started` to get a final [[csw.messages.commands.CommandResponse.SubmitResponse]] as a Future
    *
    * @param controlCommand the [[csw.params.commands.ControlCommand]] payload
    * @return a CommandResponse as a Future value
