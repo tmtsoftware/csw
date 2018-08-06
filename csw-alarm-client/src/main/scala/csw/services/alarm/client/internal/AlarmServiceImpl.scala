@@ -88,7 +88,7 @@ class AlarmServiceImpl(
     if (shouldUpdateLatchStatus) newStatus = newStatus.copy(latchStatus = Latched)
 
     if (shouldUpdateLatchedSeverityWhenLatchable || shouldUpdateLatchedSeverityWhenNotLatchable)
-      newStatus = newStatus.copy(latchedSeverity = severity)
+      newStatus = newStatus.copy(latchedSeverity = severity, alarmTime = Some(AlarmTime()))
 
     // derive acknowledgement status
     if (severity.isHighRisk && severity != currentSeverity) {
@@ -96,7 +96,7 @@ class AlarmServiceImpl(
       else newStatus = newStatus.copy(acknowledgementStatus = UnAcknowledged)
     }
 
-    // update alarm status only when severity changes
+    // update alarm status (with recent time) only when severity changes
     if (newStatus != status) await(statusApi.set(key, newStatus))
   }
 
@@ -143,7 +143,12 @@ class AlarmServiceImpl(
 
       val status = await(statusApi.get(key)).getOrElse(AlarmStatus())
       if (status.acknowledgementStatus == Acknowledged || status.latchStatus == Latched || status.latchedSeverity != Okay) {
-        val resetStatus = status.copy(acknowledgementStatus = UnAcknowledged, latchStatus = UnLatched, latchedSeverity = Okay)
+        val resetStatus = status.copy(
+          acknowledgementStatus = UnAcknowledged,
+          latchStatus = UnLatched,
+          latchedSeverity = Okay,
+          alarmTime = Some(AlarmTime())
+        )
         await(statusApi.set(key, resetStatus))
       }
     } else logAndThrow(KeyNotFoundException(key))

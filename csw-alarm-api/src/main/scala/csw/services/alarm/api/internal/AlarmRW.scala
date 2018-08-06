@@ -14,6 +14,7 @@ trait AlarmRW {
   implicit val metadataKeyRW: RW[MetadataKey] = readwriter[String].bimap(_.value, MetadataKey.apply)
   implicit val statusKeyRW: RW[StatusKey]     = readwriter[String].bimap(_.value, StatusKey.apply)
   implicit val severityKeyRW: RW[SeverityKey] = readwriter[String].bimap(_.value, SeverityKey.apply)
+  implicit val alarmTimeRW: RW[AlarmTime]     = readwriter[String].bimap(_.value, AlarmTime.apply)
 
   implicit val alarmStatusRW: RW[AlarmStatus]                     = macroRW
   implicit val alarmSeverityRW: RW[AlarmSeverity]                 = EnumUpickleSupport.enumFormat
