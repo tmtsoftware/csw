@@ -1,8 +1,10 @@
 package csw.services.location.javadsl
 
+import akka.actor.ActorSystem
 import csw.services.location.commons.{ClusterSettings, CswCluster}
 import csw.services.location.internal.JLocationServiceImpl
-import csw.services.location.scaladsl.LocationServiceFactory
+import csw.services.location.scaladsl.LocationServiceFactory.withCluster
+import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 
 /**
  * The factory is used to create ILocationService instance. With each creation, a new ActorSystem will be created and will
@@ -20,6 +22,17 @@ object JLocationServiceFactory {
    * @return an instance of `ILocationService`
    */
   def make(): ILocationService = withCluster(CswCluster.make())
+
+  /**
+   * Create an ILocationService instance to manage registrations
+   *
+   * @param actorSystem the actorSystem used to feed in `CswCluster` and use it's config properties to join the cluster
+   * @throws csw.services.location.exceptions.CouldNotEnsureDataReplication
+   * @throws csw.services.location.exceptions.CouldNotJoinCluster
+   * @return an instance of `ILocationService`
+   */
+  def withSystem(actorSystem: ActorSystem): ILocationService =
+    withCluster(CswCluster.withSystem(actorSystem))
 
   /**
    * Create an ILocationService instance to manage registrations
