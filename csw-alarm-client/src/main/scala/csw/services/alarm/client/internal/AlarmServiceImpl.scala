@@ -73,6 +73,7 @@ class AlarmServiceImpl(
     val currentSeverity = await(severityApi.get(key)).getOrElse(Disconnected)
 
     // set the severity of the alarm so that it does not transition to `Disconnected` state
+    log.info(s"Updating current severity [${severity.name}] in alarm store")
     await(severityApi.setex(key, ttlInSeconds, severity))
 
     // get alarm status
@@ -97,7 +98,10 @@ class AlarmServiceImpl(
     }
 
     // update alarm status (with recent time) only when severity changes
-    if (newStatus != status) await(statusApi.set(key, newStatus))
+    if (newStatus != status) {
+      log.info(s"Updating alarm status [$newStatus] in alarm store")
+      await(statusApi.set(key, newStatus))
+    }
   }
 
   override def getCurrentSeverity(key: AlarmKey): Future[AlarmSeverity] = async {
@@ -272,6 +276,7 @@ class AlarmServiceImpl(
     val metadataMap = alarms.map(metadata ⇒ MetadataKey.fromAlarmKey(metadata.alarmKey) → metadata).toMap
     val statusMap   = alarms.map(metadata ⇒ StatusKey.fromAlarmKey(metadata.alarmKey)   → AlarmStatus()).toMap
 
+    log.info(s"Feeding alarm metadata in alarm store for following alarms: [${alarms.map(_.alarmKey.value).mkString("\n")}]")
     Future.sequence(
       List(
         metadataApi.mset(metadataMap),
@@ -280,7 +285,8 @@ class AlarmServiceImpl(
     )
   }
 
-  private def resetAlarmStore() =
+  private def resetAlarmStore() = {
+    log.debug("Resetting alarm store")
     Future
       .sequence(
         List(
@@ -289,6 +295,7 @@ class AlarmServiceImpl(
           severityApi.pdel(GlobalKey)
         )
       )
+  }
 
   private def alarmTime(status: AlarmStatus) = {
     if (status.latchedSeverity != Okay) Some(AlarmTime()) else status.alarmTime
