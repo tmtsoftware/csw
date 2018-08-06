@@ -82,10 +82,10 @@ object RedisTestProps {
       serverPort: Int,
       clientOptions: ClientOptions = ClientOptions.create()
   ): RedisTestProps = {
-    val (clusterSettings, locationService) = BaseProperties.createInfra(seedPort, sentinelPort)
-    val redisClient: RedisClient           = RedisClient.create()
+    val (system, locationService) = BaseProperties.createInfra(seedPort, sentinelPort)
+    val redisClient: RedisClient  = RedisClient.create()
     redisClient.setOptions(clientOptions)
 
-    new RedisTestProps("Redis", sentinelPort, serverPort, redisClient, locationService)(clusterSettings.system)
+    new RedisTestProps("Redis", sentinelPort, serverPort, redisClient, locationService)(system)
   }
 }

@@ -11,7 +11,7 @@ import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.internal.wiring.BaseProperties
 import csw.services.event.internal.wiring.BaseProperties.createInfra
 import csw.services.event.models.EventStores.KafkaStore
-import csw.services.location.commons.ClusterSettings
+import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.scaladsl.LocationService
 import net.manub.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
 import org.apache.kafka.clients.producer.ProducerRecord
@@ -22,19 +22,18 @@ import scala.concurrent.Future
 
 class KafkaTestProps(
     kafkaPort: Int,
-    clusterSettings: ClusterSettings,
     locationService: LocationService,
     additionalBrokerProps: Map[String, String]
 )(implicit val actorSystem: ActorSystem)
     extends BaseProperties {
-  private val brokers          = s"PLAINTEXT://${clusterSettings.hostname}:$kafkaPort"
+  private val brokers          = s"PLAINTEXT://${ClusterAwareSettings.hostname}:$kafkaPort"
   private val brokerProperties = Map("listeners" → brokers, "advertised.listeners" → brokers) ++ additionalBrokerProps
   val config                   = EmbeddedKafkaConfig(customBrokerProperties = brokerProperties)
 
   private val eventServiceFactory = new EventServiceFactory(KafkaStore)
   private lazy val producerSettings: ProducerSettings[String, String] =
     ProducerSettings(actorSystem, new StringSerializer, new StringSerializer)
-      .withBootstrapServers(s"${clusterSettings.hostname}:$kafkaPort")
+      .withBootstrapServers(s"${ClusterAwareSettings.hostname}:$kafkaPort")
 
   private lazy val kafkaProducer = producerSettings.createKafkaProducer()
 
@@ -68,8 +67,8 @@ object KafkaTestProps {
       serverPort: Int,
       additionalBrokerProps: Map[String, String] = Map.empty
   ): KafkaTestProps = {
-    val (clusterSettings, locationService) = createInfra(seedPort, serverPort)
-    new KafkaTestProps(serverPort, clusterSettings, locationService, additionalBrokerProps)(clusterSettings.system)
+    val (system, locationService) = createInfra(seedPort, serverPort)
+    new KafkaTestProps(serverPort, locationService, additionalBrokerProps)(system)
   }
 
   def jCreateKafkaProperties(

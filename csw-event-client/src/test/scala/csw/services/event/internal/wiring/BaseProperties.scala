@@ -12,7 +12,7 @@ import csw.services.event.helpers.RegistrationFactory
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.internal.commons.serviceresolver.EventServiceLocationResolver
 import csw.services.event.internal.commons.{EventServiceConnection, EventStreamSupervisionStrategy}
-import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
+import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 
 import scala.async.Async._
@@ -44,11 +44,11 @@ trait BaseProperties {
 }
 
 object BaseProperties {
-  def createInfra(seedPort: Int, serverPort: Int): (ClusterSettings, LocationService) = {
-    val clusterSettings: ClusterSettings = ClusterAwareSettings.joinLocal(seedPort)
-    val locationService                  = LocationServiceFactory.withSettings(ClusterAwareSettings.onPort(seedPort))
-    val tcpRegistration                  = RegistrationFactory.tcp(EventServiceConnection.value, serverPort)
+  def createInfra(seedPort: Int, serverPort: Int): (actor.ActorSystem, LocationService) = {
+    val system          = ClusterAwareSettings.onPort(seedPort).system
+    val locationService = LocationServiceFactory.withSystem(system)
+    val tcpRegistration = RegistrationFactory.tcp(EventServiceConnection.value, serverPort)
     locationService.register(tcpRegistration).await
-    (clusterSettings, locationService)
+    (system, locationService)
   }
 }
