@@ -1,5 +1,7 @@
 package csw.services.alarm.client
 
+import java.util.concurrent.CompletableFuture
+
 import akka.actor.ActorSystem
 import com.typesafe.config.ConfigFactory
 import csw.services.alarm.api.javadsl.IAlarmService
@@ -13,10 +15,12 @@ import csw.services.alarm.client.internal.commons.serviceresolver.{
 import csw.services.alarm.client.internal.redis.RedisConnectionsFactory
 import csw.services.alarm.client.internal.shelve.ShelveTimeoutActorFactory
 import csw.services.alarm.client.internal.{AlarmServiceImpl, JAlarmServiceImpl}
+import csw.services.location.javadsl.ILocationService
 import csw.services.location.scaladsl.LocationService
 import io.lettuce.core.RedisClient
 
 import scala.async.Async.async
+import scala.compat.java8.FutureConverters.FutureOps
 import scala.concurrent.{ExecutionContext, Future}
 
 class AlarmServiceFactory(redisClient: RedisClient = RedisClient.create()) {
@@ -37,14 +41,16 @@ class AlarmServiceFactory(redisClient: RedisClient = RedisClient.create()) {
 
   def clientApi(host: String, port: Int)(implicit system: ActorSystem): Future[AlarmService] = adminApi(host, port)
 
-  def jClientApi(locationService: LocationService, system: ActorSystem): Future[IAlarmService] = {
-    implicit val ec: ExecutionContext = system.dispatcher
-    adminApi(locationService)(system).map(new JAlarmServiceImpl(_))
+  def jClientApi(locationService: ILocationService, system: ActorSystem): CompletableFuture[IAlarmService] = {
+    implicit val ec: ExecutionContext        = system.dispatcher
+    val alarmServiceF: Future[IAlarmService] = adminApi(locationService.asScala)(system).map(new JAlarmServiceImpl(_))
+    alarmServiceF.toJava.toCompletableFuture
   }
 
-  def jClientApi(host: String, port: Int, system: ActorSystem): Future[IAlarmService] = {
-    implicit val ec: ExecutionContext = system.dispatcher
-    adminApi(host, port)(system).map(new JAlarmServiceImpl(_))
+  def jClientApi(host: String, port: Int, system: ActorSystem): CompletableFuture[IAlarmService] = {
+    implicit val ec: ExecutionContext        = system.dispatcher
+    val alarmServiceF: Future[IAlarmService] = adminApi(host, port)(system).map(new JAlarmServiceImpl(_))
+    alarmServiceF.toJava.toCompletableFuture
   }
 
   /************ INTERNAL ************/

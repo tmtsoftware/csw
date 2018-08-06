@@ -10,31 +10,36 @@ import csw.services.alarm.client.internal.AlarmCodec.{MetadataCodec, SeverityCod
 import csw.services.alarm.client.internal.commons.serviceresolver.AlarmServiceHostPortResolver
 import csw.services.alarm.client.internal.helpers.TestFutureExt.RichFuture
 import csw.services.alarm.client.internal.redis.RedisConnectionsFactory
+import csw.services.location.commons.ActorSystemFactory
 import io.lettuce.core.RedisClient
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 import romaine.RedisAsyncScalaApi
 
 import scala.concurrent.ExecutionContext
 
-class AlarmServiceTestSetup(sentinelPort: Int, serverPort: Int)
+class AlarmServiceTestSetup
     extends FunSuite
     with Matchers
     with EmbeddedRedis
+    with AlarmTestData
     with BeforeAndAfterAll
     with BeforeAndAfterEach {
-  private val hostname           = "localhost"
-  private val alarmServer        = "alarmServer"
+  val hostname    = "localhost"
+  val alarmServer = "alarmServer"
+
+  val (sentinelPort, serverPort) = (getFreePort, getFreePort)
+
   private val (sentinel, server) = startSentinel(sentinelPort, serverPort, masterId = alarmServer)
 
   private val resolver    = new AlarmServiceHostPortResolver(hostname, sentinelPort)
   private val redisClient = RedisClient.create()
 
-  implicit val system: ActorSystem  = ActorSystem()
+  implicit val system: ActorSystem  = ActorSystemFactory.remote()
   implicit val ec: ExecutionContext = system.dispatcher
 
   val alarmServiceFactory             = new AlarmServiceFactory(redisClient)
   val alarmService: AlarmAdminService = alarmServiceFactory.adminApi(hostname, sentinelPort).await
-  val jAlarmService: IAlarmService    = alarmServiceFactory.jClientApi(hostname, sentinelPort, system).await
+  val jAlarmService: IAlarmService    = alarmServiceFactory.jClientApi(hostname, sentinelPort, system).get()
 
   val connsFactory: RedisConnectionsFactory                           = new RedisConnectionsFactory(redisClient, resolver, alarmServer)
   val testMetadataApi: RedisAsyncScalaApi[MetadataKey, AlarmMetadata] = connsFactory.wrappedAsyncConnection(MetadataCodec).await

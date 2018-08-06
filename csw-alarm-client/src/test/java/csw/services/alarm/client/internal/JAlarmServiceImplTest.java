@@ -26,7 +26,7 @@ import static org.junit.Assert.assertTrue;
 // DEOPSCSW-444: Set severity api for component
 public class JAlarmServiceImplTest {
 
-    private static AlarmServiceTestSetup alarmServiceTestSetup = new AlarmServiceTestSetup(26380, 6380);
+    private static AlarmServiceTestSetup alarmServiceTestSetup = new AlarmServiceTestSetup();
     private static IAlarmService jAlarmService = alarmServiceTestSetup.jAlarmService();
     private static AlarmAdminService alarmService = alarmServiceTestSetup.alarmService();
 

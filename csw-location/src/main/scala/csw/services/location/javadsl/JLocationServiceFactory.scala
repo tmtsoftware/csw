@@ -3,8 +3,7 @@ package csw.services.location.javadsl
 import akka.actor.ActorSystem
 import csw.services.location.commons.{ClusterSettings, CswCluster}
 import csw.services.location.internal.JLocationServiceImpl
-import csw.services.location.scaladsl.LocationServiceFactory.withCluster
-import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
+import csw.services.location.scaladsl.LocationServiceFactory
 
 /**
  * The factory is used to create ILocationService instance. With each creation, a new ActorSystem will be created and will
