@@ -126,13 +126,10 @@ class AlarmServiceImplTest extends AlarmServiceTestSetup {
     }
   }
 
-  //  DEOPSCSW-445: Get api for alarm metadata
+  // DEOPSCSW-463: Fetch Alarm List for a component name or pattern
   test("should fetch all alarms for a component") {
-    val tromboneKey = ComponentKey("nfiraos", "trombone")
-    alarmService.getMetadata(tromboneKey).await should contain allElementsOf List(
-      tromboneAxisHighLimitAlarm,
-      tromboneAxisLowLimitAlarm
-    )
+    val tromboneKey = ComponentKey("TCS", "tcsPk")
+    alarmService.getMetadata(tromboneKey).await should contain allElementsOf List(cpuExceededAlarm)
   }
 
   //  DEOPSCSW-445: Get api for alarm metadata
