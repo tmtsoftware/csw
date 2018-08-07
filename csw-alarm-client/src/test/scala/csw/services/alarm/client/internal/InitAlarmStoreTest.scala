@@ -41,14 +41,20 @@ class InitAlarmStoreTest extends AlarmServiceTestSetup {
     alarmService.getMetadata(cpuExceededAlarmKey).await shouldBe cpuExceededAlarm
     alarmService.getMetadata(tromboneAxisHighLimitAlarmKey).await shouldBe tromboneAxisHighLimitAlarm
 
+    // update tromboneAxisHighLimitAlarmKey
+    alarmService.setSeverity(tromboneAxisHighLimitAlarmKey, Major).await
+
     // two-valid-alarms.conf contains 2 alarms, it does not contain cpuExceededAlarm
     alarmService.initAlarms(twoAlarmsConfig, reset = true).await
     alarmService.getMetadata(GlobalKey).await.size shouldBe 2
     intercept[KeyNotFoundException] {
       alarmService.getMetadata(cpuExceededAlarmKey).await
     }
+
     // tromboneAxisHighLimitAlarm is present in both the files and hence rewritten in second load
     alarmService.getMetadata(tromboneAxisHighLimitAlarmKey).await shouldBe tromboneAxisHighLimitAlarm
+    alarmService.getStatus(tromboneAxisHighLimitAlarmKey).await shouldEqual AlarmStatus()
+    alarmService.getCurrentSeverity(tromboneAxisHighLimitAlarmKey).await shouldBe Disconnected
   }
 
   test("initAlarm with reset should not delete keys other than alarm service, for example sentinel related keys") {
@@ -72,9 +78,15 @@ class InitAlarmStoreTest extends AlarmServiceTestSetup {
     alarmService.getMetadata(GlobalKey).await.size shouldBe 3
     alarmService.getMetadata(cpuExceededAlarmKey).await shouldBe cpuExceededAlarm
 
+    // update tromboneAxisLowLimitAlarmKey
+    alarmService.setSeverity(tromboneAxisLowLimitAlarmKey, Critical).await
+
     // cpuExceededAlarm does not present in this file, but reset=false, it is preserved
     alarmService.initAlarms(twoAlarmsConfig).await
     alarmService.getMetadata(GlobalKey).await.size shouldBe 3
     alarmService.getMetadata(cpuExceededAlarmKey).await shouldBe cpuExceededAlarm
+
+    // current severity will be expired at it's time and will be inferred disconnected
+    alarmService.getStatus(tromboneAxisLowLimitAlarmKey).await shouldEqual AlarmStatus()
   }
 }
