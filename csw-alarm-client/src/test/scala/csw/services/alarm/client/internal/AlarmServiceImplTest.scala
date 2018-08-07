@@ -1,4 +1,5 @@
 package csw.services.alarm.client.internal
+
 import java.io.File
 
 import csw.services.alarm.api.exceptions.{InvalidSeverityException, KeyNotFoundException}
@@ -22,7 +23,7 @@ class AlarmServiceImplTest extends AlarmServiceTestSetup {
   // DEOPSCSW-444: Set severity api for component
   // DEOPSCSW-459: Update severity to Disconnected if not updated within predefined time
   // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
-  test("test set severity") {
+  test("setSeverity should set severity") {
     //set severity to Major
     val status = setSeverity(tromboneAxisHighLimitAlarmKey, Major)
     status.acknowledgementStatus shouldBe Acknowledged
@@ -42,7 +43,7 @@ class AlarmServiceImplTest extends AlarmServiceTestSetup {
   }
 
   // DEOPSCSW-444: Set severity api for component
-  test("should throw InvalidSeverityException when unsupported severity is provided") {
+  test("setSeverity should throw InvalidSeverityException when unsupported severity is provided") {
     intercept[InvalidSeverityException] {
       alarmService.setSeverity(tromboneAxisHighLimitAlarmKey, AlarmSeverity.Critical).await
     }
@@ -50,7 +51,7 @@ class AlarmServiceImplTest extends AlarmServiceTestSetup {
 
   // DEOPSCSW-444: Set severity api for component
   // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
-  test("should not latch the alarm when it's latchable but not high risk") {
+  test("setSeverity should not latch the alarm when it's latchable but not high risk") {
     //set severity to Okay
     val status = setSeverity(tromboneAxisHighLimitAlarmKey, Okay)
     status.latchStatus shouldBe UnLatched
@@ -66,7 +67,7 @@ class AlarmServiceImplTest extends AlarmServiceTestSetup {
 
   // DEOPSCSW-444: Set severity api for component
   // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
-  test("should latch alarm only when it is high risk and higher than latched severity in case of latchable alarms") {
+  test("setSeverity should latch alarm only when it is high risk and higher than latched severity in case of latchable alarms") {
     val status = setSeverity(tromboneAxisHighLimitAlarmKey, Major)
 
     status.acknowledgementStatus shouldBe Acknowledged
@@ -89,7 +90,7 @@ class AlarmServiceImplTest extends AlarmServiceTestSetup {
 
   // DEOPSCSW-444: Set severity api for component
   // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
-  test("should not latch alarm if it is not latchable") {
+  test("setSeverity should not latch alarm if it is not latchable") {
     val cpuExceededAlarm = AlarmKey("TCS", "tcsPk", "cpuExceededAlarm")
     val status           = setSeverity(cpuExceededAlarm, Critical)
     status.acknowledgementStatus shouldBe Acknowledged
@@ -105,7 +106,7 @@ class AlarmServiceImplTest extends AlarmServiceTestSetup {
   }
 
   // DEOPSCSW-444: Set severity api for component
-  test("should auto-acknowledge alarm only when it is auto-acknowledgable while setting severity") {
+  test("setSeverity should auto-acknowledge alarm only when it is auto-acknowledgable") {
     val status = setSeverity(tromboneAxisLowLimitAlarmKey, Major)
     status.acknowledgementStatus shouldBe UnAcknowledged
     status.latchStatus shouldBe Latched
@@ -113,13 +114,41 @@ class AlarmServiceImplTest extends AlarmServiceTestSetup {
     status.alarmTime.isDefined shouldBe true
   }
 
+  // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
+  test("setSeverity should update alarm time only when severity changes for latchable alarms") {
+    // latchable alarm
+    val highLimitAlarmKey = AlarmKey("nfiraos", "trombone", "tromboneAxisHighLimitAlarm")
+
+    // latch it to major
+    val status = setSeverity(highLimitAlarmKey, Major)
+
+    // set the severity again to mimic alarm refreshing
+    val status1 = setSeverity(highLimitAlarmKey, Major)
+
+    status.alarmTime.get.time shouldEqual status1.alarmTime.get.time
+  }
+
+  // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
+  test("setSeverity should update alarm time only when severity changes for un-latchable alarms") {
+    // un-latchable alarm
+    val cpuExceededAlarm = AlarmKey("TCS", "tcsPk", "cpuExceededAlarm")
+
+    // set severity to major
+    val status = setSeverity(cpuExceededAlarm, Major)
+
+    // set the severity again to mimic alarm refreshing
+    val status1 = setSeverity(cpuExceededAlarm, Major)
+
+    status.alarmTime.get.time shouldEqual status1.alarmTime.get.time
+  }
+
   //  DEOPSCSW-445: Get api for alarm metadata
-  test("should fetch metadata of the given Alarm key") {
+  test("getMetadata should fetch metadata of the given Alarm key") {
     alarmService.getMetadata(tromboneAxisHighLimitAlarmKey).await shouldBe tromboneAxisHighLimitAlarm
   }
 
   //  DEOPSCSW-445: Get api for alarm metadata
-  test("should throw exception while getting metadata if key does not exist") {
+  test("getMetadata should throw exception while getting metadata if key does not exist") {
     val invalidAlarm = AlarmKey("invalid", "invalid", "invalid")
     intercept[KeyNotFoundException] {
       alarmService.getMetadata(invalidAlarm).await
@@ -127,13 +156,13 @@ class AlarmServiceImplTest extends AlarmServiceTestSetup {
   }
 
   // DEOPSCSW-463: Fetch Alarm List for a component name or pattern
-  test("should fetch all alarms for a component") {
+  test("getMetadata should fetch all alarms for a component") {
     val tromboneKey = ComponentKey("TCS", "tcsPk")
     alarmService.getMetadata(tromboneKey).await should contain allElementsOf List(cpuExceededAlarm)
   }
 
   // DEOPSCSW-464: Fetch Alarm name list for a subsystem name or pattern
-  test("should fetch all alarms for a subsystem") {
+  test("getMetadata should fetch all alarms for a subsystem") {
     val nfiraosKey = SubsystemKey("nfiraos")
     alarmService.getMetadata(nfiraosKey).await should contain allElementsOf List(
       tromboneAxisHighLimitAlarm,
@@ -142,7 +171,7 @@ class AlarmServiceImplTest extends AlarmServiceTestSetup {
   }
 
   // DEOPSCSW-464: Fetch Alarm name list for a subsystem name or pattern
-  test("should fetch all alarms of whole system") {
+  test("getMetadata should fetch all alarms of whole system") {
     val globalKey = GlobalKey
     alarmService.getMetadata(globalKey).await should contain allElementsOf List(
       tromboneAxisHighLimitAlarm,
@@ -152,27 +181,27 @@ class AlarmServiceImplTest extends AlarmServiceTestSetup {
   }
 
   // DEOPSCSW-464: Fetch Alarm name list for a subsystem name or pattern
-  test("should throw exception if no alarms are found while getting metadata by subsystem") {
+  test("getMetadata should throw exception if no alarms are found while getting metadata by subsystem") {
     val invalidAlarm = SubsystemKey("invalid")
     intercept[KeyNotFoundException] {
       alarmService.getMetadata(invalidAlarm).await
     }
   }
 
-  test("should get current severity") {
+  test("getCurrentSeverity should get current severity") {
     alarmService.setSeverity(tromboneAxisHighLimitAlarmKey, Warning).await
 
     alarmService.getCurrentSeverity(tromboneAxisHighLimitAlarmKey).await shouldBe Warning
   }
 
-  test("should throw exception while getting current severity if key does not exist") {
+  test("getCurrentSeverity should throw exception if key does not exist") {
     val invalidAlarm = AlarmKey("invalid", "invalid", "invalid")
     intercept[KeyNotFoundException] {
       alarmService.getCurrentSeverity(invalidAlarm).await
     }
   }
 
-  test("should get aggregated latched severity for component") {
+  test("getAggregatedSeverity should get aggregated latched severity for component") {
     alarmService.setSeverity(tromboneAxisHighLimitAlarmKey, Warning).await
     alarmService.setSeverity(tromboneAxisLowLimitAlarmKey, Critical).await
 
@@ -181,7 +210,7 @@ class AlarmServiceImplTest extends AlarmServiceTestSetup {
   }
 
   // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
-  test("should update time for a latchable and auto-acknowledgable alarm while resetting it") {
+  test("reset should update time for a latchable and auto-acknowledgable alarm") {
     // latchable, auto-acknowledgable alarm
     val highLimitAlarmKey = AlarmKey("nfiraos", "trombone", "tromboneAxisHighLimitAlarm")
 
@@ -199,7 +228,7 @@ class AlarmServiceImplTest extends AlarmServiceTestSetup {
   }
 
   // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
-  test("should update time only when severity changes for a latchable and not auto-acknowledgable alarm while resetting it ") {
+  test("reset should update time only when severity changes for a latchable and not auto-acknowledgable alarm") {
     // latchable, not auto-acknowledgable alarm
     val lowLimitAlarmKey = AlarmKey("nfiraos", "trombone", "tromboneAxisLowLimitAlarm")
 
@@ -216,7 +245,7 @@ class AlarmServiceImplTest extends AlarmServiceTestSetup {
   }
 
   // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
-  test("should update time only when severity changes for an un-latchable and auto-acknowledgable alarm while resetting it") {
+  test("reset should update time only when severity changes for an un-latchable and auto-acknowledgable alarm") {
     // un-latchable, auto-acknowledgable alarm
     val cpuExceededAlarm = AlarmKey("TCS", "tcsPk", "cpuExceededAlarm")
 
@@ -231,63 +260,36 @@ class AlarmServiceImplTest extends AlarmServiceTestSetup {
     statusAfterReset1.alarmTime.get.time shouldEqual status1.alarmTime.get.time
   }
 
-  // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
-  test("should update alarm time only when severity changes for latchable alarms while setting it") {
-    // latchable alarm
-    val highLimitAlarmKey = AlarmKey("nfiraos", "trombone", "tromboneAxisHighLimitAlarm")
-
-    // latch it to major
-    val status = setSeverity(highLimitAlarmKey, Major)
-
-    // set the severity again to mimic alarm refreshing
-    val status1 = setSeverity(highLimitAlarmKey, Major)
-
-    status.alarmTime.get.time shouldEqual status1.alarmTime.get.time
-  }
-
-  // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
-  test("should update alarm time only when severity changes for un-latchable alarms while setting it") {
-    // un-latchable alarm
-    val cpuExceededAlarm = AlarmKey("TCS", "tcsPk", "cpuExceededAlarm")
-
-    // set severity to major
-    val status = setSeverity(cpuExceededAlarm, Major)
-
-    // set the severity again to mimic alarm refreshing
-    val status1 = setSeverity(cpuExceededAlarm, Major)
-
-    status.alarmTime.get.time shouldEqual status1.alarmTime.get.time
-  }
-
-//  test("should throw exception while getting status if key does not exist") {
-//    val invalidAlarm = AlarmKey("invalid", "invalid", "invalid")
-//    intercept[KeyNotFoundException] {
-//      alarmService.getStatus(invalidAlarm)
-//    }
-//  }
-//
-//  test("should throw exception while acknowledging alarm if key does not exist") {
-//    val invalidAlarm = AlarmKey("invalid", "invalid", "invalid")
-//    intercept[KeyNotFoundException] {
-//      alarmService.acknowledge(invalidAlarm)
-//    }
-//  }
-//
-//  test("should acknowledge an alarm") {}
-//
-//  test("should throw exception while resetting alarm if key does not exist") {
-//    val invalidAlarm = AlarmKey("invalid", "invalid", "invalid")
-//    intercept[KeyNotFoundException] {
-//      alarmService.reset(invalidAlarm)
-//    }
-//  }
-//
-//  test("should throw exception while resetting alarm if severity is not okay") {
-//    val tromboneAxisLowLimitAlarm = AlarmKey("nfiraos", "trombone", "tromboneAxisLowLimitAlarm")
-//    intercept[ResetOperationNotAllowed] {
-//      alarmService.reset(tromboneAxisLowLimitAlarm)
-//    }
-//  }
+  //  test("reset should throw exception if key does not exist") {
+  //    val invalidAlarm = AlarmKey("invalid", "invalid", "invalid")
+  //    intercept[KeyNotFoundException] {
+  //      alarmService.reset(invalidAlarm)
+  //    }
+  //  }
+  //
+  //  test("reset should throw exception if severity is not okay") {
+  //    val tromboneAxisLowLimitAlarm = AlarmKey("nfiraos", "trombone", "tromboneAxisLowLimitAlarm")
+  //    intercept[ResetOperationNotAllowed] {
+  //      alarmService.reset(tromboneAxisLowLimitAlarm)
+  //    }
+  //  }
+  //
+  //  test("getStatus should throw exception if key does not exist") {
+  //    val invalidAlarm = AlarmKey("invalid", "invalid", "invalid")
+  //    intercept[KeyNotFoundException] {
+  //      alarmService.getStatus(invalidAlarm)
+  //    }
+  //  }
+  //
+  //  test("acknowledge should acknowledge an alarm") {}
+  //
+  //  test("acknowledge should throw exception if key does not exist") {
+  //    val invalidAlarm = AlarmKey("invalid", "invalid", "invalid")
+  //    intercept[KeyNotFoundException] {
+  //      alarmService.acknowledge(invalidAlarm)
+  //    }
+  //  }
+  //
   private def setSeverity(alarmKey: AlarmKey, alarmSeverity: AlarmSeverity): AlarmStatus = {
     alarmService.setSeverity(alarmKey, alarmSeverity).await
     testStatusApi.get(alarmKey).await.get
