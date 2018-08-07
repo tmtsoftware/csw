@@ -4,6 +4,7 @@ import java.io.File
 import com.typesafe.config.{ConfigFactory, ConfigResolveOptions}
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.alarm.api.models.AlarmSeverity.Indeterminate
+import csw.services.alarm.api.scaladsl.{AlarmAdminService, AlarmService}
 import csw.services.alarm.client.internal.commons.AlarmServiceConnection
 import csw.services.alarm.client.internal.helpers.AlarmServiceTestSetup
 import csw.services.alarm.client.internal.helpers.TestFutureExt.RichFuture
@@ -34,23 +35,23 @@ class AlarmServiceFactoryTest extends AlarmServiceTestSetup {
   }
 
   test("should create admin alarm service using location service") {
-    val alarmServiceUsingLS = alarmServiceFactory.adminApi(locationService).await
+    val alarmServiceUsingLS: AlarmAdminService = alarmServiceFactory.adminApi(locationService).await
     alarmServiceUsingLS.getMetadata(tromboneAxisHighLimitAlarmKey).await shouldEqual tromboneAxisHighLimitAlarm
   }
 
   test("should create admin alarm service using host and port") {
-    val alarmServiceUsingLS = alarmServiceFactory.adminApi(hostname, sentinelPort).await
+    val alarmServiceUsingLS: AlarmAdminService = alarmServiceFactory.adminApi(hostname, sentinelPort).await
     alarmServiceUsingLS.getMetadata(tromboneAxisHighLimitAlarmKey).await shouldEqual tromboneAxisHighLimitAlarm
   }
 
   test("should create client alarm service using location service") {
-    val alarmServiceUsingLS = alarmServiceFactory.clientApi(locationService).await
+    val alarmServiceUsingLS: AlarmService = alarmServiceFactory.clientApi(locationService).await
     alarmServiceUsingLS.setSeverity(tromboneAxisHighLimitAlarmKey, Indeterminate).await
     alarmService.getCurrentSeverity(tromboneAxisHighLimitAlarmKey).await shouldEqual Indeterminate
   }
 
   test("should create client alarm service using host and port") {
-    val alarmServiceUsingLS = alarmServiceFactory.adminApi(hostname, sentinelPort).await
+    val alarmServiceUsingLS: AlarmAdminService = alarmServiceFactory.adminApi(hostname, sentinelPort).await
     alarmServiceUsingLS.setSeverity(tromboneAxisHighLimitAlarmKey, Indeterminate).await
     alarmService.getCurrentSeverity(tromboneAxisHighLimitAlarmKey).await shouldEqual Indeterminate
   }
