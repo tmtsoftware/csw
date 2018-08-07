@@ -1,6 +1,6 @@
 package csw.services.alarm.client.internal.configparser
 import com.typesafe.config.ConfigFactory
-import csw.services.alarm.api.models.ValidationResult
+import csw.services.alarm.api.internal.ValidationResult
 import csw.services.alarm.client.internal.configparser.SchemaRegistry._
 import org.scalatest.{FunSuite, Matchers}
 

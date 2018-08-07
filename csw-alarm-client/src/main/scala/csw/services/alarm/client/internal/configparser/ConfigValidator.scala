@@ -10,8 +10,8 @@ import com.github.fge.jsonschema.core.load.download.URIDownloader
 import com.github.fge.jsonschema.core.report.ProcessingMessage
 import com.github.fge.jsonschema.main.{JsonSchema, JsonSchemaFactory}
 import com.typesafe.config.{Config, ConfigFactory, ConfigRenderOptions}
-import csw.services.alarm.api.models.ValidationResult
-import csw.services.alarm.api.models.ValidationResult.{Failure, Success}
+import csw.services.alarm.api.internal.ValidationResult
+import csw.services.alarm.api.internal.ValidationResult.{Failure, Success}
 
 import scala.collection.JavaConverters.{asScalaIteratorConverter, iterableAsScalaIterableConverter}
 
