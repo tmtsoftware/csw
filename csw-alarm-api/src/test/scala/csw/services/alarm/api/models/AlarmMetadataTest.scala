@@ -4,7 +4,7 @@ import csw.services.alarm.api.models.AlarmSeverity._
 import csw.services.alarm.api.models.Key.AlarmKey
 import org.scalatest.{FunSuite, Matchers}
 
-// DEOPSCSW-452: Represent alarm in a model as defined in Configuration file
+// DEOPSCSW-439: Model to represent Alarm entity metadata
 class AlarmMetadataTest extends FunSuite with Matchers {
 
   val alarmMetadata = AlarmMetadata(
