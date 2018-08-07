@@ -1,16 +1,16 @@
 package csw.framework.integration
 
-import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.stream.scaladsl.{Keep, Sink}
-import akka.stream.{ActorMaterializer, Materializer}
-import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.{actor, testkit}
+import akka.stream.scaladsl.{Keep, Sink}
+import akka.testkit
 import com.typesafe.config.ConfigFactory
 import csw.common.FrameworkAssertions._
 import csw.common.components.framework.SampleComponentState._
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
+import csw.messages.ComponentCommonMessage.{GetSupervisorLifecycleState, LifecycleStateSubscription}
+import csw.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
+import csw.messages.RunningMessage.Lifecycle
+import csw.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.messages.framework
 import csw.messages.framework.PubSub.Subscribe
 import csw.messages.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
@@ -19,18 +19,12 @@ import csw.messages.location.ComponentType.{Assembly, HCD}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType, LocationRemoved, TrackingEvent}
 import csw.messages.params.states.{CurrentState, StateName}
-import csw.messages.ComponentCommonMessage.{GetSupervisorLifecycleState, LifecycleStateSubscription}
-import csw.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
-import csw.messages.RunningMessage.Lifecycle
-import csw.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.services.command.scaladsl.CommandService
-import csw.services.location.commons.ClusterSettings
-import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
+import csw.services.event.helpers.TestFutureExt.RichFuture
 import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
-import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
 
 // DEOPSCSW-169: Creation of Multiple Components
@@ -39,28 +33,22 @@ import scala.concurrent.duration.DurationLong
 // DEOPSCSW-216: Locate and connect components to send AKKA commands
 class ContainerIntegrationTest extends FunSuite with MockitoSugar with Matchers with BeforeAndAfterAll {
 
-  implicit val seedActorSystem: actor.ActorSystem     = ClusterSettings().onPort(3555).system
-  private val containerActorSystem: actor.ActorSystem = ClusterSettings().joinLocal(3555).system
-
-  implicit val typedSystem: ActorSystem[_]      = seedActorSystem.toTyped
-  implicit val testKitSettings: TestKitSettings = TestKitSettings(typedSystem)
-
-  implicit val mat: Materializer               = ActorMaterializer()
-  private val locationService: LocationService = LocationServiceFactory.withSystem(seedActorSystem)
+  private val testWiring = new FrameworkTestWiring()
+  import testWiring._
 
   private val irisContainerConnection  = AkkaConnection(ComponentId("IRIS_Container", ComponentType.Container))
   private val filterAssemblyConnection = AkkaConnection(ComponentId("Filter", Assembly))
   private val instrumentHcdConnection  = AkkaConnection(ComponentId("Instrument_Filter", HCD))
   private val disperserHcdConnection   = AkkaConnection(ComponentId("Disperser", HCD))
 
-  override protected def afterAll(): Unit = Await.result(seedActorSystem.terminate(), 5.seconds)
+  override protected def afterAll(): Unit = shutdown()
 
   test("should start multiple components withing a single container and able to accept lifecycle messages") {
 
-    val wiring = FrameworkWiring.make(containerActorSystem, mock[RedisClient])
+    val wiring = FrameworkWiring.make(testActorSystem, mock[RedisClient])
     // start a container and verify it moves to running lifecycle state
     val containerRef =
-      Await.result(Container.spawn(ConfigFactory.load("container.conf"), wiring), 5.seconds)
+      Container.spawn(ConfigFactory.load("container.conf"), wiring).await
 
     val componentsProbe              = TestProbe[Components]("comp-probe")
     val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]("container-lifecycle-state-probe")
@@ -80,7 +68,7 @@ class ContainerIntegrationTest extends FunSuite with MockitoSugar with Matchers 
     assertThatContainerIsRunning(containerRef, containerLifecycleStateProbe, 5.seconds)
 
     // resolve container using location service
-    val containerLocation = Await.result(locationService.resolve(irisContainerConnection, 5.seconds), 5.seconds)
+    val containerLocation = locationService.resolve(irisContainerConnection, 5.seconds).await
 
     containerLocation.isDefined shouldBe true
     val resolvedContainerRef = containerLocation.get.containerRef
@@ -91,9 +79,9 @@ class ContainerIntegrationTest extends FunSuite with MockitoSugar with Matchers 
     components.size shouldBe 3
 
     // resolve all the components from container using location service
-    val filterAssemblyLocation = Await.result(locationService.find(filterAssemblyConnection), 5.seconds)
-    val instrumentHcdLocation  = Await.result(locationService.find(instrumentHcdConnection), 5.seconds)
-    val disperserHcdLocation   = Await.result(locationService.find(disperserHcdConnection), 5.seconds)
+    val filterAssemblyLocation = locationService.find(filterAssemblyConnection).await
+    val instrumentHcdLocation  = locationService.find(instrumentHcdConnection).await
+    val disperserHcdLocation   = locationService.find(disperserHcdConnection).await
 
     filterAssemblyLocation.isDefined shouldBe true
     instrumentHcdLocation.isDefined shouldBe true
@@ -223,6 +211,6 @@ class ContainerIntegrationTest extends FunSuite with MockitoSugar with Matchers 
 
     // this proves that on shutdown message, container's actor system gets terminated
     // if it does not get terminated in 5 seconds, future will fail which in turn fail this test
-    Await.result(containerActorSystem.whenTerminated, 5.seconds)
+    testActorSystem.whenTerminated.await
   }
 }

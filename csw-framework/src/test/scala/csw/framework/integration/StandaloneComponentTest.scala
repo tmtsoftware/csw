@@ -1,13 +1,8 @@
 package csw.framework.integration
 
-import akka.actor
-import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
-import akka.stream.{ActorMaterializer, Materializer}
 import com.persist.JsonOps
 import com.persist.JsonOps.JsonObject
 import com.typesafe.config.ConfigFactory
@@ -18,15 +13,13 @@ import csw.common.utils.TestAppender
 import csw.commons.tags.LoggingSystemSensitive
 import csw.framework.internal.component.ComponentBehavior
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
+import csw.messages.SupervisorContainerCommonMessages.Shutdown
 import csw.messages.framework.SupervisorLifecycleState
 import csw.messages.location.ComponentType.HCD
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.messages.params.states.{CurrentState, StateName}
-import csw.messages.SupervisorContainerCommonMessages.Shutdown
 import csw.services.command.scaladsl.CommandService
-import csw.services.location.commons.ClusterSettings
-import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import csw.services.logging.internal.LoggingLevels.INFO
 import csw.services.logging.internal.LoggingSystem
 import io.lettuce.core.RedisClient
@@ -43,15 +36,8 @@ import scala.concurrent.duration.DurationLong
 @LoggingSystemSensitive
 class StandaloneComponentTest extends FunSuite with Matchers with MockitoSugar with BeforeAndAfterAll {
 
-  // ActorSystem for testing. This acts as a seed node
-  implicit val seedActorSystem: actor.ActorSystem = ClusterSettings().onPort(3553).system
-  implicit val typedSystem: ActorSystem[_]        = seedActorSystem.toTyped
-  implicit val testKitSettings: TestKitSettings   = TestKitSettings(typedSystem)
-  implicit val mat: Materializer                  = ActorMaterializer()
-  private val locationService: LocationService    = LocationServiceFactory.withSystem(seedActorSystem)
-
-  // ActorSystem for standalone component. Component will join seed node created above.
-  private val hcdActorSystem: actor.ActorSystem = ClusterSettings().joinLocal(3553).system
+  private val testWiring = new FrameworkTestWiring()
+  import testWiring._
 
   // all log messages will be captured in log buffer
   private val logBuffer                    = mutable.Buffer.empty[JsonObject]
@@ -63,12 +49,12 @@ class StandaloneComponentTest extends FunSuite with Matchers with MockitoSugar w
     loggingSystem.setAppenders(List(testAppender))
   }
 
-  override protected def afterAll(): Unit = Await.result(seedActorSystem.terminate(), 5.seconds)
+  override protected def afterAll(): Unit = shutdown()
 
   test("should start a component in standalone mode and register with location service") {
 
     // start component in standalone mode
-    val wiring: FrameworkWiring = FrameworkWiring.make(hcdActorSystem, mock[RedisClient])
+    val wiring: FrameworkWiring = FrameworkWiring.make(testActorSystem, mock[RedisClient])
     Standalone.spawn(ConfigFactory.load("standalone.conf"), wiring)
 
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]("supervisor-lifecycle-state-probe")
@@ -105,7 +91,7 @@ class StandaloneComponentTest extends FunSuite with Matchers with MockitoSugar w
 
     // this proves that on shutdown message, supervisor's actor system gets terminated
     // if it does not get terminated in 5 seconds, future will fail which in turn fail this test
-    Await.result(hcdActorSystem.whenTerminated, 5.seconds)
+    Await.result(testActorSystem.whenTerminated, 5.seconds)
 
     /*
      * This assertion are here just to prove that LoggingSystem is integrated with framework and ComponentHandlers

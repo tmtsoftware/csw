@@ -1,10 +1,6 @@
 package csw.framework.integration
 
 import akka.actor
-import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.stream.{ActorMaterializer, Materializer}
-import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
@@ -14,16 +10,16 @@ import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.messages.SupervisorContainerCommonMessages.Shutdown
 import csw.messages.commands
 import csw.messages.commands.CommandName
+import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState}
 import csw.messages.location.ComponentId
 import csw.messages.location.ComponentType.{Assembly, HCD}
 import csw.messages.location.Connection.AkkaConnection
-import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.params.states.{CurrentState, StateName}
 import csw.services.command.scaladsl.CommandService
+import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.models.{HttpRegistration, TcpRegistration}
-import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import csw.services.logging.commons.LogAdminActorFactory
 import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar
@@ -34,31 +30,23 @@ import scala.concurrent.{Await, TimeoutException}
 
 class TrackConnectionsIntegrationTest extends FunSuite with Matchers with MockitoSugar with BeforeAndAfterAll {
 
-  implicit val seedActorSystem: actor.ActorSystem = ClusterSettings().onPort(3554).system
-
-  implicit val typedSystem: ActorSystem[_]      = seedActorSystem.toTyped
-  implicit val testKitSettings: TestKitSettings = TestKitSettings(typedSystem)
-
-  implicit val mat: Materializer               = ActorMaterializer()
-  private val locationService: LocationService = LocationServiceFactory.withSystem(seedActorSystem)
+  private val testWiring = new FrameworkTestWiring()
+  import testWiring._
 
   private val filterAssemblyConnection = AkkaConnection(ComponentId("Filter", Assembly))
   private val disperserHcdConnection   = AkkaConnection(ComponentId("Disperser", HCD))
 
-  override protected def afterAll(): Unit = {
-    Await.result(seedActorSystem.terminate(), 5.seconds)
-
-  }
+  override protected def afterAll(): Unit = shutdown()
 
   // DEOPSCSW-218: Discover component connection information using Akka protocol
   // DEOPSCSW-220: Access and Monitor components for current values
   // DEOPSCSW-221: Avoid sending commands to non-executing components
   test("should track connections when locationServiceUsage is RegisterAndTrackServices") {
-    val containerActorSystem: actor.ActorSystem = ClusterSettings().joinLocal(3554).system
-    val wiring: FrameworkWiring                 = FrameworkWiring.make(containerActorSystem, mock[RedisClient])
+    val actorSystem: actor.ActorSystem = ClusterSettings().joinLocal(seedPort).system
+    val wiring: FrameworkWiring        = FrameworkWiring.make(actorSystem, mock[RedisClient])
+
     // start a container and verify it moves to running lifecycle state
-    val containerRef =
-      Await.result(Container.spawn(ConfigFactory.load("container_tracking_connections.conf"), wiring), 5.seconds)
+    val containerRef = Container.spawn(ConfigFactory.load("container_tracking_connections.conf"), wiring).await
 
     val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]("container-lifecycle-state-probe")
     val assemblyProbe                = TestProbe[CurrentState]("assembly-state-probe")
@@ -89,10 +77,10 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Mockit
 
     implicit val timeout: Timeout = Timeout(100.millis)
     intercept[TimeoutException] {
-      Await.result(disperserCommandService.submit(commands.Setup(prefix, CommandName("isAlive"), None)), 200.millis)
+      disperserCommandService.submit(commands.Setup(prefix, CommandName("isAlive"), None)).await(200.millis)
     }
 
-    Await.result(wiring.locationService.shutdown(TestFinishedReason), 5.seconds)
+    wiring.locationService.shutdown(TestFinishedReason).await
   }
 
   /**
@@ -102,7 +90,7 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Mockit
    * */
   //DEOPSCSW-219 Discover component connection using HTTP protocol
   test("component should be able to track http and tcp connections") {
-    val actorSystem: actor.ActorSystem = ClusterSettings().joinLocal(3554).system
+    val actorSystem: actor.ActorSystem = ClusterSettings().joinLocal(seedPort).system
     val wiring: FrameworkWiring        = FrameworkWiring.make(actorSystem, mock[RedisClient])
     // start component in standalone mode
     Standalone.spawn(ConfigFactory.load("standalone.conf"), wiring)
@@ -110,9 +98,7 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Mockit
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]("supervisor-lifecycle-state-probe")
     val akkaConnection                = AkkaConnection(ComponentId("IFS_Detector", HCD))
 
-    // verify component gets registered with location service
-    val eventualLocation = locationService.resolve(akkaConnection, 5.seconds)
-    val maybeLocation    = Await.result(eventualLocation, 5.seconds)
+    val maybeLocation = locationService.resolve(akkaConnection, 5.seconds).await
 
     maybeLocation.isDefined shouldBe true
     val resolvedAkkaLocation = maybeLocation.get
@@ -127,12 +113,7 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Mockit
     assemblyCommandService.subscribeCurrentState(assemblyProbe.ref ! _)
 
     // register http connection
-    Await.result(
-      locationService.register(
-        HttpRegistration(httpConnection, 9090, "test/path", LogAdminActorFactory.make(actorSystem))
-      ),
-      5.seconds
-    )
+    locationService.register(HttpRegistration(httpConnection, 9090, "test/path", LogAdminActorFactory.make(actorSystem))).await
 
     // assembly is tracking HttpConnection that we registered above, hence assemblyProbe will receive LocationUpdated event
     assemblyProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(httpLocationUpdatedChoice))))
@@ -142,10 +123,7 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Mockit
     assemblyProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(httpLocationRemovedChoice))))
 
     // register tcp connection
-    Await.result(
-      locationService.register(TcpRegistration(tcpConnection, 9090, LogAdminActorFactory.make(actorSystem))),
-      5.seconds
-    )
+    locationService.register(TcpRegistration(tcpConnection, 9090, LogAdminActorFactory.make(actorSystem))).await
 
     // assembly is tracking TcpConnection that we registered above, hence assemblyProbe will receive LocationUpdated event.
     assemblyProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(tcpLocationUpdatedChoice))))
@@ -154,7 +132,7 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Mockit
     locationService.unregister(tcpConnection)
     assemblyProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(tcpLocationRemovedChoice))))
 
-    Await.result(wiring.locationService.shutdown(TestFinishedReason), 5.seconds)
+    wiring.locationService.shutdown(TestFinishedReason).await
   }
 
 }
