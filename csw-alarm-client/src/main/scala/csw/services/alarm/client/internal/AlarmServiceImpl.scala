@@ -1,12 +1,10 @@
 package csw.services.alarm.client.internal
 
-import java.io.File
-
 import akka.actor.ActorSystem
 import akka.actor.typed.ActorRef
 import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{ActorMaterializer, Materializer}
-import com.typesafe.config.{ConfigFactory, ConfigResolveOptions}
+import com.typesafe.config.Config
 import csw.services.alarm.api.exceptions.{InvalidSeverityException, KeyNotFoundException, ResetOperationNotAllowed}
 import csw.services.alarm.api.internal.{MetadataKey, StatusKey}
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, UnAcknowledged}
@@ -49,13 +47,10 @@ class AlarmServiceImpl(
 
   private lazy val shelveTimeoutRef = shelveTimeoutActorFactory.make(key ⇒ unShelve(key, cancelShelveTimeout = false))
 
-  override def initAlarms(inputFile: File, reset: Boolean): Future[Unit] = async {
-    log.debug(s"Initializing alarm store from file [${inputFile.getAbsolutePath}] with reset [$reset]")
-    val inputConfig      = ConfigFactory.parseFile(inputFile).resolve(ConfigResolveOptions.noSystem())
+  override def initAlarms(inputConfig: Config, reset: Boolean): Future[Unit] = async {
+    log.debug(s"Initializing alarm store with reset [$reset]")
     val alarmMetadataSet = ConfigParser.parseAlarmMetadataSet(inputConfig)
-
     if (reset) await(resetAlarmStore())
-
     await(setAlarmStore(alarmMetadataSet))
   }
 

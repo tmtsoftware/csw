@@ -2,6 +2,7 @@ package csw.services.alarm.client.internal
 
 import java.io.File
 
+import com.typesafe.config.{ConfigFactory, ConfigResolveOptions}
 import csw.services.alarm.api.exceptions.{InvalidSeverityException, KeyNotFoundException}
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, UnAcknowledged}
 import csw.services.alarm.api.models.AlarmSeverity._
@@ -15,9 +16,9 @@ import csw.services.alarm.client.internal.helpers.TestFutureExt.RichFuture
 class AlarmServiceImplTest extends AlarmServiceTestSetup {
 
   override protected def beforeEach(): Unit = {
-    val path = getClass.getResource("/test-alarms/valid-alarms.conf").getPath
-    val file = new File(path)
-    alarmService.initAlarms(file, reset = true).await
+    val validAlarmsFile   = new File(getClass.getResource("/test-alarms/valid-alarms.conf").getPath)
+    val validAlarmsConfig = ConfigFactory.parseFile(validAlarmsFile).resolve(ConfigResolveOptions.noSystem())
+    alarmService.initAlarms(validAlarmsConfig, reset = true).await
   }
 
   // DEOPSCSW-444: Set severity api for component

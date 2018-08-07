@@ -1,5 +1,8 @@
 package csw.services.alarm.client.internal;
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import com.typesafe.config.ConfigResolveOptions;
 import csw.services.alarm.api.exceptions.InvalidSeverityException;
 import csw.services.alarm.api.javadsl.IAlarmService;
 import csw.services.alarm.api.javadsl.JAlarmSeverity;
@@ -35,9 +38,9 @@ public class JAlarmServiceImplTest {
 
     @Before
     public void setup() throws Exception {
-        String path = this.getClass().getResource("/test-alarms/valid-alarms.conf").getPath();
-        File file = new File(path);
-        Await.result(alarmService.initAlarms(file, true), new FiniteDuration(5, TimeUnit.SECONDS));
+        File validAlarmsFile = new File(this.getClass().getResource("/test-alarms/valid-alarms.conf").getPath());
+        Config validAlarmsConfig = ConfigFactory.parseFile(validAlarmsFile).resolve(ConfigResolveOptions.noSystem());
+        Await.result(alarmService.initAlarms(validAlarmsConfig, true), new FiniteDuration(5, TimeUnit.SECONDS));
     }
 
     @AfterClass

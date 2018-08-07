@@ -1,6 +1,7 @@
 package csw.services.alarm.client
 import java.io.File
 
+import com.typesafe.config.{ConfigFactory, ConfigResolveOptions}
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.alarm.api.models.AlarmSeverity.Indeterminate
 import csw.services.alarm.client.internal.commons.AlarmServiceConnection
@@ -22,9 +23,9 @@ class AlarmServiceFactoryTest extends AlarmServiceTestSetup {
     .await
 
   override protected def beforeEach(): Unit = {
-    val path = getClass.getResource("/test-alarms/valid-alarms.conf").getPath
-    val file = new File(path)
-    alarmService.initAlarms(file, reset = true).await
+    val validAlarmsFile   = new File(getClass.getResource("/test-alarms/valid-alarms.conf").getPath)
+    val validAlarmsConfig = ConfigFactory.parseFile(validAlarmsFile).resolve(ConfigResolveOptions.noSystem())
+    alarmService.initAlarms(validAlarmsConfig, reset = true).await
   }
 
   override protected def afterAll(): Unit = {

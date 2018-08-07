@@ -1,8 +1,7 @@
 package csw.services.alarm.api.scaladsl
 
-import java.io.File
-
 import akka.actor.typed.ActorRef
+import com.typesafe.config.Config
 import csw.services.alarm.api.models.Key.AlarmKey
 import csw.services.alarm.api.models._
 
@@ -10,7 +9,7 @@ import scala.concurrent.Future
 
 trait AlarmAdminService extends AlarmService {
 
-  def initAlarms(inputFile: File, reset: Boolean = false): Future[Unit]
+  def initAlarms(inputConfig: Config, reset: Boolean = false): Future[Unit]
 
   def getCurrentSeverity(key: AlarmKey): Future[AlarmSeverity]
   def getStatus(key: AlarmKey): Future[AlarmStatus]

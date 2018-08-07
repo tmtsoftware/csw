@@ -1,6 +1,9 @@
 package csw.services.alarm.client;
 
 import akka.actor.ActorSystem;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import com.typesafe.config.ConfigResolveOptions;
 import csw.messages.commons.CoordinatedShutdownReasons;
 import csw.services.alarm.api.javadsl.IAlarmService;
 import csw.services.alarm.api.models.AlarmSeverity;
@@ -24,13 +27,13 @@ import java.util.concurrent.TimeUnit;
 import static csw.services.alarm.api.javadsl.JAlarmSeverity.Indeterminate;
 
 // DEOPSCSW-481: Component Developer API available to all CSW components
-public class JAlarmServiceFactoryTest  {
+public class JAlarmServiceFactoryTest {
 
     private static AlarmServiceTestSetup testSetup = new AlarmServiceTestSetup();
     private AlarmServiceFactory alarmServiceFactory = testSetup.alarmServiceFactory();
     private static ActorSystem seedSystem = ClusterAwareSettings.onPort(3558).system();
-    private static ILocationService locationService =  JLocationServiceFactory.withSystem(seedSystem);
-    private  AlarmAdminService alarmService = testSetup.alarmService();
+    private static ILocationService locationService = JLocationServiceFactory.withSystem(seedSystem);
+    private AlarmAdminService alarmService = testSetup.alarmService();
 
     @BeforeClass
     public static void setup() throws ExecutionException, InterruptedException {
@@ -39,29 +42,29 @@ public class JAlarmServiceFactoryTest  {
 
     @Before
     public void beforeTest() throws Exception {
-         String path = this.getClass().getResource("/test-alarms/valid-alarms.conf").getPath();
-         File file = new File(path);
-         Await.result(alarmService.initAlarms(file, true), new FiniteDuration(5, TimeUnit.SECONDS));
-     }
+        File validAlarmsFile = new File(this.getClass().getResource("/test-alarms/valid-alarms.conf").getPath());
+        Config validAlarmsConfig = ConfigFactory.parseFile(validAlarmsFile).resolve(ConfigResolveOptions.noSystem());
+        Await.result(alarmService.initAlarms(validAlarmsConfig, true), new FiniteDuration(5, TimeUnit.SECONDS));
+    }
 
-     @AfterClass
-     public static void teardown() throws ExecutionException, InterruptedException {
+    @AfterClass
+    public static void teardown() throws ExecutionException, InterruptedException {
         locationService.shutdown(CoordinatedShutdownReasons.testFinishedReason()).get();
         testSetup.afterAll();
-     }
+    }
 
-     @Test
+    @Test
     public void shouldCreateClientAlarmServiceUsingLocationService() throws Exception {
-        IAlarmService alarmServiceUsingLS =   alarmServiceFactory.jClientApi(locationService, seedSystem).get();
-         alarmServiceUsingLS.setSeverity(testSetup.tromboneAxisHighLimitAlarmKey(), Indeterminate).get();
+        IAlarmService alarmServiceUsingLS = alarmServiceFactory.jClientApi(locationService, seedSystem).get();
+        alarmServiceUsingLS.setSeverity(testSetup.tromboneAxisHighLimitAlarmKey(), Indeterminate).get();
 
-         AlarmSeverity alarmSeverity = Await.result(alarmService.getCurrentSeverity(testSetup.tromboneAxisHighLimitAlarmKey()), Duration.create(5, TimeUnit.SECONDS));
-         Assert.assertEquals(alarmSeverity, Indeterminate);
-     }
+        AlarmSeverity alarmSeverity = Await.result(alarmService.getCurrentSeverity(testSetup.tromboneAxisHighLimitAlarmKey()), Duration.create(5, TimeUnit.SECONDS));
+        Assert.assertEquals(alarmSeverity, Indeterminate);
+    }
 
     @Test
     public void shouldCreateClientAlarmServiceUsingHostAndPort() throws Exception {
-        IAlarmService alarmServiceUsingHostPort =   alarmServiceFactory.jClientApi(testSetup.hostname(), testSetup.sentinelPort(), seedSystem).get();
+        IAlarmService alarmServiceUsingHostPort = alarmServiceFactory.jClientApi(testSetup.hostname(), testSetup.sentinelPort(), seedSystem).get();
         alarmServiceUsingHostPort.setSeverity(testSetup.tromboneAxisHighLimitAlarmKey(), Indeterminate).get();
 
         AlarmSeverity alarmSeverity = Await.result(alarmService.getCurrentSeverity(testSetup.tromboneAxisHighLimitAlarmKey()), Duration.create(5, TimeUnit.SECONDS));
