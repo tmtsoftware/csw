@@ -132,7 +132,7 @@ class AlarmServiceImplTest extends AlarmServiceTestSetup {
     alarmService.getMetadata(tromboneKey).await should contain allElementsOf List(cpuExceededAlarm)
   }
 
-  //  DEOPSCSW-445: Get api for alarm metadata
+  // DEOPSCSW-464: Fetch Alarm name list for a subsystem name or pattern
   test("should fetch all alarms for a subsystem") {
     val nfiraosKey = SubsystemKey("nfiraos")
     alarmService.getMetadata(nfiraosKey).await should contain allElementsOf List(
@@ -141,7 +141,7 @@ class AlarmServiceImplTest extends AlarmServiceTestSetup {
     )
   }
 
-  //  DEOPSCSW-445: Get api for alarm metadata
+  // DEOPSCSW-464: Fetch Alarm name list for a subsystem name or pattern
   test("should fetch all alarms of whole system") {
     val globalKey = GlobalKey
     alarmService.getMetadata(globalKey).await should contain allElementsOf List(
@@ -151,7 +151,7 @@ class AlarmServiceImplTest extends AlarmServiceTestSetup {
     )
   }
 
-  //  DEOPSCSW-445: Get api for alarm metadata
+  // DEOPSCSW-464: Fetch Alarm name list for a subsystem name or pattern
   test("should throw exception if no alarms are found while getting metadata by subsystem") {
     val invalidAlarm = SubsystemKey("invalid")
     intercept[KeyNotFoundException] {
