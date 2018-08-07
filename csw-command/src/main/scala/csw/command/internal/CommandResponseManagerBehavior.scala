@@ -80,21 +80,27 @@ private[command] class CommandResponseManagerBehavior(
       case _                      ⇒ updateCommand(runId, commandResponse)
     }
 
-
   private def updateCommand(runId: Id, updateResponse: SubmitResponse): Unit = {
-    val currentResponse:Response = commandResponseManagerState.get(runId)
+    val currentResponse: Response = commandResponseManagerState.get(runId)
+    if (/*isCommandResultType(currentResponse) == CommandResultType.Intermediate && */ currentResponse != updateResponse) {
+      commandResponseManagerState = commandResponseManagerState.updateCommandStatus(updateResponse)
+      publishToSubscribers(updateResponse, commandResponseManagerState.cmdToCmdStatus(updateResponse.runId).subscribers)
+    } else { println(s"Don't do the update for current: $currentResponse and update: $updateResponse") }
+    /*
     currentResponse match {
       case Started(_) =>
+        println("Yes I got here to Started publish")
         commandResponseManagerState = commandResponseManagerState.updateCommandStatus(updateResponse)
 //        publishToSubscribers(updateResponse, commandResponseManagerState.cmdToCmdStatus(updateResponse.runId).subscribers)
         doPublish(updateResponse, commandResponseManagerState.cmdToCmdStatus(updateResponse.runId).subscribers)
     }
+     */
     /*
     if (/*isCommandResultType(currentResponse) == CommandResultType.Intermediate && */ currentResponse != updateResponse) {
       commandResponseManagerState = commandResponseManagerState.updateCommandStatus(updateResponse)
       publishToSubscribers(updateResponse, commandResponseManagerState.cmdToCmdStatus(updateResponse.runId).subscribers)
     } else { println(s"Don't do the update for current: $currentResponse and update: $updateResponse")}
-    */
+   */
   }
 
   private def updateSubCommand(subCommandRunId: Id, commandResponse: SubmitResponse): Unit = {
@@ -126,28 +132,30 @@ private[command] class CommandResponseManagerBehavior(
       case _ ⇒ log.debug("Validation response will not affect status of Parent command.")
     }
 
-  private def publishToSubscribers(commandResponse: SubmitResponse, subscribers: Set[ActorRef[SubmitResponse]]): Unit = //subscribers.foreach(_ ! commandResponse)
+  private def publishToSubscribers(commandResponse: SubmitResponse, subscribers: Set[ActorRef[SubmitResponse]]): Unit = {
+
     isCommandResultType(commandResponse) match {
       case _: CommandResultType.Final ⇒ doPublish(commandResponse, subscribers)
 
-      case _ =>  println("Don nothing")
-        /*
+      case _ => println("Don't publish started")
+    }
+    /*
       case CommandResultType.Intermediate ⇒
         // Do not send updates for validation response as it is sent by the framework
         println("Don't publish started")
         log.debug("Validation response will not affect status of Parent command.")
-        */
-    }
+   */
+  }
 
-  private def doPublish(commandResponse: SubmitResponse, subscribers: Set[ActorRef[SubmitResponse]]):Unit =
+  private def doPublish(commandResponse: SubmitResponse, subscribers: Set[ActorRef[SubmitResponse]]): Unit =
     subscribers.foreach(_ ! commandResponse)
 
   private def subscribe(runId: Id, replyTo: ActorRef[SubmitResponse]): Unit = {
     ctx.watchWith(replyTo, SubscriberTerminated(replyTo))
     commandResponseManagerState = commandResponseManagerState.subscribe(runId, replyTo)
     commandResponseManagerState.get(runId) match {
-      case sr:SubmitResponse => publishToSubscribers(sr, Set(replyTo))
-      case _ => log.debug("Failed to find runId for subscribe.")
+      case sr: SubmitResponse => publishToSubscribers(sr, Set(replyTo))
+      case _                  => log.debug("Failed to find runId for subscribe.")
     }
   }
 }

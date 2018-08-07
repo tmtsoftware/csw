@@ -94,11 +94,11 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
     // Subscriber cannot subscribe before this happens, will not find command
     behaviorTestKit.run(AddOrUpdateCommand(runId, Started(runId)))
     // Simulate doSubmit returning Started for a long-running command
-    behaviorTestKit.run(AddOrUpdateCommand(runId, Started(runId)))
+    //behaviorTestKit.run(AddOrUpdateCommand(runId, Started(runId)))
     // Subscribe succeeds no after initial Started
     behaviorTestKit.run(Subscribe(runId, commandResponseProbe.ref))
     // Simulate doSubmit returning Started for a long-running command
-    //behaviorTestKit.run(AddOrUpdateCommand(runId, Started(runId)))
+    behaviorTestKit.run(AddOrUpdateCommand(runId, Started(runId)))
     // Started is received to subscriber now
     commandResponseProbe.expectMessage(Started(runId))
   }

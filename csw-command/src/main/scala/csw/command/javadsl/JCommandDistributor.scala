@@ -45,12 +45,12 @@ case class JCommandDistributor(componentToCommands: util.Map[JCommandService, ut
   }
 
   /**
-   * Submit multiple commands to components and subscribe for the final result for long running commands to create
-   * an aggregated response as `Completed` if all the commands completed successfully or `Error` if any one of the
-   * commands failed.
-   *
-   * @return an aggregated response as CompletableFuture of CommandResponse
-   */
+ * Submit multiple commands to components and subscribe for the final result for long running commands to create
+ * an aggregated response as `Completed` if all the commands completed successfully or `Error` if any one of the
+ * commands failed.
+ *
+ * @return an aggregated response as CompletableFuture of CommandResponse
+ */
   def aggregatedCompletionResponse(
       timeout: Timeout,
       ec: ExecutionContext,
@@ -66,5 +66,5 @@ case class JCommandDistributor(componentToCommands: util.Map[JCommandService, ut
       .toJava
       .toCompletableFuture
   }
-  */
+ */
 }

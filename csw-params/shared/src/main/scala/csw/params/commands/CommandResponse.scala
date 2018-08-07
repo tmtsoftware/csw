@@ -39,9 +39,9 @@ object CommandResponse {
   case class Accepted(runId: Id) extends ValidationResponse with OnewayResponse
 
   /**
-    * SubmiResponse can be Invalid, Started, Completed, CompletedWithResult, Error, Cancelled, Locked
-    * @param runId
-    */
+   * SubmiResponse can be Invalid, Started, Completed, CompletedWithResult, Error, Cancelled, Locked
+   * @param runId
+   */
   case class Started(runId: Id) extends SubmitResponse
 
   case class CompletedWithResult(runId: Id, result: Result) extends SubmitResponse
@@ -94,7 +94,7 @@ object CommandResponse {
 
   object test {
 
-    def x():QueryResponse = {
+    def x(): QueryResponse = {
       Started(Id())
       Completed(Id())
       CommandNotAvailable(Id())
@@ -103,10 +103,10 @@ object CommandResponse {
   }
 
   /**
-    * Helper function to convert a SubmitResponse to the internally used CommandResultType
-    * @param sr a SubmitResponse
-    * @return one of the three possible values: Intermediate, Positive, Negative
-    */
+   * Helper function to convert a SubmitResponse to the internally used CommandResultType
+   * @param sr a SubmitResponse
+   * @return one of the three possible values: Intermediate, Positive, Negative
+   */
   def isCommandResultType(sr: QueryResponse): CommandResultType = sr match {
     case Started(_)                               => Intermediate
     case Completed(_) | CompletedWithResult(_, _) => Positive

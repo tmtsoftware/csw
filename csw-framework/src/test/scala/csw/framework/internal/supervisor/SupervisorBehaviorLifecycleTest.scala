@@ -283,7 +283,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     import testData._
 
     val childRef: ActorRef[TopLevelActorMessage] = supervisorBehaviorKit.childInbox(componentActorName).ref
-    val queryResponseProbe                      = TestProbe[QueryResponse]
+    val queryResponseProbe                       = TestProbe[QueryResponse]
     val testCmdId                                = Id()
 
     supervisorBehaviorKit.run(Running(childRef))

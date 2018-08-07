@@ -142,7 +142,7 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
   // DEOPSCSW-222: Locking a component for a specific duration
   // DEOPSCSW-301: Support UnLocking
   test("should forward messages that are of type SupervisorLockMessage to TLA") {
-    val lockingStateProbe   = TestProbe[LockingResponse]
+    val lockingStateProbe  = TestProbe[LockingResponse]
     val queryResponseProbe = TestProbe[QueryResponse]()(untypedSystem.toTyped)
 
     val sourcePrefix = Prefix("wfos.prog.cloudcover.source")

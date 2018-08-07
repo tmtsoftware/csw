@@ -67,7 +67,7 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
   /*
   def submitAll(controlCommands: Set[ControlCommand])(implicit timeout: Timeout): Source[SubmitResponse, NotUsed] =
     Source(controlCommands).mapAsyncUnordered(parallelism)(submit)
-*/
+   */
 
   /**
    * Submit multiple commands and get one CommandResponse as a Future of [[csw.params.commands.CommandResponse]] for all commands. If all the commands were successful,

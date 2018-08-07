@@ -46,7 +46,7 @@ case class CommandDistributor(componentToCommands: Map[CommandService, ControlCo
       breadth,
       { case (component, commands) ⇒ component.submitAll(commands) }
     )
-    */
+ */
     CommandResponse.aggregateResponse(commandResponsesF).map {
       case _: Started    ⇒ CommandResponse.Started(Id())
       case otherResponse ⇒ CommandResponse.Invalid(Id(), CommandIssue.OtherIssue("One or more commands were Invalid"))
@@ -54,12 +54,12 @@ case class CommandDistributor(componentToCommands: Map[CommandService, ControlCo
   }
 
   /**
-   * Submit multiple commands to components and subscribe for the final result for long running commands to create
-   * an aggregated response as `Completed` if all the commands completed successfully or `Error` if any one of the
-   * commands failed.
-   *
-   * @return an aggregated response as Future value of CommandResponse
-   */
+ * Submit multiple commands to components and subscribe for the final result for long running commands to create
+ * an aggregated response as `Completed` if all the commands completed successfully or `Error` if any one of the
+ * commands failed.
+ *
+ * @return an aggregated response as Future value of CommandResponse
+ */
   def aggregatedCompletionResponse()(
       implicit timeout: Timeout,
       ec: ExecutionContext,
@@ -72,5 +72,5 @@ case class CommandDistributor(componentToCommands: Map[CommandService, ControlCo
     )
     CommandResponseAggregator.aggregateResponse(commandResponsesF)
   }
-*/
+ */
 }

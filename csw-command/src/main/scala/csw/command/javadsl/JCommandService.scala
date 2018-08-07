@@ -62,7 +62,7 @@ class JCommandService(akkaLocation: AkkaLocation, actorSystem: ActorSystem[_]) {
   /*
   def submitAll(controlCommands: java.util.Set[ControlCommand], timeout: Timeout): Source[SubmitResponse, NotUsed] =
     sCommandService.submitAll(controlCommands.asScala.toSet)(timeout).asJava
-*/
+   */
 
   /**
    * Submit multiple commands and get one CommandResponse as a Future of [[csw.params.commands.CommandResponse]] for all commands. If all the commands were successful,

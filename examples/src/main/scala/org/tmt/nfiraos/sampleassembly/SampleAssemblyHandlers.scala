@@ -81,7 +81,7 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
     submitCommandResponseF.foreach {
       case _: CommandResponse.Completed => log.info("Command completed successfully")
       case x: CommandResponse.Error     => log.error(s"Command Completed with error: ${x.message}")
-      case _                      => log.error("Command failed")
+      case _                            => log.error("Command failed")
     }
   }
   //#worker-actor
