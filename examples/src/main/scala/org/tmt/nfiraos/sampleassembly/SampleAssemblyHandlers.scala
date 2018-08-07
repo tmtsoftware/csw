@@ -11,6 +11,7 @@ import csw.messages.framework.ComponentInfo
 import csw.messages.location.{AkkaLocation, LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.messages.params.generics.{Key, KeyType, Parameter}
 import csw.messages.params.models.{ObsId, Units}
+import csw.services.alarm.api.scaladsl.AlarmService
 import csw.services.command.CommandResponseManager
 import csw.services.command.scaladsl.CommandService
 import csw.services.event.api.scaladsl.EventService
@@ -35,6 +36,7 @@ class SampleAssemblyHandlers(
     currentStatePublisher: CurrentStatePublisher,
     locationService: LocationService,
     eventService: EventService,
+    alarmService: AlarmService,
     loggerFactory: LoggerFactory
 ) extends ComponentHandlers(
       ctx,
@@ -43,6 +45,7 @@ class SampleAssemblyHandlers(
       currentStatePublisher,
       locationService,
       eventService,
+      alarmService,
       loggerFactory
     ) {
 

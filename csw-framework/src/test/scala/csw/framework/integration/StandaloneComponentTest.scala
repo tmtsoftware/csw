@@ -62,7 +62,7 @@ class StandaloneComponentTest extends FunSuite with Matchers with MockitoSugar w
     val akkaConnection                = AkkaConnection(ComponentId("IFS_Detector", HCD))
 
     // verify component gets registered with location service
-    val eventualLocation = locationService.resolve(akkaConnection, 5.seconds)
+    val eventualLocation = seedLocationService.resolve(akkaConnection, 5.seconds)
     val maybeLocation    = Await.result(eventualLocation, 5.seconds)
 
     maybeLocation.isDefined shouldBe true
@@ -74,7 +74,7 @@ class StandaloneComponentTest extends FunSuite with Matchers with MockitoSugar w
 
     val supervisorCommandService = new CommandService(resolvedAkkaLocation)
 
-    val (_, akkaProbe) = locationService.track(akkaConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
+    val (_, akkaProbe) = seedLocationService.track(akkaConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
     akkaProbe.requestNext() shouldBe a[LocationUpdated]
 
     // on shutdown, component unregisters from location service

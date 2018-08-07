@@ -1,7 +1,5 @@
 package csw.services.alarm.client.internal
-import java.io.File
-
-import com.typesafe.config.{Config, ConfigFactory, ConfigResolveOptions}
+import com.typesafe.config.{Config, ConfigFactory}
 import csw.services.alarm.api.exceptions.KeyNotFoundException
 import csw.services.alarm.api.internal.MetadataKey
 import csw.services.alarm.api.models.AlarmHealth.Bad
@@ -14,11 +12,8 @@ import csw.services.alarm.client.internal.helpers.TestFutureExt.RichFuture
 // DEOPSCSW-486: Provide API to load alarm metadata in Alarm store from file
 class InitAlarmStoreTest extends AlarmServiceTestSetup {
 
-  val threeAlarmsConfFile: File = new File(getClass.getResource("/test-alarms/valid-alarms.conf").getPath)
-  val threeAlarmsConfig: Config = ConfigFactory.parseFile(threeAlarmsConfFile).resolve(ConfigResolveOptions.noSystem())
-
-  val twoAlarmsConfFile: File = new File(getClass.getResource("/test-alarms/two-valid-alarms.conf").getPath)
-  val twoAlarmsConfig: Config = ConfigFactory.parseFile(twoAlarmsConfFile).resolve(ConfigResolveOptions.noSystem())
+  val threeAlarmsConfig: Config = ConfigFactory.parseResources("test-alarms/valid-alarms.conf")
+  val twoAlarmsConfig: Config   = ConfigFactory.parseResources("test-alarms/two-valid-alarms.conf")
 
   test("should load alarms from provided config file") {
     alarmService.initAlarms(threeAlarmsConfig).await

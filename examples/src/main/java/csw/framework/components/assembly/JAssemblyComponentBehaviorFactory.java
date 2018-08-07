@@ -26,7 +26,7 @@ public class JAssemblyComponentBehaviorFactory extends JComponentBehaviorFactory
             IAlarmService alarmService,
             JLoggerFactory loggerFactory
     ) {
-        return new JAssemblyComponentHandlers(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, eventService, loggerFactory);
+        return new JAssemblyComponentHandlers(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, eventService, alarmService, loggerFactory);
     }
 }
 //#jcomponent-factory

@@ -19,7 +19,7 @@ class FrameworkTestWiring(val seedPort: Int = SocketUtils.getFreePort) extends E
   implicit val seedActorSystem: actor.ActorSystem = ClusterSettings().onPort(seedPort).system
   implicit val typedSystem: ActorSystem[_]        = seedActorSystem.toTyped
   implicit val mat: Materializer                  = ActorMaterializer()
-  val locationService: LocationService            = LocationServiceFactory.withSystem(seedActorSystem)
+  val seedLocationService: LocationService        = LocationServiceFactory.withSystem(seedActorSystem)
 
   val testActorSystem: actor.ActorSystem = ClusterSettings().joinLocal(seedPort).system
 
@@ -28,7 +28,7 @@ class FrameworkTestWiring(val seedPort: Int = SocketUtils.getFreePort) extends E
       masterId: String
   ): (RegistrationResult, RedisSentinel, RedisServer) =
     withSentinel(masterId = masterId) { (sentinelPort, _) ⇒
-      locationService
+      seedLocationService
         .register(TcpRegistration(connection, sentinelPort, LogAdminActorFactory.make(seedActorSystem)))
         .await
     }

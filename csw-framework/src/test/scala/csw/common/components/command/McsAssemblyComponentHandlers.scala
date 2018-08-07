@@ -13,6 +13,7 @@ import csw.messages.framework.ComponentInfo
 import csw.messages.location.{AkkaLocation, TrackingEvent}
 import csw.messages.params.models.Id
 import csw.messages.params.states.{CurrentState, StateName}
+import csw.services.alarm.api.scaladsl.AlarmService
 import csw.services.command.CommandResponseManager
 import csw.services.command.scaladsl.CommandService
 import csw.services.event.api.scaladsl.EventService
@@ -29,6 +30,7 @@ class McsAssemblyComponentHandlers(
     currentStatePublisher: CurrentStatePublisher,
     locationService: LocationService,
     eventService: EventService,
+    alarmService: AlarmService,
     loggerFactory: LoggerFactory
 ) extends ComponentHandlers(
       ctx,
@@ -37,6 +39,7 @@ class McsAssemblyComponentHandlers(
       currentStatePublisher,
       locationService,
       eventService,
+      alarmService,
       loggerFactory
     ) {
 

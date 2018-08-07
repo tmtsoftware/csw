@@ -1,8 +1,6 @@
 package csw.services.alarm.client.internal
 
-import java.io.File
-
-import com.typesafe.config.{ConfigFactory, ConfigResolveOptions}
+import com.typesafe.config.ConfigFactory
 import csw.services.alarm.api.exceptions.{InvalidSeverityException, KeyNotFoundException}
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, UnAcknowledged}
 import csw.services.alarm.api.models.AlarmSeverity._
@@ -16,8 +14,7 @@ import csw.services.alarm.client.internal.helpers.TestFutureExt.RichFuture
 class AlarmServiceImplTest extends AlarmServiceTestSetup {
 
   override protected def beforeEach(): Unit = {
-    val validAlarmsFile   = new File(getClass.getResource("/test-alarms/valid-alarms.conf").getPath)
-    val validAlarmsConfig = ConfigFactory.parseFile(validAlarmsFile).resolve(ConfigResolveOptions.noSystem())
+    val validAlarmsConfig = ConfigFactory.parseResources("test-alarms/valid-alarms.conf")
     alarmService.initAlarms(validAlarmsConfig, reset = true).await
   }
 

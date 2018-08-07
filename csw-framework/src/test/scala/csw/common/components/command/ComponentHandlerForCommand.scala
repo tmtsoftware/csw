@@ -17,6 +17,7 @@ import csw.messages.location._
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.Id
 import csw.messages.params.states.{CurrentState, StateName}
+import csw.services.alarm.api.scaladsl.AlarmService
 import csw.services.command.CommandResponseManager
 import csw.services.event.api.scaladsl.EventService
 import csw.services.location.scaladsl.LocationService
@@ -32,6 +33,7 @@ class ComponentHandlerForCommand(
     currentStatePublisher: CurrentStatePublisher,
     locationService: LocationService,
     eventService: EventService,
+    alarmService: AlarmService,
     loggerFactory: LoggerFactory
 ) extends ComponentHandlers(
       ctx,
@@ -40,6 +42,7 @@ class ComponentHandlerForCommand(
       currentStatePublisher,
       locationService,
       eventService,
+      alarmService,
       loggerFactory
     ) {
 

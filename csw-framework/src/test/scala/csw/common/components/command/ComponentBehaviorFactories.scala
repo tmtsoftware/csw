@@ -29,6 +29,7 @@ class ComponentBehaviorFactoryForCommand extends ComponentBehaviorFactory {
       currentStatePublisher,
       locationService,
       eventService,
+      alarmService,
       loggerFactory
     )
 }
@@ -51,6 +52,7 @@ class McsAssemblyBehaviorFactory extends ComponentBehaviorFactory {
       currentStatePublisher,
       locationService,
       eventService,
+      alarmService,
       loggerFactory
     )
 }
@@ -73,6 +75,7 @@ class McsHcdBehaviorFactory extends ComponentBehaviorFactory {
       currentStatePublisher,
       locationService,
       eventService,
+      alarmService,
       loggerFactory
     )
 }

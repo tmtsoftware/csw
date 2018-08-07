@@ -30,6 +30,7 @@ class HcdComponentBehaviorFactory extends ComponentBehaviorFactory {
       currentStatePublisher,
       locationService,
       eventService,
+      alarmService,
       loggerFactory
     )
 }

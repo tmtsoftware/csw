@@ -3,7 +3,6 @@ package csw.services.alarm.client;
 import akka.actor.ActorSystem;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import com.typesafe.config.ConfigResolveOptions;
 import csw.messages.commons.CoordinatedShutdownReasons;
 import csw.services.alarm.api.javadsl.IAlarmService;
 import csw.services.alarm.api.models.AlarmSeverity;
@@ -20,7 +19,6 @@ import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 
-import java.io.File;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -42,8 +40,7 @@ public class JAlarmServiceFactoryTest {
 
     @Before
     public void beforeTest() throws Exception {
-        File validAlarmsFile = new File(this.getClass().getResource("/test-alarms/valid-alarms.conf").getPath());
-        Config validAlarmsConfig = ConfigFactory.parseFile(validAlarmsFile).resolve(ConfigResolveOptions.noSystem());
+        Config validAlarmsConfig = ConfigFactory.parseResources("test-alarms/valid-alarms.conf");
         Await.result(alarmService.initAlarms(validAlarmsConfig, true), new FiniteDuration(5, TimeUnit.SECONDS));
     }
 

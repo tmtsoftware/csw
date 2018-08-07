@@ -68,7 +68,7 @@ class ContainerIntegrationTest extends FunSuite with MockitoSugar with Matchers 
     assertThatContainerIsRunning(containerRef, containerLifecycleStateProbe, 5.seconds)
 
     // resolve container using location service
-    val containerLocation = locationService.resolve(irisContainerConnection, 5.seconds).await
+    val containerLocation = seedLocationService.resolve(irisContainerConnection, 5.seconds).await
 
     containerLocation.isDefined shouldBe true
     val resolvedContainerRef = containerLocation.get.containerRef
@@ -79,9 +79,9 @@ class ContainerIntegrationTest extends FunSuite with MockitoSugar with Matchers 
     components.size shouldBe 3
 
     // resolve all the components from container using location service
-    val filterAssemblyLocation = locationService.find(filterAssemblyConnection).await
-    val instrumentHcdLocation  = locationService.find(instrumentHcdConnection).await
-    val disperserHcdLocation   = locationService.find(disperserHcdConnection).await
+    val filterAssemblyLocation = seedLocationService.find(filterAssemblyConnection).await
+    val instrumentHcdLocation  = seedLocationService.find(instrumentHcdConnection).await
+    val disperserHcdLocation   = seedLocationService.find(disperserHcdConnection).await
 
     filterAssemblyLocation.isDefined shouldBe true
     instrumentHcdLocation.isDefined shouldBe true
@@ -167,22 +167,22 @@ class ContainerIntegrationTest extends FunSuite with MockitoSugar with Matchers 
     val disperserHcdTracker   = testkit.TestProbe()
 
     // start tracking container and all the components, so that on Shutdown message, all the trackers gets LocationRemoved event
-    locationService
+    seedLocationService
       .track(irisContainerConnection)
       .toMat(Sink.actorRef[TrackingEvent](containerTracker.ref, "Completed"))(Keep.both)
       .run()
 
-    locationService
+    seedLocationService
       .track(filterAssemblyConnection)
       .toMat(Sink.actorRef[TrackingEvent](filterAssemblyTracker.ref, "Completed"))(Keep.both)
       .run()
 
-    locationService
+    seedLocationService
       .track(instrumentHcdConnection)
       .toMat(Sink.actorRef[TrackingEvent](instrumentHcdTracker.ref, "Completed"))(Keep.both)
       .run()
 
-    locationService
+    seedLocationService
       .track(disperserHcdConnection)
       .toMat(Sink.actorRef[TrackingEvent](disperserHcdTracker.ref, "Completed"))(Keep.both)
       .run()

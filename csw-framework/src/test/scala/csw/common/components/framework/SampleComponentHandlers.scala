@@ -13,6 +13,7 @@ import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConn
 import csw.messages.location.{LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.messages.params.models.Prefix
 import csw.messages.params.states.{CurrentState, StateName}
+import csw.services.alarm.api.scaladsl.AlarmService
 import csw.services.command.CommandResponseManager
 import csw.services.event.api.scaladsl.EventService
 import csw.services.location.scaladsl.LocationService
@@ -27,6 +28,7 @@ class SampleComponentHandlers(
     currentStatePublisher: CurrentStatePublisher,
     locationService: LocationService,
     eventService: EventService,
+    alarmService: AlarmService,
     loggerFactory: LoggerFactory
 ) extends ComponentHandlers(
       ctx,
@@ -35,6 +37,7 @@ class SampleComponentHandlers(
       currentStatePublisher,
       locationService,
       eventService,
+      alarmService,
       loggerFactory: LoggerFactory
     ) {
   val log: Logger                   = loggerFactory.getLogger(ctx)
@@ -88,8 +91,9 @@ class SampleComponentHandlers(
       )
 
     controlCommand match {
-      case Setup(_, _, CommandName("publish.event.success"), _, _) ⇒
-        eventService.defaultPublisher.map(_.publish(event))
+      case Setup(_, _, `setSeverityCommand`, _, _) ⇒ alarmService.setSeverity(testAlarmKey, testSeverity)
+
+      case Setup(_, _, CommandName("publish.event.success"), _, _) ⇒ eventService.defaultPublisher.map(_.publish(event))
 
       case Setup(_, somePrefix, CommandName("subscribe.event.success"), _, _) ⇒
         eventService.defaultSubscriber.map(_.subscribeCallback(Set(event.eventKey), processEvent(somePrefix)))
@@ -107,7 +111,7 @@ class SampleComponentHandlers(
     }
   }
 
-  def validateCommand(command: ControlCommand): CommandResponse = {
+  override def validateCommand(command: ControlCommand): CommandResponse = {
     currentStatePublisher.publish(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(commandValidationChoice))))
     if (command.commandName.name.contains("success")) Accepted(command.runId)
     else Invalid(command.runId, OtherIssue("Testing: Received failure, will return Invalid."))

@@ -24,6 +24,6 @@ public class JSampleComponentBehaviorFactory extends JComponentBehaviorFactory {
             IEventService eventService,
             IAlarmService alarmService,
             JLoggerFactory loggerFactory) {
-        return new JSampleComponentHandlers(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, eventService, loggerFactory);
+        return new JSampleComponentHandlers(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, eventService, alarmService, loggerFactory);
     }
 }

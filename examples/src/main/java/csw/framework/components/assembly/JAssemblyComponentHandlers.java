@@ -18,6 +18,7 @@ import csw.messages.params.generics.Key;
 import csw.messages.params.models.Prefix;
 import csw.messages.params.states.CurrentState;
 import csw.messages.params.states.StateName;
+import csw.services.alarm.api.javadsl.IAlarmService;
 import csw.services.command.CommandResponseManager;
 import csw.services.command.javadsl.JCommandService;
 import csw.services.config.api.javadsl.IConfigClientService;
@@ -62,9 +63,10 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
             CurrentStatePublisher currentStatePublisher,
             ILocationService locationService,
             IEventService eventService,
+            IAlarmService alarmService,
             JLoggerFactory loggerFactory
     ) {
-        super(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, eventService, loggerFactory);
+        super(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, eventService, alarmService, loggerFactory);
         this.ctx = ctx;
         this.componentInfo = componentInfo;
         this.commandResponseManager = commandResponseManager;

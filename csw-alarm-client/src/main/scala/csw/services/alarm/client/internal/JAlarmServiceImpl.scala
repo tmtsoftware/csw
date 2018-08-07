@@ -11,4 +11,5 @@ import scala.compat.java8.FutureConverters.FutureOps
 class JAlarmServiceImpl(alarmService: AlarmService) extends IAlarmService {
   override def setSeverity(key: Key.AlarmKey, severity: AlarmSeverity): CompletableFuture[Unit] =
     alarmService.setSeverity(key, severity).toJava.toCompletableFuture
+  override def asScala: AlarmService = alarmService
 }

@@ -38,8 +38,7 @@ public class JAlarmServiceImplTest {
 
     @Before
     public void setup() throws Exception {
-        File validAlarmsFile = new File(this.getClass().getResource("/test-alarms/valid-alarms.conf").getPath());
-        Config validAlarmsConfig = ConfigFactory.parseFile(validAlarmsFile).resolve(ConfigResolveOptions.noSystem());
+        Config validAlarmsConfig = ConfigFactory.parseResources("test-alarms/valid-alarms.conf");
         Await.result(alarmService.initAlarms(validAlarmsConfig, true), new FiniteDuration(5, TimeUnit.SECONDS));
     }
 

@@ -9,6 +9,7 @@ import csw.messages.framework.ComponentInfo
 import csw.messages.location.TrackingEvent
 import csw.messages.params.generics.{Key, KeyType, Parameter}
 import csw.messages.params.models.Id
+import csw.services.alarm.api.scaladsl.AlarmService
 import csw.services.command.CommandResponseManager
 import csw.services.event.api.scaladsl.EventService
 import csw.services.location.scaladsl.LocationService
@@ -31,6 +32,7 @@ class SampleHcdHandlers(
     currentStatePublisher: CurrentStatePublisher,
     locationService: LocationService,
     eventService: EventService,
+    alarmService: AlarmService,
     loggerFactory: LoggerFactory
 ) extends ComponentHandlers(
       ctx,
@@ -39,6 +41,7 @@ class SampleHcdHandlers(
       currentStatePublisher,
       locationService,
       eventService,
+      alarmService,
       loggerFactory
     ) {
 

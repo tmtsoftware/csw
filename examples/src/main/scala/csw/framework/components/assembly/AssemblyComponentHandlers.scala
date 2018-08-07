@@ -13,6 +13,7 @@ import csw.messages.commands.CommandResponse.Accepted
 import csw.messages.commands._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location._
+import csw.services.alarm.api.scaladsl.AlarmService
 import csw.services.command.CommandResponseManager
 import csw.services.command.scaladsl.CommandService
 import csw.services.config.api.models.ConfigData
@@ -34,6 +35,7 @@ class AssemblyComponentHandlers(
     currentStatePublisher: CurrentStatePublisher,
     locationService: LocationService,
     eventService: EventService,
+    alarmService: AlarmService,
     loggerFactory: LoggerFactory
 ) extends ComponentHandlers(
       ctx,
@@ -42,6 +44,7 @@ class AssemblyComponentHandlers(
       currentStatePublisher,
       locationService,
       eventService,
+      alarmService,
       loggerFactory: LoggerFactory
     )
 //#component-handlers-class

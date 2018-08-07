@@ -29,6 +29,7 @@ class SampleComponentBehaviorFactory extends ComponentBehaviorFactory {
       currentStatePublisher,
       locationService,
       eventService,
+      alarmService,
       loggerFactory
     )
 }
@@ -51,6 +52,7 @@ class ComponentBehaviorFactoryToSimulateFailure extends ComponentBehaviorFactory
       currentStatePublisher,
       locationService,
       eventService,
+      alarmService,
       loggerFactory
     )
 }

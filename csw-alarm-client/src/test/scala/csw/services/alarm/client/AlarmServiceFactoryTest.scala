@@ -25,8 +25,7 @@ class AlarmServiceFactoryTest extends AlarmServiceTestSetup {
     .await
 
   override protected def beforeEach(): Unit = {
-    val validAlarmsFile   = new File(getClass.getResource("/test-alarms/valid-alarms.conf").getPath)
-    val validAlarmsConfig = ConfigFactory.parseFile(validAlarmsFile).resolve(ConfigResolveOptions.noSystem())
+    val validAlarmsConfig = ConfigFactory.parseResources("test-alarms/valid-alarms.conf")
     alarmService.initAlarms(validAlarmsConfig, reset = true).await
   }
 

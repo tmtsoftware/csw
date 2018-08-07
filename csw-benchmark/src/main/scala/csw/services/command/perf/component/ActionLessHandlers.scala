@@ -33,6 +33,7 @@ class ActionLessHandlers(
       currentStatePublisher,
       locationService,
       eventService,
+      alarmService,
       loggerFactory: LoggerFactory
     ) {
 

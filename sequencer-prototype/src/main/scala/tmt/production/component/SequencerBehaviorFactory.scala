@@ -29,6 +29,7 @@ class SequencerBehaviorFactory extends ComponentBehaviorFactory {
       currentStatePublisher,
       locationService,
       eventService,
+      alarmService,
       loggerFactory
     )
 }

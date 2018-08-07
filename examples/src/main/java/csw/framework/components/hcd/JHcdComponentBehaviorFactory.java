@@ -26,7 +26,7 @@ public class JHcdComponentBehaviorFactory extends JComponentBehaviorFactory {
             IAlarmService alarmService,
             JLoggerFactory loggerFactory
     ) {
-        return new JHcdComponentHandlers(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, eventService, loggerFactory);
+        return new JHcdComponentHandlers(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, eventService, alarmService, loggerFactory);
     }
 }
 //#jcomponent-factory

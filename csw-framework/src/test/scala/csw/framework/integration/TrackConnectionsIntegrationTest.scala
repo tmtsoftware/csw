@@ -56,8 +56,8 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Mockit
     assertThatContainerIsRunning(containerRef, containerLifecycleStateProbe, 5.seconds)
 
     // resolve all the components from container using location service
-    val filterAssemblyLocation = Await.result(locationService.find(filterAssemblyConnection), 5.seconds)
-    val disperserHcdLocation   = Await.result(locationService.find(disperserHcdConnection), 5.seconds)
+    val filterAssemblyLocation = Await.result(seedLocationService.find(filterAssemblyConnection), 5.seconds)
+    val disperserHcdLocation   = Await.result(seedLocationService.find(disperserHcdConnection), 5.seconds)
 
     val assemblyCommandService = new CommandService(filterAssemblyLocation.get)
 
@@ -98,7 +98,7 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Mockit
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]("supervisor-lifecycle-state-probe")
     val akkaConnection                = AkkaConnection(ComponentId("IFS_Detector", HCD))
 
-    val maybeLocation = locationService.resolve(akkaConnection, 5.seconds).await
+    val maybeLocation = seedLocationService.resolve(akkaConnection, 5.seconds).await
 
     maybeLocation.isDefined shouldBe true
     val resolvedAkkaLocation = maybeLocation.get
@@ -113,23 +113,25 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Mockit
     assemblyCommandService.subscribeCurrentState(assemblyProbe.ref ! _)
 
     // register http connection
-    locationService.register(HttpRegistration(httpConnection, 9090, "test/path", LogAdminActorFactory.make(actorSystem))).await
+    seedLocationService
+      .register(HttpRegistration(httpConnection, 9090, "test/path", LogAdminActorFactory.make(actorSystem)))
+      .await
 
     // assembly is tracking HttpConnection that we registered above, hence assemblyProbe will receive LocationUpdated event
     assemblyProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(httpLocationUpdatedChoice))))
 
     // On unavailability of HttpConnection, the assembly should know and receive LocationRemoved event
-    locationService.unregister(httpConnection)
+    seedLocationService.unregister(httpConnection)
     assemblyProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(httpLocationRemovedChoice))))
 
     // register tcp connection
-    locationService.register(TcpRegistration(tcpConnection, 9090, LogAdminActorFactory.make(actorSystem))).await
+    seedLocationService.register(TcpRegistration(tcpConnection, 9090, LogAdminActorFactory.make(actorSystem))).await
 
     // assembly is tracking TcpConnection that we registered above, hence assemblyProbe will receive LocationUpdated event.
     assemblyProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(tcpLocationUpdatedChoice))))
 
     // On unavailability of TcpConnection, the assembly should know and receive LocationRemoved event
-    locationService.unregister(tcpConnection)
+    seedLocationService.unregister(tcpConnection)
     assemblyProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(tcpLocationRemovedChoice))))
 
     wiring.locationService.shutdown(TestFinishedReason).await

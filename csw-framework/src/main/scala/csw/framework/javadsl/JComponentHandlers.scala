@@ -7,6 +7,7 @@ import csw.framework.CurrentStatePublisher
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.TopLevelActorMessage
 import csw.messages.framework.ComponentInfo
+import csw.services.alarm.api.javadsl.IAlarmService
 import csw.services.command.CommandResponseManager
 import csw.services.event.api.javadsl.IEventService
 import csw.services.location.javadsl.ILocationService
@@ -33,6 +34,7 @@ abstract class JComponentHandlers(
     currentStatePublisher: CurrentStatePublisher,
     locationService: ILocationService,
     eventService: IEventService,
+    alarmService: IAlarmService,
     loggerFactory: JLoggerFactory
 ) extends ComponentHandlers(
       ctx.asScala,
@@ -41,6 +43,7 @@ abstract class JComponentHandlers(
       currentStatePublisher,
       locationService.asScala,
       eventService.asScala,
+      alarmService.asScala,
       loggerFactory.asScala
     ) {
 

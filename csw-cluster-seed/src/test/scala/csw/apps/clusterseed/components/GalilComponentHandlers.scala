@@ -34,6 +34,7 @@ class GalilComponentHandlers(
       currentStatePublisher,
       locationService,
       eventService,
+      alarmService,
       loggerFactory
     ) {
   val log: Logger = new LoggerFactory(componentInfo.name).getLogger

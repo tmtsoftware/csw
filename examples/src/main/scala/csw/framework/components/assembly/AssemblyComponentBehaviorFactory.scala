@@ -30,6 +30,7 @@ class AssemblyComponentBehaviorFactory extends ComponentBehaviorFactory {
       currentStatePublisher,
       locationService,
       eventService,
+      alarmService,
       loggerFactory
     )
 }
