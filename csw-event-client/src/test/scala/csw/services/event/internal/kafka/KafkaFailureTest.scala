@@ -14,7 +14,8 @@ import scala.concurrent.duration.DurationInt
 //DEOPSCSW-398: Propagate failure for publish api (eventGenerator)
 class KafkaFailureTest extends FunSuite with Matchers with MockitoSugar with BeforeAndAfterAll {
 
-  val kafkaTestProps: KafkaTestProps = KafkaTestProps.createKafkaProperties(3559, 6001, Map("message.max.bytes" → "1"))
+  val kafkaTestProps: KafkaTestProps =
+    KafkaTestProps.createKafkaProperties(additionalBrokerProps = Map("message.max.bytes" → "1"))
   import kafkaTestProps._
 
   override def beforeAll(): Unit = {

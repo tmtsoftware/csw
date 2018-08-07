@@ -5,8 +5,8 @@ import akka.actor.testkit.typed.javadsl.TestProbe;
 import akka.stream.javadsl.Source;
 import csw.messages.events.Event;
 import csw.services.event.api.exceptions.PublishFailure;
-import csw.services.event.helpers.Utils;
 import csw.services.event.api.javadsl.IEventPublisher;
+import csw.services.event.helpers.Utils;
 import io.lettuce.core.ClientOptions;
 import io.lettuce.core.RedisException;
 import org.junit.*;
@@ -29,12 +29,12 @@ public class JRedisFailureTest {
     @BeforeClass
     public static void beforeClass() {
         ClientOptions clientOptions = ClientOptions.builder().autoReconnect(false).disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS).build();
-        redisTestProps = RedisTestProps.createRedisProperties(4561, 27380, 7380, clientOptions);
+        redisTestProps = RedisTestProps.jCreateRedisProperties(clientOptions);
         redisTestProps.start();
     }
 
     @AfterClass
-    public static void afterClass() throws Exception {
+    public static void afterClass() {
         redisTestProps.shutdown();
     }
 

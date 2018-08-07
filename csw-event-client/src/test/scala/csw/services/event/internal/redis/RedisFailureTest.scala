@@ -27,7 +27,7 @@ class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
     .disconnectedBehavior(DisconnectedBehavior.REJECT_COMMANDS)
     .build
 
-  private val redisTestProps: RedisTestProps = RedisTestProps.createRedisProperties(3560, 26380, 6380, redisClientOptions)
+  private val redisTestProps: RedisTestProps = RedisTestProps.createRedisProperties(clientOptions = redisClientOptions)
 
   override def beforeAll(): Unit = redisTestProps.start()
 
@@ -38,7 +38,7 @@ class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
     val publisher = eventService.makeNewPublisher().await
     publisher.publish(Utils.makeEvent(1)).await
 
-    redis.stop()
+    redisServer.stop()
 
     Thread.sleep(1000) // wait till the publisher is shutdown successfully
 
@@ -47,7 +47,7 @@ class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
       publisher.publish(failedEvent).await
     }
 
-    redis.start()
+    redisServer.start()
 
     failure.event shouldBe failedEvent
     failure.getCause shouldBe a[RedisException]
@@ -99,14 +99,14 @@ class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
     val event1             = makeDistinctEvent(Random.nextInt())
     val eventKey: EventKey = event1.eventKey
 
-    redis.stop()
+    redisServer.stop()
 
     val failure = intercept[EventServerNotAvailable] {
       val subscription = subscriber.subscribe(Set(eventKey)).toMat(Sink.foreach(println))(Keep.left).run()
       subscription.ready().await
     }
 
-    redis.start()
+    redisServer.start()
     failure.getCause shouldBe a[ConnectException]
   }
 

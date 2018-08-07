@@ -3,6 +3,8 @@ package csw.services.event.internal.redis
 import akka.Done
 import akka.actor.{ActorSystem, CoordinatedShutdown}
 import com.typesafe.config.ConfigFactory
+import csw.commons.redis.EmbeddedRedis
+import csw.commons.utils.SocketUtils.getFreePort
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.event.EventServiceFactory
 import csw.services.event.api.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
@@ -27,21 +29,16 @@ class RedisTestProps(
     val redisClient: RedisClient,
     locationService: LocationService,
 )(implicit val actorSystem: ActorSystem)
-    extends BaseProperties {
+    extends BaseProperties
+    with EmbeddedRedis {
 
-  val redis: RedisServer    = RedisServer.builder().port(serverPort).build()
   private lazy val masterId = ConfigFactory.load().getString("redis.masterId")
   private lazy val redisURI = RedisURI.Builder.sentinel("localhost", sentinelPort, masterId).build()
   private lazy val asyncConnection: Future[RedisAsyncCommands[String, String]] =
     redisClient.connectAsync(new StringCodec(), redisURI).toScala.map(_.async())
 
-  private lazy val redisSentinel: RedisSentinel = RedisSentinel
-    .builder()
-    .port(sentinelPort)
-    .masterName(masterId)
-    .masterPort(serverPort)
-    .quorumSize(1)
-    .build()
+  var redisSentinel: RedisSentinel = _
+  var redisServer: RedisServer     = _
 
   override val eventPattern: String = "*"
 
@@ -62,24 +59,24 @@ class RedisTestProps(
     asyncConnection.flatMap(c ⇒ c.publish(channel, message).toScala.map(_ ⇒ Done))
 
   override def start(): Unit = {
-    redisSentinel.start()
-    redis.start()
+    val redis = startSentinel(sentinelPort, serverPort, masterId)
+    redisSentinel = redis._1
+    redisServer = redis._2
   }
 
   override def shutdown(): Unit = {
     publisher.shutdown().await
     redisClient.shutdown()
-    redisSentinel.stop()
-    redis.stop()
+    stopSentinel(redisSentinel, redisServer)
     CoordinatedShutdown(actorSystem).run(TestFinishedReason).await
   }
 }
 
-object RedisTestProps {
+object RedisTestProps extends EmbeddedRedis {
   def createRedisProperties(
-      seedPort: Int,
-      sentinelPort: Int,
-      serverPort: Int,
+      seedPort: Int = getFreePort,
+      sentinelPort: Int = getFreePort,
+      serverPort: Int = getFreePort,
       clientOptions: ClientOptions = ClientOptions.create()
   ): RedisTestProps = {
     val (system, locationService) = BaseProperties.createInfra(seedPort, sentinelPort)
@@ -88,4 +85,8 @@ object RedisTestProps {
 
     new RedisTestProps("Redis", sentinelPort, serverPort, redisClient, locationService)(system)
   }
+
+  def jCreateRedisProperties(clientOptions: ClientOptions): RedisTestProps = createRedisProperties(clientOptions = clientOptions)
+
+  def jCreateRedisProperties(): RedisTestProps = createRedisProperties()
 }

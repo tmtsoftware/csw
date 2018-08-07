@@ -35,8 +35,8 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
 
   @BeforeSuite
   def beforeAll(): Unit = {
-    redisTestProps = RedisTestProps.createRedisProperties(3564, 26383, 6383)
-    kafkaTestProps = KafkaTestProps.createKafkaProperties(3565, 6003)
+    redisTestProps = RedisTestProps.createRedisProperties()
+    kafkaTestProps = KafkaTestProps.createKafkaProperties()
     redisTestProps.start()
     kafkaTestProps.start()
   }

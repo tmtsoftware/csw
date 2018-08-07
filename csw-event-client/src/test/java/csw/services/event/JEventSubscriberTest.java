@@ -40,8 +40,8 @@ public class JEventSubscriberTest extends TestNGSuite {
 
     @BeforeSuite
     public void beforeAll() {
-        redisTestProps = RedisTestProps.createRedisProperties(4564, 27382, 7382, ClientOptions.create());
-        kafkaTestProps = KafkaTestProps.jCreateKafkaProperties(4565, 7003, Collections.EMPTY_MAP);
+        redisTestProps = RedisTestProps.jCreateRedisProperties();
+        kafkaTestProps = KafkaTestProps.jCreateKafkaProperties();
         redisTestProps.start();
         kafkaTestProps.start();
     }

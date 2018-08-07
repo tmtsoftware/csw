@@ -42,8 +42,8 @@ public class JEventSubscriptionFrequencyTest extends TestNGSuite {
 
     @BeforeSuite
     public void beforeAll() {
-        redisTestProps = RedisTestProps.createRedisProperties(4566, 27384, 7384, ClientOptions.create());
-        kafkaTestProps = KafkaTestProps.jCreateKafkaProperties(4567, 7004, Collections.EMPTY_MAP);
+        redisTestProps = RedisTestProps.jCreateRedisProperties();
+        kafkaTestProps = KafkaTestProps.jCreateKafkaProperties();
         redisTestProps.start();
         kafkaTestProps.start();
     }

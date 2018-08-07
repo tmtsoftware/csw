@@ -1,6 +1,7 @@
 package csw.services.alarm.client.internal.helpers
 import akka.actor.ActorSystem
 import csw.commons.redis.EmbeddedRedis
+import csw.commons.utils.SocketUtils.getFreePort
 import csw.services.alarm.api.internal.{MetadataKey, SeverityKey, StatusKey}
 import csw.services.alarm.api.javadsl.IAlarmService
 import csw.services.alarm.api.models.{AlarmMetadata, AlarmSeverity, AlarmStatus}

@@ -2,6 +2,7 @@ package csw.services.alarm.client
 import java.io.File
 
 import com.typesafe.config.{ConfigFactory, ConfigResolveOptions}
+import csw.commons.utils.SocketUtils.getFreePort
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.alarm.api.models.AlarmSeverity.Indeterminate
 import csw.services.alarm.api.scaladsl.{AlarmAdminService, AlarmService}

@@ -33,8 +33,8 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
 
   @BeforeSuite
   def beforeAll(): Unit = {
-    redisTestProps = RedisTestProps.createRedisProperties(3561, 26381, 6381)
-    kafkaTestProps = KafkaTestProps.createKafkaProperties(3562, 6002)
+    redisTestProps = RedisTestProps.createRedisProperties()
+    kafkaTestProps = KafkaTestProps.createKafkaProperties()
     redisTestProps.start()
     kafkaTestProps.start()
   }
@@ -92,18 +92,16 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
     val eventKey: EventKey          = makeEvent(0).eventKey
 
     val subscription = subscriber.subscribe(Set(eventKey)).to(Sink.foreach[Event](queue.enqueue(_))).run()
-    subscription.ready.await
+    subscription.ready().await
     Thread.sleep(500) // Needed for getting the latest event
 
-    cancellable = publisher.publish(eventGenerator, 100.millis)
+    cancellable = publisher.publish(eventGenerator(), 300.millis)
     Thread.sleep(1000)
     cancellable.cancel()
 
     // subscriber will receive an invalid event first as subscription happened before publishing started.
-    // The 10 published events will follow
-    eventually(queue.size shouldBe 11)
-
-    queue should contain allElementsOf Seq(Event.invalidEvent(eventKey)) ++ events
+    // The 4 published events will follow
+    queue should (have length 5 and contain allElementsOf Seq(Event.invalidEvent(eventKey)) ++ events.take(4))
   }
 
   //DEOPSCSW-341: Allow to reuse single connection for subscribing to multiple EventKeys

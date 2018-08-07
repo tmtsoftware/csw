@@ -26,8 +26,8 @@ class EventSubscriptionFrequencyTest extends TestNGSuite with Matchers with Even
 
   @BeforeSuite
   def beforeAll(): Unit = {
-    redisTestProps = RedisTestProps.createRedisProperties(3566, 26384, 6384)
-    kafkaTestProps = KafkaTestProps.createKafkaProperties(3567, 6004)
+    redisTestProps = RedisTestProps.createRedisProperties()
+    kafkaTestProps = KafkaTestProps.createKafkaProperties()
     redisTestProps.start()
     kafkaTestProps.start()
   }

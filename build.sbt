@@ -199,7 +199,8 @@ lazy val `csw-event-client` = project
   .dependsOn(
     `csw-event-api`,
     `csw-logging`,
-    `csw-location` % "compile->compile;multi-jvm->multi-jvm"
+    `csw-location` % "compile->compile;multi-jvm->multi-jvm",
+    `csw-commons` % "test->test"
   )
   .enablePlugins(PublishBintray, AutoMultiJvm, GenJavadocPlugin, MaybeCoverage)
   .settings(libraryDependencies ++= Dependencies.EventClient)

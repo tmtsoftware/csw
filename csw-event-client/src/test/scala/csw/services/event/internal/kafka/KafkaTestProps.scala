@@ -3,6 +3,7 @@ package csw.services.event.internal.kafka
 import akka.Done
 import akka.actor.{ActorSystem, CoordinatedShutdown}
 import akka.kafka.ProducerSettings
+import csw.commons.utils.SocketUtils.getFreePort
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.event.EventServiceFactory
 import csw.services.event.api.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
@@ -63,17 +64,16 @@ class KafkaTestProps(
 object KafkaTestProps {
 
   def createKafkaProperties(
-      seedPort: Int,
-      serverPort: Int,
+      seedPort: Int = getFreePort,
+      serverPort: Int = getFreePort,
       additionalBrokerProps: Map[String, String] = Map.empty
   ): KafkaTestProps = {
     val (system, locationService) = createInfra(seedPort, serverPort)
     new KafkaTestProps(serverPort, locationService, additionalBrokerProps)(system)
   }
 
-  def jCreateKafkaProperties(
-      seedPort: Int,
-      serverPort: Int,
-      additionalBrokerProps: java.util.Map[String, String]
-  ): KafkaTestProps = createKafkaProperties(seedPort, serverPort, additionalBrokerProps.asScala.toMap)
+  def jCreateKafkaProperties(additionalBrokerProps: java.util.Map[String, String]): KafkaTestProps =
+    createKafkaProperties(additionalBrokerProps = additionalBrokerProps.asScala.toMap)
+
+  def jCreateKafkaProperties(): KafkaTestProps = createKafkaProperties()
 }

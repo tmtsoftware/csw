@@ -1,25 +1,8 @@
 package csw.commons.redis
-import java.io.IOException
-import java.net.ServerSocket
-
+import csw.commons.utils.SocketUtils.getFreePort
 import redis.embedded.{RedisSentinel, RedisServer}
 
-import scala.annotation.tailrec
-import scala.util.{Failure, Success, Try}
-
 trait EmbeddedRedis {
-
-  @tailrec
-  final def getFreePort: Int = {
-    Try(new ServerSocket(0)) match {
-      case Success(socket) =>
-        val port = socket.getLocalPort
-        socket.close()
-        port
-      case Failure(_: IOException) => getFreePort
-      case Failure(e)              => throw e
-    }
-  }
 
   type ServerPort   = Int
   type SentinelPort = Int

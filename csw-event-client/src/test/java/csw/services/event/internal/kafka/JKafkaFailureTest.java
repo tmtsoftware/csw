@@ -5,8 +5,8 @@ import akka.actor.typed.javadsl.Adapter;
 import akka.stream.javadsl.Source;
 import csw.messages.events.Event;
 import csw.services.event.api.exceptions.PublishFailure;
-import csw.services.event.helpers.Utils;
 import csw.services.event.api.javadsl.IEventPublisher;
+import csw.services.event.helpers.Utils;
 import net.manub.embeddedkafka.EmbeddedKafka$;
 import org.apache.kafka.common.errors.RecordTooLargeException;
 import org.junit.*;
@@ -29,14 +29,14 @@ public class JKafkaFailureTest {
     public final ExpectedException exception = ExpectedException.none();
 
     @BeforeClass
-    public static void beforeClass() throws Exception {
-        kafkaTestProps = KafkaTestProps.jCreateKafkaProperties(4560, 7001, Collections.singletonMap("message.max.bytes", "1"));
+    public static void beforeClass() {
+        kafkaTestProps = KafkaTestProps.jCreateKafkaProperties(Collections.singletonMap("message.max.bytes", "1"));
         publisher = kafkaTestProps.jPublisher();
         EmbeddedKafka$.MODULE$.start(kafkaTestProps.config());
     }
 
     @AfterClass
-    public static void afterClass() throws Exception {
+    public static void afterClass() {
         kafkaTestProps.shutdown();
     }
 

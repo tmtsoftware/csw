@@ -8,14 +8,12 @@ import akka.stream.javadsl.Source;
 import csw.messages.events.Event;
 import csw.messages.events.Event$;
 import csw.messages.events.EventKey;
+import csw.services.event.api.javadsl.IEventPublisher;
+import csw.services.event.api.javadsl.IEventSubscription;
 import csw.services.event.helpers.Utils;
 import csw.services.event.internal.kafka.KafkaTestProps;
 import csw.services.event.internal.redis.RedisTestProps;
 import csw.services.event.internal.wiring.BaseProperties;
-import csw.services.event.api.javadsl.IEventPublisher;
-import csw.services.event.api.javadsl.IEventSubscription;
-import csw.services.event.models.EventStores;
-import io.lettuce.core.ClientOptions;
 import org.scalatest.testng.TestNGSuite;
 import org.testng.Assert;
 import org.testng.annotations.AfterSuite;
@@ -45,8 +43,8 @@ public class JEventPublisherTest extends TestNGSuite {
 
     @BeforeSuite
     public void beforeAll() {
-        redisTestProps = RedisTestProps.createRedisProperties(4562, 27381, 7381, ClientOptions.create());
-        kafkaTestProps = KafkaTestProps.jCreateKafkaProperties(4563, 7002, Collections.EMPTY_MAP);
+        redisTestProps = RedisTestProps.jCreateRedisProperties();
+        kafkaTestProps = KafkaTestProps.jCreateKafkaProperties();
         redisTestProps.start();
         kafkaTestProps.start();
     }
