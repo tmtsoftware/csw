@@ -7,6 +7,7 @@ import csw.services.alarm.api.models.{AlarmMetadata, AlarmType}
 import org.scalatest.{FunSuite, Matchers}
 
 // DEOPSCSW-451: Create set of alarms based on Configuration file
+// DEOPSCSW-452: Represent alarm in a model as defined in Configuration file
 class ConfigParserTest extends FunSuite with Matchers {
 
   test("should able to parse valid alarm metadata config file") {
