@@ -196,6 +196,13 @@ object Dependencies {
     Chill.`chill-akka`     % Test
   )
 
+  val AlarmCli = Seq(
+    Libs.`scopt`,
+    Libs.`scala-csv`,
+    Libs.`scalatest`      % Test,
+    Libs.`embedded-redis` % Test
+  )
+
   val Romaine = Seq(
     Libs.`lettuce`,
     Libs.`scala-async`,

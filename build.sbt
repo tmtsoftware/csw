@@ -16,6 +16,7 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-event-cli`,
   `csw-alarm-api`,
   `csw-alarm-client`,
+  `csw-alarm-cli`,
   `csw-location`,
   `csw-location-agent`,
   `csw-benchmark`,
@@ -36,6 +37,7 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
   `csw-event-cli`,
   `csw-alarm-api`,
   `csw-alarm-client`,
+  `csw-alarm-cli`,
   `csw-commons`,
   `csw-benchmark`,
   `romaine`,
@@ -227,6 +229,11 @@ lazy val `csw-alarm-client` = project
     `csw-commons` % "test->test"
   )
   .settings(libraryDependencies ++= Dependencies.AlarmClient)
+
+lazy val `csw-alarm-cli` = project
+  .dependsOn(`csw-alarm-client`)
+  .enablePlugins(DeployApp, MaybeCoverage)
+  .settings(libraryDependencies ++= Dependencies.AlarmCli)
 
 lazy val `csw-commons` = project
   .enablePlugins(PublishBintray, GenJavadocPlugin)
