@@ -2,6 +2,7 @@ package csw.apps.clusterseed
 
 import csw.apps.clusterseed.internal.AdminWiring
 import csw.apps.clusterseed.cli.{ArgsParser, Options}
+import csw.services.BuildInfo
 import csw.services.location.commons.ClusterAwareSettings
 
 /**
@@ -12,7 +13,7 @@ import csw.services.location.commons.ClusterAwareSettings
  * */
 // $COVERAGE-OFF$
 object Main extends App {
-  private val name = "csw-cluster-seed"
+  private val name = BuildInfo.name
 
   new ArgsParser(name).parse(args).map {
     case Options(maybeClusterPort, maybeAdminPort, testMode) =>

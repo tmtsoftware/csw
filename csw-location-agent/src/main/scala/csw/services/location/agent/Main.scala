@@ -25,7 +25,7 @@ object Main extends App {
  * Application object allowing program execution from command line, also facilitates an entry point for Component level testing.
  */
 class Main(clusterSettings: ClusterSettings, startLogging: Boolean) {
-  private val name        = "csw-location-agent"
+  private val name        = BuildInfo.name
   private val log: Logger = LocationAgentLogger.getLogger
 
   def start(args: Array[String]): Option[Process] =

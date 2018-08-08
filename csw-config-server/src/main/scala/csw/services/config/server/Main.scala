@@ -1,6 +1,7 @@
 package csw.services.config.server
 
 import csw.messages.commons.CoordinatedShutdownReasons.FailureReason
+import csw.services.BuildInfo
 import csw.services.config.server.cli.{ArgsParser, Options}
 import csw.services.config.server.commons.ConfigServerLogger
 import csw.services.config.server.http.HttpService
@@ -15,7 +16,7 @@ import scala.concurrent.duration.DurationDouble
  * Application object to start the ConfigServer from command line.
  */
 class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) {
-  private val name        = "csw-config-server"
+  private val name        = BuildInfo.name
   private val log: Logger = ConfigServerLogger.getLogger
 
   def start(args: Array[String]): Option[HttpService] =

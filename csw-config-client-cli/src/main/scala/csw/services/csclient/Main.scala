@@ -8,7 +8,7 @@ import csw.services.logging.scaladsl.LoggingSystemFactory
 
 // $COVERAGE-OFF$
 object Main extends App {
-  private val name = "csw-config-client-cli"
+  private val name = BuildInfo.name
 
   if (ClusterAwareSettings.seedNodes.isEmpty) {
     println(
