@@ -6,7 +6,7 @@ import org.scalatest.{FunSuite, Matchers}
 class KeyTest extends FunSuite with Matchers {
   test("AlarmKey should be representing a unique alarm") {
     val tromboneAxisHighLimitAlarm = AlarmKey("nfiraos", "trombone", "tromboneAxisHighLimitAlarm")
-    tromboneAxisHighLimitAlarm.value shouldEqual "nfiraos.trombone.tromboneAxisHighLimitAlarm"
+    tromboneAxisHighLimitAlarm.value shouldEqual "nfiraos.trombone.tromboneaxishighlimitalarm"
   }
 
   test("SubsystemKey should be representing keys for all alarms of a subsystem") {

@@ -10,7 +10,7 @@ import java.util.regex.Pattern
  * @param name represents the name of the alarm unique to the component e.g tromboneAxisLowLimitAlarm
  */
 sealed abstract class Key(subsystem: String, component: String, name: String) {
-  def value: String = s"$subsystem.$component.$name"
+  def value: String = s"${subsystem.toLowerCase}.${component.toLowerCase}.${name.toLowerCase}"
 }
 
 object Key {

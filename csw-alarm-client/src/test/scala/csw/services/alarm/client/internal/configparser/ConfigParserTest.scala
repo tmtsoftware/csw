@@ -16,7 +16,7 @@ class ConfigParserTest extends FunSuite with Matchers {
 
     val expectedAlarmMetadataSet = Set(
       AlarmMetadata(
-        subsystem = "nfiraos",
+        subsystem = "NFIRAOS",
         component = "trombone",
         name = "tromboneAxisHighLimitAlarm",
         description = "Warns when trombone axis has reached the high limit",
@@ -30,7 +30,7 @@ class ConfigParserTest extends FunSuite with Matchers {
         activationStatus = Active
       ),
       AlarmMetadata(
-        subsystem = "nfiraos",
+        subsystem = "NFIRAOS",
         component = "trombone",
         name = "tromboneAxisLowLimitAlarm",
         description = "Warns when trombone axis has reached the low limit",
@@ -71,10 +71,12 @@ class ConfigParserTest extends FunSuite with Matchers {
     val parseException = intercept[ConfigParseException] {
       ConfigParser.parseAlarmMetadataSet(config)
     }
-    // invalid-alarms.conf contains 2 errors:
-    // 1. subsystem missing from second alarm
-    // 2. invalid AlarmType in third alarm
-    parseException.reasons.length shouldBe 2
+
+    parseException.reasons.map(_.split("error: ").tail.head).toSet shouldEqual Set(
+      "instance value (\"INVALID\") not found in enum (possible values: [\"AOESW\",\"APS\",\"CIS\",\"CSW\",\"DMS\",\"DPS\",\"ENC\",\"ESEN\",\"ESW\",\"GMS\",\"IRIS\",\"IRMS\",\"LGSF\",\"M1CS\",\"M2CS\",\"M3CS\",\"MCS\",\"NFIRAOS\",\"NSCU\",\"OSS\",\"PFCS\",\"PSFR\",\"RTC\",\"RPG\",\"SCMS\",\"SOSS\",\"STR\",\"SUM\",\"TCS\",\"TINC\",\"WFOS\",\"Container\"]) (schema: config:/alarm-schema.conf#:/properties/subsystem)",
+      "object has missing required properties ([\"subsystem\"]) (schema: config:/alarm-schema.conf#:)",
+      "instance value (\"Invalid\") not found in enum (possible values: [\"Absolute\",\"BitPattern\",\"Calculated\",\"Deviation\",\"Discrepancy\",\"Instrument\",\"RateChange\",\"RecipeDriven\",\"Safety\",\"Statistical\",\"System\"]) (schema: config:/alarm-schema.conf#:/properties/alarmType)"
+    )
   }
 
 }

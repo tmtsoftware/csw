@@ -9,7 +9,7 @@ trait AlarmTestData {
 
   val tromboneAxisHighLimitAlarmKey = AlarmKey("nfiraos", "trombone", "tromboneAxisHighLimitAlarm")
   val tromboneAxisHighLimitAlarm = AlarmMetadata(
-    subsystem = "nfiraos",
+    subsystem = "NFIRAOS",
     component = "trombone",
     name = "tromboneAxisHighLimitAlarm",
     description = "Warns when trombone axis has reached the high limit",
@@ -25,7 +25,7 @@ trait AlarmTestData {
 
   val tromboneAxisLowLimitAlarmKey = AlarmKey("nfiraos", "trombone", "tromboneAxisLowLimitAlarm")
   val tromboneAxisLowLimitAlarm = AlarmMetadata(
-    subsystem = "nfiraos",
+    subsystem = "NFIRAOS",
     component = "trombone",
     name = "tromboneAxisLowLimitAlarm",
     description = "Warns when trombone axis has reached the low limit",
