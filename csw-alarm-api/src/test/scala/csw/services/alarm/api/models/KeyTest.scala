@@ -22,4 +22,34 @@ class KeyTest extends FunSuite with Matchers {
   test("GlobalKey should be representing keys for all alarms") {
     GlobalKey.value shouldEqual "*.*.*"
   }
+
+  test("AlarmKey should not allow character '*'") {
+    intercept[IllegalArgumentException] {
+      AlarmKey("nfiraos", "trombone", "*")
+    }
+  }
+
+  test("AlarmKey should not allow character '['") {
+    intercept[IllegalArgumentException] {
+      AlarmKey("nfiraos", "[", "tromboneAxisHighLimitAlarm")
+    }
+  }
+
+  test("AlarmKey should not allow character ']'") {
+    intercept[IllegalArgumentException] {
+      AlarmKey("]", "trombone", "tromboneAxisHighLimitAlarm")
+    }
+  }
+
+  test("AlarmKey should not allow character '-'") {
+    intercept[IllegalArgumentException] {
+      AlarmKey("nfiraos", "trombone", "-")
+    }
+  }
+
+  test("AlarmKey should not allow character '^'") {
+    intercept[IllegalArgumentException] {
+      AlarmKey("nfiraos", "trombone", "^")
+    }
+  }
 }
