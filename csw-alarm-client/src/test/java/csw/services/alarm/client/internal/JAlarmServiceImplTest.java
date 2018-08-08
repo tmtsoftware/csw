@@ -89,26 +89,6 @@ public class JAlarmServiceImplTest {
 
     // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
     @Test
-    public void shouldNotLatchTheAlarmWhenItsLatchableButNotHighRisk() throws Exception {
-        AlarmKey tromboneAxisHighLimitAlarm = new AlarmKey("nfiraos", "trombone", "tromboneAxisHighLimitAlarm");
-
-        //set severity to Okay
-        AlarmStatus status = setSeverity(tromboneAxisHighLimitAlarm, JAlarmSeverity.Okay);
-        assertEquals(AcknowledgementStatus.UnAcknowledged$.MODULE$, status.acknowledgementStatus());
-        assertEquals(LatchStatus.UnLatched$.MODULE$, status.latchStatus());
-        assertEquals(JAlarmSeverity.Okay, status.latchedSeverity());
-        assertTrue(status.alarmTime().isDefined());
-
-        //set severity to indeterminant
-        AlarmStatus status1 = setSeverity(tromboneAxisHighLimitAlarm, JAlarmSeverity.Indeterminate);
-        assertEquals(AcknowledgementStatus.UnAcknowledged$.MODULE$, status1.acknowledgementStatus());
-        assertEquals(LatchStatus.UnLatched$.MODULE$, status1.latchStatus());
-        assertEquals(JAlarmSeverity.Indeterminate, status1.latchedSeverity());
-        assertTrue(status1.alarmTime().get().time().isAfter(status.alarmTime().get().time()));
-    }
-
-    // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
-    @Test
     public void shouldLatchAlarmOnlyWhenItIsHighRiskAndHigherThanLatchedSeverityInCaseOfLatchableAlarms() throws Exception {
         AlarmKey tromboneAxisHighLimitAlarm = new AlarmKey("nfiraos", "trombone", "tromboneAxisHighLimitAlarm");
 

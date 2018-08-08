@@ -69,7 +69,7 @@ class AlarmServiceImpl(
     }
 
     // get the current severity of the alarm
-    val currentSeverity = await(severityApi.get(key)).getOrElse(Disconnected)
+    val previousSeverity = await(severityApi.get(key)).getOrElse(Disconnected)
 
     // set the severity of the alarm so that it does not transition to `Disconnected` state
     log.info(s"Updating current severity [${severity.name}] in alarm store")
@@ -79,11 +79,11 @@ class AlarmServiceImpl(
     val status    = await(statusApi.get(key)).getOrElse(AlarmStatus())
     var newStatus = status
 
-    def shouldUpdateLatchStatus: Boolean                     = alarm.isLatchable && severity.isHighRisk
+    def shouldUpdateLatchStatus: Boolean                     = alarm.isLatchable && severity.latchable
     def shouldUpdateLatchedSeverityWhenLatchable: Boolean    = shouldUpdateWhenLatched || shouldUpdateWhenUnLatched
-    def shouldUpdateWhenLatched: Boolean                     = alarm.isLatchable && severity.isHighRisk && severity > status.latchedSeverity
-    def shouldUpdateWhenUnLatched: Boolean                   = alarm.isLatchable && status.latchStatus == UnLatched && !severity.isHighRisk
-    def shouldUpdateLatchedSeverityWhenNotLatchable: Boolean = !alarm.isLatchable && severity != currentSeverity
+    def shouldUpdateWhenLatched: Boolean                     = alarm.isLatchable && severity.latchable && severity > status.latchedSeverity
+    def shouldUpdateWhenUnLatched: Boolean                   = alarm.isLatchable && status.latchStatus == UnLatched && severity.latchable
+    def shouldUpdateLatchedSeverityWhenNotLatchable: Boolean = !alarm.isLatchable && severity != previousSeverity
 
     if (shouldUpdateLatchStatus) newStatus = newStatus.copy(latchStatus = Latched)
 
@@ -91,10 +91,9 @@ class AlarmServiceImpl(
       newStatus = newStatus.copy(latchedSeverity = severity, alarmTime = Some(AlarmTime()))
 
     // derive acknowledgement status
-    if (severity.isHighRisk && severity != currentSeverity) {
-      if (alarm.isAutoAcknowledgeable) newStatus = newStatus.copy(acknowledgementStatus = Acknowledged)
-      else newStatus = newStatus.copy(acknowledgementStatus = UnAcknowledged)
-    }
+    if (newStatus.latchedSeverity == Okay || alarm.isAutoAcknowledgeable)
+      newStatus = newStatus.copy(acknowledgementStatus = Acknowledged)
+    else if (severity != previousSeverity) newStatus = newStatus.copy(acknowledgementStatus = UnAcknowledged)
 
     // update alarm status (with recent time) only when severity changes
     if (newStatus != status) {
@@ -120,6 +119,11 @@ class AlarmServiceImpl(
     await(statusApi.get(key)).getOrElse(logAndThrow(KeyNotFoundException(key)))
   }
 
+  private[alarm] def setStatus(alarmKey: AlarmKey, alarmStatus: AlarmStatus): Future[Unit] = async {
+    val statusApi = await(statusApiF)
+    await(statusApi.set(alarmKey, alarmStatus))
+  }
+
   override def getMetadata(key: AlarmKey): Future[AlarmMetadata] = async {
     log.debug(s"Getting metadata for alarm [${key.value}]")
     val metadataApi = await(metadataApiF)
@@ -134,6 +138,11 @@ class AlarmServiceImpl(
     val metadataKeys = await(metadataApi.keys(key))
     if (metadataKeys.isEmpty) logAndThrow(KeyNotFoundException(key))
     await(metadataApi.mget(metadataKeys)).map(_.getValue)
+  }
+
+  private[alarm] def setMetadata(alarmKey: AlarmKey, alarmMetadata: AlarmMetadata): Future[Unit] = async {
+    val metadataApi = await(metadataApiF)
+    await(metadataApi.set(alarmKey, alarmMetadata))
   }
 
   override def acknowledge(key: AlarmKey): Future[Unit] = async {

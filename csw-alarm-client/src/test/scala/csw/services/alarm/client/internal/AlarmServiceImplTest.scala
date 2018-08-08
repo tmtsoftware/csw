@@ -49,22 +49,6 @@ class AlarmServiceImplTest extends AlarmServiceTestSetup {
 
   // DEOPSCSW-444: Set severity api for component
   // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
-  test("setSeverity should not latch the alarm when it's latchable but not high risk") {
-    //set severity to Okay
-    val status = setSeverity(tromboneAxisHighLimitAlarmKey, Okay)
-    status.latchStatus shouldBe UnLatched
-    status.latchedSeverity shouldBe Okay
-    status.alarmTime.isDefined shouldBe true
-
-    //set severity to indeterminant
-    val status1 = setSeverity(tromboneAxisHighLimitAlarmKey, Indeterminate)
-    status1.latchStatus shouldBe UnLatched
-    status1.latchedSeverity shouldBe Indeterminate
-    status1.alarmTime.get.time.isAfter(status.alarmTime.get.time)
-  }
-
-  // DEOPSCSW-444: Set severity api for component
-  // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
   test("setSeverity should latch alarm only when it is high risk and higher than latched severity in case of latchable alarms") {
     val status = setSeverity(tromboneAxisHighLimitAlarmKey, Major)
 
