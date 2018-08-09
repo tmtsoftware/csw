@@ -56,19 +56,16 @@ class AlarmServiceImpl(
 
   override def setSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Unit] = async {
     log.debug(s"Setting severity [${severity.name}] for alarm [${key.value}] with expire timeout [$ttlInSeconds] seconds")
-    val metadataApi = await(metadataApiF)
-    val severityApi = await(severityApiF)
-    val statusApi   = await(statusApiF)
 
     // get alarm metadata
-    val alarm = await(metadataApi.get(key)).getOrElse(logAndThrow(KeyNotFoundException(key)))
+    val alarm = await(getMetadata(key))
 
     // validate if the provided severity is supported by this alarm
-    if (!alarm.allSupportedSeverities.contains(severity)) {
+    if (!alarm.allSupportedSeverities.contains(severity))
       logAndThrow(InvalidSeverityException(key, alarm.allSupportedSeverities, severity))
-    }
 
     // get the current severity of the alarm
+    val severityApi      = await(severityApiF)
     val previousSeverity = await(severityApi.get(key)).getOrElse(Disconnected)
 
     // set the severity of the alarm so that it does not transition to `Disconnected` state
@@ -76,7 +73,7 @@ class AlarmServiceImpl(
     await(severityApi.setex(key, ttlInSeconds, severity))
 
     // get alarm status
-    val status    = await(statusApi.get(key)).getOrElse(AlarmStatus())
+    val status    = await(getStatus(key))
     var newStatus = status
 
     def shouldUpdateLatchStatus: Boolean                     = alarm.isLatchable && severity.latchable
@@ -96,10 +93,7 @@ class AlarmServiceImpl(
     else if (severity != previousSeverity) newStatus = newStatus.copy(acknowledgementStatus = UnAcknowledged)
 
     // update alarm status (with recent time) only when severity changes
-    if (newStatus != status) {
-      log.info(s"Updating alarm status [$newStatus] in alarm store")
-      await(statusApi.set(key, newStatus))
-    }
+    if (newStatus != status) await(setStatus(key, newStatus))
   }
 
   override def getCurrentSeverity(key: AlarmKey): Future[AlarmSeverity] = async {
@@ -107,8 +101,7 @@ class AlarmServiceImpl(
     val metadataApi = await(metadataApiF)
     val severityApi = await(severityApiF)
 
-    if (await(metadataApi.exists(key)))
-      await(severityApi.get(key)).getOrElse(Disconnected)
+    if (await(metadataApi.exists(key))) await(severityApi.get(key)).getOrElse(Disconnected)
     else logAndThrow(KeyNotFoundException(key))
   }
 
@@ -117,11 +110,6 @@ class AlarmServiceImpl(
 
     log.debug(s"Getting status for alarm [${key.value}]")
     await(statusApi.get(key)).getOrElse(logAndThrow(KeyNotFoundException(key)))
-  }
-
-  private[alarm] def setStatus(alarmKey: AlarmKey, alarmStatus: AlarmStatus): Future[Unit] = async {
-    val statusApi = await(statusApiF)
-    await(statusApi.set(alarmKey, alarmStatus))
   }
 
   override def getMetadata(key: AlarmKey): Future[AlarmMetadata] = async {
@@ -138,11 +126,6 @@ class AlarmServiceImpl(
     val metadataKeys = await(metadataApi.keys(key))
     if (metadataKeys.isEmpty) logAndThrow(KeyNotFoundException(key))
     await(metadataApi.mget(metadataKeys)).map(_.getValue)
-  }
-
-  private[alarm] def setMetadata(alarmKey: AlarmKey, alarmMetadata: AlarmMetadata): Future[Unit] = async {
-    val metadataApi = await(metadataApiF)
-    await(metadataApi.set(alarmKey, alarmMetadata))
   }
 
   override def acknowledge(key: AlarmKey): Future[Unit] = async {
@@ -303,11 +286,6 @@ class AlarmServiceImpl(
       }
   }
 
-  private def logAndThrow(runtimeException: RuntimeException) = {
-    log.error(runtimeException.getMessage, ex = runtimeException)
-    throw runtimeException
-  }
-
   private def setAlarmStore(alarmMetadataSet: AlarmMetadataSet) = {
     val alarms      = alarmMetadataSet.alarms
     val metadataMap = alarms.map(metadata ⇒ MetadataKey.fromAlarmKey(metadata.alarmKey) → metadata).toMap
@@ -334,7 +312,18 @@ class AlarmServiceImpl(
       )
   }
 
-  private def alarmTime(status: AlarmStatus) = {
-    if (status.latchedSeverity != Okay) Some(AlarmTime()) else status.alarmTime
+  private[alarm] def setStatus(alarmKey: AlarmKey, alarmStatus: AlarmStatus): Future[Unit] = {
+    log.info(s"Updating alarm status [$alarmStatus] in alarm store")
+    statusApiF.flatMap(_.set(alarmKey, alarmStatus))
+  }
+
+  private[alarm] def setMetadata(alarmKey: AlarmKey, alarmMetadata: AlarmMetadata): Future[Unit] =
+    metadataApiF.flatMap(_.set(alarmKey, alarmMetadata))
+
+  private def alarmTime(status: AlarmStatus) = if (status.latchedSeverity != Okay) Some(AlarmTime()) else status.alarmTime
+
+  private def logAndThrow(runtimeException: RuntimeException) = {
+    log.error(runtimeException.getMessage, ex = runtimeException)
+    throw runtimeException
   }
 }
