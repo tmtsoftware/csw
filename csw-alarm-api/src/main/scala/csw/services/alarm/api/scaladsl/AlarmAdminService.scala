@@ -30,4 +30,6 @@ trait AlarmAdminService extends AlarmService {
 
   def subscribeAggregatedSeverityActorRef(key: Key, actorRef: ActorRef[AlarmSeverity]): AlarmSubscription
   def subscribeAggregatedHealthActorRef(key: Key, actorRef: ActorRef[AlarmHealth]): AlarmSubscription
+
+  private[alarm] def unAcknowledge(key: AlarmKey): Future[Unit]
 }

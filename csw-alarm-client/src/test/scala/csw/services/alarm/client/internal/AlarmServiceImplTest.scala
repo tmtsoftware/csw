@@ -358,19 +358,44 @@ class AlarmServiceImplTest extends AlarmServiceTestSetup {
     }
   }
 
+  // DEOPSCSW-446: Acknowledge api for alarm
+  test("acknowledge should set acknowledgementStatus to Acknowledged of an alarm") {
+    // latchable, not auto-acknowledgable alarm
+    val lowLimitAlarmKey = AlarmKey("nfiraos", "trombone", "tromboneAxisLowLimitAlarm")
+
+    // set latched severity to Warning which will result status to be Latched and UnAcknowledged
+    alarmService.setSeverity(lowLimitAlarmKey, Warning).await
+
+    alarmService.acknowledge(lowLimitAlarmKey).await
+    val status = alarmService.getStatus(lowLimitAlarmKey).await
+    status.acknowledgementStatus shouldBe Acknowledged
+  }
+
+  // DEOPSCSW-446: Acknowledge api for alarm
+  test("unAcknowledge should set acknowledgementStatus to UnAcknowledged of an alarm") {
+    // latchable, not auto-acknowledgable alarm
+    val lowLimitAlarmKey = AlarmKey("nfiraos", "trombone", "tromboneAxisLowLimitAlarm")
+
+    // set latched severity to Okay which will result status to be Latched and Acknowledged
+    alarmService.setSeverity(lowLimitAlarmKey, Okay).await
+
+    alarmService.unAcknowledge(lowLimitAlarmKey).await
+    val status = alarmService.getStatus(lowLimitAlarmKey).await
+    status.acknowledgementStatus shouldBe UnAcknowledged
+  }
+
+  // DEOPSCSW-446: Acknowledge api for alarm
+  test("acknowledge should throw exception if key does not exist") {
+    val invalidAlarm = AlarmKey("invalid", "invalid", "invalid")
+    intercept[KeyNotFoundException] {
+      alarmService.acknowledge(invalidAlarm).await
+    }
+  }
+
   //  test("getStatus should throw exception if key does not exist") {
   //    val invalidAlarm = AlarmKey("invalid", "invalid", "invalid")
   //    intercept[KeyNotFoundException] {
   //      alarmService.getStatus(invalidAlarm)
-  //    }
-  //  }
-  //
-  //  test("acknowledge should acknowledge an alarm") {}
-  //
-  //  test("acknowledge should throw exception if key does not exist") {
-  //    val invalidAlarm = AlarmKey("invalid", "invalid", "invalid")
-  //    intercept[KeyNotFoundException] {
-  //      alarmService.acknowledge(invalidAlarm)
   //    }
   //  }
   //

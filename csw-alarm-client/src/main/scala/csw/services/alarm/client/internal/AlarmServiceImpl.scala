@@ -131,18 +131,7 @@ class AlarmServiceImpl(
     await(metadataApi.mget(metadataKeys)).map(_.getValue)
   }
 
-  override def acknowledge(key: AlarmKey): Future[Unit] = async {
-    log.debug(s"Acknowledge alarm [${key.value}]")
-    val metadataApi = await(metadataApiF)
-    val statusApi   = await(statusApiF)
-
-    if (await(metadataApi.exists(key))) {
-      val status = await(statusApi.get(key)).getOrElse(AlarmStatus())
-
-      if (status.acknowledgementStatus == UnAcknowledged) // save the set call if status is already Acknowledged
-        await(statusApi.set(key, status.copy(acknowledgementStatus = Acknowledged)))
-    } else logAndThrow(KeyNotFoundException(key))
-  }
+  override def acknowledge(key: AlarmKey): Future[Unit] = setAcknowledgeStatus(key, Acknowledged)
 
   // reset is only called when severity is `Okay`
   override def reset(key: AlarmKey): Future[Unit] = async {
@@ -266,6 +255,8 @@ class AlarmServiceImpl(
     subscribeAggregatedHealthCallback(key, actorRef ! _)
   }
 
+  override private[alarm] def unAcknowledge(key: AlarmKey): Future[Unit] = setAcknowledgeStatus(key, UnAcknowledged)
+
   // PatternMessage gives three values:
   // pattern: e.g  __keyspace@0__:status.nfiraos.*.*,
   // channel: e.g. __keyspace@0__:status.nfiraos.trombone.tromboneAxisLowLimitAlarm,
@@ -286,6 +277,22 @@ class AlarmServiceImpl(
           override def ready(): Future[Unit]       = mat.flatMap(_.ready())
         }
       }
+  }
+
+  private def setAcknowledgeStatus(key: AlarmKey, ackStatus: AcknowledgementStatus): Future[Unit] = async {
+    val msg = s"$ackStatus alarm [${key.value}]"
+    println(msg)
+    log.debug(msg)
+
+    val metadataApi = await(metadataApiF)
+    val statusApi   = await(statusApiF)
+
+    if (await(metadataApi.exists(key))) {
+      val status = await(statusApi.get(key)).getOrElse(AlarmStatus())
+
+      if (status.acknowledgementStatus != ackStatus) // save the set call if status is already set to given acknowledgement status
+        await(statusApi.set(key, status.copy(acknowledgementStatus = ackStatus)))
+    } else logAndThrow(KeyNotFoundException(key))
   }
 
   private def setAlarmStore(alarmMetadataSet: AlarmMetadataSet) = {
