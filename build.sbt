@@ -227,7 +227,7 @@ lazy val `csw-alarm-client` = project
     `romaine`,
     `csw-commons` % "test->test"
   )
-  .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
+  .enablePlugins(PublishBintray, GenJavadocPlugin)
   .settings(libraryDependencies ++= Dependencies.AlarmClient)
 
 lazy val `csw-alarm-cli` = project
