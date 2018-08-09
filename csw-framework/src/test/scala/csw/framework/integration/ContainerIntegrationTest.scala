@@ -6,6 +6,7 @@ import akka.testkit
 import com.typesafe.config.ConfigFactory
 import csw.common.FrameworkAssertions._
 import csw.common.components.framework.SampleComponentState._
+import csw.framework.FrameworkTestWiring
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.messages.ComponentCommonMessage.{GetSupervisorLifecycleState, LifecycleStateSubscription}
 import csw.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}

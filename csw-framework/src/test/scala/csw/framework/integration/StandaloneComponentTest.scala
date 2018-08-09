@@ -11,6 +11,7 @@ import csw.common.components.framework.SampleComponentHandlers
 import csw.common.components.framework.SampleComponentState._
 import csw.common.utils.TestAppender
 import csw.commons.tags.LoggingSystemSensitive
+import csw.framework.FrameworkTestWiring
 import csw.framework.internal.component.ComponentBehavior
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.messages.SupervisorContainerCommonMessages.Shutdown
@@ -20,6 +21,7 @@ import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.messages.params.states.{CurrentState, StateName}
 import csw.services.command.scaladsl.CommandService
+import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.logging.internal.LoggingLevels.INFO
 import csw.services.logging.internal.LoggingSystem
 import io.lettuce.core.RedisClient
@@ -62,8 +64,7 @@ class StandaloneComponentTest extends FunSuite with Matchers with MockitoSugar w
     val akkaConnection                = AkkaConnection(ComponentId("IFS_Detector", HCD))
 
     // verify component gets registered with location service
-    val eventualLocation = seedLocationService.resolve(akkaConnection, 5.seconds)
-    val maybeLocation    = Await.result(eventualLocation, 5.seconds)
+    val maybeLocation = seedLocationService.resolve(akkaConnection, 5.seconds).await
 
     maybeLocation.isDefined shouldBe true
     val resolvedAkkaLocation = maybeLocation.get

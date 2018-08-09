@@ -6,6 +6,7 @@ import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.common.FrameworkAssertions._
 import csw.common.components.framework.SampleComponentState._
+import csw.framework.FrameworkTestWiring
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.messages.SupervisorContainerCommonMessages.Shutdown
 import csw.messages.commands
@@ -25,8 +26,8 @@ import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
+import scala.concurrent.TimeoutException
 import scala.concurrent.duration.DurationLong
-import scala.concurrent.{Await, TimeoutException}
 
 class TrackConnectionsIntegrationTest extends FunSuite with Matchers with MockitoSugar with BeforeAndAfterAll {
 
@@ -56,8 +57,8 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Mockit
     assertThatContainerIsRunning(containerRef, containerLifecycleStateProbe, 5.seconds)
 
     // resolve all the components from container using location service
-    val filterAssemblyLocation = Await.result(seedLocationService.find(filterAssemblyConnection), 5.seconds)
-    val disperserHcdLocation   = Await.result(seedLocationService.find(disperserHcdConnection), 5.seconds)
+    val filterAssemblyLocation = seedLocationService.resolve(filterAssemblyConnection, 5.seconds).await
+    val disperserHcdLocation   = seedLocationService.resolve(disperserHcdConnection, 5.seconds).await
 
     val assemblyCommandService = new CommandService(filterAssemblyLocation.get)
 

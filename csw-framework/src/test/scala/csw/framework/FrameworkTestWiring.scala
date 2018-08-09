@@ -1,4 +1,4 @@
-package csw.framework.integration
+package csw.framework
 import akka.actor
 import akka.actor.Terminated
 import akka.actor.typed.ActorSystem

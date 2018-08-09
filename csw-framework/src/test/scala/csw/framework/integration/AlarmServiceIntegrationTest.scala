@@ -6,8 +6,10 @@ import com.typesafe.config.{Config, ConfigFactory}
 import csw.common.FrameworkAssertions.assertThatSupervisorIsRunning
 import csw.common.components.framework.SampleComponentState._
 import csw.commons.redis.EmbeddedRedis
+import csw.framework.FrameworkTestWiring
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.messages.commands.Setup
+import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.framework.SupervisorLifecycleState
 import csw.messages.location.ComponentId
 import csw.messages.location.ComponentType.HCD
@@ -36,6 +38,7 @@ class AlarmServiceIntegrationTest extends FunSuite with EmbeddedRedis with Match
   }
 
   override protected def afterAll(): Unit = {
+    wiring.actorRuntime.shutdown(TestFinishedReason).await
     shutdown()
     stopSentinel(sentinel, server)
   }

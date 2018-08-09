@@ -4,11 +4,14 @@ import akka.actor.testkit.typed.scaladsl.{TestInbox, TestProbe}
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.common.FrameworkAssertions
+import csw.common.FrameworkAssertions.assertThatContainerIsRunning
 import csw.common.components.framework.SampleComponentState._
 import csw.commons.redis.EmbeddedRedis
+import csw.framework.FrameworkTestWiring
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.messages.commands
 import csw.messages.commands.CommandName
+import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.framework.ContainerLifecycleState
 import csw.messages.location.ComponentId
 import csw.messages.location.ComponentType.{Assembly, HCD}
@@ -31,19 +34,20 @@ class EventServiceIntegrationTest extends FunSuite with EmbeddedRedis with Match
 
   private val filterAssemblyConnection = AkkaConnection(ComponentId("Filter", Assembly))
   private val disperserHcdConnection   = AkkaConnection(ComponentId("Disperser", HCD))
+  private val wiring                   = FrameworkWiring.make(testActorSystem)
 
   override protected def afterAll(): Unit = {
+    wiring.actorRuntime.shutdown(TestFinishedReason).await
     shutdown()
     stopSentinel(sentinel, server)
   }
 
   test("should be able to publish and subscribe to events") {
-    val wiring: FrameworkWiring = FrameworkWiring.make(testActorSystem)
-    val containerRef            = Container.spawn(ConfigFactory.load("container_tracking_connections.conf"), wiring).await
+    val containerRef = Container.spawn(ConfigFactory.load("container_tracking_connections.conf"), wiring).await
 
     val assemblyProbe                = TestInbox[CurrentState]()
     val containerLifecycleStateProbe = TestProbe[ContainerLifecycleState]("container-lifecycle-state-probe")
-    FrameworkAssertions.assertThatContainerIsRunning(containerRef, containerLifecycleStateProbe, 5.seconds)
+    assertThatContainerIsRunning(containerRef, containerLifecycleStateProbe, 5.seconds)
 
     val filterAssemblyLocation = wiring.locationService.find(filterAssemblyConnection).await
     val disperserHcdLocation   = wiring.locationService.find(disperserHcdConnection).await
