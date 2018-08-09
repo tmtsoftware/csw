@@ -1,8 +1,12 @@
 package csw.services.alarm.client.internal
 
 import com.typesafe.config.ConfigFactory
-import csw.services.alarm.api.exceptions.{InactiveAlarmException, InvalidSeverityException, KeyNotFoundException}
-import csw.services.alarm.api.internal.SeverityKey
+import csw.services.alarm.api.exceptions.{
+  InactiveAlarmException,
+  InvalidSeverityException,
+  KeyNotFoundException,
+  ResetOperationNotAllowed
+}
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, UnAcknowledged}
 import csw.services.alarm.api.models.AlarmHealth.Bad
 import csw.services.alarm.api.models.AlarmSeverity._
@@ -297,7 +301,7 @@ class AlarmServiceImplTest extends AlarmServiceTestSetup {
     // set current severity to okay, latched severity is also okay since alarm is un-latchable, alarm is acknowledged
     val status1 = setSeverityAndGetStatus(cpuExceededAlarm, Okay)
 
-    // reset the alarm, which will make alarm to go to un-acknowledged, latched severity was already okay so no change there
+    // reset the alarm, which will make alarm to go to acknowledged, un-latched severity was already okay so no change there
     alarmService.reset(cpuExceededAlarm).await
     val statusAfterReset1 = alarmService.getStatus(cpuExceededAlarm).await
 
@@ -305,20 +309,55 @@ class AlarmServiceImplTest extends AlarmServiceTestSetup {
     statusAfterReset1.alarmTime.get.time shouldEqual status1.alarmTime.get.time
   }
 
-  //  test("reset should throw exception if key does not exist") {
-  //    val invalidAlarm = AlarmKey("invalid", "invalid", "invalid")
-  //    intercept[KeyNotFoundException] {
-  //      alarmService.reset(invalidAlarm)
-  //    }
-  //  }
-  //
-  //  test("reset should throw exception if severity is not okay") {
-  //    val tromboneAxisLowLimitAlarm = AlarmKey("nfiraos", "trombone", "tromboneAxisLowLimitAlarm")
-  //    intercept[ResetOperationNotAllowed] {
-  //      alarmService.reset(tromboneAxisLowLimitAlarm)
-  //    }
-  //  }
-  //
+  // DEOPSCSW-447: Reset api for alarm
+  test("reset should set the alarm status to Unlatched Okay and Acknowledged when alarm is not latchable") {
+    // un-latchable, auto-acknowledgable alarm
+    val cpuExceededAlarm = AlarmKey("TCS", "tcsPk", "cpuExceededAlarm")
+
+    // set current severity to okay, latched severity is also okay since alarm is un-latchable, alarm is acknowledged
+    alarmService.setSeverity(cpuExceededAlarm, Okay).await
+
+    alarmService.reset(cpuExceededAlarm).await
+    val status = alarmService.getStatus(cpuExceededAlarm).await
+    status.latchedSeverity shouldEqual Okay
+    status.latchStatus shouldEqual UnLatched
+    status.acknowledgementStatus shouldEqual Acknowledged
+  }
+
+  // DEOPSCSW-447: Reset api for alarm
+  test("reset should set the alarm status to Latched Okay and Acknowledged when alarm is latchable") {
+    // latchable, not auto-acknowledgable alarm
+    val lowLimitAlarmKey = AlarmKey("nfiraos", "trombone", "tromboneAxisLowLimitAlarm")
+
+    // set latched severity to Warning which will result status to be Latched and UnAcknowledged
+    alarmService.setSeverity(lowLimitAlarmKey, Warning).await
+
+    // set current severity to Okay
+    alarmService.setSeverity(lowLimitAlarmKey, Okay).await
+
+    alarmService.reset(lowLimitAlarmKey).await
+    val status = alarmService.getStatus(lowLimitAlarmKey).await
+    status.latchedSeverity shouldEqual Okay
+    status.latchStatus shouldEqual Latched
+    status.acknowledgementStatus shouldEqual Acknowledged
+  }
+
+  // DEOPSCSW-447: Reset api for alarm
+  test("reset should throw exception if key does not exist") {
+    val invalidAlarm = AlarmKey("invalid", "invalid", "invalid")
+    intercept[KeyNotFoundException] {
+      alarmService.reset(invalidAlarm).await
+    }
+  }
+
+  // DEOPSCSW-447: Reset api for alarm
+  test("reset should throw exception if severity is not okay") {
+    val tromboneAxisLowLimitAlarm = AlarmKey("nfiraos", "trombone", "tromboneAxisLowLimitAlarm")
+    intercept[ResetOperationNotAllowed] {
+      alarmService.reset(tromboneAxisLowLimitAlarm).await
+    }
+  }
+
   //  test("getStatus should throw exception if key does not exist") {
   //    val invalidAlarm = AlarmKey("invalid", "invalid", "invalid")
   //    intercept[KeyNotFoundException] {

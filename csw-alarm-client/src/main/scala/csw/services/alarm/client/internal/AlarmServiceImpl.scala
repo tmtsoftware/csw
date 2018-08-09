@@ -150,15 +150,16 @@ class AlarmServiceImpl(
     val metadataApi = await(metadataApiF)
     val statusApi   = await(statusApiF)
 
-    if (await(metadataApi.exists(key))) {
+    val maybeMetadata = await(metadataApi.get(key))
+    if (maybeMetadata.isDefined) {
       val currentSeverity = await(getCurrentSeverity(key))
       if (currentSeverity != Okay) logAndThrow(ResetOperationNotAllowed(key, currentSeverity))
 
       val status = await(statusApi.get(key)).getOrElse(AlarmStatus())
       if (status.acknowledgementStatus == Acknowledged || status.latchStatus == Latched || status.latchedSeverity != Okay) {
         val resetStatus = status.copy(
-          acknowledgementStatus = UnAcknowledged,
-          latchStatus = UnLatched,
+          acknowledgementStatus = Acknowledged,
+          latchStatus = if (maybeMetadata.get.isLatchable) Latched else UnLatched,
           latchedSeverity = Okay,
           alarmTime = alarmTime(status)
         )
