@@ -1,7 +1,9 @@
 package csw.services.alarm.client.internal.redis
 
+import csw.services.alarm.api.internal.{MetadataKey, SeverityKey, StatusKey}
+import csw.services.alarm.api.models.{AlarmMetadata, AlarmSeverity, AlarmStatus}
 import csw.services.alarm.client.internal.AlarmCodec
-import csw.services.alarm.client.internal.AlarmCodec.StringCodec
+import csw.services.alarm.client.internal.AlarmCodec.{MetadataCodec, SeverityCodec, StatusCodec, StringCodec}
 import csw.services.alarm.client.internal.commons.serviceresolver.AlarmServiceResolver
 import io.lettuce.core.api.async.RedisAsyncCommands
 import io.lettuce.core.pubsub.api.reactive.RedisPubSubReactiveCommands
@@ -14,6 +16,10 @@ import scala.concurrent.{ExecutionContext, Future}
 class RedisConnectionsFactory(redisClient: RedisClient, alarmServiceResolver: AlarmServiceResolver, masterId: String)(
     implicit val ec: ExecutionContext
 ) {
+
+  lazy val metadataApiF: Future[RedisAsyncScalaApi[MetadataKey, AlarmMetadata]] = wrappedAsyncConnection(MetadataCodec)
+  lazy val severityApiF: Future[RedisAsyncScalaApi[SeverityKey, AlarmSeverity]] = wrappedAsyncConnection(SeverityCodec)
+  lazy val statusApiF: Future[RedisAsyncScalaApi[StatusKey, AlarmStatus]]       = wrappedAsyncConnection(StatusCodec)
 
   def asyncConnection[K, V](alarmCodec: AlarmCodec[K, V]): Future[RedisAsyncCommands[K, V]] =
     redisURI.flatMap(redisUri ⇒ redisClient.connectAsync(alarmCodec, redisUri).toScala.map(_.async()))

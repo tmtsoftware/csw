@@ -3,7 +3,6 @@ package csw.framework.integration
 import akka.actor.testkit.typed.scaladsl.{TestInbox, TestProbe}
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
-import csw.common.FrameworkAssertions
 import csw.common.FrameworkAssertions.assertThatContainerIsRunning
 import csw.common.components.framework.SampleComponentState._
 import csw.commons.redis.EmbeddedRedis

@@ -1,6 +1,5 @@
 package csw.services.alarm.client.internal
 
-import akka.actor.ActorSystem
 import akka.actor.typed.ActorRef
 import com.typesafe.config.Config
 import csw.services.alarm.api.models.Key.AlarmKey
@@ -16,7 +15,7 @@ class AlarmServiceImpl(
     statusService: StatusService,
     metadataService: MetadataService,
     severityService: SeverityService
-)(implicit actorSystem: ActorSystem, ec: ExecutionContext)
+)(implicit ec: ExecutionContext)
     extends AlarmAdminService {
 
   override def initAlarms(inputConfig: Config, reset: Boolean): Future[Unit] = metadataService.initAlarms(inputConfig, reset)

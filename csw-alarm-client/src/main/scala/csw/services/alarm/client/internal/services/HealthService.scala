@@ -16,6 +16,7 @@ class HealthService(
     severityService: SeverityService
 )(implicit actorSystem: ActorSystem) {
   import redisConnectionsFactory._
+
   private val log                     = AlarmServiceLogger.getLogger
   implicit lazy val mat: Materializer = ActorMaterializer()
 

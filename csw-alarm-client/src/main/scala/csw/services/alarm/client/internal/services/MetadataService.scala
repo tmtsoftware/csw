@@ -4,22 +4,17 @@ import com.typesafe.config.Config
 import csw.services.alarm.api.exceptions.KeyNotFoundException
 import csw.services.alarm.api.internal.{MetadataKey, StatusKey}
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
-import csw.services.alarm.api.models.{AlarmMetadata, AlarmMetadataSet, AlarmStatus, Key}
 import csw.services.alarm.api.models.Key.{AlarmKey, GlobalKey}
-import csw.services.alarm.client.internal.AlarmCodec.{MetadataCodec, SeverityCodec, StatusCodec}
+import csw.services.alarm.api.models.{AlarmMetadata, AlarmMetadataSet, AlarmStatus, Key}
 import csw.services.alarm.client.internal.AlarmServiceLogger
 import csw.services.alarm.client.internal.configparser.ConfigParser
 import csw.services.alarm.client.internal.redis.RedisConnectionsFactory
 
 import scala.async.Async.{async, await}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class MetadataService(redisConnectionsFactory: RedisConnectionsFactory) {
-
   import redisConnectionsFactory._
-  private lazy val metadataApiF = wrappedAsyncConnection(MetadataCodec)
-  private lazy val severityApiF = wrappedAsyncConnection(SeverityCodec)
-  private lazy val statusApiF   = wrappedAsyncConnection(StatusCodec)
 
   private val log = AlarmServiceLogger.getLogger
 

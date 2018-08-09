@@ -8,14 +8,12 @@ import csw.services.alarm.api.exceptions.{InactiveAlarmException, InvalidSeverit
 import csw.services.alarm.api.internal.{SeverityKey, StatusKey}
 import csw.services.alarm.api.models.AlarmSeverity.Disconnected
 import csw.services.alarm.api.models.Key.AlarmKey
-import csw.services.alarm.api.models.{AlarmSeverity, AlarmStatus, Key}
+import csw.services.alarm.api.models.{AlarmSeverity, Key}
 import csw.services.alarm.api.scaladsl.AlarmSubscription
-import csw.services.alarm.client.internal.AlarmCodec.{MetadataCodec, SeverityCodec, StatusCodec}
 import csw.services.alarm.client.internal.commons.Settings
 import csw.services.alarm.client.internal.redis.RedisConnectionsFactory
 import csw.services.alarm.client.internal.{AlarmCodec, AlarmServiceLogger}
 import reactor.core.publisher.FluxSink.OverflowStrategy
-import romaine.RedisAsyncScalaApi
 
 import scala.async.Async.{async, await}
 import scala.concurrent.Future
@@ -26,11 +24,9 @@ class SeverityService(
     settings: Settings
 )(implicit actorSystem: ActorSystem) {
   import redisConnectionsFactory._
-  implicit val mat: Materializer                                                    = ActorMaterializer()
-  private val log                                                                   = AlarmServiceLogger.getLogger
-  private lazy val metadataApiF                                                     = wrappedAsyncConnection(MetadataCodec)
-  private lazy val severityApiF                                                     = wrappedAsyncConnection(SeverityCodec)
-  protected lazy val statusApiF: Future[RedisAsyncScalaApi[StatusKey, AlarmStatus]] = wrappedAsyncConnection(StatusCodec)
+
+  private val log                = AlarmServiceLogger.getLogger
+  implicit val mat: Materializer = ActorMaterializer()
 
   def getAggregatedSeverity(key: Key): Future[AlarmSeverity] = async {
     log.debug(s"Get aggregated severity for alarm [${key.value}]")
@@ -67,7 +63,7 @@ class SeverityService(
 
   def setCurrentSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Unit] = async {
     log.debug(
-      s"Setting severity [${severity.name}] for alarm [${key.value}] with expire timeout [$settings.ttlInSeconds] seconds"
+      s"Setting severity [${severity.name}] for alarm [${key.value}] with expire timeout [${settings.ttlInSeconds}] seconds"
     )
 
     // get alarm metadata

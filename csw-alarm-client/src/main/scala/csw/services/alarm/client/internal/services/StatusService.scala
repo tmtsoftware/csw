@@ -1,14 +1,13 @@
 package csw.services.alarm.client.internal.services
 
 import akka.actor.ActorSystem
-import csw.services.alarm.api.exceptions.{InvalidSeverityException, KeyNotFoundException, ResetOperationNotAllowed}
+import csw.services.alarm.api.exceptions.{KeyNotFoundException, ResetOperationNotAllowed}
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, UnAcknowledged}
-import csw.services.alarm.api.models.AlarmSeverity.{Disconnected, Okay}
-import csw.services.alarm.api.models.{AcknowledgementStatus, AlarmSeverity, AlarmStatus, AlarmTime}
+import csw.services.alarm.api.models.AlarmSeverity.Okay
 import csw.services.alarm.api.models.Key.AlarmKey
 import csw.services.alarm.api.models.LatchStatus.{Latched, UnLatched}
 import csw.services.alarm.api.models.ShelveStatus.{Shelved, UnShelved}
-import csw.services.alarm.client.internal.AlarmCodec.{MetadataCodec, SeverityCodec, StatusCodec}
+import csw.services.alarm.api.models.{AcknowledgementStatus, AlarmSeverity, AlarmStatus, AlarmTime}
 import csw.services.alarm.client.internal.AlarmServiceLogger
 import csw.services.alarm.client.internal.commons.Settings
 import csw.services.alarm.client.internal.redis.RedisConnectionsFactory
@@ -16,21 +15,19 @@ import csw.services.alarm.client.internal.shelve.ShelveTimeoutActorFactory
 import csw.services.alarm.client.internal.shelve.ShelveTimeoutMessage.{CancelShelveTimeout, ScheduleShelveTimeout}
 
 import scala.async.Async.{async, await}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
-class StatusService(redisConnectionsFactory: RedisConnectionsFactory,
-                    shelveTimeoutActorFactory: ShelveTimeoutActorFactory,
-                    metadataService: MetadataService,
-                    severityService: SeverityService,
-                    settings: Settings)(implicit actorSystem: ActorSystem) {
-
+class StatusService(
+    redisConnectionsFactory: RedisConnectionsFactory,
+    shelveTimeoutActorFactory: ShelveTimeoutActorFactory,
+    metadataService: MetadataService,
+    severityService: SeverityService,
+    settings: Settings
+)(implicit actorSystem: ActorSystem) {
   import redisConnectionsFactory._
-  private lazy val statusApiF       = wrappedAsyncConnection(StatusCodec)
-  private lazy val metadataApiF     = wrappedAsyncConnection(MetadataCodec)
-  private lazy val severityApiF     = wrappedAsyncConnection(SeverityCodec)
-  private lazy val shelveTimeoutRef = shelveTimeoutActorFactory.make(key ⇒ unShelve(key, cancelShelveTimeout = false))
 
-  private val log = AlarmServiceLogger.getLogger
+  private val log                   = AlarmServiceLogger.getLogger
+  private lazy val shelveTimeoutRef = shelveTimeoutActorFactory.make(key ⇒ unShelve(key, cancelShelveTimeout = false))
 
   def getStatus(key: AlarmKey): Future[AlarmStatus] = async {
     val statusApi = await(statusApiF)
@@ -51,14 +48,14 @@ class StatusService(redisConnectionsFactory: RedisConnectionsFactory,
     val maybeMetadata = await(metadataApi.get(key))
 
     maybeMetadata match {
-      case Some(_) ⇒
+      case Some(metadata) ⇒
         val currentSeverity = await(severityService.getCurrentSeverity(key))
         if (currentSeverity != Okay) logAndThrow(ResetOperationNotAllowed(key, currentSeverity))
 
         val status = await(statusApi.get(key)).getOrElse(AlarmStatus())
         val resetStatus = status.copy(
           acknowledgementStatus = Acknowledged,
-          latchStatus = if (maybeMetadata.get.isLatchable) Latched else UnLatched,
+          latchStatus = if (metadata.isLatchable) Latched else UnLatched,
           latchedSeverity = Okay,
           alarmTime = alarmTime(status)
         )
@@ -82,9 +79,11 @@ class StatusService(redisConnectionsFactory: RedisConnectionsFactory,
   // this will most likely be called when operator manually un-shelves an already shelved alarm
   def unShelve(key: AlarmKey): Future[Unit] = unShelve(key, cancelShelveTimeout = true)
 
-  private[alarm] def updateStatusForSeverity(key: AlarmKey,
-                                             severity: AlarmSeverity,
-                                             previousSeverity: AlarmSeverity): Future[Unit] = async {
+  private[alarm] def updateStatusForSeverity(
+      key: AlarmKey,
+      severity: AlarmSeverity,
+      previousSeverity: AlarmSeverity
+  ): Future[Unit] = async {
     // get alarm metadata
     val alarm = await(metadataService.getMetadata(key))
 
