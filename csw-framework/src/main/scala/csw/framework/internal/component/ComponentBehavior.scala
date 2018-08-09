@@ -208,7 +208,6 @@ private[framework] final class ComponentBehavior(
             commandResponseManager.commandResponseManagerActor ! AddOrUpdateCommand(commandMessage.command.runId,
                                                                                     Started(commandMessage.command.runId))
             val submitResponse: SubmitResponse = lifecycleHandlers.onSubmit(commandMessage.command)
-
             // The response is used to update the CRM, it may still be Started it if is a long running command
             commandResponseManager.commandResponseManagerActor ! AddOrUpdateCommand(commandMessage.command.runId, submitResponse)
             su.replyTo ! submitResponse
