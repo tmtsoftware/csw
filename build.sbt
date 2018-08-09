@@ -231,7 +231,10 @@ lazy val `csw-alarm-client` = project
   .settings(libraryDependencies ++= Dependencies.AlarmClient)
 
 lazy val `csw-alarm-cli` = project
-  .dependsOn(`csw-alarm-client`)
+  .dependsOn(
+    `csw-alarm-client`,
+    `csw-config-client`
+  )
   .enablePlugins(DeployApp)
   .settings(libraryDependencies ++= Dependencies.AlarmCli)
 

@@ -5,7 +5,7 @@ import scopt.OptionParser
 import csw.services.BuildInfo
 
 class ArgsParser(name: String) {
-  val parser: OptionParser[Options] = new scopt.OptionParser[Options](name) {
+  val parser: OptionParser[CommandLineArgs] = new scopt.OptionParser[CommandLineArgs](name) {
     head(name, BuildInfo.version)
 
     cmd("init")
@@ -25,5 +25,5 @@ class ArgsParser(name: String) {
       }
   }
 
-  def parse(args: Seq[String]): Option[Options] = parser.parse(args, Options())
+  def parse(args: Seq[String]): Option[CommandLineArgs] = parser.parse(args, CommandLineArgs())
 }
