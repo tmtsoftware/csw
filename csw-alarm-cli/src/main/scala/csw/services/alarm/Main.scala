@@ -5,9 +5,6 @@ import csw.services.alarm.cli.wiring.Wiring
 import csw.services.location.commons.{ActorSystemFactory, ClusterAwareSettings}
 import csw.services.logging.scaladsl.LoggingSystemFactory
 
-import scala.concurrent.Await
-import scala.concurrent.duration.Duration
-
 // $COVERAGE-OFF$
 object Main extends App {
   private val name: String = BuildInfo.name
