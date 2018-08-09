@@ -228,7 +228,7 @@ class AlarmServiceImpl(
     val severityValues = await(severityApi.mget(severityKeys))
     val severityList = severityValues.collect {
       case kv if kv.hasValue => kv.getValue
-      case kv                => Disconnected
+      case _                 => Disconnected
     }
 
     severityList.reduceRight((previous, current: AlarmSeverity) ⇒ previous max current)

@@ -12,14 +12,14 @@ import csw.services.alarm.client.internal.helpers.TestFutureExt.RichFuture
 // DEOPSCSW-486: Provide API to load alarm metadata in Alarm store from file
 class InitAlarmStoreTest extends AlarmServiceTestSetup {
 
-  val threeAlarmsConfig: Config = ConfigFactory.parseResources("test-alarms/valid-alarms.conf")
-  val twoAlarmsConfig: Config   = ConfigFactory.parseResources("test-alarms/two-valid-alarms.conf")
+  val fourAlarmsConfig: Config = ConfigFactory.parseResources("test-alarms/valid-alarms.conf")
+  val twoAlarmsConfig: Config  = ConfigFactory.parseResources("test-alarms/two-valid-alarms.conf")
 
   test("should load alarms from provided config file") {
-    alarmService.initAlarms(threeAlarmsConfig).await
+    alarmService.initAlarms(fourAlarmsConfig).await
 
-    // valid-alarms.conf contains 3 alarms
-    alarmService.getMetadata(GlobalKey).await.size shouldBe 3
+    // valid-alarms.conf contains 4 alarms
+    alarmService.getMetadata(GlobalKey).await.size shouldBe 4
 
     alarmService.getMetadata(tromboneAxisHighLimitAlarmKey).await shouldBe tromboneAxisHighLimitAlarm
     alarmService.getStatus(tromboneAxisHighLimitAlarmKey).await shouldBe AlarmStatus()
@@ -30,9 +30,9 @@ class InitAlarmStoreTest extends AlarmServiceTestSetup {
   }
 
   test("should reset the previous alarm data in redis and load with newly provided") {
-    // valid-alarms.conf contains 3 alarms, cpuExceededAlarm is one of them
-    alarmService.initAlarms(threeAlarmsConfig, reset = true).await
-    alarmService.getMetadata(GlobalKey).await.size shouldBe 3
+    // valid-alarms.conf contains 4 alarms, cpuExceededAlarm is one of them
+    alarmService.initAlarms(fourAlarmsConfig, reset = true).await
+    alarmService.getMetadata(GlobalKey).await.size shouldBe 4
     alarmService.getMetadata(cpuExceededAlarmKey).await shouldBe cpuExceededAlarm
     alarmService.getMetadata(tromboneAxisHighLimitAlarmKey).await shouldBe tromboneAxisHighLimitAlarm
 
@@ -69,8 +69,8 @@ class InitAlarmStoreTest extends AlarmServiceTestSetup {
 
   test("initAlarm with reset=false should preserve existing alarm keys") {
     // cpuExceededAlarm present in this file
-    alarmService.initAlarms(threeAlarmsConfig, reset = true).await
-    alarmService.getMetadata(GlobalKey).await.size shouldBe 3
+    alarmService.initAlarms(fourAlarmsConfig, reset = true).await
+    alarmService.getMetadata(GlobalKey).await.size shouldBe 4
     alarmService.getMetadata(cpuExceededAlarmKey).await shouldBe cpuExceededAlarm
 
     // update tromboneAxisLowLimitAlarmKey
@@ -78,7 +78,7 @@ class InitAlarmStoreTest extends AlarmServiceTestSetup {
 
     // cpuExceededAlarm does not present in this file, but reset=false, it is preserved
     alarmService.initAlarms(twoAlarmsConfig).await
-    alarmService.getMetadata(GlobalKey).await.size shouldBe 3
+    alarmService.getMetadata(GlobalKey).await.size shouldBe 4
     alarmService.getMetadata(cpuExceededAlarmKey).await shouldBe cpuExceededAlarm
 
     // current severity will be expired at it's time and will be inferred disconnected

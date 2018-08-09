@@ -1,7 +1,7 @@
 package csw.services.alarm.client.internal.configparser
 import com.typesafe.config.ConfigFactory
 import csw.services.alarm.api.exceptions.ConfigParseException
-import csw.services.alarm.api.models.ActivationStatus.Active
+import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
 import csw.services.alarm.api.models.AlarmSeverity._
 import csw.services.alarm.api.models.AlarmType.Absolute
 import csw.services.alarm.api.models.{AlarmMetadata, AlarmType}
@@ -57,6 +57,20 @@ class ConfigParserTest extends FunSuite with Matchers {
         isAutoAcknowledgeable = true,
         isLatchable = false,
         activationStatus = Active
+      ),
+      AlarmMetadata(
+        subsystem = "LGSF",
+        component = "tcsPkInactive",
+        name = "cpuIdleAlarm",
+        description = "This alarm is activated CPU is idle",
+        location = "in computer...",
+        alarmType = Absolute,
+        supportedSeverities = Set(Indeterminate, Okay, Warning, Major, Critical),
+        probableCause = "too fast...",
+        operatorResponse = "slow it down...",
+        isAutoAcknowledgeable = true,
+        isLatchable = false,
+        activationStatus = Inactive
       )
     )
 
