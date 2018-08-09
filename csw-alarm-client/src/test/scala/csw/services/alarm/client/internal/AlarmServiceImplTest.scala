@@ -23,7 +23,7 @@ class AlarmServiceImplTest extends AlarmServiceTestSetup {
   // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
   test("setSeverity should set severity") {
     //set severity to Major
-    val status = setSeverity(tromboneAxisHighLimitAlarmKey, Major)
+    val status = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Major)
     status.acknowledgementStatus shouldBe Acknowledged
     status.latchStatus shouldBe Latched
     status.latchedSeverity shouldBe Major
@@ -41,6 +41,14 @@ class AlarmServiceImplTest extends AlarmServiceTestSetup {
   }
 
   // DEOPSCSW-444: Set severity api for component
+  test("setSeverity should throw KeyNotFoundException when tried to set severity for key which does not exists in alarm store") {
+    val invalidKey = AlarmKey("bad", "trombone", "fakeAlarm")
+    intercept[KeyNotFoundException] {
+      alarmService.setSeverity(invalidKey, AlarmSeverity.Critical).await
+    }
+  }
+
+  // DEOPSCSW-444: Set severity api for component
   test("setSeverity should throw InvalidSeverityException when unsupported severity is provided") {
     intercept[InvalidSeverityException] {
       alarmService.setSeverity(tromboneAxisHighLimitAlarmKey, AlarmSeverity.Critical).await
@@ -50,20 +58,20 @@ class AlarmServiceImplTest extends AlarmServiceTestSetup {
   // DEOPSCSW-444: Set severity api for component
   // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
   test("setSeverity should latch alarm only when it is high risk and higher than latched severity in case of latchable alarms") {
-    val status = setSeverity(tromboneAxisHighLimitAlarmKey, Major)
+    val status = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Major)
 
     status.acknowledgementStatus shouldBe Acknowledged
     status.latchStatus shouldBe Latched
     status.latchedSeverity shouldBe Major
     status.alarmTime.isDefined shouldBe true
 
-    val status1 = setSeverity(tromboneAxisHighLimitAlarmKey, Warning)
+    val status1 = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Warning)
     status1.acknowledgementStatus shouldBe Acknowledged
     status1.latchStatus shouldBe Latched
     status1.latchedSeverity shouldBe Major
     status1.alarmTime.get.time shouldEqual status.alarmTime.get.time
 
-    val status2 = setSeverity(tromboneAxisHighLimitAlarmKey, Okay)
+    val status2 = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Okay)
     status2.acknowledgementStatus shouldBe Acknowledged
     status2.latchStatus shouldBe Latched
     status2.latchedSeverity shouldBe Major
@@ -73,14 +81,13 @@ class AlarmServiceImplTest extends AlarmServiceTestSetup {
   // DEOPSCSW-444: Set severity api for component
   // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
   test("setSeverity should not latch alarm if it is not latchable") {
-    val cpuExceededAlarm = AlarmKey("TCS", "tcsPk", "cpuExceededAlarm")
-    val status           = setSeverity(cpuExceededAlarm, Critical)
+    val status = setSeverityAndGetStatus(cpuExceededAlarmKey, Critical)
     status.acknowledgementStatus shouldBe Acknowledged
     status.latchStatus shouldBe UnLatched
     status.latchedSeverity shouldBe Critical
     status.alarmTime.isDefined shouldBe true
 
-    val status1 = setSeverity(cpuExceededAlarm, Indeterminate)
+    val status1 = setSeverityAndGetStatus(cpuExceededAlarmKey, Indeterminate)
     status1.acknowledgementStatus shouldBe Acknowledged
     status1.latchStatus shouldBe UnLatched
     status1.latchedSeverity shouldBe Indeterminate
@@ -89,7 +96,7 @@ class AlarmServiceImplTest extends AlarmServiceTestSetup {
 
   // DEOPSCSW-444: Set severity api for component
   test("setSeverity should auto-acknowledge alarm only when it is auto-acknowledgable") {
-    val status = setSeverity(tromboneAxisLowLimitAlarmKey, Major)
+    val status = setSeverityAndGetStatus(tromboneAxisLowLimitAlarmKey, Major)
     status.acknowledgementStatus shouldBe UnAcknowledged
     status.latchStatus shouldBe Latched
     status.latchedSeverity shouldBe Major
@@ -102,10 +109,10 @@ class AlarmServiceImplTest extends AlarmServiceTestSetup {
     val highLimitAlarmKey = AlarmKey("nfiraos", "trombone", "tromboneAxisHighLimitAlarm")
 
     // latch it to major
-    val status = setSeverity(highLimitAlarmKey, Major)
+    val status = setSeverityAndGetStatus(highLimitAlarmKey, Major)
 
     // set the severity again to mimic alarm refreshing
-    val status1 = setSeverity(highLimitAlarmKey, Major)
+    val status1 = setSeverityAndGetStatus(highLimitAlarmKey, Major)
 
     status.alarmTime.get.time shouldEqual status1.alarmTime.get.time
   }
@@ -116,10 +123,10 @@ class AlarmServiceImplTest extends AlarmServiceTestSetup {
     val cpuExceededAlarm = AlarmKey("TCS", "tcsPk", "cpuExceededAlarm")
 
     // set severity to major
-    val status = setSeverity(cpuExceededAlarm, Major)
+    val status = setSeverityAndGetStatus(cpuExceededAlarm, Major)
 
     // set the severity again to mimic alarm refreshing
-    val status1 = setSeverity(cpuExceededAlarm, Major)
+    val status1 = setSeverityAndGetStatus(cpuExceededAlarm, Major)
 
     status.alarmTime.get.time shouldEqual status1.alarmTime.get.time
   }
@@ -197,10 +204,10 @@ class AlarmServiceImplTest extends AlarmServiceTestSetup {
     val highLimitAlarmKey = AlarmKey("nfiraos", "trombone", "tromboneAxisHighLimitAlarm")
 
     // latch it to major
-    setSeverity(highLimitAlarmKey, Major)
+    setSeverityAndGetStatus(highLimitAlarmKey, Major)
 
     // set the current severity to okay, latched severity is still at major
-    val status = setSeverity(highLimitAlarmKey, Okay)
+    val status = setSeverityAndGetStatus(highLimitAlarmKey, Okay)
 
     // reset the alarm, which sets the latched severity to okay
     alarmService.reset(highLimitAlarmKey).await
@@ -215,7 +222,7 @@ class AlarmServiceImplTest extends AlarmServiceTestSetup {
     val lowLimitAlarmKey = AlarmKey("nfiraos", "trombone", "tromboneAxisLowLimitAlarm")
 
     // latch it to okay
-    val status = setSeverity(lowLimitAlarmKey, Okay)
+    val status = setSeverityAndGetStatus(lowLimitAlarmKey, Okay)
 
     alarmService.acknowledge(lowLimitAlarmKey).await
 
@@ -232,7 +239,7 @@ class AlarmServiceImplTest extends AlarmServiceTestSetup {
     val cpuExceededAlarm = AlarmKey("TCS", "tcsPk", "cpuExceededAlarm")
 
     // set current severity to okay, latched severity is also okay since alarm is un-latchable, alarm is acknowledged
-    val status1 = setSeverity(cpuExceededAlarm, Okay)
+    val status1 = setSeverityAndGetStatus(cpuExceededAlarm, Okay)
 
     // reset the alarm, which will make alarm to go to un-acknowledged, latched severity was already okay so no change there
     alarmService.reset(cpuExceededAlarm).await
@@ -272,7 +279,7 @@ class AlarmServiceImplTest extends AlarmServiceTestSetup {
   //    }
   //  }
   //
-  private def setSeverity(alarmKey: AlarmKey, alarmSeverity: AlarmSeverity): AlarmStatus = {
+  private def setSeverityAndGetStatus(alarmKey: AlarmKey, alarmSeverity: AlarmSeverity): AlarmStatus = {
     alarmService.setSeverity(alarmKey, alarmSeverity).await
     testStatusApi.get(alarmKey).await.get
   }
