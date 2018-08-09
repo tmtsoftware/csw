@@ -24,6 +24,7 @@ import csw.services.alarm.client.internal.AlarmCodec.{MetadataCodec, SeverityCod
 import csw.services.alarm.client.internal.commons.Settings
 import csw.services.alarm.client.internal.configparser.ConfigParser
 import csw.services.alarm.client.internal.redis.RedisConnectionsFactory
+import csw.services.alarm.client.internal.services.HealthService
 import csw.services.alarm.client.internal.shelve.ShelveTimeoutActorFactory
 import csw.services.alarm.client.internal.shelve.ShelveTimeoutMessage.{CancelShelveTimeout, ScheduleShelveTimeout}
 import reactor.core.publisher.FluxSink.OverflowStrategy
@@ -34,7 +35,8 @@ import scala.concurrent.Future
 class AlarmServiceImpl(
     redisConnectionsFactory: RedisConnectionsFactory,
     shelveTimeoutActorFactory: ShelveTimeoutActorFactory,
-    settings: Settings
+    settings: Settings,
+    healthService: HealthService
 )(implicit actorSystem: ActorSystem)
     extends AlarmAdminService {
 
@@ -225,9 +227,8 @@ class AlarmServiceImpl(
     severityList.reduceRight((previous, current: AlarmSeverity) ⇒ previous max current)
   }
 
-  override def getAggregatedHealth(key: Key): Future[AlarmHealth] = {
-    log.debug(s"Get aggregated health for alarm [${key.value}]")
-    getAggregatedSeverity(key).map(AlarmHealth.fromSeverity)
+  override def getAggregatedHealth(key: Key): Future[AlarmHealth] = async {
+    await(healthService.getAggregatedHealth(key))
   }
 
   override def subscribeAggregatedSeverityCallback(key: Key, callback: AlarmSeverity ⇒ Unit): AlarmSubscription = {
@@ -238,11 +239,7 @@ class AlarmServiceImpl(
   }
 
   override def subscribeAggregatedHealthCallback(key: Key, callback: AlarmHealth ⇒ Unit): AlarmSubscription = {
-    log.debug(s"Subscribe aggregated health for alarm [${key.value}] with a callback")
-    subscribeAggregatedSeverity(key)
-      .map(AlarmHealth.fromSeverity)
-      .to(Sink.foreach(callback))
-      .run()
+    healthService.subscribeAggregatedHealthCallback(key, callback)
   }
 
   override def subscribeAggregatedSeverityActorRef(key: Key, actorRef: ActorRef[AlarmSeverity]): AlarmSubscription = {
@@ -251,8 +248,7 @@ class AlarmServiceImpl(
   }
 
   override def subscribeAggregatedHealthActorRef(key: Key, actorRef: ActorRef[AlarmHealth]): AlarmSubscription = {
-    log.debug(s"Subscribe aggregated health for alarm [${key.value}] with an actor")
-    subscribeAggregatedHealthCallback(key, actorRef ! _)
+    healthService.subscribeAggregatedHealthActorRef(key, actorRef)
   }
 
   override private[alarm] def unAcknowledge(key: AlarmKey): Future[Unit] = setAcknowledgeStatus(key, UnAcknowledged)

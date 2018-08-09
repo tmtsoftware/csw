@@ -18,7 +18,7 @@ import reactor.core.publisher.FluxSink.OverflowStrategy
 import romaine.RedisAsyncScalaApi
 
 import scala.async.Async.{async, await}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class SeverityService(
     redisConnectionsFactory: RedisConnectionsFactory,
@@ -47,7 +47,7 @@ class SeverityService(
     val severityValues = await(severityApi.mget(severityKeys))
     val severityList = severityValues.collect {
       case kv if kv.hasValue => kv.getValue
-      case kv                => Disconnected
+      case _                 => Disconnected
     }
 
     severityList.reduceRight((previous, current: AlarmSeverity) ⇒ previous max current)

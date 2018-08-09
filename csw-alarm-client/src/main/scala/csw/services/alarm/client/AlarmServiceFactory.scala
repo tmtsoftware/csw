@@ -13,6 +13,7 @@ import csw.services.alarm.client.internal.commons.serviceresolver.{
   AlarmServiceResolver
 }
 import csw.services.alarm.client.internal.redis.RedisConnectionsFactory
+import csw.services.alarm.client.internal.services.{HealthService, MetadataService, SeverityService}
 import csw.services.alarm.client.internal.shelve.ShelveTimeoutActorFactory
 import csw.services.alarm.client.internal.{AlarmServiceImpl, JAlarmServiceImpl}
 import csw.services.location.javadsl.ILocationService
@@ -59,10 +60,15 @@ class AlarmServiceFactory(redisClient: RedisClient = RedisClient.create()) {
       val settings                = new Settings(ConfigFactory.load())
       val redisConnectionsFactory = new RedisConnectionsFactory(redisClient, alarmServiceResolver, settings.masterId)
 
+      val metadataService = new MetadataService(redisConnectionsFactory)
+      val severityService = new SeverityService(redisConnectionsFactory, metadataService, settings)
+      val healthService   = new HealthService(redisConnectionsFactory, severityService)
+
       new AlarmServiceImpl(
         redisConnectionsFactory,
         new ShelveTimeoutActorFactory(),
-        settings
+        settings,
+        healthService
       )
     }
 }
