@@ -31,14 +31,16 @@ cd "$( dirname "${BASH_SOURCE[0]}" )"
 # Setting default values
 seed_port=5552
 config_port=5000
-event_port=26379
+sentinel_port=26379
 event_master_port=6379
+alarm_master_port=7379
 initSvnRepo=""
 
 # Always start cluster seed application
 shouldStartSeed=true
 shouldStartConfig=false
 shouldStartEvent=false
+shouldStartAlarm=false
 
 script_name=$0
 
@@ -56,15 +58,25 @@ seedPidFile=${logDir}/seed.pid
 configLogFile=${logDir}/config.log
 configPidFile=${logDir}/config.pid
 
-sentinelLogFile=${logDir}/event.log
-sentinelPidFile=${logDir}/event.pid
-sentinelPortFile=${logDir}/event.port
+sentinelLogFile=${logDir}/redis_sentinel.log
+sentinelPidFile=${logDir}/redis_sentinel.pid
+sentinelPortFile=${logDir}/redis_sentinel.port
 
-masterLogFile=${logDir}/event_master.log
-masterPidFile=${logDir}/event_master.pid
-masterPortFile=${logDir}/event_master.port
+eventMasterLogFile=${logDir}/event_master.log
+eventMasterPidFile=${logDir}/event_master.pid
+eventMasterPortFile=${logDir}/event_master.port
+
+alarmMasterLogFile=${logDir}/alarm_master.log
+alarmMasterPidFile=${logDir}/alarm_master.pid
+alarmMasterPortFile=${logDir}/alarm_master.port
+
+sentinelConf="../conf/redis-sentinel/sentinel.conf"
+eventMasterConf="../conf/event-service/master.conf"
+alarmMasterConf="../conf/alarm-service/master.conf"
 
 sortVersion="sort -V"
+
+location_agent_script="csw-location-agent"
 
 # Make sure we have the min redis version
 function get_version {
@@ -141,18 +153,44 @@ function start_config {
     fi
 }
 
+function start_sentinel() {
+    if [ -x "$location_agent_script" ]; then
+        if checkIfRedisIsInstalled ; then
+            echo "Starting Redis Sentinel..."
+            nohup ./csw-location-agent -DclusterSeeds=${seeds} --name "EventServer,AlarmServer" --command "$redisSentinel ${sentinelConf} --port ${sentinel_port}" --port "${sentinel_port}"> ${sentinelLogFile} 2>&1 &
+            echo $! > ${sentinelPidFile}
+            echo ${sentinel_port} > ${sentinelPortFile}
+        else
+            exit 1
+        fi
+    else
+        echo "[ERROR] $location_agent_script script does not exist, please make sure that $location_agent_script resides in same directory as $script_name"
+        exit 1
+    fi
+}
+
 function start_event() {
-    local location_agent_script="csw-cluster-seed"
+    echo "[EVENT] Starting Event Service..."
+    start_redis ${eventMasterConf} ${eventMasterLogFile} ${eventMasterPidFile} ${event_master_port} ${eventMasterPortFile}
+}
+
+function start_alarm() {
+    echo "[ALARM] Starting Alarm Service..."
+    start_redis ${alarmMasterConf} ${alarmMasterLogFile} ${alarmMasterPidFile} ${alarm_master_port} ${alarmMasterPortFile}
+}
+
+function start_redis() {
+    local conf=$1
+    local logFile=$2
+    local pidFile=$3
+    local port=$4
+    local portFile=$5
 
     if [ -x "$location_agent_script" ]; then
         if checkIfRedisIsInstalled ; then
-            echo "[EVENT] Starting Event Service on port: [$event_port] ..."
-            nohup redis-server ../conf/master.conf> ${masterLogFile} 2>&1 &
-            echo $! > ${masterPidFile}
-            nohup ./csw-location-agent -DclusterSeeds=${seeds} --name "EventServer" --command "$redisSentinel ../conf/sentinel.conf --port ${event_port}" --port "${event_port}"> ${sentinelLogFile} 2>&1 &
-            echo $! > ${sentinelPidFile}
-            echo ${event_port} > ${sentinelPortFile}
-            echo ${event_master_port} > ${masterPortFile}
+            nohup redis-server ${conf} > ${logFile} 2>&1 &
+            echo $! > ${pidFile}
+            echo ${port} > ${portFile}
         else
             exit 1
         fi
@@ -166,12 +204,15 @@ function enableAllServicesForRunning {
     shouldStartSeed=true
     shouldStartConfig=true
     shouldStartEvent=true
+    shouldStartAlarm=true
 }
 
 function start_services {
     if [[ "$shouldStartSeed" = true ]]; then start_seed ; fi
     if [[ "$shouldStartConfig" = true ]]; then start_config ; fi
     if [[ "$shouldStartEvent" = true ]]; then start_event; fi
+    if [[ "$shouldStartAlarm" = true ]]; then start_alarm; fi
+    if [[ ("$shouldStartEvent" = true) || ("$shouldStartAlarm" = true) ]]; then start_sentinel; fi
 }
 
 function usage {
@@ -183,7 +224,8 @@ function usage {
     echo "  --interfaceName | -i <name>     start cluster on ip address associated with provided interface, default: en0"
     echo "  --config <configPort>           start http config server on provided port, default: 5000"
     echo "  --initRepo                      create new svn repo, default: use existing svn repo"
-    echo -e "  --event | -es <esPort>         start event service on provided port, default: 6379 \n"
+    echo -e "  --event | -es <esPort>       start event service on provided port, default: 6379 \n"
+    echo -a "  --alarm | -as <asPort>       start alarm service on provided port, default: 7379 \n"
 
     echo "Commands:"
     echo "  start      Starts all csw services if no options provided"
@@ -229,7 +271,11 @@ function parse_cmd_args {
                             ;;
                         --event | -es)
                             shouldStartEvent=true
-                            if isPortProvided $2; then event_port="$2"; shift; fi
+                            if isPortProvided $2; then sentinel_port="$2"; shift; fi
+                            ;;
+                        --alarm | -as)
+                            shouldStartAlarm=true
+                            if isPortProvided $2; then sentinel_port="$2"; shift; fi
                             ;;
                         --help)
                             usage
@@ -273,25 +319,9 @@ function parse_cmd_args {
             ;;
         stop)
             # Stop Redis
-            if [ ! -f ${sentinelPidFile} ]
-            then
-                echo "[EVENT] Event $sentinelPidFile does not exist, process is not running."
-            else
-                local sentinelPID=$(cat ${sentinelPidFile})
-                local MasterPID=$(cat ${masterPidFile})
-                local sentinelPort=$(cat ${sentinelPortFile})
-                local masterPort=$(cat ${masterPortFile})
-                echo "[EVENT] Stopping Event Service..."
-                ${redisClient} -p ${sentinelPort} shutdown
-                ${redisClient} -p ${masterPort} shutdown
-                while(test -x /proc/${sentinelPID} ) || (test -x /proc/${MasterPID})
-                do
-                    echo "[EVENT] Waiting for Event Service to shutdown ..."
-                    sleep 1
-                done
-                echo "[EVENT] Event Service stopped."
-                rm -f ${sentinelLogFile} ${sentinelPidFile} ${sentinelPortFile} ${masterPortFile} ${masterPidFile}
-            fi
+            stop "Redis Sentinel" ${sentinelPidFile} ${sentinelPortFile}
+            stop "Event Server" ${eventMasterPidFile} ${eventMasterPortFile}
+            stop "Alarm Server" ${alarmMasterPidFile} ${alarmMasterPortFile}
 
             # Stop Cluster Seed application
             if [ ! -f ${seedPidFile} ]; then
@@ -320,6 +350,27 @@ function parse_cmd_args {
             usage
             ;;
     esac
+}
+
+function stop() {
+ local serviceName=$1
+ local pidFile=$2
+ local portFile=$3
+    if [ ! -f ${pidFile} ]; then
+        echo "$serviceName $pidFile does not exist, process is not running."
+    else
+        local pid=$(cat ${pidFile})
+        local port=$(cat ${portFile})
+        echo "Stopping $serviceName..."
+        ${redisClient} -p ${port} shutdown
+        while(test -x /proc/${pid})
+        do
+            echo "Waiting for $serviceName to shutdown ..."
+            sleep 1
+        done
+        echo "$serviceName stopped."
+        rm -f ${portFile} ${pidFile}
+    fi
 }
 
 # Parse command line arguments

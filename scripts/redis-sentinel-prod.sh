@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 #
-# Starts event service required by CSW and registers them with the location service.
-# This script uses the csw-location-agent app to start Event Service and register it with the Location Service
+# Starts redis sentinel required by CSW and registers them with the location service.
+# This script uses the csw-location-agent app to start Redis Sentinel and register it with the Location Service
 #
-#    csw-services.sh start    :to start event service and register it to location service
-#    csw-services.sh stop     :to stop event service and unregister it from the location service
+#    csw-services.sh start    :to start redis sentinel and register it to location service as EventServer and AlarmServer
+#    csw-services.sh stop     :to stop redis sentinel and unregister it from the location service
 #
 
 # Setting default values
-event_port=26379
+sentinel_port=26379
 
 script_name=$0
 
@@ -16,13 +16,15 @@ logDir=/tmp/csw-prod/logs
 test -d ${logDir} || mkdir -p ${logDir}
 
 # We need at least this version of Redis
-minRedisVersion=3.2.5
+minRedisVersion=4.0
 redisSentinel=/usr/local/bin/redis-sentinel
 redisClient=`echo ${redisSentinel} | sed -e 's/-sentinel/-cli/'`
 
-eventLogFile=${logDir}/event.log
-eventPidFile=${logDir}/event.pid
-eventPortFile=${logDir}/event.port
+sentinelLogFile=${logDir}/sentinel.log
+sentinelPidFile=${logDir}/sentinel.pid
+sentinelPortFile=${logDir}/sentinel.port
+
+sentinelConf="./conf/redis-sentinel/sentinel.conf"
 
 sortVersion="sort -V"
 
@@ -48,12 +50,12 @@ function checkIfRedisIsInstalled {
     fi
 }
 
-function start_event() {
+function start_sentinel() {
     if checkIfRedisIsInstalled ; then
-        echo "[EVENT] Starting Event Service on port: [$event_port] ..."
-        nohup ./csw-location-agent -DclusterSeeds=${clusterSeeds} --name "EventServer" --command "$redisSentinel ../conf/sentinel.conf --port ${event_port}" --port "${event_port}"> ${eventLogFile} 2>&1 &
-        echo $! > ${eventPidFile}
-        echo ${event_port} > ${eventPortFile}
+        echo "Starting Redis Sentinel on port: [$sentinel_port] ..."
+        nohup ./csw-location-agent -DclusterSeeds=${clusterSeeds} --name "EventServer,AlarmServer" --command "$redisSentinel ${sentinelConf} --port ${sentinel_port}" --port "${sentinel_port}"> ${sentinelLogFile} 2>&1 &
+        echo $! > ${sentinelPidFile}
+        echo ${sentinel_port} > ${sentinelPortFile}
     else
         exit 1
     fi
@@ -75,7 +77,7 @@ function parse_cmd_args {
         start)
             shift
 
-             start_event
+             start_sentinel
 
              echo "================================================================="
              echo "All the logs are stored at location: [$logDir]"
@@ -83,21 +85,21 @@ function parse_cmd_args {
             ;;
         stop)
             # Stop Redis
-            if [ ! -f ${eventPidFile} ]
+            if [ ! -f ${sentinelPidFile} ]
             then
-                echo "[EVENT] Event $eventPidFile does not exist, process is not running."
+                echo "Redis Sentinel $sentinelPidFile does not exist, process is not running."
             else
-                local PID=$(cat ${eventPidFile})
-                local redisPort=$(cat ${eventPortFile})
-                echo "[EVENT] Stopping Event Service..."
-                ${redisClient} -p ${redisPort} shutdown
+                local PID=$(cat ${sentinelPidFile})
+                local sentinelPort=$(cat ${sentinelPortFile})
+                echo "Stopping Redis Sentinel..."
+                ${redisClient} -p ${sentinelPort} shutdown
                 while [ -x /proc/${PID} ]
                 do
-                    echo "[EVENT] Waiting for Event Service to shutdown ..."
+                    echo "Waiting for Redis Sentinel to shutdown ..."
                     sleep 1
                 done
-                echo "[EVENT] Event Service stopped."
-                rm -f ${eventLogFile} ${eventPidFile} ${eventPortFile}
+                echo "Redis Sentinel stopped."
+                rm -f ${sentinelLogFile} ${sentinelPidFile} ${sentinelPortFile}
             fi
             ;;
         *)
