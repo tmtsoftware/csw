@@ -85,8 +85,8 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
   }
 
   test("should get one update for long running command that returns Started") {
-    val behaviorTestKit                  = createBehaviorTestKit()
-    val commandResponseProbe             = TestProbe[SubmitResponse]
+    val behaviorTestKit      = createBehaviorTestKit()
+    val commandResponseProbe = TestProbe[SubmitResponse]
 
     val runId = Id()
 
@@ -103,6 +103,24 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
     commandResponseProbe.expectMessage(Started(runId))
   }
 
+  test("should not be able to set value to Intermediate after Final in Command Response Manager") {
+    val behaviorTestKit         = createBehaviorTestKit()
+    val commandResponseProbe    = TestProbe[QueryResponse]
+    val commandCorrelationProbe = TestProbe[CommandCorrelation]
+    val runId                   = Id()
+
+    behaviorTestKit.run(AddOrUpdateCommand(runId, Started(runId)))
+    behaviorTestKit.run(Query(runId, commandResponseProbe.ref))
+    commandResponseProbe.expectMessage(Started(runId))
+
+    behaviorTestKit.run(AddOrUpdateCommand(runId, Completed(runId)))
+    behaviorTestKit.run(Query(runId, commandResponseProbe.ref))
+    commandResponseProbe.expectMessage(Completed(runId))
+
+    behaviorTestKit.run(AddOrUpdateCommand(runId, Started(runId)))
+    behaviorTestKit.run(Query(runId, commandResponseProbe.ref))
+    commandResponseProbe.expectMessage(Completed(runId))
+  }
 
   test("should be able to remove subscriber") {
     val behaviorTestKit                  = createBehaviorTestKit()
@@ -198,6 +216,20 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
     // Update of a failed sub command status(above) should update the status of parent command as failed irrespective
     // of the result of other sub command
     commandResponseProbe.expectMessage(Error(runId, "Sub command 1 failed"))
+  }
+
+  test("Test the checks") {
+    var t1:SubmitResponse = Completed(Id())
+
+    assert(isPositive(t1) == true)
+    assert(isIntermediate(t1) == false)
+    assert(isNegative(t1) == false)
+
+    t1 = Started(Id())
+
+    assert(isPositive(t1) == false)
+    assert(isIntermediate(t1) == true)
+    assert(isNegative(t1) == false)
   }
 
   // DEOPSCSW-207: Report on Configuration Command Completion

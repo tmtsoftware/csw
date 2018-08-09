@@ -4,7 +4,6 @@ import akka.NotUsed
 import akka.stream.Materializer
 import akka.stream.scaladsl.Source
 import csw.messages.TMTSerializable
-import csw.messages.commands.CommandResponse.CommandResultType.{Intermediate, Negative, Positive}
 import csw.messages.params.models.Id
 import enumeratum._
 
@@ -79,38 +78,21 @@ object CommandResponse {
     case cancelled: Cancelled                     ⇒ cancelled.copy(runId = id)
   }
 
-  sealed trait CommandResultType
-  object CommandResultType {
-
-    case object Intermediate extends CommandResultType
-
-    sealed trait Final extends CommandResultType
-
-    case object Negative extends Final
-
-    case object Positive extends Final
-
+  def isFinal(qr: QueryResponse): Boolean = qr match {
+    case Started(_) => false
+    case _          => true
   }
 
-  object test {
-
-    def x(): QueryResponse = {
-      Started(Id())
-      Completed(Id())
-      CommandNotAvailable(Id())
-    }
-
+  def isPositive(qr: QueryResponse): Boolean = qr match {
+    case Completed(_) | CompletedWithResult(_, _) => true
+    case _                                        => false
   }
 
-  /**
-   * Helper function to convert a SubmitResponse to the internally used CommandResultType
-   * @param sr a SubmitResponse
-   * @return one of the three possible values: Intermediate, Positive, Negative
-   */
-  def isCommandResultType(sr: QueryResponse): CommandResultType = sr match {
-    case Started(_)                               => Intermediate
-    case Completed(_) | CompletedWithResult(_, _) => Positive
-    case _                                        => Negative
+  def isNegative(qr: QueryResponse): Boolean = !(isPositive(qr) || isIntermediate(qr))
+
+  def isIntermediate(qr: QueryResponse): Boolean = qr match {
+    case Started(_) => true
+    case _          => false
   }
 
   /**
@@ -124,7 +106,7 @@ object CommandResponse {
                                                                            mat: Materializer): Future[SubmitResponse] = {
     commandResponses
       .runForeach { x ⇒
-        if (isCommandResultType(x) == Negative)
+        if (isNegative(x))
           throw new RuntimeException(s"Command with runId [${x.runId}] failed with response [$x]")
       }
       .transform {

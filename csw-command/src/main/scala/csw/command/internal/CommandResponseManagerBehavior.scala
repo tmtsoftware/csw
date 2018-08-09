@@ -76,31 +76,23 @@ private[command] class CommandResponseManagerBehavior(
   // This is where the command is initially added. Note that every Submit is added as "Started"/Intermediate
   private def addOrUpdateCommand(runId: Id, commandResponse: SubmitResponse): Unit =
     commandResponseManagerState.get(runId) match {
-      case _: CommandNotAvailable ⇒ commandResponseManagerState = commandResponseManagerState.add(runId, commandResponse)
-      case _                      ⇒ updateCommand(runId, commandResponse)
+      case _: CommandNotAvailable ⇒
+        commandResponseManagerState = commandResponseManagerState.add(runId, commandResponse)
+      case _ ⇒ updateCommand(runId, commandResponse)
     }
 
   private def updateCommand(runId: Id, updateResponse: SubmitResponse): Unit = {
-    val currentResponse: Response = commandResponseManagerState.get(runId)
-    if (/*isCommandResultType(currentResponse) == CommandResultType.Intermediate && */ currentResponse != updateResponse) {
-      commandResponseManagerState = commandResponseManagerState.updateCommandStatus(updateResponse)
-      publishToSubscribers(updateResponse, commandResponseManagerState.cmdToCmdStatus(updateResponse.runId).subscribers)
-    } else { println(s"Don't do the update for current: $currentResponse and update: $updateResponse") }
-    /*
-    currentResponse match {
-      case Started(_) =>
-        println("Yes I got here to Started publish")
+    val currentResponse = commandResponseManagerState.get(runId)
+    // Note that commands are added with state Started by ComponentBehavior
+    // Also makes sure that once it is final, it is final and can't be set back to Started
+    // Also fixes a potential race condition where someone sets to final status before return from onSubmit returning Started
+    if (isIntermediate(currentResponse)) {
+      if (isFinal(updateResponse)) {
         commandResponseManagerState = commandResponseManagerState.updateCommandStatus(updateResponse)
-//        publishToSubscribers(updateResponse, commandResponseManagerState.cmdToCmdStatus(updateResponse.runId).subscribers)
-        doPublish(updateResponse, commandResponseManagerState.cmdToCmdStatus(updateResponse.runId).subscribers)
+      }
+      // This means that even if not final (i.e. Intermediate/Started) it will publish a Started
+      doPublish(updateResponse, commandResponseManagerState.cmdToCmdStatus(updateResponse.runId).subscribers)
     }
-     */
-    /*
-    if (/*isCommandResultType(currentResponse) == CommandResultType.Intermediate && */ currentResponse != updateResponse) {
-      commandResponseManagerState = commandResponseManagerState.updateCommandStatus(updateResponse)
-      publishToSubscribers(updateResponse, commandResponseManagerState.cmdToCmdStatus(updateResponse.runId).subscribers)
-    } else { println(s"Don't do the update for current: $currentResponse and update: $updateResponse")}
-   */
   }
 
   private def updateSubCommand(subCommandRunId: Id, commandResponse: SubmitResponse): Unit = {
@@ -111,42 +103,33 @@ private[command] class CommandResponseManagerBehavior(
   }
 
   private def updateParent(parentRunId: Id, childCommandResponse: SubmitResponse): Unit =
-    (isCommandResultType(commandResponseManagerState.get(parentRunId)), isCommandResultType(childCommandResponse)) match {
-      // If the child command receives a negative result, the result of the parent command need not wait for the
-      // result from other sub commands
-      case (CommandResultType.Intermediate, CommandResultType.Negative) ⇒
-        updateCommand(parentRunId, CommandResponse.withRunId(parentRunId, childCommandResponse))
-      // If the child command receives a positive result, the result of the parent command needs to be evaluated based
-      // on the result from other sub commands
-      case (CommandResultType.Intermediate, CommandResultType.Positive) ⇒
+    // Is the parent in the Started/Intermediate
+    if (isIntermediate(commandResponseManagerState.get(parentRunId))) {
+      // If the child is positive, update parent
+      if (isPositive(childCommandResponse)) {
         updateParentForChild(parentRunId, childCommandResponse)
-      case _ ⇒ log.debug("Parent Command is already updated with a Final response. Ignoring this update.")
+      } else if (isNegative(childCommandResponse)) {
+        // isNegative - update the parent and quit early
+        updateCommand(parentRunId, CommandResponse.withRunId(parentRunId, childCommandResponse))
+      }
+    } else {
+      log.debug("Parent Command is already updated with a Final response. Ignoring this update.")
     }
 
   private def updateParentForChild(parentRunId: Id, childCommandResponse: SubmitResponse): Unit =
-    isCommandResultType(childCommandResponse) match {
-      case _: CommandResultType.Final ⇒
-        commandCoRelation = commandCoRelation.remove(parentRunId, childCommandResponse.runId)
-        if (!commandCoRelation.hasChildren(parentRunId))
-          updateCommand(parentRunId, CommandResponse.withRunId(parentRunId, childCommandResponse))
-      case _ ⇒ log.debug("Validation response will not affect status of Parent command.")
+    if (isFinal(childCommandResponse)) {
+      commandCoRelation = commandCoRelation.remove(parentRunId, childCommandResponse.runId)
+      if (!commandCoRelation.hasChildren(parentRunId))
+        updateCommand(parentRunId, CommandResponse.withRunId(parentRunId, childCommandResponse))
+    } else {
+      log.debug("Validation response will not affect status of Parent command.")
     }
 
-  private def publishToSubscribers(commandResponse: SubmitResponse, subscribers: Set[ActorRef[SubmitResponse]]): Unit = {
+  // This publish only publishes if the value is a final response
+  private def publishToSubscribers(commandResponse: SubmitResponse, subscribers: Set[ActorRef[SubmitResponse]]): Unit =
+    if (isFinal(commandResponse)) doPublish(commandResponse, subscribers)
 
-    isCommandResultType(commandResponse) match {
-      case _: CommandResultType.Final ⇒ doPublish(commandResponse, subscribers)
-
-      case _ => println("Don't publish started")
-    }
-    /*
-      case CommandResultType.Intermediate ⇒
-        // Do not send updates for validation response as it is sent by the framework
-        println("Don't publish started")
-        log.debug("Validation response will not affect status of Parent command.")
-   */
-  }
-
+  // This low level will publish no matter what
   private def doPublish(commandResponse: SubmitResponse, subscribers: Set[ActorRef[SubmitResponse]]): Unit =
     subscribers.foreach(_ ! commandResponse)
 

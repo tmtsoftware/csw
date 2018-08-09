@@ -7,8 +7,9 @@ import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.AskPattern.Askable
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.{Cancellable, Scheduler}
+import akka.actor.Scheduler
 import akka.util.Timeout
+import csw.framework.CurrentStatePublisher
 import csw.framework.components.ConfigNotAvailableException
 import csw.framework.components.assembly.WorkerActorMsgs.{GetStatistics, InitialState}
 import csw.framework.components.assembly.{WorkerActor, WorkerActorMsg}
