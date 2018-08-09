@@ -5,8 +5,13 @@ import akka.actor.typed.ActorRef
 import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{ActorMaterializer, Materializer}
 import com.typesafe.config.Config
-import csw.services.alarm.api.exceptions.{InvalidSeverityException, KeyNotFoundException, ResetOperationNotAllowed}
-import csw.services.alarm.api.internal.{MetadataKey, StatusKey}
+import csw.services.alarm.api.exceptions.{
+  InactiveAlarmException,
+  InvalidSeverityException,
+  KeyNotFoundException,
+  ResetOperationNotAllowed
+}
+import csw.services.alarm.api.internal.{MetadataKey, SeverityKey, StatusKey}
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, UnAcknowledged}
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
 import csw.services.alarm.api.models.AlarmSeverity.{Disconnected, Okay}
@@ -21,11 +26,9 @@ import csw.services.alarm.client.internal.configparser.ConfigParser
 import csw.services.alarm.client.internal.redis.RedisConnectionsFactory
 import csw.services.alarm.client.internal.shelve.ShelveTimeoutActorFactory
 import csw.services.alarm.client.internal.shelve.ShelveTimeoutMessage.{CancelShelveTimeout, ScheduleShelveTimeout}
-import io.lettuce.core.KeyValue
 import reactor.core.publisher.FluxSink.OverflowStrategy
 
 import scala.async.Async._
-import scala.collection.immutable
 import scala.concurrent.Future
 
 class AlarmServiceImpl(
@@ -213,25 +216,22 @@ class AlarmServiceImpl(
   override def getAggregatedSeverity(key: Key): Future[AlarmSeverity] = async {
     log.debug(s"Get aggregated severity for alarm [${key.value}]")
     val metadataApi = await(metadataApiF)
-    val statusApi   = await(statusApiF)
-
-    val statusKeys = await(statusApi.keys(key))
-    if (statusKeys.isEmpty) logAndThrow(KeyNotFoundException(key))
+    val severityApi = await(severityApiF)
 
     val metadataKeys = await(metadataApi.keys(key))
     if (metadataKeys.isEmpty) logAndThrow(KeyNotFoundException(key))
 
-    val statusList: immutable.Seq[KeyValue[StatusKey, AlarmStatus]]       = await(statusApi.mget(statusKeys))
-    val metadataList: immutable.Seq[KeyValue[MetadataKey, AlarmMetadata]] = await(metadataApi.mget(metadataKeys))
+    val metadataList = await(metadataApi.mget(metadataKeys)).filter(_.getValue.isActive)
+    if (metadataList.isEmpty) logAndThrow(InactiveAlarmException(key))
 
-    //todo: what if redis does not give status keys and metadata keys in the same order? the following .zip would fail then. Fixthis
-    val data: Seq[(KeyValue[StatusKey, AlarmStatus], KeyValue[MetadataKey, AlarmMetadata])] = statusList.zip(metadataList)
+    val severityKeys   = metadataKeys.map(SeverityKey.fromMetadataKey)
+    val severityValues = await(severityApi.mget(severityKeys))
+    val severityList = severityValues.collect {
+      case kv if kv.hasValue => kv.getValue
+      case kv                => Disconnected
+    }
 
-    data
-      .collect {
-        case (statusKV, metadataKV) if metadataKV.getValue.isActive => statusKV.getValue.latchedSeverity
-      }
-      .reduceRight((previous, current: AlarmSeverity) ⇒ previous max current)
+    severityList.reduceRight((previous, current: AlarmSeverity) ⇒ previous max current)
   }
 
   override def getAggregatedHealth(key: Key): Future[AlarmHealth] = {

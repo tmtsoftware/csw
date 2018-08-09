@@ -25,3 +25,5 @@ object KeyNotFoundException {
   def apply(key: Key): KeyNotFoundException =
     new KeyNotFoundException(s"Key: [${key.value}] does not match any key in Alarm store.")
 }
+
+case class InactiveAlarmException(key: Key) extends RuntimeException(s"alarms for the given key '$key' are inactive")

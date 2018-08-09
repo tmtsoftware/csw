@@ -13,6 +13,7 @@ import csw.services.alarm.client.internal.helpers.TestFutureExt.RichFuture
 import csw.services.alarm.client.internal.helpers.{AcknowledgeAndLatchTestCase, AlarmServiceTestSetupNGTest, SetSeverityTestCase}
 import org.testng.annotations.{BeforeSuite, DataProvider, Test}
 
+//DEOPSCSW-444 : Set severity api for component
 class SetSeverityTests extends AlarmServiceTestSetupNGTest {
 
   val `low-latchable->high-latchable` = AlarmKey("test-subsystem", "test-component", "low-latchable->high-latchable")
@@ -79,118 +80,120 @@ class SetSeverityTests extends AlarmServiceTestSetupNGTest {
       )
     )
 
+  val ackAndLatchTestCases = Array(
+    AcknowledgeAndLatchTestCase(
+      alarmKey = AlarmKey("test", "test", "AutoAcknowledgeble-Latchable-Disconnected->Okay"),
+      isAutoAcknowledgeble = true,
+      isAlarmLachable = true,
+      oldSeverity = Disconnected,
+      newSeverity = Okay,
+      expectedAckStatus = Acknowledged,
+      expectedLatchStatus = Latched
+    ),
+    AcknowledgeAndLatchTestCase(
+      alarmKey = AlarmKey("test", "test", "NotAutoAcknowledgeble-Latchable-Disconnected->Okay"),
+      isAutoAcknowledgeble = false,
+      isAlarmLachable = true,
+      oldSeverity = Disconnected,
+      newSeverity = Okay,
+      expectedAckStatus = Acknowledged,
+      expectedLatchStatus = Latched
+    ),
+    AcknowledgeAndLatchTestCase(
+      alarmKey = AlarmKey("test", "test", "AutoAcknowledgeble-NotLatchable-Disconnected->Okay"),
+      isAutoAcknowledgeble = true,
+      isAlarmLachable = false,
+      oldSeverity = Disconnected,
+      newSeverity = Okay,
+      expectedAckStatus = Acknowledged,
+      expectedLatchStatus = UnLatched
+    ),
+    AcknowledgeAndLatchTestCase(
+      alarmKey = AlarmKey("test", "test", "NotAutoAcknowledgeble-NotLatchable-Disconnected->Okay"),
+      isAutoAcknowledgeble = false,
+      isAlarmLachable = false,
+      oldSeverity = Disconnected,
+      newSeverity = Okay,
+      expectedAckStatus = Acknowledged,
+      expectedLatchStatus = UnLatched
+    ),
+    AcknowledgeAndLatchTestCase(
+      alarmKey = AlarmKey("test", "test", "AutoAcknowledgeble-Latchable-Okay->Critical"),
+      isAutoAcknowledgeble = true,
+      isAlarmLachable = true,
+      oldSeverity = Okay,
+      newSeverity = Critical,
+      expectedAckStatus = Acknowledged,
+      expectedLatchStatus = Latched
+    ),
+    AcknowledgeAndLatchTestCase(
+      alarmKey = AlarmKey("test", "test", "NotAutoAcknowledgeble-Latchable-Okay->Critical"),
+      isAutoAcknowledgeble = false,
+      isAlarmLachable = true,
+      oldSeverity = Okay,
+      newSeverity = Critical,
+      expectedAckStatus = UnAcknowledged,
+      expectedLatchStatus = Latched
+    ),
+    AcknowledgeAndLatchTestCase(
+      alarmKey = AlarmKey("test", "test", "AutoAcknowledgeble-NotLatchable-Okay->Critical"),
+      isAutoAcknowledgeble = true,
+      isAlarmLachable = false,
+      oldSeverity = Okay,
+      newSeverity = Critical,
+      expectedAckStatus = Acknowledged,
+      expectedLatchStatus = UnLatched
+    ),
+    AcknowledgeAndLatchTestCase(
+      alarmKey = AlarmKey("test", "test", "NotAutoAcknowledgeble-NotLatchable-Okay->Critical"),
+      isAutoAcknowledgeble = false,
+      isAlarmLachable = false,
+      oldSeverity = Okay,
+      newSeverity = Critical,
+      expectedAckStatus = UnAcknowledged,
+      expectedLatchStatus = UnLatched
+    ),
+    AcknowledgeAndLatchTestCase(
+      alarmKey = AlarmKey("test", "test", "AutoAcknowledgeble-Latchable-Critical->Okay"),
+      isAutoAcknowledgeble = true,
+      isAlarmLachable = true,
+      oldSeverity = Critical,
+      newSeverity = Okay,
+      expectedAckStatus = Acknowledged,
+      expectedLatchStatus = Latched
+    ),
+    AcknowledgeAndLatchTestCase(
+      alarmKey = AlarmKey("test", "test", "NotAutoAcknowledgeble-Latchable-Critical->Okay"),
+      isAutoAcknowledgeble = false,
+      isAlarmLachable = true,
+      oldSeverity = Critical,
+      newSeverity = Okay,
+      expectedAckStatus = UnAcknowledged,
+      expectedLatchStatus = Latched
+    ),
+    AcknowledgeAndLatchTestCase(
+      alarmKey = AlarmKey("test", "test", "AutoAcknowledgeble-NotLatchable-Critical->Okay"),
+      isAutoAcknowledgeble = true,
+      isAlarmLachable = false,
+      oldSeverity = Critical,
+      newSeverity = Okay,
+      expectedAckStatus = Acknowledged,
+      expectedLatchStatus = UnLatched
+    ),
+    AcknowledgeAndLatchTestCase(
+      alarmKey = AlarmKey("test", "test", "NotAutoAcknowledgeble-NotLatchable-Critical->Okay"),
+      isAutoAcknowledgeble = false,
+      isAlarmLachable = false,
+      oldSeverity = Critical,
+      newSeverity = Okay,
+      expectedAckStatus = Acknowledged,
+      expectedLatchStatus = UnLatched
+    )
+  )
+
   @DataProvider(name = "acknowledgeAndLatching-data-provider")
   def acknowledgeAndLatchDataProvider: Array[AcknowledgeAndLatchTestCase] = {
-    Array(
-      AcknowledgeAndLatchTestCase(
-        alarmKey = AlarmKey("test", "test", "AutoAcknowledgeble-Latchable-Disconnected->Okay"),
-        isAutoAcknowledgeble = true,
-        isAlarmLachable = true,
-        oldSeverity = Disconnected,
-        newSeverity = Okay,
-        expectedAckStatus = Acknowledged,
-        expectedLatchStatus = Latched
-      ),
-      AcknowledgeAndLatchTestCase(
-        alarmKey = AlarmKey("test", "test", "NotAutoAcknowledgeble-Latchable-Disconnected->Okay"),
-        isAutoAcknowledgeble = false,
-        isAlarmLachable = true,
-        oldSeverity = Disconnected,
-        newSeverity = Okay,
-        expectedAckStatus = Acknowledged,
-        expectedLatchStatus = Latched
-      ),
-      AcknowledgeAndLatchTestCase(
-        alarmKey = AlarmKey("test", "test", "AutoAcknowledgeble-NotLatchable-Disconnected->Okay"),
-        isAutoAcknowledgeble = true,
-        isAlarmLachable = false,
-        oldSeverity = Disconnected,
-        newSeverity = Okay,
-        expectedAckStatus = Acknowledged,
-        expectedLatchStatus = UnLatched
-      ),
-      AcknowledgeAndLatchTestCase(
-        alarmKey = AlarmKey("test", "test", "NotAutoAcknowledgeble-NotLatchable-Disconnected->Okay"),
-        isAutoAcknowledgeble = false,
-        isAlarmLachable = false,
-        oldSeverity = Disconnected,
-        newSeverity = Okay,
-        expectedAckStatus = Acknowledged,
-        expectedLatchStatus = UnLatched
-      ),
-      AcknowledgeAndLatchTestCase(
-        alarmKey = AlarmKey("test", "test", "AutoAcknowledgeble-Latchable-Okay->Critical"),
-        isAutoAcknowledgeble = true,
-        isAlarmLachable = true,
-        oldSeverity = Okay,
-        newSeverity = Critical,
-        expectedAckStatus = Acknowledged,
-        expectedLatchStatus = Latched
-      ),
-      AcknowledgeAndLatchTestCase(
-        alarmKey = AlarmKey("test", "test", "NotAutoAcknowledgeble-Latchable-Okay->Critical"),
-        isAutoAcknowledgeble = false,
-        isAlarmLachable = true,
-        oldSeverity = Okay,
-        newSeverity = Critical,
-        expectedAckStatus = UnAcknowledged,
-        expectedLatchStatus = Latched
-      ),
-      AcknowledgeAndLatchTestCase(
-        alarmKey = AlarmKey("test", "test", "AutoAcknowledgeble-NotLatchable-Okay->Critical"),
-        isAutoAcknowledgeble = true,
-        isAlarmLachable = false,
-        oldSeverity = Okay,
-        newSeverity = Critical,
-        expectedAckStatus = Acknowledged,
-        expectedLatchStatus = UnLatched
-      ),
-      AcknowledgeAndLatchTestCase(
-        alarmKey = AlarmKey("test", "test", "NotAutoAcknowledgeble-NotLatchable-Okay->Critical"),
-        isAutoAcknowledgeble = false,
-        isAlarmLachable = false,
-        oldSeverity = Okay,
-        newSeverity = Critical,
-        expectedAckStatus = UnAcknowledged,
-        expectedLatchStatus = UnLatched
-      ),
-      AcknowledgeAndLatchTestCase(
-        alarmKey = AlarmKey("test", "test", "AutoAcknowledgeble-Latchable-Critical->Okay"),
-        isAutoAcknowledgeble = true,
-        isAlarmLachable = true,
-        oldSeverity = Critical,
-        newSeverity = Okay,
-        expectedAckStatus = Acknowledged,
-        expectedLatchStatus = Latched
-      ),
-      AcknowledgeAndLatchTestCase(
-        alarmKey = AlarmKey("test", "test", "NotAutoAcknowledgeble-Latchable-Critical->Okay"),
-        isAutoAcknowledgeble = false,
-        isAlarmLachable = true,
-        oldSeverity = Critical,
-        newSeverity = Okay,
-        expectedAckStatus = UnAcknowledged,
-        expectedLatchStatus = Latched
-      ),
-      AcknowledgeAndLatchTestCase(
-        alarmKey = AlarmKey("test", "test", "AutoAcknowledgeble-NotLatchable-Critical->Okay"),
-        isAutoAcknowledgeble = true,
-        isAlarmLachable = false,
-        oldSeverity = Critical,
-        newSeverity = Okay,
-        expectedAckStatus = Acknowledged,
-        expectedLatchStatus = UnLatched
-      ),
-      AcknowledgeAndLatchTestCase(
-        alarmKey = AlarmKey("test", "test", "NotAutoAcknowledgeble-NotLatchable-Critical->Okay"),
-        isAutoAcknowledgeble = false,
-        isAlarmLachable = false,
-        oldSeverity = Critical,
-        newSeverity = Okay,
-        expectedAckStatus = Acknowledged,
-        expectedLatchStatus = UnLatched
-      )
-    )
+    ackAndLatchTestCases
   }
 
   @Test(dataProvider = "acknowledgeAndLatching-data-provider")

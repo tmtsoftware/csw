@@ -8,4 +8,8 @@ case class SeverityKey(value: String)
 
 object SeverityKey {
   implicit def fromAlarmKey(alarmKey: Key): SeverityKey = SeverityKey("severity." + alarmKey.value)
+
+  def fromMetadataKey(metadataKey: MetadataKey): SeverityKey = {
+    SeverityKey(metadataKey.value.replace("metadata.", "severity."))
+  }
 }
