@@ -147,25 +147,26 @@ class AlarmServiceImpl(
   // reset is only called when severity is `Okay`
   override def reset(key: AlarmKey): Future[Unit] = async {
     log.debug(s"Reset alarm [${key.value}]")
-    val metadataApi = await(metadataApiF)
-    val statusApi   = await(statusApiF)
-
+    val metadataApi   = await(metadataApiF)
+    val statusApi     = await(statusApiF)
     val maybeMetadata = await(metadataApi.get(key))
-    if (maybeMetadata.isDefined) {
-      val currentSeverity = await(getCurrentSeverity(key))
-      if (currentSeverity != Okay) logAndThrow(ResetOperationNotAllowed(key, currentSeverity))
 
-      val status = await(statusApi.get(key)).getOrElse(AlarmStatus())
-      if (status.acknowledgementStatus == Acknowledged || status.latchStatus == Latched || status.latchedSeverity != Okay) {
+    maybeMetadata match {
+      case Some(_) ⇒
+        val currentSeverity = await(getCurrentSeverity(key))
+        if (currentSeverity != Okay) logAndThrow(ResetOperationNotAllowed(key, currentSeverity))
+
+        val status = await(statusApi.get(key)).getOrElse(AlarmStatus())
         val resetStatus = status.copy(
           acknowledgementStatus = Acknowledged,
           latchStatus = if (maybeMetadata.get.isLatchable) Latched else UnLatched,
           latchedSeverity = Okay,
           alarmTime = alarmTime(status)
         )
-        await(statusApi.set(key, resetStatus))
-      }
-    } else logAndThrow(KeyNotFoundException(key))
+        if (status != resetStatus) await(statusApi.set(key, resetStatus))
+
+      case None ⇒ logAndThrow(KeyNotFoundException(key))
+    }
   }
 
   override def shelve(key: AlarmKey): Future[Unit] = async {
