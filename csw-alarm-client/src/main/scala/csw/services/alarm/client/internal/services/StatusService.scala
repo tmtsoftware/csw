@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import csw.services.alarm.api.exceptions.{InvalidSeverityException, KeyNotFoundException, ResetOperationNotAllowed}
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, UnAcknowledged}
 import csw.services.alarm.api.models.AlarmSeverity.{Disconnected, Okay}
-import csw.services.alarm.api.models.{AlarmSeverity, AlarmStatus, AlarmTime}
+import csw.services.alarm.api.models.{AcknowledgementStatus, AlarmSeverity, AlarmStatus, AlarmTime}
 import csw.services.alarm.api.models.Key.AlarmKey
 import csw.services.alarm.api.models.LatchStatus.{Latched, UnLatched}
 import csw.services.alarm.api.models.ShelveStatus.{Shelved, UnShelved}
@@ -39,40 +39,33 @@ class StatusService(redisConnectionsFactory: RedisConnectionsFactory,
     await(statusApi.get(key)).getOrElse(logAndThrow(KeyNotFoundException(key)))
   }
 
-  def acknowledge(key: AlarmKey): Future[Unit] = async {
-    log.debug(s"Acknowledge alarm [${key.value}]")
-    val metadataApi = await(metadataApiF)
-    val statusApi   = await(statusApiF)
+  def acknowledge(key: AlarmKey): Future[Unit] = setAcknowledgementStatus(key, Acknowledged)
 
-    if (await(metadataApi.exists(key))) {
-      val status = await(statusApi.get(key)).getOrElse(AlarmStatus())
-
-      if (status.acknowledgementStatus == UnAcknowledged) // save the set call if status is already Acknowledged
-        await(statusApi.set(key, status.copy(acknowledgementStatus = Acknowledged)))
-    } else logAndThrow(KeyNotFoundException(key))
-  }
+  private[alarm] def unAcknowledge(key: AlarmKey): Future[Unit] = setAcknowledgementStatus(key, UnAcknowledged)
 
   // reset is only called when severity is `Okay`
   def reset(key: AlarmKey): Future[Unit] = async {
     log.debug(s"Reset alarm [${key.value}]")
-    val metadataApi = await(metadataApiF)
-    val statusApi   = await(statusApiF)
+    val metadataApi   = await(metadataApiF)
+    val statusApi     = await(statusApiF)
+    val maybeMetadata = await(metadataApi.get(key))
 
-    if (await(metadataApi.exists(key))) {
-      val currentSeverity = await(severityService.getCurrentSeverity(key))
-      if (currentSeverity != Okay) logAndThrow(ResetOperationNotAllowed(key, currentSeverity))
+    maybeMetadata match {
+      case Some(_) ⇒
+        val currentSeverity = await(severityService.getCurrentSeverity(key))
+        if (currentSeverity != Okay) logAndThrow(ResetOperationNotAllowed(key, currentSeverity))
 
-      val status = await(statusApi.get(key)).getOrElse(AlarmStatus())
-      if (status.acknowledgementStatus == Acknowledged || status.latchStatus == Latched || status.latchedSeverity != Okay) {
+        val status = await(statusApi.get(key)).getOrElse(AlarmStatus())
         val resetStatus = status.copy(
-          acknowledgementStatus = UnAcknowledged,
-          latchStatus = UnLatched,
+          acknowledgementStatus = Acknowledged,
+          latchStatus = if (maybeMetadata.get.isLatchable) Latched else UnLatched,
           latchedSeverity = Okay,
           alarmTime = alarmTime(status)
         )
-        await(statusApi.set(key, resetStatus))
-      }
-    } else logAndThrow(KeyNotFoundException(key))
+        if (status != resetStatus) await(statusApi.set(key, resetStatus))
+
+      case None ⇒ logAndThrow(KeyNotFoundException(key))
+    }
   }
 
   def shelve(key: AlarmKey): Future[Unit] = async {
@@ -179,6 +172,20 @@ class StatusService(redisConnectionsFactory: RedisConnectionsFactory,
       // so, at this time `CancelShelveTimeout` should not be sent to `shelveTimeoutRef` as it is already cancelled
       if (cancelShelveTimeout) shelveTimeoutRef ! CancelShelveTimeout(key)
     }
+  }
+
+  private def setAcknowledgementStatus(key: AlarmKey, ackStatus: AcknowledgementStatus): Future[Unit] = async {
+    log.debug(s"$ackStatus alarm [${key.value}]")
+
+    val metadataApi = await(metadataApiF)
+    val statusApi   = await(statusApiF)
+
+    if (await(metadataApi.exists(key))) {
+      val status = await(statusApi.get(key)).getOrElse(AlarmStatus())
+
+      if (status.acknowledgementStatus != ackStatus) // save the set call if status is already set to given acknowledgement status
+        await(statusApi.set(key, status.copy(acknowledgementStatus = ackStatus)))
+    } else logAndThrow(KeyNotFoundException(key))
   }
 
   private[alarm] def setStatus(alarmKey: AlarmKey, alarmStatus: AlarmStatus): Future[Unit] = {
