@@ -10,13 +10,14 @@ import scala.async.Async.{async, await}
 import scala.concurrent.Future
 
 class AlarmAdminClient(actorRuntime: ActorRuntime, locationService: LocationService, configUtils: ConfigUtils) {
-
   import actorRuntime._
 
   private val alarmServiceF: Future[AlarmAdminService] = new AlarmServiceFactory().adminApi(locationService)
 
-  def init(options: CommandLineArgs): Future[Unit] = async {
-    val config = await(configUtils.getConfig(options.isLocal, options.filePath, None))
-    await(alarmServiceF).initAlarms(config, options.reset)
+  def init(args: CommandLineArgs): Future[Unit] = async {
+    val config = await(configUtils.getConfig(args.isLocal, args.filePath, None))
+    await(alarmServiceF).initAlarms(config, args.reset)
   }
+
+  def severity(args: CommandLineArgs): Future[Unit] = alarmServiceF.map(_.setSeverity(args.alarmKey, args.severity))
 }
