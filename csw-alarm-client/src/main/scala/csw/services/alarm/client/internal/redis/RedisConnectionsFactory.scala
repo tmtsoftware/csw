@@ -8,7 +8,8 @@ import csw.services.alarm.client.internal.commons.serviceresolver.AlarmServiceRe
 import io.lettuce.core.api.async.RedisAsyncCommands
 import io.lettuce.core.pubsub.api.reactive.RedisPubSubReactiveCommands
 import io.lettuce.core.{RedisClient, RedisURI}
-import romaine.{RedisAsyncScalaApi, RedisKeySpaceApi, RedisKeySpaceCodec, RedisReactiveScalaApi}
+import romaine._
+import romaine.reactive.{RedisKeySpaceApi, RedisKeySpaceCodec, RedisPSubscribeScalaApi}
 
 import scala.compat.java8.FutureConverters.CompletionStageOps
 import scala.concurrent.{ExecutionContext, Future}
@@ -30,8 +31,8 @@ class RedisConnectionsFactory(redisClient: RedisClient, alarmServiceResolver: Al
   def reactiveConnection[K, V](alarmCodec: AlarmCodec[K, V]): Future[RedisPubSubReactiveCommands[K, V]] =
     redisURI.flatMap(redisUri ⇒ redisClient.connectPubSubAsync(alarmCodec, redisUri).toScala.map(_.reactive()))
 
-  def wrappedReactiveConnection[K, V](alarmCodec: AlarmCodec[K, V]): Future[RedisReactiveScalaApi[K, V]] =
-    reactiveConnection(alarmCodec).map(new RedisReactiveScalaApi(_))
+  def wrappedReactiveConnection[K, V](alarmCodec: AlarmCodec[K, V]): Future[RedisPSubscribeScalaApi[K, V]] =
+    reactiveConnection(alarmCodec).map(new RedisPSubscribeScalaApi(_))
 
   def redisKeySpaceApi[K, V](
       redisAsyncScalaApi: RedisAsyncScalaApi[K, V]

@@ -17,6 +17,5 @@ object SourceExtensions {
     }
 
     def cancellable: Source[Out, KillSwitch] = source.viaMat(KillSwitches.single)(Keep.right)
-
   }
 }

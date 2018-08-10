@@ -1,4 +1,4 @@
-package romaine
+package romaine.reactive
 
 import akka.Done
 import akka.stream.KillSwitch
@@ -19,8 +19,7 @@ class RedisSubscription[TKey](
    * @return a future which completes when the unsubscribe is completed
    */
   def unsubscribe(): Future[Unit] = async {
-    await(redisReactiveScalaApi.unsubscribe(keys))  // unsubscribe is no-op
-    await(redisReactiveScalaApi.punsubscribe(keys)) // punsubscribe is no-op
+    await(redisReactiveScalaApi.unsubscribe(keys)) // unsubscribe is no-op
     await(redisReactiveScalaApi.quit)
     killSwitch.shutdown()
     await(terminationSignal) // await on terminationSignal when unsubscribe is called by user

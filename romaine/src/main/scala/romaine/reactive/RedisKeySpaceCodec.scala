@@ -1,4 +1,4 @@
-package romaine
+package romaine.reactive
 
 import io.lettuce.core.codec.RedisCodec
 
