@@ -19,7 +19,7 @@ import scala.async.Async.{async, await}
 import scala.concurrent.Future
 
 trait SeverityServiceModule extends SeverityService {
-  self: MetadataServiceModule with StatusServiceModule ⇒
+  self: MetadataServiceModule ⇒
 
   val redisConnectionsFactory: RedisConnectionsFactory
   def settings: Settings
@@ -29,12 +29,6 @@ trait SeverityServiceModule extends SeverityService {
 
   private val log                        = AlarmServiceLogger.getLogger
   implicit private val mat: Materializer = ActorMaterializer()
-
-  final override def setSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Unit] = async {
-    val previousSeverity = await(getCurrentSeverity(key))
-    await(setCurrentSeverity(key, severity))
-    await(updateStatusForSeverity(key, severity, previousSeverity))
-  }
 
   final override def getAggregatedSeverity(key: Key): Future[AlarmSeverity] = async {
     log.debug(s"Get aggregated severity for alarm [${key.value}]")
