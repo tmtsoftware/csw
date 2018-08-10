@@ -40,35 +40,27 @@ trait StatusServiceModule extends StatusService {
   // reset is only called when severity is `Okay`
   final override def reset(key: AlarmKey): Future[Unit] = async {
     log.debug(s"Reset alarm [${key.value}]")
-    val metadataApi   = await(metadataApiF)
-    val statusApi     = await(statusApiF)
-    val maybeMetadata = await(metadataApi.get(key))
+    val metadata = await(getMetadata(key))
 
-    maybeMetadata match {
-      case Some(metadata) ⇒
-        val currentSeverity = await(getCurrentSeverity(key))
-        if (currentSeverity != Okay) logAndThrow(ResetOperationNotAllowed(key, currentSeverity))
+    val currentSeverity = await(getCurrentSeverity(key))
+    if (currentSeverity != Okay) logAndThrow(ResetOperationNotAllowed(key, currentSeverity))
 
-        val status = await(statusApi.get(key)).getOrElse(AlarmStatus())
-        val resetStatus = status.copy(
-          acknowledgementStatus = Acknowledged,
-          latchStatus = if (metadata.isLatchable) Latched else UnLatched,
-          latchedSeverity = Okay,
-          alarmTime = alarmTime(status)
-        )
-        if (status != resetStatus) await(statusApi.set(key, resetStatus))
-
-      case None ⇒ logAndThrow(KeyNotFoundException(key))
-    }
+    val status = await(getStatus(key))
+    val resetStatus = status.copy(
+      acknowledgementStatus = Acknowledged,
+      latchStatus = if (metadata.isLatchable) Latched else UnLatched,
+      latchedSeverity = Okay,
+      alarmTime = alarmTime(status)
+    )
+    if (status != resetStatus) await(setStatus(key, resetStatus))
   }
 
   final override def shelve(key: AlarmKey): Future[Unit] = async {
     log.debug(s"Shelve alarm [${key.value}]")
-    val statusApi = await(statusApiF)
 
-    val status = await(statusApi.get(key)).getOrElse(AlarmStatus())
+    val status = await(getStatus(key))
     if (status.shelveStatus != Shelved) {
-      await(statusApi.set(key, status.copy(shelveStatus = Shelved)))
+      await(setStatus(key, status.copy(shelveStatus = Shelved)))
       shelveTimeoutRef ! ScheduleShelveTimeout(key) // start shelve timeout for this alarm (default 8 AM local time)
     }
   }
@@ -117,12 +109,11 @@ trait StatusServiceModule extends StatusService {
 
   private def unShelve(key: AlarmKey, cancelShelveTimeout: Boolean): Future[Unit] = async {
     log.debug(s"Un-shelve alarm [${key.value}]")
-    val statusApi = await(statusApiF)
 
     //TODO: decide whether to  unshelve an alarm when it goes to okay
-    val status = await(statusApi.get(key)).getOrElse(AlarmStatus())
+    val status = await(getStatus(key))
     if (status.shelveStatus != UnShelved) {
-      await(statusApi.set(key, status.copy(shelveStatus = UnShelved)))
+      await(setStatus(key, status.copy(shelveStatus = UnShelved)))
       // if in case of manual un-shelve operation, cancel the scheduled timer for this alarm
       // this method is also called when scheduled timer for shelving of an alarm goes off (i.e. default 8 AM local time) with
       // cancelShelveTimeout as false
@@ -134,15 +125,10 @@ trait StatusServiceModule extends StatusService {
   private def setAcknowledgementStatus(key: AlarmKey, ackStatus: AcknowledgementStatus): Future[Unit] = async {
     log.debug(s"$ackStatus alarm [${key.value}]")
 
-    val metadataApi = await(metadataApiF)
-    val statusApi   = await(statusApiF)
+    val status = await(getStatus(key))
 
-    if (await(metadataApi.exists(key))) {
-      val status = await(statusApi.get(key)).getOrElse(AlarmStatus())
-
-      if (status.acknowledgementStatus != ackStatus) // save the set call if status is already set to given acknowledgement status
-        await(statusApi.set(key, status.copy(acknowledgementStatus = ackStatus)))
-    } else logAndThrow(KeyNotFoundException(key))
+    if (status.acknowledgementStatus != ackStatus) // save the set call if status is already set to given acknowledgement status
+      await(setStatus(key, status.copy(acknowledgementStatus = ackStatus)))
   }
 
   private def alarmTime(status: AlarmStatus) = if (status.latchedSeverity != Okay) Some(AlarmTime()) else status.alarmTime
