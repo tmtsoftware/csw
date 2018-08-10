@@ -22,8 +22,9 @@ import org.scalatest.concurrent.Eventually
 import org.scalatest.time.Span
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
-import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
+import scala.concurrent.{Await, ExecutionContext}
+import scala.util.control.NonFatal
 
 class LocationServiceCompTestWithCluster extends LocationServiceCompTest("cluster")
 
@@ -38,6 +39,7 @@ class LocationServiceCompTest(mode: String)
   InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
 
   implicit val actorSystem: ActorSystem = ActorSystemFactory.remote("test")
+  implicit val ec: ExecutionContext     = actorSystem.dispatcher
   implicit val mat: Materializer        = ActorMaterializer()
 
   private lazy val locationService: LocationService = mode match {
@@ -54,7 +56,7 @@ class LocationServiceCompTest(mode: String)
 
   override protected def afterAll(): Unit = {
     if (mode.equals("cluster")) Await.result(locationService.shutdown(TestFinishedReason), 5.seconds)
-    else Http().shutdownAllConnectionPools().await
+    else Http().shutdownAllConnectionPools().recover { case NonFatal(_) ⇒ /* ignore */ }.await
 
     actorSystem.terminate().await
   }
@@ -67,9 +69,7 @@ class LocationServiceCompTest(mode: String)
 
     // register, resolve & list tcp connection for the first time
     locationService.register(tcpRegistration).await
-    locationService.resolve(connection, 2.seconds).await.get shouldBe tcpRegistration.location(
-      new Networks().hostname()
-    )
+    locationService.resolve(connection, 2.seconds).await.get shouldBe tcpRegistration.location(new Networks().hostname())
     locationService.list.await shouldBe List(tcpRegistration.location(new Networks().hostname()))
 
     // unregister, resolve & list tcp connection

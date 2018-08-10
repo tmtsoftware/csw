@@ -28,7 +28,7 @@ class EventServiceIntegrationTest extends FunSuite with EmbeddedRedis with Match
   private val testWiring = new FrameworkTestWiring()
   import testWiring._
 
-  private val masterId: String      = ConfigFactory.load().getString("redis.masterId")
+  private val masterId: String      = ConfigFactory.load().getString("csw-event.redis.masterId")
   private val (_, sentinel, server) = startSentinelAndRegisterService(EventServiceConnection.value, masterId)
 
   private val filterAssemblyConnection = AkkaConnection(ComponentId("Filter", Assembly))

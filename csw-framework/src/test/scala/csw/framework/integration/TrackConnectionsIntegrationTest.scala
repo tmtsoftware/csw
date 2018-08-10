@@ -57,8 +57,8 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Mockit
     assertThatContainerIsRunning(containerRef, containerLifecycleStateProbe, 5.seconds)
 
     // resolve all the components from container using location service
-    val filterAssemblyLocation = seedLocationService.resolve(filterAssemblyConnection, 5.seconds).await
-    val disperserHcdLocation   = seedLocationService.resolve(disperserHcdConnection, 5.seconds).await
+    val filterAssemblyLocation = wiring.locationService.find(filterAssemblyConnection).await
+    val disperserHcdLocation   = wiring.locationService.find(disperserHcdConnection).await
 
     val assemblyCommandService = new CommandService(filterAssemblyLocation.get)
 
