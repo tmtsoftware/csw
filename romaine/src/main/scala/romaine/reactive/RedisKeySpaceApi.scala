@@ -9,7 +9,7 @@ import scala.concurrent.ExecutionContext
 
 class RedisKeySpaceApi[K, V](
     redisPSubscribeApi: RedisPSubscribeScalaApi[String, String],
-    redisAsyncScalaApi: RedisAsyncScalaApi[K, V],
+    redisAsyncScalaApi: RedisAsyncScalaApi[K, V]
 )(implicit redisKeySpaceCodec: RedisKeySpaceCodec[K, V], ec: ExecutionContext) {
 
   private val redisSubscriptionApi: RedisSubscriptionApi[String, String] = new RedisSubscriptionApi(() => redisPSubscribeApi)
