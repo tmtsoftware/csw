@@ -6,7 +6,7 @@ import csw.services.alarm.api.models.AlarmSeverity.Okay
 import csw.services.alarm.api.models.Key.AlarmKey
 import csw.services.alarm.api.models.LatchStatus.{Latched, UnLatched}
 import csw.services.alarm.api.models.ShelveStatus.{Shelved, UnShelved}
-import csw.services.alarm.api.models.{AcknowledgementStatus, AlarmSeverity, AlarmStatus, AlarmTime}
+import csw.services.alarm.api.models._
 import csw.services.alarm.api.scaladsl.StatusService
 import csw.services.alarm.client.internal.AlarmServiceLogger
 import csw.services.alarm.client.internal.commons.Settings
@@ -79,24 +79,49 @@ trait StatusServiceModule extends StatusService {
     val alarm = await(getMetadata(key))
 
     // get alarm status
-    val status    = await(getStatus(key))
-    var newStatus = status
+    val status = await(getStatus(key))
 
-    def shouldUpdateLatchStatus: Boolean                     = alarm.isLatchable && severity.latchable
-    def shouldUpdateLatchedSeverityWhenLatchable: Boolean    = shouldUpdateWhenLatched || shouldUpdateWhenUnLatched
-    def shouldUpdateWhenLatched: Boolean                     = alarm.isLatchable && severity.latchable && severity > status.latchedSeverity
-    def shouldUpdateWhenUnLatched: Boolean                   = alarm.isLatchable && status.latchStatus == UnLatched && severity.latchable
-    def shouldUpdateLatchedSeverityWhenNotLatchable: Boolean = !alarm.isLatchable && severity != previousSeverity
+    object Latchable {
+      def unapply(alarmMetadata: AlarmMetadata): Boolean = alarmMetadata.isLatchable
+      def unapply(alarmSeverity: AlarmSeverity): Boolean = alarmSeverity.latchable
+    }
 
-    if (shouldUpdateLatchStatus) newStatus = newStatus.copy(latchStatus = Latched)
+    object NotLatchable {
+      def unapply(alarmMetadata: AlarmMetadata): Boolean = !alarmMetadata.isLatchable
+      def unapply(alarmSeverity: AlarmSeverity): Boolean = !alarmSeverity.latchable
+    }
 
-    if (shouldUpdateLatchedSeverityWhenLatchable || shouldUpdateLatchedSeverityWhenNotLatchable)
-      newStatus = newStatus.copy(latchedSeverity = severity, alarmTime = Some(AlarmTime()))
+    object IsUnLatched {
+      def unapply(status: AlarmStatus): Boolean = status.latchStatus == LatchStatus.UnLatched
+    }
+
+    object HigherLatchedSeverity {
+      def unapply(status: AlarmStatus): Boolean = severity > status.latchedSeverity
+    }
+
+    object NotPreviousSeverity {
+      def unapply(severity: AlarmSeverity): Boolean = severity != previousSeverity
+    }
+
+    val setLatchSeverity   = status.copy(latchedSeverity = severity, alarmTime = Some(AlarmTime()))
+    val latch: AlarmStatus = status.copy(latchedSeverity = severity, alarmTime = Some(AlarmTime()), latchStatus = Latched)
+
+    val updatedStatus = (alarm, severity, status) match {
+      case (Latchable(), Latchable(), HigherLatchedSeverity()) ⇒ latch
+      case (Latchable(), Latchable(), IsUnLatched())           ⇒ latch
+      case (NotLatchable(), NotPreviousSeverity(), _)          ⇒ setLatchSeverity
+      case _                                                   ⇒ status
+    }
 
     // derive acknowledgement status
-    if (newStatus.latchedSeverity == Okay || alarm.isAutoAcknowledgeable)
-      newStatus = newStatus.copy(acknowledgementStatus = Acknowledged)
-    else if (severity != previousSeverity) newStatus = newStatus.copy(acknowledgementStatus = UnAcknowledged)
+    val newStatus =
+      if (updatedStatus.latchedSeverity == Okay || alarm.isAutoAcknowledgeable) {
+        updatedStatus.copy(acknowledgementStatus = Acknowledged)
+      } else if (severity != previousSeverity) {
+        updatedStatus.copy(acknowledgementStatus = UnAcknowledged)
+      } else {
+        updatedStatus
+      }
 
     // update alarm status (with recent time) only when severity changes
     if (newStatus != status) await(setStatus(key, newStatus))
