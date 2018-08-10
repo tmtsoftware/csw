@@ -1,4 +1,6 @@
 package csw.services.alarm
+import akka.http.scaladsl.Http
+import csw.messages.commons.CoordinatedShutdownReasons.ApplicationFinishedReason
 import csw.services.BuildInfo
 import csw.services.alarm.cli.args.{ArgsParser, CommandLineArgs}
 import csw.services.alarm.cli.wiring.Wiring
@@ -24,8 +26,10 @@ object Main extends App {
 
     val wiring = new Wiring(actorSystem)
     import wiring._
+    import actorRuntime._
 
-    commandExecutor.execute(commandLineArgs)
+    try commandExecutor.execute(commandLineArgs)
+    finally Http().shutdownAllConnectionPools().onComplete(_ ⇒ shutdown(ApplicationFinishedReason))
   }
 }
 // $COVERAGE-ON$
