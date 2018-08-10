@@ -1,5 +1,6 @@
 package csw.apps.clusterseed.client
 
+import akka.http.scaladsl.Http
 import csw.apps.clusterseed.internal.AdminWiring
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.event.helpers.TestFutureExt.RichFuture
@@ -9,7 +10,7 @@ import scala.util.{Failure, Success, Try}
 
 trait HTTPLocationService extends FunSuiteLike with BeforeAndAfterAll {
 
-  val (wiring, binding) = Try {
+  val (maybeWiring, maybeBinding) = Try {
     val adminWiring = AdminWiring.make(Some(3553), None)
     (adminWiring, adminWiring.locationHttpService.start().await)
   } match {
@@ -18,7 +19,10 @@ trait HTTPLocationService extends FunSuiteLike with BeforeAndAfterAll {
   }
 
   override def afterAll(): Unit = {
-    wiring.map(_.actorRuntime.shutdown(TestFinishedReason).await)
+    maybeWiring.map { wiring ⇒
+      Http(wiring.actorSystem).shutdownAllConnectionPools().await
+      wiring.actorRuntime.shutdown(TestFinishedReason).await
+    }
     super.afterAll()
   }
 }

@@ -56,9 +56,10 @@ class LocationServiceCompTest(mode: String)
 
   override protected def afterAll(): Unit = {
     if (mode.equals("cluster")) Await.result(locationService.shutdown(TestFinishedReason), 5.seconds)
-    else Http().shutdownAllConnectionPools().recover { case NonFatal(_) ⇒ /* ignore */ }.await
-
-    actorSystem.terminate().await
+    else {
+      Http().shutdownAllConnectionPools().recover { case NonFatal(_) ⇒ /* ignore */ }.await
+      actorSystem.terminate().await
+    }
   }
 
   test("should able to register, resolve, list and unregister tcp location") {
