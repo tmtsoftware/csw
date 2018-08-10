@@ -79,7 +79,7 @@ class EventServiceFactory(store: EventStore = RedisStore()) {
     implicit val ec: ExecutionContext       = system.dispatcher
     implicit val materializer: Materializer = mat()
 
-    def masterId = system.settings.config.getString("redis.masterId")
+    def masterId = system.settings.config.getString("csw-event.redis.masterId")
 
     store match {
       case RedisStore(client) ⇒ new RedisEventService(eventServiceResolver, masterId, client)

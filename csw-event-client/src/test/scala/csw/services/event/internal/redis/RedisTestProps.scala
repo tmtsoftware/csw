@@ -32,7 +32,7 @@ class RedisTestProps(
     extends BaseProperties
     with EmbeddedRedis {
 
-  private lazy val masterId = ConfigFactory.load().getString("redis.masterId")
+  private lazy val masterId = ConfigFactory.load().getString("csw-event.redis.masterId")
   private lazy val redisURI = RedisURI.Builder.sentinel("localhost", sentinelPort, masterId).build()
   private lazy val asyncConnection: Future[RedisAsyncCommands[String, String]] =
     redisClient.connectAsync(new StringCodec(), redisURI).toScala.map(_.async())
