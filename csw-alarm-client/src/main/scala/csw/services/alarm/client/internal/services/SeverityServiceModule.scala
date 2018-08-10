@@ -9,7 +9,7 @@ import csw.services.alarm.api.internal.{SeverityKey, StatusKey}
 import csw.services.alarm.api.models.AlarmSeverity.Disconnected
 import csw.services.alarm.api.models.Key.AlarmKey
 import csw.services.alarm.api.models.{AlarmSeverity, Key}
-import csw.services.alarm.api.scaladsl.AlarmSubscription
+import csw.services.alarm.api.scaladsl.{AlarmSubscription, SeverityService}
 import csw.services.alarm.client.internal.commons.Settings
 import csw.services.alarm.client.internal.redis.RedisConnectionsFactory
 import csw.services.alarm.client.internal.{AlarmCodec, AlarmServiceLogger}
@@ -18,17 +18,25 @@ import reactor.core.publisher.FluxSink.OverflowStrategy
 import scala.async.Async.{async, await}
 import scala.concurrent.Future
 
-class SeverityService(
-    redisConnectionsFactory: RedisConnectionsFactory,
-    metadataService: MetadataService,
-    settings: Settings
-)(implicit actorSystem: ActorSystem) {
+trait SeverityServiceModule extends SeverityService {
+  self: MetadataServiceModule with StatusServiceModule ⇒
+
+  val redisConnectionsFactory: RedisConnectionsFactory
+  def settings: Settings
+  implicit val actorSystem: ActorSystem
+
   import redisConnectionsFactory._
 
-  private val log                = AlarmServiceLogger.getLogger
-  implicit val mat: Materializer = ActorMaterializer()
+  private val log                        = AlarmServiceLogger.getLogger
+  implicit private val mat: Materializer = ActorMaterializer()
 
-  def getAggregatedSeverity(key: Key): Future[AlarmSeverity] = async {
+  final override def setSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Unit] = async {
+    val previousSeverity = await(getCurrentSeverity(key))
+    await(setCurrentSeverity(key, severity))
+    await(updateStatusForSeverity(key, severity, previousSeverity))
+  }
+
+  final override def getAggregatedSeverity(key: Key): Future[AlarmSeverity] = async {
     log.debug(s"Get aggregated severity for alarm [${key.value}]")
     val metadataApi = await(metadataApiF)
     val severityApi = await(severityApiF)
@@ -49,25 +57,34 @@ class SeverityService(
     severityList.reduceRight((previous, current: AlarmSeverity) ⇒ previous max current)
   }
 
-  def subscribeAggregatedSeverityCallback(key: Key, callback: AlarmSeverity ⇒ Unit): AlarmSubscription = {
+  final override def subscribeAggregatedSeverityCallback(key: Key, callback: AlarmSeverity ⇒ Unit): AlarmSubscription = {
     log.debug(s"Subscribe aggregated severity for alarm [${key.value}] with a callback")
     subscribeAggregatedSeverity(key)
       .to(Sink.foreach(callback))
       .run()
   }
 
-  def subscribeAggregatedSeverityActorRef(key: Key, actorRef: ActorRef[AlarmSeverity]): AlarmSubscription = {
+  final override def subscribeAggregatedSeverityActorRef(key: Key, actorRef: ActorRef[AlarmSeverity]): AlarmSubscription = {
     log.debug(s"Subscribe aggregated severity for alarm [${key.value}] with an actor")
     subscribeAggregatedSeverityCallback(key, actorRef ! _)
   }
 
-  def setCurrentSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Unit] = async {
+  final override def getCurrentSeverity(key: AlarmKey): Future[AlarmSeverity] = async {
+    log.debug(s"Getting severity for alarm [${key.value}]")
+    val metadataApi = await(metadataApiF)
+    val severityApi = await(severityApiF)
+
+    if (await(metadataApi.exists(key))) await(severityApi.get(key)).getOrElse(Disconnected)
+    else logAndThrow(KeyNotFoundException(key))
+  }
+
+  private[alarm] def setCurrentSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Unit] = async {
     log.debug(
       s"Setting severity [${severity.name}] for alarm [${key.value}] with expire timeout [${settings.ttlInSeconds}] seconds"
     )
 
     // get alarm metadata
-    val alarm = await(metadataService.getMetadata(key))
+    val alarm = await(getMetadata(key))
 
     // validate if the provided severity is supported by this alarm
     if (!alarm.allSupportedSeverities.contains(severity))
@@ -79,15 +96,6 @@ class SeverityService(
     // set the severity of the alarm so that it does not transition to `Disconnected` state
     log.info(s"Updating current severity [${severity.name}] in alarm store")
     await(severityApi.setex(key, settings.ttlInSeconds, severity))
-  }
-
-  private[alarm] def getCurrentSeverity(key: AlarmKey): Future[AlarmSeverity] = async {
-    log.debug(s"Getting severity for alarm [${key.value}]")
-    val metadataApi = await(metadataApiF)
-    val severityApi = await(severityApiF)
-
-    if (await(metadataApi.exists(key))) await(severityApi.get(key)).getOrElse(Disconnected)
-    else logAndThrow(KeyNotFoundException(key))
   }
 
   // PatternMessage gives three values:

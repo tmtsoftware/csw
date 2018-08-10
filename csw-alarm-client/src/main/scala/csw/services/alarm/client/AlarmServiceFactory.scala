@@ -13,7 +13,6 @@ import csw.services.alarm.client.internal.commons.serviceresolver.{
   AlarmServiceResolver
 }
 import csw.services.alarm.client.internal.redis.RedisConnectionsFactory
-import csw.services.alarm.client.internal.services.{HealthService, MetadataService, SeverityService, StatusService}
 import csw.services.alarm.client.internal.shelve.ShelveTimeoutActorFactory
 import csw.services.alarm.client.internal.{AlarmServiceImpl, JAlarmServiceImpl}
 import csw.services.location.javadsl.ILocationService
@@ -57,16 +56,9 @@ class AlarmServiceFactory(redisClient: RedisClient = RedisClient.create()) {
   /************ INTERNAL ************/
   private def alarmService(alarmServiceResolver: AlarmServiceResolver)(implicit system: ActorSystem, ec: ExecutionContext) =
     async {
-      val settings                = new Settings(ConfigFactory.load())
-      val redisConnectionsFactory = new RedisConnectionsFactory(redisClient, alarmServiceResolver, settings.masterId)
-
-      val metadataService           = new MetadataService(redisConnectionsFactory)
-      val severityService           = new SeverityService(redisConnectionsFactory, metadataService, settings)
-      val healthService             = new HealthService(redisConnectionsFactory, severityService)
+      val settings                  = new Settings(ConfigFactory.load())
+      val redisConnectionsFactory   = new RedisConnectionsFactory(redisClient, alarmServiceResolver, settings.masterId)
       val shelveTimeoutActorFactory = new ShelveTimeoutActorFactory()
-      val statusService =
-        new StatusService(redisConnectionsFactory, shelveTimeoutActorFactory, metadataService, severityService, settings)
-
-      new AlarmServiceImpl(healthService, statusService, metadataService, severityService)
+      new AlarmServiceImpl(redisConnectionsFactory, shelveTimeoutActorFactory, settings)
     }
 }

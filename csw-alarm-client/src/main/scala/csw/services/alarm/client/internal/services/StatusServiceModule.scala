@@ -1,6 +1,5 @@
 package csw.services.alarm.client.internal.services
 
-import akka.actor.ActorSystem
 import csw.services.alarm.api.exceptions.{KeyNotFoundException, ResetOperationNotAllowed}
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, UnAcknowledged}
 import csw.services.alarm.api.models.AlarmSeverity.Okay
@@ -8,40 +7,38 @@ import csw.services.alarm.api.models.Key.AlarmKey
 import csw.services.alarm.api.models.LatchStatus.{Latched, UnLatched}
 import csw.services.alarm.api.models.ShelveStatus.{Shelved, UnShelved}
 import csw.services.alarm.api.models.{AcknowledgementStatus, AlarmSeverity, AlarmStatus, AlarmTime}
+import csw.services.alarm.api.scaladsl.StatusService
 import csw.services.alarm.client.internal.AlarmServiceLogger
 import csw.services.alarm.client.internal.commons.Settings
-import csw.services.alarm.client.internal.redis.RedisConnectionsFactory
 import csw.services.alarm.client.internal.shelve.ShelveTimeoutActorFactory
 import csw.services.alarm.client.internal.shelve.ShelveTimeoutMessage.{CancelShelveTimeout, ScheduleShelveTimeout}
 
 import scala.async.Async.{async, await}
 import scala.concurrent.Future
 
-class StatusService(
-    redisConnectionsFactory: RedisConnectionsFactory,
-    shelveTimeoutActorFactory: ShelveTimeoutActorFactory,
-    metadataService: MetadataService,
-    severityService: SeverityService,
-    settings: Settings
-)(implicit actorSystem: ActorSystem) {
+trait StatusServiceModule extends StatusService {
+  self: SeverityServiceModule with MetadataServiceModule ⇒
+
+  def shelveTimeoutActorFactory: ShelveTimeoutActorFactory
+  def settings: Settings
+
+  private val log = AlarmServiceLogger.getLogger
+  private lazy val shelveTimeoutRef =
+    shelveTimeoutActorFactory.make(key ⇒ unShelve(key, cancelShelveTimeout = false))(actorSystem)
+
   import redisConnectionsFactory._
 
-  private val log                   = AlarmServiceLogger.getLogger
-  private lazy val shelveTimeoutRef = shelveTimeoutActorFactory.make(key ⇒ unShelve(key, cancelShelveTimeout = false))
-
-  def getStatus(key: AlarmKey): Future[AlarmStatus] = async {
+  final override def getStatus(key: AlarmKey): Future[AlarmStatus] = async {
     val statusApi = await(statusApiF)
 
     log.debug(s"Getting status for alarm [${key.value}]")
     await(statusApi.get(key)).getOrElse(logAndThrow(KeyNotFoundException(key)))
   }
 
-  def acknowledge(key: AlarmKey): Future[Unit] = setAcknowledgementStatus(key, Acknowledged)
-
-  private[alarm] def unAcknowledge(key: AlarmKey): Future[Unit] = setAcknowledgementStatus(key, UnAcknowledged)
+  final override def acknowledge(key: AlarmKey): Future[Unit] = setAcknowledgementStatus(key, Acknowledged)
 
   // reset is only called when severity is `Okay`
-  def reset(key: AlarmKey): Future[Unit] = async {
+  final override def reset(key: AlarmKey): Future[Unit] = async {
     log.debug(s"Reset alarm [${key.value}]")
     val metadataApi   = await(metadataApiF)
     val statusApi     = await(statusApiF)
@@ -49,7 +46,7 @@ class StatusService(
 
     maybeMetadata match {
       case Some(metadata) ⇒
-        val currentSeverity = await(severityService.getCurrentSeverity(key))
+        val currentSeverity = await(getCurrentSeverity(key))
         if (currentSeverity != Okay) logAndThrow(ResetOperationNotAllowed(key, currentSeverity))
 
         val status = await(statusApi.get(key)).getOrElse(AlarmStatus())
@@ -65,7 +62,7 @@ class StatusService(
     }
   }
 
-  def shelve(key: AlarmKey): Future[Unit] = async {
+  final override def shelve(key: AlarmKey): Future[Unit] = async {
     log.debug(s"Shelve alarm [${key.value}]")
     val statusApi = await(statusApiF)
 
@@ -77,7 +74,9 @@ class StatusService(
   }
 
   // this will most likely be called when operator manually un-shelves an already shelved alarm
-  def unShelve(key: AlarmKey): Future[Unit] = unShelve(key, cancelShelveTimeout = true)
+  final override def unShelve(key: AlarmKey): Future[Unit] = unShelve(key, cancelShelveTimeout = true)
+
+  private[alarm] final override def unAcknowledge(key: AlarmKey): Future[Unit] = setAcknowledgementStatus(key, UnAcknowledged)
 
   private[alarm] def updateStatusForSeverity(
       key: AlarmKey,
@@ -85,7 +84,7 @@ class StatusService(
       previousSeverity: AlarmSeverity
   ): Future[Unit] = async {
     // get alarm metadata
-    val alarm = await(metadataService.getMetadata(key))
+    val alarm = await(getMetadata(key))
 
     // get alarm status
     val status    = await(getStatus(key))
@@ -111,51 +110,10 @@ class StatusService(
     if (newStatus != status) await(setStatus(key, newStatus))
   }
 
-  /*
-  def setSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Unit] = async {
-    log.debug(
-      s"Setting severity [${severity.name}] for alarm [${key.value}] with expire timeout [$settings.ttlInSeconds] seconds"
-    )
-
-    // get alarm metadata
-    val alarm = await(metadataServiceImpl.getMetadata(key))
-
-    // validate if the provided severity is supported by this alarm
-    if (!alarm.allSupportedSeverities.contains(severity))
-      logAndThrow(InvalidSeverityException(key, alarm.allSupportedSeverities, severity))
-
-    // get the current severity of the alarm
-    val severityApi      = await(severityApiF)
-    val previousSeverity = await(severityApi.get(key)).getOrElse(Disconnected)
-
-    // set the severity of the alarm so that it does not transition to `Disconnected` state
-    log.info(s"Updating current severity [${severity.name}] in alarm store")
-    await(severityApi.setex(key, settings.ttlInSeconds, severity))
-
-    // get alarm status
-    val status    = await(statusServiceImpl.getStatus(key))
-    var newStatus = status
-
-    def shouldUpdateLatchStatus: Boolean                     = alarm.isLatchable && severity.latchable
-    def shouldUpdateLatchedSeverityWhenLatchable: Boolean    = shouldUpdateWhenLatched || shouldUpdateWhenUnLatched
-    def shouldUpdateWhenLatched: Boolean                     = alarm.isLatchable && severity.latchable && severity > status.latchedSeverity
-    def shouldUpdateWhenUnLatched: Boolean                   = alarm.isLatchable && status.latchStatus == UnLatched && severity.latchable
-    def shouldUpdateLatchedSeverityWhenNotLatchable: Boolean = !alarm.isLatchable && severity != previousSeverity
-
-    if (shouldUpdateLatchStatus) newStatus = newStatus.copy(latchStatus = Latched)
-
-    if (shouldUpdateLatchedSeverityWhenLatchable || shouldUpdateLatchedSeverityWhenNotLatchable)
-      newStatus = newStatus.copy(latchedSeverity = severity, alarmTime = Some(AlarmTime()))
-
-    // derive acknowledgement status
-    if (newStatus.latchedSeverity == Okay || alarm.isAutoAcknowledgeable)
-      newStatus = newStatus.copy(acknowledgementStatus = Acknowledged)
-    else if (severity != previousSeverity) newStatus = newStatus.copy(acknowledgementStatus = UnAcknowledged)
-
-    // update alarm status (with recent time) only when severity changes
-    if (newStatus != status) await(statusServiceImpl.setStatus(key, newStatus))
+  private[alarm] def setStatus(alarmKey: AlarmKey, alarmStatus: AlarmStatus): Future[Unit] = {
+    log.info(s"Updating alarm status [$alarmStatus] in alarm store")
+    statusApiF.flatMap(_.set(alarmKey, alarmStatus))
   }
-   */
 
   private def unShelve(key: AlarmKey, cancelShelveTimeout: Boolean): Future[Unit] = async {
     log.debug(s"Un-shelve alarm [${key.value}]")
@@ -187,15 +145,10 @@ class StatusService(
     } else logAndThrow(KeyNotFoundException(key))
   }
 
-  private[alarm] def setStatus(alarmKey: AlarmKey, alarmStatus: AlarmStatus): Future[Unit] = {
-    log.info(s"Updating alarm status [$alarmStatus] in alarm store")
-    statusApiF.flatMap(_.set(alarmKey, alarmStatus))
-  }
+  private def alarmTime(status: AlarmStatus) = if (status.latchedSeverity != Okay) Some(AlarmTime()) else status.alarmTime
 
   private def logAndThrow(runtimeException: RuntimeException) = {
     log.error(runtimeException.getMessage, ex = runtimeException)
     throw runtimeException
   }
-
-  private def alarmTime(status: AlarmStatus) = if (status.latchedSeverity != Okay) Some(AlarmTime()) else status.alarmTime
 }

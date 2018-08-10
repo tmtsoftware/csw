@@ -6,6 +6,7 @@ import csw.services.alarm.api.internal.{MetadataKey, StatusKey}
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
 import csw.services.alarm.api.models.Key.{AlarmKey, GlobalKey}
 import csw.services.alarm.api.models.{AlarmMetadata, AlarmMetadataSet, AlarmStatus, Key}
+import csw.services.alarm.api.scaladsl.MetadataService
 import csw.services.alarm.client.internal.AlarmServiceLogger
 import csw.services.alarm.client.internal.configparser.ConfigParser
 import csw.services.alarm.client.internal.redis.RedisConnectionsFactory
@@ -13,12 +14,14 @@ import csw.services.alarm.client.internal.redis.RedisConnectionsFactory
 import scala.async.Async.{async, await}
 import scala.concurrent.Future
 
-class MetadataService(redisConnectionsFactory: RedisConnectionsFactory) {
+trait MetadataServiceModule extends MetadataService {
+
+  val redisConnectionsFactory: RedisConnectionsFactory
   import redisConnectionsFactory._
 
   private val log = AlarmServiceLogger.getLogger
 
-  def activate(key: AlarmKey): Future[Unit] = async {
+  final override def activate(key: AlarmKey): Future[Unit] = async {
     log.debug(s"Activate alarm [${key.value}]")
     val metadataApi = await(metadataApiF)
 
@@ -26,7 +29,7 @@ class MetadataService(redisConnectionsFactory: RedisConnectionsFactory) {
     if (!metadata.isActive) await(metadataApi.set(key, metadata.copy(activationStatus = Active)))
   }
 
-  def deActivate(key: AlarmKey): Future[Unit] = async {
+  final override def deActivate(key: AlarmKey): Future[Unit] = async {
     log.debug(s"Deactivate alarm [${key.value}]")
     val metadataApi = await(metadataApiF)
 
@@ -34,14 +37,14 @@ class MetadataService(redisConnectionsFactory: RedisConnectionsFactory) {
     if (metadata.isActive) await(metadataApi.set(key, metadata.copy(activationStatus = Inactive)))
   }
 
-  def getMetadata(key: AlarmKey): Future[AlarmMetadata] = async {
+  final override def getMetadata(key: AlarmKey): Future[AlarmMetadata] = async {
     log.debug(s"Getting metadata for alarm [${key.value}]")
     val metadataApi = await(metadataApiF)
 
     await(metadataApi.get(key)).getOrElse(logAndThrow(KeyNotFoundException(key)))
   }
 
-  def getMetadata(key: Key): Future[List[AlarmMetadata]] = async {
+  final override def getMetadata(key: Key): Future[List[AlarmMetadata]] = async {
     log.debug(s"Getting metadata for alarms matching [${key.value}]")
     val metadataApi = await(metadataApiF)
 
@@ -50,7 +53,7 @@ class MetadataService(redisConnectionsFactory: RedisConnectionsFactory) {
     await(metadataApi.mget(metadataKeys)).map(_.getValue)
   }
 
-  def initAlarms(inputConfig: Config, reset: Boolean): Future[Unit] = async {
+  final override def initAlarms(inputConfig: Config, reset: Boolean): Future[Unit] = async {
     log.debug(s"Initializing alarm store with reset [$reset]")
     val alarmMetadataSet = ConfigParser.parseAlarmMetadataSet(inputConfig)
     if (reset) await(resetAlarmStore())
