@@ -5,7 +5,7 @@ import csw.services.alarm.api.models.{AlarmMetadata, Key}
 
 import scala.concurrent.Future
 
-trait MetadataService {
+private[alarm] trait MetadataService {
   def initAlarms(inputConfig: Config, reset: Boolean = false): Future[Unit]
 
   def getMetadata(key: AlarmKey): Future[AlarmMetadata]

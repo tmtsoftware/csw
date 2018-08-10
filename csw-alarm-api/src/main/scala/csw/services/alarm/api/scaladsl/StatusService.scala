@@ -4,7 +4,7 @@ import csw.services.alarm.api.models.Key.AlarmKey
 
 import scala.concurrent.Future
 
-trait StatusService {
+private[alarm] trait StatusService {
   def getStatus(key: AlarmKey): Future[AlarmStatus]
   def acknowledge(key: AlarmKey): Future[Unit]
   def reset(key: AlarmKey): Future[Unit]
