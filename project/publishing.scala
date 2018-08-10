@@ -57,15 +57,14 @@ object DeployApp extends AutoPlugin {
     )
 
   private def scriptsAndConfsMapping = Def.task {
-    val scriptsDir             = baseDirectory.value.getParentFile / "scripts"
-    val serviceScript          = scriptsDir / "csw-services.sh"
-    val eventServiceDir        = scriptsDir / "event_service"
-    val eventServiceProdScript = eventServiceDir / "event_service_sentinel_prod.sh"
-    val eventServiceConfs      = Path.allSubpaths(new File(eventServiceDir, "conf"))
+    val scriptsDir    = baseDirectory.value.getParentFile / "scripts"
+    val serviceScript = scriptsDir / "csw-services.sh"
+    val prodScript    = scriptsDir / "redis-sentinel-prod.sh"
+    val confs         = Path.directory(new File(scriptsDir, "conf"))
 
-    eventServiceConfs.map { case (source, dest) ⇒ (source, s"conf/$dest") }.toSeq :+
+    confs :+
     ((serviceScript, s"bin/${serviceScript.getName}")) :+
-    ((eventServiceProdScript, s"bin/${eventServiceProdScript.getName}"))
+    ((prodScript, s"bin/${prodScript.getName}"))
   }
 }
 

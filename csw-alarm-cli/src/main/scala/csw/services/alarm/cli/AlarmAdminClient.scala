@@ -15,9 +15,13 @@ class AlarmAdminClient(actorRuntime: ActorRuntime, locationService: LocationServ
   private val alarmServiceF: Future[AlarmAdminService] = new AlarmServiceFactory().adminApi(locationService)
 
   def init(args: CommandLineArgs): Future[Unit] = async {
-    val config = await(configUtils.getConfig(args.isLocal, args.filePath, None))
-    await(alarmServiceF).initAlarms(config, args.reset)
+    val config       = await(configUtils.getConfig(args.isLocal, args.filePath, None))
+    val alarmService = await(alarmServiceF)
+    await(alarmService.initAlarms(config, args.reset))
   }
 
-  def severity(args: CommandLineArgs): Future[Unit] = alarmServiceF.map(_.setSeverity(args.alarmKey, args.severity))
+  def severity(args: CommandLineArgs): Future[Unit] = async {
+    val alarmService = await(alarmServiceF)
+    await(alarmService.setSeverity(args.alarmKey, args.severity))
+  }
 }

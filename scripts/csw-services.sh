@@ -70,9 +70,9 @@ alarmMasterLogFile=${logDir}/alarm_master.log
 alarmMasterPidFile=${logDir}/alarm_master.pid
 alarmMasterPortFile=${logDir}/alarm_master.port
 
-sentinelConf="../conf/redis-sentinel/sentinel.conf"
-eventMasterConf="../conf/event-service/master.conf"
-alarmMasterConf="../conf/alarm-service/master.conf"
+sentinelConf="../conf/redis_sentinel/sentinel.conf"
+eventMasterConf="../conf/event_service/master.conf"
+alarmMasterConf="../conf/alarm_service/master.conf"
 
 sortVersion="sort -V"
 

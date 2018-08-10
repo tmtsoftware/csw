@@ -54,7 +54,7 @@ trait MetadataServiceModule extends MetadataService {
   }
 
   final override def initAlarms(inputConfig: Config, reset: Boolean): Future[Unit] = async {
-    log.debug(s"Initializing alarm store with reset [$reset]")
+    log.debug(s"Initializing alarm store with reset [$reset] and alarms [$inputConfig]")
     val alarmMetadataSet = ConfigParser.parseAlarmMetadataSet(inputConfig)
     if (reset) await(resetAlarmStore())
     await(setAlarmStore(alarmMetadataSet))
