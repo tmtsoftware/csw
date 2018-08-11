@@ -5,6 +5,10 @@ import csw.apps.clusterseed.internal.AdminWiring
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.location.scaladsl.LocationServiceCompTest
+import csw.services.logging.appenders.StdOutAppender
+import csw.services.logging.internal.LoggingLevels.DEBUG
+import csw.services.logging.internal.LoggingSystem
+import csw.services.logging.scaladsl.LoggingSystemFactory
 
 import scala.util.control.NonFatal
 
@@ -12,6 +16,12 @@ import scala.util.control.NonFatal
 class LocationServiceCompTestWithHttp extends LocationServiceCompTest("http") {
 
   private val wiring = new AdminWiring
+
+  private val loggingSystem: LoggingSystem = LoggingSystemFactory.start("http", "master", "localhost", wiring.actorSystem)
+  loggingSystem.setAppenders(List(StdOutAppender))
+  loggingSystem.setDefaultLogLevel(DEBUG)
+  loggingSystem.setAkkaLevel(DEBUG)
+  loggingSystem.setSlf4jLevel(DEBUG)
 
   val binding: Http.ServerBinding = wiring.locationHttpService.start().await
 
