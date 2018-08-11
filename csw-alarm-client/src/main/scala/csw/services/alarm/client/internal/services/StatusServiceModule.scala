@@ -21,12 +21,11 @@ trait StatusServiceModule extends StatusService {
 
   def shelveTimeoutActorFactory: ShelveTimeoutActorFactory
   def settings: Settings
+  import redisConnectionsFactory._
 
   private val log = AlarmServiceLogger.getLogger
   private lazy val shelveTimeoutRef =
     shelveTimeoutActorFactory.make(key ⇒ unShelve(key, cancelShelveTimeout = false))(actorSystem)
-
-  import redisConnectionsFactory._
 
   final override def getStatus(key: AlarmKey): Future[AlarmStatus] = async {
     val statusApi = await(statusApiF)

@@ -24,11 +24,10 @@ trait SeverityServiceModule extends SeverityService {
   val redisConnectionsFactory: RedisConnectionsFactory
   def settings: Settings
   implicit val actorSystem: ActorSystem
-
   import redisConnectionsFactory._
 
-  private val log                        = AlarmServiceLogger.getLogger
-  implicit private val mat: Materializer = ActorMaterializer()
+  private val log                             = AlarmServiceLogger.getLogger
+  private implicit lazy val mat: Materializer = ActorMaterializer()
 
   final override def getAggregatedSeverity(key: Key): Future[AlarmSeverity] = async {
     log.debug(s"Get aggregated severity for alarm [${key.value}]")

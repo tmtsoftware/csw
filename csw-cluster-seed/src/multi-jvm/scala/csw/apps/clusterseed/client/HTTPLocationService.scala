@@ -19,6 +19,7 @@ trait HTTPLocationService extends FunSuiteLike with BeforeAndAfterAll {
   }
 
   override def afterAll(): Unit = {
+    maybeBinding.map(_.unbind().await)
     maybeWiring.map { wiring ⇒
       Http(wiring.actorSystem).shutdownAllConnectionPools().await
       wiring.actorRuntime.shutdown(TestFinishedReason).await

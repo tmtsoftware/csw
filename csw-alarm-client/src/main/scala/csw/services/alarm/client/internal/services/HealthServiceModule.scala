@@ -16,11 +16,10 @@ trait HealthServiceModule extends HealthService {
 
   val redisConnectionsFactory: RedisConnectionsFactory
   implicit val actorSystem: ActorSystem
-
   import redisConnectionsFactory._
 
-  private val log                        = AlarmServiceLogger.getLogger
-  implicit private val mat: Materializer = ActorMaterializer()
+  private val log                             = AlarmServiceLogger.getLogger
+  private implicit lazy val mat: Materializer = ActorMaterializer()
 
   final override def getAggregatedHealth(key: Key): Future[AlarmHealth] = {
     log.debug(s"Get aggregated health for alarm [${key.value}]")
