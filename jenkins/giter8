@@ -1,0 +1,65 @@
+pipeline {
+    agent {
+        label 'master'
+    }
+
+    options {
+        timestamps()
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/tmtsoftware/csw-prod.git'
+            }
+        }
+
+        stage('Publish Local') {
+            steps {
+                sh "sbt publishLocal"
+            }
+        }
+
+        stage('Giter8 Compile') { // These tests cover the scenario of multiple components in multiple containers on different machines.
+            steps {
+                sh "cd /tmp && rm -rf galil && sbt new https://github.com/tmtsoftware/csw.g8 --branch dev --name=galil --csw_version='0.1-SNAPSHOT' && cd galil && sbt clean compile"
+            }
+        }
+    }
+    post {
+        always {
+            script {
+                sendNotification(currentBuild.result)
+            }
+        }
+    }
+}
+
+def sendNotification(String buildStatus = 'STARTED') {
+    buildStatus = buildStatus ?: 'SUCCESSFUL'
+
+    def colorName = 'RED'
+    def colorCode = '#FF0000'
+    def subject = "${buildStatus}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'"
+    def summary = "${subject} (${env.BUILD_URL})"
+    def details = '${JELLY_SCRIPT,template="html"}'
+
+    // Override default values based on build status
+    if (buildStatus == 'STARTED') {
+        color = 'YELLOW'
+        colorCode = '#FFFF00'
+    } else if (buildStatus == 'SUCCESSFUL') {
+        color = 'GREEN'
+        colorCode = '#00FF00'
+    } else {
+        color = 'RED'
+        colorCode = '#FF0000'
+        emailext(
+                subject: subject,
+                body: details,
+                to: "tmt-csw@thoughtworks.com"
+        )
+    }
+
+    slackSend(channel: "#giter8-nightly-build", color: colorCode, message: summary)
+}
