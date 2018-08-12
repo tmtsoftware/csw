@@ -1,5 +1,6 @@
 package csw.apps.clusterseed
 
+import akka.actor.CoordinatedShutdown
 import csw.apps.clusterseed.internal.AdminWiring
 import csw.apps.clusterseed.cli.{ArgsParser, Options}
 import csw.services.BuildInfo
@@ -15,7 +16,7 @@ import csw.services.location.commons.ClusterAwareSettings
 object Main extends App {
   private val name = BuildInfo.name
 
-  new ArgsParser(name).parse(args).map {
+  new ArgsParser(name).parse(args).foreach {
     case Options(maybeClusterPort, maybeAdminPort, testMode) =>
       if (!testMode && ClusterAwareSettings.seedNodes.isEmpty) {
         println(
@@ -24,10 +25,19 @@ object Main extends App {
       } else {
         val wiring = AdminWiring.make(maybeClusterPort, maybeAdminPort)
         import wiring._
-        actorRuntime.startLogging(name)
+        import actorRuntime._
+        startLogging(name)
 
-        locationHttpService.start()
-        adminHttpService.registeredLazyBinding
+        val locationBindingF = locationHttpService.start()
+        val logAdminBindingF = adminHttpService.registeredLazyBinding
+
+        coordinatedShutdown.addTask(
+          CoordinatedShutdown.PhaseServiceUnbind,
+          "unbind-services"
+        ) { () ⇒
+          locationBindingF.flatMap(_.unbind())
+          logAdminBindingF.flatMap(_.unbind())
+        }
       }
   }
 }

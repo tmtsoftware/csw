@@ -17,7 +17,7 @@ private[clusterseed] class ActorRuntime(_actorSystem: ActorSystem) {
   implicit val mat: Materializer            = ActorMaterializer()
   implicit val scheduler: Scheduler         = actorSystem.scheduler
 
-  private val coordinatedShutdown = CoordinatedShutdown(actorSystem)
+  private[clusterseed] val coordinatedShutdown = CoordinatedShutdown(actorSystem)
 
   def startLogging(name: String): LoggingSystem =
     LoggingSystemFactory.start(name, BuildInfo.version, ClusterAwareSettings.hostname, actorSystem)

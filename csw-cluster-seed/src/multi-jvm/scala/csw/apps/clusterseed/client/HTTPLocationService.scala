@@ -1,5 +1,6 @@
 package csw.apps.clusterseed.client
 
+import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import csw.apps.clusterseed.internal.AdminWiring
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
@@ -8,11 +9,15 @@ import csw.services.location.commons.ActorSystemFactory
 import csw.services.logging.scaladsl.LoggingSystemFactory
 import org.scalatest.{BeforeAndAfterAll, FunSuiteLike}
 
+import scala.concurrent.ExecutionContext
+import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
 
 trait HTTPLocationService extends FunSuiteLike with BeforeAndAfterAll {
 
-  private val testSystem = ActorSystemFactory.remote()
+  val testSystem: ActorSystem               = ActorSystemFactory.remote()
+  private implicit val ec: ExecutionContext = testSystem.dispatcher
+
   LoggingSystemFactory.start("multi-jvm-http", "master", "localhost", testSystem)
 
   val (maybeWiring, maybeBinding) = Try {
@@ -24,12 +29,12 @@ trait HTTPLocationService extends FunSuiteLike with BeforeAndAfterAll {
   }
 
   override def afterAll(): Unit = {
+    super.afterAll()
     maybeBinding.map(_.unbind().await)
     maybeWiring.map { wiring ⇒
-      Http(wiring.actorSystem).shutdownAllConnectionPools().await
+      Http(wiring.actorSystem).shutdownAllConnectionPools().recover { case NonFatal(_) ⇒ /* ignore */ }.await
       wiring.actorRuntime.shutdown(TestFinishedReason).await
     }
-    super.afterAll()
     testSystem.terminate().await
   }
 }
