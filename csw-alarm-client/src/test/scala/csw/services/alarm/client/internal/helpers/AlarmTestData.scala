@@ -7,6 +7,7 @@ import csw.services.alarm.api.models.Key.AlarmKey
 
 trait AlarmTestData {
 
+  // latchable and auto-Acknowledgeable alarm
   val tromboneAxisHighLimitAlarmKey = AlarmKey("nfiraos", "trombone", "tromboneAxisHighLimitAlarm")
   val tromboneAxisHighLimitAlarm = AlarmMetadata(
     subsystem = "NFIRAOS",
@@ -23,6 +24,7 @@ trait AlarmTestData {
     activationStatus = Active
   )
 
+  // latchable, not auto-acknowledgable alarm
   val tromboneAxisLowLimitAlarmKey = AlarmKey("nfiraos", "trombone", "tromboneAxisLowLimitAlarm")
   val tromboneAxisLowLimitAlarm = AlarmMetadata(
     subsystem = "NFIRAOS",
@@ -39,6 +41,7 @@ trait AlarmTestData {
     activationStatus = Active,
   )
 
+  // un-latchable, auto-acknowledgable alarm
   val cpuExceededAlarmKey = AlarmKey("TCS", "tcsPk", "cpuExceededAlarm")
   val cpuExceededAlarm = AlarmMetadata(
     subsystem = "TCS",

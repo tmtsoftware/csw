@@ -23,50 +23,41 @@ class StatusServiceModuleTests
 
   // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
   test("reset should update time for a latchable and auto-acknowledgable alarm") {
-    // latchable, auto-acknowledgable alarm
-    val highLimitAlarmKey = AlarmKey("nfiraos", "trombone", "tromboneAxisHighLimitAlarm")
-
     // latch it to major
-    setSeverityAndGetStatus(highLimitAlarmKey, Major)
+    setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Major)
 
     // set the current severity to okay, latched severity is still at major
-    val status = setSeverityAndGetStatus(highLimitAlarmKey, Okay)
+    val status = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Okay)
 
     // reset the alarm, which sets the latched severity to okay
-    reset(highLimitAlarmKey).await
-    val statusAfterReset = getStatus(highLimitAlarmKey).await
+    reset(tromboneAxisHighLimitAlarmKey).await
+    val statusAfterReset = getStatus(tromboneAxisHighLimitAlarmKey).await
 
-    statusAfterReset.alarmTime.get.time.isAfter(status.alarmTime.get.time) shouldBe true
+    statusAfterReset.alarmTime.get.time should be > status.alarmTime.get.time
   }
 
   // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
-  test("reset should update time only when severity changes for a latchable and not auto-acknowledgable alarm") {
-    // latchable, not auto-acknowledgable alarm
-    val lowLimitAlarmKey = AlarmKey("nfiraos", "trombone", "tromboneAxisLowLimitAlarm")
-
+  test("reset should update time only when severity changes for a latchable and not auto-acknowledgeable alarm") {
     // latch it to okay
-    val status = setSeverityAndGetStatus(lowLimitAlarmKey, Okay)
+    val status = setSeverityAndGetStatus(tromboneAxisLowLimitAlarmKey, Okay)
 
-    acknowledge(lowLimitAlarmKey).await
+    acknowledge(tromboneAxisLowLimitAlarmKey).await
 
     // reset the alarm, which will make alarm to go to un-acknowledged
-    reset(lowLimitAlarmKey).await
-    val statusAfterReset = getStatus(lowLimitAlarmKey).await
+    reset(tromboneAxisLowLimitAlarmKey).await
+    val statusAfterReset = getStatus(tromboneAxisLowLimitAlarmKey).await
 
     statusAfterReset.alarmTime.get.time shouldEqual status.alarmTime.get.time
   }
 
   // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
   test("reset should update time only when severity changes for an un-latchable and auto-acknowledgable alarm") {
-    // un-latchable, auto-acknowledgable alarm
-    val cpuExceededAlarm = AlarmKey("TCS", "tcsPk", "cpuExceededAlarm")
-
     // set current severity to okay, latched severity is also okay since alarm is un-latchable, alarm is acknowledged
-    val status1 = setSeverityAndGetStatus(cpuExceededAlarm, Okay)
+    val status1 = setSeverityAndGetStatus(cpuExceededAlarmKey, Okay)
 
     // reset the alarm, which will make alarm to go to acknowledged, un-latched severity was already okay so no change there
-    reset(cpuExceededAlarm).await
-    val statusAfterReset1 = getStatus(cpuExceededAlarm).await
+    reset(cpuExceededAlarmKey).await
+    val statusAfterReset1 = getStatus(cpuExceededAlarmKey).await
 
     // alarm time should be updated only when latched severity changes
     statusAfterReset1.alarmTime.get.time shouldEqual status1.alarmTime.get.time
@@ -74,14 +65,11 @@ class StatusServiceModuleTests
 
   // DEOPSCSW-447: Reset api for alarm
   test("reset should set the alarm status to Unlatched Okay and Acknowledged when alarm is not latchable") {
-    // un-latchable, auto-acknowledgable alarm
-    val cpuExceededAlarm = AlarmKey("TCS", "tcsPk", "cpuExceededAlarm")
-
     // set current severity to okay, latched severity is also okay since alarm is un-latchable, alarm is acknowledged
-    setSeverity(cpuExceededAlarm, Okay).await
+    setSeverity(cpuExceededAlarmKey, Okay).await
 
-    reset(cpuExceededAlarm).await
-    val status = getStatus(cpuExceededAlarm).await
+    reset(cpuExceededAlarmKey).await
+    val status = getStatus(cpuExceededAlarmKey).await
     status.latchedSeverity shouldEqual Okay
     status.latchStatus shouldEqual UnLatched
     status.acknowledgementStatus shouldEqual Acknowledged
@@ -89,17 +77,14 @@ class StatusServiceModuleTests
 
   // DEOPSCSW-447: Reset api for alarm
   test("reset should set the alarm status to Latched Okay and Acknowledged when alarm is latchable") {
-    // latchable, not auto-acknowledgable alarm
-    val lowLimitAlarmKey = AlarmKey("nfiraos", "trombone", "tromboneAxisLowLimitAlarm")
-
     // set latched severity to Warning which will result status to be Latched and UnAcknowledged
-    setSeverity(lowLimitAlarmKey, Warning).await
+    setSeverity(tromboneAxisLowLimitAlarmKey, Warning).await
 
     // set current severity to Okay
-    setSeverity(lowLimitAlarmKey, Okay).await
+    setSeverity(tromboneAxisLowLimitAlarmKey, Okay).await
 
-    reset(lowLimitAlarmKey).await
-    val status = getStatus(lowLimitAlarmKey).await
+    reset(tromboneAxisLowLimitAlarmKey).await
+    val status = getStatus(tromboneAxisLowLimitAlarmKey).await
     status.latchedSeverity shouldEqual Okay
     status.latchStatus shouldEqual Latched
     status.acknowledgementStatus shouldEqual Acknowledged
@@ -115,35 +100,28 @@ class StatusServiceModuleTests
 
   // DEOPSCSW-447: Reset api for alarm
   test("reset should throw exception if severity is not okay") {
-    val tromboneAxisLowLimitAlarm = AlarmKey("nfiraos", "trombone", "tromboneAxisLowLimitAlarm")
     intercept[ResetOperationNotAllowed] {
-      reset(tromboneAxisLowLimitAlarm).await
+      reset(tromboneAxisLowLimitAlarmKey).await
     }
   }
 
   // DEOPSCSW-446: Acknowledge api for alarm
   test("acknowledge should set acknowledgementStatus to Acknowledged of an alarm") {
-    // latchable, not auto-acknowledgable alarm
-    val lowLimitAlarmKey = AlarmKey("nfiraos", "trombone", "tromboneAxisLowLimitAlarm")
-
     // set latched severity to Warning which will result status to be Latched and UnAcknowledged
-    setSeverity(lowLimitAlarmKey, Warning).await
+    setSeverity(tromboneAxisLowLimitAlarmKey, Warning).await
 
-    acknowledge(lowLimitAlarmKey).await
-    val status = getStatus(lowLimitAlarmKey).await
+    acknowledge(tromboneAxisLowLimitAlarmKey).await
+    val status = getStatus(tromboneAxisLowLimitAlarmKey).await
     status.acknowledgementStatus shouldBe Acknowledged
   }
 
   // DEOPSCSW-446: Acknowledge api for alarm
   test("unAcknowledge should set acknowledgementStatus to UnAcknowledged of an alarm") {
-    // latchable, not auto-acknowledgable alarm
-    val lowLimitAlarmKey = AlarmKey("nfiraos", "trombone", "tromboneAxisLowLimitAlarm")
-
     // set latched severity to Okay which will result status to be Latched and Acknowledged
-    setSeverity(lowLimitAlarmKey, Okay).await
+    setSeverity(tromboneAxisLowLimitAlarmKey, Okay).await
 
-    unAcknowledge(lowLimitAlarmKey).await
-    val status = getStatus(lowLimitAlarmKey).await
+    unAcknowledge(tromboneAxisLowLimitAlarmKey).await
+    val status = getStatus(tromboneAxisLowLimitAlarmKey).await
     status.acknowledgementStatus shouldBe UnAcknowledged
   }
 
