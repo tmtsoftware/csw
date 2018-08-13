@@ -3,24 +3,21 @@ package csw.services.alarm.cli
 import java.nio.file.Paths
 
 import com.typesafe.config.ConfigFactory
-import csw.services.alarm.api.exceptions.{InvalidSeverityException, KeyNotFoundException}
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, UnAcknowledged}
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
-import csw.services.alarm.api.models.AlarmSeverity.{Critical, Major}
+import csw.services.alarm.api.models.AlarmSeverity.Major
 import csw.services.alarm.api.models.Key.GlobalKey
 import csw.services.alarm.cli.args.Options
-import csw.services.alarm.cli.helpers.TestFutureExt.RichFuture
 import csw.services.config.api.models.ConfigData
 import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.config.server.commons.TestFileUtils
 import csw.services.config.server.{ServerWiring, Settings}
-import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
-class CommandExecutorTest extends FunSuite with Matchers with SeedData with BeforeAndAfterAll {
+class CommandExecutorTest extends AlarmCliTestSetup {
 
   import cliWiring._
 
-  private val adminService = alarmAdminClient.alarmServiceF.await
+  private val adminService = alarmAdminClient.alarmServiceF.futureValue
 
   private val successMsg = "[SUCCESS] Command executed successfully."
   private val failureMsg = "[FAILURE] Failed to execute the command."
@@ -39,7 +36,7 @@ class CommandExecutorTest extends FunSuite with Matchers with SeedData with Befo
     commandExecutor.execute(args)
     logBuffer shouldEqual List(successMsg)
 
-    val metadata = adminService.getMetadata(GlobalKey).await
+    val metadata = adminService.getMetadata(GlobalKey).futureValue
 
     metadata.map(_.alarmKey.value).toSet shouldEqual Set(
       "nfiraos.trombone.tromboneaxishighlimitalarm",
@@ -53,19 +50,19 @@ class CommandExecutorTest extends FunSuite with Matchers with SeedData with Befo
   test("should initialize alarms in alarm store from remote config") {
     val serverWiring = ServerWiring.make(locationService)
     serverWiring.svnRepo.initSvnRepo()
-    serverWiring.httpService.registeredLazyBinding.await
+    val (binding, regResult) = serverWiring.httpService.registeredLazyBinding.futureValue
 
     val configData    = ConfigData.fromPath(Paths.get(getClass.getResource("/valid-alarms.conf").getPath))
     val configPath    = Paths.get("valid-alarms.conf")
     val configService = ConfigClientFactory.adminApi(system, locationService)
-    configService.create(configPath, configData, comment = "commit test file").await
+    configService.create(configPath, configData, comment = "commit test file").futureValue
 
     val args = Options("init", Some(configPath))
     commandExecutor.execute(args)
 
     logBuffer shouldEqual List(successMsg)
 
-    val metadata = adminService.getMetadata(GlobalKey).await
+    val metadata = adminService.getMetadata(GlobalKey).futureValue
 
     metadata.map(_.alarmKey.value).toSet shouldEqual Set(
       "nfiraos.trombone.tromboneaxishighlimitalarm",
@@ -74,17 +71,17 @@ class CommandExecutorTest extends FunSuite with Matchers with SeedData with Befo
       "lgsf.tcspkinactive.cpuidlealarm"
     )
 
-    configService.delete(configPath, "deleting test file").await
+    // clean up
+    configService.delete(configPath, "deleting test file").futureValue
+    regResult.unregister().futureValue
+    binding.unbind().futureValue
   }
 
   // DEOPSCSW-470: CLI application to exercise and test the alarm API
-
   test("should fail to initialize alarms in alarm store when config service is down") {
     val configPath = Paths.get("valid-alarms.conf")
     val args       = Options("init", Some(configPath))
-    intercept[RuntimeException] {
-      commandExecutor.execute(args)
-    }
+    an[RuntimeException] shouldBe thrownBy(commandExecutor.execute(args))
     logBuffer shouldEqual List(failureMsg)
   }
 
@@ -107,7 +104,7 @@ class CommandExecutorTest extends FunSuite with Matchers with SeedData with Befo
     )
     commandExecutor.execute(updateCmd)
 
-    adminService.getCurrentSeverity(updateCmd.alarmKey).await shouldBe Major
+    adminService.getCurrentSeverity(updateCmd.alarmKey).futureValue shouldBe Major
 
     logBuffer shouldEqual List(successMsg)
   }
@@ -129,11 +126,11 @@ class CommandExecutorTest extends FunSuite with Matchers with SeedData with Befo
       name = "tromboneAxisLowLimitAlarm"
     )
 
-    adminService.getStatus(ackCmd.alarmKey).await.acknowledgementStatus shouldBe UnAcknowledged
+    adminService.getStatus(ackCmd.alarmKey).futureValue.acknowledgementStatus shouldBe UnAcknowledged
 
     commandExecutor.execute(ackCmd)
 
-    adminService.getStatus(ackCmd.alarmKey).await.acknowledgementStatus shouldBe Acknowledged
+    adminService.getStatus(ackCmd.alarmKey).futureValue.acknowledgementStatus shouldBe Acknowledged
 
     logBuffer shouldEqual List(successMsg)
   }
@@ -157,7 +154,7 @@ class CommandExecutorTest extends FunSuite with Matchers with SeedData with Befo
 
     commandExecutor.execute(ackCmd)
 
-    adminService.getMetadata(ackCmd.alarmKey).await.activationStatus shouldBe Active
+    adminService.getMetadata(ackCmd.alarmKey).futureValue.activationStatus shouldBe Active
     logBuffer shouldEqual List(successMsg)
   }
 
@@ -180,7 +177,7 @@ class CommandExecutorTest extends FunSuite with Matchers with SeedData with Befo
 
     commandExecutor.execute(ackCmd)
 
-    adminService.getMetadata(ackCmd.alarmKey).await.activationStatus shouldBe Inactive
+    adminService.getMetadata(ackCmd.alarmKey).futureValue.activationStatus shouldBe Inactive
     logBuffer shouldEqual List(successMsg)
   }
 }

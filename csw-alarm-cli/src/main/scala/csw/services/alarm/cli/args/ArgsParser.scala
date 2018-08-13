@@ -30,6 +30,23 @@ class ArgsParser(name: String) {
       .action((_, args) ⇒ args.copy(cmd = "deactivate"))
       .text("deactivate an alarm")
       .children(subsystem, component, alarmName)
+
+    help("help")
+
+    version("version")
+
+    checkConfig { c =>
+      if (c.cmd.isEmpty)
+        failure("""
+                  |Please specify one of the following command with their corresponding options:
+                  |  1> init
+                  |  2> update
+                  |  3> acknowledge
+                  |  4> activate
+                  |  5> deactivate
+                """.stripMargin)
+      else success
+    }
   }
 
   def parse(args: Seq[String]): Option[Options] = parser.parse(args, Options())
