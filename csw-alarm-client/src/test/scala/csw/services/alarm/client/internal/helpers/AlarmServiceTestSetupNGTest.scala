@@ -15,12 +15,13 @@ import csw.services.alarm.client.internal.redis.RedisConnectionsFactory
 import csw.services.location.commons.ActorSystemFactory
 import io.lettuce.core.RedisClient
 import org.scalatest.Matchers
+import org.scalatest.testng.TestNGSuite
 import org.testng.annotations.AfterSuite
 import romaine.RedisAsyncScalaApi
 
 import scala.concurrent.ExecutionContext
 
-class AlarmServiceTestSetupNGTest extends Matchers with EmbeddedRedis {
+class AlarmServiceTestSetupNGTest extends TestNGSuite with Matchers with EmbeddedRedis {
   val hostname    = "localhost"
   val alarmServer = "alarmServer"
 

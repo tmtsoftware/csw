@@ -16,10 +16,10 @@ import org.testng.annotations.{BeforeSuite, DataProvider, Test}
 //DEOPSCSW-444 : Set severity api for component
 class SetSeverityTests extends AlarmServiceTestSetupNGTest {
 
-  val `low-latchable->high-latchable` = AlarmKey("test-subsystem", "test-component", "low-latchable->high-latchable")
-  val `low-unlatable->hig-latchable`  = AlarmKey("test-subsystem", "test-component", "low-unlatable->hig-latchable")
-  val `high-latchable->low-latchable` = AlarmKey("test-subsystem", "test-component", "high-latchable->low-latchable")
-  val `high-unlatable->low-latchable` = AlarmKey("test-subsystem", "test-component", "high-unlatable->low-latchable")
+  val `low_latchable=>high_latchable` = AlarmKey("AOESW", "test_component", "low_latchable=>high_latchable")
+  val `low_unlatable=>hig_latchable`  = AlarmKey("AOESW", "test_component", "low_unlatable=>hig_latchable")
+  val `high_latchable=>low_latchable` = AlarmKey("AOESW", "test_component", "high_latchable=>low_latchable")
+  val `high_unlatable=>low_latchable` = AlarmKey("AOESW", "test_component", "high_unlatable=>low_latchable")
 
   val alarmServiceImpl: AlarmServiceImpl = alarmService.asInstanceOf[AlarmServiceImpl]
 
@@ -31,10 +31,10 @@ class SetSeverityTests extends AlarmServiceTestSetupNGTest {
     alarmService.initAlarms(validAlarmsConfig, reset = true).await
 
     List(
-      (`low-latchable->high-latchable`, Warning),
-      (`low-unlatable->hig-latchable`, Disconnected),
-      (`high-latchable->low-latchable`, Major),
-      (`high-unlatable->low-latchable`, Disconnected)
+      (`low_latchable=>high_latchable`, Warning),
+      (`low_unlatable=>hig_latchable`, Disconnected),
+      (`high_latchable=>low_latchable`, Major),
+      (`high_unlatable=>low_latchable`, Disconnected)
     ).foreach {
       case (alarmKey, severity) if severity == Disconnected =>
         alarmServiceImpl.setStatus(alarmKey, AlarmStatus()).await
@@ -58,31 +58,31 @@ class SetSeverityTests extends AlarmServiceTestSetupNGTest {
         oldSeverity = Warning,
         newSeverity = Major,
         outcome = Major,
-        alarmKey = `low-latchable->high-latchable`
+        alarmKey = `low_latchable=>high_latchable`
       ),
       SetSeverityTestCase(
         oldSeverity = Disconnected,
         newSeverity = Critical,
         outcome = Critical,
-        alarmKey = `low-unlatable->hig-latchable`
+        alarmKey = `low_unlatable=>hig_latchable`
       ),
       SetSeverityTestCase(
         oldSeverity = Major,
         newSeverity = Warning,
         outcome = Major,
-        alarmKey = `high-latchable->low-latchable`
+        alarmKey = `high_latchable=>low_latchable`
       ),
       SetSeverityTestCase(
         oldSeverity = Disconnected,
         newSeverity = Major,
         outcome = Major,
-        alarmKey = `high-unlatable->low-latchable`
+        alarmKey = `high_unlatable=>low_latchable`
       )
     )
 
   val ackAndLatchTestCases = Array(
     AcknowledgeAndLatchTestCase(
-      alarmKey = AlarmKey("test", "test", "AutoAcknowledgeble-Latchable-Disconnected->Okay"),
+      alarmKey = AlarmKey("AOESW", "test", "AutoAcknowledgeble_Latchable_Disconnected=>Okay"),
       isAutoAcknowledgeble = true,
       isAlarmLachable = true,
       oldSeverity = Disconnected,
@@ -91,7 +91,7 @@ class SetSeverityTests extends AlarmServiceTestSetupNGTest {
       expectedLatchStatus = Latched
     ),
     AcknowledgeAndLatchTestCase(
-      alarmKey = AlarmKey("test", "test", "NotAutoAcknowledgeble-Latchable-Disconnected->Okay"),
+      alarmKey = AlarmKey("AOESW", "test", "NotAutoAcknowledgeble_Latchable_Disconnected=>Okay"),
       isAutoAcknowledgeble = false,
       isAlarmLachable = true,
       oldSeverity = Disconnected,
@@ -100,7 +100,7 @@ class SetSeverityTests extends AlarmServiceTestSetupNGTest {
       expectedLatchStatus = Latched
     ),
     AcknowledgeAndLatchTestCase(
-      alarmKey = AlarmKey("test", "test", "AutoAcknowledgeble-NotLatchable-Disconnected->Okay"),
+      alarmKey = AlarmKey("AOESW", "test", "AutoAcknowledgeble_NotLatchable_Disconnected=>Okay"),
       isAutoAcknowledgeble = true,
       isAlarmLachable = false,
       oldSeverity = Disconnected,
@@ -109,7 +109,7 @@ class SetSeverityTests extends AlarmServiceTestSetupNGTest {
       expectedLatchStatus = UnLatched
     ),
     AcknowledgeAndLatchTestCase(
-      alarmKey = AlarmKey("test", "test", "NotAutoAcknowledgeble-NotLatchable-Disconnected->Okay"),
+      alarmKey = AlarmKey("AOESW", "test", "NotAutoAcknowledgeble_NotLatchable_Disconnected=>Okay"),
       isAutoAcknowledgeble = false,
       isAlarmLachable = false,
       oldSeverity = Disconnected,
@@ -118,7 +118,7 @@ class SetSeverityTests extends AlarmServiceTestSetupNGTest {
       expectedLatchStatus = UnLatched
     ),
     AcknowledgeAndLatchTestCase(
-      alarmKey = AlarmKey("test", "test", "AutoAcknowledgeble-Latchable-Okay->Critical"),
+      alarmKey = AlarmKey("AOESW", "test", "AutoAcknowledgeble_Latchable_Okay=>Critical"),
       isAutoAcknowledgeble = true,
       isAlarmLachable = true,
       oldSeverity = Okay,
@@ -127,34 +127,34 @@ class SetSeverityTests extends AlarmServiceTestSetupNGTest {
       expectedLatchStatus = Latched
     ),
     AcknowledgeAndLatchTestCase(
-      alarmKey = AlarmKey("test", "test", "NotAutoAcknowledgeble-Latchable-Okay->Critical"),
+      alarmKey = AlarmKey("AOESW", "test", "NotAutoAcknowledgeble_Latchable_Okay=>Critical"),
       isAutoAcknowledgeble = false,
       isAlarmLachable = true,
-      oldSeverity = Okay,
-      newSeverity = Critical,
-      expectedAckStatus = UnAcknowledged,
-      expectedLatchStatus = Latched
-    ),
-    AcknowledgeAndLatchTestCase(
-      alarmKey = AlarmKey("test", "test", "AutoAcknowledgeble-NotLatchable-Okay->Critical"),
-      isAutoAcknowledgeble = true,
-      isAlarmLachable = false,
-      oldSeverity = Okay,
-      newSeverity = Critical,
-      expectedAckStatus = Acknowledged,
-      expectedLatchStatus = UnLatched
-    ),
-    AcknowledgeAndLatchTestCase(
-      alarmKey = AlarmKey("test", "test", "NotAutoAcknowledgeble-NotLatchable-Okay->Critical"),
-      isAutoAcknowledgeble = false,
-      isAlarmLachable = false,
       oldSeverity = Okay,
       newSeverity = Critical,
       expectedAckStatus = UnAcknowledged,
+      expectedLatchStatus = Latched
+    ),
+    AcknowledgeAndLatchTestCase(
+      alarmKey = AlarmKey("AOESW", "test", "AutoAcknowledgeble_NotLatchable_Okay=>Critical"),
+      isAutoAcknowledgeble = true,
+      isAlarmLachable = false,
+      oldSeverity = Okay,
+      newSeverity = Critical,
+      expectedAckStatus = Acknowledged,
       expectedLatchStatus = UnLatched
     ),
     AcknowledgeAndLatchTestCase(
-      alarmKey = AlarmKey("test", "test", "AutoAcknowledgeble-Latchable-Critical->Okay"),
+      alarmKey = AlarmKey("AOESW", "test", "NotAutoAcknowledgeble_NotLatchable_Okay=>Critical"),
+      isAutoAcknowledgeble = false,
+      isAlarmLachable = false,
+      oldSeverity = Okay,
+      newSeverity = Critical,
+      expectedAckStatus = UnAcknowledged,
+      expectedLatchStatus = UnLatched
+    ),
+    AcknowledgeAndLatchTestCase(
+      alarmKey = AlarmKey("AOESW", "test", "AutoAcknowledgeble_Latchable_Critical=>Okay"),
       isAutoAcknowledgeble = true,
       isAlarmLachable = true,
       oldSeverity = Critical,
@@ -163,7 +163,7 @@ class SetSeverityTests extends AlarmServiceTestSetupNGTest {
       expectedLatchStatus = Latched
     ),
     AcknowledgeAndLatchTestCase(
-      alarmKey = AlarmKey("test", "test", "NotAutoAcknowledgeble-Latchable-Critical->Okay"),
+      alarmKey = AlarmKey("AOESW", "test", "NotAutoAcknowledgeble_Latchable_Critical=>Okay"),
       isAutoAcknowledgeble = false,
       isAlarmLachable = true,
       oldSeverity = Critical,
@@ -172,7 +172,7 @@ class SetSeverityTests extends AlarmServiceTestSetupNGTest {
       expectedLatchStatus = Latched
     ),
     AcknowledgeAndLatchTestCase(
-      alarmKey = AlarmKey("test", "test", "AutoAcknowledgeble-NotLatchable-Critical->Okay"),
+      alarmKey = AlarmKey("AOESW", "test", "AutoAcknowledgeble_NotLatchable_Critical=>Okay"),
       isAutoAcknowledgeble = true,
       isAlarmLachable = false,
       oldSeverity = Critical,
@@ -181,7 +181,7 @@ class SetSeverityTests extends AlarmServiceTestSetupNGTest {
       expectedLatchStatus = UnLatched
     ),
     AcknowledgeAndLatchTestCase(
-      alarmKey = AlarmKey("test", "test", "NotAutoAcknowledgeble-NotLatchable-Critical->Okay"),
+      alarmKey = AlarmKey("AOESW", "test", "NotAutoAcknowledgeble_NotLatchable_Critical=>Okay"),
       isAutoAcknowledgeble = false,
       isAlarmLachable = false,
       oldSeverity = Critical,
@@ -225,7 +225,7 @@ class SetSeverityTests extends AlarmServiceTestSetupNGTest {
           latchedSeverity = testCase.oldSeverity,
           acknowledgementStatus =
             if (testCase.isAutoAcknowledgeble || testCase.oldSeverity == Okay) Acknowledged else UnAcknowledged,
-          latchStatus = if (testCase.isAlarmLachable && testCase.newSeverity.latchable) Latched else UnLatched
+          latchStatus = if (testCase.isAlarmLachable && testCase.oldSeverity.latchable) Latched else UnLatched
         )
       )
       .await

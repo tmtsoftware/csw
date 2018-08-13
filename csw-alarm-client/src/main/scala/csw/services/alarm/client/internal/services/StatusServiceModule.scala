@@ -102,12 +102,13 @@ trait StatusServiceModule extends StatusService {
       def unapply(severity: AlarmSeverity): Boolean = severity != previousSeverity
     }
 
-    val setLatchSeverity   = status.copy(latchedSeverity = severity, alarmTime = Some(AlarmTime()))
-    val latch: AlarmStatus = status.copy(latchedSeverity = severity, alarmTime = Some(AlarmTime()), latchStatus = Latched)
+    val setLatchSeverity = status.copy(latchedSeverity = severity, alarmTime = Some(AlarmTime()))
+    val setLatchedSeverityAndStatus: AlarmStatus =
+      status.copy(latchedSeverity = severity, alarmTime = Some(AlarmTime()), latchStatus = Latched)
 
     val updatedStatus = (alarm, severity, status) match {
-      case (Latchable(), Latchable(), HigherLatchedSeverity()) ⇒ latch
-      case (Latchable(), Latchable(), IsUnLatched())           ⇒ latch
+      case (Latchable(), Latchable(), HigherLatchedSeverity()) ⇒ setLatchedSeverityAndStatus
+      case (Latchable(), Latchable(), IsUnLatched())           ⇒ setLatchedSeverityAndStatus
       case (NotLatchable(), NotPreviousSeverity(), _)          ⇒ setLatchSeverity
       case _                                                   ⇒ status
     }
