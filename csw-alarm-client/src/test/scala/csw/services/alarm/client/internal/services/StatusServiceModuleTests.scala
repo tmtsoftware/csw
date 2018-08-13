@@ -6,6 +6,7 @@ import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, UnAckn
 import csw.services.alarm.api.models.AlarmSeverity.{Major, Okay, Warning}
 import csw.services.alarm.api.models.Key.AlarmKey
 import csw.services.alarm.api.models.LatchStatus.{Latched, UnLatched}
+import csw.services.alarm.api.models.ShelveStatus.{Shelved, UnShelved}
 import csw.services.alarm.api.models.{AlarmSeverity, AlarmStatus}
 import csw.services.alarm.client.internal.helpers.AlarmServiceTestSetup
 import csw.services.alarm.client.internal.helpers.TestFutureExt.RichFuture
@@ -130,6 +131,46 @@ class StatusServiceModuleTests
     val invalidAlarm = AlarmKey("invalid", "invalid", "invalid")
     intercept[KeyNotFoundException] {
       acknowledge(invalidAlarm).await
+    }
+  }
+
+  // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
+  test("shelve should shelve an alarm") {
+    shelve(tromboneAxisHighLimitAlarmKey).await
+    val status = getStatus(tromboneAxisHighLimitAlarmKey).await
+    status.shelveStatus shouldBe Shelved
+  }
+
+  // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
+  test("shelve should be a no-op when repeated") {
+    shelve(tromboneAxisHighLimitAlarmKey).await
+    val status = getStatus(tromboneAxisHighLimitAlarmKey).await
+    status.shelveStatus shouldBe Shelved
+
+    //repeat the shelve operation
+    noException shouldBe thrownBy {
+      shelve(tromboneAxisHighLimitAlarmKey).await
+    }
+  }
+
+  // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
+  test("unShelve should shelve an alarm") {
+    setStatus(tromboneAxisHighLimitAlarmKey, AlarmStatus(shelveStatus = Shelved)).await
+    unShelve(tromboneAxisHighLimitAlarmKey).await
+    val status = getStatus(tromboneAxisHighLimitAlarmKey).await
+    status.shelveStatus shouldBe UnShelved
+  }
+
+  // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
+  test("unShelve should be a no-op when repeated") {
+    setStatus(tromboneAxisHighLimitAlarmKey, AlarmStatus(shelveStatus = Shelved)).await
+    unShelve(tromboneAxisHighLimitAlarmKey).await
+    val status = getStatus(tromboneAxisHighLimitAlarmKey).await
+    status.shelveStatus shouldBe UnShelved
+
+    //repeat the unshelve operation
+    noException shouldBe thrownBy {
+      unShelve(tromboneAxisHighLimitAlarmKey).await
     }
   }
 
