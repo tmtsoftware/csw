@@ -5,6 +5,7 @@ import csw.services.alarm.api.exceptions.{InactiveAlarmException, KeyNotFoundExc
 import csw.services.alarm.api.models.AlarmHealth.Bad
 import csw.services.alarm.api.models.AlarmSeverity.{Critical, Okay}
 import csw.services.alarm.api.models.Key
+import csw.services.alarm.api.models.Key.{ComponentKey, GlobalKey, SubsystemKey}
 import csw.services.alarm.client.internal.helpers.AlarmServiceTestSetup
 import csw.services.alarm.client.internal.helpers.TestFutureExt.RichFuture
 
@@ -21,17 +22,34 @@ class HealthServiceModuleTests
   }
 
   // DEOPSCSW-466: Fetch health for a given alarm, component name or a subsystem name
+  test("getAggregatedHealth should should get aggregated severity for a component") {
+    setSeverity(tromboneAxisHighLimitAlarmKey, Okay).await
+    setSeverity(tromboneAxisLowLimitAlarmKey, Critical).await
+
+    val tromboneKey = ComponentKey("nfiraos", "trombone")
+    getAggregatedHealth(tromboneKey).await shouldBe Bad
+  }
+
+  // DEOPSCSW-466: Fetch health for a given alarm, component name or a subsystem name
   test("getAggregatedHealth should should get aggregated severity for a subsystem") {
     setSeverity(tromboneAxisHighLimitAlarmKey, Okay).await
     setSeverity(tromboneAxisLowLimitAlarmKey, Critical).await
 
-    val tromboneKey = Key.SubsystemKey("nfiraos")
+    val tromboneKey = SubsystemKey("nfiraos")
     getAggregatedHealth(tromboneKey).await shouldBe Bad
+  }
+
+  // DEOPSCSW-466: Fetch health for a given alarm, component name or a subsystem name
+  test("getAggregatedHealth should should get aggregated severity for global system") {
+    setSeverity(tromboneAxisHighLimitAlarmKey, Okay).await
+    setSeverity(tromboneAxisLowLimitAlarmKey, Critical).await
+
+    getAggregatedHealth(GlobalKey).await shouldBe Bad
   }
 
   // DEOPSCSW-466: Fetch alarm severity, component or subsystem
   test("getAggregatedHealth should throw KeyNotFoundException when key is invalid") {
-    val invalidAlarm = Key.SubsystemKey("invalid")
+    val invalidAlarm = SubsystemKey("invalid")
     intercept[KeyNotFoundException] {
       getAggregatedHealth(invalidAlarm).await
     }
@@ -39,7 +57,7 @@ class HealthServiceModuleTests
 
   // DEOPSCSW-466: Fetch alarm severity, component or subsystem
   test("getAggregatedHealth should throw InactiveAlarmException when all resolved keys are inactive") {
-    val invalidAlarm = Key.SubsystemKey("LGSF")
+    val invalidAlarm = SubsystemKey("LGSF")
     intercept[InactiveAlarmException] {
       getAggregatedHealth(invalidAlarm).await
     }
