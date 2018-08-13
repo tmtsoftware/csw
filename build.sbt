@@ -233,7 +233,8 @@ lazy val `csw-alarm-client` = project
 lazy val `csw-alarm-cli` = project
   .dependsOn(
     `csw-alarm-client`,
-    `csw-config-client`
+    `csw-config-client`,
+    `csw-cluster-seed` % "test->multi-jvm"
   )
   .enablePlugins(DeployApp)
   .settings(libraryDependencies ++= Dependencies.AlarmCli)

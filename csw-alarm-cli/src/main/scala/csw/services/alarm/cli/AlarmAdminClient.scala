@@ -18,29 +18,26 @@ class AlarmAdminClient(
 ) {
   import actorRuntime._
 
-  private val alarmServiceF: Future[AlarmAdminService] = new AlarmServiceFactory().makeAdminApi(locationService)
+  private[alarm] val alarmServiceF: Future[AlarmAdminService] = new AlarmServiceFactory().makeAdminApi(locationService)
 
-  def init(args: CommandLineArgs): Future[Unit] = async {
-    val config       = await(configUtils.getConfig(args.isLocal, args.filePath, None))
-    val alarmService = await(alarmServiceF)
-    val initResultF  = alarmService.initAlarms(config, args.reset)
-    initResultF.onComplete {
-      case Success(_)  ⇒ printLine("[SUCCESS] Alarms successfully initialized.")
-      case Failure(ex) ⇒ printLine(s"[FAILURE] Failed to initialize alarm store with error: [${ex.getCause.getMessage}]")
+  def init(args: CommandLineArgs): Future[Unit] =
+    async {
+      val config       = await(configUtils.getConfig(args.isLocal, args.filePath, None))
+      val alarmService = await(alarmServiceF)
+      await(alarmService.initAlarms(config, args.reset))
+    }.transform {
+      case s @ Success(_)  ⇒ printLine("[SUCCESS] Alarms successfully initialized."); s
+      case f @ Failure(ex) ⇒ printLine(s"[FAILURE] Failed to initialize alarm store with error: [${ex.getMessage}]"); f
     }
-    await(initResultF)
-  }
 
-  def severity(args: CommandLineArgs): Future[Unit] = async {
-    val alarmService = await(alarmServiceF)
-    val key          = args.alarmKey
-    val severity     = args.severity
-    val setResultF   = alarmService.setSeverity(key, severity)
-    setResultF.onComplete {
-      case Success(_) ⇒ printLine(s"[SUCCESS] Severity for alarm [${key.value}] is successfully set to [${severity.name}].")
-      case Failure(ex) ⇒
-        printLine(s"[FAILURE] Failed to set severity for alarm [${key.value}] with error: [${ex.getCause.getMessage}]")
-    }
-    await(setResultF)
-  }
+  def severity(args: CommandLineArgs): Future[Unit] =
+    alarmServiceF
+      .flatMap(_.setSeverity(args.alarmKey, args.severity))
+      .transform {
+        case s @ Success(_) ⇒
+          printLine(s"[SUCCESS] Severity for alarm [${args.alarmKey.value}] is successfully set to [${args.severity.name}]."); s
+        case f @ Failure(ex) ⇒
+          printLine(s"[FAILURE] Failed to set severity for alarm [${args.alarmKey.value}] with error: [${ex.getMessage}]"); f
+      }
+
 }
