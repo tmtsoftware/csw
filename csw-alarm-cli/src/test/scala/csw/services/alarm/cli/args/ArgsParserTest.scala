@@ -79,4 +79,30 @@ class ArgsParserTest extends FunSuite with Matchers {
       )
     )
   }
+
+  test("parse acknowledge command") {
+    val args = Array(
+      "acknowledge",
+      "--subsystem",
+      "NFIRAOS",
+      "--component",
+      "trombone",
+      "--name",
+      "tromboneAxisHighLimitAlarm"
+    )
+
+    silentParse(args) should contain(
+      CommandLineArgs(
+        cmd = "acknowledge",
+        subsystem = "NFIRAOS",
+        component = "trombone",
+        name = "tromboneAxisHighLimitAlarm"
+      )
+    )
+  }
+
+  test("parse acknowledge command without any options") {
+    val args = Array("acknowledge")
+    silentParse(args) shouldBe None
+  }
 }

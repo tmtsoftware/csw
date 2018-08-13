@@ -7,8 +7,9 @@ import scala.concurrent.duration.Duration
 class CommandExecutor(alarmAdminClient: AlarmAdminClient) {
   def execute(options: CommandLineArgs): Unit = {
     options.cmd match {
-      case "init"   ⇒ await(alarmAdminClient.init(options))
-      case "update" ⇒ await(alarmAdminClient.severity(options))
+      case "init"        ⇒ await(alarmAdminClient.init(options))
+      case "update"      ⇒ await(alarmAdminClient.severity(options))
+      case "acknowledge" ⇒ await(alarmAdminClient.acknowledge(options))
     }
   }
 

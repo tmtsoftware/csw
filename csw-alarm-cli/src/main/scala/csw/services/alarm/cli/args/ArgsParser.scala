@@ -46,6 +46,24 @@ class ArgsParser(name: String) {
           .action((severity, args) ⇒ args.copy(severity = AlarmSeverity.withNameInsensitive(severity)))
           .text("severity to set for an alarm e.g Okay, Warning, Major, etc.")
       )
+
+    cmd("acknowledge")
+      .action((_, args) ⇒ args.copy(cmd = "acknowledge"))
+      .text("acknowledge an alarm")
+      .children(
+        opt[String]("subsystem")
+          .required()
+          .action((subsystem, args) ⇒ args.copy(subsystem = subsystem))
+          .text("subsystem of an alarm e.g. NFIRAOS"),
+        opt[String]("component")
+          .required()
+          .action((component, args) ⇒ args.copy(component = component))
+          .text("component of an alarm e.g. trombone"),
+        opt[String]("name")
+          .required()
+          .action((name, args) ⇒ args.copy(name = name))
+          .text("name of an alarm e.g. tromboneAxisHighLimitAlarm")
+      )
   }
 
   def parse(args: Seq[String]): Option[CommandLineArgs] = parser.parse(args, CommandLineArgs())

@@ -3,7 +3,8 @@ package csw.services.alarm.cli
 import java.nio.file.Paths
 
 import com.typesafe.config.ConfigFactory
-import csw.services.alarm.api.exceptions.InvalidSeverityException
+import csw.services.alarm.api.exceptions.{InvalidSeverityException, KeyNotFoundException}
+import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, UnAcknowledged}
 import csw.services.alarm.api.models.AlarmSeverity.{Critical, Major}
 import csw.services.alarm.api.models.Key.GlobalKey
 import csw.services.alarm.cli.args.CommandLineArgs
@@ -32,7 +33,7 @@ class CommandExecutorTest extends FunSuite with Matchers with SeedData with Befo
     val args     = CommandLineArgs("init", Some(filePath), isLocal = true)
     commandExecutor.execute(args)
 
-    logBuffer should contain("[SUCCESS] Alarms successfully initialized.")
+    logBuffer should contain("[SUCCESS] Alarm store successfully initialized.")
 
     val metadata = adminService.getMetadata(GlobalKey).await
 
@@ -58,7 +59,7 @@ class CommandExecutorTest extends FunSuite with Matchers with SeedData with Befo
     val args = CommandLineArgs("init", Some(configPath))
     commandExecutor.execute(args)
 
-    logBuffer should contain("[SUCCESS] Alarms successfully initialized.")
+    logBuffer should contain("[SUCCESS] Alarm store successfully initialized.")
 
     val metadata = adminService.getMetadata(GlobalKey).await
 
@@ -136,6 +137,57 @@ class CommandExecutorTest extends FunSuite with Matchers with SeedData with Befo
       s"[FAILURE] Failed to set severity for alarm [${updateCmd.alarmKey.value}] with error: " +
       s"[Attempt to set invalid severity [${Critical.name}] for alarm [${updateCmd.alarmKey.value}]. " +
       s"Supported severities for this alarm are [Warning,Major,Indeterminate,Okay]]"
+    )
+  }
+
+  // DEOPSCSW-471: Acknowledge alarm from CLI application
+  test("should acknowledge the alarm") {
+
+    // init alarm store
+    val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
+    val initCmd  = CommandLineArgs("init", Some(filePath), isLocal = true, reset = true)
+    commandExecutor.execute(initCmd)
+    logBuffer.clear()
+
+    // update severity of an alarm
+    val ackCmd = CommandLineArgs(
+      "acknowledge",
+      subsystem = "NFIRAOS",
+      component = "trombone",
+      name = "tromboneAxisLowLimitAlarm"
+    )
+
+    adminService.getStatus(ackCmd.alarmKey).await.acknowledgementStatus shouldBe UnAcknowledged
+
+    commandExecutor.execute(ackCmd)
+
+    adminService.getStatus(ackCmd.alarmKey).await.acknowledgementStatus shouldBe Acknowledged
+
+    logBuffer should contain(s"[SUCCESS] Alarm [${ackCmd.alarmKey.value}] is successfully acknowledged.")
+  }
+
+  // DEOPSCSW-471: Acknowledge alarm from CLI application
+  test("should fail to acknowledge an invalid alarm") {
+
+    // init alarm store
+    val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
+    val initCmd  = CommandLineArgs("init", Some(filePath), isLocal = true, reset = true)
+    commandExecutor.execute(initCmd)
+    logBuffer.clear()
+
+    // update severity of an alarm
+    val ackCmd = CommandLineArgs(
+      "acknowledge",
+      subsystem = "invalid",
+      component = "invalid",
+      name = "invalid"
+    )
+    intercept[KeyNotFoundException] {
+      commandExecutor.execute(ackCmd)
+    }
+
+    logBuffer should contain(
+      s"[FAILURE] Failed to acknowledge alarm [${ackCmd.alarmKey.value}] with error: [Key: [${ackCmd.alarmKey.value}] not found in Alarm Store.]"
     )
   }
 }

@@ -26,11 +26,11 @@ class AlarmAdminClient(
       val alarmService = await(alarmServiceF)
       await(alarmService.initAlarms(config, args.reset))
     }.transform {
-      case s @ Success(_)  ⇒ printLine("[SUCCESS] Alarms successfully initialized."); s
+      case s @ Success(_)  ⇒ printLine("[SUCCESS] Alarm store successfully initialized."); s
       case f @ Failure(ex) ⇒ printLine(s"[FAILURE] Failed to initialize alarm store with error: [${ex.getMessage}]"); f
     }
 
-  def severity(args: CommandLineArgs): Future[Unit] =
+  def severity(args: CommandLineArgs): Future[Unit] = {
     alarmServiceF
       .flatMap(_.setSeverity(args.alarmKey, args.severity))
       .transform {
@@ -38,6 +38,16 @@ class AlarmAdminClient(
           printLine(s"[SUCCESS] Severity for alarm [${args.alarmKey.value}] is successfully set to [${args.severity.name}]."); s
         case f @ Failure(ex) ⇒
           printLine(s"[FAILURE] Failed to set severity for alarm [${args.alarmKey.value}] with error: [${ex.getMessage}]"); f
+      }
+  }
+
+  def acknowledge(args: CommandLineArgs): Future[Unit] =
+    alarmServiceF
+      .flatMap(_.acknowledge(args.alarmKey))
+      .transform {
+        case s @ Success(_) ⇒ printLine(s"[SUCCESS] Alarm [${args.alarmKey.value}] is successfully acknowledged."); s
+        case f @ Failure(ex) ⇒
+          printLine(s"[FAILURE] Failed to acknowledge alarm [${args.alarmKey.value}] with error: [${ex.getMessage}]"); f
       }
 
 }
