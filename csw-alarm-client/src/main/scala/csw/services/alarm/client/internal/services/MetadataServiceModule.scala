@@ -29,7 +29,7 @@ trait MetadataServiceModule extends MetadataService {
     if (!metadata.isActive) await(metadataApi.set(key, metadata.copy(activationStatus = Active)))
   }
 
-  final override def deActivate(key: AlarmKey): Future[Unit] = async {
+  final override def deactivate(key: AlarmKey): Future[Unit] = async {
     log.debug(s"Deactivate alarm [${key.value}]")
     val metadataApi = await(metadataApiF)
 

@@ -36,7 +36,7 @@ shared/.jvm
 bin/
 journal
 snapshots
-dump.rdb
+*.rdb
 .bloop
 project/.bloop
 project/project/.bloop

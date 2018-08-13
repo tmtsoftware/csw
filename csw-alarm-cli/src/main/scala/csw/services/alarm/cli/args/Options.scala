@@ -5,7 +5,7 @@ import csw.services.alarm.api.models.AlarmSeverity
 import csw.services.alarm.api.models.AlarmSeverity.Disconnected
 import csw.services.alarm.api.models.Key.AlarmKey
 
-case class CommandLineArgs(
+case class Options(
     cmd: String = "",
     filePath: Option[Path] = None,
     isLocal: Boolean = false,

@@ -2,7 +2,7 @@ package csw.services.alarm
 import akka.http.scaladsl.Http
 import csw.messages.commons.CoordinatedShutdownReasons.ApplicationFinishedReason
 import csw.services.BuildInfo
-import csw.services.alarm.cli.args.{ArgsParser, CommandLineArgs}
+import csw.services.alarm.cli.args.{ArgsParser, Options}
 import csw.services.alarm.cli.wiring.Wiring
 import csw.services.location.commons.{ActorSystemFactory, ClusterAwareSettings}
 import csw.services.logging.scaladsl.LoggingSystemFactory
@@ -20,7 +20,7 @@ object Main extends App {
       .parse(args)
       .foreach(run)
 
-  private def run(commandLineArgs: CommandLineArgs): Unit = {
+  private def run(options: Options): Unit = {
     val actorSystem = ActorSystemFactory.remote()
     LoggingSystemFactory.start(name, BuildInfo.version, ClusterAwareSettings.hostname, actorSystem)
 
@@ -28,7 +28,7 @@ object Main extends App {
     import wiring._
     import actorRuntime._
 
-    try commandExecutor.execute(commandLineArgs)
+    try commandExecutor.execute(options)
     finally Http().shutdownAllConnectionPools().onComplete(_ ⇒ shutdown(ApplicationFinishedReason))
   }
 }

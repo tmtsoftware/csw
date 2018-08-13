@@ -12,5 +12,5 @@ private[alarm] trait MetadataService {
   def getMetadata(key: Key): Future[List[AlarmMetadata]]
 
   private[alarm] def activate(key: AlarmKey): Future[Unit]   // api only for test purpose
-  private[alarm] def deActivate(key: AlarmKey): Future[Unit] // api only for test purpose
+  private[alarm] def deactivate(key: AlarmKey): Future[Unit] // api only for test purpose
 }

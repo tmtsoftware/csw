@@ -5,9 +5,10 @@ import java.nio.file.Paths
 import com.typesafe.config.ConfigFactory
 import csw.services.alarm.api.exceptions.{InvalidSeverityException, KeyNotFoundException}
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, UnAcknowledged}
+import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
 import csw.services.alarm.api.models.AlarmSeverity.{Critical, Major}
 import csw.services.alarm.api.models.Key.GlobalKey
-import csw.services.alarm.cli.args.CommandLineArgs
+import csw.services.alarm.cli.args.Options
 import csw.services.alarm.cli.helpers.TestFutureExt.RichFuture
 import csw.services.config.api.models.ConfigData
 import csw.services.config.client.scaladsl.ConfigClientFactory
@@ -21,6 +22,9 @@ class CommandExecutorTest extends FunSuite with Matchers with SeedData with Befo
 
   private val adminService = alarmAdminClient.alarmServiceF.await
 
+  private val successMsg = "[SUCCESS] Command executed successfully."
+  private val failureMsg = "[FAILURE] Failed to execute the command."
+
   override def afterAll(): Unit = {
     val testFileUtils = new TestFileUtils(new Settings(ConfigFactory.load()))
     testFileUtils.deleteServerFiles()
@@ -30,10 +34,10 @@ class CommandExecutorTest extends FunSuite with Matchers with SeedData with Befo
   // DEOPSCSW-470: CLI application to exercise and test the alarm API
   test("should initialize alarms in alarm store from local config") {
     val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
-    val args     = CommandLineArgs("init", Some(filePath), isLocal = true)
-    commandExecutor.execute(args)
+    val args     = Options("init", Some(filePath), isLocal = true)
 
-    logBuffer should contain("[SUCCESS] Command executed successfully.")
+    commandExecutor.execute(args)
+    logBuffer shouldEqual List(successMsg)
 
     val metadata = adminService.getMetadata(GlobalKey).await
 
@@ -56,10 +60,10 @@ class CommandExecutorTest extends FunSuite with Matchers with SeedData with Befo
     val configService = ConfigClientFactory.adminApi(system, locationService)
     configService.create(configPath, configData, comment = "commit test file").await
 
-    val args = CommandLineArgs("init", Some(configPath))
+    val args = Options("init", Some(configPath))
     commandExecutor.execute(args)
 
-    logBuffer should contain("[SUCCESS] Command executed successfully.")
+    logBuffer shouldEqual List(successMsg)
 
     val metadata = adminService.getMetadata(GlobalKey).await
 
@@ -74,13 +78,14 @@ class CommandExecutorTest extends FunSuite with Matchers with SeedData with Befo
   }
 
   // DEOPSCSW-470: CLI application to exercise and test the alarm API
+
   test("should fail to initialize alarms in alarm store when config service is down") {
     val configPath = Paths.get("valid-alarms.conf")
-    val args       = CommandLineArgs("init", Some(configPath))
+    val args       = Options("init", Some(configPath))
     intercept[RuntimeException] {
       commandExecutor.execute(args)
     }
-    logBuffer should contain("[FAILURE] Failed to execute the command.")
+    logBuffer shouldEqual List(failureMsg)
   }
 
   // DEOPSCSW-480: Set alarm Severity from CLI Interface
@@ -88,12 +93,12 @@ class CommandExecutorTest extends FunSuite with Matchers with SeedData with Befo
 
     // init alarm store
     val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
-    val initCmd  = CommandLineArgs("init", Some(filePath), isLocal = true, reset = true)
+    val initCmd  = Options("init", Some(filePath), isLocal = true, reset = true)
     commandExecutor.execute(initCmd)
     logBuffer.clear()
 
     // update severity of an alarm
-    val updateCmd = CommandLineArgs(
+    val updateCmd = Options(
       "update",
       subsystem = "NFIRAOS",
       component = "trombone",
@@ -104,32 +109,7 @@ class CommandExecutorTest extends FunSuite with Matchers with SeedData with Befo
 
     adminService.getCurrentSeverity(updateCmd.alarmKey).await shouldBe Major
 
-    logBuffer should contain("[SUCCESS] Command executed successfully.")
-  }
-
-  // DEOPSCSW-480: Set alarm Severity from CLI Interface
-  test("should fail to set invalid severity of alarm") {
-
-    // init alarm store
-    val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
-    val initCmd  = CommandLineArgs("init", Some(filePath), isLocal = true, reset = true)
-    commandExecutor.execute(initCmd)
-    logBuffer.clear()
-
-    // update severity of an alarm
-    val updateCmd = CommandLineArgs(
-      "update",
-      subsystem = "NFIRAOS",
-      component = "trombone",
-      name = "tromboneAxisHighLimitAlarm",
-      severity = Critical
-    )
-
-    intercept[InvalidSeverityException] {
-      commandExecutor.execute(updateCmd)
-    }
-
-    logBuffer should contain("[FAILURE] Failed to execute the command.")
+    logBuffer shouldEqual List(successMsg)
   }
 
   // DEOPSCSW-471: Acknowledge alarm from CLI application
@@ -137,12 +117,12 @@ class CommandExecutorTest extends FunSuite with Matchers with SeedData with Befo
 
     // init alarm store
     val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
-    val initCmd  = CommandLineArgs("init", Some(filePath), isLocal = true, reset = true)
+    val initCmd  = Options("init", Some(filePath), isLocal = true, reset = true)
     commandExecutor.execute(initCmd)
     logBuffer.clear()
 
     // update severity of an alarm
-    val ackCmd = CommandLineArgs(
+    val ackCmd = Options(
       "acknowledge",
       subsystem = "NFIRAOS",
       component = "trombone",
@@ -155,29 +135,52 @@ class CommandExecutorTest extends FunSuite with Matchers with SeedData with Befo
 
     adminService.getStatus(ackCmd.alarmKey).await.acknowledgementStatus shouldBe Acknowledged
 
-    logBuffer should contain(s"[SUCCESS] Command executed successfully.")
+    logBuffer shouldEqual List(successMsg)
   }
 
-  // DEOPSCSW-471: Acknowledge alarm from CLI application
-  test("should fail to acknowledge an invalid alarm") {
+  // DEOPSCSW-472: Exercise Alarm CLI for activate/out of service alarm behaviour
+  test("should activate the alarm") {
 
     // init alarm store
     val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
-    val initCmd  = CommandLineArgs("init", Some(filePath), isLocal = true, reset = true)
+    val initCmd  = Options("init", Some(filePath), isLocal = true, reset = true)
     commandExecutor.execute(initCmd)
     logBuffer.clear()
 
     // update severity of an alarm
-    val ackCmd = CommandLineArgs(
-      "acknowledge",
-      subsystem = "invalid",
-      component = "invalid",
-      name = "invalid"
+    val ackCmd = Options(
+      "activate",
+      subsystem = "NFIRAOS",
+      component = "trombone",
+      name = "tromboneAxisLowLimitAlarm"
     )
-    intercept[KeyNotFoundException] {
-      commandExecutor.execute(ackCmd)
-    }
 
-    logBuffer should contain("[FAILURE] Failed to execute the command.")
+    commandExecutor.execute(ackCmd)
+
+    adminService.getMetadata(ackCmd.alarmKey).await.activationStatus shouldBe Active
+    logBuffer shouldEqual List(successMsg)
+  }
+
+  // DEOPSCSW-472: Exercise Alarm CLI for activate/out of service alarm behaviour
+  test("should deactivate the alarm") {
+
+    // init alarm store
+    val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
+    val initCmd  = Options("init", Some(filePath), isLocal = true, reset = true)
+    commandExecutor.execute(initCmd)
+    logBuffer.clear()
+
+    // update severity of an alarm
+    val ackCmd = Options(
+      "deactivate",
+      subsystem = "NFIRAOS",
+      component = "trombone",
+      name = "tromboneAxisLowLimitAlarm"
+    )
+
+    commandExecutor.execute(ackCmd)
+
+    adminService.getMetadata(ackCmd.alarmKey).await.activationStatus shouldBe Inactive
+    logBuffer shouldEqual List(successMsg)
   }
 }

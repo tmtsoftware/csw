@@ -13,26 +13,26 @@ class ArgsParserTest extends FunSuite with Matchers {
   private val errCapture = new ByteArrayOutputStream
   private val parser     = new ArgsParser(BuildInfo.name)
 
-  def silentParse(args: Array[String]): Option[CommandLineArgs] = Console.withOut(outCapture) {
+  def silentParse(options: Array[String]): Option[Options] = Console.withOut(outCapture) {
     Console.withErr(errCapture) {
-      parser.parse(args)
+      parser.parse(options)
     }
   }
 
   test("parse without specifying operation") {
-    val args = Array("")
-    silentParse(args) shouldBe None
+    val options = Array("")
+    silentParse(options) shouldBe None
   }
 
   test("parse init command without any options") {
-    val args = Array("init")
-    silentParse(args) shouldBe None
+    val options = Array("init")
+    silentParse(options) shouldBe None
   }
 
   test("parse init command with only mandatory options") {
-    val args = Array("init", "/a/b/c")
-    silentParse(args) should contain(
-      CommandLineArgs(
+    val options = Array("init", "/a/b/c")
+    silentParse(options) should contain(
+      Options(
         cmd = "init",
         filePath = Some(Paths.get("/a/b/c"))
       )
@@ -40,9 +40,9 @@ class ArgsParserTest extends FunSuite with Matchers {
   }
 
   test("parse init command with all options") {
-    val args = Array("init", "/a/b/c", "--local", "--reset")
-    silentParse(args) should contain(
-      CommandLineArgs(
+    val options = Array("init", "/a/b/c", "--local", "--reset")
+    silentParse(options) should contain(
+      Options(
         cmd = "init",
         filePath = Some(Paths.get("/a/b/c")),
         isLocal = true,
@@ -52,12 +52,12 @@ class ArgsParserTest extends FunSuite with Matchers {
   }
 
   test("parse update command without any options") {
-    val args = Array("update")
-    silentParse(args) shouldBe None
+    val options = Array("update")
+    silentParse(options) shouldBe None
   }
 
   test("parse update command with all options") {
-    val args = Array(
+    val options = Array(
       "update",
       "--subsystem",
       "NFIRAOS",
@@ -69,8 +69,8 @@ class ArgsParserTest extends FunSuite with Matchers {
       "Major"
     )
 
-    silentParse(args) should contain(
-      CommandLineArgs(
+    silentParse(options) should contain(
+      Options(
         cmd = "update",
         subsystem = "NFIRAOS",
         component = "trombone",
@@ -81,7 +81,7 @@ class ArgsParserTest extends FunSuite with Matchers {
   }
 
   test("parse acknowledge command") {
-    val args = Array(
+    val options = Array(
       "acknowledge",
       "--subsystem",
       "NFIRAOS",
@@ -91,8 +91,8 @@ class ArgsParserTest extends FunSuite with Matchers {
       "tromboneAxisHighLimitAlarm"
     )
 
-    silentParse(args) should contain(
-      CommandLineArgs(
+    silentParse(options) should contain(
+      Options(
         cmd = "acknowledge",
         subsystem = "NFIRAOS",
         component = "trombone",
@@ -102,7 +102,59 @@ class ArgsParserTest extends FunSuite with Matchers {
   }
 
   test("parse acknowledge command without any options") {
-    val args = Array("acknowledge")
-    silentParse(args) shouldBe None
+    val options = Array("acknowledge")
+    silentParse(options) shouldBe None
+  }
+
+  test("parse activate command") {
+    val options = Array(
+      "activate",
+      "--subsystem",
+      "NFIRAOS",
+      "--component",
+      "trombone",
+      "--name",
+      "tromboneAxisHighLimitAlarm"
+    )
+
+    silentParse(options) should contain(
+      Options(
+        cmd = "activate",
+        subsystem = "NFIRAOS",
+        component = "trombone",
+        name = "tromboneAxisHighLimitAlarm"
+      )
+    )
+  }
+
+  test("parse activate command without any options") {
+    val options = Array("activate")
+    silentParse(options) shouldBe None
+  }
+
+  test("parse deactivate command") {
+    val options = Array(
+      "deactivate",
+      "--subsystem",
+      "NFIRAOS",
+      "--component",
+      "trombone",
+      "--name",
+      "tromboneAxisHighLimitAlarm"
+    )
+
+    silentParse(options) should contain(
+      Options(
+        cmd = "deactivate",
+        subsystem = "NFIRAOS",
+        component = "trombone",
+        name = "tromboneAxisHighLimitAlarm"
+      )
+    )
+  }
+
+  test("parse deactivate command without any options") {
+    val options = Array("deactivate")
+    silentParse(options) shouldBe None
   }
 }

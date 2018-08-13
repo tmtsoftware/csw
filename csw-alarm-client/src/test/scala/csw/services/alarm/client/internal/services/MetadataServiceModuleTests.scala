@@ -158,7 +158,7 @@ class MetadataServiceModuleTests
   // DEOPSCSW-448: Set Activation status for an alarm entity
   test("deActivate should deactivate an active alarm") {
     initTestAlarms()
-    deActivate(cpuIdleAlarmKey).await
+    deactivate(cpuIdleAlarmKey).await
     val metadata = getMetadata(cpuIdleAlarmKey).await
     metadata.activationStatus shouldBe Inactive
   }
