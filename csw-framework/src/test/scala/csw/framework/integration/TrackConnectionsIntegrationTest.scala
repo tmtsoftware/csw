@@ -24,12 +24,12 @@ import csw.services.location.models.{HttpRegistration, TcpRegistration}
 import csw.services.logging.commons.LogAdminActorFactory
 import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
+import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers, OptionValues}
 
 import scala.concurrent.TimeoutException
 import scala.concurrent.duration.DurationLong
 
-class TrackConnectionsIntegrationTest extends FunSuite with Matchers with MockitoSugar with BeforeAndAfterAll {
+class TrackConnectionsIntegrationTest extends FunSuite with Matchers with OptionValues with MockitoSugar with BeforeAndAfterAll {
 
   private val testWiring = new FrameworkTestWiring()
   import testWiring._
@@ -94,19 +94,15 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Mockit
     val actorSystem: actor.ActorSystem = ClusterSettings().joinLocal(seedPort).system
     val wiring: FrameworkWiring        = FrameworkWiring.make(actorSystem, mock[RedisClient])
     // start component in standalone mode
-    Standalone.spawn(ConfigFactory.load("standalone.conf"), wiring)
+    val assemblySupervisor = Standalone.spawn(ConfigFactory.load("standalone.conf"), wiring).await
 
     val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]("supervisor-lifecycle-state-probe")
     val akkaConnection                = AkkaConnection(ComponentId("IFS_Detector", HCD))
 
-    val maybeLocation = seedLocationService.resolve(akkaConnection, 5.seconds).await
-
-    maybeLocation.isDefined shouldBe true
-    val resolvedAkkaLocation = maybeLocation.get
-    resolvedAkkaLocation.connection shouldBe akkaConnection
-
-    val assemblySupervisor = resolvedAkkaLocation.componentRef
     assertThatSupervisorIsRunning(assemblySupervisor, supervisorLifecycleStateProbe, 5.seconds)
+
+    val resolvedAkkaLocation = seedLocationService.resolve(akkaConnection, 5.seconds).await.value
+    resolvedAkkaLocation.connection shouldBe akkaConnection
 
     val assemblyProbe          = TestProbe[CurrentState]("assembly-state-probe")
     val assemblyCommandService = new CommandService(resolvedAkkaLocation)
