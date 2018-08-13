@@ -52,7 +52,7 @@ class SetSeverityTests extends AlarmServiceTestSetupNGTest {
   }
 
   @DataProvider(name = "setSeverityTest-data-provider")
-  def setSeverityTestDataProvider: Array[SetSeverityTestCase] =
+  def setSeverityTestDataProvider(): Array[SetSeverityTestCase] =
     Array(
       SetSeverityTestCase(
         oldSeverity = Warning,

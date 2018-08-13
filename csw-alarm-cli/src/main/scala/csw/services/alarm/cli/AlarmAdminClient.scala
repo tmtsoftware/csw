@@ -12,7 +12,7 @@ import scala.concurrent.Future
 class AlarmAdminClient(actorRuntime: ActorRuntime, locationService: LocationService, configUtils: ConfigUtils) {
   import actorRuntime._
 
-  private val alarmServiceF: Future[AlarmAdminService] = new AlarmServiceFactory().adminApi(locationService)
+  private val alarmServiceF: Future[AlarmAdminService] = new AlarmServiceFactory().makeAdminApi(locationService)
 
   def init(args: CommandLineArgs): Future[Unit] = async {
     val config       = await(configUtils.getConfig(args.isLocal, args.filePath, None))

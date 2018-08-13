@@ -11,11 +11,15 @@ import csw.services.alarm.api.models.{AlarmSeverity, AlarmStatus, Key}
 import csw.services.alarm.client.internal.helpers.AlarmServiceTestSetup
 import csw.services.alarm.client.internal.helpers.TestFutureExt.RichFuture
 
-class SeverityServiceModuleTests extends AlarmServiceTestSetup {
+class SeverityServiceModuleTests
+    extends AlarmServiceTestSetup
+    with SeverityServiceModule
+    with MetadataServiceModule
+    with StatusServiceModule {
 
   override protected def beforeEach(): Unit = {
     val validAlarmsConfig = ConfigFactory.parseResources("test-alarms/valid-alarms.conf")
-    alarmService.initAlarms(validAlarmsConfig, reset = true).await
+    initAlarms(validAlarmsConfig, reset = true).await
   }
 
   // DEOPSCSW-444: Set severity api for component
@@ -36,7 +40,7 @@ class SeverityServiceModuleTests extends AlarmServiceTestSetup {
 
     //wait for 1 second and assert expiry of severity
     Thread.sleep(1000)
-    val severityAfter1Second = alarmService.getCurrentSeverity(tromboneAxisHighLimitAlarmKey).await
+    val severityAfter1Second = getCurrentSeverity(tromboneAxisHighLimitAlarmKey).await
     severityAfter1Second shouldEqual Disconnected
   }
 
@@ -44,14 +48,14 @@ class SeverityServiceModuleTests extends AlarmServiceTestSetup {
   test("setSeverity should throw KeyNotFoundException when tried to set severity for key which does not exists in alarm store") {
     val invalidKey = AlarmKey("bad", "trombone", "fakeAlarm")
     intercept[KeyNotFoundException] {
-      alarmService.setSeverity(invalidKey, AlarmSeverity.Critical).await
+      setSeverity(invalidKey, AlarmSeverity.Critical).await
     }
   }
 
   // DEOPSCSW-444: Set severity api for component
   test("setSeverity should throw InvalidSeverityException when unsupported severity is provided") {
     intercept[InvalidSeverityException] {
-      alarmService.setSeverity(tromboneAxisHighLimitAlarmKey, AlarmSeverity.Critical).await
+      setSeverity(tromboneAxisHighLimitAlarmKey, AlarmSeverity.Critical).await
     }
   }
 
@@ -133,43 +137,43 @@ class SeverityServiceModuleTests extends AlarmServiceTestSetup {
 
   // DEOPSCSW-457: Fetch current alarm severity
   test("getCurrentSeverity should get current severity") {
-    alarmService.setSeverity(tromboneAxisHighLimitAlarmKey, Warning).await
+    setSeverity(tromboneAxisHighLimitAlarmKey, Warning).await
 
-    alarmService.getCurrentSeverity(tromboneAxisHighLimitAlarmKey).await shouldBe Warning
+    getCurrentSeverity(tromboneAxisHighLimitAlarmKey).await shouldBe Warning
   }
 
   // DEOPSCSW-457: Fetch current alarm severity
   test("getCurrentSeverity should throw exception if key does not exist") {
     val invalidAlarm = AlarmKey("invalid", "invalid", "invalid")
     intercept[KeyNotFoundException] {
-      alarmService.getCurrentSeverity(invalidAlarm).await
+      getCurrentSeverity(invalidAlarm).await
     }
   }
 
   // DEOPSCSW-465: Fetch alarm severity, component or subsystem
   test("getAggregatedSeverity should get aggregated severity for component") {
-    alarmService.setSeverity(tromboneAxisHighLimitAlarmKey, Warning).await
-    alarmService.setSeverity(tromboneAxisLowLimitAlarmKey, Critical).await
+    setSeverity(tromboneAxisHighLimitAlarmKey, Warning).await
+    setSeverity(tromboneAxisLowLimitAlarmKey, Critical).await
 
     val tromboneKey = ComponentKey("nfiraos", "trombone")
-    alarmService.getAggregatedSeverity(tromboneKey).await shouldBe Critical
+    getAggregatedSeverity(tromboneKey).await shouldBe Critical
   }
 
   // DEOPSCSW-465: Fetch alarm severity, component or subsystem
   test(
     "getAggregatedSeverity should get aggregated to Disconnected for Warning and Disconnected severities"
   ) {
-    alarmService.setSeverity(tromboneAxisHighLimitAlarmKey, Warning).await
+    setSeverity(tromboneAxisHighLimitAlarmKey, Warning).await
 
     val tromboneKey = ComponentKey("nfiraos", "trombone")
-    alarmService.getAggregatedSeverity(tromboneKey).await shouldBe Disconnected
+    getAggregatedSeverity(tromboneKey).await shouldBe Disconnected
   }
 
   // DEOPSCSW-465: Fetch alarm severity, component or subsystem
   test("getAggregatedSeverity should throw KeyNotFoundException when key is invalid") {
     val invalidAlarm = Key.ComponentKey("invalid", "invalid")
     intercept[KeyNotFoundException] {
-      alarmService.getAggregatedSeverity(invalidAlarm).await
+      getAggregatedSeverity(invalidAlarm).await
     }
   }
 
@@ -177,19 +181,19 @@ class SeverityServiceModuleTests extends AlarmServiceTestSetup {
   test("getAggregatedSeverity should throw InactiveAlarmException when all resolved keys are inactive") {
     val invalidAlarm = Key.ComponentKey("LGSF", "tcsPkInactive")
     intercept[InactiveAlarmException] {
-      alarmService.getAggregatedSeverity(invalidAlarm).await
+      getAggregatedSeverity(invalidAlarm).await
     }
   }
 
   //  test("getStatus should throw exception if key does not exist") {
   //    val invalidAlarm = AlarmKey("invalid", "invalid", "invalid")
   //    intercept[KeyNotFoundException] {
-  //      alarmService.getStatus(invalidAlarm)
+  //      getStatus(invalidAlarm)
   //    }
   //  }
   //
   private def setSeverityAndGetStatus(alarmKey: AlarmKey, alarmSeverity: AlarmSeverity): AlarmStatus = {
-    alarmService.setSeverity(alarmKey, alarmSeverity).await
+    setSeverity(alarmKey, alarmSeverity).await
     testStatusApi.get(alarmKey).await.get
   }
 }

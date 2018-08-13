@@ -37,7 +37,7 @@ private[framework] class SupervisorInfoFactory(containerName: String) {
     async {
       val commandResponseManagerFactory = new CommandResponseManagerFactory
       val eventService                  = eventServiceFactory.make(locationService)
-      val alarmService                  = await(alarmServiceFactory.clientApi(locationService))
+      val alarmService                  = await(alarmServiceFactory.makeClientApi(locationService))
 
       val supervisorBehavior = SupervisorBehaviorFactory.make(
         Some(containerRef),
