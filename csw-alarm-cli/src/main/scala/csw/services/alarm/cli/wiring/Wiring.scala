@@ -10,6 +10,6 @@ class Wiring(actorSystem: ActorSystem) {
 
   lazy val locationService: LocationService = LocationServiceFactory.makeRemoteHttpClient
   lazy val configUtils                      = new ConfigUtils(actorRuntime, locationService)
-  lazy val alarmAdminClient                 = new AlarmAdminClient(actorRuntime, locationService, configUtils)
+  lazy val alarmAdminClient                 = new AlarmAdminClient(actorRuntime, locationService, configUtils, println)
   lazy val commandExecutor                  = new CommandExecutor(alarmAdminClient)
 }
