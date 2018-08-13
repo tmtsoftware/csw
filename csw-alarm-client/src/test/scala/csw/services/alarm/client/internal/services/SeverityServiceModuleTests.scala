@@ -4,7 +4,7 @@ import com.typesafe.config.ConfigFactory
 import csw.services.alarm.api.exceptions.{InactiveAlarmException, InvalidSeverityException, KeyNotFoundException}
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, UnAcknowledged}
 import csw.services.alarm.api.models.AlarmSeverity._
-import csw.services.alarm.api.models.Key.{AlarmKey, ComponentKey}
+import csw.services.alarm.api.models.Key.{AlarmKey, ComponentKey, GlobalKey, SubsystemKey}
 import csw.services.alarm.api.models.LatchStatus.{Latched, UnLatched}
 import csw.services.alarm.api.models.ShelveStatus._
 import csw.services.alarm.api.models.{AlarmSeverity, AlarmStatus, Key}
@@ -152,6 +152,22 @@ class SeverityServiceModuleTests
 
     val tromboneKey = ComponentKey("nfiraos", "trombone")
     getAggregatedSeverity(tromboneKey).await shouldBe Critical
+  }
+
+  // DEOPSCSW-465: Fetch alarm severity, component or subsystem
+  test("getAggregatedSeverity should get aggregated severity for subsystem") {
+    setSeverity(tromboneAxisHighLimitAlarmKey, Warning).await
+    setSeverity(tromboneAxisLowLimitAlarmKey, Major).await
+
+    val tromboneKey = SubsystemKey("nfiraos")
+    getAggregatedSeverity(tromboneKey).await shouldBe Major
+  }
+
+  // DEOPSCSW-465: Fetch alarm severity, component or subsystem
+  test("getAggregatedSeverity should get aggregated severity for global system") {
+    setSeverity(tromboneAxisLowLimitAlarmKey, Critical).await
+
+    getAggregatedSeverity(GlobalKey).await shouldBe Critical
   }
 
   // DEOPSCSW-465: Fetch alarm severity, component or subsystem
