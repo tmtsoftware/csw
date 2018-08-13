@@ -52,7 +52,7 @@ public class JAlarmServiceFactoryTest {
 
     @Test
     public void shouldCreateClientAlarmServiceUsingLocationService() throws Exception {
-        IAlarmService alarmServiceUsingLS = alarmServiceFactory.jClientApi(locationService, seedSystem).get();
+        IAlarmService alarmServiceUsingLS = alarmServiceFactory.jMakeClientApi(locationService, seedSystem).get();
         alarmServiceUsingLS.setSeverity(testSetup.tromboneAxisHighLimitAlarmKey(), Indeterminate).get();
 
         AlarmSeverity alarmSeverity = Await.result(alarmService.getCurrentSeverity(testSetup.tromboneAxisHighLimitAlarmKey()), Duration.create(5, TimeUnit.SECONDS));
@@ -61,7 +61,7 @@ public class JAlarmServiceFactoryTest {
 
     @Test
     public void shouldCreateClientAlarmServiceUsingHostAndPort() throws Exception {
-        IAlarmService alarmServiceUsingHostPort = alarmServiceFactory.jClientApi(testSetup.hostname(), testSetup.sentinelPort(), seedSystem).get();
+        IAlarmService alarmServiceUsingHostPort = alarmServiceFactory.jMakeClientApi(testSetup.hostname(), testSetup.sentinelPort(), seedSystem).get();
         alarmServiceUsingHostPort.setSeverity(testSetup.tromboneAxisHighLimitAlarmKey(), Indeterminate).get();
 
         AlarmSeverity alarmSeverity = Await.result(alarmService.getCurrentSeverity(testSetup.tromboneAxisHighLimitAlarmKey()), Duration.create(5, TimeUnit.SECONDS));

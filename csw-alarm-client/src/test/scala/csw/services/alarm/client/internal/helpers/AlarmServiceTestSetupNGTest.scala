@@ -35,8 +35,8 @@ class AlarmServiceTestSetupNGTest extends Matchers with EmbeddedRedis {
   implicit val ec: ExecutionContext = system.dispatcher
 
   val alarmServiceFactory             = new AlarmServiceFactory(redisClient)
-  val alarmService: AlarmAdminService = alarmServiceFactory.adminApi(hostname, sentinelPort).await
-  val jAlarmService: IAlarmService    = alarmServiceFactory.jClientApi(hostname, sentinelPort, system).get()
+  val alarmService: AlarmAdminService = alarmServiceFactory.makeAdminApi(hostname, sentinelPort).await
+  val jAlarmService: IAlarmService    = alarmServiceFactory.jMakeClientApi(hostname, sentinelPort, system).get()
 
   val connsFactory: RedisConnectionsFactory                           = new RedisConnectionsFactory(redisClient, resolver, alarmServer)
   val testMetadataApi: RedisAsyncScalaApi[MetadataKey, AlarmMetadata] = connsFactory.wrappedAsyncConnection(MetadataCodec).await

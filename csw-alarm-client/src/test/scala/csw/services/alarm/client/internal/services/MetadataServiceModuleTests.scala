@@ -9,7 +9,6 @@ import csw.services.alarm.api.models.AlarmStatus
 import csw.services.alarm.api.models.Key.{AlarmKey, ComponentKey, GlobalKey, SubsystemKey}
 import csw.services.alarm.client.internal.helpers.AlarmServiceTestSetup
 import csw.services.alarm.client.internal.helpers.TestFutureExt.RichFuture
-import csw.services.alarm.client.internal.redis.RedisConnectionsFactory
 
 class MetadataServiceModuleTests
     extends AlarmServiceTestSetup

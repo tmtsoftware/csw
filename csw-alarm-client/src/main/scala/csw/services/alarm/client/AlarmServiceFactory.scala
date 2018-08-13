@@ -32,7 +32,7 @@ class AlarmServiceFactory(redisClient: RedisClient = RedisClient.create()) {
     alarmService(new AlarmServiceLocationResolver(locationService))
   }
 
-  def adminApi(host: String, port: Int)(implicit system: ActorSystem): Future[AlarmAdminService] = {
+  def makeAdminApi(host: String, port: Int)(implicit system: ActorSystem): Future[AlarmAdminService] = {
     implicit val ec: ExecutionContext = system.dispatcher
     alarmService(new AlarmServiceHostPortResolver(host, port))
   }
@@ -40,17 +40,17 @@ class AlarmServiceFactory(redisClient: RedisClient = RedisClient.create()) {
   def makeClientApi(locationService: LocationService)(implicit system: ActorSystem): Future[AlarmService] =
     makeAdminApi(locationService)
 
-  def clientApi(host: String, port: Int)(implicit system: ActorSystem): Future[AlarmService] = adminApi(host, port)
+  def makeClientApi(host: String, port: Int)(implicit system: ActorSystem): Future[AlarmService] = makeAdminApi(host, port)
 
-  def jClientApi(locationService: ILocationService, system: ActorSystem): CompletableFuture[IAlarmService] = {
+  def jMakeClientApi(locationService: ILocationService, system: ActorSystem): CompletableFuture[IAlarmService] = {
     implicit val ec: ExecutionContext        = system.dispatcher
     val alarmServiceF: Future[IAlarmService] = makeAdminApi(locationService.asScala)(system).map(new JAlarmServiceImpl(_))
     alarmServiceF.toJava.toCompletableFuture
   }
 
-  def jClientApi(host: String, port: Int, system: ActorSystem): CompletableFuture[IAlarmService] = {
+  def jMakeClientApi(host: String, port: Int, system: ActorSystem): CompletableFuture[IAlarmService] = {
     implicit val ec: ExecutionContext        = system.dispatcher
-    val alarmServiceF: Future[IAlarmService] = adminApi(host, port)(system).map(new JAlarmServiceImpl(_))
+    val alarmServiceF: Future[IAlarmService] = makeAdminApi(host, port)(system).map(new JAlarmServiceImpl(_))
     alarmServiceF.toJava.toCompletableFuture
   }
 

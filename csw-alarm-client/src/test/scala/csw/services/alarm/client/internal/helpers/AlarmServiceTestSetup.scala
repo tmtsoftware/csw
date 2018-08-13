@@ -42,8 +42,8 @@ class AlarmServiceTestSetup
   implicit val ec: ExecutionContext     = actorSystem.dispatcher
 
   val alarmServiceFactory             = new AlarmServiceFactory(redisClient)
-  val alarmService: AlarmAdminService = alarmServiceFactory.adminApi(hostname, sentinelPort).await
-  val jAlarmService: IAlarmService    = alarmServiceFactory.jClientApi(hostname, sentinelPort, actorSystem).get()
+  val alarmService: AlarmAdminService = alarmServiceFactory.makeAdminApi(hostname, sentinelPort).await
+  val jAlarmService: IAlarmService    = alarmServiceFactory.jMakeClientApi(hostname, sentinelPort, actorSystem).get()
 
   val connsFactory: RedisConnectionsFactory                           = new RedisConnectionsFactory(redisClient, resolver, alarmServer)
   val testMetadataApi: RedisAsyncScalaApi[MetadataKey, AlarmMetadata] = connsFactory.wrappedAsyncConnection(MetadataCodec).await

@@ -137,8 +137,10 @@ class SeverityServiceModuleTests
 
   // DEOPSCSW-457: Fetch current alarm severity
   test("getCurrentSeverity should get current severity") {
+    // Severity should be inferred to Disconnected when metadata exists but severity key does not exists in Alarm store.
+    // This happens after bootstrapping Alarm store.
+    getCurrentSeverity(tromboneAxisHighLimitAlarmKey).await shouldBe Disconnected
     setSeverity(tromboneAxisHighLimitAlarmKey, Warning).await
-
     getCurrentSeverity(tromboneAxisHighLimitAlarmKey).await shouldBe Warning
   }
 
