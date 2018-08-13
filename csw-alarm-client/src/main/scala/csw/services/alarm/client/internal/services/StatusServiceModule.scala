@@ -115,14 +115,28 @@ trait StatusServiceModule extends StatusService {
     }
 
     // derive acknowledgement status
-    val newStatus =
-      if (updatedStatus.latchedSeverity == Okay || alarm.isAutoAcknowledgeable) {
-        updatedStatus.copy(acknowledgementStatus = Acknowledged)
-      } else if (severity != previousSeverity) {
-        updatedStatus.copy(acknowledgementStatus = UnAcknowledged)
-      } else {
-        updatedStatus
-      }
+
+    object IsAutoAcknowledgeable {
+      def unapply(alarm: AlarmMetadata): Boolean = alarm.isAutoAcknowledgeable
+    }
+
+    object IsLatchedSeverityOkay {
+      def unapply(status: AlarmStatus): Boolean = status.latchedSeverity == Okay
+    }
+
+    object IsOtherSeverity {
+      def unapply(status: AlarmStatus): Boolean = status.latchedSeverity != previousSeverity
+    }
+
+    val acknowledgedStatus   = updatedStatus.copy(acknowledgementStatus = Acknowledged)
+    val unAcknowledgedStatus = updatedStatus.copy(acknowledgementStatus = UnAcknowledged)
+
+    val newStatus = (alarm, updatedStatus) match {
+      case (IsAutoAcknowledgeable(), _) ⇒ acknowledgedStatus
+      case (_, IsLatchedSeverityOkay()) ⇒ acknowledgedStatus
+      case (_, IsOtherSeverity())       ⇒ unAcknowledgedStatus
+      case _                            ⇒ updatedStatus
+    }
 
     // update alarm status (with recent time) only when severity changes
     if (newStatus != status) await(setStatus(key, newStatus))
