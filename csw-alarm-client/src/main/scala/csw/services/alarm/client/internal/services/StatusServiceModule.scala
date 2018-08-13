@@ -1,5 +1,6 @@
 package csw.services.alarm.client.internal.services
 
+import acyclic.skipped
 import csw.services.alarm.api.exceptions.{KeyNotFoundException, ResetOperationNotAllowed}
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, UnAcknowledged}
 import csw.services.alarm.api.models.AlarmSeverity.Okay
