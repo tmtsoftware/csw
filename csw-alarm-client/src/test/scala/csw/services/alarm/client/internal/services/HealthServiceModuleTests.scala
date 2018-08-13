@@ -1,15 +1,12 @@
 package csw.services.alarm.client.internal.services
 
-import akka.actor.ActorSystem
 import com.typesafe.config.ConfigFactory
 import csw.services.alarm.api.exceptions.{InactiveAlarmException, KeyNotFoundException}
 import csw.services.alarm.api.models.AlarmHealth.Bad
 import csw.services.alarm.api.models.AlarmSeverity.{Critical, Okay}
 import csw.services.alarm.api.models.Key
-import csw.services.alarm.client.internal.commons.Settings
 import csw.services.alarm.client.internal.helpers.AlarmServiceTestSetup
 import csw.services.alarm.client.internal.helpers.TestFutureExt.RichFuture
-import csw.services.alarm.client.internal.redis.RedisConnectionsFactory
 
 class HealthServiceModuleTests
     extends AlarmServiceTestSetup
