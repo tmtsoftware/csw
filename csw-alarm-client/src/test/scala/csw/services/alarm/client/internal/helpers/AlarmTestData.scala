@@ -1,5 +1,5 @@
 package csw.services.alarm.client.internal.helpers
-import csw.services.alarm.api.models.ActivationStatus.Active
+import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
 import csw.services.alarm.api.models.AlarmSeverity._
 import csw.services.alarm.api.models.{AlarmMetadata, AlarmType}
 import csw.services.alarm.api.models.AlarmType.Absolute
@@ -59,4 +59,19 @@ trait AlarmTestData {
     activationStatus = Active
   )
 
+  val cpuIdleAlarmKey = AlarmKey("LGSF", "tcsPkInactive", "cpuIdleAlarm")
+  val cpuIdleAlarm = AlarmMetadata(
+    subsystem = "LGSF",
+    component = "tcsPkInactive",
+    name = "cpuIdleAlarm",
+    description = "This alarm is activated CPU is idle",
+    location = "in computer...",
+    alarmType = Absolute,
+    supportedSeverities = Set(Warning, Major, Critical),
+    probableCause = "too fast...",
+    operatorResponse = "slow it down...",
+    isAutoAcknowledgeable = true,
+    isLatchable = false,
+    activationStatus = Inactive
+  )
 }

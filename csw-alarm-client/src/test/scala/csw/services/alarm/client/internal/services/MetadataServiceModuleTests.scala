@@ -3,6 +3,7 @@ package csw.services.alarm.client.internal.services
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.services.alarm.api.exceptions.KeyNotFoundException
 import csw.services.alarm.api.internal.MetadataKey
+import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
 import csw.services.alarm.api.models.AlarmHealth.Bad
 import csw.services.alarm.api.models.AlarmSeverity.{Critical, Disconnected, Major}
 import csw.services.alarm.api.models.AlarmStatus
@@ -144,5 +145,21 @@ class MetadataServiceModuleTests
 
     // current severity will be expired at it's time and will be inferred disconnected
     getStatus(tromboneAxisLowLimitAlarmKey).await shouldEqual AlarmStatus()
+  }
+
+  // DEOPSCSW-448: Set Activation status for an alarm entity
+  test("activate should activate an inactive alarm") {
+    initTestAlarms()
+    activate(cpuIdleAlarmKey).await
+    val metadata = getMetadata(cpuIdleAlarmKey).await
+    metadata.activationStatus shouldBe Active
+  }
+
+  // DEOPSCSW-448: Set Activation status for an alarm entity
+  test("deActivate should deactivate an active alarm") {
+    initTestAlarms()
+    deActivate(cpuIdleAlarmKey).await
+    val metadata = getMetadata(cpuIdleAlarmKey).await
+    metadata.activationStatus shouldBe Inactive
   }
 }
