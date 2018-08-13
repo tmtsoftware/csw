@@ -33,7 +33,7 @@ class CommandExecutorTest extends FunSuite with Matchers with SeedData with Befo
     val args     = CommandLineArgs("init", Some(filePath), isLocal = true)
     commandExecutor.execute(args)
 
-    logBuffer should contain("[SUCCESS] Alarm store successfully initialized.")
+    logBuffer should contain("[SUCCESS] Command executed successfully.")
 
     val metadata = adminService.getMetadata(GlobalKey).await
 
@@ -59,7 +59,7 @@ class CommandExecutorTest extends FunSuite with Matchers with SeedData with Befo
     val args = CommandLineArgs("init", Some(configPath))
     commandExecutor.execute(args)
 
-    logBuffer should contain("[SUCCESS] Alarm store successfully initialized.")
+    logBuffer should contain("[SUCCESS] Command executed successfully.")
 
     val metadata = adminService.getMetadata(GlobalKey).await
 
@@ -80,9 +80,7 @@ class CommandExecutorTest extends FunSuite with Matchers with SeedData with Befo
     intercept[RuntimeException] {
       commandExecutor.execute(args)
     }
-    logBuffer should contain(
-      "[FAILURE] Failed to initialize alarm store with error: [File does not exist at path=valid-alarms.conf]"
-    )
+    logBuffer should contain("[FAILURE] Failed to execute the command.")
   }
 
   // DEOPSCSW-480: Set alarm Severity from CLI Interface
@@ -106,9 +104,7 @@ class CommandExecutorTest extends FunSuite with Matchers with SeedData with Befo
 
     adminService.getCurrentSeverity(updateCmd.alarmKey).await shouldBe Major
 
-    logBuffer should contain(
-      s"[SUCCESS] Severity for alarm [${updateCmd.alarmKey.value}] is successfully set to [${Major.name}]."
-    )
+    logBuffer should contain("[SUCCESS] Command executed successfully.")
   }
 
   // DEOPSCSW-480: Set alarm Severity from CLI Interface
@@ -133,11 +129,7 @@ class CommandExecutorTest extends FunSuite with Matchers with SeedData with Befo
       commandExecutor.execute(updateCmd)
     }
 
-    logBuffer should contain(
-      s"[FAILURE] Failed to set severity for alarm [${updateCmd.alarmKey.value}] with error: " +
-      s"[Attempt to set invalid severity [${Critical.name}] for alarm [${updateCmd.alarmKey.value}]. " +
-      s"Supported severities for this alarm are [Warning,Major,Indeterminate,Okay]]"
-    )
+    logBuffer should contain("[FAILURE] Failed to execute the command.")
   }
 
   // DEOPSCSW-471: Acknowledge alarm from CLI application
@@ -163,7 +155,7 @@ class CommandExecutorTest extends FunSuite with Matchers with SeedData with Befo
 
     adminService.getStatus(ackCmd.alarmKey).await.acknowledgementStatus shouldBe Acknowledged
 
-    logBuffer should contain(s"[SUCCESS] Alarm [${ackCmd.alarmKey.value}] is successfully acknowledged.")
+    logBuffer should contain(s"[SUCCESS] Command executed successfully.")
   }
 
   // DEOPSCSW-471: Acknowledge alarm from CLI application
@@ -186,8 +178,6 @@ class CommandExecutorTest extends FunSuite with Matchers with SeedData with Befo
       commandExecutor.execute(ackCmd)
     }
 
-    logBuffer should contain(
-      s"[FAILURE] Failed to acknowledge alarm [${ackCmd.alarmKey.value}] with error: [Key: [${ackCmd.alarmKey.value}] not found in Alarm Store.]"
-    )
+    logBuffer should contain("[FAILURE] Failed to execute the command.")
   }
 }
