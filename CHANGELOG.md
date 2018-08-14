@@ -15,20 +15,20 @@ This is version 0.5 the second release of the TMT Common Software for project st
 This release includes Event Service.
 See [here](https://tmtsoftware.github.io/csw-prod/0.5.0-RC1/) for a detailed documentation of this version of the CSW software.
 
-#####New Features
+####New Features
 - Event Service
     - Command Line Interface for testing
     - Updated giter8 template
-#####Bug Fixes
+####Bug Fixes
 - Prefix missing in Akka location (CSW-11)
-#####Requests
+####Requests
 - CurrentState missing StateName (CSW-1)
 - CurrentState pubsub by StateName
-#####Source Updates Needed
+####Source Updates Needed
 - Akka update to typed actors may require your source to be updated - if you have problems, use tmt-scw-programming slack channel for help
 - Inclusion of Event Service requires an update to any Top Level Actor
 
-##### Planned for the Next Release (Coming Soon...)
+#### Planned for the Next Release (Coming Soon...)
 - Alarm Service including Examples, API and programming documentation
 
 ## [CSW v0.5.0-RC1] - 2018-08-01
