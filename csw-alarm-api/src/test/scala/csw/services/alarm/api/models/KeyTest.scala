@@ -1,9 +1,10 @@
 package csw.services.alarm.api.models
 import csw.services.alarm.api.models.Key.{AlarmKey, ComponentKey, GlobalKey, SubsystemKey}
+import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.{FunSuite, Matchers}
 
 // DEOPSCSW-435: Identify Alarm by Subsystem, component and AlarmName
-class KeyTest extends FunSuite with Matchers {
+class KeyTest extends FunSuite with Matchers with TableDrivenPropertyChecks {
   test("AlarmKey should be representing a unique alarm") {
     val tromboneAxisHighLimitAlarm = AlarmKey("nfiraos", "trombone", "tromboneAxisHighLimitAlarm")
     tromboneAxisHighLimitAlarm.value shouldEqual "nfiraos.trombone.tromboneaxishighlimitalarm"
@@ -23,35 +24,31 @@ class KeyTest extends FunSuite with Matchers {
     GlobalKey.value shouldEqual "*.*.*"
   }
 
-  test("AlarmKey should not allow character '*'") {
-    intercept[IllegalArgumentException] {
-      AlarmKey("nfiraos", "trombone", "*")
-    }
-  }
+  val invalidCharacers = List("*", "[", "]", "-", "^")
 
-  test("AlarmKey should not allow character '['") {
-    intercept[IllegalArgumentException] {
-      AlarmKey("nfiraos", "[", "tromboneAxisHighLimitAlarm")
+  invalidCharacers.foreach(character => {
+    test(s"AlarmKey should not allow '$character' character") {
+      intercept[IllegalArgumentException] {
+        AlarmKey("nfiraos", "trombone", character)
+      }
     }
-  }
+  })
 
-  test("AlarmKey should not allow character ']'") {
-    intercept[IllegalArgumentException] {
-      AlarmKey("]", "trombone", "tromboneAxisHighLimitAlarm")
+  invalidCharacers.foreach(character => {
+    test(s"ComponentKey should not allow '$character' character") {
+      intercept[IllegalArgumentException] {
+        ComponentKey("nfiraos", character)
+      }
     }
-  }
+  })
 
-  test("AlarmKey should not allow character '-'") {
-    intercept[IllegalArgumentException] {
-      AlarmKey("nfiraos", "trombone", "-")
+  invalidCharacers.foreach(character => {
+    test(s"SubsystemKey should not allow '$character' character") {
+      intercept[IllegalArgumentException] {
+        SubsystemKey(character)
+      }
     }
-  }
-
-  test("AlarmKey should not allow character '^'") {
-    intercept[IllegalArgumentException] {
-      AlarmKey("nfiraos", "trombone", "^")
-    }
-  }
+  })
 
   test("SubsystemKey should not allow empty subsystem") {
     intercept[IllegalArgumentException] {

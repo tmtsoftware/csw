@@ -35,7 +35,12 @@ object Key {
     }
   }
 
-  case class ComponentKey(subsystem: String, component: String) extends Key(subsystem, component, "*")
-  case class SubsystemKey(subsystem: String)                    extends Key(subsystem, "*", "*")
-  case object GlobalKey                                         extends Key("*", "*", "*")
+  case class ComponentKey(subsystem: String, component: String) extends Key(subsystem, component, "*") {
+    require(!patternForInvalidKey.matcher(subsystem).matches(), "subsystem name contains invalid characters")
+    require(!patternForInvalidKey.matcher(component).matches(), "component name contains invalid characters")
+  }
+  case class SubsystemKey(subsystem: String) extends Key(subsystem, "*", "*") {
+    require(!patternForInvalidKey.matcher(subsystem).matches(), "subsystem name contains invalid characters")
+  }
+  case object GlobalKey extends Key("*", "*", "*")
 }
