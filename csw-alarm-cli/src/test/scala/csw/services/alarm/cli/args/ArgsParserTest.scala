@@ -33,10 +33,7 @@ class ArgsParserTest extends FunSuite with Matchers {
   test("parse init command with only mandatory options") {
     val options = Array("init", "/a/b/c")
     silentParse(options) should contain(
-      Options(
-        cmd = "init",
-        filePath = Some(Paths.get("/a/b/c"))
-      )
+      Options(cmd = "init", filePath = Some(Paths.get("/a/b/c")))
     )
   }
 
@@ -67,11 +64,7 @@ class ArgsParserTest extends FunSuite with Matchers {
     )
 
     silentParse(options) should contain(
-      Options(
-        cmd = "update",
-        alarmKey = AlarmKey("nfiraos.trombone.tromboneaxishighlimitalarm"),
-        severity = Major
-      )
+      Options(cmd = "update", alarmKey = Some(AlarmKey("nfiraos.trombone.tromboneaxishighlimitalarm")), severity = Major)
     )
   }
 
@@ -83,10 +76,7 @@ class ArgsParserTest extends FunSuite with Matchers {
     )
 
     silentParse(options) should contain(
-      Options(
-        cmd = "acknowledge",
-        alarmKey = AlarmKey("nfiraos.trombone.tromboneaxishighlimitalarm")
-      )
+      Options(cmd = "acknowledge", alarmKey = Some(AlarmKey("nfiraos.trombone.tromboneaxishighlimitalarm")))
     )
   }
 
@@ -103,10 +93,7 @@ class ArgsParserTest extends FunSuite with Matchers {
     )
 
     silentParse(options) should contain(
-      Options(
-        cmd = "activate",
-        alarmKey = AlarmKey("nfiraos.trombone.tromboneaxishighlimitalarm")
-      )
+      Options(cmd = "activate", alarmKey = Some(AlarmKey("nfiraos.trombone.tromboneaxishighlimitalarm")))
     )
   }
 
@@ -123,10 +110,7 @@ class ArgsParserTest extends FunSuite with Matchers {
     )
 
     silentParse(options) should contain(
-      Options(
-        cmd = "deactivate",
-        alarmKey = AlarmKey("nfiraos.trombone.tromboneaxishighlimitalarm")
-      )
+      Options(cmd = "deactivate", alarmKey = Some(AlarmKey("nfiraos.trombone.tromboneaxishighlimitalarm")))
     )
   }
 

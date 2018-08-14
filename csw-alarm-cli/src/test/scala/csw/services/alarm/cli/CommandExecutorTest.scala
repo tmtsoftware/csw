@@ -92,10 +92,10 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     logBuffer.clear()
 
     // update severity of an alarm
-    val updateCmd = Options("update", alarmKey = tromboneAxisHighLimitKey, severity = Major)
+    val updateCmd = Options("update", alarmKey = Some(tromboneAxisHighLimitKey), severity = Major)
     commandExecutor.execute(updateCmd)
 
-    adminService.getCurrentSeverity(updateCmd.alarmKey).futureValue shouldBe Major
+    adminService.getCurrentSeverity(tromboneAxisHighLimitKey).futureValue shouldBe Major
 
     logBuffer shouldEqual List(successMsg)
   }
@@ -110,13 +110,13 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     logBuffer.clear()
 
     // update severity of an alarm
-    val ackCmd = Options("acknowledge", alarmKey = tromboneAxisLowLimitKey)
+    val ackCmd = Options("acknowledge", alarmKey = Some(tromboneAxisLowLimitKey))
 
-    adminService.getStatus(ackCmd.alarmKey).futureValue.acknowledgementStatus shouldBe UnAcknowledged
+    adminService.getStatus(tromboneAxisLowLimitKey).futureValue.acknowledgementStatus shouldBe UnAcknowledged
 
     commandExecutor.execute(ackCmd)
 
-    adminService.getStatus(ackCmd.alarmKey).futureValue.acknowledgementStatus shouldBe Acknowledged
+    adminService.getStatus(tromboneAxisLowLimitKey).futureValue.acknowledgementStatus shouldBe Acknowledged
 
     logBuffer shouldEqual List(successMsg)
   }
@@ -131,11 +131,11 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     logBuffer.clear()
 
     // update severity of an alarm
-    val ackCmd = Options("activate", alarmKey = tromboneAxisLowLimitKey)
+    val ackCmd = Options("activate", alarmKey = Some(tromboneAxisLowLimitKey))
 
     commandExecutor.execute(ackCmd)
 
-    adminService.getMetadata(ackCmd.alarmKey).futureValue.activationStatus shouldBe Active
+    adminService.getMetadata(tromboneAxisLowLimitKey).futureValue.activationStatus shouldBe Active
     logBuffer shouldEqual List(successMsg)
   }
 
@@ -149,11 +149,11 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     logBuffer.clear()
 
     // update severity of an alarm
-    val ackCmd = Options("deactivate", alarmKey = tromboneAxisLowLimitKey)
+    val ackCmd = Options("deactivate", alarmKey = Some(tromboneAxisLowLimitKey))
 
     commandExecutor.execute(ackCmd)
 
-    adminService.getMetadata(ackCmd.alarmKey).futureValue.activationStatus shouldBe Inactive
+    adminService.getMetadata(tromboneAxisLowLimitKey).futureValue.activationStatus shouldBe Inactive
     logBuffer shouldEqual List(successMsg)
   }
 }

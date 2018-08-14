@@ -10,7 +10,7 @@ case class Options(
     filePath: Option[Path] = None,
     isLocal: Boolean = false,
     reset: Boolean = false,
-    alarmKey: AlarmKey = AlarmKey("", "", ""),
+    alarmKey: Option[AlarmKey] = None,
     subsystem: String = "",
     component: String = "",
     name: String = "",

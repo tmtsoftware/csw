@@ -27,7 +27,7 @@ trait Arguments { self: OptionParser[Options] =>
     opt[String]("alarmKey")
       .required()
       .action((key, args) ⇒ {
-        args.copy(alarmKey = AlarmKey(key))
+        args.copy(alarmKey = Some(AlarmKey(key)))
       })
       .text("alarm key e.g. nfiraos.trombone.tromboneaxishighlimitalarm")
 

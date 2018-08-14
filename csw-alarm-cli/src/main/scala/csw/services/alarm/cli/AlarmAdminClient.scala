@@ -29,21 +29,21 @@ class AlarmAdminClient(
 
   def severity(options: Options): Future[Unit] =
     alarmServiceF
-      .flatMap(_.setSeverity(options.alarmKey, options.severity))
+      .flatMap(_.setSeverity(options.alarmKey.get, options.severity))
       .transformWithSideEffect(printLine)
 
   def acknowledge(options: Options): Future[Unit] =
     alarmServiceF
-      .flatMap(_.acknowledge(options.alarmKey))
+      .flatMap(_.acknowledge(options.alarmKey.get))
       .transformWithSideEffect(printLine)
 
   def activate(options: Options): Future[Unit] =
     alarmServiceF
-      .flatMap(_.activate(options.alarmKey))
+      .flatMap(_.activate(options.alarmKey.get))
       .transformWithSideEffect(printLine)
 
   def deactivate(options: Options): Future[Unit] =
     alarmServiceF
-      .flatMap(_.deactivate(options.alarmKey))
+      .flatMap(_.deactivate(options.alarmKey.get))
       .transformWithSideEffect(printLine)
 }
