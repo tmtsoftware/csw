@@ -52,4 +52,22 @@ class KeyTest extends FunSuite with Matchers {
       AlarmKey("nfiraos", "trombone", "^")
     }
   }
+
+  test("SubsystemKey should not allow empty subsystem") {
+    intercept[IllegalArgumentException] {
+      SubsystemKey("")
+    }
+  }
+
+  test("ComponentKey should not allow empty values") {
+    intercept[IllegalArgumentException] {
+      ComponentKey("test", null)
+    }
+  }
+
+  test("AlarmKey should not allow empty values") {
+    intercept[IllegalArgumentException] {
+      Key.AlarmKey("test", "test", "")
+    }
+  }
 }
