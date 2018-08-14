@@ -45,7 +45,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
     val metadata = adminService.getMetadata(GlobalKey).futureValue
 
-    metadata.map(_.alarmKey.value).toSet shouldEqual allAlarmKeys.map(_.value)
+    metadata.map(_.alarmKey).toSet shouldEqual allAlarmKeys
   }
 
   // DEOPSCSW-470: CLI application to exercise and test the alarm API
@@ -66,7 +66,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
     val metadata = adminService.getMetadata(GlobalKey).futureValue
 
-    metadata.map(_.alarmKey.value).toSet shouldEqual allAlarmKeys.map(_.value)
+    metadata.map(_.alarmKey).toSet shouldEqual allAlarmKeys
 
     // clean up
     configService.delete(configPath, "deleting test file").futureValue
