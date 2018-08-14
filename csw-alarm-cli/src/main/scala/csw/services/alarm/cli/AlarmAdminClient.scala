@@ -46,4 +46,14 @@ class AlarmAdminClient(
     alarmServiceF
       .flatMap(_.deactivate(options.alarmKey.get))
       .transformWithSideEffect(printLine)
+
+  def shelve(options: Options): Future[Unit] =
+    alarmServiceF
+      .flatMap(_.shelve(options.alarmKey.get))
+      .transformWithSideEffect(printLine)
+
+  def unShelve(options: Options): Future[Unit] =
+    alarmServiceF
+      .flatMap(_.unShelve(options.alarmKey.get))
+      .transformWithSideEffect(printLine)
 }

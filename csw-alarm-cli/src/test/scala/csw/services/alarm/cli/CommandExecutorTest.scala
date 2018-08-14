@@ -7,6 +7,7 @@ import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, UnAckn
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
 import csw.services.alarm.api.models.AlarmSeverity.Major
 import csw.services.alarm.api.models.Key.{AlarmKey, GlobalKey}
+import csw.services.alarm.api.models.ShelveStatus.{Shelved, UnShelved}
 import csw.services.alarm.cli.args.Options
 import csw.services.config.api.models.ConfigData
 import csw.services.config.client.scaladsl.ConfigClientFactory
@@ -109,11 +110,10 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     commandExecutor.execute(initCmd)
     logBuffer.clear()
 
-    // update severity of an alarm
-    val ackCmd = Options("acknowledge", alarmKey = Some(tromboneAxisLowLimitKey))
-
     adminService.getStatus(tromboneAxisLowLimitKey).futureValue.acknowledgementStatus shouldBe UnAcknowledged
 
+    // acknowledge the alarm
+    val ackCmd = Options("acknowledge", alarmKey = Some(tromboneAxisLowLimitKey))
     commandExecutor.execute(ackCmd)
 
     adminService.getStatus(tromboneAxisLowLimitKey).futureValue.acknowledgementStatus shouldBe Acknowledged
@@ -130,10 +130,9 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     commandExecutor.execute(initCmd)
     logBuffer.clear()
 
-    // update severity of an alarm
-    val ackCmd = Options("activate", alarmKey = Some(tromboneAxisLowLimitKey))
-
-    commandExecutor.execute(ackCmd)
+    // activate the alarm
+    val activateCmd = Options("activate", alarmKey = Some(tromboneAxisLowLimitKey))
+    commandExecutor.execute(activateCmd)
 
     adminService.getMetadata(tromboneAxisLowLimitKey).futureValue.activationStatus shouldBe Active
     logBuffer shouldEqual List(successMsg)
@@ -148,12 +147,50 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     commandExecutor.execute(initCmd)
     logBuffer.clear()
 
-    // update severity of an alarm
-    val ackCmd = Options("deactivate", alarmKey = Some(tromboneAxisLowLimitKey))
-
-    commandExecutor.execute(ackCmd)
+    // deactivate the alarm
+    val deactivateCmd = Options("deactivate", alarmKey = Some(tromboneAxisLowLimitKey))
+    commandExecutor.execute(deactivateCmd)
 
     adminService.getMetadata(tromboneAxisLowLimitKey).futureValue.activationStatus shouldBe Inactive
+    logBuffer shouldEqual List(successMsg)
+  }
+
+  // DEOPSCSW-473: Shelve/UnShelve alarm from CLI interface
+  test("should shelve the alarm") {
+
+    // init alarm store
+    val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
+    val initCmd  = Options("init", Some(filePath), isLocal = true, reset = true)
+    commandExecutor.execute(initCmd)
+    logBuffer.clear()
+
+    adminService.getStatus(tromboneAxisLowLimitKey).futureValue.shelveStatus shouldBe UnShelved
+
+    // shelve the alarm
+    val shelveCmd = Options("shelve", alarmKey = Some(tromboneAxisLowLimitKey))
+    commandExecutor.execute(shelveCmd)
+
+    adminService.getStatus(tromboneAxisLowLimitKey).futureValue.shelveStatus shouldBe Shelved
+    logBuffer shouldEqual List(successMsg)
+  }
+
+  // DEOPSCSW-473: Shelve/UnShelve alarm from CLI interface
+  test("should unshelve the alarm") {
+
+    // init alarm store
+    val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
+    val initCmd  = Options("init", Some(filePath), isLocal = true, reset = true)
+    commandExecutor.execute(initCmd)
+    logBuffer.clear()
+
+    adminService.shelve(tromboneAxisLowLimitKey).futureValue
+    adminService.getStatus(tromboneAxisLowLimitKey).futureValue.shelveStatus shouldBe Shelved
+
+    // unshelve the alarm
+    val unshelveCmd = Options("unshelve", alarmKey = Some(tromboneAxisLowLimitKey))
+    commandExecutor.execute(unshelveCmd)
+
+    adminService.getStatus(tromboneAxisLowLimitKey).futureValue.shelveStatus shouldBe UnShelved
     logBuffer shouldEqual List(successMsg)
   }
 }

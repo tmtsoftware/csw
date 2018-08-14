@@ -31,6 +31,16 @@ class ArgsParser(name: String) {
       .text("deactivate an alarm")
       .children(alarmKey)
 
+    cmd("shelve")
+      .action((_, args) ⇒ args.copy(cmd = "shelve"))
+      .text("shelve an alarm")
+      .children(alarmKey)
+
+    cmd("unshelve")
+      .action((_, args) ⇒ args.copy(cmd = "unshelve"))
+      .text("unshelve an alarm")
+      .children(alarmKey)
+
     help("help")
 
     version("version")

@@ -97,11 +97,6 @@ class ArgsParserTest extends FunSuite with Matchers {
     )
   }
 
-  test("parse activate command without any options") {
-    val options = Array("activate")
-    silentParse(options) shouldBe None
-  }
-
   test("parse deactivate command") {
     val options = Array(
       "deactivate",
@@ -114,8 +109,42 @@ class ArgsParserTest extends FunSuite with Matchers {
     )
   }
 
-  test("parse deactivate command without any options") {
-    val options = Array("deactivate")
-    silentParse(options) shouldBe None
+  test("parse activate/deactivate command without any options") {
+    val activateOptions   = Array("activate")
+    val deactivateOptions = Array("deactivate")
+
+    silentParse(activateOptions) shouldBe None
+    silentParse(deactivateOptions) shouldBe None
+  }
+
+  test("parse shelve command") {
+    val options = Array(
+      "shelve",
+      "--alarmKey",
+      "nfiraos.trombone.tromboneaxishighlimitalarm"
+    )
+
+    silentParse(options) should contain(
+      Options(cmd = "shelve", alarmKey = Some(AlarmKey("nfiraos.trombone.tromboneaxishighlimitalarm")))
+    )
+  }
+
+  test("parse unshelve command") {
+    val options = Array(
+      "unshelve",
+      "--alarmKey",
+      "nfiraos.trombone.tromboneaxishighlimitalarm"
+    )
+
+    silentParse(options) should contain(
+      Options(cmd = "unshelve", alarmKey = Some(AlarmKey("nfiraos.trombone.tromboneaxishighlimitalarm")))
+    )
+  }
+
+  test("parse shelve/unshelve command without any options") {
+    val shelveOptions   = Array("shelve")
+    val unshelveOptions = Array("unshelve")
+    silentParse(shelveOptions) shouldBe None
+    silentParse(unshelveOptions) shouldBe None
   }
 }

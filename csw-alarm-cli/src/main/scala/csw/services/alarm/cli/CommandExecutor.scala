@@ -12,6 +12,8 @@ class CommandExecutor(alarmAdminClient: AlarmAdminClient) {
       case "acknowledge" ⇒ await(alarmAdminClient.acknowledge(options))
       case "activate"    ⇒ await(alarmAdminClient.activate(options))
       case "deactivate"  ⇒ await(alarmAdminClient.deactivate(options))
+      case "shelve"      ⇒ await(alarmAdminClient.shelve(options))
+      case "unshelve"    ⇒ await(alarmAdminClient.unShelve(options))
     }
   }
 

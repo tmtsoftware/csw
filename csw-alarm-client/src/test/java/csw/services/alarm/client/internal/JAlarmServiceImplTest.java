@@ -2,7 +2,6 @@ package csw.services.alarm.client.internal;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import com.typesafe.config.ConfigResolveOptions;
 import csw.services.alarm.api.exceptions.InvalidSeverityException;
 import csw.services.alarm.api.javadsl.IAlarmService;
 import csw.services.alarm.api.javadsl.JAlarmSeverity;
@@ -17,7 +16,6 @@ import org.junit.rules.ExpectedException;
 import scala.concurrent.Await;
 import scala.concurrent.duration.FiniteDuration;
 
-import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 import static csw.services.alarm.api.models.Key.AlarmKey;
