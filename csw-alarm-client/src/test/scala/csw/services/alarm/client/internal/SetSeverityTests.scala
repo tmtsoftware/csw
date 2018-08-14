@@ -1,8 +1,5 @@
 package csw.services.alarm.client.internal
 
-import java.io.File
-
-import com.typesafe.config.{ConfigFactory, ConfigResolveOptions}
 import csw.services.alarm.api.models.AcknowledgementStatus._
 import csw.services.alarm.api.models.ActivationStatus.Active
 import csw.services.alarm.api.models.AlarmSeverity._
@@ -15,64 +12,82 @@ import csw.services.alarm.client.internal.helpers.{AcknowledgeAndLatchTestCase, 
 //DEOPSCSW-444 : Set severity api for component
 class SetSeverityTests extends AlarmServiceTestSetup {
 
-  val `low_latchable=>high_latchable` = AlarmKey("AOESW", "test_component", "low_latchable=>high_latchable")
-  val `low_unlatable=>hig_latchable`  = AlarmKey("AOESW", "test_component", "low_unlatable=>hig_latchable")
-  val `high_latchable=>low_latchable` = AlarmKey("AOESW", "test_component", "high_latchable=>low_latchable")
-  val `high_unlatable=>low_latchable` = AlarmKey("AOESW", "test_component", "high_unlatable=>low_latchable")
-
   val alarmServiceImpl: AlarmServiceImpl = alarmService.asInstanceOf[AlarmServiceImpl]
 
-  override def beforeAll() {
-    val validAlarmsFile   = new File(getClass.getResource("/test-alarms/latchSeverityTestAlarms.conf").getPath)
-    val validAlarmsConfig = ConfigFactory.parseFile(validAlarmsFile).resolve(ConfigResolveOptions.noSystem())
-    alarmService.initAlarms(validAlarmsConfig, reset = true).await
+  val setSeverityTestCases: Array[SetSeverityTestCase] = Array(
+    SetSeverityTestCase(
+      alarmKey = AlarmKey("AOESW", "test_component", "low_latchable=>high_latchable"),
+      oldSeverity = Warning,
+      newSeverity = Major,
+      expectedLatchedSeverity = Major
+    ),
+    SetSeverityTestCase(
+      alarmKey = AlarmKey("AOESW", "test_component", "low_unlatable=>hig_latchable"),
+      oldSeverity = Disconnected,
+      newSeverity = Critical,
+      expectedLatchedSeverity = Critical
+    ),
+    SetSeverityTestCase(
+      alarmKey = AlarmKey("AOESW", "test_component", "high_latchable=>low_latchable"),
+      oldSeverity = Major,
+      newSeverity = Warning,
+      expectedLatchedSeverity = Major
+    ),
+    SetSeverityTestCase(
+      alarmKey = AlarmKey("AOESW", "test_component", "high_unlatable=>low_latchable"),
+      oldSeverity = Disconnected,
+      newSeverity = Major,
+      expectedLatchedSeverity = Major
+    )
+  )
 
-    List(
-      (`low_latchable=>high_latchable`, Warning),
-      (`low_unlatable=>hig_latchable`, Disconnected),
-      (`high_latchable=>low_latchable`, Major),
-      (`high_unlatable=>low_latchable`, Disconnected)
-    ).foreach {
-      case (alarmKey, severity) if severity == Disconnected =>
-        alarmServiceImpl.setStatus(alarmKey, AlarmStatus()).await
-      case (alarmKey, severity) =>
+  setSeverityTestCases.foreach(
+    testCase =>
+      test(testCase.toString) {
+
+        // Adding metadata for corresponding test in alarm store
         alarmServiceImpl
-          .setStatus(
-            alarmKey,
-            AlarmStatus(
-              latchedSeverity = severity,
-              latchStatus = if (severity.latchable) Latched else UnLatched
+          .setMetadata(
+            testCase.alarmKey,
+            AlarmMetadata(
+              subsystem = testCase.alarmKey.subsystem,
+              component = testCase.alarmKey.component,
+              name = testCase.alarmKey.name,
+              description = "for test purpose",
+              location = "testing",
+              AlarmType.Absolute,
+              Set(Okay, Warning, Major, Indeterminate, Critical),
+              probableCause = "test",
+              operatorResponse = "test",
+              isAutoAcknowledgeable = true,
+              isLatchable = true,
+              activationStatus = Active
             )
           )
           .await
-    }
-  }
 
-  val setSeverityTestDataProvider: Array[SetSeverityTestCase] = Array(
-    SetSeverityTestCase(
-      oldSeverity = Warning,
-      newSeverity = Major,
-      outcome = Major,
-      alarmKey = `low_latchable=>high_latchable`
-    ),
-    SetSeverityTestCase(
-      oldSeverity = Disconnected,
-      newSeverity = Critical,
-      outcome = Critical,
-      alarmKey = `low_unlatable=>hig_latchable`
-    ),
-    SetSeverityTestCase(
-      oldSeverity = Major,
-      newSeverity = Warning,
-      outcome = Major,
-      alarmKey = `high_latchable=>low_latchable`
-    ),
-    SetSeverityTestCase(
-      oldSeverity = Disconnected,
-      newSeverity = Major,
-      outcome = Major,
-      alarmKey = `high_unlatable=>low_latchable`
-    )
+        // Adding status for corresponding test in alarm store
+        (testCase.alarmKey, testCase.oldSeverity) match {
+          case (alarmKey, severity) if severity == Disconnected =>
+            alarmServiceImpl.setStatus(alarmKey, AlarmStatus()).await
+          case (alarmKey, severity) =>
+            alarmServiceImpl
+              .setStatus(
+                alarmKey,
+                AlarmStatus(
+                  latchedSeverity = severity,
+                  latchStatus = if (severity.latchable) Latched else UnLatched
+                )
+              )
+              .await
+        }
+
+        //set severity to new Severity
+        val status = setSeverity(testCase.alarmKey, testCase.newSeverity)
+
+        //get severity and assert
+        status.latchedSeverity shouldEqual testCase.expectedLatchedSeverity
+    }
   )
 
   val ackAndLatchTestCases = Array(
@@ -227,17 +242,6 @@ class SetSeverityTests extends AlarmServiceTestSetup {
         //get severity and assert
         status.acknowledgementStatus shouldEqual testCase.expectedAckStatus
         status.latchStatus shouldEqual testCase.expectedLatchStatus
-    }
-  )
-
-  setSeverityTestDataProvider.foreach(
-    testCase =>
-      test(testCase.toString) {
-        //set severity to new Severity
-        val status = setSeverity(testCase.alarmKey, testCase.newSeverity)
-
-        //get severity and assert
-        status.latchedSeverity shouldEqual testCase.outcome
     }
   )
 
