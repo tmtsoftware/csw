@@ -155,4 +155,13 @@ class MetadataServiceModuleTests
     val metadata = getMetadata(cpuIdleAlarmKey).await
     metadata.activationStatus shouldBe Inactive
   }
+
+  // DEOPSCSW-448: Set Activation status for an alarm entity
+  test("should throw exception when tried to activate/deactivate alarm which is not present in alarm store") {
+    val invalidKey = AlarmKey("invalid", "invalid", "invalid")
+
+    an[KeyNotFoundException] shouldBe thrownBy(activate(invalidKey).await)
+    an[KeyNotFoundException] shouldBe thrownBy(deactivate(invalidKey).await)
+  }
+
 }
