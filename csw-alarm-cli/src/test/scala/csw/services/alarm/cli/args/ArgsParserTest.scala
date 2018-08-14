@@ -4,6 +4,7 @@ import java.nio.file.Paths
 
 import csw.services.BuildInfo
 import csw.services.alarm.api.models.AlarmSeverity.Major
+import csw.services.alarm.api.models.Key.AlarmKey
 import org.scalatest.{FunSuite, Matchers}
 
 class ArgsParserTest extends FunSuite with Matchers {
@@ -59,12 +60,8 @@ class ArgsParserTest extends FunSuite with Matchers {
   test("parse update command with all options") {
     val options = Array(
       "update",
-      "--subsystem",
-      "NFIRAOS",
-      "--component",
-      "trombone",
-      "--name",
-      "tromboneAxisHighLimitAlarm",
+      "--alarmKey",
+      "nfiraos.trombone.tromboneaxishighlimitalarm",
       "--severity",
       "Major"
     )
@@ -72,9 +69,7 @@ class ArgsParserTest extends FunSuite with Matchers {
     silentParse(options) should contain(
       Options(
         cmd = "update",
-        subsystem = "NFIRAOS",
-        component = "trombone",
-        name = "tromboneAxisHighLimitAlarm",
+        alarmKey = AlarmKey("nfiraos.trombone.tromboneaxishighlimitalarm"),
         severity = Major
       )
     )
@@ -83,20 +78,14 @@ class ArgsParserTest extends FunSuite with Matchers {
   test("parse acknowledge command") {
     val options = Array(
       "acknowledge",
-      "--subsystem",
-      "NFIRAOS",
-      "--component",
-      "trombone",
-      "--name",
-      "tromboneAxisHighLimitAlarm"
+      "--alarmKey",
+      "nfiraos.trombone.tromboneaxishighlimitalarm"
     )
 
     silentParse(options) should contain(
       Options(
         cmd = "acknowledge",
-        subsystem = "NFIRAOS",
-        component = "trombone",
-        name = "tromboneAxisHighLimitAlarm"
+        alarmKey = AlarmKey("nfiraos.trombone.tromboneaxishighlimitalarm")
       )
     )
   }
@@ -109,20 +98,14 @@ class ArgsParserTest extends FunSuite with Matchers {
   test("parse activate command") {
     val options = Array(
       "activate",
-      "--subsystem",
-      "NFIRAOS",
-      "--component",
-      "trombone",
-      "--name",
-      "tromboneAxisHighLimitAlarm"
+      "--alarmKey",
+      "nfiraos.trombone.tromboneaxishighlimitalarm"
     )
 
     silentParse(options) should contain(
       Options(
         cmd = "activate",
-        subsystem = "NFIRAOS",
-        component = "trombone",
-        name = "tromboneAxisHighLimitAlarm"
+        alarmKey = AlarmKey("nfiraos.trombone.tromboneaxishighlimitalarm")
       )
     )
   }
@@ -135,20 +118,14 @@ class ArgsParserTest extends FunSuite with Matchers {
   test("parse deactivate command") {
     val options = Array(
       "deactivate",
-      "--subsystem",
-      "NFIRAOS",
-      "--component",
-      "trombone",
-      "--name",
-      "tromboneAxisHighLimitAlarm"
+      "--alarmKey",
+      "nfiraos.trombone.tromboneaxishighlimitalarm"
     )
 
     silentParse(options) should contain(
       Options(
         cmd = "deactivate",
-        subsystem = "NFIRAOS",
-        component = "trombone",
-        name = "tromboneAxisHighLimitAlarm"
+        alarmKey = AlarmKey("nfiraos.trombone.tromboneaxishighlimitalarm")
       )
     )
   }

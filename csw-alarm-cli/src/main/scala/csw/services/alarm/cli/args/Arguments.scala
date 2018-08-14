@@ -3,6 +3,7 @@ package csw.services.alarm.cli.args
 import java.nio.file.Paths
 
 import csw.services.alarm.api.models.AlarmSeverity
+import csw.services.alarm.api.models.Key.AlarmKey
 import scopt.{OptionDef, OptionParser}
 
 trait Arguments { self: OptionParser[Options] =>
@@ -21,6 +22,14 @@ trait Arguments { self: OptionParser[Options] =>
     opt[Unit]("reset")
       .action((_, args) ⇒ args.copy(reset = true))
       .text("optional reset the alarm store data")
+
+  def alarmKey: OptionDef[String, Options] =
+    opt[String]("alarmKey")
+      .required()
+      .action((key, args) ⇒ {
+        args.copy(alarmKey = AlarmKey(key))
+      })
+      .text("alarm key e.g. nfiraos.trombone.tromboneaxishighlimitalarm")
 
   def subsystem: OptionDef[String, Options] =
     opt[String]("subsystem")

@@ -6,7 +6,7 @@ import com.typesafe.config.ConfigFactory
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, UnAcknowledged}
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
 import csw.services.alarm.api.models.AlarmSeverity.Major
-import csw.services.alarm.api.models.Key.GlobalKey
+import csw.services.alarm.api.models.Key.{AlarmKey, GlobalKey}
 import csw.services.alarm.cli.args.Options
 import csw.services.config.api.models.ConfigData
 import csw.services.config.client.scaladsl.ConfigClientFactory
@@ -21,6 +21,13 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
   private val successMsg = "[SUCCESS] Command executed successfully."
   private val failureMsg = "[FAILURE] Failed to execute the command."
+
+  private val tromboneAxisLowLimitKey  = AlarmKey("nfiraos.trombone.tromboneaxislowlimitalarm")
+  private val tromboneAxisHighLimitKey = AlarmKey("nfiraos.trombone.tromboneaxishighlimitalarm")
+  private val cpuExceededKey           = AlarmKey("tcs.tcspk.cpuexceededalarm")
+  private val cpuIdleKey               = AlarmKey("lgsf.tcspkinactive.cpuidlealarm")
+
+  private val allAlarmKeys = Set(tromboneAxisLowLimitKey, tromboneAxisHighLimitKey, cpuExceededKey, cpuIdleKey)
 
   override def afterAll(): Unit = {
     val testFileUtils = new TestFileUtils(new Settings(ConfigFactory.load()))
@@ -38,12 +45,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
     val metadata = adminService.getMetadata(GlobalKey).futureValue
 
-    metadata.map(_.alarmKey.value).toSet shouldEqual Set(
-      "nfiraos.trombone.tromboneaxishighlimitalarm",
-      "nfiraos.trombone.tromboneaxislowlimitalarm",
-      "tcs.tcspk.cpuexceededalarm",
-      "lgsf.tcspkinactive.cpuidlealarm"
-    )
+    metadata.map(_.alarmKey.value).toSet shouldEqual allAlarmKeys.map(_.value)
   }
 
   // DEOPSCSW-470: CLI application to exercise and test the alarm API
@@ -64,12 +66,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
     val metadata = adminService.getMetadata(GlobalKey).futureValue
 
-    metadata.map(_.alarmKey.value).toSet shouldEqual Set(
-      "nfiraos.trombone.tromboneaxishighlimitalarm",
-      "nfiraos.trombone.tromboneaxislowlimitalarm",
-      "tcs.tcspk.cpuexceededalarm",
-      "lgsf.tcspkinactive.cpuidlealarm"
-    )
+    metadata.map(_.alarmKey.value).toSet shouldEqual allAlarmKeys.map(_.value)
 
     // clean up
     configService.delete(configPath, "deleting test file").futureValue
@@ -95,13 +92,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     logBuffer.clear()
 
     // update severity of an alarm
-    val updateCmd = Options(
-      "update",
-      subsystem = "NFIRAOS",
-      component = "trombone",
-      name = "tromboneAxisHighLimitAlarm",
-      severity = Major
-    )
+    val updateCmd = Options("update", alarmKey = tromboneAxisHighLimitKey, severity = Major)
     commandExecutor.execute(updateCmd)
 
     adminService.getCurrentSeverity(updateCmd.alarmKey).futureValue shouldBe Major
@@ -119,12 +110,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     logBuffer.clear()
 
     // update severity of an alarm
-    val ackCmd = Options(
-      "acknowledge",
-      subsystem = "NFIRAOS",
-      component = "trombone",
-      name = "tromboneAxisLowLimitAlarm"
-    )
+    val ackCmd = Options("acknowledge", alarmKey = tromboneAxisLowLimitKey)
 
     adminService.getStatus(ackCmd.alarmKey).futureValue.acknowledgementStatus shouldBe UnAcknowledged
 
@@ -145,12 +131,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     logBuffer.clear()
 
     // update severity of an alarm
-    val ackCmd = Options(
-      "activate",
-      subsystem = "NFIRAOS",
-      component = "trombone",
-      name = "tromboneAxisLowLimitAlarm"
-    )
+    val ackCmd = Options("activate", alarmKey = tromboneAxisLowLimitKey)
 
     commandExecutor.execute(ackCmd)
 
@@ -168,12 +149,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     logBuffer.clear()
 
     // update severity of an alarm
-    val ackCmd = Options(
-      "deactivate",
-      subsystem = "NFIRAOS",
-      component = "trombone",
-      name = "tromboneAxisLowLimitAlarm"
-    )
+    val ackCmd = Options("deactivate", alarmKey = tromboneAxisLowLimitKey)
 
     commandExecutor.execute(ackCmd)
 

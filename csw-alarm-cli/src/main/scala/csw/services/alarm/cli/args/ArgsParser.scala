@@ -14,22 +14,22 @@ class ArgsParser(name: String) {
     cmd("update")
       .action((_, args) ⇒ args.copy(cmd = "update"))
       .text("set severity of an alarm")
-      .children(subsystem, component, alarmName, severity)
+      .children(alarmKey, severity)
 
     cmd("acknowledge")
       .action((_, args) ⇒ args.copy(cmd = "acknowledge"))
       .text("acknowledge an alarm")
-      .children(subsystem, component, alarmName)
+      .children(alarmKey)
 
     cmd("activate")
       .action((_, args) ⇒ args.copy(cmd = "activate"))
       .text("activate an alarm")
-      .children(subsystem, component, alarmName)
+      .children(alarmKey)
 
     cmd("deactivate")
       .action((_, args) ⇒ args.copy(cmd = "deactivate"))
       .text("deactivate an alarm")
-      .children(subsystem, component, alarmName)
+      .children(alarmKey)
 
     help("help")
 
