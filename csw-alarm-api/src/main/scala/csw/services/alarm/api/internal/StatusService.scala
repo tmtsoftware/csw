@@ -1,4 +1,4 @@
-package csw.services.alarm.api.scaladsl
+package csw.services.alarm.api.internal
 import csw.services.alarm.api.models.AlarmStatus
 import csw.services.alarm.api.models.Key.AlarmKey
 

@@ -1,4 +1,4 @@
-package csw.services.alarm.api.scaladsl
+package csw.services.alarm.api.internal
 import com.typesafe.config.Config
 import csw.services.alarm.api.models.Key.AlarmKey
 import csw.services.alarm.api.models.{AlarmMetadata, Key}
