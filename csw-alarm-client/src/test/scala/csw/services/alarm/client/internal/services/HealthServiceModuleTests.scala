@@ -48,17 +48,11 @@ class HealthServiceModuleTests
 
   // DEOPSCSW-466: Fetch alarm severity, component or subsystem
   test("getAggregatedHealth should throw KeyNotFoundException when key is invalid") {
-    val invalidAlarm = SubsystemKey("invalid")
-    intercept[KeyNotFoundException] {
-      getAggregatedHealth(invalidAlarm).await
-    }
+    an[KeyNotFoundException] shouldBe thrownBy(getAggregatedHealth(SubsystemKey("invalid")).await)
   }
 
   // DEOPSCSW-466: Fetch alarm severity, component or subsystem
   test("getAggregatedHealth should throw InactiveAlarmException when all resolved keys are inactive") {
-    val invalidAlarm = SubsystemKey("LGSF")
-    intercept[InactiveAlarmException] {
-      getAggregatedHealth(invalidAlarm).await
-    }
+    an[InactiveAlarmException] shouldBe thrownBy(getAggregatedHealth(SubsystemKey("LGSF")).await)
   }
 }

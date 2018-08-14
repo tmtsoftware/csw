@@ -32,9 +32,7 @@ class MetadataServiceModuleTests
   //  DEOPSCSW-445: Get api for alarm metadata
   test("getMetadata should throw exception while getting metadata if key does not exist") {
     val invalidAlarm = AlarmKey("invalid", "invalid", "invalid")
-    intercept[KeyNotFoundException] {
-      getMetadata(invalidAlarm).await
-    }
+    an[KeyNotFoundException] shouldBe thrownBy(getMetadata(invalidAlarm).await)
   }
 
   // DEOPSCSW-463: Fetch Alarm List for a component name or pattern
@@ -67,10 +65,7 @@ class MetadataServiceModuleTests
 
   // DEOPSCSW-464: Fetch Alarm name list for a subsystem name or pattern
   test("getMetadata should throw exception if no alarms are found while getting metadata by subsystem") {
-    val invalidAlarm = SubsystemKey("invalid")
-    intercept[KeyNotFoundException] {
-      getMetadata(invalidAlarm).await
-    }
+    an[KeyNotFoundException] shouldBe thrownBy(getMetadata(SubsystemKey("invalid")).await)
   }
 
   val fourAlarmsConfig: Config = ConfigFactory.parseResources("test-alarms/valid-alarms.conf")
@@ -104,9 +99,7 @@ class MetadataServiceModuleTests
     // two-valid-alarms.conf contains 2 alarms, it does not contain cpuExceededAlarm
     initAlarms(twoAlarmsConfig, reset = true).await
     getMetadata(GlobalKey).await.size shouldBe 2
-    intercept[KeyNotFoundException] {
-      getMetadata(cpuExceededAlarmKey).await
-    }
+    an[KeyNotFoundException] shouldBe thrownBy(getMetadata(cpuExceededAlarmKey).await)
 
     // tromboneAxisHighLimitAlarm is present in both the files and hence rewritten in second load
     getMetadata(tromboneAxisHighLimitAlarmKey).await shouldBe tromboneAxisHighLimitAlarm

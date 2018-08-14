@@ -82,9 +82,7 @@ class ConfigParserTest extends FunSuite with Matchers {
   test("should throw Exception while parsing invalid alarms metadata config file") {
     val config = ConfigFactory.parseResources("test-alarms/invalid-alarms.conf")
 
-    val parseException = intercept[ConfigParseException] {
-      ConfigParser.parseAlarmMetadataSet(config)
-    }
+    val parseException = the[ConfigParseException] thrownBy ConfigParser.parseAlarmMetadataSet(config)
 
     parseException.reasons.map(_.split("invalid-alarms.conf, ").tail.head).toSet shouldEqual Set(
       "at path: /alarms/0/subsystem: error: instance value (\"INVALID\") not found in enum (possible values: [\"AOESW\",\"APS\",\"CIS\",\"CSW\",\"DMS\",\"DPS\",\"ENC\",\"ESEN\",\"ESW\",\"GMS\",\"IRIS\",\"IRMS\",\"LGSF\",\"M1CS\",\"M2CS\",\"M3CS\",\"MCS\",\"NFIRAOS\",\"NSCU\",\"OSS\",\"PFCS\",\"PSFR\",\"RTC\",\"RPG\",\"SCMS\",\"SOSS\",\"STR\",\"SUM\",\"TCS\",\"TINC\",\"WFOS\",\"Container\"]) (schema: config:/alarm-schema.conf#:/properties/subsystem)",

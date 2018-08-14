@@ -94,16 +94,12 @@ class StatusServiceModuleTests
   // DEOPSCSW-447: Reset api for alarm
   test("reset should throw exception if key does not exist") {
     val invalidAlarm = AlarmKey("invalid", "invalid", "invalid")
-    intercept[KeyNotFoundException] {
-      reset(invalidAlarm).await
-    }
+    an[KeyNotFoundException] shouldBe thrownBy(reset(invalidAlarm).await)
   }
 
   // DEOPSCSW-447: Reset api for alarm
   test("reset should throw exception if severity is not okay") {
-    intercept[ResetOperationNotAllowed] {
-      reset(tromboneAxisLowLimitAlarmKey).await
-    }
+    an[ResetOperationNotAllowed] shouldBe thrownBy(reset(tromboneAxisLowLimitAlarmKey).await)
   }
 
   // DEOPSCSW-446: Acknowledge api for alarm
@@ -129,9 +125,7 @@ class StatusServiceModuleTests
   // DEOPSCSW-446: Acknowledge api for alarm
   test("acknowledge should throw exception if key does not exist") {
     val invalidAlarm = AlarmKey("invalid", "invalid", "invalid")
-    intercept[KeyNotFoundException] {
-      acknowledge(invalidAlarm).await
-    }
+    an[KeyNotFoundException] shouldBe thrownBy(acknowledge(invalidAlarm).await)
   }
 
   // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
@@ -148,9 +142,7 @@ class StatusServiceModuleTests
     status.shelveStatus shouldBe Shelved
 
     //repeat the shelve operation
-    noException shouldBe thrownBy {
-      shelve(tromboneAxisHighLimitAlarmKey).await
-    }
+    noException shouldBe thrownBy(shelve(tromboneAxisHighLimitAlarmKey).await)
   }
 
   // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
@@ -169,18 +161,15 @@ class StatusServiceModuleTests
     status.shelveStatus shouldBe UnShelved
 
     //repeat the unshelve operation
-    noException shouldBe thrownBy {
-      unShelve(tromboneAxisHighLimitAlarmKey).await
-    }
+    noException shouldBe thrownBy(unShelve(tromboneAxisHighLimitAlarmKey).await)
   }
 
   //  test("getStatus should throw exception if key does not exist") {
   //    val invalidAlarm = AlarmKey("invalid", "invalid", "invalid")
-  //    intercept[KeyNotFoundException] {
-  //      getStatus(invalidAlarm)
-  //    }
+  //    an[KeyNotFoundException] shouldBe thrownBy(getStatus(invalidAlarm).await)
   //  }
   //
+
   private def setSeverityAndGetStatus(alarmKey: AlarmKey, alarmSeverity: AlarmSeverity): AlarmStatus = {
     setSeverity(alarmKey, alarmSeverity).await
     testStatusApi.get(alarmKey).await.get
