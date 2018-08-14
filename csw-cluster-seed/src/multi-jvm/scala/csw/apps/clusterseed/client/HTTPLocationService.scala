@@ -1,7 +1,6 @@
 package csw.apps.clusterseed.client
 
 import akka.actor.ActorSystem
-import akka.http.scaladsl.Http
 import csw.apps.clusterseed.internal.AdminWiring
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.event.helpers.TestFutureExt.RichFuture
@@ -10,7 +9,7 @@ import csw.services.logging.scaladsl.LoggingSystemFactory
 import org.scalatest.{BeforeAndAfterAll, FunSuiteLike}
 
 import scala.concurrent.ExecutionContext
-import scala.util.control.NonFatal
+import scala.concurrent.duration.DurationInt
 import scala.util.{Failure, Success, Try}
 
 trait HTTPLocationService extends FunSuiteLike with BeforeAndAfterAll {
@@ -29,12 +28,9 @@ trait HTTPLocationService extends FunSuiteLike with BeforeAndAfterAll {
   }
 
   override def afterAll(): Unit = {
+    maybeBinding.map(_.terminate(5.seconds).await)
     super.afterAll()
-    maybeBinding.map(_.unbind().await)
-    maybeWiring.map { wiring ⇒
-      Http(wiring.actorSystem).shutdownAllConnectionPools().recover { case NonFatal(_) ⇒ /* ignore */ }.await
-      wiring.actorRuntime.shutdown(TestFinishedReason).await
-    }
+    maybeWiring.map(_.actorRuntime.shutdown(TestFinishedReason).await)
     testSystem.terminate().await
   }
 }

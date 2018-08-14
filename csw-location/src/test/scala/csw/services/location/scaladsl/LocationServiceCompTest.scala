@@ -47,8 +47,7 @@ class LocationServiceCompTest(mode: String)
     case "cluster" => LocationServiceFactory.make()
   }
 
-  implicit val patience: PatienceConfig =
-    PatienceConfig(Span(5, org.scalatest.time.Seconds), Span(100, org.scalatest.time.Millis))
+  implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 100.millis)
 
   val RegistrationFactory = new TestRegistrationFactory
 

@@ -10,7 +10,7 @@ import csw.services.logging.internal.LoggingLevels.DEBUG
 import csw.services.logging.internal.LoggingSystem
 import csw.services.logging.scaladsl.LoggingSystemFactory
 
-import scala.util.control.NonFatal
+import scala.concurrent.duration.DurationLong
 
 // DEOPSCSW-429: [SPIKE] Provide HTTP server and client for location service
 class LocationServiceCompTestWithHttp extends LocationServiceCompTest("http") {
@@ -26,9 +26,8 @@ class LocationServiceCompTestWithHttp extends LocationServiceCompTest("http") {
   val binding: Http.ServerBinding = wiring.locationHttpService.start().await
 
   override protected def afterAll(): Unit = {
+    binding.terminate(5.seconds).await
     super.afterAll()
-    binding.unbind().await
-    Http(wiring.actorSystem).shutdownAllConnectionPools().recover { case NonFatal(_) ⇒ /* ignore */ }.await
     wiring.actorRuntime.shutdown(TestFinishedReason).await
   }
 }
