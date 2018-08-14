@@ -28,19 +28,14 @@ object Key {
     require(!patternForInvalidKey.matcher(value).matches(), "key contains invalid characters")
   }
 
-  object AlarmKey {
-    def apply(key: String): AlarmKey = {
-      val keyParts = key.split("\\.")
-      AlarmKey(keyParts(0), keyParts(1), keyParts(2))
-    }
-  }
-
   case class ComponentKey(subsystem: String, component: String) extends Key(subsystem, component, "*") {
     require(!patternForInvalidKey.matcher(subsystem).matches(), "subsystem name contains invalid characters")
     require(!patternForInvalidKey.matcher(component).matches(), "component name contains invalid characters")
   }
+
   case class SubsystemKey(subsystem: String) extends Key(subsystem, "*", "*") {
     require(!patternForInvalidKey.matcher(subsystem).matches(), "subsystem name contains invalid characters")
   }
+
   case object GlobalKey extends Key("*", "*", "*")
 }

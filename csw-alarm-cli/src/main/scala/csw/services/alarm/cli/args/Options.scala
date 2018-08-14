@@ -10,11 +10,10 @@ case class Options(
     filePath: Option[Path] = None,
     isLocal: Boolean = false,
     reset: Boolean = false,
-    alarmKey: Option[AlarmKey] = None,
     subsystem: String = "",
     component: String = "",
     name: String = "",
     severity: AlarmSeverity = Disconnected
 ) {
-  def makeAlarmKey: AlarmKey = AlarmKey(subsystem, component, name)
+  def alarmKey: AlarmKey = AlarmKey(subsystem, component, name)
 }

@@ -4,7 +4,6 @@ import java.nio.file.Paths
 
 import csw.services.BuildInfo
 import csw.services.alarm.api.models.AlarmSeverity.Major
-import csw.services.alarm.api.models.Key.AlarmKey
 import org.scalatest.{FunSuite, Matchers}
 
 class ArgsParserTest extends FunSuite with Matchers {
@@ -57,26 +56,45 @@ class ArgsParserTest extends FunSuite with Matchers {
   test("parse update command with all options") {
     val options = Array(
       "update",
-      "--alarmKey",
-      "nfiraos.trombone.tromboneaxishighlimitalarm",
+      "--subsystem",
+      "NFIRAOS",
+      "--component",
+      "trombone",
+      "--name",
+      "tromboneAxisHighLimitAlarm",
       "--severity",
       "Major"
     )
 
     silentParse(options) should contain(
-      Options(cmd = "update", alarmKey = Some(AlarmKey("nfiraos.trombone.tromboneaxishighlimitalarm")), severity = Major)
+      Options(
+        cmd = "update",
+        subsystem = "NFIRAOS",
+        component = "trombone",
+        name = "tromboneAxisHighLimitAlarm",
+        severity = Major
+      )
     )
   }
 
   test("parse acknowledge command") {
     val options = Array(
       "acknowledge",
-      "--alarmKey",
-      "nfiraos.trombone.tromboneaxishighlimitalarm"
+      "--subsystem",
+      "NFIRAOS",
+      "--component",
+      "trombone",
+      "--name",
+      "tromboneAxisHighLimitAlarm"
     )
 
     silentParse(options) should contain(
-      Options(cmd = "acknowledge", alarmKey = Some(AlarmKey("nfiraos.trombone.tromboneaxishighlimitalarm")))
+      Options(
+        cmd = "acknowledge",
+        subsystem = "NFIRAOS",
+        component = "trombone",
+        name = "tromboneAxisHighLimitAlarm"
+      )
     )
   }
 
@@ -88,24 +106,42 @@ class ArgsParserTest extends FunSuite with Matchers {
   test("parse activate command") {
     val options = Array(
       "activate",
-      "--alarmKey",
-      "nfiraos.trombone.tromboneaxishighlimitalarm"
+      "--subsystem",
+      "NFIRAOS",
+      "--component",
+      "trombone",
+      "--name",
+      "tromboneAxisHighLimitAlarm"
     )
 
     silentParse(options) should contain(
-      Options(cmd = "activate", alarmKey = Some(AlarmKey("nfiraos.trombone.tromboneaxishighlimitalarm")))
+      Options(
+        cmd = "activate",
+        subsystem = "NFIRAOS",
+        component = "trombone",
+        name = "tromboneAxisHighLimitAlarm"
+      )
     )
   }
 
   test("parse deactivate command") {
     val options = Array(
       "deactivate",
-      "--alarmKey",
-      "nfiraos.trombone.tromboneaxishighlimitalarm"
+      "--subsystem",
+      "NFIRAOS",
+      "--component",
+      "trombone",
+      "--name",
+      "tromboneAxisHighLimitAlarm"
     )
 
     silentParse(options) should contain(
-      Options(cmd = "deactivate", alarmKey = Some(AlarmKey("nfiraos.trombone.tromboneaxishighlimitalarm")))
+      Options(
+        cmd = "deactivate",
+        subsystem = "NFIRAOS",
+        component = "trombone",
+        name = "tromboneAxisHighLimitAlarm"
+      )
     )
   }
 
@@ -120,24 +156,42 @@ class ArgsParserTest extends FunSuite with Matchers {
   test("parse shelve command") {
     val options = Array(
       "shelve",
-      "--alarmKey",
-      "nfiraos.trombone.tromboneaxishighlimitalarm"
+      "--subsystem",
+      "NFIRAOS",
+      "--component",
+      "trombone",
+      "--name",
+      "tromboneAxisHighLimitAlarm"
     )
 
     silentParse(options) should contain(
-      Options(cmd = "shelve", alarmKey = Some(AlarmKey("nfiraos.trombone.tromboneaxishighlimitalarm")))
+      Options(
+        cmd = "shelve",
+        subsystem = "NFIRAOS",
+        component = "trombone",
+        name = "tromboneAxisHighLimitAlarm"
+      )
     )
   }
 
   test("parse unshelve command") {
     val options = Array(
       "unshelve",
-      "--alarmKey",
-      "nfiraos.trombone.tromboneaxishighlimitalarm"
+      "--subsystem",
+      "NFIRAOS",
+      "--component",
+      "trombone",
+      "--name",
+      "tromboneAxisHighLimitAlarm"
     )
 
     silentParse(options) should contain(
-      Options(cmd = "unshelve", alarmKey = Some(AlarmKey("nfiraos.trombone.tromboneaxishighlimitalarm")))
+      Options(
+        cmd = "unshelve",
+        subsystem = "NFIRAOS",
+        component = "trombone",
+        name = "tromboneAxisHighLimitAlarm"
+      )
     )
   }
 

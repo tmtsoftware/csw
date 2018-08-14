@@ -14,32 +14,32 @@ class ArgsParser(name: String) {
     cmd("update")
       .action((_, args) ⇒ args.copy(cmd = "update"))
       .text("set severity of an alarm")
-      .children(alarmKey, severity)
+      .children(subsystem, component, alarmName, severity)
 
     cmd("acknowledge")
       .action((_, args) ⇒ args.copy(cmd = "acknowledge"))
       .text("acknowledge an alarm")
-      .children(alarmKey)
+      .children(subsystem, component, alarmName)
 
     cmd("activate")
       .action((_, args) ⇒ args.copy(cmd = "activate"))
       .text("activate an alarm")
-      .children(alarmKey)
+      .children(subsystem, component, alarmName)
 
     cmd("deactivate")
       .action((_, args) ⇒ args.copy(cmd = "deactivate"))
       .text("deactivate an alarm")
-      .children(alarmKey)
+      .children(subsystem, component, alarmName)
 
     cmd("shelve")
       .action((_, args) ⇒ args.copy(cmd = "shelve"))
       .text("shelve an alarm")
-      .children(alarmKey)
+      .children(subsystem, component, alarmName)
 
     cmd("unshelve")
       .action((_, args) ⇒ args.copy(cmd = "unshelve"))
       .text("unshelve an alarm")
-      .children(alarmKey)
+      .children(subsystem, component, alarmName)
 
     help("help")
 
@@ -54,6 +54,8 @@ class ArgsParser(name: String) {
                   |  3> acknowledge
                   |  4> activate
                   |  5> deactivate
+                  |  6> shelve
+                  |  7> unshelve
                 """.stripMargin)
       else success
     }

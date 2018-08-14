@@ -23,10 +23,10 @@ class CommandExecutorTest extends AlarmCliTestSetup {
   private val successMsg = "[SUCCESS] Command executed successfully."
   private val failureMsg = "[FAILURE] Failed to execute the command."
 
-  private val tromboneAxisLowLimitKey  = AlarmKey("nfiraos.trombone.tromboneaxislowlimitalarm")
-  private val tromboneAxisHighLimitKey = AlarmKey("nfiraos.trombone.tromboneaxishighlimitalarm")
-  private val cpuExceededKey           = AlarmKey("tcs.tcspk.cpuexceededalarm")
-  private val cpuIdleKey               = AlarmKey("lgsf.tcspkinactive.cpuidlealarm")
+  private val tromboneAxisLowLimitKey  = AlarmKey("nfiraos", "trombone", "tromboneaxislowlimitalarm")
+  private val tromboneAxisHighLimitKey = AlarmKey("nfiraos", "trombone", "tromboneaxishighlimitalarm")
+  private val cpuExceededKey           = AlarmKey("tcs", "tcspk", "cpuexceededalarm")
+  private val cpuIdleKey               = AlarmKey("lgsf", "tcspkinactive", "cpuidlealarm")
 
   private val allAlarmKeys = Set(tromboneAxisLowLimitKey, tromboneAxisHighLimitKey, cpuExceededKey, cpuIdleKey)
 
@@ -93,7 +93,13 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     logBuffer.clear()
 
     // update severity of an alarm
-    val updateCmd = Options("update", alarmKey = Some(tromboneAxisHighLimitKey), severity = Major)
+    val updateCmd = Options(
+      "update",
+      subsystem = tromboneAxisHighLimitKey.subsystem,
+      component = tromboneAxisHighLimitKey.component,
+      name = tromboneAxisHighLimitKey.name,
+      severity = Major
+    )
     commandExecutor.execute(updateCmd)
 
     adminService.getCurrentSeverity(tromboneAxisHighLimitKey).futureValue shouldBe Major
@@ -113,11 +119,16 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     adminService.getStatus(tromboneAxisLowLimitKey).futureValue.acknowledgementStatus shouldBe UnAcknowledged
 
     // acknowledge the alarm
-    val ackCmd = Options("acknowledge", alarmKey = Some(tromboneAxisLowLimitKey))
+    val ackCmd = Options(
+      "acknowledge",
+      subsystem = tromboneAxisLowLimitKey.subsystem,
+      component = tromboneAxisLowLimitKey.component,
+      name = tromboneAxisLowLimitKey.name
+    )
+
     commandExecutor.execute(ackCmd)
 
     adminService.getStatus(tromboneAxisLowLimitKey).futureValue.acknowledgementStatus shouldBe Acknowledged
-
     logBuffer shouldEqual List(successMsg)
   }
 
@@ -131,7 +142,13 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     logBuffer.clear()
 
     // activate the alarm
-    val activateCmd = Options("activate", alarmKey = Some(tromboneAxisLowLimitKey))
+    val activateCmd = Options(
+      "activate",
+      subsystem = tromboneAxisLowLimitKey.subsystem,
+      component = tromboneAxisLowLimitKey.component,
+      name = tromboneAxisLowLimitKey.name
+    )
+
     commandExecutor.execute(activateCmd)
 
     adminService.getMetadata(tromboneAxisLowLimitKey).futureValue.activationStatus shouldBe Active
@@ -148,7 +165,13 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     logBuffer.clear()
 
     // deactivate the alarm
-    val deactivateCmd = Options("deactivate", alarmKey = Some(tromboneAxisLowLimitKey))
+    val deactivateCmd = Options(
+      "deactivate",
+      subsystem = tromboneAxisLowLimitKey.subsystem,
+      component = tromboneAxisLowLimitKey.component,
+      name = tromboneAxisLowLimitKey.name
+    )
+
     commandExecutor.execute(deactivateCmd)
 
     adminService.getMetadata(tromboneAxisLowLimitKey).futureValue.activationStatus shouldBe Inactive
@@ -167,7 +190,13 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     adminService.getStatus(tromboneAxisLowLimitKey).futureValue.shelveStatus shouldBe UnShelved
 
     // shelve the alarm
-    val shelveCmd = Options("shelve", alarmKey = Some(tromboneAxisLowLimitKey))
+    val shelveCmd = Options(
+      "shelve",
+      subsystem = tromboneAxisLowLimitKey.subsystem,
+      component = tromboneAxisLowLimitKey.component,
+      name = tromboneAxisLowLimitKey.name
+    )
+
     commandExecutor.execute(shelveCmd)
 
     adminService.getStatus(tromboneAxisLowLimitKey).futureValue.shelveStatus shouldBe Shelved
@@ -187,7 +216,13 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     adminService.getStatus(tromboneAxisLowLimitKey).futureValue.shelveStatus shouldBe Shelved
 
     // unshelve the alarm
-    val unshelveCmd = Options("unshelve", alarmKey = Some(tromboneAxisLowLimitKey))
+    val unshelveCmd = Options(
+      "unshelve",
+      subsystem = tromboneAxisLowLimitKey.subsystem,
+      component = tromboneAxisLowLimitKey.component,
+      name = tromboneAxisLowLimitKey.name
+    )
+
     commandExecutor.execute(unshelveCmd)
 
     adminService.getStatus(tromboneAxisLowLimitKey).futureValue.shelveStatus shouldBe UnShelved
