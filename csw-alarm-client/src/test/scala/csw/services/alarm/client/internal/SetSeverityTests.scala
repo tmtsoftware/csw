@@ -10,11 +10,10 @@ import csw.services.alarm.api.models.Key.AlarmKey
 import csw.services.alarm.api.models.LatchStatus.{Latched, UnLatched}
 import csw.services.alarm.api.models._
 import csw.services.alarm.client.internal.helpers.TestFutureExt.RichFuture
-import csw.services.alarm.client.internal.helpers.{AcknowledgeAndLatchTestCase, AlarmServiceTestSetupNGTest, SetSeverityTestCase}
-import org.testng.annotations.{BeforeSuite, DataProvider, Test}
+import csw.services.alarm.client.internal.helpers.{AcknowledgeAndLatchTestCase, AlarmServiceTestSetup, SetSeverityTestCase}
 
 //DEOPSCSW-444 : Set severity api for component
-class SetSeverityTests extends AlarmServiceTestSetupNGTest {
+class SetSeverityTests extends AlarmServiceTestSetup {
 
   val `low_latchable=>high_latchable` = AlarmKey("AOESW", "test_component", "low_latchable=>high_latchable")
   val `low_unlatable=>hig_latchable`  = AlarmKey("AOESW", "test_component", "low_unlatable=>hig_latchable")
@@ -23,9 +22,7 @@ class SetSeverityTests extends AlarmServiceTestSetupNGTest {
 
   val alarmServiceImpl: AlarmServiceImpl = alarmService.asInstanceOf[AlarmServiceImpl]
 
-  @BeforeSuite
-  def seedData(): Unit = {
-
+  override def beforeAll() {
     val validAlarmsFile   = new File(getClass.getResource("/test-alarms/latchSeverityTestAlarms.conf").getPath)
     val validAlarmsConfig = ConfigFactory.parseFile(validAlarmsFile).resolve(ConfigResolveOptions.noSystem())
     alarmService.initAlarms(validAlarmsConfig, reset = true).await
@@ -51,34 +48,32 @@ class SetSeverityTests extends AlarmServiceTestSetupNGTest {
     }
   }
 
-  @DataProvider(name = "setSeverityTest-data-provider")
-  def setSeverityTestDataProvider(): Array[SetSeverityTestCase] =
-    Array(
-      SetSeverityTestCase(
-        oldSeverity = Warning,
-        newSeverity = Major,
-        outcome = Major,
-        alarmKey = `low_latchable=>high_latchable`
-      ),
-      SetSeverityTestCase(
-        oldSeverity = Disconnected,
-        newSeverity = Critical,
-        outcome = Critical,
-        alarmKey = `low_unlatable=>hig_latchable`
-      ),
-      SetSeverityTestCase(
-        oldSeverity = Major,
-        newSeverity = Warning,
-        outcome = Major,
-        alarmKey = `high_latchable=>low_latchable`
-      ),
-      SetSeverityTestCase(
-        oldSeverity = Disconnected,
-        newSeverity = Major,
-        outcome = Major,
-        alarmKey = `high_unlatable=>low_latchable`
-      )
+  val setSeverityTestDataProvider: Array[SetSeverityTestCase] = Array(
+    SetSeverityTestCase(
+      oldSeverity = Warning,
+      newSeverity = Major,
+      outcome = Major,
+      alarmKey = `low_latchable=>high_latchable`
+    ),
+    SetSeverityTestCase(
+      oldSeverity = Disconnected,
+      newSeverity = Critical,
+      outcome = Critical,
+      alarmKey = `low_unlatable=>hig_latchable`
+    ),
+    SetSeverityTestCase(
+      oldSeverity = Major,
+      newSeverity = Warning,
+      outcome = Major,
+      alarmKey = `high_latchable=>low_latchable`
+    ),
+    SetSeverityTestCase(
+      oldSeverity = Disconnected,
+      newSeverity = Major,
+      outcome = Major,
+      alarmKey = `high_unlatable=>low_latchable`
     )
+  )
 
   val ackAndLatchTestCases = Array(
     AcknowledgeAndLatchTestCase(
@@ -191,61 +186,60 @@ class SetSeverityTests extends AlarmServiceTestSetupNGTest {
     )
   )
 
-  @DataProvider(name = "acknowledgeAndLatching-data-provider")
-  def acknowledgeAndLatchDataProvider: Array[AcknowledgeAndLatchTestCase] = {
-    ackAndLatchTestCases
-  }
+  ackAndLatchTestCases.foreach(
+    testCase =>
+      test(testCase.toString) {
+        //test setup
+        alarmServiceImpl
+          .setMetadata(
+            testCase.alarmKey,
+            AlarmMetadata(
+              subsystem = testCase.alarmKey.subsystem,
+              component = testCase.alarmKey.component,
+              name = testCase.alarmKey.name,
+              description = "for test purpose",
+              location = "testing",
+              AlarmType.Absolute,
+              Set(Okay, Warning, Major, Indeterminate, Critical),
+              probableCause = "test",
+              operatorResponse = "test",
+              isAutoAcknowledgeable = testCase.isAutoAcknowledgeble,
+              isLatchable = testCase.isAlarmLachable,
+              activationStatus = Active
+            )
+          )
+          .await
+        alarmServiceImpl
+          .setStatus(
+            testCase.alarmKey,
+            AlarmStatus(
+              latchedSeverity = testCase.oldSeverity,
+              acknowledgementStatus =
+                if (testCase.isAutoAcknowledgeble || testCase.oldSeverity == Okay) Acknowledged else UnAcknowledged,
+              latchStatus = if (testCase.isAlarmLachable && testCase.oldSeverity.latchable) Latched else UnLatched
+            )
+          )
+          .await
 
-  @Test(dataProvider = "acknowledgeAndLatching-data-provider")
-  def acknowledgeAndLatchTest(testCase: AcknowledgeAndLatchTestCase): Unit = {
-    //test setup
-    alarmServiceImpl
-      .setMetadata(
-        testCase.alarmKey,
-        AlarmMetadata(
-          subsystem = testCase.alarmKey.subsystem,
-          component = testCase.alarmKey.component,
-          name = testCase.alarmKey.name,
-          description = "for test purpose",
-          location = "testing",
-          AlarmType.Absolute,
-          Set(Okay, Warning, Major, Indeterminate, Critical),
-          probableCause = "test",
-          operatorResponse = "test",
-          isAutoAcknowledgeable = testCase.isAutoAcknowledgeble,
-          isLatchable = testCase.isAlarmLachable,
-          activationStatus = Active
-        )
-      )
-      .await
-    alarmServiceImpl
-      .setStatus(
-        testCase.alarmKey,
-        AlarmStatus(
-          latchedSeverity = testCase.oldSeverity,
-          acknowledgementStatus =
-            if (testCase.isAutoAcknowledgeble || testCase.oldSeverity == Okay) Acknowledged else UnAcknowledged,
-          latchStatus = if (testCase.isAlarmLachable && testCase.oldSeverity.latchable) Latched else UnLatched
-        )
-      )
-      .await
+        //set severity to new Severity
+        val status = setSeverity(testCase.alarmKey, testCase.newSeverity)
 
-    //set severity to new Severity
-    val status = setSeverity(testCase.alarmKey, testCase.newSeverity)
+        //get severity and assert
+        status.acknowledgementStatus shouldEqual testCase.expectedAckStatus
+        status.latchStatus shouldEqual testCase.expectedLatchStatus
+    }
+  )
 
-    //get severity and assert
-    status.acknowledgementStatus shouldEqual testCase.expectedAckStatus
-    status.latchStatus shouldEqual testCase.expectedLatchStatus
-  }
+  setSeverityTestDataProvider.foreach(
+    testCase =>
+      test(testCase.toString) {
+        //set severity to new Severity
+        val status = setSeverity(testCase.alarmKey, testCase.newSeverity)
 
-  @Test(dataProvider = "setSeverityTest-data-provider")
-  def setSeverityTest(testCase: SetSeverityTestCase): Unit = {
-    //set severity to new Severity
-    val status = setSeverity(testCase.alarmKey, testCase.newSeverity)
-
-    //get severity and assert
-    status.latchedSeverity shouldEqual testCase.outcome
-  }
+        //get severity and assert
+        status.latchedSeverity shouldEqual testCase.outcome
+    }
+  )
 
   private def setSeverity(alarmKey: AlarmKey, alarmSeverity: AlarmSeverity): AlarmStatus = {
     alarmService.setSeverity(alarmKey, alarmSeverity).await

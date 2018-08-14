@@ -193,7 +193,6 @@ object Dependencies {
     Libs.`junit`           % Test,
     Libs.`junit-interface` % Test,
     Libs.`scalatest`       % Test,
-    Libs.testng            % Test,
     Chill.`chill-akka`     % Test
   )
 
