@@ -70,11 +70,7 @@ trait StatusServiceModule extends StatusService {
 
   private[alarm] final override def unAcknowledge(key: AlarmKey): Future[Unit] = setAcknowledgementStatus(key, UnAcknowledged)
 
-  private[alarm] def updateStatusForSeverity(
-      key: AlarmKey,
-      severity: AlarmSeverity,
-      previousSeverity: AlarmSeverity
-  ): Future[Unit] = async {
+  private[alarm] def updateStatusForSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Unit] = async {
     // get alarm metadata
     val alarm = await(getMetadata(key))
 
@@ -107,24 +103,19 @@ trait StatusServiceModule extends StatusService {
       def unapply(status: AlarmStatus): Boolean = status.latchedSeverity == Okay
     }
 
-    object IsOtherSeverity {
-      def unapply(status: AlarmStatus): Boolean = status.latchedSeverity != previousSeverity
-    }
-
     val setLatchSeverity = status.copy(latchedSeverity = severity, alarmTime = Some(AlarmTime()))
 
     val updatedStatus = (alarm, status) match {
-      case (Latchable(), HigherLatchedSeverity())              ⇒ setLatchSeverity.copy(latchStatus = Latched)
-      case (Latchable(), IsUnLatched())                        ⇒ setLatchSeverity.copy(latchStatus = Latched)
-      case (NotLatchable(), _) if severity != previousSeverity ⇒ setLatchSeverity
-      case _                                                   ⇒ status
+      case (Latchable(), HigherLatchedSeverity())                    ⇒ setLatchSeverity.copy(latchStatus = Latched)
+      case (Latchable(), IsUnLatched())                              ⇒ setLatchSeverity.copy(latchStatus = Latched)
+      case (NotLatchable(), _) if severity != status.latchedSeverity ⇒ setLatchSeverity
+      case _                                                         ⇒ status
     }
 
     val newStatus = (alarm, updatedStatus) match {
       case (IsAutoAcknowledgeable(), _) ⇒ updatedStatus.copy(acknowledgementStatus = Acknowledged)
       case (_, IsLatchedSeverityOkay()) ⇒ updatedStatus.copy(acknowledgementStatus = Acknowledged)
-      case (_, IsOtherSeverity())       ⇒ updatedStatus.copy(acknowledgementStatus = UnAcknowledged)
-      case _                            ⇒ updatedStatus
+      case _                            ⇒ updatedStatus.copy(acknowledgementStatus = UnAcknowledged)
     }
 
     // update alarm status (with recent time) only when severity changes

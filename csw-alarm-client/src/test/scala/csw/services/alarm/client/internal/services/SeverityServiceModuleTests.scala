@@ -45,6 +45,13 @@ class SeverityServiceModuleTests
   }
 
   // DEOPSCSW-444: Set severity api for component
+  test("setSeverity should throw exception when called with Disconnected severity") {
+    intercept[IllegalArgumentException] {
+      setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Disconnected)
+    }
+  }
+
+  // DEOPSCSW-444: Set severity api for component
   test("setSeverity should throw KeyNotFoundException when tried to set severity for key which does not exists in alarm store") {
     val invalidKey = AlarmKey("bad", "trombone", "fakeAlarm")
     intercept[KeyNotFoundException] {
