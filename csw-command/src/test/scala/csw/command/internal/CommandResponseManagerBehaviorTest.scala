@@ -218,21 +218,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
     commandResponseProbe.expectMessage(Error(runId, "Sub command 1 failed"))
   }
 
-  test("Test the checks") {
-    var t1:SubmitResponse = Completed(Id())
-
-    assert(isPositive(t1) == true)
-    assert(isIntermediate(t1) == false)
-    assert(isNegative(t1) == false)
-
-    t1 = Started(Id())
-
-    assert(isPositive(t1) == false)
-    assert(isIntermediate(t1) == true)
-    assert(isNegative(t1) == false)
-  }
-
-  // DEOPSCSW-207: Report on Configuration Command Completion
+//  // DEOPSCSW-207: Report on Configuration Command Completion
   test("should be able to update successful command status when all the subcommand completes with success") {
     val behaviorTestKit      = createBehaviorTestKit()
     val commandResponseProbe = TestProbe[QueryResponse]

@@ -1,6 +1,6 @@
 package csw.common.components.command
 
-import akka.{actor, NotUsed}
+import akka.actor
 import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.stream.scaladsl.{Sink, Source}
@@ -26,7 +26,7 @@ import csw.messages.params.models.Id
 import csw.messages.params.states.{CurrentState, StateName}
 
 import scala.concurrent.duration.DurationLong
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext)
@@ -61,26 +61,24 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
   override def onSubmit(controlCommand: ControlCommand): SubmitResponse = controlCommand.commandName match {
     case `cancelCmd` ⇒ processAcceptedSubmitCmd(controlCommand)
     case `withoutMatcherCmd` ⇒
-      println("IN submit withoutMatcherCmd")
-      //processCommandWithoutMatcher(controlCommand)
-      pWithout(controlCommand)
-      println("Returning started")
+      processCommandWithoutMatcher(controlCommand)
       Started(controlCommand.runId)
     case `acceptedCmd`  ⇒ Started(controlCommand.runId)
     case `immediateCmd` ⇒ Completed(controlCommand.runId)
     case `immediateResCmd` ⇒
       CompletedWithResult(controlCommand.runId, Result(controlCommand.source, Set(KeyType.IntKey.make("encoder").set(20))))
     case c ⇒
-      println(s"Some other command received: $c")
       Error(controlCommand.runId, s"Some other command received: $c")
   }
 
   override def onOneway(controlCommand: ControlCommand): Unit = controlCommand.commandName match {
-    case `cancelCmd`        ⇒ processAcceptedOnewayCmd(controlCommand)
-    case `matcherCmd`       ⇒ processCommandWithMatcher(controlCommand)
-    case `matcherFailedCmd` ⇒ processCommandWithMatcher(controlCommand)
-    case `acceptedCmd`      ⇒ //mimic long running process by publishing any state
-    case _                  ⇒ CommandNotAvailable(controlCommand.runId)
+    case `cancelCmd`         ⇒ processAcceptedOnewayCmd(controlCommand)
+    case `matcherCmd`        ⇒ processCommandWithMatcher(controlCommand)
+    case `matcherFailedCmd`  ⇒ processCommandWithMatcher(controlCommand)
+    case `acceptedCmd`       ⇒ //mimic long running process by publishing any state
+    case `matcherTimeoutCmd` => processCommandWithMatcher(controlCommand)
+    case c                   ⇒ println(s"onOneway received an unknown command: $c")
+
   }
 
   private def processAcceptedSubmitCmd(controlCommand: ControlCommand): SubmitResponse = {
@@ -100,9 +98,10 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
 
     // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
     // This simulates a long running command that eventually updates with a result
-    println(s"Handler updating CRM with $result")
-    commandResponseManager.addOrUpdateCommand(controlCommand.runId, CompletedWithResult(controlCommand.runId, result))
-    CompletedWithResult(controlCommand.runId, result)
+    Source.fromFuture(Future(CompletedWithResult(controlCommand.runId, result))).delay(250.milli).runWith(Sink.head).onComplete {
+      case Success(sr)        => commandResponseManager.addOrUpdateCommand(controlCommand.runId, sr)
+      case Failure(exception) => println(s"processWithout exception ${exception.getMessage}")
+    }
   }
 
   private def processCancelCommand(runId: Id, cancelId: Id): SubmitResponse = {
@@ -116,25 +115,9 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
 
     // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
     val eventualResponse: Future[QueryResponse] = commandResponseManager.query(runId)
-
     eventualResponse.onComplete {
-      case Success(x) => {
-        commandResponseManager.addOrUpdateCommand(runId, Cancelled(runId))
-      }
+      case Success(x) => commandResponseManager.addOrUpdateCommand(runId, Cancelled(runId))
       case Failure(x) => println("Eventual response error occured: " + x.getMessage)
-    }
-  }
-
-  private def pWithout(controlCommand: ControlCommand): Unit = {
-    val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(20)
-    val result                = Result(controlCommand.source, Set(param))
-
-    println("In pwithout")
-    Source.fromFuture(Future(CompletedWithResult(controlCommand.runId, result))).delay(250.milli).runWith(Sink.head).onComplete {
-      case Success(sr) =>
-        commandResponseManager.addOrUpdateCommand(controlCommand.runId, sr)
-        println(s"Updated CRM with $sr")
-      case Failure(exception) => println(s"processWithout exception ${exception.getMessage}")
     }
   }
 

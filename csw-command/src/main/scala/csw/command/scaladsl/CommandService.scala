@@ -44,7 +44,7 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
 
   private val component: ActorRef[ComponentMessage] = componentLocation.componentRef
 
-  private val parallelism = 10
+ // private val parallelism = 10
 
   /**
    * Submit a command and get a [[csw.params.commands.CommandResponse]] as a Future. The CommandResponse can be a response
@@ -68,6 +68,13 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
   def submitAll(controlCommands: Set[ControlCommand])(implicit timeout: Timeout): Source[SubmitResponse, NotUsed] =
     Source(controlCommands).mapAsyncUnordered(parallelism)(submit)
    */
+  def submitAll(submitCommands: List[ControlCommand])(implicit timeout: Timeout): Future[SubmitResponse] = {
+    def g(sub: ControlCommand):Future[SubmitResponse] = submit(sub)
+
+    val src:Source[ControlCommand, NotUsed] = Source(submitCommands)
+    src.runForeach(s => println(s))
+    Future(Completed(Id()))
+  }
 
   /**
    * Submit multiple commands and get one CommandResponse as a Future of [[csw.params.commands.CommandResponse]] for all commands. If all the commands were successful,
@@ -77,6 +84,7 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
    * @param controlCommands the set of [[csw.messages.commands.ControlCommand]] payloads
    * @return [[csw.messages.commands.CommandResponse.Accepted]] or [[csw.messages.commands.CommandResponse.Error]] CommandResponse as a Future
    */
+  /*
   def submitAllAndGetResponse(controlCommands: Set[ControlCommand])(implicit timeout: Timeout): Future[SubmitResponse] = {
     val value = Source(controlCommands).mapAsyncUnordered(parallelism)(submit)
     CommandResponse.aggregateResponse(value).map {
@@ -84,7 +92,7 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
       case otherResponse ⇒ otherResponse
     }
   }
-
+*/
   /**
    * Send a command as a Oneway and get a [[csw.params.commands.CommandResponse]] as a Future. The CommandResponse can be a response
    * of validation (Accepted, Invalid) or a final Response.
@@ -162,9 +170,10 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
    * @param controlCommands the [[csw.params.commands.ControlCommand]] payload
    * @return a Source of CommandResponse as a stream of CommandResponses for all commands
    */
+  /*
   def submitAllAndSubscribe(controlCommands: Set[ControlCommand])(implicit timeout: Timeout): Source[SubmitResponse, NotUsed] =
     Source(controlCommands).mapAsyncUnordered(parallelism)(submitAndSubscribe)
-
+*/
   /**
    * Submit multiple commands and get final CommandResponse for all as one CommandResponse. If all the commands were successful, a CommandResponse as
    * [[csw.params.commands.CommandResponse.Completed]] will be returned. If any one of the command fails, an [[csw.params.commands.CommandResponse.Error]]
@@ -173,10 +182,12 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
    * @param controlCommands the [[csw.params.commands.ControlCommand]] payload
    * @return a CommandResponse as a Future value
    */
+  /*
   def submitAllAndGetFinalResponse(controlCommands: Set[ControlCommand])(implicit timeout: Timeout): Future[SubmitResponse] = {
     val value = Source(controlCommands).mapAsyncUnordered(parallelism)(submitAndSubscribe)
     CommandResponseAggregator.aggregateResponse(value)
   }
+  */
 
   /**
    * Subscribe to the current state of a component corresponding to the [[csw.location.api.models.AkkaLocation]] of the component

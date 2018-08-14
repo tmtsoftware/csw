@@ -25,10 +25,10 @@ import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{AkkaLocation, ComponentId, ComponentType}
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.{CurrentState, StateName}
-import csw.services.command.scaladsl.{CommandDistributor, CommandService}
+import csw.services.command.scaladsl.CommandService
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import io.lettuce.core.RedisClient
-import org.scalatest.concurrent.{PatienceConfiguration, ScalaFutures}
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 
 import scala.concurrent.duration.DurationDouble
@@ -116,31 +116,32 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
       eventualResponse.map(_ shouldBe Started(setupForQuery.runId))
 
       enterBarrier("long-commands")
-
+/*
       val hcdLocF =
         locationService.resolve(
           AkkaConnection(ComponentId("Test_Component_Running_Long_Command", ComponentType.HCD)),
           5.seconds
         )
-      val hcdLocation: AkkaLocation = Await.result(hcdLocF, 10.seconds).get
-      val hcdComponent              = new CommandService(hcdLocation)
+        */
+      //val hcdLocation: AkkaLocation = Await.result(hcdLocF, 10.seconds).get
+      //val hcdComponent              = new CommandService(hcdLocation)
 
       val setupAssembly1 = Setup(prefix, moveCmd, Some(obsId))
-      val setupAssembly2 = Setup(prefix, initCmd, Some(obsId))
-      val setupAssembly3 = Setup(prefix, invalidCmd, Some(obsId))
-      val setupHcd1      = Setup(prefix, shortRunning, Some(obsId))
-      val setupHcd2      = Setup(prefix, mediumRunning, Some(obsId))
-      val setupHcd3      = Setup(prefix, failureAfterValidationCmd, Some(obsId))
+      //val setupAssembly2 = Setup(prefix, initCmd, Some(obsId))
+      //val setupAssembly3 = Setup(prefix, invalidCmd, Some(obsId))
+      //val setupHcd1      = Setup(prefix, shortRunning, Some(obsId))
+      //val setupHcd2      = Setup(prefix, mediumRunning, Some(obsId))
+      //val setupHcd3      = Setup(prefix, failureAfterValidationCmd, Some(obsId))
 
       //#submitAllAndGetResponse
-
+/*
       val responseOfMultipleCommands = hcdComponent.submitAllAndGetResponse(Set(setupHcd1, setupHcd2))
 
       //#submitAllAndGetResponse
       whenReady(responseOfMultipleCommands, PatienceConfiguration.Timeout(20.seconds)) { result ⇒
         result shouldBe a[Completed]
       }
-/*
+
       //#aggregated-validation
       val aggregatedValidationResponse = CommandDistributor(
         Map(assemblyCommandService → Set(setupAssembly1, setupAssembly2), hcdComponent → Set(setupHcd1, setupHcd2))

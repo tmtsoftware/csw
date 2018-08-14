@@ -157,18 +157,13 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       val eventualLongCommandResponse = async {
         val initialCommandResponse = await(assemblyComponent.submit(setupWithoutMatcher))
         initialCommandResponse shouldBe an[Started]
-        println(s"Before 1 got started: $initialCommandResponse")
         await(assemblyComponent.subscribe(setupWithoutMatcher.runId))
       }
-      println("1")
 
       val longCommandResponse = Await.result(eventualLongCommandResponse, timeout.duration)
-      println("2")
 
       longCommandResponse shouldBe a[CompletedWithResult]
       longCommandResponse.runId shouldBe setupWithoutMatcher.runId
-      println("3")
-
 
       // DEOPSCSW-229: Provide matchers infrastructure for comparison
       // DEOPSCSW-317: Use state values of HCD to determine command completion
@@ -197,8 +192,8 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
             matcherResponse match {
               case MatchCompleted =>
                 Completed(setupWithMatcher.runId)
-              case a: MatchFailed =>
-                Error(setupWithMatcher.runId, a.throwable.getMessage)
+              case mf: MatchFailed =>
+                Error(setupWithMatcher.runId, mf.throwable.getMessage)
             }
           case invalid: Invalid ⇒
             matcher.stop()
@@ -284,6 +279,7 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
       //#oneway
       // `setupWithTimeoutMatcher` is a sample setup payload intended to be used when command response is not determined
       // using matcher
+      // Note this and the next two don't do anything useful
       val onewayCommandResponseF: Future[Unit] = async {
         val initialResponse: OnewayResponse = await(assemblyComponent.oneway(setupWithTimeoutMatcher))
         initialResponse match {

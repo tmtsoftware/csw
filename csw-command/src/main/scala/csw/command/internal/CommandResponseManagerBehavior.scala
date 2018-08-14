@@ -27,13 +27,10 @@ import csw.services.logging.scaladsl.{Logger, LoggerFactory}
  * with the [[csw.messages.commands.CommandResponse.SubmitResponse]] returned into the CommandResponseManager.
  *
  * In case of short running or immediate command,
- * submit response will be of type final result which can either be of type
- * [[csw.messages.commands.CommandResultType.Positive]] or [[csw.messages.commands.CommandResultType.Negative]]
- *
- * In case of long running command, validation response will be of type [[csw.messages.commands.CommandResultType.Intermediate]]
+ * submit response will be of type final result which can either positive or negative
+ * In case of long running command, a positive validation response will be of type [[csw.messages.commands.CommandResponse.Started]]
  * then it is the responsibility of component writer to update its final command status later on
- * with [[csw.messages.commands.CommandResponse.SubmitResponse]] which will either be
- * [[csw.messages.commands.CommandResultType.Positive]] or [[csw.messages.commands.CommandResultType.Negative]]
+ * with [[csw.messages.commands.CommandResponse.SubmitResponse]] which will either be a postive or negative response.
  *
  * CommandResponseManager also provides subscribe API.
  * One of the use case for this is when Assembly splits top level command into two sub commands and forwards them to two different HCD's.
