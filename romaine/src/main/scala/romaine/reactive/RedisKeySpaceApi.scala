@@ -5,7 +5,7 @@ import reactor.core.publisher.FluxSink.OverflowStrategy
 import romaine._
 import romaine.extensions.SourceExtensions.RichSource
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class RedisKeySpaceApi[K, V](
     redisPSubscribeApi: RedisPSubscribeScalaApi[String, String],
@@ -14,29 +14,38 @@ class RedisKeySpaceApi[K, V](
 
   private val redisSubscriptionApi: RedisSubscriptionApi[String, String] = new RedisSubscriptionApi(() => redisPSubscribeApi)
 
+  private val SET_OPERATION     = "set"
+  private val EXPIRED_OPERATION = "expired"
+  private val KEYSPACE_PATTERN  = "__keyspace@0__:"
+
   def watchKeyspaceValue(
       keys: List[String],
       overflowStrategy: OverflowStrategy
-  ): Source[RedisResult[K, V], RedisSubscription[String]] =
+  ): Source[RedisResult[K, Option[V]], RedisSubscription[String]] = {
+
     redisSubscriptionApi
-      .subscribe(keys.map("__keyspace@0__:" + _), overflowStrategy)
-      .filter(pm => pm.value == "set")
+      .subscribe(keys.map(KEYSPACE_PATTERN + _), overflowStrategy)
+      .filter(pm => pm.value == SET_OPERATION || pm.value == EXPIRED_OPERATION)
       .mapAsync(1) { pm =>
         val key = redisKeySpaceCodec.fromKeyString(pm.key)
-        redisAsyncScalaApi.get(key).map(valueOpt ⇒ valueOpt.map(value ⇒ (key, value)))
+        pm.value match {
+          case SET_OPERATION     => redisAsyncScalaApi.get(key).map(valueOpt ⇒ (key, valueOpt))
+          case EXPIRED_OPERATION => Future((key, None))
+        }
       }
       .collect {
-        case Some((k, v)) ⇒ RedisResult(k, v)
+        case (k, v) ⇒ RedisResult(k, v)
       }
       .distinctUntilChanged
+  }
 
   def watchKeyspaceValueAggregation(
       keys: List[String],
       overflowStrategy: OverflowStrategy,
-      reducer: Iterable[V] => V
+      reducer: Iterable[Option[V]] => V
   ): Source[V, RedisSubscription[String]] = {
     watchKeyspaceValue(keys, overflowStrategy)
-      .scan(Map.empty[K, V]) {
+      .scan(Map.empty[K, Option[V]]) {
         case (data, RedisResult(key, value)) ⇒ data + (key → value)
       }
       .map(data => reducer(data.values))
@@ -47,20 +56,23 @@ class RedisKeySpaceApi[K, V](
       keys: List[String],
       overflowStrategy: OverflowStrategy,
       fieldMapper: V => TField
-  ): Source[RedisResult[K, TField], RedisSubscription[String]] = {
-    watchKeyspaceValue(keys, overflowStrategy)
-      .map(x => RedisResult(x.key, fieldMapper(x.value)))
-      .distinctUntilChanged
+  ): Source[RedisResult[K, Option[TField]], RedisSubscription[String]] = {
+    val stream: Source[RedisResult[K, Option[TField]], RedisSubscription[String]] =
+      watchKeyspaceValue(keys, overflowStrategy).map {
+        case RedisResult(k, Some(v)) => RedisResult(k, Some(fieldMapper(v)))
+        case RedisResult(k, _)       => RedisResult(k, None)
+      }
+    stream.distinctUntilChanged
   }
 
   def watchKeyspaceFieldAggregation[TField](
       keys: List[String],
       overflowStrategy: OverflowStrategy,
       fieldMapper: V => TField,
-      reducer: Iterable[TField] => TField
+      reducer: Iterable[Option[TField]] => TField
   ): Source[TField, RedisSubscription[String]] = {
     watchKeyspaceField(keys, overflowStrategy, fieldMapper)
-      .scan(Map.empty[K, TField]) {
+      .scan(Map.empty[K, Option[TField]]) {
         case (data, RedisResult(key, value)) ⇒ data + (key → value)
       }
       .map(data => reducer(data.values))

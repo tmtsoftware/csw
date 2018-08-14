@@ -104,15 +104,14 @@ trait SeverityServiceModule extends SeverityService {
   // channel: e.g. __keyspace@0__:status.nfiraos.trombone.tromboneAxisLowLimitAlarm,
   // message: event type as value: e.g. set, expire, expired
   private[alarm] def subscribeAggregatedSeverity(key: Key): Source[AlarmSeverity, AlarmSubscription] = {
-    val redisStreamApi     = statusApiF.flatMap(statusApi ⇒ redisKeySpaceApi(statusApi)(AlarmCodec.StatusCodec)) // create new connection for every client
-    val keys: List[String] = List(StatusKey.fromAlarmKey(key).value)
+    val redisStreamApi     = severityApiF.flatMap(severityApi ⇒ redisKeySpaceApi(severityApi)(AlarmCodec.SeverityCodec)) // create new connection for every client
+    val keys: List[String] = List(SeverityKey.fromAlarmKey(key).value)
+
+    def reducer(iterable: Iterable[Option[AlarmSeverity]]): AlarmSeverity =
+      iterable.map(x => if (x.isEmpty) Disconnected else x.get).maxBy(_.level)
 
     Source
-      .fromFutureSource(
-        redisStreamApi.map(
-          _.watchKeyspaceFieldAggregation[AlarmSeverity](keys, OverflowStrategy.LATEST, _.latchedSeverity, _.maxBy(_.level))
-        )
-      )
+      .fromFutureSource(redisStreamApi.map(_.watchKeyspaceValueAggregation(keys, OverflowStrategy.LATEST, reducer)))
       .mapMaterializedValue { mat =>
         new AlarmSubscription {
           override def unsubscribe(): Future[Unit] = mat.flatMap(_.unsubscribe())
