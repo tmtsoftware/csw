@@ -17,6 +17,7 @@ See [here](https://tmtsoftware.github.io/csw-prod/0.5.0-RC1/) for a detailed doc
 
 #### New Features
 - Event Service
+    - API and programming documentation, updated examples
     - Command Line Interface for testing
     - Updated giter8 template
 #### Bug Fixes
