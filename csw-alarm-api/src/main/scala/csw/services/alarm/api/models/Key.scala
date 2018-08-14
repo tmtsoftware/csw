@@ -10,14 +10,12 @@ import java.util.regex.Pattern
  * @param name represents the name of the alarm unique to the component e.g tromboneAxisLowLimitAlarm
  */
 sealed abstract class Key(subsystem: String, component: String, name: String) extends Proxy {
-
   require(!isNullOrEmpty(subsystem), "subsystem should not be an empty value")
   require(!isNullOrEmpty(component), "component should not be an empty value")
   require(!isNullOrEmpty(name), "name should not be an empty value")
 
+  val value: String      = s"$subsystem.$component.$name".toLowerCase
   override def self: Any = value
-
-  def value: String = s"${subsystem.toLowerCase}.${component.toLowerCase}.${name.toLowerCase}"
 
   private def isNullOrEmpty(value: String) = value == null || value.isEmpty
 }
