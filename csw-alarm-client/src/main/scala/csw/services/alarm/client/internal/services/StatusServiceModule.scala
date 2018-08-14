@@ -99,23 +99,6 @@ trait StatusServiceModule extends StatusService {
       def unapply(status: AlarmStatus): Boolean = severity > status.latchedSeverity
     }
 
-    object NotPreviousSeverity {
-      def unapply(severity: AlarmSeverity): Boolean = severity != previousSeverity
-    }
-
-    val setLatchSeverity = status.copy(latchedSeverity = severity, alarmTime = Some(AlarmTime()))
-    val setLatchedSeverityAndStatus: AlarmStatus =
-      status.copy(latchedSeverity = severity, alarmTime = Some(AlarmTime()), latchStatus = Latched)
-
-    val updatedStatus = (alarm, severity, status) match {
-      case (Latchable(), Latchable(), HigherLatchedSeverity()) ⇒ setLatchedSeverityAndStatus
-      case (Latchable(), Latchable(), IsUnLatched())           ⇒ setLatchedSeverityAndStatus
-      case (NotLatchable(), NotPreviousSeverity(), _)          ⇒ setLatchSeverity
-      case _                                                   ⇒ status
-    }
-
-    // derive acknowledgement status
-
     object IsAutoAcknowledgeable {
       def unapply(alarm: AlarmMetadata): Boolean = alarm.isAutoAcknowledgeable
     }
@@ -128,13 +111,19 @@ trait StatusServiceModule extends StatusService {
       def unapply(status: AlarmStatus): Boolean = status.latchedSeverity != previousSeverity
     }
 
-    val acknowledgedStatus   = updatedStatus.copy(acknowledgementStatus = Acknowledged)
-    val unAcknowledgedStatus = updatedStatus.copy(acknowledgementStatus = UnAcknowledged)
+    val setLatchSeverity = status.copy(latchedSeverity = severity, alarmTime = Some(AlarmTime()))
+
+    val updatedStatus = (alarm, status) match {
+      case (Latchable(), HigherLatchedSeverity())              ⇒ setLatchSeverity.copy(latchStatus = Latched)
+      case (Latchable(), IsUnLatched())                        ⇒ setLatchSeverity.copy(latchStatus = Latched)
+      case (NotLatchable(), _) if severity != previousSeverity ⇒ setLatchSeverity
+      case _                                                   ⇒ status
+    }
 
     val newStatus = (alarm, updatedStatus) match {
-      case (IsAutoAcknowledgeable(), _) ⇒ acknowledgedStatus
-      case (_, IsLatchedSeverityOkay()) ⇒ acknowledgedStatus
-      case (_, IsOtherSeverity())       ⇒ unAcknowledgedStatus
+      case (IsAutoAcknowledgeable(), _) ⇒ updatedStatus.copy(acknowledgementStatus = Acknowledged)
+      case (_, IsLatchedSeverityOkay()) ⇒ updatedStatus.copy(acknowledgementStatus = Acknowledged)
+      case (_, IsOtherSeverity())       ⇒ updatedStatus.copy(acknowledgementStatus = UnAcknowledged)
       case _                            ⇒ updatedStatus
     }
 
