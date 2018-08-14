@@ -5,8 +5,7 @@ import csw.services.alarm.api.models.{AlarmSeverity, Key}
 
 import scala.concurrent.Future
 
-private[alarm] trait SeverityService {
-  def setSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Unit]
+private[alarm] trait SeverityService extends AlarmService {
   def getCurrentSeverity(key: AlarmKey): Future[AlarmSeverity]
   def getAggregatedSeverity(key: Key): Future[AlarmSeverity]
   def subscribeAggregatedSeverityCallback(key: Key, callback: AlarmSeverity ⇒ Unit): AlarmSubscription
