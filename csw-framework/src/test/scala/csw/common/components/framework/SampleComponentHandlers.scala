@@ -117,10 +117,9 @@ class SampleComponentHandlers(
     else Invalid(command.runId, OtherIssue("Testing: Received failure, will return Invalid."))
   }
 
-  override def onShutdown(): Future[Unit] = {
+  override def onShutdown(): Future[Unit] = Future {
     currentStatePublisher.publish(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(shutdownChoice))))
-    Thread.sleep(100)
-    Future.unit
+    Thread.sleep(500)
   }
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = trackingEvent match {

@@ -136,8 +136,8 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     val queue2: mutable.Queue[Event] = new mutable.Queue[Event]()
     val eventKey                     = events.head.eventKey
 
-    val callback: Event ⇒ Future[Event]  = event ⇒ Future.successful(queue.enqueue(event)).map(_ ⇒ event)(ec)
-    val callback2: Event ⇒ Future[Event] = event ⇒ Future.successful(queue2.enqueue(event)).map(_ ⇒ event)(ec)
+    val callback: Event ⇒ Future[Unit]  = event ⇒ Future.successful(queue.enqueue(event))
+    val callback2: Event ⇒ Future[Unit] = event ⇒ Future.successful(queue2.enqueue(event))
     eventId = 0
     val cancellable = publisher.publish(eventGenerator(), 1.millis)
 

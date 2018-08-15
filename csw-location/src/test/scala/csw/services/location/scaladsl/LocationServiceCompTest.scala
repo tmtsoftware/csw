@@ -19,7 +19,6 @@ import csw.services.location.internal.Networks
 import csw.services.location.models._
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.scalatest.concurrent.Eventually
-import org.scalatest.time.Span
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 import scala.concurrent.duration.DurationInt
