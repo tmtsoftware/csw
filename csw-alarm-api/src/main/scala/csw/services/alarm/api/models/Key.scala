@@ -4,22 +4,21 @@ import java.util.regex.Pattern
 import csw.services.alarm.api.internal.RichStringExtentions.RichString
 
 /**
- * A wrapper class representing the key for an alarm e.g. NFIRAOS.trombone.tromboneAxisLowLimitAlarm. It represents each
- * alarm uniquely.
+ * A wrapper class representing the key for an alarm e.g. nfiraos.trombone.tromboneaxislowlimitalarm. It represents each
+ * alarm uniquely. Note that an alarm key is case-insensitive which means that nfiraos.trombone.tromboneaxislowlimitalarm and
+ * NFIRAOS.trombone.tromboneaxislowlimitalarm keys are equal.
  *
- * @param subsystem represents the subsystem of the component that raises an alarm e.g. NFIRAOS
+ * @param subsystem represents the subsystem of the component that raises an alarm e.g. nfiraos
  * @param component represents the component that raises an alarm e.g trombone
  * @param name represents the name of the alarm unique to the component e.g tromboneAxisLowLimitAlarm
  */
 sealed abstract class Key(subsystem: String, component: String, name: String) extends Proxy {
-  require(!isNullOrEmpty(subsystem), "subsystem should not be an empty value")
-  require(!isNullOrEmpty(component), "component should not be an empty value")
-  require(!isNullOrEmpty(name), "name should not be an empty value")
+  require(subsystem.isDefined, "subsystem should not be an empty value")
+  require(component.isDefined, "component should not be an empty value")
+  require(name.isDefined, "name should not be an empty value")
 
   val value: String      = s"$subsystem.$component.$name".toLowerCase
   override def self: Any = value
-
-  private def isNullOrEmpty(value: String) = value == null || value.isEmpty
 }
 
 object Key {
