@@ -1,6 +1,8 @@
 package csw.services.alarm.api.models
 import java.util.regex.Pattern
 
+import csw.services.alarm.api.internal.RichStringExtentions.RichString
+
 /**
  * A wrapper class representing the key for an alarm e.g. NFIRAOS.trombone.tromboneAxisLowLimitAlarm. It represents each
  * alarm uniquely.
@@ -22,19 +24,19 @@ sealed abstract class Key(subsystem: String, component: String, name: String) ex
 
 object Key {
   // pattern matches for any one of *, [, ], ^, - characters  present
-  val patternForInvalidKey: Pattern = Pattern.compile(".*[\\*\\[\\]\\^\\?\\-].*")
+  val invalidChars: Pattern = Pattern.compile(".*[\\*\\[\\]\\^\\?\\-].*")
 
   case class AlarmKey(subsystem: String, component: String, name: String) extends Key(subsystem, component, name) {
-    require(!patternForInvalidKey.matcher(value).matches(), "key contains invalid characters")
+    require(!value.matches(invalidChars), "key contains invalid characters")
   }
 
   case class ComponentKey(subsystem: String, component: String) extends Key(subsystem, component, "*") {
-    require(!patternForInvalidKey.matcher(subsystem).matches(), "subsystem name contains invalid characters")
-    require(!patternForInvalidKey.matcher(component).matches(), "component name contains invalid characters")
+    require(!subsystem.matches(invalidChars), "subsystem name contains invalid characters")
+    require(!component.matches(invalidChars), "component name contains invalid characters")
   }
 
   case class SubsystemKey(subsystem: String) extends Key(subsystem, "*", "*") {
-    require(!patternForInvalidKey.matcher(subsystem).matches(), "subsystem name contains invalid characters")
+    require(!subsystem.matches(invalidChars), "subsystem name contains invalid characters")
   }
 
   case object GlobalKey extends Key("*", "*", "*")
