@@ -71,8 +71,8 @@ class ArgsParserTest extends FunSuite with Matchers {
       Options(
         cmd = "update",
         maybeSubsystem = Some(NFIRAOS),
-        component = "trombone",
-        name = "tromboneAxisHighLimitAlarm",
+        maybeComponent = Some("trombone"),
+        maybeAlarmName = Some("tromboneAxisHighLimitAlarm"),
         severity = Major
       )
     )
@@ -93,8 +93,8 @@ class ArgsParserTest extends FunSuite with Matchers {
       Options(
         cmd = "acknowledge",
         maybeSubsystem = Some(NFIRAOS),
-        component = "trombone",
-        name = "tromboneAxisHighLimitAlarm"
+        maybeComponent = Some("trombone"),
+        maybeAlarmName = Some("tromboneAxisHighLimitAlarm")
       )
     )
   }
@@ -119,8 +119,8 @@ class ArgsParserTest extends FunSuite with Matchers {
       Options(
         cmd = "activate",
         maybeSubsystem = Some(NFIRAOS),
-        component = "trombone",
-        name = "tromboneAxisHighLimitAlarm"
+        maybeComponent = Some("trombone"),
+        maybeAlarmName = Some("tromboneAxisHighLimitAlarm")
       )
     )
   }
@@ -140,8 +140,8 @@ class ArgsParserTest extends FunSuite with Matchers {
       Options(
         cmd = "deactivate",
         maybeSubsystem = Some(NFIRAOS),
-        component = "trombone",
-        name = "tromboneAxisHighLimitAlarm"
+        maybeComponent = Some("trombone"),
+        maybeAlarmName = Some("tromboneAxisHighLimitAlarm")
       )
     )
   }
@@ -169,8 +169,8 @@ class ArgsParserTest extends FunSuite with Matchers {
       Options(
         cmd = "shelve",
         maybeSubsystem = Some(NFIRAOS),
-        component = "trombone",
-        name = "tromboneAxisHighLimitAlarm"
+        maybeComponent = Some("trombone"),
+        maybeAlarmName = Some("tromboneAxisHighLimitAlarm")
       )
     )
   }
@@ -190,8 +190,8 @@ class ArgsParserTest extends FunSuite with Matchers {
       Options(
         cmd = "unshelve",
         maybeSubsystem = Some(NFIRAOS),
-        component = "trombone",
-        name = "tromboneAxisHighLimitAlarm"
+        maybeComponent = Some("trombone"),
+        maybeAlarmName = Some("tromboneAxisHighLimitAlarm")
       )
     )
   }
@@ -218,8 +218,8 @@ class ArgsParserTest extends FunSuite with Matchers {
       Options(
         cmd = "list",
         maybeSubsystem = Some(NFIRAOS),
-        component = "trombone",
-        name = "tromboneAxisHighLimitAlarm"
+        maybeComponent = Some("trombone"),
+        maybeAlarmName = Some("tromboneAxisHighLimitAlarm")
       )
     )
   }

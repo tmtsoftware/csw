@@ -32,13 +32,13 @@ trait Arguments { self: OptionParser[Options] =>
   def component: OptionDef[String, Options] =
     opt[String]("component")
       .required()
-      .action((component, args) ⇒ args.copy(component = component))
+      .action((component, args) ⇒ args.copy(maybeComponent = Some(component)))
       .text("component of an alarm e.g. trombone")
 
   def alarmName: OptionDef[String, Options] =
     opt[String]("name")
       .required()
-      .action((name, args) ⇒ args.copy(name = name))
+      .action((name, args) ⇒ args.copy(maybeAlarmName = Some(name)))
       .text("name of an alarm e.g. tromboneAxisHighLimitAlarm")
 
   def severity: OptionDef[String, Options] =

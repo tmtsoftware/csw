@@ -98,8 +98,8 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     val updateCmd = Options(
       "update",
       maybeSubsystem = Some(tromboneAxisHighLimitKey.subsystem),
-      component = tromboneAxisHighLimitKey.component,
-      name = tromboneAxisHighLimitKey.name,
+      maybeComponent = Some(tromboneAxisHighLimitKey.component),
+      maybeAlarmName = Some(tromboneAxisHighLimitKey.name),
       severity = Major
     )
     commandExecutor.execute(updateCmd)
@@ -124,8 +124,8 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     val ackCmd = Options(
       "acknowledge",
       maybeSubsystem = Some(tromboneAxisLowLimitKey.subsystem),
-      component = tromboneAxisLowLimitKey.component,
-      name = tromboneAxisLowLimitKey.name
+      maybeComponent = Some(tromboneAxisLowLimitKey.component),
+      maybeAlarmName = Some(tromboneAxisLowLimitKey.name)
     )
 
     commandExecutor.execute(ackCmd)
@@ -147,8 +147,8 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     val activateCmd = Options(
       "activate",
       maybeSubsystem = Some(tromboneAxisLowLimitKey.subsystem),
-      component = tromboneAxisLowLimitKey.component,
-      name = tromboneAxisLowLimitKey.name
+      maybeComponent = Some(tromboneAxisLowLimitKey.component),
+      maybeAlarmName = Some(tromboneAxisLowLimitKey.name)
     )
 
     commandExecutor.execute(activateCmd)
@@ -170,8 +170,8 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     val deactivateCmd = Options(
       "deactivate",
       maybeSubsystem = Some(tromboneAxisLowLimitKey.subsystem),
-      component = tromboneAxisLowLimitKey.component,
-      name = tromboneAxisLowLimitKey.name
+      maybeComponent = Some(tromboneAxisLowLimitKey.component),
+      maybeAlarmName = Some(tromboneAxisLowLimitKey.name)
     )
 
     commandExecutor.execute(deactivateCmd)
@@ -195,8 +195,8 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     val shelveCmd = Options(
       "shelve",
       maybeSubsystem = Some(tromboneAxisLowLimitKey.subsystem),
-      component = tromboneAxisLowLimitKey.component,
-      name = tromboneAxisLowLimitKey.name
+      maybeComponent = Some(tromboneAxisLowLimitKey.component),
+      maybeAlarmName = Some(tromboneAxisLowLimitKey.name)
     )
 
     commandExecutor.execute(shelveCmd)
@@ -221,8 +221,8 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     val unshelveCmd = Options(
       "unshelve",
       maybeSubsystem = Some(tromboneAxisLowLimitKey.subsystem),
-      component = tromboneAxisLowLimitKey.component,
-      name = tromboneAxisLowLimitKey.name
+      maybeComponent = Some(tromboneAxisLowLimitKey.component),
+      maybeAlarmName = Some(tromboneAxisLowLimitKey.name)
     )
 
     commandExecutor.execute(unshelveCmd)

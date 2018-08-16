@@ -12,16 +12,16 @@ case class Options(
     isLocal: Boolean = false,
     reset: Boolean = false,
     maybeSubsystem: Option[Subsystem] = None,
-    component: String = "",
-    name: String = "",
+    maybeComponent: Option[String] = None,
+    maybeAlarmName: Option[String] = None,
     severity: AlarmSeverity = Disconnected
 ) {
-  def alarmKey: AlarmKey = AlarmKey(maybeSubsystem.get, component, name)
+  def alarmKey: AlarmKey = AlarmKey(maybeSubsystem.get, maybeComponent.get, maybeAlarmName.get)
 
-  def key: Key = (maybeSubsystem, component, name) match {
-    case (None, "", "")            ⇒ GlobalKey
-    case (Some(subsystem), "", "") ⇒ SubsystemKey(subsystem)
-    case (Some(subsystem), _, "")  ⇒ ComponentKey(subsystem, component)
-    case (Some(subsystem), _, _)   ⇒ AlarmKey(subsystem, component, name)
+  def key: Key = (maybeSubsystem, maybeComponent, maybeAlarmName) match {
+    case (None, None, None)                                  ⇒ GlobalKey
+    case (Some(subsystem), None, None)                       ⇒ SubsystemKey(subsystem)
+    case (Some(subsystem), Some(component), None)            ⇒ ComponentKey(subsystem, component)
+    case (Some(subsystem), Some(component), Some(alarmName)) ⇒ AlarmKey(subsystem, component, alarmName)
   }
 }
