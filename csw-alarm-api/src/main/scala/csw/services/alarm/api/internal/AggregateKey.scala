@@ -5,11 +5,11 @@ import csw.services.alarm.api.models.Key
 
 import scala.language.implicitConversions
 
-case class AggregateKey(key: String) {
+private[alarm] case class AggregateKey(key: String) {
   def toStatusKey: StatusKey = StatusKey(key.replace(KEYSPACE, ""))
 }
 
-object AggregateKey {
+private[alarm] object AggregateKey {
   val KEYSPACE = "__keyspace@0__:"
 
   // statusKey e.g = "status.nfiraos.*.*"
