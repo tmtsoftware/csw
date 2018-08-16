@@ -246,6 +246,12 @@ lazy val `csw-commons` = project
     libraryDependencies ++= Dependencies.Commons
   )
 
+lazy val `romaine` = project
+  .disablePlugins(BintrayPlugin)
+  .settings(
+    libraryDependencies ++= Dependencies.Romaine
+  )
+
 lazy val `csw-benchmark` = project
   .dependsOn(
     `csw-logging`,
@@ -257,11 +263,6 @@ lazy val `csw-benchmark` = project
   .disablePlugins(BintrayPlugin)
   .settings(
     libraryDependencies ++= Dependencies.Benchmark
-  )
-
-lazy val `romaine` = project
-  .settings(
-    libraryDependencies ++= Dependencies.Romaine
   )
 
 //Integration test project
