@@ -3,7 +3,7 @@ package csw.services.alarm.client.internal.services
 import com.typesafe.config.ConfigFactory
 import csw.messages.params.models.Subsystem.{AOESW, BAD, LGSF, NFIRAOS}
 import csw.services.alarm.api.exceptions.{InactiveAlarmException, InvalidSeverityException, KeyNotFoundException}
-import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, UnAcknowledged}
+import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
 import csw.services.alarm.api.models.ActivationStatus.Active
 import csw.services.alarm.api.models.AlarmSeverity._
 import csw.services.alarm.api.models.Key.{AlarmKey, ComponentKey, GlobalKey, SubsystemKey}
@@ -33,7 +33,7 @@ class SeverityServiceModuleTests
     status.acknowledgementStatus shouldBe Acknowledged
     status.latchStatus shouldBe Latched
     status.latchedSeverity shouldBe Major
-    status.shelveStatus shouldBe UnShelved
+    status.shelveStatus shouldBe Unshelved
     status.alarmTime.isDefined shouldBe true
 
     //get severity and assert
@@ -105,7 +105,7 @@ class SeverityServiceModuleTests
   // DEOPSCSW-444: Set severity api for component
   test("setSeverity should auto-acknowledge alarm only when it is auto-acknowledgable") {
     val status = setSeverityAndGetStatus(tromboneAxisLowLimitAlarmKey, Major)
-    status.acknowledgementStatus shouldBe UnAcknowledged
+    status.acknowledgementStatus shouldBe Unacknowledged
     status.latchStatus shouldBe Latched
     status.latchedSeverity shouldBe Major
     status.alarmTime.isDefined shouldBe true
@@ -317,7 +317,7 @@ class SeverityServiceModuleTests
       isAlarmLachable = true,
       oldSeverity = Okay,
       newSeverity = Critical,
-      expectedAckStatus = UnAcknowledged,
+      expectedAckStatus = Unacknowledged,
       expectedLatchStatus = Latched
     ),
     AcknowledgeAndLatchTestCase(
@@ -335,7 +335,7 @@ class SeverityServiceModuleTests
       isAlarmLachable = false,
       oldSeverity = Okay,
       newSeverity = Critical,
-      expectedAckStatus = UnAcknowledged,
+      expectedAckStatus = Unacknowledged,
       expectedLatchStatus = UnLatched
     ),
     AcknowledgeAndLatchTestCase(
@@ -353,7 +353,7 @@ class SeverityServiceModuleTests
       isAlarmLachable = true,
       oldSeverity = Critical,
       newSeverity = Okay,
-      expectedAckStatus = UnAcknowledged,
+      expectedAckStatus = Unacknowledged,
       expectedLatchStatus = Latched
     ),
     AcknowledgeAndLatchTestCase(
@@ -404,7 +404,7 @@ class SeverityServiceModuleTests
           AlarmStatus(
             latchedSeverity = testCase.oldSeverity,
             acknowledgementStatus =
-              if (testCase.isAutoAcknowledgeble || testCase.oldSeverity == Okay) Acknowledged else UnAcknowledged,
+              if (testCase.isAutoAcknowledgeble || testCase.oldSeverity == Okay) Acknowledged else Unacknowledged,
             latchStatus = if (testCase.isAlarmLachable && testCase.oldSeverity.latchable) Latched else UnLatched
           )
         ).await

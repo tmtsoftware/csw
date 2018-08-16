@@ -4,11 +4,11 @@ import java.nio.file.Paths
 
 import com.typesafe.config.ConfigFactory
 import csw.messages.params.models.Subsystem.{LGSF, NFIRAOS, TCS}
-import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, UnAcknowledged}
+import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
 import csw.services.alarm.api.models.AlarmSeverity.Major
 import csw.services.alarm.api.models.Key.{AlarmKey, GlobalKey}
-import csw.services.alarm.api.models.ShelveStatus.{Shelved, UnShelved}
+import csw.services.alarm.api.models.ShelveStatus.{Shelved, Unshelved}
 import csw.services.alarm.cli.args.Options
 import csw.services.config.api.models.ConfigData
 import csw.services.config.client.scaladsl.ConfigClientFactory
@@ -117,7 +117,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     commandExecutor.execute(initCmd)
     logBuffer.clear()
 
-    adminService.getStatus(tromboneAxisLowLimitKey).futureValue.acknowledgementStatus shouldBe UnAcknowledged
+    adminService.getStatus(tromboneAxisLowLimitKey).futureValue.acknowledgementStatus shouldBe Unacknowledged
 
     // acknowledge the alarm
     val ackCmd = Options(
@@ -179,7 +179,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     logBuffer shouldEqual List(successMsg)
   }
 
-  // DEOPSCSW-473: Shelve/UnShelve alarm from CLI interface
+  // DEOPSCSW-473: Shelve/Unshelve alarm from CLI interface
   test("should shelve the alarm") {
 
     // init alarm store
@@ -188,7 +188,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     commandExecutor.execute(initCmd)
     logBuffer.clear()
 
-    adminService.getStatus(tromboneAxisLowLimitKey).futureValue.shelveStatus shouldBe UnShelved
+    adminService.getStatus(tromboneAxisLowLimitKey).futureValue.shelveStatus shouldBe Unshelved
 
     // shelve the alarm
     val shelveCmd = Options(
@@ -204,7 +204,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     logBuffer shouldEqual List(successMsg)
   }
 
-  // DEOPSCSW-473: Shelve/UnShelve alarm from CLI interface
+  // DEOPSCSW-473: Shelve/Unshelve alarm from CLI interface
   test("should unshelve the alarm") {
 
     // init alarm store
@@ -226,7 +226,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
     commandExecutor.execute(unshelveCmd)
 
-    adminService.getStatus(tromboneAxisLowLimitKey).futureValue.shelveStatus shouldBe UnShelved
+    adminService.getStatus(tromboneAxisLowLimitKey).futureValue.shelveStatus shouldBe Unshelved
     logBuffer shouldEqual List(successMsg)
   }
 }

@@ -9,7 +9,7 @@ private[alarm] trait StatusService {
   def acknowledge(key: AlarmKey): Future[Unit]
   def reset(key: AlarmKey): Future[Unit]
   def shelve(key: AlarmKey): Future[Unit]
-  def unShelve(key: AlarmKey): Future[Unit]
+  def unshelve(key: AlarmKey): Future[Unit]
 
-  private[alarm] def unAcknowledge(key: AlarmKey): Future[Unit]
+  private[alarm] def unacknowledge(key: AlarmKey): Future[Unit]
 }

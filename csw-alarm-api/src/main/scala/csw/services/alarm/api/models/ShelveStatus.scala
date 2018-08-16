@@ -20,6 +20,6 @@ object ShelveStatus extends Enum[ShelveStatus] {
    */
   def values: IndexedSeq[ShelveStatus] = findValues
 
-  case object UnShelved extends ShelveStatus
+  case object Unshelved extends ShelveStatus
   case object Shelved   extends ShelveStatus
 }

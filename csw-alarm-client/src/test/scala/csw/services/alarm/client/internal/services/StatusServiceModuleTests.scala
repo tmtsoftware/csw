@@ -3,11 +3,11 @@ package csw.services.alarm.client.internal.services
 import com.typesafe.config.ConfigFactory
 import csw.messages.params.models.Subsystem.BAD
 import csw.services.alarm.api.exceptions.{KeyNotFoundException, ResetOperationNotAllowed}
-import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, UnAcknowledged}
+import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
 import csw.services.alarm.api.models.AlarmSeverity.{Major, Okay, Warning}
 import csw.services.alarm.api.models.Key.AlarmKey
 import csw.services.alarm.api.models.LatchStatus.{Latched, UnLatched}
-import csw.services.alarm.api.models.ShelveStatus.{Shelved, UnShelved}
+import csw.services.alarm.api.models.ShelveStatus.{Shelved, Unshelved}
 import csw.services.alarm.api.models.{AlarmSeverity, AlarmStatus}
 import csw.services.alarm.client.internal.helpers.AlarmServiceTestSetup
 import csw.services.alarm.client.internal.helpers.TestFutureExt.RichFuture
@@ -79,7 +79,7 @@ class StatusServiceModuleTests
 
   // DEOPSCSW-447: Reset api for alarm
   test("reset should set the alarm status to Latched Okay and Acknowledged when alarm is latchable") {
-    // set latched severity to Warning which will result status to be Latched and UnAcknowledged
+    // set latched severity to Warning which will result status to be Latched and Unacknowledged
     setSeverity(tromboneAxisLowLimitAlarmKey, Warning).await
 
     // set current severity to Okay
@@ -105,7 +105,7 @@ class StatusServiceModuleTests
 
   // DEOPSCSW-446: Acknowledge api for alarm
   test("acknowledge should set acknowledgementStatus to Acknowledged of an alarm") {
-    // set latched severity to Warning which will result status to be Latched and UnAcknowledged
+    // set latched severity to Warning which will result status to be Latched and Unacknowledged
     setSeverity(tromboneAxisLowLimitAlarmKey, Warning).await
 
     acknowledge(tromboneAxisLowLimitAlarmKey).await
@@ -114,13 +114,13 @@ class StatusServiceModuleTests
   }
 
   // DEOPSCSW-446: Acknowledge api for alarm
-  test("unAcknowledge should set acknowledgementStatus to UnAcknowledged of an alarm") {
+  test("unacknowledge should set acknowledgementStatus to Unacknowledged of an alarm") {
     // set latched severity to Okay which will result status to be Latched and Acknowledged
     setSeverity(tromboneAxisLowLimitAlarmKey, Okay).await
 
-    unAcknowledge(tromboneAxisLowLimitAlarmKey).await
+    unacknowledge(tromboneAxisLowLimitAlarmKey).await
     val status = getStatus(tromboneAxisLowLimitAlarmKey).await
-    status.acknowledgementStatus shouldBe UnAcknowledged
+    status.acknowledgementStatus shouldBe Unacknowledged
   }
 
   // DEOPSCSW-446: Acknowledge api for alarm
@@ -149,20 +149,20 @@ class StatusServiceModuleTests
   // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
   test("unshelve should shelve an alarm") {
     setStatus(tromboneAxisHighLimitAlarmKey, AlarmStatus(shelveStatus = Shelved)).await
-    unShelve(tromboneAxisHighLimitAlarmKey).await
+    unshelve(tromboneAxisHighLimitAlarmKey).await
     val status = getStatus(tromboneAxisHighLimitAlarmKey).await
-    status.shelveStatus shouldBe UnShelved
+    status.shelveStatus shouldBe Unshelved
   }
 
   // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
   test("unshelve should be a no-op when repeated") {
     setStatus(tromboneAxisHighLimitAlarmKey, AlarmStatus(shelveStatus = Shelved)).await
-    unShelve(tromboneAxisHighLimitAlarmKey).await
+    unshelve(tromboneAxisHighLimitAlarmKey).await
     val status = getStatus(tromboneAxisHighLimitAlarmKey).await
-    status.shelveStatus shouldBe UnShelved
+    status.shelveStatus shouldBe Unshelved
 
     //repeat the unshelve operation
-    noException shouldBe thrownBy(unShelve(tromboneAxisHighLimitAlarmKey).await)
+    noException shouldBe thrownBy(unshelve(tromboneAxisHighLimitAlarmKey).await)
   }
 
   //  test("getStatus should throw exception if key does not exist") {

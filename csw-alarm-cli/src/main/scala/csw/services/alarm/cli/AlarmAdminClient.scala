@@ -52,8 +52,8 @@ class AlarmAdminClient(
       .flatMap(_.shelve(options.alarmKey))
       .transformWithSideEffect(printLine)
 
-  def unShelve(options: Options): Future[Unit] =
+  def unshelve(options: Options): Future[Unit] =
     alarmServiceF
-      .flatMap(_.unShelve(options.alarmKey))
+      .flatMap(_.unshelve(options.alarmKey))
       .transformWithSideEffect(printLine)
 }

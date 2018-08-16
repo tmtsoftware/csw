@@ -20,6 +20,6 @@ object AcknowledgementStatus extends Enum[AcknowledgementStatus] {
    */
   def values: IndexedSeq[AcknowledgementStatus] = findValues
 
-  case object UnAcknowledged extends AcknowledgementStatus
+  case object Unacknowledged extends AcknowledgementStatus
   case object Acknowledged   extends AcknowledgementStatus
 }

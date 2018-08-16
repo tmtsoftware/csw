@@ -64,7 +64,7 @@ public class JAlarmServiceImplTest {
         assertEquals(AcknowledgementStatus.Acknowledged$.MODULE$, status.acknowledgementStatus());
         assertEquals(LatchStatus.Latched$.MODULE$, status.latchStatus());
         assertEquals(JAlarmSeverity.Major, status.latchedSeverity());
-        assertEquals(ShelveStatus.UnShelved$.MODULE$, status.shelveStatus());
+        assertEquals(ShelveStatus.Unshelved$.MODULE$, status.shelveStatus());
         assertTrue(status.alarmTime().isDefined());
 
         //get severity and assert
@@ -133,7 +133,7 @@ public class JAlarmServiceImplTest {
         AlarmKey tromboneAxisLowLimitAlarm = new AlarmKey(JSubsystem.NFIRAOS, "trombone", "tromboneAxisLowLimitAlarm");
 
         AlarmStatus status = setSeverity(tromboneAxisLowLimitAlarm, JAlarmSeverity.Major);
-        assertEquals(AcknowledgementStatus.UnAcknowledged$.MODULE$, status.acknowledgementStatus());
+        assertEquals(AcknowledgementStatus.Unacknowledged$.MODULE$, status.acknowledgementStatus());
         assertEquals(LatchStatus.Latched$.MODULE$, status.latchStatus());
         assertEquals(JAlarmSeverity.Major, status.latchedSeverity());
         assertTrue(status.alarmTime().isDefined());

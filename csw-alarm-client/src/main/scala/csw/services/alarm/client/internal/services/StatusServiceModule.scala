@@ -3,11 +3,11 @@ package csw.services.alarm.client.internal.services
 import acyclic.skipped
 import csw.services.alarm.api.exceptions.{KeyNotFoundException, ResetOperationNotAllowed}
 import csw.services.alarm.api.internal.StatusService
-import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, UnAcknowledged}
+import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
 import csw.services.alarm.api.models.AlarmSeverity.Okay
 import csw.services.alarm.api.models.Key.AlarmKey
 import csw.services.alarm.api.models.LatchStatus.{Latched, UnLatched}
-import csw.services.alarm.api.models.ShelveStatus.{Shelved, UnShelved}
+import csw.services.alarm.api.models.ShelveStatus.{Shelved, Unshelved}
 import csw.services.alarm.api.models._
 import csw.services.alarm.client.internal.AlarmServiceLogger
 import csw.services.alarm.client.internal.commons.Settings
@@ -26,7 +26,7 @@ trait StatusServiceModule extends StatusService {
 
   private val log = AlarmServiceLogger.getLogger
   private lazy val shelveTimeoutRef =
-    shelveTimeoutActorFactory.make(key ⇒ unShelve(key, cancelShelveTimeout = false))(actorSystem)
+    shelveTimeoutActorFactory.make(key ⇒ unshelve(key, cancelShelveTimeout = false))(actorSystem)
 
   final override def getStatus(key: AlarmKey): Future[AlarmStatus] = async {
     val statusApi = await(statusApiF)
@@ -66,9 +66,9 @@ trait StatusServiceModule extends StatusService {
   }
 
   // this will most likely be called when operator manually un-shelves an already shelved alarm
-  final override def unShelve(key: AlarmKey): Future[Unit] = unShelve(key, cancelShelveTimeout = true)
+  final override def unshelve(key: AlarmKey): Future[Unit] = unshelve(key, cancelShelveTimeout = true)
 
-  private[alarm] final override def unAcknowledge(key: AlarmKey): Future[Unit] = setAcknowledgementStatus(key, UnAcknowledged)
+  private[alarm] final override def unacknowledge(key: AlarmKey): Future[Unit] = setAcknowledgementStatus(key, Unacknowledged)
 
   private[alarm] def updateStatusForSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Unit] = async {
     // get alarm metadata
@@ -113,7 +113,7 @@ trait StatusServiceModule extends StatusService {
     val newStatus = (alarm, updatedStatus) match {
       case (IsAutoAcknowledgeable(), _) ⇒ updatedStatus.copy(acknowledgementStatus = Acknowledged)
       case (_, IsLatchedSeverityOkay()) ⇒ updatedStatus.copy(acknowledgementStatus = Acknowledged)
-      case _                            ⇒ updatedStatus.copy(acknowledgementStatus = UnAcknowledged)
+      case _                            ⇒ updatedStatus.copy(acknowledgementStatus = Unacknowledged)
     }
 
     // update alarm status (with recent time) only when severity changes
@@ -125,13 +125,13 @@ trait StatusServiceModule extends StatusService {
     statusApiF.flatMap(_.set(alarmKey, alarmStatus))
   }
 
-  private def unShelve(key: AlarmKey, cancelShelveTimeout: Boolean): Future[Unit] = async {
+  private def unshelve(key: AlarmKey, cancelShelveTimeout: Boolean): Future[Unit] = async {
     log.debug(s"Un-shelve alarm [${key.value}]")
 
     //TODO: decide whether to  unshelve an alarm when it goes to okay
     val status = await(getStatus(key))
-    if (status.shelveStatus != UnShelved) {
-      await(setStatus(key, status.copy(shelveStatus = UnShelved)))
+    if (status.shelveStatus != Unshelved) {
+      await(setStatus(key, status.copy(shelveStatus = Unshelved)))
       // if in case of manual un-shelve operation, cancel the scheduled timer for this alarm
       // this method is also called when scheduled timer for shelving of an alarm goes off (i.e. default 8 AM local time) with
       // cancelShelveTimeout as false
