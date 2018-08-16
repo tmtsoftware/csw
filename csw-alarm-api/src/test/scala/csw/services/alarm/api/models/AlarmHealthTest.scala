@@ -1,7 +1,8 @@
 package csw.services.alarm.api.models
 
 import csw.services.alarm.api.models.AlarmHealth._
-import csw.services.alarm.api.models.AlarmSeverity._
+import csw.services.alarm.api.models.AlarmSeverity.Disconnected
+import csw.services.alarm.api.models.ExplicitAlarmSeverity._
 
 // DEOPSCSW-458: Calculate component health based on alarm severities
 class AlarmHealthTest extends EnumTest(AlarmHealth) {

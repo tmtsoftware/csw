@@ -1,6 +1,7 @@
 package csw.services.alarm.api.models
 
-import csw.services.alarm.api.models.AlarmSeverity._
+import csw.services.alarm.api.models.AlarmSeverity.Disconnected
+import csw.services.alarm.api.models.ExplicitAlarmSeverity._
 import enumeratum.EnumEntry.Lowercase
 import enumeratum.{Enum, EnumEntry}
 

@@ -1,6 +1,6 @@
 package csw.services.alarm.api.exceptions
 
-import csw.services.alarm.api.models.AlarmSeverity.Okay
+import csw.services.alarm.api.models.ExplicitAlarmSeverity.Okay
 import csw.services.alarm.api.models.Key.AlarmKey
 import csw.services.alarm.api.models.{AlarmSeverity, Key}
 

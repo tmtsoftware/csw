@@ -2,7 +2,7 @@ package csw.services.alarm.api.javadsl
 
 import java.util.concurrent.CompletableFuture
 
-import csw.services.alarm.api.models.AlarmSeverity
+import csw.services.alarm.api.models.ExplicitAlarmSeverity
 import csw.services.alarm.api.models.Key.AlarmKey
 import csw.services.alarm.api.scaladsl.AlarmService
 
@@ -25,7 +25,7 @@ trait IAlarmService {
    *         [[csw.services.alarm.api.exceptions.InvalidSeverityException]]
    *         or [[csw.services.alarm.api.exceptions.KeyNotFoundException]]
    */
-  def setSeverity(key: AlarmKey, severity: AlarmSeverity): CompletableFuture[Unit]
+  def setSeverity(key: AlarmKey, severity: ExplicitAlarmSeverity): CompletableFuture[Unit]
 
   /**
    *  Returns the scala version of AlarmService

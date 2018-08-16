@@ -29,7 +29,7 @@ class AlarmAdminClient(
 
   def severity(options: Options): Future[Unit] =
     alarmServiceF
-      .flatMap(_.setSeverity(options.alarmKey, options.severity))
+      .flatMap(_.setSeverity(options.alarmKey, options.severity.get))
       .transformWithSideEffect(printLine)
 
   def acknowledge(options: Options): Future[Unit] =

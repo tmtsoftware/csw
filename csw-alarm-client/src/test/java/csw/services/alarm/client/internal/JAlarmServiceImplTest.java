@@ -45,7 +45,7 @@ public class JAlarmServiceImplTest {
         alarmServiceTestSetup.afterAll();
     }
 
-    private AlarmStatus setSeverity(AlarmKey alarmKey, AlarmSeverity severity) throws Exception {
+    private AlarmStatus setSeverity(AlarmKey alarmKey, ExplicitAlarmSeverity severity) throws Exception {
         jAlarmService.setSeverity(alarmKey, severity).get();
         return Await.result(alarmServiceTestSetup.alarmService().getStatus(alarmKey), new FiniteDuration(2, TimeUnit.SECONDS));
     }

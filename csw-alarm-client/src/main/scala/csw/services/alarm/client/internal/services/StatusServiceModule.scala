@@ -3,8 +3,8 @@ package csw.services.alarm.client.internal.services
 import acyclic.skipped
 import csw.services.alarm.api.exceptions.{KeyNotFoundException, ResetOperationNotAllowed}
 import csw.services.alarm.api.internal.StatusService
+import csw.services.alarm.api.models.ExplicitAlarmSeverity.Okay
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
-import csw.services.alarm.api.models.AlarmSeverity.Okay
 import csw.services.alarm.api.models.Key.AlarmKey
 import csw.services.alarm.api.models.LatchStatus.{Latched, UnLatched}
 import csw.services.alarm.api.models.ShelveStatus.{Shelved, Unshelved}

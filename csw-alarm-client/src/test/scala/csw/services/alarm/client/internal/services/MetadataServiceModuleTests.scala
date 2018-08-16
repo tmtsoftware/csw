@@ -6,7 +6,8 @@ import csw.services.alarm.api.exceptions.KeyNotFoundException
 import csw.services.alarm.api.internal.MetadataKey
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
 import csw.services.alarm.api.models.AlarmHealth.Bad
-import csw.services.alarm.api.models.AlarmSeverity.{Critical, Disconnected, Major}
+import csw.services.alarm.api.models.AlarmSeverity.Disconnected
+import csw.services.alarm.api.models.ExplicitAlarmSeverity._
 import csw.services.alarm.api.models.AlarmStatus
 import csw.services.alarm.api.models.Key.{AlarmKey, ComponentKey, GlobalKey, SubsystemKey}
 import csw.services.alarm.client.internal.helpers.AlarmServiceTestSetup

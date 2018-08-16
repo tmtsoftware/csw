@@ -4,7 +4,7 @@ import java.nio.file.Paths
 
 import csw.messages.params.models.Subsystem.NFIRAOS
 import csw.services.BuildInfo
-import csw.services.alarm.api.models.AlarmSeverity.Major
+import csw.services.alarm.api.models.ExplicitAlarmSeverity.Major
 import org.scalatest.{FunSuite, Matchers}
 
 class ArgsParserTest extends FunSuite with Matchers {
@@ -73,7 +73,7 @@ class ArgsParserTest extends FunSuite with Matchers {
         maybeSubsystem = Some(NFIRAOS),
         maybeComponent = Some("trombone"),
         maybeAlarmName = Some("tromboneAxisHighLimitAlarm"),
-        severity = Major
+        severity = Some(Major)
       )
     )
   }

@@ -4,8 +4,9 @@ import com.typesafe.config.ConfigFactory
 import csw.messages.params.models.Subsystem.{AOESW, BAD, LGSF, NFIRAOS}
 import csw.services.alarm.api.exceptions.{InactiveAlarmException, InvalidSeverityException, KeyNotFoundException}
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
+import csw.services.alarm.api.models.AlarmSeverity.Disconnected
+import csw.services.alarm.api.models.ExplicitAlarmSeverity._
 import csw.services.alarm.api.models.ActivationStatus.Active
-import csw.services.alarm.api.models.AlarmSeverity._
 import csw.services.alarm.api.models.Key.{AlarmKey, ComponentKey, GlobalKey, SubsystemKey}
 import csw.services.alarm.api.models.LatchStatus.{Latched, UnLatched}
 import csw.services.alarm.api.models.ShelveStatus._
@@ -47,19 +48,14 @@ class SeverityServiceModuleTests
   }
 
   // DEOPSCSW-444: Set severity api for component
-  test("setSeverity should throw exception when called with Disconnected severity") {
-    an[IllegalArgumentException] shouldBe thrownBy(setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Disconnected))
-  }
-
-  // DEOPSCSW-444: Set severity api for component
   test("setSeverity should throw KeyNotFoundException when tried to set severity for key which does not exists in alarm store") {
     val invalidKey = AlarmKey(BAD, "trombone", "fakeAlarm")
-    an[KeyNotFoundException] shouldBe thrownBy(setSeverity(invalidKey, AlarmSeverity.Critical).await)
+    an[KeyNotFoundException] shouldBe thrownBy(setSeverity(invalidKey, Critical).await)
   }
 
   // DEOPSCSW-444: Set severity api for component
   test("setSeverity should throw InvalidSeverityException when unsupported severity is provided") {
-    an[InvalidSeverityException] shouldBe thrownBy(setSeverity(tromboneAxisHighLimitAlarmKey, AlarmSeverity.Critical).await)
+    an[InvalidSeverityException] shouldBe thrownBy(setSeverity(tromboneAxisHighLimitAlarmKey, Critical).await)
   }
 
   // DEOPSCSW-444: Set severity api for component
@@ -424,7 +420,7 @@ class SeverityServiceModuleTests
   //  }
   //
 
-  private def setSeverityAndGetStatus(alarmKey: AlarmKey, alarmSeverity: AlarmSeverity): AlarmStatus = {
+  private def setSeverityAndGetStatus(alarmKey: AlarmKey, alarmSeverity: ExplicitAlarmSeverity): AlarmStatus = {
     setSeverity(alarmKey, alarmSeverity).await
     testStatusApi.get(alarmKey).await.get
   }

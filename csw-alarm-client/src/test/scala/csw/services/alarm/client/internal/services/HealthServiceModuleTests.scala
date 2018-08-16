@@ -4,7 +4,7 @@ import com.typesafe.config.ConfigFactory
 import csw.messages.params.models.Subsystem.{BAD, LGSF, NFIRAOS}
 import csw.services.alarm.api.exceptions.{InactiveAlarmException, KeyNotFoundException}
 import csw.services.alarm.api.models.AlarmHealth.{Bad, Good, Ill}
-import csw.services.alarm.api.models.AlarmSeverity.{Critical, Indeterminate, Major, Okay}
+import csw.services.alarm.api.models.ExplicitAlarmSeverity._
 import csw.services.alarm.api.models.Key.{ComponentKey, GlobalKey, SubsystemKey}
 import csw.services.alarm.client.internal.helpers.AlarmServiceTestSetup
 import csw.services.alarm.client.internal.helpers.TestFutureExt.RichFuture

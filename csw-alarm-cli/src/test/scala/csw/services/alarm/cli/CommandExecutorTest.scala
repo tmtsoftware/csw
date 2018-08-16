@@ -7,7 +7,7 @@ import csw.messages.params.models.Subsystem.{LGSF, NFIRAOS, TCS}
 import csw.services.alarm.api.exceptions.KeyNotFoundException
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
-import csw.services.alarm.api.models.AlarmSeverity.Major
+import csw.services.alarm.api.models.ExplicitAlarmSeverity.Major
 import csw.services.alarm.api.models.Key.{AlarmKey, GlobalKey}
 import csw.services.alarm.api.models.ShelveStatus.{Shelved, Unshelved}
 import csw.services.alarm.cli.args.Options
@@ -101,7 +101,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
       maybeSubsystem = Some(tromboneAxisHighLimitKey.subsystem),
       maybeComponent = Some(tromboneAxisHighLimitKey.component),
       maybeAlarmName = Some(tromboneAxisHighLimitKey.name),
-      severity = Major
+      severity = Some(Major)
     )
     commandExecutor.execute(updateCmd)
 

@@ -3,7 +3,7 @@ package csw.services.alarm.api.internal
 import csw.messages.params.models.Subsystem
 import csw.services.alarm.api.models.Key.{AlarmKey, ComponentKey, SubsystemKey}
 import csw.services.alarm.api.models._
-import upickle.default.{readwriter, ReadWriter ⇒ RW, _}
+import upickle.default.{readwriter, ReadWriter => RW, _}
 
 private[alarm] trait AlarmRW {
   implicit val keyRW: RW[Key] = macroRW

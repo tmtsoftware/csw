@@ -25,12 +25,24 @@ object AlarmSeverity extends Enum[AlarmSeverity] {
   /**
    * Returns a sequence of all alarm severity
    */
-  def values: IndexedSeq[AlarmSeverity] = findValues
+  def values: IndexedSeq[AlarmSeverity] = findValues ++ ExplicitAlarmSeverity.values
 
-  case object Okay          extends AlarmSeverity(0, true)
-  case object Warning       extends AlarmSeverity(1, true)
-  case object Major         extends AlarmSeverity(2, true)
-  case object Indeterminate extends AlarmSeverity(3, true)
-  case object Disconnected  extends AlarmSeverity(4, false)
-  case object Critical      extends AlarmSeverity(5, true)
+  case object Disconnected extends AlarmSeverity(4, false)
+}
+
+sealed abstract class ExplicitAlarmSeverity private[alarm] (override val level: Int) extends AlarmSeverity(level, true)
+
+object ExplicitAlarmSeverity extends Enum[ExplicitAlarmSeverity] {
+
+  /**
+   * Returns a sequence of all alarm severity
+   */
+  def values: IndexedSeq[ExplicitAlarmSeverity] = findValues
+
+  case object Okay          extends ExplicitAlarmSeverity(0)
+  case object Warning       extends ExplicitAlarmSeverity(1)
+  case object Major         extends ExplicitAlarmSeverity(2)
+  case object Indeterminate extends ExplicitAlarmSeverity(3)
+  case object Critical      extends ExplicitAlarmSeverity(5)
+
 }

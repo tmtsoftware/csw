@@ -7,7 +7,7 @@ import csw.messages.params.generics.GChoiceKey
 import csw.messages.params.generics.KeyType.ChoiceKey
 import csw.messages.params.models.Subsystem.NFIRAOS
 import csw.messages.params.models.{Choice, Choices, Prefix}
-import csw.services.alarm.api.models.AlarmSeverity.Warning
+import csw.services.alarm.api.models.ExplicitAlarmSeverity.Warning
 import csw.services.alarm.api.models.Key.AlarmKey
 
 object SampleComponentState {

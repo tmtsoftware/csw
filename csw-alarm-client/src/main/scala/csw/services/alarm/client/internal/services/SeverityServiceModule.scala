@@ -9,7 +9,7 @@ import csw.services.alarm.api.exceptions.{InactiveAlarmException, InvalidSeverit
 import csw.services.alarm.api.internal.{SeverityKey, SeverityService}
 import csw.services.alarm.api.models.AlarmSeverity.Disconnected
 import csw.services.alarm.api.models.Key.AlarmKey
-import csw.services.alarm.api.models.{AlarmSeverity, Key}
+import csw.services.alarm.api.models.{AlarmSeverity, ExplicitAlarmSeverity, Key}
 import csw.services.alarm.api.scaladsl.AlarmSubscription
 import csw.services.alarm.client.internal.commons.Settings
 import csw.services.alarm.client.internal.redis.RedisConnectionsFactory
@@ -31,8 +31,7 @@ trait SeverityServiceModule extends SeverityService {
 
   private implicit lazy val mat: Materializer = ActorMaterializer()
 
-  final override def setSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Unit] = async {
-    require(severity != Disconnected, "setting severity to Disconnected explicitly is not allowed")
+  final override def setSeverity(key: AlarmKey, severity: ExplicitAlarmSeverity): Future[Unit] = async {
     await(setCurrentSeverity(key, severity))
     await(updateStatusForSeverity(key, severity))
   }
@@ -79,7 +78,7 @@ trait SeverityServiceModule extends SeverityService {
     else logAndThrow(KeyNotFoundException(key))
   }
 
-  private[alarm] def setCurrentSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Unit] = async {
+  private[alarm] def setCurrentSeverity(key: AlarmKey, severity: ExplicitAlarmSeverity): Future[Unit] = async {
     log.debug(
       s"Setting severity [${severity.name}] for alarm [${key.value}] with expire timeout [${settings.ttlInSeconds}] seconds"
     )
