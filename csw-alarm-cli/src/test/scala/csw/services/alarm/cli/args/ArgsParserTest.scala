@@ -99,9 +99,32 @@ class ArgsParserTest extends FunSuite with Matchers {
     )
   }
 
-  test("parse acknowledge command without any options") {
-    val options = Array("acknowledge")
-    silentParse(options) shouldBe None
+  test("parse unacknowledge command") {
+    val options = Array(
+      "unacknowledge",
+      "--subsystem",
+      "NFIRAOS",
+      "--component",
+      "trombone",
+      "--name",
+      "tromboneAxisHighLimitAlarm"
+    )
+
+    silentParse(options) should contain(
+      Options(
+        cmd = "unacknowledge",
+        maybeSubsystem = Some(NFIRAOS),
+        maybeComponent = Some("trombone"),
+        maybeAlarmName = Some("tromboneAxisHighLimitAlarm")
+      )
+    )
+  }
+
+  test("parse acknowledge/unacknowledge command without any options") {
+    val ackOptions   = Array("acknowledge")
+    val unackOptions = Array("unacknowledge")
+    silentParse(ackOptions) shouldBe None
+    silentParse(unackOptions) shouldBe None
   }
 
   test("parse activate command") {

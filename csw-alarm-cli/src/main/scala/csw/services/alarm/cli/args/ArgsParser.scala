@@ -21,6 +21,11 @@ class ArgsParser(name: String) {
       .text("acknowledge an alarm")
       .children(subsystem.required(), component.required(), alarmName.required())
 
+    cmd("unacknowledge")
+      .action((_, args) ⇒ args.copy(cmd = "unacknowledge"))
+      .text("unacknowledge an alarm")
+      .children(subsystem.required(), component.required(), alarmName.required())
+
     cmd("activate")
       .action((_, args) ⇒ args.copy(cmd = "activate"))
       .text("activate an alarm")
@@ -63,12 +68,13 @@ class ArgsParser(name: String) {
                   |  1> init
                   |  2> update
                   |  3> acknowledge
-                  |  4> activate
-                  |  5> deactivate
-                  |  6> shelve
-                  |  7> unshelve
-                  |  8> reset
-                  |  9> list
+                  |  4> unacknowledge
+                  |  5> activate
+                  |  6> deactivate
+                  |  7> shelve
+                  |  8> unshelve
+                  |  9> reset
+                  |  10> list
                 """.stripMargin)
       else if (commandsAllowingPartialKey.contains(c.cmd)) validateKey(c)
       else success

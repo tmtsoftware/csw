@@ -37,6 +37,11 @@ class AlarmAdminClient(
       .flatMap(_.acknowledge(options.alarmKey))
       .transformWithSideEffect(printLine)
 
+  def unacknowledge(options: Options): Future[Unit] =
+    alarmServiceF
+      .flatMap(_.unacknowledge(options.alarmKey))
+      .transformWithSideEffect(printLine)
+
   def activate(options: Options): Future[Unit] =
     alarmServiceF
       .flatMap(_.activate(options.alarmKey))

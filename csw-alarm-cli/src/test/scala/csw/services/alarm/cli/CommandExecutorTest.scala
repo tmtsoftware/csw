@@ -135,6 +135,32 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     logBuffer shouldEqual List(successMsg)
   }
 
+  // DEOPSCSW-471: Acknowledge alarm from CLI application
+  test("should unacknowledge the alarm") {
+
+    // init alarm store
+    val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
+    val initCmd  = Options("init", Some(filePath), isLocal = true, reset = true)
+    commandExecutor.execute(initCmd)
+    logBuffer.clear()
+
+    adminService.acknowledge(tromboneAxisLowLimitKey).futureValue
+    adminService.getStatus(tromboneAxisLowLimitKey).futureValue.acknowledgementStatus shouldBe Acknowledged
+
+    // unacknowledge the alarm
+    val unackCmd = Options(
+      "unacknowledge",
+      maybeSubsystem = Some(tromboneAxisLowLimitKey.subsystem),
+      maybeComponent = Some(tromboneAxisLowLimitKey.component),
+      maybeAlarmName = Some(tromboneAxisLowLimitKey.name)
+    )
+
+    commandExecutor.execute(unackCmd)
+
+    adminService.getStatus(tromboneAxisLowLimitKey).futureValue.acknowledgementStatus shouldBe Unacknowledged
+    logBuffer shouldEqual List(successMsg)
+  }
+
   // DEOPSCSW-472: Exercise Alarm CLI for activate/out of service alarm behaviour
   test("should activate the alarm") {
 
