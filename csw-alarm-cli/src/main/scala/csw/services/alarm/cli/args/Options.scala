@@ -23,5 +23,6 @@ case class Options(
     case (Some(subsystem), None, None)                       ⇒ SubsystemKey(subsystem)
     case (Some(subsystem), Some(component), None)            ⇒ ComponentKey(subsystem, component)
     case (Some(subsystem), Some(component), Some(alarmName)) ⇒ AlarmKey(subsystem, component, alarmName)
+    case _                                                   ⇒ throw new IllegalArgumentException("Subsystem, Component or Alarm Name required.")
   }
 }

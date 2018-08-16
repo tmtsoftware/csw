@@ -203,6 +203,11 @@ class ArgsParserTest extends FunSuite with Matchers {
     silentParse(unshelveOptions) shouldBe None
   }
 
+  test("parse list command without options") {
+    val options = Array("list")
+    silentParse(options) should contain(Options(cmd = "list"))
+  }
+
   test("parse list command") {
     val options = Array(
       "list",
@@ -222,5 +227,40 @@ class ArgsParserTest extends FunSuite with Matchers {
         maybeAlarmName = Some("tromboneAxisHighLimitAlarm")
       )
     )
+  }
+
+  test("parse list command only with subsystem and/or component options") {
+
+    val options1 = Array("list", "--subsystem", "NFIRAOS")
+    val options2 = Array("list", "--subsystem", "NFIRAOS", "--component", "trombone")
+
+    silentParse(options1) should contain(Options(cmd = "list", maybeSubsystem = Some(NFIRAOS)))
+
+    silentParse(options2) should contain(
+      Options(
+        cmd = "list",
+        maybeSubsystem = Some(NFIRAOS),
+        maybeComponent = Some("trombone")
+      )
+    )
+  }
+
+  test("parse list command  with invalid options") {
+    //invalid because subsystem and component of alarm are not specified
+    val options1 = Array(
+      "list",
+      "--name",
+      "tromboneAxisHighLimitAlarm"
+    )
+
+    //invalid because subsystem of the component is not specified
+    val options2 = Array(
+      "list",
+      "--component",
+      "tromboneAxisHighLimitAlarm"
+    )
+
+    silentParse(options1) shouldBe None
+    silentParse(options2) shouldBe None
   }
 }

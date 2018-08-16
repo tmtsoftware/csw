@@ -14,32 +14,32 @@ class ArgsParser(name: String) {
     cmd("update")
       .action((_, args) ⇒ args.copy(cmd = "update"))
       .text("set severity of an alarm")
-      .children(subsystem, component, alarmName, severity)
+      .children(subsystem.required(), component.required(), alarmName.required(), severity)
 
     cmd("acknowledge")
       .action((_, args) ⇒ args.copy(cmd = "acknowledge"))
       .text("acknowledge an alarm")
-      .children(subsystem, component, alarmName)
+      .children(subsystem.required(), component.required(), alarmName.required())
 
     cmd("activate")
       .action((_, args) ⇒ args.copy(cmd = "activate"))
       .text("activate an alarm")
-      .children(subsystem, component, alarmName)
+      .children(subsystem.required(), component.required(), alarmName.required())
 
     cmd("deactivate")
       .action((_, args) ⇒ args.copy(cmd = "deactivate"))
       .text("deactivate an alarm")
-      .children(subsystem, component, alarmName)
+      .children(subsystem.required(), component.required(), alarmName.required())
 
     cmd("shelve")
       .action((_, args) ⇒ args.copy(cmd = "shelve"))
       .text("shelve an alarm")
-      .children(subsystem, component, alarmName)
+      .children(subsystem.required(), component.required(), alarmName.required())
 
     cmd("unshelve")
       .action((_, args) ⇒ args.copy(cmd = "unshelve"))
       .text("unshelve an alarm")
-      .children(subsystem, component, alarmName)
+      .children(subsystem.required(), component.required(), alarmName.required())
 
     cmd("list")
       .action((_, args) ⇒ args.copy(cmd = "list"))
@@ -51,6 +51,7 @@ class ArgsParser(name: String) {
     version("version")
 
     checkConfig { c =>
+      val commandsAllowingPartialKey = List("list")
       if (c.cmd.isEmpty)
         failure("""
                   |Please specify one of the following command with their corresponding options:
@@ -63,7 +64,14 @@ class ArgsParser(name: String) {
                   |  7> unshelve
                   |  8> list
                 """.stripMargin)
+      else if (commandsAllowingPartialKey.contains(c.cmd)) validateKey(c)
       else success
+    }
+
+    private def validateKey(c: Options) = (c.maybeSubsystem, c.maybeComponent, c.maybeAlarmName) match {
+      case (None, None, Some(_)) | (Some(_), None, Some(_)) ⇒ failure("Please specify subsystem and component of the alarm.")
+      case (None, Some(_), _)                               ⇒ failure("Please specify subsystem of the component.")
+      case _                                                ⇒ success
     }
   }
 
