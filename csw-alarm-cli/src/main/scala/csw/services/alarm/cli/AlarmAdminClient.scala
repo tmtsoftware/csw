@@ -57,6 +57,11 @@ class AlarmAdminClient(
       .flatMap(_.unshelve(options.alarmKey))
       .transformWithSideEffect(printLine)
 
+  def reset(options: Options): Future[Unit] =
+    alarmServiceF
+      .flatMap(_.reset(options.alarmKey))
+      .transformWithSideEffect(printLine)
+
   def list(options: Options): Future[Unit] = async {
     val adminService = await(alarmServiceF)
     val metadataSet  = await(adminService.getMetadata(options.key)).sortBy(_.name)

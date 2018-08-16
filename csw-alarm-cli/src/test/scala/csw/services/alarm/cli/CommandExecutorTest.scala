@@ -7,7 +7,7 @@ import csw.messages.params.models.Subsystem.{LGSF, NFIRAOS, TCS}
 import csw.services.alarm.api.exceptions.KeyNotFoundException
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
-import csw.services.alarm.api.models.ExplicitAlarmSeverity.Major
+import csw.services.alarm.api.models.ExplicitAlarmSeverity.{Major, Okay}
 import csw.services.alarm.api.models.Key.{AlarmKey, GlobalKey}
 import csw.services.alarm.api.models.ShelveStatus.{Shelved, Unshelved}
 import csw.services.alarm.cli.args.Options
@@ -334,4 +334,31 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     intercept[KeyNotFoundException] { commandExecutor.execute(invalidComponentCmd) }
     intercept[KeyNotFoundException] { commandExecutor.execute(invalidAlarmNameCmd) }
   }
+
+  // DEOPSCSW-474: Latch an alarm from CLI Interface
+  test("should reset the severity of latched alarm") {
+
+    // init alarm store
+    val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
+    val initCmd  = Options("init", Some(filePath), isLocal = true, reset = true)
+    commandExecutor.execute(initCmd)
+    logBuffer.clear()
+
+    val resetCmd = Options(
+      "reset",
+      maybeSubsystem = Some(NFIRAOS),
+      maybeComponent = Some("trombone"),
+      maybeAlarmName = Some(tromboneAxisLowLimitKey.name)
+    )
+
+    adminService.setSeverity(tromboneAxisLowLimitKey, Major).futureValue
+    adminService.setSeverity(tromboneAxisLowLimitKey, Okay).futureValue
+    adminService.getStatus(tromboneAxisLowLimitKey).futureValue.latchedSeverity shouldBe Major
+
+    commandExecutor.execute(resetCmd) // reset latch severity of the alarm
+
+    logBuffer shouldEqual List(successMsg)
+    adminService.getStatus(tromboneAxisLowLimitKey).futureValue.latchedSeverity shouldBe Okay
+  }
+
 }

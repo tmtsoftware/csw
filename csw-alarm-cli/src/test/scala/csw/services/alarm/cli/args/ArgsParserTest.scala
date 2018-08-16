@@ -203,6 +203,32 @@ class ArgsParserTest extends FunSuite with Matchers {
     silentParse(unshelveOptions) shouldBe None
   }
 
+  test("parse reset command") {
+    val options = Array(
+      "reset",
+      "--subsystem",
+      "NFIRAOS",
+      "--component",
+      "trombone",
+      "--name",
+      "tromboneAxisHighLimitAlarm"
+    )
+
+    silentParse(options) should contain(
+      Options(
+        cmd = "reset",
+        maybeSubsystem = Some(NFIRAOS),
+        maybeComponent = Some("trombone"),
+        maybeAlarmName = Some("tromboneAxisHighLimitAlarm")
+      )
+    )
+  }
+
+  test("parse reset command without any options") {
+    val options = Array("reset")
+    silentParse(options) shouldBe None
+  }
+
   test("parse list command without options") {
     val options = Array("list")
     silentParse(options) should contain(Options(cmd = "list"))
