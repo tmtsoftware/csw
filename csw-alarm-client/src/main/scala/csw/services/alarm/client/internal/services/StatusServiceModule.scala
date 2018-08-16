@@ -1,8 +1,8 @@
 package csw.services.alarm.client.internal.services
 
-import acyclic.skipped
+import akka.actor.ActorSystem
 import csw.services.alarm.api.exceptions.{KeyNotFoundException, ResetOperationNotAllowed}
-import csw.services.alarm.api.internal.StatusService
+import csw.services.alarm.api.internal.{MetadataService, SeverityService, StatusService}
 import csw.services.alarm.api.models.ExplicitAlarmSeverity.Okay
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
 import csw.services.alarm.api.models.Key.AlarmKey
@@ -11,6 +11,7 @@ import csw.services.alarm.api.models.ShelveStatus.{Shelved, Unshelved}
 import csw.services.alarm.api.models._
 import csw.services.alarm.client.internal.AlarmServiceLogger
 import csw.services.alarm.client.internal.commons.Settings
+import csw.services.alarm.client.internal.redis.RedisConnectionsFactory
 import csw.services.alarm.client.internal.shelve.ShelveTimeoutActorFactory
 import csw.services.alarm.client.internal.shelve.ShelveTimeoutMessage.{CancelShelveTimeout, ScheduleShelveTimeout}
 
@@ -18,10 +19,12 @@ import scala.async.Async.{async, await}
 import scala.concurrent.Future
 
 trait StatusServiceModule extends StatusService {
-  self: SeverityServiceModule with MetadataServiceModule ⇒
+  self: SeverityService with MetadataService ⇒
 
   def shelveTimeoutActorFactory: ShelveTimeoutActorFactory
+  implicit val actorSystem: ActorSystem
   def settings: Settings
+  val redisConnectionsFactory: RedisConnectionsFactory
   import redisConnectionsFactory._
 
   private val log = AlarmServiceLogger.getLogger

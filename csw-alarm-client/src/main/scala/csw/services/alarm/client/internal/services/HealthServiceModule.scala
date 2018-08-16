@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import akka.actor.typed.ActorRef
 import akka.stream.scaladsl.Sink
 import akka.stream.{ActorMaterializer, Materializer}
-import csw.services.alarm.api.internal.HealthService
+import csw.services.alarm.api.internal.{HealthService, SeverityService}
 import csw.services.alarm.api.models.{AlarmHealth, Key}
 import csw.services.alarm.api.scaladsl.AlarmSubscription
 import csw.services.alarm.client.internal.AlarmServiceLogger
@@ -13,7 +13,7 @@ import csw.services.alarm.client.internal.redis.RedisConnectionsFactory
 import scala.concurrent.Future
 
 trait HealthServiceModule extends HealthService {
-  self: SeverityServiceModule ⇒
+  self: SeverityService ⇒
 
   val redisConnectionsFactory: RedisConnectionsFactory
   implicit val actorSystem: ActorSystem

@@ -1,12 +1,11 @@
 package csw.services.alarm.client.internal.services
 
-import acyclic.skipped
 import akka.actor.ActorSystem
 import akka.actor.typed.ActorRef
 import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{ActorMaterializer, Materializer}
 import csw.services.alarm.api.exceptions.{InactiveAlarmException, InvalidSeverityException, KeyNotFoundException}
-import csw.services.alarm.api.internal.{SeverityKey, SeverityService}
+import csw.services.alarm.api.internal.{MetadataService, SeverityKey, SeverityService, StatusService}
 import csw.services.alarm.api.models.AlarmSeverity.Disconnected
 import csw.services.alarm.api.models.Key.AlarmKey
 import csw.services.alarm.api.models.{AlarmSeverity, ExplicitAlarmSeverity, Key}
@@ -20,7 +19,7 @@ import scala.async.Async.{async, await}
 import scala.concurrent.Future
 
 trait SeverityServiceModule extends SeverityService {
-  self: MetadataServiceModule with StatusServiceModule ⇒
+  self: MetadataService with StatusService ⇒
 
   val redisConnectionsFactory: RedisConnectionsFactory
   def settings: Settings

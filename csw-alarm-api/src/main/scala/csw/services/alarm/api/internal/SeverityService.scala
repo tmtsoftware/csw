@@ -1,5 +1,6 @@
 package csw.services.alarm.api.internal
 import akka.actor.typed.ActorRef
+import akka.stream.scaladsl.Source
 import csw.services.alarm.api.models.Key.AlarmKey
 import csw.services.alarm.api.models.{AlarmSeverity, Key}
 import csw.services.alarm.api.scaladsl.{AlarmService, AlarmSubscription}
@@ -11,4 +12,5 @@ private[alarm] trait SeverityService extends AlarmService {
   def getAggregatedSeverity(key: Key): Future[AlarmSeverity]
   def subscribeAggregatedSeverityCallback(key: Key, callback: AlarmSeverity ⇒ Unit): AlarmSubscription
   def subscribeAggregatedSeverityActorRef(key: Key, actorRef: ActorRef[AlarmSeverity]): AlarmSubscription
+  private[alarm] def subscribeAggregatedSeverity(key: Key): Source[AlarmSeverity, AlarmSubscription]
 }
