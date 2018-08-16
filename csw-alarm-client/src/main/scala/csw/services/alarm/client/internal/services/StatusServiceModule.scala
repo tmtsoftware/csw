@@ -79,12 +79,10 @@ trait StatusServiceModule extends StatusService {
 
     object Latchable {
       def unapply(alarmMetadata: AlarmMetadata): Boolean = alarmMetadata.isLatchable
-      def unapply(alarmSeverity: AlarmSeverity): Boolean = alarmSeverity.latchable
     }
 
     object NotLatchable {
       def unapply(alarmMetadata: AlarmMetadata): Boolean = !alarmMetadata.isLatchable
-      def unapply(alarmSeverity: AlarmSeverity): Boolean = !alarmSeverity.latchable
     }
 
     object IsUnLatched {

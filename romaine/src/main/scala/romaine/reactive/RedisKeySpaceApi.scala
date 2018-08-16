@@ -14,23 +14,23 @@ class RedisKeySpaceApi[K, V](
 
   private val redisSubscriptionApi: RedisSubscriptionApi[String, String] = new RedisSubscriptionApi(() => redisPSubscribeApi)
 
-  private val SET_OPERATION     = "set"
-  private val EXPIRED_OPERATION = "expired"
-  private val KEYSPACE_PATTERN  = "__keyspace@0__:"
+  private val SetOperation     = "set"
+  private val ExpiredOperation = "expired"
+  private val KeyspacePattern  = "__keyspace@0__:"
 
   def watchKeyspaceValue(
       keys: List[String],
       overflowStrategy: OverflowStrategy
-  ): Source[RedisResult[K, Option[V]], RedisSubscription[String]] = {
+  ): Source[RedisResult[K, Option[V]], RedisSubscription] = {
 
     redisSubscriptionApi
-      .subscribe(keys.map(KEYSPACE_PATTERN + _), overflowStrategy)
-      .filter(pm => pm.value == SET_OPERATION || pm.value == EXPIRED_OPERATION)
+      .subscribe(keys.map(KeyspacePattern + _), overflowStrategy)
+      .filter(pm => pm.value == SetOperation || pm.value == ExpiredOperation)
       .mapAsync(1) { pm =>
         val key = redisKeySpaceCodec.fromKeyString(pm.key)
         pm.value match {
-          case SET_OPERATION     => redisAsyncScalaApi.get(key).map(valueOpt ⇒ (key, valueOpt))
-          case EXPIRED_OPERATION => Future((key, None))
+          case SetOperation     => redisAsyncScalaApi.get(key).map(valueOpt ⇒ (key, valueOpt))
+          case ExpiredOperation => Future((key, None))
         }
       }
       .collect {
@@ -43,7 +43,7 @@ class RedisKeySpaceApi[K, V](
       keys: List[String],
       overflowStrategy: OverflowStrategy,
       reducer: Iterable[Option[V]] => V
-  ): Source[V, RedisSubscription[String]] = {
+  ): Source[V, RedisSubscription] = {
     watchKeyspaceValue(keys, overflowStrategy)
       .scan(Map.empty[K, Option[V]]) {
         case (data, RedisResult(key, value)) ⇒ data + (key → value)
@@ -56,8 +56,8 @@ class RedisKeySpaceApi[K, V](
       keys: List[String],
       overflowStrategy: OverflowStrategy,
       fieldMapper: V => TField
-  ): Source[RedisResult[K, Option[TField]], RedisSubscription[String]] = {
-    val stream: Source[RedisResult[K, Option[TField]], RedisSubscription[String]] =
+  ): Source[RedisResult[K, Option[TField]], RedisSubscription] = {
+    val stream: Source[RedisResult[K, Option[TField]], RedisSubscription] =
       watchKeyspaceValue(keys, overflowStrategy).map {
         case RedisResult(k, Some(v)) => RedisResult(k, Some(fieldMapper(v)))
         case RedisResult(k, _)       => RedisResult(k, None)
@@ -70,7 +70,7 @@ class RedisKeySpaceApi[K, V](
       overflowStrategy: OverflowStrategy,
       fieldMapper: V => TField,
       reducer: Iterable[Option[TField]] => TField
-  ): Source[TField, RedisSubscription[String]] = {
+  ): Source[TField, RedisSubscription] = {
     watchKeyspaceField(keys, overflowStrategy, fieldMapper)
       .scan(Map.empty[K, Option[TField]]) {
         case (data, RedisResult(key, value)) ⇒ data + (key → value)
@@ -79,9 +79,5 @@ class RedisKeySpaceApi[K, V](
       .distinctUntilChanged
   }
 }
-//distinct events - DONE
-//subscriptionResult with unsubscribe and quit - DONE
-//watch termination - DONE
-//remove aggregate key - DONE
 //todo: support for delete and expired, etc
 //todo: RedisWatchSubscription try to remove type parameter

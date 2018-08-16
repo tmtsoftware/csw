@@ -11,7 +11,7 @@ class RedisSubscriptionApi[K, V](reactiveApiFactory: () => RedisReactiveScalaApi
   def subscribe(
       keys: List[K],
       overflowStrategy: OverflowStrategy
-  ): Source[RedisResult[K, V], RedisSubscription[K]] = {
+  ): Source[RedisResult[K, V], RedisSubscription] = {
     val reactiveApi      = reactiveApiFactory()
     val connectionFuture = reactiveApi.subscribe(keys)
     val subscribeSource  = Source.fromFuture(connectionFuture)
@@ -24,7 +24,7 @@ class RedisSubscriptionApi[K, V](reactiveApiFactory: () => RedisReactiveScalaApi
       .watchTermination()(Keep.both)
       .mapMaterializedValue {
         case (killSwitch, terminationSignal) ⇒
-          new RedisSubscription(keys, connectionFuture, killSwitch, terminationSignal, reactiveApi)
+          new RedisSubscriptionImpl(keys, connectionFuture, killSwitch, terminationSignal, reactiveApi)
       }
   }
 }
