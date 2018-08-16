@@ -3,8 +3,8 @@ package csw.services.alarm.client.internal.services
 import com.typesafe.config.ConfigFactory
 import csw.messages.params.models.Subsystem.{BAD, LGSF, NFIRAOS}
 import csw.services.alarm.api.exceptions.{InactiveAlarmException, KeyNotFoundException}
-import csw.services.alarm.api.models.AlarmHealth.Bad
-import csw.services.alarm.api.models.AlarmSeverity.{Critical, Okay}
+import csw.services.alarm.api.models.AlarmHealth.{Bad, Good, Ill}
+import csw.services.alarm.api.models.AlarmSeverity.{Critical, Indeterminate, Major, Okay}
 import csw.services.alarm.api.models.Key.{ComponentKey, GlobalKey, SubsystemKey}
 import csw.services.alarm.client.internal.helpers.AlarmServiceTestSetup
 import csw.services.alarm.client.internal.helpers.TestFutureExt.RichFuture
@@ -19,6 +19,18 @@ class HealthServiceModuleTests
   override protected def beforeEach(): Unit = {
     val validAlarmsConfig = ConfigFactory.parseResources("test-alarms/valid-alarms.conf")
     initAlarms(validAlarmsConfig, reset = true).await
+  }
+
+  // DEOPSCSW-466: Fetch health for a given alarm, component name or a subsystem name
+  test("getAggregatedHealth should should get aggregated severity for a alarm") {
+    setSeverity(tromboneAxisHighLimitAlarmKey, Okay).await
+    getAggregatedHealth(tromboneAxisHighLimitAlarmKey).await shouldBe Good
+
+    setSeverity(tromboneAxisHighLimitAlarmKey, Major).await
+    getAggregatedHealth(tromboneAxisHighLimitAlarmKey).await shouldBe Ill
+
+    setSeverity(tromboneAxisHighLimitAlarmKey, Indeterminate).await
+    getAggregatedHealth(tromboneAxisHighLimitAlarmKey).await shouldBe Bad
   }
 
   // DEOPSCSW-466: Fetch health for a given alarm, component name or a subsystem name
