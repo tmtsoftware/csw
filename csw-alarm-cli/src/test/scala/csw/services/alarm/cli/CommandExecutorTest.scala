@@ -10,6 +10,7 @@ import csw.services.alarm.api.models.AlarmSeverity.Major
 import csw.services.alarm.api.models.Key.{AlarmKey, GlobalKey}
 import csw.services.alarm.api.models.ShelveStatus.{Shelved, Unshelved}
 import csw.services.alarm.cli.args.Options
+import csw.services.alarm.cli.utils.IterableExtensions.RichStringIterable
 import csw.services.config.api.models.ConfigData
 import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.config.server.commons.TestFileUtils
@@ -96,7 +97,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     // update severity of an alarm
     val updateCmd = Options(
       "update",
-      subsystem = Some(tromboneAxisHighLimitKey.subsystem),
+      maybeSubsystem = Some(tromboneAxisHighLimitKey.subsystem),
       component = tromboneAxisHighLimitKey.component,
       name = tromboneAxisHighLimitKey.name,
       severity = Major
@@ -122,7 +123,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     // acknowledge the alarm
     val ackCmd = Options(
       "acknowledge",
-      subsystem = Some(tromboneAxisLowLimitKey.subsystem),
+      maybeSubsystem = Some(tromboneAxisLowLimitKey.subsystem),
       component = tromboneAxisLowLimitKey.component,
       name = tromboneAxisLowLimitKey.name
     )
@@ -145,7 +146,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     // activate the alarm
     val activateCmd = Options(
       "activate",
-      subsystem = Some(tromboneAxisLowLimitKey.subsystem),
+      maybeSubsystem = Some(tromboneAxisLowLimitKey.subsystem),
       component = tromboneAxisLowLimitKey.component,
       name = tromboneAxisLowLimitKey.name
     )
@@ -168,7 +169,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     // deactivate the alarm
     val deactivateCmd = Options(
       "deactivate",
-      subsystem = Some(tromboneAxisLowLimitKey.subsystem),
+      maybeSubsystem = Some(tromboneAxisLowLimitKey.subsystem),
       component = tromboneAxisLowLimitKey.component,
       name = tromboneAxisLowLimitKey.name
     )
@@ -193,7 +194,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     // shelve the alarm
     val shelveCmd = Options(
       "shelve",
-      subsystem = Some(tromboneAxisLowLimitKey.subsystem),
+      maybeSubsystem = Some(tromboneAxisLowLimitKey.subsystem),
       component = tromboneAxisLowLimitKey.component,
       name = tromboneAxisLowLimitKey.name
     )
@@ -219,7 +220,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     // unshelve the alarm
     val unshelveCmd = Options(
       "unshelve",
-      subsystem = Some(tromboneAxisLowLimitKey.subsystem),
+      maybeSubsystem = Some(tromboneAxisLowLimitKey.subsystem),
       component = tromboneAxisLowLimitKey.component,
       name = tromboneAxisLowLimitKey.name
     )
@@ -228,5 +229,22 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
     adminService.getStatus(tromboneAxisLowLimitKey).futureValue.shelveStatus shouldBe Unshelved
     logBuffer shouldEqual List(successMsg)
+  }
+
+  // DEOPSCSW-492: Fetch all alarms' metadata from CLI Interface (list all alarms)
+  test("should list all alarms present in the alarm store") {
+
+    // init alarm store
+    val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
+    val initCmd  = Options("init", Some(filePath), isLocal = true, reset = true)
+    commandExecutor.execute(initCmd)
+    logBuffer.clear()
+
+    // list alarms
+    val listCmd = Options("list")
+
+    commandExecutor.execute(listCmd)
+
+    logBuffer shouldEqualContentsOf "metadata/all_alarms.txt"
   }
 }

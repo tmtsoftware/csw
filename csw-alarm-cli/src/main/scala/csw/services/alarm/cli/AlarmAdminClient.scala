@@ -2,7 +2,7 @@ package csw.services.alarm.cli
 import csw.services.alarm.api.scaladsl.AlarmAdminService
 import csw.services.alarm.cli.args.Options
 import csw.services.alarm.cli.extensions.RichFutureExt.RichFuture
-import csw.services.alarm.cli.utils.ConfigUtils
+import csw.services.alarm.cli.utils.{ConfigUtils, Formatter}
 import csw.services.alarm.cli.wiring.ActorRuntime
 import csw.services.alarm.client.AlarmServiceFactory
 import csw.services.location.scaladsl.LocationService
@@ -25,7 +25,7 @@ class AlarmAdminClient(
       val config       = await(configUtils.getConfig(options.isLocal, options.filePath, None))
       val alarmService = await(alarmServiceF)
       await(alarmService.initAlarms(config, options.reset))
-    } transformWithSideEffect printLine
+    }.transformWithSideEffect(printLine)
 
   def severity(options: Options): Future[Unit] =
     alarmServiceF
@@ -56,4 +56,10 @@ class AlarmAdminClient(
     alarmServiceF
       .flatMap(_.unshelve(options.alarmKey))
       .transformWithSideEffect(printLine)
+
+  def list(options: Options): Future[Unit] = async {
+    val adminService = await(alarmServiceF)
+    val metadataSet  = await(adminService.getMetadata(options.key)).sortBy(_.name)
+    printLine(Formatter.formatMetadataSet(metadataSet))
+  }
 }

@@ -41,6 +41,11 @@ class ArgsParser(name: String) {
       .text("unshelve an alarm")
       .children(subsystem, component, alarmName)
 
+    cmd("list")
+      .action((_, args) ⇒ args.copy(cmd = "list"))
+      .text("list alarms")
+      .children(subsystem, component, alarmName)
+
     help("help")
 
     version("version")
@@ -56,6 +61,7 @@ class ArgsParser(name: String) {
                   |  5> deactivate
                   |  6> shelve
                   |  7> unshelve
+                  |  8> list
                 """.stripMargin)
       else success
     }

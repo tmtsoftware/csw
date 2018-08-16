@@ -10,7 +10,7 @@ class EventOnelineTransformer(options: Options) {
 
   def transform(events: Seq[Event]): List[String] = {
     val onelines = events.flatMap(e ⇒ transform(e)).toList
-    if (options.isTerseOut) onelines else Formatter.eventSeparator :: onelines
+    if (options.isTerseOut) onelines else Formatter.EventSeparator :: onelines
   }
 
   def transform(event: Event): List[String] = {
@@ -19,7 +19,7 @@ class EventOnelineTransformer(options: Options) {
       if (event.isInvalid) Formatter.invalidKey(event.eventKey)
       else onelineFormatter.format(traverse(event.paramSet, options.paths(event.eventKey)))
 
-    if (options.isOnelineOut) List(onelineFormatter.header(event), onelines, Formatter.eventSeparator)
+    if (options.isOnelineOut) List(onelineFormatter.header(event), onelines, Formatter.EventSeparator)
     else List(onelines)
   }
 

@@ -57,7 +57,7 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
       case None           => subscriberF.map(_.subscribe(keys))
     }
 
-    if (options.isOnelineOut) printLine(Formatter.eventSeparator)
+    if (options.isOnelineOut) printLine(Formatter.EventSeparator)
 
     val (subscriptionF, doneF) = Source
       .fromFutureSource(eventStream)

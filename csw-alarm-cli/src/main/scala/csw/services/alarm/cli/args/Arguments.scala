@@ -26,7 +26,7 @@ trait Arguments { self: OptionParser[Options] =>
   def subsystem: OptionDef[String, Options] =
     opt[String]("subsystem")
       .required()
-      .action((subsystemName, args) ⇒ args.copy(subsystem = Some(Subsystem.withNameInsensitive(subsystemName))))
+      .action((subsystemName, args) ⇒ args.copy(maybeSubsystem = Some(Subsystem.withNameInsensitive(subsystemName))))
       .text("subsystem of an alarm e.g. NFIRAOS")
 
   def component: OptionDef[String, Options] =

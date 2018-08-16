@@ -6,7 +6,7 @@ import csw.messages.params.generics.Parameter
 import csw.services.event.cli.args.Options
 
 object Formatter {
-  val eventSeparator =
+  val EventSeparator =
     "==============================================================================================================="
 
   def invalidKey(eventKey: EventKey): String = s"[ERROR] No events published for key: [$eventKey]"

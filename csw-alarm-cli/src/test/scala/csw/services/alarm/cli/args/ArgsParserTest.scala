@@ -70,7 +70,7 @@ class ArgsParserTest extends FunSuite with Matchers {
     silentParse(options) should contain(
       Options(
         cmd = "update",
-        subsystem = Some(NFIRAOS),
+        maybeSubsystem = Some(NFIRAOS),
         component = "trombone",
         name = "tromboneAxisHighLimitAlarm",
         severity = Major
@@ -92,7 +92,7 @@ class ArgsParserTest extends FunSuite with Matchers {
     silentParse(options) should contain(
       Options(
         cmd = "acknowledge",
-        subsystem = Some(NFIRAOS),
+        maybeSubsystem = Some(NFIRAOS),
         component = "trombone",
         name = "tromboneAxisHighLimitAlarm"
       )
@@ -118,7 +118,7 @@ class ArgsParserTest extends FunSuite with Matchers {
     silentParse(options) should contain(
       Options(
         cmd = "activate",
-        subsystem = Some(NFIRAOS),
+        maybeSubsystem = Some(NFIRAOS),
         component = "trombone",
         name = "tromboneAxisHighLimitAlarm"
       )
@@ -139,7 +139,7 @@ class ArgsParserTest extends FunSuite with Matchers {
     silentParse(options) should contain(
       Options(
         cmd = "deactivate",
-        subsystem = Some(NFIRAOS),
+        maybeSubsystem = Some(NFIRAOS),
         component = "trombone",
         name = "tromboneAxisHighLimitAlarm"
       )
@@ -168,7 +168,7 @@ class ArgsParserTest extends FunSuite with Matchers {
     silentParse(options) should contain(
       Options(
         cmd = "shelve",
-        subsystem = Some(NFIRAOS),
+        maybeSubsystem = Some(NFIRAOS),
         component = "trombone",
         name = "tromboneAxisHighLimitAlarm"
       )
@@ -189,7 +189,7 @@ class ArgsParserTest extends FunSuite with Matchers {
     silentParse(options) should contain(
       Options(
         cmd = "unshelve",
-        subsystem = Some(NFIRAOS),
+        maybeSubsystem = Some(NFIRAOS),
         component = "trombone",
         name = "tromboneAxisHighLimitAlarm"
       )
@@ -201,5 +201,26 @@ class ArgsParserTest extends FunSuite with Matchers {
     val unshelveOptions = Array("unshelve")
     silentParse(shelveOptions) shouldBe None
     silentParse(unshelveOptions) shouldBe None
+  }
+
+  test("parse list command") {
+    val options = Array(
+      "list",
+      "--subsystem",
+      "NFIRAOS",
+      "--component",
+      "trombone",
+      "--name",
+      "tromboneAxisHighLimitAlarm"
+    )
+
+    silentParse(options) should contain(
+      Options(
+        cmd = "list",
+        maybeSubsystem = Some(NFIRAOS),
+        component = "trombone",
+        name = "tromboneAxisHighLimitAlarm"
+      )
+    )
   }
 }
