@@ -1,13 +1,10 @@
 package csw.services.location.helpers
 
-import akka.http.scaladsl.Http
 import akka.remote.testkit.{MultiNodeSpec, MultiNodeSpecCallbacks}
 import akka.testkit.ImplicitSender
 import csw.services.location.commons.CswCluster
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import org.scalatest.{BeforeAndAfterAll, FunSuiteLike, Matchers}
-
-import scala.util.control.NonFatal
 
 abstract class LSNodeSpec[T <: NMembersAndSeed](val config: T, mode: String = "cluster")
     extends MultiNodeSpec(config, config.makeSystem)
@@ -27,11 +24,7 @@ abstract class LSNodeSpec[T <: NMembersAndSeed](val config: T, mode: String = "c
 
   override def beforeAll(): Unit = multiNodeSpecBeforeAll()
 
-  override def afterAll(): Unit = {
-    if (mode.equals("http"))
-      Http().shutdownAllConnectionPools().recover { case NonFatal(e) ⇒ e.printStackTrace() }(system.dispatcher).await
-    multiNodeSpecAfterAll()
-  }
+  override def afterAll(): Unit = multiNodeSpecAfterAll()
 
   test("ensure that location service is up for all the nodes") {
     locationService.list.await

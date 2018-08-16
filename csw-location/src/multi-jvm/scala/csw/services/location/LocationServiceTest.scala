@@ -12,7 +12,6 @@ import csw.services.location.helpers.{LSNodeSpec, OneMemberAndSeed}
 import org.scalatest.BeforeAndAfterEach
 
 import scala.collection.immutable.Set
-import scala.concurrent.Await
 import scala.concurrent.duration._
 
 class LocationServiceTestMultiJvmNode1 extends LocationServiceTest(0, "cluster")
@@ -27,8 +26,7 @@ class LocationServiceTest(ignore: Int, mode: String)
 
   val RegistrationFactory = new TestRegistrationFactory
 
-  override protected def afterEach(): Unit =
-    Await.result(locationService.unregisterAll(), 10.seconds)
+  override protected def afterEach(): Unit = locationService.unregisterAll().await
 
   test("ensure that a component registered by one node is resolved and listed on all the nodes") {
     val tcpPort         = 446

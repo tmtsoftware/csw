@@ -3,7 +3,6 @@ package csw.services.location.scaladsl
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.{ActorSystem, PoisonPill}
-import akka.http.scaladsl.Http
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
 import akka.stream.{ActorMaterializer, Materializer}
@@ -21,9 +20,8 @@ import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
+import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationInt
-import scala.concurrent.{Await, ExecutionContext}
-import scala.util.control.NonFatal
 
 class LocationServiceCompTestWithCluster extends LocationServiceCompTest("cluster")
 
@@ -52,13 +50,7 @@ class LocationServiceCompTest(mode: String)
 
   override protected def afterEach(): Unit = locationService.unregisterAll().await
 
-  override protected def afterAll(): Unit = {
-    if (mode.equals("cluster")) Await.result(locationService.shutdown(TestFinishedReason), 5.seconds)
-    else {
-      Http().shutdownAllConnectionPools().recover { case NonFatal(_) ⇒ /* ignore */ }.await
-      actorSystem.terminate().await
-    }
-  }
+  override protected def afterAll(): Unit = if (mode.equals("cluster")) locationService.shutdown(TestFinishedReason).await
 
   test("should able to register, resolve, list and unregister tcp location") {
     val componentId: ComponentId         = ComponentId("exampleTCPService", ComponentType.Service)
