@@ -1,6 +1,7 @@
 package csw.services.alarm.client.internal.services
 
 import com.typesafe.config.ConfigFactory
+import csw.messages.params.models.Subsystem.BAD
 import csw.services.alarm.api.exceptions.{KeyNotFoundException, ResetOperationNotAllowed}
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, UnAcknowledged}
 import csw.services.alarm.api.models.AlarmSeverity.{Major, Okay, Warning}
@@ -93,7 +94,7 @@ class StatusServiceModuleTests
 
   // DEOPSCSW-447: Reset api for alarm
   test("reset should throw exception if key does not exist") {
-    val invalidAlarm = AlarmKey("invalid", "invalid", "invalid")
+    val invalidAlarm = AlarmKey(BAD, "invalid", "invalid")
     an[KeyNotFoundException] shouldBe thrownBy(reset(invalidAlarm).await)
   }
 
@@ -124,7 +125,7 @@ class StatusServiceModuleTests
 
   // DEOPSCSW-446: Acknowledge api for alarm
   test("acknowledge should throw exception if key does not exist") {
-    val invalidAlarm = AlarmKey("invalid", "invalid", "invalid")
+    val invalidAlarm = AlarmKey(BAD, "invalid", "invalid")
     an[KeyNotFoundException] shouldBe thrownBy(acknowledge(invalidAlarm).await)
   }
 

@@ -5,6 +5,7 @@ import csw.messages.location.Connection.{HttpConnection, TcpConnection}
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.params.generics.GChoiceKey
 import csw.messages.params.generics.KeyType.ChoiceKey
+import csw.messages.params.models.Subsystem.NFIRAOS
 import csw.messages.params.models.{Choice, Choices, Prefix}
 import csw.services.alarm.api.models.AlarmSeverity.Warning
 import csw.services.alarm.api.models.Key.AlarmKey
@@ -33,7 +34,7 @@ object SampleComponentState {
   val failedPrefix              = Prefix("wfos.prog.cloudcover.failure")
 
   val setSeverityCommand = CommandName("alarm.setSeverity.success")
-  val testAlarmKey       = AlarmKey("nfiraos", "trombone", "tromboneAxisHighLimitAlarm")
+  val testAlarmKey       = AlarmKey(NFIRAOS, "trombone", "tromboneAxisHighLimitAlarm")
   val testSeverity       = Warning
 
   val choices: Choices =

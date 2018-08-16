@@ -1,6 +1,7 @@
 package csw.services.alarm.client.internal.services
 
 import com.typesafe.config.ConfigFactory
+import csw.messages.params.models.Subsystem.{BAD, LGSF, NFIRAOS}
 import csw.services.alarm.api.exceptions.{InactiveAlarmException, InvalidSeverityException, KeyNotFoundException}
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, UnAcknowledged}
 import csw.services.alarm.api.models.AlarmSeverity._
@@ -51,7 +52,7 @@ class SeverityServiceModuleTests
 
   // DEOPSCSW-444: Set severity api for component
   test("setSeverity should throw KeyNotFoundException when tried to set severity for key which does not exists in alarm store") {
-    val invalidKey = AlarmKey("bad", "trombone", "fakeAlarm")
+    val invalidKey = AlarmKey(BAD, "trombone", "fakeAlarm")
     an[KeyNotFoundException] shouldBe thrownBy(setSeverity(invalidKey, AlarmSeverity.Critical).await)
   }
 
@@ -140,7 +141,7 @@ class SeverityServiceModuleTests
 
   // DEOPSCSW-457: Fetch current alarm severity
   test("getCurrentSeverity should throw exception if key does not exist") {
-    val invalidAlarm = AlarmKey("invalid", "invalid", "invalid")
+    val invalidAlarm = AlarmKey(BAD, "invalid", "invalid")
     an[KeyNotFoundException] shouldBe thrownBy(getCurrentSeverity(invalidAlarm).await)
   }
 
@@ -149,7 +150,7 @@ class SeverityServiceModuleTests
     setSeverity(tromboneAxisHighLimitAlarmKey, Warning).await
     setSeverity(tromboneAxisLowLimitAlarmKey, Critical).await
 
-    val tromboneKey = ComponentKey("nfiraos", "trombone")
+    val tromboneKey = ComponentKey(NFIRAOS, "trombone")
     getAggregatedSeverity(tromboneKey).await shouldBe Critical
   }
 
@@ -158,7 +159,7 @@ class SeverityServiceModuleTests
     setSeverity(tromboneAxisHighLimitAlarmKey, Warning).await
     setSeverity(tromboneAxisLowLimitAlarmKey, Major).await
 
-    val tromboneKey = SubsystemKey("nfiraos")
+    val tromboneKey = SubsystemKey(NFIRAOS)
     getAggregatedSeverity(tromboneKey).await shouldBe Major
   }
 
@@ -173,19 +174,19 @@ class SeverityServiceModuleTests
   test("getAggregatedSeverity should get aggregated to Disconnected for Warning and Disconnected severities") {
     setSeverity(tromboneAxisHighLimitAlarmKey, Warning).await
 
-    val tromboneKey = ComponentKey("nfiraos", "trombone")
+    val tromboneKey = ComponentKey(NFIRAOS, "trombone")
     getAggregatedSeverity(tromboneKey).await shouldBe Disconnected
   }
 
   // DEOPSCSW-465: Fetch alarm severity, component or subsystem
   test("getAggregatedSeverity should throw KeyNotFoundException when key is invalid") {
-    val invalidAlarm = Key.ComponentKey("invalid", "invalid")
+    val invalidAlarm = Key.ComponentKey(BAD, "invalid")
     an[KeyNotFoundException] shouldBe thrownBy(getAggregatedSeverity(invalidAlarm).await)
   }
 
   // DEOPSCSW-465: Fetch alarm severity, component or subsystem
   test("getAggregatedSeverity should throw InactiveAlarmException when all resolved keys are inactive") {
-    val invalidAlarm = Key.ComponentKey("LGSF", "tcsPkInactive")
+    val invalidAlarm = Key.ComponentKey(LGSF, "tcsPkInactive")
     an[InactiveAlarmException] shouldBe thrownBy(getAggregatedSeverity(invalidAlarm).await)
   }
 

@@ -200,7 +200,7 @@ lazy val `csw-event-client` = project
     `csw-event-api`,
     `csw-logging`,
     `csw-location` % "compile->compile;multi-jvm->multi-jvm",
-    `csw-commons` % "test->test"
+    `csw-commons`  % "test->test"
   )
   .enablePlugins(PublishBintray, AutoMultiJvm, GenJavadocPlugin, MaybeCoverage)
   .settings(libraryDependencies ++= Dependencies.EventClient)
@@ -210,12 +210,13 @@ lazy val `csw-event-cli` = project
     `csw-messages`,
     `csw-event-client`,
     `csw-cluster-seed` % "test->multi-jvm",
-    `csw-commons` % "test->test"
+    `csw-commons`      % "test->test"
   )
   .enablePlugins(DeployApp, MaybeCoverage)
   .settings(libraryDependencies ++= Dependencies.EventCli)
 
 lazy val `csw-alarm-api` = project
+  .dependsOn(`csw-messages`)
   .enablePlugins(PublishBintray, GenJavadocPlugin)
   .settings(libraryDependencies ++= Dependencies.AlarmApi)
 
@@ -262,7 +263,6 @@ lazy val `romaine` = project
   .settings(
     libraryDependencies ++= Dependencies.Romaine
   )
-
 
 //Integration test project
 lazy val integration = project

@@ -1,5 +1,6 @@
 package csw.services.alarm.client.internal
 
+import csw.messages.params.models.Subsystem.AOESW
 import csw.services.alarm.api.models.AcknowledgementStatus._
 import csw.services.alarm.api.models.ActivationStatus.Active
 import csw.services.alarm.api.models.AlarmSeverity._
@@ -16,25 +17,25 @@ class SetSeverityTests extends AlarmServiceTestSetup {
 
   val setSeverityTestCases: Array[SetSeverityTestCase] = Array(
     SetSeverityTestCase(
-      alarmKey = AlarmKey("AOESW", "test_component", "low_latchable=>high_latchable"),
+      alarmKey = AlarmKey(AOESW, "test_component", "low_latchable=>high_latchable"),
       oldSeverity = Warning,
       newSeverity = Major,
       expectedLatchedSeverity = Major
     ),
     SetSeverityTestCase(
-      alarmKey = AlarmKey("AOESW", "test_component", "low_unlatable=>hig_latchable"),
+      alarmKey = AlarmKey(AOESW, "test_component", "low_unlatable=>hig_latchable"),
       oldSeverity = Disconnected,
       newSeverity = Critical,
       expectedLatchedSeverity = Critical
     ),
     SetSeverityTestCase(
-      alarmKey = AlarmKey("AOESW", "test_component", "high_latchable=>low_latchable"),
+      alarmKey = AlarmKey(AOESW, "test_component", "high_latchable=>low_latchable"),
       oldSeverity = Major,
       newSeverity = Warning,
       expectedLatchedSeverity = Major
     ),
     SetSeverityTestCase(
-      alarmKey = AlarmKey("AOESW", "test_component", "high_unlatable=>low_latchable"),
+      alarmKey = AlarmKey(AOESW, "test_component", "high_unlatable=>low_latchable"),
       oldSeverity = Disconnected,
       newSeverity = Major,
       expectedLatchedSeverity = Major
@@ -92,7 +93,7 @@ class SetSeverityTests extends AlarmServiceTestSetup {
 
   val ackAndLatchTestCases = Array(
     AcknowledgeAndLatchTestCase(
-      alarmKey = AlarmKey("AOESW", "test", "AutoAcknowledgeble_Latchable_Disconnected=>Okay"),
+      alarmKey = AlarmKey(AOESW, "test", "AutoAcknowledgeble_Latchable_Disconnected=>Okay"),
       isAutoAcknowledgeble = true,
       isAlarmLachable = true,
       oldSeverity = Disconnected,
@@ -101,7 +102,7 @@ class SetSeverityTests extends AlarmServiceTestSetup {
       expectedLatchStatus = Latched
     ),
     AcknowledgeAndLatchTestCase(
-      alarmKey = AlarmKey("AOESW", "test", "NotAutoAcknowledgeble_Latchable_Disconnected=>Okay"),
+      alarmKey = AlarmKey(AOESW, "test", "NotAutoAcknowledgeble_Latchable_Disconnected=>Okay"),
       isAutoAcknowledgeble = false,
       isAlarmLachable = true,
       oldSeverity = Disconnected,
@@ -110,7 +111,7 @@ class SetSeverityTests extends AlarmServiceTestSetup {
       expectedLatchStatus = Latched
     ),
     AcknowledgeAndLatchTestCase(
-      alarmKey = AlarmKey("AOESW", "test", "AutoAcknowledgeble_NotLatchable_Disconnected=>Okay"),
+      alarmKey = AlarmKey(AOESW, "test", "AutoAcknowledgeble_NotLatchable_Disconnected=>Okay"),
       isAutoAcknowledgeble = true,
       isAlarmLachable = false,
       oldSeverity = Disconnected,
@@ -119,7 +120,7 @@ class SetSeverityTests extends AlarmServiceTestSetup {
       expectedLatchStatus = UnLatched
     ),
     AcknowledgeAndLatchTestCase(
-      alarmKey = AlarmKey("AOESW", "test", "NotAutoAcknowledgeble_NotLatchable_Disconnected=>Okay"),
+      alarmKey = AlarmKey(AOESW, "test", "NotAutoAcknowledgeble_NotLatchable_Disconnected=>Okay"),
       isAutoAcknowledgeble = false,
       isAlarmLachable = false,
       oldSeverity = Disconnected,
@@ -128,7 +129,7 @@ class SetSeverityTests extends AlarmServiceTestSetup {
       expectedLatchStatus = UnLatched
     ),
     AcknowledgeAndLatchTestCase(
-      alarmKey = AlarmKey("AOESW", "test", "AutoAcknowledgeble_Latchable_Okay=>Critical"),
+      alarmKey = AlarmKey(AOESW, "test", "AutoAcknowledgeble_Latchable_Okay=>Critical"),
       isAutoAcknowledgeble = true,
       isAlarmLachable = true,
       oldSeverity = Okay,
@@ -137,34 +138,34 @@ class SetSeverityTests extends AlarmServiceTestSetup {
       expectedLatchStatus = Latched
     ),
     AcknowledgeAndLatchTestCase(
-      alarmKey = AlarmKey("AOESW", "test", "NotAutoAcknowledgeble_Latchable_Okay=>Critical"),
+      alarmKey = AlarmKey(AOESW, "test", "NotAutoAcknowledgeble_Latchable_Okay=>Critical"),
       isAutoAcknowledgeble = false,
       isAlarmLachable = true,
-      oldSeverity = Okay,
-      newSeverity = Critical,
-      expectedAckStatus = UnAcknowledged,
-      expectedLatchStatus = Latched
-    ),
-    AcknowledgeAndLatchTestCase(
-      alarmKey = AlarmKey("AOESW", "test", "AutoAcknowledgeble_NotLatchable_Okay=>Critical"),
-      isAutoAcknowledgeble = true,
-      isAlarmLachable = false,
-      oldSeverity = Okay,
-      newSeverity = Critical,
-      expectedAckStatus = Acknowledged,
-      expectedLatchStatus = UnLatched
-    ),
-    AcknowledgeAndLatchTestCase(
-      alarmKey = AlarmKey("AOESW", "test", "NotAutoAcknowledgeble_NotLatchable_Okay=>Critical"),
-      isAutoAcknowledgeble = false,
-      isAlarmLachable = false,
       oldSeverity = Okay,
       newSeverity = Critical,
       expectedAckStatus = UnAcknowledged,
+      expectedLatchStatus = Latched
+    ),
+    AcknowledgeAndLatchTestCase(
+      alarmKey = AlarmKey(AOESW, "test", "AutoAcknowledgeble_NotLatchable_Okay=>Critical"),
+      isAutoAcknowledgeble = true,
+      isAlarmLachable = false,
+      oldSeverity = Okay,
+      newSeverity = Critical,
+      expectedAckStatus = Acknowledged,
       expectedLatchStatus = UnLatched
     ),
     AcknowledgeAndLatchTestCase(
-      alarmKey = AlarmKey("AOESW", "test", "AutoAcknowledgeble_Latchable_Critical=>Okay"),
+      alarmKey = AlarmKey(AOESW, "test", "NotAutoAcknowledgeble_NotLatchable_Okay=>Critical"),
+      isAutoAcknowledgeble = false,
+      isAlarmLachable = false,
+      oldSeverity = Okay,
+      newSeverity = Critical,
+      expectedAckStatus = UnAcknowledged,
+      expectedLatchStatus = UnLatched
+    ),
+    AcknowledgeAndLatchTestCase(
+      alarmKey = AlarmKey(AOESW, "test", "AutoAcknowledgeble_Latchable_Critical=>Okay"),
       isAutoAcknowledgeble = true,
       isAlarmLachable = true,
       oldSeverity = Critical,
@@ -173,7 +174,7 @@ class SetSeverityTests extends AlarmServiceTestSetup {
       expectedLatchStatus = Latched
     ),
     AcknowledgeAndLatchTestCase(
-      alarmKey = AlarmKey("AOESW", "test", "NotAutoAcknowledgeble_Latchable_Critical=>Okay"),
+      alarmKey = AlarmKey(AOESW, "test", "NotAutoAcknowledgeble_Latchable_Critical=>Okay"),
       isAutoAcknowledgeble = false,
       isAlarmLachable = true,
       oldSeverity = Critical,
@@ -182,7 +183,7 @@ class SetSeverityTests extends AlarmServiceTestSetup {
       expectedLatchStatus = Latched
     ),
     AcknowledgeAndLatchTestCase(
-      alarmKey = AlarmKey("AOESW", "test", "AutoAcknowledgeble_NotLatchable_Critical=>Okay"),
+      alarmKey = AlarmKey(AOESW, "test", "AutoAcknowledgeble_NotLatchable_Critical=>Okay"),
       isAutoAcknowledgeble = true,
       isAlarmLachable = false,
       oldSeverity = Critical,
@@ -191,7 +192,7 @@ class SetSeverityTests extends AlarmServiceTestSetup {
       expectedLatchStatus = UnLatched
     ),
     AcknowledgeAndLatchTestCase(
-      alarmKey = AlarmKey("AOESW", "test", "NotAutoAcknowledgeble_NotLatchable_Critical=>Okay"),
+      alarmKey = AlarmKey(AOESW, "test", "NotAutoAcknowledgeble_NotLatchable_Critical=>Okay"),
       isAutoAcknowledgeble = false,
       isAlarmLachable = false,
       oldSeverity = Critical,

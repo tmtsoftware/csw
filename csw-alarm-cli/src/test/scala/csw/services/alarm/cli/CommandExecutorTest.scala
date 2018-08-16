@@ -3,6 +3,7 @@ package csw.services.alarm.cli
 import java.nio.file.Paths
 
 import com.typesafe.config.ConfigFactory
+import csw.messages.params.models.Subsystem.{LGSF, NFIRAOS, TCS}
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, UnAcknowledged}
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
 import csw.services.alarm.api.models.AlarmSeverity.Major
@@ -23,10 +24,10 @@ class CommandExecutorTest extends AlarmCliTestSetup {
   private val successMsg = "[SUCCESS] Command executed successfully."
   private val failureMsg = "[FAILURE] Failed to execute the command."
 
-  private val tromboneAxisLowLimitKey  = AlarmKey("nfiraos", "trombone", "tromboneaxislowlimitalarm")
-  private val tromboneAxisHighLimitKey = AlarmKey("nfiraos", "trombone", "tromboneaxishighlimitalarm")
-  private val cpuExceededKey           = AlarmKey("tcs", "tcspk", "cpuexceededalarm")
-  private val cpuIdleKey               = AlarmKey("lgsf", "tcspkinactive", "cpuidlealarm")
+  private val tromboneAxisLowLimitKey  = AlarmKey(NFIRAOS, "trombone", "tromboneaxislowlimitalarm")
+  private val tromboneAxisHighLimitKey = AlarmKey(NFIRAOS, "trombone", "tromboneaxishighlimitalarm")
+  private val cpuExceededKey           = AlarmKey(TCS, "tcspk", "cpuexceededalarm")
+  private val cpuIdleKey               = AlarmKey(LGSF, "tcspkinactive", "cpuidlealarm")
 
   private val allAlarmKeys = Set(tromboneAxisLowLimitKey, tromboneAxisHighLimitKey, cpuExceededKey, cpuIdleKey)
 
@@ -95,7 +96,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     // update severity of an alarm
     val updateCmd = Options(
       "update",
-      subsystem = tromboneAxisHighLimitKey.subsystem,
+      subsystem = Some(tromboneAxisHighLimitKey.subsystem),
       component = tromboneAxisHighLimitKey.component,
       name = tromboneAxisHighLimitKey.name,
       severity = Major
@@ -121,7 +122,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     // acknowledge the alarm
     val ackCmd = Options(
       "acknowledge",
-      subsystem = tromboneAxisLowLimitKey.subsystem,
+      subsystem = Some(tromboneAxisLowLimitKey.subsystem),
       component = tromboneAxisLowLimitKey.component,
       name = tromboneAxisLowLimitKey.name
     )
@@ -144,7 +145,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     // activate the alarm
     val activateCmd = Options(
       "activate",
-      subsystem = tromboneAxisLowLimitKey.subsystem,
+      subsystem = Some(tromboneAxisLowLimitKey.subsystem),
       component = tromboneAxisLowLimitKey.component,
       name = tromboneAxisLowLimitKey.name
     )
@@ -167,7 +168,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     // deactivate the alarm
     val deactivateCmd = Options(
       "deactivate",
-      subsystem = tromboneAxisLowLimitKey.subsystem,
+      subsystem = Some(tromboneAxisLowLimitKey.subsystem),
       component = tromboneAxisLowLimitKey.component,
       name = tromboneAxisLowLimitKey.name
     )
@@ -192,7 +193,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     // shelve the alarm
     val shelveCmd = Options(
       "shelve",
-      subsystem = tromboneAxisLowLimitKey.subsystem,
+      subsystem = Some(tromboneAxisLowLimitKey.subsystem),
       component = tromboneAxisLowLimitKey.component,
       name = tromboneAxisLowLimitKey.name
     )
@@ -218,7 +219,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     // unshelve the alarm
     val unshelveCmd = Options(
       "unshelve",
-      subsystem = tromboneAxisLowLimitKey.subsystem,
+      subsystem = Some(tromboneAxisLowLimitKey.subsystem),
       component = tromboneAxisLowLimitKey.component,
       name = tromboneAxisLowLimitKey.name
     )

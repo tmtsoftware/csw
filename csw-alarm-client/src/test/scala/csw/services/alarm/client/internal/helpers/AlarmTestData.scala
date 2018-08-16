@@ -1,4 +1,5 @@
 package csw.services.alarm.client.internal.helpers
+import csw.messages.params.models.Subsystem.{LGSF, NFIRAOS, TCS}
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
 import csw.services.alarm.api.models.AlarmSeverity._
 import csw.services.alarm.api.models.{AlarmMetadata, AlarmType}
@@ -8,9 +9,9 @@ import csw.services.alarm.api.models.Key.AlarmKey
 trait AlarmTestData {
 
   // latchable and auto-Acknowledgeable alarm
-  val tromboneAxisHighLimitAlarmKey = AlarmKey("nfiraos", "trombone", "tromboneAxisHighLimitAlarm")
+  val tromboneAxisHighLimitAlarmKey = AlarmKey(NFIRAOS, "trombone", "tromboneAxisHighLimitAlarm")
   val tromboneAxisHighLimitAlarm = AlarmMetadata(
-    subsystem = "NFIRAOS",
+    subsystem = NFIRAOS,
     component = "trombone",
     name = "tromboneAxisHighLimitAlarm",
     description = "Warns when trombone axis has reached the high limit",
@@ -25,9 +26,9 @@ trait AlarmTestData {
   )
 
   // latchable, not auto-acknowledgable alarm
-  val tromboneAxisLowLimitAlarmKey = AlarmKey("nfiraos", "trombone", "tromboneAxisLowLimitAlarm")
+  val tromboneAxisLowLimitAlarmKey = AlarmKey(NFIRAOS, "trombone", "tromboneAxisLowLimitAlarm")
   val tromboneAxisLowLimitAlarm = AlarmMetadata(
-    subsystem = "NFIRAOS",
+    subsystem = NFIRAOS,
     component = "trombone",
     name = "tromboneAxisLowLimitAlarm",
     description = "Warns when trombone axis has reached the low limit",
@@ -42,9 +43,9 @@ trait AlarmTestData {
   )
 
   // un-latchable, auto-acknowledgable alarm
-  val cpuExceededAlarmKey = AlarmKey("TCS", "tcsPk", "cpuExceededAlarm")
+  val cpuExceededAlarmKey = AlarmKey(TCS, "tcsPk", "cpuExceededAlarm")
   val cpuExceededAlarm = AlarmMetadata(
-    subsystem = "TCS",
+    subsystem = TCS,
     component = "tcsPk",
     name = "cpuExceededAlarm",
     description =
@@ -59,9 +60,9 @@ trait AlarmTestData {
     activationStatus = Active
   )
 
-  val cpuIdleAlarmKey = AlarmKey("LGSF", "tcsPkInactive", "cpuIdleAlarm")
+  val cpuIdleAlarmKey = AlarmKey(LGSF, "tcsPkInactive", "cpuIdleAlarm")
   val cpuIdleAlarm = AlarmMetadata(
-    subsystem = "LGSF",
+    subsystem = LGSF,
     component = "tcsPkInactive",
     name = "cpuIdleAlarm",
     description = "This alarm is activated CPU is idle",

@@ -16,6 +16,11 @@ sealed abstract class Subsystem(description: String) extends EnumEntry with Lowe
    * Represents a string with entryName and description of a subsystem
    */
   def longName: String = entryName + " - " + description
+
+  /**
+   * Represents the name of the subsystem in lowercase e.g NFIRAOS will be nfiraos
+   */
+  def name: String = entryName
 }
 
 /**

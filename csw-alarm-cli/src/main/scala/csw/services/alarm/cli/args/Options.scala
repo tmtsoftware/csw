@@ -1,6 +1,7 @@
 package csw.services.alarm.cli.args
 import java.nio.file.Path
 
+import csw.messages.params.models.Subsystem
 import csw.services.alarm.api.models.AlarmSeverity
 import csw.services.alarm.api.models.AlarmSeverity.Disconnected
 import csw.services.alarm.api.models.Key.AlarmKey
@@ -10,10 +11,10 @@ case class Options(
     filePath: Option[Path] = None,
     isLocal: Boolean = false,
     reset: Boolean = false,
-    subsystem: String = "",
+    subsystem: Option[Subsystem] = None,
     component: String = "",
     name: String = "",
     severity: AlarmSeverity = Disconnected
 ) {
-  def alarmKey: AlarmKey = AlarmKey(subsystem, component, name)
+  def alarmKey: AlarmKey = AlarmKey(subsystem.get, component, name)
 }

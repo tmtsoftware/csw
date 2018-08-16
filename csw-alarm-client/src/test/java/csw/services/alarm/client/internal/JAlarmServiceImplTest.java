@@ -2,6 +2,8 @@ package csw.services.alarm.client.internal;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import csw.messages.params.models.Prefix;
+import csw.messages.params.models.Subsystem;
 import csw.services.alarm.api.exceptions.InvalidSeverityException;
 import csw.services.alarm.api.javadsl.IAlarmService;
 import csw.services.alarm.api.javadsl.JAlarmSeverity;
@@ -54,7 +56,7 @@ public class JAlarmServiceImplTest {
     // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
     @Test
     public void shouldSetSeverityInAlarmStoreForGivenKey() throws Exception {
-        AlarmKey tromboneAxisHighLimitAlarm = new AlarmKey("nfiraos", "trombone", "tromboneAxisHighLimitAlarm");
+        AlarmKey tromboneAxisHighLimitAlarm = new AlarmKey(Subsystem.NFIRAOS$.MODULE$, "trombone", "tromboneAxisHighLimitAlarm");
 
         AlarmSeverity severityBeforeSetting = Await.result(alarmService.getCurrentSeverity(tromboneAxisHighLimitAlarm), new FiniteDuration(2, TimeUnit.SECONDS));
         assertEquals(severityBeforeSetting, JAlarmSeverity.Disconnected);
@@ -79,7 +81,7 @@ public class JAlarmServiceImplTest {
 
     @Test
     public void shouldThrowInvalidSeverityExceptionWhenUnsupportedSeverityIsProvided() throws Exception {
-        AlarmKey tromboneAxisHighLimitAlarm = new AlarmKey("nfiraos", "trombone", "tromboneAxisHighLimitAlarm");
+        AlarmKey tromboneAxisHighLimitAlarm = new AlarmKey(Subsystem.NFIRAOS$.MODULE$, "trombone", "tromboneAxisHighLimitAlarm");
 
         exception.expectCause(isA(InvalidSeverityException.class));
         setSeverity(tromboneAxisHighLimitAlarm, JAlarmSeverity.Critical);
@@ -88,7 +90,7 @@ public class JAlarmServiceImplTest {
     // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
     @Test
     public void shouldLatchAlarmOnlyWhenItIsHighRiskAndHigherThanLatchedSeverityInCaseOfLatchableAlarms() throws Exception {
-        AlarmKey tromboneAxisHighLimitAlarm = new AlarmKey("nfiraos", "trombone", "tromboneAxisHighLimitAlarm");
+        AlarmKey tromboneAxisHighLimitAlarm = new AlarmKey(Subsystem.NFIRAOS$.MODULE$, "trombone", "tromboneAxisHighLimitAlarm");
 
         AlarmStatus status = setSeverity(tromboneAxisHighLimitAlarm, JAlarmSeverity.Major);
         assertEquals(AcknowledgementStatus.Acknowledged$.MODULE$, status.acknowledgementStatus());
@@ -112,7 +114,7 @@ public class JAlarmServiceImplTest {
     // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
     @Test
     public void shouldNotLatchAlarmIfItIsNotLatchble() throws Exception {
-        AlarmKey cpuExceededAlarm = new AlarmKey("TCS", "tcsPk", "cpuExceededAlarm");
+        AlarmKey cpuExceededAlarm = new AlarmKey(Subsystem.TCS$.MODULE$, "tcsPk", "cpuExceededAlarm");
 
         AlarmStatus status = setSeverity(cpuExceededAlarm, JAlarmSeverity.Critical);
         assertEquals(AcknowledgementStatus.Acknowledged$.MODULE$, status.acknowledgementStatus());
@@ -130,7 +132,7 @@ public class JAlarmServiceImplTest {
 
     @Test
     public void shouldAutoAcknowledgeAlarmOnlyWhenItIsAutoAcknowlegableWhileSettingSeverity() throws Exception {
-        AlarmKey tromboneAxisLowLimitAlarm = new AlarmKey("nfiraos", "trombone", "tromboneAxisLowLimitAlarm");
+        AlarmKey tromboneAxisLowLimitAlarm = new AlarmKey(Subsystem.NFIRAOS$.MODULE$, "trombone", "tromboneAxisLowLimitAlarm");
 
         AlarmStatus status = setSeverity(tromboneAxisLowLimitAlarm, JAlarmSeverity.Major);
         assertEquals(AcknowledgementStatus.UnAcknowledged$.MODULE$, status.acknowledgementStatus());
@@ -143,7 +145,7 @@ public class JAlarmServiceImplTest {
     @Test
     public void shouldUpdateAlarmTimeOnlyWhenSeverityChangesForLatchableAlarmsWhileSettingIt() throws Exception {
         // latchable alarm
-        AlarmKey highLimitAlarmKey = new AlarmKey("nfiraos", "trombone", "tromboneAxisHighLimitAlarm");
+        AlarmKey highLimitAlarmKey = new AlarmKey(Subsystem.NFIRAOS$.MODULE$, "trombone", "tromboneAxisHighLimitAlarm");
 
         // latch it to major
         AlarmStatus status = setSeverity(highLimitAlarmKey, JAlarmSeverity.Major);
@@ -158,7 +160,7 @@ public class JAlarmServiceImplTest {
     @Test
     public void shouldUpdateAlarmTimeOnlyWhenSeverityChangesForUnlatchableAlarmsWhileSettingIt() throws Exception {
         // un-latchable alarm
-        AlarmKey cpuExceededAlarm = new AlarmKey("TCS", "tcsPk", "cpuExceededAlarm");
+        AlarmKey cpuExceededAlarm = new AlarmKey(Subsystem.TCS$.MODULE$, "tcsPk", "cpuExceededAlarm");
 
         // set severity to major
         AlarmStatus status = setSeverity(cpuExceededAlarm, JAlarmSeverity.Major);

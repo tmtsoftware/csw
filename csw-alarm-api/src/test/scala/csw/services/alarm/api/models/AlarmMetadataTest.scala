@@ -1,4 +1,5 @@
 package csw.services.alarm.api.models
+import csw.messages.params.models.Subsystem.NFIRAOS
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
 import csw.services.alarm.api.models.AlarmSeverity._
 import csw.services.alarm.api.models.Key.AlarmKey
@@ -8,7 +9,7 @@ import org.scalatest.{FunSuite, Matchers}
 class AlarmMetadataTest extends FunSuite with Matchers {
 
   val alarmMetadata = AlarmMetadata(
-    subsystem = "nfiraos",
+    subsystem = NFIRAOS,
     component = "trombone",
     name = "tromboneAxisHighLimitAlarm",
     description = "Warns when trombone axis has reached the low limit",
@@ -24,7 +25,7 @@ class AlarmMetadataTest extends FunSuite with Matchers {
 
   // DEOPSCSW-435: Identify Alarm by Subsystem, component and AlarmName
   test("should get alarm key from AlarmMetadata") {
-    alarmMetadata.alarmKey shouldBe AlarmKey("nfiraos", "trombone", "tromboneAxisHighLimitAlarm")
+    alarmMetadata.alarmKey shouldBe AlarmKey(NFIRAOS, "trombone", "tromboneAxisHighLimitAlarm")
   }
 
   test("should always support Indeterminate and Okay severities ") {

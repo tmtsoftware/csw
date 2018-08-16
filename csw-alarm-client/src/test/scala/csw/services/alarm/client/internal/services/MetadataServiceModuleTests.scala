@@ -1,6 +1,7 @@
 package csw.services.alarm.client.internal.services
 
 import com.typesafe.config.{Config, ConfigFactory}
+import csw.messages.params.models.Subsystem.{BAD, NFIRAOS, TCS}
 import csw.services.alarm.api.exceptions.KeyNotFoundException
 import csw.services.alarm.api.internal.MetadataKey
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
@@ -31,21 +32,21 @@ class MetadataServiceModuleTests
 
   //  DEOPSCSW-445: Get api for alarm metadata
   test("getMetadata should throw exception while getting metadata if key does not exist") {
-    val invalidAlarm = AlarmKey("invalid", "invalid", "invalid")
+    val invalidAlarm = AlarmKey(BAD, "invalid", "invalid")
     an[KeyNotFoundException] shouldBe thrownBy(getMetadata(invalidAlarm).await)
   }
 
   // DEOPSCSW-463: Fetch Alarm List for a component name or pattern
   test("getMetadata should fetch all alarms for a component") {
     initTestAlarms()
-    val tromboneKey = ComponentKey("TCS", "tcsPk")
+    val tromboneKey = ComponentKey(TCS, "tcsPk")
     getMetadata(tromboneKey).await should contain allElementsOf List(cpuExceededAlarm)
   }
 
   // DEOPSCSW-464: Fetch Alarm name list for a subsystem name or pattern
   test("getMetadata should fetch all alarms for a subsystem") {
     initTestAlarms()
-    val nfiraosKey = SubsystemKey("nfiraos")
+    val nfiraosKey = SubsystemKey(NFIRAOS)
     getMetadata(nfiraosKey).await should contain allElementsOf List(
       tromboneAxisHighLimitAlarm,
       tromboneAxisLowLimitAlarm
@@ -65,7 +66,7 @@ class MetadataServiceModuleTests
 
   // DEOPSCSW-464: Fetch Alarm name list for a subsystem name or pattern
   test("getMetadata should throw exception if no alarms are found while getting metadata by subsystem") {
-    an[KeyNotFoundException] shouldBe thrownBy(getMetadata(SubsystemKey("invalid")).await)
+    an[KeyNotFoundException] shouldBe thrownBy(getMetadata(SubsystemKey(BAD)).await)
   }
 
   val fourAlarmsConfig: Config = ConfigFactory.parseResources("test-alarms/valid-alarms.conf")
@@ -158,7 +159,7 @@ class MetadataServiceModuleTests
 
   // DEOPSCSW-448: Set Activation status for an alarm entity
   test("should throw exception when tried to activate/deactivate alarm which is not present in alarm store") {
-    val invalidKey = AlarmKey("invalid", "invalid", "invalid")
+    val invalidKey = AlarmKey(BAD, "invalid", "invalid")
 
     an[KeyNotFoundException] shouldBe thrownBy(activate(invalidKey).await)
     an[KeyNotFoundException] shouldBe thrownBy(deactivate(invalidKey).await)

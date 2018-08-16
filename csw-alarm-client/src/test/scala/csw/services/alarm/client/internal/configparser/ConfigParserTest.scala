@@ -1,5 +1,6 @@
 package csw.services.alarm.client.internal.configparser
 import com.typesafe.config.ConfigFactory
+import csw.messages.params.models.Subsystem.{LGSF, NFIRAOS, TCS}
 import csw.services.alarm.api.exceptions.ConfigParseException
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
 import csw.services.alarm.api.models.AlarmSeverity._
@@ -16,7 +17,7 @@ class ConfigParserTest extends FunSuite with Matchers {
 
     val expectedAlarmMetadataSet = Set(
       AlarmMetadata(
-        subsystem = "NFIRAOS",
+        subsystem = NFIRAOS,
         component = "trombone",
         name = "tromboneAxisHighLimitAlarm",
         description = "Warns when trombone axis has reached the high limit",
@@ -30,7 +31,7 @@ class ConfigParserTest extends FunSuite with Matchers {
         activationStatus = Active
       ),
       AlarmMetadata(
-        subsystem = "NFIRAOS",
+        subsystem = NFIRAOS,
         component = "trombone",
         name = "tromboneAxisLowLimitAlarm",
         description = "Warns when trombone axis has reached the low limit",
@@ -44,7 +45,7 @@ class ConfigParserTest extends FunSuite with Matchers {
         activationStatus = Active
       ),
       AlarmMetadata(
-        subsystem = "TCS",
+        subsystem = TCS,
         component = "tcsPk",
         name = "cpuExceededAlarm",
         description =
@@ -59,7 +60,7 @@ class ConfigParserTest extends FunSuite with Matchers {
         activationStatus = Active
       ),
       AlarmMetadata(
-        subsystem = "LGSF",
+        subsystem = LGSF,
         component = "tcsPkInactive",
         name = "cpuIdleAlarm",
         description = "This alarm is activated CPU is idle",

@@ -2,6 +2,7 @@ package csw.services.alarm.cli.args
 import java.io.ByteArrayOutputStream
 import java.nio.file.Paths
 
+import csw.messages.params.models.Subsystem.NFIRAOS
 import csw.services.BuildInfo
 import csw.services.alarm.api.models.AlarmSeverity.Major
 import org.scalatest.{FunSuite, Matchers}
@@ -69,7 +70,7 @@ class ArgsParserTest extends FunSuite with Matchers {
     silentParse(options) should contain(
       Options(
         cmd = "update",
-        subsystem = "NFIRAOS",
+        subsystem = Some(NFIRAOS),
         component = "trombone",
         name = "tromboneAxisHighLimitAlarm",
         severity = Major
@@ -91,7 +92,7 @@ class ArgsParserTest extends FunSuite with Matchers {
     silentParse(options) should contain(
       Options(
         cmd = "acknowledge",
-        subsystem = "NFIRAOS",
+        subsystem = Some(NFIRAOS),
         component = "trombone",
         name = "tromboneAxisHighLimitAlarm"
       )
@@ -107,7 +108,7 @@ class ArgsParserTest extends FunSuite with Matchers {
     val options = Array(
       "activate",
       "--subsystem",
-      "NFIRAOS",
+      "nfiraos",
       "--component",
       "trombone",
       "--name",
@@ -117,7 +118,7 @@ class ArgsParserTest extends FunSuite with Matchers {
     silentParse(options) should contain(
       Options(
         cmd = "activate",
-        subsystem = "NFIRAOS",
+        subsystem = Some(NFIRAOS),
         component = "trombone",
         name = "tromboneAxisHighLimitAlarm"
       )
@@ -138,7 +139,7 @@ class ArgsParserTest extends FunSuite with Matchers {
     silentParse(options) should contain(
       Options(
         cmd = "deactivate",
-        subsystem = "NFIRAOS",
+        subsystem = Some(NFIRAOS),
         component = "trombone",
         name = "tromboneAxisHighLimitAlarm"
       )
@@ -167,7 +168,7 @@ class ArgsParserTest extends FunSuite with Matchers {
     silentParse(options) should contain(
       Options(
         cmd = "shelve",
-        subsystem = "NFIRAOS",
+        subsystem = Some(NFIRAOS),
         component = "trombone",
         name = "tromboneAxisHighLimitAlarm"
       )
@@ -188,7 +189,7 @@ class ArgsParserTest extends FunSuite with Matchers {
     silentParse(options) should contain(
       Options(
         cmd = "unshelve",
-        subsystem = "NFIRAOS",
+        subsystem = Some(NFIRAOS),
         component = "trombone",
         name = "tromboneAxisHighLimitAlarm"
       )

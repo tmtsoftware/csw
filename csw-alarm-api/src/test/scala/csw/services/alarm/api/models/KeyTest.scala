@@ -1,4 +1,6 @@
 package csw.services.alarm.api.models
+import csw.messages.params.models.Subsystem
+import csw.messages.params.models.Subsystem.NFIRAOS
 import csw.services.alarm.api.models.Key.{AlarmKey, ComponentKey, GlobalKey, SubsystemKey}
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.{FunSuite, Matchers}
@@ -6,17 +8,17 @@ import org.scalatest.{FunSuite, Matchers}
 // DEOPSCSW-435: Identify Alarm by Subsystem, component and AlarmName
 class KeyTest extends FunSuite with Matchers with TableDrivenPropertyChecks {
   test("AlarmKey should be representing a unique alarm") {
-    val tromboneAxisHighLimitAlarm = AlarmKey("nfiraos", "trombone", "tromboneAxisHighLimitAlarm")
+    val tromboneAxisHighLimitAlarm = AlarmKey(NFIRAOS, "trombone", "tromboneAxisHighLimitAlarm")
     tromboneAxisHighLimitAlarm.value shouldEqual "nfiraos.trombone.tromboneaxishighlimitalarm"
   }
 
   test("SubsystemKey should be representing keys for all alarms of a subsystem") {
-    val subsystemKey = SubsystemKey("nfiraos")
+    val subsystemKey = SubsystemKey(NFIRAOS)
     subsystemKey.value shouldEqual "nfiraos.*.*"
   }
 
   test("ComponentKey should be representing keys for all alarms of a component") {
-    val subsystemKey = ComponentKey("nfiraos", "trombone")
+    val subsystemKey = ComponentKey(NFIRAOS, "trombone")
     subsystemKey.value shouldEqual "nfiraos.trombone.*"
   }
 
@@ -29,7 +31,7 @@ class KeyTest extends FunSuite with Matchers with TableDrivenPropertyChecks {
   invalidCharacers.foreach(character => {
     test(s"AlarmKey should not allow '$character' character") {
       intercept[IllegalArgumentException] {
-        AlarmKey("nfiraos", "trombone", character)
+        AlarmKey(NFIRAOS, "trombone", character)
       }
     }
   })
@@ -37,34 +39,20 @@ class KeyTest extends FunSuite with Matchers with TableDrivenPropertyChecks {
   invalidCharacers.foreach(character => {
     test(s"ComponentKey should not allow '$character' character") {
       intercept[IllegalArgumentException] {
-        ComponentKey("nfiraos", character)
+        ComponentKey(NFIRAOS, character)
       }
     }
   })
-
-  invalidCharacers.foreach(character => {
-    test(s"SubsystemKey should not allow '$character' character") {
-      intercept[IllegalArgumentException] {
-        SubsystemKey(character)
-      }
-    }
-  })
-
-  test("SubsystemKey should not allow empty subsystem") {
-    intercept[IllegalArgumentException] {
-      SubsystemKey("")
-    }
-  }
 
   test("ComponentKey should not allow empty values") {
     intercept[IllegalArgumentException] {
-      ComponentKey("test", null)
+      ComponentKey(Subsystem.TEST, null)
     }
   }
 
   test("AlarmKey should not allow empty values") {
     intercept[IllegalArgumentException] {
-      Key.AlarmKey("test", "test", "")
+      Key.AlarmKey(Subsystem.TEST, "test", "")
     }
   }
 }

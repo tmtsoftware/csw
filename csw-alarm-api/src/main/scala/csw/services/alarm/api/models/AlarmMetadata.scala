@@ -1,4 +1,5 @@
 package csw.services.alarm.api.models
+import csw.messages.params.models.Subsystem
 import csw.services.alarm.api.internal.AlarmRW
 import csw.services.alarm.api.models.ActivationStatus.Active
 import csw.services.alarm.api.models.Key.AlarmKey
@@ -22,7 +23,7 @@ import upickle.default.{macroRW, ReadWriter ⇒ RW}
  * @param isLatchable           represents whether alarm is to be latched or not
  */
 case class AlarmMetadata(
-    subsystem: String,
+    subsystem: Subsystem,
     component: String,
     name: String,
     description: String,

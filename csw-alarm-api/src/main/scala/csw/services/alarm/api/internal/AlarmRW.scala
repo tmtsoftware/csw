@@ -1,5 +1,6 @@
 package csw.services.alarm.api.internal
 
+import csw.messages.params.models.Subsystem
 import csw.services.alarm.api.models.Key.{AlarmKey, ComponentKey, SubsystemKey}
 import csw.services.alarm.api.models._
 import upickle.default.{readwriter, ReadWriter ⇒ RW, _}
@@ -17,6 +18,7 @@ trait AlarmRW {
   implicit val alarmTimeRW: RW[AlarmTime]     = readwriter[String].bimap(_.value, AlarmTime.apply)
 
   implicit val alarmStatusRW: RW[AlarmStatus]                     = macroRW
+  implicit val subsystemRW: RW[Subsystem]                         = EnumUpickleSupport.enumFormat
   implicit val alarmSeverityRW: RW[AlarmSeverity]                 = EnumUpickleSupport.enumFormat
   implicit val acknowledgementStatusRW: RW[AcknowledgementStatus] = EnumUpickleSupport.enumFormat
   implicit val activationStatusRW: RW[ActivationStatus]           = EnumUpickleSupport.enumFormat

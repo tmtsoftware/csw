@@ -2,6 +2,7 @@ package csw.services.alarm.cli.args
 
 import java.nio.file.Paths
 
+import csw.messages.params.models.Subsystem
 import csw.services.alarm.api.models.AlarmSeverity
 import scopt.{OptionDef, OptionParser}
 
@@ -25,7 +26,7 @@ trait Arguments { self: OptionParser[Options] =>
   def subsystem: OptionDef[String, Options] =
     opt[String]("subsystem")
       .required()
-      .action((subsystem, args) ⇒ args.copy(subsystem = subsystem))
+      .action((subsystemName, args) ⇒ args.copy(subsystem = Some(Subsystem.withNameInsensitive(subsystemName))))
       .text("subsystem of an alarm e.g. NFIRAOS")
 
   def component: OptionDef[String, Options] =
