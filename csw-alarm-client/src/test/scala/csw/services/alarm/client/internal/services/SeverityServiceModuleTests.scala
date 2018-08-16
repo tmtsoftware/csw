@@ -1,16 +1,17 @@
 package csw.services.alarm.client.internal.services
 
 import com.typesafe.config.ConfigFactory
-import csw.messages.params.models.Subsystem.{BAD, LGSF, NFIRAOS}
+import csw.messages.params.models.Subsystem.{AOESW, BAD, LGSF, NFIRAOS}
 import csw.services.alarm.api.exceptions.{InactiveAlarmException, InvalidSeverityException, KeyNotFoundException}
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, UnAcknowledged}
+import csw.services.alarm.api.models.ActivationStatus.Active
 import csw.services.alarm.api.models.AlarmSeverity._
 import csw.services.alarm.api.models.Key.{AlarmKey, ComponentKey, GlobalKey, SubsystemKey}
 import csw.services.alarm.api.models.LatchStatus.{Latched, UnLatched}
 import csw.services.alarm.api.models.ShelveStatus._
-import csw.services.alarm.api.models.{AlarmSeverity, AlarmStatus, Key}
-import csw.services.alarm.client.internal.helpers.AlarmServiceTestSetup
+import csw.services.alarm.api.models._
 import csw.services.alarm.client.internal.helpers.TestFutureExt.RichFuture
+import csw.services.alarm.client.internal.helpers.{AcknowledgeAndLatchTestCase, AlarmServiceTestSetup, SetSeverityTestCase}
 
 class SeverityServiceModuleTests
     extends AlarmServiceTestSetup
@@ -189,6 +190,233 @@ class SeverityServiceModuleTests
     val invalidAlarm = Key.ComponentKey(LGSF, "tcsPkInactive")
     an[InactiveAlarmException] shouldBe thrownBy(getAggregatedSeverity(invalidAlarm).await)
   }
+
+  val setSeverityTestCases: Array[SetSeverityTestCase] = Array(
+    SetSeverityTestCase(
+      alarmKey = AlarmKey(AOESW, "test_component", "low_latchable=>high_latchable"),
+      oldSeverity = Warning,
+      newSeverity = Major,
+      expectedLatchedSeverity = Major
+    ),
+    SetSeverityTestCase(
+      alarmKey = AlarmKey(AOESW, "test_component", "low_unlatable=>hig_latchable"),
+      oldSeverity = Disconnected,
+      newSeverity = Critical,
+      expectedLatchedSeverity = Critical
+    ),
+    SetSeverityTestCase(
+      alarmKey = AlarmKey(AOESW, "test_component", "high_latchable=>low_latchable"),
+      oldSeverity = Major,
+      newSeverity = Warning,
+      expectedLatchedSeverity = Major
+    ),
+    SetSeverityTestCase(
+      alarmKey = AlarmKey(AOESW, "test_component", "high_unlatable=>low_latchable"),
+      oldSeverity = Disconnected,
+      newSeverity = Major,
+      expectedLatchedSeverity = Major
+    )
+  )
+
+  //DEOPSCSW-444 : Set severity api for component
+  setSeverityTestCases.foreach(
+    testCase =>
+      test(testCase.toString) {
+
+        // Adding metadata for corresponding test in alarm store
+
+        setMetadata(
+          testCase.alarmKey,
+          AlarmMetadata(
+            subsystem = testCase.alarmKey.subsystem,
+            component = testCase.alarmKey.component,
+            name = testCase.alarmKey.name,
+            description = "for test purpose",
+            location = "testing",
+            AlarmType.Absolute,
+            Set(Okay, Warning, Major, Indeterminate, Critical),
+            probableCause = "test",
+            operatorResponse = "test",
+            isAutoAcknowledgeable = true,
+            isLatchable = true,
+            activationStatus = Active
+          )
+        ).await
+
+        // Adding status for corresponding test in alarm store
+        (testCase.alarmKey, testCase.oldSeverity) match {
+          case (alarmKey, severity) if severity == Disconnected =>
+            setStatus(alarmKey, AlarmStatus()).await
+          case (alarmKey, severity) =>
+            setStatus(
+              alarmKey,
+              AlarmStatus(
+                latchedSeverity = severity,
+                latchStatus = if (severity.latchable) Latched else UnLatched
+              )
+            ).await
+        }
+
+        //set severity to new Severity
+        val status = setSeverityAndGetStatus(testCase.alarmKey, testCase.newSeverity)
+
+        //get severity and assert
+        status.latchedSeverity shouldEqual testCase.expectedLatchedSeverity
+    }
+  )
+
+  val ackAndLatchTestCases = Array(
+    AcknowledgeAndLatchTestCase(
+      alarmKey = AlarmKey(AOESW, "test", "AutoAcknowledgeble_Latchable_Disconnected=>Okay"),
+      isAutoAcknowledgeble = true,
+      isAlarmLachable = true,
+      oldSeverity = Disconnected,
+      newSeverity = Okay,
+      expectedAckStatus = Acknowledged,
+      expectedLatchStatus = Latched
+    ),
+    AcknowledgeAndLatchTestCase(
+      alarmKey = AlarmKey(AOESW, "test", "NotAutoAcknowledgeble_Latchable_Disconnected=>Okay"),
+      isAutoAcknowledgeble = false,
+      isAlarmLachable = true,
+      oldSeverity = Disconnected,
+      newSeverity = Okay,
+      expectedAckStatus = Acknowledged,
+      expectedLatchStatus = Latched
+    ),
+    AcknowledgeAndLatchTestCase(
+      alarmKey = AlarmKey(AOESW, "test", "AutoAcknowledgeble_NotLatchable_Disconnected=>Okay"),
+      isAutoAcknowledgeble = true,
+      isAlarmLachable = false,
+      oldSeverity = Disconnected,
+      newSeverity = Okay,
+      expectedAckStatus = Acknowledged,
+      expectedLatchStatus = UnLatched
+    ),
+    AcknowledgeAndLatchTestCase(
+      alarmKey = AlarmKey(AOESW, "test", "NotAutoAcknowledgeble_NotLatchable_Disconnected=>Okay"),
+      isAutoAcknowledgeble = false,
+      isAlarmLachable = false,
+      oldSeverity = Disconnected,
+      newSeverity = Okay,
+      expectedAckStatus = Acknowledged,
+      expectedLatchStatus = UnLatched
+    ),
+    AcknowledgeAndLatchTestCase(
+      alarmKey = AlarmKey(AOESW, "test", "AutoAcknowledgeble_Latchable_Okay=>Critical"),
+      isAutoAcknowledgeble = true,
+      isAlarmLachable = true,
+      oldSeverity = Okay,
+      newSeverity = Critical,
+      expectedAckStatus = Acknowledged,
+      expectedLatchStatus = Latched
+    ),
+    AcknowledgeAndLatchTestCase(
+      alarmKey = AlarmKey(AOESW, "test", "NotAutoAcknowledgeble_Latchable_Okay=>Critical"),
+      isAutoAcknowledgeble = false,
+      isAlarmLachable = true,
+      oldSeverity = Okay,
+      newSeverity = Critical,
+      expectedAckStatus = UnAcknowledged,
+      expectedLatchStatus = Latched
+    ),
+    AcknowledgeAndLatchTestCase(
+      alarmKey = AlarmKey(AOESW, "test", "AutoAcknowledgeble_NotLatchable_Okay=>Critical"),
+      isAutoAcknowledgeble = true,
+      isAlarmLachable = false,
+      oldSeverity = Okay,
+      newSeverity = Critical,
+      expectedAckStatus = Acknowledged,
+      expectedLatchStatus = UnLatched
+    ),
+    AcknowledgeAndLatchTestCase(
+      alarmKey = AlarmKey(AOESW, "test", "NotAutoAcknowledgeble_NotLatchable_Okay=>Critical"),
+      isAutoAcknowledgeble = false,
+      isAlarmLachable = false,
+      oldSeverity = Okay,
+      newSeverity = Critical,
+      expectedAckStatus = UnAcknowledged,
+      expectedLatchStatus = UnLatched
+    ),
+    AcknowledgeAndLatchTestCase(
+      alarmKey = AlarmKey(AOESW, "test", "AutoAcknowledgeble_Latchable_Critical=>Okay"),
+      isAutoAcknowledgeble = true,
+      isAlarmLachable = true,
+      oldSeverity = Critical,
+      newSeverity = Okay,
+      expectedAckStatus = Acknowledged,
+      expectedLatchStatus = Latched
+    ),
+    AcknowledgeAndLatchTestCase(
+      alarmKey = AlarmKey(AOESW, "test", "NotAutoAcknowledgeble_Latchable_Critical=>Okay"),
+      isAutoAcknowledgeble = false,
+      isAlarmLachable = true,
+      oldSeverity = Critical,
+      newSeverity = Okay,
+      expectedAckStatus = UnAcknowledged,
+      expectedLatchStatus = Latched
+    ),
+    AcknowledgeAndLatchTestCase(
+      alarmKey = AlarmKey(AOESW, "test", "AutoAcknowledgeble_NotLatchable_Critical=>Okay"),
+      isAutoAcknowledgeble = true,
+      isAlarmLachable = false,
+      oldSeverity = Critical,
+      newSeverity = Okay,
+      expectedAckStatus = Acknowledged,
+      expectedLatchStatus = UnLatched
+    ),
+    AcknowledgeAndLatchTestCase(
+      alarmKey = AlarmKey(AOESW, "test", "NotAutoAcknowledgeble_NotLatchable_Critical=>Okay"),
+      isAutoAcknowledgeble = false,
+      isAlarmLachable = false,
+      oldSeverity = Critical,
+      newSeverity = Okay,
+      expectedAckStatus = Acknowledged,
+      expectedLatchStatus = UnLatched
+    )
+  )
+
+  //DEOPSCSW-444 : Set severity api for component
+  ackAndLatchTestCases.foreach(
+    testCase =>
+      test(testCase.toString) {
+        //test setup
+        setMetadata(
+          testCase.alarmKey,
+          AlarmMetadata(
+            subsystem = testCase.alarmKey.subsystem,
+            component = testCase.alarmKey.component,
+            name = testCase.alarmKey.name,
+            description = "for test purpose",
+            location = "testing",
+            AlarmType.Absolute,
+            Set(Okay, Warning, Major, Indeterminate, Critical),
+            probableCause = "test",
+            operatorResponse = "test",
+            isAutoAcknowledgeable = testCase.isAutoAcknowledgeble,
+            isLatchable = testCase.isAlarmLachable,
+            activationStatus = Active
+          )
+        ).await
+
+        setStatus(
+          testCase.alarmKey,
+          AlarmStatus(
+            latchedSeverity = testCase.oldSeverity,
+            acknowledgementStatus =
+              if (testCase.isAutoAcknowledgeble || testCase.oldSeverity == Okay) Acknowledged else UnAcknowledged,
+            latchStatus = if (testCase.isAlarmLachable && testCase.oldSeverity.latchable) Latched else UnLatched
+          )
+        ).await
+
+        //set severity to new Severity
+        val status = setSeverityAndGetStatus(testCase.alarmKey, testCase.newSeverity)
+
+        //get severity and assert
+        status.acknowledgementStatus shouldEqual testCase.expectedAckStatus
+        status.latchStatus shouldEqual testCase.expectedLatchStatus
+    }
+  )
 
   //  test("getStatus should throw exception if key does not exist") {
   //    val invalidAlarm = AlarmKey("invalid", "invalid", "invalid")
