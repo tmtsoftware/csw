@@ -4,6 +4,7 @@ import java.nio.file.Paths
 
 import com.typesafe.config.ConfigFactory
 import csw.messages.params.models.Subsystem.{LGSF, NFIRAOS, TCS}
+import csw.services.alarm.api.exceptions.KeyNotFoundException
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
 import csw.services.alarm.api.models.AlarmSeverity.Major
@@ -246,5 +247,91 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     commandExecutor.execute(listCmd)
 
     logBuffer shouldEqualContentsOf "metadata/all_alarms.txt"
+  }
+
+  // DEOPSCSW-492: Fetch all alarms' metadata from CLI Interface (list all alarms)
+  test("should list alarms for specified subsystem") {
+
+    // init alarm store
+    val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
+    val initCmd  = Options("init", Some(filePath), isLocal = true, reset = true)
+    commandExecutor.execute(initCmd)
+    logBuffer.clear()
+
+    // list alarms
+    val listCmd = Options("list", maybeSubsystem = Some(NFIRAOS))
+
+    commandExecutor.execute(listCmd)
+
+    logBuffer shouldEqualContentsOf "metadata/subsystem_alarms.txt"
+  }
+
+  // DEOPSCSW-492: Fetch all alarms' metadata from CLI Interface (list all alarms)
+  test("should list alarms for specified component") {
+
+    // init alarm store
+    val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
+    val initCmd  = Options("init", Some(filePath), isLocal = true, reset = true)
+    commandExecutor.execute(initCmd)
+    logBuffer.clear()
+
+    // list alarms
+    val listCmd = Options(
+      "list",
+      maybeSubsystem = Some(NFIRAOS),
+      maybeComponent = Some("trombone")
+    )
+
+    commandExecutor.execute(listCmd)
+
+    logBuffer shouldEqualContentsOf "metadata/component_alarms.txt"
+  }
+
+  // DEOPSCSW-492: Fetch all alarms' metadata from CLI Interface (list all alarms)
+  test("should list the alarm for specified name") {
+
+    // init alarm store
+    val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
+    val initCmd  = Options("init", Some(filePath), isLocal = true, reset = true)
+    commandExecutor.execute(initCmd)
+    logBuffer.clear()
+
+    // list alarms
+    val listCmd = Options(
+      "list",
+      maybeSubsystem = Some(NFIRAOS),
+      maybeComponent = Some("trombone"),
+      maybeAlarmName = Some(tromboneAxisLowLimitKey.name)
+    )
+
+    commandExecutor.execute(listCmd)
+
+    logBuffer shouldEqualContentsOf "metadata/with_name_alarms.txt"
+  }
+
+  // DEOPSCSW-492: Fetch all alarms' metadata from CLI Interface (list all alarms)
+  test("should fail on invalid component/alarm name") {
+
+    // init alarm store
+    val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
+    val initCmd  = Options("init", Some(filePath), isLocal = true, reset = true)
+    commandExecutor.execute(initCmd)
+    logBuffer.clear()
+
+    val invalidComponentCmd = Options(
+      "list",
+      maybeSubsystem = Some(NFIRAOS),
+      maybeComponent = Some("invalid")
+    )
+
+    val invalidAlarmNameCmd = Options(
+      "list",
+      maybeSubsystem = Some(NFIRAOS),
+      maybeComponent = Some("trombone"),
+      maybeAlarmName = Some("invalid")
+    )
+
+    intercept[KeyNotFoundException] { commandExecutor.execute(invalidComponentCmd) }
+    intercept[KeyNotFoundException] { commandExecutor.execute(invalidAlarmNameCmd) }
   }
 }
