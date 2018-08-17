@@ -1,6 +1,6 @@
 package csw.services.alarm.cli.utils
 
-import csw.services.alarm.api.models.{AlarmMetadata, AlarmStatus, AlarmTime}
+import csw.services.alarm.api.models.{AlarmMetadata, AlarmSeverity, AlarmStatus}
 
 object Formatter {
 
@@ -43,5 +43,7 @@ object Formatter {
       s"Alarm Time: ${alarmTime.map(_.time.toString).getOrElse("")}"
     ).mkString(Newline)
   }
+
+  def formatSeverity(severity: AlarmSeverity): String = s"Current Alarm Severity: ${severity.toString}"
 
 }

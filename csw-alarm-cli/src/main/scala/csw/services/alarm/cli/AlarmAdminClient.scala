@@ -27,10 +27,15 @@ class AlarmAdminClient(
       await(alarmService.initAlarms(config, options.reset))
     }.transformWithSideEffect(printLine)
 
-  def severity(options: Options): Future[Unit] =
-    alarmServiceF
-      .flatMap(_.setSeverity(options.alarmKey, options.severity.get))
-      .transformWithSideEffect(printLine)
+  def severity(options: Options): Future[Unit] = async {
+    val alarmService = await(alarmServiceF)
+    options.severity match {
+      case Some(_) ⇒ await(alarmService.setSeverity(options.alarmKey, options.severity.get).transformWithSideEffect(printLine))
+      case None ⇒
+        val severity = await(alarmService.getCurrentSeverity(options.alarmKey))
+        printLine(Formatter.formatSeverity(severity))
+    }
+  }
 
   def acknowledge(options: Options): Future[Unit] =
     alarmServiceF

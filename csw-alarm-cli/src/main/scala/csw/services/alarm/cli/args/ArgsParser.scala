@@ -11,9 +11,9 @@ class ArgsParser(name: String) {
       .text("initialize the alarm store")
       .children(filePath, localConfig, reset)
 
-    cmd("update")
-      .action((_, args) ⇒ args.copy(cmd = "update"))
-      .text("set severity of an alarm")
+    cmd("severity")
+      .action((_, args) ⇒ args.copy(cmd = "severity"))
+      .text("get/set severity of an alarm")
       .children(subsystem.required(), component.required(), alarmName.required(), severity)
 
     cmd("acknowledge")

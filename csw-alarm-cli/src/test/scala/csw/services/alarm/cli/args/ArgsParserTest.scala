@@ -49,14 +49,9 @@ class ArgsParserTest extends FunSuite with Matchers {
     )
   }
 
-  test("parse update command without any options") {
-    val options = Array("update")
-    silentParse(options) shouldBe None
-  }
-
-  test("parse update command with all options") {
+  test("parse severity command with severity option") {
     val options = Array(
-      "update",
+      "severity",
       "--subsystem",
       "NFIRAOS",
       "--component",
@@ -69,7 +64,7 @@ class ArgsParserTest extends FunSuite with Matchers {
 
     silentParse(options) should contain(
       Options(
-        cmd = "update",
+        cmd = "severity",
         maybeSubsystem = Some(NFIRAOS),
         maybeComponent = Some("trombone"),
         maybeAlarmName = Some("tromboneAxisHighLimitAlarm"),
@@ -78,7 +73,8 @@ class ArgsParserTest extends FunSuite with Matchers {
     )
   }
 
-  val commands = List("acknowledge", "unacknowledge", "activate", "deactivate", "shelve", "unshelve", "reset", "status")
+  val commands =
+    List("severity", "acknowledge", "unacknowledge", "activate", "deactivate", "shelve", "unshelve", "reset", "status")
 
   commands.foreach { command ⇒
     test(s"parse $command command") {

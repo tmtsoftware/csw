@@ -7,6 +7,7 @@ import csw.messages.params.models.Subsystem.{LGSF, NFIRAOS, TCS}
 import csw.services.alarm.api.exceptions.KeyNotFoundException
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
+import csw.services.alarm.api.models.AlarmSeverity.Disconnected
 import csw.services.alarm.api.models.ExplicitAlarmSeverity.{Major, Okay}
 import csw.services.alarm.api.models.Key.{AlarmKey, GlobalKey}
 import csw.services.alarm.api.models.ShelveStatus.{Shelved, Unshelved}
@@ -97,7 +98,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
     // update severity of an alarm
     val updateCmd = Options(
-      "update",
+      "severity",
       maybeSubsystem = Some(tromboneAxisHighLimitKey.subsystem),
       maybeComponent = Some(tromboneAxisHighLimitKey.component),
       maybeAlarmName = Some(tromboneAxisHighLimitKey.name),
@@ -108,6 +109,27 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     adminService.getCurrentSeverity(tromboneAxisHighLimitKey).futureValue shouldBe Major
 
     logBuffer shouldEqual List(successMsg)
+  }
+
+  // DEOPSCSW-476: Fetch alarm severity from CLI Interface
+  test("should get severity of alarm") {
+
+    // init alarm store
+    val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
+    val initCmd  = Options("init", Some(filePath), isLocal = true, reset = true)
+    commandExecutor.execute(initCmd)
+    logBuffer.clear()
+
+    // fetch severity of an alarm
+    val getCmd = Options(
+      "severity",
+      maybeSubsystem = Some(tromboneAxisHighLimitKey.subsystem),
+      maybeComponent = Some(tromboneAxisHighLimitKey.component),
+      maybeAlarmName = Some(tromboneAxisHighLimitKey.name)
+    )
+    commandExecutor.execute(getCmd)
+
+    logBuffer shouldEqual List("Current Alarm Severity: Disconnected")
   }
 
   // DEOPSCSW-471: Acknowledge alarm from CLI application

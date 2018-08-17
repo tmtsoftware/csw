@@ -40,7 +40,6 @@ trait Arguments { self: OptionParser[Options] =>
 
   def severity: OptionDef[String, Options] =
     opt[String]("severity")
-      .required()
       .action(
         (severity, args) ⇒ args.copy(severity = Some(ExplicitAlarmSeverity.withNameInsensitive(severity)))
       )
