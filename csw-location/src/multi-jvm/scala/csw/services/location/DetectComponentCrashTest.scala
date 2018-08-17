@@ -1,7 +1,7 @@
 package csw.services.location
 
-import akka.stream.scaladsl.Keep
-import akka.stream.testkit.scaladsl.TestSink
+import akka.actor.testkit.typed.scaladsl.TestProbe
+import akka.stream.scaladsl.{Keep, Sink}
 import csw.messages.location.Connection.{HttpConnection, TcpConnection}
 import csw.messages.location._
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
@@ -29,20 +29,24 @@ class DetectComponentCrashTest(ignore: Int, mode: String) extends LSNodeSpec(con
     val tcpConnection2 = TcpConnection(ComponentId("Assembly3", ComponentType.Assembly))
 
     runOn(seed) {
-      val (_, httpProbe) = locationService.track(httpConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
-      val (_, tcpProbe1) = locationService.track(tcpConnection1).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
-      val (_, tcpProbe2) = locationService.track(tcpConnection2).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
+      val httpProbe = TestProbe[TrackingEvent]("test-probe1")
+      val tcpProbe1 = TestProbe[TrackingEvent]("test-probe2")
+      val tcpProbe2 = TestProbe[TrackingEvent]("test-probe3")
+
+      val switch1 = locationService.track(httpConnection).toMat(Sink.foreach(httpProbe.ref.tell(_)))(Keep.left).run()
+      val switch2 = locationService.track(tcpConnection1).toMat(Sink.foreach(tcpProbe1.ref.tell(_)))(Keep.left).run()
+      val switch3 = locationService.track(tcpConnection2).toMat(Sink.foreach(tcpProbe2.ref.tell(_)))(Keep.left).run()
       enterBarrier("Registration")
 
-      httpProbe.requestNext() shouldBe a[LocationUpdated]
-      tcpProbe1.requestNext() shouldBe a[LocationUpdated]
-      tcpProbe2.requestNext() shouldBe a[LocationUpdated]
+      httpProbe.expectMessageType[LocationUpdated]
+      tcpProbe1.expectMessageType[LocationUpdated]
+      tcpProbe2.expectMessageType[LocationUpdated]
       Thread.sleep(2000)
 
       Await.result(testConductor.exit(member1, 0), 5.seconds)
       within(20.seconds) {
         awaitAssert {
-          httpProbe.requestNext(20.seconds) shouldBe a[LocationRemoved]
+          httpProbe.expectMessageType[LocationRemoved](20.seconds)
         }
       }
 
@@ -51,10 +55,15 @@ class DetectComponentCrashTest(ignore: Int, mode: String) extends LSNodeSpec(con
 
       within(20.seconds) {
         awaitAssert {
-          tcpProbe1.requestNext(20.seconds) shouldBe a[LocationRemoved]
-          tcpProbe2.requestNext(20.seconds) shouldBe a[LocationRemoved]
+          tcpProbe1.expectMessageType[LocationRemoved](20.seconds)
+          tcpProbe2.expectMessageType[LocationRemoved](20.seconds)
         }
       }
+
+      //clean up
+      switch1.shutdown()
+      switch2.shutdown()
+      switch3.shutdown()
     }
 
     runOn(member1) {

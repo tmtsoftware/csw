@@ -1,9 +1,9 @@
 package csw.services.location
 
+import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.stream.scaladsl.Keep
-import akka.stream.testkit.scaladsl.TestSink
+import akka.stream.scaladsl.{Keep, Sink}
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location._
 import csw.services.location.commons.TestFutureExtension.RichFuture
@@ -84,23 +84,21 @@ class LocationServiceTest(ignore: Int, mode: String)
     }
 
     runOn(member) {
-      val (switch, probe) = locationService.track(akkaConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
+      val probe = TestProbe[TrackingEvent]("test-probe")
 
-      probe.request(1)
-      probe.requestNext() shouldBe a[LocationUpdated]
+      val switch = locationService.track(akkaConnection).toMat(Sink.foreach(probe.ref.tell(_)))(Keep.left).run()
+
+      probe.expectMessageType[LocationUpdated]
       enterBarrier("Registration")
 
-      probe.request(1)
-      probe.requestNext() shouldBe a[LocationRemoved]
+      probe.expectMessageType[LocationRemoved]
       enterBarrier("Unregister")
 
-      probe.request(1)
-      probe.requestNext() shouldBe a[LocationUpdated]
+      probe.expectMessageType[LocationUpdated]
       enterBarrier("Re-registration")
 
+      // clean up
       switch.shutdown()
-      probe.request(1)
-      probe.expectComplete()
     }
     enterBarrier("after-3")
   }

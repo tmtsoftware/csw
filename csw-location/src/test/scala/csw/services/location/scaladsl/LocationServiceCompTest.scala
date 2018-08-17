@@ -1,10 +1,10 @@
 package csw.services.location.scaladsl
 
+import akka.actor.testkit.typed.scaladsl
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.actor.{ActorSystem, PoisonPill}
-import akka.stream.scaladsl.Keep
-import akka.stream.testkit.scaladsl.TestSink
+import akka.actor.{typed, ActorSystem, PoisonPill}
+import akka.stream.scaladsl.{Keep, Sink}
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.testkit.TestProbe
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
@@ -35,9 +35,10 @@ class LocationServiceCompTest(mode: String)
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
   InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
 
-  implicit val actorSystem: ActorSystem = ActorSystemFactory.remote("test")
-  implicit val ec: ExecutionContext     = actorSystem.dispatcher
-  implicit val mat: Materializer        = ActorMaterializer()
+  implicit val actorSystem: ActorSystem          = ActorSystemFactory.remote("test")
+  implicit val typedSystem: typed.ActorSystem[_] = actorSystem.toTyped
+  implicit val ec: ExecutionContext              = actorSystem.dispatcher
+  implicit val mat: Materializer                 = ActorMaterializer()
 
   private lazy val locationService: LocationService = mode match {
     case "http"    => LocationServiceFactory.makeLocalHttpClient
@@ -162,21 +163,19 @@ class LocationServiceCompTest(mode: String)
     val redis2Connection   = TcpConnection(ComponentId("redis2", ComponentType.Service))
     val redis2registration = RegistrationFactory.tcp(redis2Connection, Port)
 
-    val (switch, probe) = locationService.track(redis1Connection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
+    val probe = scaladsl.TestProbe[TrackingEvent]("test-probe")
+
+    val switch = locationService.track(redis1Connection).toMat(Sink.foreach(probe.ref.tell(_)))(Keep.left).run()
 
     val result  = locationService.register(redis1Registration).await
     val result2 = locationService.register(redis2registration).await
-    probe.request(1)
-    probe.expectNext(LocationUpdated(redis1Registration.location(new Networks().hostname())))
+    probe.expectMessage(LocationUpdated(redis1Registration.location(new Networks().hostname())))
 
     result.unregister().await
     result2.unregister().await
-    probe.request(1)
-    probe.expectNext(LocationRemoved(redis1Connection))
+    probe.expectMessage(LocationRemoved(redis1Connection))
 
     switch.shutdown()
-    probe.request(1)
-    probe.expectComplete()
   }
 
   test("should be able to subscribe a tcp connection and receive notifications via callback") {
@@ -216,37 +215,28 @@ class LocationServiceCompTest(mode: String)
 
     val httpRegistrationResult = locationService.register(httpRegistration).await
     val akkaRegistrationResult = locationService.register(akkaRegistration).await
+    val httpProbe              = scaladsl.TestProbe[TrackingEvent]("http-probe")
+    val akkaProbe              = scaladsl.TestProbe[TrackingEvent]("akka-probe")
 
     //start tracking both http and akka connections
-    val (httpSwitch, httpProbe) =
-      locationService.track(httpConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
-    val (akkaSwitch, akkaProbe) =
-      locationService.track(akkaConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
+    val httpSwitch = locationService.track(httpConnection).toMat(Sink.foreach(httpProbe.ref.tell(_)))(Keep.left).run()
+    val akkaSwitch = locationService.track(akkaConnection).toMat(Sink.foreach(akkaProbe.ref.tell(_)))(Keep.left).run()
 
-    httpProbe.request(1)
-    httpProbe.expectNext(LocationUpdated(httpRegistration.location(hostname)))
-
-    akkaProbe.request(1)
-    akkaProbe.expectNext(LocationUpdated(akkaRegistration.location(hostname)))
+    httpProbe.expectMessage(LocationUpdated(httpRegistration.location(hostname)))
+    akkaProbe.expectMessage(LocationUpdated(akkaRegistration.location(hostname)))
 
     //unregister http connection
     httpRegistrationResult.unregister().await
-    httpProbe.request(1)
-    httpProbe.expectNext(LocationRemoved(httpConnection))
+    httpProbe.expectMessage(LocationRemoved(httpConnection))
 
     //stop tracking http connection
     httpSwitch.shutdown()
-    httpProbe.request(1)
-    httpProbe.expectComplete()
 
     //unregister and stop tracking akka connection
     akkaRegistrationResult.unregister().await
-    akkaProbe.request(1)
-    akkaProbe.expectNext(LocationRemoved(akkaConnection))
+    akkaProbe.expectMessage(LocationRemoved(akkaConnection))
 
     akkaSwitch.shutdown()
-    akkaProbe.request(1)
-    akkaProbe.expectComplete()
   }
 
   test("should able to stop tracking") {
@@ -259,17 +249,15 @@ class LocationServiceCompTest(mode: String)
 
     val httpRegistrationResult = locationService.register(httpRegistration).await
 
-    //start tracking http connection
-    val (httpSwitch, httpProbe) =
-      locationService.track(httpConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
+    val httpProbe = scaladsl.TestProbe[TrackingEvent]("test-probe")
 
-    httpProbe.request(1)
-    httpProbe.expectNext(LocationUpdated(httpRegistration.location(hostname)))
+    //start tracking http connection
+    val httpSwitch = locationService.track(httpConnection).toMat(Sink.foreach(httpProbe.ref.tell(_)))(Keep.left).run()
+
+    httpProbe.expectMessage(LocationUpdated(httpRegistration.location(hostname)))
 
     //stop tracking http connection
     httpSwitch.shutdown()
-    httpProbe.request(1)
-    httpProbe.expectComplete()
 
     httpRegistrationResult.unregister().await
 

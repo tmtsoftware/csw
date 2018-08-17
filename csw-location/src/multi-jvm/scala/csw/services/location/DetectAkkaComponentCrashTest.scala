@@ -1,9 +1,9 @@
 package csw.services.location
 
+import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.stream.scaladsl.Keep
-import akka.stream.testkit.scaladsl.TestSink
+import akka.stream.scaladsl.{Keep, Sink}
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
 import csw.messages.location._
 import csw.services.location.commons.{ActorSystemFactory, TestRegistrationFactory}
@@ -39,10 +39,13 @@ class DetectAkkaComponentCrashTest(ignore: Int, mode: String) extends LSNodeSpec
     val akkaConnection = AkkaConnection(ComponentId("Container1", ComponentType.Container))
 
     runOn(seed) {
-      val (switch, probe) = locationService.track(akkaConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
+
+      val probe = TestProbe[TrackingEvent]("test-probe")
+
+      val switch = locationService.track(akkaConnection).toMat(Sink.foreach(probe.ref.tell(_)))(Keep.left).run()
       enterBarrier("Registration")
 
-      probe.requestNext() shouldBe a[LocationUpdated]
+      probe.expectMessageType[LocationUpdated]
       Thread.sleep(2000)
 
       Await.result(testConductor.exit(member1, 0), 5.seconds)
@@ -53,11 +56,14 @@ class DetectAkkaComponentCrashTest(ignore: Int, mode: String) extends LSNodeSpec
       // if needed.
       within(5.seconds) {
         awaitAssert {
-          probe.requestNext(5.seconds) shouldBe a[LocationRemoved]
+          probe.expectMessageType[LocationRemoved](5.seconds)
         }
       }
 
       locationService.list.await.size shouldBe 1
+
+      // clean up
+      switch.shutdown()
     }
 
     runOn(member1) {
@@ -77,19 +83,23 @@ class DetectAkkaComponentCrashTest(ignore: Int, mode: String) extends LSNodeSpec
 
       val httpConnection   = HttpConnection(ComponentId("Assembly1", ComponentType.Assembly))
       val httpRegistration = HttpRegistration(httpConnection, port, prefix, LogAdminActorFactory.make(system))
+      val probe            = TestProbe[TrackingEvent]("test-probe")
 
       locationService.register(httpRegistration).await
 
       enterBarrier("Registration")
-      val (switch, probe) = locationService.track(akkaConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
+      val switch = locationService.track(akkaConnection).toMat(Sink.foreach(probe.ref.tell(_)))(Keep.left).run()
       Thread.sleep(2000)
       enterBarrier("after-crash")
 
       within(5.seconds) {
         awaitAssert {
-          probe.requestNext(5.seconds) shouldBe a[LocationRemoved]
+          probe.expectMessageType[LocationRemoved](5.seconds)
         }
       }
+
+      // clean up
+      switch.shutdown()
     }
     enterBarrier("end")
   }
