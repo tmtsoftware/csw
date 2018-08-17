@@ -1,5 +1,6 @@
 package csw.services.alarm.api.models
 
+import csw.services.alarm.api.models.ExplicitAlarmSeverity.findValues
 import enumeratum.EnumEntry.Lowercase
 import enumeratum.{Enum, EnumEntry}
 
@@ -30,7 +31,8 @@ object AlarmSeverity extends Enum[AlarmSeverity] {
   case object Disconnected extends AlarmSeverity(4, false)
 }
 
-sealed abstract class ExplicitAlarmSeverity private[alarm] (override val level: Int) extends AlarmSeverity(level, true)
+sealed abstract class ExplicitAlarmSeverity private[alarm] (override val level: Int, override val latchable: Boolean)
+    extends AlarmSeverity(level, latchable)
 
 object ExplicitAlarmSeverity extends Enum[ExplicitAlarmSeverity] {
 
@@ -39,10 +41,9 @@ object ExplicitAlarmSeverity extends Enum[ExplicitAlarmSeverity] {
    */
   def values: IndexedSeq[ExplicitAlarmSeverity] = findValues
 
-  case object Okay          extends ExplicitAlarmSeverity(0)
-  case object Warning       extends ExplicitAlarmSeverity(1)
-  case object Major         extends ExplicitAlarmSeverity(2)
-  case object Indeterminate extends ExplicitAlarmSeverity(3)
-  case object Critical      extends ExplicitAlarmSeverity(5)
-
+  case object Okay          extends ExplicitAlarmSeverity(0, false)
+  case object Warning       extends ExplicitAlarmSeverity(1, true)
+  case object Major         extends ExplicitAlarmSeverity(2, true)
+  case object Indeterminate extends ExplicitAlarmSeverity(3, true)
+  case object Critical      extends ExplicitAlarmSeverity(5, true)
 }

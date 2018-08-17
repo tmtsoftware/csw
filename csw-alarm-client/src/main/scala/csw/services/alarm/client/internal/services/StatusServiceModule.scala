@@ -80,20 +80,20 @@ trait StatusServiceModule extends StatusService {
     // get alarm status
     val status = await(getStatus(key))
 
-    object Latchable {
+    object AlarmLatchable {
       def unapply(alarmMetadata: AlarmMetadata): Boolean = alarmMetadata.isLatchable
     }
 
-    object NotLatchable {
+    object AlarmNotLatchable {
       def unapply(alarmMetadata: AlarmMetadata): Boolean = !alarmMetadata.isLatchable
     }
 
-    object IsUnLatched {
-      def unapply(status: AlarmStatus): Boolean = status.latchStatus == LatchStatus.UnLatched
+    object IsHigher {
+      def unapply(status: AlarmStatus): Boolean = severity > status.latchedSeverity
     }
 
-    object HigherLatchedSeverity {
-      def unapply(status: AlarmStatus): Boolean = severity > status.latchedSeverity
+    object IsNotHigher {
+      def unapply(status: AlarmStatus): Boolean = !(severity > status.latchedSeverity)
     }
 
     object IsAutoAcknowledgeable {
@@ -104,13 +104,38 @@ trait StatusServiceModule extends StatusService {
       def unapply(status: AlarmStatus): Boolean = status.latchedSeverity == Okay
     }
 
-    val setLatchSeverity = status.copy(latchedSeverity = severity, alarmTime = Some(AlarmTime()))
+    object LatchableSeverity {
+      def unapply(alarmSeverity: AlarmSeverity): Boolean = alarmSeverity.latchable
+    }
 
-    val updatedStatus = (alarm, status) match {
-      case (Latchable(), HigherLatchedSeverity())                    ⇒ setLatchSeverity.copy(latchStatus = Latched)
-      case (Latchable(), IsUnLatched())                              ⇒ setLatchSeverity.copy(latchStatus = Latched)
-      case (NotLatchable(), _) if severity != status.latchedSeverity ⇒ setLatchSeverity
-      case _                                                         ⇒ status
+    object UnlatchableSeverity {
+      def unapply(alarmSeverity: AlarmSeverity): Boolean = !alarmSeverity.latchable
+    }
+
+    object AlreadyLatched {
+      def unapply(status: AlarmStatus): Boolean = status.latchStatus == Latched
+    }
+
+    object NotLatched {
+      def unapply(status: AlarmStatus): Boolean = status.latchStatus == UnLatched
+    }
+
+    val setLatchSeverity              = status.copy(latchedSeverity = severity)
+    val setLatchSeverityAndLatchAlarm = status.copy(latchedSeverity = severity, latchStatus = Latched)
+
+    object & {
+      def unapply[T](arg: T): Option[(T, T)] = Some((arg, arg))
+    }
+
+    val updatedStatus = (alarm, severity, status) match {
+      case (AlarmLatchable(), LatchableSeverity(), NotLatched() & IsHigher())         => setLatchSeverityAndLatchAlarm
+      case (AlarmLatchable(), LatchableSeverity(), NotLatched() & IsNotHigher())      => setLatchSeverityAndLatchAlarm
+      case (AlarmLatchable(), LatchableSeverity(), AlreadyLatched() & IsHigher())     => setLatchSeverity
+      case (AlarmLatchable(), UnlatchableSeverity(), NotLatched() & IsNotHigher())    => setLatchSeverity
+      case (AlarmNotLatchable(), LatchableSeverity(), NotLatched() & IsHigher())      => setLatchSeverity
+      case (AlarmNotLatchable(), LatchableSeverity(), NotLatched() & IsNotHigher())   => setLatchSeverity
+      case (AlarmNotLatchable(), UnlatchableSeverity(), NotLatched() & IsNotHigher()) => setLatchSeverity
+      case _                                                                          => status
     }
 
     val newStatus = (alarm, updatedStatus) match {
@@ -119,8 +144,11 @@ trait StatusServiceModule extends StatusService {
       case _                            ⇒ updatedStatus.copy(acknowledgementStatus = Unacknowledged)
     }
 
+    val finalStatus =
+      if (newStatus.latchedSeverity != status.latchedSeverity) newStatus.copy(alarmTime = Some(AlarmTime())) else newStatus
+
     // update alarm status (with recent time) only when severity changes
-    if (newStatus != status) await(setStatus(key, newStatus))
+    if (finalStatus != status) await(setStatus(key, finalStatus))
   }
 
   private[alarm] def setStatus(alarmKey: AlarmKey, alarmStatus: AlarmStatus): Future[Unit] = {
