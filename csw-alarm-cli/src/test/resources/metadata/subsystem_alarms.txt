@@ -5,10 +5,10 @@ Name: tromboneAxisHighLimitAlarm
 Description: Warns when trombone axis has reached the high limit
 Location: south side
 Type: Absolute
-Supported Severities: Set(Warning, Major, Indeterminate, Okay)
+Supported Severities: [Warning, Major, Indeterminate, Okay]
 Probable Cause: the trombone software has failed or the stage was driven into the high limit
 Operator Response: go to the NFIRAOS engineering user interface and select the datum axis command
-AutoAcknowledgable: true
+AutoAcknowledgeable: true
 Latchable: true
 Activation Status: Active
 ===============================================================================================================
@@ -18,10 +18,10 @@ Name: tromboneAxisLowLimitAlarm
 Description: Warns when trombone axis has reached the low limit
 Location: south side
 Type: Absolute
-Supported Severities: Set(Warning, Major, Indeterminate, Critical, Okay)
+Supported Severities: [Warning, Major, Indeterminate, Critical, Okay]
 Probable Cause: the trombone software has failed or the stage was driven into the low limit
 Operator Response: go to the NFIRAOS engineering user interface and select the datum axis command
-AutoAcknowledgable: false
+AutoAcknowledgeable: false
 Latchable: true
 Activation Status: Active
 ===============================================================================================================

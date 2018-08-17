@@ -78,178 +78,34 @@ class ArgsParserTest extends FunSuite with Matchers {
     )
   }
 
-  test("parse acknowledge command") {
-    val options = Array(
-      "acknowledge",
-      "--subsystem",
-      "NFIRAOS",
-      "--component",
-      "trombone",
-      "--name",
-      "tromboneAxisHighLimitAlarm"
-    )
+  val commands = List("acknowledge", "unacknowledge", "activate", "deactivate", "shelve", "unshelve", "reset", "status")
 
-    silentParse(options) should contain(
-      Options(
-        cmd = "acknowledge",
-        maybeSubsystem = Some(NFIRAOS),
-        maybeComponent = Some("trombone"),
-        maybeAlarmName = Some("tromboneAxisHighLimitAlarm")
+  commands.foreach { command ⇒
+    test(s"parse $command command") {
+      val options = Array(
+        command,
+        "--subsystem",
+        "NFIRAOS",
+        "--component",
+        "trombone",
+        "--name",
+        "tromboneAxisHighLimitAlarm"
       )
-    )
-  }
 
-  test("parse unacknowledge command") {
-    val options = Array(
-      "unacknowledge",
-      "--subsystem",
-      "NFIRAOS",
-      "--component",
-      "trombone",
-      "--name",
-      "tromboneAxisHighLimitAlarm"
-    )
-
-    silentParse(options) should contain(
-      Options(
-        cmd = "unacknowledge",
-        maybeSubsystem = Some(NFIRAOS),
-        maybeComponent = Some("trombone"),
-        maybeAlarmName = Some("tromboneAxisHighLimitAlarm")
+      silentParse(options) should contain(
+        Options(
+          cmd = command,
+          maybeSubsystem = Some(NFIRAOS),
+          maybeComponent = Some("trombone"),
+          maybeAlarmName = Some("tromboneAxisHighLimitAlarm")
+        )
       )
-    )
-  }
+    }
 
-  test("parse acknowledge/unacknowledge command without any options") {
-    val ackOptions   = Array("acknowledge")
-    val unackOptions = Array("unacknowledge")
-    silentParse(ackOptions) shouldBe None
-    silentParse(unackOptions) shouldBe None
-  }
-
-  test("parse activate command") {
-    val options = Array(
-      "activate",
-      "--subsystem",
-      "nfiraos",
-      "--component",
-      "trombone",
-      "--name",
-      "tromboneAxisHighLimitAlarm"
-    )
-
-    silentParse(options) should contain(
-      Options(
-        cmd = "activate",
-        maybeSubsystem = Some(NFIRAOS),
-        maybeComponent = Some("trombone"),
-        maybeAlarmName = Some("tromboneAxisHighLimitAlarm")
-      )
-    )
-  }
-
-  test("parse deactivate command") {
-    val options = Array(
-      "deactivate",
-      "--subsystem",
-      "NFIRAOS",
-      "--component",
-      "trombone",
-      "--name",
-      "tromboneAxisHighLimitAlarm"
-    )
-
-    silentParse(options) should contain(
-      Options(
-        cmd = "deactivate",
-        maybeSubsystem = Some(NFIRAOS),
-        maybeComponent = Some("trombone"),
-        maybeAlarmName = Some("tromboneAxisHighLimitAlarm")
-      )
-    )
-  }
-
-  test("parse activate/deactivate command without any options") {
-    val activateOptions   = Array("activate")
-    val deactivateOptions = Array("deactivate")
-
-    silentParse(activateOptions) shouldBe None
-    silentParse(deactivateOptions) shouldBe None
-  }
-
-  test("parse shelve command") {
-    val options = Array(
-      "shelve",
-      "--subsystem",
-      "NFIRAOS",
-      "--component",
-      "trombone",
-      "--name",
-      "tromboneAxisHighLimitAlarm"
-    )
-
-    silentParse(options) should contain(
-      Options(
-        cmd = "shelve",
-        maybeSubsystem = Some(NFIRAOS),
-        maybeComponent = Some("trombone"),
-        maybeAlarmName = Some("tromboneAxisHighLimitAlarm")
-      )
-    )
-  }
-
-  test("parse unshelve command") {
-    val options = Array(
-      "unshelve",
-      "--subsystem",
-      "NFIRAOS",
-      "--component",
-      "trombone",
-      "--name",
-      "tromboneAxisHighLimitAlarm"
-    )
-
-    silentParse(options) should contain(
-      Options(
-        cmd = "unshelve",
-        maybeSubsystem = Some(NFIRAOS),
-        maybeComponent = Some("trombone"),
-        maybeAlarmName = Some("tromboneAxisHighLimitAlarm")
-      )
-    )
-  }
-
-  test("parse shelve/unshelve command without any options") {
-    val shelveOptions   = Array("shelve")
-    val unshelveOptions = Array("unshelve")
-    silentParse(shelveOptions) shouldBe None
-    silentParse(unshelveOptions) shouldBe None
-  }
-
-  test("parse reset command") {
-    val options = Array(
-      "reset",
-      "--subsystem",
-      "NFIRAOS",
-      "--component",
-      "trombone",
-      "--name",
-      "tromboneAxisHighLimitAlarm"
-    )
-
-    silentParse(options) should contain(
-      Options(
-        cmd = "reset",
-        maybeSubsystem = Some(NFIRAOS),
-        maybeComponent = Some("trombone"),
-        maybeAlarmName = Some("tromboneAxisHighLimitAlarm")
-      )
-    )
-  }
-
-  test("parse reset command without any options") {
-    val options = Array("reset")
-    silentParse(options) shouldBe None
+    test(s"parse $command without options") {
+      val options = Array(command)
+      silentParse(options) shouldBe None
+    }
   }
 
   test("parse list command without options") {

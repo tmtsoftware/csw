@@ -1,6 +1,6 @@
 package csw.services.alarm.cli.utils
 
-import csw.services.alarm.api.models.AlarmMetadata
+import csw.services.alarm.api.models.{AlarmMetadata, AlarmStatus, AlarmTime}
 
 object Formatter {
 
@@ -23,12 +23,24 @@ object Formatter {
       s"Description: $description",
       s"Location: $location",
       s"Type: $alarmType",
-      s"Supported Severities: $allSupportedSeverities",
+      s"Supported Severities: ${allSupportedSeverities.mkString("[", ", ", "]")}",
       s"Probable Cause: $probableCause",
       s"Operator Response: $operatorResponse",
-      s"AutoAcknowledgable: $isAutoAcknowledgeable",
+      s"AutoAcknowledgeable: $isAutoAcknowledgeable",
       s"Latchable: $isLatchable",
       s"Activation Status: $activationStatus"
+    ).mkString(Newline)
+  }
+
+  def formatStatus(status: AlarmStatus): String = {
+    import status._
+
+    List(
+      s"Acknowledgement Status: $acknowledgementStatus",
+      s"Latch Status: $latchStatus",
+      s"Latch Severity: $latchedSeverity",
+      s"Shelve Status: $shelveStatus",
+      s"Alarm Time: ${alarmTime.map(_.time.toString).getOrElse("")}"
     ).mkString(Newline)
   }
 

@@ -56,6 +56,11 @@ class ArgsParser(name: String) {
       .text("list alarms")
       .children(subsystem, component, alarmName)
 
+    cmd("status")
+      .action((_, args) ⇒ args.copy(cmd = "status"))
+      .text("get current status of the alarm")
+      .children(subsystem.required(), component.required(), alarmName.required())
+
     help("help")
 
     version("version")
@@ -75,6 +80,7 @@ class ArgsParser(name: String) {
                   |  8> unshelve
                   |  9> reset
                   |  10> list
+                  |  11> status
                 """.stripMargin)
       else if (commandsAllowingPartialKey.contains(c.cmd)) validateKey(c)
       else success

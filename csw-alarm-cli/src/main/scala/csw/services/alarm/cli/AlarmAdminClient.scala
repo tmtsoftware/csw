@@ -72,4 +72,10 @@ class AlarmAdminClient(
     val metadataSet  = await(adminService.getMetadata(options.key)).sortBy(_.name)
     printLine(Formatter.formatMetadataSet(metadataSet))
   }
+
+  def status(options: Options): Future[Unit] = async {
+    val adminService = await(alarmServiceF)
+    val status       = await(adminService.getStatus(options.alarmKey))
+    printLine(Formatter.formatStatus(status))
+  }
 }

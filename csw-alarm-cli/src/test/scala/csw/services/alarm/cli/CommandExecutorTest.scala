@@ -387,4 +387,25 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     adminService.getStatus(tromboneAxisLowLimitKey).futureValue.latchedSeverity shouldBe Okay
   }
 
+  // DEOPSCSW-475: Fetch alarm status from CLI Interface
+  test("should get alarm status") {
+
+    // init alarm store
+    val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
+    val initCmd  = Options("init", Some(filePath), isLocal = true, reset = true)
+    commandExecutor.execute(initCmd)
+    logBuffer.clear()
+
+    val statusCmd = Options(
+      "status",
+      maybeSubsystem = Some(NFIRAOS),
+      maybeComponent = Some("trombone"),
+      maybeAlarmName = Some(tromboneAxisLowLimitKey.name)
+    )
+
+    commandExecutor.execute(statusCmd)
+
+    logBuffer shouldEqualContentsOf "status.txt"
+  }
+
 }
