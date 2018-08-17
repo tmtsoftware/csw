@@ -148,7 +148,7 @@ class StatusServiceModuleTests
 
   // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
   test("unshelve should shelve an alarm") {
-    setStatus(tromboneAxisHighLimitAlarmKey, AlarmStatus(shelveStatus = Shelved)).await
+    setStatus(tromboneAxisHighLimitAlarmKey, AlarmStatus().copy(shelveStatus = Shelved)).await
     unshelve(tromboneAxisHighLimitAlarmKey).await
     val status = getStatus(tromboneAxisHighLimitAlarmKey).await
     status.shelveStatus shouldBe Unshelved
@@ -156,7 +156,7 @@ class StatusServiceModuleTests
 
   // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
   test("unshelve should be a no-op when repeated") {
-    setStatus(tromboneAxisHighLimitAlarmKey, AlarmStatus(shelveStatus = Shelved)).await
+    setStatus(tromboneAxisHighLimitAlarmKey, AlarmStatus().copy(shelveStatus = Shelved)).await
     unshelve(tromboneAxisHighLimitAlarmKey).await
     val status = getStatus(tromboneAxisHighLimitAlarmKey).await
     status.shelveStatus shouldBe Unshelved

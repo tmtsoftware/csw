@@ -357,8 +357,8 @@ class CommandExecutorTest extends AlarmCliTestSetup {
       maybeAlarmName = Some("invalid")
     )
 
-    intercept[KeyNotFoundException] { commandExecutor.execute(invalidComponentCmd) }
-    intercept[KeyNotFoundException] { commandExecutor.execute(invalidAlarmNameCmd) }
+    a[KeyNotFoundException] shouldBe thrownBy(commandExecutor.execute(invalidComponentCmd))
+    a[KeyNotFoundException] shouldBe thrownBy(commandExecutor.execute(invalidAlarmNameCmd))
   }
 
   // DEOPSCSW-474: Latch an alarm from CLI Interface

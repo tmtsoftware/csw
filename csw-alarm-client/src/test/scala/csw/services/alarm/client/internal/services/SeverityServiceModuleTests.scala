@@ -246,7 +246,7 @@ class SeverityServiceModuleTests
           case (alarmKey, severity) =>
             setStatus(
               alarmKey,
-              AlarmStatus(
+              AlarmStatus().copy(
                 latchedSeverity = severity,
                 latchStatus = if (severity.latchable) Latched else UnLatched
               )
@@ -397,7 +397,7 @@ class SeverityServiceModuleTests
 
         setStatus(
           testCase.alarmKey,
-          AlarmStatus(
+          AlarmStatus().copy(
             latchedSeverity = testCase.oldSeverity,
             acknowledgementStatus =
               if (testCase.isAutoAcknowledgeble || testCase.oldSeverity == Okay) Acknowledged else Unacknowledged,
