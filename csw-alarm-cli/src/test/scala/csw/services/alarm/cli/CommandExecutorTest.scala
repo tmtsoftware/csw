@@ -190,14 +190,16 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
     val initCmd  = Options("init", Some(filePath), isLocal = true, reset = true)
     commandExecutor.execute(initCmd)
+    adminService.getMetadata(cpuIdleKey).futureValue.activationStatus shouldBe Inactive
+
     logBuffer.clear()
 
     // activate the alarm
     val activateCmd = Options(
       "activate",
-      maybeSubsystem = Some(tromboneAxisLowLimitKey.subsystem),
-      maybeComponent = Some(tromboneAxisLowLimitKey.component),
-      maybeAlarmName = Some(tromboneAxisLowLimitKey.name)
+      maybeSubsystem = Some(cpuIdleKey.subsystem),
+      maybeComponent = Some(cpuIdleKey.component),
+      maybeAlarmName = Some(cpuIdleKey.name)
     )
 
     commandExecutor.execute(activateCmd)
@@ -213,6 +215,8 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
     val initCmd  = Options("init", Some(filePath), isLocal = true, reset = true)
     commandExecutor.execute(initCmd)
+    adminService.getMetadata(tromboneAxisLowLimitKey).futureValue.activationStatus shouldBe Active
+
     logBuffer.clear()
 
     // deactivate the alarm
