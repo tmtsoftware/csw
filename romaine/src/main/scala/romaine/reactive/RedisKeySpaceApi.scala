@@ -3,16 +3,15 @@ package romaine.reactive
 import akka.stream.scaladsl.Source
 import reactor.core.publisher.FluxSink.OverflowStrategy
 import romaine.async.RedisAsyncScalaApi
+import romaine.codec.RomaineStringCodec
 import romaine.extensions.SourceExtensions.RichSource
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class RedisKeySpaceApi[K, V](
-    redisPSubscribeApi: RedisPSubscribeScalaApi[String, String],
+class RedisKeySpaceApi[K: RomaineStringCodec, V: RomaineStringCodec](
+    redisSubscriptionApi: RedisSubscriptionApi[String, String],
     redisAsyncScalaApi: RedisAsyncScalaApi[K, V]
-)(implicit redisKeySpaceCodec: RedisKeySpaceCodec[K, V], ec: ExecutionContext) {
-
-  private val redisSubscriptionApi: RedisSubscriptionApi[String, String] = new RedisSubscriptionApi(() => redisPSubscribeApi)
+)(implicit ec: ExecutionContext) {
 
   private val SetOperation     = "set"
   private val ExpiredOperation = "expired"
@@ -27,7 +26,7 @@ class RedisKeySpaceApi[K, V](
       .subscribe(keys.map(KeyspacePattern + _), overflowStrategy)
       .filter(pm => pm.value == SetOperation || pm.value == ExpiredOperation)
       .mapAsync(1) { pm =>
-        val key = redisKeySpaceCodec.fromKeyString(pm.key)
+        val key = RomaineStringCodec[K].fromString(pm.key)
         pm.value match {
           case SetOperation     => redisAsyncScalaApi.get(key).map(valueOpt ⇒ (key, valueOpt))
           case ExpiredOperation => Future((key, None))

@@ -18,6 +18,7 @@ import csw.services.alarm.client.internal.{AlarmServiceImpl, JAlarmServiceImpl}
 import csw.services.location.javadsl.ILocationService
 import csw.services.location.scaladsl.LocationService
 import io.lettuce.core.RedisClient
+import romaine.RomaineFactory
 
 import scala.async.Async.async
 import scala.compat.java8.FutureConverters.FutureOps
@@ -57,8 +58,9 @@ class AlarmServiceFactory(redisClient: RedisClient = RedisClient.create()) {
   /************ INTERNAL ************/
   private def alarmService(alarmServiceResolver: AlarmServiceResolver)(implicit system: ActorSystem, ec: ExecutionContext) =
     async {
-      val settings                  = new Settings(ConfigFactory.load())
-      val redisConnectionsFactory   = new RedisConnectionsFactory(redisClient, alarmServiceResolver, settings.masterId)
+      val settings = new Settings(ConfigFactory.load())
+      val redisConnectionsFactory =
+        new RedisConnectionsFactory(alarmServiceResolver, settings.masterId, new RomaineFactory(redisClient))
       val shelveTimeoutActorFactory = new ShelveTimeoutActorFactory()
       new AlarmServiceImpl(redisConnectionsFactory, shelveTimeoutActorFactory, settings)
     }

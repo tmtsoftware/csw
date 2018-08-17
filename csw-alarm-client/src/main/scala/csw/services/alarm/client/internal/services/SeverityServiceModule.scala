@@ -102,7 +102,8 @@ trait SeverityServiceModule extends SeverityService {
   // channel: e.g. __keyspace@0__:status.nfiraos.trombone.tromboneAxisLowLimitAlarm,
   // message: event type as value: e.g. set, expire, expired
   private[alarm] def subscribeAggregatedSeverity(key: Key): Source[AlarmSeverity, AlarmSubscription] = {
-    val redisStreamApi     = severityApiF.flatMap(severityApi ⇒ redisKeySpaceApi(severityApi)(AlarmCodec.SeverityCodec)) // create new connection for every client
+    import AlarmCodec._
+    val redisStreamApi     = severityApiF.flatMap(severityApi ⇒ redisKeySpaceApi(severityApi)) // create new connection for every client
     val keys: List[String] = List(SeverityKey.fromAlarmKey(key).value)
 
     def reducer(iterable: Iterable[Option[AlarmSeverity]]): AlarmSeverity =

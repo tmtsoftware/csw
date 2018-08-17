@@ -8,7 +8,6 @@ import csw.services.alarm.api.javadsl.IAlarmService
 import csw.services.alarm.api.models.{AlarmMetadata, AlarmSeverity, AlarmStatus}
 import csw.services.alarm.api.scaladsl.AlarmAdminService
 import csw.services.alarm.client.AlarmServiceFactory
-import csw.services.alarm.client.internal.AlarmCodec.{MetadataCodec, SeverityCodec, StatusCodec}
 import csw.services.alarm.client.internal.commons.Settings
 import csw.services.alarm.client.internal.commons.serviceresolver.AlarmServiceHostPortResolver
 import csw.services.alarm.client.internal.helpers.TestFutureExt.RichFuture
@@ -17,6 +16,7 @@ import csw.services.alarm.client.internal.shelve.ShelveTimeoutActorFactory
 import csw.services.location.commons.ActorSystemFactory
 import io.lettuce.core.RedisClient
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
+import romaine.RomaineFactory
 import romaine.async.RedisAsyncScalaApi
 
 import scala.concurrent.ExecutionContext
@@ -45,10 +45,11 @@ class AlarmServiceTestSetup
   val alarmService: AlarmAdminService = alarmServiceFactory.makeAdminApi(hostname, sentinelPort).await
   val jAlarmService: IAlarmService    = alarmServiceFactory.jMakeClientApi(hostname, sentinelPort, actorSystem).get()
 
-  val connsFactory: RedisConnectionsFactory                           = new RedisConnectionsFactory(redisClient, resolver, alarmServer)
-  val testMetadataApi: RedisAsyncScalaApi[MetadataKey, AlarmMetadata] = connsFactory.wrappedAsyncConnection(MetadataCodec).await
-  val testSeverityApi: RedisAsyncScalaApi[SeverityKey, AlarmSeverity] = connsFactory.wrappedAsyncConnection(SeverityCodec).await
-  val testStatusApi: RedisAsyncScalaApi[StatusKey, AlarmStatus]       = connsFactory.wrappedAsyncConnection(StatusCodec).await
+  import csw.services.alarm.client.internal.AlarmCodec._
+  val connsFactory: RedisConnectionsFactory                           = new RedisConnectionsFactory(resolver, alarmServer, new RomaineFactory(redisClient))
+  val testMetadataApi: RedisAsyncScalaApi[MetadataKey, AlarmMetadata] = connsFactory.asyncApi[MetadataKey, AlarmMetadata].await
+  val testSeverityApi: RedisAsyncScalaApi[SeverityKey, AlarmSeverity] = connsFactory.asyncApi[SeverityKey, AlarmSeverity].await
+  val testStatusApi: RedisAsyncScalaApi[StatusKey, AlarmStatus]       = connsFactory.asyncApi[StatusKey, AlarmStatus].await
 
   override protected def afterAll(): Unit = {
     redisClient.shutdown()
