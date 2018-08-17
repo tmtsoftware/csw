@@ -39,9 +39,9 @@ trait Arguments { self: OptionParser[Options] =>
       .text("name of an alarm e.g. tromboneAxisHighLimitAlarm")
 
   def severity: OptionDef[String, Options] =
-    opt[String]("severity")
+    arg[String]("severity")
       .action(
         (severity, args) ⇒ args.copy(severity = Some(AlarmSeverity.withNameInsensitive(severity)))
       )
-      .text("severity to set for an alarm e.g Okay, Warning, Major, etc.")
+      .text(s"severity to set for an alarm e.g ${AlarmSeverity.values}")
 }

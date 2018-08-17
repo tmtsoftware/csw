@@ -9,6 +9,7 @@ import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unackn
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
 import csw.services.alarm.api.models.AlarmSeverity.{Critical, Major, Okay}
 import csw.services.alarm.api.models.AlarmStatus
+import csw.services.alarm.api.models.FullAlarmSeverity.Disconnected
 import csw.services.alarm.api.models.Key.{AlarmKey, GlobalKey}
 import csw.services.alarm.api.models.ShelveStatus.{Shelved, Unshelved}
 import csw.services.alarm.cli.args.Options
@@ -34,6 +35,14 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
   private val allAlarmKeys = Set(tromboneAxisLowLimitKey, tromboneAxisHighLimitKey, cpuExceededKey, cpuIdleKey)
 
+  override def beforeEach(): Unit = {
+    // init alarm store
+    val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
+    val initCmd  = Options(cmd = "init", filePath = Some(filePath), isLocal = true, reset = true)
+    commandExecutor.execute(initCmd)
+    logBuffer.clear()
+  }
+
   override def afterAll(): Unit = {
     val testFileUtils = new TestFileUtils(new Settings(ConfigFactory.load()))
     testFileUtils.deleteServerFiles()
@@ -43,7 +52,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
   // DEOPSCSW-470: CLI application to exercise and test the alarm API
   test("should initialize alarms in alarm store from local config") {
     val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
-    val args     = Options("init", Some(filePath), isLocal = true)
+    val args     = Options(cmd = "init", filePath = Some(filePath), isLocal = true, reset = true)
 
     commandExecutor.execute(args)
     logBuffer shouldEqual List(successMsg)
@@ -64,7 +73,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     val configService = ConfigClientFactory.adminApi(system, locationService)
     configService.create(configPath, configData, comment = "commit test file").futureValue
 
-    val args = Options("init", Some(configPath))
+    val args = Options(cmd = "init", filePath = Some(configPath), reset = true)
     commandExecutor.execute(args)
 
     logBuffer shouldEqual List(successMsg)
@@ -82,104 +91,72 @@ class CommandExecutorTest extends AlarmCliTestSetup {
   // DEOPSCSW-470: CLI application to exercise and test the alarm API
   test("should fail to initialize alarms in alarm store when config service is down") {
     val configPath = Paths.get("valid-alarms.conf")
-    val args       = Options("init", Some(configPath))
+    val args       = Options(cmd = "init", filePath = Some(configPath), reset = true)
     an[RuntimeException] shouldBe thrownBy(commandExecutor.execute(args))
     logBuffer shouldEqual List(failureMsg)
   }
 
   // DEOPSCSW-480: Set alarm Severity from CLI Interface
   test("should set severity of alarm") {
-
-    // init alarm store
-    val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
-    val initCmd  = Options("init", Some(filePath), isLocal = true, reset = true)
-    commandExecutor.execute(initCmd)
-    logBuffer.clear()
-
-    // update severity of an alarm
-    val updateCmd = Options(
+    val cmd = Options(
       "severity",
       maybeSubsystem = Some(tromboneAxisHighLimitKey.subsystem),
       maybeComponent = Some(tromboneAxisHighLimitKey.component),
       maybeAlarmName = Some(tromboneAxisHighLimitKey.name),
       severity = Some(Major)
     )
-    commandExecutor.execute(updateCmd)
 
+    adminService.getCurrentSeverity(tromboneAxisHighLimitKey).futureValue shouldBe Disconnected
+    commandExecutor.execute(cmd) // update severity of an alarm
     adminService.getCurrentSeverity(tromboneAxisHighLimitKey).futureValue shouldBe Major
-
     logBuffer shouldEqual List(successMsg)
   }
 
   // DEOPSCSW-476: Fetch alarm severity from CLI Interface
   test("should get severity of alarm") {
-
-    // init alarm store
-    val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
-    val initCmd  = Options("init", Some(filePath), isLocal = true, reset = true)
-    commandExecutor.execute(initCmd)
-    logBuffer.clear()
-
-    // fetch severity of an alarm
-    val getCmd = Options(
+    val cmd = Options(
       "severity",
       maybeSubsystem = Some(tromboneAxisHighLimitKey.subsystem),
       maybeComponent = Some(tromboneAxisHighLimitKey.component),
       maybeAlarmName = Some(tromboneAxisHighLimitKey.name)
     )
-    commandExecutor.execute(getCmd)
 
+    commandExecutor.execute(cmd)
     logBuffer shouldEqual List("Current Alarm Severity: Disconnected")
   }
 
   // DEOPSCSW-471: Acknowledge alarm from CLI application
   test("should acknowledge the alarm") {
-
-    // init alarm store
-    val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
-    val initCmd  = Options("init", Some(filePath), isLocal = true, reset = true)
-    commandExecutor.execute(initCmd)
-    logBuffer.clear()
-
-    adminService.setStatus(tromboneAxisLowLimitKey,
-                           AlarmStatus().copy(acknowledgementStatus = Unacknowledged, latchedSeverity = Critical))
-    adminService.getStatus(tromboneAxisLowLimitKey).futureValue.acknowledgementStatus shouldBe Unacknowledged
-
-    // acknowledge the alarm
-    val ackCmd = Options(
+    val cmd = Options(
       "acknowledge",
       maybeSubsystem = Some(tromboneAxisLowLimitKey.subsystem),
       maybeComponent = Some(tromboneAxisLowLimitKey.component),
       maybeAlarmName = Some(tromboneAxisLowLimitKey.name)
     )
 
-    commandExecutor.execute(ackCmd)
-
+    adminService.setStatus(
+      tromboneAxisLowLimitKey,
+      AlarmStatus().copy(acknowledgementStatus = Unacknowledged, latchedSeverity = Critical)
+    )
+    adminService.getStatus(tromboneAxisLowLimitKey).futureValue.acknowledgementStatus shouldBe Unacknowledged
+    commandExecutor.execute(cmd) // acknowledge the alarm
     adminService.getStatus(tromboneAxisLowLimitKey).futureValue.acknowledgementStatus shouldBe Acknowledged
     logBuffer shouldEqual List(successMsg)
   }
 
   // DEOPSCSW-471: Acknowledge alarm from CLI application
   test("should unacknowledge the alarm") {
-
-    // init alarm store
-    val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
-    val initCmd  = Options("init", Some(filePath), isLocal = true, reset = true)
-    commandExecutor.execute(initCmd)
-    logBuffer.clear()
-
-    adminService.acknowledge(tromboneAxisLowLimitKey).futureValue
-    adminService.getStatus(tromboneAxisLowLimitKey).futureValue.acknowledgementStatus shouldBe Acknowledged
-
-    // unacknowledge the alarm
-    val unackCmd = Options(
+    val cmd = Options(
       "unacknowledge",
       maybeSubsystem = Some(tromboneAxisLowLimitKey.subsystem),
       maybeComponent = Some(tromboneAxisLowLimitKey.component),
       maybeAlarmName = Some(tromboneAxisLowLimitKey.name)
     )
 
-    commandExecutor.execute(unackCmd)
+    adminService.acknowledge(tromboneAxisLowLimitKey).futureValue
+    adminService.getStatus(tromboneAxisLowLimitKey).futureValue.acknowledgementStatus shouldBe Acknowledged
+
+    commandExecutor.execute(cmd) // unacknowledge the alarm
 
     adminService.getStatus(tromboneAxisLowLimitKey).futureValue.acknowledgementStatus shouldBe Unacknowledged
     logBuffer shouldEqual List(successMsg)
@@ -187,49 +164,31 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
   // DEOPSCSW-472: Exercise Alarm CLI for activate/out of service alarm behaviour
   test("should activate the alarm") {
-
-    // init alarm store
-    val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
-    val initCmd  = Options("init", Some(filePath), isLocal = true, reset = true)
-    commandExecutor.execute(initCmd)
-    adminService.getMetadata(cpuIdleKey).futureValue.activationStatus shouldBe Inactive
-
-    logBuffer.clear()
-
-    // activate the alarm
-    val activateCmd = Options(
+    val cmd = Options(
       "activate",
       maybeSubsystem = Some(cpuIdleKey.subsystem),
       maybeComponent = Some(cpuIdleKey.component),
       maybeAlarmName = Some(cpuIdleKey.name)
     )
 
-    commandExecutor.execute(activateCmd)
+    adminService.getMetadata(cpuIdleKey).futureValue.activationStatus shouldBe Inactive
 
-    adminService.getMetadata(tromboneAxisLowLimitKey).futureValue.activationStatus shouldBe Active
+    commandExecutor.execute(cmd) // activate the alarm
+
+    adminService.getMetadata(cpuIdleKey).futureValue.activationStatus shouldBe Active
     logBuffer shouldEqual List(successMsg)
   }
 
   // DEOPSCSW-472: Exercise Alarm CLI for activate/out of service alarm behaviour
   test("should deactivate the alarm") {
-
-    // init alarm store
-    val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
-    val initCmd  = Options("init", Some(filePath), isLocal = true, reset = true)
-    commandExecutor.execute(initCmd)
-    adminService.getMetadata(tromboneAxisLowLimitKey).futureValue.activationStatus shouldBe Active
-
-    logBuffer.clear()
-
-    // deactivate the alarm
-    val deactivateCmd = Options(
+    val cmd = Options(
       "deactivate",
       maybeSubsystem = Some(tromboneAxisLowLimitKey.subsystem),
       maybeComponent = Some(tromboneAxisLowLimitKey.component),
       maybeAlarmName = Some(tromboneAxisLowLimitKey.name)
     )
-
-    commandExecutor.execute(deactivateCmd)
+    adminService.getMetadata(tromboneAxisLowLimitKey).futureValue.activationStatus shouldBe Active
+    commandExecutor.execute(cmd) // deactivate the alarm
 
     adminService.getMetadata(tromboneAxisLowLimitKey).futureValue.activationStatus shouldBe Inactive
     logBuffer shouldEqual List(successMsg)
@@ -237,50 +196,32 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
   // DEOPSCSW-473: Shelve/Unshelve alarm from CLI interface
   test("should shelve the alarm") {
-
-    // init alarm store
-    val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
-    val initCmd  = Options("init", Some(filePath), isLocal = true, reset = true)
-    commandExecutor.execute(initCmd)
-    logBuffer.clear()
-
-    adminService.getStatus(tromboneAxisLowLimitKey).futureValue.shelveStatus shouldBe Unshelved
-
-    // shelve the alarm
-    val shelveCmd = Options(
+    val cmd = Options(
       "shelve",
       maybeSubsystem = Some(tromboneAxisLowLimitKey.subsystem),
       maybeComponent = Some(tromboneAxisLowLimitKey.component),
       maybeAlarmName = Some(tromboneAxisLowLimitKey.name)
     )
 
-    commandExecutor.execute(shelveCmd)
-
+    adminService.getStatus(tromboneAxisLowLimitKey).futureValue.shelveStatus shouldBe Unshelved
+    commandExecutor.execute(cmd) // shelve the alarm
     adminService.getStatus(tromboneAxisLowLimitKey).futureValue.shelveStatus shouldBe Shelved
     logBuffer shouldEqual List(successMsg)
   }
 
   // DEOPSCSW-473: Shelve/Unshelve alarm from CLI interface
   test("should unshelve the alarm") {
-
-    // init alarm store
-    val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
-    val initCmd  = Options("init", Some(filePath), isLocal = true, reset = true)
-    commandExecutor.execute(initCmd)
-    logBuffer.clear()
-
-    adminService.shelve(tromboneAxisLowLimitKey).futureValue
-    adminService.getStatus(tromboneAxisLowLimitKey).futureValue.shelveStatus shouldBe Shelved
-
-    // unshelve the alarm
-    val unshelveCmd = Options(
+    val cmd = Options(
       "unshelve",
       maybeSubsystem = Some(tromboneAxisLowLimitKey.subsystem),
       maybeComponent = Some(tromboneAxisLowLimitKey.component),
       maybeAlarmName = Some(tromboneAxisLowLimitKey.name)
     )
 
-    commandExecutor.execute(unshelveCmd)
+    adminService.shelve(tromboneAxisLowLimitKey).futureValue
+    adminService.getStatus(tromboneAxisLowLimitKey).futureValue.shelveStatus shouldBe Shelved
+
+    commandExecutor.execute(cmd) // unshelve the alarm
 
     adminService.getStatus(tromboneAxisLowLimitKey).futureValue.shelveStatus shouldBe Unshelved
     logBuffer shouldEqual List(successMsg)
@@ -288,90 +229,47 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
   // DEOPSCSW-492: Fetch all alarms' metadata from CLI Interface (list all alarms)
   test("should list all alarms present in the alarm store") {
+    val cmd = Options("list")
 
-    // init alarm store
-    val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
-    val initCmd  = Options("init", Some(filePath), isLocal = true, reset = true)
-    commandExecutor.execute(initCmd)
-    logBuffer.clear()
-
-    // list alarms
-    val listCmd = Options("list")
-
-    commandExecutor.execute(listCmd)
-
+    commandExecutor.execute(cmd)
     logBuffer shouldEqualContentsOf "metadata/all_alarms.txt"
   }
 
   // DEOPSCSW-492: Fetch all alarms' metadata from CLI Interface (list all alarms)
   test("should list alarms for specified subsystem") {
+    val cmd = Options("list", maybeSubsystem = Some(NFIRAOS))
 
-    // init alarm store
-    val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
-    val initCmd  = Options("init", Some(filePath), isLocal = true, reset = true)
-    commandExecutor.execute(initCmd)
-    logBuffer.clear()
-
-    // list alarms
-    val listCmd = Options("list", maybeSubsystem = Some(NFIRAOS))
-
-    commandExecutor.execute(listCmd)
-
+    commandExecutor.execute(cmd)
     logBuffer shouldEqualContentsOf "metadata/subsystem_alarms.txt"
   }
 
   // DEOPSCSW-492: Fetch all alarms' metadata from CLI Interface (list all alarms)
   test("should list alarms for specified component") {
-
-    // init alarm store
-    val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
-    val initCmd  = Options("init", Some(filePath), isLocal = true, reset = true)
-    commandExecutor.execute(initCmd)
-    logBuffer.clear()
-
-    // list alarms
-    val listCmd = Options(
+    val cmd = Options(
       "list",
       maybeSubsystem = Some(NFIRAOS),
       maybeComponent = Some("trombone")
     )
 
-    commandExecutor.execute(listCmd)
-
+    commandExecutor.execute(cmd)
     logBuffer shouldEqualContentsOf "metadata/component_alarms.txt"
   }
 
   // DEOPSCSW-492: Fetch all alarms' metadata from CLI Interface (list all alarms)
   test("should list the alarm for specified name") {
-
-    // init alarm store
-    val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
-    val initCmd  = Options("init", Some(filePath), isLocal = true, reset = true)
-    commandExecutor.execute(initCmd)
-    logBuffer.clear()
-
-    // list alarms
-    val listCmd = Options(
+    val cmd = Options(
       "list",
       maybeSubsystem = Some(NFIRAOS),
       maybeComponent = Some("trombone"),
       maybeAlarmName = Some(tromboneAxisLowLimitKey.name)
     )
 
-    commandExecutor.execute(listCmd)
-
+    commandExecutor.execute(cmd)
     logBuffer shouldEqualContentsOf "metadata/with_name_alarms.txt"
   }
 
   // DEOPSCSW-492: Fetch all alarms' metadata from CLI Interface (list all alarms)
   test("should fail on invalid component/alarm name") {
-
-    // init alarm store
-    val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
-    val initCmd  = Options("init", Some(filePath), isLocal = true, reset = true)
-    commandExecutor.execute(initCmd)
-    logBuffer.clear()
-
     val invalidComponentCmd = Options(
       "list",
       maybeSubsystem = Some(NFIRAOS),
@@ -385,20 +283,13 @@ class CommandExecutorTest extends AlarmCliTestSetup {
       maybeAlarmName = Some("invalid")
     )
 
-    a[KeyNotFoundException] shouldBe thrownBy(commandExecutor.execute(invalidComponentCmd))
-    a[KeyNotFoundException] shouldBe thrownBy(commandExecutor.execute(invalidAlarmNameCmd))
+    intercept[KeyNotFoundException] { commandExecutor.execute(invalidComponentCmd) }
+    intercept[KeyNotFoundException] { commandExecutor.execute(invalidAlarmNameCmd) }
   }
 
   // DEOPSCSW-474: Latch an alarm from CLI Interface
   test("should reset the severity of latched alarm") {
-
-    // init alarm store
-    val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
-    val initCmd  = Options("init", Some(filePath), isLocal = true, reset = true)
-    commandExecutor.execute(initCmd)
-    logBuffer.clear()
-
-    val resetCmd = Options(
+    val cmd = Options(
       "reset",
       maybeSubsystem = Some(NFIRAOS),
       maybeComponent = Some("trombone"),
@@ -409,7 +300,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     adminService.setSeverity(tromboneAxisLowLimitKey, Okay).futureValue
     adminService.getStatus(tromboneAxisLowLimitKey).futureValue.latchedSeverity shouldBe Major
 
-    commandExecutor.execute(resetCmd) // reset latch severity of the alarm
+    commandExecutor.execute(cmd) // reset latch severity of the alarm
 
     logBuffer shouldEqual List(successMsg)
     adminService.getStatus(tromboneAxisLowLimitKey).futureValue.latchedSeverity shouldBe Okay
@@ -417,22 +308,14 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
   // DEOPSCSW-475: Fetch alarm status from CLI Interface
   test("should get alarm status") {
-
-    // init alarm store
-    val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
-    val initCmd  = Options("init", Some(filePath), isLocal = true, reset = true)
-    commandExecutor.execute(initCmd)
-    logBuffer.clear()
-
-    val statusCmd = Options(
+    val cmd = Options(
       "status",
       maybeSubsystem = Some(NFIRAOS),
       maybeComponent = Some("trombone"),
       maybeAlarmName = Some(tromboneAxisLowLimitKey.name)
     )
 
-    commandExecutor.execute(statusCmd)
-
+    commandExecutor.execute(cmd)
     logBuffer shouldEqualContentsOf "status.txt"
   }
 

@@ -49,22 +49,28 @@ class ArgsParserTest extends FunSuite with Matchers {
     )
   }
 
-  test("parse severity command with severity option") {
+  test(s"parse severity without options") {
+    val options = Array("severity")
+    silentParse(options) shouldBe None
+  }
+
+  test("parse set severity command") {
     val options = Array(
       "severity",
+      "set",
+      "Major",
       "--subsystem",
       "NFIRAOS",
       "--component",
       "trombone",
       "--name",
-      "tromboneAxisHighLimitAlarm",
-      "--severity",
-      "Major"
+      "tromboneAxisHighLimitAlarm"
     )
 
     silentParse(options) should contain(
       Options(
         cmd = "severity",
+        subCmd = "set",
         maybeSubsystem = Some(NFIRAOS),
         maybeComponent = Some("trombone"),
         maybeAlarmName = Some("tromboneAxisHighLimitAlarm"),
@@ -73,8 +79,54 @@ class ArgsParserTest extends FunSuite with Matchers {
     )
   }
 
+  test("parse get severity command") {
+    val options = Array(
+      "severity",
+      "get",
+      "--subsystem",
+      "NFIRAOS",
+      "--component",
+      "trombone",
+      "--name",
+      "tromboneAxisHighLimitAlarm"
+    )
+
+    silentParse(options) should contain(
+      Options(
+        cmd = "severity",
+        subCmd = "get",
+        maybeSubsystem = Some(NFIRAOS),
+        maybeComponent = Some("trombone"),
+        maybeAlarmName = Some("tromboneAxisHighLimitAlarm")
+      )
+    )
+  }
+
+  test("parse subscribe severity command") {
+    val options = Array(
+      "severity",
+      "subscribe",
+      "--subsystem",
+      "NFIRAOS",
+      "--component",
+      "trombone",
+      "--name",
+      "tromboneAxisHighLimitAlarm"
+    )
+
+    silentParse(options) should contain(
+      Options(
+        cmd = "severity",
+        subCmd = "subscribe",
+        maybeSubsystem = Some(NFIRAOS),
+        maybeComponent = Some("trombone"),
+        maybeAlarmName = Some("tromboneAxisHighLimitAlarm")
+      )
+    )
+  }
+
   val commands =
-    List("severity", "acknowledge", "unacknowledge", "activate", "deactivate", "shelve", "unshelve", "reset", "status")
+    List("acknowledge", "unacknowledge", "activate", "deactivate", "shelve", "unshelve", "reset", "status")
 
   commands.foreach { command ⇒
     test(s"parse $command command") {

@@ -7,13 +7,15 @@ import csw.services.alarm.api.models.Key.{AlarmKey, ComponentKey, GlobalKey, Sub
 
 case class Options(
     cmd: String = "",
+    subCmd: String = "",
     filePath: Option[Path] = None,
     isLocal: Boolean = false,
     reset: Boolean = false,
     maybeSubsystem: Option[Subsystem] = None,
     maybeComponent: Option[String] = None,
     maybeAlarmName: Option[String] = None,
-    severity: Option[AlarmSeverity] = None
+    severity: Option[AlarmSeverity] = None,
+    monitor: Boolean = false
 ) {
   def alarmKey: AlarmKey = AlarmKey(maybeSubsystem.get, maybeComponent.get, maybeAlarmName.get)
 
