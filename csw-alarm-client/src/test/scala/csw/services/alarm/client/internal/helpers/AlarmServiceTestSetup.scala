@@ -17,7 +17,7 @@ import csw.services.alarm.client.internal.shelve.ShelveTimeoutActorFactory
 import csw.services.location.commons.ActorSystemFactory
 import io.lettuce.core.RedisClient
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
-import romaine.RedisAsyncScalaApi
+import romaine.async.RedisAsyncScalaApi
 
 import scala.concurrent.ExecutionContext
 

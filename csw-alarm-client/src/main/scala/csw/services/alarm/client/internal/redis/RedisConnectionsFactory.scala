@@ -8,7 +8,7 @@ import csw.services.alarm.client.internal.commons.serviceresolver.AlarmServiceRe
 import io.lettuce.core.api.async.RedisAsyncCommands
 import io.lettuce.core.pubsub.api.reactive.RedisPubSubReactiveCommands
 import io.lettuce.core.{RedisClient, RedisURI}
-import romaine._
+import romaine.async.RedisAsyncScalaApi
 import romaine.reactive.{RedisKeySpaceApi, RedisKeySpaceCodec, RedisPSubscribeScalaApi}
 
 import scala.compat.java8.FutureConverters.CompletionStageOps

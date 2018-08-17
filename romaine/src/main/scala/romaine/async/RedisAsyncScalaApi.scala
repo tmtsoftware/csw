@@ -1,4 +1,4 @@
-package romaine
+package romaine.async
 
 import io.lettuce.core.KeyValue
 import io.lettuce.core.api.async.RedisAsyncCommands

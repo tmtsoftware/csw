@@ -2,7 +2,7 @@ package romaine.reactive
 
 import akka.stream.scaladsl.Source
 import reactor.core.publisher.FluxSink.OverflowStrategy
-import romaine._
+import romaine.async.RedisAsyncScalaApi
 import romaine.extensions.SourceExtensions.RichSource
 
 import scala.concurrent.{ExecutionContext, Future}
