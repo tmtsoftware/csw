@@ -414,7 +414,7 @@ class SeverityServiceModuleTests
             latchedSeverity = testCase.oldSeverity,
             acknowledgementStatus =
               if (testCase.isAutoAcknowledgeble || testCase.oldSeverity == Okay) Acknowledged else Unacknowledged,
-            latchStatus = if (testCase.isAlarmLachable && testCase.oldSeverity.latchable) Latched else UnLatched
+            latchStatus = if (testCase.isAlarmLachable && testCase.oldSeverity.isLatchable) Latched else UnLatched
           )
         ).await
 

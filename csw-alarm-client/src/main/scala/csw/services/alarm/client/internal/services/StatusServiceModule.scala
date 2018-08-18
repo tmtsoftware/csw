@@ -80,12 +80,14 @@ trait StatusServiceModule extends StatusService {
     // get alarm status
     val status = await(getStatus(key))
 
-    object AlarmLatchable {
-      def unapply(alarmMetadata: AlarmMetadata): Boolean = alarmMetadata.isLatchable
+    object Latchable {
+      def unapply(alarmMetadata: AlarmMetadata): Boolean     = alarmMetadata.isLatchable
+      def unapply(alarmSeverity: FullAlarmSeverity): Boolean = alarmSeverity.isLatchable
     }
 
-    object AlarmNotLatchable {
-      def unapply(alarmMetadata: AlarmMetadata): Boolean = !alarmMetadata.isLatchable
+    object NotLatchable {
+      def unapply(alarmMetadata: AlarmMetadata): Boolean     = !alarmMetadata.isLatchable
+      def unapply(alarmSeverity: FullAlarmSeverity): Boolean = !alarmSeverity.isLatchable
     }
 
     object IsHigher {
@@ -104,14 +106,6 @@ trait StatusServiceModule extends StatusService {
       def unapply(status: AlarmStatus): Boolean = status.latchedSeverity == Okay
     }
 
-    object LatchableSeverity {
-      def unapply(alarmSeverity: FullAlarmSeverity): Boolean = alarmSeverity.latchable
-    }
-
-    object UnlatchableSeverity {
-      def unapply(alarmSeverity: FullAlarmSeverity): Boolean = !alarmSeverity.latchable
-    }
-
     object AlreadyLatched {
       def unapply(status: AlarmStatus): Boolean = status.latchStatus == Latched
     }
@@ -128,14 +122,14 @@ trait StatusServiceModule extends StatusService {
     }
 
     val updatedStatus = (alarm, severity, status) match {
-      case (AlarmLatchable(), LatchableSeverity(), NotLatched() & IsHigher())         => setLatchSeverityAndLatchAlarm
-      case (AlarmLatchable(), LatchableSeverity(), NotLatched() & IsNotHigher())      => setLatchSeverityAndLatchAlarm
-      case (AlarmLatchable(), LatchableSeverity(), AlreadyLatched() & IsHigher())     => setLatchSeverity
-      case (AlarmLatchable(), UnlatchableSeverity(), NotLatched() & IsNotHigher())    => setLatchSeverity
-      case (AlarmNotLatchable(), LatchableSeverity(), NotLatched() & IsHigher())      => setLatchSeverity
-      case (AlarmNotLatchable(), LatchableSeverity(), NotLatched() & IsNotHigher())   => setLatchSeverity
-      case (AlarmNotLatchable(), UnlatchableSeverity(), NotLatched() & IsNotHigher()) => setLatchSeverity
-      case _                                                                          => status
+      case (Latchable(), Latchable(), NotLatched() & IsHigher())          => setLatchSeverityAndLatchAlarm
+      case (Latchable(), Latchable(), NotLatched() & IsNotHigher())       => setLatchSeverityAndLatchAlarm
+      case (Latchable(), Latchable(), AlreadyLatched() & IsHigher())      => setLatchSeverity
+      case (Latchable(), NotLatchable(), NotLatched() & IsNotHigher())    => setLatchSeverity
+      case (NotLatchable(), Latchable(), NotLatched() & IsHigher())       => setLatchSeverity
+      case (NotLatchable(), Latchable(), NotLatched() & IsNotHigher())    => setLatchSeverity
+      case (NotLatchable(), NotLatchable(), NotLatched() & IsNotHigher()) => setLatchSeverity
+      case _                                                              => status
     }
 
     val newStatus = (alarm, updatedStatus) match {

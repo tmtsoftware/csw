@@ -5,7 +5,9 @@ import enumeratum.{Enum, EnumEntry}
 
 import scala.collection.immutable.IndexedSeq
 
-sealed abstract class FullAlarmSeverity private[alarm] (val level: Int, val latchable: Boolean) extends EnumEntry with Lowercase {
+sealed abstract class FullAlarmSeverity private[alarm] (val level: Int, val isLatchable: Boolean)
+    extends EnumEntry
+    with Lowercase {
 
   /**
    * The name of SeverityLevels e.g. for Major severity level, the name will be represented as `major`
@@ -29,8 +31,8 @@ object FullAlarmSeverity extends Enum[FullAlarmSeverity] {
   case object Disconnected extends FullAlarmSeverity(4, false)
 }
 
-sealed abstract class AlarmSeverity private[alarm] (override val level: Int, override val latchable: Boolean)
-    extends FullAlarmSeverity(level, latchable)
+sealed abstract class AlarmSeverity private[alarm] (override val level: Int, override val isLatchable: Boolean)
+    extends FullAlarmSeverity(level, isLatchable)
 
 object AlarmSeverity extends Enum[AlarmSeverity] {
 
