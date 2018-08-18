@@ -23,7 +23,7 @@ class RedisKeySpaceApi[K: RomaineStringCodec, V: RomaineStringCodec](
   ): Source[RedisResult[K, Option[V]], RedisSubscription] = {
 
     redisSubscriptionApi
-      .subscribe(keys.map(KeyspacePattern + _), overflowStrategy)
+      .psubscribe(keys.map(KeyspacePattern + _), overflowStrategy)
       .filter(pm => pm.value == SetOperation || pm.value == ExpiredOperation)
       .mapAsync(1) { pm =>
         val key = RomaineStringCodec[K].fromString(pm.key)

@@ -3,7 +3,7 @@ package romaine
 import io.lettuce.core.{RedisClient, RedisURI}
 import romaine.async.RedisAsyncScalaApi
 import romaine.codec.{RomaineByteCodec, RomaineRedisCodec}
-import romaine.reactive.{RedisSubscribeScalaApi, RedisSubscriptionApi}
+import romaine.reactive.RedisSubscriptionApi
 
 import scala.compat.java8.FutureConverters.CompletionStageOps
 import scala.concurrent.{ExecutionContext, Future}
@@ -20,6 +20,6 @@ class RomaineFactory(redisClient: RedisClient)(implicit val ec: ExecutionContext
     redisClient
       .connectPubSubAsync(new RomaineRedisCodec[K, V], redisURI)
       .toScala
-      .map(connection => new RedisSubscriptionApi(() => new RedisSubscribeScalaApi(connection.reactive())))
+      .map(connection => new RedisSubscriptionApi(() => connection.reactive()))
   }
 }
