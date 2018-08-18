@@ -27,7 +27,7 @@ class SeverityServiceModuleTests
   // DEOPSCSW-444: Set severity api for component
   // DEOPSCSW-459: Update severity to Disconnected if not updated within predefined time
   // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
-  ignore("setSeverity should set severity") {
+  test("setSeverity should set severity") {
     //set severity to Major
     val status = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Major)
     status.acknowledgementStatus shouldBe Acknowledged
@@ -58,7 +58,7 @@ class SeverityServiceModuleTests
 
   // DEOPSCSW-444: Set severity api for component
   // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
-  ignore("setSeverity should latch alarm only when it is high risk and higher than latched severity in case of latchable alarms") {
+  test("setSeverity should latch alarm when it is higher than previous latched severity") {
     val status = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Major)
 
     status.acknowledgementStatus shouldBe Acknowledged
@@ -75,20 +75,6 @@ class SeverityServiceModuleTests
     status2.acknowledgementStatus shouldBe Acknowledged
     status2.latchedSeverity shouldBe Major
     status2.alarmTime.get.time shouldEqual status.alarmTime.get.time
-  }
-
-  // DEOPSCSW-444: Set severity api for component
-  // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
-  ignore("setSeverity should not latch alarm if it is not latchable") {
-    val status = setSeverityAndGetStatus(cpuExceededAlarmKey, Critical)
-    status.acknowledgementStatus shouldBe Acknowledged
-    status.latchedSeverity shouldBe Critical
-    status.alarmTime.isDefined shouldBe true
-
-    val status1 = setSeverityAndGetStatus(cpuExceededAlarmKey, Indeterminate)
-    status1.acknowledgementStatus shouldBe Acknowledged
-    status1.latchedSeverity shouldBe Indeterminate
-    status1.alarmTime.get.time.isAfter(status.alarmTime.get.time)
   }
 
   // DEOPSCSW-444: Set severity api for component
@@ -287,7 +273,7 @@ class SeverityServiceModuleTests
         Set(Okay, Warning, Major, Indeterminate, Critical),
         probableCause = "test",
         operatorResponse = "test",
-        isAutoAcknowledgeable = true,
+        isAutoAcknowledgeable = false,
         isLatchable = true,
         activationStatus = Active
       )

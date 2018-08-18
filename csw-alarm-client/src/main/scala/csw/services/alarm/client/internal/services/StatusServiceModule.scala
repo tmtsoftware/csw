@@ -75,6 +75,7 @@ trait StatusServiceModule extends StatusService {
 
     // get alarm status
     val originalStatus = await(getStatus(key))
+    val metadata       = await(getMetadata(key))
 
     // This class is not exposed outside `updateStatusForSeverity` function because
     // it's logic is strictly internal to this function.
@@ -98,7 +99,8 @@ trait StatusServiceModule extends StatusService {
        * @return
        */
       def updateAckStatus(): AlarmStatus = {
-        if (originalStatus.latchedSeverity != targetAlarmStatus.latchedSeverity && targetAlarmStatus.latchedSeverity != Okay)
+        if (metadata.isAutoAcknowledgeable) targetAlarmStatus.copy(acknowledgementStatus = Acknowledged)
+        else if (originalStatus.latchedSeverity != targetAlarmStatus.latchedSeverity && targetAlarmStatus.latchedSeverity != Okay)
           targetAlarmStatus.copy(acknowledgementStatus = Unacknowledged)
         else targetAlarmStatus
       }
