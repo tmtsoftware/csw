@@ -5,8 +5,8 @@ import csw.services.alarm.api.exceptions.{KeyNotFoundException, ResetOperationNo
 import csw.services.alarm.api.internal.{MetadataService, SeverityService, StatusService}
 import csw.services.alarm.api.models.AlarmSeverity.Okay
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
+import csw.services.alarm.api.models.FullAlarmSeverity.Disconnected
 import csw.services.alarm.api.models.Key.AlarmKey
-import csw.services.alarm.api.models.LatchStatus.{Latched, UnLatched}
 import csw.services.alarm.api.models.ShelveStatus.{Shelved, Unshelved}
 import csw.services.alarm.api.models._
 import csw.services.alarm.client.internal.AlarmServiceLogger
@@ -43,7 +43,6 @@ trait StatusServiceModule extends StatusService {
   // reset is only called when severity is `Okay`
   final override def reset(key: AlarmKey): Future[Unit] = async {
     log.debug(s"Reset alarm [${key.value}]")
-    val metadata = await(getMetadata(key))
 
     val currentSeverity = await(getCurrentSeverity(key))
     if (currentSeverity != Okay) logAndThrow(ResetOperationNotAllowed(key, currentSeverity))
@@ -51,7 +50,6 @@ trait StatusServiceModule extends StatusService {
     val status = await(getStatus(key))
     val resetStatus = status.copy(
       acknowledgementStatus = Acknowledged,
-      latchStatus = if (metadata.isLatchable) Latched else UnLatched,
       latchedSeverity = Okay,
       alarmTime = alarmTime(status)
     )
@@ -73,76 +71,63 @@ trait StatusServiceModule extends StatusService {
 
   private[alarm] final override def unacknowledge(key: AlarmKey): Future[Unit] = setAcknowledgementStatus(key, Unacknowledged)
 
-  private[alarm] def updateStatusForSeverity(key: AlarmKey, severity: FullAlarmSeverity): Future[Unit] = async {
-    // get alarm metadata
-    val alarm = await(getMetadata(key))
+  private[alarm] def updateStatusForSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Unit] = async {
 
     // get alarm status
-    val status = await(getStatus(key))
+    val originalStatus = await(getStatus(key))
 
-    object Latchable {
-      def unapply(alarmMetadata: AlarmMetadata): Boolean     = alarmMetadata.isLatchable
-      def unapply(alarmSeverity: FullAlarmSeverity): Boolean = alarmSeverity.isLatchable
+    // This class is not exposed outside `updateStatusForSeverity` function because
+    // it's logic is strictly internal to this function.
+    // Using closures & extension methods, this class provides a fluent api over AlarmStatus
+    implicit class RichAndFluentAlarmStatus(targetAlarmStatus: AlarmStatus) {
+
+      /**
+       * Updates latched severity of the alarm if it's is greater than original or if original latched severity is Disconnected
+       * This will be a no op if latched severity does not need to change
+       * @return updated AlarmStatus
+       */
+      def updateLatchedSeverity(): AlarmStatus = {
+        if (severity > targetAlarmStatus.latchedSeverity | originalStatus.latchedSeverity == Disconnected)
+          targetAlarmStatus.copy(latchedSeverity = severity)
+        else targetAlarmStatus
+      }
+
+      /**
+       * Updates AcknowledgementStatus of alarm if severity is changed to anything but Okay
+       * This will be a no op if AcknowledgementStatus does not need to change
+       * @return
+       */
+      def updateAckStatus(): AlarmStatus = {
+        if (originalStatus.latchedSeverity != targetAlarmStatus.latchedSeverity && targetAlarmStatus.latchedSeverity != Okay)
+          targetAlarmStatus.copy(acknowledgementStatus = Unacknowledged)
+        else targetAlarmStatus
+      }
+
+      /**
+       * Updates time of alarm if latchedSeverity has changed, otherwise it's a no op
+       * @return updated AlarmStatus
+       */
+      def updateTime(): AlarmStatus = {
+        if (originalStatus.latchedSeverity != targetAlarmStatus.latchedSeverity)
+          targetAlarmStatus.copy(alarmTime = Some(AlarmTime()))
+        else targetAlarmStatus
+      }
+
+      /**
+       * Persists the given alarm status to redis if there are any changes, otherwise it's a no op
+       */
+      def persistChanges(): Future[Unit] =
+        if (originalStatus != targetAlarmStatus) setStatus(key, targetAlarmStatus)
+        else Future(())
     }
 
-    object NotLatchable {
-      def unapply(alarmMetadata: AlarmMetadata): Boolean     = !alarmMetadata.isLatchable
-      def unapply(alarmSeverity: FullAlarmSeverity): Boolean = !alarmSeverity.isLatchable
-    }
-
-    object IsHigher {
-      def unapply(status: AlarmStatus): Boolean = severity > status.latchedSeverity
-    }
-
-    object IsNotHigher {
-      def unapply(status: AlarmStatus): Boolean = !(severity > status.latchedSeverity)
-    }
-
-    object IsAutoAcknowledgeable {
-      def unapply(alarm: AlarmMetadata): Boolean = alarm.isAutoAcknowledgeable
-    }
-
-    object IsLatchedSeverityOkay {
-      def unapply(status: AlarmStatus): Boolean = status.latchedSeverity == Okay
-    }
-
-    object AlreadyLatched {
-      def unapply(status: AlarmStatus): Boolean = status.latchStatus == Latched
-    }
-
-    object NotLatched {
-      def unapply(status: AlarmStatus): Boolean = status.latchStatus == UnLatched
-    }
-
-    val setLatchSeverity              = status.copy(latchedSeverity = severity)
-    val setLatchSeverityAndLatchAlarm = status.copy(latchedSeverity = severity, latchStatus = Latched)
-
-    object & {
-      def unapply[T](arg: T): Option[(T, T)] = Some((arg, arg))
-    }
-
-    val updatedStatus = (alarm, severity, status) match {
-      case (Latchable(), Latchable(), NotLatched() & IsHigher())          => setLatchSeverityAndLatchAlarm
-      case (Latchable(), Latchable(), NotLatched() & IsNotHigher())       => setLatchSeverityAndLatchAlarm
-      case (Latchable(), Latchable(), AlreadyLatched() & IsHigher())      => setLatchSeverity
-      case (Latchable(), NotLatchable(), NotLatched() & IsNotHigher())    => setLatchSeverity
-      case (NotLatchable(), Latchable(), NotLatched() & IsHigher())       => setLatchSeverity
-      case (NotLatchable(), Latchable(), NotLatched() & IsNotHigher())    => setLatchSeverity
-      case (NotLatchable(), NotLatchable(), NotLatched() & IsNotHigher()) => setLatchSeverity
-      case _                                                              => status
-    }
-
-    val newStatus = (alarm, updatedStatus) match {
-      case (IsAutoAcknowledgeable(), _) ⇒ updatedStatus.copy(acknowledgementStatus = Acknowledged)
-      case (_, IsLatchedSeverityOkay()) ⇒ updatedStatus.copy(acknowledgementStatus = Acknowledged)
-      case _                            ⇒ updatedStatus.copy(acknowledgementStatus = Unacknowledged)
-    }
-
-    val finalStatus =
-      if (newStatus.latchedSeverity != status.latchedSeverity) newStatus.copy(alarmTime = Some(AlarmTime())) else newStatus
-
-    // update alarm status (with recent time) only when severity changes
-    if (finalStatus != status) await(setStatus(key, finalStatus))
+    await(
+      originalStatus
+        .updateLatchedSeverity()
+        .updateAckStatus()
+        .updateTime()
+        .persistChanges()
+    )
   }
 
   private[alarm] def setStatus(alarmKey: AlarmKey, alarmStatus: AlarmStatus): Future[Unit] = {

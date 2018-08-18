@@ -6,7 +6,6 @@ import csw.services.alarm.api.exceptions.{KeyNotFoundException, ResetOperationNo
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
 import csw.services.alarm.api.models.AlarmSeverity._
 import csw.services.alarm.api.models.Key.AlarmKey
-import csw.services.alarm.api.models.LatchStatus.{Latched, UnLatched}
 import csw.services.alarm.api.models.ShelveStatus.{Shelved, Unshelved}
 import csw.services.alarm.api.models.{AlarmSeverity, AlarmStatus}
 import csw.services.alarm.client.internal.helpers.AlarmServiceTestSetup
@@ -73,7 +72,6 @@ class StatusServiceModuleTests
     reset(cpuExceededAlarmKey).await
     val status = getStatus(cpuExceededAlarmKey).await
     status.latchedSeverity shouldEqual Okay
-    status.latchStatus shouldEqual UnLatched
     status.acknowledgementStatus shouldEqual Acknowledged
   }
 
@@ -88,7 +86,6 @@ class StatusServiceModuleTests
     reset(tromboneAxisLowLimitAlarmKey).await
     val status = getStatus(tromboneAxisLowLimitAlarmKey).await
     status.latchedSeverity shouldEqual Okay
-    status.latchStatus shouldEqual Latched
     status.acknowledgementStatus shouldEqual Acknowledged
   }
 

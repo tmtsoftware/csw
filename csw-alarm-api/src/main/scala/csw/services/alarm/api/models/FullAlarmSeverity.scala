@@ -5,9 +5,7 @@ import enumeratum.{Enum, EnumEntry}
 
 import scala.collection.immutable.IndexedSeq
 
-sealed abstract class FullAlarmSeverity private[alarm] (val level: Int, val isLatchable: Boolean)
-    extends EnumEntry
-    with Lowercase {
+sealed abstract class FullAlarmSeverity private[alarm] (val level: Int) extends EnumEntry with Lowercase {
 
   /**
    * The name of SeverityLevels e.g. for Major severity level, the name will be represented as `major`
@@ -28,11 +26,10 @@ object FullAlarmSeverity extends Enum[FullAlarmSeverity] {
    */
   def values: IndexedSeq[FullAlarmSeverity] = findValues ++ AlarmSeverity.values
 
-  case object Disconnected extends FullAlarmSeverity(4, false)
+  case object Disconnected extends FullAlarmSeverity(4)
 }
 
-sealed abstract class AlarmSeverity private[alarm] (override val level: Int, override val isLatchable: Boolean)
-    extends FullAlarmSeverity(level, isLatchable)
+sealed abstract class AlarmSeverity private[alarm] (override val level: Int) extends FullAlarmSeverity(level)
 
 object AlarmSeverity extends Enum[AlarmSeverity] {
 
@@ -41,9 +38,9 @@ object AlarmSeverity extends Enum[AlarmSeverity] {
    */
   def values: IndexedSeq[AlarmSeverity] = findValues
 
-  case object Okay          extends AlarmSeverity(0, false)
-  case object Warning       extends AlarmSeverity(1, true)
-  case object Major         extends AlarmSeverity(2, true)
-  case object Indeterminate extends AlarmSeverity(3, true)
-  case object Critical      extends AlarmSeverity(5, true)
+  case object Okay          extends AlarmSeverity(0)
+  case object Warning       extends AlarmSeverity(1)
+  case object Major         extends AlarmSeverity(2)
+  case object Indeterminate extends AlarmSeverity(3)
+  case object Critical      extends AlarmSeverity(5)
 }

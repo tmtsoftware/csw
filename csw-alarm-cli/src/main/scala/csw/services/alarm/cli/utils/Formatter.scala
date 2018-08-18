@@ -37,7 +37,6 @@ object Formatter {
 
     List(
       s"Acknowledgement Status: $acknowledgementStatus",
-      s"Latch Status: $latchStatus",
       s"Latch Severity: $latchedSeverity",
       s"Shelve Status: $shelveStatus",
       s"Alarm Time: ${alarmTime.map(_.time.toString).getOrElse("")}"
