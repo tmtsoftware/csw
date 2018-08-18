@@ -271,6 +271,7 @@ class SeverityServiceModuleTests
     )
   )
 
+  //DEOPSCSW-444 : Set severity api for component
   severityTestCases.foreach(testCase => {
     test(testCase.toString) {
 
@@ -284,6 +285,146 @@ class SeverityServiceModuleTests
       status.latchStatus shouldEqual testCase.expectedLatchStatus
     }
   })
+
+  val ackTestCases = List(
+    AcknowledgeAndLatchTestCase(
+      alarmKey = AlarmKey(AOESW, "test", "AutoAcknowledgeble_Latchable_Disconnected=>Okay"),
+      isAutoAcknowledgeble = true,
+      isAlarmLachable = true,
+      oldSeverity = Disconnected,
+      newSeverity = Okay,
+      expectedAckStatus = Acknowledged
+    ),
+    AcknowledgeAndLatchTestCase(
+      alarmKey = AlarmKey(AOESW, "test", "NotAutoAcknowledgeble_Latchable_Disconnected=>Okay"),
+      isAutoAcknowledgeble = false,
+      isAlarmLachable = true,
+      oldSeverity = Disconnected,
+      newSeverity = Okay,
+      expectedAckStatus = Acknowledged
+    ),
+    AcknowledgeAndLatchTestCase(
+      alarmKey = AlarmKey(AOESW, "test", "AutoAcknowledgeble_NotLatchable_Disconnected=>Okay"),
+      isAutoAcknowledgeble = true,
+      isAlarmLachable = false,
+      oldSeverity = Disconnected,
+      newSeverity = Okay,
+      expectedAckStatus = Acknowledged
+    ),
+    AcknowledgeAndLatchTestCase(
+      alarmKey = AlarmKey(AOESW, "test", "NotAutoAcknowledgeble_NotLatchable_Disconnected=>Okay"),
+      isAutoAcknowledgeble = false,
+      isAlarmLachable = false,
+      oldSeverity = Disconnected,
+      newSeverity = Okay,
+      expectedAckStatus = Acknowledged
+    ),
+    AcknowledgeAndLatchTestCase(
+      alarmKey = AlarmKey(AOESW, "test", "AutoAcknowledgeble_Latchable_Okay=>Critical"),
+      isAutoAcknowledgeble = true,
+      isAlarmLachable = true,
+      oldSeverity = Okay,
+      newSeverity = Critical,
+      expectedAckStatus = Acknowledged
+    ),
+    AcknowledgeAndLatchTestCase(
+      alarmKey = AlarmKey(AOESW, "test", "NotAutoAcknowledgeble_Latchable_Okay=>Critical"),
+      isAutoAcknowledgeble = false,
+      isAlarmLachable = true,
+      oldSeverity = Okay,
+      newSeverity = Critical,
+      expectedAckStatus = Unacknowledged
+    ),
+    AcknowledgeAndLatchTestCase(
+      alarmKey = AlarmKey(AOESW, "test", "AutoAcknowledgeble_NotLatchable_Okay=>Critical"),
+      isAutoAcknowledgeble = true,
+      isAlarmLachable = false,
+      oldSeverity = Okay,
+      newSeverity = Critical,
+      expectedAckStatus = Acknowledged
+    ),
+    AcknowledgeAndLatchTestCase(
+      alarmKey = AlarmKey(AOESW, "test", "NotAutoAcknowledgeble_NotLatchable_Okay=>Critical"),
+      isAutoAcknowledgeble = false,
+      isAlarmLachable = false,
+      oldSeverity = Okay,
+      newSeverity = Critical,
+      expectedAckStatus = Unacknowledged
+    ),
+    AcknowledgeAndLatchTestCase(
+      alarmKey = AlarmKey(AOESW, "test", "AutoAcknowledgeble_Latchable_Critical=>Okay"),
+      isAutoAcknowledgeble = true,
+      isAlarmLachable = true,
+      oldSeverity = Critical,
+      newSeverity = Okay,
+      expectedAckStatus = Acknowledged
+    ),
+    AcknowledgeAndLatchTestCase(
+      alarmKey = AlarmKey(AOESW, "test", "NotAutoAcknowledgeble_Latchable_Critical=>Okay"),
+      isAutoAcknowledgeble = false,
+      isAlarmLachable = true,
+      oldSeverity = Critical,
+      newSeverity = Okay,
+      expectedAckStatus = Unacknowledged
+    ),
+    AcknowledgeAndLatchTestCase(
+      alarmKey = AlarmKey(AOESW, "test", "AutoAcknowledgeble_NotLatchable_Critical=>Okay"),
+      isAutoAcknowledgeble = true,
+      isAlarmLachable = false,
+      oldSeverity = Critical,
+      newSeverity = Okay,
+      expectedAckStatus = Acknowledged
+    ),
+    AcknowledgeAndLatchTestCase(
+      alarmKey = AlarmKey(AOESW, "test", "NotAutoAcknowledgeble_NotLatchable_Critical=>Okay"),
+      isAutoAcknowledgeble = false,
+      isAlarmLachable = false,
+      oldSeverity = Critical,
+      newSeverity = Okay,
+      expectedAckStatus = Acknowledged
+    )
+  )
+
+  //DEOPSCSW-444 : Set severity api for component
+  ackTestCases.foreach(
+    testCase =>
+      test(testCase.toString) {
+        //test setup
+        setMetadata(
+          testCase.alarmKey,
+          AlarmMetadata(
+            subsystem = testCase.alarmKey.subsystem,
+            component = testCase.alarmKey.component,
+            name = testCase.alarmKey.name,
+            description = "for test purpose",
+            location = "testing",
+            AlarmType.Absolute,
+            Set(Okay, Warning, Major, Indeterminate, Critical),
+            probableCause = "test",
+            operatorResponse = "test",
+            isAutoAcknowledgeable = testCase.isAutoAcknowledgeble,
+            isLatchable = testCase.isAlarmLachable,
+            activationStatus = Active
+          )
+        ).await
+
+        setStatus(
+          testCase.alarmKey,
+          AlarmStatus().copy(
+            latchedSeverity = testCase.oldSeverity,
+            acknowledgementStatus =
+              if (testCase.isAutoAcknowledgeble || testCase.oldSeverity == Okay) Acknowledged else Unacknowledged,
+            latchStatus = if (testCase.isAlarmLachable && testCase.oldSeverity.latchable) Latched else UnLatched
+          )
+        ).await
+
+        //set severity to new Severity
+        val status = setSeverityAndGetStatus(testCase.alarmKey, testCase.newSeverity)
+
+        //get severity and assert
+        status.acknowledgementStatus shouldEqual testCase.expectedAckStatus
+    }
+  )
 
   private def feedTestData(testCase: SetSeverityTestCase) = {
     // Adding metadata for corresponding test in alarm store
