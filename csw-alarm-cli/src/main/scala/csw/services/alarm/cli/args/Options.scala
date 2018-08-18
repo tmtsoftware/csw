@@ -2,7 +2,7 @@ package csw.services.alarm.cli.args
 import java.nio.file.Path
 
 import csw.messages.params.models.Subsystem
-import csw.services.alarm.api.models.{ExplicitAlarmSeverity, Key}
+import csw.services.alarm.api.models.{AlarmSeverity, Key}
 import csw.services.alarm.api.models.Key.{AlarmKey, ComponentKey, GlobalKey, SubsystemKey}
 
 case class Options(
@@ -13,7 +13,7 @@ case class Options(
     maybeSubsystem: Option[Subsystem] = None,
     maybeComponent: Option[String] = None,
     maybeAlarmName: Option[String] = None,
-    severity: Option[ExplicitAlarmSeverity] = None
+    severity: Option[AlarmSeverity] = None
 ) {
   def alarmKey: AlarmKey = AlarmKey(maybeSubsystem.get, maybeComponent.get, maybeAlarmName.get)
 

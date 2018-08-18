@@ -5,7 +5,7 @@ import csw.commons.redis.EmbeddedRedis
 import csw.commons.utils.SocketUtils.getFreePort
 import csw.services.alarm.api.internal.{MetadataKey, SeverityKey, StatusKey}
 import csw.services.alarm.api.javadsl.IAlarmService
-import csw.services.alarm.api.models.{AlarmMetadata, AlarmSeverity, AlarmStatus}
+import csw.services.alarm.api.models.{AlarmMetadata, AlarmStatus, FullAlarmSeverity}
 import csw.services.alarm.api.scaladsl.AlarmAdminService
 import csw.services.alarm.client.AlarmServiceFactory
 import csw.services.alarm.client.internal.commons.Settings
@@ -48,8 +48,9 @@ class AlarmServiceTestSetup
   import csw.services.alarm.client.internal.AlarmCodec._
   val connsFactory: RedisConnectionsFactory                           = new RedisConnectionsFactory(resolver, alarmServer, new RomaineFactory(redisClient))
   val testMetadataApi: RedisAsyncScalaApi[MetadataKey, AlarmMetadata] = connsFactory.asyncApi[MetadataKey, AlarmMetadata].await
-  val testSeverityApi: RedisAsyncScalaApi[SeverityKey, AlarmSeverity] = connsFactory.asyncApi[SeverityKey, AlarmSeverity].await
-  val testStatusApi: RedisAsyncScalaApi[StatusKey, AlarmStatus]       = connsFactory.asyncApi[StatusKey, AlarmStatus].await
+  val testSeverityApi: RedisAsyncScalaApi[SeverityKey, FullAlarmSeverity] =
+    connsFactory.asyncApi[SeverityKey, FullAlarmSeverity].await
+  val testStatusApi: RedisAsyncScalaApi[StatusKey, AlarmStatus] = connsFactory.asyncApi[StatusKey, AlarmStatus].await
 
   override protected def afterAll(): Unit = {
     redisClient.shutdown()

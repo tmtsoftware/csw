@@ -45,7 +45,7 @@ public class JAlarmServiceImplTest {
         alarmServiceTestSetup.afterAll();
     }
 
-    private AlarmStatus setSeverity(AlarmKey alarmKey, ExplicitAlarmSeverity severity) throws Exception {
+    private AlarmStatus setSeverity(AlarmKey alarmKey, AlarmSeverity severity) throws Exception {
         jAlarmService.setSeverity(alarmKey, severity).get();
         return Await.result(alarmServiceTestSetup.alarmService().getStatus(alarmKey), new FiniteDuration(2, TimeUnit.SECONDS));
     }
@@ -56,7 +56,7 @@ public class JAlarmServiceImplTest {
     public void shouldSetSeverityInAlarmStoreForGivenKey() throws Exception {
         AlarmKey tromboneAxisHighLimitAlarm = new AlarmKey(JSubsystem.NFIRAOS, "trombone", "tromboneAxisHighLimitAlarm");
 
-        AlarmSeverity severityBeforeSetting = Await.result(alarmService.getCurrentSeverity(tromboneAxisHighLimitAlarm), new FiniteDuration(2, TimeUnit.SECONDS));
+        FullAlarmSeverity severityBeforeSetting = Await.result(alarmService.getCurrentSeverity(tromboneAxisHighLimitAlarm), new FiniteDuration(2, TimeUnit.SECONDS));
         assertEquals(severityBeforeSetting, JAlarmSeverity.Disconnected);
 
         //set severity to Major
@@ -68,12 +68,12 @@ public class JAlarmServiceImplTest {
         assertTrue(status.alarmTime().isDefined());
 
         //get severity and assert
-        AlarmSeverity severityAfterSetting = Await.result(alarmService.getCurrentSeverity(tromboneAxisHighLimitAlarm), new FiniteDuration(2, TimeUnit.SECONDS));
+        FullAlarmSeverity severityAfterSetting = Await.result(alarmService.getCurrentSeverity(tromboneAxisHighLimitAlarm), new FiniteDuration(2, TimeUnit.SECONDS));
         assertEquals(severityAfterSetting, JAlarmSeverity.Major);
 
         //wait for 1 second and assert expiry of severity
         Thread.sleep(1000);
-        AlarmSeverity severityAfter1Second = Await.result(alarmService.getCurrentSeverity(tromboneAxisHighLimitAlarm), new FiniteDuration(2, TimeUnit.SECONDS));
+        FullAlarmSeverity severityAfter1Second = Await.result(alarmService.getCurrentSeverity(tromboneAxisHighLimitAlarm), new FiniteDuration(2, TimeUnit.SECONDS));
         assertEquals(severityAfter1Second, JAlarmSeverity.Disconnected);
     }
 

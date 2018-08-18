@@ -4,8 +4,8 @@ import com.typesafe.config.ConfigFactory
 import csw.messages.params.models.Subsystem.{AOESW, BAD, LGSF, NFIRAOS}
 import csw.services.alarm.api.exceptions.{InactiveAlarmException, InvalidSeverityException, KeyNotFoundException}
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
-import csw.services.alarm.api.models.AlarmSeverity.Disconnected
-import csw.services.alarm.api.models.ExplicitAlarmSeverity._
+import csw.services.alarm.api.models.FullAlarmSeverity.Disconnected
+import csw.services.alarm.api.models.AlarmSeverity._
 import csw.services.alarm.api.models.ActivationStatus.Active
 import csw.services.alarm.api.models.Key.{AlarmKey, ComponentKey, GlobalKey, SubsystemKey}
 import csw.services.alarm.api.models.LatchStatus.{Latched, UnLatched}
@@ -453,7 +453,7 @@ class SeverityServiceModuleTests
                 latchStatus = testCase.oldLatchStatus
               )).await
   }
-  private def setSeverityAndGetStatus(alarmKey: AlarmKey, alarmSeverity: ExplicitAlarmSeverity): AlarmStatus = {
+  private def setSeverityAndGetStatus(alarmKey: AlarmKey, alarmSeverity: AlarmSeverity): AlarmStatus = {
     setSeverity(alarmKey, alarmSeverity).await
     testStatusApi.get(alarmKey).await.get
   }

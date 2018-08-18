@@ -2,7 +2,7 @@ package csw.services.alarm.api.models
 import csw.messages.params.models.Subsystem
 import csw.services.alarm.api.internal.AlarmRW
 import csw.services.alarm.api.models.ActivationStatus.Active
-import csw.services.alarm.api.models.ExplicitAlarmSeverity.{Indeterminate, Okay}
+import csw.services.alarm.api.models.AlarmSeverity.{Indeterminate, Okay}
 import csw.services.alarm.api.models.Key.AlarmKey
 import upickle.default.{macroRW, ReadWriter => RW}
 
@@ -30,16 +30,16 @@ case class AlarmMetadata(
     description: String,
     location: String,
     alarmType: AlarmType,
-    private val supportedSeverities: Set[AlarmSeverity],
+    private val supportedSeverities: Set[FullAlarmSeverity],
     probableCause: String,
     operatorResponse: String,
     isAutoAcknowledgeable: Boolean,
     isLatchable: Boolean,
     activationStatus: ActivationStatus
 ) {
-  def alarmKey: Key                              = AlarmKey(subsystem, component, name)
-  def isActive: Boolean                          = activationStatus == Active
-  def allSupportedSeverities: Set[AlarmSeverity] = supportedSeverities ++ Set(Indeterminate, Okay)
+  def alarmKey: Key                                  = AlarmKey(subsystem, component, name)
+  def isActive: Boolean                              = activationStatus == Active
+  def allSupportedSeverities: Set[FullAlarmSeverity] = supportedSeverities ++ Set(Indeterminate, Okay)
 }
 
 object AlarmMetadata extends AlarmRW {

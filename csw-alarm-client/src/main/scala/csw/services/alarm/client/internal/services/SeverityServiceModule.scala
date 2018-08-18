@@ -6,9 +6,9 @@ import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{ActorMaterializer, Materializer}
 import csw.services.alarm.api.exceptions.{InactiveAlarmException, InvalidSeverityException, KeyNotFoundException}
 import csw.services.alarm.api.internal.{MetadataService, SeverityKey, SeverityService, StatusService}
-import csw.services.alarm.api.models.AlarmSeverity.Disconnected
+import csw.services.alarm.api.models.FullAlarmSeverity.Disconnected
 import csw.services.alarm.api.models.Key.AlarmKey
-import csw.services.alarm.api.models.{AlarmSeverity, ExplicitAlarmSeverity, Key}
+import csw.services.alarm.api.models.{AlarmSeverity, FullAlarmSeverity, Key}
 import csw.services.alarm.api.scaladsl.AlarmSubscription
 import csw.services.alarm.client.internal.commons.Settings
 import csw.services.alarm.client.internal.redis.RedisConnectionsFactory
@@ -30,12 +30,12 @@ trait SeverityServiceModule extends SeverityService {
 
   private implicit lazy val mat: Materializer = ActorMaterializer()
 
-  final override def setSeverity(key: AlarmKey, severity: ExplicitAlarmSeverity): Future[Unit] = async {
+  final override def setSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Unit] = async {
     await(setCurrentSeverity(key, severity))
     await(updateStatusForSeverity(key, severity))
   }
 
-  final override def getAggregatedSeverity(key: Key): Future[AlarmSeverity] = async {
+  final override def getAggregatedSeverity(key: Key): Future[FullAlarmSeverity] = async {
     log.debug(s"Get aggregated severity for alarm [${key.value}]")
     val metadataApi = await(metadataApiF)
     val severityApi = await(severityApiF)
@@ -53,22 +53,22 @@ trait SeverityServiceModule extends SeverityService {
       case _                 => Disconnected
     }
 
-    severityList.reduceRight((previous, current: AlarmSeverity) ⇒ previous max current)
+    severityList.reduceRight((previous, current: FullAlarmSeverity) ⇒ previous max current)
   }
 
-  final override def subscribeAggregatedSeverityCallback(key: Key, callback: AlarmSeverity ⇒ Unit): AlarmSubscription = {
+  final override def subscribeAggregatedSeverityCallback(key: Key, callback: FullAlarmSeverity ⇒ Unit): AlarmSubscription = {
     log.debug(s"Subscribe aggregated severity for alarm [${key.value}] with a callback")
     subscribeAggregatedSeverity(key)
       .to(Sink.foreach(callback))
       .run()
   }
 
-  final override def subscribeAggregatedSeverityActorRef(key: Key, actorRef: ActorRef[AlarmSeverity]): AlarmSubscription = {
+  final override def subscribeAggregatedSeverityActorRef(key: Key, actorRef: ActorRef[FullAlarmSeverity]): AlarmSubscription = {
     log.debug(s"Subscribe aggregated severity for alarm [${key.value}] with an actor")
     subscribeAggregatedSeverityCallback(key, actorRef ! _)
   }
 
-  final override def getCurrentSeverity(key: AlarmKey): Future[AlarmSeverity] = async {
+  final override def getCurrentSeverity(key: AlarmKey): Future[FullAlarmSeverity] = async {
     log.debug(s"Getting severity for alarm [${key.value}]")
     val metadataApi = await(metadataApiF)
     val severityApi = await(severityApiF)
@@ -77,7 +77,7 @@ trait SeverityServiceModule extends SeverityService {
     else logAndThrow(KeyNotFoundException(key))
   }
 
-  private[alarm] def setCurrentSeverity(key: AlarmKey, severity: ExplicitAlarmSeverity): Future[Unit] = async {
+  private[alarm] def setCurrentSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Unit] = async {
     log.debug(
       s"Setting severity [${severity.name}] for alarm [${key.value}] with expire timeout [${settings.ttlInSeconds}] seconds"
     )
@@ -101,12 +101,12 @@ trait SeverityServiceModule extends SeverityService {
   // pattern: e.g  __keyspace@0__:status.nfiraos.*.*,
   // channel: e.g. __keyspace@0__:status.nfiraos.trombone.tromboneAxisLowLimitAlarm,
   // message: event type as value: e.g. set, expire, expired
-  private[alarm] def subscribeAggregatedSeverity(key: Key): Source[AlarmSeverity, AlarmSubscription] = {
+  private[alarm] def subscribeAggregatedSeverity(key: Key): Source[FullAlarmSeverity, AlarmSubscription] = {
     import AlarmCodec._
     val redisStreamApi     = severityApiF.flatMap(severityApi ⇒ redisKeySpaceApi(severityApi)) // create new connection for every client
     val keys: List[String] = List(SeverityKey.fromAlarmKey(key).value)
 
-    def reducer(iterable: Iterable[Option[AlarmSeverity]]): AlarmSeverity =
+    def reducer(iterable: Iterable[Option[FullAlarmSeverity]]): FullAlarmSeverity =
       iterable.map(x => if (x.isEmpty) Disconnected else x.get).maxBy(_.level)
 
     Source

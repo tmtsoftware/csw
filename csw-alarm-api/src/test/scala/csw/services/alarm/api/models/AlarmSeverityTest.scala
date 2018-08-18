@@ -1,9 +1,7 @@
 package csw.services.alarm.api.models
 
-import csw.services.alarm.api.models.AlarmSeverity.Disconnected
-import csw.services.alarm.api.models.ExplicitAlarmSeverity._
+import csw.services.alarm.api.models.AlarmSeverity._
 
-// DEOPSCSW-437 : Model to represent alarm severities
 class AlarmSeverityTest extends EnumTest(AlarmSeverity) {
-  override val expectedValues = Set(Disconnected, Okay, Warning, Major, Indeterminate, Critical)
+  override val expectedValues = Set(Indeterminate, Okay, Warning, Major, Critical)
 }

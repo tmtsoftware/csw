@@ -1,7 +1,7 @@
 package csw.services.alarm.client.internal.redis
 
 import csw.services.alarm.api.internal.{MetadataKey, SeverityKey, StatusKey}
-import csw.services.alarm.api.models.{AlarmMetadata, AlarmSeverity, AlarmStatus}
+import csw.services.alarm.api.models.{AlarmMetadata, AlarmStatus, FullAlarmSeverity}
 import csw.services.alarm.client.internal.commons.serviceresolver.AlarmServiceResolver
 import io.lettuce.core.RedisURI
 import romaine.RomaineFactory
@@ -16,9 +16,9 @@ class RedisConnectionsFactory(alarmServiceResolver: AlarmServiceResolver, master
 ) {
   import csw.services.alarm.client.internal.AlarmCodec._
 
-  lazy val metadataApiF: Future[RedisAsyncScalaApi[MetadataKey, AlarmMetadata]] = asyncApi
-  lazy val severityApiF: Future[RedisAsyncScalaApi[SeverityKey, AlarmSeverity]] = asyncApi
-  lazy val statusApiF: Future[RedisAsyncScalaApi[StatusKey, AlarmStatus]]       = asyncApi
+  lazy val metadataApiF: Future[RedisAsyncScalaApi[MetadataKey, AlarmMetadata]]     = asyncApi
+  lazy val severityApiF: Future[RedisAsyncScalaApi[SeverityKey, FullAlarmSeverity]] = asyncApi
+  lazy val statusApiF: Future[RedisAsyncScalaApi[StatusKey, AlarmStatus]]           = asyncApi
 
   def asyncApi[K: RomaineStringCodec, V: RomaineStringCodec]: Future[RedisAsyncScalaApi[K, V]] =
     redisURI.flatMap(x => romaineFactory.redisAsyncScalaApi[K, V](x))

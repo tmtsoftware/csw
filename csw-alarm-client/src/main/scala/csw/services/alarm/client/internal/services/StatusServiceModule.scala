@@ -3,7 +3,7 @@ package csw.services.alarm.client.internal.services
 import akka.actor.ActorSystem
 import csw.services.alarm.api.exceptions.{KeyNotFoundException, ResetOperationNotAllowed}
 import csw.services.alarm.api.internal.{MetadataService, SeverityService, StatusService}
-import csw.services.alarm.api.models.ExplicitAlarmSeverity.Okay
+import csw.services.alarm.api.models.AlarmSeverity.Okay
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
 import csw.services.alarm.api.models.Key.AlarmKey
 import csw.services.alarm.api.models.LatchStatus.{Latched, UnLatched}
@@ -73,7 +73,7 @@ trait StatusServiceModule extends StatusService {
 
   private[alarm] final override def unacknowledge(key: AlarmKey): Future[Unit] = setAcknowledgementStatus(key, Unacknowledged)
 
-  private[alarm] def updateStatusForSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Unit] = async {
+  private[alarm] def updateStatusForSeverity(key: AlarmKey, severity: FullAlarmSeverity): Future[Unit] = async {
     // get alarm metadata
     val alarm = await(getMetadata(key))
 
@@ -105,11 +105,11 @@ trait StatusServiceModule extends StatusService {
     }
 
     object LatchableSeverity {
-      def unapply(alarmSeverity: AlarmSeverity): Boolean = alarmSeverity.latchable
+      def unapply(alarmSeverity: FullAlarmSeverity): Boolean = alarmSeverity.latchable
     }
 
     object UnlatchableSeverity {
-      def unapply(alarmSeverity: AlarmSeverity): Boolean = !alarmSeverity.latchable
+      def unapply(alarmSeverity: FullAlarmSeverity): Boolean = !alarmSeverity.latchable
     }
 
     object AlreadyLatched {

@@ -1,7 +1,7 @@
 package csw.services.alarm.api.models
 
-import csw.services.alarm.api.models.AlarmSeverity.Disconnected
-import csw.services.alarm.api.models.ExplicitAlarmSeverity._
+import csw.services.alarm.api.models.FullAlarmSeverity.Disconnected
+import csw.services.alarm.api.models.AlarmSeverity._
 import enumeratum.EnumEntry.Lowercase
 import enumeratum.{Enum, EnumEntry}
 
@@ -20,7 +20,7 @@ object AlarmHealth extends Enum[AlarmHealth] {
   case object Ill  extends AlarmHealth
   case object Bad  extends AlarmHealth
 
-  private[alarm] def fromSeverity(alarmSeverity: AlarmSeverity): AlarmHealth = alarmSeverity match {
+  private[alarm] def fromSeverity(alarmSeverity: FullAlarmSeverity): AlarmHealth = alarmSeverity match {
     case Disconnected | Indeterminate | Critical => Bad
     case Major                                   => Ill
     case Okay | Warning                          => Good

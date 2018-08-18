@@ -2,7 +2,7 @@ package csw.services.alarm.client
 import com.typesafe.config.ConfigFactory
 import csw.commons.utils.SocketUtils.getFreePort
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
-import csw.services.alarm.api.models.ExplicitAlarmSeverity.Indeterminate
+import csw.services.alarm.api.models.AlarmSeverity.Indeterminate
 import csw.services.alarm.api.scaladsl.{AlarmAdminService, AlarmService}
 import csw.services.alarm.client.internal.commons.AlarmServiceConnection
 import csw.services.alarm.client.internal.helpers.AlarmServiceTestSetup

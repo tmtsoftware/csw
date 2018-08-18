@@ -5,7 +5,7 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import csw.messages.commons.CoordinatedShutdownReasons;
 import csw.services.alarm.api.javadsl.IAlarmService;
-import csw.services.alarm.api.models.AlarmSeverity;
+import csw.services.alarm.api.models.FullAlarmSeverity;
 import csw.services.alarm.api.scaladsl.AlarmAdminService;
 import csw.services.alarm.client.internal.commons.AlarmServiceConnection;
 import csw.services.alarm.client.internal.helpers.AlarmServiceTestSetup;
@@ -55,7 +55,7 @@ public class JAlarmServiceFactoryTest {
         IAlarmService alarmServiceUsingLS = alarmServiceFactory.jMakeClientApi(locationService, seedSystem).get();
         alarmServiceUsingLS.setSeverity(testSetup.tromboneAxisHighLimitAlarmKey(), Indeterminate).get();
 
-        AlarmSeverity alarmSeverity = Await.result(alarmService.getCurrentSeverity(testSetup.tromboneAxisHighLimitAlarmKey()), Duration.create(5, TimeUnit.SECONDS));
+        FullAlarmSeverity alarmSeverity = Await.result(alarmService.getCurrentSeverity(testSetup.tromboneAxisHighLimitAlarmKey()), Duration.create(5, TimeUnit.SECONDS));
         Assert.assertEquals(alarmSeverity, Indeterminate);
     }
 
@@ -64,7 +64,7 @@ public class JAlarmServiceFactoryTest {
         IAlarmService alarmServiceUsingHostPort = alarmServiceFactory.jMakeClientApi(testSetup.hostname(), testSetup.sentinelPort(), seedSystem).get();
         alarmServiceUsingHostPort.setSeverity(testSetup.tromboneAxisHighLimitAlarmKey(), Indeterminate).get();
 
-        AlarmSeverity alarmSeverity = Await.result(alarmService.getCurrentSeverity(testSetup.tromboneAxisHighLimitAlarmKey()), Duration.create(5, TimeUnit.SECONDS));
+        FullAlarmSeverity alarmSeverity = Await.result(alarmService.getCurrentSeverity(testSetup.tromboneAxisHighLimitAlarmKey()), Duration.create(5, TimeUnit.SECONDS));
         Assert.assertEquals(alarmSeverity, Indeterminate);
     }
 }

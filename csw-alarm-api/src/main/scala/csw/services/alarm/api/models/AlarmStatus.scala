@@ -1,13 +1,13 @@
 package csw.services.alarm.api.models
 import csw.services.alarm.api.models.AcknowledgementStatus.Unacknowledged
-import csw.services.alarm.api.models.AlarmSeverity.Disconnected
+import csw.services.alarm.api.models.FullAlarmSeverity.Disconnected
 import csw.services.alarm.api.models.LatchStatus.UnLatched
 import csw.services.alarm.api.models.ShelveStatus.Unshelved
 
 case class AlarmStatus(
     acknowledgementStatus: AcknowledgementStatus,
     latchStatus: LatchStatus,
-    latchedSeverity: AlarmSeverity,
+    latchedSeverity: FullAlarmSeverity,
     shelveStatus: ShelveStatus,
     alarmTime: Option[AlarmTime]
 )

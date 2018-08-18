@@ -3,7 +3,7 @@ import com.typesafe.config.ConfigFactory
 import csw.messages.params.models.Subsystem.{LGSF, NFIRAOS, TCS}
 import csw.services.alarm.api.exceptions.ConfigParseException
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
-import csw.services.alarm.api.models.ExplicitAlarmSeverity._
+import csw.services.alarm.api.models.AlarmSeverity._
 import csw.services.alarm.api.models.AlarmType.Absolute
 import csw.services.alarm.api.models.{AlarmMetadata, AlarmType}
 import org.scalatest.{FunSuite, Matchers}

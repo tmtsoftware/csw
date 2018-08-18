@@ -3,7 +3,7 @@ package csw.services.alarm.cli.args
 import java.nio.file.Paths
 
 import csw.messages.params.models.Subsystem
-import csw.services.alarm.api.models.ExplicitAlarmSeverity
+import csw.services.alarm.api.models.AlarmSeverity
 import scopt.{OptionDef, OptionParser}
 
 trait Arguments { self: OptionParser[Options] =>
@@ -41,7 +41,7 @@ trait Arguments { self: OptionParser[Options] =>
   def severity: OptionDef[String, Options] =
     opt[String]("severity")
       .action(
-        (severity, args) ⇒ args.copy(severity = Some(ExplicitAlarmSeverity.withNameInsensitive(severity)))
+        (severity, args) ⇒ args.copy(severity = Some(AlarmSeverity.withNameInsensitive(severity)))
       )
       .text("severity to set for an alarm e.g Okay, Warning, Major, etc.")
 }

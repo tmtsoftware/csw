@@ -19,7 +19,7 @@ private[alarm] trait AlarmRW {
 
   implicit val alarmStatusRW: RW[AlarmStatus]                     = macroRW
   implicit val subsystemRW: RW[Subsystem]                         = EnumUpickleSupport.enumFormat
-  implicit val alarmSeverityRW: RW[AlarmSeverity]                 = EnumUpickleSupport.enumFormat
+  implicit val alarmSeverityRW: RW[FullAlarmSeverity]             = EnumUpickleSupport.enumFormat
   implicit val acknowledgementStatusRW: RW[AcknowledgementStatus] = EnumUpickleSupport.enumFormat
   implicit val activationStatusRW: RW[ActivationStatus]           = EnumUpickleSupport.enumFormat
   implicit val alarmTypeRW: RW[AlarmType]                         = EnumUpickleSupport.enumFormat
