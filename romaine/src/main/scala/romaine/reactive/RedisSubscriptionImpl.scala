@@ -10,7 +10,7 @@ private class RedisSubscriptionImpl[K](
     subscriptionF: Future[Unit],
     killSwitch: KillSwitch,
     terminationSignal: Future[Done],
-    redisReactiveScalaApi: RedisReactiveScalaApi[K, _]
+    redisReactiveApi: RedisReactiveApi[K, _]
 )(implicit executionContext: ExecutionContext)
     extends RedisSubscription {
 
@@ -19,8 +19,8 @@ private class RedisSubscriptionImpl[K](
    * @return a future which completes when the unsubscribe is completed
    */
   def unsubscribe(): Future[Unit] = async {
-    await(redisReactiveScalaApi.unsubscribe(keys)) // unsubscribe is no-op
-    await(redisReactiveScalaApi.quit)
+    await(redisReactiveApi.unsubscribe(keys)) // unsubscribe is no-op
+    await(redisReactiveApi.quit)
     killSwitch.shutdown()
     await(terminationSignal) // await on terminationSignal when unsubscribe is called by user
   }

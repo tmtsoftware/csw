@@ -10,15 +10,15 @@ import scala.concurrent.ExecutionContext
 
 class RedisSubscriptionApi[K, V](reactiveApiFactory: () => RedisPubSubReactiveCommands[K, V])(implicit ec: ExecutionContext) {
   def subscribe(keys: List[K], overflowStrategy: OverflowStrategy): Source[RedisResult[K, V], RedisSubscription] =
-    subscribeInternal(keys, overflowStrategy, new RedisSubscribeScalaApi(reactiveApiFactory()))
+    subscribeInternal(keys, overflowStrategy, new RedisSubscribeApi(reactiveApiFactory()))
 
   def psubscribe(keys: List[K], overflowStrategy: OverflowStrategy): Source[RedisResult[K, V], RedisSubscription] =
-    subscribeInternal(keys, overflowStrategy, new RedisPSubscribeScalaApi(reactiveApiFactory()))
+    subscribeInternal(keys, overflowStrategy, new RedisPSubscribeApi(reactiveApiFactory()))
 
   private def subscribeInternal(
       keys: List[K],
       overflowStrategy: OverflowStrategy,
-      reactiveApi: RedisReactiveScalaApi[K, V]
+      reactiveApi: RedisReactiveApi[K, V]
   ): Source[RedisResult[K, V], RedisSubscription] = {
     val connectionFuture = reactiveApi.subscribe(keys)
     val subscribeSource  = Source.fromFuture(connectionFuture)

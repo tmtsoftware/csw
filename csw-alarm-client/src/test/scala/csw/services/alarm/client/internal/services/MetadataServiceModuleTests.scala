@@ -114,7 +114,7 @@ class MetadataServiceModuleTests
     initAlarms(twoAlarmsConfig, reset = true).await
     getMetadata(GlobalKey).await.size shouldBe 2
 
-    // bypassing AlarmService, set some value for MetadataKey using RedisAsyncScalaApi in order to simulate keys other than alarm service
+    // bypassing AlarmService, set some value for MetadataKey using RedisAsyncApi in order to simulate keys other than alarm service
     testMetadataApi.set(MetadataKey("sentinel.a.b.c"), cpuExceededAlarm).await
     testMetadataApi.get(MetadataKey("sentinel.a.b.c")).await shouldBe Some(cpuExceededAlarm)
 

@@ -2,7 +2,7 @@ package romaine.reactive
 
 import akka.stream.scaladsl.Source
 import reactor.core.publisher.FluxSink.OverflowStrategy
-import romaine.async.RedisAsyncScalaApi
+import romaine.async.RedisAsyncApi
 import romaine.codec.RomaineStringCodec
 import romaine.extensions.SourceExtensions.RichSource
 
@@ -10,7 +10,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class RedisKeySpaceApi[K: RomaineStringCodec, V: RomaineStringCodec](
     redisSubscriptionApi: RedisSubscriptionApi[String, String],
-    redisAsyncScalaApi: RedisAsyncScalaApi[K, V]
+    redisAsyncApi: RedisAsyncApi[K, V]
 )(implicit ec: ExecutionContext) {
 
   private val SetOperation     = "set"
@@ -28,7 +28,7 @@ class RedisKeySpaceApi[K: RomaineStringCodec, V: RomaineStringCodec](
       .mapAsync(1) { pm =>
         val key = RomaineStringCodec[K].fromString(pm.key)
         pm.value match {
-          case SetOperation     => redisAsyncScalaApi.get(key).map(valueOpt ⇒ (key, valueOpt))
+          case SetOperation     => redisAsyncApi.get(key).map(valueOpt ⇒ (key, valueOpt))
           case ExpiredOperation => Future((key, None))
         }
       }

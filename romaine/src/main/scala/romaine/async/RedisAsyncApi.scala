@@ -8,7 +8,7 @@ import scala.collection.JavaConverters.{iterableAsScalaIterableConverter, mapAsJ
 import scala.compat.java8.FutureConverters.CompletionStageOps
 import scala.concurrent.{ExecutionContext, Future}
 
-class RedisAsyncScalaApi[K, V](redisAsyncCommands: RedisAsyncCommands[K, V])(implicit ec: ExecutionContext) {
+class RedisAsyncApi[K, V](redisAsyncCommands: RedisAsyncCommands[K, V])(implicit ec: ExecutionContext) {
   def set(key: K, value: V): Future[Unit] =
     redisAsyncCommands.set(key, value).toScala.failWith(s"Redis 'SET' operation failed for [key:$key value:$value]")
 

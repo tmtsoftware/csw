@@ -5,7 +5,7 @@ import csw.services.alarm.api.models.{AlarmMetadata, AlarmStatus, FullAlarmSever
 import csw.services.alarm.client.internal.commons.serviceresolver.AlarmServiceResolver
 import io.lettuce.core.RedisURI
 import romaine.RomaineFactory
-import romaine.async.RedisAsyncScalaApi
+import romaine.async.RedisAsyncApi
 import romaine.codec.RomaineStringCodec
 import romaine.reactive.{RedisKeySpaceApi, RedisSubscriptionApi}
 
@@ -16,20 +16,20 @@ class RedisConnectionsFactory(alarmServiceResolver: AlarmServiceResolver, master
 ) {
   import csw.services.alarm.client.internal.AlarmCodec._
 
-  lazy val metadataApiF: Future[RedisAsyncScalaApi[MetadataKey, AlarmMetadata]]     = asyncApi
-  lazy val severityApiF: Future[RedisAsyncScalaApi[SeverityKey, FullAlarmSeverity]] = asyncApi
-  lazy val statusApiF: Future[RedisAsyncScalaApi[StatusKey, AlarmStatus]]           = asyncApi
+  lazy val metadataApiF: Future[RedisAsyncApi[MetadataKey, AlarmMetadata]]     = asyncApi
+  lazy val severityApiF: Future[RedisAsyncApi[SeverityKey, FullAlarmSeverity]] = asyncApi
+  lazy val statusApiF: Future[RedisAsyncApi[StatusKey, AlarmStatus]]           = asyncApi
 
-  def asyncApi[K: RomaineStringCodec, V: RomaineStringCodec]: Future[RedisAsyncScalaApi[K, V]] =
-    redisURI.flatMap(x => romaineFactory.redisAsyncScalaApi[K, V](x))
+  def asyncApi[K: RomaineStringCodec, V: RomaineStringCodec]: Future[RedisAsyncApi[K, V]] =
+    redisURI.flatMap(redisURI => romaineFactory.redisAsyncApi[K, V](redisURI))
 
   def subscriptionApi[K: RomaineStringCodec, V: RomaineStringCodec]: Future[RedisSubscriptionApi[K, V]] =
-    redisURI.flatMap(x => romaineFactory.redisSubscriptionApi[K, V](x))
+    redisURI.flatMap(redisURI => romaineFactory.redisSubscriptionApi[K, V](redisURI))
 
   def redisKeySpaceApi[K: RomaineStringCodec, V: RomaineStringCodec](
-      asyncApi: RedisAsyncScalaApi[K, V]
+      asyncApi: RedisAsyncApi[K, V]
   ): Future[RedisKeySpaceApi[K, V]] =
-    subscriptionApi[String, String].map(x => new RedisKeySpaceApi(x, asyncApi))
+    subscriptionApi[String, String].map(subscriptionApi => new RedisKeySpaceApi(subscriptionApi, asyncApi))
 
   private def redisURI =
     alarmServiceResolver
