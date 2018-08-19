@@ -199,6 +199,7 @@ lazy val `csw-event-client` = project
   .dependsOn(
     `csw-event-api`,
     `csw-logging`,
+    `romaine`,
     `csw-location` % "compile->compile;multi-jvm->multi-jvm",
     `csw-commons`  % "test->test"
   )

@@ -8,11 +8,11 @@ import csw.messages.events.Event
 import csw.services.event.api.exceptions.PublishFailure
 import csw.services.event.api.scaladsl.EventPublisher
 import csw.services.event.internal.commons.EventPublisherUtil
-import io.lettuce.core.api.async.RedisAsyncCommands
 import io.lettuce.core.{RedisClient, RedisURI}
+import romaine.RomaineFactory
+import romaine.async.RedisAsyncApi
 
 import scala.async.Async._
-import scala.compat.java8.FutureConverters.CompletionStageOps
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
@@ -32,16 +32,18 @@ class RedisPublisher(redisURI: RedisURI, redisClient: RedisClient)(implicit ec: 
   private val parallelism        = 1
   private val eventPublisherUtil = new EventPublisherUtil()
 
+  private val romaineFactory = new RomaineFactory(redisClient)
+  import EventRomaineCodecs._
+
   // create underlying connection asynchronously and obtain an instance of `RedisAsyncCommands` to perform
   // redis operations asynchronously
-  private lazy val asyncConnectionF: Future[RedisAsyncCommands[String, Event]] = Future.unit
-    .flatMap(_ ⇒ redisClient.connectAsync(PatternBasedEventServiceCodec, redisURI).toScala)
-    .map(_.async())
+  private lazy val asyncConnectionF: Future[RedisAsyncApi[String, Event]] = Future.unit
+    .flatMap(_ ⇒ romaineFactory.redisAsyncApi[String, Event](redisURI))
 
   override def publish(event: Event): Future[Done] =
     async {
       val commands = await(asyncConnectionF)
-      await(commands.publish(event.eventKey.key, event).toScala)
+      await(commands.publish(event.eventKey.key, event))
       set(event, commands) // set will run independent of publish
       Done
     } recover {
@@ -63,8 +65,8 @@ class RedisPublisher(redisURI: RedisURI, redisClient: RedisClient)(implicit ec: 
   override def publish(eventGenerator: ⇒ Event, every: FiniteDuration, onError: PublishFailure ⇒ Unit): Cancellable =
     publish(eventPublisherUtil.eventSource(eventGenerator, every), onError)
 
-  override def shutdown(): Future[Done] = asyncConnectionF.flatMap(_.quit().toScala).map(_ ⇒ Done)
+  override def shutdown(): Future[Done] = asyncConnectionF.flatMap(_.quit()).map(_ ⇒ Done)
 
-  private def set(event: Event, commands: RedisAsyncCommands[String, Event]): Future[Done] =
-    commands.set(event.eventKey.key, event).toScala.recover { case NonFatal(_) ⇒ Done }.mapTo[Done]
+  private def set(event: Event, commands: RedisAsyncApi[String, Event]): Future[Done] =
+    commands.set(event.eventKey.key, event).recover { case NonFatal(_) ⇒ Done }.map(_ => Done)
 }

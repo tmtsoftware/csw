@@ -38,4 +38,6 @@ class RedisAsyncApi[K, V](redisAsyncCommands: RedisAsyncCommands[K, V])(implicit
     keys(pattern).flatMap(matchedKeys ⇒ if (matchedKeys.nonEmpty) del(matchedKeys) else Future.successful(0))
 
   def publish(key: K, value: V): Future[Long] = redisAsyncCommands.publish(key, value).toScala.map(_.toLong)
+
+  def quit(): Future[String] = redisAsyncCommands.quit().toScala
 }
