@@ -30,7 +30,7 @@ class SeverityServiceModuleTests
   test("setSeverity should set severity") {
     //set severity to Major
     val status = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Major)
-    status.acknowledgementStatus shouldBe Acknowledged
+    status.acknowledgementStatus shouldBe Unacknowledged
     status.latchedSeverity shouldBe Major
     status.shelveStatus shouldBe Unshelved
     status.alarmTime.isDefined shouldBe true
@@ -61,25 +61,25 @@ class SeverityServiceModuleTests
   test("setSeverity should latch alarm when it is higher than previous latched severity") {
     val status = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Major)
 
-    status.acknowledgementStatus shouldBe Acknowledged
+    status.acknowledgementStatus shouldBe Unacknowledged
     status.latchedSeverity shouldBe Major
     status.alarmTime.isDefined shouldBe true
 
     val status1 = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Warning)
-    status1.acknowledgementStatus shouldBe Acknowledged
+    status1.acknowledgementStatus shouldBe Unacknowledged
     status1.latchedSeverity shouldBe Major
     // latched severity is not changed here hence alarm time should not change
     status1.alarmTime.get.time shouldEqual status.alarmTime.get.time
 
     val status2 = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Okay)
-    status2.acknowledgementStatus shouldBe Acknowledged
+    status2.acknowledgementStatus shouldBe Unacknowledged
     status2.latchedSeverity shouldBe Major
     status2.alarmTime.get.time shouldEqual status.alarmTime.get.time
   }
 
   // DEOPSCSW-444: Set severity api for component
-  test("setSeverity should auto-acknowledge alarm only when it is auto-acknowledgable") {
-    val status = setSeverityAndGetStatus(tromboneAxisLowLimitAlarmKey, Major)
+  test("setSeverity should not auto-acknowledge alarm even when it is auto-acknowledgable") {
+    val status = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Major)
     status.acknowledgementStatus shouldBe Unacknowledged
     status.latchedSeverity shouldBe Major
     status.alarmTime.isDefined shouldBe true

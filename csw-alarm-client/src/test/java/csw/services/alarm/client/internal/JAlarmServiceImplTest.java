@@ -53,7 +53,7 @@ public class JAlarmServiceImplTest {
     // DEOPSCSW-459: Update severity to Disconnected if not updated within predefined time
     // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
     @Test
-    public void shouldSetSeverityInAlarmStoreForGivenKey() throws Exception {
+    public void setSeverity_shouldSetSeverityForAGivenKey() throws Exception {
         AlarmKey tromboneAxisHighLimitAlarm = new AlarmKey(JSubsystem.NFIRAOS, "trombone", "tromboneAxisHighLimitAlarm");
 
         FullAlarmSeverity severityBeforeSetting = Await.result(alarmService.getCurrentSeverity(tromboneAxisHighLimitAlarm), new FiniteDuration(2, TimeUnit.SECONDS));
@@ -61,7 +61,7 @@ public class JAlarmServiceImplTest {
 
         //set severity to Major
         AlarmStatus status = setSeverity(tromboneAxisHighLimitAlarm, JAlarmSeverity.Major);
-        assertEquals(AcknowledgementStatus.Acknowledged$.MODULE$, status.acknowledgementStatus());
+        assertEquals(AcknowledgementStatus.Unacknowledged$.MODULE$, status.acknowledgementStatus());
         assertEquals(JAlarmSeverity.Major, status.latchedSeverity());
         assertEquals(ShelveStatus.Unshelved$.MODULE$, status.shelveStatus());
         assertTrue(status.alarmTime().isDefined());
@@ -77,7 +77,7 @@ public class JAlarmServiceImplTest {
     }
 
     @Test
-    public void shouldThrowInvalidSeverityExceptionWhenUnsupportedSeverityIsProvided() throws Exception {
+    public void setSeverity_shouldThrowInvalidSeverityExceptionWhenUnsupportedSeverityIsProvided() throws Exception {
         AlarmKey tromboneAxisHighLimitAlarm = new AlarmKey(JSubsystem.NFIRAOS, "trombone", "tromboneAxisHighLimitAlarm");
 
         exception.expectCause(isA(InvalidSeverityException.class));
@@ -86,28 +86,28 @@ public class JAlarmServiceImplTest {
 
     // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
     @Test
-    public void shouldLatchAlarmWhenItIsHigherThanPreviousLatchedSeverity() throws Exception {
+    public void setSeverity_shouldLatchAlarmWhenItIsHigherThanPreviousLatchedSeverity() throws Exception {
         AlarmKey tromboneAxisHighLimitAlarm = new AlarmKey(JSubsystem.NFIRAOS, "trombone", "tromboneAxisHighLimitAlarm");
 
         AlarmStatus status = setSeverity(tromboneAxisHighLimitAlarm, JAlarmSeverity.Major);
-        assertEquals(AcknowledgementStatus.Acknowledged$.MODULE$, status.acknowledgementStatus());
+        assertEquals(AcknowledgementStatus.Unacknowledged$.MODULE$, status.acknowledgementStatus());
         assertEquals(JAlarmSeverity.Major, status.latchedSeverity());
         assertTrue(status.alarmTime().isDefined());
 
         AlarmStatus status1 = setSeverity(tromboneAxisHighLimitAlarm, JAlarmSeverity.Warning);
-        assertEquals(AcknowledgementStatus.Acknowledged$.MODULE$, status1.acknowledgementStatus());
+        assertEquals(AcknowledgementStatus.Unacknowledged$.MODULE$, status1.acknowledgementStatus());
         assertEquals(JAlarmSeverity.Major, status1.latchedSeverity());
         assertEquals(status1.alarmTime().get().time(), status.alarmTime().get().time());
 
         AlarmStatus status2 = setSeverity(tromboneAxisHighLimitAlarm, JAlarmSeverity.Okay);
-        assertEquals(AcknowledgementStatus.Acknowledged$.MODULE$, status2.acknowledgementStatus());
+        assertEquals(AcknowledgementStatus.Unacknowledged$.MODULE$, status2.acknowledgementStatus());
         assertEquals(JAlarmSeverity.Major, status2.latchedSeverity());
         assertEquals(status2.alarmTime().get().time(), status.alarmTime().get().time());
     }
 
     @Test
-    public void shouldAutoAcknowledgeAlarmOnlyWhenItIsAutoAcknowlegableWhileSettingSeverity() throws Exception {
-        AlarmKey tromboneAxisLowLimitAlarm = new AlarmKey(JSubsystem.NFIRAOS, "trombone", "tromboneAxisLowLimitAlarm");
+    public void setSeverity_shouldNotAutoAcknowledgeAlarmEvenWhenItIsAutoAcknowlegable() throws Exception {
+        AlarmKey tromboneAxisLowLimitAlarm = new AlarmKey(JSubsystem.NFIRAOS, "trombone", "tromboneAxisHighLimitAlarm");
 
         AlarmStatus status = setSeverity(tromboneAxisLowLimitAlarm, JAlarmSeverity.Major);
         assertEquals(AcknowledgementStatus.Unacknowledged$.MODULE$, status.acknowledgementStatus());
@@ -117,7 +117,7 @@ public class JAlarmServiceImplTest {
 
     // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
     @Test
-    public void shouldUpdateAlarmTimeOnlyWhenSeverityChangesForLatchableAlarmsWhileSettingIt() throws Exception {
+    public void setSeverity_shouldNotUpdateAlarmTimeWhenSeverityDoesNotChange() throws Exception {
         // latchable alarm
         AlarmKey highLimitAlarmKey = new AlarmKey(JSubsystem.NFIRAOS, "trombone", "tromboneAxisHighLimitAlarm");
 
@@ -126,21 +126,6 @@ public class JAlarmServiceImplTest {
 
         // set the severity again to mimic alarm refreshing
         AlarmStatus status1 = setSeverity(highLimitAlarmKey, JAlarmSeverity.Major);
-
-        assertEquals(status.alarmTime().get().time(), status1.alarmTime().get().time());
-    }
-
-    // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
-    @Test
-    public void shouldUpdateAlarmTimeOnlyWhenSeverityChangesForUnlatchableAlarmsWhileSettingIt() throws Exception {
-        // un-latchable alarm
-        AlarmKey cpuExceededAlarm = new AlarmKey(JSubsystem.TCS, "tcsPk", "cpuExceededAlarm");
-
-        // set severity to major
-        AlarmStatus status = setSeverity(cpuExceededAlarm, JAlarmSeverity.Major);
-
-        // set the severity again to mimic alarm refreshing
-        AlarmStatus status1 = setSeverity(cpuExceededAlarm, JAlarmSeverity.Major);
 
         assertEquals(status.alarmTime().get().time(), status1.alarmTime().get().time());
     }
