@@ -7,7 +7,8 @@ import csw.messages.params.models.Subsystem.{LGSF, NFIRAOS, TCS}
 import csw.services.alarm.api.exceptions.KeyNotFoundException
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
-import csw.services.alarm.api.models.AlarmSeverity.{Major, Okay}
+import csw.services.alarm.api.models.AlarmSeverity.{Critical, Major, Okay}
+import csw.services.alarm.api.models.AlarmStatus
 import csw.services.alarm.api.models.Key.{AlarmKey, GlobalKey}
 import csw.services.alarm.api.models.ShelveStatus.{Shelved, Unshelved}
 import csw.services.alarm.cli.args.Options
@@ -140,6 +141,8 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     commandExecutor.execute(initCmd)
     logBuffer.clear()
 
+    adminService.setStatus(tromboneAxisLowLimitKey,
+                           AlarmStatus().copy(acknowledgementStatus = Unacknowledged, latchedSeverity = Critical))
     adminService.getStatus(tromboneAxisLowLimitKey).futureValue.acknowledgementStatus shouldBe Unacknowledged
 
     // acknowledge the alarm

@@ -2,7 +2,7 @@ package csw.services.alarm.client.internal.services
 
 import com.typesafe.config.ConfigFactory
 import csw.messages.params.models.Subsystem.BAD
-import csw.services.alarm.api.exceptions.{KeyNotFoundException, ResetOperationNotAllowed}
+import csw.services.alarm.api.exceptions.KeyNotFoundException
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
 import csw.services.alarm.api.models.AlarmSeverity._
 import csw.services.alarm.api.models.FullAlarmSeverity.Disconnected
@@ -47,7 +47,7 @@ class StatusServiceModuleTests
       setCurrentSeverity(tromboneAxisLowLimitAlarmKey, currentSeverity).await
 
       val previousStatus = getStatus(tromboneAxisLowLimitAlarmKey).await
-      previousStatus.acknowledgementStatus shouldEqual Unacknowledged
+      previousStatus.acknowledgementStatus shouldEqual Acknowledged
       previousStatus.latchedSeverity shouldEqual Disconnected
       previousStatus.alarmTime shouldEqual None
 

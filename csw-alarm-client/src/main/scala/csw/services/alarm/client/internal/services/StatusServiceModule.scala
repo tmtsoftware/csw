@@ -1,10 +1,10 @@
 package csw.services.alarm.client.internal.services
 
 import akka.actor.ActorSystem
-import csw.services.alarm.api.exceptions.{KeyNotFoundException, ResetOperationNotAllowed}
+import csw.services.alarm.api.exceptions.KeyNotFoundException
 import csw.services.alarm.api.internal.{MetadataService, SeverityService, StatusService}
-import csw.services.alarm.api.models.AlarmSeverity.Okay
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
+import csw.services.alarm.api.models.AlarmSeverity.Okay
 import csw.services.alarm.api.models.FullAlarmSeverity.Disconnected
 import csw.services.alarm.api.models.Key.AlarmKey
 import csw.services.alarm.api.models.ShelveStatus.{Shelved, Unshelved}

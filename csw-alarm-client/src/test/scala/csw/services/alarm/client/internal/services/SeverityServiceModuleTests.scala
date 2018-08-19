@@ -3,7 +3,7 @@ package csw.services.alarm.client.internal.services
 import com.typesafe.config.ConfigFactory
 import csw.messages.params.models.Subsystem.{AOESW, BAD, LGSF, NFIRAOS}
 import csw.services.alarm.api.exceptions.{InactiveAlarmException, InvalidSeverityException, KeyNotFoundException}
-import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
+import csw.services.alarm.api.models.AcknowledgementStatus.Unacknowledged
 import csw.services.alarm.api.models.ActivationStatus.Active
 import csw.services.alarm.api.models.AlarmSeverity._
 import csw.services.alarm.api.models.FullAlarmSeverity.Disconnected
@@ -270,7 +270,7 @@ class SeverityServiceModuleTests
     ).await
 
     // Adding status for corresponding test in alarm store
-    setStatus(alarmKey, AlarmStatus().copy(latchedSeverity = oldSeverity, acknowledgementStatus = Acknowledged)).await
+    setStatus(alarmKey, AlarmStatus().copy(latchedSeverity = oldSeverity)).await
   }
 
   private def setSeverityAndGetStatus(alarmKey: AlarmKey, alarmSeverity: AlarmSeverity): AlarmStatus = {

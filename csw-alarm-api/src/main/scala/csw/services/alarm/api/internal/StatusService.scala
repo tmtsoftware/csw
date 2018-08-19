@@ -12,5 +12,6 @@ private[alarm] trait StatusService {
   def unshelve(key: AlarmKey): Future[Unit]
 
   private[alarm] def unacknowledge(key: AlarmKey): Future[Unit]
+  private[alarm] def setStatus(alarmKey: AlarmKey, alarmStatus: AlarmStatus): Future[Unit]
   private[alarm] def updateStatusForSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Unit]
 }
