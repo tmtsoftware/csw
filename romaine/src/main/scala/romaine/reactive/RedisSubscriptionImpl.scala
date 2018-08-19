@@ -14,6 +14,8 @@ private class RedisSubscriptionImpl[K](
 )(implicit executionContext: ExecutionContext)
     extends RedisSubscription {
 
+  terminationSignal.onComplete(_ => unsubscribe()) //unsubscribe on stream termination
+
   /**
    * To unsubscribe a given subscription. This will also clean up subscription specific underlying resources
    * @return a future which completes when the unsubscribe is completed
