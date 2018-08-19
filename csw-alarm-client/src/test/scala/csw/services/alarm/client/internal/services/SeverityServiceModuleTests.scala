@@ -86,21 +86,11 @@ class SeverityServiceModuleTests
   }
 
   // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
-  test("setSeverity should update alarm time only when severity changes for latchable alarms") {
+  test("setSeverity should not update alarm time when latched severity does not change") {
     // latch it to major
     val status = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Major)
     // set the severity again to mimic alarm refreshing
     val status1 = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Major)
-
-    status.alarmTime.get.time shouldEqual status1.alarmTime.get.time
-  }
-
-  // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
-  test("setSeverity should update alarm time only when severity changes for un-latchable alarms") {
-    // set severity to major
-    val status = setSeverityAndGetStatus(cpuExceededAlarmKey, Major) // cpuExceededAlarmKey is un-latchable
-    // set the severity again to mimic alarm refreshing
-    val status1 = setSeverityAndGetStatus(cpuExceededAlarmKey, Major)
 
     status.alarmTime.get.time shouldEqual status1.alarmTime.get.time
   }

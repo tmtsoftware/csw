@@ -5,6 +5,7 @@ import csw.messages.params.models.Subsystem.BAD
 import csw.services.alarm.api.exceptions.{KeyNotFoundException, ResetOperationNotAllowed}
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
 import csw.services.alarm.api.models.AlarmSeverity._
+import csw.services.alarm.api.models.FullAlarmSeverity.Disconnected
 import csw.services.alarm.api.models.Key.AlarmKey
 import csw.services.alarm.api.models.ShelveStatus.{Shelved, Unshelved}
 import csw.services.alarm.api.models.{AlarmSeverity, AlarmStatus}
@@ -23,22 +24,8 @@ class StatusServiceModuleTests
   }
 
   // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
-  test("reset should update time for a latchable and auto-acknowledgable alarm") {
-    // latch it to major
-    setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Major)
-
-    // set the current severity to okay, latched severity is still at major
-    val status = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Okay)
-
-    // reset the alarm, which sets the latched severity to okay
-    reset(tromboneAxisHighLimitAlarmKey).await
-    val statusAfterReset = getStatus(tromboneAxisHighLimitAlarmKey).await
-
-    statusAfterReset.alarmTime.get.time should be > status.alarmTime.get.time
-  }
-
-  // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
-  test("reset should update time only when severity changes for a latchable and not auto-acknowledgeable alarm") {
+  // DEOPSCSW-447: Reset api for alarm
+  test("reset should not update time when severity does not change") {
     // latch it to okay
     val status = setSeverityAndGetStatus(tromboneAxisLowLimitAlarmKey, Okay)
 
@@ -51,53 +38,61 @@ class StatusServiceModuleTests
     statusAfterReset.alarmTime.get.time shouldEqual status.alarmTime.get.time
   }
 
+  // DEOPSCSW-447: Reset api for alarm
   // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
-  test("reset should update time only when severity changes for an un-latchable and auto-acknowledgable alarm") {
-    // set current severity to okay, latched severity is also okay since alarm is un-latchable, alarm is acknowledged
-    val status1 = setSeverityAndGetStatus(cpuExceededAlarmKey, Okay)
+  List(Okay, Warning, Major, Indeterminate, Critical).foreach(currentSeverity => {
+    test(s"reset should set latchedSeverity to current severity and update time when current severity is $currentSeverity") {
 
-    // reset the alarm, which will make alarm to go to acknowledged, un-latched severity was already okay so no change there
-    reset(cpuExceededAlarmKey).await
-    val statusAfterReset1 = getStatus(cpuExceededAlarmKey).await
+      //setup current severity - this does not change status
+      setCurrentSeverity(tromboneAxisLowLimitAlarmKey, currentSeverity).await
 
-    // alarm time should be updated only when latched severity changes
-    statusAfterReset1.alarmTime.get.time shouldEqual status1.alarmTime.get.time
-  }
+      val previousStatus = getStatus(tromboneAxisLowLimitAlarmKey).await
+      previousStatus.acknowledgementStatus shouldEqual Unacknowledged
+      previousStatus.latchedSeverity shouldEqual Disconnected
+      previousStatus.alarmTime shouldEqual None
+
+      //reset alarm
+      reset(tromboneAxisLowLimitAlarmKey).await
+
+      val newStatus = getStatus(tromboneAxisLowLimitAlarmKey).await
+
+      newStatus.latchedSeverity shouldEqual currentSeverity
+      newStatus.acknowledgementStatus shouldEqual Acknowledged
+      newStatus.alarmTime shouldBe defined
+    }
+  })
 
   // DEOPSCSW-447: Reset api for alarm
-  test("reset should set the alarm status to Unlatched Okay and Acknowledged when alarm is not latchable") {
-    // set current severity to okay, latched severity is also okay since alarm is un-latchable, alarm is acknowledged
-    setSeverity(cpuExceededAlarmKey, Okay).await
-
-    reset(cpuExceededAlarmKey).await
-    val status = getStatus(cpuExceededAlarmKey).await
-    status.latchedSeverity shouldEqual Okay
-    status.acknowledgementStatus shouldEqual Acknowledged
-  }
-
-  // DEOPSCSW-447: Reset api for alarm
-  test("reset should set the alarm status to Latched Okay and Acknowledged when alarm is latchable") {
-    // set latched severity to Warning which will result status to be Latched and Unacknowledged
+  // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
+  test(s"reset should set latchedSeverity to current severity and update time when current severity is Disconnected") {
+    //set current and latched severity to warning
     setSeverity(tromboneAxisLowLimitAlarmKey, Warning).await
 
-    // set current severity to Okay
-    setSeverity(tromboneAxisLowLimitAlarmKey, Okay).await
+    val originalStatus = getStatus(tromboneAxisLowLimitAlarmKey).await
 
+    originalStatus.latchedSeverity shouldEqual Warning
+    originalStatus.acknowledgementStatus shouldEqual Unacknowledged
+    originalStatus.alarmTime shouldBe defined
+    getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldEqual Warning
+
+    //wait for current severity to expire and get disconnected
+    Thread.sleep(1500)
+    getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldEqual Disconnected
+
+    //reset alarm
     reset(tromboneAxisLowLimitAlarmKey).await
-    val status = getStatus(tromboneAxisLowLimitAlarmKey).await
-    status.latchedSeverity shouldEqual Okay
-    status.acknowledgementStatus shouldEqual Acknowledged
+
+    val newStatus = getStatus(tromboneAxisLowLimitAlarmKey).await
+    newStatus.acknowledgementStatus shouldEqual Acknowledged
+    newStatus.latchedSeverity shouldEqual Disconnected
+
+    originalStatus.alarmTime should not equal newStatus.alarmTime
   }
 
   // DEOPSCSW-447: Reset api for alarm
   test("reset should throw exception if key does not exist") {
     val invalidAlarm = AlarmKey(BAD, "invalid", "invalid")
     an[KeyNotFoundException] shouldBe thrownBy(reset(invalidAlarm).await)
-  }
-
-  // DEOPSCSW-447: Reset api for alarm
-  test("reset should throw exception if severity is not okay") {
-    an[ResetOperationNotAllowed] shouldBe thrownBy(reset(tromboneAxisLowLimitAlarmKey).await)
   }
 
   // DEOPSCSW-446: Acknowledge api for alarm

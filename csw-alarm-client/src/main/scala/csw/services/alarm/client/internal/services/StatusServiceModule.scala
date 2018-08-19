@@ -40,20 +40,25 @@ trait StatusServiceModule extends StatusService {
 
   final override def acknowledge(key: AlarmKey): Future[Unit] = setAcknowledgementStatus(key, Acknowledged)
 
-  // reset is only called when severity is `Okay`
   final override def reset(key: AlarmKey): Future[Unit] = async {
     log.debug(s"Reset alarm [${key.value}]")
 
     val currentSeverity = await(getCurrentSeverity(key))
-    if (currentSeverity != Okay) logAndThrow(ResetOperationNotAllowed(key, currentSeverity))
 
-    val status = await(getStatus(key))
-    val resetStatus = status.copy(
+    val originalStatus = await(getStatus(key))
+
+    val acknowledgedStatus = originalStatus.copy(
+      //reset operation acknowledges alarm
       acknowledgementStatus = Acknowledged,
-      latchedSeverity = Okay,
-      alarmTime = alarmTime(status)
+      //reset operation changes latched severity to current severity
+      latchedSeverity = currentSeverity,
+      //if latched severity is changing, alarm time also changes
+      alarmTime =
+        if (currentSeverity != originalStatus.latchedSeverity) Some(AlarmTime())
+        else originalStatus.alarmTime
     )
-    if (status != resetStatus) await(setStatus(key, resetStatus))
+
+    if (originalStatus != acknowledgedStatus) await(setStatus(key, acknowledgedStatus))
   }
 
   final override def shelve(key: AlarmKey): Future[Unit] = async {
@@ -160,8 +165,6 @@ trait StatusServiceModule extends StatusService {
     if (status.acknowledgementStatus != ackStatus) // save the set call if status is already set to given acknowledgement status
       await(setStatus(key, status.copy(acknowledgementStatus = ackStatus)))
   }
-
-  private def alarmTime(status: AlarmStatus) = if (status.latchedSeverity != Okay) Some(AlarmTime()) else status.alarmTime
 
   private def logAndThrow(runtimeException: RuntimeException) = {
     log.error(runtimeException.getMessage, ex = runtimeException)
