@@ -7,9 +7,9 @@ class ArgsParser(name: String) {
     head(name, BuildInfo.version)
 
     private def alarmKey  = List(subsystem.required(), component.required(), alarmName.required())
-    private val get       = cmd("get").action((_, args) ⇒ args.copy(subCmd = "get"))
-    private val set       = cmd("set").action((_, args) ⇒ args.copy(subCmd = "set")).children(severity)
-    private val subscribe = cmd("subscribe").action((_, args) ⇒ args.copy(subCmd = "subscribe"))
+    private val get       = cmd("get").action((_, args) ⇒ args.copy(subCmd = "get")).children(alarmKey: _*)
+    private val set       = cmd("set").action((_, args) ⇒ args.copy(subCmd = "set")).children(alarmKey :+ severity: _*)
+    private val subscribe = cmd("subscribe").action((_, args) ⇒ args.copy(subCmd = "subscribe")).children(alarmKey: _*)
 
     cmd("init")
       .action((_, args) ⇒ args.copy(cmd = "init"))
@@ -20,7 +20,6 @@ class ArgsParser(name: String) {
       .action((_, args) ⇒ args.copy(cmd = "severity"))
       .text("get/set/subscribe severity of an alarm")
       .children(get, set, subscribe)
-      .children(alarmKey: _*)
 
     cmd("acknowledge")
       .action((_, args) ⇒ args.copy(cmd = "acknowledge"))

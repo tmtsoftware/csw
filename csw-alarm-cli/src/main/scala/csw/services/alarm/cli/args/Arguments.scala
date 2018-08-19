@@ -43,5 +43,5 @@ trait Arguments { self: OptionParser[Options] =>
       .action(
         (severity, args) ⇒ args.copy(severity = Some(AlarmSeverity.withNameInsensitive(severity)))
       )
-      .text(s"severity to set for an alarm e.g ${AlarmSeverity.values}")
+      .text(s"severity to set for an alarm e.g ${AlarmSeverity.values.mkString("[", ", ", "]")}")
 }
