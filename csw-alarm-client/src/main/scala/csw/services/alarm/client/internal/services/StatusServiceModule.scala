@@ -143,7 +143,6 @@ trait StatusServiceModule extends StatusService {
   private def unshelve(key: AlarmKey, cancelShelveTimeout: Boolean): Future[Unit] = async {
     log.debug(s"Un-shelve alarm [${key.value}]")
 
-    //TODO: decide whether to  unshelve an alarm when it goes to okay
     val status = await(getStatus(key))
     if (status.shelveStatus != Unshelved) {
       await(setStatus(key, status.copy(shelveStatus = Unshelved)))

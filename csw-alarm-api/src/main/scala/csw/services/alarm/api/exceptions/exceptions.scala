@@ -1,6 +1,5 @@
 package csw.services.alarm.api.exceptions
 
-import csw.services.alarm.api.models.AlarmSeverity.Okay
 import csw.services.alarm.api.models.Key.AlarmKey
 import csw.services.alarm.api.models.{FullAlarmSeverity, Key}
 
@@ -15,17 +14,6 @@ case class InvalidSeverityException(key: Key, supportedSeverities: Set[FullAlarm
     extends RuntimeException(
       s"Attempt to set invalid severity [${invalidSeverity.name}] for alarm [${key.value}]. " +
       s"Supported severities for this alarm are [${supportedSeverities.mkString(",")}]"
-    )
-
-/**
- * Represents the exception thrown when attempted to reset an alarm which is not having it's current severity as Okay
- *
- * @param key alarm for which the reset operation was attempted
- * @param currentSeverity severity currently set for the alarm which is other than Okay
- */
-case class ResetOperationNotAllowed(key: Key, currentSeverity: FullAlarmSeverity)
-    extends RuntimeException(
-      s"Failed to reset alarm for key:[${key.value}], alarms can only be reset when severity:[${Okay.name}], but current severity is:[${currentSeverity.name}]."
     )
 
 /**
