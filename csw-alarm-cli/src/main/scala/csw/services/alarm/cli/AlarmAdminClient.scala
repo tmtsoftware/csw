@@ -97,13 +97,12 @@ class AlarmAdminClient(
 
   def getHealth(options: Options): Future[Unit] = async {
     val alarmService = await(alarmServiceF)
-    val health       = await(alarmService.getAggregatedHealth(options.alarmKey))
-    printLine(health)
+    val health       = await(alarmService.getAggregatedHealth(options.key))
+    printLine(Formatter.formatHealth(health))
   }
 
   def subscribeHealth(options: Options): Future[Unit] = async {
     val alarmService = await(alarmServiceF)
-    alarmService.subscribeAggregatedHealthCallback(options.alarmKey, printLine)
+    alarmService.subscribeAggregatedHealthCallback(options.key, h ⇒ printLine(Formatter.formatHealth(h)))
   }
-
 }

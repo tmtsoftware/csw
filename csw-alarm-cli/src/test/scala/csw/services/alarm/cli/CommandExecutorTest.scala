@@ -127,6 +127,18 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     logBuffer shouldEqual List("Current Alarm Severity: Disconnected")
   }
 
+  // DEOPSCSW-476: Fetch alarm severity from CLI Interface
+  test("should get severity of a subsystem") {
+    val cmd = Options(
+      cmd = "severity",
+      subCmd = "get",
+      maybeSubsystem = Some(tromboneAxisHighLimitKey.subsystem)
+    )
+
+    commandExecutor.execute(cmd)
+    logBuffer shouldEqual List("Current Alarm Severity: Disconnected")
+  }
+
   // DEOPSCSW-467: Monitor alarm severities in the alarm store for a single alarm, component, subsystem, or all
   ignore("should subscribe severity of alarm") {
     val cmd = Options(
@@ -338,4 +350,46 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     logBuffer shouldEqualContentsOf "status.txt"
   }
 
+  // DEOPSCSW-478: Fetch health of component/subsystem from CLI Interface
+  test("should get health of alarm") {
+    val cmd = Options(
+      cmd = "health",
+      subCmd = "get",
+      maybeSubsystem = Some(tromboneAxisHighLimitKey.subsystem),
+      maybeComponent = Some(tromboneAxisHighLimitKey.component),
+      maybeAlarmName = Some(tromboneAxisHighLimitKey.name)
+    )
+
+    commandExecutor.execute(cmd)
+    logBuffer shouldEqual List("Current Alarm Health: Bad")
+  }
+
+  // DEOPSCSW-478: Fetch health of component/subsystem from CLI Interface
+  test("should get health of subsystem") {
+    val cmd = Options(
+      cmd = "health",
+      subCmd = "get",
+      maybeSubsystem = Some(tromboneAxisHighLimitKey.subsystem)
+    )
+
+    commandExecutor.execute(cmd)
+    logBuffer shouldEqual List("Current Alarm Health: Bad")
+  }
+
+  // DEOPSCSW-479: Subscribe to health changes of component/subsystem/all alarms using CLI Interface
+  ignore("should subscribe health of subsystem/component") {
+    val cmd = Options(
+      cmd = "health",
+      subCmd = "subscribe",
+      maybeSubsystem = Some(tromboneAxisHighLimitKey.subsystem),
+      maybeComponent = Some(tromboneAxisHighLimitKey.component),
+      maybeAlarmName = Some(tromboneAxisHighLimitKey.name)
+    )
+
+    commandExecutor.execute(cmd)
+    adminService.setSeverity(tromboneAxisLowLimitKey, Major).futureValue
+    adminService.setSeverity(tromboneAxisLowLimitKey, Okay).futureValue
+
+    logBuffer shouldEqual List("Current Alarm Health: Ill", "Current Alarm Health: Good")
+  }
 }
