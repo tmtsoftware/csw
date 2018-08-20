@@ -1,5 +1,6 @@
 package csw.services.alarm.client.internal.services
 
+import akka.Done
 import akka.actor.ActorSystem
 import akka.actor.typed.ActorRef
 import akka.stream.scaladsl.{Sink, Source}
@@ -113,8 +114,8 @@ trait SeverityServiceModule extends SeverityService {
       .fromFutureSource(redisStreamApi.map(_.watchKeyspaceValueAggregation(keys, OverflowStrategy.LATEST, reducer)))
       .mapMaterializedValue { mat =>
         new AlarmSubscription {
-          override def unsubscribe(): Future[Unit] = mat.flatMap(_.unsubscribe())
-          override def ready(): Future[Unit]       = mat.flatMap(_.ready())
+          override def unsubscribe(): Future[Unit] = mat.flatMap(_.unsubscribe().map(_ ⇒ ()))
+          override def ready(): Future[Unit]       = mat.flatMap(_.ready().map(_ ⇒ ()))
         }
       }
   }
