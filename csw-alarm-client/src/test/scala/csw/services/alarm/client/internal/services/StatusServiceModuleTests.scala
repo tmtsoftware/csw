@@ -40,6 +40,7 @@ class StatusServiceModuleTests
 
   // DEOPSCSW-447: Reset api for alarm
   // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
+  // DEOPSCSW-494: Incorporate changes in set severity, reset, acknowledgement and latch status
   List(Okay, Warning, Major, Indeterminate, Critical).foreach(currentSeverity => {
     test(s"reset should set latchedSeverity to current severity and update time when current severity is $currentSeverity") {
 
@@ -64,7 +65,8 @@ class StatusServiceModuleTests
 
   // DEOPSCSW-447: Reset api for alarm
   // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
-  test(s"reset should set latchedSeverity to current severity and update time when current severity is Disconnected") {
+  // DEOPSCSW-494: Incorporate changes in set severity, reset, acknowledgement and latch status
+  test("reset should set latchedSeverity to current severity and update time when current severity is Disconnected") {
     //set current and latched severity to warning
     setSeverity(tromboneAxisLowLimitAlarmKey, Warning).await
 
