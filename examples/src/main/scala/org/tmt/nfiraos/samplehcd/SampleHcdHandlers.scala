@@ -5,6 +5,7 @@ import csw.framework.CurrentStatePublisher
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands._
+import csw.messages.events.{EventName, SystemEvent}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.TrackingEvent
 import csw.messages.params.generics.{Key, KeyType, Parameter}
@@ -16,6 +17,8 @@ import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
+import scala.concurrent.duration._
+import scala.async.Async.{async, await}
 
 /**
  * Domain specific logic should be written in below handlers.
@@ -72,6 +75,7 @@ class SampleHcdHandlers(
   //#initialize
   override def initialize(): Future[Unit] = {
     log.info("In HCD initialize")
+    publishCounter()
     Future.unit
   }
 
@@ -84,6 +88,22 @@ class SampleHcdHandlers(
     Future.unit
   }
   //#initialize
+
+  //#publish
+  private def publishCounter(): Future[Unit] = {
+    var counter = 1
+    def incrementCounterEvent() = {
+      val param: Parameter[Int] = KeyType.IntKey.make("counter").set(counter)
+      counter += 1
+      SystemEvent(componentInfo.prefix, EventName("HcdCounter")).add(param)
+    }
+
+    async {
+      val publisher = await(eventService.defaultPublisher)
+      publisher.publish(incrementCounterEvent(), 5.second, err => log.error(err.getMessage, ex = err))
+    }
+  }
+  //#publish
 
   //#validate
   override def validateCommand(controlCommand: ControlCommand): CommandResponse = {

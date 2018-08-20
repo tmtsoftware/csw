@@ -7,19 +7,21 @@ import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandResponse.Accepted
 import csw.messages.commands.{CommandName, CommandResponse, ControlCommand, Setup}
+import csw.messages.events._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.{AkkaLocation, LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.messages.params.generics.{Key, KeyType, Parameter}
-import csw.messages.params.models.{ObsId, Units}
+import csw.messages.params.models.{ObsId, Prefix, Units}
 import csw.services.alarm.api.scaladsl.AlarmService
 import csw.services.command.CommandResponseManager
 import csw.services.command.scaladsl.CommandService
-import csw.services.event.api.scaladsl.EventService
+import csw.services.event.api.scaladsl.{EventService, EventSubscription}
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContextExecutor, Future}
+import scala.async.Async.{async, await}
 
 /**
  * Domain specific logic should be written in below handlers.
@@ -101,6 +103,7 @@ class SampleAssemblyHandlers(
   //#initialize
   override def initialize(): Future[Unit] = {
     log.info("In Assembly initialize")
+    subscribeToHcd()
     Future.unit
   }
 
@@ -121,6 +124,31 @@ class SampleAssemblyHandlers(
     }
   }
   //#track-location
+
+  //#subscribe
+  val hcdPrefix       = Prefix("nfiraos.samplehcd")
+  val counterEventKey = EventKey(hcdPrefix, EventName("HcdCounter"))
+  val hcdCounterKey   = KeyType.IntKey.make("counter")
+
+  private def subscribeToHcd(): Future[EventSubscription] = {
+    async {
+      val subscriber = await(eventService.defaultSubscriber)
+      subscriber.subscribeCallback(Set(counterEventKey), processEvent)
+    }
+  }
+
+  private def processEvent(event: Event) = {
+    log.info(s"Event received: ${event.eventName}")
+    event match {
+      case e: SystemEvent =>
+        e.eventName match {
+          case EventName("HcdCounter") => log.info(s"Counter = ${e(hcdCounterKey).head}")
+          case _                       => log.error("Unexpected event received.")
+        }
+      case e: ObserveEvent => // not expected
+    }
+  }
+  //#subscribe
 
   override def validateCommand(controlCommand: ControlCommand): CommandResponse = ???
 

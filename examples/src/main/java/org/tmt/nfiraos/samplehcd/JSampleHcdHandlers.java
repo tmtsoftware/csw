@@ -1,11 +1,15 @@
 package org.tmt.nfiraos.samplehcd;
 
+import akka.actor.Cancellable;
 import akka.actor.typed.ActorRef;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.CurrentStatePublisher;
 import csw.messages.commands.*;
+import csw.messages.events.Event;
+import csw.messages.events.EventName;
+import csw.messages.events.SystemEvent;
 import csw.messages.framework.ComponentInfo;
 import csw.messages.location.TrackingEvent;
 import csw.messages.params.generics.JKeyTypes;
@@ -13,13 +17,13 @@ import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.models.Id;
 import csw.messages.TopLevelActorMessage;
-import csw.services.alarm.api.javadsl.IAlarmService;
 import csw.services.command.CommandResponseManager;
 import csw.services.event.api.javadsl.IEventService;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.logging.javadsl.ILogger;
 import csw.services.logging.javadsl.JLoggerFactory;
 
+import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -39,7 +43,7 @@ public class JSampleHcdHandlers extends JComponentHandlers {
     private ActorContext<TopLevelActorMessage> actorContext;
     private ILocationService locationService;
     private ComponentInfo componentInfo;
-
+    private IEventService eventService;
     private ActorRef<WorkerCommand> workerActor;
 
 
@@ -50,16 +54,16 @@ public class JSampleHcdHandlers extends JComponentHandlers {
             CurrentStatePublisher currentStatePublisher,
             ILocationService locationService,
             IEventService eventService,
-            IAlarmService alarmService,
             JLoggerFactory loggerFactory
     ) {
-        super(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, eventService, alarmService, loggerFactory);
+        super(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, eventService, loggerFactory);
         this.currentStatePublisher = currentStatePublisher;
         this.log = loggerFactory.getLogger(getClass());
         this.commandResponseManager = commandResponseManager;
         this.actorContext = ctx;
         this.locationService = locationService;
         this.componentInfo = componentInfo;
+        this.eventService = eventService;
         workerActor = createWorkerActor();
     }
 
@@ -100,7 +104,10 @@ public class JSampleHcdHandlers extends JComponentHandlers {
     //#initialize
     @Override
     public CompletableFuture<Void> jInitialize() {
-        return CompletableFuture.runAsync(() -> log.info("In HCD initialize"));
+        return CompletableFuture.runAsync(() -> {
+            log.info("In HCD initialize");
+            publishCounter();
+        });
     }
 
     @Override
@@ -113,6 +120,20 @@ public class JSampleHcdHandlers extends JComponentHandlers {
         return CompletableFuture.runAsync(() -> log.info("HCD is shutting down"));
     }
     //#initialize
+
+    //#publish
+    private int counter = 0;
+    private Event incrementCounterEvent() {
+        Parameter<Integer> param = JKeyTypes.IntKey().make("counter").set(counter);
+        counter += 1;
+        return new SystemEvent(componentInfo.prefix(), new EventName("HcdCounter")).add(param);
+    }
+
+    private CompletableFuture<Cancellable> publishCounter() {
+        log.info("Starting publish stream.");
+        return eventService.defaultPublisher().thenApply(publisher -> publisher.publish(() -> incrementCounterEvent(), Duration.ofSeconds(5)));
+    }
+    //#publish
 
     //#validate
     @Override
