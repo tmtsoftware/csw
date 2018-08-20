@@ -12,10 +12,9 @@ import csw.services.alarm.api.scaladsl.AlarmService
 trait IAlarmService {
 
   /**
-   * This api allows to set the severity of an alarm. It also internally updates the latch severity and acknowledgement status
-   * based on the fact that alarm is latchable or not, auto-acknowledgable or not, etc. The severity is set in alarm store
-   * with a specific TTL (time to live). After the time passes for TTL, the severity will be automatically inferred as
-   * `Disconnected`.
+   * This api allows to set the severity of an alarm. It also internally updates the latch severity and acknowledgement status.
+   * The severity is set in alarm store with a specific TTL (time to live). After the time passes for TTL, the severity
+   * will be automatically inferred as `Disconnected`.
    *
    * @note By default all alarms are loaded in alarm store as `Disconnected`. Once the component is up and working,
    *       it will it's responsibility to update all it's alarms with appropriate severity and keep refreshing it.

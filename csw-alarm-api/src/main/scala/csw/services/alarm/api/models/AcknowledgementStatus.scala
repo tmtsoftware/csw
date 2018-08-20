@@ -7,10 +7,10 @@ import scala.collection.immutable.IndexedSeq
 
 /**
  * Represents the acknowledgement related status of the alarm for e.g if it is acknowledged or not. Whenever the severity of an
- * alarm changes (other than Okay), alarm service changes the status to `Unacknowledged` (provided the alarm is not auto-acknowledgable).
- * Operator is then required to acknowledge the alarm which will then set the status to `Acknowledged`.
+ * alarm changes (other than Okay), alarm service changes the status to `Unacknowledged`. Operator is then required to acknowledge
+ * the alarm which will then set the status to `Acknowledged`.
  *
- * @note By default all the alarms are loaded in alarm store with `Unacknowledged` status
+ * @note By default all the alarms are loaded in alarm store with `Acknowledged` status
  */
 sealed abstract class AcknowledgementStatus extends EnumEntry with Lowercase {
 
@@ -34,8 +34,7 @@ object AcknowledgementStatus extends Enum[AcknowledgementStatus] {
   case object Unacknowledged extends AcknowledgementStatus
 
   /**
-   * Represents the acknowledged status of the alarm. Alarms that are auto-acknowledgable will automatically go in `Acknowledged`
-   * status whenever the severity changes.
+   * Represents the acknowledged status of the alarm
    */
   case object Acknowledged extends AcknowledgementStatus
 }

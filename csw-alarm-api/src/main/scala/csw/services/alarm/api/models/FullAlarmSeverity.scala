@@ -5,6 +5,12 @@ import enumeratum.{Enum, EnumEntry}
 
 import scala.collection.immutable.IndexedSeq
 
+/**
+ * Represents all the severities an alarm can have including Disconnected. The complete list of severities is Okay, Warning,
+ * Major, Indeterminate, Disconnected, Critical.
+ *
+ * @param level is fundamental in latching severity to higher severity than other
+ */
 sealed abstract class FullAlarmSeverity private[alarm] (val level: Int) extends EnumEntry with Lowercase {
 
   /**
@@ -15,8 +21,6 @@ sealed abstract class FullAlarmSeverity private[alarm] (val level: Int) extends 
   def >(otherSeverity: FullAlarmSeverity): Boolean = this.level > otherSeverity.level
 
   def max(otherSeverity: FullAlarmSeverity): FullAlarmSeverity = if (otherSeverity > this) otherSeverity else this
-
-  def isHighRisk: Boolean = this.level > 0
 }
 
 object FullAlarmSeverity extends Enum[FullAlarmSeverity] {
@@ -29,6 +33,12 @@ object FullAlarmSeverity extends Enum[FullAlarmSeverity] {
   case object Disconnected extends FullAlarmSeverity(4)
 }
 
+/**
+ * Represents the alarm severity set by the component developer e.g Okay, Warning, Major, Indeterminate, Critical. Disconnected
+ * is not a part of AlarmSeverity as it is never set by the component developer.
+ *
+ * @param level is fundamental in latching severity to higher severity than other
+ */
 sealed abstract class AlarmSeverity private[alarm] (override val level: Int) extends FullAlarmSeverity(level)
 
 object AlarmSeverity extends Enum[AlarmSeverity] {

@@ -7,12 +7,15 @@ import enumeratum.{Enum, EnumEntry}
 
 import scala.collection.immutable.IndexedSeq
 
+/**
+ * Represent the health status e.g Good, Ill, Bad for an alarm/component/subsystem or whole system.
+ */
 sealed abstract class AlarmHealth extends EnumEntry with Lowercase
 
 object AlarmHealth extends Enum[AlarmHealth] {
 
   /**
-   * Returns a sequence of all alarm severity
+   * Returns a sequence of alarm health values e.g good, ill or bad
    */
   def values: IndexedSeq[AlarmHealth] = findValues
 
