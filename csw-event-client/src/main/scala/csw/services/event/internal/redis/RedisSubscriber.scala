@@ -56,11 +56,11 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
     val connectionF: Future[RedisSubscriptionApi[EventKey, Event]] = reactiveConnectionF()
 
     val latestEventStream: Source[Event, NotUsed] = Source.fromFuture(get(eventKeys)).mapConcat(identity)
-    val dd: Future[Source[Event, RedisSubscription]] = async {
+    val eventStreamF: Future[Source[Event, RedisSubscription]] = async {
       val commands = await(connectionF)
       commands.subscribe(eventKeys.toList, OverflowStrategy.LATEST).map(_.value)
     }
-    val eventStream: Source[Event, EventSubscription] = subscribeInternal(eventKeys, dd)
+    val eventStream: Source[Event, EventSubscription] = subscribeInternal(eventKeys, eventStreamF)
     latestEventStream.concatMat(eventStream)(Keep.right)
   }
 
@@ -105,11 +105,11 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
     log.info(s"Subscribing to event key pattern: $keyPattern")
 
     val connectionF: Future[RedisSubscriptionApi[String, Event]] = reactiveConnectionF()
-    val dd: Future[Source[Event, RedisSubscription]] = async {
+    val eventStreamF: Future[Source[Event, RedisSubscription]] = async {
       val commands = await(connectionF)
-      commands.subscribe(List(pattern), OverflowStrategy.LATEST).map(_.value)
+      commands.psubscribe(List(keyPattern), OverflowStrategy.LATEST).map(_.value)
     }
-    subscribeInternal(pattern, dd)
+    subscribeInternal(keyPattern, eventStreamF)
   }
 
   override def pSubscribeCallback(subsystem: Subsystem, pattern: String, callback: Event ⇒ Unit): EventSubscription =
@@ -127,17 +127,17 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
   // get stream of events from redis `subscribe` command
   private def subscribeInternal[T](
       eventKeys: T,
-      dd: Future[Source[Event, RedisSubscription]]
+      eventStreamF: Future[Source[Event, RedisSubscription]]
   ): Source[Event, EventSubscription] = {
-    Source.fromFutureSource(dd).mapMaterializedValue { x =>
+    Source.fromFutureSource(eventStreamF).mapMaterializedValue { x =>
       new EventSubscription {
         override def unsubscribe(): Future[Done] = async {
-          await(dd)
+          await(eventStreamF)
           log.info(s"Unsubscribing to event keys=$eventKeys")
           await(await(x).unsubscribe())
         }
         override def ready(): Future[Done] = async {
-          await(dd)
+          await(eventStreamF)
           await(await(x).ready())
         }
       }
