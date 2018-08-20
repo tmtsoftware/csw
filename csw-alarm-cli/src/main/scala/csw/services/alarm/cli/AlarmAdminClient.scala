@@ -1,5 +1,7 @@
 package csw.services.alarm.cli
-import csw.services.alarm.api.scaladsl.AlarmAdminService
+import akka.Done
+import akka.actor.CoordinatedShutdown
+import csw.services.alarm.api.scaladsl.{AlarmAdminService, AlarmSubscription}
 import csw.services.alarm.cli.args.Options
 import csw.services.alarm.cli.extensions.RichFutureExt.RichFuture
 import csw.services.alarm.cli.utils.{ConfigUtils, Formatter}
@@ -27,14 +29,23 @@ class AlarmAdminClient(
       await(alarmService.initAlarms(config, options.reset))
     }.transformWithSideEffect(printLine)
 
-  def severity(options: Options): Future[Unit] = async {
+  def getSeverity(options: Options): Future[Unit] = async {
     val alarmService = await(alarmServiceF)
-    options.severity match {
-      case Some(_) ⇒ await(alarmService.setSeverity(options.alarmKey, options.severity.get).transformWithSideEffect(printLine))
-      case None ⇒
-        val severity = await(alarmService.getCurrentSeverity(options.alarmKey))
-        printLine(Formatter.formatSeverity(severity))
-    }
+    val severity     = await(alarmService.getCurrentSeverity(options.alarmKey))
+    printLine(Formatter.formatSeverity(severity))
+  }
+
+  def setSeverity(options: Options): Future[Unit] =
+    alarmServiceF.flatMap(_.setSeverity(options.alarmKey, options.severity.get).transformWithSideEffect(printLine))
+
+  def subscribeSeverity(options: Options): Future[Unit] = async {
+    val alarmService = await(alarmServiceF)
+    val subscription = alarmService.subscribeAggregatedSeverityCallback(options.key, s ⇒ printLine(Formatter.formatSeverity(s)))
+
+    coordinatedShutdown.addTask(
+      CoordinatedShutdown.PhaseBeforeServiceUnbind,
+      "unsubscribe-stream"
+    )(() ⇒ subscription.unsubscribe().map(_ ⇒ Done))
   }
 
   def acknowledge(options: Options): Future[Unit] =
@@ -83,4 +94,16 @@ class AlarmAdminClient(
     val status       = await(adminService.getStatus(options.alarmKey))
     printLine(Formatter.formatStatus(status))
   }
+
+  def getHealth(options: Options): Future[Unit] = async {
+    val alarmService = await(alarmServiceF)
+    val health       = await(alarmService.getAggregatedHealth(options.alarmKey))
+    printLine(health)
+  }
+
+  def subscribeHealth(options: Options): Future[Unit] = async {
+    val alarmService = await(alarmServiceF)
+    alarmService.subscribeAggregatedHealthCallback(options.alarmKey, printLine)
+  }
+
 }

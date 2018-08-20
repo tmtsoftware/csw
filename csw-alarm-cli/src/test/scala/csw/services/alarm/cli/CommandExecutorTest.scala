@@ -99,11 +99,12 @@ class CommandExecutorTest extends AlarmCliTestSetup {
   // DEOPSCSW-480: Set alarm Severity from CLI Interface
   test("should set severity of alarm") {
     val cmd = Options(
-      "severity",
+      cmd = "severity",
+      subCmd = "set",
+      severity = Some(Major),
       maybeSubsystem = Some(tromboneAxisHighLimitKey.subsystem),
       maybeComponent = Some(tromboneAxisHighLimitKey.component),
-      maybeAlarmName = Some(tromboneAxisHighLimitKey.name),
-      severity = Some(Major)
+      maybeAlarmName = Some(tromboneAxisHighLimitKey.name)
     )
 
     adminService.getCurrentSeverity(tromboneAxisHighLimitKey).futureValue shouldBe Disconnected
@@ -115,7 +116,8 @@ class CommandExecutorTest extends AlarmCliTestSetup {
   // DEOPSCSW-476: Fetch alarm severity from CLI Interface
   test("should get severity of alarm") {
     val cmd = Options(
-      "severity",
+      cmd = "severity",
+      subCmd = "get",
       maybeSubsystem = Some(tromboneAxisHighLimitKey.subsystem),
       maybeComponent = Some(tromboneAxisHighLimitKey.component),
       maybeAlarmName = Some(tromboneAxisHighLimitKey.name)
@@ -123,6 +125,23 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
     commandExecutor.execute(cmd)
     logBuffer shouldEqual List("Current Alarm Severity: Disconnected")
+  }
+
+  // DEOPSCSW-467: Monitor alarm severities in the alarm store for a single alarm, component, subsystem, or all
+  ignore("should subscribe severity of alarm") {
+    val cmd = Options(
+      cmd = "severity",
+      subCmd = "subscribe",
+      maybeSubsystem = Some(tromboneAxisHighLimitKey.subsystem),
+      maybeComponent = Some(tromboneAxisHighLimitKey.component),
+      maybeAlarmName = Some(tromboneAxisHighLimitKey.name)
+    )
+
+    commandExecutor.execute(cmd)
+    adminService.setSeverity(tromboneAxisLowLimitKey, Major).futureValue
+    adminService.setSeverity(tromboneAxisLowLimitKey, Okay).futureValue
+
+    logBuffer shouldEqual List("Current Alarm Severity: Major", "Current Alarm Severity: Okay")
   }
 
   // DEOPSCSW-471: Acknowledge alarm from CLI application

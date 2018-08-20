@@ -6,10 +6,33 @@ class ArgsParser(name: String) {
   val parser: OptionParser[Options] = new scopt.OptionParser[Options](name) with Arguments {
     head(name, BuildInfo.version)
 
-    private def alarmKey  = List(subsystem.required(), component.required(), alarmName.required())
-    private val get       = cmd("get").action((_, args) ⇒ args.copy(subCmd = "get")).children(alarmKey: _*)
-    private val set       = cmd("set").action((_, args) ⇒ args.copy(subCmd = "set")).children(alarmKey :+ severity: _*)
-    private val subscribe = cmd("subscribe").action((_, args) ⇒ args.copy(subCmd = "subscribe")).children(alarmKey: _*)
+    private def requiredAlarmKey = List(subsystem.required(), component.required(), alarmName.required())
+    private def optionalAlarmKey = List(subsystem, component, alarmName)
+
+    private val getSeverityCmd = cmd("get")
+      .action((_, args) ⇒ args.copy(subCmd = "get"))
+      .children(optionalAlarmKey: _*)
+      .text("get severity of a subsystem/component/alarm")
+
+    private val setSeverityCmd = cmd("set")
+      .action((_, args) ⇒ args.copy(subCmd = "set"))
+      .children(requiredAlarmKey :+ severity: _*)
+      .text("set severity of an alarm")
+
+    private val subscribeSeverityCmd = cmd("subscribe")
+      .action((_, args) ⇒ args.copy(subCmd = "subscribe"))
+      .children(optionalAlarmKey: _*)
+      .text("subscribe to severity of a subsystem/component/alarm")
+
+    private val getHealthCmd = cmd("get")
+      .action((_, args) ⇒ args.copy(subCmd = "get"))
+      .children(optionalAlarmKey: _*)
+      .text("get health of a subsystem/component/alarm")
+
+    private val subscribeHealthCmd = cmd("subscribe")
+      .action((_, args) ⇒ args.copy(subCmd = "subscribe"))
+      .children(optionalAlarmKey: _*)
+      .text("subscribe to health of a subsystem/component/alarm")
 
     cmd("init")
       .action((_, args) ⇒ args.copy(cmd = "init"))
@@ -18,59 +41,63 @@ class ArgsParser(name: String) {
 
     cmd("severity")
       .action((_, args) ⇒ args.copy(cmd = "severity"))
-      .text("get/set/subscribe severity of an alarm")
-      .children(get, set, subscribe)
+      .children(getSeverityCmd, setSeverityCmd, subscribeSeverityCmd)
+
+    cmd("health")
+      .action((_, args) ⇒ args.copy(cmd = "health"))
+      .children(getHealthCmd, subscribeHealthCmd)
 
     cmd("acknowledge")
       .action((_, args) ⇒ args.copy(cmd = "acknowledge"))
       .text("acknowledge an alarm")
-      .children(alarmKey: _*)
+      .children(requiredAlarmKey: _*)
 
     cmd("unacknowledge")
       .action((_, args) ⇒ args.copy(cmd = "unacknowledge"))
       .text("unacknowledge an alarm")
-      .children(alarmKey: _*)
+      .children(requiredAlarmKey: _*)
 
     cmd("activate")
       .action((_, args) ⇒ args.copy(cmd = "activate"))
       .text("activate an alarm")
-      .children(alarmKey: _*)
+      .children(requiredAlarmKey: _*)
 
     cmd("deactivate")
       .action((_, args) ⇒ args.copy(cmd = "deactivate"))
       .text("deactivate an alarm")
-      .children(alarmKey: _*)
+      .children(requiredAlarmKey: _*)
 
     cmd("shelve")
       .action((_, args) ⇒ args.copy(cmd = "shelve"))
       .text("shelve an alarm")
-      .children(alarmKey: _*)
+      .children(requiredAlarmKey: _*)
 
     cmd("unshelve")
       .action((_, args) ⇒ args.copy(cmd = "unshelve"))
       .text("unshelve an alarm")
-      .children(alarmKey: _*)
+      .children(requiredAlarmKey: _*)
 
     cmd("reset")
       .action((_, args) ⇒ args.copy(cmd = "reset"))
       .text("reset latched severity of an alarm")
-      .children(alarmKey: _*)
+      .children(requiredAlarmKey: _*)
 
     cmd("list")
       .action((_, args) ⇒ args.copy(cmd = "list"))
       .text("list alarms")
-      .children(subsystem, component, alarmName)
+      .children(optionalAlarmKey: _*)
 
     cmd("status")
       .action((_, args) ⇒ args.copy(cmd = "status"))
       .text("get current status of the alarm")
-      .children(alarmKey: _*)
+      .children(requiredAlarmKey: _*)
 
     help("help")
 
     version("version")
 
     checkConfig { c =>
+      //TODO: Validate sub-command is provided for severity,health commands
       val commandsAllowingPartialKey = List("list")
       if (c.cmd.isEmpty)
         failure("""
