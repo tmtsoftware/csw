@@ -20,7 +20,7 @@ private class RedisSubscriptionImpl[K](
    * To unsubscribe a given subscription. This will also clean up subscription specific underlying resources
    * @return a future which completes when the unsubscribe is completed
    */
-  def unsubscribe(): Future[Unit] = async {
+  def unsubscribe(): Future[Done] = async {
     await(redisReactiveApi.unsubscribe(keys)) // unsubscribe is no-op
     await(redisReactiveApi.quit)
     killSwitch.shutdown()
@@ -31,7 +31,7 @@ private class RedisSubscriptionImpl[K](
    * To check if the underlying subscription is ready to emit elements
    * @return a future which completes when the underlying subscription is ready to emit elements
    */
-  def ready(): Future[Unit] = subscriptionF.map(_ ⇒ ()).recoverWith {
-    case _ if terminationSignal.isCompleted ⇒ terminationSignal.map(_ => ())
+  def ready(): Future[Done] = subscriptionF.map(_ ⇒ Done).recoverWith {
+    case _ if terminationSignal.isCompleted ⇒ terminationSignal
   }
 }

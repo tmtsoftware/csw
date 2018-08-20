@@ -131,11 +131,15 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
   ): Source[Event, EventSubscription] = {
     Source.fromFutureSource(dd).mapMaterializedValue { x =>
       new EventSubscription {
-        override def unsubscribe(): Future[Done] = {
+        override def unsubscribe(): Future[Done] = async {
+          await(dd)
           log.info(s"Unsubscribing to event keys=$eventKeys")
-          x.flatMap(_.unsubscribe().map(_ => Done))
+          await(await(x).unsubscribe())
         }
-        override def ready(): Future[Done] = x.flatMap(_.ready().map(_ => Done))
+        override def ready(): Future[Done] = async {
+          await(dd)
+          await(await(x).ready())
+        }
       }
     }
   }
