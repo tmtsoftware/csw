@@ -9,31 +9,6 @@ class ArgsParser(name: String) {
     private def requiredAlarmKey = List(subsystem.required(), component.required(), alarmName.required())
     private def optionalAlarmKey = List(subsystem, component, alarmName)
 
-    private val getSeverityCmd = cmd("get")
-      .action((_, args) ⇒ args.copy(subCmd = "get"))
-      .children(optionalAlarmKey: _*)
-      .text("get severity of a subsystem/component/alarm")
-
-    private val setSeverityCmd = cmd("set")
-      .action((_, args) ⇒ args.copy(subCmd = "set"))
-      .children(requiredAlarmKey :+ severity: _*)
-      .text("set severity of an alarm")
-
-    private val subscribeSeverityCmd = cmd("subscribe")
-      .action((_, args) ⇒ args.copy(subCmd = "subscribe"))
-      .children(optionalAlarmKey: _*)
-      .text("subscribe to severity of a subsystem/component/alarm")
-
-    private val getHealthCmd = cmd("get")
-      .action((_, args) ⇒ args.copy(subCmd = "get"))
-      .children(optionalAlarmKey: _*)
-      .text("get health of a subsystem/component/alarm")
-
-    private val subscribeHealthCmd = cmd("subscribe")
-      .action((_, args) ⇒ args.copy(subCmd = "subscribe"))
-      .children(optionalAlarmKey: _*)
-      .text("subscribe to health of a subsystem/component/alarm")
-
     cmd("init")
       .action((_, args) ⇒ args.copy(cmd = "init"))
       .text("initialize the alarm store")
@@ -41,11 +16,33 @@ class ArgsParser(name: String) {
 
     cmd("severity")
       .action((_, args) ⇒ args.copy(cmd = "severity"))
-      .children(getSeverityCmd, setSeverityCmd, subscribeSeverityCmd)
+      .children(
+        cmd("get")
+          .action((_, args) ⇒ args.copy(subCmd = "get"))
+          .children(optionalAlarmKey: _*)
+          .text("get severity of a subsystem/component/alarm"),
+        cmd("set")
+          .action((_, args) ⇒ args.copy(subCmd = "set"))
+          .children(requiredAlarmKey :+ severity: _*)
+          .text("set severity of an alarm"),
+        cmd("subscribe")
+          .action((_, args) ⇒ args.copy(subCmd = "subscribe"))
+          .children(optionalAlarmKey: _*)
+          .text("subscribe to severity of a subsystem/component/alarm")
+      )
 
     cmd("health")
       .action((_, args) ⇒ args.copy(cmd = "health"))
-      .children(getHealthCmd, subscribeHealthCmd)
+      .children(
+        cmd("get")
+          .action((_, args) ⇒ args.copy(subCmd = "get"))
+          .children(optionalAlarmKey: _*)
+          .text("get health of a subsystem/component/alarm"),
+        cmd("subscribe")
+          .action((_, args) ⇒ args.copy(subCmd = "subscribe"))
+          .children(optionalAlarmKey: _*)
+          .text("subscribe to health of a subsystem/component/alarm")
+      )
 
     cmd("acknowledge")
       .action((_, args) ⇒ args.copy(cmd = "acknowledge"))
@@ -97,8 +94,9 @@ class ArgsParser(name: String) {
     version("version")
 
     checkConfig { c =>
-      //TODO: Validate sub-command is provided for severity,health commands
       val commandsAllowingPartialKey = List("list")
+      val commandsHavingSubCommands  = List("severity", "health")
+
       if (c.cmd.isEmpty)
         failure("""
                   |Please specify one of the following command with their corresponding options:
@@ -114,6 +112,8 @@ class ArgsParser(name: String) {
                   |  10> list
                   |  11> status
                 """.stripMargin)
+      else if (commandsHavingSubCommands.contains(c.cmd) && c.subCmd.isEmpty)
+        failure("Please specify an appropriate sub-command")
       else if (commandsAllowingPartialKey.contains(c.cmd)) validateKey(c)
       else success
     }

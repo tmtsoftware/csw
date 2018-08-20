@@ -1,7 +1,7 @@
 package csw.services.alarm.cli
 import akka.Done
 import akka.actor.CoordinatedShutdown
-import csw.services.alarm.api.scaladsl.{AlarmAdminService, AlarmSubscription}
+import csw.services.alarm.api.scaladsl.AlarmAdminService
 import csw.services.alarm.cli.args.Options
 import csw.services.alarm.cli.extensions.RichFutureExt.RichFuture
 import csw.services.alarm.cli.utils.{ConfigUtils, Formatter}
@@ -31,7 +31,7 @@ class AlarmAdminClient(
 
   def getSeverity(options: Options): Future[Unit] = async {
     val alarmService = await(alarmServiceF)
-    val severity     = await(alarmService.getCurrentSeverity(options.alarmKey))
+    val severity     = await(alarmService.getAggregatedSeverity(options.key))
     printLine(Formatter.formatSeverity(severity))
   }
 

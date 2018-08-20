@@ -49,8 +49,7 @@ class ArgsParserTest extends FunSuite with Matchers {
     )
   }
 
-  //Fixme: command should fail without sub command
-  ignore(s"parse severity without sub command") {
+  test(s"parse severity without sub command") {
     val options = Array("severity")
     silentParse(options) shouldBe None
   }
@@ -218,8 +217,7 @@ class ArgsParserTest extends FunSuite with Matchers {
     silentParse(options2) shouldBe None
   }
 
-  //Fixme: command should fail without sub command
-  ignore(s"parse health without sub command") {
+  test(s"parse health without sub command") {
     val options = Array("health")
     silentParse(options) shouldBe None
   }
