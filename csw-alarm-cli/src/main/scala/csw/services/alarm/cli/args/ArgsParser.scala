@@ -94,14 +94,14 @@ class ArgsParser(name: String) {
     version("version")
 
     checkConfig { c =>
-      val commandsAllowingPartialKey = List("list")
+      val commandsAllowingPartialKey = List("list", "severity", "health")
       val commandsHavingSubCommands  = List("severity", "health")
 
       if (c.cmd.isEmpty)
         failure("""
                   |Please specify one of the following command with their corresponding options:
                   |  1> init
-                  |  2> update
+                  |  2> severity
                   |  3> acknowledge
                   |  4> unacknowledge
                   |  5> activate
@@ -111,6 +111,7 @@ class ArgsParser(name: String) {
                   |  9> reset
                   |  10> list
                   |  11> status
+                  |  12> health
                 """.stripMargin)
       else if (commandsHavingSubCommands.contains(c.cmd) && c.subCmd.isEmpty)
         failure("Please specify an appropriate sub-command")
