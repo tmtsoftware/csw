@@ -78,7 +78,6 @@ public class JProtobufSerializationTest {
     }
 
     @Test
-    @Ignore
     public void shouldAbleToConvertToAndFromPbParameter() {
         PbParameter pbParameter = param.toPb();
         byte[] pbParameterBytes = pbParameter.toByteArray();
