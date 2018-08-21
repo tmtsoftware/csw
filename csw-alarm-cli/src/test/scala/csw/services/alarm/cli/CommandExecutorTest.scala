@@ -7,8 +7,8 @@ import csw.messages.params.models.Subsystem.{LGSF, NFIRAOS, TCS}
 import csw.services.alarm.api.exceptions.KeyNotFoundException
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
-import csw.services.alarm.api.models.AlarmHealth.Bad
-import csw.services.alarm.api.models.AlarmSeverity.{Critical, Indeterminate, Major, Okay}
+import csw.services.alarm.api.models.AlarmHealth.{Bad, Good, Ill}
+import csw.services.alarm.api.models.AlarmSeverity._
 import csw.services.alarm.api.models.AlarmStatus
 import csw.services.alarm.api.models.FullAlarmSeverity.Disconnected
 import csw.services.alarm.api.models.Key.{AlarmKey, GlobalKey}
@@ -401,6 +401,9 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
   // DEOPSCSW-478: Fetch health of component/subsystem from CLI Interface
   test("should get health of component") {
+    adminService.setSeverity(tromboneAxisHighLimitKey, Okay).futureValue
+    adminService.setSeverity(tromboneAxisLowLimitKey, Major).futureValue
+
     val cmd = Options(
       cmd = "health",
       subCmd = "get",
@@ -410,12 +413,15 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
     commandExecutor.execute(cmd)
     logBuffer shouldEqual List(
-      s"Aggregated Health of Component ${tromboneAxisHighLimitKey.subsystem}.${tromboneAxisHighLimitKey.component}: ${Bad.toString}"
+      s"Aggregated Health of Component ${tromboneAxisHighLimitKey.subsystem}.${tromboneAxisHighLimitKey.component}: ${Ill.toString}"
     )
   }
 
   // DEOPSCSW-478: Fetch health of component/subsystem from CLI Interface
   test("should get health of subsystem") {
+    adminService.setSeverity(tromboneAxisHighLimitKey, Warning).futureValue
+    adminService.setSeverity(tromboneAxisLowLimitKey, Okay).futureValue
+
     val cmd = Options(
       cmd = "health",
       subCmd = "get",
@@ -423,7 +429,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     )
 
     commandExecutor.execute(cmd)
-    logBuffer shouldEqual List(s"Aggregated Health of Subsystem ${cmd.maybeSubsystem.get}: ${Bad.toString}")
+    logBuffer shouldEqual List(s"Aggregated Health of Subsystem ${cmd.maybeSubsystem.get}: ${Good.toString}")
   }
 
   // DEOPSCSW-478: Fetch health of component/subsystem from CLI Interface
