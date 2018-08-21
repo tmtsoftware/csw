@@ -20,7 +20,7 @@ class SeverityServiceModuleTests
     with StatusServiceModule {
 
   override protected def beforeEach(): Unit = {
-    val validAlarmsConfig = ConfigFactory.parseResources("test-alarms/valid-alarms.conf")
+    val validAlarmsConfig = ConfigFactory.parseResources("test-alarms/more-alarms.conf")
     initAlarms(validAlarmsConfig, reset = true).await
   }
 
@@ -113,16 +113,21 @@ class SeverityServiceModuleTests
   // DEOPSCSW-465: Fetch alarm severity, component or subsystem
   test("getAggregatedSeverity should get aggregated severity for component") {
     setSeverity(tromboneAxisHighLimitAlarmKey, Warning).await
-    setSeverity(tromboneAxisLowLimitAlarmKey, Critical).await
+    setSeverity(tromboneAxisLowLimitAlarmKey, Major).await
+    setSeverity(splitterLimitAlarmKey, Critical).await  // splitter component should not be included
 
     val tromboneKey = ComponentKey(NFIRAOS, "trombone")
-    getAggregatedSeverity(tromboneKey).await shouldBe Critical
+    getAggregatedSeverity(tromboneKey).await shouldBe Major
   }
 
   // DEOPSCSW-465: Fetch alarm severity, component or subsystem
   test("getAggregatedSeverity should get aggregated severity for subsystem") {
     setSeverity(tromboneAxisHighLimitAlarmKey, Warning).await
     setSeverity(tromboneAxisLowLimitAlarmKey, Major).await
+    setSeverity(splitterLimitAlarmKey, Okay).await
+    setSeverity(enclosureTempHighAlarmKey, Okay).await
+    setSeverity(enclosureTempLowAlarmKey, Okay).await
+    setSeverity(cpuExceededAlarmKey, Critical).await  // TCS Alarm should not be included
 
     val tromboneKey = SubsystemKey(NFIRAOS)
     getAggregatedSeverity(tromboneKey).await shouldBe Major
@@ -130,7 +135,18 @@ class SeverityServiceModuleTests
 
   // DEOPSCSW-465: Fetch alarm severity, component or subsystem
   test("getAggregatedSeverity should get aggregated severity for global system") {
-    setSeverity(tromboneAxisLowLimitAlarmKey, Critical).await
+    setSeverity(tromboneAxisHighLimitAlarmKey, Major).await
+    setSeverity(tromboneAxisLowLimitAlarmKey, Okay).await
+    setSeverity(splitterLimitAlarmKey, Okay).await
+    setSeverity(enclosureTempHighAlarmKey, Indeterminate).await
+    setSeverity(enclosureTempLowAlarmKey, Okay).await
+    setSeverity(cpuExceededAlarmKey, Okay).await
+    setSeverity(outOfRangeOffloadAlarmKey, Warning).await
+    setSeverity(cpuIdleAlarmKey, Okay).await
+
+    getAggregatedSeverity(GlobalKey).await shouldBe Indeterminate
+
+    setSeverity(cpuIdleAlarmKey, Critical).await
 
     getAggregatedSeverity(GlobalKey).await shouldBe Critical
   }
