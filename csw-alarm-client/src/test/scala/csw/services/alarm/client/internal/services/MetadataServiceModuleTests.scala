@@ -1,7 +1,7 @@
 package csw.services.alarm.client.internal.services
 
 import com.typesafe.config.{Config, ConfigFactory}
-import csw.messages.params.models.Subsystem.{BAD, NFIRAOS, TCS}
+import csw.messages.params.models.Subsystem.{BAD, NFIRAOS}
 import csw.services.alarm.api.exceptions.KeyNotFoundException
 import csw.services.alarm.api.internal.MetadataKey
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
@@ -21,7 +21,7 @@ class MetadataServiceModuleTests
     with HealthServiceModule {
 
   def initTestAlarms(): Unit = {
-    val validAlarmsConfig = ConfigFactory.parseResources("test-alarms/valid-alarms.conf")
+    val validAlarmsConfig = ConfigFactory.parseResources("test-alarms/more-alarms.conf")
     initAlarms(validAlarmsConfig, reset = true).await
   }
 
@@ -29,6 +29,7 @@ class MetadataServiceModuleTests
   test("getMetadata should fetch metadata of the given Alarm key") {
     initTestAlarms()
     getMetadata(tromboneAxisHighLimitAlarmKey).await shouldBe tromboneAxisHighLimitAlarm
+    getMetadata(splitterLimitAlarmKey).await shouldBe splitterLimitAlarm
   }
 
   //  DEOPSCSW-445: Get api for alarm metadata
@@ -40,17 +41,29 @@ class MetadataServiceModuleTests
   // DEOPSCSW-463: Fetch Alarm List for a component name or pattern
   test("getMetadata should fetch all alarms for a component") {
     initTestAlarms()
-    val tromboneKey = ComponentKey(TCS, "tcsPk")
-    getMetadata(tromboneKey).await should contain allElementsOf List(cpuExceededAlarm)
+    val tromboneKey      = ComponentKey(NFIRAOS, "trombone")
+    val tromboneMetadata = getMetadata(tromboneKey).await
+    tromboneMetadata.length shouldBe 2
+    tromboneMetadata should contain allElementsOf List(tromboneAxisLowLimitAlarm, tromboneAxisHighLimitAlarm)
+
+    val enclosureKey      = ComponentKey(NFIRAOS, "enclosure")
+    val enclosureMetadata = getMetadata(enclosureKey).await
+    enclosureMetadata.length shouldBe 2
+    enclosureMetadata should contain allElementsOf List(enclosureTempHighAlarm, enclosureTempLowAlarm)
   }
 
   // DEOPSCSW-464: Fetch Alarm name list for a subsystem name or pattern
   test("getMetadata should fetch all alarms for a subsystem") {
     initTestAlarms()
     val nfiraosKey = SubsystemKey(NFIRAOS)
-    getMetadata(nfiraosKey).await should contain allElementsOf List(
+    val metadata   = getMetadata(nfiraosKey).await
+    metadata.length shouldBe 5
+    metadata should contain allElementsOf List(
+      splitterLimitAlarm,
       tromboneAxisHighLimitAlarm,
-      tromboneAxisLowLimitAlarm
+      tromboneAxisLowLimitAlarm,
+      enclosureTempHighAlarm,
+      enclosureTempLowAlarm
     )
   }
 
@@ -58,10 +71,17 @@ class MetadataServiceModuleTests
   test("getMetadata should fetch all alarms of whole system") {
     initTestAlarms()
     val globalKey = GlobalKey
-    getMetadata(globalKey).await should contain allElementsOf List(
+    val metadata  = getMetadata(globalKey).await
+    metadata.length shouldBe 8
+    metadata should contain allElementsOf List(
       tromboneAxisHighLimitAlarm,
       tromboneAxisLowLimitAlarm,
-      cpuExceededAlarm
+      splitterLimitAlarm,
+      enclosureTempHighAlarm,
+      enclosureTempLowAlarm,
+      cpuExceededAlarm,
+      outOfRangeOffloadAlarm,
+      cpuIdleAlarm
     )
   }
 
@@ -78,7 +98,7 @@ class MetadataServiceModuleTests
     initAlarms(fourAlarmsConfig).await
 
     // valid-alarms.conf contains 4 alarms
-    getMetadata(GlobalKey).await.size shouldBe 4
+    getMetadata(GlobalKey).await.size shouldBe 8
 
     getMetadata(tromboneAxisHighLimitAlarmKey).await shouldBe tromboneAxisHighLimitAlarm
     getStatus(tromboneAxisHighLimitAlarmKey).await shouldBe AlarmStatus()
