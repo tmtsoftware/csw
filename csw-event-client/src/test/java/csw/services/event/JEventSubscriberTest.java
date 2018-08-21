@@ -48,7 +48,7 @@ public class JEventSubscriberTest extends TestNGSuite {
 
     public List<Event> getEvents() {
         List<Event> events = new ArrayList<>();
-        for(int i = 0; i < 1500; i++) {
+        for (int i = 0; i < 1500; i++) {
             events.add(Utils.makeEvent(i));
         }
         return events;
@@ -89,7 +89,12 @@ public class JEventSubscriberTest extends TestNGSuite {
         java.util.Set<EventKey> set = new HashSet<>();
         set.add(eventKey);
 
-        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(set).take(2).toMat(Sink.foreach(event -> probe.ref().tell(event)), Keep.left()).run(baseProperties.resumingMat());
+        IEventSubscription subscription =
+                baseProperties.jSubscriber().subscribe(set)
+                        .take(2)
+                        .toMat(Sink.foreach(event -> probe.ref().tell(event)), Keep.left())
+                        .run(baseProperties.resumingMat());
+
         subscription.ready().get(10, TimeUnit.SECONDS);
 
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
@@ -161,7 +166,7 @@ public class JEventSubscriberTest extends TestNGSuite {
         TestProbe probe = TestProbe.create(baseProperties.typedActorSystem());
 
         List<Event> listOfPublishedEvents = new ArrayList<>(5);
-        for(int i = 1; i <= 5; i ++) {
+        for (int i = 1; i <= 5; i++) {
             Event event = Utils.makeEvent(i);
             listOfPublishedEvents.add(event);
             baseProperties.jPublisher().publish(event).get(10, TimeUnit.SECONDS);
@@ -265,11 +270,11 @@ public class JEventSubscriberTest extends TestNGSuite {
     // Pattern subscription doesn't work with embedded kafka hence not running it with the suite
     @Test(dataProvider = "redis-provider")
     public void should_be_able_to_subscribe_an_event_with_pattern_from_same_subsystem(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
-        Event testEvent1 = Utils.makeEventForKeyName(new EventName("movement.linear"),1);
-        Event testEvent2 = Utils.makeEventForKeyName(new EventName("movement.angular"),2);
-        Event testEvent3 = Utils.makeEventForKeyName(new EventName("temperature"),3);
-        Event testEvent4 = Utils.makeEventForKeyName(new EventName("move"),3);
-        Event testEvent5 = Utils.makeEventForKeyName(new EventName("cove"),3);
+        Event testEvent1 = Utils.makeEventForKeyName(new EventName("movement.linear"), 1);
+        Event testEvent2 = Utils.makeEventForKeyName(new EventName("movement.angular"), 2);
+        Event testEvent3 = Utils.makeEventForKeyName(new EventName("temperature"), 3);
+        Event testEvent4 = Utils.makeEventForKeyName(new EventName("move"), 3);
+        Event testEvent5 = Utils.makeEventForKeyName(new EventName("cove"), 3);
         Event testEvent6 = Utils.makeEventForPrefixAndKeyName(new Prefix("test.test_prefix"), new EventName("move"), 6);
 
         TestInbox<Event> inbox = TestInbox.create();
@@ -278,7 +283,7 @@ public class JEventSubscriberTest extends TestNGSuite {
         TestInbox<Event> inbox4 = TestInbox.create();
         TestInbox<Event> inbox5 = TestInbox.create();
 
-        String eventPattern  = "*.movement.*";      //subscribe to events with any prefix but event name containing 'movement'
+        String eventPattern = "*.movement.*";      //subscribe to events with any prefix but event name containing 'movement'
         String eventPattern2 = "*.move*";           //subscribe to events with any prefix but event name containing 'move'
         String eventPattern3 = "*.?ove*";           //subscribe to events with any prefix but event name matching any first  character followed by `ove`
         String eventPattern4 = "test_prefix.*";     //subscribe to all events with prefix `test_prefix` irresepective of event names

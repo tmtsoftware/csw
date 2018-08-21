@@ -4,7 +4,6 @@ import java.nio.ByteBuffer
 
 import csw.messages.events.{Event, EventKey}
 import csw_protobuf.events.PbEvent
-import io.lettuce.core.codec.RedisCodec
 import romaine.codec.{RomaineByteCodec, RomaineStringCodec}
 
 import scala.util.control.NonFatal
@@ -14,13 +13,13 @@ import scala.util.control.NonFatal
  */
 object EventRomaineCodecs {
   implicit object EventKeyRomaineCodec extends RomaineStringCodec[EventKey] {
-    override def toString(x: EventKey): String        = x.key
-    override def fromString(string: String): EventKey = EventKey(string)
+    override def toString(eventKey: EventKey): String = eventKey.key
+    override def fromString(str: String): EventKey    = EventKey(str)
   }
 
   implicit object EventRomaineCodec extends RomaineByteCodec[Event] {
-    override def toBytes(x: Event): ByteBuffer = {
-      val pbEvent = Event.typeMapper.toBase(x)
+    override def toBytes(event: Event): ByteBuffer = {
+      val pbEvent = Event.typeMapper.toBase(event)
       ByteBuffer.wrap(pbEvent.toByteArray)
     }
     override def fromBytes(byteBuffer: ByteBuffer): Event = {

@@ -25,10 +25,10 @@ import scala.util.control.NonFatal
  * An implementation of [[csw.services.event.api.scaladsl.EventSubscriber]] API which uses Redis as the provider for publishing
  * and subscribing events.
  *
- * @param redisURI Contains connection details for the Redis/Sentinel connections.
- * @param redisClient A redis client available from lettuce
- * @param ec        the execution context to be used for performing asynchronous operations
- * @param mat       the materializer to be used for materializing underlying streams
+ * @param redisURI    contains connection details for the Redis/Sentinel connections.
+ * @param redisClient redis client available from lettuce
+ * @param ec          the execution context to be used for performing asynchronous operations
+ * @param mat         the materializer to be used for materializing underlying streams
  */
 class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
     implicit ec: ExecutionContext,
@@ -131,16 +131,16 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
       eventKeys: T,
       eventStreamF: Future[Source[Event, RedisSubscription]]
   ): Source[Event, EventSubscription] = {
-    Source.fromFutureSource(eventStreamF).mapMaterializedValue { x =>
+    Source.fromFutureSource(eventStreamF).mapMaterializedValue { subscriptionF =>
       new EventSubscription {
         override def unsubscribe(): Future[Done] = async {
           await(eventStreamF)
           log.info(s"Unsubscribing to event keys=$eventKeys")
-          await(await(x).unsubscribe())
+          await(await(subscriptionF).unsubscribe())
         }
         override def ready(): Future[Done] = async {
           await(eventStreamF)
-          await(await(x).ready())
+          await(await(subscriptionF).ready())
         }
       }
     }
