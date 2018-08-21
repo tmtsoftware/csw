@@ -64,7 +64,7 @@ trait AlarmTestData {
   val enclosureTempHighAlarm = AlarmMetadata(
     subsystem = NFIRAOS,
     component = "enclosure",
-    name = "tempHigh",
+    name = "tempHighAlarm",
     description = "Enclosure temperature has gone out of range high",
     location = "enclosure",
     AlarmType.Absolute,
@@ -81,7 +81,7 @@ trait AlarmTestData {
   val enclosureTempLowAlarm = AlarmMetadata(
     subsystem = NFIRAOS,
     component = "enclosure",
-    name = "tempLow",
+    name = "tempLowAlarm",
     description = "Enclosure temperature has gone out of range low",
     location = "enclosure",
     AlarmType.Absolute,
