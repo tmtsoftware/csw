@@ -102,6 +102,9 @@ class StatusServiceModuleTests
     // set latched severity to Warning which will result status to be Latched and Unacknowledged
     setSeverity(tromboneAxisLowLimitAlarmKey, Warning).await
 
+    val status1 = getStatus(tromboneAxisLowLimitAlarmKey).await
+    status1.acknowledgementStatus shouldBe Unacknowledged
+
     acknowledge(tromboneAxisLowLimitAlarmKey).await
     val status = getStatus(tromboneAxisLowLimitAlarmKey).await
     status.acknowledgementStatus shouldBe Acknowledged
@@ -109,8 +112,14 @@ class StatusServiceModuleTests
 
   // DEOPSCSW-446: Acknowledge api for alarm
   test("unacknowledge should set acknowledgementStatus to Unacknowledged of an alarm") {
+    val status1 = getStatus(tromboneAxisLowLimitAlarmKey).await
+    status1.acknowledgementStatus shouldBe Acknowledged
+
     // set latched severity to Okay which will result status to be Latched and Acknowledged
     setSeverity(tromboneAxisLowLimitAlarmKey, Okay).await
+
+    val status2 = getStatus(tromboneAxisLowLimitAlarmKey).await
+    status2.acknowledgementStatus shouldBe Acknowledged
 
     unacknowledge(tromboneAxisLowLimitAlarmKey).await
     val status = getStatus(tromboneAxisLowLimitAlarmKey).await
