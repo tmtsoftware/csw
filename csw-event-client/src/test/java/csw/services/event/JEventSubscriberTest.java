@@ -96,10 +96,9 @@ public class JEventSubscriberTest extends TestNGSuite {
                         .run(baseProperties.resumingMat());
 
         subscription.ready().get(10, TimeUnit.SECONDS);
+        probe.expectMessage(Event$.MODULE$.invalidEvent(eventKey));
 
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
-
-        probe.expectMessage(Event$.MODULE$.invalidEvent(eventKey));
         probe.expectMessage(event1);
 
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
