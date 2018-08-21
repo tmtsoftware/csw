@@ -32,7 +32,7 @@ class AlarmAdminClient(
   def getSeverity(options: Options): Future[Unit] = async {
     val alarmService = await(alarmServiceF)
     val severity     = await(alarmService.getAggregatedSeverity(options.key))
-    printLine(Formatter.formatSeverity(severity))
+    printLine(Formatter.formatSeverity(options.key, severity))
   }
 
   def setSeverity(options: Options): Future[Unit] =
@@ -40,7 +40,10 @@ class AlarmAdminClient(
 
   def subscribeSeverity(options: Options): Future[Unit] = async {
     val alarmService = await(alarmServiceF)
-    val subscription = alarmService.subscribeAggregatedSeverityCallback(options.key, s ⇒ printLine(Formatter.formatSeverity(s)))
+    val subscription = alarmService.subscribeAggregatedSeverityCallback(
+      options.key,
+      severity ⇒ printLine(Formatter.formatSeverity(options.key, severity))
+    )
 
     coordinatedShutdown.addTask(
       CoordinatedShutdown.PhaseBeforeServiceUnbind,
@@ -98,11 +101,14 @@ class AlarmAdminClient(
   def getHealth(options: Options): Future[Unit] = async {
     val alarmService = await(alarmServiceF)
     val health       = await(alarmService.getAggregatedHealth(options.key))
-    printLine(Formatter.formatHealth(health))
+    printLine(Formatter.formatHealth(options.key, health))
   }
 
   def subscribeHealth(options: Options): Future[Unit] = async {
     val alarmService = await(alarmServiceF)
-    alarmService.subscribeAggregatedHealthCallback(options.key, h ⇒ printLine(Formatter.formatHealth(h)))
+    alarmService.subscribeAggregatedHealthCallback(
+      options.key,
+      health ⇒ printLine(Formatter.formatHealth(options.key, health))
+    )
   }
 }

@@ -7,6 +7,7 @@ import csw.messages.params.models.Subsystem.{LGSF, NFIRAOS, TCS}
 import csw.services.alarm.api.exceptions.KeyNotFoundException
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
+import csw.services.alarm.api.models.AlarmHealth.Bad
 import csw.services.alarm.api.models.AlarmSeverity.{Critical, Major, Okay}
 import csw.services.alarm.api.models.AlarmStatus
 import csw.services.alarm.api.models.FullAlarmSeverity.Disconnected
@@ -124,7 +125,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     )
 
     commandExecutor.execute(cmd)
-    logBuffer shouldEqual List("Current Alarm Severity: Disconnected")
+    logBuffer shouldEqual List(s"Severity of Alarm ${cmd.alarmKey.value}: ${Disconnected.toString}")
   }
 
   // DEOPSCSW-476: Fetch alarm severity from CLI Interface
@@ -136,7 +137,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     )
 
     commandExecutor.execute(cmd)
-    logBuffer shouldEqual List("Current Alarm Severity: Disconnected")
+    logBuffer shouldEqual List(s"Aggregated Severity of Subsystem ${cmd.maybeSubsystem.get}: ${Disconnected.toString}")
   }
 
   // DEOPSCSW-467: Monitor alarm severities in the alarm store for a single alarm, component, subsystem, or all
@@ -165,10 +166,10 @@ class CommandExecutorTest extends AlarmCliTestSetup {
       maybeAlarmName = Some(tromboneAxisLowLimitKey.name)
     )
 
-    adminService.setStatus(
-      tromboneAxisLowLimitKey,
-      AlarmStatus().copy(acknowledgementStatus = Unacknowledged, latchedSeverity = Critical)
-    )
+    adminService
+      .setStatus(tromboneAxisLowLimitKey, AlarmStatus().copy(acknowledgementStatus = Unacknowledged, latchedSeverity = Critical))
+      .futureValue
+
     adminService.getStatus(tromboneAxisLowLimitKey).futureValue.acknowledgementStatus shouldBe Unacknowledged
     commandExecutor.execute(cmd) // acknowledge the alarm
     adminService.getStatus(tromboneAxisLowLimitKey).futureValue.acknowledgementStatus shouldBe Acknowledged
@@ -361,7 +362,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     )
 
     commandExecutor.execute(cmd)
-    logBuffer shouldEqual List("Current Alarm Health: Bad")
+    logBuffer shouldEqual List(s"Health of Alarm ${cmd.alarmKey.value}: ${Bad.toString}")
   }
 
   // DEOPSCSW-478: Fetch health of component/subsystem from CLI Interface
@@ -373,7 +374,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     )
 
     commandExecutor.execute(cmd)
-    logBuffer shouldEqual List("Current Alarm Health: Bad")
+    logBuffer shouldEqual List(s"Aggregated Health of Subsystem ${cmd.maybeSubsystem.get}: ${Bad.toString}")
   }
 
   // DEOPSCSW-479: Subscribe to health changes of component/subsystem/all alarms using CLI Interface

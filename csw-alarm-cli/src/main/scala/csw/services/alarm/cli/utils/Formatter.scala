@@ -1,6 +1,7 @@
 package csw.services.alarm.cli.utils
 
-import csw.services.alarm.api.models.{AlarmHealth, AlarmMetadata, AlarmStatus, FullAlarmSeverity}
+import csw.services.alarm.api.models.Key._
+import csw.services.alarm.api.models._
 
 object Formatter {
 
@@ -43,7 +44,13 @@ object Formatter {
     ).mkString(Newline)
   }
 
-  def formatSeverity(severity: FullAlarmSeverity): String = s"Current Alarm Severity: ${severity.toString}"
-  def formatHealth(health: AlarmHealth): String           = s"Current Alarm Health: ${health.toString}"
+  def formatSeverity(key: Key, severity: FullAlarmSeverity): String = msg(key, "Severity", severity.toString)
+  def formatHealth(key: Key, health: AlarmHealth): String           = msg(key, "Health", health.toString)
 
+  def msg(key: Key, property: String, value: String): String = key match {
+    case GlobalKey                          ⇒ s"Aggregated $property of Alarm Service: $value"
+    case SubsystemKey(subsystem)            ⇒ s"Aggregated $property of Subsystem $subsystem: $value"
+    case ComponentKey(subsystem, component) ⇒ s"Aggregated $property of Component $subsystem.$component: $value"
+    case _: AlarmKey                        ⇒ s"$property of Alarm ${key.value}: $value"
+  }
 }
