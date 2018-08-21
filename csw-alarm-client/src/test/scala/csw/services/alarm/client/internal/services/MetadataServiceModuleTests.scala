@@ -13,6 +13,7 @@ import csw.services.alarm.api.models.Key.{AlarmKey, ComponentKey, GlobalKey, Sub
 import csw.services.alarm.client.internal.helpers.AlarmServiceTestSetup
 import csw.services.alarm.client.internal.helpers.TestFutureExt.RichFuture
 
+// DEOPSCSW-486: Provide API to load alarm metadata in Alarm store from file
 class MetadataServiceModuleTests
     extends AlarmServiceTestSetup
     with MetadataServiceModule
