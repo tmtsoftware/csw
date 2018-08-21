@@ -8,7 +8,7 @@ import csw.services.alarm.api.exceptions.KeyNotFoundException
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
 import csw.services.alarm.api.models.AlarmHealth.Bad
-import csw.services.alarm.api.models.AlarmSeverity.{Critical, Major, Okay}
+import csw.services.alarm.api.models.AlarmSeverity.{Critical, Indeterminate, Major, Okay}
 import csw.services.alarm.api.models.AlarmStatus
 import csw.services.alarm.api.models.FullAlarmSeverity.Disconnected
 import csw.services.alarm.api.models.Key.{AlarmKey, GlobalKey}
@@ -312,6 +312,8 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
   // DEOPSCSW-476: Fetch alarm severity from CLI Interface
   test("should get severity of alarm") {
+    adminService.setSeverity(tromboneAxisHighLimitKey, Okay).futureValue
+
     val cmd = Options(
       cmd = "severity",
       subCmd = "get",
@@ -321,11 +323,14 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     )
 
     commandExecutor.execute(cmd)
-    logBuffer shouldEqual List(s"Severity of Alarm ${cmd.alarmKey.value}: ${Disconnected.toString}")
+    logBuffer shouldEqual List(s"Severity of Alarm ${cmd.alarmKey.value}: ${Okay.toString}")
   }
 
   // DEOPSCSW-476: Fetch alarm severity from CLI Interface
   test("should get severity of a component") {
+    adminService.setSeverity(tromboneAxisLowLimitKey, Okay).futureValue
+    adminService.setSeverity(tromboneAxisHighLimitKey, Major).futureValue
+
     val cmd = Options(
       cmd = "severity",
       subCmd = "get",
@@ -335,7 +340,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
     commandExecutor.execute(cmd)
     logBuffer shouldEqual List(
-      s"Aggregated Severity of Component ${tromboneAxisHighLimitKey.subsystem}.${tromboneAxisHighLimitKey.component}: ${Disconnected.toString}"
+      s"Aggregated Severity of Component ${tromboneAxisHighLimitKey.subsystem}.${tromboneAxisHighLimitKey.component}: ${Major.toString}"
     )
   }
 
@@ -353,6 +358,8 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
   // DEOPSCSW-476: Fetch alarm severity from CLI Interface
   test("should get severity of Alarm Service") {
+    adminService.setSeverity(cpuExceededKey, Indeterminate).futureValue
+
     val cmd = Options(cmd = "severity", subCmd = "get")
 
     commandExecutor.execute(cmd)
