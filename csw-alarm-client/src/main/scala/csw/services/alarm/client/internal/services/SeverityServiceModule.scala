@@ -103,7 +103,7 @@ trait SeverityServiceModule extends SeverityService {
   // message: event type as value: e.g. set, expire, expired
   private[alarm] def subscribeAggregatedSeverity(key: Key): Source[FullAlarmSeverity, AlarmSubscription] = {
     import AlarmCodec._
-    val redisStreamApi     = severityApiF.flatMap(severityApi ⇒ redisKeySpaceApi(severityApi)) // create new connection for every client
+    val redisStreamApi     = severityApiF.map(severityApi ⇒ redisKeySpaceApi(severityApi)) // create new connection for every client
     val keys: List[String] = List(SeverityKey.fromAlarmKey(key).value)
 
     def reducer(iterable: Iterable[Option[FullAlarmSeverity]]): FullAlarmSeverity =

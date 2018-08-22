@@ -24,13 +24,11 @@ class RedisConnectionsFactory(alarmServiceResolver: AlarmServiceResolver, master
   def asyncApi[K: RomaineStringCodec, V: RomaineStringCodec]: Future[RedisAsyncApi[K, V]] =
     redisURI.flatMap(redisURI => romaineFactory.redisAsyncApi[K, V](redisURI))
 
-  def subscriptionApi[K: RomaineStringCodec, V: RomaineStringCodec]: Future[RedisSubscriptionApi[K, V]] =
-    redisURI.flatMap(redisURI => romaineFactory.redisSubscriptionApi[K, V](redisURI))
+  def subscriptionApi[K: RomaineStringCodec, V: RomaineStringCodec]: RedisSubscriptionApi[K, V] =
+    romaineFactory.redisSubscriptionApi[K, V](redisURI)
 
-  def redisKeySpaceApi[K: RomaineStringCodec, V: RomaineStringCodec](
-      asyncApi: RedisAsyncApi[K, V]
-  ): Future[RedisKeySpaceApi[K, V]] =
-    subscriptionApi[String, String].map(subscriptionApi => new RedisKeySpaceApi(subscriptionApi, asyncApi))
+  def redisKeySpaceApi[K: RomaineStringCodec, V: RomaineStringCodec](asyncApi: RedisAsyncApi[K, V]): RedisKeySpaceApi[K, V] =
+    new RedisKeySpaceApi(subscriptionApi, asyncApi)
 
   private def redisURI =
     alarmServiceResolver

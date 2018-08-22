@@ -14,6 +14,7 @@ import reactor.core.publisher.FluxSink.OverflowStrategy
 import romaine.RomaineFactory
 import romaine.async.RedisAsyncApi
 import romaine.codec.RomaineStringCodec
+import romaine.exceptions.RedisServerNotAvailable
 import romaine.reactive.{RedisSubscription, RedisSubscriptionApi}
 
 import scala.async.Async._
@@ -50,19 +51,17 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
 
   // create underlying connection asynchronously and obtain an instance of RedisPubSubReactiveCommands to perform
   // redis pub sub operations using a `reactor` based reactive API provided by lettuce Redis driver.
-  private def reactiveConnectionF[T: RomaineStringCodec](): Future[RedisSubscriptionApi[T, Event]] =
-    connection(romaineFactory.redisSubscriptionApi[T, Event](redisURI))
+  private def reactiveConnectionF[T: RomaineStringCodec](): RedisSubscriptionApi[T, Event] =
+    romaineFactory.redisSubscriptionApi[T, Event](Future.successful(redisURI))
 
   override def subscribe(eventKeys: Set[EventKey]): Source[Event, EventSubscription] = {
     log.info(s"Subscribing to event keys: $eventKeys")
-    val connectionF: Future[RedisSubscriptionApi[EventKey, Event]] = reactiveConnectionF()
+    val subscriptionApi: RedisSubscriptionApi[EventKey, Event] = reactiveConnectionF()
 
     val latestEventStream: Source[Event, NotUsed] = Source.fromFuture(get(eventKeys)).mapConcat(identity)
-    val eventStreamF: Future[Source[Event, RedisSubscription]] = async {
-      val commands = await(connectionF)
-      commands.subscribe(eventKeys.toList, OverflowStrategy.LATEST).map(_.value)
-    }
-    val eventStream: Source[Event, EventSubscription] = subscribeInternal(eventKeys, eventStreamF)
+    val redisStream: Source[Event, RedisSubscription] =
+      subscriptionApi.subscribe(eventKeys.toList, OverflowStrategy.LATEST).map(_.value)
+    val eventStream: Source[Event, EventSubscription] = subscribeInternal(eventKeys, redisStream)
     latestEventStream.concatMat(eventStream)(Keep.right)
   }
 
@@ -106,12 +105,10 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
     val keyPattern = s"${subsystem.entryName}.$pattern"
     log.info(s"Subscribing to event key pattern: $keyPattern")
 
-    val connectionF: Future[RedisSubscriptionApi[String, Event]] = reactiveConnectionF()
-    val eventStreamF: Future[Source[Event, RedisSubscription]] = async {
-      val commands = await(connectionF)
-      commands.psubscribe(List(keyPattern), OverflowStrategy.LATEST).map(_.value)
-    }
-    subscribeInternal(keyPattern, eventStreamF)
+    val subscriptionApi: RedisSubscriptionApi[String, Event] = reactiveConnectionF()
+    val redisStream: Source[Event, RedisSubscription] =
+      subscriptionApi.psubscribe(List(keyPattern), OverflowStrategy.LATEST).map(_.value)
+    subscribeInternal(keyPattern, redisStream)
   }
 
   override def pSubscribeCallback(subsystem: Subsystem, pattern: String, callback: Event ⇒ Unit): EventSubscription =
@@ -129,18 +126,16 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
   // get stream of events from redis `subscribe` command
   private def subscribeInternal[T](
       eventKeys: T,
-      eventStreamF: Future[Source[Event, RedisSubscription]]
+      eventStreamF: Source[Event, RedisSubscription]
   ): Source[Event, EventSubscription] = {
-    Source.fromFutureSource(eventStreamF).mapMaterializedValue { subscriptionF =>
+    eventStreamF.mapMaterializedValue { subscriptionF =>
       new EventSubscription {
-        override def unsubscribe(): Future[Done] = async {
-          await(eventStreamF)
-          log.info(s"Unsubscribing to event keys=$eventKeys")
-          await(await(subscriptionF).unsubscribe())
+        override def unsubscribe(): Future[Done] = {
+          log.info(s"Unsubscribing for keys=$eventKeys")
+          subscriptionF.unsubscribe()
         }
-        override def ready(): Future[Done] = async {
-          await(eventStreamF)
-          await(await(subscriptionF).ready())
+        override def ready(): Future[Done] = subscriptionF.ready().recover {
+          case RedisServerNotAvailable(ex) => throw EventServerNotAvailable(ex)
         }
       }
     }

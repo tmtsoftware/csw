@@ -7,10 +7,10 @@ import scala.concurrent.{ExecutionContext, Future}
 
 private class RedisSubscriptionImpl[K](
     keys: List[K],
-    subscriptionF: Future[Unit],
+    connectedF: Future[Unit],
     killSwitch: KillSwitch,
     terminationSignal: Future[Done],
-    redisReactiveApi: RedisReactiveApi[K, _]
+    redisReactiveApi: Future[RedisReactiveApi[K, _]]
 )(implicit executionContext: ExecutionContext)
     extends RedisSubscription {
 
@@ -21,8 +21,10 @@ private class RedisSubscriptionImpl[K](
    * @return a future which completes when the unsubscribe is completed
    */
   def unsubscribe(): Future[Done] = async {
-    await(redisReactiveApi.unsubscribe(keys)) // unsubscribe is no-op
-    await(redisReactiveApi.quit)
+//    println(s"Unsubscribing for keys=$keys")
+    await(connectedF)
+    await(redisReactiveApi.flatMap(_.unsubscribe(keys))) // unsubscribe is no-op
+    await(redisReactiveApi.flatMap(_.quit()))
     killSwitch.shutdown()
     await(terminationSignal) // await on terminationSignal when unsubscribe is called by user
   }
@@ -31,7 +33,9 @@ private class RedisSubscriptionImpl[K](
    * To check if the underlying subscription is ready to emit elements
    * @return a future which completes when the underlying subscription is ready to emit elements
    */
-  def ready(): Future[Done] = subscriptionF.map(_ ⇒ Done).recoverWith {
-    case _ if terminationSignal.isCompleted ⇒ terminationSignal
-  }
+  def ready(): Future[Done] =
+    async {
+      await(connectedF)
+      Done
+    }
 }

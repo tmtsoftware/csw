@@ -114,7 +114,7 @@ class SeverityServiceModuleTests
   test("getAggregatedSeverity should get aggregated severity for component") {
     setSeverity(tromboneAxisHighLimitAlarmKey, Warning).await
     setSeverity(tromboneAxisLowLimitAlarmKey, Major).await
-    setSeverity(splitterLimitAlarmKey, Critical).await  // splitter component should not be included
+    setSeverity(splitterLimitAlarmKey, Critical).await // splitter component should not be included
 
     val tromboneKey = ComponentKey(NFIRAOS, "trombone")
     getAggregatedSeverity(tromboneKey).await shouldBe Major
@@ -127,7 +127,7 @@ class SeverityServiceModuleTests
     setSeverity(splitterLimitAlarmKey, Okay).await
     setSeverity(enclosureTempHighAlarmKey, Okay).await
     setSeverity(enclosureTempLowAlarmKey, Okay).await
-    setSeverity(cpuExceededAlarmKey, Critical).await  // TCS Alarm should not be included
+    setSeverity(cpuExceededAlarmKey, Critical).await // TCS Alarm should not be included
 
     val tromboneKey = SubsystemKey(NFIRAOS)
     getAggregatedSeverity(tromboneKey).await shouldBe Major

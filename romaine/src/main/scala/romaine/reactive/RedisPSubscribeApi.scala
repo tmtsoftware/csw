@@ -16,5 +16,5 @@ class RedisPSubscribeApi[K, V](redisReactiveCommands: RedisPubSubReactiveCommand
       .fromPublisher(redisReactiveCommands.observePatterns(overflowStrategy))
       .map(x => RedisResult(x.getChannel, x.getMessage))
   def unsubscribe(keys: List[K]): Future[Unit] = redisReactiveCommands.punsubscribe(keys: _*).toFuture.toScala.map(_ ⇒ ())
-  def quit: Future[String]                     = redisReactiveCommands.quit().toFuture.toScala
+  def quit(): Future[String]                   = redisReactiveCommands.quit().toFuture.toScala
 }
