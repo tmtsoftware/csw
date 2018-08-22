@@ -1,17 +1,21 @@
 package csw.services.alarm.client.internal.services
 
+import akka.actor.testkit.typed.scaladsl.TestProbe
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import com.typesafe.config.ConfigFactory
-import csw.messages.params.models.Subsystem.{AOESW, BAD, LGSF, NFIRAOS}
+import csw.messages.params.models.Subsystem.{AOESW, BAD, LGSF, NFIRAOS, TCS}
 import csw.services.alarm.api.exceptions.{InactiveAlarmException, InvalidSeverityException, KeyNotFoundException}
 import csw.services.alarm.api.models.AcknowledgementStatus.Unacknowledged
 import csw.services.alarm.api.models.ActivationStatus.Active
 import csw.services.alarm.api.models.AlarmSeverity._
 import csw.services.alarm.api.models.FullAlarmSeverity.Disconnected
-import csw.services.alarm.api.models.Key.{AlarmKey, ComponentKey, GlobalKey, SubsystemKey}
+import csw.services.alarm.api.models.Key._
 import csw.services.alarm.api.models.ShelveStatus._
 import csw.services.alarm.api.models._
 import csw.services.alarm.client.internal.helpers.TestFutureExt.RichFuture
 import csw.services.alarm.client.internal.helpers.{AlarmServiceTestSetup, SetSeverityAcknowledgementTestCase, SetSeverityTestCase}
+
+import scala.concurrent.duration.DurationInt
 
 class SeverityServiceModuleTests
     extends AlarmServiceTestSetup
@@ -161,14 +165,103 @@ class SeverityServiceModuleTests
 
   // DEOPSCSW-465: Fetch alarm severity, component or subsystem
   test("getAggregatedSeverity should throw KeyNotFoundException when key is invalid") {
-    val invalidAlarm = Key.ComponentKey(BAD, "invalid")
+    val invalidAlarm = ComponentKey(BAD, "invalid")
     an[KeyNotFoundException] shouldBe thrownBy(getAggregatedSeverity(invalidAlarm).await)
   }
 
   // DEOPSCSW-465: Fetch alarm severity, component or subsystem
   test("getAggregatedSeverity should throw InactiveAlarmException when all resolved keys are inactive") {
-    val invalidAlarm = Key.ComponentKey(LGSF, "tcsPkInactive")
+    val invalidAlarm = ComponentKey(LGSF, "tcsPkInactive")
     an[InactiveAlarmException] shouldBe thrownBy(getAggregatedSeverity(invalidAlarm).await)
+  }
+
+  // DEOPSCSW-467: Monitor alarm severities in the alarm store for a single alarm, component, subsystem, or all
+  test("subscribe aggregated severity via callback for an alarm") {
+
+    getAggregatedSeverity(GlobalKey).await shouldBe Disconnected
+
+    // component subscription - nfiraos.trombone
+    val testProbe = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
+    val alarmSubscription =
+      subscribeAggregatedSeverityCallback(tromboneAxisLowLimitAlarmKey, testProbe.ref ! _)
+    alarmSubscription.ready().await
+
+    Thread.sleep(500) // wait for redis connection to happen
+
+    setSeverity(tromboneAxisLowLimitAlarmKey, Critical).await
+
+    testProbe.expectMessage(Critical)
+    testProbe.expectMessage(Disconnected) // severity expires after 1 second in test
+
+    setSeverity(tromboneAxisHighLimitAlarmKey, Major).await
+    testProbe.expectNoMessage(200.millis)
+
+    alarmSubscription.unsubscribe().await
+  }
+
+  // DEOPSCSW-467: Monitor alarm severities in the alarm store for a single alarm, component, subsystem, or all
+  test("subscribe aggregated severity via callback for a subsystem") {
+
+    getAggregatedSeverity(GlobalKey).await shouldBe Disconnected
+
+    // component subscription - nfiraos.trombone
+    val testProbe = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
+    val alarmSubscription =
+      subscribeAggregatedSeverityCallback(SubsystemKey(TCS), testProbe.ref ! _)
+    alarmSubscription.ready().await
+
+    Thread.sleep(500) // wait for redis connection to happen
+
+    setSeverity(cpuExceededAlarmKey, Critical).await
+
+    testProbe.expectMessage(Critical)
+    testProbe.expectMessage(Disconnected) // severity expires after 1 second in test
+
+    setSeverity(tromboneAxisHighLimitAlarmKey, Major).await
+    testProbe.expectNoMessage(200.millis)
+
+    alarmSubscription.unsubscribe().await
+  }
+
+  // DEOPSCSW-467: Monitor alarm severities in the alarm store for a single alarm, component, subsystem, or all
+  test("subscribe aggregated severity via callback for two different subscriptions, one for a component and other for all") {
+
+    getAggregatedSeverity(GlobalKey).await shouldBe Disconnected
+
+    // component subscription - nfiraos.trombone
+    val testProbe1         = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
+    val alarmSubscription1 = subscribeAggregatedSeverityCallback(ComponentKey(NFIRAOS, "trombone"), testProbe1.ref ! _)
+    alarmSubscription1.ready().await
+
+    // global subscription
+    val testProbe2         = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
+    val alarmSubscription2 = subscribeAggregatedSeverityCallback(GlobalKey, testProbe2.ref ! _)
+    alarmSubscription2.ready().await
+
+    Thread.sleep(500) // wait for redis connection to happen
+
+    setSeverity(tromboneAxisLowLimitAlarmKey, Critical).await
+
+    testProbe1.expectMessage(Critical)
+    testProbe1.expectMessage(Disconnected) // severity expires after 1 second in test
+
+    testProbe2.expectMessage(Critical)
+    testProbe2.expectMessage(Disconnected) // severity expires after 1 second in test
+
+    setSeverity(splitterLimitAlarmKey, Critical).await
+
+    testProbe2.expectMessage(Critical)
+    testProbe2.expectMessage(Disconnected) // severity expires after 1 second in test
+
+    testProbe1.expectNoMessage(200.millis)
+
+    alarmSubscription1.unsubscribe().await
+    alarmSubscription2.unsubscribe().await
+
+    setSeverity(tromboneAxisLowLimitAlarmKey, Critical).await
+
+    testProbe1.expectNoMessage(200.millis)
+    testProbe2.expectNoMessage(200.millis)
   }
 
   val severityTestCases = List(

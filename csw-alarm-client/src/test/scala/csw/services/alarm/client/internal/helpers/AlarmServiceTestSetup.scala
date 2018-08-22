@@ -1,5 +1,6 @@
 package csw.services.alarm.client.internal.helpers
 import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
 import csw.commons.redis.EmbeddedRedis
 import csw.commons.utils.SocketUtils.getFreePort
@@ -40,6 +41,7 @@ class AlarmServiceTestSetup
 
   implicit val actorSystem: ActorSystem = ActorSystemFactory.remote()
   implicit val ec: ExecutionContext     = actorSystem.dispatcher
+  implicit val mat: ActorMaterializer   = ActorMaterializer()
 
   val alarmServiceFactory             = new AlarmServiceFactory(redisClient)
   val alarmService: AlarmAdminService = alarmServiceFactory.makeAdminApi(hostname, sentinelPort).await

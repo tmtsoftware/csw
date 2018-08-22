@@ -37,7 +37,7 @@ trait EmbeddedRedis {
       serverPort: Int = getFreePort,
       masterId: String
   ): (RedisSentinel, RedisServer) = {
-    val redisServer = new RedisServer(serverPort)
+    val redisServer = RedisServer.builder().port(serverPort).setting("notify-keyspace-events K$x").build()
 
     val redisSentinel: RedisSentinel = RedisSentinel
       .builder()

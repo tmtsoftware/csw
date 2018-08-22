@@ -49,11 +49,10 @@ trait SeverityServiceModule extends SeverityService {
     val severityKeys   = metadataKeys.map(SeverityKey.fromMetadataKey)
     val severityValues = await(severityApi.mget(severityKeys))
     val severityList = severityValues.collect {
-      case kv if kv.hasValue => kv.getValue
-      case _                 => Disconnected
+      case kv if kv.hasValue => Some(kv.getValue)
+      case _                 => None
     }
-
-    severityList.reduceRight((previous, current: FullAlarmSeverity) ⇒ previous max current)
+    aggregratorByMax(severityList)
   }
 
   final override def subscribeAggregatedSeverityCallback(key: Key, callback: FullAlarmSeverity ⇒ Unit): AlarmSubscription = {
@@ -106,11 +105,8 @@ trait SeverityServiceModule extends SeverityService {
     val redisStreamApi     = severityApiF.map(severityApi ⇒ redisKeySpaceApi(severityApi)) // create new connection for every client
     val keys: List[String] = List(SeverityKey.fromAlarmKey(key).value)
 
-    def reducer(iterable: Iterable[Option[FullAlarmSeverity]]): FullAlarmSeverity =
-      iterable.map(x => if (x.isEmpty) Disconnected else x.get).maxBy(_.level)
-
     Source
-      .fromFutureSource(redisStreamApi.map(_.watchKeyspaceValueAggregation(keys, OverflowStrategy.LATEST, reducer)))
+      .fromFutureSource(redisStreamApi.map(_.watchKeyspaceValueAggregation(keys, OverflowStrategy.LATEST, aggregratorByMax)))
       .mapMaterializedValue { mat =>
         new AlarmSubscription {
           override def unsubscribe(): Future[Unit] = mat.flatMap(_.unsubscribe().map(_ ⇒ ()))
@@ -118,6 +114,9 @@ trait SeverityServiceModule extends SeverityService {
         }
       }
   }
+
+  private def aggregratorByMax(iterable: Iterable[Option[FullAlarmSeverity]]): FullAlarmSeverity =
+    iterable.map(x => if (x.isEmpty) Disconnected else x.get).maxBy(_.level)
 
   private def logAndThrow(runtimeException: RuntimeException) = {
     log.error(runtimeException.getMessage, ex = runtimeException)
