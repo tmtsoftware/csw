@@ -1,6 +1,9 @@
 package csw.services.alarm.client.internal.helpers
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
+import akka.actor.testkit.typed.scaladsl.{TestInbox, TestProbe}
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.actor.{typed, ActorSystem}
 import com.typesafe.config.ConfigFactory
 import csw.commons.redis.EmbeddedRedis
 import csw.commons.utils.SocketUtils.getFreePort
@@ -13,9 +16,12 @@ import csw.services.alarm.client.internal.commons.Settings
 import csw.services.alarm.client.internal.commons.serviceresolver.AlarmServiceHostPortResolver
 import csw.services.alarm.client.internal.helpers.TestFutureExt.RichFuture
 import csw.services.alarm.client.internal.redis.RedisConnectionsFactory
-import csw.services.alarm.client.internal.shelve.ShelveTimeoutActorFactory
+import csw.services.alarm.client.internal.shelve.{ShelveTimeoutActorFactory, ShelveTimeoutMessage, Unshelvable}
 import csw.services.location.commons.ActorSystemFactory
 import io.lettuce.core.RedisClient
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
+import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 import romaine.RomaineFactory
 import romaine.async.RedisAsyncApi
@@ -25,6 +31,7 @@ import scala.concurrent.ExecutionContext
 class AlarmServiceTestSetup
     extends FunSuite
     with Matchers
+    with MockitoSugar
     with EmbeddedRedis
     with AlarmTestData
     with BeforeAndAfterAll
@@ -39,9 +46,10 @@ class AlarmServiceTestSetup
   private val resolver    = new AlarmServiceHostPortResolver(hostname, sentinelPort)
   private val redisClient = RedisClient.create()
 
-  implicit val actorSystem: ActorSystem = ActorSystemFactory.remote()
-  implicit val ec: ExecutionContext     = actorSystem.dispatcher
-  implicit val mat: ActorMaterializer   = ActorMaterializer()
+  implicit val actorSystem: ActorSystem               = ActorSystemFactory.remote()
+  implicit val ec: ExecutionContext                   = actorSystem.dispatcher
+  implicit val typedActorSystem: typed.ActorSystem[_] = actorSystem.toTyped
+  implicit val mat: ActorMaterializer                 = ActorMaterializer()
 
   val alarmServiceFactory             = new AlarmServiceFactory(redisClient)
   val alarmService: AlarmAdminService = alarmServiceFactory.makeAdminApi(hostname, sentinelPort).await
@@ -64,5 +72,8 @@ class AlarmServiceTestSetup
 
   val redisConnectionsFactory: RedisConnectionsFactory = connsFactory
 
-  def shelveTimeoutActorFactory: ShelveTimeoutActorFactory = new ShelveTimeoutActorFactory()
+  val shelvingTimeoutProbe: TestInbox[ShelveTimeoutMessage] = TestInbox[ShelveTimeoutMessage]()
+  val shelveTimeoutActorFactory: ShelveTimeoutActorFactory  = mock[ShelveTimeoutActorFactory]
+  when(shelveTimeoutActorFactory.make(any[Unshelvable](), any[Int])(any[ActorSystem])).thenReturn(shelvingTimeoutProbe.ref)
+
 }

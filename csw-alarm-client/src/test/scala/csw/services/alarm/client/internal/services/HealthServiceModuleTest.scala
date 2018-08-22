@@ -14,7 +14,7 @@ import csw.services.alarm.client.internal.helpers.TestFutureExt.RichFuture
 
 import scala.concurrent.duration.DurationLong
 
-class HealthServiceModuleTests
+class HealthServiceModuleTest
     extends AlarmServiceTestSetup
     with HealthServiceModule
     with SeverityServiceModule

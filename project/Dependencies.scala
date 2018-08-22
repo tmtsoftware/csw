@@ -193,6 +193,7 @@ object Dependencies {
     Libs.`junit`           % Test,
     Libs.`junit-interface` % Test,
     Libs.`scalatest`       % Test,
+    Libs.`mockito-core`    % Test,
     Chill.`chill-akka`     % Test
   )
 

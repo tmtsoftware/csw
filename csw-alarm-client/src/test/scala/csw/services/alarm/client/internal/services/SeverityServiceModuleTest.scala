@@ -17,7 +17,7 @@ import csw.services.alarm.client.internal.helpers.{AlarmServiceTestSetup, SetSev
 
 import scala.concurrent.duration.DurationInt
 
-class SeverityServiceModuleTests
+class SeverityServiceModuleTest
     extends AlarmServiceTestSetup
     with SeverityServiceModule
     with MetadataServiceModule

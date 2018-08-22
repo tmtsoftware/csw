@@ -1,6 +1,7 @@
 package csw.services.alarm.client.internal.services
 
 import com.typesafe.config.ConfigFactory
+import csw.messages.params.models.Subsystem
 import csw.messages.params.models.Subsystem.BAD
 import csw.services.alarm.api.exceptions.KeyNotFoundException
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
@@ -11,8 +12,9 @@ import csw.services.alarm.api.models.ShelveStatus.{Shelved, Unshelved}
 import csw.services.alarm.api.models.{AlarmSeverity, AlarmStatus}
 import csw.services.alarm.client.internal.helpers.AlarmServiceTestSetup
 import csw.services.alarm.client.internal.helpers.TestFutureExt.RichFuture
+import csw.services.alarm.client.internal.shelve.ShelveTimeoutMessage.{CancelShelveTimeout, ScheduleShelveTimeout}
 
-class StatusServiceModuleTests
+class StatusServiceModuleTest
     extends AlarmServiceTestSetup
     with StatusServiceModule
     with SeverityServiceModule
@@ -134,9 +136,17 @@ class StatusServiceModuleTests
 
   // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
   test("shelve should shelve an alarm") {
+    getStatus(tromboneAxisHighLimitAlarmKey).await.shelveStatus shouldBe Unshelved
     shelve(tromboneAxisHighLimitAlarmKey).await
-    val status = getStatus(tromboneAxisHighLimitAlarmKey).await
-    status.shelveStatus shouldBe Shelved
+    getStatus(tromboneAxisHighLimitAlarmKey).await.shelveStatus shouldBe Shelved
+  }
+
+  // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
+  test("shelve should schedule a shelving timeout") {
+    shelvingTimeoutProbe.receiveAll() //clear all messages
+    shelve(tromboneAxisHighLimitAlarmKey).await
+    getStatus(tromboneAxisHighLimitAlarmKey).await.shelveStatus shouldBe Shelved
+    shelvingTimeoutProbe.receiveMessage() shouldBe ScheduleShelveTimeout(tromboneAxisHighLimitAlarmKey)
   }
 
   // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
@@ -168,11 +178,19 @@ class StatusServiceModuleTests
     noException shouldBe thrownBy(unshelve(tromboneAxisHighLimitAlarmKey).await)
   }
 
-  //  test("getStatus should throw exception if key does not exist") {
-  //    val invalidAlarm = AlarmKey("invalid", "invalid", "invalid")
-  //    an[KeyNotFoundException] shouldBe thrownBy(getStatus(invalidAlarm).await)
-  //  }
-  //
+  // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
+  test("unshelve should cancel the shelving timeout scheduler") {
+    setStatus(tromboneAxisHighLimitAlarmKey, AlarmStatus().copy(shelveStatus = Shelved)).await
+    shelvingTimeoutProbe.receiveAll() //clear all messages
+    unshelve(tromboneAxisHighLimitAlarmKey).await
+    getStatus(tromboneAxisHighLimitAlarmKey).await.shelveStatus shouldBe Unshelved
+    shelvingTimeoutProbe.receiveMessage() shouldBe CancelShelveTimeout(tromboneAxisHighLimitAlarmKey)
+  }
+
+  test("getStatus should throw exception if key does not exist") {
+    val invalidAlarm = AlarmKey(Subsystem.BAD, "invalid", "invalid")
+    an[KeyNotFoundException] shouldBe thrownBy(getStatus(invalidAlarm).await)
+  }
 
   private def setSeverityAndGetStatus(alarmKey: AlarmKey, alarmSeverity: AlarmSeverity): AlarmStatus = {
     setSeverity(alarmKey, alarmSeverity).await

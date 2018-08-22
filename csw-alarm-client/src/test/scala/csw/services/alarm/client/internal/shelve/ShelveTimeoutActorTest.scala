@@ -55,7 +55,8 @@ class ShelveTimeoutActorTest extends FunSuite with ActorTestKit {
     actor ! ScheduleShelveTimeout(tromboneAxisLowLimitAlarmKey)
     actor ! CancelShelveTimeout(tromboneAxisLowLimitAlarmKey)
 
-    val duration = (8.toHourOfDay - ZonedDateTime.now(ZoneOffset.UTC)) + 10.minutes
-    manualTime.expectNoMessageFor(duration, probe)
+    val duration = 8.toHourOfDay - ZonedDateTime.now(ZoneOffset.UTC)
+    manualTime.timePasses(duration)
+    probe.expectNoMessage()
   }
 }
