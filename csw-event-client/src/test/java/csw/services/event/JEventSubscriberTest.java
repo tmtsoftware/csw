@@ -81,7 +81,7 @@ public class JEventSubscriberTest extends TestNGSuite {
     //DEOPSCSW-346: Subscribe to event irrespective of Publisher's existence
     @Test(dataProvider = "event-service-provider")
     public void should_be_able_to_subscribe_an_event(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
-        Event event1 = Utils.makeDistinctEvent(new Random().nextInt());
+        Event event1 = Utils.makeDistinctJavaEvent(new Random().nextInt());
         EventKey eventKey = event1.eventKey();
 
         TestProbe probe = TestProbe.create(baseProperties.typedActorSystem());
@@ -109,7 +109,7 @@ public class JEventSubscriberTest extends TestNGSuite {
     //DEOPSCSW-343: Unsubscribe based on prefix and event name
     @Test(dataProvider = "event-service-provider")
     public void should_be_able_to_subscribe_with_async_callback(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
-        Event event1 = Utils.makeDistinctEvent(new Random().nextInt());
+        Event event1 = Utils.makeDistinctJavaEvent(new Random().nextInt());
 
         TestProbe probe = TestProbe.create(baseProperties.typedActorSystem());
 
@@ -208,7 +208,7 @@ public class JEventSubscriberTest extends TestNGSuite {
     //DEOPSCSW-339: Provide actor ref to alert about Event arrival
     @Test(dataProvider = "event-service-provider")
     public void should_be_able_to_subscribe_with_an_ActorRef(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
-        Event event1 = Utils.makeDistinctEvent(new Random().nextInt());
+        Event event1 = Utils.makeDistinctJavaEvent(new Random().nextInt());
 
         TestProbe probe = TestProbe.create(baseProperties.typedActorSystem());
 
@@ -227,7 +227,7 @@ public class JEventSubscriberTest extends TestNGSuite {
     //DEOPSCSW-342: Subscription with consumption frequency
     @Test(dataProvider = "event-service-provider")
     public void should_be_able_to_subscribe_with_an_ActorRef_with_duration(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
-        Event event1 = Utils.makeDistinctEvent(new Random().nextInt());
+        Event event1 = Utils.makeDistinctJavaEvent(new Random().nextInt());
 
         TestInbox<Event> inbox = TestInbox.create();
 
@@ -400,8 +400,8 @@ public class JEventSubscriberTest extends TestNGSuite {
     //DEOPSCSW-340: Provide most recently published event for subscribed prefix and name
     @Test(dataProvider = "event-service-provider")
     public void should_be_able_to_retrieve_valid_as_well_as_invalid_event_when_events_are_published_for_some_and_not_for_other_keys(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
-        Event distinctEvent1 = Utils.makeDistinctEvent(new Random().nextInt());
-        Event distinctEvent2 = Utils.makeDistinctEvent(new Random().nextInt());
+        Event distinctEvent1 = Utils.makeDistinctJavaEvent(new Random().nextInt());
+        Event distinctEvent2 = Utils.makeDistinctJavaEvent(new Random().nextInt());
 
         EventKey eventKey1 = distinctEvent1.eventKey();
         EventKey eventKey2 = distinctEvent2.eventKey();
@@ -427,7 +427,7 @@ public class JEventSubscriberTest extends TestNGSuite {
     //DEOPSCSW-344: Retrieve recently published event using prefix and eventname
     @Test(dataProvider = "event-service-provider")
     public void should_be_able_to_get_an_event_without_subscribing_for_it(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
-        Event event1 = Utils.makeDistinctEvent(new Random().nextInt());
+        Event event1 = Utils.makeDistinctJavaEvent(new Random().nextInt());
         EventKey eventKey = event1.eventKey();
 
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);
@@ -450,10 +450,10 @@ public class JEventSubscriberTest extends TestNGSuite {
     //DEOPSCSW-344: Retrieve recently published event using prefix and eventname
     @Test(dataProvider = "event-service-provider")
     public void should_be_able_to_get_events_for_multiple_event_keys(BaseProperties baseProperties) throws InterruptedException, ExecutionException, TimeoutException {
-        Event event1 = Utils.makeDistinctEvent(new Random().nextInt());
+        Event event1 = Utils.makeDistinctJavaEvent(new Random().nextInt());
         EventKey eventKey1 = event1.eventKey();
 
-        Event event2 = Utils.makeDistinctEvent(new Random().nextInt());
+        Event event2 = Utils.makeDistinctJavaEvent(new Random().nextInt());
         EventKey eventKey2 = event2.eventKey();
 
         baseProperties.jPublisher().publish(event1).get(10, TimeUnit.SECONDS);

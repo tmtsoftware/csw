@@ -1,11 +1,15 @@
 package csw.messages.params.pb;
 
+import csw.messages.events.Event;
+import csw.messages.events.Event$;
+import csw.messages.events.EventName;
+import csw.messages.events.SystemEvent;
 import csw.messages.params.generics.JKeyTypes;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.models.*;
+import csw_protobuf.events.PbEvent;
 import csw_protobuf.parameter.PbParameter;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -14,6 +18,7 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 
+// DEOPSCSW-495: Protobuf serde fails for Java keys/parameters
 @RunWith(value = Parameterized.class)
 public class JProtobufSerializationTest {
 
@@ -78,11 +83,25 @@ public class JProtobufSerializationTest {
     }
 
     @Test
-    public void shouldAbleToConvertToAndFromPbParameter() {
+    public void shouldAbleToConvertToAndFromPbParameterAndEvent() {
+        // ===== Test PbParameter SERDE =====
         PbParameter pbParameter = param.toPb();
         byte[] pbParameterBytes = pbParameter.toByteArray();
         PbParameter pbParameterFromBytes = (PbParameter) PbParameter.parseFrom(pbParameterBytes);
 
         Assert.assertEquals(pbParameter, pbParameterFromBytes);
+
+        // ===== Test Event SERDE =====
+        Prefix source = new Prefix("wfos.filter");
+        EventName eventName = new EventName("move");
+        SystemEvent originalEvent = new SystemEvent(source, eventName).add(param);
+
+        PbEvent pbEvent = originalEvent.toPb();
+        byte[] pbEventBytes = pbEvent.toByteArray();
+        PbEvent pbEventFromBytes = (PbEvent) PbEvent.parseFrom(pbEventBytes);
+        Assert.assertEquals(pbEventFromBytes, pbEvent);
+
+        Event eventFromPbEvent = Event$.MODULE$.fromPb(pbEventFromBytes);
+        Assert.assertEquals(eventFromPbEvent, originalEvent);
     }
 }

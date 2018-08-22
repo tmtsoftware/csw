@@ -3,8 +3,8 @@ package csw.services.event.helpers
 import java.time.Instant
 
 import csw.messages.events.{Event, EventName, EventTime, SystemEvent}
-import csw.messages.params.generics.Key
-import csw.messages.params.generics.KeyType.LongKey
+import csw.messages.params.generics.{JKeyTypes, Key, Parameter}
+import csw.messages.params.generics.KeyType.{IntKey, LongKey}
 import csw.messages.params.models.{Id, Prefix}
 
 object Utils {
@@ -12,6 +12,9 @@ object Utils {
   val eventName               = EventName("system")
   val event                   = SystemEvent(prefix, eventName)
   val timeNanosKey: Key[Long] = LongKey.make("eventTime")
+
+  private val jParam: Parameter[Integer] = JKeyTypes.IntKey.make("counter").set(1)
+  private val param: Parameter[Int]      = IntKey.make("counter").set(1)
 
   def makeEvent(id: Int): Event = event.copy(
     eventId = Id(id.toString),
@@ -34,6 +37,12 @@ object Utils {
   def makeDistinctEvent(id: Int): Event = {
     val eventName = EventName(s"system_$id")
 
-    SystemEvent(prefix, eventName).copy(eventId = Id(id.toString))
+    SystemEvent(prefix, eventName).copy(eventId = Id(id.toString), paramSet = Set(param))
+  }
+
+  def makeDistinctJavaEvent(id: Int): Event = {
+    val eventName = EventName(s"system_$id")
+
+    SystemEvent(prefix, eventName).copy(eventId = Id(id.toString), paramSet = Set(jParam))
   }
 }
