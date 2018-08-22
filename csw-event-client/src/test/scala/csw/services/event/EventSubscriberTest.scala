@@ -91,10 +91,10 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     val testProbe          = TestProbe[Event]()(typedActorSystem)
     val subscription       = subscriber.subscribe(Set(eventKey)).toMat(Sink.foreach(testProbe.ref ! _))(Keep.left).run()
 
-    subscription.ready.await
-    publisher.publish(event1).await
-
+    subscription.ready().await
     testProbe.expectMessageType[SystemEvent].isInvalid shouldBe true
+
+    publisher.publish(event1).await
     testProbe.expectMessage(event1)
 
     subscription.unsubscribe().await
@@ -112,7 +112,7 @@ class EventSubscriberTest extends TestNGSuite with Matchers with Eventually {
     val event1    = makeEvent(1)
     val testProbe = TestProbe[Event]()(typedActorSystem)
 
-    val callback: Event ⇒ Future[Event] = (event) ⇒ Future.successful(testProbe.ref ! event).map(_ ⇒ event)(ec)
+    val callback: Event ⇒ Future[Event] = event ⇒ Future.successful(testProbe.ref ! event).map(_ ⇒ event)(ec)
 
     publisher.publish(event1).await
 
