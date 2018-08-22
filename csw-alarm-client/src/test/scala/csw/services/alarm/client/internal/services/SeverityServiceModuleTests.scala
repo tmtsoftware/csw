@@ -180,7 +180,7 @@ class SeverityServiceModuleTests
 
     getAggregatedSeverity(GlobalKey).await shouldBe Disconnected
 
-    // component subscription - nfiraos.trombone
+    // alarm subscription - nfiraos.trombone
     val testProbe = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
     val alarmSubscription =
       subscribeAggregatedSeverityCallback(tromboneAxisLowLimitAlarmKey, testProbe.ref ! _)
@@ -204,7 +204,7 @@ class SeverityServiceModuleTests
 
     getAggregatedSeverity(GlobalKey).await shouldBe Disconnected
 
-    // component subscription - nfiraos.trombone
+    // subsystem subscription - tcs
     val testProbe = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
     val alarmSubscription =
       subscribeAggregatedSeverityCallback(SubsystemKey(TCS), testProbe.ref ! _)
@@ -269,7 +269,7 @@ class SeverityServiceModuleTests
 
     getAggregatedSeverity(GlobalKey).await shouldBe Disconnected
 
-    // component subscription - nfiraos.trombone
+    // subsystem subscription - tcs
     val testProbe = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
     val alarmSubscription =
       subscribeAggregatedSeverityActorRef(SubsystemKey(TCS), testProbe.ref)
