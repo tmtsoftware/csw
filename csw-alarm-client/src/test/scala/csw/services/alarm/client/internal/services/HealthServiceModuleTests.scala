@@ -74,7 +74,7 @@ class HealthServiceModuleTests
     an[InactiveAlarmException] shouldBe thrownBy(getAggregatedHealth(SubsystemKey(LGSF)).await)
   }
 
-  // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem, or all
+  // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem or all
   test("subscribe aggregated health via callback for an alarm") {
 
     getAggregatedHealth(GlobalKey).await shouldBe Bad
@@ -102,7 +102,7 @@ class HealthServiceModuleTests
     testProbe.expectNoMessage(200.millis)
   }
 
-  // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem, or all
+  // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem or all
   test("subscribe aggregated health via callback for a subsystem") {
 
     getAggregatedHealth(GlobalKey).await shouldBe Bad
@@ -126,7 +126,7 @@ class HealthServiceModuleTests
     alarmSubscription.unsubscribe().await
   }
 
-  // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem, or all
+  // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem or all
   test("subscribe aggregated health via callback for a component") {
 
     getAggregatedHealth(GlobalKey).await shouldBe Bad
@@ -146,7 +146,7 @@ class HealthServiceModuleTests
     alarmSubscription.unsubscribe().await
   }
 
-  // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem, or all
+  // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem or all
   test("subscribe aggregated health via actorRef for a subsystem") {
 
     getAggregatedHealth(GlobalKey).await shouldBe Bad
