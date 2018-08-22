@@ -29,7 +29,7 @@ trait StatusServiceModule extends StatusService {
 
   private val log = AlarmServiceLogger.getLogger
   private lazy val shelveTimeoutRef =
-    shelveTimeoutActorFactory.make(key ⇒ unshelve(key, cancelShelveTimeout = false))(actorSystem)
+    shelveTimeoutActorFactory.make(key ⇒ unshelve(key, cancelShelveTimeout = false), settings.shelveTimeoutHourOfDay)(actorSystem)
 
   final override def getStatus(key: AlarmKey): Future[AlarmStatus] = async {
     val statusApi = await(statusApiF)

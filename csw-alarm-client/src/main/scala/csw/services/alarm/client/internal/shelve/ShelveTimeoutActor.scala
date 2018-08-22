@@ -15,19 +15,24 @@ import csw.services.alarm.client.internal.shelve.ShelveTimeoutMessage.{
 import csw.services.logging.scaladsl.Logger
 
 object ShelveTimeoutActor {
-  def behavior(timerScheduler: TimerScheduler[ShelveTimeoutMessage], alarm: Unshelvable): Behavior[ShelveTimeoutMessage] =
-    Behaviors.receive { (ctx, msg) ⇒
-      val shelveTimeoutHour: Int = ctx.system.settings.config.getInt("alarm.shelve-timeout-hour-of-day")
-      val log: Logger            = AlarmServiceLogger.getLogger(ctx)
+  def behavior(
+      timerScheduler: TimerScheduler[ShelveTimeoutMessage],
+      alarm: Unshelvable,
+      shelveTimeoutHour: Int
+  ): Behavior[ShelveTimeoutMessage] =
+    Behaviors.setup { ctx ⇒
+      val log: Logger = AlarmServiceLogger.getLogger(ctx)
 
-      log.debug(s"ShelveTimeoutActor received message :[$msg]")
+      Behaviors.receiveMessage { msg ⇒
+        log.debug(s"ShelveTimeoutActor received message :[$msg]")
 
-      msg match {
-        case ScheduleShelveTimeout(key) ⇒ scheduleShelveTimeout(key, shelveTimeoutHour, timerScheduler)
-        case CancelShelveTimeout(key)   ⇒ timerScheduler.cancel(key.name)
-        case ShelveHasTimedOut(key)     ⇒ alarm.unshelve(key)
+        msg match {
+          case ScheduleShelveTimeout(key) ⇒ scheduleShelveTimeout(key, shelveTimeoutHour, timerScheduler)
+          case CancelShelveTimeout(key)   ⇒ timerScheduler.cancel(key.name)
+          case ShelveHasTimedOut(key)     ⇒ alarm.unshelve(key)
+        }
+        Behaviors.same
       }
-      Behaviors.same
     }
 
   private def scheduleShelveTimeout(
