@@ -12,10 +12,7 @@ private[alarm] trait AlarmRW {
   implicit val componentKeyRW: RW[ComponentKey] = macroRW
   implicit val subsystemKeyRW: RW[SubsystemKey] = macroRW
 
-  implicit val metadataKeyRW: RW[MetadataKey] = readwriter[String].bimap(_.value, MetadataKey.apply)
-  implicit val statusKeyRW: RW[StatusKey]     = readwriter[String].bimap(_.value, StatusKey.apply)
-  implicit val severityKeyRW: RW[SeverityKey] = readwriter[String].bimap(_.value, SeverityKey.apply)
-  implicit val alarmTimeRW: RW[AlarmTime]     = readwriter[String].bimap(_.value, AlarmTime.apply)
+  implicit val alarmTimeRW: RW[AlarmTime] = readwriter[String].bimap(_.value, AlarmTime.apply)
 
   implicit val alarmMetadataRW: RW[AlarmMetadata] =
     macroRW[AlarmMetadata].bimap(identity, metadata ⇒ metadata.copy(supportedSeverities = metadata.allSupportedSeverities))

@@ -26,7 +26,7 @@ class RedisKeySpaceApi[K: RomaineStringCodec, V: RomaineStringCodec](
       .psubscribe(keys.map(KeyspacePattern + _), overflowStrategy)
       .filter(pm => pm.value == SetOperation || pm.value == ExpiredOperation)
       .mapAsync(1) { pm =>
-        val key = RomaineStringCodec[K].fromString(pm.key)
+        val key = RomaineStringCodec[K].fromString(pm.key.replace("__keyspace@0__:", ""))
         pm.value match {
           case SetOperation     => redisAsyncApi.get(key).map(valueOpt ⇒ (key, valueOpt))
           case ExpiredOperation => Future((key, None))
@@ -47,6 +47,7 @@ class RedisKeySpaceApi[K: RomaineStringCodec, V: RomaineStringCodec](
       .scan(Map.empty[K, Option[V]]) {
         case (data, RedisResult(key, value)) ⇒ data + (key → value)
       }
+      .drop(1) // drop the seed (empty map) emitted by scan above
       .map(data => reducer(data.values))
       .distinctUntilChanged
   }

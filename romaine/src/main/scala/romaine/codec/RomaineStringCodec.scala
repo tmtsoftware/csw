@@ -8,8 +8,10 @@ trait RomaineStringCodec[T] {
 object RomaineStringCodec {
   def apply[T](implicit x: RomaineStringCodec[T]): RomaineStringCodec[T] = x
 
-  implicit val stringRomaineCodec: RomaineStringCodec[String] = new RomaineStringCodec[String] {
-    override def toString(x: String): String        = x
-    override def fromString(string: String): String = string
+  def codec[T](encode: T ⇒ String, decode: String ⇒ T): RomaineStringCodec[T] = new RomaineStringCodec[T] {
+    override def toString(value: T): String    = encode(value)
+    override def fromString(string: String): T = decode(string)
   }
+
+  implicit val stringRomaineCodec: RomaineStringCodec[String] = codec(identity, identity)
 }
