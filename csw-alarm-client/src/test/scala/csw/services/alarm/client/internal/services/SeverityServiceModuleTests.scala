@@ -264,6 +264,30 @@ class SeverityServiceModuleTests
     testProbe2.expectNoMessage(200.millis)
   }
 
+  // DEOPSCSW-467: Monitor alarm severities in the alarm store for a single alarm, component, subsystem, or all
+  test("subscribe aggregated severity via actorRef for a subsystem") {
+
+    getAggregatedSeverity(GlobalKey).await shouldBe Disconnected
+
+    // component subscription - nfiraos.trombone
+    val testProbe = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
+    val alarmSubscription =
+      subscribeAggregatedSeverityActorRef(SubsystemKey(TCS), testProbe.ref)
+    alarmSubscription.ready().await
+
+    Thread.sleep(500) // wait for redis connection to happen
+
+    setSeverity(cpuExceededAlarmKey, Critical).await
+
+    testProbe.expectMessage(Critical)
+    testProbe.expectMessage(Disconnected) // severity expires after 1 second in test
+
+    setSeverity(tromboneAxisHighLimitAlarmKey, Major).await
+    testProbe.expectNoMessage(200.millis)
+
+    alarmSubscription.unsubscribe().await
+  }
+
   val severityTestCases = List(
     SetSeverityTestCase(
       alarmKey = AlarmKey(AOESW, "test_component", "IsHigher_WasNotDisconnected"),
