@@ -3,7 +3,7 @@ package csw.services.event.internal.kafka
 import akka.Done
 import akka.actor.typed.ActorRef
 import akka.kafka.{scaladsl, ConsumerSettings, Subscription, Subscriptions}
-import akka.stream.Materializer
+import akka.stream.{Materializer, StreamDetachedException}
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import csw.messages.events._
 import csw.messages.params.models.Subsystem
@@ -42,17 +42,20 @@ class KafkaSubscriber(consumerSettings: Future[ConsumerSettings[String, Array[By
       partitionToOffsets.map(dd => Subscriptions.assignmentWithOffset(dd.mapValues(x ⇒ if (x == 0) 0L else x - 1)))
     val eventStream = getEventStream(manualSubscription)
 
-    val invalidEvents = partitionToOffsets.map {
-      _.collect {
+    val invalidEvents = partitionToOffsets.map { partitionToOffset =>
+      val events = partitionToOffset.collect {
         case (topicPartition, offset) if offset == 0 ⇒ Event.invalidEvent(EventKey(topicPartition.topic()))
       }
+      Source(events)
     }
 
-    Source
-      .fromFuture(invalidEvents)
-      .mapConcat(identity)
-      .concatMat(eventStream)(Keep.right)
-      .mapMaterializedValue(eventSubscription)
+    eventStream
+      .prepend(Source.fromFutureSource(invalidEvents))
+      .watchTermination()(Keep.both)
+      .mapMaterializedValue {
+        case (controlF, completionF) =>
+          eventSubscription(controlF, completionF)
+      }
   }
 
   override def subscribe(
@@ -98,7 +101,7 @@ class KafkaSubscriber(consumerSettings: Future[ConsumerSettings[String, Array[By
   override def pSubscribe(subsystem: Subsystem, pattern: String): Source[Event, EventSubscription] = {
     val keyPattern   = s"${subsystem.entryName}.*${Utils.globToRegex(pattern)}"
     val subscription = Subscriptions.topicPattern(keyPattern)
-    getEventStream(Future.successful(subscription)).mapMaterializedValue(eventSubscription)
+    getEventStream(Future.successful(subscription)).mapMaterializedValue(x => eventSubscription(x, Future.successful(Done)))
   }
 
   override def pSubscribeCallback(subsystem: Subsystem, pattern: String, callback: Event ⇒ Unit): EventSubscription =
@@ -109,7 +112,9 @@ class KafkaSubscriber(consumerSettings: Future[ConsumerSettings[String, Array[By
 
     async {
       val events = await(eventsF)
-      await(subscription.unsubscribe())
+      await(subscription.unsubscribe().recover {
+        case ex => ex.printStackTrace()
+      })
       events.toSet
     }
   }
@@ -131,10 +136,14 @@ class KafkaSubscriber(consumerSettings: Future[ConsumerSettings[String, Array[By
     consumer.map(_.endOffsets(topicPartitions.asJava).asScala.toMap.mapValues(_.toLong))
   }
 
-  private def eventSubscription(control: Future[scaladsl.Consumer.Control]): EventSubscription = {
+  private def eventSubscription(controlF: Future[scaladsl.Consumer.Control], completionF: Future[Done]): EventSubscription = {
     new EventSubscription {
-      override def unsubscribe(): Future[Done] = control.flatMap(_.shutdown().map(_ ⇒ Done))
-      override def ready(): Future[Done]       = control.map(_ => Done)
+      override def unsubscribe(): Future[Done] = controlF.flatMap(_.shutdown().map(_ ⇒ Done)).recover {
+        case NonFatal(ex: StreamDetachedException) if completionF.isCompleted => Done
+      }
+      override def ready(): Future[Done] = controlF.map(_ => Done).recover {
+        case NonFatal(ex: StreamDetachedException) if completionF.isCompleted => Done
+      }
     }
   }
 }
