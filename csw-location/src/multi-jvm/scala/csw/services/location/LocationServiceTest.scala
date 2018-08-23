@@ -1,10 +1,6 @@
 package csw.services.location
 
-import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.Behavior
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.stream.scaladsl.{Keep, Sink}
-import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.messages.location.Connection.{HttpConnection, TcpConnection}
 import csw.messages.location._
 import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.location.commons.TestRegistrationFactory
@@ -22,11 +18,8 @@ class LocationServiceTest(ignore: Int, mode: String)
     with BeforeAndAfterEach {
 
   import config._
-  import cswCluster.mat
 
   val RegistrationFactory = new TestRegistrationFactory
-
-  override protected def afterEach(): Unit = locationService.unregisterAll().await
 
   test("ensure that a component registered by one node is resolved and listed on all the nodes") {
     val tcpPort         = 446
@@ -65,41 +58,4 @@ class LocationServiceTest(ignore: Int, mode: String)
     enterBarrier("after-2")
   }
 
-//  This test is doing the same thing what TrackLocationTest is doing
-//  but the plan is to run this test on two amazon instance's with Jenkins configuration (multiNodeTest).
-  test("ensure that a component registered on one node is tracked on all the nodes") {
-    val componentId    = ComponentId("tromboneHcd", ComponentType.HCD)
-    val akkaConnection = AkkaConnection(componentId)
-
-    runOn(seed) {
-      val actorRef = cswCluster.actorSystem.spawn(Behavior.empty, "trombone-hcd")
-      locationService.register(RegistrationFactory.akka(akkaConnection, actorRef)).await
-      enterBarrier("Registration")
-
-      locationService.unregister(akkaConnection).await
-      enterBarrier("Unregister")
-
-      locationService.register(RegistrationFactory.akka(akkaConnection, actorRef)).await
-      enterBarrier("Re-registration")
-    }
-
-    runOn(member) {
-      val probe = TestProbe[TrackingEvent]("test-probe")
-
-      val switch = locationService.track(akkaConnection).toMat(Sink.foreach(probe.ref.tell(_)))(Keep.left).run()
-
-      probe.expectMessageType[LocationUpdated]
-      enterBarrier("Registration")
-
-      probe.expectMessageType[LocationRemoved]
-      enterBarrier("Unregister")
-
-      probe.expectMessageType[LocationUpdated]
-      enterBarrier("Re-registration")
-
-      // clean up
-      switch.shutdown()
-    }
-    enterBarrier("after-3")
-  }
 }
