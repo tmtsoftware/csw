@@ -39,7 +39,7 @@ trait AlarmTestData {
     operatorResponse = "go to the NFIRAOS engineering user interface and select the datum axis command",
     isAutoAcknowledgeable = true,
     isLatchable = true,
-    activationStatus = Inactive
+    activationStatus = Active
   )
 
   // Multiple alarms added - no auto ack no latch
@@ -90,7 +90,7 @@ trait AlarmTestData {
     operatorResponse = "go to the NFIRAOS engineering user interface and begin the shutdown enclosure process",
     isAutoAcknowledgeable = false,
     isLatchable = true,
-    activationStatus = Active
+    activationStatus = Inactive
   )
 
   // un-latchable, auto-acknowledgable alarm

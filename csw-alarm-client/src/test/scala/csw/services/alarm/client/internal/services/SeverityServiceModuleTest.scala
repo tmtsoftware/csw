@@ -151,9 +151,21 @@ class SeverityServiceModuleTest
 
     getAggregatedSeverity(GlobalKey).await shouldBe Indeterminate
 
-    setSeverity(cpuIdleAlarmKey, Critical).await
+    setSeverity(cpuExceededAlarmKey, Critical).await
 
     getAggregatedSeverity(GlobalKey).await shouldBe Critical
+  }
+
+  // DEOPSCSW-448: Set Activation status for an alarm entity
+  // DEOPSCSW-465: Fetch alarm severity, component or subsystem
+  test("getAggregatedSeverity should not consider inactive alarms in aggregation") {
+    // set severity for active alarm
+    setSeverity(enclosureTempHighAlarmKey, Indeterminate).await
+
+    // set severity for inactive alarm
+    setSeverity(enclosureTempLowAlarmKey, Critical).await
+
+    getAggregatedSeverity(ComponentKey(NFIRAOS, "enclosure")).await shouldBe Indeterminate
   }
 
   // DEOPSCSW-465: Fetch alarm severity, component or subsystem
@@ -168,18 +180,6 @@ class SeverityServiceModuleTest
   test("getAggregatedSeverity should throw KeyNotFoundException when key is invalid") {
     val invalidAlarm = ComponentKey(BAD, "invalid")
     an[KeyNotFoundException] shouldBe thrownBy(getAggregatedSeverity(invalidAlarm).await)
-  }
-
-  // DEOPSCSW-448: Set Activation status for an alarm entity
-  // DEOPSCSW-465: Fetch alarm severity, component or subsystem
-  test("getAggregatedSeverity should not consider inactive alarms in aggregation") {
-    // set severity for active alarm
-    setSeverity(tromboneAxisLowLimitAlarmKey, Warning).await
-
-    // set severity for inactive alarm
-    setSeverity(tromboneAxisHighLimitAlarmKey, Major).await
-
-    getAggregatedSeverity(ComponentKey(NFIRAOS, "trombone")).await shouldBe Warning
   }
 
   // DEOPSCSW-465: Fetch alarm severity, component or subsystem
