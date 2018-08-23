@@ -78,8 +78,9 @@ trait StatusServiceModule extends StatusService {
 
   private[alarm] def updateStatusForSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Unit] = async {
 
-    // get alarm status
-    val originalStatus = await(getStatus(key))
+    val metadata         = await(getMetadata(key))
+    val originalStatus   = await(getStatus(key))
+    val originalSeverity = await(getCurrentSeverity(key))
 
     // This class is not exposed outside `updateStatusForSeverity` function because
     // it's logic is strictly internal to this function.
@@ -103,8 +104,11 @@ trait StatusServiceModule extends StatusService {
        * @return
        */
       def updateAckStatus(): AlarmStatus = {
-        if (originalStatus.latchedSeverity != targetAlarmStatus.latchedSeverity && targetAlarmStatus.latchedSeverity != Okay)
-          targetAlarmStatus.copy(acknowledgementStatus = Unacknowledged)
+        def isAutoAckAndOkay            = metadata.isAutoAcknowledgeable && severity == Okay
+        def isSeverityChangedAndNotOkay = severity != originalSeverity && severity != Okay
+
+        if (isAutoAckAndOkay) targetAlarmStatus.copy(acknowledgementStatus = Acknowledged)
+        else if (isSeverityChangedAndNotOkay) targetAlarmStatus.copy(acknowledgementStatus = Unacknowledged)
         else targetAlarmStatus
       }
 
