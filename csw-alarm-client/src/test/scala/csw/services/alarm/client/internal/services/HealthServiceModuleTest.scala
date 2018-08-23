@@ -22,12 +22,12 @@ class HealthServiceModuleTest
     with MetadataServiceModule {
 
   override protected def beforeEach(): Unit = {
-    val validAlarmsConfig = ConfigFactory.parseResources("test-alarms/valid-alarms.conf")
+    val validAlarmsConfig = ConfigFactory.parseResources("test-alarms/more-alarms.conf")
     initAlarms(validAlarmsConfig, reset = true).await
   }
 
   // DEOPSCSW-466: Fetch health for a given alarm, component name or a subsystem name
-  test("getAggregatedHealth should should get aggregated severity for a alarm") {
+  test("getAggregatedHealth should get aggregated health for a alarm") {
     setSeverity(tromboneAxisHighLimitAlarmKey, Okay).await
     getAggregatedHealth(tromboneAxisHighLimitAlarmKey).await shouldBe Good
 
@@ -39,7 +39,7 @@ class HealthServiceModuleTest
   }
 
   // DEOPSCSW-466: Fetch health for a given alarm, component name or a subsystem name
-  test("getAggregatedHealth should should get aggregated severity for a component") {
+  test("getAggregatedHealth should get aggregated health for a component") {
     setSeverity(tromboneAxisHighLimitAlarmKey, Okay).await
     setSeverity(tromboneAxisLowLimitAlarmKey, Critical).await
 
@@ -48,7 +48,7 @@ class HealthServiceModuleTest
   }
 
   // DEOPSCSW-466: Fetch health for a given alarm, component name or a subsystem name
-  test("getAggregatedHealth should should get aggregated severity for a subsystem") {
+  test("getAggregatedHealth should get aggregated health for a subsystem") {
     setSeverity(tromboneAxisHighLimitAlarmKey, Okay).await
     setSeverity(tromboneAxisLowLimitAlarmKey, Critical).await
 
@@ -57,11 +57,21 @@ class HealthServiceModuleTest
   }
 
   // DEOPSCSW-466: Fetch health for a given alarm, component name or a subsystem name
-  test("getAggregatedHealth should should get aggregated severity for global system") {
+  test("getAggregatedHealth should get aggregated health for global system") {
     setSeverity(tromboneAxisHighLimitAlarmKey, Okay).await
     setSeverity(tromboneAxisLowLimitAlarmKey, Critical).await
 
     getAggregatedHealth(GlobalKey).await shouldBe Bad
+  }
+
+  // DEOPSCSW-448: Set Activation status for an alarm entity
+  // DEOPSCSW-466: Fetch health for a given alarm, component name or a subsystem name
+  test("getAggregatedHealth should not consider inactive alarms for health aggregation") {
+    setSeverity(enclosureTempHighAlarmKey, Okay).await
+    setSeverity(enclosureTempLowAlarmKey, Critical).await
+
+    val tromboneKey = ComponentKey(NFIRAOS, "enclosure")
+    getAggregatedHealth(tromboneKey).await shouldBe Good
   }
 
   // DEOPSCSW-466: Fetch alarm severity, component or subsystem
