@@ -159,10 +159,10 @@ class SeverityServiceModuleTest
   // DEOPSCSW-448: Set Activation status for an alarm entity
   // DEOPSCSW-465: Fetch alarm severity, component or subsystem
   test("getAggregatedSeverity should not consider inactive alarms in aggregation") {
-    // set severity for active alarm
+    enclosureTempHighAlarm.isActive shouldBe true
     setSeverity(enclosureTempHighAlarmKey, Indeterminate).await
 
-    // set severity for inactive alarm
+    enclosureTempLowAlarm.isActive shouldBe false
     setSeverity(enclosureTempLowAlarmKey, Critical).await
 
     getAggregatedSeverity(ComponentKey(NFIRAOS, "enclosure")).await shouldBe Indeterminate
@@ -287,6 +287,50 @@ class SeverityServiceModuleTest
     testProbe2.expectNoMessage(200.millis)
   }
 
+  // DEOPSCSW-448: Set Activation status for an alarm entity
+  // DEOPSCSW-467: Monitor alarm severities in the alarm store for a single alarm, component, subsystem, or all
+  test("subscribeAggregatedSeverityCallback should not consider inactive alarm for aggregation") {
+
+    val testProbe = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
+    val alarmSubscription =
+      subscribeAggregatedSeverityCallback(SubsystemKey(NFIRAOS), testProbe.ref ! _)
+    alarmSubscription.ready().await
+
+    tromboneAxisLowLimitAlarm.isActive shouldBe true
+    setSeverity(tromboneAxisLowLimitAlarmKey, Major).await
+
+    testProbe.expectMessage(Major)
+
+    setSeverity(tromboneAxisLowLimitAlarmKey, Major).await
+
+    enclosureTempLowAlarm.isActive shouldBe false
+    setSeverity(enclosureTempLowAlarmKey, Critical).await
+
+    testProbe.expectMessage(Major)
+
+    alarmSubscription.unsubscribe()
+  }
+
+  // DEOPSCSW-448: Set Activation status for an alarm entity
+  // DEOPSCSW-467: Monitor alarm severities in the alarm store for a single alarm, component, subsystem, or all
+  test("subscribeAggregatedSeverityCallback should throw InactiveAlarmException when all resolved keys are inactive") {
+
+    an[InactiveAlarmException] shouldBe thrownBy {
+      val subscription = subscribeAggregatedSeverityCallback(enclosureTempLowAlarmKey, println)
+      subscription.ready().await
+    }
+  }
+
+  // DEOPSCSW-448: Set Activation status for an alarm entity
+  // DEOPSCSW-467: Monitor alarm severities in the alarm store for a single alarm, component, subsystem, or all
+  test("subscribeAggregatedSeverity should throw KeyNotFoundException when key is invalid") {
+    val invalidAlarm = ComponentKey(BAD, "invalid")
+    an[KeyNotFoundException] shouldBe thrownBy {
+      val subscription = subscribeAggregatedSeverityCallback(invalidAlarm, println)
+      subscription.ready().await
+    }
+  }
+
   // DEOPSCSW-467: Monitor alarm severities in the alarm store for a single alarm, component, subsystem, or all
   test("subscribe aggregated severity via actorRef for a subsystem") {
 
@@ -309,6 +353,30 @@ class SeverityServiceModuleTest
     testProbe.expectNoMessage(200.millis)
 
     alarmSubscription.unsubscribe().await
+  }
+
+  // DEOPSCSW-448: Set Activation status for an alarm entity
+  // DEOPSCSW-467: Monitor alarm severities in the alarm store for a single alarm, component, subsystem, or all
+  test("subscribeAggregatedSeverityActorRef should not consider inactive alarm for aggregation") {
+
+    val testProbe = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
+    val alarmSubscription =
+      subscribeAggregatedSeverityActorRef(SubsystemKey(NFIRAOS), testProbe.ref)
+    alarmSubscription.ready().await
+
+    tromboneAxisLowLimitAlarm.isActive shouldBe true
+    setSeverity(tromboneAxisLowLimitAlarmKey, Major).await
+
+    testProbe.expectMessage(Major)
+
+    setSeverity(tromboneAxisLowLimitAlarmKey, Major).await
+
+    enclosureTempLowAlarm.isActive shouldBe false
+    setSeverity(enclosureTempLowAlarmKey, Critical).await
+
+    testProbe.expectMessage(Major)
+
+    alarmSubscription.unsubscribe()
   }
 
   //DEOPSCSW-444 : Set severity api for component

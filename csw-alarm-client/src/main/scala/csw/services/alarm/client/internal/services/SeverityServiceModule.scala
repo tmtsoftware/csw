@@ -5,7 +5,7 @@ import akka.actor.typed.ActorRef
 import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{ActorMaterializer, Materializer}
 import csw.services.alarm.api.exceptions.{InactiveAlarmException, InvalidSeverityException, KeyNotFoundException}
-import csw.services.alarm.api.internal.{MetadataService, SeverityKey, SeverityService, StatusService}
+import csw.services.alarm.api.internal._
 import csw.services.alarm.api.models.FullAlarmSeverity.Disconnected
 import csw.services.alarm.api.models.Key.AlarmKey
 import csw.services.alarm.api.models.{AlarmSeverity, FullAlarmSeverity, Key}
@@ -14,6 +14,7 @@ import csw.services.alarm.client.internal.commons.Settings
 import csw.services.alarm.client.internal.redis.RedisConnectionsFactory
 import csw.services.alarm.client.internal.{AlarmCodec, AlarmServiceLogger}
 import reactor.core.publisher.FluxSink.OverflowStrategy
+import romaine.reactive.RedisSubscription
 
 import scala.async.Async.{async, await}
 import scala.concurrent.Future
@@ -38,14 +39,7 @@ trait SeverityServiceModule extends SeverityService {
   final override def getAggregatedSeverity(key: Key): Future[FullAlarmSeverity] = async {
     log.debug(s"Get aggregated severity for alarm [${key.value}]")
 
-    val metadataKeys = await(metadataApi.keys(key))
-    if (metadataKeys.isEmpty) logAndThrow(KeyNotFoundException(key))
-
-    val activeAlarms = await(metadataApi.mget(metadataKeys)).collect {
-      case kv if kv.getValue.isActive ⇒ kv.getKey
-    }
-    if (activeAlarms.isEmpty) logAndThrow(InactiveAlarmException(key))
-
+    val activeAlarms   = await(getActiveAlarmKeys(key))
     val severityKeys   = activeAlarms.map(SeverityKey.fromMetadataKey)
     val severityValues = await(severityApi.mget(severityKeys))
     val severityList = severityValues.collect {
@@ -53,7 +47,6 @@ trait SeverityServiceModule extends SeverityService {
       case _                 => None
     }
     aggregratorByMax(severityList)
-
   }
 
   final override def subscribeAggregatedSeverityCallback(key: Key, callback: FullAlarmSeverity ⇒ Unit): AlarmSubscription = {
@@ -97,18 +90,40 @@ trait SeverityServiceModule extends SeverityService {
   // channel: e.g. __keyspace@0__:status.nfiraos.trombone.tromboneAxisLowLimitAlarm,
   // message: event type as value: e.g. set, expire, expired
   private[alarm] def subscribeAggregatedSeverity(key: Key): Source[FullAlarmSeverity, AlarmSubscription] = {
-    import AlarmCodec._
-    val redisStreamApi     = redisKeySpaceApi(severityApi) // create new connection for every client
-    val keys: List[String] = List(SeverityKey.fromAlarmKey(key).value)
 
-    redisStreamApi
-      .watchKeyspaceValueAggregation(keys, OverflowStrategy.LATEST, aggregratorByMax)
+    val severitySourceF: Future[Source[FullAlarmSeverity, RedisSubscription]] = async {
+      import AlarmCodec._
+
+      // create new connection for every client
+      val keySpaceApi = redisKeySpaceApi(severityApi)
+
+      val activeMetadataKeys = await(getActiveAlarmKeys(key))
+      val activeSeverityKeys = activeMetadataKeys.map(SeverityKey.fromMetadataKey(_).value)
+
+      keySpaceApi.watchKeyspaceValueAggregation(activeSeverityKeys, OverflowStrategy.LATEST, aggregratorByMax)
+    }
+
+    Source
+      .fromFutureSource(severitySourceF)
       .mapMaterializedValue { mat =>
         new AlarmSubscription {
-          override def unsubscribe(): Future[Unit] = mat.unsubscribe().map(_ ⇒ ())
-          override def ready(): Future[Unit]       = mat.ready().map(_ ⇒ ())
+          override def unsubscribe(): Future[Unit] = mat.map(_.unsubscribe())
+          override def ready(): Future[Unit]       = mat.map(_.ready())
         }
       }
+  }
+
+  private def getActiveAlarmKeys(key: Key): Future[List[MetadataKey]] = async {
+
+    val metadataKeys = await(metadataApi.keys(key))
+    if (metadataKeys.isEmpty) logAndThrow(KeyNotFoundException(key))
+
+    val keys = await(metadataApi.mget(metadataKeys)).collect {
+      case kv if kv.getValue.isActive ⇒ kv.getKey
+    }
+
+    if (keys.isEmpty) logAndThrow(InactiveAlarmException(key))
+    else keys
   }
 
   private def aggregratorByMax(iterable: Iterable[Option[FullAlarmSeverity]]): FullAlarmSeverity =

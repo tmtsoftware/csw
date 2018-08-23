@@ -26,7 +26,7 @@ class RedisKeySpaceApi[K: RomaineStringCodec, V: RomaineStringCodec](
       .psubscribe(keys.map(KeyspacePattern + _), overflowStrategy)
       .filter(pm => pm.value == SetOperation || pm.value == ExpiredOperation)
       .mapAsync(1) { pm =>
-        val key = RomaineStringCodec[K].fromString(pm.key.replace("__keyspace@0__:", ""))
+        val key = RomaineStringCodec[K].fromString(pm.key.replace(KeyspacePattern, ""))
         pm.value match {
           case SetOperation     => redisAsyncApi.get(key).map(valueOpt ⇒ (key, valueOpt))
           case ExpiredOperation => Future((key, None))
