@@ -74,6 +74,16 @@ class HealthServiceModuleTest
     getAggregatedHealth(tromboneKey).await shouldBe Good
   }
 
+  // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
+  // DEOPSCSW-466: Fetch health for a given alarm, component name or a subsystem name
+  test("getAggregatedHealth should consider shelved alarms also for health aggregation") {
+    setSeverity(cpuExceededAlarmKey, Okay).await
+    setSeverity(cpuExceededAlarmKey, Critical).await
+
+    val tromboneKey = ComponentKey(cpuExceededAlarmKey.subsystem, cpuExceededAlarmKey.component)
+    getAggregatedHealth(tromboneKey).await shouldBe Bad
+  }
+
   // DEOPSCSW-466: Fetch alarm severity, component or subsystem
   test("getAggregatedHealth should throw KeyNotFoundException when key is invalid") {
     an[KeyNotFoundException] shouldBe thrownBy(getAggregatedHealth(SubsystemKey(BAD)).await)

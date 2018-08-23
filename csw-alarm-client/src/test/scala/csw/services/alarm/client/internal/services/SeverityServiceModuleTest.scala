@@ -168,6 +168,16 @@ class SeverityServiceModuleTest
     getAggregatedSeverity(ComponentKey(NFIRAOS, "enclosure")).await shouldBe Indeterminate
   }
 
+  // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
+  // DEOPSCSW-465: Fetch alarm severity, component or subsystem
+  test("getAggregatedSeverity should consider shelved alarms also in aggregation") {
+
+    setStatus(cpuExceededAlarmKey, AlarmStatus().copy(shelveStatus = Unshelved))
+    setSeverity(cpuExceededAlarmKey, Critical).await
+
+    getAggregatedSeverity(ComponentKey(cpuExceededAlarmKey.subsystem, cpuExceededAlarmKey.component)).await shouldBe Critical
+  }
+
   // DEOPSCSW-465: Fetch alarm severity, component or subsystem
   test("getAggregatedSeverity should get aggregated to Disconnected for Warning and Disconnected severities") {
     setSeverity(tromboneAxisHighLimitAlarmKey, Warning).await
