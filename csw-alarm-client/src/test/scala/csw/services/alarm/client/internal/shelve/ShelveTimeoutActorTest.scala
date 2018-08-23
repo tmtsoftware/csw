@@ -61,7 +61,9 @@ class ShelveTimeoutActorTest extends FunSuite with Matchers with ActorTestKit wi
     val duration = 8.toHourOfDay - ZonedDateTime.now(ZoneOffset.UTC)
     manualTime.timePasses(duration)
 
-    eventually(unshelvedAlarms shouldEqual Set(tromboneAxisHighLimitAlarmKey, tcsAxisHighLimitAlarmKey))
+    eventually(timeout = timeout(5.seconds), interval = interval(1.second)) {
+      unshelvedAlarms shouldEqual Set(tromboneAxisHighLimitAlarmKey, tcsAxisHighLimitAlarmKey)
+    }
   }
 
   test("should cancel scheduled shelve timeout") {

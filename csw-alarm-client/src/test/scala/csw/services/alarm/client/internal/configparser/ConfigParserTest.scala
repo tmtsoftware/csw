@@ -1,11 +1,6 @@
 package csw.services.alarm.client.internal.configparser
 import com.typesafe.config.ConfigFactory
-import csw.messages.params.models.Subsystem.{LGSF, NFIRAOS, TCS}
 import csw.services.alarm.api.exceptions.ConfigParseException
-import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
-import csw.services.alarm.api.models.AlarmSeverity._
-import csw.services.alarm.api.models.AlarmType.Absolute
-import csw.services.alarm.api.models.{AlarmMetadata, AlarmType}
 import csw.services.alarm.client.internal.helpers.AlarmTestData
 import org.scalatest.{FunSuite, Matchers}
 
