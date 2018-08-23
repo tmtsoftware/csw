@@ -377,10 +377,14 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     )
 
     commandExecutor.execute(cmd)
-    adminService.setSeverity(tromboneAxisLowLimitKey, Major).futureValue
-    adminService.setSeverity(tromboneAxisLowLimitKey, Okay).futureValue
 
-    logBuffer shouldEqual List("Current Alarm Severity: Major", "Current Alarm Severity: Okay")
+    adminService.setSeverity(tromboneAxisHighLimitKey, Major).futureValue
+    adminService.setSeverity(tromboneAxisHighLimitKey, Okay).futureValue
+
+    logBuffer shouldEqual List(
+      s"Severity of Alarm ${tromboneAxisHighLimitKey.value}: ${Major.toString}",
+      s"Severity of Alarm ${tromboneAxisHighLimitKey.value}: ${Okay.toString}"
+    )
   }
 
   // -------------------------------------------Health--------------------------------------------
@@ -441,7 +445,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
   }
 
   // DEOPSCSW-479: Subscribe to health changes of component/subsystem/all alarms using CLI Interface
-  ignore("should subscribe health of subsystem/component") {
+  ignore("should subscribe health of subsystem/component/alarm") {
     val cmd = Options(
       cmd = "health",
       subCmd = "subscribe",
@@ -451,9 +455,12 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     )
 
     commandExecutor.execute(cmd)
-    adminService.setSeverity(tromboneAxisLowLimitKey, Major).futureValue
-    adminService.setSeverity(tromboneAxisLowLimitKey, Okay).futureValue
+    adminService.setSeverity(tromboneAxisHighLimitKey, Major).futureValue
+    adminService.setSeverity(tromboneAxisHighLimitKey, Okay).futureValue
 
-    logBuffer shouldEqual List("Current Alarm Health: Ill", "Current Alarm Health: Good")
+    logBuffer shouldEqual List(
+      s"Health of Alarm ${tromboneAxisHighLimitKey.value}: ${Ill.toString}",
+      s"Health of Alarm ${tromboneAxisHighLimitKey.value}: ${Good.toString}"
+    )
   }
 }
