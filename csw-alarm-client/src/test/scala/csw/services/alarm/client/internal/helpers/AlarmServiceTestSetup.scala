@@ -24,7 +24,6 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 import romaine.RomaineFactory
 import romaine.async.RedisAsyncApi
-import romaine.codec.RomaineStringCodec
 
 import scala.concurrent.ExecutionContext
 

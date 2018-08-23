@@ -25,7 +25,7 @@ import scala.util.control.NonFatal
  * @param ec the execution context to be used for performing asynchronous operations
  * @param mat the materializer to be used for materializing underlying streams
  */
-class RedisPublisher(redisURI: RedisURI, redisClient: RedisClient)(implicit ec: ExecutionContext, mat: Materializer)
+class RedisPublisher(redisURI: Future[RedisURI], redisClient: RedisClient)(implicit ec: ExecutionContext, mat: Materializer)
     extends EventPublisher {
 
   // inorder to preserve the order of publishing events, the parallelism level is maintained to 1
@@ -37,8 +37,8 @@ class RedisPublisher(redisURI: RedisURI, redisClient: RedisClient)(implicit ec: 
 
   // create underlying connection asynchronously and obtain an instance of `RedisAsyncCommands` to perform
   // redis operations asynchronously
-  private lazy val asyncConnectionF: Future[RedisAsyncApi[String, Event]] = Future.unit
-    .flatMap(_ ⇒ romaineFactory.redisAsyncApi[String, Event](redisURI))
+  private lazy val asyncConnectionF: Future[RedisAsyncApi[String, Event]] =
+    redisURI.flatMap(x => romaineFactory.redisAsyncApi[String, Event](x))
 
   override def publish(event: Event): Future[Done] =
     async {

@@ -1,7 +1,5 @@
 package csw.services.event.api.javadsl
 
-import java.util.concurrent.CompletableFuture
-
 import csw.services.event.api.scaladsl.EventService
 
 import scala.concurrent.ExecutionContext
@@ -17,7 +15,7 @@ trait IEventService {
    * A default instance of [[csw.services.event.api.javadsl.IEventPublisher]].
    * This could be shared across under normal operating conditions to share the underlying connection to event server.
    */
-  lazy val defaultPublisher: CompletableFuture[IEventPublisher] = makeNewPublisher()
+  lazy val defaultPublisher: IEventPublisher = makeNewPublisher()
 
   /**
    * A default instance of [[csw.services.event.api.javadsl.IEventSubscriber]].
@@ -31,7 +29,7 @@ trait IEventService {
    * of a publish operation demands a separate connection to be used.
    * @return
    */
-  def makeNewPublisher(): CompletableFuture[IEventPublisher]
+  def makeNewPublisher(): IEventPublisher
 
   /**
    * Create a new instance of [[csw.services.event.api.javadsl.IEventPublisher]] with a separate underlying connection than the default instance.

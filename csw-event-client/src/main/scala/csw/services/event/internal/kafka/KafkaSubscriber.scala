@@ -112,9 +112,11 @@ class KafkaSubscriber(consumerSettings: Future[ConsumerSettings[String, Array[By
 
     async {
       val events = await(eventsF)
-      await(subscription.unsubscribe().recover {
-        case ex => ex.printStackTrace()
-      })
+      await {
+        subscription.unsubscribe().recover {
+          case NonFatal(ex) => ex.printStackTrace()
+        }
+      }
       events.toSet
     }
   }

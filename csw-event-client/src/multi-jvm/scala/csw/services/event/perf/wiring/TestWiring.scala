@@ -4,7 +4,6 @@ import akka.actor
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Materializer, Supervision}
 import csw.services.event.EventServiceFactory
 import csw.services.event.api.scaladsl.{EventPublisher, EventSubscriber}
-import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.models.EventStores.{KafkaStore, RedisStore}
 import org.scalatest.mockito.MockitoSugar
 
@@ -23,7 +22,7 @@ class TestWiring(val actorSystem: actor.ActorSystem) extends MockitoSugar {
   private lazy val kafkaEventService = new EventServiceFactory(KafkaStore).make(kafkaHost, kafkaPort)(actorSystem)
 
   def publisher: EventPublisher =
-    if (redisEnabled) redisEventService.makeNewPublisher().await else kafkaEventService.makeNewPublisher().await
+    if (redisEnabled) redisEventService.makeNewPublisher() else kafkaEventService.makeNewPublisher()
 
   def subscriber: EventSubscriber =
     if (redisEnabled) redisEventService.defaultSubscriber else kafkaEventService.defaultSubscriber

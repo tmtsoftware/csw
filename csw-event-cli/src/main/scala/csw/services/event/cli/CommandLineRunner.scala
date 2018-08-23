@@ -121,15 +121,15 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
     case event: ObserveEvent ⇒ event.copy(eventId = Id(), eventTime = EventTime())
   }
 
-  private def publishEvent(event: Event) = async {
-    val publisher     = await(eventService.defaultPublisher)
+  private def publishEvent(event: Event): Future[Done] = {
+    val publisher     = eventService.defaultPublisher
     val publishResult = publisher.publish(event)
     publishResult.onComplete {
       case Success(_) ⇒ printLine(s"[SUCCESS] Event [${event.eventKey}] published successfully")
       case Failure(ex) ⇒
         printLine(s"[FAILURE] Failed to publish event [${event.eventKey}] with error: [${ex.getCause.getMessage}]")
     }
-    await(publishResult)
+    publishResult
   }
 
   private def publishEventsWithInterval(initialEvent: Event, interval: FiniteDuration, duration: FiniteDuration) = {

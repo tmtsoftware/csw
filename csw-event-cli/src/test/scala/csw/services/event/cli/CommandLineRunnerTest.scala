@@ -184,7 +184,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
       commandLineRunner.subscribe(argsParser.parse(Seq("subscribe", "-o", "json", "--events", eventKey.key)).get)
     Thread.sleep(500)
 
-    val publisher   = eventService.defaultPublisher.await
+    val publisher   = eventService.defaultPublisher
     val cancellable = publisher.publish(eventGenerator.generate, 400.millis)
 
     Thread.sleep(1000)
@@ -205,7 +205,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
     import eventGenerator._
 
     val eventKey: EventKey = eventsGroup.head.eventKey
-    val publisher          = eventService.defaultPublisher.await
+    val publisher          = eventService.defaultPublisher
 
     val (subscriptionF, _) =
       commandLineRunner.subscribe(argsParser.parse(Seq("subscribe", "--events", eventKey.key, "--id")).get)
@@ -230,7 +230,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
     import eventGenerator._
 
     val eventKey: EventKey = eventsGroup.head.eventKey
-    val publisher          = eventService.defaultPublisher.await
+    val publisher          = eventService.defaultPublisher
 
     val (subscriptionF, _) =
       commandLineRunner.subscribe(argsParser.parse(Seq("subscribe", "--events", eventKey.key, "--out", "terse")).get)

@@ -13,7 +13,6 @@ import csw.messages.params.models.Prefix;
 import csw.services.event.internal.commons.javawrappers.JEventService;
 
 import java.time.Duration;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
 public class JEventPublishExamples {
@@ -29,7 +28,7 @@ public class JEventPublishExamples {
     public void singleEvent(ComponentInfo componentInfo) {
         //#single-event
         Event event = new SystemEvent(componentInfo.prefix(), new EventName("filter_wheel"));
-        eventService.defaultPublisher().thenApply(publisher -> publisher.publish(event));
+        eventService.defaultPublisher().publish(event);
         //#single-event
     }
 
@@ -37,26 +36,23 @@ public class JEventPublishExamples {
         return new SystemEvent(prefix, name);
     }
 
-    public void source(ComponentInfo componentInfo) {
+    public CompletionStage<Done> source(ComponentInfo componentInfo) {
         int n = 10;
 
         //#with-source
-        eventService.defaultPublisher().thenApply(publisher -> {
             Source<Event, CompletionStage<Done>> eventStream = Source
                     .range(1, n)
                     .map(id -> makeEvent(id, componentInfo.prefix(), new EventName("filter_wheel")))
                     .watchTermination(Keep.right());
 
-            return publisher.<CompletionStage<Done>>publish(eventStream, failure -> { /*do something*/ });
-
-        });
+            return eventService.defaultPublisher().<CompletionStage<Done>>publish(eventStream, failure -> { /*do something*/ });
         //#with-source
     }
 
     //#event-generator
-    private CompletableFuture<Cancellable> startPublishingEvents(ComponentInfo componentInfo) {
+    private Cancellable startPublishingEvents(ComponentInfo componentInfo) {
         Event baseEvent = new SystemEvent(componentInfo.prefix(), new EventName("filter_wheel"));
-        return eventService.defaultPublisher().thenApply(publisher -> publisher.publish(() -> eventGenerator(baseEvent), Duration.ofMillis(100)));
+        return eventService.defaultPublisher().publish(() -> eventGenerator(baseEvent), Duration.ofMillis(100));
     }
 
     // this holds the logic for event generation, could be based on some computation or current state of HCD

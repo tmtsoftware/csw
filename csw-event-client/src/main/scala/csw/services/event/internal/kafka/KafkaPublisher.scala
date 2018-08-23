@@ -22,20 +22,18 @@ import scala.util.control.NonFatal
  * @param ec the execution context to be used for performing asynchronous operations
  * @param mat the materializer to be used for materializing underlying streams
  */
-class KafkaPublisher(producerSettings: ProducerSettings[String, Array[Byte]])(
+class KafkaPublisher(producerSettings: Future[ProducerSettings[String, Array[Byte]]])(
     implicit ec: ExecutionContext,
     mat: Materializer
 ) extends EventPublisher {
 
   private val parallelism        = 1
-  private val kafkaProducer      = producerSettings.createKafkaProducer()
+  private val kafkaProducer      = producerSettings.map(_.createKafkaProducer())
   private val eventPublisherUtil = new EventPublisherUtil()
 
   override def publish(event: Event): Future[Done] = {
     val promisedDone: Promise[Done] = Promise()
-    try {
-      kafkaProducer.send(eventToProducerRecord(event), completePromise(event, promisedDone))
-    } catch {
+    kafkaProducer.map(_.send(eventToProducerRecord(event), completePromise(event, promisedDone))).recover {
       case NonFatal(ex) ⇒ promisedDone.failure(PublishFailure(event, ex))
     }
     promisedDone.future
@@ -53,8 +51,8 @@ class KafkaPublisher(producerSettings: ProducerSettings[String, Array[Byte]])(
   override def publish(eventGenerator: ⇒ Event, every: FiniteDuration, onError: PublishFailure ⇒ Unit): Cancellable =
     publish(eventPublisherUtil.eventSource(eventGenerator, every), onError)
 
-  override def shutdown(): Future[Done] = Future {
-    scala.concurrent.blocking(kafkaProducer.close())
+  override def shutdown(): Future[Done] = kafkaProducer.map { x =>
+    scala.concurrent.blocking(x.close())
     Done
   }
 

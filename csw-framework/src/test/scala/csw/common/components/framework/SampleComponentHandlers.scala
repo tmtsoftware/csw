@@ -93,7 +93,7 @@ class SampleComponentHandlers(
     controlCommand match {
       case Setup(_, _, `setSeverityCommand`, _, _) ⇒ alarmService.setSeverity(testAlarmKey, testSeverity)
 
-      case Setup(_, _, CommandName("publish.event.success"), _, _) ⇒ eventService.defaultPublisher.map(_.publish(event))
+      case Setup(_, _, CommandName("publish.event.success"), _, _) ⇒ eventService.defaultPublisher.publish(event)
 
       case Setup(_, somePrefix, CommandName("subscribe.event.success"), _, _) ⇒
         eventService.defaultSubscriber.subscribeCallback(Set(event.eventKey), processEvent(somePrefix))

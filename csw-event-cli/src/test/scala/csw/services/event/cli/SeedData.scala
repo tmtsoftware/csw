@@ -65,7 +65,7 @@ trait SeedData extends HTTPLocationService with Matchers with BeforeAndAfterEach
     val e1 = JsonSupport.readEvent[SystemEvent](Json.parse(event1Str))
     val e2 = JsonSupport.readEvent[ObserveEvent](Json.parse(event2Str))
 
-    val publisher: EventPublisher = cliWiring.eventService.defaultPublisher.await
+    val publisher: EventPublisher = cliWiring.eventService.defaultPublisher
     publisher.publish(e1).await
     publisher.publish(e2).await
 

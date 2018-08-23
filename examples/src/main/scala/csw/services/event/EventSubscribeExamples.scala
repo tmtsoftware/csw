@@ -1,6 +1,5 @@
 package csw.services.event
 
-import akka.Done
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors, MutableBehavior}
 import akka.actor.typed.{ActorRef, Behavior}
 import akka.stream.Materializer
@@ -11,14 +10,10 @@ import csw.messages.location.AkkaLocation
 import csw.messages.params.models.Subsystem
 import csw.services.event.api.scaladsl.{EventService, EventSubscription, SubscriptionModes}
 
-import scala.async.Async._
+import scala.concurrent.Future
 import scala.concurrent.duration.DurationDouble
-import scala.concurrent.{ExecutionContext, Future}
 
-class EventSubscribeExamples(
-    eventService: EventService,
-    hcd: AkkaLocation
-)(implicit ec: ExecutionContext, mat: Materializer) {
+class EventSubscribeExamples(eventService: EventService, hcd: AkkaLocation)(implicit mat: Materializer) {
 
   def callback(): EventSubscription =
     //#with-callback

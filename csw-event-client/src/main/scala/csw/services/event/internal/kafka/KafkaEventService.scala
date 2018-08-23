@@ -22,7 +22,7 @@ class KafkaEventService(eventServiceResolver: EventServiceResolver)(implicit act
 
   implicit val executionContext: ExecutionContext = actorSystem.dispatcher
 
-  override def makeNewPublisher(): Future[KafkaPublisher] = producerSettings.map(new KafkaPublisher(_))
+  override def makeNewPublisher(): KafkaPublisher = new KafkaPublisher(producerSettings)
 
   override def makeNewSubscriber(): KafkaSubscriber = new KafkaSubscriber(consumerSettings)
 
