@@ -43,16 +43,19 @@ trait SeverityServiceModule extends SeverityService {
     val metadataKeys = await(metadataApi.keys(key))
     if (metadataKeys.isEmpty) logAndThrow(KeyNotFoundException(key))
 
-    val metadataList = await(metadataApi.mget(metadataKeys)).filter(_.getValue.isActive)
-    if (metadataList.isEmpty) logAndThrow(InactiveAlarmException(key))
+    val activeAlarms = await(metadataApi.mget(metadataKeys)).collect {
+      case x if x.getValue.isActive ⇒ x.getKey
+    }
+    if (activeAlarms.isEmpty) logAndThrow(InactiveAlarmException(key))
 
-    val severityKeys   = metadataKeys.map(SeverityKey.fromMetadataKey)
+    val severityKeys   = activeAlarms.map(SeverityKey.fromMetadataKey)
     val severityValues = await(severityApi.mget(severityKeys))
     val severityList = severityValues.collect {
       case kv if kv.hasValue => Some(kv.getValue)
       case _                 => None
     }
     aggregratorByMax(severityList)
+
   }
 
   final override def subscribeAggregatedSeverityCallback(key: Key, callback: FullAlarmSeverity ⇒ Unit): AlarmSubscription = {

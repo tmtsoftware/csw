@@ -39,7 +39,7 @@ trait AlarmTestData {
     operatorResponse = "go to the NFIRAOS engineering user interface and select the datum axis command",
     isAutoAcknowledgeable = true,
     isLatchable = true,
-    activationStatus = Active
+    activationStatus = Inactive
   )
 
   // Multiple alarms added - no auto ack no latch
