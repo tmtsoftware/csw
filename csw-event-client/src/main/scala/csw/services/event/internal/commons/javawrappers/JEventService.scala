@@ -2,7 +2,7 @@ package csw.services.event.internal.commons.javawrappers
 
 import java.util.concurrent.CompletableFuture
 
-import csw.services.event.api.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
+import csw.services.event.api.javadsl.{IEventPublisher, IEventService}
 import csw.services.event.api.scaladsl.EventService
 
 import scala.compat.java8.FutureConverters.FutureOps
@@ -18,8 +18,7 @@ class JEventService(eventService: EventService) extends IEventService {
   override def makeNewPublisher(): CompletableFuture[IEventPublisher] =
     eventService.makeNewPublisher().map[IEventPublisher](new JEventPublisher(_)).toJava.toCompletableFuture
 
-  override def makeNewSubscriber(): CompletableFuture[IEventSubscriber] =
-    eventService.defaultSubscriber.map[IEventSubscriber](new JEventSubscriber(_)).toJava.toCompletableFuture
+  override def makeNewSubscriber(): JEventSubscriber = new JEventSubscriber(eventService.defaultSubscriber)
 
   override def asScala: EventService = eventService
 }

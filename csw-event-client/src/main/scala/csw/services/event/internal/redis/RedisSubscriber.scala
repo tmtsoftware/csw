@@ -31,7 +31,7 @@ import scala.util.control.NonFatal
  * @param ec          the execution context to be used for performing asynchronous operations
  * @param mat         the materializer to be used for materializing underlying streams
  */
-class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
+class RedisSubscriber(redisURI: Future[RedisURI], redisClient: RedisClient)(
     implicit ec: ExecutionContext,
     mat: Materializer
 ) extends EventSubscriber {
@@ -47,12 +47,12 @@ class RedisSubscriber(redisURI: RedisURI, redisClient: RedisClient)(
   // redis operations asynchronously. This instance of RedisAsyncCommands is used for performing `get`
   // operations on Redis asynchronously
   private lazy val asyncConnectionF: Future[RedisAsyncApi[EventKey, Event]] =
-    connection(romaineFactory.redisAsyncApi[EventKey, Event](redisURI))
+    connection(redisURI.flatMap(romaineFactory.redisAsyncApi[EventKey, Event]))
 
   // create underlying connection asynchronously and obtain an instance of RedisPubSubReactiveCommands to perform
   // redis pub sub operations using a `reactor` based reactive API provided by lettuce Redis driver.
   private def reactiveConnectionF[T: RomaineStringCodec](): RedisSubscriptionApi[T, Event] =
-    romaineFactory.redisSubscriptionApi[T, Event](Future.successful(redisURI))
+    romaineFactory.redisSubscriptionApi[T, Event](redisURI)
 
   override def subscribe(eventKeys: Set[EventKey]): Source[Event, EventSubscription] = {
     log.info(s"Subscribing to event keys: $eventKeys")

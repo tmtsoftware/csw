@@ -24,7 +24,7 @@ class KafkaEventService(eventServiceResolver: EventServiceResolver)(implicit act
 
   override def makeNewPublisher(): Future[KafkaPublisher] = producerSettings.map(new KafkaPublisher(_))
 
-  override def makeNewSubscriber(): Future[KafkaSubscriber] = consumerSettings.map(new KafkaSubscriber(_))
+  override def makeNewSubscriber(): KafkaSubscriber = new KafkaSubscriber(consumerSettings)
 
   // resolve event service every time before creating a new publisher
   private def producerSettings: Future[ProducerSettings[String, Array[Byte]]] = eventServiceResolver.uri().map { uri ⇒

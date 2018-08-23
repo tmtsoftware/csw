@@ -96,7 +96,7 @@ class SampleComponentHandlers(
       case Setup(_, _, CommandName("publish.event.success"), _, _) ⇒ eventService.defaultPublisher.map(_.publish(event))
 
       case Setup(_, somePrefix, CommandName("subscribe.event.success"), _, _) ⇒
-        eventService.defaultSubscriber.map(_.subscribeCallback(Set(event.eventKey), processEvent(somePrefix)))
+        eventService.defaultSubscriber.subscribeCallback(Set(event.eventKey), processEvent(somePrefix))
 
       case Setup(_, somePrefix, _, _, _) ⇒
         currentStatePublisher.publish(

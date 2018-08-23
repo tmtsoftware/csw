@@ -18,7 +18,7 @@ trait EventService {
    * A default instance of [[csw.services.event.api.scaladsl.EventSubscriber]].
    * This could be shared across under normal operating conditions to share the underlying connection to event server.
    */
-  lazy val defaultSubscriber: Future[EventSubscriber] = makeNewSubscriber()
+  lazy val defaultSubscriber: EventSubscriber = makeNewSubscriber()
 
   /**
    * Create a new instance of [[csw.services.event.api.scaladsl.EventPublisher]] with a separate underlying connection than the default instance.
@@ -34,5 +34,5 @@ trait EventService {
    * of a subscribe operation demands a separate connection to be used.
    * @return A new instance of [[csw.services.event.api.scaladsl.EventSubscriber]]
    */
-  def makeNewSubscriber(): Future[EventSubscriber]
+  def makeNewSubscriber(): EventSubscriber
 }

@@ -23,7 +23,7 @@ trait IEventService {
    * A default instance of [[csw.services.event.api.javadsl.IEventSubscriber]].
    * This could be shared across under normal operating conditions to share the underlying connection to event server.
    */
-  lazy val defaultSubscriber: CompletableFuture[IEventSubscriber] = makeNewSubscriber()
+  lazy val defaultSubscriber: IEventSubscriber = makeNewSubscriber()
 
   /**
    * Create a new instance of [[csw.services.event.api.javadsl.IEventPublisher]] with a separate underlying connection than the default instance.
@@ -39,7 +39,7 @@ trait IEventService {
    * of a subscribe operation demands a separate connection to be used.
    * @return A new instance of [[csw.services.event.api.javadsl.IEventSubscriber]]
    */
-  def makeNewSubscriber(): CompletableFuture[IEventSubscriber]
+  def makeNewSubscriber(): IEventSubscriber
 
   /**
    * Returns the Scala API for this instance of event service

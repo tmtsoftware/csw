@@ -1,7 +1,7 @@
 package csw.services.event.internal.redis
 
 import akka.stream.Materializer
-import csw.services.event.api.scaladsl.{EventPublisher, EventService, EventSubscriber}
+import csw.services.event.api.scaladsl.{EventPublisher, EventService}
 import csw.services.event.internal.commons.serviceresolver.EventServiceResolver
 import io.lettuce.core.{RedisClient, RedisURI}
 
@@ -23,7 +23,7 @@ class RedisEventService(eventServiceResolver: EventServiceResolver, masterId: St
 
   override def makeNewPublisher(): Future[EventPublisher] = redisURI().map(new RedisPublisher(_, redisClient))
 
-  override def makeNewSubscriber(): Future[EventSubscriber] = redisURI().map(new RedisSubscriber(_, redisClient))
+  override def makeNewSubscriber(): RedisSubscriber = new RedisSubscriber(redisURI(), redisClient)
 
   // resolve event service every time before creating a new publisher or subscriber
   private def redisURI(): Future[RedisURI] =

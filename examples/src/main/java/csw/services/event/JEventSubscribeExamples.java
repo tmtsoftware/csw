@@ -21,39 +21,37 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
+import akka.stream.javadsl.Sink;
+
 public class JEventSubscribeExamples {
 
     private JEventService eventService;
     private AkkaLocation hcdLocation;
     private Materializer mat;
 
-    public JEventSubscribeExamples(JEventService eventService, AkkaLocation hcdLocation, Materializer mat){
+    public JEventSubscribeExamples(JEventService eventService, AkkaLocation hcdLocation, Materializer mat) {
         this.eventService = eventService;
         this.hcdLocation = hcdLocation;
         this.mat = mat;
     }
 
-    public void callback() {
+    public IEventSubscription callback() {
         //#with-callback
 
-        CompletableFuture<IEventSubscriber> subscriberF = eventService.defaultSubscriber();
+        IEventSubscriber subscriber = eventService.defaultSubscriber();
 
-        subscriberF.thenApply(subscriber -> {
-            EventKey filterWheelEventKey = new EventKey(hcdLocation.prefix(), new EventName("filter_wheel"));
-            return subscriber.subscribeCallback(Collections.singleton(filterWheelEventKey), event -> { /*do something*/ });
-        });
+        EventKey filterWheelEventKey = new EventKey(hcdLocation.prefix(), new EventName("filter_wheel"));
+        return subscriber.subscribeCallback(Collections.singleton(filterWheelEventKey), event -> { /*do something*/ });
 
         //#with-callback
     }
 
     //#with-async-callback
-    public CompletableFuture<IEventSubscription> subscribe() {
-        CompletableFuture<IEventSubscriber> subscriberF = eventService.defaultSubscriber();
+    public IEventSubscription subscribe() {
+        IEventSubscriber subscriber = eventService.defaultSubscriber();
 
-        return subscriberF.thenApply(subscriber -> {
-            EventKey filterWheelEventKey = new EventKey(hcdLocation.prefix(), new EventName("filter_wheel"));
-            return subscriber.subscribeAsync(Collections.singleton(filterWheelEventKey), this::callback);
-        });
+        EventKey filterWheelEventKey = new EventKey(hcdLocation.prefix(), new EventName("filter_wheel"));
+        return subscriber.subscribeAsync(Collections.singleton(filterWheelEventKey), this::callback);
     }
 
     private CompletableFuture<String> callback(Event event) {
@@ -63,15 +61,13 @@ public class JEventSubscribeExamples {
     //#with-async-callback
 
     //#with-actor-ref
-    public CompletableFuture<IEventSubscription> subscribe(ActorContext<TopLevelActorMessage> ctx) {
+    public IEventSubscription subscribe(ActorContext<TopLevelActorMessage> ctx) {
 
-        CompletableFuture<IEventSubscriber> subscriberF = eventService.defaultSubscriber();
+        IEventSubscriber subscriber = eventService.defaultSubscriber();
         ActorRef<Event> eventHandler = ctx.spawnAnonymous(new JEventHandlerFactory().make());
 
-        return subscriberF.thenApply(subscriber -> {
-            EventKey filterWheelEventKey = new EventKey(hcdLocation.prefix(), new EventName("filter_wheel"));
-            return subscriber.subscribeActorRef(Collections.singleton(filterWheelEventKey), eventHandler);
-        });
+        EventKey filterWheelEventKey = new EventKey(hcdLocation.prefix(), new EventName("filter_wheel"));
+        return subscriber.subscribeActorRef(Collections.singleton(filterWheelEventKey), eventHandler);
     }
 
     public class JEventHandlerFactory {
@@ -82,6 +78,7 @@ public class JEventSubscribeExamples {
 
     public class JEventHandler extends MutableBehavior<Event> {
         private ActorContext<Event> ctx;
+
         JEventHandler(ActorContext<Event> context) {
             ctx = context;
         }
@@ -95,39 +92,34 @@ public class JEventSubscribeExamples {
     //#with-actor-ref
 
 
-    public void source() {
+    public IEventSubscription source() {
         //#with-source
 
-        CompletableFuture<IEventSubscriber> subscriberF = eventService.defaultSubscriber();
+        IEventSubscriber subscriber = eventService.defaultSubscriber();
 
-        subscriberF.thenApply(subscriber -> {
-            EventKey filterWheelEventKey = new EventKey(hcdLocation.prefix(), new EventName("filter_wheel"));
-            return subscriber.subscribe(Collections.singleton(filterWheelEventKey)).runForeach(event -> { /*do something*/ }, mat);
-        });
+        EventKey filterWheelEventKey = new EventKey(hcdLocation.prefix(), new EventName("filter_wheel"));
+        return subscriber.subscribe(Collections.singleton(filterWheelEventKey)).to(Sink.foreach(event -> { /*do something*/ })).run(mat);
 
         //#with-source
     }
 
-    public void subscriptionMode() {
+    public IEventSubscription subscriptionMode() {
         //#with-subscription-mode
 
-        CompletableFuture<IEventSubscriber> subscriberF = eventService.defaultSubscriber();
+        IEventSubscriber subscriber = eventService.defaultSubscriber();
 
-        subscriberF.thenApply(subscriber -> {
-            EventKey filterWheelEventKey = new EventKey(hcdLocation.prefix(), new EventName("filter_wheel"));
-            return subscriber.subscribeCallback(Collections.singleton(filterWheelEventKey), event -> { /* do something*/ },  Duration.ofMillis(1000), SubscriptionModes.jRateAdapterMode());
-        });
+        EventKey filterWheelEventKey = new EventKey(hcdLocation.prefix(), new EventName("filter_wheel"));
+        return subscriber.subscribeCallback(Collections.singleton(filterWheelEventKey), event -> { /* do something*/ }, Duration.ofMillis(1000), SubscriptionModes.jRateAdapterMode());
 
         //#with-subscription-mode
     }
 
 
-    private void subscribeToSubsystemEvents(Subsystem subsystem)  {
+    private void subscribeToSubsystemEvents(Subsystem subsystem) {
         // #psubscribe
 
-        CompletableFuture<IEventSubscriber> subscriberF = eventService.defaultSubscriber();
-
-        subscriberF.thenApply(subscriber -> subscriber.pSubscribeCallback(subsystem, "*", event -> { /* do something*/ }));
+        IEventSubscriber subscriber = eventService.defaultSubscriber();
+        subscriber.pSubscribeCallback(subsystem, "*", event -> { /* do something*/ });
 
         // #psubscribe
     }

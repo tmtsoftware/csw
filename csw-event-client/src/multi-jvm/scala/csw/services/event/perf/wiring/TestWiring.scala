@@ -26,6 +26,6 @@ class TestWiring(val actorSystem: actor.ActorSystem) extends MockitoSugar {
     if (redisEnabled) redisEventService.makeNewPublisher().await else kafkaEventService.makeNewPublisher().await
 
   def subscriber: EventSubscriber =
-    if (redisEnabled) redisEventService.defaultSubscriber.await else kafkaEventService.defaultSubscriber.await
+    if (redisEnabled) redisEventService.defaultSubscriber else kafkaEventService.defaultSubscriber
 
 }

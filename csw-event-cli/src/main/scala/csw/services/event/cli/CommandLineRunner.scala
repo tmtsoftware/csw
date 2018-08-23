@@ -4,22 +4,22 @@ import java.io.File
 
 import akka.Done
 import akka.actor.CoordinatedShutdown
-import akka.stream.{KillSwitches, Materializer}
 import akka.stream.scaladsl.{Keep, Sink, Source}
+import akka.stream.{KillSwitches, Materializer}
 import csw.messages.events._
 import csw.messages.params.formats.JsonSupport
 import csw.messages.params.generics.Parameter
 import csw.messages.params.models.Id
+import csw.services.event.api.scaladsl.SubscriptionModes.RateAdapterMode
+import csw.services.event.api.scaladsl.{EventService, EventSubscription}
 import csw.services.event.cli.args.Options
 import csw.services.event.cli.utils.{EventJsonTransformer, EventOnelineTransformer, Formatter}
 import csw.services.event.cli.wiring.ActorRuntime
-import csw.services.event.api.scaladsl.SubscriptionModes.RateAdapterMode
-import csw.services.event.api.scaladsl.{EventService, EventSubscription}
 import play.api.libs.json.{JsObject, JsValue, Json}
 
 import scala.async.Async.{async, await}
+import scala.concurrent.Future
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
-import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, printLine: Any ⇒ Unit) {
@@ -48,26 +48,25 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
     }
   }
 
-  def subscribe(options: Options)(implicit ec: ExecutionContext, mat: Materializer): (Future[EventSubscription], Future[Done]) = {
+  def subscribe(options: Options)(implicit mat: Materializer): (EventSubscription, Future[Done]) = {
     val keys        = options.eventsMap.keys.toSet
     val subscriberF = eventService.defaultSubscriber
 
     val eventStream = options.maybeInterval match {
-      case Some(interval) => subscriberF.map(_.subscribe(keys, interval, RateAdapterMode))
-      case None           => subscriberF.map(_.subscribe(keys))
+      case Some(interval) => subscriberF.subscribe(keys, interval, RateAdapterMode)
+      case None           => subscriberF.subscribe(keys)
     }
 
     if (options.isOnelineOut) printLine(Formatter.EventSeparator)
 
-    val (subscriptionF, doneF) = Source
-      .fromFutureSource(eventStream)
+    val (subscriptionF, doneF) = eventStream
       .toMat(Sink.foreach(processEvent(options, _)))(Keep.both)
       .run()
 
     coordinatedShutdown.addTask(
       CoordinatedShutdown.PhaseBeforeServiceUnbind,
       "unsubscribe-stream"
-    )(() ⇒ subscriptionF.flatMap(_.unsubscribe()))
+    )(() ⇒ subscriptionF.unsubscribe())
 
     (subscriptionF, doneF)
   }
@@ -86,16 +85,16 @@ class CommandLineRunner(eventService: EventService, actorRuntime: ActorRuntime, 
     }
   }
 
-  private def getEvents(keys: Seq[EventKey]) = async {
-    val subscriber = await(eventService.defaultSubscriber)
-    await(Future.traverse(keys)(subscriber.get))
+  private def getEvents(keys: Seq[EventKey]) = {
+    val subscriber = eventService.defaultSubscriber
+    Future.traverse(keys)(subscriber.get)
   }
 
-  private def getEvent(key: EventKey, eventData: Option[File]) = async {
-    val subscriber = await(eventService.defaultSubscriber)
+  private def getEvent(key: EventKey, eventData: Option[File]) = {
+    val subscriber = eventService.defaultSubscriber
     eventData match {
-      case Some(file) ⇒ readEventFromJson(file, key)
-      case None       ⇒ await(subscriber.get(key))
+      case Some(file) ⇒ Future.successful(readEventFromJson(file, key))
+      case None       ⇒ subscriber.get(key)
     }
   }
 

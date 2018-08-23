@@ -27,25 +27,30 @@ import scala.util.control.NonFatal
  * @param ec the execution context to be used for performing asynchronous operations
  * @param mat the materializer to be used for materializing underlying streams
  */
-class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(
+class KafkaSubscriber(consumerSettings: Future[ConsumerSettings[String, Array[Byte]]])(
     implicit ec: ExecutionContext,
     mat: Materializer
 ) extends EventSubscriber {
 
-  private val consumer: Consumer[String, Array[Byte]] = consumerSettings.createKafkaConsumer()
-  private val eventSubscriberUtil                     = new EventSubscriberUtil()
+  private val consumer: Future[Consumer[String, Array[Byte]]] = consumerSettings.map(_.createKafkaConsumer())
+  private val eventSubscriberUtil                             = new EventSubscriberUtil()
 
   override def subscribe(eventKeys: Set[EventKey]): Source[Event, EventSubscription] = {
     val partitionToOffsets = getLatestOffsets(eventKeys)
     // Subscribe to the 0th offset if nothing has been published yet or `current offset - 1` to receive the last published event
-    val manualSubscription = Subscriptions.assignmentWithOffset(partitionToOffsets.mapValues(x ⇒ if (x == 0) 0L else x - 1))
-    val eventStream        = getEventStream(manualSubscription)
+    val manualSubscription =
+      partitionToOffsets.map(dd => Subscriptions.assignmentWithOffset(dd.mapValues(x ⇒ if (x == 0) 0L else x - 1)))
+    val eventStream = getEventStream(manualSubscription)
 
-    val invalidEvents = partitionToOffsets.collect {
-      case (topicPartition, offset) if offset == 0 ⇒ Event.invalidEvent(EventKey(topicPartition.topic()))
+    val invalidEvents = partitionToOffsets.map {
+      _.collect {
+        case (topicPartition, offset) if offset == 0 ⇒ Event.invalidEvent(EventKey(topicPartition.topic()))
+      }
     }
 
-    Source(invalidEvents)
+    Source
+      .fromFuture(invalidEvents)
+      .mapConcat(identity)
       .concatMat(eventStream)(Keep.right)
       .mapMaterializedValue(eventSubscription)
   }
@@ -93,7 +98,7 @@ class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(
   override def pSubscribe(subsystem: Subsystem, pattern: String): Source[Event, EventSubscription] = {
     val keyPattern   = s"${subsystem.entryName}.*${Utils.globToRegex(pattern)}"
     val subscription = Subscriptions.topicPattern(keyPattern)
-    getEventStream(subscription).mapMaterializedValue(eventSubscription)
+    getEventStream(Future.successful(subscription)).mapMaterializedValue(eventSubscription)
   }
 
   override def pSubscribeCallback(subsystem: Subsystem, pattern: String, callback: Event ⇒ Unit): EventSubscription =
@@ -111,27 +116,25 @@ class KafkaSubscriber(consumerSettings: ConsumerSettings[String, Array[Byte]])(
 
   override def get(eventKey: EventKey): Future[Event] = get(Set(eventKey)).map(_.head)
 
-  private def getEventStream(subscription: Subscription): Source[Event, scaladsl.Consumer.Control] =
-    scaladsl.Consumer
-      .plainSource(consumerSettings, subscription)
-      .map(
-        record ⇒
-          try Event.fromPb(PbEvent.parseFrom(record.value()))
-          catch { case NonFatal(_) ⇒ Event.badEvent() }
-      )
+  private def getEventStream(subscription: Future[Subscription]): Source[Event, Future[scaladsl.Consumer.Control]] = {
+    val future = subscription.flatMap(s => consumerSettings.map(c => scaladsl.Consumer.plainSource(c, s)))
+    Source.fromFutureSource(future).map { record ⇒
+      try Event.fromPb(PbEvent.parseFrom(record.value()))
+      catch { case NonFatal(_) ⇒ Event.badEvent() }
+    }
+  }
 
   //Get the last offset for the given partitions. The last offset of a partition is the offset of the upcoming
   // message, i.e. the offset of the last available message + 1.
-  private def getLatestOffsets(eventKeys: Set[EventKey]): Map[TopicPartition, Long] = {
+  private def getLatestOffsets(eventKeys: Set[EventKey]): Future[Map[TopicPartition, Long]] = {
     val topicPartitions = eventKeys.map(e ⇒ new TopicPartition(e.key, 0)).toList
-    consumer.endOffsets(topicPartitions.asJava).asScala.toMap.mapValues(_.toLong)
+    consumer.map(_.endOffsets(topicPartitions.asJava).asScala.toMap.mapValues(_.toLong))
   }
 
-  private def eventSubscription(control: scaladsl.Consumer.Control): EventSubscription = {
+  private def eventSubscription(control: Future[scaladsl.Consumer.Control]): EventSubscription = {
     new EventSubscription {
-      override def unsubscribe(): Future[Done] = control.shutdown().map(_ ⇒ Done)
-
-      override def ready(): Future[Done] = Future.successful(Done)
+      override def unsubscribe(): Future[Done] = control.flatMap(_.shutdown().map(_ ⇒ Done))
+      override def ready(): Future[Done]       = control.map(_ => Done)
     }
   }
 }

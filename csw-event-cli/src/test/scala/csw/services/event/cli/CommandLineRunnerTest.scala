@@ -15,7 +15,6 @@ import org.scalatest.{FunSuite, Matchers}
 import play.api.libs.json._
 
 import scala.collection.{immutable, mutable}
-import scala.concurrent.{Await, ExecutionContext}
 import scala.io.Source
 
 class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Eventually {
@@ -109,8 +108,9 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
     val eventJson         = Json.parse(Source.fromResource("publish/observe_event.json").mkString)
     val expectedEventJson = removeDynamicKeys(addEventIdAndName(eventJson, eventKey))
 
-    val subscriber = Await.result(eventService.defaultSubscriber, 5.seconds)
+    val subscriber = eventService.defaultSubscriber
     subscriber.subscribe(Set(eventKey)).to(Sink.foreach[Event](e ⇒ queue.enqueue(eventToSanitizedJson(e)))).run()
+
     Thread.sleep(500)
 
     // publish same event every 300 millis for 2 seconds and starts with 0th sec, which results into publishing 7 events
@@ -174,8 +174,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
   // DEOPSCSW-433: [Event Cli] Subscribe command
   test("should be able to subscribe and get json output to event key") {
 
-    implicit val mat: Materializer    = actorRuntime.mat
-    implicit val ec: ExecutionContext = actorRuntime.ec
+    implicit val mat: Materializer = actorRuntime.mat
 
     val eventGenerator = new EventGenerator(EventName("system_1"))
     import eventGenerator._
@@ -191,7 +190,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
     Thread.sleep(1000)
 
     cancellable.cancel()
-    subscriptionF.map(_.unsubscribe())
+    subscriptionF.unsubscribe()
 
     logBuffer shouldEqualContentsOf "json/entire_events.txt"
   }
@@ -200,8 +199,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
   test("should be able to subscribe to event key and get oneline output") {
     import cliWiring._
 
-    implicit val mat: Materializer    = actorRuntime.mat
-    implicit val ec: ExecutionContext = actorRuntime.ec
+    implicit val mat: Materializer = actorRuntime.mat
 
     val eventGenerator = new EventGenerator(EventName("system_2"))
     import eventGenerator._
@@ -217,7 +215,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
 
     Thread.sleep(1000)
     cancellable.cancel()
-    subscriptionF.map(_.unsubscribe())
+    subscriptionF.unsubscribe()
 
     logBuffer shouldEqualContentsOf "oneline/entire_events.txt"
   }
@@ -226,8 +224,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
   test("should be able to subscribe to event key using terse mode and get oneline output") {
     import cliWiring._
 
-    implicit val mat: Materializer    = actorRuntime.mat
-    implicit val ec: ExecutionContext = actorRuntime.ec
+    implicit val mat: Materializer = actorRuntime.mat
 
     val eventGenerator = new EventGenerator(EventName("system_3"))
     import eventGenerator._
@@ -243,7 +240,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
 
     Thread.sleep(1000)
     cancellable.cancel()
-    subscriptionF.map(_.unsubscribe())
+    subscriptionF.unsubscribe()
 
     logBuffer shouldEqualContentsOf "terse/entire_events.txt"
   }

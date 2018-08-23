@@ -1,8 +1,10 @@
 package csw.services.event
 
+import akka.Done
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors, MutableBehavior}
 import akka.actor.typed.{ActorRef, Behavior}
 import akka.stream.Materializer
+import akka.stream.scaladsl.Sink
 import csw.messages.TopLevelActorMessage
 import csw.messages.events.{Event, EventKey, EventName}
 import csw.messages.location.AkkaLocation
@@ -18,10 +20,10 @@ class EventSubscribeExamples(
     hcd: AkkaLocation
 )(implicit ec: ExecutionContext, mat: Materializer) {
 
-  def callback(): Future[Unit] =
+  def callback(): EventSubscription =
     //#with-callback
-    async {
-      val subscriber = await(eventService.defaultSubscriber)
+    {
+      val subscriber = eventService.defaultSubscriber
 
       subscriber.subscribeCallback(
         Set(EventKey(hcd.prefix, EventName("filter_wheel"))),
@@ -31,8 +33,8 @@ class EventSubscribeExamples(
   //#with-callback
 
   //#with-async-callback
-  def subscribe(): Future[Unit] = async {
-    val subscriber = await(eventService.defaultSubscriber)
+  def subscribe(): EventSubscription = {
+    val subscriber = eventService.defaultSubscriber
     subscriber.subscribeAsync(Set(EventKey(hcd.prefix, EventName("filter_wheel"))), callback)
   }
 
@@ -43,8 +45,8 @@ class EventSubscribeExamples(
   //#with-async-callback
 
   //#with-actor-ref
-  def subscribe(ctx: ActorContext[TopLevelActorMessage]): Future[Unit] = async {
-    val subscriber                    = await(eventService.defaultSubscriber)
+  def subscribe(ctx: ActorContext[TopLevelActorMessage]): EventSubscription = {
+    val subscriber                    = eventService.defaultSubscriber
     val eventHandler: ActorRef[Event] = ctx.spawnAnonymous(EventHandler.make())
 
     subscriber.subscribeActorRef(Set(EventKey(hcd.prefix, EventName("filter_wheel"))), eventHandler)
@@ -62,19 +64,23 @@ class EventSubscribeExamples(
   }
   //#with-actor-ref
 
-  def source(): Unit =
+  def source(): EventSubscription =
     //#with-source
-    async {
-      val subscriber = await(eventService.defaultSubscriber)
+    {
+      val subscriber = eventService.defaultSubscriber
 
-      subscriber.subscribe(Set(EventKey(hcd.prefix, EventName("filter_wheel")))).runForeach(event ⇒ { /*do something*/ })
+      subscriber
+        .subscribe(Set(EventKey(hcd.prefix, EventName("filter_wheel"))))
+        .to(Sink.foreach { event => /*do something*/
+        })
+        .run()
     }
   //#with-source
 
-  def subscribeWithRate(): Future[EventSubscription] =
+  def subscribeWithRate(): EventSubscription =
     //#with-subscription-mode
-    async {
-      val subscriber = await(eventService.defaultSubscriber)
+    {
+      val subscriber = eventService.defaultSubscriber
 
       subscriber.subscribeCallback(
         Set(EventKey(hcd.prefix, EventName("filter_wheel"))),
@@ -85,10 +91,10 @@ class EventSubscribeExamples(
     }
   //#with-subscription-mode
 
-  def subscribeToSubsystemEvents(subsystem: Subsystem): Future[EventSubscription] =
+  def subscribeToSubsystemEvents(subsystem: Subsystem): EventSubscription =
     // #psubscribe
-    async {
-      val subscriber = await(eventService.defaultSubscriber)
+    {
+      val subscriber = eventService.defaultSubscriber
       subscriber.pSubscribeCallback(subsystem, "*", event ⇒ { /*do something*/ })
     }
   // #psubscribe
