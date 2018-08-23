@@ -21,7 +21,6 @@ private class RedisSubscriptionImpl[K](
    * @return a future which completes when the unsubscribe is completed
    */
   def unsubscribe(): Future[Done] = async {
-//    println(s"Unsubscribing for keys=$keys")
     await(connectedF)
     await(redisReactiveApi.flatMap(_.unsubscribe(keys))) // unsubscribe is no-op
     await(redisReactiveApi.flatMap(_.quit()))
@@ -33,9 +32,5 @@ private class RedisSubscriptionImpl[K](
    * To check if the underlying subscription is ready to emit elements
    * @return a future which completes when the underlying subscription is ready to emit elements
    */
-  def ready(): Future[Done] =
-    async {
-      await(connectedF)
-      Done
-    }
+  def ready(): Future[Done] = connectedF.map(_ ⇒ Done)
 }

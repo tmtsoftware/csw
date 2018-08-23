@@ -32,8 +32,6 @@ trait StatusServiceModule extends StatusService {
     shelveTimeoutActorFactory.make(key ⇒ unshelve(key, cancelShelveTimeout = false), settings.shelveTimeoutHourOfDay)(actorSystem)
 
   final override def getStatus(key: AlarmKey): Future[AlarmStatus] = async {
-    val statusApi = statusApiF
-
     log.debug(s"Getting status for alarm [${key.value}]")
     await(statusApi.get(key)).getOrElse(logAndThrow(KeyNotFoundException(key)))
   }
@@ -44,8 +42,7 @@ trait StatusServiceModule extends StatusService {
     log.debug(s"Reset alarm [${key.value}]")
 
     val currentSeverity = await(getCurrentSeverity(key))
-
-    val originalStatus = await(getStatus(key))
+    val originalStatus  = await(getStatus(key))
 
     val acknowledgedStatus = originalStatus.copy(
       //reset operation acknowledges alarm
@@ -141,7 +138,7 @@ trait StatusServiceModule extends StatusService {
 
   private[alarm] def setStatus(alarmKey: AlarmKey, alarmStatus: AlarmStatus): Future[Unit] = {
     log.info(s"Updating alarm status [$alarmStatus] in alarm store")
-    statusApiF.set(alarmKey, alarmStatus)
+    statusApi.set(alarmKey, alarmStatus)
   }
 
   private def unshelve(key: AlarmKey, cancelShelveTimeout: Boolean): Future[Unit] = async {

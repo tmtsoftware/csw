@@ -37,8 +37,6 @@ trait SeverityServiceModule extends SeverityService {
 
   final override def getAggregatedSeverity(key: Key): Future[FullAlarmSeverity] = async {
     log.debug(s"Get aggregated severity for alarm [${key.value}]")
-    val metadataApi = metadataApiF
-    val severityApi = severityApiF
 
     val metadataKeys = await(metadataApi.keys(key))
     if (metadataKeys.isEmpty) logAndThrow(KeyNotFoundException(key))
@@ -72,8 +70,6 @@ trait SeverityServiceModule extends SeverityService {
 
   final override def getCurrentSeverity(key: AlarmKey): Future[FullAlarmSeverity] = async {
     log.debug(s"Getting severity for alarm [${key.value}]")
-    val metadataApi = metadataApiF
-    val severityApi = severityApiF
 
     if (await(metadataApi.exists(key))) await(severityApi.get(key)).getOrElse(Disconnected)
     else logAndThrow(KeyNotFoundException(key))
@@ -91,9 +87,6 @@ trait SeverityServiceModule extends SeverityService {
     if (!alarm.allSupportedSeverities.contains(severity))
       logAndThrow(InvalidSeverityException(key, alarm.allSupportedSeverities, severity))
 
-    // get the current severity of the alarm
-    val severityApi = severityApiF
-
     // set the severity of the alarm so that it does not transition to `Disconnected` state
     log.info(s"Updating current severity [${severity.name}] in alarm store")
     await(severityApi.setex(key, settings.ttlInSeconds, severity))
@@ -105,7 +98,7 @@ trait SeverityServiceModule extends SeverityService {
   // message: event type as value: e.g. set, expire, expired
   private[alarm] def subscribeAggregatedSeverity(key: Key): Source[FullAlarmSeverity, AlarmSubscription] = {
     import AlarmCodec._
-    val redisStreamApi     = redisKeySpaceApi(severityApiF) // create new connection for every client
+    val redisStreamApi     = redisKeySpaceApi(severityApi) // create new connection for every client
     val keys: List[String] = List(SeverityKey.fromAlarmKey(key).value)
 
     redisStreamApi

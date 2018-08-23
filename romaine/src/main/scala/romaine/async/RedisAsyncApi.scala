@@ -9,21 +9,16 @@ import scala.compat.java8.FutureConverters.CompletionStageOps
 import scala.concurrent.{ExecutionContext, Future}
 
 class RedisAsyncApi[K, V](redisAsyncCommands: Future[RedisAsyncCommands[K, V]])(implicit ec: ExecutionContext) {
-  def set(key: K, value: V): Future[Unit] = {
+  def set(key: K, value: V): Future[Unit] =
     redisAsyncCommands.flatMap(_.set(key, value).toScala.failWith(s"Redis 'SET' operation failed for [key:$key value:$value]"))
-  }
 
-  def mset(map: Map[K, V]): Future[Unit] = {
-    redisAsyncCommands.flatMap {
-      _.mset(map.asJava).toScala.failWith(s"Redis 'MSET' operation failed for [map: $map]")
-    }
-  }
+  def mset(map: Map[K, V]): Future[Unit] =
+    redisAsyncCommands.flatMap(_.mset(map.asJava).toScala.failWith(s"Redis 'MSET' operation failed for [map: $map]"))
 
-  def setex(key: K, seconds: Long, value: V): Future[Unit] = {
-    redisAsyncCommands.flatMap {
+  def setex(key: K, seconds: Long, value: V): Future[Unit] =
+    redisAsyncCommands.flatMap(
       _.setex(key, seconds, value).toScala.failWith(s"Redis 'SETEX' operation failed for [key: $key, value: $value]")
-    }
-  }
+    )
 
   def get(key: K): Future[Option[V]] = redisAsyncCommands.flatMap(_.get(key).toScala.map(Option(_)))
 

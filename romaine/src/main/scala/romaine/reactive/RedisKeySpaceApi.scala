@@ -42,7 +42,7 @@ class RedisKeySpaceApi[K: RomaineStringCodec, V: RomaineStringCodec](
       keys: List[String],
       overflowStrategy: OverflowStrategy,
       reducer: Iterable[Option[V]] => V
-  ): Source[V, RedisSubscription] = {
+  ): Source[V, RedisSubscription] =
     watchKeyspaceValue(keys, overflowStrategy)
       .scan(Map.empty[K, Option[V]]) {
         case (data, RedisResult(key, value)) ⇒ data + (key → value)
@@ -50,7 +50,6 @@ class RedisKeySpaceApi[K: RomaineStringCodec, V: RomaineStringCodec](
       .drop(1) // drop the seed (empty map) emitted by scan above
       .map(data => reducer(data.values))
       .distinctUntilChanged
-  }
 
   def watchKeyspaceField[TField](
       keys: List[String],
@@ -70,14 +69,13 @@ class RedisKeySpaceApi[K: RomaineStringCodec, V: RomaineStringCodec](
       overflowStrategy: OverflowStrategy,
       fieldMapper: V => TField,
       reducer: Iterable[Option[TField]] => TField
-  ): Source[TField, RedisSubscription] = {
+  ): Source[TField, RedisSubscription] =
     watchKeyspaceField(keys, overflowStrategy, fieldMapper)
       .scan(Map.empty[K, Option[TField]]) {
         case (data, RedisResult(key, value)) ⇒ data + (key → value)
       }
       .map(data => reducer(data.values))
       .distinctUntilChanged
-  }
 }
 //todo: support for delete and expired, etc
 //todo: RedisWatchSubscription try to remove type parameter

@@ -12,8 +12,5 @@ case class SetSeverityAckStatusTestCase(
     newAckStatus: AcknowledgementStatus
 ) {
   def name: String =
-    s"""ack status should transition from $oldAckStatus to $newAckStatus
-       |when severity changes from $oldSeverity to $newSeverity &
-       |autoAck=$isAutoAcknowledgeable
-       |""".stripMargin
+    s"ack status should transition from $oldAckStatus to $newAckStatus when severity changes from $oldSeverity to $newSeverity & autoAck=$isAutoAcknowledgeable"
 }
