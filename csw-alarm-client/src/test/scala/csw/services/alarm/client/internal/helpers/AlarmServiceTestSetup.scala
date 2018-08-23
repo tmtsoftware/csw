@@ -1,4 +1,5 @@
 package csw.services.alarm.client.internal.helpers
+
 import akka.actor.testkit.typed.scaladsl.TestInbox
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.{typed, ActorSystem}
@@ -57,10 +58,10 @@ class AlarmServiceTestSetup
   import csw.services.alarm.client.internal.AlarmCodec._
 
   val connsFactory: RedisConnectionsFactory                      = new RedisConnectionsFactory(resolver, alarmServer, new RomaineFactory(redisClient))
-  val testMetadataApi: RedisAsyncApi[MetadataKey, AlarmMetadata] = connsFactory.asyncApi[MetadataKey, AlarmMetadata].await
+  val testMetadataApi: RedisAsyncApi[MetadataKey, AlarmMetadata] = connsFactory.asyncApi[MetadataKey, AlarmMetadata]
   val testSeverityApi: RedisAsyncApi[SeverityKey, FullAlarmSeverity] =
-    connsFactory.asyncApi[SeverityKey, FullAlarmSeverity].await
-  val testStatusApi: RedisAsyncApi[StatusKey, AlarmStatus] = connsFactory.asyncApi[StatusKey, AlarmStatus].await
+    connsFactory.asyncApi[SeverityKey, FullAlarmSeverity]
+  val testStatusApi: RedisAsyncApi[StatusKey, AlarmStatus] = connsFactory.asyncApi[StatusKey, AlarmStatus]
 
   override protected def afterAll(): Unit = {
     redisClient.shutdown()

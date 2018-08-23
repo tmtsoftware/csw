@@ -13,19 +13,27 @@ import scala.async.Async._
 import scala.util.control.NonFatal
 
 class RomaineFactory(redisClient: RedisClient)(implicit val ec: ExecutionContext) {
-  def redisAsyncApi[K: RomaineByteCodec, V: RomaineByteCodec](redisURI: RedisURI): Future[RedisAsyncApi[K, V]] = {
-    redisClient
-      .connectAsync(new RomaineRedisCodec[K, V], redisURI)
-      .toScala
-      .map(connection => new RedisAsyncApi(connection.async()))
+  def redisAsyncApi[K: RomaineByteCodec, V: RomaineByteCodec](redisURIF: Future[RedisURI]): RedisAsyncApi[K, V] = {
+    new RedisAsyncApi(
+      Async.async {
+        val redisURI = await(redisURIF)
+        val connectionF = init { () =>
+          redisClient.connectAsync(new RomaineRedisCodec[K, V], redisURI).toScala
+        }
+        await(connectionF).async()
+      }
+    )
   }
 
-  def redisSubscriptionApi[K: RomaineByteCodec, V: RomaineByteCodec](redisURI: Future[RedisURI]): RedisSubscriptionApi[K, V] = {
+  def redisSubscriptionApi[K: RomaineByteCodec, V: RomaineByteCodec](redisURIF: Future[RedisURI]): RedisSubscriptionApi[K, V] = {
     new RedisSubscriptionApi(
       () =>
         Async.async {
-          val connectionF = redisClient.connectPubSubAsync(new RomaineRedisCodec[K, V], await(redisURI)).toScala
-          await(init(() => connectionF)).reactive()
+          val redisURI = await(redisURIF)
+          val connectionF = init { () =>
+            redisClient.connectPubSubAsync(new RomaineRedisCodec[K, V], redisURI).toScala
+          }
+          await(connectionF).reactive()
       }
     )
   }
@@ -35,5 +43,4 @@ class RomaineFactory(redisClient: RedisClient)(implicit val ec: ExecutionContext
       case NonFatal(ex) ⇒ throw RedisServerNotAvailable(ex.getCause)
     }
   }
-
 }

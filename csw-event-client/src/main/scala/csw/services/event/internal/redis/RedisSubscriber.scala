@@ -20,7 +20,6 @@ import romaine.reactive.{RedisSubscription, RedisSubscriptionApi}
 import scala.async.Async._
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.control.NonFatal
 
 /**
  * An implementation of [[csw.services.event.api.scaladsl.EventSubscriber]] API which uses Redis as the provider for publishing
@@ -46,8 +45,8 @@ class RedisSubscriber(redisURI: Future[RedisURI], redisClient: RedisClient)(
   // create underlying connection asynchronously and obtain an instance of RedisAsyncCommands to perform
   // redis operations asynchronously. This instance of RedisAsyncCommands is used for performing `get`
   // operations on Redis asynchronously
-  private lazy val asyncConnectionF: Future[RedisAsyncApi[EventKey, Event]] =
-    connection(redisURI.flatMap(romaineFactory.redisAsyncApi[EventKey, Event]))
+  private lazy val asyncConnectionF: RedisAsyncApi[EventKey, Event] =
+    romaineFactory.redisAsyncApi[EventKey, Event](redisURI)
 
   // create underlying connection asynchronously and obtain an instance of RedisPubSubReactiveCommands to perform
   // redis pub sub operations using a `reactor` based reactive API provided by lettuce Redis driver.
@@ -118,7 +117,7 @@ class RedisSubscriber(redisURI: Future[RedisURI], redisClient: RedisClient)(
 
   override def get(eventKey: EventKey): Future[Event] = async {
     log.info(s"Fetching event key: $eventKey")
-    val commands = await(asyncConnectionF)
+    val commands = asyncConnectionF
     val event    = await(commands.get(eventKey))
     event.getOrElse(Event.invalidEvent(eventKey))
   }
@@ -141,6 +140,4 @@ class RedisSubscriber(redisURI: Future[RedisURI], redisClient: RedisClient)(
     }
   }
 
-  private def connection[T](commands: ⇒ Future[T]): Future[T] =
-    Future.unit.flatMap(_ ⇒ commands).recover { case NonFatal(ex) ⇒ throw EventServerNotAvailable(ex.getCause) }
 }

@@ -9,7 +9,7 @@ import romaine.async.RedisAsyncApi
 import romaine.codec.RomaineStringCodec
 import romaine.reactive.{RedisKeySpaceApi, RedisSubscriptionApi}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class RedisConnectionsFactory(alarmServiceResolver: AlarmServiceResolver, masterId: String, romaineFactory: RomaineFactory)(
     implicit val ec: ExecutionContext
@@ -17,12 +17,11 @@ class RedisConnectionsFactory(alarmServiceResolver: AlarmServiceResolver, master
   import csw.services.alarm.client.internal.AlarmCodec._
   import romaine.codec.RomaineStringCodec.stringRomaineCodec
 
-  lazy val metadataApiF: Future[RedisAsyncApi[MetadataKey, AlarmMetadata]]     = asyncApi
-  lazy val severityApiF: Future[RedisAsyncApi[SeverityKey, FullAlarmSeverity]] = asyncApi
-  lazy val statusApiF: Future[RedisAsyncApi[StatusKey, AlarmStatus]]           = asyncApi
+  lazy val metadataApiF: RedisAsyncApi[MetadataKey, AlarmMetadata]     = asyncApi
+  lazy val severityApiF: RedisAsyncApi[SeverityKey, FullAlarmSeverity] = asyncApi
+  lazy val statusApiF: RedisAsyncApi[StatusKey, AlarmStatus]           = asyncApi
 
-  def asyncApi[K: RomaineStringCodec, V: RomaineStringCodec]: Future[RedisAsyncApi[K, V]] =
-    redisURI.flatMap(redisURI => romaineFactory.redisAsyncApi[K, V](redisURI))
+  def asyncApi[K: RomaineStringCodec, V: RomaineStringCodec]: RedisAsyncApi[K, V] = romaineFactory.redisAsyncApi[K, V](redisURI)
 
   def subscriptionApi[K: RomaineStringCodec, V: RomaineStringCodec]: RedisSubscriptionApi[K, V] =
     romaineFactory.redisSubscriptionApi[K, V](redisURI)

@@ -22,7 +22,7 @@ trait MetadataServiceModule extends MetadataService {
 
   final override def activate(key: AlarmKey): Future[Unit] = async {
     log.debug(s"Activate alarm [${key.value}]")
-    val metadataApi = await(metadataApiF)
+    val metadataApi = metadataApiF
 
     val metadata = await(metadataApi.get(key)).getOrElse(logAndThrow(KeyNotFoundException(key)))
     if (!metadata.isActive) await(metadataApi.set(key, metadata.copy(activationStatus = Active)))
@@ -30,7 +30,7 @@ trait MetadataServiceModule extends MetadataService {
 
   final override def deactivate(key: AlarmKey): Future[Unit] = async {
     log.debug(s"Deactivate alarm [${key.value}]")
-    val metadataApi = await(metadataApiF)
+    val metadataApi = metadataApiF
 
     val metadata = await(metadataApi.get(key)).getOrElse(logAndThrow(KeyNotFoundException(key)))
     if (metadata.isActive) await(metadataApi.set(key, metadata.copy(activationStatus = Inactive)))
@@ -38,14 +38,14 @@ trait MetadataServiceModule extends MetadataService {
 
   final override def getMetadata(key: AlarmKey): Future[AlarmMetadata] = async {
     log.debug(s"Getting metadata for alarm [${key.value}]")
-    val metadataApi = await(metadataApiF)
+    val metadataApi = metadataApiF
 
     await(metadataApi.get(key)).getOrElse(logAndThrow(KeyNotFoundException(key)))
   }
 
   final override def getMetadata(key: Key): Future[List[AlarmMetadata]] = async {
     log.debug(s"Getting metadata for alarms matching [${key.value}]")
-    val metadataApi = await(metadataApiF)
+    val metadataApi = metadataApiF
 
     val metadataKeys = await(metadataApi.keys(key))
     if (metadataKeys.isEmpty) logAndThrow(KeyNotFoundException(key))
@@ -67,8 +67,8 @@ trait MetadataServiceModule extends MetadataService {
     log.info(s"Feeding alarm metadata in alarm store for following alarms: [${alarms.map(_.alarmKey.value).mkString("\n")}]")
     Future.sequence(
       List(
-        metadataApiF.flatMap(_.mset(metadataMap)),
-        statusApiF.flatMap(_.mset(statusMap))
+        metadataApiF.mset(metadataMap),
+        statusApiF.mset(statusMap)
       )
     )
   }
@@ -78,15 +78,15 @@ trait MetadataServiceModule extends MetadataService {
     Future
       .sequence(
         List(
-          metadataApiF.flatMap(_.pdel(GlobalKey)),
-          statusApiF.flatMap(_.pdel(GlobalKey)),
-          severityApiF.flatMap(_.pdel(GlobalKey))
+          metadataApiF.pdel(GlobalKey),
+          statusApiF.pdel(GlobalKey),
+          severityApiF.pdel(GlobalKey)
         )
       )
   }
 
   private[alarm] def setMetadata(alarmKey: AlarmKey, alarmMetadata: AlarmMetadata): Future[Unit] =
-    metadataApiF.flatMap(_.set(alarmKey, alarmMetadata))
+    metadataApiF.set(alarmKey, alarmMetadata)
 
   private def logAndThrow(runtimeException: RuntimeException) = {
     log.error(runtimeException.getMessage, ex = runtimeException)

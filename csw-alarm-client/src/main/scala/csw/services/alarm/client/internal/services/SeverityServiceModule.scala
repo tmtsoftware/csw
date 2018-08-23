@@ -37,8 +37,8 @@ trait SeverityServiceModule extends SeverityService {
 
   final override def getAggregatedSeverity(key: Key): Future[FullAlarmSeverity] = async {
     log.debug(s"Get aggregated severity for alarm [${key.value}]")
-    val metadataApi = await(metadataApiF)
-    val severityApi = await(severityApiF)
+    val metadataApi = metadataApiF
+    val severityApi = severityApiF
 
     val metadataKeys = await(metadataApi.keys(key))
     if (metadataKeys.isEmpty) logAndThrow(KeyNotFoundException(key))
@@ -72,8 +72,8 @@ trait SeverityServiceModule extends SeverityService {
 
   final override def getCurrentSeverity(key: AlarmKey): Future[FullAlarmSeverity] = async {
     log.debug(s"Getting severity for alarm [${key.value}]")
-    val metadataApi = await(metadataApiF)
-    val severityApi = await(severityApiF)
+    val metadataApi = metadataApiF
+    val severityApi = severityApiF
 
     if (await(metadataApi.exists(key))) await(severityApi.get(key)).getOrElse(Disconnected)
     else logAndThrow(KeyNotFoundException(key))
@@ -92,7 +92,7 @@ trait SeverityServiceModule extends SeverityService {
       logAndThrow(InvalidSeverityException(key, alarm.allSupportedSeverities, severity))
 
     // get the current severity of the alarm
-    val severityApi = await(severityApiF)
+    val severityApi = severityApiF
 
     // set the severity of the alarm so that it does not transition to `Disconnected` state
     log.info(s"Updating current severity [${severity.name}] in alarm store")
@@ -105,15 +105,15 @@ trait SeverityServiceModule extends SeverityService {
   // message: event type as value: e.g. set, expire, expired
   private[alarm] def subscribeAggregatedSeverity(key: Key): Source[FullAlarmSeverity, AlarmSubscription] = {
     import AlarmCodec._
-    val redisStreamApi     = severityApiF.map(severityApi ⇒ redisKeySpaceApi(severityApi)) // create new connection for every client
+    val redisStreamApi     = redisKeySpaceApi(severityApiF) // create new connection for every client
     val keys: List[String] = List(SeverityKey.fromAlarmKey(key).value)
 
-    Source
-      .fromFutureSource(redisStreamApi.map(_.watchKeyspaceValueAggregation(keys, OverflowStrategy.LATEST, aggregratorByMax)))
+    redisStreamApi
+      .watchKeyspaceValueAggregation(keys, OverflowStrategy.LATEST, aggregratorByMax)
       .mapMaterializedValue { mat =>
         new AlarmSubscription {
-          override def unsubscribe(): Future[Unit] = mat.flatMap(_.unsubscribe().map(_ ⇒ ()))
-          override def ready(): Future[Unit]       = mat.flatMap(_.ready().map(_ ⇒ ()))
+          override def unsubscribe(): Future[Unit] = mat.unsubscribe().map(_ ⇒ ())
+          override def ready(): Future[Unit]       = mat.ready().map(_ ⇒ ())
         }
       }
   }
