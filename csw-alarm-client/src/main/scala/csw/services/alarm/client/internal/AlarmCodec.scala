@@ -5,7 +5,7 @@ import romaine.codec.RomaineStringCodec
 import upickle.default._
 
 object AlarmCodec extends AlarmRW {
-  implicit def viaJsonCodec[A: ReadWriter]: RomaineStringCodec[A] = RomaineStringCodec.codec(
+  def viaJsonCodec[A: ReadWriter]: RomaineStringCodec[A] = RomaineStringCodec.codec(
     x ⇒ write(x),
     x ⇒ read[A](x)
   )

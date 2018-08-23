@@ -25,6 +25,7 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 import romaine.RomaineFactory
 import romaine.async.RedisAsyncApi
+import romaine.codec.RomaineStringCodec
 
 import scala.concurrent.ExecutionContext
 
@@ -56,6 +57,11 @@ class AlarmServiceTestSetup
   val jAlarmService: IAlarmService    = alarmServiceFactory.jMakeClientApi(hostname, sentinelPort, actorSystem).get()
 
   import csw.services.alarm.client.internal.AlarmCodec._
+
+  implicit val metadataRomainCodec: RomaineStringCodec[AlarmMetadata]     = viaJsonCodec
+  implicit val severityRomainCodec: RomaineStringCodec[FullAlarmSeverity] = viaJsonCodec
+  implicit val statusRomainCodec: RomaineStringCodec[AlarmStatus]         = viaJsonCodec
+
   val connsFactory: RedisConnectionsFactory                      = new RedisConnectionsFactory(resolver, alarmServer, new RomaineFactory(redisClient))
   val testMetadataApi: RedisAsyncApi[MetadataKey, AlarmMetadata] = connsFactory.asyncApi[MetadataKey, AlarmMetadata].await
   val testSeverityApi: RedisAsyncApi[SeverityKey, FullAlarmSeverity] =
