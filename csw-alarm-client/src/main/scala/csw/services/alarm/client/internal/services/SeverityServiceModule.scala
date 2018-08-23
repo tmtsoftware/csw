@@ -14,7 +14,6 @@ import csw.services.alarm.client.internal.commons.Settings
 import csw.services.alarm.client.internal.redis.RedisConnectionsFactory
 import csw.services.alarm.client.internal.{AlarmCodec, AlarmServiceLogger}
 import reactor.core.publisher.FluxSink.OverflowStrategy
-import romaine.reactive.RedisSubscription
 
 import scala.async.Async.{async, await}
 import scala.concurrent.Future
@@ -90,18 +89,15 @@ trait SeverityServiceModule extends SeverityService {
   // channel: e.g. __keyspace@0__:status.nfiraos.trombone.tromboneAxisLowLimitAlarm,
   // message: event type as value: e.g. set, expire, expired
   private[alarm] def subscribeAggregatedSeverity(key: Key): Source[FullAlarmSeverity, AlarmSubscription] = {
+    import AlarmCodec._
 
-    val severitySourceF: Future[Source[FullAlarmSeverity, RedisSubscription]] = async {
-      import AlarmCodec._
+    // create new connection for every client
+    val keySpaceApi = redisKeySpaceApi(severityApi)
 
-      // create new connection for every client
-      val keySpaceApi = redisKeySpaceApi(severityApi)
-
-      val activeMetadataKeys = await(getActiveAlarmKeys(key))
-      val activeSeverityKeys = activeMetadataKeys.map(SeverityKey.fromMetadataKey(_).value)
-
+    val severitySourceF = getActiveAlarmKeys(key).map(x ⇒ {
+      val activeSeverityKeys = x.map(SeverityKey.fromMetadataKey(_).value)
       keySpaceApi.watchKeyspaceValueAggregation(activeSeverityKeys, OverflowStrategy.LATEST, aggregratorByMax)
-    }
+    })
 
     Source
       .fromFutureSource(severitySourceF)
