@@ -26,17 +26,11 @@ object ZonedDateTimeExtensions {
      * Converts an integer to ZonedDateTime with UTC offset
      * @return next instant of time with hour set to given value
      */
-    def toHourOfDay: ZonedDateTime = {
-      hourOfDay(TWENTY_HOUR_FORMAT_MIN_LIMIT, TWENTY_HOUR_FORMAT_MAX_LIMIT)
-    }
+    def toHourOfDay: ZonedDateTime = hourOfDay(TWENTY_HOUR_FORMAT_MIN_LIMIT, TWENTY_HOUR_FORMAT_MAX_LIMIT)
 
-    def am: ZonedDateTime = {
-      hourOfDay(TWELVE_FORMAT_MIN_LIMIT, TWELVE_FORMAT_MAX_LIMIT)
-    }
+    def am: ZonedDateTime = hourOfDay(TWELVE_FORMAT_MIN_LIMIT, TWELVE_FORMAT_MAX_LIMIT)
 
-    def pm: ZonedDateTime = {
-      hourOfDay(TWELVE_FORMAT_MIN_LIMIT, TWELVE_FORMAT_MAX_LIMIT).plusHours(12)
-    }
+    def pm: ZonedDateTime = hourOfDay(TWELVE_FORMAT_MIN_LIMIT, TWELVE_FORMAT_MAX_LIMIT).plusHours(12)
 
     private def hourOfDay(minHour: Int, maxHour: Int) = {
       if (value < minHour || value > maxHour)
@@ -48,8 +42,7 @@ object ZonedDateTimeExtensions {
         .truncatedTo(ChronoUnit.DAYS)
         .withHour(value)
 
-      if (date.compareTo(currentDate) > 0)
-        date
+      if (date.compareTo(currentDate) > 0) date
       else date.plusDays(1)
     }
   }

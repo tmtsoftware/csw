@@ -37,13 +37,11 @@ class AlarmServiceFactory(redisClient: RedisClient = RedisClient.create()) {
 
   def makeClientApi(host: String, port: Int)(implicit system: ActorSystem): AlarmServiceImpl = makeAdminApi(host, port)
 
-  def jMakeClientApi(locationService: ILocationService, system: ActorSystem): JAlarmServiceImpl = {
+  def jMakeClientApi(locationService: ILocationService, system: ActorSystem): JAlarmServiceImpl =
     new JAlarmServiceImpl(makeAdminApi(locationService.asScala)(system))
-  }
 
-  def jMakeClientApi(host: String, port: Int, system: ActorSystem): JAlarmServiceImpl = {
+  def jMakeClientApi(host: String, port: Int, system: ActorSystem): JAlarmServiceImpl =
     new JAlarmServiceImpl(makeAdminApi(host, port)(system))
-  }
 
   /************ INTERNAL ************/
   private def alarmService(alarmServiceResolver: AlarmServiceResolver)(implicit system: ActorSystem, ec: ExecutionContext) = {

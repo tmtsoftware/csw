@@ -20,8 +20,10 @@ import scala.collection.mutable
 import scala.concurrent.duration.DurationDouble
 
 class ShelveTimeoutActorTest extends FunSuite with Matchers with ActorTestKit with Eventually {
-  override def config: Config       = ManualTime.config
-  val manualTime: ManualTime        = ManualTime()
+  override def config: Config           = ManualTime.config
+  val manualTime: ManualTime            = ManualTime()
+  implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 10.millis)
+
   val tromboneAxisHighLimitAlarmKey = AlarmKey(NFIRAOS, "trombone", "tromboneAxisHighLimitAlarm")
   val tcsAxisHighLimitAlarmKey      = AlarmKey(NFIRAOS, "tcs", "tromboneAxisHighLimitAlarm")
 
@@ -61,9 +63,7 @@ class ShelveTimeoutActorTest extends FunSuite with Matchers with ActorTestKit wi
     val duration = 8.toHourOfDay - ZonedDateTime.now(ZoneOffset.UTC)
     manualTime.timePasses(duration)
 
-    eventually(timeout = timeout(5.seconds), interval = interval(1.second)) {
-      unshelvedAlarms shouldEqual Set(tromboneAxisHighLimitAlarmKey, tcsAxisHighLimitAlarmKey)
-    }
+    eventually(unshelvedAlarms shouldEqual Set(tromboneAxisHighLimitAlarmKey, tcsAxisHighLimitAlarmKey))
   }
 
   test("should cancel scheduled shelve timeout") {
