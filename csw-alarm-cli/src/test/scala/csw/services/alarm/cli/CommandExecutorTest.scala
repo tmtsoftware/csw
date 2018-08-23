@@ -13,6 +13,7 @@ import csw.services.alarm.api.models.AlarmStatus
 import csw.services.alarm.api.models.FullAlarmSeverity.Disconnected
 import csw.services.alarm.api.models.Key.{AlarmKey, GlobalKey}
 import csw.services.alarm.api.models.ShelveStatus.{Shelved, Unshelved}
+import csw.services.alarm.api.scaladsl.AlarmSubscription
 import csw.services.alarm.cli.args.Options
 import csw.services.alarm.cli.utils.IterableExtensions.RichStringIterable
 import csw.services.config.api.models.ConfigData
@@ -364,7 +365,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
   }
 
   // DEOPSCSW-467: Monitor alarm severities in the alarm store for a single alarm, component, subsystem, or all
-  ignore("should subscribe severity of alarm") {
+  test("should subscribe severity of alarm") {
     val cmd = Options(
       cmd = "severity",
       subCmd = "subscribe",
@@ -373,7 +374,8 @@ class CommandExecutorTest extends AlarmCliTestSetup {
       maybeAlarmName = Some(tromboneAxisHighLimitKey.name)
     )
 
-    commandExecutor.execute(cmd)
+    val subscription = commandExecutor.execute(cmd).asInstanceOf[AlarmSubscription]
+    Thread.sleep(1000) //wait for subscription to finish
 
     setSeverity(tromboneAxisHighLimitKey, Major).futureValue
     setSeverity(tromboneAxisHighLimitKey, Okay).futureValue
@@ -382,6 +384,8 @@ class CommandExecutorTest extends AlarmCliTestSetup {
       s"Severity of Alarm ${tromboneAxisHighLimitKey.value}: ${Major.toString}",
       s"Severity of Alarm ${tromboneAxisHighLimitKey.value}: ${Okay.toString}"
     )
+
+    subscription.unsubscribe()
   }
 
   // -------------------------------------------Health--------------------------------------------
@@ -442,7 +446,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
   }
 
   // DEOPSCSW-479: Subscribe to health changes of component/subsystem/all alarms using CLI Interface
-  ignore("should subscribe health of subsystem/component/alarm") {
+  test("should subscribe health of subsystem/component/alarm") {
     val cmd = Options(
       cmd = "health",
       subCmd = "subscribe",
@@ -451,7 +455,9 @@ class CommandExecutorTest extends AlarmCliTestSetup {
       maybeAlarmName = Some(tromboneAxisHighLimitKey.name)
     )
 
-    commandExecutor.execute(cmd)
+    val subscription = commandExecutor.execute(cmd).asInstanceOf[AlarmSubscription]
+    Thread.sleep(1000) //wait for subscription to finish
+
     setSeverity(tromboneAxisHighLimitKey, Major).futureValue
     setSeverity(tromboneAxisHighLimitKey, Okay).futureValue
 
@@ -459,5 +465,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
       s"Health of Alarm ${tromboneAxisHighLimitKey.value}: ${Ill.toString}",
       s"Health of Alarm ${tromboneAxisHighLimitKey.value}: ${Good.toString}"
     )
+
+    subscription.unsubscribe()
   }
 }

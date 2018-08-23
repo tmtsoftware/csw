@@ -5,7 +5,7 @@ import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
 
 class CommandExecutor(alarmAdminClient: AlarmAdminClient) {
-  def execute(options: Options): Unit = {
+  def execute(options: Options): Any = {
     options.cmd match {
       case "init"          ⇒ await(alarmAdminClient.init(options))
       case "list"          ⇒ await(alarmAdminClient.list(options))

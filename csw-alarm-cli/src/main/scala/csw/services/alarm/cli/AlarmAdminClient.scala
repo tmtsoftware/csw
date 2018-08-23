@@ -1,6 +1,7 @@
 package csw.services.alarm.cli
 import akka.Done
 import akka.actor.CoordinatedShutdown
+import csw.services.alarm.api.scaladsl.AlarmSubscription
 import csw.services.alarm.cli.args.Options
 import csw.services.alarm.cli.extensions.RichFutureExt.RichFuture
 import csw.services.alarm.cli.utils.{ConfigUtils, Formatter}
@@ -36,62 +37,47 @@ class AlarmAdminClient(
   def setSeverity(options: Options): Future[Unit] =
     alarmService.setSeverity(options.alarmKey, options.severity.get).transformWithSideEffect(printLine)
 
-  def subscribeSeverity(options: Options): Future[Unit] = async {
+  def subscribeSeverity(options: Options): Future[AlarmSubscription] = async {
     val subscription = alarmService.subscribeAggregatedSeverityCallback(
       options.key,
       severity ⇒ printLine(Formatter.formatSeverity(options.key, severity))
     )
 
-    coordinatedShutdown.addTask(
-      CoordinatedShutdown.PhaseBeforeServiceUnbind,
-      "unsubscribe-stream"
-    )(() ⇒ subscription.unsubscribe().map(_ ⇒ Done))
+    coordinatedShutdown.addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "unsubscribe-stream") { () ⇒
+      subscription.unsubscribe().map(_ ⇒ Done)
+    }
+
+    subscription
   }
 
   def acknowledge(options: Options): Future[Unit] =
-    alarmService
-      .acknowledge(options.alarmKey)
-      .transformWithSideEffect(printLine)
+    alarmService.acknowledge(options.alarmKey).transformWithSideEffect(printLine)
 
   def unacknowledge(options: Options): Future[Unit] =
-    alarmService
-      .unacknowledge(options.alarmKey)
-      .transformWithSideEffect(printLine)
+    alarmService.unacknowledge(options.alarmKey).transformWithSideEffect(printLine)
 
   def activate(options: Options): Future[Unit] =
-    alarmService
-      .activate(options.alarmKey)
-      .transformWithSideEffect(printLine)
+    alarmService.activate(options.alarmKey).transformWithSideEffect(printLine)
 
   def deactivate(options: Options): Future[Unit] =
-    alarmService
-      .deactivate(options.alarmKey)
-      .transformWithSideEffect(printLine)
+    alarmService.deactivate(options.alarmKey).transformWithSideEffect(printLine)
 
   def shelve(options: Options): Future[Unit] =
-    alarmService
-      .shelve(options.alarmKey)
-      .transformWithSideEffect(printLine)
+    alarmService.shelve(options.alarmKey).transformWithSideEffect(printLine)
 
   def unshelve(options: Options): Future[Unit] =
-    alarmService
-      .unshelve(options.alarmKey)
-      .transformWithSideEffect(printLine)
+    alarmService.unshelve(options.alarmKey).transformWithSideEffect(printLine)
 
   def reset(options: Options): Future[Unit] =
-    alarmService
-      .reset(options.alarmKey)
-      .transformWithSideEffect(printLine)
+    alarmService.reset(options.alarmKey).transformWithSideEffect(printLine)
 
   def list(options: Options): Future[Unit] = async {
-    val adminService = alarmService
-    val metadataSet  = await(adminService.getMetadata(options.key)).sortBy(_.name)
+    val metadataSet = await(alarmService.getMetadata(options.key)).sortBy(_.name)
     printLine(Formatter.formatMetadataSet(metadataSet))
   }
 
   def status(options: Options): Future[Unit] = async {
-    val adminService = alarmService
-    val status       = await(adminService.getStatus(options.alarmKey))
+    val status = await(alarmService.getStatus(options.alarmKey))
     printLine(Formatter.formatStatus(status))
   }
 
@@ -100,7 +86,7 @@ class AlarmAdminClient(
     printLine(Formatter.formatHealth(options.key, health))
   }
 
-  def subscribeHealth(options: Options): Future[Unit] = async {
+  def subscribeHealth(options: Options): Future[AlarmSubscription] = async {
     alarmService.subscribeAggregatedHealthCallback(
       options.key,
       health ⇒ printLine(Formatter.formatHealth(options.key, health))

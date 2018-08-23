@@ -44,7 +44,7 @@ trait SeverityServiceModule extends SeverityService {
     if (metadataKeys.isEmpty) logAndThrow(KeyNotFoundException(key))
 
     val activeAlarms = await(metadataApi.mget(metadataKeys)).collect {
-      case x if x.getValue.isActive ⇒ x.getKey
+      case kv if kv.getValue.isActive ⇒ kv.getKey
     }
     if (activeAlarms.isEmpty) logAndThrow(InactiveAlarmException(key))
 
