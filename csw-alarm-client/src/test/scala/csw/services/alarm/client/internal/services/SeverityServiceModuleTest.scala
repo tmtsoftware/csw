@@ -3,17 +3,17 @@ package csw.services.alarm.client.internal.services
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import com.typesafe.config.ConfigFactory
-import csw.messages.params.models.Subsystem.{AOESW, BAD, LGSF, NFIRAOS, TCS}
+import csw.messages.params.models.Subsystem.{BAD, LGSF, NFIRAOS, TCS}
 import csw.services.alarm.api.exceptions.{InactiveAlarmException, InvalidSeverityException, KeyNotFoundException}
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
-import csw.services.alarm.api.models.ActivationStatus.Active
 import csw.services.alarm.api.models.AlarmSeverity._
 import csw.services.alarm.api.models.FullAlarmSeverity.Disconnected
 import csw.services.alarm.api.models.Key._
 import csw.services.alarm.api.models.ShelveStatus._
 import csw.services.alarm.api.models._
 import csw.services.alarm.client.internal.helpers.TestFutureExt.RichFuture
-import csw.services.alarm.client.internal.helpers.{AlarmServiceTestSetup, SetSeverityAcknowledgementTestCase, SetSeverityTestCase}
+import csw.services.alarm.client.internal.helpers.{AlarmServiceTestSetup, TestDataFeeder}
+import csw.services.alarm.client.internal.services.SeverityTestScenarios.{AckStatusTestCases, SeverityTestCases}
 
 import scala.concurrent.duration.DurationInt
 
@@ -21,7 +21,8 @@ class SeverityServiceModuleTest
     extends AlarmServiceTestSetup
     with SeverityServiceModule
     with MetadataServiceModule
-    with StatusServiceModule {
+    with StatusServiceModule
+    with TestDataFeeder {
 
   override protected def beforeEach(): Unit = {
     val validAlarmsConfig = ConfigFactory.parseResources("test-alarms/more-alarms.conf")
@@ -288,168 +289,35 @@ class SeverityServiceModuleTest
     alarmSubscription.unsubscribe().await
   }
 
-  val severityTestCases = List(
-    SetSeverityTestCase(
-      alarmKey = AlarmKey(AOESW, "test_component", "IsHigher_WasNotDisconnected"),
-      oldSeverity = Warning,
-      newSeverity = Critical,
-      expectedLatchedSeverity = Critical
-    ),
-    SetSeverityTestCase(
-      alarmKey = AlarmKey(AOESW, "test_component", "IsHigher_WasDisconnected"),
-      oldSeverity = Disconnected,
-      newSeverity = Critical,
-      expectedLatchedSeverity = Critical
-    ),
-    SetSeverityTestCase(
-      alarmKey = AlarmKey(AOESW, "test_component", "IsNotHigher_WasNotDisconnected"),
-      oldSeverity = Major,
-      newSeverity = Okay,
-      expectedLatchedSeverity = Major
-    ),
-    SetSeverityTestCase(
-      alarmKey = AlarmKey(AOESW, "test_component", "IsNotHigher_WasDisconnected"),
-      oldSeverity = Disconnected,
-      newSeverity = Okay,
-      expectedLatchedSeverity = Okay
-    )
-  )
-
   //DEOPSCSW-444 : Set severity api for component
-  severityTestCases.foreach(testCase => {
-    test(testCase.toString) {
-
+  SeverityTestCases.foreach { testCase ⇒
+    test(testCase.name) {
       feedTestData(testCase)
+      import testCase._
 
       //set severity to new Severity
-      val status = setSeverityAndGetStatus(testCase.alarmKey, testCase.newSeverity)
+      val status = setSeverityAndGetStatus(alarmKey, newSeverity)
 
       //get severity and assert
-      status.latchedSeverity shouldEqual testCase.expectedLatchedSeverity
+      status.latchedSeverity shouldEqual expectedLatchedSeverity
     }
-  })
-
-  val ackStatusTestCases = List(
-    // ====== Severity change but not to Okay =====
-    // AckStatus = Unacknowledged irrespective of AutoAck flag
-    SetSeverityAcknowledgementTestCase(
-      alarmKey = AlarmKey(AOESW, "test", "alarm1"),
-      oldSeverity = Critical,
-      newSeverity = Warning,
-      isAutoAcknowledgeable = true,
-      oldAckStatus = Unacknowledged,
-      newAckStatus = Unacknowledged
-    ),
-    SetSeverityAcknowledgementTestCase(
-      alarmKey = AlarmKey(AOESW, "test", "alarm2"),
-      oldSeverity = Critical,
-      newSeverity = Warning,
-      isAutoAcknowledgeable = true,
-      oldAckStatus = Acknowledged,
-      newAckStatus = Unacknowledged
-    ),
-    SetSeverityAcknowledgementTestCase(
-      alarmKey = AlarmKey(AOESW, "test", "alarm3"),
-      oldSeverity = Critical,
-      newSeverity = Warning,
-      isAutoAcknowledgeable = false,
-      oldAckStatus = Acknowledged,
-      newAckStatus = Unacknowledged
-    ),
-    // ====== Severity = Okay && AutoAck = true =====
-    // AckStatus = Acknowledged
-    SetSeverityAcknowledgementTestCase(
-      alarmKey = AlarmKey(AOESW, "test", "alarm4"),
-      oldSeverity = Disconnected,
-      newSeverity = Okay,
-      isAutoAcknowledgeable = true,
-      oldAckStatus = Unacknowledged,
-      newAckStatus = Acknowledged
-    ),
-    SetSeverityAcknowledgementTestCase(
-      alarmKey = AlarmKey(AOESW, "test", "alarm5"),
-      oldSeverity = Okay,
-      newSeverity = Okay,
-      isAutoAcknowledgeable = true,
-      oldAckStatus = Unacknowledged,
-      newAckStatus = Acknowledged
-    ),
-    // ====== Severity = Okay && AutoAck = false =====
-    // NewAckStatus = OldAckStatus
-    SetSeverityAcknowledgementTestCase(
-      alarmKey = AlarmKey(AOESW, "test", "alarm6"),
-      oldSeverity = Warning,
-      newSeverity = Okay,
-      isAutoAcknowledgeable = false,
-      oldAckStatus = Unacknowledged,
-      newAckStatus = Unacknowledged
-    ),
-    SetSeverityAcknowledgementTestCase(
-      alarmKey = AlarmKey(AOESW, "test", "alarm7"),
-      oldSeverity = Warning,
-      newSeverity = Okay,
-      isAutoAcknowledgeable = false,
-      oldAckStatus = Acknowledged,
-      newAckStatus = Acknowledged
-    )
-  )
+  }
 
   // DEOPSCSW-444 : Set severity api for component
   // DEOPSCSW-496 : Set Ack status on setSeverity
-  ackStatusTestCases.foreach(
-    testCase ⇒
-      test(testCase.name) {
-        feedTestData(testCase)
-        import testCase._
+  AckStatusTestCases.foreach { testCase ⇒
+    test(testCase.name) {
+      feedTestData(testCase)
+      import testCase._
 
-        getStatus(alarmKey).await.acknowledgementStatus shouldBe oldAckStatus
+      getStatus(alarmKey).await.acknowledgementStatus shouldBe oldAckStatus
 
-        //set severity to new Severity
-        val status = setSeverityAndGetStatus(alarmKey, newSeverity)
+      //set severity to new Severity
+      val status = setSeverityAndGetStatus(alarmKey, newSeverity)
 
-        //get severity and assert
-        status.acknowledgementStatus shouldEqual newAckStatus
+      //get severity and assert
+      status.acknowledgementStatus shouldEqual newAckStatus
     }
-  )
-
-  private def feedTestData(testCase: SetSeverityTestCase): Unit =
-    feedTestData(testCase.alarmKey, testCase.oldSeverity)
-
-  private def feedTestData(testCase: SetSeverityAcknowledgementTestCase): Unit =
-    feedTestData(
-      testCase.alarmKey,
-      testCase.oldSeverity,
-      isAutoAck = testCase.isAutoAcknowledgeable,
-      oldAckStatus = testCase.oldAckStatus
-    )
-
-  private def feedTestData(
-      alarmKey: AlarmKey,
-      oldSeverity: FullAlarmSeverity,
-      isAutoAck: Boolean = false,
-      oldAckStatus: AcknowledgementStatus = Acknowledged
-  ): Unit = {
-    // Adding metadata for corresponding test in alarm store
-    setMetadata(
-      alarmKey,
-      AlarmMetadata(
-        subsystem = AOESW,
-        component = "test",
-        name = alarmKey.name,
-        description = "for test purpose",
-        location = "testing",
-        AlarmType.Absolute,
-        Set(Okay, Warning, Major, Indeterminate, Critical),
-        probableCause = "test",
-        operatorResponse = "test",
-        isAutoAcknowledgeable = isAutoAck,
-        isLatchable = true,
-        activationStatus = Active
-      )
-    ).await
-
-    // Adding status for corresponding test in alarm store
-    setStatus(alarmKey, AlarmStatus().copy(acknowledgementStatus = oldAckStatus, latchedSeverity = oldSeverity)).await
   }
 
   private def setSeverityAndGetStatus(alarmKey: AlarmKey, alarmSeverity: AlarmSeverity): AlarmStatus = {

@@ -3,7 +3,7 @@ package csw.services.alarm.client.internal.helpers
 import csw.services.alarm.api.models.Key.AlarmKey
 import csw.services.alarm.api.models.{AcknowledgementStatus, AlarmSeverity, FullAlarmSeverity}
 
-case class SetSeverityAcknowledgementTestCase(
+case class SetSeverityAckStatusTestCase(
     alarmKey: AlarmKey,
     oldSeverity: FullAlarmSeverity,
     newSeverity: AlarmSeverity,

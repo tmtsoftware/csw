@@ -9,5 +9,5 @@ case class SetSeverityTestCase(
     newSeverity: AlarmSeverity,
     expectedLatchedSeverity: FullAlarmSeverity
 ) {
-  override def toString: String = alarmKey.name
+  def name: String = alarmKey.name
 }
