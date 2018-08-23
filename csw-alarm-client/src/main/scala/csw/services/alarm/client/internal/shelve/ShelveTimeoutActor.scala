@@ -28,7 +28,7 @@ object ShelveTimeoutActor {
 
         msg match {
           case ScheduleShelveTimeout(key) ⇒ scheduleShelveTimeout(key, shelveTimeoutHour, timerScheduler)
-          case CancelShelveTimeout(key)   ⇒ timerScheduler.cancel(key.name)
+          case CancelShelveTimeout(key)   ⇒ timerScheduler.cancel(key.value)
           case ShelveHasTimedOut(key)     ⇒ alarm.unshelve(key)
         }
         Behaviors.same
@@ -42,6 +42,6 @@ object ShelveTimeoutActor {
   ): Unit = {
     val currentTime   = ZonedDateTime.now(ZoneOffset.UTC)
     val shelveTimeout = shelveTimeoutHour.toHourOfDay - currentTime
-    timerScheduler.startSingleTimer(key.name, ShelveHasTimedOut(key), shelveTimeout)
+    timerScheduler.startSingleTimer(key.value, ShelveHasTimedOut(key), shelveTimeout)
   }
 }
