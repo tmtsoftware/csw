@@ -7,7 +7,13 @@ case class SetSeverityAcknowledgementTestCase(
     alarmKey: AlarmKey,
     oldSeverity: FullAlarmSeverity,
     newSeverity: AlarmSeverity,
-    expectedAckStatus: Option[AcknowledgementStatus] // None stands for No change in ack status
+    isAutoAcknowledgeable: Boolean,
+    oldAckStatus: AcknowledgementStatus,
+    newAckStatus: AcknowledgementStatus
 ) {
-  override def toString: String = alarmKey.name
+  def name: String =
+    s"""ack status should transition from $oldAckStatus to $newAckStatus
+       |when severity changes from $oldSeverity to $newSeverity &
+       |autoAck=$isAutoAcknowledgeable
+       |""".stripMargin
 }

@@ -1,9 +1,8 @@
 package csw.services.alarm.client.internal.helpers
-import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
-import akka.actor.testkit.typed.scaladsl.{TestInbox, TestProbe}
+import akka.actor.testkit.typed.scaladsl.TestInbox
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.{typed, ActorSystem}
+import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
 import csw.commons.redis.EmbeddedRedis
 import csw.commons.utils.SocketUtils.getFreePort

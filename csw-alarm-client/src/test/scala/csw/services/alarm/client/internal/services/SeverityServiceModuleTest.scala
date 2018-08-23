@@ -5,7 +5,7 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import com.typesafe.config.ConfigFactory
 import csw.messages.params.models.Subsystem.{AOESW, BAD, LGSF, NFIRAOS, TCS}
 import csw.services.alarm.api.exceptions.{InactiveAlarmException, InvalidSeverityException, KeyNotFoundException}
-import csw.services.alarm.api.models.AcknowledgementStatus.Unacknowledged
+import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
 import csw.services.alarm.api.models.ActivationStatus.Active
 import csw.services.alarm.api.models.AlarmSeverity._
 import csw.services.alarm.api.models.FullAlarmSeverity.Disconnected
@@ -76,7 +76,7 @@ class SeverityServiceModuleTest
     status1.alarmTime.get.time shouldEqual status.alarmTime.get.time
 
     val status2 = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Okay)
-    status2.acknowledgementStatus shouldBe Unacknowledged
+    status2.acknowledgementStatus shouldBe Acknowledged
     status2.latchedSeverity shouldBe Major
     status2.alarmTime.get.time shouldEqual status.alarmTime.get.time
   }
@@ -329,50 +329,86 @@ class SeverityServiceModuleTest
     }
   })
 
-  val ackTestCases = List(
+  val ackStatusTestCases = List(
+    // ====== Severity change but not to Okay =====
+    // AckStatus = Unacknowledged irrespective of AutoAck flag
     SetSeverityAcknowledgementTestCase(
-      alarmKey = AlarmKey(AOESW, "test", "LatchedSeverityChanged_TargetSeverityNotOkay"),
-      oldSeverity = Warning,
-      newSeverity = Critical,
-      expectedAckStatus = Some(Unacknowledged)
-    ),
-    SetSeverityAcknowledgementTestCase(
-      alarmKey = AlarmKey(AOESW, "test", "LatchedSeverityChanged_TargetSeverityOkay"),
-      oldSeverity = Disconnected,
-      newSeverity = Okay,
-      expectedAckStatus = None // no op
-    ),
-    SetSeverityAcknowledgementTestCase(
-      alarmKey = AlarmKey(AOESW, "test", "LatchedSeverityNotChanged_TargetSeverityOkay"),
-      oldSeverity = Warning,
-      newSeverity = Okay,
-      expectedAckStatus = None // no op
-    ),
-    SetSeverityAcknowledgementTestCase(
-      alarmKey = AlarmKey(AOESW, "test", "LatchedSeverityNotChanged_TargetSeverityNotOkay"),
+      alarmKey = AlarmKey(AOESW, "test", "alarm1"),
       oldSeverity = Critical,
       newSeverity = Warning,
-      expectedAckStatus = None // no op
+      isAutoAcknowledgeable = true,
+      oldAckStatus = Unacknowledged,
+      newAckStatus = Unacknowledged
+    ),
+    SetSeverityAcknowledgementTestCase(
+      alarmKey = AlarmKey(AOESW, "test", "alarm2"),
+      oldSeverity = Critical,
+      newSeverity = Warning,
+      isAutoAcknowledgeable = true,
+      oldAckStatus = Acknowledged,
+      newAckStatus = Unacknowledged
+    ),
+    SetSeverityAcknowledgementTestCase(
+      alarmKey = AlarmKey(AOESW, "test", "alarm3"),
+      oldSeverity = Critical,
+      newSeverity = Warning,
+      isAutoAcknowledgeable = false,
+      oldAckStatus = Acknowledged,
+      newAckStatus = Unacknowledged
+    ),
+    // ====== Severity = Okay && AutoAck = true =====
+    // AckStatus = Acknowledged
+    SetSeverityAcknowledgementTestCase(
+      alarmKey = AlarmKey(AOESW, "test", "alarm4"),
+      oldSeverity = Disconnected,
+      newSeverity = Okay,
+      isAutoAcknowledgeable = true,
+      oldAckStatus = Unacknowledged,
+      newAckStatus = Acknowledged
+    ),
+    SetSeverityAcknowledgementTestCase(
+      alarmKey = AlarmKey(AOESW, "test", "alarm5"),
+      oldSeverity = Okay,
+      newSeverity = Okay,
+      isAutoAcknowledgeable = true,
+      oldAckStatus = Unacknowledged,
+      newAckStatus = Acknowledged
+    ),
+    // ====== Severity = Okay && AutoAck = false =====
+    // NewAckStatus = OldAckStatus
+    SetSeverityAcknowledgementTestCase(
+      alarmKey = AlarmKey(AOESW, "test", "alarm6"),
+      oldSeverity = Warning,
+      newSeverity = Okay,
+      isAutoAcknowledgeable = false,
+      oldAckStatus = Unacknowledged,
+      newAckStatus = Unacknowledged
+    ),
+    SetSeverityAcknowledgementTestCase(
+      alarmKey = AlarmKey(AOESW, "test", "alarm7"),
+      oldSeverity = Warning,
+      newSeverity = Okay,
+      isAutoAcknowledgeable = false,
+      oldAckStatus = Acknowledged,
+      newAckStatus = Acknowledged
     )
   )
 
-  //DEOPSCSW-444 : Set severity api for component
-  ackTestCases.foreach(
-    testCase =>
-      test(testCase.toString) {
-
+  // DEOPSCSW-444 : Set severity api for component
+  // DEOPSCSW-496 : Set Ack status on setSeverity
+  ackStatusTestCases.foreach(
+    testCase ⇒
+      test(testCase.name) {
         feedTestData(testCase)
+        import testCase._
 
-        val previousAckStatus = getStatus(testCase.alarmKey).await.acknowledgementStatus
+        getStatus(alarmKey).await.acknowledgementStatus shouldBe oldAckStatus
 
         //set severity to new Severity
-        val status = setSeverityAndGetStatus(testCase.alarmKey, testCase.newSeverity)
+        val status = setSeverityAndGetStatus(alarmKey, newSeverity)
 
         //get severity and assert
-        if (testCase.expectedAckStatus.isDefined)
-          status.acknowledgementStatus shouldEqual testCase.expectedAckStatus.get
-        else
-          status.acknowledgementStatus shouldEqual previousAckStatus
+        status.acknowledgementStatus shouldEqual newAckStatus
     }
   )
 
@@ -380,9 +416,19 @@ class SeverityServiceModuleTest
     feedTestData(testCase.alarmKey, testCase.oldSeverity)
 
   private def feedTestData(testCase: SetSeverityAcknowledgementTestCase): Unit =
-    feedTestData(testCase.alarmKey, testCase.oldSeverity)
+    feedTestData(
+      testCase.alarmKey,
+      testCase.oldSeverity,
+      isAutoAck = testCase.isAutoAcknowledgeable,
+      oldAckStatus = testCase.oldAckStatus
+    )
 
-  private def feedTestData(alarmKey: AlarmKey, oldSeverity: FullAlarmSeverity): Unit = {
+  private def feedTestData(
+      alarmKey: AlarmKey,
+      oldSeverity: FullAlarmSeverity,
+      isAutoAck: Boolean = false,
+      oldAckStatus: AcknowledgementStatus = Acknowledged
+  ): Unit = {
     // Adding metadata for corresponding test in alarm store
     setMetadata(
       alarmKey,
@@ -396,14 +442,14 @@ class SeverityServiceModuleTest
         Set(Okay, Warning, Major, Indeterminate, Critical),
         probableCause = "test",
         operatorResponse = "test",
-        isAutoAcknowledgeable = false,
+        isAutoAcknowledgeable = isAutoAck,
         isLatchable = true,
         activationStatus = Active
       )
     ).await
 
     // Adding status for corresponding test in alarm store
-    setStatus(alarmKey, AlarmStatus().copy(latchedSeverity = oldSeverity)).await
+    setStatus(alarmKey, AlarmStatus().copy(acknowledgementStatus = oldAckStatus, latchedSeverity = oldSeverity)).await
   }
 
   private def setSeverityAndGetStatus(alarmKey: AlarmKey, alarmSeverity: AlarmSeverity): AlarmStatus = {
