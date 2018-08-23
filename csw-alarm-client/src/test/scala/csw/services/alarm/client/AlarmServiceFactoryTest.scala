@@ -33,23 +33,23 @@ class AlarmServiceFactoryTest extends AlarmServiceTestSetup {
   }
 
   test("should create admin alarm service using location service") {
-    val alarmServiceUsingLS: AlarmAdminService = alarmServiceFactory.makeAdminApi(locationService).await
+    val alarmServiceUsingLS: AlarmAdminService = alarmServiceFactory.makeAdminApi(locationService)
     alarmServiceUsingLS.getMetadata(tromboneAxisHighLimitAlarmKey).await shouldEqual tromboneAxisHighLimitAlarm
   }
 
   test("should create admin alarm service using host and port") {
-    val alarmServiceUsingHostAndPort: AlarmAdminService = alarmServiceFactory.makeAdminApi(hostname, sentinelPort).await
+    val alarmServiceUsingHostAndPort: AlarmAdminService = alarmServiceFactory.makeAdminApi(hostname, sentinelPort)
     alarmServiceUsingHostAndPort.getMetadata(tromboneAxisHighLimitAlarmKey).await shouldEqual tromboneAxisHighLimitAlarm
   }
 
   test("should create client alarm service using location service") {
-    val alarmServiceUsingLS: AlarmService = alarmServiceFactory.makeClientApi(locationService).await
+    val alarmServiceUsingLS: AlarmService = alarmServiceFactory.makeClientApi(locationService)
     alarmServiceUsingLS.setSeverity(tromboneAxisHighLimitAlarmKey, Indeterminate).await
     alarmService.getCurrentSeverity(tromboneAxisHighLimitAlarmKey).await shouldEqual Indeterminate
   }
 
   test("should create client alarm service using host and port") {
-    val alarmServiceUsingUsingHostAndPort: AlarmService = alarmServiceFactory.makeClientApi(hostname, sentinelPort).await
+    val alarmServiceUsingUsingHostAndPort: AlarmService = alarmServiceFactory.makeClientApi(hostname, sentinelPort)
     alarmServiceUsingUsingHostAndPort.setSeverity(tromboneAxisHighLimitAlarmKey, Indeterminate).await
     alarmService.getCurrentSeverity(tromboneAxisHighLimitAlarmKey).await shouldEqual Indeterminate
   }

@@ -24,7 +24,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
   import cliWiring._
 
-  private val adminService = alarmAdminClient.alarmServiceF.futureValue
+  private val adminService = alarmAdminClient.alarmServiceF
 
   private val successMsg = "[SUCCESS] Command executed successfully."
   private val failureMsg = "[FAILURE] Failed to execute the command."

@@ -30,7 +30,7 @@ class AlarmServiceIntegrationTest extends FunSuite with EmbeddedRedis with Match
   private val (_, sentinel, server) = startSentinelAndRegisterService(AlarmServiceConnection.value, masterId)
 
   private val wiring: FrameworkWiring = FrameworkWiring.make(testActorSystem)
-  private val adminAlarmService       = wiring.alarmServiceFactory.makeAdminApi(wiring.locationService).await
+  private val adminAlarmService       = wiring.alarmServiceFactory.makeAdminApi(wiring.locationService)
 
   override protected def beforeAll(): Unit = {
     val config: Config = ConfigFactory.parseResources("valid-alarms.conf")

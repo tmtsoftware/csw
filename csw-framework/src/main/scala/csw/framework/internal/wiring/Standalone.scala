@@ -32,7 +32,7 @@ object Standalone {
 
     async {
       val eventService = eventServiceFactory.make(locationService)
-      val alarmService = await(alarmServiceFactory.makeClientApi(locationService))
+      val alarmService = alarmServiceFactory.makeClientApi(locationService)
 
       val supervisorBehavior = SupervisorBehaviorFactory.make(
         None,

@@ -51,8 +51,8 @@ class AlarmServiceTestSetup
   implicit val mat: ActorMaterializer                 = ActorMaterializer()
 
   val alarmServiceFactory             = new AlarmServiceFactory(redisClient)
-  val alarmService: AlarmAdminService = alarmServiceFactory.makeAdminApi(hostname, sentinelPort).await
-  val jAlarmService: IAlarmService    = alarmServiceFactory.jMakeClientApi(hostname, sentinelPort, actorSystem).get()
+  val alarmService: AlarmAdminService = alarmServiceFactory.makeAdminApi(hostname, sentinelPort)
+  val jAlarmService: IAlarmService    = alarmServiceFactory.jMakeClientApi(hostname, sentinelPort, actorSystem)
 
   import csw.services.alarm.client.internal.AlarmCodec._
 
