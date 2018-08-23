@@ -57,10 +57,6 @@ class AlarmServiceTestSetup
 
   import csw.services.alarm.client.internal.AlarmCodec._
 
-  implicit val metadataRomainCodec: RomaineStringCodec[AlarmMetadata]     = viaJsonCodec
-  implicit val severityRomainCodec: RomaineStringCodec[FullAlarmSeverity] = viaJsonCodec
-  implicit val statusRomainCodec: RomaineStringCodec[AlarmStatus]         = viaJsonCodec
-
   val connsFactory: RedisConnectionsFactory                      = new RedisConnectionsFactory(resolver, alarmServer, new RomaineFactory(redisClient))
   val testMetadataApi: RedisAsyncApi[MetadataKey, AlarmMetadata] = connsFactory.asyncApi[MetadataKey, AlarmMetadata].await
   val testSeverityApi: RedisAsyncApi[SeverityKey, FullAlarmSeverity] =

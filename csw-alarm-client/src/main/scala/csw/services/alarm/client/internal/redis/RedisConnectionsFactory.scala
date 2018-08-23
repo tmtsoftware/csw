@@ -17,10 +17,6 @@ class RedisConnectionsFactory(alarmServiceResolver: AlarmServiceResolver, master
   import csw.services.alarm.client.internal.AlarmCodec._
   import romaine.codec.RomaineStringCodec.stringRomaineCodec
 
-  implicit val metadataRomainCodec: RomaineStringCodec[AlarmMetadata]     = viaJsonCodec
-  implicit val severityRomainCodec: RomaineStringCodec[FullAlarmSeverity] = viaJsonCodec
-  implicit val statusRomainCodec: RomaineStringCodec[AlarmStatus]         = viaJsonCodec
-
   lazy val metadataApiF: Future[RedisAsyncApi[MetadataKey, AlarmMetadata]]     = asyncApi
   lazy val severityApiF: Future[RedisAsyncApi[SeverityKey, FullAlarmSeverity]] = asyncApi
   lazy val statusApiF: Future[RedisAsyncApi[StatusKey, AlarmStatus]]           = asyncApi
