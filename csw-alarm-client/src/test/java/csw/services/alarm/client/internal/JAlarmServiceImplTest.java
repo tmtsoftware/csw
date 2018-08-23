@@ -100,7 +100,7 @@ public class JAlarmServiceImplTest {
         assertEquals(status1.alarmTime().get().time(), status.alarmTime().get().time());
 
         AlarmStatus status2 = setSeverity(tromboneAxisHighLimitAlarm, JAlarmSeverity.Okay);
-        assertEquals(AcknowledgementStatus.Unacknowledged$.MODULE$, status2.acknowledgementStatus());
+        assertEquals(AcknowledgementStatus.Acknowledged$.MODULE$, status2.acknowledgementStatus());
         assertEquals(JAlarmSeverity.Major, status2.latchedSeverity());
         assertEquals(status2.alarmTime().get().time(), status.alarmTime().get().time());
     }
