@@ -60,7 +60,7 @@ class ShelveTimeoutActorTest extends FunSuite with Matchers with ActorTestKit wi
     actor ! ScheduleShelveTimeout(tromboneAxisHighLimitAlarmKey)
     actor ! ScheduleShelveTimeout(tcsAxisHighLimitAlarmKey)
 
-    val duration = 8.toHourOfDay - ZonedDateTime.now(ZoneOffset.UTC)
+    val duration = 8.toHourOfDay - ZonedDateTime.now(ZoneOffset.UTC) + 10.minutes
     manualTime.timePasses(duration)
 
     eventually(unshelvedAlarms shouldEqual Set(tromboneAxisHighLimitAlarmKey, tcsAxisHighLimitAlarmKey))
