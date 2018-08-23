@@ -132,7 +132,7 @@ class KafkaSubscriber(consumerSettings: Future[ConsumerSettings[String, Array[By
   // message, i.e. the offset of the last available message + 1.
   private def getLatestOffsets(eventKeys: Set[EventKey]): Future[Map[TopicPartition, Long]] = {
     val topicPartitions = eventKeys.map(e ⇒ new TopicPartition(e.key, 0)).toList
-    consumer.map(_.endOffsets(topicPartitions.asJava).asScala.toMap.mapValues(_.toLong))
+    consumer.map(consumer ⇒ this.synchronized(consumer.endOffsets(topicPartitions.asJava)).asScala.toMap.mapValues(_.toLong))
   }
 
   private def eventSubscription(controlF: Future[scaladsl.Consumer.Control], completionF: Future[Done]): EventSubscription = {
