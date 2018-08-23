@@ -23,8 +23,7 @@ import csw.services.config.server.{ServerWiring, Settings}
 class CommandExecutorTest extends AlarmCliTestSetup {
 
   import cliWiring._
-
-  private val adminService = alarmAdminClient.alarmServiceF
+  import alarmAdminClient.alarmService._
 
   private val successMsg = "[SUCCESS] Command executed successfully."
   private val failureMsg = "[FAILURE] Failed to execute the command."
@@ -58,7 +57,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     commandExecutor.execute(args)
     logBuffer shouldEqual List(successMsg)
 
-    val metadata = adminService.getMetadata(GlobalKey).futureValue
+    val metadata = getMetadata(GlobalKey).futureValue
 
     metadata.map(_.alarmKey).toSet shouldEqual allAlarmKeys
   }
@@ -79,7 +78,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
     logBuffer shouldEqual List(successMsg)
 
-    val metadata = adminService.getMetadata(GlobalKey).futureValue
+    val metadata = getMetadata(GlobalKey).futureValue
 
     metadata.map(_.alarmKey).toSet shouldEqual allAlarmKeys
 
@@ -106,13 +105,11 @@ class CommandExecutorTest extends AlarmCliTestSetup {
       maybeAlarmName = Some(tromboneAxisLowLimitKey.name)
     )
 
-    adminService
-      .setStatus(tromboneAxisLowLimitKey, AlarmStatus().copy(acknowledgementStatus = Unacknowledged, latchedSeverity = Critical))
-      .futureValue
+    setStatus(tromboneAxisLowLimitKey, AlarmStatus().copy(acknowledgementStatus = Unacknowledged, latchedSeverity = Critical)).futureValue
 
-    adminService.getStatus(tromboneAxisLowLimitKey).futureValue.acknowledgementStatus shouldBe Unacknowledged
+    getStatus(tromboneAxisLowLimitKey).futureValue.acknowledgementStatus shouldBe Unacknowledged
     commandExecutor.execute(cmd) // acknowledge the alarm
-    adminService.getStatus(tromboneAxisLowLimitKey).futureValue.acknowledgementStatus shouldBe Acknowledged
+    getStatus(tromboneAxisLowLimitKey).futureValue.acknowledgementStatus shouldBe Acknowledged
     logBuffer shouldEqual List(successMsg)
   }
 
@@ -125,12 +122,12 @@ class CommandExecutorTest extends AlarmCliTestSetup {
       maybeAlarmName = Some(tromboneAxisLowLimitKey.name)
     )
 
-    adminService.acknowledge(tromboneAxisLowLimitKey).futureValue
-    adminService.getStatus(tromboneAxisLowLimitKey).futureValue.acknowledgementStatus shouldBe Acknowledged
+    acknowledge(tromboneAxisLowLimitKey).futureValue
+    getStatus(tromboneAxisLowLimitKey).futureValue.acknowledgementStatus shouldBe Acknowledged
 
     commandExecutor.execute(cmd) // unacknowledge the alarm
 
-    adminService.getStatus(tromboneAxisLowLimitKey).futureValue.acknowledgementStatus shouldBe Unacknowledged
+    getStatus(tromboneAxisLowLimitKey).futureValue.acknowledgementStatus shouldBe Unacknowledged
     logBuffer shouldEqual List(successMsg)
   }
 
@@ -143,11 +140,11 @@ class CommandExecutorTest extends AlarmCliTestSetup {
       maybeAlarmName = Some(cpuIdleKey.name)
     )
 
-    adminService.getMetadata(cpuIdleKey).futureValue.activationStatus shouldBe Inactive
+    getMetadata(cpuIdleKey).futureValue.activationStatus shouldBe Inactive
 
     commandExecutor.execute(cmd) // activate the alarm
 
-    adminService.getMetadata(cpuIdleKey).futureValue.activationStatus shouldBe Active
+    getMetadata(cpuIdleKey).futureValue.activationStatus shouldBe Active
     logBuffer shouldEqual List(successMsg)
   }
 
@@ -159,10 +156,10 @@ class CommandExecutorTest extends AlarmCliTestSetup {
       maybeComponent = Some(tromboneAxisLowLimitKey.component),
       maybeAlarmName = Some(tromboneAxisLowLimitKey.name)
     )
-    adminService.getMetadata(tromboneAxisLowLimitKey).futureValue.activationStatus shouldBe Active
+    getMetadata(tromboneAxisLowLimitKey).futureValue.activationStatus shouldBe Active
     commandExecutor.execute(cmd) // deactivate the alarm
 
-    adminService.getMetadata(tromboneAxisLowLimitKey).futureValue.activationStatus shouldBe Inactive
+    getMetadata(tromboneAxisLowLimitKey).futureValue.activationStatus shouldBe Inactive
     logBuffer shouldEqual List(successMsg)
   }
 
@@ -175,9 +172,9 @@ class CommandExecutorTest extends AlarmCliTestSetup {
       maybeAlarmName = Some(tromboneAxisLowLimitKey.name)
     )
 
-    adminService.getStatus(tromboneAxisLowLimitKey).futureValue.shelveStatus shouldBe Unshelved
+    getStatus(tromboneAxisLowLimitKey).futureValue.shelveStatus shouldBe Unshelved
     commandExecutor.execute(cmd) // shelve the alarm
-    adminService.getStatus(tromboneAxisLowLimitKey).futureValue.shelveStatus shouldBe Shelved
+    getStatus(tromboneAxisLowLimitKey).futureValue.shelveStatus shouldBe Shelved
     logBuffer shouldEqual List(successMsg)
   }
 
@@ -190,12 +187,12 @@ class CommandExecutorTest extends AlarmCliTestSetup {
       maybeAlarmName = Some(tromboneAxisLowLimitKey.name)
     )
 
-    adminService.shelve(tromboneAxisLowLimitKey).futureValue
-    adminService.getStatus(tromboneAxisLowLimitKey).futureValue.shelveStatus shouldBe Shelved
+    shelve(tromboneAxisLowLimitKey).futureValue
+    getStatus(tromboneAxisLowLimitKey).futureValue.shelveStatus shouldBe Shelved
 
     commandExecutor.execute(cmd) // unshelve the alarm
 
-    adminService.getStatus(tromboneAxisLowLimitKey).futureValue.shelveStatus shouldBe Unshelved
+    getStatus(tromboneAxisLowLimitKey).futureValue.shelveStatus shouldBe Unshelved
     logBuffer shouldEqual List(successMsg)
   }
 
@@ -268,14 +265,14 @@ class CommandExecutorTest extends AlarmCliTestSetup {
       maybeAlarmName = Some(tromboneAxisLowLimitKey.name)
     )
 
-    adminService.setSeverity(tromboneAxisLowLimitKey, Major).futureValue
-    adminService.setSeverity(tromboneAxisLowLimitKey, Okay).futureValue
-    adminService.getStatus(tromboneAxisLowLimitKey).futureValue.latchedSeverity shouldBe Major
+    setSeverity(tromboneAxisLowLimitKey, Major).futureValue
+    setSeverity(tromboneAxisLowLimitKey, Okay).futureValue
+    getStatus(tromboneAxisLowLimitKey).futureValue.latchedSeverity shouldBe Major
 
     commandExecutor.execute(cmd) // reset latch severity of the alarm
 
     logBuffer shouldEqual List(successMsg)
-    adminService.getStatus(tromboneAxisLowLimitKey).futureValue.latchedSeverity shouldBe Okay
+    getStatus(tromboneAxisLowLimitKey).futureValue.latchedSeverity shouldBe Okay
   }
 
   // DEOPSCSW-475: Fetch alarm status from CLI Interface
@@ -304,15 +301,15 @@ class CommandExecutorTest extends AlarmCliTestSetup {
       maybeAlarmName = Some(tromboneAxisHighLimitKey.name)
     )
 
-    adminService.getCurrentSeverity(tromboneAxisHighLimitKey).futureValue shouldBe Disconnected
+    getCurrentSeverity(tromboneAxisHighLimitKey).futureValue shouldBe Disconnected
     commandExecutor.execute(cmd) // update severity of an alarm
-    adminService.getCurrentSeverity(tromboneAxisHighLimitKey).futureValue shouldBe Major
+    getCurrentSeverity(tromboneAxisHighLimitKey).futureValue shouldBe Major
     logBuffer shouldEqual List(successMsg)
   }
 
   // DEOPSCSW-476: Fetch alarm severity from CLI Interface
   test("should get severity of alarm") {
-    adminService.setSeverity(tromboneAxisHighLimitKey, Okay).futureValue
+    setSeverity(tromboneAxisHighLimitKey, Okay).futureValue
 
     val cmd = Options(
       cmd = "severity",
@@ -328,8 +325,8 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
   // DEOPSCSW-476: Fetch alarm severity from CLI Interface
   test("should get severity of a component") {
-    adminService.setSeverity(tromboneAxisLowLimitKey, Okay).futureValue
-    adminService.setSeverity(tromboneAxisHighLimitKey, Major).futureValue
+    setSeverity(tromboneAxisLowLimitKey, Okay).futureValue
+    setSeverity(tromboneAxisHighLimitKey, Major).futureValue
 
     val cmd = Options(
       cmd = "severity",
@@ -358,7 +355,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
   // DEOPSCSW-476: Fetch alarm severity from CLI Interface
   test("should get severity of Alarm Service") {
-    adminService.setSeverity(cpuExceededKey, Indeterminate).futureValue
+    setSeverity(cpuExceededKey, Indeterminate).futureValue
 
     val cmd = Options(cmd = "severity", subCmd = "get")
 
@@ -378,8 +375,8 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
     commandExecutor.execute(cmd)
 
-    adminService.setSeverity(tromboneAxisHighLimitKey, Major).futureValue
-    adminService.setSeverity(tromboneAxisHighLimitKey, Okay).futureValue
+    setSeverity(tromboneAxisHighLimitKey, Major).futureValue
+    setSeverity(tromboneAxisHighLimitKey, Okay).futureValue
 
     logBuffer shouldEqual List(
       s"Severity of Alarm ${tromboneAxisHighLimitKey.value}: ${Major.toString}",
@@ -405,8 +402,8 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
   // DEOPSCSW-478: Fetch health of component/subsystem from CLI Interface
   test("should get health of component") {
-    adminService.setSeverity(tromboneAxisHighLimitKey, Okay).futureValue
-    adminService.setSeverity(tromboneAxisLowLimitKey, Major).futureValue
+    setSeverity(tromboneAxisHighLimitKey, Okay).futureValue
+    setSeverity(tromboneAxisLowLimitKey, Major).futureValue
 
     val cmd = Options(
       cmd = "health",
@@ -423,8 +420,8 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
   // DEOPSCSW-478: Fetch health of component/subsystem from CLI Interface
   test("should get health of subsystem") {
-    adminService.setSeverity(tromboneAxisHighLimitKey, Warning).futureValue
-    adminService.setSeverity(tromboneAxisLowLimitKey, Okay).futureValue
+    setSeverity(tromboneAxisHighLimitKey, Warning).futureValue
+    setSeverity(tromboneAxisLowLimitKey, Okay).futureValue
 
     val cmd = Options(
       cmd = "health",
@@ -455,8 +452,8 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     )
 
     commandExecutor.execute(cmd)
-    adminService.setSeverity(tromboneAxisHighLimitKey, Major).futureValue
-    adminService.setSeverity(tromboneAxisHighLimitKey, Okay).futureValue
+    setSeverity(tromboneAxisHighLimitKey, Major).futureValue
+    setSeverity(tromboneAxisHighLimitKey, Okay).futureValue
 
     logBuffer shouldEqual List(
       s"Health of Alarm ${tromboneAxisHighLimitKey.value}: ${Ill.toString}",

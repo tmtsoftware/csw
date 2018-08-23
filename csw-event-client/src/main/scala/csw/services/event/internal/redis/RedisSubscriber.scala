@@ -42,24 +42,18 @@ class RedisSubscriber(redisURI: Future[RedisURI], redisClient: RedisClient)(
 
   private val romaineFactory = new RomaineFactory(redisClient)
 
-  // create underlying connection asynchronously and obtain an instance of RedisAsyncCommands to perform
-  // redis operations asynchronously. This instance of RedisAsyncCommands is used for performing `get`
-  // operations on Redis asynchronously
-  private lazy val asyncConnectionF: RedisAsyncApi[EventKey, Event] =
-    romaineFactory.redisAsyncApi[EventKey, Event](redisURI)
+  private lazy val asyncApi: RedisAsyncApi[EventKey, Event] = romaineFactory.redisAsyncApi[EventKey, Event](redisURI)
 
-  // create underlying connection asynchronously and obtain an instance of RedisPubSubReactiveCommands to perform
-  // redis pub sub operations using a `reactor` based reactive API provided by lettuce Redis driver.
-  private def reactiveConnectionF[T: RomaineStringCodec](): RedisSubscriptionApi[T, Event] =
+  private def subscriptionApi[T: RomaineStringCodec](): RedisSubscriptionApi[T, Event] =
     romaineFactory.redisSubscriptionApi[T, Event](redisURI)
 
   override def subscribe(eventKeys: Set[EventKey]): Source[Event, EventSubscription] = {
     log.info(s"Subscribing to event keys: $eventKeys")
-    val subscriptionApi: RedisSubscriptionApi[EventKey, Event] = reactiveConnectionF()
+    val eventSubscriptionApi: RedisSubscriptionApi[EventKey, Event] = subscriptionApi()
 
     val latestEventStream: Source[Event, NotUsed] = Source.fromFuture(get(eventKeys)).mapConcat(identity)
     val redisStream: Source[Event, RedisSubscription] =
-      subscriptionApi.subscribe(eventKeys.toList, OverflowStrategy.LATEST).map(_.value)
+      eventSubscriptionApi.subscribe(eventKeys.toList, OverflowStrategy.LATEST).map(_.value)
     val eventStream: Source[Event, EventSubscription] = subscribeInternal(eventKeys, redisStream)
     latestEventStream.concatMat(eventStream)(Keep.right)
   }
@@ -104,9 +98,9 @@ class RedisSubscriber(redisURI: Future[RedisURI], redisClient: RedisClient)(
     val keyPattern = s"${subsystem.entryName}.$pattern"
     log.info(s"Subscribing to event key pattern: $keyPattern")
 
-    val subscriptionApi: RedisSubscriptionApi[String, Event] = reactiveConnectionF()
+    val patternSubscriptionApi: RedisSubscriptionApi[String, Event] = subscriptionApi()
     val redisStream: Source[Event, RedisSubscription] =
-      subscriptionApi.psubscribe(List(keyPattern), OverflowStrategy.LATEST).map(_.value)
+      patternSubscriptionApi.psubscribe(List(keyPattern), OverflowStrategy.LATEST).map(_.value)
     subscribeInternal(keyPattern, redisStream)
   }
 
@@ -117,8 +111,7 @@ class RedisSubscriber(redisURI: Future[RedisURI], redisClient: RedisClient)(
 
   override def get(eventKey: EventKey): Future[Event] = async {
     log.info(s"Fetching event key: $eventKey")
-    val commands = asyncConnectionF
-    val event    = await(commands.get(eventKey))
+    val event = await(asyncApi.get(eventKey))
     event.getOrElse(Event.invalidEvent(eventKey))
   }
 
@@ -127,13 +120,13 @@ class RedisSubscriber(redisURI: Future[RedisURI], redisClient: RedisClient)(
       eventKeys: T,
       eventStreamF: Source[Event, RedisSubscription]
   ): Source[Event, EventSubscription] = {
-    eventStreamF.mapMaterializedValue { subscriptionF =>
+    eventStreamF.mapMaterializedValue { redisSubscription =>
       new EventSubscription {
         override def unsubscribe(): Future[Done] = {
           log.info(s"Unsubscribing for keys=$eventKeys")
-          subscriptionF.unsubscribe()
+          redisSubscription.unsubscribe()
         }
-        override def ready(): Future[Done] = subscriptionF.ready().recover {
+        override def ready(): Future[Done] = redisSubscription.ready().recover {
           case RedisServerNotAvailable(ex) => throw EventServerNotAvailable(ex)
         }
       }

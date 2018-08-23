@@ -36,13 +36,15 @@ class KafkaSubscriber(consumerSettings: Future[ConsumerSettings[String, Array[By
   private val eventSubscriberUtil                             = new EventSubscriberUtil()
 
   override def subscribe(eventKeys: Set[EventKey]): Source[Event, EventSubscription] = {
-    val partitionToOffsets = getLatestOffsets(eventKeys)
-    // Subscribe to the 0th offset if nothing has been published yet or `current offset - 1` to receive the last published event
-    val manualSubscription =
-      partitionToOffsets.map(dd => Subscriptions.assignmentWithOffset(dd.mapValues(x ⇒ if (x == 0) 0L else x - 1)))
-    val eventStream = getEventStream(manualSubscription)
+    val offsetsF = getLatestOffsets(eventKeys)
 
-    val invalidEvents = partitionToOffsets.map { partitionToOffset =>
+    // Subscribe to the 0th offset if nothing has been published yet or `current offset - 1` to receive the last published event
+    val updatedOffsetsF = offsetsF.map(_.mapValues(x ⇒ if (x == 0) 0L else x - 1))
+
+    val manualSubscription = updatedOffsetsF.map(offsets => Subscriptions.assignmentWithOffset(offsets))
+    val eventStream        = getEventStream(manualSubscription)
+
+    val invalidEvents = offsetsF.map { partitionToOffset =>
       val events = partitionToOffset.collect {
         case (topicPartition, offset) if offset == 0 ⇒ Event.invalidEvent(EventKey(topicPartition.topic()))
       }
@@ -101,7 +103,9 @@ class KafkaSubscriber(consumerSettings: Future[ConsumerSettings[String, Array[By
   override def pSubscribe(subsystem: Subsystem, pattern: String): Source[Event, EventSubscription] = {
     val keyPattern   = s"${subsystem.entryName}.*${Utils.globToRegex(pattern)}"
     val subscription = Subscriptions.topicPattern(keyPattern)
-    getEventStream(Future.successful(subscription)).mapMaterializedValue(x => eventSubscription(x, Future.successful(Done)))
+
+    getEventStream(Future.successful(subscription))
+      .mapMaterializedValue(control => eventSubscription(control, Future.successful(Done)))
   }
 
   override def pSubscribeCallback(subsystem: Subsystem, pattern: String, callback: Event ⇒ Unit): EventSubscription =
@@ -137,11 +141,11 @@ class KafkaSubscriber(consumerSettings: Future[ConsumerSettings[String, Array[By
 
   private def eventSubscription(controlF: Future[scaladsl.Consumer.Control], completionF: Future[Done]): EventSubscription = {
     new EventSubscription {
-      override def unsubscribe(): Future[Done] = controlF.flatMap(_.shutdown().map(_ ⇒ Done)).recover {
-        case NonFatal(ex: StreamDetachedException) if completionF.isCompleted => Done
+      override def unsubscribe(): Future[Done] = controlF.flatMap(_.shutdown()).recover {
+        case NonFatal(_: StreamDetachedException) if completionF.isCompleted => Done
       }
       override def ready(): Future[Done] = controlF.map(_ => Done).recover {
-        case NonFatal(ex: StreamDetachedException) if completionF.isCompleted => Done
+        case NonFatal(_: StreamDetachedException) if completionF.isCompleted => Done
       }
     }
   }

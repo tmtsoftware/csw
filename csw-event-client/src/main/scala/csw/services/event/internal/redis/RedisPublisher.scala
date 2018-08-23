@@ -25,8 +25,10 @@ import scala.util.control.NonFatal
  * @param ec the execution context to be used for performing asynchronous operations
  * @param mat the materializer to be used for materializing underlying streams
  */
-class RedisPublisher(redisURI: Future[RedisURI], redisClient: RedisClient)(implicit ec: ExecutionContext, mat: Materializer)
-    extends EventPublisher {
+class RedisPublisher(redisURI: Future[RedisURI], redisClient: RedisClient)(
+    implicit ec: ExecutionContext,
+    mat: Materializer
+) extends EventPublisher {
 
   // inorder to preserve the order of publishing events, the parallelism level is maintained to 1
   private val parallelism        = 1
@@ -35,16 +37,12 @@ class RedisPublisher(redisURI: Future[RedisURI], redisClient: RedisClient)(impli
   private val romaineFactory = new RomaineFactory(redisClient)
   import EventRomaineCodecs._
 
-  // create underlying connection asynchronously and obtain an instance of `RedisAsyncCommands` to perform
-  // redis operations asynchronously
-  private lazy val asyncConnectionF: RedisAsyncApi[String, Event] =
-    romaineFactory.redisAsyncApi[String, Event](redisURI)
+  private lazy val asyncApi: RedisAsyncApi[String, Event] = romaineFactory.redisAsyncApi(redisURI)
 
   override def publish(event: Event): Future[Done] =
     async {
-      val commands = asyncConnectionF
-      await(commands.publish(event.eventKey.key, event))
-      set(event, commands) // set will run independent of publish
+      await(asyncApi.publish(event.eventKey.key, event))
+      set(event, asyncApi) // set will run independent of publish
       Done
     } recover {
       case NonFatal(ex) ⇒
@@ -65,7 +63,7 @@ class RedisPublisher(redisURI: Future[RedisURI], redisClient: RedisClient)(impli
   override def publish(eventGenerator: ⇒ Event, every: FiniteDuration, onError: PublishFailure ⇒ Unit): Cancellable =
     publish(eventPublisherUtil.eventSource(eventGenerator, every), onError)
 
-  override def shutdown(): Future[Done] = asyncConnectionF.quit().map(_ ⇒ Done)
+  override def shutdown(): Future[Done] = asyncApi.quit().map(_ ⇒ Done)
 
   private def set(event: Event, commands: RedisAsyncApi[String, Event]): Future[Done] =
     commands.set(event.eventKey.key, event).recover { case NonFatal(_) ⇒ Done }.map(_ => Done)
