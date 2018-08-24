@@ -204,9 +204,8 @@ class SeverityServiceModuleTest
     getAggregatedSeverity(GlobalKey).await shouldBe Disconnected
 
     // alarm subscription - nfiraos.trombone
-    val testProbe = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
-    val alarmSubscription =
-      subscribeAggregatedSeverityCallback(tromboneAxisLowLimitAlarmKey, testProbe.ref ! _)
+    val testProbe         = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
+    val alarmSubscription = subscribeAggregatedSeverityCallback(tromboneAxisLowLimitAlarmKey, testProbe.ref ! _)
     alarmSubscription.ready().await
 
     Thread.sleep(500) // wait for redis connection to happen
@@ -228,9 +227,8 @@ class SeverityServiceModuleTest
     getAggregatedSeverity(GlobalKey).await shouldBe Disconnected
 
     // subsystem subscription - tcs
-    val testProbe = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
-    val alarmSubscription =
-      subscribeAggregatedSeverityCallback(SubsystemKey(TCS), testProbe.ref ! _)
+    val testProbe         = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
+    val alarmSubscription = subscribeAggregatedSeverityCallback(SubsystemKey(TCS), testProbe.ref ! _)
     alarmSubscription.ready().await
 
     Thread.sleep(500) // wait for redis connection to happen
@@ -291,9 +289,8 @@ class SeverityServiceModuleTest
   // DEOPSCSW-467: Monitor alarm severities in the alarm store for a single alarm, component, subsystem, or all
   test("subscribeAggregatedSeverityCallback should not consider inactive alarm for aggregation") {
 
-    val testProbe = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
-    val alarmSubscription =
-      subscribeAggregatedSeverityCallback(SubsystemKey(NFIRAOS), testProbe.ref ! _)
+    val testProbe         = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
+    val alarmSubscription = subscribeAggregatedSeverityCallback(SubsystemKey(NFIRAOS), testProbe.ref ! _)
     alarmSubscription.ready().await
 
     tromboneAxisLowLimitAlarm.isActive shouldBe true
@@ -337,9 +334,8 @@ class SeverityServiceModuleTest
     getAggregatedSeverity(GlobalKey).await shouldBe Disconnected
 
     // subsystem subscription - tcs
-    val testProbe = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
-    val alarmSubscription =
-      subscribeAggregatedSeverityActorRef(SubsystemKey(TCS), testProbe.ref)
+    val testProbe         = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
+    val alarmSubscription = subscribeAggregatedSeverityActorRef(SubsystemKey(TCS), testProbe.ref)
     alarmSubscription.ready().await
 
     Thread.sleep(500) // wait for redis connection to happen
@@ -359,9 +355,8 @@ class SeverityServiceModuleTest
   // DEOPSCSW-467: Monitor alarm severities in the alarm store for a single alarm, component, subsystem, or all
   test("subscribeAggregatedSeverityActorRef should not consider inactive alarm for aggregation") {
 
-    val testProbe = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
-    val alarmSubscription =
-      subscribeAggregatedSeverityActorRef(SubsystemKey(NFIRAOS), testProbe.ref)
+    val testProbe         = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
+    val alarmSubscription = subscribeAggregatedSeverityActorRef(SubsystemKey(NFIRAOS), testProbe.ref)
     alarmSubscription.ready().await
 
     tromboneAxisLowLimitAlarm.isActive shouldBe true
@@ -377,6 +372,26 @@ class SeverityServiceModuleTest
     testProbe.expectMessage(Major)
 
     alarmSubscription.unsubscribe()
+  }
+
+  // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
+  test("shelved alarms should be considered in aggregated severity") {
+    val testProbe    = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
+    val componentKey = ComponentKey(cpuExceededAlarmKey.subsystem, cpuExceededAlarmKey.component)
+
+    setStatus(cpuExceededAlarmKey, AlarmStatus().copy(shelveStatus = Shelved))
+
+    val alarmSubscription = subscribeAggregatedSeverityCallback(componentKey, testProbe.ref ! _)
+    alarmSubscription.ready().await
+    Thread.sleep(500) // wait for redis connection to happen
+
+    setSeverity(cpuExceededAlarmKey, Okay).await
+    testProbe.expectMessage(Okay)
+
+    setSeverity(cpuExceededAlarmKey, Critical).await
+    testProbe.expectMessage(Critical)
+
+    alarmSubscription.unsubscribe().await
   }
 
   //DEOPSCSW-444 : Set severity api for component

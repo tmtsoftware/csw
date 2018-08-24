@@ -5,10 +5,11 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import com.typesafe.config.ConfigFactory
 import csw.messages.params.models.Subsystem.{BAD, LGSF, NFIRAOS, TCS}
 import csw.services.alarm.api.exceptions.{InactiveAlarmException, KeyNotFoundException}
-import csw.services.alarm.api.models.AlarmHealth
+import csw.services.alarm.api.models.{AlarmHealth, AlarmStatus}
 import csw.services.alarm.api.models.AlarmHealth.{Bad, Good, Ill}
 import csw.services.alarm.api.models.AlarmSeverity._
 import csw.services.alarm.api.models.Key.{ComponentKey, GlobalKey, SubsystemKey}
+import csw.services.alarm.api.models.ShelveStatus.Shelved
 import csw.services.alarm.client.internal.helpers.AlarmServiceTestSetup
 import csw.services.alarm.client.internal.helpers.TestFutureExt.RichFuture
 
@@ -100,9 +101,8 @@ class HealthServiceModuleTest
     getAggregatedHealth(GlobalKey).await shouldBe Bad
 
     // alarm subscription - nfiraos.trombone.tromboneAxisLowLimitAlarm
-    val testProbe = TestProbe[AlarmHealth]()(actorSystem.toTyped)
-    val alarmSubscription =
-      subscribeAggregatedHealthCallback(tromboneAxisLowLimitAlarmKey, testProbe.ref ! _)
+    val testProbe         = TestProbe[AlarmHealth]()(actorSystem.toTyped)
+    val alarmSubscription = subscribeAggregatedHealthCallback(tromboneAxisLowLimitAlarmKey, testProbe.ref ! _)
     alarmSubscription.ready().await
 
     Thread.sleep(500) // wait for redis connection to happen
@@ -128,9 +128,8 @@ class HealthServiceModuleTest
     getAggregatedHealth(GlobalKey).await shouldBe Bad
 
     // subsystem subscription - tcs
-    val testProbe = TestProbe[AlarmHealth]()(actorSystem.toTyped)
-    val alarmSubscription =
-      subscribeAggregatedHealthCallback(SubsystemKey(TCS), testProbe.ref ! _)
+    val testProbe         = TestProbe[AlarmHealth]()(actorSystem.toTyped)
+    val alarmSubscription = subscribeAggregatedHealthCallback(SubsystemKey(TCS), testProbe.ref ! _)
     alarmSubscription.ready().await
 
     Thread.sleep(500) // wait for redis connection to happen
@@ -172,9 +171,8 @@ class HealthServiceModuleTest
     getAggregatedHealth(GlobalKey).await shouldBe Bad
 
     // subsystem subscription - tcs
-    val testProbe = TestProbe[AlarmHealth]()(actorSystem.toTyped)
-    val alarmSubscription =
-      subscribeAggregatedHealthActorRef(SubsystemKey(TCS), testProbe.ref)
+    val testProbe         = TestProbe[AlarmHealth]()(actorSystem.toTyped)
+    val alarmSubscription = subscribeAggregatedHealthActorRef(SubsystemKey(TCS), testProbe.ref)
     alarmSubscription.ready().await
 
     Thread.sleep(500) // wait for redis connection to happen
@@ -186,6 +184,26 @@ class HealthServiceModuleTest
 
     setSeverity(tromboneAxisHighLimitAlarmKey, Major).await
     testProbe.expectNoMessage(200.millis)
+
+    alarmSubscription.unsubscribe().await
+  }
+
+  // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
+  test("shelved alarms should be considered in health aggregation") {
+
+    val testProbe         = TestProbe[AlarmHealth]()(actorSystem.toTyped)
+    val alarmSubscription = subscribeAggregatedHealthActorRef(SubsystemKey(TCS), testProbe.ref)
+    alarmSubscription.ready().await
+
+    Thread.sleep(500) // wait for redis connection to happen
+
+    setStatus(cpuExceededAlarmKey, AlarmStatus().copy(shelveStatus = Shelved)) //shelve the alarm
+
+    setSeverity(cpuExceededAlarmKey, Critical).await
+    testProbe.expectMessage(Bad)
+
+    setSeverity(cpuExceededAlarmKey, Okay).await
+    testProbe.expectMessage(Good)
 
     alarmSubscription.unsubscribe().await
   }
