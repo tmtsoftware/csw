@@ -32,6 +32,12 @@ See [here](https://tmtsoftware.github.io/csw-prod/0.5.0-RC1/) for a detailed doc
 #### Planned for the Next Release (Coming Soon...)
 - Alarm Service including Examples, API and programming documentation
 
+## [CSW v0.5.0-RC2] - 2018-08-24
+
+This is the release candidate 2 of the second release of the TMT Common Software for project stakeholders. 
+This release includes event service and partial implementation of alarm service.
+See [here](https://tmtsoftware.github.io/csw-prod/0.5.0-RC2/) for a detailed documentation of this version of the CSW software.
+
 ## [CSW v0.5.0-RC1] - 2018-08-01
 
 This is the release candidate 1 of the second release of the TMT Common Software for project stakeholders. 

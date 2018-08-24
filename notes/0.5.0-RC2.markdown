@@ -1,0 +1,19 @@
+## CSW - TMT Common Software v0.5.0-RC2
+
+This is release v0.5.0-RC2 of the TMT Common Software.
+
+See [CHANGELOG.md](../CHANGELOG.md) for details of all releases.
+
+### Changes
+- Creation of Event Service publisher and subscriber returns concrete Publisher and Subscriber instead of wrapped in Future.
+
+### In Progress
+- Alarm Service
+
+### Issue Fix
+- DEOPSCSW-495 : Protobuf serde fails for Java keys/parameters
+
+### Documentation
+- Reference paradox documentation: https://tmtsoftware.github.io/csw-prod/0.5.0-RC2/
+- Scaladoc: https://tmtsoftware.github.io/csw-prod/0.5.0-RC2/api/scala/index.html
+- Javadoc: https://tmtsoftware.github.io/csw-prod/0.5.0-RC2/api/java/index.html
