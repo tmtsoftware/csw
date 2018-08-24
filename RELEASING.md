@@ -1,9 +1,14 @@
 # Releasing
 
 ## Prerequisites
-1. Make sure git authentication works on jenkins agent by running cmd: `ssh -vT git@github.com`
-2. npm module `junit-merge` is installed (for merging multiple xml test reports into one)
-3. npm module `junit-viewer` is installed (for generating html test report from merged xml)
+
+### Git
+* Make sure git authentication works on jenkins agent by running cmd: `ssh -vT git@github.com`
+
+### Node
+* Node is installed
+* npm module `junit-merge` is installed (for merging multiple xml test reports into one)
+* npm module `junit-viewer` is installed (for generating html test report from merged xml)
 
 ## Steps to release
 
