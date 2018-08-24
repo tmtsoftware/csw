@@ -23,9 +23,9 @@ import scala.util.control.NonFatal
 /**
  * An implementation of [[csw.services.event.api.scaladsl.EventSubscriber]] API which uses Apache Kafka as the provider for publishing
  * and subscribing events.
- * @param consumerSettings Settings for akka-streams-kafka API for Apache Kafka consumer
- * @param ec the execution context to be used for performing asynchronous operations
- * @param mat the materializer to be used for materializing underlying streams
+ * @param consumerSettings  future of settings for akka-streams-kafka API for Apache Kafka consumer
+ * @param ec                the execution context to be used for performing asynchronous operations
+ * @param mat               the materializer to be used for materializing underlying streams
  */
 class KafkaSubscriber(consumerSettings: Future[ConsumerSettings[String, Array[Byte]]])(
     implicit ec: ExecutionContext,
@@ -136,6 +136,7 @@ class KafkaSubscriber(consumerSettings: Future[ConsumerSettings[String, Array[By
   // message, i.e. the offset of the last available message + 1.
   private def getLatestOffsets(eventKeys: Set[EventKey]): Future[Map[TopicPartition, Long]] = {
     val topicPartitions = eventKeys.map(e ⇒ new TopicPartition(e.key, 0)).toList
+    // any interaction with kafka consumer needs special care to handle multi-threaded access
     consumer.map(consumer ⇒ this.synchronized(consumer.endOffsets(topicPartitions.asJava)).asScala.toMap.mapValues(_.toLong))
   }
 

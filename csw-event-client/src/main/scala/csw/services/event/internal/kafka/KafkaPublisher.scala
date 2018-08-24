@@ -18,9 +18,9 @@ import scala.util.control.NonFatal
 /**
  * An implementation of [[csw.services.event.api.scaladsl.EventPublisher]] API which uses Apache Kafka as the provider for publishing
  * and subscribing events.
- * @param producerSettings Settings for akka-streams-kafka API for Apache Kafka producer
- * @param ec the execution context to be used for performing asynchronous operations
- * @param mat the materializer to be used for materializing underlying streams
+ * @param producerSettings future of settings for akka-streams-kafka API for Apache Kafka producer
+ * @param ec               the execution context to be used for performing asynchronous operations
+ * @param mat              the materializer to be used for materializing underlying streams
  */
 class KafkaPublisher(producerSettings: Future[ProducerSettings[String, Array[Byte]]])(
     implicit ec: ExecutionContext,

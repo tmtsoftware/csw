@@ -27,7 +27,7 @@ trait IEventService {
    * Create a new instance of [[csw.services.event.api.javadsl.IEventPublisher]] with a separate underlying connection than the default instance.
    * The new instance will be required when the location of Event Service is updated or in case the performance requirements
    * of a publish operation demands a separate connection to be used.
-   * @return
+   * @return new instance of [[csw.services.event.api.javadsl.IEventPublisher]]
    */
   def makeNewPublisher(): IEventPublisher
 
@@ -35,7 +35,7 @@ trait IEventService {
    * Create a new instance of [[csw.services.event.api.javadsl.IEventPublisher]] with a separate underlying connection than the default instance.
    * The new instance will be required when the location of Event Service is updated or in case the performance requirements
    * of a subscribe operation demands a separate connection to be used.
-   * @return A new instance of [[csw.services.event.api.javadsl.IEventSubscriber]]
+   * @return new instance of [[csw.services.event.api.javadsl.IEventSubscriber]]
    */
   def makeNewSubscriber(): IEventSubscriber
 

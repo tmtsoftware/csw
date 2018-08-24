@@ -25,7 +25,7 @@ import scala.concurrent.{ExecutionContext, Future}
  * An implementation of [[csw.services.event.api.scaladsl.EventSubscriber]] API which uses Redis as the provider for publishing
  * and subscribing events.
  *
- * @param redisURI    contains connection details for the Redis/Sentinel connections.
+ * @param redisURI    future containing connection details for the Redis/Sentinel connections.
  * @param redisClient redis client available from lettuce
  * @param ec          the execution context to be used for performing asynchronous operations
  * @param mat         the materializer to be used for materializing underlying streams

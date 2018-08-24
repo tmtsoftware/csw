@@ -20,10 +20,11 @@ import scala.util.control.NonFatal
 /**
  * An implementation of [[csw.services.event.api.scaladsl.EventPublisher]] API which uses Redis as the provider for publishing
  * and subscribing events.
- * @param redisURI Contains connection details for the Redis/Sentinel connections.
- * @param redisClient A redis client available from lettuce
- * @param ec the execution context to be used for performing asynchronous operations
- * @param mat the materializer to be used for materializing underlying streams
+ *
+ * @param redisURI    future containing connection details for the Redis/Sentinel connections.
+ * @param redisClient redis client available from lettuce
+ * @param ec          the execution context to be used for performing asynchronous operations
+ * @param mat         the materializer to be used for materializing underlying streams
  */
 class RedisPublisher(redisURI: Future[RedisURI], redisClient: RedisClient)(
     implicit ec: ExecutionContext,

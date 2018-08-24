@@ -24,7 +24,7 @@ trait EventService {
    * Create a new instance of [[csw.services.event.api.scaladsl.EventPublisher]] with a separate underlying connection than the default instance.
    * The new instance will be required when the location of Event Service is updated or in case the performance requirements
    * of a publish operation demands a separate connection to be used.
-   * @return
+   * @return new instance of [[csw.services.event.api.scaladsl.EventPublisher]]
    */
   def makeNewPublisher(): EventPublisher
 
@@ -32,7 +32,7 @@ trait EventService {
    * Create a new instance of [[csw.services.event.api.scaladsl.EventPublisher]] with a separate underlying connection than the default instance.
    * The new instance will be required when the location of Event Service is updated or in case the performance requirements
    * of a subscribe operation demands a separate connection to be used.
-   * @return A new instance of [[csw.services.event.api.scaladsl.EventSubscriber]]
+   * @return new instance of [[csw.services.event.api.scaladsl.EventSubscriber]]
    */
   def makeNewSubscriber(): EventSubscriber
 }

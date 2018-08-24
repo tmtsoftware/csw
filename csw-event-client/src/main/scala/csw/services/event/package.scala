@@ -28,10 +28,8 @@ package csw.services
  *
  *      val event = SystemEvent(prefix, EventName("filter_wheel"))
  *
- *      async {
- *        val publisher    = await(eventService.defaultPublisher)
- *        publisher.publish(event)
- *      }
+ *      val publisher    = eventService.defaultPublisher
+ *      publisher.publish(event)
  *
  * }}}
  *
@@ -53,7 +51,7 @@ package csw.services
  *      }
  *
  *      async {
- *        val subscriber    = await(eventService.defaultSubscriber)
+ *        val subscriber    = eventService.defaultSubscriber
  *        subscriber.subscribeCallback(Set(EventKey(prefix, EventName("filter_wheel"))), callback)
  *
  *        val event = await(subscriber.get(event.eventKey))
