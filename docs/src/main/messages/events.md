@@ -19,17 +19,6 @@ Scala
 Java
 :   @@snip [JEventsTest.java](../../../../examples/src/test/java/csw/services/messages/JEventsTest.java) { #eventtime }
    
-## Observe Event
-
-ObserveEvent is used to describe an event within a standardized data acquisition process. Published only by Science Detector Assemblies, who emit ObserveEvents during their exposures to signal the occurrence of specific activities/actions during the acquisition of data. Observe Events are published by the detector system using the Event Service.
-
-Scala
-:   @@snip [EventsTest.scala](../../../../examples/src/test/scala/csw/services/messages/EventsTest.scala) { #observeevent }
-
-Java
-:   @@snip [JEventsTest.java](../../../../examples/src/test/java/csw/services/messages/JEventsTest.java) { #observeevent }
-
-
 ## System Event
 
 SystemEvent is used to describe a demand or other algorithm input from one component to the other. It is also used to publish internal state or status values of a component
@@ -40,6 +29,17 @@ Scala
 
 Java
 :   @@snip [JEventsTest.java](../../../../examples/src/test/java/csw/services/messages/JEventsTest.java) { #systemevent }
+
+## Observe Event
+
+ObserveEvent is used to describe an event within a standardized data acquisition process. Published only by Science Detector Assemblies, who emit ObserveEvents during their exposures to signal the occurrence of specific activities/actions during the acquisition of data. Observe Events are published by the detector system using the Event Service.
+
+Scala
+:   @@snip [EventsTest.scala](../../../../examples/src/test/scala/csw/services/messages/EventsTest.scala) { #observeevent }
+
+Java
+:   @@snip [JEventsTest.java](../../../../examples/src/test/java/csw/services/messages/JEventsTest.java) { #observeevent }
+
 
 
 ## JSON Serialization
