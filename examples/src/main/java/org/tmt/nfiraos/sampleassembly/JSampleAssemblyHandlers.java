@@ -10,6 +10,10 @@ import csw.messages.commands.CommandName;
 import csw.messages.commands.CommandResponse;
 import csw.messages.commands.ControlCommand;
 import csw.messages.commands.Setup;
+import csw.messages.events.Event;
+import csw.messages.events.EventKey;
+import csw.messages.events.EventName;
+import csw.messages.events.SystemEvent;
 import csw.messages.framework.ComponentInfo;
 import csw.messages.javadsl.JUnits;
 import csw.messages.location.*;
@@ -18,14 +22,17 @@ import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.models.ObsId;
 import csw.messages.TopLevelActorMessage;
+import csw.messages.params.models.Prefix;
 import csw.services.alarm.api.javadsl.IAlarmService;
 import csw.services.command.javadsl.JCommandService;
 import csw.services.command.CommandResponseManager;
 import csw.services.event.api.javadsl.IEventService;
+import csw.services.event.api.javadsl.IEventSubscription;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.logging.javadsl.ILogger;
 import csw.services.logging.javadsl.JLoggerFactory;
 
+import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -46,6 +53,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
     private ActorContext<TopLevelActorMessage> actorContext;
     private ILocationService locationService;
     private ComponentInfo componentInfo;
+    private IEventService eventService;
 
     private final ActorRef<WorkerCommand> commandSender;
 
@@ -67,6 +75,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
         this.locationService = locationService;
         this.componentInfo = componentInfo;
         this.commandSender = createWorkerActor();
+        this.eventService = eventService;
     }
 
     //#worker-actor
@@ -135,9 +144,13 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
     //#worker-actor
 
     //#initialize
+    private Optional<IEventSubscription> maybeEventSubscription = Optional.empty();
     @Override
     public CompletableFuture<Void> jInitialize() {
-        return CompletableFuture.runAsync(() -> log.info("In Assembly initialize"));
+        return CompletableFuture.runAsync(() -> {
+            log.info("In Assembly initialize");
+            subscribeToHcd().thenApply(s -> maybeEventSubscription = Optional.of(s));
+        });
     }
 
     @Override
@@ -160,6 +173,38 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
         }
     }
     //#track-location
+
+    //#subscribe
+    private EventKey counterEventKey = new EventKey(new Prefix("nfiraos.samplehcd"), new EventName("HcdCounter"));
+    private Key<Integer> hcdCounterKey = JKeyTypes.IntKey().make("counter");
+
+    private void processEvent(Event event) {
+        log.info("Event received: "+ event.eventName());
+        if (event instanceof SystemEvent) {
+            SystemEvent sysEvent = (SystemEvent)event;
+            if (event.eventName() == counterEventKey.eventName()) {
+                log.info("Counter = " + sysEvent.parameter(hcdCounterKey).head());
+            } else {
+                log.warn("Unexpected event received.");
+            }
+        } else {
+            // ObserveEvent, not expected
+            log.warn("Unexpected ObserveEvent received.");
+        }
+    }
+
+    private CompletableFuture<IEventSubscription> subscribeToHcd() {
+        log.info("Starting subscription.");
+        return eventService.defaultSubscriber().thenApply(subscriber ->
+                subscriber.subscribeCallback(Collections.singleton(counterEventKey), this::processEvent)
+        );
+    }
+
+    private void unsubscribeHcd() {
+        log.info("Stopping subscription.");
+        maybeEventSubscription.ifPresent(IEventSubscription::unsubscribe);
+    }
+    //#subscribe
 
     @Override
     public CommandResponse validateCommand(ControlCommand controlCommand) {

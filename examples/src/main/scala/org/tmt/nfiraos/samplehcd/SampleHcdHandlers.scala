@@ -1,5 +1,6 @@
 package org.tmt.nfiraos.samplehcd
 
+import akka.actor.Cancellable
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import csw.framework.CurrentStatePublisher
 import csw.framework.scaladsl.ComponentHandlers
@@ -73,9 +74,10 @@ class SampleHcdHandlers(
   //#worker-actor
 
   //#initialize
+  var maybePublishingGenerator: Option[Cancellable] = None
   override def initialize(): Future[Unit] = {
     log.info("In HCD initialize")
-    publishCounter()
+    publishCounter().map(p => maybePublishingGenerator = Some(p))
     Future.unit
   }
 
@@ -90,7 +92,7 @@ class SampleHcdHandlers(
   //#initialize
 
   //#publish
-  private def publishCounter(): Future[Unit] = {
+  private def publishCounter(): Future[Cancellable] = {
     var counter = 1
     def incrementCounterEvent() = {
       val param: Parameter[Int] = KeyType.IntKey.make("counter").set(counter)
@@ -98,10 +100,16 @@ class SampleHcdHandlers(
       SystemEvent(componentInfo.prefix, EventName("HcdCounter")).add(param)
     }
 
+    log.info("Starting publish stream.")
     async {
       val publisher = await(eventService.defaultPublisher)
       publisher.publish(incrementCounterEvent(), 5.second, err => log.error(err.getMessage, ex = err))
     }
+  }
+
+  private def stopPublishingGenerator(): Unit = {
+    log.info("Stopping publish stream")
+    maybePublishingGenerator.foreach(_.cancel)
   }
   //#publish
 

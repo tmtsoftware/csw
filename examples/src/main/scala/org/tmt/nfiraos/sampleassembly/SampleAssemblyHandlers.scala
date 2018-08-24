@@ -101,9 +101,10 @@ class SampleAssemblyHandlers(
   //#worker-actor
 
   //#initialize
+  private var maybeEventSubscription: Option[EventSubscription] = None
   override def initialize(): Future[Unit] = {
     log.info("In Assembly initialize")
-    subscribeToHcd()
+    subscribeToHcd().foreach(eventSubscription => maybeEventSubscription = Some(eventSubscription))
     Future.unit
   }
 
@@ -126,27 +127,32 @@ class SampleAssemblyHandlers(
   //#track-location
 
   //#subscribe
-  val hcdPrefix       = Prefix("nfiraos.samplehcd")
-  val counterEventKey = EventKey(hcdPrefix, EventName("HcdCounter"))
-  val hcdCounterKey   = KeyType.IntKey.make("counter")
+  private val counterEventKey = EventKey(Prefix("nfiraos.samplehcd"), EventName("HcdCounter"))
+  private val hcdCounterKey   = KeyType.IntKey.make("counter")
+
+  private def processEvent(event: Event): Unit = {
+    log.info(s"Event received: ${event.eventName}")
+    event match {
+      case e: SystemEvent =>
+        e.eventName match {
+          case counterEventKey.eventName => log.info(s"Counter = ${e(hcdCounterKey).head}")
+          case _                         => log.warn("Unexpected event received.")
+        }
+      case e: ObserveEvent => log.warn("Unexpected ObserveEvent received.") // not expected
+    }
+  }
 
   private def subscribeToHcd(): Future[EventSubscription] = {
+    log.info("Starting subscription.")
     async {
       val subscriber = await(eventService.defaultSubscriber)
       subscriber.subscribeCallback(Set(counterEventKey), processEvent)
     }
   }
 
-  private def processEvent(event: Event) = {
-    log.info(s"Event received: ${event.eventName}")
-    event match {
-      case e: SystemEvent =>
-        e.eventName match {
-          case EventName("HcdCounter") => log.info(s"Counter = ${e(hcdCounterKey).head}")
-          case _                       => log.error("Unexpected event received.")
-        }
-      case e: ObserveEvent => // not expected
-    }
+  private def unsubscribeHcd(): Unit = {
+    log.info("Stopping subscription.")
+    maybeEventSubscription.foreach(_.unsubscribe())
   }
   //#subscribe
 
