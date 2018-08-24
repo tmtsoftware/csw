@@ -374,7 +374,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
       maybeAlarmName = Some(tromboneAxisHighLimitKey.name)
     )
 
-    val subscription = commandExecutor.execute(cmd).asInstanceOf[AlarmSubscription]
+    val (subscription, _) = alarmAdminClient.subscribeSeverity(cmd)
     Thread.sleep(1000) //wait for subscription to finish
 
     setSeverity(tromboneAxisHighLimitKey, Major).futureValue
@@ -455,7 +455,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
       maybeAlarmName = Some(tromboneAxisHighLimitKey.name)
     )
 
-    val subscription = commandExecutor.execute(cmd).asInstanceOf[AlarmSubscription]
+    val (subscription, _) = alarmAdminClient.subscribeHealth(cmd)
     Thread.sleep(1000) //wait for subscription to finish
 
     setSeverity(tromboneAxisHighLimitKey, Major).futureValue

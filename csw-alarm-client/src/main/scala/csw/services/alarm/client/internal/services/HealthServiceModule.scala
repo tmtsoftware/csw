@@ -2,7 +2,7 @@ package csw.services.alarm.client.internal.services
 
 import akka.actor.ActorSystem
 import akka.actor.typed.ActorRef
-import akka.stream.scaladsl.Sink
+import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{ActorMaterializer, Materializer}
 import csw.services.alarm.api.internal.{HealthService, SeverityService}
 import csw.services.alarm.api.models.{AlarmHealth, Key}
@@ -27,12 +27,13 @@ trait HealthServiceModule extends HealthService {
     getAggregatedSeverity(key).map(AlarmHealth.fromSeverity)
   }
 
-  final override def subscribeAggregatedHealthCallback(key: Key, callback: AlarmHealth ⇒ Unit): AlarmSubscription = {
+  private[alarm] def subscribeAggregatedHealth(key: Key): Source[AlarmHealth, AlarmSubscription] = {
     log.debug(s"Subscribe aggregated health for alarm [${key.value}] with a callback")
-    subscribeAggregatedSeverity(key)
-      .map(AlarmHealth.fromSeverity)
-      .to(Sink.foreach(callback))
-      .run()
+    subscribeAggregatedSeverity(key).map(AlarmHealth.fromSeverity)
+  }
+
+  final override def subscribeAggregatedHealthCallback(key: Key, callback: AlarmHealth ⇒ Unit): AlarmSubscription = {
+    subscribeAggregatedHealth(key).to(Sink.foreach(callback)).run()
   }
 
   final override def subscribeAggregatedHealthActorRef(key: Key, actorRef: ActorRef[AlarmHealth]): AlarmSubscription = {

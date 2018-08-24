@@ -22,13 +22,13 @@ class CommandExecutor(alarmAdminClient: AlarmAdminClient) {
         options.subCmd match {
           case "get"       ⇒ await(alarmAdminClient.getSeverity(options))
           case "set"       ⇒ await(alarmAdminClient.setSeverity(options))
-          case "subscribe" ⇒ await(alarmAdminClient.subscribeSeverity(options))
+          case "subscribe" ⇒ await { val (_, doneF) = alarmAdminClient.subscribeSeverity(options); doneF }
         }
 
       case "health" ⇒
         options.subCmd match {
           case "get"       ⇒ await(alarmAdminClient.getHealth(options))
-          case "subscribe" ⇒ await(alarmAdminClient.subscribeHealth(options))
+          case "subscribe" ⇒ await { val (_, doneF) = alarmAdminClient.subscribeHealth(options); doneF }
         }
     }
 

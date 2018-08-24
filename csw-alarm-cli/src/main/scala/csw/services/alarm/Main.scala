@@ -15,10 +15,7 @@ object Main extends App {
     println(
       "clusterSeeds setting is not specified either as env variable or system property. Please check online documentation for this set-up."
     )
-  else
-    new ArgsParser(name)
-      .parse(args)
-      .foreach(run)
+  else new ArgsParser(name).parse(args).foreach(run)
 
   private def run(options: Options): Unit = {
     val actorSystem = ActorSystemFactory.remote()

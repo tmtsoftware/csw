@@ -50,9 +50,7 @@ trait SeverityServiceModule extends SeverityService {
 
   final override def subscribeAggregatedSeverityCallback(key: Key, callback: FullAlarmSeverity ⇒ Unit): AlarmSubscription = {
     log.debug(s"Subscribe aggregated severity for alarm [${key.value}] with a callback")
-    subscribeAggregatedSeverity(key)
-      .to(Sink.foreach(callback))
-      .run()
+    subscribeAggregatedSeverity(key).to(Sink.foreach(callback)).run()
   }
 
   final override def subscribeAggregatedSeverityActorRef(key: Key, actorRef: ActorRef[FullAlarmSeverity]): AlarmSubscription = {

@@ -1,6 +1,7 @@
 package csw.services.alarm.cli
 import akka.Done
 import akka.actor.CoordinatedShutdown
+import akka.stream.scaladsl.{Keep, RunnableGraph, Sink}
 import csw.services.alarm.api.scaladsl.AlarmSubscription
 import csw.services.alarm.cli.args.Options
 import csw.services.alarm.cli.extensions.RichFutureExt.RichFuture
@@ -37,17 +38,17 @@ class AlarmAdminClient(
   def setSeverity(options: Options): Future[Unit] =
     alarmService.setSeverity(options.alarmKey, options.severity.get).transformWithSideEffect(printLine)
 
-  def subscribeSeverity(options: Options): Future[AlarmSubscription] = async {
-    val subscription = alarmService.subscribeAggregatedSeverityCallback(
-      options.key,
-      severity ⇒ printLine(Formatter.formatSeverity(options.key, severity))
-    )
+  def subscribeSeverity(options: Options): (AlarmSubscription, Future[Done]) = {
+    val (subscription, doneF) = alarmService
+      .subscribeAggregatedSeverity(options.key)
+      .toMat(Sink.foreach(severity ⇒ printLine(Formatter.formatSeverity(options.key, severity))))(Keep.both)
+      .run()
 
     coordinatedShutdown.addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "unsubscribe-stream") { () ⇒
       subscription.unsubscribe().map(_ ⇒ Done)
     }
 
-    subscription
+    (subscription, doneF)
   }
 
   def acknowledge(options: Options): Future[Unit] =
@@ -86,10 +87,9 @@ class AlarmAdminClient(
     printLine(Formatter.formatHealth(options.key, health))
   }
 
-  def subscribeHealth(options: Options): Future[AlarmSubscription] = async {
-    alarmService.subscribeAggregatedHealthCallback(
-      options.key,
-      health ⇒ printLine(Formatter.formatHealth(options.key, health))
-    )
-  }
+  def subscribeHealth(options: Options): (AlarmSubscription, Future[Done]) =
+    alarmService
+      .subscribeAggregatedHealth(options.key)
+      .toMat(Sink.foreach(health ⇒ printLine(Formatter.formatHealth(options.key, health))))(Keep.both)
+      .run()
 }
