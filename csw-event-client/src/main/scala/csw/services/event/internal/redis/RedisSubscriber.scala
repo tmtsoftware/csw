@@ -54,8 +54,8 @@ class RedisSubscriber(redisURI: Future[RedisURI], redisClient: RedisClient)(
     val latestEventStream: Source[Event, NotUsed] = Source.fromFuture(get(eventKeys)).mapConcat(identity)
     val redisStream: Source[Event, RedisSubscription] =
       eventSubscriptionApi.subscribe(eventKeys.toList, OverflowStrategy.LATEST).map(_.value)
-    val eventStream: Source[Event, EventSubscription] = eventStream(eventKeys, redisStream)
-    latestEventStream.concatMat(eventStream)(Keep.right)
+
+    latestEventStream.concatMat(eventStream(eventKeys, redisStream))(Keep.right)
   }
 
   override def subscribe(
@@ -115,7 +115,6 @@ class RedisSubscriber(redisURI: Future[RedisURI], redisClient: RedisClient)(
     event.getOrElse(Event.invalidEvent(eventKey))
   }
 
-  // get stream of events from redis `subscribe` command
   private def eventStream[T](
       eventKeys: T,
       eventStreamF: Source[Event, RedisSubscription]
