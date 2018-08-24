@@ -25,6 +25,7 @@ pipeline {
                 sh "cd /tmp && rm -rf galil && sbt new https://github.com/tmtsoftware/csw.g8 --branch dev --name=galil --csw_version='0.1-SNAPSHOT' && cd galil && sbt clean compile"
             }
         }
+
     }
     post {
         always {
