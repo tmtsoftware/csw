@@ -1,4 +1,5 @@
 import java.io.File
+import java.nio.file.Files
 
 import com.typesafe.sbt.packager.universal.UniversalPlugin.autoImport._
 import com.typesafe.sbt.packager.universal.ZipHelper
@@ -8,10 +9,12 @@ import sbt.Keys._
 import sbt.io.{IO, Path}
 import sbt.{AutoPlugin, Def, Plugins, ProjectReference, Setting, Task, taskKey, _}
 
+import scala.sys.process._
+
 object GithubRelease extends AutoPlugin {
 
   val coverageReportZipKey = taskKey[File]("Creates a distributable zip file containing the coverage report.")
-  val testReportZipKey     = taskKey[File]("Creates a distributable zip file containing the test reports.")
+  val testReportsKey       = taskKey[(File, File)]("Creates test reports in html and zip format.")
 
   val aggregateFilter = ScopeFilter(inAggregates(ThisProject), inConfigurations(Compile))
 
@@ -24,7 +27,7 @@ object GithubRelease extends AutoPlugin {
     // this creates scoverage report zip file and required for GithubRelease task, it assumes that scoverage-report is already generated
     // and is available inside target folder (if it is not present, empty zip will be created)
     coverageReportZipKey := coverageReportZipTask.value,
-    testReportZipKey := testReportsZipTask.value
+    testReportsKey := testReportsTask.value
   )
 
   private def coverageReportZipTask = Def.task {
@@ -33,12 +36,37 @@ object GithubRelease extends AutoPlugin {
     coverageReportZip
   }
 
-  private def testReportsZipTask = Def.task {
-    lazy val testReportsZip = new File(target.value / "ghrelease", "test-reports.zip")
-    val testXmlReportFiles  = target.all(aggregateFilter).value flatMap (x ⇒ Path.allSubpaths(x / "test-reports"))
-    IO.zip(testXmlReportFiles, testReportsZip)
-    testReportsZip
+  private def testReportsTask = Def.task {
+    val log = sLog.value
+
+    lazy val testReportZip = target.value / "ghrelease" / "test-reports.zip"
+    val testReportHtml     = target.value / "ghrelease" / "test-reports.html"
+    val xmlFiles           = target.all(aggregateFilter).value.flatMap(targetPath ⇒ Path.allSubpaths(targetPath / "test-reports"))
+
+    // 1. include all xml files in single zip
+    IO.zip(xmlFiles, testReportZip)
+
+    // 2. generate html report from xml files
+    IO.withTemporaryDirectory { dir ⇒
+      // copy xml files from all projects to single directory
+      xmlFiles.foreach { case (file, fileName) ⇒ Files.copy(file.toPath, (dir / fileName).toPath) }
+
+      // 2.1 create single xml file by merging all xml's
+      val xmlFilesDir     = dir.getAbsolutePath
+      val mergedXmlReport = s"$xmlFilesDir/test-report.xml"
+      log.info(s"Merging all xml files from dir: $xmlFilesDir using junit-merge command.")
+      junitMergeCmd(xmlFilesDir, mergedXmlReport)
+
+      // 2.2 create html test report from merged xml
+      val htmlReportPath = testReportHtml.getAbsolutePath
+      log.info(s"Generating HTML report at path: $htmlReportPath using junit-viewer command.")
+      junitViewerCmd(mergedXmlReport, htmlReportPath)
+    }
+    (testReportZip, testReportHtml)
   }
+
+  private def junitMergeCmd(inputPath: String, outputPath: String)  = s"junit-merge -d $inputPath -o $outputPath".!
+  private def junitViewerCmd(inputPath: String, outputPath: String) = s"junit-viewer --results=$inputPath  --save=$outputPath".!
 
   private def stageAndZipTask(projects: Seq[ProjectReference]): Def.Initialize[Task[File]] = Def.task {
     val log          = sLog.value
@@ -68,10 +96,13 @@ object GithubRelease extends AutoPlugin {
   }
 
   def githubReleases(projects: Seq[ProjectReference]): Setting[Task[Seq[sbt.File]]] =
-    ghreleaseAssets := Seq(
-      stageAndZipTask(projects).value,
-      coverageReportZipKey.value,
-      testReportZipKey.value
-    )
-
+    ghreleaseAssets := {
+      val (testReportZip, testReportHtml) = testReportsKey.value
+      Seq(
+        stageAndZipTask(projects).value,
+        coverageReportZipKey.value,
+        testReportZip,
+        testReportHtml
+      )
+    }
 }
