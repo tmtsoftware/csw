@@ -54,6 +54,13 @@ pipeline {
             }
         }
 
+        stage('Git Tag') {
+            steps {
+                sh "git tag $VERSION"
+                sh "git push origin $VERSION"
+            }
+        }
+
         stage('Github Release') {
             steps {
                 sh "sbt -Dprod.publish=true githubRelease"
@@ -75,7 +82,7 @@ pipeline {
         stage('Remote Build Trigger- Acceptance') {
             steps {
                 withCredentials([string(credentialsId: 'RELEASE_TOKEN', variable: 'RELEASE_TOKEN')]) {
-                    sh "curl -G '$REMOTE_JENKINS_URL/job/acceptance-release/buildWithParameters' --data-urlencode token=$RELEASE_TOKEN --data-urlencode RELEASE_VERSION=$RELEASE_VERSION --data-urlencode BUILD_ENV=PROD"
+                    sh "curl -G '$REMOTE_JENKINS_URL/job/acceptance-release/buildWithParameters' --data-urlencode token=$RELEASE_TOKEN --data-urlencode RELEASE_VERSION=$VERSION --data-urlencode BUILD_ENV=PROD"
                 }
             }
         }
