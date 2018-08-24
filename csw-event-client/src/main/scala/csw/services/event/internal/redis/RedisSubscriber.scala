@@ -54,7 +54,7 @@ class RedisSubscriber(redisURI: Future[RedisURI], redisClient: RedisClient)(
     val latestEventStream: Source[Event, NotUsed] = Source.fromFuture(get(eventKeys)).mapConcat(identity)
     val redisStream: Source[Event, RedisSubscription] =
       eventSubscriptionApi.subscribe(eventKeys.toList, OverflowStrategy.LATEST).map(_.value)
-    val eventStream: Source[Event, EventSubscription] = subscribeInternal(eventKeys, redisStream)
+    val eventStream: Source[Event, EventSubscription] = eventStream(eventKeys, redisStream)
     latestEventStream.concatMat(eventStream)(Keep.right)
   }
 
@@ -101,7 +101,7 @@ class RedisSubscriber(redisURI: Future[RedisURI], redisClient: RedisClient)(
     val patternSubscriptionApi: RedisSubscriptionApi[String, Event] = subscriptionApi()
     val redisStream: Source[Event, RedisSubscription] =
       patternSubscriptionApi.psubscribe(List(keyPattern), OverflowStrategy.LATEST).map(_.value)
-    subscribeInternal(keyPattern, redisStream)
+    eventStream(keyPattern, redisStream)
   }
 
   override def pSubscribeCallback(subsystem: Subsystem, pattern: String, callback: Event ⇒ Unit): EventSubscription =
@@ -116,10 +116,10 @@ class RedisSubscriber(redisURI: Future[RedisURI], redisClient: RedisClient)(
   }
 
   // get stream of events from redis `subscribe` command
-  private def subscribeInternal[T](
+  private def eventStream[T](
       eventKeys: T,
       eventStreamF: Source[Event, RedisSubscription]
-  ): Source[Event, EventSubscription] = {
+  ): Source[Event, EventSubscription] =
     eventStreamF.mapMaterializedValue { redisSubscription =>
       new EventSubscription {
         override def unsubscribe(): Future[Done] = {
@@ -131,6 +131,4 @@ class RedisSubscriber(redisURI: Future[RedisURI], redisClient: RedisClient)(
         }
       }
     }
-  }
-
 }

@@ -385,7 +385,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
       s"Severity of Alarm ${tromboneAxisHighLimitKey.value}: ${Okay.toString}"
     )
 
-    subscription.unsubscribe()
+    subscription.unsubscribe().futureValue
   }
 
   // -------------------------------------------Health--------------------------------------------
@@ -466,6 +466,6 @@ class CommandExecutorTest extends AlarmCliTestSetup {
       s"Health of Alarm ${tromboneAxisHighLimitKey.value}: ${Good.toString}"
     )
 
-    subscription.unsubscribe()
+    subscription.unsubscribe().futureValue
   }
 }
