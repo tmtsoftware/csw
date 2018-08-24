@@ -165,6 +165,55 @@ class HealthServiceModuleTest
     alarmSubscription.unsubscribe().await
   }
 
+  // DEOPSCSW-448: Set Activation status for an alarm entity
+  // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem or all
+  test("subscribeAggregatedHealthCallback should not consider inactive alarm for aggregation") {
+
+    val testProbe = TestProbe[AlarmHealth]()(actorSystem.toTyped)
+    val alarmSubscription =
+      subscribeAggregatedHealthCallback(ComponentKey(NFIRAOS, "enclosure"), testProbe.ref ! _)
+    alarmSubscription.ready().await
+
+    Thread.sleep(500) // wait for redis connection to happen
+    enclosureTempHighAlarm.isActive shouldBe true
+    setSeverity(enclosureTempHighAlarmKey, Okay).await
+
+    testProbe.expectMessage(Good)
+
+    setSeverity(enclosureTempHighAlarmKey, Okay).await
+
+    enclosureTempLowAlarm.isActive shouldBe false
+    setSeverity(enclosureTempLowAlarmKey, Critical).await
+
+    testProbe.expectMessage(Good)
+
+    alarmSubscription.unsubscribe().await
+  }
+
+  // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem or all
+  test("subscribeAggregatedSeverityCallback should throw KeyNotFoundException if the key does not match any key") {
+    an[KeyNotFoundException] shouldBe thrownBy {
+      val subscription = subscribeAggregatedHealthCallback(SubsystemKey(BAD), println)
+      subscription.ready().await
+    }
+  }
+
+  // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem or all
+  test("subscribeAggregatedHealthCallback should throw KeyNotFoundException when key is invalid") {
+    an[KeyNotFoundException] shouldBe thrownBy {
+      val subscription = subscribeAggregatedHealthCallback(SubsystemKey(BAD), println)
+      subscription.ready().await
+    }
+  }
+
+  // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem or all
+  test("subscribeAggregatedHealthCallback should throw InactiveAlarmException when all resolved keys are inactive") {
+    an[InactiveAlarmException] shouldBe thrownBy {
+      val subscription = subscribeAggregatedHealthCallback(SubsystemKey(LGSF), println)
+      subscription.ready().await
+    }
+  }
+
   // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem or all
   test("subscribe aggregated health via actorRef for a subsystem") {
 
@@ -206,5 +255,14 @@ class HealthServiceModuleTest
     testProbe.expectMessage(Good)
 
     alarmSubscription.unsubscribe().await
+  }
+
+  // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem or all
+  test("subscribeAggregatedHealthActorRef should throw InactiveAlarmException when all resolved keys are inactive") {
+    an[InactiveAlarmException] shouldBe thrownBy {
+      val testProbe    = TestProbe[AlarmHealth]()(actorSystem.toTyped)
+      val subscription = subscribeAggregatedHealthActorRef(SubsystemKey(LGSF), testProbe.ref)
+      subscription.ready().await
+    }
   }
 }
