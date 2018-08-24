@@ -127,8 +127,8 @@ public class JSampleHcdHandlers extends JComponentHandlers {
     //#publish
     private int counter = 0;
     private Event incrementCounterEvent() {
-        Parameter<Integer> param = JKeyTypes.IntKey().make("counter").set(counter);
         counter += 1;
+        Parameter<Integer> param = JKeyTypes.IntKey().make("counter").set(counter);
         return new SystemEvent(componentInfo.prefix(), new EventName("HcdCounter")).add(param);
     }
 

@@ -93,10 +93,10 @@ class SampleHcdHandlers(
 
   //#publish
   private def publishCounter(): Future[Cancellable] = {
-    var counter = 1
+    var counter = 0
     def incrementCounterEvent() = {
-      val param: Parameter[Int] = KeyType.IntKey.make("counter").set(counter)
       counter += 1
+      val param: Parameter[Int] = KeyType.IntKey.make("counter").set(counter)
       SystemEvent(componentInfo.prefix, EventName("HcdCounter")).add(param)
     }
 
