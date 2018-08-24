@@ -1,7 +1,7 @@
 package csw.services.alarm.cli
 import akka.Done
 import akka.actor.CoordinatedShutdown
-import akka.stream.scaladsl.{Keep, RunnableGraph, Sink}
+import akka.stream.scaladsl.{Keep, Sink}
 import csw.services.alarm.api.scaladsl.AlarmSubscription
 import csw.services.alarm.cli.args.Options
 import csw.services.alarm.cli.extensions.RichFutureExt.RichFuture
@@ -44,9 +44,7 @@ class AlarmAdminClient(
       .toMat(Sink.foreach(severity ⇒ printLine(Formatter.formatSeverity(options.key, severity))))(Keep.both)
       .run()
 
-    coordinatedShutdown.addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "unsubscribe-stream") { () ⇒
-      subscription.unsubscribe().map(_ ⇒ Done)
-    }
+    unsubscribeOnCoordinatedShutdown(subscription)
 
     (subscription, doneF)
   }
@@ -87,9 +85,18 @@ class AlarmAdminClient(
     printLine(Formatter.formatHealth(options.key, health))
   }
 
-  def subscribeHealth(options: Options): (AlarmSubscription, Future[Done]) =
-    alarmService
+  def subscribeHealth(options: Options): (AlarmSubscription, Future[Done]) = {
+    val (subscription, doneF) = alarmService
       .subscribeAggregatedHealth(options.key)
       .toMat(Sink.foreach(health ⇒ printLine(Formatter.formatHealth(options.key, health))))(Keep.both)
       .run()
+
+    unsubscribeOnCoordinatedShutdown(subscription)
+    (subscription, doneF)
+  }
+
+  def unsubscribeOnCoordinatedShutdown(subscription: AlarmSubscription): Unit =
+    coordinatedShutdown.addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "unsubscribe-health-stream") { () ⇒
+      subscription.unsubscribe().map(_ ⇒ Done)
+    }
 }
