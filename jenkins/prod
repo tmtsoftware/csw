@@ -82,7 +82,7 @@ pipeline {
         stage('Remote Build Trigger- Acceptance') {
             steps {
                 withCredentials([string(credentialsId: 'RELEASE_TOKEN', variable: 'RELEASE_TOKEN')]) {
-                    sh "curl -G '$REMOTE_JENKINS_URL/job/acceptance-release/buildWithParameters' --data-urlencode token=$RELEASE_TOKEN --data-urlencode RELEASE_VERSION=$VERSION --data-urlencode BUILD_ENV=PROD"
+                    sh "curl -G '$REMOTE_JENKINS_URL/job/acceptance-release/buildWithParameters' --data-urlencode token=$RELEASE_TOKEN --data-urlencode RELEASE_VERSION=${params.VERSION - ~/^v/} --data-urlencode BUILD_ENV=PROD"
                 }
             }
         }

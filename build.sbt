@@ -248,7 +248,7 @@ lazy val `csw-commons` = project
   )
 
 lazy val `romaine` = project
-  .disablePlugins(BintrayPlugin)
+  .enablePlugins(BintrayPlugin)
   .settings(
     libraryDependencies ++= Dependencies.Romaine
   )

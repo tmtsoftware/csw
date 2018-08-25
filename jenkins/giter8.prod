@@ -17,7 +17,7 @@ pipeline {
 
         stage('Giter8 Compile') { // These tests cover the scenario of multiple components in multiple containers on different machines.
             steps {
-                sh "cd /tmp && rm -rf galil && sbt new https://github.com/tmtsoftware/csw.g8 --name=galil --csw_version=$VERSION && cd galil && sbt clean compile"
+                sh "cd /tmp && rm -rf galil && sbt new https://github.com/tmtsoftware/csw.g8 --name=galil --csw_version=${params.VERSION - ~/^v/} && cd galil && sbt clean compile"
             }
         }
 
