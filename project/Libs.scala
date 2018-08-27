@@ -21,7 +21,7 @@ object Libs {
   val `joda-time`                    = "joda-time"              % "joda-time"                     % "2.10" //Apache 2.0
   val `scala-reflect`                = "org.scala-lang"         % "scala-reflect"                 % ScalaVersion //BSD-3
   val `gson`                         = "com.google.code.gson"   % "gson"                          % "2.8.5" //Apache 2.0
-  val `play-json`                    = "com.typesafe.play"      %% "play-json"                    % "2.6.9" //Apache 2.0
+  val `play-json`                    = "com.typesafe.play"      %% "play-json"                    % "2.6.10" //Apache 2.0
   val `play-json-extensions`         = "ai.x"                   %% "play-json-extensions"         % "0.14.0" //Simplified BSD License
   val `akka-http-play-json`          = "de.heikoseeberger"      %% "akka-http-play-json"          % "1.21.0" //Apache 2.0
   val `scalapb-runtime`              = "com.thesamet.scalapb"   %% "scalapb-runtime"              % scalapbVersion % "protobuf"
@@ -52,7 +52,7 @@ object Enumeratum {
 }
 
 object Chill {
-  val Version           = "0.9.2"
+  val Version           = "0.9.3"
   val `chill-akka`      = "com.twitter" %% "chill-akka" % Version //Apache License 2.0
   val `chill-bijection` = "com.twitter" %% "chill-bijection" % Version //Apache License 2.0
 }
@@ -74,7 +74,7 @@ object Akka {
 }
 
 object AkkaHttp {
-  val Version             = "10.1.3"
+  val Version             = "10.1.4"
   val `akka-http`         = "com.typesafe.akka" %% "akka-http" % Version //ApacheV2
   val `akka-http-testkit` = "com.typesafe.akka" %% "akka-http-testkit" % Version //ApacheV2
 }
