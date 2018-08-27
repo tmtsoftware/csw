@@ -74,6 +74,14 @@ object SeverityTestScenarios {
     ),
     SetSeverityAckStatusTestCase(
       alarmKey = AlarmKey(AOESW, "test", "alarm5"),
+      oldSeverity = Critical,
+      newSeverity = Okay,
+      isAutoAcknowledgeable = true,
+      oldAckStatus = Unacknowledged,
+      newAckStatus = Acknowledged
+    ),
+    SetSeverityAckStatusTestCase(
+      alarmKey = AlarmKey(AOESW, "test", "alarm6"),
       oldSeverity = Okay,
       newSeverity = Okay,
       isAutoAcknowledgeable = true,
@@ -83,7 +91,7 @@ object SeverityTestScenarios {
     // ====== Severity = Okay && AutoAck = false =====
     // NewAckStatus = OldAckStatus
     SetSeverityAckStatusTestCase(
-      alarmKey = AlarmKey(AOESW, "test", "alarm6"),
+      alarmKey = AlarmKey(AOESW, "test", "alarm7"),
       oldSeverity = Warning,
       newSeverity = Okay,
       isAutoAcknowledgeable = false,
@@ -91,7 +99,7 @@ object SeverityTestScenarios {
       newAckStatus = Unacknowledged
     ),
     SetSeverityAckStatusTestCase(
-      alarmKey = AlarmKey(AOESW, "test", "alarm7"),
+      alarmKey = AlarmKey(AOESW, "test", "alarm8"),
       oldSeverity = Warning,
       newSeverity = Okay,
       isAutoAcknowledgeable = false,
