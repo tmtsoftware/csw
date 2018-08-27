@@ -75,9 +75,9 @@ trait StatusServiceModule extends StatusService {
 
   private[alarm] def updateStatusForSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Unit] = async {
 
-    val metadata         = await(getMetadata(key))
-    val originalStatus   = await(getStatus(key))
-    val originalSeverity = await(getCurrentSeverity(key))
+    val metadata                  = await(getMetadata(key))
+    val originalStatus            = await(getStatus(key))
+    val originalHeartbeatSeverity = await(getCurrentSeverity(key))
 
     // This class is not exposed outside `updateStatusForSeverity` function because
     // it's logic is strictly internal to this function.
@@ -102,7 +102,7 @@ trait StatusServiceModule extends StatusService {
        */
       def updateAckStatus(): AlarmStatus = {
         def isAutoAckAndOkay            = metadata.isAutoAcknowledgeable && severity == Okay
-        def isSeverityChangedAndNotOkay = severity != originalSeverity && severity != Okay
+        def isSeverityChangedAndNotOkay = severity != originalHeartbeatSeverity && severity != Okay
 
         if (isAutoAckAndOkay) targetAlarmStatus.copy(acknowledgementStatus = Acknowledged)
         else if (isSeverityChangedAndNotOkay) targetAlarmStatus.copy(acknowledgementStatus = Unacknowledged)
@@ -113,18 +113,18 @@ trait StatusServiceModule extends StatusService {
        * Updates time of alarm if latchedSeverity has changed, otherwise it's a no op
        * @return updated AlarmStatus
        */
-      def updateTime(): AlarmStatus = {
-        if (originalStatus.latchedSeverity != targetAlarmStatus.latchedSeverity)
-          targetAlarmStatus.copy(alarmTime = Some(AlarmTime()))
+      def updateTime(): AlarmStatus =
+        if (originalHeartbeatSeverity != severity) targetAlarmStatus.copy(alarmTime = Some(AlarmTime()))
         else targetAlarmStatus
-      }
 
       /**
        * Persists the given alarm status to redis if there are any changes, otherwise it's a no op
        */
       def persistChanges(): Future[Unit] =
-        if (originalStatus != targetAlarmStatus) setStatus(key, targetAlarmStatus)
-        else Future(())
+        if (originalStatus != targetAlarmStatus) {
+          log.info(s"Updating alarm status from: [$originalStatus] to: [$targetAlarmStatus]")
+          setStatus(key, targetAlarmStatus)
+        } else Future.successful()
     }
 
     await(
