@@ -101,8 +101,8 @@ trait SeverityServiceModule extends SeverityService {
       .fromFutureSource(severitySourceF)
       .mapMaterializedValue { mat =>
         new AlarmSubscription {
-          override def unsubscribe(): Future[Unit] = mat.map(_.unsubscribe())
-          override def ready(): Future[Unit]       = mat.map(_.ready())
+          override def unsubscribe(): Future[Unit] = mat.flatMap(_.unsubscribe()).map(_ ⇒ ())
+          override def ready(): Future[Unit]       = mat.flatMap(_.ready()).map(_ ⇒ ())
         }
       }
   }
