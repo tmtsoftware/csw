@@ -14,7 +14,8 @@ case class Options(
     maybeSubsystem: Option[Subsystem] = None,
     maybeComponent: Option[String] = None,
     maybeAlarmName: Option[String] = None,
-    severity: Option[AlarmSeverity] = None
+    severity: Option[AlarmSeverity] = None,
+    autoRefresh: Boolean = false
 ) {
 
   def alarmKey: AlarmKey = (maybeSubsystem, maybeComponent, maybeAlarmName) match {

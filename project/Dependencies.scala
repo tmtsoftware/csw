@@ -50,6 +50,7 @@ object Dependencies {
     Akka.`akka-actor-typed`,
     Akka.`akka-actor-testkit-typed`,
     Akka.`akka-stream`,
+    Akka.`akka-stream-typed`,
     Akka.`akka-distributed-data`,
     Akka.`akka-remote`,
     Akka.`akka-cluster-tools`,

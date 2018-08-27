@@ -125,10 +125,37 @@ class ArgsParserTest extends FunSuite with Matchers {
     )
   }
 
-  val commands =
+  test("parse refresh severity command") {
+    val options = Array(
+      "severity",
+      "set",
+      "Major",
+      "--subsystem",
+      "NFIRAOS",
+      "--component",
+      "trombone",
+      "--name",
+      "tromboneAxisHighLimitAlarm",
+      "--refresh"
+    )
+
+    silentParse(options) should contain(
+      Options(
+        cmd = "severity",
+        subCmd = "set",
+        maybeSubsystem = Some(NFIRAOS),
+        maybeComponent = Some("trombone"),
+        maybeAlarmName = Some("tromboneAxisHighLimitAlarm"),
+        severity = Some(Major),
+        autoRefresh = true
+      )
+    )
+  }
+
+  val commandsRequiringAlarmKey =
     List("acknowledge", "unacknowledge", "activate", "deactivate", "shelve", "unshelve", "reset", "status")
 
-  commands.foreach { command ⇒
+  commandsRequiringAlarmKey.foreach { command ⇒
     test(s"parse $command command") {
       val options = Array(
         command,

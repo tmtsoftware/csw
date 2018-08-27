@@ -28,10 +28,8 @@ object ShelveTimeoutActor {
           case ScheduleShelveTimeout(key) ⇒
             val duration = clock.untilNext(shelveTimeoutHour).toScala
             timerScheduler.startSingleTimer(key.value, ShelveHasTimedOut(key), duration)
-          case CancelShelveTimeout(key) ⇒
-            timerScheduler.cancel(key.value)
-          case ShelveHasTimedOut(key) ⇒
-            alarm.unshelve(key)
+          case CancelShelveTimeout(key) ⇒ timerScheduler.cancel(key.value)
+          case ShelveHasTimedOut(key)   ⇒ alarm.unshelve(key)
         }
         Behaviors.same
       }

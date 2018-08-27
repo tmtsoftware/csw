@@ -23,7 +23,7 @@ class ArgsParser(name: String) {
           .text("get severity of a subsystem/component/alarm"),
         cmd("set")
           .action((_, args) ⇒ args.copy(subCmd = "set"))
-          .children(requiredAlarmKey :+ severity: _*)
+          .children(requiredAlarmKey :+ severity :+ refresh: _*)
           .text("set severity of an alarm"),
         cmd("subscribe")
           .action((_, args) ⇒ args.copy(subCmd = "subscribe"))

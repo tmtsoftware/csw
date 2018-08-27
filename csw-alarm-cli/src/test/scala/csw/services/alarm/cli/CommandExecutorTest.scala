@@ -388,6 +388,28 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     subscription.unsubscribe().futureValue
   }
 
+  // DEOPSCSW-491: Auto-refresh an alarm through alarm service cli
+  test("should refresh severity of alarm") {
+    val cmd = Options(
+      cmd = "severity",
+      subCmd = "set",
+      severity = Some(Major),
+      maybeSubsystem = Some(tromboneAxisHighLimitKey.subsystem),
+      maybeComponent = Some(tromboneAxisHighLimitKey.component),
+      maybeAlarmName = Some(tromboneAxisHighLimitKey.name),
+      autoRefresh = true
+    )
+
+    getCurrentSeverity(tromboneAxisHighLimitKey).futureValue shouldBe Disconnected
+    alarmAdminClient.refreshSeverity(cmd)
+    Thread.sleep(500)
+    getCurrentSeverity(tromboneAxisHighLimitKey).futureValue shouldBe Major
+    Thread.sleep(1200) // Waiting for severity to timeout to Disconnected
+    getCurrentSeverity(tromboneAxisHighLimitKey).futureValue shouldBe Major
+
+    logBuffer shouldEqual List(successMsg, successMsg)
+  }
+
   // -------------------------------------------Health--------------------------------------------
 
   // DEOPSCSW-478: Fetch health of component/subsystem from CLI Interface

@@ -2,6 +2,9 @@ package csw.services.alarm.cli
 import akka.Done
 import akka.actor.CoordinatedShutdown
 import akka.stream.scaladsl.{Keep, Sink}
+import com.typesafe.config.ConfigFactory
+import csw.services.alarm.api.models.AlarmSeverity
+import csw.services.alarm.api.models.Key.AlarmKey
 import csw.services.alarm.api.scaladsl.AlarmSubscription
 import csw.services.alarm.cli.args.Options
 import csw.services.alarm.cli.extensions.RichFutureExt.RichFuture
@@ -9,6 +12,9 @@ import csw.services.alarm.cli.utils.{ConfigUtils, Formatter}
 import csw.services.alarm.cli.wiring.ActorRuntime
 import csw.services.alarm.client.AlarmServiceFactory
 import csw.services.alarm.client.internal.AlarmServiceImpl
+import csw.services.alarm.client.internal.auto_refresh.AutoRefreshSeverityActorFactory
+import csw.services.alarm.client.internal.auto_refresh.AutoRefreshSeverityMessage.SetSeverityAndAutoRefresh
+import csw.services.alarm.client.internal.commons.Settings
 import csw.services.location.scaladsl.LocationService
 
 import scala.async.Async.{async, await}
@@ -95,7 +101,16 @@ class AlarmAdminClient(
     (subscription, doneF)
   }
 
-  def unsubscribeOnCoordinatedShutdown(subscription: AlarmSubscription): Unit =
+  def refreshSeverity(options: Options): Unit = {
+    val refreshInterval = new Settings(ConfigFactory.load()).refreshInSeconds
+    def refreshable(key: AlarmKey, severity: AlarmSeverity): Unit =
+      alarmService.setCurrentSeverity(key, severity).transformWithSideEffect(printLine)
+
+    val refreshActor = new AutoRefreshSeverityActorFactory().make(refreshable, refreshInterval)
+    refreshActor ! SetSeverityAndAutoRefresh(options.alarmKey, options.severity.get)
+  }
+
+  private def unsubscribeOnCoordinatedShutdown(subscription: AlarmSubscription): Unit =
     coordinatedShutdown.addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "unsubscribe-health-stream") { () ⇒
       subscription.unsubscribe().map(_ ⇒ Done)
     }

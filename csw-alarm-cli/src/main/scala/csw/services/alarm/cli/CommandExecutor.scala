@@ -5,7 +5,7 @@ import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
 
 class CommandExecutor(alarmAdminClient: AlarmAdminClient) {
-  def execute(options: Options): Any =
+  def execute(options: Options): Unit =
     options.cmd match {
       case "init"          ⇒ await(alarmAdminClient.init(options))
       case "list"          ⇒ await(alarmAdminClient.list(options))
@@ -20,9 +20,10 @@ class CommandExecutor(alarmAdminClient: AlarmAdminClient) {
 
       case "severity" ⇒
         options.subCmd match {
-          case "get"       ⇒ await(alarmAdminClient.getSeverity(options))
-          case "set"       ⇒ await(alarmAdminClient.setSeverity(options))
-          case "subscribe" ⇒ await { val (_, doneF) = alarmAdminClient.subscribeSeverity(options); doneF }
+          case "get"                        ⇒ await(alarmAdminClient.getSeverity(options))
+          case "set" if options.autoRefresh ⇒ await({ alarmAdminClient.refreshSeverity(options); Future.never })
+          case "set"                        ⇒ await(alarmAdminClient.setSeverity(options))
+          case "subscribe"                  ⇒ await { val (_, doneF) = alarmAdminClient.subscribeSeverity(options); doneF }
         }
 
       case "health" ⇒

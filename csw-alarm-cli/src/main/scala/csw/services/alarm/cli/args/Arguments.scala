@@ -44,4 +44,9 @@ trait Arguments { self: OptionParser[Options] =>
         (severity, args) ⇒ args.copy(severity = Some(AlarmSeverity.withNameInsensitive(severity)))
       )
       .text(s"severity to set for an alarm e.g ${AlarmSeverity.values.mkString("[", ", ", "]")}")
+
+  def refresh: OptionDef[Unit, Options] =
+    opt[Unit]("refresh")
+      .action((_, options) ⇒ options.copy(autoRefresh = true))
+      .text("auto-refresh severity of an alarm")
 }

@@ -60,6 +60,7 @@ object Chill {
 object Akka {
   val Version                    = "2.5.15" //all akka is Apache License 2.0
   val `akka-stream`              = "com.typesafe.akka" %% "akka-stream" % Version
+  val `akka-stream-typed`        = "com.typesafe.akka" %% "akka-stream-typed" % Version
   val `akka-remote`              = "com.typesafe.akka" %% "akka-remote" % Version
   val `akka-stream-testkit`      = "com.typesafe.akka" %% "akka-stream-testkit" % Version
   val `akka-actor`               = "com.typesafe.akka" %% "akka-actor" % Version

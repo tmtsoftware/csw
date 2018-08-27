@@ -6,6 +6,8 @@ import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 
 class AutoRefreshSeverityActorFactory {
-  def make(alarm: Refreshable)(implicit actorSystem: ActorSystem): ActorRef[AutoRefreshSeverityMessage] =
-    actorSystem.spawnAnonymous(Behaviors.withTimers[AutoRefreshSeverityMessage](AutoRefreshSeverityActor.behavior(_, alarm)))
+  def make(alarm: Refreshable, refreshInterval: Int)(implicit actorSystem: ActorSystem): ActorRef[AutoRefreshSeverityMessage] =
+    actorSystem.spawnAnonymous(
+      Behaviors.withTimers[AutoRefreshSeverityMessage](AutoRefreshSeverityActor.behavior(_, alarm, refreshInterval))
+    )
 }
