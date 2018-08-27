@@ -1,4 +1,3 @@
 Acknowledgement Status: Acknowledged
 Latch Severity: Disconnected
 Shelve Status: Unshelved
-Alarm Time: 

@@ -285,7 +285,8 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     )
 
     commandExecutor.execute(cmd)
-    logBuffer shouldEqualContentsOf "status.txt"
+    // alarm time changes on every run hence filter out time before assertion
+    logBuffer.flatMap(_.split("\n")).filterNot(_.contains("Alarm Time")) shouldEqualContentsOf "status.txt"
   }
 
   // -------------------------------------------Severity--------------------------------------------
@@ -461,8 +462,8 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     setSeverity(tromboneAxisHighLimitKey, Okay).futureValue
 
     logBuffer shouldEqual List(
-      s"Health of Alarm ${tromboneAxisHighLimitKey.value}: ${Ill.toString}",
-      s"Health of Alarm ${tromboneAxisHighLimitKey.value}: ${Good.toString}"
+      s"Health of Alarm ${tromboneAxisHighLimitKey.value}: $Ill",
+      s"Health of Alarm ${tromboneAxisHighLimitKey.value}: $Good"
     )
 
     subscription.unsubscribe().futureValue
