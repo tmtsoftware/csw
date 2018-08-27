@@ -5,7 +5,7 @@ import java.time.{Clock, Duration, LocalTime}
 
 object TimeExtensions {
 
-  private val TimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("hh:mm a")
+  private val TimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("h:m a")
 
   implicit class RichClock(val clock: Clock) extends AnyVal {
     def untilNext(hour: Int): Duration    = untilNext(LocalTime.of(hour, 0))

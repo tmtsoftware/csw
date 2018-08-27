@@ -1,6 +1,6 @@
 package csw.services.alarm.client.internal.shelve
 
-import java.time.{ZoneOffset, ZonedDateTime}
+import java.time.Clock
 
 import akka.actor.testkit.typed.scaladsl.{ActorTestKit, ManualTime, TestProbe}
 import akka.actor.typed.ActorRef
@@ -8,7 +8,7 @@ import akka.actor.typed.scaladsl.Behaviors
 import com.typesafe.config.Config
 import csw.messages.params.models.Subsystem.NFIRAOS
 import csw.services.alarm.api.models.Key.AlarmKey
-import csw.services.alarm.client.internal.extensions.ZonedDateTimeExtensions.{RichInt, RichZonedDateTime}
+import csw.services.alarm.client.internal.extensions.TimeExtensions.RichClock
 import csw.services.alarm.client.internal.shelve.ShelveTimeoutMessage.{
   CancelShelveTimeout,
   ScheduleShelveTimeout,
@@ -18,6 +18,7 @@ import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSuite, Matchers}
 
 import scala.collection.mutable
+import scala.compat.java8.DurationConverters.DurationOps
 import scala.concurrent.duration.DurationDouble
 
 // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
@@ -48,7 +49,7 @@ class ShelveTimeoutActorTest extends FunSuite with Matchers with ActorTestKit wi
     actor ! ScheduleShelveTimeout(tromboneAxisHighLimitAlarmKey)
 
     manualTime.expectNoMessageFor(3.seconds, probe)
-    val duration = 8.toHourOfDay - ZonedDateTime.now(ZoneOffset.UTC)
+    val duration = Clock.systemUTC().untilNext("8:00 AM").toScala
     manualTime.timePasses(duration)
 
     probe.expectMessage("Unshelve called")
@@ -63,7 +64,7 @@ class ShelveTimeoutActorTest extends FunSuite with Matchers with ActorTestKit wi
     actor ! ScheduleShelveTimeout(tromboneAxisHighLimitAlarmKey)
     actor ! ScheduleShelveTimeout(tcsAxisHighLimitAlarmKey)
 
-    val duration = 8.toHourOfDay - ZonedDateTime.now(ZoneOffset.UTC) + 10.minutes
+    val duration = Clock.systemUTC().untilNext("8:10 AM").toScala
     manualTime.timePasses(duration)
 
     eventually(unshelvedAlarms shouldEqual Set(tromboneAxisHighLimitAlarmKey, tcsAxisHighLimitAlarmKey))
@@ -78,7 +79,7 @@ class ShelveTimeoutActorTest extends FunSuite with Matchers with ActorTestKit wi
     actor ! ScheduleShelveTimeout(tromboneAxisHighLimitAlarmKey)
     actor ! CancelShelveTimeout(tromboneAxisHighLimitAlarmKey)
 
-    val duration = 8.toHourOfDay - ZonedDateTime.now(ZoneOffset.UTC) + 10.minutes
+    val duration = Clock.systemUTC().untilNext("8:10 AM").toScala
     manualTime.expectNoMessageFor(duration, probe)
   }
 
@@ -94,7 +95,7 @@ class ShelveTimeoutActorTest extends FunSuite with Matchers with ActorTestKit wi
     actor ! CancelShelveTimeout(tromboneAxisHighLimitAlarmKey)
     actor ! CancelShelveTimeout(tcsAxisHighLimitAlarmKey)
 
-    val duration = 8.toHourOfDay - ZonedDateTime.now(ZoneOffset.UTC) + 10.minutes
+    val duration = Clock.systemUTC().untilNext("8:10 AM").toScala
     manualTime.expectNoMessageFor(duration, probe)
   }
 }
