@@ -1,6 +1,7 @@
 package csw.services.alarm.cli
 import akka.Done
 import akka.actor.CoordinatedShutdown
+import akka.actor.typed.ActorRef
 import akka.stream.scaladsl.{Keep, Sink}
 import com.typesafe.config.ConfigFactory
 import csw.services.alarm.api.models.AlarmSeverity
@@ -12,7 +13,7 @@ import csw.services.alarm.cli.utils.{ConfigUtils, Formatter}
 import csw.services.alarm.cli.wiring.ActorRuntime
 import csw.services.alarm.client.AlarmServiceFactory
 import csw.services.alarm.client.internal.AlarmServiceImpl
-import csw.services.alarm.client.internal.auto_refresh.AutoRefreshSeverityActorFactory
+import csw.services.alarm.client.internal.auto_refresh.{AutoRefreshSeverityActorFactory, AutoRefreshSeverityMessage}
 import csw.services.alarm.client.internal.auto_refresh.AutoRefreshSeverityMessage.SetSeverityAndAutoRefresh
 import csw.services.alarm.client.internal.commons.Settings
 import csw.services.location.scaladsl.LocationService
@@ -101,13 +102,14 @@ class AlarmAdminClient(
     (subscription, doneF)
   }
 
-  def refreshSeverity(options: Options): Unit = {
+  def refreshSeverity(options: Options): ActorRef[AutoRefreshSeverityMessage] = {
     val refreshInterval = new Settings(ConfigFactory.load()).refreshInSeconds
     def refreshable(key: AlarmKey, severity: AlarmSeverity): Unit =
-      alarmService.setCurrentSeverity(key, severity).transformWithSideEffect(printLine)
+      alarmService.setCurrentSeverity(key, severity).map(_ => printLine(Formatter.formatRefreshSeverity(key, severity)))
 
     val refreshActor = new AutoRefreshSeverityActorFactory().make(refreshable, refreshInterval)
     refreshActor ! SetSeverityAndAutoRefresh(options.alarmKey, options.severity.get)
+    refreshActor
   }
 
   private def unsubscribeOnCoordinatedShutdown(subscription: AlarmSubscription): Unit =

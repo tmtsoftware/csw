@@ -15,6 +15,7 @@ import csw.services.alarm.api.models.Key.{AlarmKey, GlobalKey}
 import csw.services.alarm.api.models.ShelveStatus.{Shelved, Unshelved}
 import csw.services.alarm.cli.args.Options
 import csw.services.alarm.cli.utils.IterableExtensions.RichStringIterable
+import csw.services.alarm.client.internal.auto_refresh.AutoRefreshSeverityMessage.CancelAutoRefresh
 import csw.services.config.api.models.ConfigData
 import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.config.server.commons.TestFileUtils
@@ -321,7 +322,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     )
 
     commandExecutor.execute(cmd)
-    logBuffer shouldEqual List(s"Severity of Alarm ${cmd.alarmKey.value}: ${Okay.toString}")
+    logBuffer shouldEqual List(s"Severity of Alarm [${cmd.alarmKey}]: $Okay")
   }
 
   // DEOPSCSW-476: Fetch alarm severity from CLI Interface
@@ -338,7 +339,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
     commandExecutor.execute(cmd)
     logBuffer shouldEqual List(
-      s"Aggregated Severity of Component ${tromboneAxisHighLimitKey.subsystem}.${tromboneAxisHighLimitKey.component}: ${Major.toString}"
+      s"Aggregated Severity of Component [${tromboneAxisHighLimitKey.subsystem}.${tromboneAxisHighLimitKey.component}]: $Major"
     )
   }
 
@@ -351,7 +352,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     )
 
     commandExecutor.execute(cmd)
-    logBuffer shouldEqual List(s"Aggregated Severity of Subsystem ${cmd.maybeSubsystem.get}: ${Disconnected.toString}")
+    logBuffer shouldEqual List(s"Aggregated Severity of Subsystem [${cmd.maybeSubsystem.get}]: $Disconnected")
   }
 
   // DEOPSCSW-476: Fetch alarm severity from CLI Interface
@@ -361,7 +362,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     val cmd = Options(cmd = "severity", subCmd = "get")
 
     commandExecutor.execute(cmd)
-    logBuffer shouldEqual List(s"Aggregated Severity of Alarm Service: ${Disconnected.toString}")
+    logBuffer shouldEqual List(s"Aggregated Severity of Alarm Service: $Disconnected")
   }
 
   // DEOPSCSW-467: Monitor alarm severities in the alarm store for a single alarm, component, subsystem, or all
@@ -381,8 +382,8 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     setSeverity(tromboneAxisHighLimitKey, Okay).futureValue
 
     logBuffer shouldEqual List(
-      s"Severity of Alarm ${tromboneAxisHighLimitKey.value}: ${Major.toString}",
-      s"Severity of Alarm ${tromboneAxisHighLimitKey.value}: ${Okay.toString}"
+      s"Severity of Alarm [$tromboneAxisHighLimitKey]: $Major",
+      s"Severity of Alarm [$tromboneAxisHighLimitKey]: $Okay"
     )
 
     subscription.unsubscribe().futureValue
@@ -401,13 +402,15 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     )
 
     getCurrentSeverity(tromboneAxisHighLimitKey).futureValue shouldBe Disconnected
-    alarmAdminClient.refreshSeverity(cmd)
+    val actorRef = alarmAdminClient.refreshSeverity(cmd)
     Thread.sleep(500)
     getCurrentSeverity(tromboneAxisHighLimitKey).futureValue shouldBe Major
     Thread.sleep(1200) // Waiting for severity to timeout to Disconnected
     getCurrentSeverity(tromboneAxisHighLimitKey).futureValue shouldBe Major
 
-    logBuffer shouldEqual List(successMsg, successMsg)
+    val expectedMsg = s"Severity for [$tromboneAxisHighLimitKey] refreshed to: $Major"
+    logBuffer shouldEqual List(expectedMsg, expectedMsg)
+    actorRef ! CancelAutoRefresh(tromboneAxisHighLimitKey)
   }
 
   // -------------------------------------------Health--------------------------------------------
@@ -423,7 +426,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     )
 
     commandExecutor.execute(cmd)
-    logBuffer shouldEqual List(s"Health of Alarm ${cmd.alarmKey.value}: ${Bad.toString}")
+    logBuffer shouldEqual List(s"Health of Alarm [${cmd.alarmKey}]: $Bad")
   }
 
   // DEOPSCSW-478: Fetch health of component/subsystem from CLI Interface
@@ -440,7 +443,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
     commandExecutor.execute(cmd)
     logBuffer shouldEqual List(
-      s"Aggregated Health of Component ${tromboneAxisHighLimitKey.subsystem}.${tromboneAxisHighLimitKey.component}: ${Ill.toString}"
+      s"Aggregated Health of Component [${tromboneAxisHighLimitKey.subsystem}.${tromboneAxisHighLimitKey.component}]: $Ill"
     )
   }
 
@@ -456,7 +459,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     )
 
     commandExecutor.execute(cmd)
-    logBuffer shouldEqual List(s"Aggregated Health of Subsystem ${cmd.maybeSubsystem.get}: ${Good.toString}")
+    logBuffer shouldEqual List(s"Aggregated Health of Subsystem [${cmd.maybeSubsystem.get}]: $Good")
   }
 
   // DEOPSCSW-478: Fetch health of component/subsystem from CLI Interface
@@ -464,7 +467,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     val cmd = Options(cmd = "health", subCmd = "get")
 
     commandExecutor.execute(cmd)
-    logBuffer shouldEqual List(s"Aggregated Health of Alarm Service: ${Bad.toString}")
+    logBuffer shouldEqual List(s"Aggregated Health of Alarm Service: $Bad")
   }
 
   // DEOPSCSW-479: Subscribe to health changes of component/subsystem/all alarms using CLI Interface
@@ -484,8 +487,8 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     setSeverity(tromboneAxisHighLimitKey, Okay).futureValue
 
     logBuffer shouldEqual List(
-      s"Health of Alarm ${tromboneAxisHighLimitKey.value}: $Ill",
-      s"Health of Alarm ${tromboneAxisHighLimitKey.value}: $Good"
+      s"Health of Alarm [$tromboneAxisHighLimitKey]: $Ill",
+      s"Health of Alarm [$tromboneAxisHighLimitKey]: $Good"
     )
 
     subscription.unsubscribe().futureValue

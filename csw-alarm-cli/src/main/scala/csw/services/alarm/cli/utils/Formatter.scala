@@ -44,13 +44,14 @@ object Formatter {
     ).mkString(Newline)
   }
 
-  def formatSeverity(key: Key, severity: FullAlarmSeverity): String = msg(key, "Severity", severity.toString)
-  def formatHealth(key: Key, health: AlarmHealth): String           = msg(key, "Health", health.toString)
+  def formatSeverity(key: Key, severity: FullAlarmSeverity): String        = msg(key, "Severity", severity.toString)
+  def formatHealth(key: Key, health: AlarmHealth): String                  = msg(key, "Health", health.toString)
+  def formatRefreshSeverity(key: Key, severity: FullAlarmSeverity): String = s"Severity for [$key] refreshed to: $severity"
 
   def msg(key: Key, property: String, value: String): String = key match {
     case GlobalKey                          ⇒ s"Aggregated $property of Alarm Service: $value"
-    case SubsystemKey(subsystem)            ⇒ s"Aggregated $property of Subsystem $subsystem: $value"
-    case ComponentKey(subsystem, component) ⇒ s"Aggregated $property of Component $subsystem.$component: $value"
-    case _: AlarmKey                        ⇒ s"$property of Alarm ${key.value}: $value"
+    case SubsystemKey(subsystem)            ⇒ s"Aggregated $property of Subsystem [$subsystem]: $value"
+    case ComponentKey(subsystem, component) ⇒ s"Aggregated $property of Component [$subsystem.$component]: $value"
+    case _: AlarmKey                        ⇒ s"$property of Alarm [$key]: $value"
   }
 }
