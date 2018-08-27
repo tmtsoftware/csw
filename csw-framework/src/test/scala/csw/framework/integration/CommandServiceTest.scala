@@ -20,7 +20,8 @@ import csw.services.command.scaladsl.CommandService
 import io.lettuce.core.RedisClient
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import org.scalatest.mockito.MockitoSugar
-import org.mockito.Mockito._
+import org.mockito.ArgumentMatchers.eq
+import org.mockito.Mockito.{when, _}
 
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationLong
@@ -102,9 +103,15 @@ class CommandServiceTest extends FunSuite with Matchers with MockitoSugar with B
     //val resolvedAkkaLocation = maybeLocation.get
     //resolvedAkkaLocation.connection shouldBe akkaConnection
     //val x = submitAll()
+    val setups = List(setupAssembly1, setupAssembly2)
 
-    // val mcs:CommandService = mock[CommandService]
-    //when(mcs.submit(_)).thenReturn(Future(Completed(Id())))
+
+    val mcs:CommandService = mock[CommandService]
+    when(submitAll(eq(setups), mcs)) //.thenReturn(Future(Completed(Id())))
+
+    val rr = submitAll(setups, mcs)
+
+    println("RR: " + rr)
 
     //val cs = new CommandService(resolvedAkkaLocation)
     //val x = submitAll(List(setupAssembly1, setupAssembly2), )
