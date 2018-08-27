@@ -361,6 +361,8 @@ class SeverityServiceModuleTest
     val alarmSubscription = subscribeAggregatedSeverityActorRef(SubsystemKey(NFIRAOS), testProbe.ref)
     alarmSubscription.ready().await
 
+    Thread.sleep(500) // wait for redis connection to happen
+
     tromboneAxisLowLimitAlarm.isActive shouldBe true
     setSeverity(tromboneAxisLowLimitAlarmKey, Major).await
 
