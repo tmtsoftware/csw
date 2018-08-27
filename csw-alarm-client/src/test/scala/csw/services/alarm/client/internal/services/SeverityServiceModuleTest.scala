@@ -5,7 +5,7 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import com.typesafe.config.ConfigFactory
 import csw.messages.params.models.Subsystem.{BAD, LGSF, NFIRAOS, TCS}
 import csw.services.alarm.api.exceptions.{InactiveAlarmException, InvalidSeverityException, KeyNotFoundException}
-import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
+import csw.services.alarm.api.models.AcknowledgementStatus.Unacknowledged
 import csw.services.alarm.api.models.AlarmSeverity._
 import csw.services.alarm.api.models.FullAlarmSeverity.Disconnected
 import csw.services.alarm.api.models.Key._
@@ -38,7 +38,6 @@ class SeverityServiceModuleTest
     status.acknowledgementStatus shouldBe Unacknowledged
     status.latchedSeverity shouldBe Major
     status.shelveStatus shouldBe Unshelved
-    status.alarmTime.isDefined shouldBe true
 
     //get severity and assert
     val alarmSeverity = testSeverityApi.get(tromboneAxisHighLimitAlarmKey).await.get
@@ -63,23 +62,24 @@ class SeverityServiceModuleTest
 
   // DEOPSCSW-444: Set severity api for component
   // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
+  // DEOPSCSW-500: Update alarm time on current severity change
   test("setSeverity should latch alarm when it is higher than previous latched severity") {
     val status = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Major)
 
     status.acknowledgementStatus shouldBe Unacknowledged
     status.latchedSeverity shouldBe Major
-    status.alarmTime.isDefined shouldBe true
 
     val status1 = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Warning)
     status1.acknowledgementStatus shouldBe Unacknowledged
     status1.latchedSeverity shouldBe Major
-    // latched severity is not changed here hence alarm time should not change
-    status1.alarmTime.get.time shouldEqual status.alarmTime.get.time
+    // current severity is changed, hence updated alarm time should be > old time
+    status1.alarmTime.time should be > status.alarmTime.time
 
-    val status2 = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Okay)
-    status2.acknowledgementStatus shouldBe Acknowledged
+    val status2 = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Warning)
+    status2.acknowledgementStatus shouldBe Unacknowledged
     status2.latchedSeverity shouldBe Major
-    status2.alarmTime.get.time shouldEqual status.alarmTime.get.time
+    // current severity is not changed, hence new alarm time == old time
+    status2.alarmTime.time shouldEqual status1.alarmTime.time
   }
 
   // DEOPSCSW-444: Set severity api for component
@@ -87,17 +87,17 @@ class SeverityServiceModuleTest
     val status = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Major)
     status.acknowledgementStatus shouldBe Unacknowledged
     status.latchedSeverity shouldBe Major
-    status.alarmTime.isDefined shouldBe true
   }
 
   // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
-  test("setSeverity should not update alarm time when latched severity does not change") {
+  // DEOPSCSW-500: Update alarm time on current severity change
+  test("setSeverity should not update alarm time when current severity does not change") {
     // latch it to major
     val status = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Major)
     // set the severity again to mimic alarm refreshing
     val status1 = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Major)
 
-    status.alarmTime.get.time shouldEqual status1.alarmTime.get.time
+    status.alarmTime.time shouldEqual status1.alarmTime.time
   }
 
   // DEOPSCSW-457: Fetch current alarm severity

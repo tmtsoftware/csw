@@ -27,6 +27,7 @@ class StatusServiceModuleTest
 
   // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
   // DEOPSCSW-447: Reset api for alarm
+  // DEOPSCSW-500: Update alarm time on current severity change
   test("reset should not update time when severity does not change") {
     // latch it to okay
     val status = setSeverityAndGetStatus(tromboneAxisLowLimitAlarmKey, Okay)
@@ -37,14 +38,14 @@ class StatusServiceModuleTest
     reset(tromboneAxisLowLimitAlarmKey).await
     val statusAfterReset = getStatus(tromboneAxisLowLimitAlarmKey).await
 
-    statusAfterReset.alarmTime.get.time shouldEqual status.alarmTime.get.time
+    statusAfterReset.alarmTime.time shouldEqual status.alarmTime.time
   }
 
   // DEOPSCSW-447: Reset api for alarm
   // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
   // DEOPSCSW-494: Incorporate changes in set severity, reset, acknowledgement and latch status
-  List(Okay, Warning, Major, Indeterminate, Critical).foreach(currentSeverity => {
-    test(s"reset should set latchedSeverity to current severity and update time when current severity is $currentSeverity") {
+  List(Okay, Warning, Major, Indeterminate, Critical).foreach { currentSeverity =>
+    test(s"reset should set latchedSeverity to current severity when current severity is $currentSeverity") {
 
       //setup current severity - this does not change status
       setCurrentSeverity(tromboneAxisLowLimitAlarmKey, currentSeverity).await
@@ -52,7 +53,6 @@ class StatusServiceModuleTest
       val previousStatus = getStatus(tromboneAxisLowLimitAlarmKey).await
       previousStatus.acknowledgementStatus shouldEqual Acknowledged
       previousStatus.latchedSeverity shouldEqual Disconnected
-      previousStatus.alarmTime shouldEqual None
 
       //reset alarm
       reset(tromboneAxisLowLimitAlarmKey).await
@@ -61,14 +61,13 @@ class StatusServiceModuleTest
 
       newStatus.latchedSeverity shouldEqual currentSeverity
       newStatus.acknowledgementStatus shouldEqual Acknowledged
-      newStatus.alarmTime shouldBe defined
     }
-  })
+  }
 
   // DEOPSCSW-447: Reset api for alarm
   // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
   // DEOPSCSW-494: Incorporate changes in set severity, reset, acknowledgement and latch status
-  test("reset should set latchedSeverity to current severity and update time when current severity is Disconnected") {
+  test("reset should set latchedSeverity to current severity when current severity is Disconnected") {
     //set current and latched severity to warning
     setSeverity(tromboneAxisLowLimitAlarmKey, Warning).await
 
@@ -76,7 +75,6 @@ class StatusServiceModuleTest
 
     originalStatus.latchedSeverity shouldEqual Warning
     originalStatus.acknowledgementStatus shouldEqual Unacknowledged
-    originalStatus.alarmTime shouldBe defined
     getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldEqual Warning
 
     //wait for current severity to expire and get disconnected
@@ -89,8 +87,6 @@ class StatusServiceModuleTest
     val newStatus = getStatus(tromboneAxisLowLimitAlarmKey).await
     newStatus.acknowledgementStatus shouldEqual Acknowledged
     newStatus.latchedSeverity shouldEqual Disconnected
-
-    originalStatus.alarmTime should not equal newStatus.alarmTime
   }
 
   // DEOPSCSW-447: Reset api for alarm

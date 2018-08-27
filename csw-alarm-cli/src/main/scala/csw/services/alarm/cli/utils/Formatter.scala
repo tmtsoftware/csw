@@ -40,7 +40,7 @@ object Formatter {
       s"Acknowledgement Status: $acknowledgementStatus",
       s"Latch Severity: $latchedSeverity",
       s"Shelve Status: $shelveStatus",
-      s"Alarm Time: ${alarmTime.map(_.time.toString).getOrElse("")}"
+      s"Alarm Time: ${alarmTime.value}"
     ).mkString(Newline)
   }
 

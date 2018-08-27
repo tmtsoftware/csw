@@ -92,17 +92,17 @@ class MetadataServiceModuleTest
   }
 
   val fourAlarmsConfig: Config = ConfigFactory.parseResources("test-alarms/valid-alarms.conf")
-
-  val twoAlarmsConfig: Config = ConfigFactory.parseResources("test-alarms/two-valid-alarms.conf")
+  val twoAlarmsConfig: Config  = ConfigFactory.parseResources("test-alarms/two-valid-alarms.conf")
 
   test("initAlarms should load alarms from provided config file") {
-    initAlarms(fourAlarmsConfig).await
+    initTestAlarms()
 
     // valid-alarms.conf contains 4 alarms
     getMetadata(GlobalKey).await.size shouldBe 8
 
     getMetadata(tromboneAxisHighLimitAlarmKey).await shouldBe tromboneAxisHighLimitAlarm
-    getStatus(tromboneAxisHighLimitAlarmKey).await shouldBe AlarmStatus()
+    val alarmStatus = getStatus(tromboneAxisHighLimitAlarmKey).await
+    alarmStatus shouldBe AlarmStatus().copy(alarmTime = alarmStatus.alarmTime)
     // Severity does not get loaded in alarm store on init, but it gets interpreted as Disconnected by getSeverity API
     testSeverityApi.get(tromboneAxisHighLimitAlarmKey).await shouldBe None
     getCurrentSeverity(tromboneAxisHighLimitAlarmKey).await shouldBe Disconnected
@@ -126,7 +126,8 @@ class MetadataServiceModuleTest
 
     // tromboneAxisHighLimitAlarm is present in both the files and hence rewritten in second load
     getMetadata(tromboneAxisHighLimitAlarmKey).await shouldBe tromboneAxisHighLimitAlarm
-    getStatus(tromboneAxisHighLimitAlarmKey).await shouldEqual AlarmStatus()
+    val alarmStatus = getStatus(tromboneAxisHighLimitAlarmKey).await
+    alarmStatus shouldEqual AlarmStatus().copy(alarmTime = alarmStatus.alarmTime)
     getCurrentSeverity(tromboneAxisHighLimitAlarmKey).await shouldBe Disconnected
   }
 
@@ -160,7 +161,8 @@ class MetadataServiceModuleTest
     getMetadata(cpuExceededAlarmKey).await shouldBe cpuExceededAlarm
 
     // current severity will be expired at it's time and will be inferred disconnected
-    getStatus(tromboneAxisLowLimitAlarmKey).await shouldEqual AlarmStatus()
+    val alarmStatus = getStatus(tromboneAxisLowLimitAlarmKey).await
+    alarmStatus shouldEqual AlarmStatus().copy(alarmTime = alarmStatus.alarmTime)
   }
 
   // DEOPSCSW-448: Set Activation status for an alarm entity

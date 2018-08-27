@@ -13,7 +13,6 @@ import csw.services.alarm.api.models.AlarmStatus
 import csw.services.alarm.api.models.FullAlarmSeverity.Disconnected
 import csw.services.alarm.api.models.Key.{AlarmKey, GlobalKey}
 import csw.services.alarm.api.models.ShelveStatus.{Shelved, Unshelved}
-import csw.services.alarm.api.scaladsl.AlarmSubscription
 import csw.services.alarm.cli.args.Options
 import csw.services.alarm.cli.utils.IterableExtensions.RichStringIterable
 import csw.services.config.api.models.ConfigData

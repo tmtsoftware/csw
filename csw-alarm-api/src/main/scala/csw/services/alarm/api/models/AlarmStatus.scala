@@ -7,7 +7,7 @@ case class AlarmStatus(
     acknowledgementStatus: AcknowledgementStatus,
     latchedSeverity: FullAlarmSeverity,
     shelveStatus: ShelveStatus,
-    alarmTime: Option[AlarmTime]
+    alarmTime: AlarmTime
 )
 
 object AlarmStatus {
@@ -18,6 +18,6 @@ object AlarmStatus {
     acknowledgementStatus = Acknowledged,
     latchedSeverity = Disconnected,
     shelveStatus = Unshelved,
-    alarmTime = None
+    alarmTime = AlarmTime()
   )
 }

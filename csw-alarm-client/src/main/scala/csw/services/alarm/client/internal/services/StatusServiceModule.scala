@@ -48,11 +48,7 @@ trait StatusServiceModule extends StatusService {
       //reset operation acknowledges alarm
       acknowledgementStatus = Acknowledged,
       //reset operation changes latched severity to current severity
-      latchedSeverity = currentSeverity,
-      //if latched severity is changing, alarm time also changes
-      alarmTime =
-        if (currentSeverity != originalStatus.latchedSeverity) Some(AlarmTime())
-        else originalStatus.alarmTime
+      latchedSeverity = currentSeverity
     )
 
     if (originalStatus != acknowledgedStatus) await(setStatus(key, acknowledgedStatus))
@@ -114,7 +110,7 @@ trait StatusServiceModule extends StatusService {
        * @return updated AlarmStatus
        */
       def updateTime(): AlarmStatus =
-        if (originalHeartbeatSeverity != severity) targetAlarmStatus.copy(alarmTime = Some(AlarmTime()))
+        if (originalHeartbeatSeverity != severity) targetAlarmStatus.copy(alarmTime = AlarmTime())
         else targetAlarmStatus
 
       /**
@@ -124,7 +120,7 @@ trait StatusServiceModule extends StatusService {
         if (originalStatus != targetAlarmStatus) {
           log.info(s"Updating alarm status from: [$originalStatus] to: [$targetAlarmStatus]")
           setStatus(key, targetAlarmStatus)
-        } else Future.successful()
+        } else Future.successful(())
     }
 
     await(

@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 import static csw.services.alarm.api.models.Key.AlarmKey;
 import static org.hamcrest.CoreMatchers.isA;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 // DEOPSCSW-444: Set severity api for component
@@ -52,6 +53,7 @@ public class JAlarmServiceImplTest {
 
     // DEOPSCSW-459: Update severity to Disconnected if not updated within predefined time
     // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
+    // DEOPSCSW-500: Update alarm time on current severity change
     @Test
     public void setSeverity_shouldSetSeverityForAGivenKey() throws Exception {
         AlarmKey tromboneAxisHighLimitAlarm = new AlarmKey(JSubsystem.NFIRAOS, "trombone", "tromboneAxisHighLimitAlarm");
@@ -64,7 +66,7 @@ public class JAlarmServiceImplTest {
         assertEquals(AcknowledgementStatus.Unacknowledged$.MODULE$, status.acknowledgementStatus());
         assertEquals(JAlarmSeverity.Major, status.latchedSeverity());
         assertEquals(ShelveStatus.Unshelved$.MODULE$, status.shelveStatus());
-        assertTrue(status.alarmTime().isDefined());
+        assertNotNull(status.alarmTime());
 
         //get severity and assert
         FullAlarmSeverity severityAfterSetting = Await.result(alarmService.getCurrentSeverity(tromboneAxisHighLimitAlarm), new FiniteDuration(2, TimeUnit.SECONDS));
@@ -85,6 +87,7 @@ public class JAlarmServiceImplTest {
     }
 
     // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
+    // DEOPSCSW-500: Update alarm time on current severity change
     @Test
     public void setSeverity_shouldLatchAlarmWhenItIsHigherThanPreviousLatchedSeverity() throws Exception {
         AlarmKey tromboneAxisHighLimitAlarm = new AlarmKey(JSubsystem.NFIRAOS, "trombone", "tromboneAxisHighLimitAlarm");
@@ -92,17 +95,19 @@ public class JAlarmServiceImplTest {
         AlarmStatus status = setSeverity(tromboneAxisHighLimitAlarm, JAlarmSeverity.Major);
         assertEquals(AcknowledgementStatus.Unacknowledged$.MODULE$, status.acknowledgementStatus());
         assertEquals(JAlarmSeverity.Major, status.latchedSeverity());
-        assertTrue(status.alarmTime().isDefined());
+        assertNotNull(status.alarmTime());
 
         AlarmStatus status1 = setSeverity(tromboneAxisHighLimitAlarm, JAlarmSeverity.Warning);
         assertEquals(AcknowledgementStatus.Unacknowledged$.MODULE$, status1.acknowledgementStatus());
         assertEquals(JAlarmSeverity.Major, status1.latchedSeverity());
-        assertEquals(status1.alarmTime().get().time(), status.alarmTime().get().time());
+        // current severity is changed, hence updated alarm time should be > old time
+        assertTrue(status1.alarmTime().time().isAfter(status.alarmTime().time()));
 
-        AlarmStatus status2 = setSeverity(tromboneAxisHighLimitAlarm, JAlarmSeverity.Okay);
-        assertEquals(AcknowledgementStatus.Acknowledged$.MODULE$, status2.acknowledgementStatus());
+        AlarmStatus status2 = setSeverity(tromboneAxisHighLimitAlarm, JAlarmSeverity.Warning);
+        assertEquals(AcknowledgementStatus.Unacknowledged$.MODULE$, status2.acknowledgementStatus());
         assertEquals(JAlarmSeverity.Major, status2.latchedSeverity());
-        assertEquals(status2.alarmTime().get().time(), status.alarmTime().get().time());
+        // current severity is not changed, hence new alarm time == old time
+        assertEquals(status2.alarmTime().time(), status1.alarmTime().time());
     }
 
     @Test
@@ -112,10 +117,10 @@ public class JAlarmServiceImplTest {
         AlarmStatus status = setSeverity(tromboneAxisLowLimitAlarm, JAlarmSeverity.Major);
         assertEquals(AcknowledgementStatus.Unacknowledged$.MODULE$, status.acknowledgementStatus());
         assertEquals(JAlarmSeverity.Major, status.latchedSeverity());
-        assertTrue(status.alarmTime().isDefined());
     }
 
     // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
+    // DEOPSCSW-500: Update alarm time on current severity change
     @Test
     public void setSeverity_shouldNotUpdateAlarmTimeWhenSeverityDoesNotChange() throws Exception {
         // latchable alarm
@@ -127,6 +132,6 @@ public class JAlarmServiceImplTest {
         // set the severity again to mimic alarm refreshing
         AlarmStatus status1 = setSeverity(highLimitAlarmKey, JAlarmSeverity.Major);
 
-        assertEquals(status.alarmTime().get().time(), status1.alarmTime().get().time());
+        assertEquals(status.alarmTime().time(), status1.alarmTime().time());
     }
 }
