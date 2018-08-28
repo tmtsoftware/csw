@@ -68,7 +68,10 @@ class HealthServiceModuleTest
   // DEOPSCSW-448: Set Activation status for an alarm entity
   // DEOPSCSW-466: Fetch health for a given alarm, component name or a subsystem name
   test("getAggregatedHealth should not consider inactive alarms for health aggregation") {
+    enclosureTempHighAlarm.isActive shouldBe true
     setSeverity(enclosureTempHighAlarmKey, Okay).await
+
+    enclosureTempLowAlarm.isActive shouldBe false
     setSeverity(enclosureTempLowAlarmKey, Critical).await
 
     val tromboneKey = ComponentKey(NFIRAOS, "enclosure")
@@ -78,11 +81,14 @@ class HealthServiceModuleTest
   // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
   // DEOPSCSW-466: Fetch health for a given alarm, component name or a subsystem name
   test("getAggregatedHealth should consider shelved alarms also for health aggregation") {
-    setSeverity(cpuExceededAlarmKey, Okay).await
-    setSeverity(cpuExceededAlarmKey, Critical).await
+    val componentKey = ComponentKey(cpuExceededAlarmKey.subsystem, cpuExceededAlarmKey.component)
+    setStatus(cpuExceededAlarmKey, AlarmStatus().copy(shelveStatus = Shelved))
 
-    val tromboneKey = ComponentKey(cpuExceededAlarmKey.subsystem, cpuExceededAlarmKey.component)
-    getAggregatedHealth(tromboneKey).await shouldBe Bad
+    setSeverity(cpuExceededAlarmKey, Okay).await
+    getAggregatedHealth(componentKey).await shouldBe Good
+
+    setSeverity(cpuExceededAlarmKey, Critical).await
+    getAggregatedHealth(componentKey).await shouldBe Bad
   }
 
   // DEOPSCSW-466: Fetch alarm severity, component or subsystem
