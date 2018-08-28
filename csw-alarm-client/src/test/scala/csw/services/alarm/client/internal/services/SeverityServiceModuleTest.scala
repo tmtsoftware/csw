@@ -92,12 +92,15 @@ class SeverityServiceModuleTest
   // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
   // DEOPSCSW-500: Update alarm time on current severity change
   test("setSeverity should not update alarm time when current severity does not change") {
+    val defaultAlarmTime = getStatus(tromboneAxisHighLimitAlarmKey).await.alarmTime
+
     // latch it to major
     val status = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Major)
     // set the severity again to mimic alarm refreshing
     val status1 = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Major)
 
     status.alarmTime.time shouldEqual status1.alarmTime.time
+    status.alarmTime.time should be > defaultAlarmTime.time
   }
 
   // DEOPSCSW-457: Fetch current alarm severity

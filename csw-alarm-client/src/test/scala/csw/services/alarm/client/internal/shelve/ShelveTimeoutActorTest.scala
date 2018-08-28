@@ -80,7 +80,7 @@ class ShelveTimeoutActorTest extends FunSuite with Matchers with ActorTestKit wi
     actor ! CancelShelveTimeout(tromboneAxisHighLimitAlarmKey)
     actor ! CancelShelveTimeout(tcsAxisHighLimitAlarmKey)
 
-    // pass the time a little more than expected (8 AM)
+    // pass the time a little more than expected. 10 minutes more than 8 AM.
     val duration = Clock.systemUTC().untilNext("8:10 AM").toScala
     manualTime.expectNoMessageFor(duration, probe)
   }

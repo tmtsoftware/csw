@@ -229,7 +229,7 @@ lazy val `csw-alarm-client` = project
     `romaine`,
     `csw-commons` % "test->test"
   )
-  .enablePlugins(PublishBintray, GenJavadocPlugin)
+  .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
   .settings(libraryDependencies ++= Dependencies.AlarmClient)
 
 lazy val `csw-alarm-cli` = project
@@ -238,7 +238,7 @@ lazy val `csw-alarm-cli` = project
     `csw-config-client`,
     `csw-cluster-seed` % "test->multi-jvm"
   )
-  .enablePlugins(DeployApp)
+  .enablePlugins(DeployApp, MaybeCoverage)
   .settings(libraryDependencies ++= Dependencies.AlarmCli)
 
 lazy val `csw-commons` = project

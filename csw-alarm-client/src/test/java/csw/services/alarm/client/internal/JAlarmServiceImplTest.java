@@ -51,6 +51,10 @@ public class JAlarmServiceImplTest {
         return Await.result(alarmServiceTestSetup.alarmService().getStatus(alarmKey), new FiniteDuration(2, TimeUnit.SECONDS));
     }
 
+    private AlarmStatus getStatus(AlarmKey alarmKey) throws Exception {
+        return Await.result(alarmServiceTestSetup.alarmService().getStatus(alarmKey), new FiniteDuration(2, TimeUnit.SECONDS));
+    }
+
     // DEOPSCSW-459: Update severity to Disconnected if not updated within predefined time
     // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
     // DEOPSCSW-500: Update alarm time on current severity change
@@ -126,6 +130,8 @@ public class JAlarmServiceImplTest {
         // latchable alarm
         AlarmKey highLimitAlarmKey = new AlarmKey(JSubsystem.NFIRAOS, "trombone", "tromboneAxisHighLimitAlarm");
 
+        AlarmTime defaultAlarmTime = getStatus(highLimitAlarmKey).alarmTime();
+
         // latch it to major
         AlarmStatus status = setSeverity(highLimitAlarmKey, JAlarmSeverity.Major);
 
@@ -133,5 +139,6 @@ public class JAlarmServiceImplTest {
         AlarmStatus status1 = setSeverity(highLimitAlarmKey, JAlarmSeverity.Major);
 
         assertEquals(status.alarmTime().time(), status1.alarmTime().time());
+        assertTrue(status.alarmTime().time().isAfter(defaultAlarmTime.time()));
     }
 }
