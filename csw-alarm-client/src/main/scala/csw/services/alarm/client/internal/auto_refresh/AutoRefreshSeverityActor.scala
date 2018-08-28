@@ -6,14 +6,14 @@ import csw.services.alarm.client.internal.AlarmServiceLogger
 import csw.services.alarm.client.internal.auto_refresh.AutoRefreshSeverityMessage._
 import csw.services.logging.scaladsl.Logger
 
-import scala.concurrent.duration.DurationInt
+import scala.concurrent.duration.FiniteDuration
 
 object AutoRefreshSeverityActor {
 
   def behavior(
       timerScheduler: TimerScheduler[AutoRefreshSeverityMessage],
       alarm: Refreshable,
-      refreshInterval: Int
+      refreshInterval: FiniteDuration
   ): Behavior[AutoRefreshSeverityMessage] = Behaviors.setup[AutoRefreshSeverityMessage] { ctx ⇒
     val log: Logger = AlarmServiceLogger.getLogger(ctx)
 
@@ -23,7 +23,8 @@ object AutoRefreshSeverityActor {
       msg match {
         case AutoRefreshSeverity(key, severity) ⇒
           alarm.refreshSeverity(key, severity) // fire and forget the refreshing of severity and straight away start the timer
-          timerScheduler.startPeriodicTimer(key, SetSeverity(key, severity), refreshInterval.seconds)
+          timerScheduler.startPeriodicTimer(key, SetSeverity(key, severity), refreshInterval)
+
         case SetSeverity(key, severity) ⇒ alarm.refreshSeverity(key, severity) //fire and forget the refreshing of severity
         case CancelAutoRefresh(key)     ⇒ timerScheduler.cancel(key)
       }

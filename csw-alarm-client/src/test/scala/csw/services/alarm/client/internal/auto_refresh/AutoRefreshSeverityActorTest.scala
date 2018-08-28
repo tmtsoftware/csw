@@ -7,8 +7,8 @@ import csw.messages.params.models.Subsystem.NFIRAOS
 import csw.services.alarm.api.models.AlarmSeverity.Major
 import csw.services.alarm.api.models.Key.AlarmKey
 import csw.services.alarm.client.internal.auto_refresh.AutoRefreshSeverityMessage._
-import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import org.scalatest.concurrent.Eventually
+import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.collection.mutable
 import scala.concurrent.duration.DurationDouble
@@ -25,7 +25,7 @@ class AutoRefreshSeverityActorTest extends FunSuite with ActorTestKit with Event
     val probe = TestProbe[String]()
     val actor = spawn(
       Behaviors.withTimers[AutoRefreshSeverityMessage](
-        t ⇒ AutoRefreshSeverityActor.behavior(t, (_, _) ⇒ probe.ref.tell("severity set"), 5)
+        t ⇒ AutoRefreshSeverityActor.behavior(t, (_, _) ⇒ probe.ref.tell("severity set"), 5.seconds)
       )
     )
     actor ! SetSeverity(tcsAxisHighLimitAlarmKey, Major)
@@ -36,7 +36,7 @@ class AutoRefreshSeverityActorTest extends FunSuite with ActorTestKit with Event
     val probe = TestProbe[String]()
     val actor = spawn(
       Behaviors.withTimers[AutoRefreshSeverityMessage](
-        t ⇒ AutoRefreshSeverityActor.behavior(t, (_, _) ⇒ probe.ref.tell("severity refreshed"), 5)
+        t ⇒ AutoRefreshSeverityActor.behavior(t, (_, _) ⇒ probe.ref.tell("severity refreshed"), 5.seconds)
       )
     )
 
@@ -51,7 +51,7 @@ class AutoRefreshSeverityActorTest extends FunSuite with ActorTestKit with Event
     val probe = TestProbe[String]()
     val actor = spawn(
       Behaviors.withTimers[AutoRefreshSeverityMessage](
-        t ⇒ AutoRefreshSeverityActor.behavior(t, (_, _) ⇒ probe.ref.tell("severity refreshed"), 5)
+        t ⇒ AutoRefreshSeverityActor.behavior(t, (_, _) ⇒ probe.ref.tell("severity refreshed"), 5.seconds)
       )
     )
 
@@ -70,7 +70,7 @@ class AutoRefreshSeverityActorTest extends FunSuite with ActorTestKit with Event
 
     val actor = spawn(
       Behaviors.withTimers[AutoRefreshSeverityMessage](
-        t ⇒ AutoRefreshSeverityActor.behavior(t, (key, _) ⇒ queue.enqueue(key), 5)
+        t ⇒ AutoRefreshSeverityActor.behavior(t, (key, _) ⇒ queue.enqueue(key), 5.seconds)
       )
     )
 

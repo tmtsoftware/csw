@@ -46,8 +46,7 @@ class AlarmAdminClient(
     alarmService.setSeverity(options.alarmKey, options.severity.get).transformWithSideEffect(printLine)
 
   def refreshSeverity(options: Options): ActorRef[AutoRefreshSeverityMessage] = {
-    val refreshInterval = new Settings(ConfigFactory.load()).refreshInSeconds
-
+    val refreshInterval = new Settings(ConfigFactory.load()).refreshInterval
     def refreshable(key: AlarmKey, severity: AlarmSeverity): Unit =
       alarmService.setCurrentSeverity(key, severity).map(_ => printLine(Formatter.formatRefreshSeverity(key, severity)))
 
