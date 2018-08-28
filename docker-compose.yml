@@ -1,0 +1,101 @@
+version: '3.3'
+
+networks:
+  csw_net:
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.28.0.0/16
+
+services:
+  # ========== CSW Services ==========
+  seed:
+    image: csw-cluster-seed:0.1-SNAPSHOT
+    ports:
+      - "3552:3552"
+      - "7654:7654"
+      - "7878:7878"
+    command:
+      - "-DclusterSeeds=172.28.1.1:3552"
+      - "--clusterPort=3552"
+    networks:
+      csw_net:
+        ipv4_address: 172.28.1.1
+
+  config:
+    image: csw-config-server:0.1-SNAPSHOT
+    ports:
+      - "4000:4000"
+    command:
+      - "-DclusterSeeds=172.28.1.1:3552"
+      - "--initRepo"
+    networks:
+      - csw_net
+    depends_on:
+      - seed
+
+  location-agent:
+    image: csw-location-agent:0.1-SNAPSHOT
+    command:
+      - "-DclusterSeeds=172.28.1.1:3552"
+      - "--name=EventServer,AlarmServer"
+      - "--command=sleep 100000"
+      - "--port=26379"
+    networks:
+      - csw_net
+    depends_on:
+      - sentinel
+
+  # ========== Sentinel Setup ==========
+  event_master:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - "./scripts/conf:/data/conf"
+    command: redis-server /data/conf/event_service/master.conf
+    networks:
+      - csw_net
+
+  event_slave:
+    image: redis:latest
+    volumes:
+      - "./scripts/conf:/data/conf"
+    command: redis-server  /data/conf/event_service/slave.conf
+    networks:
+      - csw_net
+    depends_on:
+      - event_master
+
+  alarm_master:
+    image: redis:latest
+    ports:
+      - "7379:7379"
+    volumes:
+      - "./scripts/conf:/data/conf"
+    command: redis-server /data/conf/alarm_service/master.conf
+    networks:
+      - csw_net
+
+  alarm_slave:
+    image: redis:latest
+    volumes:
+      - "./scripts/conf:/data/conf"
+    command: redis-server /data/conf/alarm_service/slave.conf
+    networks:
+      - csw_net
+    depends_on:
+      - alarm_master
+
+  sentinel:
+    image: redis:latest
+    ports:
+      - "26379:26379"
+    volumes:
+      - "./scripts/conf:/data/conf"
+    command: redis-sentinel /data/conf/redis_sentinel/sentinel.conf
+    networks:
+      - csw_net
+    depends_on:
+      - event_master
+      - alarm_master
