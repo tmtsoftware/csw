@@ -13,7 +13,8 @@ import org.scalatest.concurrent.Eventually
 import scala.collection.mutable
 import scala.concurrent.duration.DurationDouble
 
-class AutoSetSeverityActorTest extends FunSuite with ActorTestKit with Eventually with Matchers with BeforeAndAfterAll {
+// DEOPSCSW-491: Auto-refresh an alarm through alarm service cli
+class AutoRefreshSeverityActorTest extends FunSuite with ActorTestKit with Eventually with Matchers with BeforeAndAfterAll {
 
   val tromboneAxisHighLimitAlarmKey = AlarmKey(NFIRAOS, "trombone", "tromboneAxisHighLimitAlarm")
   val tcsAxisHighLimitAlarmKey      = AlarmKey(NFIRAOS, "tcs", "tromboneAxisHighLimitAlarm")
