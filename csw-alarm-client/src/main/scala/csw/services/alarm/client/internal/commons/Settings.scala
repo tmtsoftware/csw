@@ -11,7 +11,7 @@ class Settings(config: Config) {
   val masterId: String                = alarmConfig.getString("redis.masterId")
   val refreshInterval: FiniteDuration = alarmConfig.getDuration("refresh-interval").toScala // default value is 3 seconds
   val maxMissedRefreshCounts: Int     = alarmConfig.getInt("max-missed-refresh-counts") //default value is 3 times
-  val shelveTimeoutHourOfDay: Int     = alarmConfig.getInt("shelve-timeout-hour-of-day") //default value is 8
+  val shelveTimeout: String           = alarmConfig.getString("shelve-timeout")
   val ttlInSeconds: Long              = refreshInterval.toSeconds * maxMissedRefreshCounts
 
 }

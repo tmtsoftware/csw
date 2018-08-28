@@ -75,6 +75,6 @@ class AlarmServiceTestSetup
 
   val shelvingTimeoutProbe: TestInbox[ShelveTimeoutMessage] = TestInbox[ShelveTimeoutMessage]()
   val shelveTimeoutActorFactory: ShelveTimeoutActorFactory  = mock[ShelveTimeoutActorFactory]
-  when(shelveTimeoutActorFactory.make(any[Unshelvable](), any[Int])(any[ActorSystem])).thenReturn(shelvingTimeoutProbe.ref)
+  when(shelveTimeoutActorFactory.make(any[Unshelvable](), any[String])(any[ActorSystem])).thenReturn(shelvingTimeoutProbe.ref)
 
 }

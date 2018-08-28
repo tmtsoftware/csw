@@ -3,17 +3,12 @@ package csw.services.alarm.client.internal.shelve
 import java.time.Clock
 
 import akka.actor.testkit.typed.scaladsl.{ActorTestKit, ManualTime, TestProbe}
-import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.Behaviors
 import com.typesafe.config.Config
 import csw.messages.params.models.Subsystem.NFIRAOS
 import csw.services.alarm.api.models.Key.AlarmKey
 import csw.services.alarm.client.internal.extensions.TimeExtensions.RichClock
-import csw.services.alarm.client.internal.shelve.ShelveTimeoutMessage.{
-  CancelShelveTimeout,
-  ScheduleShelveTimeout,
-  ShelveHasTimedOut
-}
+import csw.services.alarm.client.internal.shelve.ShelveTimeoutMessage.{CancelShelveTimeout, ScheduleShelveTimeout}
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSuite, Matchers}
 
@@ -33,13 +28,13 @@ class ShelveTimeoutActorTest extends FunSuite with Matchers with ActorTestKit wi
   test("should schedule shelve timeout") {
     val probe = TestProbe[String]()
     val actor = spawn(
-      Behaviors.withTimers[ShelveTimeoutMessage](ShelveTimeoutActor.behavior(_, _ ⇒ probe.ref.tell("Unshelve called"), 8))
+      Behaviors.withTimers[ShelveTimeoutMessage](ShelveTimeoutActor.behavior(_, _ ⇒ probe.ref.tell("Unshelve called"), "8:00 AM"))
     )
 
     actor ! ScheduleShelveTimeout(tromboneAxisHighLimitAlarmKey)
 
     manualTime.expectNoMessageFor(3.seconds, probe)
-    val duration = Clock.systemUTC().untilNext(8).toScala
+    val duration = Clock.systemUTC().untilNext("8:00 AM").toScala
     manualTime.timePasses(duration)
 
     probe.expectMessage("Unshelve called")
@@ -48,13 +43,13 @@ class ShelveTimeoutActorTest extends FunSuite with Matchers with ActorTestKit wi
   test("should schedule shelve timeout for multiple alarms") {
     val unshelvedAlarms = new mutable.HashSet[AlarmKey]()
     val actor = spawn(
-      Behaviors.withTimers[ShelveTimeoutMessage](ShelveTimeoutActor.behavior(_, unshelvedAlarms.add, 8))
+      Behaviors.withTimers[ShelveTimeoutMessage](ShelveTimeoutActor.behavior(_, unshelvedAlarms.add, "8:00 AM"))
     )
 
     actor ! ScheduleShelveTimeout(tromboneAxisHighLimitAlarmKey)
     actor ! ScheduleShelveTimeout(tcsAxisHighLimitAlarmKey)
 
-    val duration = Clock.systemUTC().untilNext(8).toScala
+    val duration = Clock.systemUTC().untilNext("8:00 AM").toScala
     manualTime.timePasses(duration)
 
     eventually(unshelvedAlarms shouldEqual Set(tromboneAxisHighLimitAlarmKey, tcsAxisHighLimitAlarmKey))
@@ -63,7 +58,7 @@ class ShelveTimeoutActorTest extends FunSuite with Matchers with ActorTestKit wi
   test("should cancel scheduled shelve timeout") {
     val probe = TestProbe[String]()
     val actor = spawn(
-      Behaviors.withTimers[ShelveTimeoutMessage](ShelveTimeoutActor.behavior(_, _ ⇒ probe.ref.tell("Unshelve called"), 8))
+      Behaviors.withTimers[ShelveTimeoutMessage](ShelveTimeoutActor.behavior(_, _ ⇒ probe.ref.tell("Unshelve called"), "8:00 AM"))
     )
 
     actor ! ScheduleShelveTimeout(tromboneAxisHighLimitAlarmKey)
@@ -76,7 +71,7 @@ class ShelveTimeoutActorTest extends FunSuite with Matchers with ActorTestKit wi
   test("should cancel scheduled shelve timeout for multiple alarms") {
     val probe = TestProbe[String]()
     val actor = spawn(
-      Behaviors.withTimers[ShelveTimeoutMessage](ShelveTimeoutActor.behavior(_, _ ⇒ probe.ref.tell("Unshelve called"), 8))
+      Behaviors.withTimers[ShelveTimeoutMessage](ShelveTimeoutActor.behavior(_, _ ⇒ probe.ref.tell("Unshelve called"), "8:00 AM"))
     )
 
     actor ! ScheduleShelveTimeout(tromboneAxisHighLimitAlarmKey)

@@ -15,7 +15,7 @@ object ShelveTimeoutActor {
   def behavior(
       timerScheduler: TimerScheduler[ShelveTimeoutMessage],
       alarm: Unshelvable,
-      shelveTimeoutHour: Int
+      shelveTimeout: String
   ): Behavior[ShelveTimeoutMessage] = Behaviors.setup { ctx ⇒
     val log: Logger = AlarmServiceLogger.getLogger(ctx)
 
@@ -27,7 +27,7 @@ object ShelveTimeoutActor {
 
       msg match {
         case ScheduleShelveTimeout(key) ⇒
-          val duration = clock.untilNext(shelveTimeoutHour).toScala
+          val duration = clock.untilNext(shelveTimeout).toScala
           timerScheduler.startSingleTimer(key.value, ShelveHasTimedOut(key), duration)
         case CancelShelveTimeout(key) ⇒ timerScheduler.cancel(key.value)
         case ShelveHasTimedOut(key)   ⇒ alarm.unshelve(key)
