@@ -1,10 +1,13 @@
 package csw.apps.clusterseed
 
+import akka.Done
 import akka.actor.CoordinatedShutdown
 import csw.apps.clusterseed.internal.AdminWiring
 import csw.apps.clusterseed.cli.{ArgsParser, Options}
 import csw.services.BuildInfo
 import csw.services.location.commons.ClusterAwareSettings
+
+import scala.concurrent.duration.DurationDouble
 
 /**
  * responsible for starting following:
@@ -35,8 +38,9 @@ object Main extends App {
           CoordinatedShutdown.PhaseServiceUnbind,
           "unbind-services"
         ) { () ⇒
-          locationBindingF.flatMap(_.unbind())
-          logAdminBindingF.flatMap(_.unbind())
+          val hardDeadline = 30.seconds
+          locationBindingF.flatMap(_.terminate(hardDeadline)).map(_ ⇒ Done)
+          logAdminBindingF.flatMap(_.terminate(hardDeadline)).map(_ ⇒ Done)
         }
       }
   }
