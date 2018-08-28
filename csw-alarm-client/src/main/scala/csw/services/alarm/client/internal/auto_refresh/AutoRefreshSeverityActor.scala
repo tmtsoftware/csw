@@ -19,16 +19,16 @@ object AutoRefreshSeverityActor {
     Behaviors.setup[AutoRefreshSeverityMessage] { ctx ⇒
       val log: Logger = AlarmServiceLogger.getLogger(ctx)
 
-      Behaviors.receive { (_, msg) ⇒
+      Behaviors.receiveMessage { msg ⇒
         log.debug(s"AutoRefreshSeverityActor received message :[$msg]")
 
         msg match {
-          case SetSeverityAndAutoRefresh(key, severity) ⇒
+          case AutoRefreshSeverity(key, severity) ⇒
             alarm.refreshSeverity(key, severity) // fire and forget the refreshing of severity and straight away start the timer
-            timerScheduler.startPeriodicTimer(key.value, RefreshSeverity(key, severity), refreshInterval.seconds)
+            timerScheduler.startPeriodicTimer(key, SetSeverity(key, severity), refreshInterval.seconds)
 
-          case RefreshSeverity(key, severity) ⇒ alarm.refreshSeverity(key, severity) //fire and forget the refreshing of severity
-          case CancelAutoRefresh(key)         ⇒ timerScheduler.cancel(key)
+          case SetSeverity(key, severity) ⇒ alarm.refreshSeverity(key, severity) //fire and forget the refreshing of severity
+          case CancelAutoRefresh(key)     ⇒ timerScheduler.cancel(key)
         }
         Behaviors.same
       }

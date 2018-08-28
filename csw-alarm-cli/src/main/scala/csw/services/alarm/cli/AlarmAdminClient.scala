@@ -14,7 +14,7 @@ import csw.services.alarm.cli.wiring.ActorRuntime
 import csw.services.alarm.client.AlarmServiceFactory
 import csw.services.alarm.client.internal.AlarmServiceImpl
 import csw.services.alarm.client.internal.auto_refresh.{AutoRefreshSeverityActorFactory, AutoRefreshSeverityMessage}
-import csw.services.alarm.client.internal.auto_refresh.AutoRefreshSeverityMessage.SetSeverityAndAutoRefresh
+import csw.services.alarm.client.internal.auto_refresh.AutoRefreshSeverityMessage.AutoRefreshSeverity
 import csw.services.alarm.client.internal.commons.Settings
 import csw.services.location.scaladsl.LocationService
 
@@ -44,6 +44,16 @@ class AlarmAdminClient(
 
   def setSeverity(options: Options): Future[Unit] =
     alarmService.setSeverity(options.alarmKey, options.severity.get).transformWithSideEffect(printLine)
+
+  def refreshSeverity(options: Options): ActorRef[AutoRefreshSeverityMessage] = {
+    val refreshInterval = new Settings(ConfigFactory.load()).refreshInSeconds
+    def refreshable(key: AlarmKey, severity: AlarmSeverity): Unit =
+      alarmService.setCurrentSeverity(key, severity).map(_ => printLine(Formatter.formatRefreshSeverity(key, severity)))
+
+    val refreshActor = new AutoRefreshSeverityActorFactory().make(refreshable, refreshInterval)
+    refreshActor ! AutoRefreshSeverity(options.alarmKey, options.severity.get)
+    refreshActor
+  }
 
   def subscribeSeverity(options: Options): (AlarmSubscription, Future[Done]) = {
     val (subscription, doneF) = alarmService
@@ -100,16 +110,6 @@ class AlarmAdminClient(
 
     unsubscribeOnCoordinatedShutdown(subscription)
     (subscription, doneF)
-  }
-
-  def refreshSeverity(options: Options): ActorRef[AutoRefreshSeverityMessage] = {
-    val refreshInterval = new Settings(ConfigFactory.load()).refreshInSeconds
-    def refreshable(key: AlarmKey, severity: AlarmSeverity): Unit =
-      alarmService.setCurrentSeverity(key, severity).map(_ => printLine(Formatter.formatRefreshSeverity(key, severity)))
-
-    val refreshActor = new AutoRefreshSeverityActorFactory().make(refreshable, refreshInterval)
-    refreshActor ! SetSeverityAndAutoRefresh(options.alarmKey, options.severity.get)
-    refreshActor
   }
 
   private def unsubscribeOnCoordinatedShutdown(subscription: AlarmSubscription): Unit =
