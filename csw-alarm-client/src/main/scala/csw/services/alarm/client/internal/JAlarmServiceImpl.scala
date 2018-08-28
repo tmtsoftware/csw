@@ -2,6 +2,7 @@ package csw.services.alarm.client.internal
 
 import java.util.concurrent.CompletableFuture
 
+import akka.Done
 import csw.services.alarm.api.javadsl.IAlarmService
 import csw.services.alarm.api.models.{AlarmSeverity, Key}
 import csw.services.alarm.api.scaladsl.AlarmService
@@ -9,7 +10,7 @@ import csw.services.alarm.api.scaladsl.AlarmService
 import scala.compat.java8.FutureConverters.FutureOps
 
 class JAlarmServiceImpl(alarmService: AlarmService) extends IAlarmService {
-  override def setSeverity(key: Key.AlarmKey, severity: AlarmSeverity): CompletableFuture[Unit] =
+  override def setSeverity(key: Key.AlarmKey, severity: AlarmSeverity): CompletableFuture[Done] =
     alarmService.setSeverity(key, severity).toJava.toCompletableFuture
   override def asScala: AlarmService = alarmService
 }

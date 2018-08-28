@@ -31,7 +31,7 @@ class AlarmAdminClient(
 
   private[alarm] val alarmService: AlarmServiceImpl = new AlarmServiceFactory().makeAdminApi(locationService)
 
-  def init(options: Options): Future[Unit] =
+  def init(options: Options): Future[Done] =
     async {
       val config = await(configUtils.getConfig(options.isLocal, options.filePath, None))
       await(alarmService.initAlarms(config, options.reset))
@@ -42,11 +42,12 @@ class AlarmAdminClient(
     printLine(Formatter.formatSeverity(options.key, severity))
   }
 
-  def setSeverity(options: Options): Future[Unit] =
+  def setSeverity(options: Options): Future[Done] =
     alarmService.setSeverity(options.alarmKey, options.severity.get).transformWithSideEffect(printLine)
 
   def refreshSeverity(options: Options): ActorRef[AutoRefreshSeverityMessage] = {
     val refreshInterval = new Settings(ConfigFactory.load()).refreshInSeconds
+
     def refreshable(key: AlarmKey, severity: AlarmSeverity): Unit =
       alarmService.setCurrentSeverity(key, severity).map(_ => printLine(Formatter.formatRefreshSeverity(key, severity)))
 
@@ -66,25 +67,25 @@ class AlarmAdminClient(
     (subscription, doneF)
   }
 
-  def acknowledge(options: Options): Future[Unit] =
+  def acknowledge(options: Options): Future[Done] =
     alarmService.acknowledge(options.alarmKey).transformWithSideEffect(printLine)
 
-  def unacknowledge(options: Options): Future[Unit] =
+  def unacknowledge(options: Options): Future[Done] =
     alarmService.unacknowledge(options.alarmKey).transformWithSideEffect(printLine)
 
-  def activate(options: Options): Future[Unit] =
+  def activate(options: Options): Future[Done] =
     alarmService.activate(options.alarmKey).transformWithSideEffect(printLine)
 
-  def deactivate(options: Options): Future[Unit] =
+  def deactivate(options: Options): Future[Done] =
     alarmService.deactivate(options.alarmKey).transformWithSideEffect(printLine)
 
-  def shelve(options: Options): Future[Unit] =
+  def shelve(options: Options): Future[Done] =
     alarmService.shelve(options.alarmKey).transformWithSideEffect(printLine)
 
-  def unshelve(options: Options): Future[Unit] =
+  def unshelve(options: Options): Future[Done] =
     alarmService.unshelve(options.alarmKey).transformWithSideEffect(printLine)
 
-  def reset(options: Options): Future[Unit] =
+  def reset(options: Options): Future[Done] =
     alarmService.reset(options.alarmKey).transformWithSideEffect(printLine)
 
   def list(options: Options): Future[Unit] = async {

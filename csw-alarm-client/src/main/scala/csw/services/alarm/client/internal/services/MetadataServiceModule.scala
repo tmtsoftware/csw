@@ -1,5 +1,6 @@
 package csw.services.alarm.client.internal.services
 
+import akka.Done
 import com.typesafe.config.Config
 import csw.services.alarm.api.exceptions.KeyNotFoundException
 import csw.services.alarm.api.internal.{MetadataKey, MetadataService, StatusKey}
@@ -20,18 +21,20 @@ trait MetadataServiceModule extends MetadataService {
 
   private val log = AlarmServiceLogger.getLogger
 
-  final override def activate(key: AlarmKey): Future[Unit] = async {
+  final override def activate(key: AlarmKey): Future[Done] = async {
     log.debug(s"Activate alarm [${key.value}]")
 
     val metadata = await(metadataApi.get(key)).getOrElse(logAndThrow(KeyNotFoundException(key)))
     if (!metadata.isActive) await(metadataApi.set(key, metadata.copy(activationStatus = Active)))
+    Done
   }
 
-  final override def deactivate(key: AlarmKey): Future[Unit] = async {
+  final override def deactivate(key: AlarmKey): Future[Done] = async {
     log.debug(s"Deactivate alarm [${key.value}]")
 
     val metadata = await(metadataApi.get(key)).getOrElse(logAndThrow(KeyNotFoundException(key)))
     if (metadata.isActive) await(metadataApi.set(key, metadata.copy(activationStatus = Inactive)))
+    Done
   }
 
   final override def getMetadata(key: AlarmKey): Future[AlarmMetadata] = async {
@@ -48,7 +51,7 @@ trait MetadataServiceModule extends MetadataService {
     await(metadataApi.mget(metadataKeys)).map(_.getValue)
   }
 
-  final override def initAlarms(inputConfig: Config, reset: Boolean): Future[Unit] = async {
+  final override def initAlarms(inputConfig: Config, reset: Boolean): Future[Done] = async {
     log.debug(s"Initializing alarm store with reset [$reset] and alarms [$inputConfig]")
     val alarmMetadataSet = ConfigParser.parseAlarmMetadataSet(inputConfig)
     if (reset) await(resetAlarmStore())
@@ -61,12 +64,14 @@ trait MetadataServiceModule extends MetadataService {
     val statusMap   = alarms.map(metadata ⇒ StatusKey.fromAlarmKey(metadata.alarmKey) → AlarmStatus()).toMap
 
     log.info(s"Feeding alarm metadata in alarm store for following alarms: [${alarms.map(_.alarmKey.value).mkString("\n")}]")
-    Future.sequence(
-      List(
-        metadataApi.mset(metadataMap),
-        statusApi.mset(statusMap)
+    Future
+      .sequence(
+        List(
+          metadataApi.mset(metadataMap),
+          statusApi.mset(statusMap)
+        )
       )
-    )
+      .map(_ ⇒ Done)
   }
 
   private def resetAlarmStore() = {
@@ -79,9 +84,10 @@ trait MetadataServiceModule extends MetadataService {
           severityApi.pdel(GlobalKey)
         )
       )
+      .map(_ ⇒ Done)
   }
 
-  private[alarm] def setMetadata(alarmKey: AlarmKey, alarmMetadata: AlarmMetadata): Future[Unit] =
+  private[alarm] def setMetadata(alarmKey: AlarmKey, alarmMetadata: AlarmMetadata): Future[Done] =
     metadataApi.set(alarmKey, alarmMetadata)
 
   private def logAndThrow(runtimeException: RuntimeException) = {

@@ -1,5 +1,6 @@
 package romaine.async
 
+import akka.Done
 import io.lettuce.core.KeyValue
 import io.lettuce.core.api.async.RedisAsyncCommands
 import romaine.extensions.FutureExtensions.RichFuture
@@ -9,13 +10,13 @@ import scala.compat.java8.FutureConverters.CompletionStageOps
 import scala.concurrent.{ExecutionContext, Future}
 
 class RedisAsyncApi[K, V](redisAsyncCommands: Future[RedisAsyncCommands[K, V]])(implicit ec: ExecutionContext) {
-  def set(key: K, value: V): Future[Unit] =
+  def set(key: K, value: V): Future[Done] =
     redisAsyncCommands.flatMap(_.set(key, value).toScala.failWith(s"Redis 'SET' operation failed for [key:$key value:$value]"))
 
-  def mset(map: Map[K, V]): Future[Unit] =
+  def mset(map: Map[K, V]): Future[Done] =
     redisAsyncCommands.flatMap(_.mset(map.asJava).toScala.failWith(s"Redis 'MSET' operation failed for [map: $map]"))
 
-  def setex(key: K, seconds: Long, value: V): Future[Unit] =
+  def setex(key: K, seconds: Long, value: V): Future[Done] =
     redisAsyncCommands.flatMap(
       _.setex(key, seconds, value).toScala.failWith(s"Redis 'SETEX' operation failed for [key: $key, value: $value]")
     )

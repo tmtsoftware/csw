@@ -1,5 +1,6 @@
 package csw.services.alarm.client.internal.services
 
+import akka.Done
 import akka.actor.ActorSystem
 import akka.actor.typed.ActorRef
 import akka.stream.scaladsl.{Sink, Source}
@@ -30,7 +31,7 @@ trait SeverityServiceModule extends SeverityService {
 
   private implicit lazy val mat: Materializer = ActorMaterializer()
 
-  final override def setSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Unit] = async {
+  final override def setSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Done] = async {
     await(updateStatusForSeverity(key, severity))
     await(setCurrentSeverity(key, severity))
   }
@@ -65,7 +66,7 @@ trait SeverityServiceModule extends SeverityService {
     else logAndThrow(KeyNotFoundException(key))
   }
 
-  private[alarm] def setCurrentSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Unit] = async {
+  private[alarm] def setCurrentSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Done] = async {
     log.debug(
       s"Setting severity [${severity.name}] for alarm [${key.value}] with expire timeout [${settings.ttlInSeconds}] seconds"
     )
