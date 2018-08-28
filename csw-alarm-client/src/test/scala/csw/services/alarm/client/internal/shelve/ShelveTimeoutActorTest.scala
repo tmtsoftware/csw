@@ -30,16 +30,6 @@ class ShelveTimeoutActorTest extends FunSuite with Matchers with ActorTestKit wi
   val tromboneAxisHighLimitAlarmKey = AlarmKey(NFIRAOS, "trombone", "tromboneAxisHighLimitAlarm")
   val tcsAxisHighLimitAlarmKey      = AlarmKey(NFIRAOS, "tcs", "tromboneAxisHighLimitAlarm")
 
-  test("should timeout shelve") {
-    val probe: TestProbe[AlarmKey] = TestProbe[AlarmKey]()
-    val actor: ActorRef[ShelveTimeoutMessage] = spawn(
-      Behaviors.withTimers[ShelveTimeoutMessage](ShelveTimeoutActor.behavior(_, probe.ref.tell, 8))
-    )
-
-    actor ! ShelveHasTimedOut(tromboneAxisHighLimitAlarmKey)
-    probe.expectMessage(tromboneAxisHighLimitAlarmKey)
-  }
-
   test("should schedule shelve timeout") {
     val probe = TestProbe[String]()
     val actor = spawn(
@@ -49,7 +39,7 @@ class ShelveTimeoutActorTest extends FunSuite with Matchers with ActorTestKit wi
     actor ! ScheduleShelveTimeout(tromboneAxisHighLimitAlarmKey)
 
     manualTime.expectNoMessageFor(3.seconds, probe)
-    val duration = Clock.systemUTC().untilNext("8:00 AM").toScala
+    val duration = Clock.systemUTC().untilNext(8).toScala
     manualTime.timePasses(duration)
 
     probe.expectMessage("Unshelve called")
@@ -64,7 +54,7 @@ class ShelveTimeoutActorTest extends FunSuite with Matchers with ActorTestKit wi
     actor ! ScheduleShelveTimeout(tromboneAxisHighLimitAlarmKey)
     actor ! ScheduleShelveTimeout(tcsAxisHighLimitAlarmKey)
 
-    val duration = Clock.systemUTC().untilNext("8:10 AM").toScala
+    val duration = Clock.systemUTC().untilNext(8).toScala
     manualTime.timePasses(duration)
 
     eventually(unshelvedAlarms shouldEqual Set(tromboneAxisHighLimitAlarmKey, tcsAxisHighLimitAlarmKey))
@@ -95,6 +85,7 @@ class ShelveTimeoutActorTest extends FunSuite with Matchers with ActorTestKit wi
     actor ! CancelShelveTimeout(tromboneAxisHighLimitAlarmKey)
     actor ! CancelShelveTimeout(tcsAxisHighLimitAlarmKey)
 
+    // pass the time a little more than expected (8 AM)
     val duration = Clock.systemUTC().untilNext("8:10 AM").toScala
     manualTime.expectNoMessageFor(duration, probe)
   }

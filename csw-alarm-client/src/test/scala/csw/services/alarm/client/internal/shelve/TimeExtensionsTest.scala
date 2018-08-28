@@ -6,6 +6,7 @@ import csw.services.alarm.client.internal.extensions.TimeExtensions.RichClock
 import csw.services.alarm.client.internal.shelve.TestTimeExtensions.{TestClock, TestInt}
 import org.scalatest.{FunSuite, Matchers}
 
+// DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
 class TimeExtensionsTest extends FunSuite with Matchers {
 
   private val EpochClock: Clock = Clock.fixed(Instant.EPOCH, ZoneOffset.UTC)
@@ -18,6 +19,7 @@ class TimeExtensionsTest extends FunSuite with Matchers {
     EpochClock.plusDays(123).untilNext(20) shouldBe 20.hours
 
     EpochClock.plusHours(20).untilNext(10) shouldBe 14.hours
+    EpochClock.plusHours(4).untilNext(10) shouldBe 6.hours
     EpochClock.plusDays(123).plusHours(20).untilNext(10) shouldBe 14.hours
   }
 

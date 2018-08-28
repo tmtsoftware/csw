@@ -16,22 +16,23 @@ object ShelveTimeoutActor {
       timerScheduler: TimerScheduler[ShelveTimeoutMessage],
       alarm: Unshelvable,
       shelveTimeoutHour: Int
-  ): Behavior[ShelveTimeoutMessage] =
-    Behaviors.setup { ctx ⇒
-      val log: Logger = AlarmServiceLogger.getLogger(ctx)
-      val clock       = Clock.systemUTC()
+  ): Behavior[ShelveTimeoutMessage] = Behaviors.setup { ctx ⇒
+    val log: Logger = AlarmServiceLogger.getLogger(ctx)
 
-      Behaviors.receiveMessage { msg ⇒
-        log.debug(s"ShelveTimeoutActor received message :[$msg]")
+    // Use the UTC timezone for the time-being. Once the time service is in place, it can query time service.
+    val clock = Clock.systemUTC()
 
-        msg match {
-          case ScheduleShelveTimeout(key) ⇒
-            val duration = clock.untilNext(shelveTimeoutHour).toScala
-            timerScheduler.startSingleTimer(key.value, ShelveHasTimedOut(key), duration)
-          case CancelShelveTimeout(key) ⇒ timerScheduler.cancel(key.value)
-          case ShelveHasTimedOut(key)   ⇒ alarm.unshelve(key)
-        }
-        Behaviors.same
+    Behaviors.receiveMessage { msg ⇒
+      log.debug(s"ShelveTimeoutActor received message :[$msg]")
+
+      msg match {
+        case ScheduleShelveTimeout(key) ⇒
+          val duration = clock.untilNext(shelveTimeoutHour).toScala
+          timerScheduler.startSingleTimer(key.value, ShelveHasTimedOut(key), duration)
+        case CancelShelveTimeout(key) ⇒ timerScheduler.cancel(key.value)
+        case ShelveHasTimedOut(key)   ⇒ alarm.unshelve(key)
       }
+      Behaviors.same
     }
+  }
 }

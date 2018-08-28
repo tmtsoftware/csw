@@ -131,10 +131,13 @@ class StatusServiceModuleTest
   }
 
   // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
-  test("shelve should shelve an alarm") {
+  test("shelve should update the status of the alarm to shelved") {
     getStatus(tromboneAxisHighLimitAlarmKey).await.shelveStatus shouldBe Unshelved
     shelve(tromboneAxisHighLimitAlarmKey).await
     getStatus(tromboneAxisHighLimitAlarmKey).await.shelveStatus shouldBe Shelved
+
+    //repeat the shelve operation
+    noException shouldBe thrownBy(shelve(tromboneAxisHighLimitAlarmKey).await)
   }
 
   // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
@@ -146,29 +149,11 @@ class StatusServiceModuleTest
   }
 
   // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
-  test("shelve should be a no-op when repeated") {
-    shelve(tromboneAxisHighLimitAlarmKey).await
-    val status = getStatus(tromboneAxisHighLimitAlarmKey).await
-    status.shelveStatus shouldBe Shelved
-
-    //repeat the shelve operation
-    noException shouldBe thrownBy(shelve(tromboneAxisHighLimitAlarmKey).await)
-  }
-
-  // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
-  test("unshelve should shelve an alarm") {
+  test("unshelve should update the alarm status to unshelved") {
+    // initialize alarm with Shelved status just for this test
     setStatus(tromboneAxisHighLimitAlarmKey, AlarmStatus().copy(shelveStatus = Shelved)).await
     unshelve(tromboneAxisHighLimitAlarmKey).await
-    val status = getStatus(tromboneAxisHighLimitAlarmKey).await
-    status.shelveStatus shouldBe Unshelved
-  }
-
-  // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
-  test("unshelve should be a no-op when repeated") {
-    setStatus(tromboneAxisHighLimitAlarmKey, AlarmStatus().copy(shelveStatus = Shelved)).await
-    unshelve(tromboneAxisHighLimitAlarmKey).await
-    val status = getStatus(tromboneAxisHighLimitAlarmKey).await
-    status.shelveStatus shouldBe Unshelved
+    getStatus(tromboneAxisHighLimitAlarmKey).await.shelveStatus shouldBe Unshelved
 
     //repeat the unshelve operation
     noException shouldBe thrownBy(unshelve(tromboneAxisHighLimitAlarmKey).await)
@@ -176,6 +161,7 @@ class StatusServiceModuleTest
 
   // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
   test("unshelve should cancel the shelving timeout scheduler") {
+    // initialize alarm with Shelved status just for this test
     setStatus(tromboneAxisHighLimitAlarmKey, AlarmStatus().copy(shelveStatus = Shelved)).await
     shelvingTimeoutProbe.receiveAll() //clear all messages
     unshelve(tromboneAxisHighLimitAlarmKey).await

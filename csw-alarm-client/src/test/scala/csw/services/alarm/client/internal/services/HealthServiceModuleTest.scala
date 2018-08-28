@@ -245,15 +245,14 @@ class HealthServiceModuleTest
 
   // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
   test("shelved alarms should be considered in health aggregation") {
-
     val testProbe         = TestProbe[AlarmHealth]()(actorSystem.toTyped)
     val alarmSubscription = subscribeAggregatedHealthActorRef(SubsystemKey(TCS), testProbe.ref)
     alarmSubscription.ready().await
 
-    Thread.sleep(500) // wait for redis connection to happen
+    // initialize alarm with Shelved status just for this test
+    setStatus(cpuExceededAlarmKey, AlarmStatus().copy(shelveStatus = Shelved))
 
-    setStatus(cpuExceededAlarmKey, AlarmStatus().copy(shelveStatus = Shelved)) //shelve the alarm
-
+    // there is only one alarm in TCS.tcsPk component
     setSeverity(cpuExceededAlarmKey, Critical).await
     testProbe.expectMessage(Bad)
 

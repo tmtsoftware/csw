@@ -171,10 +171,11 @@ class SeverityServiceModuleTest
   // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
   // DEOPSCSW-465: Fetch alarm severity, component or subsystem
   test("getAggregatedSeverity should consider shelved alarms also in aggregation") {
-
-    setStatus(cpuExceededAlarmKey, AlarmStatus().copy(shelveStatus = Unshelved))
+    // initialize alarm with Shelved status just for this test
+    setStatus(cpuExceededAlarmKey, AlarmStatus().copy(shelveStatus = Shelved))
+    // there is only one alarm in TCS.tcsPk component
+    getAggregatedSeverity(ComponentKey(cpuExceededAlarmKey.subsystem, cpuExceededAlarmKey.component)).await shouldBe Disconnected
     setSeverity(cpuExceededAlarmKey, Critical).await
-
     getAggregatedSeverity(ComponentKey(cpuExceededAlarmKey.subsystem, cpuExceededAlarmKey.component)).await shouldBe Critical
   }
 
@@ -379,15 +380,15 @@ class SeverityServiceModuleTest
   }
 
   // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
-  test("shelved alarms should be considered in aggregated severity") {
-    val testProbe    = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
+  test("shelved alarms should be considered while subscribing aggregated severity") {
+    val testProbe = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
+    // there is only one alarm in TCS.tcsPk component
     val componentKey = ComponentKey(cpuExceededAlarmKey.subsystem, cpuExceededAlarmKey.component)
 
     setStatus(cpuExceededAlarmKey, AlarmStatus().copy(shelveStatus = Shelved))
 
     val alarmSubscription = subscribeAggregatedSeverityCallback(componentKey, testProbe.ref ! _)
     alarmSubscription.ready().await
-    Thread.sleep(500) // wait for redis connection to happen
 
     setSeverity(cpuExceededAlarmKey, Okay).await
     testProbe.expectMessage(Okay)
