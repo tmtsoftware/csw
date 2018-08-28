@@ -67,5 +67,5 @@ class RedisPublisher(redisURI: Future[RedisURI], redisClient: RedisClient)(
   override def shutdown(): Future[Done] = asyncApi.quit().map(_ ⇒ Done)
 
   private def set(event: Event, commands: RedisAsyncApi[String, Event]): Future[Done] =
-    commands.set(event.eventKey.key, event).recover { case NonFatal(_) ⇒ Done }.map(_ => Done)
+    commands.set(event.eventKey.key, event).recover { case NonFatal(_) ⇒ Done }
 }

@@ -115,6 +115,6 @@ class AlarmAdminClient(
 
   private def unsubscribeOnCoordinatedShutdown(subscription: AlarmSubscription): Unit =
     coordinatedShutdown.addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "unsubscribe-health-stream") { () ⇒
-      subscription.unsubscribe().map(_ ⇒ Done)
+      subscription.unsubscribe()
     }
 }

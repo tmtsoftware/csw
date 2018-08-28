@@ -7,7 +7,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 private class RedisSubscriptionImpl[K](
     keys: List[K],
-    connectedF: Future[Unit],
+    connectedF: Future[Done],
     killSwitch: KillSwitch,
     terminationSignal: Future[Done],
     redisReactiveApi: Future[RedisReactiveApi[K, _]]
@@ -32,5 +32,5 @@ private class RedisSubscriptionImpl[K](
    * To check if the underlying subscription is ready to emit elements
    * @return a future which completes when the underlying subscription is ready to emit elements
    */
-  def ready(): Future[Done] = connectedF.map(_ ⇒ Done)
+  def ready(): Future[Done] = connectedF
 }
