@@ -9,7 +9,7 @@ import csw.commons.redis.EmbeddedRedis
 import csw.commons.utils.SocketUtils.getFreePort
 import csw.services.alarm.api.internal.{MetadataKey, SeverityKey}
 import csw.services.alarm.api.javadsl.IAlarmService
-import csw.services.alarm.api.models.{AlarmMetadata, AlarmStatus, FullAlarmSeverity}
+import csw.services.alarm.api.models.{AlarmMetadata, FullAlarmSeverity}
 import csw.services.alarm.api.scaladsl.AlarmAdminService
 import csw.services.alarm.client.AlarmServiceFactory
 import csw.services.alarm.client.internal.commons.Settings

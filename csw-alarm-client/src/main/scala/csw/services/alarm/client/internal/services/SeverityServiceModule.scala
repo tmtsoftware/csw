@@ -68,7 +68,7 @@ trait SeverityServiceModule extends SeverityService {
 
   private[alarm] def setCurrentSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Done] = async {
     log.debug(
-      s"Setting severity [${severity.name}] for alarm [${key.value}] with expire timeout [${settings.ttlInSeconds}] seconds"
+      s"Setting severity [${severity.name}] for alarm [${key.value}] with expire timeout [${settings.severityTTLInSeconds}] seconds"
     )
 
     // get alarm metadata
@@ -80,7 +80,7 @@ trait SeverityServiceModule extends SeverityService {
 
     // set the severity of the alarm so that it does not transition to `Disconnected` state
     log.info(s"Updating current severity [${severity.name}] in alarm store")
-    await(severityApi.setex(key, settings.ttlInSeconds, severity))
+    await(severityApi.setex(key, settings.severityTTLInSeconds, severity))
   }
 
   // PatternMessage gives three values:

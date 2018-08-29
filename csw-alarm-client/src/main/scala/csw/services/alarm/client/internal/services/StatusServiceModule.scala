@@ -1,5 +1,7 @@
 package csw.services.alarm.client.internal.services
 
+import java.time.Clock
+
 import akka.Done
 import akka.actor.ActorSystem
 import csw.services.alarm.api.exceptions.KeyNotFoundException
@@ -12,11 +14,12 @@ import csw.services.alarm.api.models.ShelveStatus.{Shelved, Unshelved}
 import csw.services.alarm.api.models._
 import csw.services.alarm.client.internal.AlarmServiceLogger
 import csw.services.alarm.client.internal.commons.Settings
+import csw.services.alarm.client.internal.extensions.TimeExtensions.RichClock
 import csw.services.alarm.client.internal.redis.RedisConnectionsFactory
 import csw.services.alarm.client.internal.shelve.ShelveTimeoutActorFactory
-import csw.services.alarm.client.internal.shelve.ShelveTimeoutMessage.{CancelShelveTimeout, ScheduleShelveTimeout}
 
 import scala.async.Async.{async, await}
+import scala.compat.java8.DurationConverters.DurationOps
 import scala.concurrent.Future
 
 trait StatusServiceModule extends StatusService {
@@ -29,12 +32,21 @@ trait StatusServiceModule extends StatusService {
   import redisConnectionsFactory._
 
   private val log = AlarmServiceLogger.getLogger
-  private lazy val shelveTimeoutRef =
-    shelveTimeoutActorFactory.make(key ⇒ unshelve(key, cancelShelveTimeout = false), settings.shelveTimeout)(actorSystem)
 
   final override def getStatus(key: AlarmKey): Future[AlarmStatus] = async {
     log.debug(s"Getting status for alarm [${key.value}]")
-    await(get(key)).getOrElse(logAndThrow(KeyNotFoundException(key)))
+    val ackStatusF: Future[Option[AcknowledgementStatus]]   = ackStatusApi.get(key)
+    val latchedSeverityF: Future[Option[FullAlarmSeverity]] = latchedSeverityApi.get(key)
+    val shelveStatusF: Future[ShelveStatus]                 = getShelveStatus(key)
+    val alarmTimeF: Future[Option[AlarmTime]]               = alarmTimeApi.get(key)
+
+    val defaultAlarmStatus = AlarmStatus()
+    AlarmStatus(
+      await(ackStatusF).getOrElse(defaultAlarmStatus.acknowledgementStatus),
+      await(latchedSeverityF).getOrElse(defaultAlarmStatus.latchedSeverity),
+      await(shelveStatusF),
+      await(alarmTimeF).getOrElse(defaultAlarmStatus.alarmTime)
+    )
   }
 
   final override def acknowledge(key: AlarmKey): Future[Done] = setAcknowledgementStatus(key, Acknowledged)
@@ -56,19 +68,21 @@ trait StatusServiceModule extends StatusService {
     Done
   }
 
-  final override def shelve(key: AlarmKey): Future[Done] = async {
+  final override def shelve(key: AlarmKey): Future[Done] = {
     log.debug(s"Shelve alarm [${key.value}]")
+    // Use the UTC timezone for the time-being. Once the time service is in place, it can query time service.
+    val clock = Clock.systemUTC()
 
-    val status = await(getStatus(key))
-    if (status.shelveStatus != Shelved) {
-      await(setStatus(key, status.copy(shelveStatus = Shelved)))
-      shelveTimeoutRef ! ScheduleShelveTimeout(key) // start shelve timeout for this alarm (default 8 AM local time)
-    }
-    Done
+    val shelveTTLInSeconds = clock.untilNext(settings.shelveTimeout).toScala.toSeconds
+    // delete shelve key for this alarm on configured time (default 8 AM local time), when key is expired, it will be inferred as Unshelved
+    shelveStatusApi.setex(key, shelveTTLInSeconds, Shelved).map(_ ⇒ Done)
   }
 
   // this will most likely be called when operator manually un-shelves an already shelved alarm
-  final override def unshelve(key: AlarmKey): Future[Done] = unshelve(key, cancelShelveTimeout = true)
+  final override def unshelve(key: AlarmKey): Future[Done] = {
+    log.debug(s"Un-shelve alarm [${key.value}]")
+    shelveStatusApi.set(key, Unshelved)
+  }
 
   private[alarm] final override def unacknowledge(key: AlarmKey): Future[Done] = setAcknowledgementStatus(key, Unacknowledged)
 
@@ -157,35 +171,6 @@ trait StatusServiceModule extends StatusService {
       )
       .map(_ => Done)
 
-  private def get(key: AlarmKey): Future[Option[AlarmStatus]] = {
-    val alarmTimeF: Future[Option[AlarmTime]]               = alarmTimeApi.get(key)
-    val ackStatusF: Future[Option[AcknowledgementStatus]]   = ackStatusApi.get(key)
-    val shelveStatusF: Future[Option[ShelveStatus]]         = shelveStatusApi.get(key)
-    val latchedSeverityF: Future[Option[FullAlarmSeverity]] = latchedSeverityApi.get(key)
-
-    for (mayBeAckStatus       <- ackStatusF;
-         mayBeLatchedSeverity <- latchedSeverityF;
-         mayBeShelveStatus    <- shelveStatusF;
-         mayBeAlarmTime       <- alarmTimeF) yield {
-
-      val allEmpty = Seq(mayBeAckStatus, mayBeLatchedSeverity, mayBeLatchedSeverity, mayBeAlarmTime)
-        .exists(x => x.isEmpty)
-
-      if (allEmpty) None
-      else {
-        val defaultAlarmStatus = AlarmStatus()
-        Some(
-          AlarmStatus(
-            mayBeAckStatus.getOrElse(defaultAlarmStatus.acknowledgementStatus),
-            mayBeLatchedSeverity.getOrElse(defaultAlarmStatus.latchedSeverity),
-            mayBeShelveStatus.getOrElse(defaultAlarmStatus.shelveStatus),
-            mayBeAlarmTime.getOrElse(defaultAlarmStatus.alarmTime)
-          )
-        )
-      }
-    }
-  }
-
   private def set(key: AlarmKey, alarmStatus: AlarmStatus): Future[Done] = {
     Future
       .sequence(
@@ -193,25 +178,15 @@ trait StatusServiceModule extends StatusService {
           ackStatusApi.set(key, alarmStatus.acknowledgementStatus),
           shelveStatusApi.set(key, alarmStatus.shelveStatus),
           alarmTimeApi.set(key, alarmStatus.alarmTime),
-          latchedSeverityApi.set(key, alarmStatus.latchedSeverity),
+          latchedSeverityApi.set(key, alarmStatus.latchedSeverity)
         )
       )
       .map(_ => Done)
   }
 
-  private def unshelve(key: AlarmKey, cancelShelveTimeout: Boolean): Future[Done] = async {
-    log.debug(s"Un-shelve alarm [${key.value}]")
-
-    val status = await(getStatus(key))
-    if (status.shelveStatus != Unshelved) {
-      await(setStatus(key, status.copy(shelveStatus = Unshelved)))
-      // if in case of manual un-shelve operation, cancel the scheduled timer for this alarm
-      // this method is also called when scheduled timer for shelving of an alarm goes off (i.e. default 8 AM local time) with
-      // cancelShelveTimeout as false
-      // so, at this time `CancelShelveTimeout` should not be sent to `shelveTimeoutRef` as it is already cancelled
-      if (cancelShelveTimeout) shelveTimeoutRef ! CancelShelveTimeout(key)
-    }
-    Done
+  private def getShelveStatus(key: AlarmKey): Future[ShelveStatus] = async {
+    if (await(metadataApi.exists(key))) await(shelveStatusApi.get(key)).getOrElse(Unshelved)
+    else logAndThrow(KeyNotFoundException(key))
   }
 
   private def setAcknowledgementStatus(key: AlarmKey, ackStatus: AcknowledgementStatus): Future[Done] = async {

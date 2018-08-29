@@ -3,7 +3,7 @@ package csw.services.alarm.client.internal.services
 import akka.Done
 import com.typesafe.config.Config
 import csw.services.alarm.api.exceptions.KeyNotFoundException
-import csw.services.alarm.api.internal.{MetadataKey, MetadataService, SeverityService, StatusService}
+import csw.services.alarm.api.internal.{MetadataKey, MetadataService, StatusService}
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
 import csw.services.alarm.api.models.Key.{AlarmKey, GlobalKey}
 import csw.services.alarm.api.models.{AlarmMetadata, AlarmMetadataSet, AlarmStatus, Key}

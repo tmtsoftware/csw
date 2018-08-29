@@ -12,7 +12,6 @@ import csw.services.alarm.api.models.ShelveStatus.{Shelved, Unshelved}
 import csw.services.alarm.api.models.{AlarmSeverity, AlarmStatus}
 import csw.services.alarm.client.internal.helpers.AlarmServiceTestSetup
 import csw.services.alarm.client.internal.helpers.TestFutureExt.RichFuture
-import csw.services.alarm.client.internal.shelve.ShelveTimeoutMessage.{CancelShelveTimeout, ScheduleShelveTimeout}
 
 class StatusServiceModuleTest
     extends AlarmServiceTestSetup
@@ -141,11 +140,9 @@ class StatusServiceModuleTest
   }
 
   // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
-  test("shelve should schedule a shelving timeout") {
-    shelvingTimeoutProbe.receiveAll() //clear all messages
+  test("shelve should shelve alarm") {
     shelve(tromboneAxisHighLimitAlarmKey).await
     getStatus(tromboneAxisHighLimitAlarmKey).await.shelveStatus shouldBe Shelved
-    shelvingTimeoutProbe.receiveMessage() shouldBe ScheduleShelveTimeout(tromboneAxisHighLimitAlarmKey)
   }
 
   // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
@@ -157,16 +154,6 @@ class StatusServiceModuleTest
 
     //repeat the unshelve operation
     noException shouldBe thrownBy(unshelve(tromboneAxisHighLimitAlarmKey).await)
-  }
-
-  // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
-  test("unshelve should cancel the shelving timeout scheduler") {
-    // initialize alarm with Shelved status just for this test
-    setStatus(tromboneAxisHighLimitAlarmKey, AlarmStatus().copy(shelveStatus = Shelved)).await
-    shelvingTimeoutProbe.receiveAll() //clear all messages
-    unshelve(tromboneAxisHighLimitAlarmKey).await
-    getStatus(tromboneAxisHighLimitAlarmKey).await.shelveStatus shouldBe Unshelved
-    shelvingTimeoutProbe.receiveMessage() shouldBe CancelShelveTimeout(tromboneAxisHighLimitAlarmKey)
   }
 
   test("getStatus should throw exception if key does not exist") {
