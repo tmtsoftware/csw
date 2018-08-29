@@ -42,21 +42,21 @@ class EventsTest extends FunSpec with Matchers {
 
       //#observeevent
       //keys
-      val k1: Key[Int]    = KeyType.IntKey.make("encoder")
-      val k2: Key[Int]    = KeyType.IntKey.make("windspeed")
-      val k3: Key[String] = KeyType.StringKey.make("filter")
+      val k1: Key[Int]    = KeyType.IntKey.make("readoutsCompleted")
+      val k2: Key[Int]    = KeyType.IntKey.make("coaddsCompleted")
+      val k3: Key[String] = KeyType.StringKey.make("fileID")
       val k4: Key[Int]    = KeyType.IntKey.make("notUsed")
 
       //prefixes
-      val ck1   = Prefix("wfos.prog.cloudcover")
-      val name1 = EventName("filter wheel")
+      val ck1   = Prefix("iris.ifu.detectorAssembly")
+      val name1 = EventName("readoutEnd")
       val ck3   = Prefix("wfos.red.detector")
-      val name3 = EventName("iris")
+      val name3 = EventName("exposureStarted")
 
       //parameters
-      val p1: Parameter[Int]    = k1.set(22)
-      val p2: Parameter[Int]    = k2.set(44)
-      val p3: Parameter[String] = k3.set("A", "B", "C", "D")
+      val p1: Parameter[Int]    = k1.set(4)
+      val p2: Parameter[Int]    = k2.set(2)
+      val p3: Parameter[String] = k3.set("WFOS-RED-0001")
 
       //Create ObserveEvent using madd
       val se1: ObserveEvent = ObserveEvent(ck1, name1).madd(p1, p2)
@@ -96,15 +96,15 @@ class EventsTest extends FunSpec with Matchers {
       //#systemevent
       //keys
       val k1: Key[Int]    = KeyType.IntKey.make("encoder")
-      val k2: Key[Int]    = KeyType.IntKey.make("windspeed")
+      val k2: Key[Int]    = KeyType.IntKey.make("speed")
       val k3: Key[String] = KeyType.StringKey.make("filter")
       val k4: Key[Int]    = KeyType.IntKey.make("notUsed")
 
       //prefixes
-      val ck1   = Prefix("wfos.prog.cloudcover")
-      val name1 = EventName("filter wheel")
-      val ck3   = Prefix("wfos.red.detector")
-      val name3 = EventName("iris")
+      val ck1   = Prefix("wfos.red.filter")
+      val name1 = EventName("filterWheel")
+      val ck3   = Prefix("iris.imager.filter")
+      val name3 = EventName("status")
 
       //parameters
       val p1: Parameter[Int]    = k1.set(22)
@@ -163,8 +163,8 @@ class EventsTest extends FunSpec with Matchers {
       //key
       val k1: Key[MatrixData[Double]] = DoubleMatrixKey.make("myMatrix")
 
-      val name1  = EventName("filter wheel")
-      val prefix = Prefix("wfos.blue.filter")
+      val name1  = EventName("correctionInfo")
+      val prefix = Prefix("aoesw.rpg")
 
       //values
       val m1: MatrixData[Double] = MatrixData.fromArrays(
@@ -207,12 +207,12 @@ class EventsTest extends FunSpec with Matchers {
       //keys
       val encoderKey: Key[Int] = KeyType.IntKey.make("encoder")
       val filterKey: Key[Int]  = KeyType.IntKey.make("filter")
-      val miscKey: Key[Int]    = KeyType.IntKey.make("misc.")
+      val miscKey: Key[Int]    = KeyType.IntKey.make("misc")
 
       //prefix
       val prefix = Prefix("wfos.blue.filter")
 
-      val name1 = EventName("filter wheel")
+      val name1 = EventName("filterWheel")
 
       //params
       val encParam1 = encoderKey.set(1)
@@ -263,13 +263,13 @@ class EventsTest extends FunSpec with Matchers {
 
       //values
       val raDec1 = RaDec(10.20, 40.20)
-      val raDec2 = RaDec(100.20, 400.20)
+      val raDec2 = RaDec(11.20, 50.20)
 
       //parameters
       val param = raDecKey.set(raDec1, raDec2).withUnits(arcmin)
 
-      val prefix = Prefix("wfos.blue.filter")
-      val name   = EventName("filter wheel")
+      val prefix = Prefix("tcs.pk")
+      val name   = EventName("targetCoords")
       //events
       val observeEvent: ObserveEvent = ObserveEvent(prefix, name).add(param)
       val systemEvent1: SystemEvent  = SystemEvent(prefix, name).add(param)
