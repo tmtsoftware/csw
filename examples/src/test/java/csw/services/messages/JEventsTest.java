@@ -53,15 +53,15 @@ public class JEventsTest {
         //#systemevent
         //keys
         Key<Integer> k1 = JKeyTypes.IntKey().make("encoder");
-        Key<Integer> k2 = JKeyTypes.IntKey().make("windspeed");
+        Key<Integer> k2 = JKeyTypes.IntKey().make("speed");
         Key<String> k3 = JKeyTypes.StringKey().make("filter");
         Key<Integer> k4 = JKeyTypes.IntKey().make("notUsed");
 
         //prefixes
-        Prefix prefix1 = new Prefix("wfos.prog.cloudcover");
-        EventName name1 = new EventName("filter wheel");
-        Prefix prefix2 = new Prefix("wfos.red.detector");
-        EventName name2 = new EventName("iris");
+        Prefix prefix1 = new Prefix("wfos.red.filter");
+        EventName name1 = new EventName("filterWheel");
+        Prefix prefix2 = new Prefix("iris.imager.filter");
+        EventName name2 = new EventName("status");
 
         //parameters
         Parameter<Integer> p1 = k1.set(22);
@@ -103,21 +103,21 @@ public class JEventsTest {
     public void showUsageOfObserveEvent() {
         //#observeevent
         //keys
-        Key<Integer> k1 = JKeyTypes.IntKey().make("encoder");
-        Key<Integer> k2 = JKeyTypes.IntKey().make("windspeed");
-        Key<String> k3 = JKeyTypes.StringKey().make("filter");
+        Key<Integer> k1 = JKeyTypes.IntKey().make("readoutsCompleted");
+        Key<Integer> k2 = JKeyTypes.IntKey().make("coaddsCompleted");
+        Key<String> k3 = JKeyTypes.StringKey().make("fileID");
         Key<Integer> k4 = JKeyTypes.IntKey().make("notUsed");
 
         //prefixes
-        Prefix prefix1 = new Prefix("wfos.prog.cloudcover");
-        EventName name1 = new EventName("filter wheel");
+        Prefix prefix1 = new Prefix("iris.ifu.detectorAssembly");
+        EventName name1 = new EventName("readoutEnd");
         Prefix prefix2 = new Prefix("wfos.red.detector");
-        EventName name2 = new EventName("iris");
+        EventName name2 = new EventName("exposureStarted");
 
         //parameters
-        Parameter<Integer> p1 = k1.set(22);
-        Parameter<Integer> p2 = k2.set(44);
-        Parameter<String> p3 = k3.set("A", "B", "C", "D");
+        Parameter<Integer> p1 = k1.set(4);
+        Parameter<Integer> p2 = k2.set(2);
+        Parameter<String> p3 = k3.set("WFOS-RED-0001");
 
         //Create ObserveEvent using madd
         ObserveEvent oc1 = new ObserveEvent(prefix1, name1).madd(p1, p2);
@@ -157,8 +157,8 @@ public class JEventsTest {
         Key<MatrixData<Double>> k1 = JKeyTypes.DoubleMatrixKey().make("myMatrix");
 
         //prefixes
-        Prefix prefix1 = new Prefix("wfos.blue.filter");
-        EventName name1 = new EventName("filter wheel");
+        Prefix prefix1 = new Prefix("aoesw.rpg");
+        EventName name1 = new EventName("correctionInfo");
 
         //values
         Double[][] doubles = {{1.0, 2.0, 3.0}, {4.1, 5.1, 6.1}, {7.2, 8.2, 9.2}};
@@ -199,11 +199,11 @@ public class JEventsTest {
         //keys
         Key<Integer> encoderKey = JKeyTypes.IntKey().make("encoder");
         Key<Integer> filterKey = JKeyTypes.IntKey().make("filter");
-        Key<Integer> miscKey = JKeyTypes.IntKey().make("misc.");
+        Key<Integer> miscKey = JKeyTypes.IntKey().make("misc");
 
         //prefix
         Prefix prefix1 = new Prefix("wfos.blue.filter");
-        EventName name1 = new EventName("filter wheel");
+        EventName name1 = new EventName("filterWheel");
 
         //params
         Parameter<Integer> encParam1 = encoderKey.set(1);
@@ -249,17 +249,17 @@ public class JEventsTest {
         //#protobuf
 
         //prefixes
-        Prefix prefix1 = new Prefix("wfos.blue.filter");
-        EventName name1 = new EventName("filter wheel");
-        Prefix prefix2 = new Prefix("wfos.prog.cloudcover");
-        EventName name2 = new EventName("iris");
+        Prefix prefix1 = new Prefix("tcs.pk");
+        EventName name1 = new EventName("targetCoords");
+        Prefix prefix2 = new Prefix("tcs.cm");
+        EventName name2 = new EventName("guiderCoords");
 
         //Key
         Key<RaDec> raDecKey = JKeyTypes.RaDecKey().make("raDecKey");
 
         //values
         RaDec raDec1 = new RaDec(10.20, 40.20);
-        RaDec raDec2 = new RaDec(100.20, 400.20);
+        RaDec raDec2 = new RaDec(11.20, 50.20);
 
         //parameters
         Parameter<RaDec> param = raDecKey.set(raDec1, raDec2).withUnits(JUnits.arcmin);
