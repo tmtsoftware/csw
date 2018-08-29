@@ -24,32 +24,32 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.async.Async.{async, await}
 
 /**
- * Domain specific logic should be written in below handlers.
- * This handlers gets invoked when component receives messages/commands from other component/entity.
- * For example, if one component sends Submit(Setup(args)) command to SampleHcd,
- * This will be first validated in the supervisor and then forwarded to Component TLA which first invokes validateCommand hook
- * and if validation is successful, then onSubmit hook gets invoked.
- * You can find more information on this here : https://tmtsoftware.github.io/csw-prod/framework.html
- */
+  * Domain specific logic should be written in below handlers.
+  * This handlers gets invoked when component receives messages/commands from other component/entity.
+  * For example, if one component sends Submit(Setup(args)) command to SampleHcd,
+  * This will be first validated in the supervisor and then forwarded to Component TLA which first invokes validateCommand hook
+  * and if validation is successful, then onSubmit hook gets invoked.
+  * You can find more information on this here : https://tmtsoftware.github.io/csw-prod/framework.html
+  */
 class SampleAssemblyHandlers(
-    ctx: ActorContext[TopLevelActorMessage],
-    componentInfo: ComponentInfo,
-    commandResponseManager: CommandResponseManager,
-    currentStatePublisher: CurrentStatePublisher,
-    locationService: LocationService,
-    eventService: EventService,
-    alarmService: AlarmService,
-    loggerFactory: LoggerFactory
-) extends ComponentHandlers(
-      ctx,
-      componentInfo,
-      commandResponseManager,
-      currentStatePublisher,
-      locationService,
-      eventService,
-      alarmService,
-      loggerFactory
-    ) {
+                              ctx: ActorContext[TopLevelActorMessage],
+                              componentInfo: ComponentInfo,
+                              commandResponseManager: CommandResponseManager,
+                              currentStatePublisher: CurrentStatePublisher,
+                              locationService: LocationService,
+                              eventService: EventService,
+                              alarmService: AlarmService,
+                              loggerFactory: LoggerFactory
+                            ) extends ComponentHandlers(
+  ctx,
+  componentInfo,
+  commandResponseManager,
+  currentStatePublisher,
+  locationService,
+  eventService,
+  alarmService,
+  loggerFactory
+) {
 
   implicit val ec: ExecutionContextExecutor = ctx.executionContext
   private val log                           = loggerFactory.getLogger
@@ -104,7 +104,7 @@ class SampleAssemblyHandlers(
   private var maybeEventSubscription: Option[EventSubscription] = None
   override def initialize(): Future[Unit] = {
     log.info("In Assembly initialize")
-    subscribeToHcd().foreach(eventSubscription => maybeEventSubscription = Some(eventSubscription))
+    maybeEventSubscription = Some(subscribeToHcd())
     Future.unit
   }
 
@@ -131,23 +131,20 @@ class SampleAssemblyHandlers(
   private val hcdCounterKey   = KeyType.IntKey.make("counter")
 
   private def processEvent(event: Event): Unit = {
-    log.info(s"Event received: ${event.eventName}")
+    log.info(s"Event received: ${event.eventKey}")
     event match {
       case e: SystemEvent =>
-        e.eventName match {
-          case counterEventKey.eventName => log.info(s"Counter = ${e(hcdCounterKey).head}")
-          case _                         => log.warn("Unexpected event received.")
+        e.eventKey match {
+          case `counterEventKey` => log.info(s"Counter = ${e(hcdCounterKey).head}")
+          case _                 => log.warn("Unexpected event received.")
         }
       case e: ObserveEvent => log.warn("Unexpected ObserveEvent received.") // not expected
     }
   }
 
-  private def subscribeToHcd(): Future[EventSubscription] = {
+  private def subscribeToHcd(): EventSubscription = {
     log.info("Starting subscription.")
-    async {
-      val subscriber = await(eventService.defaultSubscriber)
-      subscriber.subscribeCallback(Set(counterEventKey), processEvent)
-    }
+    eventService.defaultSubscriber.subscribeCallback(Set(counterEventKey), processEvent)
   }
 
   private def unsubscribeHcd(): Unit = {

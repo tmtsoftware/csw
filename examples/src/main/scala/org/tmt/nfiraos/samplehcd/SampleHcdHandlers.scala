@@ -22,32 +22,32 @@ import scala.concurrent.duration._
 import scala.async.Async.{async, await}
 
 /**
- * Domain specific logic should be written in below handlers.
- * These handlers get invoked when component receives messages/commands from other component/entity.
- * For example, if one component sends Submit(Setup(args)) command to SampleHcd, these will be first validated in the
- * supervisor and then forwarded to Component TLA which first invokes validateCommand hook
- * and if validation is successful, then onSubmit hook gets invoked.
- * You can find more information on this here : https://tmtsoftware.github.io/csw-prod/framework.html
- */
+  * Domain specific logic should be written in below handlers.
+  * These handlers get invoked when component receives messages/commands from other component/entity.
+  * For example, if one component sends Submit(Setup(args)) command to SampleHcd, these will be first validated in the
+  * supervisor and then forwarded to Component TLA which first invokes validateCommand hook
+  * and if validation is successful, then onSubmit hook gets invoked.
+  * You can find more information on this here : https://tmtsoftware.github.io/csw-prod/framework.html
+  */
 class SampleHcdHandlers(
-    ctx: ActorContext[TopLevelActorMessage],
-    componentInfo: ComponentInfo,
-    commandResponseManager: CommandResponseManager,
-    currentStatePublisher: CurrentStatePublisher,
-    locationService: LocationService,
-    eventService: EventService,
-    alarmService: AlarmService,
-    loggerFactory: LoggerFactory
-) extends ComponentHandlers(
-      ctx,
-      componentInfo,
-      commandResponseManager,
-      currentStatePublisher,
-      locationService,
-      eventService,
-      alarmService,
-      loggerFactory
-    ) {
+                         ctx: ActorContext[TopLevelActorMessage],
+                         componentInfo: ComponentInfo,
+                         commandResponseManager: CommandResponseManager,
+                         currentStatePublisher: CurrentStatePublisher,
+                         locationService: LocationService,
+                         eventService: EventService,
+                         alarmService: AlarmService,
+                         loggerFactory: LoggerFactory
+                       ) extends ComponentHandlers(
+  ctx,
+  componentInfo,
+  commandResponseManager,
+  currentStatePublisher,
+  locationService,
+  eventService,
+  alarmService,
+  loggerFactory
+) {
 
   implicit val ec: ExecutionContextExecutor = ctx.executionContext
   private val log                           = loggerFactory.getLogger
@@ -77,7 +77,7 @@ class SampleHcdHandlers(
   var maybePublishingGenerator: Option[Cancellable] = None
   override def initialize(): Future[Unit] = {
     log.info("In HCD initialize")
-    publishCounter().map(p => maybePublishingGenerator = Some(p))
+    maybePublishingGenerator = Some(publishCounter())
     Future.unit
   }
 
@@ -92,7 +92,7 @@ class SampleHcdHandlers(
   //#initialize
 
   //#publish
-  private def publishCounter(): Future[Cancellable] = {
+  private def publishCounter(): Cancellable = {
     var counter = 0
     def incrementCounterEvent() = {
       counter += 1
@@ -101,10 +101,7 @@ class SampleHcdHandlers(
     }
 
     log.info("Starting publish stream.")
-    async {
-      val publisher = await(eventService.defaultPublisher)
-      publisher.publish(incrementCounterEvent(), 5.second, err => log.error(err.getMessage, ex = err))
-    }
+    eventService.defaultPublisher.publish(incrementCounterEvent(), 5.second, err => log.error(err.getMessage, ex = err))
   }
 
   private def stopPublishingGenerator(): Unit = {

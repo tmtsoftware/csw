@@ -52,8 +52,8 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
     private CurrentStatePublisher currentStatePublisher;
     private ActorContext<TopLevelActorMessage> actorContext;
     private ILocationService locationService;
-    private ComponentInfo componentInfo;
     private IEventService eventService;
+    private ComponentInfo componentInfo;
 
     private final ActorRef<WorkerCommand> commandSender;
 
@@ -73,9 +73,9 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
         this.commandResponseManager = commandResponseManager;
         this.actorContext = ctx;
         this.locationService = locationService;
+        this.eventService = eventService;
         this.componentInfo = componentInfo;
         this.commandSender = createWorkerActor();
-        this.eventService = eventService;
     }
 
     //#worker-actor
@@ -149,7 +149,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
     public CompletableFuture<Void> jInitialize() {
         return CompletableFuture.runAsync(() -> {
             log.info("In Assembly initialize");
-            subscribeToHcd().thenApply(s -> maybeEventSubscription = Optional.of(s));
+            maybeEventSubscription = Optional.of(subscribeToHcd());
         });
     }
 
@@ -179,10 +179,10 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
     private Key<Integer> hcdCounterKey = JKeyTypes.IntKey().make("counter");
 
     private void processEvent(Event event) {
-        log.info("Event received: "+ event.eventName());
+        log.info("Event received: "+ event.eventKey());
         if (event instanceof SystemEvent) {
             SystemEvent sysEvent = (SystemEvent)event;
-            if (event.eventName() == counterEventKey.eventName()) {
+            if (event.eventKey().equals(counterEventKey)) {
                 log.info("Counter = " + sysEvent.parameter(hcdCounterKey).head());
             } else {
                 log.warn("Unexpected event received.");
@@ -193,11 +193,9 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
         }
     }
 
-    private CompletableFuture<IEventSubscription> subscribeToHcd() {
+    private IEventSubscription subscribeToHcd() {
         log.info("Starting subscription.");
-        return eventService.defaultSubscriber().thenApply(subscriber ->
-                subscriber.subscribeCallback(Collections.singleton(counterEventKey), this::processEvent)
-        );
+        return eventService.defaultSubscriber().subscribeCallback(Collections.singleton(counterEventKey), this::processEvent);
     }
 
     private void unsubscribeHcd() {

@@ -109,7 +109,7 @@ public class JSampleHcdHandlers extends JComponentHandlers {
     public CompletableFuture<Void> jInitialize() {
         return CompletableFuture.runAsync(() -> {
             log.info("In HCD initialize");
-            publishCounter().thenApply(p -> maybePublishingGenerator = Optional.of(p));
+            maybePublishingGenerator = Optional.of(publishCounter());
         });
     }
 
@@ -132,9 +132,9 @@ public class JSampleHcdHandlers extends JComponentHandlers {
         return new SystemEvent(componentInfo.prefix(), new EventName("HcdCounter")).add(param);
     }
 
-    private CompletableFuture<Cancellable> publishCounter() {
+    private Cancellable publishCounter() {
         log.info("Starting publish stream.");
-        return eventService.defaultPublisher().thenApply(publisher -> publisher.publish(this::incrementCounterEvent, Duration.ofSeconds(5)));
+        return eventService.defaultPublisher().publish(this::incrementCounterEvent, Duration.ofSeconds(5));
     }
 
     private void stopPublishingGenerator() {
