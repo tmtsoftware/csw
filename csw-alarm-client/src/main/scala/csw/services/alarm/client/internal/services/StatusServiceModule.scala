@@ -68,12 +68,16 @@ trait StatusServiceModule extends StatusService {
 
   final override def shelve(key: AlarmKey): Future[Done] = {
     log.debug(s"Shelve alarm [${key.value}]")
+    shelve(key, settings.shelveTimeout)
+  }
+
+  private[alarm] def shelve(key: AlarmKey, shelveTimeout: String): Future[Done] = {
     // Use the UTC timezone for the time-being. Once the time service is in place, it can query time service.
     val clock = Clock.systemUTC()
 
-    val shelveTTLInSeconds = clock.untilNext(settings.shelveTimeout).toScala.toSeconds
+    val shelveTTLInSeconds = clock.untilNext(shelveTimeout).toScala.toSeconds
     // delete shelve key for this alarm on configured time (default 8 AM local time), when key is expired, it will be inferred as Unshelved
-    shelveStatusApi.setex(key, shelveTTLInSeconds, Shelved).map(_ ⇒ Done)
+    shelveStatusApi.setex(key, shelveTTLInSeconds, Shelved)
   }
 
   // this will most likely be called when operator manually un-shelves an already shelved alarm
@@ -149,13 +153,22 @@ trait StatusServiceModule extends StatusService {
 
   private[alarm] def setStatus(alarmKey: AlarmKey, alarmStatus: AlarmStatus): Future[Done] = {
     log.info(s"Updating alarm status [$alarmStatus] in alarm store")
-    set(alarmKey, alarmStatus)
+    Future
+      .sequence(
+        Seq(
+          ackStatusApi.set(alarmKey, alarmStatus.acknowledgementStatus),
+          shelveStatusApi.set(alarmKey, alarmStatus.shelveStatus),
+          alarmTimeApi.set(alarmKey, alarmStatus.alarmTime),
+          latchedSeverityApi.set(alarmKey, alarmStatus.latchedSeverity)
+        )
+      )
+      .map(_ ⇒ Done)
   }
 
   private[alarm] def setStatus(statusMap: Map[AlarmKey, AlarmStatus]): Future[Done] =
     Future
-      .sequence(statusMap.map { case (key, status) => setStatus(key, status) })
-      .map(_ => Done)
+      .sequence(statusMap.map { case (key, status) ⇒ setStatus(key, status) })
+      .map(_ ⇒ Done)
 
   final override private[alarm] def clearAllStatus(): Future[Done] =
     Future
@@ -167,20 +180,7 @@ trait StatusServiceModule extends StatusService {
           latchedSeverityApi.pdel(GlobalKey)
         )
       )
-      .map(_ => Done)
-
-  private def set(key: AlarmKey, alarmStatus: AlarmStatus): Future[Done] = {
-    Future
-      .sequence(
-        Seq(
-          ackStatusApi.set(key, alarmStatus.acknowledgementStatus),
-          shelveStatusApi.set(key, alarmStatus.shelveStatus),
-          alarmTimeApi.set(key, alarmStatus.alarmTime),
-          latchedSeverityApi.set(key, alarmStatus.latchedSeverity)
-        )
-      )
-      .map(_ => Done)
-  }
+      .map(_ ⇒ Done)
 
   private def getShelveStatus(key: AlarmKey): Future[ShelveStatus] = async {
     if (await(metadataApi.exists(key))) await(shelveStatusApi.get(key)).getOrElse(Unshelved)

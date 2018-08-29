@@ -1,5 +1,7 @@
 package csw.services.alarm.client.internal.services
 
+import java.time.{Clock, LocalDateTime}
+
 import com.typesafe.config.ConfigFactory
 import csw.messages.params.models.Subsystem
 import csw.messages.params.models.Subsystem.BAD
@@ -10,6 +12,7 @@ import csw.services.alarm.api.models.FullAlarmSeverity.Disconnected
 import csw.services.alarm.api.models.Key.AlarmKey
 import csw.services.alarm.api.models.ShelveStatus.{Shelved, Unshelved}
 import csw.services.alarm.api.models.{AlarmSeverity, AlarmStatus}
+import csw.services.alarm.client.internal.extensions.TimeExtensions
 import csw.services.alarm.client.internal.helpers.AlarmServiceTestSetup
 import csw.services.alarm.client.internal.helpers.TestFutureExt.RichFuture
 
@@ -179,6 +182,19 @@ class StatusServiceModuleTest
   test("shelve should shelve alarm") {
     shelve(tromboneAxisHighLimitAlarmKey).await
     getStatus(tromboneAxisHighLimitAlarmKey).await.shelveStatus shouldBe Shelved
+  }
+
+  // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
+  test("shelve alarm should automatically get unshelved on configured time") {
+    // configure shelve timeout after 2 seconds from current time
+    val currentDateTime = LocalDateTime.now(Clock.systemUTC())
+    val shelveTimeout   = currentDateTime.plusSeconds(2).format(TimeExtensions.TimeFormatter)
+
+    shelve(tromboneAxisLowLimitAlarmKey, shelveTimeout).await
+    getStatus(tromboneAxisLowLimitAlarmKey).await.shelveStatus shouldBe Shelved
+
+    Thread.sleep(2000)
+    getStatus(tromboneAxisLowLimitAlarmKey).await.shelveStatus shouldBe Unshelved
   }
 
   // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
