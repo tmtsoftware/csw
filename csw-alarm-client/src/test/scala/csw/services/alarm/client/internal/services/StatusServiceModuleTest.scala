@@ -28,7 +28,11 @@ class StatusServiceModuleTest
   // DEOPSCSW-447: Reset api for alarm
   // DEOPSCSW-500: Update alarm time on current severity change
   test("reset should not update time when severity does not change") {
-    // latch it to okay
+    // Initially latch and current are disconencted
+    getStatus(tromboneAxisLowLimitAlarmKey).await.latchedSeverity shouldEqual Disconnected
+    getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldEqual Disconnected
+
+    // Simulates initial component updating to Okay
     val status = setSeverityAndGetStatus(tromboneAxisLowLimitAlarmKey, Okay)
 
     acknowledge(tromboneAxisLowLimitAlarmKey).await
@@ -38,6 +42,33 @@ class StatusServiceModuleTest
     val statusAfterReset = getStatus(tromboneAxisLowLimitAlarmKey).await
 
     statusAfterReset.alarmTime.time shouldEqual status.alarmTime.time
+  }
+
+  // DEOPSCSW-447: Simple test to check behavior of latch and reset
+  test("simple test to check behavior of latch and reset") {
+    // Move over disconnected
+    setSeverityAndGetStatus(tromboneAxisLowLimitAlarmKey, Okay).latchedSeverity shouldEqual Okay
+    getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldEqual Okay
+
+    // Now make a significant alarm and check latch
+    setSeverityAndGetStatus(tromboneAxisLowLimitAlarmKey, Major).latchedSeverity shouldEqual Major
+    getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldEqual Major
+
+    // Return to normal
+    setSeverityAndGetStatus(tromboneAxisLowLimitAlarmKey, Okay).latchedSeverity shouldEqual Major
+    getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldEqual Okay
+
+    // Now reset
+    reset(tromboneAxisLowLimitAlarmKey).await
+    getStatus(tromboneAxisLowLimitAlarmKey).await.latchedSeverity shouldBe Okay
+    getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldEqual Okay
+
+    // Check that it's not always okay
+    setSeverityAndGetStatus(tromboneAxisLowLimitAlarmKey, Critical).latchedSeverity shouldEqual Critical
+    getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldEqual Critical
+    reset(tromboneAxisLowLimitAlarmKey).await
+    getStatus(tromboneAxisLowLimitAlarmKey).await.latchedSeverity shouldBe Critical
+    getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldEqual Critical
   }
 
   // DEOPSCSW-447: Reset api for alarm
@@ -79,6 +110,11 @@ class StatusServiceModuleTest
     //wait for current severity to expire and get disconnected
     Thread.sleep(1500)
     getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldEqual Disconnected
+
+    // This shows that until current severity goes to a real value or reset, latchedSeverity doesn't change
+    // we are relying on future Alarm Server to do this change
+    val notUpdatedStatus = getStatus(tromboneAxisLowLimitAlarmKey).await
+    notUpdatedStatus.latchedSeverity shouldEqual Warning
 
     //reset alarm
     reset(tromboneAxisLowLimitAlarmKey).await
