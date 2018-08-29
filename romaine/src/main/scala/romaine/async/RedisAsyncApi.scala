@@ -1,12 +1,13 @@
 package romaine.async
 
 import akka.Done
-import io.lettuce.core.KeyValue
 import io.lettuce.core.api.async.RedisAsyncCommands
 import romaine.extensions.FutureExtensions.RichFuture
+import romaine.reactive.RedisResult
 
 import scala.collection.JavaConverters.{iterableAsScalaIterableConverter, mapAsJavaMapConverter}
 import scala.compat.java8.FutureConverters.CompletionStageOps
+import scala.compat.java8.OptionConverters.RichOptionalGeneric
 import scala.concurrent.{ExecutionContext, Future}
 
 class RedisAsyncApi[K, V](redisAsyncCommands: Future[RedisAsyncCommands[K, V]])(implicit ec: ExecutionContext) {
@@ -23,8 +24,11 @@ class RedisAsyncApi[K, V](redisAsyncCommands: Future[RedisAsyncCommands[K, V]])(
 
   def get(key: K): Future[Option[V]] = redisAsyncCommands.flatMap(_.get(key).toScala.map(Option(_)))
 
-  def mget(keys: List[K]): Future[List[KeyValue[K, V]]] =
-    redisAsyncCommands.flatMap(_.mget(keys: _*).toScala.map(_.asScala.toList))
+  def mget(keys: List[K]): Future[List[RedisResult[K, Option[V]]]] =
+    redisAsyncCommands.flatMap(
+      _.mget(keys: _*).toScala
+        .map(_.asScala.map(kv ⇒ RedisResult(kv.getKey, kv.optional().asScala)).toList)
+    )
 
   def keys(key: K): Future[List[K]] = redisAsyncCommands.flatMap(_.keys(key).toScala.map(_.asScala.toList))
 

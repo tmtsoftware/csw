@@ -10,6 +10,7 @@ import csw.services.alarm.api.models.{AlarmMetadata, AlarmMetadataSet, AlarmStat
 import csw.services.alarm.client.internal.AlarmServiceLogger
 import csw.services.alarm.client.internal.configparser.ConfigParser
 import csw.services.alarm.client.internal.redis.RedisConnectionsFactory
+import romaine.reactive.RedisResult
 
 import scala.async.Async.{async, await}
 import scala.concurrent.Future
@@ -49,7 +50,9 @@ trait MetadataServiceModule extends MetadataService {
 
     val metadataKeys = await(metadataApi.keys(key))
     if (metadataKeys.isEmpty) logAndThrow(KeyNotFoundException(key))
-    await(metadataApi.mget(metadataKeys)).map(_.getValue)
+    await(metadataApi.mget(metadataKeys)).collect {
+      case RedisResult(_, value) if value.isDefined ⇒ value.get
+    }
   }
 
   final override def initAlarms(inputConfig: Config, reset: Boolean): Future[Done] = async {

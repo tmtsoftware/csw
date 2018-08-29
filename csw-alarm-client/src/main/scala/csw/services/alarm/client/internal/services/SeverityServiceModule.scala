@@ -15,6 +15,7 @@ import csw.services.alarm.client.internal.commons.Settings
 import csw.services.alarm.client.internal.redis.RedisConnectionsFactory
 import csw.services.alarm.client.internal.{AlarmCodec, AlarmServiceLogger}
 import reactor.core.publisher.FluxSink.OverflowStrategy
+import romaine.reactive.RedisResult
 
 import scala.async.Async.{async, await}
 import scala.concurrent.Future
@@ -42,10 +43,7 @@ trait SeverityServiceModule extends SeverityService {
     val activeAlarms   = await(getActiveAlarmKeys(key))
     val severityKeys   = activeAlarms.map(SeverityKey.fromMetadataKey)
     val severityValues = await(severityApi.mget(severityKeys))
-    val severityList = severityValues.collect {
-      case kv if kv.hasValue => Some(kv.getValue)
-      case _                 => None
-    }
+    val severityList   = severityValues.map(_.value)
     aggregratorByMax(severityList)
   }
 
@@ -114,7 +112,7 @@ trait SeverityServiceModule extends SeverityService {
     if (metadataKeys.isEmpty) logAndThrow(KeyNotFoundException(key))
 
     val keys = await(metadataApi.mget(metadataKeys)).collect {
-      case kv if kv.getValue.isActive ⇒ kv.getKey
+      case RedisResult(k, v) if v.isDefined & v.get.isActive ⇒ k
     }
 
     if (keys.isEmpty) logAndThrow(InactiveAlarmException(key))
