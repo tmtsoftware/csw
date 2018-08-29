@@ -1,6 +1,5 @@
 package csw.services.alarm.client.internal.helpers
 
-import akka.actor.testkit.typed.scaladsl.TestInbox
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.{typed, ActorSystem}
 import akka.stream.ActorMaterializer
@@ -16,11 +15,8 @@ import csw.services.alarm.client.internal.commons.Settings
 import csw.services.alarm.client.internal.commons.serviceresolver.AlarmServiceHostPortResolver
 import csw.services.alarm.client.internal.helpers.TestFutureExt.RichFuture
 import csw.services.alarm.client.internal.redis.RedisConnectionsFactory
-import csw.services.alarm.client.internal.shelve.{ShelveTimeoutActorFactory, ShelveTimeoutMessage, Unshelvable}
 import csw.services.location.commons.ActorSystemFactory
 import io.lettuce.core.RedisClient
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 import romaine.RomaineFactory
@@ -71,9 +67,4 @@ class AlarmServiceTestSetup
   def settings: Settings = new Settings(ConfigFactory.load())
 
   val redisConnectionsFactory: RedisConnectionsFactory = connsFactory
-
-  val shelvingTimeoutProbe: TestInbox[ShelveTimeoutMessage] = TestInbox[ShelveTimeoutMessage]()
-  val shelveTimeoutActorFactory: ShelveTimeoutActorFactory  = mock[ShelveTimeoutActorFactory]
-  when(shelveTimeoutActorFactory.make(any[Unshelvable](), any[String])(any[ActorSystem])).thenReturn(shelvingTimeoutProbe.ref)
-
 }

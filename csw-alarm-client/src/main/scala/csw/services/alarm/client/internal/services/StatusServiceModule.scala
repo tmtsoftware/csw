@@ -16,7 +16,6 @@ import csw.services.alarm.client.internal.AlarmServiceLogger
 import csw.services.alarm.client.internal.commons.Settings
 import csw.services.alarm.client.internal.extensions.TimeExtensions.RichClock
 import csw.services.alarm.client.internal.redis.RedisConnectionsFactory
-import csw.services.alarm.client.internal.shelve.ShelveTimeoutActorFactory
 
 import scala.async.Async.{async, await}
 import scala.compat.java8.DurationConverters.DurationOps
@@ -25,7 +24,6 @@ import scala.concurrent.Future
 trait StatusServiceModule extends StatusService {
   self: SeverityService with MetadataService ⇒
 
-  def shelveTimeoutActorFactory: ShelveTimeoutActorFactory
   implicit val actorSystem: ActorSystem
   def settings: Settings
   val redisConnectionsFactory: RedisConnectionsFactory
