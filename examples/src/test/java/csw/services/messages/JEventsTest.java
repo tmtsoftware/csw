@@ -144,8 +144,8 @@ public class JEventsTest {
 
         Assert.assertTrue(k1Exists);
         Assert.assertTrue(p4.get() == p1);
-        Assert.assertEquals(new HashSet<>(Arrays.asList(22)), new HashSet<>(v1));
-        Assert.assertEquals(new HashSet<>(Arrays.asList(44)), new HashSet<>(v2));
+        Assert.assertEquals(new HashSet<>(Arrays.asList(4)), new HashSet<>(v1));
+        Assert.assertEquals(new HashSet<>(Arrays.asList(2)), new HashSet<>(v2));
         Assert.assertEquals(new HashSet<>(Arrays.asList(missingKeys)), new HashSet<>(Arrays.asList(missingKeys)));
         Assert.assertNotEquals(oc3.eventId(), oc4.eventId()); //Test unique id when parameters are removed
     }

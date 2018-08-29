@@ -21,35 +21,34 @@ import csw.services.logging.scaladsl.LoggerFactory
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContextExecutor, Future}
-import scala.async.Async.{async, await}
 
 /**
-  * Domain specific logic should be written in below handlers.
-  * This handlers gets invoked when component receives messages/commands from other component/entity.
-  * For example, if one component sends Submit(Setup(args)) command to SampleHcd,
-  * This will be first validated in the supervisor and then forwarded to Component TLA which first invokes validateCommand hook
-  * and if validation is successful, then onSubmit hook gets invoked.
-  * You can find more information on this here : https://tmtsoftware.github.io/csw-prod/framework.html
-  */
+ * Domain specific logic should be written in below handlers.
+ * This handlers gets invoked when component receives messages/commands from other component/entity.
+ * For example, if one component sends Submit(Setup(args)) command to SampleHcd,
+ * This will be first validated in the supervisor and then forwarded to Component TLA which first invokes validateCommand hook
+ * and if validation is successful, then onSubmit hook gets invoked.
+ * You can find more information on this here : https://tmtsoftware.github.io/csw-prod/framework.html
+ */
 class SampleAssemblyHandlers(
-                              ctx: ActorContext[TopLevelActorMessage],
-                              componentInfo: ComponentInfo,
-                              commandResponseManager: CommandResponseManager,
-                              currentStatePublisher: CurrentStatePublisher,
-                              locationService: LocationService,
-                              eventService: EventService,
-                              alarmService: AlarmService,
-                              loggerFactory: LoggerFactory
-                            ) extends ComponentHandlers(
-  ctx,
-  componentInfo,
-  commandResponseManager,
-  currentStatePublisher,
-  locationService,
-  eventService,
-  alarmService,
-  loggerFactory
-) {
+    ctx: ActorContext[TopLevelActorMessage],
+    componentInfo: ComponentInfo,
+    commandResponseManager: CommandResponseManager,
+    currentStatePublisher: CurrentStatePublisher,
+    locationService: LocationService,
+    eventService: EventService,
+    alarmService: AlarmService,
+    loggerFactory: LoggerFactory
+) extends ComponentHandlers(
+      ctx,
+      componentInfo,
+      commandResponseManager,
+      currentStatePublisher,
+      locationService,
+      eventService,
+      alarmService,
+      loggerFactory
+    ) {
 
   implicit val ec: ExecutionContextExecutor = ctx.executionContext
   private val log                           = loggerFactory.getLogger
