@@ -14,5 +14,7 @@ private[alarm] trait StatusService {
 
   private[alarm] def unacknowledge(key: AlarmKey): Future[Done]
   private[alarm] def setStatus(alarmKey: AlarmKey, alarmStatus: AlarmStatus): Future[Done]
+  private[alarm] def setStatus(statusMap: Map[AlarmKey, AlarmStatus]): Future[Done]
+  private[alarm] def clearAllStatus(): Future[Done]
   private[alarm] def updateStatusForSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Done]
 }

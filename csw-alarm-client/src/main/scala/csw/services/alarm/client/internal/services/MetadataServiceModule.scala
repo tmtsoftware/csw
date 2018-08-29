@@ -3,7 +3,7 @@ package csw.services.alarm.client.internal.services
 import akka.Done
 import com.typesafe.config.Config
 import csw.services.alarm.api.exceptions.KeyNotFoundException
-import csw.services.alarm.api.internal.{MetadataKey, MetadataService, StatusKey}
+import csw.services.alarm.api.internal.{MetadataKey, MetadataService, SeverityService, StatusService}
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
 import csw.services.alarm.api.models.Key.{AlarmKey, GlobalKey}
 import csw.services.alarm.api.models.{AlarmMetadata, AlarmMetadataSet, AlarmStatus, Key}
@@ -15,6 +15,7 @@ import scala.async.Async.{async, await}
 import scala.concurrent.Future
 
 trait MetadataServiceModule extends MetadataService {
+  self: StatusService ⇒
 
   val redisConnectionsFactory: RedisConnectionsFactory
   import redisConnectionsFactory._
@@ -58,29 +59,29 @@ trait MetadataServiceModule extends MetadataService {
     await(setAlarmStore(alarmMetadataSet))
   }
 
-  private def setAlarmStore(alarmMetadataSet: AlarmMetadataSet) = {
-    val alarms      = alarmMetadataSet.alarms
-    val metadataMap = alarms.map(metadata ⇒ MetadataKey.fromAlarmKey(metadata.alarmKey) → metadata).toMap
-    val statusMap   = alarms.map(metadata ⇒ StatusKey.fromAlarmKey(metadata.alarmKey) → AlarmStatus()).toMap
+  private def setAlarmStore(alarmMetadataSet: AlarmMetadataSet): Future[Done] = {
+    val alarms                                = alarmMetadataSet.alarms
+    val metadataMap                           = alarms.map(metadata ⇒ MetadataKey.fromAlarmKey(metadata.alarmKey) → metadata).toMap
+    val statusMap: Map[AlarmKey, AlarmStatus] = alarms.map(metadata ⇒ metadata.alarmKey → AlarmStatus()).toMap
 
     log.info(s"Feeding alarm metadata in alarm store for following alarms: [${alarms.map(_.alarmKey.value).mkString("\n")}]")
     Future
       .sequence(
         List(
           metadataApi.mset(metadataMap),
-          statusApi.mset(statusMap)
+          setStatus(statusMap)
         )
       )
       .map(_ ⇒ Done)
   }
 
-  private def resetAlarmStore() = {
+  private def resetAlarmStore(): Future[Done] = {
     log.debug("Resetting alarm store")
     Future
       .sequence(
         List(
           metadataApi.pdel(GlobalKey),
-          statusApi.pdel(GlobalKey),
+          clearAllStatus(),
           severityApi.pdel(GlobalKey)
         )
       )

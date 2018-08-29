@@ -435,6 +435,6 @@ class SeverityServiceModuleTest
 
   private def setSeverityAndGetStatus(alarmKey: AlarmKey, alarmSeverity: AlarmSeverity): AlarmStatus = {
     setSeverity(alarmKey, alarmSeverity).await
-    testStatusApi.get(alarmKey).await.get
+    getStatus(alarmKey).await
   }
 }

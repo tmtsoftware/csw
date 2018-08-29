@@ -1,7 +1,7 @@
 package csw.services.alarm.client.internal.redis
 
-import csw.services.alarm.api.internal.{MetadataKey, SeverityKey, StatusKey}
-import csw.services.alarm.api.models.{AlarmMetadata, AlarmStatus, FullAlarmSeverity}
+import csw.services.alarm.api.internal._
+import csw.services.alarm.api.models._
 import csw.services.alarm.client.internal.commons.serviceresolver.AlarmServiceResolver
 import io.lettuce.core.RedisURI
 import romaine.RomaineFactory
@@ -17,9 +17,12 @@ class RedisConnectionsFactory(alarmServiceResolver: AlarmServiceResolver, master
   import csw.services.alarm.client.internal.AlarmCodec._
   import romaine.codec.RomaineStringCodec.stringRomaineCodec
 
-  lazy val metadataApi: RedisAsyncApi[MetadataKey, AlarmMetadata]     = asyncApi
-  lazy val severityApi: RedisAsyncApi[SeverityKey, FullAlarmSeverity] = asyncApi
-  lazy val statusApi: RedisAsyncApi[StatusKey, AlarmStatus]           = asyncApi
+  lazy val metadataApi: RedisAsyncApi[MetadataKey, AlarmMetadata]                   = asyncApi
+  lazy val severityApi: RedisAsyncApi[SeverityKey, FullAlarmSeverity]               = asyncApi
+  lazy val latchedSeverityApi: RedisAsyncApi[LatchedSeverityKey, FullAlarmSeverity] = asyncApi
+  lazy val alarmTimeApi: RedisAsyncApi[AlarmTimeKey, AlarmTime]                     = asyncApi
+  lazy val ackStatusApi: RedisAsyncApi[AckStatusKey, AcknowledgementStatus]         = asyncApi
+  lazy val shelveStatusApi: RedisAsyncApi[ShelveStatusKey, ShelveStatus]            = asyncApi
 
   def asyncApi[K: RomaineStringCodec, V: RomaineStringCodec]: RedisAsyncApi[K, V] = romaineFactory.redisAsyncApi[K, V](redisURI)
 

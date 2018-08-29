@@ -7,7 +7,7 @@ import csw.services.alarm.api.internal.{MetadataService, SeverityService, Status
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
 import csw.services.alarm.api.models.AlarmSeverity.Okay
 import csw.services.alarm.api.models.FullAlarmSeverity.Disconnected
-import csw.services.alarm.api.models.Key.AlarmKey
+import csw.services.alarm.api.models.Key.{AlarmKey, GlobalKey}
 import csw.services.alarm.api.models.ShelveStatus.{Shelved, Unshelved}
 import csw.services.alarm.api.models._
 import csw.services.alarm.client.internal.AlarmServiceLogger
@@ -34,7 +34,7 @@ trait StatusServiceModule extends StatusService {
 
   final override def getStatus(key: AlarmKey): Future[AlarmStatus] = async {
     log.debug(s"Getting status for alarm [${key.value}]")
-    await(statusApi.get(key)).getOrElse(logAndThrow(KeyNotFoundException(key)))
+    await(get(key)).getOrElse(logAndThrow(KeyNotFoundException(key)))
   }
 
   final override def acknowledge(key: AlarmKey): Future[Done] = setAcknowledgementStatus(key, Acknowledged)
@@ -137,7 +137,66 @@ trait StatusServiceModule extends StatusService {
 
   private[alarm] def setStatus(alarmKey: AlarmKey, alarmStatus: AlarmStatus): Future[Done] = {
     log.info(s"Updating alarm status [$alarmStatus] in alarm store")
-    statusApi.set(alarmKey, alarmStatus)
+    set(alarmKey, alarmStatus)
+  }
+
+  private[alarm] def setStatus(statusMap: Map[AlarmKey, AlarmStatus]): Future[Done] =
+    Future
+      .sequence(statusMap.map { case (key, status) => setStatus(key, status) })
+      .map(_ => Done)
+
+  final override private[alarm] def clearAllStatus(): Future[Done] =
+    Future
+      .sequence(
+        Seq(
+          alarmTimeApi.pdel(GlobalKey),
+          shelveStatusApi.pdel(GlobalKey),
+          ackStatusApi.pdel(GlobalKey),
+          latchedSeverityApi.pdel(GlobalKey)
+        )
+      )
+      .map(_ => Done)
+
+  private def get(key: AlarmKey): Future[Option[AlarmStatus]] = {
+    val alarmTimeF: Future[Option[AlarmTime]]               = alarmTimeApi.get(key)
+    val ackStatusF: Future[Option[AcknowledgementStatus]]   = ackStatusApi.get(key)
+    val shelveStatusF: Future[Option[ShelveStatus]]         = shelveStatusApi.get(key)
+    val latchedSeverityF: Future[Option[FullAlarmSeverity]] = latchedSeverityApi.get(key)
+
+    for (mayBeAckStatus       <- ackStatusF;
+         mayBeLatchedSeverity <- latchedSeverityF;
+         mayBeShelveStatus    <- shelveStatusF;
+         mayBeAlarmTime       <- alarmTimeF) yield {
+
+      val allEmpty = Seq(mayBeAckStatus, mayBeLatchedSeverity, mayBeLatchedSeverity, mayBeAlarmTime)
+        .exists(x => x.isEmpty)
+
+      if (allEmpty) None
+      else {
+        val defaultAlarmStatus = AlarmStatus()
+        Some(
+          AlarmStatus(
+            mayBeAckStatus.getOrElse(defaultAlarmStatus.acknowledgementStatus),
+            mayBeLatchedSeverity.getOrElse(defaultAlarmStatus.latchedSeverity),
+            mayBeShelveStatus.getOrElse(defaultAlarmStatus.shelveStatus),
+            mayBeAlarmTime.getOrElse(defaultAlarmStatus.alarmTime)
+          )
+        )
+      }
+    }
+  }
+
+  private def set(key: AlarmKey, alarmStatus: AlarmStatus): Future[Done] = {
+    Future
+      .sequence(
+        Seq(
+          ackStatusApi.set(key, alarmStatus.acknowledgementStatus),
+          shelveStatusApi.set(key, alarmStatus.shelveStatus),
+          alarmTimeApi.set(key, alarmStatus.alarmTime),
+          latchedSeverityApi.set(key, alarmStatus.latchedSeverity),
+        )
+      )
+      .map(_ => Done)
   }
 
   private def unshelve(key: AlarmKey, cancelShelveTimeout: Boolean): Future[Done] = async {

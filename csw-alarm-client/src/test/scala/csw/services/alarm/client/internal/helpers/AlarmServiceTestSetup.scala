@@ -7,7 +7,7 @@ import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
 import csw.commons.redis.EmbeddedRedis
 import csw.commons.utils.SocketUtils.getFreePort
-import csw.services.alarm.api.internal.{MetadataKey, SeverityKey, StatusKey}
+import csw.services.alarm.api.internal.{MetadataKey, SeverityKey}
 import csw.services.alarm.api.javadsl.IAlarmService
 import csw.services.alarm.api.models.{AlarmMetadata, AlarmStatus, FullAlarmSeverity}
 import csw.services.alarm.api.scaladsl.AlarmAdminService
@@ -61,7 +61,6 @@ class AlarmServiceTestSetup
   val testMetadataApi: RedisAsyncApi[MetadataKey, AlarmMetadata] = connsFactory.asyncApi[MetadataKey, AlarmMetadata]
   val testSeverityApi: RedisAsyncApi[SeverityKey, FullAlarmSeverity] =
     connsFactory.asyncApi[SeverityKey, FullAlarmSeverity]
-  val testStatusApi: RedisAsyncApi[StatusKey, AlarmStatus] = connsFactory.asyncApi[StatusKey, AlarmStatus]
 
   override protected def afterAll(): Unit = {
     redisClient.shutdown()

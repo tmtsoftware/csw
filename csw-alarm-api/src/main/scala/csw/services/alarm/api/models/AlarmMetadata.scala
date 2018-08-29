@@ -35,7 +35,7 @@ case class AlarmMetadata(
     isLatchable: Boolean,
     activationStatus: ActivationStatus
 ) {
-  def alarmKey: Key                                  = AlarmKey(subsystem, component, name)
+  def alarmKey: AlarmKey                             = AlarmKey(subsystem, component, name)
   def isActive: Boolean                              = activationStatus == Active
   def allSupportedSeverities: Set[FullAlarmSeverity] = supportedSeverities ++ Set(Indeterminate, Okay)
 }
