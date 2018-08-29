@@ -112,7 +112,7 @@ trait SeverityServiceModule extends SeverityService {
     if (metadataKeys.isEmpty) logAndThrow(KeyNotFoundException(key))
 
     val keys = await(metadataApi.mget(metadataKeys)).collect {
-      case RedisResult(k, v) if v.isDefined & v.get.isActive ⇒ k
+      case RedisResult(metadataKey, Some(metadata)) if metadata.isActive ⇒ metadataKey
     }
 
     if (keys.isEmpty) logAndThrow(InactiveAlarmException(key))

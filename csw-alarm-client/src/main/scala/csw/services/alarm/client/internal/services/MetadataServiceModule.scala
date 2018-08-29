@@ -50,9 +50,7 @@ trait MetadataServiceModule extends MetadataService {
 
     val metadataKeys = await(metadataApi.keys(key))
     if (metadataKeys.isEmpty) logAndThrow(KeyNotFoundException(key))
-    await(metadataApi.mget(metadataKeys)).collect {
-      case RedisResult(_, value) if value.isDefined ⇒ value.get
-    }
+    await(metadataApi.mget(metadataKeys)).collect { case RedisResult(_, Some(metadata)) ⇒ metadata }
   }
 
   final override def initAlarms(inputConfig: Config, reset: Boolean): Future[Done] = async {
