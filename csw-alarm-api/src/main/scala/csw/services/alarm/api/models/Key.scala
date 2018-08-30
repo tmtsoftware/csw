@@ -3,6 +3,7 @@ import java.util.regex.Pattern
 
 import csw.messages.params.models.Subsystem
 import csw.services.alarm.api.internal.RichStringExtentions.RichString
+import csw.services.alarm.api.internal.Separators.KeySeparator
 
 /**
  * A wrapper class representing the key for an alarm e.g. nfiraos.trombone.tromboneaxislowlimitalarm. It represents each
@@ -17,7 +18,8 @@ sealed abstract class Key(subsystem: String, component: String, name: String) ex
   require(component.isDefined, "component should not be an empty value")
   require(name.isDefined, "name should not be an empty value")
 
-  val value: String      = s"$subsystem.$component.$name".toLowerCase
+  val value: String = s"$subsystem$KeySeparator$component$KeySeparator$name".toLowerCase
+
   override def self: Any = value
 }
 
@@ -26,7 +28,8 @@ object Key {
   val invalidChars: Pattern = Pattern.compile(".*[\\*\\[\\]\\^\\?\\-].*")
 
   case class AlarmKey(subsystem: Subsystem, component: String, name: String) extends Key(subsystem.name, component, name) {
-    require(!value.matches(invalidChars), "key contains invalid characters")
+    require(!component.matches(invalidChars), "key contains invalid characters")
+    require(!name.matches(invalidChars), "key contains invalid characters")
   }
 
   case class ComponentKey(subsystem: Subsystem, component: String) extends Key(subsystem.name, component, "*") {
@@ -37,9 +40,9 @@ object Key {
   case object GlobalKey                         extends Key("*", "*", "*")
 
   object AlarmKey {
-    def apply(str: String): AlarmKey = {
-      val strings = str.split("\\.")
-      new AlarmKey(Subsystem.withName(strings(0)), strings(1), strings(2))
+    def apply(keyStr: String): AlarmKey = keyStr.split(KeySeparator) match {
+      case Array(subsystem, component, name) ⇒ AlarmKey(Subsystem.withName(subsystem), component, name)
+      case _                                 ⇒ throw new IllegalArgumentException(s"Unable to parse '$keyStr' to make AlarmKey object")
     }
   }
 }

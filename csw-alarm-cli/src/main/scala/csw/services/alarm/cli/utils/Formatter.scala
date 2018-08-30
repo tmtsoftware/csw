@@ -4,6 +4,7 @@ import csw.services.alarm.api.models.Key._
 import csw.services.alarm.api.models._
 import csw.services.alarm.cli.args.Options
 import csw.services.alarm.client.internal.models.Alarm
+import csw.services.alarm.api.internal.Separators.KeySeparator
 
 object Formatter {
 
@@ -60,7 +61,7 @@ object Formatter {
   def msg(key: Key, property: String, value: String): String = key match {
     case GlobalKey                          ⇒ s"Aggregated $property of Alarm Service: $value"
     case SubsystemKey(subsystem)            ⇒ s"Aggregated $property of Subsystem [$subsystem]: $value"
-    case ComponentKey(subsystem, component) ⇒ s"Aggregated $property of Component [$subsystem.$component]: $value"
+    case ComponentKey(subsystem, component) ⇒ s"Aggregated $property of Component [$subsystem$KeySeparator$component]: $value"
     case _: AlarmKey                        ⇒ s"$property of Alarm [$key]: $value"
   }
 }

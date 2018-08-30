@@ -9,6 +9,7 @@ import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
 import csw.services.alarm.api.models.AlarmHealth.{Bad, Good, Ill}
 import csw.services.alarm.api.models.AlarmSeverity._
 import csw.services.alarm.api.models.AlarmStatus
+import csw.services.alarm.api.internal.Separators.KeySeparator
 import csw.services.alarm.api.models.FullAlarmSeverity.Disconnected
 import csw.services.alarm.api.models.Key.{AlarmKey, GlobalKey}
 import csw.services.alarm.api.models.ShelveStatus.{Shelved, Unshelved}
@@ -363,7 +364,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
     commandExecutor.execute(cmd)
     logBuffer shouldEqual List(
-      s"Aggregated Severity of Component [${tromboneAxisHighLimitKey.subsystem}.${tromboneAxisHighLimitKey.component}]: $Major"
+      s"Aggregated Severity of Component [${tromboneAxisHighLimitKey.subsystem}$KeySeparator${tromboneAxisHighLimitKey.component}]: $Major"
     )
   }
 
@@ -467,7 +468,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
     commandExecutor.execute(cmd)
     logBuffer shouldEqual List(
-      s"Aggregated Health of Component [${tromboneAxisHighLimitKey.subsystem}.${tromboneAxisHighLimitKey.component}]: $Ill"
+      s"Aggregated Health of Component [${tromboneAxisHighLimitKey.subsystem}$KeySeparator${tromboneAxisHighLimitKey.component}]: $Ill"
     )
   }
 
