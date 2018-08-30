@@ -5,29 +5,29 @@ networks:
     ipam:
       driver: default
       config:
-      - subnet: 172.28.0.0/16
+      - subnet: ${SUBNET}
 
 services:
   # ========== CSW Services ==========
   seed:
-    image: csw-cluster-seed:0.1-SNAPSHOT
+    image: csw-cluster-seed:${TAG_ID}
     ports:
-      - "3552:3552"
-      - "7654:7654"
-      - "7878:7878"
+      - ${CLUSTER_PORT}:${CLUSTER_PORT}
+      - ${LOCATION_SERVER_PORT}:${LOCATION_SERVER_PORT}
+      - ${ADMIN_PORT}:${ADMIN_PORT}
     command:
-      - "-DclusterSeeds=172.28.1.1:3552"
-      - "--clusterPort=3552"
+      - "-DclusterSeeds=${SEED_IP}:${CLUSTER_PORT}"
+      - "--clusterPort=${CLUSTER_PORT}"
     networks:
       csw_net:
-        ipv4_address: 172.28.1.1
+        ipv4_address: ${SEED_IP}
 
   config:
-    image: csw-config-server:0.1-SNAPSHOT
+    image: csw-config-server:${TAG_ID}
     ports:
-      - "4000:4000"
+      - ${CONFIG_PORT}:${CONFIG_PORT}
     command:
-      - "-DclusterSeeds=172.28.1.1:3552"
+      - "-DclusterSeeds=${SEED_IP}:${CLUSTER_PORT}"
       - "--initRepo"
     networks:
       - csw_net
@@ -35,12 +35,12 @@ services:
       - seed
 
   location-agent:
-    image: csw-location-agent:0.1-SNAPSHOT
+    image: csw-location-agent:${TAG_ID}
     command:
-      - "-DclusterSeeds=172.28.1.1:3552"
+      - "-DclusterSeeds=${SEED_IP}:${CLUSTER_PORT}"
       - "--name=EventServer,AlarmServer"
       - "--command=sleep 100000"
-      - "--port=26379"
+      - "--port=${SENTINEL_PORT}"
     networks:
       - csw_net
     depends_on:
@@ -50,7 +50,7 @@ services:
   event_master:
     image: redis:latest
     ports:
-      - "6379:6379"
+      - ${EVENT_MASTER_PORT}:${EVENT_MASTER_PORT}
     volumes:
       - "./scripts/conf:/data/conf"
     command: redis-server /data/conf/event_service/master.conf
@@ -70,7 +70,7 @@ services:
   alarm_master:
     image: redis:latest
     ports:
-      - "7379:7379"
+      - ${ALARM_MASTER_PORT}:${ALARM_MASTER_PORT}
     volumes:
       - "./scripts/conf:/data/conf"
     command: redis-server /data/conf/alarm_service/master.conf
@@ -90,7 +90,7 @@ services:
   sentinel:
     image: redis:latest
     ports:
-      - "26379:26379"
+      - ${SENTINEL_PORT}:${SENTINEL_PORT}
     volumes:
       - "./scripts/conf:/data/conf"
     command: redis-sentinel /data/conf/redis_sentinel/sentinel.conf
