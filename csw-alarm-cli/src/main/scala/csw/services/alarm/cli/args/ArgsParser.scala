@@ -82,12 +82,7 @@ class ArgsParser(name: String) {
     cmd("list")
       .action((_, args) ⇒ args.copy(cmd = "list"))
       .text("list alarms")
-      .children(optionalAlarmKey: _*)
-
-    cmd("status")
-      .action((_, args) ⇒ args.copy(cmd = "status"))
-      .text("get current status of the alarm")
-      .children(requiredAlarmKey: _*)
+      .children(optionalAlarmKey :+ metadata :+ status: _*)
 
     help("help")
 
@@ -100,18 +95,17 @@ class ArgsParser(name: String) {
       if (c.cmd.isEmpty)
         failure("""
                   |Please specify one of the following command with their corresponding options:
-                  |  1> init
-                  |  2> severity
-                  |  3> acknowledge
-                  |  4> unacknowledge
-                  |  5> activate
-                  |  6> deactivate
-                  |  7> shelve
-                  |  8> unshelve
-                  |  9> reset
-                  |  10> list
-                  |  11> status
-                  |  12> health
+                  |  - init
+                  |  - severity
+                  |  - acknowledge
+                  |  - unacknowledge
+                  |  - activate
+                  |  - deactivate
+                  |  - shelve
+                  |  - unshelve
+                  |  - reset
+                  |  - list
+                  |  - health
                 """.stripMargin)
       else if (commandsHavingSubCommands.contains(c.cmd) && c.subCmd.isEmpty)
         failure("Please specify an appropriate sub-command")

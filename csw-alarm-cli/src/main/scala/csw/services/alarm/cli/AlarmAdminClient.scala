@@ -13,8 +13,8 @@ import csw.services.alarm.cli.utils.{ConfigUtils, Formatter}
 import csw.services.alarm.cli.wiring.ActorRuntime
 import csw.services.alarm.client.AlarmServiceFactory
 import csw.services.alarm.client.internal.AlarmServiceImpl
-import csw.services.alarm.client.internal.auto_refresh.{AutoRefreshSeverityActorFactory, AutoRefreshSeverityMessage}
 import csw.services.alarm.client.internal.auto_refresh.AutoRefreshSeverityMessage.AutoRefreshSeverity
+import csw.services.alarm.client.internal.auto_refresh.{AutoRefreshSeverityActorFactory, AutoRefreshSeverityMessage}
 import csw.services.alarm.client.internal.commons.Settings
 import csw.services.location.scaladsl.LocationService
 
@@ -39,7 +39,7 @@ class AlarmAdminClient(
 
   def getSeverity(options: Options): Future[Unit] = async {
     val severity = await(alarmService.getAggregatedSeverity(options.key))
-    printLine(Formatter.formatSeverity(options.key, severity))
+    printLine(Formatter.formatAggregatedSeverity(options.key, severity))
   }
 
   def setSeverity(options: Options): Future[Done] =
@@ -58,7 +58,7 @@ class AlarmAdminClient(
   def subscribeSeverity(options: Options): (AlarmSubscription, Future[Done]) = {
     val (subscription, doneF) = alarmService
       .subscribeAggregatedSeverity(options.key)
-      .toMat(Sink.foreach(severity ⇒ printLine(Formatter.formatSeverity(options.key, severity))))(Keep.both)
+      .toMat(Sink.foreach(severity ⇒ printLine(Formatter.formatAggregatedSeverity(options.key, severity))))(Keep.both)
       .run()
 
     unsubscribeOnCoordinatedShutdown(subscription)
@@ -88,8 +88,9 @@ class AlarmAdminClient(
     alarmService.reset(options.alarmKey).transformWithSideEffect(printLine)
 
   def list(options: Options): Future[Unit] = async {
-    val metadataSet = await(alarmService.getMetadata(options.key)).sortBy(_.name)
-    printLine(Formatter.formatMetadataSet(metadataSet))
+    val alarms = await(alarmService.getAlarms(options.key)).sortWith(_.key.value > _.key.value)
+    if (alarms.nonEmpty) printLine(Formatter.formatAlarms(alarms, options))
+    else printLine("No matching keys found.")
   }
 
   def status(options: Options): Future[Unit] = async {
@@ -99,13 +100,13 @@ class AlarmAdminClient(
 
   def getHealth(options: Options): Future[Unit] = async {
     val health = await(alarmService.getAggregatedHealth(options.key))
-    printLine(Formatter.formatHealth(options.key, health))
+    printLine(Formatter.formatAggregatedHealth(options.key, health))
   }
 
   def subscribeHealth(options: Options): (AlarmSubscription, Future[Done]) = {
     val (subscription, doneF) = alarmService
       .subscribeAggregatedHealth(options.key)
-      .toMat(Sink.foreach(health ⇒ printLine(Formatter.formatHealth(options.key, health))))(Keep.both)
+      .toMat(Sink.foreach(health ⇒ printLine(Formatter.formatAggregatedHealth(options.key, health))))(Keep.both)
       .run()
 
     unsubscribeOnCoordinatedShutdown(subscription)

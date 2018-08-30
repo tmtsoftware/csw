@@ -5,7 +5,7 @@ import java.time.Clock
 import akka.Done
 import akka.actor.ActorSystem
 import csw.services.alarm.api.exceptions.KeyNotFoundException
-import csw.services.alarm.api.internal.{MetadataService, SeverityService, StatusService}
+import csw.services.alarm.api.internal._
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
 import csw.services.alarm.api.models.AlarmSeverity.Okay
 import csw.services.alarm.api.models.FullAlarmSeverity.Disconnected
@@ -15,6 +15,7 @@ import csw.services.alarm.api.models._
 import csw.services.alarm.client.internal.AlarmServiceLogger
 import csw.services.alarm.client.internal.commons.Settings
 import csw.services.alarm.client.internal.extensions.TimeExtensions.RichClock
+import csw.services.alarm.client.internal.models.Alarm
 import csw.services.alarm.client.internal.redis.RedisConnectionsFactory
 
 import scala.async.Async.{async, await}
@@ -185,6 +186,17 @@ trait StatusServiceModule extends StatusService {
   private def getShelveStatus(key: AlarmKey): Future[ShelveStatus] = async {
     if (await(metadataApi.exists(key))) await(shelveStatusApi.get(key)).getOrElse(Unshelved)
     else logAndThrow(KeyNotFoundException(key))
+  }
+
+  def getAlarms(key: Key): Future[List[Alarm]] = metadataApi.keys(key).flatMap {
+    Future.traverse(_) { metadataKey ⇒
+      val alarmKey = MetadataKey.toAlarmKey(metadataKey)
+      for {
+        metadata ← getMetadata(alarmKey)
+        status   ← getStatus(alarmKey)
+        severity ← getCurrentSeverity(alarmKey)
+      } yield Alarm(alarmKey, metadata, status, severity)
+    }
   }
 
   private def setAcknowledgementStatus(key: AlarmKey, ackStatus: AcknowledgementStatus): Future[Done] = async {

@@ -4,7 +4,6 @@ import java.nio.file.Paths
 
 import com.typesafe.config.ConfigFactory
 import csw.messages.params.models.Subsystem.{LGSF, NFIRAOS, TCS}
-import csw.services.alarm.api.exceptions.KeyNotFoundException
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
 import csw.services.alarm.api.models.AlarmHealth.{Bad, Good, Ill}
@@ -198,22 +197,25 @@ class CommandExecutorTest extends AlarmCliTestSetup {
   }
 
   // DEOPSCSW-492: Fetch all alarms' metadata from CLI Interface (list all alarms)
+  // DEOPSCSW-503: List alarms should show all data of an alarm (metadata, status, severity)
   test("should list all alarms present in the alarm store") {
     val cmd = Options("list")
 
     commandExecutor.execute(cmd)
-    logBuffer shouldEqualContentsOf "metadata/all_alarms.txt"
+    logBuffer shouldEqualContentsOf "list/all_alarms.txt"
   }
 
   // DEOPSCSW-492: Fetch all alarms' metadata from CLI Interface (list all alarms)
+  // DEOPSCSW-503: List alarms should show all data of an alarm (metadata, status, severity)
   test("should list alarms for specified subsystem") {
     val cmd = Options("list", maybeSubsystem = Some(NFIRAOS))
 
     commandExecutor.execute(cmd)
-    logBuffer shouldEqualContentsOf "metadata/subsystem_alarms.txt"
+    logBuffer shouldEqualContentsOf "list/subsystem_alarms.txt"
   }
 
   // DEOPSCSW-492: Fetch all alarms' metadata from CLI Interface (list all alarms)
+  // DEOPSCSW-503: List alarms should show all data of an alarm (metadata, status, severity)
   test("should list alarms for specified component") {
     val cmd = Options(
       "list",
@@ -222,10 +224,11 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     )
 
     commandExecutor.execute(cmd)
-    logBuffer shouldEqualContentsOf "metadata/component_alarms.txt"
+    logBuffer shouldEqualContentsOf "list/component_alarms.txt"
   }
 
   // DEOPSCSW-492: Fetch all alarms' metadata from CLI Interface (list all alarms)
+  // DEOPSCSW-503: List alarms should show all data of an alarm (metadata, status, severity)
   test("should list the alarm for specified name") {
     val cmd = Options(
       "list",
@@ -235,11 +238,45 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     )
 
     commandExecutor.execute(cmd)
-    logBuffer shouldEqualContentsOf "metadata/with_name_alarms.txt"
+    logBuffer shouldEqualContentsOf "list/with_name_alarms.txt"
   }
 
   // DEOPSCSW-492: Fetch all alarms' metadata from CLI Interface (list all alarms)
-  test("should fail on invalid component/alarm name") {
+  // DEOPSCSW-503: List alarms should show all data of an alarm (metadata, status, severity)
+  test("should list the metadata of alarm for specified name") {
+    val cmd = Options(
+      "list",
+      maybeSubsystem = Some(NFIRAOS),
+      maybeComponent = Some("trombone"),
+      maybeAlarmName = Some(tromboneAxisLowLimitKey.name),
+      showStatus = false
+    )
+
+    commandExecutor.execute(cmd)
+    logBuffer shouldEqualContentsOf "metadata.txt"
+  }
+
+  // DEOPSCSW-492: Fetch all alarms' metadata from CLI Interface (list all alarms)
+  // DEOPSCSW-503: List alarms should show all data of an alarm (metadata, status, severity)
+  // DEOPSCSW-475: Fetch alarm status from CLI Interface
+  test("should list status of alarms") {
+    val cmd = Options(
+      "list",
+      maybeSubsystem = Some(NFIRAOS),
+      maybeComponent = Some("trombone"),
+      maybeAlarmName = Some(tromboneAxisLowLimitKey.name),
+      showMetadata = false
+    )
+
+    commandExecutor.execute(cmd)
+    // alarm time changes on every run hence filter out time before assertion
+    logBuffer shouldEqualContentsOf "status.txt"
+
+  }
+
+  // DEOPSCSW-492: Fetch all alarms' metadata from CLI Interface (list all alarms)
+  // DEOPSCSW-503: List alarms should show all data of an alarm (metadata, status, severity)
+  test("should list no alarm for invalid key/pattern") {
     val invalidComponentCmd = Options(
       "list",
       maybeSubsystem = Some(NFIRAOS),
@@ -253,8 +290,9 @@ class CommandExecutorTest extends AlarmCliTestSetup {
       maybeAlarmName = Some("invalid")
     )
 
-    intercept[KeyNotFoundException] { commandExecutor.execute(invalidComponentCmd) }
-    intercept[KeyNotFoundException] { commandExecutor.execute(invalidAlarmNameCmd) }
+    commandExecutor.execute(invalidComponentCmd)
+    commandExecutor.execute(invalidAlarmNameCmd)
+    logBuffer shouldEqual Array.fill(2)("No matching keys found.")
   }
 
   // DEOPSCSW-474: Latch an alarm from CLI Interface
@@ -274,20 +312,6 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
     logBuffer shouldEqual List(successMsg)
     getStatus(tromboneAxisLowLimitKey).futureValue.latchedSeverity shouldBe Okay
-  }
-
-  // DEOPSCSW-475: Fetch alarm status from CLI Interface
-  test("should get alarm status") {
-    val cmd = Options(
-      "status",
-      maybeSubsystem = Some(NFIRAOS),
-      maybeComponent = Some("trombone"),
-      maybeAlarmName = Some(tromboneAxisLowLimitKey.name)
-    )
-
-    commandExecutor.execute(cmd)
-    // alarm time changes on every run hence filter out time before assertion
-    logBuffer.flatMap(_.split("\n")).filterNot(_.contains("Alarm Time")) shouldEqualContentsOf "status.txt"
   }
 
   // -------------------------------------------Severity--------------------------------------------

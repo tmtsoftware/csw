@@ -153,7 +153,7 @@ class ArgsParserTest extends FunSuite with Matchers {
   }
 
   val commandsRequiringAlarmKey =
-    List("acknowledge", "unacknowledge", "activate", "deactivate", "shelve", "unshelve", "reset", "status")
+    List("acknowledge", "unacknowledge", "activate", "deactivate", "shelve", "unshelve", "reset")
 
   commandsRequiringAlarmKey.foreach { command ⇒
     test(s"parse $command command") {
@@ -205,6 +205,66 @@ class ArgsParserTest extends FunSuite with Matchers {
         maybeSubsystem = Some(NFIRAOS),
         maybeComponent = Some("trombone"),
         maybeAlarmName = Some("tromboneAxisHighLimitAlarm")
+      )
+    )
+  }
+
+  test("parse list command with status with full alarm key") {
+    val options = Array(
+      "list",
+      "--subsystem",
+      "NFIRAOS",
+      "--component",
+      "trombone",
+      "--name",
+      "tromboneAxisHighLimitAlarm",
+      "--status"
+    )
+
+    silentParse(options) should contain(
+      Options(
+        cmd = "list",
+        maybeSubsystem = Some(NFIRAOS),
+        maybeComponent = Some("trombone"),
+        maybeAlarmName = Some("tromboneAxisHighLimitAlarm"),
+        showMetadata = false
+      )
+    )
+  }
+
+  test("parse list command with status with subsystem key") {
+    val options = Array(
+      "list",
+      "--subsystem",
+      "NFIRAOS",
+      "--status"
+    )
+
+    silentParse(options) should contain(
+      Options(
+        cmd = "list",
+        maybeSubsystem = Some(NFIRAOS),
+        showMetadata = false
+      )
+    )
+  }
+
+  test("parse list command with metadata with component key") {
+    val options = Array(
+      "list",
+      "--subsystem",
+      "NFIRAOS",
+      "--component",
+      "trombone",
+      "--metadata"
+    )
+
+    silentParse(options) should contain(
+      Options(
+        cmd = "list",
+        maybeSubsystem = Some(NFIRAOS),
+        maybeComponent = Some("trombone"),
+        showStatus = false
       )
     )
   }

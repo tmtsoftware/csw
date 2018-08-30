@@ -49,4 +49,14 @@ trait Arguments { self: OptionParser[Options] =>
     opt[Unit]("refresh")
       .action((_, options) ⇒ options.copy(autoRefresh = true))
       .text("auto-refresh severity of an alarm")
+
+  def metadata: OptionDef[Unit, Options] =
+    opt[Unit]("metadata")
+      .action((_, options) ⇒ options.copy(showStatus = false))
+      .text("show metadata of alarm")
+
+  def status: OptionDef[Unit, Options] =
+    opt[Unit]("status")
+      .action((_, options) ⇒ options.copy(showMetadata = false))
+      .text("show status of alarm")
 }

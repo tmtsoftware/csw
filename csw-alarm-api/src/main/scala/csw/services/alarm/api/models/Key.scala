@@ -35,4 +35,11 @@ object Key {
 
   case class SubsystemKey(subsystem: Subsystem) extends Key(subsystem.name, "*", "*")
   case object GlobalKey                         extends Key("*", "*", "*")
+
+  object AlarmKey {
+    def apply(str: String): AlarmKey = {
+      val strings = str.split("\\.")
+      new AlarmKey(Subsystem.withName(strings(0)), strings(1), strings(2))
+    }
+  }
 }

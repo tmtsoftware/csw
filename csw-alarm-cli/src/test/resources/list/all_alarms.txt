@@ -11,32 +11,11 @@ Operator Response: slow it down...
 AutoAcknowledgeable: true
 Latchable: false
 Activation Status: Active
-===============================================================================================================
-Subsystem: LGSF
-Component: tcsPkInactive
-Name: cpuIdleAlarm
-Description: This alarm is activated CPU is idle
-Location: in computer...
-Type: Absolute
-Supported Severities: [Warning, Major, Indeterminate, Critical, Okay]
-Probable Cause: too fast...
-Operator Response: slow it down...
-AutoAcknowledgeable: true
-Latchable: false
-Activation Status: Inactive
-===============================================================================================================
-Subsystem: NFIRAOS
-Component: trombone
-Name: tromboneAxisHighLimitAlarm
-Description: Warns when trombone axis has reached the high limit
-Location: south side
-Type: Absolute
-Supported Severities: [Warning, Major, Indeterminate, Okay]
-Probable Cause: the trombone software has failed or the stage was driven into the high limit
-Operator Response: go to the NFIRAOS engineering user interface and select the datum axis command
-AutoAcknowledgeable: true
-Latchable: true
-Activation Status: Active
+Acknowledgement Status: Acknowledged
+Latch Severity: Disconnected
+Shelve Status: Unshelved
+Alarm Time: 2018-08-30T09:23:50.933Z
+Current Severity: Disconnected
 ===============================================================================================================
 Subsystem: NFIRAOS
 Component: trombone
@@ -50,4 +29,45 @@ Operator Response: go to the NFIRAOS engineering user interface and select the d
 AutoAcknowledgeable: false
 Latchable: true
 Activation Status: Active
+Acknowledgement Status: Acknowledged
+Latch Severity: Disconnected
+Shelve Status: Unshelved
+Alarm Time: 2018-08-30T09:23:50.932Z
+Current Severity: Disconnected
+===============================================================================================================
+Subsystem: NFIRAOS
+Component: trombone
+Name: tromboneAxisHighLimitAlarm
+Description: Warns when trombone axis has reached the high limit
+Location: south side
+Type: Absolute
+Supported Severities: [Warning, Major, Indeterminate, Okay]
+Probable Cause: the trombone software has failed or the stage was driven into the high limit
+Operator Response: go to the NFIRAOS engineering user interface and select the datum axis command
+AutoAcknowledgeable: true
+Latchable: true
+Activation Status: Active
+Acknowledgement Status: Acknowledged
+Latch Severity: Disconnected
+Shelve Status: Unshelved
+Alarm Time: 2018-08-30T09:23:50.933Z
+Current Severity: Disconnected
+===============================================================================================================
+Subsystem: LGSF
+Component: tcsPkInactive
+Name: cpuIdleAlarm
+Description: This alarm is activated CPU is idle
+Location: in computer...
+Type: Absolute
+Supported Severities: [Warning, Major, Indeterminate, Critical, Okay]
+Probable Cause: too fast...
+Operator Response: slow it down...
+AutoAcknowledgeable: true
+Latchable: false
+Activation Status: Inactive
+Acknowledgement Status: Acknowledged
+Latch Severity: Disconnected
+Shelve Status: Unshelved
+Alarm Time: 2018-08-30T09:23:50.933Z
+Current Severity: Disconnected
 ===============================================================================================================

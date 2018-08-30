@@ -9,7 +9,6 @@ class CommandExecutor(alarmAdminClient: AlarmAdminClient) {
     options.cmd match {
       case "init"          ⇒ await(alarmAdminClient.init(options))
       case "list"          ⇒ await(alarmAdminClient.list(options))
-      case "status"        ⇒ await(alarmAdminClient.status(options))
       case "acknowledge"   ⇒ await(alarmAdminClient.acknowledge(options))
       case "unacknowledge" ⇒ await(alarmAdminClient.unacknowledge(options))
       case "activate"      ⇒ await(alarmAdminClient.activate(options))
