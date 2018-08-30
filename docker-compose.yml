@@ -51,17 +51,15 @@ services:
     image: redis:latest
     ports:
       - ${EVENT_MASTER_PORT}:${EVENT_MASTER_PORT}
-    volumes:
-      - "./scripts/conf:/data/conf"
-    command: redis-server /data/conf/event_service/master.conf
+    command: ["redis-server", "--port", "${EVENT_MASTER_PORT}", "--notify-keyspace-events", "K$$x", "--protected-mode", "no"]
     networks:
       - csw_net
 
   event_slave:
     image: redis:latest
-    volumes:
-      - "./scripts/conf:/data/conf"
-    command: redis-server  /data/conf/event_service/slave.conf
+    ports:
+      - ${EVENT_SLAVE_PORT}:${EVENT_SLAVE_PORT}
+    command: ["redis-server", "--port", "${EVENT_SLAVE_PORT}", "--notify-keyspace-events", "K$$x", "--protected-mode", "no"]
     networks:
       - csw_net
     depends_on:
@@ -71,17 +69,15 @@ services:
     image: redis:latest
     ports:
       - ${ALARM_MASTER_PORT}:${ALARM_MASTER_PORT}
-    volumes:
-      - "./scripts/conf:/data/conf"
-    command: redis-server /data/conf/alarm_service/master.conf
+    command: ["redis-server", "--port", "${ALARM_MASTER_PORT}", "--notify-keyspace-events", "K$$x", "--protected-mode", "no"]
     networks:
       - csw_net
 
   alarm_slave:
     image: redis:latest
-    volumes:
-      - "./scripts/conf:/data/conf"
-    command: redis-server /data/conf/alarm_service/slave.conf
+    ports:
+      - ${ALARM_SLAVE_PORT}:${ALARM_SLAVE_PORT}
+    command: ["redis-server", "--port", "${ALARM_SLAVE_PORT}", "--notify-keyspace-events", "K$$x", "--protected-mode", "no"]
     networks:
       - csw_net
     depends_on:
