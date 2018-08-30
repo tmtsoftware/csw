@@ -3,6 +3,7 @@ package csw.framework.internal.supervisor
 import akka.actor.ActorSystem
 import akka.actor.typed.ActorRef
 import csw.framework.internal.wiring.CswFrameworkSystem
+import csw.framework.models.CswContext
 import csw.messages.ContainerIdleMessage
 import csw.messages.framework.{Component, ComponentInfo, SupervisorInfo}
 import csw.services.alarm.client.AlarmServiceFactory
@@ -38,15 +39,15 @@ private[framework] class SupervisorInfoFactory(containerName: String) {
       val commandResponseManagerFactory = new CommandResponseManagerFactory
       val eventService                  = eventServiceFactory.make(locationService)
       val alarmService                  = alarmServiceFactory.makeClientApi(locationService)
+      val loggerFactory                 = new LoggerFactory(componentInfo.name)
+      val cswCtx                        = CswContext(locationService, eventService, alarmService, loggerFactory)
 
       val supervisorBehavior = SupervisorBehaviorFactory.make(
         Some(containerRef),
         componentInfo,
-        locationService,
-        eventService,
-        alarmService,
         registrationFactory,
-        commandResponseManagerFactory
+        commandResponseManagerFactory,
+        cswCtx
       )
 
       val actorRefF = richSystem.spawnTyped(supervisorBehavior, componentInfo.name)

@@ -52,10 +52,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
               new SampleComponentBehaviorFactory,
               commandResponseManagerFactory,
               registrationFactory,
-              locationService,
-              eventService,
-              alarmService,
-              loggerFactory
+              cswCtx
           )
         )
     )

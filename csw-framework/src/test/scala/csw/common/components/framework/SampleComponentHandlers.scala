@@ -2,6 +2,7 @@ package csw.common.components.framework
 
 import akka.actor.typed.scaladsl.ActorContext
 import csw.framework.CurrentStatePublisher
+import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandIssue.OtherIssue
@@ -13,11 +14,8 @@ import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConn
 import csw.messages.location.{LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.messages.params.models.Prefix
 import csw.messages.params.states.{CurrentState, StateName}
-import csw.services.alarm.api.scaladsl.AlarmService
 import csw.services.command.CommandResponseManager
-import csw.services.event.api.scaladsl.EventService
-import csw.services.location.scaladsl.LocationService
-import csw.services.logging.scaladsl.{Logger, LoggerFactory}
+import csw.services.logging.scaladsl.Logger
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -26,20 +24,16 @@ class SampleComponentHandlers(
     componentInfo: ComponentInfo,
     commandResponseManager: CommandResponseManager,
     currentStatePublisher: CurrentStatePublisher,
-    locationService: LocationService,
-    eventService: EventService,
-    alarmService: AlarmService,
-    loggerFactory: LoggerFactory
+    cswCtx: CswContext
 ) extends ComponentHandlers(
       ctx,
       componentInfo,
       commandResponseManager,
       currentStatePublisher,
-      locationService,
-      eventService,
-      alarmService,
-      loggerFactory: LoggerFactory
+      cswCtx
     ) {
+  import cswCtx._
+
   val log: Logger                   = loggerFactory.getLogger(ctx)
   implicit val ec: ExecutionContext = ctx.executionContext
 

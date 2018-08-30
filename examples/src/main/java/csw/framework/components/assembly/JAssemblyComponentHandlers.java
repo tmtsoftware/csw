@@ -9,6 +9,7 @@ import csw.framework.CurrentStatePublisher;
 import csw.framework.exceptions.FailureRestart;
 import csw.framework.exceptions.FailureStop;
 import csw.framework.javadsl.JComponentHandlers;
+import csw.framework.models.JCswContext;
 import csw.messages.TopLevelActorMessage;
 import csw.messages.commands.*;
 import csw.messages.framework.ComponentInfo;
@@ -28,7 +29,6 @@ import csw.services.event.api.javadsl.IEventService;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.location.javadsl.JComponentType;
 import csw.services.logging.javadsl.ILogger;
-import csw.services.logging.javadsl.JLoggerFactory;
 import scala.concurrent.duration.FiniteDuration;
 
 import java.nio.file.Paths;
@@ -61,19 +61,16 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
             ComponentInfo componentInfo,
             CommandResponseManager commandResponseManager,
             CurrentStatePublisher currentStatePublisher,
-            ILocationService locationService,
-            IEventService eventService,
-            IAlarmService alarmService,
-            JLoggerFactory loggerFactory
+            JCswContext cswCtx
     ) {
-        super(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, eventService, alarmService, loggerFactory);
+        super(ctx, componentInfo, commandResponseManager, currentStatePublisher, cswCtx);
         this.ctx = ctx;
         this.componentInfo = componentInfo;
         this.commandResponseManager = commandResponseManager;
         this.currentStatePublisher = currentStatePublisher;
-        this.locationService = locationService;
-        this.eventService = eventService;
-        log = loggerFactory.getLogger(this.getClass());
+        this.locationService = cswCtx.locationService();
+        this.eventService = cswCtx.eventService();
+        log = cswCtx.loggerFactory().getLogger(this.getClass());
         configClient = JConfigClientFactory.clientApi(Adapter.toUntyped(ctx.getSystem()), locationService);
 
         runningHcds = new HashMap<>();

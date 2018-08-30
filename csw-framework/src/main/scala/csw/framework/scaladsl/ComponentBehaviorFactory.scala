@@ -4,13 +4,10 @@ import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.actor.typed.{ActorRef, Behavior}
 import csw.framework.CurrentStatePublisher
 import csw.framework.internal.component.ComponentBehavior
+import csw.framework.models.CswContext
 import csw.messages.framework.ComponentInfo
 import csw.messages.{FromComponentLifecycleMessage, TopLevelActorMessage}
-import csw.services.alarm.api.scaladsl.AlarmService
 import csw.services.command.CommandResponseManager
-import csw.services.event.api.scaladsl.EventService
-import csw.services.location.scaladsl.LocationService
-import csw.services.logging.scaladsl.LoggerFactory
 
 /**
  * Base class for the factory for creating the behavior representing a component actor
@@ -25,9 +22,7 @@ abstract class ComponentBehaviorFactory {
    * @param commandResponseManager to manage state of a received Submit command
    * @param currentStatePublisher the pub sub actor to publish state represented by [[csw.messages.params.states.CurrentState]]
    *                              for this component
-   * @param locationService the single instance of Location service created for a running application
-   * @param eventService the single instance of event service with default publishers and subcribers as well as the capability to create new ones
-   * @param loggerFactory factory to create suitable logger instance
+   * @param cswCtx provides access to csw services e.g. location, event, alarm, etc
    * @return componentHandlers to be used by this component
    */
   protected def handlers(
@@ -35,10 +30,7 @@ abstract class ComponentBehaviorFactory {
       componentInfo: ComponentInfo,
       commandResponseManager: CommandResponseManager,
       currentStatePublisher: CurrentStatePublisher,
-      locationService: LocationService,
-      eventService: EventService,
-      alarmService: AlarmService,
-      loggerFactory: LoggerFactory
+      cswCtx: CswContext
   ): ComponentHandlers
 
   /**
@@ -49,9 +41,7 @@ abstract class ComponentBehaviorFactory {
    * @param commandResponseManager to manage state of a received Submit command
    * @param currentStatePublisher  the pub sub actor to publish state represented by [[csw.messages.params.states.CurrentState]]
    *                               for this component
-   * @param locationService        the single instance of Location service created for a running application
-   * @param eventService the single instance of event service with default publishers and subcribers as well as the capability to create new ones
-   * @param loggerFactory factory to create suitable logger instance
+   * @param cswCtx provides access to csw services e.g. location, event, alarm, etc
    * @return behavior for component Actor
    */
   private[framework] def make(
@@ -59,10 +49,7 @@ abstract class ComponentBehaviorFactory {
       supervisor: ActorRef[FromComponentLifecycleMessage],
       currentStatePublisher: CurrentStatePublisher,
       commandResponseManager: CommandResponseManager,
-      locationService: LocationService,
-      eventService: EventService,
-      alarmService: AlarmService,
-      loggerFactory: LoggerFactory
+      cswCtx: CswContext
   ): Behavior[Nothing] =
     Behaviors
       .setup[TopLevelActorMessage](
@@ -76,14 +63,11 @@ abstract class ComponentBehaviorFactory {
               componentInfo,
               commandResponseManager,
               currentStatePublisher,
-              locationService,
-              eventService,
-              alarmService,
-              loggerFactory
+              cswCtx
             ),
             commandResponseManager,
-            locationService,
-            loggerFactory
+            cswCtx.locationService,
+            cswCtx.loggerFactory
         )
       )
       .narrow

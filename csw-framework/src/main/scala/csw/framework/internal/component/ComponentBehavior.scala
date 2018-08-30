@@ -43,7 +43,7 @@ private[framework] final class ComponentBehavior(
     supervisor: ActorRef[FromComponentLifecycleMessage],
     lifecycleHandlers: ComponentHandlers,
     commandResponseManager: CommandResponseManager,
-    locationService: LocationService,
+    locationService: LocationService, //TODO:
     loggerFactory: LoggerFactory
 ) extends MutableBehavior[TopLevelActorMessage] {
 

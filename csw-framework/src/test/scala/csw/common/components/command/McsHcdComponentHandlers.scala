@@ -3,18 +3,15 @@ package csw.common.components.command
 import akka.actor.typed.scaladsl.ActorContext
 import csw.common.components.command.ComponentStateForCommand._
 import csw.framework.CurrentStatePublisher
+import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
+import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandResponse.{Accepted, Completed, Error}
 import csw.messages.commands.{CommandResponse, ControlCommand}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.TrackingEvent
-import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
-import csw.services.alarm.api.scaladsl.AlarmService
 import csw.services.command.CommandResponseManager
-import csw.services.event.api.scaladsl.EventService
-import csw.services.location.scaladsl.LocationService
-import csw.services.logging.scaladsl.LoggerFactory
 
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationLong
@@ -24,19 +21,13 @@ class McsHcdComponentHandlers(
     componentInfo: ComponentInfo,
     commandResponseManager: CommandResponseManager,
     currentStatePublisher: CurrentStatePublisher,
-    locationService: LocationService,
-    eventService: EventService,
-    alarmService: AlarmService,
-    loggerFactory: LoggerFactory
+    cswCtx: CswContext
 ) extends ComponentHandlers(
       ctx,
       componentInfo,
       commandResponseManager,
       currentStatePublisher,
-      locationService,
-      eventService,
-      alarmService,
-      loggerFactory: LoggerFactory
+      cswCtx
     ) {
 
   override def initialize(): Future[Unit] = Future.unit

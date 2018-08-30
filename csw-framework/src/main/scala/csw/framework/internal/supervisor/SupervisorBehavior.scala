@@ -9,6 +9,7 @@ import akka.actor.typed.{ActorRef, Behavior, PostStop, Signal, SupervisorStrateg
 import csw.framework.CurrentStatePublisher
 import csw.framework.exceptions.{FailureRestart, InitializationFailed}
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
+import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentBehaviorFactory
 import csw.messages.CommandResponseManagerMessage.{Query, Subscribe, Unsubscribe}
 import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
@@ -31,13 +32,11 @@ import csw.messages.location.ComponentId
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.params.models.Prefix
 import csw.messages.params.states.CurrentState
-import csw.services.alarm.api.scaladsl.AlarmService
 import csw.services.command.CommandResponseManager
 import csw.services.command.internal.CommandResponseManagerFactory
-import csw.services.event.api.scaladsl.EventService
 import csw.services.location.models.AkkaRegistration
-import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
-import csw.services.logging.scaladsl.{Logger, LoggerFactory}
+import csw.services.location.scaladsl.RegistrationFactory
+import csw.services.logging.scaladsl.Logger
 
 import scala.concurrent.Future
 import scala.concurrent.duration.{Duration, FiniteDuration}
@@ -78,13 +77,11 @@ private[framework] final class SupervisorBehavior(
     componentBehaviorFactory: ComponentBehaviorFactory,
     commandResponseManagerFactory: CommandResponseManagerFactory,
     registrationFactory: RegistrationFactory,
-    locationService: LocationService,
-    eventService: EventService,
-    alarmService: AlarmService,
-    loggerFactory: LoggerFactory
+    cswCtx: CswContext
 ) extends MutableBehavior[SupervisorMessage] {
 
   import SupervisorBehavior._
+  import cswCtx._
   import ctx.executionContext
 
   private val log: Logger                                  = loggerFactory.getLogger(ctx)
@@ -324,10 +321,7 @@ private[framework] final class SupervisorBehavior(
             ctx.self,
             new CurrentStatePublisher(pubSubComponentActor),
             commandResponseManager,
-            locationService,
-            eventService,
-            alarmService,
-            loggerFactory
+            cswCtx
           )
       )
       .onFailure[FailureRestart](SupervisorStrategy.restartWithLimit(3, Duration.Zero).withLoggingEnabled(true))

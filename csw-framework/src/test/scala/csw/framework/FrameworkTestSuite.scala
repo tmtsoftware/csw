@@ -1,22 +1,19 @@
 package csw.framework
 
 import akka.actor
+import akka.actor.testkit.typed.TestKitSettings
+import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.actor.typed.{ActorRef, ActorSystem}
-import akka.actor.testkit.typed.TestKitSettings
-import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.util.Timeout
 import csw.framework.internal.supervisor.SupervisorBehaviorFactory
+import csw.framework.models.CswContext
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
-import csw.messages.{ComponentMessage, ContainerIdleMessage, TopLevelActorMessage}
 import csw.messages.framework.ComponentInfo
-import csw.messages.{ComponentMessage, ContainerIdleMessage}
-import csw.services.alarm.api.scaladsl.AlarmService
+import csw.messages.{ComponentMessage, ContainerIdleMessage, TopLevelActorMessage}
 import csw.services.command.CommandResponseManager
-import csw.services.event.api.scaladsl.EventService
 import csw.services.location.commons.ActorSystemFactory
-import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
@@ -42,10 +39,7 @@ private[csw] abstract class FrameworkTestSuite extends FunSuite with Matchers wi
      componentInfo: ComponentInfo,
      commandResponseManager: CommandResponseManager,
      currentStatePublisher: CurrentStatePublisher,
-     locationService: LocationService,
-     eventService: EventService,
-     alarmService: AlarmService,
-     loggerFactory: LoggerFactory) => componentHandlers
+     cswCtx: CswContext) => componentHandlers
 
   def getSampleAssemblyWiring(
       assemblyHandlers: ComponentHandlers
@@ -54,10 +48,7 @@ private[csw] abstract class FrameworkTestSuite extends FunSuite with Matchers wi
      componentInfo: ComponentInfo,
      commandResponseManager: CommandResponseManager,
      currentStatePublisher: CurrentStatePublisher,
-     locationService: LocationService,
-     eventService: EventService,
-     alarmService: AlarmService,
-     loggerFactory: LoggerFactory) => assemblyHandlers
+     cswCtx: CswContext) => assemblyHandlers
 
   def createSupervisorAndStartTLA(
       componentInfo: ComponentInfo,
@@ -69,11 +60,9 @@ private[csw] abstract class FrameworkTestSuite extends FunSuite with Matchers wi
     val supervisorBehavior = SupervisorBehaviorFactory.make(
       Some(containerRef),
       componentInfo,
-      locationService,
-      eventService,
-      alarmService,
       registrationFactory,
-      commandResponseManagerFactory
+      commandResponseManagerFactory,
+      cswCtx.copy(loggerFactory = new LoggerFactory(componentInfo.name))
     )
 
     // it creates supervisor which in turn spawns components TLA and sends Initialize and Run message to TLA

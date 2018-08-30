@@ -9,8 +9,10 @@ import akka.stream.javadsl.Source;
 import akka.util.Timeout;
 import csw.common.components.command.ComponentStateForCommand;
 import csw.common.components.framework.SampleComponentState;
-import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.CurrentStatePublisher;
+import csw.framework.javadsl.JComponentHandlers;
+import csw.framework.models.JCswContext;
+import csw.messages.TopLevelActorMessage;
 import csw.messages.commands.*;
 import csw.messages.framework.ComponentInfo;
 import csw.messages.location.TrackingEvent;
@@ -18,13 +20,8 @@ import csw.messages.params.generics.JKeyType;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.states.CurrentState;
 import csw.messages.params.states.StateName;
-import csw.messages.TopLevelActorMessage;
-import csw.services.alarm.api.javadsl.IAlarmService;
 import csw.services.command.CommandResponseManager;
-import csw.services.event.api.javadsl.IEventService;
-import csw.services.location.javadsl.ILocationService;
 import csw.services.logging.javadsl.ILogger;
-import csw.services.logging.javadsl.JLoggerFactory;
 import scala.concurrent.duration.Duration;
 
 import java.util.concurrent.CompletableFuture;
@@ -47,14 +44,11 @@ public class JSampleComponentHandlers extends JComponentHandlers {
             ComponentInfo componentInfo,
             CommandResponseManager commandResponseManager,
             CurrentStatePublisher currentStatePublisher,
-            ILocationService locationService,
-            IEventService eventService,
-            IAlarmService alarmService,
-            JLoggerFactory loggerFactory
+            JCswContext cswCtx
     ) {
-        super(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, eventService, alarmService, loggerFactory);
+        super(ctx, componentInfo, commandResponseManager, currentStatePublisher, cswCtx);
         this.currentStatePublisher = currentStatePublisher;
-        this.log = loggerFactory.getLogger(getClass());
+        this.log = cswCtx.loggerFactory().getLogger(getClass());
         this.commandResponseManager = commandResponseManager;
         this.actorContext = ctx;
     }
@@ -143,11 +137,11 @@ public class JSampleComponentHandlers extends JComponentHandlers {
             // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
             CompletableFuture<CommandResponse> status = commandResponseManager.jQuery(controlCommand.runId(), Timeout.apply(100, TimeUnit.MILLISECONDS));
             status.thenAccept(response -> {
-                if(response instanceof Accepted)
+                if (response instanceof Accepted)
                     commandResponseManager.addOrUpdateCommand(controlCommand.runId(), new CommandResponse.Error(controlCommand.runId(), "Unknown Error occurred"));
             });
         } else {
-             commandResponseManager.addOrUpdateCommand(controlCommand.runId(), new Completed(controlCommand.runId()));
+            commandResponseManager.addOrUpdateCommand(controlCommand.runId(), new Completed(controlCommand.runId()));
         }
 
     }

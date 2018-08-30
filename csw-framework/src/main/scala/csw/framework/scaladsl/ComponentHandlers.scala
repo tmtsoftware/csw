@@ -2,16 +2,13 @@ package csw.framework.scaladsl
 
 import akka.actor.typed.scaladsl.ActorContext
 import csw.framework.CurrentStatePublisher
+import csw.framework.models.CswContext
+import csw.messages.TopLevelActorCommonMessage.TrackingEventReceived
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.{CommandResponse, ControlCommand}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.{Connection, TrackingEvent}
-import csw.messages.TopLevelActorCommonMessage.TrackingEventReceived
-import csw.services.alarm.api.scaladsl.AlarmService
 import csw.services.command.CommandResponseManager
-import csw.services.event.api.scaladsl.EventService
-import csw.services.location.scaladsl.LocationService
-import csw.services.logging.scaladsl.LoggerFactory
 
 import scala.concurrent.Future
 
@@ -22,19 +19,14 @@ import scala.concurrent.Future
  * @param componentInfo component related information as described in the configuration file
  * @param commandResponseManager to manage state of a received Submit command
  * @param currentStatePublisher the pub sub actor to publish state represented by [[csw.messages.params.states.CurrentState]] for this component
- * @param locationService the single instance of Location service created for a running application
- * @param eventService the single instance of event service with default publishers and subcribers as well as the capability to create new ones
- * @param loggerFactory factory to create suitable logger instance
+ * @param cswCtx provides access to csw services e.g. location, event, alarm, etc
  */
 abstract class ComponentHandlers(
     ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
     commandResponseManager: CommandResponseManager,
     currentStatePublisher: CurrentStatePublisher,
-    locationService: LocationService,
-    eventService: EventService,
-    alarmService: AlarmService,
-    loggerFactory: LoggerFactory
+    cswCtx: CswContext
 ) {
 
   /**
@@ -113,5 +105,5 @@ abstract class ComponentHandlers(
    * @param connection to be tracked for location updates
    */
   def trackConnection(connection: Connection): Unit =
-    locationService.subscribe(connection, trackingEvent ⇒ ctx.self ! TrackingEventReceived(trackingEvent))
+    cswCtx.locationService.subscribe(connection, trackingEvent ⇒ ctx.self ! TrackingEventReceived(trackingEvent))
 }

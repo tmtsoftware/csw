@@ -4,8 +4,10 @@ import akka.actor.typed.ActorRef;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.util.Timeout;
-import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.CurrentStatePublisher;
+import csw.framework.javadsl.JComponentHandlers;
+import csw.framework.models.JCswContext;
+import csw.messages.TopLevelActorMessage;
 import csw.messages.commands.CommandName;
 import csw.messages.commands.CommandResponse;
 import csw.messages.commands.ControlCommand;
@@ -21,16 +23,13 @@ import csw.messages.params.generics.JKeyType;
 import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.models.ObsId;
-import csw.messages.TopLevelActorMessage;
 import csw.messages.params.models.Prefix;
-import csw.services.alarm.api.javadsl.IAlarmService;
-import csw.services.command.javadsl.JCommandService;
 import csw.services.command.CommandResponseManager;
+import csw.services.command.javadsl.JCommandService;
 import csw.services.event.api.javadsl.IEventService;
 import csw.services.event.api.javadsl.IEventSubscription;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.logging.javadsl.ILogger;
-import csw.services.logging.javadsl.JLoggerFactory;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -62,18 +61,15 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
             ComponentInfo componentInfo,
             CommandResponseManager commandResponseManager,
             CurrentStatePublisher currentStatePublisher,
-            ILocationService locationService,
-            IEventService eventService,
-            IAlarmService alarmService,
-            JLoggerFactory loggerFactory
+            JCswContext cswCtx
     ) {
-        super(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, eventService, alarmService, loggerFactory);
+        super(ctx, componentInfo, commandResponseManager, currentStatePublisher, cswCtx);
         this.currentStatePublisher = currentStatePublisher;
-        this.log = loggerFactory.getLogger(getClass());
+        this.log = cswCtx.loggerFactory().getLogger(getClass());
         this.commandResponseManager = commandResponseManager;
         this.actorContext = ctx;
-        this.locationService = locationService;
-        this.eventService = eventService;
+        this.locationService = cswCtx.locationService();
+        this.eventService = cswCtx.eventService();
         this.componentInfo = componentInfo;
         this.commandSender = createWorkerActor();
     }

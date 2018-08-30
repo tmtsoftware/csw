@@ -2,14 +2,11 @@ package csw.services.command.perf.component
 
 import akka.actor.typed.scaladsl.ActorContext
 import csw.framework.CurrentStatePublisher
+import csw.framework.models.CswContext
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.messages.TopLevelActorMessage
 import csw.messages.framework.ComponentInfo
-import csw.services.alarm.api.scaladsl.AlarmService
 import csw.services.command.CommandResponseManager
-import csw.services.event.api.scaladsl.EventService
-import csw.services.location.scaladsl.LocationService
-import csw.services.logging.scaladsl.LoggerFactory
 
 class HandlerFactory extends ComponentBehaviorFactory {
   protected override def handlers(
@@ -17,19 +14,13 @@ class HandlerFactory extends ComponentBehaviorFactory {
       componentInfo: ComponentInfo,
       commandResponseManager: CommandResponseManager,
       currentStatePublisher: CurrentStatePublisher,
-      locationService: LocationService,
-      eventService: EventService,
-      alarmService: AlarmService,
-      loggerFactory: LoggerFactory
+      cswCtx: CswContext
   ): ComponentHandlers =
     new ActionLessHandlers(
       ctx,
       componentInfo,
       commandResponseManager,
       currentStatePublisher,
-      locationService,
-      eventService,
-      alarmService,
-      loggerFactory
+      cswCtx
     )
 }

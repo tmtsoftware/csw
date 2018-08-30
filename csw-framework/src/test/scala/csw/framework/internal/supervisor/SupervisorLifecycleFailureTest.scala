@@ -13,6 +13,7 @@ import csw.commons.tags.LoggingSystemSensitive
 import csw.framework.ComponentInfos._
 import csw.framework.exceptions.{FailureRestart, FailureStop}
 import csw.framework.internal.component.ComponentBehavior
+import csw.framework.models.CswContext
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.framework.{CurrentStatePublisher, FrameworkTestMocks, FrameworkTestSuite}
 import csw.messages.CommandMessage.Submit
@@ -24,10 +25,7 @@ import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.{CurrentState, StateName}
 import csw.messages.{ComponentMessage, ContainerIdleMessage, TopLevelActorMessage}
-import csw.services.alarm.api.scaladsl.AlarmService
 import csw.services.command.CommandResponseManager
-import csw.services.event.api.scaladsl.EventService
-import csw.services.location.scaladsl.LocationService
 import csw.services.logging.internal.LoggingLevels.ERROR
 import csw.services.logging.internal.LoggingSystem
 import csw.services.logging.scaladsl.LoggerFactory
@@ -215,13 +213,10 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
     val supervisorBehavior = SupervisorBehaviorFactory.make(
       Some(mock[ActorRef[ContainerIdleMessage]]),
       hcdInfo,
-      locationService,
-      eventService,
-      alarmService,
       registrationFactory,
       new SampleBehaviorFactory(componentHandlers),
       commandResponseManagerFactory,
-      new LoggerFactory(hcdInfo.name)
+      cswCtx.copy(loggerFactory = new LoggerFactory(hcdInfo.name))
     )
 
     // it creates supervisor which in turn spawns components TLA and sends Initialize and Run message to TLA
@@ -259,10 +254,7 @@ class SampleBehaviorFactory(componentHandlers: ComponentHandlers) extends Compon
       componentInfo: ComponentInfo,
       commandResponseManager: CommandResponseManager,
       currentStatePublisher: CurrentStatePublisher,
-      locationService: LocationService,
-      eventService: EventService,
-      alarmService: AlarmService,
-      loggerFactory: LoggerFactory
+      cswCtx: CswContext
   ): ComponentHandlers = componentHandlers
 }
 

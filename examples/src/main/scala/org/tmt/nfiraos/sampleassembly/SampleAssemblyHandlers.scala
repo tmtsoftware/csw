@@ -3,6 +3,7 @@ package org.tmt.nfiraos.sampleassembly
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.util.Timeout
 import csw.framework.CurrentStatePublisher
+import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandResponse.Accepted
@@ -12,12 +13,9 @@ import csw.messages.framework.ComponentInfo
 import csw.messages.location.{AkkaLocation, LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.messages.params.generics.{Key, KeyType, Parameter}
 import csw.messages.params.models.{ObsId, Prefix, Units}
-import csw.services.alarm.api.scaladsl.AlarmService
 import csw.services.command.CommandResponseManager
 import csw.services.command.scaladsl.CommandService
-import csw.services.event.api.scaladsl.{EventService, EventSubscription}
-import csw.services.location.scaladsl.LocationService
-import csw.services.logging.scaladsl.LoggerFactory
+import csw.services.event.api.scaladsl.EventSubscription
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContextExecutor, Future}
@@ -35,21 +33,16 @@ class SampleAssemblyHandlers(
     componentInfo: ComponentInfo,
     commandResponseManager: CommandResponseManager,
     currentStatePublisher: CurrentStatePublisher,
-    locationService: LocationService,
-    eventService: EventService,
-    alarmService: AlarmService,
-    loggerFactory: LoggerFactory
+    cswCtx: CswContext
 ) extends ComponentHandlers(
       ctx,
       componentInfo,
       commandResponseManager,
       currentStatePublisher,
-      locationService,
-      eventService,
-      alarmService,
-      loggerFactory
+      cswCtx
     ) {
 
+  import cswCtx._
   implicit val ec: ExecutionContextExecutor = ctx.executionContext
   private val log                           = loggerFactory.getLogger
 

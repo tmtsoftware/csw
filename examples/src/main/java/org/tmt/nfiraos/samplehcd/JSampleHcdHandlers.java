@@ -6,6 +6,7 @@ import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.CurrentStatePublisher;
+import csw.framework.models.JCswContext;
 import csw.messages.commands.*;
 import csw.messages.events.Event;
 import csw.messages.events.EventName;
@@ -17,12 +18,9 @@ import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.models.Id;
 import csw.messages.TopLevelActorMessage;
-import csw.services.alarm.api.javadsl.IAlarmService;
 import csw.services.command.CommandResponseManager;
-import csw.services.event.api.javadsl.IEventService;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.logging.javadsl.ILogger;
-import csw.services.logging.javadsl.JLoggerFactory;
 
 import java.time.Duration;
 import java.util.Optional;
@@ -53,17 +51,14 @@ public class JSampleHcdHandlers extends JComponentHandlers {
             ComponentInfo componentInfo,
             CommandResponseManager commandResponseManager,
             CurrentStatePublisher currentStatePublisher,
-            ILocationService locationService,
-            IEventService eventService,
-            IAlarmService alarmService,
-            JLoggerFactory loggerFactory
+            JCswContext cswCtx
     ) {
-        super(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, eventService, alarmService, loggerFactory);
+        super(ctx, componentInfo, commandResponseManager, currentStatePublisher, cswCtx);
         this.currentStatePublisher = currentStatePublisher;
-        this.log = loggerFactory.getLogger(getClass());
+        this.log = cswCtx.loggerFactory().getLogger(getClass());
         this.commandResponseManager = commandResponseManager;
         this.actorContext = ctx;
-        this.locationService = locationService;
+        this.locationService = cswCtx.locationService();
         this.componentInfo = componentInfo;
         this.eventService = eventService;
         workerActor = createWorkerActor();

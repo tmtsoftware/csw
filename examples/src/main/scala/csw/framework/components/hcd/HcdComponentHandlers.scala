@@ -12,19 +12,17 @@ import csw.framework.CurrentStatePublisher
 import csw.framework.components.ConfigNotAvailableException
 import csw.framework.components.assembly.WorkerActorMsgs.{GetStatistics, InitialState}
 import csw.framework.components.assembly.{WorkerActor, WorkerActorMsg}
+import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandResponse.Accepted
 import csw.messages.commands.{CommandResponse, ControlCommand, Observe, Setup}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.{LocationRemoved, LocationUpdated, TrackingEvent}
-import csw.services.alarm.api.scaladsl.AlarmService
 import csw.services.command.CommandResponseManager
 import csw.services.config.api.models.ConfigData
 import csw.services.config.api.scaladsl.ConfigClientService
 import csw.services.config.client.scaladsl.ConfigClientFactory
-import csw.services.event.api.scaladsl.EventService
-import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
 import scala.async.Async.{async, await}
@@ -37,19 +35,13 @@ class HcdComponentHandlers(
     componentInfo: ComponentInfo,
     commandResponseManager: CommandResponseManager,
     currentStatePublisher: CurrentStatePublisher,
-    locationService: LocationService,
-    eventService: EventService,
-    alarmService: AlarmService,
-    loggerFactory: LoggerFactory
+    cswCtx: CswContext
 ) extends ComponentHandlers(
       ctx,
       componentInfo,
       commandResponseManager,
       currentStatePublisher,
-      locationService,
-      eventService,
-      alarmService,
-      loggerFactory: LoggerFactory
+      cswCtx
     )
 //#component-handlers-class
     {
@@ -59,7 +51,7 @@ class HcdComponentHandlers(
   implicit val ec: ExecutionContext             = ctx.executionContext
   implicit val timeout: Timeout                 = 5.seconds
   implicit val scheduler: Scheduler             = ctx.system.scheduler
-  private val configClient: ConfigClientService = ConfigClientFactory.clientApi(ctx.system.toUntyped, locationService)
+  private val configClient: ConfigClientService = ConfigClientFactory.clientApi(ctx.system.toUntyped, cswCtx.locationService)
   var current: Int                              = _
   var stats: Int                                = _
 

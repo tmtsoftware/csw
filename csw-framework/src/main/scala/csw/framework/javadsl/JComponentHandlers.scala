@@ -4,14 +4,11 @@ import java.util.concurrent.CompletableFuture
 
 import akka.actor.typed.javadsl.ActorContext
 import csw.framework.CurrentStatePublisher
+import csw.framework.models.JCswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.TopLevelActorMessage
 import csw.messages.framework.ComponentInfo
-import csw.services.alarm.api.javadsl.IAlarmService
 import csw.services.command.CommandResponseManager
-import csw.services.event.api.javadsl.IEventService
-import csw.services.location.javadsl.ILocationService
-import csw.services.logging.javadsl.JLoggerFactory
 
 import scala.compat.java8.FutureConverters._
 import scala.concurrent.{ExecutionContextExecutor, Future}
@@ -23,28 +20,20 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
  * @param componentInfo          component related information as described in the configuration file
  * @param commandResponseManager to manage state of a received Submit command
  * @param currentStatePublisher  the pub sub actor to publish state represented by [[csw.messages.params.states.CurrentState]] for this component
- * @param locationService        the single instance of Location service created for a running application
- * @param eventService           the single instance of event service with default publishers and subcribers as well as the capability to create new ones
- * @param loggerFactory          factory to create suitable logger instance
+ * @param cswCtx provides access to csw services e.g. location, event, alarm, etc
  */
 abstract class JComponentHandlers(
     ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
     commandResponseManager: CommandResponseManager,
     currentStatePublisher: CurrentStatePublisher,
-    locationService: ILocationService,
-    eventService: IEventService,
-    alarmService: IAlarmService,
-    loggerFactory: JLoggerFactory
+    cswCtx: JCswContext
 ) extends ComponentHandlers(
       ctx.asScala,
       componentInfo,
       commandResponseManager,
       currentStatePublisher,
-      locationService.asScala,
-      eventService.asScala,
-      alarmService.asScala,
-      loggerFactory.asScala
+      cswCtx.asScala
     ) {
 
   implicit val ec: ExecutionContextExecutor = ctx.getExecutionContext

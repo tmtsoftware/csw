@@ -5,6 +5,7 @@ import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.adapter._
 import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.{actor, testkit, Done}
+import csw.framework.models.CswContext
 import csw.messages.{CommandResponseManagerMessage, SupervisorMessage}
 import csw.messages.commands.CommandResponse
 import csw.messages.framework.LifecycleStateChanged
@@ -72,4 +73,7 @@ class FrameworkTestMocks(implicit untypedSystem: actor.ActorSystem, system: Acto
   when(loggerFactory.getLogger).thenReturn(logger)
   when(loggerFactory.getLogger(any[actor.ActorContext])).thenReturn(logger)
   when(loggerFactory.getLogger(any[ActorContext[_]])).thenReturn(logger)
+
+  ///////////////////////////////////////////////
+  val cswCtx: CswContext = CswContext(locationService, eventService, alarmService, loggerFactory)
 }

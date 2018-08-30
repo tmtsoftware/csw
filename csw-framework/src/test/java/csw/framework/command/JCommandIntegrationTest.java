@@ -446,8 +446,6 @@ public class JCommandIntegrationTest {
 
         Thread.sleep(1000);
         List<CurrentState> receivedStates = inbox.getAllReceived();
-        System.out.println(receivedStates.size());
-        receivedStates.forEach(System.out::println);
 
         Assert.assertFalse(receivedStates.contains(expectedValidationCurrentState));
         Assert.assertFalse(receivedStates.contains(expectedSubmitCurrentState));

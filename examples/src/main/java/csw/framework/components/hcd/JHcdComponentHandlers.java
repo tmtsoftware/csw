@@ -1,41 +1,33 @@
 package csw.framework.components.hcd;
 
-import akka.actor.Cancellable;
 import akka.actor.typed.ActorRef;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.AskPattern;
 import akka.util.Timeout;
+import csw.framework.CurrentStatePublisher;
 import csw.framework.components.ConfigNotAvailableException;
 import csw.framework.components.assembly.WorkerActor;
 import csw.framework.components.assembly.WorkerActorMsg;
 import csw.framework.components.assembly.WorkerActorMsgs;
 import csw.framework.javadsl.JComponentHandlers;
-import csw.framework.CurrentStatePublisher;
+import csw.framework.models.JCswContext;
+import csw.messages.TopLevelActorMessage;
 import csw.messages.commands.CommandResponse;
 import csw.messages.commands.ControlCommand;
 import csw.messages.commands.Observe;
 import csw.messages.commands.Setup;
-import csw.messages.events.Event;
-import csw.messages.events.EventName;
-import csw.messages.events.SystemEvent;
 import csw.messages.framework.ComponentInfo;
 import csw.messages.location.LocationRemoved;
 import csw.messages.location.LocationUpdated;
 import csw.messages.location.TrackingEvent;
-import csw.messages.TopLevelActorMessage;
-import csw.services.alarm.api.javadsl.IAlarmService;
 import csw.services.command.CommandResponseManager;
 import csw.services.config.api.javadsl.IConfigClientService;
 import csw.services.config.api.models.ConfigData;
-import csw.services.event.api.exceptions.PublishFailure;
-import csw.services.event.internal.commons.EventServiceConnection;
 import csw.services.event.api.javadsl.IEventService;
 import csw.services.location.javadsl.ILocationService;
 import csw.services.logging.javadsl.ILogger;
-import csw.services.logging.javadsl.JLoggerFactory;
 
 import java.nio.file.Paths;
-import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
@@ -61,20 +53,16 @@ public class JHcdComponentHandlers extends JComponentHandlers {
             ComponentInfo componentInfo,
             CommandResponseManager commandResponseManager,
             CurrentStatePublisher currentStatePublisher,
-            ILocationService locationService,
-            IEventService eventService,
-            IAlarmService alarmService,
-            JLoggerFactory loggerFactory
-
+            JCswContext cswCtx
     ) {
-        super(ctx, componentInfo, commandResponseManager, currentStatePublisher, locationService, eventService, alarmService, loggerFactory);
+        super(ctx, componentInfo, commandResponseManager, currentStatePublisher, cswCtx);
         this.ctx = ctx;
         this.componentInfo = componentInfo;
         this.commandResponseManager = commandResponseManager;
         this.currentStatePublisher = currentStatePublisher;
-        this.locationService = locationService;
-        this.eventService = eventService;
-        log = loggerFactory.getLogger(this.getClass());
+        this.locationService = cswCtx.locationService();
+        this.eventService = cswCtx.eventService();
+        log = cswCtx.loggerFactory().getLogger(this.getClass());
     }
     //#jcomponent-handlers-class
 

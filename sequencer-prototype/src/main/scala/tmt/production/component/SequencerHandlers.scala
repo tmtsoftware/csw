@@ -3,23 +3,20 @@ package tmt.production.component
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Paths}
 
-import akka.stream.ActorMaterializer
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
+import akka.stream.ActorMaterializer
 import akka.util.Timeout
 import csw.framework.CurrentStatePublisher
+import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.{CommandResponse, ControlCommand}
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.TrackingEvent
-import csw.services.alarm.api.scaladsl.AlarmService
 import csw.services.command.CommandResponseManager
 import csw.services.config.api.models.ConfigData
-import csw.services.event.api.scaladsl.EventService
-import csw.services.location.scaladsl.LocationService
-import csw.services.logging.scaladsl.LoggerFactory
 import tmt.production.dsl.Dsl
 import tmt.shared.Wiring
 import tmt.shared.engine.EngineBehavior
@@ -34,19 +31,13 @@ class SequencerHandlers(
     componentInfo: ComponentInfo,
     commandResponseManager: CommandResponseManager,
     currentStatePublisher: CurrentStatePublisher,
-    locationService: LocationService,
-    eventService: EventService,
-    alarmService: AlarmService,
-    loggerFactory: LoggerFactory
+    cswCtx: CswContext
 ) extends ComponentHandlers(
       ctx,
       componentInfo,
       commandResponseManager,
       currentStatePublisher,
-      locationService,
-      eventService,
-      alarmService,
-      loggerFactory: LoggerFactory
+      cswCtx
     ) {
 
   implicit val ct: ActorContext[TopLevelActorMessage] = ctx
@@ -78,7 +69,7 @@ class SequencerHandlers(
     val path = Files.write(Paths.get(s"scripts/${componentInfo.name}.sc"), updatedScript.getBytes(StandardCharsets.UTF_8)) //TODO: decide on centos charset code
 
     val engineActor: ActorRef[EngineAction] = await(ctx.system.systemActorOf(EngineBehavior.behavior, "engine"))
-    Dsl.wiring = new Wiring(ctx.system, engineActor, locationService)
+    Dsl.wiring = new Wiring(ctx.system, engineActor, cswCtx.locationService)
 
     ctx.watch(engineActor) //TODO: what to do if engine actor dies ? Decide in handlers. Decide if we need engineActor to be persistent actor
 

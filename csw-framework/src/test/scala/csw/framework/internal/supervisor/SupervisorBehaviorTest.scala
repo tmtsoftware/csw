@@ -79,10 +79,7 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
             new SampleComponentBehaviorFactory,
             commandResponseManagerFactory,
             registrationFactory,
-            locationService,
-            eventService,
-            alarmService,
-            loggerFactory
+            cswCtx
         )
       )
       .narrow
