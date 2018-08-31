@@ -304,3 +304,11 @@ lazy val `sequencer-prototype` = project
   .settings(
     libraryDependencies ++= Dependencies.SequencerPrototype
   )
+
+lazy val alarm = taskKey[Unit]("alarm")
+
+alarm := {
+  (test in (`csw-alarm-client`, Test)).value
+  (test in (`csw-alarm-api`, Test)).value
+  (test in (`csw-alarm-cli`, Test)).value
+}
