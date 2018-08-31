@@ -5,7 +5,7 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import com.typesafe.config.ConfigFactory
 import csw.messages.params.models.Subsystem.{BAD, LGSF, NFIRAOS, TCS}
 import csw.services.alarm.api.exceptions.{InactiveAlarmException, InvalidSeverityException, KeyNotFoundException}
-import csw.services.alarm.api.models.AcknowledgementStatus.Unacknowledged
+import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
 import csw.services.alarm.api.models.AlarmSeverity._
 import csw.services.alarm.api.models.FullAlarmSeverity.Disconnected
 import csw.services.alarm.api.models.Key._
@@ -33,11 +33,17 @@ class SeverityServiceModuleTest
   // DEOPSCSW-459: Update severity to Disconnected if not updated within predefined time
   // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
   test("setSeverity should set severity") {
-    //set severity to Major
-    val status = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Major)
-    status.acknowledgementStatus shouldBe Unacknowledged
-    status.latchedSeverity shouldBe Major
+    getCurrentSeverity(tromboneAxisHighLimitAlarmKey).await shouldBe Disconnected
+    val status = getStatus(tromboneAxisHighLimitAlarmKey).await
+    status.acknowledgementStatus shouldBe Acknowledged
+    status.latchedSeverity shouldBe Disconnected
     status.shelveStatus shouldBe Unshelved
+
+    //set severity to Major
+    val status1 = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Major)
+    status1.acknowledgementStatus shouldBe Unacknowledged
+    status1.latchedSeverity shouldBe Major
+    status1.shelveStatus shouldBe Unshelved
 
     //get severity and assert
     val alarmSeverity = testSeverityApi.get(tromboneAxisHighLimitAlarmKey).await.get
@@ -64,43 +70,56 @@ class SeverityServiceModuleTest
   // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
   // DEOPSCSW-500: Update alarm time on current severity change
   test("setSeverity should latch alarm when it is higher than previous latched severity") {
-    val status = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Major)
+    getCurrentSeverity(tromboneAxisHighLimitAlarmKey).await shouldBe Disconnected
 
-    status.acknowledgementStatus shouldBe Unacknowledged
-    status.latchedSeverity shouldBe Major
+    val status = getStatus(tromboneAxisHighLimitAlarmKey).await
+    status.acknowledgementStatus shouldBe Acknowledged
+    status.latchedSeverity shouldBe Disconnected
+    status.shelveStatus shouldBe Unshelved
 
-    val status1 = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Warning)
+    val status1 = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Major)
+
     status1.acknowledgementStatus shouldBe Unacknowledged
     status1.latchedSeverity shouldBe Major
-    // current severity is changed, hence updated alarm time should be > old time
-    status1.alarmTime.time should be > status.alarmTime.time
 
     val status2 = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Warning)
     status2.acknowledgementStatus shouldBe Unacknowledged
     status2.latchedSeverity shouldBe Major
+    // current severity is changed, hence updated alarm time should be > old time
+    status2.alarmTime.time should be > status1.alarmTime.time
+
+    val status3 = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Warning)
+    status3.acknowledgementStatus shouldBe Unacknowledged
+    status3.latchedSeverity shouldBe Major
     // current severity is not changed, hence new alarm time == old time
-    status2.alarmTime.time shouldEqual status1.alarmTime.time
+    status3.alarmTime.time shouldEqual status2.alarmTime.time
   }
 
   // DEOPSCSW-444: Set severity api for component
   test("setSeverity should not auto-acknowledge alarm even when it is auto-acknowledgable") {
-    val status = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Major)
-    status.acknowledgementStatus shouldBe Unacknowledged
-    status.latchedSeverity shouldBe Major
+    val status = getStatus(tromboneAxisHighLimitAlarmKey).await
+    status.acknowledgementStatus shouldBe Acknowledged
+    status.latchedSeverity shouldBe Disconnected
+
+    val status1 = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Major)
+    status1.acknowledgementStatus shouldBe Unacknowledged
+    status1.latchedSeverity shouldBe Major
   }
 
   // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
   // DEOPSCSW-500: Update alarm time on current severity change
   test("setSeverity should not update alarm time when current severity does not change") {
-    val defaultAlarmTime = getStatus(tromboneAxisHighLimitAlarmKey).await.alarmTime
+    val status = getStatus(tromboneAxisHighLimitAlarmKey).await
+    status.latchedSeverity shouldBe Disconnected
+    val defaultAlarmTime = status.alarmTime
 
     // latch it to major
-    val status = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Major)
-    // set the severity again to mimic alarm refreshing
     val status1 = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Major)
+    // set the severity again to mimic alarm refreshing
+    val status2 = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Major)
 
-    status.alarmTime.time shouldEqual status1.alarmTime.time
-    status.alarmTime.time should be > defaultAlarmTime.time
+    status1.alarmTime.time shouldEqual status2.alarmTime.time
+    status1.alarmTime.time should be > defaultAlarmTime.time
   }
 
   // DEOPSCSW-457: Fetch current alarm severity
@@ -120,16 +139,23 @@ class SeverityServiceModuleTest
 
   // DEOPSCSW-465: Fetch alarm severity, component or subsystem
   test("getAggregatedSeverity should get aggregated severity for component") {
+
+    val tromboneKey = ComponentKey(NFIRAOS, "trombone")
+    getAggregatedSeverity(tromboneKey).await shouldBe Disconnected
+
     setSeverity(tromboneAxisHighLimitAlarmKey, Warning).await
     setSeverity(tromboneAxisLowLimitAlarmKey, Major).await
     setSeverity(splitterLimitAlarmKey, Critical).await // splitter component should not be included
 
-    val tromboneKey = ComponentKey(NFIRAOS, "trombone")
     getAggregatedSeverity(tromboneKey).await shouldBe Major
   }
 
   // DEOPSCSW-465: Fetch alarm severity, component or subsystem
   test("getAggregatedSeverity should get aggregated severity for subsystem") {
+
+    val tromboneKey = SubsystemKey(NFIRAOS)
+    getAggregatedSeverity(tromboneKey).await shouldBe Disconnected
+
     setSeverity(tromboneAxisHighLimitAlarmKey, Warning).await
     setSeverity(tromboneAxisLowLimitAlarmKey, Major).await
     setSeverity(splitterLimitAlarmKey, Okay).await
@@ -137,12 +163,14 @@ class SeverityServiceModuleTest
     setSeverity(enclosureTempLowAlarmKey, Okay).await
     setSeverity(cpuExceededAlarmKey, Critical).await // TCS Alarm should not be included
 
-    val tromboneKey = SubsystemKey(NFIRAOS)
     getAggregatedSeverity(tromboneKey).await shouldBe Major
   }
 
   // DEOPSCSW-465: Fetch alarm severity, component or subsystem
   test("getAggregatedSeverity should get aggregated severity for global system") {
+
+    getAggregatedSeverity(GlobalKey).await shouldBe Disconnected
+
     setSeverity(tromboneAxisHighLimitAlarmKey, Major).await
     setSeverity(tromboneAxisLowLimitAlarmKey, Okay).await
     setSeverity(splitterLimitAlarmKey, Okay).await
@@ -176,18 +204,23 @@ class SeverityServiceModuleTest
   test("getAggregatedSeverity should consider shelved alarms also in aggregation") {
     // initialize alarm with Shelved status just for this test
     setStatus(cpuExceededAlarmKey, AlarmStatus().copy(shelveStatus = Shelved))
+
+    val componentKey = ComponentKey(cpuExceededAlarmKey.subsystem, cpuExceededAlarmKey.component)
+    getAggregatedSeverity(componentKey).await shouldBe Disconnected
+
     // there is only one alarm in TCS.tcsPk component
-    getAggregatedSeverity(ComponentKey(cpuExceededAlarmKey.subsystem, cpuExceededAlarmKey.component)).await shouldBe Disconnected
     setSeverity(cpuExceededAlarmKey, Critical).await
-    getAggregatedSeverity(ComponentKey(cpuExceededAlarmKey.subsystem, cpuExceededAlarmKey.component)).await shouldBe Critical
+    getAggregatedSeverity(componentKey).await shouldBe Critical
   }
 
   // DEOPSCSW-465: Fetch alarm severity, component or subsystem
-  test("getAggregatedSeverity should get aggregated to Disconnected for Warning and Disconnected severities") {
-    setSeverity(tromboneAxisHighLimitAlarmKey, Warning).await
-
+  test("getAggregatedSeverity should get aggregated to Disconnected for Warning and Critical severities") {
     val tromboneKey = ComponentKey(NFIRAOS, "trombone")
     getAggregatedSeverity(tromboneKey).await shouldBe Disconnected
+    setSeverity(tromboneAxisLowLimitAlarmKey, Critical).await
+    setSeverity(tromboneAxisHighLimitAlarmKey, Warning).await
+
+    getAggregatedSeverity(tromboneKey).await shouldBe Critical
   }
 
   // DEOPSCSW-465: Fetch alarm severity, component or subsystem
@@ -293,6 +326,8 @@ class SeverityServiceModuleTest
   // DEOPSCSW-467: Monitor alarm severities in the alarm store for a single alarm, component, subsystem, or all
   test("subscribeAggregatedSeverityCallback should not consider inactive alarm for aggregation") {
 
+    getAggregatedSeverity(GlobalKey).await shouldBe Disconnected
+
     val testProbe = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
     val alarmSubscription =
       subscribeAggregatedSeverityCallback(ComponentKey(NFIRAOS, "enclosure"), testProbe.ref ! _)
@@ -361,6 +396,8 @@ class SeverityServiceModuleTest
   // DEOPSCSW-467: Monitor alarm severities in the alarm store for a single alarm, component, subsystem, or all
   test("subscribeAggregatedSeverityActorRef should not consider inactive alarm for aggregation") {
 
+    getAggregatedSeverity(GlobalKey).await shouldBe Disconnected
+
     val testProbe         = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
     val alarmSubscription = subscribeAggregatedSeverityActorRef(SubsystemKey(NFIRAOS), testProbe.ref)
     alarmSubscription.ready().await
@@ -388,6 +425,8 @@ class SeverityServiceModuleTest
     // there is only one alarm in TCS.tcsPk component
     val componentKey = ComponentKey(cpuExceededAlarmKey.subsystem, cpuExceededAlarmKey.component)
 
+    getAggregatedSeverity(GlobalKey).await shouldBe Disconnected
+
     setStatus(cpuExceededAlarmKey, AlarmStatus().copy(shelveStatus = Shelved))
 
     val alarmSubscription = subscribeAggregatedSeverityCallback(componentKey, testProbe.ref ! _)
@@ -407,6 +446,8 @@ class SeverityServiceModuleTest
     test(testCase.name) {
       feedTestData(testCase)
       import testCase._
+
+      getStatus(alarmKey).await.latchedSeverity shouldBe oldLatchedSeverity
 
       //set severity to new Severity
       val status = setSeverityAndGetStatus(alarmKey, newSeverity)

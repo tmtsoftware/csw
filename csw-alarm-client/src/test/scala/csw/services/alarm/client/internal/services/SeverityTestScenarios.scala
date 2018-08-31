@@ -11,25 +11,25 @@ object SeverityTestScenarios {
   val SeverityTestCases = List(
     SetSeverityTestCase(
       alarmKey = AlarmKey(AOESW, "test_component", "IsHigher_WasNotDisconnected"),
-      oldSeverity = Warning,
+      oldLatchedSeverity = Warning,
       newSeverity = Critical,
       expectedLatchedSeverity = Critical
     ),
     SetSeverityTestCase(
       alarmKey = AlarmKey(AOESW, "test_component", "IsHigher_WasDisconnected"),
-      oldSeverity = Disconnected,
+      oldLatchedSeverity = Disconnected,
       newSeverity = Critical,
       expectedLatchedSeverity = Critical
     ),
     SetSeverityTestCase(
       alarmKey = AlarmKey(AOESW, "test_component", "IsNotHigher_WasNotDisconnected"),
-      oldSeverity = Major,
+      oldLatchedSeverity = Major,
       newSeverity = Okay,
       expectedLatchedSeverity = Major
     ),
     SetSeverityTestCase(
       alarmKey = AlarmKey(AOESW, "test_component", "IsNotHigher_WasDisconnected"),
-      oldSeverity = Disconnected,
+      oldLatchedSeverity = Disconnected,
       newSeverity = Okay,
       expectedLatchedSeverity = Okay
     )

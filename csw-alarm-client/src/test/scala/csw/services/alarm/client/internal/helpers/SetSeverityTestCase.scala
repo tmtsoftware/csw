@@ -5,7 +5,7 @@ import csw.services.alarm.api.models.Key.AlarmKey
 
 case class SetSeverityTestCase(
     alarmKey: AlarmKey,
-    oldSeverity: FullAlarmSeverity,
+    oldLatchedSeverity: FullAlarmSeverity,
     newSeverity: AlarmSeverity,
     expectedLatchedSeverity: FullAlarmSeverity
 ) {
