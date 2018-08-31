@@ -56,7 +56,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
     val cmd      = Options(cmd = "init", filePath = Some(filePath), isLocal = true, reset = true)
 
-    resetAlarmStore().futureValue
+    clearAlarmStore().futureValue
     a[KeyNotFoundException] shouldBe thrownBy(getMetadata(GlobalKey).await)
 
     commandExecutor.execute(cmd) //initialize alarm store
@@ -80,7 +80,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
     val cmd = Options(cmd = "init", filePath = Some(configPath), reset = true)
 
-    resetAlarmStore().futureValue
+    clearAlarmStore().futureValue
     a[KeyNotFoundException] shouldBe thrownBy(getMetadata(GlobalKey).await)
 
     commandExecutor.execute(cmd) //initialize alarm store
@@ -99,7 +99,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     val configPath = Paths.get("valid-alarms.conf")
     val cmd        = Options(cmd = "init", filePath = Some(configPath), reset = true)
 
-    resetAlarmStore().futureValue
+    clearAlarmStore().futureValue
     a[RuntimeException] shouldBe thrownBy(commandExecutor.execute(cmd))
     logBuffer shouldEqual List(failureMsg)
     a[KeyNotFoundException] shouldBe thrownBy(getMetadata(GlobalKey).await)

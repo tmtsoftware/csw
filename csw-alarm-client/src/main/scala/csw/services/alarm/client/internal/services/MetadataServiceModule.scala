@@ -56,11 +56,11 @@ trait MetadataServiceModule extends MetadataService {
   final override def initAlarms(inputConfig: Config, reset: Boolean): Future[Done] = async {
     log.debug(s"Initializing alarm store with reset [$reset] and alarms [$inputConfig]")
     val alarmMetadataSet = ConfigParser.parseAlarmMetadataSet(inputConfig)
-    if (reset) await(resetAlarmStore())
-    await(setAlarmStore(alarmMetadataSet))
+    if (reset) await(clearAlarmStore())
+    await(feedAlarmStore(alarmMetadataSet))
   }
 
-  private def setAlarmStore(alarmMetadataSet: AlarmMetadataSet): Future[Done] = {
+  private def feedAlarmStore(alarmMetadataSet: AlarmMetadataSet): Future[Done] = {
     val alarms                                = alarmMetadataSet.alarms
     val metadataMap                           = alarms.map(metadata ⇒ MetadataKey.fromAlarmKey(metadata.alarmKey) → metadata).toMap
     val statusMap: Map[AlarmKey, AlarmStatus] = alarms.map(metadata ⇒ metadata.alarmKey → AlarmStatus()).toMap
@@ -76,8 +76,8 @@ trait MetadataServiceModule extends MetadataService {
       .map(_ ⇒ Done)
   }
 
-  private[alarm] def resetAlarmStore(): Future[Done] = {
-    log.debug("Resetting alarm store")
+  private[alarm] def clearAlarmStore(): Future[Done] = {
+    log.debug("Clearing alarm store")
     Future
       .sequence(
         List(
