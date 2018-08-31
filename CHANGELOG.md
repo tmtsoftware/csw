@@ -9,11 +9,11 @@ The product is in a new repository: [csw-prod](https://github.com/tmtsoftware/cs
 
 All notable changes to this project will be documented in this file.
 
-## [CSW v0.5.0] - 2018-08-14
+## [CSW v0.5.0] - 2018-08-31
 
 This is version 0.5 the second release of the TMT Common Software for project stakeholders. 
 This release includes Event Service.
-See [here](https://tmtsoftware.github.io/csw-prod/0.5.0-RC1/) for a detailed documentation of this version of the CSW software.
+See [here](https://tmtsoftware.github.io/csw-prod/0.5.0/) for a detailed documentation of this version of the CSW software.
 
 #### New Features
 - Event Service
@@ -22,6 +22,7 @@ See [here](https://tmtsoftware.github.io/csw-prod/0.5.0-RC1/) for a detailed doc
     - Updated giter8 template
 #### Bug Fixes
 - Prefix missing in Akka location (CSW-11)
+- Protobuf serde fails for Java keys/parameters (DEOPSCSW-495)
 #### Requests
 - CurrentState missing StateName (CSW-1)
 - CurrentState pubsub by StateName
