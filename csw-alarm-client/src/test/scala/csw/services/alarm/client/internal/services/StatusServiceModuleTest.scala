@@ -32,7 +32,9 @@ class StatusServiceModuleTest
   // DEOPSCSW-500: Update alarm time on current severity change
   test("reset should not update time when severity does not change") {
     // Initially latch and current are disconnected
-    getStatus(tromboneAxisLowLimitAlarmKey).await.latchedSeverity shouldEqual Disconnected
+    val defaultStatus = getStatus(tromboneAxisLowLimitAlarmKey).await
+    defaultStatus.latchedSeverity shouldEqual Disconnected
+    defaultStatus.acknowledgementStatus shouldEqual Acknowledged
     getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldEqual Disconnected
 
     // Simulates initial component going to Okay and acknowledged status
@@ -49,6 +51,9 @@ class StatusServiceModuleTest
 
   // DEOPSCSW-447: Simple test to check behavior of latch and reset
   test("simple test to check behavior of latch and reset") {
+    getStatus(tromboneAxisLowLimitAlarmKey).await.latchedSeverity shouldEqual Disconnected
+    getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldEqual Disconnected
+
     // Move over disconnected
     setSeverityAndGetStatus(tromboneAxisLowLimitAlarmKey, Okay).latchedSeverity shouldEqual Okay
     getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldEqual Okay
@@ -79,6 +84,10 @@ class StatusServiceModuleTest
   // DEOPSCSW-494: Incorporate changes in set severity, reset, acknowledgement and latch status
   List(Okay, Warning, Major, Indeterminate, Critical).foreach { currentSeverity =>
     test(s"reset should set latchedSeverity to current severity when current severity is $currentSeverity") {
+      val defaultStatus = getStatus(tromboneAxisLowLimitAlarmKey).await
+      defaultStatus.latchedSeverity shouldEqual Disconnected
+      defaultStatus.acknowledgementStatus shouldEqual Acknowledged
+      getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldEqual Disconnected
 
       // setup current severity - this does not change status
       // NOTE: This is different API than setSeverity which updates severity and status
@@ -103,6 +112,11 @@ class StatusServiceModuleTest
   // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
   // DEOPSCSW-494: Incorporate changes in set severity, reset, acknowledgement and latch status
   test("reset should set latchedSeverity to current severity when current severity is Disconnected") {
+    val defaultStatus = getStatus(tromboneAxisLowLimitAlarmKey).await
+    defaultStatus.latchedSeverity shouldEqual Disconnected
+    defaultStatus.acknowledgementStatus shouldEqual Acknowledged
+    getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldEqual Disconnected
+
     //set current and latched severity to warning
     setSeverity(tromboneAxisLowLimitAlarmKey, Warning).await
 
@@ -137,6 +151,9 @@ class StatusServiceModuleTest
 
   // DEOPSCSW-446: Acknowledge api for alarm
   test("acknowledge should set acknowledgementStatus to Acknowledged of an alarm") {
+    getStatus(tromboneAxisLowLimitAlarmKey).await.acknowledgementStatus shouldEqual Acknowledged
+    getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldEqual Disconnected
+
     // set latched severity to Warning which will result status to be Latched and Unacknowledged
     val status1 = setSeverityAndGetStatus(tromboneAxisLowLimitAlarmKey, Warning)
     status1.acknowledgementStatus shouldBe Unacknowledged
@@ -149,6 +166,7 @@ class StatusServiceModuleTest
   // DEOPSCSW-446: Acknowledge api for alarm
   test("unacknowledge should set acknowledgementStatus to Unacknowledged of an alarm") {
     getStatus(tromboneAxisLowLimitAlarmKey).await.acknowledgementStatus shouldBe Acknowledged
+    getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldEqual Disconnected
 
     // set latched severity to Okay which will result status to be Latched and Acknowledged
     setSeverity(tromboneAxisLowLimitAlarmKey, Okay).await
@@ -200,7 +218,7 @@ class StatusServiceModuleTest
   // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
   test("unshelve should update the alarm status to unshelved") {
     // initialize alarm with Shelved status just for this test
-    setStatus(tromboneAxisHighLimitAlarmKey, AlarmStatus().copy(shelveStatus = Shelved)).await
+    shelve(tromboneAxisHighLimitAlarmKey).await
     getStatus(tromboneAxisHighLimitAlarmKey).await.shelveStatus shouldBe Shelved
 
     unshelve(tromboneAxisHighLimitAlarmKey).await

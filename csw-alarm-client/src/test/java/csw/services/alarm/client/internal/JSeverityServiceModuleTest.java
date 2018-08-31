@@ -24,7 +24,7 @@ import static org.hamcrest.CoreMatchers.isA;
 import static org.junit.Assert.*;
 
 // DEOPSCSW-444: Set severity api for component
-public class JAlarmServiceImplTest {
+public class JSeverityServiceModuleTest {
 
     private static AlarmServiceTestSetup alarmServiceTestSetup = new AlarmServiceTestSetup();
     private static IAlarmService jAlarmService = alarmServiceTestSetup.jAlarmService();
@@ -61,10 +61,10 @@ public class JAlarmServiceImplTest {
         AlarmKey tromboneAxisHighLimitAlarm = new AlarmKey(JSubsystem.NFIRAOS, "trombone", "tromboneAxisHighLimitAlarm");
 
         FullAlarmSeverity initialSeverity = Await.result(alarmService.getCurrentSeverity(tromboneAxisHighLimitAlarm), new FiniteDuration(2, TimeUnit.SECONDS));
-        assertEquals(initialSeverity, JAlarmSeverity.Disconnected);
+        assertEquals(JAlarmSeverity.Disconnected, initialSeverity);
 
         AlarmStatus initialStatus = getStatus(tromboneAxisHighLimitAlarm);
-        assertEquals( AcknowledgementStatus.Acknowledged$.MODULE$,initialStatus.acknowledgementStatus());
+        assertEquals(AcknowledgementStatus.Acknowledged$.MODULE$,initialStatus.acknowledgementStatus());
         assertEquals(JAlarmSeverity.Disconnected,initialStatus.latchedSeverity());
 
         //set severity to Major
@@ -99,10 +99,10 @@ public class JAlarmServiceImplTest {
         AlarmKey tromboneAxisHighLimitAlarm = new AlarmKey(JSubsystem.NFIRAOS, "trombone", "tromboneAxisHighLimitAlarm");
 
         FullAlarmSeverity initialSeverity = Await.result(alarmService.getCurrentSeverity(tromboneAxisHighLimitAlarm), new FiniteDuration(2, TimeUnit.SECONDS));
-        assertEquals(initialSeverity, JAlarmSeverity.Disconnected);
+        assertEquals(JAlarmSeverity.Disconnected, initialSeverity);
 
         AlarmStatus initialStatus = getStatus(tromboneAxisHighLimitAlarm);
-        assertEquals( AcknowledgementStatus.Acknowledged$.MODULE$,initialStatus.acknowledgementStatus());
+        assertEquals(AcknowledgementStatus.Acknowledged$.MODULE$,initialStatus.acknowledgementStatus());
         assertEquals(JAlarmSeverity.Disconnected,initialStatus.latchedSeverity());
 
 
@@ -129,7 +129,7 @@ public class JAlarmServiceImplTest {
         AlarmKey tromboneAxisLowLimitAlarm = new AlarmKey(JSubsystem.NFIRAOS, "trombone", "tromboneAxisHighLimitAlarm");
 
         FullAlarmSeverity initialSeverity = Await.result(alarmService.getCurrentSeverity(tromboneAxisLowLimitAlarm), new FiniteDuration(2, TimeUnit.SECONDS));
-        assertEquals(initialSeverity, JAlarmSeverity.Disconnected);
+        assertEquals(JAlarmSeverity.Disconnected, initialSeverity);
 
         AlarmStatus initialStatus = getStatus(tromboneAxisLowLimitAlarm);
         assertEquals( AcknowledgementStatus.Acknowledged$.MODULE$,initialStatus.acknowledgementStatus());
@@ -146,16 +146,14 @@ public class JAlarmServiceImplTest {
     public void setSeverity_shouldNotUpdateAlarmTimeWhenSeverityDoesNotChange() throws Exception {
         // latchable alarm
         AlarmKey highLimitAlarmKey = new AlarmKey(JSubsystem.NFIRAOS, "trombone", "tromboneAxisHighLimitAlarm");
-
         AlarmTime defaultAlarmTime = getStatus(highLimitAlarmKey).alarmTime();
 
         // latch it to major
         AlarmStatus status = setSeverityAndGetStatus(highLimitAlarmKey, JAlarmSeverity.Major);
+        assertTrue(status.alarmTime().time().isAfter(defaultAlarmTime.time()));
 
         // set the severity again to mimic alarm refreshing
         AlarmStatus status1 = setSeverityAndGetStatus(highLimitAlarmKey, JAlarmSeverity.Major);
-
         assertEquals(status.alarmTime().time(), status1.alarmTime().time());
-        assertTrue(status.alarmTime().time().isAfter(defaultAlarmTime.time()));
     }
 }

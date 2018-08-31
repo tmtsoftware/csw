@@ -96,6 +96,9 @@ class MetadataServiceModuleTest
   val twoAlarmsConfig: Config  = ConfigFactory.parseResources("test-alarms/two-valid-alarms.conf")
 
   test("initAlarms should load alarms from provided config file") {
+    clearAlarmStore().await
+    a[KeyNotFoundException] shouldBe thrownBy(getMetadata(GlobalKey).await)
+
     initTestAlarms()
 
     // valid-alarms.conf contains 4 alarms
@@ -111,6 +114,9 @@ class MetadataServiceModuleTest
   }
 
   test("initAlarms should reset the previous alarm data in redis and load with newly provided") {
+    clearAlarmStore().await
+    a[KeyNotFoundException] shouldBe thrownBy(getMetadata(GlobalKey).await)
+
     // valid-alarms.conf contains 4 alarms, cpuExceededAlarm is one of them
     initAlarms(fourAlarmsConfig, reset = true).await
     getMetadata(GlobalKey).await.size shouldBe 4
@@ -133,6 +139,9 @@ class MetadataServiceModuleTest
   }
 
   test("initAlarm with reset should not delete keys other than alarm service, for example sentinel related keys") {
+    clearAlarmStore().await
+    a[KeyNotFoundException] shouldBe thrownBy(getMetadata(GlobalKey).await)
+
     // two-valid-alarms.conf contains 2 alarms
     initAlarms(twoAlarmsConfig, reset = true).await
     getMetadata(GlobalKey).await.size shouldBe 2
@@ -148,6 +157,9 @@ class MetadataServiceModuleTest
   }
 
   test("initAlarm with reset=false should preserve existing alarm keys") {
+    clearAlarmStore().await
+    a[KeyNotFoundException] shouldBe thrownBy(getMetadata(GlobalKey).await)
+
     // cpuExceededAlarm present in this file
     initAlarms(fourAlarmsConfig, reset = true).await
     getMetadata(GlobalKey).await.size shouldBe 4

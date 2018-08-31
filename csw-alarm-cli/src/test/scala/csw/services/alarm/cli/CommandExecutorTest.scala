@@ -309,6 +309,9 @@ class CommandExecutorTest extends AlarmCliTestSetup {
       maybeAlarmName = Some(tromboneAxisLowLimitKey.name)
     )
 
+    getCurrentSeverity(tromboneAxisLowLimitKey).futureValue shouldBe Disconnected
+    getStatus(tromboneAxisLowLimitKey).futureValue.latchedSeverity shouldBe Disconnected
+
     setSeverity(tromboneAxisLowLimitKey, Major).futureValue
     setSeverity(tromboneAxisLowLimitKey, Okay).futureValue
     getStatus(tromboneAxisLowLimitKey).futureValue.latchedSeverity shouldBe Major
@@ -405,7 +408,9 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     )
 
     val (subscription, _) = alarmAdminClient.subscribeSeverity(cmd)
-    Thread.sleep(1000) //wait for subscription to finish
+    subscription.ready().futureValue
+
+    getCurrentSeverity(tromboneAxisHighLimitKey).futureValue shouldBe Disconnected
 
     setSeverity(tromboneAxisHighLimitKey, Major).futureValue
     setSeverity(tromboneAxisHighLimitKey, Okay).futureValue
@@ -510,7 +515,9 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     )
 
     val (subscription, _) = alarmAdminClient.subscribeHealth(cmd)
-    Thread.sleep(1000) //wait for subscription to finish
+    subscription.ready().futureValue
+
+    getCurrentSeverity(tromboneAxisHighLimitKey).futureValue shouldBe Disconnected
 
     setSeverity(tromboneAxisHighLimitKey, Major).futureValue
     setSeverity(tromboneAxisHighLimitKey, Okay).futureValue

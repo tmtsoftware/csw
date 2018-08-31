@@ -5,9 +5,10 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import com.typesafe.config.ConfigFactory
 import csw.messages.params.models.Subsystem.{BAD, LGSF, NFIRAOS, TCS}
 import csw.services.alarm.api.exceptions.{InactiveAlarmException, KeyNotFoundException}
-import csw.services.alarm.api.models.{AlarmHealth, AlarmStatus}
+import csw.services.alarm.api.models.AlarmHealth
 import csw.services.alarm.api.models.AlarmHealth.{Bad, Good, Ill}
 import csw.services.alarm.api.models.AlarmSeverity._
+import csw.services.alarm.api.models.FullAlarmSeverity.Disconnected
 import csw.services.alarm.api.models.Key.{ComponentKey, GlobalKey, SubsystemKey}
 import csw.services.alarm.api.models.ShelveStatus.Shelved
 import csw.services.alarm.client.internal.helpers.AlarmServiceTestSetup
@@ -29,6 +30,7 @@ class HealthServiceModuleTest
 
   // DEOPSCSW-466: Fetch health for a given alarm, component name or a subsystem name
   test("getAggregatedHealth should get aggregated health for a alarm") {
+    getCurrentSeverity(tromboneAxisHighLimitAlarmKey).await shouldBe Disconnected
     getAggregatedHealth(tromboneAxisHighLimitAlarmKey).await shouldBe Bad
 
     setSeverity(tromboneAxisHighLimitAlarmKey, Okay).await
@@ -46,6 +48,9 @@ class HealthServiceModuleTest
     val tromboneKey = ComponentKey(NFIRAOS, "trombone")
     getAggregatedHealth(tromboneKey).await shouldBe Bad
 
+    getCurrentSeverity(tromboneAxisHighLimitAlarmKey).await shouldBe Disconnected
+    getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldBe Disconnected
+
     setSeverity(tromboneAxisHighLimitAlarmKey, Okay).await
     setSeverity(tromboneAxisLowLimitAlarmKey, Major).await
 
@@ -56,6 +61,9 @@ class HealthServiceModuleTest
   test("getAggregatedHealth should get aggregated health for a subsystem") {
     val tromboneKey = SubsystemKey(TCS)
     getAggregatedHealth(tromboneKey).await shouldBe Bad
+
+    getCurrentSeverity(cpuExceededAlarmKey).await shouldBe Disconnected
+    getCurrentSeverity(outOfRangeOffloadAlarmKey).await shouldBe Disconnected
 
     setSeverity(cpuExceededAlarmKey, Okay).await
     setSeverity(outOfRangeOffloadAlarmKey, Major).await
@@ -70,6 +78,8 @@ class HealthServiceModuleTest
     initAlarms(validAlarmsConfig, reset = true).await
 
     getAggregatedHealth(GlobalKey).await shouldBe Bad
+    getCurrentSeverity(tromboneAxisHighLimitAlarmKey).await shouldBe Disconnected
+    getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldBe Disconnected
 
     setSeverity(tromboneAxisHighLimitAlarmKey, Okay).await
     setSeverity(tromboneAxisLowLimitAlarmKey, Major).await
@@ -80,8 +90,9 @@ class HealthServiceModuleTest
   // DEOPSCSW-448: Set Activation status for an alarm entity
   // DEOPSCSW-466: Fetch health for a given alarm, component name or a subsystem name
   test("getAggregatedHealth should not consider inactive alarms for health aggregation") {
-
     getAggregatedHealth(GlobalKey).await shouldBe Bad
+    getCurrentSeverity(enclosureTempLowAlarmKey).await shouldBe Disconnected
+    getCurrentSeverity(enclosureTempHighAlarmKey).await shouldBe Disconnected
 
     enclosureTempHighAlarm.isActive shouldBe true
     setSeverity(enclosureTempHighAlarmKey, Okay).await
@@ -99,7 +110,8 @@ class HealthServiceModuleTest
     val componentKey = ComponentKey(cpuExceededAlarmKey.subsystem, cpuExceededAlarmKey.component)
     getAggregatedHealth(componentKey).await shouldBe Bad
 
-    setStatus(cpuExceededAlarmKey, AlarmStatus().copy(shelveStatus = Shelved))
+    shelve(cpuExceededAlarmKey).await
+    getStatus(cpuExceededAlarmKey).await.shelveStatus shouldBe Shelved
 
     setSeverity(cpuExceededAlarmKey, Okay).await
     getAggregatedHealth(componentKey).await shouldBe Good
@@ -120,15 +132,14 @@ class HealthServiceModuleTest
 
   // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem or all
   test("subscribe aggregated health via callback for an alarm") {
-
     getAggregatedHealth(GlobalKey).await shouldBe Bad
+    getCurrentSeverity(tromboneAxisHighLimitAlarmKey).await shouldBe Disconnected
+    getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldBe Disconnected
 
     // alarm subscription - nfiraos.trombone.tromboneAxisLowLimitAlarm
     val testProbe         = TestProbe[AlarmHealth]()(actorSystem.toTyped)
     val alarmSubscription = subscribeAggregatedHealthCallback(tromboneAxisLowLimitAlarmKey, testProbe.ref ! _)
     alarmSubscription.ready().await
-
-    Thread.sleep(500) // wait for redis connection to happen
 
     setSeverity(tromboneAxisLowLimitAlarmKey, Major).await
 
@@ -147,15 +158,14 @@ class HealthServiceModuleTest
 
   // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem or all
   test("subscribe aggregated health via callback for a subsystem") {
-
     getAggregatedHealth(GlobalKey).await shouldBe Bad
+    getCurrentSeverity(cpuExceededAlarmKey).await shouldBe Disconnected
+    getCurrentSeverity(tromboneAxisHighLimitAlarmKey).await shouldBe Disconnected
 
     // subsystem subscription - tcs
     val testProbe         = TestProbe[AlarmHealth]()(actorSystem.toTyped)
     val alarmSubscription = subscribeAggregatedHealthCallback(SubsystemKey(TCS), testProbe.ref ! _)
     alarmSubscription.ready().await
-
-    Thread.sleep(500) // wait for redis connection to happen
 
     setSeverity(cpuExceededAlarmKey, Major).await
 
@@ -170,15 +180,13 @@ class HealthServiceModuleTest
 
   // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem or all
   test("subscribe aggregated health via callback for a component") {
-
     getAggregatedHealth(GlobalKey).await shouldBe Bad
+    getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldBe Disconnected
 
     // component subscription - nfiraos.trombone
     val testProbe         = TestProbe[AlarmHealth]()(actorSystem.toTyped)
     val alarmSubscription = subscribeAggregatedHealthCallback(ComponentKey(NFIRAOS, "trombone"), testProbe.ref ! _)
     alarmSubscription.ready().await
-
-    Thread.sleep(500) // wait for redis connection to happen
 
     setSeverity(tromboneAxisLowLimitAlarmKey, Major).await
 
@@ -191,15 +199,15 @@ class HealthServiceModuleTest
   // DEOPSCSW-448: Set Activation status for an alarm entity
   // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem or all
   test("subscribeAggregatedHealthCallback should not consider inactive alarm for aggregation") {
-
     getAggregatedHealth(GlobalKey).await shouldBe Bad
+    getCurrentSeverity(enclosureTempHighAlarmKey).await shouldBe Disconnected
+    getCurrentSeverity(enclosureTempLowAlarmKey).await shouldBe Disconnected
 
     val testProbe = TestProbe[AlarmHealth]()(actorSystem.toTyped)
     val alarmSubscription =
       subscribeAggregatedHealthCallback(ComponentKey(NFIRAOS, "enclosure"), testProbe.ref ! _)
     alarmSubscription.ready().await
 
-    Thread.sleep(500) // wait for redis connection to happen
     enclosureTempHighAlarm.isActive shouldBe true
     setSeverity(enclosureTempHighAlarmKey, Okay).await
 
@@ -241,15 +249,14 @@ class HealthServiceModuleTest
 
   // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem or all
   test("subscribe aggregated health via actorRef for a subsystem") {
-
     getAggregatedHealth(GlobalKey).await shouldBe Bad
+    getCurrentSeverity(cpuExceededAlarmKey).await shouldBe Disconnected
+    getCurrentSeverity(tromboneAxisHighLimitAlarmKey).await shouldBe Disconnected
 
     // subsystem subscription - tcs
     val testProbe         = TestProbe[AlarmHealth]()(actorSystem.toTyped)
     val alarmSubscription = subscribeAggregatedHealthActorRef(SubsystemKey(TCS), testProbe.ref)
     alarmSubscription.ready().await
-
-    Thread.sleep(500) // wait for redis connection to happen
 
     setSeverity(cpuExceededAlarmKey, Okay).await
 
@@ -264,15 +271,16 @@ class HealthServiceModuleTest
 
   // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
   test("shelved alarms should be considered in health aggregation") {
-
     getAggregatedHealth(GlobalKey).await shouldBe Bad
+    getCurrentSeverity(cpuExceededAlarmKey).await shouldBe Disconnected
 
     val testProbe         = TestProbe[AlarmHealth]()(actorSystem.toTyped)
     val alarmSubscription = subscribeAggregatedHealthActorRef(SubsystemKey(TCS), testProbe.ref)
     alarmSubscription.ready().await
 
     // initialize alarm with Shelved status just for this test
-    setStatus(cpuExceededAlarmKey, AlarmStatus().copy(shelveStatus = Shelved))
+    shelve(cpuExceededAlarmKey).await
+    getStatus(cpuExceededAlarmKey).await.shelveStatus shouldBe Shelved
 
     // there is only one alarm in TCS.tcsPk component
     setSeverity(cpuExceededAlarmKey, Critical).await
