@@ -4,18 +4,19 @@ import java.nio.file.Paths
 
 import com.typesafe.config.ConfigFactory
 import csw.messages.params.models.Subsystem.{LGSF, NFIRAOS, TCS}
+import csw.services.alarm.api.exceptions.KeyNotFoundException
+import csw.services.alarm.api.internal.Separators.KeySeparator
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
 import csw.services.alarm.api.models.AlarmHealth.{Bad, Good, Ill}
 import csw.services.alarm.api.models.AlarmSeverity._
-import csw.services.alarm.api.models.AlarmStatus
-import csw.services.alarm.api.internal.Separators.KeySeparator
 import csw.services.alarm.api.models.FullAlarmSeverity.Disconnected
 import csw.services.alarm.api.models.Key.{AlarmKey, GlobalKey}
 import csw.services.alarm.api.models.ShelveStatus.{Shelved, Unshelved}
 import csw.services.alarm.cli.args.Options
 import csw.services.alarm.cli.utils.IterableExtensions.RichStringIterable
 import csw.services.alarm.client.internal.auto_refresh.AutoRefreshSeverityMessage.CancelAutoRefresh
+import csw.services.alarm.client.internal.helpers.TestFutureExt.RichFuture
 import csw.services.config.api.models.ConfigData
 import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.config.server.commons.TestFileUtils
@@ -53,9 +54,12 @@ class CommandExecutorTest extends AlarmCliTestSetup {
   // DEOPSCSW-470: CLI application to exercise and test the alarm API
   test("should initialize alarms in alarm store from local config") {
     val filePath = Paths.get(getClass.getResource("/valid-alarms.conf").getPath)
-    val args     = Options(cmd = "init", filePath = Some(filePath), isLocal = true, reset = true)
+    val cmd      = Options(cmd = "init", filePath = Some(filePath), isLocal = true, reset = true)
 
-    commandExecutor.execute(args)
+    resetAlarmStore().futureValue
+    a[KeyNotFoundException] shouldBe thrownBy(getMetadata(GlobalKey).await)
+
+    commandExecutor.execute(cmd) //initialize alarm store
     logBuffer shouldEqual List(successMsg)
 
     val metadata = getMetadata(GlobalKey).futureValue
@@ -74,13 +78,14 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     val configService = ConfigClientFactory.adminApi(system, locationService)
     configService.create(configPath, configData, comment = "commit test file").futureValue
 
-    val args = Options(cmd = "init", filePath = Some(configPath), reset = true)
-    commandExecutor.execute(args)
+    val cmd = Options(cmd = "init", filePath = Some(configPath), reset = true)
 
+    resetAlarmStore().futureValue
+    a[KeyNotFoundException] shouldBe thrownBy(getMetadata(GlobalKey).await)
+
+    commandExecutor.execute(cmd) //initialize alarm store
     logBuffer shouldEqual List(successMsg)
-
     val metadata = getMetadata(GlobalKey).futureValue
-
     metadata.map(_.alarmKey).toSet shouldEqual allAlarmKeys
 
     // clean up
@@ -92,9 +97,12 @@ class CommandExecutorTest extends AlarmCliTestSetup {
   // DEOPSCSW-470: CLI application to exercise and test the alarm API
   test("should fail to initialize alarms in alarm store when config service is down") {
     val configPath = Paths.get("valid-alarms.conf")
-    val args       = Options(cmd = "init", filePath = Some(configPath), reset = true)
-    an[RuntimeException] shouldBe thrownBy(commandExecutor.execute(args))
+    val cmd        = Options(cmd = "init", filePath = Some(configPath), reset = true)
+
+    resetAlarmStore().futureValue
+    a[RuntimeException] shouldBe thrownBy(commandExecutor.execute(cmd))
     logBuffer shouldEqual List(failureMsg)
+    a[KeyNotFoundException] shouldBe thrownBy(getMetadata(GlobalKey).await)
   }
 
   // DEOPSCSW-471: Acknowledge alarm from CLI application
@@ -106,10 +114,11 @@ class CommandExecutorTest extends AlarmCliTestSetup {
       maybeAlarmName = Some(tromboneAxisLowLimitKey.name)
     )
 
-    setStatus(tromboneAxisLowLimitKey, AlarmStatus().copy(acknowledgementStatus = Unacknowledged, latchedSeverity = Critical)).futureValue
-
+    unacknowledge(tromboneAxisLowLimitKey).futureValue
     getStatus(tromboneAxisLowLimitKey).futureValue.acknowledgementStatus shouldBe Unacknowledged
+
     commandExecutor.execute(cmd) // acknowledge the alarm
+
     getStatus(tromboneAxisLowLimitKey).futureValue.acknowledgementStatus shouldBe Acknowledged
     logBuffer shouldEqual List(successMsg)
   }
@@ -123,11 +132,8 @@ class CommandExecutorTest extends AlarmCliTestSetup {
       maybeAlarmName = Some(tromboneAxisLowLimitKey.name)
     )
 
-    acknowledge(tromboneAxisLowLimitKey).futureValue
     getStatus(tromboneAxisLowLimitKey).futureValue.acknowledgementStatus shouldBe Acknowledged
-
     commandExecutor.execute(cmd) // unacknowledge the alarm
-
     getStatus(tromboneAxisLowLimitKey).futureValue.acknowledgementStatus shouldBe Unacknowledged
     logBuffer shouldEqual List(successMsg)
   }
@@ -142,9 +148,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     )
 
     getMetadata(cpuIdleKey).futureValue.activationStatus shouldBe Inactive
-
     commandExecutor.execute(cmd) // activate the alarm
-
     getMetadata(cpuIdleKey).futureValue.activationStatus shouldBe Active
     logBuffer shouldEqual List(successMsg)
   }
@@ -157,9 +161,9 @@ class CommandExecutorTest extends AlarmCliTestSetup {
       maybeComponent = Some(tromboneAxisLowLimitKey.component),
       maybeAlarmName = Some(tromboneAxisLowLimitKey.name)
     )
+
     getMetadata(tromboneAxisLowLimitKey).futureValue.activationStatus shouldBe Active
     commandExecutor.execute(cmd) // deactivate the alarm
-
     getMetadata(tromboneAxisLowLimitKey).futureValue.activationStatus shouldBe Inactive
     logBuffer shouldEqual List(successMsg)
   }

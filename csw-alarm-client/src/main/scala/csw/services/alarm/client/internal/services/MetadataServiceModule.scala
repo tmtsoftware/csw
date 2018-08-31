@@ -76,7 +76,7 @@ trait MetadataServiceModule extends MetadataService {
       .map(_ ⇒ Done)
   }
 
-  private def resetAlarmStore(): Future[Done] = {
+  private[alarm] def resetAlarmStore(): Future[Done] = {
     log.debug("Resetting alarm store")
     Future
       .sequence(
