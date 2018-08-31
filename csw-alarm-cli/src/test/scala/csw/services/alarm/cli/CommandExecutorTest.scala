@@ -60,7 +60,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     a[KeyNotFoundException] shouldBe thrownBy(getMetadata(GlobalKey).await)
 
     commandExecutor.execute(cmd) //initialize alarm store
-    logBuffer shouldEqual List(successMsg)
+    logBuffer.toList shouldEqual List(successMsg)
 
     val metadata = getMetadata(GlobalKey).futureValue
 
@@ -84,7 +84,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     a[KeyNotFoundException] shouldBe thrownBy(getMetadata(GlobalKey).await)
 
     commandExecutor.execute(cmd) //initialize alarm store
-    logBuffer shouldEqual List(successMsg)
+    logBuffer.toList shouldEqual List(successMsg)
     val metadata = getMetadata(GlobalKey).futureValue
     metadata.map(_.alarmKey).toSet shouldEqual allAlarmKeys
 
@@ -101,7 +101,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
     clearAlarmStore().futureValue
     a[RuntimeException] shouldBe thrownBy(commandExecutor.execute(cmd))
-    logBuffer shouldEqual List(failureMsg)
+    logBuffer.toList shouldEqual List(failureMsg)
     a[KeyNotFoundException] shouldBe thrownBy(getMetadata(GlobalKey).await)
   }
 
@@ -120,7 +120,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     commandExecutor.execute(cmd) // acknowledge the alarm
 
     getStatus(tromboneAxisLowLimitKey).futureValue.acknowledgementStatus shouldBe Acknowledged
-    logBuffer shouldEqual List(successMsg)
+    logBuffer.toList shouldEqual List(successMsg)
   }
 
   // DEOPSCSW-471: Acknowledge alarm from CLI application
@@ -135,7 +135,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     getStatus(tromboneAxisLowLimitKey).futureValue.acknowledgementStatus shouldBe Acknowledged
     commandExecutor.execute(cmd) // unacknowledge the alarm
     getStatus(tromboneAxisLowLimitKey).futureValue.acknowledgementStatus shouldBe Unacknowledged
-    logBuffer shouldEqual List(successMsg)
+    logBuffer.toList shouldEqual List(successMsg)
   }
 
   // DEOPSCSW-472: Exercise Alarm CLI for activate/out of service alarm behaviour
@@ -150,7 +150,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     getMetadata(cpuIdleKey).futureValue.activationStatus shouldBe Inactive
     commandExecutor.execute(cmd) // activate the alarm
     getMetadata(cpuIdleKey).futureValue.activationStatus shouldBe Active
-    logBuffer shouldEqual List(successMsg)
+    logBuffer.toList shouldEqual List(successMsg)
   }
 
   // DEOPSCSW-472: Exercise Alarm CLI for activate/out of service alarm behaviour
@@ -165,7 +165,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     getMetadata(tromboneAxisLowLimitKey).futureValue.activationStatus shouldBe Active
     commandExecutor.execute(cmd) // deactivate the alarm
     getMetadata(tromboneAxisLowLimitKey).futureValue.activationStatus shouldBe Inactive
-    logBuffer shouldEqual List(successMsg)
+    logBuffer.toList shouldEqual List(successMsg)
   }
 
   // DEOPSCSW-473: Shelve/Unshelve alarm from CLI interface
@@ -180,7 +180,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     getStatus(tromboneAxisLowLimitKey).futureValue.shelveStatus shouldBe Unshelved
     commandExecutor.execute(cmd) // shelve the alarm
     getStatus(tromboneAxisLowLimitKey).futureValue.shelveStatus shouldBe Shelved
-    logBuffer shouldEqual List(successMsg)
+    logBuffer.toList shouldEqual List(successMsg)
   }
 
   // DEOPSCSW-473: Shelve/Unshelve alarm from CLI interface
@@ -198,7 +198,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     commandExecutor.execute(cmd) // unshelve the alarm
 
     getStatus(tromboneAxisLowLimitKey).futureValue.shelveStatus shouldBe Unshelved
-    logBuffer shouldEqual List(successMsg)
+    logBuffer.toList shouldEqual List(successMsg)
   }
 
   // DEOPSCSW-492: Fetch all alarms' metadata from CLI Interface (list all alarms)
@@ -207,7 +207,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     val cmd = Options("list")
 
     commandExecutor.execute(cmd)
-    logBuffer shouldEqualContentsOf "list/all_alarms.txt"
+    logBuffer.toList shouldEqualContentsOf "list/all_alarms.txt"
   }
 
   // DEOPSCSW-492: Fetch all alarms' metadata from CLI Interface (list all alarms)
@@ -216,7 +216,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     val cmd = Options("list", maybeSubsystem = Some(NFIRAOS))
 
     commandExecutor.execute(cmd)
-    logBuffer shouldEqualContentsOf "list/subsystem_alarms.txt"
+    logBuffer.toList shouldEqualContentsOf "list/subsystem_alarms.txt"
   }
 
   // DEOPSCSW-492: Fetch all alarms' metadata from CLI Interface (list all alarms)
@@ -229,7 +229,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     )
 
     commandExecutor.execute(cmd)
-    logBuffer shouldEqualContentsOf "list/component_alarms.txt"
+    logBuffer.toList shouldEqualContentsOf "list/component_alarms.txt"
   }
 
   // DEOPSCSW-492: Fetch all alarms' metadata from CLI Interface (list all alarms)
@@ -243,7 +243,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     )
 
     commandExecutor.execute(cmd)
-    logBuffer shouldEqualContentsOf "list/with_name_alarms.txt"
+    logBuffer.toList shouldEqualContentsOf "list/with_name_alarms.txt"
   }
 
   // DEOPSCSW-492: Fetch all alarms' metadata from CLI Interface (list all alarms)
@@ -258,7 +258,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     )
 
     commandExecutor.execute(cmd)
-    logBuffer shouldEqualContentsOf "metadata.txt"
+    logBuffer.toList shouldEqualContentsOf "metadata.txt"
   }
 
   // DEOPSCSW-492: Fetch all alarms' metadata from CLI Interface (list all alarms)
@@ -275,7 +275,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
     commandExecutor.execute(cmd)
     // alarm time changes on every run hence filter out time before assertion
-    logBuffer shouldEqualContentsOf "status.txt"
+    logBuffer.toList shouldEqualContentsOf "status.txt"
 
   }
 
@@ -297,7 +297,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
     commandExecutor.execute(invalidComponentCmd)
     commandExecutor.execute(invalidAlarmNameCmd)
-    logBuffer shouldEqual Array.fill(2)("No matching keys found.")
+    logBuffer.toList shouldEqual Array.fill(2)("No matching keys found.")
   }
 
   // DEOPSCSW-474: Latch an alarm from CLI Interface
@@ -315,7 +315,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
     commandExecutor.execute(cmd) // reset latch severity of the alarm
 
-    logBuffer shouldEqual List(successMsg)
+    logBuffer.toList shouldEqual List(successMsg)
     getStatus(tromboneAxisLowLimitKey).futureValue.latchedSeverity shouldBe Okay
   }
 
@@ -335,7 +335,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     getCurrentSeverity(tromboneAxisHighLimitKey).futureValue shouldBe Disconnected
     commandExecutor.execute(cmd) // update severity of an alarm
     getCurrentSeverity(tromboneAxisHighLimitKey).futureValue shouldBe Major
-    logBuffer shouldEqual List(successMsg)
+    logBuffer.toList shouldEqual List(successMsg)
   }
 
   // DEOPSCSW-476: Fetch alarm severity from CLI Interface
@@ -351,7 +351,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     )
 
     commandExecutor.execute(cmd)
-    logBuffer shouldEqual List(s"Severity of Alarm [${cmd.alarmKey}]: $Okay")
+    logBuffer.toList shouldEqual List(s"Severity of Alarm [${cmd.alarmKey}]: $Okay")
   }
 
   // DEOPSCSW-476: Fetch alarm severity from CLI Interface
@@ -367,7 +367,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     )
 
     commandExecutor.execute(cmd)
-    logBuffer shouldEqual List(
+    logBuffer.toList shouldEqual List(
       s"Aggregated Severity of Component [${tromboneAxisHighLimitKey.subsystem}$KeySeparator${tromboneAxisHighLimitKey.component}]: $Major"
     )
   }
@@ -381,7 +381,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     )
 
     commandExecutor.execute(cmd)
-    logBuffer shouldEqual List(s"Aggregated Severity of Subsystem [${cmd.maybeSubsystem.get}]: $Disconnected")
+    logBuffer.toList shouldEqual List(s"Aggregated Severity of Subsystem [${cmd.maybeSubsystem.get}]: $Disconnected")
   }
 
   // DEOPSCSW-476: Fetch alarm severity from CLI Interface
@@ -391,7 +391,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     val cmd = Options(cmd = "severity", subCmd = "get")
 
     commandExecutor.execute(cmd)
-    logBuffer shouldEqual List(s"Aggregated Severity of Alarm Service: $Disconnected")
+    logBuffer.toList shouldEqual List(s"Aggregated Severity of Alarm Service: $Disconnected")
   }
 
   // DEOPSCSW-467: Monitor alarm severities in the alarm store for a single alarm, component, subsystem, or all
@@ -410,7 +410,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     setSeverity(tromboneAxisHighLimitKey, Major).futureValue
     setSeverity(tromboneAxisHighLimitKey, Okay).futureValue
 
-    logBuffer shouldEqual List(
+    logBuffer.toList shouldEqual List(
       s"Severity of Alarm [$tromboneAxisHighLimitKey]: $Major",
       s"Severity of Alarm [$tromboneAxisHighLimitKey]: $Okay"
     )
@@ -438,7 +438,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     getCurrentSeverity(tromboneAxisHighLimitKey).futureValue shouldBe Major
 
     val expectedMsg = s"Severity for [$tromboneAxisHighLimitKey] refreshed to: $Major"
-    logBuffer shouldEqual List(expectedMsg, expectedMsg)
+    logBuffer.toList shouldEqual List(expectedMsg, expectedMsg)
     actorRef ! CancelAutoRefresh(tromboneAxisHighLimitKey)
   }
 
@@ -455,7 +455,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     )
 
     commandExecutor.execute(cmd)
-    logBuffer shouldEqual List(s"Health of Alarm [${cmd.alarmKey}]: $Bad")
+    logBuffer.toList shouldEqual List(s"Health of Alarm [${cmd.alarmKey}]: $Bad")
   }
 
   // DEOPSCSW-478: Fetch health of component/subsystem from CLI Interface
@@ -471,7 +471,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     )
 
     commandExecutor.execute(cmd)
-    logBuffer shouldEqual List(
+    logBuffer.toList shouldEqual List(
       s"Aggregated Health of Component [${tromboneAxisHighLimitKey.subsystem}$KeySeparator${tromboneAxisHighLimitKey.component}]: $Ill"
     )
   }
@@ -488,7 +488,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     )
 
     commandExecutor.execute(cmd)
-    logBuffer shouldEqual List(s"Aggregated Health of Subsystem [${cmd.maybeSubsystem.get}]: $Good")
+    logBuffer.toList shouldEqual List(s"Aggregated Health of Subsystem [${cmd.maybeSubsystem.get}]: $Good")
   }
 
   // DEOPSCSW-478: Fetch health of component/subsystem from CLI Interface
@@ -496,7 +496,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     val cmd = Options(cmd = "health", subCmd = "get")
 
     commandExecutor.execute(cmd)
-    logBuffer shouldEqual List(s"Aggregated Health of Alarm Service: $Bad")
+    logBuffer.toList shouldEqual List(s"Aggregated Health of Alarm Service: $Bad")
   }
 
   // DEOPSCSW-479: Subscribe to health changes of component/subsystem/all alarms using CLI Interface
@@ -515,7 +515,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     setSeverity(tromboneAxisHighLimitKey, Major).futureValue
     setSeverity(tromboneAxisHighLimitKey, Okay).futureValue
 
-    logBuffer shouldEqual List(
+    logBuffer.toList shouldEqual List(
       s"Health of Alarm [$tromboneAxisHighLimitKey]: $Ill",
       s"Health of Alarm [$tromboneAxisHighLimitKey]: $Good"
     )
