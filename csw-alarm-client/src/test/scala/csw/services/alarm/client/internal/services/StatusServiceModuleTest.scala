@@ -31,19 +31,19 @@ class StatusServiceModuleTest
   // DEOPSCSW-447: Reset api for alarm
   // DEOPSCSW-500: Update alarm time on current severity change
   test("reset should not update time when severity does not change") {
-    // Initially latch and current are disconencted
+    // Initially latch and current are disconnected
     getStatus(tromboneAxisLowLimitAlarmKey).await.latchedSeverity shouldEqual Disconnected
     getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldEqual Disconnected
 
-    // Simulates initial component updating to Okay
+    // Simulates initial component going to Okay and acknowledged status
     val status = setSeverityAndGetStatus(tromboneAxisLowLimitAlarmKey, Okay)
-
+    status.latchedSeverity shouldBe Okay
     acknowledge(tromboneAxisLowLimitAlarmKey).await
+    getStatus(tromboneAxisLowLimitAlarmKey).await.acknowledgementStatus shouldBe Acknowledged
 
-    // reset the alarm, which will make alarm to go to un-acknowledged
+    // reset the alarm and verify that time does not change
     reset(tromboneAxisLowLimitAlarmKey).await
     val statusAfterReset = getStatus(tromboneAxisLowLimitAlarmKey).await
-
     statusAfterReset.alarmTime.time shouldEqual status.alarmTime.time
   }
 
@@ -80,9 +80,10 @@ class StatusServiceModuleTest
   List(Okay, Warning, Major, Indeterminate, Critical).foreach { currentSeverity =>
     test(s"reset should set latchedSeverity to current severity when current severity is $currentSeverity") {
 
-      //setup current severity - this does not change status
+      // setup current severity - this does not change status
+      // NOTE: This is different API than setSeverity which updates severity and status
       setCurrentSeverity(tromboneAxisLowLimitAlarmKey, currentSeverity).await
-
+      getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldBe currentSeverity
       val previousStatus = getStatus(tromboneAxisLowLimitAlarmKey).await
       previousStatus.acknowledgementStatus shouldEqual Acknowledged
       previousStatus.latchedSeverity shouldEqual Disconnected
@@ -93,6 +94,7 @@ class StatusServiceModuleTest
       val newStatus = getStatus(tromboneAxisLowLimitAlarmKey).await
 
       newStatus.latchedSeverity shouldEqual currentSeverity
+      // autoAck=false for tromboneAxisLowLimitAlarmKey hence ackStatus will be same as before
       newStatus.acknowledgementStatus shouldEqual Acknowledged
     }
   }
@@ -130,15 +132,13 @@ class StatusServiceModuleTest
   // DEOPSCSW-447: Reset api for alarm
   test("reset should throw exception if key does not exist") {
     val invalidAlarm = AlarmKey(BAD, "invalid", "invalid")
-    an[KeyNotFoundException] shouldBe thrownBy(reset(invalidAlarm).await)
+    a[KeyNotFoundException] shouldBe thrownBy(reset(invalidAlarm).await)
   }
 
   // DEOPSCSW-446: Acknowledge api for alarm
   test("acknowledge should set acknowledgementStatus to Acknowledged of an alarm") {
     // set latched severity to Warning which will result status to be Latched and Unacknowledged
-    setSeverity(tromboneAxisLowLimitAlarmKey, Warning).await
-
-    val status1 = getStatus(tromboneAxisLowLimitAlarmKey).await
+    val status1 = setSeverityAndGetStatus(tromboneAxisLowLimitAlarmKey, Warning)
     status1.acknowledgementStatus shouldBe Unacknowledged
 
     acknowledge(tromboneAxisLowLimitAlarmKey).await
@@ -148,24 +148,26 @@ class StatusServiceModuleTest
 
   // DEOPSCSW-446: Acknowledge api for alarm
   test("unacknowledge should set acknowledgementStatus to Unacknowledged of an alarm") {
-    val status1 = getStatus(tromboneAxisLowLimitAlarmKey).await
-    status1.acknowledgementStatus shouldBe Acknowledged
+    getStatus(tromboneAxisLowLimitAlarmKey).await.acknowledgementStatus shouldBe Acknowledged
 
     // set latched severity to Okay which will result status to be Latched and Acknowledged
     setSeverity(tromboneAxisLowLimitAlarmKey, Okay).await
-
-    val status2 = getStatus(tromboneAxisLowLimitAlarmKey).await
-    status2.acknowledgementStatus shouldBe Acknowledged
+    getStatus(tromboneAxisLowLimitAlarmKey).await.acknowledgementStatus shouldBe Acknowledged
 
     unacknowledge(tromboneAxisLowLimitAlarmKey).await
-    val status = getStatus(tromboneAxisLowLimitAlarmKey).await
-    status.acknowledgementStatus shouldBe Unacknowledged
+    getStatus(tromboneAxisLowLimitAlarmKey).await.acknowledgementStatus shouldBe Unacknowledged
   }
 
   // DEOPSCSW-446: Acknowledge api for alarm
   test("acknowledge should throw exception if key does not exist") {
     val invalidAlarm = AlarmKey(BAD, "invalid", "invalid")
-    an[KeyNotFoundException] shouldBe thrownBy(acknowledge(invalidAlarm).await)
+    a[KeyNotFoundException] shouldBe thrownBy(acknowledge(invalidAlarm).await)
+  }
+
+  // DEOPSCSW-446: Acknowledge api for alarm
+  test("unacknowledge should throw exception if key does not exist") {
+    val invalidAlarm = AlarmKey(BAD, "invalid", "invalid")
+    a[KeyNotFoundException] shouldBe thrownBy(unacknowledge(invalidAlarm).await)
   }
 
   // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
@@ -179,20 +181,18 @@ class StatusServiceModuleTest
   }
 
   // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
-  test("shelve should shelve alarm") {
-    shelve(tromboneAxisHighLimitAlarmKey).await
-    getStatus(tromboneAxisHighLimitAlarmKey).await.shelveStatus shouldBe Shelved
-  }
-
-  // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
   test("shelve alarm should automatically get unshelved on configured time") {
-    // configure shelve timeout after 2 seconds from current time
+    // initially make sure the shelve status of alarm is unshelved
+    getStatus(tromboneAxisLowLimitAlarmKey).await.shelveStatus shouldBe Unshelved
+
     val currentDateTime = LocalDateTime.now(Clock.systemUTC())
-    val shelveTimeout   = currentDateTime.plusSeconds(2).format(TimeExtensions.TimeFormatter)
+    // this will create shelveTimeout in 'h:m:s AM/PM' format which will be 2 seconds ahead from current time
+    val shelveTimeout = currentDateTime.plusSeconds(2).format(TimeExtensions.TimeFormatter)
 
     shelve(tromboneAxisLowLimitAlarmKey, shelveTimeout).await
     getStatus(tromboneAxisLowLimitAlarmKey).await.shelveStatus shouldBe Shelved
 
+    // after 2 seconds, expect that shelve gets timed out and inferred to unshelved
     Thread.sleep(2000)
     getStatus(tromboneAxisLowLimitAlarmKey).await.shelveStatus shouldBe Unshelved
   }
@@ -201,6 +201,8 @@ class StatusServiceModuleTest
   test("unshelve should update the alarm status to unshelved") {
     // initialize alarm with Shelved status just for this test
     setStatus(tromboneAxisHighLimitAlarmKey, AlarmStatus().copy(shelveStatus = Shelved)).await
+    getStatus(tromboneAxisHighLimitAlarmKey).await.shelveStatus shouldBe Shelved
+
     unshelve(tromboneAxisHighLimitAlarmKey).await
     getStatus(tromboneAxisHighLimitAlarmKey).await.shelveStatus shouldBe Unshelved
 
@@ -210,7 +212,7 @@ class StatusServiceModuleTest
 
   test("getStatus should throw exception if key does not exist") {
     val invalidAlarm = AlarmKey(Subsystem.BAD, "invalid", "invalid")
-    an[KeyNotFoundException] shouldBe thrownBy(getStatus(invalidAlarm).await)
+    a[KeyNotFoundException] shouldBe thrownBy(getStatus(invalidAlarm).await)
   }
 
   private def setSeverityAndGetStatus(alarmKey: AlarmKey, alarmSeverity: AlarmSeverity): AlarmStatus = {

@@ -22,7 +22,7 @@ trait AlarmTestData {
     operatorResponse = "go to the NFIRAOS engineering user interface and select the datum axis command",
     isAutoAcknowledgeable = false,
     isLatchable = true,
-    activationStatus = Active,
+    activationStatus = Active
   )
 
   // latchable and auto-Acknowledgeable alarm
