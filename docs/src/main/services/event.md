@@ -59,11 +59,11 @@ for getting latest events and creating a new connection for each subscribe call.
 many connections, but it is good to understand how connections are used and reused.
 
 __Creating a new `Publisher` or `Subscriber`__:
-Whenever a new publisher or subscriber is created, 
-location of event service is resolved. So, in case your event server goes down, and you wish to re-resolve the event server location, 
-you would make a call to `makeNewPublisher` or `makeNewSubscriber` instead of using the `defaultPublisher` and `defaultSubscriber`. 
-Apart from the above mentioned scenario, one can choose to create a new publisher in case of high frequency event streams to dedicate 
-a separate connection to demanding streams without affecting the performance of all other low frequency (for ex. 1Hz, 20Hz etc.) event streams.
+The `makeNewPublisher` API of Event Service can be used to create a new publisher which would internally create a new TCP connection to the Event Store.
+One of the use cases of this API could be to publish high frequency event streams in order to dedicate a separate connection to demanding streams without affecting the performance of all other low frequency (for ex. 1Hz, 20Hz etc.) event streams.
+
+However, `makeNewSubscriber` API does not really have any specific use cases. Both `defaultSubscriber` and `makeNewSubscriber` APIs behave almost similar since the `subscribe` API of EventService itself creates a new connection for every subscription. 
+Prefer using `defaultSubscriber` over `makeNewSubscriber`.
 
 ## Usage of EventPublisher
 
