@@ -29,6 +29,8 @@ class HealthServiceModuleTest
 
   // DEOPSCSW-466: Fetch health for a given alarm, component name or a subsystem name
   test("getAggregatedHealth should get aggregated health for a alarm") {
+    getAggregatedHealth(tromboneAxisHighLimitAlarmKey).await shouldBe Bad
+
     setSeverity(tromboneAxisHighLimitAlarmKey, Okay).await
     getAggregatedHealth(tromboneAxisHighLimitAlarmKey).await shouldBe Good
 
@@ -41,33 +43,46 @@ class HealthServiceModuleTest
 
   // DEOPSCSW-466: Fetch health for a given alarm, component name or a subsystem name
   test("getAggregatedHealth should get aggregated health for a component") {
-    setSeverity(tromboneAxisHighLimitAlarmKey, Okay).await
-    setSeverity(tromboneAxisLowLimitAlarmKey, Critical).await
-
     val tromboneKey = ComponentKey(NFIRAOS, "trombone")
     getAggregatedHealth(tromboneKey).await shouldBe Bad
+
+    setSeverity(tromboneAxisHighLimitAlarmKey, Okay).await
+    setSeverity(tromboneAxisLowLimitAlarmKey, Major).await
+
+    getAggregatedHealth(tromboneKey).await shouldBe Ill
   }
 
   // DEOPSCSW-466: Fetch health for a given alarm, component name or a subsystem name
   test("getAggregatedHealth should get aggregated health for a subsystem") {
-    setSeverity(tromboneAxisHighLimitAlarmKey, Okay).await
-    setSeverity(tromboneAxisLowLimitAlarmKey, Critical).await
-
-    val tromboneKey = SubsystemKey(NFIRAOS)
+    val tromboneKey = SubsystemKey(TCS)
     getAggregatedHealth(tromboneKey).await shouldBe Bad
+
+    setSeverity(cpuExceededAlarmKey, Okay).await
+    setSeverity(outOfRangeOffloadAlarmKey, Major).await
+
+    getAggregatedHealth(tromboneKey).await shouldBe Ill
   }
 
   // DEOPSCSW-466: Fetch health for a given alarm, component name or a subsystem name
   test("getAggregatedHealth should get aggregated health for global system") {
-    setSeverity(tromboneAxisHighLimitAlarmKey, Okay).await
-    setSeverity(tromboneAxisLowLimitAlarmKey, Critical).await
+    //feeding data of two alarms only
+    val validAlarmsConfig = ConfigFactory.parseResources("test-alarms/two-valid-alarms.conf")
+    initAlarms(validAlarmsConfig, reset = true).await
 
     getAggregatedHealth(GlobalKey).await shouldBe Bad
+
+    setSeverity(tromboneAxisHighLimitAlarmKey, Okay).await
+    setSeverity(tromboneAxisLowLimitAlarmKey, Major).await
+
+    getAggregatedHealth(GlobalKey).await shouldBe Ill
   }
 
   // DEOPSCSW-448: Set Activation status for an alarm entity
   // DEOPSCSW-466: Fetch health for a given alarm, component name or a subsystem name
   test("getAggregatedHealth should not consider inactive alarms for health aggregation") {
+
+    getAggregatedHealth(GlobalKey).await shouldBe Bad
+
     enclosureTempHighAlarm.isActive shouldBe true
     setSeverity(enclosureTempHighAlarmKey, Okay).await
 
@@ -82,6 +97,8 @@ class HealthServiceModuleTest
   // DEOPSCSW-466: Fetch health for a given alarm, component name or a subsystem name
   test("getAggregatedHealth should consider shelved alarms also for health aggregation") {
     val componentKey = ComponentKey(cpuExceededAlarmKey.subsystem, cpuExceededAlarmKey.component)
+    getAggregatedHealth(componentKey).await shouldBe Bad
+
     setStatus(cpuExceededAlarmKey, AlarmStatus().copy(shelveStatus = Shelved))
 
     setSeverity(cpuExceededAlarmKey, Okay).await
@@ -175,6 +192,8 @@ class HealthServiceModuleTest
   // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem or all
   test("subscribeAggregatedHealthCallback should not consider inactive alarm for aggregation") {
 
+    getAggregatedHealth(GlobalKey).await shouldBe Bad
+
     val testProbe = TestProbe[AlarmHealth]()(actorSystem.toTyped)
     val alarmSubscription =
       subscribeAggregatedHealthCallback(ComponentKey(NFIRAOS, "enclosure"), testProbe.ref ! _)
@@ -245,6 +264,9 @@ class HealthServiceModuleTest
 
   // DEOPSCSW-449: Set Shelve/Unshelve status for alarm entity
   test("shelved alarms should be considered in health aggregation") {
+
+    getAggregatedHealth(GlobalKey).await shouldBe Bad
+
     val testProbe         = TestProbe[AlarmHealth]()(actorSystem.toTyped)
     val alarmSubscription = subscribeAggregatedHealthActorRef(SubsystemKey(TCS), testProbe.ref)
     alarmSubscription.ready().await
