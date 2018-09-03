@@ -241,6 +241,7 @@ class SeverityServiceModuleTest
     val testProbe         = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
     val alarmSubscription = subscribeAggregatedSeverityCallback(tromboneAxisLowLimitAlarmKey, testProbe.ref ! _)
     alarmSubscription.ready().await
+    testProbe.expectMessage(Disconnected) // on subscription, current aggregated severity will be calculated
 
     setSeverity(tromboneAxisLowLimitAlarmKey, Critical).await
 
@@ -262,6 +263,7 @@ class SeverityServiceModuleTest
     val testProbe         = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
     val alarmSubscription = subscribeAggregatedSeverityCallback(SubsystemKey(TCS), testProbe.ref ! _)
     alarmSubscription.ready().await
+    testProbe.expectMessage(Disconnected) // on subscription, current aggregated severity will be calculated
 
     setSeverity(cpuExceededAlarmKey, Critical).await
 
@@ -283,11 +285,13 @@ class SeverityServiceModuleTest
     val testProbe1         = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
     val alarmSubscription1 = subscribeAggregatedSeverityCallback(ComponentKey(NFIRAOS, "trombone"), testProbe1.ref ! _)
     alarmSubscription1.ready().await
+    testProbe1.expectMessage(Disconnected) // on subscription, current aggregated severity will be calculated
 
     // global subscription
     val testProbe2         = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
     val alarmSubscription2 = subscribeAggregatedSeverityCallback(GlobalKey, testProbe2.ref ! _)
     alarmSubscription2.ready().await
+    testProbe2.expectMessage(Disconnected) // on subscription, current aggregated severity will be calculated
 
     setSeverity(tromboneAxisLowLimitAlarmKey, Critical).await
 
@@ -323,18 +327,20 @@ class SeverityServiceModuleTest
     val alarmSubscription =
       subscribeAggregatedSeverityCallback(ComponentKey(NFIRAOS, "enclosure"), testProbe.ref ! _)
     alarmSubscription.ready().await
+    testProbe.expectMessage(Disconnected) // on subscription, current aggregated severity will be calculated
 
     enclosureTempHighAlarm.isActive shouldBe true
     setSeverity(enclosureTempHighAlarmKey, Okay).await
-
-    testProbe.expectMessage(Okay)
+    testProbe.expectMessage(Okay) // enclosureTempLowAlarmKey=Inactive, hence not considered while aggregation
 
     setSeverity(enclosureTempHighAlarmKey, Okay).await
+    testProbe.expectNoMessage(100.millis)
 
     enclosureTempLowAlarm.isActive shouldBe false
     setSeverity(enclosureTempLowAlarmKey, Critical).await
 
-    testProbe.expectMessage(Okay)
+    // enclosureTempLowAlarm is inactive which is not considered for aggregation, that means no aggregated severity change
+    testProbe.expectNoMessage(200.millis)
 
     alarmSubscription.unsubscribe().await
   }
@@ -343,20 +349,16 @@ class SeverityServiceModuleTest
   // DEOPSCSW-467: Monitor alarm severities in the alarm store for a single alarm, component, subsystem, or all
   test("subscribeAggregatedSeverityCallback should throw InactiveAlarmException when all resolved keys are inactive") {
 
-    an[InactiveAlarmException] shouldBe thrownBy {
-      val subscription = subscribeAggregatedSeverityCallback(enclosureTempLowAlarmKey, println)
-      subscription.ready().await
-    }
+    a[InactiveAlarmException] shouldBe thrownBy(
+      subscribeAggregatedSeverityCallback(enclosureTempLowAlarmKey, println).ready().await
+    )
   }
 
   // DEOPSCSW-448: Set Activation status for an alarm entity
   // DEOPSCSW-467: Monitor alarm severities in the alarm store for a single alarm, component, subsystem, or all
   test("subscribeAggregatedSeverity should throw KeyNotFoundException when key is invalid") {
     val invalidAlarm = ComponentKey(BAD, "invalid")
-    an[KeyNotFoundException] shouldBe thrownBy {
-      val subscription = subscribeAggregatedSeverityCallback(invalidAlarm, println)
-      subscription.ready().await
-    }
+    a[KeyNotFoundException] shouldBe thrownBy(subscribeAggregatedSeverityCallback(invalidAlarm, println).ready().await)
   }
 
   // DEOPSCSW-467: Monitor alarm severities in the alarm store for a single alarm, component, subsystem, or all
@@ -368,6 +370,7 @@ class SeverityServiceModuleTest
     val testProbe         = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
     val alarmSubscription = subscribeAggregatedSeverityActorRef(SubsystemKey(TCS), testProbe.ref)
     alarmSubscription.ready().await
+    testProbe.expectMessage(Disconnected) // on subscription, current aggregated severity will be calculated
 
     setSeverity(cpuExceededAlarmKey, Critical).await
 
@@ -389,18 +392,15 @@ class SeverityServiceModuleTest
     val testProbe         = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
     val alarmSubscription = subscribeAggregatedSeverityActorRef(SubsystemKey(NFIRAOS), testProbe.ref)
     alarmSubscription.ready().await
+    testProbe.expectMessage(Disconnected) // on subscription, current aggregated severity will be calculated
 
     tromboneAxisLowLimitAlarm.isActive shouldBe true
     setSeverity(tromboneAxisLowLimitAlarmKey, Major).await
-
-    testProbe.expectMessage(Major)
-
-    setSeverity(tromboneAxisLowLimitAlarmKey, Major).await
+    testProbe.expectNoMessage(100.millis) // other NFIRAOS keys are still disconnected, hence no change in aggregated severity
 
     enclosureTempLowAlarm.isActive shouldBe false
     setSeverity(enclosureTempLowAlarmKey, Critical).await
-
-    testProbe.expectMessage(Major)
+    testProbe.expectNoMessage(200.millis) //enclosureTempLowAlarmKey is inactive, hence aggregated severity is still Disconnected
 
     alarmSubscription.unsubscribe()
   }
@@ -418,6 +418,7 @@ class SeverityServiceModuleTest
 
     val alarmSubscription = subscribeAggregatedSeverityCallback(componentKey, testProbe.ref ! _)
     alarmSubscription.ready().await
+    testProbe.expectMessage(Disconnected) // on subscription, current aggregated severity will be calculated
 
     setSeverity(cpuExceededAlarmKey, Okay).await
     testProbe.expectMessage(Okay)

@@ -140,6 +140,7 @@ class HealthServiceModuleTest
     val testProbe         = TestProbe[AlarmHealth]()(actorSystem.toTyped)
     val alarmSubscription = subscribeAggregatedHealthCallback(tromboneAxisLowLimitAlarmKey, testProbe.ref ! _)
     alarmSubscription.ready().await
+    testProbe.expectMessage(Bad) // on subscription, current aggregated health will be calculated
 
     setSeverity(tromboneAxisLowLimitAlarmKey, Major).await
 
@@ -160,19 +161,21 @@ class HealthServiceModuleTest
   test("subscribe aggregated health via callback for a subsystem") {
     getAggregatedHealth(GlobalKey).await shouldBe Bad
     getCurrentSeverity(cpuExceededAlarmKey).await shouldBe Disconnected
-    getCurrentSeverity(tromboneAxisHighLimitAlarmKey).await shouldBe Disconnected
+    getCurrentSeverity(outOfRangeOffloadAlarmKey).await shouldBe Disconnected
 
     // subsystem subscription - tcs
     val testProbe         = TestProbe[AlarmHealth]()(actorSystem.toTyped)
     val alarmSubscription = subscribeAggregatedHealthCallback(SubsystemKey(TCS), testProbe.ref ! _)
     alarmSubscription.ready().await
+    testProbe.expectMessage(Bad) // on subscription, current aggregated health will be calculated
 
     setSeverity(cpuExceededAlarmKey, Major).await
+    testProbe.expectNoMessage(100.millis) // outOfRangeOffloadAlarmKey is still disconnected, hence aggregated heath = Bad which means no change
 
-    testProbe.expectMessage(Ill)
-    testProbe.expectMessage(Bad) // severity expires after 1 second in test
+    setSeverity(outOfRangeOffloadAlarmKey, Warning).await
+    testProbe.expectMessage(Ill) // outOfRangeOffloadAlarmKey=Warning and cpuExceededAlarmKey=Major, hence aggregated heath = Ill
 
-    setSeverity(tromboneAxisHighLimitAlarmKey, Major).await
+    setSeverity(outOfRangeOffloadAlarmKey, Warning).await
     testProbe.expectNoMessage(200.millis)
 
     alarmSubscription.unsubscribe().await
@@ -187,11 +190,13 @@ class HealthServiceModuleTest
     val testProbe         = TestProbe[AlarmHealth]()(actorSystem.toTyped)
     val alarmSubscription = subscribeAggregatedHealthCallback(ComponentKey(NFIRAOS, "trombone"), testProbe.ref ! _)
     alarmSubscription.ready().await
+    testProbe.expectMessage(Bad) // on subscription, current aggregated health will be calculated
 
     setSeverity(tromboneAxisLowLimitAlarmKey, Major).await
+    testProbe.expectNoMessage(100.millis) // tromboneAxisHighLimitAlarmKey is still disconnected, hence aggregated heath = Bad which means no change
 
-    testProbe.expectMessage(Ill)
-    testProbe.expectMessage(Bad) // severity expires after 1 second in test
+    setSeverity(tromboneAxisHighLimitAlarmKey, Warning).await
+    testProbe.expectMessage(Ill) //tromboneAxisHighLimitAlarmKey=Warning & tromboneAxisLowLimitAlarmKey=Major
 
     alarmSubscription.unsubscribe().await
   }
@@ -207,44 +212,37 @@ class HealthServiceModuleTest
     val alarmSubscription =
       subscribeAggregatedHealthCallback(ComponentKey(NFIRAOS, "enclosure"), testProbe.ref ! _)
     alarmSubscription.ready().await
+    testProbe.expectMessage(Bad) // on subscription, current aggregated health will be calculated
 
     enclosureTempHighAlarm.isActive shouldBe true
     setSeverity(enclosureTempHighAlarmKey, Okay).await
-
     testProbe.expectMessage(Good)
 
     setSeverity(enclosureTempHighAlarmKey, Okay).await
+    testProbe.expectNoMessage(100.millis)
 
     enclosureTempLowAlarm.isActive shouldBe false
     setSeverity(enclosureTempLowAlarmKey, Critical).await
 
-    testProbe.expectMessage(Good)
+    // enclosureTempLowAlarmKey is inactive hence changing its severity does not change health
+    testProbe.expectNoMessage(200.millis)
 
     alarmSubscription.unsubscribe().await
   }
 
   // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem or all
   test("subscribeAggregatedSeverityCallback should throw KeyNotFoundException if the key does not match any key") {
-    an[KeyNotFoundException] shouldBe thrownBy {
-      val subscription = subscribeAggregatedHealthCallback(SubsystemKey(BAD), println)
-      subscription.ready().await
-    }
+    a[KeyNotFoundException] shouldBe thrownBy(subscribeAggregatedHealthCallback(SubsystemKey(BAD), println).ready().await)
   }
 
   // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem or all
   test("subscribeAggregatedHealthCallback should throw KeyNotFoundException when key is invalid") {
-    an[KeyNotFoundException] shouldBe thrownBy {
-      val subscription = subscribeAggregatedHealthCallback(SubsystemKey(BAD), println)
-      subscription.ready().await
-    }
+    a[KeyNotFoundException] shouldBe thrownBy(subscribeAggregatedHealthCallback(SubsystemKey(BAD), println).ready().await)
   }
 
   // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem or all
   test("subscribeAggregatedHealthCallback should throw InactiveAlarmException when all resolved keys are inactive") {
-    an[InactiveAlarmException] shouldBe thrownBy {
-      val subscription = subscribeAggregatedHealthCallback(SubsystemKey(LGSF), println)
-      subscription.ready().await
-    }
+    a[InactiveAlarmException] shouldBe thrownBy(subscribeAggregatedHealthCallback(SubsystemKey(LGSF), println).ready().await)
   }
 
   // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem or all
@@ -257,11 +255,13 @@ class HealthServiceModuleTest
     val testProbe         = TestProbe[AlarmHealth]()(actorSystem.toTyped)
     val alarmSubscription = subscribeAggregatedHealthActorRef(SubsystemKey(TCS), testProbe.ref)
     alarmSubscription.ready().await
+    testProbe.expectMessage(Bad) // on subscription, current aggregated health will be calculated
 
     setSeverity(cpuExceededAlarmKey, Okay).await
+    testProbe.expectNoMessage(100.millis) // outOfRangeOffloadAlarmKey is still disconnected, hence aggregated heath = Bad which means no change
 
+    setSeverity(outOfRangeOffloadAlarmKey, Okay).await
     testProbe.expectMessage(Good)
-    testProbe.expectMessage(Bad) // severity expires after 1 second in test
 
     setSeverity(tromboneAxisHighLimitAlarmKey, Major).await
     testProbe.expectNoMessage(200.millis)
@@ -277,16 +277,16 @@ class HealthServiceModuleTest
     val testProbe         = TestProbe[AlarmHealth]()(actorSystem.toTyped)
     val alarmSubscription = subscribeAggregatedHealthActorRef(SubsystemKey(TCS), testProbe.ref)
     alarmSubscription.ready().await
+    testProbe.expectMessage(Bad) // on subscription, current aggregated health will be calculated
 
     // initialize alarm with Shelved status just for this test
     shelve(cpuExceededAlarmKey).await
     getStatus(cpuExceededAlarmKey).await.shelveStatus shouldBe Shelved
 
-    // there is only one alarm in TCS.tcsPk component
-    setSeverity(cpuExceededAlarmKey, Critical).await
-    testProbe.expectMessage(Bad)
-
     setSeverity(cpuExceededAlarmKey, Okay).await
+    testProbe.expectNoMessage(100.millis) // outOfRangeOffloadAlarmKey is still disconnected, hence aggregated heath = Bad which means no change
+
+    setSeverity(outOfRangeOffloadAlarmKey, Okay).await
     testProbe.expectMessage(Good)
 
     alarmSubscription.unsubscribe().await
@@ -294,7 +294,7 @@ class HealthServiceModuleTest
 
   // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem or all
   test("subscribeAggregatedHealthActorRef should throw InactiveAlarmException when all resolved keys are inactive") {
-    an[InactiveAlarmException] shouldBe thrownBy {
+    a[InactiveAlarmException] shouldBe thrownBy {
       val testProbe    = TestProbe[AlarmHealth]()(actorSystem.toTyped)
       val subscription = subscribeAggregatedHealthActorRef(SubsystemKey(LGSF), testProbe.ref)
       subscription.ready().await

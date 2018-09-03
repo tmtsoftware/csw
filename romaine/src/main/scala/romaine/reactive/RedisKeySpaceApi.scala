@@ -41,13 +41,13 @@ class RedisKeySpaceApi[K: RomaineStringCodec, V: RomaineStringCodec](
   def watchKeyspaceValueAggregation(
       keys: List[String],
       overflowStrategy: OverflowStrategy,
-      reducer: Iterable[Option[V]] => V
+      reducer: Iterable[Option[V]] => V,
+      default: Map[K, Option[V]]
   ): Source[V, RedisSubscription] =
     watchKeyspaceValue(keys, overflowStrategy)
-      .scan(Map.empty[K, Option[V]]) {
+      .scan(default) {
         case (data, RedisResult(key, value)) ⇒ data + (key → value)
       }
-      .drop(1) // drop the seed (empty map) emitted by scan above
       .map(data => reducer(data.values))
       .distinctUntilChanged
 

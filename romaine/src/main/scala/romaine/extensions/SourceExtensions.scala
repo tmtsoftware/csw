@@ -9,7 +9,7 @@ object SourceExtensions {
     def distinctUntilChanged: Source[Out, Mat] = source.statefulMapConcat { () ⇒
       var previous: Option[Out] = None
       current ⇒
-        if (current == previous) List.empty
+        if (previous.contains(current)) List.empty
         else {
           previous = Some(current)
           List(current)

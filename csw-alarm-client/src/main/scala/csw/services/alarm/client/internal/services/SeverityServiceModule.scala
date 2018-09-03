@@ -91,10 +91,18 @@ trait SeverityServiceModule extends SeverityService {
     // create new connection for every client
     val keySpaceApi = redisKeySpaceApi(severityApi)
 
-    val severitySourceF = getActiveAlarmKeys(key).map(x ⇒ {
-      val activeSeverityKeys = x.map(SeverityKey.fromMetadataKey(_).value)
-      keySpaceApi.watchKeyspaceValueAggregation(activeSeverityKeys, OverflowStrategy.LATEST, aggregratorByMax)
-    })
+    val severitySourceF = async {
+      val metadataKeys       = await(getActiveAlarmKeys(key))
+      val activeSeverityKeys = metadataKeys.map(SeverityKey.fromMetadataKey)
+      val default            = await(severityApi.mget(activeSeverityKeys)).map(result ⇒ result.key → result.value).toMap
+
+      keySpaceApi.watchKeyspaceValueAggregation(
+        activeSeverityKeys.map(_.value),
+        OverflowStrategy.LATEST,
+        aggregratorByMax,
+        default
+      )
+    }
 
     Source
       .fromFutureSource(severitySourceF)

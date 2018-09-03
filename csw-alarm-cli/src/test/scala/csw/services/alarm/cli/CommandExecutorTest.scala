@@ -417,6 +417,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
     eventually(
       logBuffer.toList shouldEqual List(
+        s"Severity of Alarm [$tromboneAxisHighLimitKey]: $Disconnected",
         s"Severity of Alarm [$tromboneAxisHighLimitKey]: $Major",
         s"Severity of Alarm [$tromboneAxisHighLimitKey]: $Okay"
       )
@@ -526,6 +527,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
     eventually(
       logBuffer.toList shouldEqual List(
+        s"Health of Alarm [$tromboneAxisHighLimitKey]: $Bad",
         s"Health of Alarm [$tromboneAxisHighLimitKey]: $Ill",
         s"Health of Alarm [$tromboneAxisHighLimitKey]: $Good"
       )
