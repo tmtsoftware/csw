@@ -40,7 +40,7 @@ private[alarm] object KeyNotFoundException {
 }
 
 /**
- * Represents exception thrown when getting aggregated severity or health with no alarms are active
+ * Represents exception thrown when getting aggregated severity or health with no actives alarms
  *
  * @param key for which all the alarms are inactive
  */

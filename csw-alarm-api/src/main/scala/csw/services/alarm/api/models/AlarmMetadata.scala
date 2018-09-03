@@ -5,23 +5,25 @@ import csw.services.alarm.api.models.AlarmSeverity.{Indeterminate, Okay}
 import csw.services.alarm.api.models.Key.AlarmKey
 
 /**
- * Basic model for an AlarmMetadata. This information is read from the Alarm Service Config File and stored in alarm store.
- * Indeterminate and Okay alarm severities are supported by all alarms implicitly. While setting the severity, metadata is
- * referred to validate the operation.
+ * Represents the metadata of an alarm e.g. name, subsystem it belongs to, supported severities, etc. This information is
+ * read from the config file for alarms and stored in alarm store. Metadata is referred while setting the severity to validate
+ * the operation. An alarm does not change it's metadata in it's entire life span.
  *
- * @param subsystem alarm belongs to this subsystem
- * @param component alarm belongs to this component
- * @param name name of the alarm
- * @param description description of the alarm
- * @param location description of where the alarming condition is located
- * @param alarmType general category for the alarm (e.g., limit alarm)
- * @param supportedSeverities severity levels implemented by the component alarm
- * @param probableCause probable cause for each level or for all levels
- * @param operatorResponse instructions or information to help the operator respond to the alarm.
- * @param isAutoAcknowledgeable represents whether alarm requires an acknowledgement by the operator or not
- * @param isLatchable represents whether alarm is to be latched or not
+ * @note Indeterminate and Okay severities are supported by all alarms implicitly.
+ * @param subsystem represents the subsystem this alarm belongs to
+ * @param component represents the component this alarm belongs to
+ * @param name represents the name of the alarm
+ * @param description represents details and significance of the alarm
+ * @param location represents the physical location of the alarm
+ * @param alarmType represents the general category for the alarm (e.g. limit alarm)
+ * @param supportedSeverities represents possible severity levels that the alarm can raise to (other then okay and indeterminate)
+ * @param probableCause represents the probable cause for the alarm
+ * @param operatorResponse represents instructions or information to help the operator respond to the alarm
+ * @param isAutoAcknowledgeable represents whether alarm needs to be acknowledged when it goes to Okay severity
+ * @param isLatchable represents whether the alarm can store the worst severity raised until reset
+ * @param activationStatus represents whether the alarm is active or not
  */
-case class AlarmMetadata(
+case class AlarmMetadata private[alarm] (
     subsystem: Subsystem,
     component: String,
     name: String,
@@ -35,7 +37,23 @@ case class AlarmMetadata(
     isLatchable: Boolean,
     activationStatus: ActivationStatus
 ) {
-  def alarmKey: AlarmKey                             = AlarmKey(subsystem, component, name)
-  def isActive: Boolean                              = activationStatus == Active
+
+  /**
+   * Represents a unique alarm in the store
+   *
+   * @return an instance of AlarmKey composed of subsystem, component and name of the alarm
+   */
+  def alarmKey: AlarmKey = AlarmKey(subsystem, component, name)
+
+  /**
+   * Represents whether the alarm is active or not
+   */
+  def isActive: Boolean = activationStatus == Active
+
+  /**
+   * A collection of all severities the alarm can be raised to
+   *
+   * @return
+   */
   def allSupportedSeverities: Set[FullAlarmSeverity] = supportedSeverities ++ Set(Indeterminate, Okay)
 }

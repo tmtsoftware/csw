@@ -6,9 +6,8 @@ import enumeratum.{Enum, EnumEntry}
 import scala.collection.immutable.IndexedSeq
 
 /**
- * Represents the acknowledgement related status of the alarm for e.g if it is acknowledged or not. Whenever the severity of an
- * alarm changes (other than Okay), alarm service changes the status to `Unacknowledged`. Operator is then required to acknowledge
- * the alarm which will then set the status to `Acknowledged`.
+ * Represents whether the alarm is acknowledged or not. Whenever the severity of an alarm changes (other than Okay),
+ * alarm service changes the status to `Unacknowledged`. Operator is then required to acknowledge the alarm.
  *
  * @note By default all the alarms are loaded in alarm store with `Acknowledged` status
  */
@@ -23,7 +22,7 @@ sealed abstract class AcknowledgementStatus extends EnumEntry with Lowercase {
 object AcknowledgementStatus extends Enum[AcknowledgementStatus] {
 
   /**
-   * Returns the collection of values of `AcknowledgementStatus`
+   * Returns the collection of `AcknowledgementStatus` e.g. acknowledged and unacknowledged
    */
   def values: IndexedSeq[AcknowledgementStatus] = findValues
 

@@ -9,7 +9,7 @@ import scala.collection.immutable.IndexedSeq
  * Represents all the severities an alarm can have including Disconnected. The complete list of severities is Okay, Warning,
  * Major, Indeterminate, Disconnected, Critical.
  *
- * @param level is fundamental in latching severity to higher severity than other
+ * @param level is fundamental in comparing severities
  */
 sealed abstract class FullAlarmSeverity private[alarm] (val level: Int) extends EnumEntry with Lowercase {
 
@@ -18,9 +18,9 @@ sealed abstract class FullAlarmSeverity private[alarm] (val level: Int) extends 
    */
   def name: String = entryName
 
-  def >(otherSeverity: FullAlarmSeverity): Boolean = this.level > otherSeverity.level
+  private[alarm] def >(otherSeverity: FullAlarmSeverity): Boolean = this.level > otherSeverity.level
 
-  def max(otherSeverity: FullAlarmSeverity): FullAlarmSeverity = if (otherSeverity > this) otherSeverity else this
+  private[alarm] def max(otherSeverity: FullAlarmSeverity): FullAlarmSeverity = if (otherSeverity > this) otherSeverity else this
 }
 
 object FullAlarmSeverity extends Enum[FullAlarmSeverity] {
@@ -34,17 +34,17 @@ object FullAlarmSeverity extends Enum[FullAlarmSeverity] {
 }
 
 /**
- * Represents the alarm severity set by the component developer e.g Okay, Warning, Major, Indeterminate, Critical. Disconnected
- * is not a part of AlarmSeverity as it is never set by the component developer.
+ * Represents the alarm severity set by the component developer e.g Okay, Warning, Major, Indeterminate, Critical.
+ * Disconnected is not a part of AlarmSeverity as it is never set by the component developer.
  *
- * @param level is fundamental in latching severity to higher severity than other
+ * @param level is fundamental in comparing severities
  */
 sealed abstract class AlarmSeverity private[alarm] (override val level: Int) extends FullAlarmSeverity(level)
 
 object AlarmSeverity extends Enum[AlarmSeverity] {
 
   /**
-   * Returns a sequence of all alarm severity
+   * Returns a sequence of all alarm severity (except Disconnected)
    */
   def values: IndexedSeq[AlarmSeverity] = findValues
 

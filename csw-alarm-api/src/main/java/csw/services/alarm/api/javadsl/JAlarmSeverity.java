@@ -9,18 +9,6 @@ import csw.services.alarm.api.models.AlarmSeverity;
 public class JAlarmSeverity {
 
     /**
-     * Represents the disconnected state of an alarm. This severity is never set by a developer explicitly. Rather it is
-     * inferred as `Disconnected` when the severity of an alarm expires and component is unable to refresh the severity.
-     */
-    public static final FullAlarmSeverity Disconnected = FullAlarmSeverity.Disconnected$.MODULE$;
-
-    /**
-     * Represents the indeterminate state of an alarm, for e.g. hardware is not able to update the state regularly and
-     * hence component cannot determine the actual severity of the alarm.
-     */
-    public static final AlarmSeverity Indeterminate = AlarmSeverity.Indeterminate$.MODULE$;
-
-    /**
      * Represents the normal operation of the alarm
      */
     public static final AlarmSeverity Okay = AlarmSeverity.Okay$.MODULE$;
@@ -38,6 +26,18 @@ public class JAlarmSeverity {
      * performance of the same.
      */
     public static final AlarmSeverity Major = AlarmSeverity.Major$.MODULE$;
+
+    /**
+     * Represents the disconnected state of an alarm. This severity is never set by a developer explicitly. Rather it is
+     * inferred as `Disconnected` when the severity of an alarm expires and component is unable to refresh the severity.
+     */
+    public static final FullAlarmSeverity Disconnected = FullAlarmSeverity.Disconnected$.MODULE$;
+
+    /**
+     * Represents the indeterminate state of an alarm, for e.g. hardware is not able to update the state regularly and
+     * hence component cannot determine the actual severity of the alarm.
+     */
+    public static final AlarmSeverity Indeterminate = AlarmSeverity.Indeterminate$.MODULE$;
 
     /**
      * Represents the critical state of an alarm for e.g. the operator needs to respond to a critical alarm within 30 minutes.

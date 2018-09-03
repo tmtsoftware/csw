@@ -20,7 +20,7 @@ sealed abstract class ActivationStatus extends EnumEntry with Lowercase {
 object ActivationStatus extends Enum[ActivationStatus] {
 
   /**
-   * Returns a sequence of all alarm types
+   * Returns a collection of `ActivationStatus` e.g active and inactive
    */
   def values: IndexedSeq[ActivationStatus] = findValues
 

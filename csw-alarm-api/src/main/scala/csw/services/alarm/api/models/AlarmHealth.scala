@@ -15,7 +15,7 @@ sealed abstract class AlarmHealth extends EnumEntry with Lowercase
 object AlarmHealth extends Enum[AlarmHealth] {
 
   /**
-   * Returns a sequence of alarm health values e.g good, ill or bad
+   * Returns a collection of `AlarmHealth` e.g good, ill or bad
    */
   def values: IndexedSeq[AlarmHealth] = findValues
 

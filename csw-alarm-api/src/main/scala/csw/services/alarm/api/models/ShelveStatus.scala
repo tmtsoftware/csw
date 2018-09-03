@@ -16,7 +16,7 @@ sealed abstract class ShelveStatus extends EnumEntry with Lowercase {
 object ShelveStatus extends Enum[ShelveStatus] {
 
   /**
-   * Returns a sequence of all alarm types
+   * Returns a collection of `ShelveStatus` e.g shelved or unshelved
    */
   def values: IndexedSeq[ShelveStatus] = findValues
 

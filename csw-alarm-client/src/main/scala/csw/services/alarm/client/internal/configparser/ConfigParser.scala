@@ -2,9 +2,8 @@ package csw.services.alarm.client.internal.configparser
 
 import com.typesafe.config.{Config, ConfigFactory, ConfigRenderOptions}
 import csw.services.alarm.api.exceptions.ConfigParseException
-import csw.services.alarm.api.internal.AlarmRW
+import csw.services.alarm.api.internal.{AlarmMetadataSet, AlarmRW}
 import csw.services.alarm.api.internal.ValidationResult.{Failure, Success}
-import csw.services.alarm.api.models.AlarmMetadataSet
 import ujson.Js.Value
 import upickle.default.{ReadWriter ⇒ RW, _}
 
