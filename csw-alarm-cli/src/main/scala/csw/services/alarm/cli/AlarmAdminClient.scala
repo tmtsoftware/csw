@@ -89,13 +89,7 @@ class AlarmAdminClient(
 
   def list(options: Options): Future[Unit] = async {
     val alarms = await(alarmService.getAlarms(options.key)).sortWith(_.key.value > _.key.value)
-    if (alarms.nonEmpty) printLine(Formatter.formatAlarms(alarms, options))
-    else printLine("No matching keys found.")
-  }
-
-  def status(options: Options): Future[Unit] = async {
-    val status = await(alarmService.getStatus(options.alarmKey))
-    printLine(Formatter.formatStatus(status))
+    printLine(Formatter.formatAlarms(alarms, options))
   }
 
   def getHealth(options: Options): Future[Unit] = async {

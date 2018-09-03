@@ -15,14 +15,20 @@ import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.models.TcpRegistration
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
 import csw.services.logging.commons.LogAdminActorFactory
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.time.SpanSugar.convertFloatToGrainOfTime
 import org.scalatest.{BeforeAndAfterEach, Matchers}
 import redis.embedded.{RedisSentinel, RedisServer}
 
 import scala.collection.mutable
 
-trait AlarmCliTestSetup extends HTTPLocationService with Matchers with BeforeAndAfterEach with EmbeddedRedis with ScalaFutures {
+trait AlarmCliTestSetup
+    extends HTTPLocationService
+    with Matchers
+    with BeforeAndAfterEach
+    with EmbeddedRedis
+    with ScalaFutures
+    with Eventually {
 
   override implicit val patienceConfig: PatienceConfig = PatienceConfig(5.seconds, 10.millis)
 

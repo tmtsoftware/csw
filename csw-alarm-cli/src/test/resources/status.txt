@@ -1,4 +1,5 @@
 ===============================================================================================================
+Alarm Key: nfiraos-trombone-tromboneaxislowlimitalarm
 Acknowledgement Status: Acknowledged
 Latch Severity: Disconnected
 Shelve Status: Unshelved

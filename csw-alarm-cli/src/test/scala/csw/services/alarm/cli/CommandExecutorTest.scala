@@ -415,9 +415,11 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     setSeverity(tromboneAxisHighLimitKey, Major).futureValue
     setSeverity(tromboneAxisHighLimitKey, Okay).futureValue
 
-    logBuffer.toList shouldEqual List(
-      s"Severity of Alarm [$tromboneAxisHighLimitKey]: $Major",
-      s"Severity of Alarm [$tromboneAxisHighLimitKey]: $Okay"
+    eventually(
+      logBuffer.toList shouldEqual List(
+        s"Severity of Alarm [$tromboneAxisHighLimitKey]: $Major",
+        s"Severity of Alarm [$tromboneAxisHighLimitKey]: $Okay"
+      )
     )
 
     subscription.unsubscribe().futureValue
@@ -522,9 +524,11 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     setSeverity(tromboneAxisHighLimitKey, Major).futureValue
     setSeverity(tromboneAxisHighLimitKey, Okay).futureValue
 
-    logBuffer.toList shouldEqual List(
-      s"Health of Alarm [$tromboneAxisHighLimitKey]: $Ill",
-      s"Health of Alarm [$tromboneAxisHighLimitKey]: $Good"
+    eventually(
+      logBuffer.toList shouldEqual List(
+        s"Health of Alarm [$tromboneAxisHighLimitKey]: $Ill",
+        s"Health of Alarm [$tromboneAxisHighLimitKey]: $Good"
+      )
     )
 
     subscription.unsubscribe().futureValue

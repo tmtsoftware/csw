@@ -13,16 +13,31 @@ object Formatter {
     "==============================================================================================================="
 
   def formatAlarms(alarms: List[Alarm], options: Options): String =
+    if (alarms.isEmpty) "No matching keys found."
+    else formatAlarms0(alarms, options)
+
+  private def formatAlarms0(alarms: List[Alarm], options: Options): String =
     ((options.showMetadata, options.showStatus) match {
       case (true, false) ⇒ alarms.map(a ⇒ formatMetadata(a.metadata))
-      case (false, true) ⇒ alarms.map(a ⇒ formatStatus(a.status) + Newline + formatSeverity(a.severity))
+      case (false, true) ⇒ alarms.map(a ⇒ formatOnlyStatus(a.key, a.status, a.severity))
       case _             ⇒ alarms.map(formatAlarm)
     }).mkString(s"$Separator$Newline", s"\n$Separator$Newline", s"$Newline$Separator")
 
-  def formatAlarm(alarm: Alarm): String =
-    formatMetadata(alarm.metadata) + Newline + formatStatus(alarm.status) + Newline + formatSeverity(alarm.severity)
+  def formatAggregatedSeverity(key: Key, severity: FullAlarmSeverity): String = msg(key, "Severity", severity.toString)
+  def formatAggregatedHealth(key: Key, health: AlarmHealth): String           = msg(key, "Health", health.toString)
+  def formatRefreshSeverity(key: Key, severity: FullAlarmSeverity): String    = s"Severity for [$key] refreshed to: $severity"
 
-  def formatMetadata(metadata: AlarmMetadata): String = {
+  def msg(key: Key, property: String, value: String): String = key match {
+    case GlobalKey                          ⇒ s"Aggregated $property of Alarm Service: $value"
+    case SubsystemKey(subsystem)            ⇒ s"Aggregated $property of Subsystem [$subsystem]: $value"
+    case ComponentKey(subsystem, component) ⇒ s"Aggregated $property of Component [$subsystem$KeySeparator$component]: $value"
+    case _: AlarmKey                        ⇒ s"$property of Alarm [$key]: $value"
+  }
+
+  private def formatAlarm(alarm: Alarm): String =
+    List(formatMetadata(alarm.metadata), formatStatus(alarm.status), formatSeverity(alarm.severity)).mkString(Newline)
+
+  private def formatMetadata(metadata: AlarmMetadata): String = {
     import metadata._
 
     List(
@@ -41,7 +56,10 @@ object Formatter {
     ).mkString(Newline)
   }
 
-  def formatStatus(status: AlarmStatus): String = {
+  private def formatOnlyStatus(alarmKey: AlarmKey, status: AlarmStatus, severity: FullAlarmSeverity): String =
+    List(formatKey(alarmKey), formatStatus(status), formatSeverity(severity)).mkString(Newline)
+
+  private def formatStatus(status: AlarmStatus): String = {
     import status._
 
     List(
@@ -52,16 +70,7 @@ object Formatter {
     ).mkString(Newline)
   }
 
-  def formatSeverity(severity: FullAlarmSeverity): String = s"Current Severity: $severity"
+  private def formatKey(key: AlarmKey): String                    = s"Alarm Key: $key"
+  private def formatSeverity(severity: FullAlarmSeverity): String = s"Current Severity: $severity"
 
-  def formatAggregatedSeverity(key: Key, severity: FullAlarmSeverity): String = msg(key, "Severity", severity.toString)
-  def formatAggregatedHealth(key: Key, health: AlarmHealth): String           = msg(key, "Health", health.toString)
-  def formatRefreshSeverity(key: Key, severity: FullAlarmSeverity): String    = s"Severity for [$key] refreshed to: $severity"
-
-  def msg(key: Key, property: String, value: String): String = key match {
-    case GlobalKey                          ⇒ s"Aggregated $property of Alarm Service: $value"
-    case SubsystemKey(subsystem)            ⇒ s"Aggregated $property of Subsystem [$subsystem]: $value"
-    case ComponentKey(subsystem, component) ⇒ s"Aggregated $property of Component [$subsystem$KeySeparator$component]: $value"
-    case _: AlarmKey                        ⇒ s"$property of Alarm [$key]: $value"
-  }
 }

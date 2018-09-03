@@ -188,14 +188,13 @@ trait StatusServiceModule extends StatusService {
     else logAndThrow(KeyNotFoundException(key))
   }
 
-  def getAlarms(key: Key): Future[List[Alarm]] = metadataApi.keys(key).flatMap {
-    Future.traverse(_) { metadataKey ⇒
-      val alarmKey = MetadataKey.toAlarmKey(metadataKey)
+  private[alarm] def getAlarms(key: Key): Future[List[Alarm]] = metadataApi.keys(key).flatMap {
+    Future.traverse(_) { key ⇒
       for {
-        metadata ← getMetadata(alarmKey)
-        status   ← getStatus(alarmKey)
-        severity ← getCurrentSeverity(alarmKey)
-      } yield Alarm(alarmKey, metadata, status, severity)
+        metadata ← getMetadata(key)
+        status   ← getStatus(key)
+        severity ← getCurrentSeverity(key)
+      } yield Alarm(key, metadata, status, severity)
     }
   }
 
