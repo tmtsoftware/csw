@@ -30,7 +30,7 @@ class StatusServiceModuleTest
   // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
   // DEOPSCSW-447: Reset api for alarm
   // DEOPSCSW-500: Update alarm time on current severity change
-  test("reset should not update time when severity does not change") {
+  test("reset should never update the alarm time") {
     // Initially latch and current are disconnected
     val defaultStatus = getStatus(tromboneAxisLowLimitAlarmKey).await
     defaultStatus.latchedSeverity shouldEqual Disconnected

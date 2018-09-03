@@ -446,6 +446,7 @@ class SeverityServiceModuleTest
 
   // DEOPSCSW-444 : Set severity api for component
   // DEOPSCSW-496 : Set Ack status on setSeverity
+  // DEOPSCSW-494: Incorporate changes in set severity, reset, acknowledgement and latch status
   AckStatusTestCases.foreach { testCase ⇒
     test(testCase.name) {
       feedTestData(testCase)
