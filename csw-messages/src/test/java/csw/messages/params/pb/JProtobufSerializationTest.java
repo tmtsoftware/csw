@@ -96,12 +96,12 @@ public class JProtobufSerializationTest {
         EventName eventName = new EventName("move");
         SystemEvent originalEvent = new SystemEvent(source, eventName).add(param);
 
-        PbEvent pbEvent = originalEvent.toPb();
+        PbEvent pbEvent = PbConverter.toPbEvent(originalEvent);
         byte[] pbEventBytes = pbEvent.toByteArray();
         PbEvent pbEventFromBytes = (PbEvent) PbEvent.parseFrom(pbEventBytes);
         Assert.assertEquals(pbEventFromBytes, pbEvent);
 
-        Event eventFromPbEvent = Event$.MODULE$.fromPb(pbEventFromBytes);
+        Event eventFromPbEvent = PbConverter.fromPbEvent(pbEventFromBytes);
         Assert.assertEquals(eventFromPbEvent, originalEvent);
     }
 }

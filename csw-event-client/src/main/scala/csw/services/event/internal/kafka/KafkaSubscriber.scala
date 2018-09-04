@@ -7,6 +7,7 @@ import akka.stream.{Materializer, StreamDetachedException}
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import csw.messages.events._
 import csw.messages.params.models.Subsystem
+import csw.messages.params.pb.PbConverter
 import csw.services.event.api.scaladsl.{EventSubscriber, EventSubscription, SubscriptionMode}
 import csw.services.event.internal.commons.EventSubscriberUtil
 import csw.services.event.utils.Utils
@@ -127,7 +128,7 @@ class KafkaSubscriber(consumerSettings: Future[ConsumerSettings[String, Array[By
   private def getEventStream(subscription: Future[Subscription]): Source[Event, Future[scaladsl.Consumer.Control]] = {
     val future = subscription.flatMap(s => consumerSettings.map(c => scaladsl.Consumer.plainSource(c, s)))
     Source.fromFutureSource(future).map { record ⇒
-      try Event.fromPb(PbEvent.parseFrom(record.value()))
+      try PbConverter.fromPbEvent(PbEvent.parseFrom(record.value()))
       catch { case NonFatal(_) ⇒ Event.badEvent() }
     }
   }

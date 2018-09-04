@@ -27,14 +27,14 @@ class ProtobufSerializationTest extends FunSpec with Matchers with BeforeAndAfte
 
       val param                      = choiceKey.set(jupiter, pluto).withUnits(arcmin)
       val observeEvent: ObserveEvent = ObserveEvent(prefix, eventName).add(param)
+      val pbEvent: PbEvent           = PbConverter.toPbEvent(observeEvent)
 
       //able to generate protobuf from event
-      ObserveEvent.fromPb(observeEvent.toPb) shouldBe observeEvent
-
-      Event.fromPb(PbEvent.parseFrom(observeEvent.toPb.toByteArray)) shouldBe a[ObserveEvent]
+      PbConverter.fromPbEvent[ObserveEvent](pbEvent) shouldBe observeEvent
 
       //able to generate event from protobuf byteArray
-      Event.fromPb(PbEvent.parseFrom(observeEvent.toPb.toByteArray)) shouldBe observeEvent
+      PbConverter.fromPbEvent[ObserveEvent](PbEvent.parseFrom(pbEvent.toByteArray)) shouldBe a[ObserveEvent]
+      PbConverter.fromPbEvent[ObserveEvent](PbEvent.parseFrom(pbEvent.toByteArray)) shouldBe observeEvent
     }
 
     it("should serialize SystemEvent") {
@@ -48,14 +48,14 @@ class ProtobufSerializationTest extends FunSpec with Matchers with BeforeAndAfte
       val param = structKey.set(struct).withUnits(joule)
 
       val systemEvent: SystemEvent = SystemEvent(prefix, eventName).add(param)
+      val pbEvent: PbEvent         = PbConverter.toPbEvent(systemEvent)
 
       //able to generate protobuf from event
-      SystemEvent.fromPb(systemEvent.toPb) shouldBe systemEvent
-
-      Event.fromPb(PbEvent.parseFrom(systemEvent.toPb.toByteArray)) shouldBe a[SystemEvent]
+      PbConverter.fromPbEvent[SystemEvent](pbEvent) shouldBe systemEvent
 
       //able to generate event from protobuf byteArray
-      Event.fromPb(PbEvent.parseFrom(systemEvent.toPb.toByteArray)) shouldBe systemEvent
+      PbConverter.fromPbEvent[SystemEvent](PbEvent.parseFrom(pbEvent.toByteArray)) shouldBe a[SystemEvent]
+      PbConverter.fromPbEvent[SystemEvent](PbEvent.parseFrom(pbEvent.toByteArray)) shouldBe systemEvent
     }
   }
 }

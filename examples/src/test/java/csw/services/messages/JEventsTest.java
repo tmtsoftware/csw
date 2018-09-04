@@ -12,6 +12,7 @@ import csw.messages.params.generics.Parameter;
 import csw.messages.params.models.MatrixData;
 import csw.messages.params.models.Prefix;
 import csw.messages.params.models.RaDec;
+import csw.messages.params.pb.PbConverter;
 import csw_protobuf.events.PbEvent;
 import org.junit.Assert;
 import org.junit.Test;
@@ -270,14 +271,14 @@ public class JEventsTest {
         SystemEvent systemEvent2 = new SystemEvent(prefix2, name2).add(param);
 
         //convert events to protobuf bytestring
-        PbEvent byteArray2 = observeEvent.toPb();
-        PbEvent byteArray3 = systemEvent1.toPb();
-        PbEvent byteArray4 = systemEvent2.toPb();
+        PbEvent byteArray2 = PbConverter.toPbEvent(observeEvent);
+        PbEvent byteArray3 = PbConverter.toPbEvent(systemEvent1);
+        PbEvent byteArray4 = PbConverter.toPbEvent(systemEvent2);
 
         //convert protobuf bytestring to events
-        ObserveEvent pbObserveEvent = ObserveEvent.fromPb(byteArray2);
-        SystemEvent pbSystemEvent1 = SystemEvent.fromPb(byteArray3);
-        SystemEvent pbSystemEvent2 = SystemEvent.fromPb(byteArray4);
+        ObserveEvent pbObserveEvent = PbConverter.fromPbEvent(byteArray2);
+        SystemEvent pbSystemEvent1 =  PbConverter.fromPbEvent(byteArray3);
+        SystemEvent pbSystemEvent2 =  PbConverter.fromPbEvent(byteArray4);
         //#protobuf
 
         //validations

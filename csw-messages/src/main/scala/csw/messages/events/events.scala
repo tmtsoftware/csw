@@ -4,8 +4,6 @@ import java.time.Instant
 
 import csw.messages.params.generics.{Parameter, ParameterSetType}
 import csw.messages.params.models.{Id, Prefix, Subsystem}
-import csw.messages.params.pb.TypeMapperSupport
-import csw_protobuf.events.PbEvent
 
 /**
  * Common trait representing events in TMT like [[csw.messages.events.SystemEvent]] and [[csw.messages.events.ObserveEvent]]
@@ -73,14 +71,6 @@ sealed trait Event { self: ParameterSetType[_] ⇒
 object Event {
 
   /**
-   * A helper method internally used to create an Event out of provided pbEvent
-   *
-   * @param pbEvent a PbEvent representing Event in protobuf
-   * @return an Event mapped from PbEvent
-   */
-  def fromPb(pbEvent: PbEvent): Event = TypeMapperSupport.eventTypeMapper[Event].toCustom(pbEvent)
-
-  /**
    * A helper method to create an event which is provided to subscriber when there is no event available at the
    * time of subscription
    * @param eventKey the Event Key for which subscription was made
@@ -123,14 +113,6 @@ case class SystemEvent private (
    */
   override protected def create(data: Set[Parameter[_]]): SystemEvent =
     copy(eventId = Id(), eventTime = EventTime(), paramSet = data)
-
-  /**
-   * A helper method to create PbEvent out of this Event
-   *
-   * @return a protobuf representation of SystemEvent
-   */
-  def toPb: PbEvent = TypeMapperSupport.eventTypeMapper[SystemEvent].toBase(this)
-
 }
 
 object SystemEvent {
@@ -163,14 +145,6 @@ object SystemEvent {
    */
   def apply(source: Prefix, eventName: EventName, paramSet: Set[Parameter[_]]): SystemEvent =
     apply(source, eventName).madd(paramSet)
-
-  /**
-   * Constructs from byte array containing Protobuf representation of SystemEvent
-   *
-   * @param pbEvent the protobuf representation of an event
-   * @return a SystemEvent mapped from provided pbEvent
-   */
-  def fromPb(pbEvent: PbEvent): SystemEvent = TypeMapperSupport.eventTypeMapper[SystemEvent].toCustom(pbEvent)
 }
 
 /**
@@ -200,11 +174,11 @@ case class ObserveEvent private (
     copy(eventId = Id(), eventTime = EventTime(), paramSet = data)
 
   /**
-   * A helper method to create PbEvent out of this Event
-   *
-   * @return a protobuf representation of ObserveEvent
-   */
-  def toPb: PbEvent = TypeMapperSupport.eventTypeMapper[ObserveEvent].toBase(this)
+ * A helper method to create PbEvent out of this Event
+ *
+ * @return a protobuf representation of ObserveEvent
+ */
+
 }
 
 object ObserveEvent {
@@ -237,12 +211,4 @@ object ObserveEvent {
    */
   def apply(source: Prefix, eventName: EventName, paramSet: Set[Parameter[_]]): ObserveEvent =
     apply(source, eventName).madd(paramSet)
-
-  /**
-   * Constructs from byte array containing Protobuf representation of SystemEvent
-   *
-   * @param pbEvent the protobuf representation of an event
-   * @return a ObserveEvent mapped from provided pbEvent
-   */
-  def fromPb(pbEvent: PbEvent): ObserveEvent = TypeMapperSupport.eventTypeMapper[ObserveEvent].toCustom(pbEvent)
 }
