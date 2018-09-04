@@ -15,7 +15,8 @@ import csw.services.alarm.client.internal.commons.Settings
 import csw.services.alarm.client.internal.redis.RedisConnectionsFactory
 import csw.services.alarm.client.internal.{AlarmCodec, AlarmServiceLogger}
 import reactor.core.publisher.FluxSink.OverflowStrategy
-import romaine.reactive.RedisResult
+import romaine.extensions.SourceExtensions.RichSource
+import romaine.reactive.{RedisResult, RedisSubscription}
 
 import scala.async.Async.{async, await}
 import scala.concurrent.Future
@@ -94,14 +95,15 @@ trait SeverityServiceModule extends SeverityService {
     val severitySourceF = async {
       val metadataKeys       = await(getActiveAlarmKeys(key))
       val activeSeverityKeys = metadataKeys.map(SeverityKey.fromMetadataKey)
-      val default            = await(severityApi.mget(activeSeverityKeys)).map(result ⇒ result.key → result.value).toMap
+      val currentSeverities  = await(severityApi.mget(activeSeverityKeys)).map(result ⇒ result.key → result.value).toMap
 
-      keySpaceApi.watchKeyspaceValueAggregation(
-        activeSeverityKeys.map(_.value),
-        OverflowStrategy.LATEST,
-        aggregratorByMax,
-        default
-      )
+      keySpaceApi
+        .watchKeyspaceValue(activeSeverityKeys.map(_.value), OverflowStrategy.LATEST)
+        .scan(currentSeverities) {
+          case (data, RedisResult(severityKey, mayBeSeverity)) ⇒ data + (severityKey → mayBeSeverity)
+        }
+        .map(data => aggregratorByMax(data.values))
+        .distinctUntilChanged
     }
 
     Source
