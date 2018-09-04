@@ -22,6 +22,14 @@ object Dependencies {
     Libs.`junit-interface`          % Test
   )
 
+  val Params = Seq(
+    Enumeratum.`enumeratum`,
+    Libs.`play-json`,
+    Enumeratum.`enumeratum-play`,
+    Libs.`upickle`,
+    Libs.`scalatest` % Test
+  )
+
   val Logging = Seq(
     Libs.`logback-classic`,
     Libs.`persist-json`,

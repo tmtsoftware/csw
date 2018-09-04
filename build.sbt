@@ -21,6 +21,7 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-location-agent`,
   `csw-benchmark`,
   `csw-messages`,
+  `csw-params`,
   `csw-commons`,
   `integration`,
   `examples`,
@@ -64,7 +65,7 @@ lazy val `csw-prod` = project
   .settings(GithubRelease.githubReleases(githubReleases))
 
 lazy val `csw-messages` = project
-  .dependsOn(`csw-commons` % "test->test")
+  .dependsOn(`csw-params`, `csw-commons` % "test->test")
   .enablePlugins(PublishBintray, GenJavadocPlugin)
   .settings(
     libraryDependencies ++= Dependencies.Messages
@@ -75,6 +76,14 @@ lazy val `csw-messages` = project
       PB.gens.java                        -> (sourceManaged in Compile).value,
       scalapb.gen(javaConversions = true) -> (sourceManaged in Compile).value
     )
+  )
+
+lazy val `csw-params` = project
+  .dependsOn(`csw-commons` % "test->test")
+  .enablePlugins(PublishBintray, GenJavadocPlugin)
+  .settings(
+    libraryDependencies ++= Dependencies.Params,
+    Common.detectCycles := false
   )
 
 lazy val `csw-logging-macros` = project
