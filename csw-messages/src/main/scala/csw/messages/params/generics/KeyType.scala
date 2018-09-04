@@ -2,15 +2,13 @@ package csw.messages.params.generics
 
 import java.time.Instant
 
-import scalapb.TypeMapper
 import csw.messages.params.formats.JsonSupport
 import csw.messages.params.models.Units.second
 import csw.messages.params.models.{Units, _}
-import csw.messages.params.pb.ItemsFactory
 import csw_protobuf.keytype.PbKeyType
-import csw_protobuf.parameter.PbParameter
 import enumeratum.{Enum, EnumEntry, PlayJsonEnum}
 import play.api.libs.json._
+import scalapb.TypeMapper
 
 import scala.collection.immutable
 import scala.reflect.ClassTag
@@ -20,12 +18,11 @@ import scala.reflect.ClassTag
  *
  * @tparam S the type of values that will sit against the key in Parameter
  */
-sealed class KeyType[S: Format: ClassTag: ItemsFactory] extends EnumEntry with Serializable {
+sealed class KeyType[S: Format: ClassTag] extends EnumEntry with Serializable {
   override def hashCode: Int              = toString.hashCode
   override def equals(that: Any): Boolean = that.toString == this.toString
 
-  private[messages] def paramFormat: Format[Parameter[S]]                 = Parameter[S]
-  private[messages] def typeMapper: TypeMapper[PbParameter, Parameter[S]] = Parameter.typeMapper
+  private[messages] def paramFormat: Format[Parameter[S]] = Parameter[S]
 }
 
 /**
@@ -33,7 +30,7 @@ sealed class KeyType[S: Format: ClassTag: ItemsFactory] extends EnumEntry with S
  *
  * @tparam S the type of values that will sit against the key in Parameter
  */
-sealed class SimpleKeyType[S: Format: ClassTag: ItemsFactory] extends KeyType[S] {
+sealed class SimpleKeyType[S: Format: ClassTag] extends KeyType[S] {
 
   /**
    * Make a Key from provided name
@@ -51,7 +48,7 @@ sealed class SimpleKeyType[S: Format: ClassTag: ItemsFactory] extends KeyType[S]
  * @param defaultUnits applicable units
  * @tparam S the type of values that will sit against the key in Parameter
  */
-sealed class SimpleKeyTypeWithUnits[S: Format: ClassTag: ItemsFactory](defaultUnits: Units) extends KeyType[S] {
+sealed class SimpleKeyTypeWithUnits[S: Format: ClassTag](defaultUnits: Units) extends KeyType[S] {
 
   /**
    * Make a Key from provided name
@@ -65,12 +62,12 @@ sealed class SimpleKeyTypeWithUnits[S: Format: ClassTag: ItemsFactory](defaultUn
 /**
  * A KeyType that holds array
  */
-sealed class ArrayKeyType[S: Format: ClassTag](implicit x: ItemsFactory[ArrayData[S]]) extends SimpleKeyType[ArrayData[S]]
+sealed class ArrayKeyType[S: Format: ClassTag] extends SimpleKeyType[ArrayData[S]]
 
 /**
  * A KeyType that holds Matrix
  */
-sealed class MatrixKeyType[S: Format: ClassTag](implicit x: ItemsFactory[MatrixData[S]]) extends SimpleKeyType[MatrixData[S]]
+sealed class MatrixKeyType[S: Format: ClassTag] extends SimpleKeyType[MatrixData[S]]
 
 /**
  * KeyTypes defined for consumption in Scala code
@@ -131,22 +128,20 @@ object KeyType extends Enum[KeyType[_]] with PlayJsonEnum[KeyType[_]] {
 /**
  * SimpleKeyType with a name for java Keys. Holds instances of primitives such as char, int, String etc.
  */
-sealed class JSimpleKeyType[S: Format: ClassTag, T: ItemsFactory](implicit conversion: T ⇒ S) extends SimpleKeyType[S]
+sealed class JSimpleKeyType[S: Format: ClassTag, T](implicit conversion: T ⇒ S) extends SimpleKeyType[S]
 
 /**
  * A java KeyType that holds array
  */
-sealed class JArrayKeyType[S: Format: ClassTag, T: ItemsFactory](
-    implicit x: ItemsFactory[ArrayData[T]],
-    conversion: T ⇒ S
+sealed class JArrayKeyType[S: Format: ClassTag, T](
+    implicit conversion: T ⇒ S
 ) extends JSimpleKeyType[ArrayData[S], ArrayData[T]]
 
 /**
  * A java KeyType that holds matrix
  */
-sealed class JMatrixKeyType[S: Format: ClassTag, T: ItemsFactory](
-    implicit x: ItemsFactory[MatrixData[T]],
-    conversion: T ⇒ S
+sealed class JMatrixKeyType[S: Format: ClassTag, T](
+    implicit conversion: T ⇒ S
 ) extends JSimpleKeyType[MatrixData[S], MatrixData[T]]
 
 object JSimpleKeyType {

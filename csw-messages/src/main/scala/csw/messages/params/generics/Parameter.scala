@@ -3,13 +3,13 @@ package csw.messages.params.generics
 import java.util
 import java.util.Optional
 
-import scalapb.TypeMapper
 import csw.messages.TMTSerializable
 import csw.messages.params.models.Units
-import csw.messages.params.pb.{ItemType, ItemsFactory}
+import csw.messages.params.pb.{ItemType, ItemsFactory, TypeMapperFactory}
 import csw_protobuf.parameter.PbParameter
 import csw_protobuf.parameter.PbParameter.Items
 import play.api.libs.json._
+import scalapb.TypeMapper
 
 import scala.collection.JavaConverters.seqAsJavaListConverter
 import scala.collection.mutable
@@ -18,7 +18,7 @@ import scala.reflect.ClassTag
 
 object Parameter {
 
-  private[generics] def apply[S: Format: ClassTag: ItemsFactory](
+  private[generics] def apply[S: Format: ClassTag](
       keyName: String,
       keyType: KeyType[S],
       items: mutable.WrappedArray[S],
@@ -35,7 +35,7 @@ object Parameter {
     }
   }
 
-  private[messages] implicit def parameterFormat[T: Format: ClassTag: ItemsFactory]: Format[Parameter[T]] =
+  private[messages] implicit def parameterFormat[T: Format: ClassTag]: Format[Parameter[T]] =
     new Format[Parameter[T]] {
       override def writes(obj: Parameter[T]): JsValue = {
         JsObject(
@@ -79,8 +79,11 @@ object Parameter {
           .withItems(ItemsFactory[S].make(x.items))
     }
 
-  private[messages] implicit val typeMapper2: TypeMapper[PbParameter, Parameter[_]] =
-    TypeMapper[PbParameter, Parameter[_]](p ⇒ p.keyType.typeMapper.toCustom(p))(p => p.toPb)
+  implicit val typeMapper2: TypeMapper[PbParameter, Parameter[_]] = {
+    TypeMapper[PbParameter, Parameter[_]](
+      p ⇒ TypeMapperFactory.make(p.keyType).toCustom(p)
+    )(p => TypeMapperFactory.make(p.keyType).toBase(p))
+  }
 
   private def cswItems[T: ClassTag](items: Items): mutable.WrappedArray[T] = items.value match {
     case x: ItemType[_] ⇒ x.asInstanceOf[ItemType[T]].values.toArray[T]
@@ -99,7 +102,7 @@ object Parameter {
  * @param units applicable units
  * @tparam S the type of items this parameter holds
  */
-case class Parameter[S: Format: ClassTag: ItemsFactory] private[messages] (
+case class Parameter[S: Format: ClassTag] private[messages] (
     keyName: String,
     keyType: KeyType[S],
     items: mutable.WrappedArray[S],
@@ -185,10 +188,4 @@ case class Parameter[S: Format: ClassTag: ItemsFactory] private[messages] (
    * Returns a JSON representation of this parameter
    */
   def toJson: JsValue = Parameter[S].writes(this)
-
-  /**
-   * Converts this instance of Parameter to Protobuf dual, represented by PbParameter
-   * @return an instance PbParameter
-   */
-  def toPb: PbParameter = Parameter.typeMapper[S].toBase(this)
 }
