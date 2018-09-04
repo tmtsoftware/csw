@@ -27,7 +27,7 @@ object TypeMapperFactory extends DerivedJsonFormats {
     case KeyType.IntKey          ⇒ typeMapper[Int]
     case KeyType.FloatKey        ⇒ typeMapper[Float]
     case KeyType.DoubleKey       ⇒ typeMapper[Double]
-    case KeyType.ByteArrayKey    ⇒ typeMapper[Byte]
+    case KeyType.ByteArrayKey    ⇒ typeMapper[ArrayData[Byte]]
     case KeyType.ShortArrayKey   ⇒ typeMapper[ArrayData[Short]]
     case KeyType.LongArrayKey    ⇒ typeMapper[ArrayData[Long]]
     case KeyType.IntArrayKey     ⇒ typeMapper[ArrayData[Int]]

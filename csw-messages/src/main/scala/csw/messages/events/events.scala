@@ -6,9 +6,6 @@ import csw.messages.params.generics.{Parameter, ParameterSetType}
 import csw.messages.params.models.{Id, Prefix, Subsystem}
 import csw.messages.params.pb.TypeMapperSupport
 import csw_protobuf.events.PbEvent
-import csw_protobuf.events.PbEvent.PbEventType
-import csw_protobuf.parameter.PbParameter
-import scalapb.TypeMapper
 
 /**
  * Common trait representing events in TMT like [[csw.messages.events.SystemEvent]] and [[csw.messages.events.ObserveEvent]]
@@ -74,47 +71,6 @@ sealed trait Event { self: ParameterSetType[_] ⇒
 }
 
 object Event {
-  private val mapper =
-    TypeMapper[Seq[PbParameter], Set[Parameter[_]]] {
-      _.map(TypeMapperSupport.parameterTypeMapper2.toCustom).toSet
-    } {
-      _.map(TypeMapperSupport.parameterTypeMapper2.toBase).toSeq
-    }
-
-  /**
-   * TypeMapper definitions are required for to/from conversion PbEvent(Protobuf) <==> System, Observe event.
-   */
-  private[csw] implicit def typeMapper[T <: Event]: TypeMapper[PbEvent, T] = new TypeMapper[PbEvent, T] {
-    override def toCustom(base: PbEvent): T = {
-      val factory: (Id, Prefix, EventName, EventTime, Set[Parameter[_]]) ⇒ Any = base.eventType match {
-        case PbEventType.SystemEvent     ⇒ SystemEvent.apply
-        case PbEventType.ObserveEvent    ⇒ ObserveEvent.apply
-        case PbEventType.Unrecognized(x) ⇒ throw new RuntimeException(s"unknown event type=[${base.eventType.toString} :$x]")
-      }
-
-      factory(
-        Id(base.eventId),
-        Prefix(base.source),
-        EventName(base.name),
-        base.eventTime.map(EventTime.typeMapper.toCustom).get,
-        mapper.toCustom(base.paramSet)
-      ).asInstanceOf[T]
-    }
-
-    override def toBase(custom: T): PbEvent = {
-      val pbEventType = custom match {
-        case _: ObserveEvent ⇒ PbEventType.ObserveEvent
-        case _: SystemEvent  ⇒ PbEventType.SystemEvent
-      }
-      PbEvent()
-        .withEventId(custom.eventId.id)
-        .withSource(custom.source.prefix)
-        .withName(custom.eventName.name)
-        .withEventTime(EventTime.typeMapper.toBase(custom.eventTime))
-        .withParamSet(mapper.toBase(custom.paramSet))
-        .withEventType(pbEventType)
-    }
-  }
 
   /**
    * A helper method internally used to create an Event out of provided pbEvent
@@ -122,7 +78,7 @@ object Event {
    * @param pbEvent a PbEvent representing Event in protobuf
    * @return an Event mapped from PbEvent
    */
-  def fromPb(pbEvent: PbEvent): Event = Event.typeMapper[Event].toCustom(pbEvent)
+  def fromPb(pbEvent: PbEvent): Event = TypeMapperSupport.eventTypeMapper[Event].toCustom(pbEvent)
 
   /**
    * A helper method to create an event which is provided to subscriber when there is no event available at the
@@ -173,7 +129,7 @@ case class SystemEvent private (
    *
    * @return a protobuf representation of SystemEvent
    */
-  def toPb: PbEvent = Event.typeMapper[SystemEvent].toBase(this)
+  def toPb: PbEvent = TypeMapperSupport.eventTypeMapper[SystemEvent].toBase(this)
 
 }
 
@@ -214,7 +170,7 @@ object SystemEvent {
    * @param pbEvent the protobuf representation of an event
    * @return a SystemEvent mapped from provided pbEvent
    */
-  def fromPb(pbEvent: PbEvent): SystemEvent = Event.typeMapper[SystemEvent].toCustom(pbEvent)
+  def fromPb(pbEvent: PbEvent): SystemEvent = TypeMapperSupport.eventTypeMapper[SystemEvent].toCustom(pbEvent)
 }
 
 /**
@@ -248,7 +204,7 @@ case class ObserveEvent private (
    *
    * @return a protobuf representation of ObserveEvent
    */
-  def toPb: PbEvent = Event.typeMapper[ObserveEvent].toBase(this)
+  def toPb: PbEvent = TypeMapperSupport.eventTypeMapper[ObserveEvent].toBase(this)
 }
 
 object ObserveEvent {
@@ -288,5 +244,5 @@ object ObserveEvent {
    * @param pbEvent the protobuf representation of an event
    * @return a ObserveEvent mapped from provided pbEvent
    */
-  def fromPb(pbEvent: PbEvent): ObserveEvent = Event.typeMapper[ObserveEvent].toCustom(pbEvent)
+  def fromPb(pbEvent: PbEvent): ObserveEvent = TypeMapperSupport.eventTypeMapper[ObserveEvent].toCustom(pbEvent)
 }

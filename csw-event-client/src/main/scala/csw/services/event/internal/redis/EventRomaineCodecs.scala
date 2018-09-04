@@ -3,6 +3,7 @@ package csw.services.event.internal.redis
 import java.nio.ByteBuffer
 
 import csw.messages.events.{Event, EventKey}
+import csw.messages.params.pb.TypeMapperSupport
 import csw_protobuf.events.PbEvent
 import romaine.codec.{RomaineByteCodec, RomaineStringCodec}
 
@@ -19,7 +20,7 @@ object EventRomaineCodecs {
 
   implicit object EventRomaineCodec extends RomaineByteCodec[Event] {
     override def toBytes(event: Event): ByteBuffer = {
-      val pbEvent = Event.typeMapper.toBase(event)
+      val pbEvent = TypeMapperSupport.eventTypeMapper.toBase(event)
       ByteBuffer.wrap(pbEvent.toByteArray)
     }
     override def fromBytes(byteBuffer: ByteBuffer): Event = {

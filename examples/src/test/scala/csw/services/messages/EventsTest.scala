@@ -8,6 +8,7 @@ import csw.messages.params.generics.KeyType.{DoubleMatrixKey, RaDecKey}
 import csw.messages.params.generics.{Key, KeyType, Parameter}
 import csw.messages.params.models.Units.arcmin
 import csw.messages.params.models._
+import csw.messages.params.pb.TypeMapperSupport
 import csw_protobuf.events.PbEvent
 import org.scalatest.{FunSpec, Matchers}
 
