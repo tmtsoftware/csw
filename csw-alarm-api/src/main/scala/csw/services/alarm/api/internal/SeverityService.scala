@@ -48,7 +48,7 @@ private[alarm] trait SeverityService extends AlarmService {
    *
    *
    * @param key represents subsystem, component or a specific alarm whose aggregated severity is to be subscribed
-   * @param actorRef which receives message of aggregated severity on every severity change for given key
+   * @param actorRef of actor which will receive message of aggregated severity on every severity change for given key
    * @return alarm subscription to ready or unsubscribe to the severity change for give key or throws
    *         [[csw.services.alarm.api.exceptions.KeyNotFoundException]] or
    *         [[csw.services.alarm.api.exceptions.InactiveAlarmException]]
