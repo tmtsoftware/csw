@@ -14,7 +14,7 @@ import csw.framework.CurrentStatePublisher;
 import csw.messages.commands.*;
 import csw.messages.framework.ComponentInfo;
 import csw.messages.location.TrackingEvent;
-import csw.messages.params.generics.JKeyTypes;
+import csw.messages.params.generics.JKeyType;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.states.CurrentState;
 import csw.messages.params.states.StateName;
@@ -103,7 +103,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
         if (controlCommand.commandName().equals(immediateCmd())) {
             return new Completed(controlCommand.runId());
         } else if (controlCommand.commandName().equals(immediateResCmd())) {
-            Parameter<Integer> param = JKeyTypes.IntKey().make("encoder").set(22);
+            Parameter<Integer> param = JKeyType.IntKey().make("encoder").set(22);
             Result result = new Result(controlCommand.source().prefix()).add(param);
             return new CompletedWithResult(controlCommand.runId(), result);
         } else if (controlCommand.commandName().equals(failureAfterValidationCmd())) {
@@ -130,7 +130,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     private void processCommandWithMatcher(ControlCommand controlCommand) {
         Source.range(1, 10)
                 .map(i -> {
-                    currentStatePublisher.publish(new CurrentState(controlCommand.source().prefix(), new StateName("testStateName")).add(JKeyTypes.IntKey().make("encoder").set(i * 10)));
+                    currentStatePublisher.publish(new CurrentState(controlCommand.source().prefix(), new StateName("testStateName")).add(JKeyType.IntKey().make("encoder").set(i * 10)));
                     return i;
                 })
                 .throttle(1, Duration.create(100, TimeUnit.MILLISECONDS), 1, ThrottleMode.shaping())

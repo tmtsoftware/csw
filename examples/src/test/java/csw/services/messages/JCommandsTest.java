@@ -7,7 +7,7 @@ import csw.messages.commands.Wait;
 import csw.messages.javadsl.JSubsystem;
 import csw.messages.javadsl.JUnits;
 import csw.messages.params.formats.JavaJsonSupport;
-import csw.messages.params.generics.JKeyTypes;
+import csw.messages.params.generics.JKeyType;
 import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.models.ArrayData;
@@ -55,11 +55,11 @@ public class JCommandsTest {
     public void showUsageOfSetupCommand() {
         //#setup
         //keys
-        Key<Integer> k1 = JKeyTypes.IntKey().make("encoder");
-        Key<String> k2 = JKeyTypes.StringKey().make("stringThing");
-        Key<Integer> k2bad = JKeyTypes.IntKey().make("missingKey");
-        Key<Integer> k3 = JKeyTypes.IntKey().make("filter");
-        Key<Float> k4 = JKeyTypes.FloatKey().make("correction");
+        Key<Integer> k1 = JKeyType.IntKey().make("encoder");
+        Key<String> k2 = JKeyType.StringKey().make("stringThing");
+        Key<Integer> k2bad = JKeyType.IntKey().make("missingKey");
+        Key<Integer> k3 = JKeyType.IntKey().make("filter");
+        Key<Float> k4 = JKeyType.FloatKey().make("correction");
 
         //prefix
         String prefixName = "wfos.red.detector";
@@ -83,8 +83,8 @@ public class JCommandsTest {
         int paramSize = sc2.size();
 
         //add binary payload
-        Key<Byte> byteKey1 = JKeyTypes.ByteKey().make("byteKey1");
-        Key<Byte> byteKey2 = JKeyTypes.ByteKey().make("byteKey2");
+        Key<Byte> byteKey1 = JKeyType.ByteKey().make("byteKey1");
+        Key<Byte> byteKey2 = JKeyType.ByteKey().make("byteKey2");
         Byte[] bytes1 = {10, 20};
         Byte[] bytes2 = {30, 40};
 
@@ -114,11 +114,11 @@ public class JCommandsTest {
     public void showUsageOfObserveCommand() {
         //#observe
         //keys
-        Key<Boolean> k1 = JKeyTypes.BooleanKey().make("repeat");
-        Key<Integer> k2 = JKeyTypes.IntKey().make("expTime");
-        Key<Integer> k2bad = JKeyTypes.IntKey().make("missingKey");
-        Key<Integer> k3 = JKeyTypes.IntKey().make("filter");
-        Key<Instant> k4 = JKeyTypes.TimestampKey().make("creation-time");
+        Key<Boolean> k1 = JKeyType.BooleanKey().make("repeat");
+        Key<Integer> k2 = JKeyType.IntKey().make("expTime");
+        Key<Integer> k2bad = JKeyType.IntKey().make("missingKey");
+        Key<Integer> k3 = JKeyType.IntKey().make("filter");
+        Key<Instant> k4 = JKeyType.TimestampKey().make("creation-time");
 
         //prefix
         String prefixName = "wfos.red.detector";
@@ -136,7 +136,7 @@ public class JCommandsTest {
         java.util.List<Boolean> values = k1Param.get().jValues();
 
         //access parameters
-        Optional<Parameter<ArrayData<Float>>> k2BadParam = oc1.jGet(k2bad.keyName(), JKeyTypes.FloatArrayKey());
+        Optional<Parameter<ArrayData<Float>>> k2BadParam = oc1.jGet(k2bad.keyName(), JKeyType.FloatArrayKey());
 
         //add more than one parameters, using madd
         Observe oc2 = oc1.madd(k3.set(1, 2, 3, 4).withUnits(JUnits.day), k4.set(Instant.now()));
@@ -166,11 +166,11 @@ public class JCommandsTest {
     public void showUsageOfWaitCommand() {
         //#wait
         //keys
-        Key<Boolean> k1 = JKeyTypes.BooleanKey().make("repeat");
-        Key<Integer> k2 = JKeyTypes.IntKey().make("expTime");
-        Key<Integer> k2bad = JKeyTypes.IntKey().make("missingKey");
-        Key<Integer> k3 = JKeyTypes.IntKey().make("filter");
-        Key<Instant> k4 = JKeyTypes.TimestampKey().make("creation-time");
+        Key<Boolean> k1 = JKeyType.BooleanKey().make("repeat");
+        Key<Integer> k2 = JKeyType.IntKey().make("expTime");
+        Key<Integer> k2bad = JKeyType.IntKey().make("missingKey");
+        Key<Integer> k3 = JKeyType.IntKey().make("filter");
+        Key<Instant> k4 = JKeyType.TimestampKey().make("creation-time");
 
         //prefix
         String prefixName = "wfos.red.detector";
@@ -188,7 +188,7 @@ public class JCommandsTest {
         java.util.List<Boolean> values = k1Param.get().jValues();
 
         //access parameters
-        Optional<Parameter<ArrayData<Float>>> k2BadParam = wc1.jGet("absentKeyHere", JKeyTypes.FloatArrayKey());
+        Optional<Parameter<ArrayData<Float>>> k2BadParam = wc1.jGet("absentKeyHere", JKeyType.FloatArrayKey());
 
         //add more than one parameters, using madd
         Wait wc2 = wc1.madd(k3.set(1, 2, 3, 4).withUnits(JUnits.day), k4.set(Instant.now()));
@@ -218,7 +218,7 @@ public class JCommandsTest {
     public void showJsonSerialization() {
         //#json-serialization
         //key
-        Key<MatrixData<Double>> k1 = JKeyTypes.DoubleMatrixKey().make("myMatrix");
+        Key<MatrixData<Double>> k1 = JKeyType.DoubleMatrixKey().make("myMatrix");
 
         //values
         Double[][] doubles = {{1.0, 2.0, 3.0}, {4.1, 5.1, 6.1}, {7.2, 8.2, 9.2}};
@@ -257,9 +257,9 @@ public class JCommandsTest {
     public void showUniqueKeyConstraintExample() {
         //#unique-key
         //keys
-        Key<Integer> encoderKey = JKeyTypes.IntKey().make("encoder");
-        Key<Integer> filterKey = JKeyTypes.IntKey().make("filter");
-        Key<Integer> miscKey = JKeyTypes.IntKey().make("misc.");
+        Key<Integer> encoderKey = JKeyType.IntKey().make("encoder");
+        Key<Integer> filterKey = JKeyType.IntKey().make("filter");
+        Key<Integer> miscKey = JKeyType.IntKey().make("misc.");
 
         //prefix
         String prefix = "wfos.blue.filter";
@@ -306,7 +306,7 @@ public class JCommandsTest {
     @Test
     public void showCloneCommandExample() {
         String prefix = "wfos.blue.filter";
-        Key<Integer> encoderIntKey = JKeyTypes.IntKey().make("encoder");
+        Key<Integer> encoderIntKey = JKeyType.IntKey().make("encoder");
         Parameter<Integer> encoderParam = encoderIntKey.set(22, 33);
         CommandName commandName = new CommandName("move");
 

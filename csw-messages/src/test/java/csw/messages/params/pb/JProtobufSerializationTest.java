@@ -4,7 +4,7 @@ import csw.messages.events.Event;
 import csw.messages.events.Event$;
 import csw.messages.events.EventName;
 import csw.messages.events.SystemEvent;
-import csw.messages.params.generics.JKeyTypes;
+import csw.messages.params.generics.JKeyType;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.models.*;
 import csw_protobuf.events.PbEvent;
@@ -54,31 +54,31 @@ public class JProtobufSerializationTest {
         MatrixData<Double> doubleMatrixData = MatrixData.fromJavaArrays(Double.class, doubleData2D);
 
         return Arrays.asList(new Object[][]{
-                {"JChoiceKey", JKeyTypes.ChoiceKey().make("choiceKey", Choices.from("A", "B", "C")).set(new Choice("A"))},
-                {"JRaDecKey", JKeyTypes.RaDecKey().make("raDecKey").set(new RaDec(10, 20))},
-                {"JStructKey", JKeyTypes.StructKey().make("structKey").set(new Struct().add(JKeyTypes.RaDecKey().make("raDecKey").set(new RaDec(10, 20))))},
-                {"JStringKey", JKeyTypes.StringKey().make("stringKey").set("str1", "str2")},
-                {"JTimestampKey", JKeyTypes.TimestampKey().make("timestampKey").set(Instant.now())},
-                {"JBooleanKey", JKeyTypes.BooleanKey().make("booleanKey").set(true)},
-                {"JCharKey", JKeyTypes.CharKey().make("charKey").set('A', 'B')},
-                {"JByteKey", JKeyTypes.ByteKey().make("byteKey").set(byteData)},
-                {"JShortKey", JKeyTypes.ShortKey().make("shortKey").set(shortData)},
-                {"JLongKey", JKeyTypes.LongKey().make("longKey").set(longData)},
-                {"JIntKey", JKeyTypes.IntKey().make("intKey").set(intData)},
-                {"JFloatKey", JKeyTypes.FloatKey().make("floatKey").set(floatData)},
-                {"JDoubleKey", JKeyTypes.DoubleKey().make("doubleKey").set(doubleData)},
-                {"JByteArrayKey", JKeyTypes.ByteArrayKey().make("byteArrayKey").set(ArrayData.fromJavaArray(byteData))},
-                {"JShortArrayKey", JKeyTypes.ShortArrayKey().make("shortArrayKey").set(ArrayData.fromJavaArray(shortData))},
-                {"JLongArrayKey", JKeyTypes.LongArrayKey().make("longArrayKey").set(ArrayData.fromJavaArray(longData))},
-                {"JIntArrayKey", JKeyTypes.IntArrayKey().make("intArrayKey").set(ArrayData.fromJavaArray(intData))},
-                {"JFloatArrayKey", JKeyTypes.FloatArrayKey().make("floatArrayKey").set(ArrayData.fromJavaArray(floatData))},
-                {"JDoubleArrayKey", JKeyTypes.DoubleArrayKey().make("doubleArrayKey").set(ArrayData.fromJavaArray(doubleData))},
-                {"JByteMatrixKey", JKeyTypes.ByteMatrixKey().make("byteMatrixKey").set(byteMatrixData)},
-                {"JShortMatrixKey", JKeyTypes.ShortMatrixKey().make("shortMatrixKey").set(shortMatrixData)},
-                {"JLongMatrixKey", JKeyTypes.LongMatrixKey().make("longMatrixKey").set(longMatrixData)},
-                {"JIntMatrixKey", JKeyTypes.IntMatrixKey().make("intMatrixKey").set(integerMatrixData)},
-                {"JFloatMatrixKey", JKeyTypes.FloatMatrixKey().make("floatMatrixKey").set(floatMatrixData)},
-                {"JDoubleMatrixKey", JKeyTypes.DoubleMatrixKey().make("doubleMatrixKey").set(doubleMatrixData)}
+                {"JChoiceKey", JKeyType.ChoiceKey().make("choiceKey", Choices.from("A", "B", "C")).set(new Choice("A"))},
+                {"JRaDecKey", JKeyType.RaDecKey().make("raDecKey").set(new RaDec(10, 20))},
+                {"JStructKey", JKeyType.StructKey().make("structKey").set(new Struct().add(JKeyType.RaDecKey().make("raDecKey").set(new RaDec(10, 20))))},
+                {"JStringKey", JKeyType.StringKey().make("stringKey").set("str1", "str2")},
+                {"JTimestampKey", JKeyType.TimestampKey().make("timestampKey").set(Instant.now())},
+                {"JBooleanKey", JKeyType.BooleanKey().make("booleanKey").set(true)},
+                {"JCharKey", JKeyType.CharKey().make("charKey").set('A', 'B')},
+                {"JByteKey", JKeyType.ByteKey().make("byteKey").set(byteData)},
+                {"JShortKey", JKeyType.ShortKey().make("shortKey").set(shortData)},
+                {"JLongKey", JKeyType.LongKey().make("longKey").set(longData)},
+                {"JIntKey", JKeyType.IntKey().make("intKey").set(intData)},
+                {"JFloatKey", JKeyType.FloatKey().make("floatKey").set(floatData)},
+                {"JDoubleKey", JKeyType.DoubleKey().make("doubleKey").set(doubleData)},
+                {"JByteArrayKey", JKeyType.ByteArrayKey().make("byteArrayKey").set(ArrayData.fromJavaArray(byteData))},
+                {"JShortArrayKey", JKeyType.ShortArrayKey().make("shortArrayKey").set(ArrayData.fromJavaArray(shortData))},
+                {"JLongArrayKey", JKeyType.LongArrayKey().make("longArrayKey").set(ArrayData.fromJavaArray(longData))},
+                {"JIntArrayKey", JKeyType.IntArrayKey().make("intArrayKey").set(ArrayData.fromJavaArray(intData))},
+                {"JFloatArrayKey", JKeyType.FloatArrayKey().make("floatArrayKey").set(ArrayData.fromJavaArray(floatData))},
+                {"JDoubleArrayKey", JKeyType.DoubleArrayKey().make("doubleArrayKey").set(ArrayData.fromJavaArray(doubleData))},
+                {"JByteMatrixKey", JKeyType.ByteMatrixKey().make("byteMatrixKey").set(byteMatrixData)},
+                {"JShortMatrixKey", JKeyType.ShortMatrixKey().make("shortMatrixKey").set(shortMatrixData)},
+                {"JLongMatrixKey", JKeyType.LongMatrixKey().make("longMatrixKey").set(longMatrixData)},
+                {"JIntMatrixKey", JKeyType.IntMatrixKey().make("intMatrixKey").set(integerMatrixData)},
+                {"JFloatMatrixKey", JKeyType.FloatMatrixKey().make("floatMatrixKey").set(floatMatrixData)},
+                {"JDoubleMatrixKey", JKeyType.DoubleMatrixKey().make("doubleMatrixKey").set(doubleMatrixData)}
         });
     }
 

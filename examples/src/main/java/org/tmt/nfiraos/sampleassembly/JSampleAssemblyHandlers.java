@@ -17,7 +17,7 @@ import csw.messages.events.SystemEvent;
 import csw.messages.framework.ComponentInfo;
 import csw.messages.javadsl.JUnits;
 import csw.messages.location.*;
-import csw.messages.params.generics.JKeyTypes;
+import csw.messages.params.generics.JKeyType;
 import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.models.ObsId;
@@ -109,7 +109,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
     private void handle(JCommandService hcd) {
 
         // Construct Setup command
-        Key<Long> sleepTimeKey = JKeyTypes.LongKey().make("SleepTime");
+        Key<Long> sleepTimeKey = JKeyType.LongKey().make("SleepTime");
         Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L).withUnits(JUnits.millisecond);
 
         Setup setupCommand = new Setup(componentInfo.prefix(), new CommandName("sleep"), Optional.of(new ObsId("2018A-001"))).add(sleepTimeParam);
@@ -176,7 +176,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
 
     //#subscribe
     private EventKey counterEventKey = new EventKey(new Prefix("nfiraos.samplehcd"), new EventName("HcdCounter"));
-    private Key<Integer> hcdCounterKey = JKeyTypes.IntKey().make("counter");
+    private Key<Integer> hcdCounterKey = JKeyType.IntKey().make("counter");
 
     private void processEvent(Event event) {
         log.info("Event received: "+ event.eventKey());

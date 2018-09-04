@@ -13,7 +13,7 @@ import csw.messages.TopLevelActorMessage;
 import csw.messages.commands.*;
 import csw.messages.framework.ComponentInfo;
 import csw.messages.location.*;
-import csw.messages.params.generics.JKeyTypes;
+import csw.messages.params.generics.JKeyType;
 import csw.messages.params.generics.Key;
 import csw.messages.params.models.Prefix;
 import csw.messages.params.states.CurrentState;
@@ -202,7 +202,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
                 // Completed
                 commandResponseManager.jSubscribe(subCommand.runId(), commandResponse -> {
                     if (commandResponse.resultType() instanceof CommandResponse.Completed) {
-                        Key<String> stringKey = JKeyTypes.StringKey().make("sub-command-status");
+                        Key<String> stringKey = JKeyType.StringKey().make("sub-command-status");
                         CurrentState currentState = new CurrentState(sc.source().prefix(), new StateName("testStateName"));
                         currentStatePublisher.publish(currentState.madd(stringKey.set("complete")));
                     } else {

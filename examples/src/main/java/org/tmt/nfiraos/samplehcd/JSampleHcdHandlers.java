@@ -12,7 +12,7 @@ import csw.messages.events.EventName;
 import csw.messages.events.SystemEvent;
 import csw.messages.framework.ComponentInfo;
 import csw.messages.location.TrackingEvent;
-import csw.messages.params.generics.JKeyTypes;
+import csw.messages.params.generics.JKeyType;
 import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.models.Id;
@@ -128,7 +128,7 @@ public class JSampleHcdHandlers extends JComponentHandlers {
     private int counter = 0;
     private Event incrementCounterEvent() {
         counter += 1;
-        Parameter<Integer> param = JKeyTypes.IntKey().make("counter").set(counter);
+        Parameter<Integer> param = JKeyType.IntKey().make("counter").set(counter);
         return new SystemEvent(componentInfo.prefix(), new EventName("HcdCounter")).add(param);
     }
 
@@ -169,7 +169,7 @@ public class JSampleHcdHandlers extends JComponentHandlers {
     }
 
     private void onSetup(Setup setup) {
-        Key<Long> sleepTimeKey = JKeyTypes.LongKey().make("SleepTime");
+        Key<Long> sleepTimeKey = JKeyType.LongKey().make("SleepTime");
 
         // get param from the Parameter Set in the Setup
         Optional<Parameter<Long>> sleepTimeParamOption = setup.jGet(sleepTimeKey);

@@ -1,7 +1,7 @@
 package csw.services.messages;
 
 import csw.messages.params.formats.JavaJsonSupport;
-import csw.messages.params.generics.JKeyTypes;
+import csw.messages.params.generics.JKeyType;
 import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.models.MatrixData;
@@ -30,11 +30,11 @@ public class JStateVariablesTest {
         String prefix = "wfos.prog.cloudcover";
 
         //keys
-        Key<Character> charKey = JKeyTypes.CharKey().make("charKey");
-        Key<Integer> intKey = JKeyTypes.IntKey().make("intKey");
-        Key<Boolean> booleanKey = JKeyTypes.BooleanKey().make("booleanKey");
-        Key<Instant> timestampKey = JKeyTypes.TimestampKey().make("timestampKey");
-        Key<String> notUsedKey = JKeyTypes.StringKey().make("notUsed");
+        Key<Character> charKey = JKeyType.CharKey().make("charKey");
+        Key<Integer> intKey = JKeyType.IntKey().make("intKey");
+        Key<Boolean> booleanKey = JKeyType.BooleanKey().make("booleanKey");
+        Key<Instant> timestampKey = JKeyType.TimestampKey().make("timestampKey");
+        Key<String> notUsedKey = JKeyType.StringKey().make("notUsed");
 
 
         //#obsid
@@ -92,11 +92,11 @@ public class JStateVariablesTest {
         String prefix = "wfos.prog.cloudcover";
 
         //keys
-        Key<Character> charKey = JKeyTypes.CharKey().make("charKey");
-        Key<Integer> intKey = JKeyTypes.IntKey().make("intKey");
-        Key<Boolean> booleanKey = JKeyTypes.BooleanKey().make("booleanKey");
-        Key<Instant> timestampKey = JKeyTypes.TimestampKey().make("timestampKey");
-        Key<String> notUsedKey = JKeyTypes.StringKey().make("notUsed");
+        Key<Character> charKey = JKeyType.CharKey().make("charKey");
+        Key<Integer> intKey = JKeyType.IntKey().make("intKey");
+        Key<Boolean> booleanKey = JKeyType.BooleanKey().make("booleanKey");
+        Key<Instant> timestampKey = JKeyType.TimestampKey().make("timestampKey");
+        Key<String> notUsedKey = JKeyType.StringKey().make("notUsed");
 
 
         //#obsid
@@ -151,7 +151,7 @@ public class JStateVariablesTest {
     public void showJsonSerialization() {
         //#json-serialization
         //key
-        Key<MatrixData<Double>> k1 = JKeyTypes.DoubleMatrixKey().make("myMatrix");
+        Key<MatrixData<Double>> k1 = JKeyType.DoubleMatrixKey().make("myMatrix");
 
         //values
         Double[][] doubles = {{1.0, 2.0, 3.0}, {4.1, 5.1, 6.1}, {7.2, 8.2, 9.2}};
@@ -189,9 +189,9 @@ public class JStateVariablesTest {
     public void showUniqueKeyConstraintExample() {
         //#unique-key
         //keys
-        Key<Integer> encoderKey = JKeyTypes.IntKey().make("encoder");
-        Key<Integer> filterKey = JKeyTypes.IntKey().make("filter");
-        Key<Integer> miscKey = JKeyTypes.IntKey().make("misc.");
+        Key<Integer> encoderKey = JKeyType.IntKey().make("encoder");
+        Key<Integer> filterKey = JKeyType.IntKey().make("filter");
+        Key<Integer> miscKey = JKeyType.IntKey().make("misc.");
 
         //prefix
         String prefix = "wfos.blue.filter";

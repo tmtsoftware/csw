@@ -2,7 +2,7 @@ package csw.messages.params.states;
 
 import csw.messages.commands.CommandName;
 import csw.messages.commands.Setup;
-import csw.messages.params.generics.JKeyTypes;
+import csw.messages.params.generics.JKeyType;
 import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.models.ObsId;
@@ -19,9 +19,9 @@ import java.util.Optional;
 // DEOPSCSW-185: Easy to Use Syntax/Api
 public class JSateVariableTest {
 
-    private final Key<Integer> encoderIntKey = JKeyTypes.IntKey().make("encoder");
-    private final Key<String> epochStringKey = JKeyTypes.StringKey().make("epoch");
-    private final Key<Integer> epochIntKey = JKeyTypes.IntKey().make("epoch");
+    private final Key<Integer> encoderIntKey = JKeyType.IntKey().make("encoder");
+    private final Key<String> epochStringKey = JKeyType.StringKey().make("epoch");
+    private final Key<Integer> epochIntKey = JKeyType.IntKey().make("epoch");
 
     private final Parameter<Integer> encoderParam = encoderIntKey.set(22, 33);
     private final Parameter<String> epochStringParam = epochStringKey.set("A", "B");

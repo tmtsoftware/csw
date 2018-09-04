@@ -18,10 +18,10 @@ public class JSimpleKeyTypeTest {
     @Test
     public void testBooleanKeyParameter() {
         String keyName = "encoder";
-        Key<Boolean> key = JKeyTypes.BooleanKey().make(keyName);
+        Key<Boolean> key = JKeyType.BooleanKey().make(keyName);
         Boolean[] paramData = {true, false, true};
         Assert.assertEquals(keyName, key.keyName());
-        Assert.assertEquals(JKeyTypes.BooleanKey(),key.keyType());
+        Assert.assertEquals(JKeyType.BooleanKey(),key.keyType());
 
         // key.set without Units
         Parameter<Boolean> parameterWithoutUnits = key.set(paramData);
@@ -47,10 +47,10 @@ public class JSimpleKeyTypeTest {
     @Test
     public void testCharKeyParameter() {
         String keyName = "charKey";
-        Key<Character> key = JKeyTypes.CharKey().make(keyName);
+        Key<Character> key = JKeyType.CharKey().make(keyName);
         Character[] paramData = {'a', 'b', 'c'};
         Assert.assertEquals(keyName, key.keyName());
-        Assert.assertEquals(JKeyTypes.CharKey(),key.keyType());
+        Assert.assertEquals(JKeyType.CharKey(),key.keyType());
 
         // key.set without Units
         Parameter<Character> parameterWithoutUnits = key.set(paramData);
@@ -77,10 +77,10 @@ public class JSimpleKeyTypeTest {
     @Test
     public void testByteKeyParameter() {
         String keyName = "ByteKey";
-        Key<Byte> key = JKeyTypes.ByteKey().make(keyName);
+        Key<Byte> key = JKeyType.ByteKey().make(keyName);
         Byte[] paramData = {-127, 100, 127};
         Assert.assertEquals(keyName, key.keyName());
-        Assert.assertEquals(JKeyTypes.ByteKey(),key.keyType());
+        Assert.assertEquals(JKeyType.ByteKey(),key.keyType());
 
         // key.set without Units
         Parameter<Byte> parameterWithoutUnits = key.set(paramData);
@@ -106,10 +106,10 @@ public class JSimpleKeyTypeTest {
     @Test
     public void testShortKeyParameter() {
         String keyName = "ShortKey";
-        Key<Short> key = JKeyTypes.ShortKey().make(keyName);
+        Key<Short> key = JKeyType.ShortKey().make(keyName);
         Short[] paramData = {10, 20, 30};
         Assert.assertEquals(keyName, key.keyName());
-        Assert.assertEquals(JKeyTypes.ShortKey(),key.keyType());
+        Assert.assertEquals(JKeyType.ShortKey(),key.keyType());
 
         // key.set without Units
         Parameter<Short> parameterWithoutUnits = key.set(paramData);
@@ -135,10 +135,10 @@ public class JSimpleKeyTypeTest {
     @Test
     public void testLongKeyParameter() {
         String keyName = "LongKey";
-        Key<Long> key = JKeyTypes.LongKey().make(keyName);
+        Key<Long> key = JKeyType.LongKey().make(keyName);
         Long[] paramData = {10L, 20L, 30L};
         Assert.assertEquals(keyName, key.keyName());
-        Assert.assertEquals(JKeyTypes.LongKey(),key.keyType());
+        Assert.assertEquals(JKeyType.LongKey(),key.keyType());
 
         // key.set without Units
         Parameter<Long> parameterWithoutUnits = key.set(paramData);
@@ -164,10 +164,10 @@ public class JSimpleKeyTypeTest {
     @Test
     public void testIntegerKeyParameter() {
         String keyName = "IntegerKey";
-        Key<Integer> key = JKeyTypes.IntKey().make(keyName);
+        Key<Integer> key = JKeyType.IntKey().make(keyName);
         Integer[] paramData = {10, 20, 30};
         Assert.assertEquals(keyName, key.keyName());
-        Assert.assertEquals(JKeyTypes.IntKey(),key.keyType());
+        Assert.assertEquals(JKeyType.IntKey(),key.keyType());
 
         // key.set without Units
         Parameter<Integer> parameterWithoutUnits = key.set(paramData);
@@ -193,10 +193,10 @@ public class JSimpleKeyTypeTest {
     @Test
     public void testFloatKeyParameter() {
         String keyName = "FloatKey";
-        Key<Float> key = JKeyTypes.FloatKey().make(keyName);
+        Key<Float> key = JKeyType.FloatKey().make(keyName);
         Float[] paramData = {10.15f, 20.89f, 30f};
         Assert.assertEquals(keyName, key.keyName());
-        Assert.assertEquals(JKeyTypes.FloatKey(),key.keyType());
+        Assert.assertEquals(JKeyType.FloatKey(),key.keyType());
 
         // key.set without Units
         Parameter<Float> parameterWithoutUnits = key.set(paramData);
@@ -222,10 +222,10 @@ public class JSimpleKeyTypeTest {
     @Test
     public void testDoubleKeyParameter() {
         String keyName = "DoubleKey";
-        Key<Double> key = JKeyTypes.DoubleKey().make(keyName);
+        Key<Double> key = JKeyType.DoubleKey().make(keyName);
         Double[] paramData = {10.89d, 20.25d, 30d};
         Assert.assertEquals(keyName, key.keyName());
-        Assert.assertEquals(JKeyTypes.DoubleKey(),key.keyType());
+        Assert.assertEquals(JKeyType.DoubleKey(),key.keyType());
 
         // key.set without Units
         Parameter<Double> parameterWithoutUnits = key.set(paramData);
@@ -252,10 +252,10 @@ public class JSimpleKeyTypeTest {
     @Test
     public void testTimestampKeyParameter() {
         String keyName = "TimestampKey";
-        Key<Instant> key = JKeyTypes.TimestampKey().make(keyName);
+        Key<Instant> key = JKeyType.TimestampKey().make(keyName);
         Instant[] paramData = {Instant.now(), Instant.ofEpochSecond(3600)};
         Assert.assertEquals(keyName, key.keyName());
-        Assert.assertEquals(JKeyTypes.TimestampKey(),key.keyType());
+        Assert.assertEquals(JKeyType.TimestampKey(),key.keyType());
 
         // key.set without Units
         Parameter<Instant> parameterWithoutUnits = key.set(paramData);
@@ -281,10 +281,10 @@ public class JSimpleKeyTypeTest {
     @Test
     public void testRaDecKeyParameter() {
         String keyName = "RaDecKey";
-        Key<RaDec> key = JKeyTypes.RaDecKey().make(keyName);
+        Key<RaDec> key = JKeyType.RaDecKey().make(keyName);
         RaDec[] paramData = {RaDec.apply(10, 11.15), RaDec.apply(20.25, 21), RaDec.apply(30, 31)};
         Assert.assertEquals(keyName, key.keyName());
-        Assert.assertEquals(JKeyTypes.RaDecKey(),key.keyType());
+        Assert.assertEquals(JKeyType.RaDecKey(),key.keyType());
 
         // key.set without Units
         Parameter<RaDec> parameterWithoutUnits = key.set(paramData);
@@ -310,10 +310,10 @@ public class JSimpleKeyTypeTest {
     @Test
     public void testStringKeyParameter() {
         String keyName = "StringKey";
-        Key<String> key = JKeyTypes.StringKey().make(keyName);
+        Key<String> key = JKeyType.StringKey().make(keyName);
         String[] paramData = {"first", "seconds", "third"};
         Assert.assertEquals(keyName, key.keyName());
-        Assert.assertEquals(JKeyTypes.StringKey(),key.keyType());
+        Assert.assertEquals(JKeyType.StringKey(),key.keyType());
 
         // key.set without Units
         Parameter<String> parameterWithoutUnits = key.set(paramData);
@@ -339,18 +339,18 @@ public class JSimpleKeyTypeTest {
     @Test
     public void testStructKeyParameter() {
         String keyName = "StructKey";
-        Key<Struct> key = JKeyTypes.StructKey().make(keyName);
+        Key<Struct> key = JKeyType.StructKey().make(keyName);
 
-        Key<String> ra = JKeyTypes.StringKey().make("ra");
-        Key<String> dec = JKeyTypes.StringKey().make("dec");
-        Key<Double> epoch = JKeyTypes.DoubleKey().make("epoch");
+        Key<String> ra = JKeyType.StringKey().make("ra");
+        Key<String> dec = JKeyType.StringKey().make("dec");
+        Key<Double> epoch = JKeyType.DoubleKey().make("epoch");
 
         Struct struct1 = (Struct) new Struct().madd(ra.set("12:13:14.1"), dec.set("32:33:34.4"), epoch.set(1950.0));
         Struct struct2 = (Struct) new Struct().madd(ra.set("22:23:24.2"), dec.set("42:43:44.4"), epoch.set(2950.0));
 
         Struct[] paramData = {struct1, struct2};
         Assert.assertEquals(keyName, key.keyName());
-        Assert.assertEquals(JKeyTypes.StructKey(),key.keyType());
+        Assert.assertEquals(JKeyType.StructKey(),key.keyType());
 
         // key.set without Units
         Parameter<Struct> parameterWithoutUnits = key.set(paramData);

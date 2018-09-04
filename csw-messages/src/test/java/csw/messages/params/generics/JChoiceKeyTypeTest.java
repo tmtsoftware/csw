@@ -19,7 +19,7 @@ public class JChoiceKeyTypeTest {
     private final String keyName = " choiceKey";
     private final Choices choices = Choices.from("A", "B", "C");
 
-    private final GChoiceKey choiceKey = JKeyTypes.ChoiceKey().make(keyName, choices);
+    private final GChoiceKey choiceKey = JKeyType.ChoiceKey().make(keyName, choices);
 
     @Test
     public void choicesAPIShouldBeAccessible() {

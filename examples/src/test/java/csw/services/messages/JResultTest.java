@@ -2,7 +2,7 @@ package csw.services.messages;
 
 import csw.messages.commands.Result;
 import csw.messages.params.formats.JavaJsonSupport;
-import csw.messages.params.generics.JKeyTypes;
+import csw.messages.params.generics.JKeyType;
 import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.models.MatrixData;
@@ -26,10 +26,10 @@ public class JResultTest {
     public void showUsageOfResult() {
         //#result
         //keys
-        Key<Integer> k1 = JKeyTypes.IntKey().make("encoder");
-        Key<Integer> k2 = JKeyTypes.IntKey().make("windspeed");
-        Key<String> k3 = JKeyTypes.StringKey().make("filter");
-        Key<Integer> k4 = JKeyTypes.IntKey().make("notUsed");
+        Key<Integer> k1 = JKeyType.IntKey().make("encoder");
+        Key<Integer> k2 = JKeyType.IntKey().make("windspeed");
+        Key<String> k3 = JKeyType.StringKey().make("filter");
+        Key<Integer> k4 = JKeyType.IntKey().make("notUsed");
 
         //prefix
         String prefix = "wfos.prog.cloudcover";
@@ -78,7 +78,7 @@ public class JResultTest {
     public void showJsonSerialization() {
         //#json-serialization
         //key
-        Key<MatrixData<Double>> k1 = JKeyTypes.DoubleMatrixKey().make("myMatrix");
+        Key<MatrixData<Double>> k1 = JKeyType.DoubleMatrixKey().make("myMatrix");
 
         //values
         Double[][] doubles = {{1.0, 2.0, 3.0}, {4.1, 5.1, 6.1}, {7.2, 8.2, 9.2}};
@@ -113,9 +113,9 @@ public class JResultTest {
     public void showUniqueKeyConstraintExample() {
         //#unique-key
         //keys
-        Key<Integer> encoderKey = JKeyTypes.IntKey().make("encoder");
-        Key<Integer> filterKey = JKeyTypes.IntKey().make("filter");
-        Key<Integer> miscKey = JKeyTypes.IntKey().make("misc.");
+        Key<Integer> encoderKey = JKeyType.IntKey().make("encoder");
+        Key<Integer> filterKey = JKeyType.IntKey().make("filter");
+        Key<Integer> miscKey = JKeyType.IntKey().make("misc.");
 
         //ObsId
         ObsId obsId = new ObsId("Obs001");

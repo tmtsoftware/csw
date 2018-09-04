@@ -2,7 +2,7 @@ package csw.services.messages;
 
 import csw.messages.javadsl.JUnits;
 import csw.messages.params.generics.GChoiceKey;
-import csw.messages.params.generics.JKeyTypes;
+import csw.messages.params.generics.JKeyType;
 import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.models.*;
@@ -19,9 +19,9 @@ public class JKeysAndParametersTest {
         //#primitives
         //making 3 keys
         String keyName = "encoder";
-        Key<Boolean> k1 = JKeyTypes.BooleanKey().make(keyName);
-        Key<Short> k2 = JKeyTypes.ShortKey().make(keyName);
-        Key<String> k3 = JKeyTypes.StringKey().make(keyName);
+        Key<Boolean> k1 = JKeyType.BooleanKey().make(keyName);
+        Key<Short> k2 = JKeyType.ShortKey().make(keyName);
+        Key<String> k3 = JKeyType.StringKey().make(keyName);
 
         //storing a single value
         Parameter<Boolean> booleanParam = k1.set(true);
@@ -69,7 +69,7 @@ public class JKeysAndParametersTest {
         Double[] arr2 = {10.0, 20.0, 30.0, 40.0, 50.0};
 
         //keys
-        Key<ArrayData<Double>> filterKey = JKeyTypes.DoubleArrayKey().make("filter");
+        Key<ArrayData<Double>> filterKey = JKeyType.DoubleArrayKey().make("filter");
 
         //Store some values using helper method in ArrayData
         Parameter<ArrayData<Double>> p1 = filterKey.set(ArrayData.fromJavaArray(arr1), ArrayData.fromJavaArray(arr2));
@@ -107,7 +107,7 @@ public class JKeysAndParametersTest {
         Byte[][] m2 = {{1, 2, 3, 4, 5}, {10, 20, 30, 40, 50}};
 
         //keys
-        Key<MatrixData<Byte>> encoderKey = JKeyTypes.ByteMatrixKey().make("encoder");
+        Key<MatrixData<Byte>> encoderKey = JKeyType.ByteMatrixKey().make("encoder");
 
         //Store some values using helper method in ArrayData
         Parameter<MatrixData<Byte>> p1 = encoderKey.set(
@@ -148,8 +148,8 @@ public class JKeysAndParametersTest {
         final Choices choices = Choices.from("A", "B", "C");
 
         //keys
-        GChoiceKey choice1Key = JKeyTypes.ChoiceKey().make("mode", choices);
-        GChoiceKey choice2Key = JKeyTypes.ChoiceKey().make(
+        GChoiceKey choice1Key = JKeyType.ChoiceKey().make("mode", choices);
+        GChoiceKey choice2Key = JKeyType.ChoiceKey().make(
                 "mode-reset",
                 Choices.fromChoices(
                         new Choice("c"),
@@ -188,7 +188,7 @@ public class JKeysAndParametersTest {
         RaDec raDec2 = new RaDec(3.0, 4.0);
 
         //keys
-        Key<RaDec> raDecKey = JKeyTypes.RaDecKey().make("raDecKey");
+        Key<RaDec> raDecKey = JKeyType.RaDecKey().make("raDecKey");
 
         //store values
         Parameter<RaDec> p1 = raDecKey.set(raDec1);
@@ -218,11 +218,11 @@ public class JKeysAndParametersTest {
     public void showUsageOfStruct() {
         //#struct
         //keys
-        Key<Struct> skey = JKeyTypes.StructKey().make("myStruct");
+        Key<Struct> skey = JKeyType.StructKey().make("myStruct");
 
-        Key<String> ra = JKeyTypes.StringKey().make("ra");
-        Key<String> dec = JKeyTypes.StringKey().make("dec");
-        Key<Double> epoch = JKeyTypes.DoubleKey().make("epoch");
+        Key<String> ra = JKeyType.StringKey().make("ra");
+        Key<String> dec = JKeyType.StringKey().make("dec");
+        Key<Double> epoch = JKeyType.DoubleKey().make("epoch");
 
         //initialize struct
         Struct struct1 = new Struct().madd(
@@ -249,9 +249,9 @@ public class JKeysAndParametersTest {
         List<Struct> structs = p2.jValues();
 
         //get individual keys
-        Optional<Parameter<String>> firstKey = struct1.jGet(JKeyTypes.StringKey().make("ra"));
-        Optional<Parameter<String>> secondKey = struct1.jGet("dec", JKeyTypes.StringKey());
-        Optional<Parameter<Double>> thirdKey = struct1.jGet("epoch", JKeyTypes.DoubleKey());
+        Optional<Parameter<String>> firstKey = struct1.jGet(JKeyType.StringKey().make("ra"));
+        Optional<Parameter<String>> secondKey = struct1.jGet("dec", JKeyType.StringKey());
+        Optional<Parameter<Double>> thirdKey = struct1.jGet("epoch", JKeyType.DoubleKey());
 
         //access parameter using 'parameter' and 'apply' method
         boolean bSuccess = struct1.parameter(ra) == struct1.apply(ra);
@@ -261,7 +261,7 @@ public class JKeysAndParametersTest {
         Struct mutated2 = struct1.remove(firstKey.get());
 
         //find out missing keys
-        Set<String> missingKeySet = mutated1.jMissingKeys(ra, dec, epoch, JKeyTypes.StringKey().make("someRandomKey"));
+        Set<String> missingKeySet = mutated1.jMissingKeys(ra, dec, epoch, JKeyType.StringKey().make("someRandomKey"));
         List<String> expectedMissingKeys = Arrays.asList("ra", "someRandomKey");
         //#struct
 
@@ -283,16 +283,16 @@ public class JKeysAndParametersTest {
         String s1 = "encoder";
 
         //making 3 keys
-        Key<Boolean> k1 = JKeyTypes.BooleanKey().make(s1);
-        Key<Short> k2 = JKeyTypes.ShortKey().make("RandomKeyName");
-        Key<String> k3 = JKeyTypes.StringKey().make(s1);
+        Key<Boolean> k1 = JKeyType.BooleanKey().make(s1);
+        Key<Short> k2 = JKeyType.ShortKey().make("RandomKeyName");
+        Key<String> k3 = JKeyType.StringKey().make(s1);
 
         //storing a single value, default unit is NoUnits
         Parameter<Boolean> bParam = k1.set(true);
         Boolean bDefaultUnitSet = bParam.units() == JUnits.NoUnits; //true
 
         //default unit for TimestampKey
-        Parameter<Instant> tParam = JKeyTypes
+        Parameter<Instant> tParam = JKeyType
                 .TimestampKey()
                 .make("now")
                 .set(Instant.now());

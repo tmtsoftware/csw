@@ -1,6 +1,6 @@
 package csw.messages.events;
 
-import csw.messages.params.generics.JKeyTypes;
+import csw.messages.params.generics.JKeyType;
 import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.generics.ParameterSetType;
@@ -17,11 +17,11 @@ import java.util.stream.Collectors;
 // DEOPSCSW-328: Basic information of Event needed for routing and Diagnostic use
 // DEOPSCSW-329: Providing Mandatory information during Event Creation
 public class JEventsTest {
-    private final Key<Integer> encoderIntKey = JKeyTypes.IntKey().make("encoder");
-    private final Key<String> epochStringKey = JKeyTypes.StringKey().make("epoch");
-    private final Key<Integer> epochIntKey = JKeyTypes.IntKey().make("epoch");
-    private final Key<java.lang.Byte> epochByteKey = JKeyTypes.ByteKey().make("epoch");
-    private final Key<Integer> notUsedKey = JKeyTypes.IntKey().make("notUsed");
+    private final Key<Integer> encoderIntKey = JKeyType.IntKey().make("encoder");
+    private final Key<String> epochStringKey = JKeyType.StringKey().make("epoch");
+    private final Key<Integer> epochIntKey = JKeyType.IntKey().make("epoch");
+    private final Key<java.lang.Byte> epochByteKey = JKeyType.ByteKey().make("epoch");
+    private final Key<Integer> notUsedKey = JKeyType.IntKey().make("notUsed");
 
     private final Parameter<Integer> encoderParam = encoderIntKey.set(22, 33);
     private final Parameter<String> epochStringParam = epochStringKey.set("A", "B");

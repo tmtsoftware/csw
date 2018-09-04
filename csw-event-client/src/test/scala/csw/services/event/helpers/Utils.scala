@@ -3,7 +3,7 @@ package csw.services.event.helpers
 import java.time.Instant
 
 import csw.messages.events.{Event, EventName, EventTime, SystemEvent}
-import csw.messages.params.generics.{JKeyTypes, Key, Parameter}
+import csw.messages.params.generics.{JKeyType, Key, Parameter}
 import csw.messages.params.generics.KeyType.{IntKey, LongKey}
 import csw.messages.params.models.{Id, Prefix}
 
@@ -13,7 +13,7 @@ object Utils {
   val event                   = SystemEvent(prefix, eventName)
   val timeNanosKey: Key[Long] = LongKey.make("eventTime")
 
-  private val jParam: Parameter[Integer] = JKeyTypes.IntKey.make("counter").set(1)
+  private val jParam: Parameter[Integer] = JKeyType.IntKey.make("counter").set(1)
   private val param: Parameter[Int]      = IntKey.make("counter").set(1)
 
   def makeEvent(id: Int): Event = event.copy(

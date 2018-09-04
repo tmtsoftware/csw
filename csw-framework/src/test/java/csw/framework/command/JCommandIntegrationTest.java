@@ -23,7 +23,7 @@ import csw.messages.framework.LockingResponse;
 import csw.messages.framework.LockingResponses;
 import csw.messages.location.AkkaLocation;
 import csw.messages.location.ComponentId;
-import csw.messages.params.generics.JKeyTypes;
+import csw.messages.params.generics.JKeyType;
 import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.states.CurrentState;
@@ -103,7 +103,7 @@ public class JCommandIntegrationTest {
     public void testCommandExecutionBetweenComponents() throws Exception {
 
         // immediate response - CompletedWithResult
-        Key<Integer> intKey1 = JKeyTypes.IntKey().make("encoder");
+        Key<Integer> intKey1 = JKeyType.IntKey().make("encoder");
         Parameter<Integer> intParameter1 = intKey1.set(22, 23);
         Setup imdResCommand = new Setup(prefix(), immediateResCmd(), Optional.empty()).add(intParameter1);
 
@@ -112,7 +112,7 @@ public class JCommandIntegrationTest {
         Assert.assertTrue(actualImdCmdResponse instanceof CommandResponse.CompletedWithResult);
 
         // immediate response - Invalid
-        Key<Integer> intKey2 = JKeyTypes.IntKey().make("encoder");
+        Key<Integer> intKey2 = JKeyType.IntKey().make("encoder");
         Parameter<Integer> intParameter2 = intKey2.set(22, 23);
         Setup imdInvalidCommand = new Setup(prefix(), invalidCmd(), Optional.empty()).add(intParameter2);
 
@@ -135,7 +135,7 @@ public class JCommandIntegrationTest {
         Assert.assertTrue(actualImdInvalidCmdResponse instanceof CommandResponse.Invalid);
 
         // long running command which does not use matcher
-        Key<Integer> encoder = JKeyTypes.IntKey().make("encoder");
+        Key<Integer> encoder = JKeyType.IntKey().make("encoder");
         Parameter<Integer> parameter = encoder.set(22, 23);
         Setup controlCommand = new Setup(prefix(), withoutMatcherCmd(), Optional.empty()).add(parameter);
 
@@ -165,7 +165,7 @@ public class JCommandIntegrationTest {
 
         // DEOPSCSW-229: Provide matchers infrastructure for comparison
         // long running command which uses matcher
-        Parameter<Integer> param = JKeyTypes.IntKey().make("encoder").set(100);
+        Parameter<Integer> param = JKeyType.IntKey().make("encoder").set(100);
         Setup setup = new Setup(prefix(), matcherCmd(), Optional.empty()).add(parameter);
 
         //#matcher
@@ -262,7 +262,7 @@ public class JCommandIntegrationTest {
         hcdLocation.componentRef().tell(new SupervisorLockMessage.Lock(prefix(), probe.ref(), duration));
         probe.expectMessage(LockingResponses.lockAcquired());
 
-        Key<Integer> intKey2 = JKeyTypes.IntKey().make("encoder");
+        Key<Integer> intKey2 = JKeyType.IntKey().make("encoder");
         Parameter<Integer> intParameter2 = intKey2.set(22, 23);
 
         // Send command to locked component and verify that it is not allowed
@@ -285,7 +285,7 @@ public class JCommandIntegrationTest {
 
     @Test
     public void testCommandDistributor() throws ExecutionException, InterruptedException {
-        Parameter<Integer> encoderParam = JKeyTypes.IntKey().make("encoder").set(22, 23);
+        Parameter<Integer> encoderParam = JKeyType.IntKey().make("encoder").set(22, 23);
 
         Setup setupHcd1 = new Setup(prefix(), shortRunning(), Optional.empty()).add(encoderParam);
         Setup setupHcd2 = new Setup(prefix(), mediumRunning(), Optional.empty()).add(encoderParam);
@@ -317,7 +317,7 @@ public class JCommandIntegrationTest {
     @Test
     public void testCommandFailure() throws ExecutionException, InterruptedException {
         // using single submitAndSubscribe API
-        Key<Integer> intKey1 = JKeyTypes.IntKey().make("encoder");
+        Key<Integer> intKey1 = JKeyType.IntKey().make("encoder");
         Parameter<Integer> intParameter1 = intKey1.set(22, 23);
         Setup failureResCommand1 = new Setup(prefix(), failureAfterValidationCmd(), Optional.empty()).add(intParameter1);
         akka.actor.typed.ActorSystem<?> typedSystem = ActorSystemAdapter.apply(hcdActorSystem);
@@ -340,7 +340,7 @@ public class JCommandIntegrationTest {
 
     @Test
     public void testSubmitAllAndGetResponse() throws ExecutionException, InterruptedException {
-        Parameter<Integer> encoderParam = JKeyTypes.IntKey().make("encoder").set(22, 23);
+        Parameter<Integer> encoderParam = JKeyType.IntKey().make("encoder").set(22, 23);
 
         //#submitAllAndGetResponse
         Setup setupHcd1 = new Setup(prefix(), shortRunning(), Optional.empty()).add(encoderParam);
@@ -365,7 +365,7 @@ public class JCommandIntegrationTest {
     @Test
     public void testSubmitAllAndGetFinalResponse() throws ExecutionException, InterruptedException {
 
-        Parameter<Integer> encoderParam = JKeyTypes.IntKey().make("encoder").set(22, 23);
+        Parameter<Integer> encoderParam = JKeyType.IntKey().make("encoder").set(22, 23);
 
         //#submitAllAndGetFinalResponse
         Setup setupHcd1 = new Setup(prefix(), shortRunning(), Optional.empty()).add(encoderParam);
@@ -389,7 +389,7 @@ public class JCommandIntegrationTest {
 
     @Test
     public void testSubscribeCurrentState() {
-        Key<Integer> intKey1 = JKeyTypes.IntKey().make("encoder");
+        Key<Integer> intKey1 = JKeyType.IntKey().make("encoder");
         Parameter<Integer> intParameter1 = intKey1.set(22, 23);
         Setup setup = new Setup(prefix(), acceptedCmd(), Optional.empty()).add(intParameter1);
 
@@ -423,7 +423,7 @@ public class JCommandIntegrationTest {
 
     @Test
     public void testSubscribeOnlyCurrentState() throws InterruptedException {
-        Key<Integer> intKey1 = JKeyTypes.IntKey().make("encoder");
+        Key<Integer> intKey1 = JKeyType.IntKey().make("encoder");
         Parameter<Integer> intParameter1 = intKey1.set(22, 23);
         Setup setup = new Setup(prefix(), acceptedCmd(), Optional.empty()).add(intParameter1);
 

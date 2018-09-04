@@ -1,6 +1,6 @@
 package csw.messages.params.models;
 
-import csw.messages.params.generics.JKeyTypes;
+import csw.messages.params.generics.JKeyType;
 import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.models.JStruct;
@@ -19,11 +19,11 @@ import static csw.messages.javadsl.JUnits.NoUnits;
 public class JStructTest {
 
     private final String keyName = "StructKey";
-    private final Key<Struct> key = JKeyTypes.StructKey().make(keyName);
-    private final Key<String> ra = JKeyTypes.StringKey().make("ra");
-    private final Key<String> dec = JKeyTypes.StringKey().make("dec");
-    private final Key<Double> epoch = JKeyTypes.DoubleKey().make("epoch");
-    private final Key<Instant> ts = JKeyTypes.TimestampKey().make("now");
+    private final Key<Struct> key = JKeyType.StructKey().make(keyName);
+    private final Key<String> ra = JKeyType.StringKey().make("ra");
+    private final Key<String> dec = JKeyType.StringKey().make("dec");
+    private final Key<Double> epoch = JKeyType.DoubleKey().make("epoch");
+    private final Key<Instant> ts = JKeyType.TimestampKey().make("now");
     private final Parameter<String> raParameter = ra.set("12:13:14.1");
     private final Parameter<String> decParameter = dec.set("32:33:34.4");
     private final Parameter<Double> epochParameter = epoch.set(1950.0);

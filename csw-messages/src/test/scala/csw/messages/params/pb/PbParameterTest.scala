@@ -3,7 +3,7 @@ package csw.messages.params.pb
 import java.time.Instant
 
 import csw.messages.params.generics.KeyType.IntMatrixKey
-import csw.messages.params.generics.{JKeyTypes, KeyType, Parameter}
+import csw.messages.params.generics.{JKeyType, KeyType, Parameter}
 import csw.messages.params.models._
 import csw_protobuf.ParameterTypes
 import csw_protobuf.parameter.PbParameter
@@ -180,7 +180,7 @@ class PbParameterTest extends FunSuite with Matchers {
   }
 
   test("should able to change the type from/to PbParameter to/from Parameter using java api") {
-    val key         = JKeyTypes.IntKey.make("encoder")
+    val key         = JKeyType.IntKey.make("encoder")
     val param       = key.set(1, 2, 3, 4)
     val mapper      = Parameter.typeMapper2
     val parsedParam = mapper.toCustom(mapper.toBase(param))
