@@ -3,7 +3,7 @@ package csw.messages.params.pb
 import java.time.Instant
 
 import csw.messages.params.generics.KeyType.IntMatrixKey
-import csw.messages.params.generics.{JKeyType, KeyType, Parameter}
+import csw.messages.params.generics.{JKeyType, KeyType}
 import csw.messages.params.models._
 import csw_protobuf.ParameterTypes
 import csw_protobuf.parameter.PbParameter
@@ -154,14 +154,14 @@ class PbParameterTest extends FunSuite with Matchers {
   test("should able to change the type from/to PbParameter to/from Parameter for IntKey") {
     val key         = KeyType.IntKey.make("encoder")
     val param       = key.set(1, 2, 3, 4)
-    val mapper      = Parameter.typeMapper[Int]
+    val mapper      = TypeMapperSupport.parameterTypeMapper[Int]
     val mappedParam = mapper.toCustom(mapper.toBase(param))
 
     param shouldEqual mappedParam
   }
 
   test("should able to change the type from/to PbParameter to/from Parameter for IntArrayKey") {
-    val mapper      = Parameter.typeMapper2
+    val mapper      = TypeMapperSupport.parameterTypeMapper2
     val key         = KeyType.IntArrayKey.make("blah")
     val param       = key.set(ArrayData.fromArray(1, 2, 3))
     val mappedParam = mapper.toCustom(mapper.toBase(param))
@@ -170,7 +170,7 @@ class PbParameterTest extends FunSuite with Matchers {
   }
 
   test("should able to change the type from/to PbParameter to/from Parameter for IntMatrixKey") {
-    val mapper      = Parameter.typeMapper2
+    val mapper      = TypeMapperSupport.parameterTypeMapper2
     val key         = KeyType.IntMatrixKey.make("blah")
     val param       = key.set(MatrixData.fromArrays(Array(1, 2, 3), Array(6, 7)))
     val mappedParam = mapper.toCustom(mapper.toBase(param))
@@ -182,7 +182,7 @@ class PbParameterTest extends FunSuite with Matchers {
   test("should able to change the type from/to PbParameter to/from Parameter using java api") {
     val key         = JKeyType.IntKey.make("encoder")
     val param       = key.set(1, 2, 3, 4)
-    val mapper      = Parameter.typeMapper2
+    val mapper      = TypeMapperSupport.parameterTypeMapper2
     val parsedParam = mapper.toCustom(mapper.toBase(param))
 
     parsedParam shouldEqual param
@@ -198,7 +198,7 @@ class PbParameterTest extends FunSuite with Matchers {
     val raDec = RaDec(1, 2)
     val param = KeyType.RaDecKey.make("Asd").set(raDec)
 
-    val pbParameter = Parameter.typeMapper2.toBase(param)
+    val pbParameter = TypeMapperSupport.parameterTypeMapper2.toBase(param)
     pbParameter.toByteArray
 
     param.keyName shouldBe pbParameter.name

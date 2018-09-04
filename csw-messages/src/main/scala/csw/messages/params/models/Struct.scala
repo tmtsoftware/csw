@@ -2,6 +2,7 @@ package csw.messages.params.models
 
 import scalapb.TypeMapper
 import csw.messages.params.generics.{Parameter, ParameterSetType}
+import csw.messages.params.pb.TypeMapperSupport
 import csw_protobuf.parameter.PbStruct
 import play.api.libs.json.{Json, OFormat}
 
@@ -48,9 +49,9 @@ object Struct {
 
   //Protobuf converter
   implicit val typeMapper: TypeMapper[PbStruct, Struct] = TypeMapper[PbStruct, Struct] { s =>
-    Struct(s.paramSet.map(Parameter.typeMapper2.toCustom).toSet)
+    Struct(s.paramSet.map(TypeMapperSupport.parameterTypeMapper2.toCustom).toSet)
   } { s =>
-    PbStruct().withParamSet(s.paramSet.map(Parameter.typeMapper2.toBase).toSeq)
+    PbStruct().withParamSet(s.paramSet.map(TypeMapperSupport.parameterTypeMapper2.toBase).toSeq)
   }
 }
 

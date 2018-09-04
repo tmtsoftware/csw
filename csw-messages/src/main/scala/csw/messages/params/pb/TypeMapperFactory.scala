@@ -42,6 +42,7 @@ object TypeMapperFactory extends DerivedJsonFormats {
   }
 
   private def typeMapper[T: ClassTag: Format: ItemsFactory]: TypeMapper[PbParameter, Parameter[_]] = {
-    Parameter.typeMapper[T].asInstanceOf[TypeMapper[PbParameter, Parameter[_]]]
+    TypeMapperSupport.parameterTypeMapper[T].asInstanceOf[TypeMapper[PbParameter, Parameter[_]]]
   }
+
 }

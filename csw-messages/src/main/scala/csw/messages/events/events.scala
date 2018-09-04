@@ -4,6 +4,7 @@ import java.time.Instant
 
 import csw.messages.params.generics.{Parameter, ParameterSetType}
 import csw.messages.params.models.{Id, Prefix, Subsystem}
+import csw.messages.params.pb.TypeMapperSupport
 import csw_protobuf.events.PbEvent
 import csw_protobuf.events.PbEvent.PbEventType
 import csw_protobuf.parameter.PbParameter
@@ -75,9 +76,9 @@ sealed trait Event { self: ParameterSetType[_] ⇒
 object Event {
   private val mapper =
     TypeMapper[Seq[PbParameter], Set[Parameter[_]]] {
-      _.map(Parameter.typeMapper2.toCustom).toSet
+      _.map(TypeMapperSupport.parameterTypeMapper2.toCustom).toSet
     } {
-      _.map(Parameter.typeMapper2.toBase).toSeq
+      _.map(TypeMapperSupport.parameterTypeMapper2.toBase).toSeq
     }
 
   /**
