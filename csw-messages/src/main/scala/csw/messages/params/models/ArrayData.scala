@@ -2,14 +2,12 @@ package csw.messages.params.models
 
 import java.util
 
-import csw.messages.params.pb.{ItemType, ItemTypeCompanion}
 import play.api.libs.json.{Format, Json}
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.language.implicitConversions
 import scala.reflect.ClassTag
-import scalapb.TypeMapper
 
 /**
  * A top level key for a parameter set representing an array like collection.
@@ -63,9 +61,6 @@ object ArrayData {
    * @return an instance of ArrayData
    */
   def fromJavaArray[T](values: Array[T]): ArrayData[T] = ArrayData.fromArray(values)
-
-  implicit def typeMapper[T: ClassTag, S <: ItemType[T]: ItemTypeCompanion]: TypeMapper[S, ArrayData[T]] =
-    TypeMapper[S, ArrayData[T]](x ⇒ ArrayData(x.values.toArray[T]))(x ⇒ ItemTypeCompanion.make(x.data))
 
   /**
    * Convert an Array of data from one type to other

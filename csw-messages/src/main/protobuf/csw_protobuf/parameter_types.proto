@@ -10,6 +10,7 @@ option (scalapb.options) = {
     import: "csw.messages.params.pb._"
     import: "csw.messages.params.pb.Implicits._"
     import: "csw.messages.params.models._"
+    import: "csw.messages.params.pb.TypeMapperSupport._"
     single_file: true
 };
 

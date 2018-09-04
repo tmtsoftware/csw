@@ -5,10 +5,8 @@ import java.time.Instant
 import csw.messages.params.formats.JsonSupport
 import csw.messages.params.models.Units.second
 import csw.messages.params.models.{Units, _}
-import csw_protobuf.keytype.PbKeyType
 import enumeratum.{Enum, EnumEntry, PlayJsonEnum}
 import play.api.libs.json._
-import scalapb.TypeMapper
 
 import scala.collection.immutable
 import scala.reflect.ClassTag
@@ -118,7 +116,4 @@ object KeyType extends Enum[KeyType[_]] with PlayJsonEnum[KeyType[_]] {
   case object DoubleMatrixKey extends MatrixKeyType[Double]
 
   implicit def format2[T]: Format[KeyType[T]] = implicitly[Format[KeyType[_]]].asInstanceOf[Format[KeyType[T]]]
-
-  implicit val typeMapper: TypeMapper[PbKeyType, KeyType[_]] =
-    TypeMapper[PbKeyType, KeyType[_]](x ⇒ KeyType.withName(x.toString()))(x ⇒ PbKeyType.fromName(x.toString).get)
 }

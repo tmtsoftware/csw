@@ -1,8 +1,6 @@
 package csw.messages.params.models
 
-import scalapb.TypeMapper
 import csw.messages.TMTSerializable
-import csw_protobuf.units.PbUnits
 import enumeratum.{Enum, EnumEntry, PlayJsonEnum}
 
 import scala.collection.immutable
@@ -34,9 +32,6 @@ object Units extends Enum[Units] with PlayJsonEnum[Units] {
    * A Seq of all values that are Units
    */
   override def values: immutable.IndexedSeq[Units] = findValues
-
-  implicit val typeMapper: TypeMapper[PbUnits, Units] =
-    TypeMapper[PbUnits, Units](x ⇒ Units.withName(x.toString()))(x ⇒ PbUnits.fromName(x.toString).get)
 
   // SI units
   case object angstrom    extends Units("Angstrom", "10 -1 nm")

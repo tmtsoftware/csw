@@ -2,7 +2,6 @@ package csw.messages.params.models
 
 import java.util
 
-import scalapb.TypeMapper
 import play.api.libs.json.{Json, OFormat}
 
 import scala.annotation.varargs
@@ -32,7 +31,6 @@ object Choice {
   implicit def toChoice(name: String): Choice = new Choice(name)
 
   private[messages] implicit val choiceFormat: OFormat[Choice] = Json.format[Choice]
-  implicit val typeMapper: TypeMapper[String, Choice]          = TypeMapper[String, Choice](Choice.apply)(_.name)
 }
 
 /**

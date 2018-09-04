@@ -2,14 +2,12 @@ package csw.messages.params.models
 
 import java.util
 
-import csw.messages.params.pb.{ItemType, ItemTypeCompanion}
 import play.api.libs.json.{Format, Json}
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.language.implicitConversions
 import scala.reflect.ClassTag
-import scalapb.TypeMapper
 
 /**
  * A top level key for a parameter set representing an matrix like collection.
@@ -75,12 +73,6 @@ object MatrixData {
    */
   def fromJavaArrays[T](klass: Class[T], values: Array[Array[T]]): MatrixData[T] =
     new MatrixData[T](values.map(x ⇒ x: mutable.WrappedArray[T]))(ClassTag(klass))
-
-  //Protobuf converter
-  implicit def typeMapper[T: ClassTag, S <: ItemType[ArrayData[T]]: ItemTypeCompanion]: TypeMapper[S, MatrixData[T]] =
-    TypeMapper[S, MatrixData[T]](x ⇒ MatrixData.fromArrays(x.values.toArray.map(a ⇒ a.data.array)))(
-      x ⇒ ItemTypeCompanion.make(x.data.map(ArrayData.apply))
-    )
 
   /**
    * Convert a Matrix of data from one type to other

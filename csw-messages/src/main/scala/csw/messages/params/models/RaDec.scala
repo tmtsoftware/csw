@@ -1,7 +1,5 @@
 package csw.messages.params.models
 
-import scalapb.TypeMapper
-import csw_protobuf.radec.PbRaDec
 import play.api.libs.json.{Json, OFormat}
 
 /**
@@ -13,8 +11,4 @@ case object RaDec {
 
   //used by play-json
   private[messages] implicit val raDecFormat: OFormat[RaDec] = Json.format[RaDec]
-
-  //used by Protobuf for conversion between RaDec <=> PbRaDec
-  implicit val typeMapper: TypeMapper[PbRaDec, RaDec] =
-    TypeMapper[PbRaDec, RaDec](x ⇒ RaDec(x.ra, x.dec))(x ⇒ PbRaDec().withRa(x.ra).withDec(x.dec))
 }

@@ -10,6 +10,7 @@ import "csw_protobuf/parameter_types.proto";
 option (scalapb.options) = {
     import: "csw.messages.params.pb._"
     import: "csw.messages.params.models._"
+    import: "csw.messages.params.pb.TypeMapperSupport._"
     single_file: true
 };
 

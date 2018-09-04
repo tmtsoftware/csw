@@ -1,13 +1,19 @@
 package csw.messages.params.pb
 
+import com.google.protobuf.timestamp.Timestamp
 import csw.messages.events._
 import csw.messages.params.generics.{KeyType, Parameter}
-import csw.messages.params.models.{Id, Prefix}
+import csw.messages.params.models.ObsId.empty
+import csw.messages.params.models._
+import csw.messages.params.pb.Implicits.instantMapper
 import csw.messages.params.pb.TypeMapperFactory.make
 import csw_protobuf.events.PbEvent
 import csw_protobuf.events.PbEvent.PbEventType
-import csw_protobuf.parameter.PbParameter
+import csw_protobuf.keytype.PbKeyType
 import csw_protobuf.parameter.PbParameter.Items
+import csw_protobuf.parameter.{PbParameter, PbStruct}
+import csw_protobuf.radec.PbRaDec
+import csw_protobuf.units.PbUnits
 import play.api.libs.json.Format
 import scalapb.TypeMapper
 
@@ -44,8 +50,6 @@ object TypeMapperSupport {
     case x              ⇒ throw new RuntimeException(s"unexpected type ${x.getClass} found, ItemType expected")
   }
 
-  //////////////
-
   private val ParameterSetMapper =
     TypeMapper[Seq[PbParameter], Set[Parameter[_]]] {
       _.map(TypeMapperSupport.parameterTypeMapper2.toCustom).toSet
@@ -53,9 +57,6 @@ object TypeMapperSupport {
       _.map(TypeMapperSupport.parameterTypeMapper2.toBase).toSeq
     }
 
-  /**
-   * TypeMapper definitions are required for to/from conversion PbEvent(Protobuf) <==> System, Observe event.
-   */
   private[csw] implicit def eventTypeMapper[T <: Event]: TypeMapper[PbEvent, T] = new TypeMapper[PbEvent, T] {
     override def toCustom(base: PbEvent): T = {
       val factory: (Id, Prefix, EventName, EventTime, Set[Parameter[_]]) ⇒ Any = base.eventType match {
@@ -68,7 +69,7 @@ object TypeMapperSupport {
         Id(base.eventId),
         Prefix(base.source),
         EventName(base.name),
-        base.eventTime.map(EventTime.typeMapper.toCustom).get,
+        base.eventTime.map(eventTimeTypeMapper.toCustom).get,
         ParameterSetMapper.toCustom(base.paramSet)
       ).asInstanceOf[T]
     }
@@ -82,10 +83,47 @@ object TypeMapperSupport {
         .withEventId(custom.eventId.id)
         .withSource(custom.source.prefix)
         .withName(custom.eventName.name)
-        .withEventTime(EventTime.typeMapper.toBase(custom.eventTime))
+        .withEventTime(eventTimeTypeMapper.toBase(custom.eventTime))
         .withParamSet(ParameterSetMapper.toBase(custom.paramSet))
         .withEventType(pbEventType)
     }
   }
 
+  private implicit val eventTimeTypeMapper: TypeMapper[Timestamp, EventTime] =
+    TypeMapper[Timestamp, EventTime] { x ⇒
+      EventTime(instantMapper.toCustom(x))
+    } { x ⇒
+      instantMapper.toBase(x.time)
+    }
+
+  implicit val structTypeMapper: TypeMapper[PbStruct, Struct] = TypeMapper[PbStruct, Struct] { s =>
+    Struct(s.paramSet.map(parameterTypeMapper2.toCustom).toSet)
+  } { s =>
+    PbStruct().withParamSet(s.paramSet.map(TypeMapperSupport.parameterTypeMapper2.toBase).toSeq)
+  }
+
+  implicit val choiceTypeMapper: TypeMapper[String, Choice] = TypeMapper[String, Choice](Choice.apply)(_.name)
+
+  implicit val unitsTypeMapper: TypeMapper[PbUnits, Units] =
+    TypeMapper[PbUnits, Units](x ⇒ Units.withName(x.toString()))(x ⇒ PbUnits.fromName(x.toString).get)
+
+  implicit def matrixDataTypeMapper[T: ClassTag, S <: ItemType[ArrayData[T]]: ItemTypeCompanion]: TypeMapper[S, MatrixData[T]] =
+    TypeMapper[S, MatrixData[T]](x ⇒ MatrixData.fromArrays(x.values.toArray.map(a ⇒ a.data.array)))(
+      x ⇒ ItemTypeCompanion.make(x.data.map(ArrayData.apply))
+    )
+
+  implicit val raDecTypeMapper: TypeMapper[PbRaDec, RaDec] =
+    TypeMapper[PbRaDec, RaDec](x ⇒ RaDec(x.ra, x.dec))(x ⇒ PbRaDec().withRa(x.ra).withDec(x.dec))
+
+  implicit val keyTypeTypeMapper: TypeMapper[PbKeyType, KeyType[_]] =
+    TypeMapper[PbKeyType, KeyType[_]](x ⇒ KeyType.withName(x.toString()))(x ⇒ PbKeyType.fromName(x.toString).get)
+
+  implicit def arrayDataTypeMapper[T: ClassTag, S <: ItemType[T]: ItemTypeCompanion]: TypeMapper[S, ArrayData[T]] =
+    TypeMapper[S, ArrayData[T]](x ⇒ ArrayData(x.values.toArray[T]))(x ⇒ ItemTypeCompanion.make(x.data))
+
+  implicit val obsIdTypeMapper: TypeMapper[String, Option[ObsId]] = TypeMapper[String, Option[ObsId]] { x ⇒
+    if (x.isEmpty) None else Some(ObsId(x))
+  } { x ⇒
+    x.getOrElse(empty).obsId
+  }
 }
