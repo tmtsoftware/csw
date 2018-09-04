@@ -1,11 +1,7 @@
 package csw.messages.commands
 
-import java.util.Optional
-
 import csw.messages.params.generics.{Parameter, ParameterSetType}
 import csw.messages.params.models.{Id, ObsId, Prefix}
-
-import scala.compat.java8.OptionConverters.{RichOptionForJava8, RichOptionalGeneric}
 
 /**
  * Common trait representing commands in TMT like Setup, Observe and Wait
@@ -53,13 +49,6 @@ sealed trait Command { self: ParameterSetType[_] ⇒
   val maybeObsId: Option[ObsId]
 
   /**
-   * A Java helper to acsess optional obsId
-   *
-   * @return an Optional of ObsId
-   */
-  def jMaybeObsId: Optional[ObsId] = maybeObsId.asJava
-
-  /**
    * A common toString method for all concrete implementation
    *
    * @return the string representation of command
@@ -92,12 +81,6 @@ case class Setup private (
 ) extends ParameterSetType[Setup]
     with SequenceCommand
     with ControlCommand {
-
-  /**
-   * A java helper to construct Setup command
-   */
-  def this(source: Prefix, commandName: CommandName, maybeObsId: Optional[ObsId]) =
-    this(Id(), source, commandName, maybeObsId.asScala, Set.empty)
 
   /**
    * Create a new Setup instance when a parameter is added or removed
@@ -164,12 +147,6 @@ case class Observe private (
     with ControlCommand {
 
   /**
-   * A java helper to construct Observe command
-   */
-  def this(source: Prefix, commandName: CommandName, maybeObsId: Optional[ObsId]) =
-    this(Id(), source, commandName, maybeObsId.asScala, Set.empty)
-
-  /**
    * Create a new Observe instance when a parameter is added or removed
    *
    * @param data set of parameters
@@ -231,12 +208,6 @@ case class Wait private (
     paramSet: Set[Parameter[_]]
 ) extends ParameterSetType[Wait]
     with SequenceCommand {
-
-  /**
-   * A java helper to construct Wait command
-   */
-  def this(source: Prefix, commandName: CommandName, maybeObsId: Optional[ObsId]) =
-    this(Id(), source, commandName, maybeObsId.asScala, Set.empty)
 
   /**
    * Create a new Wait instance when a parameter is added or removed
