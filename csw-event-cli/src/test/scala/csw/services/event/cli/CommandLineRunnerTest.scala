@@ -192,7 +192,11 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
     cancellable.cancel()
     subscriptionF.unsubscribe()
 
-    logBuffer shouldEqualContentsOf "json/entire_events.txt"
+    logBuffer.head shouldEqual s"[ERROR] No events published for key: [${eventsGroup.head.eventKey.key}]"
+    logBuffer.tail
+      .map(str ⇒ Json.parse(str).as[JsObject])
+      .map(JsonSupport.readEvent[SystemEvent])
+      .shouldEqual(publishedEvents)
   }
 
   // DEOPSCSW-433: [Event Cli] Subscribe command
