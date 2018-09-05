@@ -18,11 +18,11 @@ class RedisKeySpaceApi[K: RomaineStringCodec, V: RomaineStringCodec](
 )(implicit ec: ExecutionContext) {
 
   def watchKeyspaceValue(
-      keys: List[String],
+      keys: List[K],
       overflowStrategy: OverflowStrategy
   ): Source[RedisResult[K, Option[V]], RedisSubscription] =
     redisSubscriptionApi
-      .psubscribe(keys.map(KeyspaceKey(keyspacePrefix, _)), overflowStrategy)
+      .psubscribe(keys.map(x ⇒ KeyspaceKey(keyspacePrefix, RomaineStringCodec[K].toString(x))), overflowStrategy)
       .filterNot(_.value == Unknown)
       .mapAsync(1) { result ⇒
         val key = RomaineStringCodec[K].fromString(result.key.value)

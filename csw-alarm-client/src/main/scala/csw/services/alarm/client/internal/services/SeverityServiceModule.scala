@@ -98,7 +98,7 @@ trait SeverityServiceModule extends SeverityService {
       val currentSeverities  = await(severityApi.mget(activeSeverityKeys)).map(result ⇒ result.key → result.value).toMap
 
       keySpaceApi
-        .watchKeyspaceValue(activeSeverityKeys.map(_.value), OverflowStrategy.LATEST)
+        .watchKeyspaceValue(activeSeverityKeys, OverflowStrategy.LATEST)
         .scan(currentSeverities) {
           case (data, RedisResult(severityKey, mayBeSeverity)) ⇒ data + (severityKey → mayBeSeverity)
         }
