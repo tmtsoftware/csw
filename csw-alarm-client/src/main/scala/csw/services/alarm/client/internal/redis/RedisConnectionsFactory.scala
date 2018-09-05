@@ -7,7 +7,8 @@ import io.lettuce.core.RedisURI
 import romaine.RomaineFactory
 import romaine.async.RedisAsyncApi
 import romaine.codec.RomaineStringCodec
-import romaine.reactive.{RedisKeySpaceApi, RedisSubscriptionApi}
+import romaine.keyspace.RedisKeySpaceApi
+import romaine.reactive.RedisSubscriptionApi
 
 import scala.concurrent.ExecutionContext
 

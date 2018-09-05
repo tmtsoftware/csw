@@ -15,8 +15,8 @@ import csw.services.alarm.client.internal.commons.Settings
 import csw.services.alarm.client.internal.redis.RedisConnectionsFactory
 import csw.services.alarm.client.internal.{AlarmCodec, AlarmServiceLogger}
 import reactor.core.publisher.FluxSink.OverflowStrategy
+import romaine.RedisResult
 import romaine.extensions.SourceExtensions.RichSource
-import romaine.reactive.{RedisResult, RedisSubscription}
 
 import scala.async.Async.{async, await}
 import scala.concurrent.Future

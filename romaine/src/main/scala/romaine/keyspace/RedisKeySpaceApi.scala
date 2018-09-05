@@ -1,10 +1,12 @@
-package romaine.reactive
+package romaine.keyspace
 
 import akka.stream.scaladsl.Source
 import reactor.core.publisher.FluxSink.OverflowStrategy
+import romaine.RedisResult
 import romaine.async.RedisAsyncApi
-import romaine.codec.{KeyspaceId, RomaineStringCodec}
+import romaine.codec.RomaineStringCodec
 import romaine.extensions.SourceExtensions.RichSource
+import romaine.reactive.{RedisSubscription, RedisSubscriptionApi}
 
 import scala.concurrent.{ExecutionContext, Future}
 

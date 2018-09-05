@@ -4,7 +4,9 @@ import akka.NotUsed
 import akka.stream.scaladsl.{Keep, Source}
 import io.lettuce.core.pubsub.api.reactive.RedisPubSubReactiveCommands
 import reactor.core.publisher.FluxSink.OverflowStrategy
+import romaine.RedisResult
 import romaine.extensions.SourceExtensions.RichSource
+import romaine.reactive.subscribe.{RedisPSubscribeApi, RedisReactiveApi, RedisSubscribeApi}
 
 import scala.concurrent.{ExecutionContext, Future}
 

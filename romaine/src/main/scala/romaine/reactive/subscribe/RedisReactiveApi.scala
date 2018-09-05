@@ -1,8 +1,8 @@
-package romaine.reactive
-
-import akka.{Done, NotUsed}
+package romaine.reactive.subscribe
 import akka.stream.scaladsl.Source
+import akka.{Done, NotUsed}
 import reactor.core.publisher.FluxSink.OverflowStrategy
+import romaine.RedisResult
 
 import scala.concurrent.Future
 

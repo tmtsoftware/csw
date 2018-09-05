@@ -1,6 +1,7 @@
 package romaine.reactive
 import akka.Done
 import akka.stream.KillSwitch
+import romaine.reactive.subscribe.RedisReactiveApi
 
 import scala.async.Async.{async, await}
 import scala.concurrent.{ExecutionContext, Future}

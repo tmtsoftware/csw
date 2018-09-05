@@ -10,7 +10,7 @@ import csw.services.alarm.api.models.{AlarmMetadata, AlarmStatus, Key}
 import csw.services.alarm.client.internal.AlarmServiceLogger
 import csw.services.alarm.client.internal.configparser.ConfigParser
 import csw.services.alarm.client.internal.redis.RedisConnectionsFactory
-import romaine.reactive.RedisResult
+import romaine.RedisResult
 
 import scala.async.Async.{async, await}
 import scala.concurrent.Future

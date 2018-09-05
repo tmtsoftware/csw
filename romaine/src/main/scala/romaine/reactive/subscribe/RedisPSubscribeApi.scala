@@ -1,9 +1,10 @@
-package romaine.reactive
+package romaine.reactive.subscribe
 
 import akka.stream.scaladsl.Source
 import akka.{Done, NotUsed}
 import io.lettuce.core.pubsub.api.reactive.RedisPubSubReactiveCommands
 import reactor.core.publisher.FluxSink.OverflowStrategy
+import romaine.RedisResult
 
 import scala.compat.java8.FutureConverters.CompletionStageOps
 import scala.concurrent.{ExecutionContext, Future}

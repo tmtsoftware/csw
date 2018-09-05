@@ -1,4 +1,4 @@
-package romaine.codec
+package romaine.keyspace
 
 import enumeratum.{Enum, EnumEntry}
 

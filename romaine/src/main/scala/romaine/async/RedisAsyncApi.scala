@@ -2,8 +2,8 @@ package romaine.async
 
 import akka.Done
 import io.lettuce.core.api.async.RedisAsyncCommands
+import romaine.RedisResult
 import romaine.extensions.FutureExtensions.RichFuture
-import romaine.reactive.RedisResult
 
 import scala.collection.JavaConverters.{iterableAsScalaIterableConverter, mapAsJavaMapConverter}
 import scala.compat.java8.FutureConverters.CompletionStageOps
