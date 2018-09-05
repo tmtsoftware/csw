@@ -207,6 +207,7 @@ object Dependencies {
 
   val Romaine = Seq(
     Libs.`lettuce`,
+    Enumeratum.`enumeratum`,
     Libs.`scala-async`,
     Libs.`scala-java8-compat`,
     Akka.`akka-stream`,
