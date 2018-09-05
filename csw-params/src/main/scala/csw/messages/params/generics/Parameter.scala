@@ -22,7 +22,7 @@ object Parameter {
   ): Parameter[S] =
     new Parameter(keyName, keyType, items, units)
 
-  private[messages] implicit def parameterFormat2: Format[Parameter[_]] = new Format[Parameter[_]] {
+  implicit def parameterFormat2: Format[Parameter[_]] = new Format[Parameter[_]] {
     override def writes(obj: Parameter[_]): JsValue = obj.toJson
 
     override def reads(json: JsValue): JsResult[Parameter[_]] = {
