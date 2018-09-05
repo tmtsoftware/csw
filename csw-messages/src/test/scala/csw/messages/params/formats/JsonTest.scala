@@ -176,9 +176,9 @@ class JsonTest extends FunSpec {
       val sc1   = Setup(ck, CommandName("move"), Some(obsId)).add(i1).add(i2)
       val items = sc1.paramSet
 
-      val js3 = JsonSupport.format[Set[Parameter[_]]].writes(items)
-      val in1 = JsonSupport.format[Set[Parameter[_]]].reads(js3)
-      assert(in1.get == items)
+      val js3 = JsonSupport.writes(items)
+      val in1 = JsonSupport.reads[Set[Parameter[_]]](js3)
+      assert(in1 == items)
     }
   }
 
