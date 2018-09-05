@@ -43,7 +43,7 @@ trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
    * @tparam A the type of the command (implied)
    * @return a JsValue object representing the SequenceCommand
    */
-  def writeSequenceCommand[A <: SequenceCommand](result: A): JsValue = {
+  def writeSequenceCommand[A <: Command](result: A): JsValue = {
     JsObject(
       Seq(
         "type"        → JsString(result.typeName),
@@ -63,7 +63,7 @@ trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
    * @tparam A the type of the command (implied)
    * @return an instance of the given SequenceCommand type, or an exception if the JSON is not valid for that type
    */
-  def readSequenceCommand[A <: SequenceCommand](json: JsValue): A = {
+  def readSequenceCommand[A <: Command](json: JsValue): A = {
     json match {
       case JsObject(fields) =>
         (fields("type"), fields("runId"), fields("source"), fields("commandName"), fields("obsId"), fields("paramSet")) match {
@@ -95,9 +95,21 @@ trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
     }
   }
 
-  implicit val sequenceCommandFormat: Format[SequenceCommand] = new Format[SequenceCommand] {
-    override def writes(o: SequenceCommand): JsValue             = writeSequenceCommand(o)
-    override def reads(json: JsValue): JsResult[SequenceCommand] = readSequenceCommand(json)
+  implicit val commandFormat: Format[Command] = new Format[Command] {
+    override def writes(o: Command): JsValue             = writeSequenceCommand(o)
+    override def reads(json: JsValue): JsResult[Command] = readSequenceCommand(json)
+  }
+
+  implicit val sequenceCommandFormat: Reads[SequenceCommand] = {
+    commandFormat.collect(JsonValidationError("invalid sequence command")) {
+      case x: SequenceCommand ⇒ x
+    }
+  }
+
+  implicit val controlCommandFormat: Reads[ControlCommand] = {
+    commandFormat.collect(JsonValidationError("invalid control command")) {
+      case x: ControlCommand ⇒ x
+    }
   }
 
   /**
