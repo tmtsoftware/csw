@@ -11,8 +11,7 @@ import play.api.libs.json._
  */
 private[messages] trait DerivedJsonFormats { self ⇒
 
-  private def formatFactory[S: Writes: Reads, J]: Format[J] =
-    Format(implicitly[Reads[S]].asInstanceOf[Reads[J]], implicitly[Writes[S]].asInstanceOf[Writes[J]])
+  private def formatFactory[S: Format, J](implicit conversion: S => J): Format[J] = implicitly[Format[S]].asInstanceOf[Format[J]]
 
   //scala
   implicit val charFormat: Format[Char] = new Format[Char] {

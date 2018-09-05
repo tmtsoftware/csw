@@ -29,6 +29,7 @@ object Dependencies {
       Enumeratum.`enumeratum`.value,
       Enumeratum.`enumeratum-play-json`.value,
       Libs.`play-json`.value,
+      Libs.`play-json-derived-codecs`.value,
       Libs.`upickle`.value,
       Libs.`scalatest`.value % Test
     )

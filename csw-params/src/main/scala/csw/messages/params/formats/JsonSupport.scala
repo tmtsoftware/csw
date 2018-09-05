@@ -2,39 +2,23 @@ package csw.messages.params.formats
 
 import csw.messages.commands._
 import csw.messages.events._
-import csw.messages.params.generics.Parameter
-import csw.messages.params.models.{Id, ObsId, Prefix}
 import csw.messages.params.states.StateVariable.StateVariable
-import csw.messages.params.states.{CurrentState, DemandState, StateName}
+import julienrf.json.derived
 import play.api.libs.json._
 
-object JsonSupport extends JsonSupport with DerivedJsonFormats with WrappedArrayProtocol
+object JsonSupport extends JsonSupport with DerivedJsonFormats
+
+//TODO: Why is Java support required? Please delete this and corrosponding tests once confirmed
+object JavaJsonSupport extends JsonSupport with DerivedJsonFormats
 
 /**
  * Supports conversion of commands, state variables and events to/from JSON
  */
-trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
+trait JsonSupport { self: DerivedJsonFormats ⇒
 
-  // JSON formats
-  lazy val paramSetFormat: Format[Set[Parameter[_]]] = implicitly[Format[Set[Parameter[_]]]]
-  lazy val idFormat: Format[Id]                      = implicitly[Format[Id]]
-  lazy val obsIdFormat: Format[Option[ObsId]]        = implicitly[Format[Option[ObsId]]]
-  lazy val prefixFormat: Format[Prefix]              = implicitly[Format[Prefix]]
-  lazy val commandTypeFormat: Format[CommandName]    = implicitly[Format[CommandName]]
-  lazy val eventTimeFormat: Format[EventTime]        = implicitly[Format[EventTime]]
-  lazy val eventNameFormat: Format[EventName]        = implicitly[Format[EventName]]
-  lazy val stateNameFormat: Format[StateName]        = implicitly[Format[StateName]]
+  def format[T](implicit x: Format[T]): Format[T] = x
 
-  // config and event type JSON tags
-  private val setupType        = classOf[Setup].getSimpleName
-  private val observeType      = classOf[Observe].getSimpleName
-  private val waitType         = classOf[Wait].getSimpleName
-  private val observeEventType = classOf[ObserveEvent].getSimpleName
-  private val systemEventType  = classOf[SystemEvent].getSimpleName
-  private val currentStateType = classOf[CurrentState].getSimpleName
-  private val demandStateType  = classOf[DemandState].getSimpleName
-
-  private def unexpectedJsValueError(x: JsValue) = throw new RuntimeException(s"Unexpected JsValue: $x")
+  implicit val commandFormat: OFormat[Command] = derived.flat.oformat((__ \ "type").format[String])
 
   /**
    * Writes a SequenceParameterSet to JSON
@@ -43,18 +27,7 @@ trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
    * @tparam A the type of the command (implied)
    * @return a JsValue object representing the SequenceCommand
    */
-  def writeSequenceCommand[A <: Command](result: A): JsValue = {
-    JsObject(
-      Seq(
-        "type"        → JsString(result.typeName),
-        "runId"       → idFormat.writes(result.runId),
-        "source"      → prefixFormat.writes(result.source),
-        "commandName" → commandTypeFormat.writes(result.commandName),
-        "obsId"       → obsIdFormat.writes(result.maybeObsId),
-        "paramSet"    → Json.toJson(result.paramSet)
-      )
-    )
-  }
+  def writeSequenceCommand[A <: Command](result: A): JsValue = format[Command].writes(result)
 
   /**
    * Reads a SequenceCommand back from JSON
@@ -63,42 +36,7 @@ trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
    * @tparam A the type of the command (implied)
    * @return an instance of the given SequenceCommand type, or an exception if the JSON is not valid for that type
    */
-  def readSequenceCommand[A <: Command](json: JsValue): A = {
-    json match {
-      case JsObject(fields) =>
-        (fields("type"), fields("runId"), fields("source"), fields("commandName"), fields("obsId"), fields("paramSet")) match {
-          case (JsString(typeName), runId, source, commandName, obsId, paramSet) =>
-            typeName match {
-              case `setupType` =>
-                Setup(runId.as[Id],
-                      source.as[Prefix],
-                      commandName.as[CommandName],
-                      obsId.as[Option[ObsId]],
-                      paramSet.as[Set[Parameter[_]]]).asInstanceOf[A]
-              case `observeType` =>
-                Observe(runId.as[Id],
-                        source.as[Prefix],
-                        commandName.as[CommandName],
-                        obsId.as[Option[ObsId]],
-                        paramSet.as[Set[Parameter[_]]]).asInstanceOf[A]
-              case `waitType` =>
-                Wait(runId.as[Id],
-                     source.as[Prefix],
-                     commandName.as[CommandName],
-                     obsId.as[Option[ObsId]],
-                     paramSet.as[Set[Parameter[_]]]).asInstanceOf[A]
-              case _ => unexpectedJsValueError(json)
-            }
-          case _ => unexpectedJsValueError(json)
-        }
-      case _ => unexpectedJsValueError(json)
-    }
-  }
-
-  implicit val commandFormat: Format[Command] = new Format[Command] {
-    override def writes(o: Command): JsValue             = writeSequenceCommand(o)
-    override def reads(json: JsValue): JsResult[Command] = readSequenceCommand(json)
-  }
+  def readSequenceCommand[A <: Command](json: JsValue): A = format[Command].reads(json).get.asInstanceOf[A]
 
   implicit val sequenceCommandFormat: Reads[SequenceCommand] = {
     commandFormat.collect(JsonValidationError("invalid sequence command")) {
@@ -112,6 +50,8 @@ trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
     }
   }
 
+  implicit val stateVariableFormat: OFormat[StateVariable] = derived.flat.oformat((__ \ "type").format[String])
+
   /**
    * Writes a state variable to JSON
    *
@@ -119,16 +59,7 @@ trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
    * @tparam A the type of the StateVariable (implied)
    * @return a JsValue object representing the StateVariable
    */
-  def writeStateVariable[A <: StateVariable](stateVariable: A): JsValue = {
-    JsObject(
-      Seq(
-        "type"      → JsString(stateVariable.typeName),
-        "prefix"    → prefixFormat.writes(stateVariable.prefix),
-        "stateName" → stateNameFormat.writes(stateVariable.stateName),
-        "paramSet"  → Json.toJson(stateVariable.paramSet)
-      )
-    )
-  }
+  def writeStateVariable[A <: StateVariable](stateVariable: A): JsValue = format[StateVariable].writes(stateVariable)
 
   /**
    * Reads a StateVariable back from JSON
@@ -137,23 +68,9 @@ trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
    * @tparam A the type of the StateVariable (implied)
    * @return an instance of the given StateVariable, or an exception if the JSON is not valid for that type
    */
-  def readStateVariable[A <: StateVariable](json: JsValue): A = {
-    json match {
-      case JsObject(fields) =>
-        (fields("type"), fields("prefix"), fields("stateName"), fields("paramSet")) match {
-          case (JsString(typeName), prefix, stateName, paramSet) =>
-            val ck    = prefix.as[Prefix]
-            val sName = stateName.as[StateName]
-            typeName match {
-              case `currentStateType` => CurrentState(ck, sName, paramSetFormat.reads(paramSet).get).asInstanceOf[A]
-              case `demandStateType`  => DemandState(ck, sName, paramSetFormat.reads(paramSet).get).asInstanceOf[A]
-              case _                  => unexpectedJsValueError(json)
-            }
-          case _ => unexpectedJsValueError(json)
-        }
-      case _ => unexpectedJsValueError(json)
-    }
-  }
+  def readStateVariable[A <: StateVariable](json: JsValue): A = format[StateVariable].reads(json).get.asInstanceOf[A]
+
+  implicit val eventFormat: OFormat[Event] = derived.flat.oformat((__ \ "type").format[String])
 
   /**
    * Writes an event to JSON
@@ -162,18 +79,7 @@ trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
    * @tparam A the type of the event (implied)
    * @return a JsValue object representing the event
    */
-  def writeEvent[A <: Event](event: A): JsValue = {
-    JsObject(
-      Seq(
-        "type"      → JsString(event.paramType.typeName),
-        "eventId"   → idFormat.writes(event.eventId),
-        "source"    → prefixFormat.writes(event.source),
-        "eventName" → eventNameFormat.writes(event.eventName),
-        "eventTime" → eventTimeFormat.writes(event.eventTime),
-        "paramSet"  → Json.toJson(event.paramSet)
-      )
-    )
-  }
+  def writeEvent[A <: Event](event: A): JsValue = format[Event].writes(event)
 
   /**
    * Reads an event back from JSON
@@ -182,35 +88,7 @@ trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
    * @tparam A the type of the event (use Any and match on the type if you don't know)
    * @return an instance of the given event type, or an exception if the JSON is not valid for that type
    */
-  def readEvent[A <: Event](json: JsValue): A = {
-    json match {
-      case JsObject(fields) =>
-        (fields("type"), fields("eventId"), fields("source"), fields("eventName"), fields("eventTime"), fields("paramSet")) match {
-          case (JsString(typeName), eventId, source, name, eventTime, paramSet) =>
-            typeName match {
-              case `observeEventType` =>
-                ObserveEvent(
-                  eventId.as[Id],
-                  source.as[Prefix],
-                  name.as[EventName],
-                  eventTime.as[EventTime],
-                  paramSet.as[Set[Parameter[_]]]
-                ).asInstanceOf[A]
-              case `systemEventType` =>
-                SystemEvent(
-                  eventId.as[Id],
-                  source.as[Prefix],
-                  name.as[EventName],
-                  eventTime.as[EventTime],
-                  paramSet.as[Set[Parameter[_]]]
-                ).asInstanceOf[A]
-              case _ => unexpectedJsValueError(json)
-            }
-          case _ => unexpectedJsValueError(json)
-        }
-      case _ => unexpectedJsValueError(json)
-    }
-  }
+  def readEvent[A <: Event](json: JsValue): A = format[Event].reads(json).get.asInstanceOf[A]
 
   /**
    * Writes a Result to JSON
@@ -218,14 +96,7 @@ trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
    * @param result any instance of Result
    * @return a JsValue object representing the Result
    */
-  def writeResult(result: Result): JsValue = {
-    JsObject(
-      Seq(
-        "prefix"   -> prefixFormat.writes(result.prefix),
-        "paramSet" -> Json.toJson(result.paramSet)
-      )
-    )
-  }
+  def writeResult(result: Result): JsValue = format[Result].writes(result)
 
   /**
    * Reads a Result back from JSON
@@ -233,15 +104,5 @@ trait JsonSupport { self: DerivedJsonFormats with WrappedArrayProtocol ⇒
    * @param json the parsed JSON
    * @return an instance of Result, or an exception if the JSON is not valid for that type
    */
-  def readResult(json: JsValue): Result = {
-    json match {
-      case JsObject(fields) =>
-        (fields("prefix"), fields("paramSet")) match {
-          case (prefix, paramSet) =>
-            Result(prefix.as[Prefix], paramSetFormat.reads(paramSet).get)
-          case _ => unexpectedJsValueError(json)
-        }
-      case _ => unexpectedJsValueError(json)
-    }
-  }
+  def readResult(json: JsValue): Result = format[Result].reads(json).get
 }

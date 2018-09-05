@@ -43,6 +43,8 @@ object Libs {
   val `akka-http-upickle`     = "de.heikoseeberger"    %% "akka-http-upickle"    % "1.21.0" //Apache 2.0
   val `scala-csv`             = "com.github.tototoshi" %% "scala-csv"            % "1.3.5"
   val `json-schema-validator` = "com.github.fge"       % "json-schema-validator" % "2.2.6" //LGPL/ASL
+
+  val `play-json-derived-codecs` = dep("org.julienrf" %%% "play-json-derived-codecs" % "4.0.1")
 }
 
 object Jackson {

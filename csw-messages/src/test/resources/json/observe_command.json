@@ -3,7 +3,7 @@
   "runId": "test-runId",
   "source": "wfos.blue.filter",
   "commandName": "move",
-  "obsId": "Obs001",
+  "maybeObsId": "Obs001",
   "paramSet": [
     {
       "keyName": "repeat",

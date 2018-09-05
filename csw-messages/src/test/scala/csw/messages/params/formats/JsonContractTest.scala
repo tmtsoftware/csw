@@ -38,16 +38,16 @@ class JsonContractTest extends FunSpec with Matchers {
       val raDecParam = raDecKey.set(raDec1, raDec2)
 
       val setup       = Setup(prefix, CommandName("move"), Some(obsId)).add(raDecParam)
-      val setupToJson = Json.prettyPrint(JsonSupport.writeSequenceCommand(setup))
+      val setupToJson = JsonSupport.writeSequenceCommand(setup)
 
-      val expectedSetupJson = Json.prettyPrint(
+      val expectedSetupJson =
         Json.parse(
           Source
             .fromResource("json/setup_command.json")
             .mkString
             .replace("test-runId", setup.runId.id)
         )
-      )
+
       setupToJson shouldEqual expectedSetupJson
     }
 
@@ -58,11 +58,11 @@ class JsonContractTest extends FunSpec with Matchers {
       val i2      = k2.set("11:10")
       val observe = Observe(prefix, CommandName("move"), Some(obsId)).add(i1).add(i2)
 
-      val observeToJson = Json.prettyPrint(JsonSupport.writeSequenceCommand(observe))
+      val observeToJson = JsonSupport.writeSequenceCommand(observe)
 
-      val expectedObserveJson = Json.prettyPrint(
+      val expectedObserveJson =
         Json.parse(Source.fromResource("json/observe_command.json").mkString.replace("test-runId", observe.runId.id))
-      )
+
       observeToJson shouldEqual expectedObserveJson
     }
 
@@ -73,11 +73,11 @@ class JsonContractTest extends FunSpec with Matchers {
       val matrixParam          = k1.set(m1, m2)
 
       val wait       = Wait(prefix, CommandName("move"), Some(obsId)).add(matrixParam)
-      val waitToJson = Json.prettyPrint(JsonSupport.writeSequenceCommand(wait))
+      val waitToJson = JsonSupport.writeSequenceCommand(wait)
 
-      val expectedWaitJson = Json.prettyPrint(
+      val expectedWaitJson =
         Json.parse(Source.fromResource("json/wait_command.json").mkString.replace("test-runId", wait.runId.id))
-      )
+
       waitToJson shouldEqual expectedWaitJson
     }
   }
@@ -94,10 +94,10 @@ class JsonContractTest extends FunSpec with Matchers {
 
       val structParam        = structKey.set(structItem)
       val observeEvent       = ObserveEvent(eventId, prefix, eventName, eventTime, Set(structParam))
-      val observeEventToJson = Json.prettyPrint(JsonSupport.writeEvent(observeEvent))
+      val observeEventToJson = JsonSupport.writeEvent(observeEvent)
 
       val expectedObserveEventJson =
-        Json.prettyPrint(Json.parse(Source.fromResource("json/observe_event.json").mkString))
+        Json.parse(Source.fromResource("json/observe_event.json").mkString)
       observeEventToJson shouldEqual expectedObserveEventJson
     }
 
@@ -109,9 +109,9 @@ class JsonContractTest extends FunSpec with Matchers {
       val arrayDataParam = arrayDataKey.set(ArrayData(a1), ArrayData(a2))
 
       val systemEvent       = SystemEvent(eventId, prefix, eventName, eventTime, Set(arrayDataParam))
-      val systemEventToJson = Json.prettyPrint(JsonSupport.writeEvent(systemEvent))
+      val systemEventToJson = JsonSupport.writeEvent(systemEvent)
 
-      val expectedSystemEventJson = Json.prettyPrint(Json.parse(Source.fromResource("json/system_event.json").mkString))
+      val expectedSystemEventJson = Json.parse(Source.fromResource("json/system_event.json").mkString)
       systemEventToJson shouldEqual expectedSystemEventJson
     }
   }
@@ -132,10 +132,10 @@ class JsonContractTest extends FunSpec with Matchers {
         timestampKey.set(Instant.ofEpochMilli(0), Instant.parse("2017-09-04T16:28:00.123456789Z")).withUnits(second)
 
       val currentState       = CurrentState(prefix, stateName).madd(charParam, intArrayParam, timestampParam)
-      val currentStateToJson = Json.prettyPrint(JsonSupport.writeStateVariable(currentState))
+      val currentStateToJson = JsonSupport.writeStateVariable(currentState)
 
       val expectedCurrentStateJson =
-        Json.prettyPrint(Json.parse(Source.fromResource("json/current_State.json").mkString))
+        Json.parse(Source.fromResource("json/current_State.json").mkString)
       currentStateToJson shouldBe expectedCurrentStateJson
     }
 
@@ -152,9 +152,9 @@ class JsonContractTest extends FunSpec with Matchers {
       val timestampParam = timestampKey.set(Instant.ofEpochMilli(0), Instant.parse("2017-09-04T16:28:00.123456789Z"))
 
       val demandState       = DemandState(prefix, stateName).madd(charParam, intParam, booleanParam, timestampParam)
-      val demandStateToJson = Json.prettyPrint(JsonSupport.writeStateVariable(demandState))
+      val demandStateToJson = JsonSupport.writeStateVariable(demandState)
 
-      val expectedDemandStateJson = Json.prettyPrint(Json.parse(Source.fromResource("json/demand_state.json").mkString))
+      val expectedDemandStateJson = Json.parse(Source.fromResource("json/demand_state.json").mkString)
       demandStateToJson shouldBe expectedDemandStateJson
     }
   }
@@ -226,13 +226,13 @@ class JsonContractTest extends FunSpec with Matchers {
         p25
       )
 
-      val setupToJson = Json.prettyPrint(JsonSupport.writeSequenceCommand(setup))
+      val setupToJson = JsonSupport.writeSequenceCommand(setup)
 
       val expectedSetupJson = Source
         .fromResource("json/setup_with_all_keys.json")
         .mkString
         .replace("test-runId", setup.runId.id)
-      setupToJson shouldBe Json.prettyPrint(Json.parse(expectedSetupJson))
+      setupToJson shouldBe Json.parse(expectedSetupJson)
     }
   }
 }
