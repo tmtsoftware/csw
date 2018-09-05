@@ -44,6 +44,8 @@ object Libs {
   val `scala-csv`             = "com.github.tototoshi" %% "scala-csv"            % "1.3.5"
   val `json-schema-validator` = "com.github.fge"       % "json-schema-validator" % "2.2.6" //LGPL/ASL
 
+  val `scalajs-java-time` = dep("org.scala-js" %%% "scalajs-java-time" % "0.2.5")
+
   val `play-json-derived-codecs` = dep("org.julienrf" %%% "play-json-derived-codecs" % "4.0.1")
 }
 
