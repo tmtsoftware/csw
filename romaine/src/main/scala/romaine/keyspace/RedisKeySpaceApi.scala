@@ -6,8 +6,8 @@ import romaine.RedisResult
 import romaine.async.RedisAsyncApi
 import romaine.codec.RomaineStringCodec
 import romaine.extensions.SourceExtensions.RichSource
-import romaine.keyspace.KeyspaceEvent.{Error, Updated, Wrapped}
-import romaine.keyspace.RedisKeyspaceEvent.Unknown
+import romaine.keyspace.KeyspaceEvent.{Error, Removed, Updated}
+import romaine.keyspace.RedisKeyspaceEvent.{Delete, Expired, Unknown}
 import romaine.reactive.{RedisSubscription, RedisSubscriptionApi}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -33,7 +33,8 @@ class RedisKeySpaceApi[K: RomaineStringCodec, V: RomaineStringCodec](
               if (x.isDefined) RedisResult(key, Updated(x.get))
               else RedisResult(key, Error(s"Received Set keyspace event for [$key] but value is not present in store."))
             }
-          case event ⇒ Future.successful(RedisResult(key, Wrapped(event)))
+          case Expired | Delete ⇒ Future.successful(RedisResult(key, Removed))
+          case Unknown          ⇒ Future.successful(RedisResult(key, Error("Received unknown keyspace event.")))
         }
       }
 
@@ -41,16 +42,9 @@ class RedisKeySpaceApi[K: RomaineStringCodec, V: RomaineStringCodec](
       keys: List[K],
       overflowStrategy: OverflowStrategy
   ): Source[RedisResult[K, Option[V]], RedisSubscription] =
-    watchKeyspaceEvent(keys, overflowStrategy)
-      .collect {
-        case RedisResult(k, Updated(v))                         ⇒ (k, Some(v))
-        case RedisResult(k, Wrapped(event)) if event != Unknown ⇒ (k, None)
-      }
-      .map {
-        case (k, v) ⇒ RedisResult(k, v)
-      }
-      .distinctUntilChanged
+    watchKeyspaceEvent(keys, overflowStrategy).collect {
+      case RedisResult(k, Updated(v)) ⇒ RedisResult[K, Option[V]](k, Some(v))
+      case RedisResult(k, Removed)    ⇒ RedisResult[K, Option[V]](k, None)
+    }.distinctUntilChanged
 
 }
-//todo: support for delete and expired, etc
-//todo: RedisWatchSubscription try to remove type parameter
