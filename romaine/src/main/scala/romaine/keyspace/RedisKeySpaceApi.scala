@@ -2,17 +2,17 @@ package romaine.keyspace
 
 import akka.stream.scaladsl.Source
 import reactor.core.publisher.FluxSink.OverflowStrategy
-import romaine.RedisOperation._
+import romaine.RedisResult
 import romaine.async.RedisAsyncApi
 import romaine.codec.RomaineStringCodec
 import romaine.extensions.SourceExtensions.RichSource
+import romaine.keyspace.KeyspaceEvent._
 import romaine.reactive.{RedisSubscription, RedisSubscriptionApi}
-import romaine.{RedisOperation, RedisResult}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class RedisKeySpaceApi[K: RomaineStringCodec, V: RomaineStringCodec](
-    redisSubscriptionApi: RedisSubscriptionApi[KeyspaceKey, RedisOperation],
+    redisSubscriptionApi: RedisSubscriptionApi[KeyspaceKey, KeyspaceEvent],
     redisAsyncApi: RedisAsyncApi[K, V],
     keyspacePrefix: KeyspaceId = KeyspaceId._0
 )(implicit ec: ExecutionContext) {
