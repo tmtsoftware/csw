@@ -22,8 +22,15 @@ object EventTime {
    */
   def apply(): EventTime = new EventTime(Instant.now(Clock.systemUTC()))
 
-  private[messages] implicit val format: Format[EventTime] = new Format[EventTime] {
-    def writes(et: EventTime): JsValue            = JsString(et.toString)
-    def reads(json: JsValue): JsResult[EventTime] = JsSuccess(EventTime(json.as[Instant]))
+  implicit val instantFormat: Format[Instant] = new Format[Instant] {
+    override def reads(json: JsValue): JsResult[Instant] = json match {
+      case JsString(value) ⇒ JsSuccess(Instant.parse(value))
+      case _               ⇒ JsError(s"can not parse $json into Instant")
+    }
+
+    override def writes(o: Instant): JsValue = JsString(o.toString)
   }
+
+  implicit val reads: Reads[EventTime]   = implicitly[Reads[Instant]].map(EventTime.apply)
+  implicit val writes: Writes[EventTime] = Writes[EventTime](x ⇒ implicitly[Writes[Instant]].writes(x.time))
 }

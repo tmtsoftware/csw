@@ -1,11 +1,13 @@
 import sbt._
-
+import Def.{setting => dep}
+import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
 import scalapb.compiler.Version.scalapbVersion
 
 object Libs {
   val ScalaVersion = "2.12.6"
 
-  val `scalatest`                    = "org.scalatest"          %% "scalatest"                    % "3.0.5" //Apache License 2.0
+  val `scalatest` = dep("org.scalatest" %%% "scalatest" % "3.0.5") //Apache License 2.0
+
   val `scala-java8-compat`           = "org.scala-lang.modules" %% "scala-java8-compat"           % "0.9.0" //BSD 3-clause "New" or "Revised" License
   val `scala-async`                  = "org.scala-lang.modules" %% "scala-async"                  % "0.9.7" //BSD 3-clause "New" or "Revised" License
   val `scopt`                        = "com.github.scopt"       %% "scopt"                        % "3.7.0" //MIT License
@@ -21,22 +23,26 @@ object Libs {
   val `joda-time`                    = "joda-time"              % "joda-time"                     % "2.10" //Apache 2.0
   val `scala-reflect`                = "org.scala-lang"         % "scala-reflect"                 % ScalaVersion //BSD-3
   val `gson`                         = "com.google.code.gson"   % "gson"                          % "2.8.5" //Apache 2.0
-  val `play-json`                    = "com.typesafe.play"      %% "play-json"                    % "2.6.10" //Apache 2.0
-  val `play-json-extensions`         = "ai.x"                   %% "play-json-extensions"         % "0.14.0" //Simplified BSD License
-  val `akka-http-play-json`          = "de.heikoseeberger"      %% "akka-http-play-json"          % "1.21.0" //Apache 2.0
-  val `scalapb-runtime`              = "com.thesamet.scalapb"   %% "scalapb-runtime"              % scalapbVersion % "protobuf"
-  val `scalapb-json4s`               = "com.thesamet.scalapb"   %% "scalapb-json4s"               % "0.7.1"
-  val `lettuce`                      = "io.lettuce"             % "lettuce-core"                  % "5.0.5.RELEASE"
-  val `akka-stream-kafka`            = "com.typesafe.akka"      %% "akka-stream-kafka"            % "0.22"
-  val `scalatest-embedded-kafka`     = "net.manub"              %% "scalatest-embedded-kafka"     % "1.1.0"
-  val `embedded-redis`               = "com.github.kstyrc"      % "embedded-redis"                % "0.6"
-  val `scala-compiler`               = "org.scala-lang"         % "scala-compiler"                % ScalaVersion
-  val `HdrHistogram`                 = "org.hdrhistogram"       % "HdrHistogram"                  % "2.1.10"
-  val `testng`                       = "org.testng"             % "testng"                        % "6.14.3"
-  val `upickle`                      = "com.lihaoyi"            %% "upickle"                      % "0.6.6"
-  val `akka-http-upickle`            = "de.heikoseeberger"      %% "akka-http-upickle"            % "1.21.0" //Apache 2.0
-  val `scala-csv`                    = "com.github.tototoshi"   %% "scala-csv"                    % "1.3.5"
-  val `json-schema-validator`        = "com.github.fge"         % "json-schema-validator"         % "2.2.6" //LGPL/ASL
+
+  val `play-json` = dep("com.typesafe.play" %%% "play-json" % "2.6.10") //Apache 2.0
+
+  val `play-json-extensions`     = "ai.x"                 %% "play-json-extensions"     % "0.14.0" //Simplified BSD License
+  val `akka-http-play-json`      = "de.heikoseeberger"    %% "akka-http-play-json"      % "1.21.0" //Apache 2.0
+  val `scalapb-runtime`          = "com.thesamet.scalapb" %% "scalapb-runtime"          % scalapbVersion % "protobuf"
+  val `scalapb-json4s`           = "com.thesamet.scalapb" %% "scalapb-json4s"           % "0.7.1"
+  val `lettuce`                  = "io.lettuce"           % "lettuce-core"              % "5.0.5.RELEASE"
+  val `akka-stream-kafka`        = "com.typesafe.akka"    %% "akka-stream-kafka"        % "0.22"
+  val `scalatest-embedded-kafka` = "net.manub"            %% "scalatest-embedded-kafka" % "1.1.0"
+  val `embedded-redis`           = "com.github.kstyrc"    % "embedded-redis"            % "0.6"
+  val `scala-compiler`           = "org.scala-lang"       % "scala-compiler"            % ScalaVersion
+  val `HdrHistogram`             = "org.hdrhistogram"     % "HdrHistogram"              % "2.1.10"
+  val `testng`                   = "org.testng"           % "testng"                    % "6.14.3"
+
+  val `upickle` = dep("com.lihaoyi" %%% "upickle" % "0.6.6")
+
+  val `akka-http-upickle`     = "de.heikoseeberger"    %% "akka-http-upickle"    % "1.21.0" //Apache 2.0
+  val `scala-csv`             = "com.github.tototoshi" %% "scala-csv"            % "1.3.5"
+  val `json-schema-validator` = "com.github.fge"       % "json-schema-validator" % "2.2.6" //LGPL/ASL
 }
 
 object Jackson {
@@ -47,7 +53,9 @@ object Jackson {
 }
 
 object Enumeratum {
-  val `enumeratum`      = "com.beachape" %% "enumeratum"      % "1.5.13" //MIT License
+  val `enumeratum`           = dep("com.beachape" %%% "enumeratum"           % "1.5.13") //MIT License
+  val `enumeratum-play-json` = dep("com.beachape" %%% "enumeratum-play-json" % "1.5.14") //MIT License
+
   val `enumeratum-play` = "com.beachape" %% "enumeratum-play" % "1.5.14" //MIT License
 }
 
