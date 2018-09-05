@@ -2,11 +2,13 @@ package csw.services.alarm.api.models
 import java.time.{Clock, Instant}
 
 /**
- * Basic model to represent time in the alarm service.
- *
- * @param time to represent in model.
+ * Represents time of severity change of an alarm
  */
 case class AlarmTime private[alarm] (time: Instant) {
+
+  /**
+   * String representation of alarm time
+   */
   val value: String = time.toString
 }
 

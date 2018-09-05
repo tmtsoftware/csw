@@ -15,13 +15,25 @@ sealed abstract class AlarmHealth extends EnumEntry with Lowercase
 object AlarmHealth extends Enum[AlarmHealth] {
 
   /**
-   * Returns a collection of `AlarmHealth` e.g good, ill or bad
+   * Returns a collection of `AlarmHealth` e.g Good, Ill or Bad
    */
   def values: IndexedSeq[AlarmHealth] = findValues
 
+  /**
+   * Represents health of an alarm/component/subsystem/system if all alarms are either Okay or Warning
+   */
   case object Good extends AlarmHealth
-  case object Ill  extends AlarmHealth
-  case object Bad  extends AlarmHealth
+
+  /**
+   * Represents health of an alarm/component/subsystem/system if at-least one alarm is Major
+   */
+  case object Ill extends AlarmHealth
+
+  /**
+   * Represents health of an alarm/component/subsystem/system if at-least one alarm is either Disconnected, Indeterminate
+   * or Critical
+   */
+  case object Bad extends AlarmHealth
 
   private[alarm] def fromSeverity(alarmSeverity: FullAlarmSeverity): AlarmHealth = alarmSeverity match {
     case Disconnected | Indeterminate | Critical => Bad

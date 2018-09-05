@@ -6,13 +6,13 @@ import enumeratum.{Enum, EnumEntry}
 import scala.collection.immutable.IndexedSeq
 
 /**
- * Represents a type of the Alarm. Alarm type of an alarm if configured in the alarm config file.
- * Alarm type will not change in entire life span of an alarm
+ * Represents the category of the Alarm. The type of an alarm is configured in the alarm config file which will be fixed
+ * for it's entire life span.
  */
 sealed abstract class AlarmType extends EnumEntry with Lowercase {
 
   /**
-   * The name of AlarmType e.g. for Absolute type of alarms, the name will be represented as `absolute`
+   * The name of the AlarmType e.g. for `Absolute` type of alarms, the name will be represented as `absolute`
    */
   def name: String = entryName
 }
@@ -20,7 +20,7 @@ sealed abstract class AlarmType extends EnumEntry with Lowercase {
 object AlarmType extends Enum[AlarmType] {
 
   /**
-   * Returns a sequence of all alarm types
+   * Returns a sequence of all alarm types e.g. Absolute, BitPattern, Calculated etc.
    */
   def values: IndexedSeq[AlarmType] = findValues
 

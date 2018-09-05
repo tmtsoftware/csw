@@ -6,15 +6,12 @@ import csw.services.alarm.api.internal.RichStringExtentions.RichString
 import csw.services.alarm.api.internal.Separators.KeySeparator
 
 /**
- * A wrapper class representing the key for an alarm e.g. nfiraos.trombone.tromboneaxislowlimitalarm
+ * A wrapper class representing the key for an alarm/component/subsystem/system
  *
  * @note key is case-insensitive e.g nfiraos.trombone.tromboneaxislowlimitalarm and
  * NFIRAOS.trombone.tromboneaxislowlimitalarm keys are equal
- * @param subsystem represents the subsystem of the component that raises an alarm e.g. nfiraos
- * @param component represents the component that raises an alarm e.g trombone
- * @param name represents the name of the alarm unique to the component e.g tromboneAxisLowLimitAlarm
  */
-sealed abstract class Key(subsystem: String, component: String, name: String) extends Proxy {
+sealed abstract class Key private[alarm] (subsystem: String, component: String, name: String) extends Proxy {
   require(component.isDefined, "component should not be an empty value")
   require(name.isDefined, "name should not be an empty value")
 
@@ -23,18 +20,22 @@ sealed abstract class Key(subsystem: String, component: String, name: String) ex
    */
   val value: String = s"$subsystem$KeySeparator$component$KeySeparator$name".toLowerCase
 
+  /**
+   * Equality of the key is based on the subsystem, component and name
+   */
   override def self: Any = value
 }
 
 object Key {
   // pattern matches for any one of *, [, ], ^, - characters  present
-  val invalidChars: Pattern = Pattern.compile(".*[\\*\\[\\]\\^\\?\\-].*")
+  private val invalidChars: Pattern = Pattern.compile(".*[\\*\\[\\]\\^\\?\\-].*")
 
   /**
-   * Represents unique alarm in the given subsystem and component
+   * Represents unique alarm in the given subsystem and component e.g. nfiraos.trombone.tromboneaxislowlimitalarm
    *
-   * @param subsystem represents the subsystem of the component to which that alarm belongs e.g. nfiraos
-   * @param component represents the component to which that alarm belongs e.g trombone
+   * @note component and name cannot contain invalid characters i.e. `* [ ] ^ -`
+   * @param subsystem this alarm belongs to e.g. NFIRAOS
+   * @param component this alarm belongs to e.g trombone
    * @param name represents the name of the alarm unique to the component e.g tromboneAxisLowLimitAlarm
    */
   case class AlarmKey(subsystem: Subsystem, component: String, name: String) extends Key(subsystem.name, component, name) {
@@ -43,24 +44,25 @@ object Key {
   }
 
   /**
-   * Represents all the alarms present given subsystem and component
+   * Represents a key for all the alarms of a component
    *
-   * @param subsystem represents the subsystem of the component that raises an alarm e.g. nfiraos
-   * @param component represents the component whose alarms to be included e.g trombone
+   * @note component cannot contain invalid characters i.e. `* [ ] ^ -`
+   * @param subsystem this component belongs to e.g. NFIRAOS
+   * @param component represents all alarms belonging to this component e.g trombone
    */
   case class ComponentKey(subsystem: Subsystem, component: String) extends Key(subsystem.name, component, "*") {
     require(!component.matches(invalidChars), "component name contains invalid characters")
   }
 
   /**
-   *Represents all the alarm present given subsystem
+   * Represents a key for all the alarms of a subsystem
    *
-   * @param subsystem represents the subsystem whose alarms to be included e.g. nfiraos
+   * @param subsystem represents all alarms belonging to this component e.g. NFIRAOS
    */
   case class SubsystemKey(subsystem: Subsystem) extends Key(subsystem.name, "*", "*")
 
   /**
-   * Represents all the alarms available in the system.
+   * Represents all the alarms available in the system
    */
   case object GlobalKey extends Key("*", "*", "*")
 
