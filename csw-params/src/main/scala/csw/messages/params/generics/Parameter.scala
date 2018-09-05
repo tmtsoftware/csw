@@ -4,12 +4,12 @@ import java.util
 import java.util.Optional
 
 import csw.messages.TMTSerializable
+import csw.messages.extensions.OptionConverters.RichOption
 import csw.messages.params.models.Units
 import play.api.libs.json._
 
 import scala.collection.JavaConverters.seqAsJavaListConverter
 import scala.collection.mutable
-import scala.compat.java8.OptionConverters.RichOptionForJava8
 import scala.reflect.ClassTag
 
 object Parameter {

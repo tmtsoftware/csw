@@ -2,10 +2,9 @@ package csw.messages.commands
 
 import java.util.Optional
 
+import csw.messages.extensions.OptionConverters.{RichOption, RichOptional}
 import csw.messages.params.generics.{Parameter, ParameterSetType}
 import csw.messages.params.models.{Id, ObsId, Prefix}
-
-import scala.compat.java8.OptionConverters.{RichOptionForJava8, RichOptionalGeneric}
 
 /**
  * Common trait representing commands in TMT like Setup, Observe and Wait

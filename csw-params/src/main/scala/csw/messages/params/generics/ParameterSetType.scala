@@ -3,11 +3,11 @@ package csw.messages.params.generics
 import java.util
 
 import csw.messages.TMTSerializable
+import csw.messages.extensions.OptionConverters.RichOption
 
 import scala.annotation.varargs
 import scala.collection.JavaConverters.setAsJavaSetConverter
 import scala.collection.JavaConverters.mapAsJavaMapConverter
-import scala.compat.java8.OptionConverters.RichOptionForJava8
 
 /**
  * The base trait for various parameter set types (commands or events)
