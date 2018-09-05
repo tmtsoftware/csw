@@ -7,13 +7,13 @@ import csw.services.alarm.api.models.Key.AlarmKey
 import scala.concurrent.Future
 
 /**
- * An AlarmService trait to set severity of alarms
+ * An AlarmService interface to set severity of alarms
  */
 trait AlarmService {
 
   /**
-   * This api allows to set the severity of an alarm. It also internally updates the latch severity and acknowledgement status.
-   * The severity is set in alarm store with a specific TTL (time to live). After the time passes for TTL, the severity
+   * Sets the severity of an alarm. It also internally updates the latch severity and acknowledgement status. The
+   * severity is set in alarm store with a specific TTL (time to live). After the time passes for TTL, the severity
    * will be automatically inferred as `Disconnected`.
    *
    * @note By default all alarms are loaded in alarm store as `Disconnected`. Once the component is up and working,

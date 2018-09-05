@@ -23,26 +23,26 @@ trait MetadataServiceModule extends MetadataService {
 
   private val log = AlarmServiceLogger.getLogger
 
-  final override def activate(key: AlarmKey): Future[Done] = async {
-    log.debug(s"Activate alarm [${key.value}]")
+  final override def activate(alarmKey: AlarmKey): Future[Done] = async {
+    log.debug(s"Activate alarm [${alarmKey.value}]")
 
-    val metadata = await(metadataApi.get(key)).getOrElse(logAndThrow(KeyNotFoundException(key)))
-    if (!metadata.isActive) await(metadataApi.set(key, metadata.copy(activationStatus = Active)))
+    val metadata = await(metadataApi.get(alarmKey)).getOrElse(logAndThrow(KeyNotFoundException(alarmKey)))
+    if (!metadata.isActive) await(metadataApi.set(alarmKey, metadata.copy(activationStatus = Active)))
     Done
   }
 
-  final override def deactivate(key: AlarmKey): Future[Done] = async {
-    log.debug(s"Deactivate alarm [${key.value}]")
+  final override def deactivate(alarmKey: AlarmKey): Future[Done] = async {
+    log.debug(s"Deactivate alarm [${alarmKey.value}]")
 
-    val metadata = await(metadataApi.get(key)).getOrElse(logAndThrow(KeyNotFoundException(key)))
-    if (metadata.isActive) await(metadataApi.set(key, metadata.copy(activationStatus = Inactive)))
+    val metadata = await(metadataApi.get(alarmKey)).getOrElse(logAndThrow(KeyNotFoundException(alarmKey)))
+    if (metadata.isActive) await(metadataApi.set(alarmKey, metadata.copy(activationStatus = Inactive)))
     Done
   }
 
-  final override def getMetadata(key: AlarmKey): Future[AlarmMetadata] = async {
-    log.debug(s"Getting metadata for alarm [${key.value}]")
+  final override def getMetadata(alarmKey: AlarmKey): Future[AlarmMetadata] = async {
+    log.debug(s"Getting metadata for alarm [${alarmKey.value}]")
 
-    await(metadataApi.get(key)).getOrElse(logAndThrow(KeyNotFoundException(key)))
+    await(metadataApi.get(alarmKey)).getOrElse(logAndThrow(KeyNotFoundException(alarmKey)))
   }
 
   final override def getMetadata(key: Key): Future[List[AlarmMetadata]] = async {

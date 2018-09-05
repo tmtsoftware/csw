@@ -8,53 +8,48 @@ import scala.concurrent.Future
 private[alarm] trait StatusService {
 
   /**
-   * To fetch status of specific alarm
+   * Fetches the status for the given alarm
    *
-   * @param key represents a unique alarm in alarm store
-   * @return a future which completes with status fetched from alarm store or fails with
-   *         [[csw.services.alarm.api.exceptions.KeyNotFoundException]]
+   * @param alarmKey represents a unique alarm in alarm store
+   * @return a future which completes with status or fails with [[csw.services.alarm.api.exceptions.KeyNotFoundException]]
    */
-  def getStatus(key: AlarmKey): Future[AlarmStatus]
+  def getStatus(alarmKey: AlarmKey): Future[AlarmStatus]
 
   /**
-   * To set `acknowledgement status` which is field of status to `acknowledged`
+   * Sets acknowledgement status to acknowledged
    *
-   * @param key represents a unique alarm in alarm store
-   * @return a future which completes when acknowledgement status of given key is set to acknowledged successfully or fails
-   *         with [[csw.services.alarm.api.exceptions.KeyNotFoundException]]
+   * @param alarmKey represents a unique alarm in alarm store
+   * @return a future which completes alarm is acknowledged successfully or fails with [[csw.services.alarm.api.exceptions.KeyNotFoundException]]
    */
-  def acknowledge(key: AlarmKey): Future[Done]
+  def acknowledge(alarmKey: AlarmKey): Future[Done]
 
   /**
-   * To set status of the given alarm to default state
+   * Sets the latched severity to current severity and acknowledgement status to acknowledged for the given alarm
    *
-   * @note reset will set `acknowledgement status` to `acknowledged`, `latched severity` to `current severity` and other fields of
-   * status remains the `same`
-   * @param key represents a unique alarm in alarm store
-   * @return a future which completes when status of given key is reset successfully in the alarm store or fails with
-   *         [[csw.services.alarm.api.exceptions.KeyNotFoundException]]
+   * @param alarmKey represents a unique alarm in alarm store
+   * @return a future which completes when alarm is reset successfully or fails with [[csw.services.alarm.api.exceptions.KeyNotFoundException]]
    */
-  def reset(key: AlarmKey): Future[Done]
+  def reset(alarmKey: AlarmKey): Future[Done]
 
   /**
-   * To set shelve status of the given alarm to shelved
+   * Sets the shelve status of the given alarm to shelved. Once alarm is shelved no response would be needed in terms of
+   * acknowledgement, reset, etc.
    *
-   * @note shelve status is set to shelved which will `expire` after a certain time which can be configured from the configuration.
-   * After timeout shelve status will be unshelved.
-   * @param key represents a unique alarm in alarm store
-   * @return a future which completes when shelved status of given key set to `shelved` successfully or fails with
-   *         [[csw.services.alarm.api.exceptions.KeyNotFoundException]]
-   */
-  def shelve(key: AlarmKey): Future[Done]
+   * @note alarms that are shelved will automatically be unshelved at a specific time (currently configured at 8 AM local time)
+   *       if not done explicitly. This time is configurable e.g csw-alarm.shelve-timeout = h:m:s a .
+   *       Also, shelved alarms are considered in aggregation of the severity and health.
+   * @param alarmKey represents a unique alarm in alarm store
+   * @return a future which completes when alarm is shelved successfully or fails with [[csw.services.alarm.api.exceptions.KeyNotFoundException]]
+   **/
+  def shelve(alarmKey: AlarmKey): Future[Done]
 
   /**
-   * To set shelve status of the given alarm to unshelved
+   * Sets the shelve status of the given alarm to unshelved
    *
-   * @param key represents a unique alarm in alarm store
-   * @return a future which completes when shelved status of given key set to `unshelved` successfully or fails with
-   *         [[csw.services.alarm.api.exceptions.KeyNotFoundException]]
+   * @param alarmKey represents a unique alarm in alarm store
+   * @return a future which completes when the alarm is unshelved successfully or fails with [[csw.services.alarm.api.exceptions.KeyNotFoundException]]
    */
-  def unshelve(key: AlarmKey): Future[Done]
+  def unshelve(alarmKey: AlarmKey): Future[Done]
 
   private[alarm] def unacknowledge(key: AlarmKey): Future[Done]
   private[alarm] def setStatus(alarmKey: AlarmKey, alarmStatus: AlarmStatus): Future[Done]

@@ -10,47 +10,49 @@ import scala.concurrent.Future
 private[alarm] trait SeverityService extends AlarmService {
 
   /**
-   * To fetch the severity of a specific alarm from the alarm store
+   * Fetches the severity of the given alarm from the alarm store
    *
-   * @param key represents a unique alarm in alarm store
-   * @return a future which completes with severity fetched from the alarm store or fails with
-   *         [[csw.services.alarm.api.exceptions.KeyNotFoundException]]
+   * @param alarmKey represents a unique alarm in alarm store
+   * @return a future which completes with the alarm severity or fails with [[csw.services.alarm.api.exceptions.KeyNotFoundException]]
    */
-  def getCurrentSeverity(key: AlarmKey): Future[FullAlarmSeverity]
+  def getCurrentSeverity(alarmKey: AlarmKey): Future[FullAlarmSeverity]
 
   /**
-   * To get a single severity representing worst alarm severity of all severities for the given key.
+   * Gets the aggregated severity which is calculated based on the worst severity amongst all active alarms for the given
+   * alarm/component/subsystem/system
    *
-   * @note Aggregated severity is highest severity amongst all active alarms for given key.
-   * @param key represents subsystem, component or a specific alarm in alarm store
-   * @return a future which completes with aggregated severity of the given subsystem, component or given alarm
-   *         or fails with [[csw.services.alarm.api.exceptions.KeyNotFoundException]]
+   * @param key represents an alarm, component, subsystem or system
+   * @return a future which completes with aggregated severity or fails with
+   *         [[csw.services.alarm.api.exceptions.KeyNotFoundException]]
    *         or [[csw.services.alarm.api.exceptions.InactiveAlarmException]]
    */
   def getAggregatedSeverity(key: Key): Future[FullAlarmSeverity]
 
   /**
-   * Executes the given callback function with the aggregated severity whenever any severity changes of given key in the alarm store.
+   * Calculates the aggregated severity for the given alarm/component/subsystem/system and executes the callback each time the
+   * aggregation changes
    *
-   * @note Aggregated severity is highest severity amongst all active alarms for given key.
-   * @param key represents subsystem, component or a specific alarm in alarm store
-   * @param callback which will be executed with aggregated severity on every severity change for given key
-   * @return alarm subscription to ready or unsubscribe to the severity change for give key or throws
-   *         [[csw.services.alarm.api.exceptions.KeyNotFoundException]] or
+   * @note aggregated severity is worst amongst all active alarms for given key
+   * @param key represents an alarm, component, subsystem or system
+   * @param callback executed with the latest worst severity
+   * @return alarm subscription which can be used to unsubscribe or check if subscription is ready to be consumed. The method
+   *         can also throw [[csw.services.alarm.api.exceptions.KeyNotFoundException]] or
    *         [[csw.services.alarm.api.exceptions.InactiveAlarmException]]
    */
   def subscribeAggregatedSeverityCallback(key: Key, callback: FullAlarmSeverity ⇒ Unit): AlarmSubscription
 
   /**
-   * Sends message to the given actor as the aggregated severity whenever any severity changes of given key in the alarm store.
+   * Calculates the aggregated severity for the given alarm/component/subsystem/system and sends to the give actor each time the
+   * aggregation changes
    *
-   * @note Aggregated severity is highest severity amongst all active alarms for given key.
-   * @param key represents subsystem, component or a specific alarm in alarm store
-   * @param actorRef of actor which will receive message of aggregated severity on every severity change for given key
-   * @return alarm subscription to ready or unsubscribe to the severity change for give key or throws
-   *         [[csw.services.alarm.api.exceptions.KeyNotFoundException]] or
+   * @note aggregated severity is worst amongst all active alarms for given key
+   * @param key represents an alarm, component, subsystem or system
+   * @param actorRef receives the latest worst severity
+   * @return alarm subscription which can be used to unsubscribe or check if subscription is ready to be consumed. The method
+   *         can also throw [[csw.services.alarm.api.exceptions.KeyNotFoundException]] or
    *         [[csw.services.alarm.api.exceptions.InactiveAlarmException]]
    */
   def subscribeAggregatedSeverityActorRef(key: Key, actorRef: ActorRef[FullAlarmSeverity]): AlarmSubscription
+
   private[alarm] def subscribeAggregatedSeverity(key: Key): Source[FullAlarmSeverity, AlarmSubscription]
 }

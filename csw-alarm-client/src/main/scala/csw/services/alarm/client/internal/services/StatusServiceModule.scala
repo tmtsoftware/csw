@@ -32,12 +32,12 @@ trait StatusServiceModule extends StatusService {
 
   private val log = AlarmServiceLogger.getLogger
 
-  final override def getStatus(key: AlarmKey): Future[AlarmStatus] = async {
-    log.debug(s"Getting status for alarm [${key.value}]")
-    val ackStatusF: Future[Option[AcknowledgementStatus]]   = ackStatusApi.get(key)
-    val latchedSeverityF: Future[Option[FullAlarmSeverity]] = latchedSeverityApi.get(key)
-    val shelveStatusF: Future[ShelveStatus]                 = getShelveStatus(key)
-    val alarmTimeF: Future[Option[AlarmTime]]               = alarmTimeApi.get(key)
+  final override def getStatus(alarmKey: AlarmKey): Future[AlarmStatus] = async {
+    log.debug(s"Getting status for alarm [${alarmKey.value}]")
+    val ackStatusF: Future[Option[AcknowledgementStatus]]   = ackStatusApi.get(alarmKey)
+    val latchedSeverityF: Future[Option[FullAlarmSeverity]] = latchedSeverityApi.get(alarmKey)
+    val shelveStatusF: Future[ShelveStatus]                 = getShelveStatus(alarmKey)
+    val alarmTimeF: Future[Option[AlarmTime]]               = alarmTimeApi.get(alarmKey)
 
     val defaultAlarmStatus = AlarmStatus()
     AlarmStatus(
@@ -48,13 +48,13 @@ trait StatusServiceModule extends StatusService {
     )
   }
 
-  final override def acknowledge(key: AlarmKey): Future[Done] = setAcknowledgementStatus(key, Acknowledged)
+  final override def acknowledge(alarmKey: AlarmKey): Future[Done] = setAcknowledgementStatus(alarmKey, Acknowledged)
 
-  final override def reset(key: AlarmKey): Future[Done] = async {
-    log.debug(s"Reset alarm [${key.value}]")
+  final override def reset(alarmKey: AlarmKey): Future[Done] = async {
+    log.debug(s"Reset alarm [${alarmKey.value}]")
 
-    val currentSeverity = await(getCurrentSeverity(key))
-    val originalStatus  = await(getStatus(key))
+    val currentSeverity = await(getCurrentSeverity(alarmKey))
+    val originalStatus  = await(getStatus(alarmKey))
 
     val acknowledgedStatus = originalStatus.copy(
       //reset operation acknowledges alarm
@@ -63,37 +63,38 @@ trait StatusServiceModule extends StatusService {
       latchedSeverity = currentSeverity
     )
 
-    if (originalStatus != acknowledgedStatus) await(setStatus(key, acknowledgedStatus))
+    if (originalStatus != acknowledgedStatus) await(setStatus(alarmKey, acknowledgedStatus))
     Done
   }
 
-  final override def shelve(key: AlarmKey): Future[Done] = {
-    log.debug(s"Shelve alarm [${key.value}]")
-    shelve(key, settings.shelveTimeout)
+  final override def shelve(alarmKey: AlarmKey): Future[Done] = {
+    log.debug(s"Shelve alarm [${alarmKey.value}]")
+    shelve(alarmKey, settings.shelveTimeout)
   }
 
-  private[alarm] def shelve(key: AlarmKey, shelveTimeout: String): Future[Done] = {
+  private[alarm] def shelve(alarmKey: AlarmKey, shelveTimeout: String): Future[Done] = {
     // Use the UTC timezone for the time-being. Once the time service is in place, it can query time service.
     val clock = Clock.systemUTC()
 
     val shelveTTLInSeconds = clock.untilNext(shelveTimeout).toScala.toSeconds
     // delete shelve key for this alarm on configured time (default 8 AM local time), when key is expired, it will be inferred as Unshelved
-    shelveStatusApi.setex(key, shelveTTLInSeconds, Shelved)
+    shelveStatusApi.setex(alarmKey, shelveTTLInSeconds, Shelved)
   }
 
   // this will most likely be called when operator manually un-shelves an already shelved alarm
-  final override def unshelve(key: AlarmKey): Future[Done] = {
-    log.debug(s"Un-shelve alarm [${key.value}]")
-    shelveStatusApi.set(key, Unshelved)
+  final override def unshelve(alarmKey: AlarmKey): Future[Done] = {
+    log.debug(s"Un-shelve alarm [${alarmKey.value}]")
+    shelveStatusApi.set(alarmKey, Unshelved)
   }
 
-  private[alarm] final override def unacknowledge(key: AlarmKey): Future[Done] = setAcknowledgementStatus(key, Unacknowledged)
+  private[alarm] final override def unacknowledge(alarmKey: AlarmKey): Future[Done] =
+    setAcknowledgementStatus(alarmKey, Unacknowledged)
 
-  private[alarm] def updateStatusForSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Done] = async {
+  private[alarm] def updateStatusForSeverity(alarmKey: AlarmKey, severity: AlarmSeverity): Future[Done] = async {
 
-    val metadata                  = await(getMetadata(key))
-    val originalStatus            = await(getStatus(key))
-    val originalHeartbeatSeverity = await(getCurrentSeverity(key))
+    val metadata                  = await(getMetadata(alarmKey))
+    val originalStatus            = await(getStatus(alarmKey))
+    val originalHeartbeatSeverity = await(getCurrentSeverity(alarmKey))
 
     // This class is not exposed outside `updateStatusForSeverity` function because
     // it's logic is strictly internal to this function.
@@ -139,7 +140,7 @@ trait StatusServiceModule extends StatusService {
       def persistChanges(): Future[Done] =
         if (originalStatus != targetAlarmStatus) {
           log.info(s"Updating alarm status from: [$originalStatus] to: [$targetAlarmStatus]")
-          setStatus(key, targetAlarmStatus)
+          setStatus(alarmKey, targetAlarmStatus)
         } else Future.successful(Done)
     }
 
@@ -183,9 +184,9 @@ trait StatusServiceModule extends StatusService {
       )
       .map(_ ⇒ Done)
 
-  private def getShelveStatus(key: AlarmKey): Future[ShelveStatus] = async {
-    if (await(metadataApi.exists(key))) await(shelveStatusApi.get(key)).getOrElse(Unshelved)
-    else logAndThrow(KeyNotFoundException(key))
+  private def getShelveStatus(alarmKey: AlarmKey): Future[ShelveStatus] = async {
+    if (await(metadataApi.exists(alarmKey))) await(shelveStatusApi.get(alarmKey)).getOrElse(Unshelved)
+    else logAndThrow(KeyNotFoundException(alarmKey))
   }
 
   private[alarm] def getAlarms(key: Key): Future[List[Alarm]] = metadataApi.keys(key).flatMap {
@@ -198,13 +199,13 @@ trait StatusServiceModule extends StatusService {
     }
   }
 
-  private def setAcknowledgementStatus(key: AlarmKey, ackStatus: AcknowledgementStatus): Future[Done] = async {
-    log.debug(s"$ackStatus alarm [${key.value}]")
+  private def setAcknowledgementStatus(alarmKey: AlarmKey, ackStatus: AcknowledgementStatus): Future[Done] = async {
+    log.debug(s"$ackStatus alarm [${alarmKey.value}]")
 
-    val status = await(getStatus(key))
+    val status = await(getStatus(alarmKey))
 
     if (status.acknowledgementStatus != ackStatus) // save the set call if status is already set to given acknowledgement status
-      await(setStatus(key, status.copy(acknowledgementStatus = ackStatus)))
+      await(setStatus(alarmKey, status.copy(acknowledgementStatus = ackStatus)))
     Done
   }
 

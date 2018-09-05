@@ -33,9 +33,9 @@ trait SeverityServiceModule extends SeverityService {
 
   private implicit lazy val mat: Materializer = ActorMaterializer()
 
-  final override def setSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Done] = async {
-    await(updateStatusForSeverity(key, severity))
-    await(setCurrentSeverity(key, severity))
+  final override def setSeverity(alarmKey: AlarmKey, severity: AlarmSeverity): Future[Done] = async {
+    await(updateStatusForSeverity(alarmKey, severity))
+    await(setCurrentSeverity(alarmKey, severity))
   }
 
   final override def getAggregatedSeverity(key: Key): Future[FullAlarmSeverity] = async {
@@ -58,28 +58,28 @@ trait SeverityServiceModule extends SeverityService {
     subscribeAggregatedSeverityCallback(key, actorRef ! _)
   }
 
-  final override def getCurrentSeverity(key: AlarmKey): Future[FullAlarmSeverity] = async {
-    log.debug(s"Getting severity for alarm [${key.value}]")
+  final override def getCurrentSeverity(alarmKey: AlarmKey): Future[FullAlarmSeverity] = async {
+    log.debug(s"Getting severity for alarm [${alarmKey.value}]")
 
-    if (await(metadataApi.exists(key))) await(severityApi.get(key)).getOrElse(Disconnected)
-    else logAndThrow(KeyNotFoundException(key))
+    if (await(metadataApi.exists(alarmKey))) await(severityApi.get(alarmKey)).getOrElse(Disconnected)
+    else logAndThrow(KeyNotFoundException(alarmKey))
   }
 
-  private[alarm] def setCurrentSeverity(key: AlarmKey, severity: AlarmSeverity): Future[Done] = async {
+  private[alarm] def setCurrentSeverity(alarmKey: AlarmKey, severity: AlarmSeverity): Future[Done] = async {
     log.debug(
-      s"Setting severity [${severity.name}] for alarm [${key.value}] with expire timeout [${settings.severityTTLInSeconds}] seconds"
+      s"Setting severity [${severity.name}] for alarm [${alarmKey.value}] with expire timeout [${settings.severityTTLInSeconds}] seconds"
     )
 
     // get alarm metadata
-    val alarm = await(getMetadata(key))
+    val alarm = await(getMetadata(alarmKey))
 
     // validate if the provided severity is supported by this alarm
     if (!alarm.allSupportedSeverities.contains(severity))
-      logAndThrow(InvalidSeverityException(key, alarm.allSupportedSeverities, severity))
+      logAndThrow(InvalidSeverityException(alarmKey, alarm.allSupportedSeverities, severity))
 
     // set the severity of the alarm so that it does not transition to `Disconnected` state
     log.info(s"Updating current severity [${severity.name}] in alarm store")
-    await(severityApi.setex(key, settings.severityTTLInSeconds, severity))
+    await(severityApi.setex(alarmKey, settings.severityTTLInSeconds, severity))
   }
 
   // PatternMessage gives three values:
