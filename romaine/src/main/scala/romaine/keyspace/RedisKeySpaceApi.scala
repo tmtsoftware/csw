@@ -11,7 +11,7 @@ import romaine.reactive.{RedisSubscription, RedisSubscriptionApi}
 import scala.concurrent.{ExecutionContext, Future}
 
 class RedisKeySpaceApi[K: RomaineStringCodec, V: RomaineStringCodec](
-    redisSubscriptionApi: RedisSubscriptionApi[String, String],
+    redisSubscriptionApi: RedisSubscriptionApi[KeyspaceKey, String],
     redisAsyncApi: RedisAsyncApi[K, V],
     keyspacePrefix: KeyspaceId = KeyspaceId._0
 )(implicit ec: ExecutionContext) {
@@ -24,10 +24,10 @@ class RedisKeySpaceApi[K: RomaineStringCodec, V: RomaineStringCodec](
       overflowStrategy: OverflowStrategy
   ): Source[RedisResult[K, Option[V]], RedisSubscription] =
     redisSubscriptionApi
-      .psubscribe(keys.map(keyspacePrefix.entryName + _), overflowStrategy)
+      .psubscribe(keys.map(x => KeyspaceKey(keyspacePrefix, x)), overflowStrategy)
       .filter(pm => pm.value == SetOperation || pm.value == ExpiredOperation)
       .mapAsync(1) { pm =>
-        val key = RomaineStringCodec[K].fromString(pm.key.replace(keyspacePrefix.entryName, ""))
+        val key = RomaineStringCodec[K].fromString(pm.key.value)
         pm.value match {
           case SetOperation     => redisAsyncApi.get(key).map(valueOpt ⇒ (key, valueOpt))
           case ExpiredOperation => Future((key, None))

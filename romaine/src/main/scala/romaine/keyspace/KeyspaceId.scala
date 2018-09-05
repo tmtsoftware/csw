@@ -5,7 +5,7 @@ import enumeratum.{Enum, EnumEntry}
 import scala.collection.immutable
 
 sealed abstract class KeyspaceId(val id: String) extends EnumEntry {
-  override def entryName = s"__keyspace@${id}__:"
+  override def entryName = s"__keyspace@${id}__"
 }
 
 object KeyspaceId extends Enum[KeyspaceId] {
