@@ -27,7 +27,6 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-commons`,
   `integration`,
   `examples`,
-  `sequencer-prototype`,
   `romaine`
 )
 
@@ -45,7 +44,6 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
   `romaine`,
   `examples`,
   `integration`,
-  `sequencer-prototype`,
   `csw-params-js`
 )
 
@@ -307,19 +305,6 @@ lazy val examples = project
   .enablePlugins(DeployApp)
   .settings(
     libraryDependencies ++= Dependencies.Examples.value
-  )
-
-lazy val `sequencer-prototype` = project
-  .dependsOn(
-    `csw-location`,
-    `csw-config-client`,
-    `csw-framework`,
-    `csw-command`
-  )
-  .enablePlugins(NoPublish)
-  .disablePlugins(BintrayPlugin)
-  .settings(
-    libraryDependencies ++= Dependencies.SequencerPrototype.value
   )
 
 lazy val alarm = taskKey[Unit]("alarm")

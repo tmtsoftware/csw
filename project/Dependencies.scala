@@ -285,19 +285,6 @@ object Dependencies {
     )
   )
 
-  val SequencerPrototype = Def.setting(
-    Seq(
-      Libs.`scalatest`.value % Test,
-      Akka.`akka-stream`,
-      Akka.`akka-actor-typed`,
-      Akka.`akka-actor-testkit-typed`,
-      Libs.`scala-reflect`,
-      Libs.`scala-compiler`,
-      Ammonite.`ammonite`,
-      Ammonite.`ammonite-sshd`
-    )
-  )
-
   val AcceptanceTests = Def.setting(
     Seq(
       Libs.`scalatest`.value
