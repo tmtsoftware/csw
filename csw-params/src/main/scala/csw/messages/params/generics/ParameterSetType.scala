@@ -7,6 +7,7 @@ import csw.messages.TMTSerializable
 import scala.annotation.varargs
 import scala.collection.JavaConverters.setAsJavaSetConverter
 import scala.collection.JavaConverters.mapAsJavaMapConverter
+import scala.compat.java8.OptionConverters.RichOptionForJava8
 
 /**
  * The base trait for various parameter set types (commands or events)
@@ -80,6 +81,15 @@ abstract class ParameterSetType[T <: ParameterSetType[T]] extends TMTSerializabl
   def get[S](key: Key[S]): Option[Parameter[S]] = get(key.keyName, key.keyType)
 
   /**
+   * Returns an Optional with the parameter for the key if found, otherwise empty
+   *
+   * @param key the Key to be used for lookup
+   * @tparam S the value type
+   * @return the parameter for the key, if found
+   */
+  def jGet[S](key: Key[S]): util.Optional[Parameter[S]] = get(key).asJava
+
+  /**
    * Returns an Option with the parameter for the key if found, otherwise None
    *
    * @param keyName the keyName for a key
@@ -92,6 +102,16 @@ abstract class ParameterSetType[T <: ParameterSetType[T]] extends TMTSerializabl
   }
 
   /**
+   * Returns an Optional with the parameter for the key if found, otherwise empty
+   *
+   * @param keyName the keyName for a key
+   * @param keyType the keyType for a key
+   * @tparam S the value type
+   * @return the parameter for the key, if found
+   */
+  def jGet[S](keyName: String, keyType: KeyType[S]): util.Optional[Parameter[S]] = get(keyName, keyType).asJava
+
+  /**
    * Find a parameter based on it's keyName and keyType
    *
    * @param parameter who's keyName and keyType is used to get values and units
@@ -99,6 +119,15 @@ abstract class ParameterSetType[T <: ParameterSetType[T]] extends TMTSerializabl
    * @return an Option of Parameter[S] if it is found, otherwise None
    */
   def find[S](parameter: Parameter[S]): Option[Parameter[S]] = get(parameter.keyName, parameter.keyType)
+
+  /**
+   * A Java helper to find a parameter based on it's keyName and keyType
+   *
+   * @param parameter who's keyName and keyType is used to get values and units
+   * @tparam S the type of values the Parameter holds
+   * @return an Optional of Parameter[S] if it is found, otherwise empty
+   */
+  def jFind[S](parameter: Parameter[S]): util.Optional[Parameter[S]] = find(parameter).asJava
 
   /**
    * Return the parameter associated with a Key rather than an Option

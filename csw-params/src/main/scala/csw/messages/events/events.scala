@@ -172,6 +172,13 @@ case class ObserveEvent private (
    */
   override protected def create(data: Set[Parameter[_]]): ObserveEvent =
     copy(eventId = Id(), eventTime = EventTime(), paramSet = data)
+
+  /**
+ * A helper method to create PbEvent out of this Event
+ *
+ * @return a protobuf representation of ObserveEvent
+ */
+
 }
 
 object ObserveEvent {

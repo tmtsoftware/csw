@@ -1,6 +1,7 @@
 package csw.messages.params.generics
 
 import java.util
+import java.util.Optional
 
 import csw.messages.TMTSerializable
 import csw.messages.params.models.Units
@@ -8,6 +9,7 @@ import play.api.libs.json._
 
 import scala.collection.JavaConverters.seqAsJavaListConverter
 import scala.collection.mutable
+import scala.compat.java8.OptionConverters.RichOptionForJava8
 import scala.reflect.ClassTag
 
 object Parameter {
@@ -115,6 +117,14 @@ case class Parameter[S: Format: ClassTag] private[messages] (
    * @return some value at the given index as an Option, if the index is in range, otherwise None
    */
   def get(index: Int): Option[S] = items.lift(index)
+
+  /**
+   * A Java helper that returns an option of value if present at the given index else empty
+   *
+   * @param index the index of a value
+   * @return value at the given index as an Optional, if the index is in range, otherwise empty
+   */
+  def jGet(index: Int): Optional[S] = items.lift(index).asJava
 
   /**
    * Returns the first value as a convenience when storing a single value
