@@ -18,7 +18,8 @@ private[alarm] trait MetadataService {
    *     [[csw.services.alarm.api.models.AlarmStatus]]
    * @param inputConfig represents the data for all alarms to be loaded in alarm store
    * @param reset the alarm store before loading the data
-   * @return a future which completes when data is loaded successfully in alarm store
+   * @return a future which completes when data is loaded successfully in alarm store or fails with
+   *         [[csw.services.alarm.api.exceptions.ConfigParseException]]
    */
   def initAlarms(inputConfig: Config, reset: Boolean = false): Future[Done]
 
