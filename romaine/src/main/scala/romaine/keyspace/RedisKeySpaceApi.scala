@@ -5,6 +5,7 @@ import reactor.core.publisher.FluxSink.OverflowStrategy
 import romaine.RedisResult
 import romaine.async.RedisAsyncApi
 import romaine.codec.RomaineStringCodec
+import romaine.codec.RomaineStringCodec.{FromString, ToString}
 import romaine.extensions.SourceExtensions.RichSource
 import romaine.keyspace.KeyspaceEvent.{Error, Removed, Updated}
 import romaine.keyspace.RedisKeyspaceEvent.{Delete, Expired, Unknown}
@@ -23,9 +24,9 @@ class RedisKeySpaceApi[K: RomaineStringCodec, V: RomaineStringCodec](
       overflowStrategy: OverflowStrategy
   ): Source[RedisResult[K, KeyspaceEvent[V]], RedisSubscription] =
     redisSubscriptionApi
-      .psubscribe(keys.map(x ⇒ KeyspaceKey(keyspacePrefix, RomaineStringCodec[K].toString(x))), overflowStrategy)
+      .psubscribe(keys.map(x ⇒ KeyspaceKey(keyspacePrefix, x.asString)), overflowStrategy)
       .mapAsync(1) { result ⇒
-        val key = RomaineStringCodec[K].fromString(result.key.value)
+        val key = result.key.value.as[K]
 
         result.value match {
           case RedisKeyspaceEvent.Set ⇒

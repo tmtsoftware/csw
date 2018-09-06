@@ -3,7 +3,7 @@ package csw.services.event.internal.redis
 import java.nio.ByteBuffer
 
 import csw.messages.events.{Event, EventKey}
-import csw.messages.params.pb.{PbConverter, TypeMapperSupport}
+import csw.messages.params.pb.PbConverter
 import csw_protobuf.events.PbEvent
 import romaine.codec.{RomaineByteCodec, RomaineStringCodec}
 
@@ -13,6 +13,7 @@ import scala.util.control.NonFatal
  * Encodes and decodes keys as EventKeys and values as ProtoBuf byte equivalent of Event
  */
 object EventRomaineCodecs {
+
   implicit object EventKeyRomaineCodec extends RomaineStringCodec[EventKey] {
     override def toString(eventKey: EventKey): String = eventKey.key
     override def fromString(str: String): EventKey    = EventKey(str)
