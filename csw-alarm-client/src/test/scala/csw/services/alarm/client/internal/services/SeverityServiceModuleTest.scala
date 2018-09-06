@@ -246,10 +246,10 @@ class SeverityServiceModuleTest
     setSeverity(tromboneAxisLowLimitAlarmKey, Critical).await
 
     testProbe.expectMessage(Critical)
-    testProbe.expectMessage(Disconnected) // severity expires after 1 second in test
+    testProbe.expectMessage(2.seconds, Disconnected) // severity expires after 1 second in test
 
     setSeverity(tromboneAxisHighLimitAlarmKey, Major).await
-    testProbe.expectNoMessage(200.millis)
+    testProbe.expectNoMessage(200.millis) // Major is lower than Disconnected, hence aggregated severity does not change
 
     alarmSubscription.unsubscribe().await
   }
@@ -258,6 +258,7 @@ class SeverityServiceModuleTest
   test("subscribe aggregated severity via callback for a subsystem") {
     getCurrentSeverity(tromboneAxisHighLimitAlarmKey).await shouldBe Disconnected
     getCurrentSeverity(cpuExceededAlarmKey).await shouldBe Disconnected
+    getCurrentSeverity(outOfRangeOffloadAlarmKey).await shouldBe Disconnected
 
     // subsystem subscription - tcs
     val testProbe         = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
@@ -265,13 +266,15 @@ class SeverityServiceModuleTest
     alarmSubscription.ready().await
     testProbe.expectMessage(Disconnected) // on subscription, current aggregated severity will be calculated
 
-    setSeverity(cpuExceededAlarmKey, Critical).await
+    setSeverity(cpuExceededAlarmKey, Warning).await
+    setSeverity(outOfRangeOffloadAlarmKey, Warning).await
+    testProbe.expectMessage(Warning)
 
-    testProbe.expectMessage(Critical)
-    testProbe.expectMessage(Disconnected) // severity expires after 1 second in test
-
+    // make sure that changing severity of non subscribed alarm does not contribute to aggregated severity calculation
     setSeverity(tromboneAxisHighLimitAlarmKey, Major).await
     testProbe.expectNoMessage(200.millis)
+
+    testProbe.expectMessage(2.seconds, Disconnected) // severity expires after 1 second in test
 
     alarmSubscription.unsubscribe().await
   }
@@ -296,17 +299,17 @@ class SeverityServiceModuleTest
     setSeverity(tromboneAxisLowLimitAlarmKey, Critical).await
 
     testProbe1.expectMessage(Critical)
-    testProbe1.expectMessage(Disconnected) // severity expires after 1 second in test
-
     testProbe2.expectMessage(Critical)
-    testProbe2.expectMessage(Disconnected) // severity expires after 1 second in test
+
+    testProbe1.expectMessage(2.seconds, Disconnected) // severity expires after 1 second in test
+    testProbe2.expectMessage(2.seconds, Disconnected) // severity expires after 1 second in test
 
     setSeverity(splitterLimitAlarmKey, Critical).await
 
-    testProbe2.expectMessage(Critical)
-    testProbe2.expectMessage(Disconnected) // severity expires after 1 second in test
-
     testProbe1.expectNoMessage(200.millis)
+    testProbe2.expectMessage(Critical)
+
+    testProbe2.expectMessage(2.seconds, Disconnected) // severity expires after 1 second in test
 
     alarmSubscription1.unsubscribe().await
     alarmSubscription2.unsubscribe().await
@@ -323,9 +326,8 @@ class SeverityServiceModuleTest
     getCurrentSeverity(enclosureTempHighAlarmKey).await shouldBe Disconnected
     getCurrentSeverity(enclosureTempLowAlarmKey).await shouldBe Disconnected
 
-    val testProbe = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
-    val alarmSubscription =
-      subscribeAggregatedSeverityCallback(ComponentKey(NFIRAOS, "enclosure"), testProbe.ref ! _)
+    val testProbe         = TestProbe[FullAlarmSeverity]()(actorSystem.toTyped)
+    val alarmSubscription = subscribeAggregatedSeverityCallback(ComponentKey(NFIRAOS, "enclosure"), testProbe.ref ! _)
     alarmSubscription.ready().await
     testProbe.expectMessage(Disconnected) // on subscription, current aggregated severity will be calculated
 
@@ -348,7 +350,6 @@ class SeverityServiceModuleTest
   // DEOPSCSW-448: Set Activation status for an alarm entity
   // DEOPSCSW-467: Monitor alarm severities in the alarm store for a single alarm, component, subsystem, or all
   test("subscribeAggregatedSeverityCallback should throw InactiveAlarmException when all resolved keys are inactive") {
-
     a[InactiveAlarmException] shouldBe thrownBy(
       subscribeAggregatedSeverityCallback(enclosureTempLowAlarmKey, println).ready().await
     )
@@ -375,7 +376,7 @@ class SeverityServiceModuleTest
     setSeverity(cpuExceededAlarmKey, Critical).await
 
     testProbe.expectMessage(Critical)
-    testProbe.expectMessage(Disconnected) // severity expires after 1 second in test
+    testProbe.expectMessage(2.seconds, Disconnected) // severity expires after 1 second in test
 
     setSeverity(tromboneAxisHighLimitAlarmKey, Major).await
     testProbe.expectNoMessage(200.millis)
