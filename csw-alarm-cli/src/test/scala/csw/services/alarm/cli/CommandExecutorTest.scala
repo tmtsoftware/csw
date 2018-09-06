@@ -397,7 +397,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     logBuffer.toList shouldEqual List(s"Aggregated Severity of Alarm Service: $Disconnected")
   }
 
-  // DEOPSCSW-467: Monitor alarm severities in the alarm store for a single alarm, component, subsystem, or all
+  // DEOPSCSW-477: Subscribe to alarm severities for component or subsystem from CLI Interface
   test("should subscribe severity of alarm") {
     val cmd = Options(
       cmd = "severity",
