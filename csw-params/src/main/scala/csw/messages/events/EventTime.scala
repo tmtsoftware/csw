@@ -16,7 +16,8 @@ case class EventTime(time: Instant) {
 object EventTime {
 
   /**
-   * The apply method is used to create EventTime using Instant.now in UTC timezone
+   * The apply method is used to create EventTime using Instant.now
+   * As UTC timezone not supported in Scala.js, we removed the timezoe. To be discussed more after time service.
    *
    * @return an EventTime representing event creation
    */
