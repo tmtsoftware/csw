@@ -17,6 +17,7 @@ import csw.messages.location.AkkaLocation
 import csw.messages.params.models.Id
 import csw.messages.params.states.{CurrentState, StateName}
 import csw.messages.{CommandResponseManagerMessage, ComponentMessage}
+import csw.services.command.extensions.AkkaLocationExt.RichAkkaLocation
 
 import scala.concurrent.{ExecutionContext, Future}
 

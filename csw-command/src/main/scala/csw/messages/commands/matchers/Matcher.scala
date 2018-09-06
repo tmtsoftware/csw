@@ -6,10 +6,10 @@ import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.adapter._
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.{KillSwitches, Materializer, OverflowStrategy}
+import csw.messages.ComponentCommonMessage.ComponentStateSubscription
 import csw.messages.commands.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
 import csw.messages.framework.PubSub.Subscribe
 import csw.messages.params.states.CurrentState
-import csw.messages.ComponentCommonMessage.ComponentStateSubscription
 
 import scala.compat.java8.FutureConverters.FutureOps
 import scala.concurrent.{ExecutionContext, Future}

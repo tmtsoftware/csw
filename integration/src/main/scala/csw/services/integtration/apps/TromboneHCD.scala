@@ -2,12 +2,12 @@ package csw.services.integtration.apps
 
 import akka.actor.typed.scaladsl.adapter._
 import akka.actor.{Actor, ActorRef, ActorSystem, Props}
+import csw.messages.CommandMessage.Submit
 import csw.messages.commands.{CommandName, Setup}
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.params.models.Prefix
-import csw.messages.CommandMessage.Submit
 import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.models.{AkkaRegistration, RegistrationResult}

@@ -27,6 +27,7 @@ import csw.messages.ContainerCommonMessage.GetComponents
 import csw.messages.RunningMessage.Lifecycle
 import csw.messages.SupervisorContainerCommonMessages.Shutdown
 import csw.messages.ContainerMessage
+import csw.services.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.services.command.scaladsl.CommandService
 import csw.services.config.api.models.ConfigData
 import csw.services.config.client.scaladsl.ConfigClientFactory

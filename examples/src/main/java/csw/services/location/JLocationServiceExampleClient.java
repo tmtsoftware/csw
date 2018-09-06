@@ -21,6 +21,7 @@ import csw.messages.location.Connection.HttpConnection;
 import csw.messages.params.models.Prefix;
 import csw.messages.ComponentMessage;
 import csw.messages.ContainerMessage;
+import csw.services.command.extensions.AkkaLocationExt;
 import csw.services.location.commons.ActorSystemFactory;
 import csw.services.location.javadsl.*;
 import csw.services.location.models.AkkaRegistration;
@@ -159,10 +160,10 @@ public class JLocationServiceExampleClient extends AbstractActor {
         findResult.ifPresent(akkaLocation -> {
             //#typed-ref
             // If the component type is HCD or Assembly, use this to get the correct ActorRef
-            akka.actor.typed.ActorRef<ComponentMessage> typedComponentRef = akkaLocation.componentRef();
+            akka.actor.typed.ActorRef<ComponentMessage> typedComponentRef = AkkaLocationExt.RichAkkaLocation(akkaLocation).componentRef();
 
             // If the component type is Container, use this to get the correct ActorRef
-            akka.actor.typed.ActorRef<ContainerMessage> typedContainerRef = akkaLocation.containerRef();
+            akka.actor.typed.ActorRef<ContainerMessage> typedContainerRef = AkkaLocationExt.RichAkkaLocation(akkaLocation).containerRef();
             //#typed-ref
         });
         //#resolve

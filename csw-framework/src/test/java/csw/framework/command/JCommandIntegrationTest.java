@@ -29,6 +29,7 @@ import csw.messages.params.generics.Parameter;
 import csw.messages.params.states.CurrentState;
 import csw.messages.params.states.DemandState;
 import csw.messages.params.states.StateName;
+import csw.services.command.extensions.AkkaLocationExt;
 import csw.services.command.javadsl.JCommandDistributor;
 import csw.services.command.javadsl.JCommandService;
 import csw.services.command.scaladsl.CurrentStateSubscription;
@@ -174,7 +175,7 @@ public class JCommandIntegrationTest {
         DemandMatcher demandMatcher = new DemandMatcher(new DemandState(prefix().prefix(), new StateName("testStateName")).add(param), false, timeout);
 
         // create matcher instance
-        Matcher matcher = new Matcher(hcdLocation.componentRef().narrow(), demandMatcher, ec, mat);
+        Matcher matcher = new Matcher(AkkaLocationExt.RichAkkaLocation(hcdLocation).componentRef().narrow(), demandMatcher, ec, mat);
 
         // start the matcher so that it is ready to receive state published by the source
         CompletableFuture<MatcherResponse> matcherResponseFuture = matcher.jStart();
@@ -237,7 +238,7 @@ public class JCommandIntegrationTest {
         StateMatcher stateMatcher = new DemandMatcher(new DemandState(prefix().prefix(), new StateName("testStateName")).add(param), false, timeout);
 
         // create matcher instance
-        Matcher matcher1 = new Matcher(hcdLocation.componentRef().narrow(), demandMatcher, ec, mat);
+        Matcher matcher1 = new Matcher(AkkaLocationExt.RichAkkaLocation(hcdLocation).componentRef().narrow(), demandMatcher, ec, mat);
 
         // start the matcher so that it is ready to receive state published by the source
         CompletableFuture<MatcherResponse> matcherResponse = matcher1.jStart();
@@ -259,7 +260,7 @@ public class JCommandIntegrationTest {
         FiniteDuration duration = new FiniteDuration(5, TimeUnit.SECONDS);
 
         // Lock component
-        hcdLocation.componentRef().tell(new SupervisorLockMessage.Lock(prefix(), probe.ref(), duration));
+        AkkaLocationExt.RichAkkaLocation(hcdLocation).componentRef().tell(new SupervisorLockMessage.Lock(prefix(), probe.ref(), duration));
         probe.expectMessage(LockingResponses.lockAcquired());
 
         Key<Integer> intKey2 = JKeyType.IntKey().make("encoder");
@@ -275,7 +276,7 @@ public class JCommandIntegrationTest {
         Assert.assertEquals(expectedLockedCmdResponse, actualLockedCmdResponse);
 
         // Unlock component
-        hcdLocation.componentRef().tell(new SupervisorLockMessage.Unlock(prefix(), probe.ref()));
+        AkkaLocationExt.RichAkkaLocation(hcdLocation).componentRef().tell(new SupervisorLockMessage.Unlock(prefix(), probe.ref()));
         probe.expectMessage(LockingResponses.lockReleased());
 
         CompletableFuture<CommandResponse> cmdAfterUnlockResCompletableFuture = hcdCmdService.submit(imdSetupCommand, timeout);

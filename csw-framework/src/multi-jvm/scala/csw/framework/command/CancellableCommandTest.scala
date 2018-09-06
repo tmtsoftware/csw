@@ -17,6 +17,7 @@ import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.params.generics.KeyType
 import csw.messages.params.models.ObsId
+import csw.services.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.services.location.helpers.{LSNodeSpec, OneMemberAndSeed}
 import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar

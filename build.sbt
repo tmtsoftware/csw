@@ -185,7 +185,11 @@ lazy val `csw-config-client-cli` = project
   )
 
 lazy val `csw-command` = project
-  .dependsOn(`csw-messages`, `csw-logging`)
+  .dependsOn(
+    `csw-messages`,
+    `csw-logging`,
+    `csw-commons` % "test->test"
+  )
   .enablePlugins(PublishBintray, AutoMultiJvm, GenJavadocPlugin, MaybeCoverage)
   .settings(libraryDependencies ++= Dependencies.Command.value)
 
@@ -218,7 +222,7 @@ lazy val `csw-event-client` = project
     `csw-logging`,
     `romaine`,
     `csw-location` % "compile->compile;multi-jvm->multi-jvm",
-    `csw-commons`  % "test->test"
+    `csw-commons`  % "test->test"ComponentType.scala
   )
   .enablePlugins(PublishBintray, AutoMultiJvm, GenJavadocPlugin, MaybeCoverage)
   .settings(libraryDependencies ++= Dependencies.EventClient.value)
@@ -285,7 +289,7 @@ lazy val `csw-benchmark` = project
 
 //Integration test project
 lazy val integration = project
-  .dependsOn(`csw-location`, `csw-location-agent`)
+  .dependsOn(`csw-location`, `csw-command` , `csw-location-agent`)
   .enablePlugins(DeployApp)
   .settings(
     libraryDependencies ++= Dependencies.Integration.value

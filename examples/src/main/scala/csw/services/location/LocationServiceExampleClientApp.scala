@@ -13,6 +13,7 @@ import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
 import csw.messages.location._
 import csw.messages.params.models.Prefix
 import csw.messages.ContainerMessage
+import csw.services.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.models._
 import csw.services.location.scaladsl.{LocationService, LocationServiceFactory, RegistrationFactory}

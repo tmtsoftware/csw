@@ -13,6 +13,7 @@ import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
 import csw.messages.location.{AkkaLocation, ComponentId, ComponentType, HttpLocation}
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.params.models.Prefix
+import csw.services.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.services.integtration.apps.TromboneHCD
 import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.commons.ClusterAwareSettings

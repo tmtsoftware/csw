@@ -17,6 +17,7 @@ import csw.messages.location.ComponentId
 import csw.messages.location.ComponentType.{Assembly, HCD}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.params.states.{CurrentState, StateName}
+import csw.services.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.services.command.scaladsl.CommandService
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.location.commons.ClusterSettings

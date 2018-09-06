@@ -15,6 +15,7 @@ import csw.messages.location.ComponentId
 import csw.messages.location.ComponentType.HCD
 import csw.messages.location.Connection.AkkaConnection
 import csw.services.alarm.client.internal.commons.AlarmServiceConnection
+import csw.services.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.services.command.scaladsl.CommandService
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}

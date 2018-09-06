@@ -3,9 +3,8 @@ package csw.messages.location
 import java.net.URI
 
 import akka.actor.typed.ActorRef
+import csw.messages.TMTSerializable
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
-import csw.messages.ContainerMessage
-import csw.messages.{ComponentMessage, ContainerMessage, TMTSerializable}
 import csw.messages.params.models.Prefix
 
 import scala.reflect.ClassTag
@@ -53,7 +52,7 @@ final case class AkkaLocation(
 
   // Akka typed actors currently don't save the type while sending ActorRef on wire.
   // So, while resolving any ActorRef for component cast the untyped ActorRef to typed one
-  private def typedRef[T: ClassTag]: ActorRef[T] = {
+  def typedRef[T: ClassTag]: ActorRef[T] = {
     val typeManifest    = scala.reflect.classTag[T].runtimeClass.getSimpleName
     val messageManifest = connection.componentId.componentType.messageManifest
 
@@ -61,20 +60,6 @@ final case class AkkaLocation(
 
     actorRef.upcast[T]
   }
-
-  /**
-   * If the component type is HCD or Assembly, use this to get the correct ActorRef
-   *
-   * @return a typed ActorRef that understands only ComponentMessage
-   */
-  def componentRef: ActorRef[ComponentMessage] = typedRef[ComponentMessage]
-
-  /**
-   * If the component type is Container, use this to get the correct ActorRef
-   *
-   * @return a typed ActorRef that understands only ContainerMessage
-   */
-  def containerRef: ActorRef[ContainerMessage] = typedRef[ContainerMessage]
 }
 
 /**

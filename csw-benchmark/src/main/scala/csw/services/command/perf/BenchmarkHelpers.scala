@@ -13,6 +13,7 @@ import csw.messages.ComponentCommonMessage.GetSupervisorLifecycleState
 import csw.messages.{ComponentMessage, ContainerMessage}
 import csw.messages.ContainerCommonMessage.GetContainerLifecycleState
 import csw.messages.ContainerMessage
+import csw.services.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.services.command.scaladsl.CommandService
 import csw.services.location.commons.BlockingUtils
 import csw.services.location.scaladsl.LocationServiceFactory

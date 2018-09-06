@@ -1,10 +1,10 @@
-package csw.messages.commands
+package csw.messages
 
 import akka.NotUsed
 import akka.actor.ActorSystem
-import akka.stream.{ActorMaterializer, Materializer}
 import akka.stream.scaladsl.Source
-import csw.messages.commands
+import akka.stream.{ActorMaterializer, Materializer}
+import csw.messages.commands.CommandResponse
 import csw.messages.commands.CommandResponse.{Completed, Error}
 import csw.messages.params.models.Id
 import org.scalatest.concurrent.ScalaFutures

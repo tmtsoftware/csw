@@ -20,6 +20,7 @@ import csw.messages.location.ComponentType.{Assembly, HCD}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.location.{ComponentId, ComponentType, LocationRemoved, TrackingEvent}
 import csw.messages.params.states.{CurrentState, StateName}
+import csw.services.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.services.command.scaladsl.CommandService
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import io.lettuce.core.RedisClient
