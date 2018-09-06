@@ -9,6 +9,7 @@ import csw.services.alarm.api.models.{AlarmHealth, Key}
 import csw.services.alarm.api.scaladsl.AlarmSubscription
 import csw.services.alarm.client.internal.AlarmServiceLogger
 import csw.services.alarm.client.internal.redis.RedisConnectionsFactory
+import romaine.extensions.SourceExtensions.RichSource
 
 import scala.concurrent.Future
 

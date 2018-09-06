@@ -8,6 +8,7 @@ import csw.services.alarm.api.exceptions.KeyNotFoundException
 import csw.services.alarm.api.internal.Separators.KeySeparator
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
+import csw.services.alarm.api.models.AlarmHealth
 import csw.services.alarm.api.models.AlarmHealth.{Bad, Good, Ill}
 import csw.services.alarm.api.models.AlarmSeverity._
 import csw.services.alarm.api.models.FullAlarmSeverity.Disconnected
@@ -509,30 +510,42 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
   // DEOPSCSW-479: Subscribe to health changes of component/subsystem/all alarms using CLI Interface
   test("should subscribe health of subsystem/component/alarm") {
+    val subsystem         = tromboneAxisHighLimitKey.subsystem
+    val component         = tromboneAxisHighLimitKey.component
+    val tromboneComponent = s"$subsystem-$component"
+
     val cmd = Options(
       cmd = "health",
       subCmd = "subscribe",
-      maybeSubsystem = Some(tromboneAxisHighLimitKey.subsystem),
-      maybeComponent = Some(tromboneAxisHighLimitKey.component),
-      maybeAlarmName = Some(tromboneAxisHighLimitKey.name)
+      maybeSubsystem = Some(subsystem),
+      maybeComponent = Some(component)
     )
 
     val (subscription, _) = alarmAdminClient.subscribeHealth(cmd)
     subscription.ready().futureValue
 
     getCurrentSeverity(tromboneAxisHighLimitKey).futureValue shouldBe Disconnected
+    getCurrentSeverity(tromboneAxisLowLimitKey).futureValue shouldBe Disconnected
 
+    // initially aggregated Health of Component [NFIRAOS-trombone] will be Bad
+    assertThatAggregatedHealthOfComponentIs(tromboneComponent, Bad)
+
+    // Verify that after setting severity of all component alarms to major, health status becomes Ill
     setSeverity(tromboneAxisHighLimitKey, Major).futureValue
-    setSeverity(tromboneAxisHighLimitKey, Okay).futureValue
+    setSeverity(tromboneAxisLowLimitKey, Major).futureValue
+    assertThatAggregatedHealthOfComponentIs(tromboneComponent, Ill)
 
-    eventually(
-      logBuffer.toList shouldEqual List(
-        s"Health of Alarm [$tromboneAxisHighLimitKey]: $Bad",
-        s"Health of Alarm [$tromboneAxisHighLimitKey]: $Ill",
-        s"Health of Alarm [$tromboneAxisHighLimitKey]: $Good"
-      )
-    )
+    // Verify that after setting severity of all component alarms to Okay, health status becomes Good
+    setSeverity(tromboneAxisHighLimitKey, Okay).futureValue
+    setSeverity(tromboneAxisLowLimitKey, Okay).futureValue
+    assertThatAggregatedHealthOfComponentIs(tromboneComponent, Good)
 
     subscription.unsubscribe().futureValue
   }
+
+  def assertThatAggregatedHealthOfComponentIs(compName: String, health: AlarmHealth): Unit = {
+    eventually(logBuffer.toList shouldEqual List(s"Aggregated Health of Component [$compName]: $health"))
+    logBuffer.clear()
+  }
+
 }
