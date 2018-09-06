@@ -30,7 +30,7 @@ trait HealthServiceModule extends HealthService {
 
   private[alarm] def subscribeAggregatedHealth(key: Key): Source[AlarmHealth, AlarmSubscription] = {
     log.debug(s"Subscribe aggregated health for alarm [${key.value}] with a callback")
-    subscribeAggregatedSeverity(key).map(AlarmHealth.fromSeverity)
+    subscribeAggregatedSeverity(key).map(AlarmHealth.fromSeverity).distinctUntilChanged
   }
 
   final override def subscribeAggregatedHealthCallback(key: Key, callback: AlarmHealth ⇒ Unit): AlarmSubscription = {

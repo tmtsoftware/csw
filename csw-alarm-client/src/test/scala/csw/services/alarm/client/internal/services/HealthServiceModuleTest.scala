@@ -143,9 +143,10 @@ class HealthServiceModuleTest
     testProbe.expectMessage(Bad) // on subscription, current aggregated health will be calculated
 
     setSeverity(tromboneAxisLowLimitAlarmKey, Major).await
-
     testProbe.expectMessage(Ill)
-    testProbe.expectMessage(Bad) // severity expires after 1 second in test
+    setSeverity(tromboneAxisLowLimitAlarmKey, Indeterminate).await
+    testProbe.expectMessage(Bad)
+    testProbe.expectNoMessage(2.seconds) // on severity expire event, you should not receive health = Bad event as it is already in Bad status
 
     setSeverity(tromboneAxisHighLimitAlarmKey, Warning).await
     testProbe.expectNoMessage(200.millis)
