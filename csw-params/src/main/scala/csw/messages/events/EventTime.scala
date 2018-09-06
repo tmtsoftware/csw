@@ -1,6 +1,6 @@
 package csw.messages.events
 
-import java.time.{Clock, Instant}
+import java.time.Instant
 
 import play.api.libs.json._
 
@@ -20,7 +20,7 @@ object EventTime {
    *
    * @return an EventTime representing event creation
    */
-  def apply(): EventTime = new EventTime(Instant.now(Clock.systemUTC()))
+  def apply(): EventTime = new EventTime(Instant.now())
 
   implicit val instantFormat: Format[Instant] = new Format[Instant] {
     override def reads(json: JsValue): JsResult[Instant] = json match {
