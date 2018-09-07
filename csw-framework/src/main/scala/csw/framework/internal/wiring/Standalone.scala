@@ -21,10 +21,7 @@ object Standalone {
    * @param wiring represents the class for initializing necessary instances to run a component(s)
    * @return a Future that completes with actor ref of spawned component
    */
-  def spawn(
-      config: com.typesafe.config.Config,
-      wiring: FrameworkWiring
-  ): Future[ActorRef[ComponentMessage]] = {
+  def spawn(config: com.typesafe.config.Config, wiring: FrameworkWiring): Future[ActorRef[ComponentMessage]] = {
     import wiring._
     import actorRuntime._
 

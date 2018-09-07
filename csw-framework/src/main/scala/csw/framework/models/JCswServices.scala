@@ -2,6 +2,7 @@ package csw.framework.models
 import csw.framework.CurrentStatePublisher
 import csw.services.alarm.api.javadsl.IAlarmService
 import csw.services.command.CommandResponseManager
+import csw.services.config.api.javadsl.IConfigClientService
 import csw.services.event.api.javadsl.IEventService
 import csw.services.location.javadsl.ILocationService
 import csw.services.logging.javadsl.JLoggerFactory
@@ -22,6 +23,7 @@ case class JCswServices(
     eventService: IEventService,
     alarmService: IAlarmService,
     loggerFactory: JLoggerFactory,
+    configClientService: IConfigClientService,
     commandResponseManager: CommandResponseManager,
     currentStatePublisher: CurrentStatePublisher
 ) {
@@ -34,6 +36,7 @@ case class JCswServices(
     eventService.asScala,
     alarmService.asScala,
     loggerFactory.asScala,
+    configClientService.asScala,
     currentStatePublisher,
     commandResponseManager
   )

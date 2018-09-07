@@ -29,10 +29,10 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], compone
 //#component-handlers-class
     {
 
+  import cswServices._
   implicit val ec: ExecutionContextExecutor = ctx.executionContext
 
-  private val log: Logger                                          = new LoggerFactory(componentInfo.name).getLogger(ctx)
-  private val configClient: ConfigClientService                    = ConfigClientFactory.clientApi(ctx.system.toUntyped, cswServices.locationService)
+  private val log: Logger                                          = loggerFactory.getLogger(ctx)
   private var runningHcds: Map[Connection, Option[CommandService]] = Map.empty
   var diagnosticsPublisher: ActorRef[DiagnosticPublisherMessages]  = _
   var commandHandler: ActorRef[CommandHandlerMsgs]                 = _
@@ -170,7 +170,7 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], compone
 
   private def getAssemblyConfig: Future[ConfigData] = {
 
-    configClient.getActive(Paths.get("tromboneAssemblyContext.conf")).flatMap {
+    configClientService.getActive(Paths.get("tromboneAssemblyContext.conf")).flatMap {
       case Some(config) ⇒ Future.successful(config) // do work
       case None         ⇒
         // required configuration could not be found in the configuration service. Component can choose to stop until the configuration is made available in the

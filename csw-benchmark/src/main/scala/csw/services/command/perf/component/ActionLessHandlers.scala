@@ -16,7 +16,7 @@ import scala.concurrent.Future
 class ActionLessHandlers(ctx: ActorContext[TopLevelActorMessage], componentInfo: ComponentInfo, cswServices: CswServices)
     extends ComponentHandlers(ctx, componentInfo, cswServices) {
 
-  val log: Logger = new LoggerFactory(componentInfo.name).getLogger(ctx)
+  val log: Logger = cswServices.loggerFactory.getLogger(ctx)
 
   override def initialize(): Future[Unit] = Future.successful(Unit)
 

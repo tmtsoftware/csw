@@ -33,14 +33,15 @@ class HcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], componentInf
 //#component-handlers-class
     {
 
-  val log: Logger = new LoggerFactory(componentInfo.name).getLogger(ctx)
+  import cswServices._
 
-  implicit val ec: ExecutionContext             = ctx.executionContext
-  implicit val timeout: Timeout                 = 5.seconds
-  implicit val scheduler: Scheduler             = ctx.system.scheduler
-  private val configClient: ConfigClientService = ConfigClientFactory.clientApi(ctx.system.toUntyped, cswServices.locationService)
-  var current: Int                              = _
-  var stats: Int                                = _
+  val log: Logger = loggerFactory.getLogger(ctx)
+
+  implicit val ec: ExecutionContext = ctx.executionContext
+  implicit val timeout: Timeout     = 5.seconds
+  implicit val scheduler: Scheduler = ctx.system.scheduler
+  var current: Int                  = _
+  var stats: Int                    = _
 
   //#initialize-handler
   override def initialize(): Future[Unit] = async {
@@ -135,7 +136,7 @@ class HcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], componentInf
 
   private def getHcdConfig: Future[ConfigData] = {
 
-    configClient.getActive(Paths.get("tromboneAssemblyContext.conf")).flatMap {
+    configClientService.getActive(Paths.get("tromboneAssemblyContext.conf")).flatMap {
       case Some(config) ⇒ Future.successful(config) // do work
       case None         ⇒
         // required configuration could not be found in the configuration service. Component can choose to stop until the configuration is made available in the

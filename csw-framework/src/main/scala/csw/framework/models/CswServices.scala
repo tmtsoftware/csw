@@ -9,6 +9,8 @@ import csw.services.alarm.api.scaladsl.AlarmService
 import csw.services.alarm.client.AlarmServiceFactory
 import csw.services.command.CommandResponseManager
 import csw.services.command.internal.CommandResponseManagerFactory
+import csw.services.config.api.scaladsl.ConfigClientService
+import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.event.EventServiceFactory
 import csw.services.event.api.scaladsl.EventService
 import csw.services.location.scaladsl.LocationService
@@ -33,6 +35,7 @@ class CswServices(
     val eventService: EventService,
     val alarmService: AlarmService,
     val loggerFactory: LoggerFactory,
+    val configClientService: ConfigClientService,
     val currentStatePublisher: CurrentStatePublisher,
     val commandResponseManager: CommandResponseManager
 )
@@ -52,10 +55,11 @@ object CswServices {
     implicit val system: ActorSystem          = richSystem.system
     implicit val ec: ExecutionContextExecutor = system.dispatcher
 
+    val eventService        = eventServiceFactory.make(locationService)
+    val alarmService        = alarmServiceFactory.makeClientApi(locationService)
+    val loggerFactory       = new LoggerFactory(componentInfo.name)
+    val configClientService = ConfigClientFactory.clientApi(system, locationService)
     async {
-      val eventService  = eventServiceFactory.make(locationService)
-      val alarmService  = alarmServiceFactory.makeClientApi(locationService)
-      val loggerFactory = new LoggerFactory(componentInfo.name)
 
       // create CurrentStatePublisher
       val pubSubComponentActor = await(
@@ -75,6 +79,7 @@ object CswServices {
         eventService,
         alarmService,
         loggerFactory,
+        configClientService,
         currentStatePublisher,
         commandResponseManager
       )

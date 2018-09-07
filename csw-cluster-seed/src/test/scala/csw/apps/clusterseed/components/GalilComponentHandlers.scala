@@ -16,16 +16,10 @@ import scala.concurrent.Future
 
 case class StartLogging()
 
-class GalilComponentHandlers(
-    ctx: ActorContext[TopLevelActorMessage],
-    componentInfo: ComponentInfo,
-    cswServices: CswServices
-) extends ComponentHandlers(
-      ctx,
-      componentInfo,
-      cswServices
-    ) {
-  val log: Logger = new LoggerFactory(componentInfo.name).getLogger
+class GalilComponentHandlers(ctx: ActorContext[TopLevelActorMessage], componentInfo: ComponentInfo, cswServices: CswServices)
+    extends ComponentHandlers(ctx, componentInfo, cswServices) {
+
+  val log: Logger = cswServices.loggerFactory.getLogger
 
   override def initialize(): Future[Unit] = Future.successful(())
 

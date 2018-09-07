@@ -37,6 +37,7 @@ class ComponentBehaviorTest extends FrameworkTestSuite with MockitoSugar with Ma
       eventService,
       alarmService,
       frameworkTestMocks().loggerFactory,
+      frameworkTestMocks().configClientService,
       mock[CurrentStatePublisher],
       commandResponseManager
     )

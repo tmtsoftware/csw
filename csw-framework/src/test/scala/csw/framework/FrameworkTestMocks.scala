@@ -15,6 +15,8 @@ import csw.messages.params.models.{Id, Prefix}
 import csw.messages.params.states.CurrentState
 import csw.services.alarm.api.scaladsl.AlarmService
 import csw.services.command.CommandResponseManager
+import csw.services.config.api.scaladsl.ConfigClientService
+import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.event.EventServiceFactory
 import csw.services.event.api.scaladsl.EventService
 import csw.services.location.javadsl.ILocationService
@@ -71,6 +73,16 @@ class FrameworkTestMocks(implicit untypedSystem: actor.ActorSystem, system: Acto
   val currentStatePublisher = new CurrentStatePublisher(pubSubComponentActor)
 
   ///////////////////////////////////////////////
+  val configClientService: ConfigClientService = ConfigClientFactory.clientApi(untypedSystem, locationService)
+
   val cswServices: CswServices =
-    new CswServices(locationService, eventService, alarmService, loggerFactory, currentStatePublisher, commandResponseManager)
+    new CswServices(
+      locationService,
+      eventService,
+      alarmService,
+      loggerFactory,
+      configClientService,
+      currentStatePublisher,
+      commandResponseManager
+    )
 }

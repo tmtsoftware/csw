@@ -2,11 +2,13 @@ package csw.framework.javadsl
 
 import akka.actor.typed.javadsl.ActorContext
 import akka.actor.typed.scaladsl
+import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import csw.framework.models.{CswServices, JCswServices}
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.messages.TopLevelActorMessage
 import csw.messages.framework.ComponentInfo
 import csw.services.alarm.client.internal.JAlarmServiceImpl
+import csw.services.config.client.javadsl.JConfigClientFactory
 import csw.services.event.internal.commons.EventServiceAdapter
 
 /**
@@ -19,19 +21,22 @@ abstract class JComponentBehaviorFactory extends ComponentBehaviorFactory() {
       ctx: scaladsl.ActorContext[TopLevelActorMessage],
       componentInfo: ComponentInfo,
       cswServices: CswServices
-  ): ComponentHandlers =
+  ): ComponentHandlers = {
+    import cswServices._
     jHandlers(
       ctx.asJava,
       componentInfo,
       JCswServices(
-        cswServices.locationService.asJava,
-        EventServiceAdapter.asJava(cswServices.eventService),
-        new JAlarmServiceImpl(cswServices.alarmService),
-        cswServices.loggerFactory.asJava,
-        cswServices.commandResponseManager,
-        cswServices.currentStatePublisher
+        locationService.asJava,
+        EventServiceAdapter.asJava(eventService),
+        new JAlarmServiceImpl(alarmService),
+        loggerFactory.asJava,
+        JConfigClientFactory.clientApi(ctx.system.toUntyped, locationService.asJava),
+        commandResponseManager,
+        currentStatePublisher
       )
     )
+  }
 
   protected[framework] def jHandlers(
       ctx: ActorContext[TopLevelActorMessage],
