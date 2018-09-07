@@ -302,7 +302,8 @@ lazy val examples = project
     `csw-config-server` % "test->test",
     `csw-logging`,
     `csw-messages`,
-    `csw-framework`
+    `csw-framework`,
+    `csw-alarm-client`
   )
   .enablePlugins(DeployApp)
   .settings(

@@ -28,11 +28,6 @@ trait HealthServiceModule extends HealthService {
     getAggregatedSeverity(key).map(AlarmHealth.fromSeverity)
   }
 
-  private[alarm] def subscribeAggregatedHealth(key: Key): Source[AlarmHealth, AlarmSubscription] = {
-    log.debug(s"Subscribe aggregated health for alarm [${key.value}] with a callback")
-    subscribeAggregatedSeverity(key).map(AlarmHealth.fromSeverity).distinctUntilChanged
-  }
-
   final override def subscribeAggregatedHealthCallback(key: Key, callback: AlarmHealth ⇒ Unit): AlarmSubscription = {
     subscribeAggregatedHealth(key).to(Sink.foreach(callback)).run()
   }
@@ -40,5 +35,10 @@ trait HealthServiceModule extends HealthService {
   final override def subscribeAggregatedHealthActorRef(key: Key, actorRef: ActorRef[AlarmHealth]): AlarmSubscription = {
     log.debug(s"Subscribe aggregated health for alarm [${key.value}] with an actor")
     subscribeAggregatedHealthCallback(key, actorRef ! _)
+  }
+
+  private[alarm] def subscribeAggregatedHealth(key: Key): Source[AlarmHealth, AlarmSubscription] = {
+    log.debug(s"Subscribe aggregated health for alarm [${key.value}] with a callback")
+    subscribeAggregatedSeverity(key).map(AlarmHealth.fromSeverity).distinctUntilChanged
   }
 }

@@ -29,7 +29,7 @@ class AlarmAdminClient(
 ) {
   import actorRuntime._
 
-  private[alarm] val alarmService: AlarmServiceImpl = new AlarmServiceFactory().makeAdminApi(locationService)
+  private[alarm] val alarmService: AlarmServiceImpl = new AlarmServiceFactory().makeAlarmImpl(locationService)
 
   def init(options: Options): Future[Done] =
     async {
