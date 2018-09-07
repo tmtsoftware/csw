@@ -5,7 +5,7 @@ import csw.framework.CurrentStatePublisher
 import csw.framework.internal.configparser.ConfigParser
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.internal.supervisor.SupervisorBehaviorFactory
-import csw.framework.models.CswContext
+import csw.framework.models.CswServices
 import csw.messages.ComponentMessage
 import csw.messages.params.states.CurrentState
 import csw.services.logging.scaladsl.LoggerFactory
@@ -51,7 +51,7 @@ object Standalone {
         await(richSystem.spawnTyped(commandResponseManagerFactory.makeBehavior(loggerFactory), CommandResponseManagerActorName))
       val commandResponseManager = commandResponseManagerFactory.make(commandResponseManagerActor)
 
-      val cswCtx = new CswContext(
+      val cswServices = new CswServices(
         locationService,
         eventService,
         alarmService,
@@ -60,7 +60,7 @@ object Standalone {
         commandResponseManager
       )
 
-      val supervisorBehavior = SupervisorBehaviorFactory.make(None, componentInfo, registrationFactory, cswCtx)
+      val supervisorBehavior = SupervisorBehaviorFactory.make(None, componentInfo, registrationFactory, cswServices)
       await(richSystem.spawnTyped(supervisorBehavior, componentInfo.name))
     }
   }

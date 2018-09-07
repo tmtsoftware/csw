@@ -2,7 +2,7 @@ package org.tmt.nfiraos.samplehcd
 
 import akka.actor.Cancellable
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
-import csw.framework.models.CswContext
+import csw.framework.models.CswServices
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands._
@@ -23,9 +23,9 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
  * and if validation is successful, then onSubmit hook gets invoked.
  * You can find more information on this here : https://tmtsoftware.github.io/csw-prod/framework.html
  */
-class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], componentInfo: ComponentInfo, cswCtx: CswContext)
-    extends ComponentHandlers(ctx, componentInfo, cswCtx) {
-  import cswCtx._
+class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], componentInfo: ComponentInfo, cswServices: CswServices)
+    extends ComponentHandlers(ctx, componentInfo, cswServices) {
+  import cswServices._
   implicit val ec: ExecutionContextExecutor = ctx.executionContext
   private val log                           = loggerFactory.getLogger
 

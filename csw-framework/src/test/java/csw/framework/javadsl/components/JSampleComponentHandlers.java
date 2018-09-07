@@ -11,7 +11,7 @@ import csw.common.components.command.ComponentStateForCommand;
 import csw.common.components.framework.SampleComponentState;
 import csw.framework.CurrentStatePublisher;
 import csw.framework.javadsl.JComponentHandlers;
-import csw.framework.models.JCswContext;
+import csw.framework.models.JCswServices;
 import csw.messages.TopLevelActorMessage;
 import csw.messages.commands.*;
 import csw.messages.framework.ComponentInfo;
@@ -42,7 +42,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     JSampleComponentHandlers(
             ActorContext<TopLevelActorMessage> ctx,
             ComponentInfo componentInfo,
-            JCswContext cswCtx
+            JCswServices cswCtx
     ) {
         super(ctx, componentInfo, cswCtx);
         this.currentStatePublisher = cswCtx.currentStatePublisher();

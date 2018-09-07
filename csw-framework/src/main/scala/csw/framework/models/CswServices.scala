@@ -6,7 +6,7 @@ import csw.services.event.api.scaladsl.EventService
 import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
 
-class CswContext(
+class CswServices(
     val locationService: LocationService,
     val eventService: EventService,
     val alarmService: AlarmService,

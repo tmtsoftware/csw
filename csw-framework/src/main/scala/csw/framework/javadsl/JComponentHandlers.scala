@@ -3,12 +3,10 @@ package csw.framework.javadsl
 import java.util.concurrent.CompletableFuture
 
 import akka.actor.typed.javadsl.ActorContext
-import csw.framework.CurrentStatePublisher
-import csw.framework.models.JCswContext
+import csw.framework.models.JCswServices
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.TopLevelActorMessage
 import csw.messages.framework.ComponentInfo
-import csw.services.command.CommandResponseManager
 
 import scala.compat.java8.FutureConverters._
 import scala.concurrent.{ExecutionContextExecutor, Future}
@@ -18,16 +16,16 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
  *
  * @param ctx the [[akka.actor.typed.javadsl.ActorContext]] under which the actor instance of the component, which use these handlers, is created
  * @param componentInfo component related information as described in the configuration file
- * @param cswCtx provides access to csw services e.g. location, event, alarm, etc
+ * @param cswServices provides access to csw services e.g. location, event, alarm, etc
  */
 abstract class JComponentHandlers(
     ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
-    cswCtx: JCswContext
+    cswServices: JCswServices
 ) extends ComponentHandlers(
       ctx.asScala,
       componentInfo,
-      cswCtx.asScala
+      cswServices.asScala
     ) {
 
   implicit val ec: ExecutionContextExecutor = ctx.getExecutionContext

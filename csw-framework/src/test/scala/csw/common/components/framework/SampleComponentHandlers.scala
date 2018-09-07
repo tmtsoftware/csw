@@ -1,7 +1,7 @@
 package csw.common.components.framework
 
 import akka.actor.typed.scaladsl.ActorContext
-import csw.framework.models.CswContext
+import csw.framework.models.CswServices
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandIssue.OtherIssue
@@ -17,9 +17,9 @@ import csw.services.logging.scaladsl.Logger
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], componentInfo: ComponentInfo, cswCtx: CswContext)
-    extends ComponentHandlers(ctx, componentInfo, cswCtx) {
-  import cswCtx._
+class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], componentInfo: ComponentInfo, cswServices: CswServices)
+    extends ComponentHandlers(ctx, componentInfo, cswServices) {
+  import cswServices._
 
   val log: Logger                   = loggerFactory.getLogger(ctx)
   implicit val ec: ExecutionContext = ctx.executionContext

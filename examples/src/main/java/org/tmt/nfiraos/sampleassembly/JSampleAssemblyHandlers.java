@@ -6,7 +6,7 @@ import akka.actor.typed.javadsl.Behaviors;
 import akka.util.Timeout;
 import csw.framework.CurrentStatePublisher;
 import csw.framework.javadsl.JComponentHandlers;
-import csw.framework.models.JCswContext;
+import csw.framework.models.JCswServices;
 import csw.messages.TopLevelActorMessage;
 import csw.messages.commands.CommandName;
 import csw.messages.commands.CommandResponse;
@@ -59,7 +59,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
     JSampleAssemblyHandlers(
             ActorContext<TopLevelActorMessage> ctx,
             ComponentInfo componentInfo,
-            JCswContext cswCtx
+            JCswServices cswCtx
     ) {
         super(ctx, componentInfo, cswCtx);
         this.currentStatePublisher = cswCtx.currentStatePublisher();

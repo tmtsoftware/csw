@@ -11,7 +11,7 @@ import akka.util.Timeout
 import csw.framework.components.ConfigNotAvailableException
 import csw.framework.components.assembly.WorkerActorMsgs.{GetStatistics, InitialState}
 import csw.framework.components.assembly.{WorkerActor, WorkerActorMsg}
-import csw.framework.models.CswContext
+import csw.framework.models.CswServices
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandResponse.Accepted
@@ -28,8 +28,8 @@ import scala.concurrent.duration.DurationLong
 import scala.concurrent.{ExecutionContext, Future}
 
 //#component-handlers-class
-class HcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], componentInfo: ComponentInfo, cswCtx: CswContext)
-    extends ComponentHandlers(ctx, componentInfo, cswCtx)
+class HcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], componentInfo: ComponentInfo, cswServices: CswServices)
+    extends ComponentHandlers(ctx, componentInfo, cswServices)
 //#component-handlers-class
     {
 
@@ -38,7 +38,7 @@ class HcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], componentInf
   implicit val ec: ExecutionContext             = ctx.executionContext
   implicit val timeout: Timeout                 = 5.seconds
   implicit val scheduler: Scheduler             = ctx.system.scheduler
-  private val configClient: ConfigClientService = ConfigClientFactory.clientApi(ctx.system.toUntyped, cswCtx.locationService)
+  private val configClient: ConfigClientService = ConfigClientFactory.clientApi(ctx.system.toUntyped, cswServices.locationService)
   var current: Int                              = _
   var stats: Int                                = _
 

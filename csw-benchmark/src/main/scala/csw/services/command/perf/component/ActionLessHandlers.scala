@@ -1,7 +1,7 @@
 package csw.services.command.perf.component
 
 import akka.actor.typed.scaladsl.ActorContext
-import csw.framework.models.CswContext
+import csw.framework.models.CswServices
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandResponse.Completed
@@ -13,8 +13,8 @@ import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
 import scala.concurrent.Future
 
-class ActionLessHandlers(ctx: ActorContext[TopLevelActorMessage], componentInfo: ComponentInfo, cswCtx: CswContext)
-    extends ComponentHandlers(ctx, componentInfo, cswCtx) {
+class ActionLessHandlers(ctx: ActorContext[TopLevelActorMessage], componentInfo: ComponentInfo, cswServices: CswServices)
+    extends ComponentHandlers(ctx, componentInfo, cswServices) {
 
   val log: Logger = new LoggerFactory(componentInfo.name).getLogger(ctx)
 

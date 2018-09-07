@@ -10,7 +10,7 @@ import csw.framework.components.assembly.WorkerActor;
 import csw.framework.components.assembly.WorkerActorMsg;
 import csw.framework.components.assembly.WorkerActorMsgs;
 import csw.framework.javadsl.JComponentHandlers;
-import csw.framework.models.JCswContext;
+import csw.framework.models.JCswServices;
 import csw.messages.TopLevelActorMessage;
 import csw.messages.commands.CommandResponse;
 import csw.messages.commands.ControlCommand;
@@ -51,7 +51,7 @@ public class JHcdComponentHandlers extends JComponentHandlers {
     public JHcdComponentHandlers(
             akka.actor.typed.javadsl.ActorContext<TopLevelActorMessage> ctx,
             ComponentInfo componentInfo,
-            JCswContext cswCtx
+            JCswServices cswCtx
     ) {
         super(ctx, componentInfo,cswCtx);
         this.ctx = ctx;

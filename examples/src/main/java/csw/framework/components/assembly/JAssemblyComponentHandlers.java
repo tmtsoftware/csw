@@ -9,7 +9,7 @@ import csw.framework.CurrentStatePublisher;
 import csw.framework.exceptions.FailureRestart;
 import csw.framework.exceptions.FailureStop;
 import csw.framework.javadsl.JComponentHandlers;
-import csw.framework.models.JCswContext;
+import csw.framework.models.JCswServices;
 import csw.messages.TopLevelActorMessage;
 import csw.messages.commands.*;
 import csw.messages.framework.ComponentInfo;
@@ -58,7 +58,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     public JAssemblyComponentHandlers(
             akka.actor.typed.javadsl.ActorContext<TopLevelActorMessage> ctx,
             ComponentInfo componentInfo,
-            JCswContext cswCtx
+            JCswServices cswCtx
     ) {
         super(ctx, componentInfo,cswCtx);
         this.ctx = ctx;

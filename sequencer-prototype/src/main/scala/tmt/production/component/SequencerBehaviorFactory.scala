@@ -13,12 +13,12 @@ class SequencerBehaviorFactory extends ComponentBehaviorFactory {
       ctx: ActorContext[TopLevelActorMessage],
       componentInfo: ComponentInfo,
 
-      cswCtx: CswContext
+      cswServices: CswContext
   ): ComponentHandlers =
     new SequencerHandlers(
       ctx,
       componentInfo,
 
-      cswCtx
+      cswServices
     )
 }

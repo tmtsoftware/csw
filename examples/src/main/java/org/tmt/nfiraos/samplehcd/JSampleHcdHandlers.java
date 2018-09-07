@@ -6,7 +6,7 @@ import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import csw.framework.CurrentStatePublisher;
 import csw.framework.javadsl.JComponentHandlers;
-import csw.framework.models.JCswContext;
+import csw.framework.models.JCswServices;
 import csw.messages.TopLevelActorMessage;
 import csw.messages.commands.*;
 import csw.messages.events.Event;
@@ -50,7 +50,7 @@ public class JSampleHcdHandlers extends JComponentHandlers {
     JSampleHcdHandlers(
             ActorContext<TopLevelActorMessage> ctx,
             ComponentInfo componentInfo,
-            JCswContext cswCtx
+            JCswServices cswCtx
     ) {
         super(ctx, componentInfo, cswCtx);
         this.currentStatePublisher = cswCtx.currentStatePublisher();

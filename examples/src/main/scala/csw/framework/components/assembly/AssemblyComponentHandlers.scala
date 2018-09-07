@@ -6,7 +6,7 @@ import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{ActorRef, ActorSystem}
 import csw.framework.exceptions.{FailureRestart, FailureStop}
-import csw.framework.models.CswContext
+import csw.framework.models.CswServices
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandResponse.Accepted
@@ -24,15 +24,15 @@ import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
 //#component-handlers-class
-class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], componentInfo: ComponentInfo, cswCtx: CswContext)
-    extends ComponentHandlers(ctx, componentInfo, cswCtx)
+class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], componentInfo: ComponentInfo, cswServices: CswServices)
+    extends ComponentHandlers(ctx, componentInfo, cswServices)
 //#component-handlers-class
     {
 
   implicit val ec: ExecutionContextExecutor = ctx.executionContext
 
   private val log: Logger                                          = new LoggerFactory(componentInfo.name).getLogger(ctx)
-  private val configClient: ConfigClientService                    = ConfigClientFactory.clientApi(ctx.system.toUntyped, cswCtx.locationService)
+  private val configClient: ConfigClientService                    = ConfigClientFactory.clientApi(ctx.system.toUntyped, cswServices.locationService)
   private var runningHcds: Map[Connection, Option[CommandService]] = Map.empty
   var diagnosticsPublisher: ActorRef[DiagnosticPublisherMessages]  = _
   var commandHandler: ActorRef[CommandHandlerMsgs]                 = _
@@ -153,7 +153,7 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], compone
     val maybeConnection = componentInfo.connections.find(connection ⇒ connection.componentId.componentType == ComponentType.HCD)
     maybeConnection match {
       case Some(hcd) ⇒
-        cswCtx.locationService.resolve(hcd.of[AkkaLocation], 5.seconds).map {
+        cswServices.locationService.resolve(hcd.of[AkkaLocation], 5.seconds).map {
           case loc @ Some(akkaLocation) ⇒ loc
           case None                     ⇒
             // Hcd connection could not be resolved for this Assembly. One option to handle this could be to automatic restart which can give enough time
@@ -188,7 +188,7 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], compone
     implicit val system: ActorSystem[Nothing] = ctx.system
 
     val eventualCommandService: Future[CommandService] =
-      cswCtx.locationService.resolve(hcdConnection.of[AkkaLocation], 5.seconds).map {
+      cswServices.locationService.resolve(hcdConnection.of[AkkaLocation], 5.seconds).map {
         case Some(hcdLocation: AkkaLocation) => new CommandService(hcdLocation)
         case _                               => throw HcdNotFoundException()
       }

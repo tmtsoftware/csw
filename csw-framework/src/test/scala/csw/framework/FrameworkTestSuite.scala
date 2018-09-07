@@ -8,7 +8,7 @@ import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import csw.framework.internal.supervisor.SupervisorBehaviorFactory
-import csw.framework.models.CswContext
+import csw.framework.models.CswServices
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.messages.framework.ComponentInfo
 import csw.messages.{ComponentMessage, ContainerIdleMessage, TopLevelActorMessage}
@@ -32,10 +32,10 @@ private[csw] abstract class FrameworkTestSuite extends FunSuite with Matchers wi
   }
 
   def getSampleHcdWiring(componentHandlers: ComponentHandlers): ComponentBehaviorFactory =
-    (ctx: ActorContext[TopLevelActorMessage], componentInfo: ComponentInfo, cswCtx: CswContext) => componentHandlers
+    (ctx: ActorContext[TopLevelActorMessage], componentInfo: ComponentInfo, cswServices: CswServices) => componentHandlers
 
   def getSampleAssemblyWiring(assemblyHandlers: ComponentHandlers): ComponentBehaviorFactory =
-    (ctx: ActorContext[TopLevelActorMessage], componentInfo: ComponentInfo, cswCtx: CswContext) => assemblyHandlers
+    (ctx: ActorContext[TopLevelActorMessage], componentInfo: ComponentInfo, cswServices: CswServices) => assemblyHandlers
 
   def createSupervisorAndStartTLA(
       componentInfo: ComponentInfo,
@@ -48,12 +48,12 @@ private[csw] abstract class FrameworkTestSuite extends FunSuite with Matchers wi
       Some(containerRef),
       componentInfo,
       registrationFactory,
-      new CswContext(
-        cswCtx.locationService,
-        cswCtx.eventService,
-        cswCtx.alarmService,
+      new CswServices(
+        cswServices.locationService,
+        cswServices.eventService,
+        cswServices.alarmService,
         new LoggerFactory(componentInfo.name),
-        cswCtx.currentStatePublisher,
+        cswServices.currentStatePublisher,
         commandResponseManager
       )
     )

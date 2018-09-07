@@ -6,7 +6,7 @@ import csw.services.event.api.javadsl.IEventService
 import csw.services.location.javadsl.ILocationService
 import csw.services.logging.javadsl.JLoggerFactory
 
-case class JCswContext(
+case class JCswServices(
     locationService: ILocationService,
     eventService: IEventService,
     alarmService: IAlarmService,
@@ -14,7 +14,7 @@ case class JCswContext(
     commandResponseManager: CommandResponseManager,
     currentStatePublisher: CurrentStatePublisher
 ) {
-  def asScala = new CswContext(
+  def asScala = new CswServices(
     locationService.asScala,
     eventService.asScala,
     alarmService.asScala,

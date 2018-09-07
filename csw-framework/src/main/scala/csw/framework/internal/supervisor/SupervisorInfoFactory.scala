@@ -5,7 +5,7 @@ import akka.actor.typed.ActorRef
 import csw.framework.CurrentStatePublisher
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.internal.wiring.CswFrameworkSystem
-import csw.framework.models.CswContext
+import csw.framework.models.CswServices
 import csw.messages.ContainerIdleMessage
 import csw.messages.framework.{Component, ComponentInfo, SupervisorInfo}
 import csw.messages.params.states.CurrentState
@@ -56,7 +56,7 @@ private[framework] class SupervisorInfoFactory(containerName: String) {
         await(richSystem.spawnTyped(commandResponseManagerFactory.makeBehavior(loggerFactory), CommandResponseManagerActorName))
       val commandResponseManager = commandResponseManagerFactory.make(commandResponseManagerActor)
 
-      val cswCtx = new CswContext(
+      val cswServices = new CswServices(
         locationService,
         eventService,
         alarmService,
@@ -69,7 +69,7 @@ private[framework] class SupervisorInfoFactory(containerName: String) {
         Some(containerRef),
         componentInfo,
         registrationFactory,
-        cswCtx
+        cswServices
       )
 
       val actorRefF = richSystem.spawnTyped(supervisorBehavior, componentInfo.name)

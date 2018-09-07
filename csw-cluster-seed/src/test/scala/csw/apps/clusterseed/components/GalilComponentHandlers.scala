@@ -2,7 +2,7 @@ package csw.apps.clusterseed.components
 
 import akka.actor.typed.scaladsl.ActorContext
 import csw.framework.CurrentStatePublisher
-import csw.framework.models.CswContext
+import csw.framework.models.CswServices
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandResponse.Accepted
@@ -19,11 +19,11 @@ case class StartLogging()
 class GalilComponentHandlers(
     ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
-    cswCtx: CswContext
+    cswServices: CswServices
 ) extends ComponentHandlers(
       ctx,
       componentInfo,
-      cswCtx
+      cswServices
     ) {
   val log: Logger = new LoggerFactory(componentInfo.name).getLogger
 

@@ -2,7 +2,7 @@ package csw.framework.internal.supervisor
 
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior}
-import csw.framework.models.CswContext
+import csw.framework.models.CswServices
 import csw.framework.scaladsl.ComponentBehaviorFactory
 import csw.messages.framework.ComponentInfo
 import csw.messages.{ComponentMessage, ContainerIdleMessage, SupervisorMessage}
@@ -17,7 +17,7 @@ private[framework] object SupervisorBehaviorFactory {
       containerRef: Option[ActorRef[ContainerIdleMessage]],
       componentInfo: ComponentInfo,
       registrationFactory: RegistrationFactory,
-      cswCtx: CswContext
+      cswServices: CswServices
   ): Behavior[ComponentMessage] = {
 
     val componentWiringClass = Class.forName(componentInfo.behaviorFactoryClassName)
@@ -29,7 +29,7 @@ private[framework] object SupervisorBehaviorFactory {
       componentInfo,
       registrationFactory,
       componentBehaviorFactory,
-      cswCtx
+      cswServices
     )
   }
 
@@ -39,7 +39,7 @@ private[framework] object SupervisorBehaviorFactory {
       componentInfo: ComponentInfo,
       registrationFactory: RegistrationFactory,
       componentBehaviorFactory: ComponentBehaviorFactory,
-      cswCtx: CswContext
+      cswServices: CswServices
   ): Behavior[ComponentMessage] = {
     Behaviors
       .withTimers[SupervisorMessage](
@@ -54,7 +54,7 @@ private[framework] object SupervisorBehaviorFactory {
                   componentInfo,
                   componentBehaviorFactory,
                   registrationFactory,
-                  cswCtx
+                  cswServices
               )
           )
       )

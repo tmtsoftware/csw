@@ -1,7 +1,7 @@
 package csw.framework.scaladsl
 
 import akka.actor.typed.scaladsl.ActorContext
-import csw.framework.models.CswContext
+import csw.framework.models.CswServices
 import csw.messages.TopLevelActorCommonMessage.TrackingEventReceived
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.{CommandResponse, ControlCommand}
@@ -15,9 +15,11 @@ import scala.concurrent.Future
  *
  * @param ctx the [[akka.actor.typed.scaladsl.ActorContext]] under which the actor instance of the component, which use these handlers, is created
  * @param componentInfo component related information as described in the configuration file
- * @param cswCtx provides access to csw services e.g. location, event, alarm, etc
+ * @param cswServices provides access to csw services e.g. location, event, alarm, etc
  */
-abstract class ComponentHandlers(ctx: ActorContext[TopLevelActorMessage], componentInfo: ComponentInfo, cswCtx: CswContext) {
+abstract class ComponentHandlers(ctx: ActorContext[TopLevelActorMessage],
+                                 componentInfo: ComponentInfo,
+                                 cswServices: CswServices) {
 
   /**
    * A component can access this flag, which can be used to determine if the component is in the online or offline state.
@@ -95,5 +97,5 @@ abstract class ComponentHandlers(ctx: ActorContext[TopLevelActorMessage], compon
    * @param connection to be tracked for location updates
    */
   def trackConnection(connection: Connection): Unit =
-    cswCtx.locationService.subscribe(connection, trackingEvent ⇒ ctx.self ! TrackingEventReceived(trackingEvent))
+    cswServices.locationService.subscribe(connection, trackingEvent ⇒ ctx.self ! TrackingEventReceived(trackingEvent))
 }

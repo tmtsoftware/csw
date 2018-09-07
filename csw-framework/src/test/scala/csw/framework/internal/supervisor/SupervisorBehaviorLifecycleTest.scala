@@ -10,7 +10,7 @@ import csw.framework.exceptions.{FailureStop, InitializationFailed}
 import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.messages.CommandResponseManagerMessage.Query
-import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
+import csw.messages.ComponentCommonMessage.{GetSupervisorLifecycleState, LifecycleStateSubscription}
 import csw.messages.FromComponentLifecycleMessage.Running
 import csw.messages.RunningMessage.Lifecycle
 import csw.messages.SupervisorContainerCommonMessages.Restart
@@ -22,7 +22,6 @@ import csw.messages.framework.PubSub.{Publish, Subscribe, Unsubscribe}
 import csw.messages.framework.ToComponentLifecycleMessages._
 import csw.messages.framework.{ComponentInfo, LifecycleStateChanged, PubSub, SupervisorLifecycleState}
 import csw.messages.params.models.Id
-import csw.messages.params.states.CurrentState
 import csw.messages.{CommandResponseManagerMessage, ContainerIdleMessage, SupervisorMessage, TopLevelActorMessage}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
@@ -51,7 +50,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
               compInfo,
               new SampleComponentBehaviorFactory,
               registrationFactory,
-              cswCtx
+              cswServices
           )
         )
     )
