@@ -6,7 +6,6 @@ import akka.actor.Scheduler
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.AskPattern.Askable
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.util.Timeout
 import csw.framework.components.ConfigNotAvailableException
 import csw.framework.components.assembly.WorkerActorMsgs.{GetStatistics, InitialState}
@@ -16,20 +15,17 @@ import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandResponse.Accepted
 import csw.messages.commands.{CommandResponse, ControlCommand, Observe, Setup}
-import csw.messages.framework.ComponentInfo
 import csw.messages.location.{LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.services.config.api.models.ConfigData
-import csw.services.config.api.scaladsl.ConfigClientService
-import csw.services.config.client.scaladsl.ConfigClientFactory
-import csw.services.logging.scaladsl.{Logger, LoggerFactory}
+import csw.services.logging.scaladsl.Logger
 
 import scala.async.Async.{async, await}
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{ExecutionContext, Future}
 
 //#component-handlers-class
-class HcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], componentInfo: ComponentInfo, cswServices: CswServices)
-    extends ComponentHandlers(ctx, componentInfo, cswServices)
+class HcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswServices: CswServices)
+    extends ComponentHandlers(ctx, cswServices)
 //#component-handlers-class
     {
 

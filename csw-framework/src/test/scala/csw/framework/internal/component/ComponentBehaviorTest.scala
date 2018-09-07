@@ -39,16 +39,12 @@ class ComponentBehaviorTest extends FrameworkTestSuite with MockitoSugar with Ma
       frameworkTestMocks().loggerFactory,
       frameworkTestMocks().configClientService,
       mock[CurrentStatePublisher],
-      commandResponseManager
+      commandResponseManager,
+      ComponentInfos.hcdInfo
     )
 
-    val factory = new TestComponentBehaviorFactory(sampleComponentHandler)
-
-    private val behavior: Behavior[Nothing] = factory.make(
-      ComponentInfos.hcdInfo,
-      supervisorProbe.ref,
-      cswServices
-    )
+    val factory                             = new TestComponentBehaviorFactory(sampleComponentHandler)
+    private val behavior: Behavior[Nothing] = factory.make(supervisorProbe.ref, cswServices)
     val componentBehaviorTestKit: BehaviorTestKit[TopLevelActorMessage] =
       BehaviorTestKit(behavior.asInstanceOf[Behavior[TopLevelActorMessage]])
   }

@@ -56,19 +56,15 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
 
     private final ActorRef<WorkerCommand> commandSender;
 
-    JSampleAssemblyHandlers(
-            ActorContext<TopLevelActorMessage> ctx,
-            ComponentInfo componentInfo,
-            JCswServices cswCtx
-    ) {
-        super(ctx, componentInfo, cswCtx);
-        this.currentStatePublisher = cswCtx.currentStatePublisher();
-        this.log = cswCtx.loggerFactory().getLogger(getClass());
-        this.commandResponseManager = cswCtx.commandResponseManager();
+    JSampleAssemblyHandlers(ActorContext<TopLevelActorMessage> ctx, JCswServices cswServices) {
+        super(ctx, cswServices);
+        this.currentStatePublisher = cswServices.currentStatePublisher();
+        this.log = cswServices.loggerFactory().getLogger(getClass());
+        this.commandResponseManager = cswServices.commandResponseManager();
         this.actorContext = ctx;
-        this.locationService = cswCtx.locationService();
-        this.eventService = cswCtx.eventService();
-        this.componentInfo = componentInfo;
+        this.locationService = cswServices.locationService();
+        this.eventService = cswServices.eventService();
+        this.componentInfo = cswServices.componentInfo();
         this.commandSender = createWorkerActor();
     }
 

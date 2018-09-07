@@ -47,19 +47,15 @@ public class JSampleHcdHandlers extends JComponentHandlers {
     private ActorRef<WorkerCommand> workerActor;
 
 
-    JSampleHcdHandlers(
-            ActorContext<TopLevelActorMessage> ctx,
-            ComponentInfo componentInfo,
-            JCswServices cswCtx
-    ) {
-        super(ctx, componentInfo, cswCtx);
-        this.currentStatePublisher = cswCtx.currentStatePublisher();
-        this.log = cswCtx.loggerFactory().getLogger(getClass());
-        this.commandResponseManager = cswCtx.commandResponseManager();
+    JSampleHcdHandlers(ActorContext<TopLevelActorMessage> ctx, JCswServices cswServices) {
+        super(ctx, cswServices);
+        this.currentStatePublisher = cswServices.currentStatePublisher();
+        this.log = cswServices.loggerFactory().getLogger(getClass());
+        this.commandResponseManager = cswServices.commandResponseManager();
         this.actorContext = ctx;
-        this.locationService = cswCtx.locationService();
-        this.componentInfo = componentInfo;
-        this.eventService = eventService;
+        this.locationService = cswServices.locationService();
+        this.componentInfo = cswServices.componentInfo();
+        this.eventService = cswServices.eventService();
         workerActor = createWorkerActor();
     }
 

@@ -20,7 +20,7 @@ import csw.messages.CommandMessage.Submit
 import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
 import csw.messages.SupervisorContainerCommonMessages.Restart
 import csw.messages.commands.{CommandName, CommandResponse, ControlCommand, Setup}
-import csw.messages.framework.{ComponentInfo, LifecycleStateChanged, PubSub, SupervisorLifecycleState}
+import csw.messages.framework.{LifecycleStateChanged, PubSub, SupervisorLifecycleState}
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.{CurrentState, StateName}
@@ -211,7 +211,6 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
 
     val supervisorBehavior = SupervisorBehaviorFactory.make(
       Some(mock[ActorRef[ContainerIdleMessage]]),
-      hcdInfo,
       registrationFactory,
       new SampleBehaviorFactory(componentHandlers),
       new CswServices(
@@ -221,7 +220,8 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
         new LoggerFactory(hcdInfo.name),
         cswServices.configClientService,
         currentStatePublisher,
-        commandResponseManager
+        commandResponseManager,
+        hcdInfo
       )
     )
 
@@ -255,11 +255,8 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
 }
 
 class SampleBehaviorFactory(componentHandlers: ComponentHandlers) extends ComponentBehaviorFactory {
-  override protected def handlers(
-      ctx: ActorContext[TopLevelActorMessage],
-      componentInfo: ComponentInfo,
-      cswServices: CswServices
-  ): ComponentHandlers = componentHandlers
+  override protected def handlers(ctx: ActorContext[TopLevelActorMessage], cswServices: CswServices): ComponentHandlers =
+    componentHandlers
 }
 
 case class TestFailureStop(msg: String)    extends FailureStop(msg)

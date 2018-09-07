@@ -32,10 +32,10 @@ private[csw] abstract class FrameworkTestSuite extends FunSuite with Matchers wi
   }
 
   def getSampleHcdWiring(componentHandlers: ComponentHandlers): ComponentBehaviorFactory =
-    (ctx: ActorContext[TopLevelActorMessage], componentInfo: ComponentInfo, cswServices: CswServices) => componentHandlers
+    (ctx: ActorContext[TopLevelActorMessage], cswServices: CswServices) => componentHandlers
 
   def getSampleAssemblyWiring(assemblyHandlers: ComponentHandlers): ComponentBehaviorFactory =
-    (ctx: ActorContext[TopLevelActorMessage], componentInfo: ComponentInfo, cswServices: CswServices) => assemblyHandlers
+    (ctx: ActorContext[TopLevelActorMessage], cswServices: CswServices) => assemblyHandlers
 
   def createSupervisorAndStartTLA(
       componentInfo: ComponentInfo,
@@ -46,7 +46,6 @@ private[csw] abstract class FrameworkTestSuite extends FunSuite with Matchers wi
 
     val supervisorBehavior = SupervisorBehaviorFactory.make(
       Some(containerRef),
-      componentInfo,
       registrationFactory,
       new CswServices(
         cswServices.locationService,
@@ -55,7 +54,8 @@ private[csw] abstract class FrameworkTestSuite extends FunSuite with Matchers wi
         new LoggerFactory(componentInfo.name),
         cswServices.configClientService,
         cswServices.currentStatePublisher,
-        commandResponseManager
+        commandResponseManager,
+        componentInfo
       )
     )
 

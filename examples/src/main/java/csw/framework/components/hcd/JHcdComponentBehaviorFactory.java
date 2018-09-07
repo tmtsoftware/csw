@@ -9,14 +9,9 @@ import csw.messages.TopLevelActorMessage;
 
 //#jcomponent-factory
 public class JHcdComponentBehaviorFactory extends JComponentBehaviorFactory {
-
     @Override
-    public JComponentHandlers jHandlers(
-            ActorContext<TopLevelActorMessage> ctx,
-            ComponentInfo componentInfo,
-            JCswServices cswCtx
-    ) {
-        return new JHcdComponentHandlers(ctx, componentInfo, cswCtx);
+    public JComponentHandlers jHandlers(ActorContext<TopLevelActorMessage> ctx, JCswServices cswServices) {
+        return new JHcdComponentHandlers(ctx, cswServices);
     }
 }
 //#jcomponent-factory

@@ -37,7 +37,7 @@ private[framework] class SupervisorInfoFactory(containerName: String) {
     async {
       val cswServicesF = CswServices(locationService, eventServiceFactory, alarmServiceFactory, componentInfo)(richSystem)
       val supervisorBehavior =
-        SupervisorBehaviorFactory.make(Some(containerRef), componentInfo, registrationFactory, await(cswServicesF))
+        SupervisorBehaviorFactory.make(Some(containerRef), registrationFactory, await(cswServicesF))
       val actorRefF = richSystem.spawnTyped(supervisorBehavior, componentInfo.name)
       Some(SupervisorInfo(system, Component(await(actorRefF), componentInfo)))
     } recoverWith {

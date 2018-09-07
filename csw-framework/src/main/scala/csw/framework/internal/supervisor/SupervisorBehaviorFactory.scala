@@ -4,7 +4,6 @@ import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior}
 import csw.framework.models.CswServices
 import csw.framework.scaladsl.ComponentBehaviorFactory
-import csw.messages.framework.ComponentInfo
 import csw.messages.{ComponentMessage, ContainerIdleMessage, SupervisorMessage}
 import csw.services.location.scaladsl.RegistrationFactory
 
@@ -15,18 +14,15 @@ private[framework] object SupervisorBehaviorFactory {
 
   def make(
       containerRef: Option[ActorRef[ContainerIdleMessage]],
-      componentInfo: ComponentInfo,
       registrationFactory: RegistrationFactory,
       cswServices: CswServices
   ): Behavior[ComponentMessage] = {
-
-    val componentWiringClass = Class.forName(componentInfo.behaviorFactoryClassName)
+    val componentWiringClass = Class.forName(cswServices.componentInfo.behaviorFactoryClassName)
     val componentBehaviorFactory =
       componentWiringClass.getDeclaredConstructor().newInstance().asInstanceOf[ComponentBehaviorFactory]
 
     make(
       containerRef,
-      componentInfo,
       registrationFactory,
       componentBehaviorFactory,
       cswServices
@@ -36,7 +32,6 @@ private[framework] object SupervisorBehaviorFactory {
   // This method is used by test
   def make(
       containerRef: Option[ActorRef[ContainerIdleMessage]],
-      componentInfo: ComponentInfo,
       registrationFactory: RegistrationFactory,
       componentBehaviorFactory: ComponentBehaviorFactory,
       cswServices: CswServices
@@ -51,7 +46,6 @@ private[framework] object SupervisorBehaviorFactory {
                   ctx,
                   timerScheduler,
                   containerRef,
-                  componentInfo,
                   componentBehaviorFactory,
                   registrationFactory,
                   cswServices

@@ -28,6 +28,7 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
  * @param loggerFactory factory to create suitable logger instance
  * @param currentStatePublisher the pub sub actor to publish state represented by [[csw.messages.params.states.CurrentState]] for this component
  * @param commandResponseManager manages state of a received Submit command
+ * @param componentInfo component related information as described in the configuration file
  *
  */
 class CswServices(
@@ -37,8 +38,21 @@ class CswServices(
     val loggerFactory: LoggerFactory,
     val configClientService: ConfigClientService,
     val currentStatePublisher: CurrentStatePublisher,
-    val commandResponseManager: CommandResponseManager
-)
+    val commandResponseManager: CommandResponseManager,
+    val componentInfo: ComponentInfo
+) {
+  def copy(newComponentInfo: ComponentInfo): CswServices =
+    new CswServices(
+      locationService,
+      eventService,
+      alarmService,
+      loggerFactory,
+      configClientService,
+      currentStatePublisher,
+      commandResponseManager,
+      newComponentInfo
+    )
+}
 
 object CswServices {
 
@@ -81,7 +95,8 @@ object CswServices {
         loggerFactory,
         configClientService,
         currentStatePublisher,
-        commandResponseManager
+        commandResponseManager,
+        componentInfo
       )
     }
   }

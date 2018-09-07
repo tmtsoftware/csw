@@ -8,7 +8,6 @@ import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandResponse.Accepted
 import csw.messages.commands.{CommandName, CommandResponse, ControlCommand, Setup}
 import csw.messages.events._
-import csw.messages.framework.ComponentInfo
 import csw.messages.location.{AkkaLocation, LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.messages.params.generics.{Key, KeyType, Parameter}
 import csw.messages.params.models.{ObsId, Prefix, Units}
@@ -26,8 +25,8 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
  * and if validation is successful, then onSubmit hook gets invoked.
  * You can find more information on this here : https://tmtsoftware.github.io/csw-prod/framework.html
  */
-class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], componentInfo: ComponentInfo, cswServices: CswServices)
-    extends ComponentHandlers(ctx, componentInfo, cswServices) {
+class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswServices: CswServices)
+    extends ComponentHandlers(ctx, cswServices) {
 
   import cswServices._
   implicit val ec: ExecutionContextExecutor = ctx.executionContext

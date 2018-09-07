@@ -6,15 +6,14 @@ import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandResponse.Completed
 import csw.messages.commands._
-import csw.messages.framework.ComponentInfo
 import csw.messages.location.TrackingEvent
 import csw.messages.params.models.Id
-import csw.services.logging.scaladsl.{Logger, LoggerFactory}
+import csw.services.logging.scaladsl.Logger
 
 import scala.concurrent.Future
 
-class ActionLessHandlers(ctx: ActorContext[TopLevelActorMessage], componentInfo: ComponentInfo, cswServices: CswServices)
-    extends ComponentHandlers(ctx, componentInfo, cswServices) {
+class ActionLessHandlers(ctx: ActorContext[TopLevelActorMessage], cswServices: CswServices)
+    extends ComponentHandlers(ctx, cswServices) {
 
   val log: Logger = cswServices.loggerFactory.getLogger(ctx)
 

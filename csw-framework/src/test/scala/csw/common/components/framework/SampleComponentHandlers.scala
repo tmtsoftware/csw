@@ -8,7 +8,6 @@ import csw.messages.commands.CommandIssue.OtherIssue
 import csw.messages.commands.CommandResponse.{Accepted, Completed, Invalid}
 import csw.messages.commands._
 import csw.messages.events.{Event, EventName, SystemEvent}
-import csw.messages.framework.ComponentInfo
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location.{LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.messages.params.models.Prefix
@@ -17,8 +16,8 @@ import csw.services.logging.scaladsl.Logger
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], componentInfo: ComponentInfo, cswServices: CswServices)
-    extends ComponentHandlers(ctx, componentInfo, cswServices) {
+class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswServices: CswServices)
+    extends ComponentHandlers(ctx, cswServices) {
   import cswServices._
 
   val log: Logger                   = loggerFactory.getLogger(ctx)

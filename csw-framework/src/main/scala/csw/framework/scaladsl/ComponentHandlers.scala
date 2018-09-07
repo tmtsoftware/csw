@@ -5,7 +5,6 @@ import csw.framework.models.CswServices
 import csw.messages.TopLevelActorCommonMessage.TrackingEventReceived
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.{CommandResponse, ControlCommand}
-import csw.messages.framework.ComponentInfo
 import csw.messages.location.{Connection, TrackingEvent}
 
 import scala.concurrent.Future
@@ -14,14 +13,9 @@ import scala.concurrent.Future
  * Base class for component handlers which will be used by the component actor
  *
  * @param ctx the [[akka.actor.typed.scaladsl.ActorContext]] under which the actor instance of the component, which use these handlers, is created
- * @param componentInfo component related information as described in the configuration file
  * @param cswServices provides access to csw services e.g. location, event, alarm, etc
  */
-abstract class ComponentHandlers(
-    ctx: ActorContext[TopLevelActorMessage],
-    componentInfo: ComponentInfo,
-    cswServices: CswServices
-) {
+abstract class ComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswServices: CswServices) {
 
   /**
    * A component can access this flag, which can be used to determine if the component is in the online or offline state.

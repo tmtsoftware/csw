@@ -50,17 +50,16 @@ public class JHcdComponentHandlers extends JComponentHandlers {
 
     public JHcdComponentHandlers(
             akka.actor.typed.javadsl.ActorContext<TopLevelActorMessage> ctx,
-            ComponentInfo componentInfo,
-            JCswServices cswCtx
+            JCswServices cswServices
     ) {
-        super(ctx, componentInfo,cswCtx);
+        super(ctx, cswServices);
         this.ctx = ctx;
-        this.componentInfo = componentInfo;
-        this.commandResponseManager = cswCtx.commandResponseManager();
-        this.currentStatePublisher = cswCtx.currentStatePublisher();
-        this.locationService = cswCtx.locationService();
-        this.eventService = cswCtx.eventService();
-        log = cswCtx.loggerFactory().getLogger(this.getClass());
+        this.componentInfo = cswServices.componentInfo();
+        this.commandResponseManager = cswServices.commandResponseManager();
+        this.currentStatePublisher = cswServices.currentStatePublisher();
+        this.locationService = cswServices.locationService();
+        this.eventService = cswServices.eventService();
+        log = cswServices.loggerFactory().getLogger(this.getClass());
     }
     //#jcomponent-handlers-class
 

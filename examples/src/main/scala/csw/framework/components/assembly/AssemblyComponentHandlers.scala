@@ -3,7 +3,6 @@ package csw.framework.components.assembly
 import java.nio.file.Paths
 
 import akka.actor.typed.scaladsl.ActorContext
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{ActorRef, ActorSystem}
 import csw.framework.exceptions.{FailureRestart, FailureStop}
 import csw.framework.models.CswServices
@@ -11,21 +10,18 @@ import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandResponse.Accepted
 import csw.messages.commands._
-import csw.messages.framework.ComponentInfo
 import csw.messages.location._
 import csw.services.command.scaladsl.CommandService
 import csw.services.config.api.models.ConfigData
-import csw.services.config.api.scaladsl.ConfigClientService
-import csw.services.config.client.scaladsl.ConfigClientFactory
-import csw.services.logging.scaladsl.{Logger, LoggerFactory}
+import csw.services.logging.scaladsl.Logger
 
 import scala.async.Async._
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
 //#component-handlers-class
-class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], componentInfo: ComponentInfo, cswServices: CswServices)
-    extends ComponentHandlers(ctx, componentInfo, cswServices)
+class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswServices: CswServices)
+    extends ComponentHandlers(ctx, cswServices)
 //#component-handlers-class
     {
 

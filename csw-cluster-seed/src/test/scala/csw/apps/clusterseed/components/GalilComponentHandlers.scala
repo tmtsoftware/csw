@@ -1,23 +1,20 @@
 package csw.apps.clusterseed.components
 
 import akka.actor.typed.scaladsl.ActorContext
-import csw.framework.CurrentStatePublisher
 import csw.framework.models.CswServices
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandResponse.Accepted
 import csw.messages.commands.{CommandResponse, ControlCommand}
-import csw.messages.framework.ComponentInfo
 import csw.messages.location.TrackingEvent
-import csw.services.command.CommandResponseManager
-import csw.services.logging.scaladsl.{Logger, LoggerFactory}
+import csw.services.logging.scaladsl.Logger
 
 import scala.concurrent.Future
 
 case class StartLogging()
 
-class GalilComponentHandlers(ctx: ActorContext[TopLevelActorMessage], componentInfo: ComponentInfo, cswServices: CswServices)
-    extends ComponentHandlers(ctx, componentInfo, cswServices) {
+class GalilComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswServices: CswServices)
+    extends ComponentHandlers(ctx, cswServices) {
 
   val log: Logger = cswServices.loggerFactory.getLogger
 

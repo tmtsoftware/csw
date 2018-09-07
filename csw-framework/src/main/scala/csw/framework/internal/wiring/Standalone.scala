@@ -29,7 +29,7 @@ object Standalone {
     val richSystem    = new CswFrameworkSystem(system)
     async {
       val cswServicesF       = CswServices(locationService, eventServiceFactory, alarmServiceFactory, componentInfo)(richSystem)
-      val supervisorBehavior = SupervisorBehaviorFactory.make(None, componentInfo, registrationFactory, await(cswServicesF))
+      val supervisorBehavior = SupervisorBehaviorFactory.make(None, registrationFactory, await(cswServicesF))
       await(richSystem.spawnTyped(supervisorBehavior, componentInfo.name))
     }
   }

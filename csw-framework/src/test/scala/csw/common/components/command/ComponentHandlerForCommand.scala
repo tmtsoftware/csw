@@ -12,7 +12,6 @@ import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandIssue.{OtherIssue, WrongPrefixIssue}
 import csw.messages.commands.CommandResponse._
 import csw.messages.commands._
-import csw.messages.framework.ComponentInfo
 import csw.messages.location._
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.Id
@@ -21,8 +20,8 @@ import csw.messages.params.states.{CurrentState, StateName}
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{ExecutionContext, Future}
 
-class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], componentInfo: ComponentInfo, cswServices: CswServices)
-    extends ComponentHandlers(ctx, componentInfo, cswServices) {
+class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswServices: CswServices)
+    extends ComponentHandlers(ctx, cswServices) {
 
   import cswServices._
   private val cancelCmdId = KeyType.StringKey.make("cancelCmdId")

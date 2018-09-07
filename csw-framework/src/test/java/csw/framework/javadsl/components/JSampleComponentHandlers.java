@@ -14,7 +14,6 @@ import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.models.JCswServices;
 import csw.messages.TopLevelActorMessage;
 import csw.messages.commands.*;
-import csw.messages.framework.ComponentInfo;
 import csw.messages.location.TrackingEvent;
 import csw.messages.params.generics.JKeyType;
 import csw.messages.params.generics.Parameter;
@@ -39,15 +38,11 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     private CurrentState currentState = new CurrentState(SampleComponentState.prefix().prefix(), new StateName("testStateName"));
     private ActorContext<TopLevelActorMessage> actorContext;
 
-    JSampleComponentHandlers(
-            ActorContext<TopLevelActorMessage> ctx,
-            ComponentInfo componentInfo,
-            JCswServices cswCtx
-    ) {
-        super(ctx, componentInfo, cswCtx);
-        this.currentStatePublisher = cswCtx.currentStatePublisher();
-        this.log = cswCtx.loggerFactory().getLogger(getClass());
-        this.commandResponseManager = cswCtx.commandResponseManager();
+    JSampleComponentHandlers(ActorContext<TopLevelActorMessage> ctx, JCswServices cswServices) {
+        super(ctx, cswServices);
+        this.currentStatePublisher = cswServices.currentStatePublisher();
+        this.log = cswServices.loggerFactory().getLogger(getClass());
+        this.commandResponseManager = cswServices.commandResponseManager();
         this.actorContext = ctx;
     }
 

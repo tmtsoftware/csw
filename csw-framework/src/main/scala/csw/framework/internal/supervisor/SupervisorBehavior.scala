@@ -55,7 +55,6 @@ private[framework] object SupervisorBehavior {
  * @param timerScheduler provides support for scheduled `self` messages in an actor
  * @param maybeContainerRef the container ref of the container under which this supervisor is started if
  *                          it's not running in standalone mode
- * @param componentInfo component related information as described in the configuration file
  * @param componentBehaviorFactory the factory for creating the component supervised by this Supervisor
  * @param registrationFactory the factory for creating a typed [[csw.services.location.models.AkkaRegistration]] from
  *                            [[csw.messages.location.Connection.AkkaConnection]]
@@ -64,7 +63,6 @@ private[framework] final class SupervisorBehavior(
     ctx: ActorContext[SupervisorMessage],
     timerScheduler: TimerScheduler[SupervisorMessage],
     maybeContainerRef: Option[ActorRef[ContainerIdleMessage]],
-    componentInfo: ComponentInfo,
     componentBehaviorFactory: ComponentBehaviorFactory,
     registrationFactory: RegistrationFactory,
     cswServices: CswServices
@@ -302,14 +300,7 @@ private[framework] final class SupervisorBehavior(
 
   private def createTLA(): ActorRef[Nothing] = {
     val behavior = Behaviors
-      .supervise[Nothing](
-        componentBehaviorFactory
-          .make(
-            componentInfo,
-            ctx.self,
-            cswServices
-          )
-      )
+      .supervise[Nothing](componentBehaviorFactory.make(ctx.self, cswServices))
       .onFailure[FailureRestart](SupervisorStrategy.restartWithLimit(3, Duration.Zero).withLoggingEnabled(true))
 
     ctx.spawn[Nothing](behavior, componentActorName)

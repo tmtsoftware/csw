@@ -6,7 +6,6 @@ import akka.actor.typed.javadsl.ActorContext
 import csw.framework.models.JCswServices
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.TopLevelActorMessage
-import csw.messages.framework.ComponentInfo
 
 import scala.compat.java8.FutureConverters._
 import scala.concurrent.{ExecutionContextExecutor, Future}
@@ -15,18 +14,10 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
  * Base class for component handlers which will be used by the component actor
  *
  * @param ctx the [[akka.actor.typed.javadsl.ActorContext]] under which the actor instance of the component, which use these handlers, is created
- * @param componentInfo component related information as described in the configuration file
  * @param cswServices provides access to csw services e.g. location, event, alarm, etc
  */
-abstract class JComponentHandlers(
-    ctx: ActorContext[TopLevelActorMessage],
-    componentInfo: ComponentInfo,
-    cswServices: JCswServices
-) extends ComponentHandlers(
-      ctx.asScala,
-      componentInfo,
-      cswServices.asScala
-    ) {
+abstract class JComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswServices: JCswServices)
+    extends ComponentHandlers(ctx.asScala, cswServices.asScala) {
 
   implicit val ec: ExecutionContextExecutor = ctx.getExecutionContext
 

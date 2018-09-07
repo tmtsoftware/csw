@@ -55,19 +55,15 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     private ActorRef<DiagnosticPublisherMessages> diagnosticPublisher;
     private ActorRef<CommandResponse> commandResponseAdapter;
 
-    public JAssemblyComponentHandlers(
-            akka.actor.typed.javadsl.ActorContext<TopLevelActorMessage> ctx,
-            ComponentInfo componentInfo,
-            JCswServices cswCtx
-    ) {
-        super(ctx, componentInfo,cswCtx);
+    public JAssemblyComponentHandlers(akka.actor.typed.javadsl.ActorContext<TopLevelActorMessage> ctx, JCswServices cswServices) {
+        super(ctx, cswServices);
         this.ctx = ctx;
-        this.componentInfo = componentInfo;
-        this.commandResponseManager = cswCtx.commandResponseManager();
-        this.currentStatePublisher = cswCtx.currentStatePublisher();
-        this.locationService = cswCtx.locationService();
-        this.eventService = cswCtx.eventService();
-        log = cswCtx.loggerFactory().getLogger(this.getClass());
+        this.componentInfo = cswServices.componentInfo();
+        this.commandResponseManager = cswServices.commandResponseManager();
+        this.currentStatePublisher = cswServices.currentStatePublisher();
+        this.locationService = cswServices.locationService();
+        this.eventService = cswServices.eventService();
+        log = cswServices.loggerFactory().getLogger(this.getClass());
         configClient = JConfigClientFactory.clientApi(Adapter.toUntyped(ctx.getSystem()), locationService);
 
         runningHcds = new HashMap<>();

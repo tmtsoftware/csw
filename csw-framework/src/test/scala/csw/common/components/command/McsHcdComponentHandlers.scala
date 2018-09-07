@@ -8,14 +8,13 @@ import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandResponse.{Accepted, Completed, Error}
 import csw.messages.commands.{CommandResponse, ControlCommand}
-import csw.messages.framework.ComponentInfo
 import csw.messages.location.TrackingEvent
 
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationLong
 
-class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], componentInfo: ComponentInfo, cswServices: CswServices)
-    extends ComponentHandlers(ctx, componentInfo, cswServices) {
+class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswServices: CswServices)
+    extends ComponentHandlers(ctx, cswServices) {
 
   import cswServices._
   override def initialize(): Future[Unit] = Future.unit

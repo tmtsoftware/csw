@@ -5,16 +5,11 @@ import csw.framework.javadsl.JComponentBehaviorFactory;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.models.JCswServices;
 import csw.messages.TopLevelActorMessage;
-import csw.messages.framework.ComponentInfo;
 
 public class JSampleComponentBehaviorFactory extends JComponentBehaviorFactory {
 
     @Override
-    public JComponentHandlers jHandlers(
-            ActorContext<TopLevelActorMessage> ctx,
-            ComponentInfo componentInfo,
-            JCswServices cswCtx
-    ) {
-        return new JSampleComponentHandlers(ctx, componentInfo, cswCtx);
+    public JComponentHandlers jHandlers(ActorContext<TopLevelActorMessage> ctx, JCswServices cswServices) {
+        return new JSampleComponentHandlers(ctx, cswServices);
     }
 }

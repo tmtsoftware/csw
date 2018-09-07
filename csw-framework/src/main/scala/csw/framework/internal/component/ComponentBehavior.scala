@@ -14,8 +14,8 @@ import csw.messages._
 import csw.messages.commands.CommandResponse
 import csw.messages.commands.CommandResponse.Accepted
 import csw.messages.framework.LocationServiceUsage.RegisterAndTrackServices
+import csw.messages.framework.ToComponentLifecycleMessage
 import csw.messages.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
-import csw.messages.framework.{ComponentInfo, ToComponentLifecycleMessage}
 import csw.services.logging.scaladsl.Logger
 
 import scala.async.Async.{async, await}
@@ -27,14 +27,11 @@ import scala.util.control.NonFatal
  * The Behavior of a component actor, represented as a mutable behavior
  *
  * @param ctx the [[akka.actor.typed.scaladsl.ActorContext]] under which the actor instance of this behavior is created
- * @param componentInfo component related information as described in the configuration file
  * @param supervisor the actor reference of the supervisor actor which created this component
- * @param lifecycleHandlers the implementation of handlers which defines the domain actions to be performed by this
- *                          component
+ * @param lifecycleHandlers the implementation of handlers which defines the domain actions to be performed by this component
  */
 private[framework] final class ComponentBehavior(
     ctx: ActorContext[TopLevelActorMessage],
-    componentInfo: ComponentInfo,
     supervisor: ActorRef[FromComponentLifecycleMessage],
     lifecycleHandlers: ComponentHandlers,
     cswServices: CswServices

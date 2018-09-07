@@ -83,6 +83,7 @@ class FrameworkTestMocks(implicit untypedSystem: actor.ActorSystem, system: Acto
       loggerFactory,
       configClientService,
       currentStatePublisher,
-      commandResponseManager
+      commandResponseManager,
+      ComponentInfos.dummyInfo
     )
 }

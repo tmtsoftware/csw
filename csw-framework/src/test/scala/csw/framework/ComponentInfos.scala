@@ -59,5 +59,15 @@ object ComponentInfos {
     5.seconds
   )
 
+  val dummyInfo =
+    ComponentInfo(
+      "DummyHcd",
+      HCD,
+      Prefix("wfos"),
+      "dummy",
+      DoNotRegister,
+      Set.empty
+    )
+
   val containerInfo: ContainerInfo = ContainerInfo("container", Set(hcdInfo, assemblyInfo))
 }
