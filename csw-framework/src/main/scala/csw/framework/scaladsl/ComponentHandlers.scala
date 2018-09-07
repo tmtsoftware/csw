@@ -17,9 +17,11 @@ import scala.concurrent.Future
  * @param componentInfo component related information as described in the configuration file
  * @param cswServices provides access to csw services e.g. location, event, alarm, etc
  */
-abstract class ComponentHandlers(ctx: ActorContext[TopLevelActorMessage],
-                                 componentInfo: ComponentInfo,
-                                 cswServices: CswServices) {
+abstract class ComponentHandlers(
+    ctx: ActorContext[TopLevelActorMessage],
+    componentInfo: ComponentInfo,
+    cswServices: CswServices
+) {
 
   /**
    * A component can access this flag, which can be used to determine if the component is in the online or offline state.
