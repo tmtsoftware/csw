@@ -32,15 +32,20 @@ class ComponentBehaviorTest extends FrameworkTestSuite with MockitoSugar with Ma
     val locationService: LocationService = mock[LocationService]
     val eventService: EventService       = mock[EventService]
     val alarmService: AlarmService       = mock[AlarmService]
-    val cswCtx: CswContext               = CswContext(locationService, eventService, alarmService, frameworkTestMocks().loggerFactory)
+    val cswCtx: CswContext = new CswContext(
+      locationService,
+      eventService,
+      alarmService,
+      frameworkTestMocks().loggerFactory,
+      mock[CurrentStatePublisher],
+      commandResponseManager
+    )
 
     val factory = new TestComponentBehaviorFactory(sampleComponentHandler)
 
     private val behavior: Behavior[Nothing] = factory.make(
       ComponentInfos.hcdInfo,
       supervisorProbe.ref,
-      mock[CurrentStatePublisher],
-      commandResponseManager,
       cswCtx
     )
     val componentBehaviorTestKit: BehaviorTestKit[TopLevelActorMessage] =

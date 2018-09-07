@@ -15,10 +15,8 @@ public class JSampleComponentBehaviorFactory extends JComponentBehaviorFactory {
     public JComponentHandlers jHandlers(
             ActorContext<TopLevelActorMessage> ctx,
             ComponentInfo componentInfo,
-            CommandResponseManager commandResponseManager,
-            CurrentStatePublisher currentStatePublisher,
             JCswContext cswCtx
     ) {
-        return new JSampleComponentHandlers(ctx, componentInfo, commandResponseManager, currentStatePublisher, cswCtx);
+        return new JSampleComponentHandlers(ctx, componentInfo, cswCtx);
     }
 }

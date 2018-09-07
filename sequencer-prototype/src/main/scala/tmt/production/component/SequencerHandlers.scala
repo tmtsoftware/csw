@@ -35,8 +35,7 @@ class SequencerHandlers(
 ) extends ComponentHandlers(
       ctx,
       componentInfo,
-      commandResponseManager,
-      currentStatePublisher,
+
       cswCtx
     ) {
 

@@ -3,10 +3,9 @@ package csw.services.command
 import java.util.concurrent.CompletableFuture
 import java.util.function.Consumer
 
-import akka.actor.Scheduler
+import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.AskPattern._
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.typed.{ActorRef, ActorSystem}
+import akka.actor.{ActorSystem, Scheduler}
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
 import csw.messages.CommandResponseManagerMessage
@@ -26,10 +25,10 @@ import scala.concurrent.Future
  * @param actorSystem actor system for managing stream resources inside
  */
 class CommandResponseManager private[command] (val commandResponseManagerActor: ActorRef[CommandResponseManagerMessage])(
-    implicit val actorSystem: ActorSystem[_]
+    implicit val actorSystem: ActorSystem
 ) {
 
-  private implicit val mat: Materializer    = ActorMaterializer()(actorSystem.toUntyped)
+  private implicit val mat: Materializer    = ActorMaterializer()(actorSystem)
   private implicit val scheduler: Scheduler = actorSystem.scheduler
 
   /**

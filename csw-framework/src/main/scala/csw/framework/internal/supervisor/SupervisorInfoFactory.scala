@@ -2,10 +2,13 @@ package csw.framework.internal.supervisor
 
 import akka.actor.ActorSystem
 import akka.actor.typed.ActorRef
+import csw.framework.CurrentStatePublisher
+import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.internal.wiring.CswFrameworkSystem
 import csw.framework.models.CswContext
 import csw.messages.ContainerIdleMessage
 import csw.messages.framework.{Component, ComponentInfo, SupervisorInfo}
+import csw.messages.params.states.CurrentState
 import csw.services.alarm.client.AlarmServiceFactory
 import csw.services.command.internal.CommandResponseManagerFactory
 import csw.services.event.EventServiceFactory
@@ -21,7 +24,9 @@ import scala.util.control.NonFatal
  * The factory for creating supervisor actors of a component specified by [[csw.messages.framework.ComponentInfo]]
  */
 private[framework] class SupervisorInfoFactory(containerName: String) {
-  private val log: Logger = new LoggerFactory(containerName).getLogger
+  private val log: Logger                     = new LoggerFactory(containerName).getLogger
+  private val PubSubComponentActor            = "pub-sub-component"
+  private val CommandResponseManagerActorName = "command-response-manager"
 
   def make(
       containerRef: ActorRef[ContainerIdleMessage],
@@ -40,13 +45,30 @@ private[framework] class SupervisorInfoFactory(containerName: String) {
       val eventService                  = eventServiceFactory.make(locationService)
       val alarmService                  = alarmServiceFactory.makeClientApi(locationService)
       val loggerFactory                 = new LoggerFactory(componentInfo.name)
-      val cswCtx                        = CswContext(locationService, eventService, alarmService, loggerFactory)
+
+      val pubSubComponentActor = await(
+        richSystem.spawnTyped(new PubSubBehaviorFactory().make[CurrentState](PubSubComponentActor, loggerFactory),
+                              PubSubComponentActor)
+      )
+      val currentStatePublisher = new CurrentStatePublisher(pubSubComponentActor)
+
+      val commandResponseManagerActor =
+        await(richSystem.spawnTyped(commandResponseManagerFactory.makeBehavior(loggerFactory), CommandResponseManagerActorName))
+      val commandResponseManager = commandResponseManagerFactory.make(commandResponseManagerActor)
+
+      val cswCtx = new CswContext(
+        locationService,
+        eventService,
+        alarmService,
+        loggerFactory,
+        currentStatePublisher,
+        commandResponseManager
+      )
 
       val supervisorBehavior = SupervisorBehaviorFactory.make(
         Some(containerRef),
         componentInfo,
         registrationFactory,
-        commandResponseManagerFactory,
         cswCtx
       )
 

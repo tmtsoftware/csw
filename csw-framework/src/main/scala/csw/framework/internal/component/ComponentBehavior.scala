@@ -2,12 +2,8 @@ package csw.framework.internal.component
 
 import akka.actor.typed.scaladsl.{ActorContext, MutableBehavior}
 import akka.actor.typed.{ActorRef, Behavior, PostStop, Signal}
+import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.messages.commands.CommandResponse
-import csw.messages.commands.CommandResponse.Accepted
-import csw.messages.framework.LocationServiceUsage.RegisterAndTrackServices
-import csw.messages.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
-import csw.messages.framework.{ComponentInfo, ToComponentLifecycleMessage}
 import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
 import csw.messages.FromComponentLifecycleMessage.Running
@@ -15,10 +11,12 @@ import csw.messages.RunningMessage.Lifecycle
 import csw.messages.TopLevelActorCommonMessage.{TrackingEventReceived, UnderlyingHookFailed}
 import csw.messages.TopLevelActorIdleMessage.Initialize
 import csw.messages._
-import csw.messages._
-import csw.services.command.CommandResponseManager
-import csw.services.location.scaladsl.LocationService
-import csw.services.logging.scaladsl.{Logger, LoggerFactory}
+import csw.messages.commands.CommandResponse
+import csw.messages.commands.CommandResponse.Accepted
+import csw.messages.framework.LocationServiceUsage.RegisterAndTrackServices
+import csw.messages.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
+import csw.messages.framework.{ComponentInfo, ToComponentLifecycleMessage}
+import csw.services.logging.scaladsl.Logger
 
 import scala.async.Async.{async, await}
 import scala.concurrent.Await
@@ -33,20 +31,16 @@ import scala.util.control.NonFatal
  * @param supervisor the actor reference of the supervisor actor which created this component
  * @param lifecycleHandlers the implementation of handlers which defines the domain actions to be performed by this
  *                          component
- * @param commandResponseManager to manage state of a received Submit command
- * @param locationService the single instance of Location service created for a running application
- * @param loggerFactory factory to create suitable logger instance
  */
 private[framework] final class ComponentBehavior(
     ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
     supervisor: ActorRef[FromComponentLifecycleMessage],
     lifecycleHandlers: ComponentHandlers,
-    commandResponseManager: CommandResponseManager,
-    locationService: LocationService, //TODO:
-    loggerFactory: LoggerFactory
+    cswCtx: CswContext
 ) extends MutableBehavior[TopLevelActorMessage] {
 
+  import cswCtx._
   import ctx.executionContext
 
   private val log: Logger = loggerFactory.getLogger(ctx)

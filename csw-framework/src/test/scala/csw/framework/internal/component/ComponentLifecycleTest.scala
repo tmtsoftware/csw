@@ -46,13 +46,18 @@ class ComponentLifecycleTest extends FrameworkTestSuite with MockitoSugar {
     when(sampleHcdHandler.onShutdown()).thenReturn(Future.unit)
     val factory = new TestComponentBehaviorFactory(sampleHcdHandler)
 
-    val cswCtx: CswContext = CswContext(locationService, eventService, alarmService, frameworkTestMocks().loggerFactory)
+    val cswCtx: CswContext = new CswContext(
+      locationService,
+      eventService,
+      alarmService,
+      frameworkTestMocks().loggerFactory,
+      mock[CurrentStatePublisher],
+      commandResponseManager
+    )
 
     private val behavior: Behavior[Nothing] = factory.make(
       ComponentInfos.hcdInfo,
       supervisorProbe.ref,
-      mock[CurrentStatePublisher],
-      commandResponseManager,
       cswCtx
     )
 

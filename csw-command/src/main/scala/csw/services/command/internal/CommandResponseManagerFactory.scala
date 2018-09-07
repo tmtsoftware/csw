@@ -1,8 +1,8 @@
 package csw.services.command.internal
 
-import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
+import akka.actor.ActorSystem
 import akka.actor.typed.{ActorRef, Behavior}
-import csw.messages.{CommandResponseManagerMessage, SupervisorMessage}
+import akka.actor.typed.scaladsl.Behaviors
 import csw.messages.CommandResponseManagerMessage
 import csw.services.command.CommandResponseManager
 import csw.services.logging.scaladsl.LoggerFactory
@@ -13,9 +13,9 @@ import csw.services.logging.scaladsl.LoggerFactory
 private[csw] class CommandResponseManagerFactory {
 
   def make(
-      ctx: ActorContext[SupervisorMessage],
       commandResponseManagerActor: ActorRef[CommandResponseManagerMessage]
-  ): CommandResponseManager = new CommandResponseManager(commandResponseManagerActor)(ctx.system)
+  )(implicit actorSystem: ActorSystem): CommandResponseManager =
+    new CommandResponseManager(commandResponseManagerActor)
 
   def makeBehavior(loggerFactory: LoggerFactory): Behavior[CommandResponseManagerMessage] =
     Behaviors.setup[CommandResponseManagerMessage](ctx ⇒ new CommandResponseManagerBehavior(ctx, loggerFactory))

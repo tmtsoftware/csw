@@ -16,23 +16,17 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
 /**
  * Base class for component handlers which will be used by the component actor
  *
- * @param ctx                    the [[akka.actor.typed.javadsl.ActorContext]] under which the actor instance of the component, which use these handlers, is created
- * @param componentInfo          component related information as described in the configuration file
- * @param commandResponseManager to manage state of a received Submit command
- * @param currentStatePublisher  the pub sub actor to publish state represented by [[csw.messages.params.states.CurrentState]] for this component
+ * @param ctx the [[akka.actor.typed.javadsl.ActorContext]] under which the actor instance of the component, which use these handlers, is created
+ * @param componentInfo component related information as described in the configuration file
  * @param cswCtx provides access to csw services e.g. location, event, alarm, etc
  */
 abstract class JComponentHandlers(
     ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
-    commandResponseManager: CommandResponseManager,
-    currentStatePublisher: CurrentStatePublisher,
     cswCtx: JCswContext
 ) extends ComponentHandlers(
       ctx.asScala,
       componentInfo,
-      commandResponseManager,
-      currentStatePublisher,
       cswCtx.asScala
     ) {
 

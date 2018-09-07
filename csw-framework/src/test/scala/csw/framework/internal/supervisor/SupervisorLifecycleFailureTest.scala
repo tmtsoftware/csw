@@ -15,7 +15,7 @@ import csw.framework.exceptions.{FailureRestart, FailureStop}
 import csw.framework.internal.component.ComponentBehavior
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
-import csw.framework.{CurrentStatePublisher, FrameworkTestMocks, FrameworkTestSuite}
+import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.messages.CommandMessage.Submit
 import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
 import csw.messages.SupervisorContainerCommonMessages.Restart
@@ -25,7 +25,6 @@ import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.{CurrentState, StateName}
 import csw.messages.{ComponentMessage, ContainerIdleMessage, TopLevelActorMessage}
-import csw.services.command.CommandResponseManager
 import csw.services.logging.internal.LoggingLevels.ERROR
 import csw.services.logging.internal.LoggingSystem
 import csw.services.logging.scaladsl.LoggerFactory
@@ -215,8 +214,14 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
       hcdInfo,
       registrationFactory,
       new SampleBehaviorFactory(componentHandlers),
-      commandResponseManagerFactory,
-      cswCtx.copy(loggerFactory = new LoggerFactory(hcdInfo.name))
+      new CswContext(
+        cswCtx.locationService,
+        cswCtx.eventService,
+        cswCtx.alarmService,
+        new LoggerFactory(hcdInfo.name),
+        currentStatePublisher,
+        commandResponseManager
+      )
     )
 
     // it creates supervisor which in turn spawns components TLA and sends Initialize and Run message to TLA
@@ -252,8 +257,6 @@ class SampleBehaviorFactory(componentHandlers: ComponentHandlers) extends Compon
   override protected def handlers(
       ctx: ActorContext[TopLevelActorMessage],
       componentInfo: ComponentInfo,
-      commandResponseManager: CommandResponseManager,
-      currentStatePublisher: CurrentStatePublisher,
       cswCtx: CswContext
   ): ComponentHandlers = componentHandlers
 }

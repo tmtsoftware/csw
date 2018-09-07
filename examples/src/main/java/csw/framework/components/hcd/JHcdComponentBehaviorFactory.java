@@ -16,11 +16,9 @@ public class JHcdComponentBehaviorFactory extends JComponentBehaviorFactory {
     public JComponentHandlers jHandlers(
             ActorContext<TopLevelActorMessage> ctx,
             ComponentInfo componentInfo,
-            CommandResponseManager commandResponseManager,
-            CurrentStatePublisher currentStatePublisher,
             JCswContext cswCtx
     ) {
-        return new JHcdComponentHandlers(ctx, componentInfo, commandResponseManager, currentStatePublisher, cswCtx);
+        return new JHcdComponentHandlers(ctx, componentInfo, cswCtx);
     }
 }
 //#jcomponent-factory

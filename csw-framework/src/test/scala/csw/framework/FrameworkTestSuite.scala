@@ -12,7 +12,6 @@ import csw.framework.models.CswContext
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.messages.framework.ComponentInfo
 import csw.messages.{ComponentMessage, ContainerIdleMessage, TopLevelActorMessage}
-import csw.services.command.CommandResponseManager
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.logging.scaladsl.LoggerFactory
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
@@ -32,23 +31,11 @@ private[csw] abstract class FrameworkTestSuite extends FunSuite with Matchers wi
     Await.result(typedSystem.terminate(), 5.seconds)
   }
 
-  def getSampleHcdWiring(
-      componentHandlers: ComponentHandlers
-  ): ComponentBehaviorFactory =
-    (ctx: ActorContext[TopLevelActorMessage],
-     componentInfo: ComponentInfo,
-     commandResponseManager: CommandResponseManager,
-     currentStatePublisher: CurrentStatePublisher,
-     cswCtx: CswContext) => componentHandlers
+  def getSampleHcdWiring(componentHandlers: ComponentHandlers): ComponentBehaviorFactory =
+    (ctx: ActorContext[TopLevelActorMessage], componentInfo: ComponentInfo, cswCtx: CswContext) => componentHandlers
 
-  def getSampleAssemblyWiring(
-      assemblyHandlers: ComponentHandlers
-  ): ComponentBehaviorFactory =
-    (ctx: ActorContext[TopLevelActorMessage],
-     componentInfo: ComponentInfo,
-     commandResponseManager: CommandResponseManager,
-     currentStatePublisher: CurrentStatePublisher,
-     cswCtx: CswContext) => assemblyHandlers
+  def getSampleAssemblyWiring(assemblyHandlers: ComponentHandlers): ComponentBehaviorFactory =
+    (ctx: ActorContext[TopLevelActorMessage], componentInfo: ComponentInfo, cswCtx: CswContext) => assemblyHandlers
 
   def createSupervisorAndStartTLA(
       componentInfo: ComponentInfo,
@@ -61,8 +48,14 @@ private[csw] abstract class FrameworkTestSuite extends FunSuite with Matchers wi
       Some(containerRef),
       componentInfo,
       registrationFactory,
-      commandResponseManagerFactory,
-      cswCtx.copy(loggerFactory = new LoggerFactory(componentInfo.name))
+      new CswContext(
+        cswCtx.locationService,
+        cswCtx.eventService,
+        cswCtx.alarmService,
+        new LoggerFactory(componentInfo.name),
+        cswCtx.currentStatePublisher,
+        commandResponseManager
+      )
     )
 
     // it creates supervisor which in turn spawns components TLA and sends Initialize and Run message to TLA

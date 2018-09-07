@@ -4,9 +4,10 @@ import akka.actor.Cancellable;
 import akka.actor.typed.ActorRef;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
-import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.CurrentStatePublisher;
+import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.models.JCswContext;
+import csw.messages.TopLevelActorMessage;
 import csw.messages.commands.*;
 import csw.messages.events.Event;
 import csw.messages.events.EventName;
@@ -17,7 +18,6 @@ import csw.messages.params.generics.JKeyType;
 import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.models.Id;
-import csw.messages.TopLevelActorMessage;
 import csw.services.command.CommandResponseManager;
 import csw.services.event.api.javadsl.IEventService;
 import csw.services.location.javadsl.ILocationService;
@@ -50,14 +50,12 @@ public class JSampleHcdHandlers extends JComponentHandlers {
     JSampleHcdHandlers(
             ActorContext<TopLevelActorMessage> ctx,
             ComponentInfo componentInfo,
-            CommandResponseManager commandResponseManager,
-            CurrentStatePublisher currentStatePublisher,
             JCswContext cswCtx
     ) {
-        super(ctx, componentInfo, commandResponseManager, currentStatePublisher, cswCtx);
-        this.currentStatePublisher = currentStatePublisher;
+        super(ctx, componentInfo, cswCtx);
+        this.currentStatePublisher = cswCtx.currentStatePublisher();
         this.log = cswCtx.loggerFactory().getLogger(getClass());
-        this.commandResponseManager = commandResponseManager;
+        this.commandResponseManager = cswCtx.commandResponseManager();
         this.actorContext = ctx;
         this.locationService = cswCtx.locationService();
         this.componentInfo = componentInfo;

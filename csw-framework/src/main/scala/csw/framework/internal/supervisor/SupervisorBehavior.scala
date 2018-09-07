@@ -6,7 +6,6 @@ import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors, MutableBehavior, TimerScheduler}
 import akka.actor.typed.{ActorRef, Behavior, PostStop, Signal, SupervisorStrategy, Terminated}
-import csw.framework.CurrentStatePublisher
 import csw.framework.exceptions.{FailureRestart, InitializationFailed}
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.models.CswContext
@@ -31,9 +30,6 @@ import csw.messages.framework._
 import csw.messages.location.ComponentId
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.params.models.Prefix
-import csw.messages.params.states.CurrentState
-import csw.services.command.CommandResponseManager
-import csw.services.command.internal.CommandResponseManagerFactory
 import csw.services.location.models.AkkaRegistration
 import csw.services.location.scaladsl.RegistrationFactory
 import csw.services.logging.scaladsl.Logger
@@ -61,13 +57,8 @@ private[framework] object SupervisorBehavior {
  *                          it's not running in standalone mode
  * @param componentInfo component related information as described in the configuration file
  * @param componentBehaviorFactory the factory for creating the component supervised by this Supervisor
- * @param commandResponseManagerFactory the factory for creating actor instance of [[csw.framework.internal.pubsub.PubSubBehavior]]
- *                                      for utilising pub-sub of any state of a component
- * @param registrationFactory           the factory for creating a typed [[csw.services.location.models.AkkaRegistration]] from
- *                                      [[csw.messages.location.Connection.AkkaConnection]]
- * @param locationService               the single instance of Location service created for a running application
- * @param eventService the single instance of event service with default publishers and subcribers as well as the capability to create new ones
- * @param loggerFactory                 the factory for creating [[csw.services.logging.scaladsl.Logger]] instance
+ * @param registrationFactory the factory for creating a typed [[csw.services.location.models.AkkaRegistration]] from
+ *                            [[csw.messages.location.Connection.AkkaConnection]]
  */
 private[framework] final class SupervisorBehavior(
     ctx: ActorContext[SupervisorMessage],
@@ -75,7 +66,6 @@ private[framework] final class SupervisorBehavior(
     maybeContainerRef: Option[ActorRef[ContainerIdleMessage]],
     componentInfo: ComponentInfo,
     componentBehaviorFactory: ComponentBehaviorFactory,
-    commandResponseManagerFactory: CommandResponseManagerFactory,
     registrationFactory: RegistrationFactory,
     cswCtx: CswContext
 ) extends MutableBehavior[SupervisorMessage] {
@@ -93,9 +83,7 @@ private[framework] final class SupervisorBehavior(
   private val isStandalone: Boolean                        = maybeContainerRef.isEmpty
   private[framework] val initializeTimeout: FiniteDuration = componentInfo.initializeTimeout
 
-  private val commandResponseManager: CommandResponseManager                      = makeCommandResponseManager()
   private val pubSubBehaviorFactory: PubSubBehaviorFactory                        = new PubSubBehaviorFactory
-  private[framework] val pubSubComponentActor: ActorRef[PubSub[CurrentState]]     = makePubSubComponent()
   private[framework] val pubSubLifecycle: ActorRef[PubSub[LifecycleStateChanged]] = makePubSubLifecycle()
 
   private var runningComponent: Option[ActorRef[RunningMessage]]  = None
@@ -159,7 +147,7 @@ private[framework] final class SupervisorBehavior(
    */
   private def onCommon(commonMessage: ComponentCommonMessage): Unit = commonMessage match {
     case LifecycleStateSubscription(subscriberMessage) ⇒ pubSubLifecycle ! subscriberMessage
-    case ComponentStateSubscription(subscriberMessage) ⇒ pubSubComponentActor ! subscriberMessage
+    case ComponentStateSubscription(subscriberMessage) ⇒ currentStatePublisher.publisherActor.upcast ! subscriberMessage
     case GetSupervisorLifecycleState(replyTo)          ⇒ replyTo ! lifecycleState
     case Restart                                       ⇒ onRestart()
     case Shutdown                                      ⇒ onShutdown()
@@ -319,8 +307,6 @@ private[framework] final class SupervisorBehavior(
           .make(
             componentInfo,
             ctx.self,
-            new CurrentStatePublisher(pubSubComponentActor),
-            commandResponseManager,
             cswCtx
           )
       )
@@ -331,19 +317,9 @@ private[framework] final class SupervisorBehavior(
 
   private def coordinatedShutdown(reason: Reason): Future[Done] = CoordinatedShutdown(ctx.system.toUntyped).run(reason)
 
-  private def makePubSubComponent(): ActorRef[PubSub[CurrentState]] =
-    ctx.spawn(pubSubBehaviorFactory.make[CurrentState](PubSubComponentActor, loggerFactory),
-              SupervisorBehavior.PubSubComponentActor)
-
   private def makePubSubLifecycle(): ActorRef[PubSub[LifecycleStateChanged]] =
     ctx.spawn(pubSubBehaviorFactory.make[LifecycleStateChanged](PubSubComponentActor, loggerFactory),
               SupervisorBehavior.PubSubLifecycleActor)
-
-  private def makeCommandResponseManager() = {
-    val commandResponseManagerActor =
-      ctx.spawn(commandResponseManagerFactory.makeBehavior(loggerFactory), CommandResponseManagerActorName)
-    commandResponseManagerFactory.make(ctx, commandResponseManagerActor)
-  }
 
   private def ignore(message: SupervisorMessage): Unit =
     log.error(s"Unexpected message :[$message] received by supervisor in lifecycle state :[$lifecycleState]")

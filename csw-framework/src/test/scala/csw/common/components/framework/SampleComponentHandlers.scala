@@ -1,7 +1,6 @@
 package csw.common.components.framework
 
 import akka.actor.typed.scaladsl.ActorContext
-import csw.framework.CurrentStatePublisher
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.TopLevelActorMessage
@@ -14,24 +13,12 @@ import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConn
 import csw.messages.location.{LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.messages.params.models.Prefix
 import csw.messages.params.states.{CurrentState, StateName}
-import csw.services.command.CommandResponseManager
 import csw.services.logging.scaladsl.Logger
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class SampleComponentHandlers(
-    ctx: ActorContext[TopLevelActorMessage],
-    componentInfo: ComponentInfo,
-    commandResponseManager: CommandResponseManager,
-    currentStatePublisher: CurrentStatePublisher,
-    cswCtx: CswContext
-) extends ComponentHandlers(
-      ctx,
-      componentInfo,
-      commandResponseManager,
-      currentStatePublisher,
-      cswCtx
-    ) {
+class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], componentInfo: ComponentInfo, cswCtx: CswContext)
+    extends ComponentHandlers(ctx, componentInfo, cswCtx) {
   import cswCtx._
 
   val log: Logger                   = loggerFactory.getLogger(ctx)

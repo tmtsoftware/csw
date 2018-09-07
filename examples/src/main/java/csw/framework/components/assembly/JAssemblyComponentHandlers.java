@@ -19,7 +19,6 @@ import csw.messages.params.generics.Key;
 import csw.messages.params.models.Prefix;
 import csw.messages.params.states.CurrentState;
 import csw.messages.params.states.StateName;
-import csw.services.alarm.api.javadsl.IAlarmService;
 import csw.services.command.CommandResponseManager;
 import csw.services.command.javadsl.JCommandService;
 import csw.services.config.api.javadsl.IConfigClientService;
@@ -59,15 +58,13 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     public JAssemblyComponentHandlers(
             akka.actor.typed.javadsl.ActorContext<TopLevelActorMessage> ctx,
             ComponentInfo componentInfo,
-            CommandResponseManager commandResponseManager,
-            CurrentStatePublisher currentStatePublisher,
             JCswContext cswCtx
     ) {
-        super(ctx, componentInfo, commandResponseManager, currentStatePublisher, cswCtx);
+        super(ctx, componentInfo,cswCtx);
         this.ctx = ctx;
         this.componentInfo = componentInfo;
-        this.commandResponseManager = commandResponseManager;
-        this.currentStatePublisher = currentStatePublisher;
+        this.commandResponseManager = cswCtx.commandResponseManager();
+        this.currentStatePublisher = cswCtx.currentStatePublisher();
         this.locationService = cswCtx.locationService();
         this.eventService = cswCtx.eventService();
         log = cswCtx.loggerFactory().getLogger(this.getClass());

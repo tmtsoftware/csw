@@ -50,7 +50,6 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
               None,
               compInfo,
               new SampleComponentBehaviorFactory,
-              commandResponseManagerFactory,
               registrationFactory,
               cswCtx
           )
@@ -60,7 +59,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     verify(timerScheduler).startSingleTimer(SupervisorBehavior.InitializeTimerKey, InitializeTimeout, hcdInfo.initializeTimeout)
   }
 
-  test("supervisor should start in Idle lifecycle state and spawn four actors") {
+  test("supervisor should start in Idle lifecycle state and spawn two actors") {
     val testData = new TestData(hcdInfo)
     import testData._
 
@@ -74,12 +73,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
       case _             ⇒ ""
     }
 
-    spawnedEffects should contain allOf (
-      SupervisorBehavior.PubSubLifecycleActor,
-      SupervisorBehavior.PubSubComponentActor,
-      SupervisorBehavior.CommandResponseManagerActorName,
-      componentActorName
-    )
+    spawnedEffects should contain allOf (SupervisorBehavior.PubSubLifecycleActor, componentActorName)
 
     verify(timerScheduler).startSingleTimer(SupervisorBehavior.InitializeTimerKey, InitializeTimeout, hcdInfo.initializeTimeout)
   }
@@ -192,36 +186,6 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
 
     val unsubscribeMessage = childPubSubLifecycleInbox.receiveMessage()
     unsubscribeMessage shouldBe Unsubscribe[LifecycleStateChanged](subscriberProbe.ref)
-  }
-
-  test("supervisor should handle ComponentStateSubscription message by coordinating with pub sub actor") {
-    val testData = new TestData(hcdInfo)
-    import testData._
-
-    val supervisorLifecycleStateProbe = TestProbe[SupervisorLifecycleState]
-    val subscriberProbe               = TestProbe[CurrentState]
-
-    supervisorBehaviorKit.run(GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref))
-    val previousSupervisorLifecycleState = supervisorLifecycleStateProbe.expectMessageType[SupervisorLifecycleState]
-
-    // Subscribe
-    supervisorBehaviorKit.run(ComponentStateSubscription(Subscribe[CurrentState](subscriberProbe.ref)))
-    supervisorBehaviorKit.run(GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref))
-    supervisorLifecycleStateProbe.expectMessage(previousSupervisorLifecycleState)
-
-    val childPubSubComponentStateInbox: TestInbox[PubSub[CurrentState]] =
-      supervisorBehaviorKit.childInbox(SupervisorBehavior.PubSubComponentActor)
-
-    val subscribeMessage = childPubSubComponentStateInbox.receiveMessage()
-    subscribeMessage shouldBe Subscribe[CurrentState](subscriberProbe.ref)
-
-    // Unsubscribe
-    supervisorBehaviorKit.run(ComponentStateSubscription(Unsubscribe[CurrentState](subscriberProbe.ref)))
-    supervisorBehaviorKit.run(GetSupervisorLifecycleState(supervisorLifecycleStateProbe.ref))
-    supervisorLifecycleStateProbe.expectMessage(previousSupervisorLifecycleState)
-
-    val unsubscribeMessage = childPubSubComponentStateInbox.receiveMessage()
-    unsubscribeMessage shouldBe Unsubscribe[CurrentState](subscriberProbe.ref)
   }
 
   // *************** End of testing onCommonMessages ***************

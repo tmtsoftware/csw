@@ -9,7 +9,7 @@ import csw.messages.params.states.CurrentState
  *
  * @param publisherActor the wrapped actor
  */
-class CurrentStatePublisher private[framework] (publisherActor: ActorRef[PublisherMessage[CurrentState]]) {
+class CurrentStatePublisher private[framework] (val publisherActor: ActorRef[PublisherMessage[CurrentState]]) {
 
   /**
    * Publish [[csw.messages.params.states.CurrentState]] to the subscribed components

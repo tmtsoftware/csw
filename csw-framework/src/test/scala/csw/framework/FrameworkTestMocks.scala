@@ -5,14 +5,14 @@ import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.adapter._
 import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.{actor, testkit, Done}
+import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.models.CswContext
-import csw.messages.{CommandResponseManagerMessage, SupervisorMessage}
+import csw.messages.CommandResponseManagerMessage
 import csw.messages.commands.CommandResponse
-import csw.messages.framework.LifecycleStateChanged
+import csw.messages.framework.{LifecycleStateChanged, PubSub}
 import csw.messages.location.Connection.AkkaConnection
 import csw.messages.params.models.{Id, Prefix}
 import csw.messages.params.states.CurrentState
-import csw.messages.CommandResponseManagerMessage
 import csw.services.alarm.api.scaladsl.AlarmService
 import csw.services.command.CommandResponseManager
 import csw.services.command.internal.CommandResponseManagerFactory
@@ -59,12 +59,12 @@ class FrameworkTestMocks(implicit untypedSystem: actor.ActorSystem, system: Acto
   val lifecycleStateProbe: TestProbe[LifecycleStateChanged]        = TestProbe[LifecycleStateChanged]
   val compStateProbe: TestProbe[CurrentState]                      = TestProbe[CurrentState]
 
-  when(
-    commandResponseManagerFactory.make(
-      any[ActorContext[SupervisorMessage]],
-      any[ActorRef[CommandResponseManagerMessage]]
-    )
-  ).thenReturn(commandResponseManager)
+//  when(
+//    commandResponseManagerFactory.make(
+//      any[ActorContext[SupervisorMessage]],
+//      any[ActorRef[CommandResponseManagerMessage]]
+//    )
+//  ).thenReturn(commandResponseManager)
 
   ///////////////////////////////////////////////
   val loggerFactory: LoggerFactory = mock[LoggerFactory]
@@ -75,5 +75,11 @@ class FrameworkTestMocks(implicit untypedSystem: actor.ActorSystem, system: Acto
   when(loggerFactory.getLogger(any[ActorContext[_]])).thenReturn(logger)
 
   ///////////////////////////////////////////////
-  val cswCtx: CswContext = CswContext(locationService, eventService, alarmService, loggerFactory)
+  val pubSubComponentActor: ActorRef[PubSub[CurrentState]] =
+    untypedSystem.spawnAnonymous(new PubSubBehaviorFactory().make[CurrentState]("pub-sub-component", loggerFactory))
+  val currentStatePublisher = new CurrentStatePublisher(pubSubComponentActor)
+
+  ///////////////////////////////////////////////
+  val cswCtx: CswContext =
+    new CswContext(locationService, eventService, alarmService, loggerFactory, currentStatePublisher, commandResponseManager)
 }

@@ -12,15 +12,7 @@ class GalilBehaviorFactory extends ComponentBehaviorFactory {
   protected override def handlers(
       ctx: ActorContext[TopLevelActorMessage],
       componentInfo: ComponentInfo,
-      commandResponseManager: CommandResponseManager,
-      currentStatePublisher: CurrentStatePublisher,
       cswCtx: CswContext
   ): ComponentHandlers =
-    new GalilComponentHandlers(
-      ctx,
-      componentInfo,
-      commandResponseManager,
-      currentStatePublisher,
-      cswCtx
-    )
+    new GalilComponentHandlers(ctx, componentInfo, cswCtx)
 }

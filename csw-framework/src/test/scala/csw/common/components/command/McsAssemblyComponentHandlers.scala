@@ -4,7 +4,6 @@ import akka.actor.Scheduler
 import akka.actor.typed.scaladsl.ActorContext
 import akka.util.Timeout
 import csw.common.components.command.ComponentStateForCommand.{longRunningCmdCompleted, _}
-import csw.framework.CurrentStatePublisher
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.TopLevelActorMessage
@@ -14,25 +13,13 @@ import csw.messages.framework.ComponentInfo
 import csw.messages.location.{AkkaLocation, TrackingEvent}
 import csw.messages.params.models.Id
 import csw.messages.params.states.{CurrentState, StateName}
-import csw.services.command.CommandResponseManager
 import csw.services.command.scaladsl.CommandService
 
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{ExecutionContext, Future}
 
-class McsAssemblyComponentHandlers(
-    ctx: ActorContext[TopLevelActorMessage],
-    componentInfo: ComponentInfo,
-    commandResponseManager: CommandResponseManager,
-    currentStatePublisher: CurrentStatePublisher,
-    cswCtx: CswContext
-) extends ComponentHandlers(
-      ctx,
-      componentInfo,
-      commandResponseManager,
-      currentStatePublisher,
-      cswCtx
-    ) {
+class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], componentInfo: ComponentInfo, cswCtx: CswContext)
+    extends ComponentHandlers(ctx, componentInfo, cswCtx) {
 
   implicit val timeout: Timeout     = 10.seconds
   implicit val scheduler: Scheduler = ctx.system.scheduler
@@ -43,6 +30,7 @@ class McsAssemblyComponentHandlers(
   var mediumSetup: Setup            = _
   var longSetup: Setup              = _
 
+  import cswCtx._
   override def initialize(): Future[Unit] =
     componentInfo.connections.headOption match {
       case Some(hcd) ⇒

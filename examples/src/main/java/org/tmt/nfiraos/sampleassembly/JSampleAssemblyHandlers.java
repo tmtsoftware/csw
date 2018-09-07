@@ -59,14 +59,12 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
     JSampleAssemblyHandlers(
             ActorContext<TopLevelActorMessage> ctx,
             ComponentInfo componentInfo,
-            CommandResponseManager commandResponseManager,
-            CurrentStatePublisher currentStatePublisher,
             JCswContext cswCtx
     ) {
-        super(ctx, componentInfo, commandResponseManager, currentStatePublisher, cswCtx);
-        this.currentStatePublisher = currentStatePublisher;
+        super(ctx, componentInfo, cswCtx);
+        this.currentStatePublisher = cswCtx.currentStatePublisher();
         this.log = cswCtx.loggerFactory().getLogger(getClass());
-        this.commandResponseManager = commandResponseManager;
+        this.commandResponseManager = cswCtx.commandResponseManager();
         this.actorContext = ctx;
         this.locationService = cswCtx.locationService();
         this.eventService = cswCtx.eventService();

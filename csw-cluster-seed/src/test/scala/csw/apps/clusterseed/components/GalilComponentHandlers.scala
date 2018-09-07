@@ -19,14 +19,10 @@ case class StartLogging()
 class GalilComponentHandlers(
     ctx: ActorContext[TopLevelActorMessage],
     componentInfo: ComponentInfo,
-    commandResponseManager: CommandResponseManager,
-    currentStatePublisher: CurrentStatePublisher,
     cswCtx: CswContext
 ) extends ComponentHandlers(
       ctx,
       componentInfo,
-      commandResponseManager,
-      currentStatePublisher,
       cswCtx
     ) {
   val log: Logger = new LoggerFactory(componentInfo.name).getLogger

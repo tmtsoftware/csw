@@ -50,7 +50,6 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
     spawnedEffects should contain allOf (
       componentTLAName,
       SupervisorBehavior.PubSubLifecycleActor,
-      SupervisorBehavior.PubSubComponentActor
     )
   }
 
@@ -59,11 +58,9 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
 
     val componentActor       = supervisorBehaviorTestKit.childInbox(componentTLAName).ref
     val pubSubLifecycleActor = supervisorBehaviorTestKit.childInbox(SupervisorBehavior.PubSubLifecycleActor).ref
-    val pubSubComponentActor = supervisorBehaviorTestKit.childInbox(SupervisorBehavior.PubSubComponentActor).ref
 
     supervisorBehaviorTestKit.retrieveAllEffects() should contain(Watched(componentActor))
     supervisorBehaviorTestKit.retrieveAllEffects() should not contain Watched(pubSubLifecycleActor)
-    supervisorBehaviorTestKit.retrieveAllEffects() should not contain Watched(pubSubComponentActor)
   }
 
   private def createBehavior(timerScheduler: TimerScheduler[SupervisorMessage]): Behavior[ComponentMessage] = {
@@ -77,7 +74,6 @@ class SupervisorBehaviorTest extends FrameworkTestSuite with MockitoSugar {
             None,
             hcdInfo,
             new SampleComponentBehaviorFactory,
-            commandResponseManagerFactory,
             registrationFactory,
             cswCtx
         )
