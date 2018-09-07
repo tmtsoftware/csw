@@ -109,6 +109,7 @@ lazy val `csw-logging` = project
 //Location service related projects
 lazy val `csw-location` = project
   .dependsOn(
+    `csw-location-api`,
     `csw-logging`,
     `csw-messages`,
     `csw-commons` % "test->test"
@@ -116,6 +117,15 @@ lazy val `csw-location` = project
   .enablePlugins(PublishBintray, GenJavadocPlugin, AutoMultiJvm, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.Location.value
+  )
+
+lazy val `csw-location-api` = project
+  .dependsOn(
+    `csw-params-jvm`
+  )
+  .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
+  .settings(
+    libraryDependencies ++= Dependencies.LocationApi.value
   )
 
 //Cluster seed
@@ -187,6 +197,7 @@ lazy val `csw-config-client-cli` = project
 lazy val `csw-command` = project
   .dependsOn(
     `csw-messages`,
+    `csw-location-api`,
     `csw-logging`,
     `csw-commons` % "test->test"
   )

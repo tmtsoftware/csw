@@ -84,6 +84,16 @@ object Dependencies {
     )
   )
 
+  val LocationApi = Def.setting(
+    Seq(
+      Akka.`akka-actor-typed`,
+      Libs.`scala-java8-compat`,
+      Enumeratum.`enumeratum`.value,
+      Libs.`upickle`.value,
+      Libs.`scalatest`.value % Test
+    )
+  )
+
   val LocationAgent = Def.setting(
     Seq(
       Akka.`akka-actor`,
