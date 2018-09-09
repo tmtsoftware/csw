@@ -1,6 +1,7 @@
 package csw.services.location.commons
 
 import com.typesafe.config.ConfigException
+import csw.messages.location.commons.Constants
 import csw.services.location.internal.Networks
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}

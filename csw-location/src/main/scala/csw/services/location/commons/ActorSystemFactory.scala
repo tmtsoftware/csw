@@ -2,6 +2,7 @@ package csw.services.location.commons
 
 import akka.actor.ActorSystem
 import com.typesafe.config.ConfigFactory
+import csw.messages.location.commons.Constants
 import csw.services.logging.scaladsl.Logger
 
 /**

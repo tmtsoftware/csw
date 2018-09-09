@@ -10,7 +10,8 @@ import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.params.models.Prefix
 import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.commons.{ActorSystemFactory, ClusterSettings, CswCluster}
-import csw.services.location.models.{AkkaRegistration, RegistrationResult}
+import csw.messages.location.models.AkkaRegistration
+import csw.services.location.models.RegistrationResult
 import csw.services.location.scaladsl.LocationServiceFactory
 import csw.services.logging.messages.LogControlMessages
 

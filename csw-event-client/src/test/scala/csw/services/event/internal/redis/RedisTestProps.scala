@@ -6,6 +6,7 @@ import com.typesafe.config.ConfigFactory
 import csw.commons.redis.EmbeddedRedis
 import csw.commons.utils.SocketUtils.getFreePort
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
+import csw.messages.location.scaladsl.LocationService
 import csw.services.event.EventServiceFactory
 import csw.services.event.api.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
 import csw.services.event.api.scaladsl._
@@ -13,7 +14,6 @@ import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.internal.commons.javawrappers.JEventService
 import csw.services.event.internal.wiring.BaseProperties
 import csw.services.event.models.EventStores.RedisStore
-import csw.services.location.scaladsl.LocationService
 import io.lettuce.core.api.async.RedisAsyncCommands
 import io.lettuce.core.codec.StringCodec
 import io.lettuce.core.{ClientOptions, RedisClient, RedisURI}

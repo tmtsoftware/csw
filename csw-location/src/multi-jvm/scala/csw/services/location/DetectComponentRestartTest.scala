@@ -5,11 +5,11 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.ActorMaterializer
 import akka.testkit.TestProbe
 import csw.messages.location.Connection.AkkaConnection
+import csw.messages.location.models.AkkaRegistration
 import csw.messages.location.{ComponentId, ComponentType, LocationRemoved, LocationUpdated}
 import csw.messages.params.models.Prefix
 import csw.services.location.commons.CswCluster
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
-import csw.services.location.models._
 import csw.services.location.scaladsl.LocationServiceFactory
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 

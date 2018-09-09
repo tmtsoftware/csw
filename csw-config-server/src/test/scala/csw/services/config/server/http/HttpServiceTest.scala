@@ -6,7 +6,7 @@ import csw.services.config.server.ServerWiring
 import csw.services.config.server.commons.TestFutureExtension.RichFuture
 import csw.services.config.server.commons.{ConfigServiceConnection, RegistrationFactory}
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
-import csw.services.location.exceptions.OtherLocationIsRegistered
+import csw.messages.location.exceptions.OtherLocationIsRegistered
 import csw.services.location.scaladsl.LocationServiceFactory
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 

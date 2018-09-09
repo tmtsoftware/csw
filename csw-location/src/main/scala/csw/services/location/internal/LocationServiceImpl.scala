@@ -10,17 +10,18 @@ import akka.stream.{KillSwitch, OverflowStrategy}
 import akka.util.Timeout
 import csw.messages.location._
 import csw.services.location.commons.{CswCluster, LocationServiceLogger}
-import csw.services.location.exceptions.{
+import csw.messages.location.exceptions.{
   OtherLocationIsRegistered,
   RegistrationFailed,
   RegistrationListingFailed,
   UnregistrationFailed
 }
+import csw.messages.location.javadsl.ILocationService
+import csw.messages.location.models.Registration
+import csw.messages.location.scaladsl.LocationService
 import csw.services.location.internal.Registry.AllServices
 import csw.services.location.internal.StreamExt.RichSource
-import csw.services.location.javadsl.ILocationService
 import csw.services.location.models._
-import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.Logger
 
 import scala.async.Async._

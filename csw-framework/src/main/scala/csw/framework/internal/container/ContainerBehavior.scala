@@ -8,23 +8,23 @@ import akka.actor.typed.scaladsl.{ActorContext, MutableBehavior}
 import akka.actor.typed.{ActorRef, Behavior, PostStop, Signal, Terminated}
 import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.framework.models._
-import csw.messages.{ComponentMessage, ContainerActorMessage, ContainerCommonMessage, ContainerIdleMessage}
-import csw.messages.commons.CoordinatedShutdownReasons.{AllActorsWithinContainerTerminatedReason, FailedToCreateSupervisorsReason}
-import csw.messages.framework._
-import csw.messages.location.Connection.AkkaConnection
-import csw.messages.location.{ComponentId, ComponentType}
-import csw.messages.params.models.Prefix
-import csw.messages.params.models.Subsystem.Container
 import csw.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.messages.ContainerIdleMessage.SupervisorsCreated
 import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.messages.RunningMessage.Lifecycle
 import csw.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
+import csw.messages.commons.CoordinatedShutdownReasons.{AllActorsWithinContainerTerminatedReason, FailedToCreateSupervisorsReason}
+import csw.messages.framework._
+import csw.messages.location.Connection.AkkaConnection
+import csw.messages.location.models.AkkaRegistration
+import csw.messages.location.scaladsl.LocationService
+import csw.messages.location.{ComponentId, ComponentType}
+import csw.messages.params.models.Prefix
+import csw.messages.params.models.Subsystem.Container
 import csw.messages.{ComponentMessage, ContainerActorMessage, ContainerCommonMessage, ContainerIdleMessage}
 import csw.services.alarm.client.AlarmServiceFactory
 import csw.services.event.EventServiceFactory
-import csw.services.location.models._
-import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
+import csw.services.location.scaladsl.RegistrationFactory
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
 import scala.concurrent.Future
@@ -36,7 +36,7 @@ import scala.util.{Failure, Success}
  * @param ctx the [[akka.actor.typed.scaladsl.ActorContext]] under which the actor instance of this behavior is created
  * @param containerInfo container related information as described in the configuration file
  * @param supervisorInfoFactory the factory for creating the Supervisors for components described in ContainerInfo
- * @param registrationFactory the factory for creating a typed [[csw.services.location.models.AkkaRegistration]] from
+ * @param registrationFactory the factory for creating a typed [[csw.messages.location.models.AkkaRegistration]] from
                               [[csw.messages.location.Connection.AkkaConnection]]
  * @param eventServiceFactory the factory to create instance of event service to be used by components to use and/or create publishers and subscribers
  * @param locationService the single instance of Location service created for a running application

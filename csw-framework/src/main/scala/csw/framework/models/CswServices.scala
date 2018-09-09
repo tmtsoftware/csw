@@ -4,6 +4,7 @@ import csw.framework.CurrentStatePublisher
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.internal.wiring.CswFrameworkSystem
 import csw.messages.framework.ComponentInfo
+import csw.messages.location.scaladsl.LocationService
 import csw.messages.params.states.CurrentState
 import csw.services.alarm.api.scaladsl.AlarmService
 import csw.services.alarm.client.AlarmServiceFactory
@@ -13,7 +14,6 @@ import csw.services.config.api.scaladsl.ConfigClientService
 import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.event.EventServiceFactory
 import csw.services.event.api.scaladsl.EventService
-import csw.services.location.scaladsl.LocationService
 import csw.services.logging.scaladsl.LoggerFactory
 
 import scala.async.Async.{async, await}

@@ -2,10 +2,10 @@ package csw.services.location.scaladsl
 
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.location.Connection.TcpConnection
+import csw.messages.location.models.TcpRegistration
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.location.commons._
-import csw.services.location.models.TcpRegistration
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 import scala.concurrent.duration.DurationInt

@@ -11,7 +11,7 @@ import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
 import csw.messages.commons.CoordinatedShutdownReasons.FailureReason
 import csw.services.location.commons.ClusterConfirmationActor.HasJoinedCluster
-import csw.services.location.exceptions.{CouldNotEnsureDataReplication, CouldNotJoinCluster}
+import csw.messages.location.exceptions.{CouldNotEnsureDataReplication, CouldNotJoinCluster}
 import csw.services.logging.scaladsl.Logger
 
 import scala.concurrent.duration.DurationInt

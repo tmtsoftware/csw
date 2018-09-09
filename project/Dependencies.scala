@@ -89,7 +89,6 @@ object Dependencies {
       Akka.`akka-actor-typed`,
       Libs.`scala-java8-compat`,
       Enumeratum.`enumeratum`.value,
-      Libs.`upickle`.value,
       Libs.`scalatest`.value % Test
     )
   )
@@ -142,6 +141,7 @@ object Dependencies {
   val ConfigClient = Def.setting(
     Seq(
       AkkaHttp.`akka-http`,
+      Libs.`scala-async`,
       Libs.`scalatest`.value         % Test,
       Libs.`junit`                   % Test,
       Libs.`junit-interface`         % Test,
@@ -215,6 +215,7 @@ object Dependencies {
     Seq(
       Libs.`play-json`.value,
       Libs.`play-json-derived-codecs`.value,
+      AkkaHttp.`akka-http`,
       Libs.`scopt`,
       Libs.`scala-csv`,
       Libs.`scalatest`.value % Test,

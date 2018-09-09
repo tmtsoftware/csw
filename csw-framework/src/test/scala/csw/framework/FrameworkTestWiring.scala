@@ -7,10 +7,12 @@ import akka.stream.{ActorMaterializer, Materializer}
 import csw.commons.redis.EmbeddedRedis
 import csw.commons.utils.SocketUtils
 import csw.messages.location.Connection.TcpConnection
+import csw.messages.location.models.TcpRegistration
+import csw.messages.location.scaladsl.LocationService
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.location.commons.ClusterSettings
-import csw.services.location.models.{RegistrationResult, TcpRegistration}
-import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
+import csw.services.location.models.RegistrationResult
+import csw.services.location.scaladsl.LocationServiceFactory
 import csw.services.logging.commons.LogAdminActorFactory
 import redis.embedded.{RedisSentinel, RedisServer}
 

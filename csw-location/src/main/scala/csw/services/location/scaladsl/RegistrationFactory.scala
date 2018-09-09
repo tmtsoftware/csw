@@ -2,8 +2,8 @@ package csw.services.location.scaladsl
 
 import akka.actor.typed.ActorRef
 import csw.messages.location.Connection.AkkaConnection
+import csw.messages.location.models.AkkaRegistration
 import csw.messages.params.models.Prefix
-import csw.services.location.models.AkkaRegistration
 import csw.services.logging.messages.LogControlMessages
 
 /**
@@ -18,7 +18,7 @@ class RegistrationFactory(logAdminActorRef: ActorRef[LogControlMessages]) {
 
   /**
    * Creates an AkkaRegistration from provided parameters. Currently, it is used to register components except Container.
-   * A [[csw.services.location.exceptions.LocalAkkaActorRegistrationNotAllowed]] can be thrown if the actorRef provided
+   * A [[csw.messages.location.exceptions.LocalAkkaActorRegistrationNotAllowed]] can be thrown if the actorRef provided
    * is not a remote actorRef.
    *
    * @param akkaConnection the AkkaConnection representing the component

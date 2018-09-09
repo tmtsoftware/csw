@@ -1,25 +1,25 @@
 package csw.services.integtration.tests
 
-import akka.actor.{ActorSystem, Props, Scheduler}
-import akka.actor.typed
-import akka.actor.typed.Behavior
-import akka.actor.typed.scaladsl.adapter._
 import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.TestProbe
+import akka.actor.typed.Behavior
+import akka.actor.typed.scaladsl.adapter._
+import akka.actor.{typed, ActorSystem, Props, Scheduler}
 import akka.util.Timeout
 import csw.messages.CommandMessage.Submit
 import csw.messages.commands.{CommandName, Setup}
-import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
-import csw.messages.location.{AkkaLocation, ComponentId, ComponentType, HttpLocation}
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
+import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
+import csw.messages.location.exceptions.OtherLocationIsRegistered
+import csw.messages.location.models.AkkaRegistration
+import csw.messages.location.scaladsl.LocationService
+import csw.messages.location.{AkkaLocation, ComponentId, ComponentType, HttpLocation}
 import csw.messages.params.models.Prefix
 import csw.services.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.services.integtration.apps.TromboneHCD
 import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.commons.ClusterAwareSettings
-import csw.services.location.exceptions.OtherLocationIsRegistered
-import csw.services.location.models._
-import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
+import csw.services.location.scaladsl.LocationServiceFactory
 import csw.services.logging.messages.LogControlMessages
 import org.scalatest._
 

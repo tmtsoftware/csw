@@ -5,8 +5,9 @@ import com.typesafe.config.{Config, ConfigFactory}
 import csw.apps.clusterseed.admin.LogAdmin
 import csw.apps.clusterseed.admin.http.{AdminExceptionHandlers, AdminHttpService, AdminRoutes}
 import csw.apps.clusterseed.location.{LocationExceptionHandler, LocationHttpService, LocationRoutes}
+import csw.messages.location.scaladsl.LocationService
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
-import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
+import csw.services.location.scaladsl.LocationServiceFactory
 
 // $COVERAGE-OFF$
 private[clusterseed] class AdminWiring {

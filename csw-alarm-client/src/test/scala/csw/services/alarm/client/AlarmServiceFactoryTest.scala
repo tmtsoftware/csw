@@ -2,13 +2,13 @@ package csw.services.alarm.client
 import com.typesafe.config.ConfigFactory
 import csw.commons.utils.SocketUtils.getFreePort
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
+import csw.messages.location.models.TcpRegistration
 import csw.services.alarm.api.models.AlarmSeverity.Indeterminate
 import csw.services.alarm.api.scaladsl.{AlarmAdminService, AlarmService}
 import csw.services.alarm.client.internal.commons.AlarmServiceConnection
 import csw.services.alarm.client.internal.helpers.AlarmServiceTestSetup
 import csw.services.alarm.client.internal.helpers.TestFutureExt.RichFuture
 import csw.services.location.commons.ClusterAwareSettings
-import csw.services.location.models.TcpRegistration
 import csw.services.location.scaladsl.LocationServiceFactory
 import csw.services.logging.commons.LogAdminActorFactory
 

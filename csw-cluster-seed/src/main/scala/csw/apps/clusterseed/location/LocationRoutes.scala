@@ -2,15 +2,15 @@ package csw.apps.clusterseed.location
 
 import akka.NotUsed
 import akka.actor.ActorSystem
+import akka.http.scaladsl.marshalling.sse.EventStreamMarshalling._
 import akka.http.scaladsl.model.sse.ServerSentEvent
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.stream.scaladsl.Source
 import csw.apps.clusterseed.internal.ActorRuntime
 import csw.messages.location._
-import csw.services.location.models.Registration
-import csw.services.location.scaladsl.LocationService
-import akka.http.scaladsl.marshalling.sse.EventStreamMarshalling._
+import csw.messages.location.models.Registration
+import csw.messages.location.scaladsl.LocationService
 import csw.services.location.internal.LocationJsonSupport
 import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
 import play.api.libs.json.Json

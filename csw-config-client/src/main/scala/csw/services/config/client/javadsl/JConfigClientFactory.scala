@@ -1,10 +1,10 @@
 package csw.services.config.client.javadsl
 
 import akka.actor.ActorSystem
+import csw.messages.location.javadsl.ILocationService
 import csw.services.config.api.javadsl.{IConfigClientService, IConfigService}
 import csw.services.config.client.internal.{ActorRuntime, JConfigService}
 import csw.services.config.client.scaladsl.ConfigClientFactory
-import csw.services.location.javadsl.ILocationService
 
 /**
  * The factory is used to create ConfigClient instance.

@@ -1,6 +1,7 @@
 package csw.services.location.javadsl
 
 import akka.actor.ActorSystem
+import csw.messages.location.javadsl.ILocationService
 import csw.services.location.commons.{ClusterSettings, CswCluster}
 import csw.services.location.internal.JLocationServiceImpl
 import csw.services.location.scaladsl.LocationServiceFactory
@@ -16,8 +17,8 @@ object JLocationServiceFactory {
   /**
    * Create an ILocationService instance to manage registrations
    *
-   * @throws csw.services.location.exceptions.CouldNotEnsureDataReplication
-   * @throws csw.services.location.exceptions.CouldNotJoinCluster
+   * @throws csw.messages.location.exceptions.CouldNotEnsureDataReplication
+   * @throws csw.messages.location.exceptions.CouldNotJoinCluster
    * @return an instance of `ILocationService`
    */
   def make(): ILocationService = withCluster(CswCluster.make())
@@ -26,8 +27,8 @@ object JLocationServiceFactory {
    * Create an ILocationService instance to manage registrations
    *
    * @param actorSystem the actorSystem used to feed in `CswCluster` and use it's config properties to join the cluster
-   * @throws csw.services.location.exceptions.CouldNotEnsureDataReplication
-   * @throws csw.services.location.exceptions.CouldNotJoinCluster
+   * @throws csw.messages.location.exceptions.CouldNotEnsureDataReplication
+   * @throws csw.messages.location.exceptions.CouldNotJoinCluster
    * @return an instance of `ILocationService`
    */
   def withSystem(actorSystem: ActorSystem): ILocationService =
@@ -38,8 +39,8 @@ object JLocationServiceFactory {
    *
    * @note it is highly recommended to use this method for testing purpose only
    * @param clusterSettings the custom clusterSettings used to join the cluster
-   * @throws csw.services.location.exceptions.CouldNotEnsureDataReplication
-   * @throws csw.services.location.exceptions.CouldNotJoinCluster
+   * @throws csw.messages.location.exceptions.CouldNotEnsureDataReplication
+   * @throws csw.messages.location.exceptions.CouldNotJoinCluster
    * @return an instance of `ILocationService`
    */
   def withSettings(clusterSettings: ClusterSettings): ILocationService =
@@ -50,8 +51,8 @@ object JLocationServiceFactory {
    *
    * @note it is highly recommended to use it for testing purpose only
    * @param cswCluster the cswCluster instance used to join the cluster
-   * @throws csw.services.location.exceptions.CouldNotEnsureDataReplication
-   * @throws csw.services.location.exceptions.CouldNotJoinCluster
+   * @throws csw.messages.location.exceptions.CouldNotEnsureDataReplication
+   * @throws csw.messages.location.exceptions.CouldNotJoinCluster
    * @return an instance of `ILocationService`
    */
   def withCluster(cswCluster: CswCluster): ILocationService = {

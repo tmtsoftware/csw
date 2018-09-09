@@ -1,9 +1,9 @@
 package csw.services.config.client.scaladsl
 
 import akka.actor.ActorSystem
+import csw.messages.location.scaladsl.LocationService
 import csw.services.config.api.scaladsl.{ConfigClientService, ConfigService}
 import csw.services.config.client.internal.{ActorRuntime, ConfigClient, ConfigServiceResolver}
-import csw.services.location.scaladsl.LocationService
 
 /**
  * The factory is used to create ConfigClient instance.

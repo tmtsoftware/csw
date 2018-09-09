@@ -11,9 +11,10 @@ import akka.actor.CoordinatedShutdown.Reason
 import akka.stream.KillSwitch
 import akka.stream.javadsl.Source
 import csw.messages.location._
-import csw.services.location.javadsl.{ILocationService, IRegistrationResult}
+import csw.messages.location.javadsl.{ILocationService, IRegistrationResult}
+import csw.messages.location.models.Registration
+import csw.messages.location.scaladsl.LocationService
 import csw.services.location.models._
-import csw.services.location.scaladsl.LocationService
 
 import scala.collection.JavaConverters._
 import scala.compat.java8.DurationConverters.DurationOps

@@ -20,7 +20,7 @@ import csw.messages.params.generics.Parameter;
 import csw.messages.params.models.Id;
 import csw.services.command.CommandResponseManager;
 import csw.services.event.api.javadsl.IEventService;
-import csw.services.location.javadsl.ILocationService;
+import csw.messages.location.javadsl.ILocationService;
 import csw.services.logging.javadsl.ILogger;
 
 import java.time.Duration;

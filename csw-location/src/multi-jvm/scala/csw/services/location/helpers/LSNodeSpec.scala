@@ -4,8 +4,9 @@ import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.remote.testkit.{MultiNodeSpec, MultiNodeSpecCallbacks}
 import akka.testkit.ImplicitSender
+import csw.messages.location.scaladsl.LocationService
 import csw.services.location.commons.CswCluster
-import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
+import csw.services.location.scaladsl.LocationServiceFactory
 import org.scalatest.{BeforeAndAfterAll, FunSuiteLike, Matchers}
 
 abstract class LSNodeSpec[T <: NMembersAndSeed](val config: T, mode: String = "cluster")

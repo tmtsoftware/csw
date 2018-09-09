@@ -6,14 +6,15 @@ import com.typesafe.config.ConfigFactory
 import csw.apps.clusterseed.client.HTTPLocationService
 import csw.commons.redis.EmbeddedRedis
 import csw.messages.commons.CoordinatedShutdownReasons
+import csw.messages.location.scaladsl.LocationService
 import csw.services.BuildInfo
 import csw.services.alarm.cli.args.ArgsParser
 import csw.services.alarm.cli.wiring.Wiring
 import csw.services.alarm.client.internal.commons.AlarmServiceConnection
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.location.commons.ActorSystemFactory
-import csw.services.location.models.TcpRegistration
-import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
+import csw.messages.location.models.TcpRegistration
+import csw.services.location.scaladsl.LocationServiceFactory
 import csw.services.logging.commons.LogAdminActorFactory
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.time.SpanSugar.convertFloatToGrainOfTime

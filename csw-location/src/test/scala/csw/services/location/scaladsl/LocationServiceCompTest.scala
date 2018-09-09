@@ -10,12 +10,13 @@ import akka.testkit.TestProbe
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location._
+import csw.messages.location.exceptions.OtherLocationIsRegistered
+import csw.messages.location.models.{HttpRegistration, TcpRegistration}
+import csw.messages.location.scaladsl.LocationService
 import csw.messages.params.models.Prefix
 import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.location.commons.{ActorSystemFactory, TestRegistrationFactory}
-import csw.services.location.exceptions.OtherLocationIsRegistered
 import csw.services.location.internal.Networks
-import csw.services.location.models._
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}

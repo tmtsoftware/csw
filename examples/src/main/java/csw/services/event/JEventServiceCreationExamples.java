@@ -3,7 +3,7 @@ package csw.services.event;
 import akka.actor.ActorSystem;
 import csw.services.event.api.javadsl.IEventService;
 import csw.services.event.models.EventStores;
-import csw.services.location.javadsl.ILocationService;
+import csw.messages.location.javadsl.ILocationService;
 import io.lettuce.core.ClientOptions;
 import io.lettuce.core.RedisClient;
 

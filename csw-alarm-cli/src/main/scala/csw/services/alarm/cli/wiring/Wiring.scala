@@ -1,8 +1,9 @@
 package csw.services.alarm.cli.wiring
 import akka.actor.ActorSystem
+import csw.messages.location.scaladsl.LocationService
 import csw.services.alarm.cli.utils.ConfigUtils
 import csw.services.alarm.cli.{AlarmAdminClient, CommandExecutor}
-import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
+import csw.services.location.scaladsl.LocationServiceFactory
 
 class Wiring(actorSystem: ActorSystem) {
   lazy val actorRuntime = new ActorRuntime(actorSystem)

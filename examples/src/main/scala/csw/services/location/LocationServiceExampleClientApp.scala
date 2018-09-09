@@ -11,12 +11,13 @@ import csw.messages.{ComponentMessage, ContainerMessage}
 import csw.messages.commons.CoordinatedShutdownReasons.ActorTerminatedReason
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
 import csw.messages.location._
+import csw.messages.location.models.{AkkaRegistration, HttpRegistration}
+import csw.messages.location.scaladsl.LocationService
 import csw.messages.params.models.Prefix
-import csw.messages.ContainerMessage
 import csw.services.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.models._
-import csw.services.location.scaladsl.{LocationService, LocationServiceFactory, RegistrationFactory}
+import csw.services.location.scaladsl.{LocationServiceFactory, RegistrationFactory}
 import csw.services.logging.commons.LogAdminActorFactory
 import csw.services.logging.internal.LoggingSystem
 import csw.services.logging.messages.LogControlMessages

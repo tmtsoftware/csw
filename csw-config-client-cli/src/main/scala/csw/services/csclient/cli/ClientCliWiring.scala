@@ -1,11 +1,12 @@
 package csw.services.csclient.cli
 
 import akka.actor.ActorSystem
+import csw.messages.location.scaladsl.LocationService
 import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.client.internal.ActorRuntime
 import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.location.commons.{ClusterSettings, CswCluster}
-import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
+import csw.services.location.scaladsl.LocationServiceFactory
 
 /**
  * ClientCliWiring lazily joins the akka cluster and starts the app. After joining the cluster, it first resolves the location

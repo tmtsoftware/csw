@@ -12,7 +12,7 @@ import csw.services.config.server.ServerWiring;
 import csw.services.config.server.commons.TestFileUtils;
 import csw.services.config.server.http.HttpService;
 import csw.services.location.commons.ClusterAwareSettings;
-import csw.services.location.javadsl.ILocationService;
+import csw.messages.location.javadsl.ILocationService;
 import csw.services.location.javadsl.JLocationServiceFactory;
 import org.junit.*;
 import scala.concurrent.Await;

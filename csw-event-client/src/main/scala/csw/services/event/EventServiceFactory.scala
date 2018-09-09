@@ -2,6 +2,8 @@ package csw.services.event
 
 import akka.actor.ActorSystem
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Materializer}
+import csw.messages.location.javadsl.ILocationService
+import csw.messages.location.scaladsl.LocationService
 import csw.services.event.api.javadsl.IEventService
 import csw.services.event.api.scaladsl.EventService
 import csw.services.event.internal.commons.EventStreamSupervisionStrategy
@@ -15,8 +17,6 @@ import csw.services.event.internal.kafka.KafkaEventService
 import csw.services.event.internal.redis.RedisEventService
 import csw.services.event.models.EventStore
 import csw.services.event.models.EventStores.{KafkaStore, RedisStore}
-import csw.services.location.javadsl.ILocationService
-import csw.services.location.scaladsl.LocationService
 
 import scala.concurrent.ExecutionContext
 

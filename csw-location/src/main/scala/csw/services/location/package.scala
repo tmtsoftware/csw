@@ -18,7 +18,7 @@ package csw.services
  *
  * Location service make use of classes defined in `csw-messages` package, for example:
  * - [[csw.messages.location.Location]] :
- *  When you resolve component location using [[csw.services.location.scaladsl.LocationService]], you get back this location.
+ *  When you resolve component location using [[csw.messages.location.scaladsl.LocationService]], you get back this location.
  *  There are three types of Locations:
  *   - [[csw.messages.location.AkkaLocation]]: holds hostname, port and actorRef which is ready to receive [[csw.messages.commands.Command]] from outside.
  *   - [[csw.messages.location.TcpLocation]]: holds hostname and port which can be used for further communication.

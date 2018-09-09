@@ -7,10 +7,11 @@ import akka.http.scaladsl.model.{HttpRequest, StatusCodes, Uri}
 import akka.stream.{ActorMaterializer, Materializer}
 import com.typesafe.config.ConfigFactory
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
+import csw.messages.location.scaladsl.LocationService
 import csw.services.config.server.commons.TestFutureExtension.RichFuture
 import csw.services.config.server.commons.{ConfigServiceConnection, TestFileUtils}
 import csw.services.location.commons.ClusterSettings
-import csw.services.location.scaladsl.{LocationService, LocationServiceFactory}
+import csw.services.location.scaladsl.LocationServiceFactory
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 import org.tmatesoft.svn.core.SVNException
 

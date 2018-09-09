@@ -3,9 +3,9 @@ package csw.services.alarm.cli.utils
 import java.nio.file.{Files, Path}
 
 import com.typesafe.config.{Config, ConfigFactory}
+import csw.messages.location.scaladsl.LocationService
 import csw.services.alarm.cli.wiring.ActorRuntime
 import csw.services.config.client.scaladsl.ConfigClientFactory
-import csw.services.location.scaladsl.LocationService
 
 import scala.async.Async.{async, await}
 import scala.concurrent.Future

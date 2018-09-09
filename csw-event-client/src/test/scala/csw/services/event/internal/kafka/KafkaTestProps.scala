@@ -5,6 +5,7 @@ import akka.actor.{ActorSystem, CoordinatedShutdown}
 import akka.kafka.ProducerSettings
 import csw.commons.utils.SocketUtils.getFreePort
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
+import csw.messages.location.scaladsl.LocationService
 import csw.services.event.EventServiceFactory
 import csw.services.event.api.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
 import csw.services.event.api.scaladsl.{EventPublisher, EventService, EventSubscriber}
@@ -13,7 +14,6 @@ import csw.services.event.internal.wiring.BaseProperties
 import csw.services.event.internal.wiring.BaseProperties.createInfra
 import csw.services.event.models.EventStores.KafkaStore
 import csw.services.location.commons.ClusterAwareSettings
-import csw.services.location.scaladsl.LocationService
 import net.manub.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.StringSerializer

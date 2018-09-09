@@ -1,6 +1,6 @@
-package csw.services.location.commons
+package csw.messages.location.commons
 
-private[location] object Constants {
+private[csw] object Constants {
 
   // CRDT Key to hold list of all components registered with location service in the form of connection -> location
   val RegistryKey = "location-service-registry"

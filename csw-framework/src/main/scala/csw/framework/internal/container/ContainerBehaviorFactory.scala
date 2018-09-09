@@ -5,9 +5,10 @@ import akka.actor.typed.scaladsl.Behaviors
 import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.framework.models.ContainerInfo
 import csw.messages.ContainerActorMessage
+import csw.messages.location.scaladsl.LocationService
 import csw.services.alarm.client.AlarmServiceFactory
 import csw.services.event.EventServiceFactory
-import csw.services.location.scaladsl.{LocationService, RegistrationFactory}
+import csw.services.location.scaladsl.RegistrationFactory
 import csw.services.logging.scaladsl.LoggerFactory
 
 /**

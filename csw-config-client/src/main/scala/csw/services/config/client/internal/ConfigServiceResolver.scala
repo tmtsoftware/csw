@@ -1,8 +1,8 @@
 package csw.services.config.client.internal
 
 import akka.http.scaladsl.model.Uri
+import csw.messages.location.scaladsl.LocationService
 import csw.services.config.client.commons.ConfigServiceConnection
-import csw.services.location.scaladsl.LocationService
 
 import scala.async.Async._
 import scala.concurrent.Future
