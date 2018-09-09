@@ -5,7 +5,7 @@ import akka.stream.Materializer
 import akka.stream.scaladsl.Source
 import akka.util.Timeout
 import csw.messages.commands.CommandResponse.Completed
-import csw.messages.commands.{CommandIssue, CommandResponse, ControlCommand}
+import csw.messages.commands.{CommandIssue, CommandResponse, CommandResponseAggregator, ControlCommand}
 import csw.messages.params.models.Id
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -36,7 +36,7 @@ case class CommandDistributor(componentToCommands: Map[CommandService, Set[Contr
       breadth,
       { case (component, commands) ⇒ component.submitAll(commands) }
     )
-    CommandResponse.aggregateResponse(commandResponsesF).map {
+    CommandResponseAggregator.aggregateResponse(commandResponsesF).map {
       case _: Completed  ⇒ CommandResponse.Accepted(Id())
       case otherResponse ⇒ CommandResponse.Invalid(Id(), CommandIssue.OtherIssue("One or more commands were Invalid"))
     }
@@ -59,6 +59,6 @@ case class CommandDistributor(componentToCommands: Map[CommandService, Set[Contr
       breadth,
       { case (component, commands) ⇒ component.submitAllAndSubscribe(commands) }
     )
-    CommandResponse.aggregateResponse(commandResponsesF)
+    CommandResponseAggregator.aggregateResponse(commandResponsesF)
   }
 }

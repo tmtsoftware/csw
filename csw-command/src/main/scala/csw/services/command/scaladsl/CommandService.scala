@@ -12,7 +12,7 @@ import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.commands.CommandResponse.{Accepted, Completed, Error}
 import csw.messages.commands.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
 import csw.messages.commands.matchers.{Matcher, StateMatcher}
-import csw.messages.commands.{CommandResponse, ControlCommand}
+import csw.messages.commands.{CommandResponse, CommandResponseAggregator, ControlCommand}
 import csw.messages.location.AkkaLocation
 import csw.messages.params.models.Id
 import csw.messages.params.states.{CurrentState, StateName}
@@ -66,7 +66,7 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
    */
   def submitAllAndGetResponse(controlCommands: Set[ControlCommand])(implicit timeout: Timeout): Future[CommandResponse] = {
     val value = Source(controlCommands).mapAsyncUnordered(parallelism)(submit)
-    CommandResponse.aggregateResponse(value).map {
+    CommandResponseAggregator.aggregateResponse(value).map {
       case _: Completed  ⇒ CommandResponse.Accepted(Id())
       case otherResponse ⇒ otherResponse
     }
@@ -158,7 +158,7 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
    */
   def submitAllAndGetFinalResponse(controlCommands: Set[ControlCommand])(implicit timeout: Timeout): Future[CommandResponse] = {
     val value = Source(controlCommands).mapAsyncUnordered(parallelism)(submitAndSubscribe)
-    CommandResponse.aggregateResponse(value)
+    CommandResponseAggregator.aggregateResponse(value)
   }
 
   /**
