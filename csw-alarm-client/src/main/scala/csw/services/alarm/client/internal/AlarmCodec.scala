@@ -2,11 +2,14 @@ package csw.services.alarm.client.internal
 
 import csw.services.alarm.api.internal._
 import csw.services.alarm.api.models._
+import play.api.libs.json.{Format, Json}
 import romaine.codec.RomaineStringCodec
-import upickle.default._
 
-object AlarmCodec extends AlarmRW {
-  def viaJsonCodec[A: ReadWriter]: RomaineStringCodec[A] = RomaineStringCodec.codec(write[A](_), read[A](_))
+object AlarmCodec extends AlarmJsonSupport {
+  def viaJsonCodec[A: Format]: RomaineStringCodec[A] = RomaineStringCodec.codec(
+    x => Json.toJson(x).toString(),
+    x => Json.parse(x).as[A]
+  )
 
   //Key Codecs
   implicit val metadataKeyRomaineCodec: RomaineStringCodec[MetadataKey]   = RomaineStringCodec.codec(_.value, MetadataKey.apply)

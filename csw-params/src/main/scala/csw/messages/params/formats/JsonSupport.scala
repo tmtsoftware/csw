@@ -16,9 +16,8 @@ object JavaJsonSupport extends JsonSupport with DerivedJsonFormats
  */
 trait JsonSupport { self: DerivedJsonFormats ⇒
 
-  def format[T](implicit x: Format[T]): Format[T] = x
-  def writes[T: Writes](x: T): JsValue            = Json.toJson(x)
-  def reads[T: Reads](x: JsValue): T              = x.as[T]
+  def writes[T: Writes](x: T): JsValue = Json.toJson(x)
+  def reads[T: Reads](x: JsValue): T   = x.as[T]
 
   implicit val commandFormat: OFormat[Command]             = derived.flat.oformat((__ \ "type").format[String])
   implicit val stateVariableFormat: OFormat[StateVariable] = derived.flat.oformat((__ \ "type").format[String])

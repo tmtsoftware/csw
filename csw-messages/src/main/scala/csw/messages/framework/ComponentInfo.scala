@@ -1,6 +1,5 @@
 package csw.messages.framework
 
-import ai.x.play.json.Jsonx
 import csw.messages.TMTSerializable
 import csw.messages.location.{ComponentType, Connection}
 import csw.messages.params.models.Prefix
@@ -47,7 +46,7 @@ case object ComponentInfo {
   private[csw] implicit val finiteDurationWrites: Writes[FiniteDuration] =
     Writes[FiniteDuration](d ⇒ Json.toJson(d.toString))
 
-  private[csw] implicit val componentInfoFormat: OFormat[ComponentInfo] = Jsonx.formatCaseClassUseDefaults[ComponentInfo]
+  private[csw] implicit val componentInfoFormat: OFormat[ComponentInfo] = Json.using[Json.WithDefaultValues].format[ComponentInfo]
 
   private def parseDuration(json: JsValue): JsResult[FiniteDuration] = json.validate[String].flatMap { str =>
     str.split(" ") match {

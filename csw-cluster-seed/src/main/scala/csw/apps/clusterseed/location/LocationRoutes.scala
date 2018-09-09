@@ -11,9 +11,9 @@ import csw.messages.location._
 import csw.services.location.models.Registration
 import csw.services.location.scaladsl.LocationService
 import akka.http.scaladsl.marshalling.sse.EventStreamMarshalling._
-import csw.services.location.internal.UpickleFormats
-import de.heikoseeberger.akkahttpupickle.UpickleSupport
-import upickle.default._
+import csw.services.location.internal.LocationJsonSupport
+import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
+import play.api.libs.json.Json
 
 import scala.concurrent.duration.{Duration, DurationLong, FiniteDuration}
 
@@ -21,8 +21,8 @@ private[csw] class LocationRoutes(
     locationService: LocationService,
     locationExceptionHandler: LocationExceptionHandler,
     actorRuntime: ActorRuntime
-) extends UpickleSupport
-    with UpickleFormats {
+) extends PlayJsonSupport
+    with LocationJsonSupport {
 
   import actorRuntime._
 
@@ -67,7 +67,7 @@ private[csw] class LocationRoutes(
           val stream: Source[ServerSentEvent, NotUsed] = locationService
             .track(connection)
             .mapMaterializedValue(_ => NotUsed)
-            .map(trackingEvent => ServerSentEvent(write(trackingEvent)))
+            .map(trackingEvent => ServerSentEvent(Json.toJson(trackingEvent).toString()))
             .keepAlive(2.second, () => ServerSentEvent.heartbeat)
           complete(stream)
         }

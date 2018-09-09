@@ -24,7 +24,4 @@ object Prefix {
     override def writes(obj: Prefix): JsValue           = JsString(obj.prefix)
     override def reads(json: JsValue): JsResult[Prefix] = JsSuccess(Prefix(json.as[String]))
   }
-
-  import upickle.default.{macroRW, ReadWriter => RW}
-  implicit def prefixRw: RW[Prefix] = macroRW
 }

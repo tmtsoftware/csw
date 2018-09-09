@@ -83,8 +83,8 @@ object Connection {
     case HttpType ⇒ HttpConnection(componentId)
   }
 
-  private[messages] implicit val connectionReads: Reads[Connection]   = ConnectionInfo.connectionInfoFormat.map(Connection.from)
-  private[messages] implicit val connectionWrites: Writes[Connection] = Writes[Connection](c ⇒ Json.toJson(c.connectionInfo))
+  implicit val connectionReads: Reads[Connection]   = ConnectionInfo.connectionInfoFormat.map(Connection.from)
+  implicit val connectionWrites: Writes[Connection] = Writes[Connection](c ⇒ Json.toJson(c.connectionInfo))
 
   /**
    * Represents a connection offered by remote Actors e.g. TromboneAssembly-assembly-akka or TromboneHcd-hcd-akka

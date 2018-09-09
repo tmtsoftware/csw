@@ -9,37 +9,34 @@ import csw.messages.params.models.Prefix
 import scala.concurrent.duration.DurationDouble
 
 object ComponentInfos {
-  val assemblyInfo =
-    ComponentInfo(
-      "SampleAssembly",
-      Assembly,
-      Prefix("wfos"),
-      "csw.common.components.framework.SampleComponentBehaviorFactory",
-      DoNotRegister,
-      Set.empty
-    )
+  val assemblyInfo: ComponentInfo = ComponentInfo(
+    "SampleAssembly",
+    Assembly,
+    Prefix("wfos"),
+    "csw.common.components.framework.SampleComponentBehaviorFactory",
+    DoNotRegister,
+    Set.empty
+  )
 
-  val assemblyInfoToSimulateFailure =
-    ComponentInfo(
-      "trombone",
-      Assembly,
-      Prefix("wfos"),
-      "csw.common.components.framework.ComponentBehaviorFactoryToSimulateFailure",
-      DoNotRegister,
-      Set.empty
-    )
+  val assemblyInfoToSimulateFailure: ComponentInfo = ComponentInfo(
+    "trombone",
+    Assembly,
+    Prefix("wfos"),
+    "csw.common.components.framework.ComponentBehaviorFactoryToSimulateFailure",
+    DoNotRegister,
+    Set.empty
+  )
 
-  val hcdInfo =
-    ComponentInfo(
-      "SampleHcd",
-      HCD,
-      Prefix("wfos"),
-      "csw.common.components.framework.SampleComponentBehaviorFactory",
-      RegisterOnly,
-      Set.empty
-    )
+  val hcdInfo: ComponentInfo = ComponentInfo(
+    "SampleHcd",
+    HCD,
+    Prefix("wfos"),
+    "csw.common.components.framework.SampleComponentBehaviorFactory",
+    RegisterOnly,
+    Set.empty
+  )
 
-  val hcdInfoWithInitializeTimeout = ComponentInfo(
+  val hcdInfoWithInitializeTimeout: ComponentInfo = ComponentInfo(
     "SampleHcd",
     HCD,
     Prefix("wfos"),
@@ -49,7 +46,7 @@ object ComponentInfos {
     50.millis
   )
 
-  val hcdInfoWithRunTimeout = ComponentInfo(
+  val hcdInfoWithRunTimeout: ComponentInfo = ComponentInfo(
     "SampleHcd",
     HCD,
     Prefix("wfos"),
@@ -59,15 +56,13 @@ object ComponentInfos {
     5.seconds
   )
 
-  val dummyInfo =
-    ComponentInfo(
-      "DummyHcd",
-      HCD,
-      Prefix("wfos"),
-      "dummy",
-      DoNotRegister,
-      Set.empty
-    )
+  val dummyInfo: ComponentInfo = ComponentInfo(
+    "DummyHcd",
+    HCD,
+    Prefix("wfos"),
+    "dummy",
+    DoNotRegister
+  )
 
   val containerInfo: ContainerInfo = ContainerInfo("container", Set(hcdInfo, assemblyInfo))
 }

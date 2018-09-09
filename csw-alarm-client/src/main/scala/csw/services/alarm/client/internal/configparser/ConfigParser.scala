@@ -2,24 +2,23 @@ package csw.services.alarm.client.internal.configparser
 
 import com.typesafe.config.{Config, ConfigFactory, ConfigRenderOptions}
 import csw.services.alarm.api.exceptions.ConfigParseException
-import csw.services.alarm.api.internal.{AlarmMetadataSet, AlarmRW}
+import csw.services.alarm.api.internal.{AlarmJsonSupport, AlarmMetadataSet}
 import csw.services.alarm.api.internal.ValidationResult.{Failure, Success}
-import ujson.Js.Value
-import upickle.default.{ReadWriter ⇒ RW, _}
+import play.api.libs.json.{Format, JsValue, Json}
 
 /**
  * Parses the information represented in configuration files into respective models
  */
-object ConfigParser extends AlarmRW {
+object ConfigParser extends AlarmJsonSupport {
   val ALARMS_SCHEMA: Config = ConfigFactory.parseResources("alarms-schema.conf")
 
   def parseAlarmMetadataSet(config: Config): AlarmMetadataSet = parse[AlarmMetadataSet](config)
 
-  private def parse[T: RW](config: Config): T =
+  private def parse[T: Format](config: Config): T =
     ConfigValidator.validate(config, ALARMS_SCHEMA) match {
-      case Success          ⇒ readJs[T](configToJsValue(config))
+      case Success          ⇒ configToJsValue(config).as[T]
       case Failure(reasons) ⇒ throw ConfigParseException(reasons)
     }
 
-  private def configToJsValue(config: Config): Value = ujson.read(config.root().render(ConfigRenderOptions.concise()))
+  private def configToJsValue(config: Config): JsValue = Json.parse(config.root().render(ConfigRenderOptions.concise()))
 }

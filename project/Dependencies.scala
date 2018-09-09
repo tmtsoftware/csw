@@ -5,15 +5,11 @@ object Dependencies {
   val Messages = Def.setting(
     Seq(
       Libs.`scala-java8-compat`,
-      Enumeratum.`enumeratum`.value,
-      Libs.`play-json`.value,
-      Libs.`play-json-extensions`,
-      Enumeratum.`enumeratum-play`,
       Chill.`chill-bijection`,
       Libs.`scalapb-runtime`,
       Libs.`scalapb-json4s`,
-      Libs.`upickle`.value,
       Akka.`akka-actor-typed`,
+      Akka.`akka-stream`,
       Akka.`akka-cluster-tools`       % Test,
       Akka.`akka-actor-testkit-typed` % Test,
       Akka.`akka-actor`               % Test,
@@ -30,7 +26,6 @@ object Dependencies {
       Enumeratum.`enumeratum-play-json`.value,
       Libs.`play-json`.value,
       Libs.`play-json-derived-codecs`.value,
-      Libs.`upickle`.value,
       Libs.`scalatest`.value % Test
     )
   )
@@ -79,8 +74,7 @@ object Dependencies {
       Libs.`akka-management-cluster-http`,
       Chill.`chill-akka`,
       AkkaHttp.`akka-http`,
-      Libs.`akka-http-upickle`,
-      Libs.`upickle`.value,
+      Libs.`akka-http-play-json`,
       Libs.`scalatest`.value         % Test,
       Libs.`junit`                   % Test,
       Libs.`junit-interface`         % Test,
@@ -209,7 +203,8 @@ object Dependencies {
 
   val EventCli = Def.setting(
     Seq(
-      Libs.`upickle`.value,
+      Libs.`play-json`.value,
+      Libs.`play-json-derived-codecs`.value,
       Libs.`scopt`,
       Libs.`scala-csv`,
       Libs.`scalatest`.value % Test,
@@ -219,7 +214,8 @@ object Dependencies {
   val AlarmApi = Def.setting(
     Seq(
       Enumeratum.`enumeratum`.value,
-      Libs.`upickle`.value,
+      Libs.`play-json`.value,
+      Libs.`play-json-derived-codecs`.value,
       Akka.`akka-actor-typed`,
       Libs.`scalatest`.value % Test
     )

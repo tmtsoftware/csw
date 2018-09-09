@@ -16,19 +16,18 @@ import csw.services.location.internal.StreamExt.RichSource
 import csw.services.location.javadsl.ILocationService
 import csw.services.location.models.{Registration, RegistrationResult}
 import csw.services.location.scaladsl.LocationService
-import de.heikoseeberger.akkahttpupickle.UpickleSupport
+import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
+import play.api.libs.json.Json
 
 import scala.async.Async._
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 
-import upickle.default._
-
 private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(implicit val actorSystem: ActorSystem,
                                                                             mat: Materializer)
     extends LocationService
-    with UpickleSupport
-    with UpickleFormats { outer =>
+    with PlayJsonSupport
+    with LocationJsonSupport { outer =>
 
   import actorSystem.dispatcher
   implicit val scheduler: Scheduler = actorSystem.scheduler
@@ -136,7 +135,7 @@ private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(impl
       await(Unmarshal(response.entity).to[Source[ServerSentEvent, NotUsed]])
     }
     val sseStream = Source.fromFuture(sseStreamFuture).flatMapConcat(identity)
-    sseStream.map(x => read[TrackingEvent](x.data)).cancellable
+    sseStream.map(x => Json.parse(x.data).as[TrackingEvent]).cancellable
   }
 
   override def subscribe(connection: Connection, callback: TrackingEvent => Unit): KillSwitch = {

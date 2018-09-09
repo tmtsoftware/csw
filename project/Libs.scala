@@ -38,9 +38,6 @@ object Libs {
   val `HdrHistogram`             = "org.hdrhistogram"     % "HdrHistogram"              % "2.1.10"
   val `testng`                   = "org.testng"           % "testng"                    % "6.14.3"
 
-  val `upickle` = dep("com.lihaoyi" %%% "upickle" % "0.6.6")
-
-  val `akka-http-upickle`     = "de.heikoseeberger"    %% "akka-http-upickle"    % "1.21.0" //Apache 2.0
   val `scala-csv`             = "com.github.tototoshi" %% "scala-csv"            % "1.3.5"
   val `json-schema-validator` = "com.github.fge"       % "json-schema-validator" % "2.2.6" //LGPL/ASL
 

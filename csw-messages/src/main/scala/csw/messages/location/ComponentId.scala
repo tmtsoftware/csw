@@ -25,7 +25,5 @@ case class ComponentId private[messages] (name: String, componentType: Component
 }
 
 object ComponentId {
-  import upickle.default.{macroRW, ReadWriter ⇒ RW}
-  private[messages] implicit val format: Format[ComponentId] = Json.format
-  implicit def componentIdRw: RW[ComponentId]                = macroRW
+  implicit val format: Format[ComponentId] = Json.format
 }

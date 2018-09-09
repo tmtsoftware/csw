@@ -51,14 +51,4 @@ object ComponentType extends Enum[ComponentType] with PlayJsonEnum[ComponentType
    * Represents a general purpose service component e.g. actor and/or web service application
    */
   case object Service extends ComponentType("")
-
-  import upickle.default.{macroRW, ReadWriter => RW}
-
-  implicit def componentTypeRw: RW[ComponentType] = RW.merge(
-    macroRW[ComponentType.Service.type],
-    macroRW[ComponentType.Sequencer.type],
-    macroRW[ComponentType.Assembly.type],
-    macroRW[ComponentType.HCD.type],
-    macroRW[ComponentType.Container.type]
-  )
 }
