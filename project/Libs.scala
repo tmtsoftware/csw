@@ -26,7 +26,6 @@ object Libs {
 
   val `play-json` = dep("com.typesafe.play" %%% "play-json" % "2.6.10") //Apache 2.0
 
-  val `play-json-extensions`     = "ai.x"                 %% "play-json-extensions"     % "0.14.0" //Simplified BSD License
   val `akka-http-play-json`      = "de.heikoseeberger"    %% "akka-http-play-json"      % "1.21.0" //Apache 2.0
   val `scalapb-runtime`          = "com.thesamet.scalapb" %% "scalapb-runtime"          % scalapbVersion % "protobuf"
   val `scalapb-json4s`           = "com.thesamet.scalapb" %% "scalapb-json4s"           % "0.7.1"
