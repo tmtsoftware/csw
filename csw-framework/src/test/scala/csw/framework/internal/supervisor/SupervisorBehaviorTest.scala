@@ -6,6 +6,7 @@ import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.{Behaviors, TimerScheduler}
 import csw.common.components.framework.SampleComponentBehaviorFactory
+import csw.common.extensions.CswServicesExtensions.RichCswServices
 import csw.framework.ComponentInfos._
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.messages.{ComponentMessage, ContainerIdleMessage, SupervisorMessage}

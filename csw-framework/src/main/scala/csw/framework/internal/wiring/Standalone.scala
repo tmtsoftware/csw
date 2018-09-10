@@ -28,7 +28,7 @@ object Standalone {
     val componentInfo = ConfigParser.parseStandalone(config)
     val richSystem    = new CswFrameworkSystem(system)
     async {
-      val cswServicesF       = CswServices(locationService, eventServiceFactory, alarmServiceFactory, componentInfo)(richSystem)
+      val cswServicesF       = CswServices.make(locationService, eventServiceFactory, alarmServiceFactory, componentInfo)(richSystem)
       val supervisorBehavior = SupervisorBehaviorFactory.make(None, registrationFactory, await(cswServicesF))
       await(richSystem.spawnTyped(supervisorBehavior, componentInfo.name))
     }

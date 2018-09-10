@@ -40,26 +40,14 @@ class CswServices(
     val currentStatePublisher: CurrentStatePublisher,
     val commandResponseManager: CommandResponseManager,
     val componentInfo: ComponentInfo
-) {
-  def copy(newComponentInfo: ComponentInfo): CswServices =
-    new CswServices(
-      locationService,
-      eventService,
-      alarmService,
-      loggerFactory,
-      configClientService,
-      currentStatePublisher,
-      commandResponseManager,
-      newComponentInfo
-    )
-}
+)
 
 object CswServices {
 
   private val PubSubComponentActor            = "pub-sub-component"
   private val CommandResponseManagerActorName = "command-response-manager"
 
-  private[framework] def apply(
+  private[framework] def make(
       locationService: LocationService,
       eventServiceFactory: EventServiceFactory,
       alarmServiceFactory: AlarmServiceFactory,

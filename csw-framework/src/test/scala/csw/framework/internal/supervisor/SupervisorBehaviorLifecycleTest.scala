@@ -5,6 +5,7 @@ import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestInbox, TestProbe}
 import akka.actor.typed.scaladsl.{Behaviors, TimerScheduler}
 import akka.actor.typed.{ActorRef, Terminated}
 import csw.common.components.framework.SampleComponentBehaviorFactory
+import csw.common.extensions.CswServicesExtensions.RichCswServices
 import csw.framework.ComponentInfos._
 import csw.framework.exceptions.{FailureStop, InitializationFailed}
 import csw.framework.scaladsl.ComponentHandlers
@@ -38,7 +39,6 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
     val timerScheduler: TimerScheduler[SupervisorMessage]          = mock[TimerScheduler[SupervisorMessage]]
     val containerIdleMessageProbe: TestProbe[ContainerIdleMessage] = TestProbe[ContainerIdleMessage]
     val componentActorName                                         = s"${compInfo.name}-${SupervisorBehavior.ComponentActorNameSuffix}"
-
     val supervisorBehaviorKit = BehaviorTestKit(
       Behaviors
         .setup[SupervisorMessage](
