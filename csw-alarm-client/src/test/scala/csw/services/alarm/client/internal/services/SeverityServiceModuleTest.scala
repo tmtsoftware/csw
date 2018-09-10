@@ -354,7 +354,6 @@ class SeverityServiceModuleTest
     )
   }
 
-  // DEOPSCSW-448: Set Activation status for an alarm entity
   // DEOPSCSW-467: Monitor alarm severities in the alarm store for a single alarm, component, subsystem, or all
   test("subscribeAggregatedSeverity should throw KeyNotFoundException when key is invalid") {
     val invalidAlarm = ComponentKey(BAD, "invalid")
