@@ -6,15 +6,15 @@ import csw.messages.params.states.StateVariable.StateVariable
 import julienrf.json.derived
 import play.api.libs.json._
 
-object JsonSupport extends JsonSupport with DerivedJsonFormats
+object JsonSupport extends JsonSupport
 
 //TODO: Why is Java support required? Please delete this and corrosponding tests once confirmed
-object JavaJsonSupport extends JsonSupport with DerivedJsonFormats
+object JavaJsonSupport extends JsonSupport
 
 /**
  * Supports conversion of commands, state variables and events to/from JSON
  */
-trait JsonSupport { self: DerivedJsonFormats ⇒
+trait JsonSupport extends MiscJsonFormats {
 
   def writes[T: Writes](x: T): JsValue = Json.toJson(x)
   def reads[T: Reads](x: JsValue): T   = x.as[T]

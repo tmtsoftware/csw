@@ -2,7 +2,7 @@ package csw.messages.params.pb
 
 import java.time.Instant
 
-import csw.messages.params.formats.DerivedJsonFormats
+import csw.messages.params.formats.MiscJsonFormats
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models._
 import csw_protobuf.parameter.PbParameter
@@ -11,7 +11,7 @@ import scalapb.TypeMapper
 
 import scala.reflect.ClassTag
 
-object TypeMapperFactory extends DerivedJsonFormats {
+object TypeMapperFactory extends MiscJsonFormats {
 
   def make(keyType: KeyType[_]): TypeMapper[PbParameter, Parameter[_]] = keyType match {
     case KeyType.ChoiceKey       ⇒ typeMapper[Choice]

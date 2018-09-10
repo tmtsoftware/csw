@@ -9,7 +9,7 @@ import play.api.libs.json._
  * Derived Json formats to be used by play-json library. For scala, the library does not support character so a custom
  * implementation is provided. All the java datatype formats are mapped onto their corresponding scala datatypes.
  */
-private[messages] trait DerivedJsonFormats { self ⇒
+trait MiscJsonFormats {
 
   private def formatFactory[S: Format, J](implicit conversion: S => J): Format[J] = implicitly[Format[S]].asInstanceOf[Format[J]]
 
