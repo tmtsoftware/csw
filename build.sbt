@@ -174,8 +174,8 @@ lazy val `csw-config-server` = project
 lazy val `csw-config-client` = project
   .dependsOn(
     `csw-config-api`,
-    `csw-commons`       % "compile->compile;test->test",
     `csw-location-api`,
+    `csw-commons`       % "compile->compile;test->test",
     `csw-location`      % "multi-jvm->multi-jvm",
     `csw-config-server` % "test->test"
   )
@@ -189,7 +189,6 @@ lazy val `csw-config-client-cli` = project
     `csw-config-client`,
     `csw-location`,
     `csw-config-server` % "test->test",
-    `csw-location`      % "multi-jvm->multi-jvm",
     `csw-commons`       % "test->test"
   )
   .enablePlugins(DeployApp, AutoMultiJvm, MaybeCoverage)
@@ -199,7 +198,7 @@ lazy val `csw-config-client-cli` = project
 
 lazy val `csw-command` = project
   .dependsOn(
-    `csw-messages`,
+    `csw-params-jvm`,
     `csw-location-api`,
     `csw-logging`,
     `csw-commons` % "test->test"
@@ -227,8 +226,9 @@ lazy val `csw-framework` = project
   )
 
 lazy val `csw-event-api` = project
-  .dependsOn(`csw-messages`)
+  .dependsOn(`csw-params-jvm`)
   .enablePlugins(PublishBintray, GenJavadocPlugin)
+  .settings(libraryDependencies ++= Dependencies.EventApi.value)
 
 lazy val `csw-event-client` = project
   .dependsOn(
@@ -244,7 +244,6 @@ lazy val `csw-event-client` = project
 
 lazy val `csw-event-cli` = project
   .dependsOn(
-    `csw-messages`,
     `csw-event-client`,
     `csw-location`,
     `csw-cluster-seed` % "test->multi-jvm",

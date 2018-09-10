@@ -191,6 +191,13 @@ object Dependencies {
     )
   )
 
+  val EventApi = Def.setting(
+    Seq(
+      Akka.`akka-stream`,
+      Akka.`akka-actor-typed`
+    )
+  )
+
   val EventClient = Def.setting(
     Seq(
       Libs.`scala-async`,
