@@ -80,7 +80,7 @@ lazy val `csw-messages` = project
   )
 
 lazy val `csw-params` = crossProject(JSPlatform, JVMPlatform)
-  .crossType(CrossType.Pure)
+  .crossType(CrossType.Full)
   .enablePlugins(PublishBintray, GenJavadocPlugin)
   .settings(
     libraryDependencies ++= Dependencies.Params.value,
@@ -111,7 +111,7 @@ lazy val `csw-location` = project
   .dependsOn(
     `csw-location-api`,
     `csw-logging`,
-    `csw-messages`,
+    `csw-params-jvm`,
     `csw-commons` % "test->test"
   )
   .enablePlugins(PublishBintray, GenJavadocPlugin, AutoMultiJvm, MaybeCoverage)
@@ -132,7 +132,7 @@ lazy val `csw-location-api` = project
 //Cluster seed
 lazy val `csw-cluster-seed` = project
   .dependsOn(
-    `csw-messages`,
+    `csw-params-jvm`,
     `csw-location`      % "compile->compile;test->test;multi-jvm->multi-jvm",
     `csw-commons`       % "compile->compile;test->test",
     `csw-framework`     % "test->test",
@@ -254,7 +254,7 @@ lazy val `csw-event-cli` = project
   .settings(libraryDependencies ++= Dependencies.EventCli.value)
 
 lazy val `csw-alarm-api` = project
-  .dependsOn(`csw-messages`)
+  .dependsOn(`csw-params-jvm`)
   .enablePlugins(PublishBintray, GenJavadocPlugin)
   .settings(libraryDependencies ++= Dependencies.AlarmApi.value)
 

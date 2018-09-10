@@ -228,6 +228,7 @@ object Dependencies {
       Libs.`play-json`.value,
       Libs.`play-json-derived-codecs`.value,
       Akka.`akka-actor-typed`,
+      Akka.`akka-stream`,
       Libs.`scalatest`.value % Test
     )
   )
