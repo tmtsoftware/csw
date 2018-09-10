@@ -21,8 +21,8 @@ import csw.messages.params.states.CurrentState;
 import csw.messages.params.states.StateName;
 import csw.services.command.CommandResponseManager;
 import csw.services.logging.javadsl.ILogger;
-import scala.concurrent.duration.Duration;
 
+import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -120,7 +120,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
                     currentStatePublisher.publish(new CurrentState(controlCommand.source().prefix(), new StateName("testStateName")).add(JKeyType.IntKey().make("encoder").set(i * 10)));
                     return i;
                 })
-                .throttle(1, Duration.create(100, TimeUnit.MILLISECONDS), 1, ThrottleMode.shaping())
+                .throttle(1, Duration.ofMillis(100), 1, ThrottleMode.shaping())
                 .runWith(Sink.ignore(), ActorMaterializer.create(Adapter.toUntyped(actorContext.getSystem())));
     }
 
