@@ -188,6 +188,7 @@ lazy val `csw-config-client-cli` = project
   .dependsOn(
     `csw-config-client`,
     `csw-location`,
+    `csw-location`      % "multi-jvm->multi-jvm",
     `csw-config-server` % "test->test",
     `csw-commons`       % "test->test"
   )
