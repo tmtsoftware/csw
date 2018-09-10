@@ -1,5 +1,6 @@
 package csw.messages.location
 
+import acyclic.skipped
 import csw.messages.TMTSerializable
 import csw.messages.location.ConnectionType.{AkkaType, HttpType, TcpType}
 import play.api.libs.json._
