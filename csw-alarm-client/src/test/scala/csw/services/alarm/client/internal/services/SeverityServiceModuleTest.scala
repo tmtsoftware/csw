@@ -31,7 +31,6 @@ class SeverityServiceModuleTest
 
   // DEOPSCSW-444: Set severity api for component
   // DEOPSCSW-459: Update severity to Disconnected if not updated within predefined time
-  // DEOPSCSW-462: Capture UTC timestamp in alarm state when severity is changed
   test("setSeverity should set severity") {
     getCurrentSeverity(tromboneAxisHighLimitAlarmKey).await shouldBe Disconnected
     val status = getStatus(tromboneAxisHighLimitAlarmKey).await
