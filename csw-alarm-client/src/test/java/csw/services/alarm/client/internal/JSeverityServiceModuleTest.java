@@ -82,6 +82,7 @@ public class JSeverityServiceModuleTest {
         Thread.sleep(1000);
         FullAlarmSeverity severityAfter1Second = Await.result(alarmService.getCurrentSeverity(tromboneAxisHighLimitAlarm), new FiniteDuration(2, TimeUnit.SECONDS));
         assertEquals(severityAfter1Second, JAlarmSeverity.Disconnected);
+        assertEquals(alarmServiceTestSetup.settings().refreshInterval(), new FiniteDuration(1, TimeUnit.SECONDS));
     }
 
     @Test

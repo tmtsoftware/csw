@@ -52,6 +52,7 @@ class SeverityServiceModuleTest
     Thread.sleep(1000)
     val severityAfter1Second = getCurrentSeverity(tromboneAxisHighLimitAlarmKey).await
     severityAfter1Second shouldEqual Disconnected
+    settings.refreshInterval shouldBe 1.second
   }
 
   // DEOPSCSW-444: Set severity api for component
