@@ -32,6 +32,7 @@ import scala.concurrent.duration.FiniteDuration;
 
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -53,7 +54,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     private IConfigClientService configClient;
     private Map<Connection, Optional<JCommandService>> runningHcds;
     private ActorRef<DiagnosticPublisherMessages> diagnosticPublisher;
-    private ActorRef<CommandResponse> commandResponseAdapter;
+    private ActorRef<CommandResponse.SubmitResponse> commandResponseAdapter;
 
     public JAssemblyComponentHandlers(akka.actor.typed.javadsl.ActorContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
         super(ctx, cswCtx);
@@ -97,6 +98,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
                         throw new HcdNotFoundException();
                     else {
                         runningHcds.put(connection, Optional.of(new JCommandService(hcdLocation.get(), ctx.getSystem())));
+                        //#event-subscriber
                     }
                     diagnosticPublisher = ctx.spawnAnonymous(JDiagnosticsPublisherFactory.make(new JCommandService(hcdLocation.get(), ctx.getSystem()), workerActor));
                 })).get();

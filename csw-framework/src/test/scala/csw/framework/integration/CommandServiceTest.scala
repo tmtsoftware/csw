@@ -1,6 +1,6 @@
 package csw.framework.integration
 
-import akka.actor.{ActorSystem, typed}
+import akka.actor.{typed, ActorSystem}
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.testkit.typed.TestKitSettings
 import akka.stream.scaladsl.{Keep, Sink, Source}
@@ -26,9 +26,7 @@ import org.mockito.Mockito.{when, _}
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationLong
 
-
 class CommandServiceTest extends FunSuite with Matchers with MockitoSugar with BeforeAndAfterAll {
-
 
   private val testWiring = new FrameworkTestWiring()
 
@@ -37,10 +35,9 @@ class CommandServiceTest extends FunSuite with Matchers with MockitoSugar with B
   override protected def afterAll(): Unit = shutdown()
 
   val prefix = Prefix("wfos.blue.filter")
-  val obsId = ObsId("Obs001")
+  val obsId  = ObsId("Obs001")
 
   implicit val timeout: Timeout = 5.seconds
-
 
   val moveCmd = CommandName("move")
   val initCmd = CommandName("init")
@@ -51,7 +48,7 @@ class CommandServiceTest extends FunSuite with Matchers with MockitoSugar with B
         AkkaConnection(ComponentId("Test_Component_Running_Long_Command", ComponentType.HCD)),
         5.seconds
       )
-    */
+   */
   //val hcdLocation: AkkaLocation = Await.result(hcdLocF, 10.seconds).get
   //val hcdComponent              = new CommandService(hcdLocation)
 
@@ -68,11 +65,11 @@ class CommandServiceTest extends FunSuite with Matchers with MockitoSugar with B
   }
 
   /**
-    * Submits the given setups, one after the other, and returns a future list of command responses.
-    * @param setups the setups to submit
-    * @param assembly the assembly to submit the setups to
-    * @return future list of responses
-    */
+   * Submits the given setups, one after the other, and returns a future list of command responses.
+   * @param setups the setups to submit
+   * @param assembly the assembly to submit the setups to
+   * @return future list of responses
+   */
   private def submitAll(setups: List[Setup], assembly: CommandService): Future[List[SubmitResponse]] = {
     Source(setups)
       .mapAsync(1)(assembly.submitAndSubscribe)
@@ -82,11 +79,11 @@ class CommandServiceTest extends FunSuite with Matchers with MockitoSugar with B
         else
           println(s"Command response: $response")
         response
-      }.toMat(Sink.seq)(Keep.right)
+      }
+      .toMat(Sink.seq)(Keep.right)
       .run()
       .map(_.toList)
   }
-
 
   test("test submit all 1") {
     // start component in standalone mode
@@ -105,9 +102,8 @@ class CommandServiceTest extends FunSuite with Matchers with MockitoSugar with B
     //val x = submitAll()
     val setups = List(setupAssembly1, setupAssembly2)
 
-
-    val mcs:CommandService = mock[CommandService]
-    when(submitAll(eq(setups), mcs)) //.thenReturn(Future(Completed(Id())))
+    val mcs: CommandService = mock[CommandService]
+    //when(submitAll(eq(setups), mcs)) //.thenReturn(Future(Completed(Id())))
 
     val rr = submitAll(setups, mcs)
 
@@ -117,6 +113,5 @@ class CommandServiceTest extends FunSuite with Matchers with MockitoSugar with B
     //val x = submitAll(List(setupAssembly1, setupAssembly2), )
 
   }
-
 
 }

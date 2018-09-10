@@ -123,7 +123,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     private void processCommandWithMatcher(ControlCommand controlCommand) {
         Source.range(1, 10)
                 .map(i -> {
-                    currentStatePublisher.publish(new CurrentState(controlCommand.source().prefix(), new StateName("testStateName")).add(JKeyTypes.IntKey().make("encoder").set(i * 10)));
+                    currentStatePublisher.publish(new CurrentState(controlCommand.source().prefix(), new StateName("testStateName")).add(JKeyType.IntKey().make("encoder").set(i * 10)));
                     return i;
                 })
                 .throttle(1, Duration.ofMillis(100), 1, ThrottleMode.shaping())

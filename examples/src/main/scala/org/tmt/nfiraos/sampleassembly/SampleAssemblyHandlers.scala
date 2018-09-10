@@ -16,6 +16,7 @@ import csw.event.api.scaladsl.EventSubscription
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandResponse.{Started, SubmitResponse, ValidationResponse}
 import csw.messages.commands._
+import csw.messages.events._
 import csw.messages.framework.ComponentInfo
 import csw.messages.location.{AkkaLocation, LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.messages.params.generics.{Key, KeyType, Parameter}
@@ -139,7 +140,7 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
   }
   //#subscribe
 
-  override def validateCommand(controlCommand: ControlCommand): CommandResponse = ???
+  override def validateCommand(controlCommand: ControlCommand): ValidationResponse = ???
 
   override def onSubmit(controlCommand: ControlCommand): SubmitResponse = ???
 
