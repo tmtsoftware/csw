@@ -23,7 +23,7 @@ import csw.messages.framework.LockingResponse;
 import csw.messages.framework.LockingResponses;
 import csw.messages.location.AkkaLocation;
 import csw.messages.location.ComponentId;
-import csw.messages.params.generics.JKeyType;
+import csw.messages.javadsl.JKeyType;
 import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.states.CurrentState;

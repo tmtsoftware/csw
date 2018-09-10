@@ -7,7 +7,7 @@ import csw.messages.commands.Setup;
 import csw.messages.commands.Wait;
 import csw.messages.events.EventName;
 import csw.messages.events.SystemEvent;
-import csw.messages.params.generics.JKeyType;
+import csw.messages.javadsl.JKeyType;
 import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.models.Prefix;

@@ -2,7 +2,7 @@ package csw.messages.params.states;
 
 import csw.messages.commands.CommandName;
 import csw.messages.commands.Setup;
-import csw.messages.params.generics.JKeyType;
+import csw.messages.javadsl.JKeyType;
 import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.models.ObsId;

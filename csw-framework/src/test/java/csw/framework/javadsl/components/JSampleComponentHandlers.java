@@ -15,7 +15,7 @@ import csw.framework.models.JCswServices;
 import csw.messages.TopLevelActorMessage;
 import csw.messages.commands.*;
 import csw.messages.location.TrackingEvent;
-import csw.messages.params.generics.JKeyType;
+import csw.messages.javadsl.JKeyType;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.states.CurrentState;
 import csw.messages.params.states.StateName;

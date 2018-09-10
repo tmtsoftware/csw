@@ -19,7 +19,7 @@ import csw.messages.events.SystemEvent;
 import csw.messages.framework.ComponentInfo;
 import csw.messages.javadsl.JUnits;
 import csw.messages.location.*;
-import csw.messages.params.generics.JKeyType;
+import csw.messages.javadsl.JKeyType;
 import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.models.ObsId;

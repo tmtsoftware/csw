@@ -1,5 +1,6 @@
 package csw.messages.params.generics;
 
+import csw.messages.javadsl.JKeyType;
 import csw.messages.params.models.Choice;
 import csw.messages.params.models.Choices;
 import org.junit.Assert;

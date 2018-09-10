@@ -70,7 +70,7 @@ class SerializationTest extends FunSuite {
   val wc1: Wait = Wait(Prefix("wfos.blue.camera"), CommandName("move"), Some(obsId))
 
   test("ConfigType kryo serialization") {
-    import csw.messages.params.generics.ParamSetSerializer._
+    import csw.messages.commons.ParamSetSerializer._
 
     val bytes = write(sc1)
     val scout = read[Setup](bytes)
@@ -90,7 +90,7 @@ class SerializationTest extends FunSuite {
   }
 
   test("System event kryo serialization") {
-    import csw.messages.params.generics.ParamSetSerializer._
+    import csw.messages.commons.ParamSetSerializer._
     val event = SystemEvent(fqn1prefix, EventName("filter wheel"))
       .add(ra.set("12:32:11"))
       .add(dec.set("30:22:22"))
@@ -102,7 +102,7 @@ class SerializationTest extends FunSuite {
   }
 
   test("CurrentStates kryo serialization") {
-    import csw.messages.params.generics.ParamSetSerializer._
+    import csw.messages.commons.ParamSetSerializer._
 
     val sca1   = CurrentStates(List(cs1))
     val bytes1 = write(sca1)

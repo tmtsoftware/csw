@@ -1,5 +1,6 @@
 package csw.messages.params.generics;
 
+import csw.messages.javadsl.JKeyType;
 import csw.messages.params.models.RaDec;
 import csw.messages.params.models.Struct;
 import org.junit.Assert;

@@ -14,7 +14,7 @@ import csw.messages.events.EventName;
 import csw.messages.events.SystemEvent;
 import csw.messages.framework.ComponentInfo;
 import csw.messages.location.TrackingEvent;
-import csw.messages.params.generics.JKeyType;
+import csw.messages.javadsl.JKeyType;
 import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.models.Id;

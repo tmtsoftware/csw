@@ -14,7 +14,7 @@ import csw.messages.TopLevelActorMessage;
 import csw.messages.commands.*;
 import csw.messages.framework.ComponentInfo;
 import csw.messages.location.*;
-import csw.messages.params.generics.JKeyType;
+import csw.messages.javadsl.JKeyType;
 import csw.messages.params.generics.Key;
 import csw.messages.params.models.Prefix;
 import csw.messages.params.states.CurrentState;

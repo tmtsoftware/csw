@@ -6,7 +6,7 @@ import csw.messages.events.ObserveEvent;
 import csw.messages.events.SystemEvent;
 import csw.messages.javadsl.JUnits;
 import csw.messages.params.formats.JavaJsonSupport;
-import csw.messages.params.generics.JKeyType;
+import csw.messages.javadsl.JKeyType;
 import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.models.MatrixData;

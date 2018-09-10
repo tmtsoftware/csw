@@ -1,6 +1,7 @@
-package csw.messages.params.generics
+package csw.messages.javadsl
 
 import csw.messages.params.formats.JsonSupport
+import csw.messages.params.generics.{KeyType, SimpleKeyType}
 import csw.messages.params.models.{ArrayData, MatrixData}
 import play.api.libs.json.Format
 

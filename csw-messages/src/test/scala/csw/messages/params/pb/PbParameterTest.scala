@@ -2,8 +2,9 @@ package csw.messages.params.pb
 
 import java.time.Instant
 
+import csw.messages.javadsl.JKeyType
 import csw.messages.params.generics.KeyType.IntMatrixKey
-import csw.messages.params.generics.{JKeyType, KeyType}
+import csw.messages.params.generics.KeyType
 import csw.messages.params.models._
 import csw_protobuf.ParameterTypes
 import csw_protobuf.parameter.PbParameter

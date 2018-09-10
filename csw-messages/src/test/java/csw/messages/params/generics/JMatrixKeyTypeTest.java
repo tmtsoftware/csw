@@ -1,5 +1,6 @@
 package csw.messages.params.generics;
 
+import csw.messages.javadsl.JKeyType;
 import csw.messages.params.models.MatrixData;
 import csw.messages.params.models.Units;
 import org.junit.Assert;

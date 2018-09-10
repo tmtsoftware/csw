@@ -1,10 +1,9 @@
 package csw.messages.params.pb;
 
 import csw.messages.events.Event;
-import csw.messages.events.Event$;
 import csw.messages.events.EventName;
 import csw.messages.events.SystemEvent;
-import csw.messages.params.generics.JKeyType;
+import csw.messages.javadsl.JKeyType;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.models.*;
 import csw_protobuf.events.PbEvent;

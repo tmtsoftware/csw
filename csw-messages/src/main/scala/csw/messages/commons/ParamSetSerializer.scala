@@ -1,4 +1,4 @@
-package csw.messages.params.generics
+package csw.messages.commons
 
 import com.twitter.chill.KryoInjection
 
