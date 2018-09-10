@@ -1,4 +1,4 @@
-package csw.messages.location.javadsl
+package csw.services.location.api.javadsl
 
 import acyclic.skipped
 import java.time.Duration
@@ -12,8 +12,8 @@ import akka.actor.CoordinatedShutdown.Reason
 import akka.stream.KillSwitch
 import akka.stream.javadsl.Source
 import csw.messages.location._
-import csw.messages.location.models.Registration
-import csw.messages.location.scaladsl.LocationService
+import csw.services.location.api.models.Registration
+import csw.services.location.api.scaladsl.LocationService
 
 /**
  * A LocationService interface to manage connections and their registrations. All operations are non-blocking.
@@ -25,7 +25,7 @@ trait ILocationService {
    *
    * @param registration the Registration holding connection and it's corresponding location to register with `LocationService`
    * @return a CompletableFuture which completes with Registration result or can fail with
-   *         [[csw.messages.location.exceptions.RegistrationFailed]] or [[csw.messages.location.exceptions.OtherLocationIsRegistered]]
+   *         [[csw.services.location.api.exceptions.RegistrationFailed]] or [[csw.services.location.api.exceptions.OtherLocationIsRegistered]]
    */
   def register(registration: Registration): CompletableFuture[IRegistrationResult]
 
@@ -36,7 +36,7 @@ trait ILocationService {
    *       unregistered from location service
    * @param connection an already registered connection
    * @return a CompletableFuture which completes after un-registration happens successfully and fails otherwise with
-   *         [[csw.messages.location.exceptions.UnregistrationFailed]]
+   *         [[csw.services.location.api.exceptions.UnregistrationFailed]]
    */
   def unregister(connection: Connection): CompletableFuture[Done]
 
@@ -45,7 +45,7 @@ trait ILocationService {
    *
    * @note it is highly recommended to use this method for testing purpose only
    * @return a CompletableFuture which completes after all connections are unregistered successfully or fails otherwise
-   *         with [[csw.messages.location.exceptions.RegistrationListingFailed]]
+   *         with [[csw.services.location.api.exceptions.RegistrationListingFailed]]
    */
   def unregisterAll(): CompletableFuture[Done]
 
@@ -54,7 +54,7 @@ trait ILocationService {
    *
    * @param connection a connection to resolve to with its registered location
    * @return a CompletableFuture which completes with the resolved location if found or Empty otherwise. It can fail with
-   *         [[csw.messages.location.exceptions.RegistrationListingFailed]].
+   *         [[csw.services.location.api.exceptions.RegistrationListingFailed]].
    */
   def find[L <: Location](connection: TypedConnection[L]): CompletableFuture[Optional[L]]
 
@@ -65,7 +65,7 @@ trait ILocationService {
    * @param within the time for which a connection is looked-up within `LocationService`
    * @tparam L the concrete Location type returned once the connection is resolved
    * @return a CompletableFuture which completes with the resolved location if found or None otherwise. It can fail with
-   *         [[csw.messages.location.exceptions.RegistrationListingFailed]].
+   *         [[csw.services.location.api.exceptions.RegistrationListingFailed]].
    */
   def resolve[L <: Location](connection: TypedConnection[L], within: Duration): CompletableFuture[Optional[L]]
 
@@ -73,7 +73,7 @@ trait ILocationService {
    * Lists all locations registered
    *
    * @return a CompletableFuture which completes with a List of all registered locations or can fail with
-   *         [[csw.messages.location.exceptions.RegistrationListingFailed]]
+   *         [[csw.services.location.api.exceptions.RegistrationListingFailed]]
    */
   def list: CompletableFuture[ju.List[Location]]
 
@@ -82,7 +82,7 @@ trait ILocationService {
    *
    * @param componentType list components of this `componentType`
    * @return a CompletableFuture which completes with filtered locations or can fail with
-   *         [[csw.messages.location.exceptions.RegistrationListingFailed]]
+   *         [[csw.services.location.api.exceptions.RegistrationListingFailed]]
    */
   def list(componentType: ComponentType): CompletableFuture[ju.List[Location]]
 
@@ -91,7 +91,7 @@ trait ILocationService {
    *
    * @param hostname list components running on this `hostname`
    * @return a CompletableFuture which completes with filtered locations or can fail with
-   *         [[csw.messages.location.exceptions.RegistrationListingFailed]]
+   *         [[csw.services.location.api.exceptions.RegistrationListingFailed]]
    */
   def list(hostname: String): CompletableFuture[ju.List[Location]]
 
@@ -100,7 +100,7 @@ trait ILocationService {
    *
    * @param connectionType list components of this `connectionType`
    * @return a CompletableFuture which completes with filtered locations or can fail with
-   *         [[csw.messages.location.exceptions.RegistrationListingFailed]]
+   *         [[csw.services.location.api.exceptions.RegistrationListingFailed]]
    */
   def list(connectionType: ConnectionType): CompletableFuture[ju.List[Location]]
 
@@ -111,7 +111,7 @@ trait ILocationService {
    *       value will be listed
    * @param prefix list components by this `prefix`
    * @return a CompletableFuture which completes with filtered locations or can fail with
-   *         [[csw.messages.location.exceptions.RegistrationListingFailed]]
+   *         [[csw.services.location.api.exceptions.RegistrationListingFailed]]
    */
   def listByPrefix(prefix: String): CompletableFuture[ju.List[AkkaLocation]]
 

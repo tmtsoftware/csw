@@ -10,9 +10,9 @@ import akka.testkit.TestProbe
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location._
-import csw.messages.location.exceptions.OtherLocationIsRegistered
-import csw.messages.location.models.{HttpRegistration, TcpRegistration}
-import csw.messages.location.scaladsl.LocationService
+import csw.services.location.api.exceptions.OtherLocationIsRegistered
+import csw.services.location.api.models.{HttpRegistration, TcpRegistration}
+import csw.services.location.api.scaladsl.LocationService
 import csw.messages.params.models.Prefix
 import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.location.commons.{ActorSystemFactory, TestRegistrationFactory}

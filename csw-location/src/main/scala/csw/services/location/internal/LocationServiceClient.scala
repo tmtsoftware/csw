@@ -11,11 +11,11 @@ import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{KillSwitch, Materializer}
 import akka.{Done, NotUsed}
 import csw.messages.location._
-import csw.messages.location.exceptions.{OtherLocationIsRegistered, RegistrationFailed}
+import csw.services.location.api.exceptions.{OtherLocationIsRegistered, RegistrationFailed}
 import csw.services.location.internal.StreamExt.RichSource
-import csw.messages.location.javadsl.ILocationService
-import csw.messages.location.models.Registration
-import csw.messages.location.scaladsl.LocationService
+import csw.services.location.api.javadsl.ILocationService
+import csw.services.location.api.models.Registration
+import csw.services.location.api.scaladsl.LocationService
 import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
 import play.api.libs.json.Json
 import csw.services.location.models.RegistrationResult

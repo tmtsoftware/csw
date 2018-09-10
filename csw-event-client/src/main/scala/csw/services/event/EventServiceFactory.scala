@@ -2,8 +2,8 @@ package csw.services.event
 
 import akka.actor.ActorSystem
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Materializer}
-import csw.messages.location.javadsl.ILocationService
-import csw.messages.location.scaladsl.LocationService
+import csw.services.location.api.javadsl.ILocationService
+import csw.services.location.api.scaladsl.LocationService
 import csw.services.event.api.javadsl.IEventService
 import csw.services.event.api.scaladsl.EventService
 import csw.services.event.internal.commons.EventStreamSupervisionStrategy

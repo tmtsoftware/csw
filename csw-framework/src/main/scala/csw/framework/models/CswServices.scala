@@ -4,7 +4,7 @@ import csw.framework.CurrentStatePublisher
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.internal.wiring.CswFrameworkSystem
 import csw.messages.framework.ComponentInfo
-import csw.messages.location.scaladsl.LocationService
+import csw.services.location.api.scaladsl.LocationService
 import csw.messages.params.states.CurrentState
 import csw.services.alarm.api.scaladsl.AlarmService
 import csw.services.alarm.client.AlarmServiceFactory

@@ -11,9 +11,9 @@ import csw.messages.CommandResponseManagerMessage
 import csw.messages.commands.CommandResponse
 import csw.messages.framework.{LifecycleStateChanged, PubSub}
 import csw.messages.location.Connection.AkkaConnection
-import csw.messages.location.javadsl.ILocationService
-import csw.messages.location.models.AkkaRegistration
-import csw.messages.location.scaladsl.LocationService
+import csw.services.location.api.javadsl.ILocationService
+import csw.services.location.api.models.AkkaRegistration
+import csw.services.location.api.scaladsl.LocationService
 import csw.messages.params.models.{Id, Prefix}
 import csw.messages.params.states.CurrentState
 import csw.services.alarm.api.scaladsl.AlarmService

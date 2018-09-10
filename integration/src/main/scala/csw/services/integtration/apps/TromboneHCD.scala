@@ -10,7 +10,7 @@ import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.params.models.Prefix
 import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.commons.ClusterAwareSettings
-import csw.messages.location.models.AkkaRegistration
+import csw.services.location.api.models.AkkaRegistration
 import csw.services.location.models.RegistrationResult
 import csw.services.location.scaladsl.LocationServiceFactory
 

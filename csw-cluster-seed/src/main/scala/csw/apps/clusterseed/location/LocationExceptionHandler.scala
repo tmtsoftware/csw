@@ -3,7 +3,7 @@ package csw.apps.clusterseed.location
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server._
 import csw.commons.http.{JsonRejectionHandler, JsonSupport}
-import csw.messages.location.exceptions.{OtherLocationIsRegistered, RegistrationFailed}
+import csw.services.location.api.exceptions.{OtherLocationIsRegistered, RegistrationFailed}
 
 class LocationExceptionHandler extends Directives with JsonRejectionHandler {
 

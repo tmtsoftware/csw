@@ -6,7 +6,7 @@ import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Materializer}
 import akka.{actor, Done}
-import csw.messages.location.scaladsl.LocationService
+import csw.services.location.api.scaladsl.LocationService
 import csw.services.event.api.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
 import csw.services.event.api.scaladsl.{EventPublisher, EventService, EventSubscriber}
 import csw.services.event.helpers.RegistrationFactory

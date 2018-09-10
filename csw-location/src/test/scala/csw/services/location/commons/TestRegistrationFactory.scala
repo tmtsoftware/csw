@@ -3,7 +3,7 @@ package csw.services.location.commons
 import akka.actor.ActorSystem
 import akka.actor.typed.ActorRef
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
-import csw.messages.location.models.{AkkaRegistration, HttpRegistration, TcpRegistration}
+import csw.services.location.api.models.{AkkaRegistration, HttpRegistration, TcpRegistration}
 import csw.messages.params.models.Prefix
 import csw.services.logging.commons.LogAdminActorFactory
 import csw.services.logging.messages.LogControlMessages

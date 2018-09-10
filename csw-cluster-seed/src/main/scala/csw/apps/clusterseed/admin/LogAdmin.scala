@@ -6,7 +6,7 @@ import csw.apps.clusterseed.admin.exceptions.{InvalidComponentNameException, Unr
 import csw.apps.clusterseed.internal.ActorRuntime
 import csw.apps.clusterseed.commons.ClusterSeedLogger
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
-import csw.messages.location.scaladsl.LocationService
+import csw.services.location.api.scaladsl.LocationService
 import csw.messages.location.{Connection, Location}
 import csw.services.logging.internal.LoggingLevels.Level
 import csw.services.logging.messages.{GetComponentLogMetadata, LogControlMessages, SetComponentLogLevel}

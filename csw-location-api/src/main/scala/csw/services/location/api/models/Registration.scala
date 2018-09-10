@@ -1,4 +1,4 @@
-package csw.messages.location.models
+package csw.services.location.api.models
 
 import java.net.URI
 
@@ -8,9 +8,9 @@ import akka.actor.{ActorPath, Address}
 import akka.serialization.Serialization
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location._
-import csw.messages.location.commons.LocationServiceLogger
+import csw.services.location.api.commons.LocationServiceLogger
 import csw.messages.params.models.Prefix
-import csw.messages.location.exceptions.LocalAkkaActorRegistrationNotAllowed
+import csw.services.location.api.exceptions.LocalAkkaActorRegistrationNotAllowed
 import csw.services.logging.messages.LogControlMessages
 import csw.services.logging.scaladsl.Logger
 
@@ -34,7 +34,7 @@ sealed abstract class Registration {
 }
 
 /**
- * AkkaRegistration holds the information needed to register an akka location. A [[csw.messages.location.exceptions.LocalAkkaActorRegistrationNotAllowed]]
+ * AkkaRegistration holds the information needed to register an akka location. A [[csw.services.location.api.exceptions.LocalAkkaActorRegistrationNotAllowed]]
  * is thrown if the actorRef provided is not a remote actorRef
  *
  * @param connection the `Connection` to register with `LocationService`

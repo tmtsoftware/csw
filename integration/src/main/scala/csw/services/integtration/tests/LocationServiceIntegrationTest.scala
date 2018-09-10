@@ -10,9 +10,9 @@ import csw.messages.CommandMessage.Submit
 import csw.messages.commands.{CommandName, Setup}
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
-import csw.messages.location.exceptions.OtherLocationIsRegistered
-import csw.messages.location.models.AkkaRegistration
-import csw.messages.location.scaladsl.LocationService
+import csw.services.location.api.exceptions.OtherLocationIsRegistered
+import csw.services.location.api.models.AkkaRegistration
+import csw.services.location.api.scaladsl.LocationService
 import csw.messages.location.{AkkaLocation, ComponentId, ComponentType, HttpLocation}
 import csw.messages.params.models.Prefix
 import csw.services.command.extensions.AkkaLocationExt.RichAkkaLocation

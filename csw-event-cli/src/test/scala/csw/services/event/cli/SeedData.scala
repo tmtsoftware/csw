@@ -8,14 +8,14 @@ import csw.commons.redis.EmbeddedRedis
 import csw.messages.commons.CoordinatedShutdownReasons
 import csw.messages.events._
 import csw.messages.params.formats.JsonSupport
-import csw.messages.location.scaladsl.LocationService
+import csw.services.location.api.scaladsl.LocationService
 import csw.services.event.api.scaladsl.EventPublisher
 import csw.services.event.cli.args.ArgsParser
 import csw.services.event.cli.wiring.Wiring
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.internal.commons.EventServiceConnection
 import csw.services.location.commons.ActorSystemFactory
-import csw.messages.location.models.TcpRegistration
+import csw.services.location.api.models.TcpRegistration
 import csw.services.location.scaladsl.LocationServiceFactory
 import csw.services.logging.commons.LogAdminActorFactory
 import org.scalatest.{BeforeAndAfterEach, Matchers}

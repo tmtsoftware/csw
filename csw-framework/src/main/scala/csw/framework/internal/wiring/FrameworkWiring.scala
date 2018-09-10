@@ -4,7 +4,7 @@ import akka.Done
 import akka.actor.typed.ActorRef
 import akka.actor.{ActorSystem, CoordinatedShutdown}
 import csw.framework.deploy.ConfigUtils
-import csw.messages.location.scaladsl.LocationService
+import csw.services.location.api.scaladsl.LocationService
 import csw.services.alarm.client.AlarmServiceFactory
 import csw.services.command.internal.CommandResponseManagerFactory
 import csw.services.config.api.scaladsl.ConfigClientService

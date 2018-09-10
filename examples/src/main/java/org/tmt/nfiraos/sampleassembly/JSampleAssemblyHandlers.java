@@ -28,7 +28,7 @@ import csw.services.command.CommandResponseManager;
 import csw.services.command.javadsl.JCommandService;
 import csw.services.event.api.javadsl.IEventService;
 import csw.services.event.api.javadsl.IEventSubscription;
-import csw.messages.location.javadsl.ILocationService;
+import csw.services.location.api.javadsl.ILocationService;
 import csw.services.logging.javadsl.ILogger;
 
 import java.util.Collections;

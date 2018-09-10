@@ -18,13 +18,13 @@ import csw.messages.SupervisorContainerCommonMessages.Restart
 import csw.messages.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.messages.framework.{ComponentInfo, ContainerLifecycleState, SupervisorLifecycleState, _}
 import csw.messages.location.Connection.AkkaConnection
-import csw.messages.location.scaladsl.LocationService
+import csw.services.location.api.scaladsl.LocationService
 import csw.messages.params.models.Prefix
 import csw.messages.{ComponentMessage, ContainerActorMessage, ContainerIdleMessage}
 import csw.services.alarm.client.AlarmServiceFactory
 import csw.services.event.EventServiceFactory
 import csw.services.location.commons.ActorSystemFactory
-import csw.messages.location.models.AkkaRegistration
+import csw.services.location.api.models.AkkaRegistration
 import csw.services.location.models.RegistrationResult
 import csw.services.location.scaladsl.RegistrationFactory
 import org.mockito.ArgumentMatchers.any

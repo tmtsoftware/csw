@@ -1,7 +1,7 @@
 package csw.services.csclient.cli
 
 import akka.actor.ActorSystem
-import csw.messages.location.scaladsl.LocationService
+import csw.services.location.api.scaladsl.LocationService
 import csw.services.config.api.scaladsl.ConfigService
 import csw.services.config.client.internal.ActorRuntime
 import csw.services.config.client.scaladsl.ConfigClientFactory

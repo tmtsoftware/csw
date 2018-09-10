@@ -1,4 +1,4 @@
-package csw.messages.location.scaladsl
+package csw.services.location.api.scaladsl
 
 import acyclic.skipped
 import akka.Done
@@ -6,8 +6,8 @@ import akka.actor.CoordinatedShutdown.Reason
 import akka.stream.KillSwitch
 import akka.stream.scaladsl.Source
 import csw.messages.location._
-import csw.messages.location.javadsl.ILocationService
-import csw.messages.location.models.Registration
+import csw.services.location.api.javadsl.ILocationService
+import csw.services.location.api.models.Registration
 import csw.services.location.models.RegistrationResult
 
 import scala.concurrent.Future
@@ -23,7 +23,7 @@ trait LocationService {
    *
    * @param registration the Registration holding connection and it's corresponding location to register with `LocationService`
    * @return a future which completes with Registration result or can fail with
-   *         [[csw.messages.location.exceptions.RegistrationFailed]] or [[csw.messages.location.exceptions.OtherLocationIsRegistered]]
+   *         [[csw.services.location.api.exceptions.RegistrationFailed]] or [[csw.services.location.api.exceptions.OtherLocationIsRegistered]]
    */
   def register(registration: Registration): Future[RegistrationResult]
 
@@ -34,7 +34,7 @@ trait LocationService {
    *       unregistered from location service
    * @param connection an already registered connection
    * @return a future which completes after un-registration happens successfully and fails otherwise with
-   *         [[csw.messages.location.exceptions.UnregistrationFailed]]
+   *         [[csw.services.location.api.exceptions.UnregistrationFailed]]
    */
   def unregister(connection: Connection): Future[Done]
 
@@ -43,7 +43,7 @@ trait LocationService {
    *
    * @note it is highly recommended to use this method for testing purpose only
    * @return a future which completes after all connections are unregistered successfully or fails otherwise with
-   *         [[csw.messages.location.exceptions.RegistrationListingFailed]]
+   *         [[csw.services.location.api.exceptions.RegistrationListingFailed]]
    */
   def unregisterAll(): Future[Done]
 
@@ -52,7 +52,7 @@ trait LocationService {
    *
    * @param connection a connection to resolve to with its registered location
    * @return a future which completes with the resolved location if found or None otherwise. It can fail with
-   *         [[csw.messages.location.exceptions.RegistrationListingFailed]].
+   *         [[csw.services.location.api.exceptions.RegistrationListingFailed]].
    */
   def find[L <: Location](connection: TypedConnection[L]): Future[Option[L]]
 
@@ -64,7 +64,7 @@ trait LocationService {
    * @param within max wait time for event to arrive
    * @tparam L the concrete Location type returned once the connection is resolved
    * @return a future which completes with the resolved location if found or None otherwise. It can fail with
-   *         [[csw.messages.location.exceptions.RegistrationListingFailed]].
+   *         [[csw.services.location.api.exceptions.RegistrationListingFailed]].
    */
   def resolve[L <: Location](connection: TypedConnection[L], within: FiniteDuration): Future[Option[L]]
 
@@ -72,7 +72,7 @@ trait LocationService {
    * Lists all locations registered
    *
    * @return a future which completes with a List of all registered locations or can fail with
-   *         [[csw.messages.location.exceptions.RegistrationListingFailed]]
+   *         [[csw.services.location.api.exceptions.RegistrationListingFailed]]
    */
   def list: Future[List[Location]]
 
@@ -81,7 +81,7 @@ trait LocationService {
    *
    * @param componentType list components of this `componentType`
    * @return a future which completes with filtered locations or can fail with
-   *         [[csw.messages.location.exceptions.RegistrationListingFailed]]
+   *         [[csw.services.location.api.exceptions.RegistrationListingFailed]]
    */
   def list(componentType: ComponentType): Future[List[Location]]
 
@@ -90,7 +90,7 @@ trait LocationService {
    *
    * @param hostname list components running on this `hostname`
    * @return a future which completes with filtered locations or can fail with
-   *         [[csw.messages.location.exceptions.RegistrationListingFailed]]
+   *         [[csw.services.location.api.exceptions.RegistrationListingFailed]]
    */
   def list(hostname: String): Future[List[Location]]
 
@@ -99,7 +99,7 @@ trait LocationService {
    *
    * @param connectionType list components of this `connectionType`
    * @return a future which completes with filtered locations or can fail with
-   *         [[csw.messages.location.exceptions.RegistrationListingFailed]]
+   *         [[csw.services.location.api.exceptions.RegistrationListingFailed]]
    */
   def list(connectionType: ConnectionType): Future[List[Location]]
 
@@ -110,7 +110,7 @@ trait LocationService {
    *       value will be listed.
    * @param prefix list components by this `prefix`
    * @return a future which completes with filtered locations or can fail with
-   *         [[csw.messages.location.exceptions.RegistrationListingFailed]]
+   *         [[csw.services.location.api.exceptions.RegistrationListingFailed]]
    */
   def listByPrefix(prefix: String): Future[List[AkkaLocation]]
 

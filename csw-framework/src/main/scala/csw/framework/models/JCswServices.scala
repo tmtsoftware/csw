@@ -5,7 +5,7 @@ import csw.services.alarm.api.javadsl.IAlarmService
 import csw.services.command.CommandResponseManager
 import csw.services.config.api.javadsl.IConfigClientService
 import csw.services.event.api.javadsl.IEventService
-import csw.messages.location.javadsl.ILocationService
+import csw.services.location.api.javadsl.ILocationService
 import csw.services.logging.javadsl.JLoggerFactory
 
 /**

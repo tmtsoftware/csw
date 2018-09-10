@@ -3,7 +3,7 @@ package csw.services.alarm.cli.utils
 import java.nio.file.{Files, Path}
 
 import com.typesafe.config.{Config, ConfigFactory}
-import csw.messages.location.scaladsl.LocationService
+import csw.services.location.api.scaladsl.LocationService
 import csw.services.alarm.cli.wiring.ActorRuntime
 import csw.services.config.client.scaladsl.ConfigClientFactory
 

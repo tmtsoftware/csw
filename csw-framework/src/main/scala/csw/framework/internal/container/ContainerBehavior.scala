@@ -16,8 +16,8 @@ import csw.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.messages.commons.CoordinatedShutdownReasons.{AllActorsWithinContainerTerminatedReason, FailedToCreateSupervisorsReason}
 import csw.messages.framework._
 import csw.messages.location.Connection.AkkaConnection
-import csw.messages.location.models.AkkaRegistration
-import csw.messages.location.scaladsl.LocationService
+import csw.services.location.api.models.AkkaRegistration
+import csw.services.location.api.scaladsl.LocationService
 import csw.messages.location.{ComponentId, ComponentType}
 import csw.messages.params.models.Prefix
 import csw.messages.params.models.Subsystem.Container
@@ -33,14 +33,14 @@ import scala.util.{Failure, Success}
 /**
  * The Behavior of a Container of one or more components, represented as a mutable behavior.
  *
- * @param ctx the [[akka.actor.typed.scaladsl.ActorContext]] under which the actor instance of this behavior is created
- * @param containerInfo container related information as described in the configuration file
+ * @param ctx                   the [[akka.actor.typed.scaladsl.ActorContext]] under which the actor instance of this behavior is created
+ * @param containerInfo         container related information as described in the configuration file
  * @param supervisorInfoFactory the factory for creating the Supervisors for components described in ContainerInfo
- * @param registrationFactory the factory for creating a typed [[csw.messages.location.models.AkkaRegistration]] from
-                              [[csw.messages.location.Connection.AkkaConnection]]
- * @param eventServiceFactory the factory to create instance of event service to be used by components to use and/or create publishers and subscribers
- * @param locationService the single instance of Location service created for a running application
- * @param loggerFactory factory to create suitable logger instance
+ * @param registrationFactory   the factory for creating a typed [[csw.services.location.api.models.AkkaRegistration]] from
+ * [[csw.messages.location.Connection.AkkaConnection]]
+ * @param eventServiceFactory   the factory to create instance of event service to be used by components to use and/or create publishers and subscribers
+ * @param locationService       the single instance of Location service created for a running application
+ * @param loggerFactory         factory to create suitable logger instance
  */
 private[framework] final class ContainerBehavior(
     ctx: ActorContext[ContainerActorMessage],

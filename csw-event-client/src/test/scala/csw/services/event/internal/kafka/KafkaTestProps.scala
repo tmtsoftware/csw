@@ -5,7 +5,7 @@ import akka.actor.{ActorSystem, CoordinatedShutdown}
 import akka.kafka.ProducerSettings
 import csw.commons.utils.SocketUtils.getFreePort
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
-import csw.messages.location.scaladsl.LocationService
+import csw.services.location.api.scaladsl.LocationService
 import csw.services.event.EventServiceFactory
 import csw.services.event.api.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
 import csw.services.event.api.scaladsl.{EventPublisher, EventService, EventSubscriber}

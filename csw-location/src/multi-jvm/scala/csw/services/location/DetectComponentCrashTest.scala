@@ -5,7 +5,7 @@ import akka.stream.scaladsl.{Keep, Sink}
 import csw.messages.location.Connection.{HttpConnection, TcpConnection}
 import csw.messages.location._
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
-import csw.messages.location.models.{HttpRegistration, TcpRegistration}
+import csw.services.location.api.models.{HttpRegistration, TcpRegistration}
 import csw.services.logging.commons.LogAdminActorFactory
 
 import scala.concurrent.Await

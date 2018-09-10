@@ -11,8 +11,8 @@ import csw.messages.{ComponentMessage, ContainerMessage}
 import csw.messages.commons.CoordinatedShutdownReasons.ActorTerminatedReason
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
 import csw.messages.location._
-import csw.messages.location.models.{AkkaRegistration, HttpRegistration}
-import csw.messages.location.scaladsl.LocationService
+import csw.services.location.api.models.{AkkaRegistration, HttpRegistration}
+import csw.services.location.api.scaladsl.LocationService
 import csw.messages.params.models.Prefix
 import csw.services.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.services.location.commons.ActorSystemFactory

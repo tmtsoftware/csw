@@ -6,7 +6,7 @@ import csw.framework.internal.wiring.CswFrameworkSystem
 import csw.framework.models.CswServices
 import csw.messages.ContainerIdleMessage
 import csw.messages.framework.{Component, ComponentInfo, SupervisorInfo}
-import csw.messages.location.scaladsl.LocationService
+import csw.services.location.api.scaladsl.LocationService
 import csw.services.alarm.client.AlarmServiceFactory
 import csw.services.event.EventServiceFactory
 import csw.services.location.commons.ActorSystemFactory

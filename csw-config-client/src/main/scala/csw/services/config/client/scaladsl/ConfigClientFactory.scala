@@ -1,7 +1,7 @@
 package csw.services.config.client.scaladsl
 
 import akka.actor.ActorSystem
-import csw.messages.location.scaladsl.LocationService
+import csw.services.location.api.scaladsl.LocationService
 import csw.services.config.api.scaladsl.{ConfigClientService, ConfigService}
 import csw.services.config.client.internal.{ActorRuntime, ConfigClient, ConfigServiceResolver}
 

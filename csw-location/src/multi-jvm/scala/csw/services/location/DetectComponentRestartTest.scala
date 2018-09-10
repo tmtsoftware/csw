@@ -5,7 +5,7 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.ActorMaterializer
 import akka.testkit.TestProbe
 import csw.messages.location.Connection.AkkaConnection
-import csw.messages.location.models.AkkaRegistration
+import csw.services.location.api.models.AkkaRegistration
 import csw.messages.location.{ComponentId, ComponentType, LocationRemoved, LocationUpdated}
 import csw.messages.params.models.Prefix
 import csw.services.location.commons.CswCluster

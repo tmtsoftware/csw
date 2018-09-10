@@ -1,6 +1,6 @@
 package csw.services.location.commons
 
-import csw.messages.location.commons.Constants
+import csw.services.location.api.commons.Constants
 import csw.services.logging.scaladsl.LoggerFactory
 
 /**

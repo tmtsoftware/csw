@@ -34,7 +34,7 @@ import csw.services.command.javadsl.JCommandDistributor;
 import csw.services.command.javadsl.JCommandService;
 import csw.services.command.scaladsl.CurrentStateSubscription;
 import csw.services.location.commons.ClusterAwareSettings;
-import csw.messages.location.javadsl.ILocationService;
+import csw.services.location.api.javadsl.ILocationService;
 import csw.services.location.javadsl.JLocationServiceFactory;
 import csw.services.logging.javadsl.JLoggingSystemFactory;
 import io.lettuce.core.RedisClient;

@@ -2,8 +2,6 @@ package csw.services.alarm.client
 
 import akka.actor.ActorSystem
 import com.typesafe.config.ConfigFactory
-import csw.messages.location.javadsl.ILocationService
-import csw.messages.location.scaladsl.LocationService
 import csw.services.alarm.api.javadsl.IAlarmService
 import csw.services.alarm.api.scaladsl.{AlarmAdminService, AlarmService}
 import csw.services.alarm.client.internal.commons.Settings
@@ -14,6 +12,8 @@ import csw.services.alarm.client.internal.commons.serviceresolver.{
 }
 import csw.services.alarm.client.internal.redis.RedisConnectionsFactory
 import csw.services.alarm.client.internal.{AlarmServiceImpl, JAlarmServiceImpl}
+import csw.services.location.api.javadsl.ILocationService
+import csw.services.location.api.scaladsl.LocationService
 import io.lettuce.core.RedisClient
 import romaine.RomaineFactory
 

@@ -4,7 +4,7 @@ import akka.Done
 import csw.messages.extensions.Formats
 import csw.messages.extensions.Formats.MappableFormat
 import csw.messages.location.{ActorSystemDependentFormats, AkkaLocation}
-import csw.messages.location.models.Registration
+import csw.services.location.api.models.Registration
 import julienrf.json.derived
 import play.api.libs.json._
 

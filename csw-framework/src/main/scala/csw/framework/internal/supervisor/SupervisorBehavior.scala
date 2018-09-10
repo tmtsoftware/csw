@@ -29,7 +29,7 @@ import csw.messages.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.messages.framework._
 import csw.messages.location.ComponentId
 import csw.messages.location.Connection.AkkaConnection
-import csw.messages.location.models.AkkaRegistration
+import csw.services.location.api.models.AkkaRegistration
 import csw.messages.params.models.Prefix
 import csw.services.location.scaladsl.RegistrationFactory
 import csw.services.logging.scaladsl.Logger
@@ -51,13 +51,13 @@ private[framework] object SupervisorBehavior {
 /**
  * The Behavior of a Supervisor of a component actor, represented as a mutable behavior
  *
- * @param ctx the [[akka.actor.typed.scaladsl.ActorContext]] under which the actor instance of this behavior is created
- * @param timerScheduler provides support for scheduled `self` messages in an actor
- * @param maybeContainerRef the container ref of the container under which this supervisor is started if
- *                          it's not running in standalone mode
+ * @param ctx                      the [[akka.actor.typed.scaladsl.ActorContext]] under which the actor instance of this behavior is created
+ * @param timerScheduler           provides support for scheduled `self` messages in an actor
+ * @param maybeContainerRef        the container ref of the container under which this supervisor is started if
+ *                                 it's not running in standalone mode
  * @param componentBehaviorFactory the factory for creating the component supervised by this Supervisor
- * @param registrationFactory the factory for creating a typed [[csw.messages.location.models.AkkaRegistration]] from
- *                            [[csw.messages.location.Connection.AkkaConnection]]
+ * @param registrationFactory      the factory for creating a typed [[csw.services.location.api.models.AkkaRegistration]] from
+ *                                 [[csw.messages.location.Connection.AkkaConnection]]
  */
 private[framework] final class SupervisorBehavior(
     ctx: ActorContext[SupervisorMessage],

@@ -3,7 +3,7 @@ package csw.services.event.helpers
 import akka.actor.typed.ActorRef
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.params.models.Prefix
-import csw.messages.location.models.{AkkaRegistration, HttpRegistration, TcpRegistration}
+import csw.services.location.api.models.{AkkaRegistration, HttpRegistration, TcpRegistration}
 
 object RegistrationFactory {
   def akka(connection: AkkaConnection, actorRef: ActorRef[Nothing]): AkkaRegistration =

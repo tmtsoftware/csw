@@ -1,4 +1,4 @@
-package csw.messages.location.commons
+package csw.services.location.api.commons
 
 import csw.services.logging.scaladsl.LoggerFactory
 

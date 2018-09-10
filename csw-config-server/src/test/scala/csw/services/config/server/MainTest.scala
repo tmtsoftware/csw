@@ -7,7 +7,7 @@ import akka.http.scaladsl.model.{HttpRequest, StatusCodes, Uri}
 import akka.stream.{ActorMaterializer, Materializer}
 import com.typesafe.config.ConfigFactory
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
-import csw.messages.location.scaladsl.LocationService
+import csw.services.location.api.scaladsl.LocationService
 import csw.services.config.server.commons.TestFutureExtension.RichFuture
 import csw.services.config.server.commons.{ConfigServiceConnection, TestFileUtils}
 import csw.services.location.commons.ClusterSettings

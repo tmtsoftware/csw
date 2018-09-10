@@ -1,7 +1,7 @@
 package csw.services.event.cli.wiring
 
 import akka.actor.ActorSystem
-import csw.messages.location.scaladsl.LocationService
+import csw.services.location.api.scaladsl.LocationService
 import csw.services.event.EventServiceFactory
 import csw.services.event.api.scaladsl.EventService
 import csw.services.event.cli.{CliApp, CommandLineRunner}

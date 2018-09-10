@@ -1,4 +1,4 @@
-package csw.messages.location.exceptions
+package csw.services.location.api.exceptions
 
 import akka.actor.typed.ActorRef
 import csw.messages.location.{Connection, Location}

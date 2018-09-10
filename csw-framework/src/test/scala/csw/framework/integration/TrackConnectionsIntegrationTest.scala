@@ -21,7 +21,7 @@ import csw.services.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.services.command.scaladsl.CommandService
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.location.commons.ClusterSettings
-import csw.messages.location.models.{HttpRegistration, TcpRegistration}
+import csw.services.location.api.models.{HttpRegistration, TcpRegistration}
 import csw.services.logging.commons.LogAdminActorFactory
 import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar

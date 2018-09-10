@@ -10,7 +10,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.location._
 import csw.services.location.commons.{ActorSystemFactory, LocationFactory, TestRegistrationFactory}
-import csw.messages.location.exceptions.LocalAkkaActorRegistrationNotAllowed
+import csw.services.location.api.exceptions.LocalAkkaActorRegistrationNotAllowed
 import csw.services.location.internal.Networks
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
