@@ -7,4 +7,5 @@
 * [Configuration service](../services/config.md)
 * [Logging service](../services/logging.md)
 * [Event service](../services/event.md)
+* [Alarm service](../services/alarm.md)
 @@@
