@@ -38,7 +38,6 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
   `csw-config-server`,
   `csw-config-client-cli`,
   `csw-event-cli`,
-  `csw-alarm-client`,
   `csw-alarm-cli`,
   `csw-commons`,
   `csw-benchmark`,
