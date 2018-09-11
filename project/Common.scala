@@ -67,7 +67,7 @@ object Common extends AutoPlugin {
   }
 
   private def cycleCheckEnabled = sys.props.get("check.cycles") match {
-    case Some("true") ⇒ true
-    case _            ⇒ false
+    case Some("false") ⇒ false
+    case _             ⇒ true
   }
 }
