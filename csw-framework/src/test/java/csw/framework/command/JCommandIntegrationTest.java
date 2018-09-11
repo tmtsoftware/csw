@@ -21,8 +21,8 @@ import csw.messages.commands.matchers.*;
 import csw.messages.commons.CoordinatedShutdownReasons;
 import csw.messages.framework.LockingResponse;
 import csw.messages.framework.LockingResponses;
-import csw.messages.location.AkkaLocation;
-import csw.messages.location.ComponentId;
+import csw.services.location.api.models.AkkaLocation;
+import csw.services.location.api.models.ComponentId;
 import csw.messages.javadsl.JKeyType;
 import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;
@@ -53,7 +53,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import static csw.common.components.command.ComponentStateForCommand.*;
-import static csw.messages.location.Connection.AkkaConnection;
+import static csw.services.location.api.models.Connection.AkkaConnection;
 import static csw.services.location.javadsl.JComponentType.HCD;
 
 // DEOPSCSW-217: Execute RPC like commands

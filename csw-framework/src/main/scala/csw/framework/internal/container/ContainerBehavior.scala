@@ -15,10 +15,10 @@ import csw.messages.RunningMessage.Lifecycle
 import csw.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.messages.commons.CoordinatedShutdownReasons.{AllActorsWithinContainerTerminatedReason, FailedToCreateSupervisorsReason}
 import csw.messages.framework._
-import csw.messages.location.Connection.AkkaConnection
+import csw.services.location.api.models.Connection.AkkaConnection
 import csw.services.location.api.models.AkkaRegistration
 import csw.services.location.api.scaladsl.LocationService
-import csw.messages.location.{ComponentId, ComponentType}
+import csw.services.location.api.models.{ComponentId, ComponentType}
 import csw.messages.params.models.Prefix
 import csw.messages.params.models.Subsystem.Container
 import csw.messages.{ComponentMessage, ContainerActorMessage, ContainerCommonMessage, ContainerIdleMessage}
@@ -37,7 +37,7 @@ import scala.util.{Failure, Success}
  * @param containerInfo         container related information as described in the configuration file
  * @param supervisorInfoFactory the factory for creating the Supervisors for components described in ContainerInfo
  * @param registrationFactory   the factory for creating a typed [[csw.services.location.api.models.AkkaRegistration]] from
- * [[csw.messages.location.Connection.AkkaConnection]]
+ * [[csw.services.location.api.models.Connection.AkkaConnection]]
  * @param eventServiceFactory   the factory to create instance of event service to be used by components to use and/or create publishers and subscribers
  * @param locationService       the single instance of Location service created for a running application
  * @param loggerFactory         factory to create suitable logger instance

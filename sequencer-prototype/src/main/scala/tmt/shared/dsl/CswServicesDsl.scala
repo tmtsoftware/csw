@@ -4,7 +4,7 @@ import akka.stream.KillSwitch
 import akka.actor.typed.ActorSystem
 import akka.util.Timeout
 import csw.messages.commands.{CommandIssue, CommandResponse, ControlCommand}
-import csw.messages.location._
+import csw.services.location.api.models._
 import csw.services.command.scaladsl.CommandService
 import csw.services.location.scaladsl.LocationService
 import tmt.shared.util.FutureExt.RichFuture

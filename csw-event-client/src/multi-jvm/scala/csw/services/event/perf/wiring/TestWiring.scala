@@ -10,7 +10,7 @@ import org.scalatest.mockito.MockitoSugar
 import scala.concurrent.ExecutionContext
 
 class TestWiring(val actorSystem: actor.ActorSystem) extends MockitoSugar {
-  lazy val testConfigs = new TestConfigs(actorSystem.settings.config)
+  lazy val testConfigs: TestConfigs = new TestConfigs(actorSystem.settings.config)
   import testConfigs._
 
   implicit lazy val ec: ExecutionContext = actorSystem.dispatcher

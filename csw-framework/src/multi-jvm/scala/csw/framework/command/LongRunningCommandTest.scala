@@ -12,8 +12,8 @@ import csw.common.components.command.ComponentStateForCommand._
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.messages.commands.CommandResponse.{Accepted, Completed, Invalid}
 import csw.messages.commands.{CommandResponse, Setup}
-import csw.messages.location.Connection.AkkaConnection
-import csw.messages.location.{AkkaLocation, ComponentId, ComponentType}
+import csw.services.location.api.models.Connection.AkkaConnection
+import csw.services.location.api.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.{CurrentState, StateName}
 import csw.services.command.scaladsl.{CommandDistributor, CommandService}

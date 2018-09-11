@@ -27,8 +27,8 @@ import csw.messages.framework.LockingResponses.{LockExpired, LockExpiringShortly
 import csw.messages.framework.PubSub.Publish
 import csw.messages.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.messages.framework._
-import csw.messages.location.ComponentId
-import csw.messages.location.Connection.AkkaConnection
+import csw.services.location.api.models.ComponentId
+import csw.services.location.api.models.Connection.AkkaConnection
 import csw.services.location.api.models.AkkaRegistration
 import csw.messages.params.models.Prefix
 import csw.services.location.scaladsl.RegistrationFactory
@@ -57,7 +57,7 @@ private[framework] object SupervisorBehavior {
  *                                 it's not running in standalone mode
  * @param componentBehaviorFactory the factory for creating the component supervised by this Supervisor
  * @param registrationFactory      the factory for creating a typed [[csw.services.location.api.models.AkkaRegistration]] from
- *                                 [[csw.messages.location.Connection.AkkaConnection]]
+ *                                 [[csw.services.location.api.models.Connection.AkkaConnection]]
  */
 private[framework] final class SupervisorBehavior(
     ctx: ActorContext[SupervisorMessage],

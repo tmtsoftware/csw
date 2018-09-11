@@ -10,8 +10,9 @@ import akka.http.scaladsl.unmarshalling.sse.EventStreamUnmarshalling._
 import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{KillSwitch, Materializer}
 import akka.{Done, NotUsed}
-import csw.messages.location._
+import csw.services.location.api.models._
 import csw.services.location.api.exceptions.{OtherLocationIsRegistered, RegistrationFailed}
+import csw.services.location.api.formats.LocationJsonSupport
 import csw.services.location.internal.StreamExt.RichSource
 import csw.services.location.api.javadsl.ILocationService
 import csw.services.location.api.models.Registration

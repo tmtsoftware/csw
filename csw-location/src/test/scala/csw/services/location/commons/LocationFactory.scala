@@ -3,8 +3,8 @@ package csw.services.location.commons
 import java.net.URI
 
 import akka.actor.typed.ActorRef
-import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
-import csw.messages.location.{AkkaLocation, HttpLocation, TcpLocation}
+import csw.services.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.services.location.api.models.{AkkaLocation, HttpLocation, TcpLocation}
 import csw.messages.params.models.Prefix
 
 object LocationFactory {

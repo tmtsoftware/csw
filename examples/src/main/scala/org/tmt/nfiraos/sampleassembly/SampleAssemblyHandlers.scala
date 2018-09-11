@@ -8,7 +8,7 @@ import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandResponse.Accepted
 import csw.messages.commands.{CommandName, CommandResponse, ControlCommand, Setup}
 import csw.messages.events._
-import csw.messages.location.{AkkaLocation, LocationRemoved, LocationUpdated, TrackingEvent}
+import csw.services.location.api.models.{AkkaLocation, LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.messages.params.generics.{Key, KeyType, Parameter}
 import csw.messages.params.models.{ObsId, Prefix, Units}
 import csw.services.command.scaladsl.CommandService

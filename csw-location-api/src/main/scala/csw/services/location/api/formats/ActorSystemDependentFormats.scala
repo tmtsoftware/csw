@@ -1,4 +1,4 @@
-package csw.messages.location
+package csw.services.location.api.formats
 
 import java.net.URI
 
@@ -8,9 +8,10 @@ import akka.actor.typed.scaladsl.adapter._
 import akka.serialization.{Serialization, SerializationExtension}
 import csw.messages.extensions.Formats
 import csw.messages.extensions.Formats.MappableFormat
-import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.services.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.services.location.api.models.{Location, TrackingEvent}
 import julienrf.json.derived
-import play.api.libs.json._
+import play.api.libs.json.{__, Format, Json, OFormat}
 
 private[csw] trait ActorSystemDependentFormats {
   implicit def actorSystem: ActorSystem

@@ -5,8 +5,8 @@ import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import csw.messages.CommandMessage.Submit
 import csw.messages.commands.{CommandName, Setup}
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
-import csw.messages.location.Connection.AkkaConnection
-import csw.messages.location.{ComponentId, ComponentType}
+import csw.services.location.api.models.Connection.AkkaConnection
+import csw.services.location.api.models.{ComponentId, ComponentType}
 import csw.messages.params.models.Prefix
 import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.commons.ClusterAwareSettings

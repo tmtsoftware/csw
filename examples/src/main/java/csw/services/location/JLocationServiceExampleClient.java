@@ -15,9 +15,7 @@ import akka.stream.Materializer;
 import akka.stream.javadsl.Keep;
 import akka.stream.javadsl.Sink;
 import csw.messages.commons.CoordinatedShutdownReasons;
-import csw.messages.location.*;
-import csw.messages.location.Connection.AkkaConnection;
-import csw.messages.location.Connection.HttpConnection;
+import csw.services.location.api.models.*;
 import csw.services.location.api.javadsl.ILocationService;
 import csw.services.location.api.javadsl.IRegistrationResult;
 import csw.messages.params.models.Prefix;
@@ -45,6 +43,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+
+import static csw.services.location.api.models.Connection.*;
 
 /**
  * An example location service client application.

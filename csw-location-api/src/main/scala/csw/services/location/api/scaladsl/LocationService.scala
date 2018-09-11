@@ -5,9 +5,8 @@ import akka.Done
 import akka.actor.CoordinatedShutdown.Reason
 import akka.stream.KillSwitch
 import akka.stream.scaladsl.Source
-import csw.messages.location._
 import csw.services.location.api.javadsl.ILocationService
-import csw.services.location.api.models.Registration
+import csw.services.location.api.models._
 import csw.services.location.models.RegistrationResult
 
 import scala.concurrent.Future

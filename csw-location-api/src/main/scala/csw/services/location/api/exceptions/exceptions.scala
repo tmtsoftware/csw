@@ -1,7 +1,7 @@
 package csw.services.location.api.exceptions
 
 import akka.actor.typed.ActorRef
-import csw.messages.location.{Connection, Location}
+import csw.services.location.api.models.{Connection, Location}
 
 /**
  * An Exception representing failure in registration

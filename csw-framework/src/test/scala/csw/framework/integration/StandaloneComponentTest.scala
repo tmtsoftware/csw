@@ -16,9 +16,9 @@ import csw.framework.internal.component.ComponentBehavior
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.messages.SupervisorContainerCommonMessages.Shutdown
 import csw.messages.framework.SupervisorLifecycleState
-import csw.messages.location.ComponentType.HCD
-import csw.messages.location.Connection.AkkaConnection
-import csw.messages.location.{ComponentId, LocationRemoved, LocationUpdated, TrackingEvent}
+import csw.services.location.api.models.ComponentType.HCD
+import csw.services.location.api.models.Connection.AkkaConnection
+import csw.services.location.api.models.{ComponentId, LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.messages.params.states.{CurrentState, StateName}
 import csw.services.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.services.command.scaladsl.CommandService

@@ -1,6 +1,6 @@
-package csw.messages.location
+package csw.services.location.api.models
 
-import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.services.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 class ConnectionTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {

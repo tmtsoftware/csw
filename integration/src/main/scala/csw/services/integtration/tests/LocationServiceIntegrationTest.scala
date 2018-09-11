@@ -9,11 +9,11 @@ import akka.util.Timeout
 import csw.messages.CommandMessage.Submit
 import csw.messages.commands.{CommandName, Setup}
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
-import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
+import csw.services.location.api.models.Connection.{AkkaConnection, HttpConnection}
 import csw.services.location.api.exceptions.OtherLocationIsRegistered
 import csw.services.location.api.models.AkkaRegistration
 import csw.services.location.api.scaladsl.LocationService
-import csw.messages.location.{AkkaLocation, ComponentId, ComponentType, HttpLocation}
+import csw.services.location.api.models.{AkkaLocation, ComponentId, ComponentType, HttpLocation}
 import csw.messages.params.models.Prefix
 import csw.services.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.services.integtration.apps.TromboneHCD

@@ -6,7 +6,7 @@ import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandResponse.Accepted
 import csw.messages.commands.{CommandResponse, ControlCommand}
-import csw.messages.location.TrackingEvent
+import csw.services.location.api.models.TrackingEvent
 import csw.services.logging.scaladsl.Logger
 
 import scala.concurrent.Future

@@ -13,7 +13,7 @@ import csw.messages.events.Event;
 import csw.messages.events.EventName;
 import csw.messages.events.SystemEvent;
 import csw.messages.framework.ComponentInfo;
-import csw.messages.location.TrackingEvent;
+import csw.services.location.api.models.TrackingEvent;
 import csw.messages.javadsl.JKeyType;
 import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;

@@ -1,4 +1,4 @@
-package csw.messages.location
+package csw.services.location.api.models
 
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 

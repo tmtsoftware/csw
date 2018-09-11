@@ -1,4 +1,4 @@
-package csw.messages.location
+package csw.services.location.api.models
 
 import csw.messages.TMTSerializable
 import enumeratum.EnumEntry.Lowercase

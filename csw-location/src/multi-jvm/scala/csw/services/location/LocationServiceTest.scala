@@ -1,7 +1,7 @@
 package csw.services.location
 
-import csw.messages.location.Connection.{HttpConnection, TcpConnection}
-import csw.messages.location._
+import csw.services.location.api.models.Connection.{HttpConnection, TcpConnection}
+import csw.services.location.api.models._
 import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.location.commons.TestRegistrationFactory
 import csw.services.location.helpers.{LSNodeSpec, OneMemberAndSeed}

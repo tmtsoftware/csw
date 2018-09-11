@@ -1,7 +1,7 @@
 package csw.services.location.scaladsl
 
 import akka.actor.typed.ActorRef
-import csw.messages.location.Connection.AkkaConnection
+import csw.services.location.api.models.Connection.AkkaConnection
 import csw.services.location.api.models.AkkaRegistration
 import csw.messages.params.models.Prefix
 import csw.services.logging.messages.LogControlMessages

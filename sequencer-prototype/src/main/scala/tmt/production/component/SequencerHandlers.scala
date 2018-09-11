@@ -14,7 +14,7 @@ import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.{CommandResponse, ControlCommand}
 import csw.messages.framework.ComponentInfo
-import csw.messages.location.TrackingEvent
+import csw.services.location.api.models.TrackingEvent
 import csw.services.command.CommandResponseManager
 import csw.services.config.api.models.ConfigData
 import tmt.production.dsl.Dsl

@@ -8,8 +8,8 @@ import csw.messages.commands.CommandIssue.OtherIssue
 import csw.messages.commands.CommandResponse.{Accepted, Completed, Invalid}
 import csw.messages.commands._
 import csw.messages.events.{Event, EventName, SystemEvent}
-import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
-import csw.messages.location.{LocationRemoved, LocationUpdated, TrackingEvent}
+import csw.services.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.services.location.api.models.{LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.messages.params.models.Prefix
 import csw.messages.params.states.{CurrentState, StateName}
 import csw.services.logging.scaladsl.Logger

@@ -12,9 +12,9 @@ import csw.messages.commands
 import csw.messages.commands.CommandName
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.framework.ContainerLifecycleState
-import csw.messages.location.ComponentId
-import csw.messages.location.ComponentType.{Assembly, HCD}
-import csw.messages.location.Connection.AkkaConnection
+import csw.services.location.api.models.ComponentId
+import csw.services.location.api.models.ComponentType.{Assembly, HCD}
+import csw.services.location.api.models.Connection.AkkaConnection
 import csw.messages.params.states.{CurrentState, StateName}
 import csw.services.command.scaladsl.CommandService
 import csw.services.event.helpers.TestFutureExt.RichFuture

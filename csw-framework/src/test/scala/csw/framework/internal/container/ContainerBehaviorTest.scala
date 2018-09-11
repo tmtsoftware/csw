@@ -17,7 +17,7 @@ import csw.messages.RunningMessage.Lifecycle
 import csw.messages.SupervisorContainerCommonMessages.Restart
 import csw.messages.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.messages.framework.{ComponentInfo, ContainerLifecycleState, SupervisorLifecycleState, _}
-import csw.messages.location.Connection.AkkaConnection
+import csw.services.location.api.models.Connection.AkkaConnection
 import csw.services.location.api.scaladsl.LocationService
 import csw.messages.params.models.Prefix
 import csw.messages.{ComponentMessage, ContainerActorMessage, ContainerIdleMessage}

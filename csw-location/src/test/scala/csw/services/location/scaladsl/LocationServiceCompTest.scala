@@ -8,8 +8,8 @@ import akka.stream.scaladsl.{Keep, Sink}
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.testkit.TestProbe
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
-import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
-import csw.messages.location._
+import csw.services.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.services.location.api.models._
 import csw.services.location.api.exceptions.OtherLocationIsRegistered
 import csw.services.location.api.models.{HttpRegistration, TcpRegistration}
 import csw.services.location.api.scaladsl.LocationService

@@ -20,8 +20,8 @@ import csw.messages.framework.LocationServiceUsage.DoNotRegister
 import csw.messages.framework.PubSub.Subscribe
 import csw.messages.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.messages.framework._
-import csw.messages.location.ComponentType.HCD
-import csw.messages.location.Connection
+import csw.services.location.api.models.ComponentType.HCD
+import csw.services.location.api.models.Connection
 import csw.messages.params.generics.KeyType.{ByteArrayKey, ChoiceKey, DoubleMatrixKey, IntKey, StructKey}
 import csw.messages.params.generics.{Key, KeyType, Parameter}
 import csw.messages.params.models.Units.{arcmin, coulomb, encoder, joule, lightyear, meter, pascal, NoUnits}

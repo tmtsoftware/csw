@@ -9,8 +9,8 @@ import akka.stream.scaladsl.{Keep, Sink}
 import akka.stream.{ActorMaterializer, Materializer}
 import csw.messages.{ComponentMessage, ContainerMessage}
 import csw.messages.commons.CoordinatedShutdownReasons.ActorTerminatedReason
-import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
-import csw.messages.location._
+import csw.services.location.api.models.Connection.{AkkaConnection, HttpConnection}
+import csw.services.location.api.models._
 import csw.services.location.api.models.{AkkaRegistration, HttpRegistration}
 import csw.services.location.api.scaladsl.LocationService
 import csw.messages.params.models.Prefix

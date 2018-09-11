@@ -1,12 +1,12 @@
-package csw.messages.location
+package csw.services.location.api.models
 
 import acyclic.skipped
 import java.net.URI
 
 import akka.actor.typed.ActorRef
 import csw.messages.TMTSerializable
-import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.messages.params.models.Prefix
+import csw.services.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 
 import scala.reflect.ClassTag
 

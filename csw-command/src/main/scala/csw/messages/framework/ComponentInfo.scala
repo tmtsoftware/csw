@@ -1,7 +1,7 @@
 package csw.messages.framework
 
 import csw.messages.TMTSerializable
-import csw.messages.location.{ComponentType, Connection}
+import csw.services.location.api.models.{ComponentType, Connection}
 import csw.messages.params.models.Prefix
 import play.api.libs.json._
 
@@ -13,7 +13,7 @@ import scala.concurrent.duration.{DurationDouble, FiniteDuration}
  *
  * @param name the name of the component
  * @param componentType
- *  : the type of the component as defined by [[csw.messages.location.ComponentType]]
+ *  : the type of the component as defined by [[csw.services.location.api.models.ComponentType]]
  * @param prefix identifies the subsystem
  * @param behaviorFactoryClassName
  *  : specifies the component to be created by name of the class of it's factory

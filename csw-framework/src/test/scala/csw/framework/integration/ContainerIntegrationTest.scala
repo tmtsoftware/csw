@@ -16,9 +16,9 @@ import csw.messages.framework
 import csw.messages.framework.PubSub.Subscribe
 import csw.messages.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.messages.framework.{Components, ContainerLifecycleState, LifecycleStateChanged, SupervisorLifecycleState}
-import csw.messages.location.ComponentType.{Assembly, HCD}
-import csw.messages.location.Connection.AkkaConnection
-import csw.messages.location.{ComponentId, ComponentType, LocationRemoved, TrackingEvent}
+import csw.services.location.api.models.ComponentType.{Assembly, HCD}
+import csw.services.location.api.models.Connection.AkkaConnection
+import csw.services.location.api.models.{ComponentId, ComponentType, LocationRemoved, TrackingEvent}
 import csw.messages.params.states.{CurrentState, StateName}
 import csw.services.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.services.command.scaladsl.CommandService

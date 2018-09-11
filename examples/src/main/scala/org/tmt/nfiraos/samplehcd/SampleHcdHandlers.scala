@@ -7,7 +7,7 @@ import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands._
 import csw.messages.events.{EventName, SystemEvent}
-import csw.messages.location.TrackingEvent
+import csw.services.location.api.models.TrackingEvent
 import csw.messages.params.generics.{Key, KeyType, Parameter}
 import csw.messages.params.models.Id
 

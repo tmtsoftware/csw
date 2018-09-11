@@ -1,8 +1,8 @@
 package csw.common.components.framework
 
 import csw.messages.commands.CommandName
-import csw.messages.location.Connection.{HttpConnection, TcpConnection}
-import csw.messages.location.{ComponentId, ComponentType}
+import csw.services.location.api.models.Connection.{HttpConnection, TcpConnection}
+import csw.services.location.api.models.{ComponentId, ComponentType}
 import csw.messages.params.generics.GChoiceKey
 import csw.messages.params.generics.KeyType.ChoiceKey
 import csw.messages.params.models.Subsystem.NFIRAOS

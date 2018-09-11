@@ -13,8 +13,8 @@ import csw.messages.CommandMessage.{Oneway, Submit}
 import csw.messages.CommandResponseManagerMessage.Subscribe
 import csw.messages.commands.CommandResponse.{Accepted, Cancelled, Completed}
 import csw.messages.commands.{CommandResponse, Setup}
-import csw.messages.location.Connection.AkkaConnection
-import csw.messages.location.{ComponentId, ComponentType}
+import csw.services.location.api.models.Connection.AkkaConnection
+import csw.services.location.api.models.{ComponentId, ComponentType}
 import csw.messages.params.generics.KeyType
 import csw.messages.params.models.ObsId
 import csw.services.command.extensions.AkkaLocationExt.RichAkkaLocation

@@ -6,8 +6,8 @@ import java.nio.file.Paths
 import akka.actor.typed.ActorRef
 import com.typesafe.config.ConfigFactory
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
-import csw.messages.location.Connection.TcpConnection
-import csw.messages.location.{ComponentId, ComponentType}
+import csw.services.location.api.models.Connection.TcpConnection
+import csw.services.location.api.models.{ComponentId, ComponentType}
 import csw.services.location.agent.common.TestFutureExtension.RichFuture
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.location.scaladsl.LocationServiceFactory

@@ -7,8 +7,8 @@ import akka.actor.{typed, ActorSystem}
 import com.typesafe.config.Config
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState}
-import csw.messages.location.Connection.AkkaConnection
-import csw.messages.location.{AkkaLocation, ComponentId, ComponentType}
+import csw.services.location.api.models.Connection.AkkaConnection
+import csw.services.location.api.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.messages.ComponentCommonMessage.GetSupervisorLifecycleState
 import csw.messages.{ComponentMessage, ContainerMessage}
 import csw.messages.ContainerCommonMessage.GetContainerLifecycleState

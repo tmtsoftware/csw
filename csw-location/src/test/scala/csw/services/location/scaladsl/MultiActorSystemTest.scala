@@ -1,9 +1,9 @@
 package csw.services.location.scaladsl
 
 import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
-import csw.messages.location.Connection.TcpConnection
+import csw.services.location.api.models.Connection.TcpConnection
 import csw.services.location.api.models.TcpRegistration
-import csw.messages.location.{ComponentId, ComponentType}
+import csw.services.location.api.models.{ComponentId, ComponentType}
 import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.location.commons._
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}

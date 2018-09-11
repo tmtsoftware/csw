@@ -10,7 +10,7 @@ import csw.framework.models.CswServices
 import csw.messages.CommandResponseManagerMessage
 import csw.messages.commands.CommandResponse
 import csw.messages.framework.{LifecycleStateChanged, PubSub}
-import csw.messages.location.Connection.AkkaConnection
+import csw.services.location.api.models.Connection.AkkaConnection
 import csw.services.location.api.javadsl.ILocationService
 import csw.services.location.api.models.AkkaRegistration
 import csw.services.location.api.scaladsl.LocationService

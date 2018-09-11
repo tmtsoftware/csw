@@ -3,7 +3,7 @@ package csw.services.location.api.javadsl
 import java.util.concurrent.CompletableFuture
 
 import akka.Done
-import csw.messages.location.Location
+import csw.services.location.api.models.Location
 
 /**
  * IRegistrationResult represents successful registration of a location

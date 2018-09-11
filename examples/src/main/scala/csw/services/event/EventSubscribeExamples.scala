@@ -6,7 +6,7 @@ import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
 import csw.messages.TopLevelActorMessage
 import csw.messages.events.{Event, EventKey, EventName}
-import csw.messages.location.AkkaLocation
+import csw.services.location.api.models.AkkaLocation
 import csw.messages.params.models.Subsystem
 import csw.services.event.api.scaladsl.{EventService, EventSubscription, SubscriptionModes}
 

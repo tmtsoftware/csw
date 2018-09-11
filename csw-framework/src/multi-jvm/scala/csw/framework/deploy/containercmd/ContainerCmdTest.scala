@@ -15,8 +15,8 @@ import csw.messages.commands.{CommandName, Setup}
 import csw.messages.framework.PubSub.Subscribe
 import csw.messages.framework.ToComponentLifecycleMessages.GoOffline
 import csw.messages.framework.{Components, ContainerLifecycleState, SupervisorLifecycleState}
-import csw.messages.location.Connection.AkkaConnection
-import csw.messages.location.{ComponentId, ComponentType}
+import csw.services.location.api.models.Connection.AkkaConnection
+import csw.services.location.api.models.{ComponentId, ComponentType}
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.{ObsId, Prefix}
 import csw.messages.params.models.Subsystem.Container

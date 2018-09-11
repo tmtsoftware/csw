@@ -17,8 +17,8 @@ import csw.messages.commands.matchers.MatcherResponses.{MatchCompleted, MatchFai
 import csw.messages.commands.matchers.{DemandMatcher, Matcher, MatcherResponse}
 import csw.messages.framework.LockingResponse
 import csw.messages.framework.LockingResponses.LockAcquired
-import csw.messages.location.Connection.AkkaConnection
-import csw.messages.location.{AkkaLocation, ComponentId, ComponentType}
+import csw.services.location.api.models.Connection.AkkaConnection
+import csw.services.location.api.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.{ObsId, Prefix}
 import csw.messages.params.states.{DemandState, StateName}

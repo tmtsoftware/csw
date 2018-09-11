@@ -1,6 +1,5 @@
 package csw.services.location.api.javadsl
 
-import acyclic.skipped
 import java.time.Duration
 import java.util.Optional
 import java.util.concurrent.CompletableFuture
@@ -11,8 +10,7 @@ import akka.Done
 import akka.actor.CoordinatedShutdown.Reason
 import akka.stream.KillSwitch
 import akka.stream.javadsl.Source
-import csw.messages.location._
-import csw.services.location.api.models.Registration
+import csw.services.location.api.models._
 import csw.services.location.api.scaladsl.LocationService
 
 /**
@@ -138,7 +136,7 @@ trait ILocationService {
   /**
    * Shuts down the LocationService
    *
-   * @see terminate method in [[csw.services.location.commons.CswCluster]]
+   * @see terminate method in CswCluster
    * @note it is recommended not to perform any operation on LocationService after calling this method
    * @param reason the reason explaining the shutdown
    * @return a CompletableFuture which completes when the location service has shutdown successfully

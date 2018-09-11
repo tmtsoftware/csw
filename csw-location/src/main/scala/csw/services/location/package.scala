@@ -17,20 +17,20 @@ package csw.services
  *  - clusterPort (Specify port on which to start this service) Ex. clusterPort=3552 if this property is not set, service will start on random port.
  *
  * Location service make use of classes defined in `csw-messages` package, for example:
- * - [[csw.messages.location.Location]] :
+ * - [[csw.services.location.api.models.Location]] :
  *  When you resolve component location using [[csw.services.location.api.scaladsl.LocationService]], you get back this location.
  *  There are three types of Locations:
- *   - [[csw.messages.location.AkkaLocation]]: holds hostname, port and actorRef which is ready to receive [[csw.messages.commands.Command]] from outside.
- *   - [[csw.messages.location.TcpLocation]]: holds hostname and port which can be used for further communication.
- *   - [[csw.messages.location.HttpLocation]]: holds hostname and port which can be used for further communication.
+ *   - [[csw.services.location.api.models.AkkaLocation]]: holds hostname, port and actorRef which is ready to receive [[csw.messages.commands.Command]] from outside.
+ *   - [[csw.services.location.api.models.TcpLocation]]: holds hostname and port which can be used for further communication.
+ *   - [[csw.services.location.api.models.HttpLocation]]: holds hostname and port which can be used for further communication.
  *
- * - [[csw.messages.location.Connection]]  :
- *  Connection holds the identity of component which includes `component name` and [[csw.messages.location.ComponentType]].
+ * - [[csw.services.location.api.models.Connection]]  :
+ *  Connection holds the identity of component which includes `component name` and [[csw.services.location.api.models.ComponentType]].
  *  Every component needs to register with location service using unique connection.
  *  There are three types of Connections:
- *  - [[csw.messages.location.Connection.AkkaConnection]]
- *  - [[csw.messages.location.Connection.TcpConnection]]
- *  - [[csw.messages.location.Connection.HttpConnection]]
+ *  - [[csw.services.location.api.models.Connection.AkkaConnection]]
+ *  - [[csw.services.location.api.models.Connection.TcpConnection]]
+ *  - [[csw.services.location.api.models.Connection.HttpConnection]]
  *
  * Another important actor from LocationService is `DeathwatchActor` [[csw.services.location.internal.DeathwatchActor]]
  * which gets created with LocationService initialization. Job of this actor is to watch health of every component and on termination,

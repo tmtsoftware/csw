@@ -8,7 +8,7 @@ import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandResponse.{Accepted, Completed, Error}
 import csw.messages.commands.{CommandResponse, ControlCommand}
-import csw.messages.location.TrackingEvent
+import csw.services.location.api.models.TrackingEvent
 
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationLong

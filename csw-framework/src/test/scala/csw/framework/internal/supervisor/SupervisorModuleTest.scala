@@ -10,8 +10,8 @@ import csw.messages.commands.matchers.DemandMatcher
 import csw.messages.framework.PubSub.Subscribe
 import csw.messages.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.messages.framework.{ComponentInfo, LifecycleStateChanged, SupervisorLifecycleState}
-import csw.messages.location.ComponentType.{Assembly, HCD}
-import csw.messages.location.Connection.AkkaConnection
+import csw.services.location.api.models.ComponentType.{Assembly, HCD}
+import csw.services.location.api.models.Connection.AkkaConnection
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.{CurrentState, DemandState, StateName}

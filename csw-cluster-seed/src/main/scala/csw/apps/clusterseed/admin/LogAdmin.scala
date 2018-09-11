@@ -5,9 +5,9 @@ import akka.util.Timeout
 import csw.apps.clusterseed.admin.exceptions.{InvalidComponentNameException, UnresolvedAkkaOrHttpLocationException}
 import csw.apps.clusterseed.internal.ActorRuntime
 import csw.apps.clusterseed.commons.ClusterSeedLogger
-import csw.messages.location.Connection.{AkkaConnection, HttpConnection}
+import csw.services.location.api.models.Connection.{AkkaConnection, HttpConnection}
 import csw.services.location.api.scaladsl.LocationService
-import csw.messages.location.{Connection, Location}
+import csw.services.location.api.models.{Connection, Location}
 import csw.services.logging.internal.LoggingLevels.Level
 import csw.services.logging.messages.{GetComponentLogMetadata, LogControlMessages, SetComponentLogLevel}
 import csw.services.logging.models.LogMetadata

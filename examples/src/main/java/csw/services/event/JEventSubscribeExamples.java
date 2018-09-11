@@ -10,7 +10,7 @@ import csw.messages.TopLevelActorMessage;
 import csw.messages.events.Event;
 import csw.messages.events.EventKey;
 import csw.messages.events.EventName;
-import csw.messages.location.AkkaLocation;
+import csw.services.location.api.models.AkkaLocation;
 import csw.messages.params.models.Subsystem;
 import csw.services.event.api.javadsl.IEventSubscriber;
 import csw.services.event.api.javadsl.IEventSubscription;

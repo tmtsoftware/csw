@@ -4,9 +4,9 @@ import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.ActorMaterializer
 import akka.testkit.TestProbe
-import csw.messages.location.Connection.AkkaConnection
+import csw.services.location.api.models.Connection.AkkaConnection
 import csw.services.location.api.models.AkkaRegistration
-import csw.messages.location.{ComponentId, ComponentType, LocationRemoved, LocationUpdated}
+import csw.services.location.api.models.{ComponentId, ComponentType, LocationRemoved, LocationUpdated}
 import csw.messages.params.models.Prefix
 import csw.services.location.commons.CswCluster
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}

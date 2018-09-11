@@ -14,10 +14,7 @@ import akka.stream.testkit.javadsl.TestSink;
 import akka.testkit.TestProbe;
 import akka.actor.typed.ActorRef;
 import akka.actor.typed.javadsl.Adapter;
-import csw.messages.location.*;
-import csw.messages.location.Connection.AkkaConnection;
-import csw.messages.location.Connection.HttpConnection;
-import csw.messages.location.Connection.TcpConnection;
+import csw.services.location.api.models.*;
 import csw.messages.commons.CoordinatedShutdownReasons;
 import csw.services.location.api.commons.Constants;
 import csw.services.location.api.javadsl.ILocationService;
@@ -40,6 +37,8 @@ import scala.concurrent.duration.FiniteDuration;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+
+import static csw.services.location.api.models.Connection.*;
 
 @SuppressWarnings("ConstantConditions")
 public class JLocationServiceImplTest {

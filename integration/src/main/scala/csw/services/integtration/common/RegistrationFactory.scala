@@ -1,6 +1,6 @@
 package csw.services.integtration.common
 
-import csw.messages.location.Connection.HttpConnection
+import csw.services.location.api.models.Connection.HttpConnection
 import csw.services.location.api.models.HttpRegistration
 
 object RegistrationFactory {

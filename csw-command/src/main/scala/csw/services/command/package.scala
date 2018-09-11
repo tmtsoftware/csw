@@ -32,7 +32,7 @@ package csw.services
  *
  * - [[csw.services.command.scaladsl.CommandService]]
  *
- * This class wraps the [[csw.messages.location.AkkaLocation]] and provides helpers to send commands to component actor extracted from provided location.
+ * This class wraps the [[csw.services.location.api.models.AkkaLocation]] and provides helpers to send commands to component actor extracted from provided location.
  * Normal component writers workflow would be to first resolve component using location service and then create CommandService instance using resolved location.
  *
  * Using this instance, you can Submit Command/Commands to other component or query for command result or subscribe for long running command result.

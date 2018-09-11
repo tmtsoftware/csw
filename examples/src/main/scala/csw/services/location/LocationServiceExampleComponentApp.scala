@@ -7,9 +7,9 @@ import akka.stream.ActorMaterializer
 import akka.actor.typed
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.adapter._
-import csw.messages.location.Connection.AkkaConnection
+import csw.services.location.api.models.Connection.AkkaConnection
 import csw.services.location.api.scaladsl.LocationService
-import csw.messages.location.{ComponentId, ComponentType}
+import csw.services.location.api.models.{ComponentId, ComponentType}
 import csw.messages.params.models.Prefix
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.api.models.AkkaRegistration

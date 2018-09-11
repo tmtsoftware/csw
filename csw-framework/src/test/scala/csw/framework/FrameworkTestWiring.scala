@@ -6,7 +6,7 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.{ActorMaterializer, Materializer}
 import csw.commons.redis.EmbeddedRedis
 import csw.commons.utils.SocketUtils
-import csw.messages.location.Connection.TcpConnection
+import csw.services.location.api.models.Connection.TcpConnection
 import csw.services.location.api.models.TcpRegistration
 import csw.services.location.api.scaladsl.LocationService
 import csw.services.event.helpers.TestFutureExt.RichFuture

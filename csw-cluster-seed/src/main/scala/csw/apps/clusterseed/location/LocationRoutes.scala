@@ -8,10 +8,10 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.stream.scaladsl.Source
 import csw.apps.clusterseed.internal.ActorRuntime
-import csw.messages.location._
+import csw.services.location.api.models._
+import csw.services.location.api.formats.LocationJsonSupport
 import csw.services.location.api.models.Registration
 import csw.services.location.api.scaladsl.LocationService
-import csw.services.location.internal.LocationJsonSupport
 import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
 import play.api.libs.json.Json
 
