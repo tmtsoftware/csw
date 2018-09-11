@@ -8,6 +8,7 @@
 * [csw-config-server](../apps/cswonfigserverapp.md): Start a Configuration Service SVN repository.
 * [csw-config-client-cli](../apps/cswconfigclientcli.md): Application to perform administrative functions on the Configuration Service.
 * [csw-event-cli](../apps/csweventcli.md): Application to publish an event or subscribe to an event.
+* [csw-alarm-cli](../apps/cswalarmcli.md): Application to perform administrative functions on the Alarm Service.
 * [csw-host-config](../apps/hostconfig.md): Framework for creating host configuration applications, used to start multiple containers on a machine.
 @@@
 
@@ -18,7 +19,7 @@ In order to run a component it is required to run `csw-cluster-seed`. Moreover, 
 
 But for developers to start `csw-cluster-seed` first and then configuration service and then event service is a tedious job. So, for
 development purpose, it is recommended to use a shell script which will start `csw-cluster-seed` and/or configuration service and/or 
-event service.
+event service and/or alarm service.
 
 Assuming that developer has downloaded `csw-apps-<some-version>.zip` from [csw releases](https://github.com/tmtsoftware/csw-prod/releases)
 and unzipped it.
@@ -39,7 +40,8 @@ This shell script will start `csw-cluster-seed` as the first step regardless of 
 
 The execution of the script is such that it starts `csw-cluster-seed`, then checks whether to start configuration service from provided
 `--config` option, if provided, then starts configuration service. Next, it checks whether to start event service from provided 
-`--event` option, if provided, it starts event service.
+`--event` option, if provided, it starts event service. Next, it checks whether to start alarm service from provided 
+`--alarm` option, if provided, it starts alarm service.
 
 With this, the component code is now ready to connect to configuration service and event service started via `csw-services.sh`.   
 
