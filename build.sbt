@@ -87,7 +87,7 @@ lazy val `csw-params` = crossProject(JSPlatform, JVMPlatform)
   )
 
 lazy val `csw-params-js` = `csw-params`.js
-lazy val `csw-params-jvm` = `csw-params`.jvm
+lazy val `csw-params-jvm` = `csw-params`.jvm.dependsOn(`csw-commons` % "test->test")
 
 lazy val `csw-logging-macros` = project
   .settings(
