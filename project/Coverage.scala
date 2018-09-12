@@ -12,7 +12,8 @@ object Coverage extends AutoPlugin {
     coverageFailOnMinimum := true,
     coverageHighlighting := true,
     coverageOutputCobertura := true,
-    coverageOutputXML := true
+    coverageOutputXML := true,
+    coverageExcludedPackages := "csw_protobuf.*"
   )
 
 }
