@@ -14,7 +14,7 @@ import akka.stream.KillSwitch;
 import akka.stream.Materializer;
 import akka.stream.javadsl.Keep;
 import akka.stream.javadsl.Sink;
-import csw.messages.commons.CoordinatedShutdownReasons;
+import csw.framework.commons.CoordinatedShutdownReasons;
 import csw.services.location.api.models.*;
 import csw.services.location.api.javadsl.ILocationService;
 import csw.services.location.api.javadsl.IRegistrationResult;

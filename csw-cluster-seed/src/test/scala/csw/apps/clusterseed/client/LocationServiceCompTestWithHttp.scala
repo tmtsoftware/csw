@@ -1,7 +1,7 @@
 package csw.apps.clusterseed.client
 
+import akka.actor.CoordinatedShutdown.UnknownReason
 import csw.apps.clusterseed.internal.AdminWiring
-import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.location.scaladsl.LocationServiceCompTest
 
@@ -12,7 +12,7 @@ class LocationServiceCompTestWithHttp extends LocationServiceCompTest("http") {
   wiring.locationHttpService.start().await
 
   override protected def afterAll(): Unit = {
-    wiring.actorRuntime.shutdown(TestFinishedReason).await
+    wiring.actorRuntime.shutdown(UnknownReason).await
     super.afterAll()
   }
 }

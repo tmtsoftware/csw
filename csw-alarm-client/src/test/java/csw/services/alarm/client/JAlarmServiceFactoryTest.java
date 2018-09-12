@@ -1,18 +1,18 @@
 package csw.services.alarm.client;
 
 import akka.actor.ActorSystem;
+import akka.actor.CoordinatedShutdown;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import csw.messages.commons.CoordinatedShutdownReasons;
 import csw.services.alarm.api.javadsl.IAlarmService;
 import csw.services.alarm.api.models.FullAlarmSeverity;
 import csw.services.alarm.api.scaladsl.AlarmAdminService;
 import csw.services.alarm.client.internal.commons.AlarmServiceConnection;
 import csw.services.alarm.client.internal.helpers.AlarmServiceTestSetup;
-import csw.services.location.commons.ClusterAwareSettings;
 import csw.services.location.api.javadsl.ILocationService;
-import csw.services.location.javadsl.JLocationServiceFactory;
 import csw.services.location.api.models.TcpRegistration;
+import csw.services.location.commons.ClusterAwareSettings;
+import csw.services.location.javadsl.JLocationServiceFactory;
 import csw.services.logging.commons.LogAdminActorFactory;
 import org.junit.*;
 import scala.concurrent.Await;
@@ -46,7 +46,7 @@ public class JAlarmServiceFactoryTest {
 
     @AfterClass
     public static void teardown() throws ExecutionException, InterruptedException {
-        locationService.shutdown(CoordinatedShutdownReasons.testFinishedReason()).get();
+        locationService.shutdown(CoordinatedShutdown.unknownReason()).get();
         testSetup.afterAll();
     }
 

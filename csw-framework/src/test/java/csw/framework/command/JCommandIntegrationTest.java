@@ -1,6 +1,7 @@
 package csw.framework.command;
 
 import akka.actor.ActorSystem;
+import akka.actor.CoordinatedShutdown;
 import akka.actor.testkit.typed.javadsl.TestInbox;
 import akka.actor.testkit.typed.javadsl.TestProbe;
 import akka.actor.typed.internal.adapter.ActorSystemAdapter;
@@ -18,7 +19,6 @@ import csw.messages.commands.CommandResponse.Completed;
 import csw.messages.commands.ControlCommand;
 import csw.messages.commands.Setup;
 import csw.messages.commands.matchers.*;
-import csw.messages.commons.CoordinatedShutdownReasons;
 import csw.messages.framework.LockingResponse;
 import csw.messages.framework.LockingResponses;
 import csw.services.location.api.models.AkkaLocation;
@@ -83,7 +83,7 @@ public class JCommandIntegrationTest {
 
     @AfterClass
     public static void teardown() throws Exception {
-        locationService.shutdown(CoordinatedShutdownReasons.testFinishedReason()).get();
+        locationService.shutdown(CoordinatedShutdown.unknownReason()).get();
         Await.result(hcdActorSystem.terminate(), Duration.create(20, "seconds"));
     }
 

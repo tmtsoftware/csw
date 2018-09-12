@@ -4,7 +4,7 @@ import akka.actor.CoordinatedShutdown
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.{ActorRef, Behavior, Props, Terminated}
-import csw.messages.commons.CoordinatedShutdownReasons.ActorTerminatedReason
+import csw.framework.commons.CoordinatedShutdownReasons.ActorTerminatedReason
 
 /**
  * This actor should be used for spawning actors which needs to be spawned directly from the actor system.

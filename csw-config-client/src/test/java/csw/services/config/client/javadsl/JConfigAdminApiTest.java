@@ -1,8 +1,8 @@
 package csw.services.config.client.javadsl;
 
 import akka.actor.ActorSystem;
+import akka.actor.CoordinatedShutdown;
 import akka.stream.Materializer;
-import csw.messages.commons.CoordinatedShutdownReasons;
 import csw.services.config.api.exceptions.FileAlreadyExists;
 import csw.services.config.api.exceptions.FileNotFound;
 import csw.services.config.api.javadsl.IConfigService;
@@ -12,8 +12,8 @@ import csw.services.config.client.internal.ActorRuntime;
 import csw.services.config.server.ServerWiring;
 import csw.services.config.server.commons.TestFileUtils;
 import csw.services.config.server.http.HttpService;
-import csw.services.location.commons.ClusterAwareSettings;
 import csw.services.location.api.javadsl.ILocationService;
+import csw.services.location.commons.ClusterAwareSettings;
 import csw.services.location.javadsl.JLocationServiceFactory;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
@@ -69,8 +69,8 @@ public class JConfigAdminApiTest {
 
     @AfterClass
     public static void afterAll() throws Exception {
-        Await.result(httpService.shutdown(CoordinatedShutdownReasons.testFinishedReason()), Duration.create(20, "seconds"));
-        clientLocationService.shutdown(CoordinatedShutdownReasons.testFinishedReason()).get();
+        Await.result(httpService.shutdown(CoordinatedShutdown.unknownReason()), Duration.create(20, "seconds"));
+        clientLocationService.shutdown(CoordinatedShutdown.unknownReason()).get();
         Await.result(actorRuntime.actorSystem().terminate(), Duration.create(20, "seconds"));
     }
 

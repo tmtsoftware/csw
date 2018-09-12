@@ -1,7 +1,7 @@
 package csw.apps.clusterseed.client
 
+import akka.actor.CoordinatedShutdown.UnknownReason
 import csw.apps.clusterseed.internal.AdminWiring
-import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import org.scalatest.{BeforeAndAfterAll, FunSuiteLike}
 
@@ -18,7 +18,7 @@ trait HTTPLocationService extends FunSuiteLike with BeforeAndAfterAll {
   }
 
   override def afterAll(): Unit = {
-    maybeWiring.map(_.actorRuntime.shutdown(TestFinishedReason).await)
+    maybeWiring.map(_.actorRuntime.shutdown(UnknownReason).await)
     super.afterAll()
   }
 }

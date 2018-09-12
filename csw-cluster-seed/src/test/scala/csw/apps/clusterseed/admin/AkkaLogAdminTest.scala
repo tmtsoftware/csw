@@ -1,6 +1,7 @@
 package csw.apps.clusterseed.admin
 
 import akka.actor
+import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
@@ -16,7 +17,6 @@ import csw.common.FrameworkAssertions.assertThatContainerIsRunning
 import csw.commons.tags.LoggingSystemSensitive
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.messages.commands.{CommandName, CommandResponse, Setup}
-import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.framework.{Component, Components, ContainerLifecycleState}
 import csw.services.location.api.models.ComponentId
 import csw.services.location.api.models.ComponentType.{Assembly, HCD}
@@ -80,7 +80,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with MockitoSugar with HttpSupp
   override protected def afterEach(): Unit = logBuffer.clear()
 
   override protected def afterAll(): Unit = {
-    Await.result(adminWiring.actorRuntime.shutdown(TestFinishedReason), 10.seconds)
+    Await.result(adminWiring.actorRuntime.shutdown(UnknownReason), 10.seconds)
     Await.result(containerActorSystem.terminate(), 5.seconds)
   }
 

@@ -3,12 +3,12 @@ package csw.services.location.agent
 import java.net.URI
 import java.nio.file.Paths
 
+import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.typed.ActorRef
 import com.typesafe.config.ConfigFactory
-import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
+import csw.services.location.agent.common.TestFutureExtension.RichFuture
 import csw.services.location.api.models.Connection.TcpConnection
 import csw.services.location.api.models.{ComponentId, ComponentType}
-import csw.services.location.agent.common.TestFutureExtension.RichFuture
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.location.scaladsl.LocationServiceFactory
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
@@ -30,7 +30,7 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterAll with Before
 
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 100.millis)
 
-  override protected def afterAll(): Unit = locationService.shutdown(TestFinishedReason).await
+  override protected def afterAll(): Unit = locationService.shutdown(UnknownReason).await
 
   test("Test with command line args") {
     val name = "test1"

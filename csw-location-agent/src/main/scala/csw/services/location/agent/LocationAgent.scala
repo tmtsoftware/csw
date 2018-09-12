@@ -3,15 +3,14 @@ package csw.services.location.agent
 import akka.Done
 import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.{ActorSystem, CoordinatedShutdown}
-import csw.messages.commons.CoordinatedShutdownReasons.{FailureReason, ProcessTerminatedReason}
+import csw.services.location.agent.commons.CoordinatedShutdownReasons.{FailureReason, ProcessTerminated}
+import csw.services.location.agent.commons.LocationAgentLogger
+import csw.services.location.agent.models.Command
 import csw.services.location.api.models.Connection.TcpConnection
-import csw.services.location.api.models.TcpRegistration
-import csw.services.location.api.models.{ComponentId, ComponentType}
+import csw.services.location.api.models.{ComponentId, ComponentType, TcpRegistration}
 import csw.services.location.commons.CswCluster
 import csw.services.location.models._
 import csw.services.location.scaladsl.LocationServiceFactory
-import csw.services.location.agent.commons.LocationAgentLogger
-import csw.services.location.agent.models.Command
 import csw.services.logging.commons.LogAdminActorFactory
 import csw.services.logging.scaladsl.Logger
 
@@ -38,7 +37,7 @@ class LocationAgent(names: List[String], command: Command, actorSystem: ActorSys
       log.info(s"Executing specified command: ${command.commandText}")
       val process = command.commandText.run()
       // shutdown location agent on termination of external program started using provided command
-      Future(process.exitValue()).onComplete(_ ⇒ shutdown(ProcessTerminatedReason))
+      Future(process.exitValue()).onComplete(_ ⇒ shutdown(ProcessTerminated))
 
       // delay the registration of component after executing the command
       Thread.sleep(command.delay)

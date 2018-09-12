@@ -1,5 +1,6 @@
 package csw.services.location.scaladsl
 
+import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.testkit.typed.scaladsl
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
@@ -7,13 +8,11 @@ import akka.actor.{typed, ActorSystem, PoisonPill}
 import akka.stream.scaladsl.{Keep, Sink}
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.testkit.TestProbe
-import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
-import csw.services.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
-import csw.services.location.api.models._
-import csw.services.location.api.exceptions.OtherLocationIsRegistered
-import csw.services.location.api.models.{HttpRegistration, TcpRegistration}
-import csw.services.location.api.scaladsl.LocationService
 import csw.messages.params.models.Prefix
+import csw.services.location.api.exceptions.OtherLocationIsRegistered
+import csw.services.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.services.location.api.models.{HttpRegistration, TcpRegistration, _}
+import csw.services.location.api.scaladsl.LocationService
 import csw.services.location.commons.TestFutureExtension.RichFuture
 import csw.services.location.commons.{ActorSystemFactory, TestRegistrationFactory}
 import csw.services.location.internal.Networks
@@ -52,7 +51,7 @@ class LocationServiceCompTest(mode: String)
 
   override protected def afterEach(): Unit = locationService.unregisterAll().await
 
-  override protected def afterAll(): Unit = if (mode.equals("cluster")) locationService.shutdown(TestFinishedReason).await
+  override protected def afterAll(): Unit = if (mode.equals("cluster")) locationService.shutdown(UnknownReason).await
 
   test("should able to register, resolve, list and unregister tcp location") {
     val componentId: ComponentId         = ComponentId("exampleTCPService", ComponentType.Service)

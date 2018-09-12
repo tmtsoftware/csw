@@ -1,11 +1,11 @@
 package csw.services.event.internal.redis
 
 import akka.Done
+import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.{ActorSystem, CoordinatedShutdown}
 import com.typesafe.config.ConfigFactory
 import csw.commons.redis.EmbeddedRedis
 import csw.commons.utils.SocketUtils.getFreePort
-import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.location.api.scaladsl.LocationService
 import csw.services.event.EventServiceFactory
 import csw.services.event.api.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
@@ -68,7 +68,7 @@ class RedisTestProps(
     publisher.shutdown().await
     redisClient.shutdown()
     stopSentinel(redisSentinel, redisServer)
-    CoordinatedShutdown(actorSystem).run(TestFinishedReason).await
+    CoordinatedShutdown(actorSystem).run(UnknownReason).await
   }
 }
 

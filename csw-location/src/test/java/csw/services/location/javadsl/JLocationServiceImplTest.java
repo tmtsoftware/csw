@@ -1,9 +1,8 @@
 package csw.services.location.javadsl;
 
-import akka.actor.AbstractActor;
-import akka.actor.ActorSystem;
-import akka.actor.PoisonPill;
-import akka.actor.Props;
+import akka.actor.*;
+import akka.actor.typed.ActorRef;
+import akka.actor.typed.javadsl.Adapter;
 import akka.japi.Pair;
 import akka.stream.ActorMaterializer;
 import akka.stream.KillSwitch;
@@ -12,17 +11,11 @@ import akka.stream.javadsl.Keep;
 import akka.stream.testkit.TestSubscriber;
 import akka.stream.testkit.javadsl.TestSink;
 import akka.testkit.TestProbe;
-import akka.actor.typed.ActorRef;
-import akka.actor.typed.javadsl.Adapter;
-import csw.services.location.api.models.*;
-import csw.messages.commons.CoordinatedShutdownReasons;
+import csw.messages.params.models.Prefix;
 import csw.services.location.api.commons.Constants;
 import csw.services.location.api.javadsl.ILocationService;
 import csw.services.location.api.javadsl.IRegistrationResult;
-import csw.services.location.api.models.AkkaRegistration;
-import csw.services.location.api.models.HttpRegistration;
-import csw.services.location.api.models.TcpRegistration;
-import csw.messages.params.models.Prefix;
+import csw.services.location.api.models.*;
 import csw.services.location.commons.ActorSystemFactory;
 import csw.services.location.commons.TestRegistrationFactory;
 import csw.services.location.internal.Networks;
@@ -72,7 +65,7 @@ public class JLocationServiceImplTest {
 
     @AfterClass
     public static void shutdown() throws ExecutionException, InterruptedException {
-        locationService.shutdown(CoordinatedShutdownReasons.testFinishedReason()).get();
+        locationService.shutdown(CoordinatedShutdown.unknownReason()).get();
     }
 
     @Test

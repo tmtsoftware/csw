@@ -1,8 +1,8 @@
 package csw.services.integtration.tests
 
+import akka.actor.CoordinatedShutdown.UnknownReason
 import csw.services.location.api.models.Connection.AkkaConnection
 import csw.services.location.api.models.{AkkaLocation, ComponentId, ComponentType}
-import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.commons.CswCluster
 import csw.services.location.scaladsl.LocationServiceFactory
@@ -23,7 +23,7 @@ class LocationServiceMultipleNICTest(cswCluster: CswCluster)
     PatienceConfig(Span(5, org.scalatest.time.Seconds), Span(100, org.scalatest.time.Millis))
 
   override protected def afterAll(): Unit =
-    locationService.shutdown(TestFinishedReason)
+    locationService.shutdown(UnknownReason)
 
   test("should list and resolve component having multiple-nic's") {
 

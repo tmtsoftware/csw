@@ -2,8 +2,8 @@ package csw.services.config.client.scaladsl
 
 import java.nio.file.Paths
 
+import akka.actor.CoordinatedShutdown.UnknownReason
 import csw.commons.tagobjects.FileSystemSensitive
-import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.config.api.exceptions.InvalidInput
 import csw.services.config.api.models.{ConfigData, FileType}
 import csw.services.config.api.scaladsl.ConfigService
@@ -35,8 +35,8 @@ class ConfigAdminApiTest extends ConfigServiceTest {
 
   override protected def afterAll(): Unit = {
     actorSystem.terminate().await
-    httpService.shutdown(TestFinishedReason).await
-    clientLocationService.shutdown(TestFinishedReason).await
+    httpService.shutdown(UnknownReason).await
+    clientLocationService.shutdown(UnknownReason).await
     super.afterAll()
   }
 

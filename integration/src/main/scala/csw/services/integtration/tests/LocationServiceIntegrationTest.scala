@@ -1,5 +1,6 @@
 package csw.services.integtration.tests
 
+import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.Behavior
@@ -8,7 +9,6 @@ import akka.actor.{typed, ActorSystem, Props, Scheduler}
 import akka.util.Timeout
 import csw.messages.CommandMessage.Submit
 import csw.messages.commands.{CommandName, Setup}
-import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.location.api.models.Connection.{AkkaConnection, HttpConnection}
 import csw.services.location.api.exceptions.OtherLocationIsRegistered
 import csw.services.location.api.models.AkkaRegistration
@@ -36,7 +36,7 @@ class LocationServiceIntegrationTest extends FunSuite with Matchers with BeforeA
   implicit val testKitSettings: TestKitSettings        = TestKitSettings(typedSystem)
 
   override protected def afterAll(): Unit =
-    Await.result(locationService.shutdown(TestFinishedReason), 5.seconds)
+    Await.result(locationService.shutdown(UnknownReason), 5.seconds)
 
   test("should not allow duplicate akka registration") {
     val tromboneHcdActorRef                                  = actorSystem.actorOf(Props[TromboneHCD], "trombone-hcd")

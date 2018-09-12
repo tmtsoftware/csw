@@ -1,5 +1,6 @@
 package csw.framework.integration
 
+import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.testkit.typed.scaladsl.{TestInbox, TestProbe}
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
@@ -10,7 +11,6 @@ import csw.framework.FrameworkTestWiring
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.messages.commands
 import csw.messages.commands.CommandName
-import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.framework.ContainerLifecycleState
 import csw.services.location.api.models.ComponentId
 import csw.services.location.api.models.ComponentType.{Assembly, HCD}
@@ -36,7 +36,7 @@ class EventServiceIntegrationTest extends FunSuite with EmbeddedRedis with Match
   private val wiring                   = FrameworkWiring.make(testActorSystem)
 
   override protected def afterAll(): Unit = {
-    wiring.actorRuntime.shutdown(TestFinishedReason).await
+    wiring.actorRuntime.shutdown(UnknownReason).await
     shutdown()
     stopSentinel(sentinel, server)
   }

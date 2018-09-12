@@ -1,8 +1,8 @@
 package csw.services.alarm
 import akka.http.scaladsl.Http
-import csw.messages.commons.CoordinatedShutdownReasons.ApplicationFinishedReason
 import csw.services.BuildInfo
 import csw.services.alarm.cli.args.{ArgsParser, Options}
+import csw.services.alarm.cli.commons.CoordinatedShutdownReasons.ApplicationFinishedReason
 import csw.services.alarm.cli.wiring.Wiring
 import csw.services.location.commons.{ActorSystemFactory, ClusterAwareSettings}
 import csw.services.logging.scaladsl.LoggingSystemFactory

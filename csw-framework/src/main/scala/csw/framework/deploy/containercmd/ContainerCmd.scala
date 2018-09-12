@@ -6,10 +6,10 @@ import akka.actor.ActorSystem
 import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed.ActorRef
 import com.typesafe.config.Config
+import csw.framework.commons.CoordinatedShutdownReasons.FailureReason
 import csw.framework.deploy.containercmd.cli.{ArgsParser, Options}
 import csw.framework.exceptions.{ClusterSeedsNotFound, UnableToParseOptions}
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
-import csw.messages.commons.CoordinatedShutdownReasons.FailureReason
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 

@@ -1,9 +1,9 @@
 package csw.services.event
 
 import akka.http.scaladsl.Http
-import csw.messages.commons.CoordinatedShutdownReasons.ApplicationFinishedReason
 import csw.services.BuildInfo
 import csw.services.event.cli.args.{ArgsParser, Options}
+import csw.services.event.cli.commons.ApplicationFinishedReason
 import csw.services.event.cli.wiring.Wiring
 import csw.services.location.commons.{ActorSystemFactory, ClusterAwareSettings}
 import csw.services.logging.scaladsl.LoggingSystemFactory

@@ -1,10 +1,10 @@
 package csw.services.integtration.apps
 
+import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.typed.scaladsl.adapter._
 import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import csw.messages.CommandMessage.Submit
 import csw.messages.commands.{CommandName, Setup}
-import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.location.api.models.Connection.AkkaConnection
 import csw.services.location.api.models.{ComponentId, ComponentType}
 import csw.messages.params.models.Prefix
@@ -38,6 +38,6 @@ class TromboneHCD extends Actor {
 
   override def receive: Receive = {
     case Submit(Setup(_, _, CommandName("Unregister"), None, _), _) ⇒
-      registrationResult.unregister().onComplete(_ => locationService.shutdown(TestFinishedReason))
+      registrationResult.unregister().onComplete(_ => locationService.shutdown(UnknownReason))
   }
 }

@@ -1,5 +1,6 @@
 package csw.apps.clusterseed.admin
 
+import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpMethods, HttpRequest, StatusCodes, Uri}
 import akka.http.scaladsl.unmarshalling.Unmarshal
@@ -10,7 +11,6 @@ import com.typesafe.config.ConfigFactory
 import csw.apps.clusterseed.admin.http.HttpSupport
 import csw.apps.clusterseed.internal.AdminWiring
 import csw.apps.clusterseed.utils.AdminLogTestSuite
-import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.config.server.commons.{ConfigServiceConnection, TestFileUtils}
 import csw.services.config.server.{ServerWiring, Settings}
 import csw.services.location.commons.ClusterAwareSettings
@@ -53,7 +53,7 @@ class HttpLogAdminTest extends AdminLogTestSuite with HttpSupport {
 
   override protected def afterAll(): Unit = {
     testFileUtils.deleteServerFiles()
-    Await.result(adminWiring.actorRuntime.shutdown(TestFinishedReason), 10.seconds)
+    Await.result(adminWiring.actorRuntime.shutdown(UnknownReason), 10.seconds)
   }
 
   // DEOPSCSW-127: Runtime update for logging characteristics

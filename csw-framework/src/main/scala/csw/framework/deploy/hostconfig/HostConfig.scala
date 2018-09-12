@@ -2,6 +2,7 @@ package csw.framework.deploy.hostconfig
 
 import akka.actor.ActorSystem
 import akka.actor.CoordinatedShutdown.Reason
+import csw.framework.commons.CoordinatedShutdownReasons.ApplicationFinishedReason
 import csw.framework.deploy.hostconfig.cli.{ArgsParser, Options}
 import csw.framework.exceptions.{ClusterSeedsNotFound, UnableToParseOptions}
 import csw.framework.internal.configparser.ConfigParser
@@ -9,7 +10,6 @@ import csw.framework.internal.wiring.FrameworkWiring
 import csw.framework.models.ConfigFileLocation.{Local, Remote}
 import csw.framework.models.ContainerMode.{Container, Standalone}
 import csw.framework.models.{ContainerBootstrapInfo, HostBootstrapInfo}
-import csw.messages.commons.CoordinatedShutdownReasons.ApplicationFinishedReason
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 

@@ -1,6 +1,7 @@
 package csw.framework.integration
 
 import akka.actor
+import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
@@ -11,7 +12,6 @@ import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.messages.SupervisorContainerCommonMessages.Shutdown
 import csw.messages.commands
 import csw.messages.commands.CommandName
-import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.messages.framework.{ContainerLifecycleState, SupervisorLifecycleState}
 import csw.services.location.api.models.ComponentId
 import csw.services.location.api.models.ComponentType.{Assembly, HCD}
@@ -82,7 +82,7 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Option
       disperserCommandService.submit(commands.Setup(prefix, CommandName("isAlive"), None)).await(200.millis)
     }
 
-    wiring.locationService.shutdown(TestFinishedReason).await
+    wiring.locationService.shutdown(UnknownReason).await
   }
 
   /**
@@ -132,7 +132,7 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Option
     seedLocationService.unregister(tcpConnection)
     assemblyProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(tcpLocationRemovedChoice))))
 
-    wiring.locationService.shutdown(TestFinishedReason).await
+    wiring.locationService.shutdown(UnknownReason).await
   }
 
 }

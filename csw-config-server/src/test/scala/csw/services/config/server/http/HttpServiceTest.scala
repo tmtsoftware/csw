@@ -1,7 +1,7 @@
 package csw.services.config.server.http
 
+import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.stream.BindFailedException
-import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.config.server.ServerWiring
 import csw.services.config.server.commons.TestFutureExtension.RichFuture
 import csw.services.config.server.commons.{ConfigServiceConnection, RegistrationFactory}
@@ -23,7 +23,7 @@ class HttpServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
 
     binding.localAddress.getAddress.getHostAddress shouldBe ClusterAwareSettings.hostname
     registrationResult.location.connection shouldBe ConfigServiceConnection.value
-    actorRuntime.shutdown(TestFinishedReason).await
+    actorRuntime.shutdown(UnknownReason).await
   }
 
   test("should not register with location service if server binding fails") {
@@ -39,7 +39,7 @@ class HttpServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
     }
 
     locationService1.find(ConfigServiceConnection.value).await shouldBe None
-    locationService1.shutdown(TestFinishedReason)
+    locationService1.shutdown(UnknownReason)
   }
 
   test("should not start server if registration with location service fails") {
@@ -56,7 +56,7 @@ class HttpServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
 
     //TODO: Find a way to assert server is not bounded
     try {
-      actorRuntime.shutdown(TestFinishedReason).await
+      actorRuntime.shutdown(UnknownReason).await
     } catch {
       case NonFatal(ex) ⇒
     }

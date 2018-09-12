@@ -2,9 +2,9 @@ package csw.apps.clusterseed.admin.http
 
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
-import csw.apps.clusterseed.internal.{ActorRuntime, Settings}
 import csw.apps.clusterseed.commons.ClusterSeedLogger
-import csw.messages.commons.CoordinatedShutdownReasons.FailureReason
+import csw.apps.clusterseed.commons.CoordinatedShutdownReasons.FailureReason
+import csw.apps.clusterseed.internal.{ActorRuntime, Settings}
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.logging.scaladsl.Logger
 

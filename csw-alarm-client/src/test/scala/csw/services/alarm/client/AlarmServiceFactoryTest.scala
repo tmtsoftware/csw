@@ -1,7 +1,7 @@
 package csw.services.alarm.client
+import akka.actor.CoordinatedShutdown.UnknownReason
 import com.typesafe.config.ConfigFactory
 import csw.commons.utils.SocketUtils.getFreePort
-import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
 import csw.services.location.api.models.TcpRegistration
 import csw.services.alarm.api.models.AlarmSeverity.Indeterminate
 import csw.services.alarm.api.scaladsl.{AlarmAdminService, AlarmService}
@@ -28,7 +28,7 @@ class AlarmServiceFactoryTest extends AlarmServiceTestSetup {
   }
 
   override protected def afterAll(): Unit = {
-    locationService.shutdown(TestFinishedReason).await
+    locationService.shutdown(UnknownReason).await
     super.afterAll()
   }
 

@@ -1,15 +1,15 @@
 package csw.services.config.server
 
 import akka.actor.ActorSystem
+import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.Uri.Path
 import akka.http.scaladsl.model.{HttpRequest, StatusCodes, Uri}
 import akka.stream.{ActorMaterializer, Materializer}
 import com.typesafe.config.ConfigFactory
-import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
-import csw.services.location.api.scaladsl.LocationService
 import csw.services.config.server.commons.TestFutureExtension.RichFuture
 import csw.services.config.server.commons.{ConfigServiceConnection, TestFileUtils}
+import csw.services.location.api.scaladsl.LocationService
 import csw.services.location.commons.ClusterSettings
 import csw.services.location.scaladsl.LocationServiceFactory
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
@@ -36,7 +36,7 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterEach with Befor
 
   override protected def afterAll(): Unit = {
     actorSystem.terminate().await
-    locationService.shutdown(TestFinishedReason).await
+    locationService.shutdown(UnknownReason).await
   }
 
   test("should not start HTTP server if repo does not exist") {
@@ -63,7 +63,7 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterEach with Befor
       response.status shouldBe StatusCodes.OK
       response.discardEntityBytes()
     } finally {
-      httpService.shutdown(TestFinishedReason).await
+      httpService.shutdown(UnknownReason).await
     }
   }
 
@@ -71,7 +71,7 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterEach with Befor
 
     // temporary start a server to create a repo and then shutdown the server
     val tmpHttpService = new Main(clusterSettings).start(Array("--initRepo")).get
-    tmpHttpService.shutdown(TestFinishedReason).await
+    tmpHttpService.shutdown(UnknownReason).await
 
     val httpService = new Main(clusterSettings).start(Array.empty).get
 
@@ -85,7 +85,7 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterEach with Befor
       val response = Http().singleRequest(request).await
       response.status shouldBe StatusCodes.OK
     } finally {
-      httpService.shutdown(TestFinishedReason).await
+      httpService.shutdown(UnknownReason).await
     }
   }
 }

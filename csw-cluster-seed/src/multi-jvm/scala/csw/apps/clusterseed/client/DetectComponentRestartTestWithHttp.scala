@@ -1,6 +1,6 @@
 package csw.apps.clusterseed.client
 
-import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
+import akka.actor.CoordinatedShutdown.UnknownReason
 import csw.services.location.DetectComponentRestartTest
 
 class DetectComponentRestartTestWithHttpMultiJvmNode1 extends DetectComponentRestartTestWithHttp(0, "http")
@@ -12,6 +12,6 @@ class DetectComponentRestartTestWithHttp(ignore: Int, mode: String)
     extends DetectComponentRestartTest(ignore, mode)
     with HTTPLocationService {
 
-  override def afterAll(): Unit = maybeWiring.map(_.actorRuntime.shutdown(TestFinishedReason).await)
+  override def afterAll(): Unit = maybeWiring.map(_.actorRuntime.shutdown(UnknownReason).await)
 
 }

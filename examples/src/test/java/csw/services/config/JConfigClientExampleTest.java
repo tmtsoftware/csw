@@ -1,8 +1,8 @@
 package csw.services.config;
 
 import akka.actor.ActorSystem;
+import akka.actor.CoordinatedShutdown;
 import akka.stream.Materializer;
-import csw.messages.commons.CoordinatedShutdownReasons;
 import csw.services.config.api.javadsl.IConfigClientService;
 import csw.services.config.api.javadsl.IConfigService;
 import csw.services.config.api.javadsl.JFileType;
@@ -71,8 +71,8 @@ public class JConfigClientExampleTest {
 
     @AfterClass
     public static void afterAll() throws Exception {
-        Await.result(httpService.shutdown(CoordinatedShutdownReasons.testFinishedReason()), Duration.create(20, "seconds"));
-        clientLocationService.shutdown(CoordinatedShutdownReasons.testFinishedReason()).get();
+        Await.result(httpService.shutdown(CoordinatedShutdown.unknownReason()), Duration.create(20, "seconds"));
+        clientLocationService.shutdown(CoordinatedShutdown.unknownReason()).get();
         Await.result(actorRuntime.actorSystem().terminate(), Duration.create(20, "seconds"));
     }
 

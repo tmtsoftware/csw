@@ -5,11 +5,11 @@ import akka.actor.CoordinatedShutdown
 import akka.actor.CoordinatedShutdown.Reason
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
-import csw.messages.commons.CoordinatedShutdownReasons.FailureReason
-import csw.services.location.api.models.HttpRegistration
-import csw.services.location.api.scaladsl.LocationService
+import csw.services.config.server.commons.CoordinatedShutdownReasons.FailureReason
 import csw.services.config.server.commons.{ConfigServerLogger, ConfigServiceConnection}
 import csw.services.config.server.{ActorRuntime, Settings}
+import csw.services.location.api.models.HttpRegistration
+import csw.services.location.api.scaladsl.LocationService
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.models._
 import csw.services.logging.commons.LogAdminActorFactory
