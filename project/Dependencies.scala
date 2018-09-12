@@ -11,7 +11,6 @@ object Dependencies {
       Akka.`akka-cluster-tools`       % Test,
       Akka.`akka-actor-testkit-typed` % Test,
       Akka.`akka-actor`               % Test,
-      Chill.`chill-akka`              % Test,
       Libs.`scalatest`.value          % Test,
       Libs.`junit`                    % Test,
       Libs.`junit-interface`          % Test
@@ -24,6 +23,7 @@ object Dependencies {
       Enumeratum.`enumeratum-play-json`.value,
       Libs.`play-json`.value,
       Libs.`play-json-derived-codecs`.value,
+      Chill.`chill-akka`,
       Libs.`scalatest`.value % Test
     )
   )
@@ -45,7 +45,6 @@ object Dependencies {
       Akka.`akka-slf4j`,
       Akka.`akka-remote`,
       Akka.`akka-actor-typed`,
-      Chill.`chill-akka`     % Test,
       Libs.`scalatest`.value % Test,
       Libs.`junit`           % Test,
       Libs.`junit-interface` % Test,
@@ -58,8 +57,7 @@ object Dependencies {
       Libs.`persist-json`,
       Libs.`gson`,
       Jackson.`jackson-core`,
-      Jackson.`jackson-databind`,
-      Chill.`chill-akka`
+      Jackson.`jackson-databind`
     )
   )
 
@@ -77,7 +75,6 @@ object Dependencies {
       Libs.`scala-async`,
       Enumeratum.`enumeratum`.value,
       Libs.`akka-management-cluster-http`,
-      Chill.`chill-akka`,
       AkkaHttp.`akka-http`,
       Libs.`akka-http-play-json`,
       Libs.`scalatest`.value         % Test,
@@ -189,7 +186,6 @@ object Dependencies {
       Akka.`akka-actor-testkit-typed` % Test,
       Akka.`akka-stream-testkit`      % Test,
       Libs.`scalatest`.value          % Test,
-      Chill.`chill-akka`              % Test,
       Libs.`junit`                    % Test,
       Libs.`junit-interface`          % Test,
       Libs.`mockito-core`             % Test
@@ -258,8 +254,7 @@ object Dependencies {
       Libs.`junit`           % Test,
       Libs.`junit-interface` % Test,
       Libs.`scalatest`.value % Test,
-      Libs.`mockito-core`    % Test,
-      Chill.`chill-akka`     % Test
+      Libs.`mockito-core`    % Test
     )
   )
 

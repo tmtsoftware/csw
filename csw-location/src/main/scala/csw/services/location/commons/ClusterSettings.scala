@@ -122,6 +122,8 @@ case class ClusterSettings(clusterName: String = Constants.ClusterName, values: 
     )
 
     log.debug(s"ClusterSettings using following configuration: [${computedValues.mkString(", ")}]")
+
+    // FIXME: Kryo config from params module does not get picked up for TMTSerializable
     ConfigFactory
       .parseMap(computedValues.asJava)
       .withFallback(ConfigFactory.load().getConfig(clusterName))
