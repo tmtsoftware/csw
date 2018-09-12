@@ -59,8 +59,8 @@ class HealthServiceModuleTest
 
   // DEOPSCSW-466: Fetch health for a given alarm, component name or a subsystem name
   test("getAggregatedHealth should get aggregated health for a subsystem") {
-    val tromboneKey = SubsystemKey(TCS)
-    getAggregatedHealth(tromboneKey).await shouldBe Bad
+    val tcsKey = SubsystemKey(TCS)
+    getAggregatedHealth(tcsKey).await shouldBe Bad
 
     getCurrentSeverity(cpuExceededAlarmKey).await shouldBe Disconnected
     getCurrentSeverity(outOfRangeOffloadAlarmKey).await shouldBe Disconnected
@@ -68,21 +68,27 @@ class HealthServiceModuleTest
     setSeverity(cpuExceededAlarmKey, Okay).await
     setSeverity(outOfRangeOffloadAlarmKey, Major).await
 
-    getAggregatedHealth(tromboneKey).await shouldBe Ill
+    getAggregatedHealth(tcsKey).await shouldBe Ill
   }
 
   // DEOPSCSW-466: Fetch health for a given alarm, component name or a subsystem name
   test("getAggregatedHealth should get aggregated health for global system") {
-    //feeding data of two alarms only
-    val validAlarmsConfig = ConfigFactory.parseResources("test-alarms/two-valid-alarms.conf")
+    //feeding data of four alarms only, one inactive
+    val validAlarmsConfig = ConfigFactory.parseResources("test-alarms/valid-alarms.conf")
     initAlarms(validAlarmsConfig, reset = true).await
 
     getAggregatedHealth(GlobalKey).await shouldBe Bad
-    getCurrentSeverity(tromboneAxisHighLimitAlarmKey).await shouldBe Disconnected
     getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldBe Disconnected
+    getCurrentSeverity(tromboneAxisHighLimitAlarmKey).await shouldBe Disconnected
+    getCurrentSeverity(cpuExceededAlarmKey).await shouldBe Disconnected
 
+    setSeverity(tromboneAxisLowLimitAlarmKey, Okay).await
     setSeverity(tromboneAxisHighLimitAlarmKey, Okay).await
-    setSeverity(tromboneAxisLowLimitAlarmKey, Major).await
+    setSeverity(cpuExceededAlarmKey, Okay).await
+
+    getAggregatedHealth(GlobalKey).await shouldBe Good
+
+    setSeverity(cpuExceededAlarmKey, Major).await
 
     getAggregatedHealth(GlobalKey).await shouldBe Ill
   }
