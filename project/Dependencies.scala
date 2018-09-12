@@ -2,21 +2,6 @@ import sbt._
 
 object Dependencies {
 
-  val Messages = Def.setting(
-    Seq(
-      Libs.`scala-java8-compat`,
-      Chill.`chill-bijection`,
-      Akka.`akka-actor-typed`,
-      Akka.`akka-stream`,
-      Akka.`akka-cluster-tools`       % Test,
-      Akka.`akka-actor-testkit-typed` % Test,
-      Akka.`akka-actor`               % Test,
-      Libs.`scalatest`.value          % Test,
-      Libs.`junit`                    % Test,
-      Libs.`junit-interface`          % Test
-    )
-  )
-
   val Params = Def.setting(
     Seq(
       Enumeratum.`enumeratum`.value,
@@ -30,8 +15,9 @@ object Dependencies {
 
   val ParamsJvm = Def.setting(
     Seq(
-      Libs.`junit`           % Test,
-      Libs.`junit-interface` % Test
+      Chill.`chill-bijection` % Test,
+      Libs.`junit`            % Test,
+      Libs.`junit-interface`  % Test
     )
   )
 

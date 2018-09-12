@@ -2,6 +2,7 @@ package csw.messages.params.generics
 
 import java.time.Instant
 
+import com.twitter.chill.KryoInjection
 import csw.messages.commands._
 import csw.messages.events.{Event, EventName, SystemEvent}
 import csw.messages.params.generics.KeyType.ChoiceKey
@@ -69,8 +70,10 @@ class SerializationTest extends FunSuite {
 
   val wc1: Wait = Wait(Prefix("wfos.blue.camera"), CommandName("move"), Some(obsId))
 
+  def read[A](bytes: Array[Byte]): A = KryoInjection.invert(bytes).get.asInstanceOf[A]
+  def write[A](in: A): Array[Byte]   = KryoInjection(in)
+
   test("ConfigType kryo serialization") {
-    import csw.messages.commons.ParamSetSerializer._
 
     val bytes = write(sc1)
     val scout = read[Setup](bytes)
@@ -90,7 +93,6 @@ class SerializationTest extends FunSuite {
   }
 
   test("System event kryo serialization") {
-    import csw.messages.commons.ParamSetSerializer._
     val event = SystemEvent(fqn1prefix, EventName("filter wheel"))
       .add(ra.set("12:32:11"))
       .add(dec.set("30:22:22"))
@@ -102,7 +104,6 @@ class SerializationTest extends FunSuite {
   }
 
   test("CurrentStates kryo serialization") {
-    import csw.messages.commons.ParamSetSerializer._
 
     val sca1   = CurrentStates(List(cs1))
     val bytes1 = write(sca1)

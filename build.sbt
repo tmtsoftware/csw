@@ -68,9 +68,6 @@ lazy val `csw-prod` = project
 lazy val `csw-messages` = project
   .dependsOn(`csw-params-jvm`, `csw-commons` % "test->test")
   .enablePlugins(PublishBintray, GenJavadocPlugin)
-  .settings(
-    libraryDependencies ++= Dependencies.Messages.value
-  )
 
 lazy val `csw-params` = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
