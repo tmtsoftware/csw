@@ -69,6 +69,8 @@ trait StatusServiceModule extends StatusService {
 
   final override def shelve(alarmKey: AlarmKey): Future[Done] = {
     log.debug(s"Shelve alarm [${alarmKey.value}]")
+    // it is important to have this public method call the private method with the shelveTimeout to ensure the timeout
+    // functionality.  Future programmers: change with care.
     shelve(alarmKey, settings.shelveTimeout)
   }
 
