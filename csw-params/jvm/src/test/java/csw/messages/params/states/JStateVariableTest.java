@@ -17,7 +17,7 @@ import java.util.Optional;
 
 // DEOPSCSW-183: Configure attributes and values
 // DEOPSCSW-185: Easy to Use Syntax/Api
-public class JSateVariableTest {
+public class JStateVariableTest {
 
     private final Key<Integer> encoderIntKey = JKeyType.IntKey().make("encoder");
     private final Key<String> epochStringKey = JKeyType.StringKey().make("epoch");

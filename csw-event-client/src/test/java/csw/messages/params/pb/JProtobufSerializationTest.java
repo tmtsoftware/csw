@@ -6,6 +6,8 @@ import csw.messages.events.SystemEvent;
 import csw.messages.javadsl.JKeyType;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.models.*;
+import csw.messages.params.pb.PbConverter;
+import csw.messages.params.pb.TypeMapperSupport;
 import csw_protobuf.events.PbEvent;
 import csw_protobuf.parameter.PbParameter;
 import org.junit.Assert;

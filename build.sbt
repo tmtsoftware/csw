@@ -82,6 +82,8 @@ lazy val `csw-params` = crossProject(JSPlatform, JVMPlatform)
     fork := false
   ).jsSettings(
     libraryDependencies += Libs.`scalajs-java-time`.value
+  ).jvmSettings(
+    libraryDependencies ++= Dependencies.ParamsJvm.value
   )
 
 lazy val `csw-params-js` = `csw-params`.js

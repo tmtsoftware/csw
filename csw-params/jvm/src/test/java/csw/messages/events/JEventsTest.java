@@ -20,7 +20,7 @@ public class JEventsTest {
     private final Key<Integer> encoderIntKey = JKeyType.IntKey().make("encoder");
     private final Key<String> epochStringKey = JKeyType.StringKey().make("epoch");
     private final Key<Integer> epochIntKey = JKeyType.IntKey().make("epoch");
-    private final Key<java.lang.Byte> epochByteKey = JKeyType.ByteKey().make("epoch");
+    private final Key<Byte> epochByteKey = JKeyType.ByteKey().make("epoch");
     private final Key<Integer> notUsedKey = JKeyType.IntKey().make("notUsed");
 
     private final Parameter<Integer> encoderParam = encoderIntKey.set(22, 33);

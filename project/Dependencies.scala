@@ -6,8 +6,6 @@ object Dependencies {
     Seq(
       Libs.`scala-java8-compat`,
       Chill.`chill-bijection`,
-      Libs.`scalapb-runtime`,
-      Libs.`scalapb-json4s`,
       Akka.`akka-actor-typed`,
       Akka.`akka-stream`,
       Akka.`akka-cluster-tools`       % Test,
@@ -27,6 +25,13 @@ object Dependencies {
       Libs.`play-json`.value,
       Libs.`play-json-derived-codecs`.value,
       Libs.`scalatest`.value % Test
+    )
+  )
+
+  val ParamsJvm = Def.setting(
+    Seq(
+      Libs.`junit`           % Test,
+      Libs.`junit-interface` % Test
     )
   )
 
@@ -204,6 +209,8 @@ object Dependencies {
       Akka.`akka-stream`,
       Libs.`akka-stream-kafka`,
       Libs.`lettuce`,
+      Libs.`scalapb-runtime`,
+      Libs.`scalapb-json4s`,
       Akka.`akka-actor-testkit-typed` % Test,
       Akka.`akka-stream-testkit`      % Test,
       Libs.`scalatest`.value          % Test,

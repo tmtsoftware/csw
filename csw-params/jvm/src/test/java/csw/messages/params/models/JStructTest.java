@@ -3,8 +3,6 @@ package csw.messages.params.models;
 import csw.messages.javadsl.JKeyType;
 import csw.messages.params.generics.Key;
 import csw.messages.params.generics.Parameter;
-import csw.messages.params.models.JStruct;
-import csw.messages.params.models.Struct;
 import org.junit.Assert;
 import org.junit.Test;
 
