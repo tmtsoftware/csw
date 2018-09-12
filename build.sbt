@@ -72,7 +72,6 @@ lazy val `csw-messages` = project
     libraryDependencies ++= Dependencies.Messages.value
   )
 
-
 lazy val `csw-params` = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
   .enablePlugins(PublishBintray, GenJavadocPlugin)
@@ -80,14 +79,18 @@ lazy val `csw-params` = crossProject(JSPlatform, JVMPlatform)
     libraryDependencies ++= Dependencies.Params.value,
     Common.detectCycles := false,
     fork := false
-  ).jsSettings(
-    libraryDependencies += Libs.`scalajs-java-time`.value
-  ).jvmSettings(
-    libraryDependencies ++= Dependencies.ParamsJvm.value
   )
 
 lazy val `csw-params-js` = `csw-params`.js
-lazy val `csw-params-jvm` = `csw-params`.jvm.dependsOn(`csw-commons` % "test->test")
+  .settings(
+    libraryDependencies += Libs.`scalajs-java-time`.value
+  )
+
+lazy val `csw-params-jvm` = `csw-params`.jvm
+  .dependsOn(`csw-commons` % "test->test")
+  .settings(
+    libraryDependencies ++= Dependencies.ParamsJvm.value
+  )
 
 lazy val `csw-logging-macros` = project
   .settings(
@@ -267,7 +270,7 @@ lazy val `csw-alarm-client` = project
     `csw-location-api`,
     `csw-logging`,
     `romaine`,
-    `csw-commons` % "test->test",
+    `csw-commons`  % "test->test",
     `csw-location` % "test->compile"
   )
   .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
@@ -310,7 +313,7 @@ lazy val `csw-benchmark` = project
 
 //Integration test project
 lazy val integration = project
-  .dependsOn(`csw-location`, `csw-command` , `csw-location-agent`)
+  .dependsOn(`csw-location`, `csw-command`, `csw-location-agent`)
   .enablePlugins(DeployApp)
   .settings(
     libraryDependencies ++= Dependencies.Integration.value
