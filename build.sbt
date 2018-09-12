@@ -80,6 +80,17 @@ lazy val `csw-params` = crossProject(JSPlatform, JVMPlatform)
     Common.detectCycles := false,
     fork := false
   )
+  .settings(
+    // Shared resource directory is ignored by sbt-crossproject, open issue: https://github.com/portable-scala/sbt-crossproject/issues/74
+    Seq(Compile, Test).flatMap(inConfig(_) {
+      unmanagedResourceDirectories ++= {
+        unmanagedSourceDirectories.value
+          .map(src => (src / ".." / "resources").getCanonicalFile)
+          .filterNot(unmanagedResourceDirectories.value.contains)
+          .distinct
+      }
+    })
+  )
 
 lazy val `csw-params-js` = `csw-params`.js
   .settings(
