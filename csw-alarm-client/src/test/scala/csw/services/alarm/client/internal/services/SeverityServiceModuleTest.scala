@@ -98,6 +98,8 @@ class SeverityServiceModuleTest
   // DEOPSCSW-444: Set severity api for component
   test("setSeverity should not auto-acknowledge alarm even when it is auto-acknowledgable") {
     val status = getStatus(tromboneAxisHighLimitAlarmKey).await
+    val metadata = getMetadata(tromboneAxisHighLimitAlarmKey).await
+    metadata.isAutoAcknowledgeable shouldBe true
     status.acknowledgementStatus shouldBe Acknowledged
     status.latchedSeverity shouldBe Disconnected
 
