@@ -2,7 +2,7 @@ package csw.common.components.command
 
 import akka.actor.typed.scaladsl.ActorContext
 import csw.common.components.command.ComponentStateForCommand._
-import csw.framework.models.CswServices
+import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
 import csw.messages.TopLevelActorMessage
@@ -13,10 +13,10 @@ import csw.services.location.api.models.TrackingEvent
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationLong
 
-class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswServices: CswServices)
-    extends ComponentHandlers(ctx, cswServices) {
+class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext)
+    extends ComponentHandlers(ctx, cswCtx) {
 
-  import cswServices._
+  import cswCtx._
   override def initialize(): Future[Unit] = Future.unit
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = ???

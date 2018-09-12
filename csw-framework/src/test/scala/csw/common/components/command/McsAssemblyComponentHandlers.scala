@@ -4,7 +4,7 @@ import akka.actor.Scheduler
 import akka.actor.typed.scaladsl.ActorContext
 import akka.util.Timeout
 import csw.common.components.command.ComponentStateForCommand.{longRunningCmdCompleted, _}
-import csw.framework.models.CswServices
+import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandResponse.{Accepted, Completed, Invalid}
@@ -17,8 +17,8 @@ import csw.services.command.scaladsl.CommandService
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{ExecutionContext, Future}
 
-class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswServices: CswServices)
-    extends ComponentHandlers(ctx, cswServices) {
+class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext)
+    extends ComponentHandlers(ctx, cswCtx) {
 
   implicit val timeout: Timeout     = 10.seconds
   implicit val scheduler: Scheduler = ctx.system.scheduler
@@ -29,11 +29,11 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswS
   var mediumSetup: Setup            = _
   var longSetup: Setup              = _
 
-  import cswServices._
+  import cswCtx._
   override def initialize(): Future[Unit] =
     componentInfo.connections.headOption match {
       case Some(hcd) ⇒
-        cswServices.locationService.resolve(hcd.of[AkkaLocation], 5.seconds).map {
+        cswCtx.locationService.resolve(hcd.of[AkkaLocation], 5.seconds).map {
           case Some(akkaLocation) ⇒ hcdComponent = new CommandService(akkaLocation)(ctx.system)
           case None               ⇒ throw new RuntimeException("Could not resolve hcd location, Initialization failure.")
         }

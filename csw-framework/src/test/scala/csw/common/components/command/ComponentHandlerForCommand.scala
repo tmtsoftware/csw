@@ -6,7 +6,7 @@ import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{ActorMaterializer, ThrottleMode}
 import akka.util.Timeout
-import csw.framework.models.CswServices
+import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandIssue.{OtherIssue, WrongPrefixIssue}
@@ -20,10 +20,10 @@ import csw.messages.params.states.{CurrentState, StateName}
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{ExecutionContext, Future}
 
-class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswServices: CswServices)
-    extends ComponentHandlers(ctx, cswServices) {
+class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext)
+    extends ComponentHandlers(ctx, cswCtx) {
 
-  import cswServices._
+  import cswCtx._
   private val cancelCmdId = KeyType.StringKey.make("cancelCmdId")
 
   import ComponentStateForCommand._

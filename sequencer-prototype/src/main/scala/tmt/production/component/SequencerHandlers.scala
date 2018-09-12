@@ -31,12 +31,11 @@ class SequencerHandlers(
     componentInfo: ComponentInfo,
     commandResponseManager: CommandResponseManager,
     currentStatePublisher: CurrentStatePublisher,
-    cswServices: CswContext
+    cswCtx: CswContext
 ) extends ComponentHandlers(
       ctx,
       componentInfo,
-
-      cswServices
+      cswCtx
     ) {
 
   implicit val ct: ActorContext[TopLevelActorMessage] = ctx
@@ -68,7 +67,7 @@ class SequencerHandlers(
     val path = Files.write(Paths.get(s"scripts/${componentInfo.name}.sc"), updatedScript.getBytes(StandardCharsets.UTF_8)) //TODO: decide on centos charset code
 
     val engineActor: ActorRef[EngineAction] = await(ctx.system.systemActorOf(EngineBehavior.behavior, "engine"))
-    Dsl.wiring = new Wiring(ctx.system, engineActor, cswServices.locationService)
+    Dsl.wiring = new Wiring(ctx.system, engineActor, cswCtx.locationService)
 
     ctx.watch(engineActor) //TODO: what to do if engine actor dies ? Decide in handlers. Decide if we need engineActor to be persistent actor
 

@@ -1,7 +1,7 @@
 package csw.apps.clusterseed.components
 
 import akka.actor.typed.scaladsl.ActorContext
-import csw.framework.models.CswServices
+import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandResponse.Accepted
@@ -13,10 +13,9 @@ import scala.concurrent.Future
 
 case class StartLogging()
 
-class GalilComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswServices: CswServices)
-    extends ComponentHandlers(ctx, cswServices) {
+class GalilComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext) extends ComponentHandlers(ctx, cswCtx) {
 
-  val log: Logger = cswServices.loggerFactory.getLogger
+  val log: Logger = cswCtx.loggerFactory.getLogger
 
   override def initialize(): Future[Unit] = Future.successful(())
 

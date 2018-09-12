@@ -2,7 +2,7 @@ package org.tmt.nfiraos.sampleassembly
 
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.util.Timeout
-import csw.framework.models.CswServices
+import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandResponse.Accepted
@@ -25,10 +25,9 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
  * and if validation is successful, then onSubmit hook gets invoked.
  * You can find more information on this here : https://tmtsoftware.github.io/csw-prod/framework.html
  */
-class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswServices: CswServices)
-    extends ComponentHandlers(ctx, cswServices) {
+class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext) extends ComponentHandlers(ctx, cswCtx) {
 
-  import cswServices._
+  import cswCtx._
   implicit val ec: ExecutionContextExecutor = ctx.executionContext
   private val log                           = loggerFactory.getLogger
 

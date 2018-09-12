@@ -12,13 +12,11 @@ class SequencerBehaviorFactory extends ComponentBehaviorFactory {
   protected override def handlers(
       ctx: ActorContext[TopLevelActorMessage],
       componentInfo: ComponentInfo,
-
-      cswServices: CswContext
+      cswCtx: CswContext
   ): ComponentHandlers =
     new SequencerHandlers(
       ctx,
       componentInfo,
-
-      cswServices
+      cswCtx
     )
 }

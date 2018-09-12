@@ -10,7 +10,7 @@ import akka.util.Timeout
 import csw.framework.components.ConfigNotAvailableException
 import csw.framework.components.assembly.WorkerActorMsgs.{GetStatistics, InitialState}
 import csw.framework.components.assembly.{WorkerActor, WorkerActorMsg}
-import csw.framework.models.CswServices
+import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandResponse.Accepted
@@ -24,12 +24,12 @@ import scala.concurrent.duration.DurationLong
 import scala.concurrent.{ExecutionContext, Future}
 
 //#component-handlers-class
-class HcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswServices: CswServices)
-    extends ComponentHandlers(ctx, cswServices)
+class HcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext)
+    extends ComponentHandlers(ctx, cswCtx)
 //#component-handlers-class
     {
 
-  import cswServices._
+  import cswCtx._
 
   val log: Logger = loggerFactory.getLogger(ctx)
 

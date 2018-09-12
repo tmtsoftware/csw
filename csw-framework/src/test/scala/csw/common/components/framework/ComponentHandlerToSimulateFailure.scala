@@ -1,13 +1,13 @@
 package csw.common.components.framework
 
 import akka.actor.typed.scaladsl.ActorContext
-import csw.framework.models.CswServices
+import csw.framework.models.CswContext
 import csw.messages.TopLevelActorMessage
 
 import scala.concurrent.Future
 
-class ComponentHandlerToSimulateFailure(ctx: ActorContext[TopLevelActorMessage], cswServices: CswServices)
-    extends SampleComponentHandlers(ctx, cswServices) {
+class ComponentHandlerToSimulateFailure(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext)
+    extends SampleComponentHandlers(ctx, cswCtx) {
 
   override def onShutdown(): Future[Unit] = throw new RuntimeException(ComponentHandlerToSimulateFailure.exceptionMsg)
 }

@@ -6,7 +6,7 @@ import akka.actor.typed.javadsl.Behaviors;
 import akka.util.Timeout;
 import csw.framework.CurrentStatePublisher;
 import csw.framework.javadsl.JComponentHandlers;
-import csw.framework.models.JCswServices;
+import csw.framework.models.JCswContext;
 import csw.messages.TopLevelActorMessage;
 import csw.messages.commands.CommandName;
 import csw.messages.commands.CommandResponse;
@@ -56,15 +56,15 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
 
     private final ActorRef<WorkerCommand> commandSender;
 
-    JSampleAssemblyHandlers(ActorContext<TopLevelActorMessage> ctx, JCswServices cswServices) {
-        super(ctx, cswServices);
-        this.currentStatePublisher = cswServices.currentStatePublisher();
-        this.log = cswServices.loggerFactory().getLogger(getClass());
-        this.commandResponseManager = cswServices.commandResponseManager();
+    JSampleAssemblyHandlers(ActorContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
+        super(ctx, cswCtx);
+        this.currentStatePublisher = cswCtx.currentStatePublisher();
+        this.log = cswCtx.loggerFactory().getLogger(getClass());
+        this.commandResponseManager = cswCtx.commandResponseManager();
         this.actorContext = ctx;
-        this.locationService = cswServices.locationService();
-        this.eventService = cswServices.eventService();
-        this.componentInfo = cswServices.componentInfo();
+        this.locationService = cswCtx.locationService();
+        this.eventService = cswCtx.eventService();
+        this.componentInfo = cswCtx.componentInfo();
         this.commandSender = createWorkerActor();
     }
 

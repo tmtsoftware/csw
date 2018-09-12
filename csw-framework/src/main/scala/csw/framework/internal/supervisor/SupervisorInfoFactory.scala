@@ -3,7 +3,7 @@ package csw.framework.internal.supervisor
 import akka.actor.ActorSystem
 import akka.actor.typed.ActorRef
 import csw.framework.internal.wiring.CswFrameworkSystem
-import csw.framework.models.CswServices
+import csw.framework.models.CswContext
 import csw.messages.ContainerIdleMessage
 import csw.messages.framework.{Component, ComponentInfo, SupervisorInfo}
 import csw.services.location.api.scaladsl.LocationService
@@ -36,9 +36,9 @@ private[framework] class SupervisorInfoFactory(containerName: String) {
     val richSystem                            = new CswFrameworkSystem(system)
 
     async {
-      val cswServicesF = CswServices.make(locationService, eventServiceFactory, alarmServiceFactory, componentInfo)(richSystem)
+      val cswCtxF = CswContext.make(locationService, eventServiceFactory, alarmServiceFactory, componentInfo)(richSystem)
       val supervisorBehavior =
-        SupervisorBehaviorFactory.make(Some(containerRef), registrationFactory, await(cswServicesF))
+        SupervisorBehaviorFactory.make(Some(containerRef), registrationFactory, await(cswCtxF))
       val actorRefF = richSystem.spawnTyped(supervisorBehavior, componentInfo.name)
       Some(SupervisorInfo(system, Component(await(actorRefF), componentInfo)))
     } recoverWith {

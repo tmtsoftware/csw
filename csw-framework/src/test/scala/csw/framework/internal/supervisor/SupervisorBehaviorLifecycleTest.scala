@@ -5,7 +5,7 @@ import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestInbox, TestProbe}
 import akka.actor.typed.scaladsl.{Behaviors, TimerScheduler}
 import akka.actor.typed.{ActorRef, Terminated}
 import csw.common.components.framework.SampleComponentBehaviorFactory
-import csw.common.extensions.CswServicesExtensions.RichCswServices
+import csw.common.extensions.CswContextExtensions.RichCswContext
 import csw.framework.ComponentInfos._
 import csw.framework.exceptions.{FailureStop, InitializationFailed}
 import csw.framework.scaladsl.ComponentHandlers
@@ -49,7 +49,7 @@ class SupervisorBehaviorLifecycleTest extends FrameworkTestSuite with BeforeAndA
               None,
               new SampleComponentBehaviorFactory,
               registrationFactory,
-              cswServices.copy(compInfo),
+              cswCtx.copy(compInfo),
           )
         )
     )

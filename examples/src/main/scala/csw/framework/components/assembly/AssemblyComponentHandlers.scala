@@ -5,7 +5,7 @@ import java.nio.file.Paths
 import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.{ActorRef, ActorSystem}
 import csw.framework.exceptions.{FailureRestart, FailureStop}
-import csw.framework.models.CswServices
+import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.messages.TopLevelActorMessage
 import csw.messages.commands.CommandResponse.Accepted
@@ -20,12 +20,12 @@ import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
 //#component-handlers-class
-class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswServices: CswServices)
-    extends ComponentHandlers(ctx, cswServices)
+class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext)
+    extends ComponentHandlers(ctx, cswCtx)
 //#component-handlers-class
     {
 
-  import cswServices._
+  import cswCtx._
   implicit val ec: ExecutionContextExecutor = ctx.executionContext
 
   private val log: Logger                                          = loggerFactory.getLogger(ctx)
@@ -149,7 +149,7 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswServ
     val maybeConnection = componentInfo.connections.find(connection ⇒ connection.componentId.componentType == ComponentType.HCD)
     maybeConnection match {
       case Some(hcd) ⇒
-        cswServices.locationService.resolve(hcd.of[AkkaLocation], 5.seconds).map {
+        cswCtx.locationService.resolve(hcd.of[AkkaLocation], 5.seconds).map {
           case loc @ Some(akkaLocation) ⇒ loc
           case None                     ⇒
             // Hcd connection could not be resolved for this Assembly. One option to handle this could be to automatic restart which can give enough time
@@ -184,7 +184,7 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswServ
     implicit val system: ActorSystem[Nothing] = ctx.system
 
     val eventualCommandService: Future[CommandService] =
-      cswServices.locationService.resolve(hcdConnection.of[AkkaLocation], 5.seconds).map {
+      cswCtx.locationService.resolve(hcdConnection.of[AkkaLocation], 5.seconds).map {
         case Some(hcdLocation: AkkaLocation) => new CommandService(hcdLocation)
         case _                               => throw HcdNotFoundException()
       }

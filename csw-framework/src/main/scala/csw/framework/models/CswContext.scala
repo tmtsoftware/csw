@@ -31,7 +31,7 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
  * @param componentInfo component related information as described in the configuration file
  *
  */
-class CswServices(
+class CswContext(
     val locationService: LocationService,
     val eventService: EventService,
     val alarmService: AlarmService,
@@ -42,7 +42,7 @@ class CswServices(
     val componentInfo: ComponentInfo
 )
 
-object CswServices {
+object CswContext {
 
   private val PubSubComponentActor            = "pub-sub-component"
   private val CommandResponseManagerActorName = "command-response-manager"
@@ -52,7 +52,7 @@ object CswServices {
       eventServiceFactory: EventServiceFactory,
       alarmServiceFactory: AlarmServiceFactory,
       componentInfo: ComponentInfo
-  )(implicit richSystem: CswFrameworkSystem): Future[CswServices] = {
+  )(implicit richSystem: CswFrameworkSystem): Future[CswContext] = {
 
     implicit val system: ActorSystem          = richSystem.system
     implicit val ec: ExecutionContextExecutor = system.dispatcher
@@ -76,7 +76,7 @@ object CswServices {
         await(richSystem.spawnTyped(commandResponseManagerFactory.makeBehavior(loggerFactory), CommandResponseManagerActorName))
       val commandResponseManager = commandResponseManagerFactory.make(commandResponseManagerActor)
 
-      new CswServices(
+      new CswContext(
         locationService,
         eventService,
         alarmService,

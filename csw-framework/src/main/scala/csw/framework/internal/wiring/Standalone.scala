@@ -3,7 +3,7 @@ package csw.framework.internal.wiring
 import akka.actor.typed.ActorRef
 import csw.framework.internal.configparser.ConfigParser
 import csw.framework.internal.supervisor.SupervisorBehaviorFactory
-import csw.framework.models.CswServices
+import csw.framework.models.CswContext
 import csw.messages.ComponentMessage
 
 import scala.async.Async.{async, await}
@@ -28,8 +28,8 @@ object Standalone {
     val componentInfo = ConfigParser.parseStandalone(config)
     val richSystem    = new CswFrameworkSystem(system)
     async {
-      val cswServicesF       = CswServices.make(locationService, eventServiceFactory, alarmServiceFactory, componentInfo)(richSystem)
-      val supervisorBehavior = SupervisorBehaviorFactory.make(None, registrationFactory, await(cswServicesF))
+      val cswCtxF            = CswContext.make(locationService, eventServiceFactory, alarmServiceFactory, componentInfo)(richSystem)
+      val supervisorBehavior = SupervisorBehaviorFactory.make(None, registrationFactory, await(cswCtxF))
       await(richSystem.spawnTyped(supervisorBehavior, componentInfo.name))
     }
   }

@@ -1,21 +1,21 @@
 package csw.common.components.command
 
 import akka.actor.typed.scaladsl.ActorContext
-import csw.framework.models.CswServices
+import csw.framework.models.CswContext
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.messages.TopLevelActorMessage
 
 class ComponentBehaviorFactoryForCommand extends ComponentBehaviorFactory {
-  protected override def handlers(ctx: ActorContext[TopLevelActorMessage], cswServices: CswServices): ComponentHandlers =
-    new ComponentHandlerForCommand(ctx, cswServices)
+  protected override def handlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext): ComponentHandlers =
+    new ComponentHandlerForCommand(ctx, cswCtx)
 }
 
 class McsAssemblyBehaviorFactory extends ComponentBehaviorFactory {
-  protected override def handlers(ctx: ActorContext[TopLevelActorMessage], cswServices: CswServices): ComponentHandlers =
-    new McsAssemblyComponentHandlers(ctx, cswServices)
+  protected override def handlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext): ComponentHandlers =
+    new McsAssemblyComponentHandlers(ctx, cswCtx)
 }
 
 class McsHcdBehaviorFactory extends ComponentBehaviorFactory {
-  protected override def handlers(ctx: ActorContext[TopLevelActorMessage], cswServices: CswServices): ComponentHandlers =
-    new McsHcdComponentHandlers(ctx, cswServices)
+  protected override def handlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext): ComponentHandlers =
+    new McsHcdComponentHandlers(ctx, cswCtx)
 }

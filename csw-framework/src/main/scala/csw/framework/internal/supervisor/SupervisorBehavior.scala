@@ -8,7 +8,7 @@ import akka.actor.typed.scaladsl.{ActorContext, Behaviors, MutableBehavior, Time
 import akka.actor.typed.{ActorRef, Behavior, PostStop, Signal, SupervisorStrategy, Terminated}
 import csw.framework.exceptions.{FailureRestart, InitializationFailed}
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
-import csw.framework.models.CswServices
+import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentBehaviorFactory
 import csw.messages.CommandResponseManagerMessage.{Query, Subscribe, Unsubscribe}
 import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
@@ -65,11 +65,11 @@ private[framework] final class SupervisorBehavior(
     maybeContainerRef: Option[ActorRef[ContainerIdleMessage]],
     componentBehaviorFactory: ComponentBehaviorFactory,
     registrationFactory: RegistrationFactory,
-    cswServices: CswServices
+    cswCtx: CswContext
 ) extends MutableBehavior[SupervisorMessage] {
 
   import SupervisorBehavior._
-  import cswServices._
+  import cswCtx._
   import ctx.executionContext
 
   private val log: Logger                                  = loggerFactory.getLogger(ctx)
@@ -300,7 +300,7 @@ private[framework] final class SupervisorBehavior(
 
   private def createTLA(): ActorRef[Nothing] = {
     val behavior = Behaviors
-      .supervise[Nothing](componentBehaviorFactory.make(ctx.self, cswServices))
+      .supervise[Nothing](componentBehaviorFactory.make(ctx.self, cswCtx))
       .onFailure[FailureRestart](SupervisorStrategy.restartWithLimit(3, Duration.Zero).withLoggingEnabled(true))
 
     ctx.spawn[Nothing](behavior, componentActorName)

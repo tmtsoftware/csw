@@ -20,7 +20,7 @@ import csw.services.logging.javadsl.JLoggerFactory
  * @param componentInfo component related information as described in the configuration file
  *
  */
-case class JCswServices(
+case class JCswContext(
     locationService: ILocationService,
     eventService: IEventService,
     alarmService: IAlarmService,
@@ -34,7 +34,7 @@ case class JCswServices(
   /**
    * Returns the Java API for this instance of csw services
    */
-  def asScala = new CswServices(
+  def asScala = new CswContext(
     locationService.asScala,
     eventService.asScala,
     alarmService.asScala,

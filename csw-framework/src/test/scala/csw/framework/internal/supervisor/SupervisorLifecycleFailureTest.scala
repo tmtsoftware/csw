@@ -13,7 +13,7 @@ import csw.commons.tags.LoggingSystemSensitive
 import csw.framework.ComponentInfos._
 import csw.framework.exceptions.{FailureRestart, FailureStop}
 import csw.framework.internal.component.ComponentBehavior
-import csw.framework.models.CswServices
+import csw.framework.models.CswContext
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.messages.CommandMessage.Submit
@@ -213,12 +213,12 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
       Some(mock[ActorRef[ContainerIdleMessage]]),
       registrationFactory,
       new SampleBehaviorFactory(componentHandlers),
-      new CswServices(
-        cswServices.locationService,
-        cswServices.eventService,
-        cswServices.alarmService,
+      new CswContext(
+        cswCtx.locationService,
+        cswCtx.eventService,
+        cswCtx.alarmService,
         new LoggerFactory(hcdInfo.name),
-        cswServices.configClientService,
+        cswCtx.configClientService,
         currentStatePublisher,
         commandResponseManager,
         hcdInfo
@@ -255,7 +255,7 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
 }
 
 class SampleBehaviorFactory(componentHandlers: ComponentHandlers) extends ComponentBehaviorFactory {
-  override protected def handlers(ctx: ActorContext[TopLevelActorMessage], cswServices: CswServices): ComponentHandlers =
+  override protected def handlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext): ComponentHandlers =
     componentHandlers
 }
 

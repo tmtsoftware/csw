@@ -6,7 +6,7 @@ import akka.actor.typed.scaladsl.adapter._
 import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.{actor, testkit, Done}
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
-import csw.framework.models.CswServices
+import csw.framework.models.CswContext
 import csw.messages.CommandResponseManagerMessage
 import csw.messages.commands.CommandResponse
 import csw.messages.framework.{LifecycleStateChanged, PubSub}
@@ -77,8 +77,8 @@ class FrameworkTestMocks(implicit untypedSystem: actor.ActorSystem, system: Acto
   ///////////////////////////////////////////////
   val configClientService: ConfigClientService = ConfigClientFactory.clientApi(untypedSystem, locationService)
 
-  val cswServices: CswServices =
-    new CswServices(
+  val cswCtx: CswContext =
+    new CswContext(
       locationService,
       eventService,
       alarmService,

@@ -9,7 +9,7 @@ import csw.framework.CurrentStatePublisher;
 import csw.framework.exceptions.FailureRestart;
 import csw.framework.exceptions.FailureStop;
 import csw.framework.javadsl.JComponentHandlers;
-import csw.framework.models.JCswServices;
+import csw.framework.models.JCswContext;
 import csw.messages.TopLevelActorMessage;
 import csw.messages.commands.*;
 import csw.messages.framework.ComponentInfo;
@@ -55,15 +55,15 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     private ActorRef<DiagnosticPublisherMessages> diagnosticPublisher;
     private ActorRef<CommandResponse> commandResponseAdapter;
 
-    public JAssemblyComponentHandlers(akka.actor.typed.javadsl.ActorContext<TopLevelActorMessage> ctx, JCswServices cswServices) {
-        super(ctx, cswServices);
+    public JAssemblyComponentHandlers(akka.actor.typed.javadsl.ActorContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
+        super(ctx, cswCtx);
         this.ctx = ctx;
-        this.componentInfo = cswServices.componentInfo();
-        this.commandResponseManager = cswServices.commandResponseManager();
-        this.currentStatePublisher = cswServices.currentStatePublisher();
-        this.locationService = cswServices.locationService();
-        this.eventService = cswServices.eventService();
-        log = cswServices.loggerFactory().getLogger(this.getClass());
+        this.componentInfo = cswCtx.componentInfo();
+        this.commandResponseManager = cswCtx.commandResponseManager();
+        this.currentStatePublisher = cswCtx.currentStatePublisher();
+        this.locationService = cswCtx.locationService();
+        this.eventService = cswCtx.eventService();
+        log = cswCtx.loggerFactory().getLogger(this.getClass());
         configClient = JConfigClientFactory.clientApi(Adapter.toUntyped(ctx.getSystem()), locationService);
 
         runningHcds = new HashMap<>();

@@ -10,7 +10,7 @@ import csw.framework.components.assembly.WorkerActor;
 import csw.framework.components.assembly.WorkerActorMsg;
 import csw.framework.components.assembly.WorkerActorMsgs;
 import csw.framework.javadsl.JComponentHandlers;
-import csw.framework.models.JCswServices;
+import csw.framework.models.JCswContext;
 import csw.messages.TopLevelActorMessage;
 import csw.messages.commands.CommandResponse;
 import csw.messages.commands.ControlCommand;
@@ -50,16 +50,16 @@ public class JHcdComponentHandlers extends JComponentHandlers {
 
     public JHcdComponentHandlers(
             akka.actor.typed.javadsl.ActorContext<TopLevelActorMessage> ctx,
-            JCswServices cswServices
+            JCswContext cswCtx
     ) {
-        super(ctx, cswServices);
+        super(ctx, cswCtx);
         this.ctx = ctx;
-        this.componentInfo = cswServices.componentInfo();
-        this.commandResponseManager = cswServices.commandResponseManager();
-        this.currentStatePublisher = cswServices.currentStatePublisher();
-        this.locationService = cswServices.locationService();
-        this.eventService = cswServices.eventService();
-        log = cswServices.loggerFactory().getLogger(this.getClass());
+        this.componentInfo = cswCtx.componentInfo();
+        this.commandResponseManager = cswCtx.commandResponseManager();
+        this.currentStatePublisher = cswCtx.currentStatePublisher();
+        this.locationService = cswCtx.locationService();
+        this.eventService = cswCtx.eventService();
+        log = cswCtx.loggerFactory().getLogger(this.getClass());
     }
     //#jcomponent-handlers-class
 
