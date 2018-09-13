@@ -2,7 +2,7 @@ package csw.framework.components.assembly
 
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors, MutableBehavior}
 import akka.actor.typed.{ActorRef, Behavior}
-import csw.services.command.scaladsl.CommandService
+import csw.command.scaladsl.CommandService
 
 trait DiagnosticPublisherMessages
 

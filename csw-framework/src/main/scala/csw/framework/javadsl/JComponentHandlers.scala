@@ -3,9 +3,9 @@ package csw.framework.javadsl
 import java.util.concurrent.CompletableFuture
 
 import akka.actor.typed.javadsl.ActorContext
+import csw.command.messages.TopLevelActorMessage
 import csw.framework.models.JCswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.messages.TopLevelActorMessage
 
 import scala.compat.java8.FutureConverters._
 import scala.concurrent.{ExecutionContextExecutor, Future}

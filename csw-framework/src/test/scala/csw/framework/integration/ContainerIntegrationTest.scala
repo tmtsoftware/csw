@@ -8,20 +8,20 @@ import csw.common.FrameworkAssertions._
 import csw.common.components.framework.SampleComponentState._
 import csw.framework.FrameworkTestWiring
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
-import csw.messages.ComponentCommonMessage.{GetSupervisorLifecycleState, LifecycleStateSubscription}
-import csw.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
-import csw.messages.RunningMessage.Lifecycle
-import csw.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
-import csw.messages.framework
-import csw.messages.framework.PubSub.Subscribe
-import csw.messages.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
-import csw.messages.framework.{Components, ContainerLifecycleState, LifecycleStateChanged, SupervisorLifecycleState}
+import csw.command.messages.ComponentCommonMessage.{GetSupervisorLifecycleState, LifecycleStateSubscription}
+import csw.command.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
+import csw.command.messages.RunningMessage.Lifecycle
+import csw.command.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
+import csw.command.models.framework
+import csw.command.models.framework.PubSub.Subscribe
+import csw.command.models.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
+import csw.command.models.framework.{Components, ContainerLifecycleState, LifecycleStateChanged, SupervisorLifecycleState}
 import csw.services.location.api.models.ComponentType.{Assembly, HCD}
 import csw.services.location.api.models.Connection.AkkaConnection
 import csw.services.location.api.models.{ComponentId, ComponentType, LocationRemoved, TrackingEvent}
 import csw.messages.params.states.{CurrentState, StateName}
-import csw.services.command.extensions.AkkaLocationExt.RichAkkaLocation
-import csw.services.command.scaladsl.CommandService
+import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
+import csw.command.scaladsl.CommandService
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar

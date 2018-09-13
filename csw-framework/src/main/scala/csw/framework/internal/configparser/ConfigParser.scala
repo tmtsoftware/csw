@@ -2,7 +2,7 @@ package csw.framework.internal.configparser
 
 import com.typesafe.config.{Config, ConfigRenderOptions}
 import csw.framework.models.{ContainerInfo, HostBootstrapInfo}
-import csw.messages.framework.ComponentInfo
+import csw.command.models.framework.ComponentInfo
 import play.api.libs.json._
 
 /**

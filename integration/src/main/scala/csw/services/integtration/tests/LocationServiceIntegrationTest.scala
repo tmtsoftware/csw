@@ -7,7 +7,7 @@ import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.adapter._
 import akka.actor.{typed, ActorSystem, Props, Scheduler}
 import akka.util.Timeout
-import csw.messages.CommandMessage.Submit
+import csw.command.messages.CommandMessage.Submit
 import csw.messages.commands.{CommandName, Setup}
 import csw.services.location.api.models.Connection.{AkkaConnection, HttpConnection}
 import csw.services.location.api.exceptions.OtherLocationIsRegistered
@@ -15,7 +15,7 @@ import csw.services.location.api.models.AkkaRegistration
 import csw.services.location.api.scaladsl.LocationService
 import csw.services.location.api.models.{AkkaLocation, ComponentId, ComponentType, HttpLocation}
 import csw.messages.params.models.Prefix
-import csw.services.command.extensions.AkkaLocationExt.RichAkkaLocation
+import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.services.integtration.apps.TromboneHCD
 import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.commons.ClusterAwareSettings

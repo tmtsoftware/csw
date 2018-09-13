@@ -4,7 +4,7 @@ import akka.actor.typed.ActorRef;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.actor.typed.javadsl.MutableBehavior;
-import csw.services.command.javadsl.JCommandService;
+import csw.command.javadsl.JCommandService;
 
 public class JDiagnosticsPublisher extends MutableBehavior<DiagnosticPublisherMessages> {
 

@@ -17,14 +17,14 @@ import csw.common.FrameworkAssertions.assertThatContainerIsRunning
 import csw.commons.tags.LoggingSystemSensitive
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.messages.commands.{CommandName, CommandResponse, Setup}
-import csw.messages.framework.{Component, Components, ContainerLifecycleState}
+import csw.command.models.framework.{Component, Components, ContainerLifecycleState}
 import csw.services.location.api.models.ComponentId
 import csw.services.location.api.models.ComponentType.{Assembly, HCD}
 import csw.services.location.api.models.Connection.AkkaConnection
 import csw.messages.params.models.Prefix
-import csw.messages.CommandMessage.Oneway
-import csw.messages.ContainerMessage
-import csw.messages.ContainerCommonMessage.GetComponents
+import csw.command.messages.CommandMessage.Oneway
+import csw.command.messages.ContainerMessage
+import csw.command.messages.ContainerCommonMessage.GetComponents
 import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.services.logging.internal.LoggingLevels.{ERROR, Level, WARN}
 import csw.services.logging.internal._

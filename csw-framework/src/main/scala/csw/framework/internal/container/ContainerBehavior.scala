@@ -6,27 +6,26 @@ import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.scaladsl.{ActorContext, MutableBehavior}
 import akka.actor.typed.{ActorRef, Behavior, PostStop, Signal, Terminated}
+import csw.command.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
+import csw.command.messages.{ComponentMessage, ContainerActorMessage, ContainerCommonMessage, ContainerIdleMessage}
+import csw.command.messages.ContainerIdleMessage.SupervisorsCreated
+import csw.command.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
+import csw.command.messages.RunningMessage.Lifecycle
+import csw.command.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
+import csw.command.models.framework._
 import csw.framework.commons.CoordinatedShutdownReasons.{
   AllActorsWithinContainerTerminatedReason,
   FailedToCreateSupervisorsReason
 }
 import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.framework.models._
-import csw.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
-import csw.messages.ContainerIdleMessage.SupervisorsCreated
-import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
-import csw.messages.RunningMessage.Lifecycle
-import csw.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
-import csw.messages.framework._
-import csw.services.location.api.models.Connection.AkkaConnection
-import csw.services.location.api.models.AkkaRegistration
-import csw.services.location.api.scaladsl.LocationService
-import csw.services.location.api.models.{ComponentId, ComponentType}
 import csw.messages.params.models.Prefix
 import csw.messages.params.models.Subsystem.Container
-import csw.messages.{ComponentMessage, ContainerActorMessage, ContainerCommonMessage, ContainerIdleMessage}
 import csw.services.alarm.client.AlarmServiceFactory
 import csw.services.event.EventServiceFactory
+import csw.services.location.api.models.Connection.AkkaConnection
+import csw.services.location.api.models.{AkkaRegistration, ComponentId, ComponentType}
+import csw.services.location.api.scaladsl.LocationService
 import csw.services.location.scaladsl.RegistrationFactory
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
@@ -75,7 +74,7 @@ private[framework] final class ContainerBehavior(
   createComponents(containerInfo.components)
 
   /**
-   * Defines processing for a [[ContainerActorMessage]] received by the actor instance.
+   * Defines processing for a [[csw.command.messages.ContainerActorMessage]] received by the actor instance.
    *
    * @param msg containerMessage received
    * @return the existing behavior
@@ -115,7 +114,7 @@ private[framework] final class ContainerBehavior(
   }
 
   /**
-   * Defines action for messages which can be received in any [[csw.messages.framework.ContainerLifecycleState]] state
+   * Defines action for messages which can be received in any [[csw.command.models.framework.ContainerLifecycleState]] state
    *
    * @param commonMessage message representing a message received in any lifecycle state
    */
@@ -136,9 +135,9 @@ private[framework] final class ContainerBehavior(
   }
 
   /**
-   * Defines action for messages which can be received in [[csw.messages.framework.ContainerLifecycleState.Idle]] state
+   * Defines action for messages which can be received in [[csw.command.models.framework.ContainerLifecycleState.Idle]] state
    *
-   * @param idleMessage message representing a message received in [[csw.messages.framework.ContainerLifecycleState.Idle]] state
+   * @param idleMessage message representing a message received in [[csw.command.models.framework.ContainerLifecycleState.Idle]] state
    */
   private def onIdle(idleMessage: ContainerIdleMessage): Unit = idleMessage match {
     case SupervisorsCreated(supervisorInfos) ⇒

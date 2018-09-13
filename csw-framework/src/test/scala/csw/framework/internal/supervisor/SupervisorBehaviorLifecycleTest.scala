@@ -10,20 +10,20 @@ import csw.framework.ComponentInfos._
 import csw.framework.exceptions.{FailureStop, InitializationFailed}
 import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
-import csw.messages.CommandResponseManagerMessage.Query
-import csw.messages.ComponentCommonMessage.{GetSupervisorLifecycleState, LifecycleStateSubscription}
-import csw.messages.FromComponentLifecycleMessage.Running
-import csw.messages.RunningMessage.Lifecycle
-import csw.messages.SupervisorContainerCommonMessages.Restart
-import csw.messages.SupervisorIdleMessage.InitializeTimeout
-import csw.messages.SupervisorInternalRunningMessage.{RegistrationNotRequired, RegistrationSuccess}
+import csw.command.messages.CommandResponseManagerMessage.Query
+import csw.command.messages.ComponentCommonMessage.{GetSupervisorLifecycleState, LifecycleStateSubscription}
+import csw.command.messages.FromComponentLifecycleMessage.Running
+import csw.command.messages.RunningMessage.Lifecycle
+import csw.command.messages.SupervisorContainerCommonMessages.Restart
+import csw.command.messages.SupervisorIdleMessage.InitializeTimeout
+import csw.command.messages.SupervisorInternalRunningMessage.{RegistrationNotRequired, RegistrationSuccess}
 import csw.messages.commands.CommandResponse
-import csw.messages.framework.LocationServiceUsage.DoNotRegister
-import csw.messages.framework.PubSub.{Publish, Subscribe, Unsubscribe}
-import csw.messages.framework.ToComponentLifecycleMessages._
-import csw.messages.framework.{ComponentInfo, LifecycleStateChanged, PubSub, SupervisorLifecycleState}
+import csw.command.models.framework.LocationServiceUsage.DoNotRegister
+import csw.command.models.framework.PubSub.{Publish, Subscribe, Unsubscribe}
+import csw.command.models.framework.ToComponentLifecycleMessages._
+import csw.command.models.framework.{ComponentInfo, LifecycleStateChanged, PubSub, SupervisorLifecycleState}
 import csw.messages.params.models.Id
-import csw.messages.{CommandResponseManagerMessage, ContainerIdleMessage, SupervisorMessage, TopLevelActorMessage}
+import csw.command.messages.{CommandResponseManagerMessage, ContainerIdleMessage, SupervisorMessage, TopLevelActorMessage}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 

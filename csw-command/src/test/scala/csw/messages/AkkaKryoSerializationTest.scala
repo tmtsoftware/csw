@@ -8,25 +8,30 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.{typed, ActorSystem}
 import akka.serialization.SerializationExtension
 import com.twitter.chill.akka.AkkaSerializer
+import csw.command.messages.ComponentCommonMessage.{
+  ComponentStateSubscription,
+  GetSupervisorLifecycleState,
+  LifecycleStateSubscription
+}
+import csw.command.messages.ComponentMessage
+import csw.command.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
+import csw.command.messages.RunningMessage.Lifecycle
+import csw.command.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
+import csw.command.models.framework.LocationServiceUsage.DoNotRegister
+import csw.command.models.framework.PubSub.Subscribe
+import csw.command.models.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
+import csw.command.models.framework._
 import csw.commons.tagobjects.FileSystemSensitive
-import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
-import csw.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
-import csw.messages.RunningMessage.Lifecycle
-import csw.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
 import csw.messages.commands.CommandResponse._
 import csw.messages.commands.{CommandIssue, _}
 import csw.messages.events.{EventName, EventTime, ObserveEvent, SystemEvent}
-import csw.messages.framework.LocationServiceUsage.DoNotRegister
-import csw.messages.framework.PubSub.Subscribe
-import csw.messages.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
-import csw.messages.framework._
-import csw.services.location.api.models.ComponentType.HCD
-import csw.services.location.api.models.Connection
 import csw.messages.params.generics.KeyType.{ByteArrayKey, ChoiceKey, DoubleMatrixKey, IntKey, StructKey}
 import csw.messages.params.generics.{Key, KeyType, Parameter}
 import csw.messages.params.models.Units.{arcmin, coulomb, encoder, joule, lightyear, meter, pascal, NoUnits}
 import csw.messages.params.models._
 import csw.messages.params.states.{CurrentState, DemandState, StateName}
+import csw.services.location.api.models.ComponentType.HCD
+import csw.services.location.api.models.Connection
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.prop.Tables.Table
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}

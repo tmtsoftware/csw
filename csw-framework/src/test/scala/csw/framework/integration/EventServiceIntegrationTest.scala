@@ -11,12 +11,12 @@ import csw.framework.FrameworkTestWiring
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.messages.commands
 import csw.messages.commands.CommandName
-import csw.messages.framework.ContainerLifecycleState
+import csw.command.models.framework.ContainerLifecycleState
 import csw.services.location.api.models.ComponentId
 import csw.services.location.api.models.ComponentType.{Assembly, HCD}
 import csw.services.location.api.models.Connection.AkkaConnection
 import csw.messages.params.states.{CurrentState, StateName}
-import csw.services.command.scaladsl.CommandService
+import csw.command.scaladsl.CommandService
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.internal.commons.EventServiceConnection
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}

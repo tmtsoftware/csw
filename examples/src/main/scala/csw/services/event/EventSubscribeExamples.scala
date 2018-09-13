@@ -4,7 +4,7 @@ import akka.actor.typed.scaladsl.{ActorContext, Behaviors, MutableBehavior}
 import akka.actor.typed.{ActorRef, Behavior}
 import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
-import csw.messages.TopLevelActorMessage
+import csw.command.messages.TopLevelActorMessage
 import csw.messages.events.{Event, EventKey, EventName}
 import csw.services.location.api.models.AkkaLocation
 import csw.messages.params.models.Subsystem

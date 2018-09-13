@@ -4,7 +4,7 @@ import akka.actor.Cancellable
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.messages.TopLevelActorMessage
+import csw.command.messages.TopLevelActorMessage
 import csw.messages.commands._
 import csw.messages.events.{EventName, SystemEvent}
 import csw.services.location.api.models.TrackingEvent

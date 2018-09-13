@@ -4,8 +4,8 @@ import akka.actor.typed.scaladsl.ActorContext
 import csw.common.components.command.ComponentStateForCommand._
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
-import csw.messages.TopLevelActorMessage
+import csw.command.messages.CommandResponseManagerMessage.AddOrUpdateCommand
+import csw.command.messages.TopLevelActorMessage
 import csw.messages.commands.CommandResponse.{Accepted, Completed, Error}
 import csw.messages.commands.{CommandResponse, ControlCommand}
 import csw.services.location.api.models.TrackingEvent

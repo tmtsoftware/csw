@@ -12,14 +12,14 @@ import csw.common.components.framework.SampleComponentState;
 import csw.framework.CurrentStatePublisher;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.models.JCswContext;
-import csw.messages.TopLevelActorMessage;
+import csw.command.messages.TopLevelActorMessage;
 import csw.messages.commands.*;
 import csw.services.location.api.models.TrackingEvent;
 import csw.messages.javadsl.JKeyType;
 import csw.messages.params.generics.Parameter;
 import csw.messages.params.states.CurrentState;
 import csw.messages.params.states.StateName;
-import csw.services.command.CommandResponseManager;
+import csw.command.CommandResponseManager;
 import csw.services.logging.javadsl.ILogger;
 
 import java.time.Duration;

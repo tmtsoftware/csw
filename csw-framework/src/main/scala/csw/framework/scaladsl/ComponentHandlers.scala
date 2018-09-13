@@ -1,9 +1,9 @@
 package csw.framework.scaladsl
 
 import akka.actor.typed.scaladsl.ActorContext
+import csw.command.messages.TopLevelActorCommonMessage.TrackingEventReceived
+import csw.command.messages.TopLevelActorMessage
 import csw.framework.models.CswContext
-import csw.messages.TopLevelActorCommonMessage.TrackingEventReceived
-import csw.messages.TopLevelActorMessage
 import csw.messages.commands.{CommandResponse, ControlCommand}
 import csw.services.location.api.models.{Connection, TrackingEvent}
 

@@ -3,7 +3,7 @@ package csw.services.integtration.apps
 import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.typed.scaladsl.adapter._
 import akka.actor.{Actor, ActorRef, ActorSystem, Props}
-import csw.messages.CommandMessage.Submit
+import csw.command.messages.CommandMessage.Submit
 import csw.messages.commands.{CommandName, Setup}
 import csw.services.location.api.models.Connection.AkkaConnection
 import csw.services.location.api.models.{ComponentId, ComponentType}

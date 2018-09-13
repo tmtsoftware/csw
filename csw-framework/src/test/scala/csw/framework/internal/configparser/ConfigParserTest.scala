@@ -3,9 +3,9 @@ package csw.framework.internal.configparser
 import com.typesafe.config.ConfigFactory
 import csw.framework.models.ConfigFileLocation.{Local, Remote}
 import csw.framework.models.ContainerMode.{Container, Standalone}
-import csw.messages.framework.LocationServiceUsage.{DoNotRegister, RegisterOnly}
+import csw.command.models.framework.LocationServiceUsage.{DoNotRegister, RegisterOnly}
 import csw.framework.models.{ContainerBootstrapInfo, ContainerInfo, HostBootstrapInfo}
-import csw.messages.framework.ComponentInfo
+import csw.command.models.framework.ComponentInfo
 import csw.services.location.api.models.Connection
 import csw.services.location.api.models.ComponentType.{Assembly, HCD}
 import csw.messages.params.models.Prefix

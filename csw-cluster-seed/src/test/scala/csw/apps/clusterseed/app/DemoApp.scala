@@ -9,11 +9,11 @@ import csw.apps.clusterseed.internal.AdminWiring
 import csw.common.FrameworkAssertions.assertThatContainerIsRunning
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.messages.commands.{CommandName, CommandResponse, Setup}
-import csw.messages.framework.{Component, Components, ContainerLifecycleState}
+import csw.command.models.framework.{Component, Components, ContainerLifecycleState}
 import csw.messages.params.models.Prefix
-import csw.messages.CommandMessage.Oneway
-import csw.messages.ContainerMessage
-import csw.messages.ContainerCommonMessage.GetComponents
+import csw.command.messages.CommandMessage.Oneway
+import csw.command.messages.ContainerMessage
+import csw.command.messages.ContainerCommonMessage.GetComponents
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.logging.scaladsl.{LoggerFactory, LoggingSystemFactory}
 

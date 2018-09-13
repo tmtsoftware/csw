@@ -6,7 +6,7 @@ import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.actor.typed.javadsl.MutableBehavior;
 import akka.stream.Materializer;
-import csw.messages.TopLevelActorMessage;
+import csw.command.messages.TopLevelActorMessage;
 import csw.messages.events.Event;
 import csw.messages.events.EventKey;
 import csw.messages.events.EventName;

@@ -7,11 +7,11 @@ import akka.actor.testkit.typed.scaladsl.TestProbe
 import csw.messages.commands.CommandIssue.ComponentLockedIssue
 import csw.messages.commands.CommandResponse.NotAllowed
 import csw.messages.commands.{CommandName, CommandResponse, Setup}
-import csw.messages.framework.LockingResponse
-import csw.messages.framework.LockingResponses._
+import csw.command.models.framework.LockingResponse
+import csw.command.models.framework.LockingResponses._
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.{ObsId, Prefix}
-import csw.messages.CommandMessage.Submit
+import csw.command.messages.CommandMessage.Submit
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar

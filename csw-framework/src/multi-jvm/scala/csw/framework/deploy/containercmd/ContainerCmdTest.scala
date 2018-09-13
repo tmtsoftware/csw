@@ -12,23 +12,23 @@ import com.typesafe.config.ConfigFactory
 import csw.common.FrameworkAssertions._
 import csw.messages.commands.CommandResponse.Invalid
 import csw.messages.commands.{CommandName, Setup}
-import csw.messages.framework.PubSub.Subscribe
-import csw.messages.framework.ToComponentLifecycleMessages.GoOffline
-import csw.messages.framework.{Components, ContainerLifecycleState, SupervisorLifecycleState}
+import csw.command.models.framework.PubSub.Subscribe
+import csw.command.models.framework.ToComponentLifecycleMessages.GoOffline
+import csw.command.models.framework.{Components, ContainerLifecycleState, SupervisorLifecycleState}
 import csw.services.location.api.models.Connection.AkkaConnection
 import csw.services.location.api.models.{ComponentId, ComponentType}
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.{ObsId, Prefix}
 import csw.messages.params.models.Subsystem.Container
 import csw.messages.params.states.{CurrentState, StateName}
-import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState}
-import csw.messages.{ComponentMessage, ContainerMessage}
-import csw.messages.ContainerCommonMessage.GetComponents
-import csw.messages.RunningMessage.Lifecycle
-import csw.messages.SupervisorContainerCommonMessages.Shutdown
-import csw.messages.ContainerMessage
-import csw.services.command.extensions.AkkaLocationExt.RichAkkaLocation
-import csw.services.command.scaladsl.CommandService
+import csw.command.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState}
+import csw.command.messages.{ComponentMessage, ContainerMessage}
+import csw.command.messages.ContainerCommonMessage.GetComponents
+import csw.command.messages.RunningMessage.Lifecycle
+import csw.command.messages.SupervisorContainerCommonMessages.Shutdown
+import csw.command.messages.ContainerMessage
+import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
+import csw.command.scaladsl.CommandService
 import csw.services.config.api.models.ConfigData
 import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.config.server.commons.TestFileUtils

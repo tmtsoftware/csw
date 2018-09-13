@@ -5,19 +5,19 @@ import akka.actor.typed.{Behavior, PostStop}
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{ComponentInfos, CurrentStatePublisher, FrameworkTestSuite}
-import csw.messages.CommandMessage.{Oneway, Submit}
-import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
-import csw.messages.RunningMessage.Lifecycle
-import csw.messages.TopLevelActorIdleMessage.Initialize
+import csw.command.messages.CommandMessage.{Oneway, Submit}
+import csw.command.messages.CommandResponseManagerMessage.AddOrUpdateCommand
+import csw.command.messages.RunningMessage.Lifecycle
+import csw.command.messages.TopLevelActorIdleMessage.Initialize
 import csw.messages.commands.CommandResponse.{Accepted, Completed, Error}
 import csw.messages.commands.{CommandName, CommandResponse, Observe, Setup}
-import csw.messages.framework.ToComponentLifecycleMessages._
+import csw.command.models.framework.ToComponentLifecycleMessages._
 import csw.services.location.api.scaladsl.LocationService
 import csw.messages.params.generics.KeyType
 import csw.messages.params.models.{ObsId, Prefix}
-import csw.messages.{CommandResponseManagerMessage, FromComponentLifecycleMessage, TopLevelActorMessage}
+import csw.command.messages.{CommandResponseManagerMessage, FromComponentLifecycleMessage, TopLevelActorMessage}
 import csw.services.alarm.api.scaladsl.AlarmService
-import csw.services.command.CommandResponseManager
+import csw.command.CommandResponseManager
 import csw.services.event.api.scaladsl.EventService
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._

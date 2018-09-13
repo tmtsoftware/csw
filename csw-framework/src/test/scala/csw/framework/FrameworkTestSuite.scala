@@ -10,8 +10,8 @@ import akka.util.Timeout
 import csw.framework.internal.supervisor.SupervisorBehaviorFactory
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
-import csw.messages.framework.ComponentInfo
-import csw.messages.{ComponentMessage, ContainerIdleMessage, TopLevelActorMessage}
+import csw.command.models.framework.ComponentInfo
+import csw.command.messages.{ComponentMessage, ContainerIdleMessage, TopLevelActorMessage}
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.logging.scaladsl.LoggerFactory
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}

@@ -8,15 +8,15 @@ import csw.framework.ComponentInfos.assemblyInfo
 import csw.framework.FrameworkTestSuite
 import csw.messages.commands.CommandResponse.{Accepted, NotAllowed}
 import csw.messages.commands.{CommandName, CommandResponse, Setup}
-import csw.messages.framework.LockingResponses._
-import csw.messages.framework.{LifecycleStateChanged, LockingResponse, PubSub, SupervisorLifecycleState}
+import csw.command.models.framework.LockingResponses._
+import csw.command.models.framework.{LifecycleStateChanged, LockingResponse, PubSub, SupervisorLifecycleState}
 import csw.messages.params.models.{ObsId, Prefix}
 import csw.messages.params.states.{CurrentState, StateName}
-import csw.messages.CommandMessage.Submit
-import csw.messages.{CommandResponseManagerMessage ⇒ CRM}
+import csw.command.messages.CommandMessage.Submit
+import csw.command.messages.{CommandResponseManagerMessage ⇒ CRM}
 import CRM.{AddOrUpdateCommand, Query, Unsubscribe}
-import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
-import csw.messages.SupervisorLockMessage.{Lock, Unlock}
+import csw.command.messages.ComponentCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
+import csw.command.messages.SupervisorLockMessage.{Lock, Unlock}
 import org.scalatest.BeforeAndAfterEach
 
 import scala.concurrent.duration.DurationDouble

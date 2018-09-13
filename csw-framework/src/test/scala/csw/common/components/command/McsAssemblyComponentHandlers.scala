@@ -6,13 +6,13 @@ import akka.util.Timeout
 import csw.common.components.command.ComponentStateForCommand.{longRunningCmdCompleted, _}
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.messages.TopLevelActorMessage
+import csw.command.messages.TopLevelActorMessage
 import csw.messages.commands.CommandResponse.{Accepted, Completed, Invalid}
 import csw.messages.commands.{CommandIssue, CommandResponse, ControlCommand, Setup}
 import csw.services.location.api.models.{AkkaLocation, TrackingEvent}
 import csw.messages.params.models.Id
 import csw.messages.params.states.{CurrentState, StateName}
-import csw.services.command.scaladsl.CommandService
+import csw.command.scaladsl.CommandService
 
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{ExecutionContext, Future}

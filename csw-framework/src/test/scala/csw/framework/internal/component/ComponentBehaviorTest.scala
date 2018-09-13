@@ -5,12 +5,12 @@ import akka.actor.typed.Behavior
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{ComponentInfos, CurrentStatePublisher, FrameworkTestSuite}
-import csw.messages.FromComponentLifecycleMessage.Running
-import csw.messages.TopLevelActorIdleMessage.Initialize
+import csw.command.messages.FromComponentLifecycleMessage.Running
+import csw.command.messages.TopLevelActorIdleMessage.Initialize
 import csw.services.location.api.scaladsl.LocationService
-import csw.messages.{CommandResponseManagerMessage, FromComponentLifecycleMessage, TopLevelActorMessage}
+import csw.command.messages.{CommandResponseManagerMessage, FromComponentLifecycleMessage, TopLevelActorMessage}
 import csw.services.alarm.api.scaladsl.AlarmService
-import csw.services.command.CommandResponseManager
+import csw.command.CommandResponseManager
 import csw.services.event.api.scaladsl.EventService
 import org.mockito.Mockito._
 import org.scalatest.Matchers

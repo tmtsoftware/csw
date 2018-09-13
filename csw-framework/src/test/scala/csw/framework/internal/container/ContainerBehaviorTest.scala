@@ -10,17 +10,17 @@ import akka.{actor, Done}
 import csw.framework.ComponentInfos._
 import csw.framework.FrameworkTestMocks
 import csw.framework.internal.supervisor.SupervisorInfoFactory
-import csw.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
-import csw.messages.ContainerIdleMessage.SupervisorsCreated
-import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
-import csw.messages.RunningMessage.Lifecycle
-import csw.messages.SupervisorContainerCommonMessages.Restart
-import csw.messages.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
-import csw.messages.framework.{ComponentInfo, ContainerLifecycleState, SupervisorLifecycleState, _}
+import csw.command.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
+import csw.command.messages.ContainerIdleMessage.SupervisorsCreated
+import csw.command.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
+import csw.command.messages.RunningMessage.Lifecycle
+import csw.command.messages.SupervisorContainerCommonMessages.Restart
+import csw.command.models.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
+import csw.command.models.framework.{ComponentInfo, ContainerLifecycleState, SupervisorLifecycleState, _}
 import csw.services.location.api.models.Connection.AkkaConnection
 import csw.services.location.api.scaladsl.LocationService
 import csw.messages.params.models.Prefix
-import csw.messages.{ComponentMessage, ContainerActorMessage, ContainerIdleMessage}
+import csw.command.messages.{ComponentMessage, ContainerActorMessage, ContainerIdleMessage}
 import csw.services.alarm.client.AlarmServiceFactory
 import csw.services.event.EventServiceFactory
 import csw.services.location.commons.ActorSystemFactory

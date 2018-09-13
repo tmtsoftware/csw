@@ -1,8 +1,8 @@
 package csw.framework
 
-import csw.messages.framework.LocationServiceUsage.{DoNotRegister, RegisterOnly}
+import csw.command.models.framework.LocationServiceUsage.{DoNotRegister, RegisterOnly}
 import csw.framework.models.ContainerInfo
-import csw.messages.framework.ComponentInfo
+import csw.command.models.framework.ComponentInfo
 import csw.services.location.api.models.ComponentType.{Assembly, HCD}
 import csw.messages.params.models.Prefix
 

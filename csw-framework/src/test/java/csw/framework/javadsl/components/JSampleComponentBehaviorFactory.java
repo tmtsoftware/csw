@@ -4,7 +4,7 @@ import akka.actor.typed.javadsl.ActorContext;
 import csw.framework.javadsl.JComponentBehaviorFactory;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.models.JCswContext;
-import csw.messages.TopLevelActorMessage;
+import csw.command.messages.TopLevelActorMessage;
 
 public class JSampleComponentBehaviorFactory extends JComponentBehaviorFactory {
 

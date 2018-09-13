@@ -10,13 +10,13 @@ import csw.commons.redis.EmbeddedRedis
 import csw.framework.FrameworkTestWiring
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.messages.commands.Setup
-import csw.messages.framework.SupervisorLifecycleState
+import csw.command.models.framework.SupervisorLifecycleState
 import csw.services.location.api.models.ComponentId
 import csw.services.location.api.models.ComponentType.HCD
 import csw.services.location.api.models.Connection.AkkaConnection
 import csw.services.alarm.client.internal.commons.AlarmServiceConnection
-import csw.services.command.extensions.AkkaLocationExt.RichAkkaLocation
-import csw.services.command.scaladsl.CommandService
+import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
+import csw.command.scaladsl.CommandService
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 

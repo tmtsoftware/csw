@@ -7,9 +7,9 @@ import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.{actor, testkit, Done}
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.models.CswContext
-import csw.messages.CommandResponseManagerMessage
+import csw.command.messages.CommandResponseManagerMessage
 import csw.messages.commands.CommandResponse
-import csw.messages.framework.{LifecycleStateChanged, PubSub}
+import csw.command.models.framework.{LifecycleStateChanged, PubSub}
 import csw.services.location.api.models.Connection.AkkaConnection
 import csw.services.location.api.javadsl.ILocationService
 import csw.services.location.api.models.AkkaRegistration
@@ -17,7 +17,7 @@ import csw.services.location.api.scaladsl.LocationService
 import csw.messages.params.models.{Id, Prefix}
 import csw.messages.params.states.CurrentState
 import csw.services.alarm.api.scaladsl.AlarmService
-import csw.services.command.CommandResponseManager
+import csw.command.CommandResponseManager
 import csw.services.config.api.scaladsl.ConfigClientService
 import csw.services.config.client.scaladsl.ConfigClientFactory
 import csw.services.event.EventServiceFactory

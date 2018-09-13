@@ -1,10 +1,10 @@
 package csw.framework.internal.wiring
 
 import akka.actor.typed.ActorRef
+import csw.command.messages.ComponentMessage
 import csw.framework.internal.configparser.ConfigParser
 import csw.framework.internal.supervisor.SupervisorBehaviorFactory
 import csw.framework.models.CswContext
-import csw.messages.ComponentMessage
 
 import scala.async.Async.{async, await}
 import scala.concurrent.Future

@@ -3,7 +3,7 @@ package csw.framework.javadsl
 import java.time.Duration
 import java.util
 
-import csw.messages.framework.{ComponentInfo, LocationServiceUsage}
+import csw.command.models.framework.{ComponentInfo, LocationServiceUsage}
 import csw.services.location.api.models.{ComponentType, Connection}
 import csw.messages.params.models.Prefix
 
@@ -11,7 +11,7 @@ import scala.collection.JavaConverters.iterableAsScalaIterableConverter
 import scala.compat.java8.DurationConverters.DurationOps
 
 /**
- * Helper instance for Java to create [[csw.messages.framework.ComponentInfo]]
+ * Helper instance for Java to create [[csw.command.models.framework.ComponentInfo]]
  */
 object JComponentInfo {
 

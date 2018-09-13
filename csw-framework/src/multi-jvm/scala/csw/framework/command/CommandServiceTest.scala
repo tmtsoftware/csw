@@ -8,23 +8,23 @@ import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
+import csw.command.messages.CommandMessage.Submit
 import csw.common.utils.LockCommandFactory
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.messages.commands.CommandIssue.ComponentLockedIssue
 import csw.messages.commands.CommandResponse._
 import csw.messages.commands._
-import csw.messages.commands.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
-import csw.messages.commands.matchers.{DemandMatcher, Matcher, MatcherResponse}
-import csw.messages.framework.LockingResponse
-import csw.messages.framework.LockingResponses.LockAcquired
+import csw.command.models.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
+import csw.command.models.matchers.{DemandMatcher, Matcher, MatcherResponse}
+import csw.command.models.framework.LockingResponse
+import csw.command.models.framework.LockingResponses.LockAcquired
 import csw.services.location.api.models.Connection.AkkaConnection
 import csw.services.location.api.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.messages.params.generics.{KeyType, Parameter}
 import csw.messages.params.models.{ObsId, Prefix}
 import csw.messages.params.states.{DemandState, StateName}
-import csw.messages.CommandMessage.Submit
-import csw.services.command.extensions.AkkaLocationExt.RichAkkaLocation
-import csw.services.command.scaladsl.CommandService
+import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
+import csw.command.scaladsl.CommandService
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar

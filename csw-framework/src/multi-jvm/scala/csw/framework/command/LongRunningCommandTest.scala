@@ -16,7 +16,7 @@ import csw.services.location.api.models.Connection.AkkaConnection
 import csw.services.location.api.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.messages.params.models.ObsId
 import csw.messages.params.states.{CurrentState, StateName}
-import csw.services.command.scaladsl.{CommandDistributor, CommandService}
+import csw.command.scaladsl.{CommandDistributor, CommandService}
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import io.lettuce.core.RedisClient
 import org.scalatest.concurrent.{PatienceConfiguration, ScalaFutures}

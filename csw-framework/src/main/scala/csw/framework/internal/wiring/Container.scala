@@ -2,10 +2,9 @@ package csw.framework.internal.wiring
 
 import akka.actor.typed.{ActorRef, Behavior}
 import com.typesafe.config.Config
+import csw.command.messages.{ContainerActorMessage, ContainerMessage}
 import csw.framework.internal.configparser.ConfigParser
 import csw.framework.internal.container.ContainerBehaviorFactory
-import csw.messages.{ContainerActorMessage, ContainerMessage}
-import csw.messages.ContainerMessage
 
 import scala.concurrent.Future
 
