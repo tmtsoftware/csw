@@ -1,7 +1,10 @@
 package csw.services.alarm.client.internal.services
 
+import java.net.InetAddress
+
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import com.persist.JsonOps.{Json, JsonObject}
 import com.typesafe.config.ConfigFactory
 import csw.messages.params.models.Subsystem.{BAD, LGSF, NFIRAOS, TCS}
 import csw.services.alarm.api.exceptions.{InactiveAlarmException, InvalidSeverityException, KeyNotFoundException}
@@ -14,7 +17,10 @@ import csw.services.alarm.api.models._
 import csw.services.alarm.client.internal.helpers.TestFutureExt.RichFuture
 import csw.services.alarm.client.internal.helpers.{AlarmServiceTestSetup, TestDataFeeder}
 import csw.services.alarm.client.internal.services.SeverityTestScenarios.{AckStatusTestCases, SeverityTestCases}
+import csw.services.logging.internal.{LoggingLevels, LoggingSystem}
+import csw.services.logging.utils.TestAppender
 
+import scala.collection.mutable
 import scala.concurrent.duration.DurationInt
 
 class SeverityServiceModuleTest
@@ -27,6 +33,28 @@ class SeverityServiceModuleTest
   override protected def beforeEach(): Unit = {
     val validAlarmsConfig = ConfigFactory.parseResources("test-alarms/more-alarms.conf")
     initAlarms(validAlarmsConfig, reset = true).await
+  }
+
+  // DEOPSCSW-461: Log entry for severity update by component
+  test("setCurrentSeverity should log a message") {
+    val logBuffer    = mutable.Buffer.empty[JsonObject]
+    val testAppender = new TestAppender(x ⇒ logBuffer += Json(x.toString).asInstanceOf[JsonObject])
+    val hostName     = InetAddress.getLocalHost.getHostName
+
+    val expectedMessage1 =
+      "Setting severity [critical] for alarm [nfiraos-trombone-tromboneaxislowlimitalarm] with expire timeout [1] seconds"
+    val expectedMessage2 = "Updating current severity [critical] in alarm store"
+
+    val loggingSystem = new LoggingSystem("logging", "version", hostName, actorSystem)
+    loggingSystem.setAppenders(List(testAppender))
+    loggingSystem.setDefaultLogLevel(LoggingLevels.DEBUG)
+    setCurrentSeverity(tromboneAxisLowLimitAlarmKey, AlarmSeverity.Critical).await
+    Thread.sleep(100)
+    val messages = logBuffer.map(log => log("message"))
+    messages.contains(expectedMessage1) shouldBe true
+    messages.contains(expectedMessage2) shouldBe true
+
+    loggingSystem.stop
   }
 
   // DEOPSCSW-444: Set severity api for component

@@ -277,6 +277,7 @@ lazy val `csw-alarm-client` = project
     `csw-alarm-api`,
     `csw-location-api`,
     `csw-logging`,
+    `csw-logging` % "test->test",
     `romaine`,
     `csw-commons`  % "test->test",
     `csw-location` % "test->compile"
