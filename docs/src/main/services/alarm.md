@@ -63,7 +63,7 @@ using @scaladoc[AlarmServiceFactory](csw/services/alarm/AlarmServiceFactory).
 
 The Admin API will be used from an administrative user interface or an alarm cli. More details about alarm cli can be 
 found here.
-<!-- The @ref:[CSW Alarm Client CLI application](../apps/cswalarmclientcli.md) is provided with this functionality. -->
+ The @ref:[CSW Alarm Client CLI application](../apps/cswalarmcli.md) is provided with this functionality.
 
 @@@
 
