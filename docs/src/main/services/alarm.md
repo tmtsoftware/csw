@@ -1,6 +1,6 @@
 # Alarm Service
 
-The Alarm Service deals with alarms present in the TMT software system.
+The Alarm Service provides api to manage alarms present in the TMT software system.
 
 <!-- introduction to the service -->
 
@@ -15,45 +15,54 @@ sbt
     ```
 
 ## Rules and checkes
-* The alarm name or component name must not have `* [ ] ^ -` or `any whitespace characters`
+* When representing a unique alarm, the alarm name or component name must not have `* [ ] ^ -` or `any whitespace characters`
 
 ## Model Classes
-* **AlarmKey** : Represents the specific alarm
+* **AlarmKey** : Represents the unique alarm in the TMT system. It is composed of subsystem, component and alarm name.
 * **ComponentKey** : Represents all alarms of a component
 * **SubsystemKey** : Represents all alarms of a subsystem
-* **GlobalKey** : Represents all alarms present in the system
-* **AlarmMetadata** : Represents fixed data of that alarm, which will not change in its lifespan.
-* **AlarmStatus** : Represents occasionally changing data of the that alarm, which will be changing depending on the
-severity change.
-* **FullAlarmSeverity** : Represents possible severity levels of the alarm
-* **AlarmHealth** : Represents possible health of the alarm
+* **GlobalKey** : Represents all alarms present in the TMT system
+* **AlarmMetadata** : Represents static metadata of an alarm, which will not change in its entire lifespan.
+* **AlarmStatus** : Represents dynamically changing data of the an alarm, which will be changing depending on the
+severity change or manually changed by an operator
+* **AlarmSeverity** : Represents severity levels that can be set by the component developer e.g. Okay, Indeterminate, 
+Warning, Major and Critical 
+* **FullAlarmSeverity** : Represents all possible severity levels of the alarm i.e. Disconnected (cannot be set by the developer) 
+plus other severity levels that can be set by the developer
+* **AlarmHealth** : Represents possible health of an alarm or component or subsystem or whole TMT system
 
 ## API Flavours
 
-The Alarm Service is used to deal with the alarms of the component. When a component is started, it will use the
-"clientAPI" to update severity of its alarms.
+The Alarm Service is used to manage alarms and it's properties. Component developers will get the handle of `CswContext`
+which has `alarmService` ready to be used for setting severity.
+
+@@@ note
+
+The `alarmService` privided in `CswContext` is a clientApi (explained in detail below) which only has `setSeverity` api.
+
+@@@  
 
 <!-- give cli reference in here -->
-To have a admin level control over alarm service, an administrative tool with access to the full "adminAPI" must be used.
-These tool would have the ability to load alarm data into alarm store, set severity of an alarm, acknowledge alarms, shelve
-or unshelve alarms, reset alarm status. With this, it also provides different APIs for observing the alarms like getting
-metadata, status, severity of an alarm and also subscribing to aggregations of severity or health of the
-alarm/component/subsystem/System.
+To use the alarm service for administrative purposes admin api must be used. The creation of the admin api is demonstrated below.
+The admin api provides the ability to load alarm data into alarm store, set severity of an alarm, acknowledge alarms, shelve
+or unshelve alarms, reset an alarm, getting the metadata/status/severity of an alarm and getting or subscribing to aggregations of 
+severity and health of the alarm/component/subsystem/whole TMT System.
 
-* **clientAPI** : Must be used by component. Available method is : `{setSeverity}`
-* **adminAPI** : Full functionality exposed by alarm service server is available with this APIs. Expected to be used by
-administrative. Available methods are: `{initAlarm | setSeverity | acknowledge | shelve | unshelve | reset | getMetaData
+* **clientAPI (AlarmService)** : Must be used by component. Available method is : `{setSeverity}`
+* **adminAPI (AlarmAdminService)** : Expected to be used by administrative. Available methods are: 
+`{initAlarm | setSeverity | acknowledge | shelve | unshelve | reset | getMetaData
 | getStatus | getCurrentSeverity | getAggregatedSeverity | getAggregatedHealth | subscribeAggregatedSeverityCallback
 | subscribeAggregatedSeverityActorRef | subscribeAggregatedHealthCallback | subscribeAggregatedHealthActorRef }`
 
-## Accessing clientAPI and adminAPI
+## Creating clientAPI and adminAPI
 
 If you are not using csw-framework, you can create @scaladoc[AlarmService](csw/services/alarm/api/scaladsl/AlarmService)
 using @scaladoc[AlarmServiceFactory](csw/services/alarm/AlarmServiceFactory).
 
 @@@ note
 
-Components should only use the client API which is provided in both Java and scala. The Admin API may be used from an administrative user interface which is available in scala only.
+The Admin API will be used from an administrative user interface or an alarm cli. More details about alarm cli can be 
+found here.
 <!-- The @ref:[CSW Alarm Client CLI application](../apps/cswalarmclientcli.md) is provided with this functionality. -->
 
 @@@
@@ -66,7 +75,8 @@ Java
 
 ## setSeverity
 
-Used to set the severity of given alarm in the alarm store
+Sets the severity of the given alarm. It is important that component devs keep refreshing the severity by setting it at 
+a regular interval for all it's alarms, so that it does not get marked as `Disconnected` after a specific time.  
 
 Scala
 :   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/services/alarm/AlarmServiceClientExampleApp.scala) { #setSeverity-scala }
@@ -74,32 +84,46 @@ Scala
 Java
 :   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/services/alarm/AlarmServiceClientExampleApp.scala) { #setSeverity-java }
 
+@@@ note
+
+* If the alarm is not refreshed within 9 seconds, it will be inferred as `Disconnected`
+* If the alarm is auto-acknowledgable and the severity is set to `Okay` then, the alarm will be auto-acknowledged and
+  will not require any explicit admin action in terms of acknowledging
+
+@@@
+
 ## init alarms
 
-Used to load the given alarm data in alarm store
+Loads the given alarm data in alarm store
 
 Scala
 :   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/services/alarm/AlarmServiceClientExampleApp.scala) { #initAlarms}
 
 ## acknowledge
 
-Used to acknowledge the given alarm which is raised to a certain severity
+Acknowledges the given alarm which is raised to a certain severity
 
 Scala
 :   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/services/alarm/AlarmServiceClientExampleApp.scala) { #acknowledge}
 
-
 ## shelve
 
-Used to shelve the given alarm which is raised to a certain severity. Alarm will be unshelved on the configured time(which is 8 Am by default). Shelved alarms are also considered in aggregation calculation of alarms
+Shelves the given alarm. Alarms will be un-shelved automatically at a specific time(i.e. 8 AM local time by default) if 
+it is not un-shelved manually before that. The time to automatically un-shelve can be configured in application.conf 
+for e.g csw-alarm.shelve-timeout = h:m:s a .
 
 Scala
 :   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/services/alarm/AlarmServiceClientExampleApp.scala) { #shelve}
 
+@@@ note
+
+Shelved alarms are also considered in aggregation calculation of alarms.
+
+@@@
 
 ## unshelve
 
-Used to explicitly unshelve the given alarm
+Unshelves the given alarm
 
 Scala
 :   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/services/alarm/AlarmServiceClientExampleApp.scala) { #unshelve}
@@ -107,51 +131,61 @@ Scala
 
 ## reset
 
-Used to reset the status of the given alarm. It will set the latched severity to current severity and acknowledgement status to acknowledged, other fields remains the same.
+Resets the status of the given alarm by updating the latched severity same as current severity and acknowledgement status to acknowledged
+without changing any other properties of the alarm.
 
 Scala
 :   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/services/alarm/AlarmServiceClientExampleApp.scala) { #reset}
 
 
-## getMetaData
+## getMetadata
 
-Gets the metadata(s) for alarm/component/subsystem/system. Metadata of an alarm contains following fields.
-- subsystem
-- component
-- name
-- description
-- location
-- alarmType
-- supported severities
-- probable cause
-- operator response
-- is autoAcknowledgeable
-- is latchable
-- activation status
+Gets the metadata(s) of an alarm/component/subsystem/whole TMT system, which contains fields like:
+
+* subsystem
+* component
+* name
+* description
+* location
+* alarmType
+* supported severities
+* probable cause
+* operator response
+* is autoAcknowledgeable
+* is latchable
+* activation status
 
 Scala
 :   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/services/alarm/AlarmServiceClientExampleApp.scala) { #getMetadata}
 
+@@@ note
+
+Inactive alarms will not be taking part in aggregation of severity or health. 
+
+@@@
+
 ## getStatus
-Gets the status of the alarm. Status contains following fields.
-- latched severity
-- acknowledgement status
-- shelve status
-- alarm time
+Gets the status of the alarm which contains fields like:
+
+* latched severity
+* acknowledgement status
+* shelve status
+* alarm time
 
 Scala
 :   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/services/alarm/AlarmServiceClientExampleApp.scala) { #getStatus}
 
 ## getCurrentSeverity
 
-Gets the severity of the alarm
+Gets the severity of the alarm.
 
 Scala
 :   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/services/alarm/AlarmServiceClientExampleApp.scala) { #getCurrentSeverity}
 
 ## getAggregatedSeverity
 
-Gets the aggregated severity for the given alarm/component/subsystem/system. Aggregation of severity is done to the most sever severity.
+Gets the aggregated severity for the given alarm/component/subsystem/whole TMT system. Aggregation of the severity is represents
+the most severe alarm amongst multiple alarms.
 
 Scala
 :   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/services/alarm/AlarmServiceClientExampleApp.scala) { #getAggregatedSeverity}
@@ -159,7 +193,8 @@ Scala
 
 ## getAggregatedHealth
 
-Gets the aggregated health for the given alarm/component/subsystem/system. Aggregation of health is done by mapping most sever severity to health.
+Gets the aggregated health for the given alarm/component/subsystem/whole TMT system. Aggregation of health is either `Good`, `ill`
+or `Bad` based on the most severe alarm amongst multiple alarms.
 
 Scala
 :   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/services/alarm/AlarmServiceClientExampleApp.scala) { #getAggregatedHealth}
@@ -167,7 +202,8 @@ Scala
 
 ## subscribeAggregatedSeverityCallback
 
-Used to subscribe to the changes of aggregated severity for given alarm/component/subsystem/system. The given callback will be executed whenever aggregated severity changes with new aggregated severity as a parameter.
+Subscribes to the changes of aggregated severity for given alarm/component/subsystem/whole TMT system by providing a callback
+which gets executed for every change.
 
 Scala
 :   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/services/alarm/AlarmServiceClientExampleApp.scala) { #subscribeAggregatedSeverityCallback}
@@ -175,7 +211,8 @@ Scala
 
 ## subscribeAggregatedSeverityActorRef
 
-Used to subscribe to the changes of aggregated severity for given alarm/component/subsystem/system. The given actor will be sent a message of aggregated severity on every change.
+Subscribes to the changes of aggregated severity for given alarm/component/subsystem/whole TMT system by providing an actor
+which will receive a message of aggregated severity on every change.
 
 Scala
 :   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/services/alarm/AlarmServiceClientExampleApp.scala) { #subscribeAggregatedSeverityActorRef}
@@ -183,7 +220,8 @@ Scala
 
 ## subscribeAggregatedHealthCallback
 
-Used to subscribe to the changes of aggregated health for given alarm/component/subsystem/system. The given callback will be executed whenever aggregated health changes with new aggregated health as a parameter.
+Subscribe to the changes of aggregated health for given alarm/component/subsystem/whole TMT system by providing a callback
+which gets executedfor every change.
 
 Scala
 :   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/services/alarm/AlarmServiceClientExampleApp.scala) { #subscribeAggregatedHealthCallback}
@@ -191,7 +229,8 @@ Scala
 
 ## subscribeAggregatedHealthActorRef
 
-Used to subscribe to the changes of aggregated health for given alarm/component/subsystem/system. The given actor will be sent a message of aggregated health on every change.
+Subscribes to the changes of aggregated health for given alarm/component/subsystem/whole TMT system by providing an actor 
+which will receive a message of aggregated severity on every change.
 
 Scala
 :   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/services/alarm/AlarmServiceClientExampleApp.scala) { #subscribeAggregatedHealthActorRef}
