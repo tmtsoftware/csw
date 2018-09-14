@@ -106,7 +106,7 @@ class SeverityServiceModuleTest
     status.latchedSeverity shouldBe Disconnected
     status.shelveStatus shouldBe Unshelved
 
-    val status1 = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Major)
+    val status1                     = setSeverityAndGetStatus(tromboneAxisHighLimitAlarmKey, Major)
     val expectedRecordedTimeSpread1 = Instant.now.toEpochMilli +- 100
     status1.alarmTime.time.toEpochMilli shouldBe expectedRecordedTimeSpread1
 
