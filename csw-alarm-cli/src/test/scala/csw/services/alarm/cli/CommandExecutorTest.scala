@@ -112,7 +112,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
     val cmd        = Options(cmd = "init", filePath = Some(configPath), reset = true)
 
     clearAlarmStore().futureValue
-    a[RuntimeException] shouldBe thrownBy(commandExecutor.execute(cmd))
+    commandExecutor.execute(cmd)
     logBuffer.toList shouldEqual List(failureMsg)
     a[KeyNotFoundException] shouldBe thrownBy(getMetadata(GlobalKey).await)
   }
