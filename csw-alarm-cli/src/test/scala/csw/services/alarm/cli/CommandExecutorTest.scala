@@ -40,8 +40,14 @@ class CommandExecutorTest extends AlarmCliTestSetup {
   private val outOfRangeOffloadKey     = AlarmKey(TCS, "corrections", "outofrangeoffload")
   private val cpuIdleKey               = AlarmKey(LGSF, "tcspkinactive", "cpuidlealarm")
 
-  private val allAlarmKeys = Set(tromboneAxisLowLimitKey, tromboneAxisHighLimitKey, encTempLowKey, encTempHighKey,
-    beamSplitterLimitKey, cpuExceededKey, outOfRangeOffloadKey, cpuIdleKey)
+  private val allAlarmKeys = Set(tromboneAxisLowLimitKey,
+                                 tromboneAxisHighLimitKey,
+                                 encTempLowKey,
+                                 encTempHighKey,
+                                 beamSplitterLimitKey,
+                                 cpuExceededKey,
+                                 outOfRangeOffloadKey,
+                                 cpuIdleKey)
 
   override def beforeEach(): Unit = {
     // init alarm store
