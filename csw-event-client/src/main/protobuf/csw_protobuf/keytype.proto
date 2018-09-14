@@ -5,7 +5,7 @@ package csw_protobuf;
 import "scalapb/scalapb.proto";
 
 enum PbKeyType {
-    option (scalapb.enum_options).type = "csw.messages.params.generics.KeyType[_]";
+    option (scalapb.enum_options).type = "csw.params.core.generics.KeyType[_]";
 
     ChoiceKey       = 0;
     RaDecKey        = 1;
