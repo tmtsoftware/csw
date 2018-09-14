@@ -33,10 +33,15 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
   private val tromboneAxisLowLimitKey  = AlarmKey(NFIRAOS, "trombone", "tromboneaxislowlimitalarm")
   private val tromboneAxisHighLimitKey = AlarmKey(NFIRAOS, "trombone", "tromboneaxishighlimitalarm")
+  private val encTempLowKey            = AlarmKey(NFIRAOS, "enclosure", "templowalarm")
+  private val encTempHighKey           = AlarmKey(NFIRAOS, "enclosure", "temphighalarm")
+  private val beamSplitterLimitKey     = AlarmKey(NFIRAOS, "beamsplitter", "splitterlimitalarm")
   private val cpuExceededKey           = AlarmKey(TCS, "tcspk", "cpuexceededalarm")
+  private val outOfRangeOffloadKey     = AlarmKey(TCS, "corrections", "outofrangeoffload")
   private val cpuIdleKey               = AlarmKey(LGSF, "tcspkinactive", "cpuidlealarm")
 
-  private val allAlarmKeys = Set(tromboneAxisLowLimitKey, tromboneAxisHighLimitKey, cpuExceededKey, cpuIdleKey)
+  private val allAlarmKeys = Set(tromboneAxisLowLimitKey, tromboneAxisHighLimitKey, encTempLowKey, encTempHighKey,
+    beamSplitterLimitKey, cpuExceededKey, outOfRangeOffloadKey, cpuIdleKey)
 
   override def beforeEach(): Unit = {
     // init alarm store
@@ -489,6 +494,10 @@ class CommandExecutorTest extends AlarmCliTestSetup {
   test("should get health of subsystem") {
     setSeverity(tromboneAxisHighLimitKey, Warning).futureValue
     setSeverity(tromboneAxisLowLimitKey, Okay).futureValue
+    setSeverity(outOfRangeOffloadKey, Okay).futureValue
+    setSeverity(beamSplitterLimitKey, Okay).futureValue
+    setSeverity(encTempHighKey, Okay).futureValue
+    setSeverity(encTempLowKey, Okay).futureValue
 
     val cmd = Options(
       cmd = "health",
