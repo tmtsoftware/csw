@@ -1,8 +1,8 @@
 package csw.command.models
 
 import akka.actor.typed.ActorRef
-import csw.messages.commands.CommandResponse
-import csw.messages.params.models.Id
+import csw.params.commands.CommandResponse
+import csw.params.core.models.Id
 
 /**
  * Represents the state of a command execution

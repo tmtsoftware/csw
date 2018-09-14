@@ -3,9 +3,9 @@ package csw.services.event
 import akka.Done
 import akka.actor.Cancellable
 import akka.stream.scaladsl.{Keep, Source}
-import csw.messages.events._
+import csw.params.events._
 import csw.command.models.framework.ComponentInfo
-import csw.messages.params.models.{Id, Prefix}
+import csw.params.core.models.{Id, Prefix}
 import csw.services.event.api.exceptions.PublishFailure
 import csw.services.event.api.scaladsl.EventService
 import csw.services.logging.scaladsl.Logger

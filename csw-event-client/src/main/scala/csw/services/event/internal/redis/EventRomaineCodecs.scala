@@ -2,8 +2,8 @@ package csw.services.event.internal.redis
 
 import java.nio.ByteBuffer
 
-import csw.messages.events.{Event, EventKey}
-import csw.messages.params.pb.PbConverter
+import csw.params.events.{Event, EventKey}
+import csw.params.core.pb.PbConverter
 import csw_protobuf.events.PbEvent
 import romaine.codec.{RomaineByteCodec, RomaineStringCodec}
 

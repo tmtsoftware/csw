@@ -4,7 +4,7 @@ import akka.Done
 import akka.actor.Cancellable
 import akka.stream.Materializer
 import akka.stream.scaladsl.Source
-import csw.messages.events.Event
+import csw.params.events.Event
 import csw.services.event.api.exceptions.PublishFailure
 import csw.services.event.api.scaladsl.EventPublisher
 import csw.services.event.internal.commons.EventPublisherUtil

@@ -13,7 +13,7 @@ import csw.services.location.api.models.Connection.{AkkaConnection, HttpConnecti
 import csw.services.location.api.models._
 import csw.services.location.api.models.{AkkaRegistration, HttpRegistration}
 import csw.services.location.api.scaladsl.LocationService
-import csw.messages.params.models.Prefix
+import csw.params.core.models.Prefix
 import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.models._

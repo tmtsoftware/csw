@@ -1,7 +1,7 @@
 package csw.command.models
 
-import csw.messages.commands.CommandResponse
-import csw.messages.params.models.Id
+import csw.params.commands.CommandResponse
+import csw.params.core.models.Id
 
 /**
  * Represents current state of a command execution

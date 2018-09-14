@@ -2,7 +2,7 @@ package csw.services.event.helpers
 
 import akka.NotUsed
 import akka.stream.scaladsl.Flow
-import csw.messages.events.Event
+import csw.params.events.Event
 
 import scala.collection.mutable
 import scala.concurrent.duration.FiniteDuration

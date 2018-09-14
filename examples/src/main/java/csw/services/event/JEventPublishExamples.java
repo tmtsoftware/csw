@@ -5,11 +5,11 @@ import akka.actor.Cancellable;
 import akka.stream.Materializer;
 import akka.stream.javadsl.Keep;
 import akka.stream.javadsl.Source;
-import csw.messages.events.Event;
-import csw.messages.events.EventName;
-import csw.messages.events.SystemEvent;
+import csw.params.events.Event;
+import csw.params.events.EventName;
+import csw.params.events.SystemEvent;
 import csw.command.models.framework.ComponentInfo;
-import csw.messages.params.models.Prefix;
+import csw.params.core.models.Prefix;
 import csw.services.event.internal.commons.javawrappers.JEventService;
 
 import java.time.Duration;

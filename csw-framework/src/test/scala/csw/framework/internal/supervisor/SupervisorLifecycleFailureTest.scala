@@ -23,11 +23,11 @@ import csw.command.messages.ComponentCommonMessage.{
   LifecycleStateSubscription
 }
 import csw.command.messages.SupervisorContainerCommonMessages.Restart
-import csw.messages.commands.{CommandName, CommandResponse, ControlCommand, Setup}
+import csw.params.commands.{CommandName, CommandResponse, ControlCommand, Setup}
 import csw.command.models.framework.{LifecycleStateChanged, PubSub, SupervisorLifecycleState}
-import csw.messages.params.generics.{KeyType, Parameter}
-import csw.messages.params.models.ObsId
-import csw.messages.params.states.{CurrentState, StateName}
+import csw.params.core.generics.{KeyType, Parameter}
+import csw.params.core.models.ObsId
+import csw.params.core.states.{CurrentState, StateName}
 import csw.command.messages.{ComponentMessage, ContainerIdleMessage, TopLevelActorMessage}
 import csw.services.logging.internal.LoggingLevels.ERROR
 import csw.services.logging.internal.LoggingSystem

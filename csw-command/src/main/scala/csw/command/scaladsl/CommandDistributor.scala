@@ -5,9 +5,9 @@ import akka.stream.Materializer
 import akka.stream.scaladsl.Source
 import akka.util.Timeout
 import csw.command.models.CommandResponseAggregator
-import csw.messages.commands.CommandResponse.Completed
-import csw.messages.commands.{CommandIssue, CommandResponse, ControlCommand}
-import csw.messages.params.models.Id
+import csw.params.commands.CommandResponse.Completed
+import csw.params.commands.{CommandIssue, CommandResponse, ControlCommand}
+import csw.params.core.models.Id
 
 import scala.concurrent.{ExecutionContext, Future}
 

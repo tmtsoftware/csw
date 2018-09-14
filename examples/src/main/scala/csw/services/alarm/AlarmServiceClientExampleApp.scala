@@ -3,7 +3,7 @@ import akka.Done
 import akka.actor.{typed, ActorSystem}
 import akka.actor.typed.scaladsl.Behaviors
 import com.typesafe.config._
-import csw.messages.params.models.Subsystem.NFIRAOS
+import csw.params.core.models.Subsystem.NFIRAOS
 import csw.services.alarm.api.models.AlarmSeverity.Okay
 import csw.services.alarm.api.models.Key.AlarmKey
 import csw.services.alarm.api.models.{AlarmHealth, AlarmMetadata, AlarmStatus, FullAlarmSeverity}

@@ -4,8 +4,8 @@ import acyclic.skipped
 import java.net.URI
 
 import akka.actor.typed.ActorRef
-import csw.messages.TMTSerializable
-import csw.messages.params.models.Prefix
+import csw.params.TMTSerializable
+import csw.params.core.models.Prefix
 import csw.services.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 
 import scala.reflect.ClassTag

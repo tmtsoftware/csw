@@ -5,8 +5,8 @@ import java.util.concurrent.TimeUnit.SECONDS
 
 import akka.Done
 import akka.stream.scaladsl.{Keep, Source}
-import csw.messages.events.{Event, EventKey, EventName, SystemEvent}
-import csw.messages.params.models.Prefix
+import csw.params.events.{Event, EventKey, EventName, SystemEvent}
+import csw.params.core.models.Prefix
 import csw.services.event.perf.reporter.{ResultReporter, TestRateReporter}
 import csw.services.event.perf.utils.EventUtils._
 import csw.services.event.perf.wiring.{TestConfigs, TestWiring}

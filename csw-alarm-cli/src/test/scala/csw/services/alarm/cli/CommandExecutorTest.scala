@@ -3,7 +3,7 @@ package csw.services.alarm.cli
 import java.nio.file.Paths
 
 import com.typesafe.config.ConfigFactory
-import csw.messages.params.models.Subsystem.{LGSF, NFIRAOS, TCS}
+import csw.params.core.models.Subsystem.{LGSF, NFIRAOS, TCS}
 import csw.services.alarm.api.exceptions.KeyNotFoundException
 import csw.services.alarm.api.internal.Separators.KeySeparator
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}

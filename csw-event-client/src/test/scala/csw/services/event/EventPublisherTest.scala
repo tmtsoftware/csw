@@ -3,7 +3,7 @@ package csw.services.event
 import akka.actor.Cancellable
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import csw.messages.events.{Event, EventKey}
+import csw.params.events.{Event, EventKey}
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.helpers.Utils.{makeDistinctEvent, makeEvent}
 import csw.services.event.internal.kafka.KafkaTestProps

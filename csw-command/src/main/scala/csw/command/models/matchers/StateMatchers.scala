@@ -1,8 +1,8 @@
 package csw.command.models.matchers
 
 import akka.util.Timeout
-import csw.messages.params.generics.Parameter
-import csw.messages.params.states.{CurrentState, DemandState}
+import csw.params.core.generics.Parameter
+import csw.params.core.states.{CurrentState, DemandState}
 
 /**
  * A StateMatcher which matches the CurrentState against the DemandState
@@ -30,7 +30,7 @@ case class DemandMatcherAll(demand: DemandState, timeout: Timeout) extends State
   /**
    * A predicate to match the current state
    *
-   * @param current current state to be matched as represented by [[csw.messages.params.states.CurrentState]]
+   * @param current current state to be matched as represented by [[csw.params.core.states.CurrentState]]
    * @return true if match is successful, false otherwise
    */
   def check(current: CurrentState): Boolean = demand.paramSet == current.paramSet
@@ -67,7 +67,7 @@ case class DemandMatcher(demand: DemandState, withUnits: Boolean = false, timeou
   /**
    * A predicate to match the current state
    *
-   * @param current current state to be matched as represented by [[csw.messages.params.states.CurrentState]]
+   * @param current current state to be matched as represented by [[csw.params.core.states.CurrentState]]
    * @return true if match is successful, false otherwise
    */
   def check(current: CurrentState): Boolean = {
@@ -91,7 +91,7 @@ case class PresenceMatcher(prefix: String, stateName: String, timeout: Timeout) 
   /**
    * A predicate to match the current state
    *
-   * @param current current state to be matched as represented by [[csw.messages.params.states.CurrentState]]
+   * @param current current state to be matched as represented by [[csw.params.core.states.CurrentState]]
    * @return true if match is successful, false otherwise
    */
   def check(current: CurrentState): Boolean = prefix == current.prefixStr && stateName == current.stateName.name

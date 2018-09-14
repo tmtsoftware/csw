@@ -2,9 +2,9 @@ package csw.services.messages
 
 import java.time.Instant
 
-import csw.messages.params.generics.KeyType.{ChoiceKey, StructKey}
-import csw.messages.params.generics.{GChoiceKey, Key, KeyType, Parameter}
-import csw.messages.params.models._
+import csw.params.core.generics.KeyType.{ChoiceKey, StructKey}
+import csw.params.core.generics.{GChoiceKey, Key, KeyType, Parameter}
+import csw.params.core.models._
 import org.scalatest.{FunSpec, Matchers}
 
 class KeysAndParametersTest extends FunSpec with Matchers {

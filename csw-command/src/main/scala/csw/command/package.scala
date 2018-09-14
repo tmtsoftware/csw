@@ -26,9 +26,9 @@ package csw
  *
  * - [[csw.command.internal.CommandResponseManagerBehavior]] maintains two states:
  *  - [[csw.command.models.CommandResponseManagerState]]:
- *      It maintains [[csw.messages.params.models.Id]] of Commands and their corresponding [[csw.command.models.CommandState]].
+ *      It maintains [[csw.params.core.models.Id]] of Commands and their corresponding [[csw.command.models.CommandState]].
  *  - [[csw.command.models.CommandCorrelation]] :
- *      It maintains commands [[csw.messages.params.models.Id]] correlation between parent to child and child to parent.
+ *      It maintains commands [[csw.params.core.models.Id]] correlation between parent to child and child to parent.
  *
  * - [[csw.command.scaladsl.CommandService]]
  *

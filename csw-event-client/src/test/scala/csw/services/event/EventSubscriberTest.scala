@@ -2,8 +2,8 @@ package csw.services.event
 
 import akka.actor.testkit.typed.scaladsl.{TestInbox, TestProbe}
 import akka.stream.scaladsl.{Keep, Sink}
-import csw.messages.events.{Event, EventKey, EventName, SystemEvent}
-import csw.messages.params.models.{Prefix, Subsystem}
+import csw.params.events.{Event, EventKey, EventName, SystemEvent}
+import csw.params.core.models.{Prefix, Subsystem}
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.helpers.Utils._
 import csw.services.event.internal.kafka.KafkaTestProps

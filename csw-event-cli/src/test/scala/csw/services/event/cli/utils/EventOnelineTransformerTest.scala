@@ -1,7 +1,7 @@
 package csw.services.event.cli.utils
 
-import csw.messages.events.{ObserveEvent, SystemEvent}
-import csw.messages.params.formats.JsonSupport
+import csw.params.events.{ObserveEvent, SystemEvent}
+import csw.params.core.formats.JsonSupport
 import csw.services.event.cli.IterableExtensions.RichStringIterable
 import csw.services.event.cli.args.Options
 import org.scalatest.{FunSuite, Matchers}

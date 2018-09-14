@@ -1,7 +1,7 @@
 package csw.services.event.perf.model_obs
 
-import csw.messages.params.models.Prefix
-import csw.messages.params.models.Subsystem.{AOESW, DMS, IRIS, NFIRAOS, TCS, WFOS}
+import csw.params.core.models.Prefix
+import csw.params.core.models.Subsystem.{AOESW, DMS, IRIS, NFIRAOS, TCS, WFOS}
 import csw.services.event.perf.model_obs.BaseSetting.{PubSetting, SubSetting}
 import csw.services.event.perf.wiring.TestConfigs
 

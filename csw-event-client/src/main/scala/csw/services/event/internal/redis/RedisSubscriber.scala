@@ -4,8 +4,8 @@ import akka.actor.typed.ActorRef
 import akka.stream.Materializer
 import akka.stream.scaladsl.{Keep, Source}
 import akka.{Done, NotUsed}
-import csw.messages.events._
-import csw.messages.params.models.Subsystem
+import csw.params.events._
+import csw.params.core.models.Subsystem
 import csw.services.event.api.exceptions.EventServerNotAvailable
 import csw.services.event.api.scaladsl.{EventSubscriber, EventSubscription, SubscriptionMode}
 import csw.services.event.internal.commons.{EventServiceLogger, EventSubscriberUtil}

@@ -4,7 +4,7 @@ import akka.Done
 import akka.actor.Cancellable
 import akka.stream.Materializer
 import akka.stream.scaladsl.{Sink, Source}
-import csw.messages.events.Event
+import csw.params.events.Event
 import csw.services.event.api.exceptions.PublishFailure
 
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}

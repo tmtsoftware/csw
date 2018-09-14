@@ -1,12 +1,12 @@
 package csw.common.components.framework
 
-import csw.messages.commands.CommandName
+import csw.params.commands.CommandName
 import csw.services.location.api.models.Connection.{HttpConnection, TcpConnection}
 import csw.services.location.api.models.{ComponentId, ComponentType}
-import csw.messages.params.generics.GChoiceKey
-import csw.messages.params.generics.KeyType.ChoiceKey
-import csw.messages.params.models.Subsystem.NFIRAOS
-import csw.messages.params.models.{Choice, Choices, Prefix}
+import csw.params.core.generics.GChoiceKey
+import csw.params.core.generics.KeyType.ChoiceKey
+import csw.params.core.models.Subsystem.NFIRAOS
+import csw.params.core.models.{Choice, Choices, Prefix}
 import csw.services.alarm.api.models.AlarmSeverity.Warning
 import csw.services.alarm.api.models.Key.AlarmKey
 

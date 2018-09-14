@@ -2,9 +2,9 @@ package csw.services.event.cli.args
 
 import java.io.{ByteArrayOutputStream, File}
 
-import csw.messages.events.EventKey
-import csw.messages.params.generics.KeyType.{IntKey, StringKey}
-import csw.messages.params.models.Units.volt
+import csw.params.events.EventKey
+import csw.params.core.generics.KeyType.{IntKey, StringKey}
+import csw.params.core.models.Units.volt
 import org.scalatest.{FunSuite, Matchers}
 
 import scala.concurrent.duration.DurationDouble

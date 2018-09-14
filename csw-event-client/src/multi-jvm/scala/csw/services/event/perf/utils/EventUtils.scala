@@ -2,10 +2,10 @@ package csw.services.event.perf.utils
 
 import java.time.Instant
 
-import csw.messages.events.{EventKey, EventName, EventTime, SystemEvent}
-import csw.messages.params.generics.Key
-import csw.messages.params.generics.KeyType.{ByteKey, DoubleKey, LongKey}
-import csw.messages.params.models.{Id, Prefix}
+import csw.params.events.{EventKey, EventName, EventTime, SystemEvent}
+import csw.params.core.generics.Key
+import csw.params.core.generics.KeyType.{ByteKey, DoubleKey, LongKey}
+import csw.params.core.models.{Id, Prefix}
 
 object EventUtils {
   private val prefix = Prefix("dummy")

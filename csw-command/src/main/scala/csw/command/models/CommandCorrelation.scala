@@ -1,6 +1,6 @@
 package csw.command.models
 
-import csw.messages.params.models.Id
+import csw.params.core.models.Id
 
 /**
  * This model maintains the relation of a command that can be split into two or more commands for execution. The state of the parent command then depends on the

@@ -1,6 +1,6 @@
 package csw.services.event.api.exceptions
 
-import csw.messages.events.Event
+import csw.params.events.Event
 
 /**
  * An exception representing unavailability of underlying server in case of publishing or subscribing
@@ -10,7 +10,8 @@ case class EventServerNotAvailable(cause: Throwable) extends RuntimeException("E
 
 /**
  * An exception representing any failure while publishing an Event
- * @param event The [[csw.messages.events.Event]] for which publishing failed
+ *
+ * @param event The [[csw.params.events.Event]] for which publishing failed
  * @param cause Underlying cause of failure in publishing
  */
 case class PublishFailure(event: Event, cause: Throwable) extends RuntimeException(s"Publishing failed for [$event]", cause)

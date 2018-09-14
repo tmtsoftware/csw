@@ -6,8 +6,8 @@ import akka.actor.ActorSystem
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.adapter._
 import akka.serialization.{Serialization, SerializationExtension}
-import csw.messages.extensions.Formats
-import csw.messages.extensions.Formats.MappableFormat
+import csw.params.extensions.Formats
+import csw.params.extensions.Formats.MappableFormat
 import csw.services.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.api.models.{Location, TrackingEvent}
 import julienrf.json.derived

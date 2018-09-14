@@ -1,5 +1,5 @@
 package csw.services.alarm.client.internal.helpers
-import csw.messages.params.models.Subsystem.AOESW
+import csw.params.core.models.Subsystem.AOESW
 import csw.services.alarm.api.models.AcknowledgementStatus.Acknowledged
 import csw.services.alarm.api.models.ActivationStatus.Active
 import csw.services.alarm.api.models.AlarmSeverity._

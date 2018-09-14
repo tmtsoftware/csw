@@ -9,8 +9,8 @@ import csw.command.messages.ComponentMessage
 import csw.command.models.framework.PubSub.{Publish, Subscribe, SubscribeOnly, Unsubscribe}
 import csw.command.models.framework.{LifecycleStateChanged, PubSub, SupervisorLifecycleState}
 import csw.framework.FrameworkTestMocks
-import csw.messages.params.models.Prefix
-import csw.messages.params.states.{CurrentState, StateName}
+import csw.params.core.models.Prefix
+import csw.params.core.states.{CurrentState, StateName}
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.logging.scaladsl.Logger
 import org.scalatest.mockito.MockitoSugar

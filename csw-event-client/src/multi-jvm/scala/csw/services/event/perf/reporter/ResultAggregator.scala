@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit.SECONDS
 import akka.actor.ActorSystem
 import akka.actor.typed.ActorRef
 import akka.util.ByteString
-import csw.messages.events.{Event, SystemEvent}
+import csw.params.events.{Event, SystemEvent}
 import csw.services.event.perf.utils.EventUtils
 import csw.services.event.perf.utils.EventUtils._
 import csw.services.event.api.scaladsl.{EventSubscriber, EventSubscription}

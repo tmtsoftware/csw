@@ -4,7 +4,7 @@ import akka.actor.typed.ActorRef
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.stage.GraphStage
 import akka.stream.{FlowShape, Materializer}
-import csw.messages.events.Event
+import csw.params.events.Event
 import csw.services.event.api.scaladsl.{EventSubscription, SubscriptionMode}
 import csw.services.event.api.scaladsl.SubscriptionModes.{RateAdapterMode, RateLimiterMode}
 import csw.services.event.internal.commons.throttle.{RateAdapterStage, RateLimiterStage}

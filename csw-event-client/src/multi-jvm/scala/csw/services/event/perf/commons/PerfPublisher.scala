@@ -3,8 +3,8 @@ package csw.services.event.perf.commons
 import akka.Done
 import akka.actor.Cancellable
 import akka.stream.scaladsl.{Keep, Source}
-import csw.messages.events.{Event, EventName, SystemEvent}
-import csw.messages.params.models.Prefix
+import csw.params.events.{Event, EventName, SystemEvent}
+import csw.params.core.models.Prefix
 import csw.services.event.perf.utils.EventUtils._
 import csw.services.event.perf.wiring.{TestConfigs, TestWiring}
 import csw.services.event.api.scaladsl.EventPublisher

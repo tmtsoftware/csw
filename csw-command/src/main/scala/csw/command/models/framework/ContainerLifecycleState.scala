@@ -1,6 +1,6 @@
 package csw.command.models.framework
 
-import csw.messages.TMTSerializable
+import csw.params.TMTSerializable
 
 /**
  * Lifecycle state of a container actor

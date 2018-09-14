@@ -3,9 +3,9 @@ package csw.command.models.framework
 import acyclic.skipped
 import akka.actor.typed.ActorRef
 import csw.command.messages.ComponentMessage
-import csw.messages.TMTSerializable
-import csw.messages.commands.Nameable
-import csw.messages.params.states.StateName
+import csw.params.TMTSerializable
+import csw.params.commands.Nameable
+import csw.params.core.states.StateName
 
 /**
  * LifecycleStateChanged represents a notification of state change in a component

@@ -9,7 +9,7 @@ import csw.common.components.framework.SampleComponentState._
 import csw.commons.redis.EmbeddedRedis
 import csw.framework.FrameworkTestWiring
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
-import csw.messages.commands.Setup
+import csw.params.commands.Setup
 import csw.command.models.framework.SupervisorLifecycleState
 import csw.services.location.api.models.ComponentId
 import csw.services.location.api.models.ComponentType.HCD

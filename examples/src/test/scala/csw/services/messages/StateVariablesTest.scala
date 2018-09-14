@@ -2,12 +2,12 @@ package csw.services.messages
 
 import java.time.Instant
 
-import csw.messages.params.formats.JsonSupport
-import csw.messages.params.generics.KeyType.DoubleMatrixKey
-import csw.messages.params.generics.{Key, KeyType, Parameter}
-import csw.messages.params.models.Units.{meter, NoUnits}
-import csw.messages.params.models.{MatrixData, Prefix}
-import csw.messages.params.states.{CurrentState, DemandState, StateName}
+import csw.params.core.formats.JsonSupport
+import csw.params.core.generics.KeyType.DoubleMatrixKey
+import csw.params.core.generics.{Key, KeyType, Parameter}
+import csw.params.core.models.Units.{meter, NoUnits}
+import csw.params.core.models.{MatrixData, Prefix}
+import csw.params.core.states.{CurrentState, DemandState, StateName}
 import org.scalatest.{FunSpec, Matchers}
 
 class StateVariablesTest extends FunSpec with Matchers {

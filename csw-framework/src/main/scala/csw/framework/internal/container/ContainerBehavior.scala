@@ -19,8 +19,8 @@ import csw.framework.commons.CoordinatedShutdownReasons.{
 }
 import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.framework.models._
-import csw.messages.params.models.Prefix
-import csw.messages.params.models.Subsystem.Container
+import csw.params.core.models.Prefix
+import csw.params.core.models.Subsystem.Container
 import csw.services.alarm.client.AlarmServiceFactory
 import csw.services.event.EventServiceFactory
 import csw.services.location.api.models.Connection.AkkaConnection

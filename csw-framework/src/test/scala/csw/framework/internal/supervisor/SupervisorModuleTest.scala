@@ -4,17 +4,17 @@ import akka.actor.testkit.typed.scaladsl.TestProbe
 import csw.framework.ComponentInfos._
 import csw.framework.FrameworkTestSuite
 import csw.framework.javadsl.commons.JComponentInfos.{jHcdInfo, jHcdInfoWithInitializeTimeout}
-import csw.messages.commands.CommandResponse.{Accepted, Invalid}
-import csw.messages.commands._
+import csw.params.commands.CommandResponse.{Accepted, Invalid}
+import csw.params.commands._
 import csw.command.models.matchers.DemandMatcher
 import csw.command.models.framework.PubSub.Subscribe
 import csw.command.models.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.command.models.framework.{ComponentInfo, LifecycleStateChanged, SupervisorLifecycleState}
 import csw.services.location.api.models.ComponentType.{Assembly, HCD}
 import csw.services.location.api.models.Connection.AkkaConnection
-import csw.messages.params.generics.{KeyType, Parameter}
-import csw.messages.params.models.ObsId
-import csw.messages.params.states.{CurrentState, DemandState, StateName}
+import csw.params.core.generics.{KeyType, Parameter}
+import csw.params.core.models.ObsId
+import csw.params.core.states.{CurrentState, DemandState, StateName}
 import csw.command.messages.CommandMessage.{Oneway, Submit}
 import csw.command.messages.ComponentCommonMessage.{
   ComponentStateSubscription,

@@ -1,7 +1,7 @@
 package csw.command.models.matchers
 
 import akka.util.Timeout
-import csw.messages.params.states.CurrentState
+import csw.params.core.states.CurrentState
 
 /**
  * The base trait to build Matchers to match given state against a predicate
@@ -25,7 +25,7 @@ trait StateMatcher {
   /**
    * A predicate to match the current state
    *
-   * @param current current state to be matched as represented by [[csw.messages.params.states.CurrentState]]
+   * @param current current state to be matched as represented by [[csw.params.core.states.CurrentState]]
    * @return true if match is successful, false otherwise
    */
   def check(current: CurrentState): Boolean

@@ -8,8 +8,8 @@ import java.util.function.Consumer
 import akka.Done
 import akka.actor.typed.ActorRef
 import akka.stream.javadsl.Source
-import csw.messages.events.{Event, EventKey}
-import csw.messages.params.models.Subsystem
+import csw.params.events.{Event, EventKey}
+import csw.params.core.models.Subsystem
 import csw.services.event.api.internal.EventServiceExts.RichEventSubscription
 import csw.services.event.api.javadsl.{IEventSubscriber, IEventSubscription}
 import csw.services.event.api.scaladsl.{EventSubscriber, EventSubscription, SubscriptionMode}

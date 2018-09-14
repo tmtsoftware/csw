@@ -2,8 +2,8 @@ package csw.services.event.cli.args
 
 import java.io.File
 
-import csw.messages.events.EventKey
-import csw.messages.params.generics.Parameter
+import csw.params.events.EventKey
+import csw.params.core.generics.Parameter
 
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
 

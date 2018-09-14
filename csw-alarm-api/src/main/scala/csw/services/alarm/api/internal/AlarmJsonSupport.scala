@@ -1,8 +1,8 @@
 package csw.services.alarm.api.internal
 
-import csw.messages.extensions.Formats
-import csw.messages.extensions.Formats.MappableFormat
-import csw.messages.params.models.Subsystem
+import csw.params.extensions.Formats
+import csw.params.extensions.Formats.MappableFormat
+import csw.params.core.models.Subsystem
 import csw.services.alarm.api.models._
 import play.api.libs.json.{Format, Json}
 

@@ -4,9 +4,9 @@ import akka.actor.typed.ActorRef
 import csw.command.messages.CommandMessage
 import csw.command.models.framework.LockingResponse
 import csw.command.models.framework.LockingResponses._
-import csw.messages.commands.CommandIssue.ComponentLockedIssue
-import csw.messages.commands.CommandResponse.NotAllowed
-import csw.messages.params.models.Prefix
+import csw.params.commands.CommandIssue.ComponentLockedIssue
+import csw.params.commands.CommandResponse.NotAllowed
+import csw.params.core.models.Prefix
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
 private[framework] class LockManager(val lockPrefix: Option[Prefix], loggerFactory: LoggerFactory) {

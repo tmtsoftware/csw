@@ -5,7 +5,7 @@ import java.util
 
 import csw.command.models.framework.{ComponentInfo, LocationServiceUsage}
 import csw.services.location.api.models.{ComponentType, Connection}
-import csw.messages.params.models.Prefix
+import csw.params.core.models.Prefix
 
 import scala.collection.JavaConverters.iterableAsScalaIterableConverter
 import scala.compat.java8.DurationConverters.DurationOps

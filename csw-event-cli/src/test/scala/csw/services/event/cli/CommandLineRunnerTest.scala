@@ -2,11 +2,11 @@ package csw.services.event.cli
 
 import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
-import csw.messages.events._
-import csw.messages.params.formats.JsonSupport
-import csw.messages.params.generics.KeyType.{IntKey, StringKey}
-import csw.messages.params.models.Id
-import csw.messages.params.models.Units.meter
+import csw.params.events._
+import csw.params.core.formats.JsonSupport
+import csw.params.core.generics.KeyType.{IntKey, StringKey}
+import csw.params.core.models.Id
+import csw.params.core.models.Units.meter
 import csw.services.event.cli.IterableExtensions.RichStringIterable
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import org.scalatest.concurrent.Eventually

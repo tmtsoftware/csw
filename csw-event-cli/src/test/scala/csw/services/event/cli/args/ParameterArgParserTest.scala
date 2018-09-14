@@ -1,7 +1,7 @@
 package csw.services.event.cli.args
 
-import csw.messages.params.generics.KeyType.{BooleanKey, DoubleKey, FloatKey, IntKey, LongKey, StringKey}
-import csw.messages.params.models.Units.{centimeter, meter, volt}
+import csw.params.core.generics.KeyType.{BooleanKey, DoubleKey, FloatKey, IntKey, LongKey, StringKey}
+import csw.params.core.models.Units.{centimeter, meter, volt}
 import org.scalatest.{FunSuite, Matchers}
 
 // DEOPSCSW-436: [Event Cli] Specialized Publish command (take params from command line)

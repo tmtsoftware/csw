@@ -8,7 +8,7 @@ import akka.actor.{typed, ActorSystem, PoisonPill}
 import akka.stream.scaladsl.{Keep, Sink}
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.testkit.TestProbe
-import csw.messages.params.models.Prefix
+import csw.params.core.models.Prefix
 import csw.services.location.api.exceptions.OtherLocationIsRegistered
 import csw.services.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.api.models.{HttpRegistration, TcpRegistration, _}

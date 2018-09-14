@@ -2,7 +2,7 @@ package csw.services.event
 
 import akka.actor.testkit.typed.scaladsl.TestInbox
 import akka.stream.scaladsl.Sink
-import csw.messages.events.{Event, EventKey, EventName}
+import csw.params.events.{Event, EventKey, EventName}
 import csw.services.event.api.scaladsl.SubscriptionModes
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.helpers.Utils.makeEventForKeyName

@@ -3,9 +3,9 @@ package csw.services
 /**
  * == Event Service ==
  *
- * This module implements an Event Service responsible for publishing an [[csw.messages.events.Event]] or subscribing to an [[csw.messages.events.Event]].
- * An event is published on a [[csw.messages.events.EventKey]]. The event key is composed of a [[csw.messages.params.models.Prefix]] depicting the source and an [[csw.messages.events.EventName]].
- * The subscriber can subscribe to the [[csw.messages.events.EventKey]] to receive all events published on the Key.
+ * This module implements an Event Service responsible for publishing an [[csw.params.events.Event]] or subscribing to an [[csw.params.events.Event]].
+ * An event is published on a [[csw.params.events.EventKey]]. The event key is composed of a [[csw.params.core.models.Prefix]] depicting the source and an [[csw.params.events.EventName]].
+ * The subscriber can subscribe to the [[csw.params.events.EventKey]] to receive all events published on the Key.
  *
  * === Example: Event Service ===
  *
@@ -39,9 +39,9 @@ package csw.services
  * It also provides APIs to subscribe using a pattern.
  * In addition, there are APIs to `get` latest events for one ore more Event Keys without making a subscription
  *
- * The EventSubscriber provides various API's to subscribe to [[csw.messages.events.EventKey]].
+ * The EventSubscriber provides various API's to subscribe to [[csw.params.events.EventKey]].
  * One of such a subscribe method takes an ActorRef of an arbitrary actor or a callback function to be called
- * when an event matching the given [[csw.messages.events.EventKey]] is received. In the example below, we only provide the callback
+ * when an event matching the given [[csw.params.events.EventKey]] is received. In the example below, we only provide the callback
  * argument value. You could also provide an ActorRef of some actor that should receive the Event message.
  *
  * {{{

@@ -5,10 +5,10 @@ import akka.actor.typed.{ActorRef, Behavior}
 import csw.command.messages.CommandResponseManagerMessage
 import csw.command.messages.CommandResponseManagerMessage._
 import csw.command.models.{CommandCorrelation, CommandResponseManagerState}
-import csw.messages.commands.CommandResponse.CommandNotAvailable
-import csw.messages.commands.CommandResultType.{Final, Intermediate}
-import csw.messages.commands.{CommandResponse, CommandResultType}
-import csw.messages.params.models.Id
+import csw.params.commands.CommandResponse.CommandNotAvailable
+import csw.params.commands.CommandResultType.{Final, Intermediate}
+import csw.params.commands.{CommandResponse, CommandResultType}
+import csw.params.core.models.Id
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
 /**
@@ -22,18 +22,18 @@ import csw.services.logging.scaladsl.{Logger, LoggerFactory}
  *
  * In case of short running or immediate command,
  * validation response will be of type final result which can either be of type
- * [[csw.messages.commands.CommandResultType.Positive]] or [[csw.messages.commands.CommandResultType.Negative]]
+ * [[csw.params.commands.CommandResultType.Positive]] or [[csw.params.commands.CommandResultType.Negative]]
  *
- * In case of long running command, validation response will be of type [[csw.messages.commands.CommandResultType.Intermediate]]
+ * In case of long running command, validation response will be of type [[csw.params.commands.CommandResultType.Intermediate]]
  * then it is the responsibility of component writer to update its final command status later on
- * with [[csw.messages.commands.CommandResponse]] which should be of type
- * [[csw.messages.commands.CommandResultType.Positive]] or [[csw.messages.commands.CommandResultType.Negative]]
+ * with [[csw.params.commands.CommandResponse]] which should be of type
+ * [[csw.params.commands.CommandResultType.Positive]] or [[csw.params.commands.CommandResultType.Negative]]
  *
  * CommandResponseManager also provides subscribe API.
  * One of the use case for this is when Assembly splits top level command into two sub commands and forwards them to two different HCD's.
- * In this case, Assembly can register its interest in the final [[csw.messages.commands.CommandResponse]]
+ * In this case, Assembly can register its interest in the final [[csw.params.commands.CommandResponse]]
  * from two HCD's when these sub commands completes, using subscribe API. And once Assembly receives final command response
- * from both the HCD's then it can update Top level command with final [[csw.messages.commands.CommandResponse]]
+ * from both the HCD's then it can update Top level command with final [[csw.params.commands.CommandResponse]]
  *
  * @param ctx             The Actor Context under which the actor instance of this behavior is created
  * @param loggerFactory   The factory for creating [[csw.services.logging.scaladsl.Logger]] instance

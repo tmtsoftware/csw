@@ -9,12 +9,12 @@ import csw.command.messages.CommandMessage.{Oneway, Submit}
 import csw.command.messages.CommandResponseManagerMessage.AddOrUpdateCommand
 import csw.command.messages.RunningMessage.Lifecycle
 import csw.command.messages.TopLevelActorIdleMessage.Initialize
-import csw.messages.commands.CommandResponse.{Accepted, Completed, Error}
-import csw.messages.commands.{CommandName, CommandResponse, Observe, Setup}
+import csw.params.commands.CommandResponse.{Accepted, Completed, Error}
+import csw.params.commands.{CommandName, CommandResponse, Observe, Setup}
 import csw.command.models.framework.ToComponentLifecycleMessages._
 import csw.services.location.api.scaladsl.LocationService
-import csw.messages.params.generics.KeyType
-import csw.messages.params.models.{ObsId, Prefix}
+import csw.params.core.generics.KeyType
+import csw.params.core.models.{ObsId, Prefix}
 import csw.command.messages.{CommandResponseManagerMessage, FromComponentLifecycleMessage, TopLevelActorMessage}
 import csw.services.alarm.api.scaladsl.AlarmService
 import csw.command.CommandResponseManager

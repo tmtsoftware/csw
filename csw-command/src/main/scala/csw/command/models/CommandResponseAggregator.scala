@@ -3,8 +3,8 @@ package csw.command.models
 import akka.NotUsed
 import akka.stream.Materializer
 import akka.stream.scaladsl.Source
-import csw.messages.commands.{CommandResponse, CommandResultType}
-import csw.messages.params.models.Id
+import csw.params.commands.{CommandResponse, CommandResultType}
+import csw.params.core.models.Id
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}

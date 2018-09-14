@@ -1,5 +1,5 @@
 package csw.services.alarm.client.internal.services
-import csw.messages.params.models.Subsystem.AOESW
+import csw.params.core.models.Subsystem.AOESW
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
 import csw.services.alarm.api.models.AlarmSeverity.{Critical, Major, Okay, Warning}
 import csw.services.alarm.api.models.FullAlarmSeverity.Disconnected

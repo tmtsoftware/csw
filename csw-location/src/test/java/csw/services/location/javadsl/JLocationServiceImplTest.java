@@ -11,7 +11,7 @@ import akka.stream.javadsl.Keep;
 import akka.stream.testkit.TestSubscriber;
 import akka.stream.testkit.javadsl.TestSink;
 import akka.testkit.TestProbe;
-import csw.messages.params.models.Prefix;
+import csw.params.core.models.Prefix;
 import csw.services.location.api.commons.Constants;
 import csw.services.location.api.javadsl.ILocationService;
 import csw.services.location.api.javadsl.IRegistrationResult;

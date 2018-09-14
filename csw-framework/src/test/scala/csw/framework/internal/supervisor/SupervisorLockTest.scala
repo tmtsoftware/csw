@@ -6,12 +6,12 @@ import csw.common.components.framework.SampleComponentState.{choiceKey, initChoi
 import csw.common.utils.LockCommandFactory
 import csw.framework.ComponentInfos.assemblyInfo
 import csw.framework.FrameworkTestSuite
-import csw.messages.commands.CommandResponse.{Accepted, NotAllowed}
-import csw.messages.commands.{CommandName, CommandResponse, Setup}
+import csw.params.commands.CommandResponse.{Accepted, NotAllowed}
+import csw.params.commands.{CommandName, CommandResponse, Setup}
 import csw.command.models.framework.LockingResponses._
 import csw.command.models.framework.{LifecycleStateChanged, LockingResponse, PubSub, SupervisorLifecycleState}
-import csw.messages.params.models.{ObsId, Prefix}
-import csw.messages.params.states.{CurrentState, StateName}
+import csw.params.core.models.{ObsId, Prefix}
+import csw.params.core.states.{CurrentState, StateName}
 import csw.command.messages.CommandMessage.Submit
 import csw.command.messages.{CommandResponseManagerMessage ⇒ CRM}
 import CRM.{AddOrUpdateCommand, Query, Unsubscribe}

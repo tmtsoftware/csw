@@ -1,6 +1,6 @@
 package csw.services.event.cli.args
 
-import csw.messages.params.models.Units.{volt, NoUnits}
+import csw.params.core.models.Units.{volt, NoUnits}
 import org.scalatest.{FunSuite, Matchers}
 
 // DEOPSCSW-436: [Event Cli] Specialized Publish command (take params from command line)

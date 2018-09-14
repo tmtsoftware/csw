@@ -9,7 +9,7 @@ import akka.stream.{KillSwitches, Materializer, OverflowStrategy}
 import csw.command.messages.ComponentCommonMessage.ComponentStateSubscription
 import csw.command.models.framework.PubSub.Subscribe
 import csw.command.models.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
-import csw.messages.params.states.CurrentState
+import csw.params.core.states.CurrentState
 
 import scala.compat.java8.FutureConverters.FutureOps
 import scala.concurrent.{ExecutionContext, Future}

@@ -1,6 +1,6 @@
 package csw.services.event.perf.model_obs
 
-import csw.messages.params.models.Prefix
+import csw.params.core.models.Prefix
 import csw.services.event.perf.model_obs.BaseSetting.{PubSetting, SubSetting}
 
 sealed trait BaseSetting {

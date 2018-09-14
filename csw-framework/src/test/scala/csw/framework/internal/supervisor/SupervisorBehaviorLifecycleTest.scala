@@ -17,12 +17,12 @@ import csw.command.messages.RunningMessage.Lifecycle
 import csw.command.messages.SupervisorContainerCommonMessages.Restart
 import csw.command.messages.SupervisorIdleMessage.InitializeTimeout
 import csw.command.messages.SupervisorInternalRunningMessage.{RegistrationNotRequired, RegistrationSuccess}
-import csw.messages.commands.CommandResponse
+import csw.params.commands.CommandResponse
 import csw.command.models.framework.LocationServiceUsage.DoNotRegister
 import csw.command.models.framework.PubSub.{Publish, Subscribe, Unsubscribe}
 import csw.command.models.framework.ToComponentLifecycleMessages._
 import csw.command.models.framework.{ComponentInfo, LifecycleStateChanged, PubSub, SupervisorLifecycleState}
-import csw.messages.params.models.Id
+import csw.params.core.models.Id
 import csw.command.messages.{CommandResponseManagerMessage, ContainerIdleMessage, SupervisorMessage, TopLevelActorMessage}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach

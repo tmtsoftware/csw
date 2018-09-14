@@ -5,9 +5,9 @@ import akka.actor.typed.ActorRef
 import akka.kafka.{scaladsl, ConsumerSettings, Subscription, Subscriptions}
 import akka.stream.{Materializer, StreamDetachedException}
 import akka.stream.scaladsl.{Keep, Sink, Source}
-import csw.messages.events._
-import csw.messages.params.models.Subsystem
-import csw.messages.params.pb.PbConverter
+import csw.params.events._
+import csw.params.core.models.Subsystem
+import csw.params.core.pb.PbConverter
 import csw.services.event.api.scaladsl.{EventSubscriber, EventSubscription, SubscriptionMode}
 import csw.services.event.internal.commons.EventSubscriberUtil
 import csw.services.event.utils.Utils

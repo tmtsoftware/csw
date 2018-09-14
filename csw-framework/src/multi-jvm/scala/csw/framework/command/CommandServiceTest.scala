@@ -11,18 +11,18 @@ import com.typesafe.config.ConfigFactory
 import csw.command.messages.CommandMessage.Submit
 import csw.common.utils.LockCommandFactory
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
-import csw.messages.commands.CommandIssue.ComponentLockedIssue
-import csw.messages.commands.CommandResponse._
-import csw.messages.commands._
+import csw.params.commands.CommandIssue.ComponentLockedIssue
+import csw.params.commands.CommandResponse._
+import csw.params.commands._
 import csw.command.models.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
 import csw.command.models.matchers.{DemandMatcher, Matcher, MatcherResponse}
 import csw.command.models.framework.LockingResponse
 import csw.command.models.framework.LockingResponses.LockAcquired
 import csw.services.location.api.models.Connection.AkkaConnection
 import csw.services.location.api.models.{AkkaLocation, ComponentId, ComponentType}
-import csw.messages.params.generics.{KeyType, Parameter}
-import csw.messages.params.models.{ObsId, Prefix}
-import csw.messages.params.states.{DemandState, StateName}
+import csw.params.core.generics.{KeyType, Parameter}
+import csw.params.core.models.{ObsId, Prefix}
+import csw.params.core.states.{DemandState, StateName}
 import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.scaladsl.CommandService
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}

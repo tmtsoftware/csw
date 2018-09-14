@@ -1,8 +1,8 @@
 package csw.services.alarm.client.internal.services
 
 import com.typesafe.config.{Config, ConfigFactory}
-import csw.messages.params.models.Subsystem
-import csw.messages.params.models.Subsystem.NFIRAOS
+import csw.params.core.models.Subsystem
+import csw.params.core.models.Subsystem.NFIRAOS
 import csw.services.alarm.api.exceptions.KeyNotFoundException
 import csw.services.alarm.api.internal.MetadataKey
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}

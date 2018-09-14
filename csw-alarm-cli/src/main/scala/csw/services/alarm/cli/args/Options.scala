@@ -1,7 +1,7 @@
 package csw.services.alarm.cli.args
 import java.nio.file.Path
 
-import csw.messages.params.models.Subsystem
+import csw.params.core.models.Subsystem
 import csw.services.alarm.api.models.{AlarmSeverity, Key}
 import csw.services.alarm.api.models.Key.{AlarmKey, ComponentKey, GlobalKey, SubsystemKey}
 

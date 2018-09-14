@@ -6,7 +6,7 @@ import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.{KillSwitches, Materializer, OverflowStrategy}
 import csw.command.messages.ComponentCommonMessage.ComponentStateSubscription
 import csw.command.models.framework.PubSub.{Subscribe, SubscribeOnly}
-import csw.messages.params.states.{CurrentState, StateName}
+import csw.params.core.states.{CurrentState, StateName}
 
 /**
  * The handle to the subscription created for the current state published by the specified publisher

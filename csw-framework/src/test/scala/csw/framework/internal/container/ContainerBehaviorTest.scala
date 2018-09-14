@@ -19,7 +19,7 @@ import csw.command.models.framework.ToComponentLifecycleMessages.{GoOffline, GoO
 import csw.command.models.framework.{ComponentInfo, ContainerLifecycleState, SupervisorLifecycleState, _}
 import csw.services.location.api.models.Connection.AkkaConnection
 import csw.services.location.api.scaladsl.LocationService
-import csw.messages.params.models.Prefix
+import csw.params.core.models.Prefix
 import csw.command.messages.{ComponentMessage, ContainerActorMessage, ContainerIdleMessage}
 import csw.services.alarm.client.AlarmServiceFactory
 import csw.services.event.EventServiceFactory

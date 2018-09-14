@@ -11,8 +11,8 @@ import akka.util.Timeout
 import csw.command.messages.CommandResponseManagerMessage
 import csw.command.messages.CommandResponseManagerMessage.{AddOrUpdateCommand, AddSubCommand, Query, UpdateSubCommand}
 import csw.command.scaladsl.CommandResponseSubscription
-import csw.messages.commands.CommandResponse
-import csw.messages.params.models.Id
+import csw.params.commands.CommandResponse
+import csw.params.core.models.Id
 
 import scala.compat.java8.FunctionConverters.enrichAsScalaFromConsumer
 import scala.compat.java8.FutureConverters._
@@ -35,7 +35,7 @@ class CommandResponseManager private[command] (val commandResponseManagerActor: 
    * Add a new command or update an existing command with the provided status
    *
    * @param runId command identifier
-   * @param cmdStatus status of command as [[csw.messages.commands.CommandResponse]]
+   * @param cmdStatus status of command as [[csw.params.commands.CommandResponse]]
    */
   def addOrUpdateCommand(runId: Id, cmdStatus: CommandResponse): Unit =
     commandResponseManagerActor ! AddOrUpdateCommand(runId, cmdStatus)
@@ -53,7 +53,7 @@ class CommandResponseManager private[command] (val commandResponseManagerActor: 
    * Update the status of a sub-command which will infer the status of the parent command
    *
    * @param subCommandId command identifier of sub command
-   * @param cmdStatus status of command as [[csw.messages.commands.CommandResponse]]
+   * @param cmdStatus status of command as [[csw.params.commands.CommandResponse]]
    */
   def updateSubCommand(subCommandId: Id, cmdStatus: CommandResponse): Unit =
     commandResponseManagerActor ! UpdateSubCommand(subCommandId, cmdStatus)

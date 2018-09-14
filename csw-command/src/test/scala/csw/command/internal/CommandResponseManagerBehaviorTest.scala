@@ -9,9 +9,9 @@ import akka.actor.{typed, ActorSystem}
 import csw.command.messages.CommandResponseManagerMessage._
 import csw.command.messages.CommandResponseManagerMessage
 import csw.command.models.{CommandCorrelation, CommandResponseManagerState}
-import csw.messages.commands.CommandResponse
-import csw.messages.commands.CommandResponse.{Accepted, Completed, Error}
-import csw.messages.params.models.Id
+import csw.params.commands.CommandResponse
+import csw.params.commands.CommandResponse.{Accepted, Completed, Error}
+import csw.params.core.models.Id
 import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when

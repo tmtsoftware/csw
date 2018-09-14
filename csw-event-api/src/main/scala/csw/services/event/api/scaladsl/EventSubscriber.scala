@@ -2,14 +2,14 @@ package csw.services.event.api.scaladsl
 
 import akka.actor.typed.ActorRef
 import akka.stream.scaladsl.Source
-import csw.messages.events.{Event, EventKey}
-import csw.messages.params.models.Subsystem
+import csw.params.events.{Event, EventKey}
+import csw.params.core.models.Subsystem
 
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 
 /**
- * An EventSubscriber interface to subscribe events. The events can be subscribed on [[csw.messages.events.EventKey]]. All events published on this key
+ * An EventSubscriber interface to subscribe events. The events can be subscribed on [[csw.params.events.EventKey]]. All events published on this key
  * will be received by subscribers.
  */
 trait EventSubscriber {
@@ -22,10 +22,9 @@ trait EventSubscriber {
    * and the stream is stopped after logging appropriately. In all other cases of exception, as per the default behavior, the stream will stop.
    * To avoid that, user should provide a resuming materializer while running the stream.
    *
-    @note All the other APIs of [[EventSubscriber]] that do not return a [[akka.stream.scaladsl.Source]], internally use the resuming materializer which will ignore the failed event and resume receiving further events.
-   *
-   * @param eventKeys a set of [[csw.messages.events.EventKey]] to subscribe to
-   * @return a [[akka.stream.scaladsl.Source]] of [[csw.messages.events.Event]]. The materialized value of the source provides an [[csw.services.event.api.scaladsl.EventSubscription]]
+   *@note All the other APIs of [[EventSubscriber]] that do not return a [[akka.stream.scaladsl.Source]], internally use the resuming materializer which will ignore the failed event and resume receiving further events.
+   * @param eventKeys a set of [[csw.params.events.EventKey]] to subscribe to
+   * @return a [[akka.stream.scaladsl.Source]] of [[csw.params.events.Event]]. The materialized value of the source provides an [[csw.services.event.api.scaladsl.EventSubscription]]
    *         which can be used to unsubscribe from all the Event Keys which were subscribed to
    */
   def subscribe(eventKeys: Set[EventKey]): Source[Event, EventSubscription]
@@ -39,12 +38,11 @@ trait EventSubscriber {
    * To avoid that, user should provide a resuming materializer while running the stream.
    *
    * @note All the other APIs of [[EventSubscriber]] that do not return a [[akka.stream.scaladsl.Source]], internally use the resuming materializer which will ignore the failed event and resume receiving further events.
-   *
-   * @param eventKeys a set of [[csw.messages.events.EventKey]] to subscribe to
+   * @param eventKeys a set of [[csw.params.events.EventKey]] to subscribe to
    * @param every the duration which determines the frequency with which events are received
    * @param mode an appropriate [[csw.services.event.api.scaladsl.SubscriptionMode]] to control the behavior of rate of events w.r.t. the given frequency.
    *             Refer the API documentation for SubscriptionMode for more details
-   * @return a [[akka.stream.scaladsl.Source]] of [[csw.messages.events.Event]]. The materialized value of the source provides an
+   * @return a [[akka.stream.scaladsl.Source]] of [[csw.params.events.Event]]. The materialized value of the source provides an
    *         [[csw.services.event.api.scaladsl.EventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
    */
   def subscribe(eventKeys: Set[EventKey], every: FiniteDuration, mode: SubscriptionMode): Source[Event, EventSubscription]
@@ -58,7 +56,7 @@ trait EventSubscriber {
    * and the subscription is stopped after logging appropriately. [[csw.services.event.api.scaladsl.EventSubscription!.ready]] method can be used to determine
    * this state. In all other cases of exception, the subscription resumes to receive remaining elements.
    *
-   * @param eventKeys a set of [[csw.messages.events.EventKey]] to subscribe to
+   * @param eventKeys a set of [[csw.params.events.EventKey]] to subscribe to
    * @param callback a function to execute asynchronously on each received event
    * @return an [[csw.services.event.api.scaladsl.EventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
    */
@@ -72,7 +70,7 @@ trait EventSubscriber {
    * and the subscription is stopped after logging appropriately. [[csw.services.event.api.scaladsl.EventSubscription!.ready]] method can be used to determine
    * this state. In all other cases of exception, the subscription resumes to receive remaining elements.
    *
-   * @param eventKeys a set of [[csw.messages.events.EventKey]] to subscribe to
+   * @param eventKeys a set of [[csw.params.events.EventKey]] to subscribe to
    * @param callback a function to execute on each received event
    * @param every the duration which determines the frequency with which events are received
    * @param mode an appropriate [[csw.services.event.api.scaladsl.SubscriptionMode]] to control the behavior of rate of events w.r.t. the given frequency.
@@ -95,7 +93,7 @@ trait EventSubscriber {
    * and the subscription is stopped after logging appropriately. [[csw.services.event.api.scaladsl.EventSubscription!.ready]] method can be used to determine this
    * state. In all other cases of exception, the subscription resumes to receive remaining elements.
    *
-   * @param eventKeys a set of [[csw.messages.events.EventKey]] to subscribe to
+   * @param eventKeys a set of [[csw.params.events.EventKey]] to subscribe to
    * @param callback a function to execute on each received event
    * @return an [[csw.services.event.api.scaladsl.EventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
    */
@@ -109,7 +107,7 @@ trait EventSubscriber {
    * and the subscription is stopped after logging appropriately. [[csw.services.event.api.scaladsl.EventSubscription!.ready]] method can be used to determine this
    * state. In all other cases of exception, the subscription resumes to receive remaining elements.
    *
-   * @param eventKeys a set of [[csw.messages.events.EventKey]] to subscribe to
+   * @param eventKeys a set of [[csw.params.events.EventKey]] to subscribe to
    * @param callback a function to execute on each received event
    * @param every the duration which determines the frequency with which events are received
    * @param mode an appropriate [[csw.services.event.api.scaladsl.SubscriptionMode]] to control the behavior of rate of events w.r.t. the given frequency.
@@ -131,7 +129,7 @@ trait EventSubscriber {
    * and the subscription is stopped after logging appropriately. [[csw.services.event.api.scaladsl.EventSubscription!.ready]] method can be used to determine this
    * state. In all other cases of exception, the subscription resumes to receive remaining elements.
    *
-   * @param eventKeys a set of [[csw.messages.events.EventKey]] to subscribe to
+   * @param eventKeys a set of [[csw.params.events.EventKey]] to subscribe to
    * @param actorRef an actorRef of an actor which handles each received event
    * @return an [[csw.services.event.api.scaladsl.EventSubscription]] which can be used to unsubscribe from all the Event Keys which were subscribed to
    */
@@ -145,7 +143,7 @@ trait EventSubscriber {
    * and the subscription is stopped after logging appropriately. [[csw.services.event.api.scaladsl.EventSubscription!.ready]] method can be used to determine this
    * state. In all other cases of exception, the subscription resumes to receive remaining elements.
    *
-   * @param eventKeys a set of [[csw.messages.events.EventKey]] to subscribe to
+   * @param eventKeys a set of [[csw.params.events.EventKey]] to subscribe to
    * @param actorRef an actorRef of an actor to which each received event is redirected
    * @param every the duration which determines the frequency with which events are received
    * @param mode an appropriate [[csw.services.event.api.scaladsl.SubscriptionMode]] to control the behavior of rate of events w.r.t. the given frequency.
@@ -167,13 +165,13 @@ trait EventSubscriber {
    * and the subscription is stopped after logging appropriately. [[csw.services.event.api.scaladsl.EventSubscription!.ready]] method can be used to determine this
    * state. In all other cases of exception, the subscription resumes to receive remaining elements.
    *
-   * @param subsystem a valid [[csw.messages.params.models.Subsystem]] which represents the source of the events
+   * @param subsystem a valid [[csw.params.core.models.Subsystem]] which represents the source of the events
    * @param pattern   Subscribes the client to the given patterns. Supported glob-style patterns:
    *                  - h?llo subscribes to hello, hallo and hxllo
    *                  - h*llo subscribes to hllo and heeeello
    *                  - h[ae]llo subscribes to hello and hallo, but not hillo
    *                  Use \ to escape special characters if you want to match them verbatim.
-   * @return a [[akka.stream.scaladsl.Source]] of [[csw.messages.events.Event]]. The materialized value of the source provides an [[csw.services.event.api.scaladsl.EventSubscription]]
+   * @return a [[akka.stream.scaladsl.Source]] of [[csw.params.events.Event]]. The materialized value of the source provides an [[csw.services.event.api.scaladsl.EventSubscription]]
    *         which can be used to unsubscribe from all the Event Keys which were subscribed to
    */
   def pSubscribe(subsystem: Subsystem, pattern: String): Source[Event, EventSubscription]
@@ -186,7 +184,7 @@ trait EventSubscriber {
    * and the subscription is stopped after logging appropriately. [[csw.services.event.api.scaladsl.EventSubscription!.ready]] method can be used to determine this
    * state. In all other cases of exception, the subscription resumes to receive remaining elements.
    *
-   * @param subsystem a valid [[csw.messages.params.models.Subsystem]] which represents the source of the events
+   * @param subsystem a valid [[csw.params.core.models.Subsystem]] which represents the source of the events
    * @param pattern   Subscribes the client to the given patterns. Supported glob-style patterns:
    *- h?llo subscribes to hello, hallo and hxllo
    *- h*llo subscribes to hllo and heeeello
@@ -204,8 +202,8 @@ trait EventSubscriber {
    * In case the underlying server is not available, the future fails with [[csw.services.event.api.exceptions.EventServerNotAvailable]] exception.
    * In all other cases of exception, the future fails with the respective exception
    *
-   * @param eventKeys a set of [[csw.messages.events.EventKey]] to subscribe to
-   * @return a future which completes with a set of latest [[csw.messages.events.Event]] for the provided Event Keys
+   * @param eventKeys a set of [[csw.params.events.EventKey]] to subscribe to
+   * @return a future which completes with a set of latest [[csw.params.events.Event]] for the provided Event Keys
    */
   def get(eventKeys: Set[EventKey]): Future[Set[Event]]
 
@@ -215,8 +213,8 @@ trait EventSubscriber {
    * In case the underlying server is not available, the future fails with [[csw.services.event.api.exceptions.EventServerNotAvailable]] exception.
    * In all other cases of exception, the future fails with the respective exception
    *
-   * @param eventKey an [[csw.messages.events.EventKey]] to subscribe to
-   * @return a future which completes with the latest [[csw.messages.events.Event]] for the provided Event Key
+   * @param eventKey an [[csw.params.events.EventKey]] to subscribe to
+   * @return a future which completes with the latest [[csw.params.events.Event]] for the provided Event Key
    */
   def get(eventKey: EventKey): Future[Event]
 }

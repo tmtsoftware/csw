@@ -8,14 +8,14 @@ import akka.{actor, testkit, Done}
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.models.CswContext
 import csw.command.messages.CommandResponseManagerMessage
-import csw.messages.commands.CommandResponse
+import csw.params.commands.CommandResponse
 import csw.command.models.framework.{LifecycleStateChanged, PubSub}
 import csw.services.location.api.models.Connection.AkkaConnection
 import csw.services.location.api.javadsl.ILocationService
 import csw.services.location.api.models.AkkaRegistration
 import csw.services.location.api.scaladsl.LocationService
-import csw.messages.params.models.{Id, Prefix}
-import csw.messages.params.states.CurrentState
+import csw.params.core.models.{Id, Prefix}
+import csw.params.core.states.CurrentState
 import csw.services.alarm.api.scaladsl.AlarmService
 import csw.command.CommandResponseManager
 import csw.services.config.api.scaladsl.ConfigClientService

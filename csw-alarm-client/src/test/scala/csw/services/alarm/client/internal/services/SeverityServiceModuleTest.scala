@@ -7,7 +7,7 @@ import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import com.persist.JsonOps.{Json, JsonObject}
 import com.typesafe.config.ConfigFactory
-import csw.messages.params.models.Subsystem.{BAD, LGSF, NFIRAOS, TCS}
+import csw.params.core.models.Subsystem.{BAD, LGSF, NFIRAOS, TCS}
 import csw.services.alarm.api.exceptions.{InactiveAlarmException, InvalidSeverityException, KeyNotFoundException}
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
 import csw.services.alarm.api.models.AlarmSeverity._

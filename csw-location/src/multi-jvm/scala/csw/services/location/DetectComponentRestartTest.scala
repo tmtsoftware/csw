@@ -7,7 +7,7 @@ import akka.testkit.TestProbe
 import csw.services.location.api.models.Connection.AkkaConnection
 import csw.services.location.api.models.AkkaRegistration
 import csw.services.location.api.models.{ComponentId, ComponentType, LocationRemoved, LocationUpdated}
-import csw.messages.params.models.Prefix
+import csw.params.core.models.Prefix
 import csw.services.location.commons.CswCluster
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.services.location.scaladsl.LocationServiceFactory

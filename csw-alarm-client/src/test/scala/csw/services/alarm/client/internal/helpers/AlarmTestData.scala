@@ -1,5 +1,5 @@
 package csw.services.alarm.client.internal.helpers
-import csw.messages.params.models.Subsystem.{LGSF, NFIRAOS, TCS}
+import csw.params.core.models.Subsystem.{LGSF, NFIRAOS, TCS}
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
 import csw.services.alarm.api.models.AlarmSeverity._
 import csw.services.alarm.api.models.{AlarmMetadata, AlarmType}

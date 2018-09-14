@@ -1,8 +1,8 @@
 package csw.services.location.api.formats
 
 import akka.Done
-import csw.messages.extensions.Formats
-import csw.messages.extensions.Formats.MappableFormat
+import csw.params.extensions.Formats
+import csw.params.extensions.Formats.MappableFormat
 import csw.services.location.api.models.{AkkaLocation, Registration}
 import julienrf.json.derived
 import play.api.libs.json.{__, Format, Json, OFormat}

@@ -1,8 +1,8 @@
 package csw.command.models.framework
 
-import csw.messages.TMTSerializable
+import csw.params.TMTSerializable
 import csw.services.location.api.models.{ComponentType, Connection}
-import csw.messages.params.models.Prefix
+import csw.params.core.models.Prefix
 import play.api.libs.json._
 
 import scala.collection.JavaConverters._

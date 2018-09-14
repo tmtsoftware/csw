@@ -1,6 +1,6 @@
 package csw.services.location.api.models
 
-import csw.messages.TMTSerializable
+import csw.params.TMTSerializable
 import enumeratum.EnumEntry.Lowercase
 import enumeratum.{Enum, EnumEntry, PlayJsonEnum}
 

@@ -10,12 +10,12 @@ import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.common.components.command.ComponentStateForCommand._
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
-import csw.messages.commands.CommandResponse.{Accepted, Completed, Invalid}
-import csw.messages.commands.{CommandResponse, Setup}
+import csw.params.commands.CommandResponse.{Accepted, Completed, Invalid}
+import csw.params.commands.{CommandResponse, Setup}
 import csw.services.location.api.models.Connection.AkkaConnection
 import csw.services.location.api.models.{AkkaLocation, ComponentId, ComponentType}
-import csw.messages.params.models.ObsId
-import csw.messages.params.states.{CurrentState, StateName}
+import csw.params.core.models.ObsId
+import csw.params.core.states.{CurrentState, StateName}
 import csw.command.scaladsl.{CommandDistributor, CommandService}
 import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import io.lettuce.core.RedisClient

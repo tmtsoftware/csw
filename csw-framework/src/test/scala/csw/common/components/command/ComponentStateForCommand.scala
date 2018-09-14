@@ -1,9 +1,9 @@
 package csw.common.components.command
 
-import csw.messages.commands.CommandName
-import csw.messages.params.generics.GChoiceKey
-import csw.messages.params.generics.KeyType.ChoiceKey
-import csw.messages.params.models.{Choice, Choices, Prefix}
+import csw.params.commands.CommandName
+import csw.params.core.generics.GChoiceKey
+import csw.params.core.generics.KeyType.ChoiceKey
+import csw.params.core.models.{Choice, Choices, Prefix}
 
 object ComponentStateForCommand {
   val prefix        = Prefix("wfos.prog.cloudcover")

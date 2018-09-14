@@ -5,10 +5,10 @@ import akka.actor.typed.ActorRef
 import csw.command.models.{CommandCorrelation, CommandResponseManagerState}
 import csw.command.models.framework.PubSub.SubscriberMessage
 import csw.command.models.framework._
-import csw.messages.TMTSerializable
-import csw.messages.commands.{CommandResponse, ControlCommand}
-import csw.messages.params.models.{Id, Prefix}
-import csw.messages.params.states.CurrentState
+import csw.params.TMTSerializable
+import csw.params.commands.{CommandResponse, ControlCommand}
+import csw.params.core.models.{Id, Prefix}
+import csw.params.core.states.CurrentState
 import csw.services.location.api.models.TrackingEvent
 
 import scala.concurrent.duration.FiniteDuration

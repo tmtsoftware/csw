@@ -1,11 +1,11 @@
 package csw.services.messages;
 
-import csw.messages.javadsl.JUnits;
-import csw.messages.params.generics.GChoiceKey;
-import csw.messages.javadsl.JKeyType;
-import csw.messages.params.generics.Key;
-import csw.messages.params.generics.Parameter;
-import csw.messages.params.models.*;
+import csw.params.javadsl.JUnits;
+import csw.params.core.generics.GChoiceKey;
+import csw.params.javadsl.JKeyType;
+import csw.params.core.generics.Key;
+import csw.params.core.generics.Parameter;
+import csw.params.core.models.*;
 import org.junit.Assert;
 import org.junit.Test;
 

@@ -1,9 +1,9 @@
 package csw.services.event.cli.utils
 
-import csw.messages.events.Event
-import csw.messages.params.generics.KeyType.StructKey
-import csw.messages.params.generics.Parameter
-import csw.messages.params.models.Struct
+import csw.params.events.Event
+import csw.params.core.generics.KeyType.StructKey
+import csw.params.core.generics.Parameter
+import csw.params.core.models.Struct
 import csw.services.event.cli.args.Options
 
 class EventOnelineTransformer(options: Options) {

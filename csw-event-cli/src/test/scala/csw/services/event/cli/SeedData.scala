@@ -6,8 +6,8 @@ import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
 import csw.apps.clusterseed.client.HTTPLocationService
 import csw.commons.redis.EmbeddedRedis
-import csw.messages.events._
-import csw.messages.params.formats.JsonSupport
+import csw.params.events._
+import csw.params.core.formats.JsonSupport
 import csw.services.location.api.scaladsl.LocationService
 import csw.services.event.api.scaladsl.EventPublisher
 import csw.services.event.cli.args.ArgsParser

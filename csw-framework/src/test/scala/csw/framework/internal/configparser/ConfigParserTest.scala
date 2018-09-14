@@ -8,7 +8,7 @@ import csw.framework.models.{ContainerBootstrapInfo, ContainerInfo, HostBootstra
 import csw.command.models.framework.ComponentInfo
 import csw.services.location.api.models.Connection
 import csw.services.location.api.models.ComponentType.{Assembly, HCD}
-import csw.messages.params.models.Prefix
+import csw.params.core.models.Prefix
 import org.scalatest.{FunSuite, Matchers}
 
 import scala.concurrent.duration.DurationInt

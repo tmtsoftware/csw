@@ -3,7 +3,7 @@ package csw.services.alarm.client.internal.services
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import com.typesafe.config.ConfigFactory
-import csw.messages.params.models.Subsystem.{BAD, LGSF, NFIRAOS, TCS}
+import csw.params.core.models.Subsystem.{BAD, LGSF, NFIRAOS, TCS}
 import csw.services.alarm.api.exceptions.{InactiveAlarmException, KeyNotFoundException}
 import csw.services.alarm.api.models.AlarmHealth
 import csw.services.alarm.api.models.AlarmHealth.{Bad, Good, Ill}

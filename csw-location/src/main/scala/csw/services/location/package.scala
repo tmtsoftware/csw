@@ -20,7 +20,7 @@ package csw.services
  * - [[csw.services.location.api.models.Location]] :
  *  When you resolve component location using [[csw.services.location.api.scaladsl.LocationService]], you get back this location.
  *  There are three types of Locations:
- *   - [[csw.services.location.api.models.AkkaLocation]]: holds hostname, port and actorRef which is ready to receive [[csw.messages.commands.Command]] from outside.
+ *   - [[csw.services.location.api.models.AkkaLocation]]: holds hostname, port and actorRef which is ready to receive [[csw.params.commands.Command]] from outside.
  *   - [[csw.services.location.api.models.TcpLocation]]: holds hostname and port which can be used for further communication.
  *   - [[csw.services.location.api.models.HttpLocation]]: holds hostname and port which can be used for further communication.
  *

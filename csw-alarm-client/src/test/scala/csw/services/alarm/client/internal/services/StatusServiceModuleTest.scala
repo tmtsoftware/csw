@@ -3,8 +3,8 @@ package csw.services.alarm.client.internal.services
 import java.time.{Clock, LocalDateTime}
 
 import com.typesafe.config.ConfigFactory
-import csw.messages.params.models.Subsystem
-import csw.messages.params.models.Subsystem.BAD
+import csw.params.core.models.Subsystem
+import csw.params.core.models.Subsystem.BAD
 import csw.services.alarm.api.exceptions.KeyNotFoundException
 import csw.services.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
 import csw.services.alarm.api.models.AlarmSeverity._

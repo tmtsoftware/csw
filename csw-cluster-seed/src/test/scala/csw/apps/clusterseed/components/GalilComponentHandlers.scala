@@ -4,8 +4,8 @@ import akka.actor.typed.scaladsl.ActorContext
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.command.messages.TopLevelActorMessage
-import csw.messages.commands.CommandResponse.Accepted
-import csw.messages.commands.{CommandResponse, ControlCommand}
+import csw.params.commands.CommandResponse.Accepted
+import csw.params.commands.{CommandResponse, ControlCommand}
 import csw.services.location.api.models.TrackingEvent
 import csw.services.logging.scaladsl.Logger
 

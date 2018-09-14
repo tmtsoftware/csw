@@ -1,9 +1,9 @@
 package csw.command.models
 
 import akka.actor.typed.ActorRef
-import csw.messages.commands.CommandResponse
-import csw.messages.commands.CommandResponse.CommandNotAvailable
-import csw.messages.params.models.Id
+import csw.params.commands.CommandResponse
+import csw.params.commands.CommandResponse.CommandNotAvailable
+import csw.params.core.models.Id
 
 /**
  * Manages state of a given command identified by a RunId

@@ -7,11 +7,11 @@ import csw.common.components.command.ComponentStateForCommand.{longRunningCmdCom
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.command.messages.TopLevelActorMessage
-import csw.messages.commands.CommandResponse.{Accepted, Completed, Invalid}
-import csw.messages.commands.{CommandIssue, CommandResponse, ControlCommand, Setup}
+import csw.params.commands.CommandResponse.{Accepted, Completed, Invalid}
+import csw.params.commands.{CommandIssue, CommandResponse, ControlCommand, Setup}
 import csw.services.location.api.models.{AkkaLocation, TrackingEvent}
-import csw.messages.params.models.Id
-import csw.messages.params.states.{CurrentState, StateName}
+import csw.params.core.models.Id
+import csw.params.core.states.{CurrentState, StateName}
 import csw.command.scaladsl.CommandService
 
 import scala.concurrent.duration.DurationDouble

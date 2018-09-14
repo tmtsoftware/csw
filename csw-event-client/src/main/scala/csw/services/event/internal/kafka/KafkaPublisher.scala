@@ -5,8 +5,8 @@ import akka.actor.Cancellable
 import akka.kafka.ProducerSettings
 import akka.stream.Materializer
 import akka.stream.scaladsl.Source
-import csw.messages.events.Event
-import csw.messages.params.pb.TypeMapperSupport
+import csw.params.events.Event
+import csw.params.core.pb.TypeMapperSupport
 import csw.services.event.api.exceptions.PublishFailure
 import csw.services.event.api.scaladsl.EventPublisher
 import csw.services.event.internal.commons.EventPublisherUtil

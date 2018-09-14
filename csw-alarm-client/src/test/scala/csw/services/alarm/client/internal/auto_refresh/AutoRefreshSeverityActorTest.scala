@@ -3,7 +3,7 @@ package csw.services.alarm.client.internal.auto_refresh
 import akka.actor.testkit.typed.scaladsl.{ActorTestKit, ManualTime, TestProbe}
 import akka.actor.typed.scaladsl.Behaviors
 import com.typesafe.config.Config
-import csw.messages.params.models.Subsystem.NFIRAOS
+import csw.params.core.models.Subsystem.NFIRAOS
 import csw.services.alarm.api.models.AlarmSeverity.Major
 import csw.services.alarm.api.models.Key.AlarmKey
 import csw.services.alarm.client.internal.auto_refresh.AutoRefreshSeverityMessage._

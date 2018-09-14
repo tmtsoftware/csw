@@ -5,7 +5,7 @@ import java.net.URI
 import akka.actor.typed.ActorRef
 import csw.services.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.services.location.api.models.{AkkaLocation, HttpLocation, TcpLocation}
-import csw.messages.params.models.Prefix
+import csw.params.core.models.Prefix
 
 object LocationFactory {
   def akka(connection: AkkaConnection, uri: URI, actorRef: ActorRef[_], logAdminRef: ActorRef[_] = null) =

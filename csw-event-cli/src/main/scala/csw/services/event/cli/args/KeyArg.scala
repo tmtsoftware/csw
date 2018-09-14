@@ -1,7 +1,7 @@
 package csw.services.event.cli.args
 
-import csw.messages.params.models.Units
-import csw.messages.params.models.Units.NoUnits
+import csw.params.core.models.Units
+import csw.params.core.models.Units.NoUnits
 import csw.services.event.cli.args.Separators.KEY_SEP
 
 case class KeyArg private (keyName: String, keyType: Char, units: Units)

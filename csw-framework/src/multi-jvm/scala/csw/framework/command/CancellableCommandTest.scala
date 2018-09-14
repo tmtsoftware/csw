@@ -12,10 +12,10 @@ import csw.command.messages.CommandResponseManagerMessage.Subscribe
 import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.common.components.command.ComponentStateForCommand.{acceptedCmd, cancelCmd, prefix}
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
-import csw.messages.commands.CommandResponse.{Accepted, Cancelled, Completed}
-import csw.messages.commands.{CommandResponse, Setup}
-import csw.messages.params.generics.KeyType
-import csw.messages.params.models.ObsId
+import csw.params.commands.CommandResponse.{Accepted, Cancelled, Completed}
+import csw.params.commands.{CommandResponse, Setup}
+import csw.params.core.generics.KeyType
+import csw.params.core.models.ObsId
 import csw.services.location.api.models.Connection.AkkaConnection
 import csw.services.location.api.models.{ComponentId, ComponentType}
 import csw.services.location.helpers.{LSNodeSpec, OneMemberAndSeed}

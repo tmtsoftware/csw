@@ -10,7 +10,7 @@ import akka.actor.typed.scaladsl.adapter._
 import csw.services.location.api.models.Connection.AkkaConnection
 import csw.services.location.api.scaladsl.LocationService
 import csw.services.location.api.models.{ComponentId, ComponentType}
-import csw.messages.params.models.Prefix
+import csw.params.core.models.Prefix
 import csw.services.location.commons.ActorSystemFactory
 import csw.services.location.api.models.AkkaRegistration
 import csw.services.location.models.RegistrationResult

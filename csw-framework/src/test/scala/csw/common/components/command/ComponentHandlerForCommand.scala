@@ -9,13 +9,13 @@ import akka.util.Timeout
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.command.messages.TopLevelActorMessage
-import csw.messages.commands.CommandIssue.{OtherIssue, WrongPrefixIssue}
-import csw.messages.commands.CommandResponse._
-import csw.messages.commands._
+import csw.params.commands.CommandIssue.{OtherIssue, WrongPrefixIssue}
+import csw.params.commands.CommandResponse._
+import csw.params.commands._
 import csw.services.location.api.models._
-import csw.messages.params.generics.{KeyType, Parameter}
-import csw.messages.params.models.Id
-import csw.messages.params.states.{CurrentState, StateName}
+import csw.params.core.generics.{KeyType, Parameter}
+import csw.params.core.models.Id
+import csw.params.core.states.{CurrentState, StateName}
 
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{ExecutionContext, Future}

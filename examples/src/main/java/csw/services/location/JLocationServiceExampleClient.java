@@ -18,7 +18,7 @@ import csw.framework.commons.CoordinatedShutdownReasons;
 import csw.services.location.api.models.*;
 import csw.services.location.api.javadsl.ILocationService;
 import csw.services.location.api.javadsl.IRegistrationResult;
-import csw.messages.params.models.Prefix;
+import csw.params.core.models.Prefix;
 import csw.command.messages.ComponentMessage;
 import csw.command.messages.ContainerMessage;
 import csw.command.extensions.AkkaLocationExt;

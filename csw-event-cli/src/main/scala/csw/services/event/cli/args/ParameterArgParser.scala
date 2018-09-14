@@ -1,8 +1,8 @@
 package csw.services.event.cli.args
 
 import com.github.tototoshi.csv.CSVParser
-import csw.messages.params.generics.KeyType.{BooleanKey, DoubleKey, FloatKey, IntKey, LongKey, StringKey}
-import csw.messages.params.generics.Parameter
+import csw.params.core.generics.KeyType.{BooleanKey, DoubleKey, FloatKey, IntKey, LongKey, StringKey}
+import csw.params.core.generics.Parameter
 import csw.services.event.cli.args.Separators._
 
 object ParameterArgParser {

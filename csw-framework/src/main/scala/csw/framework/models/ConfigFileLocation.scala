@@ -1,6 +1,6 @@
 package csw.framework.models
 
-import csw.messages.TMTSerializable
+import csw.params.TMTSerializable
 import enumeratum._
 
 import scala.collection.immutable

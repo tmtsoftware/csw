@@ -14,8 +14,8 @@ import csw.command.models.framework.ToComponentLifecycleMessage
 import csw.command.models.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.messages.commands.CommandResponse
-import csw.messages.commands.CommandResponse.Accepted
+import csw.params.commands.CommandResponse
+import csw.params.commands.CommandResponse.Accepted
 import csw.services.logging.scaladsl.Logger
 
 import scala.async.Async.{async, await}
@@ -160,9 +160,9 @@ private[framework] final class ComponentBehavior(
     }
 
   /**
-   * Defines action for messages which represent a [[csw.messages.commands.Command]]
+   * Defines action for messages which represent a [[csw.params.commands.Command]]
    *
-   * @param commandMessage message encapsulating a [[csw.messages.commands.Command]]
+   * @param commandMessage message encapsulating a [[csw.params.commands.Command]]
    */
   private def onRunningCompCommandMessage(commandMessage: CommandMessage): Unit = {
 

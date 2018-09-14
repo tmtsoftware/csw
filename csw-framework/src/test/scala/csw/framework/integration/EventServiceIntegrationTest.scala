@@ -9,13 +9,13 @@ import csw.common.components.framework.SampleComponentState._
 import csw.commons.redis.EmbeddedRedis
 import csw.framework.FrameworkTestWiring
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
-import csw.messages.commands
-import csw.messages.commands.CommandName
+import csw.params.commands
+import csw.params.commands.CommandName
 import csw.command.models.framework.ContainerLifecycleState
 import csw.services.location.api.models.ComponentId
 import csw.services.location.api.models.ComponentType.{Assembly, HCD}
 import csw.services.location.api.models.Connection.AkkaConnection
-import csw.messages.params.states.{CurrentState, StateName}
+import csw.params.core.states.{CurrentState, StateName}
 import csw.command.scaladsl.CommandService
 import csw.services.event.helpers.TestFutureExt.RichFuture
 import csw.services.event.internal.commons.EventServiceConnection

@@ -5,9 +5,9 @@ import java.util.concurrent.TimeUnit
 import akka.actor.{ActorSystem, Scheduler}
 import akka.util
 import com.typesafe.config.ConfigFactory
-import csw.messages.commands
-import csw.messages.commands.{CommandName, CommandResponse}
-import csw.messages.params.models.Prefix
+import csw.params.commands
+import csw.params.commands.{CommandName, CommandResponse}
+import csw.params.core.models.Prefix
 import csw.command.perf.BenchmarkHelpers.spawnStandaloneComponent
 import csw.command.scaladsl.CommandService
 import csw.services.location.commons.ClusterAwareSettings

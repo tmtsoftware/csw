@@ -2,7 +2,7 @@ package csw.framework.internal.pubsub
 
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.Behaviors
-import csw.messages.commands.Nameable
+import csw.params.commands.Nameable
 import csw.command.models.framework.PubSub
 import csw.services.logging.scaladsl.LoggerFactory
 

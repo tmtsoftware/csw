@@ -5,12 +5,12 @@ import akka.util.Timeout
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.command.messages.TopLevelActorMessage
-import csw.messages.commands.CommandResponse.Accepted
-import csw.messages.commands.{CommandName, CommandResponse, ControlCommand, Setup}
-import csw.messages.events._
+import csw.params.commands.CommandResponse.Accepted
+import csw.params.commands.{CommandName, CommandResponse, ControlCommand, Setup}
+import csw.params.events._
 import csw.services.location.api.models.{AkkaLocation, LocationRemoved, LocationUpdated, TrackingEvent}
-import csw.messages.params.generics.{Key, KeyType, Parameter}
-import csw.messages.params.models.{ObsId, Prefix, Units}
+import csw.params.core.generics.{Key, KeyType, Parameter}
+import csw.params.core.models.{ObsId, Prefix, Units}
 import csw.command.scaladsl.CommandService
 import csw.services.event.api.scaladsl.EventSubscription
 

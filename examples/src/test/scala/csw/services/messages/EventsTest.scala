@@ -2,13 +2,13 @@ package csw.services.messages
 
 import java.time.Instant
 
-import csw.messages.events._
-import csw.messages.params.formats.JsonSupport
-import csw.messages.params.generics.KeyType.{DoubleMatrixKey, RaDecKey}
-import csw.messages.params.generics.{Key, KeyType, Parameter}
-import csw.messages.params.models.Units.arcmin
-import csw.messages.params.models._
-import csw.messages.params.pb.PbConverter
+import csw.params.events._
+import csw.params.core.formats.JsonSupport
+import csw.params.core.generics.KeyType.{DoubleMatrixKey, RaDecKey}
+import csw.params.core.generics.{Key, KeyType, Parameter}
+import csw.params.core.models.Units.arcmin
+import csw.params.core.models._
+import csw.params.core.pb.PbConverter
 import csw_protobuf.events.PbEvent
 import org.scalatest.{FunSpec, Matchers}
 

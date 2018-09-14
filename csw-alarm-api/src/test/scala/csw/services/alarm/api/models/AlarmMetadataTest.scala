@@ -1,5 +1,5 @@
 package csw.services.alarm.api.models
-import csw.messages.params.models.Subsystem.NFIRAOS
+import csw.params.core.models.Subsystem.NFIRAOS
 import csw.services.alarm.api.models.ActivationStatus.{Active, Inactive}
 import csw.services.alarm.api.models.AlarmSeverity._
 import csw.services.alarm.api.models.Key.AlarmKey

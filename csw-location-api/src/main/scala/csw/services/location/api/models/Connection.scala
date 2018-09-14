@@ -1,7 +1,7 @@
 package csw.services.location.api.models
 
 import acyclic.skipped
-import csw.messages.TMTSerializable
+import csw.params.TMTSerializable
 import csw.services.location.api.models.ConnectionType.{AkkaType, HttpType, TcpType}
 import play.api.libs.json._
 

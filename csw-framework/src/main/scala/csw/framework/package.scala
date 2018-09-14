@@ -14,11 +14,11 @@ package csw
  * that intercepts common messages (ex. Shutdown, Restart) or lifecycle messages (ex. GoOffline or GoOnline)
  * sent from external entities to determine the state of the component.
  *
- * Components that are not in the [[csw.command.models.framework.SupervisorLifecycleState.Running]] state, do not receive [[csw.messages.CommandMessage]].
+ * Components that are not in the [[csw.command.models.framework.SupervisorLifecycleState.Running]] state, do not receive [[csw.params.CommandMessage]].
  *
  * When Component is created using this framework, it guarantees that component (HCD/Assembly) is registered with
  * LocationService only when Component moves to [[csw.command.models.framework.SupervisorLifecycleState.Running]] state.
- * That means, one component can resolve other component only when its in ``Running`` state and ready to accept [[messages.CommandMessage]]
+ * That means, one component can resolve other component only when its in ``Running`` state and ready to accept [[params.CommandMessage]]
  *
  * === Important Actors in Framework ===
  *
@@ -42,17 +42,17 @@ package csw
  *
  * - [[csw.framework.internal.pubsub.PubSubBehavior]]
  * : This actor is created by framework which is wrapped into [[csw.framework.CurrentStatePublisher]] for easy interaction with this actor
- * and then passed to component handlers so that component can publish their [[csw.messages.params.states.CurrentState]].
+ * and then passed to component handlers so that component can publish their [[csw.params.core.states.CurrentState]].
  *
- * If one component (ex. Assembly) is interested in [[csw.messages.params.states.CurrentState]] published by other component (ex. HCD)
+ * If one component (ex. Assembly) is interested in [[csw.params.core.states.CurrentState]] published by other component (ex. HCD)
  * then Assembly can subscribe to HCD's current state.
  *
- * PubSub actor maintains the list of subscribers and keeps publishing [[csw.messages.params.states.CurrentState]] to all subscribers.
+ * PubSub actor maintains the list of subscribers and keeps publishing [[csw.params.core.states.CurrentState]] to all subscribers.
  *
  * - [[csw.framework.internal.container.ContainerBehavior]]
  * : When multiple components needs to be started in container, then this actor is created.
- * Job of this actor is just to logically group multiple components and support [[csw.messages.SupervisorContainerCommonMessages]].
- * It receives [[csw.messages.SupervisorContainerCommonMessages.Shutdown]] or [[csw.messages.SupervisorContainerCommonMessages.Restart]] message
+ * Job of this actor is just to logically group multiple components and support [[csw.params.SupervisorContainerCommonMessages]].
+ * It receives [[csw.params.SupervisorContainerCommonMessages.Shutdown]] or [[csw.params.SupervisorContainerCommonMessages.Restart]] message
  * and forwards it to all the components residing in this container.
  *
  * == deploy package ==

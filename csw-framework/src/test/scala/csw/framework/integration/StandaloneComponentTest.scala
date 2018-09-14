@@ -19,7 +19,7 @@ import csw.command.models.framework.SupervisorLifecycleState
 import csw.services.location.api.models.ComponentType.HCD
 import csw.services.location.api.models.Connection.AkkaConnection
 import csw.services.location.api.models.{ComponentId, LocationRemoved, LocationUpdated, TrackingEvent}
-import csw.messages.params.states.{CurrentState, StateName}
+import csw.params.core.states.{CurrentState, StateName}
 import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.scaladsl.CommandService
 import csw.services.event.helpers.TestFutureExt.RichFuture

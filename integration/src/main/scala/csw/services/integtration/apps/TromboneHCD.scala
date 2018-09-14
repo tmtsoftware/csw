@@ -4,10 +4,10 @@ import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.typed.scaladsl.adapter._
 import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import csw.command.messages.CommandMessage.Submit
-import csw.messages.commands.{CommandName, Setup}
+import csw.params.commands.{CommandName, Setup}
 import csw.services.location.api.models.Connection.AkkaConnection
 import csw.services.location.api.models.{ComponentId, ComponentType}
-import csw.messages.params.models.Prefix
+import csw.params.core.models.Prefix
 import csw.services.integtration.common.TestFutureExtension.RichFuture
 import csw.services.location.commons.ClusterAwareSettings
 import csw.services.location.api.models.AkkaRegistration

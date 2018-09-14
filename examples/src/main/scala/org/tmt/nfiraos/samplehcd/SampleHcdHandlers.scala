@@ -5,11 +5,11 @@ import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.command.messages.TopLevelActorMessage
-import csw.messages.commands._
-import csw.messages.events.{EventName, SystemEvent}
+import csw.params.commands._
+import csw.params.events.{EventName, SystemEvent}
 import csw.services.location.api.models.TrackingEvent
-import csw.messages.params.generics.{Key, KeyType, Parameter}
-import csw.messages.params.models.Id
+import csw.params.core.generics.{Key, KeyType, Parameter}
+import csw.params.core.models.Id
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContextExecutor, Future}

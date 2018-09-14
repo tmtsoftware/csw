@@ -6,10 +6,10 @@ import akka.Done
 import akka.actor.CoordinatedShutdown
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.{KillSwitches, Materializer}
-import csw.messages.events._
-import csw.messages.params.formats.JsonSupport
-import csw.messages.params.generics.Parameter
-import csw.messages.params.models.Id
+import csw.params.events._
+import csw.params.core.formats.JsonSupport
+import csw.params.core.generics.Parameter
+import csw.params.core.models.Id
 import csw.services.event.api.scaladsl.SubscriptionModes.RateAdapterMode
 import csw.services.event.api.scaladsl.{EventService, EventSubscription}
 import csw.services.event.cli.args.Options

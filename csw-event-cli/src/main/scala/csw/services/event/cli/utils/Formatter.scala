@@ -1,8 +1,8 @@
 package csw.services.event.cli.utils
 
-import csw.messages.events.{Event, EventKey}
-import csw.messages.params.generics.KeyType.StringKey
-import csw.messages.params.generics.Parameter
+import csw.params.events.{Event, EventKey}
+import csw.params.core.generics.KeyType.StringKey
+import csw.params.core.generics.Parameter
 import csw.services.event.cli.args.Options
 
 object Formatter {

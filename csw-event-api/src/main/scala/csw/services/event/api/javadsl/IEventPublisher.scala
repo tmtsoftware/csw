@@ -7,18 +7,18 @@ import java.util.function.{Consumer, Supplier}
 import akka.Done
 import akka.actor.Cancellable
 import akka.stream.javadsl.Source
-import csw.messages.events.Event
+import csw.params.events.Event
 import csw.services.event.api.exceptions.PublishFailure
 
 /**
- * An EventPublisher interface to publish events. The published events are published on a key determined by [[csw.messages.events.EventKey]]
- * in the [[csw.messages.events.Event]] model. This key can be used by the subscribers using [[csw.services.event.api.javadsl.IEventSubscriber]]
+ * An EventPublisher interface to publish events. The published events are published on a key determined by [[csw.params.events.EventKey]]
+ * in the [[csw.params.events.Event]] model. This key can be used by the subscribers using [[csw.services.event.api.javadsl.IEventSubscriber]]
  * interface to subscribe to the events.
  */
 trait IEventPublisher {
 
   /**
-   * Publish a single [[csw.messages.events.Event]]
+   * Publish a single [[csw.params.events.Event]]
    *
    * At the time of invocation, in case the underlying server is not available, [[csw.services.event.api.exceptions.EventServerNotAvailable]] exception is thrown,
    * in all other cases [[csw.services.event.api.exceptions.PublishFailure]] exception is thrown which wraps the underlying exception and
@@ -30,7 +30,7 @@ trait IEventPublisher {
   def publish(event: Event): CompletableFuture[Done]
 
   /**
-   * Publish from a stream of [[csw.messages.events.Event]]
+   * Publish from a stream of [[csw.params.events.Event]]
    *
    * At the time of invocation, in case the underlying server is not available, [[csw.services.event.api.exceptions.EventServerNotAvailable]] exception is thrown and the stream is
    * stopped after logging appropriately. In all other cases of exception, the stream receives a [[csw.services.event.api.exceptions.PublishFailure]] exception
@@ -43,7 +43,7 @@ trait IEventPublisher {
   def publish[Mat](source: Source[Event, Mat]): Mat
 
   /**
-   * Publish from a stream of [[csw.messages.events.Event]], and perform an operation defined using `onError` consumer for each event
+   * Publish from a stream of [[csw.params.events.Event]], and perform an operation defined using `onError` consumer for each event
    * for which publishing failed
    *
    * At the time of invocation, in case the underlying server is not available, [[csw.services.event.api.exceptions.EventServerNotAvailable]] exception is thrown and the stream is
@@ -59,7 +59,7 @@ trait IEventPublisher {
   def publish[Mat](source: Source[Event, Mat], onError: Consumer[PublishFailure]): Mat
 
   /**
-   * Publish [[csw.messages.events.Event]] from an `eventGenerator` supplier, which will be executed at `every` frequency. `Cancellable` can be used to cancel
+   * Publish [[csw.params.events.Event]] from an `eventGenerator` supplier, which will be executed at `every` frequency. `Cancellable` can be used to cancel
    * the execution of `eventGenerator` function.
    *
    * At the time of invocation, in case the underlying server is not available, [[csw.services.event.api.exceptions.EventServerNotAvailable]] exception is thrown and the stream is
@@ -73,7 +73,7 @@ trait IEventPublisher {
   def publish(eventGenerator: Supplier[Event], every: Duration): Cancellable
 
   /**
-   * Publish [[csw.messages.events.Event]] from an `eventGenerator` supplier, which will be executed at `every` frequency. Also, provide `onError` consumer to
+   * Publish [[csw.params.events.Event]] from an `eventGenerator` supplier, which will be executed at `every` frequency. Also, provide `onError` consumer to
    * perform an operation for each event for which publishing failed.
    *
    * At the time of invocation, in case the underlying server is not available, [[csw.services.event.api.exceptions.EventServerNotAvailable]] exception is thrown and the stream is

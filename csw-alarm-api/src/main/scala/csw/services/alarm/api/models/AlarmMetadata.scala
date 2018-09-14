@@ -1,5 +1,5 @@
 package csw.services.alarm.api.models
-import csw.messages.params.models.Subsystem
+import csw.params.core.models.Subsystem
 import csw.services.alarm.api.models.ActivationStatus.Active
 import csw.services.alarm.api.models.AlarmSeverity.{Indeterminate, Okay}
 import csw.services.alarm.api.models.Key.AlarmKey

@@ -6,7 +6,7 @@ import akka.remote.testconductor.RoleName
 import akka.remote.testkit.MultiNodeConfig
 import akka.actor.testkit.typed.scaladsl
 import com.typesafe.config.ConfigFactory
-import csw.messages.params.models.Prefix
+import csw.params.core.models.Prefix
 import csw.services.event.perf.BasePerfSuite
 import csw.services.event.perf.commons.{EventsSetting, PerfPublisher, PerfSubscriber}
 import csw.services.event.perf.reporter._
