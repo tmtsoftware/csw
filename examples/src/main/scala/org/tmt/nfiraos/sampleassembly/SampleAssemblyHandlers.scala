@@ -8,11 +8,11 @@ import csw.command.messages.TopLevelActorMessage
 import csw.params.commands.CommandResponse.Accepted
 import csw.params.commands.{CommandName, CommandResponse, ControlCommand, Setup}
 import csw.params.events._
-import csw.services.location.api.models.{AkkaLocation, LocationRemoved, LocationUpdated, TrackingEvent}
+import csw.location.api.models.{AkkaLocation, LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.{ObsId, Prefix, Units}
 import csw.command.scaladsl.CommandService
-import csw.services.event.api.scaladsl.EventSubscription
+import csw.event.api.scaladsl.EventSubscription
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContextExecutor, Future}

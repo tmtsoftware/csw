@@ -5,9 +5,9 @@ import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.{ActorSystem, CoordinatedShutdown}
 import akka.stream.{ActorMaterializer, Materializer}
 import csw.services.BuildInfo
-import csw.services.location.commons.ClusterAwareSettings
-import csw.services.logging.internal.LoggingSystem
-import csw.services.logging.scaladsl.LoggingSystemFactory
+import csw.location.commons.ClusterAwareSettings
+import csw.logging.internal.LoggingSystem
+import csw.logging.scaladsl.LoggingSystemFactory
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 

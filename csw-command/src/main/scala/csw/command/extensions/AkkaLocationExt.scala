@@ -2,7 +2,7 @@ package csw.command.extensions
 
 import akka.actor.typed.ActorRef
 import csw.command.messages.{ComponentMessage, ContainerMessage}
-import csw.services.location.api.models.AkkaLocation
+import csw.location.api.models.AkkaLocation
 
 //TODO: Find a better way for Java Support
 object AkkaLocationExt {

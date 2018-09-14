@@ -2,7 +2,7 @@ package csw.framework.components.assembly
 
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors, MutableBehavior}
 import akka.actor.typed.{ActorRef, Behavior}
-import csw.services.config.api.models.ConfigData
+import csw.config.api.models.ConfigData
 
 trait WorkerActorMsg
 object WorkerActorMsgs {

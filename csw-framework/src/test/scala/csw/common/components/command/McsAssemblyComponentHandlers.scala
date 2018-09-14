@@ -9,7 +9,7 @@ import csw.framework.scaladsl.ComponentHandlers
 import csw.command.messages.TopLevelActorMessage
 import csw.params.commands.CommandResponse.{Accepted, Completed, Invalid}
 import csw.params.commands.{CommandIssue, CommandResponse, ControlCommand, Setup}
-import csw.services.location.api.models.{AkkaLocation, TrackingEvent}
+import csw.location.api.models.{AkkaLocation, TrackingEvent}
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
 import csw.command.scaladsl.CommandService

@@ -7,16 +7,16 @@ import akka.actor.{typed, ActorSystem}
 import com.typesafe.config.Config
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.command.models.framework.{ContainerLifecycleState, SupervisorLifecycleState}
-import csw.services.location.api.models.Connection.AkkaConnection
-import csw.services.location.api.models.{AkkaLocation, ComponentId, ComponentType}
+import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.command.messages.ComponentCommonMessage.GetSupervisorLifecycleState
 import csw.command.messages.{ComponentMessage, ContainerMessage}
 import csw.command.messages.ContainerCommonMessage.GetContainerLifecycleState
 import csw.command.messages.ContainerMessage
 import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.scaladsl.CommandService
-import csw.services.location.commons.BlockingUtils
-import csw.services.location.scaladsl.LocationServiceFactory
+import csw.location.commons.BlockingUtils
+import csw.location.scaladsl.LocationServiceFactory
 
 import scala.concurrent.Await
 import scala.concurrent.duration.{Duration, DurationDouble}

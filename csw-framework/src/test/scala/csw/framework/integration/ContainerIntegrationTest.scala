@@ -16,13 +16,13 @@ import csw.command.models.framework
 import csw.command.models.framework.PubSub.Subscribe
 import csw.command.models.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.command.models.framework.{Components, ContainerLifecycleState, LifecycleStateChanged, SupervisorLifecycleState}
-import csw.services.location.api.models.ComponentType.{Assembly, HCD}
-import csw.services.location.api.models.Connection.AkkaConnection
-import csw.services.location.api.models.{ComponentId, ComponentType, LocationRemoved, TrackingEvent}
+import csw.location.api.models.ComponentType.{Assembly, HCD}
+import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.{ComponentId, ComponentType, LocationRemoved, TrackingEvent}
 import csw.params.core.states.{CurrentState, StateName}
 import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.scaladsl.CommandService
-import csw.services.event.helpers.TestFutureExt.RichFuture
+import csw.event.helpers.TestFutureExt.RichFuture
 import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}

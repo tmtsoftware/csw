@@ -12,7 +12,7 @@ import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
 import csw.command.models.matchers.StateMatcher
 import csw.params.commands.{CommandResponse, ControlCommand}
-import csw.services.location.api.models.AkkaLocation
+import csw.location.api.models.AkkaLocation
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
 import csw.command.scaladsl.{CommandService, CurrentStateSubscription}
@@ -145,7 +145,7 @@ class JCommandService(akkaLocation: AkkaLocation, actorSystem: ActorSystem[_]) {
     sCommandService.submitAllAndGetFinalResponse(controlCommands.asScala.toSet)(timeout).toJava.toCompletableFuture
 
   /**
-   * Subscribe to the current state of a component corresponding to the [[csw.services.location.api.models.AkkaLocation]] of the component
+   * Subscribe to the current state of a component corresponding to the [[csw.location.api.models.AkkaLocation]] of the component
    *
    * @param callback the action to be applied on the CurrentState element received as a result of subscription
    * @return a CurrentStateSubscription to stop the subscription
@@ -154,7 +154,7 @@ class JCommandService(akkaLocation: AkkaLocation, actorSystem: ActorSystem[_]) {
     sCommandService.subscribeCurrentState(callback.asScala)
 
   /**
-   * Subscribe to the current state of a component corresponding to the [[csw.services.location.api.models.AkkaLocation]] of the component
+   * Subscribe to the current state of a component corresponding to the [[csw.location.api.models.AkkaLocation]] of the component
    *
    * @param names subscribe to only those states which have any of the the provided value for name
    * @param callback the action to be applied on the CurrentState element received as a result of subscription

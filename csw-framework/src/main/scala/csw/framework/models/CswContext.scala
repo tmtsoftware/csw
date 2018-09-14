@@ -4,17 +4,17 @@ import csw.framework.CurrentStatePublisher
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.internal.wiring.CswFrameworkSystem
 import csw.command.models.framework.ComponentInfo
-import csw.services.location.api.scaladsl.LocationService
+import csw.location.api.scaladsl.LocationService
 import csw.params.core.states.CurrentState
-import csw.services.alarm.api.scaladsl.AlarmService
-import csw.services.alarm.client.AlarmServiceFactory
+import csw.alarm.api.scaladsl.AlarmService
+import csw.alarm.client.AlarmServiceFactory
 import csw.command.CommandResponseManager
 import csw.command.internal.CommandResponseManagerFactory
-import csw.services.config.api.scaladsl.ConfigClientService
-import csw.services.config.client.scaladsl.ConfigClientFactory
-import csw.services.event.EventServiceFactory
-import csw.services.event.api.scaladsl.EventService
-import csw.services.logging.scaladsl.LoggerFactory
+import csw.config.api.scaladsl.ConfigClientService
+import csw.config.client.scaladsl.ConfigClientFactory
+import csw.event.EventServiceFactory
+import csw.event.api.scaladsl.EventService
+import csw.logging.scaladsl.LoggerFactory
 
 import scala.async.Async.{async, await}
 import scala.concurrent.{ExecutionContextExecutor, Future}

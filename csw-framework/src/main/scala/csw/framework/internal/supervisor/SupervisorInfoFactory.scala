@@ -6,12 +6,12 @@ import csw.command.messages.ContainerIdleMessage
 import csw.framework.internal.wiring.CswFrameworkSystem
 import csw.framework.models.CswContext
 import csw.command.models.framework.{Component, ComponentInfo, SupervisorInfo}
-import csw.services.location.api.scaladsl.LocationService
-import csw.services.alarm.client.AlarmServiceFactory
-import csw.services.event.EventServiceFactory
-import csw.services.location.commons.ActorSystemFactory
-import csw.services.location.scaladsl.RegistrationFactory
-import csw.services.logging.scaladsl.{Logger, LoggerFactory}
+import csw.location.api.scaladsl.LocationService
+import csw.alarm.client.AlarmServiceFactory
+import csw.event.EventServiceFactory
+import csw.location.commons.ActorSystemFactory
+import csw.location.scaladsl.RegistrationFactory
+import csw.logging.scaladsl.{Logger, LoggerFactory}
 
 import scala.async.Async._
 import scala.concurrent.{ExecutionContextExecutor, Future}

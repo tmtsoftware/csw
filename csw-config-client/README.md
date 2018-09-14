@@ -7,6 +7,6 @@ Configuration Client can be used by any component to interact with configuration
 
 If you want to get started with configuration service, refer the [examples](https://tmtsoftware.github.io/csw-prod/services/config.html).
 
-You can refer to Scala documentation [here](https://tmtsoftware.github.io/csw-prod/api/scala/csw/services/config/client/index.html).
+You can refer to Scala documentation [here](https://tmtsoftware.github.io/csw-prod/api/scala/csw/config/client/index.html).
 
 You can refer to Java documentation [here](https://tmtsoftware.github.io/csw-prod/api/java/?/index.html).

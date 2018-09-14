@@ -21,8 +21,8 @@ import csw.params.commands.Setup;
 import csw.command.models.matchers.*;
 import csw.command.models.framework.LockingResponse;
 import csw.command.models.framework.LockingResponses;
-import csw.services.location.api.models.AkkaLocation;
-import csw.services.location.api.models.ComponentId;
+import csw.location.api.models.AkkaLocation;
+import csw.location.api.models.ComponentId;
 import csw.params.javadsl.JKeyType;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
@@ -33,10 +33,10 @@ import csw.command.extensions.AkkaLocationExt;
 import csw.command.javadsl.JCommandDistributor;
 import csw.command.javadsl.JCommandService;
 import csw.command.scaladsl.CurrentStateSubscription;
-import csw.services.location.commons.ClusterAwareSettings;
-import csw.services.location.api.javadsl.ILocationService;
-import csw.services.location.javadsl.JLocationServiceFactory;
-import csw.services.logging.javadsl.JLoggingSystemFactory;
+import csw.location.commons.ClusterAwareSettings;
+import csw.location.api.javadsl.ILocationService;
+import csw.location.javadsl.JLocationServiceFactory;
+import csw.logging.javadsl.JLoggingSystemFactory;
 import io.lettuce.core.RedisClient;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -53,8 +53,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import static csw.common.components.command.ComponentStateForCommand.*;
-import static csw.services.location.api.models.Connection.AkkaConnection;
-import static csw.services.location.javadsl.JComponentType.HCD;
+import static csw.location.api.models.Connection.AkkaConnection;
+import static csw.location.javadsl.JComponentType.HCD;
 
 // DEOPSCSW-217: Execute RPC like commands
 // DEOPSCSW-224: Inter component command sending

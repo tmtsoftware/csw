@@ -10,10 +10,10 @@ import csw.framework.scaladsl.ComponentHandlers
 import csw.command.messages.TopLevelActorMessage
 import csw.params.commands.CommandResponse.Accepted
 import csw.params.commands._
-import csw.services.location.api.models._
+import csw.location.api.models._
 import csw.command.scaladsl.CommandService
-import csw.services.config.api.models.ConfigData
-import csw.services.logging.scaladsl.Logger
+import csw.config.api.models.ConfigData
+import csw.logging.scaladsl.Logger
 
 import scala.async.Async._
 import scala.concurrent.duration.DurationDouble

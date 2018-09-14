@@ -18,14 +18,14 @@ import csw.params.commands.CommandResponse.{Accepted, Completed, Error}
 import csw.params.commands.{CommandResponse, ControlCommand}
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
-import csw.services.location.api.models.AkkaLocation
+import csw.location.api.models.AkkaLocation
 
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
  * A Command Service API of a csw component. This model provides method based APIs for command interactions with a component.
  *
- * @param componentLocation [[csw.services.location.api.models.AkkaLocation]] of the component
+ * @param componentLocation [[csw.location.api.models.AkkaLocation]] of the component
  */
 class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: ActorSystem[_]) {
 
@@ -164,7 +164,7 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
   }
 
   /**
-   * Subscribe to the current state of a component corresponding to the [[csw.services.location.api.models.AkkaLocation]] of the component
+   * Subscribe to the current state of a component corresponding to the [[csw.location.api.models.AkkaLocation]] of the component
    *
    * @param callback the action to be applied on the CurrentState element received as a result of subscription
    * @return a CurrentStateSubscription to stop the subscription
@@ -173,7 +173,7 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
     new CurrentStateSubscription(component, None, callback)
 
   /**
-   * Subscribe to the current state of a component corresponding to the [[csw.services.location.api.models.AkkaLocation]] of the component
+   * Subscribe to the current state of a component corresponding to the [[csw.location.api.models.AkkaLocation]] of the component
    *
    * @param names subscribe to only those states which have any of the the provided value for name
    * @param callback the action to be applied on the CurrentState element received as a result of subscription

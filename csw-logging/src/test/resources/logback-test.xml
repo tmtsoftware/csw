@@ -1,6 +1,6 @@
 <configuration scan="false">
 
-    <appender name="svc_appender" class="csw.services.logging.compat.Slf4jAppender">
+    <appender name="svc_appender" class="csw.logging.compat.Slf4jAppender">
     </appender>
 
     <root level="${SLF4J_LEVEL:-TRACE}">

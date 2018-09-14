@@ -61,14 +61,14 @@ The library provides `StdOutAppender` as default logging appender. To use `FileA
  
 ```
 
-appenders = ["csw.services.logging.appenders.FileAppender$", "csw.services.logging.appenders.StdOutAppender$"]
+appenders = ["csw.logging.appenders.FileAppender$", "csw.logging.appenders.StdOutAppender$"]
 
 ```
 
 @@@ note
 
 Make sure to provide full path of the appender since it will be spawned using java reflection. In csw code base, a working example of custom appender can be found at:
-@github[Custom Appender](/csw-logging/src/test/scala/csw/services/logging/appenders/CustomAppenderTest.scala)
+@github[Custom Appender](/csw-logging/src/test/scala/csw/logging/appenders/CustomAppenderTest.scala)
 
 @@@
 
@@ -86,7 +86,7 @@ pretty=true
      "@version":"0.1",
      "actor":
        "akka.tcp://csw-examples-locationServiceClient@10.131.23.195:53618/user/$a",
-     "class":"csw.services.location.LocationServiceExampleClient",
+     "class":"csw.location.LocationServiceExampleClient",
      "file":"LocationServiceExampleClientApp.scala",
      "line":149,
      "message":"Result of the find call: None",
@@ -98,7 +98,7 @@ pretty=true
 pretty=false
 :   @@@vars
     ```
-    {"@componentName":"my-component-name","@host":"INsaloni.local","@name":"LocationServiceExampleClient","@severity":"INFO","@version":"0.1","actor":"akka.tcp://csw-examples-locationServiceClient@10.131.23.195:53618/user/$a","class":"csw.services.location.LocationServiceExampleClient","file":"LocationServiceExampleClientApp.scala","line":149,"message":"Result of the find call: None","timestamp":"2017-11-24T04:16:42.108Z"}
+    {"@componentName":"my-component-name","@host":"INsaloni.local","@name":"LocationServiceExampleClient","@severity":"INFO","@version":"0.1","actor":"akka.tcp://csw-examples-locationServiceClient@10.131.23.195:53618/user/$a","class":"csw.location.LocationServiceExampleClient","file":"LocationServiceExampleClientApp.scala","line":149,"message":"Result of the find call: None","timestamp":"2017-11-24T04:16:42.108Z"}
     ```
     @@@
     
@@ -221,13 +221,13 @@ Logging statements are used very much like existing logging services such as log
 A basic info statement can be written as follows:
 
 Scala
-:   @@snip [LocationServiceExampleClientApp](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #log-info }
+:   @@snip [LocationServiceExampleClientApp](../../../../examples/src/main/scala/csw/location/LocationServiceExampleClientApp.scala) { #log-info }
 
 Java
-:   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #log-info }
+:   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/java/csw/location/JLocationServiceExampleClient.java) { #log-info }
 
 Java (Supplier)
-:   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #log-info-supplier }
+:   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/java/csw/location/JLocationServiceExampleClient.java) { #log-info-supplier }
 
 The output of log statement will be:
 
@@ -241,7 +241,7 @@ Scala
  "@version":"0.1",
  "actor":
    "akka.tcp://csw-examples-locationServiceClient@10.131.23.195:53618/user/$a",
- "class":"csw.services.location.LocationServiceExampleClient",
+ "class":"csw.location.LocationServiceExampleClient",
  "file":"LocationServiceExampleClientApp.scala",
  "line":149,
  "message":"Result of the find call: None",
@@ -260,7 +260,7 @@ Java
  "@version":"0.1",
  "actor":
    "akka.tcp://csw-examples-locationServiceClient@10.131.23.195:53625/user/LocationServiceExampleClient",
- "class":"csw.services.location.JLocationServiceExampleClient",
+ "class":"csw.location.JLocationServiceExampleClient",
  "message":"Result of the find call : None",
  "timestamp":"2017-11-30T11:02:54.691Z"
 }
@@ -276,7 +276,7 @@ Java (Supplier)
  "@severity":"INFO",
  "actor":
    "akka.tcp://csw-examples-locationServiceClient@10.131.23.195:53625/user/LocationServiceExampleClient",
- "class":"csw.services.location.JLocationServiceExampleClient",
+ "class":"csw.location.JLocationServiceExampleClient",
  "message":
    "Resolve result: LocationServiceExampleComponent-assembly-akka, component type=Assembly, connection type=AkkaType",
  "timestamp":"2017-07-26T19:44:58.636Z"
@@ -287,13 +287,13 @@ Java (Supplier)
 The library allows usage of `Map` in message as follows:
 
 Scala
- :   @@snip [LocationServiceExampleClientApp](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #log-info-map }
+ :   @@snip [LocationServiceExampleClientApp](../../../../examples/src/main/scala/csw/location/LocationServiceExampleClientApp.scala) { #log-info-map }
  
 Java
- :   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #log-info-map }
+ :   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/java/csw/location/JLocationServiceExampleClient.java) { #log-info-map }
 
 Java (Supplier)
- :   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #log-info-map-supplier }
+ :   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/java/csw/location/JLocationServiceExampleClient.java) { #log-info-map-supplier }
 
 The output of log statement will be: 
 
@@ -307,7 +307,7 @@ Scala
  "@version":"0.1",
  "actor":
    "akka.tcp://csw-examples-locationServiceClient@10.131.23.195:53618/user/$a",
- "class":"csw.services.location.LocationServiceExampleClient",
+ "class":"csw.location.LocationServiceExampleClient",
  "exampleConnection":"LocationServiceExampleComponent-assembly-akka",
  "file":"LocationServiceExampleClientApp.scala",
  "line":143,
@@ -329,7 +329,7 @@ Java
  "@version":"0.1",
  "actor":
    "akka.tcp://csw-examples-locationServiceClient@10.131.23.195:53625/user/LocationServiceExampleClient",
- "class":"csw.services.location.JLocationServiceExampleClient",
+ "class":"csw.location.JLocationServiceExampleClient",
  "exampleConnection":"LocationServiceExampleComponent-assembly-akka",
  "message":
    "Attempting to find AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly))",
@@ -349,7 +349,7 @@ Java (Supplier)
  "@version":"0.1",
  "actor":
    "akka.tcp://csw-examples-locationServiceClient@10.131.23.195:53625/user/LocationServiceExampleClient",
- "class":"csw.services.location.JLocationServiceExampleClient",
+ "class":"csw.location.JLocationServiceExampleClient",
  "exampleConnection":"LocationServiceExampleComponent-assembly-akka",
  "message":
    "Attempting to resolve AkkaConnection(ComponentId(LocationServiceExampleComponent,Assembly)) with a wait of 30 seconds...",
@@ -363,13 +363,13 @@ Java (Supplier)
 The library allows you to log an error with its full stacktrace as follows:
  
 Scala
-  :   @@snip [LocationServiceExampleClientApp](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #log-error }
+  :   @@snip [LocationServiceExampleClientApp](../../../../examples/src/main/scala/csw/location/LocationServiceExampleClientApp.scala) { #log-error }
  
 Java
- :   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #log-info-error }
+ :   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/java/csw/location/JLocationServiceExampleClient.java) { #log-info-error }
  
 Java (Supplier)
- :   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #log-info-error-supplier }
+ :   @@snip [JLocationServiceExampleClient](../../../../examples/src/main/java/csw/location/JLocationServiceExampleClient.java) { #log-info-error-supplier }
  
 
 ## Create LoggerFactory
@@ -400,10 +400,10 @@ For logging statements to appear in the program, start `LoggingSystem` at an ear
 the folder and dump all logging files.
 
 Scala
-:   @@snip [LocationServiceExampleClientApp](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #create-logging-system }
+:   @@snip [LocationServiceExampleClientApp](../../../../examples/src/main/scala/csw/location/LocationServiceExampleClientApp.scala) { #create-logging-system }
 
 Java
-:   @@snip [JLocationServiceExampleClientApp](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #create-logging-system }
+:   @@snip [JLocationServiceExampleClientApp](../../../../examples/src/main/java/csw/location/JLocationServiceExampleClient.java) { #create-logging-system }
 
 @@@ note
 
@@ -421,15 +421,15 @@ This functionality is included in the framework code and users should not have t
 Please ensure to stop `LoggingSystem` before application exits.
 
 Scala
-:   @@snip [LocationServiceExampleClientApp](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #stop-logging-system }
+:   @@snip [LocationServiceExampleClientApp](../../../../examples/src/main/scala/csw/location/LocationServiceExampleClientApp.scala) { #stop-logging-system }
 
 Java
-:   @@snip [JLocationServiceExampleClientApp](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #stop-logging-system }
+:   @@snip [JLocationServiceExampleClientApp](../../../../examples/src/main/java/csw/location/JLocationServiceExampleClient.java) { #stop-logging-system }
  
 ## Source code for examples
 
-* @github[Scala Example](/examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala)
-* @github[Java Example](/examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java)
+* @github[Scala Example](/examples/src/main/scala/csw/location/LocationServiceExampleClientApp.scala)
+* @github[Java Example](/examples/src/main/java/csw/location/JLocationServiceExampleClient.java)
   
 
 ## Performance
@@ -480,8 +480,8 @@ Below graph depicts the throughput of Java's logging API (String and Supplier) a
 
 ![Java Scala Throughput Comparision](../images/logging-perf/java-scala-logging-throughput-comparision.png)
 
-This graph is produced based on the result generated by [JE2ELoggingBenchmark](https://github.com/tmtsoftware/csw-prod/blob/master/csw-benchmark/src/main/java/csw/services/logging/perf/jmh/JE2ELoggingBenchmark.java) and 
-[E2ELoggingBenchmark](https://github.com/tmtsoftware/csw-prod/blob/master/csw-benchmark/src/main/scala/csw/services/logging/perf/jmh/E2ELoggingBenchmark.scala)
+This graph is produced based on the result generated by [JE2ELoggingBenchmark](https://github.com/tmtsoftware/csw-prod/blob/master/csw-benchmark/src/main/java/csw/logging/perf/jmh/JE2ELoggingBenchmark.java) and 
+[E2ELoggingBenchmark](https://github.com/tmtsoftware/csw-prod/blob/master/csw-benchmark/src/main/scala/csw/logging/perf/jmh/E2ELoggingBenchmark.scala)
 
 @@@ note
 

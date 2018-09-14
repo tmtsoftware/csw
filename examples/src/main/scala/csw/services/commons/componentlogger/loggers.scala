@@ -2,8 +2,8 @@ package csw.services.commons.componentlogger
 
 import akka.actor.typed.scaladsl.ActorContext
 import csw.command.messages.ComponentMessage
-import csw.services.logging.javadsl.JLoggerFactory
-import csw.services.logging.scaladsl.{Logger, LoggerFactory}
+import csw.logging.javadsl.JLoggerFactory
+import csw.logging.scaladsl.{Logger, LoggerFactory}
 
 //#component-logger-class
 class SampleClass(loggerFactory: LoggerFactory) {

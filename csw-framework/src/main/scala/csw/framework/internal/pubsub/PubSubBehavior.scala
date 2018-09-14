@@ -6,7 +6,7 @@ import csw.params.commands.Nameable
 import csw.command.models.framework.PubSub
 import csw.command.models.framework.PubSub._
 import csw.params.core.states.StateName
-import csw.services.logging.scaladsl.{Logger, LoggerFactory}
+import csw.logging.scaladsl.{Logger, LoggerFactory}
 
 /**
  * The actor which can be used by a component to publish its data of a given type, to all the components who subscribe

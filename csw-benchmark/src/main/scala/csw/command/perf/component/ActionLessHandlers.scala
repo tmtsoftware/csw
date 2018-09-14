@@ -6,9 +6,9 @@ import csw.framework.scaladsl.ComponentHandlers
 import csw.command.messages.TopLevelActorMessage
 import csw.params.commands.CommandResponse.Completed
 import csw.params.commands._
-import csw.services.location.api.models.TrackingEvent
+import csw.location.api.models.TrackingEvent
 import csw.params.core.models.Id
-import csw.services.logging.scaladsl.Logger
+import csw.logging.scaladsl.Logger
 
 import scala.concurrent.Future
 

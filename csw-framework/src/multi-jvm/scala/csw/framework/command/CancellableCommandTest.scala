@@ -16,9 +16,9 @@ import csw.params.commands.CommandResponse.{Accepted, Cancelled, Completed}
 import csw.params.commands.{CommandResponse, Setup}
 import csw.params.core.generics.KeyType
 import csw.params.core.models.ObsId
-import csw.services.location.api.models.Connection.AkkaConnection
-import csw.services.location.api.models.{ComponentId, ComponentType}
-import csw.services.location.helpers.{LSNodeSpec, OneMemberAndSeed}
+import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.{ComponentId, ComponentType}
+import csw.location.helpers.{LSNodeSpec, OneMemberAndSeed}
 import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar
 

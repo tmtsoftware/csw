@@ -29,9 +29,9 @@ import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.ObsId
 import csw.params.core.states.{CurrentState, StateName}
 import csw.command.messages.{ComponentMessage, ContainerIdleMessage, TopLevelActorMessage}
-import csw.services.logging.internal.LoggingLevels.ERROR
-import csw.services.logging.internal.LoggingSystem
-import csw.services.logging.scaladsl.LoggerFactory
+import csw.logging.internal.LoggingLevels.ERROR
+import csw.logging.internal.LoggingSystem
+import csw.logging.scaladsl.LoggerFactory
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.mockito.stubbing.Answer

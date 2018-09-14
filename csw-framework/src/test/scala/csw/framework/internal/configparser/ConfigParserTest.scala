@@ -6,8 +6,8 @@ import csw.framework.models.ContainerMode.{Container, Standalone}
 import csw.command.models.framework.LocationServiceUsage.{DoNotRegister, RegisterOnly}
 import csw.framework.models.{ContainerBootstrapInfo, ContainerInfo, HostBootstrapInfo}
 import csw.command.models.framework.ComponentInfo
-import csw.services.location.api.models.Connection
-import csw.services.location.api.models.ComponentType.{Assembly, HCD}
+import csw.location.api.models.Connection
+import csw.location.api.models.ComponentType.{Assembly, HCD}
 import csw.params.core.models.Prefix
 import org.scalatest.{FunSuite, Matchers}
 

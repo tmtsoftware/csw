@@ -7,11 +7,11 @@ import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{ComponentInfos, CurrentStatePublisher, FrameworkTestSuite}
 import csw.command.messages.FromComponentLifecycleMessage.Running
 import csw.command.messages.TopLevelActorIdleMessage.Initialize
-import csw.services.location.api.scaladsl.LocationService
+import csw.location.api.scaladsl.LocationService
 import csw.command.messages.{CommandResponseManagerMessage, FromComponentLifecycleMessage, TopLevelActorMessage}
-import csw.services.alarm.api.scaladsl.AlarmService
+import csw.alarm.api.scaladsl.AlarmService
 import csw.command.CommandResponseManager
-import csw.services.event.api.scaladsl.EventService
+import csw.event.api.scaladsl.EventService
 import org.mockito.Mockito._
 import org.scalatest.Matchers
 import org.scalatest.mockito.MockitoSugar

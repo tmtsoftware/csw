@@ -1,8 +1,8 @@
 package csw.common.utils
 
 import akka.actor.ActorRefFactory
-import csw.services.logging.RichMsg
-import csw.services.logging.appenders.{LogAppenderBuilder, StdOutAppender}
+import csw.logging.RichMsg
+import csw.logging.appenders.{LogAppenderBuilder, StdOutAppender}
 
 class TestAppender(callback: Any ⇒ Unit) extends LogAppenderBuilder {
 

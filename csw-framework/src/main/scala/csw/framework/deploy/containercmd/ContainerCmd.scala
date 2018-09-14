@@ -10,8 +10,8 @@ import csw.framework.commons.CoordinatedShutdownReasons.FailureReason
 import csw.framework.deploy.containercmd.cli.{ArgsParser, Options}
 import csw.framework.exceptions.{ClusterSeedsNotFound, UnableToParseOptions}
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
-import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
-import csw.services.logging.scaladsl.{Logger, LoggerFactory}
+import csw.location.commons.{ClusterAwareSettings, ClusterSettings}
+import csw.logging.scaladsl.{Logger, LoggerFactory}
 
 import scala.async.Async.{async, await}
 import scala.concurrent.duration.DurationDouble

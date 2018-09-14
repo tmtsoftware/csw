@@ -1,13 +1,13 @@
-package csw.services.logging.perf.jmh
+package csw.logging.perf.jmh
 
 import java.net.InetAddress
 import java.util.concurrent.TimeUnit
 
 import akka.actor.ActorSystem
-import csw.services.logging.appenders.FileAppender
-import csw.services.logging.internal.LoggingLevels.INFO
-import csw.services.logging.internal.{LoggerImpl, LoggingSystem}
-import csw.services.logging.scaladsl.Logger
+import csw.logging.appenders.FileAppender
+import csw.logging.internal.LoggingLevels.INFO
+import csw.logging.internal.{LoggerImpl, LoggingSystem}
+import csw.logging.scaladsl.Logger
 import org.openjdk.jmh.annotations._
 
 import scala.concurrent.Await

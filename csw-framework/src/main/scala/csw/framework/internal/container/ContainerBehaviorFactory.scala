@@ -5,11 +5,11 @@ import akka.actor.typed.scaladsl.Behaviors
 import csw.command.messages.ContainerActorMessage
 import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.framework.models.ContainerInfo
-import csw.services.location.api.scaladsl.LocationService
-import csw.services.alarm.client.AlarmServiceFactory
-import csw.services.event.EventServiceFactory
-import csw.services.location.scaladsl.RegistrationFactory
-import csw.services.logging.scaladsl.LoggerFactory
+import csw.location.api.scaladsl.LocationService
+import csw.alarm.client.AlarmServiceFactory
+import csw.event.EventServiceFactory
+import csw.location.scaladsl.RegistrationFactory
+import csw.logging.scaladsl.LoggerFactory
 
 /**
  * Factory for creating [[akka.actor.typed.scaladsl.MutableBehavior]] of a container component

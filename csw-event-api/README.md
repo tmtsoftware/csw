@@ -6,6 +6,6 @@ Event Service API describes the capabilities provided by event service to publis
 
 If you want to get started with Event Service, refer the [examples](https://tmtsoftware.github.io/csw-prod/services/event.html).
 
-You can refer to Scala documentation [here](https://tmtsoftware.github.io/csw-prod/api/scala/csw/services/event/api/index.html).
+You can refer to Scala documentation [here](https://tmtsoftware.github.io/csw-prod/api/scala/csw/event/api/index.html).
 
 You can refer to Java documentation [here](https://tmtsoftware.github.io/csw-prod/api/java/?/index.html).

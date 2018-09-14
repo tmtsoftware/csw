@@ -4,7 +4,7 @@ import csw.framework.javadsl.JComponentInfo;
 import csw.command.models.framework.ComponentInfo;
 import csw.command.models.framework.LocationServiceUsage;
 import csw.params.core.models.Prefix;
-import csw.services.location.javadsl.JComponentType;
+import csw.location.javadsl.JComponentType;
 
 import java.time.Duration;
 import java.util.Collections;

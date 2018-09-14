@@ -1,12 +1,12 @@
 package csw.framework.models
 import csw.framework.CurrentStatePublisher
 import csw.command.models.framework.ComponentInfo
-import csw.services.alarm.api.javadsl.IAlarmService
+import csw.alarm.api.javadsl.IAlarmService
 import csw.command.CommandResponseManager
-import csw.services.config.api.javadsl.IConfigClientService
-import csw.services.event.api.javadsl.IEventService
-import csw.services.location.api.javadsl.ILocationService
-import csw.services.logging.javadsl.JLoggerFactory
+import csw.config.api.javadsl.IConfigClientService
+import csw.event.api.javadsl.IEventService
+import csw.location.api.javadsl.ILocationService
+import csw.logging.javadsl.JLoggerFactory
 
 /**
  * Bundles all the services provided by csw, supporting java api

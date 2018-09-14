@@ -16,7 +16,7 @@ import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.params.commands.CommandResponse
 import csw.params.commands.CommandResponse.Accepted
-import csw.services.logging.scaladsl.Logger
+import csw.logging.scaladsl.Logger
 
 import scala.async.Async.{async, await}
 import scala.concurrent.Await

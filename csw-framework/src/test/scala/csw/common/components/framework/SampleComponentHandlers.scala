@@ -8,11 +8,11 @@ import csw.params.commands.CommandIssue.OtherIssue
 import csw.params.commands.CommandResponse.{Accepted, Completed, Invalid}
 import csw.params.commands._
 import csw.params.events.{Event, EventName, SystemEvent}
-import csw.services.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
-import csw.services.location.api.models.{LocationRemoved, LocationUpdated, TrackingEvent}
+import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.location.api.models.{LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.params.core.models.Prefix
 import csw.params.core.states.{CurrentState, StateName}
-import csw.services.logging.scaladsl.Logger
+import csw.logging.scaladsl.Logger
 
 import scala.concurrent.{ExecutionContext, Future}
 

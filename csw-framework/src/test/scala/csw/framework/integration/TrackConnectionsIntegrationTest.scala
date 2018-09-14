@@ -13,16 +13,16 @@ import csw.command.messages.SupervisorContainerCommonMessages.Shutdown
 import csw.params.commands
 import csw.params.commands.CommandName
 import csw.command.models.framework.{ContainerLifecycleState, SupervisorLifecycleState}
-import csw.services.location.api.models.ComponentId
-import csw.services.location.api.models.ComponentType.{Assembly, HCD}
-import csw.services.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.ComponentId
+import csw.location.api.models.ComponentType.{Assembly, HCD}
+import csw.location.api.models.Connection.AkkaConnection
 import csw.params.core.states.{CurrentState, StateName}
 import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.scaladsl.CommandService
-import csw.services.event.helpers.TestFutureExt.RichFuture
-import csw.services.location.commons.ClusterSettings
-import csw.services.location.api.models.{HttpRegistration, TcpRegistration}
-import csw.services.logging.commons.LogAdminActorFactory
+import csw.event.helpers.TestFutureExt.RichFuture
+import csw.location.commons.ClusterSettings
+import csw.location.api.models.{HttpRegistration, TcpRegistration}
+import csw.logging.commons.LogAdminActorFactory
 import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers, OptionValues}

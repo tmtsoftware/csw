@@ -10,8 +10,8 @@ import csw.command.models.matchers.DemandMatcher
 import csw.command.models.framework.PubSub.Subscribe
 import csw.command.models.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.command.models.framework.{ComponentInfo, LifecycleStateChanged, SupervisorLifecycleState}
-import csw.services.location.api.models.ComponentType.{Assembly, HCD}
-import csw.services.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.ComponentType.{Assembly, HCD}
+import csw.location.api.models.Connection.AkkaConnection
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.ObsId
 import csw.params.core.states.{CurrentState, DemandState, StateName}

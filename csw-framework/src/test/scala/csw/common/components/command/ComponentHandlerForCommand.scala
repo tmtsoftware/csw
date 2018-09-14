@@ -12,7 +12,7 @@ import csw.command.messages.TopLevelActorMessage
 import csw.params.commands.CommandIssue.{OtherIssue, WrongPrefixIssue}
 import csw.params.commands.CommandResponse._
 import csw.params.commands._
-import csw.services.location.api.models._
+import csw.location.api.models._
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}

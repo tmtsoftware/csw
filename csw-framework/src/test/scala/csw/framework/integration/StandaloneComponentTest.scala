@@ -16,15 +16,15 @@ import csw.framework.internal.component.ComponentBehavior
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.command.messages.SupervisorContainerCommonMessages.Shutdown
 import csw.command.models.framework.SupervisorLifecycleState
-import csw.services.location.api.models.ComponentType.HCD
-import csw.services.location.api.models.Connection.AkkaConnection
-import csw.services.location.api.models.{ComponentId, LocationRemoved, LocationUpdated, TrackingEvent}
+import csw.location.api.models.ComponentType.HCD
+import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.{ComponentId, LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.params.core.states.{CurrentState, StateName}
 import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.scaladsl.CommandService
-import csw.services.event.helpers.TestFutureExt.RichFuture
-import csw.services.logging.internal.LoggingLevels.INFO
-import csw.services.logging.internal.LoggingSystem
+import csw.event.helpers.TestFutureExt.RichFuture
+import csw.logging.internal.LoggingLevels.INFO
+import csw.logging.internal.LoggingSystem
 import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}

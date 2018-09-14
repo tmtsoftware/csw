@@ -15,9 +15,9 @@ import csw.framework.scaladsl.ComponentHandlers
 import csw.command.messages.TopLevelActorMessage
 import csw.params.commands.CommandResponse.Accepted
 import csw.params.commands.{CommandResponse, ControlCommand, Observe, Setup}
-import csw.services.location.api.models.{LocationRemoved, LocationUpdated, TrackingEvent}
-import csw.services.config.api.models.ConfigData
-import csw.services.logging.scaladsl.Logger
+import csw.location.api.models.{LocationRemoved, LocationUpdated, TrackingEvent}
+import csw.config.api.models.ConfigData
+import csw.logging.scaladsl.Logger
 
 import scala.async.Async.{async, await}
 import scala.concurrent.duration.DurationLong

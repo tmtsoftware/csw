@@ -12,12 +12,12 @@ import csw.common.components.command.ComponentStateForCommand._
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.params.commands.CommandResponse.{Accepted, Completed, Invalid}
 import csw.params.commands.{CommandResponse, Setup}
-import csw.services.location.api.models.Connection.AkkaConnection
-import csw.services.location.api.models.{AkkaLocation, ComponentId, ComponentType}
+import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.params.core.models.ObsId
 import csw.params.core.states.{CurrentState, StateName}
 import csw.command.scaladsl.{CommandDistributor, CommandService}
-import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
+import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import io.lettuce.core.RedisClient
 import org.scalatest.concurrent.{PatienceConfiguration, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar

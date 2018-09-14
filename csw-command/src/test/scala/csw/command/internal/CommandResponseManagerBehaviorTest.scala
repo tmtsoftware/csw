@@ -12,7 +12,7 @@ import csw.command.models.{CommandCorrelation, CommandResponseManagerState}
 import csw.params.commands.CommandResponse
 import csw.params.commands.CommandResponse.{Accepted, Completed, Error}
 import csw.params.core.models.Id
-import csw.services.logging.scaladsl.{Logger, LoggerFactory}
+import csw.logging.scaladsl.{Logger, LoggerFactory}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar

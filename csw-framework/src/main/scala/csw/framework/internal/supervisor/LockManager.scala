@@ -7,7 +7,7 @@ import csw.command.models.framework.LockingResponses._
 import csw.params.commands.CommandIssue.ComponentLockedIssue
 import csw.params.commands.CommandResponse.NotAllowed
 import csw.params.core.models.Prefix
-import csw.services.logging.scaladsl.{Logger, LoggerFactory}
+import csw.logging.scaladsl.{Logger, LoggerFactory}
 
 private[framework] class LockManager(val lockPrefix: Option[Prefix], loggerFactory: LoggerFactory) {
   private val log: Logger = loggerFactory.getLogger

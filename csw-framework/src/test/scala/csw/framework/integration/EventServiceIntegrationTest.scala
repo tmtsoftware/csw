@@ -12,13 +12,13 @@ import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.params.commands
 import csw.params.commands.CommandName
 import csw.command.models.framework.ContainerLifecycleState
-import csw.services.location.api.models.ComponentId
-import csw.services.location.api.models.ComponentType.{Assembly, HCD}
-import csw.services.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.ComponentId
+import csw.location.api.models.ComponentType.{Assembly, HCD}
+import csw.location.api.models.Connection.AkkaConnection
 import csw.params.core.states.{CurrentState, StateName}
 import csw.command.scaladsl.CommandService
-import csw.services.event.helpers.TestFutureExt.RichFuture
-import csw.services.event.internal.commons.EventServiceConnection
+import csw.event.helpers.TestFutureExt.RichFuture
+import csw.event.internal.commons.EventServiceConnection
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.concurrent.duration.DurationLong

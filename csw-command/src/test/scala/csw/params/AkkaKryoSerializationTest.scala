@@ -30,8 +30,8 @@ import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.Units.{arcmin, coulomb, encoder, joule, lightyear, meter, pascal, NoUnits}
 import csw.params.core.models._
 import csw.params.core.states.{CurrentState, DemandState, StateName}
-import csw.services.location.api.models.ComponentType.HCD
-import csw.services.location.api.models.Connection
+import csw.location.api.models.ComponentType.HCD
+import csw.location.api.models.Connection
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.prop.Tables.Table
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}

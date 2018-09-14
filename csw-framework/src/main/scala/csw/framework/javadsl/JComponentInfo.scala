@@ -4,7 +4,7 @@ import java.time.Duration
 import java.util
 
 import csw.command.models.framework.{ComponentInfo, LocationServiceUsage}
-import csw.services.location.api.models.{ComponentType, Connection}
+import csw.location.api.models.{ComponentType, Connection}
 import csw.params.core.models.Prefix
 
 import scala.collection.JavaConverters.iterableAsScalaIterableConverter
@@ -19,7 +19,7 @@ object JComponentInfo {
    * The information needed to create a component. This class is created after de-serializing the config file for the component.
    *
    * @param name the name of the component
-   * @param componentType the type of the component as defined by [[csw.services.location.api.models.ComponentType]]
+   * @param componentType the type of the component as defined by [[csw.location.api.models.ComponentType]]
    * @param prefix identifies the subsystem
    * @param className specifies the component to be created by name of the class of it's factory
    * @param locationServiceUsage specifies component's usage of location service

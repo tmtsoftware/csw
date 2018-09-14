@@ -46,16 +46,16 @@ package csw
  * Also these models are being shared between multiple projects. `csw-location`, `csw-framework` and `csw-logging` depends on `csw-messages` project
  * which uses these models.
  *
- * Location Service uses [[csw.services.location.api.models.Connection]] model to register component/container of type:
- *   - [[csw.services.location.api.models.ComponentType.Assembly]]
- *   - [[csw.services.location.api.models.ComponentType.HCD]]
- *   - [[csw.services.location.api.models.ComponentType.Service]]
- *   - [[csw.services.location.api.models.ComponentType.Container]]
+ * Location Service uses [[csw.location.api.models.Connection]] model to register component/container of type:
+ *   - [[csw.location.api.models.ComponentType.Assembly]]
+ *   - [[csw.location.api.models.ComponentType.HCD]]
+ *   - [[csw.location.api.models.ComponentType.Service]]
+ *   - [[csw.location.api.models.ComponentType.Container]]
  *
- * When you resolve/find a [[csw.services.location.api.models.Connection]], you get [[csw.services.location.api.models.Location]] in return which can be one of below type:
- *   - [[csw.services.location.api.models.AkkaLocation]]
- *   - [[csw.services.location.api.models.TcpLocation]]
- *   - [[csw.services.location.api.models.HttpLocation]]
+ * When you resolve/find a [[csw.location.api.models.Connection]], you get [[csw.location.api.models.Location]] in return which can be one of below type:
+ *   - [[csw.location.api.models.AkkaLocation]]
+ *   - [[csw.location.api.models.TcpLocation]]
+ *   - [[csw.location.api.models.HttpLocation]]
  *
  * Framework package contains following actor messages:
  *  - Messages of type [[csw.params.framework.PubSub]] are supported by PubSubActor

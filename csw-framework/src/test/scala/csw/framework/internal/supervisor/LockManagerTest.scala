@@ -12,7 +12,7 @@ import csw.command.models.framework.LockingResponses._
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.{ObsId, Prefix}
 import csw.command.messages.CommandMessage.Submit
-import csw.services.logging.scaladsl.{Logger, LoggerFactory}
+import csw.logging.scaladsl.{Logger, LoggerFactory}
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSuite, Matchers}

@@ -18,14 +18,14 @@ import csw.command.models.matchers.MatcherResponses.{MatchCompleted, MatchFailed
 import csw.command.models.matchers.{DemandMatcher, Matcher, MatcherResponse}
 import csw.command.models.framework.LockingResponse
 import csw.command.models.framework.LockingResponses.LockAcquired
-import csw.services.location.api.models.Connection.AkkaConnection
-import csw.services.location.api.models.{AkkaLocation, ComponentId, ComponentType}
+import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.{ObsId, Prefix}
 import csw.params.core.states.{DemandState, StateName}
 import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.scaladsl.CommandService
-import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
+import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar
 

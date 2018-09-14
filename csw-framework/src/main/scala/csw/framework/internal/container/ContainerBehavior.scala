@@ -21,13 +21,13 @@ import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.framework.models._
 import csw.params.core.models.Prefix
 import csw.params.core.models.Subsystem.Container
-import csw.services.alarm.client.AlarmServiceFactory
-import csw.services.event.EventServiceFactory
-import csw.services.location.api.models.Connection.AkkaConnection
-import csw.services.location.api.models.{AkkaRegistration, ComponentId, ComponentType}
-import csw.services.location.api.scaladsl.LocationService
-import csw.services.location.scaladsl.RegistrationFactory
-import csw.services.logging.scaladsl.{Logger, LoggerFactory}
+import csw.alarm.client.AlarmServiceFactory
+import csw.event.EventServiceFactory
+import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.{AkkaRegistration, ComponentId, ComponentType}
+import csw.location.api.scaladsl.LocationService
+import csw.location.scaladsl.RegistrationFactory
+import csw.logging.scaladsl.{Logger, LoggerFactory}
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
@@ -38,8 +38,8 @@ import scala.util.{Failure, Success}
  * @param ctx                   the [[akka.actor.typed.scaladsl.ActorContext]] under which the actor instance of this behavior is created
  * @param containerInfo         container related information as described in the configuration file
  * @param supervisorInfoFactory the factory for creating the Supervisors for components described in ContainerInfo
- * @param registrationFactory   the factory for creating a typed [[csw.services.location.api.models.AkkaRegistration]] from
- * [[csw.services.location.api.models.Connection.AkkaConnection]]
+ * @param registrationFactory   the factory for creating a typed [[csw.location.api.models.AkkaRegistration]] from
+ * [[csw.location.api.models.Connection.AkkaConnection]]
  * @param eventServiceFactory   the factory to create instance of event service to be used by components to use and/or create publishers and subscribers
  * @param locationService       the single instance of Location service created for a running application
  * @param loggerFactory         factory to create suitable logger instance

@@ -6,9 +6,9 @@ import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import csw.command.messages.TopLevelActorMessage
 import csw.framework.models.{CswContext, JCswContext}
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
-import csw.services.alarm.client.internal.JAlarmServiceImpl
-import csw.services.config.client.javadsl.JConfigClientFactory
-import csw.services.event.internal.commons.EventServiceAdapter
+import csw.alarm.client.internal.JAlarmServiceImpl
+import csw.config.client.javadsl.JConfigClientFactory
+import csw.event.internal.commons.EventServiceAdapter
 
 /**
  * Base class for the factory for creating the behavior representing a component actor

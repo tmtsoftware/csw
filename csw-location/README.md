@@ -12,6 +12,6 @@ Using location service, a component or service can:
 
 If you want to get started with location service, refer the [examples](https://tmtsoftware.github.io/csw-prod/services/location.html).
 
-You can refer to Scala documentation [here](https://tmtsoftware.github.io/csw-prod/api/scala/csw/services/location/index.html).
+You can refer to Scala documentation [here](https://tmtsoftware.github.io/csw-prod/api/scala/csw/location/index.html).
 
 You can refer to Java documentation [here](https://tmtsoftware.github.io/csw-prod/api/java/?/index.html).

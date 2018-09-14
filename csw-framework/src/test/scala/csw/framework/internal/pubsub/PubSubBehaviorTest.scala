@@ -11,8 +11,8 @@ import csw.command.models.framework.{LifecycleStateChanged, PubSub, SupervisorLi
 import csw.framework.FrameworkTestMocks
 import csw.params.core.models.Prefix
 import csw.params.core.states.{CurrentState, StateName}
-import csw.services.location.commons.ActorSystemFactory
-import csw.services.logging.scaladsl.Logger
+import csw.location.commons.ActorSystemFactory
+import csw.logging.scaladsl.Logger
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 

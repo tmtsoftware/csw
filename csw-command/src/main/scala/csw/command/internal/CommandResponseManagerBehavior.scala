@@ -9,7 +9,7 @@ import csw.params.commands.CommandResponse.CommandNotAvailable
 import csw.params.commands.CommandResultType.{Final, Intermediate}
 import csw.params.commands.{CommandResponse, CommandResultType}
 import csw.params.core.models.Id
-import csw.services.logging.scaladsl.{Logger, LoggerFactory}
+import csw.logging.scaladsl.{Logger, LoggerFactory}
 
 /**
  * The Behavior of a Command Response Manager, represented as a mutable behavior. This behavior will be created as an actor.
@@ -36,7 +36,7 @@ import csw.services.logging.scaladsl.{Logger, LoggerFactory}
  * from both the HCD's then it can update Top level command with final [[csw.params.commands.CommandResponse]]
  *
  * @param ctx             The Actor Context under which the actor instance of this behavior is created
- * @param loggerFactory   The factory for creating [[csw.services.logging.scaladsl.Logger]] instance
+ * @param loggerFactory   The factory for creating [[csw.logging.scaladsl.Logger]] instance
  */
 private[command] class CommandResponseManagerBehavior(
     ctx: ActorContext[CommandResponseManagerMessage],

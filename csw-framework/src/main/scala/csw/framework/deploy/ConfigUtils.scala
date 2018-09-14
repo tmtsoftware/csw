@@ -5,7 +5,7 @@ import java.nio.file.{Files, Path}
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.framework.exceptions.{FileNotFound, LocalFileNotFound, UnableToParseOptions}
 import csw.framework.internal.wiring.ActorRuntime
-import csw.services.config.api.scaladsl.ConfigClientService
+import csw.config.api.scaladsl.ConfigClientService
 
 import scala.async.Async.{async, await}
 import scala.concurrent.Future

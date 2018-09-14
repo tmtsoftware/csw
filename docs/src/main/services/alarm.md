@@ -56,8 +56,8 @@ severity and health of the alarm/component/subsystem/whole TMT System.
 
 ## Creating clientAPI and adminAPI
 
-If you are not using csw-framework, you can create @scaladoc[AlarmService](csw/services/alarm/api/scaladsl/AlarmService)
-using @scaladoc[AlarmServiceFactory](csw/services/alarm/AlarmServiceFactory).
+If you are not using csw-framework, you can create @scaladoc[AlarmService](csw/alarm/api/scaladsl/AlarmService)
+using @scaladoc[AlarmServiceFactory](csw/alarm/AlarmServiceFactory).
 
 @@@ note
 
@@ -68,10 +68,10 @@ found here.
 @@@
 
 Scala
-:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/services/alarm/AlarmServiceClientExampleApp.scala) { #create-scala-api }
+:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #create-scala-api }
 
 Java
-:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/services/alarm/AlarmServiceClientExampleApp.scala) { #create-java-api }
+:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #create-java-api }
 
 ## setSeverity
 
@@ -79,10 +79,10 @@ Sets the severity of the given alarm. It is important that component devs keep r
 a regular interval for all it's alarms, so that it does not get marked as `Disconnected` after a specific time.  
 
 Scala
-:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/services/alarm/AlarmServiceClientExampleApp.scala) { #setSeverity-scala }
+:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #setSeverity-scala }
 
 Java
-:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/services/alarm/AlarmServiceClientExampleApp.scala) { #setSeverity-java }
+:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #setSeverity-java }
 
 @@@ note
 
@@ -97,14 +97,14 @@ Java
 Loads the given alarm data in alarm store
 
 Scala
-:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/services/alarm/AlarmServiceClientExampleApp.scala) { #initAlarms}
+:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #initAlarms}
 
 ## acknowledge
 
 Acknowledges the given alarm which is raised to a certain severity
 
 Scala
-:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/services/alarm/AlarmServiceClientExampleApp.scala) { #acknowledge}
+:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #acknowledge}
 
 ## shelve
 
@@ -113,7 +113,7 @@ it is not un-shelved manually before that. The time to automatically un-shelve c
 for e.g csw-alarm.shelve-timeout = h:m:s a .
 
 Scala
-:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/services/alarm/AlarmServiceClientExampleApp.scala) { #shelve}
+:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #shelve}
 
 @@@ note
 
@@ -126,7 +126,7 @@ Shelved alarms are also considered in aggregation calculation of alarms.
 Unshelves the given alarm
 
 Scala
-:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/services/alarm/AlarmServiceClientExampleApp.scala) { #unshelve}
+:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #unshelve}
 
 
 ## reset
@@ -135,7 +135,7 @@ Resets the status of the given alarm by updating the latched severity same as cu
 without changing any other properties of the alarm.
 
 Scala
-:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/services/alarm/AlarmServiceClientExampleApp.scala) { #reset}
+:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #reset}
 
 
 ## getMetadata
@@ -156,7 +156,7 @@ Gets the metadata(s) of an alarm/component/subsystem/whole TMT system, which con
 * activation status
 
 Scala
-:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/services/alarm/AlarmServiceClientExampleApp.scala) { #getMetadata}
+:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #getMetadata}
 
 @@@ note
 
@@ -173,14 +173,14 @@ Gets the status of the alarm which contains fields like:
 * alarm time
 
 Scala
-:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/services/alarm/AlarmServiceClientExampleApp.scala) { #getStatus}
+:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #getStatus}
 
 ## getCurrentSeverity
 
 Gets the severity of the alarm.
 
 Scala
-:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/services/alarm/AlarmServiceClientExampleApp.scala) { #getCurrentSeverity}
+:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #getCurrentSeverity}
 
 ## getAggregatedSeverity
 
@@ -188,7 +188,7 @@ Gets the aggregated severity for the given alarm/component/subsystem/whole TMT s
 the most severe alarm amongst multiple alarms.
 
 Scala
-:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/services/alarm/AlarmServiceClientExampleApp.scala) { #getAggregatedSeverity}
+:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #getAggregatedSeverity}
 
 
 ## getAggregatedHealth
@@ -197,7 +197,7 @@ Gets the aggregated health for the given alarm/component/subsystem/whole TMT sys
 or `Bad` based on the most severe alarm amongst multiple alarms.
 
 Scala
-:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/services/alarm/AlarmServiceClientExampleApp.scala) { #getAggregatedHealth}
+:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #getAggregatedHealth}
 
 
 ## subscribeAggregatedSeverityCallback
@@ -206,7 +206,7 @@ Subscribes to the changes of aggregated severity for given alarm/component/subsy
 which gets executed for every change.
 
 Scala
-:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/services/alarm/AlarmServiceClientExampleApp.scala) { #subscribeAggregatedSeverityCallback}
+:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #subscribeAggregatedSeverityCallback}
 
 
 ## subscribeAggregatedSeverityActorRef
@@ -215,7 +215,7 @@ Subscribes to the changes of aggregated severity for given alarm/component/subsy
 which will receive a message of aggregated severity on every change.
 
 Scala
-:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/services/alarm/AlarmServiceClientExampleApp.scala) { #subscribeAggregatedSeverityActorRef}
+:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #subscribeAggregatedSeverityActorRef}
 
 
 ## subscribeAggregatedHealthCallback
@@ -224,7 +224,7 @@ Subscribe to the changes of aggregated health for given alarm/component/subsyste
 which gets executedfor every change.
 
 Scala
-:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/services/alarm/AlarmServiceClientExampleApp.scala) { #subscribeAggregatedHealthCallback}
+:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #subscribeAggregatedHealthCallback}
 
 
 ## subscribeAggregatedHealthActorRef
@@ -233,4 +233,4 @@ Subscribes to the changes of aggregated health for given alarm/component/subsyst
 which will receive a message of aggregated severity on every change.
 
 Scala
-:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/services/alarm/AlarmServiceClientExampleApp.scala) { #subscribeAggregatedHealthActorRef}
+:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #subscribeAggregatedHealthActorRef}

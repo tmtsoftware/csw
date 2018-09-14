@@ -5,7 +5,7 @@ import csw.command.messages.TopLevelActorCommonMessage.TrackingEventReceived
 import csw.command.messages.TopLevelActorMessage
 import csw.framework.models.CswContext
 import csw.params.commands.{CommandResponse, ControlCommand}
-import csw.services.location.api.models.{Connection, TrackingEvent}
+import csw.location.api.models.{Connection, TrackingEvent}
 
 import scala.concurrent.Future
 

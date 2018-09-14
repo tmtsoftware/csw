@@ -1,11 +1,11 @@
-package csw.services.logging.perf.jmh
+package csw.logging.perf.jmh
 
 import java.util.concurrent.TimeUnit
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.gson.Gson
 import com.persist.JsonOps
-import csw.services.logging.commons.LoggingKeys
+import csw.logging.commons.LoggingKeys
 import org.openjdk.jmh.annotations._
 
 import scala.collection.JavaConverters.asJavaIterableConverter
@@ -32,7 +32,7 @@ class JsonUtilBenchmark {
        |  "${LoggingKeys.NAME}": "test-service",
        |  "${LoggingKeys.SEVERITY}": "ERROR",
        |  "${LoggingKeys.TIMESTAMP}": "2017-06-19T16:10:19.397Z",
-       |  "${LoggingKeys.CLASS}": "csw.services.logging.appenders.FileAppenderTest",
+       |  "${LoggingKeys.CLASS}": "csw.logging.appenders.FileAppenderTest",
        |  "${LoggingKeys.FILE}": "FileAppenderTest.scala",
        |  "${LoggingKeys.LINE}": 25,
        |  "${LoggingKeys.MESSAGE}": "This is at ERROR level"

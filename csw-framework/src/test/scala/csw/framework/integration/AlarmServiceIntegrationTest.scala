@@ -11,13 +11,13 @@ import csw.framework.FrameworkTestWiring
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.params.commands.Setup
 import csw.command.models.framework.SupervisorLifecycleState
-import csw.services.location.api.models.ComponentId
-import csw.services.location.api.models.ComponentType.HCD
-import csw.services.location.api.models.Connection.AkkaConnection
-import csw.services.alarm.client.internal.commons.AlarmServiceConnection
+import csw.location.api.models.ComponentId
+import csw.location.api.models.ComponentType.HCD
+import csw.location.api.models.Connection.AkkaConnection
+import csw.alarm.client.internal.commons.AlarmServiceConnection
 import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.scaladsl.CommandService
-import csw.services.event.helpers.TestFutureExt.RichFuture
+import csw.event.helpers.TestFutureExt.RichFuture
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.concurrent.duration.DurationLong

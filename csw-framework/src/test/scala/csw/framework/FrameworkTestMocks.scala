@@ -10,21 +10,21 @@ import csw.framework.models.CswContext
 import csw.command.messages.CommandResponseManagerMessage
 import csw.params.commands.CommandResponse
 import csw.command.models.framework.{LifecycleStateChanged, PubSub}
-import csw.services.location.api.models.Connection.AkkaConnection
-import csw.services.location.api.javadsl.ILocationService
-import csw.services.location.api.models.AkkaRegistration
-import csw.services.location.api.scaladsl.LocationService
+import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.javadsl.ILocationService
+import csw.location.api.models.AkkaRegistration
+import csw.location.api.scaladsl.LocationService
 import csw.params.core.models.{Id, Prefix}
 import csw.params.core.states.CurrentState
-import csw.services.alarm.api.scaladsl.AlarmService
+import csw.alarm.api.scaladsl.AlarmService
 import csw.command.CommandResponseManager
-import csw.services.config.api.scaladsl.ConfigClientService
-import csw.services.config.client.scaladsl.ConfigClientFactory
-import csw.services.event.EventServiceFactory
-import csw.services.event.api.scaladsl.EventService
-import csw.services.location.models.RegistrationResult
-import csw.services.location.scaladsl.RegistrationFactory
-import csw.services.logging.scaladsl.{Logger, LoggerFactory}
+import csw.config.api.scaladsl.ConfigClientService
+import csw.config.client.scaladsl.ConfigClientFactory
+import csw.event.EventServiceFactory
+import csw.event.api.scaladsl.EventService
+import csw.location.models.RegistrationResult
+import csw.location.scaladsl.RegistrationFactory
+import csw.logging.scaladsl.{Logger, LoggerFactory}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{when, _}
 import org.scalatest.mockito.MockitoSugar

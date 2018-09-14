@@ -46,13 +46,13 @@ properties should be defined to point to the correct host and port number(s).
 
 `LocationServiceFactory` provides a make method to create an instance of the LocationService API. 
 This call will look for configuration or environment variable settings as described 
-here: @scaladoc[ClusterSettings](csw/services/location/commons/ClusterSettings).
+here: @scaladoc[ClusterSettings](csw/location/commons/ClusterSettings).
 
 Scala
-:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #create-location-service }
+:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/location/LocationServiceExampleClientApp.scala) { #create-location-service }
 
 Java
-:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #create-location-service }
+:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/location/JLocationServiceExampleClient.java) { #create-location-service }
 
 
 ## Shutdown Location Service
@@ -63,10 +63,10 @@ This example demonstrates how to disconnect from the Location Service.
 **Note:** All the services registered via this instance of LocationService will continue to be available for other cluster members. 
 
 Scala
-:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #shutdown }
+:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/location/LocationServiceExampleClientApp.scala) { #shutdown }
 
 Java
-:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #shutdown }
+:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/location/JLocationServiceExampleClient.java) { #shutdown }
 
 ## Creating Components, Connections and Registrations
 
@@ -96,15 +96,15 @@ not running or could not be found or if the given component name was already reg
 The following example shows registration of both UnTyped ActorRef and Typed ActorRef:
  
 Scala
-:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #Components-Connections-Registrations }
+:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/location/LocationServiceExampleClientApp.scala) { #Components-Connections-Registrations }
 
 Java
-:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #Components-Connections-Registrations }
+:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/location/JLocationServiceExampleClient.java) { #Components-Connections-Registrations }
 
 @@@ note
 
 Notice the `logAdminActorRef` that is used while registering any connection. It is used to dynamically change the log level of a component. For an application, make sure there
-is only one `logAdminActorRef` used for all registrations. The source code of `LogAdminActor` can be found [here](https://github.com/tmtsoftware/csw-prod/blob/master/csw-logging/src/main/scala/csw/services/logging/internal/LogAdminActor.scala). 
+is only one `logAdminActorRef` used for all registrations. The source code of `LogAdminActor` can be found [here](https://github.com/tmtsoftware/csw-prod/blob/master/csw-logging/src/main/scala/csw/logging/internal/LogAdminActor.scala). 
 
 @@@
 
@@ -124,10 +124,10 @@ Make sure the ActorSystem used to start actors using the location service is cre
  
 
 Scala
-:  @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #create-actor-system }
+:  @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/location/LocationServiceExampleClientApp.scala) { #create-actor-system }
 
 Java
-:  @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #create-actor-system }
+:  @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/location/JLocationServiceExampleClient.java) { #create-actor-system }
 
 This is required to start a remote ActorSystem on the same network interface where the csw-cluster is running. 
 All the ActorRefs created using this ActorSystem will be available for communication from other components 
@@ -145,10 +145,10 @@ If not found in the cache, it waits for the event to arrive within the specified
 `find` returns the location for a connection from the local cache and returns None if not found there.    
 
 Scala
-:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #find }
+:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/location/LocationServiceExampleClientApp.scala) { #find }
 
 Java
-:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #find }
+:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/location/JLocationServiceExampleClient.java) { #find }
 
 The logging output from the above example when the given component is not registered should include:
 
@@ -160,10 +160,10 @@ The logging output from the above example when the given component is not regist
 An example of the resolve command is shown in the following: 
 
 Scala
-:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #resolve }
+:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/location/LocationServiceExampleClientApp.scala) { #resolve }
 
 Java
-:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #resolve }
+:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/location/JLocationServiceExampleClient.java) { #resolve }
 
 The logging output from the above example should include:
 
@@ -188,10 +188,10 @@ is found or resolved, we need to retain the type to the actorRef, since the expl
 (refer [type erasure](https://en.wikipedia.org/wiki/Type_erasure)). Use following `AkkaLocation` api to get the correct Typed ActorRef:
 
 Scala
-:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #typed-ref }
+:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/location/LocationServiceExampleClientApp.scala) { #typed-ref }
 
 Java
-:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #typed-ref }
+:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/location/JLocationServiceExampleClient.java) { #typed-ref }
 
 @@@ 
 ## Filtering
@@ -200,10 +200,10 @@ The `list` API and its variants offer means to inquire about available connectio
 The **parameter-less** `list` returns all available connections
 
 Scala
-:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #list }
+:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/location/LocationServiceExampleClientApp.scala) { #list }
 
 Java
-:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #list }
+:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/location/JLocationServiceExampleClient.java) { #list }
 
 The log output from the above should contain:
 
@@ -220,10 +220,10 @@ Other variants are filters using `ConnectionType`, `ComponentType`, and `hostnam
 Filtering by component type is shown below:
 
 Scala
-:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #filtering-component }
+:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/location/LocationServiceExampleClientApp.scala) { #filtering-component }
 
 Java
-:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #filtering-component }
+:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/location/JLocationServiceExampleClient.java) { #filtering-component }
 
 The log output from the above code should contain:
 
@@ -236,10 +236,10 @@ The log output from the above code should contain:
 Filtering by connection type is shown below:
 
 Scala
-:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #filtering-connection }
+:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/location/LocationServiceExampleClientApp.scala) { #filtering-connection }
 
 Java
-:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #filtering-connection }
+:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/location/JLocationServiceExampleClient.java) { #filtering-connection }
 
 The log output should contain:
 
@@ -253,10 +253,10 @@ The log output should contain:
 Filtering akka connections by prefix is shown below:
 
 Scala
-:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #filtering-prefix }
+:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/location/LocationServiceExampleClientApp.scala) { #filtering-prefix }
 
 Java
-:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #filtering-prefix }
+:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/location/JLocationServiceExampleClient.java) { #filtering-prefix }
 
 The log output should contain:
 
@@ -293,10 +293,10 @@ In return it gives a Killswitch that can be used to turn off the event notificat
  
 
 Scala
-:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #tracking }
+:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/location/LocationServiceExampleClientApp.scala) { #tracking }
 
 Java
-:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #tracking }
+:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/location/JLocationServiceExampleClient.java) { #tracking }
 
 The log output should contain the following:
 ```
@@ -331,13 +331,13 @@ tracking.  These two events could come in any order.
 One of the ways to `unregister` a service is by calling unregister on registration result received from `register` API.
 
 Scala
-:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala) { #unregister }
+:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/location/LocationServiceExampleClientApp.scala) { #unregister }
 
 Java
-:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java) { #unregister }
+:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/location/JLocationServiceExampleClient.java) { #unregister }
 
 
 ## Source code for examples
 
-* @github[Scala Example](/examples/src/main/scala/csw/services/location/LocationServiceExampleClientApp.scala)
-* @github[JavaBlocking Example](/examples/src/main/java/csw/services/location/JLocationServiceExampleClient.java)
+* @github[Scala Example](/examples/src/main/scala/csw/location/LocationServiceExampleClientApp.scala)
+* @github[JavaBlocking Example](/examples/src/main/java/csw/location/JLocationServiceExampleClient.java)

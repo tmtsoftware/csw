@@ -12,13 +12,13 @@ import csw.command.messages.TopLevelActorIdleMessage.Initialize
 import csw.params.commands.CommandResponse.{Accepted, Completed, Error}
 import csw.params.commands.{CommandName, CommandResponse, Observe, Setup}
 import csw.command.models.framework.ToComponentLifecycleMessages._
-import csw.services.location.api.scaladsl.LocationService
+import csw.location.api.scaladsl.LocationService
 import csw.params.core.generics.KeyType
 import csw.params.core.models.{ObsId, Prefix}
 import csw.command.messages.{CommandResponseManagerMessage, FromComponentLifecycleMessage, TopLevelActorMessage}
-import csw.services.alarm.api.scaladsl.AlarmService
+import csw.alarm.api.scaladsl.AlarmService
 import csw.command.CommandResponseManager
-import csw.services.event.api.scaladsl.EventService
+import csw.event.api.scaladsl.EventService
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar

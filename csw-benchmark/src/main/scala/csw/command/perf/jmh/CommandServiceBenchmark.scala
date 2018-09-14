@@ -10,7 +10,7 @@ import csw.params.commands.{CommandName, CommandResponse}
 import csw.params.core.models.Prefix
 import csw.command.perf.BenchmarkHelpers.spawnStandaloneComponent
 import csw.command.scaladsl.CommandService
-import csw.services.location.commons.ClusterAwareSettings
+import csw.location.commons.ClusterAwareSettings
 import org.openjdk.jmh.annotations._
 
 import scala.concurrent.Await

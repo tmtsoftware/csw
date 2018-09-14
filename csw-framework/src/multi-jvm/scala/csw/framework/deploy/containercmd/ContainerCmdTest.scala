@@ -15,8 +15,8 @@ import csw.params.commands.{CommandName, Setup}
 import csw.command.models.framework.PubSub.Subscribe
 import csw.command.models.framework.ToComponentLifecycleMessages.GoOffline
 import csw.command.models.framework.{Components, ContainerLifecycleState, SupervisorLifecycleState}
-import csw.services.location.api.models.Connection.AkkaConnection
-import csw.services.location.api.models.{ComponentId, ComponentType}
+import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.{ComponentId, ComponentType}
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.{ObsId, Prefix}
 import csw.params.core.models.Subsystem.Container
@@ -29,12 +29,12 @@ import csw.command.messages.SupervisorContainerCommonMessages.Shutdown
 import csw.command.messages.ContainerMessage
 import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.scaladsl.CommandService
-import csw.services.config.api.models.ConfigData
-import csw.services.config.client.scaladsl.ConfigClientFactory
-import csw.services.config.server.commons.TestFileUtils
-import csw.services.config.server.{ServerWiring, Settings}
-import csw.services.location.commons.ClusterAwareSettings
-import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
+import csw.config.api.models.ConfigData
+import csw.config.client.scaladsl.ConfigClientFactory
+import csw.config.server.commons.TestFileUtils
+import csw.config.server.{ServerWiring, Settings}
+import csw.location.commons.ClusterAwareSettings
+import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{Await, ExecutionContextExecutor}

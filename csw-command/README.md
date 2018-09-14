@@ -9,6 +9,6 @@ If you want to get started with command service,
 refer the [examples](https://tmtsoftware.github.io/csw-prod/command.html) for command based communication and,
 refer the [examples](https://tmtsoftware.github.io/csw-prod/framework/managing-command-state.html) for managing commands received.
 
-You can refer to Scala documentation [here](https://tmtsoftware.github.io/csw-prod/api/scala/csw/services/command/index.html).
+You can refer to Scala documentation [here](https://tmtsoftware.github.io/csw-prod/api/scala/csw/command/index.html).
 
 You can refer to Java documentation [here](https://tmtsoftware.github.io/csw-prod/api/java/?/index.html).

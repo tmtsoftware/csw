@@ -4,17 +4,17 @@ import akka.Done
 import akka.actor.typed.ActorRef
 import akka.actor.{ActorSystem, CoordinatedShutdown}
 import csw.framework.deploy.ConfigUtils
-import csw.services.location.api.scaladsl.LocationService
-import csw.services.alarm.client.AlarmServiceFactory
+import csw.location.api.scaladsl.LocationService
+import csw.alarm.client.AlarmServiceFactory
 import csw.command.internal.CommandResponseManagerFactory
-import csw.services.config.api.scaladsl.ConfigClientService
-import csw.services.config.client.scaladsl.ConfigClientFactory
-import csw.services.event.EventServiceFactory
-import csw.services.event.models.EventStores.RedisStore
-import csw.services.location.commons.ClusterSettings
-import csw.services.location.scaladsl.{LocationServiceFactory, RegistrationFactory}
-import csw.services.logging.commons.LogAdminActorFactory
-import csw.services.logging.messages.LogControlMessages
+import csw.config.api.scaladsl.ConfigClientService
+import csw.config.client.scaladsl.ConfigClientFactory
+import csw.event.EventServiceFactory
+import csw.event.models.EventStores.RedisStore
+import csw.location.commons.ClusterSettings
+import csw.location.scaladsl.{LocationServiceFactory, RegistrationFactory}
+import csw.logging.commons.LogAdminActorFactory
+import csw.logging.messages.LogControlMessages
 import io.lettuce.core.RedisClient
 
 import scala.concurrent.{ExecutionContext, Future}

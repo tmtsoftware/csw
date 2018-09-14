@@ -17,6 +17,6 @@ We appreciate efforts put in by authors of the persist-logging library which mad
 
 If you want to get started with logging service, refer the [examples](https://tmtsoftware.github.io/csw-prod/services/logging.html).
 
-You can refer to Scala documentation [here](https://tmtsoftware.github.io/csw-prod/api/scala/csw/services/logging/index.html).
+You can refer to Scala documentation [here](https://tmtsoftware.github.io/csw-prod/api/scala/csw/logging/index.html).
 
 You can refer to Java documentation [here](https://tmtsoftware.github.io/csw-prod/api/java/?/index.html).

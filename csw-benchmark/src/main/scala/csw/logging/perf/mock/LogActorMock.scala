@@ -1,13 +1,13 @@
-package csw.services.logging.perf.mock
+package csw.logging.perf.mock
 
 import com.persist.JsonOps.JsonObject
-import csw.services.logging.RichMsg
-import csw.services.logging.appenders.LogAppender
-import csw.services.logging.commons.{Category, LoggingKeys, TMTDateTimeFormatter}
-import csw.services.logging.internal.LogActorMessages.Log
-import csw.services.logging.internal.LoggingLevels
-import csw.services.logging.macros.SourceLocation
-import csw.services.logging.scaladsl.noId
+import csw.logging.RichMsg
+import csw.logging.appenders.LogAppender
+import csw.logging.commons.{Category, LoggingKeys, TMTDateTimeFormatter}
+import csw.logging.internal.LogActorMessages.Log
+import csw.logging.internal.LoggingLevels
+import csw.logging.macros.SourceLocation
+import csw.logging.scaladsl.noId
 
 object LogActorMock {
 
