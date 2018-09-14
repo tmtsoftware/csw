@@ -14,7 +14,25 @@ Activation Status: Active
 Acknowledgement Status: Acknowledged
 Latch Severity: Disconnected
 Shelve Status: Unshelved
-Alarm Time: 2018-08-30T09:23:50.933Z
+Alarm Time: 2018-09-14T04:51:40.762Z
+Current Severity: Disconnected
+===============================================================================================================
+Subsystem: TCS
+Component: corrections
+Name: outOfRangeOffload
+Description: Another system has sent an out of range offload that has caused the system to go into a bad state!
+Location: Computer Room
+Type: Absolute
+Supported Severities: [Warning, Major, Indeterminate, Okay]
+Probable Cause: Bad software in NFIRAOS or WFOS
+Operator Response: Reset the software system and hope
+AutoAcknowledgeable: false
+Latchable: true
+Activation Status: Active
+Acknowledgement Status: Acknowledged
+Latch Severity: Disconnected
+Shelve Status: Unshelved
+Alarm Time: 2018-09-14T04:51:40.762Z
 Current Severity: Disconnected
 ===============================================================================================================
 Subsystem: NFIRAOS
@@ -32,7 +50,7 @@ Activation Status: Active
 Acknowledgement Status: Acknowledged
 Latch Severity: Disconnected
 Shelve Status: Unshelved
-Alarm Time: 2018-08-30T09:23:50.932Z
+Alarm Time: 2018-09-14T04:51:40.762Z
 Current Severity: Disconnected
 ===============================================================================================================
 Subsystem: NFIRAOS
@@ -50,7 +68,61 @@ Activation Status: Active
 Acknowledgement Status: Acknowledged
 Latch Severity: Disconnected
 Shelve Status: Unshelved
-Alarm Time: 2018-08-30T09:23:50.933Z
+Alarm Time: 2018-09-14T04:51:40.762Z
+Current Severity: Disconnected
+===============================================================================================================
+Subsystem: NFIRAOS
+Component: enclosure
+Name: tempLowAlarm
+Description: Enclosure temperature has gone out of range low
+Location: enclosure
+Type: Absolute
+Supported Severities: [Critical, Indeterminate, Okay]
+Probable Cause: the temperature controller has failed
+Operator Response: go to the NFIRAOS engineering user interface and begin the shutdown enclosure process
+AutoAcknowledgeable: false
+Latchable: true
+Activation Status: Inactive
+Acknowledgement Status: Acknowledged
+Latch Severity: Disconnected
+Shelve Status: Unshelved
+Alarm Time: 2018-09-14T04:51:40.762Z
+Current Severity: Disconnected
+===============================================================================================================
+Subsystem: NFIRAOS
+Component: enclosure
+Name: tempHighAlarm
+Description: Enclosure temperature has gone out of range high
+Location: enclosure
+Type: Absolute
+Supported Severities: [Critical, Indeterminate, Okay]
+Probable Cause: the temperature controller has failed
+Operator Response: go to the NFIRAOS engineering user interface and begin the shutdown enclosure process
+AutoAcknowledgeable: false
+Latchable: true
+Activation Status: Active
+Acknowledgement Status: Acknowledged
+Latch Severity: Disconnected
+Shelve Status: Unshelved
+Alarm Time: 2018-09-14T04:51:40.762Z
+Current Severity: Disconnected
+===============================================================================================================
+Subsystem: NFIRAOS
+Component: beamsplitter
+Name: splitterLimitAlarm
+Description: Warns when beam splitter hits a limit
+Location: south side
+Type: Absolute
+Supported Severities: [Critical, Indeterminate, Okay]
+Probable Cause: the beam splitter has passed software limit
+Operator Response: go to the NFIRAOS engineering user interface and select the datum beamsplitter command
+AutoAcknowledgeable: false
+Latchable: false
+Activation Status: Active
+Acknowledgement Status: Acknowledged
+Latch Severity: Disconnected
+Shelve Status: Unshelved
+Alarm Time: 2018-09-14T04:51:40.762Z
 Current Severity: Disconnected
 ===============================================================================================================
 Subsystem: LGSF
@@ -68,6 +140,6 @@ Activation Status: Inactive
 Acknowledgement Status: Acknowledged
 Latch Severity: Disconnected
 Shelve Status: Unshelved
-Alarm Time: 2018-08-30T09:23:50.933Z
+Alarm Time: 2018-09-14T04:51:40.762Z
 Current Severity: Disconnected
 ===============================================================================================================

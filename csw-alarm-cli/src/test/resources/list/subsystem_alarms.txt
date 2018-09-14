@@ -35,3 +35,57 @@ Shelve Status: Unshelved
 Alarm Time: 2018-08-30T09:25:36.878Z
 Current Severity: Disconnected
 ===============================================================================================================
+Subsystem: NFIRAOS
+Component: enclosure
+Name: tempLowAlarm
+Description: Enclosure temperature has gone out of range low
+Location: enclosure
+Type: Absolute
+Supported Severities: [Critical, Indeterminate, Okay]
+Probable Cause: the temperature controller has failed
+Operator Response: go to the NFIRAOS engineering user interface and begin the shutdown enclosure process
+AutoAcknowledgeable: false
+Latchable: true
+Activation Status: Inactive
+Acknowledgement Status: Acknowledged
+Latch Severity: Disconnected
+Shelve Status: Unshelved
+Alarm Time: 2018-09-14T03:49:15.634Z
+Current Severity: Disconnected
+===============================================================================================================
+Subsystem: NFIRAOS
+Component: enclosure
+Name: tempHighAlarm
+Description: Enclosure temperature has gone out of range high
+Location: enclosure
+Type: Absolute
+Supported Severities: [Critical, Indeterminate, Okay]
+Probable Cause: the temperature controller has failed
+Operator Response: go to the NFIRAOS engineering user interface and begin the shutdown enclosure process
+AutoAcknowledgeable: false
+Latchable: true
+Activation Status: Active
+Acknowledgement Status: Acknowledged
+Latch Severity: Disconnected
+Shelve Status: Unshelved
+Alarm Time: 2018-09-14T03:49:15.634Z
+Current Severity: Disconnected
+===============================================================================================================
+Subsystem: NFIRAOS
+Component: beamsplitter
+Name: splitterLimitAlarm
+Description: Warns when beam splitter hits a limit
+Location: south side
+Type: Absolute
+Supported Severities: [Critical, Indeterminate, Okay]
+Probable Cause: the beam splitter has passed software limit
+Operator Response: go to the NFIRAOS engineering user interface and select the datum beamsplitter command
+AutoAcknowledgeable: false
+Latchable: false
+Activation Status: Active
+Acknowledgement Status: Acknowledged
+Latch Severity: Disconnected
+Shelve Status: Unshelved
+Alarm Time: 2018-09-14T03:49:15.634Z
+Current Severity: Disconnected
+===============================================================================================================
