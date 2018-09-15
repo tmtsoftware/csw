@@ -1,4 +1,5 @@
-package csw.alarm
+package csw.alarm.cli
+
 import akka.http.scaladsl.Http
 import csw.services.BuildInfo
 import csw.alarm.cli.args.{ArgsParser, Options}

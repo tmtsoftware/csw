@@ -1,12 +1,12 @@
-package csw.event
+package csw.event.cli
 
 import akka.http.scaladsl.Http
-import csw.services.BuildInfo
 import csw.event.cli.args.{ArgsParser, Options}
 import csw.event.cli.commons.ApplicationFinishedReason
 import csw.event.cli.wiring.Wiring
 import csw.location.commons.{ActorSystemFactory, ClusterAwareSettings}
 import csw.logging.scaladsl.LoggingSystemFactory
+import csw.services.BuildInfo
 
 // $COVERAGE-OFF$
 object Main extends App {

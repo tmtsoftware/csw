@@ -1,8 +1,7 @@
-package csw.config
+package csw.config.cli
 
 import csw.services.BuildInfo
 import csw.config.cli.commons.CoordinatedShutdownReasons.ApplicationFinishedReason
-import csw.config.cli.{ArgsParser, ClientCliWiring, Options}
 import csw.location.commons.ClusterAwareSettings
 import csw.logging.scaladsl.LoggingSystemFactory
 
