@@ -22,7 +22,6 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-location-agent`,
   `csw-location-api`,
   `csw-benchmark`,
-  `csw-messages`,
   `csw-params-jvm`,
   `csw-params-js`,
   `csw-commons`,
@@ -65,10 +64,6 @@ lazy val `csw-prod` = project
   .settings(Settings.docExclusions(unidocExclusions))
   .settings(GithubRelease.githubReleases(githubReleases))
 
-lazy val `csw-messages` = project
-  .dependsOn(`csw-params-jvm`, `csw-commons` % "test->test")
-  .enablePlugins(PublishBintray, GenJavadocPlugin)
-
 lazy val `csw-params` = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
   .enablePlugins(PublishBintray, GenJavadocPlugin)
@@ -107,7 +102,7 @@ lazy val `csw-logging-macros` = project
 
 //Logging service
 lazy val `csw-logging` = project
-  .dependsOn(`csw-logging-macros`, `csw-messages`)
+  .dependsOn(`csw-logging-macros`, `csw-params-jvm`)
   .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.Logging.value
@@ -216,7 +211,7 @@ lazy val `csw-command` = project
 
 lazy val `csw-framework` = project
   .dependsOn(
-    `csw-messages`,
+    `csw-params-jvm`,
     `csw-config-client`,
     `csw-logging`,
     `csw-command`,
@@ -310,7 +305,7 @@ lazy val `romaine` = project
 lazy val `csw-benchmark` = project
   .dependsOn(
     `csw-logging`,
-    `csw-messages`,
+    `csw-params-jvm`,
     `csw-framework` % "compile->compile;test->test",
     `csw-command`
   )
@@ -338,7 +333,7 @@ lazy val examples = project
     `csw-config-client`,
     `csw-config-server` % "test->test",
     `csw-logging`,
-    `csw-messages`,
+    `csw-params-jvm`,
     `csw-framework`
   )
   .enablePlugins(DeployApp)

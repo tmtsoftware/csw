@@ -1,4 +1,4 @@
-package csw.params
+package csw.command.messages
 
 /**
  *
@@ -54,4 +54,4 @@ package csw.params
  *                                                                                                                                                                                      +----------------+
  *
  */
-private[params] object MessagesArchitecture {}
+private[messages] object MessagesArchitecture {}

@@ -1,9 +1,9 @@
 package csw
 
 /**
- * == Messages ==
+ * == Params ==
  *
- * This project is intended to hold reusable models and messages used throughout the csw source code.
+ * This project is intended to hold reusable models and params used throughout the csw source code.
  *
  * This also provides out of the box support to cater to the diverse communication requirements.
  * Consumer of this library will be able to create Commands, Events, States to store ParameterSets.
@@ -38,38 +38,16 @@ package csw
  * Then Assembly can use Matcher with the matching definition as provided by [[csw.params.commands.matchers.StateMatcher]] to
  * match against the current states published by HCD.
  *
- * === Location and Framework ===
+ * === [[csw.params.TMTSerializable]] ===
  *
- * These packages contain reusable classes, traits and models. We are keeping all the models which are getting transferred over the wire and
- * requires serialization and deserialization in `csw-messages` project. All the models are marked with [[csw.params.TMTSerializable]].
+ *  All the models are marked with [[csw.params.TMTSerializable]].
  * [[csw.params.TMTSerializable]] is a marker trait which extends [[scala.Serializable]]. This is configured to use `kryo` serialization.
- * Also these models are being shared between multiple projects. `csw-location`, `csw-framework` and `csw-logging` depends on `csw-messages` project
+ * Also these models are being shared between multiple projects. `csw-location`, `csw-framework` and `csw-logging` depends on `csw-params` project
  * which uses these models.
  *
- * Location Service uses [[csw.location.api.models.Connection]] model to register component/container of type:
- *   - [[csw.location.api.models.ComponentType.Assembly]]
- *   - [[csw.location.api.models.ComponentType.HCD]]
- *   - [[csw.location.api.models.ComponentType.Service]]
- *   - [[csw.location.api.models.ComponentType.Container]]
+ * === core ===
  *
- * When you resolve/find a [[csw.location.api.models.Connection]], you get [[csw.location.api.models.Location]] in return which can be one of below type:
- *   - [[csw.location.api.models.AkkaLocation]]
- *   - [[csw.location.api.models.TcpLocation]]
- *   - [[csw.location.api.models.HttpLocation]]
- *
- * Framework package contains following actor messages:
- *  - Messages of type [[csw.params.framework.PubSub]] are supported by PubSubActor
- *  - Below Lifecycle messages can be sent to component when component is in [[csw.params.framework.SupervisorLifecycleState.Running]] state,
- *  note that these messages should be wrapped inside [[csw.params.RunningMessage.Lifecycle]] before sending it to Supervisor actor.
- *   - [[csw.params.framework.ToComponentLifecycleMessages.GoOnline]]
- *   - [[csw.params.framework.ToComponentLifecycleMessages.GoOffline]]
- *
- * === Params ===
- *
- * This package supports serialization and deserialization of commands, events and state variables in following formats:
- *  - JSON : [[csw.params.core.formats.JsonSupport]]
- *  - Kryo : [[csw.params.core.generics.ParamSetSerializer]]
- *  - Protobuf : package pb contains utility and directory protobuf contains proto schema files.
+ * This package supports serialization and deserialization of commands, events and state variables in JSON format [[csw.params.core.formats.JsonSupport]].
  *
  * === Scala and Java APIs ===
  *
