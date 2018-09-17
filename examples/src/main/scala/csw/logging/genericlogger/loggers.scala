@@ -1,4 +1,4 @@
-package csw.services.commons.genericlogger
+package csw.logging.genericlogger
 
 import akka.actor.typed.scaladsl.ActorContext
 import csw.command.messages.ComponentMessage

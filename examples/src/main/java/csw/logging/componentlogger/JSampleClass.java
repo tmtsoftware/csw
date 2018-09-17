@@ -1,4 +1,4 @@
-package csw.services.commons.componentlogger;
+package csw.logging.componentlogger;
 
 import akka.actor.typed.javadsl.ActorContext;
 import csw.command.messages.ComponentMessage;
