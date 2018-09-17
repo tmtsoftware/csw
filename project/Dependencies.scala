@@ -8,7 +8,6 @@ object Dependencies {
       Enumeratum.`enumeratum-play-json`.value,
       Libs.`play-json`.value,
       Libs.`play-json-derived-codecs`.value,
-      Chill.`chill-akka`,
       Libs.`scalatest`.value % Test
     )
   )
@@ -63,6 +62,7 @@ object Dependencies {
       Libs.`akka-management-cluster-http`,
       AkkaHttp.`akka-http`,
       Libs.`akka-http-play-json`,
+      Chill.`chill-akka`,
       Libs.`scalatest`.value         % Test,
       Libs.`junit`                   % Test,
       Libs.`junit-interface`         % Test,
