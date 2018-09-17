@@ -32,19 +32,6 @@ package csw
  *  - [[csw.params.events.SystemEvent]]
  *  - [[csw.params.events.ObserveEvent]]
  *
- * Another important feature provided by *commands* package is [[csw.params.commands.matchers.Matcher]]
- * One of the use case for using matcher is when Assembly sends [[csw.params.CommandMessage.Oneway]] command to HCD
- * and in response to this command HCD keeps publishing its current state.
- * Then Assembly can use Matcher with the matching definition as provided by [[csw.params.commands.matchers.StateMatcher]] to
- * match against the current states published by HCD.
- *
- * === [[csw.serializable.TMTSerializable]] ===
- *
- *  All the models are marked with [[csw.serializable.TMTSerializable]].
- * [[csw.serializable.TMTSerializable]] is a marker trait which extends [[scala.Serializable]]. This is configured to use `kryo` serialization.
- * Also these models are being shared between multiple projects. `csw-location`, `csw-framework` and `csw-logging` depends on `csw-params` project
- * which uses these models.
- *
  * === core ===
  *
  * This package supports serialization and deserialization of commands, events and state variables in JSON format [[csw.params.core.formats.JsonSupport]].
