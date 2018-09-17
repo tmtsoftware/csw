@@ -20,7 +20,7 @@ import csw.alarm.api.scaladsl.AlarmService
 import csw.command.CommandResponseManager
 import csw.config.api.scaladsl.ConfigClientService
 import csw.config.client.scaladsl.ConfigClientFactory
-import csw.event.EventServiceFactory
+import csw.event.client.EventServiceFactory
 import csw.event.api.scaladsl.EventService
 import csw.location.models.RegistrationResult
 import csw.location.scaladsl.RegistrationFactory

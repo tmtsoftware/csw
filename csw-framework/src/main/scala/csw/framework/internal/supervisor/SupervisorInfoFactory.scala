@@ -8,7 +8,7 @@ import csw.framework.models.CswContext
 import csw.command.models.framework.{Component, ComponentInfo, SupervisorInfo}
 import csw.location.api.scaladsl.LocationService
 import csw.alarm.client.AlarmServiceFactory
-import csw.event.EventServiceFactory
+import csw.event.client.EventServiceFactory
 import csw.location.commons.ActorSystemFactory
 import csw.location.scaladsl.RegistrationFactory
 import csw.logging.scaladsl.{Logger, LoggerFactory}

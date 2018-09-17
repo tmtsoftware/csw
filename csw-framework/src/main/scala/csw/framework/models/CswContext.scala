@@ -12,7 +12,7 @@ import csw.command.CommandResponseManager
 import csw.command.internal.CommandResponseManagerFactory
 import csw.config.api.scaladsl.ConfigClientService
 import csw.config.client.scaladsl.ConfigClientFactory
-import csw.event.EventServiceFactory
+import csw.event.client.EventServiceFactory
 import csw.event.api.scaladsl.EventService
 import csw.logging.scaladsl.LoggerFactory
 

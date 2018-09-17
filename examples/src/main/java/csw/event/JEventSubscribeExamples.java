@@ -15,8 +15,7 @@ import csw.params.core.models.Subsystem;
 import csw.event.api.javadsl.IEventSubscriber;
 import csw.event.api.javadsl.IEventSubscription;
 import csw.event.api.scaladsl.SubscriptionModes;
-import csw.event.internal.commons.javawrappers.JEventService;
-
+import csw.event.client.internal.commons.javawrappers.JEventService;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;

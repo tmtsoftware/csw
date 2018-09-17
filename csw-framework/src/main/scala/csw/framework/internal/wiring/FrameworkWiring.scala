@@ -9,8 +9,8 @@ import csw.alarm.client.AlarmServiceFactory
 import csw.command.internal.CommandResponseManagerFactory
 import csw.config.api.scaladsl.ConfigClientService
 import csw.config.client.scaladsl.ConfigClientFactory
-import csw.event.EventServiceFactory
-import csw.event.models.EventStores.RedisStore
+import csw.event.client.EventServiceFactory
+import csw.event.client.models.EventStores.RedisStore
 import csw.location.commons.ClusterSettings
 import csw.location.scaladsl.{LocationServiceFactory, RegistrationFactory}
 import csw.logging.commons.LogAdminActorFactory

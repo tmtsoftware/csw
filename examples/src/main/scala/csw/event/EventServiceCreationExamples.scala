@@ -2,7 +2,8 @@ package csw.event
 
 import akka.actor.ActorSystem
 import csw.event.api.scaladsl.EventService
-import csw.event.models.EventStores.{KafkaStore, RedisStore}
+import csw.event.client.EventServiceFactory
+import csw.event.client.models.EventStores.{KafkaStore, RedisStore}
 import csw.location.commons.ActorSystemFactory
 import csw.location.scaladsl.LocationServiceFactory
 import io.lettuce.core.ClientOptions.DisconnectedBehavior

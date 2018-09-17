@@ -10,7 +10,7 @@ import csw.params.events.EventName;
 import csw.params.events.SystemEvent;
 import csw.command.models.framework.ComponentInfo;
 import csw.params.core.models.Prefix;
-import csw.event.internal.commons.javawrappers.JEventService;
+import csw.event.client.internal.commons.javawrappers.JEventService;
 
 import java.time.Duration;
 import java.util.concurrent.CompletionStage;

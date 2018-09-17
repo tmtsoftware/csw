@@ -2,7 +2,7 @@ package csw.clusterseed.client
 
 import akka.actor.CoordinatedShutdown.UnknownReason
 import csw.clusterseed.internal.AdminWiring
-import csw.event.helpers.TestFutureExt.RichFuture
+import csw.event.client.helpers.TestFutureExt.RichFuture
 import org.scalatest.{BeforeAndAfterAll, FunSuiteLike}
 
 import scala.util.{Failure, Success, Try}

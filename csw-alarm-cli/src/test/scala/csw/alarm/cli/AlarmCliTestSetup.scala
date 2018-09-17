@@ -10,7 +10,7 @@ import csw.services.BuildInfo
 import csw.alarm.cli.args.ArgsParser
 import csw.alarm.cli.wiring.Wiring
 import csw.alarm.client.internal.commons.AlarmServiceConnection
-import csw.event.helpers.TestFutureExt.RichFuture
+import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.location.api.models.TcpRegistration
 import csw.location.api.scaladsl.LocationService
 import csw.location.commons.ActorSystemFactory

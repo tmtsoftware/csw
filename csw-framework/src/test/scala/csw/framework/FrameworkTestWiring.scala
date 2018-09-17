@@ -9,7 +9,7 @@ import csw.commons.utils.SocketUtils
 import csw.location.api.models.Connection.TcpConnection
 import csw.location.api.models.TcpRegistration
 import csw.location.api.scaladsl.LocationService
-import csw.event.helpers.TestFutureExt.RichFuture
+import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.location.commons.ClusterSettings
 import csw.location.models.RegistrationResult
 import csw.location.scaladsl.LocationServiceFactory

@@ -8,8 +8,8 @@ import "scalapb/scalapb.proto";
 import "csw_protobuf/parameter_types.proto";
 
 option (scalapb.options) = {
-    import: "csw.event.pb._"
-    import: "csw.event.pb.TypeMapperSupport._"
+    import: "csw.event.client.pb._"
+    import: "csw.event.client.pb.TypeMapperSupport._"
     import: "csw.params.core.models._"
     single_file: true
 };

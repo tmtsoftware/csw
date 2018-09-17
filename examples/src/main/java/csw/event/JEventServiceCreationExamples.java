@@ -2,7 +2,8 @@ package csw.event;
 
 import akka.actor.ActorSystem;
 import csw.event.api.javadsl.IEventService;
-import csw.event.models.EventStores;
+import csw.event.client.EventServiceFactory;
+import csw.event.client.models.EventStores;
 import csw.location.api.javadsl.ILocationService;
 import io.lettuce.core.ClientOptions;
 import io.lettuce.core.RedisClient;

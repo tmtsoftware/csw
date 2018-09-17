@@ -7,7 +7,7 @@ import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.framework.models.ContainerInfo
 import csw.location.api.scaladsl.LocationService
 import csw.alarm.client.AlarmServiceFactory
-import csw.event.EventServiceFactory
+import csw.event.client.EventServiceFactory
 import csw.location.scaladsl.RegistrationFactory
 import csw.logging.scaladsl.LoggerFactory
 
