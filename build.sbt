@@ -91,7 +91,7 @@ lazy val `csw-logging-macros` = project
 
 //Logging service
 lazy val `csw-logging` = project
-  .dependsOn(`csw-logging-macros`, `csw-params-jvm`)
+  .dependsOn(`csw-logging-macros`)
   .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.Logging.value

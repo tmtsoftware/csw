@@ -28,7 +28,6 @@ object Dependencies {
       Enumeratum.`enumeratum`.value,
       Akka.`akka-actor`,
       Akka.`akka-slf4j`,
-      Akka.`akka-remote`,
       Akka.`akka-actor-typed`,
       Libs.`scalatest`.value % Test,
       Libs.`junit`           % Test,
