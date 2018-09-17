@@ -27,7 +27,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with BeforeAndAfterAl
   val ArgsUtil = new ArgsUtil
   import ArgsUtil._
 
-  val argsParser = new ArgsParser("csw-config-client-cli")
+  val argsParser = new ArgsParser("csw-config-cli")
 
   override protected def beforeAll(): Unit  = testFileUtils.deleteServerFiles()
   override protected def beforeEach(): Unit = serverWiring.svnRepo.initSvnRepo()

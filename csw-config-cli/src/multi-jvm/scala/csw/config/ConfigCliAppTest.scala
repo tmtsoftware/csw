@@ -59,21 +59,21 @@ class ConfigCliAppTest(ignore: Int) extends LSNodeSpec(config = new TwoClientsAn
 
       def cliApp() = ClientCliWiring.noPrinting(ClusterAwareSettings.joinLocal(3552)).cliApp
 
-      cliApp().start("csw-config-client-cli", Array("create", repoPath1, "-i", inputFilePath, "-c", comment))
+      cliApp().start("csw-config-cli", Array("create", repoPath1, "-i", inputFilePath, "-c", comment))
       enterBarrier("client1-create")
       enterBarrier("client2-create-pass")
 
-      cliApp().start("csw-config-client-cli", Array("update", repoPath1, "-i", updatedInputFilePath, "-c", comment))
+      cliApp().start("csw-config-cli", Array("update", repoPath1, "-i", updatedInputFilePath, "-c", comment))
       enterBarrier("client1-update")
       enterBarrier("client2-update-pass")
 
-      cliApp().start("csw-config-client-cli", Array("setActiveVersion", repoPath1, "--id", "1", "-c", comment))
+      cliApp().start("csw-config-cli", Array("setActiveVersion", repoPath1, "--id", "1", "-c", comment))
       enterBarrier("client1-setActive")
 
       // Verify that client1 (cli app) is able to access file created by client2
       enterBarrier("client2-create")
       val tempOutputFile = Files.createTempFile("output", ".conf").toString
-      cliApp().start("csw-config-client-cli", Array("get", repoPath2, "-o", tempOutputFile))
+      cliApp().start("csw-config-cli", Array("get", repoPath2, "-o", tempOutputFile))
       new String(Files.readAllBytes(Paths.get(tempOutputFile))) shouldEqual inputFileContents
 
     }

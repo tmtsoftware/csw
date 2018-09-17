@@ -6,7 +6,7 @@
 * [csw-cluster-seed](../apps/cswclusterseed.md): Start a cluster seed application, required for running the Location Service.
 * [csw-location-agent](../apps/cswlocationagent.md): Application used to start non-CSW services so that register with Location Service.
 * [csw-config-server](../apps/cswonfigserverapp.md): Start a Configuration Service SVN repository.
-* [csw-config-client-cli](../apps/cswconfigclientcli.md): Application to perform administrative functions on the Configuration Service.
+* [csw-config-cli](../apps/cswconfigcli.md): Application to perform administrative functions on the Configuration Service.
 * [csw-event-cli](../apps/csweventcli.md): Application to publish an event or subscribe to an event.
 * [csw-alarm-cli](../apps/cswalarmcli.md): Application to perform administrative functions on the Alarm Service.
 * [csw-host-config](../apps/hostconfig.md): Framework for creating host configuration applications, used to start multiple containers on a machine.
