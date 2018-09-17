@@ -38,10 +38,10 @@ package csw
  * Then Assembly can use Matcher with the matching definition as provided by [[csw.params.commands.matchers.StateMatcher]] to
  * match against the current states published by HCD.
  *
- * === [[csw.params.TMTSerializable]] ===
+ * === [[csw.serializable.TMTSerializable]] ===
  *
- *  All the models are marked with [[csw.params.TMTSerializable]].
- * [[csw.params.TMTSerializable]] is a marker trait which extends [[scala.Serializable]]. This is configured to use `kryo` serialization.
+ *  All the models are marked with [[csw.serializable.TMTSerializable]].
+ * [[csw.serializable.TMTSerializable]] is a marker trait which extends [[scala.Serializable]]. This is configured to use `kryo` serialization.
  * Also these models are being shared between multiple projects. `csw-location`, `csw-framework` and `csw-logging` depends on `csw-params` project
  * which uses these models.
  *

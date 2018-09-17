@@ -1,6 +1,5 @@
 package csw.location.api.models
-
-import csw.params.TMTSerializable
+import csw.serializable.TMTSerializable
 import play.api.libs.json.{Format, Json}
 
 /**

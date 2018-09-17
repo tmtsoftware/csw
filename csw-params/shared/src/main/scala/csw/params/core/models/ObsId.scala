@@ -2,7 +2,7 @@ package csw.params.core.models
 
 import java.util.Optional
 
-import csw.params.TMTSerializable
+import csw.serializable.TMTSerializable
 import play.api.libs.json._
 
 object ObsId {

@@ -1,4 +1,4 @@
-package csw.params
+package csw.serializable
 
 /**
  * Marker trait for serializing domain models over the wire.

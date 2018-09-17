@@ -1,9 +1,9 @@
 package csw.logging.messages
 
 import akka.actor.typed.ActorRef
-import csw.params.TMTSerializable
 import csw.logging.internal.LoggingLevels.Level
 import csw.logging.models.LogMetadata
+import csw.serializable.TMTSerializable
 
 // Parent trait for Messages which will be send to components for interacting with its logging system
 sealed trait LogControlMessages extends TMTSerializable

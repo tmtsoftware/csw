@@ -1,6 +1,5 @@
 package csw.framework.models
-
-import csw.params.TMTSerializable
+import csw.serializable.TMTSerializable
 import enumeratum._
 
 import scala.collection.immutable

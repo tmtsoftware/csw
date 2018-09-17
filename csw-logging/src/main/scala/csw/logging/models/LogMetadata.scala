@@ -1,7 +1,6 @@
 package csw.logging.models
-
-import csw.params.TMTSerializable
 import csw.logging.internal.LoggingLevels.Level
+import csw.serializable.TMTSerializable
 
 /**
  * Holds metadata information about logging configuration

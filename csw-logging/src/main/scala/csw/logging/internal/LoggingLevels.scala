@@ -1,6 +1,5 @@
 package csw.logging.internal
-
-import csw.params.TMTSerializable
+import csw.serializable.TMTSerializable
 
 private[csw] object LoggingLevels {
 

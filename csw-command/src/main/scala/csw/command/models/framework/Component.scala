@@ -3,7 +3,7 @@ package csw.command.models.framework
 import acyclic.skipped
 import akka.actor.typed.ActorRef
 import csw.command.messages.ComponentMessage
-import csw.params.TMTSerializable
+import csw.serializable.TMTSerializable
 
 /**
  * A class that represents a logical component with it's supervisor actor reference and it's meta information

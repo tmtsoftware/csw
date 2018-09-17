@@ -2,8 +2,8 @@ package csw.params.core.generics
 
 import java.util
 
-import csw.params.TMTSerializable
 import csw.params.extensions.OptionConverters.RichOption
+import csw.serializable.TMTSerializable
 
 import scala.annotation.varargs
 import scala.collection.JavaConverters.setAsJavaSetConverter
