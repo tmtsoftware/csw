@@ -8,7 +8,7 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-cluster-seed`,
   `csw-config-api`,
   `csw-config-client`,
-  `csw-config-client-cli`,
+  `csw-config-cli`,
   `csw-config-server`,
   `csw-framework`,
   `csw-command`,
@@ -35,7 +35,7 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
   `csw-cluster-seed`,
   `csw-location-agent`,
   `csw-config-server`,
-  `csw-config-client-cli`,
+  `csw-config-cli`,
   `csw-event-cli`,
   `csw-alarm-cli`,
   `csw-commons`,
@@ -50,7 +50,7 @@ lazy val githubReleases: Seq[ProjectReference] = Seq(
   `csw-cluster-seed`,
   `csw-location-agent`,
   `csw-config-server`,
-  `csw-config-client-cli`,
+  `csw-config-cli`,
   `csw-event-cli`
 )
 
@@ -174,7 +174,7 @@ lazy val `csw-config-client` = project
     libraryDependencies ++= Dependencies.ConfigClient.value
   )
 
-lazy val `csw-config-client-cli` = project
+lazy val `csw-config-cli` = project
   .dependsOn(
     `csw-config-client`,
     `csw-location`,
@@ -184,7 +184,7 @@ lazy val `csw-config-client-cli` = project
   )
   .enablePlugins(DeployApp, AutoMultiJvm, MaybeCoverage)
   .settings(
-    libraryDependencies ++= Dependencies.ConfigClientCli.value
+    libraryDependencies ++= Dependencies.ConfigCli.value
   )
 
 lazy val `csw-command` = project
