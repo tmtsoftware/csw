@@ -11,7 +11,7 @@ import csw.logging.macros.{SourceFactory, SourceLocation}
 import csw.logging.models.ComponentLoggingState
 import csw.logging.scaladsl.{AnyId, Logger, RequestId}
 
-private[logging] class LoggerImpl(maybeComponentName: Option[String], actorName: Option[String]) extends Logger {
+private[csw] class LoggerImpl(maybeComponentName: Option[String], actorName: Option[String]) extends Logger {
 
   // this is to apply default log level for non-component classes like some common file utility classes
   private[this] val componentName: String = maybeComponentName.getOrElse(Constants.DEFAULT_KEY)

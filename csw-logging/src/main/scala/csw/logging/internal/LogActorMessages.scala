@@ -7,9 +7,9 @@ import csw.logging.macros.SourceLocation
 import csw.logging.scaladsl.AnyId
 
 // Parent trait for Log messages shared with Log Actor
-private[logging] sealed trait LogActorMessages
+private[csw] sealed trait LogActorMessages
 
-private[logging] object LogActorMessages {
+private[csw] object LogActorMessages {
 
   // Model for common Log messages shared with Log Actor
   case class Log(

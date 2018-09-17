@@ -1,10 +1,10 @@
-package csw.logging
+package csw.benchmark.logging
 
 import java.net.InetAddress
 import java.util.concurrent.TimeUnit
 
 import akka.actor.ActorSystem
-import csw.logging.mock.LogActorMock
+import csw.benchmark.logging.mock.LogActorMock
 import csw.logging.appenders.FileAppender
 import csw.logging.internal.LoggingSystem
 import org.openjdk.jmh.annotations._

@@ -1,4 +1,4 @@
-package csw.logging.jmh;
+package csw.benchmark.logging;
 
 import akka.actor.ActorSystem;
 import csw.logging.internal.LoggingLevels;
