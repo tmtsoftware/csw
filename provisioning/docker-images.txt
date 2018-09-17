@@ -1,2 +1,0 @@
-twtmt/centos-tmt,latest
-busybox,latest
