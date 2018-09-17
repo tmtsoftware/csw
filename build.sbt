@@ -122,10 +122,7 @@ lazy val `csw-location` = project
   )
 
 lazy val `csw-location-api` = project
-  .dependsOn(
-    `csw-params-jvm`,
-    `csw-logging`
-  )
+  .dependsOn(`csw-logging`)
   .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.LocationApi.value
