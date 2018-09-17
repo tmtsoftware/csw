@@ -1,4 +1,4 @@
-package csw.params.core.pb
+package csw.event.pb
 
 import java.time.Instant
 

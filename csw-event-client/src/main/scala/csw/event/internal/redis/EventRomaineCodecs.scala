@@ -3,7 +3,7 @@ package csw.event.internal.redis
 import java.nio.ByteBuffer
 
 import csw.params.events.{Event, EventKey}
-import csw.params.core.pb.PbConverter
+import csw.event.pb.PbConverter
 import csw_protobuf.events.PbEvent
 import romaine.codec.{RomaineByteCodec, RomaineStringCodec}
 

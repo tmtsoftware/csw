@@ -118,7 +118,7 @@ case class SystemEvent private (
 object SystemEvent {
 
   // The default apply method is used only internally while reading the incoming json and de-serializing it to SystemEvent model
-  private[params] def apply(
+  private[csw] def apply(
       eventId: Id,
       source: Prefix,
       eventName: EventName,
@@ -177,7 +177,7 @@ case class ObserveEvent private (
 object ObserveEvent {
 
   // The default apply method is used only internally while reading the incoming json and de-serializing it to ObserveEvent model
-  private[params] def apply(
+  private[csw] def apply(
       eventId: Id,
       source: Prefix,
       eventName: EventName,

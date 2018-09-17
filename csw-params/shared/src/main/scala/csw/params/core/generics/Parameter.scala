@@ -14,7 +14,7 @@ import scala.reflect.ClassTag
 
 object Parameter {
 
-  private[core] def apply[S: Format: ClassTag](
+  private[csw] def apply[S: Format: ClassTag](
       keyName: String,
       keyType: KeyType[S],
       items: mutable.WrappedArray[S],

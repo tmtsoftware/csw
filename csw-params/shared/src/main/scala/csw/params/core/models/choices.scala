@@ -30,7 +30,7 @@ object Choice {
    */
   implicit def toChoice(name: String): Choice = new Choice(name)
 
-  private[params] implicit val choiceFormat: OFormat[Choice] = Json.format[Choice]
+  implicit val choiceFormat: OFormat[Choice] = Json.format[Choice]
 }
 
 /**

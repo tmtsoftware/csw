@@ -1,12 +1,12 @@
-package csw.params.core.pb
+package csw.event.pb
 
 import com.google.protobuf.timestamp.Timestamp
 import csw.params.events._
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.ObsId.empty
 import csw.params.core.models._
-import csw.params.core.pb.Implicits.instantMapper
-import csw.params.core.pb.TypeMapperFactory.make
+import csw.event.pb.Implicits.instantMapper
+import csw.event.pb.TypeMapperFactory.make
 import csw_protobuf.events.PbEvent
 import csw_protobuf.events.PbEvent.PbEventType
 import csw_protobuf.keytype.PbKeyType

@@ -42,7 +42,7 @@ case class MatrixData[T](data: mutable.WrappedArray[mutable.WrappedArray[T]])(im
 object MatrixData {
 
   //play-json formatter
-  private[params] implicit def format[T: Format: ClassTag]: Format[MatrixData[T]] = Json.format[MatrixData[T]]
+  implicit def format[T: Format: ClassTag]: Format[MatrixData[T]] = Json.format[MatrixData[T]]
 
   /**
    * Create a MatrixData from one or more arrays of Array[T]

@@ -33,7 +33,7 @@ case class ArrayData[T](data: mutable.WrappedArray[T]) {
 }
 
 object ArrayData {
-  private[params] implicit def format[T: Format: ClassTag]: Format[ArrayData[T]] = Json.format[ArrayData[T]]
+  implicit def format[T: Format: ClassTag]: Format[ArrayData[T]] = Json.format[ArrayData[T]]
 
   /**
    * Create an ArrayData from one or more values

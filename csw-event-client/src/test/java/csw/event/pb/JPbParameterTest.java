@@ -1,4 +1,4 @@
-package csw.params.core.pb;
+package csw.event.pb;
 
 import csw_protobuf.Events;
 import csw_protobuf.Keytype;

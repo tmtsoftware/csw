@@ -7,7 +7,7 @@ import akka.stream.{Materializer, StreamDetachedException}
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import csw.params.events._
 import csw.params.core.models.Subsystem
-import csw.params.core.pb.PbConverter
+import csw.event.pb.PbConverter
 import csw.event.api.scaladsl.{EventSubscriber, EventSubscription, SubscriptionMode}
 import csw.event.internal.commons.EventSubscriberUtil
 import csw.event.utils.Utils

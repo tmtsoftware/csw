@@ -1,4 +1,4 @@
-package csw.params.core.pb;
+package csw.event.pb;
 
 import csw.params.events.Event;
 import csw.params.events.EventName;
@@ -6,8 +6,8 @@ import csw.params.events.SystemEvent;
 import csw.params.javadsl.JKeyType;
 import csw.params.core.generics.Parameter;
 import csw.params.core.models.*;
-import csw.params.core.pb.PbConverter;
-import csw.params.core.pb.TypeMapperSupport;
+import csw.event.pb.PbConverter;
+import csw.event.pb.TypeMapperSupport;
 import csw_protobuf.events.PbEvent;
 import csw_protobuf.parameter.PbParameter;
 import org.junit.Assert;

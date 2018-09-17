@@ -34,7 +34,7 @@ case class Struct private (paramSet: Set[Parameter[_]]) extends ParameterSetType
 
 object Struct {
   //used by play-json
-  private[params] implicit val format: OFormat[Struct] = Json.format[Struct]
+  implicit val format: OFormat[Struct] = Json.format[Struct]
 
   /**
    * A helper method to create Struct from given paramSet

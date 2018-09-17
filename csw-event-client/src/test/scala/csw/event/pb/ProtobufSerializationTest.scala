@@ -1,4 +1,4 @@
-package csw.params.core.pb
+package csw.event.pb
 
 import csw.params.events._
 import csw.params.core.generics.KeyType

@@ -10,5 +10,5 @@ case class RaDec(ra: Double, dec: Double)
 case object RaDec {
 
   //used by play-json
-  private[params] implicit val raDecFormat: OFormat[RaDec] = Json.format[RaDec]
+  implicit val raDecFormat: OFormat[RaDec] = Json.format[RaDec]
 }

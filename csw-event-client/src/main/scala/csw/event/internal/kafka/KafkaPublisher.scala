@@ -6,7 +6,7 @@ import akka.kafka.ProducerSettings
 import akka.stream.Materializer
 import akka.stream.scaladsl.Source
 import csw.params.events.Event
-import csw.params.core.pb.TypeMapperSupport
+import csw.event.pb.TypeMapperSupport
 import csw.event.api.exceptions.PublishFailure
 import csw.event.api.scaladsl.EventPublisher
 import csw.event.internal.commons.EventPublisherUtil
