@@ -50,7 +50,6 @@ object Dependencies {
       Akka.`akka-actor-typed`,
       Akka.`akka-actor-testkit-typed`,
       Akka.`akka-stream`,
-      Akka.`akka-stream-typed`,
       Akka.`akka-distributed-data`,
       Akka.`akka-remote`,
       Akka.`akka-cluster-tools`,
@@ -74,6 +73,9 @@ object Dependencies {
   val LocationApi = Def.setting(
     Seq(
       Akka.`akka-actor-typed`,
+      Akka.`akka-stream`,
+      Libs.`play-json`.value,
+      Libs.`play-json-derived-codecs`.value,
       Libs.`scala-java8-compat`,
       Enumeratum.`enumeratum`.value,
       Libs.`scalatest`.value % Test
