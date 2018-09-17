@@ -1,4 +1,4 @@
-package csw.command.perf.component
+package csw.benchmark.command.component
 
 import akka.actor.typed.scaladsl.ActorContext
 import csw.framework.models.CswContext

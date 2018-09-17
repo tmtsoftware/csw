@@ -1,4 +1,4 @@
-package csw.logging.perf.jmh
+package csw.logging
 
 import java.net.InetAddress
 import java.util.concurrent.TimeUnit
@@ -64,7 +64,7 @@ class E2ELoggingBenchmark {
 }
 
 object Person {
-  private[jmh] def createDummy = Person("James", "Bond", "Downtown", "Omaha")
+  private[logging] def createDummy = Person("James", "Bond", "Downtown", "Omaha")
 }
 
 case class Person(var firstName: String, var lastName: String, var address: String, var city: String)

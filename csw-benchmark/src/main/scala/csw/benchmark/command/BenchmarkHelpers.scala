@@ -1,20 +1,19 @@
-package csw.command.perf
+package csw.benchmark.command
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.{typed, ActorSystem}
 import com.typesafe.config.Config
-import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
+import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
+import csw.command.messages.ComponentCommonMessage.GetSupervisorLifecycleState
+import csw.command.messages.ContainerCommonMessage.GetContainerLifecycleState
+import csw.command.messages.{ComponentMessage, ContainerMessage}
 import csw.command.models.framework.{ContainerLifecycleState, SupervisorLifecycleState}
+import csw.command.scaladsl.CommandService
+import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
-import csw.command.messages.ComponentCommonMessage.GetSupervisorLifecycleState
-import csw.command.messages.{ComponentMessage, ContainerMessage}
-import csw.command.messages.ContainerCommonMessage.GetContainerLifecycleState
-import csw.command.messages.ContainerMessage
-import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
-import csw.command.scaladsl.CommandService
 import csw.location.commons.BlockingUtils
 import csw.location.scaladsl.LocationServiceFactory
 

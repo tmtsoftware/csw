@@ -1,16 +1,16 @@
-package csw.command.perf.jmh
+package csw.benchmark.command
 
 import java.util.concurrent.TimeUnit
 
 import akka.actor.{ActorSystem, Scheduler}
 import akka.util
 import com.typesafe.config.ConfigFactory
+import csw.benchmark.command.BenchmarkHelpers.spawnStandaloneComponent
+import csw.command.scaladsl.CommandService
+import csw.location.commons.ClusterAwareSettings
 import csw.params.commands
 import csw.params.commands.{CommandName, CommandResponse}
 import csw.params.core.models.Prefix
-import csw.command.perf.BenchmarkHelpers.spawnStandaloneComponent
-import csw.command.scaladsl.CommandService
-import csw.location.commons.ClusterAwareSettings
 import org.openjdk.jmh.annotations._
 
 import scala.concurrent.Await

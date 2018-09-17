@@ -1,4 +1,4 @@
-package csw.params
+package csw.benchmark.params
 
 import java.nio.file.{Files, Paths}
 import java.util.concurrent.TimeUnit

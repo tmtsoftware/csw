@@ -1,4 +1,4 @@
-package csw.logging.perf.jmh
+package csw.logging
 
 import java.util.concurrent.TimeUnit
 

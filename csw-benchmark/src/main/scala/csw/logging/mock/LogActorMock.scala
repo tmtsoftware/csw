@@ -1,4 +1,4 @@
-package csw.logging.perf.mock
+package csw.logging.mock
 
 import com.persist.JsonOps.JsonObject
 import csw.logging.RichMsg
