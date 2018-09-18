@@ -13,7 +13,7 @@ import csw.clusterseed.internal.AdminWiring
 import csw.clusterseed.utils.AdminLogTestSuite
 import csw.config.server.commons.{ConfigServiceConnection, TestFileUtils}
 import csw.config.server.{ServerWiring, Settings}
-import csw.location.commons.ClusterAwareSettings
+import csw.location.api.commons.ClusterAwareSettings
 import csw.logging.internal.LoggingLevels.{ERROR, Level, WARN}
 import csw.logging.internal._
 import csw.logging.models.LogMetadata

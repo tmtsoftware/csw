@@ -13,7 +13,7 @@ import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.event.client.internal.wiring.BaseProperties
 import csw.event.client.internal.wiring.BaseProperties.createInfra
 import csw.event.client.models.EventStores.KafkaStore
-import csw.location.commons.ClusterAwareSettings
+import csw.location.api.commons.ClusterAwareSettings
 import net.manub.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.StringSerializer

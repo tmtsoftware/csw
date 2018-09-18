@@ -11,7 +11,7 @@ import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpCo
 import csw.location.api.models._
 import csw.location.commons.{ActorSystemFactory, LocationFactory, TestRegistrationFactory}
 import csw.location.api.exceptions.LocalAkkaActorRegistrationNotAllowed
-import csw.location.internal.Networks
+import csw.location.api.internal.Networks
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 import scala.concurrent.Await

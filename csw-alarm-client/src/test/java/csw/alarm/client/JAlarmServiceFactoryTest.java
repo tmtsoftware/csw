@@ -11,7 +11,7 @@ import csw.alarm.client.internal.commons.AlarmServiceConnection;
 import csw.alarm.client.internal.helpers.AlarmServiceTestSetup;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.api.models.TcpRegistration;
-import csw.location.commons.ClusterAwareSettings;
+import csw.location.api.commons.ClusterAwareSettings;
 import csw.location.javadsl.JLocationServiceFactory;
 import csw.logging.commons.LogAdminActorFactory;
 import org.junit.*;

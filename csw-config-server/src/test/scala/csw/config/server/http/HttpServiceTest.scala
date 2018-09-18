@@ -5,7 +5,7 @@ import akka.stream.BindFailedException
 import csw.config.server.ServerWiring
 import csw.config.server.commons.TestFutureExtension.RichFuture
 import csw.config.server.commons.{ConfigServiceConnection, RegistrationFactory}
-import csw.location.commons.{ClusterAwareSettings, ClusterSettings}
+import csw.location.api.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.location.api.exceptions.OtherLocationIsRegistered
 import csw.location.scaladsl.LocationServiceFactory
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}

@@ -25,7 +25,7 @@ import csw.params.core.models.Prefix
 import csw.command.messages.CommandMessage.Oneway
 import csw.command.messages.ContainerMessage
 import csw.command.messages.ContainerCommonMessage.GetComponents
-import csw.location.commons.{ClusterAwareSettings, ClusterSettings}
+import csw.location.api.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.logging.internal.LoggingLevels.{ERROR, Level, WARN}
 import csw.logging.internal._
 import csw.logging.models.LogMetadata

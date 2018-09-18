@@ -8,7 +8,7 @@ import csw.config.api.scaladsl.{ConfigClientService, ConfigService}
 import csw.config.server.ServerWiring
 import csw.config.server.commons.TestFileUtils
 import csw.config.server.commons.TestFutureExtension.RichFuture
-import csw.location.commons.ClusterAwareSettings
+import csw.location.api.commons.ClusterAwareSettings
 import csw.location.scaladsl.LocationServiceFactory
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 

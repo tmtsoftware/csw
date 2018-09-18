@@ -5,6 +5,7 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.remote.testkit.{MultiNodeSpec, MultiNodeSpecCallbacks}
 import akka.testkit.ImplicitSender
 import csw.location.api.scaladsl.LocationService
+import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.commons.CswCluster
 import csw.location.scaladsl.LocationServiceFactory
 import org.scalatest.{BeforeAndAfterAll, FunSuiteLike, Matchers}
@@ -20,7 +21,7 @@ abstract class LSNodeSpec[T <: NMembersAndSeed](val config: T, mode: String = "c
   protected val cswCluster: CswCluster     = CswCluster.withSystem(system)
   implicit val typedSystem: ActorSystem[_] = system.toTyped
   protected val locationService: LocationService = mode match {
-    case "http"    => LocationServiceFactory.makeLocalHttpClient(system, cswCluster.mat)
+    case "http"    => HttpLocationServiceFactory.makeLocalHttpClient(system, cswCluster.mat)
     case "cluster" => LocationServiceFactory.withCluster(cswCluster)
   }
 

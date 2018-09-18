@@ -14,7 +14,7 @@ import csw.params.core.models.Prefix
 import csw.command.messages.CommandMessage.Oneway
 import csw.command.messages.ContainerMessage
 import csw.command.messages.ContainerCommonMessage.GetComponents
-import csw.location.commons.ClusterAwareSettings
+import csw.location.api.commons.ClusterAwareSettings
 import csw.logging.scaladsl.{LoggerFactory, LoggingSystemFactory}
 
 import scala.concurrent.Await

@@ -1,7 +1,8 @@
 package csw.integtration.apps
 
 import csw.integtration.tests.LocationServiceMultipleNICTest
-import csw.location.commons.{ClusterSettings, CswCluster}
+import csw.location.api.commons.ClusterSettings
+import csw.location.commons.CswCluster
 import org.scalatest
 
 object TestMultipleNicApp {

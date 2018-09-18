@@ -28,7 +28,8 @@ object Dependencies {
       Libs.`play-json-derived-codecs`.value,
       Libs.`scala-java8-compat`,
       Enumeratum.`enumeratum`.value,
-      Libs.`scalatest`.value % Test
+      Libs.`scalatest`.value % Test,
+      Libs.`mockito-core`    % Test
     )
   )
 
@@ -54,6 +55,15 @@ object Dependencies {
       Libs.`mockito-core`            % Test,
       Akka.`akka-stream-testkit`     % Test,
       Akka.`akka-multi-node-testkit` % Test
+    )
+  )
+
+  val LocationClient = Def.setting(
+    Seq(
+      AkkaHttp.`akka-http`,
+      Libs.`scala-async`,
+      Libs.`play-json`.value,
+      Libs.`akka-http-play-json`
     )
   )
 

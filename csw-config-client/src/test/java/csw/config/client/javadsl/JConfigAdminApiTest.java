@@ -13,7 +13,7 @@ import csw.config.server.ServerWiring;
 import csw.config.server.commons.TestFileUtils;
 import csw.config.server.http.HttpService;
 import csw.location.api.javadsl.ILocationService;
-import csw.location.commons.ClusterAwareSettings;
+import csw.location.api.commons.ClusterAwareSettings;
 import csw.location.javadsl.JLocationServiceFactory;
 import org.junit.*;
 import org.junit.rules.ExpectedException;

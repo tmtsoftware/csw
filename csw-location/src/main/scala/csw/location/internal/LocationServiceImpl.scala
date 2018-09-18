@@ -19,6 +19,7 @@ import csw.location.api.exceptions.{
 import csw.location.api.javadsl.ILocationService
 import csw.location.api.models.Registration
 import csw.location.api.scaladsl.LocationService
+import csw.location.client.internal.JLocationServiceImpl
 import csw.location.internal.Registry.AllServices
 import csw.location.internal.StreamExt.RichSource
 import csw.logging.scaladsl.Logger

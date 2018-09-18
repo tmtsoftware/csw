@@ -13,9 +13,10 @@ import csw.location.api.exceptions.OtherLocationIsRegistered
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.location.api.models.{HttpRegistration, TcpRegistration, _}
 import csw.location.api.scaladsl.LocationService
+import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.commons.TestFutureExtension.RichFuture
 import csw.location.commons.{ActorSystemFactory, TestRegistrationFactory}
-import csw.location.internal.Networks
+import csw.location.api.internal.Networks
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
@@ -41,7 +42,7 @@ class LocationServiceCompTest(mode: String)
   implicit val mat: Materializer                 = ActorMaterializer()
 
   private lazy val locationService: LocationService = mode match {
-    case "http"    => LocationServiceFactory.makeLocalHttpClient
+    case "http"    => HttpLocationServiceFactory.makeLocalHttpClient
     case "cluster" => LocationServiceFactory.make()
   }
 

@@ -8,7 +8,7 @@ import csw.config.api.models.ConfigId
 import csw.config.server.ServerWiring
 import csw.config.commons.TestFutureExtension.RichFuture
 import csw.config.commons.{ArgsUtil, TestFileUtils}
-import csw.location.commons.ClusterAwareSettings
+import csw.location.api.commons.ClusterAwareSettings
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 // DEOPSCSW-112: Command line interface client for Configuration service

@@ -5,7 +5,8 @@ import csw.location.api.scaladsl.LocationService
 import csw.config.api.scaladsl.ConfigService
 import csw.config.client.internal.ActorRuntime
 import csw.config.client.scaladsl.ConfigClientFactory
-import csw.location.commons.{ClusterSettings, CswCluster}
+import csw.location.api.commons.ClusterSettings
+import csw.location.commons.CswCluster
 import csw.location.scaladsl.LocationServiceFactory
 
 /**

@@ -1,4 +1,4 @@
-package csw.location.internal
+package csw.location.client.internal
 
 import akka.actor.{ActorSystem, CoordinatedShutdown, Scheduler}
 import akka.http.scaladsl.Http
@@ -7,21 +7,18 @@ import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.sse.ServerSentEvent
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.http.scaladsl.unmarshalling.sse.EventStreamUnmarshalling._
-import akka.stream.scaladsl.{Sink, Source}
-import akka.stream.{KillSwitch, Materializer}
+import akka.stream.scaladsl.{Keep, Sink, Source}
+import akka.stream.{KillSwitch, KillSwitches, Materializer}
 import akka.{Done, NotUsed}
-import csw.location.api.models._
 import csw.location.api.exceptions.{OtherLocationIsRegistered, RegistrationFailed}
 import csw.location.api.formats.LocationJsonSupport
-import csw.location.internal.StreamExt.RichSource
 import csw.location.api.javadsl.ILocationService
-import csw.location.api.models.Registration
+import csw.location.api.models.{Registration, RegistrationResult, _}
 import csw.location.api.scaladsl.LocationService
 import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
 import play.api.libs.json.Json
-import csw.location.api.models.RegistrationResult
 
-import scala.async.Async._
+import scala.async.Async.{async, await}
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 
@@ -137,7 +134,7 @@ private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(impl
       await(Unmarshal(response.entity).to[Source[ServerSentEvent, NotUsed]])
     }
     val sseStream = Source.fromFuture(sseStreamFuture).flatMapConcat(identity)
-    sseStream.map(x => Json.parse(x.data).as[TrackingEvent]).cancellable
+    sseStream.map(x => Json.parse(x.data).as[TrackingEvent]).viaMat(KillSwitches.single)(Keep.right)
   }
 
   override def subscribe(connection: Connection, callback: TrackingEvent => Unit): KillSwitch = {

@@ -1,6 +1,7 @@
 package csw.location.scaladsl
 
 import akka.actor.CoordinatedShutdown.UnknownReason
+import csw.location.api.commons.ClusterSettings
 import csw.location.api.models.Connection.TcpConnection
 import csw.location.api.models.TcpRegistration
 import csw.location.api.models.{ComponentId, ComponentType}

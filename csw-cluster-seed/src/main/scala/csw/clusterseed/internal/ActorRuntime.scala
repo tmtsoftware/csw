@@ -5,7 +5,7 @@ import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.{ActorSystem, CoordinatedShutdown, Scheduler}
 import akka.stream.{ActorMaterializer, Materializer}
 import csw.services.BuildInfo
-import csw.location.commons.ClusterAwareSettings
+import csw.location.api.commons.ClusterAwareSettings
 import csw.logging.internal.LoggingSystem
 import csw.logging.scaladsl.LoggingSystemFactory
 

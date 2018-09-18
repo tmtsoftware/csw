@@ -1,8 +1,8 @@
-package csw.location.internal
+package csw.location.api.internal
 
 import java.net.{Inet6Address, InetAddress, NetworkInterface}
 
-import csw.location.commons.LocationServiceLogger
+import csw.location.api.commons.LocationServiceLogger
 import csw.logging.scaladsl.Logger
 
 import scala.collection.JavaConverters._

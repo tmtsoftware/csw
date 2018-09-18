@@ -2,7 +2,7 @@ package csw.config.cli
 
 import csw.services.BuildInfo
 import csw.config.cli.commons.CoordinatedShutdownReasons.ApplicationFinishedReason
-import csw.location.commons.ClusterAwareSettings
+import csw.location.api.commons.ClusterAwareSettings
 import csw.logging.scaladsl.LoggingSystemFactory
 
 // $COVERAGE-OFF$

@@ -1,9 +1,10 @@
 package csw.location.javadsl
 
 import akka.actor.ActorSystem
+import csw.location.api.commons.ClusterSettings
 import csw.location.api.javadsl.ILocationService
-import csw.location.commons.{ClusterSettings, CswCluster}
-import csw.location.internal.JLocationServiceImpl
+import csw.location.client.internal.JLocationServiceImpl
+import csw.location.commons.CswCluster
 import csw.location.scaladsl.LocationServiceFactory
 
 /**

@@ -1,10 +1,11 @@
 package csw.event.cli
 
+import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import csw.event.cli.args.{ArgsParser, Options}
 import csw.event.cli.commons.ApplicationFinishedReason
 import csw.event.cli.wiring.Wiring
-import csw.location.commons.{ActorSystemFactory, ClusterAwareSettings}
+import csw.location.api.commons.ClusterAwareSettings
 import csw.logging.scaladsl.LoggingSystemFactory
 import csw.services.BuildInfo
 
@@ -23,7 +24,7 @@ object Main extends App {
     }
 
   private def run(options: Options): Unit = {
-    val actorSystem = ActorSystemFactory.remote()
+    val actorSystem = ActorSystem()
     LoggingSystemFactory.start(name, BuildInfo.version, ClusterAwareSettings.hostname, actorSystem)
 
     val wiring = new Wiring(actorSystem)

@@ -1,4 +1,4 @@
-package csw.location.internal
+package csw.location.client.internal
 
 import java.time.Duration
 import java.util
@@ -10,10 +10,10 @@ import akka.Done
 import akka.actor.CoordinatedShutdown.Reason
 import akka.stream.KillSwitch
 import akka.stream.javadsl.Source
-import csw.location.api.models._
 import csw.location.api.javadsl.{ILocationService, IRegistrationResult}
-import csw.location.api.models.Registration
+import csw.location.api.models.{Registration, _}
 import csw.location.api.scaladsl.LocationService
+
 import scala.collection.JavaConverters._
 import scala.compat.java8.DurationConverters.DurationOps
 import scala.compat.java8.FutureConverters._

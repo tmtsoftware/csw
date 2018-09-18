@@ -1,9 +1,8 @@
-package csw.location.commons
+package csw.location.api.commons
 
 import akka.actor.ActorSystem
 import com.typesafe.config.{Config, ConfigFactory}
-import csw.location.api.commons.Constants
-import csw.location.internal.Networks
+import csw.location.api.internal.Networks
 import csw.logging.scaladsl.Logger
 
 import scala.annotation.varargs
@@ -24,12 +23,12 @@ import scala.collection.JavaConverters._
  *  - clusterPort (Specify port on which to start this service)
  *
  * The config values of the `ActorSystem` will be evaluated based on the above three settings as follows :
- *  - `akka.remote.netty.tcp.hostname` will be ipV4 address based on `interfaceName` from [[csw.location.internal.Networks]]
+ *  - `akka.remote.netty.tcp.hostname` will be ipV4 address based on `interfaceName` from [[csw.location.api.internal.Networks]]
  *  - `akka.remote.netty.tcp.port` will be a random port or if `clusterPort` is specified that value will be picked
  *  - `akka.cluster.seed-nodes` will pick values of `clusterSeeds`
  *
  * If none of the settings are provided then defaults will be picked as follows :
- *  - `akka.remote.netty.tcp.hostname` will be ipV4 address from [[csw.location.internal.Networks]]
+ *  - `akka.remote.netty.tcp.hostname` will be ipV4 address from [[csw.location.api.internal.Networks]]
  *  - `akka.remote.netty.tcp.port` will be a random port
  *  - `akka.cluster.seed-nodes` will be empty
  * and an `ActorSystem` will be created and a cluster will be formed with no Seed Nodes. It will self join the cluster.

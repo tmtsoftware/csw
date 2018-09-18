@@ -5,7 +5,7 @@ import akka.http.scaladsl.Http.ServerBinding
 import csw.clusterseed.commons.ClusterSeedLogger
 import csw.clusterseed.commons.CoordinatedShutdownReasons.FailureReason
 import csw.clusterseed.internal.{ActorRuntime, Settings}
-import csw.location.commons.ClusterAwareSettings
+import csw.location.api.commons.ClusterAwareSettings
 import csw.logging.scaladsl.Logger
 
 import scala.async.Async._

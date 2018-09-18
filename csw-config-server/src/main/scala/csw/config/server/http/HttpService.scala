@@ -10,7 +10,7 @@ import csw.config.server.commons.{ConfigServerLogger, ConfigServiceConnection}
 import csw.config.server.{ActorRuntime, Settings}
 import csw.location.api.models.{HttpRegistration, RegistrationResult}
 import csw.location.api.scaladsl.LocationService
-import csw.location.commons.ClusterAwareSettings
+import csw.location.api.commons.ClusterAwareSettings
 import csw.logging.commons.LogAdminActorFactory
 import csw.logging.scaladsl.Logger
 

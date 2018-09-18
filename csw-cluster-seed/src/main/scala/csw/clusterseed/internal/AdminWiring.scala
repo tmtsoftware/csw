@@ -6,7 +6,7 @@ import csw.clusterseed.admin.LogAdmin
 import csw.clusterseed.admin.http.{AdminExceptionHandlers, AdminHttpService, AdminRoutes}
 import csw.clusterseed.location.{LocationExceptionHandler, LocationHttpService, LocationRoutes}
 import csw.location.api.scaladsl.LocationService
-import csw.location.commons.{ClusterAwareSettings, ClusterSettings}
+import csw.location.api.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.location.scaladsl.LocationServiceFactory
 
 // $COVERAGE-OFF$

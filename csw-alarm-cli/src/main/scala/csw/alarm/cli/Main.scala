@@ -1,12 +1,13 @@
 package csw.alarm.cli
 
+import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
-import csw.services.BuildInfo
 import csw.alarm.cli.args.{ArgsParser, Options}
 import csw.alarm.cli.commons.CoordinatedShutdownReasons.ApplicationFinishedReason
 import csw.alarm.cli.wiring.Wiring
-import csw.location.commons.{ActorSystemFactory, ClusterAwareSettings}
+import csw.location.api.commons.ClusterAwareSettings
 import csw.logging.scaladsl.LoggingSystemFactory
+import csw.services.BuildInfo
 
 // $COVERAGE-OFF$
 object Main extends App {
@@ -19,7 +20,7 @@ object Main extends App {
   else new ArgsParser(name).parse(args).foreach(run)
 
   private def run(options: Options): Unit = {
-    val actorSystem = ActorSystemFactory.remote()
+    val actorSystem = ActorSystem()
     LoggingSystemFactory.start(name, BuildInfo.version, ClusterAwareSettings.hostname, actorSystem)
 
     val wiring = new Wiring(actorSystem)

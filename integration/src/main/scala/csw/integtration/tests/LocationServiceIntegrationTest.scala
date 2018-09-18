@@ -18,7 +18,7 @@ import csw.params.core.models.Prefix
 import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.integtration.apps.TromboneHCD
 import csw.integtration.common.TestFutureExtension.RichFuture
-import csw.location.commons.ClusterAwareSettings
+import csw.location.api.commons.ClusterAwareSettings
 import csw.location.scaladsl.LocationServiceFactory
 import csw.logging.messages.LogControlMessages
 import org.scalatest._

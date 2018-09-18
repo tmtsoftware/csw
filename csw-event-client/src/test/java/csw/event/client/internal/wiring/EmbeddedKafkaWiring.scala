@@ -1,6 +1,6 @@
 package csw.event.client.internal.wiring
 
-import csw.location.commons.ClusterSettings
+import csw.location.api.commons.ClusterSettings
 import net.manub.embeddedkafka.EmbeddedKafkaConfig
 
 object EmbeddedKafkaWiring {

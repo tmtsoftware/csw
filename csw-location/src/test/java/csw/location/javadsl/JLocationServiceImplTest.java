@@ -18,7 +18,7 @@ import csw.location.api.javadsl.IRegistrationResult;
 import csw.location.api.models.*;
 import csw.location.commons.ActorSystemFactory;
 import csw.location.commons.TestRegistrationFactory;
-import csw.location.internal.Networks;
+import csw.location.api.internal.Networks;
 import csw.logging.javadsl.ILogger;
 import csw.logging.javadsl.JLoggerFactory;
 import org.junit.After;

@@ -5,7 +5,7 @@ import csw.config.server.cli.{ArgsParser, Options}
 import csw.config.server.commons.ConfigServerLogger
 import csw.config.server.commons.CoordinatedShutdownReasons.FailureReason
 import csw.config.server.http.HttpService
-import csw.location.commons.{ClusterAwareSettings, ClusterSettings}
+import csw.location.api.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.logging.scaladsl.Logger
 import org.tmatesoft.svn.core.SVNException
 

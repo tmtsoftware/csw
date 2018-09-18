@@ -7,7 +7,7 @@ import akka.util
 import com.typesafe.config.ConfigFactory
 import csw.benchmark.command.BenchmarkHelpers.spawnStandaloneComponent
 import csw.command.scaladsl.CommandService
-import csw.location.commons.ClusterAwareSettings
+import csw.location.api.commons.ClusterAwareSettings
 import csw.params.commands
 import csw.params.commands.{CommandName, CommandResponse}
 import csw.params.core.models.Prefix

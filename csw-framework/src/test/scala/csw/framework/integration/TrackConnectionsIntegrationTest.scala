@@ -20,7 +20,7 @@ import csw.params.core.states.{CurrentState, StateName}
 import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.scaladsl.CommandService
 import csw.event.client.helpers.TestFutureExt.RichFuture
-import csw.location.commons.ClusterSettings
+import csw.location.api.commons.ClusterSettings
 import csw.location.api.models.{HttpRegistration, TcpRegistration}
 import csw.logging.commons.LogAdminActorFactory
 import io.lettuce.core.RedisClient

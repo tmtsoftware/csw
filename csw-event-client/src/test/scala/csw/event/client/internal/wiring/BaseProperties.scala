@@ -13,7 +13,7 @@ import csw.event.client.helpers.RegistrationFactory
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.event.client.internal.commons.serviceresolver.EventServiceLocationResolver
 import csw.event.client.internal.commons.{EventServiceConnection, EventStreamSupervisionStrategy}
-import csw.location.commons.ClusterAwareSettings
+import csw.location.api.commons.ClusterAwareSettings
 import csw.location.scaladsl.LocationServiceFactory
 
 import scala.async.Async._

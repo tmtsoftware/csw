@@ -8,7 +8,7 @@ import csw.alarm.api.scaladsl.{AlarmAdminService, AlarmService}
 import csw.alarm.client.internal.commons.AlarmServiceConnection
 import csw.alarm.client.internal.helpers.AlarmServiceTestSetup
 import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
-import csw.location.commons.ClusterAwareSettings
+import csw.location.api.commons.ClusterAwareSettings
 import csw.location.scaladsl.LocationServiceFactory
 import csw.logging.commons.LogAdminActorFactory
 

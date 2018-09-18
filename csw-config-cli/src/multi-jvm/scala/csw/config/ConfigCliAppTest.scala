@@ -10,7 +10,7 @@ import csw.config.server.commons.TestFileUtils
 import csw.config.server.{ServerWiring, Settings}
 import csw.config.cli.ClientCliWiring
 import csw.config.helpers.TwoClientsAndServer
-import csw.location.commons.ClusterAwareSettings
+import csw.location.api.commons.ClusterAwareSettings
 import csw.location.helpers.LSNodeSpec
 import org.scalatest.FunSuiteLike
 

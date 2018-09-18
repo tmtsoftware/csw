@@ -12,7 +12,7 @@ import csw.config.client.javadsl.JConfigClientFactory;
 import csw.config.server.ServerWiring;
 import csw.config.server.commons.TestFileUtils;
 import csw.config.server.http.HttpService;
-import csw.location.commons.ClusterAwareSettings;
+import csw.location.api.commons.ClusterAwareSettings;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.javadsl.JLocationServiceFactory;
 import org.junit.*;
