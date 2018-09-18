@@ -266,7 +266,11 @@ class SeverityServiceModuleTest
     testProbe.expectMessage(2.seconds, Disconnected) // severity expires after 1 second in test
 
     setSeverity(tromboneAxisHighLimitAlarmKey, Major).await
-    testProbe.expectNoMessage(200.millis) // Major is lower than Disconnected, hence aggregated severity does not change
+    testProbe.expectNoMessage(200.millis) // Setting severity in another key doesn't affect this
+
+    setSeverity(tromboneAxisLowLimitAlarmKey, Major).await
+    getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldBe Major
+    testProbe.expectMessage(Major)
 
     alarmSubscription.unsubscribe().await
   }
@@ -367,6 +371,7 @@ class SeverityServiceModuleTest
   // DEOPSCSW-448: Set Activation status for an alarm entity
   // DEOPSCSW-467: Monitor alarm severities in the alarm store for a single alarm, component, subsystem, or all
   test("subscribeAggregatedSeverityCallback should throw InactiveAlarmException when all resolved keys are inactive") {
+    enclosureTempLowAlarm.isActive shouldBe false
     a[InactiveAlarmException] shouldBe thrownBy(
       subscribeAggregatedSeverityCallback(enclosureTempLowAlarmKey, println).ready().await
     )
