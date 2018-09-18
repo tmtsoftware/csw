@@ -185,6 +185,9 @@ class HealthServiceModuleTest
     setSeverity(outOfRangeOffloadAlarmKey, Warning).await
     testProbe.expectNoMessage(200.millis)
 
+    setSeverity(tromboneAxisHighLimitAlarmKey, Major).await
+    testProbe.expectNoMessage(200.millis)
+
     alarmSubscription.unsubscribe().await
   }
 
@@ -204,6 +207,9 @@ class HealthServiceModuleTest
 
     setSeverity(tromboneAxisHighLimitAlarmKey, Warning).await
     testProbe.expectMessage(Ill) //tromboneAxisHighLimitAlarmKey=Warning & tromboneAxisLowLimitAlarmKey=Major
+
+    setSeverity(splitterLimitAlarmKey, Critical).await
+    testProbe.expectNoMessage(100.millis)
 
     alarmSubscription.unsubscribe().await
   }
@@ -249,6 +255,8 @@ class HealthServiceModuleTest
 
   // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem or all
   test("subscribeAggregatedHealthCallback should throw InactiveAlarmException when all resolved keys are inactive") {
+    val metadataList = getMetadata(SubsystemKey(LGSF)).await
+    metadataList.foreach(m => m.isActive shouldBe false)
     a[InactiveAlarmException] shouldBe thrownBy(subscribeAggregatedHealthCallback(SubsystemKey(LGSF), println).ready().await)
   }
 
@@ -301,6 +309,8 @@ class HealthServiceModuleTest
 
   // DEOPSCSW-468: Monitor health values based on alarm severities for a single alarm, component, subsystem or all
   test("subscribeAggregatedHealthActorRef should throw InactiveAlarmException when all resolved keys are inactive") {
+    val metadataList = getMetadata(SubsystemKey(LGSF)).await
+    metadataList.foreach(m => m.isActive shouldBe false)
     a[InactiveAlarmException] shouldBe thrownBy {
       val testProbe    = TestProbe[AlarmHealth]()(actorSystem.toTyped)
       val subscription = subscribeAggregatedHealthActorRef(SubsystemKey(LGSF), testProbe.ref)
