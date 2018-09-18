@@ -9,7 +9,7 @@ import csw.logging.messages.LogControlMessages
 /**
  * A factory to create the `LogAdminActor`
  */
-private[csw] object LogAdminActorFactory {
+object LogAdminActorFactory {
 
   /**
    * Create LogAdminActor in an app. It is used while registering any connection in location service.
