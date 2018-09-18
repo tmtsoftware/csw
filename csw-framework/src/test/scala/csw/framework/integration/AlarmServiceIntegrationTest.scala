@@ -23,6 +23,7 @@ import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import scala.concurrent.duration.DurationLong
 
 //DEOPSCSW-490: Alarm service integration with framework
+//DEOPSCSW-481: Component Developer API available to all CSW components
 class AlarmServiceIntegrationTest extends FunSuite with EmbeddedRedis with Matchers with BeforeAndAfterAll {
   private val testWiring = new FrameworkTestWiring()
   import testWiring._
