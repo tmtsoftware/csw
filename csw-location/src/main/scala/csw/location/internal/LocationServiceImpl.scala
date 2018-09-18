@@ -21,7 +21,6 @@ import csw.location.api.models.Registration
 import csw.location.api.scaladsl.LocationService
 import csw.location.internal.Registry.AllServices
 import csw.location.internal.StreamExt.RichSource
-import csw.location.models._
 import csw.logging.scaladsl.Logger
 
 import scala.async.Async._

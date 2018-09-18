@@ -7,9 +7,8 @@ import csw.location.agent.commons.CoordinatedShutdownReasons.{FailureReason, Pro
 import csw.location.agent.commons.LocationAgentLogger
 import csw.location.agent.models.Command
 import csw.location.api.models.Connection.TcpConnection
-import csw.location.api.models.{ComponentId, ComponentType, TcpRegistration}
+import csw.location.api.models.{ComponentId, ComponentType, RegistrationResult, TcpRegistration}
 import csw.location.commons.CswCluster
-import csw.location.models._
 import csw.location.scaladsl.LocationServiceFactory
 import csw.logging.commons.LogAdminActorFactory
 import csw.logging.scaladsl.Logger

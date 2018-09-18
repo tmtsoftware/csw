@@ -11,7 +11,7 @@ import csw.params.core.models.Prefix
 import csw.integtration.common.TestFutureExtension.RichFuture
 import csw.location.commons.{ActorSystemFactory, ClusterSettings, CswCluster}
 import csw.location.api.models.AkkaRegistration
-import csw.location.models.RegistrationResult
+import csw.location.api.models.RegistrationResult
 import csw.location.scaladsl.LocationServiceFactory
 import csw.logging.messages.LogControlMessages
 

@@ -22,7 +22,7 @@ import csw.config.api.scaladsl.ConfigClientService
 import csw.config.client.scaladsl.ConfigClientFactory
 import csw.event.client.EventServiceFactory
 import csw.event.api.scaladsl.EventService
-import csw.location.models.RegistrationResult
+import csw.location.api.models.RegistrationResult
 import csw.location.scaladsl.RegistrationFactory
 import csw.logging.scaladsl.{Logger, LoggerFactory}
 import org.mockito.ArgumentMatchers.any

@@ -19,7 +19,7 @@ import csw.location.api.models.Registration
 import csw.location.api.scaladsl.LocationService
 import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
 import play.api.libs.json.Json
-import csw.location.models.RegistrationResult
+import csw.location.api.models.RegistrationResult
 
 import scala.async.Async._
 import scala.concurrent.Future

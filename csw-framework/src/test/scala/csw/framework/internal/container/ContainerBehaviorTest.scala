@@ -25,7 +25,7 @@ import csw.alarm.client.AlarmServiceFactory
 import csw.event.client.EventServiceFactory
 import csw.location.commons.ActorSystemFactory
 import csw.location.api.models.AkkaRegistration
-import csw.location.models.RegistrationResult
+import csw.location.api.models.RegistrationResult
 import csw.location.scaladsl.RegistrationFactory
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._

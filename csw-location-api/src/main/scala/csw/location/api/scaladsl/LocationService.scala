@@ -7,7 +7,7 @@ import akka.stream.KillSwitch
 import akka.stream.scaladsl.Source
 import csw.location.api.javadsl.ILocationService
 import csw.location.api.models._
-import csw.location.models.RegistrationResult
+import csw.location.api.models.RegistrationResult
 
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration

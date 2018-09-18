@@ -14,8 +14,6 @@ import csw.location.api.models._
 import csw.location.api.javadsl.{ILocationService, IRegistrationResult}
 import csw.location.api.models.Registration
 import csw.location.api.scaladsl.LocationService
-import csw.location.models._
-
 import scala.collection.JavaConverters._
 import scala.compat.java8.DurationConverters.DurationOps
 import scala.compat.java8.FutureConverters._
