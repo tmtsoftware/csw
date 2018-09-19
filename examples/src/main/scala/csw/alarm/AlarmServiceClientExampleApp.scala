@@ -3,10 +3,12 @@ import akka.Done
 import akka.actor.{typed, ActorSystem}
 import akka.actor.typed.scaladsl.Behaviors
 import com.typesafe.config._
+import csw.alarm.api.javadsl.IAlarmService
 import csw.params.core.models.Subsystem.NFIRAOS
 import csw.alarm.api.models.AlarmSeverity.Okay
 import csw.alarm.api.models.Key.AlarmKey
 import csw.alarm.api.models.{AlarmHealth, AlarmMetadata, AlarmStatus, FullAlarmSeverity}
+import csw.alarm.api.scaladsl.{AlarmAdminService, AlarmService}
 import csw.alarm.client.AlarmServiceFactory
 import csw.location.javadsl.JLocationServiceFactory
 import csw.location.scaladsl.LocationServiceFactory
@@ -53,91 +55,103 @@ object AlarmServiceClientExampleApp {
 
   val alarmKey = AlarmKey(NFIRAOS, "trombone", "tromboneAxisLowLimitAlarm")
 
+  val clientAPI: AlarmService     = clientAPI1
+  val adminAPI: AlarmAdminService = adminAPI1
+
+  val jclientAPI: IAlarmService = jclientAPI1
+
   val foo: Future[Done] =
     //#setSeverity-scala
     async {
-      await(clientAPI1.setSeverity(alarmKey, Okay))
+      await(clientAPI.setSeverity(alarmKey, Okay))
     }
   //#setSeverity-scala
 
   //#setSeverity-java
-  private val done: Done = jclientAPI1.setSeverity(alarmKey, Okay).get()
+  private val done: Done = jclientAPI.setSeverity(alarmKey, Okay).get()
   //#setSeverity-java
 
   //#initAlarms
   async {
-    val alarmsConfig: Config = ConfigFactory.parseResources("test-alarms/valid-alarms.conf")
-    await(adminAPI1.initAlarms(alarmsConfig))
+    val resource             = "test-alarms/valid-alarms.conf"
+    val alarmsConfig: Config = ConfigFactory.parseResources(resource)
+    await(adminAPI.initAlarms(alarmsConfig))
   }
   //#initAlarms
 
   //#acknowledge
   async {
-    await(adminAPI1.acknowledge(alarmKey))
+    await(adminAPI.acknowledge(alarmKey))
   }
   //#acknowledge
 
   //#shelve
   async {
-    await(adminAPI1.shelve(alarmKey))
+    await(adminAPI.shelve(alarmKey))
   }
   //#shelve
 
   //#unshelve
   async {
-    await(adminAPI1.unshelve(alarmKey))
+    await(adminAPI.unshelve(alarmKey))
   }
   //#unshelve
 
   //#reset
   async {
-    await(adminAPI1.reset(alarmKey))
+    await(adminAPI.reset(alarmKey))
   }
   //#reset
 
   //#getMetadata
   async {
-    val metadata: AlarmMetadata = await(adminAPI1.getMetadata(alarmKey))
+    val metadata: AlarmMetadata = await(adminAPI.getMetadata(alarmKey))
   }
   //#getMetadata
 
   //#getStatus
   async {
-    val status: AlarmStatus = await(adminAPI1.getStatus(alarmKey))
+    val status: AlarmStatus = await(adminAPI.getStatus(alarmKey))
   }
   //#getStatus
 
   //#getCurrentSeverity
   async {
-    val severity: FullAlarmSeverity = await(adminAPI1.getCurrentSeverity(alarmKey))
+    val severity: FullAlarmSeverity = await(adminAPI.getCurrentSeverity(alarmKey))
   }
   //#getCurrentSeverity
 
   //#getAggregatedSeverity
   async {
-    val aggregatedSeverity: FullAlarmSeverity = await(adminAPI1.getAggregatedSeverity(alarmKey))
+    val aggregatedSeverity: FullAlarmSeverity = await(adminAPI.getAggregatedSeverity(alarmKey))
   }
   //#getAggregatedSeverity
 
   //#getAggregatedHealth
   async {
-    val health: AlarmHealth = await(adminAPI1.getAggregatedHealth(alarmKey))
+    val health: AlarmHealth = await(adminAPI.getAggregatedHealth(alarmKey))
   }
   //#getAggregatedHealth
 
   //#subscribeAggregatedSeverityCallback
-  adminAPI1.subscribeAggregatedSeverityCallback(alarmKey, aggregatedSeverity ⇒ { /* do something*/ })
+  adminAPI.subscribeAggregatedSeverityCallback(
+    alarmKey,
+    aggregatedSeverity ⇒ { /* do something*/ }
+  )
   //#subscribeAggregatedSeverityCallback
 
   //#subscribeAggregatedSeverityActorRef
-  adminAPI1.subscribeAggregatedSeverityActorRef(alarmKey, severityActorRef)
+  adminAPI.subscribeAggregatedSeverityActorRef(alarmKey, severityActorRef)
   //#subscribeAggregatedSeverityActorRef
 
   //#subscribeAggregatedHealthCallback
-  adminAPI1.subscribeAggregatedHealthCallback(alarmKey, aggregatedHealth ⇒ { /* do something*/ })
+  adminAPI.subscribeAggregatedHealthCallback(
+    alarmKey,
+    aggregatedHealth ⇒ { /* do something*/ }
+  )
   //#subscribeAggregatedHealthCallback
 
   //#subscribeAggregatedHealthActorRef
-  adminAPI1.subscribeAggregatedHealthActorRef(alarmKey, healthActorRef)
+  adminAPI.subscribeAggregatedHealthActorRef(alarmKey, healthActorRef)
   //#subscribeAggregatedHealthActorRef
 }
