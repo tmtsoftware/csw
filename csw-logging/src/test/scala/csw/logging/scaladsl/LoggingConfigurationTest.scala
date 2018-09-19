@@ -7,14 +7,14 @@ import java.time.temporal.ChronoUnit
 import java.time.{ZoneId, ZoneOffset, ZonedDateTime}
 
 import akka.actor.ActorSystem
-import com.persist.JsonOps
-import com.persist.JsonOps.JsonObject
 import com.typesafe.config.ConfigFactory
 import csw.logging.appenders.{FileAppender, StdOutAppender}
 import csw.logging.commons.{LoggingKeys, TMTDateTimeFormatter}
+import csw.logging.internal.JsonExtensions.RichJsObject
 import csw.logging.internal.LoggingLevels.{DEBUG, INFO, TRACE}
 import csw.logging.utils.FileUtils
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
+import play.api.libs.json.{JsObject, Json}
 
 import scala.collection.mutable
 import scala.concurrent.Await
@@ -40,7 +40,7 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
   private val fileName  = "LoggingConfigurationTest.scala"
 
   private val outStream       = new ByteArrayOutputStream
-  private val stdOutLogBuffer = mutable.Buffer.empty[JsonObject]
+  private val stdOutLogBuffer = mutable.Buffer.empty[JsObject]
 
   override protected def beforeAll(): Unit = {
     FileUtils.deleteRecursively(logFileDir)
@@ -56,13 +56,11 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
 
   def parse(str: String): Unit = {
     str.split("\n").foreach { log ⇒
-      stdOutLogBuffer += JsonOps.Json(log).asInstanceOf[Map[String, String]]
+      stdOutLogBuffer += Json.parse(log).as[JsObject]
     }
   }
 
-  def testLogConfiguration(logBuffer: mutable.Seq[JsonObject],
-                           headersEnabled: Boolean,
-                           expectedTimestamp: ZonedDateTime): Unit = {
+  def testLogConfiguration(logBuffer: mutable.Seq[JsObject], headersEnabled: Boolean, expectedTimestamp: ZonedDateTime): Unit = {
     logBuffer.size shouldBe 1
 
     val jsonLogMessage = logBuffer.head
@@ -71,21 +69,21 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
     jsonLogMessage.contains(LoggingKeys.HOST) shouldBe headersEnabled
     jsonLogMessage.contains(LoggingKeys.VERSION) shouldBe headersEnabled
 
-    if (headersEnabled == true) {
-      jsonLogMessage(LoggingKeys.NAME) shouldBe loggingSystemName
-      jsonLogMessage(LoggingKeys.HOST) shouldBe hostname
-      jsonLogMessage(LoggingKeys.VERSION) shouldBe version
+    if (headersEnabled) {
+      jsonLogMessage.getString(LoggingKeys.NAME) shouldBe loggingSystemName
+      jsonLogMessage.getString(LoggingKeys.HOST) shouldBe hostname
+      jsonLogMessage.getString(LoggingKeys.VERSION) shouldBe version
     }
 
-    jsonLogMessage(LoggingKeys.MESSAGE) shouldBe sampleLogMessage
-    jsonLogMessage(LoggingKeys.SEVERITY) shouldBe INFO.name
-    jsonLogMessage(LoggingKeys.CLASS) shouldBe className
-    jsonLogMessage(LoggingKeys.FILE) shouldBe fileName
+    jsonLogMessage.getString(LoggingKeys.MESSAGE) shouldBe sampleLogMessage
+    jsonLogMessage.getString(LoggingKeys.SEVERITY) shouldBe INFO.name
+    jsonLogMessage.getString(LoggingKeys.CLASS) shouldBe className
+    jsonLogMessage.getString(LoggingKeys.FILE) shouldBe fileName
 
     // This assert's that, ISO_INSTANT parser should not throw exception while parsing timestamp from log message
     // If timestamp is in other than UTC(ISO_FORMAT) format, DateTimeFormatter.ISO_INSTANT will throw DateTimeParseException
-    noException shouldBe thrownBy(DateTimeFormatter.ISO_INSTANT.parse(jsonLogMessage(LoggingKeys.TIMESTAMP).toString))
-    val actualDateTime = TMTDateTimeFormatter.parse(jsonLogMessage(LoggingKeys.TIMESTAMP).toString)
+    noException shouldBe thrownBy(DateTimeFormatter.ISO_INSTANT.parse(jsonLogMessage.getString(LoggingKeys.TIMESTAMP)))
+    val actualDateTime = TMTDateTimeFormatter.parse(jsonLogMessage.getString(LoggingKeys.TIMESTAMP))
     ChronoUnit.MILLIS.between(expectedTimestamp, actualDateTime) <= 50 shouldBe true
 
   }
@@ -111,7 +109,7 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
                         | }
                         |}
                       """.stripMargin)
-        .withFallback(ConfigFactory.load)
+        .withFallback(ConfigFactory.load())
 
     val actorSystem   = ActorSystem("test", config)
     val loggingSystem = LoggingSystemFactory.start(loggingSystemName, version, hostname, actorSystem)
@@ -121,7 +119,7 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
     val expectedTimestamp = ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC))
 
     doLogging()
-    Thread.sleep(100)
+    Thread.sleep(300)
 
     // Reading common logger file
     val fileLogBuffer = FileUtils.read(testLogFilePathWithServiceName)
@@ -148,7 +146,7 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
                         | }
                         |}
                       """.stripMargin)
-        .withFallback(ConfigFactory.load)
+        .withFallback(ConfigFactory.load())
 
     val actorSystem   = ActorSystem("test", config)
     val loggingSystem = LoggingSystemFactory.start(loggingSystemName, version, hostname, actorSystem)
@@ -189,7 +187,7 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
                         | logLevel = trace
                         |}
                       """.stripMargin)
-        .withFallback(ConfigFactory.load)
+        .withFallback(ConfigFactory.load())
 
     lazy val actorSystem   = ActorSystem("test", config)
     lazy val loggingSystem = LoggingSystemFactory.start(loggingSystemName, version, hostname, actorSystem)
@@ -210,10 +208,10 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
     fileLogBuffer.size shouldBe 1
 
     val jsonFileLogMessage = fileLogBuffer.head
-    jsonFileLogMessage(LoggingKeys.MESSAGE) shouldBe sampleLogMessage
-    jsonFileLogMessage(LoggingKeys.SEVERITY) shouldBe DEBUG.name
-    jsonFileLogMessage(LoggingKeys.CLASS) shouldBe className
-    jsonFileLogMessage(LoggingKeys.FILE) shouldBe fileName
+    jsonFileLogMessage.getString(LoggingKeys.MESSAGE) shouldBe sampleLogMessage
+    jsonFileLogMessage.getString(LoggingKeys.SEVERITY) shouldBe DEBUG.name
+    jsonFileLogMessage.getString(LoggingKeys.CLASS) shouldBe className
+    jsonFileLogMessage.getString(LoggingKeys.FILE) shouldBe fileName
     //*************************** End Testing File Logs *********************************************
 
     //*************************** Start Testing StdOut Logs *****************************************
@@ -221,16 +219,16 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
     stdOutLogBuffer.size shouldBe 2
 
     val firstStdOutLogMessage = stdOutLogBuffer.head
-    firstStdOutLogMessage(LoggingKeys.MESSAGE) shouldBe sampleLogMessage
-    firstStdOutLogMessage(LoggingKeys.SEVERITY) shouldBe TRACE.name
-    firstStdOutLogMessage(LoggingKeys.CLASS) shouldBe className
-    firstStdOutLogMessage(LoggingKeys.FILE) shouldBe fileName
+    firstStdOutLogMessage.getString(LoggingKeys.MESSAGE) shouldBe sampleLogMessage
+    firstStdOutLogMessage.getString(LoggingKeys.SEVERITY) shouldBe TRACE.name
+    firstStdOutLogMessage.getString(LoggingKeys.CLASS) shouldBe className
+    firstStdOutLogMessage.getString(LoggingKeys.FILE) shouldBe fileName
 
     val secondStdOutLogMessage = stdOutLogBuffer.tail.head
-    secondStdOutLogMessage(LoggingKeys.MESSAGE) shouldBe sampleLogMessage
-    secondStdOutLogMessage(LoggingKeys.SEVERITY) shouldBe DEBUG.name
-    secondStdOutLogMessage(LoggingKeys.CLASS) shouldBe className
-    secondStdOutLogMessage(LoggingKeys.FILE) shouldBe fileName
+    secondStdOutLogMessage.getString(LoggingKeys.MESSAGE) shouldBe sampleLogMessage
+    secondStdOutLogMessage.getString(LoggingKeys.SEVERITY) shouldBe DEBUG.name
+    secondStdOutLogMessage.getString(LoggingKeys.CLASS) shouldBe className
+    secondStdOutLogMessage.getString(LoggingKeys.FILE) shouldBe fileName
     //*************************** End Testing StdOut Logs *******************************************
 
     // clean up
@@ -254,7 +252,7 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
                         | }
                         |}
                       """.stripMargin)
-        .withFallback(ConfigFactory.load)
+        .withFallback(ConfigFactory.load())
 
     lazy val actorSystem                 = ActorSystem("test", config)
     lazy val loggingSystem               = LoggingSystemFactory.start(loggingSystemName, version, hostname, actorSystem)
@@ -290,7 +288,7 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
                        | }
                        |}
                      """.stripMargin)
-        .withFallback(ConfigFactory.load)
+        .withFallback(ConfigFactory.load())
 
     lazy val actorSystem                 = ActorSystem("test", config)
     lazy val loggingSystem               = LoggingSystemFactory.start(loggingSystemName, version, hostname, actorSystem)
@@ -329,7 +327,7 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
                        | }
                        |}
                      """.stripMargin)
-        .withFallback(ConfigFactory.load)
+        .withFallback(ConfigFactory.load())
 
     lazy val loggingSystem               = LoggingSystemFactory.start(loggingSystemName, version, hostname, actorSystem)
     lazy val actorSystem                 = ActorSystem("test", config)
@@ -339,11 +337,11 @@ class LoggingConfigurationTest extends FunSuite with Matchers with BeforeAndAfte
       loggingSystem
       expectedTimestamp = ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC))
       doLogging()
-      Thread.sleep(100)
+      Thread.sleep(300)
     }
     loggingSystem.getAppenders shouldBe List(StdOutAppender)
 
-    val expectedOneLineLog = " INFO   (LoggingConfigurationTest.scala 94) - Sample log message"
+    val expectedOneLineLog = " INFO   (LoggingConfigurationTest.scala 92) - Sample log message"
 
     val (timestamp, message) = os.toString.trim.splitAt(24)
 

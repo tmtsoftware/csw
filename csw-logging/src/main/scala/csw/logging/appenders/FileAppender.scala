@@ -5,12 +5,12 @@ import java.time.temporal.ChronoUnit
 import java.time.{LocalDateTime, ZoneId, ZoneOffset, ZonedDateTime}
 
 import akka.actor._
-import com.persist.JsonOps._
-import csw.logging.RichMsg
 import csw.logging.commons.{Category, Constants, LoggingKeys, TMTDateTimeFormatter}
+import csw.logging.internal.JsonExtensions.RichJsObject
 import csw.logging.internal.LoggerImpl
 import csw.logging.internal.LoggingLevels.Level
 import csw.logging.scaladsl.Logger
+import play.api.libs.json.JsObject
 
 import scala.concurrent.{ExecutionContextExecutor, Future, Promise}
 
@@ -120,7 +120,7 @@ object FileAppender extends LogAppenderBuilder {
    * @param factory an Akka factory.
    * @param stdHeaders the headers that are fixes for this service.
    */
-  def apply(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]): FileAppender =
+  def apply(factory: ActorRefFactory, stdHeaders: JsObject): FileAppender =
     new FileAppender(factory, stdHeaders)
 
   def decideTimestampForFile(logDateTime: ZonedDateTime): ZonedDateTime = {
@@ -144,7 +144,7 @@ object FileAppender extends LogAppenderBuilder {
  * @param factory ActorRefFactory
  * @param stdHeaders the headers that are fixes for this service.
  */
-class FileAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]) extends LogAppender {
+class FileAppender(factory: ActorRefFactory, stdHeaders: JsObject) extends LogAppender {
   private[this] val system = factory match {
     case context: ActorContext => context.system
     case s: ActorSystem        => s
@@ -154,15 +154,14 @@ class FileAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]) e
     system.settings.config.getConfig("csw-logging.appender-config.file")
   private[this] val fullHeaders   = config.getBoolean("fullHeaders")
   private[this] val logPath       = config.getString("logPath")
-  private[this] val sort          = config.getBoolean("sorted")
   private[this] val logLevelLimit = Level(config.getString("logLevelLimit"))
   private[this] val rotateFlag    = config.getBoolean("rotate")
   private[this] val fileAppenders =
     scala.collection.mutable.HashMap[String, FilesAppender]()
-  private val loggingSystemName = stdHeaders(LoggingKeys.NAME).toString
+  private val loggingSystemName = stdHeaders.getString(LoggingKeys.NAME)
 
-  private def checkLevel(baseMsg: Map[String, RichMsg]): Boolean = {
-    val level = baseMsg(LoggingKeys.SEVERITY).toString
+  private def checkLevel(baseMsg: JsObject): Boolean = {
+    val level = baseMsg.getString(LoggingKeys.SEVERITY)
     Level(level) >= logLevelLimit
   }
 
@@ -172,7 +171,7 @@ class FileAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]) e
    * @param baseMsg the message to be logged.
    * @param category the kinds of log (for example, "common").
    */
-  def append(baseMsg: Map[String, RichMsg], category: String): Unit =
+  def append(baseMsg: JsObject, category: String): Unit = {
     if (category != Category.Common.name || checkLevel(baseMsg)) {
       val msg = (if (fullHeaders) stdHeaders ++ baseMsg else baseMsg) - LoggingKeys.PLAINSTACK
       // Maintain a file appender for each category in a logging system
@@ -186,12 +185,13 @@ class FileAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]) e
           filesAppender
       }
       val maybeTimestamp = if (rotateFlag) {
-        val timestamp = baseMsg(LoggingKeys.TIMESTAMP).toString
+        val timestamp = baseMsg.getString(LoggingKeys.TIMESTAMP)
         Some(TMTDateTimeFormatter.parse(timestamp))
       } else None
 
-      fileAppender.add(maybeTimestamp, Compact(msg, safe = true, sort = sort), rotateFlag)
+      fileAppender.add(maybeTimestamp, msg.toString(), rotateFlag)
     }
+  }
 
   /**
    * Called just before the logger shuts down.

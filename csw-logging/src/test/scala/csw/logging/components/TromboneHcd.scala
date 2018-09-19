@@ -14,14 +14,13 @@ class TromboneHcd() {
   // In case any line needs to be added then update constants in companion object
   def startLogging(logs: Map[String, String], kind: String = "all"): Unit = kind match {
     case "alternative" ⇒ log.alternative("some-alternative-category", Map(LoggingKeys.MSG → logs("alternative")))
-    case "all" ⇒ {
+    case "all" ⇒
       log.trace(logs("trace"))
       log.debug(logs("debug"))
       log.info(logs("info"))
       log.warn(logs("warn"))
       log.error(logs("error"))
       log.fatal(logs("fatal"))
-    }
   }
 
   def compute(number1: Int, number2: Int): String = {

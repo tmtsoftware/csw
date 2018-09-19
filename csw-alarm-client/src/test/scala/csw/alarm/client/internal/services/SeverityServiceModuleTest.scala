@@ -1,5 +1,6 @@
 package csw.alarm.client.internal.services
 
+import java.net.InetAddress
 import java.time.Instant
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
@@ -15,8 +16,12 @@ import csw.alarm.api.models._
 import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
 import csw.alarm.client.internal.helpers.{AlarmServiceTestSetup, TestDataFeeder}
 import csw.alarm.client.internal.services.SeverityTestScenarios._
+import csw.logging.internal.{LoggingLevels, LoggingSystem}
+import csw.logging.utils.TestAppender
 import csw.params.core.models.Subsystem.{BAD, LGSF, NFIRAOS, TCS}
+import play.api.libs.json.{JsObject, Json}
 
+import scala.collection.mutable
 import scala.concurrent.duration.DurationInt
 
 class SeverityServiceModuleTest
@@ -29,6 +34,28 @@ class SeverityServiceModuleTest
   override protected def beforeEach(): Unit = {
     val validAlarmsConfig = ConfigFactory.parseResources("test-alarms/more-alarms.conf")
     initAlarms(validAlarmsConfig, reset = true).await
+  }
+
+  // DEOPSCSW-461: Log entry for severity update by component
+  test("setCurrentSeverity should log a message") {
+    val logBuffer    = mutable.Buffer.empty[JsObject]
+    val testAppender = new TestAppender(x ⇒ logBuffer += Json.parse(x.toString).as[JsObject])
+    val hostName     = InetAddress.getLocalHost.getHostName
+
+    val expectedMessage1 =
+      "Setting severity [critical] for alarm [nfiraos-trombone-tromboneaxislowlimitalarm] with expire timeout [1] seconds"
+    val expectedMessage2 = "Updating current severity [critical] in alarm store"
+
+    val loggingSystem = new LoggingSystem("logging", "version", hostName, actorSystem)
+    loggingSystem.setAppenders(List(testAppender))
+    loggingSystem.setDefaultLogLevel(LoggingLevels.DEBUG)
+    setCurrentSeverity(tromboneAxisLowLimitAlarmKey, AlarmSeverity.Critical).await
+    Thread.sleep(100)
+    val messages = logBuffer.map(log => log("message"))
+    messages.contains(expectedMessage1) shouldBe true
+    messages.contains(expectedMessage2) shouldBe true
+
+    loggingSystem.stop
   }
 
   // DEOPSCSW-444: Set severity api for component

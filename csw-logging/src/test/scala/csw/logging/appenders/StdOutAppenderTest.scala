@@ -3,11 +3,11 @@ package csw.logging.appenders
 import java.io.ByteArrayOutputStream
 
 import akka.actor.ActorSystem
-import com.persist.JsonOps
 import com.typesafe.config.ConfigFactory
-import csw.logging.RichMsg
 import csw.logging.commons.{Category, LoggingKeys}
+import csw.logging.internal.JsonExtensions.RichJsObject
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
+import play.api.libs.json.{JsObject, Json}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
@@ -17,10 +17,11 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
 
   private val actorSystem = ActorSystem("test-1")
 
-  private val standardHeaders: Map[String, RichMsg] =
-    Map[String, RichMsg](LoggingKeys.VERSION -> 1,
-                         LoggingKeys.EX      -> "localhost",
-                         LoggingKeys.SERVICE -> Map[String, RichMsg]("name" -> "test-service", "version" -> "1.2.3"))
+  private val standardHeaders: JsObject = Json.obj(
+    LoggingKeys.VERSION -> 1,
+    LoggingKeys.EX      -> "localhost",
+    LoggingKeys.SERVICE -> Json.obj("name" -> "test-service", "version" -> "1.2.3")
+  )
 
   private val stdOutAppender = new StdOutAppender(actorSystem, standardHeaders, println)
 
@@ -43,7 +44,7 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
       |}
     """.stripMargin
 
-  private val expectedLogJson = JsonOps.Json(logMessage).asInstanceOf[Map[String, String]]
+  private val expectedLogJson = Json.parse(logMessage).as[JsObject]
 
   private val outCapture = new ByteArrayOutputStream
 
@@ -62,7 +63,7 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
       stdOutAppender.append(expectedLogJson, Category.Common.name)
     }
 
-    val actualLogJson = JsonOps.Json(outCapture.toString).asInstanceOf[Map[String, String]]
+    val actualLogJson = Json.parse(outCapture.toString).as[JsObject]
     actualLogJson shouldBe expectedLogJson
   }
 
@@ -81,7 +82,7 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
 
     val config = ConfigFactory
       .parseString("csw-logging.appender-config.stdout.oneLine=true")
-      .withFallback(ConfigFactory.load)
+      .withFallback(ConfigFactory.load())
 
     val actorSystemWithOneLineTrueConfig = ActorSystem("test-2", config)
     val stdOutAppenderForOneLineMsg      = new StdOutAppender(actorSystemWithOneLineTrueConfig, standardHeaders, println)
@@ -91,13 +92,13 @@ class StdOutAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach 
     }
 
     val actualOneLineLogMsg   = outCapture.toString.replace("\n", "")
-    val severity              = expectedLogJson(LoggingKeys.SEVERITY)
-    val msg                   = expectedLogJson(LoggingKeys.MESSAGE)
-    val fileName              = expectedLogJson(LoggingKeys.FILE)
-    val lineNumber            = s"${expectedLogJson(LoggingKeys.LINE)}"
-    val plainStack            = s"${expectedLogJson(LoggingKeys.PLAINSTACK)}"
-    val timestamp             = s"${expectedLogJson(LoggingKeys.TIMESTAMP)}"
-    val component             = s"${expectedLogJson(LoggingKeys.COMPONENT_NAME)}"
+    val severity              = expectedLogJson.getString(LoggingKeys.SEVERITY)
+    val msg                   = expectedLogJson.getString(LoggingKeys.MESSAGE)
+    val fileName              = expectedLogJson.getString(LoggingKeys.FILE)
+    val lineNumber            = expectedLogJson.getString(LoggingKeys.LINE)
+    val plainStack            = expectedLogJson.getString(LoggingKeys.PLAINSTACK)
+    val timestamp             = expectedLogJson.getString(LoggingKeys.TIMESTAMP)
+    val component             = expectedLogJson.getString(LoggingKeys.COMPONENT_NAME)
     val expectedOneLineLogMsg = f"$timestamp $severity%-5s $component ($fileName $lineNumber) - $msg [Stacktrace] $plainStack"
 
     actualOneLineLogMsg shouldBe expectedOneLineLogMsg

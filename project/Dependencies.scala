@@ -118,7 +118,7 @@ object Dependencies {
   val Logging = Def.setting(
     Seq(
       Libs.`logback-classic`,
-      Libs.`persist-json`,
+      Libs.`play-json`.value,
       Libs.`joda-time`,
       Enumeratum.`enumeratum`.value,
       Akka.`akka-actor`,
@@ -394,7 +394,6 @@ object Dependencies {
 
   val Benchmark = Def.setting(
     Seq(
-      Libs.`persist-json`,
       Libs.`gson`,
       Jackson.`jackson-core`,
       Jackson.`jackson-databind`

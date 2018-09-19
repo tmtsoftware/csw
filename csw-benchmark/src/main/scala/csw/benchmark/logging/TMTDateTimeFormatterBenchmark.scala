@@ -3,9 +3,10 @@ package csw.benchmark.logging
 import java.time.ZonedDateTime
 import java.util.concurrent.TimeUnit
 
-import com.persist.JsonOps
 import csw.logging.commons.{LoggingKeys, TMTDateTimeFormatter}
+import csw.logging.internal.JsonExtensions.RichJsObject
 import org.openjdk.jmh.annotations._
+import play.api.libs.json.{JsObject, Json}
 
 /**
  * Tests TMTDateTimeFormatterBenchmark performance.
@@ -36,7 +37,7 @@ class TMTDateTimeFormatterBenchmark {
                                  |}
     """.stripMargin
 
-  val expectedLogMsgJson1 = JsonOps.Json(logMsgString1).asInstanceOf[Map[String, String]]
+  val expectedLogMsgJson1 = Json.parse(logMsgString1).as[JsObject]
 
   val timestamp = System.currentTimeMillis()
   @Benchmark
@@ -46,7 +47,8 @@ class TMTDateTimeFormatterBenchmark {
     TMTDateTimeFormatter.format(timestamp)
   }
 
-  val timestampStr = expectedLogMsgJson1(LoggingKeys.TIMESTAMP)
+  val timestampStr = expectedLogMsgJson1.getString(LoggingKeys.TIMESTAMP)
+
   @Benchmark
   @BenchmarkMode(Array(Mode.Throughput))
   @OutputTimeUnit(TimeUnit.SECONDS)

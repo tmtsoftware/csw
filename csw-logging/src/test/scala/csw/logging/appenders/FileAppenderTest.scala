@@ -3,13 +3,12 @@ package csw.logging.appenders
 import java.nio.file.Paths
 
 import akka.actor.ActorSystem
-import com.persist.JsonOps
-import com.persist.JsonOps.jgetString
 import com.typesafe.config.ConfigFactory
-import csw.logging.RichMsg
 import csw.logging.commons.{Category, LoggingKeys, TMTDateTimeFormatter}
+import csw.logging.internal.JsonExtensions.RichJsObject
 import csw.logging.utils.FileUtils
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
+import play.api.libs.json.{JsObject, Json}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
@@ -19,10 +18,9 @@ class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach wi
   private val logFileDir = Paths.get("/tmp/csw-test-logs/").toFile
   private val config = ConfigFactory
     .parseString(s"csw-logging.appender-config.file.logPath=${logFileDir.getAbsolutePath}")
-    .withFallback(ConfigFactory.load)
-  private val actorSystem = ActorSystem("test-1", config)
-  private val standardHeaders: Map[String, RichMsg] =
-    Map[String, RichMsg](LoggingKeys.HOST -> "localhost", LoggingKeys.NAME -> "test-service")
+    .withFallback(ConfigFactory.load())
+  private val actorSystem               = ActorSystem("test-1", config)
+  private val standardHeaders: JsObject = Json.obj(LoggingKeys.HOST -> "localhost", LoggingKeys.NAME -> "test-service")
 
   private val fileAppender = new FileAppender(actorSystem, standardHeaders)
 
@@ -71,19 +69,19 @@ class FileAppenderTest extends FunSuite with Matchers with BeforeAndAfterEach wi
       |}
     """.stripMargin
 
-  val expectedLogMsgJson1: Map[String, String] = JsonOps.Json(logMsgString1).asInstanceOf[Map[String, String]]
-  val expectedLogMsgJson2: Map[String, String] = JsonOps.Json(logMsgString2).asInstanceOf[Map[String, String]]
-  val expectedLogMsgJson3: Map[String, String] = JsonOps.Json(logMsgString3).asInstanceOf[Map[String, String]]
+  val expectedLogMsgJson1: JsObject = Json.parse(logMsgString1).as[JsObject]
+  val expectedLogMsgJson2: JsObject = Json.parse(logMsgString2).as[JsObject]
+  val expectedLogMsgJson3: JsObject = Json.parse(logMsgString3).as[JsObject]
 
-  private val date1            = jgetString(expectedLogMsgJson1, LoggingKeys.TIMESTAMP)
+  private val date1            = expectedLogMsgJson1.getString(LoggingKeys.TIMESTAMP)
   private val localDateTime1   = FileAppender.decideTimestampForFile(TMTDateTimeFormatter.parse(date1))
   private val logFileFullPath1 = logFileDir.getAbsolutePath ++ s"/test-service/alternative.$localDateTime1.log"
 
-  private val date2            = jgetString(expectedLogMsgJson2, LoggingKeys.TIMESTAMP)
+  private val date2            = expectedLogMsgJson2.getString(LoggingKeys.TIMESTAMP)
   private val localDateTime2   = FileAppender.decideTimestampForFile(TMTDateTimeFormatter.parse(date2))
   private val logFileFullPath2 = logFileDir.getAbsolutePath ++ s"/test-service/common.$localDateTime2.log"
 
-  private val date3            = jgetString(expectedLogMsgJson3, LoggingKeys.TIMESTAMP)
+  private val date3            = expectedLogMsgJson3.getString(LoggingKeys.TIMESTAMP)
   private val localDateTime3   = FileAppender.decideTimestampForFile(TMTDateTimeFormatter.parse(date3))
   private val logFileFullPath3 = logFileDir.getAbsolutePath ++ s"/test-service/common.$localDateTime3.log"
 

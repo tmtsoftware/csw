@@ -1,8 +1,8 @@
 package csw.logging.utils
 
 import akka.actor.ActorRefFactory
-import csw.logging.RichMsg
 import csw.logging.appenders.{LogAppenderBuilder, StdOutAppender}
+import play.api.libs.json.JsObject
 
 class TestAppender(callback: Any ⇒ Unit) extends LogAppenderBuilder {
 
@@ -13,6 +13,6 @@ class TestAppender(callback: Any ⇒ Unit) extends LogAppenderBuilder {
    * @param stdHeaders the headers that are fixes for this service.
    * @return the stdout appender.
    */
-  def apply(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]): StdOutAppender =
+  def apply(factory: ActorRefFactory, stdHeaders: JsObject): StdOutAppender =
     new StdOutAppender(factory, stdHeaders, callback)
 }

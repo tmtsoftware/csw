@@ -2,14 +2,15 @@ package csw.common
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.ActorRef
-import com.persist.JsonOps.JsonObject
 import csw.command.client.messages.ComponentCommonMessage.GetSupervisorLifecycleState
 import csw.command.client.messages.ContainerCommonMessage.GetContainerLifecycleState
 import csw.command.client.messages.{ComponentMessage, ContainerMessage}
 import csw.command.client.models.framework.{ContainerLifecycleState, SupervisorLifecycleState}
+import csw.logging.internal.JsonExtensions.RichJsObject
 import csw.logging.internal.LoggingLevels.Level
 import org.scalatest.Matchers
 import org.scalatest.concurrent.Eventually
+import play.api.libs.json.{JsObject, JsString}
 
 import scala.collection.mutable
 import scala.concurrent.duration.Duration
@@ -53,7 +54,7 @@ object FrameworkAssertions extends Matchers with Eventually {
   }
 
   def assertThatMessageIsLogged(
-      logBuffer: mutable.Buffer[JsonObject],
+      logBuffer: mutable.Buffer[JsObject],
       componentName: String,
       message: String,
       expLevel: Level,
@@ -70,7 +71,7 @@ object FrameworkAssertions extends Matchers with Eventually {
   }
 
   def assertThatExceptionIsLogged(
-      logBuffer: mutable.Buffer[JsonObject],
+      logBuffer: mutable.Buffer[JsObject],
       componentName: String,
       message: String,
       expLevel: Level,
@@ -88,30 +89,30 @@ object FrameworkAssertions extends Matchers with Eventually {
     logMsg("class") shouldBe sanitizeClassName(className)
 
     logMsg.contains("trace") shouldBe true
-    val traceBlock    = logMsg("trace").asInstanceOf[JsonObject]
-    val traceMsgBlock = traceBlock("message").asInstanceOf[JsonObject]
+    val traceBlock    = logMsg("trace").asInstanceOf[JsObject]
+    val traceMsgBlock = traceBlock("message").as[JsObject]
     traceMsgBlock("ex") shouldBe s"class ${sanitizeClassName(exceptionClassName)}"
     traceMsgBlock("message") shouldBe exceptionMessage
   }
 
   def assertThatExceptionIsNotLogged(
-      logBuffer: mutable.Buffer[JsonObject],
+      logBuffer: mutable.Buffer[JsObject],
       message: String,
   ): Unit = {
     val maybeLogMsg = findLogMessageSubString(logBuffer, message)
     assert(maybeLogMsg.isEmpty, s"$message found in $logBuffer")
   }
 
-  private def findLogMessage(logBuffer: mutable.Buffer[JsonObject], message: String): Option[JsonObject] =
-    logBuffer.find(_.exists {
-      case (_, `message`) ⇒ true
-      case (_, _)         ⇒ false
+  private def findLogMessage(logBuffer: mutable.Buffer[JsObject], message: String): Option[JsObject] =
+    logBuffer.find(_.value.exists {
+      case (_, JsString(`message`)) ⇒ true
+      case (_, _)                   ⇒ false
     })
 
-  private def findLogMessageSubString(logBuffer: mutable.Buffer[JsonObject], message: String): Option[JsonObject] =
-    logBuffer.find(_.exists {
-      case (_, actualMessage: String) if actualMessage.startsWith(message) ⇒ true
-      case (_, _)                                                          ⇒ false
+  private def findLogMessageSubString(logBuffer: mutable.Buffer[JsObject], message: String): Option[JsObject] =
+    logBuffer.find(_.value.exists {
+      case (_, JsString(actualMessage)) if actualMessage.startsWith(message) ⇒ true
+      case (_, _)                                                            ⇒ false
     })
 
   private def sanitizeClassName(className: String): String =

@@ -1,10 +1,10 @@
 package csw.logging.appenders
 
 import akka.actor.{ActorContext, ActorRefFactory, ActorSystem}
-import com.persist.JsonOps._
-import csw.logging.RichMsg
 import csw.logging.commons.{Category, LoggingKeys}
+import csw.logging.internal.JsonExtensions.RichJsObject
 import csw.logging.internal.LoggingLevels.Level
+import play.api.libs.json.{JsObject, Json}
 
 import scala.concurrent.Future
 
@@ -20,7 +20,7 @@ object StdOutAppender extends LogAppenderBuilder {
    * @param stdHeaders the headers that are fixes for this service
    * @return the stdout appender
    */
-  def apply(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg]): StdOutAppender =
+  def apply(factory: ActorRefFactory, stdHeaders: JsObject): StdOutAppender =
     new StdOutAppender(factory, stdHeaders, println)
 }
 
@@ -31,7 +31,7 @@ object StdOutAppender extends LogAppenderBuilder {
  * @param factory an Akka factory
  * @param stdHeaders the headers that are fixes for this service
  */
-class StdOutAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg], logPrinter: Any ⇒ Unit) extends LogAppender {
+class StdOutAppender(factory: ActorRefFactory, stdHeaders: JsObject, logPrinter: Any ⇒ Unit) extends LogAppender {
   private[this] val system = factory match {
     case context: ActorContext => context.system
     case s: ActorSystem        => s
@@ -39,7 +39,6 @@ class StdOutAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg],
   private[this] val config        = system.settings.config.getConfig("csw-logging.appender-config.stdout")
   private[this] val fullHeaders   = config.getBoolean("fullHeaders")
   private[this] val color         = config.getBoolean("color")
-  private[this] val width         = config.getInt("width")
   private[this] val summary       = config.getBoolean("summary")
   private[this] val pretty        = config.getBoolean("pretty")
   private[this] val oneLine       = config.getBoolean("oneLine")
@@ -55,11 +54,11 @@ class StdOutAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg],
    * @param baseMsg the message to be logged
    * @param category the kinds of log (for example, "common")
    */
-  def append(baseMsg: Map[String, RichMsg], category: String): Unit = {
-    val level = jgetString(baseMsg, LoggingKeys.SEVERITY)
+  def append(baseMsg: JsObject, category: String): Unit = {
+    val level = baseMsg.getString(LoggingKeys.SEVERITY)
 
     if (category == Category.Common.name && Level(level) >= logLevelLimit) {
-      val maybeKind = jgetString(baseMsg, LoggingKeys.KIND)
+      val maybeKind = baseMsg.getString(LoggingKeys.KIND)
       if (summary) {
         buildSummary(level, maybeKind)
       }
@@ -67,9 +66,9 @@ class StdOutAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg],
       val normalText = if (oneLine) {
         oneLine(baseMsg, level, maybeKind)
       } else if (pretty) {
-        Pretty(msg - LoggingKeys.CATEGORY, safe = true, width = width)
+        Json.prettyPrint(msg - LoggingKeys.CATEGORY)
       } else {
-        Compact(msg - LoggingKeys.CATEGORY, safe = true)
+        (msg - LoggingKeys.CATEGORY).toString()
       }
 
       val finalText = if (color) {
@@ -94,19 +93,16 @@ class StdOutAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg],
       case _ => normalText
     }
 
-  private def oneLine(baseMsg: Map[String, RichMsg], level: String, maybeKind: String) = {
-    val msg = jget(baseMsg, LoggingKeys.MESSAGE) match {
-      case s: String => s
-      case x: Any    => Compact(x, safe = true)
-    }
+  private def oneLine(baseMsg: JsObject, level: String, maybeKind: String) = {
+    val msg       = baseMsg.getString(LoggingKeys.MESSAGE)
     val kind      = if (!maybeKind.isEmpty) s":$maybeKind" else ""
-    val file      = jgetString(baseMsg, LoggingKeys.FILE)
-    val where     = if (!file.isEmpty) s" ($file ${jgetInt(baseMsg, LoggingKeys.LINE)})" else ""
-    val comp      = jgetString(baseMsg, LoggingKeys.COMPONENT_NAME)
-    val timestamp = jgetString(baseMsg, LoggingKeys.TIMESTAMP)
+    val file      = baseMsg.getString(LoggingKeys.FILE)
+    val where     = if (!file.isEmpty) s" ($file ${baseMsg.getString(LoggingKeys.LINE)})" else ""
+    val comp      = baseMsg.getString(LoggingKeys.COMPONENT_NAME)
+    val timestamp = baseMsg.getString(LoggingKeys.TIMESTAMP)
 
     val plainStack =
-      if (baseMsg.contains(LoggingKeys.PLAINSTACK)) " [Stacktrace] " ++ jgetString(baseMsg, LoggingKeys.PLAINSTACK) else ""
+      if (baseMsg.contains(LoggingKeys.PLAINSTACK)) " [Stacktrace] " ++ baseMsg.getString(LoggingKeys.PLAINSTACK) else ""
 
     f"$timestamp $level%-5s$kind $comp$where - $msg$plainStack"
   }
@@ -135,10 +131,10 @@ class StdOutAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg],
    */
   def stop(): Future[Unit] = {
     if (summary) {
-      val cats = if (categories.isEmpty) emptyJsonObject else JsonObject("alts" -> categories)
-      val levs = if (levels.isEmpty) emptyJsonObject else JsonObject("levels" -> levels)
-      val knds = if (kinds.isEmpty) emptyJsonObject else JsonObject("kinds" -> kinds)
-      val txt  = Pretty(levs ++ cats ++ knds, width = width)
+      val cats = if (categories.isEmpty) Json.obj() else Json.obj("alts" -> categories)
+      val levs = if (levels.isEmpty) Json.obj() else Json.obj("levels" -> levels)
+      val knds = if (kinds.isEmpty) Json.obj() else Json.obj("kinds" -> kinds)
+      val txt  = Json.prettyPrint(levs ++ cats ++ knds)
       val colorTxt = if (color) {
         s"${Console.BLUE}$txt${Console.RESET}"
       } else {

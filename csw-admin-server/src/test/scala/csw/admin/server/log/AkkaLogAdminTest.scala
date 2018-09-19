@@ -23,6 +23,7 @@ import csw.location.api.models.ComponentId
 import csw.location.api.models.ComponentType.{Assembly, HCD}
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.client.ActorSystemFactory
+import csw.logging.internal.JsonExtensions.RichJsObject
 import csw.logging.internal.LoggingLevels.{ERROR, Level, WARN}
 import csw.logging.internal._
 import csw.logging.models.LogMetadata
@@ -156,7 +157,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
 
     // default logging level for Laser component is info
     val groupByComponentNamesLog = logBuffer.groupBy { json ⇒
-      if (json.contains("@componentName")) json("@componentName").toString
+      if (json.contains("@componentName")) json.getString("@componentName")
     }
     val laserComponentLogs = groupByComponentNamesLog(laserComponent.info.name)
 

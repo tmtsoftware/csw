@@ -4,6 +4,7 @@ import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext, Behaviors}
 import csw.logging.LogCommand
 import csw.logging.LogCommand._
+import csw.logging.internal.JsonExtensions.RichJsObject
 import csw.logging.internal.LoggingLevels
 import csw.logging.internal.LoggingLevels.Level
 import csw.logging.utils.LoggingTestSuite
@@ -49,7 +50,7 @@ class MutableActorLoggingTest extends LoggingTestSuite {
     tromboneActorRef ! LogError
     tromboneActorRef ! LogFatal
     tromboneActorRef ! Unknown
-    Thread.sleep(200)
+    Thread.sleep(300)
   }
 
   // DEOPSCSW-116: Make log messages identifiable with components
@@ -63,11 +64,11 @@ class MutableActorLoggingTest extends LoggingTestSuite {
     logBuffer.foreach { log ⇒
       log.contains("@componentName") shouldBe true
       log.contains("actor") shouldBe true
-      log("@componentName") shouldBe "tromboneMutableHcdActor"
-      log("actor") shouldBe tromboneActorRef.path.toString
-      log("file") shouldBe "MutableActorLoggingTest.scala"
+      log.getString("@componentName") shouldBe "tromboneMutableHcdActor"
+      log.getString("actor") shouldBe tromboneActorRef.path.toString
+      log.getString("file") shouldBe "MutableActorLoggingTest.scala"
       log.contains("line") shouldBe true
-      log("class") shouldBe "csw.logging.scaladsl.TromboneMutableActor"
+      log.getString("class") shouldBe "csw.logging.scaladsl.TromboneMutableActor"
     }
   }
 
@@ -78,7 +79,7 @@ class MutableActorLoggingTest extends LoggingTestSuite {
     //  TromboneHcd component is logging 7 messages
     //  As per the filter, hcd should log 3 message of level ERROR and FATAL
     val groupByComponentNamesLog =
-      logBuffer.groupBy(json ⇒ json("@componentName").toString)
+      logBuffer.groupBy(json ⇒ json.getString("@componentName"))
     val tromboneHcdLogs = groupByComponentNamesLog("tromboneMutableHcdActor")
 
     tromboneHcdLogs.size shouldBe 3
@@ -87,7 +88,7 @@ class MutableActorLoggingTest extends LoggingTestSuite {
     // assert on actual log message
     tromboneHcdLogs.toList.foreach { log ⇒
       log.contains("actor") shouldBe true
-      val currentLogLevel = log("@severity").toString.toLowerCase
+      val currentLogLevel = log.getString("@severity").toLowerCase
       Level(currentLogLevel) >= LoggingLevels.ERROR shouldBe true
     }
 

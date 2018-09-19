@@ -1,7 +1,7 @@
 package csw.logging.appenders
 
 import akka.actor.ActorRefFactory
-import csw.logging.RichMsg
+import play.api.libs.json.JsObject
 
 import scala.concurrent.Future
 
@@ -17,7 +17,7 @@ trait LogAppenderBuilder {
    * @param standardHeaders the headers that are fixes for this service
    * @return an appender
    */
-  def apply(factory: ActorRefFactory, standardHeaders: Map[String, RichMsg]): LogAppender
+  def apply(factory: ActorRefFactory, standardHeaders: JsObject): LogAppender
 }
 
 /**
@@ -31,7 +31,7 @@ trait LogAppender {
    * @param baseMsg the message to be logged
    * @param category the kinds of log (for example, "common")
    */
-  def append(baseMsg: Map[String, RichMsg], category: String): Unit
+  def append(baseMsg: JsObject, category: String): Unit
 
   /**
    * Called just before the logger shuts down

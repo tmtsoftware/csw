@@ -1,9 +1,10 @@
 package csw.logging.internal
 
 import akka.actor.Actor
-import com.persist.JsonOps._
 import csw.logging.commons.LoggingKeys
+import csw.logging.internal.JsonExtensions.{AnyToJson, RichJsObject}
 import csw.logging.scaladsl.{GenericLoggerFactory, Logger, RequestId}
+import play.api.libs.json.Json
 
 import scala.collection.mutable
 import scala.concurrent.Promise
@@ -35,17 +36,17 @@ private[logging] class TimeActor(tdone: Promise[Unit]) extends Actor {
     items.get(key) map { timeItem =>
       val jitems0 = timeItem.steps map {
         case (key1, timeStep) =>
-          val j1 = JsonObject("name" -> timeStep.name, "time0" -> timeStep.start)
+          val j1 = Json.obj("name" -> timeStep.name, "time0" -> timeStep.start)
           val j2 = if (timeStep.end == 0) {
-            emptyJsonObject
+            Json.obj()
           } else {
-            JsonObject("time1" -> timeStep.end, "total" -> (timeStep.end - timeStep.start))
+            Json.obj("time1" -> timeStep.end, "total" -> (timeStep.end - timeStep.start))
           }
           j1 ++ j2
       }
-      val traceId = JsonArray(id.trackingId, id.spanId)
-      val jitems  = jitems0.toSeq.sortBy(jgetInt(_, "time0"))
-      val j       = JsonObject(LoggingKeys.TRACE_ID -> traceId, "items" -> jitems)
+      val traceId = Seq(id.trackingId, id.spanId).asJson
+      val jitems  = jitems0.toSeq.sortBy(_.getString("time0"))
+      val j       = Map(LoggingKeys.TRACE_ID -> traceId, "items" -> jitems)
       log.alternative("time", j)
       items -= key
     }

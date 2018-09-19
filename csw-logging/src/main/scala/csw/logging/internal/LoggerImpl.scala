@@ -2,8 +2,8 @@ package csw.logging.internal
 
 import java.time.Instant
 
-import csw.logging.RichMsg
 import csw.logging.commons.{Constants, LoggingKeys}
+import csw.logging.internal.JsonExtensions.AnyMapToJson
 import csw.logging.internal.LogActorMessages.{Log, LogAltMessage}
 import csw.logging.internal.LoggingLevels._
 import csw.logging.internal.LoggingState._
@@ -28,8 +28,8 @@ private[csw] class LoggerImpl(maybeComponentName: Option[String], actorName: Opt
       ex: Throwable,
       sourceLocation: SourceLocation
   ): Unit = {
-    val time = Instant.now().toEpochMilli
-    MessageHandler.sendMsg(Log(maybeComponentName, level, id, time, actorName, msg, map, sourceLocation, ex))
+    val time = Instant.now().toEpochMilli // The current time being written in logs. In future it has to be fetched from time service
+    MessageHandler.sendMsg(Log(maybeComponentName, level, id, time, actorName, msg, map.asJsObject, sourceLocation, ex))
   }
 
   private def has(id: AnyId, level: Level): Boolean =
@@ -69,9 +69,9 @@ private[csw] class LoggerImpl(maybeComponentName: Option[String], actorName: Opt
 
   private[logging] override def alternative(
       category: String,
-      m: Map[String, RichMsg],
+      m: Map[String, Any],
       ex: Throwable,
       id: AnyId,
       time: Long
-  ): Unit = MessageHandler.sendMsg(LogAltMessage(category, time, m ++ Map(LoggingKeys.CATEGORY -> category), id, ex))
+  ): Unit = MessageHandler.sendMsg(LogAltMessage(category, time, (m ++ Map(LoggingKeys.CATEGORY -> category)).asJsObject, id, ex))
 }

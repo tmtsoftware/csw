@@ -3,9 +3,9 @@ package csw.logging.utils
 import java.net.InetAddress
 
 import akka.actor.ActorSystem
-import com.persist.JsonOps.{Json, JsonObject}
 import csw.logging.internal.LoggingSystem
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
+import play.api.libs.json.{JsObject, Json}
 
 import scala.collection.mutable
 import scala.concurrent.Await
@@ -13,9 +13,9 @@ import scala.concurrent.duration.DurationLong
 
 abstract class LoggingTestSuite() extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
 
-  protected lazy val actorSystem = ActorSystem("test")
-  protected val logBuffer        = mutable.Buffer.empty[JsonObject]
-  protected val testAppender     = new TestAppender(x ⇒ logBuffer += Json(x.toString).asInstanceOf[JsonObject])
+  protected lazy val actorSystem                    = ActorSystem("test")
+  protected val logBuffer: mutable.Buffer[JsObject] = mutable.Buffer.empty[JsObject]
+  protected val testAppender                        = new TestAppender(x ⇒ logBuffer += Json.parse(x.toString).as[JsObject])
 
   private val hostName = InetAddress.getLocalHost.getHostName
   protected lazy val loggingSystem =

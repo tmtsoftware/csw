@@ -4,14 +4,15 @@ import java.nio.file.Paths
 import java.time.{ZoneId, ZoneOffset, ZonedDateTime}
 
 import akka.actor.ActorSystem
-import com.persist.JsonOps.JsonObject
 import com.typesafe.config.ConfigFactory
 import csw.logging.appenders.FileAppender
 import csw.logging.commons.LoggingKeys
 import csw.logging.components.IRIS
 import csw.logging.components.IRIS._
+import csw.logging.internal.JsonExtensions.RichJsObject
 import csw.logging.scaladsl.RequestId
 import csw.logging.utils.{FileUtils, LoggingTestSuite}
+import play.api.libs.json.{JsArray, JsObject, Json}
 
 import scala.collection.mutable
 
@@ -20,7 +21,7 @@ class TimingTest extends LoggingTestSuite with Timing {
   private val logFileDir = Paths.get("/tmp/csw-test-logs").toFile
   private val config = ConfigFactory
     .parseString(s"csw-logging.appender-config.file.logPath=${logFileDir.getAbsolutePath}")
-    .withFallback(ConfigFactory.load)
+    .withFallback(ConfigFactory.load())
 
   private val loggingSystemName = "TimingTest"
   override lazy val actorSystem = ActorSystem("timing-test-system", config)
@@ -78,7 +79,7 @@ class TimingTest extends LoggingTestSuite with Timing {
 
     logMessagesWithTimer()
     logMessagesWithStartAndEndTimer()
-    Thread.sleep(200)
+    Thread.sleep(300)
 
     // Reading time logger file
     val timeLogBuffer = FileUtils.read(timeLogFilePath)
@@ -87,7 +88,8 @@ class TimingTest extends LoggingTestSuite with Timing {
 
     // validating timer logger
     timeLogBuffer.toList.foreach { log ⇒
-      val itemsMap = log("items").asInstanceOf[List[JsonObject]].head
+      val itemsMap = log("items").as[List[JsObject]].head
+
       itemsMap("name") shouldBe timerRegionQueue.dequeue
       itemsMap.contains("time0") shouldBe true
       itemsMap.contains("time1") shouldBe true
@@ -100,7 +102,7 @@ class TimingTest extends LoggingTestSuite with Timing {
     // validating console logger
     testLogBuffer(logBuffer)
 
-    def testLogBuffer(logBuffer: mutable.Buffer[JsonObject]): Unit = {
+    def testLogBuffer(logBuffer: mutable.Buffer[JsObject]): Unit = {
       logBuffer.foreach { log ⇒
         val currentLogLevel = log(LoggingKeys.SEVERITY).toString.toLowerCase
         log(LoggingKeys.MESSAGE).toString shouldBe IRIS.irisLogs(currentLogLevel)

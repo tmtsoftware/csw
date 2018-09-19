@@ -5,7 +5,7 @@ import ch.qos.logback.core.{Appender, UnsynchronizedAppenderBase}
 import csw.logging.internal.LogActorMessages.LogSlf4j
 import csw.logging.internal.MessageHandler
 import csw.logging.macros.DefaultSourceLocation
-import csw.logging.noException
+import csw.logging.NoLogException
 import csw.logging.scaladsl.{GenericLoggerFactory, Logger}
 
 import scala.collection.mutable
@@ -46,7 +46,7 @@ private[logging] class Slf4jAppender[E]() extends UnsynchronizedAppenderBase[E] 
           val x = e.getThrowableProxy.asInstanceOf[ch.qos.logback.classic.spi.ThrowableProxy]
           x.getThrowable
         } catch {
-          case ex: Any => noException
+          case ex: Any => NoLogException
         }
         val msg =
           LogSlf4j(level, e.getTimeStamp, frame.getClassName, e.getFormattedMessage, frame.getLineNumber, frame.getFileName, ex)

@@ -3,6 +3,7 @@ package csw.logging.scaladsl
 import csw.logging.commons.LoggingKeys
 import csw.logging.components.IRIS
 import csw.logging.components.IRIS._
+import csw.logging.internal.JsonExtensions.RichJsObject
 import csw.logging.internal.LoggingLevels
 import csw.logging.internal.LoggingLevels.Level
 import csw.logging.utils.LoggingTestSuite
@@ -19,7 +20,7 @@ class ActorLoggingTest extends LoggingTestSuite {
     irisActorRef ! LogError
     irisActorRef ! LogFatal
     irisActorRef ! "Unknown"
-    Thread.sleep(200)
+    Thread.sleep(300)
   }
 
   // DEOPSCSW-116: Make log messages identifiable with components
@@ -34,11 +35,12 @@ class ActorLoggingTest extends LoggingTestSuite {
     var logMsgLineNumber = IRIS.ERROR_LINE_NO
 
     logBuffer.foreach { log ⇒
-      log(LoggingKeys.COMPONENT_NAME) shouldBe IRIS.COMPONENT_NAME
-      log(LoggingKeys.ACTOR) shouldBe irisActorRef.path.toString
-      log(LoggingKeys.FILE) shouldBe IRIS.FILE_NAME
-      log(LoggingKeys.LINE) shouldBe logMsgLineNumber
-      log(LoggingKeys.CLASS).toString shouldBe IRIS.CLASS_NAME
+      log.getString(LoggingKeys.COMPONENT_NAME) shouldBe IRIS.COMPONENT_NAME
+      log.getString(LoggingKeys.ACTOR) shouldBe irisActorRef.path.toString
+      log.getString(LoggingKeys.FILE) shouldBe IRIS.FILE_NAME
+      // todo : create method getNumber as extension to JsObject.
+      log(LoggingKeys.LINE).as[Int] shouldBe logMsgLineNumber
+      log.getString(LoggingKeys.CLASS).toString shouldBe IRIS.CLASS_NAME
       logMsgLineNumber += 1
     }
   }
@@ -47,18 +49,17 @@ class ActorLoggingTest extends LoggingTestSuite {
   // DEOPSCSW-121: Define structured tags for log messages
   test("message logged with custom Map properties should get logged") {
     irisActorRef ! "Unknown"
-    Thread.sleep(200)
+    Thread.sleep(300)
 
-    val errorLevelLogMessages =
-      logBuffer.groupBy(json ⇒ json(LoggingKeys.SEVERITY))("ERROR")
+    val errorLevelLogMessages = logBuffer.groupBy(json ⇒ json.getString(LoggingKeys.SEVERITY))("ERROR")
     errorLevelLogMessages.size shouldEqual 1
 
     val expectedMessage  = "Unknown message received"
     val expectedReason   = "Unknown"
     val expectedActorRef = irisActorRef.toString
-    errorLevelLogMessages.head("message") shouldBe expectedMessage
-    errorLevelLogMessages.head("reason") shouldBe expectedReason
-    errorLevelLogMessages.head("actorRef") shouldBe expectedActorRef
+    errorLevelLogMessages.head.getString("message") shouldBe expectedMessage
+    errorLevelLogMessages.head.getString("reason") shouldBe expectedReason
+    errorLevelLogMessages.head.getString("actorRef") shouldBe expectedActorRef
   }
 
   // DEOPSCSW-126 : Configurability of logging characteristics for component / log instance
@@ -67,9 +68,8 @@ class ActorLoggingTest extends LoggingTestSuite {
     sendMessagesToActor()
     //  IrisSupervisorActor is logging 7 messages
     //  As per the filter, hcd should log 3 message of level ERROR and FATAL
-    val groupByComponentNamesLog =
-      logBuffer.groupBy(json ⇒ json(LoggingKeys.COMPONENT_NAME).toString)
-    val irisLogs = groupByComponentNamesLog(IRIS.COMPONENT_NAME)
+    val groupByComponentNamesLog = logBuffer.groupBy(json ⇒ json.getString(LoggingKeys.COMPONENT_NAME))
+    val irisLogs                 = groupByComponentNamesLog(IRIS.COMPONENT_NAME)
 
     irisLogs.size shouldBe 3
 
@@ -77,7 +77,7 @@ class ActorLoggingTest extends LoggingTestSuite {
     // assert on actual log message
     irisLogs.toList.foreach { log ⇒
       log.contains(LoggingKeys.ACTOR) shouldBe true
-      val currentLogLevel = log(LoggingKeys.SEVERITY).toString.toLowerCase
+      val currentLogLevel = log.getString(LoggingKeys.SEVERITY).toLowerCase
       Level(currentLogLevel) >= LoggingLevels.ERROR shouldBe true
     }
 

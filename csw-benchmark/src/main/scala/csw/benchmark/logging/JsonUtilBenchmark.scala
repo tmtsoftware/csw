@@ -4,9 +4,10 @@ import java.util.concurrent.TimeUnit
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.gson.Gson
-import com.persist.JsonOps
 import csw.logging.commons.LoggingKeys
+import csw.logging.internal.JsonExtensions.RichJsObject
 import org.openjdk.jmh.annotations._
+import play.api.libs.json.{JsObject, Json}
 
 import scala.collection.JavaConverters.asJavaIterableConverter
 
@@ -39,7 +40,7 @@ class JsonUtilBenchmark {
        |}
     """.stripMargin
 
-  val expectedLogMsgJson1: Map[String, String] = JsonOps.Json(logMsgString1).asInstanceOf[Map[String, String]]
+  val expectedLogMsgJson1: JsObject = Json.parse(logMsgString1).as[JsObject]
 
   var gson: Gson                        = _
   var jacksonObjectMapper: ObjectMapper = _
@@ -55,7 +56,7 @@ class JsonUtilBenchmark {
   @BenchmarkMode(Array(Mode.Throughput))
   @OutputTimeUnit(TimeUnit.SECONDS)
   def benchJgetString(): String = {
-    JsonOps.jgetString(expectedLogMsgJson1, LoggingKeys.TIMESTAMP)
+    expectedLogMsgJson1.getString(LoggingKeys.TIMESTAMP)
   }
 
   // Benchmark for extracting value of key using scala map
@@ -63,7 +64,7 @@ class JsonUtilBenchmark {
   @BenchmarkMode(Array(Mode.Throughput))
   @OutputTimeUnit(TimeUnit.SECONDS)
   def benchMapGet(): String = {
-    expectedLogMsgJson1(LoggingKeys.TIMESTAMP)
+    expectedLogMsgJson1.getString(LoggingKeys.TIMESTAMP)
   }
 
   // Benchmark for json string formation using persist-json library
@@ -73,7 +74,7 @@ class JsonUtilBenchmark {
   @BenchmarkMode(Array(Mode.Throughput))
   @OutputTimeUnit(TimeUnit.SECONDS)
   def benchPersistCompact(): String = {
-    JsonOps.Compact(expectedLogMsgJson1, safe = true, sort = false)
+    expectedLogMsgJson1.toString()
   }
 
   // Benchmark for json string formation using gson library
@@ -89,7 +90,7 @@ class JsonUtilBenchmark {
   @BenchmarkMode(Array(Mode.Throughput))
   @OutputTimeUnit(TimeUnit.SECONDS)
   def benchJacksonJsonConverter(): String = {
-    jacksonObjectMapper.writeValueAsString(expectedLogMsgJson1.asJava)
+    jacksonObjectMapper.writeValueAsString(expectedLogMsgJson1.value.asJava)
   }
 
 }

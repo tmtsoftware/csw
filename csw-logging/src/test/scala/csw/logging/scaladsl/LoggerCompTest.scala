@@ -1,12 +1,13 @@
 package csw.logging.scaladsl
 
 import akka.actor.ActorRef
-import com.persist.JsonOps.JsonObject
 import csw.logging.commons.LoggingKeys
 import csw.logging.components.IRIS._
 import csw.logging.components._
+import csw.logging.internal.JsonExtensions.RichJsObject
 import csw.logging.internal.LoggingLevels._
 import csw.logging.utils.LoggingTestSuite
+import play.api.libs.json.JsObject
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -20,10 +21,10 @@ class LoggerCompTest extends LoggingTestSuite {
   private val irisUtil               = new IrisUtil()
   private val tromboneHcd            = new TromboneHcd()
 
-  private var componentLogBuffer: mutable.Map[String, ArrayBuffer[JsonObject]] = mutable.Map.empty
-  var genericLogBuffer: mutable.Buffer[JsonObject]                             = mutable.Buffer.empty[JsonObject]
-  private var irisLogBuffer                                                    = mutable.Buffer.empty[JsonObject]
-  private var tromboneHcdLogBuffer                                             = mutable.Buffer.empty[JsonObject]
+  private var componentLogBuffer: mutable.Map[String, ArrayBuffer[JsObject]] = mutable.Map.empty
+  var genericLogBuffer: mutable.Buffer[JsObject]                             = mutable.Buffer.empty[JsObject]
+  private var irisLogBuffer                                                  = mutable.Buffer.empty[JsObject]
+  private var tromboneHcdLogBuffer                                           = mutable.Buffer.empty[JsObject]
 
   def sendMessagesToActor(actorRef: ActorRef): Unit = {
     actorRef ! LogTrace
@@ -43,7 +44,7 @@ class LoggerCompTest extends LoggingTestSuite {
     irisUtil.startLogging(logMsgMap)
     //componentName = tromboneHcd
     tromboneHcd.startLogging(logMsgMap)
-    Thread.sleep(200)
+    Thread.sleep(300)
   }
 
   def splitAndGroupLogs(): Unit = {
@@ -54,9 +55,9 @@ class LoggerCompTest extends LoggingTestSuite {
     tromboneHcdLogBuffer.clear()
 
     logBuffer.foreach { log ⇒
-      log.get(LoggingKeys.COMPONENT_NAME) match {
+      log.value.get(LoggingKeys.COMPONENT_NAME) match {
         case Some(_) ⇒
-          val name = log(LoggingKeys.COMPONENT_NAME).toString
+          val name = log.getString(LoggingKeys.COMPONENT_NAME)
           componentLogBuffer.get(name) match {
             case Some(xs) ⇒ componentLogBuffer.update(name, xs :+ log)
             case None     ⇒ componentLogBuffer.put(name, ArrayBuffer(log))
@@ -79,16 +80,16 @@ class LoggerCompTest extends LoggingTestSuite {
     // extract component and non-component logs and group them
     splitAndGroupLogs()
 
-    def testLogBuffer(logBuffer: mutable.Buffer[JsonObject],
+    def testLogBuffer(logBuffer: mutable.Buffer[JsObject],
                       configuredLogLevel: Level,
                       expectedLogsMap: Map[String, String] = Map.empty,
                       expectedFileName: String = "",
                       expectedCompName: String = ""): Unit = {
       logBuffer.foreach { log ⇒
-        val currentLogLevel = log(LoggingKeys.SEVERITY).toString.toLowerCase
+        val currentLogLevel = log.getString(LoggingKeys.SEVERITY).toLowerCase
         Level(currentLogLevel) >= configuredLogLevel shouldBe true
-        if (expectedLogsMap.nonEmpty) log(LoggingKeys.MESSAGE).toString shouldBe expectedLogsMap(currentLogLevel)
-        if (!expectedFileName.isEmpty) log(LoggingKeys.FILE).toString shouldBe expectedFileName
+        if (expectedLogsMap.nonEmpty) log.getString(LoggingKeys.MESSAGE) shouldBe expectedLogsMap(currentLogLevel)
+        if (!expectedFileName.isEmpty) log.getString(LoggingKeys.FILE) shouldBe expectedFileName
       }
     }
 

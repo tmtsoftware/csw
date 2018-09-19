@@ -2,8 +2,7 @@ package csw.logging.utils
 
 import java.io.File
 
-import com.persist.JsonOps
-import com.persist.JsonOps.JsonObject
+import play.api.libs.json.{JsObject, Json}
 
 import scala.collection.mutable
 
@@ -21,12 +20,12 @@ object FileUtils {
       throw new Exception(s"Unable to delete ${file.getAbsolutePath}")
   }
 
-  def read(filePath: String): mutable.Buffer[JsonObject] = {
+  def read(filePath: String): mutable.Buffer[JsObject] = {
     val fileSource = scala.io.Source.fromFile(filePath)
-    val logBuffer  = mutable.Buffer.empty[JsonObject]
+    val logBuffer  = mutable.Buffer.empty[JsObject]
 
     fileSource.mkString.lines.foreach { line ⇒
-      logBuffer += JsonOps.Json(line).asInstanceOf[JsonObject]
+      logBuffer += Json.parse(line).as[JsObject]
     }
     fileSource.close()
     logBuffer

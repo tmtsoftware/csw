@@ -4,14 +4,14 @@ import java.time._
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
-import com.persist.JsonOps
-import com.persist.JsonOps.JsonObject
 import csw.logging.commons.{Constants, LoggingKeys, TMTDateTimeFormatter}
 import csw.logging.components.{InnerSourceComponent, SingletonComponent, TromboneAssembly, TromboneHcd}
+import csw.logging.internal.JsonExtensions.RichJsObject
 import csw.logging.internal.LoggingLevels._
 import csw.logging.internal.{LoggingLevels, LoggingState}
 import csw.logging.utils.LoggingTestSuite
 import org.scalatest.prop.TableDrivenPropertyChecks._
+import play.api.libs.json.JsObject
 
 class SimpleLoggingTest extends LoggingTestSuite {
 
@@ -35,15 +35,15 @@ class SimpleLoggingTest extends LoggingTestSuite {
       // Ex.  2017-07-19T13:23:55.358+03:00 :=> DateTimeFormatter.ISO_INSTANT.parse will throw exception
       //      2017-07-19T01:23:55.360+05:30 :=> DateTimeFormatter.ISO_INSTANT.parse will throw exception
       //      2017-07-19T01:23:55.360Z      :=> DateTimeFormatter.ISO_INSTANT.parse will not throw exception
-      noException shouldBe thrownBy(DateTimeFormatter.ISO_INSTANT.parse(log(LoggingKeys.TIMESTAMP).toString))
+      noException shouldBe thrownBy(DateTimeFormatter.ISO_INSTANT.parse(log.getString(LoggingKeys.TIMESTAMP)))
 
-      val actualDateTime = TMTDateTimeFormatter.parse(log(LoggingKeys.TIMESTAMP).toString)
+      val actualDateTime = TMTDateTimeFormatter.parse(log.getString(LoggingKeys.TIMESTAMP))
       ChronoUnit.MILLIS.between(expectedDateTime, actualDateTime) <= 50 shouldBe true
 
-      log(LoggingKeys.COMPONENT_NAME) shouldBe "tromboneHcd"
-      log(LoggingKeys.FILE) shouldBe "TromboneHcd.scala"
-      log(LoggingKeys.LINE) shouldBe logMsgLineNumber
-      log(LoggingKeys.CLASS) shouldBe "csw.logging.components.TromboneHcd"
+      log.getString(LoggingKeys.COMPONENT_NAME) shouldBe "tromboneHcd"
+      log.getString(LoggingKeys.FILE) shouldBe "TromboneHcd.scala"
+      log(LoggingKeys.LINE).as[Int] shouldBe logMsgLineNumber
+      log.getString(LoggingKeys.CLASS) shouldBe "csw.logging.components.TromboneHcd"
       logMsgLineNumber += 1
     }
   }
@@ -83,10 +83,10 @@ class SimpleLoggingTest extends LoggingTestSuite {
 
     logBuffer.foreach { log ⇒
       log.contains(LoggingKeys.COMPONENT_NAME) shouldBe true
-      log(LoggingKeys.COMPONENT_NAME) shouldBe "SingletonComponent"
-      log(LoggingKeys.FILE) shouldBe "SingletonComponent.scala"
-      log(LoggingKeys.LINE) shouldBe logMsgLineNumber
-      log(LoggingKeys.CLASS) shouldBe "csw.logging.components.SingletonComponent"
+      log.getString(LoggingKeys.COMPONENT_NAME) shouldBe "SingletonComponent"
+      log.getString(LoggingKeys.FILE) shouldBe "SingletonComponent.scala"
+      log(LoggingKeys.LINE).as[Int] shouldBe logMsgLineNumber
+      log.getString(LoggingKeys.CLASS) shouldBe "csw.logging.components.SingletonComponent"
       logMsgLineNumber += 1
     }
   }
@@ -109,14 +109,14 @@ class SimpleLoggingTest extends LoggingTestSuite {
       //  Count the user messages for test at the end
       var userMsgCount = 0
       log.contains("@componentName") shouldBe true
-      log("@componentName") shouldBe "SingletonComponent"
-      log("file") shouldBe "SingletonComponent.scala"
-      log("line") shouldBe logMsgLineNumber
-      log("class") shouldBe "csw.logging.components.SingletonComponent"
+      log.getString("@componentName") shouldBe "SingletonComponent"
+      log.getString("file") shouldBe "SingletonComponent.scala"
+      log("line").as[Int] shouldBe logMsgLineNumber
+      log.getString("class") shouldBe "csw.logging.components.SingletonComponent"
       //  This verifies that the user keys are present and the value is correct
       //  Also make sure all user messages and values are present
       userMsgMap.foreach { m =>
-        log(m._1) shouldBe userMsgMap(m._1)
+        log.getString(m._1) shouldBe userMsgMap(m._1)
         userMsgCount += 1
       }
       logMsgLineNumber += 1
@@ -139,7 +139,7 @@ class SimpleLoggingTest extends LoggingTestSuite {
     //  As per the filter, hcd should log 5 message of all level except TRACE
     logBuffer.size shouldBe 5
 
-    val groupByComponentNamesLog = logBuffer.groupBy(json ⇒ json(LoggingKeys.COMPONENT_NAME).toString)
+    val groupByComponentNamesLog = logBuffer.groupBy(json ⇒ json.getString(LoggingKeys.COMPONENT_NAME))
     val tromboneHcdLogs          = groupByComponentNamesLog("tromboneHcd")
 
     tromboneHcdLogs.size shouldBe 5
@@ -147,8 +147,8 @@ class SimpleLoggingTest extends LoggingTestSuite {
     // check that log level should be greater than or equal to debug and
     // assert on actual log message
     tromboneHcdLogs.toList.foreach { log ⇒
-      val currentLogLevel = log(LoggingKeys.SEVERITY).toString.toLowerCase
-      val currentLogMsg   = log(LoggingKeys.MESSAGE).toString
+      val currentLogLevel = log.getString(LoggingKeys.SEVERITY).toLowerCase
+      val currentLogMsg   = log.getString(LoggingKeys.MESSAGE)
       Level(currentLogLevel) >= LoggingLevels.DEBUG shouldBe true
       currentLogMsg shouldBe logMsgMap(currentLogLevel)
     }
@@ -167,7 +167,7 @@ class SimpleLoggingTest extends LoggingTestSuite {
     //  As per the default loglevel = trace, assembly should log all 6 message
     logBuffer.size shouldBe 6
 
-    val groupByComponentNamesLog = logBuffer.groupBy(json ⇒ json(LoggingKeys.COMPONENT_NAME).toString)
+    val groupByComponentNamesLog = logBuffer.groupBy(json ⇒ json.getString(LoggingKeys.COMPONENT_NAME))
     val tromboneAssemblyLogs     = groupByComponentNamesLog("tromboneAssembly")
 
     tromboneAssemblyLogs.size shouldBe 6
@@ -175,8 +175,8 @@ class SimpleLoggingTest extends LoggingTestSuite {
     // check that log level should be greater than or equal to debug and
     // assert on actual log message
     tromboneAssemblyLogs.toList.foreach { log ⇒
-      val currentLogLevel = log(LoggingKeys.SEVERITY).toString.toLowerCase
-      val currentLogMsg   = log(LoggingKeys.MESSAGE).toString
+      val currentLogLevel = log.getString(LoggingKeys.SEVERITY).toLowerCase
+      val currentLogMsg   = log.getString(LoggingKeys.MESSAGE)
       Level(currentLogLevel) >= LoggingLevels.TRACE shouldBe true
       currentLogMsg shouldBe logMsgMap(currentLogLevel)
     }
@@ -196,8 +196,8 @@ class SimpleLoggingTest extends LoggingTestSuite {
     )
     val compName = "tromboneAssembly"
 
-    def filterLogsByComponentName(compName: String): Seq[JsonOps.JsonObject] = {
-      val groupByComponentNamesLog = logBuffer.groupBy(json ⇒ json(LoggingKeys.COMPONENT_NAME).toString)
+    def filterLogsByComponentName(compName: String): Seq[JsObject] = {
+      val groupByComponentNamesLog = logBuffer.groupBy(json ⇒ json.getString(LoggingKeys.COMPONENT_NAME))
       groupByComponentNamesLog(compName)
     }
 
@@ -216,8 +216,8 @@ class SimpleLoggingTest extends LoggingTestSuite {
       tromboneAssemblyLogs.size shouldBe logCount
 
       tromboneAssemblyLogs.toList.foreach { log ⇒
-        val currentLogLevel = log(LoggingKeys.SEVERITY).toString.toLowerCase
-        val currentLogMsg   = log(LoggingKeys.MESSAGE).toString
+        val currentLogLevel = log.getString(LoggingKeys.SEVERITY).toLowerCase
+        val currentLogMsg   = log.getString(LoggingKeys.MESSAGE)
         Level(currentLogLevel) >= logLevel shouldBe true
         currentLogMsg shouldBe logMsgMap(currentLogLevel)
       }
@@ -242,8 +242,8 @@ class SimpleLoggingTest extends LoggingTestSuite {
     )
     val compName = TromboneHcd.COMPONENT_NAME
 
-    def filterLogsByComponentName(compName: String): Seq[JsonOps.JsonObject] = {
-      val groupByComponentNamesLog = logBuffer.groupBy(json ⇒ json(LoggingKeys.COMPONENT_NAME).toString)
+    def filterLogsByComponentName(compName: String): Seq[JsObject] = {
+      val groupByComponentNamesLog = logBuffer.groupBy(json ⇒ json.getString(LoggingKeys.COMPONENT_NAME))
       groupByComponentNamesLog(compName)
     }
 
@@ -262,8 +262,8 @@ class SimpleLoggingTest extends LoggingTestSuite {
       tromboneHcdLogs.size shouldBe logCount
 
       tromboneHcdLogs.toList.foreach { log ⇒
-        val currentLogLevel = log(LoggingKeys.SEVERITY).toString.toLowerCase
-        val currentLogMsg   = log(LoggingKeys.MESSAGE).toString
+        val currentLogLevel = log.getString(LoggingKeys.SEVERITY).toLowerCase
+        val currentLogMsg   = log.getString(LoggingKeys.MESSAGE)
         Level(currentLogLevel) >= logLevel shouldBe true
         currentLogMsg shouldBe logMsgMap(currentLogLevel)
       }
@@ -277,7 +277,7 @@ class SimpleLoggingTest extends LoggingTestSuite {
     Thread.sleep(100)
 
     logBuffer.foreach { log ⇒
-      log(LoggingKeys.CATEGORY) shouldBe true
+      log.getString(LoggingKeys.CATEGORY) shouldBe true
     }
   }
 
@@ -309,25 +309,25 @@ class SimpleLoggingTest extends LoggingTestSuite {
      * }
      */
     logBuffer.foreach { log ⇒
-      log(LoggingKeys.COMPONENT_NAME) shouldBe "tromboneHcd"
-      log(LoggingKeys.SEVERITY) shouldBe ERROR.name
-      log(LoggingKeys.CLASS) shouldBe tromboneHcdClassName
-      log(LoggingKeys.MESSAGE) shouldBe computationResultMsg
+      log.getString(LoggingKeys.COMPONENT_NAME) shouldBe "tromboneHcd"
+      log.getString(LoggingKeys.SEVERITY) shouldBe ERROR.name
+      log.getString(LoggingKeys.CLASS) shouldBe tromboneHcdClassName
+      log.getString(LoggingKeys.MESSAGE) shouldBe computationResultMsg
       // DEOPSCSW-325: Include exception stack trace in stdout log message for exceptions
       log.contains(LoggingKeys.PLAINSTACK) shouldBe true
 
       log.contains("trace") shouldBe true
-      val traceBlock = log("trace").asInstanceOf[JsonObject]
+      val traceBlock = log("trace").as[JsObject]
       traceBlock.contains(LoggingKeys.MESSAGE) shouldBe true
       traceBlock.contains("stack") shouldBe true
 
-      val traceMsgBlock = traceBlock(LoggingKeys.MESSAGE).asInstanceOf[JsonObject]
+      val traceMsgBlock = traceBlock(LoggingKeys.MESSAGE).as[JsObject]
       traceMsgBlock.contains(LoggingKeys.EX) shouldBe true
       traceMsgBlock.contains(LoggingKeys.MESSAGE) shouldBe true
     }
 
     // DEOPSCSW-325: Include exception stack trace in stdout log message for exceptions
-    val plainstack = logBuffer.head(LoggingKeys.PLAINSTACK).toString
+    val plainstack = logBuffer.head.getString(LoggingKeys.PLAINSTACK)
     plainstack.startsWith("java.lang.ArithmeticException: / by zero") shouldBe true
   }
 

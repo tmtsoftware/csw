@@ -3,12 +3,11 @@ package csw.logging.appenders
 import java.nio.file.Paths
 
 import akka.actor.ActorSystem
-import com.persist.JsonOps
 import com.typesafe.config.ConfigFactory
-import csw.logging.RichMsg
 import csw.logging.commons.{Category, LoggingKeys}
 import csw.logging.utils.FileUtils
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
+import play.api.libs.json.{JsObject, Json}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.Await
@@ -21,10 +20,9 @@ class NonFileRotationTest extends FunSuite with Matchers with BeforeAndAfterEach
     "csw-logging.appender-config.file.logPath" → logFileDir.getAbsolutePath,
     "csw-logging.appender-config.file.rotate"  → false
   )
-  private val config      = ConfigFactory.parseMap(map.asJava).withFallback(ConfigFactory.load)
-  private val actorSystem = ActorSystem("test-1", config)
-  private val standardHeaders: Map[String, RichMsg] =
-    Map[String, RichMsg](LoggingKeys.HOST -> "localhost", LoggingKeys.NAME -> "test-service")
+  private val config                    = ConfigFactory.parseMap(map.asJava).withFallback(ConfigFactory.load())
+  private val actorSystem               = ActorSystem("test-1", config)
+  private val standardHeaders: JsObject = Json.obj(LoggingKeys.HOST -> "localhost", LoggingKeys.NAME -> "test-service")
 
   private val fileAppender = new FileAppender(actorSystem, standardHeaders)
 
@@ -73,9 +71,9 @@ class NonFileRotationTest extends FunSuite with Matchers with BeforeAndAfterEach
       |}
     """.stripMargin
 
-  val expectedLogMsgJson1: Map[String, String] = JsonOps.Json(logMsgString1).asInstanceOf[Map[String, String]]
-  val expectedLogMsgJson2: Map[String, String] = JsonOps.Json(logMsgString2).asInstanceOf[Map[String, String]]
-  val expectedLogMsgJson3: Map[String, String] = JsonOps.Json(logMsgString3).asInstanceOf[Map[String, String]]
+  val expectedLogMsgJson1: JsObject = Json.parse(logMsgString1).as[JsObject]
+  val expectedLogMsgJson2: JsObject = Json.parse(logMsgString2).as[JsObject]
+  val expectedLogMsgJson3: JsObject = Json.parse(logMsgString3).as[JsObject]
 
   private val logFileFullPath1 = logFileDir.getAbsolutePath ++ s"/test-service/alternative.log"
   private val logFileFullPath2 = logFileDir.getAbsolutePath ++ s"/test-service/common.log"

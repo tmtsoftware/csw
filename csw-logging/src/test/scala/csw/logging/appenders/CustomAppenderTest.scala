@@ -3,12 +3,11 @@ package csw.logging.appenders
 import java.net.InetAddress
 
 import akka.actor.{ActorContext, ActorRefFactory, ActorSystem}
-import com.persist.JsonOps
-import com.persist.JsonOps.{Json, JsonObject}
 import com.typesafe.config.ConfigFactory
-import csw.logging.RichMsg
+import csw.logging.internal.JsonExtensions.RichJsObject
 import csw.logging.scaladsl._
 import org.scalatest.{FunSuite, Matchers}
+import play.api.libs.json.{JsObject, Json}
 
 import scala.collection.mutable
 import scala.concurrent.duration.DurationInt
@@ -29,20 +28,20 @@ class MyFavComponent {
 }
 
 class CustomAppenderBuilderClass extends LogAppenderBuilder {
-  val logBuffer: mutable.Buffer[JsonObject] = mutable.Buffer.empty[JsonObject]
+  val logBuffer: mutable.Buffer[JsObject] = mutable.Buffer.empty[JsObject]
 
-  override def apply(factory: ActorRefFactory, standardHeaders: Map[String, RichMsg]): LogAppender =
-    new CustomAppender(factory, standardHeaders, x ⇒ logBuffer += Json(x.toString).asInstanceOf[JsonObject])
+  override def apply(factory: ActorRefFactory, standardHeaders: JsObject): LogAppender =
+    new CustomAppender(factory, standardHeaders, x ⇒ logBuffer += Json.parse(x.toString).as[JsObject])
 }
 
 object CustomAppenderBuilderObject extends LogAppenderBuilder {
-  val logBuffer: mutable.Buffer[JsonObject] = mutable.Buffer.empty[JsonObject]
+  val logBuffer: mutable.Buffer[JsObject] = mutable.Buffer.empty[JsObject]
 
-  override def apply(factory: ActorRefFactory, standardHeaders: Map[String, RichMsg]): LogAppender =
-    new CustomAppender(factory, standardHeaders, x ⇒ logBuffer += Json(x.toString).asInstanceOf[JsonObject])
+  override def apply(factory: ActorRefFactory, standardHeaders: JsObject): LogAppender =
+    new CustomAppender(factory, standardHeaders, x ⇒ logBuffer += Json.parse(x.toString).as[JsObject])
 }
 
-class CustomAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg], callback: Any ⇒ Unit) extends LogAppender {
+class CustomAppender(factory: ActorRefFactory, stdHeaders: JsObject, callback: Any ⇒ Unit) extends LogAppender {
 
   private[this] val system = factory match {
     case context: ActorContext => context.system
@@ -55,11 +54,11 @@ class CustomAppender(factory: ActorRefFactory, stdHeaders: Map[String, RichMsg],
 
   override def finish(): Future[Unit] = Future.successful(())
 
-  override def append(baseMsg: Map[String, RichMsg], category: String): Unit = {
+  override def append(baseMsg: JsObject, category: String): Unit = {
     if (logIpAddress)
-      callback(JsonOps.Compact(baseMsg + "IpAddress" → InetAddress.getLocalHost.getHostAddress))
+      callback((baseMsg ++ Json.obj("IpAddress" → InetAddress.getLocalHost.getHostAddress)).toString())
     else
-      callback(JsonOps.Compact(baseMsg))
+      callback(baseMsg.toString())
   }
 }
 
@@ -91,7 +90,7 @@ class CustomAppenderTest extends FunSuite with Matchers {
     CustomAppenderBuilderObject.logBuffer.size shouldBe 4
 
     CustomAppenderBuilderObject.logBuffer.forall(log ⇒ log.contains("IpAddress")) shouldBe true
-    CustomAppenderBuilderObject.logBuffer.forall(log ⇒ log("IpAddress") == hostName) shouldBe true
+    CustomAppenderBuilderObject.logBuffer.forall(log ⇒ log.getString("IpAddress") == hostName) shouldBe true
 
     Await.result(actorSystem.terminate(), 10.seconds)
   }
@@ -120,7 +119,7 @@ class CustomAppenderTest extends FunSuite with Matchers {
     customAppender.logBuffer.size shouldBe 4
 
     customAppender.logBuffer.forall(log ⇒ log.contains("IpAddress")) shouldBe true
-    customAppender.logBuffer.forall(log ⇒ log("IpAddress") == hostName) shouldBe true
+    customAppender.logBuffer.forall(log ⇒ log.getString("IpAddress") == hostName) shouldBe true
 
     Await.result(actorSystem.terminate(), 10.seconds)
   }

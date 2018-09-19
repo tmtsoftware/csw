@@ -6,7 +6,6 @@ import java.util.concurrent.CompletableFuture
 import akka.Done
 import akka.actor.{ActorSystem, Props}
 import ch.qos.logback.classic.LoggerContext
-import csw.logging.RichMsg
 import csw.logging.appenders.LogAppenderBuilder
 import csw.logging.commons.{Constants, LoggingKeys}
 import csw.logging.exceptions.AppenderNotFoundException
@@ -16,6 +15,7 @@ import csw.logging.macros.DefaultSourceLocation
 import csw.logging.models.LogMetadata
 import csw.logging.scaladsl.{GenericLoggerFactory, Logger}
 import org.slf4j.LoggerFactory
+import play.api.libs.json.{JsObject, Json}
 
 import scala.collection.JavaConverters.collectionAsScalaIterableConverter
 import scala.compat.java8.FutureConverters.FutureOps
@@ -85,8 +85,7 @@ private[csw] class LoggingSystem(name: String, version: String, host: String, va
   /**
    * Standard headers.
    */
-  val standardHeaders: Map[String, RichMsg] =
-    Map[String, RichMsg](LoggingKeys.HOST -> host, LoggingKeys.NAME -> name, LoggingKeys.VERSION -> version)
+  val standardHeaders: JsObject = Json.obj(LoggingKeys.HOST -> host, LoggingKeys.NAME -> name, LoggingKeys.VERSION -> version)
 
   setDefaultLogLevel(defaultLevel)
   LoggingState.loggerStopping = false

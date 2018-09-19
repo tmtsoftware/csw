@@ -4,8 +4,6 @@ import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.http.scaladsl.Http
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
-import com.persist.JsonOps
-import com.persist.JsonOps.JsonObject
 import com.typesafe.config.ConfigFactory
 import csw.command.client.CommandServiceFactory
 import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
@@ -26,6 +24,7 @@ import csw.logging.internal.LoggingLevels.INFO
 import csw.logging.internal.LoggingSystem
 import csw.params.core.states.{CurrentState, StateName}
 import io.lettuce.core.RedisClient
+import play.api.libs.json.{JsObject, Json}
 
 import scala.collection.mutable
 import scala.concurrent.Await
@@ -39,8 +38,8 @@ class StandaloneComponentTest extends FrameworkIntegrationSuite {
   import testWiring._
 
   // all log messages will be captured in log buffer
-  private val logBuffer                    = mutable.Buffer.empty[JsonObject]
-  private val testAppender                 = new TestAppender(x ⇒ logBuffer += JsonOps.Json(x.toString).asInstanceOf[JsonObject])
+  private val logBuffer                    = mutable.Buffer.empty[JsObject]
+  private val testAppender                 = new TestAppender(x ⇒ logBuffer += Json.parse(x.toString).as[JsObject])
   private var loggingSystem: LoggingSystem = _
 
   override protected def beforeAll(): Unit = {

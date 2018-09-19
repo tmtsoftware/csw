@@ -4,8 +4,6 @@ import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import com.persist.JsonOps
-import com.persist.JsonOps.JsonObject
 import csw.common.FrameworkAssertions._
 import csw.common.components.framework.SampleComponentState._
 import csw.common.utils.TestAppender
@@ -35,6 +33,7 @@ import csw.logging.scaladsl.LoggerFactory
 import csw.params.commands.CommandResponse.SubmitResponse
 import org.mockito.stubbing.Answer
 import org.scalatest.BeforeAndAfterEach
+import play.api.libs.json.{JsObject, Json}
 
 import scala.collection.mutable
 import scala.concurrent.duration.DurationDouble
@@ -54,8 +53,8 @@ class SupervisorLifecycleFailureTest extends FrameworkTestSuite with BeforeAndAf
   implicit val ec: ExecutionContext = typedSystem.executionContext
 
   // all log messages will be captured in log buffer
-  private val logBuffer                    = mutable.Buffer.empty[JsonObject]
-  private val testAppender                 = new TestAppender(x ⇒ logBuffer += JsonOps.Json(x.toString).asInstanceOf[JsonObject])
+  private val logBuffer                    = mutable.Buffer.empty[JsObject]
+  private val testAppender                 = new TestAppender(x ⇒ logBuffer += Json.parse(x.toString).as[JsObject])
   private var loggingSystem: LoggingSystem = _
 
   override protected def beforeAll(): Unit = {

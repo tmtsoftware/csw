@@ -1,12 +1,11 @@
 package csw.logging.internal
 
 import java.lang.management.MemoryUsage
-import javax.management.openmbean.CompositeData
-import javax.management.{Notification, NotificationEmitter, NotificationListener}
 
-import com.persist.JsonOps._
 import com.sun.management.GarbageCollectionNotificationInfo
 import csw.logging.scaladsl.{GenericLoggerFactory, Logger}
+import javax.management.openmbean.CompositeData
+import javax.management.{Notification, NotificationEmitter, NotificationListener}
 
 import scala.collection.JavaConverters._
 
@@ -36,14 +35,14 @@ private[logging] class GcLogger {
           } else {
             "unknown"
           }
-          def getMem(mem: Map[String, MemoryUsage]): Json = {
+          def getMem(mem: Map[String, MemoryUsage]): List[Map[String, Any]] = {
             val m = mem map {
               case (name, usage) =>
-                (name, JsonObject("used" -> usage.getUsed, "max" -> usage.getMax, "committed" -> usage.getCommitted))
+                Map(name → Map("used" -> usage.getUsed, "max" -> usage.getMax, "committed" -> usage.getCommitted))
             }
-            m
+            m.toList
           }
-          val data = JsonObject(
+          val data = Map(
             "type"     -> gctype,
             "id"       -> info.getGcInfo.getId,
             "name"     -> info.getGcName,
