@@ -60,11 +60,10 @@ object AlarmServiceClientExampleApp {
 
   val jclientAPI: IAlarmService = jclientAPI1
 
-  val foo: Future[Done] =
-    //#setSeverity-scala
-    async {
-      await(clientAPI.setSeverity(alarmKey, Okay))
-    }
+  //#setSeverity-scala
+  async {
+    await(clientAPI.setSeverity(alarmKey, Okay))
+  }
   //#setSeverity-scala
 
   //#setSeverity-java
