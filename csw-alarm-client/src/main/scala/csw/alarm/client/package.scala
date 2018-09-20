@@ -31,13 +31,13 @@ package csw.alarm
  *   val alarmKey = AlarmKey(NFIRAOS, "trombone", "tromboneAxisLowLimitAlarm")
  *
  *   val foo: Future[Done] = async {
- *      await(clientAPI1.setSeverity(alarmKey, Okay))
+ *      await(clientAPI.setSeverity(alarmKey, Okay))
  *   }
  *
  * }}}
  *
  *
- * Complete guide of usage of different API's provided by EventService is available at:
+ * Complete guide of usage of different API's provided by AlarmService is available at:
  * https://tmtsoftware.github.io/csw-prod/services/alarm.html
  *
  */
