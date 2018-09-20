@@ -61,6 +61,7 @@ object Dependencies {
   val LocationClient = Def.setting(
     Seq(
       AkkaHttp.`akka-http`,
+      Akka.`akka-remote`,
       Libs.`scala-async`,
       Libs.`play-json`.value,
       Libs.`akka-http-play-json`
