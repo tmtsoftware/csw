@@ -12,8 +12,8 @@ import csw.commons.redis.EmbeddedRedis
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.location.api.models.TcpRegistration
 import csw.location.api.scaladsl.LocationService
+import csw.location.client.ActorSystemFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.commons.ActorSystemFactory
 import csw.logging.commons.LogAdminActorFactory
 import csw.services.BuildInfo
 import org.scalatest.concurrent.{Eventually, ScalaFutures}

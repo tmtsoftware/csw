@@ -11,9 +11,9 @@ import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.scaladsl.LocationService
 import csw.location.api.models.{ComponentId, ComponentType}
 import csw.params.core.models.Prefix
-import csw.location.commons.ActorSystemFactory
 import csw.location.api.models.AkkaRegistration
 import csw.location.api.models.RegistrationResult
+import csw.location.client.ActorSystemFactory
 import csw.location.scaladsl.LocationServiceFactory
 import csw.logging.messages.LogControlMessages
 import csw.logging.scaladsl.{Logger, LoggerFactory, LoggingSystemFactory}

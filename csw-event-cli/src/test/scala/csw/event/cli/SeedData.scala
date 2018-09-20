@@ -13,8 +13,8 @@ import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.event.client.internal.commons.EventServiceConnection
 import csw.location.api.models.TcpRegistration
 import csw.location.api.scaladsl.LocationService
+import csw.location.client.ActorSystemFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.commons.ActorSystemFactory
 import csw.logging.commons.LogAdminActorFactory
 import csw.params.core.formats.JsonSupport
 import csw.params.events._

@@ -9,9 +9,10 @@ import akka.serialization.Serialization
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.location.api.models._
-import csw.location.commons.{ActorSystemFactory, LocationFactory, TestRegistrationFactory}
+import csw.location.commons.{LocationFactory, TestRegistrationFactory}
 import csw.location.api.exceptions.LocalAkkaActorRegistrationNotAllowed
 import csw.location.api.internal.Networks
+import csw.location.client.ActorSystemFactory
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 import scala.concurrent.Await

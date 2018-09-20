@@ -8,7 +8,8 @@ import csw.integtration.common.TestFutureExtension.RichFuture
 import csw.location.api.commons.ClusterSettings
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaRegistration, ComponentId, ComponentType, RegistrationResult}
-import csw.location.commons.{ActorSystemFactory, CswCluster}
+import csw.location.client.ActorSystemFactory
+import csw.location.commons.CswCluster
 import csw.location.scaladsl.LocationServiceFactory
 import csw.logging.messages.LogControlMessages
 import csw.params.core.models.Prefix

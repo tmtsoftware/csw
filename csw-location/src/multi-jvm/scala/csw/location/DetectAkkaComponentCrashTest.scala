@@ -7,7 +7,8 @@ import akka.stream.scaladsl.{Keep, Sink}
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection}
 import csw.location.api.models._
 import csw.location.api.models.HttpRegistration
-import csw.location.commons.{ActorSystemFactory, TestRegistrationFactory}
+import csw.location.client.ActorSystemFactory
+import csw.location.commons.TestRegistrationFactory
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.logging.commons.LogAdminActorFactory
 
