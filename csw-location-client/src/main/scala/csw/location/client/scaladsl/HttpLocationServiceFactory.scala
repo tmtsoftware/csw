@@ -19,7 +19,7 @@ object HttpLocationServiceFactory {
    * Short running command line applications can use this factory method to get http access to location service,
    * so that they do not need to join and leave akka cluster.
    * */
-  def makeLocalHttpClient(implicit actorSystem: ActorSystem, mat: Materializer): LocationService =
+  def makeLocalClient(implicit actorSystem: ActorSystem, mat: Materializer): LocationService =
     new LocationServiceClient("localhost", httpServerPort)
 
   /**
@@ -28,7 +28,7 @@ object HttpLocationServiceFactory {
    * This client tries to connect to the location server running on first cluster seed node.
    * Hence clusterSeeds property should be set in the environment variables else [[csw.location.api.exceptions.ClusterSeedsNotFound]] exception will be thrown.
    * */
-  def makeRemoteHttpClient(implicit actorSystem: ActorSystem, mat: Materializer): LocationService = {
+  def makeRemoteClient(implicit actorSystem: ActorSystem, mat: Materializer): LocationService = {
     val seedIp =
       if (ClusterAwareSettings.seeds.isEmpty) throw ClusterSeedsNotFound
       else ClusterAwareSettings.seeds.head.split(":").head

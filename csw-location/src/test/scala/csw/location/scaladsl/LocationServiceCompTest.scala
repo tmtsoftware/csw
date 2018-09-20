@@ -42,7 +42,7 @@ class LocationServiceCompTest(mode: String)
   implicit val mat: Materializer                 = ActorMaterializer()
 
   private lazy val locationService: LocationService = mode match {
-    case "http"    => HttpLocationServiceFactory.makeLocalHttpClient
+    case "http"    => HttpLocationServiceFactory.makeLocalClient
     case "cluster" => LocationServiceFactory.make()
   }
 

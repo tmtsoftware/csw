@@ -41,7 +41,7 @@ trait AlarmCliTestSetup
 
   val (localHttpClient: LocationService, redisSentinel: RedisSentinel, redisServer: RedisServer) =
     withSentinel(masterId = ConfigFactory.load().getString("csw-alarm.redis.masterId")) { (sentinelPort, _) ⇒
-      val localHttpClient: LocationService = HttpLocationServiceFactory.makeLocalHttpClient
+      val localHttpClient: LocationService = HttpLocationServiceFactory.makeLocalClient
       localHttpClient
         .register(TcpRegistration(AlarmServiceConnection.value, sentinelPort, LogAdminActorFactory.make(system)))
         .await

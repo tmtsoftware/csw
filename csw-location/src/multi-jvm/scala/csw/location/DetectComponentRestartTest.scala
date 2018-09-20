@@ -51,7 +51,7 @@ class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(c
       val newSystem = startNewSystem()
 
       val freshLocationService = mode match {
-        case "http"    => HttpLocationServiceFactory.makeLocalHttpClient(newSystem, ActorMaterializer()(newSystem))
+        case "http"    => HttpLocationServiceFactory.makeLocalClient(newSystem, ActorMaterializer()(newSystem))
         case "cluster" => LocationServiceFactory.withCluster(CswCluster.withSystem(newSystem))
       }
 

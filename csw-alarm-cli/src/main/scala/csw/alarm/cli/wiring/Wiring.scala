@@ -9,7 +9,7 @@ class Wiring(actorSystem: ActorSystem) {
   lazy val actorRuntime = new ActorRuntime(actorSystem)
   import actorRuntime._
 
-  lazy val locationService: LocationService = HttpLocationServiceFactory.makeRemoteHttpClient
+  lazy val locationService: LocationService = HttpLocationServiceFactory.makeRemoteClient
   lazy val configUtils                      = new ConfigUtils(actorRuntime, locationService)
   lazy val printLine: Any ⇒ Unit            = println
   lazy val alarmAdminClient                 = new AlarmAdminClient(actorRuntime, locationService, configUtils, printLine)

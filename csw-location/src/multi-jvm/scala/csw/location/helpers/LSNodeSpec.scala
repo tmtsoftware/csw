@@ -21,7 +21,7 @@ abstract class LSNodeSpec[T <: NMembersAndSeed](val config: T, mode: String = "c
   protected val cswCluster: CswCluster     = CswCluster.withSystem(system)
   implicit val typedSystem: ActorSystem[_] = system.toTyped
   protected val locationService: LocationService = mode match {
-    case "http"    => HttpLocationServiceFactory.makeLocalHttpClient(system, cswCluster.mat)
+    case "http"    => HttpLocationServiceFactory.makeLocalClient(system, cswCluster.mat)
     case "cluster" => LocationServiceFactory.withCluster(cswCluster)
   }
 

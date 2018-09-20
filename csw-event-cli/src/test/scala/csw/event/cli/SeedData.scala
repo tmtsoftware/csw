@@ -35,7 +35,7 @@ trait SeedData extends HTTPLocationService with Matchers with BeforeAndAfterEach
 
   val (localHttpClient: LocationService, redisSentinel: RedisSentinel, redisServer: RedisServer) =
     withSentinel(masterId = ConfigFactory.load().getString("csw-event.redis.masterId")) { (sentinelPort, _) ⇒
-      val localHttpClient: LocationService = HttpLocationServiceFactory.makeLocalHttpClient
+      val localHttpClient: LocationService = HttpLocationServiceFactory.makeLocalClient
       localHttpClient
         .register(TcpRegistration(EventServiceConnection.value, sentinelPort, LogAdminActorFactory.make(system)))
         .await
