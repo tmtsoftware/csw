@@ -5,26 +5,25 @@ import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.adapter._
 import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.{actor, testkit, Done}
-import csw.framework.internal.pubsub.PubSubBehaviorFactory
-import csw.framework.models.CswContext
-import csw.command.messages.CommandResponseManagerMessage
-import csw.params.commands.CommandResponse
-import csw.command.models.framework.{LifecycleStateChanged, PubSub}
-import csw.location.api.models.Connection.AkkaConnection
-import csw.location.api.javadsl.ILocationService
-import csw.location.api.models.AkkaRegistration
-import csw.location.api.scaladsl.LocationService
-import csw.params.core.models.{Id, Prefix}
-import csw.params.core.states.CurrentState
 import csw.alarm.api.scaladsl.AlarmService
 import csw.command.CommandResponseManager
+import csw.command.messages.CommandResponseManagerMessage
+import csw.command.models.framework.{LifecycleStateChanged, PubSub}
 import csw.config.api.scaladsl.ConfigClientService
 import csw.config.client.scaladsl.ConfigClientFactory
-import csw.event.client.EventServiceFactory
 import csw.event.api.scaladsl.EventService
-import csw.location.api.models.RegistrationResult
+import csw.event.client.EventServiceFactory
+import csw.framework.internal.pubsub.PubSubBehaviorFactory
+import csw.framework.models.CswContext
+import csw.location.api.javadsl.ILocationService
+import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.{AkkaRegistration, RegistrationResult}
+import csw.location.api.scaladsl.LocationService
 import csw.location.scaladsl.RegistrationFactory
 import csw.logging.scaladsl.{Logger, LoggerFactory}
+import csw.params.commands.CommandResponse
+import csw.params.core.models.{Id, Prefix}
+import csw.params.core.states.CurrentState
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{when, _}
 import org.scalatest.mockito.MockitoSugar
@@ -35,7 +34,7 @@ class FrameworkTestMocks(implicit untypedSystem: actor.ActorSystem, system: Acto
 
   ///////////////////////////////////////////////
   val testActor: ActorRef[Any]                 = testkit.TestProbe("test-probe").testActor
-  val akkaRegistration                         = AkkaRegistration(mock[AkkaConnection], Prefix("nfiraos.ncc.trombone"), testActor, testActor)
+  val akkaRegistration                         = AkkaRegistration(mock[AkkaConnection], Prefix("nfiraos.ncc.trombone"), testActor)
   val locationService: LocationService         = mock[LocationService]
   val eventServiceFactory: EventServiceFactory = mock[EventServiceFactory]
   val eventService: EventService               = mock[EventService]

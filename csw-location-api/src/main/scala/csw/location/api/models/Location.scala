@@ -25,10 +25,6 @@ sealed abstract class Location extends TMTSerializable {
    */
   def uri: URI
 
-  /**
-   * The LogAdminActorRef for this component that handles dynamic log level changes for that component
-   */
-  def logAdminActorRef: ActorRef[Nothing]
 }
 
 /**
@@ -41,14 +37,12 @@ sealed abstract class Location extends TMTSerializable {
  * @param uri represents the URI of the component. URI is not significant for AkkaLocation as actorRef serves the purpose
  *            of exposed remote address of component.
  * @param actorRef gateway or router for a component that other components will resolve and talk to
- * @param logAdminActorRef handles dynamic log level changes for that component
  */
 final case class AkkaLocation(
     connection: AkkaConnection,
     prefix: Prefix,
     uri: URI,
-    actorRef: ActorRef[Nothing],
-    logAdminActorRef: ActorRef[Nothing]
+    actorRef: ActorRef[Nothing]
 ) extends Location {
 
   // Akka typed actors currently don't save the type while sending ActorRef on wire.
@@ -68,15 +62,13 @@ final case class AkkaLocation(
  *
  * @param connection represents a connection based on a componentId and the type of connection offered by the component
  * @param uri represents the remote URI of the component that other components will resolve and talk to
- * @param logAdminActorRef handles dynamic log level changes for that component
  */
-final case class TcpLocation(connection: TcpConnection, uri: URI, logAdminActorRef: ActorRef[Nothing]) extends Location
+final case class TcpLocation(connection: TcpConnection, uri: URI) extends Location
 
 /**
  * Represents a live Http connection
  *
  * @param connection represents a connection based on a componentId and the type of connection offered by the component
  * @param uri represents the remote URI of the component that other components will resolve and talk to
- * @param logAdminActorRef handles dynamic log level changes for that component
  */
-final case class HttpLocation(connection: HttpConnection, uri: URI, logAdminActorRef: ActorRef[Nothing]) extends Location
+final case class HttpLocation(connection: HttpConnection, uri: URI) extends Location

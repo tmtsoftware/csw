@@ -103,13 +103,6 @@ Java
 
 @@@ note
 
-Notice the `logAdminActorRef` that is used while registering any connection. It is used to dynamically change the log level of a component. For an application, make sure there
-is only one `logAdminActorRef` used for all registrations. The source code of `LogAdminActor` can be found [here](https://github.com/tmtsoftware/csw-prod/blob/master/csw-logging/src/main/scala/csw/logging/internal/LogAdminActor.scala). 
-
-@@@
-
-@@@ note
-
 The `AkkaRegistration` api takes only Typed ActorRefs. Hence, to register an UnTyped ActorRef for an akka connection, it needs to be
 adapted to Typed `ActorRef[Nothing]`. This can be achieved using adapter provided for scaladsl and javadsl. The usage of adapter is
 shown in above snippet for scala and java both. 

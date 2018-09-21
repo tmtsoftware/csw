@@ -86,6 +86,15 @@ object Dependencies {
     )
   )
 
+  val Admin = Def.setting(
+    Seq(
+      AkkaHttp.`akka-http`,
+      Libs.`akka-http-play-json`,
+      Libs.`scopt`,
+      Libs.`scalatest`.value % Test
+    )
+  )
+
   val ConfigApi = Def.setting(
     Seq(
       Enumeratum.`enumeratum`.value,

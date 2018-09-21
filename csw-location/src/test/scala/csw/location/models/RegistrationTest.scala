@@ -7,12 +7,12 @@ import akka.actor.typed.scaladsl.adapter.{TypedActorRefOps, UntypedActorSystemOp
 import akka.actor.{ActorPath, ActorSystem}
 import akka.serialization.Serialization
 import com.typesafe.config.{Config, ConfigFactory}
-import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
-import csw.location.api.models._
-import csw.location.commons.{LocationFactory, TestRegistrationFactory}
 import csw.location.api.exceptions.LocalAkkaActorRegistrationNotAllowed
 import csw.location.api.internal.Networks
+import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
+import csw.location.api.models._
 import csw.location.client.ActorSystemFactory
+import csw.params.core.models.Prefix
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 import scala.concurrent.Await
@@ -22,9 +22,6 @@ class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll wit
 
   implicit val actorSystem: ActorSystem = ActorSystemFactory.remote()
 
-  val RegistrationFactory = new TestRegistrationFactory
-  import RegistrationFactory._
-
   test("should able to create the AkkaRegistration which should internally create AkkaLocation") {
     val hostname = new Networks().hostname()
 
@@ -32,10 +29,11 @@ class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll wit
     val actorRef       = actorSystem.spawn(Behavior.empty, "my-actor-1")
     val actorPath      = ActorPath.fromString(Serialization.serializedActorPath(actorRef.toUntyped))
     val akkaUri        = new URI(actorPath.toString)
+    val prefix         = Prefix("nfiraos.ncc.trombone")
 
-    val akkaRegistration = RegistrationFactory.akka(akkaConnection, actorRef)
+    val akkaRegistration = AkkaRegistration(akkaConnection, prefix, actorRef)
 
-    val expectedAkkaLocation = LocationFactory.akka(akkaConnection, akkaUri, actorRef, logAdminActorRef)
+    val expectedAkkaLocation = AkkaLocation(akkaConnection, prefix, akkaUri, actorRef)
 
     akkaRegistration.location(hostname) shouldBe expectedAkkaLocation
   }
@@ -46,9 +44,9 @@ class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll wit
     val prefix   = "/trombone/hcd"
 
     val httpConnection   = HttpConnection(ComponentId("trombone", ComponentType.HCD))
-    val httpRegistration = RegistrationFactory.http(httpConnection, port, prefix)
+    val httpRegistration = HttpRegistration(httpConnection, port, prefix)
 
-    val expectedhttpLocation = LocationFactory.http(httpConnection, new URI(s"http://$hostname:$port/$prefix"), logAdminActorRef)
+    val expectedhttpLocation = HttpLocation(httpConnection, new URI(s"http://$hostname:$port/$prefix"))
 
     httpRegistration.location(hostname) shouldBe expectedhttpLocation
   }
@@ -58,9 +56,9 @@ class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll wit
     val port     = 9596
 
     val tcpConnection   = TcpConnection(ComponentId("lgsTrombone", ComponentType.HCD))
-    val tcpRegistration = RegistrationFactory.tcp(tcpConnection, port)
+    val tcpRegistration = TcpRegistration(tcpConnection, port)
 
-    val expectedTcpLocation = LocationFactory.tcp(tcpConnection, new URI(s"tcp://$hostname:$port"), logAdminActorRef)
+    val expectedTcpLocation = TcpLocation(tcpConnection, new URI(s"tcp://$hostname:$port"))
 
     tcpRegistration.location(hostname) shouldBe expectedTcpLocation
   }
@@ -73,9 +71,10 @@ class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll wit
     implicit val actorSystem: ActorSystem = ActorSystem("local-actor-system", config)
     val actorRef                          = actorSystem.spawn(Behavior.empty, "my-actor-2")
     val akkaConnection                    = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
+    val prefix                            = Prefix("nfiraos.ncc.trombone")
 
     intercept[LocalAkkaActorRegistrationNotAllowed] {
-      RegistrationFactory.akka(akkaConnection, actorRef)
+      AkkaRegistration(akkaConnection, prefix, actorRef)
     }
     Await.result(actorSystem.terminate, 10.seconds)
   }

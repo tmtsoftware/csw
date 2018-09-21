@@ -5,11 +5,11 @@ import akka.actor.testkit.typed.Effect.{Spawned, Watched}
 import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.{Behaviors, TimerScheduler}
+import csw.command.messages.{ComponentMessage, ContainerIdleMessage, SupervisorMessage}
 import csw.common.components.framework.SampleComponentBehaviorFactory
 import csw.common.extensions.CswContextExtensions.RichCswContext
 import csw.framework.ComponentInfos._
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
-import csw.command.messages.{ComponentMessage, ContainerIdleMessage, SupervisorMessage}
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar

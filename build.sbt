@@ -6,6 +6,8 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-logging`,
   `csw-logging-macros`,
   `csw-cluster-seed`,
+  `csw-admin`,
+  `csw-location-client`,
   `csw-config-api`,
   `csw-config-client`,
   `csw-config-cli`,
@@ -133,13 +135,24 @@ lazy val `csw-cluster-seed` = project
   .dependsOn(
     `csw-params-jvm`,
     `csw-location`      % "compile->compile;test->test;multi-jvm->multi-jvm",
-    `csw-commons`       % "compile->compile;test->test",
-    `csw-framework`     % "test->test",
-    `csw-config-server` % "test->test"
+    `csw-commons`       % "compile->compile;test->test"
   )
   .enablePlugins(DeployApp, AutoMultiJvm, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.ClusterSeed.value
+  )
+
+lazy val `csw-admin` = project
+  .dependsOn(
+    `csw-location`,
+    `csw-command`,
+    `csw-commons`       % "compile->compile;test->test",
+    `csw-framework`     % "test->test",
+    `csw-config-server` % "test->test"
+  )
+  .enablePlugins(DeployApp, MaybeCoverage)
+  .settings(
+    libraryDependencies ++= Dependencies.Admin.value
   )
 
 lazy val `csw-location-agent` = project
@@ -251,10 +264,11 @@ lazy val `csw-event-client` = project
 
 lazy val `csw-event-cli` = project
   .dependsOn(
-    `csw-event-client`,
     `csw-location-client`,
+    `csw-event-client` % "compile->compile;test->test",
     `csw-cluster-seed` % "test->multi-jvm",
-    `csw-commons`      % "test->test"
+    `csw-commons`      % "test->test",
+    `csw-config-server` % "test->test"
   )
   .enablePlugins(DeployApp, MaybeCoverage)
   .settings(libraryDependencies ++= Dependencies.EventCli.value)
@@ -282,7 +296,8 @@ lazy val `csw-alarm-cli` = project
     `csw-alarm-client`,
     `csw-config-client`,
     `csw-location-client`,
-    `csw-cluster-seed` % "test->multi-jvm"
+    `csw-cluster-seed` % "test->multi-jvm",
+    `csw-config-server` % "test->test"
   )
   .enablePlugins(DeployApp, MaybeCoverage)
   .settings(libraryDependencies ++= Dependencies.AlarmCli.value)

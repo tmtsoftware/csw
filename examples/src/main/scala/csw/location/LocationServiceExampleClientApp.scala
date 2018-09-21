@@ -7,20 +7,17 @@ import akka.actor.typed.{ActorRef, Behavior}
 import akka.actor.{ActorSystem, Props}
 import akka.stream.scaladsl.{Keep, Sink}
 import akka.stream.{ActorMaterializer, Materializer}
-import csw.framework.commons.CoordinatedShutdownReasons.ActorTerminatedReason
-import csw.command.messages.{ComponentMessage, ContainerMessage}
-import csw.location.api.models.Connection.{AkkaConnection, HttpConnection}
-import csw.location.api.models._
-import csw.location.api.models.{AkkaRegistration, HttpRegistration}
-import csw.location.api.scaladsl.LocationService
-import csw.params.core.models.Prefix
 import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
+import csw.command.messages.{ComponentMessage, ContainerMessage}
+import csw.framework.commons.CoordinatedShutdownReasons.ActorTerminatedReason
+import csw.location.api.models.Connection.{AkkaConnection, HttpConnection}
+import csw.location.api.models.{AkkaRegistration, HttpRegistration, _}
+import csw.location.api.scaladsl.LocationService
 import csw.location.client.ActorSystemFactory
-import csw.location.scaladsl.{LocationServiceFactory, RegistrationFactory}
-import csw.logging.commons.LogAdminActorFactory
+import csw.location.scaladsl.LocationServiceFactory
 import csw.logging.internal.LoggingSystem
-import csw.logging.messages.LogControlMessages
 import csw.logging.scaladsl._
+import csw.params.core.models.Prefix
 
 import scala.async.Async._
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -89,18 +86,12 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
 
   //#Components-Connections-Registrations
 
-  // logAdminActorRef handles dynamically setting/getting log level of the component
-  private val logAdminActorRef: ActorRef[LogControlMessages] =
-    LogAdminActorFactory.make(context.system)
-
-  private val registrationFactory = new RegistrationFactory(logAdminActorRef)
-
   // add some dummy registrations for illustrative purposes
 
   // dummy http connection
   val httpPort                          = 8080
   val httpConnection                    = HttpConnection(ComponentId("configuration", ComponentType.Service))
-  val httpRegistration                  = HttpRegistration(httpConnection, httpPort, "path123", logAdminActorRef)
+  val httpRegistration                  = HttpRegistration(httpConnection, httpPort, "path123")
   val httpRegResult: RegistrationResult = Await.result(locationService.register(httpRegistration), 2.seconds)
 
   // ************************************************************************************************************
@@ -110,7 +101,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
 
   // dummy HCD connection
   val hcdConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
-  val hcdRegistration: AkkaRegistration = registrationFactory.akkaTyped(
+  val hcdRegistration: AkkaRegistration = AkkaRegistration(
     hcdConnection,
     Prefix("nfiraos.ncc.tromboneHcd"),
     context.actorOf(Props(new akka.actor.Actor {
@@ -135,7 +126,7 @@ class LocationServiceExampleClient(locationService: LocationService, loggingSyst
 
   // Register Typed ActorRef[String] with Location Service
   val assemblyRegistration: AkkaRegistration =
-    registrationFactory.akkaTyped(assemblyConnection, Prefix("nfiraos.ncc.tromboneAssembly"), typedActorRef)
+    AkkaRegistration(assemblyConnection, Prefix("nfiraos.ncc.tromboneAssembly"), typedActorRef)
 
   val assemblyRegResult: RegistrationResult = Await.result(locationService.register(assemblyRegistration), 2.seconds)
   //#Components-Connections-Registrations

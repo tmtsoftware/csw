@@ -38,7 +38,6 @@ class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(c
           AkkaRegistration(
             akkaConnection,
             Prefix("nfiraos.ncc.trombone"),
-            system.spawnAnonymous(Behavior.empty),
             system.spawnAnonymous(Behavior.empty)
           )
         )
@@ -62,7 +61,6 @@ class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(c
           AkkaRegistration(
             akkaConnection,
             Prefix("nfiraos.ncc.trombone"),
-            newSystem.spawnAnonymous(Behavior.empty),
             newSystem.spawnAnonymous(Behavior.empty)
           )
         )

@@ -1,8 +1,7 @@
 package csw.integtration.apps
 
 import csw.location.api.models.Connection.HttpConnection
-import csw.location.api.models.{ComponentId, ComponentType}
-import csw.integtration.common.RegistrationFactory
+import csw.location.api.models.{ComponentId, ComponentType, HttpRegistration}
 import csw.integtration.common.TestFutureExtension.RichFuture
 import csw.location.scaladsl.LocationServiceFactory
 
@@ -13,7 +12,7 @@ object TestService {
   private val Path = "redisservice.org/test"
   private val Port = 9999
 
-  val registration = RegistrationFactory.http(connection, Port, Path)
+  val registration = HttpRegistration(connection, Port, Path)
   val registrationResult =
     LocationServiceFactory.make().register(registration).await
 

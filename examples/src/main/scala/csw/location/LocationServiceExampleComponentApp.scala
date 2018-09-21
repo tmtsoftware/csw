@@ -3,20 +3,15 @@ package csw.location
 import java.net.InetAddress
 
 import akka.actor._
-import akka.stream.ActorMaterializer
-import akka.actor.typed
-import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.adapter._
+import akka.stream.ActorMaterializer
 import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.{AkkaRegistration, ComponentId, ComponentType, RegistrationResult}
 import csw.location.api.scaladsl.LocationService
-import csw.location.api.models.{ComponentId, ComponentType}
-import csw.params.core.models.Prefix
-import csw.location.api.models.AkkaRegistration
-import csw.location.api.models.RegistrationResult
 import csw.location.client.ActorSystemFactory
 import csw.location.scaladsl.LocationServiceFactory
-import csw.logging.messages.LogControlMessages
 import csw.logging.scaladsl.{Logger, LoggerFactory, LoggingSystemFactory}
+import csw.params.core.models.Prefix
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
@@ -58,12 +53,10 @@ class LocationServiceExampleComponent(locationService: LocationService) extends 
   val log: Logger = new LoggerFactory("my-component-name").getLogger(context)
 
   log.info("In actor LocationServiceExampleComponent")
-  val logAdminActorRef: typed.ActorRef[LogControlMessages] =
-    ActorSystemFactory.remote().spawn(Behavior.empty, "my-actor-1-admin")
   // Register with the location service
   val registrationResult: Future[RegistrationResult] =
     locationService.register(
-      AkkaRegistration(LocationServiceExampleComponent.connection, Prefix("nfiraos.ncc.trombone"), self, logAdminActorRef)
+      AkkaRegistration(LocationServiceExampleComponent.connection, Prefix("nfiraos.ncc.trombone"), self)
     )
   Await.result(registrationResult, 5.seconds)
 

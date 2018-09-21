@@ -6,28 +6,28 @@ import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.scaladsl.{ActorContext, MutableBehavior}
 import akka.actor.typed.{ActorRef, Behavior, PostStop, Signal, Terminated}
+import csw.alarm.client.AlarmServiceFactory
 import csw.command.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
-import csw.command.messages.{ComponentMessage, ContainerActorMessage, ContainerCommonMessage, ContainerIdleMessage}
 import csw.command.messages.ContainerIdleMessage.SupervisorsCreated
 import csw.command.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.command.messages.RunningMessage.Lifecycle
 import csw.command.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
+import csw.command.messages.{ComponentMessage, ContainerActorMessage, ContainerCommonMessage, ContainerIdleMessage}
 import csw.command.models.framework._
+import csw.event.client.EventServiceFactory
 import csw.framework.commons.CoordinatedShutdownReasons.{
   AllActorsWithinContainerTerminatedReason,
   FailedToCreateSupervisorsReason
 }
 import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.framework.models._
-import csw.params.core.models.Prefix
-import csw.params.core.models.Subsystem.Container
-import csw.alarm.client.AlarmServiceFactory
-import csw.event.client.EventServiceFactory
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaRegistration, ComponentId, ComponentType}
 import csw.location.api.scaladsl.LocationService
 import csw.location.scaladsl.RegistrationFactory
 import csw.logging.scaladsl.{Logger, LoggerFactory}
+import csw.params.core.models.Prefix
+import csw.params.core.models.Subsystem.Container
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}

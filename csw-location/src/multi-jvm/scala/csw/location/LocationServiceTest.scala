@@ -3,7 +3,6 @@ package csw.location
 import csw.location.api.models.Connection.{HttpConnection, TcpConnection}
 import csw.location.api.models._
 import csw.location.commons.TestFutureExtension.RichFuture
-import csw.location.commons.TestRegistrationFactory
 import csw.location.helpers.{LSNodeSpec, OneMemberAndSeed}
 import org.scalatest.BeforeAndAfterEach
 
@@ -19,17 +18,15 @@ class LocationServiceTest(ignore: Int, mode: String)
 
   import config._
 
-  val RegistrationFactory = new TestRegistrationFactory
-
   test("ensure that a component registered by one node is resolved and listed on all the nodes") {
     val tcpPort         = 446
     val tcpConnection   = TcpConnection(ComponentId("redis", ComponentType.Service))
-    val tcpRegistration = RegistrationFactory.tcp(tcpConnection, tcpPort)
+    val tcpRegistration = TcpRegistration(tcpConnection, tcpPort)
 
     val httpPort         = 81
     val httpPath         = "/test/hcd"
     val httpConnection   = HttpConnection(ComponentId("tromboneHcd", ComponentType.HCD))
-    val httpRegistration = RegistrationFactory.http(httpConnection, httpPort, httpPath)
+    val httpRegistration = HttpRegistration(httpConnection, httpPort, httpPath)
 
     runOn(seed) {
       locationService.register(tcpRegistration).await

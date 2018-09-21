@@ -8,9 +8,8 @@ import csw.location.api.models.Connection.{AkkaConnection, HttpConnection}
 import csw.location.api.models._
 import csw.location.api.models.HttpRegistration
 import csw.location.client.ActorSystemFactory
-import csw.location.commons.TestRegistrationFactory
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
-import csw.logging.commons.LogAdminActorFactory
+import csw.params.core.models.Prefix
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -72,7 +71,7 @@ class DetectAkkaComponentCrashTest(ignore: Int, mode: String) extends LSNodeSpec
         .remote()
         .spawn(Behavior.empty, "trombone-hcd-1")
 
-      locationService.register(new TestRegistrationFactory().akka(akkaConnection, actorRef)).await
+      locationService.register(AkkaRegistration(akkaConnection, Prefix("nfiraos.ncc.trombone"), actorRef)).await
       enterBarrier("Registration")
 
       Await.ready(system.whenTerminated, 5.seconds)
@@ -83,7 +82,7 @@ class DetectAkkaComponentCrashTest(ignore: Int, mode: String) extends LSNodeSpec
       val prefix = "/trombone/hcd"
 
       val httpConnection   = HttpConnection(ComponentId("Assembly1", ComponentType.Assembly))
-      val httpRegistration = HttpRegistration(httpConnection, port, prefix, LogAdminActorFactory.make(system))
+      val httpRegistration = HttpRegistration(httpConnection, port, prefix)
       val probe            = TestProbe[TrackingEvent]("test-probe")
 
       locationService.register(httpRegistration).await

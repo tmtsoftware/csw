@@ -24,13 +24,13 @@ class ArgsParserTest extends FunSuite with Matchers {
   }
 
   test("parse with all arguments without testMode") {
-    val args = Array("--clusterPort", "1234", "--adminPort", "5678")
-    silentParse(args) shouldBe Some(Options(Some(1234), Some(5678)))
+    val args = Array("--clusterPort", "1234")
+    silentParse(args) shouldBe Some(Options(Some(1234)))
   }
 
   test("parse with all arguments --testMode") {
-    val args = Array("--clusterPort", "1234", "--adminPort", "5678", "--testMode")
-    silentParse(args) shouldBe Some(Options(Some(1234), Some(5678), testMode = true))
+    val args = Array("--clusterPort", "1234", "--testMode")
+    silentParse(args) shouldBe Some(Options(Some(1234), testMode = true))
   }
 
   test("parse with some arguments") {

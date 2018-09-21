@@ -10,7 +10,6 @@ import csw.alarm.client.internal.helpers.AlarmServiceTestSetup
 import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
 import csw.location.api.commons.ClusterAwareSettings
 import csw.location.scaladsl.LocationServiceFactory
-import csw.logging.commons.LogAdminActorFactory
 
 // DEOPSCSW-481: Component Developer API available to all CSW components
 class AlarmServiceFactoryTest extends AlarmServiceTestSetup {
@@ -19,7 +18,7 @@ class AlarmServiceFactoryTest extends AlarmServiceTestSetup {
   private val locationService = LocationServiceFactory.withSystem(seedSystem)
 
   locationService
-    .register(TcpRegistration(AlarmServiceConnection.value, sentinelPort, LogAdminActorFactory.make(seedSystem)))
+    .register(TcpRegistration(AlarmServiceConnection.value, sentinelPort))
     .await
 
   override protected def beforeEach(): Unit = {

@@ -2,12 +2,12 @@ package csw.framework.internal.container
 
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.Behaviors
+import csw.alarm.client.AlarmServiceFactory
 import csw.command.messages.ContainerActorMessage
+import csw.event.client.EventServiceFactory
 import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.framework.models.ContainerInfo
 import csw.location.api.scaladsl.LocationService
-import csw.alarm.client.AlarmServiceFactory
-import csw.event.client.EventServiceFactory
 import csw.location.scaladsl.RegistrationFactory
 import csw.logging.scaladsl.LoggerFactory
 

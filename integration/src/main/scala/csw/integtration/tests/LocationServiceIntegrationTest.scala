@@ -3,24 +3,21 @@ package csw.integtration.tests
 import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.adapter._
 import akka.actor.{typed, ActorSystem, Props, Scheduler}
 import akka.util.Timeout
-import csw.command.messages.CommandMessage.Submit
-import csw.params.commands.{CommandName, Setup}
-import csw.location.api.models.Connection.{AkkaConnection, HttpConnection}
-import csw.location.api.exceptions.OtherLocationIsRegistered
-import csw.location.api.models.AkkaRegistration
-import csw.location.api.scaladsl.LocationService
-import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType, HttpLocation}
-import csw.params.core.models.Prefix
 import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
+import csw.command.messages.CommandMessage.Submit
 import csw.integtration.apps.TromboneHCD
 import csw.integtration.common.TestFutureExtension.RichFuture
 import csw.location.api.commons.ClusterAwareSettings
+import csw.location.api.exceptions.OtherLocationIsRegistered
+import csw.location.api.models.Connection.{AkkaConnection, HttpConnection}
+import csw.location.api.models._
+import csw.location.api.scaladsl.LocationService
 import csw.location.scaladsl.LocationServiceFactory
-import csw.logging.messages.LogControlMessages
+import csw.params.commands.{CommandName, Setup}
+import csw.params.core.models.Prefix
 import org.scalatest._
 
 import scala.concurrent.Await
@@ -39,12 +36,11 @@ class LocationServiceIntegrationTest extends FunSuite with Matchers with BeforeA
     Await.result(locationService.shutdown(UnknownReason), 5.seconds)
 
   test("should not allow duplicate akka registration") {
-    val tromboneHcdActorRef                                  = actorSystem.actorOf(Props[TromboneHCD], "trombone-hcd")
-    val logAdminActorRef: typed.ActorRef[LogControlMessages] = actorSystem.spawn(Behavior.empty, "trombone-admin")
-    val componentId                                          = ComponentId("trombonehcd", ComponentType.HCD)
-    val connection                                           = AkkaConnection(componentId)
+    val tromboneHcdActorRef = actorSystem.actorOf(Props[TromboneHCD], "trombone-hcd")
+    val componentId         = ComponentId("trombonehcd", ComponentType.HCD)
+    val connection          = AkkaConnection(componentId)
 
-    val registration = AkkaRegistration(connection, Prefix("nfiraos.ncc.trombone"), tromboneHcdActorRef, logAdminActorRef)
+    val registration = AkkaRegistration(connection, Prefix("nfiraos.ncc.trombone"), tromboneHcdActorRef)
     Thread.sleep(4000)
     intercept[OtherLocationIsRegistered] {
       locationService.register(registration).await

@@ -9,11 +9,10 @@ import csw.alarm.api.models.FullAlarmSeverity;
 import csw.alarm.api.scaladsl.AlarmAdminService;
 import csw.alarm.client.internal.commons.AlarmServiceConnection;
 import csw.alarm.client.internal.helpers.AlarmServiceTestSetup;
+import csw.location.api.commons.ClusterAwareSettings;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.api.models.TcpRegistration;
-import csw.location.api.commons.ClusterAwareSettings;
 import csw.location.javadsl.JLocationServiceFactory;
-import csw.logging.commons.LogAdminActorFactory;
 import org.junit.*;
 import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
@@ -35,7 +34,7 @@ public class JAlarmServiceFactoryTest {
 
     @BeforeClass
     public static void setup() throws ExecutionException, InterruptedException {
-        locationService.register(new TcpRegistration(AlarmServiceConnection.value(), testSetup.sentinelPort(), LogAdminActorFactory.make(seedSystem))).get();
+        locationService.register(new TcpRegistration(AlarmServiceConnection.value(), testSetup.sentinelPort())).get();
     }
 
     @Before

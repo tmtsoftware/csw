@@ -9,11 +9,11 @@ import akka.{actor, Done}
 import csw.location.api.scaladsl.LocationService
 import csw.event.api.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
 import csw.event.api.scaladsl.{EventPublisher, EventService, EventSubscriber}
-import csw.event.client.helpers.RegistrationFactory
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.event.client.internal.commons.serviceresolver.EventServiceLocationResolver
 import csw.event.client.internal.commons.{EventServiceConnection, EventStreamSupervisionStrategy}
 import csw.location.api.commons.ClusterAwareSettings
+import csw.location.api.models.TcpRegistration
 import csw.location.scaladsl.LocationServiceFactory
 
 import scala.async.Async._
@@ -48,7 +48,7 @@ object BaseProperties {
   def createInfra(seedPort: Int, serverPort: Int): (actor.ActorSystem, LocationService) = {
     val system          = ClusterAwareSettings.onPort(seedPort).system
     val locationService = LocationServiceFactory.withSystem(system)
-    val tcpRegistration = RegistrationFactory.tcp(EventServiceConnection.value, serverPort)
+    val tcpRegistration = TcpRegistration(EventServiceConnection.value, serverPort)
     locationService.register(tcpRegistration).await
     (system, locationService)
   }

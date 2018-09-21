@@ -10,7 +10,6 @@ import csw.location.api.models.Connection.TcpConnection
 import csw.location.api.models.{ComponentId, ComponentType, RegistrationResult, TcpRegistration}
 import csw.location.commons.CswCluster
 import csw.location.scaladsl.LocationServiceFactory
-import csw.logging.commons.LogAdminActorFactory
 import csw.logging.scaladsl.Logger
 
 import scala.collection.immutable.Seq
@@ -58,7 +57,7 @@ class LocationAgent(names: List[String], command: Command, actorSystem: ActorSys
   private def registerName(name: String): Future[RegistrationResult] = {
     val componentId = ComponentId(name, ComponentType.Service)
     val connection  = TcpConnection(componentId)
-    locationService.register(TcpRegistration(connection, command.port, LogAdminActorFactory.make(actorSystem)))
+    locationService.register(TcpRegistration(connection, command.port))
   }
 
   // Registers a shutdownHook to handle service un-registration during abnormal exit

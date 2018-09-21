@@ -15,7 +15,6 @@ import csw.location.api.models.TcpRegistration
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.ActorSystemFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.logging.commons.LogAdminActorFactory
 import csw.params.core.formats.JsonSupport
 import csw.params.events._
 import org.scalatest.{BeforeAndAfterEach, Matchers}
@@ -37,7 +36,7 @@ trait SeedData extends HTTPLocationService with Matchers with BeforeAndAfterEach
     withSentinel(masterId = ConfigFactory.load().getString("csw-event.redis.masterId")) { (sentinelPort, _) ⇒
       val localHttpClient: LocationService = HttpLocationServiceFactory.makeLocalClient
       localHttpClient
-        .register(TcpRegistration(EventServiceConnection.value, sentinelPort, LogAdminActorFactory.make(system)))
+        .register(TcpRegistration(EventServiceConnection.value, sentinelPort))
         .await
       localHttpClient
     }

@@ -2,13 +2,13 @@ package csw.framework.internal.supervisor
 
 import akka.actor.ActorSystem
 import akka.actor.typed.ActorRef
+import csw.alarm.client.AlarmServiceFactory
 import csw.command.messages.ContainerIdleMessage
+import csw.command.models.framework.{Component, ComponentInfo, SupervisorInfo}
+import csw.event.client.EventServiceFactory
 import csw.framework.internal.wiring.CswFrameworkSystem
 import csw.framework.models.CswContext
-import csw.command.models.framework.{Component, ComponentInfo, SupervisorInfo}
 import csw.location.api.scaladsl.LocationService
-import csw.alarm.client.AlarmServiceFactory
-import csw.event.client.EventServiceFactory
 import csw.location.client.ActorSystemFactory
 import csw.location.scaladsl.RegistrationFactory
 import csw.logging.scaladsl.{Logger, LoggerFactory}

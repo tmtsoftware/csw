@@ -2,16 +2,17 @@ package csw.clusterseed.client
 
 import akka.actor.CoordinatedShutdown.UnknownReason
 import csw.clusterseed.internal.AdminWiring
-import csw.event.client.helpers.TestFutureExt.RichFuture
+import csw.location.commons.TestFutureExtension.RichFuture
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{BeforeAndAfterAll, FunSuiteLike}
 
 import scala.util.{Failure, Success, Try}
 
-trait HTTPLocationService extends FunSuiteLike with BeforeAndAfterAll {
+trait HTTPLocationService extends FunSuiteLike with BeforeAndAfterAll with ScalaFutures {
 
   val (maybeWiring, maybeBinding) = Try {
-    val adminWiring = AdminWiring.make(Some(3553), None)
-    (adminWiring, adminWiring.locationHttpService.start().await)
+    val adminWiring = AdminWiring.make(Some(3553))
+    (adminWiring, adminWiring.locationHttpService.start().futureValue)
   } match {
     case Success((adminWiring, serverBinding)) ⇒ (Some(adminWiring), Some(serverBinding))
     case Failure(_)                            ⇒ (None, None)

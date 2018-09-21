@@ -24,7 +24,7 @@ object TromboneHCD {
   val componentId                   = ComponentId("trombonehcd", ComponentType.HCD)
   val connection                    = AkkaConnection(componentId)
 
-  val registration                           = AkkaRegistration(connection, Prefix("nfiraos.ncc.trombone"), tromboneHcdActorRef, null)
+  val registration                           = AkkaRegistration(connection, Prefix("nfiraos.ncc.trombone"), tromboneHcdActorRef)
   private val locationService                = LocationServiceFactory.withSystem(hcdActorSystem)
   val registrationResult: RegistrationResult = locationService.register(registration).await
 

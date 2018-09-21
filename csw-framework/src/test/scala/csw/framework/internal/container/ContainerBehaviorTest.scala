@@ -47,7 +47,7 @@ class ContainerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
 
   class IdleContainer() {
     private val testActor: ActorRef[Any]                  = TestProbe("test-probe").ref
-    val akkaRegistration                                  = AkkaRegistration(mock[AkkaConnection], Prefix("nfiraos.ncc.trombone"), testActor, testActor)
+    val akkaRegistration                                  = AkkaRegistration(mock[AkkaConnection], Prefix("nfiraos.ncc.trombone"), testActor)
     val locationService: LocationService                  = mock[LocationService]
     val eventService: EventServiceFactory                 = mock[EventServiceFactory]
     val alarmService: AlarmServiceFactory                 = mock[AlarmServiceFactory]
