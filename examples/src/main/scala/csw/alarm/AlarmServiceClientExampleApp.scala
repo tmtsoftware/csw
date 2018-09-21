@@ -1,10 +1,9 @@
 package csw.alarm
 import akka.Done
-import akka.actor.{typed, ActorSystem}
 import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.{typed, ActorSystem}
 import com.typesafe.config._
 import csw.alarm.api.javadsl.IAlarmService
-import csw.params.core.models.Subsystem.NFIRAOS
 import csw.alarm.api.models.AlarmSeverity.Okay
 import csw.alarm.api.models.Key.AlarmKey
 import csw.alarm.api.models.{AlarmHealth, AlarmMetadata, AlarmStatus, FullAlarmSeverity}
@@ -12,9 +11,10 @@ import csw.alarm.api.scaladsl.{AlarmAdminService, AlarmService}
 import csw.alarm.client.AlarmServiceFactory
 import csw.location.javadsl.JLocationServiceFactory
 import csw.location.scaladsl.LocationServiceFactory
+import csw.params.core.models.Subsystem.NFIRAOS
 
 import scala.async.Async._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 object AlarmServiceClientExampleApp {
 
