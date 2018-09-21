@@ -14,7 +14,7 @@ import csw.alarm.api.models.ShelveStatus._
 import csw.alarm.api.models._
 import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
 import csw.alarm.client.internal.helpers.{AlarmServiceTestSetup, TestDataFeeder}
-import csw.alarm.client.internal.services.SeverityTestScenarios.{AckStatusTestCases, SeverityTestCases}
+import csw.alarm.client.internal.services.SeverityTestScenarios._
 import csw.params.core.models.Subsystem.{BAD, LGSF, NFIRAOS, TCS}
 
 import scala.concurrent.duration.DurationInt
@@ -471,7 +471,7 @@ class SeverityServiceModuleTest
   // DEOPSCSW-496 : Set Ack status on setSeverity
   // DEOPSCSW-494: Incorporate changes in set severity, reset, acknowledgement and latch status
   AckStatusTestCases.foreach { testCase ⇒
-    test(testCase.name) {
+    test(testCase.name()) {
       feedTestData(testCase)
       import testCase._
 
@@ -479,6 +479,28 @@ class SeverityServiceModuleTest
 
       //set severity to new Severity
       val status = setSeverityAndGetStatus(alarmKey, newSeverity)
+
+      //get severity and assert
+      status.acknowledgementStatus shouldEqual newAckStatus
+    }
+  }
+
+  // DEOPSCSW-496 : Set Ack status on setSeverity
+  AckStatusTestCasesForDisconnected.foreach { testCase ⇒
+    test(testCase.name(Disconnected)) {
+      feedTestData(testCase)
+      import testCase._
+
+      setCurrentSeverity(alarmKey, oldSeverity.asInstanceOf[AlarmSeverity])
+
+      getStatus(alarmKey).await.acknowledgementStatus shouldBe oldAckStatus
+
+      // severity expires after 1 second in test
+      Thread.sleep(1000)
+
+      getCurrentSeverity(alarmKey).await shouldBe Disconnected
+
+      val status = getStatus(alarmKey).await
 
       //get severity and assert
       status.acknowledgementStatus shouldEqual newAckStatus

@@ -11,6 +11,6 @@ case class SetSeverityAckStatusTestCase(
     oldAckStatus: AcknowledgementStatus,
     newAckStatus: AcknowledgementStatus
 ) {
-  def name: String =
-    s"ack status should transition from $oldAckStatus to $newAckStatus when severity changes from $oldSeverity to $newSeverity & autoAck=$isAutoAcknowledgeable"
+  def name(severity: FullAlarmSeverity = newSeverity): String =
+    s"ack status should transition from $oldAckStatus to $newAckStatus when severity changes from $oldSeverity to $severity & autoAck=$isAutoAcknowledgeable"
 }
