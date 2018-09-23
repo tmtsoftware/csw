@@ -7,24 +7,18 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
+import csw.command.messages.CommandMessage.{Oneway, Submit}
+import csw.command.messages.CommandResponseManagerMessage.Subscribe
 import csw.common.components.command.ComponentStateForCommand.{acceptedCmd, cancelCmd, prefix}
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
-import csw.messages.CommandMessage.{Oneway, Submit}
-import csw.messages.CommandResponseManagerMessage.Subscribe
-import csw.messages.commands.CommandResponse._
-import csw.messages.commands.Setup
-import csw.messages.location.Connection.AkkaConnection
-import csw.messages.location.{ComponentId, ComponentType}
-import csw.messages.params.generics.KeyType
-import csw.messages.params.models.ObsId
-import csw.services.location.helpers.{LSNodeSpec, OneMemberAndSeed}
-import csw.params.commands.CommandResponse.{Accepted, Cancelled, Completed}
-import csw.params.commands.{CommandResponse, Setup}
+import csw.params.commands.CommandResponse._
+import csw.params.commands.Setup
 import csw.params.core.generics.KeyType
 import csw.params.core.models.ObsId
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{ComponentId, ComponentType}
 import csw.location.helpers.{LSNodeSpec, OneMemberAndSeed}
+import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
 import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar
 

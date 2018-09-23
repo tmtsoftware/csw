@@ -5,20 +5,13 @@ import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
-import akka.actor.{typed, ActorSystem}
+import akka.actor.{ActorSystem, typed}
 import csw.command.messages.CommandResponseManagerMessage._
 import csw.command.messages.CommandResponseManagerMessage
 import csw.command.models.{CommandCorrelation, CommandResponseManagerState}
-import csw.params.commands.CommandResponse
-import csw.params.commands.CommandResponse.{Accepted, Completed, Error}
+import csw.params.commands.CommandResponse._
 import csw.params.core.models.Id
 import csw.logging.scaladsl.{Logger, LoggerFactory}
-import csw.messages.CommandResponseManagerMessage
-import csw.messages.commands.{CommandCorrelation, CommandResponseManagerState}
-import csw.messages.params.models.Id
-import csw.messages.CommandResponseManagerMessage._
-import csw.messages.commands.ValidationResponse.Accepted
-import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
@@ -218,7 +211,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
     commandResponseProbe.expectMessage(Error(runId, "Sub command 1 failed"))
   }
 
-//  // DEOPSCSW-207: Report on Configuration Command Completion
+  // DEOPSCSW-207: Report on Configuration Command Completion
   test("should be able to update successful command status when all the subcommand completes with success") {
     val behaviorTestKit      = createBehaviorTestKit()
     val commandResponseProbe = TestProbe[QueryResponse]

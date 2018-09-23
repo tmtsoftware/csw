@@ -69,8 +69,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
 
         runningHcds = new HashMap<>();
         commandResponseAdapter = TestProbe.<CommandResponse.SubmitResponse>create(ctx.getSystem()).ref();
-        commandResponseAdapter = TestProbe.<CommandResponse>create(ctx.getSystem()).ref();
-        commandResponseAdapter = TestProbe.<Responses.SubmitResponse>create(ctx.getSystem()).ref();
+        commandResponseAdapter = TestProbe.<CommandResponse.SubmitResponse>create(ctx.getSystem()).ref();
     }
     //#jcomponent-handlers-class
 
@@ -199,7 +198,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
                 // Completed
                 commandResponseManager.jSubscribe(subCommand.runId(), commandResponse -> {
                     if (commandResponse instanceof CommandResponse.Completed) {
-                        Key<String> stringKey = JKeyTypes.StringKey().make("sub-command-status");
+                        Key<String> stringKey = JKeyType.StringKey().make("sub-command-status");
                         CurrentState currentState = new CurrentState(sc.source().prefix(), new StateName("testStateName"));
                         currentStatePublisher.publish(currentState.madd(stringKey.set("complete")));
                     } else {

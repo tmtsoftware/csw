@@ -4,16 +4,10 @@ import akka.actor.typed.scaladsl.ActorContext
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.command.messages.TopLevelActorMessage
-import csw.params.commands.CommandResponse.Accepted
+import csw.params.commands.CommandResponse.{Accepted, Completed, SubmitResponse, ValidationResponse}
 import csw.params.commands.{CommandResponse, ControlCommand}
 import csw.location.api.models.TrackingEvent
 import csw.logging.scaladsl.Logger
-import csw.messages.TopLevelActorMessage
-import csw.messages.commands.ControlCommand
-import csw.messages.commands.CommandResponse.{Accepted, Completed, SubmitResponse, ValidationResponse}
-import csw.messages.framework.ComponentInfo
-import csw.messages.location.TrackingEvent
-import csw.services.logging.scaladsl.Logger
 
 import scala.concurrent.Future
 

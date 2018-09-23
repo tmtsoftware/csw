@@ -17,13 +17,9 @@ import csw.framework.models.CswContext
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.command.messages.CommandMessage.Submit
-import csw.command.messages.ComponentCommonMessage.{
-  ComponentStateSubscription,
-  GetSupervisorLifecycleState,
-  LifecycleStateSubscription
-}
+import csw.command.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
 import csw.command.messages.SupervisorContainerCommonMessages.Restart
-import csw.params.commands.{CommandName, CommandResponse, ControlCommand, Setup}
+import csw.params.commands.{CommandName, ControlCommand, Setup}
 import csw.command.models.framework.{LifecycleStateChanged, PubSub, SupervisorLifecycleState}
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.ObsId
@@ -32,6 +28,7 @@ import csw.command.messages.{ComponentMessage, ContainerIdleMessage, TopLevelAct
 import csw.logging.internal.LoggingLevels.ERROR
 import csw.logging.internal.LoggingSystem
 import csw.logging.scaladsl.LoggerFactory
+import csw.params.commands.CommandResponse.SubmitResponse
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.mockito.stubbing.Answer

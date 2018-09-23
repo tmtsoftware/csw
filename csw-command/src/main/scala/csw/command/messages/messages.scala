@@ -2,7 +2,6 @@ package csw.command.messages
 
 import acyclic.skipped
 import akka.actor.typed.ActorRef
-import csw.messages.commands.CommandResponse.{OnewayResponse, QueryResponse, SubmitResponse}
 import csw.command.models.{CommandCorrelation, CommandResponseManagerState}
 import csw.command.models.framework.PubSub.SubscriberMessage
 import csw.command.models.framework._
@@ -11,12 +10,7 @@ import csw.params.commands.{CommandResponse, ControlCommand}
 import csw.params.core.models.{Id, Prefix}
 import csw.params.core.states.CurrentState
 import csw.location.api.models.TrackingEvent
-import csw.messages.commands._
-import csw.messages.framework.PubSub.SubscriberMessage
-import csw.messages.framework._
-import csw.messages.location.TrackingEvent
-import csw.messages.params.models.{Id, Prefix}
-import csw.messages.params.states.CurrentState
+import csw.params.commands.CommandResponse.{OnewayResponse, QueryResponse, SubmitResponse}
 
 import scala.concurrent.duration.FiniteDuration
 

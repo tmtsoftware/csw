@@ -8,15 +8,9 @@ import csw.command.messages.TopLevelActorMessage
 import csw.params.commands._
 import csw.params.events.{EventName, SystemEvent}
 import csw.location.api.models.TrackingEvent
+import csw.params.commands.CommandResponse._
 import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.Id
-import csw.messages.TopLevelActorMessage
-import csw.messages.commands.CommandResponse._
-import csw.messages.commands._
-import csw.messages.events.{EventName, SystemEvent}
-import csw.messages.location.TrackingEvent
-import csw.messages.params.generics.{Key, KeyType, Parameter}
-import csw.messages.params.models.Id
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContextExecutor, Future}

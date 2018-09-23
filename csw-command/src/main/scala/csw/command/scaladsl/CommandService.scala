@@ -8,23 +8,14 @@ import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.Source
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
-import csw.messages.CommandMessage.{Oneway, Submit}
-import csw.messages.commands.Responses._
-import csw.messages.commands.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
-import csw.messages.commands.matchers.{Matcher, StateMatcher}
-import csw.messages.commands.{ControlCommand, Responses}
-import csw.messages.location.AkkaLocation
-import csw.messages.params.models.Id
-import csw.messages.params.states.{CurrentState, StateName}
-import csw.messages.{CommandResponseManagerMessage, ComponentMessage}
 import csw.command.messages.CommandMessage.{Oneway, Submit}
 import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.models.CommandResponseAggregator
 import csw.command.models.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
 import csw.command.models.matchers.{Matcher, StateMatcher}
 import csw.command.messages.{CommandResponseManagerMessage, ComponentMessage}
-import csw.params.commands.CommandResponse.{Accepted, Completed, Error}
-import csw.params.commands.{CommandResponse, ControlCommand}
+import csw.params.commands.CommandResponse._
+import csw.params.commands.ControlCommand
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
 import csw.location.api.models.AkkaLocation

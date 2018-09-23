@@ -2,7 +2,8 @@ package csw.command.models.matchers
 
 import akka.util.Timeout
 import csw.params.core.generics.Parameter
-import csw.params.core.states.{CurrentState, DemandState}
+import csw.params.core.models.Prefix
+import csw.params.core.states.{CurrentState, DemandState, StateName}
 
 /**
  * A StateMatcher which matches the CurrentState against the DemandState
@@ -18,14 +19,14 @@ case class DemandMatcherAll(demand: DemandState, timeout: Timeout) extends State
    *
    * @return the prefix of destination component
    */
-  def prefix: String = demand.prefixStr
+  def prefix: Prefix = demand.prefix
 
   /**
    * The name of the state to match for
    *
    * @return the name of the state
    */
-  def stateName: String = demand.stateName.name
+  def stateName: StateName = demand.stateName
 
   /**
    * A predicate to match the current state
@@ -55,14 +56,14 @@ case class DemandMatcher(demand: DemandState, withUnits: Boolean = false, timeou
    *
    * @return the prefix of destination component
    */
-  def prefix: String = demand.prefixStr
+  def prefix: Prefix = demand.prefix
 
   /**
    * The name of the state to match for
    *
    * @return the name of the state
    */
-  def stateName: String = demand.stateName.name
+  def stateName: StateName = demand.stateName
 
   /**
    * A predicate to match the current state

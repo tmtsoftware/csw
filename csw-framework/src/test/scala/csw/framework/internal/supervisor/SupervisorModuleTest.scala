@@ -4,7 +4,7 @@ import akka.actor.testkit.typed.scaladsl.TestProbe
 import csw.framework.ComponentInfos._
 import csw.framework.FrameworkTestSuite
 import csw.framework.javadsl.commons.JComponentInfos.{jHcdInfo, jHcdInfoWithInitializeTimeout}
-import csw.params.commands.CommandResponse.{Accepted, Invalid}
+import csw.params.commands.CommandResponse._
 import csw.params.commands._
 import csw.command.models.matchers.DemandMatcher
 import csw.command.models.framework.PubSub.Subscribe
@@ -16,33 +16,11 @@ import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.ObsId
 import csw.params.core.states.{CurrentState, DemandState, StateName}
 import csw.command.messages.CommandMessage.{Oneway, Submit}
-import csw.command.messages.ComponentCommonMessage.{
-  ComponentStateSubscription,
-  GetSupervisorLifecycleState,
-  LifecycleStateSubscription
-}
+import csw.command.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
 import csw.command.messages.ContainerIdleMessage
 import csw.command.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.command.messages.RunningMessage.Lifecycle
 import csw.command.messages.SupervisorContainerCommonMessages.Restart
-import csw.messages.commands.ValidationResponse.{Accepted, Invalid}
-import csw.messages.commands._
-import csw.messages.commands.matchers.DemandMatcher
-import csw.messages.framework.PubSub.Subscribe
-import csw.messages.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
-import csw.messages.framework.{ComponentInfo, LifecycleStateChanged, SupervisorLifecycleState}
-import csw.messages.location.ComponentType.{Assembly, HCD}
-import csw.messages.location.Connection.AkkaConnection
-import csw.messages.params.generics.{KeyType, Parameter}
-import csw.messages.params.models.ObsId
-import csw.messages.params.states.{CurrentState, DemandState, StateName}
-import csw.messages.CommandMessage.{Oneway, Submit}
-import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
-import csw.messages.ContainerIdleMessage
-import csw.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
-import csw.messages.RunningMessage.Lifecycle
-import csw.messages.SupervisorContainerCommonMessages.Restart
-import csw.messages.commands.CommandResponse.Completed
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach

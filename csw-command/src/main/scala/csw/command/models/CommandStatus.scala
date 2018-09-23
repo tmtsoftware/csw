@@ -1,6 +1,6 @@
 package csw.command.models
 
-import csw.params.commands.SubmitResponse
+import csw.params.commands.CommandResponse.SubmitResponse
 import csw.params.core.models.Id
 
 /**

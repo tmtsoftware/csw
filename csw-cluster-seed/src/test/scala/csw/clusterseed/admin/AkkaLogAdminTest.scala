@@ -30,23 +30,7 @@ import csw.logging.internal.LoggingLevels.{ERROR, Level, WARN}
 import csw.logging.internal._
 import csw.logging.models.LogMetadata
 import csw.logging.scaladsl.LoggingSystemFactory
-import csw.messages.commands.{CommandName, CommandResponse, Setup, ValidationResponse}
-import csw.messages.commons.CoordinatedShutdownReasons.TestFinishedReason
-import csw.messages.framework.{Component, Components, ContainerLifecycleState}
-import csw.messages.location.ComponentId
-import csw.messages.location.ComponentType.{Assembly, HCD}
-import csw.messages.location.Connection.AkkaConnection
-import csw.messages.params.models.Prefix
-import csw.messages.CommandMessage.Oneway
-import csw.messages.ContainerMessage
-import csw.messages.ContainerCommonMessage.GetComponents
-import csw.messages.commands.{CommandName, Setup}
-import csw.messages.commands.Responses.OnewayResponse
-import csw.services.location.commons.{ClusterAwareSettings, ClusterSettings}
-import csw.services.logging.internal.LoggingLevels.{ERROR, Level, WARN}
-import csw.services.logging.internal._
-import csw.services.logging.models.LogMetadata
-import csw.services.logging.scaladsl.LoggingSystemFactory
+import csw.params.commands.CommandResponse.OnewayResponse
 import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar
 
@@ -97,7 +81,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with MockitoSugar with HttpSupp
   override protected def afterEach(): Unit = logBuffer.clear()
 
   override protected def afterAll(): Unit = {
-    Await.result(adminWiring.actorRuntime.shutdown(TestFinishedReason), 10.seconds)
+    Await.result(adminWiring.actorRuntime.shutdown(UnknownReason), 10.seconds)
     Await.result(containerActorSystem.terminate(), 5.seconds)
   }
 

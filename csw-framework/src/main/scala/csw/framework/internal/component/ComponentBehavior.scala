@@ -14,28 +14,7 @@ import csw.command.models.framework.ToComponentLifecycleMessage
 import csw.command.models.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.messages.framework.LocationServiceUsage.RegisterAndTrackServices
-import csw.messages.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
-import csw.messages.framework.{ComponentInfo, ToComponentLifecycleMessage}
-import csw.messages.CommandMessage.{Oneway, Submit}
-import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
-import csw.messages.FromComponentLifecycleMessage.Running
-import csw.messages.RunningMessage.Lifecycle
-import csw.messages.TopLevelActorCommonMessage.{TrackingEventReceived, UnderlyingHookFailed}
-import csw.messages.TopLevelActorIdleMessage.Initialize
-import csw.messages._
-import csw.messages.commands.CommandResponse._
-import csw.services.command.CommandResponseManager
-import csw.services.location.scaladsl.LocationService
-import csw.services.logging.scaladsl.{Logger, LoggerFactory}
-import csw.messages.commands.CommandResponse
-import csw.messages.commands.CommandResponse.Accepted
-import csw.messages.framework.LocationServiceUsage.RegisterAndTrackServices
-import csw.messages.framework.ToComponentLifecycleMessage
-import csw.messages.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
-import csw.services.logging.scaladsl.Logger
-import csw.params.commands.CommandResponse
-import csw.params.commands.CommandResponse.Accepted
+import csw.params.commands.CommandResponse._
 import csw.logging.scaladsl.Logger
 
 import scala.async.Async.{async, await}

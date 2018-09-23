@@ -10,7 +10,7 @@ import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.common.components.command.ComponentStateForCommand._
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
-import csw.params.commands.CommandResponse.{Accepted, Completed, Invalid}
+import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandResponse, Setup}
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
@@ -18,15 +18,6 @@ import csw.params.core.models.ObsId
 import csw.params.core.states.{CurrentState, StateName}
 import csw.command.scaladsl.{CommandDistributor, CommandService}
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
-import csw.messages.commands.CommandResponse.Completed
-import csw.messages.commands.ValidationResponse.{Accepted, Invalid}
-import csw.messages.commands.{CommandResponse, CommandResponseBase, Setup}
-import csw.messages.location.Connection.AkkaConnection
-import csw.messages.location.{AkkaLocation, ComponentId, ComponentType}
-import csw.messages.params.models.ObsId
-import csw.messages.params.states.{CurrentState, StateName}
-import csw.services.command.scaladsl.CommandService
-import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import io.lettuce.core.RedisClient
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar

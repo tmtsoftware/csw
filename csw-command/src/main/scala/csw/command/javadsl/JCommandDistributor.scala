@@ -5,15 +5,8 @@ import java.util.concurrent.CompletableFuture
 
 import akka.stream.Materializer
 import akka.util.Timeout
-import csw.messages.commands.{CommandResponseBase, ControlCommand, ValidationResponse}
-import csw.params.commands.{CommandResponse, ControlCommand}
-import csw.command.scaladsl.CommandDistributor
-import csw.messages.commands.{CommandResponse, ControlCommand, ValidationResponse}
-import csw.services.command.scaladsl.CommandDistributor
+import csw.params.commands.ControlCommand
 
-import scala.collection.JavaConverters.{collectionAsScalaIterableConverter, mapAsScalaMapConverter}
-import scala.compat.java8.FutureConverters.FutureOps
-import scala.concurrent.ExecutionContext
 
 /**
  * Helper class for Java to get the handle of [[csw.command.scaladsl.CommandDistributor]]

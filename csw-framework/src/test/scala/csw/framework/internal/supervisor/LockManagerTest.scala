@@ -1,18 +1,17 @@
 package csw.framework.internal.supervisor
 
-import akka.actor.{typed, ActorSystem}
+import akka.actor.{ActorSystem, typed}
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import csw.params.commands.CommandIssue.ComponentLockedIssue
-import csw.params.commands.CommandResponse.NotAllowed
-import csw.params.commands.{CommandName, CommandResponse, Setup}
+import csw.params.commands.{CommandName, Setup}
 import csw.command.models.framework.LockingResponse
 import csw.command.models.framework.LockingResponses._
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.{ObsId, Prefix}
 import csw.command.messages.CommandMessage.Submit
 import csw.logging.scaladsl.{Logger, LoggerFactory}
+import csw.params.commands.CommandResponse.SubmitResponse
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSuite, Matchers}

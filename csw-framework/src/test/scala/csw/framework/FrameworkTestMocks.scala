@@ -4,7 +4,7 @@ import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.adapter._
 import akka.actor.typed.{ActorRef, ActorSystem}
-import akka.{actor, testkit, Done}
+import akka.{Done, actor, testkit}
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.models.CswContext
 import csw.command.messages.CommandResponseManagerMessage
@@ -25,6 +25,7 @@ import csw.event.api.scaladsl.EventService
 import csw.location.models.RegistrationResult
 import csw.location.scaladsl.RegistrationFactory
 import csw.logging.scaladsl.{Logger, LoggerFactory}
+import csw.params.commands.CommandResponse.SubmitResponse
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{when, _}
 import org.scalatest.mockito.MockitoSugar

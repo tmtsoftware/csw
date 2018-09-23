@@ -5,17 +5,10 @@ import akka.actor.typed.{ActorRef, Behavior}
 import csw.command.messages.CommandResponseManagerMessage
 import csw.command.messages.CommandResponseManagerMessage._
 import csw.command.models.{CommandCorrelation, CommandResponseManagerState}
-import csw.params.commands.CommandResponse.CommandNotAvailable
-import csw.params.commands.CommandResultType.{Final, Intermediate}
-import csw.params.commands.{CommandResponse, CommandResultType}
+import csw.params.commands.CommandResponse.{CommandNotAvailable, SubmitResponse}
+import csw.params.commands.CommandResponse
 import csw.params.core.models.Id
 import csw.logging.scaladsl.{Logger, LoggerFactory}
-import csw.messages.CommandResponseManagerMessage
-import csw.messages.commands._
-import csw.messages.params.models.Id
-import csw.messages.CommandResponseManagerMessage._
-import csw.messages.commands.Responses._
-import csw.services.logging.scaladsl.{Logger, LoggerFactory}
 
 /**
  * The Behavior of a Command Response Manager, represented as a mutable behavior. This behavior will be created as an actor.
@@ -52,6 +45,8 @@ private[command] class CommandResponseManagerBehavior(
 
   private[command] var commandResponseManagerState: CommandResponseManagerState = CommandResponseManagerState(Map.empty)
   private[command] var commandCoRelation: CommandCorrelation                    = CommandCorrelation(Map.empty, Map.empty)
+
+  import CommandResponse._
 
   override def onMessage(msg: CommandResponseManagerMessage): Behavior[CommandResponseManagerMessage] = {
     msg match {

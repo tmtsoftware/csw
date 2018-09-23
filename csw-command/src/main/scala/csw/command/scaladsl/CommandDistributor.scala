@@ -4,14 +4,10 @@ import akka.NotUsed
 import akka.stream.Materializer
 import akka.stream.scaladsl.Source
 import akka.util.Timeout
-import csw.messages.commands.CommandResponse.{Started, SubmitResponse}
 import csw.command.models.CommandResponseAggregator
 import csw.params.commands.CommandResponse.Completed
 import csw.params.commands.{CommandIssue, CommandResponse, ControlCommand}
 import csw.params.core.models.Id
-import csw.messages.commands.CommandResponse.Completed
-import csw.messages.commands._
-import csw.messages.params.models.Id
 
 import scala.concurrent.{ExecutionContext, Future}
 

@@ -5,7 +5,7 @@ import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.command.messages.TopLevelActorMessage
 import csw.params.commands.CommandIssue.OtherIssue
-import csw.params.commands.CommandResponse.{Accepted, Completed, Invalid}
+import csw.params.commands.CommandResponse._
 import csw.params.commands._
 import csw.params.events.{Event, EventName, SystemEvent}
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
@@ -13,16 +13,6 @@ import csw.location.api.models.{LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.params.core.models.Prefix
 import csw.params.core.states.{CurrentState, StateName}
 import csw.logging.scaladsl.Logger
-import csw.messages.TopLevelActorMessage
-import csw.messages.commands.CommandIssue.OtherIssue
-import csw.messages.commands.{CommandName, ControlCommand, Observe, Setup}
-import csw.messages.commands.CommandResponse._
-import csw.messages.events.{Event, EventName, SystemEvent}
-import csw.messages.location.Connection.{AkkaConnection, HttpConnection, TcpConnection}
-import csw.messages.location.{LocationRemoved, LocationUpdated, TrackingEvent}
-import csw.messages.params.models.Prefix
-import csw.messages.params.states.{CurrentState, StateName}
-import csw.services.logging.scaladsl.Logger
 
 import scala.concurrent.{ExecutionContext, Future}
 

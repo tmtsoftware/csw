@@ -6,28 +6,17 @@ import csw.common.components.framework.SampleComponentState.{choiceKey, initChoi
 import csw.common.utils.LockCommandFactory
 import csw.framework.ComponentInfos.assemblyInfo
 import csw.framework.FrameworkTestSuite
-import csw.params.commands.CommandResponse.{Accepted, NotAllowed}
-import csw.params.commands.{CommandName, CommandResponse, Setup}
+import csw.params.commands.{CommandName, Setup}
 import csw.command.models.framework.LockingResponses._
 import csw.command.models.framework.{LifecycleStateChanged, LockingResponse, PubSub, SupervisorLifecycleState}
 import csw.params.core.models.{ObsId, Prefix}
 import csw.params.core.states.{CurrentState, StateName}
 import csw.command.messages.CommandMessage.Submit
-import csw.command.messages.{CommandResponseManagerMessage ⇒ CRM}
-import csw.messages.commands.CommandResponse.NotAllowed
-import csw.messages.commands.{CommandName, CommandResponse, CommandResponseBase, Setup}
-import csw.messages.framework.LockingResponses._
-import csw.messages.framework.{LifecycleStateChanged, LockingResponse, PubSub, SupervisorLifecycleState}
-import csw.messages.params.models.{ObsId, Prefix}
-import csw.messages.params.states.{CurrentState, StateName}
-import csw.messages.CommandMessage.Submit
-import csw.messages.{CommandResponseManagerMessage => CRM}
-import CRM.{AddOrUpdateCommand, Query, Unsubscribe}
+import csw.command.messages.CommandResponseManagerMessage.{AddOrUpdateCommand, Query, Unsubscribe}
 import csw.command.messages.ComponentCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
 import csw.command.messages.SupervisorLockMessage.{Lock, Unlock}
-import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
-import csw.messages.SupervisorLockMessage.{Lock, Unlock}
-import csw.messages.commands.ValidationResponse.Accepted
+import csw.command.messages.{CommandResponseManagerMessage => CRM}
+import csw.params.commands.CommandResponse._
 import org.scalatest.BeforeAndAfterEach
 
 import scala.concurrent.duration.DurationDouble

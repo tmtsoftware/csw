@@ -5,7 +5,6 @@ import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.util.Timeout;
 import csw.framework.CurrentStatePublisher;
-import csw.messages.commands.*;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.models.JCswContext;
 import csw.command.messages.TopLevelActorMessage;

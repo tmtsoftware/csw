@@ -9,7 +9,7 @@ import csw.command.messages.CommandMessage.{Oneway, Submit}
 import csw.command.messages.CommandResponseManagerMessage.AddOrUpdateCommand
 import csw.command.messages.RunningMessage.Lifecycle
 import csw.command.messages.TopLevelActorIdleMessage.Initialize
-import csw.params.commands.CommandResponse.{Accepted, Completed, Error}
+import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandName, CommandResponse, Observe, Setup}
 import csw.command.models.framework.ToComponentLifecycleMessages._
 import csw.location.api.scaladsl.LocationService
@@ -19,24 +19,7 @@ import csw.command.messages.{CommandResponseManagerMessage, FromComponentLifecyc
 import csw.alarm.api.scaladsl.AlarmService
 import csw.command.CommandResponseManager
 import csw.event.api.scaladsl.EventService
-import csw.messages.commands.CommandResponse.{Completed, Error}
-import csw.messages.commands.{CommandName, CommandResponse, Observe, Setup}
-import csw.messages.commands.CommandResponse.Completed
-import csw.messages.commands._
-import csw.messages.framework.ToComponentLifecycleMessages._
-import csw.messages.params.generics.KeyType
-import csw.messages.params.models.{ObsId, Prefix}
-import csw.messages.CommandMessage.{Oneway, Submit}
-import csw.messages.CommandResponseManagerMessage.AddOrUpdateCommand
-import csw.messages.RunningMessage.Lifecycle
-import csw.messages.TopLevelActorIdleMessage.Initialize
-import csw.messages.commands.CommandIssue.OtherIssue
-import csw.messages.commands.ValidationResponse.{Accepted, Invalid}
-import csw.messages.{CommandResponseManagerMessage, FromComponentLifecycleMessage, TopLevelActorMessage}
-import csw.services.alarm.api.scaladsl.AlarmService
-import csw.services.command.CommandResponseManager
-import csw.services.event.api.scaladsl.EventService
-import csw.services.location.scaladsl.LocationService
+import csw.params.commands.CommandIssue.OtherIssue
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar

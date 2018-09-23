@@ -7,23 +7,13 @@ import csw.common.components.command.ComponentStateForCommand.{longRunningCmdCom
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.command.messages.TopLevelActorMessage
-import csw.params.commands.CommandResponse.{Accepted, Completed, Invalid}
-import csw.params.commands.{CommandIssue, CommandResponse, ControlCommand, Setup}
+import csw.params.commands.CommandResponse._
+import csw.params.commands.{CommandIssue, ControlCommand, Setup}
 import csw.location.api.models.{AkkaLocation, TrackingEvent}
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
 import csw.command.scaladsl.CommandService
-import csw.messages.TopLevelActorMessage
-import csw.messages.commands.CommandIssue.UnsupportedCommandIssue
-import csw.messages.commands.CommandResponse._
-import csw.messages.commands._
-import csw.messages.framework.ComponentInfo
-import csw.messages.location.{AkkaLocation, TrackingEvent}
-import csw.messages.params.models.Id
-import csw.messages.params.states.{CurrentState, StateName}
-import csw.services.alarm.api.scaladsl.AlarmService
-import csw.services.command.CommandResponseManager
-import csw.services.command.scaladsl.CommandService
+import csw.params.commands.CommandIssue.UnsupportedCommandIssue
 
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{ExecutionContext, Future}
@@ -41,7 +31,7 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
   var longSetup: Setup              = _
 
   import cswCtx._
-  override def initialize(): Future[Unit] =
+
   override def initialize(): Future[Unit] = {
     componentInfo.connections.headOption match {
       case Some(hcd) ⇒

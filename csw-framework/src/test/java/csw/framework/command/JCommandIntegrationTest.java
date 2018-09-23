@@ -13,9 +13,7 @@ import csw.common.components.framework.SampleComponentState;
 import csw.framework.internal.wiring.FrameworkWiring;
 import csw.framework.internal.wiring.Standalone;
 import csw.command.messages.SupervisorLockMessage;
-import csw.params.commands.CommandIssue;
 import csw.params.commands.CommandResponse;
-import csw.params.commands.CommandResponse.Completed;
 import csw.params.commands.ControlCommand;
 import csw.params.commands.Setup;
 import csw.command.models.matchers.*;
@@ -30,37 +28,12 @@ import csw.params.core.states.CurrentState;
 import csw.params.core.states.DemandState;
 import csw.params.core.states.StateName;
 import csw.command.extensions.AkkaLocationExt;
-import csw.command.javadsl.JCommandDistributor;
 import csw.command.javadsl.JCommandService;
 import csw.command.scaladsl.CurrentStateSubscription;
 import csw.location.commons.ClusterAwareSettings;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.javadsl.JLocationServiceFactory;
 import csw.logging.javadsl.JLoggingSystemFactory;
-import csw.messages.SupervisorLockMessage;
-import csw.messages.commands.*;
-import csw.messages.commands.matchers.DemandMatcher;
-import csw.messages.commands.matchers.Matcher;
-import csw.messages.commands.matchers.MatcherResponse;
-import csw.messages.commands.matchers.StateMatcher;
-import csw.messages.commons.CoordinatedShutdownReasons;
-import csw.messages.framework.LockingResponse;
-import csw.messages.framework.LockingResponses;
-import csw.messages.location.AkkaLocation;
-import csw.messages.location.ComponentId;
-import csw.messages.params.generics.JKeyType;
-import csw.messages.params.generics.Key;
-import csw.messages.params.generics.Parameter;
-import csw.messages.params.states.CurrentState;
-import csw.messages.params.states.DemandState;
-import csw.messages.params.states.StateName;
-import csw.services.command.javadsl.JCommandDistributor;
-import csw.services.command.javadsl.JCommandService;
-import csw.services.command.scaladsl.CurrentStateSubscription;
-import csw.services.location.commons.ClusterAwareSettings;
-import csw.services.location.javadsl.ILocationService;
-import csw.services.location.javadsl.JLocationServiceFactory;
-import csw.services.logging.javadsl.JLoggingSystemFactory;
 import io.lettuce.core.RedisClient;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -134,6 +107,7 @@ public class JCommandIntegrationTest {
 
         CompletableFuture<CommandResponse.SubmitResponse> imdResCmdResponseCompletableFuture = hcdCmdService.submit(imdResCommand, timeout);
         CommandResponse.SubmitResponse actualImdCmdResponse = imdResCmdResponseCompletableFuture.get();
+        System.out.println("Actual: " + actualImdCmdResponse);
         Assert.assertTrue(actualImdCmdResponse instanceof CommandResponse.CompletedWithResult);
 
         // immediate response - Invalid
@@ -359,7 +333,7 @@ public class JCommandIntegrationTest {
         // using separate submit and subscribe API
         Setup failureResCommand2 = new Setup(prefix(), failureAfterValidationCmd(), Optional.empty()).add(intParameter1);
         CompletableFuture<CommandResponse.SubmitResponse> validationResponse = hcdCmdService.submit(failureResCommand2, timeout);
-        Assert.assertTrue(validationResponse.get() instanceof CommandResponse.Accepted);  // This should fail but I guess not typed by compiler
+        Assert.assertTrue(validationResponse.get() instanceof CommandResponse.Started);  // This should fail but I guess not typed by compiler
 
         CompletableFuture<CommandResponse.SubmitResponse> finalResponse = hcdCmdService.subscribe(failureResCommand1.runId(), timeout);
         Assert.assertTrue(finalResponse.get() instanceof CommandResponse.Error);
@@ -416,7 +390,7 @@ public class JCommandIntegrationTest {
     }
 */
     @Test
-    public void testSubscribeCurrentState() {
+    public void testSubscribeCurrentState() throws InterruptedException {
         Key<Integer> intKey1 = JKeyType.IntKey().make("encoder");
         Parameter<Integer> intParameter1 = intKey1.set(22, 23);
         Setup setup = new Setup(prefix(), acceptedCmd(), Optional.empty()).add(intParameter1);
@@ -444,6 +418,7 @@ public class JCommandIntegrationTest {
 
         // unsubscribe and verify no messages received by probe
         subscription.unsubscribe();
+        Thread.sleep(1000);
 
         hcdCmdService.submit(setup, timeout);
         probe.expectNoMessage(java.time.Duration.ofMillis(20));

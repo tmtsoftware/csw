@@ -16,14 +16,6 @@ import csw.location.api.models._
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
-import csw.messages.TopLevelActorMessage
-import csw.messages.commands.CommandIssue.{OtherIssue, WrongPrefixIssue}
-import csw.messages.commands.CommandResponse._
-import csw.messages.commands._
-import csw.messages.location._
-import csw.messages.params.generics.{KeyType, Parameter}
-import csw.messages.params.models.Id
-import csw.messages.params.states.{CurrentState, StateName}
 
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{ExecutionContext, Future}

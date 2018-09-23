@@ -1,8 +1,7 @@
 package csw.command.models
 
 import akka.actor.typed.ActorRef
-import csw.params.commands.CommandResponse
-import csw.params.commands.CommandResponse.CommandNotAvailable
+import csw.params.commands.CommandResponse.{CommandNotAvailable, QueryResponse, SubmitResponse}
 import csw.params.core.models.Id
 
 /**

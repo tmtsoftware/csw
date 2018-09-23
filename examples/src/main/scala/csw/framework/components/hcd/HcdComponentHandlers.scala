@@ -2,29 +2,18 @@ package csw.framework.components.hcd
 
 import java.nio.file.Paths
 
-import akka.actor.Scheduler
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.AskPattern.Askable
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.Scheduler
 import akka.util.Timeout
-import csw.framework.CurrentStatePublisher
 import csw.framework.components.ConfigNotAvailableException
 import csw.framework.components.assembly.WorkerActorMsgs.{GetStatistics, InitialState}
 import csw.framework.components.assembly.{WorkerActor, WorkerActorMsg}
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.messages.TopLevelActorMessage
-import csw.messages.commands.CommandResponse.{Accepted, Completed, SubmitResponse, ValidationResponse}
-import csw.messages.commands._
-import csw.messages.events._
-import csw.messages.framework.ComponentInfo
-import csw.messages.location.{LocationRemoved, LocationUpdated, TrackingEvent}
-import csw.services.config.api.models.ConfigData
-import csw.services.logging.scaladsl.Logger
 import csw.command.messages.TopLevelActorMessage
-import csw.params.commands.CommandResponse.Accepted
+import csw.params.commands.CommandResponse.{Accepted, Completed, SubmitResponse, ValidationResponse}
 import csw.params.commands.{CommandResponse, ControlCommand, Observe, Setup}
 import csw.location.api.models.{LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.config.api.models.ConfigData

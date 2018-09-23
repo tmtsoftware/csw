@@ -11,13 +11,8 @@ import akka.util.Timeout
 import csw.command.messages.CommandResponseManagerMessage
 import csw.command.messages.CommandResponseManagerMessage.{AddOrUpdateCommand, AddSubCommand, Query, UpdateSubCommand}
 import csw.command.scaladsl.CommandResponseSubscription
-import csw.params.commands.CommandResponse
+import csw.params.commands.CommandResponse.{QueryResponse, SubmitResponse}
 import csw.params.core.models.Id
-import csw.messages.CommandResponseManagerMessage
-import csw.messages.CommandResponseManagerMessage.{AddOrUpdateCommand, AddSubCommand, Query, UpdateSubCommand}
-import csw.messages.commands.CommandResponse.{QueryResponse, SubmitResponse}
-import csw.messages.params.models.Id
-import csw.services.command.scaladsl.CommandResponseSubscription
 
 import scala.compat.java8.FunctionConverters.enrichAsScalaFromConsumer
 import scala.compat.java8.FutureConverters._

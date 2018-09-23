@@ -14,14 +14,7 @@ import csw.location.api.models.AkkaLocation
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
 import csw.command.scaladsl.{CommandService, CurrentStateSubscription}
-import csw.messages.commands.matchers.StateMatcher
-import csw.messages.commands.{CommandResponseBase, ControlCommand, ValidationResponse}
-import csw.messages.commands.CommandResponse.{OnewayResponse, SubmitResponse}
-import csw.messages.commands.ControlCommand
-import csw.messages.location.AkkaLocation
-import csw.messages.params.models.Id
-import csw.messages.params.states.{CurrentState, StateName}
-import csw.services.command.scaladsl.{CommandService, CurrentStateSubscription}
+import csw.params.commands.CommandResponse.{OnewayResponse, QueryResponse, SubmitResponse}
 
 import scala.collection.JavaConverters.iterableAsScalaIterableConverter
 import scala.compat.java8.FunctionConverters.enrichAsScalaFromConsumer

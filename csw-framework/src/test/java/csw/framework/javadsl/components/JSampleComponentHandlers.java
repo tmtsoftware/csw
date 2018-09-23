@@ -27,9 +27,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import static csw.common.components.command.ComponentStateForCommand.*;
-import static csw.messages.commands.CommandResponse.Completed;
-import static csw.messages.commands.CommandResponse.CompletedWithResult;
-import static csw.params.commands.CommandResponse.*;
 
 public class JSampleComponentHandlers extends JComponentHandlers {
 
@@ -74,8 +71,8 @@ public class JSampleComponentHandlers extends JComponentHandlers {
         // Adding item from CommandMessage paramset to ensure things are working
         CurrentState submitState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.submitCommandChoice()));
         currentStatePublisher.publish(submitState);
-        processCommand(controlCommand);
-        return new CommandResponse.Completed(controlCommand.runId());
+        return processSubmitCommand(controlCommand);
+        //return new CommandResponse.Completed(controlCommand.runId());
     }
 
     @Override
@@ -83,42 +80,47 @@ public class JSampleComponentHandlers extends JComponentHandlers {
         // Adding item from CommandMessage paramset to ensure things are working
         CurrentState onewayState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.oneWayCommandChoice()));
         currentStatePublisher.publish(onewayState);
-        processCommand(controlCommand);
     }
 
     @Override
     public CommandResponse.ValidationResponse validateCommand(ControlCommand controlCommand) {
         CurrentState submitState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.commandValidationChoice()));
         currentStatePublisher.publish(submitState);
-// TODO -- need to fix this by moving some to process command with submit
-        /*
-        if (controlCommand.commandName().equals(immediateCmd())) {
-            return new Completed(controlCommand.runId());
-        } else if (controlCommand.commandName().equals(immediateResCmd())) {
-            Parameter<Integer> param = JKeyTypes.IntKey().make("encoder").set(22);
-            Result result = new Result(controlCommand.source().prefix()).add(param);
-            return new CompletedWithResult(controlCommand.runId(), result);
-        } else if (controlCommand.commandName().equals(failureAfterValidationCmd())) {
-            ValidationResponse.Accepted accepted = new ValidationResponse.Accepted(controlCommand.runId());
-            commandResponseManager.addOrUpdateCommand(controlCommand.runId(), accepted);
-            return accepted;
 
-        } else */ if (controlCommand.commandName().name().contains("failure")) {
+        if (controlCommand.commandName().equals(immediateCmd())) {
+            return new CommandResponse.Accepted(controlCommand.runId());
+        } else if (controlCommand.commandName().equals(immediateResCmd())) {
+            return new CommandResponse.Accepted(controlCommand.runId());
+        } else if (controlCommand.commandName().equals(failureAfterValidationCmd())) {
+            return new CommandResponse.Accepted(controlCommand.runId());
+        } else if (controlCommand.commandName().name().contains("failure")) {
             return new CommandResponse.Invalid(controlCommand.runId(), new CommandIssue.OtherIssue("Testing: Received failure, will return Invalid."));
         } else {
+            System.out.println("Accepted Command");
             return new CommandResponse.Accepted(controlCommand.runId());
         }
     }
 
-    private void processCommand(ControlCommand controlCommand) {
+    private CommandResponse.SubmitResponse processSubmitCommand(ControlCommand controlCommand) {
         publishCurrentState(controlCommand);
-        if (controlCommand.commandName().equals(ComponentStateForCommand.matcherCmd()))
+        if (controlCommand.commandName().equals(immediateCmd())) {
+            return new CommandResponse.Completed(controlCommand.runId());
+        } else if (controlCommand.commandName().equals(immediateResCmd())) {
+            Parameter<Integer> param = JKeyType.IntKey().make("encoder").set(22);
+            Result result = new Result(controlCommand.source().prefix()).add(param);
+            return new CommandResponse.CompletedWithResult(controlCommand.runId(), result);
+        } else if (controlCommand.commandName().equals(ComponentStateForCommand.matcherCmd())) {
             processCommandWithMatcher(controlCommand);
-        else if (controlCommand.commandName().equals(ComponentStateForCommand.withoutMatcherCmd()))
+            return new CommandResponse.Started(controlCommand.runId());
+        } else if (controlCommand.commandName().equals(failureAfterValidationCmd())) {
+            System.out.println("Failure After Validation commmand");
             processCommandWithoutMatcher(controlCommand);
-        else processCommandWithoutMatcher(controlCommand);
-
+        } else if (controlCommand.commandName().equals(ComponentStateForCommand.withoutMatcherCmd())) {
+            processCommandWithoutMatcher(controlCommand);
+        } else processCommandWithoutMatcher(controlCommand);
+        return new CommandResponse.Started(controlCommand.runId());
     }
+
 
     private void processCommandWithMatcher(ControlCommand controlCommand) {
         Source.range(1, 10)
@@ -133,11 +135,13 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     private void processCommandWithoutMatcher(ControlCommand controlCommand) {
 
         if (controlCommand.commandName().equals(failureAfterValidationCmd())) {
+            System.out.println("Failure After Validation commmand");
             // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
             CompletableFuture<CommandResponse.QueryResponse> status = commandResponseManager.jQuery(controlCommand.runId(), Timeout.apply(100, TimeUnit.MILLISECONDS));
             status.thenAccept(response -> {
-                if(response instanceof CommandResponse.Invalid)
+                if(response instanceof CommandResponse.Started) {
                     commandResponseManager.addOrUpdateCommand(controlCommand.runId(), new CommandResponse.Error(controlCommand.runId(), "Unknown Error occurred"));
+                } else System.out.println("Output is: " + response);
             });
         } else {
              commandResponseManager.addOrUpdateCommand(controlCommand.runId(), new CommandResponse.Completed(controlCommand.runId()));

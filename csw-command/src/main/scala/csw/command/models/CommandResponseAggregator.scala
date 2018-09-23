@@ -3,7 +3,7 @@ package csw.command.models
 import akka.NotUsed
 import akka.stream.Materializer
 import akka.stream.scaladsl.Source
-import csw.params.commands.{CommandResponse, CommandResultType}
+import csw.params.commands.CommandResponse
 import csw.params.core.models.Id
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -18,6 +18,7 @@ object CommandResponseAggregator {
    * @param commandResponses a stream of CommandResponses
    * @return a future of aggregated response
    */
+  /*
   def aggregateResponse(
       commandResponses: Source[CommandResponse, NotUsed]
   )(implicit ec: ExecutionContext, mat: Materializer): Future[CommandResponse] = {
@@ -31,4 +32,5 @@ object CommandResponseAggregator {
         case Failure(ex) ⇒ Success(CommandResponse.Error(Id(), s"${ex.getMessage}"))
       }
   }
+  */
 }

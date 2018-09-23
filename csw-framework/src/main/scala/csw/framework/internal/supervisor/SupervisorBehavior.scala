@@ -6,12 +6,9 @@ import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors, MutableBehavior, TimerScheduler}
 import akka.actor.typed.{ActorRef, Behavior, PostStop, Signal, SupervisorStrategy, Terminated}
+import csw.command.messages.CommandMessage.{Oneway, Submit}
 import csw.command.messages.CommandResponseManagerMessage.{Query, Subscribe, Unsubscribe}
-import csw.command.messages.ComponentCommonMessage.{
-  ComponentStateSubscription,
-  GetSupervisorLifecycleState,
-  LifecycleStateSubscription
-}
+import csw.command.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
 import csw.command.messages.FromComponentLifecycleMessage.Running
 import csw.command.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.command.messages.RunningMessage.Lifecycle
@@ -36,6 +33,7 @@ import csw.location.api.models.{AkkaRegistration, ComponentId}
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.scaladsl.RegistrationFactory
 import csw.logging.scaladsl.Logger
+import csw.params.commands.CommandResponse.Locked
 
 import scala.concurrent.Future
 import scala.concurrent.duration.{Duration, FiniteDuration}

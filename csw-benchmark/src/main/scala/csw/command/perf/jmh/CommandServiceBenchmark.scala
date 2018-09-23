@@ -6,18 +6,12 @@ import akka.actor.{ActorSystem, Scheduler}
 import akka.util
 import com.typesafe.config.ConfigFactory
 import csw.params.commands
-import csw.params.commands.{CommandName, CommandResponse}
+import csw.params.commands.CommandName
 import csw.params.core.models.Prefix
 import csw.command.perf.BenchmarkHelpers.spawnStandaloneComponent
 import csw.command.scaladsl.CommandService
 import csw.location.commons.ClusterAwareSettings
-import csw.messages.commands
-import csw.messages.commands.CommandResponse.SubmitResponse
-import csw.messages.commands.CommandName
-import csw.messages.params.models.Prefix
-import csw.services.command.perf.BenchmarkHelpers.spawnStandaloneComponent
-import csw.services.command.scaladsl.CommandService
-import csw.services.location.commons.ClusterAwareSettings
+import csw.params.commands.CommandResponse.SubmitResponse
 import org.openjdk.jmh.annotations._
 
 import scala.concurrent.Await

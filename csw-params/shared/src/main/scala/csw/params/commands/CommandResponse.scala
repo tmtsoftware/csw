@@ -1,13 +1,8 @@
 package csw.params.commands
 
-import akka.NotUsed
-import akka.stream.Materializer
-import akka.stream.scaladsl.Source
-import csw.messages.TMTSerializable
-import csw.messages.params.models.Id
-import enumeratum._
+import csw.params.TMTSerializable
+import csw.params.core.models.Id
 
-import scala.collection.immutable
 
 /**
  * The nature of CommandResponse as an intermediate response of command execution or a final response which could be
@@ -31,16 +26,17 @@ object CommandResponse {
 
   sealed trait OnewayResponse extends Response
 
+  /**
+    * SubmitResponse can be Invalid, Started, Completed, CompletedWithResult, Error, Cancelled, Locked
+    * @param runId
+    */
   sealed trait SubmitResponse extends QueryResponse
 
   sealed trait MatchingResponse extends Response
 
   case class Accepted(runId: Id) extends ValidationResponse with OnewayResponse
 
-  /**
-   * SubmiResponse can be Invalid, Started, Completed, CompletedWithResult, Error, Cancelled, Locked
-   * @param runId
-   */
+
   case class Started(runId: Id) extends SubmitResponse
 
   case class CompletedWithResult(runId: Id, result: Result) extends SubmitResponse
@@ -102,6 +98,7 @@ object CommandResponse {
    * @param commandResponses a stream of CommandResponses
    * @return a future of aggregated response
    */
+  /*
   def aggregateResponse(commandResponses: Source[SubmitResponse, NotUsed])(implicit ec: ExecutionContext,
                                                                            mat: Materializer): Future[SubmitResponse] = {
     commandResponses
@@ -114,5 +111,5 @@ object CommandResponse {
         case Failure(ex) ⇒ Success(Error(Id(), s"${ex.getMessage}"))
       }
   }
-
+*/
 }

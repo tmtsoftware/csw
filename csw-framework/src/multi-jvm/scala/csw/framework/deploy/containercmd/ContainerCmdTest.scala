@@ -10,30 +10,6 @@ import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.common.FrameworkAssertions._
-import csw.messages.commands.{CommandName, Setup}
-import csw.messages.framework.PubSub.Subscribe
-import csw.messages.framework.ToComponentLifecycleMessages.GoOffline
-import csw.messages.framework.{Components, ContainerLifecycleState, SupervisorLifecycleState}
-import csw.messages.location.Connection.AkkaConnection
-import csw.messages.location.{ComponentId, ComponentType}
-import csw.messages.params.generics.{KeyType, Parameter}
-import csw.messages.params.models.{ObsId, Prefix}
-import csw.messages.params.models.Subsystem.Container
-import csw.messages.params.states.{CurrentState, StateName}
-import csw.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState}
-import csw.messages.ComponentMessage
-import csw.messages.ContainerCommonMessage.GetComponents
-import csw.messages.RunningMessage.Lifecycle
-import csw.messages.SupervisorContainerCommonMessages.Shutdown
-import csw.messages.ContainerMessage
-import csw.messages.commands.CommandResponse.Invalid
-import csw.services.command.scaladsl.CommandService
-import csw.services.config.api.models.ConfigData
-import csw.services.config.client.scaladsl.ConfigClientFactory
-import csw.services.config.server.commons.TestFileUtils
-import csw.services.config.server.{ServerWiring, Settings}
-import csw.services.location.commons.ClusterAwareSettings
-import csw.services.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.params.commands.CommandResponse.Invalid
 import csw.params.commands.{CommandName, Setup}
 import csw.command.models.framework.PubSub.Subscribe
@@ -46,7 +22,7 @@ import csw.params.core.models.{ObsId, Prefix}
 import csw.params.core.models.Subsystem.Container
 import csw.params.core.states.{CurrentState, StateName}
 import csw.command.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState}
-import csw.command.messages.{ComponentMessage, ContainerMessage}
+import csw.command.messages.ComponentMessage
 import csw.command.messages.ContainerCommonMessage.GetComponents
 import csw.command.messages.RunningMessage.Lifecycle
 import csw.command.messages.SupervisorContainerCommonMessages.Shutdown

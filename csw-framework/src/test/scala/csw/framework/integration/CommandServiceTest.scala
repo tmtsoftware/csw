@@ -1,27 +1,16 @@
 package csw.framework.integration
 
-import akka.actor.{typed, ActorSystem}
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.actor.testkit.typed.TestKitSettings
 import akka.stream.scaladsl.{Keep, Sink, Source}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import akka.util.Timeout
-import com.typesafe.config.ConfigFactory
+import csw.command.scaladsl.CommandService
 import csw.framework.FrameworkTestWiring
-import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
-import csw.messages.commands.CommandResponse.{Completed, SubmitResponse}
-import csw.messages.commands.{CommandName, CommandResponse, ControlCommand, Setup}
-import csw.messages.location.ComponentId
-import csw.messages.location.ComponentType.HCD
-import csw.messages.location.Connection.AkkaConnection
-import csw.messages.params.models.{Id, ObsId, Prefix}
-import csw.services.command.scaladsl.CommandService
-import io.lettuce.core.RedisClient
+import csw.params.commands.CommandResponse.{Completed, SubmitResponse}
+import csw.params.commands.{CommandName, CommandResponse, ControlCommand, Setup}
+import csw.params.core.models.{Id, ObsId, Prefix}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import org.scalatest.mockito.MockitoSugar
-import org.mockito.ArgumentMatchers.eq
-import org.mockito.Mockito.{when, _}
 
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationLong
