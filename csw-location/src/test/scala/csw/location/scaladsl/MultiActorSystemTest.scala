@@ -1,6 +1,7 @@
 package csw.location.scaladsl
 
 import akka.actor.CoordinatedShutdown.UnknownReason
+import csw.location.api.commons.ClusterSettings
 import csw.location.api.models.Connection.TcpConnection
 import csw.location.api.models.TcpRegistration
 import csw.location.api.models.{ComponentId, ComponentType}
@@ -20,8 +21,7 @@ class MultiActorSystemTest extends FunSuite with Matchers with BeforeAndAfterAll
   private val locationService  = LocationServiceFactory.withCluster(CswCluster.withSystem(system1))
   private val locationService2 = LocationServiceFactory.withCluster(CswCluster.withSystem(system2))
 
-  val RegistrationFactory              = new TestRegistrationFactory()(system1)
-  val tcpRegistration: TcpRegistration = RegistrationFactory.tcp(connection, 1234)
+  val tcpRegistration: TcpRegistration = TcpRegistration(connection, 1234)
 
   override protected def afterAll(): Unit =
     locationService2.shutdown(UnknownReason).await

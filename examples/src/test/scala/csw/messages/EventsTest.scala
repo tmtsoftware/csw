@@ -8,7 +8,7 @@ import csw.params.core.generics.KeyType.{DoubleMatrixKey, RaDecKey}
 import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.Units.arcmin
 import csw.params.core.models._
-import csw.params.core.pb.PbConverter
+import csw.event.client.pb.PbConverter
 import csw_protobuf.events.PbEvent
 import org.scalatest.{FunSpec, Matchers}
 

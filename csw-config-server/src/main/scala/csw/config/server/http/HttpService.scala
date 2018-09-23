@@ -8,11 +8,9 @@ import akka.http.scaladsl.Http.ServerBinding
 import csw.config.server.commons.CoordinatedShutdownReasons.FailureReason
 import csw.config.server.commons.{ConfigServerLogger, ConfigServiceConnection}
 import csw.config.server.{ActorRuntime, Settings}
-import csw.location.api.models.HttpRegistration
+import csw.location.api.models.{HttpRegistration, RegistrationResult}
 import csw.location.api.scaladsl.LocationService
-import csw.location.commons.ClusterAwareSettings
-import csw.location.models._
-import csw.logging.commons.LogAdminActorFactory
+import csw.location.api.commons.ClusterAwareSettings
 import csw.logging.scaladsl.Logger
 
 import scala.async.Async._
@@ -72,8 +70,7 @@ class HttpService(
     val registration = HttpRegistration(
       connection = ConfigServiceConnection.value,
       port = binding.localAddress.getPort,
-      path = "",
-      LogAdminActorFactory.make(actorSystem)
+      path = ""
     )
     log.info(
       s"Registering Config Service HTTP Server with Location Service using registration: [${registration.toString}]"

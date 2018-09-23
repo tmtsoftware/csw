@@ -6,18 +6,17 @@ import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
 import csw.clusterseed.client.HTTPLocationService
 import csw.commons.redis.EmbeddedRedis
-import csw.params.events._
-import csw.params.core.formats.JsonSupport
-import csw.location.api.scaladsl.LocationService
 import csw.event.api.scaladsl.EventPublisher
 import csw.event.cli.args.ArgsParser
 import csw.event.cli.wiring.Wiring
-import csw.event.helpers.TestFutureExt.RichFuture
-import csw.event.internal.commons.EventServiceConnection
-import csw.location.commons.ActorSystemFactory
+import csw.event.client.helpers.TestFutureExt.RichFuture
+import csw.event.client.internal.commons.EventServiceConnection
 import csw.location.api.models.TcpRegistration
-import csw.location.scaladsl.LocationServiceFactory
-import csw.logging.commons.LogAdminActorFactory
+import csw.location.api.scaladsl.LocationService
+import csw.location.client.ActorSystemFactory
+import csw.location.client.scaladsl.HttpLocationServiceFactory
+import csw.params.core.formats.JsonSupport
+import csw.params.events._
 import org.scalatest.{BeforeAndAfterEach, Matchers}
 import play.api.libs.json.Json
 import redis.embedded.{RedisSentinel, RedisServer}
@@ -35,9 +34,9 @@ trait SeedData extends HTTPLocationService with Matchers with BeforeAndAfterEach
 
   val (localHttpClient: LocationService, redisSentinel: RedisSentinel, redisServer: RedisServer) =
     withSentinel(masterId = ConfigFactory.load().getString("csw-event.redis.masterId")) { (sentinelPort, _) ⇒
-      val localHttpClient: LocationService = LocationServiceFactory.makeLocalHttpClient
+      val localHttpClient: LocationService = HttpLocationServiceFactory.makeLocalClient
       localHttpClient
-        .register(TcpRegistration(EventServiceConnection.value, sentinelPort, LogAdminActorFactory.make(system)))
+        .register(TcpRegistration(EventServiceConnection.value, sentinelPort))
         .await
       localHttpClient
     }

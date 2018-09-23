@@ -10,7 +10,7 @@ import com.typesafe.config.ConfigFactory
 import csw.config.server.commons.TestFutureExtension.RichFuture
 import csw.config.server.commons.{ConfigServiceConnection, TestFileUtils}
 import csw.location.api.scaladsl.LocationService
-import csw.location.commons.ClusterSettings
+import csw.location.api.commons.ClusterSettings
 import csw.location.scaladsl.LocationServiceFactory
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 import org.tmatesoft.svn.core.SVNException

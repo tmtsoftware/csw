@@ -1,13 +1,10 @@
 package csw.alarm.client.internal.services
 
-import java.net.InetAddress
 import java.time.Instant
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import com.persist.JsonOps.{Json, JsonObject}
 import com.typesafe.config.ConfigFactory
-import csw.params.core.models.Subsystem.{BAD, LGSF, NFIRAOS, TCS}
 import csw.alarm.api.exceptions.{InactiveAlarmException, InvalidSeverityException, KeyNotFoundException}
 import csw.alarm.api.models.AcknowledgementStatus.{Acknowledged, Unacknowledged}
 import csw.alarm.api.models.AlarmSeverity._
@@ -17,11 +14,9 @@ import csw.alarm.api.models.ShelveStatus._
 import csw.alarm.api.models._
 import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
 import csw.alarm.client.internal.helpers.{AlarmServiceTestSetup, TestDataFeeder}
-import csw.alarm.client.internal.services.SeverityTestScenarios.{AckStatusTestCases, SeverityTestCases}
-import csw.logging.internal.{LoggingLevels, LoggingSystem}
-import csw.logging.utils.TestAppender
+import csw.alarm.client.internal.services.SeverityTestScenarios._
+import csw.params.core.models.Subsystem.{BAD, LGSF, NFIRAOS, TCS}
 
-import scala.collection.mutable
 import scala.concurrent.duration.DurationInt
 
 class SeverityServiceModuleTest
@@ -34,28 +29,6 @@ class SeverityServiceModuleTest
   override protected def beforeEach(): Unit = {
     val validAlarmsConfig = ConfigFactory.parseResources("test-alarms/more-alarms.conf")
     initAlarms(validAlarmsConfig, reset = true).await
-  }
-
-  // DEOPSCSW-461: Log entry for severity update by component
-  test("setCurrentSeverity should log a message") {
-    val logBuffer    = mutable.Buffer.empty[JsonObject]
-    val testAppender = new TestAppender(x ⇒ logBuffer += Json(x.toString).asInstanceOf[JsonObject])
-    val hostName     = InetAddress.getLocalHost.getHostName
-
-    val expectedMessage1 =
-      "Setting severity [critical] for alarm [nfiraos-trombone-tromboneaxislowlimitalarm] with expire timeout [1] seconds"
-    val expectedMessage2 = "Updating current severity [critical] in alarm store"
-
-    val loggingSystem = new LoggingSystem("logging", "version", hostName, actorSystem)
-    loggingSystem.setAppenders(List(testAppender))
-    loggingSystem.setDefaultLogLevel(LoggingLevels.DEBUG)
-    setCurrentSeverity(tromboneAxisLowLimitAlarmKey, AlarmSeverity.Critical).await
-    Thread.sleep(100)
-    val messages = logBuffer.map(log => log("message"))
-    messages.contains(expectedMessage1) shouldBe true
-    messages.contains(expectedMessage2) shouldBe true
-
-    loggingSystem.stop
   }
 
   // DEOPSCSW-444: Set severity api for component
@@ -293,7 +266,11 @@ class SeverityServiceModuleTest
     testProbe.expectMessage(2.seconds, Disconnected) // severity expires after 1 second in test
 
     setSeverity(tromboneAxisHighLimitAlarmKey, Major).await
-    testProbe.expectNoMessage(200.millis) // Major is lower than Disconnected, hence aggregated severity does not change
+    testProbe.expectNoMessage(200.millis) // Setting severity in another key doesn't affect this
+
+    setSeverity(tromboneAxisLowLimitAlarmKey, Major).await
+    getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldBe Major
+    testProbe.expectMessage(Major)
 
     alarmSubscription.unsubscribe().await
   }
@@ -394,6 +371,7 @@ class SeverityServiceModuleTest
   // DEOPSCSW-448: Set Activation status for an alarm entity
   // DEOPSCSW-467: Monitor alarm severities in the alarm store for a single alarm, component, subsystem, or all
   test("subscribeAggregatedSeverityCallback should throw InactiveAlarmException when all resolved keys are inactive") {
+    enclosureTempLowAlarm.isActive shouldBe false
     a[InactiveAlarmException] shouldBe thrownBy(
       subscribeAggregatedSeverityCallback(enclosureTempLowAlarmKey, println).ready().await
     )
@@ -493,7 +471,7 @@ class SeverityServiceModuleTest
   // DEOPSCSW-496 : Set Ack status on setSeverity
   // DEOPSCSW-494: Incorporate changes in set severity, reset, acknowledgement and latch status
   AckStatusTestCases.foreach { testCase ⇒
-    test(testCase.name) {
+    test(testCase.name()) {
       feedTestData(testCase)
       import testCase._
 
@@ -501,6 +479,28 @@ class SeverityServiceModuleTest
 
       //set severity to new Severity
       val status = setSeverityAndGetStatus(alarmKey, newSeverity)
+
+      //get severity and assert
+      status.acknowledgementStatus shouldEqual newAckStatus
+    }
+  }
+
+  // DEOPSCSW-496 : Set Ack status on setSeverity
+  AckStatusTestCasesForDisconnected.foreach { testCase ⇒
+    test(testCase.name(Disconnected)) {
+      feedTestData(testCase)
+      import testCase._
+
+      setCurrentSeverity(alarmKey, oldSeverity.asInstanceOf[AlarmSeverity])
+
+      getStatus(alarmKey).await.acknowledgementStatus shouldBe oldAckStatus
+
+      // severity expires after 1 second in test
+      Thread.sleep(1000)
+
+      getCurrentSeverity(alarmKey).await shouldBe Disconnected
+
+      val status = getStatus(alarmKey).await
 
       //get severity and assert
       status.acknowledgementStatus shouldEqual newAckStatus

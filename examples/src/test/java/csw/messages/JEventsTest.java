@@ -12,7 +12,7 @@ import csw.params.core.generics.Parameter;
 import csw.params.core.models.MatrixData;
 import csw.params.core.models.Prefix;
 import csw.params.core.models.RaDec;
-import csw.params.core.pb.PbConverter;
+import csw.event.client.pb.PbConverter;
 import csw_protobuf.events.PbEvent;
 import org.junit.Assert;
 import org.junit.Test;

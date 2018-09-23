@@ -3,10 +3,8 @@ package csw.location
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.stream.scaladsl.{Keep, Sink}
 import csw.location.api.models.Connection.{HttpConnection, TcpConnection}
-import csw.location.api.models._
+import csw.location.api.models.{HttpRegistration, TcpRegistration, _}
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
-import csw.location.api.models.{HttpRegistration, TcpRegistration}
-import csw.logging.commons.LogAdminActorFactory
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -22,7 +20,8 @@ class DetectComponentCrashTest(ignore: Int, mode: String) extends LSNodeSpec(con
   import config._
   import cswCluster.mat
 
-  test("A component running on one node should detect if a http/tcp component running on another node crashes") {
+  //FixMe: Delete this test as HTTP and TCP location's deathwatch is no longer supported.
+  ignore("A component running on one node should detect if a http/tcp component running on another node crashes") {
 
     val httpConnection = HttpConnection(ComponentId("Assembly1", ComponentType.Assembly))
     val tcpConnection1 = TcpConnection(ComponentId("Assembly2", ComponentType.Assembly))
@@ -71,7 +70,7 @@ class DetectComponentCrashTest(ignore: Int, mode: String) extends LSNodeSpec(con
       val prefix = "/trombone/hcd"
 
       val httpRegistration =
-        HttpRegistration(httpConnection, port, prefix, LogAdminActorFactory.make(system))
+        HttpRegistration(httpConnection, port, prefix)
 
       locationService.register(httpRegistration).await
       enterBarrier("Registration")
@@ -81,8 +80,8 @@ class DetectComponentCrashTest(ignore: Int, mode: String) extends LSNodeSpec(con
 
     runOn(member2) {
       val port             = 9595
-      val tcpRegistration1 = TcpRegistration(tcpConnection1, port, LogAdminActorFactory.make(system))
-      val tcpRegistration2 = TcpRegistration(tcpConnection2, port, LogAdminActorFactory.make(system))
+      val tcpRegistration1 = TcpRegistration(tcpConnection1, port)
+      val tcpRegistration2 = TcpRegistration(tcpConnection2, port)
 
       locationService.register(tcpRegistration1).await
       locationService.register(tcpRegistration2).await

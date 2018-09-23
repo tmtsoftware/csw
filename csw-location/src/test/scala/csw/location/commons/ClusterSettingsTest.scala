@@ -1,8 +1,8 @@
 package csw.location.commons
 
 import com.typesafe.config.ConfigException
-import csw.location.api.commons.Constants
-import csw.location.internal.Networks
+import csw.location.api.commons.{ClusterSettings, Constants}
+import csw.location.api.internal.Networks
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 

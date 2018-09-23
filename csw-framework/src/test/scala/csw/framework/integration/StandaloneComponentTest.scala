@@ -22,7 +22,7 @@ import csw.location.api.models.{ComponentId, LocationRemoved, LocationUpdated, T
 import csw.params.core.states.{CurrentState, StateName}
 import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.scaladsl.CommandService
-import csw.event.helpers.TestFutureExt.RichFuture
+import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.logging.internal.LoggingLevels.INFO
 import csw.logging.internal.LoggingSystem
 import io.lettuce.core.RedisClient

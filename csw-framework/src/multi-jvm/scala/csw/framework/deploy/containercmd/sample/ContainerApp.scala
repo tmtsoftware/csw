@@ -12,7 +12,7 @@ import csw.command.messages.ContainerMessage
 import csw.command.models.framework.ContainerLifecycleState
 import csw.command.messages.ContainerCommonMessage.GetContainerLifecycleState
 import csw.command.messages.SupervisorContainerCommonMessages.Restart
-import csw.location.commons.ClusterSettings
+import csw.location.api.commons.ClusterSettings
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong

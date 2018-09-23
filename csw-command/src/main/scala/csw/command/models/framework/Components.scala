@@ -1,7 +1,7 @@
 package csw.command.models.framework
 
 import acyclic.skipped
-import csw.params.TMTSerializable
+import csw.serializable.TMTSerializable
 
 /**
  * Represents a collection of components created in a single container

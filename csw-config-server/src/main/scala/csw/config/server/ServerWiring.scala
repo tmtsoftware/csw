@@ -7,7 +7,7 @@ import csw.config.api.scaladsl.ConfigService
 import csw.config.server.files._
 import csw.config.server.http.{ConfigHandlers, ConfigServiceRoute, HttpService}
 import csw.config.server.svn.{SvnConfigService, SvnRepo}
-import csw.location.commons.ClusterSettings
+import csw.location.api.commons.ClusterSettings
 import csw.location.scaladsl.LocationServiceFactory
 
 /**

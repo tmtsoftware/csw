@@ -8,7 +8,6 @@ object Dependencies {
       Enumeratum.`enumeratum-play-json`.value,
       Libs.`play-json`.value,
       Libs.`play-json-derived-codecs`.value,
-      Chill.`chill-akka`,
       Libs.`scalatest`.value % Test
     )
   )
@@ -21,29 +20,16 @@ object Dependencies {
     )
   )
 
-  val Logging = Def.setting(
+  val LocationApi = Def.setting(
     Seq(
-      Libs.`logback-classic`,
-      Libs.`persist-json`,
-      Libs.`joda-time`,
-      Enumeratum.`enumeratum`.value,
-      Akka.`akka-actor`,
-      Akka.`akka-slf4j`,
-      Akka.`akka-remote`,
       Akka.`akka-actor-typed`,
+      Akka.`akka-stream`,
+      Libs.`play-json`.value,
+      Libs.`play-json-derived-codecs`.value,
+      Libs.`scala-java8-compat`,
+      Enumeratum.`enumeratum`.value,
       Libs.`scalatest`.value % Test,
-      Libs.`junit`           % Test,
-      Libs.`junit-interface` % Test,
-      Libs.`gson`            % Test
-    )
-  )
-
-  val Benchmark = Def.setting(
-    Seq(
-      Libs.`persist-json`,
-      Libs.`gson`,
-      Jackson.`jackson-core`,
-      Jackson.`jackson-databind`
+      Libs.`mockito-core`    % Test
     )
   )
 
@@ -52,7 +38,6 @@ object Dependencies {
       Akka.`akka-actor-typed`,
       Akka.`akka-actor-testkit-typed`,
       Akka.`akka-stream`,
-      Akka.`akka-stream-typed`,
       Akka.`akka-distributed-data`,
       Akka.`akka-remote`,
       Akka.`akka-cluster-tools`,
@@ -63,6 +48,7 @@ object Dependencies {
       Libs.`akka-management-cluster-http`,
       AkkaHttp.`akka-http`,
       Libs.`akka-http-play-json`,
+      Chill.`chill-akka`,
       Libs.`scalatest`.value         % Test,
       Libs.`junit`                   % Test,
       Libs.`junit-interface`         % Test,
@@ -72,12 +58,13 @@ object Dependencies {
     )
   )
 
-  val LocationApi = Def.setting(
+  val LocationClient = Def.setting(
     Seq(
-      Akka.`akka-actor-typed`,
-      Libs.`scala-java8-compat`,
-      Enumeratum.`enumeratum`.value,
-      Libs.`scalatest`.value % Test
+      AkkaHttp.`akka-http`,
+      Akka.`akka-remote`,
+      Libs.`scala-async`,
+      Libs.`play-json`.value,
+      Libs.`akka-http-play-json`
     )
   )
 
@@ -89,19 +76,22 @@ object Dependencies {
     )
   )
 
-  val ConfigClientCli = Def.setting(
+  val ClusterSeed = Def.setting(
     Seq(
-      Akka.`akka-actor`,
+      AkkaHttp.`akka-http`,
+      Libs.`play-json`.value,
+      Libs.`akka-http-play-json`,
       Libs.`scopt`,
-      Libs.`scalatest`.value         % Test,
-      Akka.`akka-multi-node-testkit` % Test
+      Libs.`scalatest`.value % Test
     )
   )
 
-  val Integration = Def.setting(
+  val Admin = Def.setting(
     Seq(
-      Libs.`scalatest`.value,
-      Akka.`akka-stream-testkit`
+      AkkaHttp.`akka-http`,
+      Libs.`akka-http-play-json`,
+      Libs.`scopt`,
+      Libs.`scalatest`.value % Test
     )
   )
 
@@ -115,6 +105,7 @@ object Dependencies {
       Akka.`akka-stream-testkit` % Test
     )
   )
+
   val ConfigServer = Def.setting(
     Seq(
       AkkaHttp.`akka-http`,
@@ -139,13 +130,28 @@ object Dependencies {
     )
   )
 
-  val ClusterSeed = Def.setting(
+  val ConfigCli = Def.setting(
     Seq(
-      AkkaHttp.`akka-http`,
-      Libs.`play-json`.value,
-      Libs.`akka-http-play-json`,
+      Akka.`akka-actor`,
       Libs.`scopt`,
-      Libs.`scalatest`.value % Test
+      Libs.`scalatest`.value         % Test,
+      Akka.`akka-multi-node-testkit` % Test
+    )
+  )
+
+  val Logging = Def.setting(
+    Seq(
+      Libs.`logback-classic`,
+      Libs.`persist-json`,
+      Libs.`joda-time`,
+      Enumeratum.`enumeratum`.value,
+      Akka.`akka-actor`,
+      Akka.`akka-slf4j`,
+      Akka.`akka-actor-typed`,
+      Libs.`scalatest`.value % Test,
+      Libs.`junit`           % Test,
+      Libs.`junit-interface` % Test,
+      Libs.`gson`            % Test
     )
   )
 
@@ -169,6 +175,7 @@ object Dependencies {
     Seq(
       Libs.`scala-async`,
       Akka.`akka-actor-typed`,
+      Chill.`chill-akka`,
       Akka.`akka-actor-testkit-typed` % Test,
       Akka.`akka-stream-testkit`      % Test,
       Libs.`scalatest`.value          % Test,
@@ -218,6 +225,7 @@ object Dependencies {
       Libs.`embedded-redis`  % Test
     )
   )
+
   val AlarmApi = Def.setting(
     Seq(
       Enumeratum.`enumeratum`.value,
@@ -286,6 +294,22 @@ object Dependencies {
       Libs.`scalatest`.value % Test,
       Libs.`junit`           % Test,
       Libs.`junit-interface` % Test
+    )
+  )
+
+  val Benchmark = Def.setting(
+    Seq(
+      Libs.`persist-json`,
+      Libs.`gson`,
+      Jackson.`jackson-core`,
+      Jackson.`jackson-databind`
+    )
+  )
+
+  val Integration = Def.setting(
+    Seq(
+      Libs.`scalatest`.value,
+      Akka.`akka-stream-testkit`
     )
   )
 

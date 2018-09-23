@@ -4,18 +4,17 @@ import akka.actor.ActorSystem
 import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
-import csw.clusterseed.client.HTTPLocationService
-import csw.commons.redis.EmbeddedRedis
-import csw.services.BuildInfo
 import csw.alarm.cli.args.ArgsParser
+import csw.alarm.cli.utils.TestFutureExt.RichFuture
 import csw.alarm.cli.wiring.Wiring
 import csw.alarm.client.internal.commons.AlarmServiceConnection
-import csw.event.helpers.TestFutureExt.RichFuture
+import csw.clusterseed.client.HTTPLocationService
+import csw.commons.redis.EmbeddedRedis
 import csw.location.api.models.TcpRegistration
 import csw.location.api.scaladsl.LocationService
-import csw.location.commons.ActorSystemFactory
-import csw.location.scaladsl.LocationServiceFactory
-import csw.logging.commons.LogAdminActorFactory
+import csw.location.client.ActorSystemFactory
+import csw.location.client.scaladsl.HttpLocationServiceFactory
+import csw.services.BuildInfo
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.time.SpanSugar.convertFloatToGrainOfTime
 import org.scalatest.{BeforeAndAfterEach, Matchers}
@@ -41,9 +40,9 @@ trait AlarmCliTestSetup
 
   val (localHttpClient: LocationService, redisSentinel: RedisSentinel, redisServer: RedisServer) =
     withSentinel(masterId = ConfigFactory.load().getString("csw-alarm.redis.masterId")) { (sentinelPort, _) ⇒
-      val localHttpClient: LocationService = LocationServiceFactory.makeLocalHttpClient
+      val localHttpClient: LocationService = HttpLocationServiceFactory.makeLocalClient
       localHttpClient
-        .register(TcpRegistration(AlarmServiceConnection.value, sentinelPort, LogAdminActorFactory.make(system)))
+        .register(TcpRegistration(AlarmServiceConnection.value, sentinelPort))
         .await
       localHttpClient
     }

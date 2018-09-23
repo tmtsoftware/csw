@@ -19,10 +19,9 @@ import csw.location.api.models.Connection.AkkaConnection
 import csw.params.core.states.{CurrentState, StateName}
 import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.scaladsl.CommandService
-import csw.event.helpers.TestFutureExt.RichFuture
-import csw.location.commons.ClusterSettings
+import csw.event.client.helpers.TestFutureExt.RichFuture
+import csw.location.api.commons.ClusterSettings
 import csw.location.api.models.{HttpRegistration, TcpRegistration}
-import csw.logging.commons.LogAdminActorFactory
 import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers, OptionValues}
@@ -112,7 +111,7 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Option
 
     // register http connection
     seedLocationService
-      .register(HttpRegistration(httpConnection, 9090, "test/path", LogAdminActorFactory.make(actorSystem)))
+      .register(HttpRegistration(httpConnection, 9090, "test/path"))
       .await
 
     // assembly is tracking HttpConnection that we registered above, hence assemblyProbe will receive LocationUpdated event
@@ -123,7 +122,7 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Option
     assemblyProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(httpLocationRemovedChoice))))
 
     // register tcp connection
-    seedLocationService.register(TcpRegistration(tcpConnection, 9090, LogAdminActorFactory.make(actorSystem))).await
+    seedLocationService.register(TcpRegistration(tcpConnection, 9090)).await
 
     // assembly is tracking TcpConnection that we registered above, hence assemblyProbe will receive LocationUpdated event.
     assemblyProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(tcpLocationUpdatedChoice))))

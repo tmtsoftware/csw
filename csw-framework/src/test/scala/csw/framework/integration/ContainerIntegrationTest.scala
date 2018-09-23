@@ -22,7 +22,7 @@ import csw.location.api.models.{ComponentId, ComponentType, LocationRemoved, Tra
 import csw.params.core.states.{CurrentState, StateName}
 import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.scaladsl.CommandService
-import csw.event.helpers.TestFutureExt.RichFuture
+import csw.event.client.helpers.TestFutureExt.RichFuture
 import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}

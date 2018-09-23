@@ -8,7 +8,7 @@ import csw.framework.models.{CswContext, JCswContext}
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.alarm.client.internal.JAlarmServiceImpl
 import csw.config.client.javadsl.JConfigClientFactory
-import csw.event.internal.commons.EventServiceAdapter
+import csw.event.client.internal.commons.EventServiceAdapter
 
 /**
  * Base class for the factory for creating the behavior representing a component actor

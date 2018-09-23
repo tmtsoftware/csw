@@ -15,7 +15,7 @@ import csw.alarm.client.internal.commons.Settings
 import csw.alarm.client.internal.commons.serviceresolver.AlarmServiceHostPortResolver
 import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
 import csw.alarm.client.internal.redis.RedisConnectionsFactory
-import csw.location.commons.ActorSystemFactory
+import csw.location.client.ActorSystemFactory
 import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}

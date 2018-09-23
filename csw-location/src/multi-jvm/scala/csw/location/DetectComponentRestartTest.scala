@@ -7,6 +7,7 @@ import akka.testkit.TestProbe
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.AkkaRegistration
 import csw.location.api.models.{ComponentId, ComponentType, LocationRemoved, LocationUpdated}
+import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.params.core.models.Prefix
 import csw.location.commons.CswCluster
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
@@ -37,7 +38,6 @@ class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(c
           AkkaRegistration(
             akkaConnection,
             Prefix("nfiraos.ncc.trombone"),
-            system.spawnAnonymous(Behavior.empty),
             system.spawnAnonymous(Behavior.empty)
           )
         )
@@ -50,7 +50,7 @@ class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(c
       val newSystem = startNewSystem()
 
       val freshLocationService = mode match {
-        case "http"    => LocationServiceFactory.makeLocalHttpClient(newSystem, ActorMaterializer()(newSystem))
+        case "http"    => HttpLocationServiceFactory.makeLocalClient(newSystem, ActorMaterializer()(newSystem))
         case "cluster" => LocationServiceFactory.withCluster(CswCluster.withSystem(newSystem))
       }
 
@@ -61,7 +61,6 @@ class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(c
           AkkaRegistration(
             akkaConnection,
             Prefix("nfiraos.ncc.trombone"),
-            newSystem.spawnAnonymous(Behavior.empty),
             newSystem.spawnAnonymous(Behavior.empty)
           )
         )

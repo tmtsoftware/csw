@@ -1,10 +1,10 @@
 package csw.location.internal
 
-import akka.cluster.ddata.Replicator.{Changed, Subscribe}
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior, Terminated}
+import akka.cluster.ddata.Replicator.{Changed, Subscribe}
+import csw.location.api.models.{AkkaLocation, Location}
 import csw.location.api.scaladsl.LocationService
-import csw.location.api.models.{AkkaLocation, HttpLocation, Location, TcpLocation}
 import csw.location.commons.{CswCluster, LocationServiceLogger}
 import csw.location.internal.Registry.AllServices
 import csw.logging.scaladsl.Logger
@@ -32,16 +32,13 @@ private[location] class DeathwatchActor(locationService: LocationService) {
       // Find out the ones that are not being watched and watch them
       val unwatchedLocations = allLocations diff watchedLocations
 
-      // Multiple AkkaLocations can have same logAdminActorRef, hence watch supervisor actor instead of logAdminActorRef.
-      // In case of HttpLocation or TcpLocation always watch logAdminActorRef.
-      unwatchedLocations.foreach(loc ⇒ {
-        val actorRefToWatch = loc match {
-          case AkkaLocation(_, _, _, actorRef, _)       ⇒ actorRef
-          case loc @ (_: HttpLocation | _: TcpLocation) ⇒ loc.logAdminActorRef
-        }
-        log.debug(s"Started watching actor: ${actorRefToWatch.toString}")
-        context.watch(actorRefToWatch)
-      })
+      // Ignore HttpLocation or TcpLocation (Do not watch)
+      unwatchedLocations.foreach {
+        case AkkaLocation(_, _, _, actorRef) ⇒
+          log.debug(s"Started watching actor: ${actorRef.toString}")
+          context.watch(actorRef)
+        case _ ⇒ // ignore http and tcp location
+      }
       //all locations are now watched
       behavior(allLocations)
     } receiveSignal {
@@ -53,8 +50,8 @@ private[location] class DeathwatchActor(locationService: LocationService) {
         ctx.unwatch(deadActorRef)
         //Unregister the dead location and remove it from the list of watched locations
         val maybeLocation = watchedLocations.find {
-          case AkkaLocation(_, _, _, actorRef, _)       ⇒ deadActorRef == actorRef
-          case loc @ (_: HttpLocation | _: TcpLocation) ⇒ deadActorRef == loc.logAdminActorRef
+          case AkkaLocation(_, _, _, actorRef) ⇒ deadActorRef == actorRef
+          case _                               ⇒ false
         }
         maybeLocation match {
           case Some(location) =>

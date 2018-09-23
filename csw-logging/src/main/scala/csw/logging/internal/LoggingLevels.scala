@@ -1,6 +1,5 @@
 package csw.logging.internal
-
-import csw.params.TMTSerializable
+import csw.serializable.LoggingSerializable
 
 private[csw] object LoggingLevels {
 
@@ -34,7 +33,7 @@ private[csw] object LoggingLevels {
   /**
    * A logging level.
    */
-  sealed trait Level extends Ordered[Level] with TMTSerializable {
+  sealed trait Level extends Ordered[Level] with LoggingSerializable {
     private[logging] val pos: Int
 
     /**

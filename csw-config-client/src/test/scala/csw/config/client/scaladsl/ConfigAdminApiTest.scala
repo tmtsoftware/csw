@@ -11,7 +11,7 @@ import csw.config.client.internal.ActorRuntime
 import csw.config.server.commons.TestFutureExtension.RichFuture
 import csw.config.server.files.Sha1
 import csw.config.server.{ConfigServiceTest, ServerWiring}
-import csw.location.commons.ClusterAwareSettings
+import csw.location.api.commons.ClusterAwareSettings
 import csw.location.scaladsl.LocationServiceFactory
 
 // DEOPSCSW-138: Split Config API into Admin API and Client API

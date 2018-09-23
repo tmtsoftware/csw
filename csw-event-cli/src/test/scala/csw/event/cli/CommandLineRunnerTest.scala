@@ -8,7 +8,7 @@ import csw.params.core.generics.KeyType.{IntKey, StringKey}
 import csw.params.core.models.Id
 import csw.params.core.models.Units.meter
 import csw.event.cli.IterableExtensions.RichStringIterable
-import csw.event.helpers.TestFutureExt.RichFuture
+import csw.event.client.helpers.TestFutureExt.RichFuture
 import org.scalatest.concurrent.Eventually
 import org.scalatest.time.SpanSugar.convertDoubleToGrainOfTime
 import org.scalatest.{FunSuite, Matchers}

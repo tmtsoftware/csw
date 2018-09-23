@@ -28,12 +28,13 @@ import csw.framework.exceptions.{FailureRestart, InitializationFailed}
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentBehaviorFactory
-import csw.params.core.models.Prefix
-import csw.location.api.models.{AkkaRegistration, ComponentId}
 import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.{AkkaRegistration, ComponentId}
 import csw.location.scaladsl.RegistrationFactory
+import csw.logging.internal.LogAdminUtil
 import csw.logging.scaladsl.Logger
 import csw.params.commands.CommandResponse.Locked
+import csw.params.core.models.Prefix
 
 import scala.concurrent.Future
 import scala.concurrent.duration.{Duration, FiniteDuration}
@@ -57,8 +58,6 @@ private[framework] object SupervisorBehavior {
  * @param maybeContainerRef        the container ref of the container under which this supervisor is started if
  *                                 it's not running in standalone mode
  * @param componentBehaviorFactory the factory for creating the component supervised by this Supervisor
- * @param registrationFactory      the factory for creating a typed [[csw.location.api.models.AkkaRegistration]] from
- *                                 [[csw.location.api.models.Connection.AkkaConnection]]
  */
 private[framework] final class SupervisorBehavior(
     ctx: ActorContext[SupervisorMessage],
@@ -111,6 +110,8 @@ private[framework] final class SupervisorBehavior(
       case (SupervisorLifecycleState.Running, message: SupervisorInternalRunningMessage)       ⇒ onInternalRunning(message)
       case (SupervisorLifecycleState.Running, runningMessage: SupervisorRunningMessage)        ⇒ onRunning(runningMessage)
       case (SupervisorLifecycleState.RunningOffline, runningMessage: SupervisorRunningMessage) ⇒ onRunning(runningMessage)
+      case (_, GetComponentLogMetadata(compName, replyTo))                                     ⇒ replyTo ! LogAdminUtil.getLogMetadata(compName)
+      case (_, SetComponentLogLevel(compName, logLevel))                                       ⇒ LogAdminUtil.setComponentLogLevel(compName, logLevel)
       case (_, message)                                                                        ⇒ ignore(message)
     }
     this

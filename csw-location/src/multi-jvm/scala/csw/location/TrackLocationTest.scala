@@ -6,8 +6,8 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.scaladsl.{Keep, Sink}
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.location.api.models._
-import csw.location.commons.TestRegistrationFactory
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
+import csw.params.core.models.Prefix
 
 import scala.concurrent.duration.DurationInt
 
@@ -30,9 +30,11 @@ class TrackLocationTest(ignore: Int, mode: String) extends LSNodeSpec(config = n
     //create tcp connection
     val tcpConnection = TcpConnection(ComponentId("redis1", ComponentType.Service))
 
+    val prefix = Prefix("nfiraos.ncc.trombone")
+
     runOn(seed) {
       val actorRef = cswCluster.actorSystem.spawn(Behavior.empty, "trombone-hcd")
-      locationService.register(new TestRegistrationFactory().akka(akkaConnection, actorRef)).await
+      locationService.register(AkkaRegistration(akkaConnection, prefix, actorRef)).await
       enterBarrier("Registration")
 
       locationService.unregister(akkaConnection).await
@@ -45,7 +47,7 @@ class TrackLocationTest(ignore: Int, mode: String) extends LSNodeSpec(config = n
       val port   = 5656
       val prefix = "/trombone/hcd"
 
-      val httpRegistration       = new TestRegistrationFactory().http(httpConnection, port, prefix)
+      val httpRegistration       = HttpRegistration(httpConnection, port, prefix)
       val httpRegistrationResult = locationService.register(httpRegistration).await
       val akkaProbe              = TestProbe[TrackingEvent]("test-probe1")
       val tcpProbe               = TestProbe[TrackingEvent]("test-probe2")
@@ -78,7 +80,7 @@ class TrackLocationTest(ignore: Int, mode: String) extends LSNodeSpec(config = n
 
     runOn(member2) {
       val Port                  = 5657
-      val tcpRegistration       = new TestRegistrationFactory().tcp(tcpConnection, Port)
+      val tcpRegistration       = TcpRegistration(tcpConnection, Port)
       val tcpRegistrationResult = locationService.register(tcpRegistration).await
 
       val httpProbe = TestProbe[TrackingEvent]("test-probe")

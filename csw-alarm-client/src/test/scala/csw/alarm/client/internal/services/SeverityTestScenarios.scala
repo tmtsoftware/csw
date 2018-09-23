@@ -108,4 +108,22 @@ object SeverityTestScenarios {
     )
   )
 
+  val AckStatusTestCasesForDisconnected = List(
+    SetSeverityAckStatusTestCase(
+      alarmKey = AlarmKey(AOESW, "test", "alarm1"),
+      oldSeverity = Okay,
+      newSeverity = null, // this won't be used, new Severity will be Disconnected when old severity expires
+      isAutoAcknowledgeable = false, // this flag does not have any significance in this test
+      oldAckStatus = Acknowledged,
+      newAckStatus = Acknowledged
+    ),
+    SetSeverityAckStatusTestCase(
+      alarmKey = AlarmKey(AOESW, "test", "alarm2"),
+      oldSeverity = Warning,
+      newSeverity = null, // this won't be used, new Severity will be Disconnected when old severity expires
+      isAutoAcknowledgeable = false, // this flag does not have any significance in this test
+      oldAckStatus = Unacknowledged,
+      newAckStatus = Unacknowledged
+    )
+  )
 }

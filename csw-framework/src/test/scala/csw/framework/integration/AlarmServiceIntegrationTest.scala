@@ -17,12 +17,13 @@ import csw.location.api.models.Connection.AkkaConnection
 import csw.alarm.client.internal.commons.AlarmServiceConnection
 import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.scaladsl.CommandService
-import csw.event.helpers.TestFutureExt.RichFuture
+import csw.event.client.helpers.TestFutureExt.RichFuture
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.concurrent.duration.DurationLong
 
 //DEOPSCSW-490: Alarm service integration with framework
+//DEOPSCSW-481: Component Developer API available to all CSW components
 class AlarmServiceIntegrationTest extends FunSuite with EmbeddedRedis with Matchers with BeforeAndAfterAll {
   private val testWiring = new FrameworkTestWiring()
   import testWiring._

@@ -17,8 +17,8 @@ import csw.location.api.models.ComponentType.{Assembly, HCD}
 import csw.location.api.models.Connection.AkkaConnection
 import csw.params.core.states.{CurrentState, StateName}
 import csw.command.scaladsl.CommandService
-import csw.event.helpers.TestFutureExt.RichFuture
-import csw.event.internal.commons.EventServiceConnection
+import csw.event.client.helpers.TestFutureExt.RichFuture
+import csw.event.client.internal.commons.EventServiceConnection
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.concurrent.duration.DurationLong

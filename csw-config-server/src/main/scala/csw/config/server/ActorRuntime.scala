@@ -8,7 +8,7 @@ import akka.actor.{ActorSystem, CoordinatedShutdown}
 import akka.dispatch.MessageDispatcher
 import akka.stream.{ActorMaterializer, Materializer}
 import csw.services.BuildInfo
-import csw.location.commons.ClusterAwareSettings
+import csw.location.api.commons.ClusterAwareSettings
 import csw.logging.internal.LoggingSystem
 import csw.logging.scaladsl.LoggingSystemFactory
 

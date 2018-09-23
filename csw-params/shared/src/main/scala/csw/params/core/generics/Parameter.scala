@@ -3,9 +3,9 @@ package csw.params.core.generics
 import java.util
 import java.util.Optional
 
-import csw.params.TMTSerializable
 import csw.params.extensions.OptionConverters.RichOption
 import csw.params.core.models.Units
+import csw.serializable.TMTSerializable
 import play.api.libs.json._
 
 import scala.collection.JavaConverters.seqAsJavaListConverter
@@ -14,7 +14,7 @@ import scala.reflect.ClassTag
 
 object Parameter {
 
-  private[core] def apply[S: Format: ClassTag](
+  private[csw] def apply[S: Format: ClassTag](
       keyName: String,
       keyType: KeyType[S],
       items: mutable.WrappedArray[S],

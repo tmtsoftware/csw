@@ -30,7 +30,7 @@ import csw.params.core.states.StateName;
 import csw.command.extensions.AkkaLocationExt;
 import csw.command.javadsl.JCommandService;
 import csw.command.scaladsl.CurrentStateSubscription;
-import csw.location.commons.ClusterAwareSettings;
+import csw.location.api.commons.ClusterAwareSettings;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.javadsl.JLocationServiceFactory;
 import csw.logging.javadsl.JLoggingSystemFactory;

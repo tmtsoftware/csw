@@ -48,7 +48,7 @@ for its execution.
 To change the active configuration, an administrative tool with access to the full "admin API" must 
 be used. These tools would have the ability to create, delete, and update configurations, as well as retrieve past 
 configurations and their history. Any time a new configuration is to be used by a component, the user must use one of 
-these tools (via @ref:[CLI](../apps/cswconfigclientcli.md), perhaps) to set the active configuration for a component.  Since a history of active configurations 
+these tools (via @ref:[CLI](../apps/cswconfigcli.md), perhaps) to set the active configuration for a component.  Since a history of active configurations 
 is maintained by the service, the settings of each component each time it is run can be retrieved, and the system 
 configuration at any moment can be recreated.
 
@@ -66,7 +66,7 @@ ConfigClientFactory exposes functions to get clientAPI and adminAPI. Both the fu
 @@@ note
 
 Components should only use the client API.  The Admin API may be used from an engineering user interface.
-The @ref:[CSW Config Client CLI application](../apps/cswconfigclientcli.md) is provided with this functionality.
+The @ref:[CSW Config Client CLI application](../apps/cswconfigcli.md) is provided with this functionality.
 
 @@@
 

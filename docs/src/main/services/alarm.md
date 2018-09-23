@@ -57,7 +57,7 @@ severity and health of the alarm/component/subsystem/whole TMT System.
 ## Creating clientAPI and adminAPI
 
 If you are not using csw-framework, you can create @scaladoc[AlarmService](csw/alarm/api/scaladsl/AlarmService)
-using @scaladoc[AlarmServiceFactory](csw/alarm/AlarmServiceFactory).
+using @scaladoc[AlarmServiceFactory](csw/alarm/client/AlarmServiceFactory).
 
 @@@ note
 

@@ -2,15 +2,18 @@ package csw.command.messages
 
 import acyclic.skipped
 import akka.actor.typed.ActorRef
-import csw.command.models.{CommandCorrelation, CommandResponseManagerState}
 import csw.command.models.framework.PubSub.SubscriberMessage
 import csw.command.models.framework._
-import csw.params.TMTSerializable
+import csw.command.models.{CommandCorrelation, CommandResponseManagerState}
+import csw.location.api.models.TrackingEvent
+import csw.logging.internal.LoggingLevels.Level
+import csw.logging.models.LogMetadata
 import csw.params.commands.{CommandResponse, ControlCommand}
 import csw.params.core.models.{Id, Prefix}
 import csw.params.core.states.CurrentState
 import csw.location.api.models.TrackingEvent
 import csw.params.commands.CommandResponse.{OnewayResponse, QueryResponse, SubmitResponse}
+import csw.serializable.TMTSerializable
 
 import scala.concurrent.duration.FiniteDuration
 
@@ -288,3 +291,12 @@ object CommandResponseManagerMessage {
       extends CommandResponseManagerMessage
       with SupervisorLockMessage
 }
+
+// Parent trait for Messages which will be send to components for interacting with its logging system
+sealed trait LogControlMessages extends ComponentMessage with TMTSerializable
+
+// Message to get Logging configuration metadata of the receiver
+case class GetComponentLogMetadata(componentName: String, replyTo: ActorRef[LogMetadata]) extends LogControlMessages
+
+// Message to change the log level of any component
+case class SetComponentLogLevel(componentName: String, logLevel: Level) extends LogControlMessages

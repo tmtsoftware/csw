@@ -5,8 +5,7 @@ import akka.actor.CoordinatedShutdown
 import csw.clusterseed.internal.AdminWiring
 import csw.clusterseed.cli.{ArgsParser, Options}
 import csw.services.BuildInfo
-import csw.location.commons.ClusterAwareSettings
-
+import csw.location.api.commons.ClusterAwareSettings
 import scala.concurrent.duration.DurationDouble
 
 /**
@@ -20,19 +19,18 @@ object Main extends App {
   private val name = BuildInfo.name
 
   new ArgsParser(name).parse(args).foreach {
-    case Options(maybeClusterPort, maybeAdminPort, testMode) =>
+    case Options(maybeClusterPort, testMode) =>
       if (!testMode && ClusterAwareSettings.seedNodes.isEmpty) {
         println(
           "[ERROR] clusterSeeds setting is not specified either as env variable or system property. Please check online documentation for this set-up."
         )
       } else {
-        val wiring = AdminWiring.make(maybeClusterPort, maybeAdminPort)
+        val wiring = AdminWiring.make(maybeClusterPort)
         import wiring._
         import actorRuntime._
         startLogging(name)
 
         val locationBindingF = locationHttpService.start()
-        val logAdminBindingF = adminHttpService.registeredLazyBinding
 
         coordinatedShutdown.addTask(
           CoordinatedShutdown.PhaseServiceUnbind,
@@ -40,7 +38,6 @@ object Main extends App {
         ) { () ⇒
           val hardDeadline = 30.seconds
           locationBindingF.flatMap(_.terminate(hardDeadline)).map(_ ⇒ Done)
-          logAdminBindingF.flatMap(_.terminate(hardDeadline)).map(_ ⇒ Done)
         }
       }
   }

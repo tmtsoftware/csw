@@ -1,6 +1,6 @@
 package csw.logging.commons
 
-private[logging] object LoggingKeys {
+private[csw] object LoggingKeys {
 
   // Set in LogActor. Set to common unless alternative message type passed,
   // in which case the value is provided as part of message.

@@ -19,9 +19,9 @@ import csw.location.api.exceptions.{
 import csw.location.api.javadsl.ILocationService
 import csw.location.api.models.Registration
 import csw.location.api.scaladsl.LocationService
+import csw.location.client.internal.JLocationServiceImpl
 import csw.location.internal.Registry.AllServices
 import csw.location.internal.StreamExt.RichSource
-import csw.location.models._
 import csw.logging.scaladsl.Logger
 
 import scala.async.Async._
@@ -190,7 +190,7 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
 
   override def listByPrefix(_prefix: String): Future[List[AkkaLocation]] = async {
     await(list).collect {
-      case akkaLocation @ AkkaLocation(_, prefix, _, _, _) if prefix.prefix.startsWith(_prefix) ⇒ akkaLocation
+      case akkaLocation @ AkkaLocation(_, prefix, _, _) if prefix.prefix.startsWith(_prefix) ⇒ akkaLocation
     }
   }
 

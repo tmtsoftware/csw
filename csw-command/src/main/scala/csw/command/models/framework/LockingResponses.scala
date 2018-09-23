@@ -1,6 +1,5 @@
 package csw.command.models.framework
-
-import csw.params.TMTSerializable
+import csw.serializable.TMTSerializable
 
 /**
  * LockingResponse represents valid responses when a component requests to lock some component

@@ -10,9 +10,8 @@ import csw.logging.internal.LoggingState._
 import csw.logging.macros.{SourceFactory, SourceLocation}
 import csw.logging.models.ComponentLoggingState
 import csw.logging.scaladsl.{AnyId, Logger, RequestId}
-import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 
-private[logging] class LoggerImpl(maybeComponentName: Option[String], actorName: Option[String]) extends Logger {
+private[csw] class LoggerImpl(maybeComponentName: Option[String], actorName: Option[String]) extends Logger {
 
   // this is to apply default log level for non-component classes like some common file utility classes
   private[this] val componentName: String = maybeComponentName.getOrElse(Constants.DEFAULT_KEY)
@@ -20,9 +19,6 @@ private[logging] class LoggerImpl(maybeComponentName: Option[String], actorName:
   // default log level will be applied if component specific log level is not provided in logging configuration inside component-log-levels block
   private[this] def componentLoggingState: ComponentLoggingState =
     componentsLoggingState.getOrElse(componentName, componentsLoggingState(Constants.DEFAULT_KEY))
-
-  // fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
-  InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
 
   private def all(
       level: Level,
