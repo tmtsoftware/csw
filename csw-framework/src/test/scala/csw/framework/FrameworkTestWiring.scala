@@ -11,17 +11,19 @@ import csw.location.api.scaladsl.LocationService
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.location.api.commons.ClusterSettings
 import csw.location.api.models.{RegistrationResult, TcpRegistration}
+import csw.location.client.ActorSystemFactory
+import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.scaladsl.LocationServiceFactory
 import redis.embedded.{RedisSentinel, RedisServer}
 
 class FrameworkTestWiring(val seedPort: Int = SocketUtils.getFreePort) extends EmbeddedRedis {
 
-  implicit val seedActorSystem: actor.ActorSystem = ClusterSettings().onPort(seedPort).system
+  implicit val seedActorSystem: actor.ActorSystem = ActorSystemFactory.remote()
   implicit val typedSystem: ActorSystem[_]        = seedActorSystem.toTyped
   implicit val mat: Materializer                  = ActorMaterializer()
-  val seedLocationService: LocationService        = LocationServiceFactory.withSystem(seedActorSystem)
+  val seedLocationService: LocationService        = HttpLocationServiceFactory.makeLocalClient
 
-  val testActorSystem: actor.ActorSystem = ClusterSettings().joinLocal(seedPort).system
+  val testActorSystem: actor.ActorSystem = ActorSystemFactory.remote()
 
   def startSentinelAndRegisterService(
       connection: TcpConnection,

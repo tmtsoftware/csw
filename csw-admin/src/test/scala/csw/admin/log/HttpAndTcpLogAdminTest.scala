@@ -10,6 +10,7 @@ import akka.http.scaladsl.unmarshalling.Unmarshal
 import com.typesafe.config.ConfigFactory
 import csw.admin.internal.AdminWiring
 import csw.admin.log.http.HttpSupport
+import csw.clusterseed.client.HTTPLocationService
 import csw.commons.http.{ErrorMessage, ErrorResponse}
 import csw.config.server.commons.{ConfigServiceConnection, TestFileUtils}
 import csw.config.server.{ServerWiring, Settings}
@@ -18,14 +19,13 @@ import csw.location.api.models.Connection.TcpConnection
 import csw.location.api.models.{ComponentId, ComponentType}
 import csw.logging.internal._
 import csw.logging.scaladsl.LoggingSystemFactory
-import org.scalatest.concurrent.ScalaFutures
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
 
-class HttpAndTcpLogAdminTest extends AdminLogTestSuite with HttpSupport with ScalaFutures {
+class HttpAndTcpLogAdminTest extends AdminLogTestSuite with HttpSupport with HTTPLocationService {
 
-  private val adminWiring: AdminWiring = AdminWiring.make(ClusterAwareSettings.onPort(3653), Some(7888))
+  private val adminWiring: AdminWiring = AdminWiring.make(Some(7888))
   import adminWiring.actorRuntime._
 
   implicit val typedSystem: ActorSystem[Nothing] = actorSystem.toTyped
@@ -39,7 +39,7 @@ class HttpAndTcpLogAdminTest extends AdminLogTestSuite with HttpSupport with Sca
 
   private var loggingSystem: LoggingSystem = _
 
-  override protected def beforeAll(): Unit = {
+  override def beforeAll(): Unit = {
     loggingSystem = LoggingSystemFactory.start("logging", "version", hostName, adminWiring.actorSystem)
     loggingSystem.setAppenders(List(testAppender))
 
@@ -49,11 +49,12 @@ class HttpAndTcpLogAdminTest extends AdminLogTestSuite with HttpSupport with Sca
     adminWiring.locationService
   }
 
-  override protected def afterEach(): Unit = logBuffer.clear()
+  override def afterEach(): Unit = logBuffer.clear()
 
-  override protected def afterAll(): Unit = {
+  override def afterAll(): Unit = {
     testFileUtils.deleteServerFiles()
     Await.result(adminWiring.actorRuntime.shutdown(UnknownReason), 10.seconds)
+    super.afterAll()
   }
 
   // DEOPSCSW-127: Runtime update for logging characteristics

@@ -5,31 +5,30 @@ import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
+import csw.clusterseed.client.HTTPLocationService
+import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
+import csw.command.messages.SupervisorContainerCommonMessages.Shutdown
+import csw.command.models.framework.{ContainerLifecycleState, SupervisorLifecycleState}
+import csw.command.scaladsl.CommandService
 import csw.common.FrameworkAssertions._
 import csw.common.components.framework.SampleComponentState._
+import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.framework.FrameworkTestWiring
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
-import csw.command.messages.SupervisorContainerCommonMessages.Shutdown
-import csw.params.commands
-import csw.params.commands.CommandName
-import csw.command.models.framework.{ContainerLifecycleState, SupervisorLifecycleState}
-import csw.location.api.models.ComponentId
+import csw.location.api.commons.ClusterSettings
 import csw.location.api.models.ComponentType.{Assembly, HCD}
 import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.{ComponentId, HttpRegistration, TcpRegistration}
+import csw.params.commands
+import csw.params.commands.CommandName
 import csw.params.core.states.{CurrentState, StateName}
-import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
-import csw.command.scaladsl.CommandService
-import csw.event.client.helpers.TestFutureExt.RichFuture
-import csw.location.api.commons.ClusterSettings
-import csw.location.api.models.{HttpRegistration, TcpRegistration}
 import io.lettuce.core.RedisClient
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers, OptionValues}
+import org.scalatest.OptionValues
 
 import scala.concurrent.TimeoutException
 import scala.concurrent.duration.DurationLong
 
-class TrackConnectionsIntegrationTest extends FunSuite with Matchers with OptionValues with MockitoSugar with BeforeAndAfterAll {
+class TrackConnectionsIntegrationTest extends HTTPLocationService with OptionValues {
 
   private val testWiring = new FrameworkTestWiring()
   import testWiring._
@@ -37,7 +36,10 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Option
   private val filterAssemblyConnection = AkkaConnection(ComponentId("Filter", Assembly))
   private val disperserHcdConnection   = AkkaConnection(ComponentId("Disperser", HCD))
 
-  override protected def afterAll(): Unit = shutdown()
+  override def afterAll(): Unit = {
+    shutdown()
+    super.afterAll()
+  }
 
   // DEOPSCSW-218: Discover component connection information using Akka protocol
   // DEOPSCSW-220: Access and Monitor components for current values
@@ -80,8 +82,6 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Option
     intercept[TimeoutException] {
       disperserCommandService.submit(commands.Setup(prefix, CommandName("isAlive"), None)).await(200.millis)
     }
-
-    wiring.locationService.shutdown(UnknownReason).await
   }
 
   /**
@@ -130,8 +130,6 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Option
     // On unavailability of TcpConnection, the assembly should know and receive LocationRemoved event
     seedLocationService.unregister(tcpConnection)
     assemblyProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(tcpLocationRemovedChoice))))
-
-    wiring.locationService.shutdown(UnknownReason).await
   }
 
 }

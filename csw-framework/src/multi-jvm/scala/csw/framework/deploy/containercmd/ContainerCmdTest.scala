@@ -9,6 +9,7 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
+import csw.clusterseed.client.HTTPLocationService
 import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState}
 import csw.command.messages.ContainerCommonMessage.GetComponents
@@ -51,7 +52,7 @@ class ContainerCmdTestMultiJvm3 extends ContainerCmdTest(0)
 // DEOPSCSW-182: Control Life Cycle of Components
 // DEOPSCSW-203: Write component-specific verification code
 // DEOPSCSW-216: Locate and connect components to send AKKA commands
-class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSeed) {
+class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSeed, mode = "http") with HTTPLocationService {
 
   import config._
 

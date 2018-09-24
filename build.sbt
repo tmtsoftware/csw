@@ -228,6 +228,7 @@ lazy val `csw-framework` = project
     `csw-event-api`,
     `csw-event-client`,
     `csw-alarm-client`,
+    `csw-cluster-seed` % "test->multi-jvm",
     `csw-event-client`  % "test->test",
     `csw-location`      % "compile->compile;multi-jvm->multi-jvm",
     `csw-config-server` % "multi-jvm->test",

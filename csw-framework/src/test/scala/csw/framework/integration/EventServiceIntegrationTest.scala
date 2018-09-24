@@ -4,27 +4,28 @@ import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.testkit.typed.scaladsl.{TestInbox, TestProbe}
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
+import csw.clusterseed.client.HTTPLocationService
+import csw.command.models.framework.ContainerLifecycleState
+import csw.command.scaladsl.CommandService
 import csw.common.FrameworkAssertions.assertThatContainerIsRunning
 import csw.common.components.framework.SampleComponentState._
 import csw.commons.redis.EmbeddedRedis
+import csw.event.client.helpers.TestFutureExt.RichFuture
+import csw.event.client.internal.commons.EventServiceConnection
 import csw.framework.FrameworkTestWiring
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
-import csw.params.commands
-import csw.params.commands.CommandName
-import csw.command.models.framework.ContainerLifecycleState
 import csw.location.api.models.ComponentId
 import csw.location.api.models.ComponentType.{Assembly, HCD}
 import csw.location.api.models.Connection.AkkaConnection
+import csw.params.commands
+import csw.params.commands.CommandName
 import csw.params.core.states.{CurrentState, StateName}
-import csw.command.scaladsl.CommandService
-import csw.event.client.helpers.TestFutureExt.RichFuture
-import csw.event.client.internal.commons.EventServiceConnection
-import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
+import org.scalatest.Matchers
 
 import scala.concurrent.duration.DurationLong
 
 //DEOPSCSW-395: Provide EventService handle to component developers
-class EventServiceIntegrationTest extends FunSuite with EmbeddedRedis with Matchers with BeforeAndAfterAll {
+class EventServiceIntegrationTest extends HTTPLocationService with EmbeddedRedis with Matchers {
   private val testWiring = new FrameworkTestWiring()
   import testWiring._
 
@@ -35,10 +36,11 @@ class EventServiceIntegrationTest extends FunSuite with EmbeddedRedis with Match
   private val disperserHcdConnection   = AkkaConnection(ComponentId("Disperser", HCD))
   private val wiring                   = FrameworkWiring.make(testActorSystem)
 
-  override protected def afterAll(): Unit = {
+  override def afterAll(): Unit = {
     wiring.actorRuntime.shutdown(UnknownReason).await
     shutdown()
     stopSentinel(sentinel, server)
+    super.afterAll()
   }
 
   test("should be able to publish and subscribe to events") {

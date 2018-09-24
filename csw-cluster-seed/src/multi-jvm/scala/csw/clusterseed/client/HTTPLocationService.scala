@@ -4,11 +4,12 @@ import akka.actor.CoordinatedShutdown.UnknownReason
 import csw.clusterseed.internal.AdminWiring
 import csw.location.commons.TestFutureExtension.RichFuture
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuiteLike}
 
 import scala.util.{Failure, Success, Try}
 
-trait HTTPLocationService extends FunSuiteLike with BeforeAndAfterAll with ScalaFutures {
+trait HTTPLocationService extends FunSuiteLike with BeforeAndAfterAll with ScalaFutures with MockitoSugar {
 
   val (maybeWiring, maybeBinding) = Try {
     val adminWiring = AdminWiring.make(Some(3553))
@@ -23,3 +24,5 @@ trait HTTPLocationService extends FunSuiteLike with BeforeAndAfterAll with Scala
     super.afterAll()
   }
 }
+
+class JHttpLocationService extends HTTPLocationService

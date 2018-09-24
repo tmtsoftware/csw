@@ -4,27 +4,27 @@ import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigFactory}
+import csw.alarm.client.internal.commons.AlarmServiceConnection
+import csw.clusterseed.client.HTTPLocationService
+import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
+import csw.command.models.framework.SupervisorLifecycleState
+import csw.command.scaladsl.CommandService
 import csw.common.FrameworkAssertions.assertThatSupervisorIsRunning
 import csw.common.components.framework.SampleComponentState._
-import csw.commons.redis.EmbeddedRedis
+import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.framework.FrameworkTestWiring
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
-import csw.params.commands.Setup
-import csw.command.models.framework.SupervisorLifecycleState
 import csw.location.api.models.ComponentId
 import csw.location.api.models.ComponentType.HCD
 import csw.location.api.models.Connection.AkkaConnection
-import csw.alarm.client.internal.commons.AlarmServiceConnection
-import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
-import csw.command.scaladsl.CommandService
-import csw.event.client.helpers.TestFutureExt.RichFuture
-import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
+import csw.params.commands.Setup
+import org.scalatest.Matchers
 
 import scala.concurrent.duration.DurationLong
 
 //DEOPSCSW-490: Alarm service integration with framework
 //DEOPSCSW-481: Component Developer API available to all CSW components
-class AlarmServiceIntegrationTest extends FunSuite with EmbeddedRedis with Matchers with BeforeAndAfterAll {
+class AlarmServiceIntegrationTest extends HTTPLocationService with Matchers {
   private val testWiring = new FrameworkTestWiring()
   import testWiring._
 
@@ -39,10 +39,11 @@ class AlarmServiceIntegrationTest extends FunSuite with EmbeddedRedis with Match
     adminAlarmService.initAlarms(config, reset = true).await
   }
 
-  override protected def afterAll(): Unit = {
+  override def afterAll(): Unit = {
     wiring.actorRuntime.shutdown(UnknownReason).await
     shutdown()
     stopSentinel(sentinel, server)
+    super.afterAll()
   }
 
   test("component should be able to set severity of an alarm") {
