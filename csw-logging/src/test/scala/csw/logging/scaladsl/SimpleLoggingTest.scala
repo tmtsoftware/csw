@@ -22,13 +22,14 @@ class SimpleLoggingTest extends LoggingTestSuite {
   test("logs should contain component name and source location in terms of file name, class name and line number") {
     val expectedDateTime = ZonedDateTime.now(ZoneId.from(ZoneOffset.UTC))
     new TromboneHcd().startLogging(logMsgMap)
-    Thread.sleep(100)
+    Thread.sleep(300)
 
     // Verify log level for tromboneHcd is at debug level in config
     LoggingState.componentsLoggingState(TromboneHcd.COMPONENT_NAME).componentLogLevel shouldBe LoggingLevels.DEBUG
 
     var logMsgLineNumber = TromboneHcd.DEBUG_LINE_NO
 
+    logBuffer.size shouldBe 5
     logBuffer.foreach { log ⇒
       // This assert's that, ISO_INSTANT parser should not throw exception while parsing timestamp from log message
       // If timestamp is in other than UTC(ISO_FORMAT) format, DateTimeFormatter.ISO_INSTANT will throw DateTimeParseException
@@ -60,11 +61,12 @@ class SimpleLoggingTest extends LoggingTestSuite {
 
     var logMsgLineNumber = InnerSourceComponent.TRACE_LINE_NO
 
+    logBuffer.size shouldBe 6
     logBuffer.foreach { log ⇒
-      log(LoggingKeys.COMPONENT_NAME) shouldBe "InnerSourceComponent"
-      log(LoggingKeys.FILE) shouldBe "InnerSourceComponent.scala"
-      log(LoggingKeys.LINE) shouldBe logMsgLineNumber
-      log(LoggingKeys.CLASS) shouldBe "csw.logging.components.InnerSourceComponent$InnerSource"
+      log.getString(LoggingKeys.COMPONENT_NAME) shouldBe "InnerSourceComponent"
+      log.getString(LoggingKeys.FILE) shouldBe "InnerSourceComponent.scala"
+      log(LoggingKeys.LINE).as[Int] shouldBe logMsgLineNumber
+      log.getString(LoggingKeys.CLASS) shouldBe "csw.logging.components.InnerSourceComponent$InnerSource"
       logMsgLineNumber += 1
     }
   }
@@ -81,6 +83,7 @@ class SimpleLoggingTest extends LoggingTestSuite {
 
     var logMsgLineNumber = SingletonComponent.TRACE_LINE_NO
 
+    logBuffer.size shouldBe 6
     logBuffer.foreach { log ⇒
       log.contains(LoggingKeys.COMPONENT_NAME) shouldBe true
       log.getString(LoggingKeys.COMPONENT_NAME) shouldBe "SingletonComponent"
@@ -105,6 +108,7 @@ class SimpleLoggingTest extends LoggingTestSuite {
 
     var logMsgLineNumber = SingletonComponent.USER_TRACE_LINE_NO
 
+    logBuffer.size shouldBe 6
     logBuffer.foreach { log ⇒
       //  Count the user messages for test at the end
       var userMsgCount = 0

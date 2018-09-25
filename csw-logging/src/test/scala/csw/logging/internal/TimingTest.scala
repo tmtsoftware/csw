@@ -12,7 +12,7 @@ import csw.logging.components.IRIS._
 import csw.logging.internal.JsonExtensions.RichJsObject
 import csw.logging.scaladsl.RequestId
 import csw.logging.utils.{FileUtils, LoggingTestSuite}
-import play.api.libs.json.{JsArray, JsObject, Json}
+import play.api.libs.json.{JsObject, Json}
 
 import scala.collection.mutable
 
@@ -88,13 +88,13 @@ class TimingTest extends LoggingTestSuite with Timing {
 
     // validating timer logger
     timeLogBuffer.toList.foreach { log ⇒
-      val itemsMap = log("items").as[List[JsObject]].head
+      val itemsMap = log("items").as[List[String]].map(x ⇒ Json.parse(x).as[JsObject]).head
 
-      itemsMap("name") shouldBe timerRegionQueue.dequeue
+      itemsMap.getString("name") shouldBe timerRegionQueue.dequeue
       itemsMap.contains("time0") shouldBe true
       itemsMap.contains("time1") shouldBe true
       itemsMap.contains("total") shouldBe true
-      log(LoggingKeys.NAME) shouldBe "TimingTest"
+      log.getString(LoggingKeys.NAME) shouldBe "TimingTest"
     }
 
     // validating file logger
@@ -104,13 +104,13 @@ class TimingTest extends LoggingTestSuite with Timing {
 
     def testLogBuffer(logBuffer: mutable.Buffer[JsObject]): Unit = {
       logBuffer.foreach { log ⇒
-        val currentLogLevel = log(LoggingKeys.SEVERITY).toString.toLowerCase
-        log(LoggingKeys.MESSAGE).toString shouldBe IRIS.irisLogs(currentLogLevel)
+        val currentLogLevel = log.getString(LoggingKeys.SEVERITY).toLowerCase
+        log.getString(LoggingKeys.MESSAGE) shouldBe IRIS.irisLogs(currentLogLevel)
 
-        log(LoggingKeys.COMPONENT_NAME) shouldBe IRIS.COMPONENT_NAME
-        log(LoggingKeys.ACTOR) shouldBe irisActorRef.path.toString
-        log(LoggingKeys.FILE) shouldBe IRIS.FILE_NAME
-        log(LoggingKeys.CLASS) shouldBe IRIS.CLASS_NAME
+        log.getString(LoggingKeys.COMPONENT_NAME) shouldBe IRIS.COMPONENT_NAME
+        log.getString(LoggingKeys.ACTOR) shouldBe irisActorRef.path.toString
+        log.getString(LoggingKeys.FILE) shouldBe IRIS.FILE_NAME
+        log.getString(LoggingKeys.CLASS) shouldBe IRIS.CLASS_NAME
         log.contains(LoggingKeys.LINE) shouldBe true
       }
     }

@@ -16,6 +16,7 @@ import csw.alarm.api.models._
 import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
 import csw.alarm.client.internal.helpers.{AlarmServiceTestSetup, TestDataFeeder}
 import csw.alarm.client.internal.services.SeverityTestScenarios._
+import csw.logging.internal.JsonExtensions.RichJsObject
 import csw.logging.internal.{LoggingLevels, LoggingSystem}
 import csw.logging.utils.TestAppender
 import csw.params.core.models.Subsystem.{BAD, LGSF, NFIRAOS, TCS}
@@ -51,7 +52,7 @@ class SeverityServiceModuleTest
     loggingSystem.setDefaultLogLevel(LoggingLevels.DEBUG)
     setCurrentSeverity(tromboneAxisLowLimitAlarmKey, AlarmSeverity.Critical).await
     Thread.sleep(100)
-    val messages = logBuffer.map(log => log("message"))
+    val messages = logBuffer.map(log => log.getString("message"))
     messages.contains(expectedMessage1) shouldBe true
     messages.contains(expectedMessage2) shouldBe true
 

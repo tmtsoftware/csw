@@ -1,11 +1,12 @@
 package csw.alarm.client.internal.services
-import com.persist.JsonOps.{Json, JsonObject}
 import com.typesafe.config.ConfigFactory
 import csw.alarm.api.models.AlarmSeverity
 import csw.alarm.client.internal.helpers.AlarmServiceTestSetup
 import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
+import csw.logging.internal.JsonExtensions.RichJsObject
 import csw.logging.internal.{LoggingLevels, LoggingSystem}
 import csw.logging.utils.TestAppender
+import play.api.libs.json.{JsObject, Json}
 
 import scala.collection.mutable
 
@@ -16,8 +17,8 @@ class LoggingSeverityTest
     with MetadataServiceModule
     with StatusServiceModule {
 
-  private val logBuffer                    = mutable.Buffer.empty[JsonObject]
-  private val testAppender                 = new TestAppender(x ⇒ logBuffer += Json(x.toString).asInstanceOf[JsonObject])
+  private val logBuffer                    = mutable.Buffer.empty[JsObject]
+  private val testAppender                 = new TestAppender(x ⇒ logBuffer += Json.parse(x.toString).as[JsObject])
   private val loggingSystem: LoggingSystem = new LoggingSystem("logging", "version", "hostName", actorSystem)
 
   override protected def beforeEach(): Unit = {
@@ -37,7 +38,7 @@ class LoggingSeverityTest
 
     Thread.sleep(100)
 
-    val messages = logBuffer.map(log => log("message")).toSet
+    val messages = logBuffer.map(log => log.getString("message")).toSet
     messages should contain allElementsOf Set(expectedMessage1, expectedMessage2)
   }
 }

@@ -161,9 +161,9 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
     }
     val laserComponentLogs = groupByComponentNamesLog(laserComponent.info.name)
 
-    laserComponentLogs.exists(log ⇒ log("@severity").toString.toLowerCase.equalsIgnoreCase("info")) shouldBe true
+    laserComponentLogs.exists(log ⇒ log.getString("@severity").toLowerCase.equalsIgnoreCase("info")) shouldBe true
     laserComponentLogs.foreach { log ⇒
-      val currentLogLevel = log("@severity").toString.toLowerCase
+      val currentLogLevel = log.getString("@severity").toLowerCase
       Level(currentLogLevel) >= LoggingLevels.INFO shouldBe true
     }
 
@@ -192,21 +192,21 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
     galilComponent.supervisor ! Oneway(Setup(prefix, startLoggingCmd, None), probe.ref)
     Thread.sleep(100)
 
-    val groupByAfterFilter       = logBuffer.groupBy(json ⇒ json("@componentName").toString)
+    val groupByAfterFilter       = logBuffer.groupBy(json ⇒ json.getString("@componentName"))
     val laserCompLogsAfterFilter = groupByAfterFilter(laserConnection.componentId.name)
     val galilCompLogsAfterFilter = groupByAfterFilter(galilConnection.componentId.name)
 
-    laserCompLogsAfterFilter.exists(log ⇒ log("@severity").toString.toLowerCase.equalsIgnoreCase("error")) shouldBe true
+    laserCompLogsAfterFilter.exists(log ⇒ log.getString("@severity").toLowerCase.equalsIgnoreCase("error")) shouldBe true
     laserCompLogsAfterFilter.foreach { log ⇒
-      val currentLogLevel = log("@severity").toString.toLowerCase
+      val currentLogLevel = log.getString("@severity").toLowerCase
       Level(currentLogLevel) >= LoggingLevels.ERROR shouldBe true
     }
 
     // this makes sure that, changing log level of one component (laser component) from container does not affect other components (galil component) log level
-    galilCompLogsAfterFilter.exists(log ⇒ log("@severity").toString.toLowerCase.equalsIgnoreCase("info")) shouldBe true
+    galilCompLogsAfterFilter.exists(log ⇒ log.getString("@severity").toLowerCase.equalsIgnoreCase("info")) shouldBe true
 
     galilCompLogsAfterFilter.foreach { log ⇒
-      val currentLogLevel = log("@severity").toString.toLowerCase
+      val currentLogLevel = log.getString("@severity").toLowerCase
       Level(currentLogLevel) >= LoggingLevels.INFO shouldBe true
     }
   }
