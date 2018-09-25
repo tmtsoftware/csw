@@ -65,9 +65,9 @@ object FrameworkAssertions extends Matchers with Eventually {
 
     assert(maybeLogMsg.isDefined, s"$message not found in $logBuffer")
     val logMsg = maybeLogMsg.get
-    Level(logMsg("@severity").toString) shouldBe expLevel
-    logMsg("@componentName") shouldBe componentName
-    logMsg("class") shouldBe sanitizeClassName(className)
+    Level(logMsg.getString("@severity")) shouldBe expLevel
+    logMsg.getString("@componentName") shouldBe componentName
+    logMsg.getString("class") shouldBe sanitizeClassName(className)
   }
 
   def assertThatExceptionIsLogged(
@@ -84,15 +84,15 @@ object FrameworkAssertions extends Matchers with Eventually {
 
     assert(maybeLogMsg.isDefined, s"$message not found in $logBuffer")
     val logMsg = maybeLogMsg.get
-    Level(logMsg("@severity").toString) shouldBe expLevel
-    logMsg("@componentName") shouldBe componentName
-    logMsg("class") shouldBe sanitizeClassName(className)
+    Level(logMsg.getString("@severity")) shouldBe expLevel
+    logMsg.getString("@componentName") shouldBe componentName
+    logMsg.getString("class") shouldBe sanitizeClassName(className)
 
     logMsg.contains("trace") shouldBe true
     val traceBlock    = logMsg("trace").asInstanceOf[JsObject]
     val traceMsgBlock = traceBlock("message").as[JsObject]
-    traceMsgBlock("ex") shouldBe s"class ${sanitizeClassName(exceptionClassName)}"
-    traceMsgBlock("message") shouldBe exceptionMessage
+    traceMsgBlock.getString("ex") shouldBe s"class ${sanitizeClassName(exceptionClassName)}"
+    traceMsgBlock.getString("message") shouldBe exceptionMessage
   }
 
   def assertThatExceptionIsNotLogged(
