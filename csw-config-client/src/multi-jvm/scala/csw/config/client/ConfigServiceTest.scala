@@ -4,6 +4,7 @@ import java.nio.file.Paths
 
 import akka.actor.ActorSystem
 import com.typesafe.config.ConfigFactory
+import csw.clusterseed.client.HTTPLocationService
 import csw.config.api.models.ConfigData
 import csw.config.client.helpers.OneClientAndServer
 import csw.config.client.internal.ActorRuntime
@@ -15,7 +16,7 @@ import csw.location.helpers.LSNodeSpec
 class ConfigServiceTestMultiJvmNode1 extends ConfigServiceTest(0)
 class ConfigServiceTestMultiJvmNode2 extends ConfigServiceTest(0)
 
-class ConfigServiceTest(ignore: Int) extends LSNodeSpec(config = new OneClientAndServer) {
+class ConfigServiceTest(ignore: Int) extends LSNodeSpec(config = new OneClientAndServer, mode = "http") with HTTPLocationService {
 
   import config._
 

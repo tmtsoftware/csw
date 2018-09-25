@@ -4,6 +4,7 @@ import java.nio.file.{Files, Paths}
 import java.time.Instant
 
 import akka.actor.CoordinatedShutdown.UnknownReason
+import csw.clusterseed.client.HTTPLocationService
 import csw.config.api.models.ConfigId
 import csw.config.server.ServerWiring
 import csw.config.commons.TestFutureExtension.RichFuture
@@ -13,7 +14,7 @@ import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 // DEOPSCSW-112: Command line interface client for Configuration service
 // DEOPSCSW-43: Access Configuration service from any CSW component
-class CommandLineRunnerTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
+class CommandLineRunnerTest extends HTTPLocationService with Matchers with BeforeAndAfterEach {
 
   private val serverWiring = ServerWiring.make(ClusterAwareSettings.onPort(3560))
   private val httpService  = serverWiring.httpService
@@ -40,6 +41,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with BeforeAndAfterAl
     wiring.actorRuntime.shutdown(UnknownReason).await
     Files.delete(Paths.get(inputFilePath))
     Files.delete(Paths.get(updatedInputFilePath))
+    super.afterAll()
   }
 
   //DEOPSCSW-72: Retrieve a configuration file to a specified file location on a local disk

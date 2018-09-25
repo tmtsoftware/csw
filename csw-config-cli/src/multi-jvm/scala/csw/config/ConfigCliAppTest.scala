@@ -3,6 +3,7 @@ package csw.config
 import java.nio.file.{Files, Paths}
 
 import com.typesafe.config.ConfigFactory
+import csw.clusterseed.client.HTTPLocationService
 import csw.config.api.models.ConfigData
 import csw.config.client.internal.ActorRuntime
 import csw.config.client.scaladsl.ConfigClientFactory
@@ -19,7 +20,10 @@ class ConfigCliAppTestMultiJvmNode2 extends ConfigCliAppTest(0)
 class ConfigCliAppTestMultiJvmNode3 extends ConfigCliAppTest(0)
 
 // DEOPSCSW-43: Access Configuration service from any CSW component
-class ConfigCliAppTest(ignore: Int) extends LSNodeSpec(config = new TwoClientsAndServer) with FunSuiteLike {
+class ConfigCliAppTest(ignore: Int)
+    extends LSNodeSpec(config = new TwoClientsAndServer, mode = "http")
+    with HTTPLocationService
+    with FunSuiteLike {
 
   import config._
 

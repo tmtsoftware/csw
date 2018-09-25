@@ -8,6 +8,7 @@ import csw.config.server.files._
 import csw.config.server.http.{ConfigHandlers, ConfigServiceRoute, HttpService}
 import csw.config.server.svn.{SvnConfigService, SvnRepo}
 import csw.location.api.commons.ClusterSettings
+import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.scaladsl.LocationServiceFactory
 
 /**
@@ -26,7 +27,7 @@ private[csw] class ServerWiring {
   lazy val annexFileService             = new AnnexFileService(settings, annexFileRepo, actorRuntime)
   lazy val configService: ConfigService = new SvnConfigService(settings, actorRuntime, svnRepo, annexFileService)
 
-  lazy val locationService: LocationService = LocationServiceFactory.withSystem(actorSystem)
+  lazy val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient(actorSystem, actorRuntime.mat)
 
   lazy val configHandlers     = new ConfigHandlers
   lazy val configServiceRoute = new ConfigServiceRoute(configService, actorRuntime, configHandlers)

@@ -189,6 +189,7 @@ lazy val `csw-config-client` = project
     `csw-location-api`,
     `csw-commons`       % "compile->compile;test->test",
     `csw-location`      % "multi-jvm->multi-jvm",
+    `csw-cluster-seed`  % "multi-jvm->multi-jvm",
     `csw-config-server` % "test->test"
   )
   .enablePlugins(PublishBintray, AutoMultiJvm, MaybeCoverage)
@@ -201,6 +202,7 @@ lazy val `csw-config-cli` = project
     `csw-config-client`,
     `csw-location`,
     `csw-location`      % "multi-jvm->multi-jvm",
+    `csw-cluster-seed`  % "multi-jvm->multi-jvm",
     `csw-config-server` % "test->test",
     `csw-commons`       % "test->test"
   )

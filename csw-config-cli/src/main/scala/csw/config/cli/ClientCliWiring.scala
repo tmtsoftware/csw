@@ -6,6 +6,7 @@ import csw.config.api.scaladsl.ConfigService
 import csw.config.client.internal.ActorRuntime
 import csw.config.client.scaladsl.ConfigClientFactory
 import csw.location.api.commons.ClusterSettings
+import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.commons.CswCluster
 import csw.location.scaladsl.LocationServiceFactory
 
@@ -18,7 +19,7 @@ import csw.location.scaladsl.LocationServiceFactory
  */
 private[config] class ClientCliWiring(actorSystem: ActorSystem) {
   lazy val actorRuntime                     = new ActorRuntime(actorSystem)
-  lazy val locationService: LocationService = LocationServiceFactory.withCluster(CswCluster.withSystem(actorSystem))
+  lazy val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient(actorSystem, actorRuntime.mat)
   lazy val configService: ConfigService     = ConfigClientFactory.adminApi(actorRuntime.actorSystem, locationService)
   lazy val printLine: Any ⇒ Unit            = println
   lazy val commandLineRunner                = new CommandLineRunner(configService, actorRuntime, printLine)
