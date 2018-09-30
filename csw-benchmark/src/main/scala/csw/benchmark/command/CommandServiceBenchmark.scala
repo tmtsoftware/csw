@@ -7,7 +7,6 @@ import akka.util
 import com.typesafe.config.ConfigFactory
 import csw.benchmark.command.BenchmarkHelpers.spawnStandaloneComponent
 import csw.command.scaladsl.CommandService
-import csw.location.api.commons.ClusterAwareSettings
 import csw.params.commands
 import csw.params.commands.{CommandName, CommandResponse}
 import csw.params.core.models.Prefix
@@ -31,7 +30,7 @@ import scala.concurrent.duration.DurationInt
 @Threads(1)
 @Warmup(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS, batchSize = 1)
 @Measurement(iterations = 10, time = 1, timeUnit = TimeUnit.SECONDS, batchSize = 1)
-class CommandServiceBenchmark {
+class CommandServiceBenchmark extends HTTPLocationService {
 
   implicit var actorSystem: ActorSystem = _
   implicit var timeout: util.Timeout    = _
@@ -41,7 +40,7 @@ class CommandServiceBenchmark {
 
   @Setup(Level.Trial)
   def setup(): Unit = {
-    actorSystem = ClusterAwareSettings.onPort(3552).system
+    actorSystem = ActorSystem("command-service-benchmark")
 
     componentRef = spawnStandaloneComponent(actorSystem, ConfigFactory.load("standalone.conf"))
 

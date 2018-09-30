@@ -1,7 +1,6 @@
 package csw.framework.integration
 
 import akka.actor
-import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory

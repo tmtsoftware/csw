@@ -1,12 +1,12 @@
 package csw.config.server
 
-import csw.services.BuildInfo
 import csw.config.server.cli.{ArgsParser, Options}
 import csw.config.server.commons.ConfigServerLogger
 import csw.config.server.commons.CoordinatedShutdownReasons.FailureReason
 import csw.config.server.http.HttpService
-import csw.location.api.commons.{ClusterAwareSettings, ClusterSettings}
+import csw.location.api.commons.ClusterAwareSettings
 import csw.logging.scaladsl.Logger
+import csw.services.BuildInfo
 import org.tmatesoft.svn.core.SVNException
 
 import scala.concurrent.Await
@@ -15,14 +15,14 @@ import scala.concurrent.duration.DurationDouble
 /**
  * Application object to start the ConfigServer from command line.
  */
-class Main(clusterSettings: ClusterSettings, startLogging: Boolean = false) {
+class Main(startLogging: Boolean = false) {
   private val name        = BuildInfo.name
   private val log: Logger = ConfigServerLogger.getLogger
 
   def start(args: Array[String]): Option[HttpService] =
     new ArgsParser(name).parse(args).map {
       case Options(init, maybePort) =>
-        val wiring = ServerWiring.make(clusterSettings, maybePort)
+        val wiring = ServerWiring.make(maybePort)
         import wiring._
 
         if (startLogging) actorRuntime.startLogging(name)
@@ -50,7 +50,7 @@ object Main extends App {
       "clusterSeeds setting is not specified either as env variable or system property. Please check online documentation for this set-up."
     )
   } else {
-    new Main(ClusterAwareSettings, startLogging = true).start(args)
+    new Main(startLogging = true).start(args)
   }
 }
 // $COVERAGE-ON$

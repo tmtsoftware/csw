@@ -5,6 +5,7 @@ import akka.actor.testkit.typed.javadsl.TestProbe;
 import akka.stream.javadsl.Keep;
 import akka.stream.javadsl.Sink;
 import akka.stream.javadsl.Source;
+import csw.clusterseed.client.JHTTPLocationService;
 import csw.params.events.Event;
 import csw.params.events.Event$;
 import csw.params.events.EventKey;
@@ -37,6 +38,7 @@ public class JEventPublisherTest extends TestNGSuite {
 
     private RedisTestProps redisTestProps;
     private KafkaTestProps kafkaTestProps;
+    private JHTTPLocationService jHttpLocationService;
 
     private int counter = -1;
     private Cancellable cancellable;
@@ -47,12 +49,14 @@ public class JEventPublisherTest extends TestNGSuite {
         kafkaTestProps = KafkaTestProps.jCreateKafkaProperties();
         redisTestProps.start();
         kafkaTestProps.start();
+        jHttpLocationService = new JHTTPLocationService();
     }
 
     @AfterSuite
     public void afterAll() {
         redisTestProps.shutdown();
         kafkaTestProps.shutdown();
+        jHttpLocationService.afterAll();
     }
 
     @DataProvider(name = "event-service-provider")

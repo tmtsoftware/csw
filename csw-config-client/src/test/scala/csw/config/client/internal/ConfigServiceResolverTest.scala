@@ -2,24 +2,23 @@ package csw.config.client.internal
 
 import java.net.URI
 
+import csw.clusterseed.client.HTTPLocationService
 import csw.config.client.commons.ConfigServiceConnection
 import csw.config.client.scaladsl.ConfigClientFactory
 import csw.location.api.models.HttpLocation
 import csw.location.api.scaladsl.LocationService
-import csw.location.scaladsl.LocationServiceFactory
+import csw.location.client.scaladsl.HttpLocationServiceFactory
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{FunSuite, Matchers}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 
-class ConfigServiceResolverTest extends FunSuite with Matchers with MockitoSugar {
+class ConfigServiceResolverTest extends HTTPLocationService {
   private val actorRuntime = new ActorRuntime()
   import actorRuntime._
 
   test("should throw exception if not able to resolve config service http server") {
-    val locationService = LocationServiceFactory.make()
+    val locationService = HttpLocationServiceFactory.makeLocalClient
     val configService   = ConfigClientFactory.adminApi(actorSystem, locationService)
 
     val exception = intercept[RuntimeException] {

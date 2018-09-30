@@ -13,9 +13,9 @@ import csw.clusterseed.client.HTTPLocationService
 import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState}
 import csw.command.messages.ContainerCommonMessage.GetComponents
-import csw.command.messages.{ComponentMessage, ContainerMessage}
 import csw.command.messages.RunningMessage.Lifecycle
 import csw.command.messages.SupervisorContainerCommonMessages.Shutdown
+import csw.command.messages.{ComponentMessage, ContainerMessage}
 import csw.command.models.framework.PubSub.Subscribe
 import csw.command.models.framework.ToComponentLifecycleMessages.GoOffline
 import csw.command.models.framework.{Components, ContainerLifecycleState, SupervisorLifecycleState}
@@ -27,7 +27,6 @@ import csw.config.server.commons.TestFileUtils
 import csw.config.server.{ServerWiring, Settings}
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{ComponentId, ComponentType}
-import csw.location.api.commons.ClusterAwareSettings
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.params.commands.CommandResponse.Invalid
 import csw.params.commands.{CommandName, Setup}
@@ -58,7 +57,7 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
 
   implicit val actorSystem: ActorSystem[_]  = system.toTyped
   implicit val ec: ExecutionContextExecutor = actorSystem.executionContext
-  implicit val testkit: TestKitSettings     = TestKitSettings(actorSystem)
+  implicit val testKit: TestKitSettings     = TestKitSettings(actorSystem)
   implicit val timeout: Timeout             = 5.seconds
 
   private val testFileUtils = new TestFileUtils(new Settings(ConfigFactory.load()))
@@ -120,14 +119,12 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       val testProbe = TestProbe[ContainerLifecycleState]
 
       // withEntries required for multi-node test where seed node is picked up from environment variable
-      val clusterSettings = ClusterAwareSettings.joinLocal(3552).withEntries(sys.env)
-      val containerCmd    = new ContainerCmd("laser_container_app", clusterSettings, false)
+      val containerCmd = new ContainerCmd("laser_container_app", false)
 
       // only file path is provided, by default - file will be fetched from configuration service
       // and will be considered as container configuration.
-      val args = Array("/laser_container.conf")
-      val containerRef =
-        containerCmd.start(args).asInstanceOf[ActorRef[ContainerMessage]]
+      val args         = Array("/laser_container.conf")
+      val containerRef = containerCmd.start(args).asInstanceOf[ActorRef[ContainerMessage]]
 
       assertThatContainerIsRunning(containerRef, testProbe, 5.seconds)
 
@@ -205,7 +202,7 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
 
       val testProbe = TestProbe[SupervisorLifecycleState]
 
-      val containerCmd = new ContainerCmd("eaton_hcd_standalone_app", ClusterAwareSettings.joinLocal(3552), false)
+      val containerCmd = new ContainerCmd("eaton_hcd_standalone_app", false)
 
       // this step is required for multi-node, as eaton_hcd_standalone.conf file is not directly available
       // when sbt-assembly creates fat jar
@@ -218,7 +215,7 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
       enterBarrier("running")
 
       enterBarrier("offline")
-      Thread.sleep(50)
+      Thread.sleep(500)
       supervisorRef ! GetSupervisorLifecycleState(testProbe.ref)
       testProbe.expectMessage(SupervisorLifecycleState.RunningOffline)
 

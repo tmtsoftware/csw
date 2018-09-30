@@ -3,44 +3,43 @@ package csw.config.client.scaladsl
 import java.nio.file.Paths
 
 import akka.actor.CoordinatedShutdown.UnknownReason
+import csw.clusterseed.client.HTTPLocationService
 import csw.config.api.models.ConfigData
 import csw.config.api.scaladsl.{ConfigClientService, ConfigService}
 import csw.config.server.ServerWiring
 import csw.config.server.commons.TestFileUtils
 import csw.config.server.commons.TestFutureExtension.RichFuture
-import csw.location.api.commons.ClusterAwareSettings
-import csw.location.scaladsl.LocationServiceFactory
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
+import csw.location.client.scaladsl.HttpLocationServiceFactory
 
 // DEOPSCSW-138: Split Config API into Admin API and Client API
 // DEOPSCSW-80: HTTP based access for configuration file
-class ConfigClientApiTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
+class ConfigClientApiTest extends HTTPLocationService {
 
-  private val clientLocationService = LocationServiceFactory.withSettings(ClusterAwareSettings.onPort(3558))
-
-  private val serverWiring = ServerWiring.make(ClusterAwareSettings.joinLocal(3558), Some(4002))
+  private val serverWiring = ServerWiring.make(Some(4002))
   private val httpService  = serverWiring.httpService
 
-  private val testFileUtils = new TestFileUtils(serverWiring.settings)
-
   import serverWiring.actorRuntime._
+
+  private val clientLocationService = HttpLocationServiceFactory.makeLocalClient
+
+  private val testFileUtils = new TestFileUtils(serverWiring.settings)
 
   //Why 2 instances of ConfigService? adminAPI is used to set configurations; clientAPI is used for validation/testing
   val configClientService: ConfigClientService = ConfigClientFactory.clientApi(actorSystem, clientLocationService)
   val configAdminService: ConfigService        = ConfigClientFactory.adminApi(actorSystem, clientLocationService)
 
-  override protected def beforeEach(): Unit =
+  override def beforeEach(): Unit =
     serverWiring.svnRepo.initSvnRepo()
 
-  override protected def afterEach(): Unit =
+  override def afterEach(): Unit =
     testFileUtils.deleteServerFiles()
 
-  override protected def beforeAll(): Unit =
+  override def beforeAll(): Unit =
     httpService.registeredLazyBinding.await
 
-  override protected def afterAll(): Unit = {
+  override def afterAll(): Unit = {
     httpService.shutdown(UnknownReason).await
-    clientLocationService.shutdown(UnknownReason).await
+    super.afterAll()
   }
 
   val configValue1: String =

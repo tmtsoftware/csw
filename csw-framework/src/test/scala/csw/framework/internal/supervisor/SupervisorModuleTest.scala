@@ -93,7 +93,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
     testData.find(info ⇒ info.componentType == HCD && info.name == "JSampleHcd") shouldBe Some(jHcdInfo)
     testData.find(info ⇒ info.componentType == Assembly && info.name == "SampleAssembly") shouldBe Some(assemblyInfo)
 
-    forAll(testData) { (info: ComponentInfo) =>
+    forAll(testData) { info =>
       {
         val mocks = frameworkTestMocks()
         import mocks._

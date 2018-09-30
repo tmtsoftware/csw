@@ -34,6 +34,7 @@ class ConfigServiceTest(ignore: Int) extends LSNodeSpec(config = new OneClientAn
       serverWiring.svnRepo.initSvnRepo()
       serverWiring.httpService.registeredLazyBinding.await
       enterBarrier("server-started")
+      enterBarrier("end")
     }
 
     runOn(client) {
@@ -53,6 +54,7 @@ class ConfigServiceTest(ignore: Int) extends LSNodeSpec(config = new OneClientAn
       configService.create(file, ConfigData.fromString(configValue), annex = false, "commit test file").await
       val actualConfigValue = configService.getLatest(file).await.get.toStringF.await
       actualConfigValue shouldBe configValue
+      enterBarrier("end")
     }
   }
 }

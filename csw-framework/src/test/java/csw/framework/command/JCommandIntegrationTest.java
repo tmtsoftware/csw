@@ -1,16 +1,13 @@
 package csw.framework.command;
 
 import akka.actor.ActorSystem;
-import akka.actor.CoordinatedShutdown;
 import akka.actor.testkit.typed.javadsl.TestInbox;
 import akka.actor.testkit.typed.javadsl.TestProbe;
 import akka.actor.typed.internal.adapter.ActorSystemAdapter;
 import akka.stream.ActorMaterializer;
-import akka.stream.Materializer;
 import akka.util.Timeout;
 import com.typesafe.config.ConfigFactory;
-import csw.clusterseed.client.HTTPLocationService;
-import csw.clusterseed.client.JHttpLocationService;
+import csw.clusterseed.client.JHTTPLocationService;
 import csw.common.components.framework.SampleComponentState;
 import csw.framework.internal.wiring.FrameworkWiring;
 import csw.framework.internal.wiring.Standalone;
@@ -37,9 +34,7 @@ import csw.command.extensions.AkkaLocationExt;
 import csw.command.javadsl.JCommandDistributor;
 import csw.command.javadsl.JCommandService;
 import csw.command.scaladsl.CurrentStateSubscription;
-import csw.location.api.commons.ClusterAwareSettings;
 import csw.location.api.javadsl.ILocationService;
-import csw.location.javadsl.JLocationServiceFactory;
 import csw.logging.javadsl.JLoggingSystemFactory;
 import io.lettuce.core.RedisClient;
 import org.junit.AfterClass;
@@ -72,7 +67,7 @@ public class JCommandIntegrationTest {
     private ExecutionContext ec = hcdActorSystem.dispatcher();
     private static ActorMaterializer mat = ActorMaterializer.create(hcdActorSystem);
 
-    private static JHttpLocationService jHttpLocationService;
+    private static JHTTPLocationService jHttpLocationService;
     private static ILocationService locationService;
     private static JCommandService hcdCmdService;
     private static AkkaLocation hcdLocation;
@@ -80,7 +75,7 @@ public class JCommandIntegrationTest {
 
     @BeforeClass
     public static void setup() throws Exception {
-        jHttpLocationService = new JHttpLocationService();
+        jHttpLocationService = new JHTTPLocationService();
 
         locationService = JHttpLocationServiceFactory.makeLocalClient(hcdActorSystem, mat);
         hcdLocation = getLocation();

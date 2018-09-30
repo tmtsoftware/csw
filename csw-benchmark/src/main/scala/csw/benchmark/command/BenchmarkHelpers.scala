@@ -4,6 +4,7 @@ import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.{typed, ActorSystem}
+import akka.stream.ActorMaterializer
 import com.typesafe.config.Config
 import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.messages.ComponentCommonMessage.GetSupervisorLifecycleState
@@ -14,8 +15,8 @@ import csw.command.scaladsl.CommandService
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
+import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.commons.BlockingUtils
-import csw.location.scaladsl.LocationServiceFactory
 
 import scala.concurrent.Await
 import scala.concurrent.duration.{Duration, DurationDouble}
@@ -23,7 +24,8 @@ import scala.concurrent.duration.{Duration, DurationDouble}
 object BenchmarkHelpers {
 
   def spawnStandaloneComponent(actorSystem: ActorSystem, config: Config): CommandService = {
-    val locationService                                  = LocationServiceFactory.withSystem(actorSystem)
+    val mat                                              = ActorMaterializer()(actorSystem)
+    val locationService                                  = HttpLocationServiceFactory.makeLocalClient(actorSystem, mat)
     val wiring: FrameworkWiring                          = FrameworkWiring.make(actorSystem, locationService)
     implicit val typedSystem: typed.ActorSystem[Nothing] = actorSystem.toTyped
 

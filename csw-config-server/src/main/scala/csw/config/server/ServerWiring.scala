@@ -2,14 +2,12 @@ package csw.config.server
 
 import akka.actor.ActorSystem
 import com.typesafe.config.{Config, ConfigFactory}
-import csw.location.api.scaladsl.LocationService
 import csw.config.api.scaladsl.ConfigService
 import csw.config.server.files._
 import csw.config.server.http.{ConfigHandlers, ConfigServiceRoute, HttpService}
 import csw.config.server.svn.{SvnConfigService, SvnRepo}
-import csw.location.api.commons.ClusterSettings
+import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.scaladsl.LocationServiceFactory
 
 /**
  * Server configuration
@@ -18,8 +16,7 @@ private[csw] class ServerWiring {
   lazy val config: Config = ConfigFactory.load()
   lazy val settings       = new Settings(config)
 
-  lazy val clusterSettings          = ClusterSettings()
-  lazy val actorSystem: ActorSystem = clusterSettings.system
+  lazy val actorSystem: ActorSystem = ActorSystem("config-server")
   lazy val actorRuntime             = new ActorRuntime(actorSystem, settings)
   lazy val annexFileRepo            = new AnnexFileRepo(actorRuntime.blockingIoDispatcher)
   lazy val svnRepo                  = new SvnRepo(settings, actorRuntime.blockingIoDispatcher)
@@ -41,13 +38,12 @@ private[csw] object ServerWiring {
     override lazy val locationService: LocationService = _locationService
   }
 
-  def make(_clusterSettings: ClusterSettings): ServerWiring = new ServerWiring {
-    override lazy val clusterSettings: ClusterSettings = _clusterSettings
+  def make(_actorSystem: ActorSystem, _locationService: LocationService): ServerWiring = new ServerWiring {
+    override lazy val actorSystem: ActorSystem         = _actorSystem
+    override lazy val locationService: LocationService = _locationService
   }
 
-  def make(_clusterSettings: ClusterSettings, maybePort: Option[Int]): ServerWiring = new ServerWiring {
-    override lazy val clusterSettings: ClusterSettings = _clusterSettings
-
+  def make(maybePort: Option[Int]): ServerWiring = new ServerWiring {
     override lazy val settings: Settings = new Settings(config) {
       override val `service-port`: Int = maybePort.getOrElse(super.`service-port`)
     }

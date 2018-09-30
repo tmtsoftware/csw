@@ -1,18 +1,20 @@
 package csw.event
 
 import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
 import csw.event.api.scaladsl.EventService
 import csw.event.client.EventServiceFactory
 import csw.event.client.models.EventStores.{KafkaStore, RedisStore}
 import csw.location.client.ActorSystemFactory
-import csw.location.scaladsl.LocationServiceFactory
+import csw.location.client.scaladsl.HttpLocationServiceFactory
 import io.lettuce.core.ClientOptions.DisconnectedBehavior
 import io.lettuce.core.{ClientOptions, RedisClient}
 
 class EventServiceCreationExamples {
 
-  implicit val actorSystem: ActorSystem = ActorSystemFactory.remote()
-  private val locationService           = LocationServiceFactory.withSystem(actorSystem)
+  private implicit val actorSystem: ActorSystem = ActorSystemFactory.remote()
+  private implicit val mat: ActorMaterializer   = ActorMaterializer()
+  private val locationService                   = HttpLocationServiceFactory.makeLocalClient
 
   def defaultEventService(): Unit = {
     //#default-event-service

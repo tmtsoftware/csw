@@ -158,7 +158,8 @@ lazy val `csw-admin` = project
 lazy val `csw-location-agent` = project
   .dependsOn(
     `csw-location`,
-    `csw-commons` % "test->test"
+    `csw-commons` % "test->test",
+    `csw-cluster-seed` % "test->multi-jvm"
   )
   .enablePlugins(DeployApp, MaybeCoverage)
   .settings(
@@ -176,7 +177,8 @@ lazy val `csw-config-server` = project
   .dependsOn(
     `csw-location`,
     `csw-config-api`,
-    `csw-commons` % "compile->compile;test->test"
+    `csw-commons` % "compile->compile;test->test",
+    `csw-cluster-seed` % "test->multi-jvm"
   )
   .enablePlugins(DeployApp, MaybeCoverage)
   .settings(
@@ -230,7 +232,7 @@ lazy val `csw-framework` = project
     `csw-event-api`,
     `csw-event-client`,
     `csw-alarm-client`,
-    `csw-cluster-seed` % "test->multi-jvm",
+    `csw-cluster-seed`  % "test->multi-jvm",
     `csw-event-client`  % "test->test",
     `csw-location`      % "compile->compile;multi-jvm->multi-jvm",
     `csw-config-server` % "multi-jvm->test",
@@ -253,6 +255,7 @@ lazy val `csw-event-client` = project
     `romaine`,
     `csw-location-api`,
     `csw-location` % "test->compile;multi-jvm->multi-jvm",
+    `csw-cluster-seed` % "test->multi-jvm",
     `csw-commons`  % "test->test"
   )
   .enablePlugins(PublishBintray, AutoMultiJvm, GenJavadocPlugin, MaybeCoverage)
@@ -287,6 +290,7 @@ lazy val `csw-alarm-client` = project
     `csw-location-api`,
     `csw-logging`,
     `romaine`,
+    `csw-cluster-seed` % "test->multi-jvm",
     `csw-logging` % "test->test",
     `csw-commons`  % "test->test",
     `csw-location` % "test->compile"
@@ -321,8 +325,9 @@ lazy val `csw-benchmark` = project
   .dependsOn(
     `csw-logging`,
     `csw-params-jvm`,
+    `csw-command`,
     `csw-framework` % "compile->compile;test->test",
-    `csw-command`
+    `csw-cluster-seed` % "compile->multi-jvm"
   )
   .enablePlugins(NoPublish, JmhPlugin)
   .disablePlugins(BintrayPlugin)
@@ -332,7 +337,12 @@ lazy val `csw-benchmark` = project
 
 //Integration test project
 lazy val integration = project
-  .dependsOn(`csw-location`, `csw-command`, `csw-location-agent`)
+  .dependsOn(
+    `csw-location`,
+    `csw-command`,
+    `csw-location-agent`,
+    `csw-cluster-seed` % "compile->multi-jvm"
+  )
   .enablePlugins(DeployApp)
   .settings(
     libraryDependencies ++= Dependencies.Integration.value

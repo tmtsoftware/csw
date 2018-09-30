@@ -1,14 +1,11 @@
 package csw.config.cli
 
 import akka.actor.ActorSystem
-import csw.location.api.scaladsl.LocationService
 import csw.config.api.scaladsl.ConfigService
 import csw.config.client.internal.ActorRuntime
 import csw.config.client.scaladsl.ConfigClientFactory
-import csw.location.api.commons.ClusterSettings
+import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.commons.CswCluster
-import csw.location.scaladsl.LocationServiceFactory
 
 /**
  * ClientCliWiring lazily joins the akka cluster and starts the app. After joining the cluster, it first resolves the location
@@ -19,7 +16,7 @@ import csw.location.scaladsl.LocationServiceFactory
  */
 private[config] class ClientCliWiring(actorSystem: ActorSystem) {
   lazy val actorRuntime                     = new ActorRuntime(actorSystem)
-  lazy val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient(actorSystem, actorRuntime.mat)
+  lazy val locationService: LocationService = HttpLocationServiceFactory.makeRemoteClient(actorSystem, actorRuntime.mat)
   lazy val configService: ConfigService     = ConfigClientFactory.adminApi(actorRuntime.actorSystem, locationService)
   lazy val printLine: Any ⇒ Unit            = println
   lazy val commandLineRunner                = new CommandLineRunner(configService, actorRuntime, printLine)
@@ -27,7 +24,9 @@ private[config] class ClientCliWiring(actorSystem: ActorSystem) {
 }
 
 private[config] object ClientCliWiring {
-  def noPrinting(_clusterSettings: ClusterSettings): ClientCliWiring = new ClientCliWiring(_clusterSettings.system) {
-    override lazy val printLine: Any ⇒ Unit = _ ⇒ ()
-  }
+  def noPrinting(_actorSystem: ActorSystem, _locationService: LocationService): ClientCliWiring =
+    new ClientCliWiring(_actorSystem) {
+      override lazy val locationService: LocationService = _locationService
+      override lazy val printLine: Any ⇒ Unit            = _ ⇒ ()
+    }
 }

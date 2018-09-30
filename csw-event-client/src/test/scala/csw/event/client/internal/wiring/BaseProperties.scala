@@ -6,15 +6,15 @@ import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Materializer}
 import akka.{actor, Done}
-import csw.location.api.scaladsl.LocationService
+import com.typesafe.config.{Config, ConfigFactory}
 import csw.event.api.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
 import csw.event.api.scaladsl.{EventPublisher, EventService, EventSubscriber}
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.event.client.internal.commons.serviceresolver.EventServiceLocationResolver
 import csw.event.client.internal.commons.{EventServiceConnection, EventStreamSupervisionStrategy}
-import csw.location.api.commons.ClusterAwareSettings
 import csw.location.api.models.TcpRegistration
-import csw.location.scaladsl.LocationServiceFactory
+import csw.location.api.scaladsl.LocationService
+import csw.location.client.scaladsl.HttpLocationServiceFactory
 
 import scala.async.Async._
 import scala.concurrent.{ExecutionContext, Future}
@@ -45,11 +45,17 @@ trait BaseProperties {
 }
 
 object BaseProperties {
-  def createInfra(seedPort: Int, serverPort: Int): (actor.ActorSystem, LocationService) = {
-    val system          = ClusterAwareSettings.onPort(seedPort).system
-    val locationService = LocationServiceFactory.withSystem(system)
+  def createInfra(serverPort: Int, httpPort: Int): (LocationService, actor.ActorSystem) = {
+
+    val httpPortConfig                     = ConfigFactory.parseString("csw-cluster-seed.http-location-port=" + httpPort)
+    val config: Config                     = ConfigFactory.load(httpPortConfig.withFallback(ConfigFactory.load()))
+    implicit val system: actor.ActorSystem = actor.ActorSystem("event-server", config)
+    implicit val mat: ActorMaterializer    = ActorMaterializer()
+
+    val locationService = HttpLocationServiceFactory.makeLocalClient
     val tcpRegistration = TcpRegistration(EventServiceConnection.value, serverPort)
+
     locationService.register(tcpRegistration).await
-    (system, locationService)
+    (locationService, system)
   }
 }

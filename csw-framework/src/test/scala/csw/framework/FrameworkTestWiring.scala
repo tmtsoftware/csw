@@ -6,14 +6,12 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.{ActorMaterializer, Materializer}
 import csw.commons.redis.EmbeddedRedis
 import csw.commons.utils.SocketUtils
-import csw.location.api.models.Connection.TcpConnection
-import csw.location.api.scaladsl.LocationService
 import csw.event.client.helpers.TestFutureExt.RichFuture
-import csw.location.api.commons.ClusterSettings
+import csw.location.api.models.Connection.TcpConnection
 import csw.location.api.models.{RegistrationResult, TcpRegistration}
+import csw.location.api.scaladsl.LocationService
 import csw.location.client.ActorSystemFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.scaladsl.LocationServiceFactory
 import redis.embedded.{RedisSentinel, RedisServer}
 
 class FrameworkTestWiring(val seedPort: Int = SocketUtils.getFreePort) extends EmbeddedRedis {

@@ -28,5 +28,16 @@ private[clusterseed] object AdminWiring {
         override val clusterPort: Int = maybeClusterPort.getOrElse(super.clusterPort)
       }
     }
+
+  def make(maybeClusterPort: Option[Int], mayBeHttpPort: Option[Int]): AdminWiring =
+    new AdminWiring {
+
+      override lazy val settings: Settings = {
+        new Settings(config) {
+          override val clusterPort: Int      = maybeClusterPort.getOrElse(super.clusterPort)
+          override val httpLocationPort: Int = mayBeHttpPort.getOrElse(super.httpLocationPort)
+        }
+      }
+    }
 }
 // $COVERAGE-ON$

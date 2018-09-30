@@ -2,6 +2,7 @@ package csw.alarm
 import akka.Done
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.{typed, ActorSystem}
+import akka.stream.ActorMaterializer
 import com.typesafe.config._
 import csw.alarm.api.javadsl.IAlarmService
 import csw.alarm.api.models.AlarmSeverity.Okay
@@ -9,8 +10,8 @@ import csw.alarm.api.models.Key.AlarmKey
 import csw.alarm.api.models.{AlarmHealth, AlarmMetadata, AlarmStatus, FullAlarmSeverity}
 import csw.alarm.api.scaladsl.{AlarmAdminService, AlarmService}
 import csw.alarm.client.AlarmServiceFactory
-import csw.location.javadsl.JLocationServiceFactory
-import csw.location.scaladsl.LocationServiceFactory
+import csw.location.client.javadsl.JHttpLocationServiceFactory
+import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.params.core.models.Subsystem.NFIRAOS
 
 import scala.async.Async._
@@ -20,8 +21,9 @@ object AlarmServiceClientExampleApp {
 
   implicit val actorSystem: ActorSystem = ActorSystem()
   implicit val ec: ExecutionContext     = actorSystem.dispatcher
-  private val locationService           = LocationServiceFactory.withSystem(actorSystem)
-  private val jlocationService          = JLocationServiceFactory.withSystem(actorSystem)
+  implicit val mat: ActorMaterializer   = ActorMaterializer()
+  private val locationService           = HttpLocationServiceFactory.makeLocalClient
+  private val jLocationService          = JHttpLocationServiceFactory.makeLocalClient(actorSystem, mat)
 
   private def behaviour[T]: Behaviors.Receive[T] = Behaviors.receive { (ctx, msg) ⇒
     println(msg)
@@ -50,7 +52,7 @@ object AlarmServiceClientExampleApp {
   private val jclientAPI1 = new AlarmServiceFactory().jMakeClientApi("localhost", 5227, actorSystem)
 
   // create alarm client using location service
-  private val jclientAPI2 = new AlarmServiceFactory().jMakeClientApi(jlocationService, actorSystem)
+  private val jclientAPI2 = new AlarmServiceFactory().jMakeClientApi(jLocationService, actorSystem)
   //#create-java-api
 
   val alarmKey = AlarmKey(NFIRAOS, "trombone", "tromboneAxisLowLimitAlarm")

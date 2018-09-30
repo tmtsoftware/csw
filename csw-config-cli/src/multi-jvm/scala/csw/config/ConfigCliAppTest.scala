@@ -2,16 +2,18 @@ package csw.config
 
 import java.nio.file.{Files, Paths}
 
+import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
 import csw.clusterseed.client.HTTPLocationService
 import csw.config.api.models.ConfigData
+import csw.config.cli.ClientCliWiring
 import csw.config.client.internal.ActorRuntime
 import csw.config.client.scaladsl.ConfigClientFactory
+import csw.config.helpers.TwoClientsAndServer
 import csw.config.server.commons.TestFileUtils
 import csw.config.server.{ServerWiring, Settings}
-import csw.config.cli.ClientCliWiring
-import csw.config.helpers.TwoClientsAndServer
-import csw.location.api.commons.ClusterAwareSettings
+import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.helpers.LSNodeSpec
 import org.scalatest.FunSuiteLike
 
@@ -60,8 +62,10 @@ class ConfigCliAppTest(ignore: Int)
     // config client command line app is exercised on client1
     runOn(client1) {
       enterBarrier("server-started")
+      implicit val system: ActorSystem    = ActorSystem()
+      implicit val mat: ActorMaterializer = ActorMaterializer()
 
-      def cliApp() = ClientCliWiring.noPrinting(ClusterAwareSettings.joinLocal(3552)).cliApp
+      def cliApp() = ClientCliWiring.noPrinting(system, HttpLocationServiceFactory.makeLocalClient).cliApp
 
       cliApp().start("csw-config-cli", Array("create", repoPath1, "-i", inputFilePath, "-c", comment))
       enterBarrier("client1-create")

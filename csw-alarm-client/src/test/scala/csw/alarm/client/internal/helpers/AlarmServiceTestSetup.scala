@@ -42,7 +42,7 @@ class AlarmServiceTestSetup
   private val resolver    = new AlarmServiceHostPortResolver(hostname, sentinelPort)
   private val redisClient = RedisClient.create()
 
-  implicit val actorSystem: ActorSystem               = ActorSystemFactory.remote()
+  implicit val actorSystem: ActorSystem               = ActorSystem("alarm-server")
   implicit val ec: ExecutionContext                   = actorSystem.dispatcher
   implicit val typedActorSystem: typed.ActorSystem[_] = actorSystem.toTyped
   implicit val mat: ActorMaterializer                 = ActorMaterializer()

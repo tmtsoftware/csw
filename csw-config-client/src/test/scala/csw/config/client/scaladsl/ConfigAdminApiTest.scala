@@ -3,6 +3,7 @@ package csw.config.client.scaladsl
 import java.nio.file.Paths
 
 import akka.actor.CoordinatedShutdown.UnknownReason
+import csw.clusterseed.client.HTTPLocationService
 import csw.commons.tagobjects.FileSystemSensitive
 import csw.config.api.exceptions.InvalidInput
 import csw.config.api.models.{ConfigData, FileType}
@@ -11,32 +12,29 @@ import csw.config.client.internal.ActorRuntime
 import csw.config.server.commons.TestFutureExtension.RichFuture
 import csw.config.server.files.Sha1
 import csw.config.server.{ConfigServiceTest, ServerWiring}
-import csw.location.api.commons.ClusterAwareSettings
-import csw.location.scaladsl.LocationServiceFactory
+import csw.location.client.scaladsl.HttpLocationServiceFactory
 
 // DEOPSCSW-138: Split Config API into Admin API and Client API
 // DEOPSCSW-80: HTTP based access for configuration file
-class ConfigAdminApiTest extends ConfigServiceTest {
-
-  private val clientLocationService = LocationServiceFactory.withSettings(ClusterAwareSettings.onPort(3556))
-
-  private val serverWiring = ServerWiring.make(ClusterAwareSettings.joinLocal(3556))
-  private val httpService  = serverWiring.httpService
+class ConfigAdminApiTest extends ConfigServiceTest with HTTPLocationService {
 
   private val actorRuntime = new ActorRuntime()
   import actorRuntime._
 
+  private val clientLocationService = HttpLocationServiceFactory.makeLocalClient
+  private val serverWiring          = new ServerWiring()
+  private val httpService           = serverWiring.httpService
+
   override val configService: ConfigService = ConfigClientFactory.adminApi(actorSystem, clientLocationService)
 
-  override protected def beforeAll(): Unit = {
+  override def beforeAll(): Unit = {
     super.beforeAll()
     httpService.registeredLazyBinding.await
   }
 
-  override protected def afterAll(): Unit = {
+  override def afterAll(): Unit = {
     actorSystem.terminate().await
     httpService.shutdown(UnknownReason).await
-    clientLocationService.shutdown(UnknownReason).await
     super.afterAll()
   }
 

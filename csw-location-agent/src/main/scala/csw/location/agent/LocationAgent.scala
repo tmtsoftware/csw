@@ -3,18 +3,18 @@ package csw.location.agent
 import akka.Done
 import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.{ActorSystem, CoordinatedShutdown}
+import akka.stream.ActorMaterializer
 import csw.location.agent.commons.CoordinatedShutdownReasons.{FailureReason, ProcessTerminated}
 import csw.location.agent.commons.LocationAgentLogger
 import csw.location.agent.models.Command
 import csw.location.api.models.Connection.TcpConnection
 import csw.location.api.models.{ComponentId, ComponentType, RegistrationResult, TcpRegistration}
-import csw.location.commons.CswCluster
-import csw.location.scaladsl.LocationServiceFactory
+import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.logging.scaladsl.Logger
 
 import scala.collection.immutable.Seq
 import scala.concurrent.duration.DurationDouble
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.sys.process._
 import scala.util.control.NonFatal
 
@@ -24,9 +24,11 @@ import scala.util.control.NonFatal
 class LocationAgent(names: List[String], command: Command, actorSystem: ActorSystem) {
   private val log: Logger = LocationAgentLogger.getLogger
 
-  private val cswCluster      = CswCluster.withSystem(actorSystem)
-  private val locationService = LocationServiceFactory.withCluster(cswCluster)
-  import cswCluster._
+  implicit val mat: ActorMaterializer          = ActorMaterializer()(actorSystem)
+  implicit val ec: ExecutionContext            = actorSystem.dispatcher
+  val coordinatedShutdown: CoordinatedShutdown = CoordinatedShutdown(actorSystem)
+
+  private val locationService = HttpLocationServiceFactory.makeLocalClient(actorSystem, mat)
 
   // registers provided list of service names with location service
   // and starts a external program in child process using provided command
@@ -79,5 +81,5 @@ class LocationAgent(names: List[String], command: Command, actorSystem: ActorSys
     }
   }
 
-  private def shutdown(reason: Reason) = Await.result(cswCluster.shutdown(reason), 10.seconds)
+  private def shutdown(reason: Reason) = Await.result(coordinatedShutdown.run(reason), 10.seconds)
 }

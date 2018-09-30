@@ -5,7 +5,9 @@ import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.scaladsl.adapter._
 import akka.actor.{typed, ActorSystem, Props, Scheduler}
+import akka.stream.ActorMaterializer
 import akka.util.Timeout
+import csw.clusterseed.client.HTTPLocationService
 import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.messages.CommandMessage.Submit
 import csw.integtration.apps.TromboneHCD
@@ -15,24 +17,24 @@ import csw.location.api.exceptions.OtherLocationIsRegistered
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection}
 import csw.location.api.models._
 import csw.location.api.scaladsl.LocationService
-import csw.location.scaladsl.LocationServiceFactory
+import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.params.commands.{CommandName, Setup}
 import csw.params.core.models.Prefix
-import org.scalatest._
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
 
-class LocationServiceIntegrationTest extends FunSuite with Matchers with BeforeAndAfter with BeforeAndAfterAll {
+class LocationServiceIntegrationTest extends HTTPLocationService {
 
   implicit val actorSystem: ActorSystem                = ClusterAwareSettings.system
-  val locationService: LocationService                 = LocationServiceFactory.withSystem(actorSystem)
+  implicit private val mat: ActorMaterializer          = ActorMaterializer()
+  val locationService: LocationService                 = HttpLocationServiceFactory.makeLocalClient
   implicit val typedSystem: typed.ActorSystem[Nothing] = actorSystem.toTyped
   implicit val sched: Scheduler                        = actorSystem.scheduler
   implicit val timeout: Timeout                        = Timeout(5.seconds)
   implicit val testKitSettings: TestKitSettings        = TestKitSettings(typedSystem)
 
-  override protected def afterAll(): Unit =
+  override def afterAll(): Unit =
     Await.result(locationService.shutdown(UnknownReason), 5.seconds)
 
   test("should not allow duplicate akka registration") {

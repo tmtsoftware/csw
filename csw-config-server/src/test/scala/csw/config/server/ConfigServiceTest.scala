@@ -30,14 +30,11 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
   def configService: ConfigService
 
-  override protected def beforeEach(): Unit =
-    serverWiring.svnRepo.initSvnRepo()
+  override protected def beforeEach(): Unit = serverWiring.svnRepo.initSvnRepo()
 
-  override protected def afterEach(): Unit =
-    testFileUtils.deleteServerFiles()
+  override protected def afterEach(): Unit = testFileUtils.deleteServerFiles()
 
-  override protected def afterAll(): Unit =
-    actorSystem.terminate().await
+  override protected def afterAll(): Unit = actorSystem.terminate().await
 
   val configValue1: String =
     """

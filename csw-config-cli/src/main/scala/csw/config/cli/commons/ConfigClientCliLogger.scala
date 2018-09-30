@@ -1,4 +1,4 @@
-package csw.config.cli
+package csw.config.cli.commons
 
 import csw.logging.scaladsl.LoggerFactory
 

@@ -9,7 +9,7 @@ import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaRegistration, ComponentId, ComponentType, RegistrationResult}
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.ActorSystemFactory
-import csw.location.scaladsl.LocationServiceFactory
+import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.logging.scaladsl.{Logger, LoggerFactory, LoggingSystemFactory}
 import csw.params.core.models.Prefix
 
@@ -20,9 +20,9 @@ import scala.concurrent.{Await, Future}
  * An example that shows how to register a component actor with the location service.
  */
 object LocationServiceExampleComponentApp extends App {
-  private val locationService         = LocationServiceFactory.make()
   implicit val system: ActorSystem    = ActorSystemFactory.remote()
   implicit val mat: ActorMaterializer = ActorMaterializer()
+  private val locationService         = HttpLocationServiceFactory.makeLocalClient
 
   //#create-logging-system
   private val host = InetAddress.getLocalHost.getHostName
