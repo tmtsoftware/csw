@@ -30,11 +30,10 @@ class CommandResponseTest extends FunSuite with Matchers with ScalaFutures with 
 
     val source: Source[SubmitResponse, NotUsed] =
       Source(List(commandResponseSuccess1, commandResponseSuccess2, commandResponseFailure)).flatMapMerge(10, Source.fromFuture)
-    /*
+
     whenReady(CommandResponseAggregator.aggregateResponse(source)) { result ⇒
       result shouldBe a[commands.CommandResponse.Error]
     }
-    */
   }
 
   test(
@@ -48,10 +47,8 @@ class CommandResponseTest extends FunSuite with Matchers with ScalaFutures with 
       Source(List(commandResponseSuccess1, commandResponseSuccess2, commandResponseSuccess3))
         .flatMapMerge(10, Source.fromFuture)
 
-/*
     whenReady(CommandResponseAggregator.aggregateResponse(source)) { result ⇒
       result shouldBe a[commands.CommandResponse.Completed]
     }
-*/
   }
 }
