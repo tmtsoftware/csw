@@ -2,7 +2,7 @@ package csw.framework.internal.component
 
 import akka.actor.typed.scaladsl.{ActorContext, MutableBehavior}
 import akka.actor.typed.{ActorRef, Behavior, PostStop, Signal}
-import csw.command.messages.CommandMessage.{Oneway, Submit}
+import csw.command.messages.CommandMessage.{Oneway, Submit, Validate}
 import csw.command.messages.CommandResponseManagerMessage.AddOrUpdateCommand
 import csw.command.messages.FromComponentLifecycleMessage.Running
 import csw.command.messages.RunningMessage.Lifecycle
@@ -169,6 +169,9 @@ private[framework] final class ComponentBehavior(
     log.info(s"Invoking lifecycle handler's validateSubmit hook with msg :[$commandMessage]")
 
     commandMessage match {
+      case vo: Validate =>
+        // This just returns the response of the validate handler
+        vo.replyTo ! lifecycleHandlers.validateCommand(commandMessage.command)
       case ow: Oneway ⇒ //Oneway command should not be added to CommandResponseManager
         val validationResponse = lifecycleHandlers.validateCommand(commandMessage.command)
         if (validationResponse == Accepted(commandMessage.command.runId)) {

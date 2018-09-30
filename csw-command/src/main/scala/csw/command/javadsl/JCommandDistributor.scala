@@ -7,7 +7,6 @@ import akka.stream.Materializer
 import akka.util.Timeout
 import csw.params.commands.ControlCommand
 
-
 /**
  * Helper class for Java to get the handle of [[csw.command.scaladsl.CommandDistributor]]
  *

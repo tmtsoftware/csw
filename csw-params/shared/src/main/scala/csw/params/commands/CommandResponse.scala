@@ -1,8 +1,7 @@
 package csw.params.commands
 
-import csw.params.TMTSerializable
 import csw.params.core.models.Id
-
+import csw.serializable.TMTSerializable
 
 /**
  * The nature of CommandResponse as an intermediate response of command execution or a final response which could be
@@ -24,18 +23,20 @@ object CommandResponse {
 
   sealed trait ValidationResponse extends Response
 
+  sealed trait ValidateOnlyResponse extends Response
+
   sealed trait OnewayResponse extends Response
 
   /**
-    * SubmitResponse can be Invalid, Started, Completed, CompletedWithResult, Error, Cancelled, Locked
-    * @param runId
-    */
+   * SubmitResponse can be Invalid, Started, Completed, CompletedWithResult, Error, Cancelled, Locked
+   *
+   * @param runId
+   */
   sealed trait SubmitResponse extends QueryResponse
 
   sealed trait MatchingResponse extends Response
 
-  case class Accepted(runId: Id) extends ValidationResponse with OnewayResponse
-
+  case class Accepted(runId: Id) extends ValidationResponse with ValidateOnlyResponse with OnewayResponse
 
   case class Started(runId: Id) extends SubmitResponse
 
@@ -45,6 +46,7 @@ object CommandResponse {
 
   case class Invalid(runId: Id, issue: CommandIssue)
       extends ValidationResponse
+      with ValidateOnlyResponse
       with OnewayResponse
       with SubmitResponse
       with MatchingResponse
@@ -53,14 +55,14 @@ object CommandResponse {
 
   case class Cancelled(runId: Id) extends SubmitResponse
 
-  case class Locked(runId: Id) extends OnewayResponse with SubmitResponse with MatchingResponse
+  case class Locked(runId: Id) extends ValidateOnlyResponse with OnewayResponse with SubmitResponse with MatchingResponse
 
   case class CommandNotAvailable(runId: Id) extends QueryResponse
 
   /**
    * Transform a given CommandResponse to a response with the provided Id
    *
-   * @param id the RunId for the new CommandResponse
+   * @param id       the RunId for the new CommandResponse
    * @param response the CommandResponse to be transformed
    * @return a CommandResponse that has runId as provided id
    */
@@ -91,7 +93,7 @@ object CommandResponse {
     case _          => false
   }
 
-  /**
+  /*
    * Creates an aggregated response from a collection of CommandResponses received from other components. If one of the
    * CommandResponses fail, the aggregated response fails and further processing of any more CommandResponse is terminated.
    *
@@ -111,5 +113,5 @@ object CommandResponse {
         case Failure(ex) ⇒ Success(Error(Id(), s"${ex.getMessage}"))
       }
   }
-*/
+ */
 }

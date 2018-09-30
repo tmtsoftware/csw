@@ -5,14 +5,13 @@ import akka.actor.typed.ActorRef
 import csw.command.models.framework.PubSub.SubscriberMessage
 import csw.command.models.framework._
 import csw.command.models.{CommandCorrelation, CommandResponseManagerState}
-import csw.location.api.models.TrackingEvent
 import csw.logging.internal.LoggingLevels.Level
 import csw.logging.models.LogMetadata
-import csw.params.commands.{CommandResponse, ControlCommand}
+import csw.params.commands.ControlCommand
 import csw.params.core.models.{Id, Prefix}
 import csw.params.core.states.CurrentState
 import csw.location.api.models.TrackingEvent
-import csw.params.commands.CommandResponse.{OnewayResponse, QueryResponse, SubmitResponse}
+import csw.params.commands.CommandResponse.{OnewayResponse, QueryResponse, SubmitResponse, ValidationResponse}
 import csw.serializable.TMTSerializable
 
 import scala.concurrent.duration.FiniteDuration
@@ -66,6 +65,14 @@ object CommandMessage {
    * @param replyTo represents the actor that will receive the command response
    */
   case class Oneway(command: ControlCommand, replyTo: ActorRef[OnewayResponse]) extends CommandMessage
+
+  /**
+   * Represents a validate only kind of message that carries command to other component
+   *
+   * @param command represents a command sent to other component
+   * @param replyTo represents the actor that will receive the command response
+   */
+  case class Validate(command: ControlCommand, replyTo: ActorRef[ValidationResponse]) extends CommandMessage
 }
 
 private[csw] case class LockTimedout(replyTo: ActorRef[LockingResponse])       extends SupervisorMessage

@@ -22,6 +22,8 @@ import csw.location.api.scaladsl.LocationService
 import csw.location.scaladsl.RegistrationFactory
 import csw.logging.scaladsl.{Logger, LoggerFactory}
 import csw.params.commands.CommandResponse.SubmitResponse
+import csw.params.core.models.{Id, Prefix}
+import csw.params.core.states.CurrentState
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{when, _}
 import org.scalatest.mockito.MockitoSugar

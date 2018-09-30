@@ -10,7 +10,7 @@ import csw.command.messages.CommandResponseManagerMessage.AddOrUpdateCommand
 import csw.command.messages.RunningMessage.Lifecycle
 import csw.command.messages.TopLevelActorIdleMessage.Initialize
 import csw.params.commands.CommandResponse._
-import csw.params.commands.{CommandName, CommandResponse, Observe, Setup}
+import csw.params.commands.{CommandName, Observe, Setup}
 import csw.command.models.framework.ToComponentLifecycleMessages._
 import csw.location.api.scaladsl.LocationService
 import csw.params.core.generics.KeyType

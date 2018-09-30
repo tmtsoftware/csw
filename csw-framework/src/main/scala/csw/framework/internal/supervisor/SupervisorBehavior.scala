@@ -8,7 +8,11 @@ import akka.actor.typed.scaladsl.{ActorContext, Behaviors, MutableBehavior, Time
 import akka.actor.typed.{ActorRef, Behavior, PostStop, Signal, SupervisorStrategy, Terminated}
 import csw.command.messages.CommandMessage.{Oneway, Submit}
 import csw.command.messages.CommandResponseManagerMessage.{Query, Subscribe, Unsubscribe}
-import csw.command.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
+import csw.command.messages.ComponentCommonMessage.{
+  ComponentStateSubscription,
+  GetSupervisorLifecycleState,
+  LifecycleStateSubscription
+}
 import csw.command.messages.FromComponentLifecycleMessage.Running
 import csw.command.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.command.messages.RunningMessage.Lifecycle

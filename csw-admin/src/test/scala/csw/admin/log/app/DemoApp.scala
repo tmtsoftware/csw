@@ -8,7 +8,7 @@ import com.typesafe.config.ConfigFactory
 import csw.admin.internal.AdminWiring
 import csw.common.FrameworkAssertions.assertThatContainerIsRunning
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
-import csw.params.commands.{CommandName, CommandResponse, Setup}
+import csw.params.commands.{CommandName, Setup}
 import csw.command.models.framework.{Component, Components, ContainerLifecycleState}
 import csw.params.core.models.Prefix
 import csw.command.messages.CommandMessage.Oneway

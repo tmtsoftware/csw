@@ -4,6 +4,7 @@ import akka.NotUsed
 import akka.stream.Materializer
 import akka.stream.scaladsl.Source
 import csw.params.commands.CommandResponse
+import csw.params.commands.CommandResponse.SubmitResponse
 import csw.params.core.models.Id
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -18,13 +19,12 @@ object CommandResponseAggregator {
    * @param commandResponses a stream of CommandResponses
    * @return a future of aggregated response
    */
-  /*
   def aggregateResponse(
-      commandResponses: Source[CommandResponse, NotUsed]
-  )(implicit ec: ExecutionContext, mat: Materializer): Future[CommandResponse] = {
+      commandResponses: Source[SubmitResponse, NotUsed]
+  )(implicit ec: ExecutionContext, mat: Materializer): Future[SubmitResponse] = {
     commandResponses
       .runForeach { x ⇒
-        if (x.resultType == CommandResultType.Negative)
+        if (CommandResponse.isNegative(x))
           throw new RuntimeException(s"Command with runId [${x.runId}] failed with response [$x]")
       }
       .transform {
@@ -32,5 +32,5 @@ object CommandResponseAggregator {
         case Failure(ex) ⇒ Success(CommandResponse.Error(Id(), s"${ex.getMessage}"))
       }
   }
-  */
+
 }

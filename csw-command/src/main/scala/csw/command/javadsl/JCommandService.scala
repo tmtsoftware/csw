@@ -9,12 +9,12 @@ import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
 import csw.command.models.matchers.StateMatcher
-import csw.params.commands.{CommandResponse, ControlCommand}
+import csw.params.commands.ControlCommand
 import csw.location.api.models.AkkaLocation
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
 import csw.command.scaladsl.{CommandService, CurrentStateSubscription}
-import csw.params.commands.CommandResponse.{OnewayResponse, QueryResponse, SubmitResponse}
+import csw.params.commands.CommandResponse.{MatchingResponse, OnewayResponse, QueryResponse, SubmitResponse}
 
 import scala.collection.JavaConverters.iterableAsScalaIterableConverter
 import scala.compat.java8.FunctionConverters.enrichAsScalaFromConsumer
@@ -116,14 +116,11 @@ class JCommandService(akkaLocation: AkkaLocation, actorSystem: ActorSystem[_]) {
    * @param stateMatcher   the StateMatcher implementation for matching received state against a demand state.
    * @return a CommandResponse as a CompletableFuture
    */
-  /**  TODO
-  def onewayAndMatch(
-      controlCommand: ControlCommand,
-      stateMatcher: StateMatcher,
-      timeout: Timeout
-  ): CompletableFuture[CommandResponseBase] =
+  def onewayAndMatch(controlCommand: ControlCommand,
+                     stateMatcher: StateMatcher,
+                     timeout: Timeout): CompletableFuture[MatchingResponse] =
     sCommandService.onewayAndMatch(controlCommand, stateMatcher)(timeout).toJava.toCompletableFuture
-   */
+
   /**
    * Submit multiple commands and get final CommandResponse for all as a stream of CommandResponse. For long running commands, it will subscribe for the
    * result of those which were successfully validated as `Accepted` and get the final CommandResponse.
@@ -131,7 +128,7 @@ class JCommandService(akkaLocation: AkkaLocation, actorSystem: ActorSystem[_]) {
    * @param controlCommands the [[csw.params.commands.ControlCommand]] payload.
    * @return a Source of CommandResponse as a stream of CommandResponses for all commands
    */
-  /* TODO - REMOVE
+  /*
   def submitAllAndSubscribe(controlCommands: java.util.Set[ControlCommand], timeout: Timeout): Source[SubmitResponse, NotUsed] =
     sCommandService.submitAllAndSubscribe(controlCommands.asScala.toSet)(timeout).asJava
    */
@@ -163,7 +160,7 @@ class JCommandService(akkaLocation: AkkaLocation, actorSystem: ActorSystem[_]) {
   /**
    * Subscribe to the current state of a component corresponding to the [[csw.location.api.models.AkkaLocation]] of the component
    *
-   * @param names subscribe to only those states which have any of the the provided value for name
+   * @param names    subscribe to only those states which have any of the the provided value for name
    * @param callback the action to be applied on the CurrentState element received as a result of subscription
    * @return a CurrentStateSubscription to stop the subscription
    */

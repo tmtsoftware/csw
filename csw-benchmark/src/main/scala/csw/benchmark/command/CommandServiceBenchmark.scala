@@ -11,9 +11,7 @@ import csw.location.api.commons.ClusterAwareSettings
 import csw.params.commands
 import csw.params.commands.CommandName
 import csw.params.core.models.Prefix
-import csw.command.perf.BenchmarkHelpers.spawnStandaloneComponent
 import csw.command.scaladsl.CommandService
-import csw.location.commons.ClusterAwareSettings
 import csw.params.commands.CommandResponse.SubmitResponse
 import org.openjdk.jmh.annotations._
 

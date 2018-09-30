@@ -16,7 +16,11 @@ import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.ObsId
 import csw.params.core.states.{CurrentState, DemandState, StateName}
 import csw.command.messages.CommandMessage.{Oneway, Submit}
-import csw.command.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
+import csw.command.messages.ComponentCommonMessage.{
+  ComponentStateSubscription,
+  GetSupervisorLifecycleState,
+  LifecycleStateSubscription
+}
 import csw.command.messages.ContainerIdleMessage
 import csw.command.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
 import csw.command.messages.RunningMessage.Lifecycle
@@ -191,7 +195,7 @@ class SupervisorModuleTest extends FrameworkTestSuite with BeforeAndAfterEach {
           .check(onewaySetupValidationCurrentState) shouldBe true
         onewayResposeProbe.expectMessage(Accepted(setup.runId))
 
-        // verify that onSetup handler is invoked and that data is transferred
+        // verify that onOneway handler is invoked and that data is transferred
         val onewaySetupCommandCurrentState = compStateProbe.expectMessageType[CurrentState]
         val onewaySetupCommandDemandState =
           DemandState(prefix, StateName("testStateName"), Set(choiceKey.set(oneWayCommandChoice)))

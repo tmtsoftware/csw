@@ -17,7 +17,11 @@ import csw.framework.models.CswContext
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
 import csw.command.messages.CommandMessage.Submit
-import csw.command.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState, LifecycleStateSubscription}
+import csw.command.messages.ComponentCommonMessage.{
+  ComponentStateSubscription,
+  GetSupervisorLifecycleState,
+  LifecycleStateSubscription
+}
 import csw.command.messages.SupervisorContainerCommonMessages.Restart
 import csw.params.commands.{CommandName, ControlCommand, Setup}
 import csw.command.models.framework.{LifecycleStateChanged, PubSub, SupervisorLifecycleState}

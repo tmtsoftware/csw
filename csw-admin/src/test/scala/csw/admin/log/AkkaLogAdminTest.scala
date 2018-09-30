@@ -10,14 +10,16 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpMethods, HttpRequest, StatusCodes, Uri}
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import com.typesafe.config.ConfigFactory
-import csw.clusterseed.admin.http.HttpSupport
-import csw.clusterseed.internal.AdminWiring
-import csw.clusterseed.utils.AdminLogTestSuite
+import csw.admin.internal.AdminWiring
+import csw.admin.log.http.HttpSupport
+import csw.command.messages.CommandMessage.Oneway
+import csw.command.messages.ContainerCommonMessage.GetComponents
+import csw.command.messages.ContainerMessage
+import csw.command.models.framework.{Component, Components, ContainerLifecycleState}
 import csw.common.FrameworkAssertions.assertThatContainerIsRunning
 import csw.commons.tags.LoggingSystemSensitive
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
-import csw.params.commands.{CommandName, CommandResponse, Setup}
-import csw.command.models.framework.{Component, Components, ContainerLifecycleState}
+import csw.location.api.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.location.api.models.ComponentId
 import csw.location.api.models.ComponentType.{Assembly, HCD}
 import csw.location.api.models.Connection.AkkaConnection
@@ -26,6 +28,8 @@ import csw.logging.internal._
 import csw.logging.models.LogMetadata
 import csw.logging.scaladsl.LoggingSystemFactory
 import csw.params.commands.CommandResponse.OnewayResponse
+import csw.params.commands.{CommandName, Setup}
+import csw.params.core.models.Prefix
 import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar
 

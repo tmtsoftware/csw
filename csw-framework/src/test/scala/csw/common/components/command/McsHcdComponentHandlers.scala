@@ -7,7 +7,7 @@ import csw.framework.scaladsl.ComponentHandlers
 import csw.command.messages.CommandResponseManagerMessage.AddOrUpdateCommand
 import csw.command.messages.TopLevelActorMessage
 import csw.params.commands.CommandResponse._
-import csw.params.commands.{CommandResponse, ControlCommand}
+import csw.params.commands.ControlCommand
 import csw.location.api.models.TrackingEvent
 import csw.params.commands.CommandIssue.UnsupportedCommandIssue
 

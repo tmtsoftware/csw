@@ -107,7 +107,6 @@ public class JCommandIntegrationTest {
 
         CompletableFuture<CommandResponse.SubmitResponse> imdResCmdResponseCompletableFuture = hcdCmdService.submit(imdResCommand, timeout);
         CommandResponse.SubmitResponse actualImdCmdResponse = imdResCmdResponseCompletableFuture.get();
-        System.out.println("Actual: " + actualImdCmdResponse);
         Assert.assertTrue(actualImdCmdResponse instanceof CommandResponse.CompletedWithResult);
 
         // immediate response - Invalid
@@ -142,8 +141,8 @@ public class JCommandIntegrationTest {
         hcdCmdService.submit(controlCommand, timeout);
 
         // do some work before querying for the result of above command as needed
+        CompletableFuture<CommandResponse.QueryResponse> queryResponseFuture = hcdCmdService.query(controlCommand.runId(), timeout);
 
-        CompletableFuture<CommandResponse.QueryResponse> queryResponse = hcdCmdService.query(controlCommand.runId(), timeout);
         //#query-response
 
         //#subscribe-for-result
@@ -151,15 +150,17 @@ public class JCommandIntegrationTest {
                 hcdCmdService
                         .submit(controlCommand, timeout)
                         .thenCompose(commandResponse -> {
-                            if (commandResponse instanceof CommandResponse.Started)
+                            if (commandResponse instanceof CommandResponse.Started) {
                                 return hcdCmdService.subscribe(commandResponse.runId(), timeout);
-                            else
-                                return CompletableFuture.completedFuture(new CommandResponse.Error(commandResponse.runId(), "test error"));
+                            } else {
+                                return CompletableFuture.completedFuture(new CommandResponse.Error(commandResponse.runId(), "tests error"));
+                            }
                         });
         //#subscribe-for-result
 
         CommandResponse.Completed expectedCmdResponse = new CommandResponse.Completed(controlCommand.runId());
         CommandResponse.SubmitResponse actualCmdResponse = testCommandResponse.get();
+
         Assert.assertEquals(expectedCmdResponse, actualCmdResponse);
 
         // DEOPSCSW-229: Provide matchers infrastructure for comparison
@@ -177,27 +178,29 @@ public class JCommandIntegrationTest {
 
         // start the matcher so that it is ready to receive state published by the source
         CompletableFuture<MatcherResponse> matcherResponseFuture = matcher.jStart();
-/*  TODO -- FIX???
+
         // submit command and if the command is successfully validated, check for matching of demand state against current state
-        CompletableFuture<Responses.OnewayResponse> commandResponseToBeMatched = hcdCmdService
+        CompletableFuture<CommandResponse.MatchingResponse> commandResponseToBeMatched = hcdCmdService
                 .oneway(setup, timeout)
                 .thenCompose(initialCommandResponse -> {
-                    if (initialCommandResponse instanceof Responses.Accepted) {
+                    if (initialCommandResponse instanceof CommandResponse.Accepted) {
+
                         return matcherResponseFuture.thenApply(matcherResponse -> {
-                            // create appropriate response if demand state was matched from among the published state or otherwise
                             if (matcherResponse.getClass().isAssignableFrom(MatcherResponses.jMatchCompleted().getClass()))
-                                return new Completed(initialCommandResponse.runId());
+                                return new CommandResponse.Completed(initialCommandResponse.runId());
                             else
                                 return new CommandResponse.Error(initialCommandResponse.runId(), "Match not completed");
                         });
+
                     } else {
                         matcher.stop();
-                        return CompletableFuture.completedFuture(initialCommandResponse);
+                        // Need a better error message
+                        return CompletableFuture.completedFuture(new CommandResponse.Error(initialCommandResponse.runId(), "Matcher failed"));
                     }
+
                 });
 
-        CommandResponseBase actualResponse = commandResponseToBeMatched.get();
-*/
+        CommandResponse.MatchingResponse actualResponse = commandResponseToBeMatched.get();
         //#matcher
 
         //#oneway
@@ -240,15 +243,15 @@ public class JCommandIntegrationTest {
 
         // start the matcher so that it is ready to receive state published by the source
         CompletableFuture<MatcherResponse> matcherResponse = matcher1.jStart();
-/* TODO -- NEED TO FIGURE THIS OUT
-        CompletableFuture<SubmitResponse> matchedCommandResponse =
+
+
+        CompletableFuture<CommandResponse.MatchingResponse> matchedCommandResponse =
                 hcdCmdService.onewayAndMatch(setup, stateMatcher, timeout);
 
         //#onewayAndMatch
 
-        Completed expectedResponse = new Completed(setup.runId());
+        CommandResponse.Completed expectedResponse = new CommandResponse.Completed(setup.runId());
         Assert.assertEquals(expectedResponse, actualResponse);
-        */
     }
 
     @Test
@@ -327,6 +330,7 @@ public class JCommandIntegrationTest {
         CompletableFuture<CommandResponse.SubmitResponse> finalResponseCompletableFuture = hcdCmdService.submitAndSubscribe(failureResCommand1, timeout);
         CommandResponse.SubmitResponse actualValidationResponse = finalResponseCompletableFuture.get();
         //#submitAndSubscribe
+        System.out.println("Final: " + actualValidationResponse);
 
         Assert.assertTrue(actualValidationResponse instanceof CommandResponse.Error);
 

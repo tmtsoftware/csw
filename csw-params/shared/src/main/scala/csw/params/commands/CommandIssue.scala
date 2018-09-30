@@ -124,13 +124,6 @@ object CommandIssue {
   final case class RequiredSequencerUnavailableIssue(reason: String) extends CommandIssue
 
   /**
-   * Returned when command received by one component when it is locked by other component
-   *
-   * @param reason describing the cause of this issue
-   */
-  final case class ComponentLockedIssue(reason: String) extends CommandIssue
-
-  /**
    * Returned when some other issue occurred apart from those already defined
    *
    * @param reason describing the cause of this issue
