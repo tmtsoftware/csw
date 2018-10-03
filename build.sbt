@@ -326,8 +326,8 @@ lazy val `csw-benchmark` = project
     `csw-logging`,
     `csw-params-jvm`,
     `csw-command`,
-    `csw-framework` % "compile->compile;test->test",
-    `csw-cluster-seed` % "compile->multi-jvm"
+    `csw-cluster-seed` % "compile->multi-jvm",
+    `csw-framework` % "compile->compile;test->test"
   )
   .enablePlugins(NoPublish, JmhPlugin)
   .disablePlugins(BintrayPlugin)

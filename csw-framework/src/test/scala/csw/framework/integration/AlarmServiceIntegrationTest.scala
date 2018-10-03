@@ -1,6 +1,5 @@
 package csw.framework.integration
 
-import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigFactory}
@@ -40,7 +39,6 @@ class AlarmServiceIntegrationTest extends HTTPLocationService with Matchers {
   }
 
   override def afterAll(): Unit = {
-    wiring.actorRuntime.shutdown(UnknownReason).await
     shutdown()
     stopSentinel(sentinel, server)
     super.afterAll()

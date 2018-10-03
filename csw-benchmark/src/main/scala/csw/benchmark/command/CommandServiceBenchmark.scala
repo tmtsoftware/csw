@@ -11,6 +11,7 @@ import csw.params.commands
 import csw.params.commands.{CommandName, CommandResponse}
 import csw.params.core.models.Prefix
 import org.openjdk.jmh.annotations._
+import csw.clusterseed.client.HTTPLocationService
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt

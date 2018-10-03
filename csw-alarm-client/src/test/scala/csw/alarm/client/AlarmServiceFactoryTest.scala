@@ -1,8 +1,5 @@
 package csw.alarm.client
-import akka.actor.CoordinatedShutdown.UnknownReason
 import com.typesafe.config.ConfigFactory
-import csw.commons.utils.SocketUtils.getFreePort
-import csw.location.api.models.TcpRegistration
 import csw.alarm.api.models.AlarmSeverity.Indeterminate
 import csw.alarm.api.scaladsl.{AlarmAdminService, AlarmService}
 import csw.alarm.client.internal.commons.AlarmServiceConnection
