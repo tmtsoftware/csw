@@ -5,9 +5,9 @@ import csw.alarm.api.scaladsl.{AlarmAdminService, AlarmService}
 import csw.alarm.client.internal.commons.AlarmServiceConnection
 import csw.alarm.client.internal.helpers.AlarmServiceTestSetup
 import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
-import csw.clusterseed.client.HTTPLocationService
 import csw.location.api.models.TcpRegistration
 import csw.location.client.scaladsl.HttpLocationServiceFactory
+import csw.location.http.HTTPLocationService
 
 // DEOPSCSW-481: Component Developer API available to all CSW components
 class AlarmServiceFactoryTest extends AlarmServiceTestSetup with HTTPLocationService {

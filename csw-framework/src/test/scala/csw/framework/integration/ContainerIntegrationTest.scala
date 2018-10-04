@@ -4,7 +4,6 @@ import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.stream.scaladsl.{Keep, Sink}
 import akka.testkit
 import com.typesafe.config.ConfigFactory
-import csw.clusterseed.client.HTTPLocationService
 import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.messages.ComponentCommonMessage.{GetSupervisorLifecycleState, LifecycleStateSubscription}
 import csw.command.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
@@ -23,6 +22,7 @@ import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.location.api.models.ComponentType.{Assembly, HCD}
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{ComponentId, ComponentType, LocationRemoved, TrackingEvent}
+import csw.location.http.HTTPLocationService
 import csw.params.core.states.{CurrentState, StateName}
 import io.lettuce.core.RedisClient
 

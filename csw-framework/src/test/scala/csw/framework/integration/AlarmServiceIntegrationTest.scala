@@ -4,7 +4,6 @@ import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.alarm.client.internal.commons.AlarmServiceConnection
-import csw.clusterseed.client.HTTPLocationService
 import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.models.framework.SupervisorLifecycleState
 import csw.command.scaladsl.CommandService
@@ -16,6 +15,7 @@ import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.location.api.models.ComponentId
 import csw.location.api.models.ComponentType.HCD
 import csw.location.api.models.Connection.AkkaConnection
+import csw.location.http.HTTPLocationService
 import csw.params.commands.Setup
 import org.scalatest.Matchers
 

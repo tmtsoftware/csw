@@ -7,11 +7,11 @@ import akka.http.scaladsl.model.Uri.Path
 import akka.http.scaladsl.model.{HttpRequest, StatusCodes, Uri}
 import akka.stream.{ActorMaterializer, Materializer}
 import com.typesafe.config.ConfigFactory
-import csw.clusterseed.client.HTTPLocationService
 import csw.config.server.commons.TestFutureExtension.RichFuture
 import csw.config.server.commons.{ConfigServiceConnection, TestFileUtils}
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
+import csw.location.http.HTTPLocationService
 import org.tmatesoft.svn.core.SVNException
 
 import scala.concurrent.duration._

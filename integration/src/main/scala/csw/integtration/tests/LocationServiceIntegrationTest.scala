@@ -7,7 +7,6 @@ import akka.actor.typed.scaladsl.adapter._
 import akka.actor.{typed, ActorSystem, Props, Scheduler}
 import akka.stream.ActorMaterializer
 import akka.util.Timeout
-import csw.clusterseed.client.HTTPLocationService
 import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.messages.CommandMessage.Submit
 import csw.integtration.apps.TromboneHCD
@@ -18,6 +17,7 @@ import csw.location.api.models.Connection.{AkkaConnection, HttpConnection}
 import csw.location.api.models._
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
+import csw.location.http.HTTPLocationService
 import csw.params.commands.{CommandName, Setup}
 import csw.params.core.models.Prefix
 

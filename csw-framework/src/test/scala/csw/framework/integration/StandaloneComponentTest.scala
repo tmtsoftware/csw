@@ -6,7 +6,6 @@ import akka.stream.testkit.scaladsl.TestSink
 import com.persist.JsonOps
 import com.persist.JsonOps.JsonObject
 import com.typesafe.config.ConfigFactory
-import csw.clusterseed.client.HTTPLocationService
 import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.messages.SupervisorContainerCommonMessages.Shutdown
 import csw.command.models.framework.SupervisorLifecycleState
@@ -23,6 +22,7 @@ import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.location.api.models.ComponentType.HCD
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{ComponentId, LocationRemoved, LocationUpdated, TrackingEvent}
+import csw.location.http.HTTPLocationService
 import csw.logging.internal.LoggingLevels.INFO
 import csw.logging.internal.LoggingSystem
 import csw.params.core.states.{CurrentState, StateName}

@@ -1,4 +1,4 @@
-package csw.clusterseed.client
+package csw.location.http
 
 import csw.location.TrackLocationTest
 

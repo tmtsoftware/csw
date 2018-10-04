@@ -1,9 +1,9 @@
-package csw.clusterseed.client
+package csw.location.http
 
 import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.http.scaladsl.Http
-import csw.clusterseed.internal.AdminWiring
 import csw.location.commons.TestFutureExtension.RichFuture
+import csw.location.internal.AdminWiring
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuiteLike, Matchers}

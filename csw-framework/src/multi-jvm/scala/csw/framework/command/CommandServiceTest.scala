@@ -8,7 +8,6 @@ import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
-import csw.clusterseed.client.HTTPLocationService
 import csw.command.messages.CommandMessage.Submit
 import csw.common.utils.LockCommandFactory
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
@@ -27,6 +26,7 @@ import csw.params.core.states.{DemandState, StateName}
 import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.scaladsl.CommandService
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
+import csw.location.http.HTTPLocationService
 import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar
 

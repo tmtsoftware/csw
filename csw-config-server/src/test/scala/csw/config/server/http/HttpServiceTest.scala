@@ -3,7 +3,6 @@ package csw.config.server.http
 import akka.actor.ActorSystem
 import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.stream.{ActorMaterializer, BindFailedException}
-import csw.clusterseed.client.HTTPLocationService
 import csw.config.server.ServerWiring
 import csw.config.server.commons.ConfigServiceConnection
 import csw.config.server.commons.TestFutureExtension.RichFuture
@@ -11,6 +10,7 @@ import csw.location.api.commons.ClusterAwareSettings
 import csw.location.api.exceptions.OtherLocationIsRegistered
 import csw.location.api.models.HttpRegistration
 import csw.location.client.scaladsl.HttpLocationServiceFactory
+import csw.location.http.HTTPLocationService
 
 import scala.util.control.NonFatal
 

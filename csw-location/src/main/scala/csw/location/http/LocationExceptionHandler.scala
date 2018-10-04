@@ -1,4 +1,4 @@
-package csw.clusterseed.location
+package csw.location.http
 
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server._

@@ -7,7 +7,7 @@ import akka.actor.typed.internal.adapter.ActorSystemAdapter;
 import akka.stream.ActorMaterializer;
 import akka.util.Timeout;
 import com.typesafe.config.ConfigFactory;
-import csw.clusterseed.client.JHTTPLocationService;
+import csw.location.http.JHTTPLocationService;
 import csw.common.components.framework.SampleComponentState;
 import csw.framework.internal.wiring.FrameworkWiring;
 import csw.framework.internal.wiring.Standalone;

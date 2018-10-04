@@ -4,7 +4,6 @@ import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.testkit.typed.scaladsl.{TestInbox, TestProbe}
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
-import csw.clusterseed.client.HTTPLocationService
 import csw.command.models.framework.ContainerLifecycleState
 import csw.command.scaladsl.CommandService
 import csw.common.FrameworkAssertions.assertThatContainerIsRunning
@@ -17,6 +16,7 @@ import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.location.api.models.ComponentId
 import csw.location.api.models.ComponentType.{Assembly, HCD}
 import csw.location.api.models.Connection.AkkaConnection
+import csw.location.http.HTTPLocationService
 import csw.params.commands
 import csw.params.commands.CommandName
 import csw.params.core.states.{CurrentState, StateName}

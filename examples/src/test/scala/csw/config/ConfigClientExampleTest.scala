@@ -7,7 +7,6 @@ import java.time.Instant
 import akka.actor.ActorSystem
 import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.stream.{ActorMaterializer, Materializer}
-import csw.clusterseed.client.HTTPLocationService
 import csw.config.api.models.{ConfigData, ConfigId, ConfigMetadata, FileType}
 import csw.config.api.scaladsl.{ConfigClientService, ConfigService}
 import csw.config.client.scaladsl.ConfigClientFactory
@@ -15,6 +14,7 @@ import csw.config.server.ServerWiring
 import csw.config.server.commons.TestFileUtils
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
+import csw.location.http.HTTPLocationService
 import org.scalatest._
 
 import scala.async.Async._

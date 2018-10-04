@@ -7,7 +7,6 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
-import csw.clusterseed.client.HTTPLocationService
 import csw.command.messages.CommandMessage.{Oneway, Submit}
 import csw.command.messages.CommandResponseManagerMessage.Subscribe
 import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
@@ -20,6 +19,7 @@ import csw.params.core.models.ObsId
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{ComponentId, ComponentType}
 import csw.location.helpers.{LSNodeSpec, OneMemberAndSeed}
+import csw.location.http.HTTPLocationService
 import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar
 

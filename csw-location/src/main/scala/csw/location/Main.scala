@@ -1,11 +1,12 @@
-package csw.clusterseed
+package csw.location
 
 import akka.Done
 import akka.actor.CoordinatedShutdown
-import csw.clusterseed.internal.AdminWiring
 import csw.clusterseed.cli.{ArgsParser, Options}
-import csw.services.BuildInfo
 import csw.location.api.commons.ClusterAwareSettings
+import csw.location.internal.AdminWiring
+import csw.services.BuildInfo
+
 import scala.concurrent.duration.DurationDouble
 
 /**
@@ -42,4 +43,3 @@ object Main extends App {
       }
   }
 }
-// $COVERAGE-ON$

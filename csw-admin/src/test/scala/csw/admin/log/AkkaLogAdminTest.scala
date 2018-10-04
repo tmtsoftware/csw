@@ -12,7 +12,6 @@ import akka.http.scaladsl.unmarshalling.Unmarshal
 import com.typesafe.config.ConfigFactory
 import csw.admin.internal.AdminWiring
 import csw.admin.log.http.HttpSupport
-import csw.clusterseed.client.HTTPLocationService
 import csw.command.messages.CommandMessage.Oneway
 import csw.command.messages.ContainerCommonMessage.GetComponents
 import csw.command.messages.ContainerMessage
@@ -25,6 +24,7 @@ import csw.location.api.models.ComponentId
 import csw.location.api.models.ComponentType.{Assembly, HCD}
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.client.ActorSystemFactory
+import csw.location.http.HTTPLocationService
 import csw.logging.internal.LoggingLevels.{ERROR, Level, WARN}
 import csw.logging.internal._
 import csw.logging.models.LogMetadata

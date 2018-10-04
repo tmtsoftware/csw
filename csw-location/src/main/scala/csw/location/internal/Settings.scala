@@ -1,4 +1,4 @@
-package csw.clusterseed.internal
+package csw.location.internal
 
 import com.typesafe.config.Config
 

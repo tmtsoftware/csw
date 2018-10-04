@@ -1,3 +1,3 @@
-package csw.clusterseed.location
+package csw.location.http
 
 class QueryFilterException(msg: String) extends RuntimeException(msg)

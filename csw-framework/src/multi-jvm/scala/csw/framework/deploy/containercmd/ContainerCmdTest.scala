@@ -9,7 +9,6 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
-import csw.clusterseed.client.HTTPLocationService
 import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState}
 import csw.command.messages.ContainerCommonMessage.GetComponents
@@ -28,6 +27,7 @@ import csw.config.server.{ServerWiring, Settings}
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{ComponentId, ComponentType}
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
+import csw.location.http.HTTPLocationService
 import csw.params.commands.CommandResponse.Invalid
 import csw.params.commands.{CommandName, Setup}
 import csw.params.core.generics.{KeyType, Parameter}

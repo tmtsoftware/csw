@@ -3,7 +3,7 @@ package csw.config.client.javadsl;
 import akka.actor.ActorSystem;
 import akka.actor.CoordinatedShutdown;
 import akka.stream.Materializer;
-import csw.clusterseed.client.JHTTPLocationService;
+import csw.location.http.JHTTPLocationService;
 import csw.config.api.exceptions.FileAlreadyExists;
 import csw.config.api.exceptions.FileNotFound;
 import csw.config.api.javadsl.IConfigService;

@@ -6,12 +6,12 @@ import java.time.Instant
 import akka.actor.ActorSystem
 import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.stream.ActorMaterializer
-import csw.clusterseed.client.HTTPLocationService
 import csw.config.api.models.ConfigId
 import csw.config.commons.TestFutureExtension.RichFuture
 import csw.config.commons.{ArgsUtil, TestFileUtils}
 import csw.config.server.ServerWiring
 import csw.location.client.scaladsl.HttpLocationServiceFactory
+import csw.location.http.HTTPLocationService
 import org.scalatest.{BeforeAndAfterEach, Matchers}
 
 // DEOPSCSW-112: Command line interface client for Configuration service

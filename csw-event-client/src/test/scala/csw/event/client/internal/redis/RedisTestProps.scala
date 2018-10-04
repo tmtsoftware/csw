@@ -4,7 +4,6 @@ import akka.Done
 import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.{ActorSystem, CoordinatedShutdown}
 import com.typesafe.config.ConfigFactory
-import csw.clusterseed.client.HTTPLocationServiceOnPorts
 import csw.commons.redis.EmbeddedRedis
 import csw.commons.utils.SocketUtils.getFreePort
 import csw.event.api.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
@@ -16,6 +15,7 @@ import csw.event.client.internal.wiring.BaseProperties
 import csw.event.client.internal.wiring.BaseProperties.createInfra
 import csw.event.client.models.EventStores.RedisStore
 import csw.location.api.scaladsl.LocationService
+import csw.location.http.HTTPLocationServiceOnPorts
 import io.lettuce.core.api.async.RedisAsyncCommands
 import io.lettuce.core.codec.StringCodec
 import io.lettuce.core.{ClientOptions, RedisClient, RedisURI}

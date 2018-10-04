@@ -10,13 +10,13 @@ import akka.http.scaladsl.unmarshalling.Unmarshal
 import com.typesafe.config.ConfigFactory
 import csw.admin.internal.AdminWiring
 import csw.admin.log.http.HttpSupport
-import csw.clusterseed.client.HTTPLocationService
 import csw.commons.http.{ErrorMessage, ErrorResponse}
 import csw.config.server.commons.{ConfigServiceConnection, TestFileUtils}
 import csw.config.server.{ServerWiring, Settings}
 import csw.location.api.commons.ClusterAwareSettings
 import csw.location.api.models.Connection.TcpConnection
 import csw.location.api.models.{ComponentId, ComponentType}
+import csw.location.http.HTTPLocationService
 import csw.logging.internal._
 import csw.logging.scaladsl.LoggingSystemFactory
 

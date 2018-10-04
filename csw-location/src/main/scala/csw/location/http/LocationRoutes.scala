@@ -1,4 +1,4 @@
-package csw.clusterseed.location
+package csw.location.http
 
 import akka.NotUsed
 import akka.actor.ActorSystem
@@ -7,11 +7,10 @@ import akka.http.scaladsl.model.sse.ServerSentEvent
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.stream.scaladsl.Source
-import csw.clusterseed.internal.ActorRuntime
-import csw.location.api.models._
 import csw.location.api.formats.LocationJsonSupport
-import csw.location.api.models.Registration
+import csw.location.api.models.{Registration, _}
 import csw.location.api.scaladsl.LocationService
+import csw.location.internal.ActorRuntime
 import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
 import play.api.libs.json.Json
 

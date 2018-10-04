@@ -4,7 +4,6 @@ import akka.actor
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
-import csw.clusterseed.client.HTTPLocationService
 import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.messages.SupervisorContainerCommonMessages.Shutdown
 import csw.command.models.framework.{ContainerLifecycleState, SupervisorLifecycleState}
@@ -18,6 +17,7 @@ import csw.location.api.commons.ClusterSettings
 import csw.location.api.models.ComponentType.{Assembly, HCD}
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{ComponentId, HttpRegistration, TcpRegistration}
+import csw.location.http.HTTPLocationService
 import csw.params.commands
 import csw.params.commands.CommandName
 import csw.params.core.states.{CurrentState, StateName}

@@ -1,7 +1,8 @@
-package csw.clusterseed.cli
+package csw.location.cli
 
 import java.io.ByteArrayOutputStream
 
+import csw.clusterseed.cli.{ArgsParser, Options}
 import org.scalatest.{FunSuite, Matchers}
 
 class ArgsParserTest extends FunSuite with Matchers {

@@ -4,7 +4,6 @@ import java.nio.file.Paths
 
 import akka.actor.ActorSystem
 import com.typesafe.config.ConfigFactory
-import csw.clusterseed.client.HTTPLocationService
 import csw.config.api.models.ConfigData
 import csw.config.client.helpers.OneClientAndServer
 import csw.config.client.internal.ActorRuntime
@@ -12,6 +11,7 @@ import csw.config.client.scaladsl.ConfigClientFactory
 import csw.config.server.commons.TestFileUtils
 import csw.config.server.{ServerWiring, Settings}
 import csw.location.helpers.LSNodeSpec
+import csw.location.http.HTTPLocationService
 
 class ConfigServiceTestMultiJvmNode1 extends ConfigServiceTest(0)
 class ConfigServiceTestMultiJvmNode2 extends ConfigServiceTest(0)

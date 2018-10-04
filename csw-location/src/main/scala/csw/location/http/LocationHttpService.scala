@@ -1,7 +1,7 @@
-package csw.clusterseed.location
+package csw.location.http
 
 import akka.http.scaladsl.Http
-import csw.clusterseed.internal.{ActorRuntime, Settings}
+import csw.location.internal.{ActorRuntime, Settings}
 
 import scala.concurrent.Future
 

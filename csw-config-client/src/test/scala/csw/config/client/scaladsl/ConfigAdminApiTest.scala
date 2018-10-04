@@ -3,7 +3,6 @@ package csw.config.client.scaladsl
 import java.nio.file.Paths
 
 import akka.actor.CoordinatedShutdown.UnknownReason
-import csw.clusterseed.client.HTTPLocationService
 import csw.commons.tagobjects.FileSystemSensitive
 import csw.config.api.exceptions.InvalidInput
 import csw.config.api.models.{ConfigData, FileType}
@@ -13,6 +12,7 @@ import csw.config.server.commons.TestFutureExtension.RichFuture
 import csw.config.server.files.Sha1
 import csw.config.server.{ConfigServiceTest, ServerWiring}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
+import csw.location.http.HTTPLocationService
 
 // DEOPSCSW-138: Split Config API into Admin API and Client API
 // DEOPSCSW-80: HTTP based access for configuration file
