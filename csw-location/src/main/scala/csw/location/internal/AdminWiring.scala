@@ -8,7 +8,7 @@ import csw.location.http.{LocationExceptionHandler, LocationHttpService, Locatio
 import csw.location.scaladsl.LocationServiceFactory
 
 // $COVERAGE-OFF$
-private[location] class AdminWiring {
+private[csw] class AdminWiring {
   lazy val config: Config                   = ConfigFactory.load()
   lazy val settings                         = new Settings(config)
   lazy val clusterSettings: ClusterSettings = ClusterAwareSettings.onPort(settings.clusterPort)
@@ -20,7 +20,7 @@ private[location] class AdminWiring {
   lazy val locationHttpService              = new LocationHttpService(locationRoutes, actorRuntime, settings)
 }
 
-private[location] object AdminWiring {
+private[csw] object AdminWiring {
 
   def make(maybeClusterPort: Option[Int]): AdminWiring =
     new AdminWiring {
@@ -38,6 +38,11 @@ private[location] object AdminWiring {
           override val httpLocationPort: Int = mayBeHttpPort.getOrElse(super.httpLocationPort)
         }
       }
+    }
+
+  def make(_clusterSettings: ClusterSettings): AdminWiring =
+    new AdminWiring {
+      override lazy val clusterSettings: ClusterSettings = _clusterSettings
     }
 }
 // $COVERAGE-ON$

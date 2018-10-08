@@ -316,7 +316,7 @@ lazy val `csw-benchmark` = project
 //Integration test project
 lazy val integration = project
   .dependsOn(
-    `csw-location` % "compile:compile;compile->multi-jvm",
+    `csw-location`,
     `csw-command`,
     `csw-location-agent`
   )

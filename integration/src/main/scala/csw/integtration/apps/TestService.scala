@@ -1,24 +1,28 @@
 package csw.integtration.apps
 
-import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
-import csw.clusterseed.client.HTTPLocationService
+import csw.integtration.common.TestFutureExtension.RichFuture
 import csw.location.api.models.Connection.HttpConnection
 import csw.location.api.models.{ComponentId, ComponentType, HttpRegistration, RegistrationResult}
-import csw.integtration.common.TestFutureExtension.RichFuture
 import csw.location.client.scaladsl.HttpLocationServiceFactory
+import csw.location.internal.AdminWiring
+import csw.logging.scaladsl.LoggingSystemFactory
 
-object TestService extends HTTPLocationService {
+object TestService {
   val componentId = ComponentId("redisservice", ComponentType.Service)
   val connection  = HttpConnection(componentId)
 
   private val Path = "redisservice.org/test"
   private val Port = 9999
 
-  val registration                            = HttpRegistration(connection, Port, Path)
-  implicit private val system: ActorSystem    = ActorSystem()
-  implicit private val mat: ActorMaterializer = ActorMaterializer()
-  val registrationResult: RegistrationResult  = HttpLocationServiceFactory.makeLocalClient.register(registration).await
+  val adminWiring: AdminWiring = AdminWiring.make(Some(3553))
+  LoggingSystemFactory.start("Assembly", "1.0", adminWiring.clusterSettings.hostname, adminWiring.actorSystem)
+
+  adminWiring.locationHttpService.start().await
+
+  import adminWiring.actorRuntime._
+
+  val registration                           = HttpRegistration(connection, Port, Path)
+  val registrationResult: RegistrationResult = HttpLocationServiceFactory.makeLocalClient.register(registration).await
 
   print("Redis Service Registered")
 

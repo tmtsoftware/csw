@@ -17,10 +17,10 @@ docker pull ${sbtImg}
 #3. Start first container and run TromboneHcdApp which acts as a seed
 # cmd line param : -DclusterPort=3552 => This will start app on port 3552 and create a cluster with a single node
 printf "${YELLOW}----------- Starting HCD App -----------${NC}\n"
-docker run -d --name=HCD ${HOST_DIR_MAPPING} ${sbtImg} bash -c 'cd /source/csw && ./target/universal/stage/bin/trombone-hcd -DclusterPort=3552'
+docker run -d --name=HCD ${HOST_DIR_MAPPING} ${sbtImg} bash -c 'cd /source/csw && ./target/universal/stage/bin/trombone-hcd'
 
 #4. Store the ip address and port of first container (HCD App) into variable clusterSeeds
-clusterSeeds="$(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' HCD):3552"
+clusterSeeds="$(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' HCD):3553"
 printf "${PURPLE}----------- Akka Seed Node is : ${clusterSeeds}-----------${NC}\n"
 sleep 5
 

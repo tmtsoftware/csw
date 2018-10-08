@@ -1,6 +1,5 @@
 package csw.integtration.tests
 
-import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.scaladsl.adapter._
@@ -16,26 +15,29 @@ import csw.location.api.exceptions.OtherLocationIsRegistered
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection}
 import csw.location.api.models._
 import csw.location.api.scaladsl.LocationService
+import csw.location.client.ActorSystemFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.http.HTTPLocationService
+import csw.logging.scaladsl.LoggingSystemFactory
 import csw.params.commands.{CommandName, Setup}
 import csw.params.core.models.Prefix
+import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
-import scala.concurrent.Await
 import scala.concurrent.duration.DurationLong
 
-class LocationServiceIntegrationTest extends HTTPLocationService {
+class LocationServiceIntegrationTest extends FunSuite with Matchers with BeforeAndAfterAll with ScalaFutures {
 
-  implicit val actorSystem: ActorSystem                = ClusterAwareSettings.system
+  implicit val actorSystem: ActorSystem = ActorSystemFactory.remote()
+  LoggingSystemFactory.start("Assembly", "1.0", ClusterAwareSettings.hostname, actorSystem)
+
   implicit private val mat: ActorMaterializer          = ActorMaterializer()
-  val locationService: LocationService                 = HttpLocationServiceFactory.makeLocalClient
+  val locationService: LocationService                 = HttpLocationServiceFactory.makeRemoteClient
   implicit val typedSystem: typed.ActorSystem[Nothing] = actorSystem.toTyped
   implicit val sched: Scheduler                        = actorSystem.scheduler
   implicit val timeout: Timeout                        = Timeout(5.seconds)
   implicit val testKitSettings: TestKitSettings        = TestKitSettings(typedSystem)
 
-  override def afterAll(): Unit =
-    Await.result(locationService.shutdown(UnknownReason), 5.seconds)
+  override def afterAll(): Unit = actorSystem.terminate().await
 
   test("should not allow duplicate akka registration") {
     val tromboneHcdActorRef = actorSystem.actorOf(Props[TromboneHCD], "trombone-hcd")
