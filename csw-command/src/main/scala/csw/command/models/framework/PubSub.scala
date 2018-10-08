@@ -20,12 +20,20 @@ object PubSub {
   sealed trait SubscriberMessage[T] extends PubSub[T]
 
   /**
-   * Represents a subscribe action
+   * Represents the subscribe action where all the current state publishing from the particular component can be subscribed to
    *
    * @param ref the reference of subscriber used to notify to when some data is published
    * @tparam T represents the type of data that is subscribed
    */
-  case class Subscribe[T](ref: ActorRef[T])                            extends SubscriberMessage[T]
+  case class Subscribe[T](ref: ActorRef[T]) extends SubscriberMessage[T]
+
+  /**
+   * Represents the subscribe action for current states specified by a set of stateNames
+   *
+   * @param ref the reference of subscriber used to notify to when some data is published
+   * @param names set of stateNames uniquely representating current states for a component
+   * @tparam T represents the type of data that is subscribed
+   */
   case class SubscribeOnly[T](ref: ActorRef[T], names: Set[StateName]) extends SubscriberMessage[T]
 
   /**
