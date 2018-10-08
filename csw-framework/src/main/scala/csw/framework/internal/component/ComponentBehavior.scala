@@ -172,7 +172,8 @@ private[framework] final class ComponentBehavior(
       case vo: Validate =>
         // This just returns the response of the validate handler
         vo.replyTo ! lifecycleHandlers.validateCommand(commandMessage.command)
-      case ow: Oneway ⇒ //Oneway command should not be added to CommandResponseManager
+      case ow: Oneway ⇒
+        //Oneway command should not be added to CommandResponseManager
         val validationResponse = lifecycleHandlers.validateCommand(commandMessage.command)
         if (validationResponse == Accepted(commandMessage.command.runId)) {
           log.info(s"Invoking lifecycle handler's onOneway hook with msg :[$commandMessage]")

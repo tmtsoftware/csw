@@ -83,7 +83,7 @@ class CommandResponseManager private[command] (val commandResponseManagerActor: 
    *
    * @param runId command identifier of command
    * @param callback callback  to take action on the command response received
-   * @return a [[csw.services.command.scaladsl.CommandResponseSubscription]] to unsubscribe the subscription later
+   * @return a [[csw.command.scaladsl.CommandResponseSubscription]] to unsubscribe the subscription later
    */
   def subscribe(runId: Id, callback: SubmitResponse ⇒ Unit): CommandResponseSubscription =
     new CommandResponseSubscription(runId, commandResponseManagerActor, callback)

@@ -5,31 +5,30 @@ import akka.actor.typed.{ActorRef, Behavior}
 import csw.command.messages.CommandResponseManagerMessage
 import csw.command.messages.CommandResponseManagerMessage._
 import csw.command.models.{CommandCorrelation, CommandResponseManagerState}
-import csw.params.commands.CommandResponse.{CommandNotAvailable, SubmitResponse}
 import csw.params.commands.CommandResponse
 import csw.params.core.models.Id
 import csw.logging.scaladsl.{Logger, LoggerFactory}
 
 /**
- * The Behavior of a Command Response Manager, represented as a mutable behavior. This behavior will be created as an actor.
- * There will be one CommandResponseManger for a given component which will provide an interface to interact with the status
- * and result of a submitted command.
+ * The Behavior of a Command Response Manager is represented as a mutable behavior. This behavior will be created as an actor.
+ * There will be one CommandResponseManager for a given component which will provide an interface to interact with the status
+ * and result of a submitted commands.
  *
  * This class defines the behavior of CommandResponseManagerActor and is responsible for adding/updating/querying command result.
  * When component receives command of type Submit, then framework (ComponentBehavior - TLA) will add a entry of this command
- * with the [[csw.messages.commands.CommandResponse.SubmitResponse]] returned into the CommandResponseManager.
+ * with the [[csw.params.commands.CommandResponse.SubmitResponse]] of [[csw.params.commands.CommandResponse.Started]]
+ * stored into the CommandResponseManager.
  *
- * In case of short running or immediate command,
- * submit response will be of type final result which can either positive or negative
- * In case of long running command, a positive validation response will be of type [[csw.messages.commands.CommandResponse.Started]]
- * then it is the responsibility of component writer to update its final command status later on
- * with [[csw.messages.commands.CommandResponse.SubmitResponse]] which will either be a postive or negative response.
+ * In case of short running or immediate command, submit response will be of type final result which can either positive or negative
+ * In case of long running command, a positive validation will result of type [[csw.params.commands.CommandResponse.Started]]
+ * then it is the responsibility of component writer to update the runId of the command with its final command status later on
+ * with a [[csw.params.commands.CommandResponse.SubmitResponse]] which will either be a positive or negative response.
  *
  * CommandResponseManager also provides subscribe API.
- * One of the use case for this is when Assembly splits top level command into two sub commands and forwards them to two different HCD's.
- * In this case, Assembly can register its interest in the final [[csw.messages.commands.CommandResponse.SubmitResponse]]
+ * One of the use cases for this is when Assembly splits a top level command into two sub commands and forwards them to two different HCD's.
+ * In this case, Assembly can register its interest in the final [[csw.params.commands.CommandResponse.SubmitResponse]]
  * from two HCD's when these sub commands completes, using subscribe API. And once Assembly receives final submit response
- * from both the HCD's then it can update Top level command with final [[csw.messages.commands.CommandResponse.SubmitResponse]]
+ * from both the HCD's then it can update Top level command with final [[csw.params.commands.CommandResponse.SubmitResponse]]
  * In this case, Assembly can register its interest in the final [[csw.params.commands.CommandResponse]]
  * from two HCD's when these sub commands completes, using subscribe API. And once Assembly receives final command response
  * from both the HCD's then it can update Top level command with final [[csw.params.commands.CommandResponse]]

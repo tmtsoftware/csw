@@ -1,16 +1,14 @@
 package csw.command.scaladsl
 
-import akka.NotUsed
 import akka.actor.Scheduler
 import akka.actor.typed.scaladsl.AskPattern._
 import akka.actor.typed.scaladsl.adapter._
 import akka.actor.typed.{ActorRef, ActorSystem}
-import akka.stream.scaladsl.Source
+import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
 import csw.command.messages.CommandMessage.{Oneway, Submit}
 import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
-import csw.command.models.CommandResponseAggregator
 import csw.command.models.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
 import csw.command.models.matchers.{Matcher, StateMatcher}
 import csw.command.messages.{CommandResponseManagerMessage, ComponentMessage}
@@ -35,8 +33,6 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
 
   private val component: ActorRef[ComponentMessage] = componentLocation.componentRef
 
-  // private val parallelism = 10
-
   /**
    * Submit a command and get a [[csw.params.commands.CommandResponse]] as a Future. The CommandResponse can be a response
    * of validation (Accepted, Invalid) or a final Response. In case of response as `Accepted`, final CommandResponse
@@ -52,19 +48,21 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
    * Submit multiple commands and get a Source of [[csw.params.commands.CommandResponse]] for all commands. The CommandResponse can be a response
    * of validation (Accepted, Invalid) or a final Response. In case of response as `Accepted`, final CommandResponse can be obtained by using `subscribe` API.
    *
-   * @param controlCommands the set of [[csw.params.commands.ControlCommand]] payloads
+   * @param submitCommands the set of [[csw.params.commands.ControlCommand]] payloads
    * @return a Source of CommandResponse as a stream of CommandResponses for all commands
    */
-  /*
-  def submitAll(controlCommands: Set[ControlCommand])(implicit timeout: Timeout): Source[SubmitResponse, NotUsed] =
-    Source(controlCommands).mapAsyncUnordered(parallelism)(submit)
-   */
-  def submitAll(submitCommands: List[ControlCommand])(implicit timeout: Timeout): Future[SubmitResponse] = {
-    def g(sub: ControlCommand): Future[SubmitResponse] = submit(sub)
-
-    val src: Source[ControlCommand, NotUsed] = Source(submitCommands)
-    src.runForeach(s => println(s))
-    Future(Completed(Id()))
+  def submitAll(submitCommands: List[ControlCommand])(implicit timeout: Timeout): Future[List[SubmitResponse]] = {
+    Source(submitCommands)
+      .mapAsync(1)(submitAndSubscribe)
+      .map { response =>
+        if (isNegative(response))
+          throw new RuntimeException(s"Command failed: $response")
+        else
+          response
+      }
+      .toMat(Sink.seq)(Keep.right)
+      .run()
+      .map(_.toList)
   }
 
   /**
@@ -96,7 +94,8 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
     component ? (CommandResponseManagerMessage.Query(commandRunId, _))
 
   /**
-   * Submit a command and Subscribe for the result if it was successfully validated as `Started` to get a final [[csw.messages.commands.CommandResponse.SubmitResponse]] as a Future
+   * Submit a command and Subscribe for the result if it was successfully validated as `Started` to get a
+   * final [[csw.params.commands.CommandResponse.SubmitResponse]] as a Future
    *
    * @param controlCommand the [[csw.params.commands.ControlCommand]] payload
    * @return a CommandResponse as a Future value
@@ -108,7 +107,8 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
     }
 
   /**
-   * Submit a command and match the published state from the component using a [[csw.command.models.matchers.StateMatcher]]. If the match is successful a `Completed` response is
+   * Submit a command and match the published state from the component using a [[csw.command.models.matchers.StateMatcher]].
+   * If the match is successful a `Completed` response is
    * provided as a future. In case of a failure or unmatched state, `Error` CommandResponse is provided as a Future.
    *
    * @param controlCommand the [[csw.params.commands.ControlCommand]] payload
@@ -135,32 +135,6 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
         Future.successful(in)
     }
   }
-
-  /**
-   * Submit multiple commands and get final CommandResponse for all as a stream of CommandResponse. For long running commands, it will subscribe for the
-   * result of those which were successfully validated as `Accepted` and get the final CommandResponse.
-   *
-   * @param controlCommands the [[csw.params.commands.ControlCommand]] payload
-   * @return a Source of CommandResponse as a stream of CommandResponses for all commands
-   */
-  /*
-  def submitAllAndSubscribe(controlCommands: Set[ControlCommand])(implicit timeout: Timeout): Source[SubmitResponse, NotUsed] =
-    Source(controlCommands).mapAsyncUnordered(parallelism)(submitAndSubscribe)
-   */
-  /**
-   * Submit multiple commands and get final CommandResponse for all as one CommandResponse. If all the commands were successful, a CommandResponse as
-   * [[csw.params.commands.CommandResponse.Completed]] will be returned. If any one of the command fails, an [[csw.params.commands.CommandResponse.Error]]
-   * will be returned. For long running commands, it will subscribe for the result of those which were successfully validated as `Accepted` and get the final CommandResponse.
-   *
-   * @param controlCommands the [[csw.params.commands.ControlCommand]] payload
-   * @return a CommandResponse as a Future value
-   */
-  /*
-  def submitAllAndGetFinalResponse(controlCommands: Set[ControlCommand])(implicit timeout: Timeout): Future[SubmitResponse] = {
-    val value = Source(controlCommands).mapAsyncUnordered(parallelism)(submitAndSubscribe)
-    CommandResponseAggregator.aggregateResponse(value)
-  }
-   */
 
   /**
    * Subscribe to the current state of a component corresponding to the [[csw.location.api.models.AkkaLocation]] of the component

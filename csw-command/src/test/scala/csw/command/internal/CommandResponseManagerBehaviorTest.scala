@@ -43,6 +43,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
     commandCorrelationProbe.expectMessage(CommandCorrelation(Map.empty[Id, Set[Id]], Map.empty[Id, Id]))
   }
 
+
   test("should be able to add correlation between parent and child via AddSubCommand") {
     val behaviorTestKit         = createBehaviorTestKit()
     val commandCorrelationProbe = TestProbe[CommandCorrelation]
