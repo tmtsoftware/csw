@@ -62,7 +62,7 @@ In this example, a project was created with default parameters. The complete pro
 package bundled with all dependencies, and a launching application.
 
 ![sample-deploy](../images/gettingstarted/sampleDeploy.png)
-3.  Template comes with `csw-prod` and other useful library dependencies. It also includes bunch of plugins as explained in below snapshot
+3.  Template comes with `csw` and other useful library dependencies. It also includes bunch of plugins as explained in below snapshot
 
 ![sample-project](../images/gettingstarted/sampleProjectFolder.png)
 

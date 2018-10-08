@@ -87,12 +87,12 @@ package csw
  * }}}
  *
  * Detailed information about creating Keys and Parameters can be found here:
- *  https://tmtsoftware.github.io/csw-prod/services/messages/keys-parameters.html
+ *  https://tmtsoftware.github.io/csw/services/messages/keys-parameters.html
  *
  * Detailed information about creating commands can be found here:
- *  https://tmtsoftware.github.io/csw-prod/services/messages/commands.html
+ *  https://tmtsoftware.github.io/csw/services/messages/commands.html
  *
  * Detailed information about creating events can be found here:
- *  https://tmtsoftware.github.io/csw-prod/services/messages/events.html
+ *  https://tmtsoftware.github.io/csw/services/messages/events.html
  */
 package object params {}

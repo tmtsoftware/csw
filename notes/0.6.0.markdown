@@ -1,0 +1,8 @@
+## CSW - TMT Common Software v0.6.0
+
+This is release v0.6.0 of the TMT Common Software.
+
+See [CHANGELOG.md](../CHANGELOG.md) for details of all releases.
+
+### Changes
+- github repository `csw-prod` is renamed to `csw`.

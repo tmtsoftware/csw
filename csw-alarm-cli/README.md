@@ -16,4 +16,4 @@ Using alarm cli, you can perform following actions:
 * severity 
 * health
 
-If you want to get started with using alarm CLI, refer these [examples](https://tmtsoftware.github.io/csw-prod/apps/cswalarmcli.html).
+If you want to get started with using alarm CLI, refer these [examples](https://tmtsoftware.github.io/csw/apps/cswalarmcli.html).

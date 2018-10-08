@@ -25,28 +25,28 @@ This is especially useful for integration testing where multiple systems communi
 
 You can find more details on multi-JVM tests [here](https://doc.akka.io/docs/akka/current/multi-jvm-testing.html).
 
-You can also refer [csw-prod](https://github.com/tmtsoftware/csw-prod) for writing your own multi-JVM tests. For example: @github[CommandServiceTest.scala](/csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala)  
+You can also refer [csw](https://github.com/tmtsoftware/csw) for writing your own multi-JVM tests. For example: @github[CommandServiceTest.scala](/csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala)  
 
 In case you want to run your multi-JVM tests across machines, refer this multi-node testing guide [here](https://doc.akka.io/docs/akka/current/multi-node-testing.html). 
 
 ## Mockito
 
 Mocks are used so that unit tests can be written independent of dependencies.  
-[csw-prod](https://github.com/tmtsoftware/csw-prod) uses [Mockito](http://site.mockito.org/) for writing unit tests.
+[csw](https://github.com/tmtsoftware/csw) uses [Mockito](http://site.mockito.org/) for writing unit tests.
 ScalaTest comes with [MockitoSugar](http://www.scalatest.org/user_guide/testing_with_mock_objects#mockito) trait which provides some basic syntax sugar for Mockito.
 
 For example: @github[ContainerBehaviorTest.scala](/csw-framework/src/test/scala/csw/framework/internal/container/ContainerBehaviorTest.scala)
 
 ## Acceptance Tests
 
-This section explains how and where csw-prod maintains and executes acceptance tests. 
+This section explains how and where csw maintains and executes acceptance tests. 
 If you are a component writer and want to maintain acceptance tests, you can create a repo similar to [csw-acceptance](https://github.com/tmtsoftware/csw-acceptance) and update dependencies, projects as per your need. 
 
-As required by TMT Systems Engineering, the acceptance pipeline runs all the existing Java and Scala tests from [csw-prod](https://github.com/tmtsoftware/csw-prod) repo on published bintray binaries rather than directly on source code.
+As required by TMT Systems Engineering, the acceptance pipeline runs all the existing Java and Scala tests from [csw](https://github.com/tmtsoftware/csw) repo on published bintray binaries rather than directly on source code.
 
 More information can be found [here](https://github.com/tmtsoftware/csw-acceptance/blob/master/README.md).
 
-Below are the two separate Jenkins pipelines to run `csw-prod` acceptance tests:
+Below are the two separate Jenkins pipelines to run `csw` acceptance tests:
 
 1. [Acceptance Dev Pipeline](http://ec2-35-154-215-191.ap-south-1.compute.amazonaws.com:8080/job/acceptance-dev-nightly-build/)
     - Automatically triggered every night to get fast feedback and intended for developer's visibility.
@@ -59,7 +59,7 @@ Below are the two separate Jenkins pipelines to run `csw-prod` acceptance tests:
 
 [csw-prod-release](http://ec2-35-154-215-191.ap-south-1.compute.amazonaws.com:8080/job/csw-prod-release/) pipeline is responsible for following tasks:
 
-- build and run `csw-prod` tests
+- build and run `csw` tests
 - publish binaries to bintray
 - publish paradox documentation
 - publish apps and release notes to github releases

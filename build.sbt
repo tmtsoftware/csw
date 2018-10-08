@@ -58,7 +58,7 @@ lazy val githubReleases: Seq[ProjectReference] = Seq(
 )
 
 //Root project
-lazy val `csw-prod` = project
+lazy val `csw` = project
   .in(file("."))
   .enablePlugins(NoPublish, UnidocSite, GithubPublishDocs, GitBranchPrompt, GithubRelease)
   .disablePlugins(BintrayPlugin)

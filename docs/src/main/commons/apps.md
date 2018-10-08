@@ -22,7 +22,7 @@ But for developers to start `csw-cluster-seed` first and then configuration serv
 development purpose, it is recommended to use a shell script which will start `csw-cluster-seed` and/or configuration service and/or 
 event service and/or alarm service.
 
-Assuming that developer has downloaded `csw-apps-<some-version>.zip` from [csw releases](https://github.com/tmtsoftware/csw-prod/releases)
+Assuming that developer has downloaded `csw-apps-<some-version>.zip` from [csw releases](https://github.com/tmtsoftware/csw/releases)
 and unzipped it.
 
 There are three folders, as follows, in `csw-apps-<some-version>`
@@ -30,7 +30,7 @@ There are three folders, as follows, in `csw-apps-<some-version>`
 * lib
 * and conf.
 
-All the shell scripts provided by `csw-prod` reside in `bin` folder. The shell script referred in this segment is named as `csw-services.sh`.
+All the shell scripts provided by `csw` reside in `bin` folder. The shell script referred in this segment is named as `csw-services.sh`.
 Go to the bin folder and hit `./csw-services.sh --help`. This will list all possible options applicable for the script.
 
 @@@ note { title=Note }

@@ -25,10 +25,10 @@ notifications:
     on_failure: always
 
 script:
-  - ./build.sh '-v /home/travis/build/tmtsoftware/csw-prod:/source:z -v /home/travis/.ivy2:/root/.ivy2:z'
-  - ./integration/scripts/runner.sh '-v /home/travis/build/tmtsoftware/csw-prod:/source:z -v /home/travis/.ivy2:/root/.ivy2:z'
-  - ./integration/scripts/multiple_nic_test.sh '-v /home/travis/build/tmtsoftware/csw-prod:/source:z -v /home/travis/.ivy2:/root/.ivy2:z'
-  - ./integration/scripts/multiple_subnets_test.sh '-v /home/travis/build/tmtsoftware/csw-prod:/source:z -v /home/travis/.ivy2:/root/.ivy2:z'
+  - ./build.sh '-v /home/travis/build/tmtsoftware/csw:/source:z -v /home/travis/.ivy2:/root/.ivy2:z'
+  - ./integration/scripts/runner.sh '-v /home/travis/build/tmtsoftware/csw:/source:z -v /home/travis/.ivy2:/root/.ivy2:z'
+  - ./integration/scripts/multiple_nic_test.sh '-v /home/travis/build/tmtsoftware/csw:/source:z -v /home/travis/.ivy2:/root/.ivy2:z'
+  - ./integration/scripts/multiple_subnets_test.sh '-v /home/travis/build/tmtsoftware/csw:/source:z -v /home/travis/.ivy2:/root/.ivy2:z'
 
 before_cache:
   - find $HOME/.ivy2 -name "ivydata-*.properties" -print -delete

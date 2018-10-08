@@ -1,5 +1,5 @@
 # sbt Tasks
-csw-prod uses multiple plugins in the sbt ecosystem to help accomplish a variety of tasks. 
+csw uses multiple plugins in the sbt ecosystem to help accomplish a variety of tasks. 
 
 | plugin         | task            | Description               |
 | :------------: |:--------------: | :-------------------------|

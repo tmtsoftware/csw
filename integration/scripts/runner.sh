@@ -6,7 +6,7 @@ ORANGE='\033[0;33m'
 PURPLE='\033[0;35m'
 NC='\033[0m' # No Color
 
-#1. Get the current directory (Root dir : csw-prod) which is used to map to docker container
+#1. Get the current directory (Root dir : csw) which is used to map to docker container
 HOST_DIR_MAPPING="-v $(pwd):/source/csw"
 echo ${HOST_DIR_MAPPING}
 sbtImg=twtmt/scala-sbt:8u141_2.12.4_1.1.1

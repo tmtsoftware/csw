@@ -11,4 +11,4 @@ Using event cli, you can perform following actions:
 * Publish
 * Subscribe
 
-If you want to get started with using event CLI, refer these [examples](https://tmtsoftware.github.io/csw-prod/apps/csweventcli.html).
+If you want to get started with using event CLI, refer these [examples](https://tmtsoftware.github.io/csw/apps/csweventcli.html).

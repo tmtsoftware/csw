@@ -36,6 +36,6 @@ package csw
  * unregister terminated component from LocationService.
  *
  * Complete guide of usage of different API's provided by LocationService is available at:
- * https://tmtsoftware.github.io/csw-prod/services/location.html
+ * https://tmtsoftware.github.io/csw/services/location.html
  */
 package object location {}

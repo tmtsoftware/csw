@@ -12,7 +12,7 @@
 
 ## Steps to release
 
-### csw-prod
+### csw
 1. Update release notes (`notes/<version>.markdown`)
 2. Update top level `CHANGELOG.md`
 3. Update top level `README.md`

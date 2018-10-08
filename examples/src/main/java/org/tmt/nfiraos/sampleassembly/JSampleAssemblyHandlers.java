@@ -42,7 +42,7 @@ import java.util.concurrent.TimeUnit;
  * For example, if one component sends Submit(Setup(args)) command to SampleHcd,
  * This will be first validated in the supervisor and then forwarded to Component TLA which first invokes validateCommand hook
  * and if validation is successful, then onSubmit hook gets invoked.
- * You can find more information on this here : https://tmtsoftware.github.io/csw-prod/framework.html
+ * You can find more information on this here : https://tmtsoftware.github.io/csw/framework.html
  */
 public class JSampleAssemblyHandlers extends JComponentHandlers {
 

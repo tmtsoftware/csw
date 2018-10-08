@@ -38,7 +38,7 @@ package csw.alarm
  *
  *
  * Complete guide of usage of different API's provided by AlarmService is available at:
- * https://tmtsoftware.github.io/csw-prod/services/alarm.html
+ * https://tmtsoftware.github.io/csw/services/alarm.html
  *
  */
 package object client {}

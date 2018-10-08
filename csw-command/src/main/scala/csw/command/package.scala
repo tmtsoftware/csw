@@ -8,14 +8,14 @@ package csw
  * Related projects are:
  * - '''csw-messages''':
  *   - This defines the types of command (Oneway/Submit etc.) and types of ''configurations'' (Setup/Observe/Wait etc.)
- *   - Complete usage of Messages is available at: https://tmtsoftware.github.io/csw-prod/services/messages.html
+ *   - Complete usage of Messages is available at: https://tmtsoftware.github.io/csw/services/messages.html
  *
  * - '''framework''':
  *   - This defines the Hcd and Assembly handlers, lifecycle manager and supervisor for components.
  *   - Framework allows component writer to override onValidation, onSubmit and onOneway handlers. (Note it allows overriding other handlers as well.)
  *   - On every command received by component, onValidation handler gets invoked where received command gets validated and validation response is returned.
  *   - Based on validation response and command type, onSubmit/onOneway hooks gets invoked where command gets processed.
- *   - Complete details of handling commands can be found here : https://tmtsoftware.github.io/csw-prod/framework/handling-lifecycle.html#handling-commands
+ *   - Complete details of handling commands can be found here : https://tmtsoftware.github.io/csw/framework/handling-lifecycle.html#handling-commands
  *
  * Important classes in this project are:
  *
@@ -43,7 +43,7 @@ package csw
  * Using CommandDistributor utility you can send all these commands in one go and get aggregated response.
  *
  * Complete guide of usage of different API's provided by CommandService is available at:
- * https://tmtsoftware.github.io/csw-prod/command.html
+ * https://tmtsoftware.github.io/csw/command.html
  *
  */
 package object command {}

@@ -85,7 +85,7 @@ Java
 
 More details about each configuration and its significance can be found @ref:[here](./create-component.md#component-configuration-componentinfo-).
 
-Another sample container configuration file can be found [here](https://github.com/tmtsoftware/csw-prod/blob/master/csw-benchmark/src/main/resources/container.conf).  
+Another sample container configuration file can be found [here](https://github.com/tmtsoftware/csw/blob/master/csw-benchmark/src/main/resources/container.conf).  
 
 ## Tracking Dependencies
 

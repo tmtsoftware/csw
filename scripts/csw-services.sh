@@ -44,7 +44,7 @@ shouldStartAlarm=false
 
 script_name=$0
 
-logDir=/tmp/csw-prod/logs
+logDir=/tmp/csw/logs
 test -d ${logDir} || mkdir -p ${logDir}
 
 # We need at least this version of Redis

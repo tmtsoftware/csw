@@ -64,13 +64,13 @@ package csw.event
  *
  * }}}
  *
- * `csw-prod` provides two implementations for Event Service which can be accessed through `csw-event-client` :
+ * `csw` provides two implementations for Event Service which can be accessed through `csw-event-client` :
  * 1. [[csw.event.client.internal.redis.RedisEventService]] - Redis as event store and publisher/subscriber functionality
  * 2. [[csw.event.client.internal.kafka.KafkaEventService]] - Kafka as event store and publisher/subscriber functionality
  *
  *
  * Complete guide of usage of different API's provided by EventService is available at:
- * https://tmtsoftware.github.io/csw-prod/services/event.html
+ * https://tmtsoftware.github.io/csw/services/event.html
  *
  */
 package object client {}
