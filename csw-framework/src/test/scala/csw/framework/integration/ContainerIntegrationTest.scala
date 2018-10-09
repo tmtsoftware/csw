@@ -1,6 +1,7 @@
 package csw.framework.integration
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
+import akka.http.scaladsl.Http
 import akka.stream.scaladsl.{Keep, Sink}
 import akka.testkit
 import com.typesafe.config.ConfigFactory
@@ -43,7 +44,8 @@ class ContainerIntegrationTest extends HTTPLocationService {
   private val disperserHcdConnection   = AkkaConnection(ComponentId("Disperser", HCD))
 
   override def afterAll(): Unit = {
-    shutdown()
+    Http(seedActorSystem).shutdownAllConnectionPools().await
+    seedActorSystem.terminate().await
     super.afterAll()
   }
 
@@ -192,7 +194,7 @@ class ContainerIntegrationTest extends HTTPLocationService {
       .run()
 
     // ********** Message: Shutdown **********
-
+    Http(testActorSystem).shutdownAllConnectionPools().await
     resolvedContainerRef ! Shutdown
 
     // this proves that ComponentBehaviors postStop signal gets invoked for all components

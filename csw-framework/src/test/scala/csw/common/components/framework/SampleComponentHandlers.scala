@@ -107,7 +107,7 @@ class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
       location.connection match {
         case _: AkkaConnection =>
           Future {
-            Thread.sleep(100)
+            Thread.sleep(500)
             currentStatePublisher.publish(
               CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(akkaLocationUpdatedChoice)))
             )

@@ -1,6 +1,7 @@
 package csw.framework.integration
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
+import akka.http.scaladsl.Http
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
 import com.persist.JsonOps
@@ -52,7 +53,8 @@ class StandaloneComponentTest extends HTTPLocationService {
   }
 
   override def afterAll(): Unit = {
-    shutdown()
+    Http(seedActorSystem).shutdownAllConnectionPools().await
+    seedActorSystem.terminate().await
     super.afterAll()
   }
 
@@ -83,6 +85,7 @@ class StandaloneComponentTest extends HTTPLocationService {
 
     // on shutdown, component unregisters from location service
     supervisorCommandService.subscribeCurrentState(supervisorStateProbe.ref ! _)
+    Http(testActorSystem).shutdownAllConnectionPools().await
     supervisorRef ! Shutdown
 
     // this proves that ComponentBehaviors postStop signal gets invoked

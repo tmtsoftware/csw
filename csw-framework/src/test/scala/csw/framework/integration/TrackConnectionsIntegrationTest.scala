@@ -2,6 +2,7 @@ package csw.framework.integration
 
 import akka.actor
 import akka.actor.testkit.typed.scaladsl.TestProbe
+import akka.http.scaladsl.Http
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
@@ -13,10 +14,10 @@ import csw.common.components.framework.SampleComponentState._
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.framework.FrameworkTestWiring
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
-import csw.location.api.commons.ClusterSettings
 import csw.location.api.models.ComponentType.{Assembly, HCD}
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{ComponentId, HttpRegistration, TcpRegistration}
+import csw.location.client.ActorSystemFactory
 import csw.location.http.HTTPLocationService
 import csw.params.commands
 import csw.params.commands.CommandName
@@ -44,7 +45,7 @@ class TrackConnectionsIntegrationTest extends HTTPLocationService with OptionVal
   // DEOPSCSW-220: Access and Monitor components for current values
   // DEOPSCSW-221: Avoid sending commands to non-executing components
   test("should track connections when locationServiceUsage is RegisterAndTrackServices") {
-    val actorSystem: actor.ActorSystem = ClusterSettings().joinLocal(seedPort).system
+    val actorSystem: actor.ActorSystem = ActorSystemFactory.remote("test1")
     val wiring: FrameworkWiring        = FrameworkWiring.make(actorSystem, mock[RedisClient])
 
     // start a container and verify it moves to running lifecycle state
@@ -78,9 +79,10 @@ class TrackConnectionsIntegrationTest extends HTTPLocationService with OptionVal
     assemblyProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(akkaLocationRemovedChoice))))
 
     implicit val timeout: Timeout = Timeout(100.millis)
-    intercept[TimeoutException] {
+    a[TimeoutException] shouldBe thrownBy(
       disperserCommandService.submit(commands.Setup(prefix, CommandName("isAlive"), None)).await(200.millis)
-    }
+    )
+    Http(actorSystem).shutdownAllConnectionPools().await
   }
 
   /**
@@ -90,7 +92,7 @@ class TrackConnectionsIntegrationTest extends HTTPLocationService with OptionVal
    * */
   //DEOPSCSW-219 Discover component connection using HTTP protocol
   test("component should be able to track http and tcp connections") {
-    val actorSystem: actor.ActorSystem = ClusterSettings().joinLocal(seedPort).system
+    val actorSystem: actor.ActorSystem = ActorSystemFactory.remote("test2")
     val wiring: FrameworkWiring        = FrameworkWiring.make(actorSystem, mock[RedisClient])
     // start component in standalone mode
     val assemblySupervisor = Standalone.spawn(ConfigFactory.load("standalone.conf"), wiring).await
@@ -109,9 +111,7 @@ class TrackConnectionsIntegrationTest extends HTTPLocationService with OptionVal
     assemblyCommandService.subscribeCurrentState(assemblyProbe.ref ! _)
 
     // register http connection
-    seedLocationService
-      .register(HttpRegistration(httpConnection, 9090, "test/path"))
-      .await
+    seedLocationService.register(HttpRegistration(httpConnection, 9090, "test/path")).await
 
     // assembly is tracking HttpConnection that we registered above, hence assemblyProbe will receive LocationUpdated event
     assemblyProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(httpLocationUpdatedChoice))))
@@ -129,6 +129,7 @@ class TrackConnectionsIntegrationTest extends HTTPLocationService with OptionVal
     // On unavailability of TcpConnection, the assembly should know and receive LocationRemoved event
     seedLocationService.unregister(tcpConnection)
     assemblyProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(tcpLocationRemovedChoice))))
+    Http(actorSystem).shutdownAllConnectionPools().await
   }
 
 }

@@ -1,7 +1,7 @@
 package csw.framework.integration
 
-import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.testkit.typed.scaladsl.{TestInbox, TestProbe}
+import akka.http.scaladsl.Http
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.command.models.framework.ContainerLifecycleState
@@ -37,7 +37,7 @@ class EventServiceIntegrationTest extends HTTPLocationService with EmbeddedRedis
   private val wiring                   = FrameworkWiring.make(testActorSystem)
 
   override def afterAll(): Unit = {
-    wiring.actorRuntime.shutdown(UnknownReason).await
+    Http(testActorSystem).shutdownAllConnectionPools().await
     shutdown()
     stopSentinel(sentinel, server)
     super.afterAll()

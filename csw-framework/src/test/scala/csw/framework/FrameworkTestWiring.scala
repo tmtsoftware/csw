@@ -3,6 +3,7 @@ import akka.actor
 import akka.actor.Terminated
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.http.scaladsl.Http
 import akka.stream.{ActorMaterializer, Materializer}
 import csw.commons.redis.EmbeddedRedis
 import csw.commons.utils.SocketUtils
@@ -34,6 +35,7 @@ class FrameworkTestWiring(val seedPort: Int = SocketUtils.getFreePort) extends E
     }
 
   def shutdown(): Terminated = {
+    Http(seedActorSystem).shutdownAllConnectionPools().await
     testActorSystem.terminate().await
     seedActorSystem.terminate().await
   }

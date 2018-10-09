@@ -30,10 +30,7 @@ trait HTTPLocationService
       case Failure(_)                            ⇒
     }
 
-  override def afterAll(): Unit = {
-    maybeWiring.map(_.actorRuntime.shutdown(UnknownReason).await)
-    super.afterAll()
-  }
+  override def afterAll(): Unit = maybeWiring.map(_.actorRuntime.shutdown(UnknownReason).await)
 
   start(Some(3553))
 }

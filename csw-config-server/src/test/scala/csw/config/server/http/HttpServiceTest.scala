@@ -55,15 +55,10 @@ class HttpServiceTest extends HTTPLocationService {
 
     locationService.find(ConfigServiceConnection.value).await.get.connection shouldBe ConfigServiceConnection.value
 
-    intercept[OtherLocationIsRegistered] {
-      httpService.registeredLazyBinding.await
-    }
+    a[OtherLocationIsRegistered] shouldBe thrownBy(httpService.registeredLazyBinding.await)
 
     //TODO: Find a way to assert server is not bounded
-    try {
-      actorRuntime.shutdown(UnknownReason).await
-    } catch {
-      case NonFatal(ex) ⇒
-    }
+    try actorRuntime.shutdown(UnknownReason).await
+    catch { case NonFatal(ex) ⇒ }
   }
 }

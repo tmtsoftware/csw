@@ -1,8 +1,8 @@
 package csw.event.client.internal.kafka
 
 import akka.Done
-import akka.actor.CoordinatedShutdown.UnknownReason
-import akka.actor.{ActorSystem, CoordinatedShutdown}
+import akka.actor.ActorSystem
+import akka.http.scaladsl.Http
 import akka.kafka.ProducerSettings
 import csw.commons.utils.SocketUtils.getFreePort
 import csw.event.api.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
@@ -59,8 +59,9 @@ class KafkaTestProps(
 
   override def shutdown(): Unit = {
     EmbeddedKafka.stop()
+    Http(actorSystem).shutdownAllConnectionPools().await
+    actorSystem.terminate().await
     locationServer.afterAll()
-    CoordinatedShutdown(actorSystem).run(UnknownReason).await
   }
 }
 

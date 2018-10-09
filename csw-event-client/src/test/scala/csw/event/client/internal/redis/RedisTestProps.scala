@@ -1,8 +1,8 @@
 package csw.event.client.internal.redis
 
 import akka.Done
-import akka.actor.CoordinatedShutdown.UnknownReason
-import akka.actor.{ActorSystem, CoordinatedShutdown}
+import akka.actor.ActorSystem
+import akka.http.scaladsl.Http
 import com.typesafe.config.ConfigFactory
 import csw.commons.redis.EmbeddedRedis
 import csw.commons.utils.SocketUtils.getFreePort
@@ -71,8 +71,9 @@ class RedisTestProps(
     publisher.shutdown().await
     redisClient.shutdown()
     stopSentinel(redisSentinel, redisServer)
+    Http(actorSystem).shutdownAllConnectionPools().await
+    actorSystem.terminate().await
     locationServer.afterAll()
-    CoordinatedShutdown(actorSystem).run(UnknownReason).await
   }
 }
 

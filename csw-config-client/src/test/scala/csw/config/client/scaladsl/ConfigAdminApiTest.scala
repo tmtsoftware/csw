@@ -33,7 +33,6 @@ class ConfigAdminApiTest extends ConfigServiceTest with HTTPLocationService {
   }
 
   override def afterAll(): Unit = {
-    actorSystem.terminate().await
     httpService.shutdown(UnknownReason).await
     super.afterAll()
   }
@@ -43,9 +42,9 @@ class ConfigAdminApiTest extends ConfigServiceTest with HTTPLocationService {
   test("should throw exception for invalid path") {
     val filePath = Paths.get("/test/sample.$active")
 
-    intercept[InvalidInput] {
+    a[InvalidInput] shouldBe thrownBy (
       configService.create(filePath, ConfigData.fromString(configValue1), annex = false, "invalid path").await
-    }
+    )
   }
 
   // DEOPSCSW-27: Storing binary component configurations
@@ -82,8 +81,6 @@ class ConfigAdminApiTest extends ConfigServiceTest with HTTPLocationService {
 
   //DEOPSCSW-75 List the names of configuration files that match a path
   test("should throw invalid input exception if pattern is invalid") {
-    intercept[InvalidInput] {
-      configService.list(pattern = Some("?i)")).await
-    }
+    a[InvalidInput] shouldBe thrownBy(configService.list(pattern = Some("?i)")).await)
   }
 }

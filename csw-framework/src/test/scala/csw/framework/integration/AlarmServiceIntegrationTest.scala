@@ -1,6 +1,7 @@
 package csw.framework.integration
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
+import akka.http.scaladsl.Http
 import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.alarm.client.internal.commons.AlarmServiceConnection
@@ -39,6 +40,7 @@ class AlarmServiceIntegrationTest extends HTTPLocationService with Matchers {
   }
 
   override def afterAll(): Unit = {
+    Http(testActorSystem).shutdownAllConnectionPools().await
     shutdown()
     stopSentinel(sentinel, server)
     super.afterAll()

@@ -4,7 +4,6 @@ import java.net.URI
 import java.nio.file.Paths
 
 import akka.actor.ActorSystem
-import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
 import csw.location.agent.common.TestFutureExtension.RichFuture
