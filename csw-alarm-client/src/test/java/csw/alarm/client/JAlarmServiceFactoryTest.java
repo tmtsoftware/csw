@@ -2,6 +2,7 @@ package csw.alarm.client;
 
 import akka.actor.ActorSystem;
 import akka.actor.CoordinatedShutdown;
+import akka.stream.ActorMaterializer;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import csw.alarm.api.javadsl.IAlarmService;
@@ -12,6 +13,9 @@ import csw.alarm.client.internal.helpers.AlarmServiceTestSetup;
 import csw.location.api.commons.ClusterAwareSettings;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.api.models.TcpRegistration;
+import csw.location.client.ActorSystemFactory;
+import csw.location.client.javadsl.JHttpLocationServiceFactory;
+import csw.location.http.JHTTPLocationService;
 import csw.location.javadsl.JLocationServiceFactory;
 import org.junit.*;
 import scala.concurrent.Await;
@@ -25,11 +29,14 @@ import static csw.alarm.api.javadsl.JAlarmSeverity.Indeterminate;
 
 // DEOPSCSW-481: Component Developer API available to all CSW components
 public class JAlarmServiceFactoryTest {
+    // start location http server
+    private static JHTTPLocationService jhttpLocationService = new JHTTPLocationService();
 
     private static AlarmServiceTestSetup testSetup = new AlarmServiceTestSetup();
     private AlarmServiceFactory alarmServiceFactory = testSetup.alarmServiceFactory();
-    private static ActorSystem seedSystem = ClusterAwareSettings.onPort(3558).system();
-    private static ILocationService locationService = JLocationServiceFactory.withSystem(seedSystem);
+    private static ActorSystem seedSystem = ActorSystemFactory.remote();
+    private static ActorMaterializer mat = ActorMaterializer.create(seedSystem);
+    private static ILocationService locationService = JHttpLocationServiceFactory.makeLocalClient(seedSystem, mat);
     private AlarmAdminService alarmService = testSetup.alarmService();
 
     @BeforeClass
@@ -44,8 +51,9 @@ public class JAlarmServiceFactoryTest {
     }
 
     @AfterClass
-    public static void teardown() throws ExecutionException, InterruptedException {
-        locationService.shutdown(CoordinatedShutdown.unknownReason()).get();
+    public static void teardown() throws Exception {
+        Await.result(seedSystem.terminate(), FiniteDuration.create(5, TimeUnit.SECONDS));
+        jhttpLocationService.afterAll();
         testSetup.afterAll();
     }
 

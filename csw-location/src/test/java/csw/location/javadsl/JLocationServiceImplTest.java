@@ -17,6 +17,8 @@ import csw.location.api.javadsl.ILocationService;
 import csw.location.api.javadsl.IRegistrationResult;
 import csw.location.api.models.*;
 import csw.location.client.ActorSystemFactory;
+import csw.location.client.javadsl.JHttpLocationServiceFactory;
+import csw.location.http.JHTTPLocationService;
 import csw.location.scaladsl.RegistrationFactory;
 import csw.logging.javadsl.ILogger;
 import csw.logging.javadsl.JLoggerFactory;
@@ -25,6 +27,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Test;
+import scala.concurrent.Await;
 import scala.concurrent.duration.FiniteDuration;
 
 import java.util.*;
@@ -38,9 +41,12 @@ public class JLocationServiceImplTest {
 
     public ILogger log = new JLoggerFactory(Constants.LocationService()).getLogger(getClass());
 
-    private static ILocationService locationService = JLocationServiceFactory.make();
-    private ActorSystem actorSystem = ActorSystemFactory.remote();
-    private Materializer mat = ActorMaterializer.create(actorSystem);
+    // start location http server
+    private static JHTTPLocationService jhttpLocationService = new JHTTPLocationService();
+
+    private static ActorSystem actorSystem =  ActorSystemFactory.remote();
+    private static Materializer mat = ActorMaterializer.create(actorSystem);
+    private static ILocationService locationService = JHttpLocationServiceFactory.makeLocalClient(actorSystem, mat);
 
     private ComponentId akkaHcdComponentId = new ComponentId("hcd1", JComponentType.HCD);
     private AkkaConnection akkaHcdConnection = new AkkaConnection(akkaHcdComponentId);
@@ -63,8 +69,9 @@ public class JLocationServiceImplTest {
     }
 
     @AfterClass
-    public static void shutdown() throws ExecutionException, InterruptedException {
-        locationService.shutdown(CoordinatedShutdown.unknownReason()).get();
+    public static void shutdown() throws Exception {
+        Await.result(actorSystem.terminate(), FiniteDuration.create(5, TimeUnit.SECONDS));
+        jhttpLocationService.afterAll();
     }
 
     @Test
