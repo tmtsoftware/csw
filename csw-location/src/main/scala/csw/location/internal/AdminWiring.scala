@@ -34,8 +34,8 @@ private[csw] object AdminWiring {
 
       override lazy val settings: Settings = {
         new Settings(config) {
-          override val clusterPort: Int      = maybeClusterPort.getOrElse(super.clusterPort)
-          override val httpLocationPort: Int = mayBeHttpPort.getOrElse(super.httpLocationPort)
+          override val clusterPort: Int = maybeClusterPort.getOrElse(super.clusterPort)
+          override val httpPort: Int    = mayBeHttpPort.getOrElse(super.httpPort)
         }
       }
     }

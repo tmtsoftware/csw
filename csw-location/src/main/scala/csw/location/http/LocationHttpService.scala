@@ -13,7 +13,7 @@ class LocationHttpService(locationRoutes: LocationRoutes, actorRuntime: ActorRun
     Http().bindAndHandle(
       handler = locationRoutes.routes,
       interface = "0.0.0.0",
-      port = settings.httpLocationPort
+      port = settings.httpPort
     )
   }
 }
