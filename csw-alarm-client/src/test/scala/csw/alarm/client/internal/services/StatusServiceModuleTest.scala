@@ -49,7 +49,7 @@ class StatusServiceModuleTest
     statusAfterReset.alarmTime.time shouldEqual status.alarmTime.time
   }
 
-  // DEOPSCSW-447: Simple test to check behavior of latch and reset
+  // DEOPSCSW-447: Reset api for alarm
   test("simple test to check behavior of latch and reset") {
     getStatus(tromboneAxisLowLimitAlarmKey).await.latchedSeverity shouldEqual Disconnected
     getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldEqual Disconnected
@@ -84,6 +84,7 @@ class StatusServiceModuleTest
   List(Okay, Warning, Major, Indeterminate, Critical).foreach { currentSeverity =>
     test(s"reset should set latchedSeverity to current severity when current severity is $currentSeverity") {
       val defaultStatus = getStatus(tromboneAxisLowLimitAlarmKey).await
+      getMetadata(tromboneAxisLowLimitAlarmKey).await.isLatchable shouldBe true
       defaultStatus.latchedSeverity shouldEqual Disconnected
       defaultStatus.acknowledgementStatus shouldEqual Acknowledged
       getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldEqual Disconnected
@@ -110,6 +111,7 @@ class StatusServiceModuleTest
   // DEOPSCSW-447: Reset api for alarm
   // DEOPSCSW-494: Incorporate changes in set severity, reset, acknowledgement and latch status
   test("reset should set latchedSeverity to current severity when current severity is Disconnected") {
+    getMetadata(tromboneAxisLowLimitAlarmKey).await.isLatchable shouldBe true
     val defaultStatus = getStatus(tromboneAxisLowLimitAlarmKey).await
     defaultStatus.latchedSeverity shouldEqual Disconnected
     defaultStatus.acknowledgementStatus shouldEqual Acknowledged
