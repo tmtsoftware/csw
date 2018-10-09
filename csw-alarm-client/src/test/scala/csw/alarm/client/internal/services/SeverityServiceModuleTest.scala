@@ -251,6 +251,7 @@ class SeverityServiceModuleTest
   }
 
   // DEOPSCSW-467: Monitor alarm severities in the alarm store for a single alarm, component, subsystem, or all
+  // DEOPSCSW-494: Incorporate changes in set severity, reset, acknowledgement and latch status
   test("subscribe aggregated severity via callback for an alarm") {
     getCurrentSeverity(tromboneAxisLowLimitAlarmKey).await shouldBe Disconnected
 
@@ -451,7 +452,8 @@ class SeverityServiceModuleTest
     alarmSubscription.unsubscribe().await
   }
 
-  //DEOPSCSW-444 : Set severity api for component
+  // DEOPSCSW-444: Set severity api for component
+  // DEOPSCSW-494: Incorporate changes in set severity, reset, acknowledgement and latch status
   SeverityTestCases.foreach { testCase ⇒
     test(testCase.name) {
       feedTestData(testCase)
@@ -467,8 +469,8 @@ class SeverityServiceModuleTest
     }
   }
 
-  // DEOPSCSW-444 : Set severity api for component
-  // DEOPSCSW-496 : Set Ack status on setSeverity
+  // DEOPSCSW-444: Set severity api for component
+  // DEOPSCSW-496: Set Ack status on setSeverity
   // DEOPSCSW-494: Incorporate changes in set severity, reset, acknowledgement and latch status
   AckStatusTestCases.foreach { testCase ⇒
     test(testCase.name()) {
