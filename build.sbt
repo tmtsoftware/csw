@@ -129,7 +129,7 @@ lazy val `csw-location-client` = project
 
 lazy val `csw-admin` = project
   .dependsOn(
-    `csw-location`,
+    `csw-location-client`,
     `csw-command`,
     `csw-commons`       % "compile->compile;test->test",
     `csw-framework`     % "test->test",
@@ -142,7 +142,7 @@ lazy val `csw-admin` = project
 
 lazy val `csw-location-agent` = project
   .dependsOn(
-    `csw-location`,
+    `csw-location-client`,
     `csw-commons` % "test->test",
     `csw-location` % "test->multi-jvm"
   )
@@ -161,7 +161,8 @@ lazy val `csw-config-api` = project
 lazy val `csw-config-server` = project
   .dependsOn(
     `csw-config-api`,
-    `csw-location` % "compile->compile;test->multi-jvm",
+    `csw-location-client`,
+    `csw-location` % "test->multi-jvm",
     `csw-commons` % "compile->compile;test->test"
   )
   .enablePlugins(DeployApp, MaybeCoverage)
@@ -185,7 +186,7 @@ lazy val `csw-config-client` = project
 lazy val `csw-config-cli` = project
   .dependsOn(
     `csw-config-client`,
-    `csw-location`,
+    `csw-location-client`,
     `csw-location`      % "multi-jvm->multi-jvm",
     `csw-config-server` % "test->test",
     `csw-commons`       % "test->test"
@@ -214,6 +215,7 @@ lazy val `csw-framework` = project
     `csw-event-api`,
     `csw-event-client`,
     `csw-alarm-client`,
+    `csw-location-client`,
     `csw-event-client`  % "test->test",
     `csw-location`      % "compile->compile;test->multi-jvm;multi-jvm->multi-jvm",
     `csw-config-server` % "multi-jvm->test",

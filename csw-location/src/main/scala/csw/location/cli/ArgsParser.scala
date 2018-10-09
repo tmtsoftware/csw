@@ -1,4 +1,4 @@
-package csw.clusterseed.cli
+package csw.location.cli
 
 import csw.services.BuildInfo
 import scopt.OptionParser

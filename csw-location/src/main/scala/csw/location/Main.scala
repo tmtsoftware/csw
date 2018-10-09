@@ -2,8 +2,8 @@ package csw.location
 
 import akka.Done
 import akka.actor.CoordinatedShutdown
-import csw.clusterseed.cli.{ArgsParser, Options}
 import csw.location.api.commons.ClusterAwareSettings
+import csw.location.cli.{ArgsParser, Options}
 import csw.location.internal.AdminWiring
 import csw.services.BuildInfo
 
