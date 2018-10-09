@@ -18,15 +18,12 @@ import csw.location.api.javadsl.IRegistrationResult;
 import csw.location.api.models.*;
 import csw.location.client.ActorSystemFactory;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;
-import csw.location.http.JHTTPLocationService;
+import csw.location.internal.AdminWiring;
 import csw.location.scaladsl.RegistrationFactory;
 import csw.logging.javadsl.ILogger;
 import csw.logging.javadsl.JLoggerFactory;
 import csw.params.core.models.Prefix;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
 import scala.concurrent.Await;
 import scala.concurrent.duration.FiniteDuration;
 
@@ -41,8 +38,7 @@ public class JLocationServiceImplTest {
 
     public ILogger log = new JLoggerFactory(Constants.LocationService()).getLogger(getClass());
 
-    // start location http server
-    private static JHTTPLocationService jhttpLocationService = new JHTTPLocationService();
+    private static AdminWiring wiring = new AdminWiring();
 
     private static ActorSystem actorSystem =  ActorSystemFactory.remote();
     private static Materializer mat = ActorMaterializer.create(actorSystem);
@@ -63,6 +59,11 @@ public class JLocationServiceImplTest {
 
     private Prefix prefix = new Prefix("nfiraos.ncc.trombone");
 
+    @BeforeClass
+    public static void setup() throws Exception {
+        Await.result(wiring.locationHttpService().start(), FiniteDuration.create(5, TimeUnit.SECONDS));
+    }
+
     @After
     public void unregisterAllServices() throws ExecutionException, InterruptedException {
         locationService.unregisterAll().get();
@@ -71,7 +72,7 @@ public class JLocationServiceImplTest {
     @AfterClass
     public static void shutdown() throws Exception {
         Await.result(actorSystem.terminate(), FiniteDuration.create(5, TimeUnit.SECONDS));
-        jhttpLocationService.afterAll();
+        Await.result(wiring.actorRuntime().shutdown(CoordinatedShutdown.UnknownReason$.MODULE$), FiniteDuration.create(5, TimeUnit.SECONDS));
     }
 
     @Test
