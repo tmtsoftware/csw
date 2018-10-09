@@ -57,7 +57,7 @@ class CswCluster private (_actorSystem: ActorSystem) {
   /**
    * If `startManagement` flag is set to true (which is true only when a managementPort is defined in ClusterSettings)
    * then an akka provided HTTP service is started at provided port. It provides services related to akka cluster management e.g see the members of the cluster and their status i.e. up or weakly up etc.
-   * Currently, cluster management service is started on `csw-cluster-seed` which may help in production to monitor
+   * Currently, cluster management service is started on `csw-location` which may help in production to monitor
    * cluster status. But, it can be started on any machine that is a part of akka cluster.
    */
   // $COVERAGE-OFF$
