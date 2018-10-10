@@ -4,7 +4,7 @@ import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
 import scalapb.compiler.Version.scalapbVersion
 
 object Libs {
-  val ScalaVersion = "2.12.6"
+  val ScalaVersion = "2.12.7"
 
   val `scalatest` = dep("org.scalatest" %%% "scalatest" % "3.0.5") //Apache License 2.0
 
