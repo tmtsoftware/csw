@@ -1,7 +1,7 @@
 # csw-alarm-cli
 
 A command line application that facilitates interaction with Alarm Service. It accepts various commands to load and retrieve alarm data,
-to subscribe to severity and health activities of alarm, and to change current the state of alarms.
+to subscribe to severity and health activities of alarm, and to change current of the state of alarms.
 
 ## Supported Commands
 
@@ -34,7 +34,7 @@ csw-alarm-cli init /path/allAlarms.conf --local --reset
 Clears the alarm store and loads alarm data to alarm store from `/path/allAlarms.conf` which is a path of a local file.
 
 ## list
-Gets the data of alarms from alarm store. If none of the optional parameters are given then by default data of all alarms
+Gets the data of alarms from alarm store. If none of the optional parameters are given then by default, data of all alarms
 will be displayed.
 
 * `--subsystem` - is an optional parameter to get the data of a specific subsystem's alarms
@@ -185,7 +185,7 @@ after every 3 seconds.
 
 ### subscribe
 Subscribes to the severity changes of the whole TMT system, subsystem, component or an alarm. If none of the optional parameters
-are not given then the severity of the whole TMT system will be displayed.
+are given then the severity of the whole TMT system will be displayed.
 
 @@@ note
 
@@ -238,8 +238,7 @@ csw-alarm-cli health get --subsystem nfiraos
 Displays aggregated health of subsystem with name `nfiraos`.
 
 ### subscribe
-Subscribes to the health changes of the whole TMT system, subsystem, component or an alarm. If none of the optional parameters are given then
-the health of the whole TMT system will be displayed.
+Subscribes to the health changes of the whole TMT system, subsystem, component or an alarm. If none of the optional parameters are given then the health of the whole TMT system will be displayed.
 
 @@@ note
 

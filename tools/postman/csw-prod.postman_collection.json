@@ -1,9 +1,9 @@
 {
 	"variables": [],
 	"info": {
-		"name": "csw-prod copy",
+		"name": "csw copy",
 		"_postman_id": "3066e393-a4ba-72ea-0947-ebb3ebffa0fa",
-		"description": "Common Software is the package of services and infrastructure software that integrates the TMT software systems.\n\nhttp://www.tmt.org\n\nThis collection of routes consists of http end points exposed by TMT common software.\n\nComplete codebase is available at https://github.com/tmtsoftware/csw-prod",
+		"description": "Common Software is the package of services and infrastructure software that integrates the TMT software systems.\n\nhttp://www.tmt.org\n\nThis collection of routes consists of http end points exposed by TMT common software.\n\nComplete codebase is available at https://github.com/tmtsoftware/csw",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
 	},
 	"item": [

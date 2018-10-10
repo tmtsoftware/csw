@@ -3,24 +3,33 @@ package csw.config.cli
 import java.nio.file.{Files, Paths}
 import java.time.Instant
 
+import akka.actor.ActorSystem
 import akka.actor.CoordinatedShutdown.UnknownReason
+import akka.stream.ActorMaterializer
 import csw.config.api.models.ConfigId
-import csw.config.server.ServerWiring
 import csw.config.commons.TestFutureExtension.RichFuture
 import csw.config.commons.{ArgsUtil, TestFileUtils}
-import csw.location.api.commons.ClusterAwareSettings
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
+import csw.config.server.ServerWiring
+import csw.location.client.scaladsl.HttpLocationServiceFactory
+import csw.location.http.HTTPLocationService
+import org.scalatest.{BeforeAndAfterEach, Matchers}
 
 // DEOPSCSW-112: Command line interface client for Configuration service
 // DEOPSCSW-43: Access Configuration service from any CSW component
-class CommandLineRunnerTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
+class CommandLineRunnerTest extends HTTPLocationService with Matchers with BeforeAndAfterEach {
 
-  private val serverWiring = ServerWiring.make(ClusterAwareSettings.onPort(3560))
-  private val httpService  = serverWiring.httpService
+  private val serverSystem: ActorSystem    = ActorSystem("config-server")
+  private val serverMat: ActorMaterializer = ActorMaterializer()(serverSystem)
+  private val serverLocationService        = HttpLocationServiceFactory.makeLocalClient(serverSystem, serverMat)
+  private val serverWiring                 = ServerWiring.make(serverSystem, serverLocationService)
+  private val httpService                  = serverWiring.httpService
   httpService.registeredLazyBinding.await
 
-  private val wiring = ClientCliWiring.noPrinting(ClusterAwareSettings.joinLocal(3560))
-  import wiring.commandLineRunner
+  private val clientSystem: ActorSystem    = ActorSystem("config-cli")
+  private val clientMat: ActorMaterializer = ActorMaterializer()(clientSystem)
+  private val clientLocationService        = HttpLocationServiceFactory.makeLocalClient(clientSystem, clientMat)
+  private val clientWiring                 = ClientCliWiring.noPrinting(clientSystem, clientLocationService)
+  import clientWiring.commandLineRunner
 
   private val testFileUtils = new TestFileUtils(serverWiring.settings)
 
@@ -29,17 +38,19 @@ class CommandLineRunnerTest extends FunSuite with Matchers with BeforeAndAfterAl
 
   val argsParser = new ArgsParser("csw-config-cli")
 
-  override protected def beforeAll(): Unit  = testFileUtils.deleteServerFiles()
-  override protected def beforeEach(): Unit = serverWiring.svnRepo.initSvnRepo()
-  override protected def afterEach(): Unit = {
+  override def beforeAll(): Unit  = testFileUtils.deleteServerFiles()
+  override def beforeEach(): Unit = serverWiring.svnRepo.initSvnRepo()
+  override def afterEach(): Unit = {
     testFileUtils.deleteServerFiles()
     if (Files.exists(Paths.get(outputFilePath))) Files.delete(Paths.get(outputFilePath))
   }
-  override protected def afterAll(): Unit = {
+  override def afterAll(): Unit = {
     httpService.shutdown(UnknownReason).await
-    wiring.actorRuntime.shutdown(UnknownReason).await
+    clientWiring.actorRuntime.shutdown(UnknownReason).await
+    serverWiring.actorRuntime.shutdown(UnknownReason).await
     Files.delete(Paths.get(inputFilePath))
     Files.delete(Paths.get(updatedInputFilePath))
+    super.afterAll()
   }
 
   //DEOPSCSW-72: Retrieve a configuration file to a specified file location on a local disk

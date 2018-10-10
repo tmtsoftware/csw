@@ -22,7 +22,7 @@ object GithubRelease extends AutoPlugin {
 
   override def projectSettings: Seq[Setting[_]] = Seq(
     ghreleaseRepoOrg := "tmtsoftware",
-    ghreleaseRepoName := "csw-prod",
+    ghreleaseRepoName := "csw",
     aggregate in githubRelease := false,
     // this creates scoverage report zip file and required for GithubRelease task, it assumes that scoverage-report is already generated
     // and is available inside target folder (if it is not present, empty zip will be created)

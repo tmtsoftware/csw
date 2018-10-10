@@ -9,9 +9,10 @@ import csw.config.client.scaladsl.ConfigClientFactory
 import csw.event.client.EventServiceFactory
 import csw.event.client.models.EventStores.RedisStore
 import csw.framework.deploy.ConfigUtils
-import csw.location.api.commons.ClusterSettings
 import csw.location.api.scaladsl.LocationService
-import csw.location.scaladsl.{LocationServiceFactory, RegistrationFactory}
+import csw.location.client.ActorSystemFactory
+import csw.location.client.scaladsl.HttpLocationServiceFactory
+import csw.location.scaladsl.RegistrationFactory
 import io.lettuce.core.RedisClient
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -20,10 +21,9 @@ import scala.concurrent.{ExecutionContext, Future}
  * Represents a class that lazily initializes necessary instances to run a component(s)
  */
 class FrameworkWiring {
-  lazy val clusterSettings: ClusterSettings         = ClusterSettings()
-  lazy val actorSystem: ActorSystem                 = clusterSettings.system
-  lazy val locationService: LocationService         = LocationServiceFactory.withSystem(actorSystem)
+  lazy val actorSystem: ActorSystem                 = ActorSystemFactory.remote()
   lazy val actorRuntime: ActorRuntime               = new ActorRuntime(actorSystem)
+  lazy val locationService: LocationService         = HttpLocationServiceFactory.makeLocalClient(actorSystem, actorRuntime.mat)
   lazy val registrationFactory                      = new RegistrationFactory
   lazy val commandResponseManagerFactory            = new CommandResponseManagerFactory
   lazy val configClientService: ConfigClientService = ConfigClientFactory.clientApi(actorSystem, locationService)

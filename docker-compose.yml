@@ -10,7 +10,7 @@ networks:
 services:
   # ========== CSW Services ==========
   seed:
-    image: csw-cluster-seed:${TAG_ID}
+    image: csw-location:${TAG_ID}
     ports:
       - ${CLUSTER_PORT}:${CLUSTER_PORT}
       - ${LOCATION_SERVER_PORT}:${LOCATION_SERVER_PORT}

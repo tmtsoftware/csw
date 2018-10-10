@@ -6,16 +6,18 @@ import csw.admin.log.LogAdmin
 import csw.admin.log.http.{AdminExceptionHandlers, AdminHttpService, AdminRoutes}
 import csw.location.api.commons.ClusterSettings
 import csw.location.api.scaladsl.LocationService
-import csw.location.scaladsl.LocationServiceFactory
+import csw.location.client.scaladsl.HttpLocationServiceFactory
 
 // $COVERAGE-OFF$
 private[admin] class AdminWiring {
-  lazy val config: Config                     = ConfigFactory.load()
-  lazy val settings                           = new Settings(config)
-  lazy val clusterSettings                    = ClusterSettings()
-  lazy val actorSystem: ActorSystem           = clusterSettings.system
-  lazy val actorRuntime                       = new ActorRuntime(actorSystem)
-  lazy val locationService: LocationService   = LocationServiceFactory.withSystem(actorSystem)
+  lazy val config: Config           = ConfigFactory.load()
+  lazy val settings                 = new Settings(config)
+  lazy val clusterSettings          = ClusterSettings()
+  lazy val actorSystem: ActorSystem = clusterSettings.system
+  lazy val actorRuntime             = new ActorRuntime(actorSystem)
+
+  //TODO: Decide on whether to make local or remote http location client.
+  lazy val locationService: LocationService   = HttpLocationServiceFactory.makeLocalClient(actorSystem, actorRuntime.mat)
   lazy val logAdmin: LogAdmin                 = new LogAdmin(locationService, actorRuntime)
   lazy val adminHandlers                      = new AdminExceptionHandlers
   lazy val adminRoutes                        = new AdminRoutes(logAdmin, actorRuntime, adminHandlers)

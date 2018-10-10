@@ -3,6 +3,7 @@ package csw.config;
 import akka.actor.ActorSystem;
 import akka.actor.CoordinatedShutdown;
 import akka.stream.Materializer;
+import csw.location.http.JHTTPLocationService;
 import csw.config.api.javadsl.IConfigClientService;
 import csw.config.api.javadsl.IConfigService;
 import csw.config.api.javadsl.JFileType;
@@ -12,9 +13,8 @@ import csw.config.client.javadsl.JConfigClientFactory;
 import csw.config.server.ServerWiring;
 import csw.config.server.commons.TestFileUtils;
 import csw.config.server.http.HttpService;
-import csw.location.api.commons.ClusterAwareSettings;
 import csw.location.api.javadsl.ILocationService;
-import csw.location.javadsl.JLocationServiceFactory;
+import csw.location.client.javadsl.JHttpLocationServiceFactory;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 import scala.concurrent.Await;
@@ -32,7 +32,8 @@ import java.util.stream.Collectors;
 
 public class JConfigClientExampleTest {
     private static ActorRuntime actorRuntime = new ActorRuntime(ActorSystem.create());
-    private static ILocationService clientLocationService = JLocationServiceFactory.withSettings(ClusterAwareSettings.onPort(3552));
+    private static ILocationService clientLocationService = JHttpLocationServiceFactory.makeLocalClient(actorRuntime.actorSystem(), actorRuntime.mat());
+    private static JHTTPLocationService jhttpLocationService;
 
     //#create-api
     //config client API
@@ -41,7 +42,7 @@ public class JConfigClientExampleTest {
     IConfigService adminApi = JConfigClientFactory.adminApi(actorRuntime.actorSystem(), clientLocationService);
     //#create-api
 
-    private static ServerWiring serverWiring = ServerWiring.make(ClusterAwareSettings.joinLocal(3552, new scala.collection.mutable.ArrayBuffer()));
+    private static ServerWiring serverWiring = ServerWiring.make(clientLocationService.asScala());
     private static HttpService httpService = serverWiring.httpService();
     private TestFileUtils testFileUtils = new TestFileUtils(serverWiring.settings());
 
@@ -56,6 +57,7 @@ public class JConfigClientExampleTest {
 
     @BeforeClass
     public static void beforeAll() throws Exception {
+        jhttpLocationService = new JHTTPLocationService();
         Await.result(httpService.registeredLazyBinding(), Duration.create(20, "seconds"));
     }
 
@@ -72,8 +74,6 @@ public class JConfigClientExampleTest {
     @AfterClass
     public static void afterAll() throws Exception {
         Await.result(httpService.shutdown(CoordinatedShutdown.unknownReason()), Duration.create(20, "seconds"));
-        clientLocationService.shutdown(CoordinatedShutdown.unknownReason()).get();
-        Await.result(actorRuntime.actorSystem().terminate(), Duration.create(20, "seconds"));
     }
 
 

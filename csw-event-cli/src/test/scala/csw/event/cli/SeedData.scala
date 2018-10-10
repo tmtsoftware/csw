@@ -4,7 +4,6 @@ import akka.actor.ActorSystem
 import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
-import csw.clusterseed.client.HTTPLocationService
 import csw.commons.redis.EmbeddedRedis
 import csw.event.api.scaladsl.EventPublisher
 import csw.event.cli.args.ArgsParser
@@ -15,6 +14,7 @@ import csw.location.api.models.TcpRegistration
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.ActorSystemFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
+import csw.location.http.HTTPLocationService
 import csw.params.core.formats.JsonSupport
 import csw.params.events._
 import org.scalatest.{BeforeAndAfterEach, Matchers}

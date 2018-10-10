@@ -11,11 +11,12 @@ import csw.config.client.scaladsl.ConfigClientFactory
 import csw.config.server.commons.TestFileUtils
 import csw.config.server.{ServerWiring, Settings}
 import csw.location.helpers.LSNodeSpec
+import csw.location.http.HTTPLocationService
 
 class ConfigServiceTestMultiJvmNode1 extends ConfigServiceTest(0)
 class ConfigServiceTestMultiJvmNode2 extends ConfigServiceTest(0)
 
-class ConfigServiceTest(ignore: Int) extends LSNodeSpec(config = new OneClientAndServer) {
+class ConfigServiceTest(ignore: Int) extends LSNodeSpec(config = new OneClientAndServer, mode = "http") with HTTPLocationService {
 
   import config._
 
@@ -33,6 +34,7 @@ class ConfigServiceTest(ignore: Int) extends LSNodeSpec(config = new OneClientAn
       serverWiring.svnRepo.initSvnRepo()
       serverWiring.httpService.registeredLazyBinding.await
       enterBarrier("server-started")
+      enterBarrier("end")
     }
 
     runOn(client) {
@@ -52,6 +54,7 @@ class ConfigServiceTest(ignore: Int) extends LSNodeSpec(config = new OneClientAn
       configService.create(file, ConfigData.fromString(configValue), annex = false, "commit test file").await
       val actualConfigValue = configService.getLatest(file).await.get.toStringF.await
       actualConfigValue shouldBe configValue
+      enterBarrier("end")
     }
   }
 }

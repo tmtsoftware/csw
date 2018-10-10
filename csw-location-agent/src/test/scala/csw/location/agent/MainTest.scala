@@ -3,33 +3,35 @@ package csw.location.agent
 import java.net.URI
 import java.nio.file.Paths
 
-import akka.actor.CoordinatedShutdown.UnknownReason
+import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
 import csw.location.agent.common.TestFutureExtension.RichFuture
 import csw.location.api.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.location.api.models.Connection.TcpConnection
 import csw.location.api.models.{ComponentId, ComponentType}
-import csw.location.scaladsl.LocationServiceFactory
+import csw.location.client.scaladsl.HttpLocationServiceFactory
+import csw.location.http.HTTPLocationService
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.scalatest.concurrent.Eventually
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 import scala.concurrent.duration._
 
 /**
  * Test the csw-location-agent app in-line
  */
-class MainTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach with Eventually {
+class MainTest extends HTTPLocationService with Eventually {
 
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
   InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
 
-  private val clusterSettings: ClusterSettings = ClusterAwareSettings.onPort(3559)
-  private val locationService                  = LocationServiceFactory.withSystem(clusterSettings.system)
+  implicit private val system: ActorSystem    = ActorSystem()
+  implicit private val mat: ActorMaterializer = ActorMaterializer()
+  private val locationService                 = HttpLocationServiceFactory.makeLocalClient
 
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 100.millis)
 
-  override protected def afterAll(): Unit = locationService.shutdown(UnknownReason).await
+  override def afterAll(): Unit = super.afterAll()
 
   test("Test with command line args") {
     val name = "test1"
@@ -50,7 +52,7 @@ class MainTest extends FunSuite with Matchers with BeforeAndAfterAll with Before
   }
 
   private def testWith(args: Array[String], name: String, port: Int) = {
-    val locationAgentApp = new Main(ClusterAwareSettings.joinLocal(3559), false)
+    val locationAgentApp = new Main(ClusterSettings(), false)
     val process          = locationAgentApp.start(args).get
 
     val connection       = TcpConnection(ComponentId(name, ComponentType.Service))

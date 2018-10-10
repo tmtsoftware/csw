@@ -25,6 +25,7 @@ import csw.params.core.states.{DemandState, StateName}
 import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.scaladsl.CommandService
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
+import csw.location.http.HTTPLocationService
 import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar
 
@@ -77,7 +78,10 @@ class CommandServiceTestMultiJvm3 extends CommandServiceTest(0)
 // DEOPSCSW-228: Assist Components with command completion
 // DEOPSCSW-313: Support short running actions by providing immediate response
 // DEOPSCSW-321: AkkaLocation provides wrapper for ActorRef[ComponentMessage]
-class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSeed) with MockitoSugar {
+class CommandServiceTest(ignore: Int)
+    extends LSNodeSpec(config = new TwoMembersAndSeed, mode = "http")
+    with HTTPLocationService
+    with MockitoSugar {
 
   import config._
   import csw.common.components.command.ComponentStateForCommand._
@@ -88,6 +92,8 @@ class CommandServiceTest(ignore: Int) extends LSNodeSpec(config = new TwoMembers
   implicit val timeout: Timeout            = 5.seconds
   implicit val scheduler: Scheduler        = actorSystem.scheduler
   implicit val testkit: TestKitSettings    = TestKitSettings(actorSystem)
+
+  override def afterAll(): Unit = super.afterAll()
 
   test("sender of command should receive appropriate responses") {
 

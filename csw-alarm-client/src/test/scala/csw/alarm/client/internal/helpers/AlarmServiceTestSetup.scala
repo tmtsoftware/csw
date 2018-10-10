@@ -4,8 +4,6 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.{typed, ActorSystem}
 import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
-import csw.commons.redis.EmbeddedRedis
-import csw.commons.utils.SocketUtils.getFreePort
 import csw.alarm.api.internal.{MetadataKey, SeverityKey}
 import csw.alarm.api.javadsl.IAlarmService
 import csw.alarm.api.models.{AlarmMetadata, FullAlarmSeverity}
@@ -15,7 +13,8 @@ import csw.alarm.client.internal.commons.Settings
 import csw.alarm.client.internal.commons.serviceresolver.AlarmServiceHostPortResolver
 import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
 import csw.alarm.client.internal.redis.RedisConnectionsFactory
-import csw.location.client.ActorSystemFactory
+import csw.commons.redis.EmbeddedRedis
+import csw.commons.utils.SocketUtils.getFreePort
 import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
@@ -42,7 +41,7 @@ class AlarmServiceTestSetup
   private val resolver    = new AlarmServiceHostPortResolver(hostname, sentinelPort)
   private val redisClient = RedisClient.create()
 
-  implicit val actorSystem: ActorSystem               = ActorSystemFactory.remote()
+  implicit val actorSystem: ActorSystem               = ActorSystem("alarm-server")
   implicit val ec: ExecutionContext                   = actorSystem.dispatcher
   implicit val typedActorSystem: typed.ActorSystem[_] = actorSystem.toTyped
   implicit val mat: ActorMaterializer                 = ActorMaterializer()

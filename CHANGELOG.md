@@ -1,11 +1,11 @@
 # Change Log
 
-CSW Common Software is a reimplementation/refactoring of the prototype CSW code [here](https://github.com/tmtsoftware/csw) 
+CSW Common Software is a reimplementation/refactoring of the prototype CSW code [here](https://github.com/tmtsoftware/csw-prototype) 
 developed during the CSW design phase with changes to make the code and public APIs
 more robust and resilient and to improve its usability and performance for use at the
 TMT Observatory.
 
-The product is in a new repository: [csw-prod](https://github.com/tmtsoftware/csw-prod).
+The product is in a new repository: [csw](https://github.com/tmtsoftware/csw).
 
 All notable changes to this project will be documented in this file.
 
@@ -13,7 +13,7 @@ All notable changes to this project will be documented in this file.
 
 This is version 0.5 the second release of the TMT Common Software for project stakeholders. 
 This release includes Event Service.
-See [here](https://tmtsoftware.github.io/csw-prod/0.5.0/) for a detailed documentation of this version of the CSW software.
+See [here](https://tmtsoftware.github.io/csw/0.5.0/) for a detailed documentation of this version of the CSW software.
 
 #### New Features
 - Event Service
@@ -37,18 +37,18 @@ See [here](https://tmtsoftware.github.io/csw-prod/0.5.0/) for a detailed documen
 
 This is the release candidate 2 of the second release of the TMT Common Software for project stakeholders. 
 This release includes event service and partial implementation of alarm service.
-See [here](https://tmtsoftware.github.io/csw-prod/0.5.0-RC2/) for a detailed documentation of this version of the CSW software.
+See [here](https://tmtsoftware.github.io/csw/0.5.0-RC2/) for a detailed documentation of this version of the CSW software.
 
 ## [CSW v0.5.0-RC1] - 2018-08-01
 
 This is the release candidate 1 of the second release of the TMT Common Software for project stakeholders. 
 This release includes event service.
-See [here](https://tmtsoftware.github.io/csw-prod/0.5.0-RC1/) for a detailed documentation of this version of the CSW software.
+See [here](https://tmtsoftware.github.io/csw/0.5.0-RC1/) for a detailed documentation of this version of the CSW software.
 
 ## [CSW v0.4.0] - 2018-04-11
 
 This is the first early release of the TMT Common Software for project stakeholders. 
-See [here](https://tmtsoftware.github.io/csw-prod/0.4.0/) for a detailed description of this version of the CSW software.
+See [here](https://tmtsoftware.github.io/csw/0.4.0/) for a detailed description of this version of the CSW software.
 
 See the notes for [CSW v0.4.0-RC1] for release changes.
 
@@ -56,7 +56,7 @@ See the notes for [CSW v0.4.0-RC1] for release changes.
 ## [CSW v0.4.0-RC1] - 2018-04-04
 
 This is the release candidate 1 of the first release of the TMT Common Software for project stakeholders. 
-See [here](https://tmtsoftware.github.io/csw-prod/0.4.0-RC1/) for a detailed description of this version of the CSW software.
+See [here](https://tmtsoftware.github.io/csw/0.4.0-RC1/) for a detailed description of this version of the CSW software.
 
 ### Changed
 

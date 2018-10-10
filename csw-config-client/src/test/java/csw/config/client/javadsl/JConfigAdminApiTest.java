@@ -3,6 +3,7 @@ package csw.config.client.javadsl;
 import akka.actor.ActorSystem;
 import akka.actor.CoordinatedShutdown;
 import akka.stream.Materializer;
+import csw.location.http.JHTTPLocationService;
 import csw.config.api.exceptions.FileAlreadyExists;
 import csw.config.api.exceptions.FileNotFound;
 import csw.config.api.javadsl.IConfigService;
@@ -13,8 +14,7 @@ import csw.config.server.ServerWiring;
 import csw.config.server.commons.TestFileUtils;
 import csw.config.server.http.HttpService;
 import csw.location.api.javadsl.ILocationService;
-import csw.location.api.commons.ClusterAwareSettings;
-import csw.location.javadsl.JLocationServiceFactory;
+import csw.location.client.javadsl.JHttpLocationServiceFactory;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 import scala.concurrent.Await;
@@ -32,12 +32,13 @@ import static org.hamcrest.CoreMatchers.isA;
 
 // DEOPSCSW-138: Split Config API into Admin API and Client API
 // DEOPSCSW-103: Java API for Configuration service
-public class JConfigAdminApiTest {
+public class JConfigAdminApiTest  {
+    private static JHTTPLocationService jHttpLocationService;
     private static ActorRuntime actorRuntime = new ActorRuntime(ActorSystem.create());
-    private static ILocationService clientLocationService = JLocationServiceFactory.withSettings(ClusterAwareSettings.onPort(3552));
+    private static ILocationService clientLocationService = JHttpLocationServiceFactory.makeLocalClient(actorRuntime.actorSystem(), actorRuntime.mat());
     private static IConfigService configService = JConfigClientFactory.adminApi(actorRuntime.actorSystem(), clientLocationService);
 
-    private static ServerWiring serverWiring = ServerWiring.make(ClusterAwareSettings.joinLocal(3552, new scala.collection.mutable.ArrayBuffer()));
+    private static ServerWiring serverWiring = new ServerWiring();
     private static HttpService httpService = serverWiring.httpService();
     private TestFileUtils testFileUtils = new TestFileUtils(serverWiring.settings());
 
@@ -54,6 +55,7 @@ public class JConfigAdminApiTest {
 
     @BeforeClass
     public static void beforeAll() throws Exception {
+        jHttpLocationService = new JHTTPLocationService();
         Await.result(httpService.registeredLazyBinding(), Duration.create(20, "seconds"));
     }
 
@@ -70,8 +72,9 @@ public class JConfigAdminApiTest {
     @AfterClass
     public static void afterAll() throws Exception {
         Await.result(httpService.shutdown(CoordinatedShutdown.unknownReason()), Duration.create(20, "seconds"));
-        clientLocationService.shutdown(CoordinatedShutdown.unknownReason()).get();
         Await.result(actorRuntime.actorSystem().terminate(), Duration.create(20, "seconds"));
+        Await.result(serverWiring.actorSystem().terminate(), Duration.create(20, "seconds"));
+        jHttpLocationService.afterAll();
     }
 
     // DEOPSCSW-42: Storing text based component configuration

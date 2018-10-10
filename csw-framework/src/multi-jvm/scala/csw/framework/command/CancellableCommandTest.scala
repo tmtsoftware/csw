@@ -7,18 +7,19 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
+import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.messages.CommandMessage.{Oneway, Submit}
 import csw.command.messages.CommandResponseManagerMessage.Subscribe
 import csw.common.components.command.ComponentStateForCommand.{acceptedCmd, cancelCmd, prefix}
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
+import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.{ComponentId, ComponentType}
+import csw.location.helpers.{LSNodeSpec, OneMemberAndSeed}
+import csw.location.http.HTTPLocationService
 import csw.params.commands.CommandResponse._
 import csw.params.commands.Setup
 import csw.params.core.generics.KeyType
 import csw.params.core.models.ObsId
-import csw.location.api.models.Connection.AkkaConnection
-import csw.location.api.models.{ComponentId, ComponentType}
-import csw.location.helpers.{LSNodeSpec, OneMemberAndSeed}
-import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
 import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar
 
@@ -30,8 +31,10 @@ class CancellableCommandTestMultiJvm1 extends CancellableCommandTest(0)
 class CancellableCommandTestMultiJvm2 extends CancellableCommandTest(0)
 
 // DEOPSCSW-211 Notification of Interrupted Message
-class CancellableCommandTest(ignore: Int) extends LSNodeSpec(config = new OneMemberAndSeed) with MockitoSugar {
-
+class CancellableCommandTest(ignore: Int)
+    extends LSNodeSpec(config = new OneMemberAndSeed, mode = "http")
+    with HTTPLocationService
+    with MockitoSugar {
   import config._
 
   implicit val actorSystem: ActorSystem[_] = system.toTyped
@@ -39,6 +42,8 @@ class CancellableCommandTest(ignore: Int) extends LSNodeSpec(config = new OneMem
   implicit val ec: ExecutionContext = actorSystem.executionContext
   implicit val timeout: Timeout = 5.seconds
   implicit val scheduler: Scheduler = actorSystem.scheduler
+
+  override def afterAll(): Unit = super.afterAll()
 
   test("a long running command should be cancellable") {
     runOn(seed) {

@@ -2,12 +2,13 @@ package csw.benchmark.command
 
 import java.util.concurrent.TimeUnit
 
-import akka.actor.{ActorSystem, Scheduler}
+import akka.actor.CoordinatedShutdown.UnknownReason
+import akka.actor.Scheduler
 import akka.util
 import com.typesafe.config.ConfigFactory
 import csw.benchmark.command.BenchmarkHelpers.spawnStandaloneComponent
 import csw.command.scaladsl.CommandService
-import csw.location.api.commons.ClusterAwareSettings
+import csw.location.internal.AdminWiring
 import csw.params.commands
 import csw.params.commands.CommandName
 import csw.params.core.models.Prefix
@@ -35,27 +36,25 @@ import scala.concurrent.duration.DurationInt
 @Measurement(iterations = 10, time = 1, timeUnit = TimeUnit.SECONDS, batchSize = 1)
 class CommandServiceBenchmark {
 
-  implicit var actorSystem: ActorSystem = _
-  implicit var timeout: util.Timeout    = _
-  implicit var scheduler: Scheduler     = _
-  var setupCommand: commands.Setup      = _
-  var componentRef: CommandService      = _
+  implicit var timeout: util.Timeout = _
+  implicit var scheduler: Scheduler  = _
+  var setupCommand: commands.Setup   = _
+  var componentRef: CommandService   = _
+  var adminWiring: AdminWiring       = _
 
   @Setup(Level.Trial)
   def setup(): Unit = {
-    actorSystem = ClusterAwareSettings.onPort(3552).system
-
-    componentRef = spawnStandaloneComponent(actorSystem, ConfigFactory.load("standalone.conf"))
-
+    adminWiring = AdminWiring.make(Some(3553))
+    Await.result(adminWiring.locationHttpService.start(), 5.seconds)
+    componentRef = spawnStandaloneComponent(adminWiring.actorSystem, ConfigFactory.load("standalone.conf"))
     setupCommand = commands.Setup(Prefix("wfos.blue.filter"), CommandName("jmh"), None)
     timeout = util.Timeout(5.seconds)
-    scheduler = actorSystem.scheduler
+    scheduler = adminWiring.actorSystem.scheduler
   }
 
   @TearDown(Level.Trial)
   def teardown(): Unit = {
-    actorSystem.terminate()
-    Await.ready(actorSystem.whenTerminated, 15.seconds)
+    Await.result(adminWiring.actorRuntime.shutdown(UnknownReason), 5.seconds)
   }
 
   @Benchmark

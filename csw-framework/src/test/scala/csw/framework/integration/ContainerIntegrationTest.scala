@@ -1,13 +1,11 @@
 package csw.framework.integration
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
+import akka.http.scaladsl.Http
 import akka.stream.scaladsl.{Keep, Sink}
 import akka.testkit
 import com.typesafe.config.ConfigFactory
-import csw.common.FrameworkAssertions._
-import csw.common.components.framework.SampleComponentState._
-import csw.framework.FrameworkTestWiring
-import csw.framework.internal.wiring.{Container, FrameworkWiring}
+import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.messages.ComponentCommonMessage.{GetSupervisorLifecycleState, LifecycleStateSubscription}
 import csw.command.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
 import csw.command.messages.RunningMessage.Lifecycle
@@ -16,16 +14,18 @@ import csw.command.models.framework
 import csw.command.models.framework.PubSub.Subscribe
 import csw.command.models.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.command.models.framework.{Components, ContainerLifecycleState, LifecycleStateChanged, SupervisorLifecycleState}
+import csw.command.scaladsl.CommandService
+import csw.common.FrameworkAssertions._
+import csw.common.components.framework.SampleComponentState._
+import csw.event.client.helpers.TestFutureExt.RichFuture
+import csw.framework.FrameworkTestWiring
+import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.location.api.models.ComponentType.{Assembly, HCD}
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{ComponentId, ComponentType, LocationRemoved, TrackingEvent}
+import csw.location.http.HTTPLocationService
 import csw.params.core.states.{CurrentState, StateName}
-import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
-import csw.command.scaladsl.CommandService
-import csw.event.client.helpers.TestFutureExt.RichFuture
 import io.lettuce.core.RedisClient
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.concurrent.duration.DurationLong
 
@@ -33,7 +33,7 @@ import scala.concurrent.duration.DurationLong
 // DEOPSCSW-177: Hooks for lifecycle management
 // DEOPSCSW-182: Control Life Cycle of Components
 // DEOPSCSW-216: Locate and connect components to send AKKA commands
-class ContainerIntegrationTest extends FunSuite with MockitoSugar with Matchers with BeforeAndAfterAll {
+class ContainerIntegrationTest extends HTTPLocationService {
 
   private val testWiring = new FrameworkTestWiring()
   import testWiring._
@@ -43,7 +43,11 @@ class ContainerIntegrationTest extends FunSuite with MockitoSugar with Matchers 
   private val instrumentHcdConnection  = AkkaConnection(ComponentId("Instrument_Filter", HCD))
   private val disperserHcdConnection   = AkkaConnection(ComponentId("Disperser", HCD))
 
-  override protected def afterAll(): Unit = shutdown()
+  override def afterAll(): Unit = {
+    Http(seedActorSystem).shutdownAllConnectionPools().await
+    seedActorSystem.terminate().await
+    super.afterAll()
+  }
 
   test("should start multiple components withing a single container and able to accept lifecycle messages") {
 
@@ -190,7 +194,7 @@ class ContainerIntegrationTest extends FunSuite with MockitoSugar with Matchers 
       .run()
 
     // ********** Message: Shutdown **********
-
+    Http(testActorSystem).shutdownAllConnectionPools().await
     resolvedContainerRef ! Shutdown
 
     // this proves that ComponentBehaviors postStop signal gets invoked for all components

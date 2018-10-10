@@ -8,8 +8,8 @@ The relationship between publishers and subscribers can be one-to-one, one-to-ma
 
 Event Service client provides the implementation for publishing and subscribing to an event.
 
-If you want to get started with Event Service, refer the [examples](https://tmtsoftware.github.io/csw-prod/services/event.html).
+If you want to get started with Event Service, refer the [examples](https://tmtsoftware.github.io/csw/services/event.html).
 
-You can refer to Scala documentation [here](https://tmtsoftware.github.io/csw-prod/api/scala/csw/event/api/index.html).
+You can refer to Scala documentation [here](https://tmtsoftware.github.io/csw/api/scala/csw/event/api/index.html).
 
-You can refer to Java documentation [here](https://tmtsoftware.github.io/csw-prod/api/java/?/index.html).
+You can refer to Java documentation [here](https://tmtsoftware.github.io/csw/api/java/?/index.html).

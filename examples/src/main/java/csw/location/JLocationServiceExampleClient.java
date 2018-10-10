@@ -19,6 +19,8 @@ import csw.location.api.models.*;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.api.javadsl.IRegistrationResult;
 import csw.location.client.ActorSystemFactory;
+import csw.location.client.javadsl.JHttpLocationServiceFactory;
+import csw.location.internal.AdminWiring;
 import csw.params.core.models.Prefix;
 import csw.command.messages.ComponentMessage;
 import csw.command.messages.ContainerMessage;
@@ -32,6 +34,8 @@ import csw.logging.javadsl.ILogger;
 import csw.logging.javadsl.JKeys;
 import csw.logging.javadsl.JLoggerFactory;
 import csw.logging.javadsl.JLoggingSystemFactory;
+import scala.concurrent.Await;
+import scala.concurrent.duration.FiniteDuration;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -41,6 +45,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import static csw.location.api.models.Connection.*;
 
@@ -52,8 +57,11 @@ public class JLocationServiceExampleClient extends AbstractActor {
 
     private ILogger log = new JLoggerFactory("my-component-name").getLogger(context(), getClass());
     //#actor-mixin
+
     //#create-location-service
-    private ILocationService locationService = JLocationServiceFactory.make();
+    private ActorSystem system = context().system();
+    private ActorMaterializer mat = ActorMaterializer.create(system);
+    private ILocationService locationService = JHttpLocationServiceFactory.makeLocalClient(system, mat);
     //#create-location-service
 
     private AkkaConnection exampleConnection = LocationServiceExampleComponent.connection();
@@ -316,7 +324,12 @@ public class JLocationServiceExampleClient extends AbstractActor {
                 .build();
     }
 
-    public static void main(String[] args) throws InterruptedException, UnknownHostException {
+    public static void main(String[] args) throws Exception {
+        // http location service client expect that location server is running on local machine
+        // here we are starting location http server so that httpLocationClient uses can be illustrated
+        AdminWiring locationWiring = new AdminWiring();
+        Await.result(locationWiring.locationHttpService().start(), new FiniteDuration(5, TimeUnit.SECONDS));
+
         //#create-actor-system
         ActorSystem actorSystem = ActorSystemFactory.remote("csw-examples-locationServiceClient");
         //#create-actor-system

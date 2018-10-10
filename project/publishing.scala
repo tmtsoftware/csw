@@ -37,7 +37,7 @@ object GithubPublishDocs extends AutoPlugin {
     includeFilter in ghpagesCleanSite := new FileFilter {
       override def accept(pathname: File): Boolean = pathname.getAbsolutePath.contains(s"/${version.value}")
     },
-    GitKeys.gitRemoteRepo := "git@github.com:tmtsoftware/csw-prod.git"
+    GitKeys.gitRemoteRepo := "git@github.com:tmtsoftware/csw.git"
   )
 }
 

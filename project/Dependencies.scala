@@ -44,6 +44,7 @@ object Dependencies {
       Akka.`akka-cluster-typed`,
       Libs.`scala-java8-compat`,
       Libs.`scala-async`,
+      Libs.`scopt`,
       Enumeratum.`enumeratum`.value,
       Libs.`akka-management-cluster-http`,
       AkkaHttp.`akka-http`,
@@ -71,16 +72,6 @@ object Dependencies {
   val LocationAgent = Def.setting(
     Seq(
       Akka.`akka-actor`,
-      Libs.`scopt`,
-      Libs.`scalatest`.value % Test
-    )
-  )
-
-  val ClusterSeed = Def.setting(
-    Seq(
-      AkkaHttp.`akka-http`,
-      Libs.`play-json`.value,
-      Libs.`akka-http-play-json`,
       Libs.`scopt`,
       Libs.`scalatest`.value % Test
     )

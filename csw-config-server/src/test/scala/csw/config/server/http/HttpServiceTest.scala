@@ -1,23 +1,33 @@
 package csw.config.server.http
 
+import akka.actor.ActorSystem
 import akka.actor.CoordinatedShutdown.UnknownReason
-import akka.stream.BindFailedException
+import akka.stream.{ActorMaterializer, BindFailedException}
 import csw.config.server.ServerWiring
 import csw.config.server.commons.ConfigServiceConnection
 import csw.config.server.commons.TestFutureExtension.RichFuture
-import csw.location.api.commons.{ClusterAwareSettings, ClusterSettings}
+import csw.location.api.commons.ClusterAwareSettings
 import csw.location.api.exceptions.OtherLocationIsRegistered
 import csw.location.api.models.HttpRegistration
-import csw.location.scaladsl.LocationServiceFactory
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
+import csw.location.client.scaladsl.HttpLocationServiceFactory
+import csw.location.http.HTTPLocationService
 
 import scala.util.control.NonFatal
 
-class HttpServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
+class HttpServiceTest extends HTTPLocationService {
+
+  implicit val system: ActorSystem    = ActorSystem("test")
+  implicit val mat: ActorMaterializer = ActorMaterializer()
+  private val testLocationService     = HttpLocationServiceFactory.makeLocalClient
+
+  override def afterAll(): Unit = {
+    system.terminate().await
+    super.afterAll()
+  }
 
   test("should start the http server and register with location service") {
     val _servicePort = 4005
-    val serverWiring = ServerWiring.make(ClusterAwareSettings, Some(_servicePort))
+    val serverWiring = ServerWiring.make(Some(_servicePort))
     import serverWiring._
     val (binding, registrationResult) = httpService.registeredLazyBinding.await
     locationService.find(ConfigServiceConnection.value).await.get.connection shouldBe ConfigServiceConnection.value
@@ -28,38 +38,27 @@ class HttpServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
   }
 
   test("should not register with location service if server binding fails") {
-    val _servicePort     = 4006
-    val locationService1 = LocationServiceFactory.withSettings(ClusterSettings().onPort(_servicePort))
-    val _clusterSettings = ClusterSettings().joinLocal(_servicePort)
-    val serverWiring     = ServerWiring.make(_clusterSettings, Some(_servicePort))
+    val _servicePort = 3553 // Location Service runs on this port
+    val serverWiring = ServerWiring.make(Some(_servicePort))
 
     import serverWiring._
 
-    intercept[BindFailedException] {
-      httpService.registeredLazyBinding.await
-    }
-
-    locationService1.find(ConfigServiceConnection.value).await shouldBe None
-    locationService1.shutdown(UnknownReason)
+    a[BindFailedException] shouldBe thrownBy(httpService.registeredLazyBinding.await)
+    testLocationService.find(ConfigServiceConnection.value).await shouldBe None
   }
 
   test("should not start server if registration with location service fails") {
     val _servicePort = 4007
-    val serverWiring = ServerWiring.make(ClusterAwareSettings, Some(_servicePort))
+    val serverWiring = ServerWiring.make(Some(_servicePort))
     import serverWiring._
     locationService.register(HttpRegistration(ConfigServiceConnection.value, 21212, "")).await
 
     locationService.find(ConfigServiceConnection.value).await.get.connection shouldBe ConfigServiceConnection.value
 
-    intercept[OtherLocationIsRegistered] {
-      httpService.registeredLazyBinding.await
-    }
+    a[OtherLocationIsRegistered] shouldBe thrownBy(httpService.registeredLazyBinding.await)
 
     //TODO: Find a way to assert server is not bounded
-    try {
-      actorRuntime.shutdown(UnknownReason).await
-    } catch {
-      case NonFatal(ex) ⇒
-    }
+    try actorRuntime.shutdown(UnknownReason).await
+    catch { case NonFatal(ex) ⇒ }
   }
 }

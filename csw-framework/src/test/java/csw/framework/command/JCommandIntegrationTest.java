@@ -1,39 +1,38 @@
 package csw.framework.command;
 
 import akka.actor.ActorSystem;
-import akka.actor.CoordinatedShutdown;
 import akka.actor.testkit.typed.javadsl.TestInbox;
 import akka.actor.testkit.typed.javadsl.TestProbe;
 import akka.actor.typed.internal.adapter.ActorSystemAdapter;
 import akka.stream.ActorMaterializer;
-import akka.stream.Materializer;
 import akka.util.Timeout;
 import com.typesafe.config.ConfigFactory;
+import csw.command.extensions.AkkaLocationExt;
+import csw.command.javadsl.JCommandService;
+import csw.command.messages.SupervisorLockMessage;
+import csw.command.models.framework.LockingResponse;
+import csw.command.models.framework.LockingResponses;
+import csw.command.models.matchers.*;
+import csw.command.scaladsl.CurrentStateSubscription;
 import csw.common.components.framework.SampleComponentState;
 import csw.framework.internal.wiring.FrameworkWiring;
 import csw.framework.internal.wiring.Standalone;
-import csw.command.messages.SupervisorLockMessage;
+import csw.location.api.javadsl.ILocationService;
+import csw.location.api.models.AkkaLocation;
+import csw.location.api.models.ComponentId;
+import csw.location.client.ActorSystemFactory;
+import csw.location.client.javadsl.JHttpLocationServiceFactory;
+import csw.location.http.JHTTPLocationService;
+import csw.logging.javadsl.JLoggingSystemFactory;
 import csw.params.commands.CommandResponse;
 import csw.params.commands.ControlCommand;
 import csw.params.commands.Setup;
-import csw.command.models.matchers.*;
-import csw.command.models.framework.LockingResponse;
-import csw.command.models.framework.LockingResponses;
-import csw.location.api.models.AkkaLocation;
-import csw.location.api.models.ComponentId;
-import csw.params.javadsl.JKeyType;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.core.states.CurrentState;
 import csw.params.core.states.DemandState;
 import csw.params.core.states.StateName;
-import csw.command.extensions.AkkaLocationExt;
-import csw.command.javadsl.JCommandService;
-import csw.command.scaladsl.CurrentStateSubscription;
-import csw.location.api.commons.ClusterAwareSettings;
-import csw.location.api.javadsl.ILocationService;
-import csw.location.javadsl.JLocationServiceFactory;
-import csw.logging.javadsl.JLoggingSystemFactory;
+import csw.params.javadsl.JKeyType;
 import io.lettuce.core.RedisClient;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -61,18 +60,21 @@ import static csw.location.javadsl.JComponentType.HCD;
 // DEOPSCSW-317: Use state values of HCD to determine command completion
 // DEOPSCSW-321: AkkaLocation provides wrapper for ActorRef[ComponentMessage]
 public class JCommandIntegrationTest {
-    private static ILocationService locationService = JLocationServiceFactory.withSettings(ClusterAwareSettings.onPort(3552));
-
-    private static ActorSystem hcdActorSystem = ClusterAwareSettings.joinLocal(3552).system();
-
+    private static ActorSystem hcdActorSystem = ActorSystemFactory.remote();
     private ExecutionContext ec = hcdActorSystem.dispatcher();
-    private Materializer mat = ActorMaterializer.create(hcdActorSystem);
+    private static ActorMaterializer mat = ActorMaterializer.create(hcdActorSystem);
+
+    private static JHTTPLocationService jHttpLocationService;
+    private static ILocationService locationService;
     private static JCommandService hcdCmdService;
     private static AkkaLocation hcdLocation;
     private Timeout timeout = new Timeout(5, TimeUnit.SECONDS);
 
     @BeforeClass
     public static void setup() throws Exception {
+        jHttpLocationService = new JHTTPLocationService();
+
+        locationService = JHttpLocationServiceFactory.makeLocalClient(hcdActorSystem, mat);
         hcdLocation = getLocation();
         hcdCmdService = new JCommandService(hcdLocation, akka.actor.typed.ActorSystem.wrap(hcdActorSystem));
         JLoggingSystemFactory.start("","", "", hcdActorSystem);
@@ -80,8 +82,8 @@ public class JCommandIntegrationTest {
 
     @AfterClass
     public static void teardown() throws Exception {
-        locationService.shutdown(CoordinatedShutdown.unknownReason()).get();
         Await.result(hcdActorSystem.terminate(), Duration.create(20, "seconds"));
+        jHttpLocationService.afterAll();
     }
 
     private static AkkaLocation getLocation() throws Exception {

@@ -169,9 +169,9 @@ package csw
  * The contents of the files are exchanged using [Akka reactive streams](http://www.typesafe.com/activator/template/akka-stream-scala).
  *
  * Detailed documentation of Config Server application is available at:
- * https://tmtsoftware.github.io/csw-prod/apps/cswonfigserverapp.html
+ * https://tmtsoftware.github.io/csw/apps/cswonfigserverapp.html
  *
  * Detailed documentation of Config Service is available at:
- * https://tmtsoftware.github.io/csw-prod/services/config.html
+ * https://tmtsoftware.github.io/csw/services/config.html
  */
 package object config {}

@@ -66,7 +66,7 @@ class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
     val pubSubBehavior: BehaviorTestKit[PubSub[CurrentState]] = createCurrentStatePubSubBehavior()
 
     pubSubBehavior.run(Subscribe(currentStateProbe1.ref))
-    pubSubBehavior.run(SubscribeOnly(currentStateProbe2.ref, Set(StateName("testStateName2"), StateName("testStateName3"))))
+    pubSubBehavior.run(SubscribeOnly(currentStateProbe2.ref, Set(currentState2.stateName, currentState3.stateName)))
 
     pubSubBehavior.run(Publish(currentState1))
     pubSubBehavior.run(Publish(currentState2))

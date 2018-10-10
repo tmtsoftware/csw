@@ -10,8 +10,8 @@ Using location service, a component or service can:
 * List or filter components and services using subsystem name/prefix in its name.
 * Track the location of another component or service for change in its location information.
 
-If you want to get started with location service, refer the [examples](https://tmtsoftware.github.io/csw-prod/services/location.html).
+If you want to get started with location service, refer the [examples](https://tmtsoftware.github.io/csw/services/location.html).
 
-You can refer to Scala documentation [here](https://tmtsoftware.github.io/csw-prod/api/scala/csw/location/index.html).
+You can refer to Scala documentation [here](https://tmtsoftware.github.io/csw/api/scala/csw/location/index.html).
 
-You can refer to Java documentation [here](https://tmtsoftware.github.io/csw-prod/api/java/?/index.html).
+You can refer to Java documentation [here](https://tmtsoftware.github.io/csw/api/java/?/index.html).

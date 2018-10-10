@@ -1,33 +1,33 @@
 package csw.framework.integration
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
+import akka.http.scaladsl.Http
 import akka.stream.scaladsl.Keep
 import akka.stream.testkit.scaladsl.TestSink
 import com.persist.JsonOps
 import com.persist.JsonOps.JsonObject
 import com.typesafe.config.ConfigFactory
+import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
+import csw.command.messages.SupervisorContainerCommonMessages.Shutdown
+import csw.command.models.framework.SupervisorLifecycleState
+import csw.command.scaladsl.CommandService
 import csw.common.FrameworkAssertions._
 import csw.common.components.framework.SampleComponentHandlers
 import csw.common.components.framework.SampleComponentState._
 import csw.common.utils.TestAppender
 import csw.commons.tags.LoggingSystemSensitive
+import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.framework.FrameworkTestWiring
 import csw.framework.internal.component.ComponentBehavior
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
-import csw.command.messages.SupervisorContainerCommonMessages.Shutdown
-import csw.command.models.framework.SupervisorLifecycleState
 import csw.location.api.models.ComponentType.HCD
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{ComponentId, LocationRemoved, LocationUpdated, TrackingEvent}
-import csw.params.core.states.{CurrentState, StateName}
-import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
-import csw.command.scaladsl.CommandService
-import csw.event.client.helpers.TestFutureExt.RichFuture
+import csw.location.http.HTTPLocationService
 import csw.logging.internal.LoggingLevels.INFO
 import csw.logging.internal.LoggingSystem
+import csw.params.core.states.{CurrentState, StateName}
 import io.lettuce.core.RedisClient
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 import scala.collection.mutable
 import scala.concurrent.Await
@@ -37,7 +37,7 @@ import scala.concurrent.duration.DurationLong
 // DEOPSCSW-177: Hooks for lifecycle management
 // DEOPSCSW-216: Locate and connect components to send AKKA commands
 @LoggingSystemSensitive
-class StandaloneComponentTest extends FunSuite with Matchers with MockitoSugar with BeforeAndAfterAll {
+class StandaloneComponentTest extends HTTPLocationService {
 
   private val testWiring = new FrameworkTestWiring()
   import testWiring._
@@ -52,7 +52,11 @@ class StandaloneComponentTest extends FunSuite with Matchers with MockitoSugar w
     loggingSystem.setAppenders(List(testAppender))
   }
 
-  override protected def afterAll(): Unit = shutdown()
+  override def afterAll(): Unit = {
+    Http(seedActorSystem).shutdownAllConnectionPools().await
+    seedActorSystem.terminate().await
+    super.afterAll()
+  }
 
   test("should start a component in standalone mode and register with location service") {
 
@@ -81,6 +85,7 @@ class StandaloneComponentTest extends FunSuite with Matchers with MockitoSugar w
 
     // on shutdown, component unregisters from location service
     supervisorCommandService.subscribeCurrentState(supervisorStateProbe.ref ! _)
+    Http(testActorSystem).shutdownAllConnectionPools().await
     supervisorRef ! Shutdown
 
     // this proves that ComponentBehaviors postStop signal gets invoked

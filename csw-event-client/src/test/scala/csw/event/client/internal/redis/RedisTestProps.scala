@@ -1,19 +1,21 @@
 package csw.event.client.internal.redis
 
 import akka.Done
-import akka.actor.CoordinatedShutdown.UnknownReason
-import akka.actor.{ActorSystem, CoordinatedShutdown}
+import akka.actor.ActorSystem
+import akka.http.scaladsl.Http
 import com.typesafe.config.ConfigFactory
 import csw.commons.redis.EmbeddedRedis
 import csw.commons.utils.SocketUtils.getFreePort
-import csw.location.api.scaladsl.LocationService
-import csw.event.client.EventServiceFactory
 import csw.event.api.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
 import csw.event.api.scaladsl._
+import csw.event.client.EventServiceFactory
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.event.client.internal.commons.javawrappers.JEventService
 import csw.event.client.internal.wiring.BaseProperties
+import csw.event.client.internal.wiring.BaseProperties.createInfra
 import csw.event.client.models.EventStores.RedisStore
+import csw.location.api.scaladsl.LocationService
+import csw.location.http.HTTPLocationServiceOnPorts
 import io.lettuce.core.api.async.RedisAsyncCommands
 import io.lettuce.core.codec.StringCodec
 import io.lettuce.core.{ClientOptions, RedisClient, RedisURI}
@@ -28,6 +30,7 @@ class RedisTestProps(
     serverPort: Int,
     val redisClient: RedisClient,
     locationService: LocationService,
+    locationServer: HTTPLocationServiceOnPorts
 )(implicit val actorSystem: ActorSystem)
     extends BaseProperties
     with EmbeddedRedis {
@@ -68,22 +71,28 @@ class RedisTestProps(
     publisher.shutdown().await
     redisClient.shutdown()
     stopSentinel(redisSentinel, redisServer)
-    CoordinatedShutdown(actorSystem).run(UnknownReason).await
+    Http(actorSystem).shutdownAllConnectionPools().await
+    actorSystem.terminate().await
+    locationServer.afterAll()
   }
 }
 
 object RedisTestProps extends EmbeddedRedis {
   def createRedisProperties(
-      seedPort: Int = getFreePort,
+      clusterPort: Int = getFreePort,
+      httpLocationServicePort: Int = getFreePort,
       sentinelPort: Int = getFreePort,
       serverPort: Int = getFreePort,
       clientOptions: ClientOptions = ClientOptions.create()
   ): RedisTestProps = {
-    val (system, locationService) = BaseProperties.createInfra(seedPort, sentinelPort)
+
+    val locationServer = new HTTPLocationServiceOnPorts(clusterPort, httpLocationServicePort)
+
+    val (locationService, system) = createInfra(sentinelPort, httpLocationServicePort)
     val redisClient: RedisClient  = RedisClient.create()
     redisClient.setOptions(clientOptions)
 
-    new RedisTestProps("Redis", sentinelPort, serverPort, redisClient, locationService)(system)
+    new RedisTestProps("Redis", sentinelPort, serverPort, redisClient, locationService, locationServer)(system)
   }
 
   def jCreateRedisProperties(clientOptions: ClientOptions): RedisTestProps = createRedisProperties(clientOptions = clientOptions)

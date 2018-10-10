@@ -1,19 +1,20 @@
 package csw.event.client.internal.kafka
 
 import akka.Done
-import akka.actor.CoordinatedShutdown.UnknownReason
-import akka.actor.{ActorSystem, CoordinatedShutdown}
+import akka.actor.ActorSystem
+import akka.http.scaladsl.Http
 import akka.kafka.ProducerSettings
 import csw.commons.utils.SocketUtils.getFreePort
-import csw.location.api.scaladsl.LocationService
-import csw.event.client.EventServiceFactory
 import csw.event.api.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
 import csw.event.api.scaladsl.{EventPublisher, EventService, EventSubscriber}
+import csw.event.client.EventServiceFactory
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.event.client.internal.wiring.BaseProperties
 import csw.event.client.internal.wiring.BaseProperties.createInfra
 import csw.event.client.models.EventStores.KafkaStore
 import csw.location.api.commons.ClusterAwareSettings
+import csw.location.api.scaladsl.LocationService
+import csw.location.http.HTTPLocationServiceOnPorts
 import net.manub.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.StringSerializer
@@ -24,12 +25,13 @@ import scala.concurrent.Future
 class KafkaTestProps(
     kafkaPort: Int,
     locationService: LocationService,
+    locationServer: HTTPLocationServiceOnPorts,
     additionalBrokerProps: Map[String, String]
 )(implicit val actorSystem: ActorSystem)
     extends BaseProperties {
   private val brokers          = s"PLAINTEXT://${ClusterAwareSettings.hostname}:$kafkaPort"
   private val brokerProperties = Map("listeners" → brokers, "advertised.listeners" → brokers) ++ additionalBrokerProps
-  val config                   = EmbeddedKafkaConfig(customBrokerProperties = brokerProperties)
+  val config                   = EmbeddedKafkaConfig(customBrokerProperties = brokerProperties, zooKeeperPort = getFreePort)
 
   private val eventServiceFactory = new EventServiceFactory(KafkaStore)
   private lazy val producerSettings: ProducerSettings[String, String] =
@@ -57,19 +59,25 @@ class KafkaTestProps(
 
   override def shutdown(): Unit = {
     EmbeddedKafka.stop()
-    CoordinatedShutdown(actorSystem).run(UnknownReason).await
+    Http(actorSystem).shutdownAllConnectionPools().await
+    actorSystem.terminate().await
+    locationServer.afterAll()
   }
 }
 
 object KafkaTestProps {
 
   def createKafkaProperties(
-      seedPort: Int = getFreePort,
+      clusterPort: Int = getFreePort,
+      httpLocationServicePort: Int = getFreePort,
       serverPort: Int = getFreePort,
       additionalBrokerProps: Map[String, String] = Map.empty
   ): KafkaTestProps = {
-    val (system, locationService) = createInfra(seedPort, serverPort)
-    new KafkaTestProps(serverPort, locationService, additionalBrokerProps)(system)
+
+    val locationServer = new HTTPLocationServiceOnPorts(clusterPort, httpLocationServicePort)
+
+    val (locationService, system) = createInfra(serverPort, httpLocationServicePort)
+    new KafkaTestProps(serverPort, locationService, locationServer, additionalBrokerProps)(system)
   }
 
   def jCreateKafkaProperties(additionalBrokerProps: java.util.Map[String, String]): KafkaTestProps =

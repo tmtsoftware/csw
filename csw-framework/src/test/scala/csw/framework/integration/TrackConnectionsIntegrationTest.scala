@@ -1,35 +1,34 @@
 package csw.framework.integration
 
 import akka.actor
-import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.testkit.typed.scaladsl.TestProbe
+import akka.http.scaladsl.Http
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
+import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
+import csw.command.messages.SupervisorContainerCommonMessages.Shutdown
+import csw.command.models.framework.{ContainerLifecycleState, SupervisorLifecycleState}
+import csw.command.scaladsl.CommandService
 import csw.common.FrameworkAssertions._
 import csw.common.components.framework.SampleComponentState._
+import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.framework.FrameworkTestWiring
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
-import csw.command.messages.SupervisorContainerCommonMessages.Shutdown
-import csw.params.commands
-import csw.params.commands.CommandName
-import csw.command.models.framework.{ContainerLifecycleState, SupervisorLifecycleState}
-import csw.location.api.models.ComponentId
 import csw.location.api.models.ComponentType.{Assembly, HCD}
 import csw.location.api.models.Connection.AkkaConnection
+import csw.location.api.models.{ComponentId, HttpRegistration, TcpRegistration}
+import csw.location.client.ActorSystemFactory
+import csw.location.http.HTTPLocationService
+import csw.params.commands
+import csw.params.commands.CommandName
 import csw.params.core.states.{CurrentState, StateName}
-import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
-import csw.command.scaladsl.CommandService
-import csw.event.client.helpers.TestFutureExt.RichFuture
-import csw.location.api.commons.ClusterSettings
-import csw.location.api.models.{HttpRegistration, TcpRegistration}
 import io.lettuce.core.RedisClient
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers, OptionValues}
+import org.scalatest.OptionValues
 
 import scala.concurrent.TimeoutException
 import scala.concurrent.duration.DurationLong
 
-class TrackConnectionsIntegrationTest extends FunSuite with Matchers with OptionValues with MockitoSugar with BeforeAndAfterAll {
+class TrackConnectionsIntegrationTest extends HTTPLocationService with OptionValues {
 
   private val testWiring = new FrameworkTestWiring()
   import testWiring._
@@ -37,13 +36,16 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Option
   private val filterAssemblyConnection = AkkaConnection(ComponentId("Filter", Assembly))
   private val disperserHcdConnection   = AkkaConnection(ComponentId("Disperser", HCD))
 
-  override protected def afterAll(): Unit = shutdown()
+  override def afterAll(): Unit = {
+    shutdown()
+    super.afterAll()
+  }
 
   // DEOPSCSW-218: Discover component connection information using Akka protocol
   // DEOPSCSW-220: Access and Monitor components for current values
   // DEOPSCSW-221: Avoid sending commands to non-executing components
   test("should track connections when locationServiceUsage is RegisterAndTrackServices") {
-    val actorSystem: actor.ActorSystem = ClusterSettings().joinLocal(seedPort).system
+    val actorSystem: actor.ActorSystem = ActorSystemFactory.remote("test1")
     val wiring: FrameworkWiring        = FrameworkWiring.make(actorSystem, mock[RedisClient])
 
     // start a container and verify it moves to running lifecycle state
@@ -77,11 +79,10 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Option
     assemblyProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(akkaLocationRemovedChoice))))
 
     implicit val timeout: Timeout = Timeout(100.millis)
-    intercept[TimeoutException] {
+    a[TimeoutException] shouldBe thrownBy(
       disperserCommandService.submit(commands.Setup(prefix, CommandName("isAlive"), None)).await(200.millis)
-    }
-
-    wiring.locationService.shutdown(UnknownReason).await
+    )
+    Http(actorSystem).shutdownAllConnectionPools().await
   }
 
   /**
@@ -91,7 +92,7 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Option
    * */
   //DEOPSCSW-219 Discover component connection using HTTP protocol
   test("component should be able to track http and tcp connections") {
-    val actorSystem: actor.ActorSystem = ClusterSettings().joinLocal(seedPort).system
+    val actorSystem: actor.ActorSystem = ActorSystemFactory.remote("test2")
     val wiring: FrameworkWiring        = FrameworkWiring.make(actorSystem, mock[RedisClient])
     // start component in standalone mode
     val assemblySupervisor = Standalone.spawn(ConfigFactory.load("standalone.conf"), wiring).await
@@ -110,9 +111,7 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Option
     assemblyCommandService.subscribeCurrentState(assemblyProbe.ref ! _)
 
     // register http connection
-    seedLocationService
-      .register(HttpRegistration(httpConnection, 9090, "test/path"))
-      .await
+    seedLocationService.register(HttpRegistration(httpConnection, 9090, "test/path")).await
 
     // assembly is tracking HttpConnection that we registered above, hence assemblyProbe will receive LocationUpdated event
     assemblyProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(httpLocationUpdatedChoice))))
@@ -130,8 +129,7 @@ class TrackConnectionsIntegrationTest extends FunSuite with Matchers with Option
     // On unavailability of TcpConnection, the assembly should know and receive LocationRemoved event
     seedLocationService.unregister(tcpConnection)
     assemblyProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(tcpLocationRemovedChoice))))
-
-    wiring.locationService.shutdown(UnknownReason).await
+    Http(actorSystem).shutdownAllConnectionPools().await
   }
 
 }

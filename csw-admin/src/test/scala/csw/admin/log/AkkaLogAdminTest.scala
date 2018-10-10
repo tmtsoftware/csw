@@ -19,10 +19,12 @@ import csw.command.models.framework.{Component, Components, ContainerLifecycleSt
 import csw.common.FrameworkAssertions.assertThatContainerIsRunning
 import csw.commons.tags.LoggingSystemSensitive
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
-import csw.location.api.commons.{ClusterAwareSettings, ClusterSettings}
+import csw.location.api.commons.ClusterAwareSettings
 import csw.location.api.models.ComponentId
 import csw.location.api.models.ComponentType.{Assembly, HCD}
 import csw.location.api.models.Connection.AkkaConnection
+import csw.location.client.ActorSystemFactory
+import csw.location.http.HTTPLocationService
 import csw.logging.internal.LoggingLevels.{ERROR, Level, WARN}
 import csw.logging.internal._
 import csw.logging.models.LogMetadata
@@ -31,16 +33,15 @@ import csw.params.commands.CommandResponse.OnewayResponse
 import csw.params.commands.{CommandName, Setup}
 import csw.params.core.models.Prefix
 import io.lettuce.core.RedisClient
-import org.scalatest.mockito.MockitoSugar
 
 import scala.collection.JavaConverters.mapAsScalaMapConverter
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
 
 @LoggingSystemSensitive
-class AkkaLogAdminTest extends AdminLogTestSuite with MockitoSugar with HttpSupport {
+class AkkaLogAdminTest extends AdminLogTestSuite with HTTPLocationService with HttpSupport {
 
-  private val adminWiring: AdminWiring = AdminWiring.make(ClusterSettings().onPort(3652), Some(7879))
+  private val adminWiring: AdminWiring = AdminWiring.make(Some(7879))
   import adminWiring.actorRuntime._
 
   implicit val typedSystem: ActorSystem[Nothing] = actorSystem.toTyped
@@ -70,7 +71,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with MockitoSugar with HttpSupp
     // this will start seed on port 3652 and log admin server on 7879
     adminWiring.locationService
 
-    containerActorSystem = ClusterSettings().joinLocal(3652).system
+    containerActorSystem = ActorSystemFactory.remote()
 
     // this will start container on random port and join seed and form a cluster
     val containerRef = startContainerAndWaitForRunning()
@@ -79,9 +80,10 @@ class AkkaLogAdminTest extends AdminLogTestSuite with MockitoSugar with HttpSupp
 
   override protected def afterEach(): Unit = logBuffer.clear()
 
-  override protected def afterAll(): Unit = {
+  override def afterAll(): Unit = {
     Await.result(adminWiring.actorRuntime.shutdown(UnknownReason), 10.seconds)
     Await.result(containerActorSystem.terminate(), 5.seconds)
+    super.afterAll()
   }
 
   def startContainerAndWaitForRunning(): ActorRef[ContainerMessage] = {

@@ -3,25 +3,26 @@ import akka.actor
 import akka.actor.Terminated
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
+import akka.http.scaladsl.Http
 import akka.stream.{ActorMaterializer, Materializer}
 import csw.commons.redis.EmbeddedRedis
 import csw.commons.utils.SocketUtils
-import csw.location.api.models.Connection.TcpConnection
-import csw.location.api.scaladsl.LocationService
 import csw.event.client.helpers.TestFutureExt.RichFuture
-import csw.location.api.commons.ClusterSettings
+import csw.location.api.models.Connection.TcpConnection
 import csw.location.api.models.{RegistrationResult, TcpRegistration}
-import csw.location.scaladsl.LocationServiceFactory
+import csw.location.api.scaladsl.LocationService
+import csw.location.client.ActorSystemFactory
+import csw.location.client.scaladsl.HttpLocationServiceFactory
 import redis.embedded.{RedisSentinel, RedisServer}
 
 class FrameworkTestWiring(val seedPort: Int = SocketUtils.getFreePort) extends EmbeddedRedis {
 
-  implicit val seedActorSystem: actor.ActorSystem = ClusterSettings().onPort(seedPort).system
+  implicit val seedActorSystem: actor.ActorSystem = ActorSystemFactory.remote()
   implicit val typedSystem: ActorSystem[_]        = seedActorSystem.toTyped
   implicit val mat: Materializer                  = ActorMaterializer()
-  val seedLocationService: LocationService        = LocationServiceFactory.withSystem(seedActorSystem)
+  val seedLocationService: LocationService        = HttpLocationServiceFactory.makeLocalClient
 
-  val testActorSystem: actor.ActorSystem = ClusterSettings().joinLocal(seedPort).system
+  val testActorSystem: actor.ActorSystem = ActorSystemFactory.remote()
 
   def startSentinelAndRegisterService(
       connection: TcpConnection,
@@ -34,6 +35,7 @@ class FrameworkTestWiring(val seedPort: Int = SocketUtils.getFreePort) extends E
     }
 
   def shutdown(): Terminated = {
+    Http(seedActorSystem).shutdownAllConnectionPools().await
     testActorSystem.terminate().await
     seedActorSystem.terminate().await
   }

@@ -10,7 +10,7 @@ the machines hosting the seed crashes.
 ## Prerequisite
 
 The CSW cluster seed application can be installed as binaries or constructed from source.  To download the application,
-go to the [CSW Release page](https://tmtsoftware.github.com/csw-prod/releases/) and follow instructions.
+go to the [CSW Release page](https://tmtsoftware.github.com/csw/releases/) and follow instructions.
 
 To install from source, the command `sbt csw-cluster-seed/universal:publishLocal` will publish necessary artifacts to run csw-cluster-seed application. 
 The target of above command is a zip file titled "csw-cluster-seed.zip" and its path will be printed on console. 
@@ -23,7 +23,7 @@ working directory to the extracted folder. Choose appropriate instructions from 
  
 ## Environment Variables
 
-Note that before running any CSW applications that use the location service  (including HCDs, assemblies and other services), some environment variables or system properties will need to be set to indicate the correct cluster seeds and possibly the network interface to use. More detailed comments on this can be found in the [ClusterSettings](https://tmtsoftware.github.io/csw-prod/api/scala/csw/location/commons/ClusterSettings.html) API documentation.
+Note that before running any CSW applications that use the location service  (including HCDs, assemblies and other services), some environment variables or system properties will need to be set to indicate the correct cluster seeds and possibly the network interface to use. More detailed comments on this can be found in the [ClusterSettings](https://tmtsoftware.github.io/csw/api/scala/csw/location/commons/ClusterSettings.html) API documentation.
 
 ### If Deploying a Single Seed Application
 The steps below describe how to run cluster seed on a single machine. This can be a requirement for testing or demo purpose.

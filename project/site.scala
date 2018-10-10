@@ -44,15 +44,15 @@ object ParadoxSite extends AutoPlugin {
       sourceDirectory in (Paradox, paradoxTheme) := (sourceDirectory in Paradox).value / "_template",
       paradoxMaterialTheme in Paradox ~= {
         _.withFavicon("assets/tmt_favicon.ico")
-          .withRepository(new URI("https://github.com/tmtsoftware/csw-prod"))
+          .withRepository(new URI("https://github.com/tmtsoftware/csw"))
       },
       paradoxProperties in Paradox ++= Map(
         "version"                -> version.value,
         "scala.binaryVersion"    -> scalaBinaryVersion.value,
-        "scaladoc.base_url"      -> s"https://tmtsoftware.github.io/csw-prod/${version.value}/api/scala",
-        "javadoc.base_url"       -> s"https://tmtsoftware.github.io/csw-prod/${version.value}/api/java",
-        "extref.manual.base_url" -> s"https://tmtsoftware.github.io/csw-prod/${version.value}/manual/index.html",
-        "github.base_url"        -> "https://github.com/tmtsoftware/csw-prod/tree/master"
+        "scaladoc.base_url"      -> s"https://tmtsoftware.github.io/csw/${version.value}/api/scala",
+        "javadoc.base_url"       -> s"https://tmtsoftware.github.io/csw/${version.value}/api/java",
+        "extref.manual.base_url" -> s"https://tmtsoftware.github.io/csw/${version.value}/manual/index.html",
+        "github.base_url"        -> "https://github.com/tmtsoftware/csw/tree/master"
       )
     )
 }

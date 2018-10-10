@@ -44,7 +44,7 @@ shouldStartAlarm=false
 
 script_name=$0
 
-logDir=/tmp/csw-prod/logs
+logDir=/tmp/csw/logs
 test -d ${logDir} || mkdir -p ${logDir}
 
 # We need at least this version of Redis
@@ -52,8 +52,8 @@ minRedisVersion=4.0
 redisSentinel=redis-sentinel
 redisClient=`echo ${redisSentinel} | sed -e 's/-sentinel/-cli/'`
 
-seedLogFile=${logDir}/seed.log
-seedPidFile=${logDir}/seed.pid
+locationLogFile=${logDir}/location.log
+locationPidFile=${logDir}/location.pid
 
 configLogFile=${logDir}/config.log
 configPidFile=${logDir}/config.pid
@@ -128,14 +128,14 @@ function random_unused_port {
 }
 
 function start_seed {
-    local seed_script="csw-cluster-seed"
+    local location_script="csw-location"
 
-    if [ -x "$seed_script" ]; then
-        echo "[SEED] Starting cluster seed on port: [$seed_port] ..."
-        nohup ./csw-cluster-seed --clusterPort ${seed_port} -DclusterSeeds=${seeds} &> ${seedLogFile} &
-        echo $! > ${seedPidFile}
+    if [ -x "$location_script" ]; then
+        echo "[LOCATION] Starting cluster seed on port: [$seed_port] ..."
+        nohup ./csw-location --clusterPort ${seed_port} -DclusterSeeds=${seeds} &> ${locationLogFile} &
+        echo $! > ${locationPidFile}
     else
-        echo "[ERROR] $seed_script script does not exist, please make sure that $seed_script resides in same directory as $script_name"
+        echo "[ERROR] $location_script script does not exist, please make sure that $location_script resides in same directory as $script_name"
         exit 1
     fi
 }
@@ -324,14 +324,14 @@ function parse_cmd_args {
             stop "Alarm Server" ${alarmMasterPidFile} ${alarmMasterPortFile}
 
             # Stop Cluster Seed application
-            if [ ! -f ${seedPidFile} ]; then
-                echo "[SEED] Cluster seed $seedPidFile does not exist, process is not running."
+            if [ ! -f ${locationPidFile} ]; then
+                echo "[LOCATION] Cluster seed $locationPidFile does not exist, process is not running."
             else
-                local PID=$(cat ${seedPidFile})
-                echo "[SEED] Stopping Cluster Seed application..."
+                local PID=$(cat ${locationPidFile})
+                echo "[LOCATION] Stopping Cluster Seed application..."
                 kill ${PID} &> /dev/null
-                rm -f ${seedPidFile} ${seedLogFile}
-                echo "[SEED] Cluster Seed stopped."
+                rm -f ${locationPidFile} ${locationLogFile}
+                echo "[LOCATION] Cluster Seed stopped."
             fi
 
             # Stop Config Service

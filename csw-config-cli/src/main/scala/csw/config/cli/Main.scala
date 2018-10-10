@@ -1,5 +1,6 @@
 package csw.config.cli
 
+import akka.actor.ActorSystem
 import csw.services.BuildInfo
 import csw.config.cli.commons.CoordinatedShutdownReasons.ApplicationFinishedReason
 import csw.location.api.commons.ClusterAwareSettings
@@ -21,7 +22,7 @@ object Main extends App {
   }
 
   private def run(options: Options): Unit = {
-    val actorSystem = ClusterAwareSettings.system
+    val actorSystem = ActorSystem("config-cli")
     LoggingSystemFactory.start(name, BuildInfo.version, ClusterAwareSettings.hostname, actorSystem)
 
     val wiring = new ClientCliWiring(actorSystem)

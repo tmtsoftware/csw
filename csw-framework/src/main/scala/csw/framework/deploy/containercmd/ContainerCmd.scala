@@ -8,9 +8,9 @@ import akka.actor.typed.ActorRef
 import com.typesafe.config.Config
 import csw.framework.commons.CoordinatedShutdownReasons.FailureReason
 import csw.framework.deploy.containercmd.cli.{ArgsParser, Options}
-import csw.framework.exceptions.{ClusterSeedsNotFound, UnableToParseOptions}
+import csw.framework.exceptions.UnableToParseOptions
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
-import csw.location.api.commons.{ClusterAwareSettings, ClusterSettings}
+import csw.location.client.ActorSystemFactory
 import csw.logging.scaladsl.{Logger, LoggerFactory}
 
 import scala.async.Async.{async, await}
@@ -30,43 +30,39 @@ object ContainerCmd {
    * @return                  Actor ref of the container or supervisor of the component started without container
    */
   def start(name: String, args: Array[String], defaultConfig: Option[Config] = None): ActorRef[_] =
-    new ContainerCmd(name, ClusterAwareSettings, true, defaultConfig).start(args)
+    new ContainerCmd(name, true, defaultConfig).start(args)
 }
 
 private[containercmd] class ContainerCmd(
     name: String,
-    clusterSettings: ClusterSettings,
     startLogging: Boolean,
     defaultConfig: Option[Config] = None
 ) {
   private val log: Logger = new LoggerFactory(name).getLogger
 
-  private lazy val actorSystem: ActorSystem = clusterSettings.system
-  private lazy val wiring: FrameworkWiring  = FrameworkWiring.make(actorSystem)
+  private val actorSystem: ActorSystem     = ActorSystemFactory.remote()
+  private lazy val wiring: FrameworkWiring = FrameworkWiring.make(actorSystem)
   import wiring.actorRuntime._
 
   def start(args: Array[String]): ActorRef[_] = {
-    if (clusterSettings.seedNodes.isEmpty)
-      throw ClusterSeedsNotFound
-    else
-      new ArgsParser(name).parse(args) match {
-        case None ⇒ throw UnableToParseOptions
-        case Some(Options(standalone, isLocal, inputFilePath)) =>
-          if (startLogging) wiring.actorRuntime.startLogging(name)
+    new ArgsParser(name).parse(args) match {
+      case None ⇒ throw UnableToParseOptions
+      case Some(Options(standalone, isLocal, inputFilePath)) =>
+        if (startLogging) wiring.actorRuntime.startLogging(name)
 
-          log.debug(s"$name started with following arguments [${args.mkString(",")}]")
+        log.debug(s"$name started with following arguments [${args.mkString(",")}]")
 
-          try {
-            val actorRef = Await.result(createF(standalone, isLocal, inputFilePath, defaultConfig), 30.seconds)
-            log.info(s"Component is successfully created with actor actorRef $actorRef")
-            actorRef
-          } catch {
-            case NonFatal(ex) ⇒
-              log.error(s"${ex.getMessage}", ex = ex)
-              shutdown(FailureReason(ex))
-              throw ex
-          }
-      }
+        try {
+          val actorRef = Await.result(createF(standalone, isLocal, inputFilePath, defaultConfig), 30.seconds)
+          log.info(s"Component is successfully created with actor actorRef $actorRef")
+          actorRef
+        } catch {
+          case NonFatal(ex) ⇒
+            log.error(s"${ex.getMessage}", ex = ex)
+            shutdown(FailureReason(ex))
+            throw ex
+        }
+    }
   }
 
   // fetch config file and start components in container mode or a single component in standalone mode

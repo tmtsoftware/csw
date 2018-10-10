@@ -10,7 +10,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'git@github.com:tmtsoftware/csw-prod.git'
+                git 'git@github.com:tmtsoftware/csw.git'
             }
         }
 
@@ -50,7 +50,7 @@ pipeline {
                 sh "sbt csw-config-client/multi-jvm:test"
                 sh "sbt csw-config-cli/multi-jvm:test"
                 sh "sbt csw-framework/multi-jvm:test"
-                sh "sbt csw-cluster-seed/multi-jvm:test"
+                sh "sbt csw-location/multi-jvm:test"
             }
         }
 

@@ -2,16 +2,19 @@ package csw.config
 
 import java.nio.file.{Files, Paths}
 
+import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
 import csw.config.api.models.ConfigData
+import csw.config.cli.ClientCliWiring
 import csw.config.client.internal.ActorRuntime
 import csw.config.client.scaladsl.ConfigClientFactory
+import csw.config.helpers.TwoClientsAndServer
 import csw.config.server.commons.TestFileUtils
 import csw.config.server.{ServerWiring, Settings}
-import csw.config.cli.ClientCliWiring
-import csw.config.helpers.TwoClientsAndServer
-import csw.location.api.commons.ClusterAwareSettings
+import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.helpers.LSNodeSpec
+import csw.location.http.HTTPLocationService
 import org.scalatest.FunSuiteLike
 
 class ConfigCliAppTestMultiJvmNode1 extends ConfigCliAppTest(0)
@@ -19,7 +22,10 @@ class ConfigCliAppTestMultiJvmNode2 extends ConfigCliAppTest(0)
 class ConfigCliAppTestMultiJvmNode3 extends ConfigCliAppTest(0)
 
 // DEOPSCSW-43: Access Configuration service from any CSW component
-class ConfigCliAppTest(ignore: Int) extends LSNodeSpec(config = new TwoClientsAndServer) with FunSuiteLike {
+class ConfigCliAppTest(ignore: Int)
+    extends LSNodeSpec(config = new TwoClientsAndServer, mode = "http")
+    with HTTPLocationService
+    with FunSuiteLike {
 
   import config._
 
@@ -56,8 +62,10 @@ class ConfigCliAppTest(ignore: Int) extends LSNodeSpec(config = new TwoClientsAn
     // config client command line app is exercised on client1
     runOn(client1) {
       enterBarrier("server-started")
+      implicit val system: ActorSystem    = ActorSystem()
+      implicit val mat: ActorMaterializer = ActorMaterializer()
 
-      def cliApp() = ClientCliWiring.noPrinting(ClusterAwareSettings.joinLocal(3552)).cliApp
+      def cliApp() = ClientCliWiring.noPrinting(system, HttpLocationServiceFactory.makeLocalClient).cliApp
 
       cliApp().start("csw-config-cli", Array("create", repoPath1, "-i", inputFilePath, "-c", comment))
       enterBarrier("client1-create")

@@ -14,7 +14,7 @@ import csw.location.api.models.Connection.{AkkaConnection, HttpConnection}
 import csw.location.api.models.{AkkaRegistration, HttpRegistration, _}
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.ActorSystemFactory
-import csw.location.scaladsl.LocationServiceFactory
+import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.logging.internal.LoggingSystem
 import csw.logging.scaladsl._
 import csw.params.core.models.Prefix
@@ -29,24 +29,23 @@ import scala.concurrent.{Await, Future}
  */
 object LocationServiceExampleClientApp extends App {
 
-  //#create-location-service
-  private val locationService = LocationServiceFactory.make()
-  //#create-location-service
-
   //#create-actor-system
-  implicit val system: ActorSystem =
-    ActorSystemFactory.remote("csw-examples-locationServiceClient")
+  implicit val actorSystem: ActorSystem = ActorSystemFactory.remote("csw-examples-locationServiceClient")
   //#create-actor-system
 
   implicit val mat: ActorMaterializer = ActorMaterializer()
 
+  //#create-location-service
+  private val locationService = HttpLocationServiceFactory.makeLocalClient(actorSystem, mat)
+  //#create-location-service
+
   //#create-logging-system
   private val host = InetAddress.getLocalHost.getHostName
   // Only call this once per application
-  val loggingSystem: LoggingSystem = LoggingSystemFactory.start("LocationServiceExampleClient", "0.1", host, system)
+  val loggingSystem: LoggingSystem = LoggingSystemFactory.start("LocationServiceExampleClient", "0.1", host, actorSystem)
   //#create-logging-system
 
-  system.actorOf(LocationServiceExampleClient.props(locationService, loggingSystem))
+  actorSystem.actorOf(LocationServiceExampleClient.props(locationService, loggingSystem))
 }
 
 object LocationServiceExampleClient {

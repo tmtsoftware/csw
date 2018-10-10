@@ -1,35 +1,29 @@
 package csw.alarm.client
-import akka.actor.CoordinatedShutdown.UnknownReason
 import com.typesafe.config.ConfigFactory
-import csw.commons.utils.SocketUtils.getFreePort
-import csw.location.api.models.TcpRegistration
 import csw.alarm.api.models.AlarmSeverity.Indeterminate
 import csw.alarm.api.scaladsl.{AlarmAdminService, AlarmService}
 import csw.alarm.client.internal.commons.AlarmServiceConnection
 import csw.alarm.client.internal.helpers.AlarmServiceTestSetup
 import csw.alarm.client.internal.helpers.TestFutureExt.RichFuture
-import csw.location.api.commons.ClusterAwareSettings
-import csw.location.scaladsl.LocationServiceFactory
+import csw.location.api.models.TcpRegistration
+import csw.location.client.scaladsl.HttpLocationServiceFactory
+import csw.location.http.HTTPLocationService
 
 // DEOPSCSW-481: Component Developer API available to all CSW components
-class AlarmServiceFactoryTest extends AlarmServiceTestSetup {
+class AlarmServiceFactoryTest extends AlarmServiceTestSetup with HTTPLocationService {
 
-  private val seedSystem      = ClusterAwareSettings.onPort(getFreePort).system
-  private val locationService = LocationServiceFactory.withSystem(seedSystem)
+  private val locationService = HttpLocationServiceFactory.makeLocalClient
 
   locationService
     .register(TcpRegistration(AlarmServiceConnection.value, sentinelPort))
     .await
 
-  override protected def beforeEach(): Unit = {
+  override def beforeEach(): Unit = {
     val validAlarmsConfig = ConfigFactory.parseResources("test-alarms/valid-alarms.conf")
     alarmService.initAlarms(validAlarmsConfig, reset = true).await
   }
 
-  override protected def afterAll(): Unit = {
-    locationService.shutdown(UnknownReason).await
-    super.afterAll()
-  }
+  override def afterAll(): Unit = super.afterAll()
 
   test("should create admin alarm service using location service") {
     val alarmServiceUsingLS: AlarmAdminService = alarmServiceFactory.makeAdminApi(locationService)

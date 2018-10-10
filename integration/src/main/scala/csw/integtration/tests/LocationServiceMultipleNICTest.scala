@@ -1,29 +1,36 @@
 package csw.integtration.tests
 
+import akka.actor.ActorSystem
 import akka.actor.CoordinatedShutdown.UnknownReason
+import akka.stream.ActorMaterializer
+import csw.integtration.common.TestFutureExtension.RichFuture
+import csw.location.api.commons.ClusterAwareSettings
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
-import csw.integtration.common.TestFutureExtension.RichFuture
-import csw.location.commons.CswCluster
-import csw.location.scaladsl.LocationServiceFactory
-import org.scalatest.concurrent.Eventually
+import csw.location.client.scaladsl.HttpLocationServiceFactory
+import csw.location.internal.AdminWiring
+import csw.logging.scaladsl.LoggingSystemFactory
+import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.time.Span
-import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, FunSuite, Matchers}
+import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
-class LocationServiceMultipleNICTest(cswCluster: CswCluster)
-    extends FunSuite
-    with Matchers
-    with BeforeAndAfter
-    with BeforeAndAfterAll
-    with Eventually {
+import scala.concurrent.Await
+import scala.concurrent.duration.DurationDouble
 
-  private val locationService = LocationServiceFactory.withCluster(cswCluster)
+class LocationServiceMultipleNICTest() extends FunSuite with Matchers with BeforeAndAfterAll with ScalaFutures with Eventually {
 
   implicit val patience: PatienceConfig =
     PatienceConfig(Span(5, org.scalatest.time.Seconds), Span(100, org.scalatest.time.Millis))
 
-  override protected def afterAll(): Unit =
-    locationService.shutdown(UnknownReason)
+  val adminWiring: AdminWiring = AdminWiring.make(ClusterAwareSettings.onPort(3553).withInterface("eth1"))
+  LoggingSystemFactory.start("Assembly", "1.0", ClusterAwareSettings.hostname, adminWiring.actorSystem)
+
+  adminWiring.locationHttpService.start().futureValue
+
+  import adminWiring.actorRuntime._
+  private val locationService = HttpLocationServiceFactory.makeLocalClient
+
+  override def afterAll(): Unit = Await.result(adminWiring.actorRuntime.shutdown(UnknownReason), 5.seconds)
 
   test("should list and resolve component having multiple-nic's") {
 

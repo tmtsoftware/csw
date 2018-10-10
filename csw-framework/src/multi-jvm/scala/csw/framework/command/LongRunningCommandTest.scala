@@ -18,6 +18,7 @@ import csw.params.core.models.ObsId
 import csw.params.core.states.{CurrentState, StateName}
 import csw.command.scaladsl.{CommandDistributor, CommandService}
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
+import csw.location.http.HTTPLocationService
 import io.lettuce.core.RedisClient
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
@@ -33,7 +34,11 @@ class LongRunningCommandTestMultiJvm3 extends LongRunningCommandTest(0)
 // DEOPSCSW-227: Distribute commands to multiple destinations
 // DEOPSCSW-228: Assist Components with command completion
 // DEOPSCSW-233: Hide implementation by having a CCS API
-class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSeed) with ScalaFutures with MockitoSugar {
+class LongRunningCommandTest(ignore: Int)
+    extends LSNodeSpec(config = new TwoMembersAndSeed, mode = "http")
+    with HTTPLocationService
+    with ScalaFutures
+    with MockitoSugar {
   import config._
 
   implicit val actorSystem: ActorSystem[_]  = system.toTyped
@@ -42,6 +47,8 @@ class LongRunningCommandTest(ignore: Int) extends LSNodeSpec(config = new TwoMem
   implicit val timeout: Timeout             = 20.seconds
   implicit val scheduler: Scheduler         = actorSystem.scheduler
   implicit val testkit: TestKitSettings     = TestKitSettings(actorSystem)
+
+  override def afterAll(): Unit = super.afterAll()
 
   test("should be able to send long running commands asynchronously and get the response") {
     runOn(seed) {

@@ -3,9 +3,9 @@ package csw.admin.log.http
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
 import csw.admin.commons.AdminLogger
+import csw.admin.commons.CoordinatedShutdownReasons.FailureReason
 import csw.admin.internal.{ActorRuntime, Settings}
 import csw.location.api.commons.ClusterAwareSettings
-import csw.location.commons.CoordinatedShutdownReasons.FailureReason
 import csw.logging.scaladsl.Logger
 
 import scala.async.Async._
