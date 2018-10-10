@@ -5,7 +5,7 @@ val MaybeCoverage: Plugins = if (enableCoverage) Coverage else Plugins.empty
 lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-logging`,
   `csw-logging-macros`,
-  `csw-admin`,
+  `csw-admin-server`,
   `csw-location-client`,
   `csw-config-api`,
   `csw-config-client`,
@@ -138,7 +138,7 @@ lazy val `csw-location-agent` = project
     libraryDependencies ++= Dependencies.LocationAgent.value
   )
 
-lazy val `csw-admin` = project
+lazy val `csw-admin-server` = project
   .dependsOn(
     `csw-location-client`,
     `csw-command`,
