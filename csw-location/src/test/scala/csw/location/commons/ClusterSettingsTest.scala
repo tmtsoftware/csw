@@ -19,9 +19,7 @@ class ClusterSettingsTest extends FunSuite with Matchers with BeforeAndAfterAll 
 
   test("exception is thrown when settings are not found for a given cluster name") {
     val settings: ClusterSettings = ClusterSettings("undefined-settings-in-conf")
-    intercept[ConfigException.Missing] {
-      settings.config
-    }
+    a[ConfigException.Missing] shouldBe thrownBy(settings.config)
   }
 
   test("default cluster settings are used when no custom parameters are supplied") {
