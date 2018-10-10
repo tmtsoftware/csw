@@ -15,11 +15,11 @@ import csw.event.api.scaladsl.EventService
 import csw.event.client.EventServiceFactory
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.models.CswContext
+import csw.framework.scaladsl.RegistrationFactory
 import csw.location.api.javadsl.ILocationService
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaRegistration, RegistrationResult}
 import csw.location.api.scaladsl.LocationService
-import csw.location.scaladsl.RegistrationFactory
 import csw.logging.scaladsl.{Logger, LoggerFactory}
 import csw.params.commands.CommandResponse
 import csw.params.core.models.{Id, Prefix}

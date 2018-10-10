@@ -38,7 +38,6 @@ import scala.concurrent.Await;
 import scala.concurrent.duration.FiniteDuration;
 
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;

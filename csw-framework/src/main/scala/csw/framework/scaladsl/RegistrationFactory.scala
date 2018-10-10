@@ -1,4 +1,4 @@
-package csw.location.scaladsl
+package csw.framework.scaladsl
 
 import akka.actor.typed.ActorRef
 import csw.location.api.models.AkkaRegistration

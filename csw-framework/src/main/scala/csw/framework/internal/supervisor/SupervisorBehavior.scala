@@ -30,10 +30,9 @@ import csw.framework.commons.CoordinatedShutdownReasons.ShutdownMessageReceivedR
 import csw.framework.exceptions.{FailureRestart, InitializationFailed}
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.models.CswContext
-import csw.framework.scaladsl.ComponentBehaviorFactory
+import csw.framework.scaladsl.{ComponentBehaviorFactory, RegistrationFactory}
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaRegistration, ComponentId}
-import csw.location.scaladsl.RegistrationFactory
 import csw.logging.internal.LogAdminUtil
 import csw.logging.scaladsl.Logger
 import csw.params.core.models.Prefix

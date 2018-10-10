@@ -217,7 +217,7 @@ lazy val `csw-framework` = project
     `csw-alarm-client`,
     `csw-location-client`,
     `csw-event-client`  % "test->test",
-    `csw-location`      % "compile->compile;test->multi-jvm;multi-jvm->multi-jvm",
+    `csw-location`      % "test->multi-jvm;multi-jvm->multi-jvm",
     `csw-config-server` % "multi-jvm->test",
     `csw-commons`       % "test->test"
   )
