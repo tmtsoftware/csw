@@ -42,7 +42,7 @@ class ConfigAdminApiTest extends ConfigServiceTest with HTTPLocationService {
   test("should throw exception for invalid path") {
     val filePath = Paths.get("/test/sample.$active")
 
-    a[InvalidInput] shouldBe thrownBy (
+    a[InvalidInput] shouldBe thrownBy(
       configService.create(filePath, ConfigData.fromString(configValue1), annex = false, "invalid path").await
     )
   }
