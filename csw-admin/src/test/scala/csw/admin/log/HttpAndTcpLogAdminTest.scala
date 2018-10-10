@@ -16,7 +16,7 @@ import csw.config.server.{ServerWiring, Settings}
 import csw.location.api.commons.ClusterAwareSettings
 import csw.location.api.models.Connection.TcpConnection
 import csw.location.api.models.{ComponentId, ComponentType}
-import csw.location.http.HTTPLocationService
+import csw.location.server.http.HTTPLocationService
 import csw.logging.internal._
 import csw.logging.scaladsl.LoggingSystemFactory
 

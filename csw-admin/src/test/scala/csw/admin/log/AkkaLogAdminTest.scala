@@ -24,7 +24,7 @@ import csw.location.api.models.ComponentId
 import csw.location.api.models.ComponentType.{Assembly, HCD}
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.client.ActorSystemFactory
-import csw.location.http.HTTPLocationService
+import csw.location.server.http.HTTPLocationService
 import csw.logging.internal.LoggingLevels.{ERROR, Level, WARN}
 import csw.logging.internal._
 import csw.logging.models.LogMetadata

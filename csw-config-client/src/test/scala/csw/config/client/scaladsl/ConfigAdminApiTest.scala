@@ -12,7 +12,7 @@ import csw.config.server.commons.TestFutureExtension.RichFuture
 import csw.config.server.files.Sha1
 import csw.config.server.{ConfigServiceTest, ServerWiring}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.http.HTTPLocationService
+import csw.location.server.http.HTTPLocationService
 
 // DEOPSCSW-138: Split Config API into Admin API and Client API
 // DEOPSCSW-80: HTTP based access for configuration file

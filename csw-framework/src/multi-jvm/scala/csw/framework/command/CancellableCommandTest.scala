@@ -19,7 +19,7 @@ import csw.params.core.models.ObsId
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{ComponentId, ComponentType}
 import csw.location.helpers.{LSNodeSpec, OneMemberAndSeed}
-import csw.location.http.HTTPLocationService
+import csw.location.server.http.HTTPLocationService
 import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar
 

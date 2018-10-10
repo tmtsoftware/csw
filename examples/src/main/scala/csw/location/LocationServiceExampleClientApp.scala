@@ -15,7 +15,7 @@ import csw.location.api.models.{AkkaRegistration, HttpRegistration, _}
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.ActorSystemFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.internal.AdminWiring
+import csw.location.server.internal.AdminWiring
 import csw.logging.internal.LoggingSystem
 import csw.logging.scaladsl._
 import csw.params.core.models.Prefix

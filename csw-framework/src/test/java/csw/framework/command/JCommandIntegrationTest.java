@@ -7,7 +7,7 @@ import akka.actor.typed.internal.adapter.ActorSystemAdapter;
 import akka.stream.ActorMaterializer;
 import akka.util.Timeout;
 import com.typesafe.config.ConfigFactory;
-import csw.location.http.JHTTPLocationService;
+import csw.location.server.http.JHTTPLocationService;
 import csw.common.components.framework.SampleComponentState;
 import csw.framework.internal.wiring.FrameworkWiring;
 import csw.framework.internal.wiring.Standalone;
@@ -53,7 +53,7 @@ import java.util.concurrent.TimeUnit;
 
 import static csw.common.components.command.ComponentStateForCommand.*;
 import static csw.location.api.models.Connection.AkkaConnection;
-import static csw.location.javadsl.JComponentType.HCD;
+import static csw.location.server.javadsl.JComponentType.HCD;
 
 // DEOPSCSW-217: Execute RPC like commands
 // DEOPSCSW-224: Inter component command sending

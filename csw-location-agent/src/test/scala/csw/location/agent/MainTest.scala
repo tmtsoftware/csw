@@ -11,7 +11,7 @@ import csw.location.api.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.location.api.models.Connection.TcpConnection
 import csw.location.api.models.{ComponentId, ComponentType}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.http.HTTPLocationService
+import csw.location.server.http.HTTPLocationService
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.scalatest.concurrent.Eventually
 
