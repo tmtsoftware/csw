@@ -21,7 +21,7 @@ To use the Configuration Service without using the framework, add this to your `
 sbt
 :   @@@vars
     ```scala
-    libraryDependencies += "org.tmt" %% "csw-config-client" % "$version$"
+    libraryDependencies += "com.github.tmtsoftware.csw" %% "csw-config-client" % "$version$"
     ```
     @@@
 

@@ -29,7 +29,7 @@ Otherwise add below dependency in your `build.sbt`
 sbt
 :   @@@vars
     ```scala
-    libraryDependencies += "org.tmt" %% "csw-event-client" % "$version$"
+    libraryDependencies += "com.github.tmtsoftware.csw" %% "csw-event-client" % "$version$"
     ```
     @@@
 

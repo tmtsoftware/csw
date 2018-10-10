@@ -399,7 +399,7 @@ go to the project root directory and type `sbt "<deploy-module>/runMain <mainCla
  
 - `<deploy-module>` is the name of the deployment module created by the template (`sample-deploy` if using defaults) 
 - `<mainClass>` is the full class name of our ContainerCmd application, which the template names `<prefix>.<name>deploy.<Name>ContainerCmdApp`.
-If you accept the defaults for the template, it will be `org.tmt.nfiraos.sampledeploy.SampleContainerCmdApp`.  If you are having problems
+If you accept the defaults for the template, it will be `nfiraos.sampledeploy.SampleContainerCmdApp`.  If you are having problems
 determining the class name, use `sbt run` and it will prompt you the possibilities.
 - `<path-to-config-file>` is the filename, which can be an absolute path or relative to the directory of the deployment module.  If using defaults,
 this would be `src/main/resources/SampleHcdStandalone.conf` for Scala, and `src/main/resources/JSampleHcdStandalone.conf` for Java.
@@ -409,13 +409,13 @@ So if using the template defaults, the full command would be
 Scala
 :   
 ```
-sbt "sample-deploy/runMain org.tmt.nfiraos.sampledeploy.SampleContainerCmdApp --local --standalone src/main/resources/SampleHcdStandalone.conf"
+sbt "sample-deploy/runMain nfiraos.sampledeploy.SampleContainerCmdApp --local --standalone src/main/resources/SampleHcdStandalone.conf"
 ```
 
 Java
 :   
 ```
-sbt "sample-deploy/runMain org.tmt.nfiraos.sampledeploy.SampleContainerCmdApp --local --standalone src/main/resources/JSampleHcdStandalone.conf"
+sbt "sample-deploy/runMain nfiraos.sampledeploy.SampleContainerCmdApp --local --standalone src/main/resources/JSampleHcdStandalone.conf"
 ```
 
 To run the component using the deployment package, perform the following steps:

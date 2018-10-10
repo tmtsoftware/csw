@@ -11,7 +11,7 @@ To use the Alarm service without using the framework, add this to your `build.sb
 sbt
 :   @@@vars
     ```scala
-    libraryDependencies += "org.tmt" %% "csw-alarm-client" % "$version$"
+    libraryDependencies += "com.github.tmtsoftware.csw" %% "csw-alarm-client" % "$version$"
     ```
 
 ## Rules and checkes

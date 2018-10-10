@@ -10,7 +10,7 @@ received, please visit @ref:[Managing Command State](../framework/managing-comma
 sbt
 :   @@@vars
     ```scala
-    libraryDependencies += "org.tmt" %% "csw-command" % "$version$"
+    libraryDependencies += "com.github.tmtsoftware.csw" %% "csw-command" % "$version$"
     ```
     @@@
 

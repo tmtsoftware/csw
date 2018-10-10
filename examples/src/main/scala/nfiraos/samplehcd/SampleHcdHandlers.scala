@@ -1,15 +1,15 @@
-package org.tmt.nfiraos.samplehcd
+package nfiraos.samplehcd
 
 import akka.actor.Cancellable
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
+import csw.command.messages.TopLevelActorMessage
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.command.messages.TopLevelActorMessage
-import csw.params.commands._
-import csw.params.events.{EventName, SystemEvent}
 import csw.location.api.models.TrackingEvent
+import csw.params.commands._
 import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.Id
+import csw.params.events.{EventName, SystemEvent}
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContextExecutor, Future}

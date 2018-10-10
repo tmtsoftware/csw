@@ -16,7 +16,7 @@ To use the Logging Service without using the framework, add this to your `build.
 sbt
 :   @@@vars
     ```scala
-    libraryDependencies += "org.tmt" %% "csw-logging" % "$version$"
+    libraryDependencies += "com.github.tmtsoftware.csw" %% "csw-logging" % "$version$"
     ```
     @@@
     

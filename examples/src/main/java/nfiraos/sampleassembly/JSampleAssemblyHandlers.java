@@ -1,4 +1,4 @@
-package org.tmt.nfiraos.sampleassembly;
+package nfiraos.sampleassembly;
 
 import akka.actor.typed.ActorRef;
 import akka.actor.typed.javadsl.ActorContext;

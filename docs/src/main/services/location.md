@@ -32,7 +32,7 @@ To use the Location Service without using the framework, add this to your `build
 sbt
 :   @@@vars
     ```scala
-    libraryDependencies += "org.tmt" %% "csw-location" % "$version$"
+    libraryDependencies += "com.github.tmtsoftware.csw" %% "csw-location" % "$version$"
     ```
     @@@
 

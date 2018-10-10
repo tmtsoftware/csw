@@ -11,7 +11,7 @@ destination. Commands provide flexible placeholders to store values to convey pr
 sbt
 :   @@@vars
     ```scala
-    libraryDependencies += "org.tmt" %% "csw-messages" % "$version$"
+    libraryDependencies += "com.github.tmtsoftware.csw" %% "csw-messages" % "$version$"
     ```
     @@@
 

@@ -37,7 +37,7 @@ Scala
 ```
 name = "SampleAssembly"
 componentType = assembly
-behaviorFactoryClassName = "org.tmt.nfiraos.sampleassembly.SampleAssemblyBehaviorFactory"
+behaviorFactoryClassName = "nfiraos.sampleassembly.SampleAssemblyBehaviorFactory"
 prefix = "nfiraos.sample"
 locationServiceUsage = RegisterAndTrackServices
 connections = [
@@ -54,7 +54,7 @@ Java
 ```
 name = "JSampleAssembly"
 componentType = assembly
-behaviorFactoryClassName = "org.tmt.nfiraos.sampleassembly.JSampleAssemblyBehaviorFactory"
+behaviorFactoryClassName = "nfiraos.sampleassembly.JSampleAssemblyBehaviorFactory"
 prefix = "nfiraos.sample"
 locationServiceUsage = RegisterAndTrackServices
 connections = [
@@ -281,7 +281,7 @@ Go to the project root directory and type `sbt "<deploy-module>/runMain <mainCla
  
 - `<deploy-module>` is the name of the deployment module created by the template (`sample-deploy` if using defaults) 
 - `<mainClass>` is the full class name of our ContainerCmd application, which the template names `<prefix>.<name>deploy.<Name>ContainerCmdApp`.
-If you accept the defaults for the template, it will be `org.tmt.nfiraos.sampledeploy.SampleContainerCmdApp`.  If you are having problems
+If you accept the defaults for the template, it will be `nfiraos.sampledeploy.SampleContainerCmdApp`.  If you are having problems
 determining the class name, use `sbt run` and it will prompt you the possibilities.
 - `<path-to-config-file>` is the filename, which can be an absolute path or relative to the directory of the deployment module.  If using defaults,
 this would be `src/main/resources/SampleContainer.conf` for Scala, and `src/main/resources/JSampleContainer.conf` for Java.
@@ -291,13 +291,13 @@ So if using the template defaults, the full command would be
 Scala
 :    
 ```
-sbt "sample-deploy/runMain org.tmt.nfiraos.sampledeploy.SampleContainerCmdApp --local src/main/resources/SampleContainer.conf"
+sbt "sample-deploy/runMain nfiraos.sampledeploy.SampleContainerCmdApp --local src/main/resources/SampleContainer.conf"
 ```
 
 Java
 :    
 ```
-sbt "sample-deploy/runMain org.tmt.nfiraos.sampledeploy.SampleContainerCmdApp --local src/main/resources/JSampleContainer.conf"
+sbt "sample-deploy/runMain nfiraos.sampledeploy.SampleContainerCmdApp --local src/main/resources/JSampleContainer.conf"
 ```
 
 Like with the HCD, the `sbt stage` command can also be used to create binaries in the `target/universal/stage/bin` directories of the root project.

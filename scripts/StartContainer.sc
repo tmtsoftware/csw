@@ -1,7 +1,7 @@
 import $ivy.`com.typesafe.akka::akka-actor-typed:2.5.11`
 import $ivy.`com.typesafe.akka::akka-cluster-tools:2.5.11`
 
-import $ivy.`org.tmt::csw-framework:0.1-SNAPSHOT`
+import $ivy.`com.github.tmtsoftware.csw::csw-framework:0.1-SNAPSHOT`
 
 import java.io.File
 

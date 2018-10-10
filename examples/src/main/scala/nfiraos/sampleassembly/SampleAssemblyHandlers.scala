@@ -1,18 +1,18 @@
-package org.tmt.nfiraos.sampleassembly
+package nfiraos.sampleassembly
 
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.util.Timeout
-import csw.framework.models.CswContext
-import csw.framework.scaladsl.ComponentHandlers
 import csw.command.messages.TopLevelActorMessage
-import csw.params.commands.CommandResponse.Accepted
-import csw.params.commands.{CommandName, CommandResponse, ControlCommand, Setup}
-import csw.params.events._
-import csw.location.api.models.{AkkaLocation, LocationRemoved, LocationUpdated, TrackingEvent}
-import csw.params.core.generics.{Key, KeyType, Parameter}
-import csw.params.core.models.{ObsId, Prefix, Units}
 import csw.command.scaladsl.CommandService
 import csw.event.api.scaladsl.EventSubscription
+import csw.framework.models.CswContext
+import csw.framework.scaladsl.ComponentHandlers
+import csw.location.api.models.{AkkaLocation, LocationRemoved, LocationUpdated, TrackingEvent}
+import csw.params.commands.CommandResponse.Accepted
+import csw.params.commands.{CommandName, CommandResponse, ControlCommand, Setup}
+import csw.params.core.generics.{Key, KeyType, Parameter}
+import csw.params.core.models.{ObsId, Prefix, Units}
+import csw.params.events._
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContextExecutor, Future}
