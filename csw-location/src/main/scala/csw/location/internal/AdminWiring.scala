@@ -5,7 +5,6 @@ import com.typesafe.config.{Config, ConfigFactory}
 import csw.location.api.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.location.api.scaladsl.LocationService
 import csw.location.http.{LocationExceptionHandler, LocationHttpService, LocationRoutes}
-import csw.location.scaladsl.LocationServiceFactory
 
 // $COVERAGE-OFF$
 private[csw] class AdminWiring {
@@ -31,7 +30,6 @@ private[csw] object AdminWiring {
 
   def make(maybeClusterPort: Option[Int], mayBeHttpPort: Option[Int]): AdminWiring =
     new AdminWiring {
-
       override lazy val settings: Settings = {
         new Settings(config) {
           override val clusterPort: Int = maybeClusterPort.getOrElse(super.clusterPort)

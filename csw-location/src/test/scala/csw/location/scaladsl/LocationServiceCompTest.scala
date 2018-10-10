@@ -16,6 +16,7 @@ import csw.location.api.scaladsl.LocationService
 import csw.location.client.ActorSystemFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.commons.TestFutureExtension.RichFuture
+import csw.location.internal.LocationServiceFactory
 import csw.params.core.models.Prefix
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.scalatest.concurrent.Eventually

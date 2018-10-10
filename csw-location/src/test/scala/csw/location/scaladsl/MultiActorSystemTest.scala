@@ -7,6 +7,7 @@ import csw.location.api.models.TcpRegistration
 import csw.location.api.models.{ComponentId, ComponentType}
 import csw.location.commons.TestFutureExtension.RichFuture
 import csw.location.commons._
+import csw.location.internal.LocationServiceFactory
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 import scala.concurrent.duration.DurationInt

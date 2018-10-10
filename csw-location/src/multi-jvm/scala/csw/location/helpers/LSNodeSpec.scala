@@ -7,7 +7,7 @@ import akka.testkit.ImplicitSender
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.commons.CswCluster
-import csw.location.scaladsl.LocationServiceFactory
+import csw.location.internal.LocationServiceFactory
 import org.scalatest.{BeforeAndAfterAll, FunSuiteLike, Matchers}
 
 abstract class LSNodeSpec[T <: NMembersAndSeed](val config: T, mode: String = "cluster")

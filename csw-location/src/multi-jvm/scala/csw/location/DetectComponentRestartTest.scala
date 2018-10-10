@@ -11,7 +11,7 @@ import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.params.core.models.Prefix
 import csw.location.commons.CswCluster
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
-import csw.location.scaladsl.LocationServiceFactory
+import csw.location.internal.LocationServiceFactory
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 
 import scala.concurrent.Await
