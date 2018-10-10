@@ -53,7 +53,7 @@ import java.util.concurrent.TimeUnit;
 
 import static csw.common.components.command.ComponentStateForCommand.*;
 import static csw.location.api.models.Connection.AkkaConnection;
-import static csw.location.server.javadsl.JComponentType.HCD;
+import static csw.location.api.javadsl.JComponentType.HCD;
 
 // DEOPSCSW-217: Execute RPC like commands
 // DEOPSCSW-224: Inter component command sending

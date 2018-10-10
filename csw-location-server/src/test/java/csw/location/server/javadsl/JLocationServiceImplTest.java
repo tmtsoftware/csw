@@ -15,6 +15,8 @@ import csw.location.api.commons.Constants;
 import csw.location.api.internal.Networks;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.api.javadsl.IRegistrationResult;
+import csw.location.api.javadsl.JComponentType;
+import csw.location.api.javadsl.JConnectionType;
 import csw.location.api.models.*;
 import csw.location.client.ActorSystemFactory;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;

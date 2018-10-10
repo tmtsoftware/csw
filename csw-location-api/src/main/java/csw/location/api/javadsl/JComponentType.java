@@ -1,4 +1,4 @@
-package csw.location.server.javadsl;
+package csw.location.api.javadsl;
 
 import csw.location.api.models.ComponentType;
 
