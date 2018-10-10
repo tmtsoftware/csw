@@ -141,8 +141,5 @@ private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(impl
     track(connection).to(Sink.foreach(callback)).run()
   }
 
-  override def shutdown(reason: CoordinatedShutdown.Reason): Future[Done] =
-    Future.failed(new RuntimeException("can not shutdown via http-client"))
-
   override def asJava: ILocationService = new JLocationServiceImpl(this)
 }

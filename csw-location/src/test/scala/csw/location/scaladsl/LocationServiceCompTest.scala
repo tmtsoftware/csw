@@ -1,6 +1,5 @@
 package csw.location.scaladsl
 
-import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.testkit.typed.scaladsl
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
@@ -47,15 +46,10 @@ class LocationServiceCompTest(mode: String)
     case "cluster" => LocationServiceFactory.make()
   }
 
-  private val prefix = Prefix("nfiraos.ncc.trombone")
-
+  private val prefix                    = Prefix("nfiraos.ncc.trombone")
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 100.millis)
 
-//  val RegistrationFactory = new TestRegistrationFactory
-
   override protected def afterEach(): Unit = locationService.unregisterAll().await
-
-  override protected def afterAll(): Unit = if (mode.equals("cluster")) locationService.shutdown(UnknownReason).await
 
   test("should able to register, resolve, list and unregister tcp location") {
     val componentId: ComponentId         = ComponentId("exampleTCPService", ComponentType.Service)

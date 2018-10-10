@@ -55,19 +55,6 @@ Java
 :   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/location/JLocationServiceExampleClient.java) { #create-location-service }
 
 
-## Shutdown Location Service
-
-This example demonstrates how to disconnect from the Location Service. 
-`Shutdown` will terminate the application's ActorSystem leave the cluster.  
-
-**Note:** All the services registered via this instance of LocationService will continue to be available for other cluster members. 
-
-Scala
-:   @@snip [LocationServiceExampleClientApp.scala](../../../../examples/src/main/scala/csw/location/LocationServiceExampleClientApp.scala) { #shutdown }
-
-Java
-:   @@snip [JLocationServiceExampleClient.java](../../../../examples/src/main/java/csw/location/JLocationServiceExampleClient.java) { #shutdown }
-
 ## Creating Components, Connections and Registrations
 
 An Application, Sequencer, Assembly, HCD, or Service component may need to be used by another component as part of normal observatory operations. 

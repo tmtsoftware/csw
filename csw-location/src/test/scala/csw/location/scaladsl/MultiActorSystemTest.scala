@@ -1,10 +1,8 @@
 package csw.location.scaladsl
 
-import akka.actor.CoordinatedShutdown.UnknownReason
 import csw.location.api.commons.ClusterSettings
 import csw.location.api.models.Connection.TcpConnection
-import csw.location.api.models.TcpRegistration
-import csw.location.api.models.{ComponentId, ComponentType}
+import csw.location.api.models.{ComponentId, ComponentType, TcpRegistration}
 import csw.location.commons.TestFutureExtension.RichFuture
 import csw.location.commons._
 import csw.location.internal.LocationServiceFactory
@@ -24,14 +22,13 @@ class MultiActorSystemTest extends FunSuite with Matchers with BeforeAndAfterAll
 
   val tcpRegistration: TcpRegistration = TcpRegistration(connection, 1234)
 
-  override protected def afterAll(): Unit =
-    locationService2.shutdown(UnknownReason).await
+  override protected def afterAll(): Unit = system2.terminate().await
 
   test("ensure that location service works across two actorSystems within the same JVM") {
     locationService.register(tcpRegistration).await
     locationService2.resolve(connection, 5.seconds).await.get.connection shouldBe tcpRegistration.connection
 
-    locationService.shutdown(UnknownReason).await
+    system1.terminate().await
     locationService2.resolve(connection, 5.seconds).await.get.connection shouldBe tcpRegistration.connection
   }
 }

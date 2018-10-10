@@ -1,15 +1,12 @@
 package csw.location.internal
 
 import akka.Done
-import akka.actor.CoordinatedShutdown.Reason
 import akka.cluster.ddata.Replicator._
 import akka.cluster.ddata._
 import akka.pattern.ask
 import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{KillSwitch, OverflowStrategy}
 import akka.util.Timeout
-import csw.location.api.models._
-import csw.location.commons.{CswCluster, LocationServiceLogger}
 import csw.location.api.exceptions.{
   OtherLocationIsRegistered,
   RegistrationFailed,
@@ -17,9 +14,10 @@ import csw.location.api.exceptions.{
   UnregistrationFailed
 }
 import csw.location.api.javadsl.ILocationService
-import csw.location.api.models.Registration
+import csw.location.api.models.{Registration, _}
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.internal.JLocationServiceImpl
+import csw.location.commons.{CswCluster, LocationServiceLogger}
 import csw.location.internal.Registry.AllServices
 import csw.location.internal.StreamExt.RichSource
 import csw.logging.scaladsl.Logger
@@ -230,13 +228,6 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
   }
 
   override def asJava: ILocationService = new JLocationServiceImpl(this)
-
-  /**
-   * Terminate the ActorSystem and gracefully leave the akka cluster
-   *
-   * @note it is recommended not to perform any operation on LocationService after shutdown
-   */
-  def shutdown(reason: Reason): Future[Done] = cswCluster.shutdown(reason)
 
   private def registrationResult(loc: Location): RegistrationResult = new RegistrationResult {
     override def location: Location = loc
