@@ -111,8 +111,8 @@ lazy val `csw-location-api` = project
 lazy val `csw-location-server` = project
   .dependsOn(
     `csw-location-api`,
-    `csw-location-client`,
     `csw-logging`,
+    `csw-location-client` % "test->compile;multi-jvm->compile",
     `csw-commons` % "compile->compile;test->test"
   )
   .enablePlugins(PublishBintray, GenJavadocPlugin, AutoMultiJvm, MaybeCoverage, DeployApp)

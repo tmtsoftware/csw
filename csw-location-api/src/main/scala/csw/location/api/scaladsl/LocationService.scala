@@ -1,11 +1,10 @@
 package csw.location.api.scaladsl
 
-import acyclic.skipped
 import akka.Done
 import akka.stream.KillSwitch
 import akka.stream.scaladsl.Source
-import csw.location.api.javadsl.ILocationService
 import csw.location.api.models.{RegistrationResult, _}
+
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 
@@ -130,8 +129,4 @@ trait LocationService {
    */
   def subscribe(connection: Connection, callback: TrackingEvent ⇒ Unit): KillSwitch
 
-  /**
-   * Returns the Java API for this instance of location service
-   */
-  def asJava: ILocationService
 }

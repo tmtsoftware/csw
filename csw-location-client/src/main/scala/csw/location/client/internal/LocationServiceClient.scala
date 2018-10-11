@@ -12,7 +12,6 @@ import akka.stream.{KillSwitch, KillSwitches, Materializer}
 import akka.{Done, NotUsed}
 import csw.location.api.exceptions.{OtherLocationIsRegistered, RegistrationFailed}
 import csw.location.api.formats.LocationJsonSupport
-import csw.location.api.javadsl.ILocationService
 import csw.location.api.models.{Registration, RegistrationResult, _}
 import csw.location.api.scaladsl.LocationService
 import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
@@ -141,5 +140,4 @@ private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(impl
     track(connection).to(Sink.foreach(callback)).run()
   }
 
-  override def asJava: ILocationService = new JLocationServiceImpl(this)
 }

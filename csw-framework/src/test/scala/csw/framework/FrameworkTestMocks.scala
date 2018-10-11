@@ -16,7 +16,6 @@ import csw.event.client.EventServiceFactory
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.RegistrationFactory
-import csw.location.api.javadsl.ILocationService
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaRegistration, RegistrationResult}
 import csw.location.api.scaladsl.LocationService
@@ -46,7 +45,6 @@ class FrameworkTestMocks(implicit untypedSystem: actor.ActorSystem, system: Acto
     .thenReturn(akkaRegistration)
   when(locationService.register(akkaRegistration)).thenReturn(Future.successful(registrationResult))
   when(locationService.unregister(any[AkkaConnection])).thenReturn(Future.successful(Done))
-  when(locationService.asJava).thenReturn(mock[ILocationService])
   when(eventServiceFactory.make(any[LocationService]())(any[actor.ActorSystem]())).thenReturn(eventService)
   when(eventService.executionContext).thenReturn(untypedSystem.dispatcher)
   ///////////////////////////////////////////////

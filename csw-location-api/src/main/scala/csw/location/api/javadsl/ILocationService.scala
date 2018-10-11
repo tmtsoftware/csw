@@ -1,6 +1,5 @@
 package csw.location.api.javadsl
 
-import acyclic.skipped
 import java.time.Duration
 import java.util.Optional
 import java.util.concurrent.CompletableFuture

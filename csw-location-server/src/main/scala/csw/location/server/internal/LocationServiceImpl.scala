@@ -13,10 +13,8 @@ import csw.location.api.exceptions.{
   RegistrationListingFailed,
   UnregistrationFailed
 }
-import csw.location.api.javadsl.ILocationService
 import csw.location.api.models.{Registration, _}
 import csw.location.api.scaladsl.LocationService
-import csw.location.client.internal.JLocationServiceImpl
 import csw.location.server.commons.{CswCluster, LocationServiceLogger}
 import csw.location.server.internal.Registry.AllServices
 import csw.location.server.internal.StreamExt.RichSource
@@ -226,8 +224,6 @@ private[location] class LocationServiceImpl(cswCluster: CswCluster) extends Loca
     log.info(s"Subscribing to connection: [${connection.name}]")
     track(connection).to(Sink.foreach(callback)).run()
   }
-
-  override def asJava: ILocationService = new JLocationServiceImpl(this)
 
   private def registrationResult(loc: Location): RegistrationResult = new RegistrationResult {
     override def location: Location = loc
