@@ -16,6 +16,7 @@ import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.params.commands.CommandResponse._
 import csw.logging.scaladsl.Logger
+import csw.params.commands.ControlCommand
 
 import scala.async.Async.{async, await}
 import scala.concurrent.Await
@@ -165,39 +166,48 @@ private[framework] final class ComponentBehavior(
    * @param commandMessage message encapsulating a [[csw.params.commands.Command]]
    */
   private def onRunningCompCommandMessage(commandMessage: CommandMessage): Unit = {
-
-    log.info(s"Invoking lifecycle handler's validateSubmit hook with msg :[$commandMessage]")
-
-    commandMessage match {
-      case vo: Validate =>
-        // This just returns the response of the validate handler
-        vo.replyTo ! lifecycleHandlers.validateCommand(commandMessage.command)
-      case ow: Oneway ⇒
-        //Oneway command should not be added to CommandResponseManager
-        val validationResponse = lifecycleHandlers.validateCommand(commandMessage.command)
-        if (validationResponse == Accepted(commandMessage.command.runId)) {
-          log.info(s"Invoking lifecycle handler's onOneway hook with msg :[$commandMessage]")
-          lifecycleHandlers.onOneway(commandMessage.command)
-        }
-        ow.replyTo ! validationResponse.asInstanceOf[OnewayResponse]
-      case su: Submit ⇒
-        val validationResponse = lifecycleHandlers.validateCommand(commandMessage.command)
-        validationResponse match {
-          case _: Accepted =>
-            // Here the submit is marked as started, to indicate that the command has transitioned from validation
-            // and has started processing. This is needed also for the case where someone in onSubmit subscribes
-            // to their own runId, which is done in at least one of the tests
-            // Prefer not to add a new unique response that would only be relevant to the internals
-            commandResponseManager.commandResponseManagerActor ! AddOrUpdateCommand(commandMessage.command.runId,
-                                                                                    Started(commandMessage.command.runId))
-            val submitResponse: SubmitResponse = lifecycleHandlers.onSubmit(commandMessage.command)
-            // The response is used to update the CRM, it may still be Started it if is a long running command
-            commandResponseManager.commandResponseManagerActor ! AddOrUpdateCommand(commandMessage.command.runId, submitResponse)
-            su.replyTo ! submitResponse
-          case inv: Invalid =>
-            su.replyTo ! inv
-        }
-    }
+    case Validate(_, replyTo) ⇒ handleValidate(commandMessage, replyTo)
+    case Oneway(_, replyTo)   ⇒ handleOneway(commandMessage, replyTo)
+    case Submit(_, replyTo)   ⇒ handleSubmit(commandMessage, replyTo)
   }
 
+  private def handleValidate(commandMessage: CommandMessage, replyTo: ActorRef[ValidateOnlyResponse]): Unit = {
+    log.info(s"Invoking lifecycle handler's validateCommand hook with msg :[$commandMessage]")
+    val validationResponse = lifecycleHandlers.validateCommand(commandMessage.command)
+    replyTo ! validationResponse.asInstanceOf[ValidateOnlyResponse]
+  }
+
+  private def handleOneway(commandMessage: CommandMessage, replyTo: ActorRef[OnewayResponse]): Unit = {
+    log.info(s"Invoking lifecycle handler's validateCommand hook with msg :[$commandMessage]")
+    val validationResponse = lifecycleHandlers.validateCommand(commandMessage.command)
+
+    validationResponse match {
+      case Accepted(_) ⇒
+        log.info(s"Invoking lifecycle handler's onOneway hook with msg :[$commandMessage]")
+        lifecycleHandlers.onOneway(commandMessage.command)
+      case invalid: Invalid ⇒
+        log.debug(s"Command not forwarded to TLA post validation. ValidationResponse was [$invalid]")
+    }
+
+    replyTo ! validationResponse.asInstanceOf[OnewayResponse]
+  }
+
+  private def handleSubmit(commandMessage: CommandMessage, replyTo: ActorRef[SubmitResponse]): Unit = {
+    log.info(s"Invoking lifecycle handler's validateCommand hook with msg :[$commandMessage]")
+    lifecycleHandlers.validateCommand(commandMessage.command) match {
+      case Accepted(runId) =>
+        commandResponseManager.commandResponseManagerActor ! AddOrUpdateCommand(runId, Started(runId))
+
+        log.info(s"Invoking lifecycle handler's onSubmit hook with msg :[$commandMessage]")
+        val submitResponse = lifecycleHandlers.onSubmit(commandMessage.command)
+
+        // The response is used to update the CRM, it may still be `Started` if is a long running command
+        commandResponseManager.commandResponseManagerActor ! AddOrUpdateCommand(runId, submitResponse)
+
+        replyTo ! submitResponse
+      case invalid: Invalid =>
+        log.debug(s"Command not forwarded to TLA post validation. ValidationResponse was [$invalid]")
+        replyTo ! invalid
+    }
+  }
 }

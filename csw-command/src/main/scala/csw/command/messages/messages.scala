@@ -11,7 +11,7 @@ import csw.params.commands.ControlCommand
 import csw.params.core.models.{Id, Prefix}
 import csw.params.core.states.CurrentState
 import csw.location.api.models.TrackingEvent
-import csw.params.commands.CommandResponse.{OnewayResponse, QueryResponse, SubmitResponse, ValidationResponse}
+import csw.params.commands.CommandResponse._
 import csw.serializable.TMTSerializable
 
 import scala.concurrent.duration.FiniteDuration
@@ -41,11 +41,6 @@ sealed trait CommandMessage extends RunningMessage with SupervisorLockMessage {
    * Represents a command sent to other component
    */
   def command: ControlCommand
-
-  /*
-   * Represents the actor that will receive the command response
-   */
-  // def replyTo: ActorRef[Responses.CanBeLockedResponse]
 }
 
 object CommandMessage {
@@ -72,7 +67,7 @@ object CommandMessage {
    * @param command represents a command sent to other component
    * @param replyTo represents the actor that will receive the command response
    */
-  case class Validate(command: ControlCommand, replyTo: ActorRef[ValidationResponse]) extends CommandMessage
+  case class Validate(command: ControlCommand, replyTo: ActorRef[ValidateOnlyResponse]) extends CommandMessage
 }
 
 private[csw] case class LockTimedout(replyTo: ActorRef[LockingResponse])       extends SupervisorMessage
