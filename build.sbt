@@ -221,7 +221,7 @@ lazy val `csw-framework` = project
     `csw-config-server` % "multi-jvm->test",
     `csw-commons`       % "test->test"
   )
-  .enablePlugins(PublishBintray, AutoMultiJvm, GenJavadocPlugin, CswBuildInfo, MaybeCoverage)
+  .enablePlugins(PublishBintray, AutoMultiJvm, GenJavadocPlugin, CswBuildInfo)
   .settings(
     libraryDependencies ++= Dependencies.Framework.value
   )
