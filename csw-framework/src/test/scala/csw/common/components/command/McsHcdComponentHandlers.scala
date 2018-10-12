@@ -22,7 +22,7 @@ class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = ???
 
-  override def validateCommand(controlCommand: ControlCommand): ValidationResponse = {
+  override def validateCommand(controlCommand: ControlCommand): ValidateCommandResponse = {
     controlCommand.commandName match {
       case `longRunning`               ⇒ Accepted(controlCommand.runId)
       case `mediumRunning`             ⇒ Accepted(controlCommand.runId)

@@ -87,7 +87,7 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
   //#publish
 
   //#validate
-  override def validateCommand(controlCommand: ControlCommand): ValidationResponse = {
+  override def validateCommand(controlCommand: ControlCommand): ValidateCommandResponse = {
     log.info(s"Validating command: ${controlCommand.commandName.name}")
     controlCommand.commandName.name match {
       case "sleep" => Accepted(controlCommand.runId)

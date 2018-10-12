@@ -4,7 +4,7 @@ import akka.actor.typed.scaladsl.ActorContext
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.command.messages.TopLevelActorMessage
-import csw.params.commands.CommandResponse.{Accepted, Completed, SubmitResponse, ValidationResponse}
+import csw.params.commands.CommandResponse.{Accepted, Completed, SubmitResponse, ValidateCommandResponse}
 import csw.params.commands.ControlCommand
 import csw.location.api.models.TrackingEvent
 import csw.logging.scaladsl.Logger
@@ -30,7 +30,7 @@ class GalilComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
     log.fatal("Level is fatal")
   }
 
-  override def validateCommand(controlCommand: ControlCommand): ValidationResponse = Accepted(controlCommand.runId)
+  override def validateCommand(controlCommand: ControlCommand): ValidateCommandResponse = Accepted(controlCommand.runId)
 
   override def onSubmit(controlCommand: ControlCommand): SubmitResponse = {
     Completed(controlCommand.runId)

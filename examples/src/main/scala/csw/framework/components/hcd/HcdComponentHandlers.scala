@@ -13,7 +13,7 @@ import csw.framework.components.assembly.{WorkerActor, WorkerActorMsg}
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.command.messages.TopLevelActorMessage
-import csw.params.commands.CommandResponse.{Accepted, Completed, SubmitResponse, ValidationResponse}
+import csw.params.commands.CommandResponse.{Accepted, Completed, SubmitResponse, ValidateCommandResponse}
 import csw.params.commands.{ControlCommand, Observe, Setup}
 import csw.location.api.models.{LocationRemoved, LocationUpdated, TrackingEvent}
 import csw.config.api.models.ConfigData
@@ -56,7 +56,7 @@ class HcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswC
   //#initialize-handler
 
   //#validateCommand-handler
-  override def validateCommand(controlCommand: ControlCommand): ValidationResponse = controlCommand match {
+  override def validateCommand(controlCommand: ControlCommand): ValidateCommandResponse = controlCommand match {
     case _: Setup   ⇒ Accepted(controlCommand.runId) // validation for setup goes here
     case _: Observe ⇒ Accepted(controlCommand.runId) // validation for observe goes here
   }

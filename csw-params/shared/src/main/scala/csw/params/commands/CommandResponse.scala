@@ -23,14 +23,14 @@ object CommandResponse {
    * ValidationResponse is returned by validateCommand handler.
    * Values can only be Invalid, Accepted
    */
-  sealed trait ValidationResponse extends CommandResponse
+  sealed trait ValidateCommandResponse extends CommandResponse
 
   /**
    * ValidateOnlyResponse is returned by Validate message, which calls validateCommand handler
    * Values can be Invalid, Accepted, Locked.
    * Since the component can be locked, it is ValidationResponse with Locked
    */
-  sealed trait ValidateOnlyResponse extends CommandResponse
+  sealed trait ValidateResponse extends CommandResponse
 
   /**
    * OnewayResponse is returned by Oneway message which calls the onOneway handler
@@ -61,7 +61,7 @@ object CommandResponse {
    *
    * @param runId the runId of command for which this response is created
    */
-  case class Accepted(runId: Id) extends ValidationResponse with ValidateOnlyResponse with OnewayResponse
+  case class Accepted(runId: Id) extends ValidateCommandResponse with ValidateResponse with OnewayResponse
 
   /**
    * Represents an intermediate response stating a long running command has been started
@@ -92,8 +92,8 @@ object CommandResponse {
    * @param issue describing the cause of invalidation
    */
   case class Invalid(runId: Id, issue: CommandIssue)
-      extends ValidationResponse
-      with ValidateOnlyResponse
+      extends ValidateCommandResponse
+      with ValidateResponse
       with OnewayResponse
       with SubmitResponse
       with MatchingResponse
@@ -118,7 +118,7 @@ object CommandResponse {
    *
    * @param runId of command for which this response is created
    */
-  case class Locked(runId: Id) extends ValidateOnlyResponse with OnewayResponse with SubmitResponse with MatchingResponse
+  case class Locked(runId: Id) extends ValidateResponse with OnewayResponse with SubmitResponse with MatchingResponse
 
   /**
    * A negative response stating that a command with given runId is not available or cannot be located

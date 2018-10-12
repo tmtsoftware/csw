@@ -170,10 +170,10 @@ private[framework] final class ComponentBehavior(
     case Submit(_, replyTo)   ⇒ handleSubmit(commandMessage, replyTo)
   }
 
-  private def handleValidate(commandMessage: CommandMessage, replyTo: ActorRef[ValidateOnlyResponse]): Unit = {
+  private def handleValidate(commandMessage: CommandMessage, replyTo: ActorRef[ValidateResponse]): Unit = {
     log.info(s"Invoking lifecycle handler's validateCommand hook with msg :[$commandMessage]")
     val validationResponse = lifecycleHandlers.validateCommand(commandMessage.command)
-    replyTo ! validationResponse.asInstanceOf[ValidateOnlyResponse]
+    replyTo ! validationResponse.asInstanceOf[ValidateResponse]
   }
 
   private def handleOneway(commandMessage: CommandMessage, replyTo: ActorRef[OnewayResponse]): Unit = {

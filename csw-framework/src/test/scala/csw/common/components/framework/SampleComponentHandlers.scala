@@ -91,7 +91,7 @@ class SampleComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
     }
   }
 
-  def validateCommand(command: ControlCommand): ValidationResponse = {
+  def validateCommand(command: ControlCommand): ValidateCommandResponse = {
     currentStatePublisher.publish(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(commandValidationChoice))))
     if (command.commandName.name.contains("success")) Accepted(command.runId)
     else Invalid(command.runId, OtherIssue("Testing: Received failure, will return Invalid."))

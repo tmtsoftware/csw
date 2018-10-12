@@ -1,6 +1,5 @@
 package csw.framework.components.hcd;
 
-import akka.actor.Cancellable;
 import akka.actor.typed.ActorRef;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.AskPattern;
@@ -26,7 +25,6 @@ import csw.location.api.javadsl.ILocationService;
 import csw.logging.javadsl.ILogger;
 
 import java.nio.file.Paths;
-import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
@@ -86,7 +84,7 @@ public class JHcdComponentHandlers extends JComponentHandlers {
     //#jInitialize-handler
     //#validateCommand-handler
     @Override
-    public CommandResponse.ValidationResponse validateCommand(ControlCommand controlCommand) {
+    public CommandResponse.ValidateCommandResponse validateCommand(ControlCommand controlCommand) {
         if (controlCommand instanceof Setup) {
             // validation for setup goes here
             return new CommandResponse.Accepted(controlCommand.runId());

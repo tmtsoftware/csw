@@ -6,7 +6,6 @@ import akka.stream.ActorMaterializer;
 import akka.stream.ThrottleMode;
 import akka.stream.javadsl.Sink;
 import akka.stream.javadsl.Source;
-import akka.util.Timeout;
 import csw.common.components.command.ComponentStateForCommand;
 import csw.common.components.framework.SampleComponentState;
 import csw.framework.CurrentStatePublisher;
@@ -22,7 +21,6 @@ import csw.params.core.states.CurrentState;
 import csw.params.core.states.StateName;
 import csw.command.CommandResponseManager;
 import csw.logging.javadsl.ILogger;
-import views.html.helper.input;
 
 import java.time.Duration;
 import java.util.concurrent.*;
@@ -83,7 +81,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     }
 
     @Override
-    public CommandResponse.ValidationResponse validateCommand(ControlCommand controlCommand) {
+    public CommandResponse.ValidateCommandResponse validateCommand(ControlCommand controlCommand) {
         CurrentState submitState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.commandValidationChoice()));
         currentStatePublisher.publish(submitState);
 

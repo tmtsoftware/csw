@@ -8,7 +8,7 @@ import csw.event.api.scaladsl.EventSubscription
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.location.api.models.{AkkaLocation, LocationRemoved, LocationUpdated, TrackingEvent}
-import csw.params.commands.CommandResponse.{Started, SubmitResponse, ValidationResponse}
+import csw.params.commands.CommandResponse.{Started, SubmitResponse, ValidateCommandResponse}
 import csw.params.commands.{CommandName, CommandResponse, ControlCommand, Setup}
 import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.{ObsId, Prefix, Units}
@@ -130,7 +130,7 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
   }
   //#subscribe
 
-  override def validateCommand(controlCommand: ControlCommand): ValidationResponse = ???
+  override def validateCommand(controlCommand: ControlCommand): ValidateCommandResponse = ???
 
   override def onSubmit(controlCommand: ControlCommand): SubmitResponse = ???
 

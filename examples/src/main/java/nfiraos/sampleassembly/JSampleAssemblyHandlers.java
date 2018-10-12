@@ -195,7 +195,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
     //#subscribe
 
     @Override
-    public CommandResponse.ValidationResponse validateCommand(ControlCommand controlCommand) {
+    public CommandResponse.ValidateCommandResponse validateCommand(ControlCommand controlCommand) {
         return null;
     }
 

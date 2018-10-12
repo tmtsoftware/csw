@@ -32,7 +32,6 @@ import scala.concurrent.duration.FiniteDuration;
 
 import java.nio.file.Paths;
 import java.time.Duration;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -107,7 +106,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
 
     //#validateCommand-handler
     @Override
-    public CommandResponse.ValidationResponse validateCommand(ControlCommand controlCommand) {
+    public CommandResponse.ValidateCommandResponse validateCommand(ControlCommand controlCommand) {
         if (controlCommand instanceof Setup) {
             // validation for setup goes here
             //#addOrUpdateCommand

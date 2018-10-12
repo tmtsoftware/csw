@@ -8,7 +8,7 @@ import csw.framework.exceptions.{FailureRestart, FailureStop}
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.command.messages.TopLevelActorMessage
-import csw.params.commands.CommandResponse.{Accepted, Completed, SubmitResponse, ValidationResponse}
+import csw.params.commands.CommandResponse.{Accepted, Completed, SubmitResponse, ValidateCommandResponse}
 import csw.params.commands._
 import csw.location.api.models._
 import csw.command.scaladsl.CommandService
@@ -67,7 +67,7 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
   //#initialize-handler
 
   //#validateCommand-handler
-  override def validateCommand(controlCommand: ControlCommand): ValidationResponse = controlCommand match {
+  override def validateCommand(controlCommand: ControlCommand): ValidateCommandResponse = controlCommand match {
     case _: Setup   ⇒ Accepted(controlCommand.runId) // validation for setup goes here
     case _: Observe ⇒ Accepted(controlCommand.runId) // validation for observe goes here
   }

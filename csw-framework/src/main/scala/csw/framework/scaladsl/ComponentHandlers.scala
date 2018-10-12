@@ -6,7 +6,7 @@ import csw.command.messages.TopLevelActorMessage
 import csw.framework.models.CswContext
 import csw.params.commands.ControlCommand
 import csw.location.api.models.{Connection, TrackingEvent}
-import csw.params.commands.CommandResponse.{SubmitResponse, ValidationResponse}
+import csw.params.commands.CommandResponse.{SubmitResponse, ValidateCommandResponse}
 
 import scala.concurrent.Future
 
@@ -50,7 +50,7 @@ abstract class ComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx
    * @param controlCommand represents a command received e.g. Setup, Observe or wait
    * @return a CommandResponse after validation
    */
-  def validateCommand(controlCommand: ControlCommand): ValidationResponse
+  def validateCommand(controlCommand: ControlCommand): ValidateCommandResponse
 
   /**
    * On receiving a command as Submit, the onSubmit handler is invoked for a component only if the validateCommand handler

@@ -72,7 +72,7 @@ object CommandMessage {
    * @param command represents a command sent to other component
    * @param replyTo represents the actor that will receive the command response
    */
-  case class Validate(command: ControlCommand, replyTo: ActorRef[ValidateOnlyResponse]) extends CommandMessage
+  case class Validate(command: ControlCommand, replyTo: ActorRef[ValidateResponse]) extends CommandMessage
 }
 
 private[csw] case class LockTimedout(replyTo: ActorRef[LockingResponse])       extends SupervisorMessage

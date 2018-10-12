@@ -36,7 +36,7 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = ???
 
-  override def validateCommand(controlCommand: ControlCommand): ValidationResponse = controlCommand.commandName match {
+  override def validateCommand(controlCommand: ControlCommand): ValidateCommandResponse = controlCommand.commandName match {
     case `acceptedCmd`       ⇒ Accepted(controlCommand.runId)
     case `withoutMatcherCmd` ⇒ Accepted(controlCommand.runId)
     case `matcherCmd`        ⇒ Accepted(controlCommand.runId)

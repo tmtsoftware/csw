@@ -8,7 +8,7 @@ import csw.params.commands._
 import csw.location.api.models.TrackingEvent
 import csw.params.core.models.Id
 import csw.logging.scaladsl.Logger
-import csw.params.commands.CommandResponse.{Accepted, SubmitResponse, ValidationResponse}
+import csw.params.commands.CommandResponse.{Accepted, SubmitResponse, ValidateCommandResponse}
 
 import scala.concurrent.Future
 
@@ -20,7 +20,7 @@ class ActionLessHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCon
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = ???
 
-  override def validateCommand(controlCommand: ControlCommand): ValidationResponse = Accepted(Id())
+  override def validateCommand(controlCommand: ControlCommand): ValidateCommandResponse = Accepted(Id())
 
   override def onSubmit(controlCommand: ControlCommand): SubmitResponse = ???
 

@@ -45,7 +45,7 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
 
   override def onLocationTrackingEvent(trackingEvent: TrackingEvent): Unit = Unit
 
-  override def validateCommand(controlCommand: ControlCommand): ValidationResponse = {
+  override def validateCommand(controlCommand: ControlCommand): ValidateCommandResponse = {
     controlCommand.commandName match {
       case `longRunning` ⇒
         //#addOrUpdateCommand

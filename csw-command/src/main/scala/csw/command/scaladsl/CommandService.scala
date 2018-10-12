@@ -132,7 +132,14 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
     }
   }
 
-  def validate(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[ValidateOnlyResponse] =
+  /**
+   * Send a Validate command and get ValidateResponse as a Future. The ValidateResponse can be of type Accepted, Invalid
+   * or Locked.
+   *
+   * @param controlCommand the [[csw.params.commands.ControlCommand]] payload
+   * @return a ValidateResponse as a Future value
+   */
+  def validate(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[ValidateResponse] =
     component ? (Validate(controlCommand, _))
 
   /**
