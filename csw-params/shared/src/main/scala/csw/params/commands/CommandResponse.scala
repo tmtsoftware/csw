@@ -3,40 +3,40 @@ package csw.params.commands
 import csw.params.core.models.Id
 import csw.serializable.TMTSerializable
 
+sealed trait CommandResponse extends TMTSerializable {
+
+  /**
+   * A helper method to get the runId for this command response
+   *
+   * @return the runId of command for which this response is created
+   */
+  def runId: Id
+}
+
 /**
  * The nature of CommandResponse as an intermediate response of command execution or a final response which could be
  * positive or negative
  */
 object CommandResponse {
 
-  sealed trait Response extends TMTSerializable {
-
-    /**
-     * A helper method to get the runId for this command response
-     *
-     * @return the runId of command for which this response is created
-     */
-    def runId: Id
-  }
-
   /**
    * ValidationResponse is returned by validateCommand handler.
    * Values can only be Invalid, Accepted
    */
-  sealed trait ValidationResponse extends Response
+  sealed trait ValidationResponse extends CommandResponse
 
   /**
    * ValidateOnlyResponse is returned by Validate message, which calls validateCommand handler
    * Values can be Invalid, Accepted, Locked.
    * Since the component can be locked, it is ValidationResponse with Locked
    */
-  sealed trait ValidateOnlyResponse extends Response
+  sealed trait ValidateOnlyResponse extends CommandResponse
 
   /**
    * OnewayResponse is returned by Oneway message which calls the onOneway handler
    * Responses returned can be Accepted, Invalid, Locked
    */
-  sealed trait OnewayResponse extends Response
+  sealed trait OnewayResponse extends CommandResponse
 
   /**
    * SubmitResponse is returned by Submit message which calls the onSubmit handler
@@ -48,13 +48,13 @@ object CommandResponse {
    * QueryResponse is returned by CommandService query
    * Values can be Invalid, Started, Completed, CompletedWithResult, Error, Cancelled, Locked, CommandNotAvailable
    */
-  sealed trait QueryResponse extends Response
+  sealed trait QueryResponse extends CommandResponse
 
   /**
    * MatchingResponse is returned by matchers.
    * Responses returned can be Invalid, Completed, Error, Locked
    */
-  sealed trait MatchingResponse extends Response
+  sealed trait MatchingResponse extends CommandResponse
 
   /**
    * Represents a final response stating acceptance of a command received
