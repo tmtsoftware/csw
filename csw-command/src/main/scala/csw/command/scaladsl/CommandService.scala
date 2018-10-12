@@ -7,16 +7,16 @@ import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
-import csw.command.messages.CommandMessage.{Oneway, Submit}
 import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
+import csw.command.messages.CommandMessage.{Oneway, Submit, Validate}
+import csw.command.messages.{CommandResponseManagerMessage, ComponentMessage}
 import csw.command.models.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
 import csw.command.models.matchers.{Matcher, StateMatcher}
-import csw.command.messages.{CommandResponseManagerMessage, ComponentMessage}
+import csw.location.api.models.AkkaLocation
 import csw.params.commands.CommandResponse._
 import csw.params.commands.ControlCommand
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
-import csw.location.api.models.AkkaLocation
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -131,6 +131,9 @@ class CommandService(componentLocation: AkkaLocation)(implicit val actorSystem: 
         Future.successful(x.asInstanceOf[MatchingResponse])
     }
   }
+
+  def validate(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[ValidateOnlyResponse] =
+    component ? (Validate(controlCommand, _))
 
   /**
    * Subscribe to the current state of a component corresponding to the [[csw.location.api.models.AkkaLocation]] of the component
