@@ -332,7 +332,6 @@ public class JCommandIntegrationTest {
         CompletableFuture<CommandResponse.SubmitResponse> finalResponseCompletableFuture = hcdCmdService.submitAndSubscribe(failureResCommand1, timeout);
         CommandResponse.SubmitResponse actualValidationResponse = finalResponseCompletableFuture.get();
         //#submitAndSubscribe
-        System.out.println("Final: " + actualValidationResponse);
 
         Assert.assertTrue(actualValidationResponse instanceof CommandResponse.Error);
 

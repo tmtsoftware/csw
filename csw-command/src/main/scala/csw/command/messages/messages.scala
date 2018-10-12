@@ -41,6 +41,11 @@ sealed trait CommandMessage extends RunningMessage with SupervisorLockMessage {
    * Represents a command sent to other component
    */
   def command: ControlCommand
+
+  /**
+   * Represents the actor that will receive the Locked response for Submit, Oneway and Validate kind of commands
+   */
+  def replyTo: ActorRef[Locked]
 }
 
 object CommandMessage {
