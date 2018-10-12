@@ -5,7 +5,7 @@ import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
-import akka.actor.{ActorSystem, typed}
+import akka.actor.{typed, ActorSystem}
 import csw.command.messages.CommandResponseManagerMessage._
 import csw.command.messages.CommandResponseManagerMessage
 import csw.command.models.{CommandCorrelation, CommandResponseManagerState}
@@ -42,7 +42,6 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
     behaviorTestKit.run(GetCommandCorrelation(commandCorrelationProbe.ref))
     commandCorrelationProbe.expectMessage(CommandCorrelation(Map.empty[Id, Set[Id]], Map.empty[Id, Id]))
   }
-
 
   test("should be able to add correlation between parent and child via AddSubCommand") {
     val behaviorTestKit         = createBehaviorTestKit()
