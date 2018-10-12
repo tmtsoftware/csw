@@ -135,7 +135,7 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
           //#updateSubCommand
           // An original command is split into sub-commands and sent to a component. The result of the command is
           // obtained by subscribing to the component with the sub command id.
-          hcdComponent.subscribe(controlCommand.runId).map {
+          hcdComponent.getFinalResponse(controlCommand.runId).map {
             case _: Completed ⇒
               controlCommand.runId match {
                 case id if id == shortSetup.runId ⇒

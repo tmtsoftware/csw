@@ -88,7 +88,7 @@ class JCommandService(akkaLocation: AkkaLocation, actorSystem: ActorSystem[_]) {
    * @return a CommandResponse as a CompletableFuture
    */
   def subscribe(commandRunId: Id, timeout: Timeout): CompletableFuture[SubmitResponse] =
-    sCommandService.subscribe(commandRunId)(timeout).toJava.toCompletableFuture
+    sCommandService.getFinalResponse(commandRunId)(timeout).toJava.toCompletableFuture
 
   /**
    * Query for the result of a long running command which was sent as Submit to get a [[csw.params.commands.CommandResponse]] as a Future.
@@ -106,7 +106,7 @@ class JCommandService(akkaLocation: AkkaLocation, actorSystem: ActorSystem[_]) {
    * @return a CommandResponse as a CompletableFuture
    */
   def submitAndSubscribe(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[SubmitResponse] =
-    sCommandService.submitAndSubscribe(controlCommand)(timeout).toJava.toCompletableFuture
+    sCommandService.submitAndGetFinalResponse(controlCommand)(timeout).toJava.toCompletableFuture
 
   /**
    * Submit a command and match the published state from the component using a [[csw.command.models.matchers.StateMatcher]]. If the match is successful a `Completed` response is

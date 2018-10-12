@@ -62,7 +62,7 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
       case _: Started =>
         // If valid, subscribe to the HCD's CommandResponseManager
         // This explicit timeout indicates how long to wait for completion
-        hcd.subscribe(setupCommand.runId)(10000.seconds)
+        hcd.getFinalResponse(setupCommand.runId)(10000.seconds)
       case x =>
         log.error("Sleep command invalid")
         Future(x)

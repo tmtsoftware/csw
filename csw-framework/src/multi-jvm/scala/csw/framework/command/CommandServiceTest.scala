@@ -34,32 +34,32 @@ import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{Await, ExecutionContext, Future, TimeoutException}
 
 /**
-  * Test Configuration :
-  * JVM-1 : Seed node
-  * JVM-2 : Assembly running in Standalone mode (Commanding Assembly)
-  * JVM-3 : Assembly and HCD running in Container Mode
-  *
-  * Scenario 1 : Short Running Command
-  * 1. Assembly running in JVM-2 (Commanding Assembly) resolves Assembly running in JVM-3
-  * 2. Commanding Assembly sends short running command to another assembly (JVM-3)
-  * 3. Assembly (JVM-3) receives command and update its status as Invalid in CSRM
-  * 4. Commanding Assembly (JVM-2) receives Command Completion response which is Invalid
-  *
-  * Scenario 2 : Long Running Command without matcher
-  * 1. Commanding Assembly sends long running command to another assembly (JVM-3)
-  * 2. Assembly (JVM-3) receives command and update its validation status as Accepted in CSRM
-  * 3. Commanding Assembly (JVM-2) receives validation response as Accepted
-  * 4. Commanding Assembly then waits for Command Completion response
-  * 5. Assembly from JVM-3 updates Command Completion status which is CompletedWithResult in CSRM
-  * 6. Commanding Assembly (JVM-2) receives Command Completion response which is CompletedWithResult
-  *
-  * Scenario 3 : Long Running Command with matcher
-  * 1. Commanding Assembly sends long running command to another assembly (JVM-3)
-  * 2. Assembly (JVM-3) receives command and update its validation status as Accepted in CSRM
-  * 3. Commanding Assembly (JVM-2) receives validation response as Accepted
-  * 4. Commanding Assembly starts state matcher
-  * 5. Assembly (JVM-3) keeps publishing its current state
-  * 6. Commanding Assembly marks status of Command as Completed when demand state matches with current state=
+ * Test Configuration :
+ * JVM-1 : Seed node
+ * JVM-2 : Assembly running in Standalone mode (Commanding Assembly)
+ * JVM-3 : Assembly and HCD running in Container Mode
+ *
+ * Scenario 1 : Short Running Command
+ * 1. Assembly running in JVM-2 (Commanding Assembly) resolves Assembly running in JVM-3
+ * 2. Commanding Assembly sends short running command to another assembly (JVM-3)
+ * 3. Assembly (JVM-3) receives command and update its status as Invalid in CSRM
+ * 4. Commanding Assembly (JVM-2) receives Command Completion response which is Invalid
+ *
+ * Scenario 2 : Long Running Command without matcher
+ * 1. Commanding Assembly sends long running command to another assembly (JVM-3)
+ * 2. Assembly (JVM-3) receives command and update its validation status as Accepted in CSRM
+ * 3. Commanding Assembly (JVM-2) receives validation response as Accepted
+ * 4. Commanding Assembly then waits for Command Completion response
+ * 5. Assembly from JVM-3 updates Command Completion status which is CompletedWithResult in CSRM
+ * 6. Commanding Assembly (JVM-2) receives Command Completion response which is CompletedWithResult
+ *
+ * Scenario 3 : Long Running Command with matcher
+ * 1. Commanding Assembly sends long running command to another assembly (JVM-3)
+ * 2. Assembly (JVM-3) receives command and update its validation status as Accepted in CSRM
+ * 3. Commanding Assembly (JVM-2) receives validation response as Accepted
+ * 4. Commanding Assembly starts state matcher
+ * 5. Assembly (JVM-3) keeps publishing its current state
+ * 6. Commanding Assembly marks status of Command as Completed when demand state matches with current state=
   **/
 class CommandServiceTestMultiJvm1 extends CommandServiceTest(0)
 
@@ -102,7 +102,7 @@ class CommandServiceTest(ignore: Int)
       enterBarrier("spawned")
 
       // resolve assembly running in jvm-3 and send setup command expecting immediate command completion response
-      val assemblyLocF = locationService.resolve(AkkaConnection(ComponentId("Assembly", ComponentType.Assembly)), 5.seconds)
+      val assemblyLocF  = locationService.resolve(AkkaConnection(ComponentId("Assembly", ComponentType.Assembly)), 5.seconds)
       val maybeLocation = Await.result(assemblyLocF, 10.seconds)
 
       maybeLocation.isDefined shouldBe true
@@ -127,15 +127,15 @@ class CommandServiceTest(ignore: Int)
       val obsId = Some(ObsId("Obs001"))
 
       // spawn single assembly running in Standalone mode in jvm-2
-      val wiring = FrameworkWiring.make(system, locationService, mock[RedisClient])
+      val wiring        = FrameworkWiring.make(system, locationService, mock[RedisClient])
       val sequencerConf = ConfigFactory.load("command/commanding_assembly.conf")
       Await.result(Standalone.spawn(sequencerConf, wiring), 5.seconds)
       enterBarrier("spawned")
 
       // resolve assembly running in jvm-3 and send setup command expecting immediate command completion response
-      val assemblyLocF = locationService.resolve(AkkaConnection(ComponentId("Assembly", ComponentType.Assembly)), 5.seconds)
+      val assemblyLocF                   = locationService.resolve(AkkaConnection(ComponentId("Assembly", ComponentType.Assembly)), 5.seconds)
       val assemblyLocation: AkkaLocation = Await.result(assemblyLocF, 10.seconds).get
-      val assemblyComponent = new CommandService(assemblyLocation)
+      val assemblyComponent              = new CommandService(assemblyLocation)
 
       // DEOPSCSW-233: Hide implementation by having a CCS API
       // short running command
@@ -162,7 +162,7 @@ class CommandServiceTest(ignore: Int)
       val eventualLongCommandResponse = async {
         val initialCommandResponse = await(assemblyComponent.submit(setupWithoutMatcher))
         initialCommandResponse shouldBe an[Started]
-        await(assemblyComponent.subscribe(setupWithoutMatcher.runId))
+        await(assemblyComponent.getFinalResponse(setupWithoutMatcher.runId))
       }
 
       val longCommandResponse = Await.result(eventualLongCommandResponse, timeout.duration)
@@ -174,7 +174,7 @@ class CommandServiceTest(ignore: Int)
       // DEOPSCSW-317: Use state values of HCD to determine command completion
       // long running command which uses matcher
       val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(100)
-      val setupWithMatcher = Setup(prefix, matcherCmd, obsId)
+      val setupWithMatcher      = Setup(prefix, matcherCmd, obsId)
 
       //#matcher
 
@@ -220,7 +220,7 @@ class CommandServiceTest(ignore: Int)
 
       // Test failed matching
       val setupWithFailedMatcher = Setup(prefix, matcherFailedCmd, obsId)
-      val failedMatcher = new Matcher(assemblyLocation.componentRef, demandMatcher)
+      val failedMatcher          = new Matcher(assemblyLocation.componentRef, demandMatcher)
 
       val failedMatcherResponseF: Future[MatcherResponse] = failedMatcher.start
 
@@ -231,7 +231,7 @@ class CommandServiceTest(ignore: Int)
             val matcherResponse = await(failedMatcherResponseF)
             // create appropriate response if demand state was matched from among the published state or otherwise
             matcherResponse match {
-              case MatchCompleted ⇒ Completed(setupWithFailedMatcher.runId)
+              case MatchCompleted  ⇒ Completed(setupWithFailedMatcher.runId)
               case MatchFailed(ex) ⇒ Error(setupWithFailedMatcher.runId, ex.getMessage)
             }
           case invalid: Invalid ⇒
@@ -254,9 +254,9 @@ class CommandServiceTest(ignore: Int)
       // 2. Assembly on receiving setupWithTimeoutMatcher command, sleeps for 1 second
       // 3. This results in Timeout in Matcher
       val demandMatcherToSimulateTimeout =
-      DemandMatcher(DemandState(prefix, StateName("testStateName"), Set(param)), withUnits = false, 500.millis)
+        DemandMatcher(DemandState(prefix, StateName("testStateName"), Set(param)), withUnits = false, 500.millis)
       val setupWithTimeoutMatcher = Setup(prefix, matcherTimeoutCmd, obsId)
-      val matcherForTimeout = new Matcher(assemblyLocation.componentRef, demandMatcherToSimulateTimeout)
+      val matcherForTimeout       = new Matcher(assemblyLocation.componentRef, demandMatcherToSimulateTimeout)
 
       val matcherResponseF1: Future[MatcherResponse] = matcherForTimeout.start
 
@@ -267,11 +267,11 @@ class CommandServiceTest(ignore: Int)
           case _: Accepted ⇒
             val matcherResponse = await(matcherResponseF1)
             matcherResponse match {
-              case MatchCompleted ⇒ Completed(setupWithMatcher.runId)
+              case MatchCompleted                                       ⇒ Completed(setupWithMatcher.runId)
               case MatchFailed(ex) if ex.isInstanceOf[TimeoutException] ⇒ Error(setupWithMatcher.runId, timeoutExMsg)
-              case MatchFailed(ex) ⇒ Error(setupWithMatcher.runId, ex.getMessage)
+              case MatchFailed(ex)                                      ⇒ Error(setupWithMatcher.runId, ex.getMessage)
             }
-          case other@(Invalid(_, _) | Locked(_)) =>
+          case other @ (Invalid(_, _) | Locked(_)) =>
             matcher.stop()
             other.asInstanceOf[MatchingResponse]
         }
@@ -340,7 +340,7 @@ class CommandServiceTest(ignore: Int)
 
     runOn(member2) {
       // spawn container having assembly and hcd running in jvm-3
-      val wiring = FrameworkWiring.make(system, locationService, mock[RedisClient])
+      val wiring        = FrameworkWiring.make(system, locationService, mock[RedisClient])
       val containerConf = ConfigFactory.load("command/container.conf")
       Await.result(Container.spawn(containerConf, wiring), 5.seconds)
       enterBarrier("spawned")

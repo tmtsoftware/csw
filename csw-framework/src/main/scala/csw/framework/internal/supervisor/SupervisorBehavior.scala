@@ -202,8 +202,8 @@ private[framework] final class SupervisorBehavior(
     case Unsubscribe(runId, replyTo)          ⇒ commandResponseManager.commandResponseManagerActor ! Unsubscribe(runId, replyTo)
     case Lock(source, replyTo, leaseDuration) ⇒ lockComponent(source, replyTo, leaseDuration)
     case Unlock(source, replyTo)              ⇒ unlockComponent(source, replyTo)
-    case command: CommandMessage ⇒
-      if (lockManager.allowCommand(command)) runningComponent.get ! command else command.replyTo ! Locked(command.command.runId)
+    case cmdMsg: CommandMessage ⇒
+      if (lockManager.allowCommand(cmdMsg)) runningComponent.get ! cmdMsg else cmdMsg.replyTo ! Locked(cmdMsg.command.runId)
     case runningMessage: RunningMessage ⇒ handleRunningMessage(runningMessage)
     case msg @ Running(_)               ⇒ log.info(s"Ignoring [$msg] message received from TLA as Supervisor already in Running state")
   }

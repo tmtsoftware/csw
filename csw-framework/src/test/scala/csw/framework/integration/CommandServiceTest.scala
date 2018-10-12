@@ -61,7 +61,7 @@ class CommandServiceTest extends FunSuite with Matchers with MockitoSugar with B
    */
   private def submitAll(setups: List[Setup], assembly: CommandService): Future[List[SubmitResponse]] = {
     Source(setups)
-      .mapAsync(1)(assembly.submitAndSubscribe)
+      .mapAsync(1)(assembly.submitAndGetFinalResponse)
       .map { response =>
         if (CommandResponse.isNegative(response))
           throw new RuntimeException(s"Command failed: $response")

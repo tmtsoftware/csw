@@ -63,7 +63,7 @@ class LongRunningCommandTest(ignore: Int)
           5.seconds
         )
       val assemblyLocation: AkkaLocation = Await.result(assemblyLocF, 10.seconds).get
-      val assemblyCommandService = new CommandService(assemblyLocation)
+      val assemblyCommandService         = new CommandService(assemblyLocation)
 
       val setup = Setup(prefix, longRunning, Some(obsId))
       val probe = TestProbe[CurrentState]
@@ -83,7 +83,7 @@ class LongRunningCommandTest(ignore: Int)
       //#subscribe-for-result
       val eventualCommandResponse = assemblyCommandService.submit(setup).flatMap {
         case _: Started ⇒
-          assemblyCommandService.subscribe(setup.runId)
+          assemblyCommandService.getFinalResponse(setup.runId)
         case _ ⇒ Future(Error(setup.runId, ""))
       }
       //#subscribe-for-result
@@ -92,7 +92,7 @@ class LongRunningCommandTest(ignore: Int)
 
       //#submitAndSubscribe
       val setupForSubscribe = Setup(prefix, longRunning, Some(obsId))
-      val response          = assemblyCommandService.submitAndSubscribe(setupForSubscribe)
+      val response          = assemblyCommandService.submitAndGetFinalResponse(setupForSubscribe)
       //#submitAndSubscribe
 
       Await.result(response, 20.seconds) shouldBe Completed(setupForSubscribe.runId)
@@ -114,13 +114,13 @@ class LongRunningCommandTest(ignore: Int)
       eventualResponse.map(_ shouldBe Started(setupForQuery.runId))
 
       enterBarrier("long-commands")
-/*
+      /*
       val hcdLocF =
         locationService.resolve(
           AkkaConnection(ComponentId("Test_Component_Running_Long_Command", ComponentType.HCD)),
           5.seconds
         )
-        */
+       */
       //val hcdLocation: AkkaLocation = Await.result(hcdLocF, 10.seconds).get
       //val hcdComponent              = new CommandService(hcdLocation)
 
@@ -132,7 +132,7 @@ class LongRunningCommandTest(ignore: Int)
       //val setupHcd3      = Setup(prefix, failureAfterValidationCmd, Some(obsId))
 
       //#submitAllAndGetResponse
-/*
+      /*
       val responseOfMultipleCommands = hcdComponent.submitAllAndGetResponse(Set(setupHcd1, setupHcd2))
 
       //#submitAllAndGetResponse
@@ -159,11 +159,11 @@ class LongRunningCommandTest(ignore: Int)
       whenReady(aggregatedInvalidValidationResponse, PatienceConfiguration.Timeout(20.seconds)) { result ⇒
         result shouldBe a[Invalid]
       }
-*/
+       */
       enterBarrier("multiple-components-submit-multiple-commands")
 
       //#submitAllAndGetFinalResponse
-/*
+      /*
       val finalResponseOfMultipleCommands = hcdComponent.submitAllAndGetFinalResponse(Set(setupHcd1, setupHcd2))
 
       //#submitAllAndGetFinalResponse
@@ -188,7 +188,7 @@ class LongRunningCommandTest(ignore: Int)
       whenReady(aggregatedErrorResponse, PatienceConfiguration.Timeout(20.seconds)) { result ⇒
         result shouldBe a[Error]
       }
-*/
+       */
       enterBarrier("multiple-components-submit-subscribe-multiple-commands")
     }
 
