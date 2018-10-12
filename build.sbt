@@ -203,7 +203,7 @@ lazy val `csw-command` = project
     `csw-logging`,
     `csw-commons` % "test->test"
   )
-  .enablePlugins(PublishBintray, AutoMultiJvm, GenJavadocPlugin, MaybeCoverage)
+  .enablePlugins(PublishBintray, AutoMultiJvm, GenJavadocPlugin)
   .settings(libraryDependencies ++= Dependencies.Command.value)
 
 lazy val `csw-framework` = project
