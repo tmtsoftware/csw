@@ -14,9 +14,8 @@ import csw.command.models.framework.ToComponentLifecycleMessage
 import csw.command.models.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.params.commands.CommandResponse._
 import csw.logging.scaladsl.Logger
-import csw.params.commands.ControlCommand
+import csw.params.commands.CommandResponse._
 
 import scala.async.Async.{async, await}
 import scala.concurrent.Await
@@ -165,7 +164,7 @@ private[framework] final class ComponentBehavior(
    *
    * @param commandMessage message encapsulating a [[csw.params.commands.Command]]
    */
-  private def onRunningCompCommandMessage(commandMessage: CommandMessage): Unit = {
+  private def onRunningCompCommandMessage(commandMessage: CommandMessage): Unit = commandMessage match {
     case Validate(_, replyTo) ⇒ handleValidate(commandMessage, replyTo)
     case Oneway(_, replyTo)   ⇒ handleOneway(commandMessage, replyTo)
     case Submit(_, replyTo)   ⇒ handleSubmit(commandMessage, replyTo)

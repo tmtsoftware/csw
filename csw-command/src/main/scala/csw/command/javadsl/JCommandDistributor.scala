@@ -1,10 +1,7 @@
 package csw.command.javadsl
 
 import java.util
-import java.util.concurrent.CompletableFuture
 
-import akka.stream.Materializer
-import akka.util.Timeout
 import csw.params.commands.ControlCommand
 
 /**

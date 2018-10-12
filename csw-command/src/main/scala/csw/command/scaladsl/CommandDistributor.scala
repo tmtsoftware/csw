@@ -1,15 +1,6 @@
 package csw.command.scaladsl
 
-import akka.NotUsed
-import akka.stream.Materializer
-import akka.stream.scaladsl.Source
-import akka.util.Timeout
-import csw.command.models.CommandResponseAggregator
-import csw.params.commands.CommandResponse.Completed
-import csw.params.commands.{CommandIssue, CommandResponse, ControlCommand}
-import csw.params.core.models.Id
-
-import scala.concurrent.{ExecutionContext, Future}
+import csw.params.commands.ControlCommand
 
 /**
  * The ConfigDistributor enables distributing multiple commands to multiple components and get one aggregated command
