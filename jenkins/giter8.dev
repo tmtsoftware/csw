@@ -16,7 +16,7 @@ pipeline {
 
         stage('Publish Local') {
             steps {
-                sh "sbt publishLocal"
+                sh "sbt clean publishLocal"
             }
         }
 

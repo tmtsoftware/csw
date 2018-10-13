@@ -1,12 +1,14 @@
 package csw.location.server.scaladsl
 
+import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.actor.testkit.typed.scaladsl
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.actor.{typed, ActorSystem, PoisonPill}
+import akka.actor.{typed, ActorSystem, CoordinatedShutdown, PoisonPill}
 import akka.stream.scaladsl.{Keep, Sink}
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.testkit.TestProbe
+import csw.location.api.commons.ClusterAwareSettings
 import csw.location.api.exceptions.OtherLocationIsRegistered
 import csw.location.api.internal.Networks
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
@@ -41,15 +43,19 @@ class LocationServiceCompTest(mode: String)
   implicit val ec: ExecutionContext              = actorSystem.dispatcher
   implicit val mat: Materializer                 = ActorMaterializer()
 
+  private lazy val clusterSystem = ClusterAwareSettings.system
+
   private lazy val locationService: LocationService = mode match {
     case "http"    => HttpLocationServiceFactory.makeLocalClient
-    case "cluster" => LocationServiceFactory.make()
+    case "cluster" => LocationServiceFactory.withSystem(clusterSystem)
   }
 
   private val prefix                    = Prefix("nfiraos.ncc.trombone")
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 100.millis)
 
   override protected def afterEach(): Unit = locationService.unregisterAll().await
+
+  override protected def afterAll(): Unit = if (mode == "cluster") CoordinatedShutdown(clusterSystem).run(UnknownReason).await
 
   test("should able to register, resolve, list and unregister tcp location") {
     val componentId: ComponentId         = ComponentId("exampleTCPService", ComponentType.Service)

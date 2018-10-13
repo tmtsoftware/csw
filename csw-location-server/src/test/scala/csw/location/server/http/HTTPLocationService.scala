@@ -35,7 +35,14 @@ trait HTTPLocationService
   start(Some(3553))
 }
 
-class JHTTPLocationService extends HTTPLocationService
+class JHTTPLocationService {
+
+  private val adminWiring = AdminWiring.make(Some(3553))
+  adminWiring.locationHttpService.start().await
+
+  def afterAll(): Unit = adminWiring.actorRuntime.shutdown(UnknownReason).await
+
+}
 
 class HTTPLocationServiceOnPorts(clusterPort: Int, httpPort: Int) extends HTTPLocationService {
   start(Some(clusterPort), Some(httpPort))

@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 public class JConfigClientExampleTest {
     private static ActorRuntime actorRuntime = new ActorRuntime(ActorSystem.create());
     private static ILocationService clientLocationService = JHttpLocationServiceFactory.makeLocalClient(actorRuntime.actorSystem(), actorRuntime.mat());
-    private static JHTTPLocationService jhttpLocationService;
+    private static JHTTPLocationService jHttpLocationService;
 
     //#create-api
     //config client API
@@ -57,7 +57,7 @@ public class JConfigClientExampleTest {
 
     @BeforeClass
     public static void beforeAll() throws Exception {
-        jhttpLocationService = new JHTTPLocationService();
+        jHttpLocationService = new JHTTPLocationService();
         Await.result(httpService.registeredLazyBinding(), Duration.create(20, "seconds"));
     }
 
@@ -74,6 +74,7 @@ public class JConfigClientExampleTest {
     @AfterClass
     public static void afterAll() throws Exception {
         Await.result(httpService.shutdown(CoordinatedShutdown.unknownReason()), Duration.create(20, "seconds"));
+        jHttpLocationService.afterAll();
     }
 
 
