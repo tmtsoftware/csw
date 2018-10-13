@@ -38,7 +38,6 @@ public class JEventPublisherTest extends TestNGSuite {
 
     private RedisTestProps redisTestProps;
     private KafkaTestProps kafkaTestProps;
-    private JHTTPLocationService jHttpLocationService;
 
     private int counter = -1;
     private Cancellable cancellable;
@@ -49,14 +48,12 @@ public class JEventPublisherTest extends TestNGSuite {
         kafkaTestProps = KafkaTestProps.jCreateKafkaProperties();
         redisTestProps.start();
         kafkaTestProps.start();
-        jHttpLocationService = new JHTTPLocationService();
     }
 
     @AfterSuite
     public void afterAll() {
         redisTestProps.shutdown();
         kafkaTestProps.shutdown();
-        jHttpLocationService.afterAll();
     }
 
     @DataProvider(name = "event-service-provider")
