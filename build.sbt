@@ -13,7 +13,8 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-config-cli`,
   `csw-config-server`,
   `csw-framework`,
-  `csw-command`,
+  `csw-command-api`,
+  `csw-command-client`,
   `csw-event-api`,
   `csw-event-client`,
   `csw-event-cli`,
@@ -142,7 +143,7 @@ lazy val `csw-location-agent` = project
 lazy val `csw-admin-server` = project
   .dependsOn(
     `csw-location-client`,
-    `csw-command`,
+    `csw-command-client`,
     `csw-commons`       % "compile->compile;test->test",
     `csw-framework`     % "test->test",
     `csw-config-server` % "test->test"
@@ -202,8 +203,9 @@ lazy val `csw-command-api` = project
     `csw-params-jvm`,
     `csw-location-api`
   )
+  .enablePlugins(PublishBintray, GenJavadocPlugin)
 
-lazy val `csw-command` = project
+lazy val `csw-command-client` = project
   .dependsOn(
     `csw-params-jvm`,
     `csw-location-api`,
@@ -218,7 +220,7 @@ lazy val `csw-framework` = project
     `csw-params-jvm`,
     `csw-config-client`,
     `csw-logging`,
-    `csw-command`,
+    `csw-command-client`,
     `csw-event-api`,
     `csw-event-client`,
     `csw-alarm-client`,
@@ -312,7 +314,7 @@ lazy val `csw-benchmark` = project
   .dependsOn(
     `csw-logging`,
     `csw-params-jvm`,
-    `csw-command`,
+    `csw-command-client`,
     `csw-location-server` % "compile->test",
     `csw-framework`       % "compile->compile;test->test"
   )
@@ -326,7 +328,7 @@ lazy val `csw-benchmark` = project
 lazy val integration = project
   .dependsOn(
     `csw-location-server`,
-    `csw-command`,
+    `csw-command-client`,
     `csw-location-agent`
   )
   .enablePlugins(DeployApp)
