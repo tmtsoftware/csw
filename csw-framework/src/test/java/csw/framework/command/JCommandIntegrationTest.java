@@ -24,6 +24,7 @@ import csw.location.api.models.ComponentId;
 import csw.location.client.ActorSystemFactory;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;
 import csw.logging.javadsl.JLoggingSystemFactory;
+import csw.params.commands.CommandIssue;
 import csw.params.commands.CommandResponse;
 import csw.params.commands.ControlCommand;
 import csw.params.commands.Setup;
@@ -129,6 +130,8 @@ public class JCommandIntegrationTest {
                                 }
                         );
         //#immediate-response
+        CommandResponse.Invalid expectedInvalidResponse = new CommandResponse.Invalid(imdInvalidCommand.runId(), new CommandIssue.OtherIssue("Testing: Received failure, will return Invalid."));
+        Assert.assertEquals(expectedInvalidResponse, eventualCommandResponse.get());
 
         CompletableFuture<CommandResponse.SubmitResponse> imdInvalidCmdResponseCompletableFuture = hcdCmdService.submit(imdInvalidCommand, timeout);
         CommandResponse.SubmitResponse actualImdInvalidCmdResponse = imdInvalidCmdResponseCompletableFuture.get();
@@ -146,6 +149,7 @@ public class JCommandIntegrationTest {
         CompletableFuture<CommandResponse.QueryResponse> queryResponseFuture = hcdCmdService.query(controlCommand.runId(), timeout);
 
         //#query-response
+        Assert.assertEquals(new CommandResponse.Started(controlCommand.runId()), queryResponseFuture.get());
 
         //#subscribe-for-result
         CompletableFuture<CommandResponse.SubmitResponse> testCommandResponse =
@@ -204,6 +208,8 @@ public class JCommandIntegrationTest {
 
         CommandResponse.MatchingResponse actualResponse = commandResponseToBeMatched.get();
         //#matcher
+        CommandResponse.Completed expectedResponse = new CommandResponse.Completed(setup.runId());
+        Assert.assertEquals(expectedResponse, actualResponse);
 
         //#oneway
         CompletableFuture onewayCommandResponseF = hcdCmdService
@@ -219,6 +225,8 @@ public class JCommandIntegrationTest {
                 });
 
         //#oneway
+        // just wait for command completion so that it ll not impact other results
+        onewayCommandResponseF.get();
 
         //#submit
         CompletableFuture submitCommandResponseF = hcdCmdService
@@ -234,6 +242,7 @@ public class JCommandIntegrationTest {
                 });
 
         //#submit
+        submitCommandResponseF.get();
 
         //#onewayAndMatch
 
@@ -246,14 +255,12 @@ public class JCommandIntegrationTest {
         // start the matcher so that it is ready to receive state published by the source
         CompletableFuture<MatcherResponse> matcherResponse = matcher1.jStart();
 
-
         CompletableFuture<CommandResponse.MatchingResponse> matchedCommandResponse =
                 hcdCmdService.onewayAndMatch(setup, stateMatcher, timeout);
 
         //#onewayAndMatch
-
-        CommandResponse.Completed expectedResponse = new CommandResponse.Completed(setup.runId());
-        Assert.assertEquals(expectedResponse, actualResponse);
+        Assert.assertEquals(new CommandResponse.Completed(setup.runId()), matchedCommandResponse.get());
+        Assert.assertEquals(MatcherResponses.MatchCompleted$.MODULE$, matcherResponse.get());
     }
 
     @Test
