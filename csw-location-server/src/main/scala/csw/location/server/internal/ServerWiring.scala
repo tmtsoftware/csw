@@ -42,5 +42,10 @@ private[csw] object ServerWiring {
     new ServerWiring {
       override lazy val clusterSettings: ClusterSettings = _clusterSettings
     }
+
+  def make(_actorSystem: ActorSystem): ServerWiring =
+    new ServerWiring {
+      override lazy val actorSystem: ActorSystem = _actorSystem
+    }
 }
 // $COVERAGE-ON$

@@ -27,7 +27,7 @@ import csw.config.server.{ServerWiring, Settings}
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{ComponentId, ComponentType}
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
-import csw.location.server.http.HTTPLocationService
+import csw.location.server.http.MultiNodeHTTPLocationService
 import csw.params.commands.CommandResponse.Invalid
 import csw.params.commands.{CommandName, Setup}
 import csw.params.core.generics.{KeyType, Parameter}
@@ -51,7 +51,9 @@ class ContainerCmdTestMultiJvm3 extends ContainerCmdTest(0)
 // DEOPSCSW-182: Control Life Cycle of Components
 // DEOPSCSW-203: Write component-specific verification code
 // DEOPSCSW-216: Locate and connect components to send AKKA commands
-class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAndSeed, mode = "http") with HTTPLocationService {
+class ContainerCmdTest(ignore: Int)
+    extends LSNodeSpec(config = new TwoMembersAndSeed, mode = "http")
+    with MultiNodeHTTPLocationService {
 
   import config._
 
@@ -68,8 +70,8 @@ class ContainerCmdTest(ignore: Int) extends LSNodeSpec(config = new TwoMembersAn
   }
 
   override def afterAll(): Unit = {
-    super.afterAll()
     testFileUtils.deleteServerFiles()
+    super.afterAll()
   }
 
   def createStandaloneTmpFile(): Path = {

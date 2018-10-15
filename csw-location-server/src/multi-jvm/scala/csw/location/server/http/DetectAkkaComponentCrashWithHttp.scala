@@ -9,4 +9,4 @@ class DetectAkkaComponentCrashWithHttpMultiJvmNode3 extends DetectAkkaComponentC
 // DEOPSCSW-429: [SPIKE] Provide HTTP server and client for location service
 class DetectAkkaComponentCrashWithHttp(ignore: Int, mode: String)
     extends DetectAkkaComponentCrashTest(ignore, mode)
-    with HTTPLocationService
+    with MultiNodeHTTPLocationService

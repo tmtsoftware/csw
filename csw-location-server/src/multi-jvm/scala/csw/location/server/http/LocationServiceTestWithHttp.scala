@@ -6,4 +6,6 @@ class LocationServiceTestWithHttpMultiJvmNode1 extends LocationServiceTestWithHt
 class LocationServiceTestWithHttpMultiJvmNode2 extends LocationServiceTestWithHttp(0, "http")
 
 // DEOPSCSW-429: [SPIKE] Provide HTTP server and client for location service
-class LocationServiceTestWithHttp(ignore: Int, mode: String) extends LocationServiceTest(ignore, mode) with HTTPLocationService
+class LocationServiceTestWithHttp(ignore: Int, mode: String)
+    extends LocationServiceTest(ignore, mode)
+    with MultiNodeHTTPLocationService

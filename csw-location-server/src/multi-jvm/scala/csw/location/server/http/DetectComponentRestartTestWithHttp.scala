@@ -9,8 +9,4 @@ class DetectComponentRestartTestWithHttpMultiJvmNode3 extends DetectComponentRes
 // DEOPSCSW-429: [SPIKE] Provide HTTP server and client for location service
 class DetectComponentRestartTestWithHttp(ignore: Int, mode: String)
     extends DetectComponentRestartTest(ignore, mode)
-    with HTTPLocationService {
-
-  override def afterAll(): Unit = super.afterAll()
-
-}
+    with MultiNodeHTTPLocationService

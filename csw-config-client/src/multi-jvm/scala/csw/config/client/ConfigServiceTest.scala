@@ -11,12 +11,14 @@ import csw.config.client.scaladsl.ConfigClientFactory
 import csw.config.server.commons.TestFileUtils
 import csw.config.server.{ServerWiring, Settings}
 import csw.location.helpers.LSNodeSpec
-import csw.location.server.http.HTTPLocationService
+import csw.location.server.http.MultiNodeHTTPLocationService
 
 class ConfigServiceTestMultiJvmNode1 extends ConfigServiceTest(0)
 class ConfigServiceTestMultiJvmNode2 extends ConfigServiceTest(0)
 
-class ConfigServiceTest(ignore: Int) extends LSNodeSpec(config = new OneClientAndServer, mode = "http") with HTTPLocationService {
+class ConfigServiceTest(ignore: Int)
+    extends LSNodeSpec(config = new OneClientAndServer, mode = "http")
+    with MultiNodeHTTPLocationService {
 
   import config._
 

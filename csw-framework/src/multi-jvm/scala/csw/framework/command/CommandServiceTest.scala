@@ -1,31 +1,31 @@
 package csw.framework.command
 
 import akka.actor.Scheduler
+import akka.actor.testkit.typed.TestKitSettings
+import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.{ActorMaterializer, Materializer}
-import akka.actor.testkit.typed.TestKitSettings
-import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
+import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.messages.CommandMessage.Submit
-import csw.common.utils.LockCommandFactory
-import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
-import csw.params.commands.CommandResponse._
-import csw.params.commands._
-import csw.command.models.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
-import csw.command.models.matchers.{DemandMatcher, Matcher, MatcherResponse}
 import csw.command.models.framework.LockingResponse
 import csw.command.models.framework.LockingResponses.LockAcquired
+import csw.command.models.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
+import csw.command.models.matchers.{DemandMatcher, Matcher, MatcherResponse}
+import csw.command.scaladsl.CommandService
+import csw.common.utils.LockCommandFactory
+import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
+import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
+import csw.location.server.http.MultiNodeHTTPLocationService
+import csw.params.commands.CommandResponse._
+import csw.params.commands._
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.{ObsId, Prefix}
 import csw.params.core.states.{DemandState, StateName}
-import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
-import csw.command.scaladsl.CommandService
-import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
-import csw.location.server.http.HTTPLocationService
 import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar
 
@@ -80,7 +80,7 @@ class CommandServiceTestMultiJvm3 extends CommandServiceTest(0)
 // DEOPSCSW-321: AkkaLocation provides wrapper for ActorRef[ComponentMessage]
 class CommandServiceTest(ignore: Int)
     extends LSNodeSpec(config = new TwoMembersAndSeed, mode = "http")
-    with HTTPLocationService
+    with MultiNodeHTTPLocationService
     with MockitoSugar {
 
   import config._
@@ -92,8 +92,6 @@ class CommandServiceTest(ignore: Int)
   implicit val timeout: Timeout            = 5.seconds
   implicit val scheduler: Scheduler        = actorSystem.scheduler
   implicit val testkit: TestKitSettings    = TestKitSettings(actorSystem)
-
-  override def afterAll(): Unit = super.afterAll()
 
   test("sender of command should receive appropriate responses") {
 

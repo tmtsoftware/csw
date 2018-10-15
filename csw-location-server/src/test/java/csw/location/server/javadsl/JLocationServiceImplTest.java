@@ -38,8 +38,6 @@ import static csw.location.api.models.Connection.*;
 @SuppressWarnings("ConstantConditions")
 public class JLocationServiceImplTest {
 
-    public ILogger log = new JLoggerFactory(Constants.LocationService()).getLogger(getClass());
-
     private static ServerWiring wiring = new ServerWiring();
 
     private static ActorSystem actorSystem =  ActorSystemFactory.remote();
@@ -80,9 +78,6 @@ public class JLocationServiceImplTest {
     @Test
     public void testRegistrationAndUnregistrationOfHttpComponent() throws ExecutionException, InterruptedException {
         int port = 8080;
-
-        log.info(() -> "in the test class");
-
         HttpRegistration httpRegistration = new HttpRegistration(httpServiceConnection, port, Path);
 
         IRegistrationResult registrationResult = locationService.register(httpRegistration).get();

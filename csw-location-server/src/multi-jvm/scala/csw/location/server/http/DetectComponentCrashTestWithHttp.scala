@@ -9,4 +9,4 @@ class DetectComponentCrashTestWithHttpMultiJvmNode3 extends DetectComponentCrash
 // DEOPSCSW-429: [SPIKE] Provide HTTP server and client for location service
 class DetectComponentCrashTestWithHttp(ignore: Int, mode: String)
     extends DetectComponentCrashTest(ignore, mode)
-    with HTTPLocationService
+    with MultiNodeHTTPLocationService

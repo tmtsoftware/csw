@@ -15,11 +15,11 @@ import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{ComponentId, ComponentType}
 import csw.location.helpers.{LSNodeSpec, OneMemberAndSeed}
+import csw.location.server.http.MultiNodeHTTPLocationService
 import csw.params.commands.CommandResponse._
 import csw.params.commands.Setup
 import csw.params.core.generics.KeyType
 import csw.params.core.models.ObsId
-import csw.location.server.http.HTTPLocationService
 import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar
 
@@ -33,22 +33,20 @@ class CancellableCommandTestMultiJvm2 extends CancellableCommandTest(0)
 // DEOPSCSW-211 Notification of Interrupted Message
 class CancellableCommandTest(ignore: Int)
     extends LSNodeSpec(config = new OneMemberAndSeed, mode = "http")
-    with HTTPLocationService
+    with MultiNodeHTTPLocationService
     with MockitoSugar {
   import config._
 
   implicit val actorSystem: ActorSystem[_] = system.toTyped
-  implicit val mat: Materializer = ActorMaterializer()
-  implicit val ec: ExecutionContext = actorSystem.executionContext
-  implicit val timeout: Timeout = 5.seconds
-  implicit val scheduler: Scheduler = actorSystem.scheduler
-
-  override def afterAll(): Unit = super.afterAll()
+  implicit val mat: Materializer           = ActorMaterializer()
+  implicit val ec: ExecutionContext        = actorSystem.executionContext
+  implicit val timeout: Timeout            = 5.seconds
+  implicit val scheduler: Scheduler        = actorSystem.scheduler
 
   test("a long running command should be cancellable") {
     runOn(seed) {
       // spawn container having assembly and hcd running in jvm-1
-      val wiring = FrameworkWiring.make(system, locationService, mock[RedisClient])
+      val wiring       = FrameworkWiring.make(system, locationService, mock[RedisClient])
       val assemblyConf = ConfigFactory.load("command/commanding_assembly.conf")
       Await.result(Standalone.spawn(assemblyConf, wiring), 5.seconds)
       enterBarrier("spawned")
@@ -57,8 +55,8 @@ class CancellableCommandTest(ignore: Int)
     runOn(member) {
       val submitResponseProbe = TestProbe[SubmitResponse]
       val onewayResponseProbe = TestProbe[OnewayResponse]
-      val obsId = Some(ObsId("Obs001"))
-      val cancelCmdId = KeyType.StringKey.make("cancelCmdId")
+      val obsId               = Some(ObsId("Obs001"))
+      val cancelCmdId         = KeyType.StringKey.make("cancelCmdId")
 
       enterBarrier("spawned")
 

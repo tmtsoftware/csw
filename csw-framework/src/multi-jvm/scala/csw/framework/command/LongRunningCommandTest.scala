@@ -14,7 +14,7 @@ import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
-import csw.location.server.http.HTTPLocationService
+import csw.location.server.http.MultiNodeHTTPLocationService
 import csw.params.commands.CommandResponse._
 import csw.params.commands.Setup
 import csw.params.core.models.ObsId
@@ -36,7 +36,7 @@ class LongRunningCommandTestMultiJvm3 extends LongRunningCommandTest(0)
 // DEOPSCSW-233: Hide implementation by having a CCS API
 class LongRunningCommandTest(ignore: Int)
     extends LSNodeSpec(config = new TwoMembersAndSeed, mode = "http")
-    with HTTPLocationService
+    with MultiNodeHTTPLocationService
     with ScalaFutures
     with MockitoSugar {
   import config._
@@ -47,8 +47,6 @@ class LongRunningCommandTest(ignore: Int)
   implicit val timeout: Timeout             = 20.seconds
   implicit val scheduler: Scheduler         = actorSystem.scheduler
   implicit val testkit: TestKitSettings     = TestKitSettings(actorSystem)
-
-  override def afterAll(): Unit = super.afterAll()
 
   test("should be able to send long running commands asynchronously and get the response") {
     runOn(seed) {
