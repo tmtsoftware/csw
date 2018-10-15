@@ -10,7 +10,6 @@ import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
 import csw.command.api.javadsl.ICommandService
 import csw.command.api.scaladsl.{CurrentStateSubscription, StateMatcher}
-import csw.command.client.CommandServiceFactory
 import csw.location.api.models.AkkaLocation
 import csw.params.commands.CommandResponse.{MatchingResponse, OnewayResponse, QueryResponse, SubmitResponse}
 import csw.params.commands.{CommandResponse, ControlCommand}
@@ -28,7 +27,7 @@ private[csw] class JCommandServiceImpl(akkaLocation: AkkaLocation, actorSystem: 
   implicit val mat: Materializer    = ActorMaterializer()(actorSystem.toUntyped)
   implicit val scheduler: Scheduler = actorSystem.scheduler
 
-  private[command] val sCommandService = CommandServiceFactory.make(akkaLocation)(actorSystem)
+  private[command] val sCommandService = new CommandServiceImpl(akkaLocation)(actorSystem)
 
   def completeAll(
       controlCommand: java.util.List[ControlCommand],
