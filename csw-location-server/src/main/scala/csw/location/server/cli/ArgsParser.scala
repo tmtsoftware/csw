@@ -13,11 +13,11 @@ class ArgsParser(name: String) {
 
     opt[Int]("clusterPort") action { (x, c) =>
       c.copy(clusterPort = Some(x))
-    } text "Optional: Port at which this cluster seed will run. Default is 3552"
+    } text "Optional: Port at which this cluster will run. Default is 3552"
 
     opt[Unit]("testMode") action { (_, c) =>
       c.copy(testMode = true)
-    } text "Optional: if provided, start cluster seed app with default port: 3552 and self join to form single node cluster. [Only for testing purpose]"
+    } text "Optional: if provided, start cluster app with default port: 3552 and self join to form single node cluster. [Only for testing purpose]"
 
     help("help")
 

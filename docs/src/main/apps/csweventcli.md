@@ -164,7 +164,7 @@ Prints the version of the application.
 ## Testing/Development
 While testing or development, in order to use this CLI application, below prerequisites must be satisfied:  
 
-*  @ref:[csw-cluster-seed](./../apps/cswclusterseed.md) application is running.
+*  @ref:[csw-location-server](./../apps/cswlocationserver.md) application is running.
 *  @ref:[csw-location-agent](./../apps/cswlocationagent.md) application is running, which has started event server and registered it to location service.
 
 Please refer @ref:[Starting apps for development](./../commons/apps.md#starting-apps-for-development) section for more details on how to start these applications using `csw-services.sh` script.

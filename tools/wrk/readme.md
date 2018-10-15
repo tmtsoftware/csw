@@ -53,7 +53,7 @@ Verify wrk installation by running `wrk --version` and you should get something 
 
 ## Test Instructions
 Once the wrk is installed on test machine, follow below instructions to run load test on Configuration Server :
-1. Start cluster seed app
+1. Start location server app
 2. Start config service at port 4000 with initRepo option enabled
 3. Now run wrk command with test parameters
     - ex. 

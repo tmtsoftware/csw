@@ -3,8 +3,8 @@
 The Location Service handles component (i.e., Applications, Sequencers, Assemblies, HCDs, and Services) registration 
 and discovery in the distributed TMT software system.
 
-CSW Location Service cluster seed must be running, and appropriate environment variables set to run apps.
-See @ref:[CSW Cluster Seed](../apps/cswclusterseed.md).
+CSW Location Service cluster must be running, and appropriate environment variables set to run apps.
+See @ref:[CSW Location Server](../apps/cswlocationserver.md).
 
 A component’s location information can be used by other components and services to connect to it and use it. 
 An example of location information is:
@@ -39,8 +39,8 @@ sbt
 
 ## Create Location Service
 
-Note that before using this API, the [csw-cluster-seed](../apps/cswclusterseed.html) application 
-(the main seed node for the location service cluster) should be running at a known location in the 
+Note that before using this API, the [csw-location-server](../apps/cswlocationserver.html) application 
+should be running at a known location in the 
 network (or at multiple locations) and the necessary configuration, environment variables or system 
 properties should be defined to point to the correct host and port number(s).
 
@@ -77,8 +77,7 @@ Some of the examples of string representation of a connection are:
 
 The `register` API takes a `Registration` parameter and returns a future registration result. 
 If registration fails for some reason, the returned future will fail with an exception. 
-(Registration will fail if the `csw-cluster-seed` application is
-not running or could not be found or if the given component name was already registered.)
+(Registration will fail if the `csw-location-server` application is not running or could not be found or if the given component name was already registered.)
 
 The following example shows registration of both UnTyped ActorRef and Typed ActorRef:
  

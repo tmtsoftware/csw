@@ -314,7 +314,7 @@ To run using the deployment packaging, follow the steps below:
 
 @@@ note { title=Note }
 
-The CSW Location Service cluster seed must be running and appropriate environment variables set to run the apps.
-See @ref:[CSW Cluster Seed](../apps/cswclusterseed.md).
+The CSW HTTP Location server must be running and appropriate environment variables set to run the apps.
+See @ref:[CSW Location Server](../apps/cswlocationserver.md).
 
 @@@

@@ -4,10 +4,10 @@ The Configuration Service provides a centralized persistent store for any config
 All versions of configuration files are retained, providing a historical record of each configuration file.
 
 Note that in order to use the APIs described here, the [Location Service](../services/location.html)
-([csw-cluster-seed](../apps/cswclusterseed.html))
+([csw-location-server](../apps/cswlocationserver.html))
 and [Configuration Service Server](../apps/cswonfigserverapp.html) needs to be running somewhere in the local network
 and the necessary configuration, environment variables or system properties should be defined to point to the 
-correct host and port number(s) for the Location Service seed nodes.
+correct host and port number(s) for the Location Service nodes.
 
 This service will be part of the observatory cluster and exposes Rest endpoints that can be accessed over HTTP.
 Component developers can use the csw-config-client library in their code.

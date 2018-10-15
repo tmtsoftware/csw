@@ -3,7 +3,7 @@
 @@ toc { .main depth=1 }
 
 @@@ index
-* [csw-cluster-seed](../apps/cswclusterseed.md): Start a cluster seed application, required for running the Location Service.
+* [csw-location-server](../apps/cswlocationserver.md): Start HTTP location server application, required for running the Location Service.
 * [csw-admin-server](../apps/cswadminserver.md): Start HTTP server that supports changing/getting log level of component.
 * [csw-location-agent](../apps/cswlocationagent.md): Application used to start non-CSW services so that register with Location Service.
 * [csw-config-server](../apps/cswonfigserverapp.md): Start a Configuration Service SVN repository.
@@ -15,11 +15,11 @@
 
 ## Starting apps for development
 
-In order to run a component it is required to run `csw-cluster-seed`. Moreover, even to start event service or configuration service,
-`csw-cluster-seed` should be running.
+In order to run a component it is required to run `csw-location-server`. Moreover, even to start event service or configuration service,
+`csw-location-server` should be running.
 
-But for developers to start `csw-cluster-seed` first and then configuration service and then event service is a tedious job. So, for
-development purpose, it is recommended to use a shell script which will start `csw-cluster-seed` and/or configuration service and/or 
+But for developers to start `csw-location-server` first and then configuration service and then event service is a tedious job. So, for
+development purpose, it is recommended to use a shell script which will start `csw-location-server` and/or configuration service and/or 
 event service and/or alarm service.
 
 Assuming that developer has downloaded `csw-apps-<some-version>.zip` from [csw releases](https://github.com/tmtsoftware/csw/releases)
@@ -35,11 +35,11 @@ Go to the bin folder and hit `./csw-services.sh --help`. This will list all poss
 
 @@@ note { title=Note }
 
-This shell script will start `csw-cluster-seed` as the first step regardless of any options provided. 
+This shell script will start `csw-location-server` as the first step regardless of any options provided. 
 
 @@@
 
-The execution of the script is such that it starts `csw-cluster-seed`, then checks whether to start configuration service from provided
+The execution of the script is such that it starts `csw-location-server`, then checks whether to start configuration service from provided
 `--config` option, if provided, then starts configuration service. Next, it checks whether to start event service from provided 
 `--event` option, if provided, it starts event service. Next, it checks whether to start alarm service from provided 
 `--alarm` option, if provided, it starts alarm service.

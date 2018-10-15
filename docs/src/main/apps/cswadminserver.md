@@ -5,8 +5,8 @@ A HTTP server application that supports changing/getting log level of component.
 ## Prerequisites
 
 The HTTP csw-admin-server needs to be part of csw-cluster so that it can resolve components for which log level needs to be fetched/changed.
-A required check before starting csw-admin-server app is to ensure the csw-cluster is setup and seed nodes are available.
-Kindly refer to @ref:[CSW Cluster Seed](../apps/cswclusterseed.md) for more information about cluster-seed setup.
+A required check before starting csw-admin-server app is to ensure the csw-cluster is setup and location sever are available.
+Kindly refer to @ref:[CSW Location Server](../apps/cswlocationserver.md) for more information about location server setup.
 
 ## Command line parameter options
 

@@ -1,8 +1,8 @@
 # Host Configuration Init (systemd) Setup
 
 ## Pre-requisite :
-1. Cluster seed application is up and running.
-2. IP address and Port number of Seed application is known and configured as environment variable in the systemd service definition
+1. Location server application is up and running.
+2. IP address and Port number of location server (cluster specific) application is known and configured as environment variable in the systemd service definition
 3. All the necessary binaries are available on the host machine 
 
 ## Steps to enable and start service

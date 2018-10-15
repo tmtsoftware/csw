@@ -4,8 +4,8 @@ A HTTP server application that hosts Configuration Service.
   
 ## Prerequisites
 The HTTP server hosting Configuration Service needs to be part of csw-cluster so that it can be consumed by other components.
-A required check before starting configuration service is to ensure the csw-cluster is setup and seed nodes are available.
-Kindly refer to @ref:[CSW Cluster Seed](../apps/cswclusterseed.md) for more information about cluster-seed setup.
+A required check before starting configuration service is to ensure the csw-cluster is setup and location server are available.
+Kindly refer to @ref:[CSW Location Server](../apps/cswlocationserver.md) for more information about location server setup.
 
 ## Command line parameter options
 
