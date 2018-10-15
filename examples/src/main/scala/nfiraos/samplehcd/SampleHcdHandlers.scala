@@ -2,7 +2,7 @@ package nfiraos.samplehcd
 
 import akka.actor.Cancellable
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
-import csw.command.messages.TopLevelActorMessage
+import csw.command.client.internal.messages.TopLevelActorMessage
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.location.api.models.TrackingEvent

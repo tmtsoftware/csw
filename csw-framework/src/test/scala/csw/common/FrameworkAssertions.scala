@@ -3,10 +3,10 @@ package csw.common
 import akka.actor.typed.ActorRef
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import com.persist.JsonOps.JsonObject
-import csw.command.models.framework.{ContainerLifecycleState, SupervisorLifecycleState}
-import csw.command.messages.ComponentCommonMessage.GetSupervisorLifecycleState
-import csw.command.messages.{ComponentMessage, ContainerMessage}
-import csw.command.messages.ContainerCommonMessage.GetContainerLifecycleState
+import csw.command.client.internal.models.framework.{ContainerLifecycleState, SupervisorLifecycleState}
+import csw.command.client.internal.messages.ComponentCommonMessage.GetSupervisorLifecycleState
+import csw.command.client.internal.messages.{ComponentMessage, ContainerMessage}
+import csw.command.client.internal.messages.ContainerCommonMessage.GetContainerLifecycleState
 import csw.location.server.commons.BlockingUtils
 import csw.logging.internal.LoggingLevels.Level
 import org.scalatest.Matchers

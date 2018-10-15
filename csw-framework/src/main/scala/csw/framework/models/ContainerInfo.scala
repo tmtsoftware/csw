@@ -1,6 +1,6 @@
 package csw.framework.models
 
-import csw.command.models.framework.ComponentInfo
+import csw.command.client.internal.models.framework.ComponentInfo
 import play.api.libs.json._
 
 /**

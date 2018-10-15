@@ -5,9 +5,9 @@ import akka.http.scaladsl.Http
 import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.alarm.client.internal.commons.AlarmServiceConnection
-import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
-import csw.command.models.framework.SupervisorLifecycleState
-import csw.command.scaladsl.CommandService
+import csw.command.client.CommandServiceFactory
+import csw.command.client.internal.extensions.AkkaLocationExt.RichAkkaLocation
+import csw.command.client.internal.models.framework.SupervisorLifecycleState
 import csw.common.FrameworkAssertions.assertThatSupervisorIsRunning
 import csw.common.components.framework.SampleComponentState._
 import csw.event.client.helpers.TestFutureExt.RichFuture
@@ -57,7 +57,7 @@ class AlarmServiceIntegrationTest extends HTTPLocationService with Matchers {
     val supervisorRef = location.get.componentRef
     assertThatSupervisorIsRunning(supervisorRef, supervisorLifecycleStateProbe, 5.seconds)
 
-    val commandService = new CommandService(location.get)
+    val commandService = CommandServiceFactory.make(location.get)
 
     implicit val timeout: Timeout = Timeout(1000.millis)
     commandService.submit(Setup(prefix, setSeverityCommand, None)).await

@@ -1,9 +1,9 @@
 package csw.common.utils
 
 import akka.actor.typed.ActorRef
-import csw.command.models.framework.LockingResponse
+import csw.command.client.internal.models.framework.LockingResponse
 import csw.params.core.models.Prefix
-import csw.command.messages.SupervisorLockMessage.Lock
+import csw.command.client.internal.messages.SupervisorLockMessage.Lock
 
 import scala.concurrent.duration.DurationLong
 

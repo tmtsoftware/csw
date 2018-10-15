@@ -7,14 +7,18 @@ import akka.actor.typed.internal.adapter.ActorSystemAdapter;
 import akka.stream.ActorMaterializer;
 import akka.util.Timeout;
 import com.typesafe.config.ConfigFactory;
-import csw.command.extensions.AkkaLocationExt;
-import csw.command.javadsl.JCommandService;
-import csw.command.messages.SupervisorLockMessage;
-import csw.command.models.framework.LockingResponse;
-import csw.command.models.framework.LockingResponses;
-import csw.command.models.matchers.*;
-import csw.command.scaladsl.CurrentStateSubscription;
-import csw.location.server.http.JHTTPLocationService;
+import csw.command.api.javadsl.ICommandService;
+import csw.command.api.scaladsl.CurrentStateSubscription;
+import csw.command.api.scaladsl.StateMatcher;
+import csw.command.client.CommandServiceFactory;
+import csw.command.client.internal.extensions.AkkaLocationExt;
+import csw.command.client.internal.messages.SupervisorLockMessage;
+import csw.command.client.internal.models.framework.LockingResponse;
+import csw.command.client.internal.models.framework.LockingResponses;
+import csw.command.client.internal.models.matchers.DemandMatcher;
+import csw.command.client.internal.models.matchers.Matcher;
+import csw.command.client.internal.models.matchers.MatcherResponse;
+import csw.command.client.internal.models.matchers.MatcherResponses;
 import csw.common.components.framework.SampleComponentState;
 import csw.framework.internal.wiring.FrameworkWiring;
 import csw.framework.internal.wiring.Standalone;
@@ -23,6 +27,7 @@ import csw.location.api.models.AkkaLocation;
 import csw.location.api.models.ComponentId;
 import csw.location.client.ActorSystemFactory;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;
+import csw.location.server.http.JHTTPLocationService;
 import csw.logging.javadsl.JLoggingSystemFactory;
 import csw.params.commands.CommandIssue;
 import csw.params.commands.CommandResponse;
@@ -67,7 +72,7 @@ public class JCommandIntegrationTest {
 
     private static JHTTPLocationService jHttpLocationService;
     private static ILocationService locationService;
-    private static JCommandService hcdCmdService;
+    private static ICommandService hcdCmdService;
     private static AkkaLocation hcdLocation;
     private Timeout timeout = new Timeout(5, TimeUnit.SECONDS);
 
@@ -77,7 +82,7 @@ public class JCommandIntegrationTest {
 
         locationService = JHttpLocationServiceFactory.makeLocalClient(hcdActorSystem, mat);
         hcdLocation = getLocation();
-        hcdCmdService = new JCommandService(hcdLocation, akka.actor.typed.ActorSystem.wrap(hcdActorSystem));
+        hcdCmdService = CommandServiceFactory.jMake(hcdLocation, akka.actor.typed.ActorSystem.wrap(hcdActorSystem));
         JLoggingSystemFactory.start("","", "", hcdActorSystem);
     }
 
@@ -157,7 +162,7 @@ public class JCommandIntegrationTest {
                         .submit(controlCommand, timeout)
                         .thenCompose(commandResponse -> {
                             if (commandResponse instanceof CommandResponse.Started) {
-                                return hcdCmdService.subscribe(commandResponse.runId(), timeout);
+                                return hcdCmdService.queryFinal(commandResponse.runId(), timeout);
                             } else {
                                 return CompletableFuture.completedFuture(new CommandResponse.Error(commandResponse.runId(), "tests error"));
                             }
@@ -302,7 +307,7 @@ public class JCommandIntegrationTest {
         Setup setupHcd1 = new Setup(prefix(), shortRunning(), Optional.empty()).add(encoderParam);
         Setup setupHcd2 = new Setup(prefix(), mediumRunning(), Optional.empty()).add(encoderParam);
 
-        HashMap<JCommandService, Set<ControlCommand>> componentsToCommands = new HashMap<JCommandService, Set<ControlCommand>>() {
+        HashMap<ICommandService, Set<ControlCommand>> componentsToCommands = new HashMap<ICommandService, Set<ControlCommand>>() {
             {
                 put(hcdCmdService, new HashSet<ControlCommand>(Arrays.asList(setupHcd1, setupHcd2)));
             }
@@ -336,7 +341,7 @@ public class JCommandIntegrationTest {
         akka.actor.typed.ActorSystem<?> typedSystem = ActorSystemAdapter.apply(hcdActorSystem);
 
         //#submitAndSubscribe
-        CompletableFuture<CommandResponse.SubmitResponse> finalResponseCompletableFuture = hcdCmdService.submitAndSubscribe(failureResCommand1, timeout);
+        CompletableFuture<CommandResponse.SubmitResponse> finalResponseCompletableFuture = hcdCmdService.complete(failureResCommand1, timeout);
         CommandResponse.SubmitResponse actualValidationResponse = finalResponseCompletableFuture.get();
         //#submitAndSubscribe
 
@@ -347,7 +352,7 @@ public class JCommandIntegrationTest {
         CompletableFuture<CommandResponse.SubmitResponse> validationResponse = hcdCmdService.submit(failureResCommand2, timeout);
         Assert.assertTrue(validationResponse.get() instanceof CommandResponse.Started);  // This should fail but I guess not typed by compiler
 
-        CompletableFuture<CommandResponse.SubmitResponse> finalResponse = hcdCmdService.subscribe(failureResCommand1.runId(), timeout);
+        CompletableFuture<CommandResponse.SubmitResponse> finalResponse = hcdCmdService.queryFinal(failureResCommand1.runId(), timeout);
         Assert.assertTrue(finalResponse.get() instanceof CommandResponse.Error);
     }
 /*
@@ -449,7 +454,7 @@ public class JCommandIntegrationTest {
         //#subscribeOnlyCurrentState
         // subscribe to the current state of an assembly component and use a callback which forwards each received
         // element to a test probe actor
-        CurrentStateSubscription subscription = hcdCmdService.subscribeOnlyCurrentState(Collections.singleton(StateName.apply("testStateSetup")), currentState -> inbox.getRef().tell(currentState));
+        CurrentStateSubscription subscription = hcdCmdService.subscribeCurrentState(Collections.singleton(StateName.apply("testStateSetup")), currentState -> inbox.getRef().tell(currentState));
         //#subscribeOnlyCurrentState
 
         hcdCmdService.submit(setup, timeout);

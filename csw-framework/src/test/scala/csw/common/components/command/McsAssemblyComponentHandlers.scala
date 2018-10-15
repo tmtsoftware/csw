@@ -3,17 +3,18 @@ package csw.common.components.command
 import akka.actor.Scheduler
 import akka.actor.typed.scaladsl.ActorContext
 import akka.util.Timeout
+import csw.command.api.scaladsl.CommandService
+import csw.command.client.CommandServiceFactory
+import csw.command.client.internal.messages.TopLevelActorMessage
 import csw.common.components.command.ComponentStateForCommand.{longRunningCmdCompleted, _}
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.command.messages.TopLevelActorMessage
+import csw.location.api.models.{AkkaLocation, TrackingEvent}
+import csw.params.commands.CommandIssue.UnsupportedCommandIssue
 import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandIssue, ControlCommand, Setup}
-import csw.location.api.models.{AkkaLocation, TrackingEvent}
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
-import csw.command.scaladsl.CommandService
-import csw.params.commands.CommandIssue.UnsupportedCommandIssue
 
 import scala.concurrent.duration.DurationDouble
 import scala.concurrent.{ExecutionContext, Future}
@@ -36,7 +37,7 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
     componentInfo.connections.headOption match {
       case Some(hcd) ⇒
         cswCtx.locationService.resolve(hcd.of[AkkaLocation], 5.seconds).map {
-          case Some(akkaLocation) ⇒ hcdComponent = new CommandService(akkaLocation)(ctx.system)
+          case Some(akkaLocation) ⇒ hcdComponent = CommandServiceFactory.make(akkaLocation)(ctx.system)
           case None               ⇒ throw new RuntimeException("Could not resolve hcd location, Initialization failure.")
         }
       case None ⇒ Future.successful(Unit)
@@ -135,7 +136,7 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
           //#updateSubCommand
           // An original command is split into sub-commands and sent to a component. The result of the command is
           // obtained by subscribing to the component with the sub command id.
-          hcdComponent.getFinalResponse(controlCommand.runId).map {
+          hcdComponent.queryFinal(controlCommand.runId).map {
             case _: Completed ⇒
               controlCommand.runId match {
                 case id if id == shortSetup.runId ⇒

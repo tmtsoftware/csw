@@ -1,7 +1,7 @@
 package csw.logging.componentlogger
 
 import akka.actor.typed.scaladsl.ActorContext
-import csw.command.messages.ComponentMessage
+import csw.command.client.internal.messages.ComponentMessage
 import csw.logging.javadsl.JLoggerFactory
 import csw.logging.scaladsl.{Logger, LoggerFactory}
 

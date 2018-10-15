@@ -4,16 +4,17 @@ import java.nio.file.Paths
 
 import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.{ActorRef, ActorSystem}
+import csw.command.api.scaladsl.CommandService
+import csw.command.client.CommandServiceFactory
+import csw.command.client.internal.messages.TopLevelActorMessage
+import csw.config.api.models.ConfigData
 import csw.framework.exceptions.{FailureRestart, FailureStop}
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.command.messages.TopLevelActorMessage
+import csw.location.api.models._
+import csw.logging.scaladsl.Logger
 import csw.params.commands.CommandResponse.{Accepted, Completed, SubmitResponse, ValidateCommandResponse}
 import csw.params.commands._
-import csw.location.api.models._
-import csw.command.scaladsl.CommandService
-import csw.config.api.models.ConfigData
-import csw.logging.scaladsl.Logger
 
 import scala.async.Async._
 import scala.concurrent.duration.DurationDouble
@@ -55,7 +56,7 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
       case Some(_) ⇒
         resolveHcd().map {
           case Some(hcd) ⇒
-            runningHcds = runningHcds.updated(maybeConnection.get, Some(new CommandService(hcd)(ctx.system)))
+            runningHcds = runningHcds.updated(maybeConnection.get, Some(CommandServiceFactory.make(hcd)(ctx.system)))
             diagnosticsPublisher = ctx.spawnAnonymous(DiagnosticsPublisher.make(runningHcds(maybeConnection.get).get, worker))
             commandHandler = ctx.spawnAnonymous(CommandHandler.make(calculationConfig, runningHcds(maybeConnection.get)))
           case None ⇒ // do something
@@ -191,7 +192,7 @@ class AssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx:
 
     val eventualCommandService: Future[CommandService] =
       cswCtx.locationService.resolve(hcdConnection.of[AkkaLocation], 5.seconds).map {
-        case Some(hcdLocation: AkkaLocation) => new CommandService(hcdLocation)
+        case Some(hcdLocation: AkkaLocation) => CommandServiceFactory.make(hcdLocation)
         case _                               => throw HcdNotFoundException()
       }
 

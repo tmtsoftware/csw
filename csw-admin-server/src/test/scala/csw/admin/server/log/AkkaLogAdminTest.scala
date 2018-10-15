@@ -12,10 +12,10 @@ import akka.http.scaladsl.unmarshalling.Unmarshal
 import com.typesafe.config.ConfigFactory
 import csw.admin.server.internal.AdminWiring
 import csw.admin.server.log.http.HttpSupport
-import csw.command.messages.CommandMessage.Oneway
-import csw.command.messages.ContainerCommonMessage.GetComponents
-import csw.command.messages.ContainerMessage
-import csw.command.models.framework.{Component, Components, ContainerLifecycleState}
+import csw.command.client.internal.messages.CommandMessage.Oneway
+import csw.command.client.internal.messages.ContainerCommonMessage.GetComponents
+import csw.command.client.internal.messages.ContainerMessage
+import csw.command.client.internal.models.framework.{Component, Components, ContainerLifecycleState}
 import csw.common.FrameworkAssertions.assertThatContainerIsRunning
 import csw.commons.tags.LoggingSystemSensitive
 import csw.framework.internal.wiring.{Container, FrameworkWiring}

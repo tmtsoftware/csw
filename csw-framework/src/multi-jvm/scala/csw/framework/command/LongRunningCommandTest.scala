@@ -8,7 +8,7 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
-import csw.command.scaladsl.CommandService
+import csw.command.client.CommandServiceFactory
 import csw.common.components.command.ComponentStateForCommand._
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.location.api.models.Connection.AkkaConnection
@@ -61,7 +61,7 @@ class LongRunningCommandTest(ignore: Int)
           5.seconds
         )
       val assemblyLocation: AkkaLocation = Await.result(assemblyLocF, 10.seconds).get
-      val assemblyCommandService         = new CommandService(assemblyLocation)
+      val assemblyCommandService         = CommandServiceFactory.make(assemblyLocation)
 
       val setup = Setup(prefix, longRunning, Some(obsId))
       val probe = TestProbe[CurrentState]
@@ -81,7 +81,7 @@ class LongRunningCommandTest(ignore: Int)
       //#subscribe-for-result
       val eventualCommandResponse = assemblyCommandService.submit(setup).flatMap {
         case _: Started ⇒
-          assemblyCommandService.getFinalResponse(setup.runId)
+          assemblyCommandService.queryFinal(setup.runId)
         case _ ⇒ Future(Error(setup.runId, ""))
       }
       //#subscribe-for-result
@@ -90,7 +90,7 @@ class LongRunningCommandTest(ignore: Int)
 
       //#submitAndSubscribe
       val setupForSubscribe = Setup(prefix, longRunning, Some(obsId))
-      val response          = assemblyCommandService.submitAndGetFinalResponse(setupForSubscribe)
+      val response          = assemblyCommandService.complete(setupForSubscribe)
       //#submitAndSubscribe
 
       Await.result(response, 20.seconds) shouldBe Completed(setupForSubscribe.runId)

@@ -8,19 +8,19 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.{typed, ActorSystem}
 import akka.serialization.SerializationExtension
 import com.twitter.chill.akka.AkkaSerializer
-import csw.command.messages.ComponentCommonMessage.{
+import csw.command.client.internal.messages.ComponentCommonMessage.{
   ComponentStateSubscription,
   GetSupervisorLifecycleState,
   LifecycleStateSubscription
 }
-import csw.command.messages.ComponentMessage
-import csw.command.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
-import csw.command.messages.RunningMessage.Lifecycle
-import csw.command.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
-import csw.command.models.framework.LocationServiceUsage.DoNotRegister
-import csw.command.models.framework.PubSub.Subscribe
-import csw.command.models.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
-import csw.command.models.framework._
+import csw.command.client.internal.messages.ComponentMessage
+import csw.command.client.internal.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
+import csw.command.client.internal.messages.RunningMessage.Lifecycle
+import csw.command.client.internal.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
+import csw.command.client.internal.models.framework.LocationServiceUsage.DoNotRegister
+import csw.command.client.internal.models.framework.PubSub.Subscribe
+import csw.command.client.internal.models.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
+import csw.command.client.internal.models.framework._
 import csw.commons.tagobjects.FileSystemSensitive
 import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandIssue, _}

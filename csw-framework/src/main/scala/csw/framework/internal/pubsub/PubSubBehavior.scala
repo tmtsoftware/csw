@@ -3,8 +3,8 @@ package csw.framework.internal.pubsub
 import akka.actor.typed.scaladsl.{ActorContext, MutableBehavior}
 import akka.actor.typed.{ActorRef, Behavior, Signal, Terminated}
 import csw.params.commands.Nameable
-import csw.command.models.framework.PubSub
-import csw.command.models.framework.PubSub._
+import csw.command.client.internal.models.framework.PubSub
+import csw.command.client.internal.models.framework.PubSub._
 import csw.params.core.states.StateName
 import csw.logging.scaladsl.{Logger, LoggerFactory}
 

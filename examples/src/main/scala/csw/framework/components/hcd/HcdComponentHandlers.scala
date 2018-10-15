@@ -12,7 +12,7 @@ import csw.framework.components.assembly.WorkerActorMsgs.{GetStatistics, Initial
 import csw.framework.components.assembly.{WorkerActor, WorkerActorMsg}
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.command.messages.TopLevelActorMessage
+import csw.command.client.internal.messages.TopLevelActorMessage
 import csw.params.commands.CommandResponse.{Accepted, Completed, SubmitResponse, ValidateCommandResponse}
 import csw.params.commands.{ControlCommand, Observe, Setup}
 import csw.location.api.models.{LocationRemoved, LocationUpdated, TrackingEvent}

@@ -7,15 +7,15 @@ import csw.common.utils.LockCommandFactory
 import csw.framework.ComponentInfos.assemblyInfo
 import csw.framework.FrameworkTestSuite
 import csw.params.commands.{CommandName, Setup}
-import csw.command.models.framework.LockingResponses._
-import csw.command.models.framework.{LifecycleStateChanged, LockingResponse, PubSub, SupervisorLifecycleState}
+import csw.command.client.internal.models.framework.LockingResponses._
+import csw.command.client.internal.models.framework.{LifecycleStateChanged, LockingResponse, PubSub, SupervisorLifecycleState}
 import csw.params.core.models.{ObsId, Prefix}
 import csw.params.core.states.{CurrentState, StateName}
-import csw.command.messages.CommandMessage.Submit
-import csw.command.messages.CommandResponseManagerMessage.{AddOrUpdateCommand, Query, Unsubscribe}
-import csw.command.messages.ComponentCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
-import csw.command.messages.SupervisorLockMessage.{Lock, Unlock}
-import csw.command.messages.{CommandResponseManagerMessage => CRM}
+import csw.command.client.internal.messages.CommandMessage.Submit
+import csw.command.client.internal.messages.CommandResponseManagerMessage.{AddOrUpdateCommand, Query, Unsubscribe}
+import csw.command.client.internal.messages.ComponentCommonMessage.{ComponentStateSubscription, LifecycleStateSubscription}
+import csw.command.client.internal.messages.SupervisorLockMessage.{Lock, Unlock}
+import csw.command.client.internal.messages.{CommandResponseManagerMessage => CRM}
 import csw.params.commands.CommandResponse._
 import org.scalatest.BeforeAndAfterEach
 

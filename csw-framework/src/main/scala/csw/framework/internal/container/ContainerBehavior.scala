@@ -7,13 +7,18 @@ import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.scaladsl.{ActorContext, MutableBehavior}
 import akka.actor.typed.{ActorRef, Behavior, PostStop, Signal, Terminated}
 import csw.alarm.client.AlarmServiceFactory
-import csw.command.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
-import csw.command.messages.ContainerIdleMessage.SupervisorsCreated
-import csw.command.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
-import csw.command.messages.RunningMessage.Lifecycle
-import csw.command.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
-import csw.command.messages.{ComponentMessage, ContainerActorMessage, ContainerCommonMessage, ContainerIdleMessage}
-import csw.command.models.framework._
+import csw.command.client.internal.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
+import csw.command.client.internal.messages.ContainerIdleMessage.SupervisorsCreated
+import csw.command.client.internal.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
+import csw.command.client.internal.messages.RunningMessage.Lifecycle
+import csw.command.client.internal.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
+import csw.command.client.internal.messages.{
+  ComponentMessage,
+  ContainerActorMessage,
+  ContainerCommonMessage,
+  ContainerIdleMessage
+}
+import csw.command.client.internal.models.framework._
 import csw.event.client.EventServiceFactory
 import csw.framework.commons.CoordinatedShutdownReasons.{
   AllActorsWithinContainerTerminatedReason,
@@ -74,7 +79,7 @@ private[framework] final class ContainerBehavior(
   createComponents(containerInfo.components)
 
   /**
-   * Defines processing for a [[csw.command.messages.ContainerActorMessage]] received by the actor instance.
+   * Defines processing for a [[csw.command.client.internal.messages.ContainerActorMessage]] received by the actor instance.
    *
    * @param msg containerMessage received
    * @return the existing behavior
@@ -114,7 +119,7 @@ private[framework] final class ContainerBehavior(
   }
 
   /**
-   * Defines action for messages which can be received in any [[csw.command.models.framework.ContainerLifecycleState]] state
+   * Defines action for messages which can be received in any [[csw.command.client.internal.models.framework.ContainerLifecycleState]] state
    *
    * @param commonMessage message representing a message received in any lifecycle state
    */
@@ -135,9 +140,9 @@ private[framework] final class ContainerBehavior(
   }
 
   /**
-   * Defines action for messages which can be received in [[csw.command.models.framework.ContainerLifecycleState.Idle]] state
+   * Defines action for messages which can be received in [[csw.command.client.internal.models.framework.ContainerLifecycleState.Idle]] state
    *
-   * @param idleMessage message representing a message received in [[csw.command.models.framework.ContainerLifecycleState.Idle]] state
+   * @param idleMessage message representing a message received in [[csw.command.client.internal.models.framework.ContainerLifecycleState.Idle]] state
    */
   private def onIdle(idleMessage: ContainerIdleMessage): Unit = idleMessage match {
     case SupervisorsCreated(supervisorInfos) ⇒

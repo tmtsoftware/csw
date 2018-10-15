@@ -7,6 +7,9 @@ import csw.params.core.states.{CurrentState, StateName}
 
 import scala.concurrent.Future
 
+/**
+ * A Command Service API of a csw component. This model provides method based APIs for command interactions with a component.
+ */
 trait CommandService {
 
   /**

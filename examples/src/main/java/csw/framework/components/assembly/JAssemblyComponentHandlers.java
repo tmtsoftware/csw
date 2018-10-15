@@ -5,29 +5,30 @@ import akka.actor.typed.ActorRef;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Adapter;
 import akka.util.Timeout;
+import csw.command.api.javadsl.ICommandService;
+import csw.command.client.CommandResponseManager;
+import csw.command.client.CommandServiceFactory;
+import csw.command.client.internal.messages.TopLevelActorMessage;
+import csw.command.client.internal.models.framework.ComponentInfo;
+import csw.config.api.javadsl.IConfigClientService;
+import csw.config.api.models.ConfigData;
+import csw.config.client.javadsl.JConfigClientFactory;
+import csw.event.api.javadsl.IEventService;
 import csw.framework.CurrentStatePublisher;
 import csw.framework.exceptions.FailureRestart;
 import csw.framework.exceptions.FailureStop;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.models.JCswContext;
-import csw.command.messages.TopLevelActorMessage;
+import csw.location.api.javadsl.ILocationService;
+import csw.location.api.javadsl.JComponentType;
+import csw.location.api.models.*;
+import csw.logging.javadsl.ILogger;
 import csw.params.commands.*;
-import csw.command.models.framework.ComponentInfo;
-import csw.params.javadsl.JKeyType;
 import csw.params.core.generics.Key;
 import csw.params.core.models.Prefix;
 import csw.params.core.states.CurrentState;
 import csw.params.core.states.StateName;
-import csw.command.CommandResponseManager;
-import csw.command.javadsl.JCommandService;
-import csw.config.api.javadsl.IConfigClientService;
-import csw.config.api.models.ConfigData;
-import csw.config.client.javadsl.JConfigClientFactory;
-import csw.event.api.javadsl.IEventService;
-import csw.location.api.javadsl.ILocationService;
-import csw.location.api.models.*;
-import csw.location.api.javadsl.JComponentType;
-import csw.logging.javadsl.ILogger;
+import csw.params.javadsl.JKeyType;
 import scala.concurrent.duration.FiniteDuration;
 
 import java.nio.file.Paths;
@@ -51,7 +52,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     private final IEventService eventService;
     private ILogger log;
     private IConfigClientService configClient;
-    private Map<Connection, Optional<JCommandService>> runningHcds;
+    private Map<Connection, Optional<ICommandService>> runningHcds;
     private ActorRef<DiagnosticPublisherMessages> diagnosticPublisher;
     private ActorRef<CommandResponse.SubmitResponse> commandResponseAdapter;
 
@@ -95,10 +96,10 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
                     if (!hcdLocation.isPresent())
                         throw new HcdNotFoundException();
                     else {
-                        runningHcds.put(connection, Optional.of(new JCommandService(hcdLocation.get(), ctx.getSystem())));
+                        runningHcds.put(connection, Optional.of(CommandServiceFactory.jMake(hcdLocation.get(), ctx.getSystem())));
                         //#event-subscriber
                     }
-                    diagnosticPublisher = ctx.spawnAnonymous(JDiagnosticsPublisherFactory.make(new JCommandService(hcdLocation.get(), ctx.getSystem()), workerActor));
+                    diagnosticPublisher = ctx.spawnAnonymous(JDiagnosticsPublisherFactory.make(CommandServiceFactory.jMake(hcdLocation.get(), ctx.getSystem()), workerActor));
                 })).get();
 
     }
@@ -209,8 +210,8 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
                 //#updateSubCommand
                 // An original command is split into sub-commands and sent to a component. The result of the command is
                 // obtained by subscribing to the component with the sub command id.
-                JCommandService componentCommandService = runningHcds.get(componentInfo.getConnections().get(0)).get();
-                componentCommandService.subscribe(subCommand2.runId(), Timeout.durationToTimeout(FiniteDuration.apply(5, TimeUnit.SECONDS)))
+                ICommandService componentCommandService = runningHcds.get(componentInfo.getConnections().get(0)).get();
+                componentCommandService.queryFinal(subCommand2.runId(), Timeout.durationToTimeout(FiniteDuration.apply(5, TimeUnit.SECONDS)))
                         .thenAccept(commandResponse -> {
                             if (commandResponse instanceof CommandResponse.Completed) {
                                 // As the commands get completed, the results are updated in the commandResponseManager
@@ -319,7 +320,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     }
     // #failureStop-Exception
 
-    private JCommandService hcd = null;
+    private ICommandService hcd = null;
 
     private void resolveHcdAndCreateCommandService() throws ExecutionException, InterruptedException {
 
@@ -330,9 +331,9 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
         // #resolve-hcd-and-create-commandservice
         CompletableFuture<Optional<AkkaLocation>> resolvedHcdLocation = locationService.resolve(hcdConnection, Duration.ofSeconds(5));
 
-        CompletableFuture<JCommandService> eventualCommandService = resolvedHcdLocation.thenApply((Optional<AkkaLocation> hcdLocation) -> {
+        CompletableFuture<ICommandService> eventualCommandService = resolvedHcdLocation.thenApply((Optional<AkkaLocation> hcdLocation) -> {
             if (hcdLocation.isPresent())
-                return new JCommandService(hcdLocation.get(), ctx.getSystem());
+                return CommandServiceFactory.jMake(hcdLocation.get(), ctx.getSystem());
             else
                 throw new HcdNotFoundException();
         });

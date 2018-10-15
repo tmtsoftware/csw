@@ -2,8 +2,9 @@ package nfiraos.sampleassembly
 
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.util.Timeout
-import csw.command.messages.TopLevelActorMessage
-import csw.command.scaladsl.CommandService
+import csw.command.api.scaladsl.CommandService
+import csw.command.client.CommandServiceFactory
+import csw.command.client.internal.messages.TopLevelActorMessage
 import csw.event.api.scaladsl.EventSubscription
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
@@ -62,7 +63,7 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
       case _: Started =>
         // If valid, subscribe to the HCD's CommandResponseManager
         // This explicit timeout indicates how long to wait for completion
-        hcd.getFinalResponse(setupCommand.runId)(10000.seconds)
+        hcd.queryFinal(setupCommand.runId)(10000.seconds)
       case x =>
         log.error("Sleep command invalid")
         Future(x)
@@ -96,7 +97,7 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
     log.debug(s"onLocationTrackingEvent called: $trackingEvent")
     trackingEvent match {
       case LocationUpdated(location) =>
-        val hcd = new CommandService(location.asInstanceOf[AkkaLocation])(ctx.system)
+        val hcd = CommandServiceFactory.make(location.asInstanceOf[AkkaLocation])(ctx.system)
         commandSender ! SendCommand(hcd)
       case LocationRemoved(_) => log.info("HCD no longer available")
     }

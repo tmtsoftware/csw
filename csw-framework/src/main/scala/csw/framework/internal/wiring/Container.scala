@@ -2,7 +2,7 @@ package csw.framework.internal.wiring
 
 import akka.actor.typed.{ActorRef, Behavior}
 import com.typesafe.config.Config
-import csw.command.messages.{ContainerActorMessage, ContainerMessage}
+import csw.command.client.internal.messages.{ContainerActorMessage, ContainerMessage}
 import csw.framework.internal.configparser.ConfigParser
 import csw.framework.internal.container.ContainerBehaviorFactory
 

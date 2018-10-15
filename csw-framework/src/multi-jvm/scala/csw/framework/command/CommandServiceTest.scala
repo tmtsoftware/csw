@@ -8,13 +8,13 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
-import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
-import csw.command.messages.CommandMessage.Submit
-import csw.command.models.framework.LockingResponse
-import csw.command.models.framework.LockingResponses.LockAcquired
-import csw.command.models.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
-import csw.command.models.matchers.{DemandMatcher, Matcher, MatcherResponse}
-import csw.command.scaladsl.CommandService
+import csw.command.client.CommandServiceFactory
+import csw.command.client.internal.extensions.AkkaLocationExt.RichAkkaLocation
+import csw.command.client.internal.messages.CommandMessage.Submit
+import csw.command.client.internal.models.framework.LockingResponse
+import csw.command.client.internal.models.framework.LockingResponses.LockAcquired
+import csw.command.client.internal.models.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
+import csw.command.client.internal.models.matchers.{DemandMatcher, Matcher, MatcherResponse}
 import csw.common.utils.LockCommandFactory
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.location.api.models.Connection.AkkaConnection
@@ -133,7 +133,7 @@ class CommandServiceTest(ignore: Int)
       // resolve assembly running in jvm-3 and send setup command expecting immediate command completion response
       val assemblyLocF                   = locationService.resolve(AkkaConnection(ComponentId("Assembly", ComponentType.Assembly)), 5.seconds)
       val assemblyLocation: AkkaLocation = Await.result(assemblyLocF, 10.seconds).get
-      val assemblyComponent              = new CommandService(assemblyLocation)
+      val assemblyComponent              = CommandServiceFactory.make(assemblyLocation)
 
       // DEOPSCSW-233: Hide implementation by having a CCS API
       // short running command
@@ -160,7 +160,7 @@ class CommandServiceTest(ignore: Int)
       val eventualLongCommandResponse = async {
         val initialCommandResponse = await(assemblyComponent.submit(setupWithoutMatcher))
         initialCommandResponse shouldBe an[Started]
-        await(assemblyComponent.getFinalResponse(setupWithoutMatcher.runId))
+        await(assemblyComponent.queryFinal(setupWithoutMatcher.runId))
       }
 
       val longCommandResponse = Await.result(eventualLongCommandResponse, timeout.duration)

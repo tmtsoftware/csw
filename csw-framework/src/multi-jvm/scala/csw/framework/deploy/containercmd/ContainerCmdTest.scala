@@ -9,16 +9,16 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
-import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
-import csw.command.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState}
-import csw.command.messages.ContainerCommonMessage.GetComponents
-import csw.command.messages.RunningMessage.Lifecycle
-import csw.command.messages.SupervisorContainerCommonMessages.Shutdown
-import csw.command.messages.{ComponentMessage, ContainerMessage}
-import csw.command.models.framework.PubSub.Subscribe
-import csw.command.models.framework.ToComponentLifecycleMessages.GoOffline
-import csw.command.models.framework.{Components, ContainerLifecycleState, SupervisorLifecycleState}
-import csw.command.scaladsl.CommandService
+import csw.command.client.CommandServiceFactory
+import csw.command.client.internal.extensions.AkkaLocationExt.RichAkkaLocation
+import csw.command.client.internal.messages.ComponentCommonMessage.{ComponentStateSubscription, GetSupervisorLifecycleState}
+import csw.command.client.internal.messages.ContainerCommonMessage.GetComponents
+import csw.command.client.internal.messages.RunningMessage.Lifecycle
+import csw.command.client.internal.messages.SupervisorContainerCommonMessages.Shutdown
+import csw.command.client.internal.messages.{ComponentMessage, ContainerMessage}
+import csw.command.client.internal.models.framework.PubSub.Subscribe
+import csw.command.client.internal.models.framework.ToComponentLifecycleMessages.GoOffline
+import csw.command.client.internal.models.framework.{Components, ContainerLifecycleState, SupervisorLifecycleState}
 import csw.common.FrameworkAssertions._
 import csw.config.api.models.ConfigData
 import csw.config.client.scaladsl.ConfigClientFactory
@@ -151,7 +151,7 @@ class ContainerCmdTest(ignore: Int)
 
       val etonSupervisorTypedRef = etonSupervisorLocation.componentRef
       val eatonCompStateProbe    = TestProbe[CurrentState]
-      val etonCommandService     = new CommandService(etonSupervisorLocation)
+      val etonCommandService     = CommandServiceFactory.make(etonSupervisorLocation)
 
       // DEOPSCSW-372: Provide an API for PubSubActor that hides actor based interaction
       etonCommandService.subscribeCurrentState(eatonCompStateProbe.ref ! _)

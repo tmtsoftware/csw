@@ -3,7 +3,7 @@ package csw.framework.internal.wiring
 import akka.Done
 import akka.actor.{ActorSystem, CoordinatedShutdown}
 import csw.alarm.client.AlarmServiceFactory
-import csw.command.internal.CommandResponseManagerFactory
+import csw.command.client.internal.CommandResponseManagerFactory
 import csw.config.api.scaladsl.ConfigClientService
 import csw.config.client.scaladsl.ConfigClientFactory
 import csw.event.client.EventServiceFactory

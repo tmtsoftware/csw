@@ -10,19 +10,24 @@ import csw.framework.ComponentInfos._
 import csw.framework.exceptions.{FailureStop, InitializationFailed}
 import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
-import csw.command.messages.CommandResponseManagerMessage.Query
-import csw.command.messages.ComponentCommonMessage.{GetSupervisorLifecycleState, LifecycleStateSubscription}
-import csw.command.messages.FromComponentLifecycleMessage.Running
-import csw.command.messages.RunningMessage.Lifecycle
-import csw.command.messages.SupervisorContainerCommonMessages.Restart
-import csw.command.messages.SupervisorIdleMessage.InitializeTimeout
-import csw.command.messages.SupervisorInternalRunningMessage.{RegistrationNotRequired, RegistrationSuccess}
-import csw.command.models.framework.LocationServiceUsage.DoNotRegister
-import csw.command.models.framework.PubSub.{Publish, Subscribe, Unsubscribe}
-import csw.command.models.framework.ToComponentLifecycleMessages._
-import csw.command.models.framework.{ComponentInfo, LifecycleStateChanged, PubSub, SupervisorLifecycleState}
+import csw.command.client.internal.messages.CommandResponseManagerMessage.Query
+import csw.command.client.internal.messages.ComponentCommonMessage.{GetSupervisorLifecycleState, LifecycleStateSubscription}
+import csw.command.client.internal.messages.FromComponentLifecycleMessage.Running
+import csw.command.client.internal.messages.RunningMessage.Lifecycle
+import csw.command.client.internal.messages.SupervisorContainerCommonMessages.Restart
+import csw.command.client.internal.messages.SupervisorIdleMessage.InitializeTimeout
+import csw.command.client.internal.messages.SupervisorInternalRunningMessage.{RegistrationNotRequired, RegistrationSuccess}
+import csw.command.client.internal.models.framework.LocationServiceUsage.DoNotRegister
+import csw.command.client.internal.models.framework.PubSub.{Publish, Subscribe, Unsubscribe}
+import csw.command.client.internal.models.framework.ToComponentLifecycleMessages._
+import csw.command.client.internal.models.framework.{ComponentInfo, LifecycleStateChanged, PubSub, SupervisorLifecycleState}
 import csw.params.core.models.Id
-import csw.command.messages.{CommandResponseManagerMessage, ContainerIdleMessage, SupervisorMessage, TopLevelActorMessage}
+import csw.command.client.internal.messages.{
+  CommandResponseManagerMessage,
+  ContainerIdleMessage,
+  SupervisorMessage,
+  TopLevelActorMessage
+}
 import csw.params.commands.CommandResponse.QueryResponse
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach

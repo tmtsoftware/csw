@@ -1,6 +1,6 @@
 package csw.common.extensions
 import csw.framework.models.CswContext
-import csw.command.models.framework.ComponentInfo
+import csw.command.client.internal.models.framework.ComponentInfo
 
 object CswContextExtensions {
   implicit class RichCswContext(val cswCtx: CswContext) extends AnyVal {

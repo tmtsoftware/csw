@@ -4,8 +4,8 @@ import akka.actor.testkit.typed.scaladsl.{TestInbox, TestProbe}
 import akka.http.scaladsl.Http
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
-import csw.command.models.framework.ContainerLifecycleState
-import csw.command.scaladsl.CommandService
+import csw.command.client.CommandServiceFactory
+import csw.command.client.internal.models.framework.ContainerLifecycleState
 import csw.common.FrameworkAssertions.assertThatContainerIsRunning
 import csw.common.components.framework.SampleComponentState._
 import csw.commons.redis.EmbeddedRedis
@@ -53,8 +53,8 @@ class EventServiceIntegrationTest extends HTTPLocationService with EmbeddedRedis
     val filterAssemblyLocation = wiring.locationService.find(filterAssemblyConnection).await
     val disperserHcdLocation   = wiring.locationService.find(disperserHcdConnection).await
 
-    val assemblyCommandService  = new CommandService(filterAssemblyLocation.get)
-    val disperserCommandService = new CommandService(disperserHcdLocation.get)
+    val assemblyCommandService  = CommandServiceFactory.make(filterAssemblyLocation.get)
+    val disperserCommandService = CommandServiceFactory.make(disperserHcdLocation.get)
 
     assemblyCommandService.subscribeCurrentState(assemblyProbe.ref ! _)
 

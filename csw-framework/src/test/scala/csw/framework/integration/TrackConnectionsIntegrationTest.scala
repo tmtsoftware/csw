@@ -5,10 +5,10 @@ import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.http.scaladsl.Http
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
-import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
-import csw.command.messages.SupervisorContainerCommonMessages.Shutdown
-import csw.command.models.framework.{ContainerLifecycleState, SupervisorLifecycleState}
-import csw.command.scaladsl.CommandService
+import csw.command.client.CommandServiceFactory
+import csw.command.client.internal.extensions.AkkaLocationExt.RichAkkaLocation
+import csw.command.client.internal.messages.SupervisorContainerCommonMessages.Shutdown
+import csw.command.client.internal.models.framework.{ContainerLifecycleState, SupervisorLifecycleState}
 import csw.common.FrameworkAssertions._
 import csw.common.components.framework.SampleComponentState._
 import csw.event.client.helpers.TestFutureExt.RichFuture
@@ -62,10 +62,10 @@ class TrackConnectionsIntegrationTest extends HTTPLocationService with OptionVal
     val filterAssemblyLocation = wiring.locationService.find(filterAssemblyConnection).await
     val disperserHcdLocation   = wiring.locationService.find(disperserHcdConnection).await
 
-    val assemblyCommandService = new CommandService(filterAssemblyLocation.get)
+    val assemblyCommandService = CommandServiceFactory.make(filterAssemblyLocation.get)
 
     val disperserComponentRef   = disperserHcdLocation.get.componentRef
-    val disperserCommandService = new CommandService(disperserHcdLocation.get)
+    val disperserCommandService = CommandServiceFactory.make(disperserHcdLocation.get)
 
     // Subscribe to component's current state
     assemblyCommandService.subscribeCurrentState(assemblyProbe.ref ! _)
@@ -116,7 +116,7 @@ class TrackConnectionsIntegrationTest extends HTTPLocationService with OptionVal
     resolvedAkkaLocation.connection shouldBe akkaConnection
 
     val assemblyProbe          = TestProbe[CurrentState]("assembly-state-probe")
-    val assemblyCommandService = new CommandService(resolvedAkkaLocation)
+    val assemblyCommandService = CommandServiceFactory.make(resolvedAkkaLocation)
     // Subscribe to component's current state
     assemblyCommandService.subscribeCurrentState(assemblyProbe.ref ! _)
 

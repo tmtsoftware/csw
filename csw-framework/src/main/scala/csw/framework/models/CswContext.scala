@@ -3,13 +3,13 @@ import akka.actor.ActorSystem
 import csw.framework.CurrentStatePublisher
 import csw.framework.internal.pubsub.PubSubBehaviorFactory
 import csw.framework.internal.wiring.CswFrameworkSystem
-import csw.command.models.framework.ComponentInfo
+import csw.command.client.internal.models.framework.ComponentInfo
 import csw.location.api.scaladsl.LocationService
 import csw.params.core.states.CurrentState
 import csw.alarm.api.scaladsl.AlarmService
 import csw.alarm.client.AlarmServiceFactory
-import csw.command.CommandResponseManager
-import csw.command.internal.CommandResponseManagerFactory
+import csw.command.client.CommandResponseManager
+import csw.command.client.internal.CommandResponseManagerFactory
 import csw.config.api.scaladsl.ConfigClientService
 import csw.config.client.scaladsl.ConfigClientFactory
 import csw.event.client.EventServiceFactory

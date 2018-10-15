@@ -3,7 +3,7 @@ package csw.framework.components.hcd
 import akka.actor.typed.scaladsl.ActorContext
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
-import csw.command.messages.TopLevelActorMessage
+import csw.command.client.internal.messages.TopLevelActorMessage
 
 //#component-factory
 class HcdComponentBehaviorFactory extends ComponentBehaviorFactory {

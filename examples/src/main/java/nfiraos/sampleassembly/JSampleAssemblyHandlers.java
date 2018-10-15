@@ -4,32 +4,33 @@ import akka.actor.typed.ActorRef;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.util.Timeout;
+import csw.command.api.javadsl.ICommandService;
+import csw.command.client.CommandResponseManager;
+import csw.command.client.CommandServiceFactory;
+import csw.command.client.internal.messages.TopLevelActorMessage;
+import csw.command.client.internal.models.framework.ComponentInfo;
+import csw.event.api.javadsl.IEventService;
+import csw.event.api.javadsl.IEventSubscription;
 import csw.framework.CurrentStatePublisher;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.models.JCswContext;
-import csw.command.messages.TopLevelActorMessage;
+import csw.location.api.javadsl.ILocationService;
+import csw.location.api.models.*;
+import csw.logging.javadsl.ILogger;
 import csw.params.commands.CommandName;
 import csw.params.commands.CommandResponse;
 import csw.params.commands.ControlCommand;
 import csw.params.commands.Setup;
-import csw.params.events.Event;
-import csw.params.events.EventKey;
-import csw.params.events.EventName;
-import csw.params.events.SystemEvent;
-import csw.command.models.framework.ComponentInfo;
-import csw.params.javadsl.JUnits;
-import csw.location.api.models.*;
-import csw.params.javadsl.JKeyType;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.core.models.ObsId;
 import csw.params.core.models.Prefix;
-import csw.command.CommandResponseManager;
-import csw.command.javadsl.JCommandService;
-import csw.event.api.javadsl.IEventService;
-import csw.event.api.javadsl.IEventSubscription;
-import csw.location.api.javadsl.ILocationService;
-import csw.logging.javadsl.ILogger;
+import csw.params.events.Event;
+import csw.params.events.EventKey;
+import csw.params.events.EventName;
+import csw.params.events.SystemEvent;
+import csw.params.javadsl.JKeyType;
+import csw.params.javadsl.JUnits;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -73,9 +74,9 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
     }
 
     private static final class SendCommand implements WorkerCommand {
-        private final JCommandService hcd;
+        private final ICommandService hcd;
 
-        private SendCommand(JCommandService hcd) {
+        private SendCommand(ICommandService hcd) {
             this.hcd = hcd;
         }
     }
@@ -96,7 +97,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
         );
     }
 
-    private void handle(JCommandService hcd) {
+    private void handle(ICommandService hcd) {
 
         // Construct Setup command
         Key<Long> sleepTimeKey = JKeyType.LongKey().make("SleepTime");
@@ -111,7 +112,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
         CompletableFuture<CommandResponse.SubmitResponse> submitCommandResponseF = hcd.submit(setupCommand, submitTimeout)
                 .thenCompose(commandResponse -> {
                     if (commandResponse instanceof CommandResponse.Started) {
-                        return hcd.subscribe(commandResponse.runId(), commandResponseTimeout);
+                        return hcd.queryFinal(commandResponse.runId(), commandResponseTimeout);
                     } else {
                         log.error("Sleep command invalid");
                         return CompletableFuture.completedFuture(new CommandResponse.Error(commandResponse.runId(), "test error"));
@@ -156,7 +157,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
         if (trackingEvent instanceof LocationUpdated) {
             LocationUpdated updated = (LocationUpdated) trackingEvent;
             Location location = updated.location();
-            JCommandService hcd = new JCommandService((AkkaLocation) (location), actorContext.getSystem());
+            ICommandService hcd = CommandServiceFactory.jMake((AkkaLocation) (location), actorContext.getSystem());
             commandSender.tell(new SendCommand(hcd));
         } else if (trackingEvent instanceof LocationRemoved) {
             log.info("HCD no longer available");

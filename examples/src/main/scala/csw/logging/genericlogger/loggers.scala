@@ -1,7 +1,7 @@
 package csw.logging.genericlogger
 
 import akka.actor.typed.scaladsl.ActorContext
-import csw.command.messages.ComponentMessage
+import csw.command.client.internal.messages.ComponentMessage
 import csw.logging.scaladsl.{GenericLoggerFactory, Logger}
 
 //#generic-logger-class

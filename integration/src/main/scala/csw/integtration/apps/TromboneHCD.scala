@@ -2,7 +2,7 @@ package csw.integtration.apps
 
 import akka.actor.typed.scaladsl.adapter._
 import akka.actor.{Actor, ActorRef, Props}
-import csw.command.messages.CommandMessage.Submit
+import csw.command.client.internal.messages.CommandMessage.Submit
 import csw.integtration.common.TestFutureExtension.RichFuture
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaRegistration, ComponentId, ComponentType, RegistrationResult}

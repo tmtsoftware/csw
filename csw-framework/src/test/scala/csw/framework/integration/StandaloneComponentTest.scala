@@ -7,10 +7,10 @@ import akka.stream.testkit.scaladsl.TestSink
 import com.persist.JsonOps
 import com.persist.JsonOps.JsonObject
 import com.typesafe.config.ConfigFactory
-import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
-import csw.command.messages.SupervisorContainerCommonMessages.Shutdown
-import csw.command.models.framework.SupervisorLifecycleState
-import csw.command.scaladsl.CommandService
+import csw.command.client.CommandServiceFactory
+import csw.command.client.internal.extensions.AkkaLocationExt.RichAkkaLocation
+import csw.command.client.internal.messages.SupervisorContainerCommonMessages.Shutdown
+import csw.command.client.internal.models.framework.SupervisorLifecycleState
 import csw.common.FrameworkAssertions._
 import csw.common.components.framework.SampleComponentHandlers
 import csw.common.components.framework.SampleComponentState._
@@ -78,7 +78,7 @@ class StandaloneComponentTest extends HTTPLocationService {
     val supervisorRef = resolvedAkkaLocation.componentRef
     assertThatSupervisorIsRunning(supervisorRef, supervisorLifecycleStateProbe, 5.seconds)
 
-    val supervisorCommandService = new CommandService(resolvedAkkaLocation)
+    val supervisorCommandService = CommandServiceFactory.make(resolvedAkkaLocation)
 
     val (_, akkaProbe) = seedLocationService.track(akkaConnection).toMat(TestSink.probe[TrackingEvent])(Keep.both).run()
     akkaProbe.requestNext() shouldBe a[LocationUpdated]

@@ -1,7 +1,7 @@
 package csw.framework.internal.wiring
 
 import akka.actor.typed.ActorRef
-import csw.command.messages.ComponentMessage
+import csw.command.client.internal.messages.ComponentMessage
 import csw.framework.internal.configparser.ConfigParser
 import csw.framework.internal.supervisor.SupervisorBehaviorFactory
 import csw.framework.models.CswContext

@@ -3,7 +3,7 @@ package csw.framework.internal.container
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.Behaviors
 import csw.alarm.client.AlarmServiceFactory
-import csw.command.messages.ContainerActorMessage
+import csw.command.client.internal.messages.ContainerActorMessage
 import csw.event.client.EventServiceFactory
 import csw.framework.internal.supervisor.SupervisorInfoFactory
 import csw.framework.models.ContainerInfo

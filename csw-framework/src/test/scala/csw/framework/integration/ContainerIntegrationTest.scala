@@ -5,16 +5,21 @@ import akka.http.scaladsl.Http
 import akka.stream.scaladsl.{Keep, Sink}
 import akka.testkit
 import com.typesafe.config.ConfigFactory
-import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
-import csw.command.messages.ComponentCommonMessage.{GetSupervisorLifecycleState, LifecycleStateSubscription}
-import csw.command.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
-import csw.command.messages.RunningMessage.Lifecycle
-import csw.command.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
-import csw.command.models.framework
-import csw.command.models.framework.PubSub.Subscribe
-import csw.command.models.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
-import csw.command.models.framework.{Components, ContainerLifecycleState, LifecycleStateChanged, SupervisorLifecycleState}
-import csw.command.scaladsl.CommandService
+import csw.command.client.CommandServiceFactory
+import csw.command.client.internal.extensions.AkkaLocationExt.RichAkkaLocation
+import csw.command.client.internal.messages.ComponentCommonMessage.{GetSupervisorLifecycleState, LifecycleStateSubscription}
+import csw.command.client.internal.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
+import csw.command.client.internal.messages.RunningMessage.Lifecycle
+import csw.command.client.internal.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
+import csw.command.client.internal.models.framework
+import csw.command.client.internal.models.framework.PubSub.Subscribe
+import csw.command.client.internal.models.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
+import csw.command.client.internal.models.framework.{
+  Components,
+  ContainerLifecycleState,
+  LifecycleStateChanged,
+  SupervisorLifecycleState
+}
 import csw.common.FrameworkAssertions._
 import csw.common.components.framework.SampleComponentState._
 import csw.event.client.helpers.TestFutureExt.RichFuture
@@ -97,9 +102,9 @@ class ContainerIntegrationTest extends HTTPLocationService {
     val filterSupervisor    = instrumentHcdLocation.get.componentRef
     val disperserSupervisor = disperserHcdLocation.get.componentRef
 
-    val assemblyCommandService  = new CommandService(filterAssemblyLocation.get)
-    val filterCommandService    = new CommandService(instrumentHcdLocation.get)
-    val disperserCommandService = new CommandService(disperserHcdLocation.get)
+    val assemblyCommandService  = CommandServiceFactory.make(filterAssemblyLocation.get)
+    val filterCommandService    = CommandServiceFactory.make(instrumentHcdLocation.get)
+    val disperserCommandService = CommandServiceFactory.make(disperserHcdLocation.get)
 
     // DEOPSCSW-372: Provide an API for PubSubActor that hides actor based interaction
     // Subscribe to component's current state

@@ -1,8 +1,8 @@
 package csw.framework.javadsl.commons;
 
 import csw.framework.javadsl.JComponentInfo;
-import csw.command.models.framework.ComponentInfo;
-import csw.command.models.framework.LocationServiceUsage;
+import csw.command.client.internal.models.framework.ComponentInfo;
+import csw.command.client.internal.models.framework.LocationServiceUsage;
 import csw.params.core.models.Prefix;
 import csw.location.api.javadsl.JComponentType;
 

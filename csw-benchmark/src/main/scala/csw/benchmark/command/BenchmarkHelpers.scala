@@ -6,12 +6,13 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.{typed, ActorSystem}
 import akka.stream.ActorMaterializer
 import com.typesafe.config.Config
-import csw.command.extensions.AkkaLocationExt.RichAkkaLocation
-import csw.command.messages.ComponentCommonMessage.GetSupervisorLifecycleState
-import csw.command.messages.ContainerCommonMessage.GetContainerLifecycleState
-import csw.command.messages.{ComponentMessage, ContainerMessage}
-import csw.command.models.framework.{ContainerLifecycleState, SupervisorLifecycleState}
-import csw.command.scaladsl.CommandService
+import csw.command.api.scaladsl.CommandService
+import csw.command.client.CommandServiceFactory
+import csw.command.client.internal.extensions.AkkaLocationExt.RichAkkaLocation
+import csw.command.client.internal.messages.ComponentCommonMessage.GetSupervisorLifecycleState
+import csw.command.client.internal.messages.ContainerCommonMessage.GetContainerLifecycleState
+import csw.command.client.internal.messages.{ComponentMessage, ContainerMessage}
+import csw.command.client.internal.models.framework.{ContainerLifecycleState, SupervisorLifecycleState}
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
@@ -37,7 +38,7 @@ object BenchmarkHelpers {
 
     assertThatSupervisorIsRunning(akkaLocation.componentRef, probe, 5.seconds)
 
-    new CommandService(akkaLocation)
+    CommandServiceFactory.make(akkaLocation)
   }
 
   def assertThatContainerIsRunning(

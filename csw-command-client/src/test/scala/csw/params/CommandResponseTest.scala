@@ -4,7 +4,7 @@ import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.Source
 import akka.stream.{ActorMaterializer, Materializer}
-import csw.command.models.CommandResponseAggregator
+import csw.command.client.internal.models.CommandResponseAggregator
 import csw.params.commands.CommandResponse.{Completed, Error, SubmitResponse}
 import csw.params.core.models.Id
 import org.scalatest.concurrent.ScalaFutures

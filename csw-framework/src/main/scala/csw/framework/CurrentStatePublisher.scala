@@ -1,7 +1,7 @@
 package csw.framework
 
 import akka.actor.typed.ActorRef
-import csw.command.models.framework.PubSub.{Publish, PublisherMessage}
+import csw.command.client.internal.models.framework.PubSub.{Publish, PublisherMessage}
 import csw.params.core.states.CurrentState
 
 /**

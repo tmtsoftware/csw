@@ -11,7 +11,7 @@ import csw.common.components.framework.SampleComponentState;
 import csw.framework.CurrentStatePublisher;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.models.JCswContext;
-import csw.command.messages.TopLevelActorMessage;
+import csw.command.client.internal.messages.TopLevelActorMessage;
 import csw.params.commands.*;
 import csw.location.api.models.TrackingEvent;
 import csw.params.core.models.Id;
@@ -19,7 +19,7 @@ import csw.params.javadsl.JKeyType;
 import csw.params.core.generics.Parameter;
 import csw.params.core.states.CurrentState;
 import csw.params.core.states.StateName;
-import csw.command.CommandResponseManager;
+import csw.command.client.CommandResponseManager;
 import csw.logging.javadsl.ILogger;
 
 import java.time.Duration;

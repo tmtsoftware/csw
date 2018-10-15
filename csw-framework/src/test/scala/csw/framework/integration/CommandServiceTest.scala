@@ -4,7 +4,7 @@ import akka.stream.scaladsl.{Keep, Sink, Source}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import akka.util.Timeout
-import csw.command.scaladsl.CommandService
+import csw.command.client.internal.CommandServiceImpl
 import csw.framework.FrameworkTestWiring
 import csw.params.commands.CommandResponse.{Completed, SubmitResponse}
 import csw.params.commands.{CommandName, CommandResponse, ControlCommand, Setup}
@@ -58,9 +58,9 @@ class CommandServiceTest extends FunSuite with Matchers with MockitoSugar with B
    * @param assembly the assembly to submit the setups to
    * @return future list of responses
    */
-  private def submitAll(setups: List[Setup], assembly: CommandService): Future[List[SubmitResponse]] = {
+  private def submitAll(setups: List[Setup], assembly: CommandServiceImpl): Future[List[SubmitResponse]] = {
     Source(setups)
-      .mapAsync(1)(assembly.submitAndGetFinalResponse)
+      .mapAsync(1)(assembly.complete)
       .map { response =>
         if (CommandResponse.isNegative(response))
           throw new RuntimeException(s"Command failed: $response")
@@ -88,7 +88,7 @@ class CommandServiceTest extends FunSuite with Matchers with MockitoSugar with B
     //val x = submitAll()
     val setups = List(setupAssembly1, setupAssembly2)
 
-    val mcs: CommandService = mock[CommandService]
+    val mcs: CommandServiceImpl = mock[CommandServiceImpl]
     //when(submitAll(eq(setups), mcs)) //.thenReturn(Future(Completed(Id())))
 
     val rr = submitAll(setups, mcs)

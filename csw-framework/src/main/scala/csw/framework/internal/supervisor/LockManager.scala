@@ -1,9 +1,9 @@
 package csw.framework.internal.supervisor
 
 import akka.actor.typed.ActorRef
-import csw.command.messages.CommandMessage
-import csw.command.models.framework.LockingResponse
-import csw.command.models.framework.LockingResponses._
+import csw.command.client.internal.messages.CommandMessage
+import csw.command.client.internal.models.framework.LockingResponse
+import csw.command.client.internal.models.framework.LockingResponses._
 import csw.params.core.models.Prefix
 import csw.logging.scaladsl.{Logger, LoggerFactory}
 

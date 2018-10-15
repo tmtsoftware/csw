@@ -7,13 +7,12 @@ import akka.actor.Scheduler
 import akka.util
 import com.typesafe.config.ConfigFactory
 import csw.benchmark.command.BenchmarkHelpers.spawnStandaloneComponent
-import csw.command.scaladsl.CommandService
+import csw.command.api.scaladsl.CommandService
 import csw.location.server.internal.ServerWiring
 import csw.params.commands
 import csw.params.commands.CommandName
-import csw.params.core.models.Prefix
-import csw.command.scaladsl.CommandService
 import csw.params.commands.CommandResponse.SubmitResponse
+import csw.params.core.models.Prefix
 import org.openjdk.jmh.annotations._
 
 import scala.concurrent.Await

@@ -6,9 +6,9 @@ import akka.actor.typed.scaladsl.adapter._
 import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.{actor, testkit, Done}
 import csw.alarm.api.scaladsl.AlarmService
-import csw.command.CommandResponseManager
-import csw.command.messages.CommandResponseManagerMessage
-import csw.command.models.framework.{LifecycleStateChanged, PubSub}
+import csw.command.client.CommandResponseManager
+import csw.command.client.internal.messages.CommandResponseManagerMessage
+import csw.command.client.internal.models.framework.{LifecycleStateChanged, PubSub}
 import csw.config.api.scaladsl.ConfigClientService
 import csw.config.client.scaladsl.ConfigClientFactory
 import csw.event.api.scaladsl.EventService
