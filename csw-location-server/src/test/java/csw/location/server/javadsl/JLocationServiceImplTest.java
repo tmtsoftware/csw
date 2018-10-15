@@ -20,7 +20,7 @@ import csw.location.api.javadsl.JConnectionType;
 import csw.location.api.models.*;
 import csw.location.client.ActorSystemFactory;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;
-import csw.location.server.internal.AdminWiring;
+import csw.location.server.internal.ServerWiring;
 import csw.location.server.scaladsl.RegistrationFactory;
 import csw.logging.javadsl.ILogger;
 import csw.logging.javadsl.JLoggerFactory;
@@ -40,7 +40,7 @@ public class JLocationServiceImplTest {
 
     public ILogger log = new JLoggerFactory(Constants.LocationService()).getLogger(getClass());
 
-    private static AdminWiring wiring = new AdminWiring();
+    private static ServerWiring wiring = new ServerWiring();
 
     private static ActorSystem actorSystem =  ActorSystemFactory.remote();
     private static Materializer mat = ActorMaterializer.create(actorSystem);

@@ -8,13 +8,13 @@ import csw.location.api.commons.ClusterAwareSettings
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaRegistration, ComponentId, ComponentType, RegistrationResult}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.server.internal.AdminWiring
+import csw.location.server.internal.ServerWiring
 import csw.logging.scaladsl.LoggingSystemFactory
 import csw.params.core.models.Prefix
 
 object AssemblyApp {
 
-  val adminWiring: AdminWiring = AdminWiring.make(ClusterAwareSettings.onPort(3553).withInterface("eth1"))
+  val adminWiring: ServerWiring = ServerWiring.make(ClusterAwareSettings.onPort(3553).withInterface("eth1"))
   LoggingSystemFactory.start("Assembly", "1.0", adminWiring.clusterSettings.hostname, adminWiring.actorSystem)
   adminWiring.locationHttpService.start().await
 

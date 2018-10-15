@@ -15,7 +15,7 @@ import csw.location.api.models.{AkkaRegistration, HttpRegistration, _}
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.ActorSystemFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.server.internal.AdminWiring
+import csw.location.server.internal.ServerWiring
 import csw.logging.internal.LoggingSystem
 import csw.logging.scaladsl._
 import csw.params.core.models.Prefix
@@ -32,7 +32,7 @@ object LocationServiceExampleClientApp extends App {
 
   // http location service client expect that location server is running on local machine
   // here we are starting location http server so that httpLocationClient uses can be illustrated
-  private val wiring = new AdminWiring
+  private val wiring = new ServerWiring
   Await.result(wiring.locationHttpService.start(), 5.seconds)
 
   //#create-actor-system

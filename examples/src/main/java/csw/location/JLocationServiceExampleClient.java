@@ -19,7 +19,7 @@ import csw.location.api.javadsl.ILocationService;
 import csw.location.api.javadsl.IRegistrationResult;
 import csw.location.client.ActorSystemFactory;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;
-import csw.location.server.internal.AdminWiring;
+import csw.location.server.internal.ServerWiring;
 import csw.params.core.models.Prefix;
 import csw.command.messages.ComponentMessage;
 import csw.command.messages.ContainerMessage;
@@ -322,7 +322,7 @@ public class JLocationServiceExampleClient extends AbstractActor {
     public static void main(String[] args) throws Exception {
         // http location service client expect that location server is running on local machine
         // here we are starting location http server so that httpLocationClient uses can be illustrated
-        AdminWiring locationWiring = new AdminWiring();
+        ServerWiring locationWiring = new ServerWiring();
         Await.result(locationWiring.locationHttpService().start(), new FiniteDuration(5, TimeUnit.SECONDS));
 
         //#create-actor-system

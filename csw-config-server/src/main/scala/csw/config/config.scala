@@ -10,7 +10,7 @@ package csw
  *
  * === Config Server Application ===
  *
- * Before starting the config server, the ''cluster seed application'' should be running on a known port and IP address.
+ * Before starting the config server, the ''location server application'' should be running on a known port and IP address.
  * You can start the config server with the `csw-config-server` command (found under target/universal/stage/bin) by passing command line arguments.
  * The locations of the repositories are defined in resources/application.conf.
  * You can also override the values with system properties. For example:

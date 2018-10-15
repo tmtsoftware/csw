@@ -8,7 +8,7 @@ import akka.util
 import com.typesafe.config.ConfigFactory
 import csw.benchmark.command.BenchmarkHelpers.spawnStandaloneComponent
 import csw.command.scaladsl.CommandService
-import csw.location.server.internal.AdminWiring
+import csw.location.server.internal.ServerWiring
 import csw.params.commands
 import csw.params.commands.CommandName
 import csw.params.core.models.Prefix
@@ -40,11 +40,11 @@ class CommandServiceBenchmark {
   implicit var scheduler: Scheduler  = _
   var setupCommand: commands.Setup   = _
   var componentRef: CommandService   = _
-  var adminWiring: AdminWiring       = _
+  var adminWiring: ServerWiring      = _
 
   @Setup(Level.Trial)
   def setup(): Unit = {
-    adminWiring = AdminWiring.make(Some(3553))
+    adminWiring = ServerWiring.make(Some(3553))
     Await.result(adminWiring.locationHttpService.start(), 5.seconds)
     componentRef = spawnStandaloneComponent(adminWiring.actorSystem, ConfigFactory.load("standalone.conf"))
     setupCommand = commands.Setup(Prefix("wfos.blue.filter"), CommandName("jmh"), None)

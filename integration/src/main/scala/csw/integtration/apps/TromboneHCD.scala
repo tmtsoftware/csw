@@ -7,14 +7,14 @@ import csw.integtration.common.TestFutureExtension.RichFuture
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaRegistration, ComponentId, ComponentType, RegistrationResult}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.server.internal.AdminWiring
+import csw.location.server.internal.ServerWiring
 import csw.logging.scaladsl.LoggingSystemFactory
 import csw.params.commands.{CommandName, Setup}
 import csw.params.core.models.Prefix
 
 object TromboneHCD {
 
-  val adminWiring: AdminWiring = AdminWiring.make(Some(3553))
+  val adminWiring: ServerWiring = ServerWiring.make(Some(3553))
   LoggingSystemFactory.start("Assembly", "1.0", adminWiring.clusterSettings.hostname, adminWiring.actorSystem)
 
   adminWiring.locationHttpService.start().await

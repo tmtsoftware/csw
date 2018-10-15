@@ -3,7 +3,7 @@ package csw.location.server.http
 import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.http.scaladsl.Http
 import csw.location.server.commons.TestFutureExtension.RichFuture
-import csw.location.server.internal.AdminWiring
+import csw.location.server.internal.ServerWiring
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuiteLike, Matchers}
@@ -18,12 +18,12 @@ trait HTTPLocationService
     with ScalaFutures
     with MockitoSugar {
 
-  private var maybeWiring: Option[AdminWiring]         = None
+  private var maybeWiring: Option[ServerWiring]        = None
   private var maybeBinding: Option[Http.ServerBinding] = None
 
   def start(clusterPort: Option[Int], httpPort: Option[Int] = None): Unit =
     Try {
-      val adminWiring = AdminWiring.make(clusterPort, httpPort)
+      val adminWiring = ServerWiring.make(clusterPort, httpPort)
       (adminWiring, adminWiring.locationHttpService.start().futureValue)
     } match {
       case Success((adminWiring, serverBinding)) ⇒ maybeWiring = Some(adminWiring); maybeBinding = Some(serverBinding)
@@ -37,7 +37,7 @@ trait HTTPLocationService
 
 class JHTTPLocationService {
 
-  private val adminWiring = AdminWiring.make(Some(3553))
+  private val adminWiring = ServerWiring.make(Some(3553))
   adminWiring.locationHttpService.start().await
 
   def afterAll(): Unit = adminWiring.actorRuntime.shutdown(UnknownReason).await

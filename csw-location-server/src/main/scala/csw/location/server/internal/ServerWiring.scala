@@ -7,7 +7,7 @@ import csw.location.api.scaladsl.LocationService
 import csw.location.server.http.{LocationExceptionHandler, LocationHttpService, LocationRoutes}
 
 // $COVERAGE-OFF$
-private[csw] class AdminWiring {
+private[csw] class ServerWiring {
   lazy val config: Config                   = ConfigFactory.load()
   lazy val settings                         = new Settings(config)
   lazy val clusterSettings: ClusterSettings = ClusterAwareSettings.onPort(settings.clusterPort)
@@ -19,17 +19,17 @@ private[csw] class AdminWiring {
   lazy val locationHttpService              = new LocationHttpService(locationRoutes, actorRuntime, settings)
 }
 
-private[csw] object AdminWiring {
+private[csw] object ServerWiring {
 
-  def make(maybeClusterPort: Option[Int]): AdminWiring =
-    new AdminWiring {
+  def make(maybeClusterPort: Option[Int]): ServerWiring =
+    new ServerWiring {
       override lazy val settings: Settings = new Settings(config) {
         override val clusterPort: Int = maybeClusterPort.getOrElse(super.clusterPort)
       }
     }
 
-  def make(maybeClusterPort: Option[Int], mayBeHttpPort: Option[Int]): AdminWiring =
-    new AdminWiring {
+  def make(maybeClusterPort: Option[Int], mayBeHttpPort: Option[Int]): ServerWiring =
+    new ServerWiring {
       override lazy val settings: Settings = {
         new Settings(config) {
           override val clusterPort: Int = maybeClusterPort.getOrElse(super.clusterPort)
@@ -38,8 +38,8 @@ private[csw] object AdminWiring {
       }
     }
 
-  def make(_clusterSettings: ClusterSettings): AdminWiring =
-    new AdminWiring {
+  def make(_clusterSettings: ClusterSettings): ServerWiring =
+    new ServerWiring {
       override lazy val clusterSettings: ClusterSettings = _clusterSettings
     }
 }
