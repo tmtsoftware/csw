@@ -1,24 +1,24 @@
 package csw.framework.command
 
 import akka.actor.Scheduler
+import akka.actor.testkit.typed.TestKitSettings
+import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.{ActorMaterializer, Materializer}
-import akka.actor.testkit.typed.TestKitSettings
-import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
+import csw.command.scaladsl.CommandService
 import csw.common.components.command.ComponentStateForCommand._
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
-import csw.params.commands.CommandResponse._
-import csw.params.commands.{CommandResponse, Setup}
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
-import csw.params.core.models.ObsId
-import csw.params.core.states.{CurrentState, StateName}
-import csw.command.scaladsl.{CommandDistributor, CommandService}
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.location.server.http.HTTPLocationService
+import csw.params.commands.CommandResponse._
+import csw.params.commands.Setup
+import csw.params.core.models.ObsId
+import csw.params.core.states.{CurrentState, StateName}
 import io.lettuce.core.RedisClient
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar

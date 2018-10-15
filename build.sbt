@@ -197,6 +197,12 @@ lazy val `csw-config-cli` = project
     libraryDependencies ++= Dependencies.ConfigCli.value
   )
 
+lazy val `csw-command-api` = project
+  .dependsOn(
+    `csw-params-jvm`,
+    `csw-location-api`
+  )
+
 lazy val `csw-command` = project
   .dependsOn(
     `csw-params-jvm`,

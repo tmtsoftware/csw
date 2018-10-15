@@ -49,7 +49,6 @@ class CommandServiceTest extends FunSuite with Matchers with MockitoSugar with B
   //val setupHcd3      = Setup(prefix, failureAfterValidationCmd, Some(obsId))
 
   def submit(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[SubmitResponse] = {
-    println(s"Command: $controlCommand")
     Future(Completed(Id()))
   }
 
@@ -65,8 +64,6 @@ class CommandServiceTest extends FunSuite with Matchers with MockitoSugar with B
       .map { response =>
         if (CommandResponse.isNegative(response))
           throw new RuntimeException(s"Command failed: $response")
-        else
-          println(s"Command response: $response")
         response
       }
       .toMat(Sink.seq)(Keep.right)
@@ -95,8 +92,6 @@ class CommandServiceTest extends FunSuite with Matchers with MockitoSugar with B
     //when(submitAll(eq(setups), mcs)) //.thenReturn(Future(Completed(Id())))
 
     val rr = submitAll(setups, mcs)
-
-    println("RR: " + rr)
 
     //val cs = new CommandService(resolvedAkkaLocation)
     //val x = submitAll(List(setupAssembly1, setupAssembly2), )
