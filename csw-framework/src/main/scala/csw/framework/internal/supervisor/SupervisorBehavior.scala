@@ -6,7 +6,6 @@ import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors, MutableBehavior, TimerScheduler}
 import akka.actor.typed.{ActorRef, Behavior, PostStop, Signal, SupervisorStrategy, Terminated}
-import csw.command.messages.CommandMessage.{Oneway, Submit, Validate}
 import csw.command.messages.CommandResponseManagerMessage.{Query, Subscribe, Unsubscribe}
 import csw.command.messages.ComponentCommonMessage.{
   ComponentStateSubscription,

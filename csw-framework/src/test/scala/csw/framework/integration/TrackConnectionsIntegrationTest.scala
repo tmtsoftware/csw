@@ -71,17 +71,27 @@ class TrackConnectionsIntegrationTest extends HTTPLocationService with OptionVal
     assemblyCommandService.subscribeCurrentState(assemblyProbe.ref ! _)
 
     // assembly is tracking two HCD's, hence assemblyProbe will receive LocationUpdated event from two HCD's
-    assemblyProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(akkaLocationUpdatedChoice))))
-    assemblyProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(akkaLocationUpdatedChoice))))
+    assemblyProbe.expectMessage(
+      5.seconds,
+      CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(akkaLocationUpdatedChoice)))
+    )
+    assemblyProbe.expectMessage(
+      5.seconds,
+      CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(akkaLocationUpdatedChoice)))
+    )
 
     // if one of the HCD shuts down, then assembly should know and receive LocationRemoved event
     disperserComponentRef ! Shutdown
-    assemblyProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(akkaLocationRemovedChoice))))
+    assemblyProbe.expectMessage(
+      5.seconds,
+      CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(akkaLocationRemovedChoice)))
+    )
 
     implicit val timeout: Timeout = Timeout(100.millis)
     a[TimeoutException] shouldBe thrownBy(
       disperserCommandService.submit(commands.Setup(prefix, CommandName("isAlive"), None)).await(200.millis)
     )
+
     Http(actorSystem).shutdownAllConnectionPools().await
   }
 
@@ -114,7 +124,10 @@ class TrackConnectionsIntegrationTest extends HTTPLocationService with OptionVal
     seedLocationService.register(HttpRegistration(httpConnection, 9090, "test/path")).await
 
     // assembly is tracking HttpConnection that we registered above, hence assemblyProbe will receive LocationUpdated event
-    assemblyProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(httpLocationUpdatedChoice))))
+    assemblyProbe.expectMessage(
+      5.seconds,
+      CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(httpLocationUpdatedChoice)))
+    )
 
     // On unavailability of HttpConnection, the assembly should know and receive LocationRemoved event
     seedLocationService.unregister(httpConnection)
@@ -124,11 +137,18 @@ class TrackConnectionsIntegrationTest extends HTTPLocationService with OptionVal
     seedLocationService.register(TcpRegistration(tcpConnection, 9090)).await
 
     // assembly is tracking TcpConnection that we registered above, hence assemblyProbe will receive LocationUpdated event.
-    assemblyProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(tcpLocationUpdatedChoice))))
+    assemblyProbe.expectMessage(
+      5.seconds,
+      CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(tcpLocationUpdatedChoice)))
+    )
 
     // On unavailability of TcpConnection, the assembly should know and receive LocationRemoved event
     seedLocationService.unregister(tcpConnection)
-    assemblyProbe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(tcpLocationRemovedChoice))))
+    assemblyProbe.expectMessage(
+      5.seconds,
+      CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(tcpLocationRemovedChoice)))
+    )
+
     Http(actorSystem).shutdownAllConnectionPools().await
   }
 
