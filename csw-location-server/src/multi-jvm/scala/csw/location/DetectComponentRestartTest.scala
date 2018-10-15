@@ -5,13 +5,13 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.ActorMaterializer
 import akka.testkit.TestProbe
 import csw.location.api.models.Connection.AkkaConnection
-import csw.location.api.models.AkkaRegistration
-import csw.location.api.models.{ComponentId, ComponentType, LocationRemoved, LocationUpdated}
+import csw.location.api.models._
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.params.core.models.Prefix
-import csw.location.server.commons.CswCluster
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
+import csw.location.server.commons.CswCluster
 import csw.location.server.internal.LocationServiceFactory
+import csw.logging.scaladsl.LoggingSystemFactory
+import csw.params.core.models.Prefix
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 
 import scala.concurrent.Await
@@ -24,6 +24,8 @@ class DetectComponentRestartTestMultiJvmNode3 extends DetectComponentRestartTest
 class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(config = new TwoMembersAndSeed, mode) {
 
   import config._
+
+  LoggingSystemFactory.start("", "", "", system)
 
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
   InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
