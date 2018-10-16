@@ -2,21 +2,12 @@ import sbt._
 
 object Dependencies {
 
-  val Params = Def.setting(
+  val AdminServer = Def.setting(
     Seq(
-      Enumeratum.`enumeratum`.value,
-      Enumeratum.`enumeratum-play-json`.value,
-      Libs.`play-json`.value,
-      Libs.`play-json-derived-codecs`.value,
+      AkkaHttp.`akka-http`,
+      Libs.`akka-http-play-json`,
+      Libs.`scopt`,
       Libs.`scalatest`.value % Test
-    )
-  )
-
-  val ParamsJvm = Def.setting(
-    Seq(
-      Chill.`chill-bijection` % Test,
-      Libs.`junit`            % Test,
-      Libs.`junit-interface`  % Test
     )
   )
 
@@ -33,7 +24,7 @@ object Dependencies {
     )
   )
 
-  val Location = Def.setting(
+  val LocationServer = Def.setting(
     Seq(
       Akka.`akka-actor-typed`,
       Akka.`akka-actor-testkit-typed`,
@@ -72,15 +63,6 @@ object Dependencies {
   val LocationAgent = Def.setting(
     Seq(
       Akka.`akka-actor`,
-      Libs.`scopt`,
-      Libs.`scalatest`.value % Test
-    )
-  )
-
-  val Admin = Def.setting(
-    Seq(
-      AkkaHttp.`akka-http`,
-      Libs.`akka-http-play-json`,
       Libs.`scopt`,
       Libs.`scalatest`.value % Test
     )
@@ -146,6 +128,24 @@ object Dependencies {
     )
   )
 
+  val Params = Def.setting(
+    Seq(
+      Enumeratum.`enumeratum`.value,
+      Enumeratum.`enumeratum-play-json`.value,
+      Libs.`play-json`.value,
+      Libs.`play-json-derived-codecs`.value,
+      Libs.`scalatest`.value % Test
+    )
+  )
+
+  val ParamsJvm = Def.setting(
+    Seq(
+      Chill.`chill-bijection` % Test,
+      Libs.`junit`            % Test,
+      Libs.`junit-interface`  % Test
+    )
+  )
+
   val Framework = Def.setting(
     Seq(
       Libs.`scala-async`,
@@ -162,7 +162,7 @@ object Dependencies {
     )
   )
 
-  val Command = Def.setting(
+  val CommandClient = Def.setting(
     Seq(
       Libs.`scala-async`,
       Akka.`akka-actor-typed`,
@@ -252,17 +252,6 @@ object Dependencies {
     )
   )
 
-  val Romaine = Def.setting(
-    Seq(
-      Libs.`lettuce`,
-      Enumeratum.`enumeratum`.value,
-      Libs.`scala-async`,
-      Libs.`scala-java8-compat`,
-      Akka.`akka-stream`,
-      Libs.`scalatest`.value % Test
-    )
-  )
-
   val Commons = Def.setting(
     Seq(
       Akka.`akka-stream`,
@@ -273,8 +262,13 @@ object Dependencies {
     )
   )
 
-  val Deploy = Def.setting(
+  val Romaine = Def.setting(
     Seq(
+      Libs.`lettuce`,
+      Enumeratum.`enumeratum`.value,
+      Libs.`scala-async`,
+      Libs.`scala-java8-compat`,
+      Akka.`akka-stream`,
       Libs.`scalatest`.value % Test
     )
   )
@@ -304,9 +298,4 @@ object Dependencies {
     )
   )
 
-  val AcceptanceTests = Def.setting(
-    Seq(
-      Libs.`scalatest`.value
-    )
-  )
 }

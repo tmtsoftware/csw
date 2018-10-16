@@ -86,9 +86,3 @@ object AkkaHttp {
   val `akka-http`         = "com.typesafe.akka" %% "akka-http" % Version //ApacheV2
   val `akka-http-testkit` = "com.typesafe.akka" %% "akka-http-testkit" % Version //ApacheV2
 }
-
-object Ammonite {
-  val Version         = "1.1.2"
-  val `ammonite`      = "com.lihaoyi" % "ammonite" % Version cross CrossVersion.full
-  val `ammonite-sshd` = "com.lihaoyi" % "ammonite-sshd" % Version cross CrossVersion.full
-}
