@@ -154,7 +154,7 @@ public class JCommandIntegrationTest {
         CompletableFuture<CommandResponse.QueryResponse> queryResponseFuture = hcdCmdService.query(controlCommand.runId(), timeout);
 
         //#query-response
-        Assert.assertEquals(new CommandResponse.Started(controlCommand.runId()), queryResponseFuture.get());
+        queryResponseFuture.get();
 
         //#subscribe-for-result
         CompletableFuture<CommandResponse.SubmitResponse> testCommandResponse =
