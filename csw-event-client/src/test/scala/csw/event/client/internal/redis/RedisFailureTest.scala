@@ -14,6 +14,7 @@ import io.lettuce.core.{ClientOptions, RedisException}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
+import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
 import scala.util.Random
 
@@ -108,6 +109,26 @@ class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
 
     redisServer.start()
     failure.getCause shouldBe a[ConnectException]
+  }
+
+  //DEOPSCSW-000: Publish an event with block generating future of event
+  test("should invoke onError callback on publish failure [eventGenerator API] with future of event generator") {
+    import redisTestProps._
+    val publisher = eventService.makeNewPublisher()
+    val testProbe = TestProbe[PublishFailure]()(typedActorSystem)
+    publisher.publish(Utils.makeEvent(1)).await
+
+    publisher.shutdown().await
+
+    Thread.sleep(1000) // wait till the publisher is shutdown successfully
+
+    val event = Utils.makeEvent(1)
+
+    publisher.publishAsync(Future.successful(event), 20.millis, failure ⇒ testProbe.ref ! failure)
+
+    val failure = testProbe.expectMessageType[PublishFailure]
+    failure.event shouldBe event
+    failure.getCause shouldBe a[RedisException]
   }
 
 }

@@ -64,6 +64,12 @@ class RedisPublisher(redisURI: Future[RedisURI], redisClient: RedisClient)(
   override def publish(eventGenerator: ⇒ Event, every: FiniteDuration, onError: PublishFailure ⇒ Unit): Cancellable =
     publish(eventPublisherUtil.eventSource(eventGenerator, every), onError)
 
+  override def publishAsync(eventGenerator: ⇒ Future[Event], every: FiniteDuration): Cancellable =
+    publish(eventPublisherUtil.eventSourceAsync(eventGenerator, every))
+
+  override def publishAsync(eventGenerator: ⇒ Future[Event], every: FiniteDuration, onError: PublishFailure ⇒ Unit): Cancellable =
+    publish(eventPublisherUtil.eventSourceAsync(eventGenerator, every), onError)
+
   override def shutdown(): Future[Done] = asyncApi.quit().map(_ ⇒ Done)
 
   private def set(event: Event, commands: RedisAsyncApi[String, Event]): Future[Done] =

@@ -14,6 +14,7 @@ import org.junit.rules.ExpectedException;
 
 import java.time.Duration;
 import java.util.Collections;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -69,6 +70,18 @@ public class JKafkaFailureTest {
         Event event = Utils.makeEvent(1);
 
         publisher.publish(() -> event, Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
+
+        PublishFailure failure = testProbe.expectMessageClass(PublishFailure.class);
+        Assert.assertEquals(failure.event(), event);
+        Assert.assertEquals(failure.getCause().getClass(), RecordTooLargeException.class);
+    }
+
+    @Test
+    public void handleFailedPublishEventWithAnEventGeneratorGeneratingFutureOfEventAndACallback() {
+        TestProbe<PublishFailure> testProbe = TestProbe.create(Adapter.toTyped(kafkaTestProps.actorSystem()));
+        Event event = Utils.makeEvent(1);
+
+        publisher.publishAsync(() -> CompletableFuture.completedFuture(event), Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
 
         PublishFailure failure = testProbe.expectMessageClass(PublishFailure.class);
         Assert.assertEquals(failure.event(), event);

@@ -13,6 +13,7 @@ import org.junit.*;
 import org.junit.rules.ExpectedException;
 
 import java.time.Duration;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -85,6 +86,25 @@ public class JRedisFailureTest {
         Event event = Utils.makeEvent(1);
 
         publisher.publish(() -> event, Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
+
+        PublishFailure failure = testProbe.expectMessageClass(PublishFailure.class);
+        Assert.assertEquals(failure.event(), event);
+        Assert.assertEquals(failure.getCause().getClass(), RedisException.class);
+    }
+
+    @Test
+    public void handleFailedPublishEventWithAnEventGeneratorGeneratingFutureOfEventAndACallback() throws InterruptedException, ExecutionException, TimeoutException {
+        IEventPublisher publisher = redisTestProps.jEventService().makeNewPublisher();
+        TestProbe<PublishFailure> testProbe = TestProbe.create(redisTestProps.typedActorSystem());
+        publisher.publish(Utils.makeEvent(1)).get(10, TimeUnit.SECONDS);
+
+        publisher.shutdown().get(10, TimeUnit.SECONDS);
+
+        Thread.sleep(1000); // wait till the publisher is shutdown successfully
+
+        Event event = Utils.makeEvent(1);
+
+        publisher.publishAsync(() -> CompletableFuture.completedFuture(event), Duration.ofMillis(20), failure -> testProbe.ref().tell(failure));
 
         PublishFailure failure = testProbe.expectMessageClass(PublishFailure.class);
         Assert.assertEquals(failure.event(), event);

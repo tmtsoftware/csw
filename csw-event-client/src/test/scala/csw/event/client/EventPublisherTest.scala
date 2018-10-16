@@ -4,10 +4,11 @@ import akka.actor.Cancellable
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import csw.event.client.helpers.TestFutureExt.RichFuture
-import csw.event.client.helpers.Utils.{makeDistinctEvent, makeEvent}
+import csw.event.client.helpers.Utils.{makeDistinctEvent, makeEvent, makeEventWithPrefix}
 import csw.event.client.internal.kafka.KafkaTestProps
 import csw.event.client.internal.redis.RedisTestProps
 import csw.event.client.internal.wiring._
+import csw.params.core.models.Prefix
 import csw.params.events.{Event, EventKey}
 import net.manub.embeddedkafka.EmbeddedKafka
 import org.scalatest.Matchers
@@ -16,6 +17,7 @@ import org.scalatest.testng.TestNGSuite
 import org.testng.annotations._
 
 import scala.collection.{immutable, mutable}
+import scala.concurrent.Future
 import scala.concurrent.duration.DurationLong
 import scala.util.Random
 
@@ -123,4 +125,34 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
 
     queue should contain theSameElementsAs events.map(x ⇒ Event.invalidEvent(x.eventKey)) ++ events
   }
+
+  //DEOPSCSW-000: Publish events with block generating futre of event
+  @Test(dataProvider = "event-service-provider")
+  def should_be_able_to_publish_an_event_with_block_genrating_future_of_event(baseProperties: BaseProperties): Unit = {
+    import baseProperties._
+
+    var counter                      = -1
+    val events: immutable.Seq[Event] = for (i ← 31 to 41) yield makeEventWithPrefix(i, Prefix("test"))
+
+    def eventGenerator(): Future[Event] = Future {
+      counter += 1
+      events(counter)
+    }
+
+    val queue: mutable.Queue[Event] = new mutable.Queue[Event]()
+    val eventKey: EventKey          = events(0).eventKey
+
+    val subscription = subscriber.subscribe(Set(eventKey)).to(Sink.foreach[Event](queue.enqueue(_))).run()
+    subscription.ready().await
+    Thread.sleep(500) // Needed for getting the latest event
+
+    val cancellable = publisher.publishAsync(eventGenerator(), 300.millis)
+    Thread.sleep(1000)
+    cancellable.cancel()
+
+    // subscriber will receive an invalid event first as subscription happened before publishing started.
+    // The 4 published events will follow
+    queue should (have length 5 and contain allElementsOf Seq(Event.invalidEvent(eventKey)) ++ events.take(4))
+  }
+
 }

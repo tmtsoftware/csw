@@ -53,6 +53,14 @@ class KafkaPublisher(producerSettings: Future[ProducerSettings[String, Array[Byt
   override def publish(eventGenerator: ⇒ Event, every: FiniteDuration, onError: PublishFailure ⇒ Unit): Cancellable =
     publish(eventPublisherUtil.eventSource(eventGenerator, every), onError)
 
+  override def publishAsync(eventGenerator: => Future[Event], every: FiniteDuration): Cancellable =
+    publish(eventPublisherUtil.eventSourceAsync(eventGenerator, every))
+
+  override def publishAsync(eventGenerator: => Future[Event],
+                            every: FiniteDuration,
+                            onError: PublishFailure => Unit): Cancellable =
+    publish(eventPublisherUtil.eventSourceAsync(eventGenerator, every), onError)
+
   override def shutdown(): Future[Done] = kafkaProducer.map { x =>
     scala.concurrent.blocking(x.close())
     Done

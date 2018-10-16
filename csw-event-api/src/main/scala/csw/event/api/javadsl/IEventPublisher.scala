@@ -91,6 +91,42 @@ trait IEventPublisher {
   def publish(eventGenerator: Supplier[Event], every: Duration, onError: Consumer[PublishFailure]): Cancellable
 
   /**
+   * Publish [[csw.params.events.Event]] from an `eventGenerator` supplier, which will be executed at `every` frequency. `Cancellable` can be used to cancel
+   * the execution of `eventGenerator` function. Prefer this version if eventGenerator closes over mutable state. This method allows caller to prepare future on it's own
+   * execution context to make it thread safe.
+   *
+   * At the time of invocation, in case the underlying server is not available, [[csw.event.api.exceptions.EventServerNotAvailable]] exception is thrown and the stream is
+   * stopped after logging appropriately. In all other cases of exception, the stream receives a [[csw.event.api.exceptions.PublishFailure]] exception
+   * which wraps the underlying exception. The generator resumes to publish remaining elements in case of this exception.
+   *
+   * @param eventGenerator a supplier which can generate Future of event to be published at `every` frequency
+   * @param every frequency with which the events are to be published
+   * @return a handle to cancel the event generation through `eventGenerator`
+   */
+  def publishAsync(eventGenerator: Supplier[CompletableFuture[Event]], every: Duration): Cancellable
+
+  /**
+   * Publish [[csw.params.events.Event]] from an `eventGenerator` supplier, which will be executed at `every` frequency. Also, provide `onError` consumer to
+   * perform an operation for each event for which publishing failed. Prefer this version if eventGenerator closes over mutable state. This method allows caller to prepare future on it's own
+   * execution context to make it thread safe.
+   *
+   * At the time of invocation, in case the underlying server is not available, [[csw.event.api.exceptions.EventServerNotAvailable]] exception is thrown and the stream is
+   * stopped after logging appropriately. In all other cases of exception, the stream receives a [[csw.event.api.exceptions.PublishFailure]] exception
+   * which wraps the underlying exception and also provides the handle to the event which was failed to be published.
+   * The provided callback is executed on the failed element and the generator resumes to publish remaining elements.
+   *
+   * @note any exception thrown from `eventGenerator` or `onError` callback is expected
+   * to be handled by component developers.
+   * @param eventGenerator a function which can generate Future of event to be published at `every` frequency
+   * @param every frequency with which the events are to be published
+   * @param onError a consumer which defines an operation for each event for which publishing failed
+   * @return a handle to cancel the event generation through `eventGenerator`
+   */
+  def publishAsync(eventGenerator: Supplier[CompletableFuture[Event]],
+                   every: Duration,
+                   onError: Consumer[PublishFailure]): Cancellable
+
+  /**
    * Shuts down the connection for this publisher. Using any api of publisher after shutdown should give exceptions.
    * This method should be called while the component is shutdown gracefully.
    *

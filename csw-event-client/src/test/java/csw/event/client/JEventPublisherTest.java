@@ -6,6 +6,7 @@ import akka.stream.javadsl.Keep;
 import akka.stream.javadsl.Sink;
 import akka.stream.javadsl.Source;
 import csw.location.server.http.JHTTPLocationService;
+import csw.params.core.models.Prefix;
 import csw.params.events.Event;
 import csw.params.events.Event$;
 import csw.params.events.EventKey;
@@ -24,6 +25,7 @@ import org.testng.annotations.Test;
 
 import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -141,5 +143,38 @@ public class JEventPublisherTest extends TestNGSuite {
         List<Event> expectedEvents = events.stream().map(event -> Event$.MODULE$.invalidEvent(event.eventKey())).collect(Collectors.toList());
         expectedEvents.addAll(events);
         Assert.assertEquals(new HashSet<>(expectedEvents), queue);
+    }
+
+    //DEOPSCSW-000: Publish events with block generating futre of event
+    @Test(dataProvider = "event-service-provider")
+    public void should_be_able_to_publish_an_event_with_block_generating_future_of_event_with_duration(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
+        List<Event> events = new ArrayList<>();
+        for (int i = 31; i < 41; i++) {
+            events.add(Utils.makeEventWithPrefix(i, new Prefix("test")));
+        }
+
+        EventKey eventKey = events.get(0).eventKey();
+
+        List<Event> queue = new ArrayList<>();
+        IEventSubscription subscription = baseProperties.jSubscriber().subscribe(Collections.singleton(eventKey)).toMat(Sink.foreach(queue::add), Keep.left()).run(baseProperties.resumingMat());
+        subscription.ready().get(10, TimeUnit.SECONDS);
+        Thread.sleep(500); // Needed for getting the latest event
+
+        IEventPublisher publisher = baseProperties.jPublisher();
+        counter = -1;
+        cancellable = publisher.publishAsync(() -> {
+            counter += 1;
+            return CompletableFuture.completedFuture(events.get(counter));
+        }, Duration.ofMillis(10));
+
+        Thread.sleep(1000);
+        cancellable.cancel();
+
+        // subscriber will receive an invalid event first as subscription happened before publishing started.
+        // The 10 published events will follow
+        Assert.assertEquals(11, queue.size());
+
+        events.add(0, Event$.MODULE$.invalidEvent(eventKey));
+        Assert.assertEquals(events, queue);
     }
 }

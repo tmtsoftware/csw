@@ -20,7 +20,11 @@ class EventPublisherUtil(implicit ec: ExecutionContext, mat: Materializer) {
 
   // create an akka stream source out of eventGenerator function
   def eventSource(eventGenerator: => Event, every: FiniteDuration): Source[Event, Cancellable] =
-    Source.tick(0.millis, every, ()).map(_ => withErrorLogging(eventGenerator))
+    eventSourceAsync(Future.successful(eventGenerator), every)
+
+  // create an akka stream source out of eventGenerator function
+  def eventSourceAsync(eventGenerator: => Future[Event], every: FiniteDuration): Source[Event, Cancellable] =
+    Source.tick(0.millis, every, ()).mapAsync(1)(x => withErrorLogging(eventGenerator))
 
   def publishFromSource[Mat](
       source: Source[Event, Mat],
@@ -47,10 +51,8 @@ class EventPublisherUtil(implicit ec: ExecutionContext, mat: Materializer) {
   }
 
   // log error for any exception from provided eventGenerator
-  private def withErrorLogging(eventGenerator: => Event): Event =
-    try {
-      eventGenerator
-    } catch {
+  private def withErrorLogging(eventGenerator: => Future[Event]): Future[Event] =
+    eventGenerator.recover {
       case NonFatal(ex) ⇒
         logger.error(ex.getMessage, ex = ex)
         throw ex
