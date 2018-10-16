@@ -52,7 +52,13 @@ object ParadoxSite extends AutoPlugin {
         "scaladoc.base_url"      -> s"https://tmtsoftware.github.io/csw/${version.value}/api/scala",
         "javadoc.base_url"       -> s"https://tmtsoftware.github.io/csw/${version.value}/api/java",
         "extref.manual.base_url" -> s"https://tmtsoftware.github.io/csw/${version.value}/manual/index.html",
-        "github.base_url"        -> "https://github.com/tmtsoftware/csw/tree/master"
+        "github.base_url"        -> githubBaseUrl(version.value)
       )
     )
+
+  private def githubBaseUrl(version: String) = {
+    val baseRepoUrl = "https://github.com/tmtsoftware/csw/tree"
+    if (version == "0.1-SNAPSHOT") s"$baseRepoUrl/master"
+    else s"$baseRepoUrl/$version"
+  }
 }

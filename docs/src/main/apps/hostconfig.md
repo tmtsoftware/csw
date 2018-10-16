@@ -98,4 +98,4 @@ Use the following command to get version information for this app
 
 Using systemd, you can configure host configuration application to spawn containers on a machine to be run automatically on system startup.
 
-For detailed information on systemd configuration, please refer to [readme.md](https://github.com/tmtsoftware/csw/blob/master/tools/systemd/readme.md) 
+For detailed information on systemd configuration, please refer to @github[readme.md](/tools/systemd/readme.md) 

@@ -32,7 +32,7 @@ Because the Supervisor registers itself with location service, it serves as the 
 
 @@@
 
-The source code of supervisor actor can be found [here](https://github.com/tmtsoftware/csw/blob/master/csw-framework/src/main/scala/csw/framework/internal/supervisor/SupervisorBehavior.scala)
+The source code of supervisor actor can be found @github[here](/csw-framework/src/main/scala/csw/framework/internal/supervisor/SupervisorBehavior.scala)
 
 ## Top level actor
 
@@ -42,7 +42,7 @@ However, the developer is not expected to implement TLA code directly.  Instead,
 implementing the `ComponentHandlers` abstract class, consisting of a list of a methods, or `hooks`, called by the TLA during specific lifecycle and command events (see [Handlers](#handlers)).
 The `ComponentHandlers` implementation is specified during constructing using that factory (see [Constructing The Component](#constructing-the-component)) 
 
-The source code of the Top Level Actor can be found [here](https://github.com/tmtsoftware/csw/blob/master/csw-framework/src/main/scala/csw/framework/internal/component/ComponentBehavior.scala).
+The source code of the Top Level Actor can be found @github[here](/csw-framework/src/main/scala/csw/framework/internal/component/ComponentBehavior.scala).
 
 ## Handlers
 
@@ -57,14 +57,14 @@ The following hooks should be overridden in your ComponentHandlers implementatio
 -   `onLocationTrackingEvent`: called when a tracked dependency changes location state. (see @ref:[Tracking Dependencies](./multiple-components.md#tracking-dependencies))
 -   `onShutdown`: called when component is shutting down.
 
-The source code of `ComponentHandlers` can be found [here](https://github.com/tmtsoftware/csw/blob/master/csw-framework/src/main/scala/csw/framework/scaladsl/ComponentHandlers.scala). 
+The source code of `ComponentHandlers` can be found @github[here](/csw-framework/src/main/scala/csw/framework/scaladsl/ComponentHandlers.scala). 
 
 More details about handler significance and invocation can be found @ref:[here](./framework.md#handling-lifecycle)
 
 @@@ note { title=Note }
 
 If the component developer wishes to write the handler implementation in java, then he/she needs to implement the java version of `ComponentHandlers`
-which is `JComponentHandlers`. The source code of `JComponentHandlers` can be found [here](https://github.com/tmtsoftware/csw/blob/master/csw-framework/src/main/scala/csw/framework/javadsl/JComponentHandlers.scala).
+which is `JComponentHandlers`. The source code of `JComponentHandlers` can be found @github[here](/csw-framework/src/main/scala/csw/framework/javadsl/JComponentHandlers.scala).
 Any further reference to `ComponentHandlers` should implicitly also apply to `JComponentHandlers`.
 
 @@@
@@ -120,7 +120,7 @@ The configuration can also contain a list of components and services it wishes t
 
 More details about `ComponentInfo` can be found @ref:[here](./framework.md#describing-components).
 
-An additional sample configuration file can be found [here](https://github.com/tmtsoftware/csw/blob/master/csw-benchmark/src/main/resources/container.conf).
+An additional sample configuration file can be found @github[here](/csw-benchmark/src/main/resources/container.conf).
 
 ## Lifecycle 
 
@@ -387,7 +387,8 @@ Java
 
 ## Building and Running component in standalone mode
 
-Once the component is ready, it is started using the `ContainerCmd` object in standalone mode. The details about starting the `ContainerCmd` in standalone mode can be found [here](https://tmtsoftware.github.io/csw/framework/deploying-components.html).
+Once the component is ready, it is started using the `ContainerCmd` object in standalone mode. 
+The details about starting the `ContainerCmd` in standalone mode can be found @ref:[here](../framework/deploying-components.md).
 
 There are various ways to build and run the project.  A simple way during development is to to use sbt to run it. 
 The sbt command `runMain` can be used to specify an application with a main method and run it with arguments specified at the command line.  When this
