@@ -11,13 +11,13 @@ object Settings {
       val cswVersion   = version.value
       val siteMappings = (mappings in makeSite).value ++ (mappings in makeSite in p).value
 
-      if (cswVersion.endsWith("-SNAPSHOT")) {
-        // keep documentation for SNAPSHOT versions in SNAPSHOT directory. (Don't copy SNAPSHOT docs to top level)
-        siteMappings.map { case (file, output) => (file, "/" + cswVersion + output) }
-      } else {
-        // copy latest version of documentation to top level as well as inside corresponding version directory at gh-pages branch
-        siteMappings ++ siteMappings.map { case (file, output) => (file, "/" + cswVersion + output) }
-      }
+      val siteMappingsWithoutVersion = siteMappings.map { case (file, output) => (file, "/csw/" + output) }
+      val siteMappingsWithVersion    = siteMappings.map { case (file, output) => (file, "/csw/" + cswVersion + output) }
+
+      // keep documentation for SNAPSHOT versions in SNAPSHOT directory. (Don't copy SNAPSHOT docs to top level)
+      // If not SNAPSHOT version, then copy latest version of documentation to top level as well as inside corresponding version directory
+      if (cswVersion.endsWith("-SNAPSHOT")) siteMappingsWithVersion
+      else siteMappingsWithoutVersion ++ siteMappingsWithVersion
     }
 
   def docExclusions(projects: Seq[ProjectReference]): Seq[Setting[_]] =

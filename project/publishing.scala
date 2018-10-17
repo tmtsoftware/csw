@@ -1,8 +1,8 @@
 import java.io.File
 
 import sbt.Keys._
-import sbt._
 import sbt.io.Path
+import sbt.{Def, _}
 
 object NoPublish extends AutoPlugin {
   override def requires: Plugins = plugins.JvmPlugin
@@ -34,10 +34,11 @@ object GithubPublishDocs extends AutoPlugin {
   override def requires: Plugins = GhpagesPlugin
 
   override def projectSettings: Seq[Setting[_]] = Seq(
+    ghpagesBranch := "master",
     includeFilter in ghpagesCleanSite := new FileFilter {
       override def accept(pathname: File): Boolean = pathname.getAbsolutePath.contains(s"/${version.value}")
     },
-    GitKeys.gitRemoteRepo := "git@github.com:tmtsoftware/csw.git"
+    GitKeys.gitRemoteRepo := "git@github.com:tmtsoftware/tmtsoftware.github.io.git"
   )
 }
 
