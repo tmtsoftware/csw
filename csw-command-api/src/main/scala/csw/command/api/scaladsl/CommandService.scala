@@ -1,5 +1,6 @@
 package csw.command.api.scaladsl
 import akka.util.Timeout
+import csw.command.api.{CurrentStateSubscription, StateMatcher}
 import csw.params.commands.CommandResponse._
 import csw.params.commands.ControlCommand
 import csw.params.core.models.Id

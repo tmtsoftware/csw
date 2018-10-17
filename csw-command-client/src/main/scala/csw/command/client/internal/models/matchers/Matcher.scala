@@ -6,7 +6,7 @@ import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.adapter._
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.{KillSwitches, Materializer, OverflowStrategy}
-import csw.command.api.scaladsl.StateMatcher
+import csw.command.api.StateMatcher
 import csw.command.client.internal.messages.ComponentCommonMessage.ComponentStateSubscription
 import csw.command.client.internal.models.framework.PubSub.Subscribe
 import csw.command.client.internal.models.matchers.MatcherResponses.{MatchCompleted, MatchFailed}

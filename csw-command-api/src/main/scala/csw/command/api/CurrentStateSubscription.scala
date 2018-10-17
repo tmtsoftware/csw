@@ -1,4 +1,4 @@
-package csw.command.api.scaladsl
+package csw.command.api
 
 trait CurrentStateSubscription {
 

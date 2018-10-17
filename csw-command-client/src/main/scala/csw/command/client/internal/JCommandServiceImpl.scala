@@ -9,7 +9,7 @@ import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
 import csw.command.api.javadsl.ICommandService
-import csw.command.api.scaladsl.{CurrentStateSubscription, StateMatcher}
+import csw.command.api.{CurrentStateSubscription, StateMatcher}
 import csw.location.api.models.AkkaLocation
 import csw.params.commands.CommandResponse.{MatchingResponse, OnewayResponse, QueryResponse, SubmitResponse}
 import csw.params.commands.{CommandResponse, ControlCommand}

@@ -3,7 +3,7 @@ import java.util.concurrent.CompletableFuture
 import java.util.function.Consumer
 
 import akka.util.Timeout
-import csw.command.api.scaladsl.{CurrentStateSubscription, StateMatcher}
+import csw.command.api.{CurrentStateSubscription, StateMatcher}
 import csw.params.commands.CommandResponse._
 import csw.params.commands.ControlCommand
 import csw.params.core.models.Id

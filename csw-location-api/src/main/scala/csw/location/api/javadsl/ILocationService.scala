@@ -4,7 +4,7 @@ import java.time.Duration
 import java.util.Optional
 import java.util.concurrent.CompletableFuture
 import java.util.function.Consumer
-import java.{util => ju}
+import java.{util ⇒ ju}
 
 import akka.Done
 import akka.stream.KillSwitch

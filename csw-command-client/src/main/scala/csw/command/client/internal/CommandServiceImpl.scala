@@ -7,7 +7,8 @@ import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
-import csw.command.api.scaladsl.{CommandService, CurrentStateSubscription, StateMatcher}
+import csw.command.api.scaladsl.CommandService
+import csw.command.api.{CurrentStateSubscription, StateMatcher}
 import csw.command.client.internal.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.client.internal.messages.CommandMessage.{Oneway, Submit, Validate}
 import csw.command.client.internal.messages.{CommandResponseManagerMessage, ComponentMessage}

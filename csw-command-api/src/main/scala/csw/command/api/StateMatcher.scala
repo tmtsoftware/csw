@@ -1,5 +1,4 @@
-package csw.command.api.scaladsl
-
+package csw.command.api
 import akka.util.Timeout
 import csw.params.core.models.Prefix
 import csw.params.core.states.{CurrentState, StateName}
