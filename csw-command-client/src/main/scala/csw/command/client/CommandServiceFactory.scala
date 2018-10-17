@@ -11,5 +11,5 @@ object CommandServiceFactory {
     new CommandServiceImpl(componentLocation)
 
   def jMake(componentLocation: AkkaLocation, actorSystem: ActorSystem[_]): ICommandService =
-    new JCommandServiceImpl(componentLocation, actorSystem)
+    new JCommandServiceImpl(make(componentLocation)(actorSystem))
 }

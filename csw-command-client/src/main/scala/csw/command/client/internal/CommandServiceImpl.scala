@@ -31,10 +31,21 @@ private[csw] class CommandServiceImpl(componentLocation: AkkaLocation)(implicit 
 
   private val component: ActorRef[ComponentMessage] = componentLocation.componentRef
 
-  def submit(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[SubmitResponse] =
+  override def validate(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[ValidateResponse] =
+    component ? (Validate(controlCommand, _))
+
+  override def submit(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[SubmitResponse] =
     component ? (Submit(controlCommand, _))
 
-  def submitAndCompleteAll(submitCommands: List[ControlCommand])(implicit timeout: Timeout): Future[List[SubmitResponse]] =
+  override def submitAndComplete(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[SubmitResponse] =
+    submit(controlCommand).flatMap {
+      case _: Started ⇒ queryFinal(controlCommand.runId)
+      case x          ⇒ Future.successful(x)
+    }
+
+  override def submitAndCompleteAll(
+      submitCommands: List[ControlCommand]
+  )(implicit timeout: Timeout): Future[List[SubmitResponse]] =
     Source(submitCommands)
       .mapAsync(1)(submitAndComplete)
       .map { response =>
@@ -47,22 +58,10 @@ private[csw] class CommandServiceImpl(componentLocation: AkkaLocation)(implicit 
       .run()
       .map(_.toList)
 
-  def queryFinal(commandRunId: Id)(implicit timeout: Timeout): Future[SubmitResponse] =
-    component ? (CommandResponseManagerMessage.Subscribe(commandRunId, _))
-
-  def submitAndComplete(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[SubmitResponse] =
-    submit(controlCommand).flatMap {
-      case _: Started ⇒ queryFinal(controlCommand.runId)
-      case x          ⇒ Future.successful(x)
-    }
-
-  def query(commandRunId: Id)(implicit timeout: Timeout): Future[QueryResponse] =
-    component ? (CommandResponseManagerMessage.Query(commandRunId, _))
-
-  def send(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[OnewayResponse] =
+  override def send(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[OnewayResponse] =
     component ? (Oneway(controlCommand, _))
 
-  def sendAndMatch(
+  override def sendAndMatch(
       controlCommand: ControlCommand,
       stateMatcher: StateMatcher
   )(implicit timeout: Timeout): Future[MatchingResponse] = {
@@ -80,13 +79,16 @@ private[csw] class CommandServiceImpl(componentLocation: AkkaLocation)(implicit 
     }
   }
 
-  def validate(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[ValidateResponse] =
-    component ? (Validate(controlCommand, _))
+  override def query(commandRunId: Id)(implicit timeout: Timeout): Future[QueryResponse] =
+    component ? (CommandResponseManagerMessage.Query(commandRunId, _))
 
-  def subscribeCurrentState(callback: CurrentState ⇒ Unit): CurrentStateSubscription =
+  override def queryFinal(commandRunId: Id)(implicit timeout: Timeout): Future[SubmitResponse] =
+    component ? (CommandResponseManagerMessage.Subscribe(commandRunId, _))
+
+  override def subscribeCurrentState(callback: CurrentState ⇒ Unit): CurrentStateSubscription =
     new CurrentStateSubscriptionImpl(component, None, callback)
 
-  def subscribeCurrentState(names: Set[StateName], callback: CurrentState ⇒ Unit): CurrentStateSubscription =
+  override def subscribeCurrentState(names: Set[StateName], callback: CurrentState ⇒ Unit): CurrentStateSubscription =
     new CurrentStateSubscriptionImpl(component, Some(names), callback)
 
 }

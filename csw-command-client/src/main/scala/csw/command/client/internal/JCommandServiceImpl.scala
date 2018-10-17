@@ -3,71 +3,61 @@ package csw.command.client.internal
 import java.util.concurrent.CompletableFuture
 import java.util.function.Consumer
 
-import akka.actor.Scheduler
-import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
 import csw.command.api.javadsl.ICommandService
+import csw.command.api.scaladsl.CommandService
 import csw.command.api.{CurrentStateSubscription, StateMatcher}
-import csw.location.api.models.AkkaLocation
-import csw.params.commands.CommandResponse.{MatchingResponse, OnewayResponse, QueryResponse, SubmitResponse}
-import csw.params.commands.{CommandResponse, ControlCommand}
+import csw.params.commands.CommandResponse._
+import csw.params.commands.ControlCommand
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
 
 import scala.collection.JavaConverters.{iterableAsScalaIterableConverter, seqAsJavaListConverter}
 import scala.compat.java8.FunctionConverters.enrichAsScalaFromConsumer
 import scala.compat.java8.FutureConverters.FutureOps
-import scala.concurrent.ExecutionContext
 
-private[csw] class JCommandServiceImpl(akkaLocation: AkkaLocation, actorSystem: ActorSystem[_]) extends ICommandService {
+private[csw] class JCommandServiceImpl(commandService: CommandService) extends ICommandService {
 
-  implicit val ec: ExecutionContext = actorSystem.executionContext
-  implicit val mat: Materializer    = ActorMaterializer()(actorSystem.toUntyped)
-  implicit val scheduler: Scheduler = actorSystem.scheduler
+  override def validate(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[ValidateResponse] =
+    commandService.validate(controlCommand)(timeout).toJava.toCompletableFuture
 
-  private[command] val sCommandService = new CommandServiceImpl(akkaLocation)(actorSystem)
+  override def submit(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[SubmitResponse] =
+    commandService.submit(controlCommand)(timeout).toJava.toCompletableFuture
 
-  def submitAndCompleteAll(
+  override def submitAndComplete(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[SubmitResponse] =
+    commandService.submitAndComplete(controlCommand)(timeout).toJava.toCompletableFuture
+
+  override def submitAndCompleteAll(
       controlCommand: java.util.List[ControlCommand],
       timeout: Timeout
   ): CompletableFuture[java.util.List[SubmitResponse]] =
-    sCommandService.submitAndCompleteAll(controlCommand.asScala.toList)(timeout).map(_.asJava).toJava.toCompletableFuture
+    commandService
+      .submitAndCompleteAll(controlCommand.asScala.toList)(timeout)
+      .toJava
+      .toCompletableFuture
+      .thenApply(_.asJava)
 
-  def submit(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[SubmitResponse] =
-    sCommandService.submit(controlCommand)(timeout).toJava.toCompletableFuture
+  override def send(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[OnewayResponse] =
+    commandService.send(controlCommand)(timeout).toJava.toCompletableFuture
 
-  def send(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[OnewayResponse] =
-    sCommandService.send(controlCommand)(timeout).toJava.toCompletableFuture
-
-  def queryFinal(commandRunId: Id, timeout: Timeout): CompletableFuture[SubmitResponse] =
-    sCommandService.queryFinal(commandRunId)(timeout).toJava.toCompletableFuture
-
-  def query(commandRunId: Id, timeout: Timeout): CompletableFuture[QueryResponse] =
-    sCommandService.query(commandRunId)(timeout).toJava.toCompletableFuture
-
-  def submitAndComplete(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[SubmitResponse] =
-    sCommandService.submitAndComplete(controlCommand)(timeout).toJava.toCompletableFuture
-
-  def sendAndMatch(
+  override def sendAndMatch(
       controlCommand: ControlCommand,
       stateMatcher: StateMatcher,
       timeout: Timeout
   ): CompletableFuture[MatchingResponse] =
-    sCommandService.sendAndMatch(controlCommand, stateMatcher)(timeout).toJava.toCompletableFuture
+    commandService.sendAndMatch(controlCommand, stateMatcher)(timeout).toJava.toCompletableFuture
 
-  def subscribeCurrentState(callback: Consumer[CurrentState]): CurrentStateSubscription =
-    sCommandService.subscribeCurrentState(callback.asScala)
+  override def query(commandRunId: Id, timeout: Timeout): CompletableFuture[QueryResponse] =
+    commandService.query(commandRunId)(timeout).toJava.toCompletableFuture
 
-  def subscribeCurrentState(
+  override def queryFinal(commandRunId: Id, timeout: Timeout): CompletableFuture[SubmitResponse] =
+    commandService.queryFinal(commandRunId)(timeout).toJava.toCompletableFuture
+
+  override def subscribeCurrentState(callback: Consumer[CurrentState]): CurrentStateSubscription =
+    commandService.subscribeCurrentState(callback.asScala)
+
+  override def subscribeCurrentState(
       names: java.util.Set[StateName],
       callback: Consumer[CurrentState]
-  ): CurrentStateSubscription = sCommandService.subscribeCurrentState(names.asScala.toSet, callback.asScala)
-
-  override def validate(
-      controlCommand: ControlCommand,
-      timeout: Timeout
-  ): CompletableFuture[CommandResponse.ValidateResponse] =
-    sCommandService.validate(controlCommand)(timeout).toJava.toCompletableFuture
+  ): CurrentStateSubscription = commandService.subscribeCurrentState(names.asScala.toSet, callback.asScala)
 }

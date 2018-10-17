@@ -14,6 +14,15 @@ import scala.concurrent.Future
 trait CommandService {
 
   /**
+   * Send a Validate command and get ValidateResponse as a Future. The ValidateResponse can be of type Accepted, Invalid
+   * or Locked.
+   *
+   * @param controlCommand the [[csw.params.commands.ControlCommand]] payload
+   * @return a ValidateResponse as a Future value
+   */
+  def validate(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[ValidateResponse]
+
+  /**
    * Submit a command and get a [[csw.params.commands.CommandResponse]] as a Future. The CommandResponse can be a response
    * of validation (Accepted, Invalid) or a final Response. In case of response as `Accepted`, final CommandResponse
    * can be obtained by using `subscribe` API.
@@ -42,22 +51,6 @@ trait CommandService {
   def submitAndCompleteAll(submitCommands: List[ControlCommand])(implicit timeout: Timeout): Future[List[SubmitResponse]]
 
   /**
-   * Subscribe for the result of a long running command which was sent as Submit to get a [[csw.params.commands.CommandResponse]] as a Future
-   *
-   * @param commandRunId the runId of the command for which response is required
-   * @return a CommandResponse as a Future value
-   */
-  def queryFinal(commandRunId: Id)(implicit timeout: Timeout): Future[SubmitResponse]
-
-  /**
-   * Query for the result of a long running command which was sent as Submit to get a [[csw.params.commands.CommandResponse]] as a Future
-   *
-   * @param commandRunId the runId of the command for which response is required
-   * @return a CommandResponse as a Future value
-   */
-  def query(commandRunId: Id)(implicit timeout: Timeout): Future[QueryResponse]
-
-  /**
    * Send a command as a Oneway and get a [[csw.params.commands.CommandResponse]] as a Future. The CommandResponse can be a response
    * of validation (Accepted, Invalid) or a final Response.
    *
@@ -81,13 +74,20 @@ trait CommandService {
   )(implicit timeout: Timeout): Future[MatchingResponse]
 
   /**
-   * Send a Validate command and get ValidateResponse as a Future. The ValidateResponse can be of type Accepted, Invalid
-   * or Locked.
+   * Query for the result of a long running command which was sent as Submit to get a [[csw.params.commands.CommandResponse]] as a Future
    *
-   * @param controlCommand the [[csw.params.commands.ControlCommand]] payload
-   * @return a ValidateResponse as a Future value
+   * @param commandRunId the runId of the command for which response is required
+   * @return a CommandResponse as a Future value
    */
-  def validate(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[ValidateResponse]
+  def query(commandRunId: Id)(implicit timeout: Timeout): Future[QueryResponse]
+
+  /**
+   * Subscribe for the result of a long running command which was sent as Submit to get a [[csw.params.commands.CommandResponse]] as a Future
+   *
+   * @param commandRunId the runId of the command for which response is required
+   * @return a CommandResponse as a Future value
+   */
+  def queryFinal(commandRunId: Id)(implicit timeout: Timeout): Future[SubmitResponse]
 
   /**
    * Subscribe to the current state of a component corresponding to the [[csw.location.api.models.AkkaLocation]] of the component
