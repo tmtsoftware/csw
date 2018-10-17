@@ -192,7 +192,7 @@ public class JCommandIntegrationTest {
 
         // submit command and if the command is successfully validated, check for matching of demand state against current state
         CompletableFuture<CommandResponse.MatchingResponse> commandResponseToBeMatched = hcdCmdService
-                .oneway(setup, timeout)
+                .send(setup, timeout)
                 .thenCompose(initialCommandResponse -> {
                     if (initialCommandResponse instanceof CommandResponse.Accepted) {
 
@@ -218,7 +218,7 @@ public class JCommandIntegrationTest {
 
         //#oneway
         CompletableFuture onewayCommandResponseF = hcdCmdService
-                .oneway(setup, timeout)
+                .send(setup, timeout)
                 .thenAccept(initialCommandResponse -> {
                     if (initialCommandResponse instanceof CommandResponse.Accepted) {
                         //do something
@@ -261,7 +261,7 @@ public class JCommandIntegrationTest {
         CompletableFuture<MatcherResponse> matcherResponse = matcher1.jStart();
 
         CompletableFuture<CommandResponse.MatchingResponse> matchedCommandResponse =
-                hcdCmdService.onewayAndMatch(setup, stateMatcher, timeout);
+                hcdCmdService.sendAndMatch(setup, stateMatcher, timeout);
 
         //#onewayAndMatch
         Assert.assertEquals(new CommandResponse.Completed(setup.runId()), matchedCommandResponse.get());
@@ -341,7 +341,7 @@ public class JCommandIntegrationTest {
         akka.actor.typed.ActorSystem<?> typedSystem = ActorSystemAdapter.apply(hcdActorSystem);
 
         //#submitAndSubscribe
-        CompletableFuture<CommandResponse.SubmitResponse> finalResponseCompletableFuture = hcdCmdService.complete(failureResCommand1, timeout);
+        CompletableFuture<CommandResponse.SubmitResponse> finalResponseCompletableFuture = hcdCmdService.submitAndComplete(failureResCommand1, timeout);
         CommandResponse.SubmitResponse actualValidationResponse = finalResponseCompletableFuture.get();
         //#submitAndSubscribe
 

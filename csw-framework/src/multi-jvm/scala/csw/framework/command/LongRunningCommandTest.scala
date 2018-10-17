@@ -90,7 +90,7 @@ class LongRunningCommandTest(ignore: Int)
 
       //#submitAndSubscribe
       val setupForSubscribe = Setup(prefix, longRunning, Some(obsId))
-      val response          = assemblyCommandService.complete(setupForSubscribe)
+      val response          = assemblyCommandService.submitAndComplete(setupForSubscribe)
       //#submitAndSubscribe
 
       Await.result(response, 20.seconds) shouldBe Completed(setupForSubscribe.runId)

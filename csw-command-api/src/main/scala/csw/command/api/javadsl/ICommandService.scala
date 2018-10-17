@@ -31,7 +31,7 @@ trait ICommandService {
    * @param controlCommand the [[csw.params.commands.ControlCommand]] payload
    * @return a CommandResponse as a Future value
    */
-  def complete(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[SubmitResponse]
+  def submitAndComplete(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[SubmitResponse]
 
   /**
    * Submit multiple commands and get a Source of [[csw.params.commands.CommandResponse]] for all commands. The CommandResponse can be a response
@@ -40,7 +40,7 @@ trait ICommandService {
    * @param submitCommands the set of [[csw.params.commands.ControlCommand]] payloads
    * @return a Source of CommandResponse as a stream of CommandResponses for all commands
    */
-  def completeAll(
+  def submitAndCompleteAll(
       submitCommands: java.util.List[ControlCommand],
       timeout: Timeout
   ): CompletableFuture[java.util.List[SubmitResponse]]
@@ -68,7 +68,7 @@ trait ICommandService {
    * @param controlCommand the [[csw.params.commands.ControlCommand]] payload
    * @return a CommandResponse as a Future value
    */
-  def oneway(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[OnewayResponse]
+  def send(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[OnewayResponse]
 
   /**
    * Submit a command and match the published state from the component using a [[StateMatcher]].
@@ -79,7 +79,7 @@ trait ICommandService {
    * @param stateMatcher the StateMatcher implementation for matching received state against a demand state
    * @return a MatchingResponse as a Future value
    */
-  def onewayAndMatch(
+  def sendAndMatch(
       controlCommand: ControlCommand,
       stateMatcher: StateMatcher,
       timeout: Timeout

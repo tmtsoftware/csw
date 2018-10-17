@@ -29,17 +29,17 @@ private[csw] class JCommandServiceImpl(akkaLocation: AkkaLocation, actorSystem: 
 
   private[command] val sCommandService = new CommandServiceImpl(akkaLocation)(actorSystem)
 
-  def completeAll(
+  def submitAndCompleteAll(
       controlCommand: java.util.List[ControlCommand],
       timeout: Timeout
   ): CompletableFuture[java.util.List[SubmitResponse]] =
-    sCommandService.completeAll(controlCommand.asScala.toList)(timeout).map(_.asJava).toJava.toCompletableFuture
+    sCommandService.submitAndCompleteAll(controlCommand.asScala.toList)(timeout).map(_.asJava).toJava.toCompletableFuture
 
   def submit(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[SubmitResponse] =
     sCommandService.submit(controlCommand)(timeout).toJava.toCompletableFuture
 
-  def oneway(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[OnewayResponse] =
-    sCommandService.oneway(controlCommand)(timeout).toJava.toCompletableFuture
+  def send(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[OnewayResponse] =
+    sCommandService.send(controlCommand)(timeout).toJava.toCompletableFuture
 
   def queryFinal(commandRunId: Id, timeout: Timeout): CompletableFuture[SubmitResponse] =
     sCommandService.queryFinal(commandRunId)(timeout).toJava.toCompletableFuture
@@ -47,15 +47,15 @@ private[csw] class JCommandServiceImpl(akkaLocation: AkkaLocation, actorSystem: 
   def query(commandRunId: Id, timeout: Timeout): CompletableFuture[QueryResponse] =
     sCommandService.query(commandRunId)(timeout).toJava.toCompletableFuture
 
-  def complete(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[SubmitResponse] =
-    sCommandService.complete(controlCommand)(timeout).toJava.toCompletableFuture
+  def submitAndComplete(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[SubmitResponse] =
+    sCommandService.submitAndComplete(controlCommand)(timeout).toJava.toCompletableFuture
 
-  def onewayAndMatch(
+  def sendAndMatch(
       controlCommand: ControlCommand,
       stateMatcher: StateMatcher,
       timeout: Timeout
   ): CompletableFuture[MatchingResponse] =
-    sCommandService.onewayAndMatch(controlCommand, stateMatcher)(timeout).toJava.toCompletableFuture
+    sCommandService.sendAndMatch(controlCommand, stateMatcher)(timeout).toJava.toCompletableFuture
 
   def subscribeCurrentState(callback: Consumer[CurrentState]): CurrentStateSubscription =
     sCommandService.subscribeCurrentState(callback.asScala)

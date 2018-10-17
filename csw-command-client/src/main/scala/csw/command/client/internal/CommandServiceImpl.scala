@@ -34,9 +34,9 @@ private[csw] class CommandServiceImpl(componentLocation: AkkaLocation)(implicit 
   def submit(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[SubmitResponse] =
     component ? (Submit(controlCommand, _))
 
-  def completeAll(submitCommands: List[ControlCommand])(implicit timeout: Timeout): Future[List[SubmitResponse]] =
+  def submitAndCompleteAll(submitCommands: List[ControlCommand])(implicit timeout: Timeout): Future[List[SubmitResponse]] =
     Source(submitCommands)
-      .mapAsync(1)(complete)
+      .mapAsync(1)(submitAndComplete)
       .map { response =>
         if (isNegative(response))
           throw new RuntimeException(s"Command failed: $response")
@@ -50,7 +50,7 @@ private[csw] class CommandServiceImpl(componentLocation: AkkaLocation)(implicit 
   def queryFinal(commandRunId: Id)(implicit timeout: Timeout): Future[SubmitResponse] =
     component ? (CommandResponseManagerMessage.Subscribe(commandRunId, _))
 
-  def complete(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[SubmitResponse] =
+  def submitAndComplete(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[SubmitResponse] =
     submit(controlCommand).flatMap {
       case _: Started ⇒ queryFinal(controlCommand.runId)
       case x          ⇒ Future.successful(x)
@@ -59,16 +59,16 @@ private[csw] class CommandServiceImpl(componentLocation: AkkaLocation)(implicit 
   def query(commandRunId: Id)(implicit timeout: Timeout): Future[QueryResponse] =
     component ? (CommandResponseManagerMessage.Query(commandRunId, _))
 
-  def oneway(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[OnewayResponse] =
+  def send(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[OnewayResponse] =
     component ? (Oneway(controlCommand, _))
 
-  def onewayAndMatch(
+  def sendAndMatch(
       controlCommand: ControlCommand,
       stateMatcher: StateMatcher
   )(implicit timeout: Timeout): Future[MatchingResponse] = {
     val matcher          = new Matcher(component, stateMatcher)
     val matcherResponseF = matcher.start
-    oneway(controlCommand).flatMap {
+    send(controlCommand).flatMap {
       case Accepted(runId) ⇒
         matcherResponseF.map {
           case MatchCompleted  ⇒ Completed(runId)
