@@ -1,4 +1,4 @@
-package csw.command.client.internal.models.framework
+package csw.command.client.models.framework
 
 import acyclic.skipped
 import akka.actor.ActorSystem
@@ -11,4 +11,4 @@ import akka.actor.ActorSystem
  *               received by a container.
  * @param component represents a supervisor actor reference and componentInfo
  */
-case class SupervisorInfo private[framework] (system: ActorSystem, component: Component)
+private[csw] case class SupervisorInfo(system: ActorSystem, component: Component)

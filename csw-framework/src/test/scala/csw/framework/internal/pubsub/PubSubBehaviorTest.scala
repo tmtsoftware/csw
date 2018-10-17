@@ -5,9 +5,9 @@ import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestInbox, TestProbe}
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.typed.scaladsl.{Behaviors, MutableBehavior}
 import akka.actor.{typed, ActorSystem}
-import csw.command.client.internal.messages.ComponentMessage
-import csw.command.client.internal.models.framework.PubSub.{Publish, Subscribe, SubscribeOnly, Unsubscribe}
-import csw.command.client.internal.models.framework.{LifecycleStateChanged, PubSub, SupervisorLifecycleState}
+import csw.command.client.messages.ComponentMessage
+import csw.command.client.models.framework.PubSub.{Publish, Subscribe, SubscribeOnly, Unsubscribe}
+import csw.command.client.models.framework.{LifecycleStateChanged, PubSub, SupervisorLifecycleState}
 import csw.framework.FrameworkTestMocks
 import csw.location.client.ActorSystemFactory
 import csw.params.core.models.Prefix

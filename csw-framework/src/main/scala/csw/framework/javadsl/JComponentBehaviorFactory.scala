@@ -3,7 +3,7 @@ package csw.framework.javadsl
 import akka.actor.typed.javadsl.ActorContext
 import akka.actor.typed.scaladsl
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import csw.command.client.internal.messages.TopLevelActorMessage
+import csw.command.client.messages.TopLevelActorMessage
 import csw.framework.models.{CswContext, JCswContext}
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.alarm.client.internal.JAlarmServiceImpl

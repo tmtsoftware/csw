@@ -7,9 +7,9 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
-import csw.command.client.internal.extensions.AkkaLocationExt.RichAkkaLocation
-import csw.command.client.internal.messages.CommandMessage.{Oneway, Submit}
-import csw.command.client.internal.messages.CommandResponseManagerMessage.Subscribe
+import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
+import csw.command.client.messages.CommandMessage.{Oneway, Submit}
+import csw.command.client.messages.CommandResponseManagerMessage.Subscribe
 import csw.common.components.command.ComponentStateForCommand.{acceptedCmd, cancelCmd, prefix}
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.location.api.models.Connection.AkkaConnection

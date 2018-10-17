@@ -9,12 +9,12 @@ import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.command.client.CommandServiceFactory
-import csw.command.client.internal.extensions.AkkaLocationExt.RichAkkaLocation
-import csw.command.client.internal.messages.CommandMessage.Submit
-import csw.command.client.internal.models.framework.LockingResponse
-import csw.command.client.internal.models.framework.LockingResponses.LockAcquired
-import csw.command.client.internal.models.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
-import csw.command.client.internal.models.matchers.{DemandMatcher, Matcher, MatcherResponse}
+import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
+import csw.command.client.messages.CommandMessage.Submit
+import csw.command.client.models.framework.LockingResponse
+import csw.command.client.models.framework.LockingResponses.LockAcquired
+import csw.command.client.models.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
+import csw.command.client.models.matchers.{DemandMatcher, Matcher, MatcherResponse}
 import csw.common.utils.LockCommandFactory
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.location.api.models.Connection.AkkaConnection

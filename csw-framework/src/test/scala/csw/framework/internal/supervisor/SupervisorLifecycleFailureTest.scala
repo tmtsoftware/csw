@@ -16,19 +16,19 @@ import csw.framework.internal.component.ComponentBehavior
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.{ComponentBehaviorFactory, ComponentHandlers}
 import csw.framework.{FrameworkTestMocks, FrameworkTestSuite}
-import csw.command.client.internal.messages.CommandMessage.Submit
-import csw.command.client.internal.messages.ComponentCommonMessage.{
+import csw.command.client.messages.CommandMessage.Submit
+import csw.command.client.messages.ComponentCommonMessage.{
   ComponentStateSubscription,
   GetSupervisorLifecycleState,
   LifecycleStateSubscription
 }
-import csw.command.client.internal.messages.SupervisorContainerCommonMessages.Restart
+import csw.command.client.messages.SupervisorContainerCommonMessages.Restart
 import csw.params.commands.{CommandName, ControlCommand, Setup}
-import csw.command.client.internal.models.framework.{LifecycleStateChanged, PubSub, SupervisorLifecycleState}
+import csw.command.client.models.framework.{LifecycleStateChanged, PubSub, SupervisorLifecycleState}
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.ObsId
 import csw.params.core.states.{CurrentState, StateName}
-import csw.command.client.internal.messages.{ComponentMessage, ContainerIdleMessage, TopLevelActorMessage}
+import csw.command.client.messages.{ComponentMessage, ContainerIdleMessage, TopLevelActorMessage}
 import csw.logging.internal.LoggingLevels.ERROR
 import csw.logging.internal.LoggingSystem
 import csw.logging.scaladsl.LoggerFactory

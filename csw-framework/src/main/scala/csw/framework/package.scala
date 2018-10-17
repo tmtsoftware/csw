@@ -14,10 +14,10 @@ package csw
  * that intercepts common messages (ex. Shutdown, Restart) or lifecycle messages (ex. GoOffline or GoOnline)
  * sent from external entities to determine the state of the component.
  *
- * Components that are not in the [[csw.command.client.internal.models.framework.SupervisorLifecycleState.Running]] state, do not receive [[csw.params.CommandMessage]].
+ * Components that are not in the [[csw.command.client.models.framework.SupervisorLifecycleState.Running]] state, do not receive [[csw.params.CommandMessage]].
  *
  * When Component is created using this framework, it guarantees that component (HCD/Assembly) is registered with
- * LocationService only when Component moves to [[csw.command.client.internal.models.framework.SupervisorLifecycleState.Running]] state.
+ * LocationService only when Component moves to [[csw.command.client.models.framework.SupervisorLifecycleState.Running]] state.
  * That means, one component can resolve other component only when its in ``Running`` state and ready to accept [[params.CommandMessage]]
  *
  * === Important Actors in Framework ===
@@ -29,9 +29,9 @@ package csw
  *  - [[csw.framework.exceptions.FailureRestart]] : Restart the child actor i.e. kill the current child actor that failed and create a new one in its place
  *  - [[csw.framework.exceptions.FailureStop]] : Stop the child actor permanently
  *
- * Supervisor changes its [[csw.command.client.internal.models.framework.SupervisorLifecycleState]] based on the messages it receives.
- * Decision to handle external messages or not is taken by the supervisor based on its current [[csw.command.client.internal.models.framework.SupervisorLifecycleState]].
- * For complete list of supported messages per [[csw.command.client.internal.models.framework.SupervisorLifecycleState]], see `csw-messages` project.
+ * Supervisor changes its [[csw.command.client.models.framework.SupervisorLifecycleState]] based on the messages it receives.
+ * Decision to handle external messages or not is taken by the supervisor based on its current [[csw.command.client.models.framework.SupervisorLifecycleState]].
+ * For complete list of supported messages per [[csw.command.client.models.framework.SupervisorLifecycleState]], see `csw-messages` project.
  *
  * - [[csw.framework.internal.component.ComponentBehavior]]
  * : Like Supervisor, evey component is associate with this actor which is known as TLA (Top Level Actor)

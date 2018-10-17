@@ -1,4 +1,4 @@
-package csw.command.client.internal.models.framework
+package csw.command.client.models.framework
 import csw.location.api.models.{ComponentType, Connection}
 import csw.params.core.models.Prefix
 import csw.serializable.TMTSerializable

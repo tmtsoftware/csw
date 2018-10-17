@@ -4,7 +4,7 @@ import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.util.Timeout
 import csw.command.api.scaladsl.CommandService
 import csw.command.client.CommandServiceFactory
-import csw.command.client.internal.messages.TopLevelActorMessage
+import csw.command.client.messages.TopLevelActorMessage
 import csw.event.api.scaladsl.EventSubscription
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers

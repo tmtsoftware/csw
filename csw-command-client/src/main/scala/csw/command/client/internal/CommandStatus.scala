@@ -1,5 +1,4 @@
-package csw.command.client.internal.models
-
+package csw.command.client.internal
 import csw.params.commands.CommandResponse.SubmitResponse
 import csw.params.core.models.Id
 

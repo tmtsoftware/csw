@@ -1,7 +1,7 @@
-package csw.command.client.internal.extensions
+package csw.command.client.extensions
 
 import akka.actor.typed.ActorRef
-import csw.command.client.internal.messages.{ComponentMessage, ContainerMessage}
+import csw.command.client.messages.{ComponentMessage, ContainerMessage}
 import csw.location.api.models.AkkaLocation
 
 //TODO: Find a better way for Java Support
@@ -21,7 +21,5 @@ object AkkaLocationExt {
      * @return a typed ActorRef that understands only ContainerMessage
      */
     def containerRef: ActorRef[ContainerMessage] = akkaLocation.typedRef[ContainerMessage]
-
   }
-
 }

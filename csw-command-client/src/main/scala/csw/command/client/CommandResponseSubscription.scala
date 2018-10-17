@@ -4,8 +4,8 @@ import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.adapter._
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.{KillSwitches, Materializer, OverflowStrategy}
-import csw.command.client.internal.messages.CommandResponseManagerMessage
-import csw.command.client.internal.messages.CommandResponseManagerMessage.Subscribe
+import csw.command.client.messages.CommandResponseManagerMessage
+import csw.command.client.messages.CommandResponseManagerMessage.Subscribe
 import csw.params.commands.CommandResponse.SubmitResponse
 import csw.params.core.models.Id
 

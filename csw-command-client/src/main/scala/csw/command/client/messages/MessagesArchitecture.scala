@@ -1,4 +1,4 @@
-package csw.command.client.internal.messages
+package csw.command.client.messages
 
 /**
  *

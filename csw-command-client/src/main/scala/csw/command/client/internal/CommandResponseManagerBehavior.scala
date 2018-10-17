@@ -2,12 +2,11 @@ package csw.command.client.internal
 
 import akka.actor.typed.scaladsl.{ActorContext, MutableBehavior}
 import akka.actor.typed.{ActorRef, Behavior}
-import csw.command.client.internal.messages.CommandResponseManagerMessage
-import csw.command.client.internal.messages.CommandResponseManagerMessage._
-import csw.command.client.internal.models.{CommandCorrelation, CommandResponseManagerState}
+import csw.command.client.messages.CommandResponseManagerMessage
+import csw.command.client.messages.CommandResponseManagerMessage._
+import csw.logging.scaladsl.{Logger, LoggerFactory}
 import csw.params.commands.CommandResponse
 import csw.params.core.models.Id
-import csw.logging.scaladsl.{Logger, LoggerFactory}
 
 /**
  * The Behavior of a Command Response Manager is represented as a mutable behavior. This behavior will be created as an actor.

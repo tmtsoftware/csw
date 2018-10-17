@@ -8,7 +8,7 @@ import akka.stream.javadsl.Source;
 import csw.params.events.Event;
 import csw.params.events.EventName;
 import csw.params.events.SystemEvent;
-import csw.command.client.internal.models.framework.ComponentInfo;
+import csw.command.client.models.framework.ComponentInfo;
 import csw.params.core.models.Prefix;
 import csw.event.client.internal.commons.javawrappers.JEventService;
 

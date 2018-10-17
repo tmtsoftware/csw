@@ -6,30 +6,30 @@ import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors, MutableBehavior, TimerScheduler}
 import akka.actor.typed.{ActorRef, Behavior, PostStop, Signal, SupervisorStrategy, Terminated}
-import csw.command.client.internal.messages.CommandResponseManagerMessage.{Query, Subscribe, Unsubscribe}
-import csw.command.client.internal.messages.ComponentCommonMessage.{
+import csw.command.client.messages.CommandResponseManagerMessage.{Query, Subscribe, Unsubscribe}
+import csw.command.client.messages.ComponentCommonMessage.{
   ComponentStateSubscription,
   GetSupervisorLifecycleState,
   LifecycleStateSubscription
 }
-import csw.command.client.internal.messages.FromComponentLifecycleMessage.Running
-import csw.command.client.internal.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
-import csw.command.client.internal.messages.RunningMessage.Lifecycle
-import csw.command.client.internal.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
-import csw.command.client.internal.messages.SupervisorIdleMessage.InitializeTimeout
-import csw.command.client.internal.messages.SupervisorInternalRunningMessage.{
+import csw.command.client.messages.FromComponentLifecycleMessage.Running
+import csw.command.client.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
+import csw.command.client.messages.RunningMessage.Lifecycle
+import csw.command.client.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
+import csw.command.client.messages.SupervisorIdleMessage.InitializeTimeout
+import csw.command.client.messages.SupervisorInternalRunningMessage.{
   RegistrationFailed,
   RegistrationNotRequired,
   RegistrationSuccess
 }
-import csw.command.client.internal.messages.SupervisorLockMessage.{Lock, Unlock}
-import csw.command.client.internal.messages.SupervisorRestartMessage.{UnRegistrationComplete, UnRegistrationFailed}
-import csw.command.client.internal.messages._
-import csw.command.client.internal.models.framework.LocationServiceUsage.DoNotRegister
-import csw.command.client.internal.models.framework.LockingResponses.{LockExpired, LockExpiringShortly}
-import csw.command.client.internal.models.framework.PubSub.Publish
-import csw.command.client.internal.models.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
-import csw.command.client.internal.models.framework._
+import csw.command.client.messages.SupervisorLockMessage.{Lock, Unlock}
+import csw.command.client.messages.SupervisorRestartMessage.{UnRegistrationComplete, UnRegistrationFailed}
+import csw.command.client.messages._
+import csw.command.client.models.framework.LocationServiceUsage.DoNotRegister
+import csw.command.client.models.framework.LockingResponses.{LockExpired, LockExpiringShortly}
+import csw.command.client.models.framework.PubSub.Publish
+import csw.command.client.models.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
+import csw.command.client.models.framework._
 import csw.framework.commons.CoordinatedShutdownReasons.ShutdownMessageReceivedReason
 import csw.framework.exceptions.{FailureRestart, InitializationFailed}
 import csw.framework.internal.pubsub.PubSubBehaviorFactory

@@ -2,16 +2,16 @@ package csw.framework.internal.component
 
 import akka.actor.typed.scaladsl.{ActorContext, MutableBehavior}
 import akka.actor.typed.{ActorRef, Behavior, PostStop, Signal}
-import csw.command.client.internal.messages.CommandMessage.{Oneway, Submit, Validate}
-import csw.command.client.internal.messages.CommandResponseManagerMessage.AddOrUpdateCommand
-import csw.command.client.internal.messages.FromComponentLifecycleMessage.Running
-import csw.command.client.internal.messages.RunningMessage.Lifecycle
-import csw.command.client.internal.messages.TopLevelActorCommonMessage.{TrackingEventReceived, UnderlyingHookFailed}
-import csw.command.client.internal.messages.TopLevelActorIdleMessage.Initialize
-import csw.command.client.internal.messages._
-import csw.command.client.internal.models.framework.LocationServiceUsage.RegisterAndTrackServices
-import csw.command.client.internal.models.framework.ToComponentLifecycleMessage
-import csw.command.client.internal.models.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
+import csw.command.client.messages.CommandMessage.{Oneway, Submit, Validate}
+import csw.command.client.messages.CommandResponseManagerMessage.AddOrUpdateCommand
+import csw.command.client.messages.FromComponentLifecycleMessage.Running
+import csw.command.client.messages.RunningMessage.Lifecycle
+import csw.command.client.messages.TopLevelActorCommonMessage.{TrackingEventReceived, UnderlyingHookFailed}
+import csw.command.client.messages.TopLevelActorIdleMessage.Initialize
+import csw.command.client.messages._
+import csw.command.client.models.framework.LocationServiceUsage.RegisterAndTrackServices
+import csw.command.client.models.framework.ToComponentLifecycleMessage
+import csw.command.client.models.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.logging.scaladsl.Logger

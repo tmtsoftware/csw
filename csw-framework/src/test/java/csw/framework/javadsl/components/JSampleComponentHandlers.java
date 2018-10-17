@@ -11,7 +11,7 @@ import csw.common.components.framework.SampleComponentState;
 import csw.framework.CurrentStatePublisher;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.models.JCswContext;
-import csw.command.client.internal.messages.TopLevelActorMessage;
+import csw.command.client.messages.TopLevelActorMessage;
 import csw.params.commands.*;
 import csw.location.api.models.TrackingEvent;
 import csw.params.core.models.Id;

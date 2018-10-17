@@ -1,10 +1,10 @@
-package csw.command.client.internal.messages
+package csw.command.client.messages
 
 import acyclic.skipped
 import akka.actor.typed.ActorRef
-import csw.command.client.internal.models.framework.PubSub.SubscriberMessage
-import csw.command.client.internal.models.framework._
-import csw.command.client.internal.models.{CommandCorrelation, CommandResponseManagerState}
+import csw.command.client.internal.{CommandCorrelation, CommandResponseManagerState}
+import csw.command.client.models.framework.PubSub.SubscriberMessage
+import csw.command.client.models.framework._
 import csw.logging.internal.LoggingLevels.Level
 import csw.logging.models.LogMetadata
 import csw.params.commands.ControlCommand

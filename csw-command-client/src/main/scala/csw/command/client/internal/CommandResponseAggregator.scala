@@ -1,5 +1,4 @@
-package csw.command.client.internal.models
-
+package csw.command.client.internal
 import akka.NotUsed
 import akka.stream.Materializer
 import akka.stream.scaladsl.Source

@@ -6,20 +6,15 @@ import akka.stream.scaladsl.{Keep, Sink}
 import akka.testkit
 import com.typesafe.config.ConfigFactory
 import csw.command.client.CommandServiceFactory
-import csw.command.client.internal.extensions.AkkaLocationExt.RichAkkaLocation
-import csw.command.client.internal.messages.ComponentCommonMessage.{GetSupervisorLifecycleState, LifecycleStateSubscription}
-import csw.command.client.internal.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
-import csw.command.client.internal.messages.RunningMessage.Lifecycle
-import csw.command.client.internal.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
-import csw.command.client.internal.models.framework
-import csw.command.client.internal.models.framework.PubSub.Subscribe
-import csw.command.client.internal.models.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
-import csw.command.client.internal.models.framework.{
-  Components,
-  ContainerLifecycleState,
-  LifecycleStateChanged,
-  SupervisorLifecycleState
-}
+import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
+import csw.command.client.messages.ComponentCommonMessage.{GetSupervisorLifecycleState, LifecycleStateSubscription}
+import csw.command.client.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
+import csw.command.client.messages.RunningMessage.Lifecycle
+import csw.command.client.messages.SupervisorContainerCommonMessages.{Restart, Shutdown}
+import csw.command.client.models.framework
+import csw.command.client.models.framework.PubSub.Subscribe
+import csw.command.client.models.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
+import csw.command.client.models.framework.{Components, ContainerLifecycleState, LifecycleStateChanged, SupervisorLifecycleState}
 import csw.common.FrameworkAssertions._
 import csw.common.components.framework.SampleComponentState._
 import csw.event.client.helpers.TestFutureExt.RichFuture

@@ -5,8 +5,8 @@ import akka.actor.typed.scaladsl.adapter._
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.{KillSwitches, Materializer, OverflowStrategy}
 import csw.command.api.CurrentStateSubscription
-import csw.command.client.internal.messages.ComponentCommonMessage.ComponentStateSubscription
-import csw.command.client.internal.models.framework.PubSub.{Subscribe, SubscribeOnly}
+import csw.command.client.messages.ComponentCommonMessage.ComponentStateSubscription
+import csw.command.client.models.framework.PubSub.{Subscribe, SubscribeOnly}
 import csw.params.core.states.{CurrentState, StateName}
 
 /**

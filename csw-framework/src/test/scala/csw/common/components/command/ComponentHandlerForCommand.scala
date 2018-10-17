@@ -8,7 +8,7 @@ import akka.stream.{ActorMaterializer, ThrottleMode}
 import akka.util.Timeout
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
-import csw.command.client.internal.messages.TopLevelActorMessage
+import csw.command.client.messages.TopLevelActorMessage
 import csw.params.commands.CommandIssue.{OtherIssue, WrongPrefixIssue}
 import csw.params.commands.CommandResponse._
 import csw.params.commands._

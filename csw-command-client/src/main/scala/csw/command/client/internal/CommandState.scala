@@ -1,4 +1,4 @@
-package csw.command.client.internal.models
+package csw.command.client.internal
 
 import akka.actor.typed.ActorRef
 import csw.params.commands.CommandResponse.SubmitResponse

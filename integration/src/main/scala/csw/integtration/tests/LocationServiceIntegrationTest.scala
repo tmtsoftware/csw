@@ -6,8 +6,8 @@ import akka.actor.typed.scaladsl.adapter._
 import akka.actor.{typed, ActorSystem, Props, Scheduler}
 import akka.stream.ActorMaterializer
 import akka.util.Timeout
-import csw.command.client.internal.extensions.AkkaLocationExt.RichAkkaLocation
-import csw.command.client.internal.messages.CommandMessage.Submit
+import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
+import csw.command.client.messages.CommandMessage.Submit
 import csw.integtration.apps.TromboneHCD
 import csw.integtration.common.TestFutureExtension.RichFuture
 import csw.location.api.commons.ClusterAwareSettings

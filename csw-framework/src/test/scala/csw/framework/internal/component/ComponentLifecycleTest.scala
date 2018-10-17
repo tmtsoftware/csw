@@ -5,17 +5,17 @@ import akka.actor.typed.{Behavior, PostStop}
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.framework.{ComponentInfos, CurrentStatePublisher, FrameworkTestSuite}
-import csw.command.client.internal.messages.CommandMessage.{Oneway, Submit}
-import csw.command.client.internal.messages.CommandResponseManagerMessage.AddOrUpdateCommand
-import csw.command.client.internal.messages.RunningMessage.Lifecycle
-import csw.command.client.internal.messages.TopLevelActorIdleMessage.Initialize
+import csw.command.client.messages.CommandMessage.{Oneway, Submit}
+import csw.command.client.messages.CommandResponseManagerMessage.AddOrUpdateCommand
+import csw.command.client.messages.RunningMessage.Lifecycle
+import csw.command.client.messages.TopLevelActorIdleMessage.Initialize
 import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandName, Observe, Setup}
-import csw.command.client.internal.models.framework.ToComponentLifecycleMessages._
+import csw.command.client.models.framework.ToComponentLifecycleMessages._
 import csw.location.api.scaladsl.LocationService
 import csw.params.core.generics.KeyType
 import csw.params.core.models.{ObsId, Prefix}
-import csw.command.client.internal.messages.{CommandResponseManagerMessage, FromComponentLifecycleMessage, TopLevelActorMessage}
+import csw.command.client.messages.{CommandResponseManagerMessage, FromComponentLifecycleMessage, TopLevelActorMessage}
 import csw.alarm.api.scaladsl.AlarmService
 import csw.command.client.CommandResponseManager
 import csw.event.api.scaladsl.EventService

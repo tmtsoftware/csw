@@ -1,4 +1,4 @@
-package csw.command.client.internal.models.framework
+package csw.command.client.models.framework
 import csw.serializable.TMTSerializable
 import enumeratum.{Enum, EnumEntry, PlayJsonEnum}
 

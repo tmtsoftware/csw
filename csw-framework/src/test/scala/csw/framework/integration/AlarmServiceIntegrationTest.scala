@@ -6,8 +6,8 @@ import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.alarm.client.internal.commons.AlarmServiceConnection
 import csw.command.client.CommandServiceFactory
-import csw.command.client.internal.extensions.AkkaLocationExt.RichAkkaLocation
-import csw.command.client.internal.models.framework.SupervisorLifecycleState
+import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
+import csw.command.client.models.framework.SupervisorLifecycleState
 import csw.common.FrameworkAssertions.assertThatSupervisorIsRunning
 import csw.common.components.framework.SampleComponentState._
 import csw.event.client.helpers.TestFutureExt.RichFuture

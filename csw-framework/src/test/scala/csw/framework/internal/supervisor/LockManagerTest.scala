@@ -5,11 +5,11 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import csw.params.commands.{CommandName, Setup}
-import csw.command.client.internal.models.framework.LockingResponse
-import csw.command.client.internal.models.framework.LockingResponses._
+import csw.command.client.models.framework.LockingResponse
+import csw.command.client.models.framework.LockingResponses._
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.{ObsId, Prefix}
-import csw.command.client.internal.messages.CommandMessage.Submit
+import csw.command.client.messages.CommandMessage.Submit
 import csw.logging.scaladsl.{Logger, LoggerFactory}
 import csw.params.commands.CommandResponse.SubmitResponse
 import org.mockito.Mockito.when

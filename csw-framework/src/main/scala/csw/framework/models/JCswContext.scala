@@ -1,6 +1,6 @@
 package csw.framework.models
 import csw.framework.CurrentStatePublisher
-import csw.command.client.internal.models.framework.ComponentInfo
+import csw.command.client.models.framework.ComponentInfo
 import csw.alarm.api.javadsl.IAlarmService
 import csw.command.client.CommandResponseManager
 import csw.config.api.javadsl.IConfigClientService

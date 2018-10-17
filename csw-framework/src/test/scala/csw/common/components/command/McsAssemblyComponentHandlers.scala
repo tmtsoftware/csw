@@ -5,7 +5,7 @@ import akka.actor.typed.scaladsl.ActorContext
 import akka.util.Timeout
 import csw.command.api.scaladsl.CommandService
 import csw.command.client.CommandServiceFactory
-import csw.command.client.internal.messages.TopLevelActorMessage
+import csw.command.client.messages.TopLevelActorMessage
 import csw.common.components.command.ComponentStateForCommand.{longRunningCmdCompleted, _}
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers

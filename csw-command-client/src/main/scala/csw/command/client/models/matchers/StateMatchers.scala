@@ -1,4 +1,4 @@
-package csw.command.client.internal.models.matchers
+package csw.command.client.models.matchers
 
 import akka.util.Timeout
 import csw.command.api.StateMatcher

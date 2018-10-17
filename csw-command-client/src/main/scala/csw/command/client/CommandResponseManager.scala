@@ -8,13 +8,8 @@ import akka.actor.typed.scaladsl.AskPattern._
 import akka.actor.{ActorSystem, Scheduler}
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
-import csw.command.client.internal.messages.CommandResponseManagerMessage
-import csw.command.client.internal.messages.CommandResponseManagerMessage.{
-  AddOrUpdateCommand,
-  AddSubCommand,
-  Query,
-  UpdateSubCommand
-}
+import csw.command.client.messages.CommandResponseManagerMessage
+import csw.command.client.messages.CommandResponseManagerMessage.{AddOrUpdateCommand, AddSubCommand, Query, UpdateSubCommand}
 import csw.params.commands.CommandResponse.{QueryResponse, SubmitResponse}
 import csw.params.core.models.Id
 

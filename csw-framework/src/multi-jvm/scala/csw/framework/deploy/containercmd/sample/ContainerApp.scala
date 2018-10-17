@@ -8,10 +8,10 @@ import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
-import csw.command.client.internal.messages.ContainerMessage
-import csw.command.client.internal.models.framework.ContainerLifecycleState
-import csw.command.client.internal.messages.ContainerCommonMessage.GetContainerLifecycleState
-import csw.command.client.internal.messages.SupervisorContainerCommonMessages.Restart
+import csw.command.client.messages.ContainerMessage
+import csw.command.client.models.framework.ContainerLifecycleState
+import csw.command.client.messages.ContainerCommonMessage.GetContainerLifecycleState
+import csw.command.client.messages.SupervisorContainerCommonMessages.Restart
 import csw.location.api.commons.ClusterSettings
 
 import scala.concurrent.Await

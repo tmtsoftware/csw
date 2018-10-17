@@ -1,4 +1,4 @@
-package csw.command.client.internal.models.matchers
+package csw.command.client.models.matchers
 
 import java.util.concurrent.CompletableFuture
 
@@ -7,9 +7,9 @@ import akka.actor.typed.scaladsl.adapter._
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.{KillSwitches, Materializer, OverflowStrategy}
 import csw.command.api.StateMatcher
-import csw.command.client.internal.messages.ComponentCommonMessage.ComponentStateSubscription
-import csw.command.client.internal.models.framework.PubSub.Subscribe
-import csw.command.client.internal.models.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
+import csw.command.client.messages.ComponentCommonMessage.ComponentStateSubscription
+import csw.command.client.models.framework.PubSub.Subscribe
+import csw.command.client.models.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
 import csw.params.core.states.CurrentState
 
 import scala.compat.java8.FutureConverters.FutureOps

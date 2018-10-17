@@ -9,11 +9,11 @@ import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
 import csw.command.api.scaladsl.CommandService
 import csw.command.api.{CurrentStateSubscription, StateMatcher}
-import csw.command.client.internal.extensions.AkkaLocationExt.RichAkkaLocation
-import csw.command.client.internal.messages.CommandMessage.{Oneway, Submit, Validate}
-import csw.command.client.internal.messages.{CommandResponseManagerMessage, ComponentMessage}
-import csw.command.client.internal.models.matchers.Matcher
-import csw.command.client.internal.models.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
+import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
+import csw.command.client.messages.CommandMessage.{Oneway, Submit, Validate}
+import csw.command.client.messages.{CommandResponseManagerMessage, ComponentMessage}
+import csw.command.client.models.matchers.Matcher
+import csw.command.client.models.matchers.MatcherResponses.{MatchCompleted, MatchFailed}
 import csw.location.api.models.AkkaLocation
 import csw.params.commands.CommandResponse._
 import csw.params.commands.ControlCommand

@@ -1,8 +1,8 @@
-package csw.command.client.internal.models.framework
+package csw.command.client.models.framework
 
 import acyclic.skipped
 import akka.actor.typed.ActorRef
-import csw.command.client.internal.messages.ComponentMessage
+import csw.command.client.messages.ComponentMessage
 import csw.serializable.TMTSerializable
 
 /**

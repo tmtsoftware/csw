@@ -8,9 +8,9 @@ import com.persist.JsonOps
 import com.persist.JsonOps.JsonObject
 import com.typesafe.config.ConfigFactory
 import csw.command.client.CommandServiceFactory
-import csw.command.client.internal.extensions.AkkaLocationExt.RichAkkaLocation
-import csw.command.client.internal.messages.SupervisorContainerCommonMessages.Shutdown
-import csw.command.client.internal.models.framework.SupervisorLifecycleState
+import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
+import csw.command.client.messages.SupervisorContainerCommonMessages.Shutdown
+import csw.command.client.models.framework.SupervisorLifecycleState
 import csw.common.FrameworkAssertions._
 import csw.common.components.framework.SampleComponentHandlers
 import csw.common.components.framework.SampleComponentState._

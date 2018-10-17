@@ -5,7 +5,7 @@ import akka.http.scaladsl.Http
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.command.client.CommandServiceFactory
-import csw.command.client.internal.models.framework.ContainerLifecycleState
+import csw.command.client.models.framework.ContainerLifecycleState
 import csw.common.FrameworkAssertions.assertThatContainerIsRunning
 import csw.common.components.framework.SampleComponentState._
 import csw.commons.redis.EmbeddedRedis

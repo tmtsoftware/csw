@@ -2,7 +2,7 @@ package csw.framework.scaladsl
 
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.actor.typed.{ActorRef, Behavior}
-import csw.command.client.internal.messages.{FromComponentLifecycleMessage, TopLevelActorMessage}
+import csw.command.client.messages.{FromComponentLifecycleMessage, TopLevelActorMessage}
 import csw.framework.internal.component.ComponentBehavior
 import csw.framework.models.CswContext
 

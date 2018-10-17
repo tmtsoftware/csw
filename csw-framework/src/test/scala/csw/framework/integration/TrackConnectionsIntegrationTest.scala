@@ -6,9 +6,9 @@ import akka.http.scaladsl.Http
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.command.client.CommandServiceFactory
-import csw.command.client.internal.extensions.AkkaLocationExt.RichAkkaLocation
-import csw.command.client.internal.messages.SupervisorContainerCommonMessages.Shutdown
-import csw.command.client.internal.models.framework.{ContainerLifecycleState, SupervisorLifecycleState}
+import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
+import csw.command.client.messages.SupervisorContainerCommonMessages.Shutdown
+import csw.command.client.models.framework.{ContainerLifecycleState, SupervisorLifecycleState}
 import csw.common.FrameworkAssertions._
 import csw.common.components.framework.SampleComponentState._
 import csw.event.client.helpers.TestFutureExt.RichFuture

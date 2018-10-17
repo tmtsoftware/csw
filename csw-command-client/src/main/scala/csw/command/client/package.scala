@@ -25,9 +25,9 @@ package csw.command
  * Component writers will get handle to CommandResponseManager in their handlers.
  *
  * - [[csw.command.client.internal.CommandResponseManagerBehavior]] maintains two states:
- *  - [[csw.command.client.internal.models.CommandResponseManagerState]]:
- *      It maintains [[csw.params.core.models.Id]] of Commands and their corresponding [[csw.command.client.internal.models.CommandState]].
- *  - [[csw.command.client.internal.models.CommandCorrelation]] :
+ *  - [[csw.command.client.internal.CommandResponseManagerState]]:
+ *      It maintains [[csw.params.core.models.Id]] of Commands and their corresponding [[csw.command.client.internal.CommandState]].
+ *  - [[csw.command.client.internal.CommandCorrelation]] :
  *      It maintains commands [[csw.params.core.models.Id]] correlation between parent to child and child to parent.
  *
  * - [[csw.command.api.scaladsl.CommandService]]

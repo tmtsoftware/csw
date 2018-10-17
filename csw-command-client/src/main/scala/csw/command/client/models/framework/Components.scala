@@ -1,4 +1,4 @@
-package csw.command.client.internal.models.framework
+package csw.command.client.models.framework
 
 import acyclic.skipped
 import csw.serializable.TMTSerializable

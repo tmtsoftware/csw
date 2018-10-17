@@ -6,25 +6,25 @@ import csw.framework.FrameworkTestSuite
 import csw.framework.javadsl.commons.JComponentInfos.{jHcdInfo, jHcdInfoWithInitializeTimeout}
 import csw.params.commands.CommandResponse._
 import csw.params.commands._
-import csw.command.client.internal.models.matchers.DemandMatcher
-import csw.command.client.internal.models.framework.PubSub.Subscribe
-import csw.command.client.internal.models.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
-import csw.command.client.internal.models.framework.{ComponentInfo, LifecycleStateChanged, SupervisorLifecycleState}
+import csw.command.client.models.matchers.DemandMatcher
+import csw.command.client.models.framework.PubSub.Subscribe
+import csw.command.client.models.framework.ToComponentLifecycleMessages.{GoOffline, GoOnline}
+import csw.command.client.models.framework.{ComponentInfo, LifecycleStateChanged, SupervisorLifecycleState}
 import csw.location.api.models.ComponentType.{Assembly, HCD}
 import csw.location.api.models.Connection.AkkaConnection
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.ObsId
 import csw.params.core.states.{CurrentState, DemandState, StateName}
-import csw.command.client.internal.messages.CommandMessage.{Oneway, Submit}
-import csw.command.client.internal.messages.ComponentCommonMessage.{
+import csw.command.client.messages.CommandMessage.{Oneway, Submit}
+import csw.command.client.messages.ComponentCommonMessage.{
   ComponentStateSubscription,
   GetSupervisorLifecycleState,
   LifecycleStateSubscription
 }
-import csw.command.client.internal.messages.ContainerIdleMessage
-import csw.command.client.internal.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
-import csw.command.client.internal.messages.RunningMessage.Lifecycle
-import csw.command.client.internal.messages.SupervisorContainerCommonMessages.Restart
+import csw.command.client.messages.ContainerIdleMessage
+import csw.command.client.messages.FromSupervisorMessage.SupervisorLifecycleStateChanged
+import csw.command.client.messages.RunningMessage.Lifecycle
+import csw.command.client.messages.SupervisorContainerCommonMessages.Restart
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach

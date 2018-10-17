@@ -5,8 +5,8 @@ import akka.util.Timeout
 import csw.admin.server.commons.AdminLogger
 import csw.admin.server.internal.ActorRuntime
 import csw.admin.server.log.exceptions._
-import csw.command.client.internal.extensions.AkkaLocationExt.RichAkkaLocation
-import csw.command.client.internal.messages.{GetComponentLogMetadata, SetComponentLogLevel}
+import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
+import csw.command.client.messages.{GetComponentLogMetadata, SetComponentLogLevel}
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.location.api.models.{AkkaLocation, Connection, Location}
 import csw.location.api.scaladsl.LocationService

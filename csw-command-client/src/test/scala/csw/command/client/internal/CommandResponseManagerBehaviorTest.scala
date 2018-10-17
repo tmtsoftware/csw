@@ -6,12 +6,12 @@ import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestProbe}
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.actor.{typed, ActorSystem}
-import csw.command.client.internal.messages.CommandResponseManagerMessage._
-import csw.command.client.internal.messages.CommandResponseManagerMessage
-import csw.command.client.internal.models.{CommandCorrelation, CommandResponseManagerState}
+import csw.command.client.internal
+import csw.command.client.messages.CommandResponseManagerMessage
+import csw.command.client.messages.CommandResponseManagerMessage._
+import csw.logging.scaladsl.{Logger, LoggerFactory}
 import csw.params.commands.CommandResponse._
 import csw.params.core.models.Id
-import csw.logging.scaladsl.{Logger, LoggerFactory}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
@@ -40,7 +40,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
     commandResponseProbe.expectMessage(Started(runId))
 
     behaviorTestKit.run(GetCommandCorrelation(commandCorrelationProbe.ref))
-    commandCorrelationProbe.expectMessage(CommandCorrelation(Map.empty[Id, Set[Id]], Map.empty[Id, Id]))
+    commandCorrelationProbe.expectMessage(internal.CommandCorrelation(Map.empty[Id, Set[Id]], Map.empty[Id, Id]))
   }
 
   test("should be able to add correlation between parent and child via AddSubCommand") {
