@@ -9,13 +9,14 @@ import csw.location.api.models._
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.location.server.commons.CswCluster
-import csw.location.server.internal.LocationServiceFactory
+import csw.location.server.internal.{LocationServiceFactory, ServerWiring}
 import csw.logging.scaladsl.LoggingSystemFactory
 import csw.params.core.models.Prefix
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
+import scala.util.Try
 
 class DetectComponentRestartTestMultiJvmNode1 extends DetectComponentRestartTest(0, "cluster")
 class DetectComponentRestartTestMultiJvmNode2 extends DetectComponentRestartTest(0, "cluster")
@@ -36,23 +37,23 @@ class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(c
 
     runOn(member1) {
       locationService
-        .register(
-          AkkaRegistration(
-            akkaConnection,
-            Prefix("nfiraos.ncc.trombone"),
-            system.spawnAnonymous(Behavior.empty)
-          )
-        )
+        .register(AkkaRegistration(akkaConnection, Prefix("nfiraos.ncc.trombone"), system.spawnAnonymous(Behavior.empty)))
         .await
+
       enterBarrier("location-registered")
       enterBarrier("location-updated")
 
-      Await.ready(system.whenTerminated, 10.seconds)
+      Await.result(system.whenTerminated, 10.seconds)
 
       val newSystem = startNewSystem()
+      LoggingSystemFactory.start("", "", "", newSystem)
 
       val freshLocationService = mode match {
-        case "http"    => HttpLocationServiceFactory.makeLocalClient(newSystem, ActorMaterializer()(newSystem))
+        case "http" =>
+          Try(ServerWiring.make(newSystem).locationHttpService.start().await) match {
+            case _ => // ignore binding errors
+          }
+          HttpLocationServiceFactory.makeLocalClient(newSystem, ActorMaterializer()(newSystem))
         case "cluster" => LocationServiceFactory.withCluster(CswCluster.withSystem(newSystem))
       }
 
@@ -72,8 +73,8 @@ class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(c
 
     runOn(seed, member2) {
       enterBarrier("location-registered")
-      val testProbe = TestProbe()
-      locationService.subscribe(akkaConnection, testProbe.testActor ! _)
+      val testProbe  = TestProbe()
+      val killSwitch = locationService.subscribe(akkaConnection, testProbe.testActor ! _)
 
       testProbe.expectMsgType[LocationUpdated]
       enterBarrier("location-updated")
@@ -86,6 +87,8 @@ class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(c
       Thread.sleep(2000)
       enterBarrier("member-re-registered")
       testProbe.expectMsgType[LocationUpdated](5.seconds)
+
+      killSwitch.shutdown()
     }
 
     enterBarrier("after-2")

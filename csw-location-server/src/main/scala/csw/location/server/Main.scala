@@ -37,8 +37,7 @@ object Main extends App {
           CoordinatedShutdown.PhaseServiceUnbind,
           "unbind-services"
         ) { () ⇒
-          val hardDeadline = 30.seconds
-          locationBindingF.flatMap(_.terminate(hardDeadline)).map(_ ⇒ Done)
+          locationBindingF.flatMap(_.terminate(30.seconds)).map(_ ⇒ Done)
         }
       }
   }

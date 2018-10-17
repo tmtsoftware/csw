@@ -1,17 +1,16 @@
 package csw.framework.integration
 
 import akka.stream.scaladsl.{Keep, Sink, Source}
-
-import scala.concurrent.ExecutionContext.Implicits.global
 import akka.util.Timeout
-import csw.command.client.internal.CommandServiceImpl
+import csw.command.api.scaladsl.CommandService
 import csw.framework.FrameworkTestWiring
 import csw.params.commands.CommandResponse.{Completed, SubmitResponse}
 import csw.params.commands.{CommandName, CommandResponse, ControlCommand, Setup}
 import csw.params.core.models.{Id, ObsId, Prefix}
-import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import org.scalatest.mockito.MockitoSugar
+import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationLong
 
@@ -58,7 +57,7 @@ class CommandServiceTest extends FunSuite with Matchers with MockitoSugar with B
    * @param assembly the assembly to submit the setups to
    * @return future list of responses
    */
-  private def submitAll(setups: List[Setup], assembly: CommandServiceImpl): Future[List[SubmitResponse]] = {
+  private def submitAll(setups: List[Setup], assembly: CommandService): Future[List[SubmitResponse]] = {
     Source(setups)
       .mapAsync(1)(assembly.submitAndComplete)
       .map { response =>
@@ -88,7 +87,7 @@ class CommandServiceTest extends FunSuite with Matchers with MockitoSugar with B
     //val x = submitAll()
     val setups = List(setupAssembly1, setupAssembly2)
 
-    val mcs: CommandServiceImpl = mock[CommandServiceImpl]
+    val mcs: CommandService = mock[CommandService]
     //when(submitAll(eq(setups), mcs)) //.thenReturn(Future(Completed(Id())))
 
     val rr = submitAll(setups, mcs)

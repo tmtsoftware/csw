@@ -55,7 +55,10 @@ class LocationServiceCompTest(mode: String)
 
   override protected def afterEach(): Unit = locationService.unregisterAll().await
 
-  override protected def afterAll(): Unit = if (mode == "cluster") CoordinatedShutdown(clusterSystem).run(UnknownReason).await
+  override protected def afterAll(): Unit = {
+    if (mode == "cluster") CoordinatedShutdown(clusterSystem).run(UnknownReason).await
+    CoordinatedShutdown(actorSystem).run(UnknownReason).await
+  }
 
   test("should able to register, resolve, list and unregister tcp location") {
     val componentId: ComponentId         = ComponentId("exampleTCPService", ComponentType.Service)
