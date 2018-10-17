@@ -20,12 +20,11 @@ import scala.concurrent.Future
 /**
  * Wrapper API for interacting with Command Response Manager of a component
  *
- * @param commandResponseManagerActor the wrapped actor
  * @param actorSystem actor system for managing stream resources inside
  */
-class CommandResponseManager private[command] (val commandResponseManagerActor: ActorRef[CommandResponseManagerMessage])(
-    implicit val actorSystem: ActorSystem
-) {
+class CommandResponseManager private[command] (
+    private[csw] val commandResponseManagerActor: ActorRef[CommandResponseManagerMessage]
+)(implicit val actorSystem: ActorSystem) {
 
   private implicit val mat: Materializer    = ActorMaterializer()(actorSystem)
   private implicit val scheduler: Scheduler = actorSystem.scheduler
