@@ -16,7 +16,7 @@ import scala.collection.JavaConverters.{iterableAsScalaIterableConverter, seqAsJ
 import scala.compat.java8.FunctionConverters.enrichAsScalaFromConsumer
 import scala.compat.java8.FutureConverters.FutureOps
 
-private[csw] class JCommandServiceImpl(commandService: CommandService) extends ICommandService {
+private[command] class JCommandServiceImpl(commandService: CommandService) extends ICommandService {
 
   override def validate(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[ValidateResponse] =
     commandService.validate(controlCommand)(timeout).toJava.toCompletableFuture

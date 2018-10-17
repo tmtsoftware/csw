@@ -76,7 +76,7 @@ sealed trait SequenceCommand extends Command { self: ParameterSetType[_] ⇒
 /**
  * Marker trait for control parameter sets which i applicable to Assembly and HCD type of components
  */
-sealed trait ControlCommand extends Command { self: ParameterSetType[_] ⇒
+sealed trait ControlCommand extends SequenceCommand { self: ParameterSetType[_] ⇒
 }
 
 /**
@@ -89,7 +89,6 @@ case class Setup private (
     maybeObsId: Option[ObsId],
     paramSet: Set[Parameter[_]]
 ) extends ParameterSetType[Setup]
-    with SequenceCommand
     with ControlCommand {
 
   /**
@@ -159,7 +158,6 @@ case class Observe private (
     maybeObsId: Option[ObsId],
     paramSet: Set[Parameter[_]]
 ) extends ParameterSetType[Observe]
-    with SequenceCommand
     with ControlCommand {
 
   /**

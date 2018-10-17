@@ -8,7 +8,7 @@ import csw.params.core.models.Id
  * @param parentToChildren a map of parent command to all children command
  * @param childToParent a map of a child command to its parent command
  */
-private[csw] case class CommandCorrelation(parentToChildren: Map[Id, Set[Id]], childToParent: Map[Id, Id]) {
+private[client] case class CommandCorrelation(parentToChildren: Map[Id, Set[Id]], childToParent: Map[Id, Id]) {
 
   /**
    * Add a new command relation

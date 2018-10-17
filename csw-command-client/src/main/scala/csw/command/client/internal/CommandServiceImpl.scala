@@ -22,7 +22,7 @@ import csw.params.core.states.{CurrentState, StateName}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-private[csw] class CommandServiceImpl(componentLocation: AkkaLocation)(implicit val actorSystem: ActorSystem[_])
+private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(implicit val actorSystem: ActorSystem[_])
     extends CommandService {
 
   private implicit val ec: ExecutionContext = actorSystem.executionContext

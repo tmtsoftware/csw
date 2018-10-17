@@ -16,7 +16,7 @@ import csw.params.core.states.{CurrentState, StateName}
  * @param callback the action to perform on each received element
  * @param mat the materializer to materialize the underlying stream
  */
-private[csw] class CurrentStateSubscriptionImpl(
+private[internal] class CurrentStateSubscriptionImpl(
     publisher: ActorRef[ComponentStateSubscription],
     names: Option[Set[StateName]],
     callback: CurrentState ⇒ Unit

@@ -8,7 +8,7 @@ import csw.params.core.models.Id
  * @param runId command identifier as a RunId
  * @param currentCmdStatus current command response
  */
-private[csw] case class CommandStatus(runId: Id, currentCmdStatus: SubmitResponse) {
+private[internal] case class CommandStatus(runId: Id, currentCmdStatus: SubmitResponse) {
 
   /**
    * Create a new CommandStatus with provided command response
