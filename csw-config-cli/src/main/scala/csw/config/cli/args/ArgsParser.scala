@@ -1,4 +1,4 @@
-package csw.config.cli
+package csw.config.cli.args
 
 import java.nio.file.Paths
 import java.time.Instant
@@ -205,6 +205,10 @@ class ArgsParser(name: String) {
       } text "output file path"
     )
 
+    opt[String]("locationHost") action { (x, c) =>
+      c.copy(locationHost = x)
+    } text "Optional: host address of machine where location server is running. Default is localhost"
+
     help("help")
 
     version("version")
@@ -212,7 +216,22 @@ class ArgsParser(name: String) {
     checkConfig { c =>
       if (c.op.isEmpty)
         failure(
-          "Please specify at least one command {create | update | get | delete | list | history | setActiveVersion | resetActiveVersion | getActiveVersion | getActiveByTime | getMetadata | exists | getActive}"
+          """
+            |Please specify one of the following command with their corresponding options:
+            | - create
+            | - update
+            | - get
+            | - delete
+            | - list
+            | - history
+            | - setActiveVersion
+            | - resetActiveVersion
+            | - getActiveVersion
+            | - getActiveByTime
+            | - getMetadata
+            | - exists
+            | - getActive
+          """.stripMargin
         )
       else
         success

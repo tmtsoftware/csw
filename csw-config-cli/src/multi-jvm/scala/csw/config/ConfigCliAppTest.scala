@@ -6,7 +6,7 @@ import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
 import csw.config.api.models.ConfigData
-import csw.config.cli.ClientCliWiring
+import csw.config.cli.wiring.Wiring
 import csw.config.client.internal.ActorRuntime
 import csw.config.client.scaladsl.ConfigClientFactory
 import csw.config.helpers.TwoClientsAndServer
@@ -65,7 +65,7 @@ class ConfigCliAppTest(ignore: Int)
       implicit val system: ActorSystem    = ActorSystem()
       implicit val mat: ActorMaterializer = ActorMaterializer()
 
-      def cliApp() = ClientCliWiring.noPrinting(system, HttpLocationServiceFactory.makeLocalClient).cliApp
+      def cliApp() = Wiring.noPrinting(HttpLocationServiceFactory.makeLocalClient).cliApp
 
       cliApp().start("csw-config-cli", Array("create", repoPath1, "-i", inputFilePath, "-c", comment))
       enterBarrier("client1-create")

@@ -1,4 +1,5 @@
 package csw.config.cli
+import csw.config.cli.args.{ArgsParser, Options}
 
 /**
  * Application object allowing program execution from command line.

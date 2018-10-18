@@ -1,5 +1,4 @@
-package csw.config.cli
-
+package csw.config.cli.args
 import java.nio.file.Path
 import java.time.Instant
 
@@ -15,6 +14,7 @@ import java.time.Instant
  * @param latest Optional: Get the latest file.
  * @param pattern Optional: List all files whose path matches the given pattern.
  * @param normal Optional: If the file is normal.
+ * @param locationHost Optional: Host address of machine where location server is running.
  */
 case class Options(
     op: String = "",
@@ -30,5 +30,6 @@ case class Options(
     comment: Option[String] = None,
     latest: Boolean = false,
     pattern: Option[String] = None,
-    normal: Boolean = false
+    normal: Boolean = false,
+    locationHost: String = "localhost"
 )

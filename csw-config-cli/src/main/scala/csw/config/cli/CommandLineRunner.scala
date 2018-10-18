@@ -5,6 +5,7 @@ import java.nio.file.{Files, Path}
 import csw.config.api.exceptions.FileNotFound
 import csw.config.api.models._
 import csw.config.api.scaladsl.ConfigService
+import csw.config.cli.args.Options
 import csw.config.client.internal.ActorRuntime
 
 import scala.concurrent.duration.Duration

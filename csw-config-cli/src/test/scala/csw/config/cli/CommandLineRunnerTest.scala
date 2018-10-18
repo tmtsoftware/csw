@@ -7,6 +7,8 @@ import akka.actor.ActorSystem
 import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.stream.ActorMaterializer
 import csw.config.api.models.ConfigId
+import csw.config.cli.args.{ArgsParser, Options}
+import csw.config.cli.wiring.Wiring
 import csw.config.commons.TestFutureExtension.RichFuture
 import csw.config.commons.{ArgsUtil, TestFileUtils}
 import csw.config.server.ServerWiring
@@ -28,7 +30,7 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
   private val clientSystem: ActorSystem    = ActorSystem("config-cli")
   private val clientMat: ActorMaterializer = ActorMaterializer()(clientSystem)
   private val clientLocationService        = HttpLocationServiceFactory.makeLocalClient(clientSystem, clientMat)
-  private val clientWiring                 = ClientCliWiring.noPrinting(clientSystem, clientLocationService)
+  private val clientWiring                 = Wiring.noPrinting(clientLocationService)
   import clientWiring.commandLineRunner
 
   private val testFileUtils = new TestFileUtils(serverWiring.settings)

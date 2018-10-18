@@ -16,10 +16,10 @@ private[csw] class ServerWiring {
   lazy val config: Config = ConfigFactory.load()
   lazy val settings       = new Settings(config)
 
-  lazy val actorSystem: ActorSystem = ActorSystem("config-server")
-  lazy val actorRuntime             = new ActorRuntime(actorSystem, settings)
-  lazy val annexFileRepo            = new AnnexFileRepo(actorRuntime.blockingIoDispatcher)
-  lazy val svnRepo                  = new SvnRepo(settings, actorRuntime.blockingIoDispatcher)
+  lazy val actorSystem   = ActorSystem("config-server")
+  lazy val actorRuntime  = new ActorRuntime(actorSystem, settings)
+  lazy val annexFileRepo = new AnnexFileRepo(actorRuntime.blockingIoDispatcher)
+  lazy val svnRepo       = new SvnRepo(settings, actorRuntime.blockingIoDispatcher)
 
   lazy val annexFileService             = new AnnexFileService(settings, annexFileRepo, actorRuntime)
   lazy val configService: ConfigService = new SvnConfigService(settings, actorRuntime, svnRepo, annexFileService)

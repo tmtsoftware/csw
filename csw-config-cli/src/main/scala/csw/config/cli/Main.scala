@@ -1,35 +1,33 @@
 package csw.config.cli
 
-import akka.actor.ActorSystem
-import csw.services.BuildInfo
+import akka.http.scaladsl.Http
+import csw.config.cli.args.{ArgsParser, Options}
 import csw.config.cli.commons.CoordinatedShutdownReasons.ApplicationFinishedReason
+import csw.config.cli.wiring.Wiring
 import csw.location.api.commons.ClusterAwareSettings
+import csw.location.client.utils.LocationServerStatus
 import csw.logging.scaladsl.LoggingSystemFactory
+import csw.services.BuildInfo
 
 // $COVERAGE-OFF$
 object Main extends App {
   private val name = BuildInfo.name
 
-  if (ClusterAwareSettings.seedNodes.isEmpty) {
-    println(
-      "clusterSeeds setting is not specified either as env variable or system property. Please check online documentation for this set-up."
-    )
-  } else {
-    new ArgsParser(name).parse(args) match {
-      case None          ⇒
-      case Some(options) ⇒ run(options)
-    }
-  }
+  new ArgsParser(name).parse(args).foreach(run)
 
   private def run(options: Options): Unit = {
-    val actorSystem = ActorSystem("config-cli")
+    LocationServerStatus.requireUp(options.locationHost)
+
+    val wiring = Wiring.make(options.locationHost)
+    import wiring._
     LoggingSystemFactory.start(name, BuildInfo.version, ClusterAwareSettings.hostname, actorSystem)
 
-    val wiring = new ClientCliWiring(actorSystem)
     try {
-      wiring.cliApp.start(options)
+      cliApp.start(options)
     } finally {
-      wiring.actorRuntime.shutdown(ApplicationFinishedReason)
+      Http(actorSystem)
+        .shutdownAllConnectionPools()
+        .foreach(_ => actorRuntime.shutdown(ApplicationFinishedReason))(actorRuntime.ec)
     }
   }
 }

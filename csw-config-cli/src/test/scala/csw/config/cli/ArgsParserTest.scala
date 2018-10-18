@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream
 import java.nio.file.Paths
 import java.time.Instant
 
+import csw.config.cli.args.{ArgsParser, Options}
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.scalatest.{BeforeAndAfterEach, FunSuite, Matchers}
 
@@ -33,7 +34,7 @@ class ArgsParserTest extends FunSuite with Matchers with BeforeAndAfterEach {
   def silentParse(args: Array[String]): Option[Options] =
     Console.withOut(outCapture) {
       Console.withErr(errCapture) {
-        new ArgsParser("csw-config-cli").parser.parse(args, Options())
+        new ArgsParser("csw-config-cli").parse(args)
       }
     }
 
@@ -53,14 +54,16 @@ class ArgsParserTest extends FunSuite with Matchers with BeforeAndAfterEach {
     val args               = Array("create", relativeRepoPath, "-i", inputFilePath, "--annex", "-c", comment)
     val x: Option[Options] = silentParse(args)
     x should contain(
-      Options("create",
-              Some(Paths.get(relativeRepoPath)),
-              Some(Paths.get(inputFilePath)),
-              None,
-              None,
-              None,
-              annex = true,
-              comment = Some(comment))
+      Options(
+        "create",
+        Some(Paths.get(relativeRepoPath)),
+        Some(Paths.get(inputFilePath)),
+        None,
+        None,
+        None,
+        annex = true,
+        comment = Some(comment)
+      )
     )
   }
 
@@ -68,13 +71,15 @@ class ArgsParserTest extends FunSuite with Matchers with BeforeAndAfterEach {
     val args               = Array("create", relativeRepoPath, "-i", inputFilePath, "-c", comment)
     val x: Option[Options] = silentParse(args)
     x should contain(
-      Options("create",
-              Some(Paths.get(relativeRepoPath)),
-              Some(Paths.get(inputFilePath)),
-              None,
-              None,
-              None,
-              comment = Some(comment))
+      Options(
+        "create",
+        Some(Paths.get(relativeRepoPath)),
+        Some(Paths.get(inputFilePath)),
+        None,
+        None,
+        None,
+        comment = Some(comment)
+      )
     )
   }
 
@@ -88,13 +93,15 @@ class ArgsParserTest extends FunSuite with Matchers with BeforeAndAfterEach {
     val args               = Array("update", relativeRepoPath, "-i", inputFilePath, "-c", comment)
     val x: Option[Options] = silentParse(args)
     x should contain(
-      Options("update",
-              Some(Paths.get(relativeRepoPath)),
-              Some(Paths.get(inputFilePath)),
-              None,
-              None,
-              None,
-              comment = Some(comment))
+      Options(
+        "update",
+        Some(Paths.get(relativeRepoPath)),
+        Some(Paths.get(inputFilePath)),
+        None,
+        None,
+        None,
+        comment = Some(comment)
+      )
     )
   }
 
@@ -176,11 +183,13 @@ class ArgsParserTest extends FunSuite with Matchers with BeforeAndAfterEach {
     val args               = Array("history", relativeRepoPath, "--from", date, "--to", date, "--max", maxFileVersions.toString)
     val x: Option[Options] = silentParse(args)
     x should contain(
-      Options("history",
-              Some(Paths.get(relativeRepoPath)),
-              fromDate = Instant.parse(date),
-              toDate = Instant.parse(date),
-              maxFileVersions = maxFileVersions)
+      Options(
+        "history",
+        Some(Paths.get(relativeRepoPath)),
+        fromDate = Instant.parse(date),
+        toDate = Instant.parse(date),
+        maxFileVersions = maxFileVersions
+      )
     )
   }
 
@@ -232,12 +241,14 @@ class ArgsParserTest extends FunSuite with Matchers with BeforeAndAfterEach {
     val args               = Array("getActiveByTime", relativeRepoPath, "--date", date, "-o", outputFilePath)
     val x: Option[Options] = silentParse(args)
     x should contain(
-      Options("getActiveByTime",
-              Some(Paths.get(relativeRepoPath)),
-              None,
-              Some(Paths.get(outputFilePath)),
-              None,
-              Some(Instant.parse(date)))
+      Options(
+        "getActiveByTime",
+        Some(Paths.get(relativeRepoPath)),
+        None,
+        Some(Paths.get(outputFilePath)),
+        None,
+        Some(Instant.parse(date))
+      )
     )
   }
 
@@ -252,11 +263,13 @@ class ArgsParserTest extends FunSuite with Matchers with BeforeAndAfterEach {
       Array("historyActive", relativeRepoPath, "--from", date, "--to", date, "--max", maxFileVersions.toString)
     val x: Option[Options] = silentParse(args)
     x should contain(
-      Options("historyActive",
-              Some(Paths.get(relativeRepoPath)),
-              fromDate = Instant.parse(date),
-              toDate = Instant.parse(date),
-              maxFileVersions = maxFileVersions)
+      Options(
+        "historyActive",
+        Some(Paths.get(relativeRepoPath)),
+        fromDate = Instant.parse(date),
+        toDate = Instant.parse(date),
+        maxFileVersions = maxFileVersions
+      )
     )
   }
 
@@ -280,6 +293,12 @@ class ArgsParserTest extends FunSuite with Matchers with BeforeAndAfterEach {
     val args               = Array("getMetadata")
     val x: Option[Options] = silentParse(args)
     x should contain(Options("getMetadata", None, None, None, None, None))
+  }
+
+  test("test getMetadata with locationHost") {
+    val args               = Array("getMetadata", "--locationHost", "location.server")
+    val x: Option[Options] = silentParse(args)
+    x should contain(Options(op = "getMetadata", locationHost = "location.server"))
   }
 
   test("test exists with no sub-options") {
