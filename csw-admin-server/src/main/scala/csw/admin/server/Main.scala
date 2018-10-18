@@ -3,7 +3,7 @@ package csw.admin.server
 import akka.Done
 import akka.actor.CoordinatedShutdown
 import csw.admin.server.cli.{ArgsParser, Options}
-import csw.admin.server.internal.AdminWiring
+import csw.admin.server.wiring.AdminWiring
 import csw.location.client.utils.LocationServerStatus
 import csw.services.BuildInfo
 

@@ -8,7 +8,7 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpMethods, HttpRequest, StatusCodes, Uri}
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import com.typesafe.config.ConfigFactory
-import csw.admin.server.internal.AdminWiring
+import csw.admin.server.wiring.AdminWiring
 import csw.admin.server.log.http.HttpSupport
 import csw.commons.http.{ErrorMessage, ErrorResponse}
 import csw.config.server.commons.{ConfigServiceConnection, TestFileUtils}

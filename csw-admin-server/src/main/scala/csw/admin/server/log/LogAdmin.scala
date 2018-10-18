@@ -3,7 +3,7 @@ package csw.admin.server.log
 import akka.actor.typed.scaladsl.AskPattern._
 import akka.util.Timeout
 import csw.admin.server.commons.AdminLogger
-import csw.admin.server.internal.ActorRuntime
+import csw.admin.server.wiring.ActorRuntime
 import csw.admin.server.log.exceptions._
 import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.client.messages.{GetComponentLogMetadata, SetComponentLogLevel}

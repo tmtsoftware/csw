@@ -5,7 +5,7 @@ import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.scaladsl.adapter._
 import akka.actor.typed.{ActorRef, ActorSystem}
 import com.typesafe.config.ConfigFactory
-import csw.admin.server.internal.AdminWiring
+import csw.admin.server.wiring.AdminWiring
 import csw.command.client.messages.CommandMessage.Oneway
 import csw.command.client.messages.ContainerCommonMessage.GetComponents
 import csw.command.client.messages.ContainerMessage

@@ -1,4 +1,4 @@
-package csw.admin.server.internal
+package csw.admin.server.wiring
 
 import com.typesafe.config.Config
 

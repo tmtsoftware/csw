@@ -1,4 +1,4 @@
-package csw.admin.server.internal
+package csw.admin.server.wiring
 
 import akka.Done
 import akka.actor.CoordinatedShutdown.Reason
