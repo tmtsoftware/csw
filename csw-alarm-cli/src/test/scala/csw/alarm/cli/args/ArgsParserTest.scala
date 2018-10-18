@@ -37,13 +37,14 @@ class ArgsParserTest extends FunSuite with Matchers {
   }
 
   test("parse init command with all options") {
-    val options = Array("init", "/a/b/c", "--local", "--reset")
+    val options = Array("init", "/a/b/c", "--local", "--reset", "--locationHost", "location.server")
     silentParse(options) should contain(
       Options(
         cmd = "init",
         filePath = Some(Paths.get("/a/b/c")),
         isLocal = true,
-        reset = true
+        reset = true,
+        locationHost = "location.server"
       )
     )
   }

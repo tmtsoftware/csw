@@ -7,7 +7,8 @@ import csw.event.client.EventServiceFactory
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 
-class Wiring(actorSystem: ActorSystem) {
+private[event] class Wiring {
+  lazy val actorSystem  = ActorSystem("event-cli")
   lazy val actorRuntime = new ActorRuntime(actorSystem)
   import actorRuntime._
   lazy val locationService: LocationService = HttpLocationServiceFactory.makeRemoteClient
@@ -18,9 +19,13 @@ class Wiring(actorSystem: ActorSystem) {
 }
 
 object Wiring {
-  private[event] def make(_actorSystem: ActorSystem, _locationService: LocationService, _printLine: Any ⇒ Unit): Wiring =
-    new Wiring(_actorSystem) {
-      override lazy val locationService: LocationService = _locationService
-      override lazy val printLine: Any ⇒ Unit            = _printLine
+
+  private[event] def make(locationHost: String = "localhost", _printLine: Any ⇒ Unit = println): Wiring =
+    new Wiring {
+      override lazy val locationService: LocationService =
+        HttpLocationServiceFactory.make(locationHost)(actorSystem, actorRuntime.mat)
+
+      override lazy val printLine: Any ⇒ Unit = _printLine
     }
+
 }

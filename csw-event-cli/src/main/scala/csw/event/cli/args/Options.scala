@@ -19,7 +19,8 @@ case class Options(
     printId: Boolean = false,
     printUnits: Boolean = false,
     maybeInterval: Option[FiniteDuration] = None,
-    period: FiniteDuration = (Int.MaxValue / 1000).seconds
+    period: FiniteDuration = (Int.MaxValue / 1000).seconds,
+    locationHost: String = "localhost"
 ) {
   def isJsonOut: Boolean                 = out == "json"
   def isOnelineOut: Boolean              = out == "oneline"

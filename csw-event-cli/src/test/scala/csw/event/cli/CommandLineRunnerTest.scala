@@ -36,6 +36,7 @@ class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Ev
   }
 
   import cliWiring._
+  import actorRuntime._
 
   // DEOPSCSW-364: [Event Cli] Inspect command
   test("should able to inspect events containing multiple parameters including recursive structs") {

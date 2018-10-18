@@ -44,6 +44,10 @@ class ArgsParser(name: String) {
         units
       )
 
+    opt[String]("locationHost") action { (x, c) =>
+      c.copy(locationHost = x)
+    } text "Optional: host address of machine where location server is running. Default is localhost"
+
     help("help")
 
     version("version")
