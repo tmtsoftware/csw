@@ -1,9 +1,8 @@
-package csw.location.agent.utils
+package csw.location.agent.args
 
 import java.io.File
 
 import csw.services.BuildInfo
-import csw.location.agent.models.Options
 import scopt.OptionParser
 
 /**
@@ -18,11 +17,8 @@ class ArgsParser(name: String) {
       val allValid = services.forall { service =>
         !service.contains("-") && service.trim == service
       }
-      if (allValid) {
-        success
-      } else {
-        failure("Service name cannot have '-' or leading/trailing spaces")
-      }
+      if (allValid) success
+      else failure("Service name cannot have '-' or leading/trailing spaces")
     }
 
     opt[Seq[String]]("name")
@@ -53,6 +49,10 @@ class ArgsParser(name: String) {
     opt[Unit]("no-exit") action { (_, c) =>
       c.copy(noExit = true)
     } text "for testing: prevents application from exiting after running command"
+
+    opt[String]("locationHost") action { (x, c) =>
+      c.copy(locationHost = x)
+    } text "Optional: host address of machine where location server is running. Default is localhost"
 
     help("help")
     version("version")

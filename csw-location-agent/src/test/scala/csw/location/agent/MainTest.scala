@@ -52,8 +52,7 @@ class MainTest extends HTTPLocationService with Eventually {
   }
 
   private def testWith(args: Array[String], name: String, port: Int) = {
-    val locationAgentApp = new Main(false)
-    val process          = locationAgentApp.start(args).get
+    val process = Main.start(args).get
 
     val connection       = TcpConnection(ComponentId(name, ComponentType.Service))
     val resolvedLocation = locationService.resolve(connection, 5.seconds).await.get

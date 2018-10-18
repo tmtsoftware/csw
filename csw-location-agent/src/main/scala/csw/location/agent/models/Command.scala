@@ -1,6 +1,7 @@
 package csw.location.agent.models
 
 import com.typesafe.config.Config
+import csw.location.agent.args.Options
 import csw.location.agent.utils.{OptionsHandler, Utils}
 
 /**
@@ -11,12 +12,7 @@ import csw.location.agent.utils.{OptionsHandler, Utils}
  * @param delay Number of milliseconds
  * @param noExit prevents application from exiting after running the command
  */
-case class Command(
-    commandText: String,
-    port: Int,
-    delay: Int,
-    noExit: Boolean
-)
+case class Command(commandText: String, port: Int, delay: Int, noExit: Boolean)
 
 object Command {
   val defaultDelay = 1000

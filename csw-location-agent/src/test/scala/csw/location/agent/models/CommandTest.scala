@@ -3,6 +3,7 @@ package csw.location.agent.models
 import java.io.File
 import java.nio.file.Paths
 
+import csw.location.agent.args.Options
 import org.scalatest.{FunSuite, Matchers}
 
 class CommandTest extends FunSuite with Matchers {
@@ -18,7 +19,7 @@ class CommandTest extends FunSuite with Matchers {
   }
 
   test("testParse with options should return executable command") {
-    val opt        = Options(List("Alarm, Event, Telemetry"), Some("ls"), Some(8080), None, Some(9999), true)
+    val opt        = Options(List("Alarm, Event, Telemetry"), Some("ls"), Some(8080), None, Some(9999), noExit = true)
     val c: Command = Command.parse(opt)
 
     c.commandText shouldBe "ls"

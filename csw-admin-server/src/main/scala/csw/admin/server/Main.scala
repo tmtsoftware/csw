@@ -4,7 +4,6 @@ import akka.Done
 import akka.actor.CoordinatedShutdown
 import csw.admin.server.cli.{ArgsParser, Options}
 import csw.admin.server.internal.AdminWiring
-import csw.location.client.ActorSystemFactory
 import csw.location.client.utils.LocationServerStatus
 import csw.services.BuildInfo
 

@@ -1,8 +1,7 @@
-package csw.location.agent.utils
+package csw.location.agent.args
 
 import java.io.ByteArrayOutputStream
 
-import csw.location.agent.models.Options
 import org.scalatest.{BeforeAndAfterEach, FunSuite, Matchers}
 
 class ArgsParserTest extends FunSuite with Matchers with BeforeAndAfterEach {
@@ -29,7 +28,7 @@ class ArgsParserTest extends FunSuite with Matchers with BeforeAndAfterEach {
     val args     = Array("--name", services, "--port", port.toString, "--command", "sleep 5")
 
     val x: Option[Options] = silentParse(args)
-    x should contain(Options(List("redis", "alarm", "watchdog"), Some("sleep 5"), Some(port), None, None, false))
+    x should contain(Options(List("redis", "alarm", "watchdog"), Some("sleep 5"), Some(port), None, None))
   }
 
   test("test parser with invalid service name combinations") {
@@ -47,7 +46,7 @@ class ArgsParserTest extends FunSuite with Matchers with BeforeAndAfterEach {
     val args               = Array[String]("--name", "myService")
     val x: Option[Options] = silentParse(args)
 
-    x should contain(new Options(List("myService"), None, None, None, None, false))
+    x should contain(Options(List("myService"), None, None, None, None))
   }
 
   test("test parser without --name option, should error out") {

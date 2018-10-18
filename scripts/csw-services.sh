@@ -208,7 +208,7 @@ function enableAllServicesForRunning {
 }
 
 function start_services {
-    if [[ "$shouldStartSeed" = true ]]; then start_seed ; fi
+    if [[ "$shouldStartSeed" = true ]]; then start_seed ; sleep 2 ; fi
     if [[ "$shouldStartConfig" = true ]]; then start_config ; fi
     if [[ "$shouldStartEvent" = true ]]; then start_event; fi
     if [[ "$shouldStartAlarm" = true ]]; then start_alarm; fi

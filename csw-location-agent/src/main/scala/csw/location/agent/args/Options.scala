@@ -1,5 +1,4 @@
-package csw.location.agent.models
-
+package csw.location.agent.args
 import java.io.File
 
 /**
@@ -19,5 +18,6 @@ case class Options(
     port: Option[Int] = None,
     appConfigFile: Option[File] = None,
     delay: Option[Int] = None,
-    noExit: Boolean = false
+    noExit: Boolean = false,
+    locationHost: String = "localhost"
 )
