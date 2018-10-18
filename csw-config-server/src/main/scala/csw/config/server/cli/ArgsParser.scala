@@ -18,6 +18,10 @@ class ArgsParser(name: String) {
       c.copy(port = Some(x))
     } text "http port at which service will be run, if not specified value from config file will be used"
 
+    opt[String]("locationHost") action { (x, c) =>
+      c.copy(locationHost = x)
+    } text "Optional: host address of machine where location server is running. Default is localhost"
+
     help("help")
 
     version("version")

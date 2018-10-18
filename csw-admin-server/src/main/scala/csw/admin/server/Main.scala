@@ -22,8 +22,7 @@ object Main extends App {
     case Options(maybeAdminPort, locationHost) =>
       LocationServerStatus.requireUp(locationHost)
 
-      val actorSystem = ActorSystemFactory.remote("csw-admin-server")
-      val wiring      = AdminWiring.make(actorSystem, maybeAdminPort, locationHost)
+      val wiring = AdminWiring.make(maybeAdminPort, locationHost)
       import wiring._
       import actorRuntime._
       startLogging(name)

@@ -36,7 +36,7 @@ class MainTest extends HTTPLocationService {
 
   test("should not start HTTP server if repo does not exist") {
     val actualException = intercept[Exception] {
-      new Main().start(Array.empty).get
+      Main.start(Array.empty).get
     }
 
     actualException.getCause shouldBe a[SVNException]
@@ -45,7 +45,7 @@ class MainTest extends HTTPLocationService {
   }
 
   test("should init svn repo and register with location service if --initRepo option is provided") {
-    val httpService = new Main().start(Array("--initRepo")).get
+    val httpService = Main.start(Array("--initRepo")).get
 
     try {
       val configServiceLocation = locationService.resolve(ConfigServiceConnection.value, 5.seconds).await.get
@@ -65,10 +65,10 @@ class MainTest extends HTTPLocationService {
   test("should not initialize svn repo if --initRepo option is not provided and should use existing repo if available") {
 
     // temporary start a server to create a repo and then shutdown the server
-    val tmpHttpService = new Main().start(Array("--initRepo")).get
+    val tmpHttpService = Main.start(Array("--initRepo")).get
     tmpHttpService.shutdown(UnknownReason).await
 
-    val httpService = new Main().start(Array.empty).get
+    val httpService = Main.start(Array.empty).get
 
     try {
       val configServiceLocation = locationService.resolve(ConfigServiceConnection.value, 5.seconds).await.get

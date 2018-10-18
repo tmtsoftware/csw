@@ -8,10 +8,11 @@ import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 
 // $COVERAGE-OFF$
-private[admin] class AdminWiring(actorSystem: ActorSystem) {
-  lazy val config: Config = ConfigFactory.load()
-  lazy val settings       = new Settings(config)
-  lazy val actorRuntime   = new ActorRuntime(actorSystem)
+private[admin] class AdminWiring {
+  lazy val config: Config           = ConfigFactory.load()
+  lazy val settings                 = new Settings(config)
+  lazy val actorSystem: ActorSystem = ActorSystem("admin-server")
+  lazy val actorRuntime             = new ActorRuntime(actorSystem)
 
   lazy val locationService: LocationService   = HttpLocationServiceFactory.makeLocalClient(actorSystem, actorRuntime.mat)
   lazy val logAdmin: LogAdmin                 = new LogAdmin(locationService, actorRuntime)
@@ -22,8 +23,8 @@ private[admin] class AdminWiring(actorSystem: ActorSystem) {
 
 private[admin] object AdminWiring {
 
-  def make(actorSystem: ActorSystem, maybeAdminPort: Option[Int], locationHost: String = "localhost"): AdminWiring =
-    new AdminWiring(actorSystem) {
+  def make(maybeAdminPort: Option[Int], locationHost: String = "localhost"): AdminWiring =
+    new AdminWiring {
       override lazy val locationService: LocationService =
         HttpLocationServiceFactory.make(locationHost)(actorSystem, actorRuntime.mat)
 

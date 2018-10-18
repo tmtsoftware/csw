@@ -48,7 +48,7 @@ object AppLogger extends LoggerFactory("app")
 
 object DemoApp extends App {
 
-  val adminWiring: AdminWiring = new AdminWiring(ActorSystemFactory.remote())
+  val adminWiring: AdminWiring = new AdminWiring()
 
   val frameworkSystem = ActorSystemFactory.remote("framework")
   val frameworkWiring = FrameworkWiring.make(frameworkSystem)
