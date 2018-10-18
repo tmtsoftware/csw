@@ -23,23 +23,13 @@ trait CommandService {
   def validate(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[ValidateResponse]
 
   /**
-   * Submit a command and get a [[csw.params.commands.CommandResponse]] as a Future. The CommandResponse can be a response
-   * of validation (Accepted, Invalid) or a final Response. In case of response as `Accepted`, final CommandResponse
-   * can be obtained by using `subscribe` API.
-   *
-   * @param controlCommand the [[csw.params.commands.ControlCommand]] payload
-   * @return a CommandResponse as a Future value
-   */
-  def submit(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[SubmitResponse]
-
-  /**
    * Submit a command and Subscribe for the result if it was successfully validated as `Started` to get a
    * final [[csw.params.commands.CommandResponse.SubmitResponse]] as a Future
    *
    * @param controlCommand the [[csw.params.commands.ControlCommand]] payload
    * @return a CommandResponse as a Future value
    */
-  def submitAndComplete(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[SubmitResponse]
+  def submit(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[SubmitResponse]
 
   /**
    * Submit multiple commands and get a Source of [[csw.params.commands.CommandResponse]] for all commands. The CommandResponse can be a response
@@ -48,7 +38,7 @@ trait CommandService {
    * @param submitCommands the set of [[csw.params.commands.ControlCommand]] payloads
    * @return a Source of CommandResponse as a stream of CommandResponses for all commands
    */
-  def submitAndCompleteAll(submitCommands: List[ControlCommand])(implicit timeout: Timeout): Future[List[SubmitResponse]]
+  def submitAll(submitCommands: List[ControlCommand])(implicit timeout: Timeout): Future[List[SubmitResponse]]
 
   /**
    * Send a command as a Oneway and get a [[csw.params.commands.CommandResponse]] as a Future. The CommandResponse can be a response
@@ -57,7 +47,7 @@ trait CommandService {
    * @param controlCommand the [[csw.params.commands.ControlCommand]] payload
    * @return a CommandResponse as a Future value
    */
-  def send(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[OnewayResponse]
+  def oneway(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[OnewayResponse]
 
   /**
    * Submit a command and match the published state from the component using a [[StateMatcher]].
@@ -68,7 +58,7 @@ trait CommandService {
    * @param stateMatcher the StateMatcher implementation for matching received state against a demand state
    * @return a MatchingResponse as a Future value
    */
-  def sendAndMatch(
+  def onewayAndMatch(
       controlCommand: ControlCommand,
       stateMatcher: StateMatcher
   )(implicit timeout: Timeout): Future[MatchingResponse]
@@ -80,14 +70,6 @@ trait CommandService {
    * @return a CommandResponse as a Future value
    */
   def query(commandRunId: Id)(implicit timeout: Timeout): Future[QueryResponse]
-
-  /**
-   * Subscribe for the result of a long running command which was sent as Submit to get a [[csw.params.commands.CommandResponse]] as a Future
-   *
-   * @param commandRunId the runId of the command for which response is required
-   * @return a CommandResponse as a Future value
-   */
-  def queryFinal(commandRunId: Id)(implicit timeout: Timeout): Future[SubmitResponse]
 
   /**
    * Subscribe to the current state of a component corresponding to the [[csw.location.api.models.AkkaLocation]] of the component

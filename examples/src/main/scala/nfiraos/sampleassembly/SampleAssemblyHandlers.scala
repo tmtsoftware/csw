@@ -9,7 +9,7 @@ import csw.event.api.scaladsl.EventSubscription
 import csw.framework.models.CswContext
 import csw.framework.scaladsl.ComponentHandlers
 import csw.location.api.models.{AkkaLocation, LocationRemoved, LocationUpdated, TrackingEvent}
-import csw.params.commands.CommandResponse.{Started, SubmitResponse, ValidateCommandResponse}
+import csw.params.commands.CommandResponse._
 import csw.params.commands.{CommandName, CommandResponse, ControlCommand, Setup}
 import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.{ObsId, Prefix, Units}
@@ -60,13 +60,11 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
 
     // Submit command, and handle validation response. Final response is returned as a Future
     val submitCommandResponseF: Future[SubmitResponse] = hcd.submit(setupCommand).flatMap {
-      case _: Started =>
-        // If valid, subscribe to the HCD's CommandResponseManager
-        // This explicit timeout indicates how long to wait for completion
-        hcd.queryFinal(setupCommand.runId)(10000.seconds)
-      case x =>
+      case x @ (Invalid(_, _) | Locked(_)) =>
         log.error("Sleep command invalid")
         Future(x)
+      case x =>
+        Future.successful(x)
     }
 
     // Wait for final response, and log result

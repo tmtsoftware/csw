@@ -173,7 +173,7 @@ class ContainerCmdTest(ignore: Int)
           .expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(commandValidationChoice))))
       }
 
-      etonCommandService.send(setupSuccess).map { _ ⇒
+      etonCommandService.oneway(setupSuccess).map { _ ⇒
         eatonCompStateProbe
           .expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(commandValidationChoice))))
         eatonCompStateProbe

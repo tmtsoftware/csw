@@ -24,34 +24,28 @@ private[command] class JCommandServiceImpl(commandService: CommandService) exten
   override def submit(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[SubmitResponse] =
     commandService.submit(controlCommand)(timeout).toJava.toCompletableFuture
 
-  override def submitAndComplete(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[SubmitResponse] =
-    commandService.submitAndComplete(controlCommand)(timeout).toJava.toCompletableFuture
-
-  override def submitAndCompleteAll(
+  override def submitAll(
       controlCommand: java.util.List[ControlCommand],
       timeout: Timeout
   ): CompletableFuture[java.util.List[SubmitResponse]] =
     commandService
-      .submitAndCompleteAll(controlCommand.asScala.toList)(timeout)
+      .submitAll(controlCommand.asScala.toList)(timeout)
       .toJava
       .toCompletableFuture
       .thenApply(_.asJava)
 
-  override def send(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[OnewayResponse] =
-    commandService.send(controlCommand)(timeout).toJava.toCompletableFuture
+  override def oneway(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[OnewayResponse] =
+    commandService.oneway(controlCommand)(timeout).toJava.toCompletableFuture
 
-  override def sendAndMatch(
+  override def onewayAndMatch(
       controlCommand: ControlCommand,
       stateMatcher: StateMatcher,
       timeout: Timeout
   ): CompletableFuture[MatchingResponse] =
-    commandService.sendAndMatch(controlCommand, stateMatcher)(timeout).toJava.toCompletableFuture
+    commandService.onewayAndMatch(controlCommand, stateMatcher)(timeout).toJava.toCompletableFuture
 
   override def query(commandRunId: Id, timeout: Timeout): CompletableFuture[QueryResponse] =
     commandService.query(commandRunId)(timeout).toJava.toCompletableFuture
-
-  override def queryFinal(commandRunId: Id, timeout: Timeout): CompletableFuture[SubmitResponse] =
-    commandService.queryFinal(commandRunId)(timeout).toJava.toCompletableFuture
 
   override def subscribeCurrentState(callback: Consumer[CurrentState]): CurrentStateSubscription =
     commandService.subscribeCurrentState(callback.asScala)

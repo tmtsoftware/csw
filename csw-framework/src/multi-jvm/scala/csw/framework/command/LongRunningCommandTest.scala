@@ -79,10 +79,9 @@ class LongRunningCommandTest(ignore: Int)
       // 2. shortSetup which takes 1 second to finish
       // 3. mediumSetup which takes 3 seconds to finish
       //#subscribe-for-result
-      val eventualCommandResponse = assemblyCommandService.submit(setup).flatMap {
-        case _: Started ⇒
-          assemblyCommandService.queryFinal(setup.runId)
-        case _ ⇒ Future(Error(setup.runId, ""))
+      val eventualCommandResponse = assemblyCommandService.submit(setup).map {
+        case Invalid(runId, _) ⇒ Error(runId, "")
+        case x: SubmitResponse ⇒ x
       }
       //#subscribe-for-result
 
@@ -90,7 +89,7 @@ class LongRunningCommandTest(ignore: Int)
 
       //#submitAndSubscribe
       val setupForSubscribe = Setup(prefix, longRunning, Some(obsId))
-      val response          = assemblyCommandService.submitAndComplete(setupForSubscribe)
+      val response          = assemblyCommandService.submit(setupForSubscribe)
       //#submitAndSubscribe
 
       Await.result(response, 20.seconds) shouldBe Completed(setupForSubscribe.runId)

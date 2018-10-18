@@ -131,31 +131,27 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
     hcdComponent
       .submit(controlCommand)
       .map {
-        case response: Started ⇒
-          // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
-          //#updateSubCommand
-          // An original command is split into sub-commands and sent to a component. The result of the command is
-          // obtained by subscribing to the component with the sub command id.
-          hcdComponent.queryFinal(controlCommand.runId).map {
-            case _: Completed ⇒
-              controlCommand.runId match {
-                case id if id == shortSetup.runId ⇒
-                  currentStatePublisher
-                    .publish(CurrentState(shortSetup.source, StateName("testStateName"), Set(choiceKey.set(shortCmdCompleted))))
-                  // As the commands get completed, the results are updated in the commandResponseManager
-                  commandResponseManager.updateSubCommand(id, Completed(id))
-                case id if id == mediumSetup.runId ⇒
-                  currentStatePublisher
-                    .publish(CurrentState(mediumSetup.source, StateName("testStateName"), Set(choiceKey.set(mediumCmdCompleted))))
-                  commandResponseManager.updateSubCommand(id, Completed(id))
-                case id if id == longSetup.runId ⇒
-                  currentStatePublisher
-                    .publish(CurrentState(longSetup.source, StateName("testStateName"), Set(choiceKey.set(longCmdCompleted))))
-                  commandResponseManager.updateSubCommand(id, Completed(id))
-              }
-            //#updateSubCommand
-            case _ ⇒ // Do nothing
+        // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
+        //#updateSubCommand
+        // An original command is split into sub-commands and sent to a component. The result of the command is
+        // obtained by subscribing to the component with the sub command id.
+        case _: Completed ⇒
+          controlCommand.runId match {
+            case id if id == shortSetup.runId ⇒
+              currentStatePublisher
+                .publish(CurrentState(shortSetup.source, StateName("testStateName"), Set(choiceKey.set(shortCmdCompleted))))
+              // As the commands get completed, the results are updated in the commandResponseManager
+              commandResponseManager.updateSubCommand(id, Completed(id))
+            case id if id == mediumSetup.runId ⇒
+              currentStatePublisher
+                .publish(CurrentState(mediumSetup.source, StateName("testStateName"), Set(choiceKey.set(mediumCmdCompleted))))
+              commandResponseManager.updateSubCommand(id, Completed(id))
+            case id if id == longSetup.runId ⇒
+              currentStatePublisher
+                .publish(CurrentState(longSetup.source, StateName("testStateName"), Set(choiceKey.set(longCmdCompleted))))
+              commandResponseManager.updateSubCommand(id, Completed(id))
           }
+        //#updateSubCommand
         case _ ⇒ // Do nothing
       }
   }

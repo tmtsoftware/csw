@@ -161,10 +161,10 @@ public class JCommandIntegrationTest {
                 hcdCmdService
                         .submit(controlCommand, timeout)
                         .thenCompose(commandResponse -> {
-                            if (commandResponse instanceof CommandResponse.Started) {
-                                return hcdCmdService.queryFinal(commandResponse.runId(), timeout);
-                            } else {
+                            if (commandResponse instanceof CommandResponse.Invalid) {
                                 return CompletableFuture.completedFuture(new CommandResponse.Error(commandResponse.runId(), "tests error"));
+                            } else {
+                                return CompletableFuture.completedFuture(commandResponse);
                             }
                         });
         //#subscribe-for-result
@@ -192,7 +192,7 @@ public class JCommandIntegrationTest {
 
         // submit command and if the command is successfully validated, check for matching of demand state against current state
         CompletableFuture<CommandResponse.MatchingResponse> commandResponseToBeMatched = hcdCmdService
-                .send(setup, timeout)
+                .oneway(setup, timeout)
                 .thenCompose(initialCommandResponse -> {
                     if (initialCommandResponse instanceof CommandResponse.Accepted) {
 
@@ -218,7 +218,7 @@ public class JCommandIntegrationTest {
 
         //#oneway
         CompletableFuture onewayCommandResponseF = hcdCmdService
-                .send(setup, timeout)
+                .oneway(setup, timeout)
                 .thenAccept(initialCommandResponse -> {
                     if (initialCommandResponse instanceof CommandResponse.Accepted) {
                         //do something
@@ -261,7 +261,7 @@ public class JCommandIntegrationTest {
         CompletableFuture<MatcherResponse> matcherResponse = matcher1.jStart();
 
         CompletableFuture<CommandResponse.MatchingResponse> matchedCommandResponse =
-                hcdCmdService.sendAndMatch(setup, stateMatcher, timeout);
+                hcdCmdService.onewayAndMatch(setup, stateMatcher, timeout);
 
         //#onewayAndMatch
         Assert.assertEquals(new CommandResponse.Completed(setup.runId()), matchedCommandResponse.get());
@@ -341,7 +341,7 @@ public class JCommandIntegrationTest {
         akka.actor.typed.ActorSystem<?> typedSystem = ActorSystemAdapter.apply(hcdActorSystem);
 
         //#submitAndSubscribe
-        CompletableFuture<CommandResponse.SubmitResponse> finalResponseCompletableFuture = hcdCmdService.submitAndComplete(failureResCommand1, timeout);
+        CompletableFuture<CommandResponse.SubmitResponse> finalResponseCompletableFuture = hcdCmdService.submit(failureResCommand1, timeout);
         CommandResponse.SubmitResponse actualValidationResponse = finalResponseCompletableFuture.get();
         //#submitAndSubscribe
 
@@ -350,10 +350,7 @@ public class JCommandIntegrationTest {
         // using separate submit and subscribe API
         Setup failureResCommand2 = new Setup(prefix(), failureAfterValidationCmd(), Optional.empty()).add(intParameter1);
         CompletableFuture<CommandResponse.SubmitResponse> validationResponse = hcdCmdService.submit(failureResCommand2, timeout);
-        Assert.assertTrue(validationResponse.get() instanceof CommandResponse.Started);  // This should fail but I guess not typed by compiler
-
-        CompletableFuture<CommandResponse.SubmitResponse> finalResponse = hcdCmdService.queryFinal(failureResCommand1.runId(), timeout);
-        Assert.assertTrue(finalResponse.get() instanceof CommandResponse.Error);
+        Assert.assertTrue(validationResponse.get() instanceof CommandResponse.Error);  // This should fail but I guess not typed by compiler
     }
 /*
     @Test

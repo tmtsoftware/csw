@@ -111,8 +111,8 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
         // Submit command, and handle validation response. Final response is returned as a Future
         CompletableFuture<CommandResponse.SubmitResponse> submitCommandResponseF = hcd.submit(setupCommand, submitTimeout)
                 .thenCompose(commandResponse -> {
-                    if (commandResponse instanceof CommandResponse.Started) {
-                        return hcd.queryFinal(commandResponse.runId(), commandResponseTimeout);
+                    if (! (commandResponse instanceof CommandResponse.Invalid || commandResponse instanceof CommandResponse.Locked)) {
+                        return CompletableFuture.completedFuture(commandResponse);
                     } else {
                         log.error("Sleep command invalid");
                         return CompletableFuture.completedFuture(new CommandResponse.Error(commandResponse.runId(), "test error"));

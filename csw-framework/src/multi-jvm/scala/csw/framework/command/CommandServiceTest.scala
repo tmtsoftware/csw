@@ -157,11 +157,7 @@ class CommandServiceTest(ignore: Int)
       val setupWithoutMatcher = Setup(prefix, withoutMatcherCmd, obsId)
 
       // DEOPSCSW-233: Hide implementation by having a CCS API
-      val eventualLongCommandResponse = async {
-        val initialCommandResponse = await(assemblyComponent.submit(setupWithoutMatcher))
-        initialCommandResponse shouldBe an[Started]
-        await(assemblyComponent.queryFinal(setupWithoutMatcher.runId))
-      }
+      val eventualLongCommandResponse = assemblyComponent.submit(setupWithoutMatcher)
 
       val longCommandResponse = Await.result(eventualLongCommandResponse, timeout.duration)
 
@@ -187,7 +183,7 @@ class CommandServiceTest(ignore: Int)
 
       // submit command and if the command is successfully validated, check for matching of demand state against current state
       val eventualCommandResponse: Future[MatchingResponse] = async {
-        val initialResponse = await(assemblyComponent.send(setupWithMatcher))
+        val initialResponse = await(assemblyComponent.oneway(setupWithMatcher))
         initialResponse match {
           case _: Accepted ⇒
             val matcherResponse = await(matcherResponseF)
@@ -212,7 +208,7 @@ class CommandServiceTest(ignore: Int)
       commandResponse shouldBe Completed(setupWithMatcher.runId)
 
       //#onewayAndMatch
-      val eventualResponse1: Future[MatchingResponse] = assemblyComponent.sendAndMatch(setupWithMatcher, demandMatcher)
+      val eventualResponse1: Future[MatchingResponse] = assemblyComponent.onewayAndMatch(setupWithMatcher, demandMatcher)
       //#onewayAndMatch
       Await.result(eventualResponse1, timeout.duration) shouldBe Completed(setupWithMatcher.runId)
 
@@ -223,7 +219,7 @@ class CommandServiceTest(ignore: Int)
       val failedMatcherResponseF: Future[MatcherResponse] = failedMatcher.start
 
       val eventualCommandResponse2: Future[MatchingResponse] = async {
-        val initialResponse = await(assemblyComponent.send(setupWithFailedMatcher))
+        val initialResponse = await(assemblyComponent.oneway(setupWithFailedMatcher))
         initialResponse match {
           case _: Accepted ⇒
             val matcherResponse = await(failedMatcherResponseF)
@@ -260,7 +256,7 @@ class CommandServiceTest(ignore: Int)
 
       val timeoutExMsg = "The stream has not been completed in 500 milliseconds."
       val eventualCommandResponse1: Future[MatchingResponse] = async {
-        val initialResponse = await(assemblyComponent.send(setupWithTimeoutMatcher))
+        val initialResponse = await(assemblyComponent.oneway(setupWithTimeoutMatcher))
         initialResponse match {
           case _: Accepted ⇒
             val matcherResponse = await(matcherResponseF1)
@@ -284,7 +280,7 @@ class CommandServiceTest(ignore: Int)
       // using matcher
       // Note this and the next two don't do anything useful
       val onewayCommandResponseF: Future[Unit] = async {
-        val initialResponse: OnewayResponse = await(assemblyComponent.send(setupWithTimeoutMatcher))
+        val initialResponse: OnewayResponse = await(assemblyComponent.oneway(setupWithTimeoutMatcher))
         initialResponse match {
           case accepted: Accepted ⇒
           // do Something
