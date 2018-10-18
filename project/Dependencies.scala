@@ -56,7 +56,8 @@ object Dependencies {
       Akka.`akka-remote`,
       Libs.`scala-async`,
       Libs.`play-json`.value,
-      Libs.`akka-http-play-json`
+      Libs.`akka-http-play-json`,
+      Libs.`scalatest`.value % Test
     )
   )
 
