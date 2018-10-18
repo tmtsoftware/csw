@@ -17,8 +17,7 @@ object HttpLocationServiceFactory {
    * Use this factory method to create http location client when location server is running locally.
    * HTTP Location server runs on port 7654.
    * */
-  def makeLocalClient(implicit actorSystem: ActorSystem, mat: Materializer): LocationService =
-    new LocationServiceClient("localhost", httpServerPort)
+  def makeLocalClient(implicit actorSystem: ActorSystem, mat: Materializer): LocationService = make("localhost")
 
   /**
    * Use this factory method to create http location client when location server is running remotely.
@@ -35,5 +34,12 @@ object HttpLocationServiceFactory {
 
     new LocationServiceClient(seedIp, httpServerPort)
   }
+
+  /**
+   * Use this factory method to create http location client when location server ip is known.
+   * HTTP Location server runs on port 7654.
+   * */
+  private[csw] def make(serverIp: String)(implicit actorSystem: ActorSystem, mat: Materializer): LocationService =
+    new LocationServiceClient(serverIp, httpServerPort)
 
 }

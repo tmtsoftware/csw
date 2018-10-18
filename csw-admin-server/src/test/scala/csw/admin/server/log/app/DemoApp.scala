@@ -1,22 +1,25 @@
 package csw.admin.server.log.app
 
-import akka.actor.typed.scaladsl.adapter._
 import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.TestProbe
+import akka.actor.typed.scaladsl.adapter._
 import akka.actor.typed.{ActorRef, ActorSystem}
 import com.typesafe.config.ConfigFactory
 import csw.admin.server.internal.AdminWiring
+import csw.command.client.messages.CommandMessage.Oneway
+import csw.command.client.messages.ContainerCommonMessage.GetComponents
+import csw.command.client.messages.ContainerMessage
+import csw.command.client.models.framework.{Component, Components, ContainerLifecycleState}
 import csw.common.FrameworkAssertions.assertThatContainerIsRunning
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
-import csw.params.commands.{CommandName, Setup}
-import csw.command.client.models.framework.{Component, Components, ContainerLifecycleState}
-import csw.params.core.models.Prefix
-import csw.command.client.messages.CommandMessage.Oneway
-import csw.command.client.messages.ContainerMessage
-import csw.command.client.messages.ContainerCommonMessage.GetComponents
 import csw.location.api.commons.ClusterAwareSettings
+import csw.location.client.ActorSystemFactory
+import csw.location.server.internal.ServerWiring
+import csw.logging.appenders.StdOutAppender
 import csw.logging.scaladsl.{LoggerFactory, LoggingSystemFactory}
 import csw.params.commands.CommandResponse.OnewayResponse
+import csw.params.commands.{CommandName, Setup}
+import csw.params.core.models.Prefix
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
@@ -45,9 +48,9 @@ object AppLogger extends LoggerFactory("app")
 
 object DemoApp extends App {
 
-  val adminWiring: AdminWiring = AdminWiring.make(ClusterAwareSettings.onPort(3552), None)
+  val adminWiring: AdminWiring = new AdminWiring(ActorSystemFactory.remote())
 
-  val frameworkSystem = ClusterAwareSettings.joinLocal(3552).system
+  val frameworkSystem = ActorSystemFactory.remote("framework")
   val frameworkWiring = FrameworkWiring.make(frameworkSystem)
 
   implicit val typedSystem: ActorSystem[Nothing] = frameworkWiring.actorSystem.toTyped
@@ -58,8 +61,10 @@ object DemoApp extends App {
   private val prefix           = Prefix("iris.command")
 
   private def startSeed() = {
-    LoggingSystemFactory.start("logging", "version", ClusterAwareSettings.hostname, adminWiring.actorSystem)
-    adminWiring.locationService
+    import adminWiring.actorRuntime._
+    val loggingSystem = LoggingSystemFactory.start("logging", "version", ClusterAwareSettings.hostname, actorSystem)
+    loggingSystem.setAppenders(List(StdOutAppender))
+    Await.result(ServerWiring.make(Some(3552)).locationHttpService.start(), 5.seconds)
     Await.result(adminWiring.adminHttpService.registeredLazyBinding, 5.seconds)
   }
 

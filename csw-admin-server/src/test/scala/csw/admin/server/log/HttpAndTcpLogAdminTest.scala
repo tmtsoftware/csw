@@ -16,6 +16,7 @@ import csw.config.server.{ServerWiring, Settings}
 import csw.location.api.commons.ClusterAwareSettings
 import csw.location.api.models.Connection.TcpConnection
 import csw.location.api.models.{ComponentId, ComponentType}
+import csw.location.client.ActorSystemFactory
 import csw.location.server.http.HTTPLocationService
 import csw.logging.internal._
 import csw.logging.scaladsl.LoggingSystemFactory
@@ -25,7 +26,7 @@ import scala.concurrent.duration.DurationDouble
 
 class HttpAndTcpLogAdminTest extends AdminLogTestSuite with HttpSupport with HTTPLocationService {
 
-  private val adminWiring: AdminWiring = AdminWiring.make(Some(7888))
+  private val adminWiring: AdminWiring = AdminWiring.make(ActorSystemFactory.remote(), Some(7888))
   import adminWiring.actorRuntime._
 
   implicit val typedSystem: ActorSystem[Nothing] = actorSystem.toTyped
@@ -40,7 +41,7 @@ class HttpAndTcpLogAdminTest extends AdminLogTestSuite with HttpSupport with HTT
   private var loggingSystem: LoggingSystem = _
 
   override def beforeAll(): Unit = {
-    loggingSystem = LoggingSystemFactory.start("logging", "version", hostName, adminWiring.actorSystem)
+    loggingSystem = LoggingSystemFactory.start("logging", "version", hostName, adminWiring.actorRuntime.actorSystem)
     loggingSystem.setAppenders(List(testAppender))
 
     logBuffer.clear()

@@ -23,8 +23,13 @@ class ArgsParserTest extends FunSuite with Matchers {
     silentParse(args) shouldBe None
   }
 
-  test("parse with all arguments") {
+  test("parse when only port argument provided") {
     val args = Array("--port", "8080")
     silentParse(args) shouldBe Some(Options(Some(8080)))
+  }
+
+  test("parse with all arguments") {
+    val args = Array("--port", "8080", "--locationHost", "location.server")
+    silentParse(args) shouldBe Some(Options(Some(8080), "location.server"))
   }
 }
