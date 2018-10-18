@@ -89,7 +89,7 @@ class CommandExecutorTest extends AlarmCliTestSetup {
 
     val configData    = ConfigData.fromPath(Paths.get(getClass.getResource("/valid-alarms.conf").getPath))
     val configPath    = Paths.get("valid-alarms.conf")
-    val configService = ConfigClientFactory.adminApi(system, locationService)
+    val configService = ConfigClientFactory.adminApi(actorRuntime.system, locationService)
     configService.create(configPath, configData, comment = "commit test file").futureValue
 
     val cmd = Options(cmd = "init", filePath = Some(configPath), reset = true)

@@ -5,7 +5,8 @@ import csw.alarm.cli.{AlarmAdminClient, CommandExecutor}
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 
-class Wiring(actorSystem: ActorSystem) {
+private[alarm] class Wiring {
+  lazy val actorSystem  = ActorSystem("alarm-cli")
   lazy val actorRuntime = new ActorRuntime(actorSystem)
   import actorRuntime._
 
@@ -17,9 +18,13 @@ class Wiring(actorSystem: ActorSystem) {
 }
 
 object Wiring {
-  private[alarm] def make(_actorSystem: ActorSystem, _locationService: LocationService, _printLine: Any ⇒ Unit): Wiring =
-    new Wiring(_actorSystem) {
-      override lazy val locationService: LocationService = _locationService
-      override lazy val printLine: Any ⇒ Unit            = _printLine
+
+  private[alarm] def make(locationHost: String = "localhost", _printLine: Any ⇒ Unit = println): Wiring =
+    new Wiring {
+      override lazy val locationService: LocationService =
+        HttpLocationServiceFactory.make(locationHost)(actorSystem, actorRuntime.mat)
+
+      override lazy val printLine: Any ⇒ Unit = _printLine
     }
+
 }

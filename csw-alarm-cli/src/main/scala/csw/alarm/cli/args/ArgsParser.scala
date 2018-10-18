@@ -84,6 +84,10 @@ class ArgsParser(name: String) {
       .text("list alarms")
       .children(optionalAlarmKey :+ metadata :+ status: _*)
 
+    opt[String]("locationHost") action { (x, c) =>
+      c.copy(locationHost = x)
+    } text "Optional: host address of machine where location server is running. Default is localhost"
+
     help("help")
 
     version("version")

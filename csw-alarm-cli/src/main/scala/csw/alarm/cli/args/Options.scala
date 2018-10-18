@@ -17,7 +17,8 @@ case class Options(
     severity: Option[AlarmSeverity] = None,
     autoRefresh: Boolean = false,
     showMetadata: Boolean = true,
-    showStatus: Boolean = true
+    showStatus: Boolean = true,
+    locationHost: String = "localhost"
 ) {
 
   def alarmKey: AlarmKey = (maybeSubsystem, maybeComponent, maybeAlarmName) match {
