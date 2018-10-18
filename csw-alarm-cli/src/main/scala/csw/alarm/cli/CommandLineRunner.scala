@@ -21,7 +21,7 @@ import csw.alarm.client.internal.commons.Settings
 import scala.async.Async.{async, await}
 import scala.concurrent.Future
 
-class AlarmAdminClient(
+class CommandLineRunner(
     actorRuntime: ActorRuntime,
     locationService: LocationService,
     configUtils: ConfigUtils,

@@ -4,7 +4,7 @@ import csw.alarm.cli.args.Options
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
 
-class CommandExecutor(alarmAdminClient: AlarmAdminClient) {
+class CliApp(alarmAdminClient: CommandLineRunner) {
   def execute(options: Options): Unit =
     try {
       options.cmd match {

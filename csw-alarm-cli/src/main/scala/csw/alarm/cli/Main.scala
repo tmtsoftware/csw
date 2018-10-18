@@ -22,7 +22,7 @@ object Main extends App {
     import actorRuntime._
     startLogging(name)
 
-    try commandExecutor.execute(options)
+    try cliApp.execute(options)
     finally Http().shutdownAllConnectionPools().onComplete(_ ⇒ shutdown(ApplicationFinishedReason))
   }
 
