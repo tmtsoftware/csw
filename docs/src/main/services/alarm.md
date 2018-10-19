@@ -1,18 +1,68 @@
 # Alarm Service
 
-The Alarm Service provides API to manage alarms present in the TMT software system.
+The Alarm Service provides API to manage alarms in the TMT software system.  The service uses Redis to store Alarm
+data, including the alarm status and associated metadata.  Alarm "keys" are used to access information about an alarm.
 
 <!-- introduction to the service -->
 
 ## Dependencies
 
-To use the Alarm service without using the framework, add this to your `build.sbt` file:
+The Alarm Service comes bundled with the Framework, no additional dependency needs to be added to your `build.sbt`
+ file if using it.  To use the Alarm service without using the framework, add this to your `build.sbt` file:
 
 sbt
 :   @@@vars
     ```scala
     libraryDependencies += "com.github.tmtsoftware.csw" %% "csw-alarm-client" % "$version$"
     ```
+    @@@
+
+## API Flavours
+
+There are two APIs provided in the Alarm Service: a client API, and an administrative (admin) API.  The client API is
+the API used by component developers to set the severity of an alarm.  This is the only functionality needed by 
+component developers.  As per TMT policy, the severity of an alarm must be set periodically (within some time limit) 
+in order to maintain the integrity of the alarm status.  If an alarm severity is not refreshed within the time limit, 
+currently set at TBD seconds, the severity is set to `Disconnected` by the Alarm Service, which indicates to the operator
+that there is some problem with the component's ability to evaluate the alarm status.
+
+The admin API provides all of the functions needed manage the alarm store, as well as 
+providing access to monitor alarms for use by an operator or instrument specialist.  The admin API provides the
+ability to load alarm data into alarm store, set severity of an alarm, acknowledge alarms, shelve
+or unshelve alarms, reset a latched alarm, get the metadata/status/severity of an alarm, and get or subscribe to 
+aggregations of severity and health of the alarm, a component's alarms, a subsystem's alarms, or the alarms of the 
+whole TMT System.  
+
+A command line tool is provided as part of the Alarm Service that implements this API can provides low level control over the
+Alarm Service.  More details about alarm CLI can be found here: @ref:[CSW Alarm Client CLI application](../apps/cswalarmcli.md)
+
+Eventually, operators will use Graphical User Interfaces that access the admin API through a UI
+gateway.  This will be delivered as part of the ESW HCMS package.
+
+@@@ note
+Since the admin API will primarily be used with the CLI and HCMS applications, it is only supported in Scala, and not Java.
+@@@
+
+To summarize, the APIs are as follows:
+* **client API (AlarmService)** : Must be used by component. Available method is : `{setSeverity}`
+* **admin API (AlarmAdminService)** : Expected to be used by administrator. Available methods are: 
+`{initAlarm | setSeverity | acknowledge | shelve | unshelve | reset | getMetaData
+| getStatus | getCurrentSeverity | getAggregatedSeverity | getAggregatedHealth | subscribeAggregatedSeverityCallback
+| subscribeAggregatedSeverityActorRef | subscribeAggregatedHealthCallback | subscribeAggregatedHealthActorRef }`
+
+## Creating clientAPI and adminAPI
+
+For component developers, the client API is provided as an @scaladoc[AlarmService](csw/alarm/api/scaladsl/AlarmService) 
+object in the `CswContext` object injected into the ComponentHandlers class provided by the framework.  
+
+If you are not using csw-framework, you can create @scaladoc[AlarmService](csw/alarm/api/scaladsl/AlarmService)
+using @scaladoc[AlarmServiceFactory](csw/alarm/client/AlarmServiceFactory).
+
+Scala
+:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #create-scala-api }
+
+Java
+:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #create-java-api }
 
 ## Rules and checkes
 * When representing a unique alarm, the alarm name or component name must not have `* [ ] ^ -` or `any whitespace characters`
@@ -31,51 +81,11 @@ Warning, Major and Critical
 plus other severity levels that can be set by the developer
 * **AlarmHealth** : Represents possible health of an alarm or component or subsystem or whole TMT system
 
-## API Flavours
-
-The Alarm Service is used to manage alarms and its properties. Component developers will get the handle of `CswContext`
-which has `alarmService` ready to be used for setting severity.
-
-@@@ note
-
-The `alarmService` provided in `CswContext` is a clientAPI (explained in detail below) which only has `setSeverity` API.
-
-@@@  
-
-<!-- give CLI reference in here -->
-To use the alarm service for administrative purposes adminAPI must be used. The creation of the adminAPI is demonstrated below:
-The adminAPI provides the ability to load alarm data into alarm store, set severity of an alarm, acknowledge alarms, shelve
-or unshelve alarms, reset an alarm, getting the metadata/status/severity of an alarm and getting or subscribing to aggregations of severity and health of the alarm/component/subsystem/whole TMT System.
-
-* **clientAPI (AlarmService)** : Must be used by component. Available method is : `{setSeverity}`
-* **adminAPI (AlarmAdminService)** : Expected to be used by administrator. Available methods are: 
-`{initAlarm | setSeverity | acknowledge | shelve | unshelve | reset | getMetaData
-| getStatus | getCurrentSeverity | getAggregatedSeverity | getAggregatedHealth | subscribeAggregatedSeverityCallback
-| subscribeAggregatedSeverityActorRef | subscribeAggregatedHealthCallback | subscribeAggregatedHealthActorRef }`
-
-## Creating clientAPI and adminAPI
-
-If you are not using csw-framework, you can create @scaladoc[AlarmService](csw/alarm/api/scaladsl/AlarmService)
-using @scaladoc[AlarmServiceFactory](csw/alarm/client/AlarmServiceFactory).
-
-@@@ note
-
-The adminAPI will be used from an administrative user interface or an alarm CLI. More details about alarm CLI can be 
-found here.
- The @ref:[CSW Alarm Client CLI application](../apps/cswalarmcli.md) is provided with this functionality.
-
-@@@
-
-Scala
-:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #create-scala-api }
-
-Java
-:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #create-java-api }
 
 ## setSeverity
 
-Sets the severity of the given alarm. It is important that component devs keep refreshing the severity by setting it at 
-a regular interval for all its alarms, so that it does not get marked as `Disconnected` after a specific time.  
+Sets the severity of the given alarm. The severity must be refreshed by setting it at 
+a regular interval or it will automatically be changed to `Disconnected` after a specific time.  
 
 Scala
 :   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #setSeverity-scala }
