@@ -1,18 +1,18 @@
 package csw.alarm
 import akka.Done
 import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.{typed, ActorSystem}
+import akka.actor.{ActorSystem, typed}
 import akka.stream.ActorMaterializer
 import com.typesafe.config._
 import csw.alarm.api.javadsl.IAlarmService
 import csw.alarm.api.models.AlarmSeverity.Okay
-import csw.alarm.api.models.Key.AlarmKey
+import csw.alarm.api.models.Key.{AlarmKey, ComponentKey, SubsystemKey}
 import csw.alarm.api.models.{AlarmHealth, AlarmMetadata, AlarmStatus, FullAlarmSeverity}
 import csw.alarm.api.scaladsl.{AlarmAdminService, AlarmService}
 import csw.alarm.client.AlarmServiceFactory
 import csw.location.client.javadsl.JHttpLocationServiceFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.params.core.models.Subsystem.NFIRAOS
+import csw.params.core.models.Subsystem.{IRIS, NFIRAOS}
 
 import scala.async.Async._
 import scala.concurrent.ExecutionContext
@@ -25,13 +25,12 @@ object AlarmServiceClientExampleApp {
   private val locationService           = HttpLocationServiceFactory.makeLocalClient
   private val jLocationService          = JHttpLocationServiceFactory.makeLocalClient(actorSystem, mat)
 
+
   private def behaviour[T]: Behaviors.Receive[T] = Behaviors.receive { (ctx, msg) ⇒
     println(msg)
     Behaviors.same
   }
 
-  val severityActorRef = typed.ActorSystem(behaviour[FullAlarmSeverity], "fullSeverityActor")
-  val healthActorRef   = typed.ActorSystem(behaviour[AlarmHealth], "healthActor")
 
   //#create-scala-api
   // create alarm client using host and port of alarm server
@@ -55,7 +54,6 @@ object AlarmServiceClientExampleApp {
   private val jclientAPI2 = new AlarmServiceFactory().jMakeClientApi(jLocationService, actorSystem)
   //#create-java-api
 
-  val alarmKey = AlarmKey(NFIRAOS, "trombone", "tromboneAxisLowLimitAlarm")
 
   val clientAPI: AlarmService     = clientAPI1
   val adminAPI: AlarmAdminService = adminAPI1
@@ -63,6 +61,9 @@ object AlarmServiceClientExampleApp {
   val jclientAPI: IAlarmService = jclientAPI1
 
   //#setSeverity-scala
+  val alarmKey = AlarmKey(NFIRAOS, "trombone", "tromboneAxisLowLimitAlarm")
+  clientAPI.setSeverity(alarmKey, Okay)
+
   async {
     await(clientAPI.setSeverity(alarmKey, Okay))
   }
@@ -124,35 +125,39 @@ object AlarmServiceClientExampleApp {
 
   //#getAggregatedSeverity
   async {
-    val aggregatedSeverity: FullAlarmSeverity = await(adminAPI.getAggregatedSeverity(alarmKey))
+    val componentKey = ComponentKey(NFIRAOS, "tromboneAssembly")
+    val aggregatedSeverity: FullAlarmSeverity = await(adminAPI.getAggregatedSeverity(componentKey))
   }
   //#getAggregatedSeverity
 
   //#getAggregatedHealth
   async {
-    val health: AlarmHealth = await(adminAPI.getAggregatedHealth(alarmKey))
+    val subsystemKey = SubsystemKey(IRIS)
+    val health: AlarmHealth = await(adminAPI.getAggregatedHealth(subsystemKey))
   }
   //#getAggregatedHealth
 
   //#subscribeAggregatedSeverityCallback
   adminAPI.subscribeAggregatedSeverityCallback(
-    alarmKey,
+    ComponentKey(NFIRAOS, "tromboneAssembly"),
     aggregatedSeverity ⇒ { /* do something*/ }
   )
   //#subscribeAggregatedSeverityCallback
 
   //#subscribeAggregatedSeverityActorRef
-  adminAPI.subscribeAggregatedSeverityActorRef(alarmKey, severityActorRef)
+  val severityActorRef = typed.ActorSystem(behaviour[FullAlarmSeverity], "fullSeverityActor")
+  adminAPI.subscribeAggregatedSeverityActorRef(SubsystemKey(NFIRAOS), severityActorRef)
   //#subscribeAggregatedSeverityActorRef
 
   //#subscribeAggregatedHealthCallback
   adminAPI.subscribeAggregatedHealthCallback(
-    alarmKey,
+    ComponentKey(IRIS, "ImagerDetectorAssembly"),
     aggregatedHealth ⇒ { /* do something*/ }
   )
   //#subscribeAggregatedHealthCallback
 
   //#subscribeAggregatedHealthActorRef
-  adminAPI.subscribeAggregatedHealthActorRef(alarmKey, healthActorRef)
+  val healthActorRef   = typed.ActorSystem(behaviour[AlarmHealth], "healthActor")
+  adminAPI.subscribeAggregatedHealthActorRef(SubsystemKey(IRIS), healthActorRef)
   //#subscribeAggregatedHealthActorRef
 }
