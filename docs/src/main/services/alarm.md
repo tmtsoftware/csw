@@ -101,7 +101,7 @@ Java
 
 @@@
 
-## init alarms
+## initAlarms
 
 Loads the given alarm data in alarm store
 
@@ -110,7 +110,7 @@ Scala
 
 ## acknowledge
 
-Acknowledges the given alarm which is raised to a certain severity
+Acknowledges the given alarm which is raised to a higher severity
 
 Scala
 :   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #acknowledge}
@@ -126,7 +126,7 @@ Scala
 
 @@@ note
 
-Shelved alarms are also considered in aggregation calculation of alarms.
+Shelved alarms are also considered in aggregation severity or health calculation of alarms.
 
 @@@
 
@@ -140,7 +140,7 @@ Scala
 
 ## reset
 
-Resets the status of the given alarm by updating the latched severity same as current severity and acknowledgement status to acknowledged without changing any other properties of the alarm.
+Resets the status of the given latched alarm by updating the latched severity same as current severity and acknowledgement status to acknowledged without changing any other properties of the alarm.
 
 Scala
 :   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #reset}
@@ -148,7 +148,7 @@ Scala
 
 ## getMetadata
 
-Gets the metadata(s) of an alarm/component/subsystem/whole TMT system, which contains fields like:
+Gets the metadata of an alarm, component, subsystem, or whole TMT system.  The following information is returned for each alarm:
 
 * subsystem
 * component
@@ -168,7 +168,8 @@ Scala
 
 @@@ note
 
-Inactive alarms will not be taking part in aggregation of severity or health. 
+Inactive alarms will not be taking part in aggregation of severity or health.  Alarms are set active or inactive in the alarm
+configuration file, and not through either API.
 
 @@@
 
