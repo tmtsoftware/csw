@@ -161,6 +161,15 @@ Prints the help message.
 ### `--version` 
 Prints the version of the application.
 
+@@@ note
+
+All the above examples require that `csw-location-server` is running on local machine at `localhost:7654`.
+If `csw-location-server` is running on remote machine having Ip address `172.1.1.2`, then you need to pass additional `--locationHost 172.1.1.2` command line argument.
+Example:
+`csw-event-cli get -e wfos.prog.cloudcover --locationHost 172.1.1.2`
+
+@@@
+
 ## Testing/Development
 While testing or development, in order to use this CLI application, below prerequisites must be satisfied:  
 

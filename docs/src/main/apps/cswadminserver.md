@@ -4,13 +4,14 @@ A HTTP server application that supports changing/getting log level of component.
 
 ## Prerequisites
 
-The HTTP csw-admin-server needs to be part of csw-cluster so that it can resolve components for which log level needs to be fetched/changed.
-A required check before starting csw-admin-server app is to ensure the csw-cluster is setup and location sever are available.
+A required check before starting csw-admin-server app is to ensure the csw-cluster is setup and location sever is available so that using HTTP location client, 
+it can resolve components for which log level needs to be fetched/changed..
 Kindly refer to @ref:[CSW Location Server](../apps/cswlocationserver.md) for more information about location server setup.
 
 ## Command line parameter options
 
 * **`--port`** is an optional parameter. When specified the HTTP server will start on this port. Default is 7878.
+* **`--locationHost`** is an optional parameter. Indicates the host address of machine where location server is running. Default is localhost.
 * **`--help`** prints the help message.
 * **`--version`** prints the version of the application.
 
@@ -21,20 +22,34 @@ Kindly refer to @ref:[CSW Location Server](../apps/cswlocationserver.md) for mor
 csw-admin-server
 ```  
 Start HTTP server on default port 7878.
- 
+
+@@@ note
+This requires that location server is running locally
+@@@
+
 2. 
+```
+csw-admin-server --locationHost 172.1.1.2
+```  
+Start HTTP server on default port 7878.
+
+@@@ note
+This indicates, location server is running on remote machine having ip address=`172.1.1.2`
+@@@
+ 
+3. 
 ```
 csw-admin-server --port 8080
 ```  
 Start HTTP server on port 8080.
 
-3. 
+4. 
 ```
 csw-admin-server --help
 ```  
 Prints help message
 
-4. 
+5. 
 ```
 csw-admin-server --version
 ```    

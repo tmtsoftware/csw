@@ -39,3 +39,10 @@ Prints help message
 csw-config-server --version
 ```    
 Prints application version
+
+@@@ note
+
+Before running `csw-config-server`, make sure that `csw-location-server` is running on local machine at `localhost:7654`.
+As config server uses local HTTP location client which expect location server running locally.
+
+@@@

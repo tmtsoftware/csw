@@ -44,3 +44,10 @@ Prints help message
 csw-location-agent --version
 ```  
 Prints application version
+
+@@@ note
+
+Before running `csw-location-agent`, make sure that `csw-location-server` is running on local machine at `localhost:7654`.
+As location agent uses local HTTP location client which expect location server running locally.
+
+@@@

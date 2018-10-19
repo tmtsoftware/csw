@@ -247,7 +247,6 @@ public class JCommandIntegrationTest {
                 });
 
         //#submit
-        submitCommandResponseF.get();
 
         //#onewayAndMatch
 

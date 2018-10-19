@@ -4,7 +4,19 @@ A command line application that facilitates interaction with Configuration Servi
 
 ## Supported Commands
 
-Note: Exactly one operation must be specified from this list - `{create | update | get | delete | list | history | setActiveVersion | resetActiveVersion | getActiveVersion | getActiveByTime | getMetadata | exists | getActive}`
+* create 
+* update 
+* get 
+* delete 
+* list 
+* history 
+* setActiveVersion 
+* resetActiveVersion 
+* getActiveVersion 
+* getActiveByTime 
+* getMetadata 
+* exists 
+* getActive
 
 ## Admin API
 The commands listed below will be used by administrators and maintainers of Configuration Service.
@@ -188,3 +200,12 @@ Prints the help message.
 
 ### --version 
 Prints the version of the application.
+
+@@@ note
+
+All the above examples require that `csw-location-server` is running on local machine at `localhost:7654`.
+If `csw-location-server` is running on remote machine having Ip address `172.1.1.2`, then you need to pass additional `--locationHost 172.1.1.2` command line argument.
+Example:
+`csw-config-cli getMetadata --locationHost 172.1.1.2`
+
+@@@
