@@ -11,7 +11,7 @@ private[event] class Wiring {
   lazy val actorSystem  = ActorSystem("event-cli")
   lazy val actorRuntime = new ActorRuntime(actorSystem)
   import actorRuntime._
-  lazy val locationService: LocationService = HttpLocationServiceFactory.makeRemoteClient
+  lazy val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient
   lazy val eventService: EventService       = new EventServiceFactory().make(locationService)
   lazy val printLine: Any ⇒ Unit            = println
   lazy val commandLineRunner                = new CommandLineRunner(eventService, actorRuntime, printLine)

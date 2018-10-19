@@ -10,7 +10,7 @@ private[alarm] class Wiring {
   lazy val actorRuntime = new ActorRuntime(actorSystem)
   import actorRuntime._
 
-  lazy val locationService: LocationService = HttpLocationServiceFactory.makeRemoteClient
+  lazy val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient
   lazy val configUtils                      = new ConfigUtils(actorRuntime, locationService)
   lazy val printLine: Any ⇒ Unit            = println
   lazy val commandLineRunner                = new CommandLineRunner(actorRuntime, locationService, configUtils, printLine)
