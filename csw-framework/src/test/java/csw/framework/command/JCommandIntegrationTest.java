@@ -236,12 +236,12 @@ public class JCommandIntegrationTest {
         //#submit
         CompletableFuture submitCommandResponseF = hcdCmdService
                 .submit(setup, timeout)
-                .thenAccept(initialCommandResponse -> {
-                    if (initialCommandResponse instanceof CommandResponse.Started) {
+                .thenAccept(submitResponse -> {
+                    if (submitResponse instanceof CommandResponse.Completed) {
                         //do something
-                    } else if (initialCommandResponse instanceof CommandResponse.Invalid) {
+                    } else if (submitResponse instanceof CommandResponse.Error) {
                         //do something
-                    } else {
+                    } else if (submitResponse instanceof CommandResponse.Invalid){
                         //do something
                     }
                 });
