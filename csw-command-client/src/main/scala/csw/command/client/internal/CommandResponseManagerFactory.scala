@@ -10,7 +10,7 @@ import csw.logging.scaladsl.LoggerFactory
 /**
  * The factory for creating [[csw.command.client.internal.CommandResponseManagerBehavior]]
  */
-private[csw] class CommandResponseManagerFactory {
+class CommandResponseManagerFactory {
 
   def make(
       commandResponseManagerActor: ActorRef[CommandResponseManagerMessage]

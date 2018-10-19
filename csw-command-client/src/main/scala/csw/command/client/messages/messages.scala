@@ -259,7 +259,7 @@ private[csw] object FromSupervisorMessage {
 
 ////////////////
 
-private[csw] sealed trait CommandResponseManagerMessage
+sealed trait CommandResponseManagerMessage
 object CommandResponseManagerMessage {
   private[csw] case class AddOrUpdateCommand(runId: Id, commandResponse: SubmitResponse) extends CommandResponseManagerMessage
   private[csw] case class AddSubCommand(runId: Id, subCommandId: Id)                     extends CommandResponseManagerMessage

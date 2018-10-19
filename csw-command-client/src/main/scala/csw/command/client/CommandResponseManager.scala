@@ -9,7 +9,7 @@ import akka.actor.{ActorSystem, Scheduler}
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
 import csw.command.client.messages.CommandResponseManagerMessage
-import csw.command.client.messages.CommandResponseManagerMessage.{AddOrUpdateCommand, AddSubCommand, Query, UpdateSubCommand}
+import csw.command.client.messages.CommandResponseManagerMessage._
 import csw.params.commands.CommandResponse.{QueryResponse, SubmitResponse}
 import csw.params.core.models.Id
 
@@ -85,6 +85,17 @@ class CommandResponseManager private[command] (
    */
   def subscribe(runId: Id, callback: SubmitResponse ⇒ Unit): CommandResponseSubscription =
     new CommandResponseSubscription(runId, commandResponseManagerActor, callback)
+
+  /**
+   * Query the final status of a command
+   *
+   * @param runId command identifier of command
+   * @param timeout timeout duration until which this operation is expected to wait for providing a value
+   * @return a future of CommandResponse
+   */
+  def queryFinal(runId: Id)(implicit timeout: Timeout): Future[SubmitResponse] = {
+    commandResponseManagerActor ? (Subscribe(runId, _))
+  }
 
   /**
    * A helper method for Java to subscribe to the status of a command to receive the update in status
