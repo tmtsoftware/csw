@@ -2,6 +2,9 @@ package csw.location.client.utils
 
 import java.net.Socket
 
+import csw.location.client.utils.BlockingUtils.poll
+
+import scala.concurrent.duration.{Duration, DurationDouble}
 import scala.util.{Failure, Success, Try}
 
 object LocationServerStatus {
@@ -13,9 +16,9 @@ object LocationServerStatus {
 
   final def up(locationHost: String): Boolean = up(locationHost, 7654)
 
-  final def requireUp(locationHost: String): Unit =
+  final def requireUp(locationHost: String, within: Duration = 5.seconds): Unit =
     require(
-      LocationServerStatus.up(locationHost),
+      poll(LocationServerStatus.up(locationHost)),
       s"Location server is not running at $locationHost:7654. Please check online documentation for location server setup"
     )
 }

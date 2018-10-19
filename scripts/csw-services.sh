@@ -34,7 +34,7 @@ config_port=5000
 sentinel_port=26379
 event_master_port=6379
 alarm_master_port=7379
-initSvnRepo=""
+initSvnRepo="--initRepo"
 
 # Always start cluster seed application
 shouldStartSeed=true
@@ -208,7 +208,7 @@ function enableAllServicesForRunning {
 }
 
 function start_services {
-    if [[ "$shouldStartSeed" = true ]]; then start_seed ; sleep 5 ; fi
+    if [[ "$shouldStartSeed" = true ]]; then start_seed ; fi
     if [[ "$shouldStartConfig" = true ]]; then start_config ; fi
     if [[ "$shouldStartEvent" = true ]]; then start_event; fi
     if [[ "$shouldStartAlarm" = true ]]; then start_alarm; fi
