@@ -93,6 +93,14 @@ Use the following command to get version information for this app
   
 `./bin/trombone-host-config-app --version`
 
+@@@ note
+
+Before running `host-config` app, make sure that `csw-location-server` is running on local machine at `localhost:7654`.
+As host config application internally executes `container-cmd` application which uses local HTTP location client which expect location server running locally.
+
+@@@
+
+
 
 ## Systemd configuration
 

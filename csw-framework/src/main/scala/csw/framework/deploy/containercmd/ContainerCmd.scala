@@ -2,7 +2,6 @@ package csw.framework.deploy.containercmd
 
 import java.nio.file.Path
 
-import akka.actor.ActorSystem
 import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed.ActorRef
 import com.typesafe.config.Config
@@ -10,7 +9,7 @@ import csw.framework.commons.CoordinatedShutdownReasons.FailureReason
 import csw.framework.deploy.containercmd.cli.{ArgsParser, Options}
 import csw.framework.exceptions.UnableToParseOptions
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
-import csw.location.client.ActorSystemFactory
+import csw.location.client.utils.LocationServerStatus
 import csw.logging.scaladsl.{Logger, LoggerFactory}
 
 import scala.async.Async.{async, await}
@@ -40,29 +39,28 @@ private[containercmd] class ContainerCmd(
 ) {
   private val log: Logger = new LoggerFactory(name).getLogger
 
-  private val actorSystem: ActorSystem     = ActorSystemFactory.remote()
-  private lazy val wiring: FrameworkWiring = FrameworkWiring.make(actorSystem)
+  private lazy val wiring: FrameworkWiring = new FrameworkWiring
   import wiring.actorRuntime._
 
-  def start(args: Array[String]): ActorRef[_] = {
-    new ArgsParser(name).parse(args) match {
-      case None ⇒ throw UnableToParseOptions
-      case Some(Options(standalone, isLocal, inputFilePath)) =>
-        if (startLogging) wiring.actorRuntime.startLogging(name)
+  def start(args: Array[String]): ActorRef[_] = new ArgsParser(name).parse(args) match {
+    case None ⇒ throw UnableToParseOptions
+    case Some(Options(standalone, isLocal, inputFilePath)) =>
+      LocationServerStatus.requireUpLocally()
 
-        log.debug(s"$name started with following arguments [${args.mkString(",")}]")
+      if (startLogging) wiring.actorRuntime.startLogging(name)
 
-        try {
-          val actorRef = Await.result(createF(standalone, isLocal, inputFilePath, defaultConfig), 30.seconds)
-          log.info(s"Component is successfully created with actor actorRef $actorRef")
-          actorRef
-        } catch {
-          case NonFatal(ex) ⇒
-            log.error(s"${ex.getMessage}", ex = ex)
-            shutdown(FailureReason(ex))
-            throw ex
-        }
-    }
+      log.debug(s"$name started with following arguments [${args.mkString(",")}]")
+
+      try {
+        val actorRef = Await.result(createF(standalone, isLocal, inputFilePath, defaultConfig), 30.seconds)
+        log.info(s"Component is successfully created with actor actorRef $actorRef")
+        actorRef
+      } catch {
+        case NonFatal(ex) ⇒
+          log.error(s"${ex.getMessage}", ex = ex)
+          shutdown(FailureReason(ex))
+          throw ex
+      }
   }
 
   // fetch config file and start components in container mode or a single component in standalone mode
@@ -71,23 +69,16 @@ private[containercmd] class ContainerCmd(
       isLocal: Boolean,
       inputFilePath: Option[Path],
       defaultConfig: Option[Config]
-  ): Future[ActorRef[_]] = {
-    async {
-      val config   = await(wiring.configUtils.getConfig(isLocal, inputFilePath, defaultConfig))
-      val actorRef = await(createComponent(standalone, wiring, config))
-      log.info(s"Component is successfully created with actor actorRef $actorRef")
-      actorRef
-    }
+  ): Future[ActorRef[_]] = async {
+    val config   = await(wiring.configUtils.getConfig(isLocal, inputFilePath, defaultConfig))
+    val actorRef = await(createComponent(standalone, wiring, config))
+    log.info(s"Component is successfully created with actor actorRef $actorRef")
+    actorRef
   }
 
-  private def createComponent(
-      standalone: Boolean,
-      wiring: FrameworkWiring,
-      config: Config
-  ): Future[ActorRef[_]] = {
+  private def createComponent(standalone: Boolean, wiring: FrameworkWiring, config: Config): Future[ActorRef[_]] =
     if (standalone) Standalone.spawn(config, wiring)
     else Container.spawn(config, wiring)
-  }
 
   private def shutdown(reason: Reason) = Await.result(wiring.actorRuntime.shutdown(reason), 10.seconds)
 }
