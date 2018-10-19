@@ -21,4 +21,7 @@ object LocationServerStatus {
       poll(LocationServerStatus.up(locationHost)),
       s"Location server is not running at $locationHost:7654. Please check online documentation for location server setup"
     )
+
+  final def requireUpLocally(within: Duration = 5.seconds): Unit = requireUp("localhost", within)
+
 }

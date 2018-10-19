@@ -1,7 +1,7 @@
 package csw.alarm
 import akka.Done
 import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.{ActorSystem, typed}
+import akka.actor.{typed, ActorSystem}
 import akka.stream.ActorMaterializer
 import com.typesafe.config._
 import csw.alarm.api.javadsl.IAlarmService
@@ -25,12 +25,10 @@ object AlarmServiceClientExampleApp {
   private val locationService           = HttpLocationServiceFactory.makeLocalClient
   private val jLocationService          = JHttpLocationServiceFactory.makeLocalClient(actorSystem, mat)
 
-
   private def behaviour[T]: Behaviors.Receive[T] = Behaviors.receive { (ctx, msg) ⇒
     println(msg)
     Behaviors.same
   }
-
 
   //#create-scala-api
   // create alarm client using host and port of alarm server
@@ -53,7 +51,6 @@ object AlarmServiceClientExampleApp {
   // create alarm client using location service
   private val jclientAPI2 = new AlarmServiceFactory().jMakeClientApi(jLocationService, actorSystem)
   //#create-java-api
-
 
   val clientAPI: AlarmService     = clientAPI1
   val adminAPI: AlarmAdminService = adminAPI1
@@ -125,14 +122,14 @@ object AlarmServiceClientExampleApp {
 
   //#getAggregatedSeverity
   async {
-    val componentKey = ComponentKey(NFIRAOS, "tromboneAssembly")
+    val componentKey                          = ComponentKey(NFIRAOS, "tromboneAssembly")
     val aggregatedSeverity: FullAlarmSeverity = await(adminAPI.getAggregatedSeverity(componentKey))
   }
   //#getAggregatedSeverity
 
   //#getAggregatedHealth
   async {
-    val subsystemKey = SubsystemKey(IRIS)
+    val subsystemKey        = SubsystemKey(IRIS)
     val health: AlarmHealth = await(adminAPI.getAggregatedHealth(subsystemKey))
   }
   //#getAggregatedHealth
@@ -157,7 +154,7 @@ object AlarmServiceClientExampleApp {
   //#subscribeAggregatedHealthCallback
 
   //#subscribeAggregatedHealthActorRef
-  val healthActorRef   = typed.ActorSystem(behaviour[AlarmHealth], "healthActor")
+  val healthActorRef = typed.ActorSystem(behaviour[AlarmHealth], "healthActor")
   adminAPI.subscribeAggregatedHealthActorRef(SubsystemKey(IRIS), healthActorRef)
   //#subscribeAggregatedHealthActorRef
 }

@@ -46,9 +46,4 @@ class ArgsParserTest extends FunSuite with Matchers with BeforeAndAfterEach {
     x.get shouldEqual Options(initRepo = true, Some(2345))
   }
 
-  test("should be able to parse with all arguments") {
-    val args               = Array("--initRepo", "--port", "2345", "--locationHost", "location.server")
-    val x: Option[Options] = silentParse(args)
-    x.get shouldEqual Options(initRepo = true, Some(2345), "location.server")
-  }
 }

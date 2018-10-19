@@ -50,10 +50,6 @@ class ArgsParser(name: String) {
       c.copy(noExit = true)
     } text "for testing: prevents application from exiting after running command"
 
-    opt[String]("locationHost") action { (x, c) =>
-      c.copy(locationHost = x)
-    } text "Optional: host address of machine where location server is running. Default is localhost"
-
     help("help")
     version("version")
   }

@@ -23,10 +23,10 @@ object Main {
 
   def start(args: Array[String], startLogging: Boolean = false): Option[HttpService] =
     new ArgsParser(name).parse(args).map {
-      case Options(init, maybePort, locationHost) =>
-        LocationServerStatus.requireUp(locationHost)
+      case Options(init, maybePort) =>
+        LocationServerStatus.requireUpLocally()
 
-        val wiring = ServerWiring.make(maybePort, locationHost)
+        val wiring = ServerWiring.make(maybePort)
         import wiring._
 
         if (startLogging) actorRuntime.startLogging(name)

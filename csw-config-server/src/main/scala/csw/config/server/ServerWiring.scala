@@ -43,10 +43,7 @@ private[csw] object ServerWiring {
     override lazy val locationService: LocationService = _locationService
   }
 
-  def make(maybePort: Option[Int], locationHost: String = "localhost"): ServerWiring = new ServerWiring {
-    override lazy val locationService: LocationService =
-      HttpLocationServiceFactory.make(locationHost)(actorSystem, actorRuntime.mat)
-
+  def make(maybePort: Option[Int]): ServerWiring = new ServerWiring {
     override lazy val settings: Settings = new Settings(config) {
       override val `service-port`: Int = maybePort.getOrElse(super.`service-port`)
     }

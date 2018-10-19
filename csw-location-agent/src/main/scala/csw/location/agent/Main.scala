@@ -20,7 +20,7 @@ object Main {
 
   def start(args: Array[String], startLogging: Boolean = false): Option[Process] =
     new ArgsParser(name).parse(args).map { options =>
-      LocationServerStatus.requireUp(options.locationHost)
+      LocationServerStatus.requireUpLocally()
 
       val wiring = new Wiring
       if (startLogging) wiring.actorRuntime.startLogging(name)
