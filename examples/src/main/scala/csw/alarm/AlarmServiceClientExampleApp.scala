@@ -59,8 +59,6 @@ object AlarmServiceClientExampleApp {
 
   //#setSeverity-scala
   val alarmKey = AlarmKey(NFIRAOS, "trombone", "tromboneAxisLowLimitAlarm")
-  clientAPI.setSeverity(alarmKey, Okay)
-
   async {
     await(clientAPI.setSeverity(alarmKey, Okay))
   }
