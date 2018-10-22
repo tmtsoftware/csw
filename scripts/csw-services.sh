@@ -132,7 +132,7 @@ function start_seed {
 
     if [ -x "$location_script" ]; then
         echo "[LOCATION] Starting cluster seed on port: [$seed_port] ..."
-        nohup ./csw-location-server --clusterPort ${seed_port} -DclusterSeeds=${seeds} &> ${locationLogFile} &
+        nohup ./csw-location-server --clusterPort ${seed_port} &> ${locationLogFile} &
         echo $! > ${locationPidFile}
     else
         echo "[ERROR] $location_script script does not exist, please make sure that $location_script resides in same directory as $script_name"
@@ -145,7 +145,7 @@ function start_config {
 
     if [ -x "$config_script" ]; then
         echo "[CONFIG] Starting config service on port: [$config_port] ..."
-        nohup ./csw-config-server --port ${config_port} ${initSvnRepo} -DclusterSeeds=${seeds} &> ${configLogFile} &
+        nohup ./csw-config-server --port ${config_port} ${initSvnRepo} &> ${configLogFile} &
         echo $! > ${configPidFile}
     else
         echo "[ERROR] $config_script script does not exist, please make sure that $config_script resides in same directory as $script_name"
@@ -157,7 +157,7 @@ function start_sentinel() {
     if [ -x "$location_agent_script" ]; then
         if checkIfRedisIsInstalled ; then
             echo "Starting Redis Sentinel..."
-            nohup ./csw-location-agent -DclusterSeeds=${seeds} --name "EventServer,AlarmServer" --command "$redisSentinel ${sentinelConf} --port ${sentinel_port}" --port "${sentinel_port}"> ${sentinelLogFile} 2>&1 &
+            nohup ./csw-location-agent --name "EventServer,AlarmServer" --command "$redisSentinel ${sentinelConf} --port ${sentinel_port}" --port "${sentinel_port}"> ${sentinelLogFile} 2>&1 &
             echo $! > ${sentinelPidFile}
             echo ${sentinel_port} > ${sentinelPortFile}
         else
@@ -305,6 +305,7 @@ function parse_cmd_args {
                 else
                     seeds="${IP}:${seed_port}"
                     echo "[INFO] Using clusterSeeds=$seeds"
+                    export clusterSeeds=$seeds
 
                     start_services
 
