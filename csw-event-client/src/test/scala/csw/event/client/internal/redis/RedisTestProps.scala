@@ -5,7 +5,6 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import com.typesafe.config.ConfigFactory
 import csw.commons.redis.EmbeddedRedis
-import csw.commons.utils.SocketUtils.getFreePort
 import csw.event.api.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
 import csw.event.api.scaladsl._
 import csw.event.client.EventServiceFactory
@@ -16,6 +15,7 @@ import csw.event.client.internal.wiring.BaseProperties.createInfra
 import csw.event.client.models.EventStores.RedisStore
 import csw.location.api.scaladsl.LocationService
 import csw.location.server.http.HTTPLocationServiceOnPorts
+import csw.network.utils.SocketUtils.getFreePort
 import io.lettuce.core.api.async.RedisAsyncCommands
 import io.lettuce.core.codec.StringCodec
 import io.lettuce.core.{ClientOptions, RedisClient, RedisURI}

@@ -13,12 +13,12 @@ import csw.admin.server.log.http.HttpSupport
 import csw.commons.http.{ErrorMessage, ErrorResponse}
 import csw.config.server.commons.{ConfigServiceConnection, TestFileUtils}
 import csw.config.server.{ServerWiring, Settings}
-import csw.location.api.commons.ClusterAwareSettings
 import csw.location.api.models.Connection.TcpConnection
 import csw.location.api.models.{ComponentId, ComponentType}
 import csw.location.server.http.HTTPLocationService
 import csw.logging.internal._
 import csw.logging.scaladsl.LoggingSystemFactory
+import csw.network.utils.Networks
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
@@ -64,7 +64,7 @@ class HttpAndTcpLogAdminTest extends AdminLogTestSuite with HttpSupport with HTT
     // send http get metadata request and verify the response has correct log levels
     val getLogMetadataUri = Uri.from(
       scheme = "http",
-      host = ClusterAwareSettings.hostname,
+      host = Networks().hostname,
       port = 7888,
       path = s"/admin/logging/${ConfigServiceConnection.value.name}/level"
     )
@@ -83,7 +83,7 @@ class HttpAndTcpLogAdminTest extends AdminLogTestSuite with HttpSupport with HTT
     // send http get metadata request and verify the response has correct log levels
     val getLogMetadataUri = Uri.from(
       scheme = "http",
-      host = ClusterAwareSettings.hostname,
+      host = Networks().hostname,
       port = 7888,
       path = s"/admin/logging/${ConfigServiceConnection.value.name}/level",
       queryString = Some("value=debug")
@@ -105,7 +105,7 @@ class HttpAndTcpLogAdminTest extends AdminLogTestSuite with HttpSupport with HTT
     // send http get metadata request and verify the response has correct log levels
     val getLogMetadataUri = Uri.from(
       scheme = "http",
-      host = ClusterAwareSettings.hostname,
+      host = Networks().hostname,
       port = 7888,
       path = s"/admin/logging/${tcpConnection.name}/level"
     )
@@ -126,7 +126,7 @@ class HttpAndTcpLogAdminTest extends AdminLogTestSuite with HttpSupport with HTT
     // send http get metadata request and verify the response has correct log levels
     val getLogMetadataUri = Uri.from(
       scheme = "http",
-      host = ClusterAwareSettings.hostname,
+      host = Networks().hostname,
       port = 7888,
       path = s"/admin/logging/${tcpConnection.name}/level",
       queryString = Some("value=debug")

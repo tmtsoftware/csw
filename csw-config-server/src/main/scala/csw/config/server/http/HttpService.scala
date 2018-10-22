@@ -10,8 +10,8 @@ import csw.config.server.commons.{ConfigServerLogger, ConfigServiceConnection}
 import csw.config.server.{ActorRuntime, Settings}
 import csw.location.api.models.{HttpRegistration, RegistrationResult}
 import csw.location.api.scaladsl.LocationService
-import csw.location.api.commons.ClusterAwareSettings
 import csw.logging.scaladsl.Logger
+import csw.network.utils.Networks
 
 import scala.async.Async._
 import scala.concurrent.Future
@@ -62,7 +62,7 @@ class HttpService(
 
   private def bind() = Http().bindAndHandle(
     handler = configServiceRoute.route,
-    interface = ClusterAwareSettings.hostname,
+    interface = Networks().hostname,
     port = settings.`service-port`
   )
 

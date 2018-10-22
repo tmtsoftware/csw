@@ -10,7 +10,6 @@ import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.location.server.commons.CswCluster
 import csw.location.server.internal.{LocationServiceFactory, ServerWiring}
-import csw.logging.scaladsl.LoggingSystemFactory
 import csw.params.core.models.Prefix
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 
@@ -25,8 +24,6 @@ class DetectComponentRestartTestMultiJvmNode3 extends DetectComponentRestartTest
 class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(config = new TwoMembersAndSeed, mode) {
 
   import config._
-
-  LoggingSystemFactory.start("", "", "", system)
 
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
   InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
@@ -46,7 +43,6 @@ class DetectComponentRestartTest(ignore: Int, mode: String) extends LSNodeSpec(c
       Await.result(system.whenTerminated, 10.seconds)
 
       val newSystem = startNewSystem()
-      LoggingSystemFactory.start("", "", "", newSystem)
 
       val freshLocationService = mode match {
         case "http" =>

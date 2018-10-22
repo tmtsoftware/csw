@@ -2,8 +2,8 @@ package csw.location.server.internal
 
 import akka.actor.ActorSystem
 import com.typesafe.config.{Config, ConfigFactory}
-import csw.location.api.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.location.api.scaladsl.LocationService
+import csw.location.server.commons.{ClusterAwareSettings, ClusterSettings}
 import csw.location.server.http.{LocationExceptionHandler, LocationHttpService, LocationRoutes}
 
 // $COVERAGE-OFF$

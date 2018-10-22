@@ -1,6 +1,5 @@
 package csw.location.server.scaladsl
 
-import csw.location.api.commons.ClusterSettings
 import csw.location.api.models.Connection.TcpConnection
 import csw.location.api.models.{ComponentId, ComponentType, TcpRegistration}
 import csw.location.server.commons.TestFutureExtension.RichFuture

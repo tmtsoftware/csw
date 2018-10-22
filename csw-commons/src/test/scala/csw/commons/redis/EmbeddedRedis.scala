@@ -1,5 +1,6 @@
 package csw.commons.redis
-import csw.commons.utils.SocketUtils.getFreePort
+
+import csw.network.utils.SocketUtils.getFreePort
 import redis.embedded.{RedisSentinel, RedisServer}
 
 trait EmbeddedRedis {

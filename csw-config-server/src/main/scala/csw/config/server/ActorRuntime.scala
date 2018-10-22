@@ -8,9 +8,9 @@ import akka.actor.{ActorSystem, CoordinatedShutdown}
 import akka.dispatch.MessageDispatcher
 import akka.stream.{ActorMaterializer, Materializer}
 import csw.services.BuildInfo
-import csw.location.api.commons.ClusterAwareSettings
 import csw.logging.internal.LoggingSystem
 import csw.logging.scaladsl.LoggingSystemFactory
+import csw.network.utils.Networks
 
 import scala.compat.java8.FutureConverters.FutureOps
 import scala.concurrent.{ExecutionContextExecutor, Future}
@@ -28,7 +28,7 @@ private[config] class ActorRuntime(_actorSystem: ActorSystem, settings: Settings
   val blockingIoDispatcher: MessageDispatcher = actorSystem.dispatchers.lookup(settings.`blocking-io-dispatcher`)
 
   def startLogging(name: String): LoggingSystem =
-    LoggingSystemFactory.start(name, BuildInfo.version, ClusterAwareSettings.hostname, actorSystem)
+    LoggingSystemFactory.start(name, BuildInfo.version, Networks().hostname, actorSystem)
 
   def shutdown(reason: Reason): Future[Done] = coordinatedShutdown.run(reason)
 

@@ -263,6 +263,13 @@ object Dependencies {
     )
   )
 
+  val NetworkUtils = Def.setting(
+    Seq(
+      Libs.`scalatest`.value % Test,
+      Libs.`mockito-core`    % Test
+    )
+  )
+
   val Romaine = Def.setting(
     Seq(
       Libs.`lettuce`,

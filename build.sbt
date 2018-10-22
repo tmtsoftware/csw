@@ -26,6 +26,7 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-alarm-api`,
   `csw-alarm-client`,
   `csw-alarm-cli`,
+  `csw-network-utils`,
   `csw-commons`,
   `csw-benchmark`,
   `romaine`,
@@ -43,6 +44,7 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
   `csw-alarm-cli`,
   `csw-logging-macros`,
   `csw-params-js`,
+  `csw-network-utils`,
   `csw-commons`,
   `csw-benchmark`,
   `romaine`,
@@ -99,6 +101,7 @@ lazy val `csw-location-server` = project
   .dependsOn(
     `csw-location-api`,
     `csw-logging`,
+    `csw-network-utils`,
     `csw-location-client` % "test->compile;multi-jvm->compile",
     `csw-commons`         % "compile->compile;test->test"
   )
@@ -108,7 +111,10 @@ lazy val `csw-location-server` = project
   )
 
 lazy val `csw-location-client` = project
-  .dependsOn(`csw-location-api`)
+  .dependsOn(
+    `csw-location-api`,
+    `csw-network-utils`
+  )
   .enablePlugins(PublishBintray, GenJavadocPlugin, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.LocationClient.value
@@ -308,7 +314,15 @@ lazy val `csw-alarm-cli` = project
   .settings(libraryDependencies ++= Dependencies.AlarmCli.value)
 
 /* =============== Common Utilities ============ */
+lazy val `csw-network-utils` = project
+  .dependsOn(`csw-logging`)
+  .enablePlugins(PublishBintray)
+  .settings(
+    libraryDependencies ++= Dependencies.NetworkUtils.value
+  )
+
 lazy val `csw-commons` = project
+  .dependsOn(`csw-network-utils`)
   .enablePlugins(PublishBintray)
   .settings(
     libraryDependencies ++= Dependencies.Commons.value
@@ -359,7 +373,8 @@ lazy val integration = project
   .dependsOn(
     `csw-location-server`,
     `csw-command-client`,
-    `csw-location-agent`
+    `csw-location-agent`,
+    `csw-network-utils`
   )
   .enablePlugins(DeployApp)
   .settings(

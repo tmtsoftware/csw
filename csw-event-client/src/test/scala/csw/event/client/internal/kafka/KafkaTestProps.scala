@@ -4,7 +4,6 @@ import akka.Done
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.kafka.ProducerSettings
-import csw.commons.utils.SocketUtils.getFreePort
 import csw.event.api.javadsl.{IEventPublisher, IEventService, IEventSubscriber}
 import csw.event.api.scaladsl.{EventPublisher, EventService, EventSubscriber}
 import csw.event.client.EventServiceFactory
@@ -12,10 +11,11 @@ import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.event.client.internal.wiring.BaseProperties
 import csw.event.client.internal.wiring.BaseProperties.createInfra
 import csw.event.client.models.EventStores.KafkaStore
-import csw.location.api.commons.ClusterAwareSettings
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.extensions.LocationServiceExt.RichLocationService
 import csw.location.server.http.HTTPLocationServiceOnPorts
+import csw.network.utils.Networks
+import csw.network.utils.SocketUtils.getFreePort
 import net.manub.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.StringSerializer
@@ -30,14 +30,14 @@ class KafkaTestProps(
     additionalBrokerProps: Map[String, String]
 )(implicit val actorSystem: ActorSystem)
     extends BaseProperties {
-  private val brokers          = s"PLAINTEXT://${ClusterAwareSettings.hostname}:$kafkaPort"
+  private val brokers          = s"PLAINTEXT://${Networks().hostname}:$kafkaPort"
   private val brokerProperties = Map("listeners" → brokers, "advertised.listeners" → brokers) ++ additionalBrokerProps
   val config                   = EmbeddedKafkaConfig(customBrokerProperties = brokerProperties, zooKeeperPort = getFreePort)
 
   private val eventServiceFactory = new EventServiceFactory(KafkaStore)
   private lazy val producerSettings: ProducerSettings[String, String] =
     ProducerSettings(actorSystem, new StringSerializer, new StringSerializer)
-      .withBootstrapServers(s"${ClusterAwareSettings.hostname}:$kafkaPort")
+      .withBootstrapServers(s"${Networks().hostname}:$kafkaPort")
 
   private lazy val kafkaProducer = producerSettings.createKafkaProducer()
 

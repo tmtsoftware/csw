@@ -12,7 +12,6 @@ import akka.util.Timeout
 import csw.location.api.exceptions.{CouldNotEnsureDataReplication, CouldNotJoinCluster}
 import csw.location.server.commons.ClusterConfirmationActor.HasJoinedCluster
 import csw.location.server.commons.CoordinatedShutdownReasons.FailureReason
-import csw.location.api.commons.ClusterSettings
 import csw.logging.scaladsl.Logger
 
 import scala.concurrent.duration.DurationInt
@@ -127,7 +126,7 @@ object CswCluster {
   /**
    * Creates CswCluster with the default cluster settings
    *
-   * @see [[csw.location.api.commons.ClusterSettings]] same as [[csw.location.server.commons.CswCluster.withSettings()]]
+   * @see [[ClusterSettings]] same as [[csw.location.server.commons.CswCluster.withSettings()]]
    * @return an instance of CswCluster
    */
   def make(): CswCluster = withSettings(ClusterSettings())

@@ -2,12 +2,13 @@ package csw.integtration.tests
 
 import akka.actor.CoordinatedShutdown.UnknownReason
 import csw.integtration.common.TestFutureExtension.RichFuture
-import csw.location.api.commons.ClusterAwareSettings
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
+import csw.location.server.commons.ClusterAwareSettings
 import csw.location.server.internal.ServerWiring
 import csw.logging.scaladsl.LoggingSystemFactory
+import csw.network.utils.Networks
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.time.Span
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
@@ -21,7 +22,7 @@ class LocationServiceMultipleNICTest() extends FunSuite with Matchers with Befor
     PatienceConfig(Span(5, org.scalatest.time.Seconds), Span(100, org.scalatest.time.Millis))
 
   val adminWiring: ServerWiring = ServerWiring.make(ClusterAwareSettings.onPort(3553).withInterface("eth1"))
-  LoggingSystemFactory.start("Assembly", "1.0", ClusterAwareSettings.hostname, adminWiring.actorSystem)
+  LoggingSystemFactory.start("Assembly", "1.0", Networks().hostname, adminWiring.actorSystem)
 
   adminWiring.locationHttpService.start().futureValue
 

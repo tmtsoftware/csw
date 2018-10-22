@@ -1,8 +1,8 @@
 package csw.location.server.commons
 
 import com.typesafe.config.ConfigException
-import csw.location.api.commons.{ClusterSettings, Constants}
-import csw.location.api.internal.Networks
+import csw.location.api.commons.Constants
+import csw.network.utils.Networks
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
@@ -27,7 +27,7 @@ class ClusterSettingsTest extends FunSuite with Matchers with BeforeAndAfterAll 
     val config          = clusterSettings.config
 
     clusterSettings.clusterName shouldBe Constants.ClusterName
-    config.getString("akka.remote.netty.tcp.hostname") shouldBe new Networks().hostname()
+    config.getString("akka.remote.netty.tcp.hostname") shouldBe Networks().hostname
     config.getInt("akka.remote.netty.tcp.port") shouldBe 0
     config.getList("akka.cluster.seed-nodes").size shouldBe 0
   }
@@ -47,7 +47,7 @@ class ClusterSettingsTest extends FunSuite with Matchers with BeforeAndAfterAll 
   test("cluster settings with join Local") {
     val port     = 9010
     val portList = List(9000, 9001, 9002, 9003)
-    val hostname = new Networks().hostname
+    val hostname = Networks().hostname
     val clusterSettings: ClusterSettings =
       ClusterSettings().onPort(port).joinLocal(portList(0), portList(1), portList(2), portList(3))
 

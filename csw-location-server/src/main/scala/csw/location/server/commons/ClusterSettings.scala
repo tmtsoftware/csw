@@ -1,9 +1,10 @@
-package csw.location.api.commons
+package csw.location.server.commons
 
 import akka.actor.ActorSystem
 import com.typesafe.config.{Config, ConfigFactory}
-import csw.location.api.internal.Networks
+import csw.location.api.commons.Constants
 import csw.logging.scaladsl.Logger
+import csw.network.utils.Networks
 
 import scala.annotation.varargs
 import scala.collection.JavaConverters._
@@ -23,12 +24,12 @@ import scala.collection.JavaConverters._
  *  - clusterPort (Specify port on which to start this service)
  *
  * The config values of the `ActorSystem` will be evaluated based on the above three settings as follows :
- *  - `akka.remote.netty.tcp.hostname` will be ipV4 address based on `interfaceName` from [[csw.location.api.internal.Networks]]
+ *  - `akka.remote.netty.tcp.hostname` will be ipV4 address based on `interfaceName` from [[Networks]]
  *  - `akka.remote.netty.tcp.port` will be a random port or if `clusterPort` is specified that value will be picked
  *  - `akka.cluster.seed-nodes` will pick values of `clusterSeeds`
  *
  * If none of the settings are provided then defaults will be picked as follows :
- *  - `akka.remote.netty.tcp.hostname` will be ipV4 address from [[csw.location.api.internal.Networks]]
+ *  - `akka.remote.netty.tcp.hostname` will be ipV4 address from [[Networks]]
  *  - `akka.remote.netty.tcp.port` will be a random port
  *  - `akka.cluster.seed-nodes` will be empty
  * and an `ActorSystem` will be created and a cluster will be formed with no Seed Nodes. It will self join the cluster.
@@ -50,7 +51,7 @@ import scala.collection.JavaConverters._
  *  - the `ClusterSettings` api of providing values should be used for testing purpose only
  *
  */
-case class ClusterSettings(clusterName: String = Constants.ClusterName, values: Map[String, Any] = Map.empty) {
+private[location] case class ClusterSettings(clusterName: String = Constants.ClusterName, values: Map[String, Any] = Map.empty) {
   private val log: Logger       = LocationServiceLogger.getLogger
   private val InterfaceNameKey  = "interfaceName"
   private val ClusterSeedsKey   = "clusterSeeds"
@@ -94,7 +95,7 @@ case class ClusterSettings(clusterName: String = Constants.ClusterName, values: 
 
   //Get the host address based on interfaceName provided.
   //If it is empty then get the default ipv4 address to start the current ActorSystem on.
-  def hostname: String = new Networks(interfaceName).hostname()
+  def hostname: String = Networks(interfaceName).hostname
 
   //Get the port for current ActorSystem to start. If no port is provided 0 will be used default.
   //SeedNode should start on a fixed port and rest all can start on random port.
@@ -137,4 +138,4 @@ case class ClusterSettings(clusterName: String = Constants.ClusterName, values: 
  * can be used to add properties like port, seedNodes etc. `ClusterAwareSettings` is used internally in spawning many csw
  * apps like `csw-location-server`, `csw-config-cli`, `csw-config-server`, etc.
  */
-object ClusterAwareSettings extends ClusterSettings
+private[csw] object ClusterAwareSettings extends ClusterSettings

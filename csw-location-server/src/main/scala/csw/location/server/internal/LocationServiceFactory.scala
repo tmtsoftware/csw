@@ -1,9 +1,8 @@
 package csw.location.server.internal
 
 import akka.actor.ActorSystem
-import csw.location.api.commons.ClusterSettings
 import csw.location.api.scaladsl.LocationService
-import csw.location.server.commons.CswCluster
+import csw.location.server.commons.{ClusterSettings, CswCluster}
 
 /**
  * The factory is used to create LocationService instance. With each creation, a new ActorSystem will be created and will

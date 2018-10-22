@@ -8,10 +8,10 @@ import akka.actor.{ActorPath, ActorSystem}
 import akka.serialization.Serialization
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.location.api.exceptions.LocalAkkaActorRegistrationNotAllowed
-import csw.location.api.internal.Networks
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection, TcpConnection}
 import csw.location.api.models._
 import csw.location.client.ActorSystemFactory
+import csw.network.utils.Networks
 import csw.params.core.models.Prefix
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
@@ -23,7 +23,7 @@ class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll wit
   implicit val actorSystem: ActorSystem = ActorSystemFactory.remote()
 
   test("should able to create the AkkaRegistration which should internally create AkkaLocation") {
-    val hostname = new Networks().hostname()
+    val hostname = Networks().hostname
 
     val akkaConnection = AkkaConnection(ComponentId("hcd1", ComponentType.HCD))
     val actorRef       = actorSystem.spawn(Behavior.empty, "my-actor-1")
@@ -39,7 +39,7 @@ class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll wit
   }
 
   test("should able to create the HttpRegistration which should internally create HttpLocation") {
-    val hostname = new Networks().hostname()
+    val hostname = Networks().hostname
     val port     = 9595
     val prefix   = "/trombone/hcd"
 
@@ -52,7 +52,7 @@ class RegistrationTest extends FunSuite with Matchers with BeforeAndAfterAll wit
   }
 
   test("should able to create the TcpRegistration which should internally create TcpLocation") {
-    val hostname = new Networks().hostname()
+    val hostname = Networks().hostname
     val port     = 9596
 
     val tcpConnection   = TcpConnection(ComponentId("lgsTrombone", ComponentType.HCD))

@@ -2,8 +2,9 @@ package csw.location.client
 
 import akka.actor.ActorSystem
 import com.typesafe.config.ConfigFactory
-import csw.location.api.commons.{ClusterSettings, Constants, LocationServiceLogger}
+import csw.location.api.commons.{Constants, LocationServiceLogger}
 import csw.logging.scaladsl.Logger
+import csw.network.utils.Networks
 
 /**
  * ActorSystemFactory creates a remote ActorSystem on the interface where csw-cluster is running. The ActorSystem starts on a
@@ -28,7 +29,7 @@ object ActorSystemFactory {
    */
   def remote(componentName: String): ActorSystem = {
     val config = ConfigFactory
-      .parseString(s"akka.remote.netty.tcp.hostname = ${ClusterSettings().hostname}")
+      .parseString(s"akka.remote.netty.tcp.hostname = ${Networks().hostname}")
       .withFallback(ConfigFactory.load().getConfig(Constants.RemoteActorSystemName))
       .withFallback(ConfigFactory.defaultApplication().resolve())
 

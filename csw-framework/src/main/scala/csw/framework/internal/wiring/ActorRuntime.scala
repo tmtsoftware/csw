@@ -5,9 +5,9 @@ import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.{ActorSystem, CoordinatedShutdown}
 import akka.stream.{ActorMaterializer, Materializer}
 import csw.services.BuildInfo
-import csw.location.api.commons.ClusterAwareSettings
 import csw.logging.internal.LoggingSystem
 import csw.logging.scaladsl.LoggingSystemFactory
+import csw.network.utils.Networks
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
@@ -23,7 +23,7 @@ private[framework] class ActorRuntime(_actorSystem: ActorSystem) {
   private[framework] val coordinatedShutdown = CoordinatedShutdown(system)
 
   def startLogging(name: String): LoggingSystem =
-    LoggingSystemFactory.start(name, BuildInfo.version, ClusterAwareSettings.hostname, system)
+    LoggingSystemFactory.start(name, BuildInfo.version, Networks().hostname, system)
 
   def shutdown(reason: Reason): Future[Done] = coordinatedShutdown.run(reason)
 }

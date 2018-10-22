@@ -4,10 +4,10 @@ import akka.actor.typed.scaladsl.adapter._
 import akka.actor.{Actor, ActorPath, ActorRef, Props}
 import akka.serialization.Serialization
 import csw.integtration.common.TestFutureExtension.RichFuture
-import csw.location.api.commons.ClusterAwareSettings
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaRegistration, ComponentId, ComponentType, RegistrationResult}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
+import csw.location.server.commons.ClusterAwareSettings
 import csw.location.server.internal.ServerWiring
 import csw.logging.scaladsl.LoggingSystemFactory
 import csw.params.core.models.Prefix

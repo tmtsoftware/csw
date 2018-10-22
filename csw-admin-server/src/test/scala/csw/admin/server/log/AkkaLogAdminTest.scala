@@ -19,7 +19,6 @@ import csw.command.client.models.framework.{Component, Components, ContainerLife
 import csw.common.FrameworkAssertions.assertThatContainerIsRunning
 import csw.commons.tags.LoggingSystemSensitive
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
-import csw.location.api.commons.ClusterAwareSettings
 import csw.location.api.models.ComponentId
 import csw.location.api.models.ComponentType.{Assembly, HCD}
 import csw.location.api.models.Connection.AkkaConnection
@@ -29,6 +28,7 @@ import csw.logging.internal.LoggingLevels.{ERROR, Level, WARN}
 import csw.logging.internal._
 import csw.logging.models.LogMetadata
 import csw.logging.scaladsl.LoggingSystemFactory
+import csw.network.utils.Networks
 import csw.params.commands.CommandResponse.OnewayResponse
 import csw.params.commands.{CommandName, Setup}
 import csw.params.core.models.Prefix
@@ -112,7 +112,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HTTPLocationService with H
     // send http get metadata request and verify the response has correct log levels
     val getLogMetadataUri = Uri.from(
       scheme = "http",
-      host = ClusterAwareSettings.hostname,
+      host = Networks().hostname,
       port = 7879,
       path = s"/admin/logging/${motionControllerConnection.name}/level"
     )
@@ -169,7 +169,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HTTPLocationService with H
     // set log level of laser component to error through http endpoint
     val uri = Uri.from(
       scheme = "http",
-      host = ClusterAwareSettings.hostname,
+      host = Networks().hostname,
       port = 7879,
       path = s"/admin/logging/${laserConnection.name}/level",
       queryString = Some("value=error")
@@ -214,7 +214,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HTTPLocationService with H
     // send http get metadata request for invalid component
     val getLogMetadataUri = Uri.from(
       scheme = "http",
-      host = ClusterAwareSettings.hostname,
+      host = Networks().hostname,
       port = 7879,
       path = s"/admin/logging/abcd-hcd-akka/level"
     )
@@ -229,7 +229,7 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HTTPLocationService with H
     // send http set request for invalid log level
     val uri = Uri.from(
       scheme = "http",
-      host = ClusterAwareSettings.hostname,
+      host = Networks().hostname,
       port = 7879,
       path = s"/admin/logging/${laserConnection.name}/level",
       queryString = Some("value=error1")

@@ -1,8 +1,6 @@
 package csw.location.client.scaladsl
 import akka.actor.ActorSystem
 import akka.stream.Materializer
-import csw.location.api.commons.ClusterAwareSettings
-import csw.location.api.exceptions.ClusterSeedsNotFound
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.internal.LocationServiceClient
 
@@ -19,6 +17,7 @@ object HttpLocationServiceFactory {
    * */
   def makeLocalClient(implicit actorSystem: ActorSystem, mat: Materializer): LocationService = make("localhost")
 
+  /*
   /**
    * Use this factory method to create http location client when location server is running remotely.
    * HTTP Location server runs on port 7654.
@@ -34,6 +33,7 @@ object HttpLocationServiceFactory {
 
     new LocationServiceClient(seedIp, httpServerPort)
   }
+   */
 
   /**
    * Use this factory method to create http location client when location server ip is known.

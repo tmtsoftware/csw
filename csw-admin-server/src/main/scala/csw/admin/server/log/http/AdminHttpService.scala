@@ -5,8 +5,8 @@ import akka.http.scaladsl.Http.ServerBinding
 import csw.admin.server.commons.AdminLogger
 import csw.admin.server.commons.CoordinatedShutdownReasons.FailureReason
 import csw.admin.server.wiring.{ActorRuntime, Settings}
-import csw.location.api.commons.ClusterAwareSettings
 import csw.logging.scaladsl.Logger
+import csw.network.utils.Networks
 
 import scala.async.Async._
 import scala.concurrent.Future
@@ -32,7 +32,7 @@ class AdminHttpService(adminRoutes: AdminRoutes, actorRuntime: ActorRuntime, set
 
   private def bind() = Http().bindAndHandle(
     handler = adminRoutes.route,
-    interface = ClusterAwareSettings.hostname,
+    interface = Networks().hostname,
     port = settings.adminPort
   )
 }

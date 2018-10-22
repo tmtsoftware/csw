@@ -1,8 +1,10 @@
-package csw.location.api.internal
+package csw.network.utils
 
 import java.net.{InetAddress, NetworkInterface}
 
-import org.mockito.Mockito._
+import csw.network.utils.exceptions.NetworkInterfaceNotFound
+import csw.network.utils.internal.NetworkInterfaceProvider
+import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
@@ -33,7 +35,7 @@ class NetworksTest extends FunSuite with Matchers with BeforeAndAfterAll with Be
     )
     when(mockedNetworkProvider.getInterface("eth0")).thenReturn(Seq((1, List(inet6Address, inet4Address))))
     val ipv4Address: InetAddress = new Networks("eth0", mockedNetworkProvider).ipv4Address
-    ipv4Address shouldEqual (inet4Address)
+    ipv4Address shouldEqual inet4Address
 
   }
 
@@ -45,19 +47,16 @@ class NetworksTest extends FunSuite with Matchers with BeforeAndAfterAll with Be
     when(mockedNetworkProvider.allInterfaces)
       .thenReturn(Seq((1, List(inet4Address1)), (2, List(inet4Address2)), (3, List(inet4Address3))))
 
-    new Networks("", mockedNetworkProvider).ipv4Address shouldBe (inet4Address1)
+    Networks("", mockedNetworkProvider).ipv4Address shouldBe inet4Address1
   }
 
   test("testGetIpv4Address throws NetworkInterfaceNotFound when provided interface name is not present") {
-    intercept[NetworkInterfaceNotFound] {
-      new Networks("test").ipv4Address
-    }
+    a[NetworkInterfaceNotFound] shouldBe thrownBy(Networks("test").ipv4Address)
   }
 
   test("testGetIpv4Address returns inet address when provided a valid interface name") {
-    val inetAddresses: List[InetAddress] = NetworkInterface.getNetworkInterfaces.asScala.toList.map { iface ⇒
-      new Networks(iface.getName).ipv4Address
-    }
+    val inetAddresses: List[InetAddress] =
+      NetworkInterface.getNetworkInterfaces.asScala.toList.map(iface ⇒ Networks(iface.getName).ipv4Address)
     inetAddresses.contains(InetAddress.getLocalHost) shouldEqual true
   }
 }

@@ -12,11 +12,11 @@ import csw.command.client.messages.ContainerMessage
 import csw.command.client.models.framework.{Component, Components, ContainerLifecycleState}
 import csw.common.FrameworkAssertions.assertThatContainerIsRunning
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
-import csw.location.api.commons.ClusterAwareSettings
 import csw.location.client.ActorSystemFactory
 import csw.location.server.internal.ServerWiring
 import csw.logging.appenders.StdOutAppender
 import csw.logging.scaladsl.{LoggerFactory, LoggingSystemFactory}
+import csw.network.utils.Networks
 import csw.params.commands.CommandResponse.OnewayResponse
 import csw.params.commands.{CommandName, Setup}
 import csw.params.core.models.Prefix
@@ -62,7 +62,7 @@ object DemoApp extends App {
 
   private def startSeed() = {
     import adminWiring.actorRuntime._
-    val loggingSystem = LoggingSystemFactory.start("logging", "version", ClusterAwareSettings.hostname, actorSystem)
+    val loggingSystem = LoggingSystemFactory.start("logging", "version", Networks().hostname, actorSystem)
     loggingSystem.setAppenders(List(StdOutAppender))
     Await.result(ServerWiring.make(Some(3552)).locationHttpService.start(), 5.seconds)
     Await.result(adminWiring.adminHttpService.registeredLazyBinding, 5.seconds)

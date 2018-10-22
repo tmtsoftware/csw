@@ -10,7 +10,6 @@ import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.client.messages.CommandMessage.Submit
 import csw.integtration.apps.TromboneHCD
 import csw.integtration.common.TestFutureExtension.RichFuture
-import csw.location.api.commons.ClusterAwareSettings
 import csw.location.api.exceptions.OtherLocationIsRegistered
 import csw.location.api.models.Connection.{AkkaConnection, HttpConnection}
 import csw.location.api.models._
@@ -18,6 +17,7 @@ import csw.location.api.scaladsl.LocationService
 import csw.location.client.ActorSystemFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.logging.scaladsl.LoggingSystemFactory
+import csw.network.utils.Networks
 import csw.params.commands.{CommandName, Setup}
 import csw.params.core.models.Prefix
 import org.scalatest.concurrent.ScalaFutures
@@ -28,10 +28,11 @@ import scala.concurrent.duration.DurationLong
 class LocationServiceIntegrationTest extends FunSuite with Matchers with BeforeAndAfterAll with ScalaFutures {
 
   implicit val actorSystem: ActorSystem = ActorSystemFactory.remote()
-  LoggingSystemFactory.start("Assembly", "1.0", ClusterAwareSettings.hostname, actorSystem)
+  LoggingSystemFactory.start("Assembly", "1.0", Networks().hostname, actorSystem)
 
-  implicit private val mat: ActorMaterializer          = ActorMaterializer()
-  val locationService: LocationService                 = HttpLocationServiceFactory.makeRemoteClient
+  implicit private val mat: ActorMaterializer = ActorMaterializer()
+  // FIXME
+  val locationService: LocationService                 = HttpLocationServiceFactory.makeLocalClient
   implicit val typedSystem: typed.ActorSystem[Nothing] = actorSystem.toTyped
   implicit val sched: Scheduler                        = actorSystem.scheduler
   implicit val timeout: Timeout                        = Timeout(5.seconds)

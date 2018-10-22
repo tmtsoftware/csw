@@ -4,9 +4,9 @@ import akka.http.scaladsl.Http
 import csw.config.cli.args.{ArgsParser, Options}
 import csw.config.cli.commons.CoordinatedShutdownReasons.ApplicationFinishedReason
 import csw.config.cli.wiring.Wiring
-import csw.location.api.commons.ClusterAwareSettings
 import csw.location.client.utils.LocationServerStatus
 import csw.logging.scaladsl.LoggingSystemFactory
+import csw.network.utils.Networks
 import csw.services.BuildInfo
 
 // $COVERAGE-OFF$
@@ -20,7 +20,7 @@ object Main extends App {
 
     val wiring = Wiring.make(options.locationHost)
     import wiring._
-    LoggingSystemFactory.start(name, BuildInfo.version, ClusterAwareSettings.hostname, actorSystem)
+    LoggingSystemFactory.start(name, BuildInfo.version, Networks().hostname, actorSystem)
 
     try {
       cliApp.start(options)

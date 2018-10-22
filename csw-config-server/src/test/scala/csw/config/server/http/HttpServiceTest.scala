@@ -6,11 +6,11 @@ import akka.stream.{ActorMaterializer, BindFailedException}
 import csw.config.server.ServerWiring
 import csw.config.server.commons.ConfigServiceConnection
 import csw.config.server.commons.TestFutureExtension.RichFuture
-import csw.location.api.commons.ClusterAwareSettings
 import csw.location.api.exceptions.OtherLocationIsRegistered
 import csw.location.api.models.HttpRegistration
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.server.http.HTTPLocationService
+import csw.network.utils.Networks
 
 import scala.util.control.NonFatal
 
@@ -32,7 +32,7 @@ class HttpServiceTest extends HTTPLocationService {
     val (binding, registrationResult) = httpService.registeredLazyBinding.await
     locationService.find(ConfigServiceConnection.value).await.get.connection shouldBe ConfigServiceConnection.value
 
-    binding.localAddress.getAddress.getHostAddress shouldBe ClusterAwareSettings.hostname
+    binding.localAddress.getAddress.getHostAddress shouldBe Networks().hostname
     registrationResult.location.connection shouldBe ConfigServiceConnection.value
     actorRuntime.shutdown(UnknownReason).await
   }
