@@ -148,13 +148,17 @@ public class JCommandIntegrationTest {
         Setup controlCommand = new Setup(prefix(), withoutMatcherCmd(), Optional.empty()).add(parameter);
 
         //#query-response
-        hcdCmdService.submit(controlCommand, timeout);
+        CompletableFuture<CommandResponse.SubmitResponse> submitResponseFuture = hcdCmdService.submit(controlCommand, timeout);
 
         // do some work before querying for the result of above command as needed
         CompletableFuture<CommandResponse.QueryResponse> queryResponseFuture = hcdCmdService.query(controlCommand.runId(), timeout);
 
         //#query-response
-        queryResponseFuture.get();
+        CommandResponse.QueryResponse queryResponse = queryResponseFuture.get();
+        Assert.assertEquals(new CommandResponse.Started(controlCommand.runId()), queryResponse);
+
+        // Now get the final value
+        Assert.assertEquals(new CommandResponse.Completed(controlCommand.runId()), submitResponseFuture.get());
 
         //#subscribe-for-result
         CompletableFuture<CommandResponse.SubmitResponse> testCommandResponse =
@@ -173,6 +177,16 @@ public class JCommandIntegrationTest {
         CommandResponse.SubmitResponse actualCmdResponse = testCommandResponse.get();
 
         Assert.assertEquals(expectedCmdResponse, actualCmdResponse);
+
+        // submitAll
+        Setup imdSetupCommand = new Setup(invalidPrefix(), immediateCmd(), Optional.empty()).add(intParameter2);
+
+        CompletableFuture<List<CommandResponse.SubmitResponse>> submitAllFuture =
+                hcdCmdService.submitAll(Arrays.asList(imdSetupCommand, controlCommand), timeout);
+        List<CommandResponse.SubmitResponse> submitAllResponses = submitAllFuture.get();
+        Assert.assertEquals(2, submitAllResponses.size());
+        Assert.assertEquals(new CommandResponse.Completed(imdSetupCommand.runId()), submitAllResponses.get(0));
+        Assert.assertEquals(new CommandResponse.Completed(controlCommand.runId()), submitAllResponses.get(1));
 
         // DEOPSCSW-229: Provide matchers infrastructure for comparison
         // long running command which uses matcher

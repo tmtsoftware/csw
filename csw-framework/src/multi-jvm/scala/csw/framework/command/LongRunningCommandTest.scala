@@ -15,12 +15,13 @@ import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.location.server.http.MultiNodeHTTPLocationService
+import csw.params.commands.CommandIssue.OtherIssue
 import csw.params.commands.CommandResponse._
 import csw.params.commands.Setup
 import csw.params.core.models.ObsId
 import csw.params.core.states.{CurrentState, StateName}
 import io.lettuce.core.RedisClient
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{PatienceConfiguration, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 
 import scala.concurrent.duration.DurationDouble
@@ -63,7 +64,7 @@ class LongRunningCommandTest(ignore: Int)
       val assemblyLocation: AkkaLocation = Await.result(assemblyLocF, 10.seconds).get
       val assemblyCommandService         = CommandServiceFactory.make(assemblyLocation)
 
-      val setup = Setup(prefix, longRunning, Some(obsId))
+      val assemblyLongSetup = Setup(prefix, longRunning, Some(obsId))
       val probe = TestProbe[CurrentState]
 
       //#subscribeCurrentState
@@ -79,13 +80,13 @@ class LongRunningCommandTest(ignore: Int)
       // 2. shortSetup which takes 1 second to finish
       // 3. mediumSetup which takes 3 seconds to finish
       //#subscribe-for-result
-      val eventualCommandResponse = assemblyCommandService.submit(setup).map {
+      val eventualCommandResponse = assemblyCommandService.submit(assemblyLongSetup).map {
         case Invalid(runId, _) ⇒ Error(runId, "")
         case x: SubmitResponse ⇒ x
       }
       //#subscribe-for-result
 
-      Await.result(eventualCommandResponse, 20.seconds) shouldBe Completed(setup.runId)
+      Await.result(eventualCommandResponse, 20.seconds) shouldBe Completed(assemblyLongSetup.runId)
 
       //#submitAndSubscribe
       val setupForSubscribe = Setup(prefix, longRunning, Some(obsId))
@@ -103,89 +104,60 @@ class LongRunningCommandTest(ignore: Int)
 
       //#query-response
       val setupForQuery = Setup(prefix, longRunning, Some(obsId))
-      assemblyCommandService.submit(setupForQuery)
+      val finalResponse = assemblyCommandService.submit(setupForQuery)
 
       //do some work before querying for the result of above command as needed
       val eventualResponse: Future[QueryResponse] = assemblyCommandService.query(setupForQuery.runId)
       //#query-response
       eventualResponse.map(_ shouldBe Started(setupForQuery.runId))
 
+      // Use the initial future to determine the when completed
+      finalResponse.map(_ shouldBe Completed(setupForQuery.runId))
+
       enterBarrier("long-commands")
-      /*
-      val hcdLocF =
-        locationService.resolve(
-          AkkaConnection(ComponentId("Test_Component_Running_Long_Command", ComponentType.HCD)),
-          5.seconds
-        )
-       */
-      //val hcdLocation: AkkaLocation = Await.result(hcdLocF, 10.seconds).get
-      //val hcdComponent              = new CommandService(hcdLocation)
 
-      val setupAssembly1 = Setup(prefix, moveCmd, Some(obsId))
-      //val setupAssembly2 = Setup(prefix, initCmd, Some(obsId))
-      //val setupAssembly3 = Setup(prefix, invalidCmd, Some(obsId))
-      //val setupHcd1      = Setup(prefix, shortRunning, Some(obsId))
-      //val setupHcd2      = Setup(prefix, mediumRunning, Some(obsId))
-      //val setupHcd3      = Setup(prefix, failureAfterValidationCmd, Some(obsId))
+      val assemblyInitSetup    = Setup(prefix, initCmd, Some(obsId))
+      val assemblyMoveSetup    = Setup(prefix, moveCmd, Some(obsId))
+      val assemblyInvalidSetup = Setup(prefix, invalidCmd, Some(obsId))
 
-      //#submitAllAndGetResponse
-      /*
-      val responseOfMultipleCommands = hcdComponent.submitAllAndGetResponse(Set(setupHcd1, setupHcd2))
-
-      //#submitAllAndGetResponse
-      whenReady(responseOfMultipleCommands, PatienceConfiguration.Timeout(20.seconds)) { result ⇒
-        result shouldBe a[Completed]
+      //#submitAll
+      // First test sends two commands that complete immediately successfully
+      val multiResponse1 = assemblyCommandService.submitAll(List(assemblyInitSetup , assemblyMoveSetup))
+      whenReady(multiResponse1, PatienceConfiguration.Timeout(5.seconds)) { result =>
+        result.length shouldBe 2
+        result.head shouldBe Completed(assemblyInitSetup.runId)
+        result(1) shouldBe Completed(assemblyMoveSetup.runId)
       }
 
-      //#aggregated-validation
-      val aggregatedValidationResponse = CommandDistributor(
-        Map(assemblyCommandService → Set(setupAssembly1, setupAssembly2), hcdComponent → Set(setupHcd1, setupHcd2))
-      ).aggregatedValidationResponse()
-      //#aggregated-validation
-
-      whenReady(aggregatedValidationResponse, PatienceConfiguration.Timeout(20.seconds)) { result ⇒
-        result shouldBe a[Invalid]
+      // Second test sends three commands with last invalid
+      val multiResponse2 = assemblyCommandService.submitAll(List(assemblyInitSetup, assemblyMoveSetup, assemblyInvalidSetup))
+      whenReady(multiResponse2, PatienceConfiguration.Timeout(5.seconds)) { result =>
+        result.length shouldBe 3
+        result(0) shouldBe Completed(assemblyInitSetup.runId)
+        result(1) shouldBe Completed(assemblyMoveSetup.runId)
+        result(2) shouldBe Invalid(assemblyInvalidSetup.runId, OtherIssue("Invalid"))
       }
 
-      // Test failed validation in one more more commands
-      val aggregatedInvalidValidationResponse = CommandDistributor(
-        Map(assemblyCommandService → Set(setupAssembly1, setupAssembly2, setupAssembly3),
-            hcdComponent           → Set(setupHcd1, setupHcd2))
-      ).aggregatedValidationResponse()
-
-      whenReady(aggregatedInvalidValidationResponse, PatienceConfiguration.Timeout(20.seconds)) { result ⇒
-        result shouldBe a[Invalid]
+      // Second test sends three commands with second invalid so last one is unexecuted
+      val multiResponse3 = assemblyCommandService.submitAll(List(assemblyInitSetup, assemblyInvalidSetup, assemblyMoveSetup))
+      whenReady(multiResponse3, PatienceConfiguration.Timeout(5.seconds)) { result =>
+        result.length shouldBe 2
+        result(0) shouldBe Completed(assemblyInitSetup.runId)
+        result(1) shouldBe Invalid(assemblyInvalidSetup.runId, OtherIssue("Invalid"))
       }
-       */
+
+      // Last test does an init of assembly and then sends the long command
+      val multiResponse4 = assemblyCommandService.submitAll(List(assemblyInitSetup, assemblyLongSetup))
+      whenReady(multiResponse4, PatienceConfiguration.Timeout(10.seconds)) { result =>
+        result.length shouldBe 2
+        result(0) shouldBe Completed(assemblyInitSetup.runId)
+        result(1) shouldBe Completed(assemblyLongSetup.runId)
+      }
+
       enterBarrier("multiple-components-submit-multiple-commands")
 
       //#submitAllAndGetFinalResponse
-      /*
-      val finalResponseOfMultipleCommands = hcdComponent.submitAllAndGetFinalResponse(Set(setupHcd1, setupHcd2))
 
-      //#submitAllAndGetFinalResponse
-      whenReady(finalResponseOfMultipleCommands, PatienceConfiguration.Timeout(20.seconds)) { result ⇒
-        result shouldBe a[Completed]
-      }
-
-      //#aggregated-completion
-      val aggregatedResponse = CommandDistributor(
-        Map(assemblyCommandService → Set(setupAssembly1, setupAssembly2), hcdComponent → Set(setupHcd1, setupHcd2))
-      ).aggregatedCompletionResponse()
-      //#aggregated-completion
-
-      whenReady(aggregatedResponse, PatienceConfiguration.Timeout(20.seconds)) { result ⇒
-        result shouldBe a[Completed]
-      }
-
-      val aggregatedErrorResponse = CommandDistributor(
-        Map(assemblyCommandService → Set(setupAssembly1, setupAssembly2), hcdComponent → Set(setupHcd1, setupHcd2, setupHcd3))
-      ).aggregatedCompletionResponse()
-
-      whenReady(aggregatedErrorResponse, PatienceConfiguration.Timeout(20.seconds)) { result ⇒
-        result shouldBe a[Error]
-      }
-       */
       enterBarrier("multiple-components-submit-subscribe-multiple-commands")
     }
 

@@ -44,18 +44,26 @@ private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(impli
 
   override def submitAll(
       submitCommands: List[ControlCommand]
-  )(implicit timeout: Timeout): Future[List[SubmitResponse]] =
+  )(implicit timeout: Timeout): Future[List[SubmitResponse]] = {
+    // This exception is used to pass the failing command response to the recover to shut down the stream
+    class CommandFailureException(val r: SubmitResponse) extends Exception(r.toString)
+
     Source(submitCommands)
       .mapAsync(1)(submit)
       .map { response =>
         if (isNegative(response))
-          throw new RuntimeException(s"Command failed: $response")
+          throw new CommandFailureException(response)
         else
           response
+      }
+      .recover {
+        // If the command fails, then terminate but return the last response giving the problem, others are ignored
+        case ex: CommandFailureException => ex.r
       }
       .toMat(Sink.seq)(Keep.right)
       .run()
       .map(_.toList)
+  }
 
   override def oneway(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[OnewayResponse] =
     component ? (Oneway(controlCommand, _))
@@ -80,6 +88,9 @@ private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(impli
 
   override def query(commandRunId: Id)(implicit timeout: Timeout): Future[QueryResponse] =
     component ? (CommandResponseManagerMessage.Query(commandRunId, _))
+
+  def queryFinal(commandRunId: Id)(implicit timeout: Timeout): Future[SubmitResponse] =
+    component ? (CommandResponseManagerMessage.Subscribe(commandRunId, _))
 
   override def subscribeCurrentState(callback: CurrentState ⇒ Unit): CurrentStateSubscription =
     new CurrentStateSubscriptionImpl(component, None, callback)
