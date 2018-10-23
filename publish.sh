@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-sbt -Dprod.publish=true -DenableCoverage=false publish
+sbt -Dcheck.cycles=false -Dprod.publish=true -DenableCoverage=false publish

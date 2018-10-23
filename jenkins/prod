@@ -68,7 +68,7 @@ pipeline {
 
         stage('Docs Publish') {
             steps {
-                sh "sbt -Dprod.publish=true ghpagesPushSite"
+                sh "sbt -Dcheck.cycles=false -Dprod.publish=true ghpagesPushSite"
             }
         }
 
