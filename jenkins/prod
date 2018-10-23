@@ -62,7 +62,7 @@ pipeline {
 
         stage('Github Release') {
             steps {
-                sh "sbt -Dprod.publish=true githubRelease"
+                sh "sbt -Dcheck.cycles=false -Dprod.publish=true githubRelease"
             }
         }
 
