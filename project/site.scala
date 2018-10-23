@@ -59,6 +59,6 @@ object ParadoxSite extends AutoPlugin {
   private def githubBaseUrl(version: String) = {
     val baseRepoUrl = "https://github.com/tmtsoftware/csw/tree"
     if (version == "0.1-SNAPSHOT") s"$baseRepoUrl/master"
-    else s"$baseRepoUrl/$version"
+    else s"$baseRepoUrl/v$version"
   }
 }
