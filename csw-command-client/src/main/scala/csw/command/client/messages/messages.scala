@@ -261,14 +261,12 @@ private[csw] object FromSupervisorMessage {
 
 sealed trait CommandResponseManagerMessage
 object CommandResponseManagerMessage {
-  private[csw] case class AddOrUpdateCommand(runId: Id, commandResponse: SubmitResponse) extends CommandResponseManagerMessage
-  private[csw] case class AddSubCommand(runId: Id, subCommandId: Id)                     extends CommandResponseManagerMessage
-  private[csw] case class UpdateSubCommand(subCommandId: Id, commandResponse: SubmitResponse)
-      extends CommandResponseManagerMessage
-  private[csw] case class GetCommandCorrelation(replyTo: ActorRef[CommandCorrelation]) extends CommandResponseManagerMessage
-  private[csw] case class GetCommandResponseManagerState(replyTo: ActorRef[CommandResponseManagerState])
-      extends CommandResponseManagerMessage
-  private[csw] case class SubscriberTerminated(terminated: ActorRef[SubmitResponse]) extends CommandResponseManagerMessage
+  case class AddOrUpdateCommand(runId: Id, commandResponse: SubmitResponse)                 extends CommandResponseManagerMessage
+  case class AddSubCommand(runId: Id, subCommandId: Id)                                     extends CommandResponseManagerMessage
+  case class UpdateSubCommand(subCommandId: Id, commandResponse: SubmitResponse)            extends CommandResponseManagerMessage
+  case class GetCommandCorrelation(replyTo: ActorRef[CommandCorrelation])                   extends CommandResponseManagerMessage
+  case class GetCommandResponseManagerState(replyTo: ActorRef[CommandResponseManagerState]) extends CommandResponseManagerMessage
+  case class SubscriberTerminated(terminated: ActorRef[SubmitResponse])                     extends CommandResponseManagerMessage
 
   /**
    * Represents a message to query the command status of a command running on some component
