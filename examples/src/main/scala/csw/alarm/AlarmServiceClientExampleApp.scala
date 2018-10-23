@@ -1,16 +1,13 @@
 package csw.alarm
-import akka.Done
 import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.{typed, ActorSystem}
+import akka.actor.{ActorSystem, typed}
 import akka.stream.ActorMaterializer
 import com.typesafe.config._
-import csw.alarm.api.javadsl.IAlarmService
 import csw.alarm.api.models.AlarmSeverity.Okay
 import csw.alarm.api.models.Key.{AlarmKey, ComponentKey, SubsystemKey}
 import csw.alarm.api.models.{AlarmHealth, AlarmMetadata, AlarmStatus, FullAlarmSeverity}
 import csw.alarm.api.scaladsl.{AlarmAdminService, AlarmService}
 import csw.alarm.client.AlarmServiceFactory
-import csw.location.client.javadsl.JHttpLocationServiceFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.params.core.models.Subsystem.{IRIS, NFIRAOS}
 
@@ -23,7 +20,6 @@ object AlarmServiceClientExampleApp {
   implicit val ec: ExecutionContext     = actorSystem.dispatcher
   implicit val mat: ActorMaterializer   = ActorMaterializer()
   private val locationService           = HttpLocationServiceFactory.makeLocalClient
-  private val jLocationService          = JHttpLocationServiceFactory.makeLocalClient(actorSystem, mat)
 
   private def behaviour[T]: Behaviors.Receive[T] = Behaviors.receive { (ctx, msg) ⇒
     println(msg)
@@ -44,29 +40,16 @@ object AlarmServiceClientExampleApp {
   private val adminAPI2 = new AlarmServiceFactory().makeAdminApi(locationService)
   //#create-scala-api
 
-  //#create-java-api
-  // create alarm client using host and port of alarm server
-  private val jclientAPI1 = new AlarmServiceFactory().jMakeClientApi("localhost", 5227, actorSystem)
-
-  // create alarm client using location service
-  private val jclientAPI2 = new AlarmServiceFactory().jMakeClientApi(jLocationService, actorSystem)
-  //#create-java-api
-
   val clientAPI: AlarmService     = clientAPI1
   val adminAPI: AlarmAdminService = adminAPI1
 
-  val jclientAPI: IAlarmService = jclientAPI1
-
   //#setSeverity-scala
   val alarmKey = AlarmKey(NFIRAOS, "trombone", "tromboneAxisLowLimitAlarm")
+
   async {
     await(clientAPI.setSeverity(alarmKey, Okay))
   }
   //#setSeverity-scala
-
-  //#setSeverity-java
-  private val done: Done = jclientAPI.setSeverity(alarmKey, Okay).get()
-  //#setSeverity-java
 
   //#initAlarms
   async {

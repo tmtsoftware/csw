@@ -62,7 +62,7 @@ Scala
 :   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #create-scala-api }
 
 Java
-:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #create-java-api }
+:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/java/csw/alarm/JAlarmServiceClientExampleApp.java) { #create-java-api }
 
 ## Rules and checkes
 * When representing a unique alarm, the alarm name or component name must not have `* [ ] ^ -` or `any whitespace characters`
@@ -91,7 +91,7 @@ Scala
 :   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #setSeverity-scala }
 
 Java
-:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #setSeverity-java }
+:   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/java/csw/alarm/JAlarmServiceClientExampleApp.java) { #setSeverity-java }
 
 @@@ note
 
