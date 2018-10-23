@@ -65,7 +65,7 @@ class LongRunningCommandTest(ignore: Int)
       val assemblyCommandService         = CommandServiceFactory.make(assemblyLocation)
 
       val assemblyLongSetup = Setup(prefix, longRunning, Some(obsId))
-      val probe = TestProbe[CurrentState]
+      val probe             = TestProbe[CurrentState]
 
       //#subscribeCurrentState
       // subscribe to the current state of an assembly component and use a callback which forwards each received
@@ -88,10 +88,10 @@ class LongRunningCommandTest(ignore: Int)
 
       Await.result(eventualCommandResponse, 20.seconds) shouldBe Completed(assemblyLongSetup.runId)
 
-      //#submitAndSubscribe
+      //#submit
       val setupForSubscribe = Setup(prefix, longRunning, Some(obsId))
       val response          = assemblyCommandService.submit(setupForSubscribe)
-      //#submitAndSubscribe
+      //#submit
 
       Await.result(response, 20.seconds) shouldBe Completed(setupForSubscribe.runId)
 
@@ -116,13 +116,17 @@ class LongRunningCommandTest(ignore: Int)
 
       enterBarrier("long-commands")
 
-      val assemblyInitSetup    = Setup(prefix, initCmd, Some(obsId))
-      val assemblyMoveSetup    = Setup(prefix, moveCmd, Some(obsId))
       val assemblyInvalidSetup = Setup(prefix, invalidCmd, Some(obsId))
 
-      //#submitAll
       // First test sends two commands that complete immediately successfully
-      val multiResponse1 = assemblyCommandService.submitAll(List(assemblyInitSetup , assemblyMoveSetup))
+      //#submitAll
+      val assemblyInitSetup = Setup(prefix, initCmd, Some(obsId))
+      val assemblyMoveSetup = Setup(prefix, moveCmd, Some(obsId))
+
+      val multiResponse1: Future[List[SubmitResponse]] =
+        assemblyCommandService.submitAll(List(assemblyInitSetup, assemblyMoveSetup))
+      //#submitAll
+
       whenReady(multiResponse1, PatienceConfiguration.Timeout(5.seconds)) { result =>
         result.length shouldBe 2
         result.head shouldBe Completed(assemblyInitSetup.runId)
@@ -155,8 +159,6 @@ class LongRunningCommandTest(ignore: Int)
       }
 
       enterBarrier("multiple-components-submit-multiple-commands")
-
-      //#submitAllAndGetFinalResponse
 
       enterBarrier("multiple-components-submit-subscribe-multiple-commands")
     }

@@ -32,7 +32,7 @@ trait CommandService {
   def submit(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[SubmitResponse]
 
   /**
-   * Submit multiple commands and get a Source of [[csw.params.commands.CommandResponse]] for all commands. The CommandResponse can be a response
+   * Submit multiple commands and get a List of [[csw.params.commands.CommandResponse]] for all commands. The CommandResponse can be a response
    * of validation (Accepted, Invalid) or a final Response. In case of response as `Accepted`, final CommandResponse can be obtained by using `subscribe` API.
    *
    * @param submitCommands the set of [[csw.params.commands.ControlCommand]] payloads

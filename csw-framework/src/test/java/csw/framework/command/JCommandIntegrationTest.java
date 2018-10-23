@@ -7,9 +7,9 @@ import akka.actor.typed.internal.adapter.ActorSystemAdapter;
 import akka.stream.ActorMaterializer;
 import akka.util.Timeout;
 import com.typesafe.config.ConfigFactory;
-import csw.command.api.javadsl.ICommandService;
 import csw.command.api.CurrentStateSubscription;
 import csw.command.api.StateMatcher;
+import csw.command.api.javadsl.ICommandService;
 import csw.command.client.CommandServiceFactory;
 import csw.command.client.extensions.AkkaLocationExt;
 import csw.command.client.messages.SupervisorLockMessage;
@@ -28,10 +28,8 @@ import csw.location.api.models.ComponentId;
 import csw.location.client.ActorSystemFactory;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;
 import csw.location.server.http.JHTTPLocationService;
-import csw.logging.javadsl.JLoggingSystemFactory;
 import csw.params.commands.CommandIssue;
 import csw.params.commands.CommandResponse;
-import csw.params.commands.ControlCommand;
 import csw.params.commands.Setup;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
@@ -49,7 +47,10 @@ import scala.concurrent.ExecutionContext;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -83,7 +84,6 @@ public class JCommandIntegrationTest {
         locationService = JHttpLocationServiceFactory.makeLocalClient(hcdActorSystem, mat);
         hcdLocation = getLocation();
         hcdCmdService = CommandServiceFactory.jMake(hcdLocation, akka.actor.typed.ActorSystem.wrap(hcdActorSystem));
-        JLoggingSystemFactory.start("","", "", hcdActorSystem);
     }
 
     @AfterClass
@@ -176,16 +176,6 @@ public class JCommandIntegrationTest {
         CommandResponse.SubmitResponse actualCmdResponse = testCommandResponse.get();
 
         Assert.assertEquals(expectedCmdResponse, actualCmdResponse);
-
-        // submitAll
-        Setup imdSetupCommand = new Setup(invalidPrefix(), immediateCmd(), Optional.empty()).add(intParameter2);
-
-        CompletableFuture<List<CommandResponse.SubmitResponse>> submitAllFuture =
-                hcdCmdService.submitAll(Arrays.asList(imdSetupCommand, controlCommand), timeout);
-        List<CommandResponse.SubmitResponse> submitAllResponses = submitAllFuture.get();
-        Assert.assertEquals(2, submitAllResponses.size());
-        Assert.assertEquals(new CommandResponse.Completed(imdSetupCommand.runId()), submitAllResponses.get(0));
-        Assert.assertEquals(new CommandResponse.Completed(controlCommand.runId()), submitAllResponses.get(1));
 
         // DEOPSCSW-229: Provide matchers infrastructure for comparison
         // long running command which uses matcher
@@ -312,37 +302,6 @@ public class JCommandIntegrationTest {
         Assert.assertTrue(actualCmdResponseAfterUnlock instanceof CommandResponse.Completed);
     }
 
-    @Test
-    public void testCommandDistributor() throws ExecutionException, InterruptedException {
-        Parameter<Integer> encoderParam = JKeyType.IntKey().make("encoder").set(22, 23);
-
-        Setup setupHcd1 = new Setup(prefix(), shortRunning(), Optional.empty()).add(encoderParam);
-        Setup setupHcd2 = new Setup(prefix(), mediumRunning(), Optional.empty()).add(encoderParam);
-
-        HashMap<ICommandService, Set<ControlCommand>> componentsToCommands = new HashMap<ICommandService, Set<ControlCommand>>() {
-            {
-                put(hcdCmdService, new HashSet<ControlCommand>(Arrays.asList(setupHcd1, setupHcd2)));
-            }
-        };
-/*
-        //#aggregated-validation
-        CompletableFuture<CommandResponse.SubmitResponse> cmdValidationResponseF =
-                new JCommandDistributor(componentsToCommands).
-                        aggregatedValidationResponse(timeout, ec, mat);
-        //#aggregated-validation
-
-        Assert.assertTrue(cmdValidationResponseF.get() instanceof CommandResponse.Started);
-
-        //#aggregated-completion
-        CompletableFuture<CommandResponse.SubmitResponse> cmdCompletionResponseF =
-                new JCommandDistributor(componentsToCommands).
-                        aggregatedCompletionResponse(timeout, ec, mat);
-        //#aggregated-completion
-
-        Assert.assertTrue(cmdCompletionResponseF.get() instanceof CommandResponse.Completed);
-        */
-    }
-
     // DEOPSCSW-208: Report failure on Configuration Completion command
     @Test
     public void testCommandFailure() throws ExecutionException, InterruptedException {
@@ -352,10 +311,10 @@ public class JCommandIntegrationTest {
         Setup failureResCommand1 = new Setup(prefix(), failureAfterValidationCmd(), Optional.empty()).add(intParameter1);
         akka.actor.typed.ActorSystem<?> typedSystem = ActorSystemAdapter.apply(hcdActorSystem);
 
-        //#submitAndSubscribe
+        //#submit
         CompletableFuture<CommandResponse.SubmitResponse> finalResponseCompletableFuture = hcdCmdService.submit(failureResCommand1, timeout);
         CommandResponse.SubmitResponse actualValidationResponse = finalResponseCompletableFuture.get();
-        //#submitAndSubscribe
+        //#submit
 
         Assert.assertTrue(actualValidationResponse instanceof CommandResponse.Error);
 
@@ -364,57 +323,28 @@ public class JCommandIntegrationTest {
         CompletableFuture<CommandResponse.SubmitResponse> validationResponse = hcdCmdService.submit(failureResCommand2, timeout);
         Assert.assertTrue(validationResponse.get() instanceof CommandResponse.Error);  // This should fail but I guess not typed by compiler
     }
-/*
+
     @Test
-    public void testSubmitAllAndGetResponse() throws ExecutionException, InterruptedException {
-        Parameter<Integer> encoderParam = JKeyType.IntKey().make("encoder").set(22, 23);
-
-        //#submitAllAndGetResponse
-        Setup setupHcd1 = new Setup(prefix(), shortRunning(), Optional.empty()).add(encoderParam);
-        Setup setupHcd2 = new Setup(prefix(), mediumRunning(), Optional.empty()).add(encoderParam);
-
-        HashMap<JCommandService, Set<ControlCommand>> componentsToCommands = new HashMap<JCommandService, Set<ControlCommand>>() {
-            {
-                put(hcdCmdService, new HashSet<ControlCommand>(Arrays.asList(setupHcd1, setupHcd2)));
-            }
-        };
-
-        CompletableFuture<CommandResponse.SubmitResponse> commandResponse = hcdCmdService
-                .submitAllAndGetResponse(
-                        new HashSet<ControlCommand>(Arrays.asList(setupHcd1, setupHcd2)),
-                        timeout
-                );
-        //#submitAllAndGetResponse
-
-        Assert.assertTrue(commandResponse.get() instanceof CommandResponse.Accepted);  // Should fail
-    }
-    */
-/*  TODO -- Remove
-    @Test
-    public void testSubmitAllAndGetFinalResponse() throws ExecutionException, InterruptedException {
+    public void testSubmitAll() throws ExecutionException, InterruptedException {
 
         Parameter<Integer> encoderParam = JKeyType.IntKey().make("encoder").set(22, 23);
 
-        //#submitAllAndGetFinalResponse
+        //#submitAll
         Setup setupHcd1 = new Setup(prefix(), shortRunning(), Optional.empty()).add(encoderParam);
         Setup setupHcd2 = new Setup(prefix(), mediumRunning(), Optional.empty()).add(encoderParam);
 
-        HashMap<JCommandService, Set<ControlCommand>> componentsToCommands = new HashMap<JCommandService, Set<ControlCommand>>() {
-            {
-                put(hcdCmdService, new HashSet<ControlCommand>(Arrays.asList(setupHcd1, setupHcd2)));
-            }
-        };
-
-        CompletableFuture<CommandResponse.SubmitResponse> finalCommandResponse = hcdCmdService
-                .submitAllAndGetFinalResponse(
-                        new HashSet<ControlCommand>(Arrays.asList(setupHcd1, setupHcd2)),
+        CompletableFuture<List<CommandResponse.SubmitResponse>> finalCommandResponse = hcdCmdService
+                .submitAll(
+                        Arrays.asList(setupHcd1, setupHcd2),
                         timeout
                 );
-        //#submitAllAndGetFinalResponse
+        //#submitAll
 
-        Assert.assertTrue(finalCommandResponse.get() instanceof CommandResponse.Completed);
+        List<CommandResponse.SubmitResponse> actualSubmitResponses = finalCommandResponse.get();
+        List<CommandResponse.Completed> expectedResponses = Arrays.asList(new CommandResponse.Completed(setupHcd1.runId()), new CommandResponse.Completed(setupHcd2.runId()));
+        Assert.assertEquals(expectedResponses, actualSubmitResponses);
     }
-*/
+
     @Test
     public void testSubscribeCurrentState() throws InterruptedException {
         Key<Integer> intKey1 = JKeyType.IntKey().make("encoder");

@@ -157,14 +157,14 @@ Scala
 Java
 :   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #query-response }
 
-### submitAndSubscribe
+### submit
 Submit a command and Subscribe for the result if it was successfully validated as `Accepted` to get a final `CommandResponse` as a Future.
 
 Scala
-:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/LongRunningCommandTest.scala) { #submitAndSubscribe }
+:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/LongRunningCommandTest.scala) { #submit }
 
 Java
-:   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #submitAndSubscribe }
+:   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #submit }
 
 ### onewayAndMatch
 Send a command and match the published state from the component using a `StateMatcher`. If the match is successful a `Completed` response is provided as a future. 
@@ -176,26 +176,15 @@ Scala
 Java
 :   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #onewayAndMatch }
 
-### submitAllAndGetResponse
-Submit multiple commands and get one CommandResponse as a Future of `CommandResponse` for all commands. If all the commands were successful, a CommandResponse 
-as `Completed` will be returned. If any one of the command fails, an `Error` will be returned.
+
+### submitAll
+Submit multiple commands and get list of SubmitResponse for each of the submitted command.
 
 Scala
-:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/LongRunningCommandTest.scala) { #submitAllAndGetResponse }
+:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/LongRunningCommandTest.scala) { #submitAll }
 
 Java
-:   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #submitAllAndGetResponse }
-
-### submitAllAndGetFinalResponse
-Submit multiple commands and get final CommandResponse for all as one CommandResponse. If all the commands were successful, a CommandResponse as `Completed` will be 
-returned. If any one of the command fails, an `Error` will be returned. For long running commands, it will subscribe for the result of those which were successfully 
-validated as `Accepted` and get the final CommandResponse.
-
-Scala
-:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/LongRunningCommandTest.scala) { #submitAllAndGetFinalResponse }
-
-Java
-:   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #submitAllAndGetFinalResponse }
+:   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #submitAll }
 
 ### subscribeCurrentState
 This method can be used to subscribe to the @ref:[CurrentState](../messages/states.md) of the component by providing a 
@@ -220,32 +209,4 @@ Scala
 
 Java
 :   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #matcher }
-
-## Distributing commands
-
-`CommandDistributor` is a utility for distributing commands to multiple components and get an aggregated response. 
-
-### aggregated validation response
-
-A component can send one or more commands to one or more components using a `Map[ComponentRef, Set[ControlCommand]`, and get an aggregated response 
-of validation as `Accepted` if all the commands were successfully validated. An `Error` response is returned otherwise
-
-Scala
-:   @@snip [LongRunningCommandTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/LongRunningCommandTest.scala) { #aggregated-validation }
-
-Java
-:   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #aggregated-validation }
-
-### aggregated completion response
-
-A component can send one or more commands to one or more components using a `Map[ComponentRef, Set[ControlCommand]`. The utility handles subscribing for 
-final completion result for all the commands post successful validation and get an aggregated response of completion as `Completed` if all the commands 
-were successfully completed. An `Error` response is returned otherwise.
-
-Scala
-:   @@snip [LongRunningCommandTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/LongRunningCommandTest.scala) { #aggregated-completion }
-
-Java
-:   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #aggregated-completion }
-
 
