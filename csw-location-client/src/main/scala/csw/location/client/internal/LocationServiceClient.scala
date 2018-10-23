@@ -1,5 +1,7 @@
 package csw.location.client.internal
 
+import java.io.IOException
+
 import akka.actor.{ActorSystem, CoordinatedShutdown, Scheduler}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.marshalling.Marshal
@@ -25,7 +27,7 @@ private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(impl
                                                                             mat: Materializer)
     extends LocationService
     with PlayJsonSupport
-    with LocationJsonSupport { outer =>
+    with LocationJsonSupport { outer ⇒
 
   import actorSystem.dispatcher
   implicit val scheduler: Scheduler = actorSystem.scheduler
@@ -39,9 +41,7 @@ private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(impl
     val response      = await(Http().singleRequest(request))
 
     response.status match {
-      case x @ StatusCodes.BadRequest          => throw OtherLocationIsRegistered(x.reason)
-      case x @ StatusCodes.InternalServerError => throw RegistrationFailed(x.reason)
-      case StatusCodes.OK =>
+      case StatusCodes.OK ⇒
         val location0 = await(Unmarshal(response.entity).to[Location])
         CoordinatedShutdown(actorSystem).addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "unregister")(
           () ⇒ unregister(location0.connection)
@@ -50,6 +50,9 @@ private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(impl
           override def unregister(): Future[Done] = outer.unregister(location0.connection)
           override def location: Location         = location0
         }
+      case x @ StatusCodes.BadRequest          ⇒ throw OtherLocationIsRegistered(x.reason)
+      case x @ StatusCodes.InternalServerError ⇒ throw RegistrationFailed(x.reason)
+      case _                                   ⇒ await(throwExOnInvalidResponse[RegistrationResult](request, response))
     }
   }
 
@@ -73,8 +76,9 @@ private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(impl
     val request  = HttpRequest(HttpMethods.GET, uri = uri)
     val response = await(Http().singleRequest(request))
     response.status match {
-      case StatusCodes.OK       => Some(await(Unmarshal(response.entity).to[Location]).asInstanceOf[L])
-      case StatusCodes.NotFound => None
+      case StatusCodes.OK       ⇒ Some(await(Unmarshal(response.entity).to[Location]).asInstanceOf[L])
+      case StatusCodes.NotFound ⇒ None
+      case _                    ⇒ await(throwExOnInvalidResponse[Option[L]](request, response))
     }
   }
 
@@ -85,8 +89,9 @@ private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(impl
     val request  = HttpRequest(HttpMethods.GET, uri = uri)
     val response = await(Http().singleRequest(request))
     response.status match {
-      case StatusCodes.OK       => Some(await(Unmarshal(response.entity).to[Location]).asInstanceOf[L])
-      case StatusCodes.NotFound => None
+      case StatusCodes.OK       ⇒ Some(await(Unmarshal(response.entity).to[Location]).asInstanceOf[L])
+      case StatusCodes.NotFound ⇒ None
+      case _                    ⇒ await(throwExOnInvalidResponse[Option[L]](request, response))
     }
   }
 
@@ -133,11 +138,14 @@ private[csw] class LocationServiceClient(serverIp: String, serverPort: Int)(impl
       await(Unmarshal(response.entity).to[Source[ServerSentEvent, NotUsed]])
     }
     val sseStream = Source.fromFuture(sseStreamFuture).flatMapConcat(identity)
-    sseStream.map(x => Json.parse(x.data).as[TrackingEvent]).viaMat(KillSwitches.single)(Keep.right)
+    sseStream.map(x ⇒ Json.parse(x.data).as[TrackingEvent]).viaMat(KillSwitches.single)(Keep.right)
   }
 
-  override def subscribe(connection: Connection, callback: TrackingEvent => Unit): KillSwitch = {
+  override def subscribe(connection: Connection, callback: TrackingEvent ⇒ Unit): KillSwitch =
     track(connection).to(Sink.foreach(callback)).run()
-  }
 
+  private def throwExOnInvalidResponse[T](request: HttpRequest, response: HttpResponse): Future[T] =
+    Unmarshal(response.entity).to[String].flatMap { body ⇒
+      Future.failed(new IOException(s"The response status is ${response.status} [${request.uri}] and response body is $body"))
+    }
 }

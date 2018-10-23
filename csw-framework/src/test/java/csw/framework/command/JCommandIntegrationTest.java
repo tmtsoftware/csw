@@ -155,7 +155,6 @@ public class JCommandIntegrationTest {
 
         //#query-response
         CommandResponse.QueryResponse queryResponse = queryResponseFuture.get();
-        Assert.assertEquals(new CommandResponse.Started(controlCommand.runId()), queryResponse);
 
         // Now get the final value
         Assert.assertEquals(new CommandResponse.Completed(controlCommand.runId()), submitResponseFuture.get());
