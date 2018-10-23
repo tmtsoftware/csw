@@ -1,0 +1,17 @@
+## CSW - TMT Common Software v0.6.0-RC1
+
+This is release v0.6.0-RC1 of the TMT Common Software.
+
+See [CHANGELOG.md](../CHANGELOG.md) for details of all releases.
+
+### Changes
+- github repository `csw-prod` is renamed to `csw`.
+- top level package in all modules changed from `csw.services` to `csw`
+- all the csw services are injected to `ComponentHandlers` as a part of `CswContext` wrapper
+- removed `csw-cluster-seed` module
+- extracted `csw-admin-server` module out from `csw-cluster-seed` and moved remaining location related code to `csw-location-server`
+- migrated all CLI applications and framework to use HTTP Location Service client
+- separated out command service API and client
+- `csw-messages` module renamed to `csw-params`
+- `csw-params` is cross compilable to `java` and `js`
+- messages from `csw-messages` module moved to `csw-command-client`
