@@ -1,6 +1,6 @@
 package csw.alarm
 import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.{ActorSystem, typed}
+import akka.actor.{typed, ActorSystem}
 import akka.stream.ActorMaterializer
 import com.typesafe.config._
 import csw.alarm.api.models.AlarmSeverity.Okay
