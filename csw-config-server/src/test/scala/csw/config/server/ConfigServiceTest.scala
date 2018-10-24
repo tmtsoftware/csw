@@ -19,7 +19,7 @@ import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
 
-  private val serverWiring = new ServerWiring
+  val serverWiring = new ServerWiring
 
   private val testFileUtils = new TestFileUtils(serverWiring.settings)
 

@@ -3,17 +3,18 @@ package csw.config.client.scaladsl
 import java.nio.file.Paths
 
 import akka.actor.CoordinatedShutdown.UnknownReason
+import akka.http.scaladsl.Http
 import csw.config.api.models.ConfigData
 import csw.config.api.scaladsl.{ConfigClientService, ConfigService}
+import csw.config.client.ConfigClientBaseSuite
 import csw.config.server.ServerWiring
 import csw.config.server.commons.TestFileUtils
 import csw.config.server.commons.TestFutureExtension.RichFuture
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.server.http.HTTPLocationService
 
 // DEOPSCSW-138: Split Config API into Admin API and Client API
 // DEOPSCSW-80: HTTP based access for configuration file
-class ConfigClientApiTest extends HTTPLocationService {
+class ConfigClientApiTest extends ConfigClientBaseSuite {
 
   private val serverWiring = ServerWiring.make(Some(4002))
   private val httpService  = serverWiring.httpService
@@ -28,16 +29,17 @@ class ConfigClientApiTest extends HTTPLocationService {
   val configClientService: ConfigClientService = ConfigClientFactory.clientApi(actorSystem, clientLocationService)
   val configAdminService: ConfigService        = ConfigClientFactory.adminApi(actorSystem, clientLocationService)
 
-  override def beforeEach(): Unit =
-    serverWiring.svnRepo.initSvnRepo()
+  override def beforeEach(): Unit = serverWiring.svnRepo.initSvnRepo()
 
-  override def afterEach(): Unit =
-    testFileUtils.deleteServerFiles()
+  override def afterEach(): Unit = testFileUtils.deleteServerFiles()
 
-  override def beforeAll(): Unit =
+  override def beforeAll(): Unit = {
+    super.beforeAll()
     httpService.registeredLazyBinding.await
+  }
 
   override def afterAll(): Unit = {
+    Http().shutdownAllConnectionPools().await
     httpService.shutdown(UnknownReason).await
     super.afterAll()
   }

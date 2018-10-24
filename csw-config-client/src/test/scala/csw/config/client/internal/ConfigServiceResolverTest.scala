@@ -2,20 +2,29 @@ package csw.config.client.internal
 
 import java.net.URI
 
+import akka.http.scaladsl.Http
+import csw.config.client.ConfigClientBaseSuite
 import csw.config.client.commons.ConfigServiceConnection
 import csw.config.client.scaladsl.ConfigClientFactory
+import csw.config.server.commons.TestFutureExtension.RichFuture
 import csw.location.api.models.HttpLocation
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.server.http.HTTPLocationService
 import org.mockito.Mockito._
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 
-class ConfigServiceResolverTest extends HTTPLocationService {
+class ConfigServiceResolverTest extends ConfigClientBaseSuite {
+
   private val actorRuntime = new ActorRuntime()
   import actorRuntime._
+
+  override protected def afterAll(): Unit = {
+    Http().shutdownAllConnectionPools().await
+    actorSystem.terminate().await
+    super.afterAll()
+  }
 
   test("should throw exception if not able to resolve config service http server") {
     val locationService = HttpLocationServiceFactory.makeLocalClient

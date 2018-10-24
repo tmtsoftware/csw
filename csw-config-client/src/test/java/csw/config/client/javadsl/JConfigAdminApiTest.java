@@ -1,24 +1,14 @@
 package csw.config.client.javadsl;
 
-import akka.actor.ActorSystem;
-import akka.actor.CoordinatedShutdown;
 import akka.stream.Materializer;
-import csw.location.server.http.JHTTPLocationService;
 import csw.config.api.exceptions.FileAlreadyExists;
 import csw.config.api.exceptions.FileNotFound;
 import csw.config.api.javadsl.IConfigService;
 import csw.config.api.javadsl.JFileType;
 import csw.config.api.models.*;
-import csw.config.client.internal.ActorRuntime;
-import csw.config.server.ServerWiring;
-import csw.config.server.commons.TestFileUtils;
-import csw.config.server.http.HttpService;
-import csw.location.api.javadsl.ILocationService;
-import csw.location.client.javadsl.JHttpLocationServiceFactory;
+import csw.config.client.JConfigClientBaseSuite;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
-import scala.concurrent.Await;
-import scala.concurrent.duration.Duration;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -33,16 +23,33 @@ import static org.hamcrest.CoreMatchers.isA;
 // DEOPSCSW-138: Split Config API into Admin API and Client API
 // DEOPSCSW-103: Java API for Configuration service
 public class JConfigAdminApiTest  {
-    private static JHTTPLocationService jHttpLocationService;
-    private static ActorRuntime actorRuntime = new ActorRuntime(ActorSystem.create());
-    private static ILocationService clientLocationService = JHttpLocationServiceFactory.makeLocalClient(actorRuntime.actorSystem(), actorRuntime.mat());
-    private static IConfigService configService = JConfigClientFactory.adminApi(actorRuntime.actorSystem(), clientLocationService);
 
-    private static ServerWiring serverWiring = new ServerWiring();
-    private static HttpService httpService = serverWiring.httpService();
-    private TestFileUtils testFileUtils = new TestFileUtils(serverWiring.settings());
+    private static JConfigClientBaseSuite jConfigClientBaseSuite;
+    private static IConfigService configService;
+    private static Materializer mat;
 
-    private Materializer mat = actorRuntime.mat();
+    @BeforeClass
+    public static void beforeAll() throws Exception {
+        jConfigClientBaseSuite = new JConfigClientBaseSuite();
+        jConfigClientBaseSuite.setup();
+        configService = jConfigClientBaseSuite.configService;
+        mat = jConfigClientBaseSuite.mat;
+    }
+
+    @Before
+    public void initSvnRepo() {
+        jConfigClientBaseSuite.initSvnRepo();
+    }
+
+    @After
+    public void deleteServerFiles() {
+        jConfigClientBaseSuite.deleteServerFiles();
+    }
+
+    @AfterClass
+    public static void afterAll() throws Exception {
+        jConfigClientBaseSuite.cleanup();
+    }
 
     private String configValue1 = "axisName1 = tromboneAxis\naxisName2 = tromboneAxis2\naxisName3 = tromboneAxis3";
     private String configValue2 = "axisName11 = tromboneAxis\naxisName22 = tromboneAxis2\naxisName3 = tromboneAxis33";
@@ -52,30 +59,6 @@ public class JConfigAdminApiTest  {
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
-
-    @BeforeClass
-    public static void beforeAll() throws Exception {
-        jHttpLocationService = new JHTTPLocationService();
-        Await.result(httpService.registeredLazyBinding(), Duration.create(20, "seconds"));
-    }
-
-    @Before
-    public void initSvnRepo() {
-        serverWiring.svnRepo().initSvnRepo();
-    }
-
-    @After
-    public void deleteServerFiles() {
-        testFileUtils.deleteServerFiles();
-    }
-
-    @AfterClass
-    public static void afterAll() throws Exception {
-        Await.result(httpService.shutdown(CoordinatedShutdown.unknownReason()), Duration.create(20, "seconds"));
-        Await.result(actorRuntime.actorSystem().terminate(), Duration.create(20, "seconds"));
-        Await.result(serverWiring.actorSystem().terminate(), Duration.create(20, "seconds"));
-        jHttpLocationService.afterAll();
-    }
 
     // DEOPSCSW-42: Storing text based component configuration
     // DEOPSCSW-48: Store new configuration file in Config. service

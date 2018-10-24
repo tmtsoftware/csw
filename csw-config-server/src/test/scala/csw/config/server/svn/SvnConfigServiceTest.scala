@@ -4,19 +4,13 @@ import java.nio.file.Paths
 
 import csw.config.api.models.ConfigData
 import csw.config.api.scaladsl.ConfigService
+import csw.config.server.ConfigServiceTest
 import csw.config.server.commons.TestFutureExtension.RichFuture
-import csw.config.server.{ConfigServiceTest, ServerWiring}
 
 class SvnConfigServiceTest extends ConfigServiceTest {
-  val serverWiring                          = new ServerWiring()
+
   override val configService: ConfigService = serverWiring.configService
-
   import serverWiring.actorRuntime._
-
-  override protected def afterAll(): Unit = {
-    serverWiring.actorSystem.terminate().await
-    super.afterAll()
-  }
 
   // DEOPSCSW-141: Change the 'create' API
   test("create call should create a normal file and active file in repo and reset should not delete active file") {
