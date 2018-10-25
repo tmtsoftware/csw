@@ -9,7 +9,11 @@ import csw.location.server.scaladsl.LocationServiceCompTest
 class LocationServiceCompTestWithHttp extends LocationServiceCompTest("http") {
 
   private val wiring = new ServerWiring
-  wiring.locationHttpService.start().await
+
+  override protected def beforeAll(): Unit = {
+    wiring.locationHttpService.start().await
+    super.beforeAll()
+  }
 
   override protected def afterAll(): Unit = {
     wiring.actorRuntime.shutdown(UnknownReason).await

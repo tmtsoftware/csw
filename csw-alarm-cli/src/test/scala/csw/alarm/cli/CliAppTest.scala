@@ -18,11 +18,13 @@ import csw.alarm.cli.args.Options
 import csw.alarm.cli.utils.IterableExtensions.RichStringIterable
 import csw.alarm.cli.utils.TestFutureExt.RichFuture
 import csw.alarm.client.internal.auto_refresh.AutoRefreshSeverityMessage.CancelAutoRefresh
+import csw.commons.tags.FileSystemSensitive
 import csw.config.api.models.ConfigData
 import csw.config.client.scaladsl.ConfigClientFactory
 import csw.config.server.commons.TestFileUtils
 import csw.config.server.{ServerWiring, Settings}
 
+@FileSystemSensitive
 class CliAppTest extends AlarmCliTestSetup {
 
   import cliWiring._
