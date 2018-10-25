@@ -18,12 +18,10 @@ import csw.command.client.models.framework.{Components, ContainerLifecycleState,
 import csw.common.FrameworkAssertions._
 import csw.common.components.framework.SampleComponentState._
 import csw.event.client.helpers.TestFutureExt.RichFuture
-import csw.framework.FrameworkTestWiring
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.location.api.models.ComponentType.{Assembly, HCD}
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{ComponentId, ComponentType, LocationRemoved, TrackingEvent}
-import csw.location.server.http.HTTPLocationService
 import csw.params.core.states.{CurrentState, StateName}
 import io.lettuce.core.RedisClient
 
@@ -33,9 +31,7 @@ import scala.concurrent.duration.DurationLong
 // DEOPSCSW-177: Hooks for lifecycle management
 // DEOPSCSW-182: Control Life Cycle of Components
 // DEOPSCSW-216: Locate and connect components to send AKKA commands
-class ContainerIntegrationTest extends HTTPLocationService {
-
-  private val testWiring = new FrameworkTestWiring()
+class ContainerIntegrationTest extends FrameworkIntegrationSuite {
   import testWiring._
 
   private val irisContainerConnection  = AkkaConnection(ComponentId("IRIS_Container", ComponentType.Container))
@@ -45,7 +41,6 @@ class ContainerIntegrationTest extends HTTPLocationService {
 
   override def afterAll(): Unit = {
     Http(seedActorSystem).shutdownAllConnectionPools().await
-    seedActorSystem.terminate().await
     super.afterAll()
   }
 

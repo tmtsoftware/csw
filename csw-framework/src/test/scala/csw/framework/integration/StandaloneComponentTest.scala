@@ -17,13 +17,11 @@ import csw.common.components.framework.SampleComponentState._
 import csw.common.utils.TestAppender
 import csw.commons.tags.LoggingSystemSensitive
 import csw.event.client.helpers.TestFutureExt.RichFuture
-import csw.framework.FrameworkTestWiring
 import csw.framework.internal.component.ComponentBehavior
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.location.api.models.ComponentType.HCD
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{ComponentId, LocationRemoved, LocationUpdated, TrackingEvent}
-import csw.location.server.http.HTTPLocationService
 import csw.logging.internal.LoggingLevels.INFO
 import csw.logging.internal.LoggingSystem
 import csw.params.core.states.{CurrentState, StateName}
@@ -37,9 +35,7 @@ import scala.concurrent.duration.DurationLong
 // DEOPSCSW-177: Hooks for lifecycle management
 // DEOPSCSW-216: Locate and connect components to send AKKA commands
 @LoggingSystemSensitive
-class StandaloneComponentTest extends HTTPLocationService {
-
-  private val testWiring = new FrameworkTestWiring()
+class StandaloneComponentTest extends FrameworkIntegrationSuite {
   import testWiring._
 
   // all log messages will be captured in log buffer
@@ -48,13 +44,13 @@ class StandaloneComponentTest extends HTTPLocationService {
   private var loggingSystem: LoggingSystem = _
 
   override protected def beforeAll(): Unit = {
+    super.beforeAll()
     loggingSystem = new LoggingSystem("standalone", "1.0", "localhost", seedActorSystem)
     loggingSystem.setAppenders(List(testAppender))
   }
 
   override def afterAll(): Unit = {
     Http(seedActorSystem).shutdownAllConnectionPools().await
-    seedActorSystem.terminate().await
     super.afterAll()
   }
 

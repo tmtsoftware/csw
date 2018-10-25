@@ -8,37 +8,40 @@ import csw.command.client.CommandServiceFactory
 import csw.command.client.models.framework.ContainerLifecycleState
 import csw.common.FrameworkAssertions.assertThatContainerIsRunning
 import csw.common.components.framework.SampleComponentState._
-import csw.commons.redis.EmbeddedRedis
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.event.client.internal.commons.EventServiceConnection
-import csw.framework.FrameworkTestWiring
 import csw.framework.internal.wiring.{Container, FrameworkWiring}
 import csw.location.api.models.ComponentId
 import csw.location.api.models.ComponentType.{Assembly, HCD}
 import csw.location.api.models.Connection.AkkaConnection
-import csw.location.server.http.HTTPLocationService
 import csw.params.commands
 import csw.params.commands.CommandName
 import csw.params.core.states.{CurrentState, StateName}
-import org.scalatest.Matchers
+import redis.embedded.{RedisSentinel, RedisServer}
 
 import scala.concurrent.duration.DurationLong
 
 //DEOPSCSW-395: Provide EventService handle to component developers
-class EventServiceIntegrationTest extends HTTPLocationService with EmbeddedRedis with Matchers {
-  private val testWiring = new FrameworkTestWiring()
+class EventServiceIntegrationTest extends FrameworkIntegrationSuite {
   import testWiring._
 
-  private val masterId: String      = ConfigFactory.load().getString("csw-event.redis.masterId")
-  private val (_, sentinel, server) = startSentinelAndRegisterService(EventServiceConnection.value, masterId)
+  private val masterId: String        = ConfigFactory.load().getString("csw-event.redis.masterId")
+  private var sentinel: RedisSentinel = _
+  private var server: RedisServer     = _
 
   private val filterAssemblyConnection = AkkaConnection(ComponentId("Filter", Assembly))
   private val disperserHcdConnection   = AkkaConnection(ComponentId("Disperser", HCD))
   private val wiring                   = FrameworkWiring.make(testActorSystem)
 
+  override protected def beforeAll(): Unit = {
+    super.beforeAll()
+    val tuple = startSentinelAndRegisterService(EventServiceConnection.value, masterId)
+    sentinel = tuple._2
+    server = tuple._3
+  }
+
   override def afterAll(): Unit = {
     Http(testActorSystem).shutdownAllConnectionPools().await
-    shutdown()
     stopSentinel(sentinel, server)
     super.afterAll()
   }

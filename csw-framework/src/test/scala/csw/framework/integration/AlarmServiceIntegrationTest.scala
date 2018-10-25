@@ -11,37 +11,39 @@ import csw.command.client.models.framework.SupervisorLifecycleState
 import csw.common.FrameworkAssertions.assertThatSupervisorIsRunning
 import csw.common.components.framework.SampleComponentState._
 import csw.event.client.helpers.TestFutureExt.RichFuture
-import csw.framework.FrameworkTestWiring
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.location.api.models.ComponentId
 import csw.location.api.models.ComponentType.HCD
 import csw.location.api.models.Connection.AkkaConnection
-import csw.location.server.http.HTTPLocationService
 import csw.params.commands.Setup
-import org.scalatest.Matchers
+import redis.embedded.{RedisSentinel, RedisServer}
 
 import scala.concurrent.duration.DurationLong
 
 //DEOPSCSW-490: Alarm service integration with framework
 //DEOPSCSW-481: Component Developer API available to all CSW components
-class AlarmServiceIntegrationTest extends HTTPLocationService with Matchers {
-  private val testWiring = new FrameworkTestWiring()
+class AlarmServiceIntegrationTest extends FrameworkIntegrationSuite {
   import testWiring._
 
-  private val masterId: String      = ConfigFactory.load().getString("csw-alarm.redis.masterId")
-  private val (_, sentinel, server) = startSentinelAndRegisterService(AlarmServiceConnection.value, masterId)
+  private val masterId: String        = ConfigFactory.load().getString("csw-alarm.redis.masterId")
+  private var sentinel: RedisSentinel = _
+  private var server: RedisServer     = _
 
   private val wiring: FrameworkWiring = FrameworkWiring.make(testActorSystem)
   private val adminAlarmService       = wiring.alarmServiceFactory.makeAdminApi(wiring.locationService)
 
-  override protected def beforeAll(): Unit = {
+  override def beforeAll(): Unit = {
+    super.beforeAll()
+
+    val tuple = startSentinelAndRegisterService(AlarmServiceConnection.value, masterId)
+    sentinel = tuple._2
+    server = tuple._3
     val config: Config = ConfigFactory.parseResources("valid-alarms.conf")
     adminAlarmService.initAlarms(config, reset = true).await
   }
 
   override def afterAll(): Unit = {
     Http(testActorSystem).shutdownAllConnectionPools().await
-    shutdown()
     stopSentinel(sentinel, server)
     super.afterAll()
   }
