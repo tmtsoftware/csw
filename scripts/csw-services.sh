@@ -157,6 +157,8 @@ function start_sentinel() {
     if [ -x "$location_agent_script" ]; then
         if checkIfRedisIsInstalled ; then
             echo "Starting Redis Sentinel..."
+            sed -i "" "s/eventServer 127.0.0.1/eventServer ${IP}/g" ${sentinelConf}
+            sed -i "" "s/alarmServer 127.0.0.1/alarmServer ${IP}/g" ${sentinelConf}
             nohup ./csw-location-agent --name "EventServer,AlarmServer" --command "$redisSentinel ${sentinelConf} --port ${sentinel_port}" --port "${sentinel_port}"> ${sentinelLogFile} 2>&1 &
             echo $! > ${sentinelPidFile}
             echo ${sentinel_port} > ${sentinelPortFile}
