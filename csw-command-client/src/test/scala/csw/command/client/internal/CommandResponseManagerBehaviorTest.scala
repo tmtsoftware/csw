@@ -17,6 +17,8 @@ import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSuite, Matchers}
 
+import scala.concurrent.duration.DurationDouble
+
 // DEOPSCSW-207: Report on Configuration Command Completion
 // DEOPSCSW-208: Report failure on Configuration Completion command
 class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with MockitoSugar {
@@ -245,6 +247,41 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
     // Update of final sub command as Completed where other sub commands have completed earlier
     // should update the status of parent command as Completed
     commandResponseProbe.expectMessage(Completed(runId))
+  }
+
+  test("CRM should support three level tree including sequenceId as top level") {
+    val behaviorTestKit      = createBehaviorTestKit()
+    val commandResponseProbe = TestProbe[SubmitResponse]
+
+    val sequenceRunId = Id("0000")
+    val stepA         = Id("1111")
+    val stepB         = Id("2222")
+    val stepB1        = Id("3333")
+
+    behaviorTestKit.run(AddOrUpdateCommand(sequenceRunId, Started(sequenceRunId)))
+    behaviorTestKit.run(Subscribe(sequenceRunId, commandResponseProbe.ref))
+
+    behaviorTestKit.run(AddSubCommand(sequenceRunId, stepA))
+    behaviorTestKit.run(AddOrUpdateCommand(stepA, Started(stepA)))
+    behaviorTestKit.run(Subscribe(stepA, commandResponseProbe.ref))
+
+    behaviorTestKit.run(AddSubCommand(sequenceRunId, stepB))
+    behaviorTestKit.run(AddOrUpdateCommand(stepB, Started(stepB)))
+    behaviorTestKit.run(Subscribe(stepB, commandResponseProbe.ref))
+
+    behaviorTestKit.run(AddSubCommand(stepB, stepB1))
+    behaviorTestKit.run(UpdateSubCommand(stepB1, Completed(stepB1)))
+
+    commandResponseProbe.expectMessage(10.seconds, Completed(stepB))
+
+    behaviorTestKit.run(UpdateSubCommand(stepB, Completed(stepB)))
+
+    behaviorTestKit.run(AddOrUpdateCommand(stepA, Completed(stepA)))
+    behaviorTestKit.run(UpdateSubCommand(stepA, Completed(stepA)))
+
+    // Update of a sub command status(above) should update the status of parent command
+    commandResponseProbe.expectMessage(10.seconds, Completed(stepA))
+    commandResponseProbe.expectMessage(10.seconds, Completed(sequenceRunId))
   }
 
   private def getMockedLogger: LoggerFactory = {
