@@ -12,7 +12,7 @@ import csw.testkit.internal.TestKitUtils
 
 import scala.compat.java8.OptionConverters.RichOptionalGeneric
 
-final class ConfigTestKit private[csw] (
+final class ConfigTestKit private (
     configOpt: Option[Config],
     serverPortOpt: Option[Int],
     settingsOpt: Option[TestKitSettings]

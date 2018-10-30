@@ -5,11 +5,12 @@ import akka.Done
 import akka.http.scaladsl.Http
 import akka.util.Timeout
 import csw.location.server.internal.ServerWiring
-import csw.params.extensions.OptionConverters.RichOptional
 import csw.testkit.TestKitSettings
 import csw.testkit.internal.TestKitUtils
 
-final class LocationTestKit(clusterPort: Option[Int], settings: Option[TestKitSettings]) {
+import scala.compat.java8.OptionConverters.RichOptionalGeneric
+
+final class LocationTestKit private (clusterPort: Option[Int], settings: Option[TestKitSettings]) {
 
   private val locationWiring = ServerWiring.make(clusterPort)
   import locationWiring.actorRuntime._

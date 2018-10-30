@@ -11,13 +11,13 @@ object TestKitSettings {
   /**
    * Reads configuration settings from `csw.testkit` section.
    */
-  def apply(system: ActorSystem): TestKitSettings = apply(system.settings.config.getConfig("csw.testkit"))
+  def apply(system: ActorSystem): TestKitSettings = apply(system.settings.config)
 
   /**
    * Reads configuration settings from given `Config` that
    * must have the same layout as the `csw.testkit` section.
    */
-  def apply(config: Config): TestKitSettings = new TestKitSettings(config)
+  def apply(config: Config): TestKitSettings = new TestKitSettings(config.getConfig("csw.testkit"))
 
   /**
    * Java API: Reads configuration settings from ``csw.testkit`` section.
