@@ -1,24 +1,28 @@
 package csw.alarm.client.internal.auto_refresh
 
-import akka.actor.testkit.typed.scaladsl.{ActorTestKit, ManualTime, TestProbe}
+import akka.actor.testkit.typed.scaladsl.{ManualTime, ScalaTestWithActorTestKit, TestProbe}
 import akka.actor.typed.scaladsl.Behaviors
 import com.typesafe.config.Config
-import csw.params.core.models.Subsystem.NFIRAOS
 import csw.alarm.api.models.AlarmSeverity.Major
 import csw.alarm.api.models.Key.AlarmKey
 import csw.alarm.client.internal.auto_refresh.AutoRefreshSeverityMessage._
+import csw.params.core.models.Subsystem.NFIRAOS
 import org.scalatest.concurrent.Eventually
-import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
+import org.scalatest.{BeforeAndAfterAll, FunSuiteLike, Matchers}
 
 import scala.collection.mutable
 import scala.concurrent.duration.DurationDouble
 
 // DEOPSCSW-491: Auto-refresh an alarm through alarm service cli
-class AutoRefreshSeverityActorTest extends FunSuite with ActorTestKit with Eventually with Matchers with BeforeAndAfterAll {
+class AutoRefreshSeverityActorTest
+    extends ScalaTestWithActorTestKit(ManualTime.config)
+    with FunSuiteLike
+    with Eventually
+    with Matchers
+    with BeforeAndAfterAll {
 
   val tromboneAxisHighLimitAlarmKey = AlarmKey(NFIRAOS, "trombone", "tromboneAxisHighLimitAlarm")
   val tcsAxisHighLimitAlarmKey      = AlarmKey(NFIRAOS, "tcs", "tromboneAxisHighLimitAlarm")
-  override def config: Config       = ManualTime.config
   private val manualTime            = ManualTime()
 
   test("should refresh severity") {

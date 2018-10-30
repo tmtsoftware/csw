@@ -1,13 +1,13 @@
 package csw.framework.internal.wiring
 
-import akka.actor.{ActorSystem, Scheduler}
 import akka.actor.typed.scaladsl.AskPattern.Askable
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.actor.typed.{ActorRef, Behavior, Props}
+import akka.actor.{ActorSystem, Scheduler}
 import akka.util.Timeout
 import csw.framework.internal.wiring.CswFrameworkGuardian.CreateActor
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration.DurationDouble
 
 /**
@@ -21,7 +21,6 @@ private[framework] class CswFrameworkSystem(val system: ActorSystem) {
   implicit val scheduler: Scheduler     = system.scheduler
   implicit val timeout: Timeout         = Timeout(2.seconds)
   private val cswFrameworkGuardianActor = system.spawn(CswFrameworkGuardian.behavior, "system")
-  def spawnTyped[T](behavior: Behavior[T], name: String, props: Props = Props.empty): Future[ActorRef[T]] = {
+  def spawnTyped[T](behavior: Behavior[T], name: String, props: Props = Props.empty): Future[ActorRef[T]] =
     cswFrameworkGuardianActor ? CreateActor(behavior, name, props)
-  }
 }

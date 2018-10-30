@@ -1,9 +1,9 @@
 package csw.event.cli.utils
 
-import csw.params.events.{ObserveEvent, SystemEvent}
-import csw.params.core.formats.JsonSupport
 import csw.event.cli.IterableExtensions.RichStringIterable
 import csw.event.cli.args.Options
+import csw.params.core.formats.JsonSupport
+import csw.params.events.{ObserveEvent, SystemEvent}
 import org.scalatest.{FunSuite, Matchers}
 import play.api.libs.json.Json
 
