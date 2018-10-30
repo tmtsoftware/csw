@@ -28,6 +28,7 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-alarm-cli`,
   `csw-network-utils`,
   `csw-commons`,
+  `csw-testkit`,
   `csw-benchmark`,
   `romaine`,
   `examples`,
@@ -312,6 +313,15 @@ lazy val `csw-alarm-cli` = project
   )
   .enablePlugins(DeployApp, MaybeCoverage)
   .settings(libraryDependencies ++= Dependencies.AlarmCli.value)
+
+lazy val `csw-testkit` = project
+  .dependsOn(
+    `csw-location-server`,
+    `csw-config-server`,
+    `csw-framework`
+  )
+  .enablePlugins(PublishBintray, GenJavadocPlugin)
+  .settings(libraryDependencies ++= Dependencies.Testkit.value)
 
 /* =============== Common Utilities ============ */
 lazy val `csw-network-utils` = project

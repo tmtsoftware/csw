@@ -253,6 +253,14 @@ object Dependencies {
     )
   )
 
+  val Testkit = Def.setting(
+    Seq(
+      //TODO: make this as provided deps
+      Libs.`scalatest`.value,
+      Libs.`embedded-redis`
+    )
+  )
+
   val Commons = Def.setting(
     Seq(
       Akka.`akka-stream`,
