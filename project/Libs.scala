@@ -43,6 +43,10 @@ object Libs {
   val `scalajs-java-time` = dep("org.scala-js" %%% "scalajs-java-time" % "0.2.5")
 
   val `play-json-derived-codecs` = dep("org.julienrf" %%% "play-json-derived-codecs" % "4.0.1")
+
+  val `time4j`         = "net.time4j"       % "time4j-core"    % "4.38"
+  val `threeten-extra` = "org.threeten"     % "threeten-extra" % "1.4"
+  val `jna`            = "net.java.dev.jna" % "jna"            % "5.0.0"
 }
 
 object Jackson {

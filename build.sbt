@@ -26,6 +26,8 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-alarm-api`,
   `csw-alarm-client`,
   `csw-alarm-cli`,
+  `csw-time-api`,
+  `csw-time-client`,
   `csw-network-utils`,
   `csw-commons`,
   `csw-testkit`,
@@ -313,6 +315,14 @@ lazy val `csw-alarm-cli` = project
   )
   .enablePlugins(DeployApp, MaybeCoverage)
   .settings(libraryDependencies ++= Dependencies.AlarmCli.value)
+
+/* ================= Time Service ============== */
+
+lazy val `csw-time-api` = project
+
+lazy val `csw-time-client` = project
+  .dependsOn(`csw-time-api`)
+  .settings(libraryDependencies ++= Dependencies.TimeClient.value)
 
 lazy val `csw-testkit` = project
   .dependsOn(

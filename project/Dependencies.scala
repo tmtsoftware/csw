@@ -261,6 +261,17 @@ object Dependencies {
     )
   )
 
+  val TimeClient = Def.setting(
+    Seq(
+      Libs.`time4j`,
+      Libs.`threeten-extra`,
+      Libs.`jna`,
+      Libs.`junit-interface` % Test,
+      Libs.`scalatest`.value % Test,
+      Libs.`mockito-core`    % Test
+    )
+  )
+
   val Commons = Def.setting(
     Seq(
       Akka.`akka-stream`,
