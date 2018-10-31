@@ -56,7 +56,7 @@ class DetectAkkaComponentCrashTest(ignore: Int, mode: String) extends LSNodeSpec
       // if needed.
       within(5.seconds) {
         awaitAssert {
-          probe.expectMessageType[LocationRemoved](5.seconds)
+          probe.expectMessageType[LocationRemoved](15.seconds)
         }
       }
 
@@ -94,7 +94,7 @@ class DetectAkkaComponentCrashTest(ignore: Int, mode: String) extends LSNodeSpec
 
       within(5.seconds) {
         awaitAssert {
-          probe.expectMessageType[LocationRemoved](5.seconds)
+          probe.expectMessageType[LocationRemoved](15.seconds)
         }
       }
 
