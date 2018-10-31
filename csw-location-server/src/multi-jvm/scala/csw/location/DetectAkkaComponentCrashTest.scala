@@ -54,7 +54,7 @@ class DetectAkkaComponentCrashTest(ignore: Int, mode: String) extends LSNodeSpec
       // Story CSW-15 requires crash detection within 10 seconds with a goal of 5 seconds.
       // This 5.seconds demonstrates that if the test passes, the performance goal is met. Could be relaxed to 10 seconds
       // if needed.
-      within(5.seconds) {
+      within(15.seconds) {
         awaitAssert {
           probe.expectMessageType[LocationRemoved](15.seconds)
         }
@@ -92,7 +92,7 @@ class DetectAkkaComponentCrashTest(ignore: Int, mode: String) extends LSNodeSpec
       Thread.sleep(2000)
       enterBarrier("after-crash")
 
-      within(5.seconds) {
+      within(15.seconds) {
         awaitAssert {
           probe.expectMessageType[LocationRemoved](15.seconds)
         }
