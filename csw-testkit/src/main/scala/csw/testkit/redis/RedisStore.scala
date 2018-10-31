@@ -34,7 +34,7 @@ private[testkit] trait RedisStore extends EmbeddedRedis {
     redisSentinel = Some(tuple._1)
     redisServer = Some(tuple._2)
     val resultF = locationService.register(TcpRegistration(connection, sentinelPort))
-    TestKitUtils.await(() ⇒ resultF, timeout)
+    TestKitUtils.await(resultF, timeout)
   }
 
   def start(sentinelPort: Optional[Int], serverPort: Optional[Int]): Unit =
@@ -43,6 +43,6 @@ private[testkit] trait RedisStore extends EmbeddedRedis {
   def shutdown(): Unit = {
     redisServer.foreach(_.stop())
     redisSentinel.foreach(_.stop())
-    TestKitUtils.await(() ⇒ system.terminate(), timeout)
+    TestKitUtils.await(system.terminate(), timeout)
   }
 }

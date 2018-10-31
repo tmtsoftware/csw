@@ -1,4 +1,4 @@
-package csw.testkit.alarm
+package csw.testkit
 
 import java.util.Optional
 
@@ -9,19 +9,18 @@ import csw.alarm.client.internal.commons.AlarmServiceConnection
 import csw.location.api.models.Connection.TcpConnection
 import csw.location.api.models.RegistrationResult
 import csw.network.utils.SocketUtils.getFreePort
-import csw.testkit.TestKitSettings
 import csw.testkit.redis.RedisStore
 
 import scala.compat.java8.OptionConverters.RichOptionalGeneric
 
 final class AlarmTestKit private (config: Config, settings: Option[TestKitSettings]) extends RedisStore {
 
-  override implicit val system: ActorSystem        = ActorSystem("alarm-test-kit", config)
-  override implicit val timeout: Timeout           = testKitSettings.DefaultTimeout
-  override protected val masterId: String          = config.getString("csw-alarm.redis.masterId")
-  override protected val connection: TcpConnection = AlarmServiceConnection.value
+  override implicit lazy val system: ActorSystem        = ActorSystem("alarm-test-kit", config)
+  override implicit lazy val timeout: Timeout           = testKitSettings.DefaultTimeout
+  override protected lazy val masterId: String          = config.getString("csw-alarm.redis.masterId")
+  override protected lazy val connection: TcpConnection = AlarmServiceConnection.value
 
-  implicit def testKitSettings: TestKitSettings = settings.getOrElse(TestKitSettings(config))
+  lazy val testKitSettings: TestKitSettings = settings.getOrElse(TestKitSettings(config))
 
   /**
    * Scala API to Start Alarm service
@@ -62,6 +61,14 @@ object AlarmTestKit {
    * @return handle to AlarmTestKit which can be used to start and stop alarm service
    */
   def apply(): AlarmTestKit = new AlarmTestKit(ConfigFactory.load(), None)
+
+  /**
+   * Create a AlarmTestKit
+   *
+   * @param testKitSettings custom testKitSettings
+   * @return handle to AlarmTestKit which can be used to start and stop alarm service
+   */
+  def apply(testKitSettings: TestKitSettings): AlarmTestKit = new AlarmTestKit(ConfigFactory.load(), Some(testKitSettings))
 
   /**
    * Scala API for creating AlarmTestKit

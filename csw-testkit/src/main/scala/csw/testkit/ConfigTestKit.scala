@@ -1,13 +1,11 @@
-package csw.testkit.config
+package csw.testkit
 
 import java.util.Optional
 
-import akka.Done
 import akka.http.scaladsl.Http
 import akka.util.Timeout
 import com.typesafe.config.Config
 import csw.config.server.ServerWiring
-import csw.testkit.TestKitSettings
 import csw.testkit.internal.TestKitUtils
 
 import scala.compat.java8.OptionConverters.RichOptionalGeneric
@@ -18,14 +16,14 @@ final class ConfigTestKit private (
     settingsOpt: Option[TestKitSettings]
 ) {
 
-  private val configWiring = (configOpt, serverPortOpt) match {
+  private lazy val configWiring = (configOpt, serverPortOpt) match {
     case (Some(config), _) ⇒ ServerWiring.make(config)
     case (_, serverPort)   ⇒ ServerWiring.make(serverPort)
   }
   import configWiring.actorRuntime._
 
-  implicit def testKitSettings: TestKitSettings = settingsOpt.getOrElse(TestKitSettings(actorSystem))
-  implicit val timeout: Timeout                 = testKitSettings.DefaultTimeout
+  lazy val testKitSettings: TestKitSettings = settingsOpt.getOrElse(TestKitSettings(actorSystem))
+  implicit lazy val timeout: Timeout        = testKitSettings.DefaultTimeout
 
   /**
    * Start HTTP Config server on provided port in constructor or configuration
@@ -35,14 +33,14 @@ final class ConfigTestKit private (
    * which can be created via [[csw.config.client.scaladsl.ConfigClientFactory]]
    *
    */
-  def startConfigServer(): Http.ServerBinding = TestKitUtils.await(configWiring.httpService.registeredLazyBinding _, timeout)._1
+  def startConfigServer(): Http.ServerBinding = TestKitUtils.await(configWiring.httpService.registeredLazyBinding, timeout)._1
 
   /**
    * Shutdown HTTP Config server
    *
    * When the test has completed, make sure you shutdown config server.
    */
-  def shutdownConfigServer: Done = TestKitUtils.coordShutdown(shutdown, timeout)
+  def shutdownConfigServer(): Unit = TestKitUtils.coordShutdown(shutdown, timeout)
 
 }
 
@@ -57,6 +55,14 @@ object ConfigTestKit {
    * @return handle to ConfigTestKit which can be used to start and stop config server
    */
   def apply(): ConfigTestKit = new ConfigTestKit(None, None, None)
+
+  /**
+   * Create a ConfigTestKit
+   *
+   * @param testKitSettings custom testKitSettings
+   * @return handle to ConfigTestKit which can be used to start and stop config server
+   */
+  def apply(testKitSettings: TestKitSettings): ConfigTestKit = new ConfigTestKit(None, None, Some(testKitSettings))
 
   /**
    * Scala API for creating ConfigTestKit

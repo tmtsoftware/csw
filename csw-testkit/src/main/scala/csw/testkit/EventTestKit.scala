@@ -1,4 +1,4 @@
-package csw.testkit.event
+package csw.testkit
 
 import java.util.Optional
 
@@ -9,7 +9,6 @@ import csw.event.client.internal.commons.EventServiceConnection
 import csw.location.api.models.Connection.TcpConnection
 import csw.location.api.models.RegistrationResult
 import csw.network.utils.SocketUtils.getFreePort
-import csw.testkit.TestKitSettings
 import csw.testkit.redis.RedisStore
 
 import scala.compat.java8.OptionConverters.RichOptionalGeneric
@@ -62,6 +61,14 @@ object EventTestKit {
    * @return handle to EventTestKit which can be used to start and stop event service
    */
   def apply(): EventTestKit = new EventTestKit(ConfigFactory.load(), None)
+
+  /**
+   * Create a EventTestKit
+   *
+   * @param testKitSettings custom testKitSettings
+   * @return handle to EventTestKit which can be used to start and stop event service
+   */
+  def apply(testKitSettings: TestKitSettings): EventTestKit = new EventTestKit(ConfigFactory.load(), Some(testKitSettings))
 
   /**
    * Scala API for creating EventTestKit
