@@ -32,11 +32,10 @@ class CommandResponseManager private[command] (
   /**
    * Add a new command or update an existing command with the provided status
    *
-   * @param runId command identifier
    * @param cmdStatus status of command as [[csw.params.commands.CommandResponse]]
    */
-  def addOrUpdateCommand(runId: Id, cmdStatus: SubmitResponse): Unit =
-    commandResponseManagerActor ! AddOrUpdateCommand(runId, cmdStatus)
+  def addOrUpdateCommand(cmdStatus: SubmitResponse): Unit =
+    commandResponseManagerActor ! AddOrUpdateCommand(cmdStatus)
 
   /**
    * Add a new sub command against another command
@@ -50,11 +49,10 @@ class CommandResponseManager private[command] (
   /**
    * Update the status of a sub-command which will infer the status of the parent command
    *
-   * @param subCommandId command identifier of sub command
    * @param cmdStatus status of command as [[csw.params.commands.CommandResponse]]
    */
-  def updateSubCommand(subCommandId: Id, cmdStatus: SubmitResponse): Unit =
-    commandResponseManagerActor ! UpdateSubCommand(subCommandId, cmdStatus)
+  def updateSubCommand(cmdStatus: SubmitResponse): Unit =
+    commandResponseManagerActor ! UpdateSubCommand(cmdStatus)
 
   /**
    * Query the current status of a command

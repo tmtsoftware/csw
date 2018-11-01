@@ -159,8 +159,8 @@ class SupervisorLockTest extends FrameworkTestSuite with BeforeAndAfterEach {
     supervisorRef ! Submit(setup, queryResponseProbe.ref)
     queryResponseProbe.expectMessageType[Completed]
     // Note there is a Started from ComponentBehavior as well as Completed
-    commandResponseManagerActor.expectMessage(AddOrUpdateCommand(setup.runId, Started(setup.runId)))
-    commandResponseManagerActor.expectMessage(AddOrUpdateCommand(setup.runId, Completed(setup.runId)))
+    commandResponseManagerActor.expectMessage(AddOrUpdateCommand(Started(setup.runId)))
+    commandResponseManagerActor.expectMessage(AddOrUpdateCommand(Completed(setup.runId)))
 
     // Ensure Query can be sent to component even in locked state
     supervisorRef ! Query(setup.runId, queryResponseProbe.ref)

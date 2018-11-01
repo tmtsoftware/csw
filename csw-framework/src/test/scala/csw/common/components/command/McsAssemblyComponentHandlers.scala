@@ -114,11 +114,11 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
       //#query-command-response-manager
 
       case `initCmd` ⇒
-        commandResponseManager.addOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId))
+        commandResponseManager.addOrUpdateCommand(Completed(controlCommand.runId))
         Completed(controlCommand.runId)
 
       case `moveCmd` ⇒
-        commandResponseManager.addOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId))
+        commandResponseManager.addOrUpdateCommand(Completed(controlCommand.runId))
         Completed(controlCommand.runId)
 
       case _ ⇒ //do nothing
@@ -141,15 +141,15 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
               currentStatePublisher
                 .publish(CurrentState(shortSetup.source, StateName("testStateName"), Set(choiceKey.set(shortCmdCompleted))))
               // As the commands get completed, the results are updated in the commandResponseManager
-              commandResponseManager.updateSubCommand(id, Completed(id))
+              commandResponseManager.updateSubCommand(Completed(id))
             case id if id == mediumSetup.runId ⇒
               currentStatePublisher
                 .publish(CurrentState(mediumSetup.source, StateName("testStateName"), Set(choiceKey.set(mediumCmdCompleted))))
-              commandResponseManager.updateSubCommand(id, Completed(id))
+              commandResponseManager.updateSubCommand(Completed(id))
             case id if id == longSetup.runId ⇒
               currentStatePublisher
                 .publish(CurrentState(longSetup.source, StateName("testStateName"), Set(choiceKey.set(longCmdCompleted))))
-              commandResponseManager.updateSubCommand(id, Completed(id))
+              commandResponseManager.updateSubCommand(Completed(id))
           }
         //#updateSubCommand
         case _ ⇒ // Do nothing

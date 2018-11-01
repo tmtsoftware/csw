@@ -36,7 +36,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
     val commandResponseProbe    = TestProbe[QueryResponse]
     val commandCorrelationProbe = TestProbe[CommandCorrelation]
     val runId                   = Id()
-    behaviorTestKit.run(AddOrUpdateCommand(runId, Started(runId)))
+    behaviorTestKit.run(AddOrUpdateCommand(Started(runId)))
 
     behaviorTestKit.run(Query(runId, commandResponseProbe.ref))
     commandResponseProbe.expectMessage(Started(runId))
@@ -51,7 +51,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
     val parentId                = Id()
     val childId                 = Id()
 
-    behaviorTestKit.run(AddOrUpdateCommand(parentId, Started(parentId)))
+    behaviorTestKit.run(AddOrUpdateCommand(Started(parentId)))
     behaviorTestKit.run(AddSubCommand(parentId, childId))
 
     behaviorTestKit.run(GetCommandCorrelation(commandCorrelationProbe.ref))
@@ -65,7 +65,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
 
     val runId = Id()
 
-    behaviorTestKit.run(AddOrUpdateCommand(runId, Completed(runId)))
+    behaviorTestKit.run(AddOrUpdateCommand(Completed(runId)))
 
     behaviorTestKit.run(GetCommandResponseManagerState(commandResponseManagerStateProbe.ref))
     val commandResponseManagerState = commandResponseManagerStateProbe.expectMessageType[CommandResponseManagerState]
@@ -87,13 +87,13 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
 
     // This simulates ComponentBehavior adding the command with Started - does not cause update to subscriber
     // Subscriber cannot subscribe before this happens, will not find command
-    behaviorTestKit.run(AddOrUpdateCommand(runId, Started(runId)))
+    behaviorTestKit.run(AddOrUpdateCommand(Started(runId)))
     // Simulate doSubmit returning Started for a long-running command
     //behaviorTestKit.run(AddOrUpdateCommand(runId, Started(runId)))
     // Subscribe succeeds no after initial Started
     behaviorTestKit.run(Subscribe(runId, commandResponseProbe.ref))
     // Simulate doSubmit returning Started for a long-running command
-    behaviorTestKit.run(AddOrUpdateCommand(runId, Started(runId)))
+    behaviorTestKit.run(AddOrUpdateCommand(Started(runId)))
     // Started is received to subscriber now
     commandResponseProbe.expectMessage(Started(runId))
   }
@@ -104,15 +104,15 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
     val commandCorrelationProbe = TestProbe[CommandCorrelation]
     val runId                   = Id()
 
-    behaviorTestKit.run(AddOrUpdateCommand(runId, Started(runId)))
+    behaviorTestKit.run(AddOrUpdateCommand(Started(runId)))
     behaviorTestKit.run(Query(runId, commandResponseProbe.ref))
     commandResponseProbe.expectMessage(Started(runId))
 
-    behaviorTestKit.run(AddOrUpdateCommand(runId, Completed(runId)))
+    behaviorTestKit.run(AddOrUpdateCommand(Completed(runId)))
     behaviorTestKit.run(Query(runId, commandResponseProbe.ref))
     commandResponseProbe.expectMessage(Completed(runId))
 
-    behaviorTestKit.run(AddOrUpdateCommand(runId, Started(runId)))
+    behaviorTestKit.run(AddOrUpdateCommand(Started(runId)))
     behaviorTestKit.run(Query(runId, commandResponseProbe.ref))
     commandResponseProbe.expectMessage(Completed(runId))
   }
@@ -124,7 +124,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
 
     val runId = Id()
 
-    behaviorTestKit.run(AddOrUpdateCommand(runId, Started(runId)))
+    behaviorTestKit.run(AddOrUpdateCommand(Started(runId)))
 
     behaviorTestKit.run(Subscribe(runId, commandResponseProbe.ref))
 
@@ -145,7 +145,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
 
     val runId = Id()
 
-    behaviorTestKit.run(AddOrUpdateCommand(runId, Started(runId)))
+    behaviorTestKit.run(AddOrUpdateCommand(Started(runId)))
 
     behaviorTestKit.run(Query(runId, commandResponseProbe.ref))
     commandResponseProbe.expectMessage(Started(runId))
@@ -159,11 +159,11 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
 
     val runId = Id()
 
-    behaviorTestKit.run(AddOrUpdateCommand(runId, Started(runId)))
+    behaviorTestKit.run(AddOrUpdateCommand(Started(runId)))
     behaviorTestKit.run(Subscribe(runId, commandResponseProbe1.ref))
     behaviorTestKit.run(Subscribe(runId, commandResponseProbe2.ref))
 
-    behaviorTestKit.run(AddOrUpdateCommand(runId, Completed(runId)))
+    behaviorTestKit.run(AddOrUpdateCommand(Completed(runId)))
 
     behaviorTestKit.run(GetCommandResponseManagerState(commandResponseManagerStateProbe.ref))
     val commandResponseManagerState = commandResponseManagerStateProbe.expectMessageType[CommandResponseManagerState]
@@ -180,12 +180,12 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
     val runId        = Id()
     val subCommandId = Id()
 
-    behaviorTestKit.run(AddOrUpdateCommand(runId, Started(runId)))
+    behaviorTestKit.run(AddOrUpdateCommand(Started(runId)))
     behaviorTestKit.run(Subscribe(runId, commandResponseProbe.ref))
 
     behaviorTestKit.run(AddSubCommand(runId, subCommandId))
 
-    behaviorTestKit.run(UpdateSubCommand(subCommandId, Completed(subCommandId)))
+    behaviorTestKit.run(UpdateSubCommand(Completed(subCommandId)))
 
     // Update of a sub command status(above) should update the status of parent command
     commandResponseProbe.expectMessage(Completed(runId))
@@ -199,14 +199,14 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
     val subCommandId1        = Id()
     val subCommandId2        = Id()
 
-    behaviorTestKit.run(AddOrUpdateCommand(runId, Started(runId)))
+    behaviorTestKit.run(AddOrUpdateCommand(Started(runId)))
     behaviorTestKit.run(Subscribe(runId, commandResponseProbe.ref))
 
     behaviorTestKit.run(AddSubCommand(runId, subCommandId1))
     behaviorTestKit.run(AddSubCommand(runId, subCommandId2))
 
-    behaviorTestKit.run(UpdateSubCommand(subCommandId1, Error(subCommandId1, "Sub command 1 failed")))
-    behaviorTestKit.run(UpdateSubCommand(subCommandId2, Completed(subCommandId2)))
+    behaviorTestKit.run(UpdateSubCommand(Error(subCommandId1, "Sub command 1 failed")))
+    behaviorTestKit.run(UpdateSubCommand(Completed(subCommandId2)))
 
     // Update of a failed sub command status(above) should update the status of parent command as failed irrespective
     // of the result of other sub command
@@ -221,28 +221,28 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
     val subCommandId1        = Id()
     val subCommandId2        = Id()
 
-    behaviorTestKit.run(AddOrUpdateCommand(runId, Started(runId)))
+    behaviorTestKit.run(AddOrUpdateCommand(Started(runId)))
     behaviorTestKit.run(Subscribe(runId, commandResponseProbe.ref))
 
     behaviorTestKit.run(AddSubCommand(runId, subCommandId1))
     behaviorTestKit.run(AddSubCommand(runId, subCommandId2))
 
     // Update status of sub command 1 as completed
-    behaviorTestKit.run(UpdateSubCommand(subCommandId1, Completed(subCommandId1)))
+    behaviorTestKit.run(UpdateSubCommand(Completed(subCommandId1)))
 
     // Status update of sub command 1 does not make the parent command complete
     behaviorTestKit.run(Query(runId, commandResponseProbe.ref))
     commandResponseProbe.expectMessage(Started(runId))
 
     // Update status of sub command 2 with some intermediate status
-    behaviorTestKit.run(UpdateSubCommand(subCommandId2, Started(subCommandId2)))
+    behaviorTestKit.run(UpdateSubCommand(Started(subCommandId2)))
 
     // Status update of sub command 2 with intermediate does not make the parent command complete
     behaviorTestKit.run(Query(runId, commandResponseProbe.ref))
     commandResponseProbe.expectMessage(Started(runId))
 
     // Update status of sub command 2 as completed
-    behaviorTestKit.run(UpdateSubCommand(subCommandId2, Completed(subCommandId2)))
+    behaviorTestKit.run(UpdateSubCommand(Completed(subCommandId2)))
 
     // Update of final sub command as Completed where other sub commands have completed earlier
     // should update the status of parent command as Completed
@@ -258,26 +258,26 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
     val stepB         = Id("2222")
     val stepB1        = Id("3333")
 
-    behaviorTestKit.run(AddOrUpdateCommand(sequenceRunId, Started(sequenceRunId)))
+    behaviorTestKit.run(AddOrUpdateCommand(Started(sequenceRunId)))
     behaviorTestKit.run(Subscribe(sequenceRunId, commandResponseProbe.ref))
 
     behaviorTestKit.run(AddSubCommand(sequenceRunId, stepA))
-    behaviorTestKit.run(AddOrUpdateCommand(stepA, Started(stepA)))
+    behaviorTestKit.run(AddOrUpdateCommand(Started(stepA)))
     behaviorTestKit.run(Subscribe(stepA, commandResponseProbe.ref))
 
     behaviorTestKit.run(AddSubCommand(sequenceRunId, stepB))
-    behaviorTestKit.run(AddOrUpdateCommand(stepB, Started(stepB)))
+    behaviorTestKit.run(AddOrUpdateCommand(Started(stepB)))
     behaviorTestKit.run(Subscribe(stepB, commandResponseProbe.ref))
 
     behaviorTestKit.run(AddSubCommand(stepB, stepB1))
-    behaviorTestKit.run(UpdateSubCommand(stepB1, Completed(stepB1)))
+    behaviorTestKit.run(UpdateSubCommand(Completed(stepB1)))
 
     commandResponseProbe.expectMessage(10.seconds, Completed(stepB))
 
-    behaviorTestKit.run(UpdateSubCommand(stepB, Completed(stepB)))
+    behaviorTestKit.run(UpdateSubCommand(Completed(stepB)))
 
-    behaviorTestKit.run(AddOrUpdateCommand(stepA, Completed(stepA)))
-    behaviorTestKit.run(UpdateSubCommand(stepA, Completed(stepA)))
+    behaviorTestKit.run(AddOrUpdateCommand(Completed(stepA)))
+    behaviorTestKit.run(UpdateSubCommand(Completed(stepA)))
 
     // Update of a sub command status(above) should update the status of parent command
     commandResponseProbe.expectMessage(10.seconds, Completed(stepA))

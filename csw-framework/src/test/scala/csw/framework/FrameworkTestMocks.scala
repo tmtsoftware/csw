@@ -21,7 +21,7 @@ import csw.location.api.models.{AkkaRegistration, RegistrationResult}
 import csw.location.api.scaladsl.LocationService
 import csw.logging.scaladsl.{Logger, LoggerFactory}
 import csw.params.commands.CommandResponse.SubmitResponse
-import csw.params.core.models.{Id, Prefix}
+import csw.params.core.models.Prefix
 import csw.params.core.states.CurrentState
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{when, _}
@@ -53,7 +53,7 @@ class FrameworkTestMocks(implicit untypedSystem: actor.ActorSystem, system: Acto
   val commandResponseManager: CommandResponseManager                        = mock[CommandResponseManager]
 
   when(commandResponseManager.commandResponseManagerActor).thenReturn(commandResponseManagerActor.ref)
-  doNothing().when(commandResponseManager).addOrUpdateCommand(any[Id], any[SubmitResponse])
+  doNothing().when(commandResponseManager).addOrUpdateCommand(any[SubmitResponse])
 
   val lifecycleStateProbe: TestProbe[LifecycleStateChanged] = TestProbe[LifecycleStateChanged]
   val compStateProbe: TestProbe[CurrentState]               = TestProbe[CurrentState]

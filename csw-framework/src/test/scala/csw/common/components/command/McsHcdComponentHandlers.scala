@@ -38,20 +38,20 @@ class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
       case `longRunning` ⇒
         ctx.schedule(5.seconds,
                      commandResponseManager.commandResponseManagerActor,
-                     AddOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId)))
+                     AddOrUpdateCommand(Completed(controlCommand.runId)))
         Started(controlCommand.runId)
       case `mediumRunning` ⇒
         ctx.schedule(3.seconds,
                      commandResponseManager.commandResponseManagerActor,
-                     AddOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId)))
+                     AddOrUpdateCommand(Completed(controlCommand.runId)))
         Started(controlCommand.runId)
       case `shortRunning` ⇒
         ctx.schedule(1.seconds,
                      commandResponseManager.commandResponseManagerActor,
-                     AddOrUpdateCommand(controlCommand.runId, Completed(controlCommand.runId)))
+                     AddOrUpdateCommand(Completed(controlCommand.runId)))
         Started(controlCommand.runId)
       case `failureAfterValidationCmd` ⇒
-        commandResponseManager.addOrUpdateCommand(controlCommand.runId, Error(controlCommand.runId, "Failed command"))
+        commandResponseManager.addOrUpdateCommand(Error(controlCommand.runId, "Failed command"))
         Error(controlCommand.runId, "Failed command")
       case _ ⇒
         Error(controlCommand.runId, "Unknown Command")

@@ -215,7 +215,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
                         .thenAccept(commandResponse -> {
                             if (commandResponse instanceof CommandResponse.Completed) {
                                 // As the commands get completed, the results are updated in the commandResponseManager
-                                commandResponseManager.updateSubCommand(subCommand2.runId(), commandResponse);
+                                commandResponseManager.updateSubCommand(commandResponse);
                             } else {
                                 // do something
                             }

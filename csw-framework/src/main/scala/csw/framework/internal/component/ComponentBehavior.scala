@@ -195,13 +195,13 @@ private[framework] final class ComponentBehavior(
     log.info(s"Invoking lifecycle handler's validateCommand hook with msg :[$commandMessage]")
     lifecycleHandlers.validateCommand(commandMessage.command) match {
       case Accepted(runId) =>
-        commandResponseManager.commandResponseManagerActor ! AddOrUpdateCommand(runId, Started(runId))
+        commandResponseManager.commandResponseManagerActor ! AddOrUpdateCommand(Started(runId))
 
         log.info(s"Invoking lifecycle handler's onSubmit hook with msg :[$commandMessage]")
         val submitResponse = lifecycleHandlers.onSubmit(commandMessage.command)
 
         // The response is used to update the CRM, it may still be `Started` if is a long running command
-        commandResponseManager.commandResponseManagerActor ! AddOrUpdateCommand(runId, submitResponse)
+        commandResponseManager.commandResponseManagerActor ! AddOrUpdateCommand(submitResponse)
 
         replyTo ! submitResponse
       case invalid: Invalid =>

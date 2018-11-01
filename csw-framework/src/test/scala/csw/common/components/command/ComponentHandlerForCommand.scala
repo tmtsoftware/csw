@@ -91,7 +91,7 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
     // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
     // This simulates a long running command that eventually updates with a result
     Source.fromFuture(Future(CompletedWithResult(controlCommand.runId, result))).delay(250.milli).runWith(Sink.head).onComplete {
-      case Success(sr)        => commandResponseManager.addOrUpdateCommand(controlCommand.runId, sr)
+      case Success(sr)        => commandResponseManager.addOrUpdateCommand(sr)
       case Failure(exception) => println(s"processWithout exception ${exception.getMessage}")
     }
   }
@@ -108,7 +108,7 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
     // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
     val eventualResponse: Future[QueryResponse] = commandResponseManager.query(runId)
     eventualResponse.onComplete {
-      case Success(x) => commandResponseManager.addOrUpdateCommand(runId, Cancelled(runId))
+      case Success(x) => commandResponseManager.addOrUpdateCommand(Cancelled(runId))
       case Failure(x) => println("Eventual response error occured: " + x.getMessage)
     }
   }

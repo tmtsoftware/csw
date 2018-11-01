@@ -261,9 +261,9 @@ private[csw] object FromSupervisorMessage {
 
 sealed trait CommandResponseManagerMessage
 object CommandResponseManagerMessage {
-  case class AddOrUpdateCommand(runId: Id, commandResponse: SubmitResponse)                 extends CommandResponseManagerMessage
+  case class AddOrUpdateCommand(commandResponse: SubmitResponse)                            extends CommandResponseManagerMessage
   case class AddSubCommand(runId: Id, subCommandId: Id)                                     extends CommandResponseManagerMessage
-  case class UpdateSubCommand(subCommandId: Id, commandResponse: SubmitResponse)            extends CommandResponseManagerMessage
+  case class UpdateSubCommand(commandResponse: SubmitResponse)                              extends CommandResponseManagerMessage
   case class GetCommandCorrelation(replyTo: ActorRef[CommandCorrelation])                   extends CommandResponseManagerMessage
   case class GetCommandResponseManagerState(replyTo: ActorRef[CommandResponseManagerState]) extends CommandResponseManagerMessage
   case class SubscriberTerminated(terminated: ActorRef[SubmitResponse])                     extends CommandResponseManagerMessage

@@ -139,7 +139,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
         Runnable task = new Runnable() {
             @Override
             public void run() {
-                commandResponseManager.addOrUpdateCommand(runId, response);
+                commandResponseManager.addOrUpdateCommand(response);
             }
         };
         // Wait a bit and then set CRM to Completed
