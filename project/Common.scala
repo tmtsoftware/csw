@@ -42,7 +42,8 @@ object Common extends AutoPlugin {
       Tests.Argument("-oDF"),
       // -v Log "test run started" / "test started" / "test run finished" events on log level "info" instead of "debug".
       // -a Show stack traces and exception class name for AssertionErrors.
-      Tests.Argument(TestFrameworks.JUnit, "-v", "-a")
+      Tests.Argument(TestFrameworks.JUnit, "-v", "  -a"),
+      Tests.Argument("-l", "csw.time.client.tags.NanoPrecisionTag")
     ),
     publishArtifact in (Test, packageBin) := true,
     version := {
