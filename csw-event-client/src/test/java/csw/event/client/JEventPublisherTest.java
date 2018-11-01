@@ -2,20 +2,20 @@ package csw.event.client;
 
 import akka.actor.Cancellable;
 import akka.actor.testkit.typed.javadsl.TestProbe;
+import akka.japi.function.Procedure;
 import akka.stream.javadsl.Keep;
 import akka.stream.javadsl.Sink;
 import akka.stream.javadsl.Source;
-import csw.location.server.http.JHTTPLocationService;
-import csw.params.core.models.Prefix;
-import csw.params.events.Event;
-import csw.params.events.Event$;
-import csw.params.events.EventKey;
 import csw.event.api.javadsl.IEventPublisher;
 import csw.event.api.javadsl.IEventSubscription;
 import csw.event.client.helpers.Utils;
 import csw.event.client.internal.kafka.KafkaTestProps;
 import csw.event.client.internal.redis.RedisTestProps;
 import csw.event.client.internal.wiring.BaseProperties;
+import csw.params.core.models.Prefix;
+import csw.params.events.Event;
+import csw.params.events.Event$;
+import csw.params.events.EventKey;
 import org.scalatest.testng.TestNGSuite;
 import org.testng.Assert;
 import org.testng.annotations.AfterSuite;
@@ -176,5 +176,42 @@ public class JEventPublisherTest extends TestNGSuite {
 
         events.add(0, Event$.MODULE$.invalidEvent(eventKey));
         Assert.assertEquals(events, queue);
+    }
+
+    //DEOPSCSW-595: Enforce ordering in publish
+    @Test(dataProvider = "event-service-provider")
+    public void should_be_able_to_maintain_ordering_while_publish(BaseProperties baseProperties) throws InterruptedException, TimeoutException, ExecutionException {
+        Prefix prefix = Prefix.apply("ordering.test.prefix");
+        Event event1             = Utils.makeEventWithPrefix(6, prefix);
+        Event event2             = Utils.makeEventWithPrefix(7, prefix);
+        Event event3             = Utils.makeEventWithPrefix(8, prefix);
+        Event event4             = Utils.makeEventWithPrefix(9, prefix);
+        Event event5             = Utils.makeEventWithPrefix(10, prefix);
+
+        EventKey eventKey = event1.eventKey();
+        TestProbe testProbe          = TestProbe.create(baseProperties.typedActorSystem());
+
+        IEventSubscription subscription = baseProperties.jSubscriber()
+                .subscribe(Collections.singleton(eventKey))
+                .toMat(Sink.foreach((Procedure<Event>) testProbe.ref()::tell), Keep.left())
+                .run(baseProperties.resumingMat());
+
+        subscription.ready().get(10, TimeUnit.SECONDS);
+        Thread.sleep(500);
+
+        baseProperties.jPublisher().publish(event1);
+        baseProperties.jPublisher().publish(event2);
+        baseProperties.jPublisher().publish(event3);
+        baseProperties.jPublisher().publish(event4);
+        baseProperties.jPublisher().publish(event5);
+
+        Thread.sleep(1000);
+
+        testProbe.expectMessage(Event$.MODULE$.invalidEvent(eventKey));
+        testProbe.expectMessage(event1);
+        testProbe.expectMessage(event2);
+        testProbe.expectMessage(event3);
+        testProbe.expectMessage(event4);
+        testProbe.expectMessage(event5);
     }
 }

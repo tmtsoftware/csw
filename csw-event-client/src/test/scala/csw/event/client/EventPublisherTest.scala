@@ -155,4 +155,41 @@ class EventPublisherTest extends TestNGSuite with Matchers with Eventually with 
     queue should (have length 5 and contain allElementsOf Seq(Event.invalidEvent(eventKey)) ++ events.take(4))
   }
 
+  //DEOPSCSW-595: Enforce ordering in publish
+  @Test(dataProvider = "event-service-provider")
+  def should_be_able_to_maintain_ordering_while_publish(baseProperties: BaseProperties): Unit = {
+    import baseProperties._
+
+    val prefix             = Prefix("ordering.test.prefix")
+    val event1             = makeEventWithPrefix(1, prefix)
+    val event2             = makeEventWithPrefix(2, prefix)
+    val event3             = makeEventWithPrefix(3, prefix)
+    val event4             = makeEventWithPrefix(4, prefix)
+    val event5             = makeEventWithPrefix(5, prefix)
+    val eventKey: EventKey = event1.eventKey
+    val testProbe          = TestProbe[Event]()(typedActorSystem)
+
+    val subscription = subscriber
+      .subscribe(Set(eventKey))
+      .toMat(Sink.foreach[Event](testProbe.ref ! _))(Keep.left)
+      .run()
+
+    subscription.ready().await
+    Thread.sleep(500)
+
+    publisher.publish(event1)
+    publisher.publish(event2)
+    publisher.publish(event3)
+    publisher.publish(event4)
+    publisher.publish(event5)
+
+    Thread.sleep(1000)
+
+    testProbe.expectMessage(Event.invalidEvent(eventKey))
+    testProbe.expectMessage(event1)
+    testProbe.expectMessage(event2)
+    testProbe.expectMessage(event3)
+    testProbe.expectMessage(event4)
+    testProbe.expectMessage(event5)
+  }
 }

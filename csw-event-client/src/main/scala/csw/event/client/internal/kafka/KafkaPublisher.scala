@@ -1,15 +1,17 @@
 package csw.event.client.internal.kafka
 
+import java.util.concurrent.Executors
+
 import akka.Done
 import akka.actor.Cancellable
 import akka.kafka.ProducerSettings
 import akka.stream.Materializer
 import akka.stream.scaladsl.Source
-import csw.params.events.Event
-import csw.event.client.pb.TypeMapperSupport
 import csw.event.api.exceptions.PublishFailure
 import csw.event.api.scaladsl.EventPublisher
 import csw.event.client.internal.commons.EventPublisherUtil
+import csw.event.client.pb.TypeMapperSupport
+import csw.params.events.Event
 import org.apache.kafka.clients.producer.{Callback, ProducerRecord}
 
 import scala.concurrent.duration.FiniteDuration
@@ -24,10 +26,11 @@ import scala.util.control.NonFatal
  * @param ec               the execution context to be used for performing asynchronous operations
  * @param mat              the materializer to be used for materializing underlying streams
  */
-class KafkaPublisher(producerSettings: Future[ProducerSettings[String, Array[Byte]]])(
-    implicit ec: ExecutionContext,
-    mat: Materializer
-) extends EventPublisher {
+class KafkaPublisher(producerSettings: Future[ProducerSettings[String, Array[Byte]]])(implicit mat: Materializer)
+    extends EventPublisher {
+
+  private implicit val singleThreadedEc: ExecutionContext =
+    ExecutionContext.fromExecutorService(Executors.newSingleThreadExecutor())
 
   private val parallelism        = 1
   private val kafkaProducer      = producerSettings.map(_.createKafkaProducer())

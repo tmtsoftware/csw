@@ -8,9 +8,13 @@ import romaine.extensions.FutureExtensions.RichFuture
 import scala.collection.JavaConverters.{iterableAsScalaIterableConverter, mapAsJavaMapConverter}
 import scala.compat.java8.FutureConverters.CompletionStageOps
 import scala.compat.java8.OptionConverters.RichOptionalGeneric
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration.DurationDouble
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 class RedisAsyncApi[K, V](redisAsyncCommands: Future[RedisAsyncCommands[K, V]])(implicit ec: ExecutionContext) {
+
+  Await.ready(redisAsyncCommands, 5.seconds)
+
   def set(key: K, value: V): Future[Done] =
     redisAsyncCommands.flatMap(_.set(key, value).toScala.failWith(s"Redis 'SET' operation failed for [key:$key value:$value]"))
 

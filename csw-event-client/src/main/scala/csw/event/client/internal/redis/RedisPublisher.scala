@@ -1,5 +1,7 @@
 package csw.event.client.internal.redis
 
+import java.util.concurrent.Executors
+
 import akka.Done
 import akka.actor.Cancellable
 import akka.stream.Materializer
@@ -23,13 +25,12 @@ import scala.util.control.NonFatal
  *
  * @param redisURI    future containing connection details for the Redis/Sentinel connections.
  * @param redisClient redis client available from lettuce
- * @param ec          the execution context to be used for performing asynchronous operations
  * @param mat         the materializer to be used for materializing underlying streams
  */
-class RedisPublisher(redisURI: Future[RedisURI], redisClient: RedisClient)(
-    implicit ec: ExecutionContext,
-    mat: Materializer
-) extends EventPublisher {
+class RedisPublisher(redisURI: Future[RedisURI], redisClient: RedisClient)(implicit mat: Materializer) extends EventPublisher {
+
+  private implicit val singleThreadedEc: ExecutionContext =
+    ExecutionContext.fromExecutorService(Executors.newSingleThreadExecutor())
 
   // inorder to preserve the order of publishing events, the parallelism level is maintained to 1
   private val parallelism        = 1
@@ -38,7 +39,7 @@ class RedisPublisher(redisURI: Future[RedisURI], redisClient: RedisClient)(
   private val romaineFactory = new RomaineFactory(redisClient)
   import EventRomaineCodecs._
 
-  private lazy val asyncApi: RedisAsyncApi[String, Event] = romaineFactory.redisAsyncApi(redisURI)
+  private val asyncApi: RedisAsyncApi[String, Event] = romaineFactory.redisAsyncApi(redisURI)
 
   override def publish(event: Event): Future[Done] =
     async {

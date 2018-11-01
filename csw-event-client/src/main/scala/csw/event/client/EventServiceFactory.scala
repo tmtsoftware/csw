@@ -4,8 +4,6 @@ import akka.actor.ActorSystem
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Materializer}
 import csw.event.api.javadsl.IEventService
 import csw.event.api.scaladsl.EventService
-import csw.event.client.models.EventStore
-import csw.event.client.models.EventStores.{KafkaStore, RedisStore}
 import csw.event.client.internal.commons.EventStreamSupervisionStrategy
 import csw.event.client.internal.commons.javawrappers.JEventService
 import csw.event.client.internal.commons.serviceresolver.{
@@ -15,6 +13,8 @@ import csw.event.client.internal.commons.serviceresolver.{
 }
 import csw.event.client.internal.kafka.KafkaEventService
 import csw.event.client.internal.redis.RedisEventService
+import csw.event.client.models.EventStore
+import csw.event.client.models.EventStores.{KafkaStore, RedisStore}
 import csw.location.api.javadsl.ILocationService
 import csw.location.api.scaladsl.LocationService
 
