@@ -363,10 +363,11 @@ lazy val examples = project
   .dependsOn(
     `csw-location-server`,
     `csw-config-client`,
-    `csw-config-server` % "test->test",
     `csw-logging`,
     `csw-params-jvm`,
-    `csw-framework`
+    `csw-framework`,
+    `csw-testkit`       % "test->compile",
+    `csw-config-server` % "test->test"
   )
   .enablePlugins(DeployApp)
   .settings(

@@ -15,7 +15,7 @@ import scala.compat.java8.OptionConverters.RichOptionalGeneric
 
 final class EventTestKit private (config: Config, settings: Option[TestKitSettings]) extends RedisStore {
 
-  override implicit val system: ActorSystem        = ActorSystem("event-test-kit", config)
+  override implicit lazy val system: ActorSystem   = ActorSystem("event-test-kit", config)
   override implicit val timeout: Timeout           = testKitSettings.DefaultTimeout
   override protected val masterId: String          = config.getString("csw-event.redis.masterId")
   override protected val connection: TcpConnection = EventServiceConnection.value

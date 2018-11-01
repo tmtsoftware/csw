@@ -1,8 +1,8 @@
 package csw.testkit
 
+import java.nio.file.Paths
 import java.util.Optional
 
-import akka.http.scaladsl.Http
 import akka.util.Timeout
 import com.typesafe.config.Config
 import csw.config.server.ServerWiring
@@ -16,7 +16,7 @@ final class ConfigTestKit private (
     settingsOpt: Option[TestKitSettings]
 ) {
 
-  private lazy val configWiring = (configOpt, serverPortOpt) match {
+  lazy val configWiring: ServerWiring = (configOpt, serverPortOpt) match {
     case (Some(config), _) ⇒ ServerWiring.make(config)
     case (_, serverPort)   ⇒ ServerWiring.make(serverPort)
   }
@@ -26,21 +26,34 @@ final class ConfigTestKit private (
   implicit lazy val timeout: Timeout        = testKitSettings.DefaultTimeout
 
   /**
-   * Start HTTP Config server on provided port in constructor or configuration
+   * Start HTTP Config server on provided port in constructor or configuration and create clean copy of SVN repo
    *
    * If your test's requires accessing/creating configurations from configuration service, then using this method you can start configuration service.
    * Configuration service can be accessed via [[csw.config.api.scaladsl.ConfigClientService]] or [[csw.config.api.scaladsl.ConfigService]]
    * which can be created via [[csw.config.client.scaladsl.ConfigClientFactory]]
    *
    */
-  def startConfigServer(): Http.ServerBinding = TestKitUtils.await(configWiring.httpService.registeredLazyBinding, timeout)._1
+  def startConfigServer(): Unit = {
+    TestKitUtils.await(configWiring.httpService.registeredLazyBinding, timeout)
+    deleteServerFiles()
+    configWiring.svnRepo.initSvnRepo()
+  }
+
+  def deleteServerFiles(): Unit = {
+    val annexFileDir = Paths.get(configWiring.settings.`annex-files-dir`).toFile
+    TestKitUtils.deleteDirectoryRecursively(annexFileDir)
+    TestKitUtils.deleteDirectoryRecursively(configWiring.settings.repositoryFile)
+  }
 
   /**
    * Shutdown HTTP Config server
    *
    * When the test has completed, make sure you shutdown config server.
    */
-  def shutdownConfigServer(): Unit = TestKitUtils.coordShutdown(shutdown, timeout)
+  def shutdownConfigServer(): Unit = {
+    deleteServerFiles()
+    TestKitUtils.coordShutdown(shutdown, timeout)
+  }
 
 }
 

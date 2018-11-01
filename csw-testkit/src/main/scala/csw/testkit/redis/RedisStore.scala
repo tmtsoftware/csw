@@ -1,7 +1,7 @@
 package csw.testkit.redis
 import java.util.Optional
 
-import akka.actor.ActorSystem
+import akka.actor.{ActorSystem, CoordinatedShutdown}
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
 import csw.location.api.models.Connection.TcpConnection
@@ -21,8 +21,8 @@ private[testkit] trait RedisStore extends EmbeddedRedis {
   protected def masterId: String
   protected def connection: TcpConnection
 
-  implicit val mat: Materializer    = ActorMaterializer()
-  implicit val ec: ExecutionContext = system.dispatcher
+  implicit lazy val mat: Materializer    = ActorMaterializer()
+  implicit lazy val ec: ExecutionContext = system.dispatcher
 
   var redisSentinel: Option[RedisSentinel] = None
   var redisServer: Option[RedisServer]     = None
@@ -43,6 +43,6 @@ private[testkit] trait RedisStore extends EmbeddedRedis {
   def shutdown(): Unit = {
     redisServer.foreach(_.stop())
     redisSentinel.foreach(_.stop())
-    TestKitUtils.await(system.terminate(), timeout)
+    TestKitUtils.coordShutdown(CoordinatedShutdown(system).run, timeout)
   }
 }

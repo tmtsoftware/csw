@@ -25,8 +25,8 @@ final class FrameworkTestKit private (
     alarmTestKit: AlarmTestKit
 ) {
 
-  private val frameworkWiring           = FrameworkWiring.make(actorSystem)
-  private implicit val timeout: Timeout = locationTestKit.testKitSettings.DefaultTimeout
+  val frameworkWiring: FrameworkWiring = FrameworkWiring.make(actorSystem)
+  implicit val timeout: Timeout        = locationTestKit.testKitSettings.DefaultTimeout
 
   private var configStarted = false
   private var eventStarted  = false
@@ -45,9 +45,9 @@ final class FrameworkTestKit private (
    * This will always start location server as it is required by all other services along with provided services
    */
   @varargs
-  def start(service: Service, services: Service*): Unit = {
+  def start(services: Service*): Unit = {
     locationTestKit.startLocationServer()
-    (services :+ service).foreach {
+    services.foreach {
       case Config   ⇒ configTestKit.startConfigServer(); configStarted = true
       case Event    ⇒ eventTestKit.startEventService(); eventStarted = true
       case Alarm    ⇒ alarmTestKit.startAlarmService(); alarmStarted = true
@@ -84,7 +84,7 @@ final class FrameworkTestKit private (
     if (configStarted) configTestKit.shutdownConfigServer()
     if (eventStarted) eventTestKit.shutdown()
     if (alarmStarted) alarmTestKit.shutdown()
-    TestKitUtils.await(actorSystem.terminate(), timeout)
+    TestKitUtils.coordShutdown(frameworkWiring.actorRuntime.shutdown, timeout)
     locationTestKit.shutdownLocationServer()
   }
 }
