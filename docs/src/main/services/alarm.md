@@ -69,9 +69,9 @@ Java
 
 ## Model Classes
 * **AlarmKey** : Represents the unique alarm in the TMT system. It is composed of subsystem, component and alarm name.
-* **ComponentKey** : Represents all alarms of a component
-* **SubsystemKey** : Represents all alarms of a subsystem
-* **GlobalKey** : Represents all alarms present in the TMT system
+* **ComponentKey** : Represents all alarms of a component.  Used for getting severity or health of an entire component.
+* **SubsystemKey** : Represents all alarms of a subsystem  Used for getting severity or health of an entire subsystem.
+* **GlobalKey** : Represents all alarms present in the TMT system.  Used for getting severity or health of an entire observatory.
 * **AlarmMetadata** : Represents static metadata of an alarm, which will not change in its entire lifespan.
 * **AlarmStatus** : Represents dynamically changing data of the an alarm, which will be changing depending on the
 severity change or manually changed by an operator
@@ -81,8 +81,9 @@ Warning, Major and Critical
 plus other severity levels that can be set by the developer
 * **AlarmHealth** : Represents possible health of an alarm or component or subsystem or whole TMT system
 
+## Client API
 
-## setSeverity
+### setSeverity
 
 Sets the severity of the given alarm. The severity must be refreshed by setting it at 
 a regular interval or it will automatically be changed to `Disconnected` after a specific time.  
@@ -101,21 +102,23 @@ Java
 
 @@@
 
-## initAlarms
+## Admin API
+
+### initAlarms
 
 Loads the given alarm data in alarm store
 
 Scala
 :   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #initAlarms}
 
-## acknowledge
+### acknowledge
 
 Acknowledges the given alarm which is raised to a higher severity
 
 Scala
 :   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #acknowledge}
 
-## shelve
+### shelve
 
 Shelves the given alarm. Alarms will be un-shelved automatically at a specific time(i.e. 8 AM local time by default) if 
 it is not un-shelved manually before that. The time to automatically un-shelve can be configured in application.conf 
@@ -130,7 +133,7 @@ Shelved alarms are also considered in aggregation severity or health calculation
 
 @@@
 
-## unshelve
+### unshelve
 
 Unshelves the given alarm
 
@@ -138,7 +141,7 @@ Scala
 :   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #unshelve}
 
 
-## reset
+### reset
 
 Resets the status of the given latched alarm by updating the latched severity same as current severity and acknowledgement status to acknowledged without changing any other properties of the alarm.
 
@@ -146,7 +149,7 @@ Scala
 :   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #reset}
 
 
-## getMetadata
+### getMetadata
 
 Gets the metadata of an alarm, component, subsystem, or whole TMT system.  The following information is returned for each alarm:
 
@@ -173,7 +176,7 @@ configuration file, and not through either API.
 
 @@@
 
-## getStatus
+### getStatus
 Gets the status of the alarm which contains fields like:
 
 * latched severity
@@ -184,14 +187,14 @@ Gets the status of the alarm which contains fields like:
 Scala
 :   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #getStatus}
 
-## getCurrentSeverity
+### getCurrentSeverity
 
 Gets the severity of the alarm.
 
 Scala
 :   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #getCurrentSeverity}
 
-## getAggregatedSeverity
+### getAggregatedSeverity
 
 Gets the aggregated severity for the given alarm/component/subsystem/whole TMT system. Aggregation of the severity represents
 the most severe alarm amongst multiple alarms.
@@ -200,7 +203,7 @@ Scala
 :   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #getAggregatedSeverity}
 
 
-## getAggregatedHealth
+### getAggregatedHealth
 
 Gets the aggregated health for the given alarm/component/subsystem/whole TMT system. Aggregation of health is either `Good`, `ill`
 or `Bad` based on the most severe alarm amongst multiple alarms.
@@ -209,7 +212,7 @@ Scala
 :   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #getAggregatedHealth}
 
 
-## subscribeAggregatedSeverityCallback
+### subscribeAggregatedSeverityCallback
 
 Subscribes to the changes of aggregated severity for given alarm/component/subsystem/whole TMT system by providing a callback
 which gets executed for every change.
@@ -218,7 +221,7 @@ Scala
 :   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #subscribeAggregatedSeverityCallback}
 
 
-## subscribeAggregatedSeverityActorRef
+### subscribeAggregatedSeverityActorRef
 
 Subscribes to the changes of aggregated severity for given alarm/component/subsystem/whole TMT system by providing an actor
 which will receive a message of aggregated severity on every change.
@@ -227,7 +230,7 @@ Scala
 :   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #subscribeAggregatedSeverityActorRef}
 
 
-## subscribeAggregatedHealthCallback
+### subscribeAggregatedHealthCallback
 
 Subscribe to the changes of aggregated health for given alarm/component/subsystem/whole TMT system by providing a callback
 which gets executed for every change.
@@ -236,7 +239,7 @@ Scala
 :   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #subscribeAggregatedHealthCallback}
 
 
-## subscribeAggregatedHealthActorRef
+### subscribeAggregatedHealthActorRef
 
 Subscribes to the changes of aggregated health for given alarm/component/subsystem/whole TMT system by providing an actor 
 which will receive a message of aggregated severity on every change.
