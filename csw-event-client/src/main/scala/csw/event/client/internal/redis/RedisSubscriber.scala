@@ -42,7 +42,7 @@ class RedisSubscriber(redisURI: Future[RedisURI], redisClient: RedisClient)(
 
   private val romaineFactory = new RomaineFactory(redisClient)
 
-  private lazy val asyncApi: RedisAsyncApi[EventKey, Event] = romaineFactory.redisAsyncApi[EventKey, Event](redisURI)
+  private val asyncApi: RedisAsyncApi[EventKey, Event] = romaineFactory.redisAsyncApi[EventKey, Event](redisURI)
 
   private def subscriptionApi[T: RomaineStringCodec](): RedisSubscriptionApi[T, Event] =
     romaineFactory.redisSubscriptionApi[T, Event](redisURI)
