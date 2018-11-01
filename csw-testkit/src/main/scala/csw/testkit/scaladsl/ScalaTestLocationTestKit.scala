@@ -1,14 +1,7 @@
 package csw.testkit.scaladsl
 import csw.testkit.{LocationTestKit, TestKitSettings}
-import org.scalatest._
-import org.scalatest.concurrent.{Eventually, ScalaFutures}
 
-abstract class ScalaTestLocationTestKit(testKit: LocationTestKit)
-    extends TestSuite
-    with Matchers
-    with BeforeAndAfterAll
-    with ScalaFutures
-    with Eventually {
+abstract class ScalaTestLocationTestKit(testKit: LocationTestKit) extends ScalaTestBase {
 
   /** Initialize testkit with default configuration */
   def this() = this(LocationTestKit())
