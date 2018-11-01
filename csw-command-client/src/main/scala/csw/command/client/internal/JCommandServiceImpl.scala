@@ -18,8 +18,8 @@ import scala.compat.java8.FutureConverters.FutureOps
 
 private[command] class JCommandServiceImpl(commandService: CommandService) extends ICommandService {
 
-  override def validate(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[ValidateResponse] =
-    commandService.validate(controlCommand)(timeout).toJava.toCompletableFuture
+  override def validate(controlCommand: ControlCommand): CompletableFuture[ValidateResponse] =
+    commandService.validate(controlCommand).toJava.toCompletableFuture
 
   override def submit(controlCommand: ControlCommand, timeout: Timeout): CompletableFuture[SubmitResponse] =
     commandService.submit(controlCommand)(timeout).toJava.toCompletableFuture
@@ -46,6 +46,9 @@ private[command] class JCommandServiceImpl(commandService: CommandService) exten
 
   override def query(commandRunId: Id, timeout: Timeout): CompletableFuture[QueryResponse] =
     commandService.query(commandRunId)(timeout).toJava.toCompletableFuture
+
+  override def queryFinal(commandRunId: Id, timeout: Timeout): CompletableFuture[SubmitResponse] =
+    commandService.queryFinal(commandRunId)(timeout).toJava.toCompletableFuture
 
   override def subscribeCurrentState(callback: Consumer[CurrentState]): CurrentStateSubscription =
     commandService.subscribeCurrentState(callback.asScala)

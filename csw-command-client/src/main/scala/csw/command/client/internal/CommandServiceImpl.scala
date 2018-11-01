@@ -20,6 +20,7 @@ import csw.params.commands.ControlCommand
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
 
+import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
 
 private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(implicit val actorSystem: ActorSystem[_])
@@ -30,9 +31,12 @@ private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(impli
   private implicit val scheduler: Scheduler = actorSystem.scheduler
 
   private val component: ActorRef[ComponentMessage] = componentLocation.componentRef
+  private val ValidateTimeout                       = 1.seconds
 
-  override def validate(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[ValidateResponse] =
+  override def validate(controlCommand: ControlCommand): Future[ValidateResponse] = {
+    implicit val timeout: Timeout = Timeout(ValidateTimeout)
     component ? (Validate(controlCommand, _))
+  }
 
   override def submit(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[SubmitResponse] = {
     val eventualResponse: Future[SubmitResponse] = component ? (Submit(controlCommand, _))
@@ -89,7 +93,7 @@ private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(impli
   override def query(commandRunId: Id)(implicit timeout: Timeout): Future[QueryResponse] =
     component ? (CommandResponseManagerMessage.Query(commandRunId, _))
 
-  def queryFinal(commandRunId: Id)(implicit timeout: Timeout): Future[SubmitResponse] =
+  override def queryFinal(commandRunId: Id)(implicit timeout: Timeout): Future[SubmitResponse] =
     component ? (CommandResponseManagerMessage.Subscribe(commandRunId, _))
 
   override def subscribeCurrentState(callback: CurrentState ⇒ Unit): CurrentStateSubscription =

@@ -20,7 +20,7 @@ trait CommandService {
    * @param controlCommand the [[csw.params.commands.ControlCommand]] payload
    * @return a ValidateResponse as a Future value
    */
-  def validate(controlCommand: ControlCommand)(implicit timeout: Timeout): Future[ValidateResponse]
+  def validate(controlCommand: ControlCommand): Future[ValidateResponse]
 
   /**
    * Submit a command and Subscribe for the result if it was successfully validated as `Started` to get a
@@ -70,6 +70,14 @@ trait CommandService {
    * @return a CommandResponse as a Future value
    */
   def query(commandRunId: Id)(implicit timeout: Timeout): Future[QueryResponse]
+
+  /**
+   * Query for the final result of a long running command which was sent as Submit to get a [[csw.params.commands.CommandResponse]] as a Future
+   *
+   * @param commandRunId the runId of the command for which response is required
+   * @return a CommandResponse as a Future value
+   */
+  def queryFinal(commandRunId: Id)(implicit timeout: Timeout): Future[SubmitResponse]
 
   /**
    * Subscribe to the current state of a component corresponding to the [[csw.location.api.models.AkkaLocation]] of the component
