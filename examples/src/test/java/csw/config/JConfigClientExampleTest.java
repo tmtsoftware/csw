@@ -1,24 +1,18 @@
 package csw.config;
 
 import akka.actor.ActorSystem;
-import akka.actor.CoordinatedShutdown;
 import akka.stream.Materializer;
-import csw.location.server.http.JHTTPLocationService;
 import csw.config.api.javadsl.IConfigClientService;
 import csw.config.api.javadsl.IConfigService;
 import csw.config.api.javadsl.JFileType;
 import csw.config.api.models.*;
-import csw.config.client.internal.ActorRuntime;
 import csw.config.client.javadsl.JConfigClientFactory;
 import csw.config.server.ServerWiring;
-import csw.config.server.commons.TestFileUtils;
-import csw.config.server.http.HttpService;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;
+import csw.testkit.javadsl.ConfigTestKitJunitResource;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
-import scala.concurrent.Await;
-import scala.concurrent.duration.Duration;
 
 import java.io.IOException;
 import java.net.URI;
@@ -31,22 +25,23 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 public class JConfigClientExampleTest {
-    private static ActorRuntime actorRuntime = new ActorRuntime(ActorSystem.create());
-    private static ILocationService clientLocationService = JHttpLocationServiceFactory.makeLocalClient(actorRuntime.actorSystem(), actorRuntime.mat());
-    private static JHTTPLocationService jHttpLocationService;
+
+    @ClassRule
+    public static final ConfigTestKitJunitResource testKit = new ConfigTestKitJunitResource();
+
+    private static ServerWiring configWiring = testKit.configTestKit().configWiring();
+    private static ActorSystem actorSystem = configWiring.actorSystem();
+    private static Materializer mat = configWiring.actorRuntime().mat();
+
+    private static ILocationService clientLocationService =
+            JHttpLocationServiceFactory.makeLocalClient(actorSystem, mat);
 
     //#create-api
     //config client API
-    IConfigClientService clientApi = JConfigClientFactory.clientApi(actorRuntime.actorSystem(), clientLocationService);
+    IConfigClientService clientApi = JConfigClientFactory.clientApi(actorSystem, clientLocationService);
     //config admin API
-    IConfigService adminApi = JConfigClientFactory.adminApi(actorRuntime.actorSystem(), clientLocationService);
+    IConfigService adminApi = JConfigClientFactory.adminApi(actorSystem, clientLocationService);
     //#create-api
-
-    private static ServerWiring serverWiring = ServerWiring.make(clientLocationService.asScala());
-    private static HttpService httpService = serverWiring.httpService();
-    private TestFileUtils testFileUtils = new TestFileUtils(serverWiring.settings());
-
-    private Materializer mat = actorRuntime.mat();
 
     //#declare_string_config
     String defaultStrConf = "foo { bar { baz : 1234 } }";
@@ -55,28 +50,15 @@ public class JConfigClientExampleTest {
     @Rule
     public final ExpectedException exception = ExpectedException.none();
 
-    @BeforeClass
-    public static void beforeAll() throws Exception {
-        jHttpLocationService = new JHTTPLocationService();
-        Await.result(httpService.registeredLazyBinding(), Duration.create(20, "seconds"));
-    }
-
     @Before
     public void initSvnRepo() {
-        serverWiring.svnRepo().initSvnRepo();
+        configWiring.svnRepo().initSvnRepo();
     }
 
     @After
     public void deleteServerFiles() {
-        testFileUtils.deleteServerFiles();
+        testKit.configTestKit().deleteServerFiles();
     }
-
-    @AfterClass
-    public static void afterAll() throws Exception {
-        Await.result(httpService.shutdown(CoordinatedShutdown.unknownReason()), Duration.create(20, "seconds"));
-        jHttpLocationService.afterAll();
-    }
-
 
     @Test
     public void testExists() throws ExecutionException, InterruptedException {

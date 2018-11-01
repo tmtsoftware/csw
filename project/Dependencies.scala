@@ -257,7 +257,8 @@ object Dependencies {
     Seq(
       //TODO: make this as provided deps
       Libs.`scalatest`.value,
-      Libs.`embedded-redis`
+      Libs.`embedded-redis`,
+      Libs.`junit`
     )
   )
 

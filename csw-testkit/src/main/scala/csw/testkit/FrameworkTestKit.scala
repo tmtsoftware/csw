@@ -7,15 +7,10 @@ import com.typesafe.config.Config
 import csw.command.client.messages.{ComponentMessage, ContainerMessage}
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.testkit.internal.TestKitUtils
+import csw.testkit.scaladsl.Service
+import csw.testkit.scaladsl.Service._
 
 import scala.annotation.varargs
-
-sealed trait Service extends Product with Serializable
-
-case object Location extends Service
-case object Config   extends Service
-case object Event    extends Service
-case object Alarm    extends Service
 
 final class FrameworkTestKit private (
     actorSystem: ActorSystem,
@@ -37,7 +32,7 @@ final class FrameworkTestKit private (
    *
    * This will start following services: [Location, Config, Event, Alarm]
    */
-  def startAll(): Unit = start(Location, Config, Event, Alarm)
+  def startAll(): Unit = start(LocationServer, ConfigServer, EventStore, AlarmStore)
 
   /**
    * Before running tests, use this or [FrameworkTestKit#startAll] method to start required services
@@ -48,10 +43,10 @@ final class FrameworkTestKit private (
   def start(services: Service*): Unit = {
     locationTestKit.startLocationServer()
     services.foreach {
-      case Config   ⇒ configTestKit.startConfigServer(); configStarted = true
-      case Event    ⇒ eventTestKit.startEventService(); eventStarted = true
-      case Alarm    ⇒ alarmTestKit.startAlarmService(); alarmStarted = true
-      case Location ⇒ // location server is already started above
+      case ConfigServer   ⇒ configTestKit.startConfigServer(); configStarted = true
+      case EventStore     ⇒ eventTestKit.startEventService(); eventStarted = true
+      case AlarmStore     ⇒ alarmTestKit.startAlarmService(); alarmStarted = true
+      case LocationServer ⇒ // location server is already started above
     }
   }
 

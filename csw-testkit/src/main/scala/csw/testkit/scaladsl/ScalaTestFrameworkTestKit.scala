@@ -28,10 +28,8 @@ abstract class ScalaTestFrameworkTestKit(val frameworkTestKit: FrameworkTestKit,
   def this(actorSystem: ActorSystem) = this(FrameworkTestKit(actorSystem))
 
   /**
-   * Start ConfigTestKit and LocationTestKit. If override be sure to call super.beforeAll
-   * or start the testkit explicitly with `locationTestKit.startLocationServer()` and `configTestKit.startConfigServer()`.
-   *
-   * @note location server needs be started before starting config server as config server needs to registered with location server
+   * Start FrameworkTestKit. If override be sure to call super.beforeAll
+   * or start the testkit explicitly with `frameworkTestKit.start()`.
    */
   override protected def beforeAll(): Unit = {
     super.beforeAll()
