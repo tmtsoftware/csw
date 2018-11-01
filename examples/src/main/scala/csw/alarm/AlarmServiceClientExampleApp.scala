@@ -69,7 +69,7 @@ object AlarmServiceClientExampleApp {
   //#unshelve
 
   //#reset
-  val result6F: Future[Done] = adminAPI.reset(alarmKey))
+  val result6F: Future[Done] = adminAPI.reset(alarmKey)
   //#reset
 
   //#getMetadata
