@@ -185,7 +185,7 @@ public class JCommandIntegrationTest {
         //#matcher
 
         // create a DemandMatcher which specifies the desired state to be matched.
-        DemandMatcher demandMatcher = new DemandMatcher(new DemandState(prefix().prefix(), new StateName("testStateName")).add(param), false, timeout);
+        DemandMatcher demandMatcher = new DemandMatcher(new DemandState(prefix(), new StateName("testStateName")).add(param), false, timeout);
 
         // create matcher instance
         Matcher matcher = new Matcher(AkkaLocationExt.RichAkkaLocation(hcdLocation).componentRef().narrow(), demandMatcher, ec, mat);
@@ -254,7 +254,7 @@ public class JCommandIntegrationTest {
         //#onewayAndMatch
 
         // create a DemandMatcher which specifies the desired state to be matched.
-        StateMatcher stateMatcher = new DemandMatcher(new DemandState(prefix().prefix(), new StateName("testStateName")).add(param), false, timeout);
+        StateMatcher stateMatcher = new DemandMatcher(new DemandState(prefix(), new StateName("testStateName")).add(param), false, timeout);
 
         // create matcher instance
         Matcher matcher1 = new Matcher(AkkaLocationExt.RichAkkaLocation(hcdLocation).componentRef().narrow(), demandMatcher, ec, mat);
@@ -363,10 +363,10 @@ public class JCommandIntegrationTest {
 
         hcdCmdService.submit(setup, timeout);
 
-        CurrentState currentState = new CurrentState(SampleComponentState.prefix().prefix(), new StateName("testStateName"));
+        CurrentState currentState = new CurrentState(SampleComponentState.prefix(), new StateName("testStateName"));
         CurrentState expectedValidationCurrentState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.commandValidationChoice()));
         CurrentState expectedSubmitCurrentState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.submitCommandChoice()));
-        CurrentState expectedSetupCurrentState = new CurrentState(SampleComponentState.prefix().prefix(), new StateName("testStateSetup")).madd(SampleComponentState.choiceKey().set(SampleComponentState.setupConfigChoice()), intParameter1);
+        CurrentState expectedSetupCurrentState = new CurrentState(SampleComponentState.prefix(), new StateName("testStateSetup")).madd(SampleComponentState.choiceKey().set(SampleComponentState.setupConfigChoice()), intParameter1);
 
         probe.expectMessage(expectedValidationCurrentState);
         probe.expectMessage(expectedSubmitCurrentState);
@@ -398,10 +398,10 @@ public class JCommandIntegrationTest {
 
         hcdCmdService.submit(setup, timeout);
 
-        CurrentState currentState = new CurrentState(SampleComponentState.prefix().prefix(), new StateName("testStateName"));
+        CurrentState currentState = new CurrentState(SampleComponentState.prefix(), new StateName("testStateName"));
         CurrentState expectedValidationCurrentState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.commandValidationChoice()));
         CurrentState expectedSubmitCurrentState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.submitCommandChoice()));
-        CurrentState expectedSetupCurrentState = new CurrentState(SampleComponentState.prefix().prefix(), new StateName("testStateSetup")).madd(SampleComponentState.choiceKey().set(SampleComponentState.setupConfigChoice()), intParameter1);
+        CurrentState expectedSetupCurrentState = new CurrentState(SampleComponentState.prefix(), new StateName("testStateSetup")).madd(SampleComponentState.choiceKey().set(SampleComponentState.setupConfigChoice()), intParameter1);
 
         Thread.sleep(1000);
         List<CurrentState> receivedStates = inbox.getAllReceived();

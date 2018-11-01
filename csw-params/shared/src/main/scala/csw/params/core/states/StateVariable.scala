@@ -94,7 +94,7 @@ case class DemandState private (prefix: Prefix, stateName: StateName, paramSet: 
   /**
    * A Java helper method to construct with String
    */
-  def this(prefix: String, stateName: StateName) = this(Prefix(prefix), stateName)
+  def this(prefix: Prefix, stateName: StateName) = this(prefix, stateName, Set.empty[Parameter[_]])
 
   /**
    * A Java helper method to create a DemandState from a Setup
@@ -142,7 +142,7 @@ case class CurrentState private (
   /**
    * A Java helper method to construct with String
    */
-  def this(prefix: String, currentStateName: StateName) = this(Prefix(prefix), currentStateName)
+  def this(prefix: Prefix, currentStateName: StateName) = this(prefix, currentStateName, Set.empty[Parameter[_]])
 
   /**
    * A Java helper method to create a CurrentState from a Setup

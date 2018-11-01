@@ -204,7 +204,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
 
                 if (submitResponse instanceof CommandResponse.Completed) {
                     Key<String> stringKey = JKeyType.StringKey().make("sub-command-status");
-                    CurrentState currentState = new CurrentState(sc.source().prefix(), new StateName("testStateName"));
+                    CurrentState currentState = new CurrentState(sc.source(), new StateName("testStateName"));
                     currentStatePublisher.publish(currentState.madd(stringKey.set("complete")));
                 } else {
                     // do something

@@ -33,7 +33,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     private ILogger log;
     private CommandResponseManager commandResponseManager;
     private CurrentStatePublisher currentStatePublisher;
-    private CurrentState currentState = new CurrentState(SampleComponentState.prefix().prefix(), new StateName("testStateName"));
+    private CurrentState currentState = new CurrentState(SampleComponentState.prefix(), new StateName("testStateName"));
     private ActorContext<TopLevelActorMessage> actorContext;
 
     JSampleComponentHandlers(ActorContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
@@ -128,7 +128,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     private void processCommandWithMatcher(ControlCommand controlCommand) {
         Source.range(1, 10)
                 .map(i -> {
-                    currentStatePublisher.publish(new CurrentState(controlCommand.source().prefix(), new StateName("testStateName")).add(JKeyType.IntKey().make("encoder").set(i * 10)));
+                    currentStatePublisher.publish(new CurrentState(controlCommand.source(), new StateName("testStateName")).add(JKeyType.IntKey().make("encoder").set(i * 10)));
                     return i;
                 })
                 .throttle(1, Duration.ofMillis(100), 1, ThrottleMode.shaping())
@@ -179,7 +179,7 @@ public class JSampleComponentHandlers extends JComponentHandlers {
         CurrentState commandState;
 
         if (controlCommand instanceof Setup) {
-            commandState = new CurrentState(SampleComponentState.prefix().prefix(), new StateName("testStateSetup")).add(SampleComponentState.choiceKey().set(SampleComponentState.setupConfigChoice())).add(controlCommand.paramSet().head());
+            commandState = new CurrentState(SampleComponentState.prefix(), new StateName("testStateSetup")).add(SampleComponentState.choiceKey().set(SampleComponentState.setupConfigChoice())).add(controlCommand.paramSet().head());
         } else
             commandState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.observeConfigChoice())).add(controlCommand.paramSet().head());
 
