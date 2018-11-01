@@ -2,7 +2,7 @@ package csw.testkit.javadsl
 
 import java.util.Optional
 
-import csw.testkit.{LocationTestKit, LocationTestKit, TestKitSettings}
+import csw.testkit.{LocationTestKit, TestKitSettings}
 import org.junit.rules.ExternalResource
 
 import scala.compat.java8.OptionConverters.RichOptionalGeneric

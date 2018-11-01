@@ -1,14 +1,15 @@
 package csw.messages;
 
 import csw.params.core.formats.JavaJsonSupport;
-import csw.params.javadsl.JKeyType;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.core.models.MatrixData;
 import csw.params.core.models.ObsId;
+import csw.params.core.models.Prefix;
 import csw.params.core.states.CurrentState;
 import csw.params.core.states.DemandState;
 import csw.params.core.states.StateName;
+import csw.params.javadsl.JKeyType;
 import org.junit.Assert;
 import org.junit.Test;
 import play.api.libs.json.JsValue;
@@ -27,7 +28,7 @@ public class JStateVariablesTest {
     public void showUsageOfDemandState() {
         //#demandstate
         //prefix
-        String prefix = "wfos.prog.cloudcover";
+        Prefix prefix = new Prefix("wfos.prog.cloudcover");
 
         //keys
         Key<Character> charKey = JKeyType.CharKey().make("charKey");
@@ -89,7 +90,7 @@ public class JStateVariablesTest {
     public void showUsageOfCurrentState() {
         //#currentstate
         //prefix
-        String prefix = "wfos.prog.cloudcover";
+        Prefix prefix = new Prefix("wfos.prog.cloudcover");
 
         //keys
         Key<Character> charKey = JKeyType.CharKey().make("charKey");
@@ -161,8 +162,8 @@ public class JStateVariablesTest {
         Parameter<MatrixData<Double>> i1 = k1.set(m1);
 
         //state variables
-        DemandState ds = new DemandState("wfos.blue.filter", new StateName("testStateName")).add(i1);
-        CurrentState cs = new CurrentState("wfos.blue.filter", new StateName("testStateName")).add(i1);
+        DemandState ds = new DemandState(new Prefix("wfos.blue.filter"), new StateName("testStateName")).add(i1);
+        CurrentState cs = new CurrentState(new Prefix("wfos.blue.filter"), new StateName("testStateName")).add(i1);
 
         //json support - write
         JsValue dsJson = JavaJsonSupport.writeStateVariable(ds);
@@ -194,7 +195,7 @@ public class JStateVariablesTest {
         Key<Integer> miscKey = JKeyType.IntKey().make("misc.");
 
         //prefix
-        String prefix = "wfos.blue.filter";
+        Prefix prefix = new Prefix("wfos.blue.filter");
 
         //params
         Parameter<Integer> encParam1 = encoderKey.set(1);
