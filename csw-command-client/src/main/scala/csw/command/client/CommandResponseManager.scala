@@ -75,33 +75,22 @@ class CommandResponseManager private[command] (
     query(runId)(timeout).toJava.toCompletableFuture
 
   /**
-   * Subscribe to the status of a command to receive the update in status
-   *
-   * @param runId command identifier of command
-   * @param callback callback  to take action on the command response received
-   * @return a [[CommandResponseSubscription]] to unsubscribe the subscription later
-   */
-  def subscribe(runId: Id, callback: SubmitResponse ⇒ Unit): CommandResponseSubscription =
-    new CommandResponseSubscription(runId, commandResponseManagerActor, callback)
-
-  /**
    * Query the final status of a command
    *
    * @param runId command identifier of command
    * @param timeout timeout duration until which this operation is expected to wait for providing a value
    * @return a future of CommandResponse
    */
-  def queryFinal(runId: Id)(implicit timeout: Timeout): Future[SubmitResponse] = {
+  def queryFinal(runId: Id)(implicit timeout: Timeout): Future[SubmitResponse] =
     commandResponseManagerActor ? (Subscribe(runId, _))
-  }
 
   /**
-   * A helper method for Java to subscribe to the status of a command to receive the update in status
+   * A helper method for java to query the final status of a command
+   *
    * @param runId command identifier of command
-   * @param consumer consumer function to take action on the command response received
-   * @return a CommandResponseSubscription that can be used to unsubscribe
+   * @param timeout timeout duration until which this operation is expected to wait for providing a value
+   * @return a CompletableFuture of CommandResponse
    */
-  def jSubscribe(runId: Id, consumer: Consumer[SubmitResponse]): CommandResponseSubscription =
-    new CommandResponseSubscription(runId, commandResponseManagerActor, consumer.asScala)
-
+  def jQueryFinal(runId: Id, timeout: Timeout): CompletableFuture[SubmitResponse] =
+    queryFinal(runId)(timeout).toJava.toCompletableFuture
 }

@@ -33,6 +33,7 @@ import scala.concurrent.duration.FiniteDuration;
 
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.time.temporal.TemporalUnit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -133,7 +134,8 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
             return submitSetup((Setup) controlCommand); // includes logic to handle Submit with Setup config command
         else if (controlCommand instanceof Observe)
             return submitObserve((Observe) controlCommand); // includes logic to handle Submit with Observe config command
-        else return new CommandResponse.Error(controlCommand.runId(), "Submitted command not supported: " + controlCommand.commandName().name());
+        else
+            return new CommandResponse.Error(controlCommand.runId(), "Submitted command not supported: " + controlCommand.commandName().name());
     }
     //#onSubmit-handler
 
@@ -196,15 +198,17 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
                 //#subscribe-to-command-response-manager
                 // subscribe to the status of original command received and publish the state when its status changes to
                 // Completed
-                commandResponseManager.jSubscribe(subCommand.runId(), commandResponse -> {
-                    if (commandResponse instanceof CommandResponse.Completed) {
-                        Key<String> stringKey = JKeyType.StringKey().make("sub-command-status");
-                        CurrentState currentState = new CurrentState(sc.source().prefix(), new StateName("testStateName"));
-                        currentStatePublisher.publish(currentState.madd(stringKey.set("complete")));
-                    } else {
-                        // do something
-                    }
-                });
+                CommandResponse.SubmitResponse submitResponse = commandResponseManager
+                        .jQueryFinal(subCommand.runId(), Timeout.create(Duration.ofSeconds(10)))
+                        .join();
+
+                if (submitResponse instanceof CommandResponse.Completed) {
+                    Key<String> stringKey = JKeyType.StringKey().make("sub-command-status");
+                    CurrentState currentState = new CurrentState(sc.source().prefix(), new StateName("testStateName"));
+                    currentStatePublisher.publish(currentState.madd(stringKey.set("complete")));
+                } else {
+                    // do something
+                }
                 //#subscribe-to-command-response-manager
 
                 //#updateSubCommand

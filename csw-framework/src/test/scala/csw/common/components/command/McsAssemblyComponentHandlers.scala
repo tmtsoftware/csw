@@ -89,17 +89,17 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
 
         // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
         //#subscribe-to-command-response-manager
-        // subscribe to the status of original command received and publish the state when its status changes to
+        // query the status of original command received and publish the state when its status changes to
         // Completed
-        commandResponseManager.subscribe(
-          controlCommand.runId, {
+        commandResponseManager
+          .queryFinal(controlCommand.runId)
+          .foreach {
             case Completed(_) ⇒
               currentStatePublisher.publish(
                 CurrentState(controlCommand.source, StateName("testStateName"), Set(choiceKey.set(longRunningCmdCompleted)))
               )
             case _ ⇒
           }
-        )
         //#subscribe-to-command-response-manager
 
         //#query-command-response-manager
