@@ -7,6 +7,7 @@ import csw.alarm.client.AlarmServiceFactory;
 import csw.location.api.javadsl.ILocationService;
 
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import static csw.alarm.api.javadsl.JAlarmSeverity.Okay;
 import static csw.alarm.api.models.Key.AlarmKey;
@@ -32,8 +33,7 @@ public class JAlarmServiceClientExampleApp {
     //#create-java-api
 
     //#setSeverity-java
-    AlarmKey alarmKey = new AlarmKey(NFIRAOS, "trombone", "tromboneAxisLowLimitAlarm");
-
-    Done done = jclientAPI1.setSeverity(alarmKey, Okay).get();
+    private AlarmKey alarmKey = new AlarmKey(NFIRAOS, "trombone", "tromboneAxisLowLimitAlarm");
+    Future<Done> doneF = jclientAPI1.setSeverity(alarmKey, Okay);
     //#setSeverity-java
 }
