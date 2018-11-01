@@ -1,18 +1,19 @@
 package csw.alarm
+import akka.Done
 import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.{typed, ActorSystem}
+import akka.actor.{ActorSystem, typed}
 import akka.stream.ActorMaterializer
 import com.typesafe.config._
 import csw.alarm.api.models.AlarmSeverity.Okay
 import csw.alarm.api.models.Key.{AlarmKey, ComponentKey, SubsystemKey}
 import csw.alarm.api.models.{AlarmHealth, AlarmMetadata, AlarmStatus, FullAlarmSeverity}
-import csw.alarm.api.scaladsl.{AlarmAdminService, AlarmService}
+import csw.alarm.api.scaladsl.{AlarmAdminService, AlarmService, AlarmSubscription}
 import csw.alarm.client.AlarmServiceFactory
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.params.core.models.Subsystem.{IRIS, NFIRAOS}
 
-import scala.async.Async._
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 object AlarmServiceClientExampleApp {
 
@@ -45,97 +46,106 @@ object AlarmServiceClientExampleApp {
 
   //#setSeverity-scala
   val alarmKey = AlarmKey(NFIRAOS, "trombone", "tromboneAxisLowLimitAlarm")
-
-  async {
-    await(clientAPI.setSeverity(alarmKey, Okay))
-  }
+  val resultF: Future[Done] = clientAPI.setSeverity(alarmKey, Okay)
   //#setSeverity-scala
 
+
   //#initAlarms
-  async {
-    val resource             = "test-alarms/valid-alarms.conf"
-    val alarmsConfig: Config = ConfigFactory.parseResources(resource)
-    await(adminAPI.initAlarms(alarmsConfig))
-  }
+  val resource             = "test-alarms/valid-alarms.conf"
+  val alarmsConfig: Config = ConfigFactory.parseResources(resource)
+  val result2F: Future[Done] = adminAPI.initAlarms(alarmsConfig)
   //#initAlarms
 
   //#acknowledge
-  async {
-    await(adminAPI.acknowledge(alarmKey))
-  }
+  val result3F: Future[Done] = adminAPI.acknowledge(alarmKey)
   //#acknowledge
 
   //#shelve
-  async {
-    await(adminAPI.shelve(alarmKey))
-  }
+  val result4F: Future[Done] = adminAPI.shelve(alarmKey)
   //#shelve
 
   //#unshelve
-  async {
-    await(adminAPI.unshelve(alarmKey))
-  }
+  val result5F: Future[Done] = adminAPI.unshelve(alarmKey)
   //#unshelve
 
   //#reset
-  async {
-    await(adminAPI.reset(alarmKey))
-  }
+  val result6F: Future[Done] = adminAPI.reset(alarmKey))
   //#reset
 
   //#getMetadata
-  async {
-    val metadata: AlarmMetadata = await(adminAPI.getMetadata(alarmKey))
+  val metadataF: Future[AlarmMetadata] = adminAPI.getMetadata(alarmKey)
+  metadataF.onComplete {
+    case Success(metadata) => println(s"${metadata.name}: ${metadata.description}")
+    case Failure(exception) => println(s"Error getting metadata: ${exception.getMessage}")
   }
   //#getMetadata
 
   //#getStatus
-  async {
-    val status: AlarmStatus = await(adminAPI.getStatus(alarmKey))
+  val statusF: Future[AlarmStatus] = adminAPI.getStatus(alarmKey)
+  statusF.onComplete {
+    case Success(status) => println(s"${status.alarmTime}: ${status.latchedSeverity}")
+    case Failure(exception) => println(s"Error getting status: ${exception.getMessage}")
   }
   //#getStatus
 
   //#getCurrentSeverity
-  async {
-    val severity: FullAlarmSeverity = await(adminAPI.getCurrentSeverity(alarmKey))
+  val severityF: Future[FullAlarmSeverity] = adminAPI.getCurrentSeverity(alarmKey)
+  severityF.onComplete {
+    case Success(severity) => println(s"${severity.name}: ${severity.level}")
+    case Failure(exception) => println(s"Error getting severity: ${exception.getMessage}")
   }
   //#getCurrentSeverity
 
   //#getAggregatedSeverity
-  async {
-    val componentKey                          = ComponentKey(NFIRAOS, "tromboneAssembly")
-    val aggregatedSeverity: FullAlarmSeverity = await(adminAPI.getAggregatedSeverity(componentKey))
+  val componentKey                          = ComponentKey(NFIRAOS, "tromboneAssembly")
+  val aggregatedSeverityF: Future[FullAlarmSeverity] = adminAPI.getAggregatedSeverity(componentKey)
+  aggregatedSeverityF.onComplete {
+    case Success(severity) => println(s"aggregate severity: ${severity.name}: ${severity.level}")
+    case Failure(exception) => println(s"Error getting aggregate severity: ${exception.getMessage}")
   }
   //#getAggregatedSeverity
 
   //#getAggregatedHealth
-  async {
-    val subsystemKey        = SubsystemKey(IRIS)
-    val health: AlarmHealth = await(adminAPI.getAggregatedHealth(subsystemKey))
+  val subsystemKey        = SubsystemKey(IRIS)
+  val healthF: Future[AlarmHealth] = adminAPI.getAggregatedHealth(subsystemKey)
+  healthF.onComplete {
+    case Success(health) => println(s"${subsystemKey.subsystem.name} health = ${health.entryName}")
+    case Failure(exception) => println(s"Error getting health: ${exception.getMessage}")
   }
   //#getAggregatedHealth
 
   //#subscribeAggregatedSeverityCallback
-  adminAPI.subscribeAggregatedSeverityCallback(
+  val alarmSubscription: AlarmSubscription = adminAPI.subscribeAggregatedSeverityCallback(
     ComponentKey(NFIRAOS, "tromboneAssembly"),
     aggregatedSeverity ⇒ { /* do something*/ }
   )
+  // to unsubscribe:
+  val unsubscribe1F: Future[Done] = alarmSubscription.unsubscribe()
   //#subscribeAggregatedSeverityCallback
 
   //#subscribeAggregatedSeverityActorRef
   val severityActorRef = typed.ActorSystem(behaviour[FullAlarmSeverity], "fullSeverityActor")
-  adminAPI.subscribeAggregatedSeverityActorRef(SubsystemKey(NFIRAOS), severityActorRef)
+  val alarmSubscription2: AlarmSubscription = adminAPI.subscribeAggregatedSeverityActorRef(SubsystemKey(NFIRAOS), severityActorRef)
+
+  // to unsubscribe:
+  val unsubscribe2F: Future[Done] = alarmSubscription2.unsubscribe()
   //#subscribeAggregatedSeverityActorRef
 
   //#subscribeAggregatedHealthCallback
-  adminAPI.subscribeAggregatedHealthCallback(
+  val alarmSubscription3: AlarmSubscription = adminAPI.subscribeAggregatedHealthCallback(
     ComponentKey(IRIS, "ImagerDetectorAssembly"),
     aggregatedHealth ⇒ { /* do something*/ }
   )
+
+  // to unsubscribe
+  val unsubscribe3F: Future[Done] = alarmSubscription3.unsubscribe()
   //#subscribeAggregatedHealthCallback
 
   //#subscribeAggregatedHealthActorRef
   val healthActorRef = typed.ActorSystem(behaviour[AlarmHealth], "healthActor")
-  adminAPI.subscribeAggregatedHealthActorRef(SubsystemKey(IRIS), healthActorRef)
+  val alarmSubscription4: AlarmSubscription = adminAPI.subscribeAggregatedHealthActorRef(SubsystemKey(IRIS), healthActorRef)
+
+  // to unsubscribe
+  val unsubscribe4F: Future[Done] = alarmSubscription4.unsubscribe()
   //#subscribeAggregatedHealthActorRef
 }
