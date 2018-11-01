@@ -14,6 +14,7 @@ import csw.framework.models.JCswContext;
 import csw.command.client.messages.TopLevelActorMessage;
 import csw.params.commands.*;
 import csw.location.api.models.TrackingEvent;
+import csw.params.core.generics.Key;
 import csw.params.core.models.Id;
 import csw.params.javadsl.JKeyType;
 import csw.params.core.generics.Parameter;
@@ -65,6 +66,27 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     }
 
     @Override
+    public CommandResponse.ValidateCommandResponse validateCommand(ControlCommand controlCommand) {
+        if (controlCommand.commandName().equals(hcdCurrentState())) {
+            // This is special because test doesn't want these other CurrentState values published
+            return new CommandResponse.Accepted(controlCommand.runId());
+        } else {
+            // All other tests
+            CurrentState submitState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.commandValidationChoice()));
+            currentStatePublisher.publish(submitState);
+
+            // Special case to accept failure after validation
+            if (controlCommand.commandName().equals(failureAfterValidationCmd())) {
+                return new CommandResponse.Accepted(controlCommand.runId());
+            } else if (controlCommand.commandName().name().contains("failure")) {
+                return new CommandResponse.Invalid(controlCommand.runId(), new CommandIssue.OtherIssue("Testing: Received failure, will return Invalid."));
+            } else {
+                return new CommandResponse.Accepted(controlCommand.runId());
+            }
+        }
+    }
+
+    @Override
     public CommandResponse.SubmitResponse onSubmit(ControlCommand controlCommand) {
         // Adding item from CommandMessage paramset to ensure things are working
         CurrentState submitState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.submitCommandChoice()));
@@ -74,25 +96,14 @@ public class JSampleComponentHandlers extends JComponentHandlers {
 
     @Override
     public void onOneway(ControlCommand controlCommand) {
-        // Adding item from CommandMessage paramset to ensure things are working
-        CurrentState onewayState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.oneWayCommandChoice()));
-        currentStatePublisher.publish(onewayState);
-        processOnewayCommand(controlCommand);
-    }
-
-    @Override
-    public CommandResponse.ValidateCommandResponse validateCommand(ControlCommand controlCommand) {
-        CurrentState submitState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.commandValidationChoice()));
-        currentStatePublisher.publish(submitState);
-
-        // Special case to accept failure after validation
-        if (controlCommand.commandName().equals(failureAfterValidationCmd())) {
-            return new CommandResponse.Accepted(controlCommand.runId());
-        } else
-        if (controlCommand.commandName().name().contains("failure")) {
-            return new CommandResponse.Invalid(controlCommand.runId(), new CommandIssue.OtherIssue("Testing: Received failure, will return Invalid."));
+        if (controlCommand.commandName().equals(hcdCurrentState())) {
+            // Special handling for oneway to test current state
+            processCurrentStateOnewayCommand((Setup)controlCommand);
         } else {
-            return new CommandResponse.Accepted(controlCommand.runId());
+            // Adding item from CommandMessage paramset to ensure things are working
+            CurrentState onewayState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.oneWayCommandChoice()));
+            currentStatePublisher.publish(onewayState);
+            processOnewayCommand(controlCommand);
         }
     }
 
@@ -109,11 +120,21 @@ public class JSampleComponentHandlers extends JComponentHandlers {
             return new CommandResponse.Started(controlCommand.runId());
         } else if (controlCommand.commandName().equals(failureAfterValidationCmd())) {
             return processCommandWithoutMatcher(controlCommand);
-        } else if (controlCommand.commandName().equals(ComponentStateForCommand.withoutMatcherCmd())) {
+        } else if (controlCommand.commandName().equals(ComponentStateForCommand.longRunningCmd())) {
             return processCommandWithoutMatcher(controlCommand);
         }
 
         return new CommandResponse.Completed(controlCommand.runId());
+    }
+
+    private void processCurrentStateOnewayCommand(Setup setup) {
+        System.out.println("One way it is ");
+        Key<Integer> encoder = JKeyType.IntKey().make("encoder");
+        int expectedEncoderValue = setup.jGet(encoder).get().head();
+
+        CurrentState currentState = new CurrentState(prefix().prefix(), new StateName("HCDState")).add(encoder().set(expectedEncoderValue));
+        currentStatePublisher.publish(currentState);
+        System.out.println("Done process");
     }
 
     private void processOnewayCommand(ControlCommand controlCommand) {
@@ -148,7 +169,6 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     }
 
 
-
     private CommandResponse.SubmitResponse processCommandWithoutMatcher(ControlCommand controlCommand) {
 
         if (controlCommand.commandName().equals(failureAfterValidationCmd())) {
@@ -168,8 +188,11 @@ public class JSampleComponentHandlers extends JComponentHandlers {
             });
             */
         } else {
+            Parameter<Integer> parameter = JKeyType.IntKey().make("encoder").set(20);
+            Result result = new Result(controlCommand.source().prefix()).add(parameter);
+
             // Set CRM to Completed after 1 second
-            sendCRM(controlCommand.runId(),  new CommandResponse.Completed(controlCommand.runId()));
+            sendCRM(controlCommand.runId(), new CommandResponse.CompletedWithResult(controlCommand.runId(), result));
             return new CommandResponse.Started(controlCommand.runId());
         }
 
@@ -179,7 +202,8 @@ public class JSampleComponentHandlers extends JComponentHandlers {
         CurrentState commandState;
 
         if (controlCommand instanceof Setup) {
-            commandState = new CurrentState(SampleComponentState.prefix(), new StateName("testStateSetup")).add(SampleComponentState.choiceKey().set(SampleComponentState.setupConfigChoice())).add(controlCommand.paramSet().head());
+            commandState = new CurrentState(SampleComponentState.prefix().prefix(), new StateName("testStateSetup"))
+                    .add(SampleComponentState.choiceKey().set(SampleComponentState.setupConfigChoice())).add(controlCommand.paramSet().head());
         } else
             commandState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.observeConfigChoice())).add(controlCommand.paramSet().head());
 

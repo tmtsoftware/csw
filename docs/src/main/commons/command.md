@@ -17,121 +17,198 @@ sbt
 ## Command-based Communication Between Components
 
 A component can send @ref:[Commands](../messages/commands.md) to other components. The commands can be sent as following 
-two types of messages: 
+with three types of messages: 
 
 * **submit** - A command is sent as Submit when the result of completion is desired.
 * **oneway** - A command is sent as Oneway when the result of completion is not desired.
+* **validate** - A command is sent, but it is only validated with no actions started.
 
-A `oneway` is meant to be used between an Assembly and an HCD.  It is also used when tracking completion using a Matcher 
-and current state values (see below).
+A `submit` is the typical way of sending a command from one component to another. When received, a `submit` command
+is validated and if accepted, the actions associated with the command are executed or started. `submit` has a 
+different responses that allow for different scenarios. When the actions started are long-running, the caller can
+wait for the actions to complete if needed.
 
-@@@ warning { title='Feedback Needed on Future of Oneway' }
+A `oneway` is primarily meant to be used between an Assembly and an HCD when no completion information is
+desired.  It is also useful when tracking completion using a Matcher 
+and current state values (see below) or events.
 
-In the FDR prototype version of CSW, the `oneway` message was used between an Assembly and HCD to "fire and forget". 
-A `oneway` command was sent to the destination and no validation or command completion is provided in order 
-to be as efficient as possible. In this case completion information is provided through Command Service
-pubsub and current state values.
+A `validate` message is used to ask a destination component to validate a command and determine if the command can
+be executed. But it does not execute the command and returns the result of validation. In some scenarios,
+it may be useful to test to see if a command can be executed prior to trying to execute the command.
 
-In this release version of CSW, `oneway` _does_ provide validation to the caller, and this version of CSW Command Service 
-also reinstates immediate completion, which was dropped in the CSW prototype release. The only feature left from the 
-FDR version is that `oneway` tells the sender that there is no completion information provided.
- 
-Given these two changes, the use of `oneway` is not sufficiently different from submit. With this in mind we 
-anticipate one of the two possibly futures for `oneway`:
+@@@ warning { title='Significant Update to Command Service' }
 
-1. `Oneway` should provide a clear difference with `submit` and go back to its original features with no
-validation or command completion.
-2. `Oneway` could be removed simplifying the command API to just `submit`.
-
-The reason for `oneway` case 1 is to provide the best possible performance. A scenario is an actor that
-is subscribed to a 20 Hz demand event and sends out motion commands to one or more HCDs based on a calculation 
-using data in this event. At 20 Hz, it's probably not useful to get validation information. Nothing can be
-done anyway. The receiver could log a message.  
-
-However, maybe even in this case validation is useful and can be used by the sender to
-understand problems in the receiver, so providing only `submit` is adequate.
-
-We are looking for feedback.  Do you see a continued role for `oneway`?  Maybe there is another scenario
-for `oneway`?  Please write us if with your recommendation for oneway -- and be warned that it may change
-behavior or disappear in the next release based on feedback.
+Thanks to an issue brought up by a user of Release 0.4, the Command Service API and command-related component handlers 
+have been modified in this release. The result is a much improved, simplified API that is easier
+to understand, and refines the responsibilities of the handlers. Code that has been written for 0.5 or 
+0.4 will need to be updated.
 
 @@@
 
-The following responses can be received as a `CommandResponse` after sending a command with `Submit` or `Oneway`:
 
-* **Accepted** : The command is validated and will be executed, this is returned for a long-running action.
-* **Completed** : The command has been executed successfully.
-* **CompletedWithResult** : The command is executed successfully and generated some result as a parameter set.
-* **Invalid** : The command is not valid and will not be executed. A reason is provided.
-* **NoLongerValid** : The command can no longer be executed (will be deprecated)
-* **Error** : The command has failed in execution. A reason is provided.
-* **Cancelled** : The command was cancelled.
-* **CommandNotAvailable** : A queried command is not available.
-* **NotAllowed** : The command cannot be executed currently because of the current state of the destination component. Eg. 
-another command is in execution in the presence of which it cannot accept any other command to execute or some other reason.
+### Command Validation
+The first step in processing a command--either `submit` or `oneway`--is validation.  If not locked, the
+component's supervisor calls the `validateCommand` handler of the Top Level Actor. The developer code evaluates
+and returns a `ValidateCommandResponse` as shown in the following table.  
 
-A command sent as `Submit` or `Oneway` is validated by the receiving component before actual execution. If the validation is successful, 
-the actual execution can happen in two ways :
+| ValidateCommandResponse | Description |
+| :---: | --- |
+| Accepted | The command is valid and can be executed by the component. |
+| Invalid | The command is not valid and cannot be executed. The response includes a reason in the form of a `CommandIssue` |
+| Locked | The component is locked by some other command sender. The validation could not occur.
 
-* **Immediate Completion** - The component receiving the command can determine if the command can be executed immediately and thus provide the
-final execution response directly without sending a response for validation. This should be reserved for actions that do not take
-long to complete.
+Note that the developer code does not need to return `Locked`. If the component has been Locked, the component's 
+Supervisor returns the `Locked` response to the caller and the `validateCommand` handler is not called.
 
-Scala
-:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #immediate-response }
+### The Submit Message
+A `submit` message is sent with its @ref:[command](../messages/commands.md) to a component destination. 
+A `SubmitResponse` is returned to the caller when the `submit` message is used.
+If the `validateCommand` handler returns `Accepted`, the framework calls the `onSubmit` handler of the Top Level
+Actor. The `onSubmit` handler always returns a `SubmitResponse`.
 
-Java
-:   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #immediate-response }
+####Immediate Completion Scenario
+If the actions of the `submit` command take a very short time to complete they may be completed by the 
+`onSubmit` handler.  This is called *immediate completion*. The time for the actions to complete should be
+less than 1 second. (Note: The framework will timeout if the onSubmit handler does not return a response within 1 second.)
+In this scenario with `onSubmit`, the values of `SubmitResponse` can be `Completed`, `CompletedWithResult`, or `Error`.
+`Error` is returned when the actions could not be accomplished. This is different than `Invalid`, which indicates 
+that the command could not be validated.
 
-* **Long Running Actions** - The component receiving the command may determine that the command cannot be executed immediately. In this case, the 
-component provides a `Accepted` response as an acknowledgement and maintains the state of the command. The sender can query the state of 
-a particular command at a later time or use the subscribe method to get the final response when the execution is completed.
+The immediate completion behavior is similar to a remote procedure call although the execution is entirely asynchronous. 
+If the actions do not produce a value for the client, the `Completed` `SubmitResponse` is returned. If there is a result, the
+`CompletedWithResult` `SubmitResult` is returned with a parameter set of `Result` type.
 
-The sender component can use the following with the command id (RunId) of an executing command to 
-get the current status, completion response and/or result of the command
+####Long Running Actions Scenario
+When actions take longer than 1 second, `onSubmit` should start the actions and return the `Started` `SubmitResponse`. The
+`Started` response indicates to the framework that long running actions have been started. In this case, the 
+`Started` is returned to the sender of the command. Note, however, that the response returned to the sender
+by `submit` in the Command Service API is the final `SubmitResponse` returned when the actions are finished, not 
+`Started`.
 
-* **Query** - Query the current state of an executing command
+Once the long running actions have started, the client code must notify the framework when the actions are
+completed. This is done be updating the @ref:[Command Response Manager](../framework/managing-command-state.md).
 
-Scala
-:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/LongRunningCommandTest.scala) { #query-response }
-
-Java
-:   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #query-response } 
-
-* **Subscribe** - It is also possible to subscribe to asynchronously get command response updates for an executing command. At least one response is always delivered.
-
-Scala
-:   @@snip [LongRunningCommandTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/LongRunningCommandTest.scala) { #subscribe-for-result }
-
-Java
-:   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #subscribe-for-result }
+In addition to the values returned for immediate completion, long running actions can return `Cancelled`. If
+the component supports a special command to cancel actions, the cancelled command should return `Cancelled` when
+successfully cancelled and the command that cancels a command should return `Completed`.
  
+The following table summarizes all the possible values for `SubmitResponse`.
+
+| SubmitResponse | Description |
+| :---: | --- |
+| Invalid | The command is not valid and cannot be executed. The response includes a reason in the form of a `CommandIssue`.  `onSubmit` is not executed. |
+| Completed | This response is returned when the actions associated with a command are complete. |
+| CompletedWithResult | This response is returned when the actions associated with a command are complete and a result is returned. |
+| Started | Returned when long running actions have been started. |
+| Error | Error is returned the the actions started by a command do not complete properly. A message is returned explaining the error. |
+| Cancelled | The actions associated with a long running command have been cancelled. |
+| Locked | The component is locked by some other command sender. The validation could not occur. |
+
+###The Oneway Message
+The other option for sending a @ref:[command](../messages/commands.md) to a component destination is the `oneway`
+message. The central difference between `submit` and `oneway` is that `oneway` does not track or allow reporting
+of completion information. It supports a *fire and forget* type of communication approach.
+
+A `OnewayResponse` is returned to the caller when the `oneway` message is used. `Oneway` does validate
+the command. If the component is not locked, the `validateCommand` handler is called.  
+If the `validateCommand` handler returns `Accepted`, the framework calls the `onOneway` handler of the Top Level
+Actor. However, the `onOneway` handler does not return a value. The sender of the `oneway` message receives
+the result of the validation or the Locked indication.  
+
+The following table summarizes all the possible values for `OnewayResponse`.
+
+| OnewayResponse | Description |
+| :---: | --- |
+| Invalid | The command is not valid and cannot be executed. The response includes a reason in the form of a `CommandIssue`.  `onSubmit` is not executed. |
+| Accepted | Returned when validation succeeds and the command was passed to the `onOneway` handler. |
+| Locked | The component is locked by some other command sender. The validation could not occur. |
+
+`Oneway` is available as a higher performance option when an Assembly needs to send commands to an HCD but
+doesn't really care about completion such as the case when demands are being sent to a motor. Validation
+is still present to ensure the HCD supports the standalone operation requirement and can check that 
+it is not getting out of range values.
+
+`Oneway` is can be used with a *matcher*. The matcher can use CurrentState or even events from Event Service
+to determine completion. This is more complicated than `submit` but may be useful in some scenarios.
+
+###The Validate Message
+The `validate` message is available when the sender wants to validate a @ref:[command](../messages/commands.md)
+but does not want to execute any associated actions. `Validate` returns a `ValidateResponse`. If the
+component is not locked, the `validateCommand` handler of the Top Level Actor is called and the developer 
+code evaluates the command and returns a `ValidateResponse` as shown in the following table.  
+
+| ValidateResponse | Description |
+| :---: | --- |
+| Accepted | The command is valid and can be executed by the component. |
+| Invalid | The command is not valid and cannot be executed. The response includes a reason in the form of a `CommandIssue` |
+| Locked | The component is locked by some other command sender. The validation could not occur.
+
+`Validate` could be used by an Assembly when it needs to send multiple commands to different HCDs and it wants
+to first check that all the HCDs can execute their commands before sending a command to any of the HCDs.  
+
 ## CommandService
 
-A helper/wrapper is provided called `CommandService` that provides a convenient way to use the Command Service with a component 
-discovered using Location Service. A `CommandService` instance is created using the value from the Location Service.
-This `CommandService` instance will has methods for communicating with the component. 
+A helper/wrapper is provided called `CommandService` that provides a convenient way to use the Command Service 
+with a component from the Location Service. 
+
+A `CommandService` instance is created using an `AkkaLocation` discovered from the Location Service.
+This `CommandService` instance will has methods for communicating with the component. A new `CommandService` is 
+created for each component for which commands are to be sent.
 
 The API can be exercised as follows for different scenarios of command-based communication:
 
 ### submit
-Submit a command and get a `CommandResponse` as a Future. The CommandResponse can be a response from validation (Accepted, Invalid) or a final Response
-in case of immediate completion.
+Sending a `submit` message with a command returns a `SubmitResponse` as a Future.
+The Future returned by `submit` will always be the final response, which may be a positive completion (Completed or
+CompletedWithResult) or a negative completion (`Invalid`, `Error`, `Cancelled`, `Locked`). The `Started` response is never seen
+by the programmer when using the `submit` of `CommandService`.
 
-Scala/immediate-response
+This example shows an immediate completion command using `submit` that returns `Completed`.
+
+Scala/submit w/immediate-response
 :   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #immediate-response }
 
-Java/immediate-response
+Java/submit w/immediate-response
 :   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #immediate-response }
 
-Scala/validation-response
-:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #submit }
+Note that the Scala examples are using `async/await` which simplifies handling the Futures, but is not necessary.
+The `async/await` library is not available in Java.
+If using `submit` and the validation fails in the destination component, 
+the `Invalid` response is returned.
 
-Java/validation-response
-:   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #submit }
-   
+Scala/submit w/invalid response
+:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #invalidCmd }
+
+Java/submit w/invalid response
+:   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #invalidCmd }
+
+The handling of long-running and immediate completion commands look the same from the command sender's
+perspective. The following example shows a long-running command that returns a value when
+the command action completes with a result.
+
+Scala/submit long running
+:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #longRunning }
+
+Java/submit long running
+:   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #longRunning }
+
+If a command is long-running and the sender needs to determine that the
+actions have started properly, the `query` method of `CommandService` can be used as shown in the
+following example without using the Future returned by `submit`, which provides the final
+completion notification.
+
+Scala/submit long running/query
+:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #queryLongRunning }
+
+Java/submit long running/query
+:   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #queryLongRunning }
+
+
 ### oneway
-Send a command as a Oneway and get a `CommandResponse` as a Future. The CommandResponse can be a response of validation (Accepted, Invalid) or a final Response.
+
+`Oneway` does not provide completion information but does return the result of `validateCommand` handler
+in the Top-Level-Actor (`Accepted`, `Invalid`, or `Locked`). 
+When sending a command as a `oneway` message, a `OnewayResponse` is returned as a Future that can be used to check that it was validated. 
 
 Scala
 :   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #oneway }
@@ -139,56 +216,61 @@ Scala
 Java
 :   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #oneway }
 
-### subscribe
-Subscribe for the result of a long-running command which was sent as Submit to get a `CommandResponse` as a Future.
-
-Scala
-:   @@snip [LongRunningCommandTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/LongRunningCommandTest.scala) { #subscribe-for-result }
-
-Java
-:   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #subscribe-for-result }
 
 ### query
-Query for the result of a long-running command which was sent as Submit to get a `CommandResponse` as a Future.
+At any time, the `query` call of `CommandService` can be used to check the current status of
+a command that has been sent via the `submit` message using the command's `runId`. 
+This is most useful with a long-running command but all commands that use `submit` are available.
 
-Scala
-:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/LongRunningCommandTest.scala) { #query-response }
+The `query` message returns a `QueryResponse`, which includes all of the values of `SubmitResponse`
+plus the `CommandNotAvailable` response. This response occurs when the framework has no knowledge
+of the command associated with the `runId` passed with the `query`. The previous long-running
+example above showed the use of `query` to check that the actions associated with a command that
+had started. Another usage is to check the final
+value of a command that is already completed using its `runId`.
 
-Java
-:   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #query-response }
+Scala/query usage
+:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #query }
 
-### submit
-Submit a command and Subscribe for the result if it was successfully validated as `Accepted` to get a final `CommandResponse` as a Future.
+Java/query usage
+:   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #query }
 
-Scala
-:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/LongRunningCommandTest.scala) { #submit }
-
-Java
-:   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #submit }
-
-### onewayAndMatch
-Send a command and match the published state from the component using a `StateMatcher`. If the match is successful a `Completed` response is provided as a future. 
-In case of a failure or unmatched state, `Error` CommandResponse is provided as a Future.
-
-Scala
-:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #onewayAndMatch }
-
-Java
-:   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #onewayAndMatch }
 
 
 ### submitAll
-Submit multiple commands and get list of SubmitResponse for each of the submitted command.
+`SubmitAll` can be used to send multiple commands sequentially to the same component.
+This could be used to send initialization commands to an HCD, for instance. The
+argument for `submitAll` is a list of commands. `SubmitAll` returns a list of `SubmitResponse`s--one
+for each command in the list.  While `submit` returns a `SubmitResponse`
+as a Future, `submitAll` returns a list of `SubmitResponse`s as a future, which completes when
+all the commands in the list have completed. 
 
-Scala
-:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/LongRunningCommandTest.scala) { #submitAll }
+Scala/query usage
+:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #submitAll }
 
-Java
+Java/query usage
 :   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #submitAll }
 
+In the first example, three commands are sent and the result is a list with three `SubmitResponse`s. 
+The last one returned invalid and was not executed.
+
+The commands in `submitAll` will execute sequentially, but each one must complete successfully for
+the subsequent commands to be executed. If any one of the commands fails, `submitAll` stops and
+the list is returned with the commands that are completed up to and including the command
+that failed. This is shown in the following example by making the invalidCmd second in the list.
+
+Scala/query usage
+:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #submitAllInvalid }
+
+Java/query usage
+:   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #submitAllInvalid }
+
+In this case, the returned list is of length 2 rather than 3.
+
 ### subscribeCurrentState
-This method can be used to subscribe to the @ref:[CurrentState](../messages/states.md) of the component by providing a 
-callback. Subscribing results into a handle of `CurrentStateSubscription` which can be used to unsubscribe the subscription.
+This method provided by `CommandService` can be used to subscribe to 
+the @ref:[CurrentState](../messages/states.md) of a component by providing a callback. 
+Subscribing results into a handle of `CurrentStateSubscription` which can be used to unsubscribe the subscription.
 
 Scala
 :   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/LongRunningCommandTest.scala) { #subscribeCurrentState }
@@ -209,4 +291,17 @@ Scala
 
 Java
 :   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #matcher }
+
+
+### onewayAndMatch
+`Oneway` can be combined with a Matcher 
+ a command and match the published state from the component using a `StateMatcher`. If the match is successful a `Completed` response is provided as a future. 
+In case of a failure or unmatched state, `Error` CommandResponse is provided as a Future.
+
+Scala
+:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #onewayAndMatch }
+
+Java
+:   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #onewayAndMatch }
+
 

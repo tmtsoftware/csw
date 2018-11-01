@@ -164,6 +164,11 @@ object CommandResponse {
     case _                                        => false
   }
 
+  def isPositive(xs: OnewayResponse): Boolean = xs match {
+    case Accepted(runId) => true
+    case _               => false
+  }
+
   /**
    * Tests a response to determine if it is a negative response
    * @param qr response for testing

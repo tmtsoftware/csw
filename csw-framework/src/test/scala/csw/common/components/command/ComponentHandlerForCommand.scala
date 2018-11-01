@@ -11,8 +11,8 @@ import csw.framework.scaladsl.ComponentHandlers
 import csw.command.client.messages.TopLevelActorMessage
 import csw.params.commands.CommandIssue.{OtherIssue, WrongPrefixIssue}
 import csw.params.commands.CommandResponse._
-import csw.params.commands._
 import csw.location.api.models._
+import csw.params.commands.{ControlCommand, Result, Setup}
 import csw.params.core.generics.{KeyType, Parameter}
 import csw.params.core.models.Id
 import csw.params.core.states.{CurrentState, StateName}
@@ -38,11 +38,14 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
 
   override def validateCommand(controlCommand: ControlCommand): ValidateCommandResponse = controlCommand.commandName match {
     case `acceptedCmd`       ⇒ Accepted(controlCommand.runId)
-    case `withoutMatcherCmd` ⇒ Accepted(controlCommand.runId)
+    case `longRunningCmd`    ⇒ Accepted(controlCommand.runId)
+    case `onewayCmd`         => Accepted(controlCommand.runId)
     case `matcherCmd`        ⇒ Accepted(controlCommand.runId)
     case `matcherFailedCmd`  ⇒ Accepted(controlCommand.runId)
     case `matcherTimeoutCmd` ⇒ Accepted(controlCommand.runId)
     case `cancelCmd`         ⇒ Accepted(controlCommand.runId)
+    case `assemCurrentState` => Accepted(controlCommand.runId)
+    case `hcdCurrentState`   => Accepted(controlCommand.runId)
     case `immediateCmd`      ⇒ Accepted(controlCommand.runId)
     case `immediateResCmd`   ⇒ Accepted(controlCommand.runId)
     case `invalidCmd` ⇒
@@ -50,27 +53,33 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
     case _ ⇒ Invalid(controlCommand.runId, WrongPrefixIssue(s"Wrong prefix: ${controlCommand.commandName}"))
   }
 
-  override def onSubmit(controlCommand: ControlCommand): SubmitResponse = controlCommand.commandName match {
-    case `cancelCmd` ⇒ processAcceptedSubmitCmd(controlCommand)
-    case `withoutMatcherCmd` ⇒
-      processCommandWithoutMatcher(controlCommand)
-      Started(controlCommand.runId)
-    case `acceptedCmd`  ⇒ Started(controlCommand.runId)
-    case `immediateCmd` ⇒ Completed(controlCommand.runId)
-    case `immediateResCmd` ⇒
-      CompletedWithResult(controlCommand.runId, Result(controlCommand.source, Set(KeyType.IntKey.make("encoder").set(20))))
-    case c ⇒
-      Error(controlCommand.runId, s"Some other command received: $c")
+  override def onSubmit(controlCommand: ControlCommand): SubmitResponse = {
+
+    controlCommand match {
+      case s @ Setup(_, _, `cancelCmd`, _, _) ⇒ processAcceptedSubmitCmd(s)
+      case s @ Setup(_, _, `longRunningCmd`, _, _) ⇒
+        processCommandWithoutMatcher(s)
+        Started(s.runId)
+      case s @ Setup(_, _, `acceptedCmd`, _, _)  ⇒ Started(s.runId)
+      case s @ Setup(_, _, `immediateCmd`, _, _) ⇒ Completed(s.runId)
+      case s @ Setup(_, _, `immediateResCmd`, _, _) ⇒
+        CompletedWithResult(s.runId, Result(s.source, Set(KeyType.IntKey.make("encoder").set(20))))
+      case c ⇒
+        Error(controlCommand.runId, s"Some other command received: $c")
+    }
   }
 
   override def onOneway(controlCommand: ControlCommand): Unit = controlCommand.commandName match {
     case `cancelCmd`         ⇒ processAcceptedOnewayCmd(controlCommand)
+    case `onewayCmd`         => // Do nothing
     case `matcherCmd`        ⇒ processCommandWithMatcher(controlCommand)
     case `matcherFailedCmd`  ⇒ processCommandWithMatcher(controlCommand)
     case `acceptedCmd`       ⇒ //mimic long running process by publishing any state
     case `matcherTimeoutCmd` => processCommandWithMatcher(controlCommand)
-    case c                   ⇒ println(s"onOneway received an unknown command: $c")
-
+    case `hcdCurrentState` =>
+      val currentState = CurrentState(prefix, StateName("HCDState"), controlCommand.paramSet)
+      cswCtx.currentStatePublisher.publish(currentState)
+    case c ⇒ println(s"onOneway received an unknown command: $c")
   }
 
   private def processAcceptedSubmitCmd(controlCommand: ControlCommand): SubmitResponse = {
@@ -85,7 +94,7 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
 
   // This simulates a long command that has been started and finishes with a result
   private def processCommandWithoutMatcher(controlCommand: ControlCommand): Unit = {
-    val param: Parameter[Int] = KeyType.IntKey.make("encoder").set(20)
+    val param: Parameter[Int] = encoder.set(20)
     val result                = Result(controlCommand.source, Set(param))
 
     // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction

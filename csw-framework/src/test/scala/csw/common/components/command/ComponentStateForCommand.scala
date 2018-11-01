@@ -1,21 +1,26 @@
 package csw.common.components.command
 
 import csw.params.commands.CommandName
-import csw.params.core.generics.GChoiceKey
+import csw.params.core.generics.{GChoiceKey, KeyType}
 import csw.params.core.generics.KeyType.ChoiceKey
 import csw.params.core.models.{Choice, Choices, Prefix}
 
 object ComponentStateForCommand {
-  val prefix        = Prefix("wfos.prog.cloudcover")
-  val invalidPrefix = Prefix("wfos.prog.cloudcover.invalid")
+  val encoder = KeyType.IntKey.make("encoder")
+
+  val prefix        = Prefix("wfos.blue.filter")
+  val invalidPrefix = Prefix("wfos.blue.filter.invalid")
 
   val moveCmd                   = CommandName("move")
   val initCmd                   = CommandName("init")
   val acceptedCmd               = CommandName("move.accepted")
-  val withoutMatcherCmd         = CommandName("move.accept.result")
+  val longRunningCmd            = CommandName("move.accept.result")
+  val onewayCmd                 = CommandName("move.oneway.accept")
   val matcherCmd                = CommandName("move.accept.matcher.success.result")
   val matcherFailedCmd          = CommandName("move.accept.matcher.failed.result")
   val matcherTimeoutCmd         = CommandName("move.accept.matcher.success.timeout")
+  val assemCurrentState         = CommandName("assem.send.current.state")
+  val hcdCurrentState           = CommandName("hcd.send.current.state")
   val immediateCmd              = CommandName("move.immediate")
   val immediateResCmd           = CommandName("move.immediate.result")
   val invalidCmd                = CommandName("move.failure")
