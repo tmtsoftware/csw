@@ -106,10 +106,28 @@ Java
 
 ### initAlarms
 
-Loads the given alarm data in alarm store
+Loads the given alarm data in alarm store, passing in the alarm configuration file.
 
 Scala
 :   @@snip [AlarmClientExampleTest.scala](../../../../examples/src/main/scala/csw/alarm/AlarmServiceClientExampleApp.scala) { #initAlarms}
+
+
+Alarm configuration files are written in the HOCON format using the following fields:
+* subsystem: subsystem name the alarm belongs to
+* component: name of component for the alarm, matching the name in the componentInfo file (see @ref:[Describing Components](../framework/describing-components.md))
+* name: name of the alarm
+* description: a description of what the alarm represents
+* location: physical location within observatory or instrument in which the alarm condition is occuring
+* alarmType: the general category for the alarm.
+* supportedSeverities: list of non-Okay severities the alarm may become (Warning, Major, Critical).  All alarms are assumed to support Okay, Disconnected, and Indeterminate.
+* probableCause: a description of the likely cause of the alarm reaching each severity level
+* operatorResponse: instructions or information to help the operator respond to the alarm.
+* isAutoAcknowledgable: true/false flag for whether the alarm automatically acknowledges alarm when alarm severity returns to Okay.
+* isLatchable: true/false flag whether alarm latches at highest severity until reset.
+* activationStatus: true/false flag for whether alarm is currently active (and considered in aggregated severity and health calculations)
+
+alarms.conf
+:   @@snip [valid_alarms.conf](../../../../examples/src/main/resources/valid-alarms.conf#alarmsconf)
 
 ### acknowledge
 
