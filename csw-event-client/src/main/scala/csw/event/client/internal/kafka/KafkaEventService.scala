@@ -21,9 +21,9 @@ import scala.concurrent.{ExecutionContext, Future}
 class KafkaEventService(eventServiceResolver: EventServiceResolver)(implicit actorSystem: ActorSystem, mat: Materializer)
     extends EventService {
 
-  override def makeNewPublisher(): KafkaPublisher = new KafkaPublisher(producerSettings)
+  implicit val executionContext: ExecutionContext = actorSystem.dispatcher
 
-  implicit val executionContext: ExecutionContext   = actorSystem.dispatcher
+  override def makeNewPublisher(): KafkaPublisher   = new KafkaPublisher(producerSettings)
   override def makeNewSubscriber(): KafkaSubscriber = new KafkaSubscriber(consumerSettings)
 
   // resolve event service every time before creating a new publisher

@@ -1,12 +1,10 @@
 package csw.event.client.internal.kafka
 
-import java.util.concurrent.Executors
-
 import akka.Done
 import akka.actor.Cancellable
 import akka.kafka.ProducerSettings
-import akka.stream.Materializer
 import akka.stream.scaladsl.Source
+import akka.stream.{Materializer, OverflowStrategy}
 import csw.event.api.exceptions.PublishFailure
 import csw.event.api.scaladsl.EventPublisher
 import csw.event.client.internal.commons.EventPublisherUtil
@@ -26,29 +24,43 @@ import scala.util.control.NonFatal
  * @param ec               the execution context to be used for performing asynchronous operations
  * @param mat              the materializer to be used for materializing underlying streams
  */
-class KafkaPublisher(producerSettings: Future[ProducerSettings[String, Array[Byte]]])(implicit mat: Materializer)
+class KafkaPublisher(producerSettings: Future[ProducerSettings[String, Array[Byte]]])(implicit ec: ExecutionContext,
+                                                                                      mat: Materializer)
     extends EventPublisher {
-
-  private implicit val singleThreadedEc: ExecutionContext =
-    ExecutionContext.fromExecutorService(Executors.newSingleThreadExecutor())
 
   private val parallelism        = 1
   private val kafkaProducer      = producerSettings.map(_.createKafkaProducer())
   private val eventPublisherUtil = new EventPublisherUtil()
+  private val (actorRef, stream) = Source.actorRef[(Event, Promise[Done])](1024, OverflowStrategy.dropHead).preMaterialize()
+
+  stream
+    .mapAsync(1) {
+      case (e, p) =>
+        publishInternal(e).map(p.trySuccess).recover {
+          case ex => p.tryFailure(ex)
+        }
+    }
+    .runForeach(_ => ())
 
   override def publish(event: Event): Future[Done] = {
-    val promisedDone: Promise[Done] = Promise()
-    kafkaProducer.map(_.send(eventToProducerRecord(event), completePromise(event, promisedDone))).recover {
-      case NonFatal(ex) ⇒ promisedDone.failure(PublishFailure(event, ex))
+    val p = Promise[Done]
+    actorRef ! ((event, p))
+    p.future
+  }
+
+  private def publishInternal(event: Event): Future[Done] = {
+    val p = Promise[Done]
+    kafkaProducer.map(_.send(eventToProducerRecord(event), completePromise(event, p))).recover {
+      case NonFatal(ex) ⇒ p.failure(PublishFailure(event, ex))
     }
-    promisedDone.future
+    p.future
   }
 
   override def publish[Mat](source: Source[Event, Mat]): Mat =
-    eventPublisherUtil.publishFromSource(source, parallelism, publish, None)
+    eventPublisherUtil.publishFromSource(source, parallelism, publishInternal, None)
 
   override def publish[Mat](stream: Source[Event, Mat], onError: PublishFailure ⇒ Unit): Mat =
-    eventPublisherUtil.publishFromSource(stream, parallelism, publish, Some(onError))
+    eventPublisherUtil.publishFromSource(stream, parallelism, publishInternal, Some(onError))
 
   override def publish(eventGenerator: ⇒ Event, every: FiniteDuration): Cancellable =
     publish(eventPublisherUtil.eventSource(eventGenerator, every))
