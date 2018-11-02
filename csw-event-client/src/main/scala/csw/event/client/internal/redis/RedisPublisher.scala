@@ -1,22 +1,20 @@
 package csw.event.client.internal.redis
 
-import java.util.concurrent.Executors
-
 import akka.Done
-import akka.actor.Cancellable
-import akka.stream.Materializer
+import akka.actor.{Cancellable, PoisonPill}
 import akka.stream.scaladsl.Source
-import csw.params.events.Event
+import akka.stream.{Materializer, OverflowStrategy}
 import csw.event.api.exceptions.PublishFailure
 import csw.event.api.scaladsl.EventPublisher
 import csw.event.client.internal.commons.EventPublisherUtil
+import csw.params.events.Event
 import io.lettuce.core.{RedisClient, RedisURI}
 import romaine.RomaineFactory
 import romaine.async.RedisAsyncApi
 
 import scala.async.Async._
 import scala.concurrent.duration.FiniteDuration
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.util.control.NonFatal
 
 /**
@@ -27,10 +25,8 @@ import scala.util.control.NonFatal
  * @param redisClient redis client available from lettuce
  * @param mat         the materializer to be used for materializing underlying streams
  */
-class RedisPublisher(redisURI: Future[RedisURI], redisClient: RedisClient)(implicit mat: Materializer) extends EventPublisher {
-
-  private implicit val singleThreadedEc: ExecutionContext =
-    ExecutionContext.fromExecutorService(Executors.newSingleThreadExecutor())
+class RedisPublisher(redisURI: Future[RedisURI], redisClient: RedisClient)(implicit mat: Materializer, ec: ExecutionContext)
+    extends EventPublisher {
 
   // inorder to preserve the order of publishing events, the parallelism level is maintained to 1
   private val parallelism        = 1
@@ -41,7 +37,24 @@ class RedisPublisher(redisURI: Future[RedisURI], redisClient: RedisClient)(impli
 
   private val asyncApi: RedisAsyncApi[String, Event] = romaineFactory.redisAsyncApi(redisURI)
 
-  override def publish(event: Event): Future[Done] =
+  private val (actorRef, stream) = Source.actorRef[(Event, Promise[Done])](1024, OverflowStrategy.dropHead).preMaterialize()
+
+  stream
+    .mapAsync(1) {
+      case (e, p) =>
+        publishInternal(e).map(p.trySuccess).recover {
+          case ex => p.tryFailure(ex)
+        }
+    }
+    .runForeach(_ => ())
+
+  override def publish(event: Event): Future[Done] = {
+    val p = Promise[Done]
+    actorRef ! ((event, p))
+    p.future
+  }
+
+  private def publishInternal(event: Event): Future[Done] =
     async {
       await(asyncApi.publish(event.eventKey.key, event))
       set(event, asyncApi) // set will run independent of publish
@@ -54,10 +67,10 @@ class RedisPublisher(redisURI: Future[RedisURI], redisClient: RedisClient)(impli
     }
 
   override def publish[Mat](source: Source[Event, Mat]): Mat =
-    eventPublisherUtil.publishFromSource(source, parallelism, publish, None)
+    eventPublisherUtil.publishFromSource(source, parallelism, publishInternal, None)
 
   override def publish[Mat](source: Source[Event, Mat], onError: PublishFailure ⇒ Unit): Mat =
-    eventPublisherUtil.publishFromSource(source, parallelism, publish, Some(onError))
+    eventPublisherUtil.publishFromSource(source, parallelism, publishInternal, Some(onError))
 
   override def publish(eventGenerator: ⇒ Event, every: FiniteDuration): Cancellable =
     publish(eventPublisherUtil.eventSource(eventGenerator, every))
@@ -71,7 +84,10 @@ class RedisPublisher(redisURI: Future[RedisURI], redisClient: RedisClient)(impli
   override def publishAsync(eventGenerator: ⇒ Future[Event], every: FiniteDuration, onError: PublishFailure ⇒ Unit): Cancellable =
     publish(eventPublisherUtil.eventSourceAsync(eventGenerator, every), onError)
 
-  override def shutdown(): Future[Done] = asyncApi.quit().map(_ ⇒ Done)
+  override def shutdown(): Future[Done] = {
+    actorRef ! PoisonPill
+    asyncApi.quit().map(_ ⇒ Done)
+  }
 
   private def set(event: Event, commands: RedisAsyncApi[String, Event]): Future[Done] =
     commands.set(event.eventKey.key, event).recover { case NonFatal(_) ⇒ Done }

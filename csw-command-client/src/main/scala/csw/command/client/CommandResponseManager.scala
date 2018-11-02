@@ -1,7 +1,6 @@
 package csw.command.client
 
 import java.util.concurrent.CompletableFuture
-import java.util.function.Consumer
 
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.AskPattern._
@@ -13,7 +12,6 @@ import csw.command.client.messages.CommandResponseManagerMessage._
 import csw.params.commands.CommandResponse.{QueryResponse, SubmitResponse}
 import csw.params.core.models.Id
 
-import scala.compat.java8.FunctionConverters.enrichAsScalaFromConsumer
 import scala.compat.java8.FutureConverters._
 import scala.concurrent.Future
 

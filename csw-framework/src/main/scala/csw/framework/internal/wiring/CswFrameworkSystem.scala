@@ -7,7 +7,7 @@ import akka.actor.{ActorSystem, Scheduler}
 import akka.util.Timeout
 import csw.framework.internal.wiring.CswFrameworkGuardian.CreateActor
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 import scala.concurrent.duration.DurationDouble
 
 /**
