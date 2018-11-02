@@ -3,7 +3,6 @@ package csw.time.client
 import java.time._
 
 import csw.time.api.TimeService
-import csw.time.client.tags.NanoPrecisionTag
 import org.scalatest.{FunSuite, Matchers}
 
 class TimeServiceTest extends FunSuite with Matchers {
@@ -25,7 +24,7 @@ class TimeServiceTest extends FunSuite with Matchers {
   }
 
   //DEOPSCSW-533: Access parts of UTC date.time in Java and Scala
-  test("should get precision up to nanoseconds in UTC time", NanoPrecisionTag) {
+  ignore("should get precision up to nanoseconds in UTC time") {
     val instant = timeService.UTCTime()
 
     println(instant)

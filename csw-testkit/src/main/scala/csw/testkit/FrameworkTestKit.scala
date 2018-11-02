@@ -7,17 +7,17 @@ import com.typesafe.config.Config
 import csw.command.client.messages.{ComponentMessage, ContainerMessage}
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.testkit.internal.TestKitUtils
-import csw.testkit.scaladsl.Service
-import csw.testkit.scaladsl.Service._
+import csw.testkit.scaladsl.CSWService
+import csw.testkit.scaladsl.CSWService._
 
 import scala.annotation.varargs
 
 final class FrameworkTestKit private (
-    actorSystem: ActorSystem,
-    locationTestKit: LocationTestKit,
-    configTestKit: ConfigTestKit,
-    eventTestKit: EventTestKit,
-    alarmTestKit: AlarmTestKit
+    val actorSystem: ActorSystem,
+    val locationTestKit: LocationTestKit,
+    val configTestKit: ConfigTestKit,
+    val eventTestKit: EventTestKit,
+    val alarmTestKit: AlarmTestKit
 ) {
 
   val frameworkWiring: FrameworkWiring = FrameworkWiring.make(actorSystem)
@@ -40,7 +40,7 @@ final class FrameworkTestKit private (
    * This will always start location server as it is required by all other services along with provided services
    */
   @varargs
-  def start(services: Service*): Unit = {
+  def start(services: CSWService*): Unit = {
     locationTestKit.startLocationServer()
     services.foreach {
       case ConfigServer   ⇒ configTestKit.startConfigServer(); configStarted = true
@@ -123,7 +123,7 @@ object FrameworkTestKit {
     new FrameworkTestKit(
       actorSystem,
       LocationTestKit(testKitSettings),
-      ConfigTestKit(testKitSettings),
+      ConfigTestKit(testKitSettings = testKitSettings),
       EventTestKit(testKitSettings),
       AlarmTestKit(testKitSettings)
     )

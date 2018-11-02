@@ -1,11 +1,8 @@
 package csw.testkit.javadsl
 
-import java.util.Optional
-
+import com.typesafe.config.Config
 import csw.testkit.{ConfigTestKit, LocationTestKit, TestKitSettings}
 import org.junit.rules.ExternalResource
-
-import scala.compat.java8.OptionConverters.RichOptionalGeneric
 
 /**
  * A Junit external resource for the [[ConfigTestKit]], making it possible to have Junit manage the lifecycle of the testkit.
@@ -33,18 +30,21 @@ final class ConfigTestKitJunitResource(val configTestKit: ConfigTestKit, val loc
   def this() = this(ConfigTestKit(), LocationTestKit())
 
   /** Initialize testkit with custom TestKitSettings */
-  def this(testKitSettings: TestKitSettings) = this(ConfigTestKit(testKitSettings), LocationTestKit(testKitSettings))
+  def this(testKitSettings: TestKitSettings) =
+    this(ConfigTestKit(testKitSettings = testKitSettings), LocationTestKit(testKitSettings))
+
+  /** Initialize testkit with custom Configuration */
+  def this(config: Config) = this(ConfigTestKit(Some(config)), LocationTestKit())
 
   /**
    * Initialize testkit with custom configuration
    *
-   * @param configPort port on which config server to run
-   * @param locationPort port on which location server akka cluster runs
+   * @param config custom configuration with which to start config server
    * @param testKitSettings custom TestKitSettings
-   * @return ScalaTestConfigTestKit which can be mixed in with tests
+   * @return ConfigTestKitJunitResource which can be mixed in with tests
    */
-  def this(configPort: Int, locationPort: Optional[Int], testKitSettings: Optional[TestKitSettings]) =
-    this(ConfigTestKit(configPort, testKitSettings.asScala), LocationTestKit(locationPort.asScala, testKitSettings.asScala))
+  def this(config: Config, testKitSettings: TestKitSettings) =
+    this(ConfigTestKit(Some(config), testKitSettings), LocationTestKit(testKitSettings))
 
   /**
    * Start ConfigTestKit and LocationTestKit.

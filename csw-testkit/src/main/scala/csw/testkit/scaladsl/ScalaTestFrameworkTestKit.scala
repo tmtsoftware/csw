@@ -1,28 +1,21 @@
 package csw.testkit.scaladsl
 import akka.actor.ActorSystem
 import csw.testkit._
-import org.scalatest.concurrent.{Eventually, ScalaFutures}
-import org.scalatest.{BeforeAndAfterAll, Matchers, TestSuite}
 
-abstract class ScalaTestFrameworkTestKit(val frameworkTestKit: FrameworkTestKit, services: Service*)
-    extends TestSuite
-    with Matchers
-    with BeforeAndAfterAll
-    with ScalaFutures
-    with Eventually {
+abstract class ScalaTestFrameworkTestKit(val frameworkTestKit: FrameworkTestKit, services: CSWService*) extends ScalaTestBase {
 
   /** Initialize testkit with default configuration
    *
    * By default only Location server gets started, if your tests requires other services [ex. Config, Event, Alarm etc.] along with location,
-   * then use other override which accepts sequence of [[Service]] to create instance of testkit
+   * then use other override which accepts sequence of [[CSWService]] to create instance of testkit
    * */
   def this() = this(FrameworkTestKit())
 
   /** Initialize testkit and start all the provided services.
    *
-   * @note Refer [[Service]] for supported services
+   * @note Refer [[CSWService]] for supported services
    * */
-  def this(services: Service*) = this(FrameworkTestKit(), services: _*)
+  def this(services: CSWService*) = this(FrameworkTestKit(), services: _*)
 
   /** Initialize testkit with provided actorSystem */
   def this(actorSystem: ActorSystem) = this(FrameworkTestKit(actorSystem))

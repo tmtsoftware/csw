@@ -1,32 +1,16 @@
 package csw.testkit.scaladsl
-
+import com.typesafe.config.{Config, ConfigFactory}
 import csw.testkit.{ConfigTestKit, LocationTestKit, TestKitSettings}
-import org.scalatest._
-import org.scalatest.concurrent.{Eventually, ScalaFutures}
 
 abstract class ScalaTestConfigTestKit(val configTestKit: ConfigTestKit, val locationTestKit: LocationTestKit)
-    extends TestSuite
-    with Matchers
-    with BeforeAndAfterAll
-    with ScalaFutures
-    with Eventually {
+    extends ScalaTestBase {
 
   /** Initialize testkit with default configuration */
   def this() = this(ConfigTestKit(), LocationTestKit())
 
   /** Initialize testkit with custom TestKitSettings */
-  def this(testKitSettings: TestKitSettings) = this(ConfigTestKit(testKitSettings), LocationTestKit(testKitSettings))
-
-  /**
-   * Initialize testkit with custom configuration
-   *
-   * @param configPort port on which config server to run
-   * @param locationPort port on which location server akka cluster runs
-   * @param testKitSettings custom TestKitSettings
-   * @return ScalaTestConfigTestKit which can be mixed in with tests
-   */
-  def this(configPort: Int, locationPort: Option[Int], testKitSettings: Option[TestKitSettings]) =
-    this(ConfigTestKit(configPort, testKitSettings), LocationTestKit(locationPort, testKitSettings))
+  def this(configOpt: Option[Config] = None, testKitSettings: TestKitSettings = TestKitSettings(ConfigFactory.load())) =
+    this(ConfigTestKit(configOpt, testKitSettings), LocationTestKit(testKitSettings))
 
   /**
    * Start ConfigTestKit and LocationTestKit. If override be sure to call super.beforeAll

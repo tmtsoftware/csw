@@ -2,7 +2,6 @@ package csw.alarm.client.internal.auto_refresh
 
 import akka.actor.testkit.typed.scaladsl.{ManualTime, ScalaTestWithActorTestKit, TestProbe}
 import akka.actor.typed.scaladsl.Behaviors
-import com.typesafe.config.Config
 import csw.alarm.api.models.AlarmSeverity.Major
 import csw.alarm.api.models.Key.AlarmKey
 import csw.alarm.client.internal.auto_refresh.AutoRefreshSeverityMessage._
