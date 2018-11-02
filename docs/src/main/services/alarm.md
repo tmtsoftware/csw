@@ -127,7 +127,7 @@ Alarm configuration files are written in the HOCON format using the following fi
 * activationStatus: true/false flag for whether alarm is currently active (and considered in aggregated severity and health calculations)
 
 alarms.conf
-:   @@snip [valid_alarms.conf](../../../../examples/src/main/resources/valid-alarms.conf#alarmsconf)
+:   @@snip [valid_alarms.conf](../../../../examples/src/main/resources/valid-alarms.conf) {#alarmsconf}
 
 ### acknowledge
 
