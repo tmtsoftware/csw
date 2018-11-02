@@ -123,7 +123,7 @@ object FrameworkTestKit {
     new FrameworkTestKit(
       actorSystem,
       LocationTestKit(testKitSettings),
-      ConfigTestKit(testKitSettings),
+      ConfigTestKit(testKitSettings = testKitSettings),
       EventTestKit(testKitSettings),
       AlarmTestKit(testKitSettings)
     )

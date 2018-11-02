@@ -10,16 +10,6 @@ abstract class ScalaTestLocationTestKit(testKit: LocationTestKit) extends ScalaT
   def this(testKitSettings: TestKitSettings) = this(LocationTestKit(testKitSettings))
 
   /**
-   * Initialize testkit with custom configuration
-   *
-   * @param clusterPort port on which location server akka cluster runs
-   * @param testKitSettings custom TestKitSettings
-   * @return ScalaTestLocationTestKit which can be mixed in with tests
-   */
-  def this(clusterPort: Option[Int], testKitSettings: Option[TestKitSettings]) =
-    this(LocationTestKit(clusterPort, testKitSettings))
-
-  /**
    * Start LocationTestKit. If override be sure to call super.beforeAll
    * or start the testkit explicitly with `locationTestKit.startLocationServer()`.
    */

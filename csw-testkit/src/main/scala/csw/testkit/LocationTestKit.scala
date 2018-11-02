@@ -1,21 +1,17 @@
 package csw.testkit
 
-import java.util.Optional
-
 import akka.http.scaladsl.Http
 import akka.util.Timeout
+import com.typesafe.config.ConfigFactory
 import csw.location.server.internal.ServerWiring
 import csw.testkit.internal.TestKitUtils
 
-import scala.compat.java8.OptionConverters.RichOptionalGeneric
+final class LocationTestKit private (val testKitSettings: TestKitSettings = TestKitSettings(ConfigFactory.load())) {
 
-final class LocationTestKit private (clusterPort: Option[Int], settings: Option[TestKitSettings]) {
-
-  private lazy val locationWiring = ServerWiring.make(clusterPort)
+  private lazy val locationWiring = ServerWiring.make(testKitSettings.LocationClusterPort)
   import locationWiring.actorRuntime._
 
-  lazy val testKitSettings: TestKitSettings = settings.getOrElse(TestKitSettings(actorSystem))
-  implicit lazy val timeout: Timeout        = testKitSettings.DefaultTimeout
+  implicit lazy val timeout: Timeout = testKitSettings.DefaultTimeout
 
   /**
    * Start HTTP location server on default port 7654
@@ -40,37 +36,23 @@ object LocationTestKit {
    *
    * When the test has completed you should shutdown the location server
    * with [[LocationTestKit#shutdownLocationServer]].
-   *
-   * @return handle to LocationTestKit which can be used to start and stop location server
    */
-  def apply(): LocationTestKit = new LocationTestKit(None, None)
-
-  /**
-   * Create a LocationTestKit
-   *
-   * @param testKitSettings custom testKitSettings
-   * @return handle to LocationTestKit which can be used to start and stop location server
-   */
-  def apply(testKitSettings: TestKitSettings): LocationTestKit = new LocationTestKit(None, Some(testKitSettings))
-
-  /**
-   * Scala API for creating LocationTestKit
-   *
-   * @param clusterPort port on which akka cluster to be started (backend of location service)
-   * @param testKitSettings custom testKitSettings
-   * @return handle to LocationTestKit which can be used to start and stop location server
-   */
-  def apply(clusterPort: Option[Int], testKitSettings: Option[TestKitSettings]): LocationTestKit =
-    new LocationTestKit(clusterPort, testKitSettings)
+  def apply(testKitSettings: TestKitSettings = TestKitSettings(ConfigFactory.load())): LocationTestKit =
+    new LocationTestKit(testKitSettings)
 
   /**
    * Java API for creating LocationTestKit
    *
-   * @param clusterPort port on which akka cluster to be started (backend of location service)
+   * @return handle to LocationTestKit which can be used to start and stop location server
+   */
+  def create(): LocationTestKit = apply()
+
+  /**
+   * Java API for creating LocationTestKit
+   *
    * @param testKitSettings custom testKitSettings
    * @return handle to LocationTestKit which can be used to start and stop location server
    */
-  def create(clusterPort: Optional[Int], testKitSettings: Optional[TestKitSettings]): LocationTestKit =
-    apply(clusterPort.asScala, testKitSettings.asScala)
+  def create(testKitSettings: TestKitSettings): LocationTestKit = apply(testKitSettings)
 
 }

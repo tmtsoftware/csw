@@ -4,23 +4,22 @@ import java.util.Optional
 
 import akka.actor.ActorSystem
 import akka.util.Timeout
-import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.config.ConfigFactory
 import csw.alarm.client.internal.commons.AlarmServiceConnection
 import csw.location.api.models.Connection.TcpConnection
 import csw.location.api.models.RegistrationResult
 import csw.network.utils.SocketUtils.getFreePort
 import csw.testkit.redis.RedisStore
 
-import scala.compat.java8.OptionConverters.RichOptionalGeneric
+final class AlarmTestKit private (testKitSettings: TestKitSettings = TestKitSettings(ConfigFactory.load())) extends RedisStore {
 
-final class AlarmTestKit private (config: Config, settings: Option[TestKitSettings]) extends RedisStore {
-
-  override implicit lazy val system: ActorSystem        = ActorSystem("alarm-test-kit", config)
+  override implicit lazy val system: ActorSystem        = ActorSystem("alarm-test-kit")
   override implicit lazy val timeout: Timeout           = testKitSettings.DefaultTimeout
-  override protected lazy val masterId: String          = config.getString("csw-alarm.redis.masterId")
+  override protected lazy val masterId: String          = system.settings.config.getString("csw-alarm.redis.masterId")
   override protected lazy val connection: TcpConnection = AlarmServiceConnection.value
 
-  lazy val testKitSettings: TestKitSettings = settings.getOrElse(TestKitSettings(config))
+  private def getSentinelPort: Int = testKitSettings.AlarmSentinelPort.getOrElse(getFreePort)
+  private def getMasterPort: Int   = testKitSettings.AlarmMasterPort.getOrElse(getFreePort)
 
   /**
    * Scala API to Start Alarm service
@@ -28,7 +27,7 @@ final class AlarmTestKit private (config: Config, settings: Option[TestKitSettin
    * It will start redis sentinel and redis server on provided ports
    * and then register's Alarm service with location service
    */
-  def startAlarmService(sentinelPort: Int = getFreePort, serverPort: Int = getFreePort): RegistrationResult =
+  def startAlarmService(sentinelPort: Int = getSentinelPort, serverPort: Int = getMasterPort): RegistrationResult =
     start(sentinelPort, serverPort)
 
   /**
@@ -38,7 +37,7 @@ final class AlarmTestKit private (config: Config, settings: Option[TestKitSettin
    * and then register's Alarm service with location service
    */
   def startAlarmService(sentinelPort: Optional[Int], serverPort: Optional[Int]): Unit =
-    startAlarmService(sentinelPort.orElse(getFreePort), serverPort.orElse(getFreePort))
+    startAlarmService(sentinelPort.orElse(getSentinelPort), serverPort.orElse(getMasterPort))
 
   /**
    * Shutdown Alarm service
@@ -60,7 +59,7 @@ object AlarmTestKit {
    *
    * @return handle to AlarmTestKit which can be used to start and stop alarm service
    */
-  def apply(): AlarmTestKit = new AlarmTestKit(ConfigFactory.load(), None)
+  def apply(): AlarmTestKit = new AlarmTestKit()
 
   /**
    * Create a AlarmTestKit
@@ -68,26 +67,6 @@ object AlarmTestKit {
    * @param testKitSettings custom testKitSettings
    * @return handle to AlarmTestKit which can be used to start and stop alarm service
    */
-  def apply(testKitSettings: TestKitSettings): AlarmTestKit = new AlarmTestKit(ConfigFactory.load(), Some(testKitSettings))
-
-  /**
-   * Scala API for creating AlarmTestKit
-   *
-   * @param config custom configuration with which to start alarm service
-   * @param testKitSettings custom testKitSettings
-   * @return handle to AlarmTestKit which can be used to start and stop alarm service
-   */
-  def apply(config: Config, testKitSettings: Option[TestKitSettings]): AlarmTestKit =
-    new AlarmTestKit(config, testKitSettings)
-
-  /**
-   * Java API for creating AlarmTestKit
-   *
-   * @param config custom configuration with which to start alarm service
-   * @param testKitSettings custom testKitSettings
-   * @return handle to AlarmTestKit which can be used to start and stop alarm service
-   */
-  def create(config: Config, testKitSettings: Optional[TestKitSettings]): AlarmTestKit =
-    apply(config, testKitSettings.asScala)
+  def apply(testKitSettings: TestKitSettings): AlarmTestKit = new AlarmTestKit(testKitSettings)
 
 }
