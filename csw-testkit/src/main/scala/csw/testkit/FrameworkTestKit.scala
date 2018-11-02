@@ -13,11 +13,11 @@ import csw.testkit.scaladsl.CSWService._
 import scala.annotation.varargs
 
 final class FrameworkTestKit private (
-    actorSystem: ActorSystem,
-    locationTestKit: LocationTestKit,
-    configTestKit: ConfigTestKit,
-    eventTestKit: EventTestKit,
-    alarmTestKit: AlarmTestKit
+    val actorSystem: ActorSystem,
+    val locationTestKit: LocationTestKit,
+    val configTestKit: ConfigTestKit,
+    val eventTestKit: EventTestKit,
+    val alarmTestKit: AlarmTestKit
 ) {
 
   val frameworkWiring: FrameworkWiring = FrameworkWiring.make(actorSystem)

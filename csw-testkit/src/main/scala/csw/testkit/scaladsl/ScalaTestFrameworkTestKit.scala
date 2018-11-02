@@ -1,6 +1,7 @@
 package csw.testkit.scaladsl
 import akka.actor.ActorSystem
 import csw.testkit._
+
 abstract class ScalaTestFrameworkTestKit(val frameworkTestKit: FrameworkTestKit, services: CSWService*) extends ScalaTestBase {
 
   /** Initialize testkit with default configuration

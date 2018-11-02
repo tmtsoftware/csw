@@ -41,7 +41,7 @@ final class ConfigTestKitJunitResource(val configTestKit: ConfigTestKit, val loc
    * @param configPort port on which config server to run
    * @param locationPort port on which location server akka cluster runs
    * @param testKitSettings custom TestKitSettings
-   * @return ScalaTestConfigTestKit which can be mixed in with tests
+   * @return ConfigTestKitJunitResource which can be mixed in with tests
    */
   def this(configPort: Int, locationPort: Optional[Int], testKitSettings: Optional[TestKitSettings]) =
     this(ConfigTestKit(configPort, testKitSettings.asScala), LocationTestKit(locationPort.asScala, testKitSettings.asScala))

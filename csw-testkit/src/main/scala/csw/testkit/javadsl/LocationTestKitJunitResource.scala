@@ -24,7 +24,7 @@ final class LocationTestKitJunitResource(val locationTestKit: LocationTestKit) e
    *
    * @param clusterPort port on which location server akka cluster runs
    * @param testKitSettings custom TestKitSettings
-   * @return ScalaTestLocationTestKit which can be mixed in with tests
+   * @return LocationTestKitJunitResource which can be mixed in with tests
    */
   def this(clusterPort: Optional[Int], testKitSettings: Option[TestKitSettings]) =
     this(LocationTestKit(clusterPort.asScala, testKitSettings))
