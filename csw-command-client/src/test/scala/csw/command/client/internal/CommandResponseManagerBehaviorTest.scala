@@ -79,7 +79,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
     commandResponseProbe.expectMessage(Completed(runId))
   }
 
-  test("should get one update for long running command that returns Started") {
+  test("should not get update for long running command that returns Started") {
     val behaviorTestKit      = createBehaviorTestKit()
     val commandResponseProbe = TestProbe[SubmitResponse]
 
@@ -88,21 +88,18 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
     // This simulates ComponentBehavior adding the command with Started - does not cause update to subscriber
     // Subscriber cannot subscribe before this happens, will not find command
     behaviorTestKit.run(AddOrUpdateCommand(Started(runId)))
-    // Simulate doSubmit returning Started for a long-running command
-    //behaviorTestKit.run(AddOrUpdateCommand(runId, Started(runId)))
     // Subscribe succeeds no after initial Started
     behaviorTestKit.run(Subscribe(runId, commandResponseProbe.ref))
     // Simulate doSubmit returning Started for a long-running command
     behaviorTestKit.run(AddOrUpdateCommand(Started(runId)))
-    // Started is received to subscriber now
-    commandResponseProbe.expectMessage(Started(runId))
+    // Started should not be received by subscriber as it is not final response
+    commandResponseProbe.expectNoMessage(200.milli)
   }
 
   test("should not be able to set value to Intermediate after Final in Command Response Manager") {
-    val behaviorTestKit         = createBehaviorTestKit()
-    val commandResponseProbe    = TestProbe[QueryResponse]
-    val commandCorrelationProbe = TestProbe[CommandCorrelation]
-    val runId                   = Id()
+    val behaviorTestKit      = createBehaviorTestKit()
+    val commandResponseProbe = TestProbe[QueryResponse]
+    val runId                = Id()
 
     behaviorTestKit.run(AddOrUpdateCommand(Started(runId)))
     behaviorTestKit.run(Query(runId, commandResponseProbe.ref))

@@ -88,19 +88,19 @@ class LongRunningCommandTest(ignore: Int)
 
       Await.result(eventualCommandResponse, 20.seconds) shouldBe Completed(assemblyLongSetup.runId)
 
-      //#submit
-      val setupForSubscribe = Setup(prefix, longRunning, Some(obsId))
-      val response          = assemblyCommandService.submit(setupForSubscribe)
-      //#submit
-
-      Await.result(response, 20.seconds) shouldBe Completed(setupForSubscribe.runId)
-
       // verify that commands gets completed in following sequence
       // ShortSetup => MediumSetup => LongSetup
       probe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(shortCmdCompleted))))
       probe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(mediumCmdCompleted))))
       probe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(longCmdCompleted))))
       probe.expectMessage(CurrentState(prefix, StateName("testStateName"), Set(choiceKey.set(longRunningCmdCompleted))))
+
+      //#submit
+      val setupForSubscribe = Setup(prefix, longRunning, Some(obsId))
+      val response          = assemblyCommandService.submit(setupForSubscribe)
+      //#submit
+
+      Await.result(response, 20.seconds) shouldBe Completed(setupForSubscribe.runId)
 
       //#query-response
       val setupForQuery = Setup(prefix, longRunning, Some(obsId))
