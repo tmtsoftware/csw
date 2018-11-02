@@ -2,7 +2,7 @@ package csw.event.client.internal.redis
 
 import akka.Done
 import akka.actor.{Cancellable, PoisonPill}
-import akka.stream.scaladsl.Source
+import akka.stream.scaladsl.{Keep, Source}
 import akka.stream.{Materializer, OverflowStrategy}
 import csw.event.api.exceptions.PublishFailure
 import csw.event.api.scaladsl.EventPublisher
@@ -39,7 +39,7 @@ class RedisPublisher(redisURI: Future[RedisURI], redisClient: RedisClient)(impli
 
   private val (actorRef, stream) = Source.actorRef[(Event, Promise[Done])](1024, OverflowStrategy.dropHead).preMaterialize()
 
-  stream
+  private val streamTermination: Future[Done] = stream
     .mapAsync(1) {
       case (e, p) =>
         publishInternal(e).map(p.trySuccess).recover {
@@ -50,7 +50,8 @@ class RedisPublisher(redisURI: Future[RedisURI], redisClient: RedisClient)(impli
 
   override def publish(event: Event): Future[Done] = {
     val p = Promise[Done]
-    actorRef ! ((event, p))
+    if (streamTermination.isCompleted) p.tryFailure(PublishFailure(event, new RuntimeException("Publisher is shutdown")))
+    else actorRef ! ((event, p))
     p.future
   }
 
