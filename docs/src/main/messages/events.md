@@ -1,17 +1,22 @@
 # Events
 
-Events are the most basic type of asynchronous notification in TMT when an activity occurs somewhere in the TMT system and other components need to be notified. Each type of event has a unique purpose and unique information, but they all share same structural features. All events have **EventInfo** and **ParameterSet**.
+Events are the most basic type of asynchronous notification in TMT when an activity occurs 
+somewhere in the TMT system and other components need to be notified. Each type of event has a unique 
+purpose and unique information, but they all share same structural features. 
+All events have **EventInfo** and **ParameterSet**.
 
 @@@ note
 
-`csw-messages` library offers out of the box support to serialize Events using **Protobuf**, so that events can be produced and consumed by JVM(Java virtual machine) as well as Non-JVM applications.
+`csw-messages` library offers out of the box support to serialize Events using **Protobuf**, so that events can be produced and 
+consumed by JVM(Java virtual machine) as well as Non-JVM applications.
 
 For more on this [Protobuf support](events.html#protobuf) section below.
 
 @@@
 
 ## EventTime
-It captures the instance of a time in UTC format. To create current instance of time use default constructor. For other utility functions, see below examples:
+Each event includes its time of creation in UTC format. 
+To create an event instance at the current time use the default constructor. For other utility functions, see below examples:
 
 Scala
 :   @@snip [EventsTest.scala](../../../../examples/src/test/scala/csw/messages/EventsTest.scala) { #eventtime }
@@ -21,8 +26,9 @@ Java
    
 ## System Event
 
-SystemEvent is used to describe a demand or other algorithm input from one component to the other. It is also used to publish internal state or status values of a component
-that may be of interest to other components in the system.
+`SystemEvent` is the type used to describe the majority of events in the system. An example is a demand that is 
+the output of an algorithm in one component that is used as an input to another. `SystemEvent` is also used 
+to publish internal state or status values of a component that may be of interest to other components in the system.
 
 Scala
 :   @@snip [EventsTest.scala](../../../../examples/src/test/scala/csw/messages/EventsTest.scala) { #systemevent }
@@ -32,7 +38,17 @@ Java
 
 ## Observe Event
 
-ObserveEvent is used to describe an event within a standardized data acquisition process. Published only by Science Detector Assemblies, who emit ObserveEvents during their exposures to signal the occurrence of specific activities/actions during the acquisition of data. Observe Events are published by the detector system using the Event Service.
+ObserveEvent are standardized events used to describe an activities within the data acquisition process. 
+These events are ublished only by Science Detector Assemblies, which emit ObserveEvents during their exposures 
+to signal the occurrence of specific activities/actions during the acquisition of data. 
+Observe Events are published by the detector system using the Event Service.
+
+@@@ note
+
+The current ObserveEvents do not match the descriptions of the ESW Phase 1 review. The model files and documents
+can be used to create standard ObserveEvents.
+
+@@@
 
 Scala
 :   @@snip [EventsTest.scala](../../../../examples/src/test/scala/csw/messages/EventsTest.scala) { #observeevent }

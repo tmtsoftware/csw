@@ -67,8 +67,10 @@ public class JSampleComponentHandlers extends JComponentHandlers {
 
     @Override
     public CommandResponse.ValidateCommandResponse validateCommand(ControlCommand controlCommand) {
-        if (controlCommand.commandName().equals(hcdCurrentState())) {
+        if (controlCommand.commandName().equals(hcdCurrentStateCmd())) {
             // This is special because test doesn't want these other CurrentState values published
+            return new CommandResponse.Accepted(controlCommand.runId());
+        } else if (controlCommand.commandName().equals(crmAddOrUpdateCmd())) {
             return new CommandResponse.Accepted(controlCommand.runId());
         } else {
             // All other tests
@@ -89,14 +91,18 @@ public class JSampleComponentHandlers extends JComponentHandlers {
     @Override
     public CommandResponse.SubmitResponse onSubmit(ControlCommand controlCommand) {
         // Adding item from CommandMessage paramset to ensure things are working
-        CurrentState submitState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.submitCommandChoice()));
-        currentStatePublisher.publish(submitState);
-        return processSubmitCommand(controlCommand);
+        if (controlCommand.commandName().equals(crmAddOrUpdateCmd())) {
+            return crmAddOrUpdate((Setup)controlCommand);
+        } else {
+            CurrentState submitState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.submitCommandChoice()));
+            currentStatePublisher.publish(submitState);
+            return processSubmitCommand(controlCommand);
+        }
     }
 
     @Override
     public void onOneway(ControlCommand controlCommand) {
-        if (controlCommand.commandName().equals(hcdCurrentState())) {
+        if (controlCommand.commandName().equals(hcdCurrentStateCmd())) {
             // Special handling for oneway to test current state
             processCurrentStateOnewayCommand((Setup)controlCommand);
         } else {
@@ -127,14 +133,33 @@ public class JSampleComponentHandlers extends JComponentHandlers {
         return new CommandResponse.Completed(controlCommand.runId());
     }
 
+    //#addOrUpdateCommand
+    private CommandResponse.SubmitResponse crmAddOrUpdate(Setup setup) {
+        // This simulates some worker task doing something that finishes after onSubmit returns
+        Runnable task = new Runnable() {
+            @Override
+            public void run() {
+                commandResponseManager.addOrUpdateCommand(new CommandResponse.Completed(setup.runId()));
+            }
+        };
+
+        // Wait a bit and then set CRM to Completed
+        ExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+        ((ScheduledExecutorService) executor).schedule(task, 1, TimeUnit.SECONDS);
+
+        // Return Started from onSubmit
+        return new CommandResponse.Started(setup.runId());
+    }
+    //#addOrUpdateCommand
+
     private void processCurrentStateOnewayCommand(Setup setup) {
-        System.out.println("One way it is ");
+        //#subscribeCurrentState
         Key<Integer> encoder = JKeyType.IntKey().make("encoder");
         int expectedEncoderValue = setup.jGet(encoder).get().head();
 
-        CurrentState currentState = new CurrentState(prefix().prefix(), new StateName("HCDState")).add(encoder().set(expectedEncoderValue));
+        CurrentState currentState = new CurrentState(prefix(), new StateName("HCDState")).add(encoder().set(expectedEncoderValue));
         currentStatePublisher.publish(currentState);
-        System.out.println("Done process");
+        //#subscribeCurrentState
     }
 
     private void processOnewayCommand(ControlCommand controlCommand) {
@@ -156,6 +181,23 @@ public class JSampleComponentHandlers extends JComponentHandlers {
                 .runWith(Sink.ignore(), ActorMaterializer.create(Adapter.toUntyped(actorContext.getSystem())));
     }
 
+
+    private CommandResponse.SubmitResponse processCommandWithoutMatcher(ControlCommand controlCommand) {
+        if (controlCommand.commandName().equals(failureAfterValidationCmd())) {
+            // Set CRM to Error after 1 second
+            sendCRM(controlCommand.runId(), new CommandResponse.Error(controlCommand.runId(), "Unknown Error occurred"));
+            return new CommandResponse.Started(controlCommand.runId());
+        } else {
+            Parameter<Integer> parameter = JKeyType.IntKey().make("encoder").set(20);
+            Result result = new Result(controlCommand.source().prefix()).add(parameter);
+
+            // Set CRM to Completed after 1 second
+            sendCRM(controlCommand.runId(), new CommandResponse.CompletedWithResult(controlCommand.runId(), result));
+            return new CommandResponse.Started(controlCommand.runId());
+        }
+
+    }
+
     private void sendCRM(Id runId, CommandResponse.SubmitResponse response) {
         Runnable task = new Runnable() {
             @Override
@@ -168,41 +210,11 @@ public class JSampleComponentHandlers extends JComponentHandlers {
         ((ScheduledExecutorService) executor).schedule(task, 1, TimeUnit.SECONDS);
     }
 
-
-    private CommandResponse.SubmitResponse processCommandWithoutMatcher(ControlCommand controlCommand) {
-
-        if (controlCommand.commandName().equals(failureAfterValidationCmd())) {
-            // Set CRM to Error after 1 second
-            sendCRM(controlCommand.runId(), new CommandResponse.Error(controlCommand.runId(), "Unknown Error occurred"));
-            return new CommandResponse.Started(controlCommand.runId());
-
-            /*  Retained for checking 371
-            // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
-            CompletableFuture<CommandResponse.QueryResponse> status = commandResponseManager.jQuery(controlCommand.runId(), Timeout.apply(100, TimeUnit.MILLISECONDS));
-            status.thenAccept(response -> {
-                if(response instanceof CommandResponse.Started) {
-                    //commandResponseManager.addOrUpdateCommand(controlCommand.runId(), new CommandResponse.Error(controlCommand.runId(), "Unknown Error occurred"));
-                    //return new CommandResponse.Error(controlCommand.runId(), "Unknown Error occurred");
-                                }
-                return new CommandResponse.Error(controlCommand.runId(), "Unknown Error occurred");
-            });
-            */
-        } else {
-            Parameter<Integer> parameter = JKeyType.IntKey().make("encoder").set(20);
-            Result result = new Result(controlCommand.source().prefix()).add(parameter);
-
-            // Set CRM to Completed after 1 second
-            sendCRM(controlCommand.runId(), new CommandResponse.CompletedWithResult(controlCommand.runId(), result));
-            return new CommandResponse.Started(controlCommand.runId());
-        }
-
-    }
-
     private void publishCurrentState(ControlCommand controlCommand) {
         CurrentState commandState;
 
         if (controlCommand instanceof Setup) {
-            commandState = new CurrentState(SampleComponentState.prefix().prefix(), new StateName("testStateSetup"))
+            commandState = new CurrentState(SampleComponentState.prefix(), new StateName("testStateSetup"))
                     .add(SampleComponentState.choiceKey().set(SampleComponentState.setupConfigChoice())).add(controlCommand.paramSet().head());
         } else
             commandState = currentState.add(SampleComponentState.choiceKey().set(SampleComponentState.observeConfigChoice())).add(controlCommand.paramSet().head());

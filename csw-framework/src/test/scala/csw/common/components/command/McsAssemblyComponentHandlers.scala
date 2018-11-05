@@ -48,17 +48,11 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
 
   override def validateCommand(controlCommand: ControlCommand): ValidateCommandResponse = {
     controlCommand.commandName match {
-      case `longRunning` ⇒
-        //#addOrUpdateCommand
-        // after validation of the controlCommand, update its status of successful validation as Accepted
-        // TODO -- This isn't needed, but it must be part of docs
-        // commandResponseManager.addOrUpdateCommand(controlCommand.runId, Started(controlCommand.runId))
-        //#addOrUpdateCommand
-        Accepted(controlCommand.runId)
-      case `moveCmd`    ⇒ Accepted(controlCommand.runId)
-      case `initCmd`    ⇒ Accepted(controlCommand.runId)
-      case `invalidCmd` ⇒ Invalid(controlCommand.runId, CommandIssue.OtherIssue("Invalid"))
-      case _            ⇒ Invalid(controlCommand.runId, UnsupportedCommandIssue(controlCommand.commandName.name))
+      case `longRunning` ⇒ Accepted(controlCommand.runId)
+      case `moveCmd`     ⇒ Accepted(controlCommand.runId)
+      case `initCmd`     ⇒ Accepted(controlCommand.runId)
+      case `invalidCmd`  ⇒ Invalid(controlCommand.runId, CommandIssue.OtherIssue("Invalid"))
+      case _             ⇒ Invalid(controlCommand.runId, UnsupportedCommandIssue(controlCommand.commandName.name))
     }
   }
 
@@ -67,17 +61,18 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
       case `longRunning` ⇒
         runId = controlCommand.runId
 
+        // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
         //#addSubCommand
+        // When receiving the command, onSubmit adds three subCommands
         shortSetup = Setup(prefix, shortRunning, controlCommand.maybeObsId)
         commandResponseManager.addSubCommand(runId, shortSetup.runId)
-        //#addSubCommand
 
         mediumSetup = Setup(prefix, mediumRunning, controlCommand.maybeObsId)
-        // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
         commandResponseManager.addSubCommand(runId, mediumSetup.runId)
 
         longSetup = Setup(prefix, longRunning, controlCommand.maybeObsId)
         commandResponseManager.addSubCommand(runId, longSetup.runId)
+        //#addSubCommand
 
         // this is to simulate that assembly is splitting command into three sub commands and forwarding same to hcd
         // longSetup takes 5 seconds to finish
@@ -113,13 +108,9 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
         Started(controlCommand.runId)
       //#query-command-response-manager
 
-      case `initCmd` ⇒
-        commandResponseManager.addOrUpdateCommand(Completed(controlCommand.runId))
-        Completed(controlCommand.runId)
+      case `initCmd` ⇒ Completed(controlCommand.runId)
 
-      case `moveCmd` ⇒
-        commandResponseManager.addOrUpdateCommand(Completed(controlCommand.runId))
-        Completed(controlCommand.runId)
+      case `moveCmd` ⇒ Completed(controlCommand.runId)
 
       case _ ⇒ //do nothing
         Completed(controlCommand.runId)
@@ -133,8 +124,8 @@ class McsAssemblyComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswC
       .map {
         // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
         //#updateSubCommand
-        // An original command is split into sub-commands and sent to a component. The result of the command is
-        // obtained by subscribing to the component with the sub command id.
+        // An original command is split into sub-commands and sent to a component.
+        // The current state publishing is not relevant to the updateSubCommand usage.
         case _: Completed ⇒
           controlCommand.runId match {
             case id if id == shortSetup.runId ⇒

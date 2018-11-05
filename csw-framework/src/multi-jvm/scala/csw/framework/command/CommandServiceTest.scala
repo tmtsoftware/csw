@@ -8,6 +8,7 @@ import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
+import csw.command.api.StateMatcher
 import csw.command.client.CommandServiceFactory
 import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.client.messages.CommandMessage.Submit
@@ -138,7 +139,6 @@ class CommandServiceTest(ignore: Int)
       // resolve assembly running in jvm-3 and send setup command expecting immediate command completion response
       val hcdLocF                   = locationService.resolve(AkkaConnection(ComponentId("HCD", ComponentType.HCD)), 5.seconds)
       val hcdLocation: AkkaLocation = Await.result(hcdLocF, 10.seconds).get
-      println("HCD: " + hcdLocation)
       val hcdCmdService = CommandServiceFactory.make(hcdLocation)
 
       //#invalidCmd
@@ -203,10 +203,8 @@ class CommandServiceTest(ignore: Int)
           case Started(runId) =>
             // happy case - no action needed
             // Do some other work
-            println("Happy")
           case a =>
             // log.error. This indicates that the command probably failed to start.
-            println("Not happy: " + a)
         }
 
         // Now wait for completion and result
@@ -236,6 +234,20 @@ class CommandServiceTest(ignore: Int)
       }
       Await.ready(oneWayF, timeout.duration)
       //#oneway
+
+      //#validate
+      val validateCommandF = async {
+        await(assemblyCmdService.validate(immediateSetup)) match {
+          case response: Accepted ⇒ true
+          case Invalid(_, issue) ⇒
+            // do something with other response which is not expected
+            log.error(s"Command failed to validate with issue: $issue")
+            false
+          case l:Locked => false
+        }
+      }
+      Await.result(validateCommandF, timeout.duration) shouldBe true
+      //#validate
 
       //#query
       // Check on a command that was completed in the past
@@ -269,32 +281,34 @@ class CommandServiceTest(ignore: Int)
       //#submitAllInvalid
 
       //#subscribeCurrentState
+      // Subscriber code
       val expectedEncoderValue = 234
-      val currStateSetup       = Setup(prefix, hcdCurrentState, obsId).add(encoder.set(expectedEncoderValue))
+      val currStateSetup       = Setup(prefix, hcdCurrentStateCmd, obsId).add(encoder.set(expectedEncoderValue))
       // Setup a callback response to CurrentState
       var cstate: CurrentState = CurrentState(prefix, StateName("no cstate"), Set.empty)
       val subscription            = hcdCmdService.subscribeCurrentState(cs => cstate = cs)
-      // Send a oneway to the HCD that will cause a publish of a CurrentState with the encoder value
-      // in the command parameter "encoder"
+      // Send a oneway to the HCD that will cause it to publish a CurrentState with the encoder value
+      // in the command parameter "encoder". Callback will store value into cstate.
       hcdCmdService.oneway(currStateSetup)
+
       // Wait for a bit for callback
       Thread.sleep(100)
-
+      // Test to see if value was received
       cstate(encoder).head shouldBe expectedEncoderValue
 
-      // Unsubscribe to pubsub
+      // Unsubscribe to CurrentState
       subscription.unsubscribe()
+      //#subscribeCurrentState
 
       // DEOPSCSW-229: Provide matchers infrastructure for comparison
       // DEOPSCSW-317: Use state values of HCD to determine command completion
       // long running command which uses matcher
+      //#matcher
       val param: Parameter[Int] = encoder.set(100)
       val setupWithMatcher      = Setup(prefix, matcherCmd, obsId)
 
-      //#matcher
-
-      // create a DemandMatcher which specifies the desired state to be matched.
-      val demandMatcher = DemandMatcher(DemandState(prefix, StateName("testStateName"), Set(param)), withUnits = false, timeout)
+      // create a StateMatcher which specifies the desired algorithm and state to be matched.
+      val demandMatcher: StateMatcher = DemandMatcher(DemandState(prefix, StateName("testStateName")).add(param), withUnits = false, timeout)
 
       // create matcher instance
       val matcher = new Matcher(assemblyLocation.componentRef, demandMatcher)
@@ -302,13 +316,15 @@ class CommandServiceTest(ignore: Int)
       // start the matcher so that it is ready to receive state published by the source
       val matcherResponseF: Future[MatcherResponse] = matcher.start
 
-      // submit command and if the command is successfully validated, check for matching of demand state against current state
-      val eventualCommandResponse: Future[MatchingResponse] = async {
-        val initialResponse = await(assemblyCmdService.oneway(setupWithMatcher))
-        initialResponse match {
+      // Submit command as a oneway and if the command is successfully validated,
+      // check for matching of demand state against current state
+      val matchResponseF: Future[MatchingResponse] = async {
+        val onewayResponse:OnewayResponse = await(assemblyCmdService.oneway(setupWithMatcher))
+        onewayResponse match {
           case Accepted(runId) ⇒
             val matcherResponse = await(matcherResponseF)
             // create appropriate response if demand state was matched from among the published state or otherwise
+            // this would allow the response to be used to complete a command received by the Assembly
             matcherResponse match {
               case MatchCompleted =>
                 Completed(setupWithMatcher.runId)
@@ -324,16 +340,36 @@ class CommandServiceTest(ignore: Int)
         }
       }
 
-      val commandResponse = Await.result(eventualCommandResponse, timeout.duration)
-      //#matcher
+      val commandResponse = Await.result(matchResponseF, timeout.duration)
       commandResponse shouldBe Completed(setupWithMatcher.runId)
+      //#matcher
 
       //#onewayAndMatch
-      val eventualResponse1: Future[MatchingResponse] = assemblyCmdService.onewayAndMatch(setupWithMatcher, demandMatcher)
+      val onewayMatchF = async {
+        await(assemblyCmdService.onewayAndMatch(setupWithMatcher, demandMatcher)) match {
+          case i:Invalid =>
+            // Command was not accepted
+            log.error(s"Oneway match was not accepted: ${i.issue}")
+            i
+          case c:Completed =>
+            // Do some completed work
+            c
+          case e:Error =>
+            // Match failed and timedout generating an error - log a message
+            println("Error")
+            log.error(s"Oeway match produced an error: ${e.message}")
+            e
+          case l:Locked =>
+            // Destination component was locked, log a message
+            log.error(s"Destination component was locked")
+            l
+        }
+      }
+      Await.result(onewayMatchF, timeout.duration) shouldBe Completed(setupWithMatcher.runId)
       //#onewayAndMatch
-      Await.result(eventualResponse1, timeout.duration) shouldBe Completed(setupWithMatcher.runId)
 
       // Test failed matching
+      //#onewayMatchFail
       val setupWithFailedMatcher = Setup(prefix, matcherFailedCmd, obsId)
       val failedMatcher          = new Matcher(assemblyLocation.componentRef, demandMatcher)
 

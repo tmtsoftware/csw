@@ -159,12 +159,16 @@ for submit commands called `onSubmit` and a handler for oneway called `onOneway`
 
 Whenever a command is received by a component it is first validated. The component should
 inspect the command and its parameters to determine if the actions related to the command
-can be executed or started.
+can be executed or started. For instance, if an Assembly or HCD can only handle one command
+at a time, `validateCommand` should return an return `Invalid` if a second command is received.
 
-A command can be sent as a `Submit` or `Oneway` message to the component. If a command can be completed immediately, a `CommandResponse` indicating 
-the final response for the command can be returned. If a command requires time for processing, the component is required to validate the `ControlCommand` received
-and return a validation result as `Accepted` or `Invalid`. The final response for a command sent as `Submit` can be obtained by the sender command by querying or
-subscribing for this response to the component as described here. 
+A command can be sent as a `Submit` or `Oneway` message to the component. The `onSubmit` and `onOneway` handlers are only
+called if `validateCommand` returns `Accepted`. `Oneway` messages return their validation response or indicate the component is
+currently locked as a `OnewayResponse`.
+The `onSubmit` handler can complete the actions immediately by returning a `SubmitResponse` indicating 
+the final response (`Completed`, `CompletedWithResult`, `Error`). If the command actions require time for processing, the `onSubmit` handler 
+returns `Started` indicating to the framework that there are long-running actions. 
+More information about sending commands using `CommandService` is @ref:[here](../commons/command.md)
 
 Assembly/Scala
 :   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/AssemblyComponentHandlers.scala) { #validateCommand-handler }
@@ -182,8 +186,9 @@ If a response can be provided immediately, a final `CommandResponse` such as `Co
 
 ### onSubmit
 
-On receiving a command as `Submit`, the `onSubmit` handler is invoked for a component only if the `validateCommand` handler returns `Accepted`. In case a command 
-is received as a submit, the command response should be updated in the `CommandResponseManager`, which is an actor (A reference to it is passed to the component handler constructor). 
+On receiving a command sent using the `submit` message, the `onSubmit` handler is invoked for a component only if the `validateCommand` handler returns `Accepted`. 
+The `onSubmit` handler returns a `SubmitResponse` indicating if the command is completed immediately, or if it is long-running by returning a `Started` response. 
+The example shows one way to process `Setup` and `Observe` commands separately.
 
 Assembly/Scala
 :   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/AssemblyComponentHandlers.scala) { #onSubmit-handler }
@@ -191,16 +196,10 @@ Assembly/Scala
 Assembly/Java
 :   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JAssemblyComponentHandlers.java) { #onSubmit-handler }
 
-Hcd/Scala
-:   @@snip [HcdComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/hcd/HcdComponentHandlers.scala) { #onSubmit-handler }
-
-Hcd/Java
-:   @@snip [JHcdComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/hcd/JHcdComponentHandlers.java) { #onSubmit-handler }
-
 ### onOneway
 
-On receiving a command as `Oneway`, the `onOneway` handler is invoked for a component only if the `validateCommand` handler returns `Accepted`.In case a command 
-is received as a oneway, command response should not be provided to the sender.
+On receiving a command as `oneway`, the `onOneway` handler is invoked for a component only if the `validateCommand` handler returns `Accepted`.
+The `onOneway` handler does not return a value and a command submitted with the `oneway` does not track completion of actions. 
 
 Assembly/Scala
 :   @@snip [AssemblyComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/assembly/AssemblyComponentHandlers.scala) { #onOneway-handler }
@@ -208,8 +207,4 @@ Assembly/Scala
 Assembly/Java
 :   @@snip [JAssemblyComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/assembly/JAssemblyComponentHandlers.java) { #onOneway-handler }
 
-Hcd/Scala
-:   @@snip [HcdComponentHandlers.scala](../../../../examples/src/main/scala/csw/framework/components/hcd/HcdComponentHandlers.scala) { #onOneway-handler }
-
-Hcd/Java
-:   @@snip [JHcdComponentHandlers.java](../../../../examples/src/main/java/csw/framework/components/hcd/JHcdComponentHandlers.java) { #onOneway-handler }
+More information on handling commands is provided @ref:[here](../commons/command.md).

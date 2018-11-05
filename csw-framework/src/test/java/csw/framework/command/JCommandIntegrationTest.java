@@ -197,10 +197,8 @@ public class JCommandIntegrationTest extends JUnitSuite {
             if (r instanceof CommandResponse.Started) {
                 // happy case - no action needed
                 // Do some other work
-                System.out.println("Happy");
             } else {
                 // log.error. This indicates that the command probably failed to start.
-                System.out.println("Not happy: " + r);
             }
         });
 
@@ -233,6 +231,27 @@ public class JCommandIntegrationTest extends JUnitSuite {
         //#oneway
         // just wait for command completion so that it ll not impact other results
         onewayF.get();
+
+        //#validate
+        CompletableFuture<Boolean> validateCommandF =
+                hcdCmdService
+                        .validate(immediateCmd)
+                        .thenApply(
+                                response -> {
+                                    if (response instanceof CommandResponse.Accepted) {
+                                        //do something with completed result
+                                        return true;
+                                    } else if (response instanceof CommandResponse.Invalid) {
+                                        // do something with unexpected response
+                                        return false;
+                                    } else {
+                                        // Locked
+                                        return false;
+                                    }
+                                }
+                        );
+        Assert.assertTrue(validateCommandF.get());
+        //#validate
 
         //#query
         CompletableFuture<CommandResponse.QueryResponse> queryResponseF2 = hcdCmdService.query(longRunningSetup2.runId(), timeout);
@@ -273,15 +292,13 @@ public class JCommandIntegrationTest extends JUnitSuite {
         //#submitAllInvalid
 
         //#subscribeCurrentState
+        // Subscriber code
         int expectedEncoderValue = 234;
-        Setup currStateSetup = new Setup(prefix(), hcdCurrentState(), Optional.empty()).add(encoder.set(expectedEncoderValue));
-        // Setup a callback response to CurrentState
-        //final CurrentState cstate = new CurrentState(prefix().prefix(), new StateName("no cstate"));
-
+        Setup currStateSetup = new Setup(prefix(), hcdCurrentStateCmd(), Optional.empty()).add(encoder.set(expectedEncoderValue));
+        // Setup a callback response to CurrentState - use AtomicInteger to capture final value
         final AtomicInteger cstate = new AtomicInteger((1));
         CurrentStateSubscription subscription = hcdCmdService.subscribeCurrentState(cs -> {
             // Example sets variable outside scope of closure
-            System.out.println("Got: " + cs);
             cstate.set(cs.jGet(encoder).get().head());
         });
         // Send a oneway to the HCD that will cause a publish of a CurrentState with the encoder value
@@ -290,39 +307,35 @@ public class JCommandIntegrationTest extends JUnitSuite {
 
         // Wait for a bit for the callback
         Thread.sleep(200);
-        // Unsubscribe from CurrentState
-        subscription.unsubscribe();
         // Check to see if CurrentState has the value we sent
         Assert.assertEquals(expectedEncoderValue, cstate.get());
+
+        // Unsubscribe from CurrentState
+        subscription.unsubscribe();
         //#subscribeCurrentState
-
-
-        // Now get the final value
-        // Assert.assertEquals(new CommandResponse.Completed(controlCommand.runId()), submitResponseFuture.get());
 
 
         // DEOPSCSW-229: Provide matchers infrastructure for comparison
         // long running command which uses matcher
-        Parameter<Integer> param = JKeyType.IntKey().make("encoder").set(100);
-        Setup setup = new Setup(prefix(), matcherCmd(), Optional.empty()).add(param);
-
         //#matcher
+        Parameter<Integer> param = JKeyType.IntKey().make("encoder").set(100);
+        Setup setupWithMatcher = new Setup(prefix(), matcherCmd(), Optional.empty()).add(param);
 
-        // create a DemandMatcher which specifies the desired state to be matched.
+        // create a StateMatcher which specifies the desired algorithm and state to be matched.
         DemandMatcher demandMatcher = new DemandMatcher(new DemandState(prefix(), new StateName("testStateName")).add(param), false, timeout);
 
-        // create matcher instance
+        // create the matcher instance
         Matcher matcher = new Matcher(AkkaLocationExt.RichAkkaLocation(hcdLocation).componentRef().narrow(), demandMatcher, ec, mat);
 
         // start the matcher so that it is ready to receive state published by the source
         CompletableFuture<MatcherResponse> matcherResponseFuture = matcher.jStart();
 
-        // submit command and if the command is successfully validated, check for matching of demand state against current state
-        CompletableFuture<CommandResponse.MatchingResponse> commandResponseToBeMatched = hcdCmdService
-                .oneway(setup, timeout)
+        // Submit command as a oneway and if the command is successfully validated,
+        // check for matching of demand state against current state
+        CompletableFuture<CommandResponse.MatchingResponse> matchResponseF = hcdCmdService
+                .oneway(setupWithMatcher, timeout)
                 .thenCompose(initialCommandResponse -> {
                     if (initialCommandResponse instanceof CommandResponse.Accepted) {
-
                         return matcherResponseFuture.thenApply(matcherResponse -> {
                             if (matcherResponse.getClass().isAssignableFrom(MatcherResponses.jMatchCompleted().getClass()))
                                 return new CommandResponse.Completed(initialCommandResponse.runId());
@@ -332,35 +345,31 @@ public class JCommandIntegrationTest extends JUnitSuite {
 
                     } else {
                         matcher.stop();
-                        // Need a better error message
                         return CompletableFuture.completedFuture(new CommandResponse.Error(initialCommandResponse.runId(), "Matcher failed"));
                     }
-
                 });
 
-        CommandResponse.MatchingResponse actualResponse = commandResponseToBeMatched.get();
-        //#matcher
-        CommandResponse.Completed expectedResponse = new CommandResponse.Completed(setup.runId());
+        CommandResponse.MatchingResponse actualResponse = matchResponseF.get();
+        CommandResponse.Completed expectedResponse = new CommandResponse.Completed(setupWithMatcher.runId());
         Assert.assertEquals(expectedResponse, actualResponse);
-
+        //#matcher
 
         //#onewayAndMatch
-
         // create a DemandMatcher which specifies the desired state to be matched.
         StateMatcher stateMatcher = new DemandMatcher(new DemandState(prefix(), new StateName("testStateName")).add(param), false, timeout);
 
         // create matcher instance
-        Matcher matcher1 = new Matcher(AkkaLocationExt.RichAkkaLocation(hcdLocation).componentRef().narrow(), demandMatcher, ec, mat);
+        //Matcher matcher1 = new Matcher(AkkaLocationExt.RichAkkaLocation(hcdLocation).componentRef().narrow(), demandMatcher, ec, mat);
 
         // start the matcher so that it is ready to receive state published by the source
-        CompletableFuture<MatcherResponse> matcherResponse = matcher1.jStart();
+       // CompletableFuture<MatcherResponse> matcherResponse = matcher1.jStart();
 
         CompletableFuture<CommandResponse.MatchingResponse> matchedCommandResponse =
-                hcdCmdService.onewayAndMatch(setup, stateMatcher, timeout);
+                hcdCmdService.onewayAndMatch(setupWithMatcher, stateMatcher, timeout);
 
         //#onewayAndMatch
-        Assert.assertEquals(new CommandResponse.Completed(setup.runId()), matchedCommandResponse.get());
-        Assert.assertEquals(MatcherResponses.MatchCompleted$.MODULE$, matcherResponse.get());
+        Assert.assertEquals(new CommandResponse.Completed(setupWithMatcher.runId()), matchedCommandResponse.get());
+        //Assert.assertEquals(MatcherResponses.MatchCompleted$.MODULE$, matcherResponse.get());
     }
 
     @Test
@@ -502,5 +511,26 @@ public class JCommandIntegrationTest extends JUnitSuite {
         Assert.assertTrue(receivedStates.contains(expectedSetupCurrentState));
 
         subscription.unsubscribe();
+    }
+
+    @Test
+    public void testCRMUsageForCompletion() throws Exception {
+        Setup crmAddSetup = new Setup(prefix(), crmAddOrUpdateCmd(), Optional.empty());
+        CompletableFuture<CommandResponse.SubmitResponse> addOrUpdateCommandF =
+                hcdCmdService.submit(crmAddSetup, timeout);
+        CommandResponse.Completed expectedResponse = new CommandResponse.Completed(crmAddSetup.runId());
+        Assert.assertEquals(expectedResponse, addOrUpdateCommandF.get());
+    }
+
+    @Test
+    public void testCRMUsageForSubComands() throws Exception {
+        Setup parentSetup = new Setup(prefix(), crmParentCommandCmd(), Optional.empty());
+
+
+        Setup crmAddSetup = new Setup(prefix(), crmAddOrUpdateCmd(), Optional.empty());
+        CompletableFuture<CommandResponse.SubmitResponse> addOrUpdateCommandF =
+                hcdCmdService.submit(crmAddSetup, timeout);
+        CommandResponse.Completed expectedResponse = new CommandResponse.Completed(crmAddSetup.runId());
+        Assert.assertEquals(expectedResponse, addOrUpdateCommandF.get());
     }
 }

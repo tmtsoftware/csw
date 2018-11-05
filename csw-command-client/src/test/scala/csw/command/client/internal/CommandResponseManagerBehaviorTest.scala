@@ -88,6 +88,8 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
     // This simulates ComponentBehavior adding the command with Started - does not cause update to subscriber
     // Subscriber cannot subscribe before this happens, will not find command
     behaviorTestKit.run(AddOrUpdateCommand(Started(runId)))
+    // Simulate doSubmit returning Started for a long-running command
+    //behaviorTestKit.run(AddOrUpdateCommand(Started(runId)))
     // Subscribe succeeds no after initial Started
     behaviorTestKit.run(Subscribe(runId, commandResponseProbe.ref))
     // Simulate doSubmit returning Started for a long-running command
@@ -244,6 +246,27 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
     // Update of final sub command as Completed where other sub commands have completed earlier
     // should update the status of parent command as Completed
     commandResponseProbe.expectMessage(Completed(runId))
+  }
+
+  test("CRM queryFinal actually works") {
+    val behaviorTestKit      = createBehaviorTestKit()
+    val commandResponseProbe = TestProbe[SubmitResponse]
+
+    val parentCom = Id("0000")
+    val sub1      = Id("1111")
+    val sub2      = Id("2222")
+
+    behaviorTestKit.run(AddOrUpdateCommand(Started(parentCom)))
+    behaviorTestKit.run(Subscribe(parentCom, commandResponseProbe.ref))
+
+    behaviorTestKit.run(AddSubCommand(parentCom, sub1))
+    behaviorTestKit.run(AddSubCommand(parentCom, sub2))
+    behaviorTestKit.run(AddOrUpdateCommand(Started(parentCom)))
+
+    behaviorTestKit.run(UpdateSubCommand(Completed(sub1)))
+    behaviorTestKit.run(UpdateSubCommand(Completed(sub2)))
+
+    commandResponseProbe.expectMessage(10.seconds, Completed(parentCom))
   }
 
   test("CRM should support three level tree including sequenceId as top level") {

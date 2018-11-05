@@ -101,7 +101,7 @@ Holds Ra(Right Ascension) and Dec(Declination) values
 @@@ note
 
 This version of the `radec` parameter is a placeholder for testing. A more complete version will be added once
-details of positions are better defined.
+details of positions are better defined. 
 
 @@@
 

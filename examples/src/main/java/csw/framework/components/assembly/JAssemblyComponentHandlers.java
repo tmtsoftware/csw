@@ -111,12 +111,6 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
     public CommandResponse.ValidateCommandResponse validateCommand(ControlCommand controlCommand) {
         if (controlCommand instanceof Setup) {
             // validation for setup goes here
-            //#addOrUpdateCommand
-            // after validation of the controlCommand, update its status of successful validation as Accepted
-            CommandResponse.Accepted accepted = new CommandResponse.Accepted(controlCommand.runId());
-            // TODO - REALLY?
-            //commandResponseManager.addOrUpdateCommand(controlCommand.runId(), accepted);
-            //#addOrUpdateCommand
             return new CommandResponse.Accepted(controlCommand.runId());
         } else if (controlCommand instanceof Observe) {
             // validation for observe goes here
@@ -186,20 +180,20 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
         switch (sc.commandName().name()) {
             case "forwardToWorker":
                 //#addSubCommand
-                Prefix prefix = new Prefix("wfos.red.detector");
-                Setup subCommand = new Setup(prefix, new CommandName("sub-command-1"), sc.jMaybeObsId());
-                commandResponseManager.addSubCommand(sc.runId(), subCommand.runId());
+                Prefix prefix1 = new Prefix("wfos.red.detector");
+                Setup subCommand1 = new Setup(prefix1, new CommandName("sub-command-1"), sc.jMaybeObsId());
+                commandResponseManager.addSubCommand(sc.runId(), subCommand1.runId());
 
-                Setup subCommand2 = new Setup(prefix, new CommandName("sub-command-2"), sc.jMaybeObsId());
+                Prefix prefix2 = new Prefix("wfos.blue.detector");
+                Setup subCommand2 = new Setup(prefix2, new CommandName("sub-command-2"), sc.jMaybeObsId());
                 commandResponseManager.addSubCommand(sc.runId(), subCommand2.runId());
-
                 //#addSubCommand
 
                 //#subscribe-to-command-response-manager
                 // subscribe to the status of original command received and publish the state when its status changes to
                 // Completed
                 CommandResponse.SubmitResponse submitResponse = commandResponseManager
-                        .jQueryFinal(subCommand.runId(), Timeout.create(Duration.ofSeconds(10)))
+                        .jQueryFinal(subCommand1.runId(), Timeout.create(Duration.ofSeconds(10)))
                         .join();
 
                 if (submitResponse instanceof CommandResponse.Completed) {
@@ -212,8 +206,8 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
                 //#subscribe-to-command-response-manager
 
                 //#updateSubCommand
-                // An original command is split into sub-commands and sent to a component. The result of the command is
-                // obtained by subscribing to the component with the sub command id.
+                // An original command is split into sub-commands and sent to a component.
+                // The result from submitting the sub-commands is used to update the CRM
                 ICommandService componentCommandService = runningHcds.get(componentInfo.getConnections().get(0)).get();
                 componentCommandService.submit(subCommand2, Timeout.durationToTimeout(FiniteDuration.apply(5, TimeUnit.SECONDS)))
                         .thenAccept(commandResponse -> {
@@ -229,7 +223,7 @@ public class JAssemblyComponentHandlers extends JComponentHandlers {
                 //#query-command-response-manager
                 // query CommandResponseManager to get the current status of Command, for example: Accepted/Completed/Invalid etc.
                 commandResponseManager
-                        .jQuery(subCommand.runId(), Timeout.durationToTimeout(FiniteDuration.apply(5, "seconds")))
+                        .jQuery(subCommand1.runId(), Timeout.durationToTimeout(FiniteDuration.apply(5, "seconds")))
                         .thenAccept(commandResponse -> {
                             // may choose to publish current state to subscribers or do other operations
                         });

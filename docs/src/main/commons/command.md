@@ -216,6 +216,15 @@ Scala
 Java
 :   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #oneway }
 
+### validate
+Sometimes it may be useful to test whether or not a component can execute a command without committing to executing its
+actions. The `validate` message can be used for this purpose. `Validate` returns a `ValidateResponse` of `Accepted`, `Invalid`, or `Locked`.
+
+Scala
+:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #validate }
+
+Java
+:   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #oneway }
 
 ### query
 At any time, the `query` call of `CommandService` can be used to check the current status of
@@ -234,8 +243,6 @@ Scala/query usage
 
 Java/query usage
 :   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #query }
-
-
 
 ### submitAll
 `SubmitAll` can be used to send multiple commands sequentially to the same component.
@@ -269,22 +276,56 @@ In this case, the returned list is of length 2 rather than 3.
 
 ### subscribeCurrentState
 This method provided by `CommandService` can be used to subscribe to 
-the @ref:[CurrentState](../messages/states.md) of a component by providing a callback. 
-Subscribing results into a handle of `CurrentStateSubscription` which can be used to unsubscribe the subscription.
+the @ref:[CurrentState](../messages/states.md) of a component by providing a callback that
+is called with the arrival of every `CurrentState` item.
+ `SubscribeCurrentState` returns a handle of `CurrentStateSubscription` which should be used 
+to unsubscribe the subscription.
+
+The following example code shows an Assembly that subscribes to all `CurrentState` of an HCD.
+The example sends a `Setup` with an encoder parameter value to the HCD as a `oneway` message.
 
 Scala
-:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/LongRunningCommandTest.scala) { #subscribeCurrentState }
+:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #subscribeCurrentState }
 
 Java
 :   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #subscribeCurrentState }
 
+The second part of the example shows the code in the HCD. When the HCD receives the `oneway` message, it extracts 
+the encoder value and publishes a CurrentState item with the encoder parameter. 
+
+Scala
+:   @@snip [ComponentHandlerForCommand.scala](../../../../csw-framework/src/test/scala/csw/common/components/command/ComponentHandlerForCommand.scala) { #subscribeCurrentState }
+
+Java
+:   @@snip [JSampleComponentHandlers.java](../../../../csw-framework/src/test/java/csw/framework/javadsl/components/JSampleComponentHandlers.java) { #subscribeCurrentState }
+
+There are two `subscribeCurrentState` methods in `CommandService`. The method shown in the above examples subscribes
+the caller to *all* CurrentState published. Each `CurrentState` item has a `StateName`. A second signature for 
+`subscribeCurrentState` can include a Set of `StateName` when the caller only needs some of the CurrentState
+published by a component. 
+
 ## Matching state for command completion
 
-A `Matcher` is provided for matching state against a desired state. The matcher is created with a source of state identified
-by its ActorRef and an instance of `StateMatcher` which defines the state and criteria for matching. Several instances of 
-`StateMatcher` are available for common use. These are `DemandMatcherAll` for matching the entire `DemandState` against the current state,
-`DemandMatcher` for matching state with or without units against the current state and `PresenceMatcher` which checks if a 
-matching state is found with a provided prefix. 
+The `matcher` is provided to allow a component sending a command to use `CurrentState` published by a 
+component to determine when actions are complete. The expected case is an Assembly using the `CurrentState`
+published by an HCD. When using a `submit` completion is determined in the destination. In some
+scenarios, the Assembly may want to determine when actions are complete. This is what the
+ `matcher` allows.
+ 
+ To use this feature, the `oneway` message is used rather than `submit`. A `oneway` command is
+ validated but the framework does not provide completion. Doing a query with the `runId` of a `oneway`
+ will always return `CommandNotAvailable`, but `oneway` is perfect for use with a `matcher`.
+
+The `matcher` is created with the ActorRef of the component that is the source of 
+`CurrentState` and an instance of `StateMatcher`, which defines the state and criteria for matching. 
+
+Several types of `StateMatcher` are provided as part of CSW for common use. 
+These are `DemandMatcherAll` for matching the entire `DemandState` against the current state,
+`DemandMatcher` for matching state with or without units against the current state, 
+and `PresenceMatcher` which checks if a matching state is found with a provided prefix. 
+
+The developer is not limited to these `StateMatcher`s. Any class the implements the `StateMatcher`
+interface can be provided to a `Matcher`.
   
 Scala
 :   @@snip [LongRunningCommandTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #matcher }
@@ -292,12 +333,13 @@ Scala
 Java
 :   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #matcher }
 
+One important point is that the `matcher` is created and must be shutdown when you are finished with it using
+the `stop` method of the matcher as shown in the example.
 
 ### onewayAndMatch
-`Oneway` can be combined with a Matcher 
- a command and match the published state from the component using a `StateMatcher`. If the match is successful a `Completed` response is provided as a future. 
-In case of a failure or unmatched state, `Error` CommandResponse is provided as a Future.
-
+`CommandService` provides a short-cut called `onewayAndMatch` that combines a `oneway` and a `matcher`
+ and implements much of the boilerplate of the previous example. This can be often be used saving code. 
+ 
 Scala
 :   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #onewayAndMatch }
 

@@ -91,7 +91,8 @@ case class DemandMatcher(demand: DemandState, withUnits: Boolean = false, timeou
 case class PresenceMatcher(prefix: Prefix, stateName: StateName, timeout: Timeout) extends StateMatcher {
 
   /**
-   * A predicate to match the current state
+   * A predicate that returns true when a CurrentState is published that matches the prefix and stateName
+   * that are arguments to the PresenceMatcher
    *
    * @param current current state to be matched as represented by [[csw.params.core.states.CurrentState]]
    * @return true if match is successful, false otherwise

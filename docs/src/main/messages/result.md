@@ -1,6 +1,7 @@
 # Result
 
-Components use **Results** to return results in the form of a **ParameterSet**.
+Components use **Results** to return results in the form of a **ParameterSet**. `Result` is the value that is returned
+as an argument to the `CompletedWithResult` `SubmitResponse`. 
 
 Creating a Result Requires:
 
