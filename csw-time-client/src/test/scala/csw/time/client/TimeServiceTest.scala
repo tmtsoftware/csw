@@ -18,17 +18,29 @@ class TimeServiceTest extends FunSuite with Matchers {
     val instant               = timeService.UTCTime()
     val fixedInstant: Instant = Instant.now()
 
-    val expectedMillis = fixedInstant.toEpochMilli +- 10
+    val expectedMillis = fixedInstant.toEpochMilli +- 5
 
     instant.toEpochMilli shouldEqual expectedMillis
   }
 
-  //DEOPSCSW-533: Access parts of UTC date.time in Java and Scala
+  //DEOPSCSW-534: PTP accuracy and precision while reading UTC
   ignore("should get precision up to nanoseconds in UTC time") {
     val instant = timeService.UTCTime()
 
     println(instant)
     Utils.digits(instant.getNano) shouldEqual 9
+  }
+
+  //DEOPSCSW-536: Access parts of TAI date/time in Java and Scala
+  ignore("should get TAI time") {
+    val taiOffset = 37
+
+    val instant               = timeService.TAITime()
+    val fixedInstant: Instant = Instant.now().plusSeconds(taiOffset)
+
+    val expectedMillis = fixedInstant.toEpochMilli +- 5
+
+    instant.toEpochMilli shouldEqual expectedMillis
   }
 
 }
