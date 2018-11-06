@@ -1,10 +1,5 @@
 package csw.teskit
-import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.actor.typed.{ActorRef, ActorSystem}
 import com.typesafe.config.ConfigFactory
-import csw.command.client.messages.ContainerMessage
-import csw.command.client.models.framework.ContainerLifecycleState
 import csw.location.api.models.ComponentId
 import csw.location.api.models.ComponentType.Assembly
 import csw.location.api.models.Connection.AkkaConnection
@@ -36,8 +31,6 @@ class TestKitsExampleTest extends FunSuiteLike with BeforeAndAfterAll with Match
 
   import frameworkTestKit.frameworkWiring.actorRuntime._
   private val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient
-
-  private implicit val typed: ActorSystem[Nothing] = system.toTyped
 
   test("framework testkit example for spawning container") {
     //#spawn-using-testkit

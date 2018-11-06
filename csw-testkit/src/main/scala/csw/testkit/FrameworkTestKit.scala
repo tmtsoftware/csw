@@ -6,6 +6,7 @@ import akka.util.Timeout
 import com.typesafe.config.Config
 import csw.command.client.messages.{ComponentMessage, ContainerMessage}
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
+import csw.location.client.ActorSystemFactory
 import csw.testkit.internal.TestKitUtils
 import csw.testkit.scaladsl.CSWService
 import csw.testkit.scaladsl.CSWService._
@@ -97,7 +98,7 @@ object FrameworkTestKit {
    * @return handle to FrameworkTestKit which can be used to start and stop all services started
    */
   def apply(
-      actorSystem: ActorSystem = ActorSystem("framework"),
+      actorSystem: ActorSystem = ActorSystemFactory.remote("framework-testkit"),
       locationTestKit: LocationTestKit = LocationTestKit(),
       configTestKit: ConfigTestKit = ConfigTestKit(),
       eventTestKit: EventTestKit = EventTestKit(),
