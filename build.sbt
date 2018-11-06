@@ -126,8 +126,8 @@ lazy val `csw-location-client` = project
 lazy val `csw-location-agent` = project
   .dependsOn(
     `csw-location-client`,
-    `csw-commons`         % "test->test",
-    `csw-location-server` % "test->test"
+    `csw-commons` % "test->test",
+    `csw-testkit` % "test->compile"
   )
   .enablePlugins(DeployApp, MaybeCoverage)
   .settings(

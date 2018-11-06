@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
+// DEOPSCSW-592: Create csw testkit for component writers
 public class FrameworkTestKitJunitTest {
 
     @ClassRule

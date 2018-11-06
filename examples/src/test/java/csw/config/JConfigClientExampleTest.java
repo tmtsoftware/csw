@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 
 public class JConfigClientExampleTest {
 
+    // DEOPSCSW-592: Create csw testkit for component writers
     @ClassRule
     public static final ConfigTestKitJunitResource testKit = new ConfigTestKitJunitResource();
 

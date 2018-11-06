@@ -16,6 +16,7 @@ import scala.async.Async._
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{Await, Future}
 
+// DEOPSCSW-592: Create csw testkit for component writers
 class ConfigClientExampleTest extends ScalaTestConfigTestKit with FunSuiteLike with BeforeAndAfterEach {
 
   import configTestKit.configWiring.actorRuntime._
