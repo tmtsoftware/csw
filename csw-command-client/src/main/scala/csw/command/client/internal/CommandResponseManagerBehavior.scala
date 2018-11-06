@@ -41,8 +41,9 @@ private[internal] class CommandResponseManagerBehavior(
 ) extends MutableBehavior[CommandResponseManagerMessage] {
   private val log: Logger = loggerFactory.getLogger(ctx)
 
-  private[command] var commandResponseManagerState: CommandResponseManagerState = CommandResponseManagerState(Map.empty)
-  private[command] var commandCoRelation: CommandCorrelation                    = CommandCorrelation(Map.empty, Map.empty)
+  private[command] var commandResponseManagerState: CommandResponseManagerState       = CommandResponseManagerState(Map.empty)
+  private[command] var commandSubscribersManagerState: CommandSubscribersManagerState = CommandSubscribersManagerState(Map.empty)
+  private[command] var commandCoRelation: CommandCorrelation                          = CommandCorrelation(Map.empty, Map.empty)
 
   import CommandResponse._
 
@@ -54,11 +55,12 @@ private[internal] class CommandResponseManagerBehavior(
       case Query(runId, replyTo)                  ⇒ replyTo ! commandResponseManagerState.get(runId)
       case Subscribe(runId, replyTo)              ⇒ subscribe(runId, replyTo)
       case Unsubscribe(runId, subscriber) ⇒
-        commandResponseManagerState = commandResponseManagerState.unSubscribe(runId, subscriber)
+        commandSubscribersManagerState = commandSubscribersManagerState.unSubscribe(runId, subscriber)
       case SubscriberTerminated(subscriber) ⇒
-        commandResponseManagerState = commandResponseManagerState.removeSubscriber(subscriber)
-      case GetCommandCorrelation(replyTo)          ⇒ replyTo ! commandCoRelation
-      case GetCommandResponseManagerState(replyTo) ⇒ replyTo ! commandResponseManagerState
+        commandSubscribersManagerState = commandSubscribersManagerState.removeSubscriber(subscriber)
+      case GetCommandCorrelation(replyTo)             ⇒ replyTo ! commandCoRelation
+      case GetCommandResponseManagerState(replyTo)    ⇒ replyTo ! commandResponseManagerState
+      case GetCommandSubscribersManagerState(replyTo) ⇒ replyTo ! commandSubscribersManagerState
     }
     this
   }
@@ -78,7 +80,7 @@ private[internal] class CommandResponseManagerBehavior(
     // Also fixes a potential race condition where someone sets to final status before return from onSubmit returning Started
     if (isIntermediate(currentResponse) && isFinal(updateResponse)) {
       commandResponseManagerState = commandResponseManagerState.updateCommandStatus(updateResponse)
-      doPublish(updateResponse, commandResponseManagerState.cmdToCmdStatus(updateResponse.runId).subscribers)
+      doPublish(updateResponse, commandSubscribersManagerState.getSubscribers(updateResponse.runId))
     }
   }
 
@@ -122,7 +124,7 @@ private[internal] class CommandResponseManagerBehavior(
 
   private def subscribe(runId: Id, replyTo: ActorRef[SubmitResponse]): Unit = {
     ctx.watchWith(replyTo, SubscriberTerminated(replyTo))
-    commandResponseManagerState = commandResponseManagerState.subscribe(runId, replyTo)
+    commandSubscribersManagerState = commandSubscribersManagerState.subscribe(runId, replyTo)
     commandResponseManagerState.get(runId) match {
       case sr: SubmitResponse => publishToSubscribers(sr, Set(replyTo))
       case _                  => log.debug("Failed to find runId for subscribe.")

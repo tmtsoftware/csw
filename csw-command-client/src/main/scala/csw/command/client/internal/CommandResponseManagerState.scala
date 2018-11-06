@@ -1,24 +1,23 @@
 package csw.command.client.internal
-import akka.actor.typed.ActorRef
 import csw.params.commands.CommandResponse.{CommandNotAvailable, QueryResponse, SubmitResponse}
 import csw.params.core.models.Id
 
 /**
  * Manages state of a given command identified by a RunId
  *
- * @param cmdToCmdStatus a map of runId to CommandState
+ * @param cmdToCmdResponse a map of runId to CommandState
  */
-private[command] case class CommandResponseManagerState(cmdToCmdStatus: Map[Id, CommandState]) {
+private[command] case class CommandResponseManagerState(cmdToCmdResponse: Map[Id, SubmitResponse]) {
 
   /**
-   * Add the command with some initial state
+   * Add the command with some initial response
    *
    * @param runId command identifier
-   * @param initialState an initial state
-   * @return a new CommandResponseManagerState instance with updated cmdToCmdStatus
+   * @param initialResponse an initial response
+   * @return a new CommandResponseManagerState instance with updated cmdToCmdResponse
    */
-  def add(runId: Id, initialState: SubmitResponse): CommandResponseManagerState =
-    CommandResponseManagerState(cmdToCmdStatus.updated(runId, CommandState.init(runId, initialState)))
+  def add(runId: Id, initialResponse: SubmitResponse): CommandResponseManagerState =
+    CommandResponseManagerState(cmdToCmdResponse.updated(runId, initialResponse))
 
   /**
    * Get the current command response for the command
@@ -26,9 +25,9 @@ private[command] case class CommandResponseManagerState(cmdToCmdStatus: Map[Id, 
    * @param runId command identifier
    * @return current command response
    */
-  def get(runId: Id): QueryResponse = cmdToCmdStatus.get(runId) match {
-    case Some(cmdState) => cmdState.commandStatus
-    case None           => CommandNotAvailable(runId)
+  def get(runId: Id): QueryResponse = cmdToCmdResponse.get(runId) match {
+    case Some(cmdResponse) => cmdResponse
+    case None              => CommandNotAvailable(runId)
   }
 
   /**
@@ -38,40 +37,8 @@ private[command] case class CommandResponseManagerState(cmdToCmdStatus: Map[Id, 
    * @return a new CommandResponseManagerState instance with updated cmdToCmdStatus
    */
   def updateCommandStatus(commandResponse: SubmitResponse): CommandResponseManagerState =
-    update(commandResponse.runId, _.withCommandStatus(commandResponse))
-
-  /**
-   * Subscribe to the change in state of a Command
-   * @param runId command identifier
-   * @param actorRef the subscriber as an actor to which the updated state will be sent
-   * @return a new CommandResponseManagerState instance with updated cmdToCmdStatus
-   */
-  def subscribe(runId: Id, actorRef: ActorRef[SubmitResponse]): CommandResponseManagerState =
-    update(runId, _.addSubscriber(actorRef))
-
-  /**
-   * UnSubscribe to the change in state of a Command
-   *
-   * @param runId command identifier
-   * @param actorRef the subscriber as an actor to which the updated state was being sent
-   * @return a new CommandResponseManagerState instance with updated cmdToCmdStatus
-   */
-  def unSubscribe(runId: Id, actorRef: ActorRef[SubmitResponse]): CommandResponseManagerState =
-    update(runId, _.removeSubscriber(actorRef))
-
-  def removeSubscriber(actorRef: ActorRef[SubmitResponse]): CommandResponseManagerState = {
-    def remove(ids: List[Id], commandResponseManagerState: CommandResponseManagerState): CommandResponseManagerState = {
-      ids match {
-        case Nil                ⇒ commandResponseManagerState
-        case id :: remainingIds ⇒ remove(remainingIds, unSubscribe(id, actorRef))
-      }
-    }
-    remove(cmdToCmdStatus.keys.toList, this)
-  }
-
-  private def update(runId: Id, f: CommandState ⇒ CommandState): CommandResponseManagerState =
-    cmdToCmdStatus.get(runId) match {
-      case Some(cmdState) ⇒ CommandResponseManagerState(cmdToCmdStatus.updated(runId, f(cmdState)))
+    cmdToCmdResponse.get(commandResponse.runId) match {
+      case Some(cmdState) ⇒ CommandResponseManagerState(cmdToCmdResponse.updated(commandResponse.runId, commandResponse))
       case None           ⇒ this
     }
 }
