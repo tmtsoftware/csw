@@ -10,7 +10,7 @@ import csw.params.core.models.Id
  * @param commandStatus the current command status
  * @param subscribers the subscriber list for the change in state
  */
-private[internal] case class CommandState(commandStatus: CommandStatus, subscribers: Set[ActorRef[SubmitResponse]]) {
+private[internal] case class CommandState(commandStatus: SubmitResponse, subscribers: Set[ActorRef[SubmitResponse]]) {
 
   /**
    * Add a new subscriber for change in state
@@ -36,7 +36,7 @@ private[internal] case class CommandState(commandStatus: CommandStatus, subscrib
    * @return a new CommandState instance with the current state as provided command response
    */
   def withCommandStatus(commandResponse: SubmitResponse): CommandState =
-    copy(commandStatus = this.commandStatus.withCommandResponse(commandResponse))
+    copy(commandStatus = commandResponse)
 
 }
 
@@ -50,5 +50,5 @@ private[internal] object CommandState {
    * @return a new command state
    */
   def init(runId: Id, initialState: SubmitResponse): CommandState =
-    CommandState(CommandStatus(runId, initialState), Set.empty)
+    CommandState(initialState, Set.empty)
 }

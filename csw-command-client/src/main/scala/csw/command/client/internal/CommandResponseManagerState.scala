@@ -27,7 +27,7 @@ private[command] case class CommandResponseManagerState(cmdToCmdStatus: Map[Id, 
    * @return current command response
    */
   def get(runId: Id): QueryResponse = cmdToCmdStatus.get(runId) match {
-    case Some(cmdState) => cmdState.commandStatus.currentCmdStatus
+    case Some(cmdState) => cmdState.commandStatus
     case None           => CommandNotAvailable(runId)
   }
 

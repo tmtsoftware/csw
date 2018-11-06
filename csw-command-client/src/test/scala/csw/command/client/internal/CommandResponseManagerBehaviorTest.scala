@@ -164,7 +164,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
 
     behaviorTestKit.run(GetCommandResponseManagerState(commandResponseManagerStateProbe.ref))
     val commandResponseManagerState = commandResponseManagerStateProbe.expectMessageType[CommandResponseManagerState]
-    commandResponseManagerState.cmdToCmdStatus(runId).commandStatus.currentCmdStatus shouldBe Completed(runId)
+    commandResponseManagerState.cmdToCmdStatus(runId).commandStatus shouldBe Completed(runId)
 
     commandResponseProbe1.expectMessage(Completed(runId))
     commandResponseProbe2.expectMessage(Completed(runId))
