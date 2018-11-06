@@ -6,6 +6,16 @@ import org.junit.rules.ExternalResource
 /**
  * A Junit external resource for the [[LocationTestKit]], making it possible to have Junit manage the lifecycle of the testkit.
  * The testkit will be automatically shut down when the test completes or fails.
+ *
+ * Example:
+ * {{{
+ * public class JLocationExampleTest {
+ *
+ *  @ClassRule
+ *  public static final LocationTestKitJunitResource testKit = new LocationTestKitJunitResource();
+ *
+ * }
+ * }}}
  */
 final class LocationTestKitJunitResource(val locationTestKit: LocationTestKit) extends ExternalResource {
 

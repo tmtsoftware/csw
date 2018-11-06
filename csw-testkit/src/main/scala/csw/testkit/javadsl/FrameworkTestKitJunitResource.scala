@@ -12,6 +12,24 @@ import scala.collection.JavaConverters.iterableAsScalaIterableConverter
 /**
  * A Junit external resource for the [[FrameworkTestKit]], making it possible to have Junit manage the lifecycle of the testkit.
  * The testkit will be automatically shut down when the test completes or fails.
+ *
+ * Example:
+ * {{{
+ * public class JFrameworkExampleTest {
+ *
+ *  @ClassRule
+ *   public static final FrameworkTestKitJunitResource testKit =
+ *   new FrameworkTestKitJunitResource(JCSWService.EventStore, JCSWService.ConfigServer);
+ *
+ *   @Test
+ *   public void spawnContainer() {
+ *      ActorRef<ContainerMessage> containerRef =
+ *      testKit.frameworkTestKit().spawnContainer(ConfigFactory.load("container.conf"))
+ *   }
+ *
+ * }
+ * }}}
+ *
  */
 final class FrameworkTestKitJunitResource(val frameworkTestKit: FrameworkTestKit, services: java.util.List[CSWService])
     extends ExternalResource {
