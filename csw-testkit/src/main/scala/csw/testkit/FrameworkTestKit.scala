@@ -58,7 +58,7 @@ final class FrameworkTestKit private (
    * @note before calling this, make sure you have started location server and other pre-requisite services
    *       use one of [FrameworkTestKit#startAll] or [FrameworkTestKit#start] method to start services
    */
-  def spawnStandaloneComponent(config: Config): ActorRef[ComponentMessage] =
+  def spawnStandalone(config: Config): ActorRef[ComponentMessage] =
     TestKitUtils.await(Standalone.spawn(config, frameworkWiring), timeout)
 
   /**

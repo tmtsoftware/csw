@@ -49,8 +49,7 @@ Similarly you can use other testkits. Please refer API docs for more details.
 ### Spawning components
 
 `FrameworkTestKit` provides easy way to spawn components in `Container` or `Standalone` mode.
-Use `spawnContainer` method provided by `FrameworkTestKit` to start components in container mode and
-`spawnStandaloneComponent` method to start component in standalone mode.
+Use `spawnContainer` method provided by `FrameworkTestKit` to start components in container mode and`spawnStandalone` method to start component in standalone mode.
 
 Below example show how to spawn container or component in standalone mode using framework testkit.
 
@@ -61,5 +60,21 @@ Java
 :   @@snip [TestKitsExampleTest.scala](../../../../examples/src/test/java/csw/testkit/JTestKitsExampleTest.java) { #spawn-using-testkit }
 
 Full source at GitHub
+
 * @github[Scala](/examples/src/test/scala/csw/teskit/TestKitsExampleTest.scala)
 * @github[Java](/examples/src/test/java/csw/testkit/JTestKitsExampleTest.java)
+
+## Test framework integration
+
+### ScalaTest
+If you are using ScalaTest then you can extend `csw.testkit.scaladsl.ScalaTestFrameworkTestKit` to have framework test kit automatically start provided services before running tests and shutdown it when the test is complete. 
+This is done in `beforeAll` and `afterAll` from the `BeforeAndAfterAll` trait. If you override that method you should call `super.beforeAll` to start services and `super.afterAll` to shutdown the test kit.
+
+### JUnit
+If you are using JUnit then you can use `csw.testkit.javadsl.FrameworkTestKitJunitResource` to have the framework test kit automatically start provided services before running tests and shutdown it when the test is complete.
+
+Scala
+:   @@snip [ScalaTestExampleIntegrationTest.scala](../../../../examples/src/test/scala/csw/teskit/ScalaTestIntegrationExampleTest.scala) { #scalatest-testkit }
+
+Java
+:   @@snip [JUnitIntegrationExampleTest.scala](../../../../examples/src/test/java/csw/testkit/JUnitIntegrationExampleTest.java) { #junit-testkit }

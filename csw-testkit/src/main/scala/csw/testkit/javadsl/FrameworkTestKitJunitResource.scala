@@ -3,6 +3,9 @@ package csw.testkit.javadsl
 import java.util.Collections
 
 import akka.actor.ActorSystem
+import akka.actor.typed.ActorRef
+import com.typesafe.config.Config
+import csw.command.client.messages.{ComponentMessage, ContainerMessage}
 import csw.testkit._
 import csw.testkit.scaladsl.CSWService
 import org.junit.rules.ExternalResource
@@ -49,6 +52,10 @@ final class FrameworkTestKitJunitResource(val frameworkTestKit: FrameworkTestKit
 
   /** Initialize testkit with provided actorSystem */
   def this(actorSystem: ActorSystem) = this(FrameworkTestKit(actorSystem), Collections.emptyList())
+
+  def spawnContainer(config: Config): ActorRef[ContainerMessage] = frameworkTestKit.spawnContainer(config)
+
+  def spawnStandalone(config: Config): ActorRef[ComponentMessage] = frameworkTestKit.spawnStandalone(config)
 
   /**
    * Start FrameworkTestKit.
