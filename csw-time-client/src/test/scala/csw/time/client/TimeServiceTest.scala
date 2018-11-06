@@ -3,6 +3,7 @@ package csw.time.client
 import java.time._
 
 import csw.time.api.TimeService
+import csw.time.client.tags.Linux
 import org.scalatest.{FunSuite, Matchers}
 
 class TimeServiceTest extends FunSuite with Matchers {
@@ -24,7 +25,7 @@ class TimeServiceTest extends FunSuite with Matchers {
   }
 
   //DEOPSCSW-534: PTP accuracy and precision while reading UTC
-  ignore("should get precision up to nanoseconds in UTC time") {
+  test("should get precision up to nanoseconds in UTC time", Linux) {
     val instant = timeService.UTCTime()
 
     println(instant)
@@ -32,7 +33,7 @@ class TimeServiceTest extends FunSuite with Matchers {
   }
 
   //DEOPSCSW-536: Access parts of TAI date/time in Java and Scala
-  ignore("should get TAI time") {
+  test("should get TAI time", Linux) {
     val taiOffset = 37
 
     val instant               = timeService.TAITime()
