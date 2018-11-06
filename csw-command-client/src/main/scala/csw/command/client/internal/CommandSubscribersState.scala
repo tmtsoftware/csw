@@ -9,7 +9,7 @@ import csw.params.core.models.Id
  *
  * @param cmdToSubscribers a map of runId to subscribers
  */
-private[command] case class CommandSubscribersManagerState(cmdToSubscribers: Map[Id, Set[ActorRef[SubmitResponse]]]) {
+private[command] case class CommandSubscribersState(cmdToSubscribers: Map[Id, Set[ActorRef[SubmitResponse]]]) {
 
   /**
    * Add a new subscriber for change in state
@@ -18,12 +18,12 @@ private[command] case class CommandSubscribersManagerState(cmdToSubscribers: Map
    * @param subscriber the subscriber as an actor to which the updated state will be sent
    * @return a new CommandSubscribersManagerState instance with updated subscribers
    */
-  def subscribe(runId: Id, subscriber: ActorRef[SubmitResponse]): CommandSubscribersManagerState = {
+  def subscribe(runId: Id, subscriber: ActorRef[SubmitResponse]): CommandSubscribersState = {
     val updatedCmdToSubscribers: Map[Id, Set[ActorRef[SubmitResponse]]] = cmdToSubscribers.get(runId) match {
       case Some(subscribers) => cmdToSubscribers.updated(runId, subscribers + subscriber)
       case None              => cmdToSubscribers.updated(runId, Set(subscriber))
     }
-    CommandSubscribersManagerState(cmdToSubscribers = updatedCmdToSubscribers)
+    CommandSubscribersState(cmdToSubscribers = updatedCmdToSubscribers)
   }
 
   /**
@@ -33,12 +33,12 @@ private[command] case class CommandSubscribersManagerState(cmdToSubscribers: Map
    * @param subscriber the subscriber as an actor to which the updated state will be sent
    * @return a new CommandSubscribersManagerState instance with updated subscribers
    */
-  def unSubscribe(runId: Id, subscriber: ActorRef[SubmitResponse]): CommandSubscribersManagerState = {
+  def unSubscribe(runId: Id, subscriber: ActorRef[SubmitResponse]): CommandSubscribersState = {
     val updatedCmdToSubscribers: Map[Id, Set[ActorRef[SubmitResponse]]] = cmdToSubscribers.get(runId) match {
       case Some(subscribers) => cmdToSubscribers.updated(runId, subscribers - subscriber)
       case None              => cmdToSubscribers
     }
-    CommandSubscribersManagerState(cmdToSubscribers = updatedCmdToSubscribers)
+    CommandSubscribersState(cmdToSubscribers = updatedCmdToSubscribers)
   }
 
   /**
@@ -52,8 +52,8 @@ private[command] case class CommandSubscribersManagerState(cmdToSubscribers: Map
     case None              => Set.empty
   }
 
-  def removeSubscriber(actorRef: ActorRef[SubmitResponse]): CommandSubscribersManagerState = {
-    def remove(ids: List[Id], commandSubscribersManagerState: CommandSubscribersManagerState): CommandSubscribersManagerState = {
+  def removeSubscriber(actorRef: ActorRef[SubmitResponse]): CommandSubscribersState = {
+    def remove(ids: List[Id], commandSubscribersManagerState: CommandSubscribersState): CommandSubscribersState = {
       ids match {
         case Nil                ⇒ commandSubscribersManagerState
         case id :: remainingIds ⇒ remove(remainingIds, unSubscribe(id, actorRef))

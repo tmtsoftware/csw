@@ -41,9 +41,9 @@ private[internal] class CommandResponseManagerBehavior(
 ) extends MutableBehavior[CommandResponseManagerMessage] {
   private val log: Logger = loggerFactory.getLogger(ctx)
 
-  private[command] var commandResponseManagerState: CommandResponseManagerState       = CommandResponseManagerState(Map.empty)
-  private[command] var commandSubscribersManagerState: CommandSubscribersManagerState = CommandSubscribersManagerState(Map.empty)
-  private[command] var commandCoRelation: CommandCorrelation                          = CommandCorrelation(Map.empty, Map.empty)
+  private[command] var commandResponseState: CommandResponseState       = CommandResponseState(Map.empty)
+  private[command] var commandSubscribersState: CommandSubscribersState = CommandSubscribersState(Map.empty)
+  private[command] var commandCoRelation: CommandCorrelation            = CommandCorrelation(Map.empty, Map.empty)
 
   import CommandResponse._
 
@@ -52,35 +52,35 @@ private[internal] class CommandResponseManagerBehavior(
       case AddOrUpdateCommand(cmdStatus)          ⇒ addOrUpdateCommand(cmdStatus)
       case AddSubCommand(parentRunId, childRunId) ⇒ commandCoRelation = commandCoRelation.add(parentRunId, childRunId)
       case UpdateSubCommand(cmdStatus)            ⇒ updateSubCommand(cmdStatus)
-      case Query(runId, replyTo)                  ⇒ replyTo ! commandResponseManagerState.get(runId)
+      case Query(runId, replyTo)                  ⇒ replyTo ! commandResponseState.get(runId)
       case Subscribe(runId, replyTo)              ⇒ subscribe(runId, replyTo)
       case Unsubscribe(runId, subscriber) ⇒
-        commandSubscribersManagerState = commandSubscribersManagerState.unSubscribe(runId, subscriber)
+        commandSubscribersState = commandSubscribersState.unSubscribe(runId, subscriber)
       case SubscriberTerminated(subscriber) ⇒
-        commandSubscribersManagerState = commandSubscribersManagerState.removeSubscriber(subscriber)
-      case GetCommandCorrelation(replyTo)             ⇒ replyTo ! commandCoRelation
-      case GetCommandResponseManagerState(replyTo)    ⇒ replyTo ! commandResponseManagerState
-      case GetCommandSubscribersManagerState(replyTo) ⇒ replyTo ! commandSubscribersManagerState
+        commandSubscribersState = commandSubscribersState.removeSubscriber(subscriber)
+      case GetCommandCorrelation(replyTo)      ⇒ replyTo ! commandCoRelation
+      case GetCommandResponseState(replyTo)    ⇒ replyTo ! commandResponseState
+      case GetCommandSubscribersState(replyTo) ⇒ replyTo ! commandSubscribersState
     }
     this
   }
 
   // This is where the command is initially added. Note that every Submit is added as "Started"/Intermediate
   private def addOrUpdateCommand(commandResponse: SubmitResponse): Unit =
-    commandResponseManagerState.get(commandResponse.runId) match {
+    commandResponseState.get(commandResponse.runId) match {
       case _: CommandNotAvailable ⇒
-        commandResponseManagerState = commandResponseManagerState.add(commandResponse.runId, commandResponse)
+        commandResponseState = commandResponseState.add(commandResponse.runId, commandResponse)
       case _ ⇒ updateCommand(commandResponse.runId, commandResponse)
     }
 
   private def updateCommand(runId: Id, updateResponse: SubmitResponse): Unit = {
-    val currentResponse = commandResponseManagerState.get(runId)
+    val currentResponse = commandResponseState.get(runId)
     // Note that commands are added with state Started by ComponentBehavior
     // Also makes sure that once it is final, it is final and can't be set back to Started
     // Also fixes a potential race condition where someone sets to final status before return from onSubmit returning Started
     if (isIntermediate(currentResponse) && isFinal(updateResponse)) {
-      commandResponseManagerState = commandResponseManagerState.updateCommandStatus(updateResponse)
-      doPublish(updateResponse, commandSubscribersManagerState.getSubscribers(updateResponse.runId))
+      commandResponseState = commandResponseState.updateCommandStatus(updateResponse)
+      doPublish(updateResponse, commandSubscribersState.getSubscribers(updateResponse.runId))
     }
   }
 
@@ -93,7 +93,7 @@ private[internal] class CommandResponseManagerBehavior(
 
   private def updateParent(parentRunId: Id, childCommandResponse: SubmitResponse): Unit =
     // Is the parent in the Started/Intermediate
-    if (isIntermediate(commandResponseManagerState.get(parentRunId))) {
+    if (isIntermediate(commandResponseState.get(parentRunId))) {
       // If the child is positive, update parent
       if (isPositive(childCommandResponse)) {
         updateParentForChild(parentRunId, childCommandResponse)
@@ -124,8 +124,8 @@ private[internal] class CommandResponseManagerBehavior(
 
   private def subscribe(runId: Id, replyTo: ActorRef[SubmitResponse]): Unit = {
     ctx.watchWith(replyTo, SubscriberTerminated(replyTo))
-    commandSubscribersManagerState = commandSubscribersManagerState.subscribe(runId, replyTo)
-    commandResponseManagerState.get(runId) match {
+    commandSubscribersState = commandSubscribersState.subscribe(runId, replyTo)
+    commandResponseState.get(runId) match {
       case sr: SubmitResponse => publishToSubscribers(sr, Set(replyTo))
       case _                  => log.debug("Failed to find runId for subscribe.")
     }
