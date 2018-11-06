@@ -1,20 +1,18 @@
 package csw.testkit;
 
 import akka.actor.ActorSystem;
-import akka.actor.typed.ActorRef;
 import akka.stream.ActorMaterializer;
 import com.typesafe.config.ConfigFactory;
-import csw.command.client.messages.ComponentMessage;
-import csw.command.client.messages.ContainerMessage;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.api.models.AkkaLocation;
 import csw.location.api.models.ComponentId;
 import csw.location.api.models.Connection.AkkaConnection;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;
 import csw.testkit.javadsl.JCSWService;
-import org.jboss.netty.logging.InternalLoggerFactory;
-import org.jboss.netty.logging.Slf4JLoggerFactory;
-import org.junit.*;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import java.time.Duration;
 import java.util.Optional;
@@ -47,8 +45,7 @@ public class JTestKitsExampleTest {
         //#spawn-using-testkit
 
         // starting container from container config using testkit
-        ActorRef<ContainerMessage> containerRef =
-                frameworkTestKit.spawnContainer(ConfigFactory.load("SampleContainer.conf"));
+        frameworkTestKit.spawnContainer(ConfigFactory.load("SampleContainer.conf"));
 
         // starting standalone component from config using testkit
         // ActorRef<ComponentMessage> componentRef =

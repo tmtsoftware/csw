@@ -22,12 +22,12 @@ import scala.collection.JavaConverters.iterableAsScalaIterableConverter
  *
  *  @ClassRule
  *   public static final FrameworkTestKitJunitResource testKit =
- *   new FrameworkTestKitJunitResource(JCSWService.EventStore, JCSWService.ConfigServer);
+ *      new FrameworkTestKitJunitResource(JCSWService.EventStore, JCSWService.ConfigServer);
  *
  *   @Test
  *   public void spawnContainer() {
  *      ActorRef<ContainerMessage> containerRef =
- *      testKit.frameworkTestKit().spawnContainer(ConfigFactory.load("container.conf"))
+ *      testKit.spawnContainer(ConfigFactory.load("container.conf"))
  *   }
  *
  * }
