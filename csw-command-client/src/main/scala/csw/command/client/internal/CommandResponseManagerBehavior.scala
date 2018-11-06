@@ -78,19 +78,9 @@ private[internal] class CommandResponseManagerBehavior(
     // Note that commands are added with state Started by ComponentBehavior
     // Also makes sure that once it is final, it is final and can't be set back to Started
     // Also fixes a potential race condition where someone sets to final status before return from onSubmit returning Started
-<<<<<<< HEAD
     if (isIntermediate(currentResponse) && isFinal(updateResponse)) {
       commandResponseState = commandResponseState.updateCommandStatus(updateResponse)
       doPublish(updateResponse, commandSubscribersState.getSubscribers(updateResponse.runId))
-=======
-    if (isIntermediate(currentResponse)) {
-      if (isFinal(updateResponse)) {
-        commandResponseManagerState = commandResponseManagerState.updateCommandStatus(updateResponse)
-        doPublish(updateResponse, commandResponseManagerState.cmdToCmdStatus(updateResponse.runId).subscribers)
-      }
-      // This means that even if not final (i.e. Intermediate/Started) it will publish a Started
-      //doPublish(updateResponse, commandResponseManagerState.cmdToCmdStatus(updateResponse.runId).subscribers)
->>>>>>> Removed change to CommandResponseManager after discussion with Poorva and Pritam.
     }
   }
 
