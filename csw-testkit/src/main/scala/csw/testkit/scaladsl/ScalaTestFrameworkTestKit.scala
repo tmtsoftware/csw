@@ -2,6 +2,14 @@ package csw.testkit.scaladsl
 import akka.actor.ActorSystem
 import csw.testkit._
 
+/**
+ * A ScalaTest base class for the [[FrameworkTestKit]], making it possible to have ScalaTest manage the lifecycle of the testkit.
+ *
+ * The testkit will be automatically start list of provided [[CSWService]]
+ * and shut down all started [[CSWService]] when the test completes or fails using ScalaTest's BeforeAndAfterAll trait.
+ *
+ * If a spec overrides beforeAll or afterAll, it must call super.beforeAll and super.afterAll respectively.
+ */
 abstract class ScalaTestFrameworkTestKit(val frameworkTestKit: FrameworkTestKit, services: CSWService*) extends ScalaTestBase {
 
   /** Initialize testkit with default configuration
