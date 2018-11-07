@@ -13,10 +13,10 @@ import csw.testkit.redis.RedisStore
 
 final class EventTestKit private (testKitSettings: TestKitSettings = TestKitSettings(ConfigFactory.load())) extends RedisStore {
 
-  override implicit lazy val system: ActorSystem   = ActorSystem("event-test-kit")
-  override implicit val timeout: Timeout           = testKitSettings.DefaultTimeout
-  override protected val masterId: String          = system.settings.config.getString("csw-event.redis.masterId")
-  override protected val connection: TcpConnection = EventServiceConnection.value
+  override implicit lazy val system: ActorSystem        = ActorSystem("event-test-kit")
+  override implicit lazy val timeout: Timeout           = testKitSettings.DefaultTimeout
+  override protected lazy val masterId: String          = system.settings.config.getString("csw-event.redis.masterId")
+  override protected lazy val connection: TcpConnection = EventServiceConnection.value
 
   private def getSentinelPort: Int = testKitSettings.EventSentinelPort.getOrElse(getFreePort)
   private def getMasterPort: Int   = testKitSettings.EventMasterPort.getOrElse(getFreePort)

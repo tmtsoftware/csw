@@ -2,6 +2,7 @@ package csw.testkit.redis
 import java.util.Optional
 
 import akka.actor.{ActorSystem, CoordinatedShutdown}
+import akka.http.scaladsl.Http
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
 import csw.location.api.models.Connection.TcpConnection
@@ -27,7 +28,7 @@ private[testkit] trait RedisStore extends EmbeddedRedis {
   var redisSentinel: Option[RedisSentinel] = None
   var redisServer: Option[RedisServer]     = None
 
-  def locationService: LocationService = HttpLocationServiceFactory.makeLocalClient
+  implicit lazy val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient
 
   def start(sentinelPort: Int = getFreePort, serverPort: Int = getFreePort): RegistrationResult = {
     val tuple = startSentinel(sentinelPort, serverPort, masterId)
@@ -43,6 +44,7 @@ private[testkit] trait RedisStore extends EmbeddedRedis {
   def shutdown(): Unit = {
     redisServer.foreach(_.stop())
     redisSentinel.foreach(_.stop())
+    TestKitUtils.await(Http().shutdownAllConnectionPools(), timeout)
     TestKitUtils.coordShutdown(CoordinatedShutdown(system).run, timeout)
   }
 }

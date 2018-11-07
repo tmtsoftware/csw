@@ -16,6 +16,7 @@ import csw.event.client.pb.PbConverter;
 import csw_protobuf.events.PbEvent;
 import org.junit.Assert;
 import org.junit.Test;
+import org.scalatest.junit.JUnitSuite;
 import play.api.libs.json.JsValue;
 import play.api.libs.json.Json;
 
@@ -23,7 +24,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class JEventsTest {
+public class JEventsTest extends JUnitSuite {
 
     @Test
     public void showUsageOfEventTime() {

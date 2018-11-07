@@ -13,6 +13,7 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.scalatest.junit.JUnitSuite;
 
 import java.time.Duration;
 import java.util.Optional;
@@ -20,7 +21,7 @@ import java.util.concurrent.ExecutionException;
 
 import static csw.location.api.javadsl.JComponentType.Assembly;
 
-public class JTestKitsExampleTest {
+public class JTestKitsExampleTest extends JUnitSuite {
 
     //#framework-testkit
     private static FrameworkTestKit frameworkTestKit = FrameworkTestKit.create();

@@ -6,10 +6,11 @@ import csw.testkit.javadsl.FrameworkTestKitJunitResource;
 import csw.testkit.javadsl.JCSWService;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.scalatest.junit.JUnitSuite;
 
 import java.util.Arrays;
 
-public class JUnitIntegrationExampleTest {
+public class JUnitIntegrationExampleTest extends JUnitSuite {
 
     @ClassRule
     public static final FrameworkTestKitJunitResource testKit =

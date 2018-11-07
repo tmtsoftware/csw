@@ -12,6 +12,7 @@ import csw.params.core.states.StateName;
 import csw.params.javadsl.JKeyType;
 import org.junit.Assert;
 import org.junit.Test;
+import org.scalatest.junit.JUnitSuite;
 import play.api.libs.json.JsValue;
 import play.api.libs.json.Json;
 
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
 import static csw.params.javadsl.JUnits.NoUnits;
 import static csw.params.javadsl.JUnits.meter;
 
-public class JStateVariablesTest {
+public class JStateVariablesTest extends JUnitSuite {
 
     @Test
     public void showUsageOfDemandState() {

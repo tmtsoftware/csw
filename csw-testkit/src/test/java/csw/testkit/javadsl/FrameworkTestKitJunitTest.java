@@ -13,13 +13,14 @@ import csw.location.client.javadsl.JHttpLocationServiceFactory;
 import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.scalatest.junit.JUnitSuite;
 
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 // DEOPSCSW-592: Create csw testkit for component writers
-public class FrameworkTestKitJunitTest {
+public class FrameworkTestKitJunitTest extends JUnitSuite {
 
     @ClassRule
     public static final FrameworkTestKitJunitResource testKit =

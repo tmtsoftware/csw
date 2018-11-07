@@ -11,13 +11,13 @@ import csw.location.api.models.Connection.TcpConnection
 import csw.location.api.models.{ComponentId, ComponentType}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.network.utils.Networks
-import csw.testkit.scaladsl.ScalaTestLocationTestKit
+import csw.testkit.scaladsl.ScalaTestFrameworkTestKit
 import org.scalatest.FunSuiteLike
 
 import scala.concurrent.duration._
 
 // DEOPSCSW-592: Create csw testkit for component writers
-class MainTest extends ScalaTestLocationTestKit with FunSuiteLike {
+class MainTest extends ScalaTestFrameworkTestKit with FunSuiteLike {
 
   implicit private val system: ActorSystem    = ActorSystem()
   implicit private val mat: ActorMaterializer = ActorMaterializer()

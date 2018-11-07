@@ -2,6 +2,7 @@ package csw.testkit
 
 import akka.actor.ActorSystem
 import akka.actor.typed.ActorRef
+import akka.http.scaladsl.Http
 import akka.util.Timeout
 import com.typesafe.config.Config
 import csw.command.client.messages.{ComponentMessage, ContainerMessage}
@@ -21,8 +22,8 @@ final class FrameworkTestKit private (
     val alarmTestKit: AlarmTestKit
 ) {
 
-  val frameworkWiring: FrameworkWiring = FrameworkWiring.make(actorSystem)
-  implicit val timeout: Timeout        = locationTestKit.testKitSettings.DefaultTimeout
+  lazy val frameworkWiring: FrameworkWiring = FrameworkWiring.make(actorSystem)
+  implicit val timeout: Timeout             = locationTestKit.testKitSettings.DefaultTimeout
 
   private var configStarted = false
   private var eventStarted  = false
@@ -80,6 +81,7 @@ final class FrameworkTestKit private (
     if (configStarted) configTestKit.shutdownConfigServer()
     if (eventStarted) eventTestKit.shutdown()
     if (alarmStarted) alarmTestKit.shutdown()
+    TestKitUtils.await(Http(frameworkWiring.actorSystem).shutdownAllConnectionPools(), timeout)
     TestKitUtils.coordShutdown(frameworkWiring.actorRuntime.shutdown, timeout)
     locationTestKit.shutdownLocationServer()
   }

@@ -10,13 +10,14 @@ import csw.params.core.models.ObsId;
 import csw.params.core.models.Id;
 import org.junit.Assert;
 import org.junit.Test;
+import org.scalatest.junit.JUnitSuite;
 import play.api.libs.json.JsValue;
 import play.api.libs.json.Json;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class JResultTest {
+public class JResultTest extends JUnitSuite {
 
     //#runid
     Id runId = Id.apply();
