@@ -1,15 +1,11 @@
 package csw.testkit.javadsl;
 
-import akka.actor.ActorSystem;
-import akka.stream.ActorMaterializer;
-import akka.stream.Materializer;
 import csw.alarm.client.internal.commons.AlarmServiceConnection;
 import csw.config.server.commons.ConfigServiceConnection;
 import csw.event.client.internal.commons.EventServiceConnection;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.api.models.HttpLocation;
 import csw.location.api.models.TcpLocation;
-import csw.location.client.javadsl.JHttpLocationServiceFactory;
 import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -26,10 +22,7 @@ public class FrameworkTestKitJunitTest extends JUnitSuite {
     public static final FrameworkTestKitJunitResource testKit =
             new FrameworkTestKitJunitResource(Arrays.asList(JCSWService.AlarmStore, JCSWService.ConfigServer));
 
-    private ActorSystem system = testKit.frameworkTestKit().actorSystem();
-    private Materializer mat = ActorMaterializer.create(system);
-
-    private ILocationService locationService = JHttpLocationServiceFactory.makeLocalClient(system, mat);
+    private ILocationService locationService = testKit.jLocationService();
 
     @Test
     public void shouldStartAllProvidedCSWServices() throws ExecutionException, InterruptedException {

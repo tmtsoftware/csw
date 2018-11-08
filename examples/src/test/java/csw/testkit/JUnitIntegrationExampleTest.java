@@ -17,7 +17,7 @@ public class JUnitIntegrationExampleTest extends JUnitSuite {
             new FrameworkTestKitJunitResource(Arrays.asList(JCSWService.AlarmStore, JCSWService.EventStore));
 
     @Test
-    public void testSpwaningComponentInStandaloneMode() {
+    public void testSpawningComponentInStandaloneMode() {
         testKit.spawnStandalone(ConfigFactory.load("SampleHcdStandalone.conf"));
 
          // ... assertions etc.

@@ -32,8 +32,10 @@ abstract class ScalaTestFrameworkTestKit(val frameworkTestKit: FrameworkTestKit,
   /** Initialize testkit with provided actorSystem */
   def this(actorSystem: ActorSystem) = this(FrameworkTestKit(actorSystem))
 
+  /** Delegate to framework testkit */
   def spawnContainer(config: Config): ActorRef[ContainerMessage] = frameworkTestKit.spawnContainer(config)
 
+  /** Delegate to framework testkit */
   def spawnStandalone(config: Config): ActorRef[ComponentMessage] = frameworkTestKit.spawnStandalone(config)
 
   /**

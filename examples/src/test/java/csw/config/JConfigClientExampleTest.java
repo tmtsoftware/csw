@@ -38,8 +38,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
     private static ActorSystem actorSystem = configWiring.actorSystem();
     private static Materializer mat = configWiring.actorRuntime().mat();
 
-    private static ILocationService clientLocationService =
-            JHttpLocationServiceFactory.makeLocalClient(actorSystem, mat);
+    private static ILocationService clientLocationService = testKit.jLocationService();
 
     //#create-api
     //config client API
