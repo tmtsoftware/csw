@@ -4,6 +4,7 @@
  - [Getting Started](commons/getting-started.md)
  - [Creating a Component](commons/create-component.md)
  - [Working with Multiple Components](commons/multiple-components.md)
+ - [Using Alarms](commons/using-alarms.md)
  - [Messages](commons/messages.md)
  - [Framework](commons/framework.md)
  - [Commands](commons/command.md)
@@ -143,6 +144,43 @@ connection information for components sending commands with CCS.
 In the system design each observing mode has a sequencer that consists of one or more OMOA
 Sequence Components. Commands flow down through the Sequence Components to the
 Assemblies, HCDs and hardware in a hierarchy.
+
+### @ref:[Event Service](services/event.md)
+In an event-driven system, an event marks the occurrence of a state change, action, or activity
+that is of interest in the system. In TMT many interactions between systems are best viewed as
+being event-driven. For instance, Observe Events are used by a science detector to indicate
+when activities have occurred such as closing the shutter at the conclusion of a science
+observation. The TCS Pointing Assembly sends pointing demand events to mechanisms
+throughout the software system.
+
+The Event Service is bsed on the publish/subscribe messaging paradigm.
+One component publishes an event and all components that have subscribed receive the event.
+The advantage of this type of message system is that publishers and subscribers are decoupled.
+Publishers can publish regardless of whether there are subscribers, and subscribers can
+subscribe even if there are no publishers. The relationship between publishers and subscribers
+can be one-to-one, one-to-many, many to one, or even many-to-many. Another advantage of 
+publish-subscribe systems is that components and systems can startup and stop independently
+without requiring special interactions or startup sequences with other systems.
+The publish-subscribe pattern also allows the creation of event dependencies between systems
+that are difficult to track but must be managed. Dependencies can be passive or active. When a
+component subscribes to a topic, but takes no action based on the value it is called a passive
+dependency. For instance, a GUI display could subscribe to the current position of an instrument
+filter but take no action other than displaying the value.
+
+### @ref:[Alarm Service](services/alarm.md)
+An alarm is published to mark an abnormal condition that requires the attention of an operator or
+other user. Alarms are not errors, they are conditions that occur asynchronously while
+components are executing or inactive. For instance, an alarm could be published to indicate a
+hardware limit. An example of this kind of alarm event is a detector temperature that is too high.
+Alarms are most valuable to operators and observers who monitor the status of the telescope
+systems and the instruments. The control GUIs will include standardized ways for displaying
+alarms if needed. The Executive Software provides the observer and operator interfaces for the
+purpose of displaying alarms relevant to observing from the instruments and telescope system.
+
+However, **alarms are not a suitable or approved approach to hazard control as part of a
+TMT safety system**. Alarms should provide additional information to operators and staff about
+systems monitored by the OSS and can provide early warning of future hazardous conditions,
+but should not be a sole, primary hazard control.
 
 ### @ref:[Framework](commons/framework.md)
 The framework provides templates for @ref:[creating](./commons/create-component.md) and running the kind of software components 

@@ -71,7 +71,7 @@ Any further reference to `ComponentHandlers` should implicitly also apply to `JC
 
 #### *Tutorial: Developing an HCD*
 
-As seen in the @ref:[Getting Started](getting-started.md) page, if you are using the giter8  template, handler classes for both the HCD and Assembly are written for you, with handler implementations stubbed out.
+As seen in the @ref:[Getting Started](getting-started.md) page, if you are using the giter8 template, handler classes for both the HCD and Assembly are written for you, with handler implementations stubbed out.
 We will walkthough filling them in below.
 
 
@@ -81,7 +81,7 @@ After writing the handlers, component developer needs to wire it up with framewo
 needs to implement a `ComponentBehaviorFactory`. This factory should to be configured in configuration file for
 the component (see example below). The `csw-framework` then picks up the full path of
 `ComponentBehaviorFactory` from configuration file and spawns the component handlers using this factory as a process of
-booting a component. The factory is instantiated using java reflection.
+booting a component. The factory is instantiated using Java reflection.
 
 Additional sample code to implement the `ComponentBehaviorFactory` can be found @ref:[here](./framework.md#creating-components) 
 
@@ -200,9 +200,25 @@ In the `Lock` state, messages like `Shutdown` and `Restart` will also be ignored
 `Lock` messages are constructed with a duration value specified.  When this duration expires, the component
 will automatically be unlocked.  A component can be manually unlocked by sending an `Unlock` message.
 
+## CSW Services Injection
+To provide access to CSW Services, they are injected into the `ComponentHandlers` class in the constructor in a `CswContext` object.
+This object provides the following services:
+
+  * Location Service
+  * Event Service
+  * Alarm Service (Client API)
+  * Configuration Service (Client API)
+  * Logging Service (Logger Factory)
+  
+And the following utilities:
+
+  * Component Configuration (ComponentInfo)
+  * Command Service Command Response Manager
+  * Current State Publisher Actor (intended for HCDs)
+
 ## Logging
 
-`csw-framework` will provide a `LoggerFactory` as dependency injection in constructor of `ComponentHandlers`. The `LoggerFactory` will have the component's name predefined in
+`csw-framework` will provide a `LoggerFactory` in the `CswContext` injected in constructor of `ComponentHandlers`. The `LoggerFactory` will have the component's name predefined in
 it. The component developer is expected to use this factory to log statements.
 
 Logging works much like other popular loggers such as *log4j*.  However, with the development of log management tools such as *logstash*, 
@@ -211,7 +227,10 @@ to stdout is still supported.  More details on how to use logging can be found @
 
 #### *Tutorial: Developing an HCD*
 
-Let's use logging to flesh out some of our command handlers.  Add some simple log messages in the `initialize` and `onShutdown` hooks, 
+Let's use logging to flesh out some of our command handlers.  The template will instantiate a logger for you to use by
+constructing one from the `LoggerFactory` from in the `CswContext` passed in the constructor, instantiated as a `log` object.
+
+Add some simple log messages in the `initialize` and `onShutdown` hooks, 
 and to the `onLocationTrackingEvent` hook as well, although we won't be using it for this HCD:
 
 Scala
@@ -294,7 +313,7 @@ The `CommandService` class provides helper methods for communicating with other 
 commands to other components. This will be described in the next tutorial section, @ref:[Sending Commands](./multiple-components.md#sending-commands).
 
 When the `onSubmit` hook is called, it is the responsibility of component developers to update the status of the received command in the `CommandResponseManager` as it changes. The instance
-of commandResponseManager is provided in `ComponentHandlers` which should be injected in any worker actor or other actor/class created for the component.   
+of commandResponseManager is provided in the `CswContext` object in `ComponentHandlers` and should be injected in any worker actor or other actor/class created for the component.   
 
 More details on methods available in `CommandResponseManager` can be found @ref:[here](./framework.md#managing-command-state).
 
@@ -321,6 +340,12 @@ At this point, to prevent our HCD from blocking while handling the command, we p
 This could be defined in a separate class, but writing it as an internal class allows us to use the logging facility and `CommandResponseManager` without 
 having to inject them into our new Actor class.
 
+Note that our `onSetup` command handling logic returns a `Started` response.  This indicates that the command is a long-running
+command and will be finished after some time, and that the final result will be posted to the `CommandResponseManager`.  The
+`submit` command in the CommandService is implemented such that when it receives the `Started` response, it automatically
+starts a subscription to the `CommandResponseManager` for the final response, and when it is published, the Future returned by
+`submit` command is completed with this value.
+
 Scala
 :   @@snip [SampleHcdHandlers.scala](../../../../examples/src/main/scala/nfiraos/samplehcd/SampleHcdHandlers.scala) { #worker-actor }
 
@@ -343,7 +368,7 @@ the event), they include data represented in the `Event` in a set of parameters.
 
 More details about events can be found @ref:[here](../messages/events.md).
 
-Access to the Event Service is passed in to the handlers class in the constructor.  The Event Service provides a factory method
+Access to the Event Service is in the `CswContext` object passed in to the handlers class in the constructor.  The Event Service provides a factory method
 to create a "default" publisher and subscriber, which can be accessed in various parts of your code to reuse a single
 connection to the service.  In most cases, reusing this connection will provide the performance needed.  
 But if you prefer to create new connections, custom publishers and subscribers can be constructed.
@@ -363,12 +388,10 @@ Scala
 Java
 :   @@snip [JSampleHcdHandlers.java](../../../../examples/src/main/java/nfiraos/samplehcd/JSampleHcdHandlers.java) { #publish }
 
-In Java, you must save a reference to the `IEventService` passed into the constructor as a member variable.  We use the name `eventService` (not shown here).
-
 We encapsulate the starting of the publishing in our method `publishCounter`.  Our `EventGenerator` is the `incrementCounterEvent`
 method which increments our integer variable `counter` and stores it in the `ParameterSet`
 of a new `SystemEvent` and returns it.  Once our `defaultPublisher` is resolved, we pass in a reference to `incrementCounterEvent` and 
-specify a period of 5 seconds.  We log a message when publishing the event so that it can be observed when running the component.
+specify a period of 2 seconds.  We log a message when publishing the event so that it can be observed when running the component.
   
 The `publish` method returns a `Cancellable` type in a future.  When the publishing is set up, the `Cancellable` can be used to
 stop the event generator.  We demonstrate its usage in the `stopPublishingGenerator` method, although this method is 
@@ -384,6 +407,27 @@ Scala
 Java
 :   @@snip [JSampleHcdHandlers.java](../../../../examples/src/main/java/nfiraos/samplehcd/JSampleHcdHandlers.java) { #initialize }
 
+## Starting CSW Services
+
+Before we run our application, we must first start the Location Service and the Event Service.  A script has been provided to simplify
+the starting and stopping of CSW services, and is included in the application bundle that comes with each release.  The
+application bundle is called `csw-apps-@var[$version.value].zip` and the script is named `csw-services.sh`.
+
+The `csw-services.sh` script has two basic commands: `start` and `stop`.  The start command can start specific services using
+passed in flags, or all services without any.  Services are started on default ports but those ports can be overridden using
+command line arguments.  It is important to pass in a network interface name that is appropriate for your system.  These
+can be obtained using `ifconfig` on Linux and Mac computers.  `en0` is the default and typically works for most machines.
+
+To get information on the arguments for the tool, use `csw-services.sh --help`.
+
+#### *Tutorial: Developing an HCD*
+
+Let's go ahead and start our CSW Services using the script.  Go to the [release page](https://github.com/tmtsoftware/csw/releases)
+and download and unpack the CSW application bundle.  Then go into the `bin` directory and enter the command
+
+```
+./csw-services.sh start 
+```
 
 ## Building and Running component in standalone mode
 
@@ -427,10 +471,4 @@ To run the component using the deployment package, perform the following steps:
 
 Alternatively, you can run `sbt stage`, which installs the application under target/universal/stage/bin.
 
-@@@ note { title=Note }
-
-CSW HTTP Location server must be running, and appropriate environment variables set to run apps.
-See @ref:[CSW Location Server](../apps/cswlocationserver.md).
-
-@@@
 

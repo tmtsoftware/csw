@@ -23,7 +23,7 @@ Scala
 Java
 :   @@snip [JSampleAssemblyHandlers.java](../../../../examples/src/main/java/nfiraos/sampleassembly/JSampleAssemblyHandlers.java) { #initialize }
 
-Once again, ingore the code about setting up the subscription.  This will be covered later when we discuss subscribing to events.
+Once again, ignore the code about setting up the subscription.  This will be covered later when we discuss subscribing to events.
 
 ## Component Configuration (ComponentInfo)
 
@@ -177,24 +177,13 @@ Java
 If a component wants to send a command to another component, it uses a `CommandService` instance. The creation of a`CommandService` instance and its usage can be found
 @ref:[here](./command.md#commandservice).
 
-If a component wants to send multiple commands in response to a single received command, then it can use a `CommandDistributor` instance. The CommandDistributor will help in
-getting the aggregated response of multiple commands sent to other components. The component developer can use the aggregated response to update the `CommandResponseManager` with the
-appropriate status if the received command was in a `Submit` wrapper.
-
-More details about creating a `CommandDistributor` instance and its usage can be found @ref:[here](./command.md#distributing-commands).
-
-@@@ note { title=Note }
-
-`CommandDistributor` can be used to get an aggregated response only if the multiple commands sent to other components are all wrapped in a `Submit` wrapper.
-
-@@@
 
 ## Tracking Long Running Commands
 
-A command sent in a `Submit` wrapper that receives an `Accepted` response in return is considered as a long running command.
-  
-When a component sends a long running command to another component, it may be interested in knowing the status of the command and take decisions based on that. In order to subscribe
-to the changes in command status, the sender component will have to use the `subscribe` method after `submit` or use `submitAndSubscribe` in `CommandService`.
+The `submit` method has been written so that it will return a Future response encapsulating a `SubmitResponse` type.   If the Future completes, 
+no matter whether the command has an immediate response or is long-running, is invalid, or encounters an error at any point, 
+the Future completes with the final response.  If there is an exception, which may occur if the `submit` times out, that must
+be handled explicity using Future exception handling (this can be done many ways; an example is given below).
 
 #### *Tutorial: Developing an Assembly*
 
@@ -227,8 +216,9 @@ More details on how to use `Matcher` can  be found @ref:[here](./command.md#matc
 A component might need to subscribe to the current state of any other component provided it knows the location of that component. In order to subscribe to current state, it may
 use the `subscribeCurrentState` method of the `CommandService`. More details about the usage of `subscribeCurrentState` can ber found @ref:[here](./command.md#subscribecurrentstate).
 
-If a component wants to publish its current state then it can use the `currentStatePublisher` provided by `csw-framework` in `ComponentHandlers`. More details about the usage
-of `currentStatePublisher` can ber found @ref:[here](../framework/publishing-state.md).
+If a component wants to publish its current state then it can use the `currentStatePublisher` provided by `csw-framework`
+in the `CswContext` object passed into `ComponentHandlers`. More details about the usage
+of `currentStatePublisher` can be found @ref:[here](../framework/publishing-state.md).
 
 ## Subscribing to Events
 
@@ -249,8 +239,6 @@ Scala
 Java
 :   @@snip [SampleAssemblyHandlers.java](../../../../examples/src/main/java/nfiraos/sampleassembly/JSampleAssemblyHandlers.java) { #subscribe }
 
-
-Again, in Java, you must save a reference to the `IEventService` passed into the constructor as a member variable.  We use the name `eventService` (not shown here).
 
 We use the `subscribeCallback` method from the API and specify the method `processEvent` as our callback, in which we 
 unpack the event and log the counter value.  The subscribe methods in the API return a `EventSubscription` object, which can 
@@ -314,7 +302,6 @@ To run using the deployment packaging, follow the steps below:
 
 @@@ note { title=Note }
 
-The CSW HTTP Location server must be running and appropriate environment variables set to run the apps.
-See @ref:[CSW Location Server](../apps/cswlocationserver.md).
-
+This assumes you still have the CSW Services running using the  `csw-services.sh` script as described in the
+@ref:[Create a Component](./create-component.md) tutorial page.
 @@@
