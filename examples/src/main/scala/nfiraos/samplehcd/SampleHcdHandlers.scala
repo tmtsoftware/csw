@@ -13,7 +13,6 @@ import csw.params.core.models.Id
 import csw.params.events.{EventName, SystemEvent}
 import csw.serializable.TMTSerializable
 
-import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
 /**
@@ -69,6 +68,7 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
   //#initialize
 
   //#publish
+  import scala.concurrent.duration._
   private def publishCounter(): Cancellable = {
     var counter = 0
     def incrementCounterEvent() = {

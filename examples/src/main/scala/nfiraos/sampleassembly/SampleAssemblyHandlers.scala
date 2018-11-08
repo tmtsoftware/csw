@@ -17,9 +17,7 @@ import csw.params.events._
 import csw.serializable.TMTSerializable
 
 import scala.async.Async._
-import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContextExecutor, Future}
-import scala.util.{Failure, Success}
 
 /**
  * Domain specific logic should be written in below handlers.
@@ -53,6 +51,7 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
       "CommandSender"
     )
 
+  import scala.concurrent.duration._
   private implicit val sleepCommandTimeout: Timeout = Timeout(10000.millis)
   def handle(hcd: CommandService): Unit = {
 
@@ -63,7 +62,7 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
 
     // submit command and handle response
     hcd.submit(setupCommand).onComplete {
-      case Success(value) =>
+      case scala.util.Success(value) =>
         value match {
           case _: CommandResponse.Locked    => log.error("Sleedp command failed: HCD is locked.")
           case inv: CommandResponse.Invalid => log.error(s"Command is invalid: (${inv.issue.getClass.getSimpleName}): ${inv.issue.reason}")
@@ -71,7 +70,7 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
           case _: CommandResponse.Completed => log.info("Command completed successfully")
           case _                            => log.error("Command failed")
         }
-      case Failure(ex) => log.error(s"Exception occured when sending command: ${ex.getMessage}")
+      case scala.util.Failure(ex) => log.error(s"Exception occured when sending command: ${ex.getMessage}")
     }
   }
   //#worker-actor

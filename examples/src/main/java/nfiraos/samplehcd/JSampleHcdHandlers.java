@@ -4,27 +4,21 @@ import akka.actor.Cancellable;
 import akka.actor.typed.ActorRef;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
-import csw.framework.CurrentStatePublisher;
+import csw.command.client.messages.TopLevelActorMessage;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.models.JCswContext;
-import csw.command.client.messages.TopLevelActorMessage;
-import csw.params.commands.*;
-import csw.params.events.Event;
-import csw.params.events.EventName;
-import csw.params.events.SystemEvent;
-import csw.command.client.models.framework.ComponentInfo;
 import csw.location.api.models.TrackingEvent;
-import csw.params.javadsl.JKeyType;
+import csw.logging.javadsl.ILogger;
+import csw.params.commands.*;
 import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import csw.params.core.models.Id;
-import csw.command.client.CommandResponseManager;
-import csw.event.api.javadsl.IEventService;
-import csw.location.api.javadsl.ILocationService;
-import csw.logging.javadsl.ILogger;
+import csw.params.events.Event;
+import csw.params.events.EventName;
+import csw.params.events.SystemEvent;
+import csw.params.javadsl.JKeyType;
 import csw.serializable.TMTSerializable;
 
-import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -117,7 +111,7 @@ public class JSampleHcdHandlers extends JComponentHandlers {
 
     private Cancellable publishCounter() {
         log.info("Starting publish stream.");
-        return cswCtx.eventService().defaultPublisher().publish(this::incrementCounterEvent, Duration.ofSeconds(2));
+        return cswCtx.eventService().defaultPublisher().publish(this::incrementCounterEvent, java.time.Duration.ofSeconds(2));
     }
 
     private void stopPublishingGenerator() {
