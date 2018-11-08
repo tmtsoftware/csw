@@ -33,7 +33,7 @@ alarms.conf
 For our tutorial, let's save this file to disk in our resources folder in the `sample-deploy` module
 (`sample-deploy/src/main/resources/alarms.conf`).
 
-Now, we will use the CLI tool.  Find it in the `bin` directory of the csw-apps-0.6.0.zip package available with the
+Now, we will use the CLI tool.  Find it in the `bin` directory of the CSW application package available with the
 [release](https://github.com/tmtsoftware/csw/releases) as `csw-alarm-cli`.
 
 Use the `init` command to initialize the Alarm Store (this assumes csw-services is running, which sets up the Redis store

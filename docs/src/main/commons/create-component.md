@@ -411,12 +411,20 @@ Java
 
 Before we run our application, we must first start the Location Service and the Event Service.  A script has been provided to simplify
 the starting and stopping of CSW services, and is included in the application bundle that comes with each release.  The
-application bundle is called `csw-apps-@var[$version.value].zip` and the script is named `csw-services.sh`.
+application bundle is called 
+
+@@@vars
+
+csw-apps-$version$.zip 
+
+@@@
+
+and the script is named `csw-services.sh`.
 
 The `csw-services.sh` script has two basic commands: `start` and `stop`.  The start command can start specific services using
 passed in flags, or all services without any.  Services are started on default ports but those ports can be overridden using
 command line arguments.  It is important to pass in a network interface name that is appropriate for your system.  These
-can be obtained using `ifconfig` on Linux and Mac computers.  `en0` is the default and typically works for most machines.
+can be obtained using `ifconfig` on Linux and Mac computers.  `en0` typically works for most machines.
 
 To get information on the arguments for the tool, use `csw-services.sh --help`.
 
@@ -426,8 +434,10 @@ Let's go ahead and start our CSW Services using the script.  Go to the [release 
 and download and unpack the CSW application bundle.  Then go into the `bin` directory and enter the command
 
 ```
-./csw-services.sh start 
+./csw-services.sh start -i <iname>
 ```
+
+where `<iname>` is your interface name (e.g. `en0`).
 
 ## Building and Running component in standalone mode
 
@@ -443,9 +453,9 @@ Our template includes a wrapper application around ContainerCmd that we can use 
 go to the project root directory and type `sbt "<deploy-module>/runMain <mainClass> --local --standalone <path-to-config-file>"`, where
  
 - `<deploy-module>` is the name of the deployment module created by the template (`sample-deploy` if using defaults) 
-- `<mainClass>` is the full class name of our ContainerCmd application, which the template names `<prefix>.<name>deploy.<Name>ContainerCmdApp`.
-If you accept the defaults for the template, it will be `nfiraos.sampledeploy.SampleContainerCmdApp`.  If you are having problems
-determining the class name, use `sbt run` and it will prompt you the possibilities.
+- `<mainClass>` is the full class name of our ContainerCmd application, which the template names `<package>.<name>deploy.<Name>ContainerCmdApp`.
+If you accept the defaults for the template, it will be `org.tmt.nfiraos.sampledeploy.SampleContainerCmdApp`.  If you are having problems
+determining the class name, use `sbt <deploy-module>/run` and it will prompt you the possibilities.
 - `<path-to-config-file>` is the filename, which can be an absolute path or relative to the directory of the deployment module.  If using defaults,
 this would be `src/main/resources/SampleHcdStandalone.conf` for Scala, and `src/main/resources/JSampleHcdStandalone.conf` for Java.
 
@@ -454,13 +464,13 @@ So if using the template defaults, the full command would be
 Scala
 :   
 ```
-sbt "sample-deploy/runMain nfiraos.sampledeploy.SampleContainerCmdApp --local --standalone src/main/resources/SampleHcdStandalone.conf"
+sbt "sample-deploy/runMain org.tmt.nfiraos.sampledeploy.SampleContainerCmdApp --local --standalone src/main/resources/SampleHcdStandalone.conf"
 ```
 
 Java
 :   
 ```
-sbt "sample-deploy/runMain nfiraos.sampledeploy.SampleContainerCmdApp --local --standalone src/main/resources/JSampleHcdStandalone.conf"
+sbt "sample-deploy/runMain org.tmt.nfiraos.sampledeploy.SampleContainerCmdApp --local --standalone src/main/resources/JSampleHcdStandalone.conf"
 ```
 
 To run the component using the deployment package, perform the following steps:
