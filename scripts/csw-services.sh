@@ -226,9 +226,9 @@ function usage {
     echo "  --interfaceName | -i <name>     start cluster on ip address associated with provided interface, default: en0"
     echo "  --config <configPort>           start http config server on provided port, default: 5000"
     echo "  --initRepo                      create new svn repo, default: use existing svn repo"
-    echo -e "  --event | -es <esPort>       start event service on provided port, default: 6379 \n"
-    echo -a "  --alarm | -as <asPort>       start alarm service on provided port, default: 7379 \n"
-
+    echo "  --event | -es <esPort>          start event service on provided port, default: 6379"
+    echo "  --alarm | -as <asPort>          start alarm service on provided port, default: 7379"
+    echo
     echo "Commands:"
     echo "  start      Starts all csw services if no options provided"
     echo "  stop       Stops all csw services, it does not take any arguments"
