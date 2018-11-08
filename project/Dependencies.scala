@@ -258,7 +258,8 @@ object Dependencies {
       //TODO: make this as provided deps
       Libs.`scalatest`.value,
       Libs.`embedded-redis`,
-      Libs.`junit`
+      Libs.`junit`,
+      Libs.`junit-interface`
     )
   )
 

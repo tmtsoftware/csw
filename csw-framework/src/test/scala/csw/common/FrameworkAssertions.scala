@@ -1,20 +1,20 @@
 package csw.common
 
-import akka.actor.typed.ActorRef
 import akka.actor.testkit.typed.scaladsl.TestProbe
+import akka.actor.typed.ActorRef
 import com.persist.JsonOps.JsonObject
-import csw.command.client.models.framework.{ContainerLifecycleState, SupervisorLifecycleState}
 import csw.command.client.messages.ComponentCommonMessage.GetSupervisorLifecycleState
-import csw.command.client.messages.{ComponentMessage, ContainerMessage}
 import csw.command.client.messages.ContainerCommonMessage.GetContainerLifecycleState
-import csw.location.server.commons.BlockingUtils
+import csw.command.client.messages.{ComponentMessage, ContainerMessage}
+import csw.command.client.models.framework.{ContainerLifecycleState, SupervisorLifecycleState}
 import csw.logging.internal.LoggingLevels.Level
 import org.scalatest.Matchers
+import org.scalatest.concurrent.Eventually
 
 import scala.collection.mutable
 import scala.concurrent.duration.Duration
 
-object FrameworkAssertions extends Matchers {
+object FrameworkAssertions extends Matchers with Eventually {
 
   def assertThatContainerIsRunning(
       containerRef: ActorRef[ContainerMessage],
@@ -26,9 +26,11 @@ object FrameworkAssertions extends Matchers {
       probe.expectMessageType[ContainerLifecycleState]
     }
 
-    assert(
-      BlockingUtils.poll(getContainerLifecycleState == ContainerLifecycleState.Running, duration),
-      s"expected :${ContainerLifecycleState.Running}, found :$getContainerLifecycleState"
+    eventually(timeout(duration))(
+      assert(
+        getContainerLifecycleState == ContainerLifecycleState.Running,
+        s"expected :${ContainerLifecycleState.Running}, found :$getContainerLifecycleState"
+      )
     )
   }
 
@@ -42,9 +44,11 @@ object FrameworkAssertions extends Matchers {
       probe.expectMessageType[SupervisorLifecycleState]
     }
 
-    assert(
-      BlockingUtils.poll(getSupervisorLifecycleState == SupervisorLifecycleState.Running, duration),
-      s"expected :${SupervisorLifecycleState.Running}, found :$getSupervisorLifecycleState"
+    eventually(timeout(duration))(
+      assert(
+        getSupervisorLifecycleState == SupervisorLifecycleState.Running,
+        s"expected :${SupervisorLifecycleState.Running}, found :$getSupervisorLifecycleState"
+      )
     )
   }
 

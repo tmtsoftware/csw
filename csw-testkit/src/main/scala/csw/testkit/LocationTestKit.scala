@@ -13,19 +13,24 @@ final class LocationTestKit private (val testKitSettings: TestKitSettings = Test
 
   implicit lazy val timeout: Timeout = testKitSettings.DefaultTimeout
 
+  private var locationServer: Option[Http.ServerBinding] = None
+
   /**
    * Start HTTP location server on default port 7654
    *
    * Location server is required to be running on a machine before starting components. (HCD's, Assemblies etc.)
    */
-  def startLocationServer(): Http.ServerBinding = TestKitUtils.await(locationWiring.locationHttpService.start(), timeout)
+  def startLocationServer(): Unit = locationServer = Some(TestKitUtils.await(locationWiring.locationHttpService.start(), timeout))
 
   /**
    * Shutdown HTTP location server
    *
    * When the test has completed, make sure you shutdown location server.
    */
-  def shutdownLocationServer(): Unit = TestKitUtils.coordShutdown(shutdown, timeout.duration)
+  def shutdownLocationServer(): Unit = {
+    locationServer.foreach(binding ⇒ TestKitUtils.await(binding.terminate(timeout.duration), timeout))
+    TestKitUtils.coordShutdown(shutdown, timeout.duration)
+  }
 
 }
 

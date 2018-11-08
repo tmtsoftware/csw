@@ -59,27 +59,27 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
   }
 
   test("should be able to add subscriber and publish current state to newly added subscriber") {
-    val behaviorTestKit                  = createBehaviorTestKit()
-    val commandResponseProbe             = TestProbe[SubmitResponse]
-    val commandResponseManagerStateProbe = TestProbe[CommandResponseManagerState]
+    val behaviorTestKit              = createBehaviorTestKit()
+    val commandResponseProbe         = TestProbe[SubmitResponse]
+    val commandSubscribersStateProbe = TestProbe[CommandSubscribersState]
 
     val runId = Id()
 
     behaviorTestKit.run(AddOrUpdateCommand(Completed(runId)))
 
-    behaviorTestKit.run(GetCommandResponseManagerState(commandResponseManagerStateProbe.ref))
-    val commandResponseManagerState = commandResponseManagerStateProbe.expectMessageType[CommandResponseManagerState]
-    commandResponseManagerState.cmdToCmdStatus(runId).subscribers shouldBe empty
+    behaviorTestKit.run(GetCommandSubscribersState(commandSubscribersStateProbe.ref))
+    val commandSubscribersState = commandSubscribersStateProbe.expectMessageType[CommandSubscribersState]
+    commandSubscribersState.getSubscribers(runId) shouldBe empty
 
     behaviorTestKit.run(Subscribe(runId, commandResponseProbe.ref))
-    behaviorTestKit.run(GetCommandResponseManagerState(commandResponseManagerStateProbe.ref))
-    val commandResponseManagerState2 = commandResponseManagerStateProbe.expectMessageType[CommandResponseManagerState]
-    commandResponseManagerState2.cmdToCmdStatus(runId).subscribers shouldBe Set(commandResponseProbe.ref)
+    behaviorTestKit.run(GetCommandSubscribersState(commandSubscribersStateProbe.ref))
+    val commandSubscribersState2 = commandSubscribersStateProbe.expectMessageType[CommandSubscribersState]
+    commandSubscribersState2.getSubscribers(runId) shouldBe Set(commandResponseProbe.ref)
 
     commandResponseProbe.expectMessage(Completed(runId))
   }
 
-  test("should get one update for long running command that returns Started") {
+  test("should not get update for long running command that returns Started") {
     val behaviorTestKit      = createBehaviorTestKit()
     val commandResponseProbe = TestProbe[SubmitResponse]
 
@@ -88,21 +88,18 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
     // This simulates ComponentBehavior adding the command with Started - does not cause update to subscriber
     // Subscriber cannot subscribe before this happens, will not find command
     behaviorTestKit.run(AddOrUpdateCommand(Started(runId)))
-    // Simulate doSubmit returning Started for a long-running command
-    //behaviorTestKit.run(AddOrUpdateCommand(runId, Started(runId)))
     // Subscribe succeeds no after initial Started
     behaviorTestKit.run(Subscribe(runId, commandResponseProbe.ref))
     // Simulate doSubmit returning Started for a long-running command
     behaviorTestKit.run(AddOrUpdateCommand(Started(runId)))
-    // Started is received to subscriber now
-    commandResponseProbe.expectMessage(Started(runId))
+    // Started should not be received by subscriber as it is not final response
+    commandResponseProbe.expectNoMessage(200.milli)
   }
 
   test("should not be able to set value to Intermediate after Final in Command Response Manager") {
-    val behaviorTestKit         = createBehaviorTestKit()
-    val commandResponseProbe    = TestProbe[QueryResponse]
-    val commandCorrelationProbe = TestProbe[CommandCorrelation]
-    val runId                   = Id()
+    val behaviorTestKit      = createBehaviorTestKit()
+    val commandResponseProbe = TestProbe[QueryResponse]
+    val runId                = Id()
 
     behaviorTestKit.run(AddOrUpdateCommand(Started(runId)))
     behaviorTestKit.run(Query(runId, commandResponseProbe.ref))
@@ -118,9 +115,9 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
   }
 
   test("should be able to remove subscriber") {
-    val behaviorTestKit                  = createBehaviorTestKit()
-    val commandResponseProbe             = TestProbe[SubmitResponse]
-    val commandResponseManagerStateProbe = TestProbe[CommandResponseManagerState]
+    val behaviorTestKit              = createBehaviorTestKit()
+    val commandResponseProbe         = TestProbe[SubmitResponse]
+    val commandSubscribersStateProbe = TestProbe[CommandSubscribersState]
 
     val runId = Id()
 
@@ -128,15 +125,15 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
 
     behaviorTestKit.run(Subscribe(runId, commandResponseProbe.ref))
 
-    behaviorTestKit.run(GetCommandResponseManagerState(commandResponseManagerStateProbe.ref))
-    val commandResponseManagerState = commandResponseManagerStateProbe.expectMessageType[CommandResponseManagerState]
-    commandResponseManagerState.cmdToCmdStatus(runId).subscribers shouldBe Set(commandResponseProbe.ref)
+    behaviorTestKit.run(GetCommandSubscribersState(commandSubscribersStateProbe.ref))
+    val commandSubscribersState = commandSubscribersStateProbe.expectMessageType[CommandSubscribersState]
+    commandSubscribersState.getSubscribers(runId) shouldBe Set(commandResponseProbe.ref)
 
     behaviorTestKit.run(Unsubscribe(runId, commandResponseProbe.ref))
 
-    behaviorTestKit.run(GetCommandResponseManagerState(commandResponseManagerStateProbe.ref))
-    val commandResponseManagerState2 = commandResponseManagerStateProbe.expectMessageType[CommandResponseManagerState]
-    commandResponseManagerState2.cmdToCmdStatus(runId).subscribers shouldBe Set()
+    behaviorTestKit.run(GetCommandSubscribersState(commandSubscribersStateProbe.ref))
+    val commandSubscribersState2 = commandSubscribersStateProbe.expectMessageType[CommandSubscribersState]
+    commandSubscribersState2.getSubscribers(runId) shouldBe Set()
   }
 
   test("should be able to get current status of command on Query message") {
@@ -152,10 +149,10 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
   }
 
   test("should be able to update and publish command status to all subscribers") {
-    val behaviorTestKit                  = createBehaviorTestKit()
-    val commandResponseProbe1            = TestProbe[SubmitResponse]
-    val commandResponseProbe2            = TestProbe[SubmitResponse]
-    val commandResponseManagerStateProbe = TestProbe[CommandResponseManagerState]
+    val behaviorTestKit           = createBehaviorTestKit()
+    val commandResponseProbe1     = TestProbe[SubmitResponse]
+    val commandResponseProbe2     = TestProbe[SubmitResponse]
+    val commandResponseStateProbe = TestProbe[CommandResponseState]
 
     val runId = Id()
 
@@ -165,9 +162,9 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
 
     behaviorTestKit.run(AddOrUpdateCommand(Completed(runId)))
 
-    behaviorTestKit.run(GetCommandResponseManagerState(commandResponseManagerStateProbe.ref))
-    val commandResponseManagerState = commandResponseManagerStateProbe.expectMessageType[CommandResponseManagerState]
-    commandResponseManagerState.cmdToCmdStatus(runId).commandStatus.currentCmdStatus shouldBe Completed(runId)
+    behaviorTestKit.run(GetCommandResponseState(commandResponseStateProbe.ref))
+    val commandResponseState = commandResponseStateProbe.expectMessageType[CommandResponseState]
+    commandResponseState.get(runId) shouldBe Completed(runId)
 
     commandResponseProbe1.expectMessage(Completed(runId))
     commandResponseProbe2.expectMessage(Completed(runId))
@@ -282,6 +279,30 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
     // Update of a sub command status(above) should update the status of parent command
     commandResponseProbe.expectMessage(10.seconds, Completed(stepA))
     commandResponseProbe.expectMessage(10.seconds, Completed(sequenceRunId))
+  }
+
+  test("should be able subscribe before submitting command and gets added to CRM ") {
+    val behaviorTestKit              = createBehaviorTestKit()
+    val commandResponseProbe         = TestProbe[SubmitResponse]
+    val commandResponseStateProbe    = TestProbe[CommandResponseState]
+    val commandSubscribersStateProbe = TestProbe[CommandSubscribersState]
+
+    val runId = Id()
+
+    behaviorTestKit.run(Subscribe(runId, commandResponseProbe.ref))
+    behaviorTestKit.run(GetCommandSubscribersState(commandSubscribersStateProbe.ref))
+    val commandSubscribersState = commandSubscribersStateProbe.expectMessageType[CommandSubscribersState]
+    commandSubscribersState.getSubscribers(runId) shouldBe Set(commandResponseProbe.ref)
+
+    behaviorTestKit.run(AddOrUpdateCommand(Started(runId)))
+
+    behaviorTestKit.run(AddOrUpdateCommand(Completed(runId)))
+
+    behaviorTestKit.run(GetCommandResponseState(commandResponseStateProbe.ref))
+    val commandResponseState = commandResponseStateProbe.expectMessageType[CommandResponseState]
+    commandResponseState.get(runId) shouldBe Completed(runId)
+
+    commandResponseProbe.expectMessage(Completed(runId))
   }
 
   private def getMockedLogger: LoggerFactory = {

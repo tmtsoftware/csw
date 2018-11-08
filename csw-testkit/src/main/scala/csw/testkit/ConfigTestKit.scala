@@ -2,6 +2,7 @@ package csw.testkit
 
 import java.nio.file.Paths
 
+import akka.http.scaladsl.Http
 import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.config.server.ServerWiring
@@ -47,6 +48,7 @@ final class ConfigTestKit private (
    */
   def shutdownConfigServer(): Unit = {
     deleteServerFiles()
+    TestKitUtils.await(Http(configWiring.actorSystem).shutdownAllConnectionPools(), timeout)
     TestKitUtils.coordShutdown(shutdown, timeout)
   }
 

@@ -9,15 +9,18 @@ import csw.config.api.scaladsl.{ConfigClientService, ConfigService}
 import csw.config.client.scaladsl.ConfigClientFactory
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.testkit.scaladsl.ScalaTestConfigTestKit
+import csw.testkit.scaladsl.CSWService.ConfigServer
+import csw.testkit.scaladsl.ScalaTestFrameworkTestKit
 import org.scalatest._
 
 import scala.async.Async._
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{Await, Future}
 
-class ConfigClientExampleTest extends ScalaTestConfigTestKit with FunSuiteLike with BeforeAndAfterEach {
+// DEOPSCSW-592: Create csw testkit for component writers
+class ConfigClientExampleTest extends ScalaTestFrameworkTestKit(ConfigServer) with FunSuiteLike with BeforeAndAfterEach {
 
+  private val configTestKit = frameworkTestKit.configTestKit
   import configTestKit.configWiring.actorRuntime._
   private val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient
 

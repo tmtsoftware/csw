@@ -16,6 +16,7 @@ import csw.params.core.models.ObsId;
 import csw.params.core.models.Prefix;
 import org.junit.Assert;
 import org.junit.Test;
+import org.scalatest.junit.JUnitSuite;
 import play.api.libs.json.JsValue;
 import play.api.libs.json.Json;
 
@@ -26,7 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class JCommandsTest {
+public class JCommandsTest extends JUnitSuite {
     //#obsid
     ObsId obsId = new ObsId("Obs001");
     //#obsid

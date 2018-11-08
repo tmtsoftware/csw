@@ -1,7 +1,19 @@
 package csw.testkit.scaladsl
+
 import akka.actor.ActorSystem
+import akka.actor.typed.ActorRef
+import com.typesafe.config.Config
+import csw.command.client.messages.{ComponentMessage, ContainerMessage}
 import csw.testkit._
 
+/**
+ * A ScalaTest base class for the [[FrameworkTestKit]], making it possible to have ScalaTest manage the lifecycle of the testkit.
+ *
+ * The testkit will be automatically start list of provided [[CSWService]]
+ * and shut down all started [[CSWService]] when the test completes or fails using ScalaTest's BeforeAndAfterAll trait.
+ *
+ * If a spec overrides beforeAll or afterAll, it must call super.beforeAll and super.afterAll respectively.
+ */
 abstract class ScalaTestFrameworkTestKit(val frameworkTestKit: FrameworkTestKit, services: CSWService*) extends ScalaTestBase {
 
   /** Initialize testkit with default configuration
@@ -19,6 +31,12 @@ abstract class ScalaTestFrameworkTestKit(val frameworkTestKit: FrameworkTestKit,
 
   /** Initialize testkit with provided actorSystem */
   def this(actorSystem: ActorSystem) = this(FrameworkTestKit(actorSystem))
+
+  /** Delegate to framework testkit */
+  def spawnContainer(config: Config): ActorRef[ContainerMessage] = frameworkTestKit.spawnContainer(config)
+
+  /** Delegate to framework testkit */
+  def spawnStandalone(config: Config): ActorRef[ComponentMessage] = frameworkTestKit.spawnStandalone(config)
 
   /**
    * Start FrameworkTestKit. If override be sure to call super.beforeAll

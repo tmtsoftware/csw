@@ -126,8 +126,8 @@ lazy val `csw-location-client` = project
 lazy val `csw-location-agent` = project
   .dependsOn(
     `csw-location-client`,
-    `csw-commons`         % "test->test",
-    `csw-location-server` % "test->test"
+    `csw-commons` % "test->test",
+    `csw-testkit` % "test->compile"
   )
   .enablePlugins(DeployApp, MaybeCoverage)
   .settings(
@@ -320,9 +320,15 @@ lazy val `csw-alarm-cli` = project
 
 lazy val `csw-time-api` = project
 
+lazy val Linux = config("linux").extend(Test)
+
 lazy val `csw-time-client` = project
   .dependsOn(`csw-time-api`)
   .settings(libraryDependencies ++= Dependencies.TimeClient.value)
+  .configs(Linux)
+  .settings(inConfig(Linux)(Defaults.testTasks): _*)
+  .settings(testOptions in Linux -= Tests.Argument("-l", "csw.time.client.tags.Linux"))
+  .settings(testOptions in Linux ++= Seq(Tests.Argument("-n", "csw.time.client.tags.Linux")))
 
 lazy val `csw-testkit` = project
   .dependsOn(

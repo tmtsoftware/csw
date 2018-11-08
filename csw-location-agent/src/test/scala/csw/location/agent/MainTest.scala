@@ -10,20 +10,14 @@ import csw.location.agent.common.TestFutureExtension.RichFuture
 import csw.location.api.models.Connection.TcpConnection
 import csw.location.api.models.{ComponentId, ComponentType}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
-import csw.location.server.http.HTTPLocationService
 import csw.network.utils.Networks
-import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
-import org.scalatest.concurrent.Eventually
+import csw.testkit.scaladsl.ScalaTestFrameworkTestKit
+import org.scalatest.FunSuiteLike
 
 import scala.concurrent.duration._
 
-/**
- * Test the csw-location-agent app in-line
- */
-class MainTest extends HTTPLocationService with Eventually {
-
-  // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
-  InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
+// DEOPSCSW-592: Create csw testkit for component writers
+class MainTest extends ScalaTestFrameworkTestKit with FunSuiteLike {
 
   implicit private val system: ActorSystem    = ActorSystem()
   implicit private val mat: ActorMaterializer = ActorMaterializer()
@@ -31,7 +25,10 @@ class MainTest extends HTTPLocationService with Eventually {
 
   implicit val patience: PatienceConfig = PatienceConfig(5.seconds, 100.millis)
 
-  override def afterAll(): Unit = super.afterAll()
+  override def afterAll(): Unit = {
+    system.terminate().await
+    super.afterAll()
+  }
 
   test("Test with command line args") {
     val name = "test1"

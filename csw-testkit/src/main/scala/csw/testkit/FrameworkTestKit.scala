@@ -2,10 +2,12 @@ package csw.testkit
 
 import akka.actor.ActorSystem
 import akka.actor.typed.ActorRef
+import akka.http.scaladsl.Http
 import akka.util.Timeout
 import com.typesafe.config.Config
 import csw.command.client.messages.{ComponentMessage, ContainerMessage}
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
+import csw.location.client.ActorSystemFactory
 import csw.testkit.internal.TestKitUtils
 import csw.testkit.scaladsl.CSWService
 import csw.testkit.scaladsl.CSWService._
@@ -20,8 +22,8 @@ final class FrameworkTestKit private (
     val alarmTestKit: AlarmTestKit
 ) {
 
-  val frameworkWiring: FrameworkWiring = FrameworkWiring.make(actorSystem)
-  implicit val timeout: Timeout        = locationTestKit.testKitSettings.DefaultTimeout
+  lazy val frameworkWiring: FrameworkWiring = FrameworkWiring.make(actorSystem)
+  implicit val timeout: Timeout             = locationTestKit.testKitSettings.DefaultTimeout
 
   private var configStarted = false
   private var eventStarted  = false
@@ -58,7 +60,7 @@ final class FrameworkTestKit private (
    * @note before calling this, make sure you have started location server and other pre-requisite services
    *       use one of [FrameworkTestKit#startAll] or [FrameworkTestKit#start] method to start services
    */
-  def spawnStandaloneComponent(config: Config): ActorRef[ComponentMessage] =
+  def spawnStandalone(config: Config): ActorRef[ComponentMessage] =
     TestKitUtils.await(Standalone.spawn(config, frameworkWiring), timeout)
 
   /**
@@ -79,6 +81,7 @@ final class FrameworkTestKit private (
     if (configStarted) configTestKit.shutdownConfigServer()
     if (eventStarted) eventTestKit.shutdown()
     if (alarmStarted) alarmTestKit.shutdown()
+    TestKitUtils.await(Http(frameworkWiring.actorSystem).shutdownAllConnectionPools(), timeout)
     TestKitUtils.coordShutdown(frameworkWiring.actorRuntime.shutdown, timeout)
     locationTestKit.shutdownLocationServer()
   }
@@ -97,7 +100,7 @@ object FrameworkTestKit {
    * @return handle to FrameworkTestKit which can be used to start and stop all services started
    */
   def apply(
-      actorSystem: ActorSystem = ActorSystem("framework"),
+      actorSystem: ActorSystem = ActorSystemFactory.remote("framework-testkit"),
       locationTestKit: LocationTestKit = LocationTestKit(),
       configTestKit: ConfigTestKit = ConfigTestKit(),
       eventTestKit: EventTestKit = EventTestKit(),

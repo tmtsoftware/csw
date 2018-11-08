@@ -25,6 +25,7 @@ pipeline {
         stage('Unit and Component Tests') {
             steps {
                 sh "sbt -DenableCoverage=true test:test"
+                sh "sbt csw-time-client/linux:test"
             }
             post {
                 always {

@@ -8,11 +8,12 @@ import csw.params.core.generics.Parameter;
 import csw.params.core.models.*;
 import org.junit.Assert;
 import org.junit.Test;
+import org.scalatest.junit.JUnitSuite;
 
 import java.time.Instant;
 import java.util.*;
 
-public class JKeysAndParametersTest {
+public class JKeysAndParametersTest extends JUnitSuite {
 
     @Test
     public void showUsageOfPrimitiveTypes() {

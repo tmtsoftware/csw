@@ -10,9 +10,12 @@ import csw.config.client.javadsl.JConfigClientFactory;
 import csw.config.server.ServerWiring;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;
-import csw.testkit.javadsl.ConfigTestKitJunitResource;
+import csw.testkit.ConfigTestKit;
+import csw.testkit.javadsl.FrameworkTestKitJunitResource;
+import csw.testkit.javadsl.JCSWService;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
+import org.scalatest.junit.JUnitSuite;
 
 import java.io.IOException;
 import java.net.URI;
@@ -24,17 +27,18 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
-public class JConfigClientExampleTest {
+public class JConfigClientExampleTest extends JUnitSuite {
 
+    // DEOPSCSW-592: Create csw testkit for component writers
     @ClassRule
-    public static final ConfigTestKitJunitResource testKit = new ConfigTestKitJunitResource();
+    public static final FrameworkTestKitJunitResource testKit = new FrameworkTestKitJunitResource(Collections.singletonList(JCSWService.ConfigServer));
 
-    private static ServerWiring configWiring = testKit.configTestKit().configWiring();
+    private static ConfigTestKit configTestKit = testKit.frameworkTestKit().configTestKit();
+    private static ServerWiring configWiring = configTestKit.configWiring();
     private static ActorSystem actorSystem = configWiring.actorSystem();
     private static Materializer mat = configWiring.actorRuntime().mat();
 
-    private static ILocationService clientLocationService =
-            JHttpLocationServiceFactory.makeLocalClient(actorSystem, mat);
+    private static ILocationService clientLocationService = testKit.jLocationService();
 
     //#create-api
     //config client API
@@ -57,7 +61,7 @@ public class JConfigClientExampleTest {
 
     @After
     public void deleteServerFiles() {
-        testKit.configTestKit().deleteServerFiles();
+        configTestKit.deleteServerFiles();
     }
 
     @Test

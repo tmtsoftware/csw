@@ -5,6 +5,7 @@ import csw.event.client.internal.commons.EventServiceConnection
 import csw.testkit.scaladsl.CSWService.{ConfigServer, EventStore, LocationServer}
 import org.scalatest.FunSuiteLike
 
+// DEOPSCSW-592: Create csw testkit for component writers
 class ScalaTestFrameworkTestKitSpec
     extends ScalaTestFrameworkTestKit(LocationServer, ConfigServer, EventStore)
     with FunSuiteLike {
