@@ -11,6 +11,7 @@ import csw.params.commands._
 import csw.params.core.generics.{Key, KeyType, Parameter}
 import csw.params.core.models.Id
 import csw.params.events.{EventName, SystemEvent}
+import csw.serializable.TMTSerializable
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContextExecutor, Future}
@@ -29,7 +30,7 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
   private val log                           = loggerFactory.getLogger
 
   //#worker-actor
-  sealed trait WorkerCommand
+  sealed trait WorkerCommand extends TMTSerializable
   case class Sleep(runId: Id, timeInMillis: Long) extends WorkerCommand
 
   private val workerActor =
@@ -77,7 +78,7 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
     }
 
     log.info("Starting publish stream.")
-    eventService.defaultPublisher.publish(incrementCounterEvent(), 5.second, err => log.error(err.getMessage, ex = err))
+    eventService.defaultPublisher.publish(incrementCounterEvent(), 2.second, err => log.error(err.getMessage, ex = err))
   }
 
   private def stopPublishingGenerator(): Unit = {
@@ -124,10 +125,10 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
   }
   //#onSetup
 
-  override def onOneway(controlCommand: ControlCommand): Unit = ???
+  override def onOneway(controlCommand: ControlCommand): Unit = {}
 
-  override def onGoOffline(): Unit = ???
+  override def onGoOffline(): Unit = {}
 
-  override def onGoOnline(): Unit = ???
+  override def onGoOnline(): Unit = {}
 
 }

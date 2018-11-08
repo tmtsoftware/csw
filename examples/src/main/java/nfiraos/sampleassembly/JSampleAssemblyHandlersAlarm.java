@@ -4,17 +4,15 @@ import akka.actor.typed.ActorRef;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.util.Timeout;
+import csw.alarm.api.javadsl.JAlarmSeverity;
+import csw.alarm.api.models.AlarmSeverity;
+import csw.alarm.api.models.Key.AlarmKey;
 import csw.command.api.javadsl.ICommandService;
-import csw.command.client.CommandResponseManager;
 import csw.command.client.CommandServiceFactory;
 import csw.command.client.messages.TopLevelActorMessage;
-import csw.command.client.models.framework.ComponentInfo;
-import csw.event.api.javadsl.IEventService;
 import csw.event.api.javadsl.IEventSubscription;
-import csw.framework.CurrentStatePublisher;
 import csw.framework.javadsl.JComponentHandlers;
 import csw.framework.models.JCswContext;
-import csw.location.api.javadsl.ILocationService;
 import csw.location.api.models.*;
 import csw.logging.javadsl.ILogger;
 import csw.params.commands.CommandName;
@@ -31,12 +29,13 @@ import csw.params.events.EventName;
 import csw.params.events.SystemEvent;
 import csw.params.javadsl.JKeyType;
 import csw.params.javadsl.JUnits;
-import csw.serializable.TMTSerializable;
 
 import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+
+import static csw.params.javadsl.JSubsystem.NFIRAOS;
 
 /**
  * Domain specific logic should be written in below handlers.
@@ -46,14 +45,14 @@ import java.util.concurrent.TimeUnit;
  * and if validation is successful, then onSubmit hook gets invoked.
  * You can find more information on this here : https://tmtsoftware.github.io/csw/framework.html
  */
-public class JSampleAssemblyHandlers extends JComponentHandlers {
+public class JSampleAssemblyHandlersAlarm extends JComponentHandlers {
 
     private JCswContext cswCtx;
     private ILogger log;
     private ActorContext<TopLevelActorMessage> actorContext;
     private final ActorRef<WorkerCommand> commandSender;
 
-    JSampleAssemblyHandlers(ActorContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
+    JSampleAssemblyHandlersAlarm(ActorContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
         super(ctx, cswCtx);
         this.cswCtx = cswCtx;
         this.log = cswCtx.loggerFactory().getLogger(getClass());
@@ -62,7 +61,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
     }
 
     //#worker-actor
-    private interface WorkerCommand extends TMTSerializable {
+    private interface WorkerCommand {
     }
 
     private static final class SendCommand implements WorkerCommand {
@@ -97,51 +96,19 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
 
         Setup setupCommand = new Setup(cswCtx.componentInfo().prefix(), new CommandName("sleep"), Optional.of(new ObsId("2018A-001"))).add(sleepTimeParam);
 
-        Timeout commandResponseTimeout = new Timeout(10, TimeUnit.SECONDS);
-
-        // Submit command and handle response
-        hcd.submit(setupCommand, commandResponseTimeout)
-                .exceptionally(ex -> new CommandResponse.Error(setupCommand.runId(), "Exception occurred when sending command: " + ex.getMessage()))
-                .thenAccept(commandResponse -> {
-                    if (commandResponse instanceof CommandResponse.Locked) {
-                        log.error("Sleed command failed: HCD is locked");
-                    } else if (commandResponse instanceof CommandResponse.Invalid) {
-                        CommandResponse.Invalid inv = (CommandResponse.Invalid) commandResponse;
-                        log.error("Sleep command invalid (" + inv.issue().getClass().getSimpleName() + "): " + inv.issue().reason());
-                    } else if (commandResponse instanceof CommandResponse.Error) {
-                        CommandResponse.Error x = (CommandResponse.Error) commandResponse;
-                        log.error(() -> "Command Completed with error: " + x.message());
-                    } else if (commandResponse instanceof CommandResponse.Completed) {
-                        log.info("Command completed successfully");
-                    } else {
-                        log.error("Command failed: ");
-                    }
-                });
-    }
-    //#worker-actor
-
-    private void handle2Stage(ICommandService hcd) {
-
-        // Construct Setup command
-        Key<Long> sleepTimeKey = JKeyType.LongKey().make("SleepTime");
-        Parameter<Long> sleepTimeParam = sleepTimeKey.set(5000L).withUnits(JUnits.millisecond);
-
-        Setup setupCommand = new Setup(cswCtx.componentInfo().prefix(), new CommandName("sleep"), Optional.of(new ObsId("2018A-001"))).add(sleepTimeParam);
-
         Timeout submitTimeout = new Timeout(1, TimeUnit.SECONDS);
         Timeout commandResponseTimeout = new Timeout(10, TimeUnit.SECONDS);
 
         // Submit command, and handle validation response. Final response is returned as a Future
         CompletableFuture<CommandResponse.SubmitResponse> submitCommandResponseF = hcd.submit(setupCommand, submitTimeout)
-                .thenApply(commandResponse -> {
+                .thenCompose(commandResponse -> {
                     if (! (commandResponse instanceof CommandResponse.Invalid || commandResponse instanceof CommandResponse.Locked)) {
-                        return commandResponse;
+                        return CompletableFuture.completedFuture(commandResponse);
                     } else {
                         log.error("Sleep command invalid");
-                        return new CommandResponse.Error(commandResponse.runId(), "test error");
+                        return CompletableFuture.completedFuture(new CommandResponse.Error(commandResponse.runId(), "test error"));
                     }
-                }).exceptionally(ex -> new CommandResponse.Error(setupCommand.runId(), ex.getMessage()))
-                .toCompletableFuture();
+                });
 
 
         // Wait for final response, and log result
@@ -156,6 +123,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
             }
         });
     }
+    //#worker-actor
 
     //#initialize
     private Optional<IEventSubscription> maybeEventSubscription = Optional.empty();
@@ -188,10 +156,11 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
     }
     //#track-location
 
-    //#subscribe
     private EventKey counterEventKey = new EventKey(new Prefix("nfiraos.samplehcd"), new EventName("HcdCounter"));
     private Key<Integer> hcdCounterKey = JKeyType.IntKey().make("counter");
 
+
+    //#subscribe
     private void processEvent(Event event) {
         log.info("Event received: "+ event.eventKey());
         if (event instanceof SystemEvent) {
@@ -199,6 +168,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
             if (event.eventKey().equals(counterEventKey)) {
                 int counter = sysEvent.parameter(hcdCounterKey).head();
                 log.info("Counter = " + counter);
+                setCounterAlarm(counter);
             } else {
                 log.warn("Unexpected event received.");
             }
@@ -207,6 +177,7 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
             log.warn("Unexpected ObserveEvent received.");
         }
     }
+    //#subscribe
 
     private IEventSubscription subscribeToHcd() {
         log.info("Starting subscription.");
@@ -217,7 +188,32 @@ public class JSampleAssemblyHandlers extends JComponentHandlers {
         log.info("Stopping subscription.");
         maybeEventSubscription.ifPresent(IEventSubscription::unsubscribe);
     }
-    //#subscribe
+
+    //#alarm
+    private AlarmSeverity getCounterSeverity(int counter) {
+        if (counter >= 0 && counter <= 10) {
+            return JAlarmSeverity.Okay;
+        } else if (counter >= 11 && counter <= 15) {
+            return JAlarmSeverity.Warning;
+        } else if (counter >= 16 && counter <= 20) {
+            return JAlarmSeverity.Major;
+        }
+        return JAlarmSeverity.Critical;
+    }
+
+    private void setCounterAlarm(int counter) {
+        AlarmKey counterAlarmKey = new AlarmKey(NFIRAOS, cswCtx.componentInfo().name(), "CounterTooHighAlarm");
+        AlarmSeverity severity = getCounterSeverity(counter);
+        cswCtx.alarmService().setSeverity(counterAlarmKey, severity)
+                .whenComplete((d, ex) -> {
+                    if (ex != null) {
+                        log.error("Error setting severity for alarm "+ counterAlarmKey.name() + ": " + ex.getMessage());
+                    } else {
+                        log.info("Severity for alarm " + counterAlarmKey.name() + " set to " + severity.toString());
+                    }
+                });
+    }
+    //#alarm
 
     @Override
     public CommandResponse.ValidateCommandResponse validateCommand(ControlCommand controlCommand) {

@@ -22,6 +22,7 @@ import csw.command.client.CommandResponseManager;
 import csw.event.api.javadsl.IEventService;
 import csw.location.api.javadsl.ILocationService;
 import csw.logging.javadsl.ILogger;
+import csw.serializable.TMTSerializable;
 
 import java.time.Duration;
 import java.util.Optional;
@@ -37,30 +38,22 @@ import java.util.concurrent.CompletableFuture;
  */
 public class JSampleHcdHandlers extends JComponentHandlers {
 
+    private JCswContext cswCtx;
     private ILogger log;
-    private CommandResponseManager commandResponseManager;
-    private CurrentStatePublisher currentStatePublisher;
     private ActorContext<TopLevelActorMessage> actorContext;
-    private ILocationService locationService;
-    private ComponentInfo componentInfo;
-    private IEventService eventService;
     private ActorRef<WorkerCommand> workerActor;
 
 
     JSampleHcdHandlers(ActorContext<TopLevelActorMessage> ctx, JCswContext cswCtx) {
         super(ctx, cswCtx);
-        this.currentStatePublisher = cswCtx.currentStatePublisher();
+        this.cswCtx = cswCtx;
         this.log = cswCtx.loggerFactory().getLogger(getClass());
-        this.commandResponseManager = cswCtx.commandResponseManager();
         this.actorContext = ctx;
-        this.locationService = cswCtx.locationService();
-        this.componentInfo = cswCtx.componentInfo();
-        this.eventService = cswCtx.eventService();
         workerActor = createWorkerActor();
     }
 
     //#worker-actor
-    private interface WorkerCommand {
+    private interface WorkerCommand extends TMTSerializable {
     }
 
     private static final class Sleep implements WorkerCommand {
@@ -81,7 +74,7 @@ public class JSampleHcdHandlers extends JComponentHandlers {
                         log.trace(() -> "WorkerActor received sleep command with time of " + sleep.timeInMillis + " ms");
                         // simulate long running command
                         Thread.sleep(sleep.timeInMillis);
-                        commandResponseManager.addOrUpdateCommand(new CommandResponse.Completed(sleep.runId));
+                        cswCtx.commandResponseManager().addOrUpdateCommand(new CommandResponse.Completed(sleep.runId));
                     } else {
                         log.error("Unsupported message type");
                     }
@@ -119,12 +112,12 @@ public class JSampleHcdHandlers extends JComponentHandlers {
     private Event incrementCounterEvent() {
         counter += 1;
         Parameter<Integer> param = JKeyType.IntKey().make("counter").set(counter);
-        return new SystemEvent(componentInfo.prefix(), new EventName("HcdCounter")).add(param);
+        return new SystemEvent(cswCtx.componentInfo().prefix(), new EventName("HcdCounter")).add(param);
     }
 
     private Cancellable publishCounter() {
         log.info("Starting publish stream.");
-        return eventService.defaultPublisher().publish(this::incrementCounterEvent, Duration.ofSeconds(5));
+        return cswCtx.eventService().defaultPublisher().publish(this::incrementCounterEvent, Duration.ofSeconds(2));
     }
 
     private void stopPublishingGenerator() {
