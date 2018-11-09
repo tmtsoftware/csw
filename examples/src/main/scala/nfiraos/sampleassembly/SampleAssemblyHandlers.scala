@@ -34,7 +34,7 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
   private val log                           = loggerFactory.getLogger
 
   //#worker-actor
-  sealed trait WorkerCommand extends TMTSerializable
+  sealed trait WorkerCommand                  extends TMTSerializable
   case class SendCommand(hcd: CommandService) extends WorkerCommand
 
   private val commandSender =
@@ -64,8 +64,9 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
     hcd.submit(setupCommand).onComplete {
       case scala.util.Success(value) =>
         value match {
-          case _: CommandResponse.Locked    => log.error("Sleedp command failed: HCD is locked.")
-          case inv: CommandResponse.Invalid => log.error(s"Command is invalid: (${inv.issue.getClass.getSimpleName}): ${inv.issue.reason}")
+          case _: CommandResponse.Locked => log.error("Sleedp command failed: HCD is locked.")
+          case inv: CommandResponse.Invalid =>
+            log.error(s"Command is invalid: (${inv.issue.getClass.getSimpleName}): ${inv.issue.reason}")
           case x: CommandResponse.Error     => log.error(s"Command Completed with error: ${x.message}")
           case _: CommandResponse.Completed => log.info("Command completed successfully")
           case _                            => log.error("Command failed")
@@ -82,7 +83,7 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
     val sleepTimeParam: Parameter[Long] = sleepTimeKey.set(5000).withUnits(Units.millisecond)
     val setupCommand                    = Setup(componentInfo.prefix, CommandName("sleep"), Some(ObsId("2018A-001"))).add(sleepTimeParam)
 
-    async{
+    async {
       await(hcd.submit(setupCommand)) match {
         case _: CommandResponse.Locked    => log.error("HCD is locked.")
         case inv: CommandResponse.Invalid => log.error(s"Command is invalid: ${inv.issue.reason}")
@@ -160,7 +161,7 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
           case `counterEventKey` =>
             val counter = e(hcdCounterKey).head
             log.info(s"Counter = $counter")
-          case _                 => log.warn("Unexpected event received.")
+          case _ => log.warn("Unexpected event received.")
         }
       case e: ObserveEvent => log.warn("Unexpected ObserveEvent received.") // not expected
     }
