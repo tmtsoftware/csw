@@ -9,6 +9,7 @@ import csw.config.api.models.*;
 import csw.config.client.JConfigClientBaseSuite;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
+import org.scalatest.junit.JUnitSuite;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -22,7 +23,7 @@ import static org.hamcrest.CoreMatchers.isA;
 
 // DEOPSCSW-138: Split Config API into Admin API and Client API
 // DEOPSCSW-103: Java API for Configuration service
-public class JConfigAdminApiTest  {
+public class JConfigAdminApiTest extends JUnitSuite {
 
     private static JConfigClientBaseSuite jConfigClientBaseSuite;
     private static IConfigService configService;

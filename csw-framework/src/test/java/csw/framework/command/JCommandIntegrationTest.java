@@ -42,6 +42,7 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.scalatest.junit.JUnitSuite;
 import scala.concurrent.Await;
 import scala.concurrent.ExecutionContext;
 import scala.concurrent.duration.Duration;
@@ -66,7 +67,7 @@ import static csw.location.api.models.Connection.AkkaConnection;
 // DEOPSCSW-228: Assist Components with command completion
 // DEOPSCSW-317: Use state values of HCD to determine command completion
 // DEOPSCSW-321: AkkaLocation provides wrapper for ActorRef[ComponentMessage]
-public class JCommandIntegrationTest {
+public class JCommandIntegrationTest extends JUnitSuite {
     private static ActorSystem hcdActorSystem = ActorSystemFactory.remote();
     private ExecutionContext ec = hcdActorSystem.dispatcher();
     private static ActorMaterializer mat = ActorMaterializer.create(hcdActorSystem);

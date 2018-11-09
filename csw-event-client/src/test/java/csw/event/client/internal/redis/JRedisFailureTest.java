@@ -11,6 +11,7 @@ import io.lettuce.core.ClientOptions;
 import io.lettuce.core.RedisException;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
+import org.scalatest.junit.JUnitSuite;
 
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
@@ -20,7 +21,7 @@ import java.util.concurrent.TimeoutException;
 
 import static org.hamcrest.CoreMatchers.isA;
 
-public class JRedisFailureTest {
+public class JRedisFailureTest extends JUnitSuite {
 
     private static RedisTestProps redisTestProps;
 

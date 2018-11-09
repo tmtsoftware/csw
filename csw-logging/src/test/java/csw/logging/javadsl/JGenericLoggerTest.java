@@ -14,6 +14,7 @@ import csw.logging.utils.JGenericActor;
 import csw.logging.utils.JLogUtil;
 import csw.logging.utils.TestAppender;
 import org.junit.*;
+import org.scalatest.junit.JUnitSuite;
 import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
 
@@ -22,7 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class JGenericLoggerTest {
+public class JGenericLoggerTest extends JUnitSuite {
     private static ActorSystem actorSystem = ActorSystem.create("base-system");
     private static LoggingSystem loggingSystem;
 

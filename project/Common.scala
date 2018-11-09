@@ -38,12 +38,9 @@ object Common extends AutoPlugin {
     ),
     javacOptions in (Compile, doc) ++= Seq("-Xdoclint:none"),
     testOptions in Test ++= Seq(
-      Tests.Argument("-l", "csw.time.client.tags.Linux"),
       // show full stack traces and test case durations
       Tests.Argument("-oDF"),
-      // -v Log "test run started" / "test started" / "test run finished" events on log level "info" instead of "debug".
-      // -a Show stack traces and exception class name for AssertionErrors.
-      Tests.Argument(TestFrameworks.JUnit, "-v", "-a")
+      Tests.Argument("-l", "csw.time.client.tags.Linux")
     ),
     publishArtifact in (Test, packageBin) := true,
     version := {

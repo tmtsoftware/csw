@@ -8,6 +8,7 @@ import csw.logging.javadsl.JGenericLoggerFactory;
 import csw.logging.javadsl.JLogAppenderBuilders;
 import csw.logging.javadsl.JLoggingSystemFactory;
 import org.openjdk.jmh.annotations.*;
+import org.scalatest.junit.JUnitSuite;
 import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
 
@@ -32,7 +33,7 @@ import java.util.concurrent.TimeUnit;
 @Warmup(iterations = 5)
 @Measurement(iterations = 10)
 @Fork(value = 1)
-public class JE2ELoggingBenchmark {
+public class JE2ELoggingBenchmark extends JUnitSuite {
     private ILogger log;
     private static ActorSystem actorSystem;
     private JPerson person;

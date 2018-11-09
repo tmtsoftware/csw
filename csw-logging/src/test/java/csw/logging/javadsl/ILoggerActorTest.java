@@ -14,6 +14,7 @@ import csw.logging.internal.LoggingSystem;
 import csw.logging.utils.JLogUtil;
 import csw.logging.utils.TestAppender;
 import org.junit.*;
+import org.scalatest.junit.JUnitSuite;
 import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
 
@@ -22,7 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class ILoggerActorTest {
+public class ILoggerActorTest extends JUnitSuite {
     protected static ActorSystem actorSystem = ActorSystem.create("base-system");
     protected static LoggingSystem loggingSystem;
 

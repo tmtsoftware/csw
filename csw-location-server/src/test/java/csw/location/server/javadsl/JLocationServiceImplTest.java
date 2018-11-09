@@ -26,6 +26,7 @@ import csw.logging.javadsl.JLoggerFactory;
 import csw.network.utils.Networks;
 import csw.params.core.models.Prefix;
 import org.junit.*;
+import org.scalatest.junit.JUnitSuite;
 import scala.concurrent.Await;
 import scala.concurrent.duration.FiniteDuration;
 
@@ -36,7 +37,7 @@ import java.util.concurrent.TimeUnit;
 import static csw.location.api.models.Connection.*;
 
 @SuppressWarnings("ConstantConditions")
-public class JLocationServiceImplTest {
+public class JLocationServiceImplTest extends JUnitSuite {
 
     private static ServerWiring wiring = new ServerWiring();
 

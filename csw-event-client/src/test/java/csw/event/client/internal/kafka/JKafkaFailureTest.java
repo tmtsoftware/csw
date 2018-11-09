@@ -11,6 +11,7 @@ import net.manub.embeddedkafka.EmbeddedKafka$;
 import org.apache.kafka.common.errors.RecordTooLargeException;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
+import org.scalatest.junit.JUnitSuite;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -21,7 +22,7 @@ import java.util.concurrent.TimeoutException;
 
 import static org.hamcrest.CoreMatchers.isA;
 
-public class JKafkaFailureTest {
+public class JKafkaFailureTest extends JUnitSuite {
 
     private static KafkaTestProps kafkaTestProps;
     private static IEventPublisher publisher;

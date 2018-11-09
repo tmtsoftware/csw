@@ -5,6 +5,7 @@ import csw.params.core.generics.Key;
 import csw.params.core.generics.Parameter;
 import org.junit.Assert;
 import org.junit.Test;
+import org.scalatest.junit.JUnitSuite;
 
 import java.time.Instant;
 import java.util.Arrays;
@@ -14,7 +15,7 @@ import static csw.params.javadsl.JUnits.NoUnits;
 
 // DEOPSCSW-183: Configure attributes and values
 //DEOPSCSW-282: Add a timestamp Key and Parameter
-public class JStructTest {
+public class JStructTest extends JUnitSuite {
 
     private final String keyName = "StructKey";
     private final Key<Struct> key = JKeyType.StructKey().make(keyName);

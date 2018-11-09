@@ -5,6 +5,7 @@ import csw.params.core.models.ArrayData;
 import csw.params.core.models.Units;
 import org.junit.Assert;
 import org.junit.Test;
+import org.scalatest.junit.JUnitSuite;
 
 import java.util.List;
 
@@ -13,7 +14,7 @@ import static csw.params.javadsl.JUnits.*;
 // DEOPSCSW-183: Configure attributes and values
 // DEOPSCSW-190: Implement Unit Support
 // DEOPSCSW-184: Change configurations - attributes and values
-public class JArrayKeyTypeTest {
+public class JArrayKeyTypeTest extends JUnitSuite {
 
     private final Units NoUnit = NoUnits;
 

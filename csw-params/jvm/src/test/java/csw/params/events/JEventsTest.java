@@ -7,6 +7,7 @@ import csw.params.core.generics.ParameterSetType;
 import csw.params.core.models.Prefix;
 import org.junit.Assert;
 import org.junit.Test;
+import org.scalatest.junit.JUnitSuite;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -16,7 +17,7 @@ import java.util.stream.Collectors;
 // DEOPSCSW-327: Define Event Data Structure
 // DEOPSCSW-328: Basic information of Event needed for routing and Diagnostic use
 // DEOPSCSW-329: Providing Mandatory information during Event Creation
-public class JEventsTest {
+public class JEventsTest extends JUnitSuite {
     private final Key<Integer> encoderIntKey = JKeyType.IntKey().make("encoder");
     private final Key<String> epochStringKey = JKeyType.StringKey().make("epoch");
     private final Key<Integer> epochIntKey = JKeyType.IntKey().make("epoch");

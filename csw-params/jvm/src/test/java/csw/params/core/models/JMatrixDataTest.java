@@ -2,9 +2,10 @@ package csw.params.core.models;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.scalatest.junit.JUnitSuite;
 
 // DEOPSCSW-183: Configure attributes and values
-public class JMatrixDataTest {
+public class JMatrixDataTest extends JUnitSuite {
 
     @Test
     public void shouldCreateMatrixDataFromJavaArrays() {

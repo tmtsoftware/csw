@@ -15,6 +15,7 @@ import csw.location.client.ActorSystemFactory;
 import csw.location.client.javadsl.JHttpLocationServiceFactory;
 import csw.location.server.http.JHTTPLocationService;
 import org.junit.*;
+import org.scalatest.junit.JUnitSuite;
 import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
@@ -25,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 import static csw.alarm.api.javadsl.JAlarmSeverity.Indeterminate;
 
 // DEOPSCSW-481: Component Developer API available to all CSW components
-public class JAlarmServiceFactoryTest {
+public class JAlarmServiceFactoryTest extends JUnitSuite {
     // start location http server
     private static JHTTPLocationService jhttpLocationService = new JHTTPLocationService();
 

@@ -3,6 +3,7 @@ package csw.time.client;
 import csw.time.api.TimeService;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.scalatest.junit.JUnitSuite;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -10,7 +11,7 @@ import java.time.ZoneId;
 
 import static org.junit.Assert.assertEquals;
 
-public class JTimeServiceTest {
+public class JTimeServiceTest extends JUnitSuite {
 
     private Instant fixedInstant = Instant.now();
     private ZoneId zoneId        = ZoneId.of("US/Hawaii");

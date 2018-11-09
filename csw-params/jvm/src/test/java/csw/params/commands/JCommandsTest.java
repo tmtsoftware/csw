@@ -8,6 +8,7 @@ import csw.params.core.models.ObsId;
 import csw.params.core.models.Prefix;
 import org.junit.Assert;
 import org.junit.Test;
+import org.scalatest.junit.JUnitSuite;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -17,7 +18,7 @@ import static csw.params.javadsl.JSubsystem.WFOS;
 // DEOPSCSW-183: Configure attributes and values
 // DEOPSCSW-185: Easy to Use Syntax/Api
 // DEOPSCSW-320: Add command type in Setup, observe and wait
-public class JCommandsTest {
+public class JCommandsTest extends JUnitSuite {
 
     private final Key<Integer> encoderIntKey = JKeyType.IntKey().make("encoder");
     private final Key<String> epochStringKey = JKeyType.StringKey().make("epoch");
