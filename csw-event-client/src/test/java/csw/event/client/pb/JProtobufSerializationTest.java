@@ -14,6 +14,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.scalatest.junit.JUnitSuite;
 
 import java.time.Instant;
 import java.util.Arrays;
@@ -21,7 +22,7 @@ import java.util.List;
 
 // DEOPSCSW-495: Protobuf serde fails for Java keys/parameters
 @RunWith(value = Parameterized.class)
-public class JProtobufSerializationTest {
+public class JProtobufSerializationTest extends JUnitSuite {
 
     private final String keyType;
     private final Parameter<?> param;

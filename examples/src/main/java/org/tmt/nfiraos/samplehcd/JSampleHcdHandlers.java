@@ -1,4 +1,4 @@
-package nfiraos.samplehcd;
+package org.tmt.nfiraos.samplehcd;
 
 import akka.actor.Cancellable;
 import akka.actor.typed.ActorRef;

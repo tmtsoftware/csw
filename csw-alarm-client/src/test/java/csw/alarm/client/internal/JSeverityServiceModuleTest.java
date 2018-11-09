@@ -14,6 +14,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.scalatest.junit.JUnitSuite;
 import scala.concurrent.Await;
 import scala.concurrent.duration.FiniteDuration;
 
@@ -24,7 +25,7 @@ import static org.hamcrest.CoreMatchers.isA;
 import static org.junit.Assert.*;
 
 // DEOPSCSW-444: Set severity api for component
-public class JSeverityServiceModuleTest {
+public class JSeverityServiceModuleTest extends JUnitSuite {
 
     private static AlarmServiceTestSetup alarmServiceTestSetup = new AlarmServiceTestSetup();
     private static IAlarmService jAlarmService = alarmServiceTestSetup.jAlarmService();

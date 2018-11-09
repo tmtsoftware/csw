@@ -41,9 +41,13 @@ private[testkit] trait RedisStore extends EmbeddedRedis {
   def start(sentinelPort: Optional[Int], serverPort: Optional[Int]): Unit =
     start(sentinelPort.orElse(getFreePort), serverPort.orElse(getFreePort))
 
-  def shutdown(): Unit = {
+  def stopRedis(): Unit = {
     redisServer.foreach(_.stop())
     redisSentinel.foreach(_.stop())
+  }
+
+  def shutdown(): Unit = {
+    stopRedis()
     TestKitUtils.await(Http().shutdownAllConnectionPools(), timeout)
     TestKitUtils.coordShutdown(CoordinatedShutdown(system).run, timeout)
   }

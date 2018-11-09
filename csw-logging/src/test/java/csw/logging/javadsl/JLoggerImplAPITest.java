@@ -9,9 +9,9 @@ import csw.logging.commons.LoggingKeys$;
 import csw.logging.internal.LoggingLevels;
 import csw.logging.internal.LoggingSystem;
 import csw.logging.scaladsl.RequestId;
-import csw.logging.utils.JGenericSimple;
 import csw.logging.utils.TestAppender;
 import org.junit.*;
+import org.scalatest.junit.JUnitSuite;
 import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
 
@@ -21,9 +21,9 @@ import java.util.concurrent.TimeUnit;
 // DEOPSCSW-115: Format and control logging content
 // DEOPSCSW-271: API change
 // DEOPSCSW-278: Create Java API without arguments as suppliers
-public class JLoggerImplAPITest extends JGenericSimple {
+public class JLoggerImplAPITest extends JUnitSuite {
 
-    private ILogger logger = JGenericLoggerFactory.getLogger(getClass());;
+    private ILogger logger = JGenericLoggerFactory.getLogger(getClass());
 
     private String message = "Sample log message";
     private String exceptionMessage = "Sample exception message";

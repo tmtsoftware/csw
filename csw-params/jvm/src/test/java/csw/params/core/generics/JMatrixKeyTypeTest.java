@@ -7,6 +7,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.scalatest.junit.JUnitSuite;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -18,7 +19,7 @@ import static csw.params.javadsl.JUnits.*;
 // DEOPSCSW-190: Implement Unit Support
 // DEOPSCSW-184: Change configurations - attributes and values
 @RunWith(value = Parameterized.class)
-public class JMatrixKeyTypeTest {
+public class JMatrixKeyTypeTest extends JUnitSuite {
 
     private final String keyName;
     private final SimpleKeyType<MatrixData> matrixKey;

@@ -19,6 +19,7 @@ import csw.logging.utils.JGenericSimple;
 import csw.logging.utils.JLogUtil;
 import csw.logging.utils.TestAppender;
 import org.junit.*;
+import org.scalatest.junit.JUnitSuite;
 import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
 
@@ -26,7 +27,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 // DEOPSCSW-316: Improve Logger accessibility for component developers
-public class ILoggerTest {
+public class ILoggerTest extends JUnitSuite {
     private static ActorSystem actorSystem = ActorSystem.create("base-system");
     private static LoggingSystem loggingSystem;
 

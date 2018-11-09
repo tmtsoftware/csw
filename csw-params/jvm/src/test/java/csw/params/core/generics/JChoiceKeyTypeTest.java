@@ -7,6 +7,7 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.scalatest.junit.JUnitSuite;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,7 +17,7 @@ import static csw.params.javadsl.JUnits.kilometer;
 
 // DEOPSCSW-183: Configure attributes and values
 // DEOPSCSW-190: Implement Unit Support
-public class JChoiceKeyTypeTest {
+public class JChoiceKeyTypeTest extends JUnitSuite {
     private final String keyName = " choiceKey";
     private final Choices choices = Choices.from("A", "B", "C");
 

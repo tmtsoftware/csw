@@ -14,6 +14,7 @@ import csw.logging.internal.LoggingSystem;
 import csw.logging.LogCommand;
 import csw.logging.utils.TestAppender;
 import org.junit.*;
+import org.scalatest.junit.JUnitSuite;
 import scala.concurrent.Await;
 import scala.concurrent.duration.Duration;
 
@@ -23,7 +24,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 // DEOPSCSW-280 SPIKE: Introduce Akkatyped in logging
-public class ILoggerMutableActorTest {
+public class ILoggerMutableActorTest extends JUnitSuite {
     protected static ActorSystem actorSystem = ActorSystem.create("base-system");
     protected static LoggingSystem loggingSystem;
 

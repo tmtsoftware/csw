@@ -9,7 +9,6 @@ import csw.config.api.models.*;
 import csw.config.client.javadsl.JConfigClientFactory;
 import csw.config.server.ServerWiring;
 import csw.location.api.javadsl.ILocationService;
-import csw.location.client.javadsl.JHttpLocationServiceFactory;
 import csw.testkit.ConfigTestKit;
 import csw.testkit.javadsl.FrameworkTestKitJunitResource;
 import csw.testkit.javadsl.JCSWService;

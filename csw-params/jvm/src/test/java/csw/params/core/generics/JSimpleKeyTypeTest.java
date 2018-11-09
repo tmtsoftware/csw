@@ -5,6 +5,7 @@ import csw.params.core.models.RaDec;
 import csw.params.core.models.Struct;
 import org.junit.Assert;
 import org.junit.Test;
+import org.scalatest.junit.JUnitSuite;
 
 import java.time.Instant;
 
@@ -14,7 +15,7 @@ import static csw.params.javadsl.JUnits.*;
 // DEOPSCSW-185: Easy to Use Syntax/Api
 // DEOPSCSW-190: Implement Unit Support
 // DEOPSCSW-184: Change configurations - attributes and values
-public class JSimpleKeyTypeTest {
+public class JSimpleKeyTypeTest extends JUnitSuite {
 
     @Test
     public void testBooleanKeyParameter() {

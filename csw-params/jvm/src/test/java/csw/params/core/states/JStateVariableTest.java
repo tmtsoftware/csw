@@ -9,6 +9,7 @@ import csw.params.core.models.Prefix;
 import csw.params.javadsl.JKeyType;
 import org.junit.Assert;
 import org.junit.Test;
+import org.scalatest.junit.JUnitSuite;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -17,7 +18,7 @@ import java.util.Optional;
 
 // DEOPSCSW-183: Configure attributes and values
 // DEOPSCSW-185: Easy to Use Syntax/Api
-public class JStateVariableTest {
+public class JStateVariableTest extends JUnitSuite {
 
     private final Key<Integer> encoderIntKey = JKeyType.IntKey().make("encoder");
     private final Key<String> epochStringKey = JKeyType.StringKey().make("epoch");
