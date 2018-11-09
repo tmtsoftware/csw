@@ -20,12 +20,12 @@ public class JTimeServiceTest extends JUnitSuite {
     private TimeService timeService = new TimeServiceImpl(clock);
 
     //DEOPSCSW-533: Access parts of UTC date.time in Java and Scala
-    @Ignore
+    @Test
     public void shouldGetUTCTime(){
         Instant instant               = timeService.UTCTime();
         Instant fixedInstant = Instant.now();
 
-        long expectedMillis = fixedInstant.toEpochMilli() +- 10;
+        long expectedMillis = fixedInstant.toEpochMilli();
 
         assertEquals(expectedMillis, instant.toEpochMilli());
     }
