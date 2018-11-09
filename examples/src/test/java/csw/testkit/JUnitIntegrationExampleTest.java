@@ -18,7 +18,7 @@ public class JUnitIntegrationExampleTest extends JUnitSuite {
 
     @Test
     public void testSpawningComponentInStandaloneMode() {
-        testKit.spawnStandalone(ConfigFactory.load("SampleHcdStandalone.conf"));
+        testKit.spawnStandalone(ConfigFactory.load("JSampleHcdStandalone.conf"));
 
          // ... assertions etc.
     }

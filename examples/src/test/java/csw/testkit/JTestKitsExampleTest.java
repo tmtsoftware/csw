@@ -46,7 +46,7 @@ public class JTestKitsExampleTest extends JUnitSuite {
         //#spawn-using-testkit
 
         // starting container from container config using testkit
-        frameworkTestKit.spawnContainer(ConfigFactory.load("SampleContainer.conf"));
+        frameworkTestKit.spawnContainer(ConfigFactory.load("JSampleContainer.conf"));
 
         // starting standalone component from config using testkit
         // ActorRef<ComponentMessage> componentRef =
@@ -54,7 +54,7 @@ public class JTestKitsExampleTest extends JUnitSuite {
 
         //#spawn-using-testkit
 
-        AkkaConnection connection       = new AkkaConnection(new ComponentId("SampleAssembly", Assembly));
+        AkkaConnection connection       = new AkkaConnection(new ComponentId("JSampleAssembly", Assembly));
         Optional<AkkaLocation> akkaLocation = locationService.resolve(connection, Duration.ofSeconds(5)).get();
 
         Assert.assertTrue(akkaLocation.isPresent());
