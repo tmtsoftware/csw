@@ -29,7 +29,7 @@ class SampleHcdHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswCont
   private val log                           = loggerFactory.getLogger
 
   //#worker-actor
-  sealed trait WorkerCommand extends TMTSerializable
+  sealed trait WorkerCommand                      extends TMTSerializable
   case class Sleep(runId: Id, timeInMillis: Long) extends WorkerCommand
 
   private val workerActor =

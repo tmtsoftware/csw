@@ -30,7 +30,8 @@ import scala.util.{Failure, Success}
  * and if validation is successful, then onSubmit hook gets invoked.
  * You can find more information on this here : https://tmtsoftware.github.io/csw/framework.html
  */
-class SampleAssemblyHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext) extends ComponentHandlers(ctx, cswCtx) {
+class SampleAssemblyHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCtx: CswContext)
+    extends ComponentHandlers(ctx, cswCtx) {
 
   import cswCtx._
   implicit val ec: ExecutionContextExecutor = ctx.executionContext
@@ -119,7 +120,7 @@ class SampleAssemblyHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCt
             val counter = e(hcdCounterKey).head
             log.info(s"Counter = $counter")
             setCounterAlarm(counter)
-          case _                 => log.warn("Unexpected event received.")
+          case _ => log.warn("Unexpected event received.")
         }
       case e: ObserveEvent => log.warn("Unexpected ObserveEvent received.") // not expected
     }
@@ -127,9 +128,9 @@ class SampleAssemblyHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCt
   //#subscribe
 
   //#alarm
-  private val safeRange    = 0 to 10
-  private val warnRange    = 11 to 15
-  private val majorRange   = 16 to 20
+  private val safeRange  = 0 to 10
+  private val warnRange  = 11 to 15
+  private val majorRange = 16 to 20
   private def getCounterSeverity(counter: Int) = counter match {
     case x if safeRange contains x  => AlarmSeverity.Okay
     case x if warnRange contains x  => AlarmSeverity.Warning
@@ -143,7 +144,7 @@ class SampleAssemblyHandlersAlarm(ctx: ActorContext[TopLevelActorMessage], cswCt
     val severity = getCounterSeverity(counter)
     alarmService.setSeverity(counterAlarmKey, severity).onComplete {
       case Success(value) => log.info(s"Severity for alarm ${counterAlarmKey.name} set to " + severity.toString)
-      case Failure(ex) => log.error(s"Error setting severity for alarm ${counterAlarmKey.name}: ${ ex.getMessage}")
+      case Failure(ex)    => log.error(s"Error setting severity for alarm ${counterAlarmKey.name}: ${ex.getMessage}")
     }
   }
   //#alarm
