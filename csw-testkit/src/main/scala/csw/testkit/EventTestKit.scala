@@ -11,9 +11,9 @@ import csw.location.api.models.RegistrationResult
 import csw.network.utils.SocketUtils.getFreePort
 import csw.testkit.redis.RedisStore
 
-final class EventTestKit private (testKitSettings: TestKitSettings = TestKitSettings(ConfigFactory.load())) extends RedisStore {
+final class EventTestKit private (_system: ActorSystem, testKitSettings: TestKitSettings) extends RedisStore {
 
-  override implicit lazy val system: ActorSystem        = ActorSystem("event-test-kit")
+  override implicit val system: ActorSystem             = _system
   override implicit lazy val timeout: Timeout           = testKitSettings.DefaultTimeout
   override protected lazy val masterId: String          = system.settings.config.getString("csw-event.redis.masterId")
   override protected lazy val connection: TcpConnection = EventServiceConnection.value
@@ -59,14 +59,25 @@ object EventTestKit {
    *
    * @return handle to EventTestKit which can be used to start and stop event service
    */
-  def apply(): EventTestKit = new EventTestKit()
+  def apply(
+      actorSystem: ActorSystem = ActorSystem("alarm-testkit"),
+      testKitSettings: TestKitSettings = TestKitSettings(ConfigFactory.load())
+  ): EventTestKit = new EventTestKit(actorSystem, testKitSettings)
 
   /**
-   * Create a EventTestKit
+   * Java API to create a EventTestKit
+   *
+   * @param actorSystem actorSystem
+   * @return handle to EventTestKit which can be used to start and stop event service
+   */
+  def create(actorSystem: ActorSystem): EventTestKit = apply(actorSystem)
+
+  /**
+   * Java API to create a EventTestKit
    *
    * @param testKitSettings custom testKitSettings
    * @return handle to EventTestKit which can be used to start and stop event service
    */
-  def apply(testKitSettings: TestKitSettings): EventTestKit = new EventTestKit(testKitSettings)
+  def create(testKitSettings: TestKitSettings): EventTestKit = apply(testKitSettings = testKitSettings)
 
 }

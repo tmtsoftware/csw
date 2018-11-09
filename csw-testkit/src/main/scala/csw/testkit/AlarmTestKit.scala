@@ -11,9 +11,9 @@ import csw.location.api.models.RegistrationResult
 import csw.network.utils.SocketUtils.getFreePort
 import csw.testkit.redis.RedisStore
 
-final class AlarmTestKit private (testKitSettings: TestKitSettings = TestKitSettings(ConfigFactory.load())) extends RedisStore {
+final class AlarmTestKit private (_system: ActorSystem, testKitSettings: TestKitSettings) extends RedisStore {
 
-  override implicit lazy val system: ActorSystem        = ActorSystem("alarm-test-kit")
+  override implicit val system: ActorSystem             = _system
   override implicit lazy val timeout: Timeout           = testKitSettings.DefaultTimeout
   override protected lazy val masterId: String          = system.settings.config.getString("csw-alarm.redis.masterId")
   override protected lazy val connection: TcpConnection = AlarmServiceConnection.value
@@ -46,7 +46,6 @@ final class AlarmTestKit private (testKitSettings: TestKitSettings = TestKitSett
    * This will terminate actor system and stop redis sentinel and redis server.
    */
   def shutdownAlarmService(): Unit = shutdown()
-
 }
 
 object AlarmTestKit {
@@ -59,14 +58,25 @@ object AlarmTestKit {
    *
    * @return handle to AlarmTestKit which can be used to start and stop alarm service
    */
-  def apply(): AlarmTestKit = new AlarmTestKit()
+  def apply(
+      actorSystem: ActorSystem = ActorSystem("alarm-testkit"),
+      testKitSettings: TestKitSettings = TestKitSettings(ConfigFactory.load())
+  ): AlarmTestKit = new AlarmTestKit(actorSystem, testKitSettings)
 
   /**
-   * Create a AlarmTestKit
+   * Java API to create a EventTestKit
+   *
+   * @param actorSystem actorSystem
+   * @return handle to EventTestKit which can be used to start and stop event service
+   */
+  def create(actorSystem: ActorSystem): AlarmTestKit = apply(actorSystem)
+
+  /**
+   * Java API to create a AlarmTestKit
    *
    * @param testKitSettings custom testKitSettings
    * @return handle to AlarmTestKit which can be used to start and stop alarm service
    */
-  def apply(testKitSettings: TestKitSettings): AlarmTestKit = new AlarmTestKit(testKitSettings)
+  def create(testKitSettings: TestKitSettings): AlarmTestKit = apply(testKitSettings = testKitSettings)
 
 }

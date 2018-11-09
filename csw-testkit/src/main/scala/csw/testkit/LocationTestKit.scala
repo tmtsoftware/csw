@@ -6,7 +6,7 @@ import com.typesafe.config.ConfigFactory
 import csw.location.server.internal.ServerWiring
 import csw.testkit.internal.TestKitUtils
 
-final class LocationTestKit private (val testKitSettings: TestKitSettings = TestKitSettings(ConfigFactory.load())) {
+final class LocationTestKit private (val testKitSettings: TestKitSettings) {
 
   private lazy val locationWiring = ServerWiring.make(testKitSettings.LocationClusterPort)
   import locationWiring.actorRuntime._
@@ -28,7 +28,7 @@ final class LocationTestKit private (val testKitSettings: TestKitSettings = Test
    * When the test has completed, make sure you shutdown location server.
    */
   def shutdownLocationServer(): Unit = {
-    locationServer.foreach(binding ⇒ TestKitUtils.await(binding.terminate(timeout.duration), timeout))
+    locationServer.foreach(TestKitUtils.terminateHttpServerBinding(_, timeout))
     TestKitUtils.coordShutdown(shutdown, timeout.duration)
   }
 

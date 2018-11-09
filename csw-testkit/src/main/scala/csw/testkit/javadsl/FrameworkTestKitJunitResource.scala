@@ -2,8 +2,9 @@ package csw.testkit.javadsl
 
 import java.util.Collections
 
-import akka.actor.ActorSystem
+import akka.actor.{typed, ActorSystem}
 import akka.actor.typed.ActorRef
+import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
 import com.typesafe.config.Config
 import csw.command.client.messages.{ComponentMessage, ContainerMessage}
 import csw.event.api.javadsl.IEventService
@@ -58,8 +59,11 @@ final class FrameworkTestKitJunitResource(val frameworkTestKit: FrameworkTestKit
 
   private val wiring = frameworkTestKit.frameworkWiring
 
-  /** Easy access to testkits actor system from java */
+  /** Easy access to testkits untyped actor system from java */
   lazy val actorSystem: ActorSystem = wiring.actorSystem
+
+  /** Easy access to testkits typed actor system from java (just wraps untyped to typed). */
+  lazy val typedSystem: typed.ActorSystem[_] = actorSystem.toTyped
 
   /** Handle to Java Location service  */
   lazy val jLocationService: ILocationService =

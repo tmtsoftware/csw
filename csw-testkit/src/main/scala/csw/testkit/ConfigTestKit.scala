@@ -2,21 +2,33 @@ package csw.testkit
 
 import java.nio.file.Paths
 
+import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigFactory}
-import csw.config.server.ServerWiring
+import csw.config.server.{ServerWiring, Settings}
 import csw.testkit.internal.TestKitUtils
 
-final class ConfigTestKit private (
-    serverConfig: Option[Config] = None,
-    val testKitSettings: TestKitSettings = TestKitSettings(ConfigFactory.load())
-) {
+final class ConfigTestKit private (system: ActorSystem, serverConfig: Option[Config], testKitSettings: TestKitSettings) {
 
+  implicit lazy val actorSystem: ActorSystem = system
   lazy val configWiring: ServerWiring = (serverConfig, testKitSettings.ConfigPort) match {
-    case (Some(config), _) ⇒ ServerWiring.make(config)
-    case (_, serverPort)   ⇒ ServerWiring.make(serverPort)
+    case (Some(_config), _) ⇒
+      new ServerWiring {
+        override lazy val config: Config           = _config
+        override lazy val actorSystem: ActorSystem = system
+      }
+    case (_, serverPort) ⇒
+      new ServerWiring {
+        override lazy val actorSystem: ActorSystem = system
+        override lazy val settings: Settings = new Settings(config) {
+          override val `service-port`: Int = serverPort.getOrElse(super.`service-port`)
+        }
+      }
   }
+
+  private var configServer: Option[Http.ServerBinding] = None
+
   import configWiring.actorRuntime._
 
   implicit lazy val timeout: Timeout = testKitSettings.DefaultTimeout
@@ -30,7 +42,8 @@ final class ConfigTestKit private (
    *
    */
   def startConfigServer(): Unit = {
-    TestKitUtils.await(configWiring.httpService.registeredLazyBinding, timeout)
+    val (server, _) = TestKitUtils.await(configWiring.httpService.registeredLazyBinding, timeout)
+    configServer = Some(server)
     deleteServerFiles()
     configWiring.svnRepo.initSvnRepo()
   }
@@ -41,6 +54,8 @@ final class ConfigTestKit private (
     TestKitUtils.deleteDirectoryRecursively(configWiring.settings.repositoryFile)
   }
 
+  def terminateServer(): Unit = configServer.foreach(TestKitUtils.terminateHttpServerBinding(_, timeout))
+
   /**
    * Shutdown HTTP Config server
    *
@@ -48,7 +63,8 @@ final class ConfigTestKit private (
    */
   def shutdownConfigServer(): Unit = {
     deleteServerFiles()
-    TestKitUtils.await(Http(configWiring.actorSystem).shutdownAllConnectionPools(), timeout)
+    TestKitUtils.await(Http(actorSystem).shutdownAllConnectionPools(), timeout)
+    terminateServer()
     TestKitUtils.coordShutdown(shutdown, timeout)
   }
 
@@ -61,12 +77,20 @@ object ConfigTestKit {
    *
    * When the test has completed you should shutdown the config server
    * with [[ConfigTestKit#shutdownConfigServer]].
-   *
    */
   def apply(
+      actorSystem: ActorSystem = ActorSystem("config-server"),
       serverConfig: Option[Config] = None,
       testKitSettings: TestKitSettings = TestKitSettings(ConfigFactory.load())
-  ): ConfigTestKit = new ConfigTestKit(serverConfig, testKitSettings)
+  ): ConfigTestKit = new ConfigTestKit(system = actorSystem, serverConfig = serverConfig, testKitSettings = testKitSettings)
+
+  /**
+   * Java API for creating ConfigTestKit
+   *
+   * @param actorSystem
+   * @return handle to ConfigTestKit which can be used to start and stop config server
+   */
+  def create(actorSystem: ActorSystem): ConfigTestKit = apply(actorSystem = actorSystem)
 
   /**
    * Java API for creating ConfigTestKit
@@ -74,7 +98,7 @@ object ConfigTestKit {
    * @param serverConfig custom configuration with which to start config server
    * @return handle to ConfigTestKit which can be used to start and stop config server
    */
-  def create(serverConfig: Config): ConfigTestKit = new ConfigTestKit(serverConfig = Some(serverConfig))
+  def create(serverConfig: Config): ConfigTestKit = apply(serverConfig = Some(serverConfig))
 
   /**
    * Java API for creating ConfigTestKit
@@ -93,6 +117,6 @@ object ConfigTestKit {
    * @return handle to ConfigTestKit which can be used to start and stop config server
    */
   def create(serverConfig: Config, testKitSettings: TestKitSettings): ConfigTestKit =
-    apply(Some(serverConfig), testKitSettings)
+    apply(serverConfig = Some(serverConfig), testKitSettings = testKitSettings)
 
 }

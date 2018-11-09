@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import akka.actor.typed.ActorRef
 import akka.http.scaladsl.Http
 import akka.util.Timeout
-import com.typesafe.config.Config
+import com.typesafe.config.{Config, ConfigFactory}
 import csw.command.client.messages.{ComponentMessage, ContainerMessage}
 import csw.framework.internal.wiring.{Container, FrameworkWiring, Standalone}
 import csw.location.client.ActorSystemFactory
@@ -22,6 +22,7 @@ final class FrameworkTestKit private (
     val alarmTestKit: AlarmTestKit
 ) {
 
+  implicit lazy val system: ActorSystem     = actorSystem
   lazy val frameworkWiring: FrameworkWiring = FrameworkWiring.make(actorSystem)
   implicit val timeout: Timeout             = locationTestKit.testKitSettings.DefaultTimeout
 
@@ -78,10 +79,10 @@ final class FrameworkTestKit private (
    * Shutdown all testkits which are started.
    */
   def shutdown(): Unit = {
-    if (configStarted) configTestKit.shutdownConfigServer()
-    if (eventStarted) eventTestKit.shutdown()
-    if (alarmStarted) alarmTestKit.shutdown()
-    TestKitUtils.await(Http(frameworkWiring.actorSystem).shutdownAllConnectionPools(), timeout)
+    TestKitUtils.await(Http().shutdownAllConnectionPools(), timeout)
+    if (configStarted) configTestKit.deleteServerFiles(); configTestKit.terminateServer()
+    if (eventStarted) eventTestKit.stopRedis()
+    if (alarmStarted) alarmTestKit.stopRedis()
     TestKitUtils.coordShutdown(frameworkWiring.actorRuntime.shutdown, timeout)
     locationTestKit.shutdownLocationServer()
   }
@@ -93,20 +94,19 @@ object FrameworkTestKit {
    * Scala API for creating FrameworkTestKit
    *
    * @param actorSystem actorSystem used for spawning components
-   * @param locationTestKit location testkit to start location server
-   * @param configTestKit config testkit to start config server
-   * @param eventTestKit event testkit to start event service
-   * @param alarmTestKit alarm testkit to start alarm service
+   * @param testKitSettings custom testKitSettings
    * @return handle to FrameworkTestKit which can be used to start and stop all services started
    */
   def apply(
       actorSystem: ActorSystem = ActorSystemFactory.remote("framework-testkit"),
-      locationTestKit: LocationTestKit = LocationTestKit(),
-      configTestKit: ConfigTestKit = ConfigTestKit(),
-      eventTestKit: EventTestKit = EventTestKit(),
-      alarmTestKit: AlarmTestKit = AlarmTestKit()
-  ): FrameworkTestKit =
-    new FrameworkTestKit(actorSystem, locationTestKit, configTestKit, eventTestKit, alarmTestKit)
+      testKitSettings: TestKitSettings = TestKitSettings(ConfigFactory.load())
+  ): FrameworkTestKit = new FrameworkTestKit(
+    actorSystem,
+    LocationTestKit(testKitSettings),
+    ConfigTestKit(actorSystem, testKitSettings = testKitSettings),
+    EventTestKit(actorSystem, testKitSettings),
+    AlarmTestKit(actorSystem, testKitSettings)
+  )
 
   /**
    * Java API for creating FrameworkTestKit
@@ -119,15 +119,16 @@ object FrameworkTestKit {
    * Java API for creating FrameworkTestKit
    *
    * @param actorSystem actorSystem used for spawning components
-   * @param testKitSettings custom testkit settings
-   * @return handle to FrameworkTestKit which can be used to start and stop services
+   * @return handle to FrameworkTestKit which can be used to start and stop all services started
    */
-  def create(actorSystem: ActorSystem, testKitSettings: TestKitSettings): FrameworkTestKit =
-    new FrameworkTestKit(
-      actorSystem,
-      LocationTestKit(testKitSettings),
-      ConfigTestKit(testKitSettings = testKitSettings),
-      EventTestKit(testKitSettings),
-      AlarmTestKit(testKitSettings)
-    )
+  def create(actorSystem: ActorSystem): FrameworkTestKit = apply(actorSystem = actorSystem)
+
+  /**
+   * Java API for creating FrameworkTestKit
+   *
+   * @param testKitSettings custom testKitSettings
+   * @return handle to FrameworkTestKit which can be used to start and stop all services started
+   */
+  def create(testKitSettings: TestKitSettings): FrameworkTestKit = apply(testKitSettings = testKitSettings)
+
 }
