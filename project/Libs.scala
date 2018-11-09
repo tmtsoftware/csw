@@ -28,6 +28,7 @@ object Libs {
   val `play-json` = dep("com.typesafe.play" %%% "play-json" % "2.6.10") //Apache 2.0
 
   val `akka-http-play-json`      = "de.heikoseeberger"    %% "akka-http-play-json"      % "1.22.0" //Apache 2.0
+  val `jwt-play-json`            = "com.pauldijou"        %% "jwt-play-json"            % "0.19.0"
   val `scalapb-runtime`          = "com.thesamet.scalapb" %% "scalapb-runtime"          % scalapbVersion % "protobuf"
   val `scalapb-json4s`           = "com.thesamet.scalapb" %% "scalapb-json4s"           % scalapbVersion
   val `lettuce`                  = "io.lettuce"           % "lettuce-core"              % "5.0.5.RELEASE"
@@ -49,7 +50,12 @@ object Libs {
   val `threeten-extra` = "org.threeten"     % "threeten-extra" % "1.4"
   val `jna`            = "net.java.dev.jna" % "jna"            % "5.1.0"
 
-  val `postgresql` = "org.postgresql" % "postgresql" % "42.2.5"
+  val `postgresql`    = "org.postgresql"            % "postgresql"    % "42.2.5"
+  val `jna`           = "net.java.dev.jna"          % "jna"           % "5.0.0"
+  val requests        = "com.lihaoyi"               %% "requests"     % "0.1.4"
+  val httpclient      = "org.apache.httpcomponents" % "httpclient"    % "4.5.6"
+  val `jboss-logging` = "org.jboss.logging"         % "jboss-logging" % "3.3.2.Final"
+  val `config`        = "com.typesafe"              % "config"        % "1.3.3"
 }
 
 object Jackson {
@@ -92,4 +98,10 @@ object AkkaHttp {
   val Version             = "10.1.5"
   val `akka-http`         = "com.typesafe.akka" %% "akka-http" % Version //ApacheV2
   val `akka-http-testkit` = "com.typesafe.akka" %% "akka-http-testkit" % Version //ApacheV2
+}
+
+object Keycloak {
+  val Version                 = "4.5.0.Final"
+  val `keycloak-adapter-core` = "org.keycloak" % "keycloak-adapter-core" % Version
+  val `keycloak-core`         = "org.keycloak" % "keycloak-core" % Version
 }
