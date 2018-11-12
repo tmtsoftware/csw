@@ -28,7 +28,7 @@ public class JTestKitsExampleTest extends JUnitSuite {
 
     @BeforeClass
     public static void beforeAll() {
-        frameworkTestKit.start(JCSWService.ConfigServer, JCSWService.EventStore);
+        frameworkTestKit.start(JCSWService.ConfigServer, JCSWService.EventServer);
     }
 
     @AfterClass

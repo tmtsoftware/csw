@@ -6,7 +6,7 @@ import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.testkit.FrameworkTestKit
-import csw.testkit.scaladsl.CSWService.{ConfigServer, EventStore}
+import csw.testkit.scaladsl.CSWService.{ConfigServer, EventServer}
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
 import org.scalatest.{BeforeAndAfterAll, FunSuiteLike, Matchers, OptionValues}
 
@@ -23,7 +23,7 @@ class TestKitsExampleTest extends FunSuiteLike with BeforeAndAfterAll with Match
   private val frameworkTestKit = FrameworkTestKit()
 
   // starts Config Server and Event Service
-  override protected def beforeAll(): Unit = frameworkTestKit.start(ConfigServer, EventStore)
+  override protected def beforeAll(): Unit = frameworkTestKit.start(ConfigServer, EventServer)
 
   // stops all services started by this testkit
   override protected def afterAll(): Unit = frameworkTestKit.shutdown()

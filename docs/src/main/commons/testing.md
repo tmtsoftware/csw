@@ -73,6 +73,17 @@ This is done in `beforeAll` and `afterAll` from the `BeforeAndAfterAll` trait. I
 ### JUnit
 If you are using JUnit then you can use `csw.testkit.javadsl.FrameworkTestKitJunitResource` to have the framework test kit automatically start provided services before running tests and shutdown it when the test is complete.
 
+### Supported CSW Services by FrameworkTestKit
+
+`ScalaTestFrameworkTestKit` and `FrameworkTestKitJunitResource` both support starting one or more of the following services.
+
+- `CSWService.LocationServer` | `JCSWService.LocationServer` 
+- `CSWService.ConfigServer`   | `JCSWService.ConfigServer`   
+- `CSWService.EventServer`    | `JCSWService.EventServer`    
+- `CSWService.AlarmServer`    | `JCSWService.AlarmServer`    
+
+Below example show's the usage of `ScalaTestFrameworkTestKit` and `FrameworkTestKitJunitResource` and how you can start above mentioned services as per your need.
+
 Scala
 :   @@snip [ScalaTestExampleIntegrationTest.scala](../../../../examples/src/test/scala/csw/teskit/ScalaTestIntegrationExampleTest.scala) { #scalatest-testkit }
 
