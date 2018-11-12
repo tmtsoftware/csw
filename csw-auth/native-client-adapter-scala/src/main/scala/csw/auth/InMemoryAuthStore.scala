@@ -9,9 +9,9 @@ import org.keycloak.representations.{AccessToken, AccessTokenResponse, IDToken}
 private[auth] object InMemoryAuthStore extends AuthStorage {
 
   private var accessTokenResponse: Option[AccessTokenResponse] = None
-  private var accessTokenObject: Option[AccessToken] = None
-  private var idTokenObject: Option[IDToken] = None
-  private var status: Option[Status] = None
+  private var accessTokenObject: Option[AccessToken]           = None
+  private var idTokenObject: Option[IDToken]                   = None
+  private var status: Option[Status]                           = None
 
   override def saveStatus(status: Status): Unit = this.status = Some(status)
 
@@ -46,16 +46,12 @@ private[auth] object InMemoryAuthStore extends AuthStorage {
   }
 
   //todo: we need to somehow stop using Keycloak's access token class and use ours
-  override def saveAccessTokenResponse(
-      accessTokenResponse: AccessTokenResponse,
-      keycloakDeployment: KeycloakDeployment): Unit = {
+  override def saveAccessTokenResponse(accessTokenResponse: AccessTokenResponse, keycloakDeployment: KeycloakDeployment): Unit = {
     this.accessTokenResponse = Some(accessTokenResponse)
 
     //todo:where does the public key come from?
     //todo: remove the verification. we only need decoding here
-    val tokens = AdapterTokenVerifier.verifyTokens(getAccessTokenString.get,
-                                                   getIdTokenString.get,
-                                                   keycloakDeployment)
+    val tokens = AdapterTokenVerifier.verifyTokens(getAccessTokenString.get, getIdTokenString.get, keycloakDeployment)
     this.accessTokenObject = Some(tokens.getAccessToken)
     this.idTokenObject = Some(tokens.getIdToken)
   }

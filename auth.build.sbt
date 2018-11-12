@@ -15,6 +15,7 @@ lazy val `native-client-adapter-scala` = project.settings(
     //for adapter
     Keycloak.`keycloak-core`,
     Keycloak.`keycloak-adapter-core`,
+    Keycloak.`keycloak-installed`,
     Libs.requests,
 
     //(legacy dependencies) required*
