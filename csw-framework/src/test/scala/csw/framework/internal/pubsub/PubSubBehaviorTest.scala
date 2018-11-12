@@ -3,16 +3,16 @@ package csw.framework.internal.pubsub
 import akka.actor.testkit.typed.TestKitSettings
 import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestInbox, TestProbe}
 import akka.actor.typed.scaladsl.adapter.UntypedActorSystemOps
-import akka.actor.typed.scaladsl.{Behaviors, MutableBehavior}
+import akka.actor.typed.scaladsl.{AbstractBehavior, Behaviors}
 import akka.actor.{typed, ActorSystem}
 import csw.command.client.messages.ComponentMessage
 import csw.command.client.models.framework.PubSub.{Publish, Subscribe, SubscribeOnly, Unsubscribe}
 import csw.command.client.models.framework.{LifecycleStateChanged, PubSub, SupervisorLifecycleState}
 import csw.framework.FrameworkTestMocks
 import csw.location.client.ActorSystemFactory
+import csw.logging.scaladsl.Logger
 import csw.params.core.models.Prefix
 import csw.params.core.states.{CurrentState, StateName}
-import csw.logging.scaladsl.Logger
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
@@ -21,7 +21,7 @@ import scala.concurrent.duration.DurationInt
 
 class PubSubBehaviorTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
-  trait MutableActorMock[T] { this: MutableBehavior[T] ⇒
+  trait MutableActorMock[T] { this: AbstractBehavior[T] ⇒
     protected lazy val log: Logger = MockitoSugar.mock[Logger]
   }
 

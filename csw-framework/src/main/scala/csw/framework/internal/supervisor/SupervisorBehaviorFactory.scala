@@ -7,7 +7,7 @@ import csw.framework.models.CswContext
 import csw.framework.scaladsl.{ComponentBehaviorFactory, RegistrationFactory}
 
 /**
- * The factory for creating [[akka.actor.typed.scaladsl.MutableBehavior]] of the supervisor of a component
+ * The factory for creating [[akka.actor.typed.scaladsl.AbstractBehavior]] of the supervisor of a component
  */
 private[framework] object SupervisorBehaviorFactory {
 

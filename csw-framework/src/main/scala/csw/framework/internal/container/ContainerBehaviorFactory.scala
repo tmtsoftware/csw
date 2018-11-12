@@ -12,7 +12,7 @@ import csw.location.api.scaladsl.LocationService
 import csw.logging.scaladsl.LoggerFactory
 
 /**
- * Factory for creating [[akka.actor.typed.scaladsl.MutableBehavior]] of a container component
+ * Factory for creating [[akka.actor.typed.scaladsl.AbstractBehavior]] of a container component
  */
 private[framework] object ContainerBehaviorFactory {
   def behavior(

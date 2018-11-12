@@ -1,6 +1,6 @@
 package csw.event
 
-import akka.actor.typed.scaladsl.{ActorContext, Behaviors, MutableBehavior}
+import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext, Behaviors}
 import akka.actor.typed.{ActorRef, Behavior}
 import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
@@ -51,7 +51,7 @@ class EventSubscribeExamples(eventService: EventService, hcd: AkkaLocation)(impl
     def make(): Behavior[Event] = Behaviors.setup(ctx ⇒ new EventHandler(ctx))
   }
 
-  class EventHandler(ctx: ActorContext[Event]) extends MutableBehavior[Event] {
+  class EventHandler(ctx: ActorContext[Event]) extends AbstractBehavior[Event] {
     override def onMessage(msg: Event): Behavior[Event] = {
       // handle messages
       Behaviors.same

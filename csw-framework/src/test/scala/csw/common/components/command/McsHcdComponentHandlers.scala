@@ -36,19 +36,19 @@ class McsHcdComponentHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: C
   override def onSubmit(controlCommand: ControlCommand): SubmitResponse = {
     controlCommand.commandName match {
       case `longRunning` ⇒
-        ctx.schedule(5.seconds,
-                     commandResponseManager.commandResponseManagerActor,
-                     AddOrUpdateCommand(Completed(controlCommand.runId)))
+        ctx.scheduleOnce(5.seconds,
+                         commandResponseManager.commandResponseManagerActor,
+                         AddOrUpdateCommand(Completed(controlCommand.runId)))
         Started(controlCommand.runId)
       case `mediumRunning` ⇒
-        ctx.schedule(3.seconds,
-                     commandResponseManager.commandResponseManagerActor,
-                     AddOrUpdateCommand(Completed(controlCommand.runId)))
+        ctx.scheduleOnce(3.seconds,
+                         commandResponseManager.commandResponseManagerActor,
+                         AddOrUpdateCommand(Completed(controlCommand.runId)))
         Started(controlCommand.runId)
       case `shortRunning` ⇒
-        ctx.schedule(1.seconds,
-                     commandResponseManager.commandResponseManagerActor,
-                     AddOrUpdateCommand(Completed(controlCommand.runId)))
+        ctx.scheduleOnce(1.seconds,
+                         commandResponseManager.commandResponseManagerActor,
+                         AddOrUpdateCommand(Completed(controlCommand.runId)))
         Started(controlCommand.runId)
       case `failureAfterValidationCmd` ⇒
         commandResponseManager.addOrUpdateCommand(Error(controlCommand.runId, "Failed command"))

@@ -1,12 +1,12 @@
 package csw.framework.internal.pubsub
 
-import akka.actor.typed.scaladsl.{ActorContext, MutableBehavior}
+import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext}
 import akka.actor.typed.{ActorRef, Behavior, Signal, Terminated}
-import csw.params.commands.Nameable
 import csw.command.client.models.framework.PubSub
 import csw.command.client.models.framework.PubSub._
-import csw.params.core.states.StateName
 import csw.logging.scaladsl.{Logger, LoggerFactory}
+import csw.params.commands.Nameable
+import csw.params.core.states.StateName
 
 /**
  * The actor which can be used by a component to publish its data of a given type, to all the components who subscribe
@@ -16,7 +16,7 @@ import csw.logging.scaladsl.{Logger, LoggerFactory}
  * @tparam T the type of the data which will be published or subscribed to using this actor
  */
 private[framework] class PubSubBehavior[T: Nameable](ctx: ActorContext[PubSub[T]], loggerFactory: LoggerFactory)
-    extends MutableBehavior[PubSub[T]] {
+    extends AbstractBehavior[PubSub[T]] {
   private val log: Logger = loggerFactory.getLogger(ctx)
 
   val nameableData: Nameable[T] = implicitly[Nameable[T]]

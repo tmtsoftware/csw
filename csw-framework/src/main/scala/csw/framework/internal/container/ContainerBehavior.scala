@@ -4,7 +4,7 @@ import akka.Done
 import akka.actor.CoordinatedShutdown
 import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.typed.scaladsl.{ActorContext, MutableBehavior}
+import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext}
 import akka.actor.typed.{ActorRef, Behavior, PostStop, Signal, Terminated}
 import csw.alarm.client.AlarmServiceFactory
 import csw.command.client.messages.ContainerCommonMessage.{GetComponents, GetContainerLifecycleState}
@@ -53,7 +53,7 @@ private[framework] final class ContainerBehavior(
     eventServiceFactory: EventServiceFactory,
     alarmServiceFactory: AlarmServiceFactory,
     loggerFactory: LoggerFactory
-) extends MutableBehavior[ContainerActorMessage] {
+) extends AbstractBehavior[ContainerActorMessage] {
 
   import ctx.executionContext
   private val log: Logger                        = loggerFactory.getLogger(ctx)
