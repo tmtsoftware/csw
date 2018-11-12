@@ -10,13 +10,14 @@ import csw.alarm.api.models.Key.AlarmKey
 import csw.alarm.api.scaladsl.AlarmSubscription
 import csw.alarm.cli.args.Options
 import csw.alarm.cli.extensions.RichFutureExt.RichFuture
-import csw.alarm.cli.utils.{ConfigUtils, Formatter}
+import csw.alarm.cli.utils.Formatter
 import csw.alarm.cli.wiring.ActorRuntime
 import csw.alarm.client.AlarmServiceFactory
 import csw.alarm.client.internal.AlarmServiceImpl
 import csw.alarm.client.internal.auto_refresh.AutoRefreshSeverityMessage.AutoRefreshSeverity
 import csw.alarm.client.internal.auto_refresh.{AutoRefreshSeverityActorFactory, AutoRefreshSeverityMessage}
 import csw.alarm.client.internal.commons.Settings
+import csw.config.client.commons.ConfigUtils
 
 import scala.async.Async.{async, await}
 import scala.concurrent.Future

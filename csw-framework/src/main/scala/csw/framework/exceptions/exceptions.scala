@@ -1,7 +1,5 @@
 package csw.framework.exceptions
 
-import java.nio.file.Path
-
 /**
  * Represents an exception that will cause the termination of component when thrown from any
  * component code. The onShutdown handler will be invoked next to facilitate graceful shutdown.
@@ -17,24 +15,6 @@ abstract class FailureStop(message: String) extends RuntimeException(message)
  * @param message represents the description or cause of exception
  */
 abstract class FailureRestart(message: String) extends RuntimeException(message)
-
-/**
- * FileNotFound exception is thrown while starting the container or host app if a remote config file used to spawn the
- * app is not available on config server
- *
- * @param filePath the path of file on config service that is not available
- */
-private[framework] case class FileNotFound(filePath: Path)
-    extends RuntimeException(s"File does not exist in configuration service at path ${filePath.toString}")
-
-/**
- * LocalFileNotFound exception is thrown while starting the container or host app if a local config file used to spawn the
- * app is not available on local disk
- *
- * @param filePath the path of file on local disk that is not available
- */
-private[framework] case class LocalFileNotFound(filePath: Path)
-    extends RuntimeException(s"File does not exist on local disk at path ${filePath.toString}")
 
 /**
  * UnableToParseOptions is thrown while starting the container or host app if any of the options is not valid
