@@ -33,7 +33,7 @@ final class FrameworkTestKit private (
   /**
    * Before running tests, use this or [FrameworkTestKit#start] method to start required services
    *
-   * This will start following services: [Location, Config, Event, Alarm]
+   * This will start following services: [LocationServer, ConfigServer, EventServer, AlarmServer]
    */
   def startAll(): Unit = start(LocationServer, ConfigServer, EventServer, AlarmServer)
 
