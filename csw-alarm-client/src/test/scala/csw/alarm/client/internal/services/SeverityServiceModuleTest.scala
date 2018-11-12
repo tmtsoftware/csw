@@ -497,8 +497,8 @@ class SeverityServiceModuleTest
 
       getStatus(alarmKey).await.acknowledgementStatus shouldBe oldAckStatus
 
-      // severity expires after 1 second in test
-      Thread.sleep(1000)
+      // severity expires after 1 second in test (wait 100 millis extra to make sure that it is expired and reflected in redis)
+      Thread.sleep(1100)
 
       getCurrentSeverity(alarmKey).await shouldBe Disconnected
 

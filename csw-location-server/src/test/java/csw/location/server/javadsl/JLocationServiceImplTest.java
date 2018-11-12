@@ -72,7 +72,7 @@ public class JLocationServiceImplTest extends JUnitSuite {
 
     @AfterClass
     public static void shutdown() throws Exception {
-        Await.result(actorSystem.terminate(), FiniteDuration.create(5, TimeUnit.SECONDS));
+        Await.result(CoordinatedShutdown.get(actorSystem).run(CoordinatedShutdown.unknownReason()), FiniteDuration.create(5, TimeUnit.SECONDS));
         Await.result(wiring.actorRuntime().shutdown(CoordinatedShutdown.UnknownReason$.MODULE$), FiniteDuration.create(5, TimeUnit.SECONDS));
     }
 
