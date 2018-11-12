@@ -3,8 +3,8 @@ package csw.event.client.internal.kafka
 import akka.Done
 import akka.actor.Cancellable
 import akka.kafka.ProducerSettings
+import akka.stream.Materializer
 import akka.stream.scaladsl.Source
-import akka.stream.{Materializer, OverflowStrategy}
 import csw.event.api.exceptions.PublishFailure
 import csw.event.api.scaladsl.EventPublisher
 import csw.event.client.internal.commons.EventPublisherUtil
@@ -31,21 +31,11 @@ class KafkaPublisher(producerSettings: Future[ProducerSettings[String, Array[Byt
   private val parallelism        = 1
   private val kafkaProducer      = producerSettings.map(_.createKafkaProducer())
   private val eventPublisherUtil = new EventPublisherUtil()
-  private val (actorRef, stream) = Source.actorRef[(Event, Promise[Done])](1024, OverflowStrategy.dropHead).preMaterialize()
 
-  stream
-    .mapAsync(1) {
-      case (e, p) =>
-        publishInternal(e).map(p.trySuccess).recover {
-          case ex => p.tryFailure(ex)
-        }
-    }
-    .runForeach(_ => ())
+  private val streamTermination: Future[Done] = eventPublisherUtil.streamTermination(publishInternal)
 
   override def publish(event: Event): Future[Done] = {
-    val p = Promise[Done]
-    actorRef ! ((event, p))
-    p.future
+    eventPublisherUtil.publish(event, streamTermination.isCompleted)
   }
 
   private def publishInternal(event: Event): Future[Done] = {
@@ -77,6 +67,7 @@ class KafkaPublisher(producerSettings: Future[ProducerSettings[String, Array[Byt
     publish(eventPublisherUtil.eventSourceAsync(eventGenerator, every), onError)
 
   override def shutdown(): Future[Done] = kafkaProducer.map { x =>
+    eventPublisherUtil.shutdown()
     scala.concurrent.blocking(x.close())
     Done
   }

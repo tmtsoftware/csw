@@ -1,14 +1,14 @@
 package csw.event.client.internal.commons
 
 import akka.Done
-import akka.actor.Cancellable
-import akka.stream.Materializer
+import akka.actor.{Cancellable, PoisonPill}
 import akka.stream.scaladsl.{Sink, Source}
-import csw.params.events.Event
+import akka.stream.{Materializer, OverflowStrategy}
 import csw.event.api.exceptions.PublishFailure
+import csw.params.events.Event
 
 import scala.concurrent.duration.{DurationDouble, FiniteDuration}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.util.control.NonFatal
 
 /**
@@ -17,6 +17,18 @@ import scala.util.control.NonFatal
 class EventPublisherUtil(implicit ec: ExecutionContext, mat: Materializer) {
 
   private val logger = EventServiceLogger.getLogger
+
+  lazy val (actorRef, stream) = Source.actorRef[(Event, Promise[Done])](1024, OverflowStrategy.dropHead).preMaterialize()
+
+  def streamTermination(f: Event => Future[Done]): Future[Done] =
+    stream
+      .mapAsync(1) {
+        case (e, p) =>
+          f(e).map(p.trySuccess).recover {
+            case ex => p.tryFailure(ex)
+          }
+      }
+      .runForeach(_ => ())
 
   // create an akka stream source out of eventGenerator function
   def eventSource(eventGenerator: => Event, every: FiniteDuration): Source[Event, Cancellable] =
@@ -48,6 +60,17 @@ class EventPublisherUtil(implicit ec: ExecutionContext, mat: Materializer) {
 
   def logError(failure: PublishFailure): Unit = {
     logger.error(failure.getMessage, ex = failure)
+  }
+
+  def publish(event: Event, isStreamTerminated: Boolean): Future[Done] = {
+    val p = Promise[Done]
+    if (isStreamTerminated) p.tryFailure(PublishFailure(event, new RuntimeException("Publisher is shutdown")))
+    else actorRef ! ((event, p))
+    p.future
+  }
+
+  def shutdown(): Unit = {
+    actorRef ! PoisonPill
   }
 
   // log error for any exception from provided eventGenerator
