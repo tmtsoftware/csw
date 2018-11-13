@@ -31,10 +31,17 @@ trait KeycloakInstalledApi {
   /**
    * User logs in by entering credentials on console. This however is not Resource Owner Credentials Password grant.
    * This method uses www-authenticate mechanism to post user credentials to auth server. It can also work with OTP.
+   * @return
+   */
+  def loginCommandLine(): Boolean
+
+  /**
+   * User logs in by entering credentials on console. This however is not Resource Owner Credentials Password grant.
+   * This method uses www-authenticate mechanism to post user credentials to auth server. It can also work with OTP.
    * @param redirectUri
    * @return
    */
-  def loginCommandLine(redirectUri: String = "urn:ietf:wg:oauth:2.0:oob"): Boolean
+  def loginCommandLine(redirectUri: String): Boolean
 
   /**
    * Access token in string format
