@@ -34,3 +34,18 @@ case object EmptyResponse
     extends RuntimeException(
       "response must have content-length"
     )
+
+/**
+ * LocalFileNotFound exception is thrown while starting the container or host app if a local config file used to spawn the
+ * app is not available on local disk
+ *
+ * @param filePath the path of file on local disk that is not available
+ */
+private[config] case class LocalFileNotFound(filePath: Path)
+    extends RuntimeException(s"File does not exist on local disk at path ${filePath.toString}")
+
+/**
+ * UnableToParseOptions is thrown while starting the container or host app if any of the options is not valid
+ */
+private[config] case object UnableToParseOptions
+    extends RuntimeException("Could not parse command line options. See --help to know more.")

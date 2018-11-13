@@ -2,25 +2,26 @@ package csw.event;
 
 import akka.actor.typed.ActorRef;
 import akka.actor.typed.Behavior;
+import akka.actor.typed.javadsl.AbstractBehavior;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
-import akka.actor.typed.javadsl.MutableBehavior;
+import akka.actor.typed.javadsl.Receive;
 import akka.stream.Materializer;
+import akka.stream.javadsl.Sink;
 import csw.command.client.messages.TopLevelActorMessage;
-import csw.params.events.Event;
-import csw.params.events.EventKey;
-import csw.params.events.EventName;
-import csw.location.api.models.AkkaLocation;
-import csw.params.core.models.Subsystem;
 import csw.event.api.javadsl.IEventSubscriber;
 import csw.event.api.javadsl.IEventSubscription;
 import csw.event.api.scaladsl.SubscriptionModes;
 import csw.event.client.internal.commons.javawrappers.JEventService;
+import csw.location.api.models.AkkaLocation;
+import csw.params.core.models.Subsystem;
+import csw.params.events.Event;
+import csw.params.events.EventKey;
+import csw.params.events.EventName;
+
 import java.time.Duration;
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
-
-import akka.stream.javadsl.Sink;
 
 public class JEventSubscribeExamples {
 
@@ -75,7 +76,7 @@ public class JEventSubscribeExamples {
         }
     }
 
-    public class JEventHandler extends MutableBehavior<Event> {
+    public class JEventHandler extends AbstractBehavior<Event> {
         private ActorContext<Event> ctx;
 
         JEventHandler(ActorContext<Event> context) {
@@ -83,7 +84,7 @@ public class JEventSubscribeExamples {
         }
 
         @Override
-        public Behaviors.Receive<Event> createReceive() {
+        public Receive<Event> createReceive() {
             // handle messages
             return null;
         }

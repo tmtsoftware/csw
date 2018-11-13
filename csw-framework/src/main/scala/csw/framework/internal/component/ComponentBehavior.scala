@@ -1,6 +1,6 @@
 package csw.framework.internal.component
 
-import akka.actor.typed.scaladsl.{ActorContext, MutableBehavior}
+import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext}
 import akka.actor.typed.{ActorRef, Behavior, PostStop, Signal}
 import csw.command.client.messages.CommandMessage.{Oneway, Submit, Validate}
 import csw.command.client.messages.CommandResponseManagerMessage.AddOrUpdateCommand
@@ -34,7 +34,7 @@ private[framework] final class ComponentBehavior(
     supervisor: ActorRef[FromComponentLifecycleMessage],
     lifecycleHandlers: ComponentHandlers,
     cswCtx: CswContext
-) extends MutableBehavior[TopLevelActorMessage] {
+) extends AbstractBehavior[TopLevelActorMessage] {
 
   import cswCtx._
   import ctx.executionContext

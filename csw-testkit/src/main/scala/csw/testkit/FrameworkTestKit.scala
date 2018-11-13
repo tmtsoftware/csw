@@ -33,9 +33,9 @@ final class FrameworkTestKit private (
   /**
    * Before running tests, use this or [FrameworkTestKit#start] method to start required services
    *
-   * This will start following services: [Location, Config, Event, Alarm]
+   * This will start following services: [LocationServer, ConfigServer, EventServer, AlarmServer]
    */
-  def startAll(): Unit = start(LocationServer, ConfigServer, EventStore, AlarmStore)
+  def startAll(): Unit = start(LocationServer, ConfigServer, EventServer, AlarmServer)
 
   /**
    * Before running tests, use this or [FrameworkTestKit#startAll] method to start required services
@@ -47,8 +47,8 @@ final class FrameworkTestKit private (
     locationTestKit.startLocationServer()
     services.foreach {
       case ConfigServer   ⇒ configTestKit.startConfigServer(); configStarted = true
-      case EventStore     ⇒ eventTestKit.startEventService(); eventStarted = true
-      case AlarmStore     ⇒ alarmTestKit.startAlarmService(); alarmStarted = true
+      case EventServer    ⇒ eventTestKit.startEventService(); eventStarted = true
+      case AlarmServer    ⇒ alarmTestKit.startAlarmService(); alarmStarted = true
       case LocationServer ⇒ // location server is already started above
     }
   }

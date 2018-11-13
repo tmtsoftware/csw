@@ -1,15 +1,12 @@
 package csw.logging.components.iris;
 
 import akka.actor.typed.Behavior;
-import akka.actor.typed.javadsl.Behaviors;
-import akka.actor.typed.javadsl.ActorContext;
-import akka.actor.typed.javadsl.MutableBehavior;
-import akka.actor.typed.javadsl.ReceiveBuilder;
+import akka.actor.typed.javadsl.*;
 import csw.logging.LogCommand;
 import csw.logging.javadsl.ILogger;
 import csw.logging.javadsl.JLoggerFactory;
 
-public class JIrisSupervisorMutableActor extends MutableBehavior<LogCommand> {
+public class JIrisSupervisorMutableActor extends AbstractBehavior<LogCommand> {
 
     private ActorContext<LogCommand> actorContext;
     private ILogger log;
@@ -22,12 +19,12 @@ public class JIrisSupervisorMutableActor extends MutableBehavior<LogCommand> {
     public static <LogCommand> Behavior<LogCommand> irisBeh(String componentName) {
         return Behaviors.setup(ctx -> {
             JLoggerFactory loggerFactory = new JLoggerFactory(componentName);
-            return (MutableBehavior<LogCommand>) new JIrisSupervisorMutableActor((ActorContext<csw.logging.LogCommand>) ctx, loggerFactory);
+            return (AbstractBehavior<LogCommand>) new JIrisSupervisorMutableActor((ActorContext<csw.logging.LogCommand>) ctx, loggerFactory);
         });
     }
 
     @Override
-    public Behaviors.Receive<LogCommand> createReceive() {
+    public Receive<LogCommand> createReceive() {
 
         ReceiveBuilder<LogCommand> builder = receiveBuilder()
                 .onMessage(LogCommand.class,

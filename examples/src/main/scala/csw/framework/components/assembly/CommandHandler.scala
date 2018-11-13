@@ -1,7 +1,7 @@
 package csw.framework.components.assembly
 
 import akka.actor.typed.Behavior
-import akka.actor.typed.scaladsl.{ActorContext, Behaviors, MutableBehavior}
+import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext, Behaviors}
 import csw.command.api.scaladsl.CommandService
 import csw.config.api.models.ConfigData
 
@@ -13,6 +13,6 @@ object CommandHandler {
 }
 
 class CommandHandler(ctx: ActorContext[CommandHandlerMsgs], configData: ConfigData, runningIn: Option[CommandService])
-    extends MutableBehavior[CommandHandlerMsgs] {
+    extends AbstractBehavior[CommandHandlerMsgs] {
   override def onMessage(msg: CommandHandlerMsgs): Behavior[CommandHandlerMsgs] = ???
 }

@@ -1,6 +1,6 @@
 package csw.framework.components.assembly
 
-import akka.actor.typed.scaladsl.{ActorContext, Behaviors, MutableBehavior}
+import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext, Behaviors}
 import akka.actor.typed.{ActorRef, Behavior}
 import csw.command.api.scaladsl.CommandService
 trait DiagnosticPublisherMessages
@@ -15,6 +15,6 @@ class DiagnosticsPublisher(
     ctx: ActorContext[DiagnosticPublisherMessages],
     runningIn: CommandService,
     worker: ActorRef[WorkerActorMsg]
-) extends MutableBehavior[DiagnosticPublisherMessages] {
+) extends AbstractBehavior[DiagnosticPublisherMessages] {
   override def onMessage(msg: DiagnosticPublisherMessages): Behavior[DiagnosticPublisherMessages] = ???
 }

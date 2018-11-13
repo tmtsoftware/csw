@@ -3,8 +3,8 @@ package csw.framework.internal.supervisor
 import akka.Done
 import akka.actor.CoordinatedShutdown
 import akka.actor.CoordinatedShutdown.Reason
+import akka.actor.typed.scaladsl._
 import akka.actor.typed.scaladsl.adapter.TypedActorSystemOps
-import akka.actor.typed.scaladsl.{ActorContext, Behaviors, MutableBehavior, TimerScheduler}
 import akka.actor.typed.{ActorRef, Behavior, PostStop, Signal, SupervisorStrategy, Terminated}
 import csw.command.client.messages.CommandResponseManagerMessage.{Query, Subscribe, Unsubscribe}
 import csw.command.client.messages.ComponentCommonMessage.{
@@ -72,7 +72,7 @@ private[framework] final class SupervisorBehavior(
     componentBehaviorFactory: ComponentBehaviorFactory,
     registrationFactory: RegistrationFactory,
     cswCtx: CswContext
-) extends MutableBehavior[SupervisorMessage] {
+) extends AbstractBehavior[SupervisorMessage] {
 
   import SupervisorBehavior._
   import cswCtx._

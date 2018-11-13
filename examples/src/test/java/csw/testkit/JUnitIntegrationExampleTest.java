@@ -14,7 +14,7 @@ public class JUnitIntegrationExampleTest extends JUnitSuite {
 
     @ClassRule
     public static final FrameworkTestKitJunitResource testKit =
-            new FrameworkTestKitJunitResource(Arrays.asList(JCSWService.AlarmStore, JCSWService.EventStore));
+            new FrameworkTestKitJunitResource(Arrays.asList(JCSWService.AlarmServer, JCSWService.EventServer));
 
     @Test
     public void testSpawningComponentInStandaloneMode() {

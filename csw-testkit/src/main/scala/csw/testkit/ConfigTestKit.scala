@@ -48,12 +48,14 @@ final class ConfigTestKit private (system: ActorSystem, serverConfig: Option[Con
     configWiring.svnRepo.initSvnRepo()
   }
 
+  /** useful for deleting entire svn repo when test has finished */
   def deleteServerFiles(): Unit = {
     val annexFileDir = Paths.get(configWiring.settings.`annex-files-dir`).toFile
     TestKitUtils.deleteDirectoryRecursively(annexFileDir)
     TestKitUtils.deleteDirectoryRecursively(configWiring.settings.repositoryFile)
   }
 
+  /** terminate HTTP ConfigServer */
   def terminateServer(): Unit = configServer.foreach(TestKitUtils.terminateHttpServerBinding(_, timeout))
 
   /**

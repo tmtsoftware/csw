@@ -1,6 +1,6 @@
 package csw.framework.components.assembly
 
-import akka.actor.typed.scaladsl.{ActorContext, Behaviors, MutableBehavior}
+import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext, Behaviors}
 import akka.actor.typed.{ActorRef, Behavior}
 import csw.config.api.models.ConfigData
 
@@ -16,6 +16,6 @@ object WorkerActor {
     Behaviors.setup(ctx ⇒ new WorkerActor(ctx, configData: ConfigData))
 }
 
-class WorkerActor(ctx: ActorContext[WorkerActorMsg], configData: ConfigData) extends MutableBehavior[WorkerActorMsg] {
+class WorkerActor(ctx: ActorContext[WorkerActorMsg], configData: ConfigData) extends AbstractBehavior[WorkerActorMsg] {
   override def onMessage(msg: WorkerActorMsg): Behavior[WorkerActorMsg] = ???
 }

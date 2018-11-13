@@ -1,6 +1,6 @@
 package csw.command.client.internal
 
-import akka.actor.typed.scaladsl.{ActorContext, MutableBehavior}
+import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext}
 import akka.actor.typed.{ActorRef, Behavior}
 import csw.command.client.messages.CommandResponseManagerMessage
 import csw.command.client.messages.CommandResponseManagerMessage._
@@ -38,7 +38,7 @@ import csw.params.core.models.Id
 private[internal] class CommandResponseManagerBehavior(
     ctx: ActorContext[CommandResponseManagerMessage],
     loggerFactory: LoggerFactory
-) extends MutableBehavior[CommandResponseManagerMessage] {
+) extends AbstractBehavior[CommandResponseManagerMessage] {
   private val log: Logger = loggerFactory.getLogger(ctx)
 
   private[command] var commandResponseState: CommandResponseState       = CommandResponseState(Map.empty)

@@ -20,7 +20,7 @@ public class FrameworkTestKitJunitTest extends JUnitSuite {
 
     @ClassRule
     public static final FrameworkTestKitJunitResource testKit =
-            new FrameworkTestKitJunitResource(Arrays.asList(JCSWService.AlarmStore, JCSWService.ConfigServer));
+            new FrameworkTestKitJunitResource(Arrays.asList(JCSWService.AlarmServer, JCSWService.ConfigServer));
 
     private ILocationService locationService = testKit.jLocationService();
 

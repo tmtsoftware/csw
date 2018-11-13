@@ -1,7 +1,8 @@
 package csw.alarm.cli.wiring
 import akka.actor.ActorSystem
-import csw.alarm.cli.utils.ConfigUtils
 import csw.alarm.cli.{CliApp, CommandLineRunner}
+import csw.config.client.commons.ConfigUtils
+import csw.config.client.scaladsl.ConfigClientFactory
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 
@@ -11,7 +12,8 @@ private[alarm] class Wiring {
   import actorRuntime._
 
   lazy val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient
-  lazy val configUtils                      = new ConfigUtils(actorRuntime, locationService)
+  lazy val configClientService              = ConfigClientFactory.clientApi(system, locationService)
+  lazy val configUtils                      = new ConfigUtils(configClientService)(system, mat)
   lazy val printLine: Any ⇒ Unit            = println
   lazy val commandLineRunner                = new CommandLineRunner(actorRuntime, locationService, configUtils, printLine)
   lazy val cliApp                           = new CliApp(commandLineRunner)

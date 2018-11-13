@@ -1,9 +1,9 @@
 package csw.event.client.internal.redis
 
 import akka.Done
-import akka.actor.{Cancellable, PoisonPill}
-import akka.stream.scaladsl.{Keep, Source}
-import akka.stream.{Materializer, OverflowStrategy}
+import akka.actor.Cancellable
+import akka.stream.Materializer
+import akka.stream.scaladsl.Source
 import csw.event.api.exceptions.PublishFailure
 import csw.event.api.scaladsl.EventPublisher
 import csw.event.client.internal.commons.EventPublisherUtil
@@ -14,7 +14,7 @@ import romaine.async.RedisAsyncApi
 
 import scala.async.Async._
 import scala.concurrent.duration.FiniteDuration
-import scala.concurrent.{ExecutionContext, Future, Promise}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
 /**
@@ -37,22 +37,10 @@ class RedisPublisher(redisURI: Future[RedisURI], redisClient: RedisClient)(impli
 
   private val asyncApi: RedisAsyncApi[String, Event] = romaineFactory.redisAsyncApi(redisURI)
 
-  private val (actorRef, stream) = Source.actorRef[(Event, Promise[Done])](1024, OverflowStrategy.dropHead).preMaterialize()
-
-  private val streamTermination: Future[Done] = stream
-    .mapAsync(1) {
-      case (e, p) =>
-        publishInternal(e).map(p.trySuccess).recover {
-          case ex => p.tryFailure(ex)
-        }
-    }
-    .runForeach(_ => ())
+  private val streamTermination: Future[Done] = eventPublisherUtil.streamTermination(publishInternal)
 
   override def publish(event: Event): Future[Done] = {
-    val p = Promise[Done]
-    if (streamTermination.isCompleted) p.tryFailure(PublishFailure(event, new RuntimeException("Publisher is shutdown")))
-    else actorRef ! ((event, p))
-    p.future
+    eventPublisherUtil.publish(event, streamTermination.isCompleted)
   }
 
   private def publishInternal(event: Event): Future[Done] =
@@ -86,7 +74,7 @@ class RedisPublisher(redisURI: Future[RedisURI], redisClient: RedisClient)(impli
     publish(eventPublisherUtil.eventSourceAsync(eventGenerator, every), onError)
 
   override def shutdown(): Future[Done] = {
-    actorRef ! PoisonPill
+    eventPublisherUtil.shutdown()
     asyncApi.quit().map(_ ⇒ Done)
   }
 
