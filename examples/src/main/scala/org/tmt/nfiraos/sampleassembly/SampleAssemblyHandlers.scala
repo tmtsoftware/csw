@@ -64,7 +64,7 @@ class SampleAssemblyHandlers(ctx: ActorContext[TopLevelActorMessage], cswCtx: Cs
     hcd.submit(setupCommand).onComplete {
       case scala.util.Success(value) =>
         value match {
-          case _: CommandResponse.Locked => log.error("Sleedp command failed: HCD is locked.")
+          case _: CommandResponse.Locked => log.error("Sleep command failed: HCD is locked.")
           case inv: CommandResponse.Invalid =>
             log.error(s"Command is invalid: (${inv.issue.getClass.getSimpleName}): ${inv.issue.reason}")
           case x: CommandResponse.Error     => log.error(s"Command Completed with error: ${x.message}")
