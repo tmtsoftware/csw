@@ -248,7 +248,7 @@ lazy val `csw-command-client` = project
     `csw-logging`,
     `csw-commons` % "test->test"
   )
-  .enablePlugins(PublishBintray, GenJavadocPlugin, AutoMultiJvm)
+  .enablePlugins(PublishBintray, GenJavadocPlugin, AutoMultiJvm, MaybeCoverage)
   .settings(libraryDependencies ++= Dependencies.CommandClient.value)
 
 /* ================= Event Service ============== */
