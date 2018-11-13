@@ -161,7 +161,7 @@ lazy val `csw-config-client` = project
     `csw-location-server` % "multi-jvm->multi-jvm",
     `csw-config-server`   % "test->test"
   )
-  .enablePlugins(PublishBintray, GenJavadocPlugin, AutoMultiJvm)
+  .enablePlugins(PublishBintray, GenJavadocPlugin, AutoMultiJvm, MaybeCoverage)
   .settings(
     libraryDependencies ++= Dependencies.ConfigClient.value
   )
