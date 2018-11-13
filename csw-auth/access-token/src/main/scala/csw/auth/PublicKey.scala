@@ -3,18 +3,14 @@ import java.security.spec.X509EncodedKeySpec
 import java.security.{KeyFactory, PublicKey}
 import java.util.Base64
 
-import com.typesafe.config.Config
 import org.keycloak.adapters.rotation.JWKPublicKeyLocator
 
 import scala.io.Source
 
-/**
- * This object is should be used when not fetching public keys from auth server
- * but instead want to use hardcoded public keys
- */
-object PublicKey {
+private[auth] object PublicKey {
 
-  val publicKeyLocator = new JWKPublicKeyLocator()
+  private val publicKeyLocator   = new JWKPublicKeyLocator()
+  private val keycloakDeployment = KeycloakDeploymentFactory.createInstance()
 
   def fromString(text: String): PublicKey = {
     val lines = text.split("\n")
@@ -29,9 +25,8 @@ object PublicKey {
     fromSource(Source.fromResource(name))
   }
 
-  def fromAuthServer(kid: String, config: Config): PublicKey = {
-    val kd = KeycloakDeploymentFactory.createInstance(config)
-    publicKeyLocator.getPublicKey(kid, kd)
+  def fromAuthServer(kid: String): PublicKey = {
+    publicKeyLocator.getPublicKey(kid, keycloakDeployment)
   }
 
   private def fromSource(source: Source): PublicKey = {

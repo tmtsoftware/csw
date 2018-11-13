@@ -44,7 +44,12 @@ lazy val `akka-http-adapter` = project.settings(
 lazy val `keycloak-config` = project.settings(
   libraryDependencies ++= Seq(
     Keycloak.`keycloak-adapter-core`,
-    Libs.`config`
+    Keycloak.`keycloak-core`,
+    Libs.`config`,
+
+    //(legacy dependencies) required*
+    Libs.`jboss-logging`,
+    Libs.httpclient,
   )
 ).in(file("csw-auth/keycloak-config"))
 

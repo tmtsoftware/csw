@@ -29,12 +29,11 @@ object AccessToken {
   private implicit def accessTokenFormat: OFormat[AccessToken] =
     Json.format[AccessToken]
 
-  //todo: should we take Config or KD? pending design decision. KD seems a better choice
-  def decode(token: String, config: Config): Try[AccessToken] = {
+  def decode(token: String): Try[AccessToken] = {
     getKeyId(token) match {
       case Failure(exception) => Failure(exception)
       case Success(kid) =>
-        val publicKey = PublicKey.fromAuthServer(kid, config)
+        val publicKey = PublicKey.fromAuthServer(kid)
         decode(token, publicKey)
     }
   }

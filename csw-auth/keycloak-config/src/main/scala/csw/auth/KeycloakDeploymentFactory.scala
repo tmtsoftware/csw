@@ -1,11 +1,21 @@
 package csw.auth
-import com.typesafe.config.Config
-import org.keycloak.adapters.KeycloakDeployment
+import java.io.{ByteArrayInputStream, InputStream}
 
-object KeycloakDeploymentFactory {
-  def createInstance(config: Config): KeycloakDeployment = {
-    //todo: here we need to convert this config into a KD
-    //more info can be found here: https://www.keycloak.org/docs/4.5/securing_apps/index.html#_multi_tenancy
-    ???
+import com.typesafe.config.{ConfigFactory, ConfigRenderOptions}
+import org.keycloak.adapters.{KeycloakDeployment, KeycloakDeploymentBuilder}
+
+private[auth] object KeycloakDeploymentFactory {
+
+  private val authConfig = ConfigFactory
+    .load()
+    .getConfig("auth-config")
+
+  def createInstance(): KeycloakDeployment = {
+
+    val configJSON: String = authConfig.root().render(ConfigRenderOptions.concise())
+
+    val inputStream: InputStream = new ByteArrayInputStream(configJSON.getBytes())
+
+    KeycloakDeploymentBuilder.build(inputStream)
   }
 }
