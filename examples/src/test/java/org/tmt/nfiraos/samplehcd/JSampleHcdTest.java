@@ -2,7 +2,6 @@ package org.tmt.nfiraos.samplehcd;
 
 import akka.actor.typed.ActorSystem;
 import akka.util.Timeout;
-import com.typesafe.config.ConfigFactory;
 import csw.command.api.javadsl.ICommandService;
 import csw.command.client.CommandServiceFactory;
 import csw.event.api.javadsl.IEventService;
@@ -47,7 +46,7 @@ public class JSampleHcdTest extends JUnitSuite {
 
     @BeforeClass
     public static void setup() {
-        testKit.spawnStandalone(ConfigFactory.load("JSampleHcdStandalone.conf"));
+        testKit.spawnStandalone(com.typesafe.config.ConfigFactory.load("JSampleHcdStandalone.conf"));
     }
 
     @Test

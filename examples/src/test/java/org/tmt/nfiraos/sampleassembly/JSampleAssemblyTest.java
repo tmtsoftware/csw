@@ -1,6 +1,5 @@
 package org.tmt.nfiraos.sampleassembly;
 
-import com.typesafe.config.ConfigFactory;
 import csw.location.api.javadsl.ILocationService;
 import csw.location.api.javadsl.JComponentType;
 import csw.location.api.models.AkkaLocation;
@@ -28,7 +27,7 @@ public class JSampleAssemblyTest extends JUnitSuite {
     //#setup
     @BeforeClass
     public static void setup() {
-        testKit.spawnStandalone(ConfigFactory.load("JSampleAssemblyStandalone.conf"));
+        testKit.spawnStandalone(com.typesafe.config.ConfigFactory.load("JSampleAssemblyStandalone.conf"));
     }
 //#setup
 

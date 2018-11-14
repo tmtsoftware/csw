@@ -2,7 +2,6 @@ package org.tmt.nfiraos.samplehcd
 
 import akka.actor.typed.ActorSystem
 import akka.util.Timeout
-import com.typesafe.config.ConfigFactory
 import csw.command.client.CommandServiceFactory
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{ComponentId, ComponentType}
@@ -23,13 +22,12 @@ class SampleHcdTest extends ScalaTestFrameworkTestKit(AlarmServer, EventServer) 
 
   override def beforeAll(): Unit = {
     super.beforeAll()
-    spawnStandalone(ConfigFactory.load("SampleHcdStandalone.conf"))
+    spawnStandalone(com.typesafe.config.ConfigFactory.load("SampleHcdStandalone.conf"))
   }
 
   import scala.concurrent.duration._
   test("HCD should be locatable using Location Service") {
     val connection = AkkaConnection(ComponentId("SampleHcd", ComponentType.HCD))
-
     val akkaLocation = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
 
     akkaLocation.connection shouldBe connection

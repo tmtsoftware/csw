@@ -45,6 +45,12 @@ in a method with a `@BeforeClass` annotation in Java, so that it is run only onc
 The Component Configuration files use are the one provided by the giter8 template.
 Note that for Scala, we must call the superclass's `beforeAll` method to ensure the services are run.
 
+@@@ note
+
+This code has been provided as part of the giter8 template, so the relevant line only needs to be uncommented.
+
+@@@
+
 Scala
 :   @@snip [SampleAssemblyTest.scala](../../../../examples/src/test/scala/org/tmt/nfiraos/sampleassembly/SampleAssemblyTest.scala) { #setup }
 
@@ -52,7 +58,13 @@ Java
 :   @@snip [JSampleAssemblyTest.java](../../../../examples/src/test/java/org/tmt/nfiraos/sampleassembly/JSampleAssemblyTest.java) { #setup }
 
 Next, let's add a test.  We will add a simple test that uses the Location Service to make sure the Assembly is
-running and resolve the registration information for it.
+running and resolve the registration information for it.  
+
+@@@ note
+
+This test has been provided as part of the giter8 template as an example.
+
+@@@
 
 Scala
 :   @@snip [SampleAssemblyTest.scala](../../../../examples/src/test/scala/org/tmt/nfiraos/sampleassembly/SampleAssemblyTest.scala) { #locate }
@@ -70,6 +82,12 @@ additional things we can test, including the publishing of Events and the handli
 
 First, we will set up the test fixtures similarly as we did for the Assembly, and add a similar test to show 
 the component registers itself with the Location Service on startup.
+
+@@@ note
+
+This also has been provided in the giter8 template.  Uncomment the line that launches the HCD before tests are run.
+
+@@@
 
 Scala
 :   @@snip [SampleHcdTest.scala](../../../../examples/src/test/scala/org/tmt/nfiraos/samplehcd/SampleHcdTest.scala) { #setup }
