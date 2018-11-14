@@ -10,7 +10,7 @@ import org.keycloak.representations.AccessToken
 import scala.concurrent.duration.{DurationLong, FiniteDuration}
 import scala.util.Try
 
-private[auth] class NativeAuthServiceImpl(keycloakInstalled: KeycloakInstalled, authStore: Option[AuthStore] = None)
+private[auth] class NativeAuthServiceImpl(val keycloakInstalled: KeycloakInstalled, authStore: Option[AuthStore] = None)
     extends NativeAuthService {
 
   def this() = this(new KeycloakInstalled())
@@ -86,8 +86,13 @@ private[auth] class NativeAuthServiceImpl(keycloakInstalled: KeycloakInstalled, 
   }
 
   private def refreshAccessToken(): Unit = {
-    keycloakInstalled.refreshToken()
+    refreshTokenStr().foreach(keycloakInstalled.refreshToken)
     updateAuthStore()
+  }
+
+  private def refreshTokenStr() = authStore match {
+    case Some(store) ⇒ store.getRefreshTokenString
+    case None        ⇒ Option(keycloakInstalled.getRefreshToken)
   }
 
   private def updateAuthStore(): Unit =
