@@ -3,7 +3,6 @@ package csw.auth
 import java.security.PublicKey
 import java.util.Base64
 
-import com.typesafe.config.Config
 import csw.auth.Conversions._
 import pdi.jwt.{JwtAlgorithm, JwtJson}
 import play.api.libs.json._
@@ -12,17 +11,18 @@ import scala.language.implicitConversions
 import scala.util.{Failure, Success, Try}
 
 case class AccessToken(
-                       //standard checks
-                       sub: String,
-                       iat: Long,
-                       exp: Long,
-                       iss: String,
-                       aud: String,
-                       jti: String,
-                       //additional information
-                       name: String,
-                       permissions: Array[String],
-                       roles: Array[String])
+    //standard checks
+    sub: String,
+    iat: Long,
+    exp: Long,
+    iss: String,
+    aud: String,
+    jti: String,
+    //additional information
+    name: String,
+    permissions: Array[String],
+    roles: Array[String]
+)
 
 object AccessToken {
 

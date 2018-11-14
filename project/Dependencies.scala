@@ -280,6 +280,20 @@ object Dependencies {
     )
   )
 
+  val AuthNativeClientAdapter = Def.setting(
+    Seq(
+      Keycloak.`keycloak-core`,
+      Keycloak.`keycloak-adapter-core`,
+      Keycloak.`keycloak-installed`,
+      Enumeratum.`enumeratum`.value,
+      Libs.`os-lib`,
+      Libs.requests,
+      //(legacy dependencies) required*
+      Libs.`jboss-logging`,
+      Libs.httpclient
+    )
+  )
+
   val Commons = Def.setting(
     Seq(
       Akka.`akka-stream`,

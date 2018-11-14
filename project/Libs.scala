@@ -58,6 +58,7 @@ object Libs {
   val `config`         = "com.typesafe"              % "config"         % "1.3.3"
   val `time4j`         = "net.time4j"                % "time4j-core"    % "4.38"
   val `threeten-extra` = "org.threeten"              % "threeten-extra" % "1.4"
+  val `os-lib`         = "com.lihaoyi"               %% "os-lib"        % "0.2.2"
 }
 
 object Jackson {

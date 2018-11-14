@@ -1,15 +1,10 @@
 package csw.auth
 
-import com.typesafe.config.ConfigFactory
-
 import scala.util.{Failure, Success, Try}
 
 object Example extends App {
 
-  val accessToken: Try[AccessToken] = AccessToken.decode(
-    "header.payload.signature",
-    ConfigFactory.load()
-  )
+  val accessToken: Try[AccessToken] = AccessToken.decode("header.payload.signature")
 
   accessToken match {
     case Failure(exception) =>
