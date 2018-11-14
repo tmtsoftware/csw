@@ -1,13 +1,14 @@
 # Using Alarms
 
 Alarms are used to indicate when some condition has arisen that warrants operator intervention.  In order to ensure
-the integrity of alarms, components are required to broadcast the state of each alarm periodically, so that situations
-in which a component is unable to determine and/or broadcast the alarm state occur, and the operator can take
+the integrity of alarms, components are required to broadcast the state of each alarm periodically.  When situations occur
+in which a component is unable to determine and/or broadcast the alarm state, the alarm severity is automatically
+set to `Disconnected` after some period of time.  This is brought to the operator's attention and the operator can then take
 appropriate action.  This means even when situations are normal, the component must continue to publish each alarm 
 with an `Okay` severity; otherwise, the alarm severity is automatically marked as `Disconnected`, prompting the operator
 to investigate.
 
-The CSW Alarm Service provides two APIs: a "Client API" used by component, and an "Admin API" used to manage the Alarm
+The CSW Alarm Service provides two APIs: a "Client API" used by a component, and an "Admin API" used to manage the Alarm
 Store and for operator use (typically via HCMS user interfaces).  The Client API consists of a single method call, `setSeverity`. 
 The Admin API includes methods to set up the Alarm Store, get alarm severities and health of components or subsystems, 
 acknowledge alarms, reset latched alarms, and other operator tasks. 
@@ -54,7 +55,7 @@ Scala
 :   @@snip [SampleAssemblyHandlers.scala](../../../../examples/src/main/scala/org/tmt/nfiraos/sampleassembly/SampleAssemblyHandlersAlarm.scala) { #alarm }
 
 Java
-:   @@snip [JSampleAssemblyHandlers.scala](../../../../examples/src/main/java/org/tmt/nfiraos/sampleassembly/JSampleAssemblyHandlersAlarm.java) { #alarm }
+:   @@snip [JSampleAssemblyHandlers.java](../../../../examples/src/main/java/org/tmt/nfiraos/sampleassembly/JSampleAssemblyHandlersAlarm.java) { #alarm }
 
 This code determines the severity of the alarm based on the rules we established above:
 
@@ -70,7 +71,7 @@ Scala
 :   @@snip [SampleAssemblyHandlers.scala](../../../../examples/src/main/scala/org/tmt/nfiraos/sampleassembly/SampleAssemblyHandlersAlarm.scala) { #subscribe }
 
 Java
-:   @@snip [JSampleAssemblyHandlers.scala](../../../../examples/src/main/java/org/tmt/nfiraos/sampleassembly/JSampleAssemblyHandlersAlarm.java) { #subscribe }
+:   @@snip [JSampleAssemblyHandlers.java](../../../../examples/src/main/java/org/tmt/nfiraos/sampleassembly/JSampleAssemblyHandlersAlarm.java) { #subscribe }
 
 To see the effect, let's use the CLI to set up a subscription to the alarm.  Note the alarm key is composed of the subsystem (`nfiraos`),
 component name (`SampleAssembly` for Scala, `JSampleAssembly` for Java), and the alarm name (`counterTooHighAlarm`).

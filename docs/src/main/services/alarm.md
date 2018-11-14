@@ -23,7 +23,7 @@ There are two APIs provided in the Alarm Service: a client API, and an administr
 the API used by component developers to set the severity of an alarm.  This is the only functionality needed by 
 component developers.  As per TMT policy, the severity of an alarm must be set periodically (within some time limit) 
 in order to maintain the integrity of the alarm status.  If an alarm severity is not refreshed within the time limit, 
-currently set at TBD seconds, the severity is set to `Disconnected` by the Alarm Service, which indicates to the operator
+currently set at 9 seconds, the severity is set to `Disconnected` by the Alarm Service, which indicates to the operator
 that there is some problem with the component's ability to evaluate the alarm status.
 
 The admin API provides all of the functions needed manage the alarm store, as well as 
