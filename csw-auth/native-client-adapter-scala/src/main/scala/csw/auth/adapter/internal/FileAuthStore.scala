@@ -1,11 +1,12 @@
-package csw.auth.internal
+package csw.auth.adapter.internal
 import java.nio.file.{Path, Paths}
 
-import csw.auth.AccessToken
-import csw.auth.api.AuthStore
+import csw.auth.adapter.api.AuthStore
 import org.keycloak.adapters.KeycloakDeployment
 import org.keycloak.adapters.rotation.AdapterTokenVerifier
-import org.keycloak.representations.{AccessTokenResponse, IDToken}
+import org.keycloak.representations.{AccessToken, AccessTokenResponse, IDToken}
+
+import scala.language.implicitConversions
 
 class FileAuthStore(storePath: Path) extends AuthStore {
 
@@ -21,13 +22,13 @@ class FileAuthStore(storePath: Path) extends AuthStore {
 
   override def getAccessTokenString: Option[String] = read(accessTokenPath)
 
-  override def getAccessToken(kd: KeycloakDeployment): Option[AccessToken] = getAccessTokenString.map { tokenStr ⇒
+  private[auth] override def getAccessToken(kd: KeycloakDeployment): Option[AccessToken] = getAccessTokenString.map { tokenStr ⇒
     val verifier = AdapterTokenVerifier.createVerifier(tokenStr, kd, true, classOf[AccessToken])
-    verifier.verify().getToken
+    verifier.getToken
   }
 
   override def getIdTokenString: Option[String]      = read(idTokenPath)
-  override def getIdToken: Option[IDToken]           = ???
+  private[auth] def getIdToken: Option[IDToken]      = ???
   override def getRefreshTokenString: Option[String] = read(refreshTokenPath)
   override def clearStorage(): Unit                  = delete(storePath)
 

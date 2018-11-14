@@ -1,16 +1,16 @@
-package csw.auth.api
+package csw.auth.adapter.api
 
-import csw.auth.AccessToken
 import org.keycloak.adapters.KeycloakDeployment
-import org.keycloak.representations.{AccessTokenResponse, IDToken}
+import org.keycloak.representations.{AccessToken, AccessTokenResponse}
 
 trait AuthStore {
 
   def getAccessTokenString: Option[String]
-  def getAccessToken(kd: KeycloakDeployment): Option[AccessToken]
+
+  //FIXME: Delete me
+  private[auth] def getAccessToken(kd: KeycloakDeployment): Option[AccessToken]
 
   def getIdTokenString: Option[String]
-  def getIdToken: Option[IDToken]
 
   def getRefreshTokenString: Option[String]
 

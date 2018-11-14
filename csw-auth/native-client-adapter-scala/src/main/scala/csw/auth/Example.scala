@@ -2,16 +2,27 @@ package csw.auth
 
 import java.nio.file.Paths
 
-import csw.auth.api.KeycloakInstalledFactory
-import csw.auth.internal.FileAuthStore
+import csw.auth.adapter.NativeAuthServiceFactory
+import csw.auth.adapter.internal.FileAuthStore
+
+import scala.concurrent.duration.DurationDouble
 
 object Example extends App {
-  val keycloak = KeycloakInstalledFactory.make(new FileAuthStore(Paths.get("/tmp")))
+  val keycloak = NativeAuthServiceFactory.make(new FileAuthStore(Paths.get("/tmp")))
 
   println("login initiated")
 //  keycloak.login()
 
-  println(keycloak.getAccessToken())
+  private val expires: Int = keycloak.getAccessToken().map(x ⇒ x.getExpiration).get
+  println(s"Expiring on: $expires")
+  println(System.currentTimeMillis() / 1000)
+
+  private val timeLeft: Long = expires - System.currentTimeMillis() / 1000
+  println(s"time left to expire: $timeLeft")
+
+  println(keycloak.getAccessTokenString())
+
+  println(keycloak.getAccessTokenString((timeLeft + 100).seconds))
 
   Thread.sleep(500000)
 

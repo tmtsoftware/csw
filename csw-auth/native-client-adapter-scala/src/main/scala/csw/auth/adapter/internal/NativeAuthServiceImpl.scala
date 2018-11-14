@@ -1,17 +1,17 @@
-package csw.auth.internal
+package csw.auth.adapter.internal
 
 import java.io._
 
-import csw.auth.AccessToken
-import csw.auth.api.{AuthStore, KeycloakInstalledApi}
+import csw.auth.adapter.api.{AuthStore, NativeAuthService}
 import org.keycloak.adapters.KeycloakDeployment
 import org.keycloak.adapters.installed.KeycloakInstalled
+import org.keycloak.representations.AccessToken
 
 import scala.concurrent.duration.{DurationLong, FiniteDuration}
 import scala.util.Try
 
-private[auth] class KeycloakInstalledImpl(keycloakInstalled: KeycloakInstalled, authStore: Option[AuthStore] = None)
-    extends KeycloakInstalledApi {
+private[auth] class NativeAuthServiceImpl(keycloakInstalled: KeycloakInstalled, authStore: Option[AuthStore] = None)
+    extends NativeAuthService {
 
   def this() = this(new KeycloakInstalled())
 
@@ -56,31 +56,34 @@ private[auth] class KeycloakInstalledImpl(keycloakInstalled: KeycloakInstalled, 
   }
 
   def getAccessTokenString(minValidity: FiniteDuration = 0.seconds): Try[String] =
-    Try(keycloakInstalled.getTokenString(minValidity.length, minValidity.unit))
+    Try {
+      getAccessToken(minValidity)
+      accessTokenStr().getOrElse(throw new RuntimeException("Access token not found"))
+    }
 
-  // todo : minValidity is not considered here.
   def getAccessToken(minValidity: FiniteDuration = 0.seconds): Try[AccessToken] =
     Try {
-      authStore
-        .map(_.getAccessToken(keycloakInstalled.getDeployment))
-        .getOrElse(
-          Option(keycloakInstalled.getToken)
-            .map { at =>
-              if (at.isExpired) refreshAccessToken()
-              keycloakInstalled.getToken
-            }
-        )
+      accessToken()
+        .flatMap { token ⇒
+          if (isExpired(token, minValidity)) { refreshAccessToken(); accessToken() } else Some(token)
+        }
         .getOrElse(throw new RuntimeException("Access token not found"))
     }
 
-//    Try {
-//    Option(keycloakInstalled.getToken)
-//      .map { at =>
-//        if (at.isExpired) refreshAccessToken()
-//        keycloakInstalled.getToken
-//      }
-//      .getOrElse(throw new RuntimeException("Access token not found"))
-//  }
+  private def accessToken() = authStore match {
+    case Some(store) ⇒ store.getAccessToken(keycloakInstalled.getDeployment)
+    case None        ⇒ Option(keycloakInstalled.getToken)
+  }
+
+  private def accessTokenStr() = authStore match {
+    case Some(store) ⇒ store.getAccessTokenString
+    case None        ⇒ Option(keycloakInstalled.getTokenString)
+  }
+
+  private def isExpired(accessToken: AccessToken, minValidity: FiniteDuration) = {
+    val expires: Long = accessToken.getExpiration.toLong * 1000 - minValidity.toMillis
+    expires < System.currentTimeMillis
+  }
 
   private def refreshAccessToken(): Unit = {
     keycloakInstalled.refreshToken()
