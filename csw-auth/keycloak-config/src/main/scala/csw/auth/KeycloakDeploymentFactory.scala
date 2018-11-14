@@ -12,7 +12,8 @@ private[auth] object KeycloakDeploymentFactory {
 
   def createInstance(): KeycloakDeployment = {
 
-    val configJSON: String = authConfig.root().render(ConfigRenderOptions.concise())
+    val configJSON: String =
+      authConfig.root().render(ConfigRenderOptions.concise())
 
     val inputStream: InputStream = new ByteArrayInputStream(configJSON.getBytes())
 
