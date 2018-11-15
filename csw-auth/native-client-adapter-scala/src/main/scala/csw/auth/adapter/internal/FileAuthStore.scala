@@ -28,8 +28,8 @@ class FileAuthStore(storePath: Path) extends AuthStore {
   // todo : Will we always have this tokens
   override def saveAccessTokenResponse(idToken: String, accessToken: String, refreshToken: String): Unit = {
     write(idTokenPath, idToken)
-    write(refreshTokenPath, accessToken)
-    write(accessTokenPath, refreshToken)
+    write(accessTokenPath, accessToken)
+    write(refreshTokenPath, refreshToken)
   }
 
   /************************************************
