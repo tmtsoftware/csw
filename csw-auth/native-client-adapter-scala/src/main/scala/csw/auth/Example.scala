@@ -3,7 +3,7 @@ package csw.auth
 import java.nio.file.Paths
 
 import csw.auth.adapter.NativeAuthServiceFactory
-import csw.auth.adapter.internal.{FileAuthStore, NativeAuthServiceImpl}
+import csw.auth.adapter.internal.FileAuthStore
 
 import scala.concurrent.duration.DurationDouble
 

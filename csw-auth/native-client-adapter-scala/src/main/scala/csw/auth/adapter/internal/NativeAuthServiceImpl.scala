@@ -5,6 +5,7 @@ import java.io._
 import csw.auth.adapter.api.{AuthStore, NativeAuthService}
 import org.keycloak.adapters.KeycloakDeployment
 import org.keycloak.adapters.installed.KeycloakInstalled
+import org.keycloak.adapters.rotation.AdapterTokenVerifier
 import org.keycloak.representations.AccessToken
 
 import scala.concurrent.duration.{DurationLong, FiniteDuration}
@@ -70,9 +71,13 @@ private[auth] class NativeAuthServiceImpl(val keycloakInstalled: KeycloakInstall
         .getOrElse(throw new RuntimeException("Access token not found"))
     }
 
-  private def accessToken() = authStore match {
-    case Some(store) ⇒ store.getAccessToken(keycloakInstalled.getDeployment)
-    case None        ⇒ Option(keycloakInstalled.getToken)
+  private def accessToken(): Option[AccessToken] = authStore match {
+    case Some(store) ⇒
+      store.getAccessTokenString.map { at ⇒
+        val verifier = AdapterTokenVerifier.createVerifier(at, keycloakInstalled.getDeployment, true, classOf[AccessToken])
+        verifier.getToken
+      }
+    case None ⇒ Option(keycloakInstalled.getToken)
   }
 
   private def accessTokenStr() = authStore match {
@@ -95,8 +100,10 @@ private[auth] class NativeAuthServiceImpl(val keycloakInstalled: KeycloakInstall
     case None        ⇒ Option(keycloakInstalled.getRefreshToken)
   }
 
-  private def updateAuthStore(): Unit =
-    authStore.foreach(_.saveAccessTokenResponse(keycloakInstalled.getTokenResponse, keycloakInstalled.getDeployment))
+  private def updateAuthStore(): Unit = {
+    val response = keycloakInstalled.getTokenResponse
+    authStore.foreach(_.saveAccessTokenResponse(response.getIdToken, response.getToken, response.getRefreshToken))
+  }
 
   private def clearAuthStore(): Unit = authStore.foreach(_.clearStorage())
 }

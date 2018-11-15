@@ -2,9 +2,7 @@ package csw.auth.adapter.internal
 import java.nio.file.{Path, Paths}
 
 import csw.auth.adapter.api.AuthStore
-import org.keycloak.adapters.KeycloakDeployment
-import org.keycloak.adapters.rotation.AdapterTokenVerifier
-import org.keycloak.representations.{AccessToken, AccessTokenResponse, IDToken}
+import org.keycloak.representations.IDToken
 
 import scala.language.implicitConversions
 
@@ -22,21 +20,16 @@ class FileAuthStore(storePath: Path) extends AuthStore {
 
   override def getAccessTokenString: Option[String] = read(accessTokenPath)
 
-  private[auth] override def getAccessToken(kd: KeycloakDeployment): Option[AccessToken] = getAccessTokenString.map { tokenStr ⇒
-    val verifier = AdapterTokenVerifier.createVerifier(tokenStr, kd, true, classOf[AccessToken])
-    verifier.getToken
-  }
-
   override def getIdTokenString: Option[String]      = read(idTokenPath)
   private[auth] def getIdToken: Option[IDToken]      = ???
   override def getRefreshTokenString: Option[String] = read(refreshTokenPath)
   override def clearStorage(): Unit                  = delete(storePath)
 
-  override def saveAccessTokenResponse(accessTokenResponse: AccessTokenResponse, keycloakDeployment: KeycloakDeployment): Unit = {
-    write(idTokenPath, accessTokenResponse.getIdToken)
-    write(refreshTokenPath, accessTokenResponse.getRefreshToken)
-    // todo: verify it is actually access token
-    write(accessTokenPath, accessTokenResponse.getToken)
+  // todo : Will we always have this tokens
+  override def saveAccessTokenResponse(idToken: String, accessToken: String, refreshToken: String): Unit = {
+    write(idTokenPath, idToken)
+    write(refreshTokenPath, accessToken)
+    write(accessTokenPath, refreshToken)
   }
 
   /************************************************
