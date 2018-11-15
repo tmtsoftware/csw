@@ -1,14 +1,12 @@
 package csw.event.client.internal.redis
 
-import java.net.ConnectException
-
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.stream.scaladsl.{Keep, Sink, Source}
-import csw.params.events.EventKey
 import csw.event.api.exceptions.{EventServerNotAvailable, PublishFailure}
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.event.client.helpers.Utils
 import csw.event.client.helpers.Utils.makeDistinctEvent
+import csw.params.events.EventKey
 import io.lettuce.core.ClientOptions.DisconnectedBehavior
 import io.lettuce.core.{ClientOptions, RedisException}
 import org.scalatest.mockito.MockitoSugar
@@ -102,13 +100,12 @@ class RedisFailureTest extends FunSuite with Matchers with MockitoSugar with Bef
 
     redisServer.stop()
 
-    val failure = intercept[EventServerNotAvailable] {
+    intercept[EventServerNotAvailable] {
       val subscription = subscriber.subscribe(Set(eventKey)).toMat(Sink.foreach(println))(Keep.left).run()
       subscription.ready().await
     }
 
     redisServer.start()
-    failure.getCause shouldBe a[ConnectException]
   }
 
   //DEOPSCSW-000: Publish an event with block generating future of event

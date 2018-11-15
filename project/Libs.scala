@@ -4,32 +4,33 @@ import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
 import scalapb.compiler.Version.scalapbVersion
 
 object Libs {
-  val ScalaVersion = "2.12.7"
+  val ScalaVersion   = "2.12.7"
+  val AcyclicVersion = "0.1.8"
 
   val `scalatest` = dep("org.scalatest" %%% "scalatest" % "3.0.5") //Apache License 2.0
 
   val `scala-java8-compat`           = "org.scala-lang.modules" %% "scala-java8-compat"           % "0.9.0" //BSD 3-clause "New" or "Revised" License
   val `scala-async`                  = "org.scala-lang.modules" %% "scala-async"                  % "0.9.7" //BSD 3-clause "New" or "Revised" License
   val `scopt`                        = "com.github.scopt"       %% "scopt"                        % "3.7.0" //MIT License
-  val `acyclic`                      = "com.lihaoyi"            %% "acyclic"                      % "0.1.7" % Provided //MIT License
+  val `acyclic`                      = "com.lihaoyi"            %% "acyclic"                      % AcyclicVersion % Provided //MIT License
   val `junit`                        = "junit"                  % "junit"                         % "4.12" //Eclipse Public License 1.0
   val `junit-interface`              = "com.novocode"           % "junit-interface"               % "0.11" //BSD 2-clause "Simplified" License
-  val `mockito-core`                 = "org.mockito"            % "mockito-core"                  % "2.21.0" //MIT License
+  val `mockito-core`                 = "org.mockito"            % "mockito-core"                  % "2.23.0" //MIT License
   val `logback-classic`              = "ch.qos.logback"         % "logback-classic"               % "1.2.3" //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
   val `akka-management-cluster-http` = "com.lightbend.akka"     %% "akka-management-cluster-http" % "0.6" //N/A at the moment
   val `svnkit`                       = "org.tmatesoft.svnkit"   % "svnkit"                        % "1.9.3" //TMate Open Source License
   val `commons-codec`                = "commons-codec"          % "commons-codec"                 % "1.10" //Apache 2.0
   val `persist-json`                 = "com.persist"            %% "persist-json"                 % "1.2.1" //Apache 2.0
-  val `joda-time`                    = "joda-time"              % "joda-time"                     % "2.10" //Apache 2.0
+  val `joda-time`                    = "joda-time"              % "joda-time"                     % "2.10.1" //Apache 2.0
   val `scala-reflect`                = "org.scala-lang"         % "scala-reflect"                 % ScalaVersion //BSD-3
   val `gson`                         = "com.google.code.gson"   % "gson"                          % "2.8.5" //Apache 2.0
 
   val `play-json` = dep("com.typesafe.play" %%% "play-json" % "2.6.10") //Apache 2.0
 
-  val `akka-http-play-json`      = "de.heikoseeberger"    %% "akka-http-play-json"      % "1.21.0" //Apache 2.0
+  val `akka-http-play-json`      = "de.heikoseeberger"    %% "akka-http-play-json"      % "1.22.0" //Apache 2.0
   val `scalapb-runtime`          = "com.thesamet.scalapb" %% "scalapb-runtime"          % scalapbVersion % "protobuf"
-  val `scalapb-json4s`           = "com.thesamet.scalapb" %% "scalapb-json4s"           % "0.7.1"
-  val `lettuce`                  = "io.lettuce"           % "lettuce-core"              % "5.0.5.RELEASE"
+  val `scalapb-json4s`           = "com.thesamet.scalapb" %% "scalapb-json4s"           % scalapbVersion
+  val `lettuce`                  = "io.lettuce"           % "lettuce-core"              % "5.1.2.RELEASE"
   val `akka-stream-kafka`        = "com.typesafe.akka"    %% "akka-stream-kafka"        % "0.22"
   val `scalatest-embedded-kafka` = "net.manub"            %% "scalatest-embedded-kafka" % "1.1.0"
   val `embedded-redis`           = "com.github.kstyrc"    % "embedded-redis"            % "0.6"
@@ -46,11 +47,11 @@ object Libs {
 
   val `time4j`         = "net.time4j"       % "time4j-core"    % "4.38"
   val `threeten-extra` = "org.threeten"     % "threeten-extra" % "1.4"
-  val `jna`            = "net.java.dev.jna" % "jna"            % "5.0.0"
+  val `jna`            = "net.java.dev.jna" % "jna"            % "5.1.0"
 }
 
 object Jackson {
-  val Version                = "2.9.6"
+  val Version                = "2.9.7"
   val `jackson-core`         = "com.fasterxml.jackson.core" % "jackson-core" % Version
   val `jackson-databind`     = "com.fasterxml.jackson.core" % "jackson-databind" % Version
   val `jackson-module-scala` = "com.fasterxml.jackson.module" %% "jackson-module-scala" % Version

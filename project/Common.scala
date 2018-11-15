@@ -56,7 +56,7 @@ object Common extends AutoPlugin {
     autoCompilerPlugins := true,
     cancelable in Global := true, // allow ongoing test(or any task) to cancel with ctrl + c and still remain inside sbt
     if (formatOnCompile) scalafmtOnCompile := true else scalafmtOnCompile := false,
-    addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.7")
+    addCompilerPlugin("com.lihaoyi" %% "acyclic" % Libs.AcyclicVersion)
   )
 
   private def formatOnCompile = sys.props.get("format.on.compile") match {
