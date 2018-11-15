@@ -3,6 +3,7 @@ package csw.auth.adapter.internal
 import java.io._
 
 import csw.auth.adapter.api.{AuthStore, NativeAuthService}
+import org.keycloak.adapters.KeycloakDeployment
 import org.keycloak.adapters.installed.KeycloakInstalled
 import org.keycloak.adapters.rotation.AdapterTokenVerifier
 import org.keycloak.representations.AccessToken
@@ -13,11 +14,10 @@ import scala.util.Try
 private[auth] class NativeAuthServiceImpl(val keycloakInstalled: KeycloakInstalled, authStore: Option[AuthStore] = None)
     extends NativeAuthService {
 
-  def this() = this(new KeycloakInstalled())
+  def this(keycloakDeployment: KeycloakDeployment) = this(new KeycloakInstalled(keycloakDeployment))
 
-  def this(authStore: AuthStore) = this(new KeycloakInstalled(), Some(authStore))
-
-  def this(config: InputStream) = this(new KeycloakInstalled(config))
+  def this(keycloakDeployment: KeycloakDeployment, authStore: AuthStore) =
+    this(new KeycloakInstalled(keycloakDeployment), Some(authStore))
 
   def login(): Unit = {
     keycloakInstalled.login()

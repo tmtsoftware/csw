@@ -13,7 +13,7 @@ lazy val `csw-auth` = project
 lazy val `native-client-adapter-scala` = project.settings(
   libraryDependencies ++= Dependencies.AuthNativeClientAdapter.value
 ).in(file("csw-auth/native-client-adapter-scala"))
-  .dependsOn(`access-token`)
+  .dependsOn(`access-token`, `keycloak-config`)
 
 lazy val `access-token` = project.settings(
   libraryDependencies ++= Seq(
