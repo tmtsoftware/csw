@@ -1,9 +1,8 @@
 package csw.time.client;
 
 import csw.time.api.TimeService;
+import csw.time.client.javadsl.tags.LinuxTag;
 import org.junit.Ignore;
-import org.junit.Test;
-import org.scalatest.junit.JUnitSuite;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -11,17 +10,18 @@ import java.time.ZoneId;
 
 import static org.junit.Assert.assertEquals;
 
-public class JTimeServiceTest extends JUnitSuite {
+@LinuxTag
+public class JTimeServiceTest {
 
     private Instant fixedInstant = Instant.now();
     private ZoneId zoneId        = ZoneId.of("US/Hawaii");
     private Clock clock          = Clock.fixed(fixedInstant, zoneId);
 
-    private TimeService timeService = new TimeServiceImpl(clock);
-
     //DEOPSCSW-533: Access parts of UTC date.time in Java and Scala
-    @Test
+    @Ignore
     public void shouldGetUTCTime(){
+        TimeService timeService = new TimeServiceImpl(clock);
+
         Instant instant               = timeService.UTCTime();
         Instant fixedInstant = Instant.now();
 
@@ -33,6 +33,8 @@ public class JTimeServiceTest extends JUnitSuite {
     //DEOPSCSW-536: Access parts of TAI date/time in Java and Scala
     @Ignore
     public void shouldGetTAITime(){
+        TimeService timeService = new TimeServiceImpl(clock);
+
         int taiOffset = 37;
         Instant instant               = timeService.TAITime();
         Instant fixedInstant = Instant.now().plusSeconds(taiOffset);
@@ -40,5 +42,17 @@ public class JTimeServiceTest extends JUnitSuite {
         long expectedMillis = fixedInstant.toEpochMilli();
 
         assertEquals(expectedMillis, instant.toEpochMilli());
+    }
+
+    //DEOPSCSW-530: SPIKE: Get TAI offset and convert to UTC and Vice Versa
+    @Ignore
+    public void shouldGetTAIOffset(){
+        TimeService timeService = new TimeServiceImpl(clock);
+
+        int expectedOffset = 37;
+
+        int offset = timeService.TAIOffset();
+
+        assertEquals(expectedOffset, offset);
     }
 }

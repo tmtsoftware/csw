@@ -12,10 +12,10 @@ class TimeServiceTest extends FunSuite with Matchers {
   private val zoneId: ZoneId        = ZoneId.of("US/Hawaii")
   private val clock: Clock          = Clock.fixed(fixedInstant, zoneId)
 
-  private val timeService: TimeService = new TimeServiceImpl(clock)
-
   //DEOPSCSW-533: Access parts of UTC date.time in Java and Scala
-  test("should get UTC time") {
+  ignore("should get UTC time", Linux) {
+    val timeService: TimeService = new TimeServiceImpl(clock)
+
     val instant               = timeService.UTCTime()
     val fixedInstant: Instant = Instant.now()
 
@@ -25,7 +25,9 @@ class TimeServiceTest extends FunSuite with Matchers {
   }
 
   //DEOPSCSW-534: PTP accuracy and precision while reading UTC
-  test("should get precision up to nanoseconds in UTC time", Linux) {
+  ignore("should get precision up to nanoseconds in UTC time", Linux) {
+    val timeService: TimeService = new TimeServiceImpl(clock)
+
     val instant = timeService.UTCTime()
 
     println(instant)
@@ -33,7 +35,9 @@ class TimeServiceTest extends FunSuite with Matchers {
   }
 
   //DEOPSCSW-536: Access parts of TAI date/time in Java and Scala
-  test("should get TAI time", Linux) {
+  ignore("should get TAI time", Linux) {
+    val timeService: TimeService = new TimeServiceImpl(clock)
+
     val taiOffset = 37
 
     val instant               = timeService.TAITime()
@@ -42,6 +46,17 @@ class TimeServiceTest extends FunSuite with Matchers {
     val expectedMillis = fixedInstant.toEpochMilli +- 5
 
     instant.toEpochMilli shouldEqual expectedMillis
+  }
+
+  //DEOPSCSW-530: SPIKE: Get TAI offset and convert to UTC and Vice Versa
+  ignore("should get TAI offset", Linux) {
+    val timeService: TimeService = new TimeServiceImpl(clock)
+
+    val expectedOffset = 37
+
+    val offset = timeService.TAIOffset()
+
+    offset shouldEqual expectedOffset
   }
 
 }

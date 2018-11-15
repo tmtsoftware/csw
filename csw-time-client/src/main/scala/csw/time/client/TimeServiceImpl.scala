@@ -12,10 +12,17 @@ class TimeServiceImpl(clock: Clock) extends TimeService {
 
   override def TAITime(): Instant = time(ClockTAI)
 
+  private val library: TimeLibrary = new TimeLibrary()
+
+  override def TAIOffset(): Int = {
+    val timeVal = new NTPTimeVal()
+    library.ntp_gettimex(timeVal)
+    timeVal.tai
+  }
+
   private def time(clock: Int): Instant = {
     val timeSpec = new TimeSpec()
-
-    TimeLibrary2.clock_gettime(clock, timeSpec)
+    library.clock_gettime(clock, timeSpec)
 
     Instant.ofEpochSecond(timeSpec.seconds, timeSpec.nanoseconds)
   }
