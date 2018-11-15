@@ -45,6 +45,8 @@ lazy val unidocExclusions: Seq[ProjectReference] = Seq(
   `csw-config-cli`,
   `csw-event-cli`,
   `csw-alarm-cli`,
+  `csw-time-api`,
+  `csw-time-client`,
   `csw-logging-macros`,
   `csw-params-js`,
   `csw-network-utils`,
@@ -403,7 +405,7 @@ lazy val integration = project
     `csw-location-agent`,
     `csw-network-utils`
   )
-  .enablePlugins(DeployApp)
+  .enablePlugins(NoPublish, DeployApp)
   .settings(
     libraryDependencies ++= Dependencies.Integration.value
   )

@@ -1,0 +1,16 @@
+## CSW - TMT Common Software v0.6.0-RC2
+
+This is release v0.6.0-RC2 of the TMT Common Software.
+
+See [CHANGELOG.md](CHANGELOG.md) for details of all releases.
+
+### Changes
+- added `csw-testkit` which provides easy access for starting and stopping csw-services and many other helpers for testing 
+- new `validateCommand` handler added in `ComponentHandlers`
+- bug fix for `CommandResponseManager#queryFinal` API. It now supports querying commands which are yet to be inserted in CRM.  
+- updated command service paradox documentation
+
+### Documentation
+- Reference paradox documentation: https://tmtsoftware.github.io/csw/0.6.0-RC2/
+- Scaladoc: https://tmtsoftware.github.io/csw/0.6.0-RC2/api/scala/index.html
+- Javadoc: https://tmtsoftware.github.io/csw/0.6.0-RC2/api/java/index.html
