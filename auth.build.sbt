@@ -54,9 +54,13 @@ lazy val `auth-examples` = project
 lazy val `akka-http-example` = project.settings(
   libraryDependencies ++= Seq(
     AkkaHttp.`akka-http`,
-    Akka.`akka-stream`
+    Akka.`akka-stream`,
+    //Libs.`play-json`,
+    Libs.`play-json-derived-codecs`.value,
+    Libs.`akka-http-play-json`
   )
 ).in(file("csw-auth/auth-examples/akka-http-example"))
+  .dependsOn(`akka-http-adapter`)
 
 lazy val `cli-app-example` = project
   .in(file("csw-auth/auth-examples/cli-app-example"))

@@ -7,19 +7,25 @@ object SecurityDirectives {
 
   type AuthorizationPolicy = AccessToken => Boolean
 
-  def permission(name: String): Directive0 =
+  def permission(name: String, resource: String): Directive0 =
     authenticateOAuth2("master", Authentication.authenticator).flatMap { at =>
-      authorize(Authorization.hasPermission(at, name))
+      authorize(at.hasPermission(name, resource))
     }
 
-  def role(name: String): Directive0 =
+  def role(name: String, resource: String): Directive0 =
     authenticateOAuth2("master", Authentication.authenticator).flatMap { at =>
-      authorize(Authorization.hasRole(at, name))
+      authorize(at.hasRole(name, resource))
     }
 
   def customPolicy(policy: AuthorizationPolicy): Directive0 = {
     authenticateOAuth2("master", Authentication.authenticator).flatMap { at =>
       authorize(policy(at))
+    }
+  }
+
+  def customPolicy(predicate: => Boolean): Directive0 = {
+    authenticateOAuth2("master", Authentication.authenticator).flatMap { at =>
+      authorize(predicate)
     }
   }
 }
