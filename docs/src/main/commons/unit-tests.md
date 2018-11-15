@@ -4,14 +4,14 @@ Unit testing is a fundamental part of programming, and essential component of th
 TMT CSW extensively uses unit testing for both Scala and Java code, using ScalaTest for the former, and primarily
 JUnit for the latter (TestNG is used in one instance for the Event Service).  While this guide will not attempt
 to educate the reader on how to use these popular packages, it will serve to show some examples of how tests
-can be created for component code and demonstate some tools provided by CSW to simplify and enable integration
+can be created for component code and demonstrate some tools provided by CSW to simplify and enable integration
 of TMT components and other software with CSW and its services.
 
 ## CSW Test Kit
 
-CSW provides a set of tools for use by developers called the CSW Test Kit.  This allows the developer to 
+CSW provides a set of tools for use by developers called the CSW Test Kit. This allows the developer to 
 start CSW services within the testing environment, so that they can be accessed by the components and/or
-applications being tested, as well as the testing fixtures themselves.  It also provides simple methods to start
+applications being tested, as well as the testing fixtures themselves. It also provides simple methods to start
 components or a set of components within a container, as well as an ActorContext to be used if other Actors
 are needed to be created in the tests.
 
@@ -19,18 +19,18 @@ More information about testing with CSW and the CSW Test Kit can be found @ref:[
 
 #### *Tutorial: Writing unit tests for our components*
 
-In this part of the tutorial, we will write a few unit tests for our components.  These tests are in no way
+In this part of the tutorial, we will write a few unit tests for our components. These tests are in no way
 meant to be comprehensive, but hopefully, they show enough to get you started.
 
 The giter8 template provides the required directory structure, and skeletons for tests of the HCD and Assembly
-in both Java and Scala.   It also provides some Component Configuration (ComponentInfo) files for running
-each of the HCD and Assembly in standalone mode for both languages.  They are there for convenience, but 
-may not be required depending your deployment and testing strategy.  We will be using them in our tutorial.
+in both Java and Scala. It also provides some Component Configuration (ComponentInfo) files for running
+each of the HCD and Assembly in standalone mode for both languages. They are there for convenience, but 
+may not be required depending your deployment and testing strategy. We will be using them in our tutorial.
 
-We will first look at the tests for the Assembly.  As described on the @ref:[Testing Manual page](./testing.md),
+We will first look at the tests for the Assembly. As described on the @ref:[Testing Manual page](./testing.md),
 the Scala version overrides the CSW-provided superclass `csw.testkit.scaladsl.ScalaTestFrameworkTestKit` to 
-get access to the services it needs.  By passing in the needed services in the constructor, those services are
-started in the superclass's `beforeAll` method.  In the Java version, we must create an instance of 
+get access to the services it needs. By passing in the needed services in the constructor, those services are
+started in the superclass's `beforeAll` method. In the Java version, we must create an instance of 
 `csw.testkit.javadsl.FrameworkTestKitJunitResource` to get access to and start our services, with the
 services we want to start passed into the constructor of this object.
 

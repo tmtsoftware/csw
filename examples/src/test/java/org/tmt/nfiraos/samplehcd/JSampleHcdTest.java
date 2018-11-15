@@ -55,7 +55,7 @@ public class JSampleHcdTest extends JUnitSuite {
         ILocationService locationService = testKit.jLocationService();
         AkkaLocation location = locationService.resolve(connection, Duration.ofSeconds(10)).get().get();
 
-        Assert.assertEquals(location.connection(), connection);
+        Assert.assertEquals(connection, location.connection());
     }
 //#setup
 
@@ -69,7 +69,7 @@ public class JSampleHcdTest extends JUnitSuite {
         IEventSubscriber subscriber = eventService.defaultSubscriber();
 
         // wait for a bit to ensure HCD has started and published an event
-        Thread.sleep(2000);
+        Thread.sleep(2500);
 
 
         ArrayList<Event> subscriptionEventList = new ArrayList<>();
@@ -81,7 +81,7 @@ public class JSampleHcdTest extends JUnitSuite {
         // Event publishing period is 2 seconds.
         // Expecting 3 events: first event on subscription
         // and two more events 2 and 4 seconds later.
-        Assert.assertEquals(subscriptionEventList.size(), 3);
+        Assert.assertEquals(3, subscriptionEventList.size());
 
         // extract counter values to a List for comparison
         List<Integer> counterList = subscriptionEventList.stream()
@@ -101,7 +101,7 @@ public class JSampleHcdTest extends JUnitSuite {
         int counter0 = counterList.get(0);
         List<Integer> expectedCounterList = Arrays.asList(counter0, counter0+1, counter0+2);
 
-        Assert.assertEquals(counterList, expectedCounterList);
+        Assert.assertEquals(expectedCounterList, counterList);
     }
     //#subscribe
 
