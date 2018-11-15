@@ -37,7 +37,7 @@ public class JTimeServiceTest extends JUnitSuite {
         Instant instant               = timeService.TAITime();
         Instant fixedInstant = Instant.now().plusSeconds(taiOffset);
 
-        long expectedMillis = fixedInstant.toEpochMilli() +- 10;
+        long expectedMillis = fixedInstant.toEpochMilli();
 
         assertEquals(expectedMillis, instant.toEpochMilli());
     }

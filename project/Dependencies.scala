@@ -267,6 +267,7 @@ object Dependencies {
       Libs.`time4j`,
       Libs.`threeten-extra`,
       Libs.`jna`,
+      Akka.`akka-actor`,
       Libs.`junit-interface` % Test,
       Libs.`scalatest`.value % Test,
       Libs.`mockito-core`    % Test
