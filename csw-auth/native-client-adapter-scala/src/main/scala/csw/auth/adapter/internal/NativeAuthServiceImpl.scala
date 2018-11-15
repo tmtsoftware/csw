@@ -3,7 +3,6 @@ package csw.auth.adapter.internal
 import java.io._
 
 import csw.auth.adapter.api.{AuthStore, NativeAuthService}
-import org.keycloak.adapters.KeycloakDeployment
 import org.keycloak.adapters.installed.KeycloakInstalled
 import org.keycloak.adapters.rotation.AdapterTokenVerifier
 import org.keycloak.representations.AccessToken

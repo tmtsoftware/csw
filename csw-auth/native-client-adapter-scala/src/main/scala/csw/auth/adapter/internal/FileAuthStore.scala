@@ -2,7 +2,6 @@ package csw.auth.adapter.internal
 import java.nio.file.{Path, Paths}
 
 import csw.auth.adapter.api.AuthStore
-import org.keycloak.representations.IDToken
 
 import scala.language.implicitConversions
 
