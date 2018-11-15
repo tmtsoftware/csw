@@ -30,7 +30,7 @@ object Libs {
   val `akka-http-play-json`      = "de.heikoseeberger"    %% "akka-http-play-json"      % "1.22.0" //Apache 2.0
   val `scalapb-runtime`          = "com.thesamet.scalapb" %% "scalapb-runtime"          % scalapbVersion % "protobuf"
   val `scalapb-json4s`           = "com.thesamet.scalapb" %% "scalapb-json4s"           % scalapbVersion
-  val `lettuce`                  = "io.lettuce"           % "lettuce-core"              % "5.1.2.RELEASE"
+  val `lettuce`                  = "io.lettuce"           % "lettuce-core"              % "5.0.5.RELEASE"
   val `akka-stream-kafka`        = "com.typesafe.akka"    %% "akka-stream-kafka"        % "0.22"
   val `scalatest-embedded-kafka` = "net.manub"            %% "scalatest-embedded-kafka" % "1.1.0"
   val `embedded-redis`           = "com.github.kstyrc"    % "embedded-redis"            % "0.6"
