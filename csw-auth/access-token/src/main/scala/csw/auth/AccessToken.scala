@@ -3,7 +3,6 @@ package csw.auth
 import java.security.PublicKey
 import java.util.Base64
 
-import com.typesafe.config.Config
 import csw.auth.Conversions._
 import pdi.jwt.{JwtAlgorithm, JwtJson}
 import play.api.libs.json._

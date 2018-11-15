@@ -7,12 +7,12 @@ private[auth] sealed trait Access {
 
 private[auth] final case class RealmAccess(override val roles: Option[Set[String]]) extends Access
 
-object RealmAccess {
+private[auth] object RealmAccess {
   implicit val accessFormat: OFormat[RealmAccess] = Json.format[RealmAccess]
 }
 
 private[auth] final case class ResourceAccess(override val roles: Option[Set[String]]) extends Access
 
-object ResourceAccess {
+private[auth] object ResourceAccess {
   implicit val accessFormat: OFormat[ResourceAccess] = Json.format[ResourceAccess]
 }

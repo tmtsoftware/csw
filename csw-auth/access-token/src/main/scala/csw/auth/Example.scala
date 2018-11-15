@@ -1,7 +1,5 @@
 package csw.auth
 
-import com.typesafe.config.ConfigFactory
-
 import scala.util.{Failure, Success, Try}
 
 private[auth] object Example extends App {
