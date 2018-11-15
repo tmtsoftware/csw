@@ -20,10 +20,6 @@ private[auth] class NativeAuthServiceImpl(val keycloakInstalled: KeycloakInstall
 
   def this(config: InputStream) = this(new KeycloakInstalled(config))
 
-  def this(deployment: KeycloakDeployment) = this(new KeycloakInstalled(deployment))
-
-  def this(deployment: KeycloakDeployment, authStore: AuthStore) = this(new KeycloakInstalled(deployment), Some(authStore))
-
   def login(): Unit = {
     keycloakInstalled.login()
     updateAuthStore()
@@ -62,7 +58,7 @@ private[auth] class NativeAuthServiceImpl(val keycloakInstalled: KeycloakInstall
       accessTokenStr().getOrElse(throw new RuntimeException("Access token not found"))
     }
 
-  def getAccessToken(minValidity: FiniteDuration = 0.seconds): Try[AccessToken] =
+  private[auth] def getAccessToken(minValidity: FiniteDuration = 0.seconds): Try[AccessToken] =
     Try {
       accessToken()
         .flatMap { token ⇒
@@ -102,7 +98,7 @@ private[auth] class NativeAuthServiceImpl(val keycloakInstalled: KeycloakInstall
 
   private def updateAuthStore(): Unit = {
     val response = keycloakInstalled.getTokenResponse
-    authStore.foreach(_.saveAccessTokenResponse(response.getIdToken, response.getToken, response.getRefreshToken))
+    authStore.foreach(_.saveTokens(response.getIdToken, response.getToken, response.getRefreshToken))
   }
 
   private def clearAuthStore(): Unit = authStore.foreach(_.clearStorage())

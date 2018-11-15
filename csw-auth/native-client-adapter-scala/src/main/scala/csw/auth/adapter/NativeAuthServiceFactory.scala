@@ -11,10 +11,5 @@ object NativeAuthServiceFactory {
 
   def make(secretStore: AuthStore): NativeAuthService = new NativeAuthServiceImpl(authStore = secretStore)
 
-  def make(keycloakDeployment: KeycloakDeployment): NativeAuthService = new NativeAuthServiceImpl(keycloakDeployment)
-
-  def make(keycloakDeployment: KeycloakDeployment, secretStore: AuthStore): NativeAuthService =
-    new NativeAuthServiceImpl(keycloakDeployment, secretStore)
-
   def make(config: InputStream): NativeAuthService = new NativeAuthServiceImpl(config)
 }

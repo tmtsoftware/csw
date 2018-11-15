@@ -10,5 +10,5 @@ trait AuthStore {
 
   def clearStorage(): Unit
 
-  def saveAccessTokenResponse(idToken: String, accessToken: String, refreshToken: String): Unit
+  def saveTokens(idToken: String, accessToken: String, refreshToken: String): Unit
 }

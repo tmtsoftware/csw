@@ -1,7 +1,5 @@
 package csw.auth.adapter.api
 
-import org.keycloak.representations.AccessToken
-
 import scala.concurrent.duration.{DurationLong, FiniteDuration}
 import scala.util.Try
 
@@ -51,12 +49,4 @@ trait NativeAuthService {
    */
   def getAccessTokenString(minValidity: FiniteDuration = 0.seconds): Try[String]
 
-  /**
-   * Access token
-   *
-   * @param minValidity ensure that returned access token is valid at-least for given duration.
-   *                    Will refresh the token if required.
-   * @return
-   */
-  private[auth] def getAccessToken(minValidity: FiniteDuration = 0.seconds): Try[AccessToken]
 }

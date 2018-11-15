@@ -18,15 +18,14 @@ class FileAuthStore(storePath: Path) extends AuthStore {
 
   private def toPath(name: String) = Paths.get(s"${storePath.toString}/$name")
 
-  override def getAccessTokenString: Option[String] = read(accessTokenPath)
-
+  override def getAccessTokenString: Option[String]  = read(accessTokenPath)
   override def getIdTokenString: Option[String]      = read(idTokenPath)
-  private[auth] def getIdToken: Option[IDToken]      = ???
   override def getRefreshTokenString: Option[String] = read(refreshTokenPath)
-  override def clearStorage(): Unit                  = delete(storePath)
+
+  override def clearStorage(): Unit = delete(storePath)
 
   // todo : Will we always have this tokens
-  override def saveAccessTokenResponse(idToken: String, accessToken: String, refreshToken: String): Unit = {
+  override def saveTokens(idToken: String, accessToken: String, refreshToken: String): Unit = {
     write(idTokenPath, idToken)
     write(accessTokenPath, accessToken)
     write(refreshTokenPath, refreshToken)
