@@ -1,18 +1,16 @@
 package csw.auth
 
-import scala.util.{Failure, Success, Try}
-
 private[auth] object Example extends App {
 
-  val accessToken: Try[AccessToken] = AccessToken.verifyAndDecode(
+  val accessToken: Either[TokenFailure, AccessToken] = AccessToken.verifyAndDecode(
     "header.payload.signature"
   )
 
   accessToken match {
-    case Failure(exception) =>
-      System.err.println(exception.getMessage)
+    case Left(failure) =>
+      System.err.println(failure)
       sys.exit(1)
-    case Success(at) =>
+    case Right(at) =>
       println(s"access token: $at")
   }
 }

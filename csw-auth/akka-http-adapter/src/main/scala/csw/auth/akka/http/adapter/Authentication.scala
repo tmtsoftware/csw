@@ -1,17 +1,15 @@
 package csw.auth.akka.http.adapter
-import csw.auth.AccessToken
-import akka.http.scaladsl.server.directives.Credentials.Provided
 import akka.http.scaladsl.server.Directives._
-
-import scala.util.{Failure, Success}
+import akka.http.scaladsl.server.directives.Credentials.Provided
+import csw.auth.AccessToken
 
 //todo: these checks need to be more strong. we need to check for exp, aud, etc. consider taking help from keycloak to other jwt-scala
 private[auth] object Authentication {
   val authenticator: Authenticator[AccessToken] = {
     case p @ Provided(token) => {
       AccessToken.verifyAndDecode(token) match {
-        case Failure(_)     => None
-        case Success(value) => Some(value)
+        case Left(_)      => None
+        case Right(value) => Some(value)
       }
     }
     case _ => None

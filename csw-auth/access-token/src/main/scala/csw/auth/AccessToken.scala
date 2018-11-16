@@ -3,10 +3,8 @@ package csw.auth
 import java.util.Base64
 
 import csw.auth.Conversions._
-import pdi.jwt.{JwtAlgorithm, JwtJson}
+import pdi.jwt.{JwtAlgorithm, JwtHeader, JwtJson}
 import play.api.libs.json._
-
-import scala.util.{Failure, Success, Try}
 
 //todo: integrate csw logging
 case class AccessToken(
@@ -90,59 +88,58 @@ object AccessToken {
   implicit val accessTokenFormat: OFormat[AccessToken] =
     Json.format[AccessToken]
 
-  def verifyAndDecode(token: String): Try[AccessToken] = {
+  def verifyAndDecode(token: String): Either[TokenFailure, AccessToken] = {
     getKeyId(token) match {
-      case Failure(exception) => Failure(exception)
-      case Success(kid) =>
+      case Left(error) => Left(error)
+      case Right(kid) =>
         val publicKey = PublicKey.fromAuthServer(kid)
         verifyAndDecode(token, publicKey)
     }
   }
 
-  private def getKeyId(token: String): Try[String] = {
+  private def getKeyId(token: String): Either[TokenFailure, String] = {
 
     val format = "^(.+?)\\.(.+?)\\.(.+?$)".r
 
-    val mayBeHeaderString = token match {
+    val mayBeHeaderString: Either[TokenFailure, String] = token match {
       case format(header, _, _) =>
         val jsonHeaderString = Base64.getDecoder.decode(header).map(_.toChar).mkString
-        Success(jsonHeaderString)
+        Right(jsonHeaderString)
       case _ =>
-        Failure(new RuntimeException("invalid token format"))
+        Left(InvalidTokenFormat())
     }
 
-    val mayBeHeader = mayBeHeaderString match {
-      case Success(headerString) => Success(JwtJson.parseHeader(headerString))
-      case Failure(_)            => Failure(new RuntimeException("invalid token format"))
+    val mayBeJwtHeader: Either[TokenFailure, JwtHeader] = mayBeHeaderString match {
+      case Right(headerString) => Right(JwtJson.parseHeader(headerString))
+      case Left(error)         => Left(error)
     }
 
-    mayBeHeader match {
-      case Failure(exception) => Failure(exception)
-      case Success(header) =>
-        header.keyId match {
-          case Some(keyId) => Success(keyId)
-          case None        => Failure(new RuntimeException("token does not have a key Id"))
+    mayBeJwtHeader match {
+      case Left(error) => Left(error)
+      case Right(jwtHeader) =>
+        jwtHeader.keyId match {
+          case Some(keyId) => Right(keyId)
+          case None        => Left(KidMissing)
         }
     }
   }
 
-  private def verifyAndDecode(token: String, publicKey: java.security.PublicKey): Try[AccessToken] = {
+  private def verifyAndDecode(token: String, publicKey: java.security.PublicKey): Either[TokenFailure, AccessToken] = {
 
-    val verification: Try[JsObject] =
-      JwtJson.decodeJson(token, publicKey, Seq(JwtAlgorithm.RS256))
+    val verification: Either[TokenFailure, JsObject] =
+      JwtJson.decodeJson(token, publicKey, Seq(JwtAlgorithm.RS256)).toEither.left.map(t => InvalidTokenFormat(t.getMessage))
 
     verification match {
-      case Failure(exception) =>
-        System.err.println(exception)
-        Failure(exception)
-      case Success(jsObject) =>
-        val jsResult = accessTokenFormat.reads(jsObject)
-
+      case Left(error) =>
+        System.err.println(error)
+        Left(error)
+      case Right(jsObject) =>
+        val jsResult: JsResult[AccessToken] = accessTokenFormat.reads(jsObject)
         jsResult match {
-          case JsSuccess(accessToken, _) => Success(accessToken)
+          case JsSuccess(accessToken, _) => Right(accessToken)
           case e: JsError =>
-            System.err.println(toFailure(e).exception)
-            e
+            System.err.println(allErrorMessages(e))
+            Left(InvalidTokenFormat(allErrorMessages(e)))
         }
     }
   }
