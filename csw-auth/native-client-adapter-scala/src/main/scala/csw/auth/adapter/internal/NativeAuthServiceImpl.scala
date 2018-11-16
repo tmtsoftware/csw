@@ -1,14 +1,11 @@
 package csw.auth.adapter.internal
 
-import csw.auth.AccessToken
 import csw.auth.adapter.api.{AuthStore, NativeAuthService}
+import csw.auth.{AccessToken, TokenExpired, TokenFailure, TokenMissing}
 import org.keycloak.adapters.KeycloakDeployment
 import org.keycloak.adapters.installed.KeycloakInstalled
-import org.keycloak.adapters.rotation.AdapterTokenVerifier
-import org.keycloak
 
 import scala.concurrent.duration.{DurationLong, FiniteDuration}
-import scala.util.{Failure, Try}
 
 private[auth] class NativeAuthServiceImpl(val keycloakInstalled: KeycloakInstalled, authStore: Option[AuthStore] = None)
     extends NativeAuthService {
@@ -50,33 +47,31 @@ private[auth] class NativeAuthServiceImpl(val keycloakInstalled: KeycloakInstall
     bool
   }
 
-  def getAccessTokenString(minValidity: FiniteDuration = 0.seconds): Try[String] =
-    Try {
-      getAccessToken(minValidity)
-      accessTokenStr().getOrElse(throw new RuntimeException("Access token not found"))
+  def getAccessTokenString(minValidity: FiniteDuration = 0.seconds): Option[String] = {
+    getAccessToken(minValidity)
+    accessTokenStr()
+  }
+
+  def getAccessToken(minValidity: FiniteDuration = 0.seconds): Option[AccessToken] = {
+    def getNewToken = {
+      refreshAccessToken()
+      accessTokenStr().flatMap(AccessToken.verifyAndDecode(_).toOption)
     }
 
-  def getAccessToken(minValidity: FiniteDuration = 0.seconds): Try[AccessToken] =
-    accessToken().flatMap { token ⇒
-      if (isExpired(token, minValidity)) refreshAccessToken()
-      accessTokenStr()
-    } match {
-      case Some(at) ⇒ AccessToken.verifyAndDecode(at)
-      case None     ⇒ Failure(throw new RuntimeException("Access token not found"))
+    accessToken() match {
+      case Right(at)          ⇒ if (isExpired(at, minValidity)) getNewToken else Some(at)
+      case Left(TokenExpired) ⇒ getNewToken
+      case _                  ⇒ None
     }
+  }
 
-  private def accessToken(): Option[keycloak.representations.AccessToken] = authStore match {
+  private def accessToken(): Either[TokenFailure, AccessToken] = authStore match {
     case Some(store) ⇒
-      store.getAccessTokenString.map { at ⇒
-        val verifier = AdapterTokenVerifier.createVerifier(
-          at,
-          keycloakInstalled.getDeployment,
-          true,
-          classOf[keycloak.representations.AccessToken]
-        )
-        verifier.getToken
+      store.getAccessTokenString match {
+        case Some(at) ⇒ AccessToken.verifyAndDecode(at)
+        case None     ⇒ Left(TokenMissing)
       }
-    case None ⇒ Option(keycloakInstalled.getToken)
+    case None ⇒ AccessToken.verifyAndDecode(keycloakInstalled.getTokenString)
   }
 
   private def accessTokenStr() = authStore match {
@@ -84,10 +79,11 @@ private[auth] class NativeAuthServiceImpl(val keycloakInstalled: KeycloakInstall
     case None        ⇒ Option(keycloakInstalled.getTokenString)
   }
 
-  private def isExpired(accessToken: keycloak.representations.AccessToken, minValidity: FiniteDuration) = {
-    val expires: Long = accessToken.getExpiration.toLong * 1000 - minValidity.toMillis
-    expires < System.currentTimeMillis
-  }
+  private def isExpired(accessToken: AccessToken, minValidity: FiniteDuration) =
+    accessToken.exp match {
+      case Some(exp) ⇒ (exp * 1000 - minValidity.toMillis) < System.currentTimeMillis
+      case None      ⇒ false
+    }
 
   private def refreshAccessToken(): Unit = {
     refreshTokenStr().foreach(keycloakInstalled.refreshToken)

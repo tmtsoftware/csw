@@ -26,6 +26,10 @@ class NativeAuthServiceImplMockTest extends FunSuite with MockitoSugar {
     when(accessTokenResponse.getIdToken).thenReturn(idToken)
     when(accessTokenResponse.getRefreshToken).thenReturn(refreshToken)
 
+    when(store.getAccessTokenString).thenReturn(Some(accessToken))
+    when(store.getIdTokenString).thenReturn(Some(idToken))
+    when(store.getRefreshTokenString).thenReturn(Some(refreshToken))
+
     val authService = new NativeAuthServiceImpl(keycloakInstalled, Some(store))
   }
 
@@ -58,25 +62,10 @@ class NativeAuthServiceImplMockTest extends FunSuite with MockitoSugar {
     verify(keycloakInstalled).getTokenResponse
     verify(store).saveTokens(idToken, accessToken, refreshToken)
   }
-  /*
 
   test("getAccessToken") {
-
-    PowerMockito.mockStatic(classOf[AdapterTokenVerifier])
-    val at       = mock[representations.AccessToken]
-    val verifier = mock[TokenVerifier[representations.AccessToken]]
-    import org.mockito.Mockito
-    Mockito
-      .when(
-        AdapterTokenVerifier
-          .createVerifier(accessToken, keycloakInstalled.getDeployment, true, classOf[representations.AccessToken])
-      )
-      .thenReturn(verifier)
-    when(verifier.getToken).thenReturn(at)
-
-    authService.getAccessToken()
-
-    when(at.getExpiration).thenReturn(Int.MinValue)
+    val mocks = new AuthMocks
+    import mocks._
 
     authService.getAccessToken()
     verify(store).getRefreshTokenString
@@ -84,7 +73,6 @@ class NativeAuthServiceImplMockTest extends FunSuite with MockitoSugar {
     verify(keycloakInstalled).getTokenResponse
     verify(store).saveTokens(idToken, accessToken, refreshToken)
   }
-   */
 
   test("logout") {
     val mocks = new AuthMocks
