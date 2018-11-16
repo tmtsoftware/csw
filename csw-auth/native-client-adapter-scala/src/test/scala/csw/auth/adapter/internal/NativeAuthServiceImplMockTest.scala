@@ -4,10 +4,10 @@ import org.keycloak.adapters.KeycloakDeployment
 import org.keycloak.adapters.installed.KeycloakInstalled
 import org.keycloak.representations.AccessTokenResponse
 import org.mockito.Mockito.{verify, when}
-import org.scalatest.FunSuite
 import org.scalatest.mockito.MockitoSugar
+import org.scalatest.{FunSuite, Matchers}
 
-class NativeAuthServiceImplMockTest extends FunSuite with MockitoSugar {
+class NativeAuthServiceImplMockTest extends FunSuite with MockitoSugar with Matchers {
 
   class AuthMocks {
     val keycloakInstalled: KeycloakInstalled     = mock[KeycloakInstalled]
@@ -19,13 +19,16 @@ class NativeAuthServiceImplMockTest extends FunSuite with MockitoSugar {
     val idToken      = "id_token"
     val refreshToken = "refresh_token"
 
-    when(keycloakInstalled.getTokenResponse).thenReturn(accessTokenResponse)
+    // mock keycloakInstalled calls
     when(keycloakInstalled.getTokenResponse).thenReturn(accessTokenResponse)
     when(keycloakInstalled.getDeployment).thenReturn(kd)
+
+    // mock keycloak's access token response calls
     when(accessTokenResponse.getToken).thenReturn(accessToken)
     when(accessTokenResponse.getIdToken).thenReturn(idToken)
     when(accessTokenResponse.getRefreshToken).thenReturn(refreshToken)
 
+    // mock auth store calls
     when(store.getAccessTokenString).thenReturn(Some(accessToken))
     when(store.getIdTokenString).thenReturn(Some(idToken))
     when(store.getRefreshTokenString).thenReturn(Some(refreshToken))
@@ -67,11 +70,8 @@ class NativeAuthServiceImplMockTest extends FunSuite with MockitoSugar {
     val mocks = new AuthMocks
     import mocks._
 
-    authService.getAccessToken()
-    verify(store).getRefreshTokenString
-    verify(keycloakInstalled).refreshToken(refreshToken)
-    verify(keycloakInstalled).getTokenResponse
-    verify(store).saveTokens(idToken, accessToken, refreshToken)
+    authService.getAccessToken() shouldBe None
+    verify(store).getAccessTokenString
   }
 
   test("logout") {

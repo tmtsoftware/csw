@@ -33,10 +33,9 @@ class FileAuthStore(storePath: Path) extends AuthStore {
   /************************************************
    * Internal APIs: Uses os-libs for file handling
   ************************************************/
-  private def write(path: Path, content: String): Unit = {
+  private def write(path: Path, content: String): Unit =
     if (os.exists(path)) os.write.over(path, content)
     else os.write(path, content)
-  }
 
   private def read(path: Path): Option[String] = if (os.exists(path)) Some(os.read(path)) else None
 
