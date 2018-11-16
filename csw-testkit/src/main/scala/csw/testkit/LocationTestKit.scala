@@ -6,7 +6,23 @@ import com.typesafe.config.ConfigFactory
 import csw.location.server.internal.ServerWiring
 import csw.testkit.internal.TestKitUtils
 
-final class LocationTestKit private (val testKitSettings: TestKitSettings) {
+/**
+ * LocationTestKit supports starting HTTP Location Server backed by Akka cluster and Distributed Data
+ *
+ * Example:
+ * {{{
+ *   private val testKit = LocationTestKit()
+ *
+ *   // starting Location Server (starts location server on default ports specified in configuration file)
+ *   testKit.startLocationServer()
+ *
+ *   // stopping alarm server
+ *   testKit.shutdownLocationServer()
+ *
+ * }}}
+ *
+ */
+final class LocationTestKit private (testKitSettings: TestKitSettings) {
 
   private lazy val locationWiring = ServerWiring.make(testKitSettings.LocationClusterPort)
   import locationWiring.actorRuntime._

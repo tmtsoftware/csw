@@ -3,6 +3,7 @@ package csw.testkit
 import akka.actor.ActorSystem
 import akka.actor.typed.ActorRef
 import akka.http.scaladsl.Http
+import akka.stream.Materializer
 import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.command.client.messages.{ComponentMessage, ContainerMessage}
@@ -13,7 +14,28 @@ import csw.testkit.scaladsl.CSWService
 import csw.testkit.scaladsl.CSWService._
 
 import scala.annotation.varargs
+import scala.concurrent.ExecutionContext
 
+/**
+ * FrameworkTestKit supports starting one or more services from [[CSWService]]
+ * It also provides helpers to spawn components in standalone or container mode
+ *
+ * Example:
+ * {{{
+ *   private val testKit = FrameworkTestKit()
+ *
+ *   // this will start Event and Alarm Server (Note: Location Server will always be started as it is required by all other services)
+ *   testKit.start(EventServer, AlarmServer)
+ *
+ *   // spawn component in standalone mode
+ *   testKit.spawnStandalone(ConfigFactory.load("standalone.conf"))
+ *
+ *   // stopping services
+ *   testKit.shutdown()
+ *
+ * }}}
+ *
+ */
 final class FrameworkTestKit private (
     val actorSystem: ActorSystem,
     val locationTestKit: LocationTestKit,
@@ -24,7 +46,10 @@ final class FrameworkTestKit private (
 
   implicit lazy val system: ActorSystem     = actorSystem
   lazy val frameworkWiring: FrameworkWiring = FrameworkWiring.make(actorSystem)
-  implicit val timeout: Timeout             = locationTestKit.testKitSettings.DefaultTimeout
+  implicit lazy val ec: ExecutionContext    = frameworkWiring.actorRuntime.ec
+  implicit lazy val mat: Materializer       = frameworkWiring.actorRuntime.mat
+
+  implicit val timeout: Timeout = locationTestKit.timeout
 
   private var configStarted = false
   private var eventStarted  = false

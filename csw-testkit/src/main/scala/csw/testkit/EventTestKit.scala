@@ -11,6 +11,24 @@ import csw.location.api.models.RegistrationResult
 import csw.network.utils.SocketUtils.getFreePort
 import csw.testkit.redis.RedisStore
 
+/**
+ * EventTestKit supports starting Alarm server using embedded redis internally (sentinel + master)
+ * and registering it with location service
+ *
+ * Example:
+ * {{{
+ *   private val testKit = EventTestKit()
+ *
+ *   // starting event server (start sentinel on port 6379 and master on port 6378)
+ *   // it will also register EventService with location service
+ *   testKit.startEventService(sentinelPort = 6379, serverPort = 6378)
+ *
+ *   // stopping event server
+ *   testKit.shutdownEventService()
+ *
+ * }}}
+ *
+ */
 final class EventTestKit private (_system: ActorSystem, testKitSettings: TestKitSettings) extends RedisStore {
 
   override implicit val system: ActorSystem             = _system

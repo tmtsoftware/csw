@@ -25,10 +25,10 @@ private[testkit] trait RedisStore extends EmbeddedRedis {
   implicit lazy val mat: Materializer    = ActorMaterializer()
   implicit lazy val ec: ExecutionContext = system.dispatcher
 
-  var redisSentinel: Option[RedisSentinel] = None
-  var redisServer: Option[RedisServer]     = None
+  private var redisSentinel: Option[RedisSentinel] = None
+  private var redisServer: Option[RedisServer]     = None
 
-  implicit lazy val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient
+  private implicit lazy val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient
 
   def start(sentinelPort: Int = getFreePort, serverPort: Int = getFreePort): RegistrationResult = {
     val tuple = startSentinel(sentinelPort, serverPort, masterId)

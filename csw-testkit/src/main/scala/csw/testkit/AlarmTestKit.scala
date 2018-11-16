@@ -11,6 +11,24 @@ import csw.location.api.models.RegistrationResult
 import csw.network.utils.SocketUtils.getFreePort
 import csw.testkit.redis.RedisStore
 
+/**
+ * AlarmTestKit supports starting Alarm server using embedded redis internally (sentinel + master)
+ * and registering it with location service
+ *
+ * Example:
+ * {{{
+ *   private val testKit = AlarmTestKit()
+ *
+ *   // starting alarm server (start sentinel and master on default ports specified in configuration file)
+ *   // it will also register AlarmService with location service
+ *   testKit.startAlarmService()
+ *
+ *   // stopping alarm server
+ *   testKit.shutdownAlarmService()
+ *
+ * }}}
+ *
+ */
 final class AlarmTestKit private (_system: ActorSystem, testKitSettings: TestKitSettings) extends RedisStore {
 
   override implicit val system: ActorSystem             = _system

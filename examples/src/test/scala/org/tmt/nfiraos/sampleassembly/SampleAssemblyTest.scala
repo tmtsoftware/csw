@@ -23,7 +23,7 @@ class SampleAssemblyTest extends ScalaTestFrameworkTestKit(AlarmServer, EventSer
   //#locate
   import scala.concurrent.duration._
   test("Assembly should be locatable using Location Service") {
-    val connection = AkkaConnection(ComponentId("SampleAssembly", ComponentType.Assembly))
+    val connection   = AkkaConnection(ComponentId("SampleAssembly", ComponentType.Assembly))
     val akkaLocation = Await.result(locationService.resolve(connection, 10.seconds), 10.seconds).get
 
     akkaLocation.connection shouldBe connection

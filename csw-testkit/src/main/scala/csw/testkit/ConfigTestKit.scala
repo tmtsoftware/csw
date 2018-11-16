@@ -4,15 +4,36 @@ import java.nio.file.Paths
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
+import akka.stream.Materializer
 import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.config.server.{ServerWiring, Settings}
 import csw.testkit.internal.TestKitUtils
 
+import scala.concurrent.ExecutionContextExecutor
+
+/**
+ * ConfigTestKit supports starting HTTP Config Server backed by SVN
+ * and registering it with location service
+ *
+ * Example:
+ * {{{
+ *   private val testKit = ConfigTestKit()
+ *
+ *   // starting Config Server (starts config server on default ports specified in configuration file)
+ *   // it will also register ConfigService with location service
+ *   testKit.startConfigServer()
+ *
+ *   // stopping Config Server
+ *   testKit.shutdownConfigServer()
+ *
+ * }}}
+ *
+ */
 final class ConfigTestKit private (system: ActorSystem, serverConfig: Option[Config], testKitSettings: TestKitSettings) {
 
   implicit lazy val actorSystem: ActorSystem = system
-  lazy val configWiring: ServerWiring = (serverConfig, testKitSettings.ConfigPort) match {
+  private[csw] lazy val configWiring: ServerWiring = (serverConfig, testKitSettings.ConfigPort) match {
     case (Some(_config), _) ⇒
       new ServerWiring {
         override lazy val config: Config           = _config
@@ -29,9 +50,9 @@ final class ConfigTestKit private (system: ActorSystem, serverConfig: Option[Con
 
   private var configServer: Option[Http.ServerBinding] = None
 
-  import configWiring.actorRuntime._
-
-  implicit lazy val timeout: Timeout = testKitSettings.DefaultTimeout
+  implicit lazy val ec: ExecutionContextExecutor = configWiring.actorRuntime.ec
+  implicit lazy val mat: Materializer            = configWiring.actorRuntime.mat
+  implicit lazy val timeout: Timeout             = testKitSettings.DefaultTimeout
 
   /**
    * Start HTTP Config server on provided port in constructor or configuration and create clean copy of SVN repo
@@ -67,7 +88,7 @@ final class ConfigTestKit private (system: ActorSystem, serverConfig: Option[Con
     deleteServerFiles()
     TestKitUtils.await(Http(actorSystem).shutdownAllConnectionPools(), timeout)
     terminateServer()
-    TestKitUtils.coordShutdown(shutdown, timeout)
+    TestKitUtils.coordShutdown(configWiring.actorRuntime.shutdown, timeout)
   }
 
 }

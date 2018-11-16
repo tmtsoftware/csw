@@ -4,6 +4,27 @@ import csw.testkit.scaladsl.CSWService;
 
 /**
  * Helper class for Java to get handle of [[{@link CSWService}]]
+ *
+ * Specify one or more services from following ADT's while creating FrameworkTestKit
+ * and testkit will make sure that those services are started.
+ *
+ * Example:
+ * == With JUnit Integration ==
+ * {{{
+ *
+ *   @ClassRule
+ *   public static final FrameworkTestKitJunitResource testKit =
+ *           new FrameworkTestKitJunitResource(Arrays.asList(JCSWService.AlarmServer, JCSWService.ConfigServer));
+ *
+ * }}}
+ *
+ * == With FrameworkTestKit ==
+ * {{{
+ *
+ *   private static FrameworkTestKit frameworkTestKit = FrameworkTestKit.create();
+ *   frameworkTestKit.start(JCSWService.ConfigServer, JCSWService.EventServer);
+ *
+ * }}}
  */
 @SuppressWarnings("unused")
 public class JCSWService {

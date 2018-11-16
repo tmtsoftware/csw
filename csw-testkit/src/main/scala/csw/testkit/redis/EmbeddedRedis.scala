@@ -2,7 +2,7 @@ package csw.testkit.redis
 import csw.network.utils.SocketUtils.getFreePort
 import redis.embedded.{RedisSentinel, RedisServer}
 
-trait EmbeddedRedis {
+private[testkit] trait EmbeddedRedis {
 
   def startSentinel(
       sentinelPort: Int = getFreePort,
