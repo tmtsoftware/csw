@@ -13,7 +13,7 @@ object Example extends App {
   println("login initiated")
 //  keycloak.login()
 
-  private val expires: Int = keycloak.asInstanceOf[NativeAuthServiceImpl].getAccessToken().map(x ⇒ x.getExpiration).get
+  private val expires: Long = keycloak.asInstanceOf[NativeAuthServiceImpl].getAccessToken().get.iat.get
   println(s"Expiring on: $expires")
   println(System.currentTimeMillis() / 1000)
 

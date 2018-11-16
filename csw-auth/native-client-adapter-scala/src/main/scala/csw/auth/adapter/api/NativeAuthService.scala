@@ -1,5 +1,7 @@
 package csw.auth.adapter.api
 
+import csw.auth.AccessToken
+
 import scala.concurrent.duration.{DurationLong, FiniteDuration}
 import scala.util.Try
 
@@ -48,5 +50,14 @@ trait NativeAuthService {
    * @return access token in string format. This token could be signed or encrypted
    */
   def getAccessTokenString(minValidity: FiniteDuration = 0.seconds): Try[String]
+
+  /**
+   * Access token
+   *
+   * @param minValidity ensure that returned access token is valid at-least for given duration.
+   *                    Will refresh the token if required.
+   * @return access token
+   */
+  def getAccessToken(minValidity: FiniteDuration = 0.seconds): Try[AccessToken]
 
 }
