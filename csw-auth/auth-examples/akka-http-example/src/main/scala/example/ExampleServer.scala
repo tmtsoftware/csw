@@ -1,7 +1,7 @@
 package example
 import akka.http.scaladsl.server.{HttpApp, Route}
 import akka.http.scaladsl.unmarshalling.GenericUnmarshallers
-import csw.auth.SecurityDirectives._
+import csw.auth.akka.http.adapter.SecurityDirectives._
 import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
 
 object ExampleServer extends HttpApp with App with GenericUnmarshallers with PlayJsonSupport {
@@ -22,11 +22,17 @@ object ExampleServer extends HttpApp with App with GenericUnmarshallers with Pla
       } ~ post {
         entity(as[Person]) { person =>
           customPolicy(
-            person.country == "US"
-            && _.email.getOrElse("").endsWith("gmail.com")
+            at =>
+              person.country == "US"
+              && at.email.getOrElse("").endsWith("gmail.com")
           ) {
             complete("OK")
           }
+        }
+      } ~
+      patch {
+        role("example-service-admin") {
+          complete("OK")
         }
       }
     }

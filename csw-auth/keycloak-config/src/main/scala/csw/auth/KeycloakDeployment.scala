@@ -1,16 +1,16 @@
 package csw.auth
 import java.io.{ByteArrayInputStream, InputStream}
 
-import com.typesafe.config.{ConfigFactory, ConfigRenderOptions}
+import com.typesafe.config.{Config, ConfigFactory, ConfigRenderOptions}
 import org.keycloak.adapters.{KeycloakDeployment, KeycloakDeploymentBuilder}
 
-private[auth] object KeycloakDeploymentFactory {
+private[auth] object KeycloakDeployment {
 
-  private val authConfig = ConfigFactory
-    .load()
-    .getConfig("auth-config")
+  val instance: KeycloakDeployment = {
 
-  def createInstance(): KeycloakDeployment = {
+    val authConfig: Config = ConfigFactory
+      .load()
+      .getConfig("auth-config")
 
     val configJSON: String =
       authConfig.root().render(ConfigRenderOptions.concise())

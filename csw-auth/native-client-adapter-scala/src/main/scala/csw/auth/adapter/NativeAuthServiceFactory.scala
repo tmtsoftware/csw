@@ -1,12 +1,12 @@
 package csw.auth.adapter
-import csw.auth.KeycloakDeploymentFactory
+import csw.auth.KeycloakDeployment
 import csw.auth.adapter.api.{AuthStore, NativeAuthService}
 import csw.auth.adapter.internal.NativeAuthServiceImpl
 
 //todo:add documentation
 object NativeAuthServiceFactory {
 
-  val kd = KeycloakDeploymentFactory.createInstance()
+  val kd = KeycloakDeployment.instance
 
   def make(): NativeAuthService = new NativeAuthServiceImpl(kd)
 

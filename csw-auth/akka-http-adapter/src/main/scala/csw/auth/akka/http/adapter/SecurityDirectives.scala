@@ -1,31 +1,29 @@
-package csw.auth
-
+package csw.auth.akka.http.adapter
+import csw.auth.AccessToken
 import akka.http.scaladsl.server.Directive0
 import akka.http.scaladsl.server.Directives._
 
 object SecurityDirectives {
-
-  type AuthorizationPolicy = AccessToken => Boolean
 
   def permission(name: String, resource: String): Directive0 =
     authenticateOAuth2("master", Authentication.authenticator).flatMap { at =>
       authorize(at.hasPermission(name, resource))
     }
 
-  def role(name: String, resource: String): Directive0 =
+  def role(name: String): Directive0 =
     authenticateOAuth2("master", Authentication.authenticator).flatMap { at =>
-      authorize(at.hasRole(name, resource))
+      authorize(at.hasRole(name))
     }
 
-  def customPolicy(policy: AuthorizationPolicy): Directive0 = {
+  def customPolicy(policy: AccessToken => Boolean): Directive0 = {
     authenticateOAuth2("master", Authentication.authenticator).flatMap { at =>
       authorize(policy(at))
     }
   }
 
-  def customPolicy(predicate: => Boolean): Directive0 = {
+  def customPolicy(policy: => Boolean): Directive0 = {
     authenticateOAuth2("master", Authentication.authenticator).flatMap { at =>
-      authorize(predicate)
+      authorize(policy)
     }
   }
 }

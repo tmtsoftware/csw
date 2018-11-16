@@ -10,6 +10,7 @@ import play.api.libs.json._
 import scala.language.implicitConversions
 import scala.util.{Failure, Success, Try}
 
+//todo: integrate csw logging
 case class AccessToken(
     //standard checks
     sub: Option[String],
@@ -55,7 +56,7 @@ case class AccessToken(
     }
   }
 
-  def hasRole(role: String, resource: String): Boolean = {
+  def hasRole(role: String): Boolean = {
 
     val allRealmRoles: Set[String] = this.realm_access match {
       case Some(realmAccess) =>
@@ -66,9 +67,11 @@ case class AccessToken(
       case None => Set.empty
     }
 
+    val clientName: String = KeycloakDeployment.instance.getResourceName
+
     val allResourceRoles: Set[String] = this.resource_access match {
       case Some(resourceAccesses) =>
-        resourceAccesses.get(resource) match {
+        resourceAccesses.get(clientName) match {
           case Some(resourceAccess) =>
             resourceAccess.roles match {
               case Some(roles) => roles
@@ -83,6 +86,7 @@ case class AccessToken(
   }
 }
 
+//todo: think about splitting verification and decoding
 object AccessToken {
 
   implicit val accessTokenFormat: OFormat[AccessToken] =
@@ -126,7 +130,7 @@ object AccessToken {
 
   private def decode(token: String, publicKey: PublicKey): Try[AccessToken] = {
 
-    val verification =
+    val verification: Try[JsObject] =
       JwtJson.decodeJson(token, publicKey, Seq(JwtAlgorithm.RS256))
 
     verification match {

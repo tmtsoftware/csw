@@ -1,5 +1,5 @@
-package csw.auth
-
+package csw.auth.akka.http.adapter
+import csw.auth.AccessToken
 import akka.http.scaladsl.server.directives.Credentials.Provided
 import akka.http.scaladsl.server.Directives._
 
