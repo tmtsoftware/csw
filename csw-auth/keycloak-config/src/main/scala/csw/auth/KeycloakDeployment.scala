@@ -8,12 +8,9 @@ private[auth] object KeycloakDeployment {
 
   val instance: org.keycloak.adapters.KeycloakDeployment = {
 
-    val authConfig: Config = ConfigFactory
-      .load()
-      .getConfig("auth-config")
+    val authConfig: Config = ConfigFactory.load().getConfig("auth-config")
 
-    val configJSON: String =
-      authConfig.root().render(ConfigRenderOptions.concise())
+    val configJSON: String = authConfig.root().render(ConfigRenderOptions.concise())
 
     val inputStream: InputStream = new ByteArrayInputStream(configJSON.getBytes())
 

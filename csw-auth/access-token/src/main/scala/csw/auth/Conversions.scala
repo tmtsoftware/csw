@@ -1,20 +1,18 @@
 package csw.auth
 
-import play.api.libs.json.JsError
+import play.api.libs.json.{JsError, JsPath}
 
 import scala.language.implicitConversions
 
 private[auth] object Conversions {
-  implicit def allErrorMessages(jsError: JsError): String = {
-    val message = jsError.errors
+  implicit def allErrorMessages(jsError: JsError): String =
+    jsError.errors
       .map {
-        case (jsPath, es) =>
-          (jsPath.toString(), es.flatMap(_.messages).mkString("\n"))
-      }
-      .map {
-        case (path, es) => s"--------------\n$path\n\n$es"
+        case (jsPath: JsPath, es) =>
+          s"""
+            |Error at path: $jsPath
+            |Validation errors: ${es.flatMap(_.messages).mkString("\n")}
+          """.stripMargin
       }
       .mkString("\n")
-    message
-  }
 }

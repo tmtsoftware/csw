@@ -35,58 +35,40 @@ case class AccessToken(
           case Some(permissions) =>
             permissions.exists {
               case Permission(_, r, Some(scopes)) if r == resource => scopes.contains(scope)
-              case _ => {
+              case _ =>
                 System.err.println(s"user doesn't have '$scope' permission for '$resource' resource")
                 false
-              }
             }
-          case None => {
+          case None =>
             System.err.println("token doesn't contain permissions")
             false
-          }
         }
-      case None => {
+      case None =>
         System.err.println("token doesn't authorization claim")
         false
-      }
     }
   }
 
   def hasRole(role: String): Boolean = {
+    val allRealmRoles: Set[String] = this.realm_access.flatMap(_.roles).getOrElse(Set.empty)
+    val clientName: String         = KeycloakDeployment.instance.getResourceName
 
-    val allRealmRoles: Set[String] = this.realm_access match {
-      case Some(realmAccess) =>
-        realmAccess.roles match {
-          case Some(realmRoles) => realmRoles
-          case None             => Set.empty
-        }
-      case None => Set.empty
-    }
+    val maybeRoles = for {
+      resourceAccesses ← this.resource_access
+      resourceAccess   ← resourceAccesses.get(clientName)
+      roles            ← resourceAccess.roles
+    } yield roles
 
-    val clientName: String = KeycloakDeployment.instance.getResourceName
+    val allResourceRoles: Set[String] = maybeRoles.getOrElse(Set.empty)
 
-    val allResourceRoles: Set[String] = this.resource_access match {
-      case Some(resourceAccesses) =>
-        resourceAccesses.get(clientName) match {
-          case Some(resourceAccess) =>
-            resourceAccess.roles match {
-              case Some(roles) => roles
-              case None        => Set.empty
-            }
-          case None => Set.empty
-        }
-      case None => Set.empty
-    }
-
-    allRealmRoles.union(allResourceRoles).contains(role)
+    (allRealmRoles ++ allResourceRoles).contains(role)
   }
 }
 
 //todo: think about splitting verification and decoding
 object AccessToken {
 
-  implicit val accessTokenFormat: OFormat[AccessToken] =
-    Json.format[AccessToken]
+  implicit val accessTokenFormat: OFormat[AccessToken] = Json.format[AccessToken]
 
   def verifyAndDecode(token: String): Either[TokenFailure, AccessToken] = getKeyId(token).flatMap { kid =>
     val publicKey = PublicKey.fromAuthServer(kid)
@@ -101,8 +83,7 @@ object AccessToken {
       case format(header, _, _) =>
         val jsonHeaderString = Base64.getDecoder.decode(header).map(_.toChar).mkString
         Right(jsonHeaderString)
-      case _ =>
-        Left(InvalidTokenFormat())
+      case _ => Left(InvalidTokenFormat())
     }
 
     mayBeHeaderString
@@ -122,14 +103,13 @@ object AccessToken {
           case ex: Throwable             => InvalidTokenFormat(ex.getMessage)
         }
 
-    verification.flatMap(jsObject => {
+    verification.flatMap { jsObject =>
       val jsResult: JsResult[AccessToken] = accessTokenFormat.reads(jsObject)
 
       jsResult match {
         case JsSuccess(accessToken, _) => Right(accessToken)
-        case e: JsError =>
-          Left(InvalidTokenFormat(allErrorMessages(e)))
+        case e: JsError                => Left(InvalidTokenFormat(allErrorMessages(e)))
       }
-    })
+    }
   }
 }

@@ -12,27 +12,12 @@ private[auth] object PublicKey {
   private val publicKeyLocator   = new JWKPublicKeyLocator()
   private val keycloakDeployment = KeycloakDeployment.instance
 
-  def fromString(text: String): PublicKey = {
-    val lines = text.split("\n")
-    fromLines(lines)
-  }
+  def fromString(text: String): PublicKey       = fromLines(text.split("\n"))
+  def fromFile(path: String): PublicKey         = fromSource(Source.fromFile(path))
+  def fromResourceFile(name: String): PublicKey = fromSource(Source.fromResource(name))
+  def fromAuthServer(kid: String): PublicKey    = publicKeyLocator.getPublicKey(kid, keycloakDeployment)
 
-  def fromFile(path: String): PublicKey = {
-    fromSource(Source.fromFile(path))
-  }
-
-  def fromResourceFile(name: String): PublicKey = {
-    fromSource(Source.fromResource(name))
-  }
-
-  def fromAuthServer(kid: String): PublicKey = {
-    publicKeyLocator.getPublicKey(kid, keycloakDeployment)
-  }
-
-  private def fromSource(source: Source): PublicKey = {
-    val lines = source.getLines().toArray
-    fromLines(lines)
-  }
+  private def fromSource(source: Source): PublicKey = fromLines(source.getLines().toArray)
 
   private def fromLines(lines: Array[String]): PublicKey = {
     val contents = lines
@@ -41,10 +26,8 @@ private[auth] object PublicKey {
 
     val decoded = Base64.getDecoder.decode(contents)
 
-    val publicKey: PublicKey = KeyFactory
+    KeyFactory
       .getInstance("RSA")
       .generatePublic(new X509EncodedKeySpec(decoded))
-
-    publicKey
   }
 }
