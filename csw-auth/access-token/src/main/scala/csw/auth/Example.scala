@@ -4,7 +4,7 @@ import scala.util.{Failure, Success, Try}
 
 private[auth] object Example extends App {
 
-  val accessToken: Try[AccessToken] = AccessToken.decode(
+  val accessToken: Try[AccessToken] = AccessToken.verifyAndDecode(
     "header.payload.signature"
   )
 

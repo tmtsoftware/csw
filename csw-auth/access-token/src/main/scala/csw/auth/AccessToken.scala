@@ -1,13 +1,11 @@
 package csw.auth
 
-import java.security.PublicKey
 import java.util.Base64
 
 import csw.auth.Conversions._
 import pdi.jwt.{JwtAlgorithm, JwtJson}
 import play.api.libs.json._
 
-import scala.language.implicitConversions
 import scala.util.{Failure, Success, Try}
 
 //todo: integrate csw logging
@@ -92,12 +90,12 @@ object AccessToken {
   implicit val accessTokenFormat: OFormat[AccessToken] =
     Json.format[AccessToken]
 
-  def decode(token: String): Try[AccessToken] = {
+  def verifyAndDecode(token: String): Try[AccessToken] = {
     getKeyId(token) match {
       case Failure(exception) => Failure(exception)
       case Success(kid) =>
         val publicKey = PublicKey.fromAuthServer(kid)
-        decode(token, publicKey)
+        verifyAndDecode(token, publicKey)
     }
   }
 
@@ -128,7 +126,7 @@ object AccessToken {
     }
   }
 
-  private def decode(token: String, publicKey: PublicKey): Try[AccessToken] = {
+  private def verifyAndDecode(token: String, publicKey: java.security.PublicKey): Try[AccessToken] = {
 
     val verification: Try[JsObject] =
       JwtJson.decodeJson(token, publicKey, Seq(JwtAlgorithm.RS256))

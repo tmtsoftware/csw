@@ -17,7 +17,6 @@ lazy val `native-client-adapter-scala` = project.settings(
 
 lazy val `access-token` = project.settings(
   libraryDependencies ++= Seq(
-    Keycloak.`keycloak-adapter-core`,
     Libs.`jwt-play-json`,
     Libs.`config`
   )

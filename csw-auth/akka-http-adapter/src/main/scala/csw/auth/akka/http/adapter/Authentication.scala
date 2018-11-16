@@ -9,7 +9,7 @@ import scala.util.{Failure, Success}
 private[auth] object Authentication {
   val authenticator: Authenticator[AccessToken] = {
     case p @ Provided(token) => {
-      AccessToken.decode(token) match {
+      AccessToken.verifyAndDecode(token) match {
         case Failure(_)     => None
         case Success(value) => Some(value)
       }

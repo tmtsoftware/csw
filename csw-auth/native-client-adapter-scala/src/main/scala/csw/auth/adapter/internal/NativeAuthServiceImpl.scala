@@ -61,7 +61,7 @@ private[auth] class NativeAuthServiceImpl(val keycloakInstalled: KeycloakInstall
       if (isExpired(token, minValidity)) refreshAccessToken()
       accessTokenStr()
     } match {
-      case Some(at) ⇒ AccessToken.decode(at)
+      case Some(at) ⇒ AccessToken.verifyAndDecode(at)
       case None     ⇒ Failure(throw new RuntimeException("Access token not found"))
     }
 
