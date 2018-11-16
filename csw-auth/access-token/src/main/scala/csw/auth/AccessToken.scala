@@ -89,13 +89,9 @@ object AccessToken {
   implicit val accessTokenFormat: OFormat[AccessToken] =
     Json.format[AccessToken]
 
-  def verifyAndDecode(token: String): Either[TokenFailure, AccessToken] = {
-    getKeyId(token) match {
-      case Left(error) => Left(error)
-      case Right(kid) =>
-        val publicKey = PublicKey.fromAuthServer(kid)
-        verifyAndDecode(token, publicKey)
-    }
+  def verifyAndDecode(token: String): Either[TokenFailure, AccessToken] = getKeyId(token).flatMap { kid =>
+    val publicKey = PublicKey.fromAuthServer(kid)
+    verifyAndDecode(token, publicKey)
   }
 
   private def getKeyId(token: String): Either[TokenFailure, String] = {
@@ -110,19 +106,9 @@ object AccessToken {
         Left(InvalidTokenFormat())
     }
 
-    val mayBeJwtHeader: Either[TokenFailure, JwtHeader] = mayBeHeaderString match {
-      case Right(headerString) => Right(JwtJson.parseHeader(headerString))
-      case Left(error)         => Left(error)
-    }
-
-    mayBeJwtHeader match {
-      case Left(error) => Left(error)
-      case Right(jwtHeader) =>
-        jwtHeader.keyId match {
-          case Some(keyId) => Right(keyId)
-          case None        => Left(KidMissing)
-        }
-    }
+    mayBeHeaderString
+      .map(JwtJson.parseHeader)
+      .flatMap(_.keyId.toRight(KidMissing))
   }
 
   private def verifyAndDecode(token: String, publicKey: java.security.PublicKey): Either[TokenFailure, AccessToken] = {
@@ -137,18 +123,14 @@ object AccessToken {
           case ex: Throwable             => InvalidTokenFormat(ex.getMessage)
         }
 
-    verification match {
-      case Left(error) =>
-        System.err.println(error)
-        Left(error)
-      case Right(jsObject) =>
-        val jsResult: JsResult[AccessToken] = accessTokenFormat.reads(jsObject)
-        jsResult match {
-          case JsSuccess(accessToken, _) => Right(accessToken)
-          case e: JsError =>
-            System.err.println(allErrorMessages(e))
-            Left(InvalidTokenFormat(allErrorMessages(e)))
-        }
-    }
+    verification.flatMap(jsObject => {
+      val jsResult: JsResult[AccessToken] = accessTokenFormat.reads(jsObject)
+
+      jsResult match {
+        case JsSuccess(accessToken, _) => Right(accessToken)
+        case e: JsError =>
+          Left(InvalidTokenFormat(allErrorMessages(e)))
+      }
+    })
   }
 }
