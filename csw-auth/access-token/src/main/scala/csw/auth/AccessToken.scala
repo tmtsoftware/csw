@@ -3,6 +3,7 @@ package csw.auth
 import java.util.Base64
 
 import csw.auth.Conversions._
+import pdi.jwt.exceptions.JwtExpirationException
 import pdi.jwt.{JwtAlgorithm, JwtHeader, JwtJson}
 import play.api.libs.json._
 
@@ -127,7 +128,14 @@ object AccessToken {
   private def verifyAndDecode(token: String, publicKey: java.security.PublicKey): Either[TokenFailure, AccessToken] = {
 
     val verification: Either[TokenFailure, JsObject] =
-      JwtJson.decodeJson(token, publicKey, Seq(JwtAlgorithm.RS256)).toEither.left.map(t => InvalidTokenFormat(t.getMessage))
+      JwtJson
+        .decodeJson(token, publicKey, Seq(JwtAlgorithm.RS256))
+        .toEither
+        .left
+        .map {
+          case _: JwtExpirationException => TokenExpired
+          case ex: Throwable             => InvalidTokenFormat(ex.getMessage)
+        }
 
     verification match {
       case Left(error) =>
