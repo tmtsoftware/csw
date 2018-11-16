@@ -292,6 +292,7 @@ object Dependencies {
       Libs.`jboss-logging`,
       Libs.httpclient,
       Libs.`scalatest`.value % Test,
+      Libs.`mockito-core`    % Test
     )
   )
 
