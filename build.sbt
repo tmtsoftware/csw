@@ -28,6 +28,8 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-alarm-cli`,
   `csw-time-api`,
   `csw-time-client`,
+  `csw-database-api`,
+  `csw-database-client`,
   `csw-network-utils`,
   `csw-commons`,
   `csw-testkit`,
@@ -340,6 +342,14 @@ lazy val `csw-testkit` = project
   )
   .enablePlugins(PublishBintray, GenJavadocPlugin)
   .settings(libraryDependencies ++= Dependencies.Testkit.value)
+
+/* ================= Database Service ============== */
+
+lazy val `csw-database-api` = project
+
+lazy val `csw-database-client` = project
+  .dependsOn(`csw-database-api`)
+  .settings(libraryDependencies ++= Dependencies.DatabaseClient.value)
 
 /* =============== Common Utilities ============ */
 lazy val `csw-network-utils` = project

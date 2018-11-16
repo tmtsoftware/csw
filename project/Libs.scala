@@ -1,6 +1,6 @@
-import sbt._
-import Def.{setting => dep}
 import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
+import sbt.Def.{setting ⇒ dep}
+import sbt._
 import scalapb.compiler.Version.scalapbVersion
 
 object Libs {
@@ -48,6 +48,8 @@ object Libs {
   val `time4j`         = "net.time4j"       % "time4j-core"    % "4.38"
   val `threeten-extra` = "org.threeten"     % "threeten-extra" % "1.4"
   val `jna`            = "net.java.dev.jna" % "jna"            % "5.1.0"
+
+  val `postgresql` = "org.postgresql" % "postgresql" % "42.2.5"
 }
 
 object Jackson {

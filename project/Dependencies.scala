@@ -274,6 +274,12 @@ object Dependencies {
     )
   )
 
+  val DatabaseClient = Def.setting(
+    Seq(
+      Libs.`postgresql`
+    )
+  )
+
   val Commons = Def.setting(
     Seq(
       Akka.`akka-stream`,
