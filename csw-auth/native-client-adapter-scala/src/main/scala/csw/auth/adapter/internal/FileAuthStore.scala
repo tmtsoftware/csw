@@ -40,7 +40,7 @@ class FileAuthStore(storePath: Path) extends AuthStore {
 
   private def read(path: Path): Option[String] = if (os.exists(path)) Some(os.read(path)) else None
 
-  private def delete(path: Path): Unit = os.remove(path)
+  private def delete(path: Path): Unit = os.remove.all(path)
 
   implicit private def toOsPath(path: Path): os.Path = os.Path(path)
 

@@ -290,7 +290,8 @@ object Dependencies {
       Libs.requests,
       //(legacy dependencies) required*
       Libs.`jboss-logging`,
-      Libs.httpclient
+      Libs.httpclient,
+      Libs.`scalatest`.value % Test,
     )
   )
 
