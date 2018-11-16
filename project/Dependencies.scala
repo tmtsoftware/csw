@@ -296,6 +296,41 @@ object Dependencies {
     )
   )
 
+  val AuthAccessToken = Def.setting(
+    Seq(
+      Libs.`jwt-play-json`,
+      Libs.`config`
+    )
+  )
+
+  val AuthAkkaHttpAdapter = Def.setting(
+    Seq(
+      AkkaHttp.`akka-http`,
+      Akka.`akka-stream`
+    )
+  )
+
+  val AuthKeyCloakConfig = Def.setting(
+    Seq(
+      Keycloak.`keycloak-adapter-core`,
+      Keycloak.`keycloak-core`,
+      Libs.`config`,
+      //(legacy dependencies) required*
+      Libs.`jboss-logging`,
+      Libs.httpclient,
+    )
+  )
+
+  val AuthAkkaHttpExample = Def.setting(
+    Seq(
+      AkkaHttp.`akka-http`,
+      Akka.`akka-stream`,
+      //Libs.`play-json`,
+      Libs.`play-json-derived-codecs`.value,
+      Libs.`akka-http-play-json`
+    )
+  )
+
   val Commons = Def.setting(
     Seq(
       Akka.`akka-stream`,

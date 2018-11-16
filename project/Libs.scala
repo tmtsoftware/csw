@@ -50,15 +50,12 @@ object Libs {
   val `threeten-extra` = "org.threeten"     % "threeten-extra" % "1.4"
   val `jna`            = "net.java.dev.jna" % "jna"            % "5.1.0"
 
-  val `postgresql`     = "org.postgresql"            % "postgresql"     % "42.2.5"
-  val `jna`            = "net.java.dev.jna"          % "jna"            % "5.0.0"
-  val requests         = "com.lihaoyi"               %% "requests"      % "0.1.4"
-  val httpclient       = "org.apache.httpcomponents" % "httpclient"     % "4.5.6"
-  val `jboss-logging`  = "org.jboss.logging"         % "jboss-logging"  % "3.3.2.Final"
-  val `config`         = "com.typesafe"              % "config"         % "1.3.3"
-  val `time4j`         = "net.time4j"                % "time4j-core"    % "4.38"
-  val `threeten-extra` = "org.threeten"              % "threeten-extra" % "1.4"
-  val `os-lib`         = "com.lihaoyi"               %% "os-lib"        % "0.2.2"
+  val `postgresql`    = "org.postgresql"            % "postgresql"    % "42.2.5"
+  val requests        = "com.lihaoyi"               %% "requests"     % "0.1.4"
+  val httpclient      = "org.apache.httpcomponents" % "httpclient"    % "4.5.6"
+  val `jboss-logging` = "org.jboss.logging"         % "jboss-logging" % "3.3.2.Final"
+  val `config`        = "com.typesafe"              % "config"        % "1.3.3"
+  val `os-lib`        = "com.lihaoyi"               %% "os-lib"       % "0.2.2"
 }
 
 object Jackson {
