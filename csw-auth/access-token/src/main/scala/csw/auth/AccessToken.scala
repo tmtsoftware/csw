@@ -4,7 +4,7 @@ import java.util.Base64
 
 import csw.auth.Conversions._
 import pdi.jwt.exceptions.JwtExpirationException
-import pdi.jwt.{JwtAlgorithm, JwtHeader, JwtJson}
+import pdi.jwt.{JwtAlgorithm, JwtJson}
 import play.api.libs.json._
 
 //todo: integrate csw logging
@@ -14,7 +14,6 @@ case class AccessToken(
     iat: Option[Long],
     exp: Option[Long],
     iss: Option[String],
-    aud: Option[String],
     jti: Option[String],
     //additional information
     given_name: Option[String],
