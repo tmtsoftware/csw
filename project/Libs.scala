@@ -101,8 +101,9 @@ object AkkaHttp {
 }
 
 object Keycloak {
-  val Version                 = "4.5.0.Final"
+  val Version                 = "4.6.0.Final"
   val `keycloak-adapter-core` = "org.keycloak" % "keycloak-adapter-core" % Version
   val `keycloak-core`         = "org.keycloak" % "keycloak-core" % Version
   val `keycloak-installed`    = "org.keycloak" % "keycloak-installed-adapter" % Version
+  val `keycloak-authz`        = "org.keycloak" % "keycloak-authz-client" % Version
 }
