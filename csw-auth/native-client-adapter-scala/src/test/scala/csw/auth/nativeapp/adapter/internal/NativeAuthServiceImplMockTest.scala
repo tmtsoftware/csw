@@ -1,4 +1,4 @@
-package csw.auth.adapter.internal
+package csw.auth.nativeapp.adapter.internal
 
 import org.keycloak.adapters.KeycloakDeployment
 import org.keycloak.adapters.installed.KeycloakInstalled

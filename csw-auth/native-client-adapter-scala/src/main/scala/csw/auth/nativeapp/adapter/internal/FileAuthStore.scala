@@ -1,7 +1,7 @@
-package csw.auth.adapter.internal
+package csw.auth.nativeapp.adapter.internal
 import java.nio.file.{Path, Paths}
 
-import csw.auth.adapter.api.AuthStore
+import csw.auth.nativeapp.adapter.api.AuthStore
 
 import scala.language.implicitConversions
 

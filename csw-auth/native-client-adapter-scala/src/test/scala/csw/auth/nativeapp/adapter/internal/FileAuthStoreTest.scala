@@ -1,4 +1,5 @@
-package csw.auth.adapter.internal
+package csw.auth.nativeapp.adapter.internal
+
 import java.io.File
 
 import org.scalatest.Matchers.convertToAnyShouldWrapper

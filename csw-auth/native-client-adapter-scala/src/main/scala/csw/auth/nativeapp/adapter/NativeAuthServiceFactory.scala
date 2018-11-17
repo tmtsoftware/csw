@@ -1,7 +1,7 @@
-package csw.auth.adapter
+package csw.auth.nativeapp.adapter
 import csw.auth.KeycloakDeployment
-import csw.auth.adapter.api.{AuthStore, NativeAuthService}
-import csw.auth.adapter.internal.NativeAuthServiceImpl
+import csw.auth.nativeapp.adapter.api.{AuthStore, NativeAuthService}
+import csw.auth.nativeapp.adapter.internal.NativeAuthServiceImpl
 
 object NativeAuthServiceFactory {
 
