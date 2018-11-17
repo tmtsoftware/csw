@@ -14,6 +14,7 @@ case class AccessToken(
     iat: Option[Long],
     exp: Option[Long],
     iss: Option[String],
+    aud: Option[Audience],
     jti: Option[String],
     //additional information
     given_name: Option[String],
