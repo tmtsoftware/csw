@@ -1,5 +1,6 @@
 package csw.config.client.commons
-import java.nio.file.Paths
+import java.io.File
+import java.nio.file.{Files, Paths}
 
 import akka.actor.ActorSystem
 import akka.stream.{ActorMaterializer, Materializer}
@@ -44,13 +45,15 @@ class ConfigUtilsTest extends FunSuite with Matchers with BeforeAndAfterEach wit
   test("should use input file for config") {
     val mockedConfigClientService = mock[ConfigClientService]
     val configUtils               = new ConfigUtils(mockedConfigClientService)(system, mat)
-    val filePath                  = Paths.get(getClass.getResource("/application.conf").getPath)
-    val expectedConfig            = ConfigFactory.parseFile(filePath.toFile)
+    val tmpFile                   = File.createTempFile("temp-config", ".conf")
+    val tmpPath                   = tmpFile.toPath
+    tmpFile.deleteOnExit()
+    Files.write(tmpPath, "Name = Test".getBytes)
 
     val actualConfig =
-      Await.result(configUtils.getConfig(isLocal = true, inputFilePath = Some(filePath), defaultConfig = None), 7.seconds)
+      Await.result(configUtils.getConfig(isLocal = true, inputFilePath = Some(tmpPath), defaultConfig = None), 7.seconds)
 
-    actualConfig shouldEqual expectedConfig
+    actualConfig shouldEqual ConfigFactory.parseFile(tmpFile)
   }
 
   test("should throw exception if input file does not exist") {
