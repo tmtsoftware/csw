@@ -67,18 +67,14 @@ private[auth] class NativeAuthServiceImpl(val keycloakInstalled: KeycloakInstall
 
   private def verifiedAccessToken: Either[TokenFailure, AccessToken] = authStore match {
     case Some(store) ⇒
-      store.getAccessTokenString match {
-        case Some(at) ⇒ AccessToken.verifyAndDecode(at)
-        case None     ⇒ Left(TokenMissing)
-      }
+      store.getAccessTokenString
+        .map(AccessToken.verifyAndDecode)
+        .getOrElse(Left(TokenMissing))
     case None ⇒ AccessToken.verifyAndDecode(keycloakInstalled.getTokenString)
   }
 
   private def isExpired(accessToken: AccessToken, minValidity: FiniteDuration) =
-    accessToken.exp match {
-      case Some(exp) ⇒ (exp * 1000 - minValidity.toMillis) < System.currentTimeMillis
-      case None      ⇒ false
-    }
+    accessToken.exp.exists(x ⇒ (x * 1000 - minValidity.toMillis) < System.currentTimeMillis)
 
   private def refreshAccessToken(): Unit = {
     refreshTokenStr.foreach(keycloakInstalled.refreshToken)
