@@ -6,7 +6,7 @@ import csw.auth.AccessToken
 //todo: these checks need to be more strong. we need to check for exp, aud, etc. consider taking help from keycloak to other jwt-scala
 private[auth] object Authentication {
   val authenticator: Authenticator[AccessToken] = {
-    case p @ Provided(token) => AccessToken.verifyAndDecode(token).toOption
-    case _                   => None
+    case Provided(token) ⇒ AccessToken.verifyAndDecode(token).toOption
+    case _               ⇒ None
   }
 }

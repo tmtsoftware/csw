@@ -10,7 +10,7 @@ import scala.io.Source
 private[auth] object PublicKey {
 
   private val publicKeyLocator   = new JWKPublicKeyLocator()
-  private val keycloakDeployment = KeycloakDeployment.instance
+  private val keycloakDeployment = Keycloak.deployment
 
   def fromString(text: String): PublicKey       = fromLines(text.split("\n"))
   def fromFile(path: String): PublicKey         = fromSource(Source.fromFile(path))

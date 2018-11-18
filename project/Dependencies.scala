@@ -314,6 +314,7 @@ object Dependencies {
     Seq(
       Keycloak.`keycloak-adapter-core`,
       Keycloak.`keycloak-core`,
+      Keycloak.`keycloak-authz`,
       Libs.`config`,
       //(legacy dependencies) required*
       Libs.`jboss-logging`,

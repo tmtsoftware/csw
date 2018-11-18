@@ -52,7 +52,7 @@ case class AccessToken(
 
   def hasRole(role: String): Boolean = {
     val allRealmRoles: Set[String] = this.realm_access.flatMap(_.roles).getOrElse(Set.empty)
-    val clientName: String         = KeycloakDeployment.instance.getResourceName
+    val clientName: String         = Keycloak.deployment.getResourceName
 
     val maybeRoles = for {
       resourceAccesses ← this.resource_access
