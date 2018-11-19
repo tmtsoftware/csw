@@ -21,15 +21,15 @@ class AskWithOrdering extends FunSuite with Matchers {
   private implicit val timeout: Timeout = Timeout(5.seconds)
   import test.dispatcher
 
-  test("ask should maintain ordering") {
-    Future.traverse((1 to 1000).toList)(service.put)
+  test("ddd ask should maintain ordering") {
+    (1 to 10).foreach(service.put)
     val results = Await.result(service.get, 5.seconds)
     println(results)
-    results.reverse shouldBe (1 to 1000)
+    results.reverse shouldBe (1 to 100)
   }
 
-  test("ask from different threads should not maintain ordering") {
-    Future(Future.traverse((1 to 1000).toList)(service.put))
+  test("eee ask from different threads should not maintain ordering") {
+    Future((1 to 100).foreach(service.put))
     val results = Await.result(service.get, 5.seconds)
     println(results)
     results.reverse shouldBe (1 to 1000)
