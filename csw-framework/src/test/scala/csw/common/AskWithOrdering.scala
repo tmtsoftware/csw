@@ -22,7 +22,7 @@ class AskWithOrdering extends FunSuite with Matchers {
   import test.dispatcher
 
   test("ask should maintain ordering") {
-    Await.result(Future.traverse((1 to 1000).toList)(service.put), 5.seconds)
+    Future.traverse((1 to 1000).toList)(service.put)
     val results = Await.result(service.get, 5.seconds)
     println(results)
     results.reverse shouldBe results.sorted
