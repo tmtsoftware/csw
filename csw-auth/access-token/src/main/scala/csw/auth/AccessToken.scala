@@ -80,7 +80,7 @@ object AccessToken {
       Right(AdapterTokenVerifier.verifyToken(token, Keycloak.deployment))
     } catch {
       case _: TokenNotActiveException => Left(TokenExpired)
-      case ex: VerificationException  => Left(InvalidTokenFormat(ex.getMessage))
+      case ex: VerificationException  => Left(InvalidToken(ex.getMessage))
     }
 
     keycloakToken
