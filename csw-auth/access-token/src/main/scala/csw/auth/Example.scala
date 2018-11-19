@@ -2,7 +2,7 @@ package csw.auth
 
 private[auth] object Example extends App {
 
-  val accessToken: Either[TokenFailure, AccessToken] = AccessToken.verifyAndDecode(
+  val accessToken: Either[TokenVerificationFailure, AccessToken] = AccessToken.verifyAndDecode(
     "header.payload.signature"
   )
 

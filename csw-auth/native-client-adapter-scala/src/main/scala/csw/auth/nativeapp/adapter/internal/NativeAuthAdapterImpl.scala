@@ -1,7 +1,7 @@
 package csw.auth.nativeapp.adapter.internal
 
 import csw.auth.nativeapp.adapter.api.{AuthStore, NativeAuthAdapter}
-import csw.auth.{AccessToken, TokenExpired, TokenFailure, TokenMissing}
+import csw.auth.{AccessToken, TokenExpired, TokenMissing, TokenVerificationFailure}
 import org.keycloak.adapters.KeycloakDeployment
 import org.keycloak.adapters.installed.KeycloakInstalled
 
@@ -65,7 +65,7 @@ private[auth] class NativeAuthAdapterImpl(val keycloakInstalled: KeycloakInstall
     }
   }
 
-  private def verifiedAccessToken: Either[TokenFailure, AccessToken] = authStore match {
+  private def verifiedAccessToken: Either[TokenVerificationFailure, AccessToken] = authStore match {
     case Some(store) ⇒
       store.getAccessTokenString
         .map(AccessToken.verifyAndDecode)

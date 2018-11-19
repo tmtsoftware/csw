@@ -1,11 +1,13 @@
 package csw.auth
 
-import java.util.Base64
-
-import csw.auth.Conversions._
-import pdi.jwt.exceptions.JwtExpirationException
-import pdi.jwt.{JwtAlgorithm, JwtJson}
+import org.keycloak.adapters.rotation.AdapterTokenVerifier
+import org.keycloak.common.VerificationException
+import org.keycloak.exceptions.TokenNotActiveException
+import org.keycloak.representations.idm.authorization
+import org.keycloak.representations.{AccessToken => KeycloakAccessToken}
 import play.api.libs.json._
+
+import scala.collection.JavaConverters._
 
 //todo: integrate csw logging
 case class AccessToken(
@@ -72,47 +74,52 @@ object AccessToken {
 
   implicit val accessTokenFormat: OFormat[AccessToken] = Json.format[AccessToken]
 
-  def verifyAndDecode(token: String): Either[TokenFailure, AccessToken] = getKeyId(token).flatMap { kid =>
-    val publicKey = PublicKey.fromAuthServer(kid)
-    verifyAndDecode(token, publicKey)
-  }
+  def verifyAndDecode(token: String): Either[TokenVerificationFailure, AccessToken] = {
 
-  private def getKeyId(token: String): Either[TokenFailure, String] = {
-
-    //todo: regex creation could be outside method, once, to avoid perf penalty
-    val format = "^(.+?)\\.(.+?)\\.(.+?$)".r
-
-    val mayBeHeaderString: Either[TokenFailure, String] = token match {
-      case format(header, _, _) =>
-        val jsonHeaderString = Base64.getDecoder.decode(header).map(_.toChar).mkString
-        Right(jsonHeaderString)
-      case _ => Left(InvalidTokenFormat())
+    val keycloakToken: Either[TokenVerificationFailure, KeycloakAccessToken] = try {
+      Right(AdapterTokenVerifier.verifyToken(token, Keycloak.deployment))
+    } catch {
+      case _: TokenNotActiveException => Left(TokenExpired)
+      case ex: VerificationException  => Left(InvalidTokenFormat(ex.getMessage))
     }
 
-    mayBeHeaderString
-      .map(JwtJson.parseHeader)
-      .flatMap(_.keyId.toRight(KidMissing))
+    keycloakToken
+      .map(convert)
+
   }
 
-  private def verifyAndDecode(token: String, publicKey: java.security.PublicKey): Either[TokenFailure, AccessToken] = {
+  private def convert(keycloakAccessToken: KeycloakAccessToken): AccessToken = {
 
-    val verification: Either[TokenFailure, JsObject] =
-      JwtJson
-        .decodeJson(token, publicKey, Seq(JwtAlgorithm.RS256))
-        .toEither
-        .left
-        .map {
-          case _: JwtExpirationException => TokenExpired
-          case ex: Throwable             => InvalidTokenFormat(ex.getMessage)
-        }
+    val keycloakPermissions: Set[authorization.Permission] =
+      keycloakAccessToken.getAuthorization.getPermissions.asScala.toSet
 
-    verification.flatMap { jsObject =>
-      val jsResult: JsResult[AccessToken] = accessTokenFormat.reads(jsObject)
+    val permissions: Set[Permission] = keycloakPermissions.map(
+      permission => Permission(permission.getResourceId, permission.getResourceName, Some(permission.getScopes.asScala.toSet))
+    )
 
-      jsResult match {
-        case JsSuccess(accessToken, _) => Right(accessToken)
-        case e: JsError                => Left(InvalidTokenFormat(allErrorMessages(e)))
-      }
-    }
+    //todo: remove var
+    var resourceAccess: Map[String, ResourceAccess] = Map.empty
+    keycloakAccessToken.getResourceAccess.forEach(
+      (key, access) => resourceAccess += (key -> ResourceAccess(Some(access.getRoles.asScala.toSet)))
+    )
+
+    AccessToken(
+      sub = Some(keycloakAccessToken.getSubject),
+      iat = Some(keycloakAccessToken.getIssuedAt.toLong),
+      exp = Some(keycloakAccessToken.getExpiration.toLong),
+      iss = Some(keycloakAccessToken.getIssuer),
+      aud = Some(Audience(keycloakAccessToken.getAudience.toSeq)),
+      jti = Some(keycloakAccessToken.getId),
+      given_name = Some(keycloakAccessToken.getGivenName),
+      family_name = Some(keycloakAccessToken.getFamilyName),
+      name = Some(keycloakAccessToken.getFamilyName),
+      preferred_username = Some(keycloakAccessToken.getPreferredUsername),
+      email = Some(keycloakAccessToken.getEmail),
+      scope = Some(keycloakAccessToken.getScope),
+      realm_access = Some(RealmAccess(Some(keycloakAccessToken.getRealmAccess.getRoles.asScala.toSet))),
+      resource_access = Some(resourceAccess),
+      authorization = Some(Authorization(Some(permissions)))
+    )
   }
+
 }
