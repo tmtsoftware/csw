@@ -276,7 +276,10 @@ object Dependencies {
 
   val DatabaseClient = Def.setting(
     Seq(
-      Libs.`postgresql`
+      Libs.`postgresql`,
+      Libs.`scalatest`.value     % Test,
+      Akka.`akka-actor`          % Test,
+      Libs.`postgresql-embedded` % Test
     )
   )
 

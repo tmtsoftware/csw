@@ -7,7 +7,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class DatabaseServiceImpl(connection: Connection)(implicit ec: ExecutionContext) extends DatabaseService {
   private val statement: Statement = connection.createStatement()
-  override def execute(sql: String): Future[Boolean] = Future {
+  override def execute(sql: String): Future[Unit] = Future {
     statement.execute(sql)
   }
 
