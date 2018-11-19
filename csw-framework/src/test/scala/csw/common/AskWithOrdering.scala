@@ -25,7 +25,14 @@ class AskWithOrdering extends FunSuite with Matchers {
     Future.traverse((1 to 1000).toList)(service.put)
     val results = Await.result(service.get, 5.seconds)
     println(results)
-    results.reverse shouldBe results.sorted
+    results.reverse shouldBe (1 to 1000)
+  }
+
+  test("ask from different threads should not maintain ordering") {
+    Future(Future.traverse((1 to 1000).toList)(service.put))
+    val results = Await.result(service.get, 5.seconds)
+    println(results)
+    results.reverse shouldBe (1 to 1000)
   }
 
   object Accumulator {
