@@ -348,7 +348,7 @@ lazy val `csw-testkit` = project
 lazy val `csw-database-api` = project
 
 lazy val `csw-database-client` = project
-  .dependsOn(`csw-database-api`)
+  .dependsOn(`csw-database-api`, `csw-location-api`)
   .settings(libraryDependencies ++= Dependencies.DatabaseClient.value)
 
 /* =============== Common Utilities ============ */
