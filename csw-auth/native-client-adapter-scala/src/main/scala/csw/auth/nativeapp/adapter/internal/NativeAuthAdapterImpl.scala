@@ -1,14 +1,14 @@
 package csw.auth.nativeapp.adapter.internal
 
-import csw.auth.nativeapp.adapter.api.{AuthStore, NativeAuthService}
+import csw.auth.nativeapp.adapter.api.{AuthStore, NativeAuthAdapter}
 import csw.auth.{AccessToken, TokenExpired, TokenFailure, TokenMissing}
 import org.keycloak.adapters.KeycloakDeployment
 import org.keycloak.adapters.installed.KeycloakInstalled
 
 import scala.concurrent.duration.{DurationLong, FiniteDuration}
 
-private[auth] class NativeAuthServiceImpl(val keycloakInstalled: KeycloakInstalled, authStore: Option[AuthStore] = None)
-    extends NativeAuthService {
+private[auth] class NativeAuthAdapterImpl(val keycloakInstalled: KeycloakInstalled, authStore: Option[AuthStore] = None)
+    extends NativeAuthAdapter {
 
   def this(keycloakDeployment: KeycloakDeployment) = this(new KeycloakInstalled(keycloakDeployment))
 

@@ -7,7 +7,7 @@ import org.mockito.Mockito.{verify, when}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSuite, Matchers}
 
-class NativeAuthServiceImplMockTest extends FunSuite with MockitoSugar with Matchers {
+class NativeAuthAdapterImplMockTest extends FunSuite with MockitoSugar with Matchers {
 
   class AuthMocks {
     val keycloakInstalled: KeycloakInstalled     = mock[KeycloakInstalled]
@@ -33,7 +33,7 @@ class NativeAuthServiceImplMockTest extends FunSuite with MockitoSugar with Matc
     when(store.getIdTokenString).thenReturn(Some(idToken))
     when(store.getRefreshTokenString).thenReturn(Some(refreshToken))
 
-    val authService = new NativeAuthServiceImpl(keycloakInstalled, Some(store))
+    val authService = new NativeAuthAdapterImpl(keycloakInstalled, Some(store))
   }
 
   test("login") {
