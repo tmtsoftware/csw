@@ -9,6 +9,8 @@ import scala.io.Source
 
 private[auth] object PublicKey {
 
+  //todo: consider removing static state to make this more testable.
+  //todo: can we use DI and inject JWKPublicKeyLocator and Keycloak?
   private val publicKeyLocator   = new JWKPublicKeyLocator()
   private val keycloakDeployment = Keycloak.deployment
 

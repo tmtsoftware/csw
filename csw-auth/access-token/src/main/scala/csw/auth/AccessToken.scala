@@ -30,6 +30,7 @@ case class AccessToken(
 ) {
   def hasPermission(scope: String, resource: String): Boolean = {
 
+    //todo: if messages can be simplfied, nested pattern match could work
     this.authorization match {
       case Some(auth) =>
         auth.permissions match {
@@ -78,6 +79,7 @@ object AccessToken {
 
   private def getKeyId(token: String): Either[TokenFailure, String] = {
 
+    //todo: regex creation could be outside method, once, to avoid perf penalty
     val format = "^(.+?)\\.(.+?)\\.(.+?$)".r
 
     val mayBeHeaderString: Either[TokenFailure, String] = token match {

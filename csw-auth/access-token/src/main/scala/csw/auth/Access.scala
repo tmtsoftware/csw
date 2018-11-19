@@ -1,6 +1,7 @@
 package csw.auth
 import play.api.libs.json.{Json, OFormat}
 
+//TODO: consider making a case class Access and remove 2 subtypes
 private[auth] sealed trait Access {
   val roles: Option[Set[String]]
 }
