@@ -1,12 +1,10 @@
 package csw.time.api
 
-import java.time.Instant
-
 trait TimeService {
 
-  def UTCTime(): Instant
+  def UTCTime(): CswInstant
 
-  def TAITime(): Instant
+  def TAITime(): CswInstant
 
   def TAIOffset(): Int
 }
