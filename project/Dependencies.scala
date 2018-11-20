@@ -289,8 +289,6 @@ object Dependencies {
 
   val AuthNativeClientAdapter = Def.setting(
     Seq(
-      Keycloak.`keycloak-core`,
-      Keycloak.`keycloak-adapter-core`,
       Keycloak.`keycloak-installed`,
       Enumeratum.`enumeratum`.value,
       Libs.`os-lib`,
@@ -321,11 +319,10 @@ object Dependencies {
     Seq(
       Keycloak.`keycloak-adapter-core`,
       Keycloak.`keycloak-core`,
-      Keycloak.`keycloak-authz`,
       Libs.`config`,
       //(legacy dependencies) required*
       Libs.`jboss-logging`,
-      Libs.httpclient,
+      Libs.httpclient
     )
   )
 
