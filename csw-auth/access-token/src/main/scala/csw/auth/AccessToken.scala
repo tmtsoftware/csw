@@ -1,7 +1,7 @@
 package csw.auth
 
 import csw.auth.TokenVerificationFailure.{InvalidToken, TokenExpired}
-import csw.auth.commons.AuthServiceLogger
+import csw.auth.commons.AuthLogger
 import csw.auth.token.claims.{Access, Audience, Authorization, Permission}
 import csw.logging.scaladsl.Logger
 import org.keycloak.adapters.rotation.AdapterTokenVerifier
@@ -64,7 +64,7 @@ case class AccessToken(
 //todo: think about splitting verification and decoding
 object AccessToken {
 
-  private val log: Logger = AuthServiceLogger.getLogger
+  private val log: Logger = AuthLogger.getLogger
 
   implicit val accessTokenFormat: OFormat[AccessToken] = Json.format[AccessToken]
 
