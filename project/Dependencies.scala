@@ -296,8 +296,9 @@ object Dependencies {
       //(legacy dependencies) required*
       Libs.`jboss-logging`,
       Libs.httpclient,
-      Libs.`scalatest`.value % Test,
-      Libs.`mockito-core`    % Test
+      Libs.`scalatest`.value          % Test,
+      Libs.`mockito-core`             % Test,
+      Keycloak.`keycloak-test-helper` % Test
     )
   )
 

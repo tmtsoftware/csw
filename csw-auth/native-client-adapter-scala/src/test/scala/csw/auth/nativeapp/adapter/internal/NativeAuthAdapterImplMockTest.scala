@@ -1,11 +1,16 @@
 package csw.auth.nativeapp.adapter.internal
 
+import akka.japi.Option
+import csw.auth.AccessToken
 import org.keycloak.adapters.KeycloakDeployment
 import org.keycloak.adapters.installed.KeycloakInstalled
 import org.keycloak.representations.AccessTokenResponse
-import org.mockito.Mockito.{verify, when}
+import org.keycloak.test.FluentTestsHelper
+import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSuite, Matchers}
+
+import scala.concurrent.duration.DurationDouble
 
 class NativeAuthAdapterImplMockTest extends FunSuite with MockitoSugar with Matchers {
 
@@ -14,6 +19,7 @@ class NativeAuthAdapterImplMockTest extends FunSuite with MockitoSugar with Matc
     val kd: KeycloakDeployment                   = mock[KeycloakDeployment]
     val store: FileAuthStore                     = mock[FileAuthStore]
     val accessTokenResponse: AccessTokenResponse = mock[AccessTokenResponse]
+    val keycloakHelper: FluentTestsHelper        = new FluentTestsHelper()
 
     val accessToken  = "access_token"
     val idToken      = "id_token"
@@ -70,7 +76,11 @@ class NativeAuthAdapterImplMockTest extends FunSuite with MockitoSugar with Matc
     val mocks = new AuthMocks
     import mocks._
 
-    authService.getAccessToken() shouldBe None
+    val token = new FluentTestsHelper().init().getToken
+
+    when(store.getAccessTokenString).thenReturn(Some(token))
+
+    authService.getAccessToken() shouldBe AccessToken.verifyAndDecode(token).toOption
     verify(store).getAccessTokenString
   }
 
@@ -81,6 +91,21 @@ class NativeAuthAdapterImplMockTest extends FunSuite with MockitoSugar with Matc
     authService.logout()
     verify(keycloakInstalled).logout()
     verify(store).clearStorage()
+  }
+
+  test("refreshing token") {
+    val mocks = new AuthMocks
+    import mocks._
+
+    val token          = new FluentTestsHelper().init().getToken
+    val refreshedToken = new FluentTestsHelper().init().getToken
+
+    when(store.getAccessTokenString).thenReturn(Some(token)).thenReturn(Some(refreshedToken))
+
+    authService.getAccessToken(200.seconds) shouldBe AccessToken.verifyAndDecode(refreshedToken).toOption
+
+    verify(store, times(2)).getAccessTokenString
+    verify(keycloakInstalled).refreshToken(refreshToken)
   }
 
 }
