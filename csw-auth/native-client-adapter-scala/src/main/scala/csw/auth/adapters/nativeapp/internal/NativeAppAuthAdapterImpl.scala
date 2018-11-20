@@ -9,7 +9,7 @@ import org.keycloak.adapters.installed.KeycloakInstalled
 
 import scala.concurrent.duration.{DurationLong, FiniteDuration}
 
-private[auth] class NativeAppAuthAdapterImpl(val keycloakInstalled: KeycloakInstalled, authStore: Option[AuthStore] = None)
+private[auth] class NativeAppAuthAdapterImpl(val keycloakInstalled: KeycloakInstalled, maybeStore: Option[AuthStore] = None)
     extends NativeAppAuthAdapter {
 
   def this(keycloakDeployment: KeycloakDeployment) = this(new KeycloakInstalled(keycloakDeployment))
@@ -60,16 +60,16 @@ private[auth] class NativeAppAuthAdapterImpl(val keycloakInstalled: KeycloakInst
       accessTokenStr.flatMap(AccessToken.verifyAndDecode(_).toOption)
     }
 
-    authStore
-      .flatMap(
-        _.getAccessTokenString
-          .map(AccessToken.verifyAndDecode)
-      )
-      .flatMap {
-        case Right(at)          ⇒ if (isExpired(at, minValidity)) getNewToken else Some(at)
-        case Left(TokenExpired) ⇒ getNewToken
-        case _                  => None
-      }
+    val mayBeAccessTokenVerification = maybeStore match {
+      case Some(store) => store.getAccessTokenString.map(AccessToken.verifyAndDecode)
+      case None        => Some(AccessToken.verifyAndDecode(keycloakInstalled.getTokenString))
+    }
+
+    mayBeAccessTokenVerification flatMap {
+      case Right(at)          => if (isExpired(at, minValidity)) getNewToken else Some(at)
+      case Left(TokenExpired) => getNewToken
+      case _                  => None
+    }
   }
 
   private def isExpired(accessToken: AccessToken, minValidity: FiniteDuration) =
@@ -80,20 +80,20 @@ private[auth] class NativeAppAuthAdapterImpl(val keycloakInstalled: KeycloakInst
     updateAuthStore()
   }
 
-  private def accessTokenStr = authStore match {
+  private def accessTokenStr = maybeStore match {
     case Some(store) ⇒ store.getAccessTokenString
     case None        ⇒ Option(keycloakInstalled.getTokenString)
   }
 
-  private def refreshTokenStr = authStore match {
+  private def refreshTokenStr = maybeStore match {
     case Some(store) ⇒ store.getRefreshTokenString
     case None        ⇒ Option(keycloakInstalled.getRefreshToken)
   }
 
   private def updateAuthStore(): Unit = {
     val response = keycloakInstalled.getTokenResponse
-    authStore.foreach(_.saveTokens(response.getIdToken, response.getToken, response.getRefreshToken))
+    maybeStore.foreach(_.saveTokens(response.getIdToken, response.getToken, response.getRefreshToken))
   }
 
-  private def clearAuthStore(): Unit = authStore.foreach(_.clearStorage())
+  private def clearAuthStore(): Unit = maybeStore.foreach(_.clearStorage())
 }
