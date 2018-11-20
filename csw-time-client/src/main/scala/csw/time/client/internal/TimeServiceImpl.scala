@@ -14,12 +14,9 @@ class TimeServiceImpl() extends TimeService {
 
   override def TAITime(): CswInstant = time(TimeScales.TAIScale)
 
-  // TimeLibrary is responsible to make native calls
-  private val timeLib: TimeLibrary = new TimeLibrary()
-
   override def TAIOffset(): Int = {
     val timeVal = new NTPTimeVal()
-    timeLib.ntp_gettimex(timeVal)
+    TimeLibrary.ntp_gettimex(timeVal)
     timeVal.tai
   }
 
@@ -30,7 +27,7 @@ class TimeServiceImpl() extends TimeService {
     }
 
     val timeSpec = new TimeSpec()
-    timeLib.clock_gettime(clockId, timeSpec)
+    TimeLibrary.clock_gettime(clockId, timeSpec)
 
     val instant = Instant.ofEpochSecond(timeSpec.seconds, timeSpec.nanoseconds)
     CswInstant(instant, scale)
