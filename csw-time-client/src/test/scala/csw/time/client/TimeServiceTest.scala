@@ -9,6 +9,7 @@ import csw.time.client.tags.Linux
 import org.scalatest.{FunSuite, Matchers}
 
 class TimeServiceTest extends FunSuite with Matchers {
+
   //DEOPSCSW-533: Access parts of UTC date.time in Java and Scala
   test("should get UTC time", Linux) {
     val timeService: TimeService = new TimeServiceImpl()

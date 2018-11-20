@@ -1,7 +1,9 @@
 package csw.time.client.scheduling_spikes;
 
-import java.time.Instant;
-import java.util.ArrayList;
+import csw.time.client.internal.TimeLibrary;
+import csw.time.client.internal.native_models.TimeSpec;
+
+import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -12,31 +14,35 @@ import java.util.TimerTask;
 class TimerExample {
     public static void main(String[] args) {
     Timer timer= new Timer();
-        ArrayList<Long> buffer  = new ArrayList<>();
-
     System.out.println("About to schedule task.");
-    timer.schedule(new MyTask(buffer), 0, 100);
+    timer.schedule(new MyTask(), 0, 100);
     System.out.println("Task scheduled.");
   }
 }
 
 class MyTask extends TimerTask {
 
-    private ArrayList<Long> buf;
+    private LinkedList<String> buf = new LinkedList<String>();
 
-    MyTask(ArrayList<Long> buf) {
-        this.buf = buf;
-    }
-
-  private int numWarningBeeps = 1000;
+    private int numWarningBeeps = 1000;
 
     @Override
     public void run() {
 
     if (numWarningBeeps > 0) {
-      Instant instant = Instant.now();
-      buf.add(instant.toEpochMilli());
-      numWarningBeeps -= 1;
+//      Instant instant = Instant.now();
+//      buf.add(instant.toEpochMilli());
+
+
+        TimeSpec timeSpec = new TimeSpec();
+
+        TimeLibrary.clock_gettime(0, timeSpec);
+        long s = timeSpec.seconds;
+        String n = String.format("%09d",timeSpec.nanoseconds);
+        buf.add(s+""+n);
+
+
+        numWarningBeeps -= 1;
     } else {
       System.out.println(buf);
 //    timer.cancel(); //Not necessary because we call System.exit

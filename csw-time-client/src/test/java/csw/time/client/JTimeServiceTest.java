@@ -13,6 +13,7 @@ import static org.junit.Assert.assertEquals;
 
 @LinuxTag
 public class JTimeServiceTest {
+
     //DEOPSCSW-533: Access parts of UTC date.time in Java and Scala
     @Test
     public void shouldGetUTCTime(){
