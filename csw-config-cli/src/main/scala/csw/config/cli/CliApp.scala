@@ -13,6 +13,8 @@ class CliApp(commandLineRunner: CommandLineRunner) {
 
   def start(options: Options): Any = {
     options.op match {
+      case "login"  ⇒ commandLineRunner.login()
+      case "logout" ⇒ commandLineRunner.logout()
       //adminApi
       case "create"             ⇒ commandLineRunner.create(options)
       case "update"             ⇒ commandLineRunner.update(options)

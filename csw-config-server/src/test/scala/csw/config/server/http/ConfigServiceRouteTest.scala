@@ -587,4 +587,10 @@ class ConfigServiceRouteTest
       responseAs[ConfigMetadata].maxConfigFileSize should not be empty
     }
   }
+
+  test("delete - Unauthorized code") {
+    Delete("/config/test.conf?comment=deleting") ~> route ~> check {
+      status shouldEqual StatusCodes.Unauthorized
+    }
+  }
 }

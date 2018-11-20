@@ -2,6 +2,7 @@ package csw.config.cli
 
 import java.nio.file.{Files, Path}
 
+import csw.auth.adapters.nativeapp.api.NativeAppAuthAdapter
 import csw.config.api.exceptions.FileNotFound
 import csw.config.api.models._
 import csw.config.api.scaladsl.ConfigService
@@ -11,9 +12,17 @@ import csw.config.client.internal.ActorRuntime
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
-class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime, printLine: Any ⇒ Unit) {
+class CommandLineRunner(
+    configService: ConfigService,
+    actorRuntime: ActorRuntime,
+    printLine: Any ⇒ Unit,
+    nativeAuthAdapter: NativeAppAuthAdapter
+) {
 
   import actorRuntime._
+
+  def login(): Unit  = nativeAuthAdapter.login()
+  def logout(): Unit = nativeAuthAdapter.logout()
 
   //adminApi
   def create(options: Options): ConfigId = {

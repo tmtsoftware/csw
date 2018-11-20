@@ -1,4 +1,4 @@
-package csw.auth.adapters.nativeapp.internal
+package csw.auth.adapters.nativeapp
 
 import java.io.File
 

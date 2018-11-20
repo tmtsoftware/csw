@@ -6,8 +6,10 @@ import java.time.Instant
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.Uri.{Path, Query}
 import akka.http.scaladsl.model._
+import akka.http.scaladsl.model.headers.{Authorization, OAuth2BearerToken}
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import csw.commons.http.ErrorResponse
+import csw.config.api.TokenFactory
 import csw.config.api.commons.BinaryUtils
 import csw.config.api.exceptions.{EmptyResponse, FileAlreadyExists, FileNotFound, InvalidInput}
 import csw.config.api.internal.ConfigStreamExts.RichSource
@@ -26,8 +28,11 @@ import scala.concurrent.Future
  * @param configServiceResolver ConfigServiceResolver to get the uri of Configuration Service
  * @param actorRuntime ActorRuntime instance for actor system, execution context and dispatcher
  */
-private[config] class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: ActorRuntime)
-    extends ConfigService {
+private[config] class ConfigClient(
+    configServiceResolver: ConfigServiceResolver,
+    actorRuntime: ActorRuntime,
+    tokenFactory: Option[TokenFactory] = None
+) extends ConfigService {
 
   private val log: Logger = ConfigClientLogger.getLogger
 
@@ -47,6 +52,17 @@ private[config] class ConfigClient(configServiceResolver: ConfigServiceResolver,
 
   private def baseUri(path: Path) = async {
     await(configServiceResolver.uri).withPath(path)
+  }
+
+  private def bearerTokenHeader = tokenFactory.map(_.getToken).map(token ⇒ Authorization(OAuth2BearerToken(token)))
+
+  private implicit class HttpRequestExt(val httpRequest: HttpRequest) {
+
+    def withBearerToken: HttpRequest = bearerTokenHeader match {
+      case Some(auth) ⇒ httpRequest.addHeader(auth)
+      case None       ⇒ httpRequest
+    }
+
   }
 
   override def create(path: jnio.Path, configData: ConfigData, annex: Boolean, comment: String): Future[ConfigId] = async {
@@ -116,7 +132,7 @@ private[config] class ConfigClient(configServiceResolver: ConfigServiceResolver,
   override def delete(path: jnio.Path, comment: String): Future[Unit] = async {
     val uri = await(configUri(path)).withQuery(Query("comment" → comment))
 
-    val request = HttpRequest(HttpMethods.DELETE, uri = uri)
+    val request = HttpRequest(HttpMethods.DELETE, uri = uri).withBearerToken
     log.info("Sending HTTP request", Map("request" → request.toString()))
     val response = await(Http().singleRequest(request))
 

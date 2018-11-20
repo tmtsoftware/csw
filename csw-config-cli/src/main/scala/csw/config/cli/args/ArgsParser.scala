@@ -14,6 +14,16 @@ class ArgsParser(name: String) {
   val parser: OptionParser[Options] = new scopt.OptionParser[Options](name) {
     head(name, BuildInfo.version)
 
+    //login operation
+    cmd("login") action { (_, c) =>
+      c.copy(op = "login")
+    } text "login to access admin API's"
+
+    //logout operation
+    cmd("logout") action { (_, c) =>
+      c.copy(op = "logout")
+    } text "logout"
+
     //create operation
     cmd("create") action { (_, c) =>
       c.copy(op = "create")

@@ -3,6 +3,7 @@ package csw.config.server.http
 import akka.Done
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Route
+import csw.auth.adapters.akka.http.SecurityDirectives.role
 import csw.config.api.scaladsl.ConfigService
 import csw.config.server.ActorRuntime
 
@@ -17,6 +18,13 @@ class ConfigServiceRoute(configService: ConfigService, actorRuntime: ActorRuntim
     extends HttpSupport {
 
   import actorRuntime._
+
+  private object Roles {
+    val Read   = "read"
+    val Write  = "write"
+    val update = "update"
+    val Delete = "delete"
+  }
 
   def route: Route = routeLogger {
     handleExceptions(configHandlers.jsonExceptionHandler) {
@@ -53,10 +61,13 @@ class ConfigServiceRoute(configService: ConfigService, actorRuntime: ActorRuntim
             }
           } ~
           delete { // delete route - http://{{hostname}}:{{port}}/config/{{path}}?comment="deleting config file"
-            commentParam { comment ⇒
-              complete(configService.delete(filePath, comment).map(_ ⇒ Done))
+            role(Roles.Delete) {
+              commentParam { comment ⇒
+                complete(configService.delete(filePath, comment).map(_ ⇒ Done))
+              }
             }
           }
+
         } ~
         (prefix("active-config") & get & rejectEmptyResponse) { filePath ⇒
           dateParam { // get route to fetch the currently active file - http://{{hostname}}:{{port}}/active-config/{{path}}

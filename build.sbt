@@ -149,6 +149,7 @@ lazy val `csw-config-server` = project
   .dependsOn(
     `csw-config-api`,
     `csw-location-client`,
+    `akka-http-adapter`,
     `csw-location-server` % "test->test",
     `csw-commons`         % "compile->compile;test->test"
   )
@@ -174,6 +175,7 @@ lazy val `csw-config-cli` = project
   .dependsOn(
     `csw-config-client`,
     `csw-location-client`,
+    `native-client-adapter-scala`,
     `csw-location-server` % "multi-jvm->multi-jvm",
     `csw-config-server`   % "test->test",
     `csw-commons`         % "test->test"

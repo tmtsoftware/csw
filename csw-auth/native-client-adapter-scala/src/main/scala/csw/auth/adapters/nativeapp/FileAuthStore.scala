@@ -1,4 +1,5 @@
-package csw.auth.adapters.nativeapp.internal
+package csw.auth.adapters.nativeapp
+
 import java.nio.file.{Path, Paths}
 
 import csw.auth.adapters.nativeapp.api.AuthStore

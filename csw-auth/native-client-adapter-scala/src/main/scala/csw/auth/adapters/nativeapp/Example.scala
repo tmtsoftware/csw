@@ -1,8 +1,6 @@
 package csw.auth.adapters.nativeapp
 import java.nio.file.Paths
 
-import csw.auth.adapters.nativeapp.internal.FileAuthStore
-
 import scala.concurrent.duration.DurationLong
 
 object Example extends App {
