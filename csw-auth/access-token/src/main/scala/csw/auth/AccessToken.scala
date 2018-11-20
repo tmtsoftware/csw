@@ -112,10 +112,10 @@ object AccessToken {
 
     val accessToken = AccessToken(
       sub = Option(keycloakAccessToken.getSubject),
-      iat = Option(keycloakAccessToken.getIssuedAt.toLong),
-      exp = Option(keycloakAccessToken.getExpiration.toLong),
+      iat = Option(keycloakAccessToken.getIssuedAt).map(_.toLong),
+      exp = Option(keycloakAccessToken.getExpiration).map(_.toLong),
       iss = Option(keycloakAccessToken.getIssuer),
-      aud = Option(Audience(keycloakAccessToken.getAudience.toSeq)),
+      aud = Option(keycloakAccessToken.getAudience).map(a ⇒ Audience(a.toSeq)),
       jti = Option(keycloakAccessToken.getId),
       given_name = Option(keycloakAccessToken.getGivenName),
       family_name = Option(keycloakAccessToken.getFamilyName),
