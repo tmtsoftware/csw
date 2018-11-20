@@ -1,4 +1,4 @@
-package csw.time.api
+package csw.time.api.models
 
 sealed trait TimeScale
 

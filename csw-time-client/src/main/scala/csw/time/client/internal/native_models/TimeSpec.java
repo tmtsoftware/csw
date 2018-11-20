@@ -1,4 +1,4 @@
-package csw.time.client;
+package csw.time.client.internal.native_models;
 
 import com.sun.jna.Structure;
 

@@ -1,4 +1,5 @@
-package csw.time.api
+package csw.time.api.scaladsl
+import csw.time.api.models.CswInstant
 
 trait TimeService {
 
