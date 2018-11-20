@@ -1,8 +1,9 @@
 package csw.auth.nativeapp.adapter.internal
 
 import csw.auth.nativeapp.adapter.api.{AuthStore, NativeAuthAdapter}
-import csw.auth.{AccessToken, TokenVerificationFailure}
+import csw.auth.TokenVerificationFailure
 import csw.auth.TokenVerificationFailure._
+import csw.auth.token.AccessToken
 import org.keycloak.adapters.KeycloakDeployment
 import org.keycloak.adapters.installed.KeycloakInstalled
 

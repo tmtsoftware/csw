@@ -1,6 +1,6 @@
 package csw.auth.nativeapp.adapter.api
 
-import csw.auth.AccessToken
+import csw.auth.token.AccessToken
 
 import scala.concurrent.duration.{DurationLong, FiniteDuration}
 

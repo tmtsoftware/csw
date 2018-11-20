@@ -305,7 +305,8 @@ object Dependencies {
   val AuthAccessToken = Def.setting(
     Seq(
       Libs.`jwt-play-json`,
-      Libs.`config`
+      Libs.`config`,
+      Keycloak.`keycloak-authz`
     )
   )
 

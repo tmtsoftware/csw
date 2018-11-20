@@ -1,8 +1,9 @@
-package csw.auth
+package csw.auth.token
 
 import csw.auth.TokenVerificationFailure.{InvalidToken, TokenExpired}
 import csw.auth.commons.AuthLogger
 import csw.auth.token.claims.{Access, Audience, Authorization, Permission}
+import csw.auth.{Keycloak, TokenVerificationFailure}
 import csw.logging.scaladsl.Logger
 import org.keycloak.adapters.rotation.AdapterTokenVerifier
 import org.keycloak.common.VerificationException
