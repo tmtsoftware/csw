@@ -1,7 +1,6 @@
-package csw.auth.nativeapp.adapter.internal
+package csw.auth.adapters.nativeapp.internal
 
-import akka.japi.Option
-import csw.auth.AccessToken
+import csw.auth.token.AccessToken
 import org.keycloak.adapters.KeycloakDeployment
 import org.keycloak.adapters.installed.KeycloakInstalled
 import org.keycloak.representations.AccessTokenResponse
@@ -12,7 +11,7 @@ import org.scalatest.{FunSuite, Matchers}
 
 import scala.concurrent.duration.DurationDouble
 
-class NativeAuthAdapterImplMockTest extends FunSuite with MockitoSugar with Matchers {
+class NativeAppAuthAdapterImplMockTest extends FunSuite with MockitoSugar with Matchers {
 
   class AuthMocks {
     val keycloakInstalled: KeycloakInstalled     = mock[KeycloakInstalled]
@@ -39,7 +38,7 @@ class NativeAuthAdapterImplMockTest extends FunSuite with MockitoSugar with Matc
     when(store.getIdTokenString).thenReturn(Some(idToken))
     when(store.getRefreshTokenString).thenReturn(Some(refreshToken))
 
-    val authService = new NativeAuthAdapterImpl(keycloakInstalled, Some(store))
+    val authService = new NativeAppAuthAdapterImpl(keycloakInstalled, Some(store))
   }
 
   test("login") {

@@ -1,14 +1,12 @@
-package csw.auth
-
+package csw.auth.adapters.nativeapp
 import java.nio.file.Paths
 
-import csw.auth.nativeapp.adapter.NativeAuthServiceFactory
-import csw.auth.nativeapp.adapter.internal.FileAuthStore
+import csw.auth.adapters.nativeapp.internal.FileAuthStore
 
-import scala.concurrent.duration.DurationDouble
+import scala.concurrent.duration.DurationLong
 
 object Example extends App {
-  val keycloak = NativeAuthServiceFactory.make(new FileAuthStore(Paths.get("/tmp/auth")))
+  val keycloak = NativeAppAuthAdapterFactory.make(new FileAuthStore(Paths.get("/tmp/auth")))
 
   println("login initiated")
   keycloak.login()

@@ -1,7 +1,8 @@
-package csw.auth.akka.http.adapter
+package csw.auth.adapters.akka.http
 import akka.http.scaladsl.server.Directive0
-import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.Directives.{authenticateOAuth2, authorize}
 import csw.auth.token.AccessToken
+
 object SecurityDirectives {
 
   def permission(name: String, resource: String = "Default Resource"): Directive0 =

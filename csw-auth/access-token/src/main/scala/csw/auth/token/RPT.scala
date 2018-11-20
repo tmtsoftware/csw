@@ -1,7 +1,5 @@
 package csw.auth.token
 import csw.auth.Keycloak.deployment
-import csw.auth.TokenVerificationFailure
-import csw.auth.TokenVerificationFailure.InvalidToken
 import csw.auth.commons.AuthLogger
 import csw.logging.scaladsl.Logger
 import org.keycloak.authorization.client.{AuthzClient, Configuration}

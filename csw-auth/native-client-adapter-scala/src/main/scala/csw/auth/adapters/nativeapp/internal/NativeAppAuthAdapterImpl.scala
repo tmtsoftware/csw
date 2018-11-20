@@ -1,6 +1,6 @@
-package csw.auth.nativeapp.adapter.internal
+package csw.auth.adapters.nativeapp.internal
 
-import csw.auth.nativeapp.adapter.api.{AuthStore, NativeAuthAdapter}
+import csw.auth.adapters.nativeapp.api.{AuthStore, NativeAppAuthAdapter}
 import csw.auth.TokenVerificationFailure
 import csw.auth.TokenVerificationFailure._
 import csw.auth.token.AccessToken
@@ -9,8 +9,8 @@ import org.keycloak.adapters.installed.KeycloakInstalled
 
 import scala.concurrent.duration.{DurationLong, FiniteDuration}
 
-private[auth] class NativeAuthAdapterImpl(val keycloakInstalled: KeycloakInstalled, authStore: Option[AuthStore] = None)
-    extends NativeAuthAdapter {
+private[auth] class NativeAppAuthAdapterImpl(val keycloakInstalled: KeycloakInstalled, authStore: Option[AuthStore] = None)
+    extends NativeAppAuthAdapter {
 
   def this(keycloakDeployment: KeycloakDeployment) = this(new KeycloakInstalled(keycloakDeployment))
 
@@ -55,24 +55,21 @@ private[auth] class NativeAuthAdapterImpl(val keycloakInstalled: KeycloakInstall
   }
 
   override def getAccessToken(minValidity: FiniteDuration = 0.seconds): Option[AccessToken] = {
-    def getNewToken = {
+    def getNewToken: Option[AccessToken] = {
       refreshAccessToken()
       accessTokenStr.flatMap(AccessToken.verifyAndDecode(_).toOption)
     }
 
-    verifiedAccessToken match {
-      case Right(at)          ⇒ if (isExpired(at, minValidity)) getNewToken else Some(at)
-      case Left(TokenExpired) ⇒ getNewToken
-      case _                  ⇒ None
-    }
-  }
-
-  private def verifiedAccessToken: Either[TokenVerificationFailure, AccessToken] = authStore match {
-    case Some(store) ⇒
-      store.getAccessTokenString
-        .map(AccessToken.verifyAndDecode)
-        .getOrElse(Left(TokenMissing))
-    case None ⇒ AccessToken.verifyAndDecode(keycloakInstalled.getTokenString)
+    authStore
+      .flatMap(
+        _.getAccessTokenString
+          .map(AccessToken.verifyAndDecode)
+      )
+      .flatMap {
+        case Right(at)          ⇒ if (isExpired(at, minValidity)) getNewToken else Some(at)
+        case Left(TokenExpired) ⇒ getNewToken
+        case _                  => None
+      }
   }
 
   private def isExpired(accessToken: AccessToken, minValidity: FiniteDuration) =

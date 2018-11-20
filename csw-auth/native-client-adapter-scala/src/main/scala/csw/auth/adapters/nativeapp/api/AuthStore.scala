@@ -1,4 +1,4 @@
-package csw.auth.nativeapp.adapter.api
+package csw.auth.adapters.nativeapp.api
 
 trait AuthStore {
 

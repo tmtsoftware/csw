@@ -1,10 +1,10 @@
-package csw.auth.nativeapp.adapter.api
+package csw.auth.adapters.nativeapp.api
 
 import csw.auth.token.AccessToken
 
 import scala.concurrent.duration.{DurationLong, FiniteDuration}
 
-trait NativeAuthAdapter {
+trait NativeAppAuthAdapter {
 
   /**
    * Automatic login using the best approach

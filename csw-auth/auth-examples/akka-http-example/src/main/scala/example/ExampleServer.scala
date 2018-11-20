@@ -1,7 +1,7 @@
 package example
 import akka.http.scaladsl.server.{HttpApp, Route}
 import akka.http.scaladsl.unmarshalling.GenericUnmarshallers
-import csw.auth.akka.http.adapter.SecurityDirectives._
+import csw.auth.adapters.akka.http.SecurityDirectives._
 import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
 
 object ExampleServer extends HttpApp with App with GenericUnmarshallers with PlayJsonSupport {
