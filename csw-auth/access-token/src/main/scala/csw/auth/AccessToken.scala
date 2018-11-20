@@ -1,7 +1,9 @@
 package csw.auth
 
 import csw.auth.TokenVerificationFailure.{InvalidToken, TokenExpired}
+import csw.auth.commons.AuthServiceLogger
 import csw.auth.token.claims.{Access, Audience, Authorization, Permission}
+import csw.logging.scaladsl.Logger
 import org.keycloak.adapters.rotation.AdapterTokenVerifier
 import org.keycloak.common.VerificationException
 import org.keycloak.exceptions.TokenNotActiveException
@@ -62,15 +64,23 @@ case class AccessToken(
 //todo: think about splitting verification and decoding
 object AccessToken {
 
+  private val log: Logger = AuthServiceLogger.getLogger
+
   implicit val accessTokenFormat: OFormat[AccessToken] = Json.format[AccessToken]
 
   def verifyAndDecode(token: String): Either[TokenVerificationFailure, AccessToken] = {
 
+    log.info("Verifying and decoding token")
+
     val keycloakToken: Either[TokenVerificationFailure, KeycloakAccessToken] = try {
       Right(AdapterTokenVerifier.verifyToken(token, Keycloak.deployment))
     } catch {
-      case _: TokenNotActiveException => Left(TokenExpired)
-      case ex: VerificationException  => Left(InvalidToken(ex.getMessage))
+      case ex: TokenNotActiveException =>
+        log.error(s"Token is expired with error ${ex.getMessage}")
+        Left(TokenExpired)
+      case ex: VerificationException =>
+        log.error(ex.getMessage)
+        Left(InvalidToken(ex.getMessage))
     }
 
     keycloakToken
@@ -100,7 +110,7 @@ object AccessToken {
 
     val realmRoles = Option(keycloakAccessToken.getRealmAccess).map(_.getRoles).map(_.asScala).map(_.toSet)
 
-    AccessToken(
+    val accessToken = AccessToken(
       sub = Option(keycloakAccessToken.getSubject),
       iat = Option(keycloakAccessToken.getIssuedAt.toLong),
       exp = Option(keycloakAccessToken.getExpiration.toLong),
@@ -117,6 +127,10 @@ object AccessToken {
       resource_access = Option(resourceAccess),
       authorization = Option(Authorization(keycloakPermissions.map(getPermissions)))
     )
+
+    log.info("Verified and decoded token")
+
+    accessToken
   }
 
   private def getPermissions(kpermissions: Set[authorization.Permission]): Set[Permission] = {
