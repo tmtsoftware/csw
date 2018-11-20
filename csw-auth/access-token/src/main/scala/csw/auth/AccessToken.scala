@@ -1,5 +1,7 @@
 package csw.auth
 
+import csw.auth.TokenVerificationFailure.{InvalidToken, TokenExpired}
+import csw.auth.token.claims.{Access, Audience, Authorization, Permission}
 import org.keycloak.adapters.rotation.AdapterTokenVerifier
 import org.keycloak.common.VerificationException
 import org.keycloak.exceptions.TokenNotActiveException
@@ -26,30 +28,18 @@ case class AccessToken(
     email: Option[String],
     scope: Option[String],
     //auth
-    realm_access: Option[RealmAccess],
-    resource_access: Option[Map[String, ResourceAccess]],
+    realm_access: Option[Access],
+    resource_access: Option[Map[String, Access]],
     authorization: Option[Authorization]
 ) {
   def hasPermission(scope: String, resource: String): Boolean = {
-
-    //todo: if messages can be simplfied, nested pattern match could work
     this.authorization match {
-      case Some(auth) =>
-        auth.permissions match {
-          case Some(permissions) =>
-            permissions.exists {
-              case Permission(_, r, Some(scopes)) if r == resource => scopes.contains(scope)
-              case _ =>
-                System.err.println(s"user doesn't have '$scope' permission for '$resource' resource")
-                false
-            }
-          case None =>
-            System.err.println("token doesn't contain permissions")
-            false
+      case Some(Authorization(Some(perms))) =>
+        perms.exists {
+          case Permission(_, r, Some(scopes)) if r == resource => scopes.contains(scope)
+          case _                                               => false
         }
-      case None =>
-        System.err.println("token doesn't authorization claim")
-        false
+      case _ => false
     }
   }
 
@@ -98,9 +88,9 @@ object AccessToken {
     )
 
     //todo: remove var
-    var resourceAccess: Map[String, ResourceAccess] = Map.empty
+    var resourceAccess: Map[String, Access] = Map.empty
     keycloakAccessToken.getResourceAccess.forEach(
-      (key, access) => resourceAccess += (key -> ResourceAccess(Some(access.getRoles.asScala.toSet)))
+      (key, access) => resourceAccess += (key -> Access(Some(access.getRoles.asScala.toSet)))
     )
 
     AccessToken(
@@ -116,7 +106,7 @@ object AccessToken {
       preferred_username = Some(keycloakAccessToken.getPreferredUsername),
       email = Some(keycloakAccessToken.getEmail),
       scope = Some(keycloakAccessToken.getScope),
-      realm_access = Some(RealmAccess(Some(keycloakAccessToken.getRealmAccess.getRoles.asScala.toSet))),
+      realm_access = Some(Access(Some(keycloakAccessToken.getRealmAccess.getRoles.asScala.toSet))),
       resource_access = Some(resourceAccess),
       authorization = Some(Authorization(Some(permissions)))
     )

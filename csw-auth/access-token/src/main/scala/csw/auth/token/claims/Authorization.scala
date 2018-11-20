@@ -1,4 +1,5 @@
-package csw.auth
+package csw.auth.token.claims
+
 import play.api.libs.json.{Json, OFormat}
 
 private[auth] case class Authorization(permissions: Option[Set[Permission]])

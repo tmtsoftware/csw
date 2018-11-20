@@ -1,4 +1,4 @@
-package csw.auth
+package csw.auth.token.claims
 
 import play.api.libs.json._
 
