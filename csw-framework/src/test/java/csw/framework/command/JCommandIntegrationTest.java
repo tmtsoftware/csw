@@ -217,6 +217,25 @@ public class JCommandIntegrationTest extends JUnitSuite {
         Assert.assertEquals(Optional.of(20), intF.get());
         //#queryLongRunning
 
+        //#queryFinal
+        Setup longRunningSetup3 = longRunningSetup1.cloneCommand();
+        hcdCmdService.submit(longRunningSetup3, timeout);
+
+        CompletableFuture<Optional<Integer>> int3F =
+                hcdCmdService.queryFinal(longRunningSetup3.runId(), timeout).thenCompose(response -> {
+                    if (response instanceof CommandResponse.CompletedWithResult) {
+                        // This extracts and returns the the first value of parameter encoder
+                        Result result = ((CommandResponse.CompletedWithResult) response).result();
+                        Optional<Integer> rvalue = Optional.of(result.jGet(encoder).get().head());
+                        return CompletableFuture.completedFuture(rvalue);
+                    } else {
+                        // For some other response, return empty
+                        return CompletableFuture.completedFuture(Optional.empty());
+                    }
+                });
+        Assert.assertEquals(Optional.of(20), int3F.get());
+        //#queryFinal
+
         //#oneway
         Setup onewaySetup = new Setup(prefix(), onewayCmd(), Optional.empty()).add(intParameter1);
         CompletableFuture onewayF = hcdCmdService

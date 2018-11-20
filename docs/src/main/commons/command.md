@@ -203,6 +203,15 @@ Scala/submit long running/query
 Java/submit long running/query
 :   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #queryLongRunning }
 
+It's also possible to use the runId of the `Setup` with `queryFinal` to determine when the actions are completed. 
+This is equivalent to using the Future returned by `submit`, but in this case, the original Future from `submit` is not available.
+
+Scala/submit long running/queryFinal
+:   @@snip [CommandServiceTest.scala](../../../../csw-framework/src/multi-jvm/scala/csw/framework/command/CommandServiceTest.scala) { #queryFinal }
+
+Java/submit long running/queryFinal
+:   @@snip [JCommandIntegrationTest.java](../../../../csw-framework/src/test/java/csw/framework/command/JCommandIntegrationTest.java) { #queryFinal }
+ 
 
 ### oneway
 

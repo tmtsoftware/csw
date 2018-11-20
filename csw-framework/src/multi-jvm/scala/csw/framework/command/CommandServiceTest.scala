@@ -220,6 +220,25 @@ class CommandServiceTest(ignore: Int)
       Await.result(longRunningQueryResultF, timeout.duration) shouldBe Some(20)
       // #queryLongRunning
 
+      // #queryFinal
+      val longRunningSetup3 = longRunningSetup1.cloneCommand
+      val queryFinalF = async {
+        // The following submit is made without saving the Future!
+        assemblyCmdService.submit(longRunningSetup3)
+
+        // Use queryFinal and runId to wait for completion and result
+        await(assemblyCmdService.queryFinal(longRunningSetup3.runId)) match {
+          case CompletedWithResult(_, result) =>
+            Some(result(encoder).head)
+
+          case otherResponse =>
+            // log a message?
+            None
+        }
+      }
+      Await.result(queryFinalF, timeout.duration) shouldBe Some(20)
+      // #queryFinal
+
       //#oneway
       // `onewayCmd` is a sample to demonstrate oneway without any actions
       val onewaySetup = Setup(prefix, onewayCmd, obsId)
