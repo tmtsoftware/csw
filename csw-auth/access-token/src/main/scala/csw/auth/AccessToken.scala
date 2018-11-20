@@ -80,35 +80,53 @@ object AccessToken {
 
   private def convert(keycloakAccessToken: KeycloakAccessToken): AccessToken = {
 
-    val keycloakPermissions: Set[authorization.Permission] =
-      keycloakAccessToken.getAuthorization.getPermissions.asScala.toSet
+    val keycloakPermissions: Option[Set[authorization.Permission]] =
+      Option(keycloakAccessToken.getAuthorization)
+        .flatMap(
+          authorization => {
+            Option(authorization.getPermissions).map(_.asScala).map(_.toSet)
+          }
+        )
 
-    val permissions: Set[Permission] = keycloakPermissions.map(
-      permission => Permission(permission.getResourceId, permission.getResourceName, Some(permission.getScopes.asScala.toSet))
-    )
-
-    //todo: remove var
+    //todo: Remove var
     var resourceAccess: Map[String, Access] = Map.empty
-    keycloakAccessToken.getResourceAccess.forEach(
-      (key, access) => resourceAccess += (key -> Access(Some(access.getRoles.asScala.toSet)))
+
+    Option(keycloakAccessToken.getResourceAccess).foreach(
+      ra =>
+        ra.forEach(
+          (key, access) => resourceAccess += key -> Access(Option(access.getRoles).map(_.asScala).map(_.toSet))
+      )
     )
+
+    val realmRoles = Option(keycloakAccessToken.getRealmAccess).map(_.getRoles).map(_.asScala).map(_.toSet)
 
     AccessToken(
-      sub = Some(keycloakAccessToken.getSubject),
-      iat = Some(keycloakAccessToken.getIssuedAt.toLong),
-      exp = Some(keycloakAccessToken.getExpiration.toLong),
-      iss = Some(keycloakAccessToken.getIssuer),
-      aud = Some(Audience(keycloakAccessToken.getAudience.toSeq)),
-      jti = Some(keycloakAccessToken.getId),
-      given_name = Some(keycloakAccessToken.getGivenName),
-      family_name = Some(keycloakAccessToken.getFamilyName),
-      name = Some(keycloakAccessToken.getFamilyName),
-      preferred_username = Some(keycloakAccessToken.getPreferredUsername),
-      email = Some(keycloakAccessToken.getEmail),
-      scope = Some(keycloakAccessToken.getScope),
-      realm_access = Some(Access(Some(keycloakAccessToken.getRealmAccess.getRoles.asScala.toSet))),
-      resource_access = Some(resourceAccess),
-      authorization = Some(Authorization(Some(permissions)))
+      sub = Option(keycloakAccessToken.getSubject),
+      iat = Option(keycloakAccessToken.getIssuedAt.toLong),
+      exp = Option(keycloakAccessToken.getExpiration.toLong),
+      iss = Option(keycloakAccessToken.getIssuer),
+      aud = Option(Audience(keycloakAccessToken.getAudience.toSeq)),
+      jti = Option(keycloakAccessToken.getId),
+      given_name = Option(keycloakAccessToken.getGivenName),
+      family_name = Option(keycloakAccessToken.getFamilyName),
+      name = Option(keycloakAccessToken.getFamilyName),
+      preferred_username = Option(keycloakAccessToken.getPreferredUsername),
+      email = Option(keycloakAccessToken.getEmail),
+      scope = Option(keycloakAccessToken.getScope),
+      realm_access = Option(Access(realmRoles)),
+      resource_access = Option(resourceAccess),
+      authorization = Option(Authorization(keycloakPermissions.map(getPermissions)))
+    )
+  }
+
+  private def getPermissions(kpermissions: Set[authorization.Permission]): Set[Permission] = {
+    kpermissions.map(
+      permission =>
+        Permission(
+          permission.getResourceId,
+          permission.getResourceName,
+          Option(permission.getScopes).map(_.asScala).map(_.toSet)
+      )
     )
   }
 
