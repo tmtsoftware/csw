@@ -10,13 +10,13 @@ private[auth] object Keycloak {
 
   //todo: consider removing static state to make this more testable.
   //todo: can we use DI and inject config here?
-  private lazy val authConfig: Config  = ConfigFactory.load().getConfig("auth-config")
-  private lazy val configJSON: String  = authConfig.root().render(ConfigRenderOptions.concise())
-  private def inputStream: InputStream = new ByteArrayInputStream(configJSON.getBytes())
+  private val authConfig: Config       = ConfigFactory.load().getConfig("auth-config")
+  private val configJSON: String       = authConfig.root().render(ConfigRenderOptions.concise())
+  private val inputStream: InputStream = new ByteArrayInputStream(configJSON.getBytes())
 
-  lazy val deployment: KeycloakDeployment = KeycloakDeploymentBuilder.build(inputStream)
+  val deployment: KeycloakDeployment = KeycloakDeploymentBuilder.build(inputStream)
 
-  private lazy val configuration: Configuration = new Configuration(
+  private val configuration: Configuration = new Configuration(
     deployment.getAuthServerBaseUrl,
     deployment.getRealm,
     deployment.getResourceName,
@@ -24,5 +24,5 @@ private[auth] object Keycloak {
     deployment.getClient
   )
 
-  lazy val authzClient: AuthzClient = AuthzClient.create(configuration)
+  val authzClient: AuthzClient = AuthzClient.create(configuration)
 }

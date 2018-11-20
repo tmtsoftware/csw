@@ -4,7 +4,7 @@ import akka.http.scaladsl.server.Directives._
 import csw.auth.AccessToken
 object SecurityDirectives {
 
-  def permission(name: String, resource: String): Directive0 =
+  def permission(name: String, resource: String = "Default Resource"): Directive0 =
     authenticateOAuth2("master", Authentication.authenticator).flatMap { at =>
       authorize(at.hasPermission(name, resource))
     }
