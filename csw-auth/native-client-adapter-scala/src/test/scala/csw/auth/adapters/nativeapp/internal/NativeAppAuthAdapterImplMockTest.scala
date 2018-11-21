@@ -1,6 +1,6 @@
 package csw.auth.adapters.nativeapp.internal
 
-import csw.auth.token.AccessToken
+import csw.auth.TMTTokenVerifier
 import org.keycloak.adapters.KeycloakDeployment
 import org.keycloak.adapters.installed.KeycloakInstalled
 import org.keycloak.representations.AccessTokenResponse
@@ -79,7 +79,7 @@ class NativeAppAuthAdapterImplMockTest extends FunSuite with MockitoSugar with M
 
     when(store.getAccessTokenString).thenReturn(Some(token))
 
-    authService.getAccessToken() shouldBe AccessToken.verifyAndDecode(token).toOption
+    authService.getAccessToken() shouldBe TMTTokenVerifier().verifyAndDecode(token).toOption
     verify(store).getAccessTokenString
   }
 
@@ -101,7 +101,7 @@ class NativeAppAuthAdapterImplMockTest extends FunSuite with MockitoSugar with M
 
     when(store.getAccessTokenString).thenReturn(Some(token)).thenReturn(Some(refreshedToken))
 
-    authService.getAccessToken(200.seconds) shouldBe AccessToken.verifyAndDecode(refreshedToken).toOption
+    authService.getAccessToken(200.seconds) shouldBe TMTTokenVerifier().verifyAndDecode(refreshedToken).toOption
 
     verify(store, times(2)).getAccessTokenString
     verify(keycloakInstalled).refreshToken(refreshToken)

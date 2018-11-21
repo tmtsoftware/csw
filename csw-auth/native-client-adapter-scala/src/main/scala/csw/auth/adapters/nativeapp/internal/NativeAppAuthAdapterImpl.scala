@@ -1,16 +1,19 @@
 package csw.auth.adapters.nativeapp.internal
 
-import csw.auth.adapters.nativeapp.api.{AuthStore, NativeAppAuthAdapter}
-import csw.auth.TokenVerificationFailure
+import csw.auth.TMTTokenVerifier
 import csw.auth.TokenVerificationFailure._
+import csw.auth.adapters.nativeapp.api.{AuthStore, NativeAppAuthAdapter}
 import csw.auth.token.AccessToken
 import org.keycloak.adapters.KeycloakDeployment
 import org.keycloak.adapters.installed.KeycloakInstalled
 
 import scala.concurrent.duration.{DurationLong, FiniteDuration}
 
-private[auth] class NativeAppAuthAdapterImpl(val keycloakInstalled: KeycloakInstalled, maybeStore: Option[AuthStore] = None)
-    extends NativeAppAuthAdapter {
+private[auth] class NativeAppAuthAdapterImpl(
+    val keycloakInstalled: KeycloakInstalled,
+    maybeStore: Option[AuthStore] = None,
+    tokenVerifier: TMTTokenVerifier = TMTTokenVerifier()
+) extends NativeAppAuthAdapter {
 
   def this(keycloakDeployment: KeycloakDeployment) = this(new KeycloakInstalled(keycloakDeployment))
 
@@ -57,12 +60,12 @@ private[auth] class NativeAppAuthAdapterImpl(val keycloakInstalled: KeycloakInst
   override def getAccessToken(minValidity: FiniteDuration = 0.seconds): Option[AccessToken] = {
     def getNewToken: Option[AccessToken] = {
       refreshAccessToken()
-      accessTokenStr.flatMap(AccessToken.verifyAndDecode(_).toOption)
+      accessTokenStr.flatMap(tokenVerifier.verifyAndDecode(_).toOption)
     }
 
     val mayBeAccessTokenVerification = maybeStore match {
-      case Some(store) => store.getAccessTokenString.map(AccessToken.verifyAndDecode)
-      case None        => Some(AccessToken.verifyAndDecode(keycloakInstalled.getTokenString))
+      case Some(store) => store.getAccessTokenString.map(tokenVerifier.verifyAndDecode)
+      case None        => Some(tokenVerifier.verifyAndDecode(keycloakInstalled.getTokenString))
     }
 
     mayBeAccessTokenVerification flatMap {
