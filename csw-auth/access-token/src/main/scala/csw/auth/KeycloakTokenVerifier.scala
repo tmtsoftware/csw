@@ -8,19 +8,19 @@ import org.keycloak.exceptions.TokenNotActiveException
 import org.keycloak.representations.{AccessToken => KeycloakAccessToken}
 import pdi.jwt.{JwtJson, JwtOptions}
 
+import scala.util.Try
+
 private[auth] class KeycloakTokenVerifier {
-  def verifyToken(token: String, keycloakDeployment: KeycloakDeployment): KeycloakAccessToken =
-    AdapterTokenVerifier.verifyToken(token, Keycloak.deployment)
+  def verifyToken(token: String, keycloakDeployment: KeycloakDeployment): Try[KeycloakAccessToken] =
+    Try { AdapterTokenVerifier.verifyToken(token, Keycloak.deployment) }
 }
 
 class TokenVerifier private[auth] (keycloakTokenVerifier: KeycloakTokenVerifier) {
 
   def verifyAndDecode(token: String): Either[TokenVerificationFailure, AccessToken] = {
 
-    val keycloakToken: Either[TokenVerificationFailure, KeycloakAccessToken] = try {
-      Right(keycloakTokenVerifier.verifyToken(token, Keycloak.deployment))
-    } catch {
-      case ex: TokenNotActiveException =>
+    val keycloakToken = keycloakTokenVerifier.verifyToken(token, Keycloak.deployment).toEither.left.flatMap {
+      case _: TokenNotActiveException =>
         Left(TokenExpired)
       case ex: VerificationException =>
         Left(InvalidToken(ex.getMessage))
