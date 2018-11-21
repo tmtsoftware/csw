@@ -1,6 +1,6 @@
 package csw.auth
 
-sealed trait TokenVerificationFailure
+sealed trait TokenVerificationFailure extends Product with Serializable
 
 object TokenVerificationFailure {
   case object TokenExpired                                              extends TokenVerificationFailure

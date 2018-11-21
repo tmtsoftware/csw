@@ -3,14 +3,14 @@ import csw.auth.TokenVerificationFailure.InvalidToken
 import csw.auth.token.claims.{Access, Authorization, Permission}
 import csw.auth.{Keycloak, KeycloakTokenVerifier, TokenVerifier}
 import org.keycloak.exceptions.TokenSignatureInvalidException
-import org.keycloak.representations.{AccessToken => KeycloakAccessToken}
-import org.mockito.Mockito
+import org.keycloak.representations.{AccessToken ⇒ KeycloakAccessToken}
+import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.{EitherValues, FunSuite, Matchers}
 
 import scala.util.Failure
 
-class AccessTokenTest extends FunSuite with MockitoSugar with Matchers {
+class AccessTokenTest extends FunSuite with MockitoSugar with Matchers with EitherValues {
   test("should able to check permissions for access token") {
     val permission: Set[Permission] = Set(Permission("test-resource-id", "test-resource", Option(Set("test-scope"))))
     val accessToken                 = AccessToken(authorization = Some(Authorization(Some(permission))))
@@ -78,17 +78,14 @@ class AccessTokenTest extends FunSuite with MockitoSugar with Matchers {
   test("should throw exception while verifyAndDecode token") {
     val keycloakTokenVerifier  = mock[KeycloakTokenVerifier]
     val token                  = "test-token"
-    val deployement            = Keycloak.deployment
+    val deployment             = Keycloak.deployment
     val keycloakAccessToken    = new KeycloakAccessToken()
     val tmtTokenVerifier       = new TokenVerifier(keycloakTokenVerifier)
     val validationExceptionMsg = "invalid token"
     val validationException    = new TokenSignatureInvalidException(keycloakAccessToken, validationExceptionMsg)
 
-    Mockito.when(keycloakTokenVerifier.verifyToken(token, deployement)).thenReturn(Failure(validationException))
+    when(keycloakTokenVerifier.verifyToken(token, deployment)).thenReturn(Failure(validationException))
 
-    tmtTokenVerifier.verifyAndDecode(token) match {
-      case Left(l)  => l shouldEqual InvalidToken(validationExceptionMsg)
-      case Right(r) => throw new RuntimeException("test failed")
-    }
+    tmtTokenVerifier.verifyAndDecode(token).left.value shouldBe InvalidToken(validationExceptionMsg)
   }
 }
