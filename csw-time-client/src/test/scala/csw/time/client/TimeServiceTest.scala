@@ -2,7 +2,6 @@ package csw.time.client
 
 import java.time._
 
-import csw.time.api.models.TimeScales
 import csw.time.api.scaladsl.TimeService
 import csw.time.client.internal.TimeServiceImpl
 import csw.time.client.tags.Linux
@@ -14,24 +13,22 @@ class TimeServiceTest extends FunSuite with Matchers {
   test("should get UTC time", Linux) {
     val timeService: TimeService = new TimeServiceImpl()
 
-    val cswInstant            = timeService.UTCTime()
+    val utcInstant            = timeService.UtcTime()
     val fixedInstant: Instant = Instant.now()
 
     val expectedMillis = fixedInstant.toEpochMilli +- 5
 
-    cswInstant.instant.toEpochMilli shouldEqual expectedMillis
-    cswInstant.timeScale shouldBe TimeScales.UTCScale
+    utcInstant.value.toEpochMilli shouldEqual expectedMillis
   }
 
   //DEOPSCSW-534: PTP accuracy and precision while reading UTC
   test("should get precision up to nanoseconds in UTC time", Linux) {
     val timeService: TimeService = new TimeServiceImpl()
 
-    val cswInstant = timeService.UTCTime()
+    val utcInstant = timeService.UtcTime()
 
-    println(cswInstant.instant)
-    Utils.digits(cswInstant.instant.getNano) shouldEqual 9
-    cswInstant.timeScale shouldBe TimeScales.UTCScale
+    println(utcInstant.value)
+    Utils.digits(utcInstant.value.getNano) shouldEqual 9
   }
 
   //DEOPSCSW-536: Access parts of TAI date/time in Java and Scala
@@ -41,13 +38,12 @@ class TimeServiceTest extends FunSuite with Matchers {
 
     val taiOffset = 37
 
-    val cswInstant          = timeService.TAITime()
+    val taiInstant          = timeService.TaiTime()
     val TAIInstant: Instant = Instant.now().plusSeconds(taiOffset)
 
     val expectedMillis = TAIInstant.toEpochMilli +- 5
 
-    cswInstant.instant.toEpochMilli shouldEqual expectedMillis
-    cswInstant.timeScale shouldBe TimeScales.TAIScale
+    taiInstant.value.toEpochMilli shouldEqual expectedMillis
   }
 
   //DEOPSCSW-530: SPIKE: Get TAI offset and convert to UTC and Vice Versa
@@ -56,7 +52,7 @@ class TimeServiceTest extends FunSuite with Matchers {
 
     val expectedOffset = 37
 
-    val offset = timeService.TAIOffset()
+    val offset = timeService.TaiOffset()
 
     offset shouldEqual expectedOffset
   }

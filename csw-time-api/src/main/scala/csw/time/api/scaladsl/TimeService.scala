@@ -1,11 +1,11 @@
 package csw.time.api.scaladsl
-import csw.time.api.models.CswInstant
+import csw.time.api.models.CswInstant.{TaiInstant, UtcInstant}
 
 trait TimeService {
 
-  def UTCTime(): CswInstant
+  def UtcTime(): UtcInstant
 
-  def TAITime(): CswInstant
+  def TaiTime(): TaiInstant
 
-  def TAIOffset(): Int
+  def TaiOffset(): Int
 }

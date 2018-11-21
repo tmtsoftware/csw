@@ -1,7 +1,7 @@
 package csw.time.client;
 
-import csw.time.api.models.CswInstant;
-import csw.time.api.models.TimeScales;
+import csw.time.api.models.CswInstant.TaiInstant;
+import csw.time.api.models.CswInstant.UtcInstant;
 import csw.time.api.scaladsl.TimeService;
 import csw.time.client.internal.TimeServiceImpl;
 import csw.time.client.javadsl.tags.LinuxTag;
@@ -19,13 +19,12 @@ public class JTimeServiceTest {
     public void shouldGetUTCTime(){
         TimeService timeService = new TimeServiceImpl();
 
-        CswInstant cswInstant = timeService.UTCTime();
+        UtcInstant utcInstant = timeService.UtcTime();
         Instant fixedInstant = Instant.now();
 
         long expectedMillis = fixedInstant.toEpochMilli();
 
-        assertEquals(expectedMillis, cswInstant.instant().toEpochMilli());
-        assertEquals(TimeScales.jUTCScale(), cswInstant.timeScale());
+        assertEquals(expectedMillis, utcInstant.value().toEpochMilli());
     }
 
     //DEOPSCSW-536: Access parts of TAI date/time in Java and Scala
@@ -35,13 +34,12 @@ public class JTimeServiceTest {
         TimeService timeService = new TimeServiceImpl();
 
         int taiOffset = 37;
-        CswInstant cswInstant               = timeService.TAITime();
-        Instant TAIInstant = Instant.now().plusSeconds(taiOffset);
+        TaiInstant taiInstant = timeService.TaiTime();
+        Instant TaiInstant = Instant.now().plusSeconds(taiOffset);
 
-        long expectedMillis = TAIInstant.toEpochMilli();
+        long expectedMillis = TaiInstant.toEpochMilli();
 
-        assertEquals(expectedMillis, cswInstant.instant().toEpochMilli());
-        assertEquals(TimeScales.jTAIScale(), cswInstant.timeScale());
+        assertEquals(expectedMillis, taiInstant.value().toEpochMilli());
     }
 
     //DEOPSCSW-530: SPIKE: Get TAI offset and convert to UTC and Vice Versa
@@ -51,7 +49,7 @@ public class JTimeServiceTest {
 
         int expectedOffset = 37;
 
-        int offset = timeService.TAIOffset();
+        int offset = timeService.TaiOffset();
 
         assertEquals(expectedOffset, offset);
     }

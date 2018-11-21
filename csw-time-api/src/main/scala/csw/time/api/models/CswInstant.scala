@@ -1,4 +1,12 @@
 package csw.time.api.models
+
 import java.time.Instant
 
-case class CswInstant(instant: Instant, timeScale: TimeScale)
+sealed trait CswInstant {
+  val value: Instant
+}
+
+object CswInstant {
+  case class UtcInstant(value: Instant) extends CswInstant
+  case class TaiInstant(value: Instant) extends CswInstant
+}
