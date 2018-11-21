@@ -12,6 +12,7 @@ import ru.yandex.qatools.embed.postgresql.distribution.Version
 
 import scala.concurrent.ExecutionContext
 
+// DEOPSCSW-601: Create Database API
 class DatabaseServiceImplTest extends FunSuite with Matchers with ScalaFutures with BeforeAndAfterAll {
   private val system                = ActorSystem("test")
   implicit val ec: ExecutionContext = system.dispatcher
@@ -23,6 +24,9 @@ class DatabaseServiceImplTest extends FunSuite with Matchers with ScalaFutures w
   private val postgres: EmbeddedPostgres = new EmbeddedPostgres(Version.V10_6)
   postgres.start(host, port, dbName)
 
+  // DEOPSCSW-618: Create a method to locate a database server
+  // DEOPSCSW-620: Create a method to make a connection to a database
+  // DEOPSCSW-621: Create a session with a database
   private val factory                          = new DatabaseServiceFactory()
   private val databaseService: DatabaseService = factory.make(host, port, dbName)
 
@@ -34,6 +38,7 @@ class DatabaseServiceImplTest extends FunSuite with Matchers with ScalaFutures w
     system.terminate().futureValue
   }
 
+  // DEOPSCSW-608: Examples of creating a database in the database service
   test("should be able to create a new Database") {
     databaseService.execute("CREATE DATABASE box_office;").futureValue(Timeout(Span(5, Seconds)))
     val resultSet = databaseService
@@ -46,6 +51,8 @@ class DatabaseServiceImplTest extends FunSuite with Matchers with ScalaFutures w
     assert(databaseList contains "box_office")
   }
 
+  // DEOPSCSW-609: Examples of creating records in a database in the database service
+  // DEOPSCSW-613: Examples of querying records in a database in the database service
   test("should be able to create table with unique default IDs and insert data in it") {
     databaseService
       .execute(
@@ -60,6 +67,9 @@ class DatabaseServiceImplTest extends FunSuite with Matchers with ScalaFutures w
     resultSet.getInt("rowCount") shouldBe 3
   }
 
+  // DEOPSCSW-607: Complex relational database example
+  // DEOPSCSW-609: Examples of creating records in a database in the database service
+  // DEOPSCSW-613: Examples of querying records in a database in the database service
   test("should be able to create join and group records using ForeignKey") {
     databaseService
       .execute(
@@ -97,6 +107,8 @@ class DatabaseServiceImplTest extends FunSuite with Matchers with ScalaFutures w
     assert(result === List(("movie_1", 5000), ("movie_4", 6000), ("movie_2", 10000)))
   }
 
+  // DEOPSCSW-611: Examples of updating records in a database in the database service
+  // DEOPSCSW-619: Create a method to send an update sql string to a database
   test("should be able to update record") {
     databaseService.execute("UPDATE films SET name = 'movie_3' WHERE name = 'movie_2'").futureValue
     val resultSet =
@@ -105,6 +117,7 @@ class DatabaseServiceImplTest extends FunSuite with Matchers with ScalaFutures w
     resultSet.getInt("rowCount") shouldBe 0
   }
 
+  // DEOPSCSW-612: Examples of deleting records in a database in the database service
   test("should be able to delete records") {
     databaseService.execute("DELETE from films WHERE name = 'movie_4'").futureValue
     val resultSet = databaseService.executeQuery("SELECT count(*) AS rowCount from films;").futureValue
@@ -112,6 +125,8 @@ class DatabaseServiceImplTest extends FunSuite with Matchers with ScalaFutures w
     resultSet.getInt("rowCount") shouldBe 2
   }
 
+  // DEOPSCSW-613: Examples of querying records in a database in the database service
+  // DEOPSCSW-616: Create a method to send a query (select) sql string to a database
   test("should be able to query records from the table") {
     val resultSet = databaseService.executeQuery("SELECT * FROM films where name = 'movie_1';").futureValue
     resultSet.next()
