@@ -71,7 +71,7 @@ private[config] class ConfigClient(
     val uri                      = await(configUri(path)).withQuery(Query("annex" → isAnnex.toString, "comment" → comment))
     val entity                   = HttpEntity(ContentTypes.`application/octet-stream`, configData.length, stitchedSource)
 
-    val request = HttpRequest(HttpMethods.POST, uri = uri, entity = entity)
+    val request = HttpRequest(HttpMethods.POST, uri = uri, entity = entity).withBearerToken
     log.info("Sending HTTP request", Map("request" → request.toString()))
     val response = await(Http().singleRequest(request))
 
@@ -87,7 +87,7 @@ private[config] class ConfigClient(
     val entity = HttpEntity(ContentTypes.`application/octet-stream`, configData.length, configData.source)
     val uri    = await(configUri(path)).withQuery(Query("comment" → comment))
 
-    val request = HttpRequest(HttpMethods.PUT, uri = uri, entity = entity)
+    val request = HttpRequest(HttpMethods.PUT, uri = uri, entity = entity).withBearerToken
     log.info("Sending HTTP request", Map("request" → request.toString()))
     val response = await(Http().singleRequest(request))
 
@@ -205,7 +205,7 @@ private[config] class ConfigClient(
   private def handleActiveConfig(path: jnio.Path, query: Query): Future[Unit] = async {
     val uri = await(activeConfigVersion(path)).withQuery(query)
 
-    val request = HttpRequest(HttpMethods.PUT, uri = uri)
+    val request = HttpRequest(HttpMethods.PUT, uri = uri).withBearerToken
     log.info("Sending HTTP request", Map("request" → request.toString()))
     val response = await(Http().singleRequest(request))
 
@@ -260,25 +260,24 @@ private[config] class ConfigClient(
   private def handleResponse[T](response: HttpResponse)(pf: PartialFunction[StatusCode, Future[T]]): Future[T] = {
     def contentF = Unmarshal(response).to[ErrorResponse]
 
+    def logAndThrow(e: RuntimeException) = {
+      log.error(e.getMessage, ex = e)
+      throw e
+    }
+
     val defaultHandler: PartialFunction[StatusCode, Future[T]] = {
       case StatusCodes.BadRequest ⇒
-        contentF.map(errorResponse ⇒ {
-          val invalidInput = InvalidInput(errorResponse.error.message)
-          log.error(invalidInput.getMessage, ex = invalidInput)
-          throw invalidInput
-        })
+        contentF.map { errorResponse ⇒
+          logAndThrow(InvalidInput(errorResponse.error.message))
+        }
       case StatusCodes.NotFound ⇒
-        contentF.map(errorResponse ⇒ {
-          val fileNotFound = FileNotFound(errorResponse.error.message)
-          log.error(fileNotFound.getMessage, ex = fileNotFound)
-          throw fileNotFound
-        })
+        contentF.map { errorResponse ⇒
+          logAndThrow(FileNotFound(errorResponse.error.message))
+        }
       case _ ⇒
-        contentF.map(errorResponse ⇒ {
-          val runtimeException = new RuntimeException(errorResponse.error.message)
-          log.error(runtimeException.getMessage, ex = runtimeException)
-          throw runtimeException
-        })
+        contentF.map { errorResponse ⇒
+          logAndThrow(new RuntimeException(errorResponse.error.message))
+        }
     }
 
     val handler = pf.orElse(defaultHandler)

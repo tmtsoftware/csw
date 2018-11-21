@@ -35,9 +35,7 @@ class CommandLineRunner(
         )
       printLine(s"File : ${options.relativeRepoPath.get} is created with id : ${configId.id}")
       configId
-    } else {
-      throw FileNotFound(inputFilePath)
-    }
+    } else throw FileNotFound(inputFilePath)
   }
 
   def update(options: Options): ConfigId = {
@@ -47,9 +45,7 @@ class CommandLineRunner(
       val configId   = await(configService.update(options.relativeRepoPath.get, configData, options.comment.get))
       printLine(s"File : ${options.relativeRepoPath.get} is updated with id : ${configId.id}")
       configId
-    } else {
-      throw FileNotFound(inputFilePath)
-    }
+    } else throw FileNotFound(inputFilePath)
   }
 
   def get(options: Options): Option[Path] = {
