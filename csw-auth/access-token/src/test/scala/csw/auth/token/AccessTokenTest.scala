@@ -36,9 +36,15 @@ class AccessTokenTest extends FunSuite with MockitoSugar with Matchers {
   }
 
   test("should able to check realm role for access token") {
-    val accessToken = AccessToken(realm_access = Some(Access(Some(Set("test-role")))))
+    val accessToken = AccessToken(realm_access = Some(Access(Some(Set("test-realm-role")))))
 
-    accessToken.hasRealmRole("test-role") shouldEqual true
+    accessToken.hasRealmRole("test-realm-role") shouldEqual true
+  }
+
+  test("should fail check for realm role") {
+    val accessToken = AccessToken(realm_access = Some(Access(Some(Set("test-realm-role")))))
+
+    accessToken.hasRealmRole("invalid-realm-role") shouldEqual false
   }
 
   test("should able to check resource role for access token") {
@@ -48,14 +54,14 @@ class AccessTokenTest extends FunSuite with MockitoSugar with Matchers {
     accessToken.hasResourceRole("test-resource-role") shouldEqual true
   }
 
-  test("should able to check role if role is present for other resource") {
+  test("should fail check for resource role if role is present for other resource") {
     val resourceAccess: Option[Map[String, Access]] = Some(Map("other-resource" -> Access(Some(Set("test-resource-role")))))
     val accessToken                                 = AccessToken(resource_access = resourceAccess)
 
     accessToken.hasResourceRole("test-resource-role") shouldEqual false
   }
 
-  test("should able to check role if role is not present for that resource") {
+  test("should fail check for resource role") {
     val resourceAccess: Option[Map[String, Access]] = Some(Map("test-resource" -> Access(Some(Set("test-resource-role")))))
     val accessToken                                 = AccessToken(resource_access = resourceAccess)
 
