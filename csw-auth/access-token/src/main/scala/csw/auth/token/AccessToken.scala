@@ -17,23 +17,23 @@ import scala.collection.JavaConverters._
 //todo: integrate csw logging
 case class AccessToken(
     //standard checks
-    sub: Option[String],
-    iat: Option[Long],
-    exp: Option[Long],
-    iss: Option[String],
-    aud: Option[Audience],
-    jti: Option[String],
+    sub: Option[String] = None,
+    iat: Option[Long] = None,
+    exp: Option[Long] = None,
+    iss: Option[String] = None,
+    aud: Option[Audience] = None,
+    jti: Option[String] = None,
     //additional information
-    given_name: Option[String],
-    family_name: Option[String],
-    name: Option[String],
-    preferred_username: Option[String],
-    email: Option[String],
-    scope: Option[String],
+    given_name: Option[String] = None,
+    family_name: Option[String] = None,
+    name: Option[String] = None,
+    preferred_username: Option[String] = None,
+    email: Option[String] = None,
+    scope: Option[String] = None,
     //auth
-    realm_access: Option[Access],
-    resource_access: Option[Map[String, Access]],
-    authorization: Option[Authorization]
+    realm_access: Option[Access] = None,
+    resource_access: Option[Map[String, Access]] = None,
+    authorization: Option[Authorization] = None
 ) {
   def hasPermission(scope: String, resource: String): Boolean = {
     this.authorization match {

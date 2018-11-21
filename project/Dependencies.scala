@@ -306,7 +306,9 @@ object Dependencies {
     Seq(
       Libs.`jwt-play-json`,
       Libs.`config`,
-      Keycloak.`keycloak-authz`
+      Keycloak.`keycloak-authz`,
+      Libs.`scalatest`.value % Test,
+      Libs.`mockito-core`    % Test
     )
   )
 
