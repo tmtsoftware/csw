@@ -588,8 +588,27 @@ class ConfigServiceRouteTest
     }
   }
 
+  /** Auth Based routes **/
+  test("create - Unauthorized code") {
+    Post("/config/test.conf?comment=create") ~> route ~> check {
+      status shouldEqual StatusCodes.Unauthorized
+    }
+  }
+
+  test("update - Unauthorized code") {
+    Put("/config/test.conf?comment=update") ~> route ~> check {
+      status shouldEqual StatusCodes.Unauthorized
+    }
+  }
+
   test("delete - Unauthorized code") {
     Delete("/config/test.conf?comment=deleting") ~> route ~> check {
+      status shouldEqual StatusCodes.Unauthorized
+    }
+  }
+
+  test("set active-version - Unauthorized code") {
+    Put("/active-version/test.conf?id=1&comment=active") ~> route ~> check {
       status shouldEqual StatusCodes.Unauthorized
     }
   }
