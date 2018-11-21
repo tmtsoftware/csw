@@ -2,6 +2,7 @@ package csw.config.server
 
 import akka.actor.ActorSystem
 import com.typesafe.config.{Config, ConfigFactory}
+import csw.auth.adapters.akka.http.{Authentication, SecurityDirectives}
 import csw.config.api.scaladsl.ConfigService
 import csw.config.server.files._
 import csw.config.server.http.{ConfigHandlers, ConfigServiceRoute, HttpService}
@@ -27,7 +28,9 @@ private[csw] class ServerWiring {
   lazy val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient(actorSystem, actorRuntime.mat)
 
   lazy val configHandlers     = new ConfigHandlers
-  lazy val configServiceRoute = new ConfigServiceRoute(configService, actorRuntime, configHandlers)
+  lazy val authentication     = new Authentication
+  lazy val securityDirectives = SecurityDirectives(authentication)
+  lazy val configServiceRoute = new ConfigServiceRoute(configService, actorRuntime, configHandlers, securityDirectives)
 
   lazy val httpService: HttpService = new HttpService(locationService, configServiceRoute, settings, actorRuntime)
 }
@@ -51,5 +54,9 @@ private[csw] object ServerWiring {
 
   def make(_config: Config): ServerWiring = new ServerWiring {
     override lazy val config: Config = _config.withFallback(ConfigFactory.load())
+  }
+
+  private[server] def make(_securityDirectives: SecurityDirectives): ServerWiring = new ServerWiring {
+    override lazy val securityDirectives: SecurityDirectives = _securityDirectives
   }
 }

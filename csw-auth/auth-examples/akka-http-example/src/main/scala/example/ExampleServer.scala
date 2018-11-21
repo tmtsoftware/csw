@@ -1,11 +1,13 @@
 package example
 import akka.http.scaladsl.server.{HttpApp, Route}
 import akka.http.scaladsl.unmarshalling.GenericUnmarshallers
-import csw.auth.adapters.akka.http.SecurityDirectives._
+import csw.auth.adapters.akka.http.SecurityDirectives
 import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
 
 object ExampleServer extends HttpApp with App with GenericUnmarshallers with PlayJsonSupport {
 
+  private val directives = SecurityDirectives()
+  import directives._
   private val HOST = "localhost"
   private val PORT = 9002
 

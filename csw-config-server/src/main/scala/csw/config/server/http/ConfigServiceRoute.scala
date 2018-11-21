@@ -3,7 +3,7 @@ package csw.config.server.http
 import akka.Done
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.{Directive0, Route}
-import csw.auth.adapters.akka.http.SecurityDirectives.resourceRole
+import csw.auth.adapters.akka.http.SecurityDirectives
 import csw.config.api.scaladsl.ConfigService
 import csw.config.server.ActorRuntime
 
@@ -14,12 +14,16 @@ import csw.config.server.ActorRuntime
  * @param actorRuntime actorRuntime provides runtime accessories related to ActorSystem like Materializer, ExecutionContext etc.
  * @param configHandlers exception handler which maps server side exceptions to Http Status codes
  */
-class ConfigServiceRoute(configService: ConfigService, actorRuntime: ActorRuntime, configHandlers: ConfigHandlers)
-    extends HttpSupport {
+class ConfigServiceRoute(
+    configService: ConfigService,
+    actorRuntime: ActorRuntime,
+    configHandlers: ConfigHandlers,
+    securityDirectives: SecurityDirectives
+) extends HttpSupport {
 
   import actorRuntime._
 
-  private val adminProtected: Directive0 = resourceRole("admin")
+  private val adminProtected: Directive0 = securityDirectives.resourceRole("admin")
 
   def route: Route = routeLogger {
     handleExceptions(configHandlers.jsonExceptionHandler) {
