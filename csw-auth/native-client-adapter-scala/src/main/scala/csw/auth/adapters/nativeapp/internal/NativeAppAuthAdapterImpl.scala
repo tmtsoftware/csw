@@ -1,6 +1,6 @@
 package csw.auth.adapters.nativeapp.internal
 
-import csw.auth.TMTTokenVerifier
+import csw.auth.TokenVerifier
 import csw.auth.TokenVerificationFailure._
 import csw.auth.adapters.nativeapp.api.{AuthStore, NativeAppAuthAdapter}
 import csw.auth.token.AccessToken
@@ -12,7 +12,7 @@ import scala.concurrent.duration.{DurationLong, FiniteDuration}
 private[auth] class NativeAppAuthAdapterImpl(
     val keycloakInstalled: KeycloakInstalled,
     maybeStore: Option[AuthStore] = None,
-    tokenVerifier: TMTTokenVerifier = TMTTokenVerifier()
+    tokenVerifier: TokenVerifier = TokenVerifier()
 ) extends NativeAppAuthAdapter {
 
   def this(keycloakDeployment: KeycloakDeployment) = this(new KeycloakInstalled(keycloakDeployment))
