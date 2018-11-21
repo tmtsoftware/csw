@@ -1,0 +1,14 @@
+## CSW - TMT Common Software v0.6.0-RC3
+
+This is release v0.6.0-RC3 of the TMT Common Software.
+
+See [CHANGELOG.md](CHANGELOG.md) for details of all releases.
+
+### Changes
+- fix for command service `query` API to return `Started` once the command execution starts
+- updated command service documentation
+
+### Documentation
+- Reference paradox documentation: https://tmtsoftware.github.io/csw/0.6.0-RC3/
+- Scaladoc: https://tmtsoftware.github.io/csw/0.6.0-RC3/api/scala/index.html
+- Javadoc: https://tmtsoftware.github.io/csw/0.6.0-RC3/api/java/index.html

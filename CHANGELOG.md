@@ -9,6 +9,12 @@ The product is in a new repository: [csw](https://github.com/tmtsoftware/csw).
 
 All notable changes to this project will be documented in this file.
 
+## [CSW v0.6.0-RC3] - 2018-11-21
+
+This is the release candidate 3 of the third release of the TMT Common Software for project stakeholders. 
+This release includes updated command service documentation and fix for `query` to return `Started` once the command execution starts. 
+See [here](https://tmtsoftware.github.io/csw/0.6.0-RC3/) for a detailed documentation of this version of the CSW software.
+
 ## [CSW v0.6.0-RC2] - 2018-11-15
 
 This is the release candidate 2 of the third release of the TMT Common Software for project stakeholders. 
