@@ -1,5 +1,7 @@
 package csw.command.client.internal
 
+import java.util.concurrent.TimeoutException
+
 import akka.actor.Scheduler
 import akka.actor.typed.scaladsl.AskPattern._
 import akka.actor.typed.scaladsl.adapter._
@@ -90,8 +92,12 @@ private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(impli
     }
   }
 
-  override def query(commandRunId: Id)(implicit timeout: Timeout): Future[QueryResponse] =
-    component ? (CommandResponseManagerMessage.Query(commandRunId, _))
+  override def query(commandRunId: Id)(implicit timeout: Timeout): Future[QueryResponse] = {
+    val eventualResponse: Future[QueryResponse] = component ? (CommandResponseManagerMessage.Query(commandRunId, _))
+    eventualResponse.recover {
+      case _: TimeoutException ⇒ CommandNotAvailable(commandRunId)
+    }
+  }
 
   override def queryFinal(commandRunId: Id)(implicit timeout: Timeout): Future[SubmitResponse] =
     component ? (CommandResponseManagerMessage.Subscribe(commandRunId, _))

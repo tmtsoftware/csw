@@ -69,12 +69,12 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
 
     behaviorTestKit.run(GetCommandSubscribersState(commandSubscribersStateProbe.ref))
     val commandSubscribersState = commandSubscribersStateProbe.expectMessageType[CommandSubscribersState]
-    commandSubscribersState.getSubscribers(runId) shouldBe empty
+    commandSubscribersState.store.get(runId) shouldBe empty
 
     behaviorTestKit.run(Subscribe(runId, commandResponseProbe.ref))
     behaviorTestKit.run(GetCommandSubscribersState(commandSubscribersStateProbe.ref))
     val commandSubscribersState2 = commandSubscribersStateProbe.expectMessageType[CommandSubscribersState]
-    commandSubscribersState2.getSubscribers(runId) shouldBe Set(commandResponseProbe.ref)
+    commandSubscribersState2.store.get(runId) shouldBe Set(commandResponseProbe.ref)
 
     commandResponseProbe.expectMessage(Completed(runId))
   }
@@ -129,13 +129,13 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
 
     behaviorTestKit.run(GetCommandSubscribersState(commandSubscribersStateProbe.ref))
     val commandSubscribersState = commandSubscribersStateProbe.expectMessageType[CommandSubscribersState]
-    commandSubscribersState.getSubscribers(runId) shouldBe Set(commandResponseProbe.ref)
+    commandSubscribersState.store.get(runId) shouldBe Set(commandResponseProbe.ref)
 
     behaviorTestKit.run(Unsubscribe(runId, commandResponseProbe.ref))
 
     behaviorTestKit.run(GetCommandSubscribersState(commandSubscribersStateProbe.ref))
     val commandSubscribersState2 = commandSubscribersStateProbe.expectMessageType[CommandSubscribersState]
-    commandSubscribersState2.getSubscribers(runId) shouldBe Set()
+    commandSubscribersState2.store.get(runId) shouldBe Set()
   }
 
   test("should be able to get current status of command on Query message") {
@@ -315,7 +315,7 @@ class CommandResponseManagerBehaviorTest extends FunSuite with Matchers with Moc
     behaviorTestKit.run(Subscribe(runId, commandResponseProbe.ref))
     behaviorTestKit.run(GetCommandSubscribersState(commandSubscribersStateProbe.ref))
     val commandSubscribersState = commandSubscribersStateProbe.expectMessageType[CommandSubscribersState]
-    commandSubscribersState.getSubscribers(runId) shouldBe Set(commandResponseProbe.ref)
+    commandSubscribersState.store.get(runId) shouldBe Set(commandResponseProbe.ref)
 
     behaviorTestKit.run(AddOrUpdateCommand(Started(runId)))
 

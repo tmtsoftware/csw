@@ -23,9 +23,9 @@ import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.location.server.http.MultiNodeHTTPLocationService
 import csw.params.commands.CommandResponse._
-import csw.params.commands._
+import csw.params.commands.{CommandResponse, _}
 import csw.params.core.generics.Parameter
-import csw.params.core.models.{ObsId, Prefix}
+import csw.params.core.models.{Id, ObsId, Prefix}
 import csw.params.core.states.{CurrentState, DemandState, StateName}
 import io.lettuce.core.RedisClient
 import org.scalatest.mockito.MockitoSugar
@@ -139,7 +139,7 @@ class CommandServiceTest(ignore: Int)
       // resolve assembly running in jvm-3 and send setup command expecting immediate command completion response
       val hcdLocF                   = locationService.resolve(AkkaConnection(ComponentId("HCD", ComponentType.HCD)), 5.seconds)
       val hcdLocation: AkkaLocation = Await.result(hcdLocF, 10.seconds).get
-      val hcdCmdService = CommandServiceFactory.make(hcdLocation)
+      val hcdCmdService             = CommandServiceFactory.make(hcdLocation)
 
       //#invalidCmd
       val invalidSetup    = Setup(prefix, invalidCmd, obsId)
@@ -201,10 +201,10 @@ class CommandServiceTest(ignore: Int)
 
         await(assemblyCmdService.query(longRunningSetup2.runId)) match {
           case Started(runId) =>
-            // happy case - no action needed
-            // Do some other work
+          // happy case - no action needed
+          // Do some other work
           case a =>
-            // log.error. This indicates that the command probably failed to start.
+          // log.error. This indicates that the command probably failed to start.
         }
 
         // Now wait for completion and result
@@ -258,15 +258,18 @@ class CommandServiceTest(ignore: Int)
       val validateCommandF = async {
         await(assemblyCmdService.validate(immediateSetup)) match {
           case response: Accepted ⇒ true
-          case Invalid(_, issue) ⇒
+          case Invalid(_, issue)  ⇒
             // do something with other response which is not expected
             log.error(s"Command failed to validate with issue: $issue")
             false
-          case l:Locked => false
+          case l: Locked => false
         }
       }
       Await.result(validateCommandF, timeout.duration) shouldBe true
       //#validate
+
+      // test CommandNotAvailable after timeout of 5 seconds
+      Await.result(assemblyCmdService.query(Id("blah"))(5.seconds), 10.seconds) shouldEqual CommandNotAvailable(Id("blah"))
 
       //#query
       // Check on a command that was completed in the past
@@ -305,7 +308,7 @@ class CommandServiceTest(ignore: Int)
       val currStateSetup       = Setup(prefix, hcdCurrentStateCmd, obsId).add(encoder.set(expectedEncoderValue))
       // Setup a callback response to CurrentState
       var cstate: CurrentState = CurrentState(prefix, StateName("no cstate"), Set.empty)
-      val subscription            = hcdCmdService.subscribeCurrentState(cs => cstate = cs)
+      val subscription         = hcdCmdService.subscribeCurrentState(cs => cstate = cs)
       // Send a oneway to the HCD that will cause it to publish a CurrentState with the encoder value
       // in the command parameter "encoder". Callback will store value into cstate.
       hcdCmdService.oneway(currStateSetup)
@@ -327,7 +330,8 @@ class CommandServiceTest(ignore: Int)
       val setupWithMatcher      = Setup(prefix, matcherCmd, obsId)
 
       // create a StateMatcher which specifies the desired algorithm and state to be matched.
-      val demandMatcher: StateMatcher = DemandMatcher(DemandState(prefix, StateName("testStateName")).add(param), withUnits = false, timeout)
+      val demandMatcher: StateMatcher =
+        DemandMatcher(DemandState(prefix, StateName("testStateName")).add(param), withUnits = false, timeout)
 
       // create matcher instance
       val matcher = new Matcher(assemblyLocation.componentRef, demandMatcher)
@@ -338,7 +342,7 @@ class CommandServiceTest(ignore: Int)
       // Submit command as a oneway and if the command is successfully validated,
       // check for matching of demand state against current state
       val matchResponseF: Future[MatchingResponse] = async {
-        val onewayResponse:OnewayResponse = await(assemblyCmdService.oneway(setupWithMatcher))
+        val onewayResponse: OnewayResponse = await(assemblyCmdService.oneway(setupWithMatcher))
         onewayResponse match {
           case Accepted(runId) ⇒
             val matcherResponse = await(matcherResponseF)
@@ -366,19 +370,19 @@ class CommandServiceTest(ignore: Int)
       //#onewayAndMatch
       val onewayMatchF = async {
         await(assemblyCmdService.onewayAndMatch(setupWithMatcher, demandMatcher)) match {
-          case i:Invalid =>
+          case i: Invalid =>
             // Command was not accepted
             log.error(s"Oneway match was not accepted: ${i.issue}")
             i
-          case c:Completed =>
+          case c: Completed =>
             // Do some completed work
             c
-          case e:Error =>
+          case e: Error =>
             // Match failed and timedout generating an error - log a message
             println("Error")
             log.error(s"Oeway match produced an error: ${e.message}")
             e
-          case l:Locked =>
+          case l: Locked =>
             // Destination component was locked, log a message
             log.error(s"Destination component was locked")
             l

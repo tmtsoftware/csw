@@ -267,6 +267,7 @@ object CommandResponseManagerMessage {
   case class GetCommandCorrelation(replyTo: ActorRef[CommandCorrelation])           extends CommandResponseManagerMessage
   case class GetCommandResponseState(replyTo: ActorRef[CommandResponseState])       extends CommandResponseManagerMessage
   case class SubscriberTerminated(terminated: ActorRef[SubmitResponse])             extends CommandResponseManagerMessage
+  case class QuerySubscriberTerminated(terminated: ActorRef[QueryResponse])         extends CommandResponseManagerMessage
   case class GetCommandSubscribersState(replyTo: ActorRef[CommandSubscribersState]) extends CommandResponseManagerMessage
 
   /**
