@@ -31,7 +31,7 @@ object ExampleServer extends HttpApp with App with GenericUnmarshallers with Pla
         }
       } ~
       patch {
-        role("example-service-admin") {
+        resourceRole("example-service-admin") {
           complete("OK")
         }
       }

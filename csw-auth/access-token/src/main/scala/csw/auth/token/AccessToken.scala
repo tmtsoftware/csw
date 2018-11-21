@@ -46,23 +46,25 @@ case class AccessToken(
     }
   }
 
-  def hasRole(role: String): Boolean = {
-    val allRealmRoles: Set[String] = this.realm_access.flatMap(_.roles).getOrElse(Set.empty)
-    val clientName: String         = Keycloak.deployment.getResourceName
-
+  def hasResourceRole(role: String): Boolean = {
+    val clientName: String = Keycloak.deployment.getResourceName
     val maybeRoles = for {
       resourceAccesses ← this.resource_access
       resourceAccess   ← resourceAccesses.get(clientName)
       roles            ← resourceAccess.roles
     } yield roles
 
-    val allResourceRoles: Set[String] = maybeRoles.getOrElse(Set.empty)
+    maybeRoles.getOrElse(Set.empty).contains(role)
+  }
 
-    (allRealmRoles ++ allResourceRoles).contains(role)
+  def hasRealmRole(role: String): Boolean = {
+    this.realm_access
+      .flatMap(_.roles)
+      .getOrElse(Set.empty)
+      .contains(role)
   }
 }
 
-//todo: think about splitting verification and decoding
 object AccessToken {
 
   private val log: Logger = AuthLogger.getLogger
