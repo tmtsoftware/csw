@@ -3,6 +3,7 @@ package csw.database.client
 import akka.actor.ActorSystem
 import csw.database.api.scaladsl.DatabaseService
 import csw.database.client.scaladsl.DatabaseServiceFactory
+import org.junit.Assert
 import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Seconds, Span}
@@ -31,16 +32,17 @@ class DatabaseServiceImplTest extends FunSuite with Matchers with ScalaFutures w
   private val databaseService: DatabaseService = factory.make(host, port, dbName)
 
   override def afterAll(): Unit = {
-    databaseService.execute("DROP DATABASE box_office;").futureValue(Timeout(Span(5, Seconds)))
-    databaseService.execute("DROP TABLE budget;").futureValue
-    databaseService.execute("DROP TABLE films;").futureValue
+    databaseService.execute("DROP DATABASE box_office_scala;").futureValue(Timeout(Span(5, Seconds)))
+    databaseService.execute("DROP TABLE budget_scala;").futureValue
+    databaseService.execute("DROP TABLE films_scala;").futureValue
+    databaseService.execute("DROP TABLE new_table_scala;").futureValue
     postgres.stop()
     system.terminate().futureValue
   }
 
   // DEOPSCSW-608: Examples of creating a database in the database service
   test("should be able to create a new Database") {
-    databaseService.execute("CREATE DATABASE box_office;").futureValue(Timeout(Span(5, Seconds)))
+    databaseService.execute("CREATE DATABASE box_office_scala;").futureValue(Timeout(Span(5, Seconds)))
     val resultSet = databaseService
       .executeQuery(
         """SELECT datname FROM pg_database WHERE datistemplate = false;"""
@@ -48,7 +50,7 @@ class DatabaseServiceImplTest extends FunSuite with Matchers with ScalaFutures w
       .futureValue
     val databaseList =
       Iterator.from(0).takeWhile(_ => resultSet.next()).map(_ => resultSet.getString(1)).toList
-    assert(databaseList contains "box_office")
+    assert(databaseList contains "box_office_scala")
   }
 
   // DEOPSCSW-609: Examples of creating records in a database in the database service
@@ -56,13 +58,13 @@ class DatabaseServiceImplTest extends FunSuite with Matchers with ScalaFutures w
   test("should be able to create table with unique default IDs and insert data in it") {
     databaseService
       .execute(
-        "CREATE TABLE films (id SERIAL PRIMARY KEY, name VARCHAR (10) UNIQUE NOT NULL);"
+        "CREATE TABLE films_scala (id SERIAL PRIMARY KEY, name VARCHAR (10) UNIQUE NOT NULL);"
       )
       .futureValue
-    databaseService.execute("INSERT INTO films VALUES (DEFAULT, 'movie_1');").futureValue
-    databaseService.execute("INSERT INTO films VALUES (DEFAULT, 'movie_4');").futureValue
-    databaseService.execute("INSERT INTO films VALUES (DEFAULT, 'movie_2');").futureValue
-    val resultSet = databaseService.executeQuery("SELECT count(*) AS rowCount from films;").futureValue
+    databaseService.execute("INSERT INTO films_scala VALUES (DEFAULT, 'movie_1');").futureValue
+    databaseService.execute("INSERT INTO films_scala VALUES (DEFAULT, 'movie_4');").futureValue
+    databaseService.execute("INSERT INTO films_scala VALUES (DEFAULT, 'movie_2');").futureValue
+    val resultSet = databaseService.executeQuery("SELECT count(*) AS rowCount from films_scala;").futureValue
     resultSet.next()
     resultSet.getInt("rowCount") shouldBe 3
   }
@@ -73,27 +75,27 @@ class DatabaseServiceImplTest extends FunSuite with Matchers with ScalaFutures w
   test("should be able to create join and group records using ForeignKey") {
     databaseService
       .execute(
-        """CREATE TABLE budget (
+        """CREATE TABLE budget_scala (
           |id SERIAL PRIMARY KEY,
           |movie_id INTEGER,
           |movie_name VARCHAR(10),
           |amount NUMERIC,
-          |FOREIGN KEY (movie_id) REFERENCES films(id) ON DELETE CASCADE
+          |FOREIGN KEY (movie_id) REFERENCES films_scala(id) ON DELETE CASCADE
           |);""".stripMargin
       )
       .futureValue
-    databaseService.execute("INSERT INTO budget VALUES (DEFAULT, 1, 'movie_1', 5000);").futureValue
-    databaseService.execute("INSERT INTO budget VALUES (DEFAULT, 2, 'movie_4', 6000);").futureValue
-    databaseService.execute("INSERT INTO budget VALUES (DEFAULT, 3, 'movie_2', 7000);").futureValue
-    databaseService.execute("INSERT INTO budget VALUES (DEFAULT, 3, 'movie_2', 3000);").futureValue
+    databaseService.execute("INSERT INTO budget_scala VALUES (DEFAULT, 1, 'movie_1', 5000);").futureValue
+    databaseService.execute("INSERT INTO budget_scala VALUES (DEFAULT, 2, 'movie_4', 6000);").futureValue
+    databaseService.execute("INSERT INTO budget_scala VALUES (DEFAULT, 3, 'movie_2', 7000);").futureValue
+    databaseService.execute("INSERT INTO budget_scala VALUES (DEFAULT, 3, 'movie_2', 3000);").futureValue
 
     val resultSet =
       databaseService.executeQuery("""
-          |SELECT films.name, SUM(budget.amount)
-          |    FROM films
-          |    INNER JOIN budget
-          |    ON films.id = budget.movie_id
-          |    GROUP BY  films.name;
+          |SELECT films_scala.name, SUM(budget_scala.amount)
+          |    FROM films_scala
+          |    INNER JOIN budget_scala
+          |    ON films_scala.id = budget_scala.movie_id
+          |    GROUP BY  films_scala.name;
         """.stripMargin).futureValue
 
     val result = Iterator
@@ -110,17 +112,17 @@ class DatabaseServiceImplTest extends FunSuite with Matchers with ScalaFutures w
   // DEOPSCSW-611: Examples of updating records in a database in the database service
   // DEOPSCSW-619: Create a method to send an update sql string to a database
   test("should be able to update record") {
-    databaseService.execute("UPDATE films SET name = 'movie_3' WHERE name = 'movie_2'").futureValue
+    databaseService.execute("UPDATE films_scala SET name = 'movie_3' WHERE name = 'movie_2'").futureValue
     val resultSet =
-      databaseService.executeQuery("SELECT count(*) AS rowCount from films where name = 'movie_2';").futureValue
+      databaseService.executeQuery("SELECT count(*) AS rowCount from films_scala where name = 'movie_2';").futureValue
     resultSet.next()
     resultSet.getInt("rowCount") shouldBe 0
   }
 
   // DEOPSCSW-612: Examples of deleting records in a database in the database service
   test("should be able to delete records") {
-    databaseService.execute("DELETE from films WHERE name = 'movie_4'").futureValue
-    val resultSet = databaseService.executeQuery("SELECT count(*) AS rowCount from films;").futureValue
+    databaseService.execute("DELETE from films_scala WHERE name = 'movie_4'").futureValue
+    val resultSet = databaseService.executeQuery("SELECT count(*) AS rowCount from films_scala;").futureValue
     resultSet.next()
     resultSet.getInt("rowCount") shouldBe 2
   }
@@ -128,8 +130,33 @@ class DatabaseServiceImplTest extends FunSuite with Matchers with ScalaFutures w
   // DEOPSCSW-613: Examples of querying records in a database in the database service
   // DEOPSCSW-616: Create a method to send a query (select) sql string to a database
   test("should be able to query records from the table") {
-    val resultSet = databaseService.executeQuery("SELECT * FROM films where name = 'movie_1';").futureValue
+    val resultSet = databaseService.executeQuery("SELECT * FROM films_scala where name = 'movie_1';").futureValue
     resultSet.next()
     resultSet.getString("name").trim shouldEqual "movie_1"
+  }
+
+  // DEOPSCSW-612: Examples of deleting records in a database in the database service
+  test("should be able to drop a table") {
+    val dbm = databaseService.getConnectionMetaData.futureValue
+    databaseService.execute("CREATE TABLE table_scala (id SERIAL PRIMARY KEY);").futureValue
+    val tableCheckAfterCreate = dbm.getTables(null, null, "table_scala", null)
+    Assert.assertTrue(tableCheckAfterCreate.next)
+
+    databaseService.execute("DROP TABLE table_scala;").futureValue
+    val tableCheckAfterDrop = dbm.getTables(null, null, "table_scala", null)
+    Assert.assertFalse(tableCheckAfterDrop.next)
+  }
+
+  // DEOPSCSW-622: Create a method to send a table update sql string to a database
+  test("should be able to alter a table") {
+    databaseService.execute("CREATE TABLE new_table_scala (id SERIAL PRIMARY KEY);").futureValue
+    val resultSetBeforeAlter = databaseService.executeQuery("SELECT * from new_table_scala;").futureValue
+    val rsmd                 = resultSetBeforeAlter.getMetaData
+    Assert.assertEquals(1, rsmd.getColumnCount)
+
+    databaseService.execute("ALTER TABLE new_table_scala ADD COLUMN name VARCHAR(10);").futureValue
+    val resultSetAfterAlter = databaseService.executeQuery("SELECT * from new_table_scala;").futureValue
+    val rsmdAltered         = resultSetAfterAlter.getMetaData
+    Assert.assertEquals(2, rsmdAltered.getColumnCount)
   }
 }

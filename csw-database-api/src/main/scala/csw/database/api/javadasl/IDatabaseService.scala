@@ -1,6 +1,6 @@
 package csw.database.api.javadasl
 
-import java.sql.ResultSet
+import java.sql.{DatabaseMetaData, ResultSet}
 import java.util.concurrent.CompletableFuture
 
 trait IDatabaseService {
@@ -10,4 +10,7 @@ trait IDatabaseService {
 
   // Used to execute select type of queries that return ResultSet
   def executeQuery(sql: String): CompletableFuture[ResultSet]
+
+  // Used to get meta data for the connection being used
+  def getConnectionMetaData: CompletableFuture[DatabaseMetaData]
 }

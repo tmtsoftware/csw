@@ -1,6 +1,6 @@
 package csw.database.client.internal
 
-import java.sql.ResultSet
+import java.sql.{DatabaseMetaData, ResultSet}
 import java.util.concurrent.CompletableFuture
 
 import csw.database.api.javadasl.IDatabaseService
@@ -13,4 +13,7 @@ class JDatabaseServiceImpl(databaseService: DatabaseService) extends IDatabaseSe
 
   override def executeQuery(sql: String): CompletableFuture[ResultSet] =
     databaseService.executeQuery(sql).toJava.toCompletableFuture
+
+  override def getConnectionMetaData: CompletableFuture[DatabaseMetaData] =
+    databaseService.getConnectionMetaData.toJava.toCompletableFuture
 }
