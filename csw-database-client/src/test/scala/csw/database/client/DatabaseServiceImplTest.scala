@@ -60,7 +60,7 @@ class DatabaseServiceImplTest extends FunSuite with Matchers with ScalaFutures w
     resultSet.getInt("rowCount") shouldBe 3
   }
 
-  test("should be able to create table with foreign key and insert data in it") {
+  test("should be able to create join and group records using ForeignKey") {
     databaseService
       .execute(
         """CREATE TABLE budget (
