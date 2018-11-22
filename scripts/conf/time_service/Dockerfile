@@ -10,10 +10,6 @@ RUN yum -y update && yum clean all
 # installing openjdk 8
 RUN yum install -y java-$JAVA_VERSION-openjdk java-$JAVA_VERSION-openjdk-devel
 
-# installing ntp and setting TAI offset to 37 seconds
-RUN yum install ntp -y
-RUN ntptime -T 37
-
 # install wget
 RUN yum install -y wget
 
@@ -23,9 +19,11 @@ RUN yum install -y https://dl.bintray.com/sbt/rpm/sbt-$SBT_VERSION.rpm
 RUN sbt update
 
 # mount current native path to docker
-ADD . /csw
+# ADD . /csw
 
 # go inside csw
-WORKDIR /csw
+# WORKDIR /csw
 
 #ENTRYPOINT ["sbt", "csw-time-client/test"]
+
+CMD tail -f /dev/null

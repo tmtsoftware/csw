@@ -10,11 +10,11 @@ class TimeServiceImpl() extends TimeService {
   val ClockRealtime = 0
   val ClockTAI      = 11
 
-  override def UtcTime(): UtcInstant = UtcInstant(instantFor(ClockRealtime))
+  override def utcTime(): UtcInstant = UtcInstant(instantFor(ClockRealtime))
 
-  override def TaiTime(): TaiInstant = TaiInstant(instantFor(ClockTAI))
+  override def taiTime(): TaiInstant = TaiInstant(instantFor(ClockTAI))
 
-  override def TaiOffset(): Int = {
+  override def taiOffset(): Int = {
     val timeVal = new NTPTimeVal()
     TimeLibrary.ntp_gettimex(timeVal)
     timeVal.tai
