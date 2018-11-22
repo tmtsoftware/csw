@@ -22,9 +22,10 @@ private[auth] object RPT {
 
   def create(token: String): Try[AccessToken] = {
     log.debug("fetching RPT")
-
-    Try { authzClient.authorization(token).authorize().getToken }
-      .flatMap(rptString => JwtJson.decode(rptString, JwtOptions(signature = false, expiration = false, notBefore = false)))
-      .flatMap(j => Try { Json.parse(j.toJson).as[AccessToken] })
+    for {
+      rptString   ← Try { authzClient.authorization(token).authorize().getToken }
+      claim       ← JwtJson.decode(rptString, JwtOptions(signature = false, expiration = false, notBefore = false))
+      accessToken ← Try { Json.parse(claim.toJson).as[AccessToken] }
+    } yield accessToken
   }
 }

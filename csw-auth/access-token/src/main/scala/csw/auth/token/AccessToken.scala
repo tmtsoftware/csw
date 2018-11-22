@@ -25,16 +25,11 @@ case class AccessToken(
     resource_access: Option[Map[String, Access]] = None,
     authorization: Option[Authorization] = None
 ) {
-  def hasPermission(scope: String, resource: String): Boolean = {
+  def hasPermission(scope: String, resource: String): Boolean =
     this.authorization match {
-      case Some(Authorization(Some(perms))) =>
-        perms.exists {
-          case Permission(_, r, Some(scopes)) if r == resource => scopes.contains(scope)
-          case _                                               => false
-        }
-      case _ => false
+      case Some(Authorization(Some(perms))) ⇒ perms.exists(p ⇒ p.rsname == resource && p.scopes.exists(_.contains(scope)))
+      case _                                ⇒ false
     }
-  }
 
   def hasResourceRole(role: String): Boolean = {
     val clientName: String = Keycloak.deployment.getResourceName
@@ -47,12 +42,11 @@ case class AccessToken(
     maybeRoles.getOrElse(Set.empty).contains(role)
   }
 
-  def hasRealmRole(role: String): Boolean = {
+  def hasRealmRole(role: String): Boolean =
     this.realm_access
       .flatMap(_.roles)
       .getOrElse(Set.empty)
       .contains(role)
-  }
 }
 
 object AccessToken {
