@@ -1,24 +1,14 @@
 package csw.auth.token
-import csw.auth.Keycloak.deployment
 import csw.auth.commons.AuthLogger
 import csw.logging.scaladsl.Logger
-import org.keycloak.authorization.client.{AuthzClient, Configuration}
+import org.keycloak.authorization.client.AuthzClient
 import pdi.jwt.{JwtJson, JwtOptions}
 import play.api.libs.json.Json
 
 import scala.util.Try
 
-private[auth] object RPT {
+private[auth] class RPT(authzClient: AuthzClient) {
   private val log: Logger = AuthLogger.getLogger
-
-  private val configuration: Configuration = new Configuration(
-    deployment.getAuthServerBaseUrl,
-    deployment.getRealm,
-    deployment.getResourceName,
-    deployment.getResourceCredentials,
-    deployment.getClient
-  )
-  private val authzClient: AuthzClient = AuthzClient.create(configuration)
 
   def create(token: String): Try[AccessToken] = {
     log.debug("fetching RPT")
@@ -28,4 +18,8 @@ private[auth] object RPT {
       accessToken ← Try { Json.parse(claim.toJson).as[AccessToken] }
     } yield accessToken
   }
+}
+
+object RPT {
+  def apply(authzClient: AuthzClient): RPT = new RPT(authzClient)
 }

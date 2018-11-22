@@ -1,7 +1,7 @@
 package csw.auth.token
 
 import csw.auth.Keycloak
-import csw.auth.token.claims.{Access, Audience, Authorization, Permission}
+import csw.auth.token.claims.{Access, Audience, Authorization}
 import play.api.libs.json._
 
 //todo: integrate csw logging

@@ -39,5 +39,4 @@ class SecurityDirectives(authentication: Authentication) {
 
 object SecurityDirectives {
   def apply(authentication: Authentication): SecurityDirectives = new SecurityDirectives(authentication)
-  def apply(): SecurityDirectives                               = new SecurityDirectives(new Authentication)
 }
