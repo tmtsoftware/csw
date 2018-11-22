@@ -3,7 +3,8 @@ package csw.config.cli.wiring
 import akka.actor.ActorSystem
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.auth.adapters.nativeapp.api.NativeAppAuthAdapter
-import csw.auth.adapters.nativeapp.{FileAuthStore, NativeAppAuthAdapterFactory}
+import csw.auth.adapters.nativeapp.NativeAppAuthAdapterFactory
+import csw.auth.adapters.nativeapp.scaladsl.FileAuthStore
 import csw.config.api.TokenFactory
 import csw.config.api.scaladsl.ConfigService
 import csw.config.cli.{CliApp, CliTokenFactory, CommandLineRunner}

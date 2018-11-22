@@ -2,7 +2,7 @@ package csw.auth.adapters.nativeapp.internal
 
 import csw.auth.TokenVerificationFailure.TokenExpired
 import csw.auth.TokenVerifier
-import csw.auth.adapters.nativeapp.FileAuthStore
+import csw.auth.adapters.nativeapp.scaladsl.FileAuthStore
 import csw.auth.token.AccessToken
 import org.keycloak.adapters.KeycloakDeployment
 import org.keycloak.adapters.installed.KeycloakInstalled

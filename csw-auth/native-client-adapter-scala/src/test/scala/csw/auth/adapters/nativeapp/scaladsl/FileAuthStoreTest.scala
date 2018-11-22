@@ -1,4 +1,4 @@
-package csw.auth.adapters.nativeapp
+package csw.auth.adapters.nativeapp.scaladsl
 
 import java.io.File
 
