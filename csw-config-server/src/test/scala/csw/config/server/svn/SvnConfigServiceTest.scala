@@ -4,11 +4,12 @@ import java.nio.file.Paths
 
 import csw.config.api.models.ConfigData
 import csw.config.api.scaladsl.ConfigService
-import csw.config.server.ConfigServiceTest
+import csw.config.server.{ConfigServiceTest, ServerWiring}
 import csw.config.server.commons.TestFutureExtension.RichFuture
 
 class SvnConfigServiceTest extends ConfigServiceTest {
 
+  override val serverWiring: ServerWiring   = new ServerWiring
   override val configService: ConfigService = serverWiring.configService
   import serverWiring.actorRuntime._
 

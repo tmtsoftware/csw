@@ -58,7 +58,7 @@ private[csw] object ServerWiring {
     override lazy val config: Config = _config.withFallback(ConfigFactory.load())
   }
 
-  private[server] def make(_securityDirectives: SecurityDirectives): ServerWiring = new ServerWiring {
+  private[csw] def make(_securityDirectives: SecurityDirectives): ServerWiring = new ServerWiring {
     override lazy val securityDirectives: SecurityDirectives = _securityDirectives
   }
 }

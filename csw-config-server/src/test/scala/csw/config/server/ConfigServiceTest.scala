@@ -19,16 +19,16 @@ import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
 
-  val serverWiring = new ServerWiring
-
-  private val testFileUtils = new TestFileUtils(serverWiring.settings)
-
-  import serverWiring.actorRuntime._
-
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
   InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
 
+  def serverWiring: ServerWiring
   def configService: ConfigService
+
+  private lazy val wiring: ServerWiring = serverWiring
+  private lazy val testFileUtils        = new TestFileUtils(wiring.settings)
+
+  import wiring.actorRuntime._
 
   override protected def beforeEach(): Unit = serverWiring.svnRepo.initSvnRepo()
 

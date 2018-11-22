@@ -9,21 +9,22 @@ import csw.config.api.exceptions.InvalidInput
 import csw.config.api.models.{ConfigData, FileType}
 import csw.config.api.scaladsl.ConfigService
 import csw.config.client.ConfigClientBaseSuite
-import csw.config.server.ConfigServiceTest
 import csw.config.server.commons.TestFutureExtension.RichFuture
 import csw.config.server.files.Sha1
+import csw.config.server.{ConfigServiceTest, ServerWiring}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 
 // DEOPSCSW-138: Split Config API into Admin API and Client API
 // DEOPSCSW-80: HTTP based access for configuration file
 class ConfigAdminApiTest extends ConfigServiceTest with ConfigClientBaseSuite {
 
+  override val serverWiring: ServerWiring = ServerWiring.make(securityDirectives)
   import serverWiring.actorRuntime._
 
   private val httpService           = serverWiring.httpService
   private val clientLocationService = HttpLocationServiceFactory.makeLocalClient
 
-  override val configService: ConfigService = ConfigClientFactory.adminApi(actorSystem, clientLocationService)
+  override val configService: ConfigService = ConfigClientFactory.adminApi(actorSystem, clientLocationService, factory)
 
   override def beforeAll(): Unit = {
     super[ConfigClientBaseSuite].beforeAll()
