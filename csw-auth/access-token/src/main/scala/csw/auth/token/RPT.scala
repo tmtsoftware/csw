@@ -24,7 +24,7 @@ private[auth] object RPT {
     log.debug("fetching RPT")
 
     Try { authzClient.authorization(token).authorize().getToken }
-      .flatMap(rptString => JwtJson.decode(rptString, JwtOptions(signature = false)))
+      .flatMap(rptString => JwtJson.decode(rptString, JwtOptions(signature = false, expiration = false, notBefore = false)))
       .flatMap(j => Try { Json.parse(j.toJson).as[AccessToken] })
   }
 }
