@@ -23,7 +23,7 @@ import csw.location.api.models.{AkkaLocation, ComponentId, ComponentType}
 import csw.location.helpers.{LSNodeSpec, TwoMembersAndSeed}
 import csw.location.server.http.MultiNodeHTTPLocationService
 import csw.params.commands.CommandResponse._
-import csw.params.commands.{CommandResponse, _}
+import csw.params.commands._
 import csw.params.core.generics.Parameter
 import csw.params.core.models.{Id, ObsId, Prefix}
 import csw.params.core.states.{CurrentState, DemandState, StateName}
@@ -268,8 +268,8 @@ class CommandServiceTest(ignore: Int)
       Await.result(validateCommandF, timeout.duration) shouldBe true
       //#validate
 
-      // test CommandNotAvailable after timeout of 5 seconds
-      Await.result(assemblyCmdService.query(Id("blah"))(5.seconds), 10.seconds) shouldEqual CommandNotAvailable(Id("blah"))
+      // test CommandNotAvailable after timeout of 1 seconds
+      Await.result(assemblyCmdService.query(Id("blah"))(1.seconds), 2.seconds) shouldEqual CommandNotAvailable(Id("blah"))
 
       //#query
       // Check on a command that was completed in the past

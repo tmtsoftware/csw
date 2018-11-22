@@ -117,7 +117,7 @@ class ComponentHandlerForCommand(ctx: ActorContext[TopLevelActorMessage], cswCtx
 
   // This simulates the handling of cancelling a long command
   private def processOriginalCommand(runId: Id): Unit = {
-    implicit val timeout: Timeout = 5.seconds
+    implicit val timeout: Timeout = 1.seconds
 
     // DEOPSCSW-371: Provide an API for CommandResponseManager that hides actor based interaction
     val eventualResponse: Future[QueryResponse] = commandResponseManager.query(runId)

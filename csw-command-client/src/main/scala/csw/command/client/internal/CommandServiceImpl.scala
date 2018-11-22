@@ -94,7 +94,7 @@ private[command] class CommandServiceImpl(componentLocation: AkkaLocation)(impli
 
   override def query(commandRunId: Id)(implicit timeout: Timeout): Future[QueryResponse] = {
     val eventualResponse: Future[QueryResponse] = component ? (CommandResponseManagerMessage.Query(commandRunId, _))
-    eventualResponse.recover {
+    eventualResponse recover {
       case _: TimeoutException ⇒ CommandNotAvailable(commandRunId)
     }
   }

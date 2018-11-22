@@ -1,19 +1,18 @@
 package csw.command.client
 
-import java.util.concurrent.CompletableFuture
+import java.util.concurrent.{CompletableFuture, TimeoutException}
 
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.AskPattern._
 import akka.actor.{ActorSystem, Scheduler}
-import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.Timeout
 import csw.command.client.messages.CommandResponseManagerMessage
 import csw.command.client.messages.CommandResponseManagerMessage._
-import csw.params.commands.CommandResponse.{QueryResponse, SubmitResponse}
+import csw.params.commands.CommandResponse.{CommandNotAvailable, QueryResponse, SubmitResponse}
 import csw.params.core.models.Id
 
 import scala.compat.java8.FutureConverters._
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
  * Wrapper API for interacting with Command Response Manager of a component
@@ -24,8 +23,8 @@ class CommandResponseManager private[command] (
     private[csw] val commandResponseManagerActor: ActorRef[CommandResponseManagerMessage]
 )(implicit val actorSystem: ActorSystem) {
 
-  private implicit val mat: Materializer    = ActorMaterializer()(actorSystem)
   private implicit val scheduler: Scheduler = actorSystem.scheduler
+  private implicit val ec: ExecutionContext = actorSystem.dispatcher
 
   /**
    * Add a new command or update an existing command with the provided status
@@ -59,8 +58,12 @@ class CommandResponseManager private[command] (
    * @param timeout timeout duration until which this operation is expected to wait for providing a value
    * @return a future of CommandResponse
    */
-  def query(runId: Id)(implicit timeout: Timeout): Future[QueryResponse] =
-    commandResponseManagerActor ? (Query(runId, _))
+  def query(runId: Id)(implicit timeout: Timeout): Future[QueryResponse] = {
+    val eventualResponse: Future[QueryResponse] = commandResponseManagerActor ? (Query(runId, _))
+    eventualResponse recover {
+      case _: TimeoutException ⇒ CommandNotAvailable(runId)
+    }
+  }
 
   /**
    * A helper method for Java to query the current status of a command

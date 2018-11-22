@@ -9,7 +9,7 @@ import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import csw.command.client.extensions.AkkaLocationExt.RichAkkaLocation
 import csw.command.client.messages.CommandMessage.{Oneway, Submit}
-import csw.command.client.messages.CommandResponseManagerMessage.Subscribe
+import csw.command.client.messages.CommandResponseManagerMessage.{Query, Subscribe}
 import csw.common.components.command.ComponentStateForCommand.{acceptedCmd, cancelCmd, prefix}
 import csw.framework.internal.wiring.{FrameworkWiring, Standalone}
 import csw.location.api.models.Connection.AkkaConnection
@@ -54,6 +54,7 @@ class CancellableCommandTest(ignore: Int)
 
     runOn(member) {
       val submitResponseProbe = TestProbe[SubmitResponse]
+      val queryResponseProbe  = TestProbe[QueryResponse]
       val onewayResponseProbe = TestProbe[OnewayResponse]
       val obsId               = Some(ObsId("Obs001"))
       val cancelCmdId         = KeyType.StringKey.make("cancelCmdId")
@@ -105,8 +106,8 @@ class CancellableCommandTest(ignore: Int)
 
       // Note that this works, even though initial Oneway was not in CRM, if code puts Cancelled for the runId into CRM
       // the subscribe will work
-      assemblyRef ! Subscribe(originalSetup3.runId, submitResponseProbe.ref)
-      submitResponseProbe.expectMessage(Cancelled(originalSetup3.runId))
+      assemblyRef ! Query(originalSetup3.runId, queryResponseProbe.ref)
+      queryResponseProbe.expectMessage(Cancelled(originalSetup3.runId))
 
       // original command is oneway and Cancel command is also oneway
       val originalSetup4 = Setup(prefix, acceptedCmd, obsId)
