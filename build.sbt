@@ -443,8 +443,7 @@ lazy val `csw-auth` = project
     `native-client-adapter-scala`,
     `access-token`,
     `akka-http-adapter`,
-    `keycloak-config`,
-    `auth-examples`
+    `keycloak-config`
   )
 
 lazy val `native-client-adapter-scala` = project
@@ -473,20 +472,3 @@ lazy val `keycloak-config` = project
   .settings(
     libraryDependencies ++= Dependencies.AuthKeyCloakConfig.value
   )
-
-lazy val `auth-examples` = project
-  .in(file("csw-auth/auth-examples"))
-  .aggregate(
-    `akka-http-example`,
-    `cli-app-example`
-  )
-
-lazy val `akka-http-example` = project
-  .in(file("csw-auth/auth-examples/akka-http-example"))
-  .dependsOn(`akka-http-adapter`)
-  .settings(
-    libraryDependencies ++= Dependencies.AuthAkkaHttpExample.value
-  )
-
-lazy val `cli-app-example` = project
-  .in(file("csw-auth/auth-examples/cli-app-example"))

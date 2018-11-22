@@ -317,7 +317,9 @@ object Dependencies {
   val AuthAkkaHttpAdapter = Def.setting(
     Seq(
       AkkaHttp.`akka-http`,
-      Akka.`akka-stream`
+      Akka.`akka-stream`,
+      Libs.`play-json-derived-codecs`.value % Test,
+      Libs.`akka-http-play-json`            % Test
     )
   )
 
@@ -329,16 +331,6 @@ object Dependencies {
       //(legacy dependencies) required*
       Libs.`jboss-logging`,
       Libs.httpclient
-    )
-  )
-
-  val AuthAkkaHttpExample = Def.setting(
-    Seq(
-      AkkaHttp.`akka-http`,
-      Akka.`akka-stream`,
-      //Libs.`play-json`,
-      Libs.`play-json-derived-codecs`.value,
-      Libs.`akka-http-play-json`
     )
   )
 
