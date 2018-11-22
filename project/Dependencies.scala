@@ -323,6 +323,10 @@ object Dependencies {
     Seq(
       AkkaHttp.`akka-http`,
       Akka.`akka-stream`,
+      Libs.`scalatest`.value       % Test,
+      AkkaHttp.`akka-http-testkit` % Test,
+      Libs.`mockito-core`,
+      //Libs.`play-json`,
       Libs.`play-json-derived-codecs`.value % Test,
       Libs.`akka-http-play-json`            % Test
     )
