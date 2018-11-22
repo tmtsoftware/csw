@@ -1,9 +1,8 @@
 package csw.auth.token
 import csw.auth.token.claims.{Access, Authorization, Permission}
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{EitherValues, FunSuite, Matchers}
+import org.scalatest.{FunSuite, Matchers}
 
-class AccessTokenTest extends FunSuite with MockitoSugar with Matchers with EitherValues {
+class AccessTokenTest extends FunSuite with Matchers {
 
   test("should able to check permissions for access token") {
     val permission: Set[Permission] = Set(Permission("test-resource-id", "test-resource", Option(Set("test-scope"))))
