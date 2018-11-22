@@ -9,7 +9,7 @@ import csw.database.client.internal.{DatabaseServiceImpl, JDatabaseServiceImpl}
 import csw.location.api.javadsl.ILocationService
 import csw.location.api.scaladsl.LocationService
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class DatabaseServiceFactory {
 
@@ -34,4 +34,10 @@ class DatabaseServiceFactory {
 
   def jMake(host: String, port: Int, dbName: String, ec: ExecutionContext): IDatabaseService =
     new JDatabaseServiceImpl(make(host, port, dbName)(ec))
+
+  def make(connection: String)(implicit ec: ExecutionContext): DatabaseService =
+    new DatabaseServiceImpl(Future(DriverManager.getConnection(connection)))
+
+  def jMake(connection: String, ec: ExecutionContext): IDatabaseService =
+    new JDatabaseServiceImpl(make(connection)(ec))
 }
