@@ -4,6 +4,7 @@ import akka.actor.ActorSystem
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.auth.adapters.nativeapp.api.NativeAppAuthAdapter
 import csw.auth.adapters.nativeapp.{FileAuthStore, NativeAppAuthAdapterFactory}
+import csw.config.api.TokenFactory
 import csw.config.api.scaladsl.ConfigService
 import csw.config.cli.{CliApp, CliTokenFactory, CommandLineRunner}
 import csw.config.client.internal.ActorRuntime
@@ -24,7 +25,7 @@ private[config] class Wiring {
   lazy val locationService: LocationService        = HttpLocationServiceFactory.makeLocalClient(actorSystem, actorRuntime.mat)
   lazy val authStore                               = new FileAuthStore(settings.authStorePath)
   lazy val nativeAuthAdapter: NativeAppAuthAdapter = NativeAppAuthAdapterFactory.make(authStore)
-  lazy val tokenFactory                            = new CliTokenFactory(nativeAuthAdapter)
+  lazy val tokenFactory: TokenFactory              = new CliTokenFactory(nativeAuthAdapter)
   lazy val configService: ConfigService            = ConfigClientFactory.adminApi(actorRuntime.actorSystem, locationService, tokenFactory)
   lazy val printLine: Any ⇒ Unit                   = println
   lazy val commandLineRunner                       = new CommandLineRunner(configService, actorRuntime, printLine, nativeAuthAdapter)
@@ -38,9 +39,10 @@ private[config] object Wiring {
       HttpLocationServiceFactory.make(locationHost)(actorSystem, actorRuntime.mat)
   }
 
-  def noPrinting(_locationService: LocationService): Wiring =
+  def noPrinting(_locationService: LocationService, _tokenFactory: TokenFactory): Wiring =
     new Wiring {
       override lazy val locationService: LocationService = _locationService
+      override lazy val tokenFactory: TokenFactory       = _tokenFactory
       override lazy val printLine: Any ⇒ Unit            = _ ⇒ ()
     }
 }

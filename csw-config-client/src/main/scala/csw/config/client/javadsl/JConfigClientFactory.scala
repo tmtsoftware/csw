@@ -17,24 +17,14 @@ object JConfigClientFactory {
    *
    * @param actorSystem local actor system of the client
    * @param locationService location service instance which will be used to resolve the location of config server
+   * @param tokenFactory factory to get access tokens
    * @return an instance of IConfigService
    */
-  def adminApi(actorSystem: ActorSystem, locationService: ILocationService): IConfigService = {
-    val configService = ConfigClientFactory.adminApi(actorSystem, locationService.asScala)
-    val actorRuntime  = new ActorRuntime(actorSystem)
-    new JConfigService(configService, actorRuntime)
-  }
-
-  // Fixme: token factory should be mandatory for admin api, hence delete above admin api where tokenFactory is optional
   def adminApi(
       actorSystem: ActorSystem,
       locationService: ILocationService,
       tokenFactory: TokenFactory
-  ): IConfigService = {
-    val configService = ConfigClientFactory.adminApi(actorSystem, locationService.asScala, tokenFactory)
-    val actorRuntime  = new ActorRuntime(actorSystem)
-    new JConfigService(configService, actorRuntime)
-  }
+  ): IConfigService = make(actorSystem, locationService, Some(tokenFactory))
 
   /**
    * Create ConfigClient instance for non admin users.
@@ -44,6 +34,16 @@ object JConfigClientFactory {
    * @return an instance of IConfigClientService
    */
   def clientApi(actorSystem: ActorSystem, locationService: ILocationService): IConfigClientService =
-    adminApi(actorSystem, locationService)
+    make(actorSystem, locationService)
+
+  private def make(
+      actorSystem: ActorSystem,
+      locationService: ILocationService,
+      tokenFactory: Option[TokenFactory] = None
+  ): IConfigService = {
+    val actorRuntime  = new ActorRuntime(actorSystem)
+    val configService = ConfigClientFactory.make(actorRuntime, locationService.asScala, tokenFactory)
+    new JConfigService(configService, actorRuntime)
+  }
 
 }

@@ -258,7 +258,8 @@ object Dependencies {
       Libs.`scalatest`.value,
       Libs.`embedded-redis`,
       Libs.`junit`,
-      Libs.`junit-interface`
+      Libs.`junit-interface`,
+      Libs.`mockito-core`
     )
   )
 

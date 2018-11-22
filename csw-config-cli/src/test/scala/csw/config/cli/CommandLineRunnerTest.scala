@@ -12,23 +12,24 @@ import csw.config.cli.wiring.Wiring
 import csw.config.commons.TestFutureExtension.RichFuture
 import csw.config.commons.{ArgsUtil, TestFileUtils}
 import csw.config.server.ServerWiring
+import csw.config.server.mocks.MockedAuthentication
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.server.http.HTTPLocationService
 import org.scalatest.{BeforeAndAfterEach, Matchers}
 
 // DEOPSCSW-112: Command line interface client for Configuration service
 // DEOPSCSW-43: Access Configuration service from any CSW component
-class CommandLineRunnerTest extends HTTPLocationService with Matchers with BeforeAndAfterEach {
-
-  private val serverSystem: ActorSystem    = ActorSystem("config-server")
-  private val serverMat: ActorMaterializer = ActorMaterializer()(serverSystem)
-  private val serverLocationService        = HttpLocationServiceFactory.makeLocalClient(serverSystem, serverMat)
-  private val serverWiring                 = ServerWiring.make(serverSystem, serverLocationService)
+class CommandLineRunnerTest extends HTTPLocationService with Matchers with BeforeAndAfterEach with MockedAuthentication {
 
   private val clientSystem: ActorSystem    = ActorSystem("config-cli")
   private val clientMat: ActorMaterializer = ActorMaterializer()(clientSystem)
-  private val clientLocationService        = HttpLocationServiceFactory.makeLocalClient(clientSystem, clientMat)
-  private val clientWiring                 = Wiring.noPrinting(clientLocationService)
+  private val locationService              = HttpLocationServiceFactory.makeLocalClient(clientSystem, clientMat)
+  private val clientWiring                 = Wiring.noPrinting(locationService, factory)
+
+  private val serverWiring = ServerWiring.make(locationService, securityDirectives)
+  private val httpService  = serverWiring.httpService
+  httpService.registeredLazyBinding.await
+
   import clientWiring.commandLineRunner
 
   private val testFileUtils = new TestFileUtils(serverWiring.settings)

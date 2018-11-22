@@ -23,6 +23,7 @@ import csw.common.FrameworkAssertions._
 import csw.config.api.models.ConfigData
 import csw.config.client.scaladsl.ConfigClientFactory
 import csw.config.server.commons.TestFileUtils
+import csw.config.server.mocks.MockedAuthentication
 import csw.config.server.{ServerWiring, Settings}
 import csw.location.api.models.Connection.AkkaConnection
 import csw.location.api.models.{ComponentId, ComponentType}
@@ -53,7 +54,8 @@ class ContainerCmdTestMultiJvm3 extends ContainerCmdTest(0)
 // DEOPSCSW-216: Locate and connect components to send AKKA commands
 class ContainerCmdTest(ignore: Int)
     extends LSNodeSpec(config = new TwoMembersAndSeed, mode = "http")
-    with MultiNodeHTTPLocationService {
+    with MultiNodeHTTPLocationService
+    with MockedAuthentication {
 
   import config._
 
@@ -87,11 +89,11 @@ class ContainerCmdTest(ignore: Int)
 
     // start config server and upload laser_container.conf file
     runOn(seed) {
-      val serverWiring = ServerWiring.make(locationService)
+      val serverWiring = ServerWiring.make(locationService, securityDirectives)
       serverWiring.svnRepo.initSvnRepo()
       serverWiring.httpService.registeredLazyBinding.await
 
-      val configService       = ConfigClientFactory.adminApi(system, locationService)
+      val configService       = ConfigClientFactory.adminApi(system, locationService, factory)
       val containerConfigData = ConfigData.fromString(Source.fromResource("laser_container.conf").mkString)
 
       Await.result(

@@ -164,7 +164,7 @@ lazy val `csw-config-client` = project
     `csw-location-api`,
     `csw-commons`         % "compile->compile;test->test",
     `csw-location-server` % "multi-jvm->multi-jvm",
-    `csw-config-server`   % "test->test"
+    `csw-config-server`   % "test->test;multi-jvm->test"
   )
   .enablePlugins(PublishBintray, GenJavadocPlugin, AutoMultiJvm, MaybeCoverage)
   .settings(
@@ -177,7 +177,7 @@ lazy val `csw-config-cli` = project
     `csw-location-client`,
     `native-client-adapter-scala`,
     `csw-location-server` % "multi-jvm->multi-jvm",
-    `csw-config-server`   % "test->test",
+    `csw-config-server`   % "test->test;multi-jvm->test",
     `csw-commons`         % "test->test"
   )
   .enablePlugins(DeployApp, AutoMultiJvm, MaybeCoverage)

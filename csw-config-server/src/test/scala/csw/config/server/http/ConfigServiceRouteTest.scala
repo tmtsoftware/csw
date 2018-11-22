@@ -3,18 +3,14 @@ package csw.config.server.http
 import java.time.Instant
 
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.model.headers.{Authorization, OAuth2BearerToken}
 import akka.http.scaladsl.server.Route
-import akka.http.scaladsl.server.directives.Credentials.Provided
 import akka.http.scaladsl.testkit.ScalatestRouteTest
-import csw.auth.adapters.akka.http.{Authentication, SecurityDirectives}
-import csw.auth.token.AccessToken
 import csw.commons.http.ErrorResponse
 import csw.config.api.models.{ConfigData, ConfigFileInfo, ConfigFileRevision, ConfigId, _}
 import csw.config.server.ServerWiring
 import csw.config.server.commons.TestFileUtils
+import csw.config.server.mocks.MockedAuthentication
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
-import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
@@ -26,40 +22,11 @@ class ConfigServiceRouteTest
     with BeforeAndAfterEach
     with Matchers
     with HttpSupport
-    with MockitoSugar {
+    with MockitoSugar
+    with MockedAuthentication {
 
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
   InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
-
-  class MockedAuthentication {
-    val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication)
-
-    val roleMissingTokenStr = "rolemissing"
-    val validTokenStr       = "valid"
-    val invalidTokenStr     = "invalid"
-
-    val roleMissingToken: AccessToken = mock[AccessToken]
-    val validToken: AccessToken       = mock[AccessToken]
-    val invalidToken: AccessToken     = mock[AccessToken]
-
-    private val authenticator: Authenticator[AccessToken] = {
-      case Provided(`roleMissingTokenStr`) ⇒ Some(roleMissingToken)
-      case Provided(`validTokenStr`)       ⇒ Some(validToken)
-      case _                               ⇒ None
-    }
-
-    when(roleMissingToken.hasResourceRole("admin")).thenReturn(false)
-    when(validToken.hasResourceRole("admin")).thenReturn(true)
-    when(authentication.authenticator).thenReturn(authenticator)
-
-    val roleMissingTokenHeader = Authorization(OAuth2BearerToken(roleMissingTokenStr))
-    val validTokenHeader       = Authorization(OAuth2BearerToken(validTokenStr))
-    val invalidTokenHeader     = Authorization(OAuth2BearerToken(invalidTokenStr))
-  }
-
-  private val mockedAuthentication = new MockedAuthentication
-  import mockedAuthentication._
 
   val serverWiring: ServerWiring = ServerWiring.make(securityDirectives)
   import serverWiring._

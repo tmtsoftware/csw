@@ -39,15 +39,6 @@ private[csw] class ServerWiring {
 
 private[csw] object ServerWiring {
 
-  def make(_locationService: LocationService): ServerWiring = new ServerWiring {
-    override lazy val locationService: LocationService = _locationService
-  }
-
-  def make(_actorSystem: ActorSystem, _locationService: LocationService): ServerWiring = new ServerWiring {
-    override lazy val actorSystem: ActorSystem         = _actorSystem
-    override lazy val locationService: LocationService = _locationService
-  }
-
   def make(maybePort: Option[Int]): ServerWiring = new ServerWiring {
     override lazy val settings: Settings = new Settings(config) {
       override val `service-port`: Int = maybePort.getOrElse(super.`service-port`)
@@ -58,7 +49,12 @@ private[csw] object ServerWiring {
     override lazy val config: Config = _config.withFallback(ConfigFactory.load())
   }
 
-  private[csw] def make(_securityDirectives: SecurityDirectives): ServerWiring = new ServerWiring {
+  def make(_locationService: LocationService, _securityDirectives: SecurityDirectives): ServerWiring = new ServerWiring {
+    override lazy val locationService: LocationService       = _locationService
+    override lazy val securityDirectives: SecurityDirectives = _securityDirectives
+  }
+
+  def make(_securityDirectives: SecurityDirectives): ServerWiring = new ServerWiring {
     override lazy val securityDirectives: SecurityDirectives = _securityDirectives
   }
 }

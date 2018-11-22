@@ -1,4 +1,4 @@
-package csw.config.client.commons
+package csw.config.server.mocks
 
 import akka.http.scaladsl.model.headers.{Authorization, OAuth2BearerToken}
 import akka.http.scaladsl.server.Directives.Authenticator
