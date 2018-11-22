@@ -1,7 +1,8 @@
 package csw.database.client
 
 import java.nio.file.Paths
-import java.util.Collections
+import java.util
+import java.util.Arrays.asList
 
 import akka.actor.ActorSystem
 import csw.database.api.scaladsl.DatabaseService
@@ -21,8 +22,18 @@ class DatabaseServiceImplTest extends FunSuite with Matchers with ScalaFutures w
   private val system                = ActorSystem("test")
   implicit val ec: ExecutionContext = system.dispatcher
 
-  private val postgres: EmbeddedPostgres = new EmbeddedPostgres(Version.V10_6, "/tmp/postgresDataDir")
-  postgres.start(EmbeddedPostgres.cachedRuntimeConfig(Paths.get("/tmp/postgresExtracted")))
+  private val postgres: EmbeddedPostgres    = new EmbeddedPostgres(Version.V10_6, "/tmp/postgresDataDir")
+  private val DEFAULT_PORT                  = 5434
+  val DEFAULT_ADD_PARAMS: util.List[String] = asList("-E", "SQL_ASCII", "--locale=C", "--lc-collate=C", "--lc-ctype=C")
+  postgres.start(
+    EmbeddedPostgres.cachedRuntimeConfig(Paths.get("/tmp/postgresExtracted")),
+    EmbeddedPostgres.DEFAULT_HOST,
+    DEFAULT_PORT,
+    EmbeddedPostgres.DEFAULT_DB_NAME,
+    EmbeddedPostgres.DEFAULT_USER,
+    EmbeddedPostgres.DEFAULT_PASSWORD,
+    DEFAULT_ADD_PARAMS
+  )
 
   //DEOPSCSW-618: Create a method to locate a database server
   //DEOPSCSW-620: Create a method to make a connection to a database
@@ -35,6 +46,7 @@ class DatabaseServiceImplTest extends FunSuite with Matchers with ScalaFutures w
     databaseService.execute("DROP TABLE budget_scala;").futureValue
     databaseService.execute("DROP TABLE films_scala;").futureValue
     databaseService.execute("DROP TABLE new_table_scala;").futureValue
+    databaseService.closeConnection()
     postgres.stop()
     system.terminate().futureValue
   }

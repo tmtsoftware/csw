@@ -16,4 +16,7 @@ class JDatabaseServiceImpl(databaseService: DatabaseService) extends IDatabaseSe
 
   override def getConnectionMetaData: CompletableFuture[DatabaseMetaData] =
     databaseService.getConnectionMetaData.toJava.toCompletableFuture
+
+  override def closeConnection(): CompletableFuture[Unit] =
+    databaseService.closeConnection().toJava.toCompletableFuture
 }

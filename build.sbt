@@ -349,7 +349,10 @@ lazy val `csw-database-api` = project
 
 lazy val `csw-database-client` = project
   .dependsOn(`csw-database-api`, `csw-location-api`)
-  .settings(libraryDependencies ++= Dependencies.DatabaseClient.value)
+  .settings(
+    parallelExecution in Test := false,
+    libraryDependencies ++= Dependencies.DatabaseClient.value
+  )
 
 /* =============== Common Utilities ============ */
 lazy val `csw-network-utils` = project

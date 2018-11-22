@@ -12,4 +12,5 @@ class DatabaseServiceImpl(connectionF: Future[Connection])(implicit ec: Executio
   override def execute(sql: String): Future[Unit]              = statementF.map(_.execute(sql))
   override def executeQuery(sql: String): Future[ResultSet]    = statementF.map(_.executeQuery(sql))
   override def getConnectionMetaData: Future[DatabaseMetaData] = connectionF.map(_.getMetaData)
+  override def closeConnection(): Future[Unit]                 = connectionF.map(_.close())
 }

@@ -23,6 +23,7 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
+import static java.util.Arrays.asList;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 //DEOPSCSW-601: Create Database API
@@ -36,8 +37,19 @@ public class JDatabaseServiceImplTest extends JUnitSuite {
         system = ActorSystem.apply("test");
         ExecutionContext ec = system.dispatcher();
         postgres = new EmbeddedPostgres(Version.V10_6, "/tmp/postgresDataDir");
-        postgres.start(EmbeddedPostgres.cachedRuntimeConfig(Paths.get("/tmp/postgresExtracted")));
+        int DEFAULT_PORT = 5435;
 
+        final List<String> DEFAULT_ADD_PARAMS = asList("-E", "SQL_ASCII", "--locale=C", "--lc-collate=C", "--lc-ctype=C");
+
+        postgres.start(
+                EmbeddedPostgres.cachedRuntimeConfig(Paths.get("/tmp/postgresExtracted")),
+                EmbeddedPostgres.DEFAULT_HOST,
+                DEFAULT_PORT,
+                EmbeddedPostgres.DEFAULT_DB_NAME,
+                EmbeddedPostgres.DEFAULT_USER,
+                EmbeddedPostgres.DEFAULT_PASSWORD,
+                DEFAULT_ADD_PARAMS
+        );
         //DEOPSCSW-618: Create a method to locate a database server
         //DEOPSCSW-620: Create a method to make a connection to a database
         //DEOPSCSW-621: Create a session with a database
@@ -51,8 +63,9 @@ public class JDatabaseServiceImplTest extends JUnitSuite {
         databaseService.execute("DROP TABLE budget_java;").get(5, SECONDS);
         databaseService.execute("DROP TABLE films_java;").get(5, SECONDS);
         databaseService.execute("DROP TABLE new_table_java;").get(5, SECONDS);
-        ;
+        databaseService.closeConnection();
         postgres.stop();
+        Runtime.getRuntime().exec("pkill postgres").waitFor();
         Await.result(system.terminate(), Duration.apply(5, SECONDS));
     }
 

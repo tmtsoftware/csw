@@ -13,4 +13,6 @@ trait DatabaseService {
 
   // Used to get meta data for the connection being used
   def getConnectionMetaData: Future[DatabaseMetaData]
+
+  def closeConnection(): Future[Unit]
 }

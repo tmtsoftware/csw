@@ -13,4 +13,6 @@ trait IDatabaseService {
 
   // Used to get meta data for the connection being used
   def getConnectionMetaData: CompletableFuture[DatabaseMetaData]
+
+  def closeConnection(): CompletableFuture[Unit]
 }
