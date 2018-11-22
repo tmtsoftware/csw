@@ -3,7 +3,7 @@ package csw.config.server
 import akka.actor.ActorSystem
 import com.typesafe.config.{Config, ConfigFactory}
 import csw.auth.adapters.akka.http.{Authentication, SecurityDirectives}
-import csw.auth.token.TokenFactory
+import csw.auth.core.token.TokenFactory
 import csw.config.api.scaladsl.ConfigService
 import csw.config.server.files._
 import csw.config.server.http.{ConfigHandlers, ConfigServiceRoute, HttpService}

@@ -2,8 +2,8 @@ package csw.auth.adapters.akka.http
 
 import akka.http.scaladsl.server.Directive0
 import akka.http.scaladsl.server.Directives.{authenticateOAuth2, authorize}
-import csw.auth.Keycloak
-import csw.auth.token.AccessToken
+import csw.auth.core.Keycloak
+import csw.auth.core.token.AccessToken
 
 class SecurityDirectives(authentication: Authentication) {
 

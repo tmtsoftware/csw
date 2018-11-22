@@ -4,7 +4,7 @@ import akka.http.scaladsl.model.headers.{Authorization, OAuth2BearerToken}
 import akka.http.scaladsl.server.Directives.Authenticator
 import akka.http.scaladsl.server.directives.Credentials.Provided
 import csw.auth.adapters.akka.http.{Authentication, SecurityDirectives}
-import csw.auth.token.AccessToken
+import csw.auth.core.token.AccessToken
 import csw.config.api.TokenFactory
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar

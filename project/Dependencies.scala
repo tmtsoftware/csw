@@ -304,11 +304,16 @@ object Dependencies {
     )
   )
 
-  val AuthAccessToken = Def.setting(
+  val AuthAdapterCore = Def.setting(
     Seq(
       Libs.`jwt-play-json`,
       Libs.`config`,
+      Keycloak.`keycloak-core`,
+      Keycloak.`keycloak-adapter-core`,
       Keycloak.`keycloak-authz`,
+      //(legacy dependencies) required*
+      Libs.`jboss-logging`,
+      Libs.httpclient,
       Libs.`scalatest`.value % Test,
       Libs.`mockito-core`    % Test
     )
@@ -320,17 +325,6 @@ object Dependencies {
       Akka.`akka-stream`,
       Libs.`play-json-derived-codecs`.value % Test,
       Libs.`akka-http-play-json`            % Test
-    )
-  )
-
-  val AuthKeyCloakConfig = Def.setting(
-    Seq(
-      Keycloak.`keycloak-adapter-core`,
-      Keycloak.`keycloak-core`,
-      Libs.`config`,
-      //(legacy dependencies) required*
-      Libs.`jboss-logging`,
-      Libs.httpclient
     )
   )
 

@@ -175,7 +175,7 @@ lazy val `csw-config-cli` = project
   .dependsOn(
     `csw-config-client`,
     `csw-location-client`,
-    `native-client-adapter-scala`,
+    `native-client-adapter`,
     `csw-location-server` % "multi-jvm->multi-jvm",
     `csw-config-server`   % "test->test;multi-jvm->test",
     `csw-commons`         % "test->test"
@@ -440,35 +440,28 @@ alarm := {
 lazy val `csw-auth` = project
   .in(file("csw-auth"))
   .aggregate(
-    `native-client-adapter-scala`,
-    `access-token`,
-    `akka-http-adapter`,
-    `keycloak-config`
+    `native-client-adapter`,
+    `auth-core`,
+    `akka-http-adapter`
   )
 
-lazy val `native-client-adapter-scala` = project
-  .in(file("csw-auth/native-client-adapter-scala"))
-  .dependsOn(`access-token`, `keycloak-config`)
+lazy val `auth-core` = project
+  .in(file("csw-auth/auth-core"))
+  .dependsOn(`csw-logging`)
   .settings(
-    libraryDependencies ++= Dependencies.AuthNativeClientAdapter.value
-  )
-
-lazy val `access-token` = project
-  .in(file("csw-auth/access-token"))
-  .dependsOn(`keycloak-config`, `csw-logging`)
-  .settings(
-    libraryDependencies ++= Dependencies.AuthAccessToken.value
+    libraryDependencies ++= Dependencies.AuthAdapterCore.value
   )
 
 lazy val `akka-http-adapter` = project
   .in(file("csw-auth/akka-http-adapter"))
-  .dependsOn(`access-token`)
+  .dependsOn(`auth-core`)
   .settings(
     libraryDependencies ++= Dependencies.AuthAkkaHttpAdapter.value
   )
 
-lazy val `keycloak-config` = project
-  .in(file("csw-auth/keycloak-config"))
+ lazy val `native-client-adapter` = project
+  .in(file("csw-auth/native-client-adapter"))
+  .dependsOn(`auth-core`)
   .settings(
-    libraryDependencies ++= Dependencies.AuthKeyCloakConfig.value
+    libraryDependencies ++= Dependencies.AuthNativeClientAdapter.value
   )
