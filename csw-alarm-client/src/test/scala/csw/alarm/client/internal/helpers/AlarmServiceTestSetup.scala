@@ -52,10 +52,9 @@ class AlarmServiceTestSetup
 
   import csw.alarm.client.internal.AlarmCodec._
 
-  val connsFactory: RedisConnectionsFactory                      = new RedisConnectionsFactory(resolver, alarmServer, new RomaineFactory(redisClient))
-  val testMetadataApi: RedisAsyncApi[MetadataKey, AlarmMetadata] = connsFactory.asyncApi[MetadataKey, AlarmMetadata]
-  val testSeverityApi: RedisAsyncApi[SeverityKey, FullAlarmSeverity] =
-    connsFactory.asyncApi[SeverityKey, FullAlarmSeverity]
+  val connsFactory: RedisConnectionsFactory                          = new RedisConnectionsFactory(resolver, alarmServer, new RomaineFactory(redisClient))
+  val testMetadataApi: RedisAsyncApi[MetadataKey, AlarmMetadata]     = connsFactory.asyncApi[MetadataKey, AlarmMetadata]
+  val testSeverityApi: RedisAsyncApi[SeverityKey, FullAlarmSeverity] = connsFactory.asyncApi[SeverityKey, FullAlarmSeverity]
 
   override protected def afterAll(): Unit = {
     redisClient.shutdown()

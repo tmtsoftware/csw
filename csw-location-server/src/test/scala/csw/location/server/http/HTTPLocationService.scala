@@ -1,14 +1,11 @@
 package csw.location.server.http
 
 import akka.actor.CoordinatedShutdown.UnknownReason
-import akka.http.scaladsl.Http
 import csw.location.server.commons.TestFutureExtension.RichFuture
 import csw.location.server.internal.ServerWiring
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuiteLike, Matchers}
-
-import scala.util.{Failure, Success, Try}
 
 trait HTTPLocationService
     extends FunSuiteLike
@@ -18,32 +15,21 @@ trait HTTPLocationService
     with ScalaFutures
     with MockitoSugar {
 
-  private var maybeWiring: Option[ServerWiring]        = None
-  private var maybeBinding: Option[Http.ServerBinding] = None
+  private val locationPort                 = 3553
+  var locationWiring: Option[ServerWiring] = None
 
-  def start(clusterPort: Option[Int], httpPort: Option[Int] = None): Unit =
-    Try {
-      val adminWiring = ServerWiring.make(clusterPort, httpPort)
-      (adminWiring, adminWiring.locationHttpService.start().futureValue)
-    } match {
-      case Success((adminWiring, serverBinding)) ⇒ maybeWiring = Some(adminWiring); maybeBinding = Some(serverBinding)
-      case Failure(_)                            ⇒
-    }
+  def start(clusterPort: Option[Int] = Some(locationPort), httpPort: Option[Int] = None): Unit = {
+    locationWiring = Some(ServerWiring.make(clusterPort, httpPort))
+    locationWiring.map(_.locationHttpService.start().futureValue)
+  }
 
-  override def afterAll(): Unit = maybeWiring.map(_.actorRuntime.shutdown(UnknownReason).await)
-
-  start(Some(3553))
-}
-
-class JHTTPLocationService {
-
-  private val adminWiring = ServerWiring.make(Some(3553))
-  adminWiring.locationHttpService.start().await
-
-  def afterAll(): Unit = adminWiring.actorRuntime.shutdown(UnknownReason).await
+  override def beforeAll(): Unit = start()
+  override def afterAll(): Unit  = locationWiring.map(_.actorRuntime.shutdown(UnknownReason).await)
 
 }
+
+class JHTTPLocationService extends HTTPLocationService
 
 class HTTPLocationServiceOnPorts(clusterPort: Int, httpPort: Int) extends HTTPLocationService {
-  start(Some(clusterPort), Some(httpPort))
+  override def beforeAll(): Unit = start(Some(clusterPort), Some(httpPort))
 }

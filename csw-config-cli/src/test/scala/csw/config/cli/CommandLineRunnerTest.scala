@@ -24,8 +24,6 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
   private val serverMat: ActorMaterializer = ActorMaterializer()(serverSystem)
   private val serverLocationService        = HttpLocationServiceFactory.makeLocalClient(serverSystem, serverMat)
   private val serverWiring                 = ServerWiring.make(serverSystem, serverLocationService)
-  private val httpService                  = serverWiring.httpService
-  httpService.registeredLazyBinding.await
 
   private val clientSystem: ActorSystem    = ActorSystem("config-cli")
   private val clientMat: ActorMaterializer = ActorMaterializer()(clientSystem)
@@ -40,14 +38,19 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
 
   val argsParser = new ArgsParser("csw-config-cli")
 
-  override def beforeAll(): Unit  = testFileUtils.deleteServerFiles()
+  override def beforeAll(): Unit = {
+    super.beforeAll()
+    testFileUtils.deleteServerFiles()
+    serverWiring.httpService.registeredLazyBinding.await
+  }
+
   override def beforeEach(): Unit = serverWiring.svnRepo.initSvnRepo()
   override def afterEach(): Unit = {
     testFileUtils.deleteServerFiles()
     if (Files.exists(Paths.get(outputFilePath))) Files.delete(Paths.get(outputFilePath))
   }
   override def afterAll(): Unit = {
-    httpService.shutdown(UnknownReason).await
+    serverWiring.httpService.shutdown(UnknownReason).await
     clientWiring.actorRuntime.shutdown(UnknownReason).await
     serverWiring.actorRuntime.shutdown(UnknownReason).await
     Files.delete(Paths.get(inputFilePath))

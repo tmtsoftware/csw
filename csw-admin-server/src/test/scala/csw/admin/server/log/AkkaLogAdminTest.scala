@@ -61,7 +61,8 @@ class AkkaLogAdminTest extends AdminLogTestSuite with HTTPLocationService with H
 
   private var loggingSystem: LoggingSystem = _
 
-  override protected def beforeAll(): Unit = {
+  override def beforeAll(): Unit = {
+    super.beforeAll()
     loggingSystem = LoggingSystemFactory.start("logging", "version", hostName, adminWiring.actorSystem)
     loggingSystem.setAppenders(List(testAppender))
 

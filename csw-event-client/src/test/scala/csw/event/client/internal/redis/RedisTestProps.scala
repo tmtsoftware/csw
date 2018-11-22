@@ -87,7 +87,7 @@ object RedisTestProps extends EmbeddedRedis {
   ): RedisTestProps = {
 
     val locationServer = new HTTPLocationServiceOnPorts(clusterPort, httpLocationServicePort)
-
+    locationServer.beforeAll()
     val (locationService, system) = createInfra(sentinelPort, httpLocationServicePort)
     val redisClient: RedisClient  = RedisClient.create()
     redisClient.setOptions(clientOptions)

@@ -31,15 +31,16 @@ class HttpAndTcpLogAdminTest extends AdminLogTestSuite with HttpSupport with HTT
   implicit val typedSystem: ActorSystem[Nothing] = actorSystem.toTyped
   implicit val testKitSettings: TestKitSettings  = TestKitSettings(typedSystem)
 
-  private val serverWiring = ServerWiring.make(adminWiring.locationService)
-  serverWiring.svnRepo.initSvnRepo()
-  Await.result(serverWiring.httpService.registeredLazyBinding, 20.seconds)
-
+  private val serverWiring  = ServerWiring.make(adminWiring.locationService)
   private val testFileUtils = new TestFileUtils(new Settings(ConfigFactory.load()))
 
   private var loggingSystem: LoggingSystem = _
 
   override def beforeAll(): Unit = {
+    super.beforeAll()
+    serverWiring.svnRepo.initSvnRepo()
+    Await.result(serverWiring.httpService.registeredLazyBinding, 20.seconds)
+
     loggingSystem = LoggingSystemFactory.start("logging", "version", hostName, adminWiring.actorSystem)
     loggingSystem.setAppenders(List(testAppender))
 

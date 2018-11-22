@@ -28,7 +28,7 @@ import static csw.alarm.api.javadsl.JAlarmSeverity.Indeterminate;
 // DEOPSCSW-481: Component Developer API available to all CSW components
 public class JAlarmServiceFactoryTest extends JUnitSuite {
     // start location http server
-    private static JHTTPLocationService jhttpLocationService = new JHTTPLocationService();
+    private static JHTTPLocationService jHttpLocationService = new JHTTPLocationService();
 
     private static AlarmServiceTestSetup testSetup = new AlarmServiceTestSetup();
     private AlarmServiceFactory alarmServiceFactory = testSetup.alarmServiceFactory();
@@ -39,6 +39,7 @@ public class JAlarmServiceFactoryTest extends JUnitSuite {
 
     @BeforeClass
     public static void setup() throws ExecutionException, InterruptedException {
+        jHttpLocationService.beforeAll();
         locationService.register(new TcpRegistration(AlarmServiceConnection.value(), testSetup.sentinelPort())).get();
     }
 
@@ -51,7 +52,7 @@ public class JAlarmServiceFactoryTest extends JUnitSuite {
     @AfterClass
     public static void teardown() throws Exception {
         Await.result(seedSystem.terminate(), FiniteDuration.create(5, TimeUnit.SECONDS));
-        jhttpLocationService.afterAll();
+        jHttpLocationService.afterAll();
         testSetup.afterAll();
     }
 

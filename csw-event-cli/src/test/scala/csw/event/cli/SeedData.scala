@@ -9,7 +9,6 @@ import csw.event.cli.wiring.Wiring
 import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.event.client.internal.commons.EventServiceConnection
 import csw.location.api.models.TcpRegistration
-import csw.location.api.scaladsl.LocationService
 import csw.location.server.http.HTTPLocationService
 import csw.params.core.formats.JsonSupport
 import csw.params.events._
@@ -27,18 +26,26 @@ trait SeedData extends HTTPLocationService with Matchers with BeforeAndAfterEach
 
   val argsParser                        = new ArgsParser("csw-event-cli")
   val logBuffer: mutable.Buffer[String] = mutable.Buffer.empty[String]
-
-  val (localHttpClient: LocationService, redisSentinel: RedisSentinel, redisServer: RedisServer) =
-    withSentinel(masterId = ConfigFactory.load().getString("csw-event.redis.masterId")) { (sentinelPort, _) ⇒
-      locationService
-        .register(TcpRegistration(EventServiceConnection.value, sentinelPort))
-        .await
-      locationService
-    }
+  var redisSentinel: RedisSentinel      = _
+  var redisServer: RedisServer          = _
+  var event1: SystemEvent               = _
+  var event2: ObserveEvent              = _
 
   private def printLine(msg: Any): Unit = logBuffer += msg.toString
 
-  val (event1: SystemEvent, event2: ObserveEvent) = seedEvents()
+  override def beforeAll(): Unit = {
+    super.beforeAll()
+    val (_, sentinel: RedisSentinel, server: RedisServer) =
+      withSentinel(masterId = ConfigFactory.load().getString("csw-event.redis.masterId")) { (sentinelPort, _) ⇒
+        locationService.register(TcpRegistration(EventServiceConnection.value, sentinelPort)).await
+      }
+    redisSentinel = sentinel
+    redisServer = server
+
+    val events = seedEvents()
+    event1 = events._1
+    event2 = events._2
+  }
 
   override protected def afterEach(): Unit = {
     super.afterEach()

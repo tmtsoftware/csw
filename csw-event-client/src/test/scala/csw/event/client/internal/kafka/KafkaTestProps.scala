@@ -76,7 +76,7 @@ object KafkaTestProps {
   ): KafkaTestProps = {
 
     val locationServer = new HTTPLocationServiceOnPorts(clusterPort, httpLocationServicePort)
-
+    locationServer.beforeAll()
     val (locationService, system) = createInfra(serverPort, httpLocationServicePort)
     new KafkaTestProps(serverPort, locationService, locationServer, additionalBrokerProps)(system)
   }

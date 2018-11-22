@@ -14,9 +14,10 @@ class AlarmServiceFactoryTest extends AlarmServiceTestSetup with HTTPLocationSer
 
   private val locationService = HttpLocationServiceFactory.makeLocalClient
 
-  locationService
-    .register(TcpRegistration(AlarmServiceConnection.value, sentinelPort))
-    .await
+  override def beforeAll(): Unit = {
+    super.beforeAll()
+    locationService.register(TcpRegistration(AlarmServiceConnection.value, sentinelPort)).await
+  }
 
   override def beforeEach(): Unit = {
     val validAlarmsConfig = ConfigFactory.parseResources("test-alarms/valid-alarms.conf")

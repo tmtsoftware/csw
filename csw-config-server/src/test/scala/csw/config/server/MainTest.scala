@@ -25,7 +25,7 @@ class MainTest extends HTTPLocationService {
 
   private val testFileUtils = new TestFileUtils(new Settings(ConfigFactory.load()))
 
-  override def beforeAll(): Unit = testFileUtils.deleteServerFiles()
+  override def beforeAll(): Unit = super.beforeAll(); testFileUtils.deleteServerFiles()
 
   override def afterEach(): Unit = testFileUtils.deleteServerFiles()
 

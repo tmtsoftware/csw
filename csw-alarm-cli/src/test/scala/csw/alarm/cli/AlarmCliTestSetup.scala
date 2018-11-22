@@ -8,23 +8,15 @@ import csw.alarm.cli.wiring.Wiring
 import csw.alarm.client.internal.commons.AlarmServiceConnection
 import csw.commons.redis.EmbeddedRedis
 import csw.location.api.models.TcpRegistration
-import csw.location.api.scaladsl.LocationService
 import csw.location.server.http.HTTPLocationService
 import csw.services.BuildInfo
-import org.scalatest.concurrent.{Eventually, ScalaFutures}
+import org.scalatest.concurrent.Eventually
 import org.scalatest.time.SpanSugar.convertFloatToGrainOfTime
-import org.scalatest.{BeforeAndAfterEach, Matchers}
 import redis.embedded.{RedisSentinel, RedisServer}
 
 import scala.collection.mutable
 
-trait AlarmCliTestSetup
-    extends HTTPLocationService
-    with Matchers
-    with BeforeAndAfterEach
-    with EmbeddedRedis
-    with ScalaFutures
-    with Eventually {
+trait AlarmCliTestSetup extends HTTPLocationService with EmbeddedRedis with Eventually {
 
   override implicit val patienceConfig: PatienceConfig = PatienceConfig(5.seconds, 10.millis)
 
@@ -34,15 +26,22 @@ trait AlarmCliTestSetup
   val argsParser                        = new ArgsParser(BuildInfo.name)
   val logBuffer: mutable.Buffer[String] = mutable.Buffer.empty[String]
 
-  val (localHttpClient: LocationService, redisSentinel: RedisSentinel, redisServer: RedisServer) =
-    withSentinel(masterId = ConfigFactory.load().getString("csw-alarm.redis.masterId")) { (sentinelPort, _) ⇒
-      locationService
-        .register(TcpRegistration(AlarmServiceConnection.value, sentinelPort))
-        .await
-      locationService
-    }
+  var redisSentinel: RedisSentinel = _
+  var redisServer: RedisServer     = _
 
   private def printLine(msg: Any): Unit = logBuffer += msg.toString
+
+  override def beforeAll(): Unit = {
+    super.beforeAll()
+    val (_, sentinel: RedisSentinel, server: RedisServer) =
+      withSentinel(masterId = ConfigFactory.load().getString("csw-alarm.redis.masterId")) { (sentinelPort, _) ⇒
+        locationService
+          .register(TcpRegistration(AlarmServiceConnection.value, sentinelPort))
+          .futureValue
+      }
+    redisSentinel = sentinel
+    redisServer = server
+  }
 
   override protected def afterEach(): Unit = {
     super.afterEach()

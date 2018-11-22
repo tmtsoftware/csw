@@ -2,22 +2,21 @@ package csw.event.cli
 
 import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
-import csw.params.events._
+import csw.event.cli.IterableExtensions.RichStringIterable
+import csw.event.client.helpers.TestFutureExt.RichFuture
 import csw.params.core.formats.JsonSupport
 import csw.params.core.generics.KeyType.{IntKey, StringKey}
 import csw.params.core.models.Id
 import csw.params.core.models.Units.meter
-import csw.event.cli.IterableExtensions.RichStringIterable
-import csw.event.client.helpers.TestFutureExt.RichFuture
+import csw.params.events._
 import org.scalatest.concurrent.Eventually
 import org.scalatest.time.SpanSugar.convertDoubleToGrainOfTime
-import org.scalatest.{FunSuite, Matchers}
 import play.api.libs.json._
 
 import scala.collection.{immutable, mutable}
 import scala.io.Source
 
-class CommandLineRunnerTest extends FunSuite with Matchers with SeedData with Eventually {
+class CommandLineRunnerTest extends SeedData with Eventually {
 
   def events(name: EventName): immutable.Seq[Event] =
     for (i ← 1 to 10) yield event1.copy(eventName = name, eventId = Id(i.toString))

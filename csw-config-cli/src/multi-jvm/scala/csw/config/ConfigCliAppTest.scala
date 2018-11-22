@@ -14,7 +14,7 @@ import csw.config.server.commons.TestFileUtils
 import csw.config.server.{ServerWiring, Settings}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.helpers.LSNodeSpec
-import csw.location.server.http.HTTPLocationService
+import csw.location.server.http.MultiNodeHTTPLocationService
 import org.scalatest.FunSuiteLike
 
 class ConfigCliAppTestMultiJvmNode1 extends ConfigCliAppTest(0)
@@ -24,7 +24,7 @@ class ConfigCliAppTestMultiJvmNode3 extends ConfigCliAppTest(0)
 // DEOPSCSW-43: Access Configuration service from any CSW component
 class ConfigCliAppTest(ignore: Int)
     extends LSNodeSpec(config = new TwoClientsAndServer, mode = "http")
-    with HTTPLocationService
+    with MultiNodeHTTPLocationService
     with FunSuiteLike {
 
   import config._

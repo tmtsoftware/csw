@@ -83,6 +83,7 @@ public class JCommandIntegrationTest extends JUnitSuite {
     @BeforeClass
     public static void setup() throws Exception {
         jHttpLocationService = new JHTTPLocationService();
+        jHttpLocationService.beforeAll();
 
         locationService = JHttpLocationServiceFactory.makeLocalClient(hcdActorSystem, mat);
         hcdLocation = getLocation();
