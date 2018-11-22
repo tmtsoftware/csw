@@ -3,9 +3,10 @@ import csw.time.api.models.CswInstant.{TaiInstant, UtcInstant}
 
 trait TimeService {
 
-  def UtcTime(): UtcInstant
+  def utcTime(): UtcInstant
 
-  def TaiTime(): TaiInstant
+  def taiTime(): TaiInstant
 
-  def TaiOffset(): Int
+  def taiOffset(): Int
+
 }

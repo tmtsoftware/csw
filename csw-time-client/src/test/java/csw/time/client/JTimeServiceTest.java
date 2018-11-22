@@ -19,7 +19,7 @@ public class JTimeServiceTest {
     public void shouldGetUTCTime(){
         TimeService timeService = new TimeServiceImpl();
 
-        UtcInstant utcInstant = timeService.UtcTime();
+        UtcInstant utcInstant = timeService.utcTime();
         Instant fixedInstant = Instant.now();
 
         long expectedMillis = fixedInstant.toEpochMilli();
@@ -34,7 +34,7 @@ public class JTimeServiceTest {
         TimeService timeService = new TimeServiceImpl();
 
         int taiOffset = 37;
-        TaiInstant taiInstant = timeService.TaiTime();
+        TaiInstant taiInstant = timeService.taiTime();
         Instant TaiInstant = Instant.now().plusSeconds(taiOffset);
 
         long expectedMillis = TaiInstant.toEpochMilli();
@@ -49,7 +49,7 @@ public class JTimeServiceTest {
 
         int expectedOffset = 37;
 
-        int offset = timeService.TaiOffset();
+        int offset = timeService.taiOffset();
 
         assertEquals(expectedOffset, offset);
     }
