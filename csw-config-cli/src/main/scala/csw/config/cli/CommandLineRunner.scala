@@ -21,8 +21,14 @@ class CommandLineRunner(
 
   import actorRuntime._
 
-  def login(): Unit  = nativeAuthAdapter.login()
-  def logout(): Unit = nativeAuthAdapter.logout()
+  def login(): Unit = {
+    nativeAuthAdapter.login()
+    printLine(s"SUCCESS : Logged in successfully")
+  }
+  def logout(): Unit = {
+    nativeAuthAdapter.logout()
+    printLine(s"SUCCESS : Logged out successfully")
+  }
 
   //adminApi
   def create(options: Options): ConfigId = {
