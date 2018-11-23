@@ -15,6 +15,7 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 // DEOPSCSW-80: HTTP based access for configuration file
+// DEOPSCSW-576: Auth token for Configuration service
 class ConfigServiceRouteTest
     extends FunSuite
     with ScalatestRouteTest
@@ -592,6 +593,7 @@ class ConfigServiceRouteTest
     }
   }
 
+  // DEOPSCSW-576: Auth token for Configuration service
   /** Auth Based routes **/
   /* ================ Unauthorized code ================*/
   test("create - Unauthorized code") {

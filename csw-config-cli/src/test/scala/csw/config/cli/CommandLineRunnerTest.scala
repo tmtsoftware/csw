@@ -21,6 +21,7 @@ import org.scalatest.{BeforeAndAfterEach, Matchers}
 
 // DEOPSCSW-112: Command line interface client for Configuration service
 // DEOPSCSW-43: Access Configuration service from any CSW component
+// DEOPSCSW-576: Auth token for Configuration service
 class CommandLineRunnerTest extends HTTPLocationService with Matchers with BeforeAndAfterEach with MockedAuthentication {
 
   private val clientSystem: ActorSystem       = ActorSystem("config-cli")
@@ -251,11 +252,13 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
     actualMetadata.toString should not be empty
   }
 
+  // DEOPSCSW-576: Auth token for Configuration service
   test("login") {
     commandLineRunner.login()
     verify(nativeAuthAdapter).login()
   }
 
+  // DEOPSCSW-576: Auth token for Configuration service
   test("logout") {
     commandLineRunner.logout()
     verify(nativeAuthAdapter).logout()
