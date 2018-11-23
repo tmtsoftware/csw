@@ -21,33 +21,28 @@ case class AccessToken(
     scope: Option[String] = None,
     //auth
     realm_access: Option[Access] = None,
-    resource_access: Option[Map[String, Access]] = None,
+    resource_access: Map[String, Access] = Map.empty,
     authorization: Option[Authorization] = None
 ) {
   def hasPermission(scope: String, resource: String): Boolean =
     this.authorization match {
-      case Some(Authorization(Some(perms))) ⇒ perms.exists(p ⇒ p.rsname == resource && p.scopes.exists(_.contains(scope)))
-      case _                                ⇒ false
+      case Some(Authorization(perms)) ⇒ perms.exists(p ⇒ p.rsname == resource && p.scopes.exists(_.contains(scope)))
+      case _                          ⇒ false
     }
 
   def hasResourceRole(role: String): Boolean = {
     val clientName: String = Keycloak.deployment.getResourceName
-    val maybeRoles = for {
-      resourceAccesses ← this.resource_access
-      resourceAccess   ← resourceAccesses.get(clientName)
-      roles            ← resourceAccess.roles
-    } yield roles
 
-    maybeRoles.getOrElse(Set.empty).contains(role)
+    this.resource_access.get(clientName) match {
+      case Some(access) => access.roles.contains(role)
+      case _            => false
+    }
   }
 
   def hasRealmRole(role: String): Boolean =
-    this.realm_access
-      .flatMap(_.roles)
-      .getOrElse(Set.empty)
-      .contains(role)
+    this.realm_access.exists(_.roles.contains(role))
 }
 
 object AccessToken {
-  implicit val accessTokenFormat: OFormat[AccessToken] = Json.format[AccessToken]
+  implicit val accessTokenFormat: OFormat[AccessToken] = Json.using[Json.WithDefaultValues].format
 }
