@@ -23,17 +23,24 @@ object FileNotFound {
 /**
  * An Exception representing failed validation of provided input
  *
- * @param message exception message containing invalid pattern
+ * @param msg exception message containing invalid pattern
  */
-case class InvalidInput(message: String) extends RuntimeException(message)
+case class InvalidInput(msg: String) extends RuntimeException(msg)
+
+/**
+ * An Exception representing Unauthenticated user performing an action
+ */
+case object NotAllowed extends RuntimeException("Not allowed, make sure you have correct role assigned to perform this action.")
+
+/**
+ * An Exception representing Unauthorized user performing an action
+ */
+case object Unauthorized extends RuntimeException("Unauthorized, You must login before performing this action.")
 
 /**
  * An Exception representing undefined response content
  */
-case object EmptyResponse
-    extends RuntimeException(
-      "response must have content-length"
-    )
+case object EmptyResponse extends RuntimeException("response must have content-length")
 
 /**
  * LocalFileNotFound exception is thrown while starting the container or host app if a local config file used to spawn the

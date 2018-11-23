@@ -8,6 +8,6 @@ class CliTokenFactory(nativeAuthAdapter: NativeAppAuthAdapter) extends TokenFact
   override def getToken: String =
     nativeAuthAdapter
       .getAccessTokenString()
-      .getOrElse(throw new RuntimeException("Missing access token, login before using this API"))
+      .getOrElse(throw new RuntimeException("Missing access token, You must login before executing this command."))
 
 }

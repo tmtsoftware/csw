@@ -26,6 +26,7 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-alarm-api`,
   `csw-alarm-client`,
   `csw-alarm-cli`,
+  `csw-auth`,
   `csw-time-api`,
   `csw-time-client`,
   `csw-database-api`,

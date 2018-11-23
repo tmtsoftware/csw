@@ -11,7 +11,7 @@ import akka.http.scaladsl.unmarshalling.Unmarshal
 import csw.commons.http.ErrorResponse
 import csw.config.api.TokenFactory
 import csw.config.api.commons.BinaryUtils
-import csw.config.api.exceptions.{EmptyResponse, FileAlreadyExists, FileNotFound, InvalidInput}
+import csw.config.api.exceptions._
 import csw.config.api.internal.ConfigStreamExts.RichSource
 import csw.config.api.internal.JsonSupport
 import csw.config.api.models._
@@ -266,18 +266,11 @@ private[config] class ConfigClient(
     }
 
     val defaultHandler: PartialFunction[StatusCode, Future[T]] = {
-      case StatusCodes.BadRequest ⇒
-        contentF.map { errorResponse ⇒
-          logAndThrow(InvalidInput(errorResponse.error.message))
-        }
-      case StatusCodes.NotFound ⇒
-        contentF.map { errorResponse ⇒
-          logAndThrow(FileNotFound(errorResponse.error.message))
-        }
-      case _ ⇒
-        contentF.map { errorResponse ⇒
-          logAndThrow(new RuntimeException(errorResponse.error.message))
-        }
+      case StatusCodes.BadRequest   ⇒ contentF.map(res ⇒ logAndThrow(InvalidInput(res.error.message)))
+      case StatusCodes.NotFound     ⇒ contentF.map(res ⇒ logAndThrow(FileNotFound(res.error.message)))
+      case StatusCodes.Unauthorized ⇒ contentF.map(_ ⇒ logAndThrow(Unauthorized))
+      case StatusCodes.Forbidden    ⇒ contentF.map(_ ⇒ logAndThrow(NotAllowed))
+      case _                        ⇒ contentF.map(res ⇒ logAndThrow(new RuntimeException(res.error.message)))
     }
 
     val handler = pf.orElse(defaultHandler)
