@@ -15,10 +15,8 @@ object ExampleServer extends HttpApp with App with GenericUnmarshallers with Pla
 
   override protected def routes: Route = path("config") {
     get {
-      withUser { user =>
-        permission("read", "config") {
-          complete(user.preferredUsername)
-        }
+      permissionWithUser("read", "config") { user ⇒
+        complete(user.preferredUsername)
       }
     } ~ put {
       permission("write", "config") {
