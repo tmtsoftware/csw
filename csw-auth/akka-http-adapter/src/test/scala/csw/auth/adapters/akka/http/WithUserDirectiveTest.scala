@@ -15,14 +15,6 @@ class WithUserDirectiveTest extends FunSuite with MockitoSugar with Directives w
     val securityDirectives             = new SecurityDirectives(authentication)
     import securityDirectives._
 
-    val route: Route = {
-      get {
-        permissionWithUser("read") { user =>
-          complete(user.preferredUsername)
-        }
-      }
-    }
-
     val invalidTokenStr    = "invalid"
     val invalidTokenHeader = Authorization(OAuth2BearerToken(invalidTokenStr))
 
@@ -32,6 +24,14 @@ class WithUserDirectiveTest extends FunSuite with MockitoSugar with Directives w
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
+
+    val route: Route = secure { implicit at ⇒
+      permission("sd") {
+        user { user: User ⇒
+          complete(user.preferredUsername)
+        }
+      }
+    }
 
     Get("/").addHeader(invalidTokenHeader) ~> route ~> check {
       rejection shouldBe a[AuthenticationFailedRejection]

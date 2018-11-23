@@ -2,8 +2,9 @@ package csw.config.server.http
 
 import akka.Done
 import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.{Directive0, Route}
+import akka.http.scaladsl.server.Route
 import csw.auth.adapters.akka.http.SecurityDirectives
+import csw.auth.core.token.AccessToken
 import csw.config.api.scaladsl.ConfigService
 import csw.config.server.ActorRuntime
 
@@ -22,8 +23,9 @@ class ConfigServiceRoute(
 ) extends HttpSupport {
 
   import actorRuntime._
+  import securityDirectives._
 
-  private val adminProtected: Directive0 = securityDirectives.resourceRole("admin")
+  private def adminProtected(f: Route)(implicit accessToken: AccessToken) = resourceRole("admin")(f)
 
   def route: Route = routeLogger {
     handleExceptions(configHandlers.jsonExceptionHandler) {
@@ -46,22 +48,34 @@ class ConfigServiceRoute(
               }
             }
           } ~
-          (post & adminProtected) { // create file - http://{{hostname}}:{{port}}/config/{{path}}?comment="Sample commit message"
-            (configDataEntity & annexParam & commentParam) { (configData, annex, comment) ⇒
-              complete(
-                StatusCodes.Created -> configService
-                  .create(filePath, configData, annex, comment)
-              )
+          post {
+            secure { implicit at ⇒
+              adminProtected { // create file - http://{{hostname}}:{{port}}/config/{{path}}?comment="Sample commit message"
+                (configDataEntity & annexParam & commentParam) { (configData, annex, comment) ⇒
+                  complete(
+                    StatusCodes.Created -> configService
+                      .create(filePath, configData, annex, comment)
+                  )
+                }
+              }
             }
           } ~
-          (put & adminProtected) { // update file - http://{{hostname}}:{{port}}/config/{{path}}?comment="Sample update commit message"
-            (configDataEntity & commentParam) { (configData, comment) ⇒
-              complete(configService.update(filePath, configData, comment))
+          put {
+            secure { implicit at ⇒
+              adminProtected { // update file - http://{{hostname}}:{{port}}/config/{{path}}?comment="Sample update commit message"
+                (configDataEntity & commentParam) { (configData, comment) ⇒
+                  complete(configService.update(filePath, configData, comment))
+                }
+              }
             }
           } ~
-          (delete & adminProtected) { // delete file - http://{{hostname}}:{{port}}/config/{{path}}?comment="deleting config file"
-            commentParam { comment ⇒
-              complete(configService.delete(filePath, comment).map(_ ⇒ Done))
+          delete {
+            secure { implicit at ⇒
+              adminProtected { // delete file - http://{{hostname}}:{{port}}/config/{{path}}?comment="deleting config file"
+                commentParam { comment ⇒
+                  complete(configService.delete(filePath, comment).map(_ ⇒ Done))
+                }
+              }
             }
           }
 
@@ -74,10 +88,15 @@ class ConfigServiceRoute(
           }
         } ~
         prefix("active-version") { filePath ⇒
-          (put & adminProtected) { // set the active version - http://{{hostname}}:{{port}}/active-version/{{path}}?id=3&comment="Setting activer version"
-            (idParam & commentParam) {
-              case (Some(configId), comment) ⇒ complete(configService.setActiveVersion(filePath, configId, comment).map(_ ⇒ Done))
-              case (_, comment)              ⇒ complete(configService.resetActiveVersion(filePath, comment).map(_ ⇒ Done))
+          put {
+            secure { implicit at ⇒
+              adminProtected { // set the active version - http://{{hostname}}:{{port}}/active-version/{{path}}?id=3&comment="Setting activer version"
+                (idParam & commentParam) {
+                  case (Some(configId), comment) ⇒
+                    complete(configService.setActiveVersion(filePath, configId, comment).map(_ ⇒ Done))
+                  case (_, comment) ⇒ complete(configService.resetActiveVersion(filePath, comment).map(_ ⇒ Done))
+                }
+              }
             }
           } ~
           (get & rejectEmptyResponse) { // fetch the active version - http://{{hostname}}:{{port}}/active-version/{{path}}

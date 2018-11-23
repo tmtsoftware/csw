@@ -17,14 +17,6 @@ class CustomPolicyDirectiveTest extends FunSuite with MockitoSugar with Directiv
     val securityDirectives             = new SecurityDirectives(authentication)
     import securityDirectives._
 
-    val route: Route = {
-      get {
-        customPolicy(at => at.given_name.contains("John")) {
-          complete("OK")
-        }
-      }
-    }
-
     val invalidTokenStr    = "invalid"
     val invalidTokenHeader = Authorization(OAuth2BearerToken(invalidTokenStr))
 
@@ -35,7 +27,16 @@ class CustomPolicyDirectiveTest extends FunSuite with MockitoSugar with Directiv
 
     when(authentication.authenticator).thenReturn(authenticator)
 
-    Get("/").addHeader(invalidTokenHeader) ~> route ~> check {
+    val route: Route =
+      secure { implicit at ⇒
+        get {
+          customPolicy(at => at.given_name.contains("John")) {
+            complete("OK")
+          }
+        }
+      }
+
+    Get("/test").addHeader(invalidTokenHeader) ~> route ~> check {
       rejection shouldBe a[AuthenticationFailedRejection]
     }
   }
@@ -45,17 +46,17 @@ class CustomPolicyDirectiveTest extends FunSuite with MockitoSugar with Directiv
     val securityDirectives             = new SecurityDirectives(authentication)
     import securityDirectives._
 
-    val route: Route = {
+    val authenticator: Authenticator[AccessToken] = _ ⇒ None
+
+    when(authentication.authenticator).thenReturn(authenticator)
+
+    val route: Route = secure { implicit at ⇒
       get {
         customPolicy(_ => false) {
           complete("OK")
         }
       }
     }
-
-    val authenticator: Authenticator[AccessToken] = _ ⇒ None
-
-    when(authentication.authenticator).thenReturn(authenticator)
 
     Get("/") ~> route ~> check {
       rejection shouldBe a[AuthenticationFailedRejection]
@@ -67,14 +68,6 @@ class CustomPolicyDirectiveTest extends FunSuite with MockitoSugar with Directiv
     val securityDirectives             = new SecurityDirectives(authentication)
     import securityDirectives._
 
-    val route: Route = {
-      get {
-        customPolicy(_ => false) {
-          complete("OK")
-        }
-      }
-    }
-
     val validTokenWithPolicyViolationStr    = "validTokenWithPolicyViolation"
     val validTokenWithPolicyViolationHeader = Authorization(OAuth2BearerToken(validTokenWithPolicyViolationStr))
 
@@ -86,6 +79,14 @@ class CustomPolicyDirectiveTest extends FunSuite with MockitoSugar with Directiv
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
+
+    val route: Route = secure { implicit at ⇒
+      get {
+        customPolicy(_ => false) {
+          complete("OK")
+        }
+      }
+    }
 
     Get("/").addHeader(validTokenWithPolicyViolationHeader) ~> route ~> check {
       rejection shouldBe a[AuthorizationFailedRejection]
@@ -97,14 +98,6 @@ class CustomPolicyDirectiveTest extends FunSuite with MockitoSugar with Directiv
     val securityDirectives             = new SecurityDirectives(authentication)
     import securityDirectives._
 
-    val route: Route = {
-      get {
-        customPolicy(_ => true) {
-          complete("OK")
-        }
-      }
-    }
-
     val validTokenWithPolicyMatchStr    = "validTokenWithPolicyMatch"
     val validTokenWithPolicyMatchHeader = Authorization(OAuth2BearerToken(validTokenWithPolicyMatchStr))
 
@@ -117,6 +110,14 @@ class CustomPolicyDirectiveTest extends FunSuite with MockitoSugar with Directiv
 
     when(authentication.authenticator).thenReturn(authenticator)
 
+    val route: Route = secure { implicit at ⇒
+      get {
+        customPolicy(_ => true) {
+          complete("OK")
+        }
+      }
+    }
+
     Get("/").addHeader(validTokenWithPolicyMatchHeader) ~> route ~> check {
       status shouldBe StatusCodes.OK
     }
@@ -126,14 +127,6 @@ class CustomPolicyDirectiveTest extends FunSuite with MockitoSugar with Directiv
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication)
     import securityDirectives._
-
-    val route: Route = {
-      get {
-        customPolicy(false) {
-          complete("OK")
-        }
-      }
-    }
 
     val validTokenWithPolicyViolationStr    = "validTokenWithPolicyViolation"
     val validTokenWithPolicyViolationHeader = Authorization(OAuth2BearerToken(validTokenWithPolicyViolationStr))
@@ -147,6 +140,14 @@ class CustomPolicyDirectiveTest extends FunSuite with MockitoSugar with Directiv
 
     when(authentication.authenticator).thenReturn(authenticator)
 
+    val route: Route = secure { implicit at ⇒
+      get {
+        customPolicy(false) {
+          complete("OK")
+        }
+      }
+    }
+
     Get("/").addHeader(validTokenWithPolicyViolationHeader) ~> route ~> check {
       rejection shouldBe a[AuthorizationFailedRejection]
     }
@@ -156,14 +157,6 @@ class CustomPolicyDirectiveTest extends FunSuite with MockitoSugar with Directiv
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication)
     import securityDirectives._
-
-    val route: Route = {
-      get {
-        customPolicy(true) {
-          complete("OK")
-        }
-      }
-    }
 
     val validTokenWithPolicyMatchStr    = "validTokenWithPolicyMatch"
     val validTokenWithPolicyMatchHeader = Authorization(OAuth2BearerToken(validTokenWithPolicyMatchStr))
@@ -176,6 +169,14 @@ class CustomPolicyDirectiveTest extends FunSuite with MockitoSugar with Directiv
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
+
+    val route: Route = secure { implicit at ⇒
+      get {
+        customPolicy(policy = true) {
+          complete("OK")
+        }
+      }
+    }
 
     Get("/").addHeader(validTokenWithPolicyMatchHeader) ~> route ~> check {
       status shouldBe StatusCodes.OK

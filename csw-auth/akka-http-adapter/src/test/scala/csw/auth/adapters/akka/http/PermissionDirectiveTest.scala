@@ -17,14 +17,6 @@ class PermissionDirectiveTest extends FunSuite with MockitoSugar with Directives
     val securityDirectives             = new SecurityDirectives(authentication)
     import securityDirectives._
 
-    val route: Route = {
-      get {
-        permission("read") {
-          complete("OK")
-        }
-      }
-    }
-
     val invalidTokenStr    = "invalid"
     val invalidTokenHeader = Authorization(OAuth2BearerToken(invalidTokenStr))
 
@@ -34,6 +26,14 @@ class PermissionDirectiveTest extends FunSuite with MockitoSugar with Directives
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
+
+    val route: Route = secure { implicit at ⇒
+      get {
+        permission("read") {
+          complete("OK")
+        }
+      }
+    }
 
     Get("/").addHeader(invalidTokenHeader) ~> route ~> check {
       rejection shouldBe a[AuthenticationFailedRejection]
@@ -45,17 +45,17 @@ class PermissionDirectiveTest extends FunSuite with MockitoSugar with Directives
     val securityDirectives             = new SecurityDirectives(authentication)
     import securityDirectives._
 
-    val route: Route = {
+    val authenticator: Authenticator[AccessToken] = _ ⇒ None
+
+    when(authentication.authenticator).thenReturn(authenticator)
+
+    val route: Route = secure { implicit at ⇒
       get {
         permission("read") {
           complete("OK")
         }
       }
     }
-
-    val authenticator: Authenticator[AccessToken] = _ ⇒ None
-
-    when(authentication.authenticator).thenReturn(authenticator)
 
     Get("/") ~> route ~> check {
       rejection shouldBe a[AuthenticationFailedRejection]
@@ -66,14 +66,6 @@ class PermissionDirectiveTest extends FunSuite with MockitoSugar with Directives
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication)
     import securityDirectives._
-
-    val route: Route = {
-      get {
-        permission("read") {
-          complete("OK")
-        }
-      }
-    }
 
     val validTokenWithoutPermissionStr    = "validTokenWithoutPermissionStr"
     val validTokenWithoutPermissionHeader = Authorization(OAuth2BearerToken(validTokenWithoutPermissionStr))
@@ -90,6 +82,14 @@ class PermissionDirectiveTest extends FunSuite with MockitoSugar with Directives
 
     when(authentication.authenticator).thenReturn(authenticator)
 
+    val route: Route = secure { implicit at ⇒
+      get {
+        permission("read") {
+          complete("OK")
+        }
+      }
+    }
+
     Get("/").addHeader(validTokenWithoutPermissionHeader) ~> route ~> check {
       rejection shouldBe a[AuthorizationFailedRejection]
     }
@@ -99,14 +99,6 @@ class PermissionDirectiveTest extends FunSuite with MockitoSugar with Directives
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication)
     import securityDirectives._
-
-    val route: Route = {
-      get {
-        permission("read") {
-          complete("OK")
-        }
-      }
-    }
 
     val validTokenWithPermissionStr    = "validTokenWithPermissionStr"
     val validTokenWithPermissionHeader = Authorization(OAuth2BearerToken(validTokenWithPermissionStr))
@@ -122,6 +114,14 @@ class PermissionDirectiveTest extends FunSuite with MockitoSugar with Directives
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
+
+    val route: Route = secure { implicit at ⇒
+      get {
+        permission("read") {
+          complete("OK")
+        }
+      }
+    }
 
     Get("/").addHeader(validTokenWithPermissionHeader) ~> route ~> check {
       status shouldBe StatusCodes.OK

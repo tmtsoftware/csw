@@ -28,7 +28,7 @@ class ResourceRoleDirectiveTest extends FunSuite with MockitoSugar with Directiv
 
     when(authentication.authenticator).thenReturn(authenticator)
 
-    val route: Route = {
+    val route: Route = secure { implicit at ⇒
       get {
         resourceRole("admin") {
           complete("OK")
@@ -46,17 +46,17 @@ class ResourceRoleDirectiveTest extends FunSuite with MockitoSugar with Directiv
     val securityDirectives             = new SecurityDirectives(authentication)
     import securityDirectives._
 
-    val route: Route = {
+    val authenticator: Authenticator[AccessToken] = _ ⇒ None
+
+    when(authentication.authenticator).thenReturn(authenticator)
+
+    val route: Route = secure { implicit at ⇒
       get {
         resourceRole("admin") {
           complete("OK")
         }
       }
     }
-
-    val authenticator: Authenticator[AccessToken] = _ ⇒ None
-
-    when(authentication.authenticator).thenReturn(authenticator)
 
     Get("/") ~> route ~> check {
       rejection shouldBe a[AuthenticationFailedRejection]
@@ -67,14 +67,6 @@ class ResourceRoleDirectiveTest extends FunSuite with MockitoSugar with Directiv
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication)
     import securityDirectives._
-
-    val route: Route = {
-      get {
-        resourceRole("admin") {
-          complete("OK")
-        }
-      }
-    }
 
     val validTokenWithoutResourceRoleStr = "validTokenWithoutResourceRoleStr"
 
@@ -92,6 +84,14 @@ class ResourceRoleDirectiveTest extends FunSuite with MockitoSugar with Directiv
 
     when(authentication.authenticator).thenReturn(authenticator)
 
+    val route: Route = secure { implicit at ⇒
+      get {
+        resourceRole("admin") {
+          complete("OK")
+        }
+      }
+    }
+
     Get("/").addHeader(validTokenWithoutResourceRoleHeader) ~> route ~> check {
       rejection shouldBe a[AuthorizationFailedRejection]
     }
@@ -101,14 +101,6 @@ class ResourceRoleDirectiveTest extends FunSuite with MockitoSugar with Directiv
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication)
     import securityDirectives._
-
-    val route: Route = {
-      get {
-        resourceRole("admin") {
-          complete("OK")
-        }
-      }
-    }
 
     val validTokenWithResourceRoleStr    = "validTokenWithResourceRoleStr"
     val validTokenWithResourceRole       = mock[AccessToken]
@@ -122,6 +114,14 @@ class ResourceRoleDirectiveTest extends FunSuite with MockitoSugar with Directiv
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
+
+    val route: Route = secure { implicit at ⇒
+      get {
+        resourceRole("admin") {
+          complete("OK")
+        }
+      }
+    }
 
     Get("/").addHeader(validTokenWithResourceRoleHeader) ~> route ~> check {
       status shouldBe StatusCodes.OK

@@ -14,28 +14,34 @@ object ExampleServer extends HttpApp with App with GenericUnmarshallers with Pla
   private val PORT = 9002
 
   override protected def routes: Route = path("config") {
-    get {
-      permissionWithUser("read", "config") { user ⇒
-        complete(user.preferredUsername)
-      }
-    } ~ put {
-      permission("write", "config") {
-        complete("OK")
-      }
-    } ~ post {
-      entity(as[Person]) { person =>
-        customPolicy(
-          at =>
-            person.country == "US"
-            && at.email.getOrElse("").endsWith("gmail.com")
-        ) {
-          complete("OK")
+    secure { implicit token ⇒
+      {
+        get {
+          permission("read", "config") {
+            user(u ⇒ {
+              complete(u.preferredUsername)
+            })
+          }
+        } ~ put {
+          permission("write", "config") {
+            complete("OK")
+          }
+        } ~ post {
+          entity(as[Person]) { person =>
+            customPolicy(
+              at =>
+                person.country == "US"
+                && at.email.getOrElse("").endsWith("gmail.com")
+            ) {
+              complete("OK")
+            }
+          }
+        } ~
+        patch {
+          resourceRole("example-service-admin") {
+            complete("OK")
+          }
         }
-      }
-    } ~
-    patch {
-      resourceRole("example-service-admin") {
-        complete("OK")
       }
     }
   }

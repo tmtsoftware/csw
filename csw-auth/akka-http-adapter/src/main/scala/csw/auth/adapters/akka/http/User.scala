@@ -1,7 +1,7 @@
 package csw.auth.adapters.akka.http
 import csw.auth.core.token.AccessToken
 
-case class User private[auth] (
+case class User(
     givenName: Option[String] = None,
     familyName: Option[String] = None,
     name: Option[String] = None,

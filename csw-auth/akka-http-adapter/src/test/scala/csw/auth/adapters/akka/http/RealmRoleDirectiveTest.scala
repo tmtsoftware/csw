@@ -27,7 +27,7 @@ class RealmRoleDirectiveTest extends FunSuite with MockitoSugar with Directives 
 
     when(authentication.authenticator).thenReturn(authenticator)
 
-    val route: Route = {
+    val route: Route = secure { implicit at ⇒
       get {
         realmRole("admin") {
           complete("OK")
@@ -45,17 +45,17 @@ class RealmRoleDirectiveTest extends FunSuite with MockitoSugar with Directives 
     val securityDirectives             = new SecurityDirectives(authentication)
     import securityDirectives._
 
-    val route: Route = {
+    val authenticator: Authenticator[AccessToken] = _ ⇒ None
+
+    when(authentication.authenticator).thenReturn(authenticator)
+
+    val route: Route = secure { implicit at ⇒
       get {
         realmRole("admin") {
           complete("OK")
         }
       }
     }
-
-    val authenticator: Authenticator[AccessToken] = _ ⇒ None
-
-    when(authentication.authenticator).thenReturn(authenticator)
 
     Get("/") ~> route ~> check {
       rejection shouldBe a[AuthenticationFailedRejection]
@@ -66,14 +66,6 @@ class RealmRoleDirectiveTest extends FunSuite with MockitoSugar with Directives 
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication)
     import securityDirectives._
-
-    val route: Route = {
-      get {
-        realmRole("admin") {
-          complete("OK")
-        }
-      }
-    }
 
     val validTokenWithoutRealmRoleStr = "validTokenWithoutRealmRoleStr"
 
@@ -91,6 +83,14 @@ class RealmRoleDirectiveTest extends FunSuite with MockitoSugar with Directives 
 
     when(authentication.authenticator).thenReturn(authenticator)
 
+    val route: Route = secure { implicit at ⇒
+      get {
+        realmRole("admin") {
+          complete("OK")
+        }
+      }
+    }
+
     Get("/").addHeader(validTokenWithoutRealmRoleHeader) ~> route ~> check {
       rejection shouldBe a[AuthorizationFailedRejection]
     }
@@ -100,14 +100,6 @@ class RealmRoleDirectiveTest extends FunSuite with MockitoSugar with Directives 
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication)
     import securityDirectives._
-
-    val route: Route = {
-      get {
-        realmRole("admin") {
-          complete("OK")
-        }
-      }
-    }
 
     val validTokenWithRealmRoleStr    = "validTokenWithRealmRoleStr"
     val validTokenWithRealmRole       = mock[AccessToken]
@@ -121,6 +113,14 @@ class RealmRoleDirectiveTest extends FunSuite with MockitoSugar with Directives 
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
+
+    val route: Route = secure { implicit at ⇒
+      get {
+        realmRole("admin") {
+          complete("OK")
+        }
+      }
+    }
 
     Get("/").addHeader(validTokenWithRealmRoleHeader) ~> route ~> check {
       status shouldBe StatusCodes.OK
