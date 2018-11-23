@@ -12,11 +12,10 @@ import org.scalatest.{FunSuite, Matchers}
 
 class RealmRoleDirectiveTest extends FunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
 
-  val authentication: Authentication = mock[Authentication]
-  val securityDirectives             = new SecurityDirectives(authentication)
-  import securityDirectives._
-
   test("realmRole directive should return AuthenticationFailedRejection when token is invalid") {
+    val authentication: Authentication = mock[Authentication]
+    val securityDirectives             = new SecurityDirectives(authentication)
+    import securityDirectives._
 
     val invalidTokenStr    = "invalid"
     val invalidTokenHeader = Authorization(OAuth2BearerToken(invalidTokenStr))
@@ -42,6 +41,10 @@ class RealmRoleDirectiveTest extends FunSuite with MockitoSugar with Directives 
   }
 
   test("realmRole directive should return AuthenticationFailedRejection when token is not present") {
+    val authentication: Authentication = mock[Authentication]
+    val securityDirectives             = new SecurityDirectives(authentication)
+    import securityDirectives._
+
     val route: Route = {
       get {
         realmRole("admin") {
@@ -60,6 +63,10 @@ class RealmRoleDirectiveTest extends FunSuite with MockitoSugar with Directives 
   }
 
   test("realmRole directive should return AuthorizationFailedRejection when token does not have realmRole") {
+    val authentication: Authentication = mock[Authentication]
+    val securityDirectives             = new SecurityDirectives(authentication)
+    import securityDirectives._
+
     val route: Route = {
       get {
         realmRole("admin") {
@@ -90,6 +97,10 @@ class RealmRoleDirectiveTest extends FunSuite with MockitoSugar with Directives 
   }
 
   test("realmRole directive should return 200 OK when token is valid & has realmRole") {
+    val authentication: Authentication = mock[Authentication]
+    val securityDirectives             = new SecurityDirectives(authentication)
+    import securityDirectives._
+
     val route: Route = {
       get {
         realmRole("admin") {

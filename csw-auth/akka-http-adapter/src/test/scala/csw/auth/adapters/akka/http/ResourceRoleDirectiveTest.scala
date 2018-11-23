@@ -13,11 +13,10 @@ import org.scalatest.{FunSuite, Matchers}
 
 class ResourceRoleDirectiveTest extends FunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
 
-  val authentication: Authentication = mock[Authentication]
-  val securityDirectives             = new SecurityDirectives(authentication)
-  import securityDirectives._
-
   test("resourceRole directive should return AuthenticationFailedRejection when token is invalid") {
+    val authentication: Authentication = mock[Authentication]
+    val securityDirectives             = new SecurityDirectives(authentication)
+    import securityDirectives._
 
     val invalidTokenStr    = "invalid"
     val invalidTokenHeader = Authorization(OAuth2BearerToken(invalidTokenStr))
@@ -43,6 +42,10 @@ class ResourceRoleDirectiveTest extends FunSuite with MockitoSugar with Directiv
   }
 
   test("resourceRole directive should return AuthenticationFailedRejection when token is not present") {
+    val authentication: Authentication = mock[Authentication]
+    val securityDirectives             = new SecurityDirectives(authentication)
+    import securityDirectives._
+
     val route: Route = {
       get {
         resourceRole("admin") {
@@ -61,6 +64,10 @@ class ResourceRoleDirectiveTest extends FunSuite with MockitoSugar with Directiv
   }
 
   test("resourceRole directive should return AuthorizationFailedRejection when token does not have resourceRole") {
+    val authentication: Authentication = mock[Authentication]
+    val securityDirectives             = new SecurityDirectives(authentication)
+    import securityDirectives._
+
     val route: Route = {
       get {
         resourceRole("admin") {
@@ -91,6 +98,10 @@ class ResourceRoleDirectiveTest extends FunSuite with MockitoSugar with Directiv
   }
 
   test("resourceRole directive should return 200 OK when token is valid & has resourceRole") {
+    val authentication: Authentication = mock[Authentication]
+    val securityDirectives             = new SecurityDirectives(authentication)
+    import securityDirectives._
+
     val route: Route = {
       get {
         resourceRole("admin") {

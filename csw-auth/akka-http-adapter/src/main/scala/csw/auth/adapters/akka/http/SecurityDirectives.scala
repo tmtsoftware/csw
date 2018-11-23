@@ -31,7 +31,7 @@ class SecurityDirectives(authentication: Authentication) {
   }
 
   def customPolicy(policy: => Boolean): Directive0 = {
-    authenticateOAuth2(realm, authentication.authenticator).flatMap { at =>
+    authenticateOAuth2(realm, authentication.authenticator).flatMap { _ =>
       authorize(policy)
     }
   }

@@ -12,11 +12,11 @@ import org.scalatest.{FunSuite, Matchers}
 
 class PermissionDirectiveTest extends FunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
 
-  val authentication: Authentication = mock[Authentication]
-  val securityDirectives             = new SecurityDirectives(authentication)
-  import securityDirectives._
-
   test("permission directive should return AuthenticationFailedRejection when token is invalid") {
+    val authentication: Authentication = mock[Authentication]
+    val securityDirectives             = new SecurityDirectives(authentication)
+    import securityDirectives._
+
     val route: Route = {
       get {
         permission("read") {
@@ -41,6 +41,10 @@ class PermissionDirectiveTest extends FunSuite with MockitoSugar with Directives
   }
 
   test("permission directive should return AuthenticationFailedRejection when token is not present") {
+    val authentication: Authentication = mock[Authentication]
+    val securityDirectives             = new SecurityDirectives(authentication)
+    import securityDirectives._
+
     val route: Route = {
       get {
         permission("read") {
@@ -49,12 +53,20 @@ class PermissionDirectiveTest extends FunSuite with MockitoSugar with Directives
       }
     }
 
+    val authenticator: Authenticator[AccessToken] = _ ⇒ None
+
+    when(authentication.authenticator).thenReturn(authenticator)
+
     Get("/") ~> route ~> check {
       rejection shouldBe a[AuthenticationFailedRejection]
     }
   }
 
   test("permission directive should return AuthorizationFailedRejection when token does not have permission") {
+    val authentication: Authentication = mock[Authentication]
+    val securityDirectives             = new SecurityDirectives(authentication)
+    import securityDirectives._
+
     val route: Route = {
       get {
         permission("read") {
@@ -84,6 +96,10 @@ class PermissionDirectiveTest extends FunSuite with MockitoSugar with Directives
   }
 
   test("permission directive should return 200 OK when token is valid & has permission") {
+    val authentication: Authentication = mock[Authentication]
+    val securityDirectives             = new SecurityDirectives(authentication)
+    import securityDirectives._
+
     val route: Route = {
       get {
         permission("read") {
