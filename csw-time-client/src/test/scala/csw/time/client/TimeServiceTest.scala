@@ -44,7 +44,7 @@ class TimeServiceTest extends FunSuite with Matchers with BeforeAndAfterAll {
     val utcInstant = timeService.utcTime()
 
     println(utcInstant.value)
-    Utils.digits(utcInstant.value.getNano) shouldEqual 9
+    Utils.digits(utcInstant.value.getNano) should be >= 7
   }
 
   //DEOPSCSW-536: Access parts of TAI date/time in Java and Scala
