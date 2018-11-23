@@ -18,12 +18,7 @@ RUN yum install -y https://downloads.lightbend.com/scala/$SCALA_VERSION/scala-$S
 RUN yum install -y https://dl.bintray.com/sbt/rpm/sbt-$SBT_VERSION.rpm
 RUN sbt update
 
-# mount current native path to docker
-# ADD . /csw
-
 # go inside csw
-# WORKDIR /csw
+ WORKDIR /csw
 
-#ENTRYPOINT ["sbt", "csw-time-client/test"]
-
-CMD tail -f /dev/null
+ENTRYPOINT ["sbt", "csw-time-client/linux:test"]
