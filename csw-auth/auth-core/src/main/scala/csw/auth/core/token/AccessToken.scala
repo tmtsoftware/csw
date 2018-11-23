@@ -22,7 +22,11 @@ case class AccessToken(
     //auth
     realm_access: Option[Access] = None,
     resource_access: Map[String, Access] = Map.empty,
-    authorization: Option[Authorization] = None
+    authorization: Option[Authorization] = None,
+    //clientToken
+    clientId: Option[String] = None,
+    clientAddress: Option[String] = None,
+    clientHost: Option[String] = None
 ) {
   def hasPermission(scope: String, resource: String): Boolean =
     this.authorization match {

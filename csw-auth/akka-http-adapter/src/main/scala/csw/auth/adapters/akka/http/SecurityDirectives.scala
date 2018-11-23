@@ -1,7 +1,7 @@
 package csw.auth.adapters.akka.http
 
-import akka.http.scaladsl.server.Directive0
 import akka.http.scaladsl.server.Directives.{authenticateOAuth2, authorize}
+import akka.http.scaladsl.server.{Directive, Directive0, Directive1, Directives}
 import csw.auth.core.Keycloak
 import csw.auth.core.token.AccessToken
 
@@ -34,6 +34,15 @@ class SecurityDirectives(authentication: Authentication) {
     authenticateOAuth2(realm, authentication.authenticator).flatMap { _ =>
       authorize(policy)
     }
+  }
+
+  def withUser: Directive1[User] = {
+    authenticateOAuth2(realm, authentication.authenticator)
+      .map(at => User(at))
+      .flatMap {
+        case Some(user) => Directives.provide(user)
+        case _          => akka.http.scaladsl.server.Directives.reject(akka.http.javadsl.server.Rejections.authorizationFailed)
+      }
   }
 }
 
