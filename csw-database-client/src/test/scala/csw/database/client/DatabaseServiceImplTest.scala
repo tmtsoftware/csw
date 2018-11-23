@@ -53,7 +53,7 @@ class DatabaseServiceImplTest extends FunSuite with Matchers with ScalaFutures w
     if (databaseService.isDefined) {
       block(databaseService.get)
     } else {
-      fail("could initialize database service")
+      fail("[ERROR] Could not initialize database service")
     }
   }
 
