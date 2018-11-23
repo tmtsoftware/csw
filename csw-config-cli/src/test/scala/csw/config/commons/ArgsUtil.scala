@@ -37,6 +37,8 @@ class ArgsUtil {
   val setActiveAllArgs   = Array("setActiveVersion", relativeRepoPath, "--id", id, "-c", comment)
   val resetActiveAllArgs = Array("resetActiveVersion", relativeRepoPath, "-c", comment)
   val meteDataArgs       = Array("getMetadata")
+  val loginArgs          = Array("login")
+  val logoutArgs         = Array("logout")
 
   private def createTempFile(fileName: String, fileContent: String): Path =
     Files.write(Files.createTempFile(fileName, ".conf"), fileContent.getBytes)

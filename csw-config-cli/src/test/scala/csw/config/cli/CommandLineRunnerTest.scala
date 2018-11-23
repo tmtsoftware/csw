@@ -6,6 +6,7 @@ import java.time.Instant
 import akka.actor.ActorSystem
 import akka.actor.CoordinatedShutdown.UnknownReason
 import akka.stream.ActorMaterializer
+import csw.auth.adapters.nativeapp.api.NativeAppAuthAdapter
 import csw.config.api.models.ConfigId
 import csw.config.cli.args.{ArgsParser, Options}
 import csw.config.cli.wiring.Wiring
@@ -15,16 +16,18 @@ import csw.config.server.ServerWiring
 import csw.config.server.mocks.MockedAuthentication
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.server.http.HTTPLocationService
+import org.mockito.Mockito.verify
 import org.scalatest.{BeforeAndAfterEach, Matchers}
 
 // DEOPSCSW-112: Command line interface client for Configuration service
 // DEOPSCSW-43: Access Configuration service from any CSW component
 class CommandLineRunnerTest extends HTTPLocationService with Matchers with BeforeAndAfterEach with MockedAuthentication {
 
-  private val clientSystem: ActorSystem    = ActorSystem("config-cli")
-  private val clientMat: ActorMaterializer = ActorMaterializer()(clientSystem)
-  private val locationService              = HttpLocationServiceFactory.makeLocalClient(clientSystem, clientMat)
-  private val clientWiring                 = Wiring.noPrinting(locationService, factory)
+  private val clientSystem: ActorSystem       = ActorSystem("config-cli")
+  private val clientMat: ActorMaterializer    = ActorMaterializer()(clientSystem)
+  private val locationService                 = HttpLocationServiceFactory.makeLocalClient(clientSystem, clientMat)
+  val nativeAuthAdapter: NativeAppAuthAdapter = mock[NativeAppAuthAdapter]
+  private val clientWiring                    = Wiring.noPrinting(locationService, factory, nativeAuthAdapter)
 
   private val serverWiring = ServerWiring.make(locationService, securityDirectives)
   private val httpService  = serverWiring.httpService
@@ -247,4 +250,15 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
     val actualMetadata                      = commandLineRunner.getMetadata(parsedMetaDataArgs.get)
     actualMetadata.toString should not be empty
   }
+
+  test("login") {
+    commandLineRunner.login()
+    verify(nativeAuthAdapter).login()
+  }
+
+  test("logout") {
+    commandLineRunner.logout()
+    verify(nativeAuthAdapter).logout()
+  }
+
 }

@@ -46,4 +46,16 @@ private[config] object Wiring {
       override lazy val tokenFactory: TokenFactory       = _tokenFactory
       override lazy val printLine: Any ⇒ Unit            = _ ⇒ ()
     }
+
+  private[config] def noPrinting(
+      _locationService: LocationService,
+      _tokenFactory: TokenFactory,
+      _nativeAuthAdapter: NativeAppAuthAdapter
+  ): Wiring =
+    new Wiring {
+      override lazy val nativeAuthAdapter: NativeAppAuthAdapter = _nativeAuthAdapter
+      override lazy val locationService: LocationService        = _locationService
+      override lazy val tokenFactory: TokenFactory              = _tokenFactory
+      override lazy val printLine: Any ⇒ Unit                   = _ ⇒ ()
+    }
 }
