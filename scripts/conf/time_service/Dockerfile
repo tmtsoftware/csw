@@ -19,6 +19,6 @@ RUN yum install -y https://dl.bintray.com/sbt/rpm/sbt-$SBT_VERSION.rpm
 RUN sbt update
 
 # go inside csw
- WORKDIR /csw
+WORKDIR /csw
 
 ENTRYPOINT ["sbt", "csw-time-client/linux:test"]
