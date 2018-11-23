@@ -1,14 +1,14 @@
 package csw.database.client;
 
 import akka.actor.ActorSystem;
+import com.opentable.db.postgres.embedded.EmbeddedPostgres;
 import csw.database.api.javadasl.IDatabaseService;
 import csw.database.client.scaladsl.DatabaseServiceFactory;
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.scalatest.junit.JUnitSuite;
-import ru.yandex.qatools.embed.postgresql.EmbeddedPostgres;
-import ru.yandex.qatools.embed.postgresql.distribution.Version;
 import scala.concurrent.Await;
 import scala.concurrent.ExecutionContext;
 import scala.concurrent.duration.Duration;
@@ -23,7 +23,6 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
-import static java.util.Arrays.asList;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 //DEOPSCSW-601: Create Database API
@@ -33,28 +32,24 @@ public class JDatabaseServiceImplTest extends JUnitSuite {
     private static EmbeddedPostgres postgres;
     private static IDatabaseService databaseService;
 
-    public JDatabaseServiceImplTest() throws IOException {
+    @BeforeClass
+    public static void setup() throws IOException {
+        postgres = EmbeddedPostgres
+                .builder()
+                .setDataDirectory(Paths.get("/tmp/postgresDataDir"))
+                .setCleanDataDirectory(true)
+                .setPgBinaryResolver(new PostgresBinaryResolver())
+                .start();
+
         system = ActorSystem.apply("test");
         ExecutionContext ec = system.dispatcher();
-        postgres = new EmbeddedPostgres(Version.V10_6, "/tmp/postgresDataDir");
-        int DEFAULT_PORT = 5435;
+        DatabaseServiceFactory factory = new DatabaseServiceFactory();
 
-        final List<String> DEFAULT_ADD_PARAMS = asList("-E", "SQL_ASCII", "--locale=C", "--lc-collate=C", "--lc-ctype=C");
-
-        postgres.start(
-                EmbeddedPostgres.cachedRuntimeConfig(Paths.get("/tmp/postgresExtracted")),
-                EmbeddedPostgres.DEFAULT_HOST,
-                DEFAULT_PORT,
-                EmbeddedPostgres.DEFAULT_DB_NAME,
-                EmbeddedPostgres.DEFAULT_USER,
-                EmbeddedPostgres.DEFAULT_PASSWORD,
-                DEFAULT_ADD_PARAMS
-        );
         //DEOPSCSW-618: Create a method to locate a database server
         //DEOPSCSW-620: Create a method to make a connection to a database
         //DEOPSCSW-621: Create a session with a database
-        DatabaseServiceFactory factory = new DatabaseServiceFactory();
-        databaseService = factory.jMake(postgres.getConnectionUrl().get(), ec);
+        databaseService = factory.jMake(postgres.getJdbcUrl("postgres", "postgres"), ec);
+
     }
 
     @AfterClass
@@ -64,7 +59,7 @@ public class JDatabaseServiceImplTest extends JUnitSuite {
         databaseService.execute("DROP TABLE films_java;").get(5, SECONDS);
         databaseService.execute("DROP TABLE new_table_java;").get(5, SECONDS);
         databaseService.closeConnection();
-        postgres.stop();
+        postgres.close();
         Runtime.getRuntime().exec("pkill postgres").waitFor();
         Await.result(system.terminate(), Duration.apply(5, SECONDS));
     }

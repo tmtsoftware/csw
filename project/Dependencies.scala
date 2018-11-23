@@ -279,11 +279,12 @@ object Dependencies {
       Libs.`postgresql`,
       Libs.`scala-java8-compat`,
       Libs.`scala-async`,
-      Libs.`scalatest`.value     % Test,
-      Akka.`akka-actor`          % Test,
-      Libs.`junit`               % Test,
-      Libs.`junit-interface`     % Test,
-      Libs.`postgresql-embedded` % Test
+      Libs.`scalatest`.value % Test,
+      Akka.`akka-actor`      % Test,
+      Libs.`junit`           % Test,
+      Libs.`junit-interface` % Test,
+      Libs.`otj-pg-embedded` % Test
+//      Libs.`postgresql-embedded` % Test,
     )
   )
 
