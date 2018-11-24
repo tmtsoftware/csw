@@ -32,7 +32,7 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
 
   private implicit val _blockingIoDispatcher: MessageDispatcher = blockingIoDispatcher
 
-  // Intitialize repository
+  // Initialize repository
   def initSvnRepo(): Unit =
     try {
       // Create the new main repo
@@ -47,29 +47,15 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
     }
 
   // Fetch the file from svn repo and write the contents on outputStream
-  def getFile(path: Path, revision: Long, outputStream: OutputStream): Future[Unit] = Future {
-    val svn = svnHandle()
-    try {
-      svn.getFile(path.toString, revision, null, outputStream)
-    } finally {
-      svn.closeSession()
-    }
-  }
+  def getFile(path: Path, revision: Long, outputStream: OutputStream): Future[Unit] =
+    withAsyncSvn(_.getFile(path.toString, revision, null, outputStream))
 
-  def getFileSize(path: Path, revision: Long): Future[Long] = Future {
-    val svn = svnHandle()
-    try {
-      svn.info(path.toString, revision).getSize
-    } finally {
-      svn.closeSession()
-    }
-  }
+  def getFileSize(path: Path, revision: Long): Future[Long] = withAsyncSvn(_.info(path.toString, revision).getSize)
 
   // Adds the given file (and dir if needed) to svn.
   // See http://svn.svnkit.com/repos/svnkit/tags/1.3.5/doc/examples/src/org/tmatesoft/svn/examples/repository/Commit.java.
-  def addFile(path: Path, comment: String, data: InputStream): Future[SVNCommitInfo] = Future {
-    val svn = svnHandle()
-    try {
+  def addFile(path: Path, comment: String, data: InputStream): Future[SVNCommitInfo] =
+    withAsyncSvn { svn ⇒
       val editor = svn.getCommitEditor(comment, null)
       editor.openRoot(SVNRepository.INVALID_REVISION)
       val dirPath = path.getParent
@@ -87,8 +73,7 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
 
       def closeDir(checksum: String, depth: Int): SVNCommitInfo = {
         editor.closeFile(path.toString, checksum)
-        for (i <- 1 to openDirDepth)
-          editor.closeDir()
+        for (_ <- 1 to openDirDepth) editor.closeDir()
         editor.closeEdit
       }
 
@@ -100,16 +85,12 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
 
       val checksum = deltaGenerator.sendDelta(filePath, data, editor, true)
       closeDir(checksum, openDirDepth)
-    } finally {
-      svn.closeSession()
     }
-  }
 
   // Modifies the contents of the given file in the repository.
   // See http://svn.svnkit.com/repos/svnkit/tags/1.3.5/doc/examples/src/org/tmatesoft/svn/examples/repository/Commit.java.
-  def modifyFile(path: Path, comment: String, data: InputStream) = Future {
-    val svn = svnHandle()
-    try {
+  def modifyFile(path: Path, comment: String, data: InputStream): Future[SVNCommitInfo] =
+    withAsyncSvn { svn ⇒
       val editor = svn.getCommitEditor(comment, null)
       editor.openRoot(SVNRepository.INVALID_REVISION)
       val filePath = path.toString
@@ -120,45 +101,34 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
       editor.closeFile(filePath, checksum)
       editor.closeDir()
       editor.closeEdit
-    } finally {
-      svn.closeSession()
     }
+
+  def delete(path: Path, comment: String): Future[SVNCommitInfo] = withAsyncSvnOpFactory { svnOperationFactory ⇒
+    val remoteDelete = svnOperationFactory.createRemoteDelete()
+    remoteDelete.setSingleTarget(SvnTarget.fromURL(settings.svnUrl.appendPath(path.toString, false)))
+    remoteDelete.setCommitMessage(comment)
+    remoteDelete.run()
   }
 
-  def delete(path: Path, comment: String): Future[SVNCommitInfo] = Future {
-    val svnOperationFactory = new SvnOperationFactory()
-    try {
-      val remoteDelete = svnOperationFactory.createRemoteDelete()
-      remoteDelete.setSingleTarget(SvnTarget.fromURL(settings.svnUrl.appendPath(path.toString, false)))
-      remoteDelete.setCommitMessage(comment)
-      remoteDelete.run()
-    } finally {
-      svnOperationFactory.dispose()
-    }
-  }
+  def list(fileType: Option[FileType] = None, pattern: Option[String] = None): Future[List[SVNDirEntry]] =
+    withAsyncSvnOpFactory { svnOperationFactory ⇒
+      // svn always stores file in the repo without '/' prefix.
+      // Hence if input pattern is provided like '/root/', then prefix '/' need to be striped to get the list of files from root folder.
+      val compiledPattern            = pattern.map(pat ⇒ Pattern.compile(pat.stripPrefix("/")))
+      var entries: List[SVNDirEntry] = List.empty
 
-  def list(fileType: Option[FileType] = None, pattern: Option[String] = None): Future[List[SVNDirEntry]] = Future {
-    val svnOperationFactory = new SvnOperationFactory()
-    // svn always stores file in the repo without '/' prefix.
-    // Hence if input pattern is provided like '/root/', then prefix '/' need to be striped to get the list of files from root folder.
-    val compiledPattern            = pattern.map(pat ⇒ Pattern.compile(pat.stripPrefix("/")))
-    var entries: List[SVNDirEntry] = List.empty
-
-    // if the fileType(Annex or Normal) is defined then filter the list of files with this type
-    // for all files representing annex file, strip the suffix settings.`sha1-suffix`
-    // if the pattern is defined then filter the list matching this pattern
-    // it is important that we first strip the suffix settings.`sha1-suffix` before matching the pattern so that pattern
-    // is properly matched on exact name of file name
-    val receiver: ISvnObjectReceiver[SVNDirEntry] = { (_, entry: SVNDirEntry) ⇒
-      if (entry.isFile && entry.isNotActiveFile(settings.`active-config-suffix`) && entry
-            .matchesFileType(fileType, settings.`sha1-suffix`)) {
-        entry.stripAnnexSuffix(settings.`sha1-suffix`)
-        if (entry.matches(compiledPattern)) {
-          entries = entry :: entries
+      // if the fileType(Annex or Normal) is defined then filter the list of files with this type
+      // for all files representing annex file, strip the suffix settings.`sha1-suffix`
+      // if the pattern is defined then filter the list matching this pattern
+      // it is important that we first strip the suffix settings.`sha1-suffix` before matching the pattern so that pattern
+      // is properly matched on exact name of file name
+      val receiver: ISvnObjectReceiver[SVNDirEntry] = { (_, entry: SVNDirEntry) ⇒
+        if (entry.isFile && entry.isNotActiveFile(settings.`active-config-suffix`) && entry
+              .matchesFileType(fileType, settings.`sha1-suffix`)) {
+          entry.stripAnnexSuffix(settings.`sha1-suffix`)
+          if (entry.matches(compiledPattern)) entries = entry :: entries
         }
       }
-    }
-    try {
       val svnList = svnOperationFactory.createList()
       svnList.setSingleTarget(SvnTarget.fromURL(settings.svnUrl, SVNRevision.HEAD))
       svnList.setRevision(SVNRevision.HEAD)
@@ -166,28 +136,18 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
       svnList.setReceiver(receiver)
       svnList.run()
       entries.sortWith(_.getRelativePath < _.getRelativePath)
-    } finally {
-      svnOperationFactory.dispose()
     }
-  }
 
-  def hist(path: Path, from: Instant, to: Instant, maxResults: Int): Future[List[SVNLogEntry]] = Future {
-    val clientManager = SVNClientManager.newInstance()
-    var logEntries    = List[SVNLogEntry]()
-    try {
-      val logClient = clientManager.getLogClient
+  def hist(path: Path, from: Instant, to: Instant, maxResults: Int): Future[List[SVNLogEntry]] = withAsyncSvnClientMgr {
+    clientManager ⇒
+      var logEntries = List[SVNLogEntry]()
+      val logClient  = clientManager.getLogClient
       val handler: ISVNLogEntryHandler = logEntry =>
-        logEntries = {
-          if (logEntry.getDate.toInstant.isAfter(from) && logEntry.getDate.toInstant.isBefore(to))
-            logEntry :: logEntries
-          else
-            logEntries
-      }
+        logEntries =
+          if (logEntry.getDate.toInstant.isAfter(from) && logEntry.getDate.toInstant.isBefore(to)) logEntry :: logEntries
+          else logEntries
       logClient.doLog(settings.svnUrl, Array(path.toString), SVNRevision.HEAD, null, null, true, true, maxResults, handler)
       logEntries.sortWith(_.getRevision > _.getRevision)
-    } finally {
-      clientManager.dispose()
-    }
   }
 
   // Gets the svn revision from the given id, defaulting to HEAD
@@ -202,17 +162,20 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
     checkPath(path, SVNNodeKind.FILE, id.getOrElse(SVNRepository.INVALID_REVISION))
   }
 
+  // test if there're no problems with accessing a repository
+  def testConnection(): Unit = withSvn { svn ⇒
+    log.debug("Testing svn connection")
+    svn.testConnection()
+  }
+
   // true if the directory path exists in the repository
   private def dirExists(path: Path): Boolean = checkPath(path, SVNNodeKind.DIR, SVNRepository.INVALID_REVISION)
 
-  private def checkPath(path: Path, kind: SVNNodeKind, revision: Long): Boolean = {
-    val svn = svnHandle()
+  private def checkPath(path: Path, kind: SVNNodeKind, revision: Long): Boolean = withSvn { svn ⇒
     try {
       svn.checkPath(path.toString, revision) == kind
     } catch {
       case ex: SVNException if ex.getErrorMessage.getErrorCode == SVNErrorCode.FS_NO_SUCH_REVISION ⇒ false
-    } finally {
-      svn.closeSession()
     }
   }
 
@@ -224,15 +187,25 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
     svn
   }
 
-  // test if there're no problems with accessing a repository
-  def testConnection(): Unit = {
+  private def withSvn[T](f: SVNRepository ⇒ T): T = {
     val svn = svnHandle()
-    try {
-      log.debug("Testing svn connection")
-      svn.testConnection()
-    } finally {
-      svn.closeSession()
-    }
+    try f(svn)
+    finally svn.closeSession()
   }
 
+  private def withSvnOpFactory[T](f: SvnOperationFactory ⇒ T): T = {
+    val svnOperationFactory = new SvnOperationFactory()
+    try f(svnOperationFactory)
+    finally svnOperationFactory.dispose()
+  }
+
+  private def withSvnClientMgr[T](f: SVNClientManager ⇒ T): T = {
+    val clientManager = SVNClientManager.newInstance()
+    try f(clientManager)
+    finally clientManager.dispose()
+  }
+
+  private def withAsyncSvn[T](f: SVNRepository ⇒ T): Future[T]                = Future { withSvn(f) }
+  private def withAsyncSvnOpFactory[T](f: SvnOperationFactory ⇒ T): Future[T] = Future { withSvnOpFactory(f) }
+  private def withAsyncSvnClientMgr[T](f: SVNClientManager ⇒ T): Future[T]    = Future { withSvnClientMgr(f) }
 }
