@@ -21,6 +21,7 @@ private[testkit] trait MockedAuthentication extends MockitoSugar {
   }
 
   when(validToken.hasResourceRole("admin")).thenReturn(true)
+  when(validToken.preferred_username).thenReturn(Some("test"))
   when(authentication.authenticator).thenReturn(authenticator)
 
   private val factory: TokenFactory = mock[TokenFactory]

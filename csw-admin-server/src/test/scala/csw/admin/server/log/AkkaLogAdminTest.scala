@@ -39,7 +39,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
 
 @LoggingSystemSensitive
-class AkkaLogAdminTest extends AdminLogTestSuite with HTTPLocationService with HttpSupport {
+class AkkaLogAdminTest extends AdminLogTestSuite with HttpSupport {
 
   private val adminWiring: AdminWiring = AdminWiring.make(Some(7879))
   import adminWiring.actorRuntime._

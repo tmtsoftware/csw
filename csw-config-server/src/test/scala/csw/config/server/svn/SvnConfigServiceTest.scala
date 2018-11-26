@@ -10,7 +10,7 @@ import csw.config.server.commons.TestFutureExtension.RichFuture
 class SvnConfigServiceTest extends ConfigServiceTest {
 
   override val serverWiring: ServerWiring   = new ServerWiring
-  override val configService: ConfigService = serverWiring.configService
+  override val configService: ConfigService = serverWiring.configServiceFactory.make()
   import serverWiring.actorRuntime._
 
   // DEOPSCSW-141: Change the 'create' API

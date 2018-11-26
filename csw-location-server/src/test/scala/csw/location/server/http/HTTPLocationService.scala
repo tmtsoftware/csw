@@ -20,7 +20,7 @@ trait HTTPLocationService
 
   def start(clusterPort: Option[Int] = Some(locationPort), httpPort: Option[Int] = None): Unit = {
     locationWiring = Some(ServerWiring.make(clusterPort, httpPort))
-    locationWiring.map(_.locationHttpService.start().futureValue)
+    locationWiring.map(_.locationHttpService.start().await)
   }
 
   override def beforeAll(): Unit = start()

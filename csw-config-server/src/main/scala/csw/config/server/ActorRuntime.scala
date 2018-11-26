@@ -18,7 +18,7 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
 /**
  * A convenient class wrapping actor system and providing handles for execution context, materializer and clean up of actor system
  */
-private[config] class ActorRuntime(_actorSystem: ActorSystem, settings: Settings) {
+private[config] class ActorRuntime(_actorSystem: ActorSystem, val settings: Settings) {
   implicit val actorSystem: ActorSystem     = _actorSystem
   implicit val ec: ExecutionContextExecutor = actorSystem.dispatcher
   implicit val mat: Materializer            = ActorMaterializer()

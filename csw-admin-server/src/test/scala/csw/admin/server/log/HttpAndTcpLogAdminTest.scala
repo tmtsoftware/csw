@@ -16,7 +16,6 @@ import csw.config.server.mocks.MockedAuthentication
 import csw.config.server.{ServerWiring, Settings}
 import csw.location.api.models.Connection.TcpConnection
 import csw.location.api.models.{ComponentId, ComponentType}
-import csw.location.server.http.HTTPLocationService
 import csw.logging.internal._
 import csw.logging.scaladsl.LoggingSystemFactory
 import csw.network.utils.Networks
@@ -24,7 +23,7 @@ import csw.network.utils.Networks
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationDouble
 
-class HttpAndTcpLogAdminTest extends AdminLogTestSuite with HttpSupport with HTTPLocationService with MockedAuthentication {
+class HttpAndTcpLogAdminTest extends AdminLogTestSuite with HttpSupport with MockedAuthentication {
 
   private val adminWiring: AdminWiring = AdminWiring.make(Some(7888))
   import adminWiring.actorRuntime._
@@ -32,10 +31,7 @@ class HttpAndTcpLogAdminTest extends AdminLogTestSuite with HttpSupport with HTT
   implicit val typedSystem: ActorSystem[Nothing] = actorSystem.toTyped
   implicit val testKitSettings: TestKitSettings  = TestKitSettings(typedSystem)
 
-  private val serverWiring = ServerWiring.make(adminWiring.locationService, securityDirectives)
-  serverWiring.svnRepo.initSvnRepo()
-  Await.result(serverWiring.httpService.registeredLazyBinding, 20.seconds)
-
+  private val serverWiring  = ServerWiring.make(adminWiring.locationService, securityDirectives)
   private val testFileUtils = new TestFileUtils(new Settings(ConfigFactory.load()))
 
   private var loggingSystem: LoggingSystem = _

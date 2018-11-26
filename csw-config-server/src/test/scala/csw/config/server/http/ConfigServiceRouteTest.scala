@@ -44,14 +44,11 @@ class ConfigServiceRouteTest
   private val configValue2 = "name = NFIRAOS Trombone Assembly"
   private val configFile2  = ConfigData.fromString(configValue2)
 
-  override protected def beforeAll(): Unit =
-    testFileUtils.deleteServerFiles()
+  override protected def beforeAll(): Unit = testFileUtils.deleteServerFiles()
 
-  override protected def beforeEach(): Unit =
-    svnRepo.initSvnRepo()
+  override protected def beforeEach(): Unit = svnRepo.initSvnRepo()
 
-  override protected def afterEach(): Unit =
-    testFileUtils.deleteServerFiles()
+  override protected def afterEach(): Unit = testFileUtils.deleteServerFiles()
 
   /**
    * test HTTP response codes

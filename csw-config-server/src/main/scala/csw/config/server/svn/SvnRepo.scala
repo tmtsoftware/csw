@@ -27,10 +27,12 @@ import scala.concurrent.Future
  * @param settings server runtime configuration
  * @param blockingIoDispatcher dispatcher to be used for blocking operations
  */
-class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
+class SvnRepo(userName: String, settings: Settings, blockingIoDispatcher: MessageDispatcher) {
   private val log: Logger = ConfigServerLogger.getLogger
 
   private implicit val _blockingIoDispatcher: MessageDispatcher = blockingIoDispatcher
+
+  private val authManager = BasicAuthenticationManager.newInstance(userName, Array[Char]())
 
   // Initialize repository
   def initSvnRepo(): Unit =
@@ -181,8 +183,7 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
 
   // gets an object for accessing the svn repository (not reusing a single instance since not thread safe)
   private def svnHandle(): SVNRepository = {
-    val svn         = SVNRepositoryFactory.create(settings.svnUrl)
-    val authManager = BasicAuthenticationManager.newInstance(settings.`svn-user-name`, Array[Char]())
+    val svn = SVNRepositoryFactory.create(settings.svnUrl)
     svn.setAuthenticationManager(authManager)
     svn
   }
@@ -195,6 +196,7 @@ class SvnRepo(settings: Settings, blockingIoDispatcher: MessageDispatcher) {
 
   private def withSvnOpFactory[T](f: SvnOperationFactory ⇒ T): T = {
     val svnOperationFactory = new SvnOperationFactory()
+    svnOperationFactory.setAuthenticationManager(authManager)
     try f(svnOperationFactory)
     finally svnOperationFactory.dispose()
   }

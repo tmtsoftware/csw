@@ -31,6 +31,7 @@ trait MockedAuthentication extends MockitoSugar {
 
   when(roleMissingToken.hasResourceRole("admin")).thenReturn(false)
   when(validToken.hasResourceRole("admin")).thenReturn(true)
+  when(validToken.preferred_username).thenReturn(Some("mocked"))
   when(authentication.authenticator).thenReturn(authenticator)
 
   val roleMissingTokenHeader = Authorization(OAuth2BearerToken(roleMissingTokenStr))

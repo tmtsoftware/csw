@@ -76,7 +76,7 @@ class ConfigAdminApiTest extends ConfigServiceTest with ConfigClientBaseSuite {
     //Note that configService instance from the server-wiring can be used for assert-only calls for sha files
     //This call is invalid from client side
     val svnConfigData =
-      serverWiring.configService
+      serverConfigService
         .getById(Paths.get(s"$fileName${serverWiring.settings.`sha1-suffix`}"), configId)
         .await
         .get
