@@ -2,13 +2,16 @@ package csw.time.client
 
 import java.time._
 
+import akka.actor.ActorSystem
+import akka.testkit.TestProbe
 import csw.time.api.scaladsl.TimeService
 import csw.time.client.internal.native_models.{NTPTimeVal, Timex}
 import csw.time.client.internal.{TimeLibrary, TimeServiceImpl}
 import csw.time.client.tags.Linux
+import org.scalatest.concurrent.Eventually
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
-class TimeServiceTest extends FunSuite with Matchers with BeforeAndAfterAll {
+class TimeServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with Eventually {
   val TaiOffset = 37
 
   override protected def beforeAll(): Unit = {
@@ -63,10 +66,38 @@ class TimeServiceTest extends FunSuite with Matchers with BeforeAndAfterAll {
   }
 
   //DEOPSCSW-530: SPIKE: Get TAI offset and convert to UTC and Vice Versa
-  test("should get TAI offset", Linux) {
+  test("should get TAI offset") {
     val timeService: TimeService = new TimeServiceImpl()
 
     val offset = timeService.taiOffset()
     offset shouldEqual TaiOffset
+  }
+
+  test("should schedule a task once at given start time with allowed jitter of 5ms", Linux) {
+    val timeService: TimeService = new TimeServiceImpl()
+
+    implicit val sys: ActorSystem = ActorSystem.create("time-service")
+    val testProbe                 = TestProbe()
+    val probeMsg                  = "Scheduled"
+
+    var actualScheduleTime: Instant = null
+    val idealScheduleTime: Instant  = timeService.utcTime().value.plusSeconds(1)
+
+    timeService.scheduleOnce(idealScheduleTime) {
+      // Task to execute
+      actualScheduleTime = timeService.utcTime().value
+      testProbe.ref ! probeMsg
+    }
+
+    testProbe.expectMsg(probeMsg)
+
+    println(s"Ideal Schedule Time: $idealScheduleTime")
+    println(s"Actual Schedule Time: $actualScheduleTime")
+
+    val allowedJitterInNanos = 5 * 1000 * 1000 // should be ideally 200µs as per statistics from manual tests
+
+    actualScheduleTime.getEpochSecond - idealScheduleTime.getEpochSecond shouldBe 0
+    actualScheduleTime.getNano - idealScheduleTime.getNano should be < allowedJitterInNanos
+
   }
 }

@@ -268,9 +268,10 @@ object Dependencies {
       Libs.`threeten-extra`,
       Libs.`jna`,
       Akka.`akka-actor`,
-      Libs.`junit-interface` % Test,
-      Libs.`scalatest`.value % Test,
-      Libs.`mockito-core`    % Test
+      Libs.`junit-interface`          % Test,
+      Libs.`scalatest`.value          % Test,
+      Akka.`akka-actor-testkit-typed` % Test,
+      Libs.`mockito-core`             % Test
     )
   )
 
