@@ -313,9 +313,6 @@ function parse_cmd_args {
                     echo "================================================================="
                     echo "All the logs are stored at location: [$logDir]"
                     echo "================================================================="
-                    echo "For assemblies or HCD's to join this cluster and use config and event service from other machine's/nodes, run below command to export env variable:"
-                    echo "export clusterSeeds=$seeds"
-                    echo "================================================================="
                 fi
             fi
             ;;
