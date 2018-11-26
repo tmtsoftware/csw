@@ -18,7 +18,7 @@ trait MultiNodeHTTPLocationService {
 
   override def afterAll(): Unit = {
     CoordinatedShutdown(self.system).run(UnknownReason).await
-    multiNodeSpecBeforeAll()
+    multiNodeSpecAfterAll()
   }
 
 }
