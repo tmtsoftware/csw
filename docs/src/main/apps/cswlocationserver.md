@@ -1,8 +1,10 @@
 # csw-location-server
 
+Note: Normally you will not need to start this application manually. The csw-services.sh script does this for you. 
+
 This application will start a HTTP CSW location server on port 7654 which is required for all Location service consumers who uses HTTP Location client. 
 All the components (HCD's, Assemblies, Services etc.) uses local HTTP location client which expects location server running at localhost:7654. 
-Hence in production environment, it is required that all machines running components should have HTTP location server running locally.
+In a production environment, it is required that all machines running components should have HTTP location server running locally.
 
 ## Prerequisite
 
@@ -18,12 +20,6 @@ Note: An alternative method is to run `sbt publishLocal stage`, which installs a
 Unzip either the downloaded or constructed zip file and switch current
 working directory to the extracted folder. Choose appropriate instructions from below based on requirement ie single machine or multiple machines.
  
-## Environment Variables
-
-Note that before running any CSW applications that use the location service (including HCDs, assemblies and other services), 
-some environment variables or system properties will need to be set to indicate the correct cluster seeds and possibly the network interface to use. 
-More detailed comments on this can be found in the [ClusterSettings](https://tmtsoftware.github.io/csw/api/scala/csw/location/commons/ClusterSettings.html) API documentation.
-
 ### Starting Location Server on a single machine
 The steps below describe how to run location server on a single machine. This can be a requirement for testing or demo purpose.
 
