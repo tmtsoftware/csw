@@ -30,6 +30,7 @@ class TimeServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
     println(s"Tai offset set to [${timeVal.tai}]")
   }
 
+  //DEOPSCSW-532: Synchronize activities with other comp. using UTC
   //DEOPSCSW-533: Access parts of UTC date.time in Java and Scala
   test("should get UTC time", Linux) {
     val timeService: TimeService = new TimeServiceImpl()
@@ -51,6 +52,7 @@ class TimeServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
     )
   }
 
+  //DEOPSCSW-535: Synchronize activities with other comp, using TAI
   //DEOPSCSW-536: Access parts of TAI date/time in Java and Scala
   //DEOPSCSW-530: SPIKE: Get TAI offset and convert to UTC and Vice Versa
   test("should get TAI time", Linux) {
@@ -83,6 +85,7 @@ class TimeServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
     offset shouldEqual TaiOffset
   }
 
+  //DEOPSCSW-542: Schedule a task to execute in future
   test("should schedule a task once at given start time with allowed jitter of 5ms", Linux) {
     val timeService: TimeService = new TimeServiceImpl()
 
