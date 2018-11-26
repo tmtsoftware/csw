@@ -5,10 +5,12 @@ import java.time._
 import akka.actor.ActorSystem
 import akka.testkit.TestProbe
 import csw.time.api.scaladsl.TimeService
+import csw.time.client.extensions.RichInstant.RichInstant
 import csw.time.client.internal.native_models.{NTPTimeVal, Timex}
 import csw.time.client.internal.{TimeLibrary, TimeServiceImpl}
 import csw.time.client.tags.Linux
 import org.scalatest.concurrent.Eventually
+import org.scalatest.time.SpanSugar.convertDoubleToGrainOfTime
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 class TimeServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with Eventually {
@@ -44,10 +46,9 @@ class TimeServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
   test("should get precision up to nanoseconds in UTC time", Linux) {
     val timeService: TimeService = new TimeServiceImpl()
 
-    val utcInstant = timeService.utcTime()
-
-    println(utcInstant.value)
-    Utils.digits(utcInstant.value.getNano) should be >= 7
+    eventually(timeout = timeout(50.millis), interval = interval(10.millis))(
+      timeService.utcTime().value.formatNanos should not endWith "000"
+    )
   }
 
   //DEOPSCSW-536: Access parts of TAI date/time in Java and Scala
@@ -63,6 +64,15 @@ class TimeServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
     val expectedMillis = TAIInstant.toEpochMilli +- 5
 
     taiInstant.value.toEpochMilli shouldEqual expectedMillis
+  }
+
+  //DEOPSCSW-538: PTP accuracy and precision while reading TAI
+  test("should get precision up to nanoseconds in TAI time", Linux) {
+    val timeService: TimeService = new TimeServiceImpl()
+
+    eventually(timeout = timeout(50.millis), interval = interval(10.millis))(
+      timeService.taiTime().value.formatNanos should not endWith "000"
+    )
   }
 
   //DEOPSCSW-530: SPIKE: Get TAI offset and convert to UTC and Vice Versa
