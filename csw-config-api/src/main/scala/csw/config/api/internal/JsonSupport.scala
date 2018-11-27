@@ -30,11 +30,7 @@ private[config] trait JsonSupport extends PlayJsonSupport {
     }
   }
 
-  implicit val configIdFormat: Format[ConfigId] = new Format[ConfigId] {
-    override def writes(obj: ConfigId): JsValue           = JsString(obj.id)
-    override def reads(json: JsValue): JsResult[ConfigId] = JsSuccess(ConfigId(json.as[String]))
-  }
-
+  implicit val configIdFormat: Format[ConfigId]                     = Json.format[ConfigId]
   implicit val configFileInfoFormat: OFormat[ConfigFileInfo]        = Json.format[ConfigFileInfo]
   implicit val configFileHistoryFormat: OFormat[ConfigFileRevision] = Json.format[ConfigFileRevision]
   implicit val configMetadataFormat: OFormat[ConfigMetadata]        = Json.format[ConfigMetadata]

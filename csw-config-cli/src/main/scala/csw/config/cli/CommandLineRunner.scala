@@ -98,16 +98,15 @@ class CommandLineRunner(
     val fileRevisions = await(
       configService.history(options.relativeRepoPath.get, options.fromDate, options.toDate, options.maxFileVersions)
     )
-    fileRevisions.foreach(h => printLine(s"${h.id.id}\t${h.time}\t${h.comment}"))
+    printHistory(fileRevisions)
     fileRevisions
   }
 
   def historyActive(options: Options): List[ConfigFileRevision] = {
     val fileRevisions = await(
-      configService
-        .historyActive(options.relativeRepoPath.get, options.fromDate, options.toDate, options.maxFileVersions)
+      configService.historyActive(options.relativeRepoPath.get, options.fromDate, options.toDate, options.maxFileVersions)
     )
-    fileRevisions.foreach(h => printLine(s"${h.id.id}\t${h.time}\t${h.comment}"))
+    printHistory(fileRevisions)
     fileRevisions
   }
 
@@ -177,4 +176,7 @@ class CommandLineRunner(
   // command line app is by nature blocking.
   // Do not use such method in library/server side code
   private def await[T](future: Future[T]): T = Await.result(future, Duration.Inf)
+
+  private def printHistory(fileRevisions: List[ConfigFileRevision]): Unit =
+    fileRevisions.foreach(h => printLine(s"${h.id.id}\t${h.time}\t${h.author}\t${h.comment}"))
 }
