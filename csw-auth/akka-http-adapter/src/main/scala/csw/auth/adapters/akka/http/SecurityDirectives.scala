@@ -16,11 +16,10 @@ class SecurityDirectives(authentication: Authentication) {
 
   private[auth] def authorize(authorizationPolicy: AuthorizationPolicy, accessToken: AccessToken): Directive0 =
     authorizationPolicy match {
-      case ResourceRolePolicy(name)                           => keycloakAuthorize(accessToken.hasResourceRole(name))
-      case RealmRolePolicy(name)                              => keycloakAuthorize(accessToken.hasRealmRole(name))
-      case PermissionPolicyWithDefaultResource(name)          => keycloakAuthorize(accessToken.hasPermission(name))
-      case PermissionPolicyWithCustomResource(name, resource) => keycloakAuthorize(accessToken.hasPermission(name, resource))
-      case CustomPolicy(predicate)                            => keycloakAuthorize(predicate(accessToken))
+      case ResourceRolePolicy(name)         => keycloakAuthorize(accessToken.hasResourceRole(name))
+      case RealmRolePolicy(name)            => keycloakAuthorize(accessToken.hasRealmRole(name))
+      case PermissionPolicy(name, resource) => keycloakAuthorize(accessToken.hasPermission(name, resource))
+      case CustomPolicy(predicate)          => keycloakAuthorize(predicate(accessToken))
     }
 
   private def sMethod(httpMethod: HttpMethod, authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] =

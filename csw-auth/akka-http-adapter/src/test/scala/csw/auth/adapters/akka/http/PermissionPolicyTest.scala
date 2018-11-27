@@ -5,7 +5,7 @@ import akka.http.scaladsl.model.headers.{Authorization, OAuth2BearerToken}
 import akka.http.scaladsl.server.directives.Credentials.Provided
 import akka.http.scaladsl.server.{Directives, Route}
 import akka.http.scaladsl.testkit._
-import csw.auth.adapters.akka.http.AuthorizationPolicy.PermissionPolicyWithDefaultResource
+import csw.auth.adapters.akka.http.AuthorizationPolicy.PermissionPolicy
 import csw.auth.core.token.AccessToken
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
@@ -29,7 +29,7 @@ class PermissionPolicyTest extends FunSuite with MockitoSugar with Directives wi
 
     val route: Route = securityDirectives.authenticate { implicit at ⇒
       get {
-        securityDirectives.authorize(PermissionPolicyWithDefaultResource("read"), at) {
+        securityDirectives.authorize(PermissionPolicy("read"), at) {
           complete("OK")
         }
       }
@@ -50,7 +50,7 @@ class PermissionPolicyTest extends FunSuite with MockitoSugar with Directives wi
 
     val route: Route = securityDirectives.authenticate { implicit at ⇒
       get {
-        securityDirectives.authorize(PermissionPolicyWithDefaultResource("read"), at) {
+        securityDirectives.authorize(PermissionPolicy("read"), at) {
           complete("OK")
         }
       }
@@ -82,7 +82,7 @@ class PermissionPolicyTest extends FunSuite with MockitoSugar with Directives wi
 
     val route: Route = securityDirectives.authenticate { implicit at ⇒
       get {
-        securityDirectives.authorize(PermissionPolicyWithDefaultResource("read"), at) {
+        securityDirectives.authorize(PermissionPolicy("read"), at) {
           complete("OK")
         }
       }
@@ -114,7 +114,7 @@ class PermissionPolicyTest extends FunSuite with MockitoSugar with Directives wi
 
     val route: Route = securityDirectives.authenticate { implicit at ⇒
       get {
-        securityDirectives.authorize(PermissionPolicyWithDefaultResource("read"), at) {
+        securityDirectives.authorize(PermissionPolicy("read"), at) {
           complete("OK")
         }
       }
