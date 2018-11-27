@@ -272,7 +272,12 @@ class SvnConfigService(settings: Settings, actorRuntime: ActorRuntime, svnRepo: 
   // get the content of the file representing active revisions and prepare the history view as (id (revision marked active), comment, time)
   private def historyActiveRevisions(path: Path, configFileRevision: ConfigFileRevision): Future[ConfigFileRevision] = async {
     val configData = await(getById(path, configFileRevision.id))
-    ConfigFileRevision(ConfigId(await(configData.get.toStringF)), configFileRevision.comment, configFileRevision.time)
+    ConfigFileRevision(
+      ConfigId(await(configData.get.toStringF)),
+      configFileRevision.author,
+      configFileRevision.comment,
+      configFileRevision.time
+    )
   }
 
   // determines whether the file at given path and id exists as normal or annex or is missing
@@ -326,7 +331,7 @@ class SvnConfigService(settings: Settings, actorRuntime: ActorRuntime, svnRepo: 
   // get the file history - (id (revision), comment, time)
   private def hist(path: Path, from: Instant, to: Instant, maxResults: Int): Future[List[ConfigFileRevision]] = async {
     await(svnRepo.hist(path, from, to, maxResults))
-      .map(e => ConfigFileRevision(ConfigId(e.getRevision), e.getMessage, e.getDate.toInstant))
+      .map(e => ConfigFileRevision(ConfigId(e.getRevision), e.getAuthor, e.getMessage, e.getDate.toInstant))
   }
 
   // File used to store the SHA-1 of the actual file, if annexd.

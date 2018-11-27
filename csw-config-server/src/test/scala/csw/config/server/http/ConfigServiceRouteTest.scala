@@ -11,6 +11,7 @@ import csw.config.server.ServerWiring
 import csw.config.server.commons.TestFileUtils
 import csw.config.server.mocks.MockedAuthentication
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
+import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
@@ -290,43 +291,51 @@ class ConfigServiceRouteTest
     }
   }
 
+  // DEOPSCSW-577: Ability to view detailed change log in SVN
+  // DEOPSCSW-625: Include username from svn in history model of config service
   test("history - success  status code") {
+    val bilal  = "bilal"
+    val poorva = "poorva"
 
-    //consumes 2 revisions, one for actual file one for active file
+    when(validToken.preferred_username).thenReturn(Some(bilal)).thenReturn(Some(poorva))
+
+    // consumes 2 revisions, one for actual file one for active file
+    // first request will use username=bilal
     Post("/secure/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
 
     val timeWhenFileWasCreated = Instant.now()
 
+    // second request will use username=poorva
     Put("/secure/config/test.conf?comment=commit2", updatedConfigFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.OK
     }
 
     val timeWhenFileWasUpdated = Instant.now()
 
-    val configFileHistoryIdCommentTuples = Set((ConfigId(1), "commit1"), (ConfigId(3), "commit2"))
+    val configFileHistoryIdAuthorCommentTuples = Set((ConfigId(1), bilal, "commit1"), (ConfigId(3), poorva, "commit2"))
 
     Get("/history/test.conf") ~> route ~> check {
       status shouldEqual StatusCodes.OK
 
       responseAs[List[ConfigFileRevision]]
-        .map(history => (history.id, history.comment))
-        .toSet shouldEqual configFileHistoryIdCommentTuples
+        .map(history => (history.id, history.author, history.comment))
+        .toSet shouldEqual configFileHistoryIdAuthorCommentTuples
     }
 
     Get("/history/test.conf?maxResults=1") ~> route ~> check {
       status shouldEqual StatusCodes.OK
 
       responseAs[List[ConfigFileRevision]]
-        .map(history => (history.id, history.comment)) shouldEqual List((ConfigId(3), "commit2"))
+        .map(history => (history.id, history.author, history.comment)) shouldEqual List((ConfigId(3), poorva, "commit2"))
     }
 
     Get(s"/history/test.conf?maxResults=1&from=$timeWhenFileWasCreated&to=$timeWhenFileWasUpdated") ~> route ~> check {
       status shouldEqual StatusCodes.OK
 
       responseAs[List[ConfigFileRevision]]
-        .map(history => (history.id, history.comment)) shouldEqual List((ConfigId(3), "commit2"))
+        .map(history => (history.id, history.author, history.comment)) shouldEqual List((ConfigId(3), poorva, "commit2"))
     }
 
   }
@@ -495,9 +504,17 @@ class ConfigServiceRouteTest
 
   }
 
+  // DEOPSCSW-577: Ability to view detailed change log in SVN
+  // DEOPSCSW-625: Include username from svn in history model of config service
   test("history-active - success  status code") {
+    val bilal   = "bilal"
+    val poorva  = "poorva"
+    val shubham = "shubham"
+
+    when(validToken.preferred_username).thenReturn(Some(bilal)).thenReturn(Some(poorva)).thenReturn(Some(shubham))
 
     //consumes 2 revisions, one for actual file one for active file
+    // first request will use username=bilal
     Post("/secure/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
@@ -508,35 +525,41 @@ class ConfigServiceRouteTest
       status shouldEqual StatusCodes.OK
     }
 
+    // second request will use username=poorva
+    Put("/secure/config/test.conf?comment=commit2", updatedConfigFile1).addHeader(validTokenHeader) ~> route ~> check {
+      status shouldEqual StatusCodes.OK
+    }
+
+    // third request will use username=shubham
     Put("/secure/active-version/test.conf?id=3&comment=commit1").addHeader(validTokenHeader) ~> Route.seal(route) ~> check {
       status shouldEqual StatusCodes.OK
     }
 
     val timeWhenFileWasUpdated = Instant.now()
 
-    val configFileHistoryIdCommentTuples =
-      Set((ConfigId(1), "initializing active file with the first version"), (ConfigId(3), "commit1"))
+    val configFileHistoryIdAuthorCommentTuples =
+      Set((ConfigId(1), bilal, "initializing active file with the first version"), (ConfigId(3), shubham, "commit1"))
 
     Get("/history-active/test.conf") ~> route ~> check {
       status shouldEqual StatusCodes.OK
 
       responseAs[List[ConfigFileRevision]]
-        .map(history => (history.id, history.comment))
-        .toSet shouldEqual configFileHistoryIdCommentTuples
+        .map(history => (history.id, history.author, history.comment))
+        .toSet shouldEqual configFileHistoryIdAuthorCommentTuples
     }
 
     Get("/history-active/test.conf?maxResults=1") ~> route ~> check {
       status shouldEqual StatusCodes.OK
 
       responseAs[List[ConfigFileRevision]]
-        .map(history => (history.id, history.comment)) shouldEqual List((ConfigId(3), "commit1"))
+        .map(history => (history.id, history.author, history.comment)) shouldEqual List((ConfigId(3), shubham, "commit1"))
     }
 
     Get(s"/history-active/test.conf?maxResults=1&from=$timeWhenFileWasCreated&to=$timeWhenFileWasUpdated") ~> route ~> check {
       status shouldEqual StatusCodes.OK
 
       responseAs[List[ConfigFileRevision]]
-        .map(history => (history.id, history.comment)) shouldEqual List((ConfigId(3), "commit1"))
+        .map(history => (history.id, history.author, history.comment)) shouldEqual List((ConfigId(3), shubham, "commit1"))
     }
 
   }

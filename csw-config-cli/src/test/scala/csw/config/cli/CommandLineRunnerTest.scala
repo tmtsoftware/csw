@@ -16,7 +16,7 @@ import csw.config.server.ServerWiring
 import csw.config.server.mocks.MockedAuthentication
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.server.http.HTTPLocationService
-import org.mockito.Mockito.verify
+import org.mockito.Mockito.{verify, when}
 import org.scalatest.{BeforeAndAfterEach, Matchers}
 
 // DEOPSCSW-112: Command line interface client for Configuration service
@@ -189,7 +189,13 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
     readFile(outputFilePath) shouldEqual inputFileContents
   }
 
+  // DEOPSCSW-577: Ability to view detailed change log in SVN
+  // DEOPSCSW-625: Include username from svn in history model of config service
   test("should able to fetch history of file.") {
+    val user1 = "user1"
+    val user2 = "user2"
+    val user3 = "user3"
+    when(validToken.preferred_username).thenReturn(Some(user1), Some(user2), Some(user3))
 
     //  create file
     val parsedCreateArgs: Option[Options] = argsParser.parse(createMinimalArgs)
@@ -205,37 +211,44 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
     val update2ConfigId                    = commandLineRunner.update(parsedUpdate2Args.get)
     val updateTS                           = Instant.now
 
-    commandLineRunner.history(argsParser.parse(historyArgs).get).map(_.id) shouldBe List(update2ConfigId,
-                                                                                         updateConfigId,
-                                                                                         createConfigId)
+    commandLineRunner.history(argsParser.parse(historyArgs).get).map(h ⇒ (h.id, h.author, h.comment)).toSet shouldBe
+    Set((createConfigId, user1, comment), (updateConfigId, user2, comment), (update2ConfigId, user3, comment))
 
     commandLineRunner
       .history(argsParser.parse(historyArgs :+ "--from" :+ createTS.toString :+ "--to" :+ updateTS.toString).get)
       .map(_.id) shouldBe List(update2ConfigId, updateConfigId)
   }
 
+  // DEOPSCSW-577: Ability to view detailed change log in SVN
+  // DEOPSCSW-625: Include username from svn in history model of config service
   test("should able to fetch history of active files.") {
+    val user1 = "user1"
+    val user2 = "user2"
+    val user3 = "user3"
+    val user4 = "user4"
+    val user5 = "user5"
+    when(validToken.preferred_username).thenReturn(Some(user1), Some(user2), Some(user3), Some(user4), Some(user5))
 
     //  create file
     val parsedCreateArgs: Option[Options] = argsParser.parse(createMinimalArgs)
-    val createConfigId                    = commandLineRunner.create(parsedCreateArgs.get)
+    val createConfigId                    = commandLineRunner.create(parsedCreateArgs.get) //user1
     val createTS                          = Instant.now
 
     //  update file content
     val parsedUpdateArgs: Option[Options] = argsParser.parse(updateAllArgs)
-    val updateConfigId                    = commandLineRunner.update(parsedUpdateArgs.get)
+    val updateConfigId                    = commandLineRunner.update(parsedUpdateArgs.get) //user2
 
     //  update file content
     val parsedUpdate2Args: Option[Options] = argsParser.parse(updateAllArgs)
-    val update2ConfigId                    = commandLineRunner.update(parsedUpdate2Args.get)
+    val update2ConfigId                    = commandLineRunner.update(parsedUpdate2Args.get) //user3
 
     val setActiveArgs = Array("setActiveVersion", relativeRepoPath, "--id", updateConfigId.id, "-c", comment)
-    commandLineRunner.setActiveVersion(argsParser.parse(setActiveArgs).get)
+    commandLineRunner.setActiveVersion(argsParser.parse(setActiveArgs).get) //user4
 
-    commandLineRunner.historyActive(argsParser.parse(historyActiveArgs).get).map(_.id) shouldBe List(updateConfigId,
-                                                                                                     createConfigId)
+    commandLineRunner.historyActive(argsParser.parse(historyActiveArgs).get).map(h ⇒ (h.id, h.author, h.comment)).toSet shouldBe
+    Set((createConfigId, user1, "initializing active file with the first version"), (updateConfigId, user4, comment))
 
-    commandLineRunner.resetActiveVersion(argsParser.parse(resetActiveAllArgs).get)
+    commandLineRunner.resetActiveVersion(argsParser.parse(resetActiveAllArgs).get) //user5
 
     commandLineRunner
       .historyActive(
