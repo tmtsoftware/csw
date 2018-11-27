@@ -4,7 +4,7 @@ import java.time._
 
 import akka.actor.ActorSystem
 import akka.testkit.TestProbe
-import csw.time.api.models.CswInstant.TaiInstant
+import csw.time.api.models.CswInstant.{TaiInstant, UtcInstant}
 import csw.time.api.scaladsl.TimeService
 import csw.time.client.extensions.RichInstant.RichInstant
 import csw.time.client.internal.native_models.{NTPTimeVal, Timex}
@@ -31,6 +31,8 @@ class TimeServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
     println(s"Tai offset set to [${timeVal.tai}]")
   }
 
+  //------------------------------UTC-------------------------------
+
   //DEOPSCSW-532: Synchronize activities with other comp. using UTC
   //DEOPSCSW-533: Access parts of UTC date.time in Java and Scala
   test("should get UTC time", Linux) {
@@ -52,6 +54,24 @@ class TimeServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
       timeService.utcTime().value.formatNanos should not endWith "000"
     )
   }
+
+  //DEOPSCSW-533: Access parts of UTC date.time in Java and Scala
+  test("should access parts of UTC time", Linux) {
+    val utcInstant = UtcInstant(Instant.parse("2007-12-03T10:15:30.00Z"))
+
+    val hstZone = ZoneId.of("-10:00")
+
+    val hstZDT: ZonedDateTime = utcInstant.value.atZone(hstZone)
+
+    hstZDT.getYear shouldBe 2007
+    hstZDT.getMonth.getValue shouldBe 12
+    hstZDT.getDayOfMonth shouldBe 3
+    hstZDT.getHour shouldBe 0 // since HST is -10:00 from UTC
+    hstZDT.getMinute shouldBe 15
+    hstZDT.getSecond shouldBe 30
+  }
+
+  //------------------------------TAI-------------------------------
 
   //DEOPSCSW-535: Synchronize activities with other comp, using TAI
   //DEOPSCSW-536: Access parts of TAI date/time in Java and Scala
@@ -78,6 +98,22 @@ class TimeServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
     )
   }
 
+  //DEOPSCSW-536: Access parts of TAI date.time in Java and Scala
+  test("should access parts of TAI time", Linux) {
+    val taiInstant = TaiInstant(Instant.parse("2007-12-03T10:15:30.00Z"))
+
+    val hstZone = ZoneId.of("-10:00")
+
+    val hstZDT = taiInstant.value.atZone(hstZone)
+
+    hstZDT.getYear shouldBe 2007
+    hstZDT.getMonth.getValue shouldBe 12
+    hstZDT.getDayOfMonth shouldBe 3
+    hstZDT.getHour shouldBe 0 // since HST is -10:00 from UTC
+    hstZDT.getMinute shouldBe 15
+    hstZDT.getSecond shouldBe 30
+  }
+
   //DEOPSCSW-530: SPIKE: Get TAI offset and convert to UTC and Vice Versa
   test("should get TAI offset") {
     val timeService: TimeService = new TimeServiceImpl()
@@ -85,6 +121,8 @@ class TimeServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
     val offset = timeService.taiOffset()
     offset shouldEqual TaiOffset
   }
+
+  //------------------------------Scheduling-------------------------------
 
   //DEOPSCSW-542: Schedule a task to execute in future
   test("should schedule a task once at given start time with allowed jitter of 5ms", Linux) {
