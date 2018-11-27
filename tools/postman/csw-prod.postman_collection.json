@@ -1,39 +1,21 @@
 {
-	"variables": [],
 	"info": {
-		"name": "csw copy",
-		"_postman_id": "3066e393-a4ba-72ea-0947-ebb3ebffa0fa",
-		"description": "Common Software is the package of services and infrastructure software that integrates the TMT software systems.\n\nhttp://www.tmt.org\n\nThis collection of routes consists of http end points exposed by TMT common software.\n\nComplete codebase is available at https://github.com/tmtsoftware/csw",
-		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+		"_postman_id": "8dee7bb6-4d14-61c4-ebe9-f9320c8e90e9",
+		"name": "csw-prod",
+		"description": "Common Software is the package of services and infrastructure software that integrates the TMT software systems.\n\nhttp://www.tmt.org\n\nThis collection of routes consists of http end points exposed by TMT common software.\n\nComplete codebase is available at https://github.com/tmtsoftware/csw-prod",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
 			"name": "Configuration Service",
-			"description": "Configuration service provides the collection of api's to store, retrieve and maintain the history of component configuration files.",
 			"item": [
 				{
 					"name": "create",
 					"event": [
 						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"tests[\"response code is 201\"] = responseCode.code === 201;",
-									"",
-									"tests[\"Body matches string\"] = responseBody.has(\"id\");",
-									"",
-									"var jsonData = JSON.parse(responseBody);",
-									"postman.setGlobalVariable(\"id\", jsonData.id);",
-									"",
-									""
-								]
-							}
-						},
-						{
 							"listen": "prerequest",
 							"script": {
-								"type": "text/javascript",
+								"id": "33360c9e-2bce-40ca-a353-d12d95424ec6",
 								"exec": [
 									"",
 									"postman.clearGlobalVariable(\"path\");",
@@ -44,19 +26,59 @@
 									"var path = \"trombone/hcd/application_\" + random",
 									"postman.setGlobalVariable(\"path\", path);",
 									""
-								]
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "8c02e129-9fdd-48d0-9f76-546612632c1a",
+								"exec": [
+									"tests[\"response code is 201\"] = responseCode.code === 201;",
+									"",
+									"tests[\"Body matches string\"] = responseBody.has(\"id\");",
+									"",
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setGlobalVariable(\"id\", jsonData.id);",
+									"",
+									""
+								],
+								"type": "text/javascript"
 							}
 						}
 					],
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "text/plain"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "containers: [\n  {\n    containerCmdAppExecPath: \"/Users/pritamkadam/TMT/csw-prod/target/universal/stage/bin/container-cmd-app\"\n    mode: \"Container\"\n    configFilePath: \"container.conf\"\n    configFileLocation: \"Remote\"\n  },\n  {\n    containerCmdAppExecPath: \"/Users/pritamkadam/TMT/csw-prod/target/universal/stage/bin/container-cmd-app\"\n    mode: \"Standalone\"\n    configFilePath: \"/Users/pritamkadam/TMT/csw-prod/csw-framework/src/multi-jvm/resources/eaton_hcd_standalone.conf\"\n    configFileLocation: \"Local\"\n  }\n]"
+						},
 						"url": {
-							"raw": "http://{{hostname}}:{{port}}/config/{{path}}?comment=\"Sample commit message\"",
+							"raw": "http://{{hostname}}:{{port}}/secure/config/{{path}}?comment=\"Sample commit message\"",
 							"protocol": "http",
 							"host": [
 								"{{hostname}}"
 							],
 							"port": "{{port}}",
 							"path": [
+								"secure",
 								"config",
 								"{{path}}"
 							],
@@ -64,93 +86,33 @@
 								{
 									"key": "annnex",
 									"value": "true",
-									"equals": true,
 									"description": "Flag to upload file in Annex store.",
 									"disabled": true
 								},
 								{
 									"key": "comment",
 									"value": "\"Sample commit message\"",
-									"equals": true,
 									"description": "Create commit message."
 								}
-							],
-							"variable": []
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "text/plain",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "****************************************************\n*****************   version : 1   ******************\n****************************************************\n\n\n// This describes a container containing the HCD and is used to start the actors.\ncontainer {\n  name = \"tromboneHCD\"\n  connectionType: [akka]\n  components {\n    lgsTromboneHCD {\n      type = HCD\n      class = \"csw.examples.vslice.hcd.TromboneHCD\"\n      prefix = nfiraos.ncc.tromboneHCD\n      connectionType: [akka]\n      rate = 1 second\n    }\n  }\n}\n\n// Additional, application specific configuration for the HCD\ncsw.examples.trombone.hcd {\n  axis-config {\n    axisName = \"tromboneAxis\"\n    lowLimit = 100\n    lowUser = 200\n    highUser = 1200\n    highLimit = 1300\n    home = 300\n    startPosition = 350\n    stepDelayMS = 100  // This value can be shorter, but 150 shows well in tests\n  }\n}\n\n// This describes a container containing the HCD and is used to start the actors.\ncontainer {\n  name = \"tromboneHCD\"\n  connectionType: [akka]\n  components {\n    lgsTromboneHCD {\n      type = HCD\n      class = \"csw.examples.vslice.hcd.TromboneHCD\"\n      prefix = nfiraos.ncc.tromboneHCD\n      connectionType: [akka]\n      rate = 1 second\n    }\n  }\n}"
+							]
 						},
 						"description": "Create Api lets you upload configuration file in the repository.\nConfiguraion file gets stored in annex store if one of the below condition statisfies else gets stored in normal store :\n1. Annex flag is true\n2. File size exceeds the maximum size configured in Configuration service."
 					},
 					"response": [
 						{
-							"id": "702d1516-38d1-423b-bb01-ab037003a5e4",
-							"name": "Create normal conf file.",
+							"name": "Invalid file path.",
 							"originalRequest": {
-								"url": {
-									"raw": "http://{{hostname}}:{{port}}/config/{{path}}?comment=\"Sample commit message\"",
-									"protocol": "http",
-									"host": [
-										"{{hostname}}"
-									],
-									"port": "{{port}}",
-									"path": [
-										"config",
-										"{{path}}"
-									],
-									"query": [
-										{
-											"key": "annnex",
-											"value": "true",
-											"equals": true,
-											"description": "Flag to upload file in Annex store.",
-											"disabled": true
-										},
-										{
-											"key": "comment",
-											"value": "\"Sample commit message\"",
-											"equals": true,
-											"description": "Create commit message."
-										}
-									],
-									"variable": []
-								},
 								"method": "POST",
 								"header": [
 									{
 										"key": "Content-Type",
-										"value": "text/plain",
-										"description": ""
+										"value": "text/plain"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "****************************************************\n*****************   version : 1   ******************\n****************************************************\n\n\n// This describes a container containing the HCD and is used to start the actors.\ncontainer {\n  name = \"tromboneHCD\"\n  connectionType: [akka]\n  components {\n    lgsTromboneHCD {\n      type = HCD\n      class = \"csw.examples.vslice.hcd.TromboneHCD\"\n      prefix = nfiraos.ncc.tromboneHCD\n      connectionType: [akka]\n      rate = 1 second\n    }\n  }\n}\n\n// Additional, application specific configuration for the HCD\ncsw.examples.trombone.hcd {\n  axis-config {\n    axisName = \"tromboneAxis\"\n    lowLimit = 100\n    lowUser = 200\n    highUser = 1200\n    highLimit = 1300\n    home = 300\n    startPosition = 350\n    stepDelayMS = 100  // This value can be shorter, but 150 shows well in tests\n  }\n}\n\n// This describes a container containing the HCD and is used to start the actors.\ncontainer {\n  name = \"tromboneHCD\"\n  connectionType: [akka]\n  components {\n    lgsTromboneHCD {\n      type = HCD\n      class = \"csw.examples.vslice.hcd.TromboneHCD\"\n      prefix = nfiraos.ncc.tromboneHCD\n      connectionType: [akka]\n      rate = 1 second\n    }\n  }\n}"
 								},
-								"description": ""
-							},
-							"status": "Created",
-							"code": 201,
-							"_postman_previewlanguage": "Text",
-							"_postman_previewtype": "parsed",
-							"header": [],
-							"cookie": [],
-							"responseTime": 0,
-							"body": "{\n\"id\" : \"1\"\n}"
-						},
-						{
-							"id": "c5acb015-0620-40db-81b9-47a3104f38a8",
-							"name": "Invalid file path.",
-							"originalRequest": {
 								"url": {
 									"raw": "http://{{hostname}}:{{port}}/config/File%Path?comment=\"My path is invalid\"",
 									"protocol": "http",
@@ -166,41 +128,70 @@
 										{
 											"key": "annnex",
 											"value": "true",
-											"equals": true,
 											"description": "Flag to upload file in Annex store.",
 											"disabled": true
 										},
 										{
 											"key": "comment",
 											"value": "\"My path is invalid\"",
-											"equals": true,
 											"description": "Create commit message."
 										}
-									],
-									"variable": []
-								},
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "Text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						},
+						{
+							"name": "Create normal conf file.",
+							"originalRequest": {
 								"method": "POST",
 								"header": [
 									{
 										"key": "Content-Type",
-										"value": "text/plain",
-										"description": ""
+										"value": "text/plain"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "****************************************************\n*****************   version : 1   ******************\n****************************************************\n\n\n// This describes a container containing the HCD and is used to start the actors.\ncontainer {\n  name = \"tromboneHCD\"\n  connectionType: [akka]\n  components {\n    lgsTromboneHCD {\n      type = HCD\n      class = \"csw.examples.vslice.hcd.TromboneHCD\"\n      prefix = nfiraos.ncc.tromboneHCD\n      connectionType: [akka]\n      rate = 1 second\n    }\n  }\n}\n\n// Additional, application specific configuration for the HCD\ncsw.examples.trombone.hcd {\n  axis-config {\n    axisName = \"tromboneAxis\"\n    lowLimit = 100\n    lowUser = 200\n    highUser = 1200\n    highLimit = 1300\n    home = 300\n    startPosition = 350\n    stepDelayMS = 100  // This value can be shorter, but 150 shows well in tests\n  }\n}\n\n// This describes a container containing the HCD and is used to start the actors.\ncontainer {\n  name = \"tromboneHCD\"\n  connectionType: [akka]\n  components {\n    lgsTromboneHCD {\n      type = HCD\n      class = \"csw.examples.vslice.hcd.TromboneHCD\"\n      prefix = nfiraos.ncc.tromboneHCD\n      connectionType: [akka]\n      rate = 1 second\n    }\n  }\n}"
 								},
-								"description": ""
+								"url": {
+									"raw": "http://{{hostname}}:{{port}}/config/{{path}}?comment=\"Sample commit message\"",
+									"protocol": "http",
+									"host": [
+										"{{hostname}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"config",
+										"{{path}}"
+									],
+									"query": [
+										{
+											"key": "annnex",
+											"value": "true",
+											"description": "Flag to upload file in Annex store.",
+											"disabled": true
+										},
+										{
+											"key": "comment",
+											"value": "\"Sample commit message\"",
+											"description": "Create commit message."
+										}
+									]
+								}
 							},
-							"status": "Bad Request",
-							"code": 400,
+							"status": "Created",
+							"code": 201,
 							"_postman_previewlanguage": "Text",
-							"_postman_previewtype": "parsed",
 							"header": [],
 							"cookie": [],
-							"responseTime": 0,
-							"body": ""
+							"body": "{\n\"id\" : \"1\"\n}"
 						}
 					]
 				},
@@ -218,6 +209,12 @@
 						}
 					],
 					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "http://{{hostname}}:{{port}}/config/{{path}}?",
 							"protocol": "http",
@@ -233,49 +230,14 @@
 								{
 									"key": "id",
 									"value": "1",
-									"equals": true,
 									"description": "Revision number of configuration file.",
 									"disabled": true
 								},
 								{
 									"key": "date",
 									"value": "2017-05-06T06:50:32.283Z",
-									"equals": true,
 									"description": "Latest version of file on provided timestamp will be retrieved.",
 									"disabled": true
-								}
-							],
-							"variable": []
-						},
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "code",
-									"value": "xWnkliVQJURqB2x1",
-									"type": "text"
-								},
-								{
-									"key": "grant_type",
-									"value": "authorization_code",
-									"type": "text"
-								},
-								{
-									"key": "redirect_uri",
-									"value": "https://www.getpostman.com/oauth2/callback",
-									"type": "text"
-								},
-								{
-									"key": "client_id",
-									"value": "abc123",
-									"type": "text"
-								},
-								{
-									"key": "client_secret",
-									"value": "ssh-secret",
-									"type": "text"
 								}
 							]
 						},
@@ -289,24 +251,42 @@
 						{
 							"listen": "test",
 							"script": {
-								"type": "text/javascript",
+								"id": "540a0fa9-3f19-4835-95b3-d2d5faa9dfe9",
 								"exec": [
 									"tests[\"response code is 200\"] = responseCode.code === 200;",
 									"",
 									"tests[\"Body matches string\"] = responseBody.has(\"id\");"
-								]
+								],
+								"type": "text/javascript"
 							}
 						}
 					],
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "***********************************************************\n********************* Version 2 ***************************\n***********************************************************\ncsw-config-server {\n\n  repository-dir = /tmp/csw-config-svn\n  tmp-dir = /tmp/csw-config-temp\n  oversize-files-dir = /tmp/csw-config-oversize-files\n\n  svn-user-name = some-user-name\n\n  sha1-suffix = .sha1\n  default-suffix = .default\n\n  service-port = 4000\n  service-port = ${?httpPort}\n\n  blocking-io-dispatcher = \"csw-config-server.default-blocking-io-dispatcher\"\n\n  default-blocking-io-dispatcher {\n    type = \"Dispatcher\"\n    executor = \"thread-pool-executor\"\n    throughput = 1\n\n    thread-pool-executor {\n      fixed-pool-size = 64\n    }\n  }\n\n}\n"
+						},
 						"url": {
-							"raw": "http://{{hostname}}:{{port}}/config/{{path}}?comment=\"Sample update commit message\"",
+							"raw": "http://{{hostname}}:{{port}}/secure/config/{{path}}?comment=\"Sample update commit message\"",
 							"protocol": "http",
 							"host": [
 								"{{hostname}}"
 							],
 							"port": "{{port}}",
 							"path": [
+								"secure",
 								"config",
 								"{{path}}"
 							],
@@ -314,17 +294,9 @@
 								{
 									"key": "comment",
 									"value": "\"Sample update commit message\"",
-									"equals": true,
 									"description": "Update commit message."
 								}
-							],
-							"variable": []
-						},
-						"method": "PUT",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "***********************************************************\n********************* Version 2 ***************************\n***********************************************************\ncsw-config-server {\n\n  repository-dir = /tmp/csw-config-svn\n  tmp-dir = /tmp/csw-config-temp\n  oversize-files-dir = /tmp/csw-config-oversize-files\n\n  svn-user-name = some-user-name\n\n  sha1-suffix = .sha1\n  default-suffix = .default\n\n  service-port = 4000\n  service-port = ${?httpPort}\n\n  blocking-io-dispatcher = \"csw-config-server.default-blocking-io-dispatcher\"\n\n  default-blocking-io-dispatcher {\n    type = \"Dispatcher\"\n    executor = \"thread-pool-executor\"\n    throughput = 1\n\n    thread-pool-executor {\n      fixed-pool-size = 64\n    }\n  }\n\n}\n"
+							]
 						},
 						"description": "Update Api modifies the content of existing file with the updated content."
 					},
@@ -336,41 +308,50 @@
 						{
 							"listen": "test",
 							"script": {
-								"type": "text/javascript",
+								"id": "112ced1b-9b64-4ed3-8587-c07e75541dd8",
 								"exec": [
 									"tests[\"response code is 200\"] = responseCode.code === 200;",
 									""
-								]
+								],
+								"type": "text/javascript"
 							}
 						}
 					],
 					"request": {
-						"url": {
-							"raw": "http://{{hostname}}:{{port}}/config/{{path}}?comment=\"deleting config file\"",
-							"protocol": "http",
-							"host": [
-								"{{hostname}}"
-							],
-							"port": "{{port}}",
-							"path": [
-								"config",
-								"{{path}}"
-							],
-							"query": [
+						"auth": {
+							"type": "bearer",
+							"bearer": [
 								{
-									"key": "comment",
-									"value": "\"deleting config file\"",
-									"equals": true,
-									"description": "Deletion commit message."
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
 								}
-							],
-							"variable": []
+							]
 						},
 						"method": "DELETE",
 						"header": [],
 						"body": {
 							"mode": "raw",
 							"raw": ""
+						},
+						"url": {
+							"raw": "http://{{hostname}}:{{port}}/secure/config/{{path}}?comment=\"deleting config file\"",
+							"protocol": "http",
+							"host": [
+								"{{hostname}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"secure",
+								"config",
+								"{{path}}"
+							],
+							"query": [
+								{
+									"key": "comment",
+									"value": "\"deleting config file\""
+								}
+							]
 						},
 						"description": "Delete Api removes the configuration file from repository."
 					},
@@ -390,6 +371,12 @@
 						}
 					],
 					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "http://{{hostname}}:{{port}}/list?",
 							"protocol": "http",
@@ -404,49 +391,14 @@
 								{
 									"key": "fileType",
 									"value": "annex",
-									"equals": false,
 									"description": "One of Annex/Normal File type.",
 									"disabled": true
 								},
 								{
 									"key": "pattern",
 									"value": "/trombone/.*",
-									"equals": true,
 									"description": "Regular expression to filter list of files.",
 									"disabled": true
-								}
-							],
-							"variable": []
-						},
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "code",
-									"value": "xWnkliVQJURqB2x1",
-									"type": "text"
-								},
-								{
-									"key": "grant_type",
-									"value": "authorization_code",
-									"type": "text"
-								},
-								{
-									"key": "redirect_uri",
-									"value": "https://www.getpostman.com/oauth2/callback",
-									"type": "text"
-								},
-								{
-									"key": "client_id",
-									"value": "abc123",
-									"type": "text"
-								},
-								{
-									"key": "client_secret",
-									"value": "ssh-secret",
-									"type": "text"
 								}
 							]
 						},
@@ -460,14 +412,21 @@
 						{
 							"listen": "test",
 							"script": {
-								"type": "text/javascript",
+								"id": "efdcec94-8238-4564-adef-be9c140b08c5",
 								"exec": [
 									"tests[\"response code is 200\"] = responseCode.code === 200;"
-								]
+								],
+								"type": "text/javascript"
 							}
 						}
 					],
 					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "http://{{hostname}}:{{port}}/history/{{path}}?",
 							"protocol": "http",
@@ -483,56 +442,20 @@
 								{
 									"key": "maxResults",
 									"value": "100",
-									"equals": true,
 									"description": "Fetch the provided number of results,",
 									"disabled": true
 								},
 								{
 									"key": "from",
 									"value": "2017-05-06T07:10:38.385Z",
-									"equals": false,
 									"description": "Retrieves history from timestamp onwards.",
 									"disabled": true
 								},
 								{
 									"key": "to",
 									"value": "2017-05-06T07:55:38.385Z",
-									"equals": false,
 									"description": "Retrieves hostory till the timestamp.",
 									"disabled": true
-								}
-							],
-							"variable": []
-						},
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "code",
-									"value": "xWnkliVQJURqB2x1",
-									"type": "text"
-								},
-								{
-									"key": "grant_type",
-									"value": "authorization_code",
-									"type": "text"
-								},
-								{
-									"key": "redirect_uri",
-									"value": "https://www.getpostman.com/oauth2/callback",
-									"type": "text"
-								},
-								{
-									"key": "client_id",
-									"value": "abc123",
-									"type": "text"
-								},
-								{
-									"key": "client_secret",
-									"value": "ssh-secret",
-									"type": "text"
 								}
 							]
 						},
@@ -554,6 +477,12 @@
 						}
 					],
 					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "http://{{hostname}}:{{port}}/history-active/{{path}}?",
 							"protocol": "http",
@@ -569,56 +498,20 @@
 								{
 									"key": "maxResults",
 									"value": "100",
-									"equals": true,
 									"description": "Fetch the provided number of results,",
 									"disabled": true
 								},
 								{
 									"key": "from",
 									"value": "2017-05-06T07:10:38.385Z",
-									"equals": false,
 									"description": "Retrieves active revisions history from timestamp onwards.",
 									"disabled": true
 								},
 								{
 									"key": "to",
 									"value": "2017-05-06T07:55:38.385Z",
-									"equals": false,
 									"description": "Retrieves active revisions history till the provided timestamp.",
 									"disabled": true
-								}
-							],
-							"variable": []
-						},
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "code",
-									"value": "xWnkliVQJURqB2x1",
-									"type": "text"
-								},
-								{
-									"key": "grant_type",
-									"value": "authorization_code",
-									"type": "text"
-								},
-								{
-									"key": "redirect_uri",
-									"value": "https://www.getpostman.com/oauth2/callback",
-									"type": "text"
-								},
-								{
-									"key": "client_id",
-									"value": "abc123",
-									"type": "text"
-								},
-								{
-									"key": "client_secret",
-									"value": "ssh-secret",
-									"type": "text"
 								}
 							]
 						},
@@ -632,40 +525,24 @@
 						{
 							"listen": "test",
 							"script": {
-								"type": "text/javascript",
+								"id": "b5a91829-07d6-478f-8ef5-443f9142dce5",
 								"exec": [
 									"tests[\"response code is 200\"] = responseCode.code === 200;"
-								]
+								],
+								"type": "text/javascript"
 							}
 						}
 					],
 					"request": {
-						"url": {
-							"raw": "http://{{hostname}}:{{port}}/active-version/{{path}}?id={{id}}&comment=\"Setting activer version\"",
-							"protocol": "http",
-							"host": [
-								"{{hostname}}"
-							],
-							"port": "{{port}}",
-							"path": [
-								"active-version",
-								"{{path}}"
-							],
-							"query": [
+						"auth": {
+							"type": "bearer",
+							"bearer": [
 								{
-									"key": "id",
-									"value": "{{id}}",
-									"equals": true,
-									"description": "Revision number of configuration file to be marked as active."
-								},
-								{
-									"key": "comment",
-									"value": "\"Setting activer version\"",
-									"equals": true,
-									"description": "Set active commit message."
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
 								}
-							],
-							"variable": []
+							]
 						},
 						"method": "PUT",
 						"header": [],
@@ -674,8 +551,33 @@
 							"formdata": [
 								{
 									"key": "conf",
-									"value": "",
-									"type": "file"
+									"type": "file",
+									"src": ""
+								}
+							]
+						},
+						"url": {
+							"raw": "http://{{hostname}}:{{port}}/secure/active-version/{{path}}?id={{id}}&comment=\"Setting activer version\"",
+							"protocol": "http",
+							"host": [
+								"{{hostname}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"secure",
+								"active-version",
+								"{{path}}"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{id}}",
+									"description": "Revision number of configuration file to be marked as active."
+								},
+								{
+									"key": "comment",
+									"value": "\"Setting activer version\"",
+									"description": "Set active commit message."
 								}
 							]
 						},
@@ -689,34 +591,24 @@
 						{
 							"listen": "test",
 							"script": {
-								"type": "text/javascript",
+								"id": "50781664-8d4d-4b58-8e9e-93ba1679fe88",
 								"exec": [
 									"tests[\"response code is 200\"] = responseCode.code === 200;"
-								]
+								],
+								"type": "text/javascript"
 							}
 						}
 					],
 					"request": {
-						"url": {
-							"raw": "http://{{hostname}}:{{port}}/active-version/{{path}}?comment=\"Resetting active version\"",
-							"protocol": "http",
-							"host": [
-								"{{hostname}}"
-							],
-							"port": "{{port}}",
-							"path": [
-								"active-version",
-								"{{path}}"
-							],
-							"query": [
+						"auth": {
+							"type": "bearer",
+							"bearer": [
 								{
-									"key": "comment",
-									"value": "\"Resetting active version\"",
-									"equals": true,
-									"description": "Reset active commit message."
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
 								}
-							],
-							"variable": []
+							]
 						},
 						"method": "PUT",
 						"header": [],
@@ -725,8 +617,28 @@
 							"formdata": [
 								{
 									"key": "conf",
-									"value": "",
-									"type": "file"
+									"type": "file",
+									"src": ""
+								}
+							]
+						},
+						"url": {
+							"raw": "http://{{hostname}}:{{port}}/secure/active-version/{{path}}?comment=\"Resetting active version\"",
+							"protocol": "http",
+							"host": [
+								"{{hostname}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"secure",
+								"active-version",
+								"{{path}}"
+							],
+							"query": [
+								{
+									"key": "comment",
+									"value": "\"Resetting active version\"",
+									"description": "Reset active commit message."
 								}
 							]
 						},
@@ -748,17 +660,22 @@
 						}
 					],
 					"request": {
-						"url": "http://{{hostname}}:{{port}}/active-version/{{path}}",
 						"method": "GET",
 						"header": [],
 						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "conf",
-									"value": "",
-									"type": "file"
-								}
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://{{hostname}}:{{port}}/active-version/{{path}}",
+							"protocol": "http",
+							"host": [
+								"{{hostname}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"active-version",
+								"{{path}}"
 							]
 						},
 						"description": "Get active version Api fetches the current active version of a configuration file."
@@ -779,6 +696,12 @@
 						}
 					],
 					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "http://{{hostname}}:{{port}}/active-config/{{path}}?",
 							"protocol": "http",
@@ -794,42 +717,8 @@
 								{
 									"key": "date",
 									"value": "2017-05-06T07:55:38.385Z",
-									"equals": true,
 									"description": "Fetch the active configuration file on provided timestamp.",
 									"disabled": true
-								}
-							],
-							"variable": []
-						},
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "code",
-									"value": "xWnkliVQJURqB2x1",
-									"type": "text"
-								},
-								{
-									"key": "grant_type",
-									"value": "authorization_code",
-									"type": "text"
-								},
-								{
-									"key": "redirect_uri",
-									"value": "https://www.getpostman.com/oauth2/callback",
-									"type": "text"
-								},
-								{
-									"key": "client_id",
-									"value": "abc123",
-									"type": "text"
-								},
-								{
-									"key": "client_secret",
-									"value": "ssh-secret",
-									"type": "text"
 								}
 							]
 						},
@@ -851,37 +740,22 @@
 						}
 					],
 					"request": {
-						"url": "http://{{hostname}}:{{port}}/config/{{path}}",
 						"method": "HEAD",
 						"header": [],
 						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "code",
-									"value": "xWnkliVQJURqB2x1",
-									"type": "text"
-								},
-								{
-									"key": "grant_type",
-									"value": "authorization_code",
-									"type": "text"
-								},
-								{
-									"key": "redirect_uri",
-									"value": "https://www.getpostman.com/oauth2/callback",
-									"type": "text"
-								},
-								{
-									"key": "client_id",
-									"value": "abc123",
-									"type": "text"
-								},
-								{
-									"key": "client_secret",
-									"value": "ssh-secret",
-									"type": "text"
-								}
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://{{hostname}}:{{port}}/config/{{path}}",
+							"protocol": "http",
+							"host": [
+								"{{hostname}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"config",
+								"{{path}}"
 							]
 						},
 						"description": "Performing a simple `GET` request to this endpoint returns status code `401 Unauthorized` with `WWW-Authenticate` header containing information to successfully authenticate subsequent requests.\nThe `WWW-Authenticate` header must be processed to extract `realm` and `nonce` values to hash subsequent requests.\n\nWhen this request is executed within Postman, the script attached with this request does the hard work of extracting realm and nonce from the header and set it as [global variables](https://www.getpostman.com/docs/environments#global-variables?source=echo-collection-app-onboarding) named `echo_digest_nonce` and `echo_digest_realm`.\nThese variables are re-used in subsequent request for seamless integration of the two requests."
@@ -894,56 +768,41 @@
 						{
 							"listen": "test",
 							"script": {
-								"type": "text/javascript",
+								"id": "61489b4f-5d00-4415-8dcf-18d5749fb0be",
 								"exec": [
 									"tests[\"response code is 200\"] = responseCode.code === 200;"
-								]
+								],
+								"type": "text/javascript"
 							}
 						}
 					],
 					"request": {
-						"url": "http://{{hostname}}:{{port}}/metadata",
 						"method": "GET",
 						"header": [],
 						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "code",
-									"value": "xWnkliVQJURqB2x1",
-									"type": "text"
-								},
-								{
-									"key": "grant_type",
-									"value": "authorization_code",
-									"type": "text"
-								},
-								{
-									"key": "redirect_uri",
-									"value": "https://www.getpostman.com/oauth2/callback",
-									"type": "text"
-								},
-								{
-									"key": "client_id",
-									"value": "abc123",
-									"type": "text"
-								},
-								{
-									"key": "client_secret",
-									"value": "ssh-secret",
-									"type": "text"
-								}
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://{{hostname}}:{{port}}/metadata",
+							"protocol": "http",
+							"host": [
+								"{{hostname}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"metadata"
 							]
 						},
 						"description": "Get metadata Api returns the following configurations of Configuration service :\n1. Repository Path\n2. Annex store Path\n3. Annex file min Size\n4. Max Config File Size"
 					},
 					"response": []
 				}
-			]
+			],
+			"description": "Configuration service provides the collection of api's to store, retrieve and maintain the history of component configuration files."
 		},
 		{
 			"name": "Log Admin",
-			"description": "Log admin provides Api to fetch the current log configurations and alter if required.",
 			"item": [
 				{
 					"name": "get log metadata",
@@ -959,37 +818,24 @@
 						}
 					],
 					"request": {
-						"url": "http://{{hostname}}:{{adminPort}}/admin/logging/{{componentName}}/level",
 						"method": "GET",
 						"header": [],
 						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "code",
-									"value": "xWnkliVQJURqB2x1",
-									"type": "text"
-								},
-								{
-									"key": "grant_type",
-									"value": "authorization_code",
-									"type": "text"
-								},
-								{
-									"key": "redirect_uri",
-									"value": "https://www.getpostman.com/oauth2/callback",
-									"type": "text"
-								},
-								{
-									"key": "client_id",
-									"value": "abc123",
-									"type": "text"
-								},
-								{
-									"key": "client_secret",
-									"value": "ssh-secret",
-									"type": "text"
-								}
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://{{hostname}}:{{adminPort}}/admin/logging/{{componentName}}/level",
+							"protocol": "http",
+							"host": [
+								"{{hostname}}"
+							],
+							"port": "{{adminPort}}",
+							"path": [
+								"admin",
+								"logging",
+								"{{componentName}}",
+								"level"
 							]
 						},
 						"description": "Get log metatdata Api returns the current log level details for particular component. Response contains below details :\n1. LogLevel\n2. AkkaLevel\n3. Slf4jLevel\n4. ComponentLevel"
@@ -1010,6 +856,12 @@
 						}
 					],
 					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "http://{{hostname}}:{{adminPort}}/admin/logging/{{componentName}}/level?value=FATAL",
 							"protocol": "http",
@@ -1027,23 +879,704 @@
 								{
 									"key": "value",
 									"value": "FATAL",
-									"equals": true,
 									"description": "Log level, can be one of TRACE, DEBUG, INFO, WARN, ERROR, FATAL."
 								}
-							],
-							"variable": []
+							]
 						},
+						"description": "Set log level Api dynamically changes the log level of component."
+					},
+					"response": []
+				},
+				{
+					"name": "container",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"response code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
 						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://{{hostname}}:{{adminPort}}/admin/LGSF_Container-container-akka/container/restart",
+							"protocol": "http",
+							"host": [
+								"{{hostname}}"
+							],
+							"port": "{{adminPort}}",
+							"path": [
+								"admin",
+								"LGSF_Container-container-akka",
+								"container",
+								"restart"
+							]
+						},
+						"description": "Set log level Api dynamically changes the log level of component."
+					},
+					"response": []
+				},
+				{
+					"name": "component",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"response code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://{{hostname}}:{{adminPort}}/admin/LGSF_Container-container-akka/container/restart",
+							"protocol": "http",
+							"host": [
+								"{{hostname}}"
+							],
+							"port": "{{adminPort}}",
+							"path": [
+								"admin",
+								"LGSF_Container-container-akka",
+								"container",
+								"restart"
+							]
+						},
+						"description": "Set log level Api dynamically changes the log level of component."
+					},
+					"response": []
+				},
+				{
+					"name": "setup",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"response code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://{{hostname}}:{{adminPort}}/admin/LGSF_Container-container-akka/container/restart",
+							"protocol": "http",
+							"host": [
+								"{{hostname}}"
+							],
+							"port": "{{adminPort}}",
+							"path": [
+								"admin",
+								"LGSF_Container-container-akka",
+								"container",
+								"restart"
+							]
+						},
+						"description": "Set log level Api dynamically changes the log level of component."
+					},
+					"response": []
+				},
+				{
+					"name": "Cluster Management",
+					"request": {
+						"method": "GET",
 						"header": [],
 						"body": {
 							"mode": "raw",
 							"raw": ""
 						},
-						"description": "Set log level Api dynamically changes the log level of component."
+						"url": {
+							"raw": ""
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Log admin provides Api to fetch the current log configurations and alter if required."
+		},
+		{
+			"name": "http-location",
+			"item": [
+				{
+					"name": "list",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"response code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:{{location-port}}/location/list",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "{{location-port}}",
+							"path": [
+								"location",
+								"list"
+							]
+						},
+						"description": "Get log metatdata Api returns the current log level details for particular component. Response contains below details :\n1. LogLevel\n2. AkkaLevel\n3. Slf4jLevel\n4. ComponentLevel"
+					},
+					"response": []
+				},
+				{
+					"name": "register TCP",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"response code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"$type\": \"csw.services.location.models.TcpRegistration\",\n  \"connection\": {\n    \"$type\": \"csw.messages.location.Connection.TcpConnection\",\n    \"componentId\": {\n      \"name\": \"EventServer\",\n      \"componentType\": {\n        \"$type\": \"csw.messages.location.ComponentType.Service\"\n      }\n    }\n  },\n  \"port\": 26379,\n  \"logAdminActorRef\": \"akka.tcp://test@192.168.0.103:58420/user/$a#-2084221527\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:{{location-port}}/location/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "{{location-port}}",
+							"path": [
+								"location",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "register Akka",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"response code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"AkkaRegistration\":{\n\t\t\"connection\":\"assembly2-assembly-akka\",\n\t\t\"prefix\":\"nfiraos.ncc.tromboneAssembly2\",\n\t\t\"actorRef\":\"akka.tcp://test@192.168.0.104:49592/user/$c#612197610\",\n\t\t\"logAdminActorRef\":\"akka.tcp://test@192.168.0.104:49592/user/$a#163534290\"\n\t}\n}"
+						},
+						"url": {
+							"raw": "http://localhost:{{location-port}}/location/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "{{location-port}}",
+							"path": [
+								"location",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "register HTTP",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"response code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"HttpRegistration\":{\n\t\t\"connection\":\"assembly1-assembly-http\",\n\t\t\"port\":1234,\n\t\t\"path\":\"path123\",\n\t\t\"logAdminActorRef\":\"null\"\n\t}\n}"
+						},
+						"url": {
+							"raw": "http://localhost:{{location-port}}/location/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "{{location-port}}",
+							"path": [
+								"location",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "resolve",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"response code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:{{location-port}}/location/resolve/sample-service-tcp?within=2seconds",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "{{location-port}}",
+							"path": [
+								"location",
+								"resolve",
+								"sample-service-tcp"
+							],
+							"query": [
+								{
+									"key": "within",
+									"value": "2seconds"
+								}
+							]
+						},
+						"description": "Get log metatdata Api returns the current log level details for particular component. Response contains below details :\n1. LogLevel\n2. AkkaLevel\n3. Slf4jLevel\n4. ComponentLevel"
+					},
+					"response": []
+				},
+				{
+					"name": "unregister",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"response code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "\"sample-service-tcp\""
+						},
+						"url": {
+							"raw": "http://localhost:{{location-port}}/location/unregister?connection=sample-service-tcp",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "{{location-port}}",
+							"path": [
+								"location",
+								"unregister"
+							],
+							"query": [
+								{
+									"key": "connection",
+									"value": "sample-service-tcp"
+								}
+							]
+						},
+						"description": "Get log metatdata Api returns the current log level details for particular component. Response contains below details :\n1. LogLevel\n2. AkkaLevel\n3. Slf4jLevel\n4. ComponentLevel"
+					},
+					"response": []
+				},
+				{
+					"name": "unregister all",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"response code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "code",
+									"value": "xWnkliVQJURqB2x1",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "authorization_code",
+									"type": "text"
+								},
+								{
+									"key": "redirect_uri",
+									"value": "https://www.getpostman.com/oauth2/callback",
+									"type": "text"
+								},
+								{
+									"key": "client_id",
+									"value": "abc123",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "ssh-secret",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:{{location-port}}/location/unregisterAll",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "{{location-port}}",
+							"path": [
+								"location",
+								"unregisterAll"
+							]
+						},
+						"description": "Get log metatdata Api returns the current log level details for particular component. Response contains below details :\n1. LogLevel\n2. AkkaLevel\n3. Slf4jLevel\n4. ComponentLevel"
+					},
+					"response": []
+				},
+				{
+					"name": "track",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"response code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:{{location-port}}/location/track/sample-service-tcp",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "{{location-port}}",
+							"path": [
+								"location",
+								"track",
+								"sample-service-tcp"
+							]
+						},
+						"description": "Get log metatdata Api returns the current log level details for particular component. Response contains below details :\n1. LogLevel\n2. AkkaLevel\n3. Slf4jLevel\n4. ComponentLevel"
 					},
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "keycloak",
+			"item": [
+				{
+					"name": "Permission ticket",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJneWlMbndmWWR3SmNENUdnUnJXMUFCNmNzeVBLZWFPb2lMZHp4dnFBeUZjIn0.eyJqdGkiOiIyMDZlNDRkZC04MThhLTQ1ODItOTlkMC1hNDFmNTcwZjQ4NTMiLCJleHAiOjE1NDIyNjI0NjAsIm5iZiI6MCwiaWF0IjoxNTQyMjYyNDAwLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvYXV0aC9yZWFsbXMvbWFzdGVyIiwiYXVkIjoiYnJvd3Nlci1hcHAiLCJzdWIiOiJhYTYyMGFjOC0wZmRlLTRkMjYtOWE2Ni04N2UwNTdhMWZhOWEiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJicm93c2VyLWFwcCIsImF1dGhfdGltZSI6MCwic2Vzc2lvbl9zdGF0ZSI6IjU2MWEyYmY5LTQ4ZGQtNGQ0Ni1iZWNkLTAyODlkY2M4NTRmMCIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiKiJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiZGJfYWRtaW4iXX0sInJlc291cmNlX2FjY2VzcyI6eyJicm93c2VyLWFwcCI6eyJyb2xlcyI6WyJicm93c2VyX2FwcF9yb2xlIiwidW1hX3Byb3RlY3Rpb24iXX19LCJzY29wZSI6ImVtYWlsIHByb2ZpbGUiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImNsaWVudElkIjoiYnJvd3Nlci1hcHAiLCJjbGllbnRIb3N0IjoiMTcyLjE3LjAuMSIsInByZWZlcnJlZF91c2VybmFtZSI6InNlcnZpY2UtYWNjb3VudC1icm93c2VyLWFwcCIsImNsaWVudEFkZHJlc3MiOiIxNzIuMTcuMC4xIiwiZW1haWwiOiJzZXJ2aWNlLWFjY291bnQtYnJvd3Nlci1hcHBAcGxhY2Vob2xkZXIub3JnIn0.RAaj4ObhiPoWFzKdLJPzbHI4cleM5DrodSG6DnKY_7SQhgPZanD_8I6vvmIj0eBIwUAZCqS9GG4N3VTNShkAUc5hjC4bpmSpRclVN2gjl4lInwZGWEnJX9jga_0QfF03wPXvJATTib5qRCZR_dw_SkeXZBV3YVcSXTXS5KlpniDXy4avChG1hGqWgiGYv7RONzRgh6FEnqdq36fHsC2CWqJudiuIlRD_7eR_fyroubAZ_KxZkhpP9Dnh6w6NFMIGbzS2HwqGFjhOx7EUpxbcLUhd8XWnKu8uHIg1KBjzrKX5ERnOgJziRWFY9PkXRxyBEWGCRvQFbe6DEn1weAD6ew"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n  {\n    \"resource_id\": \"e1718e9c-285d-4661-9c89-829c7dc62b87\",\n    \"resource_scopes\": [\n      \"read\"\n    ]\n  }\n]"
+						},
+						"url": {
+							"raw": "http://localhost:8080/auth/realms/master/authz/protection/permission",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"auth",
+								"realms",
+								"master",
+								"authz",
+								"protection",
+								"permission"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "RPT",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "urn:ietf:params:oauth:grant-type:uma-ticket",
+									"type": "text"
+								},
+								{
+									"key": "ticket",
+									"value": "",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/auth/realms/master/protocol/openid-connect/token",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"auth",
+								"realms",
+								"master",
+								"protocol",
+								"openid-connect",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "token",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "11ce3dfd-ef9e-4f8e-98dd-d341dd16fdfd",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "4f8b5079-25bb-4d22-9ae3-fce2b92fb63d",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"access_token\", jsonData.access_token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								},
+								{
+									"key": "client_id",
+									"value": "csw-config-cli",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "eeba75d7-a191-4aba-8275-7a6e8c6ad6c9",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/auth/realms/master/protocol/openid-connect/token",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"auth",
+								"realms",
+								"master",
+								"protocol",
+								"openid-connect",
+								"token"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "f148af92-1788-42b6-995f-684242dd5a11",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "a78ad1d5-20ca-4304-bc67-b53c93e681d1",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
 		}
 	]
 }
