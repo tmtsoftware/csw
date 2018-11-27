@@ -28,7 +28,7 @@ case class AccessToken(
     clientAddress: Option[String] = None,
     clientHost: Option[String] = None
 ) {
-  def hasPermission(scope: String, resource: String): Boolean =
+  def hasPermission(scope: String, resource: String = "Default Resource"): Boolean =
     this.authorization match {
       case Some(Authorization(perms)) ⇒ perms.exists(p ⇒ p.rsname == resource && p.scopes.exists(_.contains(scope)))
       case _                          ⇒ false

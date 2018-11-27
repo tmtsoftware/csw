@@ -3,6 +3,7 @@ package csw.config.server.http
 import akka.Done
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Route
+import csw.auth.adapters.akka.http.AuthorizationPolicy.ResourceRolePolicy
 import csw.auth.adapters.akka.http.SecurityDirectives
 import csw.auth.core.token.AccessToken
 import csw.config.api.scaladsl.ConfigService
@@ -59,19 +60,19 @@ class ConfigServiceRoute(
               }
             }
           } ~
-          sPost(resourceRole = AdminRole) { implicit at =>
+          sPost(ResourceRolePolicy(AdminRole)) { implicit token =>
             (configDataEntity & annexParam & commentParam) { (configData, annex, comment) ⇒
               complete(
                 StatusCodes.Created -> configService(name).create(filePath, configData, annex, comment)
               )
             }
           } ~
-          sPut(resourceRole = AdminRole) { implicit at =>
+          sPut(ResourceRolePolicy(AdminRole)) { implicit token =>
             (configDataEntity & commentParam) { (configData, comment) ⇒
               complete(configService(name).update(filePath, configData, comment))
             }
           } ~
-          sDelete(resourceRole = AdminRole) { implicit at =>
+          sDelete(ResourceRolePolicy(AdminRole)) { implicit token =>
             commentParam { comment ⇒
               complete(configService(name).delete(filePath, comment).map(_ ⇒ Done))
             }
@@ -88,7 +89,7 @@ class ConfigServiceRoute(
           (get & rejectEmptyResponse) { // fetch the active version - http://{{hostname}}:{{port}}/active-version/{{path}}
             complete(configService().getActiveVersion(filePath))
           } ~
-          sPut(resourceRole = AdminRole) { implicit at =>
+          sPut(ResourceRolePolicy(AdminRole)) { implicit token =>
             (idParam & commentParam) {
               case (Some(configId), comment) ⇒
                 complete(configService(name).setActiveVersion(filePath, configId, comment).map(_ ⇒ Done))

@@ -1,22 +1,21 @@
 package csw.auth.adapters.akka.http
-
 import akka.http.javadsl.server.{AuthenticationFailedRejection, AuthorizationFailedRejection}
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.model.headers.{Authorization, OAuth2BearerToken}
 import akka.http.scaladsl.server.directives.Credentials.Provided
 import akka.http.scaladsl.server.{Directives, Route}
 import akka.http.scaladsl.testkit._
+import csw.auth.adapters.akka.http.AuthorizationPolicy.RealmRolePolicy
 import csw.auth.core.token.AccessToken
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSuite, Matchers}
 
-class ResourceRoleDirectiveTest extends FunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
+class RealmRolePolicyTest extends FunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
 
-  test("resourceRole directive should return AuthenticationFailedRejection when token is invalid") {
+  test("realmRole directive should return AuthenticationFailedRejection when token is invalid") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication)
-    import securityDirectives._
 
     val invalidTokenStr    = "invalid"
     val invalidTokenHeader = Authorization(OAuth2BearerToken(invalidTokenStr))
@@ -28,9 +27,9 @@ class ResourceRoleDirectiveTest extends FunSuite with MockitoSugar with Directiv
 
     when(authentication.authenticator).thenReturn(authenticator)
 
-    val route: Route = secure { implicit at ⇒
+    val route: Route = securityDirectives.authenticate { implicit at ⇒
       get {
-        resourceRole("admin", at) {
+        securityDirectives.authorize(RealmRolePolicy("admin"), at) {
           complete("OK")
         }
       }
@@ -41,18 +40,17 @@ class ResourceRoleDirectiveTest extends FunSuite with MockitoSugar with Directiv
     }
   }
 
-  test("resourceRole directive should return AuthenticationFailedRejection when token is not present") {
+  test("realmRole directive should return AuthenticationFailedRejection when token is not present") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication)
-    import securityDirectives._
 
     val authenticator: Authenticator[AccessToken] = _ ⇒ None
 
     when(authentication.authenticator).thenReturn(authenticator)
 
-    val route: Route = secure { implicit at ⇒
+    val route: Route = securityDirectives.authenticate { implicit at ⇒
       get {
-        resourceRole("admin", at) {
+        securityDirectives.authorize(RealmRolePolicy("admin"), at) {
           complete("OK")
         }
       }
@@ -63,67 +61,65 @@ class ResourceRoleDirectiveTest extends FunSuite with MockitoSugar with Directiv
     }
   }
 
-  test("resourceRole directive should return AuthorizationFailedRejection when token does not have resourceRole") {
+  test("realmRole directive should return AuthorizationFailedRejection when token does not have realmRole") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication)
-    import securityDirectives._
 
-    val validTokenWithoutResourceRoleStr = "validTokenWithoutResourceRoleStr"
+    val validTokenWithoutRealmRoleStr = "validTokenWithoutRealmRoleStr"
 
-    val validTokenWithoutResourceRole = mock[AccessToken]
+    val validTokenWithoutRealmRole = mock[AccessToken]
 
-    val validTokenWithoutResourceRoleHeader = Authorization(OAuth2BearerToken(validTokenWithoutResourceRoleStr))
+    val validTokenWithoutRealmRoleHeader = Authorization(OAuth2BearerToken(validTokenWithoutRealmRoleStr))
 
-    when(validTokenWithoutResourceRole.hasResourceRole("admin"))
+    when(validTokenWithoutRealmRole.hasRealmRole("admin"))
       .thenReturn(false)
 
     val authenticator: Authenticator[AccessToken] = {
-      case Provided(`validTokenWithoutResourceRoleStr`) ⇒ Some(validTokenWithoutResourceRole)
-      case _                                            ⇒ None
-    }
-
-    when(authentication.authenticator).thenReturn(authenticator)
-
-    val route: Route = secure { implicit at ⇒
-      get {
-        resourceRole("admin", at) {
-          complete("OK")
-        }
-      }
-    }
-
-    Get("/").addHeader(validTokenWithoutResourceRoleHeader) ~> route ~> check {
-      rejection shouldBe a[AuthorizationFailedRejection]
-    }
-  }
-
-  test("resourceRole directive should return 200 OK when token is valid & has resourceRole") {
-    val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication)
-    import securityDirectives._
-
-    val validTokenWithResourceRoleStr    = "validTokenWithResourceRoleStr"
-    val validTokenWithResourceRole       = mock[AccessToken]
-    val validTokenWithResourceRoleHeader = Authorization(OAuth2BearerToken(validTokenWithResourceRoleStr))
-    when(validTokenWithResourceRole.hasResourceRole("admin"))
-      .thenReturn(true)
-
-    val authenticator: Authenticator[AccessToken] = {
-      case Provided(`validTokenWithResourceRoleStr`) ⇒ Some(validTokenWithResourceRole)
+      case Provided(`validTokenWithoutRealmRoleStr`) ⇒ Some(validTokenWithoutRealmRole)
       case _                                         ⇒ None
     }
 
     when(authentication.authenticator).thenReturn(authenticator)
 
-    val route: Route = secure { implicit at ⇒
+    val route: Route = securityDirectives.authenticate { implicit at ⇒
       get {
-        resourceRole("admin", at) {
+        securityDirectives.authorize(RealmRolePolicy("admin"), at) {
           complete("OK")
         }
       }
     }
 
-    Get("/").addHeader(validTokenWithResourceRoleHeader) ~> route ~> check {
+    Get("/").addHeader(validTokenWithoutRealmRoleHeader) ~> route ~> check {
+      rejection shouldBe a[AuthorizationFailedRejection]
+    }
+  }
+
+  test("realmRole directive should return 200 OK when token is valid & has realmRole") {
+    val authentication: Authentication = mock[Authentication]
+    val securityDirectives             = new SecurityDirectives(authentication)
+
+    val validTokenWithRealmRoleStr    = "validTokenWithRealmRoleStr"
+    val validTokenWithRealmRole       = mock[AccessToken]
+    val validTokenWithRealmRoleHeader = Authorization(OAuth2BearerToken(validTokenWithRealmRoleStr))
+    when(validTokenWithRealmRole.hasRealmRole("admin"))
+      .thenReturn(true)
+
+    val authenticator: Authenticator[AccessToken] = {
+      case Provided(`validTokenWithRealmRoleStr`) ⇒ Some(validTokenWithRealmRole)
+      case _                                      ⇒ None
+    }
+
+    when(authentication.authenticator).thenReturn(authenticator)
+
+    val route: Route = securityDirectives.authenticate { implicit at ⇒
+      get {
+        securityDirectives.authorize(RealmRolePolicy("admin"), at) {
+          complete("OK")
+        }
+      }
+    }
+
+    Get("/").addHeader(validTokenWithRealmRoleHeader) ~> route ~> check {
       status shouldBe StatusCodes.OK
     }
   }

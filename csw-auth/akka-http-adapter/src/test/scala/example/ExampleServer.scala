@@ -1,6 +1,7 @@
 package example
 import akka.http.scaladsl.server._
 import akka.http.scaladsl.unmarshalling.GenericUnmarshallers
+import csw.auth.adapters.akka.http.AuthorizationPolicy.{CustomPolicy, ResourceRolePolicy}
 import csw.auth.adapters.akka.http.{Authentication, SecurityDirectives}
 import csw.auth.core.token.TokenFactory
 import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
@@ -17,7 +18,7 @@ object ExampleServer extends HttpApp with App with GenericUnmarshallers with Pla
     head {
       complete("HEAD OK")
     } ~
-    sPost(resourceRole = "admin") { _ =>
+    sPost(ResourceRolePolicy("admin")) { _ =>
       complete("POST OK")
     } ~
     post {
@@ -25,6 +26,12 @@ object ExampleServer extends HttpApp with App with GenericUnmarshallers with Pla
     } ~
     get {
       complete("GET OK")
+    } ~
+    parameter('subsystem) { subsystem =>
+      sGet(CustomPolicy(token => token.hasRealmRole(s"${subsystem}_admin"))) { _ =>
+        //your route code goes here
+        complete("SUCCESS")
+      }
     }
   }
 
