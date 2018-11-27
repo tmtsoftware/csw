@@ -41,7 +41,31 @@ class ConfigServiceRoute(
   def route: Route = routeLogger {
     handleExceptions(configHandlers.jsonExceptionHandler) {
       handleRejections(configHandlers.jsonRejectionHandler) {
-
+        pathPrefix("secure") {
+          prefix("config") { filePath ⇒
+            secure { implicit token =>
+              {
+                adminProtected {
+                  post {
+                    (configDataEntity & annexParam & commentParam) { (configData, annex, comment) ⇒
+                      complete(
+                        StatusCodes.Created -> configService(name).create(filePath, configData, annex, comment)
+                      )
+                    }
+                  } ~ put {
+                    (configDataEntity & commentParam) { (configData, comment) ⇒
+                      complete(configService(name).update(filePath, configData, comment))
+                    }
+                  } ~ delete {
+                    commentParam { comment ⇒
+                      complete(configService(name).delete(filePath, comment).map(_ ⇒ Done))
+                    }
+                  }
+                }
+              }
+            }
+          }
+        } ~
         prefix("config") { filePath ⇒
           (get & rejectEmptyResponse) { // fetch the file - http://{{hostname}}:{{port}}/config/{{path}}
             (dateParam & idParam) {
@@ -58,37 +82,7 @@ class ConfigServiceRoute(
                 }
               }
             }
-          } ~
-          post {
-            secure { implicit at ⇒
-              adminProtected { // create file - http://{{hostname}}:{{port}}/config/{{path}}?comment="Sample commit message"
-                (configDataEntity & annexParam & commentParam) { (configData, annex, comment) ⇒
-                  complete(
-                    StatusCodes.Created -> configService(name).create(filePath, configData, annex, comment)
-                  )
-                }
-              }
-            }
-          } ~
-          put {
-            secure { implicit at ⇒
-              adminProtected { // update file - http://{{hostname}}:{{port}}/config/{{path}}?comment="Sample update commit message"
-                (configDataEntity & commentParam) { (configData, comment) ⇒
-                  complete(configService(name).update(filePath, configData, comment))
-                }
-              }
-            }
-          } ~
-          delete {
-            secure { implicit at ⇒
-              adminProtected { // delete file - http://{{hostname}}:{{port}}/config/{{path}}?comment="deleting config file"
-                commentParam { comment ⇒
-                  complete(configService(name).delete(filePath, comment).map(_ ⇒ Done))
-                }
-              }
-            }
           }
-
         } ~
         (prefix("active-config") & get & rejectEmptyResponse) { filePath ⇒
           dateParam { // fetch the currently active file - http://{{hostname}}:{{port}}/active-config/{{path}}
@@ -97,19 +91,27 @@ class ConfigServiceRoute(
             case _ ⇒ complete(configService().getActive(filePath))
           }
         } ~
-        prefix("active-version") { filePath ⇒
-          put {
-            secure { implicit at ⇒
-              adminProtected { // set the active version - http://{{hostname}}:{{port}}/active-version/{{path}}?id=3&comment="Setting activer version"
-                (idParam & commentParam) {
-                  case (Some(configId), comment) ⇒
-                    complete(configService(name).setActiveVersion(filePath, configId, comment).map(_ ⇒ Done))
-                  case (_, comment) ⇒
-                    complete(configService(name).resetActiveVersion(filePath, comment).map(_ ⇒ Done))
+        pathPrefix("secure") {
+          prefix("active-version") { filePath ⇒
+            {
+              secure { implicit token =>
+                {
+                  adminProtected {
+                    put {
+                      (idParam & commentParam) {
+                        case (Some(configId), comment) ⇒
+                          complete(configService(name).setActiveVersion(filePath, configId, comment).map(_ ⇒ Done))
+                        case (_, comment) ⇒
+                          complete(configService(name).resetActiveVersion(filePath, comment).map(_ ⇒ Done))
+                      }
+                    }
+                  }
                 }
               }
             }
-          } ~
+          }
+        } ~
+        prefix("active-version") { filePath ⇒
           (get & rejectEmptyResponse) { // fetch the active version - http://{{hostname}}:{{port}}/active-version/{{path}}
             complete(configService().getActiveVersion(filePath))
           }

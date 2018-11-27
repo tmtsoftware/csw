@@ -140,9 +140,9 @@ class CustomPolicyDirectiveTest extends FunSuite with MockitoSugar with Directiv
 
     when(authentication.authenticator).thenReturn(authenticator)
 
-    val route: Route = secure { implicit at ⇒
+    val route: Route = secure { _ ⇒
       get {
-        customPolicy(false) {
+        customPolicy(policy = false) {
           complete("OK")
         }
       }
