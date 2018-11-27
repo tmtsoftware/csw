@@ -27,7 +27,7 @@ class TimeServiceImpl() extends TimeService {
     timeVal.tai
   }
 
-  override def scheduleOnce(startTime: Instant)(task: => Unit): Cancellable = {
+  override def scheduleOnce(startTime: TaiInstant)(task: => Unit): Cancellable = {
     val delay                 = delayFrom(startTime)
     val underlyingCancellable = actorSystem.scheduler.scheduleOnce(delay)(task)(actorSystem.dispatcher)
     underlyingCancellable.toTsCancellable
@@ -40,9 +40,9 @@ class TimeServiceImpl() extends TimeService {
     Instant.ofEpochSecond(timeSpec.seconds, timeSpec.nanoseconds)
   }
 
-  private def delayFrom(time: Instant): FiniteDuration = {
-    val now      = utcTime().value
-    val duration = Duration.between(now, time)
+  private def delayFrom(time: TaiInstant): FiniteDuration = {
+    val now      = taiTime().value
+    val duration = Duration.between(now, time.value)
     FiniteDuration(duration.toNanos, NANOSECONDS)
   }
 

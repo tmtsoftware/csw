@@ -4,6 +4,7 @@ import java.time._
 
 import akka.actor.ActorSystem
 import akka.testkit.TestProbe
+import csw.time.api.models.CswInstant.TaiInstant
 import csw.time.api.scaladsl.TimeService
 import csw.time.client.extensions.RichInstant.RichInstant
 import csw.time.client.internal.native_models.{NTPTimeVal, Timex}
@@ -93,12 +94,11 @@ class TimeServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
     val testProbe                 = TestProbe()
     val probeMsg                  = "Scheduled"
 
-    var actualScheduleTime: Instant = null
-    val idealScheduleTime: Instant  = timeService.utcTime().value.plusSeconds(1)
+    var actualScheduleTime: TaiInstant = null
+    val idealScheduleTime: TaiInstant  = TaiInstant(timeService.taiTime().value.plusSeconds(1))
 
     timeService.scheduleOnce(idealScheduleTime) {
-      // Task to execute
-      actualScheduleTime = timeService.utcTime().value
+      actualScheduleTime = timeService.taiTime()
       testProbe.ref ! probeMsg
     }
 
@@ -107,10 +107,9 @@ class TimeServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
     println(s"Ideal Schedule Time: $idealScheduleTime")
     println(s"Actual Schedule Time: $actualScheduleTime")
 
-    val allowedJitterInNanos = 5 * 1000 * 1000 // should be ideally 200µs as per statistics from manual tests
+    val allowedJitterInNanos = 5 * 1000 * 1000 // should be ideally 400µs as per 3σ statistics from manual tests
 
-    actualScheduleTime.getEpochSecond - idealScheduleTime.getEpochSecond shouldBe 0
-    actualScheduleTime.getNano - idealScheduleTime.getNano should be < allowedJitterInNanos
-
+    actualScheduleTime.value.getEpochSecond - idealScheduleTime.value.getEpochSecond shouldBe 0
+    actualScheduleTime.value.getNano - idealScheduleTime.value.getNano should be < allowedJitterInNanos
   }
 }
