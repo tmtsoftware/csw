@@ -1,5 +1,5 @@
 package example
-import akka.http.scaladsl.server.{HttpApp, Route}
+import akka.http.scaladsl.server._
 import akka.http.scaladsl.unmarshalling.GenericUnmarshallers
 import csw.auth.adapters.akka.http.{Authentication, SecurityDirectives}
 import csw.auth.core.token.TokenFactory
@@ -11,38 +11,20 @@ object ExampleServer extends HttpApp with App with GenericUnmarshallers with Pla
 
   import directives._
   private val HOST = "localhost"
-  private val PORT = 9002
+  private val PORT = 9003
 
   override protected def routes: Route = path("config") {
-    secure { implicit token ⇒
-      {
-        get {
-          permission("read", "config") {
-            user(u ⇒ {
-              complete(u.preferredUsername)
-            })
-          }
-        } ~ put {
-          permission("write", "config") {
-            complete("OK")
-          }
-        } ~ post {
-          entity(as[Person]) { person =>
-            customPolicy(
-              at =>
-                person.country == "US"
-                && at.email.getOrElse("").endsWith("gmail.com")
-            ) {
-              complete("OK")
-            }
-          }
-        } ~
-        patch {
-          resourceRole("example-service-admin") {
-            complete("OK")
-          }
-        }
-      }
+    head {
+      complete("HEAD OK")
+    } ~
+    sPost(resourceRole = "admin") { _ =>
+      complete("POST OK")
+    } ~
+    post {
+      complete("UNAUTHORIZED POST")
+    } ~
+    get {
+      complete("GET OK")
     }
   }
 

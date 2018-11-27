@@ -30,7 +30,7 @@ class ResourceRoleDirectiveTest extends FunSuite with MockitoSugar with Directiv
 
     val route: Route = secure { implicit at ⇒
       get {
-        resourceRole("admin") {
+        resourceRole("admin", at) {
           complete("OK")
         }
       }
@@ -52,7 +52,7 @@ class ResourceRoleDirectiveTest extends FunSuite with MockitoSugar with Directiv
 
     val route: Route = secure { implicit at ⇒
       get {
-        resourceRole("admin") {
+        resourceRole("admin", at) {
           complete("OK")
         }
       }
@@ -86,7 +86,7 @@ class ResourceRoleDirectiveTest extends FunSuite with MockitoSugar with Directiv
 
     val route: Route = secure { implicit at ⇒
       get {
-        resourceRole("admin") {
+        resourceRole("admin", at) {
           complete("OK")
         }
       }
@@ -117,7 +117,7 @@ class ResourceRoleDirectiveTest extends FunSuite with MockitoSugar with Directiv
 
     val route: Route = secure { implicit at ⇒
       get {
-        resourceRole("admin") {
+        resourceRole("admin", at) {
           complete("OK")
         }
       }

@@ -29,7 +29,7 @@ class PermissionDirectiveTest extends FunSuite with MockitoSugar with Directives
 
     val route: Route = secure { implicit at ⇒
       get {
-        permission("read") {
+        permission("read", at) {
           complete("OK")
         }
       }
@@ -51,7 +51,7 @@ class PermissionDirectiveTest extends FunSuite with MockitoSugar with Directives
 
     val route: Route = secure { implicit at ⇒
       get {
-        permission("read") {
+        permission("read", at) {
           complete("OK")
         }
       }
@@ -84,7 +84,7 @@ class PermissionDirectiveTest extends FunSuite with MockitoSugar with Directives
 
     val route: Route = secure { implicit at ⇒
       get {
-        permission("read") {
+        permission("read", at) {
           complete("OK")
         }
       }
@@ -117,7 +117,7 @@ class PermissionDirectiveTest extends FunSuite with MockitoSugar with Directives
 
     val route: Route = secure { implicit at ⇒
       get {
-        permission("read") {
+        permission("read", at) {
           complete("OK")
         }
       }

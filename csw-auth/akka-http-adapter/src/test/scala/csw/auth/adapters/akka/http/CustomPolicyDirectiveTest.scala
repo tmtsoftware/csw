@@ -30,7 +30,7 @@ class CustomPolicyDirectiveTest extends FunSuite with MockitoSugar with Directiv
     val route: Route =
       secure { implicit at ⇒
         get {
-          customPolicy(at => at.given_name.contains("John")) {
+          customPolicy(at.given_name.contains("John")) {
             complete("OK")
           }
         }
@@ -52,7 +52,7 @@ class CustomPolicyDirectiveTest extends FunSuite with MockitoSugar with Directiv
 
     val route: Route = secure { implicit at ⇒
       get {
-        customPolicy(_ => false) {
+        customPolicy(false) {
           complete("OK")
         }
       }
@@ -82,7 +82,7 @@ class CustomPolicyDirectiveTest extends FunSuite with MockitoSugar with Directiv
 
     val route: Route = secure { implicit at ⇒
       get {
-        customPolicy(_ => false) {
+        customPolicy(false) {
           complete("OK")
         }
       }
@@ -112,67 +112,7 @@ class CustomPolicyDirectiveTest extends FunSuite with MockitoSugar with Directiv
 
     val route: Route = secure { implicit at ⇒
       get {
-        customPolicy(_ => true) {
-          complete("OK")
-        }
-      }
-    }
-
-    Get("/").addHeader(validTokenWithPolicyMatchHeader) ~> route ~> check {
-      status shouldBe StatusCodes.OK
-    }
-  }
-
-  test("customPolicy directive overload should return AuthorizationFailedRejection when policy does not match") {
-    val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication)
-    import securityDirectives._
-
-    val validTokenWithPolicyViolationStr    = "validTokenWithPolicyViolation"
-    val validTokenWithPolicyViolationHeader = Authorization(OAuth2BearerToken(validTokenWithPolicyViolationStr))
-
-    val validTokenWithPolicyViolation = mock[AccessToken]
-
-    val authenticator: Authenticator[AccessToken] = {
-      case Provided(`validTokenWithPolicyViolationStr`) ⇒ Some(validTokenWithPolicyViolation)
-      case _                                            ⇒ None
-    }
-
-    when(authentication.authenticator).thenReturn(authenticator)
-
-    val route: Route = secure { _ ⇒
-      get {
-        customPolicy(policy = false) {
-          complete("OK")
-        }
-      }
-    }
-
-    Get("/").addHeader(validTokenWithPolicyViolationHeader) ~> route ~> check {
-      rejection shouldBe a[AuthorizationFailedRejection]
-    }
-  }
-
-  test("customPolicy directive overload should return 200 OK when policy matches") {
-    val authentication: Authentication = mock[Authentication]
-    val securityDirectives             = new SecurityDirectives(authentication)
-    import securityDirectives._
-
-    val validTokenWithPolicyMatchStr    = "validTokenWithPolicyMatch"
-    val validTokenWithPolicyMatchHeader = Authorization(OAuth2BearerToken(validTokenWithPolicyMatchStr))
-
-    val validTokenWithPolicyMatch = mock[AccessToken]
-
-    val authenticator: Authenticator[AccessToken] = {
-      case Provided(`validTokenWithPolicyMatchStr`) ⇒ Some(validTokenWithPolicyMatch)
-      case _                                        ⇒ None
-    }
-
-    when(authentication.authenticator).thenReturn(authenticator)
-
-    val route: Route = secure { implicit at ⇒
-      get {
-        customPolicy(policy = true) {
+        customPolicy(true) {
           complete("OK")
         }
       }

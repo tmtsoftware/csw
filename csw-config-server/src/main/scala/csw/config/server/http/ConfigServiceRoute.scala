@@ -30,7 +30,7 @@ class ConfigServiceRoute(
 
   private def configService(userName: String = defaultUserName): ConfigService = configServiceFactory.make(userName)
 
-  private def adminProtected(f: Route)(implicit accessToken: AccessToken) = resourceRole("admin")(f)
+  val AdminRole = "admin"
 
   private def name(implicit at: AccessToken): String = (at.preferred_username, at.clientId) match {
     case (Some(userName), _)    ⇒ userName
@@ -41,31 +41,7 @@ class ConfigServiceRoute(
   def route: Route = routeLogger {
     handleExceptions(configHandlers.jsonExceptionHandler) {
       handleRejections(configHandlers.jsonRejectionHandler) {
-        pathPrefix("secure") {
-          prefix("config") { filePath ⇒
-            secure { implicit token =>
-              {
-                adminProtected {
-                  post {
-                    (configDataEntity & annexParam & commentParam) { (configData, annex, comment) ⇒
-                      complete(
-                        StatusCodes.Created -> configService(name).create(filePath, configData, annex, comment)
-                      )
-                    }
-                  } ~ put {
-                    (configDataEntity & commentParam) { (configData, comment) ⇒
-                      complete(configService(name).update(filePath, configData, comment))
-                    }
-                  } ~ delete {
-                    commentParam { comment ⇒
-                      complete(configService(name).delete(filePath, comment).map(_ ⇒ Done))
-                    }
-                  }
-                }
-              }
-            }
-          }
-        } ~
+
         prefix("config") { filePath ⇒
           (get & rejectEmptyResponse) { // fetch the file - http://{{hostname}}:{{port}}/config/{{path}}
             (dateParam & idParam) {
@@ -82,6 +58,23 @@ class ConfigServiceRoute(
                 }
               }
             }
+          } ~
+          sPost(resourceRole = AdminRole) { implicit at =>
+            (configDataEntity & annexParam & commentParam) { (configData, annex, comment) ⇒
+              complete(
+                StatusCodes.Created -> configService(name).create(filePath, configData, annex, comment)
+              )
+            }
+          } ~
+          sPut(resourceRole = AdminRole) { implicit at =>
+            (configDataEntity & commentParam) { (configData, comment) ⇒
+              complete(configService(name).update(filePath, configData, comment))
+            }
+          } ~
+          sDelete(resourceRole = AdminRole) { implicit at =>
+            commentParam { comment ⇒
+              complete(configService(name).delete(filePath, comment).map(_ ⇒ Done))
+            }
           }
         } ~
         (prefix("active-config") & get & rejectEmptyResponse) { filePath ⇒
@@ -91,29 +84,17 @@ class ConfigServiceRoute(
             case _ ⇒ complete(configService().getActive(filePath))
           }
         } ~
-        pathPrefix("secure") {
-          prefix("active-version") { filePath ⇒
-            {
-              secure { implicit token =>
-                {
-                  adminProtected {
-                    put {
-                      (idParam & commentParam) {
-                        case (Some(configId), comment) ⇒
-                          complete(configService(name).setActiveVersion(filePath, configId, comment).map(_ ⇒ Done))
-                        case (_, comment) ⇒
-                          complete(configService(name).resetActiveVersion(filePath, comment).map(_ ⇒ Done))
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        } ~
         prefix("active-version") { filePath ⇒
           (get & rejectEmptyResponse) { // fetch the active version - http://{{hostname}}:{{port}}/active-version/{{path}}
             complete(configService().getActiveVersion(filePath))
+          } ~
+          sPut(resourceRole = AdminRole) { implicit at =>
+            (idParam & commentParam) {
+              case (Some(configId), comment) ⇒
+                complete(configService(name).setActiveVersion(filePath, configId, comment).map(_ ⇒ Done))
+              case (_, comment) ⇒
+                complete(configService(name).resetActiveVersion(filePath, comment).map(_ ⇒ Done))
+            }
           }
         } ~
         (prefix("history") & get) { filePath ⇒

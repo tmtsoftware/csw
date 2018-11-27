@@ -29,7 +29,7 @@ class RealmRoleDirectiveTest extends FunSuite with MockitoSugar with Directives 
 
     val route: Route = secure { implicit at ⇒
       get {
-        realmRole("admin") {
+        realmRole("admin", at) {
           complete("OK")
         }
       }
@@ -51,7 +51,7 @@ class RealmRoleDirectiveTest extends FunSuite with MockitoSugar with Directives 
 
     val route: Route = secure { implicit at ⇒
       get {
-        realmRole("admin") {
+        realmRole("admin", at) {
           complete("OK")
         }
       }
@@ -85,7 +85,7 @@ class RealmRoleDirectiveTest extends FunSuite with MockitoSugar with Directives 
 
     val route: Route = secure { implicit at ⇒
       get {
-        realmRole("admin") {
+        realmRole("admin", at) {
           complete("OK")
         }
       }
@@ -116,7 +116,7 @@ class RealmRoleDirectiveTest extends FunSuite with MockitoSugar with Directives 
 
     val route: Route = secure { implicit at ⇒
       get {
-        realmRole("admin") {
+        realmRole("admin", at) {
           complete("OK")
         }
       }
