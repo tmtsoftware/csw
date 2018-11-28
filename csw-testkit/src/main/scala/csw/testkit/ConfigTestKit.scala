@@ -7,8 +7,9 @@ import akka.http.scaladsl.Http
 import akka.stream.Materializer
 import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigFactory}
+import csw.auth.adapters.akka.http.SecurityDirectives
 import csw.config.server.{ServerWiring, Settings}
-import csw.testkit.internal.TestKitUtils
+import csw.testkit.internal.{MockedAuthentication, TestKitUtils}
 
 import scala.concurrent.ExecutionContextExecutor
 
@@ -30,18 +31,21 @@ import scala.concurrent.ExecutionContextExecutor
  * }}}
  *
  */
-final class ConfigTestKit private (system: ActorSystem, serverConfig: Option[Config], testKitSettings: TestKitSettings) {
+final class ConfigTestKit private (system: ActorSystem, serverConfig: Option[Config], testKitSettings: TestKitSettings)
+    extends MockedAuthentication {
 
   implicit lazy val actorSystem: ActorSystem = system
   private[csw] lazy val configWiring: ServerWiring = (serverConfig, testKitSettings.ConfigPort) match {
     case (Some(_config), _) ⇒
       new ServerWiring {
-        override lazy val config: Config           = _config
-        override lazy val actorSystem: ActorSystem = system
+        override lazy val config: Config                         = _config
+        override lazy val actorSystem: ActorSystem               = system
+        override lazy val securityDirectives: SecurityDirectives = _securityDirectives
       }
     case (_, serverPort) ⇒
       new ServerWiring {
-        override lazy val actorSystem: ActorSystem = system
+        override lazy val actorSystem: ActorSystem               = system
+        override lazy val securityDirectives: SecurityDirectives = _securityDirectives
         override lazy val settings: Settings = new Settings(config) {
           override val `service-port`: Int = serverPort.getOrElse(super.`service-port`)
         }

@@ -19,22 +19,25 @@ import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAfterEach with BeforeAndAfterAll {
 
-  val serverWiring = new ServerWiring
-
-  private val testFileUtils = new TestFileUtils(serverWiring.settings)
-
-  import serverWiring.actorRuntime._
-
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
   InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
 
+  def serverWiring: ServerWiring
   def configService: ConfigService
+
+  private lazy val wiring: ServerWiring = serverWiring
+  private lazy val testFileUtils        = new TestFileUtils(wiring.settings)
+
+  import wiring.actorRuntime._
+  protected lazy val serverConfigService = wiring.configServiceFactory.make()
 
   override protected def beforeEach(): Unit = serverWiring.svnRepo.initSvnRepo()
 
   override protected def afterEach(): Unit = testFileUtils.deleteServerFiles()
 
   override protected def afterAll(): Unit = actorSystem.terminate().await
+
+  private val rootUsername = "root"
 
   val configValue1: String =
     """
@@ -453,8 +456,8 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
       .create(assemblyConfig, ConfigData.fromString(configValue2), annex = false, assemblyConfigComment)
       .await
 
-    val tromboneConfigInfo: ConfigFileInfo = ConfigFileInfo(tromboneConfig, tromboneConfigId, tromboneConfigComment)
-    val assemblyConfigInfo: ConfigFileInfo = ConfigFileInfo(assemblyConfig, assemblyConfigId, assemblyConfigComment)
+    val tromboneConfigInfo: ConfigFileInfo = ConfigFileInfo(tromboneConfig, tromboneConfigId, rootUsername, tromboneConfigComment)
+    val assemblyConfigInfo: ConfigFileInfo = ConfigFileInfo(assemblyConfig, assemblyConfigId, rootUsername, assemblyConfigComment)
 
     // list files from repo and assert that it contains added files
     configService.list().await shouldBe List(assemblyConfigInfo, tromboneConfigInfo)
@@ -672,7 +675,7 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     //Note that configService instance from the server-wiring can be used for assert-only calls for sha files
     //This call is invalid from client side
     val svnConfigData =
-      serverWiring.configService
+      serverConfigService
         .getById(Paths.get(s"${file.toString}${serverWiring.settings.`sha1-suffix`}"), configId)
         .await
         .get
@@ -695,8 +698,8 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val listOfFileInfo: List[ConfigFileInfo] = configService.list().await
 
     listOfFileInfo.toSet shouldBe Set(
-      ConfigFileInfo(file1, configId1, comment1),
-      ConfigFileInfo(file2, configId2, comment2)
+      ConfigFileInfo(file1, configId1, rootUsername, comment1),
+      ConfigFileInfo(file2, configId2, rootUsername, comment2)
     )
   }
 
@@ -727,13 +730,13 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val shaFilePath = Paths.get(s"${file.toString}${serverWiring.settings.`sha1-suffix`}")
     //Note that configService instance from the server-wiring can be used for assert-only calls for sha files
     //This call is invalid from client side
-    val shaOfConfigData1 = serverWiring.configService.getById(shaFilePath, configId1).await.get
+    val shaOfConfigData1 = serverConfigService.getById(shaFilePath, configId1).await.get
     shaOfConfigData1.toStringF.await shouldBe Sha1.fromConfigData(configData1).await
 
-    val shaOfConfigData2 = serverWiring.configService.getById(shaFilePath, configId2).await.get
+    val shaOfConfigData2 = serverConfigService.getById(shaFilePath, configId2).await.get
     shaOfConfigData2.toStringF.await shouldBe Sha1.fromConfigData(configData2).await
 
-    val shaOfConfigData3 = serverWiring.configService.getById(shaFilePath, configId3).await.get
+    val shaOfConfigData3 = serverConfigService.getById(shaFilePath, configId3).await.get
     shaOfConfigData3.toStringF.await shouldBe Sha1.fromConfigData(configData3).await
 
     // verify history without any parameter
@@ -907,8 +910,8 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val configFiles = configService.list().await
 
     configFiles.toSet shouldBe Set(
-      ConfigFileInfo(tromboneConfig, tromboneConfigId, tromboneConfigComment),
-      ConfigFileInfo(assemblyConfig, assemblyConfigId, assemblyConfigComment)
+      ConfigFileInfo(tromboneConfig, tromboneConfigId, rootUsername, tromboneConfigComment),
+      ConfigFileInfo(assemblyConfig, assemblyConfigId, rootUsername, assemblyConfigComment)
     )
   }
 
@@ -922,24 +925,17 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val configData            = ConfigData.fromPath(path)
     val config: Config        = ConfigFactory.parseString("csw-config-server.annex-min-file-size=1 KiB")
     val serverWiringAnnexTest = ServerWiring.make(config)
+    val cs                    = serverWiringAnnexTest.configServiceFactory.make()
 
-    val configId =
-      serverWiringAnnexTest.configService
-        .create(Paths.get(fileName), configData, annex = false, s"committing file: $fileName")
-        .await
+    val configId = cs.create(Paths.get(fileName), configData, annex = false, s"committing file: $fileName").await
 
     // This test verifies that the binary file has been stored properly in the configuration service
-    val expectedContent =
-      serverWiringAnnexTest.configService.getById(Paths.get(fileName), configId).await.get.toInputStream.toByteArray
-    val diskFile = getClass.getClassLoader.getResourceAsStream(fileName)
+    val expectedContent = cs.getById(Paths.get(fileName), configId).await.get.toInputStream.toByteArray
+    val diskFile        = getClass.getClassLoader.getResourceAsStream(fileName)
     expectedContent shouldBe diskFile.toByteArray
 
     // This test verifies that the file was stored in the annex because the file with the sha1-suffix only exists if in the annex
-    val svnConfigData =
-      serverWiringAnnexTest.configService
-        .getById(Paths.get(s"$fileName${serverWiring.settings.`sha1-suffix`}"), configId)
-        .await
-        .get
+    val svnConfigData = cs.getById(Paths.get(s"$fileName${serverWiring.settings.`sha1-suffix`}"), configId).await.get
     svnConfigData.toStringF.await shouldBe Sha1.fromConfigData(configData).await
     serverWiringAnnexTest.actorRuntime.shutdown(UnknownReason).await
   }
@@ -1081,8 +1077,9 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
       """.stripMargin)
 
     val serverWiringMetadataTest = ServerWiring.make(config)
+    val cs                       = serverWiringMetadataTest.configServiceFactory.make()
 
-    val metadata = serverWiringMetadataTest.configService.getMetadata.await
+    val metadata = cs.getMetadata.await
     metadata.repoPath shouldBe "/test/csw-config-svn"
     metadata.annexPath shouldBe "/test/csw-config-temp"
     metadata.annexMinFileSize shouldBe "333 MiB"

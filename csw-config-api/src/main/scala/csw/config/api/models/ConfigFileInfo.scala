@@ -9,4 +9,4 @@ import java.nio.file.Path
  * @param id the ConfigId representing unique id of the file
  * @param comment the comment end user wants to provide while committing the file in config service
  */
-case class ConfigFileInfo private[config] (path: Path, id: ConfigId, comment: String)
+case class ConfigFileInfo private[config] (path: Path, id: ConfigId, author: String, comment: String)

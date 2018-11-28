@@ -2,6 +2,7 @@ package csw.config.cli
 
 import java.nio.file.{Files, Path}
 
+import csw.auth.adapters.nativeapp.api.NativeAppAuthAdapter
 import csw.config.api.exceptions.FileNotFound
 import csw.config.api.models._
 import csw.config.api.scaladsl.ConfigService
@@ -11,9 +12,23 @@ import csw.config.client.internal.ActorRuntime
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
-class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime, printLine: Any ⇒ Unit) {
+class CommandLineRunner(
+    configService: ConfigService,
+    actorRuntime: ActorRuntime,
+    printLine: Any ⇒ Unit,
+    nativeAuthAdapter: NativeAppAuthAdapter
+) {
 
   import actorRuntime._
+
+  def login(): Unit = {
+    nativeAuthAdapter.login()
+    printLine(s"SUCCESS : Logged in successfully")
+  }
+  def logout(): Unit = {
+    nativeAuthAdapter.logout()
+    printLine(s"SUCCESS : Logged out successfully")
+  }
 
   //adminApi
   def create(options: Options): ConfigId = {
@@ -26,9 +41,7 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
         )
       printLine(s"File : ${options.relativeRepoPath.get} is created with id : ${configId.id}")
       configId
-    } else {
-      throw FileNotFound(inputFilePath)
-    }
+    } else throw FileNotFound(inputFilePath)
   }
 
   def update(options: Options): ConfigId = {
@@ -38,9 +51,7 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
       val configId   = await(configService.update(options.relativeRepoPath.get, configData, options.comment.get))
       printLine(s"File : ${options.relativeRepoPath.get} is updated with id : ${configId.id}")
       configId
-    } else {
-      throw FileNotFound(inputFilePath)
-    }
+    } else throw FileNotFound(inputFilePath)
   }
 
   def get(options: Options): Option[Path] = {
@@ -87,16 +98,15 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
     val fileRevisions = await(
       configService.history(options.relativeRepoPath.get, options.fromDate, options.toDate, options.maxFileVersions)
     )
-    fileRevisions.foreach(h => printLine(s"${h.id.id}\t${h.time}\t${h.comment}"))
+    printHistory(fileRevisions)
     fileRevisions
   }
 
   def historyActive(options: Options): List[ConfigFileRevision] = {
     val fileRevisions = await(
-      configService
-        .historyActive(options.relativeRepoPath.get, options.fromDate, options.toDate, options.maxFileVersions)
+      configService.historyActive(options.relativeRepoPath.get, options.fromDate, options.toDate, options.maxFileVersions)
     )
-    fileRevisions.foreach(h => printLine(s"${h.id.id}\t${h.time}\t${h.comment}"))
+    printHistory(fileRevisions)
     fileRevisions
   }
 
@@ -166,4 +176,7 @@ class CommandLineRunner(configService: ConfigService, actorRuntime: ActorRuntime
   // command line app is by nature blocking.
   // Do not use such method in library/server side code
   private def await[T](future: Future[T]): T = Await.result(future, Duration.Inf)
+
+  private def printHistory(fileRevisions: List[ConfigFileRevision]): Unit =
+    fileRevisions.foreach(h => printLine(s"${h.id.id}\t${h.time}\t${h.author}\t${h.comment}"))
 }

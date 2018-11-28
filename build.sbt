@@ -26,6 +26,7 @@ lazy val aggregatedProjects: Seq[ProjectReference] = Seq(
   `csw-alarm-api`,
   `csw-alarm-client`,
   `csw-alarm-cli`,
+  `csw-auth`,
   `csw-time-api`,
   `csw-time-client`,
   `csw-database-api`,
@@ -149,6 +150,7 @@ lazy val `csw-config-server` = project
   .dependsOn(
     `csw-config-api`,
     `csw-location-client`,
+    `akka-http-adapter`,
     `csw-location-server` % "test->test",
     `csw-commons`         % "compile->compile;test->test"
   )
@@ -163,7 +165,7 @@ lazy val `csw-config-client` = project
     `csw-location-api`,
     `csw-commons`         % "compile->compile;test->test",
     `csw-location-server` % "multi-jvm->multi-jvm",
-    `csw-config-server`   % "test->test"
+    `csw-config-server`   % "test->test;multi-jvm->test"
   )
   .enablePlugins(PublishBintray, GenJavadocPlugin, AutoMultiJvm, MaybeCoverage)
   .settings(
@@ -174,8 +176,9 @@ lazy val `csw-config-cli` = project
   .dependsOn(
     `csw-config-client`,
     `csw-location-client`,
+    `native-client-adapter`,
     `csw-location-server` % "multi-jvm->multi-jvm",
-    `csw-config-server`   % "test->test",
+    `csw-config-server`   % "test->test;multi-jvm->test",
     `csw-commons`         % "test->test"
   )
   .enablePlugins(DeployApp, AutoMultiJvm, MaybeCoverage)
@@ -438,53 +441,28 @@ alarm := {
 lazy val `csw-auth` = project
   .in(file("csw-auth"))
   .aggregate(
-    `native-client-adapter-scala`,
-    `access-token`,
-    `akka-http-adapter`,
-    `keycloak-config`,
-    `auth-examples`
+    `native-client-adapter`,
+    `auth-core`,
+    `akka-http-adapter`
   )
 
-lazy val `native-client-adapter-scala` = project
-  .in(file("csw-auth/native-client-adapter-scala"))
-  .dependsOn(`access-token`, `keycloak-config`)
+lazy val `auth-core` = project
+  .in(file("csw-auth/auth-core"))
+  .dependsOn(`csw-logging`)
   .settings(
-    libraryDependencies ++= Dependencies.AuthNativeClientAdapter.value
-  )
-
-lazy val `access-token` = project
-  .in(file("csw-auth/access-token"))
-  .dependsOn(`keycloak-config`, `csw-logging`)
-  .settings(
-    libraryDependencies ++= Dependencies.AuthAccessToken.value
+    libraryDependencies ++= Dependencies.AuthAdapterCore.value
   )
 
 lazy val `akka-http-adapter` = project
   .in(file("csw-auth/akka-http-adapter"))
-  .dependsOn(`access-token`)
+  .dependsOn(`auth-core`)
   .settings(
     libraryDependencies ++= Dependencies.AuthAkkaHttpAdapter.value
   )
 
-lazy val `keycloak-config` = project
-  .in(file("csw-auth/keycloak-config"))
+ lazy val `native-client-adapter` = project
+  .in(file("csw-auth/native-client-adapter"))
+  .dependsOn(`auth-core`)
   .settings(
-    libraryDependencies ++= Dependencies.AuthKeyCloakConfig.value
+    libraryDependencies ++= Dependencies.AuthNativeClientAdapter.value
   )
-
-lazy val `auth-examples` = project
-  .in(file("csw-auth/auth-examples"))
-  .aggregate(
-    `akka-http-example`,
-    `cli-app-example`
-  )
-
-lazy val `akka-http-example` = project
-  .in(file("csw-auth/auth-examples/akka-http-example"))
-  .dependsOn(`akka-http-adapter`)
-  .settings(
-    libraryDependencies ++= Dependencies.AuthAkkaHttpExample.value
-  )
-
-lazy val `cli-app-example` = project
-  .in(file("csw-auth/auth-examples/cli-app-example"))

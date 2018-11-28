@@ -2,10 +2,11 @@ package csw.config.server
 
 import akka.actor.ActorSystem
 import com.typesafe.config.{Config, ConfigFactory}
-import csw.config.api.scaladsl.ConfigService
+import csw.auth.adapters.akka.http.{Authentication, SecurityDirectives}
+import csw.auth.core.token.TokenFactory
 import csw.config.server.files._
 import csw.config.server.http.{ConfigHandlers, ConfigServiceRoute, HttpService}
-import csw.config.server.svn.{SvnConfigService, SvnRepo}
+import csw.config.server.svn.{SvnConfigServiceFactory, SvnRepo}
 import csw.location.api.scaladsl.LocationService
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 
@@ -16,32 +17,25 @@ private[csw] class ServerWiring {
   lazy val config: Config = ConfigFactory.load()
   lazy val settings       = new Settings(config)
 
-  lazy val actorSystem   = ActorSystem("config-server")
-  lazy val actorRuntime  = new ActorRuntime(actorSystem, settings)
-  lazy val annexFileRepo = new AnnexFileRepo(actorRuntime.blockingIoDispatcher)
-  lazy val svnRepo       = new SvnRepo(settings, actorRuntime.blockingIoDispatcher)
+  lazy val actorSystem      = ActorSystem("config-server")
+  lazy val actorRuntime     = new ActorRuntime(actorSystem, settings)
+  lazy val annexFileRepo    = new AnnexFileRepo(actorRuntime.blockingIoDispatcher)
+  lazy val annexFileService = new AnnexFileService(settings, annexFileRepo, actorRuntime)
 
-  lazy val annexFileService             = new AnnexFileService(settings, annexFileRepo, actorRuntime)
-  lazy val configService: ConfigService = new SvnConfigService(settings, actorRuntime, svnRepo, annexFileService)
+  lazy val svnRepo              = new SvnRepo(settings.`svn-user-name`, settings, actorRuntime.blockingIoDispatcher)
+  lazy val configServiceFactory = new SvnConfigServiceFactory(actorRuntime, annexFileService)
 
   lazy val locationService: LocationService = HttpLocationServiceFactory.makeLocalClient(actorSystem, actorRuntime.mat)
 
   lazy val configHandlers     = new ConfigHandlers
-  lazy val configServiceRoute = new ConfigServiceRoute(configService, actorRuntime, configHandlers)
+  lazy val authentication     = new Authentication(new TokenFactory)
+  lazy val securityDirectives = SecurityDirectives(authentication)
+  lazy val configServiceRoute = new ConfigServiceRoute(configServiceFactory, actorRuntime, configHandlers, securityDirectives)
 
   lazy val httpService: HttpService = new HttpService(locationService, configServiceRoute, settings, actorRuntime)
 }
 
 private[csw] object ServerWiring {
-
-  def make(_locationService: LocationService): ServerWiring = new ServerWiring {
-    override lazy val locationService: LocationService = _locationService
-  }
-
-  def make(_actorSystem: ActorSystem, _locationService: LocationService): ServerWiring = new ServerWiring {
-    override lazy val actorSystem: ActorSystem         = _actorSystem
-    override lazy val locationService: LocationService = _locationService
-  }
 
   def make(maybePort: Option[Int]): ServerWiring = new ServerWiring {
     override lazy val settings: Settings = new Settings(config) {
@@ -51,5 +45,14 @@ private[csw] object ServerWiring {
 
   def make(_config: Config): ServerWiring = new ServerWiring {
     override lazy val config: Config = _config.withFallback(ConfigFactory.load())
+  }
+
+  def make(_locationService: LocationService, _securityDirectives: SecurityDirectives): ServerWiring = new ServerWiring {
+    override lazy val locationService: LocationService       = _locationService
+    override lazy val securityDirectives: SecurityDirectives = _securityDirectives
+  }
+
+  def make(_securityDirectives: SecurityDirectives): ServerWiring = new ServerWiring {
+    override lazy val securityDirectives: SecurityDirectives = _securityDirectives
   }
 }

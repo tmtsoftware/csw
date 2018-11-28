@@ -321,4 +321,15 @@ class ArgsParserTest extends FunSuite with Matchers with BeforeAndAfterEach {
     )
   }
 
+  test("test login") {
+    val args               = Array("login")
+    val x: Option[Options] = silentParse(args)
+    x should contain(Options("login"))
+  }
+
+  test("test logout") {
+    val args               = Array("logout")
+    val x: Option[Options] = silentParse(args)
+    x should contain(Options("logout"))
+  }
 }

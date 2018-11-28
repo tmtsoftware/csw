@@ -17,7 +17,7 @@ private[config] trait JsonSupport extends PlayJsonSupport {
 
     override def reads(json: JsValue): JsResult[Path] = json match {
       case JsString(value) ⇒ JsSuccess(Paths.get(value))
-      case _               ⇒ throw new RuntimeException("can not parse")
+      case _               ⇒ JsError(s"can not parse $json into Path")
     }
   }
 
@@ -30,8 +30,17 @@ private[config] trait JsonSupport extends PlayJsonSupport {
     }
   }
 
-  implicit val configIdFormat: OFormat[ConfigId]                    = Json.format[ConfigId]
-  implicit val configFileInfoFormat: OFormat[ConfigFileInfo]        = Json.format[ConfigFileInfo]
-  implicit val configFileHistoryFormat: OFormat[ConfigFileRevision] = Json.format[ConfigFileRevision]
-  implicit val configMetadataFormat: OFormat[ConfigMetadata]        = Json.format[ConfigMetadata]
+  implicit val configIdFormat: Format[ConfigId]              = Json.format[ConfigId]
+  implicit val configFileInfoFormat: OFormat[ConfigFileInfo] = Json.format[ConfigFileInfo]
+  implicit val configFileHistoryFormat: OFormat[ConfigFileRevision] = {
+    implicit val configIdFormat: Format[ConfigId] = new Format[ConfigId] {
+      override def writes(o: ConfigId): JsValue = JsString(o.id)
+      override def reads(json: JsValue): JsResult[ConfigId] = json match {
+        case JsString(x) ⇒ JsSuccess(ConfigId(x))
+        case _           ⇒ JsError(s"can not parse $json into configId")
+      }
+    }
+    Json.format[ConfigFileRevision]
+  }
+  implicit val configMetadataFormat: OFormat[ConfigMetadata] = Json.format[ConfigMetadata]
 }

@@ -9,22 +9,28 @@ import csw.commons.http.ErrorResponse
 import csw.config.api.models.{ConfigData, ConfigFileInfo, ConfigFileRevision, ConfigId, _}
 import csw.config.server.ServerWiring
 import csw.config.server.commons.TestFileUtils
+import csw.config.server.mocks.MockedAuthentication
 import org.jboss.netty.logging.{InternalLoggerFactory, Slf4JLoggerFactory}
+import org.mockito.Mockito.when
+import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Matchers}
 
 // DEOPSCSW-80: HTTP based access for configuration file
+// DEOPSCSW-576: Auth token for Configuration service
 class ConfigServiceRouteTest
     extends FunSuite
     with ScalatestRouteTest
     with BeforeAndAfterAll
     with BeforeAndAfterEach
     with Matchers
-    with HttpSupport {
+    with HttpSupport
+    with MockitoSugar
+    with MockedAuthentication {
 
   // Fix to avoid 'java.util.concurrent.RejectedExecutionException: Worker has already been shutdown'
   InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory)
 
-  val serverWiring = new ServerWiring
+  val serverWiring: ServerWiring = ServerWiring.make(securityDirectives)
   import serverWiring._
   import configServiceRoute.route
 
@@ -39,26 +45,23 @@ class ConfigServiceRouteTest
   private val configValue2 = "name = NFIRAOS Trombone Assembly"
   private val configFile2  = ConfigData.fromString(configValue2)
 
-  override protected def beforeAll(): Unit =
-    testFileUtils.deleteServerFiles()
+  override protected def beforeAll(): Unit = testFileUtils.deleteServerFiles()
 
-  override protected def beforeEach(): Unit =
-    svnRepo.initSvnRepo()
+  override protected def beforeEach(): Unit = svnRepo.initSvnRepo()
 
-  override protected def afterEach(): Unit =
-    testFileUtils.deleteServerFiles()
+  override protected def afterEach(): Unit = testFileUtils.deleteServerFiles()
 
   /**
    * test HTTP response codes
    */
   test("create - success status code") {
     // try to create by providing optional comment parameter
-    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
 
     // try to create by not providing optional comment parameter
-    Post("/config/test1.conf?annex=true", configFile2) ~> route ~> check {
+    Post("/config/test1.conf?annex=true", configFile2).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
 
@@ -66,16 +69,16 @@ class ConfigServiceRouteTest
 
   test("create - failure status codes") {
 
-    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
 
-    Post("/config?annex=true&comment=commit1", configFile1) ~> Route.seal(route) ~> check {
+    Post("/config?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> Route.seal(route) ~> check {
       status shouldEqual StatusCodes.NotFound
     }
 
     // try to create file which already exists
-    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> Route.seal(route) ~> check {
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> Route.seal(route) ~> check {
       status shouldEqual StatusCodes.Conflict
     }
 
@@ -83,17 +86,17 @@ class ConfigServiceRouteTest
 
   test("update - success status code") {
 
-    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
 
     // try to update by providing optional comment parameter
-    Put("/config/test.conf?comment=updated", updatedConfigFile1) ~> route ~> check {
+    Put("/config/test.conf?comment=updated", updatedConfigFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.OK
     }
 
     // try to update by not providing optional comment parameter
-    Put("/config/test.conf", updatedConfigFile1) ~> route ~> check {
+    Put("/config/test.conf", updatedConfigFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.OK
     }
 
@@ -105,24 +108,24 @@ class ConfigServiceRouteTest
 
   test("update - failure status codes") {
     // path missing
-    Post("/update") ~> Route.seal(route) ~> check {
+    Post("/update").addHeader(validTokenHeader) ~> Route.seal(route) ~> check {
       status shouldEqual StatusCodes.NotFound
     }
 
     // try to update file which does not exist
-    Put("/config/test.conf?comment=updated", configFile1) ~> route ~> check {
+    Put("/config/test.conf?comment=updated", configFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.NotFound
     }
 
     // try to update a file which does not exist by not providing optional comment parameter
-    Put("/config/test.conf", configFile1) ~> route ~> check {
+    Put("/config/test.conf", configFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.NotFound
     }
 
   }
 
   test("get - success status code") {
-    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
 
@@ -141,7 +144,7 @@ class ConfigServiceRouteTest
   test("get - failure status codes") {
 
     //consumes 2 revisions, one for actual file one for active file
-    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
 
@@ -159,12 +162,12 @@ class ConfigServiceRouteTest
 
   test("get by date - success status code") {
     val timeWhenRepoWasEmpty = Instant.now()
-    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
     val timeWhenFileWasCreated = Instant.now()
 
-    Put("/config/test.conf?comment=updated", updatedConfigFile1) ~> route ~> check {
+    Put("/config/test.conf?comment=updated", updatedConfigFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.OK
     }
 
@@ -186,15 +189,15 @@ class ConfigServiceRouteTest
   }
 
   test("get latest - success status code") {
-    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
 
-    Put("/config/test.conf?comment=updated", updatedConfigFile1) ~> route ~> check {
+    Put("/config/test.conf?comment=updated", updatedConfigFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.OK
     }
 
-    Put("/active-version/test.conf?id=1") ~> Route.seal(route) ~> check {
+    Put("/active-version/test.conf?id=1").addHeader(validTokenHeader) ~> Route.seal(route) ~> check {
       status shouldEqual StatusCodes.OK
     }
 
@@ -218,7 +221,7 @@ class ConfigServiceRouteTest
       responseAs[List[ConfigFileInfo]].size shouldBe 0
     }
 
-    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
 
@@ -229,13 +232,32 @@ class ConfigServiceRouteTest
     }
   }
 
+  // DEOPSCSW-577: Ability to view detailed change log in SVN
+  test("list - with correct author") {
+    Get("/list") ~> route ~> check {
+      status shouldEqual StatusCodes.OK
+      responseAs[List[ConfigFileInfo]].size shouldBe 0
+    }
+
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> route ~> check {
+      status shouldEqual StatusCodes.Created
+    }
+
+    Get("/list") ~> route ~> check {
+      status shouldEqual StatusCodes.OK
+      val fileList = responseAs[List[ConfigFileInfo]]
+      fileList.size shouldBe 1
+      fileList.map(_.author) shouldBe List(preferredUserName)
+    }
+  }
+
   test("list by pattern - success code") {
     Get("/list?pattern=a/b") ~> route ~> check {
       status shouldEqual StatusCodes.OK
       responseAs[List[ConfigFileInfo]].size shouldBe 0
     }
 
-    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
 
@@ -254,7 +276,7 @@ class ConfigServiceRouteTest
   }
 
   test("list by file type - success code") {
-    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
 
@@ -278,7 +300,7 @@ class ConfigServiceRouteTest
   }
 
   test("list by file type and pattern - success code") {
-    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
 
@@ -288,43 +310,51 @@ class ConfigServiceRouteTest
     }
   }
 
+  // DEOPSCSW-577: Ability to view detailed change log in SVN
+  // DEOPSCSW-625: Include username from svn in history model of config service
   test("history - success  status code") {
+    val bilal  = "bilal"
+    val poorva = "poorva"
 
-    //consumes 2 revisions, one for actual file one for active file
-    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
+    when(validToken.preferred_username).thenReturn(Some(bilal)).thenReturn(Some(poorva))
+
+    // consumes 2 revisions, one for actual file one for active file
+    // first request will use username=bilal
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
 
     val timeWhenFileWasCreated = Instant.now()
 
-    Put("/config/test.conf?comment=commit2", updatedConfigFile1) ~> route ~> check {
+    // second request will use username=poorva
+    Put("/config/test.conf?comment=commit2", updatedConfigFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.OK
     }
 
     val timeWhenFileWasUpdated = Instant.now()
 
-    val configFileHistoryIdCommentTuples = Set((ConfigId(1), "commit1"), (ConfigId(3), "commit2"))
+    val configFileHistoryIdAuthorCommentTuples = Set((ConfigId(1), bilal, "commit1"), (ConfigId(3), poorva, "commit2"))
 
     Get("/history/test.conf") ~> route ~> check {
       status shouldEqual StatusCodes.OK
 
       responseAs[List[ConfigFileRevision]]
-        .map(history => (history.id, history.comment))
-        .toSet shouldEqual configFileHistoryIdCommentTuples
+        .map(history => (history.id, history.author, history.comment))
+        .toSet shouldEqual configFileHistoryIdAuthorCommentTuples
     }
 
     Get("/history/test.conf?maxResults=1") ~> route ~> check {
       status shouldEqual StatusCodes.OK
 
       responseAs[List[ConfigFileRevision]]
-        .map(history => (history.id, history.comment)) shouldEqual List((ConfigId(3), "commit2"))
+        .map(history => (history.id, history.author, history.comment)) shouldEqual List((ConfigId(3), poorva, "commit2"))
     }
 
     Get(s"/history/test.conf?maxResults=1&from=$timeWhenFileWasCreated&to=$timeWhenFileWasUpdated") ~> route ~> check {
       status shouldEqual StatusCodes.OK
 
       responseAs[List[ConfigFileRevision]]
-        .map(history => (history.id, history.comment)) shouldEqual List((ConfigId(3), "commit2"))
+        .map(history => (history.id, history.author, history.comment)) shouldEqual List((ConfigId(3), poorva, "commit2"))
     }
 
   }
@@ -349,7 +379,7 @@ class ConfigServiceRouteTest
 
   test("getActive - success status code") {
 
-    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
 
@@ -372,23 +402,23 @@ class ConfigServiceRouteTest
   test("getActive by date - success status code") {
 
     val timeWhenRepoWasEmpty = Instant.now()
-    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
 
     val timeWhenFileWasCreated = Instant.now()
 
-    Put("/config/test.conf?comment=updated", updatedConfigFile1) ~> route ~> check {
+    Put("/config/test.conf?comment=updated", updatedConfigFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.OK
     }
 
-    Put("/active-version/test.conf?id=3&comment=commit1") ~> Route.seal(route) ~> check {
+    Put("/active-version/test.conf?id=3&comment=commit1").addHeader(validTokenHeader) ~> Route.seal(route) ~> check {
       status shouldEqual StatusCodes.OK
     }
 
     val timeWhenFileWasUpdated = Instant.now()
 
-    Put("/config/test.conf?comment=updated", configFile2) ~> route ~> check {
+    Put("/config/test.conf?comment=updated", configFile2).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.OK
     }
 
@@ -423,15 +453,15 @@ class ConfigServiceRouteTest
 
   test("setActive - success status code") {
 
-    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
 
-    Put("/config/test.conf?comment=updated", updatedConfigFile1) ~> route ~> check {
+    Put("/config/test.conf?comment=updated", updatedConfigFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.OK
     }
 
-    Put("/active-version/test.conf?id=1&comment=commit1") ~> Route.seal(route) ~> check {
+    Put("/active-version/test.conf?id=1&comment=commit1").addHeader(validTokenHeader) ~> Route.seal(route) ~> check {
       status shouldEqual StatusCodes.OK
     }
 
@@ -445,17 +475,17 @@ class ConfigServiceRouteTest
   test("setActive - failure status codes") {
 
     // try to set active version of file which does not exist
-    Put("/active-version/test.conf?id=1&comment=commit1") ~> Route.seal(route) ~> check {
+    Put("/active-version/test.conf?id=1&comment=commit1").addHeader(validTokenHeader) ~> Route.seal(route) ~> check {
       status shouldEqual StatusCodes.NotFound
     }
 
     //consumes 2 revisions, one for actual file one for active file
-    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
 
     // try to set active version of file which exist but corresponding id does not exist
-    Put("/active-version/test.conf?id=3&comment=commit1") ~> Route.seal(route) ~> check {
+    Put("/active-version/test.conf?id=3&comment=commit1").addHeader(validTokenHeader) ~> Route.seal(route) ~> check {
       status shouldEqual StatusCodes.NotFound
     }
 
@@ -463,23 +493,23 @@ class ConfigServiceRouteTest
 
   test("resetActive - success status code") {
 
-    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
 
-    Put("/config/test.conf?comment=updated", updatedConfigFile1) ~> route ~> check {
+    Put("/config/test.conf?comment=updated", updatedConfigFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.OK
     }
 
-    Put("/active-version/test.conf") ~> Route.seal(route) ~> check {
+    Put("/active-version/test.conf").addHeader(validTokenHeader) ~> Route.seal(route) ~> check {
       status shouldEqual StatusCodes.OK
     }
 
-    Put("/active-version/test.conf?id=1") ~> Route.seal(route) ~> check {
+    Put("/active-version/test.conf?id=1").addHeader(validTokenHeader) ~> Route.seal(route) ~> check {
       status shouldEqual StatusCodes.OK
     }
 
-    Put("/active-version/test.conf") ~> Route.seal(route) ~> check {
+    Put("/active-version/test.conf").addHeader(validTokenHeader) ~> Route.seal(route) ~> check {
       status shouldEqual StatusCodes.OK
     }
   }
@@ -487,54 +517,68 @@ class ConfigServiceRouteTest
   test("resetActive - failure status codes") {
 
     //  try to reset active version of file which does not exists
-    Put("/active-version/test.conf") ~> Route.seal(route) ~> check {
+    Put("/active-version/test.conf").addHeader(validTokenHeader) ~> Route.seal(route) ~> check {
       status shouldEqual StatusCodes.NotFound
     }
 
   }
 
+  // DEOPSCSW-577: Ability to view detailed change log in SVN
+  // DEOPSCSW-625: Include username from svn in history model of config service
   test("history-active - success  status code") {
+    val bilal   = "bilal"
+    val poorva  = "poorva"
+    val shubham = "shubham"
+
+    when(validToken.preferred_username).thenReturn(Some(bilal)).thenReturn(Some(poorva)).thenReturn(Some(shubham))
 
     //consumes 2 revisions, one for actual file one for active file
-    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
+    // first request will use username=bilal
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
 
     val timeWhenFileWasCreated = Instant.now()
 
-    Put("/config/test.conf?comment=commit2", updatedConfigFile1) ~> route ~> check {
+    Put("/config/test.conf?comment=commit2", updatedConfigFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.OK
     }
 
-    Put("/active-version/test.conf?id=3&comment=commit1") ~> Route.seal(route) ~> check {
+    // second request will use username=poorva
+    Put("/config/test.conf?comment=commit2", updatedConfigFile1).addHeader(validTokenHeader) ~> route ~> check {
+      status shouldEqual StatusCodes.OK
+    }
+
+    // third request will use username=shubham
+    Put("/active-version/test.conf?id=3&comment=commit1").addHeader(validTokenHeader) ~> Route.seal(route) ~> check {
       status shouldEqual StatusCodes.OK
     }
 
     val timeWhenFileWasUpdated = Instant.now()
 
-    val configFileHistoryIdCommentTuples =
-      Set((ConfigId(1), "initializing active file with the first version"), (ConfigId(3), "commit1"))
+    val configFileHistoryIdAuthorCommentTuples =
+      Set((ConfigId(1), bilal, "initializing active file with the first version"), (ConfigId(3), shubham, "commit1"))
 
     Get("/history-active/test.conf") ~> route ~> check {
       status shouldEqual StatusCodes.OK
 
       responseAs[List[ConfigFileRevision]]
-        .map(history => (history.id, history.comment))
-        .toSet shouldEqual configFileHistoryIdCommentTuples
+        .map(history => (history.id, history.author, history.comment))
+        .toSet shouldEqual configFileHistoryIdAuthorCommentTuples
     }
 
     Get("/history-active/test.conf?maxResults=1") ~> route ~> check {
       status shouldEqual StatusCodes.OK
 
       responseAs[List[ConfigFileRevision]]
-        .map(history => (history.id, history.comment)) shouldEqual List((ConfigId(3), "commit1"))
+        .map(history => (history.id, history.author, history.comment)) shouldEqual List((ConfigId(3), shubham, "commit1"))
     }
 
     Get(s"/history-active/test.conf?maxResults=1&from=$timeWhenFileWasCreated&to=$timeWhenFileWasUpdated") ~> route ~> check {
       status shouldEqual StatusCodes.OK
 
       responseAs[List[ConfigFileRevision]]
-        .map(history => (history.id, history.comment)) shouldEqual List((ConfigId(3), "commit1"))
+        .map(history => (history.id, history.author, history.comment)) shouldEqual List((ConfigId(3), shubham, "commit1"))
     }
 
   }
@@ -559,7 +603,7 @@ class ConfigServiceRouteTest
 
   test("exists - success status code") {
 
-    Post("/config/test.conf?annex=true&comment=commit1", configFile1) ~> route ~> check {
+    Post("/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> route ~> check {
       status shouldEqual StatusCodes.Created
     }
 
@@ -585,6 +629,58 @@ class ConfigServiceRouteTest
       responseAs[ConfigMetadata].annexPath should not be empty
       responseAs[ConfigMetadata].annexMinFileSize should not be empty
       responseAs[ConfigMetadata].maxConfigFileSize should not be empty
+    }
+  }
+
+  // DEOPSCSW-576: Auth token for Configuration service
+  /** Auth Based routes **/
+  /* ================ Unauthorized code ================*/
+  test("create - Unauthorized code") {
+    Post("/config/test.conf?comment=create") ~> route ~> check {
+      status shouldEqual StatusCodes.Unauthorized
+    }
+  }
+
+  test("update - Unauthorized code") {
+    Put("/config/test.conf?comment=update") ~> route ~> check {
+      status shouldEqual StatusCodes.Unauthorized
+    }
+  }
+
+  test("delete - Unauthorized code") {
+    Delete("/config/test.conf?comment=deleting") ~> route ~> check {
+      status shouldEqual StatusCodes.Unauthorized
+    }
+  }
+
+  test("set active-version - Unauthorized code") {
+    Put("/active-version/test.conf?id=1&comment=active") ~> route ~> check {
+      status shouldEqual StatusCodes.Unauthorized
+    }
+  }
+
+  /* ================ Forbidden code ================*/
+  test("create - Forbidden code") {
+    Post("/config/test.conf?comment=create").addHeader(roleMissingTokenHeader) ~> route ~> check {
+      status shouldEqual StatusCodes.Forbidden
+    }
+  }
+
+  test("update - Forbidden code") {
+    Put("/config/test.conf?comment=update").addHeader(roleMissingTokenHeader) ~> route ~> check {
+      status shouldEqual StatusCodes.Forbidden
+    }
+  }
+
+  test("set active-version - Forbidden code") {
+    Put("/active-version/test.conf?id=1&comment=active").addHeader(roleMissingTokenHeader) ~> route ~> check {
+      status shouldEqual StatusCodes.Forbidden
+    }
+  }
+
+  test("delete - Forbidden code") {
+    Delete("/config/test.conf?comment=deleting").addHeader(roleMissingTokenHeader) ~> route ~> check {
+      status shouldEqual StatusCodes.Forbidden
     }
   }
 }

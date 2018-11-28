@@ -6,10 +6,12 @@ import java.time.Instant
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.Uri.{Path, Query}
 import akka.http.scaladsl.model._
+import akka.http.scaladsl.model.headers.{Authorization, OAuth2BearerToken}
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import csw.commons.http.ErrorResponse
+import csw.config.api.TokenFactory
 import csw.config.api.commons.BinaryUtils
-import csw.config.api.exceptions.{EmptyResponse, FileAlreadyExists, FileNotFound, InvalidInput}
+import csw.config.api.exceptions._
 import csw.config.api.internal.ConfigStreamExts.RichSource
 import csw.config.api.internal.JsonSupport
 import csw.config.api.models._
@@ -26,8 +28,11 @@ import scala.concurrent.Future
  * @param configServiceResolver ConfigServiceResolver to get the uri of Configuration Service
  * @param actorRuntime ActorRuntime instance for actor system, execution context and dispatcher
  */
-private[config] class ConfigClient(configServiceResolver: ConfigServiceResolver, actorRuntime: ActorRuntime)
-    extends ConfigService {
+private[config] class ConfigClient(
+    configServiceResolver: ConfigServiceResolver,
+    actorRuntime: ActorRuntime,
+    tokenFactory: Option[TokenFactory] = None
+) extends ConfigService {
 
   private val log: Logger = ConfigClientLogger.getLogger
 
@@ -49,13 +54,24 @@ private[config] class ConfigClient(configServiceResolver: ConfigServiceResolver,
     await(configServiceResolver.uri).withPath(path)
   }
 
+  private def bearerTokenHeader = tokenFactory.map(_.getToken).map(token ⇒ Authorization(OAuth2BearerToken(token)))
+
+  private implicit class HttpRequestExt(val httpRequest: HttpRequest) {
+
+    def withBearerToken: HttpRequest = bearerTokenHeader match {
+      case Some(auth) ⇒ httpRequest.addHeader(auth)
+      case None       ⇒ httpRequest
+    }
+
+  }
+
   override def create(path: jnio.Path, configData: ConfigData, annex: Boolean, comment: String): Future[ConfigId] = async {
     val (prefix, stitchedSource) = configData.source.prefixAndStitch(1)
     val isAnnex                  = if (annex) annex else BinaryUtils.isBinary(await(prefix))
     val uri                      = await(configUri(path)).withQuery(Query("annex" → isAnnex.toString, "comment" → comment))
     val entity                   = HttpEntity(ContentTypes.`application/octet-stream`, configData.length, stitchedSource)
 
-    val request = HttpRequest(HttpMethods.POST, uri = uri, entity = entity)
+    val request = HttpRequest(HttpMethods.POST, uri = uri, entity = entity).withBearerToken
     log.info("Sending HTTP request", Map("request" → request.toString()))
     val response = await(Http().singleRequest(request))
 
@@ -71,7 +87,7 @@ private[config] class ConfigClient(configServiceResolver: ConfigServiceResolver,
     val entity = HttpEntity(ContentTypes.`application/octet-stream`, configData.length, configData.source)
     val uri    = await(configUri(path)).withQuery(Query("comment" → comment))
 
-    val request = HttpRequest(HttpMethods.PUT, uri = uri, entity = entity)
+    val request = HttpRequest(HttpMethods.PUT, uri = uri, entity = entity).withBearerToken
     log.info("Sending HTTP request", Map("request" → request.toString()))
     val response = await(Http().singleRequest(request))
 
@@ -116,7 +132,7 @@ private[config] class ConfigClient(configServiceResolver: ConfigServiceResolver,
   override def delete(path: jnio.Path, comment: String): Future[Unit] = async {
     val uri = await(configUri(path)).withQuery(Query("comment" → comment))
 
-    val request = HttpRequest(HttpMethods.DELETE, uri = uri)
+    val request = HttpRequest(HttpMethods.DELETE, uri = uri).withBearerToken
     log.info("Sending HTTP request", Map("request" → request.toString()))
     val response = await(Http().singleRequest(request))
 
@@ -189,7 +205,7 @@ private[config] class ConfigClient(configServiceResolver: ConfigServiceResolver,
   private def handleActiveConfig(path: jnio.Path, query: Query): Future[Unit] = async {
     val uri = await(activeConfigVersion(path)).withQuery(query)
 
-    val request = HttpRequest(HttpMethods.PUT, uri = uri)
+    val request = HttpRequest(HttpMethods.PUT, uri = uri).withBearerToken
     log.info("Sending HTTP request", Map("request" → request.toString()))
     val response = await(Http().singleRequest(request))
 
@@ -244,25 +260,17 @@ private[config] class ConfigClient(configServiceResolver: ConfigServiceResolver,
   private def handleResponse[T](response: HttpResponse)(pf: PartialFunction[StatusCode, Future[T]]): Future[T] = {
     def contentF = Unmarshal(response).to[ErrorResponse]
 
+    def logAndThrow(e: RuntimeException) = {
+      log.error(e.getMessage, ex = e)
+      throw e
+    }
+
     val defaultHandler: PartialFunction[StatusCode, Future[T]] = {
-      case StatusCodes.BadRequest ⇒
-        contentF.map(errorResponse ⇒ {
-          val invalidInput = InvalidInput(errorResponse.error.message)
-          log.error(invalidInput.getMessage, ex = invalidInput)
-          throw invalidInput
-        })
-      case StatusCodes.NotFound ⇒
-        contentF.map(errorResponse ⇒ {
-          val fileNotFound = FileNotFound(errorResponse.error.message)
-          log.error(fileNotFound.getMessage, ex = fileNotFound)
-          throw fileNotFound
-        })
-      case _ ⇒
-        contentF.map(errorResponse ⇒ {
-          val runtimeException = new RuntimeException(errorResponse.error.message)
-          log.error(runtimeException.getMessage, ex = runtimeException)
-          throw runtimeException
-        })
+      case StatusCodes.BadRequest   ⇒ contentF.map(res ⇒ logAndThrow(InvalidInput(res.error.message)))
+      case StatusCodes.NotFound     ⇒ contentF.map(res ⇒ logAndThrow(FileNotFound(res.error.message)))
+      case StatusCodes.Unauthorized ⇒ contentF.map(_ ⇒ logAndThrow(Unauthorized))
+      case StatusCodes.Forbidden    ⇒ contentF.map(_ ⇒ logAndThrow(NotAllowed))
+      case _                        ⇒ contentF.map(res ⇒ logAndThrow(new RuntimeException(res.error.message)))
     }
 
     val handler = pf.orElse(defaultHandler)

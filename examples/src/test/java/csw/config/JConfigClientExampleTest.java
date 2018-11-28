@@ -8,6 +8,7 @@ import csw.config.api.javadsl.JFileType;
 import csw.config.api.models.*;
 import csw.config.client.javadsl.JConfigClientFactory;
 import csw.config.server.ServerWiring;
+import csw.config.server.mocks.JMockedAuthentication;
 import csw.location.api.javadsl.ILocationService;
 import csw.testkit.ConfigTestKit;
 import csw.testkit.javadsl.FrameworkTestKitJunitResource;
@@ -31,7 +32,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
     // DEOPSCSW-592: Create csw testkit for component writers
     @ClassRule
     public static final FrameworkTestKitJunitResource testKit = new FrameworkTestKitJunitResource(Collections.singletonList(JCSWService.ConfigServer));
-
+    private static JMockedAuthentication mocks = new JMockedAuthentication();
     private static ConfigTestKit configTestKit = testKit.frameworkTestKit().configTestKit();
     private static ServerWiring configWiring = configTestKit.configWiring();
     private static ActorSystem actorSystem = configWiring.actorSystem();
@@ -43,7 +44,7 @@ public class JConfigClientExampleTest extends JUnitSuite {
     //config client API
     IConfigClientService clientApi = JConfigClientFactory.clientApi(actorSystem, clientLocationService);
     //config admin API
-    IConfigService adminApi = JConfigClientFactory.adminApi(actorSystem, clientLocationService);
+    IConfigService adminApi = JConfigClientFactory.adminApi(actorSystem, clientLocationService, mocks.factory());
     //#create-api
 
     //#declare_string_config

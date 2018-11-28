@@ -9,4 +9,4 @@ import java.time.Instant
  * @param comment the comment end user wants to provide while committing the file in config service
  * @param time capturing the time of file getting committed in config service
  */
-case class ConfigFileRevision private[config] (id: ConfigId, comment: String, time: Instant)
+case class ConfigFileRevision private[config] (id: ConfigId, author: String, comment: String, time: Instant)

@@ -10,6 +10,7 @@ import csw.config.client.JConfigClientBaseSuite;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 import org.scalatest.junit.JUnitSuite;
+import scala.Some;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.isA;
+import static org.mockito.Mockito.when;
 
 // DEOPSCSW-138: Split Config API into Admin API and Client API
 // DEOPSCSW-103: Java API for Configuration service
@@ -186,9 +188,16 @@ public class JConfigAdminApiTest extends JUnitSuite {
     // DEOPSCSW-76: Access a list of all the versions of a stored configuration file
     // DEOPSCSW-63: Add comment while creating or updating a configuration file
     // DEOPSCSW-83: Retrieve file based on range of time for being most recent version
+    // DEOPSCSW-577: Ability to view detailed change log in SVN
     @Test
     public void testHistoryOfAFile() throws ExecutionException, InterruptedException {
         Path path = Paths.get("/test.conf");
+
+        String firstUser = "firstUser";
+        String secondUser = "secondUser";
+        String thirdUser = "thirdUser";
+        when(jConfigClientBaseSuite.validToken().preferred_username())
+                .thenReturn(new Some(firstUser),new Some(secondUser),new Some(thirdUser));
 
         try{
             exception.expectCause(isA(FileNotFound.class));
@@ -212,6 +221,8 @@ public class JConfigAdminApiTest extends JUnitSuite {
                     new ArrayList<>(Arrays.asList(configId3, configId2, configId1)));
             Assert.assertEquals(historyByPath.stream().map(ConfigFileRevision::comment).collect(Collectors.toList()),
                     new ArrayList<>(Arrays.asList(comment3, comment2, comment1)));
+            Assert.assertEquals(historyByPath.stream().map(ConfigFileRevision::author).collect(Collectors.toList()),
+                    new ArrayList<>(Arrays.asList(thirdUser, secondUser, firstUser)));
 
             List<ConfigFileRevision> historyByPathAndSize = configService.history(path, 2).get();
 
@@ -239,10 +250,15 @@ public class JConfigAdminApiTest extends JUnitSuite {
     }
 
     // DEOPSCSW-48: Store new configuration file in Config. service
+    // DEOPSCSW-577: Ability to view detailed change log in SVN
     @Test
     public void testListAllFiles() throws ExecutionException, InterruptedException {
         Path tromboneConfig = Paths.get("trombone.conf");
         Path assemblyConfig = Paths.get("a/b/assembly/assembly.conf");
+
+        String firstUser = "firstUser";
+        String secondUser = "secondUser";
+        when(jConfigClientBaseSuite.validToken().preferred_username()).thenReturn(new Some(firstUser),new Some(secondUser));
 
         String tromboneConfigComment = "hello trombone";
         String assemblyConfigComment = "hello assembly";
@@ -250,8 +266,8 @@ public class JConfigAdminApiTest extends JUnitSuite {
         ConfigId tromboneConfigId = configService.create(tromboneConfig, ConfigData.fromString("axisName = tromboneAxis"), false, tromboneConfigComment).get();
         ConfigId assemblyConfigId = configService.create(assemblyConfig, ConfigData.fromString("assemblyHCDCount = 3"), false, assemblyConfigComment).get();
 
-        ConfigFileInfo tromboneConfigInfo = new ConfigFileInfo(tromboneConfig, tromboneConfigId, tromboneConfigComment);
-        ConfigFileInfo assemblyConfigInfo = new ConfigFileInfo(assemblyConfig, assemblyConfigId, assemblyConfigComment);
+        ConfigFileInfo tromboneConfigInfo = new ConfigFileInfo(tromboneConfig, tromboneConfigId, firstUser, tromboneConfigComment);
+        ConfigFileInfo assemblyConfigInfo = new ConfigFileInfo(assemblyConfig, assemblyConfigId, secondUser, assemblyConfigComment);
 
         Assert.assertEquals(configService.list().get(), new ArrayList<>(Arrays.asList(assemblyConfigInfo, tromboneConfigInfo)));
     }
@@ -372,6 +388,10 @@ public class JConfigAdminApiTest extends JUnitSuite {
         Path tromboneConfig = Paths.get("trombone.conf");
         Path assemblyConfig = Paths.get("a/b/assembly/assembly.conf");
 
+        String firstUser = "firstUser";
+        String secondUser = "secondUser";
+        when(jConfigClientBaseSuite.validToken().preferred_username()).thenReturn(new Some(firstUser),new Some(secondUser));
+
         String tromboneConfigComment = "test{Annex file no1}";
         String assemblyConfigComment = "test{Annex file no2}";
 
@@ -382,8 +402,8 @@ public class JConfigAdminApiTest extends JUnitSuite {
                                                         true,
                                                          assemblyConfigComment).get();
 
-        ConfigFileInfo tromboneConfigInfo = new ConfigFileInfo(tromboneConfig, tromboneConfigId, tromboneConfigComment);
-        ConfigFileInfo assemblyConfigInfo = new ConfigFileInfo(assemblyConfig, assemblyConfigId, assemblyConfigComment);
+        ConfigFileInfo tromboneConfigInfo = new ConfigFileInfo(tromboneConfig, tromboneConfigId, firstUser, tromboneConfigComment);
+        ConfigFileInfo assemblyConfigInfo = new ConfigFileInfo(assemblyConfig, assemblyConfigId, secondUser, assemblyConfigComment);
 
         Assert.assertEquals(configService.list().get(), new ArrayList<>(Arrays.asList(assemblyConfigInfo, tromboneConfigInfo)));
     }
@@ -479,6 +499,10 @@ public class JConfigAdminApiTest extends JUnitSuite {
         String tromboneConfigComment = "hello trombone";
         String assemblyConfigComment = "hello assembly";
 
+        String firstUser = "firstUser";
+        String secondUser = "secondUser";
+        when(jConfigClientBaseSuite.validToken().preferred_username()).thenReturn(new Some(firstUser),new Some(secondUser));
+
         // Add files to repo
         ConfigId tromboneConfigId = configService
                 .create(tromboneConfig, ConfigData.fromString(configValue1),false, tromboneConfigComment)
@@ -487,15 +511,15 @@ public class JConfigAdminApiTest extends JUnitSuite {
                 .create(assemblyConfig, ConfigData.fromString(configValue2),true, assemblyConfigComment)
                 .get();
 
-        configService.setActiveVersion(tromboneConfig, tromboneConfigId, "settting active version").get();
-        configService.setActiveVersion(assemblyConfig, assemblyConfigId, "settting active version").get();
+        configService.setActiveVersion(tromboneConfig, tromboneConfigId, "setting active version").get();
+        configService.setActiveVersion(assemblyConfig, assemblyConfigId, "setting active version").get();
 
         // list files from repo and assert that it contains added files
 
         Set<ConfigFileInfo> actual = new HashSet<ConfigFileInfo>(configService.list().get());
 
-        Set<ConfigFileInfo> expected = new HashSet<>(Arrays.asList(new ConfigFileInfo(tromboneConfig, tromboneConfigId, tromboneConfigComment),
-                new ConfigFileInfo(assemblyConfig, assemblyConfigId, assemblyConfigComment)));
+        Set<ConfigFileInfo> expected = new HashSet<>(Arrays.asList(new ConfigFileInfo(tromboneConfig, tromboneConfigId, firstUser, tromboneConfigComment),
+                new ConfigFileInfo(assemblyConfig, assemblyConfigId, secondUser, assemblyConfigComment)));
 
         Assert.assertEquals(expected, actual);
     }

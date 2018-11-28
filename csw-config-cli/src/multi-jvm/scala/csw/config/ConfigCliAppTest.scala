@@ -11,6 +11,7 @@ import csw.config.client.internal.ActorRuntime
 import csw.config.client.scaladsl.ConfigClientFactory
 import csw.config.helpers.TwoClientsAndServer
 import csw.config.server.commons.TestFileUtils
+import csw.config.server.mocks.MockedAuthentication
 import csw.config.server.{ServerWiring, Settings}
 import csw.location.client.scaladsl.HttpLocationServiceFactory
 import csw.location.helpers.LSNodeSpec
@@ -25,7 +26,8 @@ class ConfigCliAppTestMultiJvmNode3 extends ConfigCliAppTest(0)
 class ConfigCliAppTest(ignore: Int)
     extends LSNodeSpec(config = new TwoClientsAndServer, mode = "http")
     with MultiNodeHTTPLocationService
-    with FunSuiteLike {
+    with FunSuiteLike
+    with MockedAuthentication {
 
   import config._
 
@@ -47,7 +49,7 @@ class ConfigCliAppTest(ignore: Int)
   test("should upload, update, get and set active version of configuration files") {
     runOn(server) {
       // Start server on first node
-      val serverWiring = ServerWiring.make(locationService)
+      val serverWiring = ServerWiring.make(locationService, securityDirectives)
       serverWiring.svnRepo.initSvnRepo()
       serverWiring.httpService.registeredLazyBinding.await
       enterBarrier("server-started")
@@ -65,7 +67,7 @@ class ConfigCliAppTest(ignore: Int)
       implicit val system: ActorSystem    = ActorSystem()
       implicit val mat: ActorMaterializer = ActorMaterializer()
 
-      def cliApp() = Wiring.noPrinting(HttpLocationServiceFactory.makeLocalClient).cliApp
+      def cliApp() = Wiring.noPrinting(HttpLocationServiceFactory.makeLocalClient, factory).cliApp
 
       cliApp().start("csw-config-cli", Array("create", repoPath1, "-i", inputFilePath, "-c", comment))
       enterBarrier("client1-create")
@@ -91,7 +93,7 @@ class ConfigCliAppTest(ignore: Int)
       enterBarrier("server-started")
       val actorRuntime = new ActorRuntime(system)
       import actorRuntime._
-      val configService = ConfigClientFactory.adminApi(system, locationService)
+      val configService = ConfigClientFactory.adminApi(system, locationService, factory)
 
       enterBarrier("client1-create")
       val actualConfigValue = configService.getLatest(Paths.get(repoPath1)).await.get.toStringF.await

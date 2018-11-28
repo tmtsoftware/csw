@@ -258,7 +258,8 @@ object Dependencies {
       Libs.`scalatest`.value,
       Libs.`embedded-redis`,
       Libs.`junit`,
-      Libs.`junit-interface`
+      Libs.`junit-interface`,
+      Libs.`mockito-core`
     )
   )
 
@@ -303,11 +304,16 @@ object Dependencies {
     )
   )
 
-  val AuthAccessToken = Def.setting(
+  val AuthAdapterCore = Def.setting(
     Seq(
       Libs.`jwt-play-json`,
       Libs.`config`,
+      Keycloak.`keycloak-core`,
+      Keycloak.`keycloak-adapter-core`,
       Keycloak.`keycloak-authz`,
+      //(legacy dependencies) required*
+      Libs.`jboss-logging`,
+      Libs.httpclient,
       Libs.`scalatest`.value % Test,
       Libs.`mockito-core`    % Test
     )
@@ -316,28 +322,13 @@ object Dependencies {
   val AuthAkkaHttpAdapter = Def.setting(
     Seq(
       AkkaHttp.`akka-http`,
-      Akka.`akka-stream`
-    )
-  )
-
-  val AuthKeyCloakConfig = Def.setting(
-    Seq(
-      Keycloak.`keycloak-adapter-core`,
-      Keycloak.`keycloak-core`,
-      Libs.`config`,
-      //(legacy dependencies) required*
-      Libs.`jboss-logging`,
-      Libs.httpclient
-    )
-  )
-
-  val AuthAkkaHttpExample = Def.setting(
-    Seq(
-      AkkaHttp.`akka-http`,
       Akka.`akka-stream`,
+      Libs.`scalatest`.value       % Test,
+      AkkaHttp.`akka-http-testkit` % Test,
+      Libs.`mockito-core`,
       //Libs.`play-json`,
-      Libs.`play-json-derived-codecs`.value,
-      Libs.`akka-http-play-json`
+      Libs.`play-json-derived-codecs`.value % Test,
+      Libs.`akka-http-play-json`            % Test
     )
   )
 
