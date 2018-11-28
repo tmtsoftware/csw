@@ -11,6 +11,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 git 'git@github.com:tmtsoftware/csw.git'
+                sh "git checkout $SHA"
             }
         }
 
