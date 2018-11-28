@@ -22,3 +22,7 @@
 ### csw.g8
 1. Merge `dev` branch to master
 2. Run `giter8-release` pipeline by providing `VERSION` number
+
+### More detailed instructions
+
+https://docs.google.com/document/d/1tK9W6NClJOB0wq3bFVEzdrYynCxES6BnPdSLNtyGMXo/edit?usp=sharing
