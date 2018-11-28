@@ -102,7 +102,7 @@ class PermissionPolicyTest extends FunSuite with MockitoSugar with Directives wi
 
     val validTokenWithPermission = mock[AccessToken]
 
-    when(validTokenWithPermission.hasPermission("read"))
+    when(validTokenWithPermission.hasPermission(scope = "read", resource = "Default Resource"))
       .thenReturn(true)
 
     val authenticator: Authenticator[AccessToken] = {

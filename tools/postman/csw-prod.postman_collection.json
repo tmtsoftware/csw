@@ -71,7 +71,7 @@
 							"raw": "containers: [\n  {\n    containerCmdAppExecPath: \"/Users/pritamkadam/TMT/csw-prod/target/universal/stage/bin/container-cmd-app\"\n    mode: \"Container\"\n    configFilePath: \"container.conf\"\n    configFileLocation: \"Remote\"\n  },\n  {\n    containerCmdAppExecPath: \"/Users/pritamkadam/TMT/csw-prod/target/universal/stage/bin/container-cmd-app\"\n    mode: \"Standalone\"\n    configFilePath: \"/Users/pritamkadam/TMT/csw-prod/csw-framework/src/multi-jvm/resources/eaton_hcd_standalone.conf\"\n    configFileLocation: \"Local\"\n  }\n]"
 						},
 						"url": {
-							"raw": "http://{{hostname}}:{{port}}/secure/config/{{path}}?comment=\"Sample commit message\"",
+							"raw": "http://{{hostname}}:{{port}}/config/{{path}}?comment=\"Sample commit message\"",
 							"protocol": "http",
 							"host": [
 								"{{hostname}}"
@@ -279,7 +279,7 @@
 							"raw": "***********************************************************\n********************* Version 2 ***************************\n***********************************************************\ncsw-config-server {\n\n  repository-dir = /tmp/csw-config-svn\n  tmp-dir = /tmp/csw-config-temp\n  oversize-files-dir = /tmp/csw-config-oversize-files\n\n  svn-user-name = some-user-name\n\n  sha1-suffix = .sha1\n  default-suffix = .default\n\n  service-port = 4000\n  service-port = ${?httpPort}\n\n  blocking-io-dispatcher = \"csw-config-server.default-blocking-io-dispatcher\"\n\n  default-blocking-io-dispatcher {\n    type = \"Dispatcher\"\n    executor = \"thread-pool-executor\"\n    throughput = 1\n\n    thread-pool-executor {\n      fixed-pool-size = 64\n    }\n  }\n\n}\n"
 						},
 						"url": {
-							"raw": "http://{{hostname}}:{{port}}/secure/config/{{path}}?comment=\"Sample update commit message\"",
+							"raw": "http://{{hostname}}:{{port}}/config/{{path}}?comment=\"Sample update commit message\"",
 							"protocol": "http",
 							"host": [
 								"{{hostname}}"
@@ -335,7 +335,7 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://{{hostname}}:{{port}}/secure/config/{{path}}?comment=\"deleting config file\"",
+							"raw": "http://{{hostname}}:{{port}}/config/{{path}}?comment=\"deleting config file\"",
 							"protocol": "http",
 							"host": [
 								"{{hostname}}"
@@ -557,7 +557,7 @@
 							]
 						},
 						"url": {
-							"raw": "http://{{hostname}}:{{port}}/secure/active-version/{{path}}?id={{id}}&comment=\"Setting activer version\"",
+							"raw": "http://{{hostname}}:{{port}}/active-version/{{path}}?id={{id}}&comment=\"Setting activer version\"",
 							"protocol": "http",
 							"host": [
 								"{{hostname}}"
@@ -623,7 +623,7 @@
 							]
 						},
 						"url": {
-							"raw": "http://{{hostname}}:{{port}}/secure/active-version/{{path}}?comment=\"Resetting active version\"",
+							"raw": "http://{{hostname}}:{{port}}/active-version/{{path}}?comment=\"Resetting active version\"",
 							"protocol": "http",
 							"host": [
 								"{{hostname}}"

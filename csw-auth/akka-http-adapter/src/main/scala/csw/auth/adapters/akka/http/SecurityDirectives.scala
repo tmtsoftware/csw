@@ -38,8 +38,6 @@ class SecurityDirectives(authentication: Authentication) {
 
   def sHead(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] = sMethod(HttpMethods.HEAD, authorizationPolicy)
 
-  def sTrace(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] = sMethod(HttpMethods.TRACE, authorizationPolicy)
-
   def sConnect(authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] =
     sMethod(HttpMethods.CONNECT, authorizationPolicy)
 }
