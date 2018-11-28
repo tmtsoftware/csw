@@ -9,6 +9,13 @@ The product is in a new repository: [csw](https://github.com/tmtsoftware/csw).
 
 All notable changes to this project will be documented in this file.
 
+## [CSW v0.6.0] - 2018-11-28
+
+This is version 0.6.0 the second release of the TMT Common Software for project stakeholders.  
+This release includes csw test-kit, ordering guarantee in event publish api, enhancements to command service query api & bug fixes    
+See [here](https://tmtsoftware.github.io/csw/0.6.0/) for a detailed documentation of this version of the CSW software.
+
+
 ## [CSW v0.6.0-RC3] - 2018-11-21
 
 This is the release candidate 3 of the third release of the TMT Common Software for project stakeholders. 

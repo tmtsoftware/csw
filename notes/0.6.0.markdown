@@ -1,0 +1,30 @@
+## CSW - TMT Common Software v0.6.0
+
+This is release v0.6.0 of the TMT Common Software.
+
+See [CHANGELOG.md](CHANGELOG.md) for details of all releases.
+
+### Changes
+- event publishing api is now enhanced to maintain order of published events (DEOPSCSW-595)
+- fix for command service `query` API to return `Started` once the command execution starts
+- updated command service documentation
+- added `csw-testkit` which provides easy access for starting and stopping csw-services and many other helpers for testing 
+- new `validateCommand` handler added in `ComponentHandlers`
+- bug fix for `CommandResponseManager#queryFinal` API. It now supports querying commands which are yet to be inserted in CRM.  
+- updated command service paradox documentation
+- github repository `csw-prod` is renamed to `csw`.
+- top level package in all modules changed from `csw.services` to `csw`
+- all the csw services are injected to `ComponentHandlers` as a part of `CswContext` wrapper
+- removed `csw-cluster-seed` module
+- extracted `csw-admin-server` module out from `csw-cluster-seed` and moved remaining location related code to `csw-location-server`
+- migrated all CLI applications and framework to use HTTP Location Service client
+- separated out command service API and client
+- `csw-messages` module renamed to `csw-params`
+- `csw-params` is cross compilable to `java` and `js`
+- messages from `csw-messages` module moved to `csw-command-client`
+
+
+### Documentation
+- Reference paradox documentation: https://tmtsoftware.github.io/csw/0.6.0/
+- Scaladoc: https://tmtsoftware.github.io/csw/0.6.0/api/scala/index.html
+- Javadoc: https://tmtsoftware.github.io/csw/0.6.0/api/java/index.html
