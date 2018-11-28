@@ -59,7 +59,11 @@ private[auth] class NativeAppAuthAdapterImpl(
 
   override def getAccessToken(minValidity: FiniteDuration = 0.seconds): Option[AccessToken] = {
     def getNewToken: Option[AccessToken] = {
-      refreshAccessToken()
+      try refreshAccessToken()
+      catch {
+        case e: Exception ⇒
+          throw new RuntimeException(s"Error in refreshing token: try login before executing this command ${e.getMessage}")
+      }
       accessTokenStr.flatMap(tokenVerifier.verifyAndDecode(_).toOption)
     }
 
