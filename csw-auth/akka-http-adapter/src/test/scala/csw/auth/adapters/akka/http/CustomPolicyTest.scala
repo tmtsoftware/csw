@@ -13,7 +13,7 @@ import org.scalatest.{FunSuite, Matchers}
 
 class CustomPolicyTest extends FunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
 
-  test("customPolicy directive should return AuthenticationFailedRejection when token is invalid") {
+  test("custom policy should return AuthenticationFailedRejection when token is invalid") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication)
 
@@ -41,7 +41,7 @@ class CustomPolicyTest extends FunSuite with MockitoSugar with Directives with S
     }
   }
 
-  test("customPolicy directive should return AuthenticationFailedRejection when token is not present") {
+  test("custom policy should return AuthenticationFailedRejection when token is not present") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication)
 
@@ -62,7 +62,7 @@ class CustomPolicyTest extends FunSuite with MockitoSugar with Directives with S
     }
   }
 
-  test("customPolicy directive should return AuthorizationFailedRejection when policy does not match") {
+  test("custom policy should return AuthorizationFailedRejection when policy does not match") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication)
 
@@ -91,7 +91,7 @@ class CustomPolicyTest extends FunSuite with MockitoSugar with Directives with S
     }
   }
 
-  test("customPolicy directive should return 200 OK when policy matches") {
+  test("custom policy should return 200 OK when policy matches") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication)
 

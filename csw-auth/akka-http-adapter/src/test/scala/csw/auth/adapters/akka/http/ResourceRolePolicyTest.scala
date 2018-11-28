@@ -14,7 +14,7 @@ import org.scalatest.{FunSuite, Matchers}
 
 class ResourceRolePolicyTest extends FunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
 
-  test("resourceRole directive should return AuthenticationFailedRejection when token is invalid") {
+  test("resourceRole policy should return AuthenticationFailedRejection when token is invalid") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication)
 
@@ -41,7 +41,7 @@ class ResourceRolePolicyTest extends FunSuite with MockitoSugar with Directives 
     }
   }
 
-  test("resourceRole directive should return AuthenticationFailedRejection when token is not present") {
+  test("resourceRole policy should return AuthenticationFailedRejection when token is not present") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication)
 
@@ -62,7 +62,7 @@ class ResourceRolePolicyTest extends FunSuite with MockitoSugar with Directives 
     }
   }
 
-  test("resourceRole directive should return AuthorizationFailedRejection when token does not have resourceRole") {
+  test("resourceRole policy should return AuthorizationFailedRejection when token does not have resourceRole") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication)
 
@@ -95,7 +95,7 @@ class ResourceRolePolicyTest extends FunSuite with MockitoSugar with Directives 
     }
   }
 
-  test("resourceRole directive should return 200 OK when token is valid & has resourceRole") {
+  test("resourceRole policy should return 200 OK when token is valid & has resourceRole") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication)
 

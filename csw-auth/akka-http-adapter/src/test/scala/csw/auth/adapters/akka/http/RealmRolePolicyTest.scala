@@ -13,7 +13,7 @@ import org.scalatest.{FunSuite, Matchers}
 
 class RealmRolePolicyTest extends FunSuite with MockitoSugar with Directives with ScalatestRouteTest with Matchers {
 
-  test("realmRole directive should return AuthenticationFailedRejection when token is invalid") {
+  test("realmRole policy should return AuthenticationFailedRejection when token is invalid") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication)
 
@@ -40,7 +40,7 @@ class RealmRolePolicyTest extends FunSuite with MockitoSugar with Directives wit
     }
   }
 
-  test("realmRole directive should return AuthenticationFailedRejection when token is not present") {
+  test("realmRole policy should return AuthenticationFailedRejection when token is not present") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication)
 
@@ -61,7 +61,7 @@ class RealmRolePolicyTest extends FunSuite with MockitoSugar with Directives wit
     }
   }
 
-  test("realmRole directive should return AuthorizationFailedRejection when token does not have realmRole") {
+  test("realmRole policy should return AuthorizationFailedRejection when token does not have realmRole") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication)
 
@@ -94,7 +94,7 @@ class RealmRolePolicyTest extends FunSuite with MockitoSugar with Directives wit
     }
   }
 
-  test("realmRole directive should return 200 OK when token is valid & has realmRole") {
+  test("realmRole policy should return 200 OK when token is valid & has realmRole") {
     val authentication: Authentication = mock[Authentication]
     val securityDirectives             = new SecurityDirectives(authentication)
 
