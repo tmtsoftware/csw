@@ -115,7 +115,7 @@ class TimeServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
   }
 
   //DEOPSCSW-530: SPIKE: Get TAI offset and convert to UTC and Vice Versa
-  test("should get TAI offset") {
+  test("should get TAI offset", Linux) {
     val timeService: TimeService = new TimeServiceImpl()
 
     val offset = timeService.taiOffset()
