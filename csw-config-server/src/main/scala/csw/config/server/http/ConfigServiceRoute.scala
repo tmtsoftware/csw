@@ -27,16 +27,18 @@ class ConfigServiceRoute(
   import actorRuntime._
   import securityDirectives._
 
-  private val defaultUserName = settings.`svn-user-name`
+  private val defaultUserName = "Unknown"
 
   private def configService(userName: String = defaultUserName): ConfigService = configServiceFactory.make(userName)
 
-  val AdminRole = "admin"
+  private val AdminRole = "admin"
 
-  private def name(implicit at: AccessToken): String = (at.preferred_username, at.clientId) match {
-    case (Some(userName), _)    ⇒ userName
-    case (None, Some(clientId)) ⇒ clientId
-    case _                      ⇒ defaultUserName
+  private implicit class RichAccessToken(at: AccessToken) {
+    def userOrClientName: String = (at.preferred_username, at.clientId) match {
+      case (Some(userName), _)    ⇒ userName
+      case (None, Some(clientId)) ⇒ clientId
+      case _                      ⇒ defaultUserName
+    }
   }
 
   def route: Route = routeLogger {
@@ -60,21 +62,21 @@ class ConfigServiceRoute(
               }
             }
           } ~
-          sPost(ResourceRolePolicy(AdminRole)) { implicit token =>
+          sPost(ResourceRolePolicy(AdminRole)) { token =>
             (configDataEntity & annexParam & commentParam) { (configData, annex, comment) ⇒
               complete(
-                StatusCodes.Created -> configService(name).create(filePath, configData, annex, comment)
+                StatusCodes.Created -> configService(token.userOrClientName).create(filePath, configData, annex, comment)
               )
             }
           } ~
-          sPut(ResourceRolePolicy(AdminRole)) { implicit token =>
+          sPut(ResourceRolePolicy(AdminRole)) { token =>
             (configDataEntity & commentParam) { (configData, comment) ⇒
-              complete(configService(name).update(filePath, configData, comment))
+              complete(configService(token.userOrClientName).update(filePath, configData, comment))
             }
           } ~
-          sDelete(ResourceRolePolicy(AdminRole)) { implicit token =>
+          sDelete(ResourceRolePolicy(AdminRole)) { token =>
             commentParam { comment ⇒
-              complete(configService(name).delete(filePath, comment).map(_ ⇒ Done))
+              complete(configService(token.userOrClientName).delete(filePath, comment).map(_ ⇒ Done))
             }
           }
         } ~
@@ -89,12 +91,12 @@ class ConfigServiceRoute(
           (get & rejectEmptyResponse) { // fetch the active version - http://{{hostname}}:{{port}}/active-version/{{path}}
             complete(configService().getActiveVersion(filePath))
           } ~
-          sPut(ResourceRolePolicy(AdminRole)) { implicit token =>
+          sPut(ResourceRolePolicy(AdminRole)) { token =>
             (idParam & commentParam) {
               case (Some(configId), comment) ⇒
-                complete(configService(name).setActiveVersion(filePath, configId, comment).map(_ ⇒ Done))
+                complete(configService(token.userOrClientName).setActiveVersion(filePath, configId, comment).map(_ ⇒ Done))
               case (_, comment) ⇒
-                complete(configService(name).resetActiveVersion(filePath, comment).map(_ ⇒ Done))
+                complete(configService(token.userOrClientName).resetActiveVersion(filePath, comment).map(_ ⇒ Done))
             }
           }
         } ~
