@@ -20,6 +20,7 @@ class SecurityDirectives(authentication: Authentication) {
       case RealmRolePolicy(name)            => keycloakAuthorize(accessToken.hasRealmRole(name))
       case PermissionPolicy(name, resource) => keycloakAuthorize(accessToken.hasPermission(name, resource))
       case CustomPolicy(predicate)          => keycloakAuthorize(predicate(accessToken))
+      case EmptyPolicy                      => Directive.Empty
     }
 
   private def sMethod(httpMethod: HttpMethod, authorizationPolicy: AuthorizationPolicy): Directive1[AccessToken] =

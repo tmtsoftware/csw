@@ -8,4 +8,5 @@ object AuthorizationPolicy {
   case class RealmRolePolicy(name: String)                                         extends AuthorizationPolicy
   case class PermissionPolicy(name: String, resource: String = "Default Resource") extends AuthorizationPolicy
   case class CustomPolicy(predicate: AccessToken => Boolean)                       extends AuthorizationPolicy
+  case object EmptyPolicy                                                          extends AuthorizationPolicy
 }
