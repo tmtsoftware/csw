@@ -15,6 +15,18 @@ This is version 0.6.0 the second release of the TMT Common Software for project 
 This release includes csw test-kit, ordering guarantee in event publish api, enhancements to command service query api & bug fixes    
 See [here](https://tmtsoftware.github.io/csw/0.6.0/) for a detailed documentation of this version of the CSW software.
 
+#### API Changes
+- Command Service
+    
+    - `CommandService.submit()` now returns a future with the final response.
+        (Previously it returned the initial response, which could be `Accepted`. 
+        In 0.6.0 you can call `CommandService.query()` to get the initial response after the submit.)
+    
+    - CommandService.query() now waits for the initial command response, if it has not yet been received
+    
+#### New Features
+    - Updated giter8 template
+
 
 ## [CSW v0.6.0-RC3] - 2018-11-21
 
