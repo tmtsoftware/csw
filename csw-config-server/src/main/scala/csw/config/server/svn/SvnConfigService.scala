@@ -161,7 +161,7 @@ class SvnConfigService(settings: Settings, actorRuntime: ActorRuntime, svnRepo: 
   // list the file info - (path, id (revision), commit message)
   override def list(fileType: Option[FileType] = None, pattern: Option[String] = None): Future[List[ConfigFileInfo]] = async {
     await(svnRepo.list(fileType, pattern)).map { entry =>
-      ConfigFileInfo(Paths.get(entry.getRelativePath), ConfigId(entry.getRevision), entry.getCommitMessage)
+      ConfigFileInfo(Paths.get(entry.getRelativePath), ConfigId(entry.getRevision), entry.getAuthor, entry.getCommitMessage)
     }
   }
 

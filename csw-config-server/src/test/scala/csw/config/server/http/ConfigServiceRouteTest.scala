@@ -232,6 +232,25 @@ class ConfigServiceRouteTest
     }
   }
 
+  // DEOPSCSW-577: Ability to view detailed change log in SVN
+  test("list - with correct author") {
+    Get("/list") ~> route ~> check {
+      status shouldEqual StatusCodes.OK
+      responseAs[List[ConfigFileInfo]].size shouldBe 0
+    }
+
+    Post("/secure/config/test.conf?annex=true&comment=commit1", configFile1).addHeader(validTokenHeader) ~> route ~> check {
+      status shouldEqual StatusCodes.Created
+    }
+
+    Get("/list") ~> route ~> check {
+      status shouldEqual StatusCodes.OK
+      val fileList = responseAs[List[ConfigFileInfo]]
+      fileList.size shouldBe 1
+      fileList.map(_.author) shouldBe List(preferredUserName)
+    }
+  }
+
   test("list by pattern - success code") {
     Get("/list?pattern=a/b") ~> route ~> check {
       status shouldEqual StatusCodes.OK

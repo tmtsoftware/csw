@@ -72,6 +72,7 @@ class ConfigAdminApiTest extends ConfigServiceTest with ConfigClientBaseSuite {
 
     val list = configService.list(Some(FileType.Annex)).await
     list.map(_.path) shouldBe List(repoPath)
+    list.map(_.author) shouldBe List(preferredUserName)
 
     //Note that configService instance from the server-wiring can be used for assert-only calls for sha files
     //This call is invalid from client side
@@ -186,6 +187,31 @@ class ConfigAdminApiTest extends ConfigServiceTest with ConfigClientBaseSuite {
     completeHistory.size shouldBe 3
     completeHistory.map(h ⇒ (h.id, h.author, h.comment)).toSet shouldBe
     Set((configId1, user1, createActiveComment), (configId3, user4, setActiveComment), (configId4, user5, resetActiveComment1))
+  }
+
+  // DEOPSCSW-577: Ability to view detailed change log in SVN
+  test("should get the list of a file with correct username") {
+    val user1 = "user1"
+    val user2 = "user2"
+    when(validToken.preferred_username).thenReturn(Some(user1), Some(user2))
+
+    val file1 = Paths.get("/tmt/lgs/trombone/hcd1.conf")
+    val file2 = Paths.get("/tmt/lgs/trombone/hcd2.conf")
+
+    val commitMsg1 = "commit version: 1"
+    val commitMsg2 = "commit version: 2"
+
+    // will use user1
+    val configId1 = configService.create(file1, ConfigData.fromString(configValue1), annex = false, commitMsg1).await
+
+    // will use user2
+    val configId2 = configService.create(file2, ConfigData.fromString(configValue2), annex = false, commitMsg2).await
+
+    val fileInfo       = configService.list().await
+    val expectedResult = Set((configId1, user1, commitMsg1), (configId2, user2, commitMsg2))
+
+    fileInfo.size shouldBe expectedResult.size
+    fileInfo.map(h ⇒ (h.id, h.author, h.comment)).toSet shouldBe expectedResult
   }
 
 }

@@ -110,7 +110,8 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
     commandLineRunner.exists(parsedExistsArgs.get) shouldBe false
   }
 
-  test("should be able to list files and use filter pattern") {
+  // DEOPSCSW-577: Ability to view detailed change log in SVN
+  test("should be able to list files with author and use filter pattern") {
     val normalFileName                                = "troubleshooting"
     val annexFileName                                 = "firmware"
     def relativeRepoPath(fileName: String, i: String) = s"path/hcd/$fileName$i.conf"
@@ -136,8 +137,8 @@ class CommandLineRunnerTest extends HTTPLocationService with Matchers with Befor
 
     commandLineRunner
       .list(argsParser.parse(Array("list", "--normal")).get)
-      .map(_.path.toString)
-      .toSet shouldBe normalFiles.toSet
+      .map(x ⇒ (x.path.toString, x.author))
+      .toSet shouldBe normalFiles.map(x ⇒ (x, preferredUserName)).toSet
 
     commandLineRunner
       .list(argsParser.parse(Array("list", "--annex")).get)

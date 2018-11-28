@@ -58,6 +58,8 @@ public class JConfigAdminApiTest extends JUnitSuite {
     private String configValue4 = "axisName1111 = tromboneAxis\naxisName2222 = tromboneAxis2\naxisName3 = tromboneAxis3333";
     private String configValue5 = "axisName11111 = tromboneAxis\naxisName22222 = tromboneAxis2\naxisName3 = tromboneAxis3333";
 
+    private String defaultUser = jConfigClientBaseSuite.preferredUserName();
+
     @Rule
     public final ExpectedException exception = ExpectedException.none();
 
@@ -250,8 +252,8 @@ public class JConfigAdminApiTest extends JUnitSuite {
         ConfigId tromboneConfigId = configService.create(tromboneConfig, ConfigData.fromString("axisName = tromboneAxis"), false, tromboneConfigComment).get();
         ConfigId assemblyConfigId = configService.create(assemblyConfig, ConfigData.fromString("assemblyHCDCount = 3"), false, assemblyConfigComment).get();
 
-        ConfigFileInfo tromboneConfigInfo = new ConfigFileInfo(tromboneConfig, tromboneConfigId, tromboneConfigComment);
-        ConfigFileInfo assemblyConfigInfo = new ConfigFileInfo(assemblyConfig, assemblyConfigId, assemblyConfigComment);
+        ConfigFileInfo tromboneConfigInfo = new ConfigFileInfo(tromboneConfig, tromboneConfigId, defaultUser, tromboneConfigComment);
+        ConfigFileInfo assemblyConfigInfo = new ConfigFileInfo(assemblyConfig, assemblyConfigId, defaultUser, assemblyConfigComment);
 
         Assert.assertEquals(configService.list().get(), new ArrayList<>(Arrays.asList(assemblyConfigInfo, tromboneConfigInfo)));
     }
@@ -382,8 +384,8 @@ public class JConfigAdminApiTest extends JUnitSuite {
                                                         true,
                                                          assemblyConfigComment).get();
 
-        ConfigFileInfo tromboneConfigInfo = new ConfigFileInfo(tromboneConfig, tromboneConfigId, tromboneConfigComment);
-        ConfigFileInfo assemblyConfigInfo = new ConfigFileInfo(assemblyConfig, assemblyConfigId, assemblyConfigComment);
+        ConfigFileInfo tromboneConfigInfo = new ConfigFileInfo(tromboneConfig, tromboneConfigId, defaultUser, tromboneConfigComment);
+        ConfigFileInfo assemblyConfigInfo = new ConfigFileInfo(assemblyConfig, assemblyConfigId, defaultUser, assemblyConfigComment);
 
         Assert.assertEquals(configService.list().get(), new ArrayList<>(Arrays.asList(assemblyConfigInfo, tromboneConfigInfo)));
     }
@@ -494,8 +496,8 @@ public class JConfigAdminApiTest extends JUnitSuite {
 
         Set<ConfigFileInfo> actual = new HashSet<ConfigFileInfo>(configService.list().get());
 
-        Set<ConfigFileInfo> expected = new HashSet<>(Arrays.asList(new ConfigFileInfo(tromboneConfig, tromboneConfigId, tromboneConfigComment),
-                new ConfigFileInfo(assemblyConfig, assemblyConfigId, assemblyConfigComment)));
+        Set<ConfigFileInfo> expected = new HashSet<>(Arrays.asList(new ConfigFileInfo(tromboneConfig, tromboneConfigId, defaultUser, tromboneConfigComment),
+                new ConfigFileInfo(assemblyConfig, assemblyConfigId, defaultUser, assemblyConfigComment)));
 
         Assert.assertEquals(expected, actual);
     }

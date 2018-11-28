@@ -19,6 +19,8 @@ trait MockedAuthentication extends MockitoSugar {
   val validTokenStr       = "valid"
   val invalidTokenStr     = "invalid"
 
+  val preferredUserName = "root"
+
   val roleMissingToken: AccessToken = mock[AccessToken]
   val validToken: AccessToken       = mock[AccessToken]
   val invalidToken: AccessToken     = mock[AccessToken]
@@ -28,10 +30,9 @@ trait MockedAuthentication extends MockitoSugar {
     case Provided(`validTokenStr`)       ⇒ Some(validToken)
     case _                               ⇒ None
   }
-
   when(roleMissingToken.hasResourceRole("admin")).thenReturn(false)
   when(validToken.hasResourceRole("admin")).thenReturn(true)
-  when(validToken.preferred_username).thenReturn(Some("mocked"))
+  when(validToken.preferred_username).thenReturn(Some(preferredUserName))
   when(authentication.authenticator).thenReturn(authenticator)
 
   val roleMissingTokenHeader = Authorization(OAuth2BearerToken(roleMissingTokenStr))

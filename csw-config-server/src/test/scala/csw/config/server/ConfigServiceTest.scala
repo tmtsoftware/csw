@@ -37,6 +37,8 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
 
   override protected def afterAll(): Unit = actorSystem.terminate().await
 
+  private val rootUsername = "root"
+
   val configValue1: String =
     """
       |axisName1 = tromboneAxis1
@@ -454,8 +456,8 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
       .create(assemblyConfig, ConfigData.fromString(configValue2), annex = false, assemblyConfigComment)
       .await
 
-    val tromboneConfigInfo: ConfigFileInfo = ConfigFileInfo(tromboneConfig, tromboneConfigId, tromboneConfigComment)
-    val assemblyConfigInfo: ConfigFileInfo = ConfigFileInfo(assemblyConfig, assemblyConfigId, assemblyConfigComment)
+    val tromboneConfigInfo: ConfigFileInfo = ConfigFileInfo(tromboneConfig, tromboneConfigId, rootUsername, tromboneConfigComment)
+    val assemblyConfigInfo: ConfigFileInfo = ConfigFileInfo(assemblyConfig, assemblyConfigId, rootUsername, assemblyConfigComment)
 
     // list files from repo and assert that it contains added files
     configService.list().await shouldBe List(assemblyConfigInfo, tromboneConfigInfo)
@@ -696,8 +698,8 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val listOfFileInfo: List[ConfigFileInfo] = configService.list().await
 
     listOfFileInfo.toSet shouldBe Set(
-      ConfigFileInfo(file1, configId1, comment1),
-      ConfigFileInfo(file2, configId2, comment2)
+      ConfigFileInfo(file1, configId1, rootUsername, comment1),
+      ConfigFileInfo(file2, configId2, rootUsername, comment2)
     )
   }
 
@@ -908,8 +910,8 @@ abstract class ConfigServiceTest extends FunSuite with Matchers with BeforeAndAf
     val configFiles = configService.list().await
 
     configFiles.toSet shouldBe Set(
-      ConfigFileInfo(tromboneConfig, tromboneConfigId, tromboneConfigComment),
-      ConfigFileInfo(assemblyConfig, assemblyConfigId, assemblyConfigComment)
+      ConfigFileInfo(tromboneConfig, tromboneConfigId, rootUsername, tromboneConfigComment),
+      ConfigFileInfo(assemblyConfig, assemblyConfigId, rootUsername, assemblyConfigComment)
     )
   }
 
