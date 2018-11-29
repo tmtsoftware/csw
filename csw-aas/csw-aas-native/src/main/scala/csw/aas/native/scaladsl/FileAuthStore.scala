@@ -36,7 +36,7 @@ class FileAuthStore(storePath: Path) extends AuthStore {
   ************************************************/
   private def write(path: Path, content: String): Unit =
     if (os.exists(path)) os.write.over(path, content)
-    else os.write(path, content)
+    else os.write(path, content, createFolders = true)
 
   private def read(path: Path): Option[String] = if (os.exists(path)) Some(os.read(path)) else None
 

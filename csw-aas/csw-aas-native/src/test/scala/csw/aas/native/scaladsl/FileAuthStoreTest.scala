@@ -21,9 +21,9 @@ class FileAuthStoreTest extends FunSuite with BeforeAndAfterEach {
 
   override protected def beforeEach(): Unit = {
 
-    os.write(accessTokenPath, testAccessToken)
-    os.write(idTokenPath, testIdToken)
-    os.write(refreshTokenPath, testRefreshToken)
+    os.write(accessTokenPath, testAccessToken, createFolders = true)
+    os.write(idTokenPath, testIdToken, createFolders = true)
+    os.write(refreshTokenPath, testRefreshToken, createFolders = true)
   }
 
   override protected def afterEach(): Unit = {

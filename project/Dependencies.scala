@@ -303,7 +303,6 @@ object Dependencies {
       Keycloak.`keycloak-installed`,
       Enumeratum.`enumeratum`.value,
       Libs.`os-lib`,
-      Libs.requests,
       //(legacy dependencies) required*
       Libs.`jboss-logging`,
       Libs.httpclient,

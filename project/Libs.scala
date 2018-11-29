@@ -15,7 +15,7 @@ object Libs {
   val `acyclic`                      = "com.lihaoyi"            %% "acyclic"                      % AcyclicVersion % Provided //MIT License
   val `junit`                        = "junit"                  % "junit"                         % "4.12" //Eclipse Public License 1.0
   val `junit-interface`              = "com.novocode"           % "junit-interface"               % "0.11" //BSD 2-clause "Simplified" License
-  val `mockito-core`                 = "org.mockito"            % "mockito-core"                  % "2.23.0" //MIT License
+  val `mockito-core`                 = "org.mockito"            % "mockito-core"                  % "2.23.4" //MIT License
   val `logback-classic`              = "ch.qos.logback"         % "logback-classic"               % "1.2.3" //Dual license: Either, Eclipse Public License v1.0 or GNU Lesser General Public License version 2.1
   val `akka-management-cluster-http` = "com.lightbend.akka"     %% "akka-management-cluster-http" % "0.6" //N/A at the moment
   val `svnkit`                       = "org.tmatesoft.svnkit"   % "svnkit"                        % "1.9.3" //TMate Open Source License
@@ -25,10 +25,10 @@ object Libs {
   val `scala-reflect`                = "org.scala-lang"         % "scala-reflect"                 % ScalaVersion //BSD-3
   val `gson`                         = "com.google.code.gson"   % "gson"                          % "2.8.5" //Apache 2.0
 
-  val `play-json` = dep("com.typesafe.play" %%% "play-json" % "2.6.10") //Apache 2.0
+  val `play-json` = dep("com.typesafe.play" %%% "play-json" % "2.6.11") //Apache 2.0
 
   val `akka-http-play-json`      = "de.heikoseeberger"    %% "akka-http-play-json"      % "1.22.0" //Apache 2.0
-  val `jwt-play-json`            = "com.pauldijou"        %% "jwt-play-json"            % "0.19.0"
+  val `jwt-play-json`            = "com.pauldijou"        %% "jwt-play-json"            % "1.0.0"
   val `scalapb-runtime`          = "com.thesamet.scalapb" %% "scalapb-runtime"          % scalapbVersion % "protobuf"
   val `scalapb-json4s`           = "com.thesamet.scalapb" %% "scalapb-json4s"           % scalapbVersion
   val `lettuce`                  = "io.lettuce"           % "lettuce-core"              % "5.0.5.RELEASE"
@@ -53,11 +53,10 @@ object Libs {
   val `postgresql`          = "org.postgresql"            % "postgresql"          % "42.2.5"
   val `postgresql-embedded` = "ru.yandex.qatools.embed"   % "postgresql-embedded" % "2.10"
   val `otj-pg-embedded`     = "com.opentable.components"  % "otj-pg-embedded"     % "0.12.5"
-  val requests              = "com.lihaoyi"               %% "requests"           % "0.1.4"
   val httpclient            = "org.apache.httpcomponents" % "httpclient"          % "4.5.6"
   val `jboss-logging`       = "org.jboss.logging"         % "jboss-logging"       % "3.3.2.Final"
   val `config`              = "com.typesafe"              % "config"              % "1.3.3"
-  val `os-lib`              = "com.lihaoyi"               %% "os-lib"             % "0.2.2"
+  val `os-lib`              = "com.lihaoyi"               %% "os-lib"             % "0.2.5"
 }
 
 object Jackson {
@@ -100,7 +99,7 @@ object AkkaHttp {
   val Version             = "10.1.5"
   val `akka-http`         = "com.typesafe.akka" %% "akka-http" % Version //ApacheV2
   val `akka-http-testkit` = "com.typesafe.akka" %% "akka-http-testkit" % Version //ApacheV2
-  val `akka-http-cors`    = "ch.megard" %% "akka-http-cors" % "0.3.0"
+  val `akka-http-cors`    = "ch.megard" %% "akka-http-cors" % "0.3.1"
 }
 
 object Keycloak {

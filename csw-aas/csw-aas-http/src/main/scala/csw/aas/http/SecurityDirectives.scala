@@ -43,6 +43,7 @@ class SecurityDirectives(authentication: Authentication) {
     sMethod(HttpMethods.CONNECT, authorizationPolicy)
 }
 
+//todo: do we really need this object and factory, why not simply new?
 object SecurityDirectives {
   def apply(authentication: Authentication): SecurityDirectives = new SecurityDirectives(authentication)
 }
