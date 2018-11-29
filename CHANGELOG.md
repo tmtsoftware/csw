@@ -43,15 +43,21 @@ See [here](https://tmtsoftware.github.io/csw/0.6.0/) for a detailed documentatio
     
     - The API for `ComponentHandlers` has changed. Now `onSubmit()` returns either `Started` for a 
       long running command that will complete later, or it can complete the command immediately and return the response, such as `Completed` or `Error`.
+    
+    - The `csw-messages` dependency was renamed to `csw-params` and is now compiled for both
+      the JVM and ScalaJS.
           
 - Location Service
 
     - It is no longer necessary for components (HCDs, assemblies) and applications to join the
       location service cluster and no need to define any environment variables or system properties
-      before starting the components (Previously `clusterSeeds` and `interfaceName` had to be defined).
+      before starting the components or applications (Previously `clusterSeeds` and `interfaceName` had to be defined). 
       
     - Location service access is now via an HTTP server running on each host 
     (The HTTP servers form a cluster).
+    
+    - Command line applications now use the HTTP API for location service, resulting in much 
+    faster startup times.
 
 - Event Service
 
@@ -59,9 +65,13 @@ See [here](https://tmtsoftware.github.io/csw/0.6.0/) for a detailed documentatio
 
 #### New Features
 
-- New Template for Components
+- Alarm Service
 
-    - Updated giter8 template
+    - The Alarm Service API is now complete.
+
+- New Template for Component Builders
+
+    - Updated giter8 template. You can create a new HCD or assembly project with `sbt new tmtsoftware/csw.g8`.
     
 - Test Kits
 
