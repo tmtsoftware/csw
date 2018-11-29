@@ -8,7 +8,7 @@ import csw.time.api.models.CswInstant.{TaiInstant, UtcInstant}
 import csw.time.api.scaladsl.TimeService
 import csw.time.client.extensions.RichInstant.RichInstant
 import csw.time.client.internal.native_models.{NTPTimeVal, Timex}
-import csw.time.client.internal.{TimeLibrary, TimeServiceImpl}
+import csw.time.client.internal.{TimeLibraryUtil, TimeServiceImpl}
 import csw.time.client.tags.Linux
 import org.scalatest.concurrent.Eventually
 import org.scalatest.time.SpanSugar.convertDoubleToGrainOfTime
@@ -24,10 +24,10 @@ class TimeServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
     // sets the tai offset on kernel (needed when ptp is not setup)
     timex.modes = 128
     timex.constant = TaiOffset
-    TimeLibrary.ntp_adjtime(timex)
+    TimeLibraryUtil.ntp_adjtime(timex)
     println("Status of Tai offset command=" + timex.status)
 
-    TimeLibrary.ntp_gettimex(timeVal)
+    TimeLibraryUtil.ntp_gettimex(timeVal)
     println(s"Tai offset set to [${timeVal.tai}]")
   }
 
@@ -148,6 +148,6 @@ class TimeServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
     val allowedJitterInNanos = 5 * 1000 * 1000 // should be ideally 400µs as per 3σ statistics from manual tests
 
     actualScheduleTime.value.getEpochSecond - idealScheduleTime.value.getEpochSecond shouldBe 0
-    actualScheduleTime.value.getNano - idealScheduleTime.value.getNano should be < allowedJitterInNanos
+    actualScheduleTime.value.getNano - idealScheduleTime.value.getNano should be <= allowedJitterInNanos
   }
 }
