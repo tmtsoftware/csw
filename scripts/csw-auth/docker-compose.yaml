@@ -1,0 +1,17 @@
+version: '3'
+services:
+  keycloak-server:
+    build:
+      context: keycloak-server/
+    ports:
+    - "8080:8080"
+  keycloak-config:
+    image: jboss/keycloak
+    entrypoint: "sh"
+    command: ["/var/lib/tools/configure.sh"]
+    depends_on:
+    - "keycloak-server"
+    volumes:
+    - type: bind
+      source: ./keycloak-config
+      target: /var/lib/tools
