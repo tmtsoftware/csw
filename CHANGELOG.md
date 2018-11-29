@@ -11,21 +11,63 @@ All notable changes to this project will be documented in this file.
 
 ## [CSW v0.6.0] - 2018-11-28
 
-This is version 0.6.0 the second release of the TMT Common Software for project stakeholders.  
-This release includes csw test-kit, ordering guarantee in event publish api, enhancements to command service query api & bug fixes    
-See [here](https://tmtsoftware.github.io/csw/0.6.0/) for a detailed documentation of this version of the CSW software.
+This is the version 0.6.0 release of the TMT Common Software for project stakeholders.  
+This release includes csw test-kit, ordering guarantee in event publish api, enhancements to command service query api and bug fixes.
+  
+See [here](https://tmtsoftware.github.io/csw/0.6.0/) for a detailed documentation of this version of the CSW software. See also the csw [release](https://github.com/tmtsoftware/csw/releases) page.
+
+#### Changes
+
+- GitHub Repository Renamed
+
+    - The GitHub repository has been renamed from `csw-prod` to [csw](https://github.com/tmtsoftware/csw), while the old csw repository was renamed to `csw-prototype`.
 
 #### API Changes
+
+- Package Name Changes
+
+    - The top level package in all modules has changed from `csw.services` to `csw`.
+    
 - Command Service
+
+    -  `ComponentHandlers` (Implementation classes for HCDs and Assemblies) now receive a single
+       `CswContext` object containing references to all the CSW services (Previously the services were passed as separate arguments).
     
     - `CommandService.submit()` now returns a future with the final response.
-        (Previously it returned the initial response, which could be `Accepted`. 
-        In 0.6.0 you can call `CommandService.query()` to get the initial response after the submit.)
+        Previously it returned the initial response, which could be `Accepted` for a long running command. 
+        In csw-0.6.0 you can call `CommandService.query()` to get an initial `Started` response, if needed, after the call to `submit()`.
     
-    - CommandService.query() now waits for the initial command response, if it has not yet been received
+    - `CommandService.query()` now waits for the initial command response, if it has not yet been received. Previously it returned `CommandNotAvailable` if called too early.
     
+    - There are now separate response types for submit, validation and query (Previously all used `CommandResponse`). A long running submit command now responds with `Started` (was `Accepted`).
+    
+    - The API for `ComponentHandlers` has changed. Now `onSubmit()` returns either `Started` for a 
+      long running command that will complete later, or it can complete the command immediately and return the response, such as `Completed` or `Error`.
+          
+- Location Service
+
+    - It is no longer necessary for components (HCDs, assemblies) and applications to join the
+      location service cluster and no need to define any environment variables or system properties
+      before starting the components (Previously `clusterSeeds` and `interfaceName` had to be defined).
+      
+    - Location service access is now via an HTTP server running on each host 
+    (The HTTP servers form a cluster).
+
+- Event Service
+
+    - The event service has been updated to make sure events are published in order, even if the caller does not wait for the returned future to complete before publishing again.
+
 #### New Features
+
+- New Template for Components
+
     - Updated giter8 template
+    
+- Test Kits
+
+    - Test kits are now avaiable that can start and stop CSW services inside tests so that
+      there is no need to run csw-services.sh before running the tests.
+      See `ScalaTestFrameworkTestKit` and `FrameworkTestKit` (for Java).
 
 
 ## [CSW v0.6.0-RC3] - 2018-11-21
