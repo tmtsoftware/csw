@@ -111,3 +111,9 @@ object Keycloak {
   val `keycloak-authz`        = "org.keycloak" % "keycloak-authz-client" % Version
   val `keycloak-test-helper`  = "org.keycloak" % "keycloak-test-helper" % Version
 }
+
+object Slick {
+  val Version          = "3.2.3"
+  val `slick`          = "com.typesafe.slick" %% "slick" % Version
+  val `slick-hikaricp` = "com.typesafe.slick" %% "slick-hikaricp" % Version
+}

@@ -1,15 +1,11 @@
 package csw.database.api.scaladsl
-import java.sql.ResultSet
+
+import slick.jdbc.GetResult
 
 import scala.concurrent.Future
 
 trait DatabaseService {
-
-  // Used to execute queries like create, update, delete that does not return any ResultSet
-  def execute(sql: String): Future[Unit]
-
-  // Used to execute select type of queries that return ResultSet
-  def executeQuery(sql: String): Future[ResultSet]
-
-  def closeConnection(): Future[Unit]
+  def executeQuery[T](query: String)(implicit getResult: GetResult[T]): Future[Seq[T]]
+  def execute(query: String): Future[Int]
+  def execute(queries: List[String]): Future[Unit]
 }

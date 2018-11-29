@@ -1,15 +1,22 @@
 package csw.database.client.internal
 
-import java.sql.{Connection, ResultSet, Statement}
-
 import csw.database.api.scaladsl.DatabaseService
+import slick.jdbc.PostgresProfile.api._
+import slick.jdbc.{GetResult, SQLActionBuilder, SetParameter}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class DatabaseServiceImpl(connectionF: Future[Connection])(implicit ec: ExecutionContext) extends DatabaseService {
-  private val statementF: Future[Statement] = connectionF.map(_.createStatement())
+class DatabaseServiceImpl(db: Future[Database])(implicit ec: ExecutionContext) extends DatabaseService {
 
-  override def execute(sql: String): Future[Unit]           = statementF.map(_.execute(sql))
-  override def executeQuery(sql: String): Future[ResultSet] = statementF.map(_.executeQuery(sql))
-  override def closeConnection(): Future[Unit]              = connectionF.map(_.close())
+  override def executeQuery[T](query: String)(implicit getResult: GetResult[T]): Future[Seq[T]] =
+    db.flatMap(_.run(SQLActionBuilder(query, SetParameter.SetUnit).as[T]))
+
+  override def execute(query: String): Future[Int] =
+    db.flatMap(_.run(SQLActionBuilder(query, SetParameter.SetUnit).asUpdate))
+
+  override def execute(queries: List[String]): Future[Unit] = {
+    val queryActions: List[DBIO[Int]] =
+      queries.map(SQLActionBuilder(_, SetParameter.SetUnit).asUpdate)
+    db.flatMap(_.run(DBIO.seq(queryActions: _*)))
+  }
 }

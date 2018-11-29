@@ -1,15 +1,16 @@
 package csw.database.api.javadasl
 
-import java.sql.ResultSet
 import java.util.concurrent.CompletableFuture
 
 trait IDatabaseService {
 
-  // Used to execute queries like create, update, delete that does not return any ResultSet
-  def execute(sql: String): CompletableFuture[Unit]
+  def executeQuery[T](
+      query: String,
+      mapper: java.util.function.Function[DBRow, T]
+  ): CompletableFuture[java.util.List[T]]
 
-  // Used to execute select type of queries that return ResultSet
-  def executeQuery(sql: String): CompletableFuture[ResultSet]
+  def execute(query: String): CompletableFuture[Int]
 
-  def closeConnection(): CompletableFuture[Unit]
+  def execute(queries: java.util.List[String]): CompletableFuture[Unit]
+
 }
