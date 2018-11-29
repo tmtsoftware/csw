@@ -1,7 +1,7 @@
 package example
 import akka.http.scaladsl.server._
 import akka.http.scaladsl.unmarshalling.GenericUnmarshallers
-import csw.auth.adapters.akka.http.AuthorizationPolicy.{EmptyPolicy, RealmRolePolicy, ResourceRolePolicy}
+import csw.auth.adapters.akka.http.AuthorizationPolicy.{EmptyPolicy, ResourceRolePolicy}
 import csw.auth.adapters.akka.http.{Authentication, SecurityDirectives}
 import csw.auth.core.token.TokenFactory
 import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
