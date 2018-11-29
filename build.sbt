@@ -387,6 +387,7 @@ lazy val examples = project
   .dependsOn(
     `csw-location-server`,
     `csw-config-client`,
+    `akka-http-adapter`,
     `csw-logging`,
     `csw-params-jvm`,
     `csw-framework`,

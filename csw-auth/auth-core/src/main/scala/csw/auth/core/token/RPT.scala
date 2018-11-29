@@ -14,7 +14,7 @@ private[auth] class RPT(authzClient: AuthzClient) {
     for {
       rptString ← Try { authzClient.authorization(token).authorize().getToken }
       accessToken ← JwtJson
-        .decodeJson(token, JwtOptions(signature = false, expiration = false, notBefore = false))
+        .decodeJson(rptString, JwtOptions(signature = false, expiration = false, notBefore = false))
         .map(_.as[AccessToken])
     } yield accessToken
   }
