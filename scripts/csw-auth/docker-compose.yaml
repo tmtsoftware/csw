@@ -7,8 +7,8 @@ services:
     - "8080:8080"
   keycloak-config:
     image: jboss/keycloak
-    entrypoint: "sh"
-    command: ["/var/lib/tools/configure.sh"]
+    restart: on-failure
+    entrypoint: ["/var/lib/tools/configure.sh"]
     depends_on:
     - "keycloak-server"
     volumes:
