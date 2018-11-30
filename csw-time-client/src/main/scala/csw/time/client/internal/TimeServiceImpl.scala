@@ -4,6 +4,7 @@ import java.time.{Duration, Instant}
 import java.util.concurrent.TimeUnit.NANOSECONDS
 
 import akka.actor.ActorSystem
+import com.sun.jna.NativeLong
 import csw.time.api.models.Cancellable
 import csw.time.api.models.CswInstant.{TaiInstant, UtcInstant}
 import csw.time.api.scaladsl.TimeService
@@ -37,7 +38,7 @@ class TimeServiceImpl() extends TimeService {
     val timeSpec = new TimeSpec()
     TimeLibrary.clock_gettime(clockId, timeSpec)
 
-    Instant.ofEpochSecond(timeSpec.seconds, timeSpec.nanoseconds)
+    Instant.ofEpochSecond(timeSpec.seconds.longValue(), timeSpec.nanoseconds.longValue())
   }
 
   private def delayFrom(time: TaiInstant): FiniteDuration = {
@@ -51,7 +52,7 @@ class TimeServiceImpl() extends TimeService {
     val timex = new Timex()
 
     timex.modes = 128
-    timex.constant = offset
+    timex.constant = new NativeLong(offset)
     TimeLibrary.ntp_adjtime(timex)
     println(s"Status of Tai offset command=" + timex.status)
     timex.clear()

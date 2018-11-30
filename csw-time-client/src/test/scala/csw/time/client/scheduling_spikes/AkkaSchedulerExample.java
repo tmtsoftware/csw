@@ -31,8 +31,8 @@ class MyTask1 implements Runnable {
             TimeSpec timeSpec = new TimeSpec();
 
             TimeLibrary.clock_gettime(0, timeSpec);
-            long s = timeSpec.seconds;
-            String n = String.format("%09d",timeSpec.nanoseconds);
+            long s = timeSpec.seconds.longValue();
+            String n = String.format("%09d",timeSpec.nanoseconds.longValue());
             buf.add(s+""+n);
             numWarningBeeps -= 1;
         } else {
