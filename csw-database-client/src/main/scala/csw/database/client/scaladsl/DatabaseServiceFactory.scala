@@ -1,22 +1,14 @@
 package csw.database.client.scaladsl
 import com.typesafe.config.{Config, ConfigFactory, ConfigValueFactory}
-import csw.database.api.javadasl.IDatabaseService
 import csw.database.api.scaladsl.DatabaseService
 import csw.database.client.commons.serviceresolver.{DatabaseServiceHostPortResolver, DatabaseServiceLocationResolver}
-import csw.database.client.internal.{DatabaseServiceImpl, JDatabaseServiceImpl}
-import csw.location.api.javadsl.ILocationService
+import csw.database.client.internal.DatabaseServiceImpl
 import csw.location.api.scaladsl.LocationService
-import slick.jdbc.PostgresProfile.api._
+import slick.jdbc.PostgresProfile.api.Database
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class DatabaseServiceFactory {
-  def getConfigWithUrl(url: String): Config = {
-    ConfigFactory
-      .load()
-      .getConfig("postgresConfig")
-      .withValue("url", ConfigValueFactory.fromAnyRef(url))
-  }
 
   def make(locationService: LocationService, dbName: String, user: String)(implicit ec: ExecutionContext): DatabaseService = {
     val locationResolver = new DatabaseServiceLocationResolver(locationService)
@@ -25,14 +17,6 @@ class DatabaseServiceFactory {
       Database.forConfig("", getConfigWithUrl(url))
     }
     new DatabaseServiceImpl(connectionF)
-  }
-
-  def jMake(locationService: ILocationService,
-            dbName: String,
-            user: String,
-            executionContext: ExecutionContext): IDatabaseService = {
-    implicit val ec: ExecutionContext = executionContext
-    new JDatabaseServiceImpl(make(locationService.asScala, dbName, user))
   }
 
   def make(host: String, port: Int, dbName: String, user: String)(implicit ec: ExecutionContext): DatabaseService = {
@@ -45,17 +29,14 @@ class DatabaseServiceFactory {
     new DatabaseServiceImpl(connectionF)
   }
 
-  def jMake(host: String, port: Int, dbName: String, user: String, executionContext: ExecutionContext): IDatabaseService = {
-    implicit val ec: ExecutionContext = executionContext
-    new JDatabaseServiceImpl(make(host, port, dbName, user))
-  }
+  def make(configPath: String)(implicit ec: ExecutionContext): DatabaseService =
+    new DatabaseServiceImpl(Future(Database.forConfig(configPath)))
 
-  def make(path: String)(implicit ec: ExecutionContext): DatabaseService =
-    new DatabaseServiceImpl(Future(Database.forConfig(path)))
-
-  def jMake(path: String, executionContext: ExecutionContext): IDatabaseService = {
-    implicit val ec: ExecutionContext = executionContext
-    new JDatabaseServiceImpl(make(path))
+  private def getConfigWithUrl(url: String): Config = {
+    ConfigFactory
+      .load()
+      .getConfig("postgresConfig")
+      .withValue("url", ConfigValueFactory.fromAnyRef(url))
   }
 
 }
