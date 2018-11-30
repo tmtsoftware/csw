@@ -7,8 +7,7 @@ import akka.testkit.TestProbe
 import csw.time.api.models.CswInstant.{TaiInstant, UtcInstant}
 import csw.time.api.scaladsl.TimeService
 import csw.time.client.extensions.RichInstant.RichInstant
-import csw.time.client.internal.native_models.{NTPTimeVal, Timex}
-import csw.time.client.internal.{TimeLibrary, TimeServiceImpl}
+import csw.time.client.internal.TimeServiceImpl
 import csw.time.client.tags.Linux
 import org.scalatest.concurrent.Eventually
 import org.scalatest.time.SpanSugar.convertDoubleToGrainOfTime
@@ -18,17 +17,8 @@ class TimeServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
   val TaiOffset = 37
 
   override protected def beforeAll(): Unit = {
-    val timex   = new Timex()
-    val timeVal = new NTPTimeVal()
-
-    // sets the tai offset on kernel (needed when ptp is not setup)
-    timex.modes = 128
-    timex.constant = TaiOffset
-    TimeLibrary.ntp_adjtime(timex)
-    println("Status of Tai offset command=" + timex.status)
-
-    TimeLibrary.ntp_gettimex(timeVal)
-    println(s"Tai offset set to [${timeVal.tai}]")
+    val timeService = new TimeServiceImpl()
+    timeService.setTaiOffset(TaiOffset)
   }
 
   //------------------------------UTC-------------------------------

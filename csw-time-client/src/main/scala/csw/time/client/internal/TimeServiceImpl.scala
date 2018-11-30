@@ -8,7 +8,7 @@ import csw.time.api.models.Cancellable
 import csw.time.api.models.CswInstant.{TaiInstant, UtcInstant}
 import csw.time.api.scaladsl.TimeService
 import csw.time.client.internal.extensions.RichCancellableExt.RichCancellable
-import csw.time.client.internal.native_models.{NTPTimeVal, TimeSpec}
+import csw.time.client.internal.native_models.{NTPTimeVal, TimeSpec, Timex}
 
 import scala.concurrent.duration.FiniteDuration
 
@@ -44,6 +44,19 @@ class TimeServiceImpl() extends TimeService {
     val now      = taiTime().value
     val duration = Duration.between(now, time.value)
     FiniteDuration(duration.toNanos, NANOSECONDS)
+  }
+
+  // sets the tai offset on kernel (needed when ptp is not setup)
+  private[time] def setTaiOffset(offset: Int): Unit = {
+    val timex = new Timex()
+
+    timex.modes = 128
+    timex.constant = offset
+    TimeLibrary.ntp_adjtime(timex)
+    println(s"Status of Tai offset command=" + timex.status)
+    timex.clear()
+
+    println(s"Tai offset set to [${taiOffset()}]")
   }
 
 }
