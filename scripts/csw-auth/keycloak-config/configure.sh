@@ -1,3 +1,5 @@
+#!/bin/sh
+
 function is_keycloak_running {
     local http_code=$(curl -s -o /dev/null -w "%{http_code}" http://keycloak-server:8080/auth/admin/realms)
     if [[ $http_code -eq 401 ]]; then
