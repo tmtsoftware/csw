@@ -330,7 +330,7 @@ lazy val `csw-time-api` = project
 lazy val Linux = config("linux").extend(Test)
 
 lazy val `csw-time-client` = project
-  .dependsOn(`csw-time-api`)
+  .dependsOn(`csw-time-api`, `csw-logging`)
   .configs(Linux)
   .settings(libraryDependencies ++= Dependencies.TimeClient.value)
   .settings(inConfig(Linux)(Defaults.testTasks): _*)
