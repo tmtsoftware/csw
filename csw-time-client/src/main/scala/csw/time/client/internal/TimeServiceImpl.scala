@@ -9,14 +9,12 @@ import csw.time.api.models.Cancellable
 import csw.time.api.models.CswInstant.{TaiInstant, UtcInstant}
 import csw.time.api.scaladsl.TimeService
 import csw.time.client.internal.extensions.RichCancellableExt.RichCancellable
+import csw.time.client.internal.native_models.ClockId.{ClockRealtime, ClockTAI}
 import csw.time.client.internal.native_models.{NTPTimeVal, TimeSpec, Timex}
 
 import scala.concurrent.duration.FiniteDuration
 
 class TimeServiceImpl(implicit actorSystem: ActorSystem) extends TimeService {
-  private val ClockRealtime = 0 // todo: can this go in constants with some docs?
-  private val ClockTAI      = 11
-
   override def utcTime(): UtcInstant = UtcInstant(instantFor(ClockRealtime))
 
   override def taiTime(): TaiInstant = TaiInstant(instantFor(ClockTAI))
