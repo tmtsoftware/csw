@@ -5,7 +5,6 @@ import java.time._
 import akka.actor.ActorSystem
 import akka.testkit.TestProbe
 import csw.time.api.models.CswInstant.{TaiInstant, UtcInstant}
-import csw.time.api.scaladsl.TimeService
 import csw.time.client.extensions.RichInstant.RichInstant
 import csw.time.client.internal.TimeServiceImpl
 import csw.time.client.tags.Linux
@@ -16,7 +15,8 @@ import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 class TimeServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with Eventually {
   private val TaiOffset = 37 // At the time of writing this, TAI is ahead of UTC by 37 seconds.
 
-  var timeService: TimeServiceImpl = _
+  override implicit val patienceConfig: PatienceConfig = PatienceConfig(50.millis, 10.millis)
+  var timeService: TimeServiceImpl                     = _
 
   override protected def beforeAll(): Unit = {
     implicit val system: ActorSystem = ActorSystem("time-service")
@@ -39,11 +39,10 @@ class TimeServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
 
   //DEOPSCSW-534: PTP accuracy and precision while reading UTC
   test("should get precision up to nanoseconds in UTC time", Linux) {
-    //todo: patience config in constructor
-    //todo: comment why test is written with eventually
-    eventually(timeout = timeout(50.millis), interval = interval(10.millis))(
-      timeService.utcTime().value.formatNanos should not endWith "000"
-    )
+    // This test is written in eventually block because coincidentally digits at nano place can be "000".
+    // To cover that edge-case eventually is used.
+
+    eventually(timeService.utcTime().value.formatNanos should not endWith "000")
   }
 
   //DEOPSCSW-533: Access parts of UTC date.time in Java and Scala
@@ -80,9 +79,10 @@ class TimeServiceTest extends FunSuite with Matchers with BeforeAndAfterAll with
 
   //DEOPSCSW-538: PTP accuracy and precision while reading TAI
   test("should get precision up to nanoseconds in TAI time", Linux) {
-    eventually(timeout = timeout(50.millis), interval = interval(10.millis))(
-      timeService.taiTime().value.formatNanos should not endWith "000"
-    )
+    // This test is written in eventually block because coincidentally digits at nano place can be "000".
+    // To cover that edge-case eventually is used.
+
+    eventually(timeService.taiTime().value.formatNanos should not endWith "000")
   }
 
   //DEOPSCSW-536: Access parts of TAI date.time in Java and Scala
